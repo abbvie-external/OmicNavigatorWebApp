@@ -1,0 +1,85 @@
+// Small tablets and large smartphones (landscape view)
+$screen-sm-min: 576px;
+
+// Small tablets (portrait view)
+$screen-md-min: 768px;
+
+// Tablets and small desktops
+$screen-lg-min: 992px;
+
+// Large tablets and desktops
+$screen-xl-min: 1200px;
+
+// Small devices
+@mixin sm {
+  @media (min-width: #{$screen-sm-min}) {
+    @content;
+  }
+}
+
+// Medium devices
+@mixin md {
+  @media (min-width: #{$screen-md-min}) {
+    @content;
+  }
+}
+
+// Large devices
+@mixin lg {
+  @media (min-width: #{$screen-lg-min}) {
+    @content;
+  }
+}
+
+// Extra large devices
+@mixin xl {
+  @media (min-width: #{$screen-xl-min}) {
+    @content;
+  }
+}
+
+.AppContainer {
+  background-color: whitesmoke;
+  height: 100vh;
+
+  .TopBar {
+    background-color: #00163b !important;
+    padding: 5px 0px 5px 0px !important;
+
+    .Title {
+      font-size: 20px;
+      color: white !important;
+    }
+  }
+
+  .BreadcrumbContainer {
+    margin-bottom: 25px !important;
+  }
+
+  .deviceMargin {
+    margin: 20px 15px 30px 15px !important;
+
+    // 992px window width and more
+    @include xl {
+      margin: 0px !important;
+    }
+  }
+
+  .PlotContainer, .ChartsContainer {
+    margin-top: 5px !important;
+    min-height: 75vh !important;
+  
+    .PlotSVG {
+      height: 75vh !important;
+    }
+    
+  }
+
+  .phophositeIcon {
+    float: right;
+    height: 16px;
+    width: 16px;
+    cursor: pointer;
+  }
+
+}

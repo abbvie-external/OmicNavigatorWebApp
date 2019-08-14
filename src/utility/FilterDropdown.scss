@@ -1,0 +1,51 @@
+.DateFilterDropdown.ui.dropdown.dropdown .ui.input {
+  min-width: 15rem;
+}
+
+/* make the native arrow invisible and stretch it 
+  over the whole field so you can click anywhere in 
+  the input field to trigger the native datepicker*/
+.DateFilterDropdown input[type='date']::-webkit-calendar-picker-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: auto;
+  height: auto;
+  color: transparent;
+  background: transparent;
+}
+
+/* adjust increase/decrease button */
+.DateFilterDropdown input[type='date']::-webkit-inner-spin-button {
+  display: none;
+}
+
+/* adjust clear button */
+.DateFilterDropdown input[type='date']::-webkit-clear-button {
+  z-index: 1;
+}
+
+.dropdownItem {
+  cursor: pointer;
+  padding: 0.78571429rem 1.14285714rem;
+  font-size: 1rem;
+  line-height: 1rem;
+  font-weight: 400;
+  // min-width: 100%;
+  width: 100% !important;
+  &:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: rgba(0, 0, 0, 0.95);
+    z-index: 13;
+  }
+}
+.dropdownMenu {
+  width: 25vw !important;
+  position: static;
+  border-top: 1px solid rgba(34, 36, 38, 0.15);
+  & div.ReactVirtualized__Grid__innerScrollContainer {
+    max-width: 25vw !important;
+  }
+}
