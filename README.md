@@ -1,3 +1,5 @@
+To develop, first install node modules from top level folder using `npm install`, then run `npm start`, which will open the app at localhost:3000
+
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
 
 Below you will find some information on how to perform common tasks.<br>
