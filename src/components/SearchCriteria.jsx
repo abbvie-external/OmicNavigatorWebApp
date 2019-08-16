@@ -2,34 +2,7 @@ import React, { Component } from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import { Form, Select, Segment, Button } from 'semantic-ui-react';
 import { phosphoprotService } from '../services/phosphoprot.service';
-
-// Mock Data until services are wired up
-const studies = [
-  { key: 'p', text: '***REMOVED***', value: '***REMOVED***' },
-  { key: 'h', text: '***REMOVED***', value: 'hpk1' },
-  { key: 'c', text: '***REMOVED***', value: '***REMOVED***' }
-];
-
-// const studies = [{}];
-
-const testCategories = [
-  {
-    key: 'd',
-    text: 'DonorDifferentialPhosphorylation',
-    value: 'donordifferentialphosphorylation'
-  },
-  {
-    key: 't',
-    text: 'TreatmentDifferentialPhosphorylation',
-    value: 'treatmentdifferentialphosphorylation'
-  }
-];
-
-const tests = [
-  { key: 'd1d2', text: 'Donor1vDonor2', value: 'donor1vdonor2' },
-  { key: 'd1d3', text: 'Donor1vDonor3', value: 'tesdonor1vdonor3tb' },
-  { key: 'd2d3', text: 'Donor2vDonor3', value: 'tesdonor2vdonor3tb' }
-];
+import _ from 'lodash';
 
 class SearchCriteria extends Component {
   constructor() {
@@ -37,21 +10,40 @@ class SearchCriteria extends Component {
     this.state = {
       view: 'pepplot',
       study: '',
+      studies: [],
       model: '',
+      models: [],
       test: '',
+      tests: [],
       modelsDisabled: true,
       testsDisabled: true,
-      selectedView: '',
-      selectedStudy: '',
-      selectedModel: '',
-      selectedTest: ''
+      searchDisabled: true
+      // selectedView: "",
+      // selectedStudy: "",
+      // selectedModel: "",
+      // selectedTest: ""
     };
-    this.handleChange = this.handleChange.bind(this);
     this.handleViewChange = this.handleViewChange.bind(this);
+    this.handleStudyChange = this.handleStudyChange.bind(this);
+    this.handleModelChange = this.handleModelChange.bind(this);
     this.handleSearch = this.handleSearch.bind(this);
+    this.populateStudies = this.populateStudies.bind(this);
   }
 
-  handleChange = (evt, { name, value }) => this.setState({ [name]: value });
+  componentDidMount() {
+    this.populateStudies();
+  }
+
+  populateStudies() {
+    phosphoprotService.getStudies().then(studiesFromService => {
+      const studiesArr = studiesFromService.map(study => {
+        return { key: study, text: study, value: study };
+      });
+      this.setState({
+        studies: studiesArr
+      });
+    });
+  }
 
   handleViewChange = choice => {
     return evt => {
@@ -62,43 +54,93 @@ class SearchCriteria extends Component {
         test: '',
         modelsDisabled: true,
         testsDisabled: true,
-        selectedView: '',
-        selectedStudy: '',
-        selectedModel: '',
-        selectedTest: ''
+        searchDisabled: true
+        // selectedView: "",
+        // selectedStudy: "",
+        // selectedModel: "",
+        // selectedTest: ""
       });
     };
+  };
+
+  handleStudyChange = (evt, { name, value }) => {
+    this.setState({
+      [name]: value,
+      model: '',
+      test: '',
+      modelsDisabled: true,
+      testsDisabled: true,
+      searchDisabled: true
+    });
+    this.state.study = value;
+    const modelNamesParam =
+      this.state.view === 'pepplot' ? 'inferenceNames' : 'EnrichmentNames';
+    phosphoprotService
+      .getModelNames(modelNamesParam, this.state.study + 'plots')
+      .then(modelsFromService => {
+        this.allNames = modelsFromService;
+        const modelsArr = _.map(_.keys(modelsFromService), function(modelName) {
+          return { key: modelName, text: modelName, value: modelName };
+        });
+        this.setState({
+          modelsDisabled: false,
+          models: modelsArr
+        });
+      });
+  };
+
+  handleModelChange = (evt, { name, value }) => {
+    this.setState({
+      test: '',
+      [name]: value
+    });
+    const testsArr = _.map(this.allNames[value], function(testName) {
+      return { key: testName, text: testName, value: testName };
+    });
+    this.setState({
+      testsDisabled: false,
+      searchDisabled: true,
+      tests: testsArr
+    });
+  };
+
+  handleTestChange = (evt, { name, value }) => {
+    this.setState({
+      [name]: value
+    });
+    this.state.test = value;
+    const testResultsParam =
+      this.state.view === 'pepplot'
+        ? 'getInferenceResults'
+        : 'getEnrichmentResults';
+    phosphoprotService
+      .getTestData(
+        this.state.view,
+        testResultsParam,
+        this.state.model,
+        this.state.test,
+        this.state.study + 'plots'
+      )
+      .then(dataFromService => {
+        this.data = dataFromService;
+        // committing here, next step is to integrate this data into the grid...
+      });
   };
 
   validSearch = () => {
     console.log('Add Validation that view, study, model, test have values');
   };
 
-  handleSearch = e => {
-    e.preventDefault();
-    const { view, study, model, test } = this.state;
-    this.setState({
-      selectedView: view,
-      selectedStudy: study,
-      selectedModel: model,
-      selectedTest: test
-    });
+  handleSearch = evt => {
+    evt.preventDefault();
+    // const { view, study, model, test } = this.state;
+    // this.setState({
+    //   selectedView: view,
+    //   selectedStudy: study,
+    //   selectedModel: model,
+    //   selectedTest: test
+    // });
     // this.props.history.push('/{view}');
-  };
-
-  componentDidMount() {
-    this.populateStudies();
-  }
-
-  populateStudies = () => {
-    phosphoprotService.getStudies();
-    // phosphoprotService.getStudies()
-    //   .then((studies) => (
-    //     this.setState({
-    //       modelsDisabled: false,
-    //       studies: studies
-    //     })
-    // ));
   };
 
   render() {
@@ -106,11 +148,11 @@ class SearchCriteria extends Component {
       view,
       study,
       model,
-      test,
-      selectedView,
-      selectedStudy,
-      selectedModel,
-      selectedTest
+      test
+      // selectedView,
+      // selectedStudy,
+      // selectedModel,
+      // selectedTest
     } = this.state;
 
     return (
@@ -148,35 +190,37 @@ class SearchCriteria extends Component {
               required
               label="Study"
               name="study"
-              value={study}
-              options={studies}
+              value={this.state.study}
+              options={this.state.studies}
               placeholder="Select A Study"
-              onChange={this.handleChange}
+              onChange={this.handleStudyChange}
             />
             <Form.Field
               control={Select}
               required
               label="Model"
               name="model"
-              value={model}
-              options={testCategories}
+              value={this.state.model}
+              options={this.state.models}
               placeholder="Select Model"
-              onChange={this.handleChange}
+              onChange={this.handleModelChange}
+              disabled={this.state.modelsDisabled}
             />
             <Form.Field
               control={Select}
               required
               name="test"
-              value={test}
-              options={tests}
+              value={this.state.test}
+              options={this.state.tests}
               placeholder="Select Test"
-              onChange={this.handleChange}
+              onChange={this.handleTestChange}
+              disabled={this.state.testsDisabled}
               label={{
                 children: 'Test',
-                htmlFor: 'form-select-control-gender'
+                htmlFor: 'form-select-control-test'
               }}
               search
-              searchInput={{ id: 'form-select-control-gender' }}
+              searchInput={{ id: 'form-select-control-test' }}
             />
             <Link
               to={{
@@ -186,7 +230,11 @@ class SearchCriteria extends Component {
                 }
               }}
             >
-              <Form.Button content="Search"></Form.Button>
+              <Form.Button
+                content="Search"
+                type="submit"
+                disabled={this.state.searchDisabled}
+              ></Form.Button>
             </Link>
           </Segment>
         </Form>

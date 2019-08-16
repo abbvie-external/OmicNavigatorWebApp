@@ -11,13 +11,15 @@ export * from '../selectors/quickViewSelector';
 export { QHGrid, EZGrid, QuickViewModal };
 export { getField, getFieldValue, typeMap };
 
+// import { additionalTemplateInfo } from '../utility/additionalTemplateInfo';
+
 const mockColumns = [
   {
     title: 'Protein_Site',
     field: 'Protein_Site',
     type: 'number',
     filterable: { type: 'multiFilter' },
-    template: (value, item, additionalParameters) => {
+    template: (value, item, addParams) => {
       return (
         <p>
           {value}
@@ -26,7 +28,7 @@ const mockColumns = [
             alt="Phosophosite"
             class="phophositeIcon"
           />
-          {/* <img  src="phosphosite.ico" alt="Phosophosite" class="phosphositeIcon" data-manifest={item} onClick="additionalParameters.showPhosphositePlus(e, item)" /> */}
+          {/* <img  src="phosphosite.ico" alt="Phosophosite" class="phosphositeIcon" data-manifest={item} onClick={addParams.showPhosphositePlus(item)} /> */}
         </p>
       );
     }
@@ -71,6 +73,44 @@ const mockColumns = [
     type: 'number'
   }
 ];
+
+class PepplotContainer extends Component {
+  state = {};
+  componentDidMount() {
+    this.phosphorylationData = this.phosphorylationData.bind(this);
+  }
+
+  render() {
+    return (
+      <Segment className="PepplotResultsContainer">
+        <EZGrid
+          // data={this.state.data}
+          data={mockData}
+          height="60vh"
+          columnsConfig={mockColumns}
+        />
+        <br></br>
+        <Link
+          to={{
+            pathname: `/plot`,
+            state: {
+              view: this.state.view
+            }
+          }}
+        >
+          <Button primary content="Mock Protein Site Click"></Button>
+        </Link>
+      </Segment>
+    );
+  }
+
+  phosphorylationData() {
+    const result = {
+      data: process(this.testData, this.stateExcelExport).data
+    };
+    return result;
+  }
+}
 
 const mockData = [
   {
@@ -338,44 +378,5 @@ const mockData = [
     Protein: 'CCDC86'
   }
 ];
-
-class PepplotContainer extends Component {
-  state = {};
-
-  componentDidMount() {
-    this.phosphorylationData = this.phosphorylationData.bind(this);
-  }
-
-  render() {
-    return (
-      <Segment className="PepplotResultsContainer">
-        <EZGrid
-          // data={this.state.data}
-          data={mockData}
-          height="60vh"
-          columnsConfig={mockColumns}
-        />
-        <br></br>
-        <Link
-          to={{
-            pathname: `/plot`,
-            state: {
-              view: this.state.view
-            }
-          }}
-        >
-          <Button primary content="Mock Protein Site Click"></Button>
-        </Link>
-      </Segment>
-    );
-  }
-
-  phosphorylationData() {
-    const result = {
-      data: process(this.testData, this.stateExcelExport).data
-    };
-    return result;
-  }
-}
 
 export default PepplotContainer;
