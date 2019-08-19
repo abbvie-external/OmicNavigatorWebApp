@@ -8,7 +8,7 @@ class SearchCriteria extends Component {
   constructor() {
     super();
     this.state = {
-      view: 'pepplot',
+      tab: 'pepplot',
       study: '',
       studies: [],
       model: '',
@@ -17,11 +17,11 @@ class SearchCriteria extends Component {
       tests: [],
       modelsDisabled: true,
       testsDisabled: true,
-      searchDisabled: true
+      searchValid: false
     };
-    this.handleViewChange = this.handleViewChange.bind(this);
     this.handleStudyChange = this.handleStudyChange.bind(this);
     this.handleModelChange = this.handleModelChange.bind(this);
+    this.isValidSearch = this.isValidSearch.bind(this);
     this.handleSearch = this.handleSearch.bind(this);
     this.populateStudies = this.populateStudies.bind(this);
   }
@@ -41,20 +41,6 @@ class SearchCriteria extends Component {
     });
   }
 
-  handleViewChange = choice => {
-    return evt => {
-      this.setState({
-        view: choice,
-        study: '',
-        model: '',
-        test: '',
-        modelsDisabled: true,
-        testsDisabled: true,
-        searchDisabled: true
-      });
-    };
-  };
-
   handleStudyChange = (evt, { name, value }) => {
     this.setState({
       [name]: value,
@@ -62,7 +48,7 @@ class SearchCriteria extends Component {
       test: '',
       modelsDisabled: true,
       testsDisabled: true,
-      searchDisabled: true
+      searchValid: false
     });
     this.state.study = value;
     const modelNamesParam =
@@ -91,7 +77,7 @@ class SearchCriteria extends Component {
     });
     this.setState({
       testsDisabled: false,
-      searchDisabled: true,
+      searchValid: false,
       tests: testsArr
     });
   };
@@ -115,24 +101,27 @@ class SearchCriteria extends Component {
       )
       .then(dataFromService => {
         this.data = dataFromService;
+        this.setState({
+          validSearch: true
+        });
         // committing here, next step is to integrate this data into the grid...
       });
   };
 
-  validSearch = () => {
-    console.log('Add Validation that view, study, model, test have values');
-  };
+  isValidSearch() {
+    return false;
+  }
 
   handleSearch = evt => {
     evt.preventDefault();
-    // const { view, study, model, test } = this.state;
+    // const { tab, study, model, test } = this.state;
     // this.setState({
     // });
-    // this.props.history.push('/{view}');
+    // this.props.history.push('/{tab}');
   };
 
   render() {
-    const { view, study, model, test } = this.state;
+    const { tab, study, model, test } = this.state;
 
     return (
       <div className="SearchCriteriaContainer">

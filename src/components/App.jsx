@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route, Switch } from 'react-router-dom';
+import { Route, Switch, Redirect } from 'react-router-dom';
 import { Grid, Message } from 'semantic-ui-react';
 import TopBar from './TopBar';
 import SearchCriteria from './SearchCriteria';
@@ -40,10 +40,7 @@ const App = () => (
             <Route exact path="/plot" component={PlotContainer} />
             <Route exact path="/enrichment" component={EnrichmentContainer} />
             <Route exact path="/charts" component={ChartsContainer} />
-            <Route exact path="/" component={SearchPrompt} />
-            {/* <Route exact path="/public/***REMOVED***.html" component={StudyHTMLContainer} />
-        <Route exact path="/public/***REMOVED***.html" component={StudyHTMLContainer} />
-        <Route exact path="/public/***REMOVED***.html" component={StudyHTMLContainer} /> */}
+            <Route exact path="/" render={() => <Redirect to="/pepplot" />} />
             <Route component={NoMatch} />
           </Switch>
         </Grid.Column>

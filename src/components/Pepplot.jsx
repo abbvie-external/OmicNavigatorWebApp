@@ -1,18 +1,53 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from 'semantic-ui-react';
-// import ButtonActions from './ButtonActions'
+// import ButtonActions from './ButtonActions';
+import SearchPrompt from './SearchPrompt';
 
 import QHGrid from '../utility/QHGrid';
 import EZGrid from '../utility/EZGrid';
 import QuickViewModal from '../utility/QuickViewModal';
 import { getFieldValue, getField, typeMap } from '../selectors/QHGridSelector';
+import SearchCriteria from './SearchCriteria';
 export * from '../utility/FilterTypeConfig';
 export * from '../selectors/quickViewSelector';
 export { QHGrid, EZGrid, QuickViewModal };
 export { getField, getFieldValue, typeMap };
 
 // import { additionalTemplateInfo } from '../utility/additionalTemplateInfo';
+
+class PepplotContainer extends Component {
+  state = {
+    isValidSearch: true
+  };
+  componentDidMount() {
+    this.phosphorylationData = this.phosphorylationData.bind(this);
+  }
+
+  render() {
+    return (
+      <div className="PepplotResultsContainer">
+        {this.state.isValidSearch ? (
+          <EZGrid
+            // data={this.state.data}
+            data={mockData}
+            height="60vh"
+            columnsConfig={mockColumns}
+          />
+        ) : (
+          <SearchPrompt />
+        )}
+      </div>
+    );
+  }
+
+  phosphorylationData() {
+    const result = {
+      data: process(this.testData, this.stateExcelExport).data
+    };
+    return result;
+  }
+}
 
 const mockColumns = [
   {
@@ -74,45 +109,6 @@ const mockColumns = [
     type: 'number'
   }
 ];
-
-class PepplotContainer extends Component {
-  state = {};
-  componentDidMount() {
-    this.phosphorylationData = this.phosphorylationData.bind(this);
-  }
-
-  render() {
-    return (
-      <div className="PepplotResultsContainer">
-        {/* <ButtonActions /> */}
-        <EZGrid
-          // data={this.state.data}
-          data={mockData}
-          height="60vh"
-          columnsConfig={mockColumns}
-        />
-        <br></br>
-        <Link
-          to={{
-            pathname: `/plot`,
-            state: {
-              view: this.state.view
-            }
-          }}
-        >
-          <Button primary content="Mock Protein Site Click"></Button>
-        </Link>
-      </div>
-    );
-  }
-
-  phosphorylationData() {
-    const result = {
-      data: process(this.testData, this.stateExcelExport).data
-    };
-    return result;
-  }
-}
 
 const mockData = [
   {
