@@ -1,21 +1,14 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { Breadcrumb, Button } from 'semantic-ui-react';
+import { Breadcrumb, Icon } from 'semantic-ui-react';
 
 class Breadcrumbs extends Component {
   state = {
-    view: 'pepplot',
+    tab: 'pepplot',
     study: '***REMOVED***',
     model: 'donordifferentialphosphorylation',
     test: 'donor1vdonor3',
-    protein: 'HMGA1_S44',
-    studiesFetched: true,
-    testCategoriesFetched: true,
-    testsFetched: true,
-    selectedView: 'pepplot',
-    selectedStudy: '***REMOVED***',
-    selectedModel: 'donordifferentialphosphorylation',
-    selectedTest: 'donor1vdonor3'
+    protein: 'HMGA1_S44'
   };
 
   componentDidMount() {}
@@ -24,22 +17,17 @@ class Breadcrumbs extends Component {
     return (
       <div className="BreadcrumbContainer">
         <div className="deviceMargin">
-          <Breadcrumb size="large">
-            <Link to={{ pathname: `/` }}>
+          <Breadcrumb size="small">
+            <Link to={{ pathname: `/pepplot` }}>
               <Breadcrumb.Section>
-                {this.state.view} {this.state.study} {this.state.model}{' '}
-                {this.state.test}
+                <Icon name="home" />
               </Breadcrumb.Section>
             </Link>
             <Breadcrumb.Divider icon="right chevron" />
-            <Breadcrumb.Section>{this.state.protein}</Breadcrumb.Section>
+            <Breadcrumb.Section active={this.state.protein !== ''}>
+              {this.state.protein}
+            </Breadcrumb.Section>
           </Breadcrumb>
-
-          <Link to={{ pathname: `/` }}>
-            <Button className="BackToGrid" size="small" floated="right">
-              Back
-            </Button>
-          </Link>
         </div>
       </div>
     );

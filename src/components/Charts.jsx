@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { Grid, Segment, Icon, Header, Button } from 'semantic-ui-react';
-import Steps from './Steps';
+import Breadcrumbs from './Breadcrumbs';
 
 class ChartsContainer extends Component {
   state = {};
@@ -11,7 +11,7 @@ class ChartsContainer extends Component {
   render() {
     return (
       <div className="">
-        <Steps />
+        <Breadcrumbs />
         <Segment className="ChartsContainer">
           <Grid divided="vertically">
             <Grid.Row columns={1}>

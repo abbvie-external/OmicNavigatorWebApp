@@ -1,18 +1,16 @@
 import React from 'react';
-import { Segment, Message } from 'semantic-ui-react';
+import { Header, Image } from 'semantic-ui-react';
 
 const SearchPrompt = () => (
-  <Segment className="Search Prompt">
-    <Message info floating>
-      <Message.Header>Please Select</Message.Header>
-      <Message.List>
-        <Message.Item>Differential or Enrichment</Message.Item>
-        <Message.Item>Study</Message.Item>
-        <Message.Item>Model</Message.Item>
-        <Message.Item>Test</Message.Item>
-      </Message.List>
-    </Message>
-  </Segment>
+  <div className="SearchPrompt">
+    <Image src="empty_search.png" size="medium" centered />
+    <Header as="h2" textAlign="center">
+      No records available
+    </Header>
+    <Header as="h4" textAlign="center">
+      Use the filters to display relevant records
+    </Header>
+  </div>
 );
 
 export default SearchPrompt;

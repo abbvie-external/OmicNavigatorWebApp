@@ -21,9 +21,7 @@ class EnrichmentContainer extends Component {
                 <Link
                   to={{
                     pathname: `/charts`,
-                    state: {
-                      view: this.state.view
-                    }
+                    state: {}
                   }}
                 >
                   <Button primary content="Mock Chart Click"></Button>

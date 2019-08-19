@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Link, withRouter } from 'react-router-dom';
-import { Form, Select, Segment, Button } from 'semantic-ui-react';
+import { Form, Select } from 'semantic-ui-react';
 import { phosphoprotService } from '../services/phosphoprot.service';
 import _ from 'lodash';
 
@@ -18,10 +18,6 @@ class SearchCriteria extends Component {
       modelsDisabled: true,
       testsDisabled: true,
       searchDisabled: true
-      // selectedView: "",
-      // selectedStudy: "",
-      // selectedModel: "",
-      // selectedTest: ""
     };
     this.handleViewChange = this.handleViewChange.bind(this);
     this.handleStudyChange = this.handleStudyChange.bind(this);
@@ -55,10 +51,6 @@ class SearchCriteria extends Component {
         modelsDisabled: true,
         testsDisabled: true,
         searchDisabled: true
-        // selectedView: "",
-        // selectedStudy: "",
-        // selectedModel: "",
-        // selectedTest: ""
       });
     };
   };
@@ -74,7 +66,7 @@ class SearchCriteria extends Component {
     });
     this.state.study = value;
     const modelNamesParam =
-      this.state.view === 'pepplot' ? 'inferenceNames' : 'EnrichmentNames';
+      this.state.tab === 'pepplot' ? 'inferenceNames' : 'EnrichmentNames';
     phosphoprotService
       .getModelNames(modelNamesParam, this.state.study + 'plots')
       .then(modelsFromService => {
@@ -110,12 +102,12 @@ class SearchCriteria extends Component {
     });
     this.state.test = value;
     const testResultsParam =
-      this.state.view === 'pepplot'
+      this.state.tab === 'pepplot'
         ? 'getInferenceResults'
         : 'getEnrichmentResults';
     phosphoprotService
       .getTestData(
-        this.state.view,
+        this.state.tab,
         testResultsParam,
         this.state.model,
         this.state.test,
@@ -135,120 +127,59 @@ class SearchCriteria extends Component {
     evt.preventDefault();
     // const { view, study, model, test } = this.state;
     // this.setState({
-    //   selectedView: view,
-    //   selectedStudy: study,
-    //   selectedModel: model,
-    //   selectedTest: test
     // });
     // this.props.history.push('/{view}');
   };
 
   render() {
-    const {
-      view,
-      study,
-      model,
-      test
-      // selectedView,
-      // selectedStudy,
-      // selectedModel,
-      // selectedTest
-    } = this.state;
+    const { view, study, model, test } = this.state;
 
     return (
       <div className="SearchCriteriaContainer">
         <Form
-          size="small"
+          size="medium"
           className="SearchCriteria"
           onSubmit={this.handleSearch.bind(this)}
         >
-          <Segment className="">
-            <Button.Group className="">
-              <Button
-                type="button"
-                className="DifferentialButton"
-                positive={this.state.view === 'pepplot'}
-                onClick={this.handleViewChange('pepplot')}
-              >
-                Differential
-              </Button>
-              <Button.Or className="OrCircle" />
-              <Button
-                type="button"
-                className="EnrichmentButton"
-                positive={this.state.view === 'enrichment'}
-                onClick={this.handleViewChange('enrichment')}
-              >
-                Enrichment
-              </Button>
-            </Button.Group>
-          </Segment>
-
-          <Segment>
-            <Form.Field
-              control={Select}
-              required
-              label="Study"
-              name="study"
-              value={this.state.study}
-              options={this.state.studies}
-              placeholder="Select A Study"
-              onChange={this.handleStudyChange}
-            />
-            <Form.Field
-              control={Select}
-              required
-              label="Model"
-              name="model"
-              value={this.state.model}
-              options={this.state.models}
-              placeholder="Select Model"
-              onChange={this.handleModelChange}
-              disabled={this.state.modelsDisabled}
-            />
-            <Form.Field
-              control={Select}
-              required
-              name="test"
-              value={this.state.test}
-              options={this.state.tests}
-              placeholder="Select Test"
-              onChange={this.handleTestChange}
-              disabled={this.state.testsDisabled}
-              label={{
-                children: 'Test',
-                htmlFor: 'form-select-control-test'
-              }}
-              search
-              searchInput={{ id: 'form-select-control-test' }}
-            />
-            <Link
-              to={{
-                pathname: `/${this.state.view}`,
-                state: {
-                  view: this.state.view
-                }
-              }}
-            >
-              <Form.Button
-                content="Search"
-                type="submit"
-                disabled={this.state.searchDisabled}
-              ></Form.Button>
-            </Link>
-          </Segment>
+          <p className="CondensedBoldText">FILTERS</p>
+          <Form.Field
+            control={Select}
+            required
+            label="Study"
+            name="study"
+            value={this.state.study}
+            options={this.state.studies}
+            placeholder="Select A Study"
+            onChange={this.handleStudyChange}
+          />
+          <Form.Field
+            control={Select}
+            required
+            label="Model"
+            name="model"
+            value={this.state.model}
+            options={this.state.models}
+            placeholder="Select Model"
+            onChange={this.handleModelChange}
+            disabled={this.state.modelsDisabled}
+          />
+          <Form.Field
+            control={Select}
+            required
+            name="test"
+            value={this.state.test}
+            options={this.state.tests}
+            placeholder="Select Test"
+            onChange={this.handleTestChange}
+            disabled={this.state.testsDisabled}
+            label={{
+              children: 'Test',
+              htmlFor: 'form-select-control-test'
+            }}
+            search
+            searchInput={{ id: 'form-select-control-test' }}
+          />
         </Form>
-        <br></br>
-        <strong>onChange:</strong>
-        <pre>{JSON.stringify({ view, study, model, test }, null, 2)}</pre>
-        {/* <strong>onSubmit:</strong>
-        <pre>
-          {JSON.stringify(
-            { selectedView, selectedStudy, selectedModel, selectedTest },
-            null,
-            2
-          )}
-        </pre> */}
       </div>
     );
   }

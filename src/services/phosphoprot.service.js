@@ -1,6 +1,6 @@
-import _ from 'lodash';
+// import _ from 'lodash';
 // import jQuery from './scripts/jquery-1.11.1';
-import ocpu from '../scripts/opencpu-0.4';
+// import ocpu from '../scripts/opencpu-0.4';
 
 class PhosphoprotService {
   constructor() {
@@ -47,9 +47,9 @@ class PhosphoprotService {
     });
   }
 
-  async getTestData(view, rName, model, test, study) {
+  async getTestData(tab, rName, model, test, study) {
     this.setUrl();
-    const dynamicKey = view === 'pepplot' ? 'test' : 'annotation';
+    const dynamicKey = tab === 'pepplot' ? 'test' : 'annotation';
     const obj = { testCategory: model, [dynamicKey]: test, study: study };
     const promise = this.ocpuCall(rName, obj);
     const dataFromPromise = await promise;

@@ -1,42 +1,52 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 // import { client } from '../Client';
-import { Grid, Menu, Button } from 'semantic-ui-react';
+import { Grid, Menu } from 'semantic-ui-react';
 
 class TopBar extends Component {
-  state = {};
+  state = { activeTab: 'pepplot' };
 
   componentDidMount() {}
 
+  handleTabClick = (e, { name }) => this.setState({ activeTab: name });
+
   render() {
+    const { activeTab } = this.state;
     return (
       <Grid.Column className="TopBar" relaxed width={16}>
-        <Menu secondary inverted size="mini">
-          <Link to={{ pathname: `/` }}>
-            <Menu.Item className="Title" name="Phosphoproteomic Analyzer" />
-          </Link>
-          <Menu.Menu position="right">
-            <Menu.Item>
-              <div>
-                {/* <Link
-                to={{
-                  pathname: `/public/{{selectedStudy}}.html`,
-                }}
-                target="blank"
-              > */}
-                <Button
-                  inverted
-                  size="small"
-                  href="public/***REMOVED***.html"
-                  // rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  Study HTML
-                </Button>
-                {/* </Link> */}
-              </div>
+        <Menu inverted pointing secondary className="TopBar">
+          <Menu.Item className="LogoEl">
+            <img
+              alt="Phosphoproteomic Analyzer"
+              src="/icon.png"
+              className="Logo"
+            />
+          </Menu.Item>
+          <Menu.Item className="Title">
+            <b>Phosphoproteomic</b>&nbsp;
+            <span className="thinItalic">Analyzer</span>
+          </Menu.Item>
+          <Link to={{ pathname: `/pepplot` }}>
+            <Menu.Item
+              onClick={this.handleTabClick}
+              className="Tab"
+              name="pepplot"
+              active={activeTab === 'pepplot'}
+            >
+              Differential Phosophate Analysis
             </Menu.Item>
-          </Menu.Menu>
+          </Link>
+
+          <Link to={{ pathname: `/enrichment` }}>
+            <Menu.Item
+              onClick={this.handleTabClick}
+              className="Tab"
+              name="enrichment"
+              active={activeTab === 'enrichment'}
+            >
+              Enrichment Analysis
+            </Menu.Item>
+          </Link>
         </Menu>
       </Grid.Column>
     );

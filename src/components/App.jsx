@@ -1,6 +1,6 @@
 import React from 'react';
 import { Route, Switch } from 'react-router-dom';
-import { Grid, Segment, Message } from 'semantic-ui-react';
+import { Grid, Message } from 'semantic-ui-react';
 import TopBar from './TopBar';
 import SearchCriteria from './SearchCriteria';
 import SearchPrompt from './SearchPrompt';
@@ -13,7 +13,7 @@ import './App.scss';
 
 const App = () => (
   <div className="AppContainer">
-    <Grid className="" padded>
+    <Grid className="">
       <TopBar />
       <Grid.Row className="MainContainer">
         <Grid.Column
@@ -28,6 +28,7 @@ const App = () => (
         </Grid.Column>
 
         <Grid.Column
+          className="ContentContainer"
           relaxed
           mobile={16}
           tablet={16}
@@ -53,15 +54,13 @@ const App = () => (
 
 const NoMatch = ({ location }) => (
   <div className="NoMatchContainer">
-    <Segment>
-      <Message
-        error
-        compact
-        icon="exclamation"
-        header="ROUTE ERROR"
-        content="Please enter a valid URL"
-      />
-    </Segment>
+    <Message
+      error
+      compact
+      icon="exclamation"
+      header="ROUTE ERROR"
+      content="Please enter a valid URL"
+    />
   </div>
 );
 

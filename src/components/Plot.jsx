@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { Grid, Segment, Icon, Header } from 'semantic-ui-react';
-// import Steps from "./Steps";
 import Breadcrumbs from './Breadcrumbs';
 import PlotAccordion from './PlotAccordion';
 
@@ -12,7 +11,6 @@ class PlotContainer extends Component {
   render() {
     return (
       <div className="">
-        {/* <Steps /> */}
         <Breadcrumbs />
         <Segment className="PlotContainer">
           <Grid columns={2}>

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Segment } from 'semantic-ui-react';
+import { Button } from 'semantic-ui-react';
+// import ButtonActions from './ButtonActions'
 
 import QHGrid from '../utility/QHGrid';
 import EZGrid from '../utility/EZGrid';
@@ -82,7 +83,8 @@ class PepplotContainer extends Component {
 
   render() {
     return (
-      <Segment className="PepplotResultsContainer">
+      <div className="PepplotResultsContainer">
+        {/* <ButtonActions /> */}
         <EZGrid
           // data={this.state.data}
           data={mockData}
@@ -100,7 +102,7 @@ class PepplotContainer extends Component {
         >
           <Button primary content="Mock Protein Site Click"></Button>
         </Link>
-      </Segment>
+      </div>
     );
   }
 
