@@ -1,6 +1,6 @@
 import React from 'react';
 import { Route, Switch, Redirect } from 'react-router-dom';
-import { Grid, Message } from 'semantic-ui-react';
+import { Grid } from 'semantic-ui-react';
 import TopBar from './TopBar';
 import PepplotContainer from './Pepplot';
 import EnrichmentContainer from './Enrichment';

@@ -18,7 +18,7 @@ class TopBar extends Component {
   render() {
     const { activeTab } = this.state;
     return (
-      <Grid.Column className="TopBar" relaxed width={16}>
+      <Grid.Column className="TopBar" width={16}>
         <Menu inverted pointing secondary className="TopBar">
           <Menu.Item className="LogoEl">
             <img

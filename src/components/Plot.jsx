@@ -17,7 +17,6 @@ class PlotContainer extends Component {
             <Grid.Row className="">
               <Grid.Column
                 className="PlotAccordionContainer"
-                relaxed
                 mobile={16}
                 tablet={16}
                 largeScreen={3}
@@ -26,7 +25,6 @@ class PlotContainer extends Component {
                 <PlotAccordion />
               </Grid.Column>
               <Grid.Column
-                relaxed
                 mobile={16}
                 tablet={16}
                 largeScreen={13}

@@ -28,7 +28,6 @@ class EnrichmentContainer extends Component {
       isValidSearchEnrichment: true,
       enrichmentResults: data
     });
-    debugger;
   };
 
   render() {
@@ -36,7 +35,6 @@ class EnrichmentContainer extends Component {
       <Grid.Row className="MainContainer">
         <Grid.Column
           className="SearchCriteriaContainer"
-          relaxed
           mobile={16}
           tablet={16}
           largeScreen={3}
@@ -50,7 +48,6 @@ class EnrichmentContainer extends Component {
 
         <Grid.Column
           className="ContentContainer"
-          relaxed
           mobile={16}
           tablet={16}
           largeScreen={13}

@@ -16,7 +16,6 @@ class ChartsContainer extends Component {
           <Grid divided="vertically">
             <Grid.Row columns={1}>
               <Grid.Column
-                relaxed
                 mobile={16}
                 tablet={16}
                 largeScreen={16}
@@ -32,7 +31,6 @@ class ChartsContainer extends Component {
             </Grid.Row>
             <Grid.Row columns={2}>
               <Grid.Column
-                relaxed
                 mobile={16}
                 tablet={16}
                 largeScreen={8}
@@ -46,7 +44,6 @@ class ChartsContainer extends Component {
                 </Segment>
               </Grid.Column>
               <Grid.Column
-                relaxed
                 mobile={16}
                 tablet={16}
                 largeScreen={8}

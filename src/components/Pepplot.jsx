@@ -37,7 +37,6 @@ class PepplotContainer extends Component {
       <Grid.Row className="PepplotContainer MainContainer">
         <Grid.Column
           className="SearchCriteriaContainer"
-          relaxed
           mobile={16}
           tablet={16}
           largeScreen={3}
@@ -51,7 +50,6 @@ class PepplotContainer extends Component {
 
         <Grid.Column
           className="ContentContainer"
-          relaxed
           mobile={16}
           tablet={16}
           largeScreen={13}

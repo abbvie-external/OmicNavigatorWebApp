@@ -113,8 +113,6 @@ class PepplotSearchCriteria extends Component {
   };
 
   render() {
-    const { tab, study, model, test } = this.state;
-
     return (
       <div className="SearchCriteriaContainer">
         <Form className="SearchCriteria">
