@@ -1,11 +1,16 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
-// import { client } from '../Client';
+import { withRouter, Link } from 'react-router-dom';
 import { Grid, Menu } from 'semantic-ui-react';
 
 class TopBar extends Component {
-  state = { activeTab: 'pepplot' };
-
+  constructor(props) {
+    super(props);
+    const path =
+      props.location.pathname === '/' ? '/pepplot' : props.location.pathname;
+    this.state = {
+      activeTab: path
+    };
+  }
   componentDidMount() {}
 
   handleTabClick = (e, { name }) => this.setState({ activeTab: name });
@@ -26,31 +31,31 @@ class TopBar extends Component {
             <b>Phosphoproteomic</b>&nbsp;
             <span className="thinItalic">Analyzer</span>
           </Menu.Item>
-          <Link to={{ pathname: `/pepplot` }}>
-            <Menu.Item
-              onClick={this.handleTabClick}
-              className="Tab"
-              name="pepplot"
-              active={activeTab === 'pepplot'}
-            >
-              Differential Phosophate Analysis
-            </Menu.Item>
-          </Link>
+          <Menu.Item
+            as={Link}
+            to="/pepplot"
+            onClick={this.handleTabClick}
+            className="Tab"
+            name="/pepplot"
+            active={activeTab === '/pepplot'}
+          >
+            Differential Phosophate Analysis
+          </Menu.Item>
 
-          <Link to={{ pathname: `/enrichment` }}>
-            <Menu.Item
-              onClick={this.handleTabClick}
-              className="Tab"
-              name="enrichment"
-              active={activeTab === 'enrichment'}
-            >
-              Enrichment Analysis
-            </Menu.Item>
-          </Link>
+          <Menu.Item
+            as={Link}
+            to="/enrichment"
+            onClick={this.handleTabClick}
+            className="Tab"
+            name="/enrichment"
+            active={activeTab === '/enrichment'}
+          >
+            Enrichment Analysis
+          </Menu.Item>
         </Menu>
       </Grid.Column>
     );
   }
 }
 
-export default TopBar;
+export default withRouter(TopBar);
