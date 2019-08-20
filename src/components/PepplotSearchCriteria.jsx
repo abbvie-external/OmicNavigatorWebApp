@@ -20,7 +20,7 @@ class PepplotSearchCriteria extends Component {
       isValidSearchPepplot: this.props.isValidSearchPepplot || false,
       pepplotResults: this.props.pepplotResults || []
     };
-    
+
     this.populateStudies = this.populateStudies.bind(this);
     this.handleStudyChange = this.handleStudyChange.bind(this);
     this.handleModelChange = this.handleModelChange.bind(this);
@@ -102,27 +102,22 @@ class PepplotSearchCriteria extends Component {
       )
       .then(dataFromService => {
         this.data = dataFromService;
-        this.setState({
-          isValidSearchPepplot: true
-        });
         this.handlePepplotSearch(this.data);
       });
   };
 
-  handlePepplotSearch = (data) => {
+  handlePepplotSearch = data => {
     this.props.onPepplotSearch({
       pepplotResults: data
-    })
-  }
+    });
+  };
 
   render() {
     const { tab, study, model, test } = this.state;
 
     return (
       <div className="SearchCriteriaContainer">
-        <Form
-          className="SearchCriteria"
-        >
+        <Form className="SearchCriteria">
           <p className="CondensedBoldText">FILTERS</p>
           <Form.Field
             control={Select}

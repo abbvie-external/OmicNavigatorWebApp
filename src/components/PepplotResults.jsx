@@ -23,14 +23,7 @@ class PepplotResults extends Component {
 
   render() {
     const results = this.state.pepplotResults.pepplotResults;
-    return (
-      <EZGrid
-        // data={this.state.data}
-        data={results}
-        height="60vh"
-        columnsConfig={mockColumns}
-      />
-    );
+    return <EZGrid data={results} height="60vh" columnsConfig={mockColumns} />;
   }
 }
 
