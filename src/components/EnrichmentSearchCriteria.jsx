@@ -1,29 +1,30 @@
 import React, { Component } from 'react';
-import { Link, withRouter } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 import { Form, Select } from 'semantic-ui-react';
 import { phosphoprotService } from '../services/phosphoprot.service';
 import _ from 'lodash';
 
-class SearchCriteria extends Component {
-  constructor() {
-    super();
+class EnrichmentSearchCriteria extends Component {
+  constructor(props) {
+    super(props);
     this.state = {
-      tab: 'pepplot',
-      study: '',
-      studies: [],
-      model: '',
-      models: [],
-      test: '',
-      tests: [],
-      modelsDisabled: true,
-      testsDisabled: true,
-      searchValid: false
+      tab: this.props.tab || 'enrichment',
+      study: this.props.study || '',
+      studies: this.props.studies || [],
+      model: this.props.model || '',
+      models: this.props.models || [],
+      test: this.props.test || '',
+      tests: this.props.tests || [],
+      modelsDisabled: this.props.modelsDisabled,
+      testsDisabled: this.props.testsDisabled || true,
+      isValidSearchEnrichment: this.props.isValidSearchEnrichment || false,
+      enrichmentResults: this.props.enrichmentResults || []
     };
+
+    this.populateStudies = this.populateStudies.bind(this);
     this.handleStudyChange = this.handleStudyChange.bind(this);
     this.handleModelChange = this.handleModelChange.bind(this);
-    this.isValidSearch = this.isValidSearch.bind(this);
-    this.handleSearch = this.handleSearch.bind(this);
-    this.populateStudies = this.populateStudies.bind(this);
+    this.handleTestChange = this.handleTestChange.bind(this);
   }
 
   componentDidMount() {
@@ -48,7 +49,7 @@ class SearchCriteria extends Component {
       test: '',
       modelsDisabled: true,
       testsDisabled: true,
-      searchValid: false
+      isValidSearchEnrichment: false
     });
     this.state.study = value;
     const modelNamesParam =
@@ -77,7 +78,7 @@ class SearchCriteria extends Component {
     });
     this.setState({
       testsDisabled: false,
-      searchValid: false,
+      isValidSearchEnrichment: false,
       tests: testsArr
     });
   };
@@ -102,22 +103,16 @@ class SearchCriteria extends Component {
       .then(dataFromService => {
         this.data = dataFromService;
         this.setState({
-          validSearch: true
+          isValidSearchEnrichment: true
         });
-        // committing here, next step is to integrate this data into the grid...
+        this.handleEnrichmentSearch(this.data);
       });
   };
 
-  isValidSearch() {
-    return false;
-  }
-
-  handleSearch = evt => {
-    evt.preventDefault();
-    // const { tab, study, model, test } = this.state;
-    // this.setState({
-    // });
-    // this.props.history.push('/{tab}');
+  handleEnrichmentSearch = data => {
+    this.props.onEnrichmentSearch({
+      enrichmentResults: data
+    });
   };
 
   render() {
@@ -125,11 +120,7 @@ class SearchCriteria extends Component {
 
     return (
       <div className="SearchCriteriaContainer">
-        <Form
-          size="medium"
-          className="SearchCriteria"
-          onSubmit={this.handleSearch.bind(this)}
-        >
+        <Form className="SearchCriteria">
           <p className="CondensedBoldText">FILTERS</p>
           <Form.Field
             control={Select}
@@ -174,4 +165,4 @@ class SearchCriteria extends Component {
   }
 }
 
-export default withRouter(SearchCriteria);
+export default withRouter(EnrichmentSearchCriteria);

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Link, Redirect } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 // import { client } from '../Client';
 import { Grid, Menu } from 'semantic-ui-react';
 

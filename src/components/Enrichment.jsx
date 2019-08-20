@@ -1,45 +1,68 @@
 import React, { Component } from 'react';
-import { Segment, Header, Icon, Grid, Divider } from 'semantic-ui-react';
-import { Link } from 'react-router-dom';
-import { Button } from 'semantic-ui-react';
+import { Grid } from 'semantic-ui-react';
+
+import EnrichmentSearchCriteria from './EnrichmentSearchCriteria';
+import EnrichmentResults from './EnrichmentResults';
+// import ButtonActions from './ButtonActions';
+import SearchPrompt from './SearchPrompt';
 
 class EnrichmentContainer extends Component {
-  state = {};
+  state = {
+    tab: this.props.tab || 'enrichment',
+    study: this.props.study || '',
+    studies: this.props.studies || [],
+    model: this.props.model || '',
+    models: this.props.models || [],
+    test: this.props.test || '',
+    tests: this.props.tests || [],
+    modelsDisabled: this.props.modelsDisabled,
+    testsDisabled: this.props.testsDisabled || true,
+    isValidSearchEnrichment: this.props.isValidSearchEnrichment || false,
+    enrichmentResults: []
+  };
 
   componentDidMount() {}
 
+  handleEnrichmentSearch = data => {
+    this.setState({
+      isValidSearchEnrichment: true,
+      enrichmentResults: data
+    });
+    debugger;
+  };
+
   render() {
     return (
-      <Segment className="EnrichmentResultsContainer">
-        <Grid columns={2} relaxed stackable>
-          <Grid.Column>
-            <Header icon textAlign="center">
-              <Icon name="chart pie" circular />
-              <Header.Content>Pie Chart</Header.Content>
-              <br></br>
-              <Header.Subheader>
-                <Link
-                  to={{
-                    pathname: `/charts`,
-                    state: {}
-                  }}
-                >
-                  <Button primary content="Mock Chart Click"></Button>
-                </Link>
-              </Header.Subheader>
-            </Header>
-          </Grid.Column>
+      <Grid.Row className="MainContainer">
+        <Grid.Column
+          className="SearchCriteriaContainer"
+          relaxed
+          mobile={16}
+          tablet={16}
+          largeScreen={3}
+          widescreen={3}
+        >
+          <EnrichmentSearchCriteria
+            formProps={this.state}
+            onEnrichmentSearch={this.handleEnrichmentSearch}
+          />
+        </Grid.Column>
 
-          <Grid.Column verticalAlign="middle">
-            <Header icon textAlign="center">
-              <Icon name="table" circular />
-              <Header.Content>Grid</Header.Content>
-            </Header>
-          </Grid.Column>
-        </Grid>
-
-        <Divider vertical>Or</Divider>
-      </Segment>
+        <Grid.Column
+          className="ContentContainer"
+          relaxed
+          mobile={16}
+          tablet={16}
+          largeScreen={13}
+          widescreen={13}
+        >
+          {this.state.isValidSearchEnrichment ? (
+            <EnrichmentResults formProps={this.state} />
+          ) : (
+            <SearchPrompt />
+          )}
+        </Grid.Column>
+      </Grid.Row>
     );
   }
 }
