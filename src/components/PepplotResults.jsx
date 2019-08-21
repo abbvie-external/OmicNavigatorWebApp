@@ -14,15 +14,12 @@ export { getField, getFieldValue, typeMap };
 class PepplotResults extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      pepplotResults: this.props.formProps.pepplotResults || []
-    };
   }
 
   componentDidMount() {}
 
   render() {
-    const results = this.state.pepplotResults.pepplotResults;
+    const results = this.props.searchCriteria.pepplotResults;
     return <EZGrid data={results} height="60vh" columnsConfig={mockColumns} />;
   }
 }

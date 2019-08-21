@@ -101,13 +101,22 @@ class PepplotSearchCriteria extends Component {
         this.state.study + 'plots'
       )
       .then(dataFromService => {
-        this.data = dataFromService;
-        this.handlePepplotSearch(this.data);
+        this.testdata = dataFromService;
+        this.handlePepplotSearch(
+          this.state.study,
+          this.state.model,
+          this.state.test,
+          this.testdata
+        );
       });
   };
 
-  handlePepplotSearch = data => {
+  handlePepplotSearch = (study, model, test, data) => {
+    debugger;
     this.props.onPepplotSearch({
+      study: study,
+      model: model,
+      test: test,
       pepplotResults: data
     });
   };

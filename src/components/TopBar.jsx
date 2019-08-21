@@ -29,7 +29,7 @@ class TopBar extends Component {
           </Menu.Item>
           <Menu.Item className="Title">
             <b>Phosphoproteomic</b>&nbsp;
-            <span className="thinItalic">Analyzer</span>
+            <span className="ThinItalic">Analyzer</span>
           </Menu.Item>
           <Menu.Item
             as={Link}
