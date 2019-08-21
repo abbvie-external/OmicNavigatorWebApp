@@ -131,6 +131,12 @@ class PepplotContainer extends Component {
     });
   };
 
+  hideGrid = () => {
+    this.setState({
+      isValidSearchPepplot: false
+    });
+  };
+
   render() {
     return (
       <Grid.Row className="PepplotContainer MainContainer">
@@ -144,6 +150,7 @@ class PepplotContainer extends Component {
           <PepplotSearchCriteria
             searchCriteria={this.state}
             onPepplotSearch={this.handlePepplotSearch}
+            onSearchCriteriaReset={this.hideGrid}
           />
         </Grid.Column>
 

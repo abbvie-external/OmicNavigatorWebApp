@@ -32,14 +32,22 @@ class PepplotSearchCriteria extends Component {
   }
 
   populateStudies() {
-    phosphoprotService.getStudies().then(studiesFromService => {
-      const studiesArr = studiesFromService.map(study => {
-        return { key: study, text: study, value: study };
-      });
+    if (localStorage.studies) {
+      const studiesArrStored = JSON.parse(localStorage.studies || []);
       this.setState({
-        studies: studiesArr
+        studies: studiesArrStored
       });
-    });
+    } else {
+      phosphoprotService.getStudies().then(studiesFromService => {
+        const studiesArr = studiesFromService.map(study => {
+          return { key: study, text: study, value: study };
+        });
+        this.setState({
+          studies: studiesArr
+        });
+        localStorage.studies = JSON.stringify(studiesArr);
+      });
+    }
   }
 
   handleStudyChange = (evt, { name, value }) => {
@@ -48,9 +56,10 @@ class PepplotSearchCriteria extends Component {
       model: '',
       test: '',
       modelsDisabled: true,
-      testsDisabled: true,
-      isValidSearchPepplot: false
+      testsDisabled: true
+      // isValidSearchPepplot: false
     });
+    this.hidePepplotGrid();
     this.state.study = value;
     const modelNamesParam =
       this.state.tab === 'pepplot' ? 'inferenceNames' : 'EnrichmentNames';
@@ -73,6 +82,7 @@ class PepplotSearchCriteria extends Component {
       test: '',
       [name]: value
     });
+    this.hidePepplotGrid();
     const testsArr = _.map(this.allNames[value], function(testName) {
       return { key: testName, text: testName, value: testName };
     });
@@ -112,12 +122,17 @@ class PepplotSearchCriteria extends Component {
   };
 
   handlePepplotSearch = (study, model, test, data) => {
-    debugger;
     this.props.onPepplotSearch({
       study: study,
       model: model,
       test: test,
       pepplotResults: data
+    });
+  };
+
+  hidePepplotGrid = () => {
+    this.props.onSearchCriteriaReset({
+      isValidSearchPepplot: false
     });
   };
 
