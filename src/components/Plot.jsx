@@ -4,7 +4,13 @@ import Breadcrumbs from './Breadcrumbs';
 import PlotAccordion from './PlotAccordion';
 
 class PlotContainer extends Component {
-  state = {};
+  // constructor(props) {
+  //   super(props);
+  //   const path = props.location.pathname === '/' ? '/pepplot' : props.location.pathname;
+  //   this.state = {
+  //     activeTab: path
+  //   };
+  // }
 
   componentDidMount() {}
 

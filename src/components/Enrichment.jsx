@@ -5,6 +5,7 @@ import EnrichmentSearchCriteria from './EnrichmentSearchCriteria';
 import EnrichmentResults from './EnrichmentResults';
 // import ButtonActions from './ButtonActions';
 import SearchPrompt from './SearchPrompt';
+import _ from 'lodash';
 
 class EnrichmentContainer extends Component {
   state = {
@@ -21,28 +22,40 @@ class EnrichmentContainer extends Component {
     enrichmentResults: []
   };
 
-  componentDidMount() {}
+  componentDidMount() {
+    this.handleEnrichmentSearch = this.handleEnrichmentSearch.bind(this);
+  }
 
-  handleEnrichmentSearch = data => {
+  handleEnrichmentSearch = searchResults => {
     this.setState({
-      isValidSearchEnrichment: true,
-      enrichmentResults: data
+      study: searchResults.study,
+      model: searchResults.model,
+      test: searchResults.test,
+      enrichmentResults: searchResults.enrichmentResults,
+      isValidSearchEnrichment: true
+    });
+  };
+
+  hideEGrid = () => {
+    this.setState({
+      isValidSearchEnrichment: false
     });
   };
 
   render() {
     return (
-      <Grid.Row className="MainContainer">
+      <Grid.Row className="EnrichmentContainer">
         <Grid.Column
-          className="SearchCriteriaContainer"
+          className="SidebarContainer"
           mobile={16}
           tablet={16}
           largeScreen={3}
           widescreen={3}
         >
           <EnrichmentSearchCriteria
-            formProps={this.state}
+            searchCriteria={this.state}
             onEnrichmentSearch={this.handleEnrichmentSearch}
+            onSearchCriteriaReset={this.hideEGrid}
           />
         </Grid.Column>
 
@@ -54,7 +67,7 @@ class EnrichmentContainer extends Component {
           widescreen={13}
         >
           {this.state.isValidSearchEnrichment ? (
-            <EnrichmentResults formProps={this.state} />
+            <EnrichmentResults searchCriteria={this.state} />
           ) : (
             <SearchPrompt />
           )}

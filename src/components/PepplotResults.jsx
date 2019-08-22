@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+// import ButtonActions from './ButtonActions';
 
 import QHGrid from '../utility/QHGrid';
 import EZGrid from '../utility/EZGrid';
@@ -20,7 +21,13 @@ class PepplotResults extends Component {
 
   render() {
     const results = this.props.searchCriteria.pepplotResults;
-    return <EZGrid data={results} height="60vh" columnsConfig={mockColumns} />;
+    // const columns = this.props.pepplotColumns;
+    return (
+      <div>
+        {/* <ButtonActions /> */}
+        <EZGrid data={results} height="60vh" columnsConfig={mockColumns} />
+      </div>
+    );
   }
 }
 

@@ -48,9 +48,9 @@ class EnrichmentSearchCriteria extends Component {
       model: '',
       test: '',
       modelsDisabled: true,
-      testsDisabled: true,
-      isValidSearchEnrichment: false
+      testsDisabled: true
     });
+    this.hideEnrichmentGrid();
     this.state.study = value;
     const modelNamesParam =
       this.state.tab === 'pepplot' ? 'inferenceNames' : 'EnrichmentNames';
@@ -73,6 +73,7 @@ class EnrichmentSearchCriteria extends Component {
       test: '',
       [name]: value
     });
+    this.hideEnrichmentGrid();
     const testsArr = _.map(this.allNames[value], function(testName) {
       return { key: testName, text: testName, value: testName };
     });
@@ -101,64 +102,74 @@ class EnrichmentSearchCriteria extends Component {
         this.state.study + 'plots'
       )
       .then(dataFromService => {
-        this.data = dataFromService;
-        this.setState({
-          isValidSearchEnrichment: true
-        });
-        this.handleEnrichmentSearch(this.data);
+        debugger;
+        this.testdata = dataFromService;
+        this.handleEnrichmentSearch(
+          this.state.study,
+          this.state.model,
+          this.state.test,
+          this.testdata
+        );
       });
   };
 
-  handleEnrichmentSearch = data => {
+  handleEnrichmentSearch = (study, model, test, data) => {
     this.props.onEnrichmentSearch({
+      study: study,
+      model: model,
+      test: test,
       enrichmentResults: data
+    });
+  };
+
+  hideEnrichmentGrid = () => {
+    this.props.onSearchCriteriaReset({
+      isValidSearchEnrichment: false
     });
   };
 
   render() {
     return (
-      <div className="SearchCriteriaContainer">
-        <Form className="SearchCriteria">
-          <p className="CondensedBoldText">FILTERS</p>
-          <Form.Field
-            control={Select}
-            required
-            label="Study"
-            name="study"
-            value={this.state.study}
-            options={this.state.studies}
-            placeholder="Select A Study"
-            onChange={this.handleStudyChange}
-          />
-          <Form.Field
-            control={Select}
-            required
-            label="Model"
-            name="model"
-            value={this.state.model}
-            options={this.state.models}
-            placeholder="Select Model"
-            onChange={this.handleModelChange}
-            disabled={this.state.modelsDisabled}
-          />
-          <Form.Field
-            control={Select}
-            required
-            name="test"
-            value={this.state.test}
-            options={this.state.tests}
-            placeholder="Select Test"
-            onChange={this.handleTestChange}
-            disabled={this.state.testsDisabled}
-            label={{
-              children: 'Test',
-              htmlFor: 'form-select-control-test'
-            }}
-            search
-            searchInput={{ id: 'form-select-control-test' }}
-          />
-        </Form>
-      </div>
+      <Form className="SearchCriteriaContainer">
+        <p className="FilterText">FILTERS</p>
+        <Form.Field
+          control={Select}
+          required
+          label="Study"
+          name="study"
+          value={this.state.study}
+          options={this.state.studies}
+          placeholder="Select A Study"
+          onChange={this.handleStudyChange}
+        />
+        <Form.Field
+          control={Select}
+          required
+          label="Model"
+          name="model"
+          value={this.state.model}
+          options={this.state.models}
+          placeholder="Select Model"
+          onChange={this.handleModelChange}
+          disabled={this.state.modelsDisabled}
+        />
+        <Form.Field
+          control={Select}
+          required
+          name="test"
+          value={this.state.test}
+          options={this.state.tests}
+          placeholder="Select Test"
+          onChange={this.handleTestChange}
+          disabled={this.state.testsDisabled}
+          label={{
+            children: 'Test',
+            htmlFor: 'form-select-control-test'
+          }}
+          search
+          searchInput={{ id: 'form-select-control-test' }}
+        />
+      </Form>
     );
   }
 }

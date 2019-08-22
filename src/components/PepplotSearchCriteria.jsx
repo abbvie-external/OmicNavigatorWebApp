@@ -57,7 +57,6 @@ class PepplotSearchCriteria extends Component {
       test: '',
       modelsDisabled: true,
       testsDisabled: true
-      // isValidSearchPepplot: false
     });
     this.hidePepplotGrid();
     this.state.study = value;
@@ -138,48 +137,46 @@ class PepplotSearchCriteria extends Component {
 
   render() {
     return (
-      <div className="SearchCriteriaContainer">
-        <Form className="SearchCriteria">
-          <p className="CondensedBoldText">FILTERS</p>
-          <Form.Field
-            control={Select}
-            required
-            label="Study"
-            name="study"
-            value={this.state.study}
-            options={this.state.studies}
-            placeholder="Select A Study"
-            onChange={this.handleStudyChange}
-          />
-          <Form.Field
-            control={Select}
-            required
-            label="Model"
-            name="model"
-            value={this.state.model}
-            options={this.state.models}
-            placeholder="Select Model"
-            onChange={this.handleModelChange}
-            disabled={this.state.modelsDisabled}
-          />
-          <Form.Field
-            control={Select}
-            required
-            name="test"
-            value={this.state.test}
-            options={this.state.tests}
-            placeholder="Select Test"
-            onChange={this.handleTestChange}
-            disabled={this.state.testsDisabled}
-            label={{
-              children: 'Test',
-              htmlFor: 'form-select-control-test'
-            }}
-            search
-            searchInput={{ id: 'form-select-control-test' }}
-          />
-        </Form>
-      </div>
+      <Form className="SearchCriteriaContainer">
+        <p className="FilterText">FILTERS</p>
+        <Form.Field
+          control={Select}
+          required
+          label="Study"
+          name="study"
+          value={this.state.study}
+          options={this.state.studies}
+          placeholder="Select A Study"
+          onChange={this.handleStudyChange}
+        />
+        <Form.Field
+          control={Select}
+          required
+          label="Model"
+          name="model"
+          value={this.state.model}
+          options={this.state.models}
+          placeholder="Select Model"
+          onChange={this.handleModelChange}
+          disabled={this.state.modelsDisabled}
+        />
+        <Form.Field
+          control={Select}
+          required
+          name="test"
+          value={this.state.test}
+          options={this.state.tests}
+          placeholder="Select Test"
+          onChange={this.handleTestChange}
+          disabled={this.state.testsDisabled}
+          label={{
+            children: 'Test',
+            htmlFor: 'form-select-control-test'
+          }}
+          search
+          searchInput={{ id: 'form-select-control-test' }}
+        />
+      </Form>
     );
   }
 }

@@ -17,12 +17,12 @@ class ButtonActions extends Component {
       <div className="">
         <Button
           basic
-          color="orange"
+          className="customOrange"
           icon="ellipsis horizontal"
           floated="right"
         />
-        <Button.Group basic color="orange" floated="right">
-          <Button basic color="orange" content="Export" />
+        <Button.Group basic className="customOrange" floated="right">
+          <Button basic className="customOrange" content="Export" />
           <Dropdown
             className="button icon"
             options={options}
@@ -30,8 +30,8 @@ class ButtonActions extends Component {
           />
         </Button.Group>
         <Button.Group floated="right">
-          <Button basic color="orange" icon="chart pie" />
-          <Button basic color="orange" icon="th list" />
+          <Button basic className="customOrange" icon="chart pie" />
+          <Button basic className="customOrange" icon="th list" />
         </Button.Group>
       </div>
     );

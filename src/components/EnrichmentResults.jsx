@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+// import ButtonActions from './ButtonActions';
 
 import QHGrid from '../utility/QHGrid';
 import EZGrid from '../utility/EZGrid';
@@ -14,16 +15,18 @@ export { getField, getFieldValue, typeMap };
 class EnrichmentResults extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      enrichmentResults: this.props.formProps.enrichmentResults || []
-    };
   }
 
   componentDidMount() {}
 
   render() {
     const results = this.state.enrichmentResults.enrichmentResults;
-    return <EZGrid data={[]} height="60vh" columnsConfig={[]} />;
+    return (
+      <div>
+        {/* <ButtonActions /> */}
+        <EZGrid data={[]} height="60vh" columnsConfig={[]} />
+      </div>
+    );
   }
 }
 

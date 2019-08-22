@@ -27,6 +27,23 @@ class PepplotContainer extends Component {
     this.handlePepplotSearch = this.handlePepplotSearch.bind(this);
   }
 
+  handlePepplotSearch = searchResults => {
+    // this.getCongfigCols(data);
+    this.setState({
+      study: searchResults.study,
+      model: searchResults.model,
+      test: searchResults.test,
+      pepplotResults: searchResults.pepplotResults,
+      isValidSearchPepplot: true
+    });
+  };
+
+  hidePGrid = () => {
+    this.setState({
+      isValidSearchPepplot: false
+    });
+  };
+
   getCongfigCols = testData => {
     this.testData = testData.pepplotResults;
     var configCols = ['F', 'logFC', 't', 'P_Value', 'adj_P_Val'];
@@ -120,28 +137,11 @@ class PepplotContainer extends Component {
     ];
   };
 
-  handlePepplotSearch = searchResults => {
-    // this.getCongfigCols(data);
-    this.setState({
-      study: searchResults.study,
-      model: searchResults.model,
-      test: searchResults.test,
-      pepplotResults: searchResults.pepplotResults,
-      isValidSearchPepplot: true
-    });
-  };
-
-  hideGrid = () => {
-    this.setState({
-      isValidSearchPepplot: false
-    });
-  };
-
   render() {
     return (
-      <Grid.Row className="PepplotContainer MainContainer">
+      <Grid.Row className="PepplotContainer">
         <Grid.Column
-          className="SearchCriteriaContainer"
+          className="SidebarContainer"
           mobile={16}
           tablet={16}
           largeScreen={3}
@@ -150,7 +150,7 @@ class PepplotContainer extends Component {
           <PepplotSearchCriteria
             searchCriteria={this.state}
             onPepplotSearch={this.handlePepplotSearch}
-            onSearchCriteriaReset={this.hideGrid}
+            onSearchCriteriaReset={this.hidePGrid}
           />
         </Grid.Column>
 
@@ -166,19 +166,17 @@ class PepplotContainer extends Component {
           ) : (
             <SearchPrompt />
           )}
-
-          {/* <Switch>
-          <Route exact path="/pepplot" component={PepplotContainer} />
-          <Route exact path="/plot" component={PlotContainer} />
-          <Route exact path="/enrichment" component={EnrichmentContainer} />
-          <Route exact path="/charts" component={ChartsContainer} />
-          <Route exact path="/" render={() => <Redirect to="/pepplot" />} />
-          <Route component={NoMatch} />
-        </Switch> */}
         </Grid.Column>
       </Grid.Row>
     );
   }
+
+  /* <Switch>
+  <Route exact path="/pepplot" component={PepplotContainer} />
+  <Route exact path="/enrichment" component={EnrichmentContainer} />
+  <Route exact path="/" render={() => <Redirect to="/pepplot" />} />
+  <Route component={NoMatch} />
+  </Switch> */
 
   phosphorylationData() {
     const result = {
