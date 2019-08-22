@@ -7,7 +7,6 @@ import EnrichmentContainer from './Enrichment';
 class Tabs extends Component {
   constructor(props) {
     super(props);
-    // const path = props.location.pathname === '/' ? '/pepplot' : props.location.pathname;
     this.state = {
       tab: { activeIndex: 1 }
     };
@@ -15,7 +14,9 @@ class Tabs extends Component {
 
   componentDidMount() {}
 
-  handleTabChange = (e, { activeIndex }) => this.setState({ activeIndex });
+  handleTabChange = (e, { activeIndex }) => {
+    this.setState({ activeIndex });
+  };
 
   render() {
     const { activeIndex } = this.state;

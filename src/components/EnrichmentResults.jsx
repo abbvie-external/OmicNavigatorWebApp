@@ -20,7 +20,8 @@ class EnrichmentResults extends Component {
   componentDidMount() {}
 
   render() {
-    const results = this.state.enrichmentResults.enrichmentResults;
+    const results = this.props.searchCriteria.enrichmentResults;
+    const columns = this.props.searchCriteria.enrichmentColumns;
     return (
       <div>
         {/* <ButtonActions /> */}

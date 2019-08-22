@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { phosphoprotService } from '../services/phosphoprot.service';
 // import ButtonActions from './ButtonActions';
 
 import QHGrid from '../utility/QHGrid';
@@ -21,75 +22,38 @@ class PepplotResults extends Component {
 
   render() {
     const results = this.props.searchCriteria.pepplotResults;
-    // const columns = this.props.pepplotColumns;
+    const columns = this.props.searchCriteria.pepplotColumns;
+    const rows = this.props.searchCriteria.pepplotResults.length;
+    const additionalTemplateInfo = {
+      showPhosphositePlus: dataItem => {
+        return function() {
+          var protein = (dataItem.Protein
+            ? dataItem.Protein
+            : dataItem.MajorityProteinIDsHGNC
+          ).split(';')[0];
+          let param = { proteinNames: protein, queryId: -1, from: 0 };
+          phosphoprotService.postToPhosphositePlus(
+            param,
+            'https://www.phosphosite.org/proteinSearchSubmitAction.action'
+          );
+        };
+      }
+    };
+
     return (
       <div>
-        {/* <ButtonActions /> */}
-        <EZGrid data={results} height="60vh" columnsConfig={mockColumns} />
+        <EZGrid
+          data={results}
+          columnsConfig={columns}
+          totalRows={rows}
+          // use "rows" for itemsPerPage if you want all results. For dev, keep it at 500 so rendering doesn't take too long
+          itemsPerPage={500}
+          height="65vh"
+          additionalTemplateInfo={additionalTemplateInfo}
+        />
       </div>
     );
   }
 }
-
-const mockColumns = [
-  {
-    title: 'Protein_Site',
-    field: 'Protein_Site',
-    type: 'number',
-    filterable: { type: 'multiFilter' },
-    template: (value, item, addParams) => {
-      return (
-        <p>
-          {value}
-          <img
-            src="phosphosite.ico"
-            alt="Phosophosite"
-            className="phophositeIcon"
-          />
-          {/* <img  src="phosphosite.ico" alt="Phosophosite" class="phosphositeIcon" data-manifest={item} onClick={addParams.showPhosphositePlus(item)} /> */}
-        </p>
-      );
-    }
-  },
-  {
-    title: 'logFC',
-    field: {
-      field: 'logFC',
-      sortAccessor: (item, field) => item[field] && item[field].toFixed(2),
-      groupByAccessor: (item, field) => item[field] && item[field].toFixed(2),
-      accessor: (item, field) => item[field] && item[field].toFixed(2)
-    },
-    type: 'number',
-    filterable: { type: 'multiFilter' }
-  },
-  {
-    title: 't',
-    field: {
-      field: 't',
-      sortAccessor: (item, field) => item[field] && item[field].toFixed(2),
-      groupByAccessor: (item, field) => item[field] && item[field].toFixed(2),
-      accessor: (item, field) => item[field] && item[field].toFixed(2)
-    },
-    type: 'number'
-  },
-  {
-    title: 'P_Value',
-    field: {
-      field: 'P_Value'
-    },
-    type: 'number',
-    filterable: { type: 'multiFilter' }
-  },
-  {
-    title: 'adj_P_Val',
-    field: {
-      field: 'adj_P_Val',
-      sortAccessor: (item, field) => item[field] && item[field].toFixed(4),
-      groupByAccessor: (item, field) => item[field] && item[field].toFixed(4),
-      accessor: (item, field) => item[field] && item[field].toFixed(4)
-    },
-    type: 'number'
-  }
-];
 
 export default PepplotResults;

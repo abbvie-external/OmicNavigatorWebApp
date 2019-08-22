@@ -73,24 +73,24 @@ $screen-xl-min: 1200px;
     }
   }
 
-  .EnrichmentContainer {
-    padding-top: 0px !important;
-  }
-
   .SidebarContainer {
     background-color: lightgray;
     height: 100vh;
 
     .SearchCriteriaContainer {
       padding: 0px 20px !important;
+    }  
+    
+    .FilterText {
+      font-weight: bold;
+      font-stretch: condensed !important;
+      margin-top: 0px !important;
+      padding-top: 10px !important;
     }
   }
 
-  .FilterText {
-    font-weight: bold;
-    font-stretch: condensed !important;
-    margin-top: 0px !important;
-    padding-top: 10px !important;
+  .EnrichmentContainer {
+    padding-top: 0px !important;
   }
 
   .PepplotContainer {
@@ -103,7 +103,11 @@ $screen-xl-min: 1200px;
   }
 
   .ContentContainer {
-    padding: 20px;
+    padding: 0px;
+  
+    .SearchPrompt {
+      padding-top: 20px;
+    }
   }
 
   .BreadcrumbContainer {
@@ -132,14 +136,14 @@ $screen-xl-min: 1200px;
     }
   }
 
-  .phophositeIcon {
+  .PhosphositeIcon {
     float: right;
     height: 16px;
     width: 16px;
     cursor: pointer;
   }
 
-  .phophositeIcon:hover {
+  .PhosphositeIcon:hover {
       transform: scale(1.2);
   }
 

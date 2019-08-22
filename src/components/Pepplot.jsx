@@ -19,6 +19,7 @@ class PepplotContainer extends Component {
     modelsDisabled: this.props.modelsDisabled,
     testsDisabled: this.props.testsDisabled || true,
     isValidSearchPepplot: this.props.isValidSearchPepplot || false,
+    pepplotColumns: [],
     pepplotResults: []
   };
 
@@ -28,12 +29,13 @@ class PepplotContainer extends Component {
   }
 
   handlePepplotSearch = searchResults => {
-    // this.getCongfigCols(data);
+    const columns = this.getCongfigCols(searchResults);
     this.setState({
       study: searchResults.study,
       model: searchResults.model,
       test: searchResults.test,
       pepplotResults: searchResults.pepplotResults,
+      pepplotColumns: columns,
       isValidSearchPepplot: true
     });
   };
@@ -46,10 +48,168 @@ class PepplotContainer extends Component {
 
   getCongfigCols = testData => {
     this.testData = testData.pepplotResults;
-    var configCols = ['F', 'logFC', 't', 'P_Value', 'adj_P_Val'];
-    var orderedTestData = JSON.parse(
-      JSON.stringify(this.testData[0], configCols)
-    );
+    // var configCols = ['F', 'logFC', 't', 'P_Value', 'adj_P_Val'];
+    const model = testData.model;
+    let configCols = [];
+    if (model === 'Differential Expression') {
+      configCols = [
+        {
+          title: 'MajorityProteinIDsHGNC',
+          field: 'MajorityProteinIDsHGNC',
+          // type: 'number',
+          filterable: { type: 'multiFilter' },
+          template: (value, item, addParams) => {
+            return (
+              <p>
+                {value}
+                <img
+                  src="phosphosite.ico"
+                  alt="Phosophosite"
+                  className="PhosphositeIcon"
+                  // data-manifest={item}
+                  onClick={addParams.showPhosphositePlus(item)}
+                />
+              </p>
+            );
+          }
+        },
+        {
+          title: 'MajorityProteinIDs',
+          field: 'MajorityProteinIDs',
+          field: {
+            field: 'MajorityProteinIDs',
+            sortAccessor: (item, field) =>
+              item[field] && item[field].toFixed(2),
+            groupByAccessor: (item, field) =>
+              item[field] && item[field].toFixed(2),
+            accessor: (item, field) => item[field] && item[field].toFixed(2)
+          },
+          // type: 'number',
+          filterable: { type: 'multiFilter' }
+        },
+        {
+          title: 'logFC',
+          field: {
+            field: 'logFC',
+            sortAccessor: (item, field) =>
+              item[field] && item[field].toFixed(2),
+            groupByAccessor: (item, field) =>
+              item[field] && item[field].toFixed(2),
+            accessor: (item, field) => item[field] && item[field].toFixed(2)
+          },
+          // type: 'number',
+          filterable: { type: 'multiFilter' }
+        },
+        {
+          title: 't',
+          field: {
+            field: 't',
+            sortAccessor: (item, field) =>
+              item[field] && item[field].toFixed(2),
+            groupByAccessor: (item, field) =>
+              item[field] && item[field].toFixed(2),
+            accessor: (item, field) => item[field] && item[field].toFixed(2)
+          },
+          // type: 'number'
+          filterable: { type: 'multiFilter' }
+        },
+        {
+          title: 'P_Value',
+          field: {
+            field: 'P_Value'
+          },
+          // type: 'number',
+          filterable: { type: 'multiFilter' }
+        },
+        {
+          title: 'adj_P_Val',
+          field: {
+            field: 'adj_P_Val',
+            sortAccessor: (item, field) =>
+              item[field] && item[field].toFixed(4),
+            groupByAccessor: (item, field) =>
+              item[field] && item[field].toFixed(4),
+            accessor: (item, field) => item[field] && item[field].toFixed(4)
+          },
+          // type: 'number'
+          filterable: { type: 'multiFilter' }
+        }
+      ];
+    } else {
+      configCols = [
+        {
+          title: 'Protein_Site',
+          field: 'Protein_Site',
+          // type: 'number',
+          filterable: { type: 'multiFilter' },
+          template: (value, item, addParams) => {
+            return (
+              <p>
+                {value}
+                <img
+                  src="phosphosite.ico"
+                  alt="Phosophosite"
+                  className="PhosphositeIcon"
+                  // data-manifest={item}
+                  onClick={addParams.showPhosphositePlus(item)}
+                />
+              </p>
+            );
+          }
+        },
+        {
+          title: 'logFC',
+          field: {
+            field: 'logFC',
+            sortAccessor: (item, field) =>
+              item[field] && item[field].toFixed(2),
+            groupByAccessor: (item, field) =>
+              item[field] && item[field].toFixed(2),
+            accessor: (item, field) => item[field] && item[field].toFixed(2)
+          },
+          // type: 'number',
+          filterable: { type: 'multiFilter' }
+        },
+        {
+          title: 't',
+          field: {
+            field: 't',
+            sortAccessor: (item, field) =>
+              item[field] && item[field].toFixed(2),
+            groupByAccessor: (item, field) =>
+              item[field] && item[field].toFixed(2),
+            accessor: (item, field) => item[field] && item[field].toFixed(2)
+          },
+          // type: 'number',
+          filterable: { type: 'multiFilter' }
+        },
+        {
+          title: 'P_Value',
+          field: {
+            field: 'P_Value'
+          },
+          // type: 'number',
+          filterable: { type: 'multiFilter' }
+        },
+        {
+          title: 'adj_P_Val',
+          field: {
+            field: 'adj_P_Val',
+            sortAccessor: (item, field) =>
+              item[field] && item[field].toFixed(4),
+            groupByAccessor: (item, field) =>
+              item[field] && item[field].toFixed(4),
+            accessor: (item, field) => item[field] && item[field].toFixed(4)
+          },
+          // type: 'number'
+          filterable: { type: 'multiFilter' }
+        }
+      ];
+    }
+    return configCols;
+    // var orderedTestData = JSON.parse(
+    //   JSON.stringify(this.testData[0], configCols)
+    // );
     // P_Value: 0.00001367510918
     // adj_P_Val: 0.024064375844
     // logFC: 1.8698479717
@@ -59,82 +219,15 @@ class PepplotContainer extends Component {
     // 1: "t"
     // 2: "P_Value"
     // 3: "adj_P_Val"
-    this.columns = _.map(
-      _.filter(_.keys(orderedTestData), function(d) {
-        return _.includes(configCols, d);
-      }),
-      function(d) {
-        return { field: d };
-      }
-    );
-  };
 
-  getConfigColsMock = testData => {
-    this.testData = testData.pepplotResults;
-
-    const configCols = [
-      {
-        title: 'Protein_Site',
-        field: 'Protein_Site',
-        type: 'number',
-        filterable: { type: 'multiFilter' },
-        template: (value, item, addParams) => {
-          return (
-            <p>
-              {value}
-              <img
-                src="phosphosite.ico"
-                alt="Phosophosite"
-                className="phophositeIcon"
-              />
-              {/* <img  src="phosphosite.ico" alt="Phosophosite" class="phosphositeIcon" data-manifest={item} onClick={addParams.showPhosphositePlus(item)} /> */}
-            </p>
-          );
-        }
-      },
-      {
-        title: 'logFC',
-        field: {
-          field: 'logFC',
-          sortAccessor: (item, field) => item[field] && item[field].toFixed(2),
-          groupByAccessor: (item, field) =>
-            item[field] && item[field].toFixed(2),
-          accessor: (item, field) => item[field] && item[field].toFixed(2)
-        },
-        type: 'number',
-        filterable: { type: 'multiFilter' }
-      },
-      {
-        title: 't',
-        field: {
-          field: 't',
-          sortAccessor: (item, field) => item[field] && item[field].toFixed(2),
-          groupByAccessor: (item, field) =>
-            item[field] && item[field].toFixed(2),
-          accessor: (item, field) => item[field] && item[field].toFixed(2)
-        },
-        type: 'number'
-      },
-      {
-        title: 'P_Value',
-        field: {
-          field: 'P_Value'
-        },
-        type: 'number',
-        filterable: { type: 'multiFilter' }
-      },
-      {
-        title: 'adj_P_Val',
-        field: {
-          field: 'adj_P_Val',
-          sortAccessor: (item, field) => item[field] && item[field].toFixed(4),
-          groupByAccessor: (item, field) =>
-            item[field] && item[field].toFixed(4),
-          accessor: (item, field) => item[field] && item[field].toFixed(4)
-        },
-        type: 'number'
-      }
-    ];
+    // this.columns = _.map(
+    //   _.filter(_.keys(orderedTestData), function(d) {
+    //     return _.includes(configCols, d);
+    //   }),
+    //   function(d) {
+    //     return { field: d };
+    //   }
+    // );
   };
 
   render() {

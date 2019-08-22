@@ -102,7 +102,6 @@ class EnrichmentSearchCriteria extends Component {
         this.state.study + 'plots'
       )
       .then(dataFromService => {
-        debugger;
         this.testdata = dataFromService;
         this.handleEnrichmentSearch(
           this.state.study,

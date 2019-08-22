@@ -56,6 +56,22 @@ class PhosphoprotService {
     return dataFromPromise;
   }
 
+  postToPhosphositePlus(obj, url) {
+    var mapForm = document.createElement('form');
+    mapForm.target = '_blank';
+    mapForm.method = 'POST'; // or "post" if appropriate
+    mapForm.action = url;
+    Object.keys(obj).forEach(function(param) {
+      var mapInput = document.createElement('input');
+      mapInput.type = 'hidden';
+      mapInput.name = param;
+      mapInput.setAttribute('value', obj[param]);
+      mapForm.appendChild(mapInput);
+    });
+    document.body.appendChild(mapForm);
+    mapForm.submit();
+  }
+
   // getProteinData(id, study) {
   //   function getData(fn) {
   //     ocpu.rpc("proteindata", { "id": id, "study": study }, function (session) {
@@ -85,22 +101,6 @@ class PhosphoprotService {
 
   // getGraphic(path) {
   //   return this._http.get(path, { responseType: 'text' });
-  // }
-
-  // postToPhosphositePlus(obj, url) {
-  //   var mapForm = document.createElement("form");
-  //   mapForm.target = "_blank";
-  //   mapForm.method = "POST"; // or "post" if appropriate
-  //   mapForm.action = url;
-  //   Object.keys(obj).forEach(function (param) {
-  //     var mapInput = document.createElement("input");
-  //     mapInput.type = "hidden";
-  //     mapInput.name = param;
-  //     mapInput.setAttribute("value", obj[param]);
-  //     mapForm.appendChild(mapInput);
-  //   });
-  //   document.body.appendChild(mapForm);
-  //   mapForm.submit();
   // }
 }
 
