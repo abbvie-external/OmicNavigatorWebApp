@@ -1,6 +1,6 @@
-// import _ from 'lodash';
-// import jQuery from './scripts/jquery-1.11.1';
-// import ocpu from '../scripts/opencpu-0.4';
+import $ from 'jquery';
+window.jQuery = $;
+const ocpu = require('opencpu.js/opencpu-0.5.js');
 
 class PhosphoprotService {
   constructor() {
