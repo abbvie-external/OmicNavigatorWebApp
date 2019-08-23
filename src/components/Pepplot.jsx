@@ -48,9 +48,20 @@ class PepplotContainer extends Component {
 
   getCongfigCols = testData => {
     this.testData = testData.pepplotResults;
-    // var configCols = ['F', 'logFC', 't', 'P_Value', 'adj_P_Val'];
     const model = testData.model;
     let configCols = [];
+    // var configCols = ['F', 'logFC', 't', 'P_Value', 'adj_P_Val'];
+    // var orderedTestData = JSON.parse(
+    //   JSON.stringify(this.testData[0], configCols)
+    // );
+    // this.columns = _.map(
+    //   _.filter(_.keys(orderedTestData), function(d) {
+    //     return _.includes(configCols, d);
+    //   }),
+    //   function(d) {
+    //     return { field: d };
+    //   }
+    // );
     if (model === 'Differential Expression') {
       configCols = [
         {
@@ -61,7 +72,12 @@ class PepplotContainer extends Component {
           template: (value, item, addParams) => {
             return (
               <p>
-                {value}
+                <span
+                  className="ProteinNameLink"
+                  onClick={addParams.showPlot(model, item)}
+                >
+                  {value}
+                </span>
                 <img
                   src="phosphosite.ico"
                   alt="Phosophosite"
@@ -76,15 +92,6 @@ class PepplotContainer extends Component {
         {
           title: 'MajorityProteinIDs',
           field: 'MajorityProteinIDs',
-          field: {
-            field: 'MajorityProteinIDs',
-            sortAccessor: (item, field) =>
-              item[field] && item[field].toFixed(2),
-            groupByAccessor: (item, field) =>
-              item[field] && item[field].toFixed(2),
-            accessor: (item, field) => item[field] && item[field].toFixed(2)
-          },
-          // type: 'number',
           filterable: { type: 'multiFilter' }
         },
         {
@@ -145,7 +152,12 @@ class PepplotContainer extends Component {
           template: (value, item, addParams) => {
             return (
               <p>
-                {value}
+                <span
+                  className="ProteinNameLink"
+                  onClick={addParams.showPlot(model, item)}
+                >
+                  {value}
+                </span>
                 <img
                   src="phosphosite.ico"
                   alt="Phosophosite"
@@ -207,27 +219,6 @@ class PepplotContainer extends Component {
       ];
     }
     return configCols;
-    // var orderedTestData = JSON.parse(
-    //   JSON.stringify(this.testData[0], configCols)
-    // );
-    // P_Value: 0.00001367510918
-    // adj_P_Val: 0.024064375844
-    // logFC: 1.8698479717
-    // t: 7.7253981892
-
-    // 0: "logFC"
-    // 1: "t"
-    // 2: "P_Value"
-    // 3: "adj_P_Val"
-
-    // this.columns = _.map(
-    //   _.filter(_.keys(orderedTestData), function(d) {
-    //     return _.includes(configCols, d);
-    //   }),
-    //   function(d) {
-    //     return { field: d };
-    //   }
-    // );
   };
 
   render() {

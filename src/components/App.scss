@@ -39,7 +39,6 @@ $screen-xl-min: 1200px;
 }
 
 .AppContainer {
-  height: 100vh;
 
   .TopBar {
     background-color: #2E2E2E !important;
@@ -75,7 +74,7 @@ $screen-xl-min: 1200px;
 
   .SidebarContainer {
     background-color: lightgray;
-    height: 100vh;
+    height: 92vh;
 
     .SearchCriteriaContainer {
       padding: 0px 20px !important;
@@ -134,6 +133,12 @@ $screen-xl-min: 1200px;
     .PlotSVG {
       height: 75vh !important;
     }
+  }
+
+  .ProteinNameLink {
+    color: orangered;
+    font-weight: bold;
+    font-size: 14px;
   }
 
   .PhosphositeIcon {
