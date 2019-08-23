@@ -16,7 +16,7 @@ class PepplotContainer extends Component {
     models: this.props.models || [],
     test: this.props.test || '',
     tests: this.props.tests || [],
-    modelsDisabled: this.props.modelsDisabled,
+    modelsDisabled: this.props.modelsDisabled || true,
     testsDisabled: this.props.testsDisabled || true,
     isValidSearchPepplot: this.props.isValidSearchPepplot || false,
     pepplotColumns: [],
@@ -29,7 +29,7 @@ class PepplotContainer extends Component {
   }
 
   handlePepplotSearch = searchResults => {
-    const columns = this.getCongfigCols(searchResults);
+    const columns = this.getConfigCols(searchResults);
     this.setState({
       study: searchResults.study,
       model: searchResults.model,
@@ -46,7 +46,7 @@ class PepplotContainer extends Component {
     });
   };
 
-  getCongfigCols = testData => {
+  getConfigCols = testData => {
     this.testData = testData.pepplotResults;
     const model = testData.model;
     let configCols = [];
