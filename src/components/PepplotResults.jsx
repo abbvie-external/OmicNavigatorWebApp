@@ -4,6 +4,7 @@ import { phosphoprotService } from '../services/phosphoprot.service';
 // import TableHelpers from '../utility/TableHelpers';
 import Plot from './Plot';
 import _ from 'lodash';
+import DOMPurify from 'dompurify';
 
 import QHGrid from '../utility/QHGrid';
 import EZGrid from '../utility/EZGrid';
@@ -32,7 +33,7 @@ class PepplotResults extends Component {
         title: '',
         svg: []
       },
-      currentSVGs: [],
+      // currentSVGs: [],
       isProteinSelected: this.props.isProteinSelected || false
     };
 
@@ -44,12 +45,13 @@ class PepplotResults extends Component {
   componentDidMount() {}
 
   getProteinData(id, dataItem, plotCb, imageInfo) {
-    let currentSVGs = [];
     let treeDataRaw = [];
     let treeData = [];
     let treeDataColumns = [];
     // let imageInfo.svg = [];
-
+    // this.setState({
+    //   isProteinSelected: true
+    // })
     // this.setState({
     //   currentSVGs = [],
     //   treeDataRaw = [],
@@ -161,12 +163,12 @@ class PepplotResults extends Component {
               i +
               '"'
           );
-          // find React tool to sanitize this, e.g. DOM Purify!
-          // var sanitizedSVG = sanitized.bypassSecurityTrustHtml(svgMarkup);
+          var sanitizedSVG = DOMPurify.sanitize(svgMarkup);
+          debugger;
           let svgInfo = { plotType: plotType[i], svg: svgMarkup };
           imageInfo.svg.push(svgInfo);
           // add local state for some of these objects~
-          // currentSVGs.push(svgMarkup);
+          currentSVGs.push(svgMarkup);
         });
     });
   }

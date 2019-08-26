@@ -5,6 +5,7 @@
   "dependencies": {
     "airbnb-prop-types": "^2.13.2",
     "axios": "^0.18.1",
+    "dompurify": "^1.0.11",
     "husky": "^3.0.3",
     "immutability-helper": "^3.0.1",
     "jquery": "^3.4.1",
