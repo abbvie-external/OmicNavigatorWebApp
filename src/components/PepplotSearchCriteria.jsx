@@ -58,7 +58,9 @@ class PepplotSearchCriteria extends Component {
       modelsDisabled: true,
       testsDisabled: true
     });
-    this.hidePepplotGrid();
+    this.props.onSearchCriteriaReset({
+      isValidSearchPepplot: false
+    });
     this.state.study = value;
     const modelNamesParam =
       this.state.tab === 'pepplot' ? 'inferenceNames' : 'EnrichmentNames';
@@ -81,7 +83,9 @@ class PepplotSearchCriteria extends Component {
       test: '',
       [name]: value
     });
-    this.hidePepplotGrid();
+    this.props.onSearchCriteriaReset({
+      isValidSearchPepplot: false
+    });
     const testsArr = _.map(this.allNames[value], function(testName) {
       return { key: testName, text: testName, value: testName };
     });
@@ -115,28 +119,13 @@ class PepplotSearchCriteria extends Component {
         this.setState({
           testsDisabled: false
         });
-        this.handlePepplotSearch(
-          this.state.study,
-          this.state.model,
-          this.state.test,
-          this.testdata
-        );
+        this.props.onPepplotSearch({
+          study: this.state.study,
+          model: this.state.model,
+          test: this.state.test,
+          pepplotResults: this.testdata
+        });
       });
-  };
-
-  handlePepplotSearch = (study, model, test, data) => {
-    this.props.onPepplotSearch({
-      study: study,
-      model: model,
-      test: test,
-      pepplotResults: data
-    });
-  };
-
-  hidePepplotGrid = () => {
-    this.props.onSearchCriteriaReset({
-      isValidSearchPepplot: false
-    });
   };
 
   render() {

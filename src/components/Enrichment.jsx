@@ -3,9 +3,8 @@ import { Grid } from 'semantic-ui-react';
 
 import EnrichmentSearchCriteria from './EnrichmentSearchCriteria';
 import EnrichmentResults from './EnrichmentResults';
-// import ButtonActions from './ButtonActions';
 import SearchPrompt from './SearchPrompt';
-import _ from 'lodash';
+// import _ from 'lodash';
 
 class EnrichmentContainer extends Component {
   state = {
@@ -16,7 +15,7 @@ class EnrichmentContainer extends Component {
     models: this.props.models || [],
     test: this.props.test || '',
     tests: this.props.tests || [],
-    modelsDisabled: this.props.modelsDisabled,
+    modelsDisabled: this.props.modelsDisabled || true,
     testsDisabled: this.props.testsDisabled || true,
     isValidSearchEnrichment: this.props.isValidSearchEnrichment || false,
     enrichmentColumns: [],

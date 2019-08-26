@@ -15,7 +15,7 @@ class EnrichmentSearchCriteria extends Component {
       models: this.props.models || [],
       test: this.props.test || '',
       tests: this.props.tests || [],
-      modelsDisabled: this.props.modelsDisabled,
+      modelsDisabled: this.props.modelsDisabled || true,
       testsDisabled: this.props.testsDisabled || true,
       isValidSearchEnrichment: this.props.isValidSearchEnrichment || false,
       enrichmentResults: this.props.enrichmentResults || []
@@ -86,7 +86,8 @@ class EnrichmentSearchCriteria extends Component {
 
   handleTestChange = (evt, { name, value }) => {
     this.setState({
-      [name]: value
+      [name]: value,
+      testsDisabled: true
     });
     this.state.test = value;
     const testResultsParam =
@@ -103,6 +104,9 @@ class EnrichmentSearchCriteria extends Component {
       )
       .then(dataFromService => {
         this.testdata = dataFromService;
+        this.setState({
+          testsDisabled: false
+        });
         this.handleEnrichmentSearch(
           this.state.study,
           this.state.model,

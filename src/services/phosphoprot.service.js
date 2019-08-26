@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import axios from 'axios';
 window.jQuery = $;
 const ocpu = require('opencpu.js/opencpu-0.5.js');
 
@@ -37,7 +38,7 @@ class PhosphoprotService {
     return modelsFromPromise;
   }
 
-  ocpuCall(method, obj) {
+  ocpuDataCall(method, obj) {
     return new Promise(function(resolve, reject) {
       window.ocpu.call(method, obj, function(session) {
         session
@@ -51,7 +52,7 @@ class PhosphoprotService {
     this.setUrl();
     const dynamicKey = tab === 'pepplot' ? 'test' : 'annotation';
     const obj = { testCategory: model, [dynamicKey]: test, study: study };
-    const promise = this.ocpuCall(rName, obj);
+    const promise = this.ocpuDataCall(rName, obj);
     const dataFromPromise = await promise;
     return dataFromPromise;
   }
@@ -72,36 +73,34 @@ class PhosphoprotService {
     mapForm.submit();
   }
 
-  // getProteinData(id, study) {
-  //   function getData(fn) {
-  //     ocpu.rpc("proteindata", { "id": id, "study": study }, function (session) {
-  //       fn(session)
-  //     })
-  //   }
-  // }
+  async getSiteData(id, study) {
+    const promise = this.ocpuRPC('sitedata', { idmult: id, study: study });
+    const siteDataFromPromise = await promise;
+    return siteDataFromPromise;
+  }
 
-  // getSiteData(id, study) {
-  //   function getData(fn) {
-  //     ocpu.rpc("sitedata", { "idmult": id, "study": study }, function (session) {
-  //       fn(session)
-  //     })
-  //   }
-  // }
+  async getProteinData(id, study) {
+    const promise = this.ocpuRPC('proteindata', { id: id, study: study });
+    const proteinDataFromPromise = await promise;
+    return proteinDataFromPromise;
+  }
 
-  // getPlot(id, plottype, study) {
-  //   function getData(fn) {
-  //     var self = this
-  //     ocpu.call(plottype, { idmult: id, "study": study }, function (session) {
-  //       var tester = session.getLoc()
-  //       self.getGraphic(tester + 'graphics/1/svg').subscribe(result => fn(result))
+  async ocpuPlotCall(plottype, obj) {
+    return new Promise(function(resolve, reject) {
+      window.ocpu.call(plottype, obj, function(session) {
+        axios
+          .get(session.getLoc() + 'graphics/1/svg', { responseType: 'text' })
+          .then(response => resolve(response));
+      });
+    });
+  }
 
-  //     })
-  //   }
-  // }
-
-  // getGraphic(path) {
-  //   return this._http.get(path, { responseType: 'text' });
-  // }
+  async getPlot(id, plottype, study) {
+    this.setUrl();
+    const promise = this.ocpuPlotCall(plottype, { idmult: id, study: study });
+    const svgMarkupFromPromise = await promise;
+    return svgMarkupFromPromise;
+  }
 }
 
 export const phosphoprotService = new PhosphoprotService();

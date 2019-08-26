@@ -1,26 +1,22 @@
 import React, { Component } from 'react';
 import { Grid } from 'semantic-ui-react';
 
+import { phosphoprotService } from '../services/phosphoprot.service';
 import PepplotSearchCriteria from './PepplotSearchCriteria';
 import PepplotResults from './PepplotResults';
-// import ButtonActions from './ButtonActions';
 import SearchPrompt from './SearchPrompt';
+import PlotContainer from './Plot';
 import _ from 'lodash';
 
 class PepplotContainer extends Component {
   state = {
     tab: this.props.tab || 'pepplot',
     study: this.props.study || '',
-    studies: this.props.studies || [],
     model: this.props.model || '',
-    models: this.props.models || [],
     test: this.props.test || '',
-    tests: this.props.tests || [],
-    modelsDisabled: this.props.modelsDisabled || true,
-    testsDisabled: this.props.testsDisabled || true,
     isValidSearchPepplot: this.props.isValidSearchPepplot || false,
-    pepplotColumns: [],
-    pepplotResults: []
+    pepplotResults: [],
+    pepplotColumns: []
   };
 
   componentDidMount() {
@@ -221,7 +217,14 @@ class PepplotContainer extends Component {
     return configCols;
   };
 
+  getView = () => {
+    if (this.state.isValidSearchPepplot) {
+      return <PepplotResults searchCriteria={this.state} />;
+    } else return <SearchPrompt />;
+  };
+
   render() {
+    const pepplotView = this.getView(this.state);
     return (
       <Grid.Row className="PepplotContainer">
         <Grid.Column
@@ -237,7 +240,6 @@ class PepplotContainer extends Component {
             onSearchCriteriaReset={this.hidePGrid}
           />
         </Grid.Column>
-
         <Grid.Column
           className="ContentContainer"
           mobile={16}
@@ -245,11 +247,7 @@ class PepplotContainer extends Component {
           largeScreen={13}
           widescreen={13}
         >
-          {this.state.isValidSearchPepplot ? (
-            <PepplotResults searchCriteria={this.state} />
-          ) : (
-            <SearchPrompt />
-          )}
+          {pepplotView}
         </Grid.Column>
       </Grid.Row>
     );
