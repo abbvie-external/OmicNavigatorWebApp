@@ -44,7 +44,6 @@ class PepplotResults extends Component {
   componentDidMount() {}
 
   getProteinData(id, dataItem, plotCb, imageInfo) {
-    debugger;
     let currentSVGs = [];
     let treeDataRaw = [];
     let treeData = [];
@@ -162,14 +161,12 @@ class PepplotResults extends Component {
               i +
               '"'
           );
+          // find React tool to sanitize this, e.g. DOM Purify!
           // var sanitizedSVG = sanitized.bypassSecurityTrustHtml(svgMarkup);
-
           let svgInfo = { plotType: plotType[i], svg: svgMarkup };
-
           imageInfo.svg.push(svgInfo);
-
+          // add local state for some of these objects~
           // currentSVGs.push(svgMarkup);
-          debugger;
         });
     });
   }
@@ -191,7 +188,6 @@ class PepplotResults extends Component {
   }
 
   getTableHelpers(proteinCb, plotCb) {
-    debugger;
     let addParams = {};
     addParams.showPhosphositePlus = dataItem => {
       return function() {

@@ -6,7 +6,6 @@ import PlotAccordion from './PlotAccordion';
 class PlotContainer extends Component {
   constructor(props) {
     super(props);
-    debugger;
     // const path = props.location.pathname === '/' ? '/pepplot' : props.location.pathname;
     this.state = {
       // activeTab: path
