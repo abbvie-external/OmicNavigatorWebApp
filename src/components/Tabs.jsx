@@ -7,7 +7,6 @@ import EnrichmentContainer from './Enrichment';
 class Tabs extends Component {
   constructor(props) {
     super(props);
-    debugger;
     const pathname = props.location.pathname;
     const enrichment = pathname.includes('enrichment');
     const tab = enrichment ? 'enrichment' : 'pepplot';

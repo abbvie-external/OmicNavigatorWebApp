@@ -51,11 +51,10 @@ class EnrichmentSearchCriteria extends Component {
       testsDisabled: true
     });
     this.hideEnrichmentGrid();
-    this.state.study = value;
     const modelNamesParam =
       this.state.tab === 'pepplot' ? 'inferenceNames' : 'EnrichmentNames';
     phosphoprotService
-      .getModelNames(modelNamesParam, this.state.study + 'plots')
+      .getModelNames(modelNamesParam, value + 'plots')
       .then(modelsFromService => {
         this.allNames = modelsFromService;
         const modelsArr = _.map(_.keys(modelsFromService), function(modelName) {
@@ -89,7 +88,6 @@ class EnrichmentSearchCriteria extends Component {
       [name]: value,
       testsDisabled: true
     });
-    this.state.test = value;
     const testResultsParam =
       this.state.tab === 'pepplot'
         ? 'getInferenceResults'
@@ -99,7 +97,7 @@ class EnrichmentSearchCriteria extends Component {
         this.state.tab,
         testResultsParam,
         this.state.model,
-        this.state.test,
+        value,
         this.state.study + 'plots'
       )
       .then(dataFromService => {
@@ -110,7 +108,7 @@ class EnrichmentSearchCriteria extends Component {
         this.handleEnrichmentSearch(
           this.state.study,
           this.state.model,
-          this.state.test,
+          value,
           this.testdata
         );
       });

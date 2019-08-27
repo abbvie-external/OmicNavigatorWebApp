@@ -10,15 +10,15 @@ export { QHGrid, EZGrid, QuickViewModal };
 export { getField, getFieldValue, typeMap };
 
 class EnrichmentResults extends Component {
-  constructor(props) {
-    super(props);
-  }
+  // constructor(props) {
+  //   super(props);
+  // }
 
   componentDidMount() {}
 
   render() {
-    const results = this.props.searchCriteria.enrichmentResults;
-    const columns = this.props.searchCriteria.enrichmentColumns;
+    // const results = this.props.searchCriteria.enrichmentResults;
+    // const columns = this.props.searchCriteria.enrichmentColumns;
     return (
       <div>
         <EZGrid data={[]} height="60vh" columnsConfig={[]} />

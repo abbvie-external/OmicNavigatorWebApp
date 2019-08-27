@@ -11,9 +11,7 @@ class PhosphoprotService {
   }
 
   setUrl() {
-    //if (window.location.host === 'localhost:3000') {
-      window.ocpu.seturl(this.ocpuUrl);
-    //}
+    window.ocpu.seturl(this.ocpuUrl);
   }
 
   ocpuRPC(name, paramsObj) {

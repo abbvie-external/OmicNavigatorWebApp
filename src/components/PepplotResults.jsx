@@ -1,4 +1,4 @@
-import React, { Component, useMemo } from 'react';
+import React, { Component } from 'react';
 import { phosphoprotService } from '../services/phosphoprot.service';
 // import ButtonActions from './ButtonActions';
 // import TableHelpers from '../utility/TableHelpers';
@@ -19,12 +19,12 @@ class PepplotResults extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      tab: this.props.tab || 'pepplot',
-      study: this.props.study || '',
-      model: this.props.model || '',
-      test: this.props.test || '',
-      pepplotResults: this.props.pepplotResults || [],
-      pepplotColumns: this.props.pepplotColumns || [],
+      // tab: this.props.tab || 'pepplot',
+      // study: this.props.study || '',
+      // model: this.props.model || '',
+      // test: this.props.test || '',
+      // pepplotResults: this.props.pepplotResults || [],
+      // pepplotColumns: this.props.pepplotColumns || [],
       treeDataRaw: [],
       treeData: [],
       treeDataColumns: [],
@@ -33,7 +33,7 @@ class PepplotResults extends Component {
         title: '',
         svg: []
       },
-      // currentSVGs: [],
+      currentSVGs: [],
       isProteinSelected: false
     };
 
@@ -44,25 +44,22 @@ class PepplotResults extends Component {
 
   componentDidMount() {}
 
-  getProteinData(id, dataItem, plotCb, imageInfo) {
-    let treeDataRaw = [];
-    let treeData = [];
-    let treeDataColumns = [];
-    // let imageInfo.svg = [];
-    this.setState({
-      isProteinSelected: true
+  getProteinData(id, dataItem, getPlotCb, imageInfo) {
+    debugger;
+    let self = this;
+    self.setState({
+      imageInfo: imageInfo,
+      isProteinSelected: true,
+      treeDataRaw: [],
+      treeData: [],
+      treeDataColumns: [],
+      currentSVGs: []
+      // imageInfo.svg = []
     });
-    // this.state.isProteinSelected = true;
-    // this.forceUpdate();
-    // this.setState({
-    //   currentSVGs = [],
-    //   treeDataRaw = [],
-    //   treeData = [];
-    //   treeDataColumns = [];
-    //   imageInfo.svg = [];
-    // })
-    let model = this.props.searchCriteria.model;
-    let study = this.props.searchCriteria.study;
+
+    let model = this.props.model;
+    let study = this.props.study;
+
     let plotType = ['splineplot'];
     switch (model) {
       case 'DonorDifferentialPhosphorylation':
@@ -88,10 +85,10 @@ class PepplotResults extends Component {
       phosphoprotService
         .getSiteData(id, study + 'plots')
         .then(treeData => {
-          treeDataRaw = treeData;
-          console.log('here is the raw treedata');
-          console.log(treeDataRaw);
-          treeDataColumns = _.map(_.keys(treeData[0]), function(d) {
+          self.state.treeDataRaw = treeData;
+          // console.log('here is the raw treedata');
+          // console.log(treeDataRaw);
+          self.state.treeDataColumns = _.map(_.keys(treeData[0]), function(d) {
             return { field: d };
           });
           treeData = _.map(treeData, function(d, i) {
@@ -105,18 +102,21 @@ class PepplotResults extends Component {
               items: entries
             };
           });
+          self.state.treeData = treeData;
         })
         .then(function() {
-          plotCb(id, plotType, study, imageInfo);
+          getPlotCb(id, plotType, study, imageInfo, self);
         });
     } else {
       phosphoprotService
         .getProteinData(id, study + 'plots')
         .then(proteinData => {
-          treeDataRaw = proteinData;
-          console.log('here is the raw treeData');
-          console.log(treeDataRaw);
-          treeDataColumns = _.map(_.keys(proteinData[0]), function(d) {
+          self.state.treeDataRaw = proteinData;
+          // console.log('here is the raw treeData');
+          // console.log(treeDataRaw);
+          self.state.treeDataColumns = _.map(_.keys(proteinData[0]), function(
+            d
+          ) {
             return { field: d };
           });
 
@@ -128,17 +128,17 @@ class PepplotResults extends Component {
             return entries;
           });
 
-          console.log('this is proteinData');
-          console.log(proteinData);
-          treeData = proteinData[0];
+          // console.log('this is proteinData');
+          // console.log(proteinData);
+          self.state.treeData = proteinData[0];
         })
         .then(function() {
-          plotCb(id, plotType, study, imageInfo);
+          getPlotCb(id, plotType, study, imageInfo, self);
         });
     }
   }
 
-  getPlot(id, plotType, study, imageInfo) {
+  getPlot(id, plotType, study, imageInfo, self) {
     let currentSVGs = [];
     let heightCalculation = this.calculateHeight;
     let widthCalculation = this.calculateWidth;
@@ -165,12 +165,12 @@ class PepplotResults extends Component {
               i +
               '"'
           );
-          var sanitizedSVG = DOMPurify.sanitize(svgMarkup);
-          debugger;
-          let svgInfo = { plotType: plotType[i], svg: svgMarkup };
+          let sanitizedSVG = DOMPurify.sanitize(svgMarkup);
+          let svgInfo = { plotType: plotType[i], svg: sanitizedSVG };
           imageInfo.svg.push(svgInfo);
           // add local state for some of these objects~
-          currentSVGs.push(svgMarkup);
+          currentSVGs.push(sanitizedSVG);
+          debugger;
         });
     });
   }
@@ -191,7 +191,7 @@ class PepplotResults extends Component {
     return w;
   }
 
-  getTableHelpers(proteinCb, plotCb) {
+  getTableHelpers(getProteinDataCb, getPlotCb) {
     let addParams = {};
     addParams.showPhosphositePlus = dataItem => {
       return function() {
@@ -220,10 +220,10 @@ class PepplotResults extends Component {
               imageInfo.title =
                 'Phosphosite Intensity - ' + dataItem.Protein_Site;
           }
-          proteinCb(
+          getProteinDataCb(
             dataItem.id_mult ? dataItem.id_mult : dataItem.id,
             dataItem,
-            plotCb,
+            getPlotCb,
             imageInfo
           );
         }
@@ -233,9 +233,9 @@ class PepplotResults extends Component {
   }
 
   render() {
-    const results = this.props.searchCriteria.pepplotResults;
-    const columns = this.props.searchCriteria.pepplotColumns;
-    const rows = this.props.searchCriteria.pepplotResults.length;
+    const results = this.props.pepplotResults;
+    const columns = this.props.pepplotColumns;
+    const rows = this.props.pepplotResults.length;
     const additionalTemplateInfo = this.getTableHelpers(
       this.getProteinData,
       this.getPlot

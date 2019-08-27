@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import { Grid } from 'semantic-ui-react';
 
-import { phosphoprotService } from '../services/phosphoprot.service';
+// import { phosphoprotService } from '../services/phosphoprot.service';
 import PepplotSearchCriteria from './PepplotSearchCriteria';
 import PepplotResults from './PepplotResults';
 import SearchPrompt from './SearchPrompt';
-import PlotContainer from './Plot';
-import _ from 'lodash';
+// import PlotContainer from './Plot';
+// import _ from 'lodash';
 
 class PepplotContainer extends Component {
   state = {
@@ -219,7 +219,7 @@ class PepplotContainer extends Component {
 
   getView = () => {
     if (this.state.isValidSearchPepplot) {
-      return <PepplotResults searchCriteria={this.state} />;
+      return <PepplotResults {...this.state} />;
     } else return <SearchPrompt />;
   };
 
@@ -235,7 +235,7 @@ class PepplotContainer extends Component {
           widescreen={3}
         >
           <PepplotSearchCriteria
-            searchCriteria={this.state}
+            {...this.state}
             onPepplotSearch={this.handlePepplotSearch}
             onSearchCriteriaReset={this.hidePGrid}
           />

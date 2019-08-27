@@ -61,11 +61,10 @@ class PepplotSearchCriteria extends Component {
     this.props.onSearchCriteriaReset({
       isValidSearchPepplot: false
     });
-    this.state.study = value;
     const modelNamesParam =
       this.state.tab === 'pepplot' ? 'inferenceNames' : 'EnrichmentNames';
     phosphoprotService
-      .getModelNames(modelNamesParam, this.state.study + 'plots')
+      .getModelNames(modelNamesParam, value + 'plots')
       .then(modelsFromService => {
         this.allNames = modelsFromService;
         const modelsArr = _.map(_.keys(modelsFromService), function(modelName) {
@@ -101,7 +100,6 @@ class PepplotSearchCriteria extends Component {
       [name]: value,
       testsDisabled: true
     });
-    this.state.test = value;
     const testResultsParam =
       this.state.tab === 'pepplot'
         ? 'getInferenceResults'
@@ -111,7 +109,7 @@ class PepplotSearchCriteria extends Component {
         this.state.tab,
         testResultsParam,
         this.state.model,
-        this.state.test,
+        value,
         this.state.study + 'plots'
       )
       .then(dataFromService => {
@@ -122,7 +120,7 @@ class PepplotSearchCriteria extends Component {
         this.props.onPepplotSearch({
           study: this.state.study,
           model: this.state.model,
-          test: this.state.test,
+          test: value,
           pepplotResults: this.testdata
         });
       });
