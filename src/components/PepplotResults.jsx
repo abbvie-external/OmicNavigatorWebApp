@@ -34,7 +34,7 @@ class PepplotResults extends Component {
         svg: []
       },
       // currentSVGs: [],
-      isProteinSelected: this.props.isProteinSelected || false
+      isProteinSelected: false
     };
 
     this.getProteinData = this.getProteinData.bind(this);
@@ -49,9 +49,11 @@ class PepplotResults extends Component {
     let treeData = [];
     let treeDataColumns = [];
     // let imageInfo.svg = [];
-    // this.setState({
-    //   isProteinSelected: true
-    // })
+    this.setState({
+      isProteinSelected: true
+    });
+    // this.state.isProteinSelected = true;
+    // this.forceUpdate();
     // this.setState({
     //   currentSVGs = [],
     //   treeDataRaw = [],

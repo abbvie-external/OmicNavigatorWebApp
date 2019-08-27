@@ -7,8 +7,14 @@ import EnrichmentContainer from './Enrichment';
 class Tabs extends Component {
   constructor(props) {
     super(props);
+    debugger;
+    const pathname = props.location.pathname;
+    const enrichment = pathname.includes('enrichment');
+    const tab = enrichment ? 'enrichment' : 'pepplot';
+    props.history.push(tab);
+    let index = tab === 'enrichment' ? 3 : 2;
     this.state = {
-      tab: { activeIndex: 1 }
+      tab: { activeIndex: index }
     };
   }
 
@@ -16,6 +22,8 @@ class Tabs extends Component {
 
   handleTabChange = (e, { activeIndex }) => {
     this.setState({ activeIndex });
+    let tab = activeIndex === 3 ? 'enrichment' : 'pepplot';
+    this.props.history.push(tab);
   };
 
   render() {
