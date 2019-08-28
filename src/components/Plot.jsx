@@ -3,6 +3,7 @@ import { withRouter } from 'react-router-dom';
 import { Grid, Segment, Icon, Header, Dimmer, Loader } from 'semantic-ui-react';
 // import Breadcrumbs from './Breadcrumbs';
 import PlotAccordion from './PlotAccordion';
+import PlotSVG from './PlotSVG';
 
 class PlotContainer extends Component {
   constructor(props) {
@@ -71,12 +72,7 @@ class PlotContainer extends Component {
                   largeScreen={13}
                   widescreen={12}
                 >
-                  <Segment className="PlotSVG" placeholder>
-                    <Header icon>
-                      <Icon name="chart area" />
-                      Plot (formerly Dialog) goes here
-                    </Header>
-                  </Segment>
+                  <PlotSVG {...this.state} />
                 </Grid.Column>
               </Grid.Row>
             </Grid>

@@ -175,22 +175,10 @@ class PepplotResults extends Component {
             '#' + id + '-' + i + '-glyph'
           );
           svgMarkup = svgMarkup.replace(/#clip/g, '#' + id + '-' + i + '-clip');
-          svgMarkup = svgMarkup.replace(
-            /<svg/g,
-            '<svg preserveAspectRatio="none" style="width:' +
-              heightCalculation() * 0.65 +
-              'px; height:' +
-              widthCalculation() * 0.7 +
-              'px;" id="currentSVG-' +
-              id +
-              '-' +
-              i +
-              '"'
-          );
+          // svgMarkup = svgMarkup.replace(/<svg/g, '<svg preserveAspectRatio="none" style="width:' + widthCalculation() * .65 + 'px; height:' + heightCalculation() * .70 + 'px;" id="currentSVG-' + id + '-' + i + '"');
           let sanitizedSVG = DOMPurify.sanitize(svgMarkup);
           let svgInfo = { plotType: plotType[i], svg: sanitizedSVG };
           imageInfo.svg.push(svgInfo);
-          // add local state for some of these objects~
           currentSVGs.push(sanitizedSVG);
           handleSVGCb(imageInfo);
         });

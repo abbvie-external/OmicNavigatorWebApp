@@ -153,8 +153,24 @@ $screen-xl-min: 1200px;
       transform: scale(1.2);
   }
 
+  .svgContainer {
+    height: 100% !important;
+    width: 100% !important;
+  }
+
+  .svgDiv {
+    height: 100% !important;
+    width: 100% !important;
+  }
+
+  .svgSpan {
+    height: 100% !important;
+    width: 100% !important;
+  }
+
   .customOrange {
     color: #FF4400 !important;
     border: 1px solid #FF4400 !important;
   }
+
 }
