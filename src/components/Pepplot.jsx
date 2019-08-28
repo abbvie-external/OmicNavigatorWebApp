@@ -5,7 +5,6 @@ import { Grid } from 'semantic-ui-react';
 import PepplotSearchCriteria from './PepplotSearchCriteria';
 import PepplotResults from './PepplotResults';
 import SearchPrompt from './SearchPrompt';
-// import PlotContainer from './Plot';
 // import _ from 'lodash';
 
 class PepplotContainer extends Component {

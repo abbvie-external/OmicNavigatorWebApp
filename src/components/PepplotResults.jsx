@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import { phosphoprotService } from '../services/phosphoprot.service';
 // import ButtonActions from './ButtonActions';
 // import TableHelpers from '../utility/TableHelpers';
-import Plot from './Plot';
+import PlotContainer from './Plot';
+import { Dimmer, Loader } from 'semantic-ui-react';
 import _ from 'lodash';
 import DOMPurify from 'dompurify';
 
@@ -19,12 +20,12 @@ class PepplotResults extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      // tab: this.props.tab || 'pepplot',
-      // study: this.props.study || '',
-      // model: this.props.model || '',
-      // test: this.props.test || '',
-      // pepplotResults: this.props.pepplotResults || [],
-      // pepplotColumns: this.props.pepplotColumns || [],
+      tab: this.props.tab || 'pepplot',
+      study: this.props.study || '',
+      model: this.props.model || '',
+      test: this.props.test || '',
+      pepplotResults: this.props.pepplotResults || [],
+      pepplotColumns: this.props.pepplotColumns || [],
       treeDataRaw: [],
       treeData: [],
       treeDataColumns: [],
@@ -34,27 +35,35 @@ class PepplotResults extends Component {
         svg: []
       },
       currentSVGs: [],
-      isProteinSelected: false
+      isProteinSelected: false,
+      isProteinDataLoaded: false
     };
-
     this.getProteinData = this.getProteinData.bind(this);
     this.getPlot = this.getPlot.bind(this);
     this.getTableHelpers = this.getTableHelpers.bind(this);
+    this.handleSVG = this.handleSVG.bind(this);
   }
 
   componentDidMount() {}
 
+  handleSVG(imageInfo) {
+    this.setState({
+      imageInfo: imageInfo,
+      isProteinDataLoaded: true
+    });
+  }
+
   getProteinData(id, dataItem, getPlotCb, imageInfo) {
-    debugger;
     let self = this;
+    const handleSVGCb = this.handleSVG;
     self.setState({
       imageInfo: imageInfo,
       isProteinSelected: true,
+      isProteinDataLoaded: false,
       treeDataRaw: [],
       treeData: [],
       treeDataColumns: [],
       currentSVGs: []
-      // imageInfo.svg = []
     });
 
     let model = this.props.model;
@@ -84,61 +93,74 @@ class PepplotResults extends Component {
     if (model !== 'Differential Expression') {
       phosphoprotService
         .getSiteData(id, study + 'plots')
-        .then(treeData => {
-          self.state.treeDataRaw = treeData;
+        .then(treeDataResponse => {
+          // self.state.treeDataRaw = treeData;
           // console.log('here is the raw treedata');
-          // console.log(treeDataRaw);
-          self.state.treeDataColumns = _.map(_.keys(treeData[0]), function(d) {
+          // console.log(treeDataResponse);
+          self.setState({
+            treeDataRaw: treeDataResponse
+          });
+          let tdCols = _.map(_.keys(treeDataResponse[0]), function(d) {
             return { field: d };
           });
-          treeData = _.map(treeData, function(d, i) {
+          self.setState({
+            treeDataColumns: tdCols
+          });
+          let tD = _.map(treeDataResponse, function(d, i) {
             let entries = _.toPairs(d);
 
             entries = _.map(entries, function(e) {
-              return { text: e[0], items: [{ text: e[1] }] };
+              return { key: e[0], text: e[0], items: [{ text: e[1] }] };
             });
             return {
+              key: i + 1,
               text: 'Peptide' + (i + 1) + '  (' + d.Modified_sequence + ')',
               items: entries
             };
           });
-          self.state.treeData = treeData;
+          this.setState({
+            treeData: tD
+          });
         })
         .then(function() {
-          getPlotCb(id, plotType, study, imageInfo, self);
+          getPlotCb(id, plotType, study, imageInfo, handleSVGCb);
         });
     } else {
       phosphoprotService
         .getProteinData(id, study + 'plots')
-        .then(proteinData => {
-          self.state.treeDataRaw = proteinData;
+        .then(proteinDataResponse => {
+          self.setState({
+            treeDataRaw: proteinDataResponse
+          });
           // console.log('here is the raw treeData');
-          // console.log(treeDataRaw);
-          self.state.treeDataColumns = _.map(_.keys(proteinData[0]), function(
-            d
-          ) {
-            return { field: d };
+          // console.log(proteinDataResponse);
+          let tdCols = _.map(_.keys(proteinData[0]), function(d) {
+            return { key: d, field: d };
+          });
+          self.setState({
+            treeDataColumns: tdCols
           });
 
-          proteinData = _.map(proteinData, function(d, i) {
+          let proteinData = _.map(proteinDataResponse, function(d, i) {
             var entries = _.toPairs(d);
             entries = _.map(entries, function(e) {
-              return { text: e[0], items: [{ text: e[1] }] };
+              return { key: e[0], text: e[0], items: [{ text: e[1] }] };
             });
             return entries;
           });
-
           // console.log('this is proteinData');
           // console.log(proteinData);
-          self.state.treeData = proteinData[0];
+          self.setState({
+            treeData: proteinData[0]
+          });
         })
         .then(function() {
-          getPlotCb(id, plotType, study, imageInfo, self);
+          getPlotCb(id, plotType, study, imageInfo, handleSVGCb);
         });
     }
   }
 
-  getPlot(id, plotType, study, imageInfo, self) {
+  getPlot(id, plotType, study, imageInfo, handleSVGCb) {
     let currentSVGs = [];
     let heightCalculation = this.calculateHeight;
     let widthCalculation = this.calculateWidth;
@@ -170,7 +192,7 @@ class PepplotResults extends Component {
           imageInfo.svg.push(svgInfo);
           // add local state for some of these objects~
           currentSVGs.push(sanitizedSVG);
-          debugger;
+          handleSVGCb(imageInfo);
         });
     });
   }
@@ -209,16 +231,18 @@ class PepplotResults extends Component {
 
     addParams.showPlot = (model, dataItem) => {
       return function() {
-        let imageInfo = { title: '', svg: [] };
+        let imageInfo = { key: '', title: '', svg: [] };
         if (dataItem.id_mult) {
           switch (model) {
             case 'Differential Expression':
               imageInfo.title =
                 'Protein Intensity - ' + dataItem.MajorityProteinIDs;
+              imageInfo.key = dataItem.MajorityProteinIDs;
               break;
             default:
               imageInfo.title =
                 'Phosphosite Intensity - ' + dataItem.Protein_Site;
+              imageInfo.key = dataItem.Protein_Site;
           }
           getProteinDataCb(
             dataItem.id_mult ? dataItem.id_mult : dataItem.id,
@@ -241,7 +265,7 @@ class PepplotResults extends Component {
       this.getPlot
     );
 
-    if (!this.isProteinSelected) {
+    if (!this.state.isProteinSelected) {
       return (
         <div>
           <EZGrid
@@ -255,10 +279,21 @@ class PepplotResults extends Component {
           />
         </div>
       );
+    } else if (
+      this.state.isProteinSelected &&
+      !this.state.isProteinDataLoaded
+    ) {
+      return (
+        <div>
+          <Dimmer active inverted>
+            <Loader size="large">Preparing Protein Data and Plots</Loader>
+          </Dimmer>
+        </div>
+      );
     } else {
       return (
         <div>
-          <Plot {...this.props}></Plot>
+          <PlotContainer {...this.state}></PlotContainer>
         </div>
       );
     }
