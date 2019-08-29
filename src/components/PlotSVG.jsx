@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
-import { Segment, Loader, Dimmer, Tab } from 'semantic-ui-react';
+import { Loader, Dimmer, Tab } from 'semantic-ui-react';
 import _ from 'lodash';
 
 class PlotSVG extends Component {
   constructor(props) {
     super(props);
-    let index = 1;
+    const plotIndex = props.index || 0;
     this.state = {
       isSVGReady: false,
-      tab: { activeIndex: index }
+      activeIndex: plotIndex
     };
     this.getSVGPanes = this.getSVGPanes.bind(this);
     this.handleTabChange = this.handleTabChange.bind(this);
@@ -21,17 +21,10 @@ class PlotSVG extends Component {
   }
 
   handleTabChange = (e, { activeIndex }) => {
-    debugger;
     this.setState({ activeIndex });
   };
 
-  parseSVG(svg) {
-    let domparser = new DOMParser();
-    let parsedSVG = domparser.parseFromString(svg, 'image/svg+xml');
-    return parsedSVG;
-  }
-
-  getSVGPanes() {
+  getSVGPanes(activeIndex) {
     if (this.props.imageInfo) {
       const imageInfoArray = this.props.imageInfo;
       const svgArray = this.props.imageInfo.svg;
@@ -39,20 +32,13 @@ class PlotSVG extends Component {
         return {
           menuItem: `${s.plotType}`,
           render: () => (
-            <Tab.Pane attached={false}>
+            <Tab.Pane attached={false} as={'string'}>
               <div
                 className="svgSpan"
                 dangerouslySetInnerHTML={{ __html: s.svg }}
               ></div>
             </Tab.Pane>
           )
-
-          // render: () => <Tab.Pane attached={false}>{this.parseSVG(s.svg)}</Tab.Pane>,
-
-          // pane: (
-          // <Tab.Pane attached={false}>
-          // {this.parseSVG(s.svg)}
-          // </Tab.Pane>
         };
       });
 
@@ -60,14 +46,18 @@ class PlotSVG extends Component {
         <Tab
           menu={{ secondary: true, pointing: true, className: 'SVGDiv' }}
           panes={panes}
+          onTabChange={this.handleTabChange}
+          panes={panes}
+          activeIndex={activeIndex}
+          defaultActiveIndex={0}
         />
       );
     }
   }
 
   render() {
-    // const { activeIndex } = this.state;
-    const svgPanes = this.getSVGPanes();
+    const { activeIndex } = this.state;
+    const svgPanes = this.getSVGPanes(activeIndex);
     if (!this.state.isSVGReady) {
       return (
         <div>

@@ -176,7 +176,26 @@ class PepplotResults extends Component {
           );
           svgMarkup = svgMarkup.replace(/#clip/g, '#' + id + '-' + i + '-clip');
           // svgMarkup = svgMarkup.replace(/<svg/g, '<svg preserveAspectRatio="none" style="width:' + widthCalculation() * .65 + 'px; height:' + heightCalculation() * .70 + 'px;" id="currentSVG-' + id + '-' + i + '"');
-          let sanitizedSVG = DOMPurify.sanitize(svgMarkup);
+          svgMarkup = svgMarkup.replace(
+            /<svg/g,
+            '<svg preserveAspectRatio="xMidYMid meet" id="currentSVG-' +
+              id +
+              '-' +
+              i +
+              '"'
+          );
+          DOMPurify.addHook('afterSanitizeAttributes', function(node) {
+            if (
+              node.hasAttribute('xlink:href') &&
+              !node.getAttribute('xlink:href').match(/^#/)
+            ) {
+              node.remove();
+            }
+          });
+          // Clean HTML string and write into our DIV
+          let sanitizedSVG = DOMPurify.sanitize(svgMarkup, {
+            ADD_TAGS: ['use']
+          });
           let svgInfo = { plotType: plotType[i], svg: sanitizedSVG };
           imageInfo.svg.push(svgInfo);
           currentSVGs.push(sanitizedSVG);

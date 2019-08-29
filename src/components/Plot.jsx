@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import { Grid, Segment, Icon, Header, Dimmer, Loader } from 'semantic-ui-react';
+import { Grid, Icon, Header, Dimmer, Loader } from 'semantic-ui-react';
 // import Breadcrumbs from './Breadcrumbs';
 import PlotAccordion from './PlotAccordion';
 import PlotSVG from './PlotSVG';
@@ -54,29 +54,27 @@ class PlotContainer extends Component {
       return (
         <div className="">
           {/* <Breadcrumbs /> */}
-          <Segment className="PlotContainer">
-            <Grid columns={2}>
-              <Grid.Row className="">
-                <Grid.Column
-                  className="PlotAccordionContainer"
-                  mobile={16}
-                  tablet={16}
-                  largeScreen={3}
-                  widescreen={4}
-                >
-                  <PlotAccordion {...this.state} />
-                </Grid.Column>
-                <Grid.Column
-                  mobile={16}
-                  tablet={16}
-                  largeScreen={13}
-                  widescreen={12}
-                >
-                  <PlotSVG {...this.state} />
-                </Grid.Column>
-              </Grid.Row>
-            </Grid>
-          </Segment>
+          <Grid columns={2} className="PlotContainer">
+            <Grid.Row className="">
+              <Grid.Column
+                className="PlotAccordionContainer"
+                mobile={16}
+                tablet={16}
+                largeScreen={3}
+                widescreen={4}
+              >
+                <PlotAccordion {...this.state} />
+              </Grid.Column>
+              <Grid.Column
+                mobile={16}
+                tablet={16}
+                largeScreen={13}
+                widescreen={12}
+              >
+                <PlotSVG {...this.state} />
+              </Grid.Column>
+            </Grid.Row>
+          </Grid>
         </div>
       );
     }
