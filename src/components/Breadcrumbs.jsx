@@ -1,15 +1,14 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 import { Breadcrumb, Icon } from 'semantic-ui-react';
 
 class Breadcrumbs extends Component {
-  state = {
-    tab: 'pepplot',
-    study: '***REMOVED***',
-    model: 'donordifferentialphosphorylation',
-    test: 'donor1vdonor3',
-    protein: 'HMGA1_S44'
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      protein: this.props.imageInfo.key
+    };
+  }
 
   componentDidMount() {}
 
@@ -17,10 +16,10 @@ class Breadcrumbs extends Component {
     return (
       <div className="BreadcrumbContainer">
         <div className="deviceMargin">
-          <Breadcrumb size="small">
-            <Link to={{ pathname: `/pepplot` }}>
+          <Breadcrumb size="large">
+            <Link to={this.props.history.location.pathname}>
               <Breadcrumb.Section>
-                <Icon name="home" />
+                <Icon name="table" />
               </Breadcrumb.Section>
             </Link>
             <Breadcrumb.Divider icon="right chevron" />
@@ -34,4 +33,4 @@ class Breadcrumbs extends Component {
   }
 }
 
-export default Breadcrumbs;
+export default withRouter(Breadcrumbs);

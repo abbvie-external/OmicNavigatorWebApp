@@ -14,6 +14,7 @@ class PepplotContainer extends Component {
     model: this.props.model || '',
     test: this.props.test || '',
     isValidSearchPepplot: this.props.isValidSearchPepplot || false,
+    isProteinSelected: false,
     pepplotResults: [],
     pepplotColumns: []
   };
@@ -31,7 +32,8 @@ class PepplotContainer extends Component {
       test: searchResults.test,
       pepplotResults: searchResults.pepplotResults,
       pepplotColumns: columns,
-      isValidSearchPepplot: true
+      isValidSearchPepplot: true,
+      isProteinSelected: false
     });
   };
 
@@ -217,7 +219,7 @@ class PepplotContainer extends Component {
   };
 
   getView = () => {
-    if (this.state.isValidSearchPepplot) {
+    if (this.state.isValidSearchPepplot && !this.state.isProteinSelected) {
       return <PepplotResults {...this.state} />;
     } else return <SearchPrompt />;
   };

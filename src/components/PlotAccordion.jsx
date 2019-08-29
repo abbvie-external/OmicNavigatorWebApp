@@ -63,7 +63,7 @@ class PlotAccordion extends Component {
         panels={rootPanels}
         exclusive={false}
         fluid
-        styled
+        // styled
       />
     );
   }

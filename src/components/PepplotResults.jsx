@@ -35,7 +35,7 @@ class PepplotResults extends Component {
         svg: []
       },
       currentSVGs: [],
-      isProteinSelected: false,
+      isProteinSelected: this.props.isProteinSelected || false,
       isProteinDataLoaded: false
     };
     this.getProteinData = this.getProteinData.bind(this);
@@ -175,15 +175,26 @@ class PepplotResults extends Component {
             '#' + id + '-' + i + '-glyph'
           );
           svgMarkup = svgMarkup.replace(/#clip/g, '#' + id + '-' + i + '-clip');
-          // svgMarkup = svgMarkup.replace(/<svg/g, '<svg preserveAspectRatio="none" style="width:' + widthCalculation() * .65 + 'px; height:' + heightCalculation() * .70 + 'px;" id="currentSVG-' + id + '-' + i + '"');
           svgMarkup = svgMarkup.replace(
             /<svg/g,
-            '<svg preserveAspectRatio="xMidYMid meet" id="currentSVG-' +
+            '<svg preserveAspectRatio="xMinYMid meet" style="width:' +
+              widthCalculation() * 0.7 +
+              'px; height:' +
+              heightCalculation() * 0.7 +
+              'px;" id="currentSVG-' +
               id +
               '-' +
               i +
               '"'
           );
+          // svgMarkup = svgMarkup.replace(
+          //   /<svg/g,
+          //   '<svg preserveAspectRatio="xMidYMid meet" id="currentSVG-' +
+          //     id +
+          //     '-' +
+          //     i +
+          //     '"'
+          // );
           DOMPurify.addHook('afterSanitizeAttributes', function(node) {
             if (
               node.hasAttribute('xlink:href') &&
@@ -271,7 +282,6 @@ class PepplotResults extends Component {
       this.getProteinData,
       this.getPlot
     );
-
     if (!this.state.isProteinSelected) {
       return (
         <div>
@@ -280,7 +290,7 @@ class PepplotResults extends Component {
             columnsConfig={columns}
             totalRows={rows}
             // use "rows" for itemsPerPage if you want all results. For dev, keep it at 500 so rendering doesn't take too long
-            itemsPerPage={500}
+            itemsPerPage={rows}
             height="65vh"
             additionalTemplateInfo={additionalTemplateInfo}
           />
