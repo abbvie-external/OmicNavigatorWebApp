@@ -136,6 +136,12 @@ $screen-xl-min: 1200px;
     }
   }
 
+  .ProteinColWidth {
+    width: 30px !important;
+    max-width: 30px !important;
+    background-color: red !important;
+  }
+
   .ProteinNameLink {
     color: rgb(22, 120, 194);
     font-weight: bold;

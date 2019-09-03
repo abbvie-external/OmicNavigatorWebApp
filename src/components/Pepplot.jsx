@@ -1,11 +1,8 @@
 import React, { Component } from 'react';
-import { Grid } from 'semantic-ui-react';
-
-// import { phosphoprotService } from '../services/phosphoprot.service';
+import { Grid, Popup } from 'semantic-ui-react';
 import PepplotSearchCriteria from './PepplotSearchCriteria';
 import PepplotResults from './PepplotResults';
 import SearchPrompt from './SearchPrompt';
-// import _ from 'lodash';
 
 class PepplotContainer extends Component {
   state = {
@@ -43,10 +40,25 @@ class PepplotContainer extends Component {
     });
   };
 
+  formatNumberForDisplay(num) {
+    if (num) {
+      if (Math.abs(num) > 0.001) {
+        return num.toPrecision(3); //sig dig
+      } else {
+        return num.toExponential(2); // num after decimal
+      }
+    } else return null;
+  }
+
+  truncateValue(value, indexEnd) {
+    return value.substr(0, indexEnd);
+  }
+
   getConfigCols = testData => {
     this.testData = testData.pepplotResults;
     const model = testData.model;
     let configCols = [];
+
     // var configCols = ['F', 'logFC', 't', 'P_Value', 'adj_P_Val'];
     // var orderedTestData = JSON.parse(
     //   JSON.stringify(this.testData[0], configCols)
@@ -59,22 +71,28 @@ class PepplotContainer extends Component {
     //     return { field: d };
     //   }
     // );
+
     if (model === 'Differential Expression') {
       configCols = [
         {
           title: 'MajorityProteinIDsHGNC',
           field: 'MajorityProteinIDsHGNC',
-          // type: 'number',
           filterable: { type: 'multiFilter' },
           template: (value, item, addParams) => {
             return (
               <p>
-                <span
-                  className="ProteinNameLink"
-                  onClick={addParams.showPlot(model, item)}
-                >
-                  {value}
-                </span>
+                <Popup
+                  trigger={
+                    <span
+                      className="ProteinNameLink"
+                      onClick={addParams.showPlot(model, item)}
+                    >
+                      {this.truncateValue(value, 11)}
+                    </span>
+                  }
+                  content={value}
+                  inverted
+                />
                 <img
                   src="phosphosite.ico"
                   alt="Phosophosite"
@@ -89,7 +107,18 @@ class PepplotContainer extends Component {
         {
           title: 'MajorityProteinIDs',
           field: 'MajorityProteinIDs',
-          filterable: { type: 'multiFilter' }
+          filterable: { type: 'multiFilter' },
+          template: (value, item, addParams) => {
+            return (
+              <p>
+                <Popup
+                  trigger={<span>{this.truncateValue(value, 17)}</span>}
+                  content={value}
+                  inverted
+                />
+              </p>
+            );
+          }
         },
         {
           title: 'logFC',
@@ -98,10 +127,19 @@ class PepplotContainer extends Component {
             sortAccessor: (item, field) =>
               item[field] && item[field].toFixed(2),
             groupByAccessor: (item, field) =>
-              item[field] && item[field].toFixed(2),
-            accessor: (item, field) => item[field] && item[field].toFixed(2)
+              item[field] && item[field].toFixed(2)
           },
-          // type: 'number',
+          template: (value, item, addParams) => {
+            return (
+              <p>
+                <Popup
+                  trigger={<span>{this.formatNumberForDisplay(value)}</span>}
+                  content={value}
+                  inverted
+                />
+              </p>
+            );
+          },
           filterable: { type: 'multiFilter' }
         },
         {
@@ -111,10 +149,19 @@ class PepplotContainer extends Component {
             sortAccessor: (item, field) =>
               item[field] && item[field].toFixed(2),
             groupByAccessor: (item, field) =>
-              item[field] && item[field].toFixed(2),
-            accessor: (item, field) => item[field] && item[field].toFixed(2)
+              item[field] && item[field].toFixed(2)
           },
-          // type: 'number'
+          template: (value, item, addParams) => {
+            return (
+              <p>
+                <Popup
+                  trigger={<span>{this.formatNumberForDisplay(value)}</span>}
+                  content={value}
+                  inverted
+                />
+              </p>
+            );
+          },
           filterable: { type: 'multiFilter' }
         },
         {
@@ -122,7 +169,17 @@ class PepplotContainer extends Component {
           field: {
             field: 'P_Value'
           },
-          // type: 'number',
+          template: (value, item, addParams) => {
+            return (
+              <p>
+                <Popup
+                  trigger={<span>{this.formatNumberForDisplay(value)}</span>}
+                  content={value}
+                  inverted
+                />
+              </p>
+            );
+          },
           filterable: { type: 'multiFilter' }
         },
         {
@@ -132,10 +189,19 @@ class PepplotContainer extends Component {
             sortAccessor: (item, field) =>
               item[field] && item[field].toFixed(4),
             groupByAccessor: (item, field) =>
-              item[field] && item[field].toFixed(4),
-            accessor: (item, field) => item[field] && item[field].toFixed(4)
+              item[field] && item[field].toFixed(4)
           },
-          // type: 'number'
+          template: (value, item, addParams) => {
+            return (
+              <p>
+                <Popup
+                  trigger={<span>{this.formatNumberForDisplay(value)}</span>}
+                  content={value}
+                  inverted
+                />
+              </p>
+            );
+          },
           filterable: { type: 'multiFilter' }
         }
       ];
@@ -144,22 +210,29 @@ class PepplotContainer extends Component {
         {
           title: 'Protein_Site',
           field: 'Protein_Site',
-          // type: 'number',
+          headerAttributes: {
+            width: '10%'
+          },
           filterable: { type: 'multiFilter' },
           template: (value, item, addParams) => {
             return (
               <p>
-                <span
-                  className="ProteinNameLink"
-                  onClick={addParams.showPlot(model, item)}
-                >
-                  {value}
-                </span>
+                <Popup
+                  trigger={
+                    <span
+                      className="ProteinNameLink"
+                      onClick={addParams.showPlot(model, item)}
+                    >
+                      {this.truncateValue(value, 11)}
+                    </span>
+                  }
+                  content={value}
+                  inverted
+                />
                 <img
                   src="phosphosite.ico"
                   alt="Phosophosite"
                   className="PhosphositeIcon"
-                  // data-manifest={item}
                   onClick={addParams.showPhosphositePlus(item)}
                 />
               </p>
@@ -173,10 +246,19 @@ class PepplotContainer extends Component {
             sortAccessor: (item, field) =>
               item[field] && item[field].toFixed(2),
             groupByAccessor: (item, field) =>
-              item[field] && item[field].toFixed(2),
-            accessor: (item, field) => item[field] && item[field].toFixed(2)
+              item[field] && item[field].toFixed(2)
           },
-          // type: 'number',
+          template: (value, item, addParams) => {
+            return (
+              <p>
+                <Popup
+                  trigger={<span>{this.formatNumberForDisplay(value)}</span>}
+                  content={value}
+                  inverted
+                />
+              </p>
+            );
+          },
           filterable: { type: 'multiFilter' }
         },
         {
@@ -186,10 +268,19 @@ class PepplotContainer extends Component {
             sortAccessor: (item, field) =>
               item[field] && item[field].toFixed(2),
             groupByAccessor: (item, field) =>
-              item[field] && item[field].toFixed(2),
-            accessor: (item, field) => item[field] && item[field].toFixed(2)
+              item[field] && item[field].toFixed(2)
           },
-          // type: 'number',
+          template: (value, item, addParams) => {
+            return (
+              <p>
+                <Popup
+                  trigger={<span>{this.formatNumberForDisplay(value)}</span>}
+                  content={value}
+                  inverted
+                />
+              </p>
+            );
+          },
           filterable: { type: 'multiFilter' }
         },
         {
@@ -197,7 +288,17 @@ class PepplotContainer extends Component {
           field: {
             field: 'P_Value'
           },
-          // type: 'number',
+          template: (value, item, addParams) => {
+            return (
+              <p>
+                <Popup
+                  trigger={<span>{this.formatNumberForDisplay(value)}</span>}
+                  content={value}
+                  inverted
+                />
+              </p>
+            );
+          },
           filterable: { type: 'multiFilter' }
         },
         {
@@ -207,10 +308,19 @@ class PepplotContainer extends Component {
             sortAccessor: (item, field) =>
               item[field] && item[field].toFixed(4),
             groupByAccessor: (item, field) =>
-              item[field] && item[field].toFixed(4),
-            accessor: (item, field) => item[field] && item[field].toFixed(4)
+              item[field] && item[field].toFixed(4)
           },
-          // type: 'number'
+          template: (value, item, addParams) => {
+            return (
+              <p>
+                <Popup
+                  trigger={<span>{this.formatNumberForDisplay(value)}</span>}
+                  content={value}
+                  inverted
+                />
+              </p>
+            );
+          },
           filterable: { type: 'multiFilter' }
         }
       ];
@@ -253,13 +363,6 @@ class PepplotContainer extends Component {
       </Grid.Row>
     );
   }
-
-  /* <Switch>
-  <Route exact path="/pepplot" component={PepplotContainer} />
-  <Route exact path="/enrichment" component={EnrichmentContainer} />
-  <Route exact path="/" render={() => <Redirect to="/pepplot" />} />
-  <Route component={NoMatch} />
-  </Switch> */
 
   phosphorylationData() {
     const result = {

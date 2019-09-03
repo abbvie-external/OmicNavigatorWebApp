@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { phosphoprotService } from '../services/phosphoprot.service';
 // import ButtonActions from './ButtonActions';
-// import TableHelpers from '../utility/TableHelpers';
 import PlotContainer from './Plot';
 import { Dimmer, Loader } from 'semantic-ui-react';
 import _ from 'lodash';
@@ -187,14 +186,6 @@ class PepplotResults extends Component {
               i +
               '"'
           );
-          // svgMarkup = svgMarkup.replace(
-          //   /<svg/g,
-          //   '<svg preserveAspectRatio="xMidYMid meet" id="currentSVG-' +
-          //     id +
-          //     '-' +
-          //     i +
-          //     '"'
-          // );
           DOMPurify.addHook('afterSanitizeAttributes', function(node) {
             if (
               node.hasAttribute('xlink:href') &&
@@ -290,7 +281,10 @@ class PepplotResults extends Component {
             columnsConfig={columns}
             totalRows={rows}
             // use "rows" for itemsPerPage if you want all results. For dev, keep it at 500 so rendering doesn't take too long
-            itemsPerPage={rows}
+            itemsPerPage={15}
+            disableGeneralSearch={true}
+            disableGrouping={true}
+            disableColumnVisibilityToggle={true}
             height="65vh"
             additionalTemplateInfo={additionalTemplateInfo}
           />
