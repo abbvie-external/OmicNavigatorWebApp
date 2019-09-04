@@ -39,6 +39,7 @@ $screen-xl-min: 1200px;
 }
 
 .AppContainer {
+  // height: 100vh !important;
 
   .TopBar {
     background-color: #2E2E2E !important;
@@ -105,7 +106,7 @@ $screen-xl-min: 1200px;
     padding: 0px;
   
     .SearchPrompt {
-      padding-top: 20px;
+      padding-top: 120px;
     }
   }
 
@@ -142,11 +143,11 @@ $screen-xl-min: 1200px;
     background-color: red !important;
   }
 
-  .ProteinNameLink {
+  .BreadcrumbLink, .ProteinNameLink {
     color: rgb(22, 120, 194);
     font-weight: bold;
     // font-size: 14px;
-    cursor: pointer;
+    cursor: pointer !important;
   }
 
   .PhosphositeIcon {
@@ -183,5 +184,9 @@ $screen-xl-min: 1200px;
   .TableHeaderCell, .TableFooter {
     display: none !important;
   }
+
+  // .EmptySearchImage {
+  //   z-index: 1001 !important;
+  // }
 
 }

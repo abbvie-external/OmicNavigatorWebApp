@@ -7,27 +7,27 @@
 /* The loader */
 .searching-loader {
   position: absolute;
-  top: 20%;
-  left: 50%;
+  top: 35%;
+  left: 52%;
 
-  width: 200px;
-  height: 200px;
+  width: 190px;
+  height: 190px;
 
-  border-radius: 200px;
+  border-radius: 190px;
 
   margin-top: -100px;
   margin-left: -100px;
 
   background: linear-gradient(#bd2300, transparent),
-    linear-gradient(90deg, #ff0000, transparent),
-    linear-gradient(-90deg, grey, transparent);
+    linear-gradient(90deg, #ff4400, transparent),
+    linear-gradient(-90deg, #2e2e2e, transparent);
   background-blend-mode: screen;
 
   box-shadow: 0 0 50px 0 black;
 
   -webkit-clip-path: circle(50%, 50%, 10%);
 
-  /* animation: loader 3s cubic-bezier(.55,.3,.24,.99) infinite; */
+  animation: searching-loader 3s cubic-bezier(0.55, 0.3, 0.24, 0.99) infinite;
 }
 
 .searching-loader:after {

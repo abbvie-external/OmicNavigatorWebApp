@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import { Grid, Icon, Header, Dimmer, Loader } from 'semantic-ui-react';
+import { Grid, Dimmer, Loader } from 'semantic-ui-react';
 import Breadcrumbs from './Breadcrumbs';
 import PlotAccordion from './PlotAccordion';
 import PlotSVG from './PlotSVG';
@@ -30,10 +30,12 @@ class PlotContainer extends Component {
       treeDataColumns: this.props.treeDataColumns || [],
       plotType: this.props.plotType || [],
       imageInfo: this.props.imageInfo || {
+        key: '',
         title: '',
         svg: []
       },
       currentSVGs: this.props.currentSVGs || [],
+      isProteinSelected: this.props.isProteinSelected || true,
       isProteinDataLoaded: this.props.isProteinDataLoaded || false
     };
   }
@@ -41,7 +43,7 @@ class PlotContainer extends Component {
   componentDidMount() {}
 
   render() {
-    const imageInfo = this.props.imageInfo;
+    // const imageInfo = this.state.imageInfo;
     if (!this.props.isProteinDataLoaded) {
       return (
         <div>
@@ -53,7 +55,10 @@ class PlotContainer extends Component {
     } else {
       return (
         <div className="">
-          <Breadcrumbs {...this.state} />
+          <Breadcrumbs
+            {...this.state}
+            onNavigateBack={this.props.onBackToGrid}
+          />
           <Grid columns={2} className="PlotContainer">
             <Grid.Row className="">
               <Grid.Column

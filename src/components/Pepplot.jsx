@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Grid, Popup } from 'semantic-ui-react';
+import { withRouter } from 'react-router-dom';
 import PepplotSearchCriteria from './PepplotSearchCriteria';
 import PepplotResults from './PepplotResults';
 import SearchPrompt from './SearchPrompt';
@@ -82,6 +83,12 @@ class PepplotContainer extends Component {
     //   }
     // );
 
+    const popupStyle = {
+      backgroundColor: '#FF4400 !important',
+      cursor: 'pointer !important',
+      fontSize: '12px'
+    };
+
     if (model === 'Differential Expression') {
       configCols = [
         {
@@ -92,6 +99,7 @@ class PepplotContainer extends Component {
             return (
               <p>
                 <Popup
+                  style={popupStyle}
                   trigger={
                     <span
                       className="ProteinNameLink"
@@ -122,6 +130,7 @@ class PepplotContainer extends Component {
             return (
               <p>
                 <Popup
+                  style={popupStyle}
                   trigger={<span>{this.truncateValue(value, 17)}</span>}
                   content={value}
                   inverted
@@ -143,6 +152,7 @@ class PepplotContainer extends Component {
             return (
               <p>
                 <Popup
+                  style={popupStyle}
                   trigger={<span>{this.formatNumberForDisplay(value)}</span>}
                   content={value}
                   inverted
@@ -165,6 +175,7 @@ class PepplotContainer extends Component {
             return (
               <p>
                 <Popup
+                  style={popupStyle}
                   trigger={<span>{this.formatNumberForDisplay(value)}</span>}
                   content={value}
                   inverted
@@ -183,6 +194,7 @@ class PepplotContainer extends Component {
             return (
               <p>
                 <Popup
+                  style={popupStyle}
                   trigger={<span>{this.formatNumberForDisplay(value)}</span>}
                   content={value}
                   inverted
@@ -205,6 +217,7 @@ class PepplotContainer extends Component {
             return (
               <p>
                 <Popup
+                  style={popupStyle}
                   trigger={<span>{this.formatNumberForDisplay(value)}</span>}
                   content={value}
                   inverted
@@ -228,6 +241,7 @@ class PepplotContainer extends Component {
             return (
               <p>
                 <Popup
+                  style={popupStyle}
                   trigger={
                     <span
                       className="ProteinNameLink"
@@ -262,6 +276,7 @@ class PepplotContainer extends Component {
             return (
               <p>
                 <Popup
+                  style={popupStyle}
                   trigger={<span>{this.formatNumberForDisplay(value)}</span>}
                   content={value}
                   inverted
@@ -284,6 +299,7 @@ class PepplotContainer extends Component {
             return (
               <p>
                 <Popup
+                  style={popupStyle}
                   trigger={<span>{this.formatNumberForDisplay(value)}</span>}
                   content={value}
                   inverted
@@ -302,6 +318,7 @@ class PepplotContainer extends Component {
             return (
               <p>
                 <Popup
+                  style={popupStyle}
                   trigger={<span>{this.formatNumberForDisplay(value)}</span>}
                   content={value}
                   inverted
@@ -324,6 +341,7 @@ class PepplotContainer extends Component {
             return (
               <p>
                 <Popup
+                  style={popupStyle}
                   trigger={<span>{this.formatNumberForDisplay(value)}</span>}
                   content={value}
                   inverted
@@ -389,4 +407,4 @@ class PepplotContainer extends Component {
   }
 }
 
-export default PepplotContainer;
+export default withRouter(PepplotContainer);

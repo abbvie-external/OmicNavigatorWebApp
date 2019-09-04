@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Loader, Dimmer, Tab } from 'semantic-ui-react';
-import _ from 'lodash';
+// import _ from 'lodash';
 
 class PlotSVG extends Component {
   constructor(props) {
@@ -26,7 +26,7 @@ class PlotSVG extends Component {
 
   getSVGPanes(activeIndex) {
     if (this.props.imageInfo) {
-      const imageInfoArray = this.props.imageInfo;
+      // const imageInfoArray = this.props.imageInfo;
       const svgArray = this.props.imageInfo.svg;
       const panes = svgArray.map(s => {
         return {
@@ -47,8 +47,7 @@ class PlotSVG extends Component {
           menu={{ secondary: true, pointing: true, className: 'SVGDiv' }}
           panes={panes}
           onTabChange={this.handleTabChange}
-          panes={panes}
-          activeIndex={activeIndex}
+          // activeIndex={activeIndex}
           defaultActiveIndex={0}
         />
       );

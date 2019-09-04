@@ -13,9 +13,11 @@ body {
 }
 
 .PepplotContainer ::-webkit-scrollbar-thumb {
-  /* border-radius: 50% !important; */
+  border-radius: 0 !important;
+  /* background: #ff4400 !important; */
   background: #ff4400 !important;
-  box-shadow: 0px 3px 0px rgba(0, 0, 0, 0.6) !important;
+  /* box-shadow: 0px 2px 0px rgba(0, 0, 0, 0.6) !important; */
+  box-shadow: 0px 2px 0px #2e2e2e !important;
 }
 
 /* .SidebarContainer ::-webkit-scrollbar-thumb {
@@ -26,4 +28,9 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+html,
+body {
+  height: 100%;
 }

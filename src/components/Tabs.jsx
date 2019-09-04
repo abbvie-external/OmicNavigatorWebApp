@@ -26,7 +26,7 @@ class Tabs extends Component {
   };
 
   render() {
-    const { activeIndex } = this.state;
+    // const { activeIndex } = this.state;
     const panes = [
       {
         menuItem: (
@@ -73,7 +73,7 @@ class Tabs extends Component {
       <Tab
         onTabChange={this.handleTabChange}
         panes={panes}
-        activeIndex={activeIndex}
+        // activeIndex={activeIndex}
         defaultActiveIndex={2}
         renderActiveOnly={false}
         menu={{

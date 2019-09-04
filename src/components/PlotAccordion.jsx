@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { Accordion, Segment, Loader, Dimmer } from 'semantic-ui-react';
-import _ from 'lodash';
+import { Accordion, Loader, Dimmer } from 'semantic-ui-react';
+// import _ from 'lodash';
 
 class PlotAccordion extends Component {
   constructor(props) {

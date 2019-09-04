@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { phosphoprotService } from '../services/phosphoprot.service';
+import { withRouter } from 'react-router-dom';
 // import ButtonActions from './ButtonActions';
 import PlotContainer from './Plot';
 import { Dimmer, Loader } from 'semantic-ui-react';
@@ -38,6 +39,7 @@ class PepplotResults extends Component {
       isProteinDataLoaded: false
     };
     this.getProteinData = this.getProteinData.bind(this);
+    this.backToGrid = this.backToGrid.bind(this);
     this.getPlot = this.getPlot.bind(this);
     this.getTableHelpers = this.getTableHelpers.bind(this);
     this.handleSVG = this.handleSVG.bind(this);
@@ -133,7 +135,7 @@ class PepplotResults extends Component {
           });
           // console.log('here is the raw treeData');
           // console.log(proteinDataResponse);
-          let tdCols = _.map(_.keys(proteinData[0]), function(d) {
+          let tdCols = _.map(_.keys(proteinDataResponse[0]), function(d) {
             return { key: d, field: d };
           });
           self.setState({
@@ -206,7 +208,7 @@ class PepplotResults extends Component {
     });
   }
 
-  calculateHeight(): number {
+  calculateHeight() {
     var h = Math.max(
       document.documentElement.clientHeight,
       window.innerHeight || 0
@@ -214,7 +216,7 @@ class PepplotResults extends Component {
     return h;
   }
 
-  calculateWidth(): number {
+  calculateWidth() {
     var w = Math.max(
       document.documentElement.clientWidth,
       window.innerWidth || 0
@@ -265,6 +267,12 @@ class PepplotResults extends Component {
     return addParams;
   }
 
+  backToGrid() {
+    this.setState({
+      isProteinSelected: false
+    });
+  }
+
   render() {
     const results = this.props.pepplotResults;
     const columns = this.props.pepplotColumns;
@@ -281,7 +289,7 @@ class PepplotResults extends Component {
             columnsConfig={columns}
             totalRows={rows}
             // use "rows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
-            itemsPerPage={rows}
+            itemsPerPage={50}
             disableGeneralSearch={true}
             disableGrouping={true}
             disableColumnVisibilityToggle={true}
@@ -297,18 +305,21 @@ class PepplotResults extends Component {
       return (
         <div>
           <Dimmer active inverted>
-            <Loader size="large">Preparing Protein Data and Plots</Loader>
+            <Loader size="large">Preparing Data and Plots</Loader>
           </Dimmer>
         </div>
       );
     } else {
       return (
         <div>
-          <PlotContainer {...this.state}></PlotContainer>
+          <PlotContainer
+            {...this.state}
+            onBackToGrid={this.backToGrid}
+          ></PlotContainer>
         </div>
       );
     }
   }
 }
 
-export default PepplotResults;
+export default withRouter(PepplotResults);
