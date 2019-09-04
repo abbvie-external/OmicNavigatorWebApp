@@ -3,6 +3,7 @@ import { phosphoprotService } from '../services/phosphoprot.service';
 import { withRouter } from 'react-router-dom';
 // import ButtonActions from './ButtonActions';
 import PlotContainer from './Plot';
+import LoadingPlots from './LoadingPlots';
 import { Dimmer, Loader } from 'semantic-ui-react';
 import _ from 'lodash';
 import DOMPurify from 'dompurify';
@@ -284,6 +285,7 @@ class PepplotResults extends Component {
     if (!this.state.isProteinSelected) {
       return (
         <div>
+          {/* <ButtonActions /> */}
           <EZGrid
             data={results}
             columnsConfig={columns}
@@ -304,9 +306,7 @@ class PepplotResults extends Component {
     ) {
       return (
         <div>
-          <Dimmer active inverted>
-            <Loader size="large">Preparing Data and Plots</Loader>
-          </Dimmer>
+          <LoadingPlots />
         </div>
       );
     } else {

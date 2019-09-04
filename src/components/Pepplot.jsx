@@ -53,10 +53,18 @@ class PepplotContainer extends Component {
 
   formatNumberForDisplay(num) {
     if (num) {
-      if (Math.abs(num) > 0.001) {
-        return num.toPrecision(3); //sig dig
+      const number = Math.abs(num);
+      debugger;
+      if (number < 0.001 || number >= 1000) {
+        return num.toExponential(2);
+        // * If a number is < .001 report this value scientific notation with three significant digits
+        // * If a number is >= 1000, switch to scientific notation with three sig digits.
+      } else if (number < 1 && number >= 0.001) {
+        return num.toPrecision(3);
+        // * If a number is < 1 & >= .001, report this value with three decimal places
       } else {
-        return num.toExponential(2); // num after decimal
+        return num.toPrecision(3);
+        // PN - what's left is >=1 and <1000, guess that goes to 3 digits too
       }
     } else return null;
   }
@@ -142,11 +150,7 @@ class PepplotContainer extends Component {
         {
           title: 'logFC',
           field: {
-            field: 'logFC',
-            sortAccessor: (item, field) =>
-              item[field] && item[field].toFixed(2),
-            groupByAccessor: (item, field) =>
-              item[field] && item[field].toFixed(2)
+            field: 'logFC'
           },
           template: (value, item, addParams) => {
             return (
@@ -165,11 +169,7 @@ class PepplotContainer extends Component {
         {
           title: 't',
           field: {
-            field: 't',
-            sortAccessor: (item, field) =>
-              item[field] && item[field].toFixed(2),
-            groupByAccessor: (item, field) =>
-              item[field] && item[field].toFixed(2)
+            field: 't'
           },
           template: (value, item, addParams) => {
             return (
@@ -207,11 +207,7 @@ class PepplotContainer extends Component {
         {
           title: 'adj_P_Val',
           field: {
-            field: 'adj_P_Val',
-            sortAccessor: (item, field) =>
-              item[field] && item[field].toFixed(4),
-            groupByAccessor: (item, field) =>
-              item[field] && item[field].toFixed(4)
+            field: 'adj_P_Val'
           },
           template: (value, item, addParams) => {
             return (
@@ -266,11 +262,7 @@ class PepplotContainer extends Component {
         {
           title: 'logFC',
           field: {
-            field: 'logFC',
-            sortAccessor: (item, field) =>
-              item[field] && item[field].toFixed(2),
-            groupByAccessor: (item, field) =>
-              item[field] && item[field].toFixed(2)
+            field: 'logFC'
           },
           template: (value, item, addParams) => {
             return (
@@ -289,11 +281,7 @@ class PepplotContainer extends Component {
         {
           title: 't',
           field: {
-            field: 't',
-            sortAccessor: (item, field) =>
-              item[field] && item[field].toFixed(2),
-            groupByAccessor: (item, field) =>
-              item[field] && item[field].toFixed(2)
+            field: 't'
           },
           template: (value, item, addParams) => {
             return (
@@ -331,11 +319,7 @@ class PepplotContainer extends Component {
         {
           title: 'adj_P_Val',
           field: {
-            field: 'adj_P_Val',
-            sortAccessor: (item, field) =>
-              item[field] && item[field].toFixed(4),
-            groupByAccessor: (item, field) =>
-              item[field] && item[field].toFixed(4)
+            field: 'adj_P_Val'
           },
           template: (value, item, addParams) => {
             return (

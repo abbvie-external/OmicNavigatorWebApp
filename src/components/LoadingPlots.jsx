@@ -1,14 +1,14 @@
 import React from 'react';
-import './Searching.css';
+import './LoadingPlots.css';
 import { Header, Image } from 'semantic-ui-react';
 
-const Searching = () => (
+const LoadingPlots = () => (
   <div className="SearchPrompt">
     <Header as="h2" textAlign="center">
-      Records are loading
+      Data &amp; plots are loading
     </Header>
     <Header as="h4" textAlign="center">
-      Sit up straight, take a deep breath
+      Hydrate with water, or dehydrate with coffee~
     </Header>
     <Image src="empty_search_alt2.png" size="medium" centered />
     <div className="searching-loader">
@@ -27,4 +27,4 @@ const Searching = () => (
   </div>
 );
 
-export default Searching;
+export default LoadingPlots;
