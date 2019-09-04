@@ -280,12 +280,12 @@ class PepplotResults extends Component {
             data={results}
             columnsConfig={columns}
             totalRows={rows}
-            // use "rows" for itemsPerPage if you want all results. For dev, keep it at 500 so rendering doesn't take too long
-            itemsPerPage={15}
+            // use "rows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
+            itemsPerPage={rows}
             disableGeneralSearch={true}
             disableGrouping={true}
             disableColumnVisibilityToggle={true}
-            height="65vh"
+            height="75vh"
             additionalTemplateInfo={additionalTemplateInfo}
           />
         </div>

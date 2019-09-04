@@ -15,9 +15,11 @@ class PepplotSearchCriteria extends Component {
       models: this.props.models || [],
       test: this.props.test || '',
       tests: this.props.tests || [],
+      studiesDisabled: this.props.studiesDisabled || false,
       modelsDisabled: this.props.modelsDisabled || true,
       testsDisabled: this.props.testsDisabled || true,
       isValidSearchPepplot: this.props.isValidSearchPepplot || false,
+      isSearching: this.props.isSearching || false,
       pepplotResults: this.props.pepplotResults || []
     };
 
@@ -98,7 +100,13 @@ class PepplotSearchCriteria extends Component {
   handleTestChange = (evt, { name, value }) => {
     this.setState({
       [name]: value,
-      testsDisabled: true
+      studiesDisabled: true,
+      modelsDisabled: true,
+      testsDisabled: true,
+      isSearching: true
+    });
+    this.props.onSearchTransition({
+      isSearching: true
     });
     const testResultsParam =
       this.state.tab === 'pepplot'
@@ -115,6 +123,8 @@ class PepplotSearchCriteria extends Component {
       .then(dataFromService => {
         this.testdata = dataFromService;
         this.setState({
+          studiesDisabled: false,
+          modelsDisabled: false,
           testsDisabled: false
         });
         this.props.onPepplotSearch({
@@ -139,6 +149,7 @@ class PepplotSearchCriteria extends Component {
           options={this.state.studies}
           placeholder="Select A Study"
           onChange={this.handleStudyChange}
+          disabled={this.state.studiesDisabled}
         />
         <Form.Field
           control={Select}

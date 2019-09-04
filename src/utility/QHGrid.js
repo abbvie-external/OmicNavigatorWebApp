@@ -345,6 +345,8 @@ class QHGridHeader extends React.PureComponent {
         <Table.Header>
           <Table.Row>
             <Table.HeaderCell
+              // Paul added this - custom for Phosphoprotemoic Analyzer
+              className="TableHeaderCell"
               colSpan={numColumns + grouping.length}
               style={{ backgroundColor: '#1678C2', color: 'white' }}
             >
@@ -1143,7 +1145,7 @@ export class QHGrid extends React.PureComponent {
           <Table
             className={'QHGrid--body'}
             fixed={this.props.loading && !this.props.isPaginated}
-            striped
+            // striped
             sortable={!!this.props.onSort}
             selectable
             celled
@@ -1155,7 +1157,9 @@ export class QHGrid extends React.PureComponent {
               borderRadius: 0,
               marginBottom: 0,
               paddingBottom: 0,
-              fontSize: 12
+              fontSize: 12,
+              // Paul added this - custom for Phosphoprotemoic Analyzer
+              borderTop: 0
             }}
           >
             <Table.Header>
@@ -1211,7 +1215,10 @@ export class QHGrid extends React.PureComponent {
           size="small"
           style={{ marginTop: 0, paddingTop: 0, borderRadius: 0, borderTop: 0 }}
         >
-          <Table.Footer>
+          <Table.Footer
+            // Paul added this - custom for Phosphoprotemoic Analyzer
+            className="TableFooter"
+          >
             <Table.Row>
               <Table.HeaderCell
                 colSpan={numColumns + grouping.length}

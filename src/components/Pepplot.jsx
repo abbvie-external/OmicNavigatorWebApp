@@ -3,6 +3,7 @@ import { Grid, Popup } from 'semantic-ui-react';
 import PepplotSearchCriteria from './PepplotSearchCriteria';
 import PepplotResults from './PepplotResults';
 import SearchPrompt from './SearchPrompt';
+import Searching from './Searching';
 
 class PepplotContainer extends Component {
   state = {
@@ -11,6 +12,7 @@ class PepplotContainer extends Component {
     model: this.props.model || '',
     test: this.props.test || '',
     isValidSearchPepplot: this.props.isValidSearchPepplot || false,
+    isSearching: this.props.isSearching || false,
     isProteinSelected: false,
     pepplotResults: [],
     pepplotColumns: []
@@ -19,7 +21,14 @@ class PepplotContainer extends Component {
   componentDidMount() {
     this.phosphorylationData = this.phosphorylationData.bind(this);
     this.handlePepplotSearch = this.handlePepplotSearch.bind(this);
+    this.handleSearchTransition = this.handleSearchTransition.bind(this);
   }
+
+  handleSearchTransition = stuff => {
+    this.setState({
+      isSearching: true
+    });
+  };
 
   handlePepplotSearch = searchResults => {
     const columns = this.getConfigCols(searchResults);
@@ -29,6 +38,7 @@ class PepplotContainer extends Component {
       test: searchResults.test,
       pepplotResults: searchResults.pepplotResults,
       pepplotColumns: columns,
+      isSearching: false,
       isValidSearchPepplot: true,
       isProteinSelected: false
     });
@@ -211,7 +221,7 @@ class PepplotContainer extends Component {
           title: 'Protein_Site',
           field: 'Protein_Site',
           headerAttributes: {
-            width: '10%'
+            className: 'two wide'
           },
           filterable: { type: 'multiFilter' },
           template: (value, item, addParams) => {
@@ -329,8 +339,14 @@ class PepplotContainer extends Component {
   };
 
   getView = () => {
-    if (this.state.isValidSearchPepplot && !this.state.isProteinSelected) {
+    if (
+      this.state.isValidSearchPepplot &&
+      !this.state.isProteinSelected &&
+      !this.state.isSearching
+    ) {
       return <PepplotResults {...this.state} />;
+    } else if (this.state.isSearching) {
+      return <Searching />;
     } else return <SearchPrompt />;
   };
 
@@ -347,6 +363,7 @@ class PepplotContainer extends Component {
         >
           <PepplotSearchCriteria
             {...this.state}
+            onSearchTransition={this.handleSearchTransition}
             onPepplotSearch={this.handlePepplotSearch}
             onSearchCriteriaReset={this.hidePGrid}
           />
