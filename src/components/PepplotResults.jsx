@@ -31,6 +31,7 @@ class PepplotResults extends Component {
       treeDataColumns: [],
       plotType: [],
       imageInfo: {
+        key: null,
         title: '',
         svg: []
       },
@@ -242,18 +243,16 @@ class PepplotResults extends Component {
     addParams.showPlot = (model, dataItem) => {
       return function() {
         let imageInfo = { key: '', title: '', svg: [] };
-        if (dataItem.id_mult) {
-          switch (model) {
-            case 'Differential Expression':
-              imageInfo.title =
-                'Protein Intensity - ' + dataItem.MajorityProteinIDs;
-              imageInfo.key = dataItem.MajorityProteinIDs;
-              break;
-            default:
-              imageInfo.title =
-                'Phosphosite Intensity - ' + dataItem.Protein_Site;
-              imageInfo.key = dataItem.Protein_Site;
-          }
+        switch (model) {
+          case 'Differential Expression':
+            imageInfo.title =
+              'Protein Intensity - ' + dataItem.MajorityProteinIDs;
+            imageInfo.key = dataItem.MajorityProteinIDs;
+            break;
+          default:
+            imageInfo.title =
+              'Phosphosite Intensity - ' + dataItem.Protein_Site;
+            imageInfo.key = dataItem.Protein_Site;
         }
         getProteinDataCb(
           dataItem.id_mult ? dataItem.id_mult : dataItem.id,

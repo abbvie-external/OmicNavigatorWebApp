@@ -5,6 +5,7 @@ import PepplotSearchCriteria from './PepplotSearchCriteria';
 import PepplotResults from './PepplotResults';
 import SearchPrompt from './SearchPrompt';
 import Searching from './Searching';
+import _ from 'lodash';
 
 class PepplotContainer extends Component {
   state = {
@@ -75,20 +76,7 @@ class PepplotContainer extends Component {
   getConfigCols = testData => {
     this.testData = testData.pepplotResults;
     const model = testData.model;
-    let configCols = [];
-
-    // var configCols = ['F', 'logFC', 't', 'P_Value', 'adj_P_Val'];
-    // var orderedTestData = JSON.parse(
-    //   JSON.stringify(this.testData[0], configCols)
-    // );
-    // this.columns = _.map(
-    //   _.filter(_.keys(orderedTestData), function(d) {
-    //     return _.includes(configCols, d);
-    //   }),
-    //   function(d) {
-    //     return { field: d };
-    //   }
-    // );
+    let initConfigCols = [];
 
     const popupStyle = {
       backgroundColor: '#FF4400 !important',
@@ -97,7 +85,7 @@ class PepplotContainer extends Component {
     };
 
     if (model === 'Differential Expression') {
-      configCols = [
+      initConfigCols = [
         {
           title: 'MajorityProteinIDsHGNC',
           field: 'MajorityProteinIDsHGNC',
@@ -144,86 +132,10 @@ class PepplotContainer extends Component {
               </p>
             );
           }
-        },
-        {
-          title: 'logFC',
-          field: {
-            field: 'logFC'
-          },
-          template: (value, item, addParams) => {
-            return (
-              <p>
-                <Popup
-                  style={popupStyle}
-                  trigger={<span>{this.formatNumberForDisplay(value)}</span>}
-                  content={value}
-                  inverted
-                />
-              </p>
-            );
-          },
-          filterable: { type: 'multiFilter' }
-        },
-        {
-          title: 't',
-          field: {
-            field: 't'
-          },
-          template: (value, item, addParams) => {
-            return (
-              <p>
-                <Popup
-                  style={popupStyle}
-                  trigger={<span>{this.formatNumberForDisplay(value)}</span>}
-                  content={value}
-                  inverted
-                />
-              </p>
-            );
-          },
-          filterable: { type: 'multiFilter' }
-        },
-        {
-          title: 'P_Value',
-          field: {
-            field: 'P_Value'
-          },
-          template: (value, item, addParams) => {
-            return (
-              <p>
-                <Popup
-                  style={popupStyle}
-                  trigger={<span>{this.formatNumberForDisplay(value)}</span>}
-                  content={value}
-                  inverted
-                />
-              </p>
-            );
-          },
-          filterable: { type: 'multiFilter' }
-        },
-        {
-          title: 'adj_P_Val',
-          field: {
-            field: 'adj_P_Val'
-          },
-          template: (value, item, addParams) => {
-            return (
-              <p>
-                <Popup
-                  style={popupStyle}
-                  trigger={<span>{this.formatNumberForDisplay(value)}</span>}
-                  content={value}
-                  inverted
-                />
-              </p>
-            );
-          },
-          filterable: { type: 'multiFilter' }
         }
       ];
     } else {
-      configCols = [
+      initConfigCols = [
         {
           title: 'Protein_Site',
           field: 'Protein_Site',
@@ -256,85 +168,42 @@ class PepplotContainer extends Component {
               </p>
             );
           }
-        },
-        {
-          title: 'logFC',
-          field: {
-            field: 'logFC'
-          },
-          template: (value, item, addParams) => {
-            return (
-              <p>
-                <Popup
-                  style={popupStyle}
-                  trigger={<span>{this.formatNumberForDisplay(value)}</span>}
-                  content={value}
-                  inverted
-                />
-              </p>
-            );
-          },
-          filterable: { type: 'multiFilter' }
-        },
-        {
-          title: 't',
-          field: {
-            field: 't'
-          },
-          template: (value, item, addParams) => {
-            return (
-              <p>
-                <Popup
-                  style={popupStyle}
-                  trigger={<span>{this.formatNumberForDisplay(value)}</span>}
-                  content={value}
-                  inverted
-                />
-              </p>
-            );
-          },
-          filterable: { type: 'multiFilter' }
-        },
-        {
-          title: 'P_Value',
-          field: {
-            field: 'P_Value'
-          },
-          template: (value, item, addParams) => {
-            return (
-              <p>
-                <Popup
-                  style={popupStyle}
-                  trigger={<span>{this.formatNumberForDisplay(value)}</span>}
-                  content={value}
-                  inverted
-                />
-              </p>
-            );
-          },
-          filterable: { type: 'multiFilter' }
-        },
-        {
-          title: 'adj_P_Val',
-          field: {
-            field: 'adj_P_Val'
-          },
-          template: (value, item, addParams) => {
-            return (
-              <p>
-                <Popup
-                  style={popupStyle}
-                  trigger={<span>{this.formatNumberForDisplay(value)}</span>}
-                  content={value}
-                  inverted
-                />
-              </p>
-            );
-          },
-          filterable: { type: 'multiFilter' }
         }
       ];
     }
+
+    let allConfigCols = ['F', 'logFC', 't', 'P_Value', 'adj_P_Val'];
+    let orderedTestData = JSON.parse(
+      JSON.stringify(this.testData[0], allConfigCols)
+    );
+    let relevantConfigColumns = _.map(
+      _.filter(_.keys(orderedTestData), function(d) {
+        return _.includes(allConfigCols, d);
+      })
+    );
+
+    const additionalConfigColumns = relevantConfigColumns.map(c => {
+      return {
+        title: c,
+        field: c,
+        template: (value, item, addParams) => {
+          return (
+            <p>
+              <Popup
+                style={popupStyle}
+                trigger={<span>{this.formatNumberForDisplay(value)}</span>}
+                content={value}
+                inverted
+              />
+            </p>
+          );
+        },
+        filterable: { type: 'multiFilter' }
+      };
+    });
+
+    const configCols = initConfigCols.concat(additionalConfigColumns);
+
     return configCols;
   };
 
