@@ -5,12 +5,12 @@ import { Header, Image } from 'semantic-ui-react';
 const LoadingPlots = () => (
   <div className="SearchPrompt">
     <Header as="h2" textAlign="center">
-      Data &amp; plots are loading
+      Plots are loading
     </Header>
     <Header as="h4" textAlign="center">
       Hydrate with water, or dehydrate with coffee~
     </Header>
-    <Image src="empty_search_alt.png" size="medium" centered />
+    <Image src="empty_search_alt3.png" size="medium" centered />
     {/* <div className="searching-loader">
       <div className="searching-dot"></div>
       <div className="searching-dot"></div>

@@ -17,15 +17,18 @@ export { QHGrid, EZGrid, QuickViewModal };
 export { getField, getFieldValue, typeMap };
 
 class PepplotResults extends Component {
+  static defaultProps = {
+    study: '',
+    model: '',
+    test: '',
+    pepplotResults: [],
+    pepplotColumns: [],
+    isProteinSelected: false
+  };
+
   constructor(props) {
     super(props);
     this.state = {
-      tab: this.props.tab || 'pepplot',
-      study: this.props.study || '',
-      model: this.props.model || '',
-      test: this.props.test || '',
-      pepplotResults: this.props.pepplotResults || [],
-      pepplotColumns: this.props.pepplotColumns || [],
       treeDataRaw: [],
       treeData: [],
       treeDataColumns: [],
@@ -36,26 +39,20 @@ class PepplotResults extends Component {
         svg: []
       },
       currentSVGs: [],
-      isProteinSelected: this.props.isProteinSelected || false,
       isProteinDataLoaded: false
     };
-    this.getProteinData = this.getProteinData.bind(this);
-    this.backToGrid = this.backToGrid.bind(this);
-    this.getPlot = this.getPlot.bind(this);
-    this.getTableHelpers = this.getTableHelpers.bind(this);
-    this.handleSVG = this.handleSVG.bind(this);
   }
 
   componentDidMount() {}
 
-  handleSVG(imageInfo) {
+  handleSVG = imageInfo => {
     this.setState({
       imageInfo: imageInfo,
       isProteinDataLoaded: true
     });
-  }
+  };
 
-  getProteinData(id, dataItem, getPlotCb, imageInfo) {
+  getProteinData = (id, dataItem, getPlotCb, imageInfo) => {
     let self = this;
     const handleSVGCb = this.handleSVG;
     self.setState({
@@ -159,9 +156,9 @@ class PepplotResults extends Component {
           getPlotCb(id, plotType, study, imageInfo, handleSVGCb);
         });
     }
-  }
+  };
 
-  getPlot(id, plotType, study, imageInfo, handleSVGCb) {
+  getPlot = (id, plotType, study, imageInfo, handleSVGCb) => {
     let currentSVGs = [];
     let heightCalculation = this.calculateHeight;
     let widthCalculation = this.calculateWidth;
@@ -206,7 +203,7 @@ class PepplotResults extends Component {
           handleSVGCb(imageInfo);
         });
     });
-  }
+  };
 
   calculateHeight() {
     var h = Math.max(
@@ -224,7 +221,7 @@ class PepplotResults extends Component {
     return w;
   }
 
-  getTableHelpers(getProteinDataCb, getPlotCb) {
+  getTableHelpers = (getProteinDataCb, getPlotCb) => {
     let addParams = {};
     addParams.showPhosphositePlus = dataItem => {
       return function() {
@@ -263,13 +260,13 @@ class PepplotResults extends Component {
       };
     };
     return addParams;
-  }
+  };
 
-  backToGrid() {
+  backToGrid = () => {
     this.setState({
       isProteinSelected: false
     });
-  }
+  };
 
   render() {
     const results = this.props.pepplotResults;
@@ -286,12 +283,12 @@ class PepplotResults extends Component {
           <EZGrid
             data={results}
             columnsConfig={columns}
-            totalRows={rows}
+            // totalRows={rows}
             // use "rows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
-            itemsPerPage={50}
-            disableGeneralSearch={true}
-            disableGrouping={true}
-            disableColumnVisibilityToggle={true}
+            itemsPerPage={100}
+            disableGeneralSearch
+            disableGrouping
+            disableColumnVisibilityToggle
             height="75vh"
             additionalTemplateInfo={additionalTemplateInfo}
           />

@@ -2,10 +2,15 @@ import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { Grid, Dimmer, Loader } from 'semantic-ui-react';
 import Breadcrumbs from './Breadcrumbs';
+import ButtonActions from './ButtonActions';
 import PlotAccordion from './PlotAccordion';
 import PlotSVG from './PlotSVG';
 
 class PlotContainer extends Component {
+  static defaultProps = {
+    isProteinDataLoaded: false
+  };
+
   constructor(props) {
     super(props);
     // const tab = props.history.location.pathname;
@@ -17,48 +22,42 @@ class PlotContainer extends Component {
     // const customPathFriendly = customPath.replace(/[^a-zA-Z0-9-_/]/g, '');
     // const customPathEncodedURI = encodeURIComponent(customPath);
     // props.history.push(customPathFriendly);
-
-    this.state = {
-      tab: this.props.tab || 'pepplot',
-      study: this.props.study || '',
-      model: this.props.model || '',
-      test: this.props.test || '',
-      pepplotResults: this.props.pepplotResults || [],
-      pepplotColumns: this.props.pepplotColumns || [],
-      treeDataRaw: this.props.treeDataRaw || [],
-      treeData: this.props.treeData || [],
-      treeDataColumns: this.props.treeDataColumns || [],
-      plotType: this.props.plotType || [],
-      imageInfo: this.props.imageInfo || {
-        key: '',
-        title: '',
-        svg: []
-      },
-      currentSVGs: this.props.currentSVGs || [],
-      isProteinSelected: this.props.isProteinSelected || true,
-      isProteinDataLoaded: this.props.isProteinDataLoaded || false
-    };
   }
 
   componentDidMount() {}
 
   render() {
-    // const imageInfo = this.state.imageInfo;
     if (!this.props.isProteinDataLoaded) {
       return (
         <div>
           <Dimmer active inverted>
-            <Loader size="large">Data and Plots are Loading</Loader>
+            <Loader size="large">Plots are Loading</Loader>
           </Dimmer>
         </div>
       );
     } else {
       return (
         <div className="">
-          <Breadcrumbs
-            {...this.state}
-            onNavigateBack={this.props.onBackToGrid}
-          />
+          <Grid columns={2} className="">
+            <Grid.Row className="ActionsRow">
+              <Grid.Column
+                className="PlotAccordionContainer"
+                mobile={8}
+                tablet={8}
+                largeScreen={8}
+                widescreen={8}
+              >
+                <Breadcrumbs
+                  {...this.props}
+                  onNavigateBack={this.props.onBackToGrid}
+                />
+              </Grid.Column>
+              <Grid.Column mobile={8} tablet={8} largeScreen={8} widescreen={8}>
+                <ButtonActions {...this.state} />
+              </Grid.Column>
+            </Grid.Row>
+          </Grid>
+
           <Grid columns={2} className="PlotContainer">
             <Grid.Row className="">
               <Grid.Column
@@ -68,7 +67,7 @@ class PlotContainer extends Component {
                 largeScreen={5}
                 widescreen={5}
               >
-                <PlotAccordion {...this.state} />
+                <PlotAccordion {...this.props} />
               </Grid.Column>
               <Grid.Column
                 mobile={16}
@@ -76,7 +75,7 @@ class PlotContainer extends Component {
                 largeScreen={11}
                 widescreen={11}
               >
-                <PlotSVG {...this.state} />
+                <PlotSVG {...this.props} />
               </Grid.Column>
             </Grid.Row>
           </Grid>

@@ -8,25 +8,21 @@ import Searching from './Searching';
 import _ from 'lodash';
 
 class PepplotContainer extends Component {
+  static defaultProps = {
+    tab: 'pepplot'
+  };
+
   state = {
-    tab: this.props.tab || 'pepplot',
-    study: this.props.study || '',
-    model: this.props.model || '',
-    test: this.props.test || '',
-    isValidSearchPepplot: this.props.isValidSearchPepplot || false,
-    isSearching: this.props.isSearching || false,
+    isValidSearchPepplot: false,
+    isSearching: false,
     isProteinSelected: false,
     pepplotResults: [],
     pepplotColumns: []
   };
 
-  componentDidMount() {
-    this.phosphorylationData = this.phosphorylationData.bind(this);
-    this.handlePepplotSearch = this.handlePepplotSearch.bind(this);
-    this.handleSearchTransition = this.handleSearchTransition.bind(this);
-  }
+  componentDidMount() {}
 
-  handleSearchTransition = stuff => {
+  handleSearchTransition = () => {
     this.setState({
       isSearching: true
     });
@@ -52,55 +48,26 @@ class PepplotContainer extends Component {
     });
   };
 
-  formatNumberForDisplay(num) {
-    if (num) {
-      const number = Math.abs(num);
-      if (number < 0.001 || number >= 1000) {
-        return num.toExponential(2);
-        // * If a number is < .001 report this value scientific notation with three significant digits
-        // * If a number is >= 1000, switch to scientific notation with three sig digits.
-      } else if (number < 1 && number >= 0.001) {
-        return num.toPrecision(3);
-        // * If a number is < 1 & >= .001, report this value with three decimal places
-      } else {
-        return num.toPrecision(3);
-        // PN - what's left is >=1 and <1000, guess that goes to 3 digits too
-      }
-    } else return null;
-  }
-
-  truncateValue(value, indexEnd) {
-    return value.substr(0, indexEnd);
-  }
-
   getConfigCols = testData => {
     this.testData = testData.pepplotResults;
     const model = testData.model;
     let initConfigCols = [];
-
-    const popupStyle = {
-      backgroundColor: '#FF4400 !important',
-      cursor: 'pointer !important',
-      fontSize: '12px'
-    };
 
     if (model === 'Differential Expression') {
       initConfigCols = [
         {
           title: 'MajorityProteinIDsHGNC',
           field: 'MajorityProteinIDsHGNC',
-          filterable: { type: 'multiFilter' },
           template: (value, item, addParams) => {
             return (
-              <p>
+              <div>
                 <Popup
-                  style={popupStyle}
                   trigger={
                     <span
                       className="ProteinNameLink"
                       onClick={addParams.showPlot(model, item)}
                     >
-                      {this.truncateValue(value, 11)}
+                      {truncateValue(value, 11)}
                     </span>
                   }
                   content={value}
@@ -112,24 +79,20 @@ class PepplotContainer extends Component {
                   className="PhosphositeIcon"
                   onClick={addParams.showPhosphositePlus(item)}
                 />
-              </p>
+              </div>
             );
           }
         },
         {
           title: 'MajorityProteinIDs',
           field: 'MajorityProteinIDs',
-          filterable: { type: 'multiFilter' },
           template: (value, item, addParams) => {
             return (
-              <p>
-                <Popup
-                  style={popupStyle}
-                  trigger={<span>{this.truncateValue(value, 17)}</span>}
-                  content={value}
-                  inverted
-                />
-              </p>
+              <Popup
+                trigger={<span>{truncateValue(value, 17)}</span>}
+                content={value}
+                inverted
+              />
             );
           }
         }
@@ -142,18 +105,16 @@ class PepplotContainer extends Component {
           headerAttributes: {
             className: 'two wide'
           },
-          filterable: { type: 'multiFilter' },
           template: (value, item, addParams) => {
             return (
               <p>
                 <Popup
-                  style={popupStyle}
                   trigger={
                     <span
                       className="ProteinNameLink"
                       onClick={addParams.showPlot(model, item)}
                     >
-                      {this.truncateValue(value, 11)}
+                      {truncateValue(value, 11)}
                     </span>
                   }
                   content={value}
@@ -190,15 +151,14 @@ class PepplotContainer extends Component {
           return (
             <p>
               <Popup
-                style={popupStyle}
-                trigger={<span>{this.formatNumberForDisplay(value)}</span>}
+                trigger={<span>{formatNumberForDisplay(value)}</span>}
                 content={value}
                 inverted
               />
             </p>
           );
         },
-        filterable: { type: 'multiFilter' }
+        type: 'number'
       };
     });
 
@@ -227,8 +187,8 @@ class PepplotContainer extends Component {
           className="SidebarContainer"
           mobile={16}
           tablet={16}
-          largeScreen={3}
-          widescreen={3}
+          largeScreen={4}
+          widescreen={4}
         >
           <PepplotSearchCriteria
             {...this.state}
@@ -241,8 +201,8 @@ class PepplotContainer extends Component {
           className="ContentContainer"
           mobile={16}
           tablet={16}
-          largeScreen={13}
-          widescreen={13}
+          largeScreen={12}
+          widescreen={12}
         >
           {pepplotView}
         </Grid.Column>
@@ -250,12 +210,34 @@ class PepplotContainer extends Component {
     );
   }
 
-  phosphorylationData() {
+  phosphorylationData = () => {
     const result = {
       data: process(this.testData, this.stateExcelExport).data
     };
     return result;
-  }
+  };
 }
 
 export default withRouter(PepplotContainer);
+
+function formatNumberForDisplay(num) {
+  if (num) {
+    const number = Math.abs(num);
+    if (number < 0.001 || number >= 1000) {
+      return num.toExponential(2);
+      // * If a number is < .001 report this value scientific notation with three significant digits
+      // * If a number is >= 1000, switch to scientific notation with three sig digits.
+
+      // } else if (number < 1 && number >= 0.001) {
+      //   return num.toPrecision(3);
+      // * If a number is < 1 & >= .001, report this value with three decimal places
+      // PN - what's left is >=1 and <1000, guess that goes to 3 digits too
+    } else {
+      return num.toPrecision(3);
+    }
+  } else return null;
+}
+
+function truncateValue(value, indexEnd) {
+  return value.substr(0, indexEnd);
+}

@@ -22,9 +22,7 @@ class EnrichmentContainer extends Component {
     enrichmentResults: []
   };
 
-  componentDidMount() {
-    this.handleEnrichmentSearch = this.handleEnrichmentSearch.bind(this);
-  }
+  componentDidMount() {}
 
   handleEnrichmentSearch = searchResults => {
     // const columns = this.getCongfigCols(searchResults);

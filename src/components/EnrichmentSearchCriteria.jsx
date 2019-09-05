@@ -20,18 +20,13 @@ class EnrichmentSearchCriteria extends Component {
       isValidSearchEnrichment: this.props.isValidSearchEnrichment || false,
       enrichmentResults: this.props.enrichmentResults || []
     };
-
-    this.populateStudies = this.populateStudies.bind(this);
-    this.handleStudyChange = this.handleStudyChange.bind(this);
-    this.handleModelChange = this.handleModelChange.bind(this);
-    this.handleTestChange = this.handleTestChange.bind(this);
   }
 
   componentDidMount() {
     this.populateStudies();
   }
 
-  populateStudies() {
+  populateStudies = () => {
     phosphoprotService.getStudies().then(studiesFromService => {
       const studiesArr = studiesFromService.map(study => {
         return { key: study, text: study, value: study };
@@ -40,7 +35,7 @@ class EnrichmentSearchCriteria extends Component {
         studies: studiesArr
       });
     });
-  }
+  };
 
   handleStudyChange = (evt, { name, value }) => {
     this.setState({

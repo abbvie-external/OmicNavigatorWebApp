@@ -5,52 +5,41 @@ import { phosphoprotService } from '../services/phosphoprot.service';
 import _ from 'lodash';
 
 class PepplotSearchCriteria extends Component {
+  static defaultProps = {
+    tab: 'pepplot',
+    isValidSearchPepplot: false,
+    isSearching: false
+  };
+
   constructor(props) {
     super(props);
     this.state = {
-      tab: this.props.tab || 'pepplot',
-      study: this.props.study || '',
-      studies: this.props.studies || [],
-      model: this.props.model || '',
-      models: this.props.models || [],
-      test: this.props.test || '',
-      tests: this.props.tests || [],
-      studiesDisabled: this.props.studiesDisabled || false,
-      modelsDisabled: this.props.modelsDisabled || true,
-      testsDisabled: this.props.testsDisabled || true,
-      isValidSearchPepplot: this.props.isValidSearchPepplot || false,
-      isSearching: this.props.isSearching || false,
-      pepplotResults: this.props.pepplotResults || []
+      study: '',
+      studies: [],
+      model: '',
+      models: [],
+      test: '',
+      tests: [],
+      studiesDisabled: false,
+      modelsDisabled: true,
+      testsDisabled: true
     };
-
-    this.populateStudies = this.populateStudies.bind(this);
-    this.handleStudyChange = this.handleStudyChange.bind(this);
-    this.handleModelChange = this.handleModelChange.bind(this);
-    this.handleTestChange = this.handleTestChange.bind(this);
   }
 
   componentDidMount() {
     this.populateStudies();
   }
 
-  populateStudies() {
-    if (localStorage.studies) {
-      const studiesArrStored = JSON.parse(localStorage.studies || []);
+  populateStudies = () => {
+    phosphoprotService.getStudies().then(studiesFromService => {
+      const studiesArr = studiesFromService.map(study => {
+        return { key: study, text: study, value: study };
+      });
       this.setState({
-        studies: studiesArrStored
+        studies: studiesArr
       });
-    } else {
-      phosphoprotService.getStudies().then(studiesFromService => {
-        const studiesArr = studiesFromService.map(study => {
-          return { key: study, text: study, value: study };
-        });
-        this.setState({
-          studies: studiesArr
-        });
-        localStorage.studies = JSON.stringify(studiesArr);
-      });
-    }
-  }
+    });
+  };
 
   handleStudyChange = (evt, { name, value }) => {
     this.setState({
@@ -64,7 +53,7 @@ class PepplotSearchCriteria extends Component {
       isValidSearchPepplot: false
     });
     const modelNamesParam =
-      this.state.tab === 'pepplot' ? 'inferenceNames' : 'EnrichmentNames';
+      this.props.tab === 'pepplot' ? 'inferenceNames' : 'EnrichmentNames';
     phosphoprotService
       .getModelNames(modelNamesParam, value + 'plots')
       .then(modelsFromService => {
@@ -92,7 +81,6 @@ class PepplotSearchCriteria extends Component {
     });
     this.setState({
       testsDisabled: false,
-      isValidSearchPepplot: false,
       tests: testsArr
     });
   };
@@ -102,19 +90,18 @@ class PepplotSearchCriteria extends Component {
       [name]: value,
       studiesDisabled: true,
       modelsDisabled: true,
-      testsDisabled: true,
-      isSearching: true
+      testsDisabled: true
     });
     this.props.onSearchTransition({
       isSearching: true
     });
     const testResultsParam =
-      this.state.tab === 'pepplot'
+      this.props.tab === 'pepplot'
         ? 'getInferenceResults'
         : 'getEnrichmentResults';
     phosphoprotService
       .getTestData(
-        this.state.tab,
+        this.props.tab,
         testResultsParam,
         this.state.model,
         value,
