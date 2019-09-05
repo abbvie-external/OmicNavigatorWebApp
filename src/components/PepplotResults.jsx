@@ -4,7 +4,6 @@ import { withRouter } from 'react-router-dom';
 // import ButtonActions from './ButtonActions';
 import PlotContainer from './Plot';
 import LoadingPlots from './LoadingPlots';
-import { Dimmer, Loader } from 'semantic-ui-react';
 import _ from 'lodash';
 import DOMPurify from 'dompurify';
 
@@ -96,14 +95,11 @@ class PepplotResults extends Component {
       phosphoprotService
         .getSiteData(id, study + 'plots')
         .then(treeDataResponse => {
-          // self.state.treeDataRaw = treeData;
-          // console.log('here is the raw treedata');
-          // console.log(treeDataResponse);
           self.setState({
             treeDataRaw: treeDataResponse
           });
           let tdCols = _.map(_.keys(treeDataResponse[0]), function(d) {
-            return { field: d };
+            return { key: d, field: d };
           });
           self.setState({
             treeDataColumns: tdCols
@@ -134,8 +130,6 @@ class PepplotResults extends Component {
           self.setState({
             treeDataRaw: proteinDataResponse
           });
-          // console.log('here is the raw treeData');
-          // console.log(proteinDataResponse);
           let tdCols = _.map(_.keys(proteinDataResponse[0]), function(d) {
             return { key: d, field: d };
           });
@@ -148,12 +142,16 @@ class PepplotResults extends Component {
             entries = _.map(entries, function(e) {
               return { key: e[0], text: e[0], items: [{ text: e[1] }] };
             });
-            return entries;
+            return {
+              key: i + 1,
+              text: 'Differential Expression Data',
+              items: entries
+            };
           });
           // console.log('this is proteinData');
           // console.log(proteinData);
           self.setState({
-            treeData: proteinData[0]
+            treeData: proteinData
           });
         })
         .then(function() {
@@ -256,13 +254,13 @@ class PepplotResults extends Component {
                 'Phosphosite Intensity - ' + dataItem.Protein_Site;
               imageInfo.key = dataItem.Protein_Site;
           }
-          getProteinDataCb(
-            dataItem.id_mult ? dataItem.id_mult : dataItem.id,
-            dataItem,
-            getPlotCb,
-            imageInfo
-          );
         }
+        getProteinDataCb(
+          dataItem.id_mult ? dataItem.id_mult : dataItem.id,
+          dataItem,
+          getPlotCb,
+          imageInfo
+        );
       };
     };
     return addParams;

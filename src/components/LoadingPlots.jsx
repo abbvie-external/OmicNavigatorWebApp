@@ -1,5 +1,5 @@
 import React from 'react';
-import './LoadingPlots.css';
+// import './LoadingPlots.css';
 import { Header, Image } from 'semantic-ui-react';
 
 const LoadingPlots = () => (
@@ -10,8 +10,8 @@ const LoadingPlots = () => (
     <Header as="h4" textAlign="center">
       Hydrate with water, or dehydrate with coffee~
     </Header>
-    <Image src="empty_search_alt2.png" size="medium" centered />
-    <div className="searching-loader">
+    <Image src="empty_search_alt.png" size="medium" centered />
+    {/* <div className="searching-loader">
       <div className="searching-dot"></div>
       <div className="searching-dot"></div>
       <div className="searching-dot"></div>
@@ -23,7 +23,7 @@ const LoadingPlots = () => (
       <div className="searching-dot"></div>
       <div className="searching-spec"></div>
       <div className="searching-shadow"></div>
-    </div>
+    </div> */}
   </div>
 );
 

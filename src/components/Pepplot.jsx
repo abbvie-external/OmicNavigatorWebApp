@@ -54,7 +54,6 @@ class PepplotContainer extends Component {
   formatNumberForDisplay(num) {
     if (num) {
       const number = Math.abs(num);
-      debugger;
       if (number < 0.001 || number >= 1000) {
         return num.toExponential(2);
         // * If a number is < .001 report this value scientific notation with three significant digits
@@ -123,7 +122,6 @@ class PepplotContainer extends Component {
                   src="phosphosite.ico"
                   alt="Phosophosite"
                   className="PhosphositeIcon"
-                  // data-manifest={item}
                   onClick={addParams.showPhosphositePlus(item)}
                 />
               </p>
