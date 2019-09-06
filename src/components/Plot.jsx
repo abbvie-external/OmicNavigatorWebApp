@@ -13,6 +13,7 @@ class PlotContainer extends Component {
 
   constructor(props) {
     super(props);
+
     // const tab = props.history.location.pathname;
     // const study = props.study;
     // const model = props.model;
@@ -22,9 +23,18 @@ class PlotContainer extends Component {
     // const customPathFriendly = customPath.replace(/[^a-zA-Z0-9-_/]/g, '');
     // const customPathEncodedURI = encodeURIComponent(customPath);
     // props.history.push(customPathFriendly);
+    this.state = {
+      activeSVGTabIndex: 0
+    };
   }
 
   componentDidMount() {}
+
+  handleSVGTabChange = activeTabIndex => {
+    this.setState({
+      activeSVGTabIndex: activeTabIndex
+    });
+  };
 
   render() {
     if (!this.props.isProteinDataLoaded) {
@@ -53,7 +63,7 @@ class PlotContainer extends Component {
                 />
               </Grid.Column>
               <Grid.Column mobile={8} tablet={8} largeScreen={8} widescreen={8}>
-                <ButtonActions {...this.state} />
+                <ButtonActions {...this.props} {...this.state} />
               </Grid.Column>
             </Grid.Row>
           </Grid>
@@ -75,7 +85,11 @@ class PlotContainer extends Component {
                 largeScreen={11}
                 widescreen={11}
               >
-                <PlotSVG {...this.props} />
+                <PlotSVG
+                  {...this.props}
+                  {...this.state}
+                  onSVGTabChange={this.handleSVGTabChange}
+                />
               </Grid.Column>
             </Grid.Row>
           </Grid>

@@ -67,14 +67,14 @@ $screen-xl-min: 1200px;
       .TitleTextStyle {
         font-weight: 100 !important;
         font-style: italic;
-        color: lightgray !important;
+        color: #e0e1e2 !important;
       }
 
     }
   }
 
   .SidebarContainer {
-    background-color: lightgray;
+    background-color: #e0e1e2;
     height: 93vh;
 
     .SearchCriteriaContainer {
@@ -137,24 +137,44 @@ $screen-xl-min: 1200px;
     margin-left: 5px !important;
   }
 
-  .ExportButtonGroup {
-    border: 0px !important;
-    margin-left: 5px !important;
+  .ExportButtonGroupLabel {
+    background-color: #FF4400 !important;
+    color: #FFF !important;
   }
 
-  .ChartViewButton {
-    border-top-right-radius: 0 !important;
-    border-bottom-right-radius: 0 !important; 
+  .ui.basic.black.button, .ui.basic.black.buttons .button {
+    box-shadow: none !important;
   }
 
-  .ListViewButton {
-    border-top-left-radius: 0 !important;
-    border-bottom-left-radius: 0 !important; 
+  .ExportButton {
+    cursor: pointer !important;
+    // border: none !important;
+    // color: #2E2E2E !important;
   }
 
-  .MoreButtonGroup:hover, .ViewButtonGroup:hover, .ExportButtonGroup:hover {
-    background-color: #FF4400 !important
-  }
+  // .ExportButton:hover {
+  //   background-color: #2E2E2E !important;
+  //   color: #FFF !important;
+  // }
+
+  // .ExportButtonGroup {
+  //   border: 0px !important;
+  //   margin-left: 5px !important;
+  // }
+
+  // .ChartViewButton {
+  //   border-top-right-radius: 0 !important;
+  //   border-bottom-right-radius: 0 !important; 
+  // }
+
+  // .ListViewButton {
+  //   border-top-left-radius: 0 !important;
+  //   border-bottom-left-radius: 0 !important; 
+  // }
+
+  // .MoreButtonGroup:hover, .ViewButtonGroup:hover, .ExportButtonGroup:hover {
+  //   background-color: #FF4400 !important
+  // }
 
   .deviceMargin {
     margin: 20px 15px 30px 15px !important;
@@ -218,9 +238,9 @@ $screen-xl-min: 1200px;
     width: 100% !important;
   }
 
-  // .TableHeaderCell, .TableFooter {
-  //   display: none !important;
-  // }
+  .TableHeaderCell, .TableFooter {
+    display: none !important;
+  }
 
   // .EmptySearchImage {
   //   z-index: 1001 !important;

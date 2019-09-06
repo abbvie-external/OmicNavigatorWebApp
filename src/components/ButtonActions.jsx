@@ -1,56 +1,139 @@
 import React, { Component } from 'react';
-import { Dropdown, Button } from 'semantic-ui-react';
-
-const options = [
-  { key: 1, text: 'Data (.xls)', value: 1 },
-  { key: 2, text: 'PDF', value: 2 }
-];
+import { Dropdown, Button, Label } from 'semantic-ui-react';
+import * as saveSvgAsPng from 'save-svg-as-png';
+import { excelService } from '../services/excel.service';
+// import * as jsPDF from 'jspdf';
+// import { pdfService } from '../services/pdf.service';
 
 class ButtonActions extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      excelVisible: true,
+      excelExporting: false,
+      excelDisabled: false,
+      pngVisible: true,
+      pngExporting: false,
+      pngDisabled: false,
+      pdfVisible: false,
+      pdfExporting: false,
+      pdfDisabled: false
+    };
+  }
+
   componentDidMount() {}
 
+  PNGExport = () => {
+    this.setState({
+      pngDisabled: true,
+      pngExporting: true
+    });
+    saveSvgAsPng.saveSvgAsPng(
+      document.getElementsByTagName('svg')[0],
+      this.props.imageInfo.title +
+        '-' +
+        this.props.imageInfo.svg[this.props.activeSVGTabIndex].plotType +
+        '.png'
+    );
+    const exportingPNGCB = this.exportingPNGIndicator;
+    setTimeout(function() {
+      exportingPNGCB();
+    }, 1500);
+  };
+
+  ExcelExport = () => {
+    this.setState({
+      excelDisabled: true,
+      excelExporting: true
+    });
+    excelService.exportAsExcelFile(
+      this.props.treeDataRaw,
+      this.props.imageInfo.title + '_Peptide_Data'
+    );
+    const exportingExcelCB = this.exportingExcelIndicator;
+    setTimeout(function() {
+      exportingExcelCB();
+    }, 1500);
+  };
+
+  exportingPNGIndicator = () => {
+    this.setState({
+      pngDisabled: false,
+      pngExporting: false
+    });
+  };
+
+  exportingExcelIndicator = () => {
+    this.setState({
+      excelDisabled: false,
+      excelExporting: false
+    });
+  };
+
+  // PDFExport = () => {
+  //   this.setState({
+  //     pdfDisabled: true,
+  //     pdfExporting: true
+  //   })
+  //   pdfService.createPDF(document.getElementsByTagName("svg")[0]);
+  //   this.setState({
+  //     pdfDisabled: false,
+  //     pdfExporting: false
+  //   })
+  // };
+
+  getAdditionalButtons = () => {
+    if (this.state.pngVisible) {
+      return (
+        <Button
+          className="ExportButton"
+          loading={this.state.pngExporting}
+          disabled={this.state.pngDisabled}
+          onClick={this.PNGExport}
+        >
+          PNG
+        </Button>
+      );
+    }
+    if (this.state.pdfVisible) {
+      return (
+        <Button
+          className="ExportButton"
+          loading={this.state.pdfExporting}
+          disabled={this.state.pdfDisabled}
+          onClick={this.PDFExport}
+        >
+          PDF
+        </Button>
+      );
+    }
+  };
+
   render() {
+    const { ...state } = this.state;
+    const additionalButtons = this.getAdditionalButtons();
     return (
       <div className="ButtonActions">
-        <Button.Group className="MoreButtonGroup" floated="right">
-          <Button
-            basic
-            color="black"
-            className="MoreButton"
-            icon="ellipsis horizontal"
-            floated="right"
-          />
-        </Button.Group>
-
-        <Button.Group
-          basic
-          color="black"
-          className="ExportButtonGroup"
-          floated="right"
-        >
-          <Button basic className="customOrange" content="Export" />
-          <Dropdown
-            className="button icon"
-            options={options}
-            trigger={<React.Fragment />}
-          />
-        </Button.Group>
-
-        <Button.Group className="ViewButtonGroup" floated="right">
-          <Button
-            basic
-            className="ListViewButton"
-            color="black"
-            icon="chart list"
-          />
-        </Button.Group>
-        <Button.Group className="ViewButtonGroup" floated="right">
-          <Button
-            basic
-            className="ChartViewButton"
-            color="black"
-            icon="th pie"
-          />
+        <Button.Group className="ExportButtonGroup" floated="right">
+          <Button as="div" labelPosition="left">
+            <Label
+              as="string"
+              basic
+              pointing="right"
+              className="ExportButtonGroupLabel"
+            >
+              EXPORT
+            </Label>
+            <Button
+              className="ExportButton"
+              loading={this.state.excelExporting}
+              disabled={this.state.excelDisabled}
+              onClick={this.ExcelExport}
+            >
+              Data (.xls)
+            </Button>
+          </Button>
+          {additionalButtons}
         </Button.Group>
       </div>
     );

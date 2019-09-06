@@ -5,13 +5,11 @@ import { Loader, Dimmer, Tab } from 'semantic-ui-react';
 class PlotSVG extends Component {
   constructor(props) {
     super(props);
-    const plotIndex = props.index || 0;
     this.state = {
-      isSVGReady: false,
-      activeIndex: plotIndex
+      isSVGReady: false
     };
-    this.getSVGPanes = this.getSVGPanes.bind(this);
-    this.handleTabChange = this.handleTabChange.bind(this);
+    // this.getSVGPanes = this.getSVGPanes.bind(this);
+    // this.handleTabChange = this.handleTabChange.bind(this);
   }
 
   componentDidMount() {
@@ -21,10 +19,11 @@ class PlotSVG extends Component {
   }
 
   handleTabChange = (e, { activeIndex }) => {
-    this.setState({ activeIndex });
+    debugger;
+    this.props.onSVGTabChange(activeIndex);
   };
 
-  getSVGPanes(activeIndex) {
+  getSVGPanes(activeSVGTabIndex) {
     if (this.props.imageInfo) {
       // const imageInfoArray = this.props.imageInfo;
       const svgArray = this.props.imageInfo.svg;
@@ -47,16 +46,17 @@ class PlotSVG extends Component {
           menu={{ secondary: true, pointing: true, className: 'SVGDiv' }}
           panes={panes}
           onTabChange={this.handleTabChange}
-          // activeIndex={activeIndex}
           defaultActiveIndex={0}
+          activeIndex={activeSVGTabIndex}
         />
       );
     }
   }
 
   render() {
-    const { activeIndex } = this.state;
-    const svgPanes = this.getSVGPanes(activeIndex);
+    debugger;
+    const { activeSVGTabIndex } = this.props;
+    const svgPanes = this.getSVGPanes(activeSVGTabIndex);
     if (!this.state.isSVGReady) {
       return (
         <div>
