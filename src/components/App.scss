@@ -41,6 +41,15 @@ $screen-xl-min: 1200px;
 .AppContainer {
   // height: 100vh !important;
 
+  .deviceMargin {
+    margin: 20px 15px 30px 15px !important;
+
+    // 992px window width and more
+    @include xl {
+      margin: 0px !important;
+    }
+  }
+
   .TopBar {
     background-color: #2E2E2E !important;
 
@@ -118,19 +127,19 @@ $screen-xl-min: 1200px;
   .BreadcrumbContainer {
     margin: 0px 10px 5px 10px !important;
 
+    .BreadcrumbLink {
+      color: rgb(22, 120, 194);
+      font-weight: bold;
+      cursor: pointer !important;
+    }
+
     .active {
       color: #FF4400 !important;
     }
   }
-
-  // .customOrange {
-  //   color: #FF4400 !important;
-  //   border: 1px solid #FF4400 !important;
-  // }
   
   .ButtonActions {
     display: inline !important;
-    // float: right !important;
   }
 
   .MoreButtonGroup {
@@ -148,41 +157,6 @@ $screen-xl-min: 1200px;
 
   .ExportButton {
     cursor: pointer !important;
-    // border: none !important;
-    // color: #2E2E2E !important;
-  }
-
-  // .ExportButton:hover {
-  //   background-color: #2E2E2E !important;
-  //   color: #FFF !important;
-  // }
-
-  // .ExportButtonGroup {
-  //   border: 0px !important;
-  //   margin-left: 5px !important;
-  // }
-
-  // .ChartViewButton {
-  //   border-top-right-radius: 0 !important;
-  //   border-bottom-right-radius: 0 !important; 
-  // }
-
-  // .ListViewButton {
-  //   border-top-left-radius: 0 !important;
-  //   border-bottom-left-radius: 0 !important; 
-  // }
-
-  // .MoreButtonGroup:hover, .ViewButtonGroup:hover, .ExportButtonGroup:hover {
-  //   background-color: #FF4400 !important
-  // }
-
-  .deviceMargin {
-    margin: 20px 15px 30px 15px !important;
-
-    // 992px window width and more
-    @include xl {
-      margin: 0px !important;
-    }
   }
 
   .PlotContainer, .ChartsContainer {
@@ -202,10 +176,9 @@ $screen-xl-min: 1200px;
   .ProteinColWidth {
     width: 30px !important;
     max-width: 30px !important;
-    background-color: red !important;
   }
 
-  .BreadcrumbLink, .ProteinNameLink {
+  .ProteinNameLink {
     color: rgb(22, 120, 194);
     font-weight: bold;
     // font-size: 14px;

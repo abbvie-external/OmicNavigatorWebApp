@@ -53,9 +53,8 @@ class PepplotResults extends Component {
   };
 
   getProteinData = (id, dataItem, getPlotCb, imageInfo) => {
-    let self = this;
     const handleSVGCb = this.handleSVG;
-    self.setState({
+    this.setState({
       imageInfo: imageInfo,
       isProteinSelected: true,
       isProteinDataLoaded: false,
@@ -73,6 +72,9 @@ class PepplotResults extends Component {
       case 'DonorDifferentialPhosphorylation':
         plotType = ['dotplot'];
         break;
+      case 'TreatmentDifferentialPhosphorylation':
+        plotType = ['splineplot'];
+        break;
       case 'Treatment and/or Strain Differential Phosphorylation':
         plotType = ['StrainStimDotplot', 'StimStrainDotplot'];
         break;
@@ -80,10 +82,18 @@ class PepplotResults extends Component {
         plotType = ['splineplot', 'lineplot'];
         break;
       case 'Differential Expression':
-        plotType = ['proteindotplot'];
+        if (study === '***REMOVED***') {
+          plotType = ['proteinlineplot'];
+        } else {
+          plotType = ['proteindotplot'];
+        }
         break;
       case 'Differential Phosphorylation':
-        plotType = ['phosphodotplot'];
+        if (study === '***REMOVED***') {
+          plotType = ['proteinlineplot'];
+        } else {
+          plotType = ['proteindotplot'];
+        }
         break;
       default:
         plotType = ['dotplot'];
@@ -93,13 +103,13 @@ class PepplotResults extends Component {
       phosphoprotService
         .getSiteData(id, study + 'plots')
         .then(treeDataResponse => {
-          self.setState({
+          this.setState({
             treeDataRaw: treeDataResponse
           });
           let tdCols = _.map(_.keys(treeDataResponse[0]), function(d) {
             return { key: d, field: d };
           });
-          self.setState({
+          this.setState({
             treeDataColumns: tdCols
           });
           let tD = _.map(treeDataResponse, function(d, i) {
@@ -125,13 +135,13 @@ class PepplotResults extends Component {
       phosphoprotService
         .getProteinData(id, study + 'plots')
         .then(proteinDataResponse => {
-          self.setState({
+          this.setState({
             treeDataRaw: proteinDataResponse
           });
           let tdCols = _.map(_.keys(proteinDataResponse[0]), function(d) {
             return { key: d, field: d };
           });
-          self.setState({
+          this.setState({
             treeDataColumns: tdCols
           });
 
@@ -148,7 +158,7 @@ class PepplotResults extends Component {
           });
           // console.log('this is proteinData');
           // console.log(proteinData);
-          self.setState({
+          this.setState({
             treeData: proteinData
           });
         })

@@ -19,7 +19,6 @@ class PlotSVG extends Component {
   }
 
   handleTabChange = (e, { activeIndex }) => {
-    debugger;
     this.props.onSVGTabChange(activeIndex);
   };
 
@@ -54,7 +53,6 @@ class PlotSVG extends Component {
   }
 
   render() {
-    debugger;
     const { activeSVGTabIndex } = this.props;
     const svgPanes = this.getSVGPanes(activeSVGTabIndex);
     if (!this.state.isSVGReady) {

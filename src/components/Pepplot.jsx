@@ -53,6 +53,16 @@ class PepplotContainer extends Component {
     const model = testData.model;
     let initConfigCols = [];
 
+    const BreadcrumbPopupStyle = {
+      backgroundColor: '2E2E2E',
+      borderBottom: '2px solid #FF4400',
+      color: '#FFF',
+      padding: '1em',
+      maxWidth: '50vw',
+      fontSize: '13px',
+      wordBreak: 'break-all'
+    };
+
     if (model === 'Differential Expression') {
       initConfigCols = [
         {
@@ -67,11 +77,13 @@ class PepplotContainer extends Component {
                       className="ProteinNameLink"
                       onClick={addParams.showPlot(model, item)}
                     >
-                      {truncateValue(value, 11)}
+                      {splitValue(value)}
                     </span>
                   }
                   content={value}
+                  style={BreadcrumbPopupStyle}
                   inverted
+                  basic
                 />
                 <img
                   src="phosphosite.ico"
@@ -89,9 +101,11 @@ class PepplotContainer extends Component {
           template: (value, item, addParams) => {
             return (
               <Popup
-                trigger={<span>{truncateValue(value, 17)}</span>}
+                trigger={<span>{splitValue(value)}</span>}
                 content={value}
+                style={BreadcrumbPopupStyle}
                 inverted
+                basic
               />
             );
           }
@@ -114,11 +128,13 @@ class PepplotContainer extends Component {
                       className="ProteinNameLink"
                       onClick={addParams.showPlot(model, item)}
                     >
-                      {truncateValue(value, 11)}
+                      {splitValue(value)}
                     </span>
                   }
+                  style={BreadcrumbPopupStyle}
                   content={value}
                   inverted
+                  basic
                 />
                 <img
                   src="phosphosite.ico"
@@ -133,7 +149,7 @@ class PepplotContainer extends Component {
       ];
     }
 
-    let allConfigCols = ['F', 'logFC', 't', 'P_Value', 'adj_P_Val'];
+    let allConfigCols = ['F', 'logFC', 't', 'P_Value', 'adj_P_Val', 'adjPVal'];
     let orderedTestData = JSON.parse(
       JSON.stringify(this.testData[0], allConfigCols)
     );
@@ -152,8 +168,10 @@ class PepplotContainer extends Component {
             <p>
               <Popup
                 trigger={<span>{formatNumberForDisplay(value)}</span>}
+                style={BreadcrumbPopupStyle}
                 content={value}
                 inverted
+                basic
               />
             </p>
           );
@@ -238,6 +256,10 @@ function formatNumberForDisplay(num) {
   } else return null;
 }
 
-function truncateValue(value, indexEnd) {
-  return value.substr(0, indexEnd);
+function splitValue(value) {
+  const firstValue = value.split(';')[0];
+  const numberOfSemicolons = (value.match(/;/g) || []).length;
+  return numberOfSemicolons > 0
+    ? firstValue + ' ...' + '(' + numberOfSemicolons + ')'
+    : firstValue;
 }

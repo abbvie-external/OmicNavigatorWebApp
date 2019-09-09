@@ -1,18 +1,22 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import { Breadcrumb, Icon } from 'semantic-ui-react';
+import { Breadcrumb, Icon, Popup } from 'semantic-ui-react';
 
 class Breadcrumbs extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      protein: this.props.imageInfo.key
-    };
-  }
-
   componentDidMount() {}
 
   render() {
+    const name = this.props.imageInfo.key;
+    const BreadcrumbPopupStyle = {
+      backgroundColor: '2E2E2E',
+      borderBottom: '2px solid #FF4400',
+      color: '#FFF',
+      padding: '1em',
+      maxWidth: '50vw',
+      fontSize: '13px',
+      wordBreak: 'break-all'
+    };
+
     return (
       <div className="BreadcrumbContainer">
         <div className="deviceMargin">
@@ -20,12 +24,30 @@ class Breadcrumbs extends Component {
             {/* <Link to={this.props.history.location.pathname}> */}
             {/* <Link onClick={this.props.onNavigateBack()}> */}
             <Breadcrumb.Section className="BreadcrumbLink">
-              <Icon name="table" onClick={this.props.onNavigateBack} />
+              <Popup
+                trigger={
+                  <Icon name="table" onClick={this.props.onNavigateBack} />
+                }
+                style={BreadcrumbPopupStyle}
+                inverted
+                basic
+                position="bottom left"
+                content="Back To Table"
+              />
             </Breadcrumb.Section>
             {/* </Link> */}
             <Breadcrumb.Divider icon="right chevron" />
-            <Breadcrumb.Section active={this.state.protein !== ''}>
-              {this.state.protein}
+            <Breadcrumb.Section active={true}>
+              <Popup
+                trigger={
+                  <span className="BreadcrumbName">{splitValue(name)}</span>
+                }
+                style={BreadcrumbPopupStyle}
+                inverted
+                basic
+                position="bottom left"
+                content={name}
+              />
             </Breadcrumb.Section>
           </Breadcrumb>
         </div>
@@ -35,3 +57,11 @@ class Breadcrumbs extends Component {
 }
 
 export default withRouter(Breadcrumbs);
+
+function splitValue(value) {
+  const firstValue = value.split(';')[0];
+  const numberOfSemicolons = (value.match(/;/g) || []).length;
+  return numberOfSemicolons > 0
+    ? firstValue + ' ...' + '(' + numberOfSemicolons + ')'
+    : firstValue;
+}
