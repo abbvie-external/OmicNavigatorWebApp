@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Dropdown, Button, Label } from 'semantic-ui-react';
+import { Button, Label } from 'semantic-ui-react';
 import * as saveSvgAsPng from 'save-svg-as-png';
 import { excelService } from '../services/excel.service';
 // import * as jsPDF from 'jspdf';
@@ -110,7 +110,6 @@ class ButtonActions extends Component {
   };
 
   render() {
-    const { ...state } = this.state;
     const additionalButtons = this.getAdditionalButtons();
     return (
       <div className="ButtonActions">

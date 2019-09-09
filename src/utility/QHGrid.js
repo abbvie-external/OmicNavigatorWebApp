@@ -23,7 +23,7 @@ import { filterTypes } from './FilterTypeConfig';
 import _ from 'lodash';
 import moment from 'moment';
 
-import excel_logo from '../resources/excel.png';
+import excel_logo from '../resources/excel2.png';
 
 import './QHGrid.scss';
 import {
@@ -516,8 +516,8 @@ class QHGridHeader extends React.PureComponent {
               {!this.props.loading && !!this.props.exportBaseName && (
                 <Image
                   src={excel_logo}
-                  avatar
-                  size="mini"
+                  // avatar
+                  // size="mini"
                   onClick={this.props.exportExcel(columns)}
                   style={{ float: 'right', cursor: 'pointer' }}
                 />

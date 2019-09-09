@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { phosphoprotService } from '../services/phosphoprot.service';
 import { withRouter } from 'react-router-dom';
-// import ButtonActions from './ButtonActions';
+import { Grid } from 'semantic-ui-react';
+import ButtonActions from './ButtonActions';
 import PlotContainer from './Plot';
 import LoadingPlots from './LoadingPlots';
 import _ from 'lodash';
@@ -282,6 +283,7 @@ class PepplotResults extends Component {
     const results = this.props.pepplotResults;
     const columns = this.props.pepplotColumns;
     const rows = this.props.pepplotResults.length;
+    const quickViews = [];
     const additionalTemplateInfo = this.getTableHelpers(
       this.getProteinData,
       this.getPlot
@@ -289,18 +291,36 @@ class PepplotResults extends Component {
     if (!this.state.isProteinSelected) {
       return (
         <div>
-          {/* <ButtonActions /> */}
+          {/* <Grid columns={2} className="">
+            <Grid.Row className="ActionsRow">
+              <Grid.Column
+                className="PlotAccordionContainer"
+                mobile={8}
+                tablet={8}
+                largeScreen={8}
+                widescreen={8}
+              >
+              </Grid.Column>
+              <Grid.Column mobile={8} tablet={8} largeScreen={8} widescreen={8}>
+                <ButtonActions {...this.props} {...this.state} />
+              </Grid.Column>
+            </Grid.Row>
+          </Grid> */}
+
           <EZGrid
             data={results}
             columnsConfig={columns}
             // totalRows={rows}
             // use "rows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
-            itemsPerPage={100}
+            itemsPerPage={rows}
+            exportBaseName="Differential_Phosphorylation_Analysis"
+            quickViews={quickViews}
             disableGeneralSearch
             disableGrouping
             disableColumnVisibilityToggle
             height="75vh"
             additionalTemplateInfo={additionalTemplateInfo}
+            headerAttributes={<ButtonActions />}
           />
         </div>
       );
