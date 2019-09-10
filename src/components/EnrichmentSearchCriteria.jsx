@@ -1,24 +1,31 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import { Form, Select } from 'semantic-ui-react';
+import { Form, Select, Icon, Popup } from 'semantic-ui-react';
+import './SearchCriteria.scss';
 import { phosphoprotService } from '../services/phosphoprot.service';
 import _ from 'lodash';
 
 class EnrichmentSearchCriteria extends Component {
+  static defaultProps = {
+    tab: 'enrichment',
+    isValidSearchEnrichment: false,
+    isSearching: false
+  };
+
   constructor(props) {
     super(props);
     this.state = {
-      tab: this.props.tab || 'enrichment',
-      study: this.props.study || '',
-      studies: this.props.studies || [],
-      model: this.props.model || '',
-      models: this.props.models || [],
-      test: this.props.test || '',
-      tests: this.props.tests || [],
-      modelsDisabled: this.props.modelsDisabled || true,
-      testsDisabled: this.props.testsDisabled || true,
-      isValidSearchEnrichment: this.props.isValidSearchEnrichment || false,
-      enrichmentResults: this.props.enrichmentResults || []
+      study: '',
+      studies: [],
+      studyHrefVisible: false,
+      studyHref: '',
+      model: '',
+      models: [],
+      test: '',
+      tests: [],
+      studiesDisabled: false,
+      modelsDisabled: true,
+      testsDisabled: true
     };
   }
 
@@ -40,14 +47,18 @@ class EnrichmentSearchCriteria extends Component {
   handleStudyChange = (evt, { name, value }) => {
     this.setState({
       [name]: value,
+      studyHrefVisible: true,
+      studyHref: `${value}.html`,
       model: '',
       test: '',
       modelsDisabled: true,
       testsDisabled: true
     });
-    this.hideEnrichmentGrid();
+    this.props.onSearchCriteriaReset({
+      isValidSearchEnrichment: false
+    });
     const modelNamesParam =
-      this.state.tab === 'pepplot' ? 'inferenceNames' : 'EnrichmentNames';
+      this.props.tab === 'pepplot' ? 'inferenceNames' : 'EnrichmentNames';
     phosphoprotService
       .getModelNames(modelNamesParam, value + 'plots')
       .then(modelsFromService => {
@@ -67,13 +78,14 @@ class EnrichmentSearchCriteria extends Component {
       test: '',
       [name]: value
     });
-    this.hideEnrichmentGrid();
+    this.props.onSearchCriteriaReset({
+      isValidSearchEnrichment: false
+    });
     const testsArr = _.map(this.allNames[value], function(testName) {
       return { key: testName, text: testName, value: testName };
     });
     this.setState({
       testsDisabled: false,
-      isValidSearchEnrichment: false,
       tests: testsArr
     });
   };
@@ -81,15 +93,20 @@ class EnrichmentSearchCriteria extends Component {
   handleTestChange = (evt, { name, value }) => {
     this.setState({
       [name]: value,
+      studiesDisabled: true,
+      modelsDisabled: true,
       testsDisabled: true
     });
+    this.props.onSearchTransition({
+      isSearching: true
+    });
     const testResultsParam =
-      this.state.tab === 'pepplot'
+      this.props.tab === 'pepplot'
         ? 'getInferenceResults'
         : 'getEnrichmentResults';
     phosphoprotService
       .getTestData(
-        this.state.tab,
+        this.props.tab,
         testResultsParam,
         this.state.model,
         value,
@@ -98,68 +115,123 @@ class EnrichmentSearchCriteria extends Component {
       .then(dataFromService => {
         this.testdata = dataFromService;
         this.setState({
+          studiesDisabled: false,
+          modelsDisabled: false,
           testsDisabled: false
         });
-        this.handleEnrichmentSearch(
-          this.state.study,
-          this.state.model,
-          value,
-          this.testdata
-        );
+        this.props.onEnrichmentSearch({
+          study: this.state.study,
+          model: this.state.model,
+          test: value,
+          enrichmentResults: this.testdata
+        });
       });
   };
 
-  handleEnrichmentSearch = (study, model, test, data) => {
-    this.props.onEnrichmentSearch({
-      study: study,
-      model: model,
-      test: test,
-      enrichmentResults: data
-    });
-  };
-
-  hideEnrichmentGrid = () => {
-    this.props.onSearchCriteriaReset({
-      isValidSearchEnrichment: false
-    });
-  };
-
   render() {
+    const {
+      study,
+      studies,
+      studyHref,
+      studyHrefVisible,
+      model,
+      models,
+      test,
+      tests,
+      studiesDisabled,
+      modelsDisabled,
+      testsDisabled
+    } = this.state;
+
+    const StudyPopupStyle = {
+      backgroundColor: '2E2E2E',
+      borderBottom: '2px solid #FF4400',
+      color: '#FFF',
+      padding: '1em',
+      fontSize: '13px'
+    };
+
+    let studyIcon;
+    let studyName = `${study} Analysis Details`;
+
+    if (studyHrefVisible) {
+      studyIcon = (
+        <Popup
+          trigger={
+            <a target="_blank" rel="noopener noreferrer" href={studyHref}>
+              <Icon
+                name="html5"
+                size="large"
+                className="StudyHTMLIcon"
+                inverted
+                circular
+              />
+            </a>
+          }
+          style={StudyPopupStyle}
+          inverted
+          basic
+          position="bottom center"
+          content={studyName}
+        />
+      );
+    } else {
+      studyIcon = (
+        <Popup
+          trigger={
+            <a target="_blank" rel="noopener noreferrer">
+              <Icon name="html5" size="large" circular inverted disabled />
+            </a>
+          }
+          style={StudyPopupStyle}
+          basic
+          inverted
+          position="bottom center"
+          content="Select A Study to view Analysis Details"
+        />
+      );
+    }
+
     return (
       <Form className="SearchCriteriaContainer">
-        <p className="FilterText">FILTERS</p>
+        <div className="FilterStudyContainer">
+          <span className="FilterText">FILTERS</span>
+          <span className="StudyHTML">{studyIcon}</span>
+        </div>
+
         <Form.Field
           control={Select}
           required
           label="Study"
           name="study"
-          value={this.state.study}
-          options={this.state.studies}
+          value={study}
+          options={studies}
           placeholder="Select A Study"
           onChange={this.handleStudyChange}
+          disabled={studiesDisabled}
         />
         <Form.Field
           control={Select}
           required
           label="Model"
           name="model"
-          value={this.state.model}
-          options={this.state.models}
+          value={model}
+          options={models}
           placeholder="Select Model"
           onChange={this.handleModelChange}
-          disabled={this.state.modelsDisabled}
+          disabled={modelsDisabled}
         />
         <Form.Field
           control={Select}
           required
           name="test"
-          value={this.state.test}
-          options={this.state.tests}
-          placeholder="Select Test"
+          value={test}
+          options={tests}
+          placeholder="Select Database"
           onChange={this.handleTestChange}
-          disabled={this.state.testsDisabled}
+          disabled={testsDisabled}
           label={{
-            children: 'Test',
+            children: 'Database',
             htmlFor: 'form-select-control-test'
           }}
           search

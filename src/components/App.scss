@@ -50,14 +50,10 @@ $screen-xl-min: 1200px;
     }
   }
 
-  .PepplotContainer {
-    padding: 0px !important;
-  }
-
-  .EnrichmentContainer {
-    padding: 0px !important;
-    padding-top: 1px !important;
-  }
+  /* .SidebarContainer ::-webkit-scrollbar-thumb {
+    background: #FF4400 !important;
+    box-shadow: 0px 3px 0px rgba(0,0,0,0.6) !important;
+  } */
 
   .ContentContainer {
     padding: 0px;
@@ -77,7 +73,6 @@ $screen-xl-min: 1200px;
     padding-top: 0px !important;
     min-height: 75vh !important;
   }
-
 
   // QH Grid Overrides
 

@@ -1,4 +1,9 @@
 import React, { Component } from 'react';
+import { phosphoprotService } from '../services/phosphoprot.service';
+import { withRouter } from 'react-router-dom';
+import { Grid } from 'semantic-ui-react';
+import ButtonActions from './ButtonActions';
+import _ from 'lodash';
 
 import QHGrid from '../utility/QHGrid';
 import EZGrid from '../utility/EZGrid';
@@ -10,21 +15,47 @@ export { QHGrid, EZGrid, QuickViewModal };
 export { getField, getFieldValue, typeMap };
 
 class EnrichmentResults extends Component {
-  // constructor(props) {
-  //   super(props);
-  // }
+  static defaultProps = {
+    study: '',
+    model: '',
+    test: '',
+    enrichmentResults: [],
+    enrichmentColumns: []
+  };
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      isProteinDataLoaded: false
+    };
+  }
 
   componentDidMount() {}
 
   render() {
-    // const results = this.props.searchCriteria.enrichmentResults;
-    // const columns = this.props.searchCriteria.enrichmentColumns;
+    const results = this.props.enrichmentResults;
+    const columns = this.props.enrichmentColumns;
+    const rows = this.props.enrichmentResults.length;
+    const quickViews = [];
     return (
       <div>
-        <EZGrid data={[]} height="60vh" columnsConfig={[]} />
+        <EZGrid
+          data={results}
+          columnsConfig={columns}
+          // totalRows={rows}
+          // use "rows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
+          itemsPerPage={100}
+          exportBaseName="Enrichment_Analysis"
+          quickViews={quickViews}
+          disableGeneralSearch
+          disableGrouping
+          disableColumnVisibilityToggle
+          height="75vh"
+          headerAttributes={<ButtonActions />}
+        />
       </div>
     );
   }
 }
 
-export default EnrichmentResults;
+export default withRouter(EnrichmentResults);

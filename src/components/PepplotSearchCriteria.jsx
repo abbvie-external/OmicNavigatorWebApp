@@ -175,6 +175,21 @@ class PepplotSearchCriteria extends Component {
           content={studyName}
         />
       );
+    } else {
+      studyIcon = (
+        <Popup
+          trigger={
+            <a target="_blank" rel="noopener noreferrer">
+              <Icon name="html5" size="large" circular inverted disabled />
+            </a>
+          }
+          style={StudyPopupStyle}
+          basic
+          inverted
+          position="bottom center"
+          content="Select A Study to view Analysis Details"
+        />
+      );
     }
 
     return (

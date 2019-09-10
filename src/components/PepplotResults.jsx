@@ -171,6 +171,7 @@ class PepplotResults extends Component {
 
   getPlot = (id, plotType, study, imageInfo, handleSVGCb) => {
     let currentSVGs = [];
+    debugger;
     let heightCalculation = this.calculateHeight;
     let widthCalculation = this.calculateWidth;
     _.forEach(plotType, function(plot, i) {
@@ -296,7 +297,7 @@ class PepplotResults extends Component {
             columnsConfig={columns}
             // totalRows={rows}
             // use "rows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
-            itemsPerPage={rows}
+            itemsPerPage={100}
             exportBaseName="Differential_Phosphorylation_Analysis"
             quickViews={quickViews}
             disableGeneralSearch

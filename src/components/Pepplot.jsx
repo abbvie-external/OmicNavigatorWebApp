@@ -6,6 +6,7 @@ import PepplotResults from './PepplotResults';
 import SearchPrompt from './SearchPrompt';
 import Searching from './Searching';
 import _ from 'lodash';
+import './Pepplot.scss';
 import './Table.scss';
 
 class PepplotContainer extends Component {
@@ -258,9 +259,11 @@ function formatNumberForDisplay(num) {
 }
 
 function splitValue(value) {
-  const firstValue = value.split(';')[0];
-  const numberOfSemicolons = (value.match(/;/g) || []).length;
-  return numberOfSemicolons > 0
-    ? `${firstValue}...(${numberOfSemicolons})`
-    : firstValue;
+  if (value) {
+    const firstValue = value.split(';')[0];
+    const numberOfSemicolons = (value.match(/;/g) || []).length;
+    return numberOfSemicolons > 0
+      ? `${firstValue}...(${numberOfSemicolons})`
+      : firstValue;
+  }
 }
