@@ -291,22 +291,6 @@ class PepplotResults extends Component {
     if (!this.state.isProteinSelected) {
       return (
         <div>
-          {/* <Grid columns={2} className="">
-            <Grid.Row className="ActionsRow">
-              <Grid.Column
-                className="PlotAccordionContainer"
-                mobile={8}
-                tablet={8}
-                largeScreen={8}
-                widescreen={8}
-              >
-              </Grid.Column>
-              <Grid.Column mobile={8} tablet={8} largeScreen={8} widescreen={8}>
-                <ButtonActions {...this.props} {...this.state} />
-              </Grid.Column>
-            </Grid.Row>
-          </Grid> */}
-
           <EZGrid
             data={results}
             columnsConfig={columns}

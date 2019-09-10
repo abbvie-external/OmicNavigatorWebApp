@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Loader, Dimmer, Tab } from 'semantic-ui-react';
-// import _ from 'lodash';
+import './PlotSVG.scss';
 
 class PlotSVG extends Component {
   constructor(props) {
@@ -8,8 +8,6 @@ class PlotSVG extends Component {
     this.state = {
       isSVGReady: false
     };
-    // this.getSVGPanes = this.getSVGPanes.bind(this);
-    // this.handleTabChange = this.handleTabChange.bind(this);
   }
 
   componentDidMount() {

@@ -6,6 +6,7 @@ import PepplotResults from './PepplotResults';
 import SearchPrompt from './SearchPrompt';
 import Searching from './Searching';
 import _ from 'lodash';
+import './Table.scss';
 
 class PepplotContainer extends Component {
   static defaultProps = {

@@ -1,0 +1,34 @@
+.SidebarContainer {
+    background-color: #e0e1e2;
+    height: 93vh;
+
+    .SearchCriteriaContainer {
+      padding: 0px 20px !important;
+    }  
+    
+    .FilterStudyContainer {
+      padding-top: 20px;
+      padding-bottom: 15px !important;
+      margin-bottom: 15px !important;
+    }
+    
+    .FilterText {
+      font-weight: bold;
+      font-stretch: condensed !important;
+      margin-top: 0px !important;
+      padding-top: 10px !important;
+    }
+
+    .StudyHTML {
+      float: right !important;
+    }
+
+    .StudyHTMLIcon {
+      cursor: pointer;
+      background-color: #FF4400 !important;
+    }
+
+    i.inverted.circular.icon {
+      background-color: #FF4400 !important;
+    }
+  }

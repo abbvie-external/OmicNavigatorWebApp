@@ -1,0 +1,31 @@
+.TopBar {
+background-color: #2E2E2E !important;
+
+    .MenuContainer {
+        margin-bottom: 0px !important;
+        
+        .active {
+        border-color: #FF4400 !important;
+        }
+
+    }
+
+    .LogoElement {
+        padding: 0px 0px 17px 10px !important;
+    }
+
+    .Title {
+        font-size: 18px;
+        margin: 0px !important;
+        padding-left: 10px !important;
+        padding-top: 15px !important;
+        padding-right: 70px !important;
+        
+        .TitleTextStyle {
+        font-weight: 100 !important;
+        font-style: italic;
+        color: #e0e1e2 !important;
+        }
+
+    }
+}

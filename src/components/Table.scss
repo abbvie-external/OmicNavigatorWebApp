@@ -1,0 +1,21 @@
+.ProteinNameLink {
+  color: rgb(22, 120, 194);
+  font-weight: bold;
+  // font-size: 14px;
+  cursor: pointer !important;
+}
+
+.PhosphositeIcon {
+  float: right;
+  height: 16px;
+  width: 16px;
+  cursor: pointer;
+}
+
+.PhosphositeIcon:hover {
+  transform: scale(1.2);
+}
+
+.NumericValues {
+  cursor: pointer !important;
+}

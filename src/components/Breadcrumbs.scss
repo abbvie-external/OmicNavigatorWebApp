@@ -1,0 +1,13 @@
+.BreadcrumbContainer {
+    margin: 0px 10px 5px 10px !important;
+
+    .BreadcrumbLink {
+      color: rgb(22, 120, 194);
+      font-weight: bold;
+      cursor: pointer !important;
+    }
+
+    .active {
+      color: #FF4400 !important;
+    }
+  }

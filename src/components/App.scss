@@ -50,77 +50,6 @@ $screen-xl-min: 1200px;
     }
   }
 
-  .TopBar {
-    background-color: #2E2E2E !important;
-
-    .MenuContainer {
-      margin-bottom: 0px !important;
-      
-      .active {
-        border-color: #FF4400 !important;
-      }
-
-    }
-
-    .LogoElement {
-      padding: 0px 0px 17px 10px !important;
-    }
-
-    .Title {
-      font-size: 18px;
-      margin: 0px !important;
-      padding-left: 10px !important;
-      padding-top: 15px !important;
-      padding-right: 70px !important;
-      
-      .TitleTextStyle {
-        font-weight: 100 !important;
-        font-style: italic;
-        color: #e0e1e2 !important;
-      }
-
-    }
-  }
-
-  .SidebarContainer {
-    background-color: #e0e1e2;
-    height: 93vh;
-
-    .SearchCriteriaContainer {
-      padding: 0px 20px !important;
-    }  
-    
-    .FilterStudyContainer {
-      padding-top: 20px;
-      padding-bottom: 15px !important;
-      margin-bottom: 15px !important;
-    }
-    
-    .FilterText {
-      font-weight: bold;
-      font-stretch: condensed !important;
-      margin-top: 0px !important;
-      padding-top: 10px !important;
-    }
-
-    .StudyHTML {
-      float: right !important;
-    }
-
-    .StudyHTMLIcon {
-      cursor: pointer;
-      background-color: #FF4400 !important;
-    }
-
-    i.inverted.circular.icon {
-      background-color: #FF4400 !important;
-    }
-  }
-
-  .EnrichmentContainer {
-    padding-top: 0px !important;
-  }
-
   .PepplotContainer {
     padding: 0px !important;
   }
@@ -143,92 +72,14 @@ $screen-xl-min: 1200px;
     padding-top: 15px !important;
   }
 
-  .BreadcrumbContainer {
-    margin: 0px 10px 5px 10px !important;
-
-    .BreadcrumbLink {
-      color: rgb(22, 120, 194);
-      font-weight: bold;
-      cursor: pointer !important;
-    }
-
-    .active {
-      color: #FF4400 !important;
-    }
-  }
-  
-  .ButtonActions {
-    display: inline !important;
-  }
-
-  .MoreButtonGroup {
-    margin-left: 5px !important;
-  }
-
-  .ExportButtonGroupLabel {
-    background-color: #FF4400 !important;
-    color: #FFF !important;
-  }
-
-  .ui.basic.black.button, .ui.basic.black.buttons .button {
-    box-shadow: none !important;
-  }
-
-  .ExportButton {
-    cursor: pointer !important;
-  }
-
-  .PlotContainer, .ChartsContainer {
+  .ChartsContainer {
     margin-top: 0px !important;
     padding-top: 0px !important;
     min-height: 75vh !important;
-  
-    .PlotSVG {
-      height: 75vh !important;
-    }
-
-    .PlotAccordionContainer .content {
-      overflow-wrap: break-word !important;
-    }
   }
 
-  .ProteinColWidth {
-    width: 30px !important;
-    max-width: 30px !important;
-  }
 
-  .ProteinNameLink {
-    color: rgb(22, 120, 194);
-    font-weight: bold;
-    // font-size: 14px;
-    cursor: pointer !important;
-  }
-
-  .PhosphositeIcon {
-    float: right;
-    height: 16px;
-    width: 16px;
-    cursor: pointer;
-  }
-
-  .PhosphositeIcon:hover {
-      transform: scale(1.2);
-  }
-
-  .svgContainer {
-    height: 100% !important;
-    width: 100% !important;
-  }
-
-  .svgDiv {
-    height: 100% !important;
-    width: 100% !important;
-  }
-
-  .svgSpan {
-    height: 100% !important;
-    width: 100% !important;
-  }
+  // QH Grid Overrides
 
   .TableHeaderCell {
     background-color: #FFF !important;
@@ -242,16 +93,8 @@ $screen-xl-min: 1200px;
     display: none !important;
   }
 
-  .NumericValues {
-    cursor: pointer !important;
-  }
-
   .QHGridTable {
     border: none !important;
   }
-
-  // .EmptySearchImage {
-  //   z-index: 1001 !important;
-  // }
 
 }

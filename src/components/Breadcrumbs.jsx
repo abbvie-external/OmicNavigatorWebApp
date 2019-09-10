@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { Breadcrumb, Icon, Popup } from 'semantic-ui-react';
+import './Breadcrumbs.scss';
 
 class Breadcrumbs extends Component {
   componentDidMount() {}

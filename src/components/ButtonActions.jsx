@@ -4,6 +4,7 @@ import * as saveSvgAsPng from 'save-svg-as-png';
 import { excelService } from '../services/excel.service';
 // import * as jsPDF from 'jspdf';
 // import { pdfService } from '../services/pdf.service';
+import './ButtonActions.scss';
 
 class ButtonActions extends Component {
   constructor(props) {

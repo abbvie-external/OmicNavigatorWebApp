@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import Tabs from './Tabs';
+import './TopBar.scss';
 
 class TopBar extends Component {
   componentDidMount() {}

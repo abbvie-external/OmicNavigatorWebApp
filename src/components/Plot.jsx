@@ -5,6 +5,7 @@ import Breadcrumbs from './Breadcrumbs';
 import ButtonActions from './ButtonActions';
 import PlotAccordion from './PlotAccordion';
 import PlotSVG from './PlotSVG';
+import './Plot.scss';
 
 class PlotContainer extends Component {
   static defaultProps = {
@@ -50,13 +51,7 @@ class PlotContainer extends Component {
         <div className="">
           <Grid columns={2} className="">
             <Grid.Row className="ActionsRow">
-              <Grid.Column
-                className="PlotAccordionContainer"
-                mobile={8}
-                tablet={8}
-                largeScreen={8}
-                widescreen={8}
-              >
+              <Grid.Column mobile={8} tablet={8} largeScreen={8} widescreen={8}>
                 <Breadcrumbs
                   {...this.props}
                   onNavigateBack={this.props.onBackToGrid}

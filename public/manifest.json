@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "PhosphoProtReact",
+  "name": "Phosphoproteomic Analyzer",
   "icons": [
     {
       "src": "favicon.ico",
