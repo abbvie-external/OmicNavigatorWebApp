@@ -340,6 +340,7 @@ class QHGridHeader extends React.PureComponent {
       <Table
         compact="very"
         size="small"
+        className="QHGridTable"
         style={{ marginBottom: 0, paddingBottom: 0 }}
       >
         <Table.Header>

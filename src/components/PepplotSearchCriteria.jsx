@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import { Form, Select } from 'semantic-ui-react';
+import { Form, Select, Icon, Popup } from 'semantic-ui-react';
 import { phosphoprotService } from '../services/phosphoprot.service';
 import _ from 'lodash';
 
@@ -16,6 +16,8 @@ class PepplotSearchCriteria extends Component {
     this.state = {
       study: '',
       studies: [],
+      studyHrefVisible: false,
+      studyHref: '',
       model: '',
       models: [],
       test: '',
@@ -44,6 +46,8 @@ class PepplotSearchCriteria extends Component {
   handleStudyChange = (evt, { name, value }) => {
     this.setState({
       [name]: value,
+      studyHrefVisible: true,
+      studyHref: `${value}.html`,
       model: '',
       test: '',
       modelsDisabled: true,
@@ -124,40 +128,92 @@ class PepplotSearchCriteria extends Component {
   };
 
   render() {
+    const {
+      study,
+      studies,
+      studyHref,
+      studyHrefVisible,
+      model,
+      models,
+      test,
+      tests,
+      studiesDisabled,
+      modelsDisabled,
+      testsDisabled
+    } = this.state;
+
+    const StudyPopupStyle = {
+      backgroundColor: '2E2E2E',
+      borderBottom: '2px solid #FF4400',
+      color: '#FFF',
+      padding: '1em',
+      fontSize: '13px'
+    };
+
+    let studyIcon;
+    let studyName = `${study} Analysis Details`;
+
+    if (studyHrefVisible) {
+      studyIcon = (
+        <Popup
+          trigger={
+            <a target="_blank" rel="noopener noreferrer" href={studyHref}>
+              <Icon
+                name="html5"
+                size="large"
+                className="StudyHTMLIcon"
+                inverted
+                circular
+              />
+            </a>
+          }
+          style={StudyPopupStyle}
+          inverted
+          basic
+          position="bottom center"
+          content={studyName}
+        />
+      );
+    }
+
     return (
       <Form className="SearchCriteriaContainer">
-        <p className="FilterText">FILTERS</p>
+        <div className="FilterStudyContainer">
+          <span className="FilterText">FILTERS</span>
+          <span className="StudyHTML">{studyIcon}</span>
+        </div>
+
         <Form.Field
           control={Select}
           required
           label="Study"
           name="study"
-          value={this.state.study}
-          options={this.state.studies}
+          value={study}
+          options={studies}
           placeholder="Select A Study"
           onChange={this.handleStudyChange}
-          disabled={this.state.studiesDisabled}
+          disabled={studiesDisabled}
         />
         <Form.Field
           control={Select}
           required
           label="Model"
           name="model"
-          value={this.state.model}
-          options={this.state.models}
+          value={model}
+          options={models}
           placeholder="Select Model"
           onChange={this.handleModelChange}
-          disabled={this.state.modelsDisabled}
+          disabled={modelsDisabled}
         />
         <Form.Field
           control={Select}
           required
           name="test"
-          value={this.state.test}
-          options={this.state.tests}
+          value={test}
+          options={tests}
           placeholder="Select Test"
           onChange={this.handleTestChange}
-          disabled={this.state.testsDisabled}
+          disabled={testsDisabled}
           label={{
             children: 'Test',
             htmlFor: 'form-select-control-test'
