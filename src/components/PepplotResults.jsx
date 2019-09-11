@@ -3,7 +3,7 @@ import { phosphoprotService } from '../services/phosphoprot.service';
 import { withRouter } from 'react-router-dom';
 import { Grid } from 'semantic-ui-react';
 import ButtonActions from './ButtonActions';
-import PlotContainer from './Plot';
+import PlotContainer from './PlotContainer';
 import LoadingPlots from './LoadingPlots';
 import SearchingAlt from './SearchingAlt';
 import LoaderActiveTable from './LoaderActiveTable';
@@ -276,7 +276,7 @@ class PepplotResults extends Component {
     return addParams;
   };
 
-  backToGrid = () => {
+  backToTable = () => {
     this.setState({
       isProteinSelected: false,
       isProteinDataLoaded: false
@@ -300,7 +300,7 @@ class PepplotResults extends Component {
             columnsConfig={columns}
             // totalRows={rows}
             // use "rows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
-            itemsPerPage={1000}
+            itemsPerPage={500}
             exportBaseName="Differential_Phosphorylation_Analysis"
             quickViews={quickViews}
             disableGeneralSearch
@@ -310,17 +310,6 @@ class PepplotResults extends Component {
             additionalTemplateInfo={additionalTemplateInfo}
             headerAttributes={<ButtonActions />}
           />
-        </div>
-      );
-    } else if (
-      !this.state.isProteinSelected &&
-      !this.state.isProteinDataLoaded
-    ) {
-      return (
-        <div>
-          <LoaderActiveTable />
-          {/* <SearchingAlt /> */}
-          {/* <LoadingPlots /> */}
         </div>
       );
     } else if (
@@ -339,7 +328,7 @@ class PepplotResults extends Component {
         <div>
           <PlotContainer
             {...this.state}
-            onBackToGrid={this.backToGrid}
+            onBackToTable={this.backToTable}
           ></PlotContainer>
         </div>
       );

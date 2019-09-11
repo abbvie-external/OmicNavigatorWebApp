@@ -27,7 +27,8 @@ class Breadcrumbs extends Component {
             <Breadcrumb.Section className="BreadcrumbLink">
               <Popup
                 trigger={
-                  <Icon name="table" onClick={this.props.onNavigateBack} />
+                  <Icon name="table" onClick={this.props.onBackToTable} />
+                  // <Icon name="table" onClick={this.props.onNavigateBack} />
                 }
                 style={BreadcrumbPopupStyle}
                 inverted

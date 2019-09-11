@@ -10,13 +10,13 @@ const LoaderStill = () => (
     <Header as="h4" textAlign="center">
       Use the filters to display relevant records
     </Header>
-    <div class="loading">
-      <div class="loader-still-dots">
-        <div class="loader-still-dot"></div>
-        <div class="loader-still-dot"></div>
-        <div class="loader-still-dot"></div>
-        <div class="loader-still-dot"></div>
-        <div class="loader-still-dot"></div>
+    <div className="loading">
+      <div className="loader-still-dots">
+        <div className="loader-still-dot"></div>
+        <div className="loader-still-dot"></div>
+        <div className="loader-still-dot"></div>
+        <div className="loader-still-dot"></div>
+        <div className="loader-still-dot"></div>
       </div>
     </div>
   </div>

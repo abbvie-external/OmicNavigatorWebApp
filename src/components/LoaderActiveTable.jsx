@@ -7,13 +7,13 @@ const LoaderActivePlots = () => (
     <Header as="h2" textAlign="center">
       Records are loading...
     </Header>
-    <div class="loading">
-      <div class="loader-active-table-dots animate">
-        <div class="loader-active-table-dot"></div>
-        <div class="loader-active-table-dot"></div>
-        <div class="loader-active-table-dot"></div>
-        <div class="loader-active-table-dot"></div>
-        <div class="loader-active-table-dot"></div>
+    <div className="loading">
+      <div className="loader-active-table-dots animate">
+        <div className="loader-active-table-dot"></div>
+        <div className="loader-active-table-dot"></div>
+        <div className="loader-active-table-dot"></div>
+        <div className="loader-active-table-dot"></div>
+        <div className="loader-active-table-dot"></div>
       </div>
     </div>
   </div>

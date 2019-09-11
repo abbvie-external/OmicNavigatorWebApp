@@ -5,7 +5,8 @@ import Breadcrumbs from './Breadcrumbs';
 import ButtonActions from './ButtonActions';
 import PlotAccordion from './PlotAccordion';
 import PlotSVG from './PlotSVG';
-import './Plot.scss';
+import './PlotContainer.scss';
+import LoaderActiveTable from './LoaderActiveTable';
 
 class PlotContainer extends Component {
   static defaultProps = {
@@ -25,7 +26,8 @@ class PlotContainer extends Component {
     // const customPathEncodedURI = encodeURIComponent(customPath);
     // props.history.push(customPathFriendly);
     this.state = {
-      activeSVGTabIndex: 0
+      activeSVGTabIndex: 0,
+      // returningToTable: false,
     };
   }
 
@@ -37,8 +39,18 @@ class PlotContainer extends Component {
     });
   };
 
+  // tableTransition = () => {
+  //   this.setState({
+  //     returningToTable: true
+  //   });
+  //   this.props.onBackToTable();
+  // };
+
   render() {
-    if (!this.props.isProteinDataLoaded) {
+    const { returningToTable } = this.state;
+    if (this.state.returningToTable) {
+      return <LoaderActiveTable />
+    } else if (!this.props.isProteinDataLoaded) {
       return (
         <div>
           <Dimmer active inverted>
@@ -54,7 +66,7 @@ class PlotContainer extends Component {
               <Grid.Column mobile={8} tablet={8} largeScreen={8} widescreen={8}>
                 <Breadcrumbs
                   {...this.props}
-                  onNavigateBack={this.props.onBackToGrid}
+                  // onNavigateBack={this.tableTransition}
                 />
               </Grid.Column>
               <Grid.Column mobile={8} tablet={8} largeScreen={8} widescreen={8}>

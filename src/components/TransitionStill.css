@@ -7,7 +7,7 @@
 /* The loader */
 .transition-still-loader {
   position: absolute;
-  top: 40%;
+  top: 37%;
   left: 50%;
 
   width: 190px;
@@ -45,7 +45,7 @@
 
   background-color: rgba(177, 196, 202, 0.3);
 
-  box-shadow: 0 0 50px 20px rgba(177, 196, 202, 0.3);
+  box-shadow: 0 0 50px 20px rgba(179, 190, 194, 0.3);
 
   transform-origin: 50% 100%;
   transform: scaleX(0.7) scaleY(0.1);
@@ -62,9 +62,9 @@
 
   border-radius: 20px;
 
-  background-color: rgba(172, 224, 241, 0.4);
+  background-color: rgba(141, 154, 158, 0.4);
 
-  box-shadow: 0 0 35px 20px rgba(172, 224, 241, 0.4);
+  box-shadow: 0 0 35px 20px rgba(91, 101, 104, 0.4);
 
   transform: rotateZ(30deg) translateY(-65px) scaleY(0.75);
 }
@@ -80,7 +80,7 @@
 
   border-radius: 20px;
 
-  background-color: rgba(30, 63, 87, 0.1);
+  background-color: rgba(52, 59, 63, 0.1);
 
   box-shadow: 0 0 30px 20px rgba(30, 63, 87, 0.1);
 
@@ -102,8 +102,8 @@
   margin-left: -10px;
 
   background: linear-gradient(rgba(255, 255, 255, 0.6), transparent),
-    linear-gradient(90deg, #3c617d, transparent),
-    linear-gradient(-90deg, #6bb2cd, transparent);
+    linear-gradient(90deg, lightgrey, transparent),
+    linear-gradient(-90deg, white, transparent);
   background-blend-mode: screen;
 
   animation: dot5 3s cubic-bezier(0.8, 0.1, 0.9, 0.5) infinite;
