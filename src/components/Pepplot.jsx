@@ -4,7 +4,12 @@ import { withRouter } from 'react-router-dom';
 import PepplotSearchCriteria from './PepplotSearchCriteria';
 import PepplotResults from './PepplotResults';
 import SearchPrompt from './SearchPrompt';
-import Searching from './Searching';
+import LoaderActiveTable from './LoaderActiveTable';
+import LoaderStill from './LoaderStill';
+import TransitionStill from './TransitionStill';
+import TransitionActive from './TransitionActive';
+import SearchingAlt from './SearchingAlt';
+
 import _ from 'lodash';
 import './Pepplot.scss';
 import './Table.scss';
@@ -200,8 +205,12 @@ class PepplotContainer extends Component {
     ) {
       return <PepplotResults {...this.state} />;
     } else if (this.state.isSearching) {
-      return <Searching />;
-    } else return <SearchPrompt />;
+      // return <SearchingAlt />;
+      // return <LoaderActiveTable />;
+      return <TransitionActive />;
+      // } else return <SearchPrompt />;
+      // } else return <LoaderStill />;
+    } else return <TransitionStill />;
   };
 
   render() {

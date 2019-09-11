@@ -4,7 +4,10 @@ import { withRouter } from 'react-router-dom';
 import EnrichmentSearchCriteria from './EnrichmentSearchCriteria';
 import EnrichmentResults from './EnrichmentResults';
 import SearchPrompt from './SearchPrompt';
-import Searching from './Searching';
+import LoaderActiveTable from './LoaderActiveTable';
+import LoaderStill from './LoaderStill';
+import TransitionActive from './TransitionActive';
+import TransitionStill from './TransitionStill';
 import _ from 'lodash';
 import './Enrichment.scss';
 import './Table.scss';
@@ -30,7 +33,6 @@ class EnrichmentContainer extends Component {
   };
 
   handleEnrichmentSearch = searchResults => {
-    debugger;
     const columns = this.getConfigCols(searchResults);
     this.setState({
       study: searchResults.study,
@@ -109,7 +111,6 @@ class EnrichmentContainer extends Component {
           );
         }
       };
-      debugger;
       initConfigCols.push(Col_Name_1006);
       // const configCols = initConfigCols.concat(Col_Name_1006);
       // includeCols.push('name_1006');
@@ -119,7 +120,6 @@ class EnrichmentContainer extends Component {
     // let orderedTestData = JSON.parse(
     //   JSON.stringify(this.testData[0], allConfigCols)
     // );
-    debugger;
     let orderedTestData = JSON.parse(JSON.stringify(this.annotationData[0]));
     let relevantConfigColumns = _.map(
       _.filter(_.keys(orderedTestData), function(d) {
@@ -163,8 +163,12 @@ class EnrichmentContainer extends Component {
     if (this.state.isValidSearchEnrichment && !this.state.isSearching) {
       return <EnrichmentResults {...this.state} />;
     } else if (this.state.isSearching) {
-      return <Searching />;
-    } else return <SearchPrompt />;
+      //  return <LoaderActiveTable />
+      return <TransitionActive />;
+      // } else return <SearchPrompt />;
+      // } else return <LoaderStill />;
+      // } else return <TransitionActive />;
+    } else return <TransitionStill />;
   };
 
   render() {

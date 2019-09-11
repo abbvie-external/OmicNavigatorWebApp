@@ -5,6 +5,9 @@ import { Grid } from 'semantic-ui-react';
 import ButtonActions from './ButtonActions';
 import PlotContainer from './Plot';
 import LoadingPlots from './LoadingPlots';
+import SearchingAlt from './SearchingAlt';
+import LoaderActiveTable from './LoaderActiveTable';
+import LoaderActivePlots from './LoaderActivePlots';
 import _ from 'lodash';
 import DOMPurify from 'dompurify';
 
@@ -171,7 +174,6 @@ class PepplotResults extends Component {
 
   getPlot = (id, plotType, study, imageInfo, handleSVGCb) => {
     let currentSVGs = [];
-    debugger;
     let heightCalculation = this.calculateHeight;
     let widthCalculation = this.calculateWidth;
     _.forEach(plotType, function(plot, i) {
@@ -276,7 +278,8 @@ class PepplotResults extends Component {
 
   backToGrid = () => {
     this.setState({
-      isProteinSelected: false
+      isProteinSelected: false,
+      isProteinDataLoaded: false
     });
   };
 
@@ -297,7 +300,7 @@ class PepplotResults extends Component {
             columnsConfig={columns}
             // totalRows={rows}
             // use "rows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
-            itemsPerPage={100}
+            itemsPerPage={1000}
             exportBaseName="Differential_Phosphorylation_Analysis"
             quickViews={quickViews}
             disableGeneralSearch
@@ -310,12 +313,25 @@ class PepplotResults extends Component {
         </div>
       );
     } else if (
+      !this.state.isProteinSelected &&
+      !this.state.isProteinDataLoaded
+    ) {
+      return (
+        <div>
+          <LoaderActiveTable />
+          {/* <SearchingAlt /> */}
+          {/* <LoadingPlots /> */}
+        </div>
+      );
+    } else if (
       this.state.isProteinSelected &&
       !this.state.isProteinDataLoaded
     ) {
       return (
         <div>
-          <LoadingPlots />
+          <LoaderActivePlots />
+          {/* <SearchingAlt /> */}
+          {/* <LoadingPlots /> */}
         </div>
       );
     } else {

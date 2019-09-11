@@ -1,20 +1,16 @@
 import React from 'react';
-import './SearchingAlt.css';
+import { Header, Image } from 'semantic-ui-react';
+import './SearchingAlt.scss';
 
 const SearchingAlt = () => (
   <div className="SearchPrompt">
-    <div class="searching-loader">
-      <div class="searching-dots">
-        <div class="searching-dot"></div>
-        <div class="searching-dot"></div>
-        <div class="searching-dot"></div>
-        <div class="searching-dot"></div>
-        <div class="searching-dot"></div>
-        <div class="searching-dot"></div>
-        <div class="searching-dot"></div>
-        <div class="searching-dot"></div>
-        <div class="searching-dot"></div>
-      </div>
+    <Header as="h2" textAlign="center">
+      Records are loading...
+    </Header>
+    <div id="hourglassLoader">
+      <div id="top"></div>
+      <div id="bottom"></div>
+      <div id="line"></div>
     </div>
   </div>
 );

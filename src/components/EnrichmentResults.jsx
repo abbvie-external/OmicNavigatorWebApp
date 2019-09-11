@@ -44,7 +44,7 @@ class EnrichmentResults extends Component {
           columnsConfig={columns}
           // totalRows={rows}
           // use "rows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
-          itemsPerPage={100}
+          itemsPerPage={1000}
           exportBaseName="Enrichment_Analysis"
           quickViews={quickViews}
           disableGeneralSearch
