@@ -97,6 +97,7 @@ class EnrichmentContainer extends Component {
       const Col_Name_1006 = {
         title: 'name_1006',
         field: 'name_1006',
+        filterable: { type: 'alphanumericFilter' },
         template: (value, item) => {
           return (
             <p>
@@ -133,6 +134,7 @@ class EnrichmentContainer extends Component {
         title: c,
         field: c,
         type: 'number',
+        filterable: { type: 'numericFilter' },
         exportTemplate: value => (value ? `${value}` : 'N/A'),
         template: (value, item) => {
           return (

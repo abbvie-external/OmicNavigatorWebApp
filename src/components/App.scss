@@ -75,8 +75,11 @@ $screen-xl-min: 1200px;
   }
 
   // QH Grid Overrides
+  table tfoot:last-child {
+    display: none !important;
+  }
 
-  .TableHeaderCell {
+  table th:first-child {
     background-color: #FFF !important;
     padding-top: 0px !important;
     padding-right: 0px !important;
@@ -84,12 +87,7 @@ $screen-xl-min: 1200px;
     padding-left: 0px !important;
   }
 
-  .TableFooter {
-    display: none !important;
-  }
-
-  .QHGridTable {
+  table {
     border: none !important;
   }
-
 }

@@ -1,6 +1,42 @@
 .DateFilterDropdown.ui.dropdown.dropdown .ui.input {
   min-width: 15rem;
 }
+// .NumericFilterDropdown.ui.dropdown.dropdown > div {
+// }
+.ComparisonFilter {
+  min-width: 17.7rem;
+  display: flex;
+  flex-direction: column;
+  & .combination {
+    align-self: center;
+  }
+  & .filter {
+    display: flex;
+    flex-direction: column;
+    margin: 0.2rem 0.1rem;
+  }
+  & .add.ui.button {
+    height: auto;
+  }
+  & .values {
+    display: flex;
+    align-items: center;
+    & > div {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+  }
+}
+.ComparisonFilterPopup.ui.popup {
+  max-height: 25rem;
+  overflow-y: auto;
+  // margin-top: 1.2rem;
+  padding: 0;
+  &::before {
+    content: none;
+  }
+}
 
 /* make the native arrow invisible and stretch it 
   over the whole field so you can click anywhere in 

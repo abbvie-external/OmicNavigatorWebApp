@@ -1,8 +1,16 @@
-import React from 'react';
+import React, { useCallback, useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 
-import { Dropdown, Input, Icon, Button } from 'semantic-ui-react';
+import {
+  Dropdown,
+  Input,
+  Icon,
+  Button,
+  Popup,
+  Divider
+} from 'semantic-ui-react';
 import { List } from 'react-virtualized';
+import update from 'immutability-helper';
 import _ from 'lodash';
 import './FilterDropdown.scss';
 export function getAccessorValue(opt, accessor) {
@@ -23,7 +31,7 @@ const ListSwitchLength = 300;
 
 /* 
 * Component Props
-- selectedOps
+- selectedOpts
 - onChange
 - trigger
 - data
@@ -34,6 +42,7 @@ export class MultiFilterDropdown extends React.PureComponent {
     selectedOpts: []
   };
   state = { search: '', selectedOpts: [] };
+  handleClick = evt => evt.stopPropagation();
   handleSearchChange = (evt, data) => {
     const filteredOpts = _.filter(
       this.state.options,
@@ -167,7 +176,7 @@ export class MultiFilterDropdown extends React.PureComponent {
         compact
         closeOnChange={false}
       >
-        <Dropdown.Menu>
+        <Dropdown.Menu onClick={this.handleClick}>
           <Input
             icon="search"
             iconPosition="left"
@@ -237,6 +246,7 @@ export class RemoteMultiFilterDropdown extends React.PureComponent {
     selectedOpts: []
   };
   state = { search: '', selectedOpts: [] };
+  handleClick = evt => evt.stopPropagation();
   handleSearchChange = (evt, data) => {
     const remoteFilteredOpts = _.filter(this.state.remoteOptions, option => {
       return (
@@ -389,7 +399,7 @@ export class RemoteMultiFilterDropdown extends React.PureComponent {
         loading={this.state.fetchingRemoteOpts}
         onOpen={this.handleOpen}
       >
-        <Dropdown.Menu>
+        <Dropdown.Menu onClick={this.handleClick}>
           <Input
             icon="search"
             iconPosition="left"
@@ -450,6 +460,7 @@ export class RemoteAndLocalMultiFilterDropdown extends React.PureComponent {
     selectedOpts: []
   };
   state = { search: '', selectedOpts: [] };
+  handleClick = evt => evt.stopPropagation();
   handleSearchChange = (evt, data) => this.setState({ search: data.value });
 
   handleSelectionChange = (evt, data) => {
@@ -553,7 +564,7 @@ export class RemoteAndLocalMultiFilterDropdown extends React.PureComponent {
         closeOnChange={false}
         loading={this.state.fetchingRemoteOpts}
       >
-        <Dropdown.Menu style={{ maxWidth: '25vw' }}>
+        <Dropdown.Menu style={{ maxWidth: '25vw' }} onClick={this.handleClick}>
           <Dropdown.Item>
             <Dropdown
               text="Filter From Standard Options"
@@ -812,3 +823,353 @@ export class DateFilterDropdown extends React.PureComponent {
     );
   }
 }
+
+const numericComparisons = [
+  {
+    text: 'Is equal to',
+    value: '='
+  },
+  {
+    text: 'Is not equal to',
+    value: '!='
+  },
+  {
+    text: 'Is greater than or equal to',
+    value: '>='
+  },
+  {
+    text: 'Is greater than',
+    value: '>'
+  },
+  {
+    text: 'Is less than or equal to',
+    value: '<='
+  },
+  {
+    text: 'Is less than',
+    value: '<'
+  },
+  {
+    text: 'Is null',
+    value: 'null'
+  },
+  {
+    text: 'Is not null',
+    value: '!null'
+  }
+];
+const singleComparisons = {
+  null: true,
+  '!null': true,
+  empty: true,
+  '!empty': true
+};
+const combinations = [
+  {
+    text: 'And',
+    value: '&&'
+  },
+  { text: 'Or', value: '||' }
+];
+const numericInitialState = { combination: '&&', comparison: '=', value: '' };
+
+const stopPropagation = evt => evt.stopPropagation();
+const isComparisonActive = opts =>
+  singleComparisons[opts.comparison] || opts.value;
+function useComparisonFilter(selectedOptsProp, onChange, initialState) {
+  const [selectedOpts, setSelectedOpts] = useState(selectedOptsProp);
+  const selectedOptsRef = useRef(selectedOpts);
+  useEffect(() => {
+    selectedOptsRef.current = selectedOpts;
+  }, [selectedOpts]);
+  const handleAdd = useCallback(
+    evt => {
+      setSelectedOpts(selectedOpts =>
+        update(selectedOpts, { $push: [initialState] })
+      );
+    },
+    [initialState]
+  );
+  const handleChange = useCallback((evt, { value, name, 'data-idx': idx }) => {
+    evt.stopPropagation();
+    setSelectedOpts(selectedOpts =>
+      update(selectedOpts, { [idx]: { [name]: { $set: value } } })
+    );
+  }, []);
+  const handleClear = useCallback(() => {
+    setSelectedOpts([initialState]);
+    onChange();
+  }, [onChange, initialState]);
+  const handleFilter = useCallback(() => {
+    if (!selectedOptsRef.current.some(isComparisonActive)) {
+      onChange();
+    } else {
+      onChange(selectedOptsRef.current);
+    }
+  }, [onChange]);
+  const handleOpen = useCallback(() => {
+    if (selectedOptsProp.some(isComparisonActive)) {
+      setSelectedOpts(selectedOptsProp);
+    }
+  }, [selectedOptsProp]);
+  const handleRemove = useCallback((evt, { 'data-idx': idx }) => {
+    setSelectedOpts(selectedOpts =>
+      update(selectedOpts, { $splice: [[idx, 1]] })
+    );
+  }, []);
+  return {
+    handleAdd,
+    handleChange,
+    handleClear,
+    handleFilter,
+    handleOpen,
+    handleRemove,
+    selectedOpts
+  };
+}
+
+export function NumericFilterPopup({ onChange, ...props }) {
+  const filter = useComparisonFilter(
+    props.selectedOpts,
+    onChange,
+    numericInitialState
+  );
+  let filterInputs = filter.selectedOpts.map((opts, idx) => {
+    let combination =
+      idx > 0 ? (
+        <Dropdown
+          data-idx={idx}
+          name="combination"
+          options={combinations}
+          selection
+          value={opts.combination}
+          onChange={filter.handleChange}
+          className="combination"
+          compact
+        />
+      ) : null;
+    return (
+      <div className="filter" key={idx}>
+        {idx > 0 &&
+          (opts.combination === '&&' ? (
+            combination
+          ) : (
+            <Divider horizontal>{combination}</Divider>
+          ))}
+        <div className="values">
+          <div>
+            <Dropdown
+              data-idx={idx}
+              name="comparison"
+              options={numericComparisons}
+              selection
+              value={opts.comparison}
+              onChange={filter.handleChange}
+            />
+            {!singleComparisons[opts.comparison] && (
+              <Input
+                data-idx={idx}
+                name="value"
+                type="number"
+                step="any"
+                value={opts.value}
+                onChange={filter.handleChange}
+              />
+            )}
+          </div>
+          <Button
+            icon={{ name: 'minus', color: 'red' }}
+            compact
+            disabled={idx === 0}
+            onClick={filter.handleRemove}
+            data-idx={idx}
+          />
+        </div>
+      </div>
+    );
+  });
+  return (
+    <Popup
+      position="bottom center"
+      trigger={<span onClick={stopPropagation}>{props.trigger}</span>}
+      className="ComparisonFilterPopup"
+      on="click"
+      onOpen={filter.handleOpen}
+      onClick={stopPropagation}
+    >
+      <Popup.Content className="ComparisonFilter">
+        {filterInputs}
+        <Divider horizontal>
+          <Button
+            className="add"
+            icon={{ name: 'plus circle', color: 'green', size: 'large' }}
+            compact
+            onClick={filter.handleAdd}
+          />
+        </Divider>
+        <Button.Group
+          fluid
+          widths={2}
+          style={{ position: 'sticky', bottom: '0px' }}
+        >
+          <Button positive onClick={filter.handleFilter}>
+            Filter
+          </Button>
+          <Button negative onClick={filter.handleClear}>
+            Clear
+          </Button>
+        </Button.Group>
+      </Popup.Content>
+    </Popup>
+  );
+}
+NumericFilterPopup.defaultProps = {
+  selectedOpts: [numericInitialState]
+};
+
+const alphanumericComparisons = [
+  {
+    text: 'Is equal to',
+    value: '='
+  },
+  {
+    text: 'Is not equal to',
+    value: '!='
+  },
+  {
+    text: 'Contains',
+    value: 'contains'
+  },
+  {
+    text: 'Does not Contain',
+    value: '!contains'
+  },
+  {
+    text: 'Starts with',
+    value: 'starts'
+  },
+  {
+    text: 'Ends with',
+    value: 'ends'
+  },
+  {
+    text: 'Is null',
+    value: 'null'
+  },
+  {
+    text: 'Is not null',
+    value: '!null'
+  },
+  {
+    text: 'Is empty',
+    value: 'empty'
+  },
+  {
+    text: 'Is not empty',
+    value: '!empty'
+  }
+];
+const alphanumericInitialState = {
+  combination: '&&',
+  comparison: 'contains',
+  value: ''
+};
+
+export function AlphanumericFilterPopup({ onChange, ...props }) {
+  const filter = useComparisonFilter(
+    props.selectedOpts,
+    onChange,
+    alphanumericInitialState
+  );
+  let filterInputs = filter.selectedOpts.map((opts, idx) => {
+    let combination =
+      idx > 0 ? (
+        <Dropdown
+          data-idx={idx}
+          name="combination"
+          options={combinations}
+          selection
+          value={opts.combination}
+          onChange={filter.handleChange}
+          className="combination"
+          compact
+        />
+      ) : null;
+    return (
+      <div className="filter" key={idx}>
+        {idx > 0 &&
+          (opts.combination === '&&' ? (
+            combination
+          ) : (
+            <Divider horizontal>{combination}</Divider>
+          ))}
+        <div className="values">
+          <div>
+            <Dropdown
+              data-idx={idx}
+              name="comparison"
+              options={alphanumericComparisons}
+              selection
+              value={opts.comparison}
+              onChange={filter.handleChange}
+            />
+            {!singleComparisons[opts.comparison] && (
+              <Input
+                data-idx={idx}
+                name="value"
+                // type="number"
+                // step="any"
+                value={opts.value}
+                onChange={filter.handleChange}
+              />
+            )}
+          </div>
+          <Button
+            icon={{ name: 'minus', color: 'red' }}
+            compact
+            disabled={idx === 0}
+            onClick={filter.handleRemove}
+            data-idx={idx}
+          />
+        </div>
+      </div>
+    );
+  });
+  return (
+    <Popup
+      position="bottom center"
+      trigger={<span onClick={stopPropagation}>{props.trigger}</span>}
+      className="ComparisonFilterPopup"
+      on="click"
+      onOpen={filter.handleOpen}
+      onClick={stopPropagation}
+    >
+      <Popup.Content className="ComparisonFilter">
+        {filterInputs}
+        <Divider horizontal>
+          <Button
+            className="add"
+            icon={{ name: 'plus circle', color: 'green', size: 'large' }}
+            compact
+            onClick={filter.handleAdd}
+          />
+        </Divider>
+        <Button.Group
+          fluid
+          widths={2}
+          style={{ position: 'sticky', bottom: '0px' }}
+        >
+          <Button positive onClick={filter.handleFilter}>
+            Filter
+          </Button>
+          <Button negative onClick={filter.handleClear}>
+            Clear
+          </Button>
+        </Button.Group>
+      </Popup.Content>
+    </Popup>
+  );
+}
+AlphanumericFilterPopup.defaultProps = {
+  selectedOpts: [alphanumericInitialState]
+};

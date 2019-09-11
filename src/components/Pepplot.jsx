@@ -75,6 +75,7 @@ class PepplotContainer extends Component {
         {
           title: 'MajorityProteinIDsHGNC',
           field: 'MajorityProteinIDsHGNC',
+          filterable: { type: 'alphanumericFilter' },
           template: (value, item, addParams) => {
             return (
               <div>
@@ -105,6 +106,7 @@ class PepplotContainer extends Component {
         {
           title: 'MajorityProteinIDs',
           field: 'MajorityProteinIDs',
+          filterable: { type: 'alphanumericFilter' },
           template: (value, item, addParams) => {
             return (
               <Popup
@@ -123,9 +125,7 @@ class PepplotContainer extends Component {
         {
           title: 'Protein_Site',
           field: 'Protein_Site',
-          headerAttributes: {
-            className: 'two wide'
-          },
+          filterable: { type: 'alphanumericFilter' },
           template: (value, item, addParams) => {
             return (
               <p>
@@ -171,6 +171,7 @@ class PepplotContainer extends Component {
         title: c,
         field: c,
         type: 'number',
+        filterable: { type: 'numericFilter' },
         exportTemplate: value => (value ? `${value}` : 'N/A'),
         template: (value, item, addParams) => {
           return (

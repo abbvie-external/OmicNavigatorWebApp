@@ -23,7 +23,10 @@ import { filterTypes } from './FilterTypeConfig';
 import _ from 'lodash';
 import moment from 'moment';
 
+// import excel_logo from './resources/excel2.png';
+// Paul changed this - custom for Phosphoprotemoic Analyzer
 import excel_logo from '../resources/excel2.png';
+//
 
 import './QHGrid.scss';
 import {
@@ -34,7 +37,7 @@ import {
   getField,
   getTemplate,
   getExportTemplate
-} from '../selectors/QHGridSelector';
+} from './selectors/QHGridSelector';
 
 //import { DragDropContext } from 'react-dnd';
 //import HTML5Backend from 'react-dnd-html5-backend';
@@ -340,14 +343,11 @@ class QHGridHeader extends React.PureComponent {
       <Table
         compact="very"
         size="small"
-        className="QHGridTable"
         style={{ marginBottom: 0, paddingBottom: 0 }}
       >
         <Table.Header>
           <Table.Row>
             <Table.HeaderCell
-              // Paul added this - custom for Phosphoprotemoic Analyzer
-              className="TableHeaderCell"
               colSpan={numColumns + grouping.length}
               style={{ backgroundColor: '#1678C2', color: 'white' }}
             >
@@ -517,6 +517,7 @@ class QHGridHeader extends React.PureComponent {
               {!this.props.loading && !!this.props.exportBaseName && (
                 <Image
                   src={excel_logo}
+                  // Paul commented this out - custom for Phosphoprotemoic Analyzer
                   // avatar
                   // size="mini"
                   onClick={this.props.exportExcel(columns)}
@@ -1146,7 +1147,7 @@ export class QHGrid extends React.PureComponent {
           <Table
             className={'QHGrid--body'}
             fixed={this.props.loading && !this.props.isPaginated}
-            // striped
+            striped
             sortable={!!this.props.onSort}
             selectable
             celled
@@ -1158,9 +1159,7 @@ export class QHGrid extends React.PureComponent {
               borderRadius: 0,
               marginBottom: 0,
               paddingBottom: 0,
-              fontSize: 12,
-              // Paul added this - custom for Phosphoprotemoic Analyzer
-              borderTop: 0
+              fontSize: 12
             }}
           >
             <Table.Header>
@@ -1216,10 +1215,7 @@ export class QHGrid extends React.PureComponent {
           size="small"
           style={{ marginTop: 0, paddingTop: 0, borderRadius: 0, borderTop: 0 }}
         >
-          <Table.Footer
-            // Paul added this - custom for Phosphoprotemoic Analyzer
-            className="TableFooter"
-          >
+          <Table.Footer>
             <Table.Row>
               <Table.HeaderCell
                 colSpan={numColumns + grouping.length}
