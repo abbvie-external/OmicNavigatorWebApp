@@ -3,9 +3,6 @@ import { Grid, Popup } from 'semantic-ui-react';
 import { withRouter } from 'react-router-dom';
 import EnrichmentSearchCriteria from './EnrichmentSearchCriteria';
 import EnrichmentResults from './EnrichmentResults';
-import SearchPrompt from './SearchPrompt';
-import LoaderActiveTable from './LoaderActiveTable';
-import LoaderStill from './LoaderStill';
 import TransitionActive from './TransitionActive';
 import TransitionStill from './TransitionStill';
 import _ from 'lodash';
@@ -53,7 +50,6 @@ class EnrichmentContainer extends Component {
 
   getConfigCols = annotationData => {
     this.annotationData = annotationData.enrichmentResults;
-    const model = annotationData.model;
     let initConfigCols = [];
 
     const BreadcrumbPopupStyle = {
@@ -165,11 +161,7 @@ class EnrichmentContainer extends Component {
     if (this.state.isValidSearchEnrichment && !this.state.isSearching) {
       return <EnrichmentResults {...this.state} />;
     } else if (this.state.isSearching) {
-      //  return <LoaderActiveTable />
       return <TransitionActive />;
-      // } else return <SearchPrompt />;
-      // } else return <LoaderStill />;
-      // } else return <TransitionActive />;
     } else return <TransitionStill />;
   };
 

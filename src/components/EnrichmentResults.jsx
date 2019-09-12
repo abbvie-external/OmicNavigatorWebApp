@@ -1,16 +1,17 @@
 import React, { Component } from 'react';
-import { phosphoprotService } from '../services/phosphoprot.service';
 import { withRouter } from 'react-router-dom';
-import { Grid } from 'semantic-ui-react';
 import ButtonActions from './ButtonActions';
-import _ from 'lodash';
 
 import QHGrid from '../utility/QHGrid';
 import EZGrid from '../utility/EZGrid';
 import QuickViewModal from '../utility/QuickViewModal';
-import { getFieldValue, getField, typeMap } from '../selectors/QHGridSelector';
+import {
+  getFieldValue,
+  getField,
+  typeMap
+} from '../utility/selectors/QHGridSelector';
 export * from '../utility/FilterTypeConfig';
-export * from '../selectors/quickViewSelector';
+export * from '../utility/selectors/quickViewSelector';
 export { QHGrid, EZGrid, QuickViewModal };
 export { getField, getFieldValue, typeMap };
 

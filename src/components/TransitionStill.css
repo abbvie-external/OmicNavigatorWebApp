@@ -1,14 +1,34 @@
-* {
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
+@media (min-width: 1px) and (max-width: 374px) {
+  .transition-still-loader {
+    top: 75%;
+    left: 50%;
+  }
+}
+
+@media (min-width: 375px) and (max-width: 767px) {
+  .transition-still-loader {
+    top: 70%;
+    left: 50%;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  .transition-still-loader {
+    top: 65%;
+    left: 50%;
+  }
+}
+
+@media (min-width: 1200px) {
+  .transition-still-loader {
+    top: 45%;
+    left: 50%;
+  }
 }
 
 /* The loader */
 .transition-still-loader {
   position: absolute;
-  top: 37%;
-  left: 50%;
 
   width: 190px;
   height: 190px;

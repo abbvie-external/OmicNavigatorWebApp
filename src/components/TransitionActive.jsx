@@ -1,9 +1,9 @@
 import React from 'react';
 import './TransitionActive.css';
-import { Header, Image } from 'semantic-ui-react';
+import { Header } from 'semantic-ui-react';
 
 const TransitionActive = () => (
-  <div className="SearchPrompt">
+  <div className="LoaderContainer">
     <Header as="h2" textAlign="center">
       Records are loading...
     </Header>

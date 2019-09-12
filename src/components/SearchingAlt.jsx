@@ -3,7 +3,7 @@ import { Header, Image } from 'semantic-ui-react';
 import './SearchingAlt.scss';
 
 const SearchingAlt = () => (
-  <div className="SearchPrompt">
+  <div className="LoaderContainer">
     <Header as="h2" textAlign="center">
       Records are loading...
     </Header>

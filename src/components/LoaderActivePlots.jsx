@@ -1,9 +1,9 @@
 import React from 'react';
-import { Header, Image } from 'semantic-ui-react';
+import { Header } from 'semantic-ui-react';
 import './LoaderActivePlots.scss';
 
 const LoaderActivePlots = () => (
-  <div className="SearchPrompt">
+  <div className="LoaderContainer">
     <Header as="h2" textAlign="center">
       Plots are loading...
     </Header>

@@ -6,7 +6,6 @@ import ButtonActions from './ButtonActions';
 import PlotAccordion from './PlotAccordion';
 import PlotSVG from './PlotSVG';
 import './PlotContainer.scss';
-import LoaderActiveTable from './LoaderActiveTable';
 
 class PlotContainer extends Component {
   static defaultProps = {
@@ -26,7 +25,7 @@ class PlotContainer extends Component {
     // const customPathEncodedURI = encodeURIComponent(customPath);
     // props.history.push(customPathFriendly);
     this.state = {
-      activeSVGTabIndex: 0,
+      activeSVGTabIndex: 0
       // returningToTable: false,
     };
   }
@@ -47,10 +46,11 @@ class PlotContainer extends Component {
   // };
 
   render() {
-    const { returningToTable } = this.state;
-    if (this.state.returningToTable) {
-      return <LoaderActiveTable />
-    } else if (!this.props.isProteinDataLoaded) {
+    // const { returningToTable } = this.state;
+    // if (this.state.returningToTable) {
+    //   return <LoaderActiveTable />
+
+    if (!this.props.isProteinDataLoaded) {
       return (
         <div>
           <Dimmer active inverted>

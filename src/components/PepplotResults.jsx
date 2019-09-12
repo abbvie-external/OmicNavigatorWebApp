@@ -1,12 +1,8 @@
 import React, { Component } from 'react';
 import { phosphoprotService } from '../services/phosphoprot.service';
 import { withRouter } from 'react-router-dom';
-import { Grid } from 'semantic-ui-react';
 import ButtonActions from './ButtonActions';
 import PlotContainer from './PlotContainer';
-import LoadingPlots from './LoadingPlots';
-import SearchingAlt from './SearchingAlt';
-import LoaderActiveTable from './LoaderActiveTable';
 import LoaderActivePlots from './LoaderActivePlots';
 import _ from 'lodash';
 import DOMPurify from 'dompurify';
@@ -14,9 +10,13 @@ import DOMPurify from 'dompurify';
 import QHGrid from '../utility/QHGrid';
 import EZGrid from '../utility/EZGrid';
 import QuickViewModal from '../utility/QuickViewModal';
-import { getFieldValue, getField, typeMap } from '../selectors/QHGridSelector';
+import {
+  getFieldValue,
+  getField,
+  typeMap
+} from '../utility/selectors/QHGridSelector';
 export * from '../utility/FilterTypeConfig';
-export * from '../selectors/quickViewSelector';
+export * from '../utility/selectors/quickViewSelector';
 export { QHGrid, EZGrid, QuickViewModal };
 export { getField, getFieldValue, typeMap };
 
@@ -319,8 +319,6 @@ class PepplotResults extends Component {
       return (
         <div>
           <LoaderActivePlots />
-          {/* <SearchingAlt /> */}
-          {/* <LoadingPlots /> */}
         </div>
       );
     } else {

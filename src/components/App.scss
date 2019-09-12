@@ -1,64 +1,46 @@
-// Small tablets and large smartphones (landscape view)
-$screen-sm-min: 576px;
-
-// Small tablets (portrait view)
-$screen-md-min: 768px;
-
-// Tablets and small desktops
-$screen-lg-min: 992px;
-
-// Large tablets and desktops
-$screen-xl-min: 1200px;
-
-// Small devices
-@mixin sm {
-  @media (min-width: #{$screen-sm-min}) {
-    @content;
-  }
-}
-
-// Medium devices
-@mixin md {
-  @media (min-width: #{$screen-md-min}) {
-    @content;
-  }
-}
-
-// Large devices
-@mixin lg {
-  @media (min-width: #{$screen-lg-min}) {
-    @content;
-  }
-}
-
-// Extra large devices
-@mixin xl {
-  @media (min-width: #{$screen-xl-min}) {
-    @content;
-  }
-}
-
 .AppContainer {
   // height: 100vh !important;
 
-  .deviceMargin {
-    margin: 20px 15px 30px 15px !important;
+  @media (max-width: 1199px) {
+    .deviceMargin {
+      margin: 20px 15px 30px 15px !important;
+    }
+  }
 
-    // 992px window width and more
-    @include xl {
+  @media (min-width: 1200px) {
+    .deviceMargin {
       margin: 0px !important;
     }
   }
 
-  /* .SidebarContainer ::-webkit-scrollbar-thumb {
-    background: #FF4400 !important;
-    box-shadow: 0px 3px 0px rgba(0,0,0,0.6) !important;
-  } */
+  @media (min-width: 1px) and (max-width: 374px) {
+    .ContentContainer {
+      height: 55vh;
+    }
+  }
+  
+  @media (min-width: 375px) and (max-width: 767px) {
+    .ContentContainer {
+      height: 60vh;
+    }
+  }
+  
+  @media (min-width: 768px) and (max-width: 1199px) {
+    .ContentContainer {
+      height: 65vh;
+    }
+  }
+  
+  @media (min-width: 1200px) {
+    .ContentContainer {
+      height: 100vh;
+    }
+  }
 
   .ContentContainer {
-    padding: 0px;
+    padding: 0px;  
   
-    .SearchPrompt {
+    .LoaderContainer {
       padding-top: 120px;
     }
   }

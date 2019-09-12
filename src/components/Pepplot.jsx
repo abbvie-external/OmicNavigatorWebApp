@@ -3,12 +3,8 @@ import { Grid, Popup } from 'semantic-ui-react';
 import { withRouter } from 'react-router-dom';
 import PepplotSearchCriteria from './PepplotSearchCriteria';
 import PepplotResults from './PepplotResults';
-import SearchPrompt from './SearchPrompt';
-import LoaderActiveTable from './LoaderActiveTable';
-import LoaderStill from './LoaderStill';
 import TransitionStill from './TransitionStill';
 import TransitionActive from './TransitionActive';
-import SearchingAlt from './SearchingAlt';
 
 import _ from 'lodash';
 import './Pepplot.scss';
@@ -206,11 +202,7 @@ class PepplotContainer extends Component {
     ) {
       return <PepplotResults {...this.state} />;
     } else if (this.state.isSearching) {
-      // return <SearchingAlt />;
-      // return <LoaderActiveTable />;
       return <TransitionActive />;
-      // } else return <SearchPrompt />;
-      // } else return <LoaderStill />;
     } else return <TransitionStill />;
   };
 

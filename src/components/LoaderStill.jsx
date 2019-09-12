@@ -3,7 +3,7 @@ import { Header, Image } from 'semantic-ui-react';
 import './LoaderStill.scss';
 
 const LoaderStill = () => (
-  <div className="SearchPrompt">
+  <div className="LoaderContainer">
     <Header as="h2" textAlign="center">
       No records available
     </Header>

@@ -5,11 +5,11 @@ import Axios from 'axios';
 
 import QHGrid from './QHGrid';
 import { filterTypes } from './FilterTypeConfig';
-import { getField, getFieldValue } from '../selectors/QHGridSelector';
+import { getField, getFieldValue } from './selectors/QHGridSelector';
 import {
   stripNonCustomViews,
   ezQuickViewSelector
-} from '../selectors/quickViewSelector';
+} from './selectors/quickViewSelector';
 import QuickViewModal from './QuickViewModal';
 
 const cache = {};

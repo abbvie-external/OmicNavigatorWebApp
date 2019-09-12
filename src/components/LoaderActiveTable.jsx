@@ -3,7 +3,7 @@ import { Header, Image } from 'semantic-ui-react';
 import './LoaderActiveTable.scss';
 
 const LoaderActivePlots = () => (
-  <div className="SearchPrompt">
+  <div className="LoaderContainer">
     <Header as="h2" textAlign="center">
       Records are loading...
     </Header>
