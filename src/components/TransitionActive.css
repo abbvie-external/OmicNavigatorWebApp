@@ -1,27 +1,27 @@
 @media (min-width: 1px) and (max-width: 374px) {
   .transition-active-loader {
-    top: 37%;
+    top: 75%;
     left: 50%;
   }
 }
 
 @media (min-width: 375px) and (max-width: 767px) {
   .transition-active-loader {
-    top: 37%;
+    top: 70%;
     left: 50%;
   }
 }
 
 @media (min-width: 768px) and (max-width: 1199px) {
   .transition-active-loader {
-    top: 37%;
+    top: 65%;
     left: 50%;
   }
 }
 
 @media (min-width: 1200px) {
   .transition-active-loader {
-    top: 37%;
+    top: 45%;
     left: 50%;
   }
 }
