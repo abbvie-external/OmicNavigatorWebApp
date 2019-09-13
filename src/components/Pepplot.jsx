@@ -33,6 +33,12 @@ class PepplotContainer extends Component {
   };
 
   handlePepplotSearch = searchResults => {
+    //const pepplotResultsFromSearch = searchResults.pepplotResults;
+    // debugger;
+    // var newPepplotResultsArr = _.map(pepplotResultsFromSearch, function(element) {
+    //   debugger;
+    //     return _.extend({}, element, {formattedValue: formatValue(value)});
+    // });
     const columns = this.getConfigCols(searchResults);
     this.setState({
       study: searchResults.study,
@@ -53,7 +59,7 @@ class PepplotContainer extends Component {
   };
 
   getConfigCols = testData => {
-    this.testData = testData.pepplotResults;
+    const pepResults = testData.pepplotResults;
     const model = testData.model;
     let initConfigCols = [];
 
@@ -157,14 +163,21 @@ class PepplotContainer extends Component {
         }
       ];
     }
-
-    let allConfigCols = ['F', 'logFC', 't', 'P_Value', 'adj_P_Val', 'adjPVal'];
+    debugger;
+    let relevantConfigCols = [
+      'F',
+      'logFC',
+      't',
+      'P_Value',
+      'adj_P_Val',
+      'adjPVal'
+    ];
     let orderedTestData = JSON.parse(
-      JSON.stringify(this.testData[0], allConfigCols)
+      JSON.stringify(pepResults[0], relevantConfigCols)
     );
     let relevantConfigColumns = _.map(
       _.filter(_.keys(orderedTestData), function(d) {
-        return _.includes(allConfigCols, d);
+        return _.includes(relevantConfigCols, d);
       })
     );
 

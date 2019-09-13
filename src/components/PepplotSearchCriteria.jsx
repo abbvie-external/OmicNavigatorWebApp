@@ -4,7 +4,6 @@ import { Form, Select, Icon, Popup } from 'semantic-ui-react';
 import './SearchCriteria.scss';
 import { phosphoprotService } from '../services/phosphoprot.service';
 import _ from 'lodash';
-import { formatNumberForDisplay, splitValue } from '../helpers';
 
 class PepplotSearchCriteria extends Component {
   static defaultProps = {

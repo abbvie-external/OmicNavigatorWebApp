@@ -50,7 +50,7 @@ class EnrichmentContainer extends Component {
   };
 
   getConfigCols = annotationData => {
-    this.annotationData = annotationData.enrichmentResults;
+    const enrResults = annotationData.enrichmentResults;
     let initConfigCols = [];
 
     // const TableValuePopupStyle = {
@@ -63,34 +63,9 @@ class EnrichmentContainer extends Component {
     //   wordBreak: 'break-all'
     // };
 
-    // initConfigCols = [
-    //   {
-    //     title: 'Annotation',
-    //     field: 'Annotation',
-    //     template: (value, item) => {
-    //       return (
-    //         <p>
-    //           <Popup
-    //             trigger={
-    //               <span>
-    //                 {splitValue(value)}
-    //               </span>
-    //             }
-    //             style={TableValuePopupStyle}
-    //             className="TablePopupValue"
-    //             content={value}
-    //             inverted
-    //             basic
-    //           />
-    //         </p>
-    //       );
-    //     }
-    //   }
-    // ];
+    let allKeys = _.keys(enrResults[0]);
 
-    let allKeys = _.keys(annotationData[0]);
     let ***REMOVED***_text_col = _.indexOf(allKeys, 'name_1006');
-
     if (***REMOVED***_text_col >= 0) {
       const Col_Name_1006 = {
         title: 'name_1006',
@@ -114,21 +89,65 @@ class EnrichmentContainer extends Component {
         }
       };
       initConfigCols.push(Col_Name_1006);
-      // const configCols = initConfigCols.concat(Col_Name_1006);
-      // includeCols.push('name_1006');
     }
 
-    // let allConfigCols = ['F', 'logFC', 't', 'P_Value', 'adj_P_Val', 'adjPVal'];
-    // let orderedTestData = JSON.parse(
-    //   JSON.stringify(this.testData[0], allConfigCols)
-    // );
-    let orderedTestData = JSON.parse(JSON.stringify(this.annotationData[0]));
-    let relevantConfigColumns = _.map(
-      _.filter(_.keys(orderedTestData), function(d) {
-        return d;
-      })
-    );
-    // pepp end
+    let descripton_text_col = _.indexOf(allKeys, 'Description');
+    if (descripton_text_col >= 0) {
+      const Col_Name_Description = {
+        title: 'Description',
+        field: 'Description',
+        filterable: { type: 'alphanumericFilter' },
+        template: (value, item) => {
+          return (
+            <p>
+              <Popup
+                trigger={
+                  <span className="TableValue">{splitValue(value)}</span>
+                }
+                // style={TableValuePopupStyle}
+                className="TablePopupValue"
+                content={value}
+                inverted
+                basic
+              />
+            </p>
+          );
+        }
+      };
+      initConfigCols.push(Col_Name_Description);
+    }
+
+    let annotation_text_col = _.indexOf(allKeys, 'Annotation');
+    if (annotation_text_col >= 0) {
+      const Col_Name_Annotation = {
+        title: 'Annotation',
+        field: 'Annotation',
+        filterable: { type: 'alphanumericFilter' },
+        template: (value, item) => {
+          return (
+            <p>
+              <Popup
+                trigger={
+                  <span className="TableValue">{splitValue(value)}</span>
+                }
+                // style={TableValuePopupStyle}
+                className="TablePopupValue"
+                content={value}
+                inverted
+                basic
+              />
+            </p>
+          );
+        }
+      };
+      initConfigCols.push(Col_Name_Annotation);
+    }
+
+    const relevantConfigColumns = _.filter(allKeys, function(key) {
+      return (
+        key !== 'name_1006' && key !== 'Description' && key !== 'Annotation'
+      );
+    });
 
     const additionalConfigColumns = relevantConfigColumns.map(c => {
       return {
@@ -142,7 +161,7 @@ class EnrichmentContainer extends Component {
             <p>
               <Popup
                 trigger={
-                  <span className="NumericValues">
+                  <span className="TableValue">
                     {formatNumberForDisplay(value)}
                   </span>
                 }
