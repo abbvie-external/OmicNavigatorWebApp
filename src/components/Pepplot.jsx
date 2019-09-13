@@ -56,15 +56,15 @@ class PepplotContainer extends Component {
     const model = testData.model;
     let initConfigCols = [];
 
-    const BreadcrumbPopupStyle = {
-      backgroundColor: '2E2E2E',
-      borderBottom: '2px solid #FF4400',
-      color: '#FFF',
-      padding: '1em',
-      maxWidth: '50vw',
-      fontSize: '13px',
-      wordBreak: 'break-all'
-    };
+    // const TableValuePopupStyle = {
+    //   backgroundColor: '2E2E2E',
+    //   borderBottom: '2px solid #FF4400',
+    //   color: '#FFF',
+    //   padding: '1em',
+    //   maxWidth: '50vw',
+    //   fontSize: '13px',
+    //   wordBreak: 'break-all'
+    // };
 
     if (model === 'Differential Expression') {
       initConfigCols = [
@@ -85,7 +85,8 @@ class PepplotContainer extends Component {
                     </span>
                   }
                   content={value}
-                  style={BreadcrumbPopupStyle}
+                  // style={TableValuePopupStyle}
+                  className="TablePopupValue"
                   inverted
                   basic
                 />
@@ -106,9 +107,12 @@ class PepplotContainer extends Component {
           template: (value, item, addParams) => {
             return (
               <Popup
-                trigger={<span>{splitValue(value)}</span>}
+                trigger={
+                  <span className="TableValue">{splitValue(value)}</span>
+                }
                 content={value}
-                style={BreadcrumbPopupStyle}
+                // style={TableValuePopupStyle}
+                className="TablePopupValue"
                 inverted
                 basic
               />
@@ -134,7 +138,8 @@ class PepplotContainer extends Component {
                       {splitValue(value)}
                     </span>
                   }
-                  style={BreadcrumbPopupStyle}
+                  // style={TableValuePopupStyle}
+                  className="TablePopupValue"
                   content={value}
                   inverted
                   basic
@@ -174,11 +179,12 @@ class PepplotContainer extends Component {
             <p>
               <Popup
                 trigger={
-                  <span className="NumericValues">
+                  <span className="TableValue">
                     {formatNumberForDisplay(value)}
                   </span>
                 }
-                style={BreadcrumbPopupStyle}
+                // style={TableValuePopupStyle}
+                className="TablePopupValue"
                 content={value}
                 inverted
                 basic

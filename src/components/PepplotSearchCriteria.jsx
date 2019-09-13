@@ -160,7 +160,7 @@ class PepplotSearchCriteria extends Component {
           trigger={
             <a target="_blank" rel="noopener noreferrer" href={studyHref}>
               <Icon
-                name="pie chart"
+                name="line graph"
                 size="large"
                 className="StudyHTMLIcon"
                 inverted
@@ -180,7 +180,7 @@ class PepplotSearchCriteria extends Component {
         <Popup
           trigger={
             <a target="_blank" rel="noopener noreferrer">
-              <Icon name="pie chart" size="large" circular inverted disabled />
+              <Icon name="line graph" size="large" circular inverted disabled />
             </a>
           }
           style={StudyPopupStyle}

@@ -52,15 +52,15 @@ class EnrichmentContainer extends Component {
     this.annotationData = annotationData.enrichmentResults;
     let initConfigCols = [];
 
-    const BreadcrumbPopupStyle = {
-      backgroundColor: '2E2E2E',
-      borderBottom: '2px solid #FF4400',
-      color: '#FFF',
-      padding: '1em',
-      maxWidth: '50vw',
-      fontSize: '13px',
-      wordBreak: 'break-all'
-    };
+    // const TableValuePopupStyle = {
+    //   backgroundColor: '2E2E2E',
+    //   borderBottom: '2px solid #FF4400',
+    //   color: '#FFF',
+    //   padding: '1em',
+    //   maxWidth: '50vw',
+    //   fontSize: '13px',
+    //   wordBreak: 'break-all'
+    // };
 
     // initConfigCols = [
     //   {
@@ -75,7 +75,8 @@ class EnrichmentContainer extends Component {
     //                 {splitValue(value)}
     //               </span>
     //             }
-    //             style={BreadcrumbPopupStyle}
+    //             style={TableValuePopupStyle}
+    //             className="TablePopupValue"
     //             content={value}
     //             inverted
     //             basic
@@ -98,8 +99,11 @@ class EnrichmentContainer extends Component {
           return (
             <p>
               <Popup
-                trigger={<span>{splitValue(value)}</span>}
-                style={BreadcrumbPopupStyle}
+                trigger={
+                  <span className="TableValue">{splitValue(value)}</span>
+                }
+                // style={TableValuePopupStyle}
+                className="TablePopupValue"
                 content={value}
                 inverted
                 basic
@@ -141,7 +145,8 @@ class EnrichmentContainer extends Component {
                     {formatNumberForDisplay(value)}
                   </span>
                 }
-                style={BreadcrumbPopupStyle}
+                // style={TableValuePopupStyle}
+                className="TablePopupValue"
                 content={value}
                 inverted
                 basic

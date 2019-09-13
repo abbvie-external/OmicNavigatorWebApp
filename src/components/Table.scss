@@ -16,6 +16,10 @@
   transform: scale(1.2);
 }
 
-.NumericValues {
+.TableValue {
   cursor: pointer !important;
+}
+
+.TablePopupValue {
+  word-break: break-all !important;
 }
