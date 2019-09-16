@@ -81,16 +81,16 @@ class PlotContainer extends Component {
                 className="PlotAccordionContainer"
                 mobile={16}
                 tablet={16}
-                largeScreen={5}
-                widescreen={5}
+                largeScreen={4}
+                widescreen={3}
               >
                 <PlotAccordion {...this.props} />
               </Grid.Column>
               <Grid.Column
                 mobile={16}
                 tablet={16}
-                largeScreen={11}
-                widescreen={11}
+                largeScreen={12}
+                widescreen={13}
               >
                 <PlotSVG
                   {...this.props}

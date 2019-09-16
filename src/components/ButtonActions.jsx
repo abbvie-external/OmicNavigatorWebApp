@@ -2,8 +2,7 @@ import React, { Component } from 'react';
 import { Button, Label } from 'semantic-ui-react';
 import * as saveSvgAsPng from 'save-svg-as-png';
 import { excelService } from '../services/excel.service';
-// import * as jsPDF from 'jspdf';
-// import { pdfService } from '../services/pdf.service';
+import { pdfService } from '../services/pdf.service';
 import './ButtonActions.scss';
 
 class ButtonActions extends Component {
@@ -16,7 +15,7 @@ class ButtonActions extends Component {
       pngVisible: true,
       pngExporting: false,
       pngDisabled: false,
-      pdfVisible: false,
+      pdfVisible: true,
       pdfExporting: false,
       pdfDisabled: false
     };
@@ -71,31 +70,19 @@ class ButtonActions extends Component {
     });
   };
 
-  // PDFExport = () => {
-  //   this.setState({
-  //     pdfDisabled: true,
-  //     pdfExporting: true
-  //   })
-  //   pdfService.createPDF(document.getElementsByTagName("svg")[0]);
-  //   this.setState({
-  //     pdfDisabled: false,
-  //     pdfExporting: false
-  //   })
-  // };
+  PDFExport = () => {
+    this.setState({
+      pdfDisabled: true,
+      pdfExporting: true
+    });
+    pdfService.createPDF(document.getElementsByTagName('svg')[0]);
+    this.setState({
+      pdfDisabled: false,
+      pdfExporting: false
+    });
+  };
 
-  getAdditionalButtons = () => {
-    if (this.state.pngVisible) {
-      return (
-        <Button
-          className="ExportButton"
-          loading={this.state.pngExporting}
-          disabled={this.state.pngDisabled}
-          onClick={this.PNGExport}
-        >
-          PNG
-        </Button>
-      );
-    }
+  getPDFButton = () => {
     if (this.state.pdfVisible) {
       return (
         <Button
@@ -110,8 +97,24 @@ class ButtonActions extends Component {
     }
   };
 
+  getPNGButton = () => {
+    if (this.state.pngVisible) {
+      return (
+        <Button
+          className="ExportButton"
+          loading={this.state.pngExporting}
+          disabled={this.state.pngDisabled}
+          onClick={this.PNGExport}
+        >
+          PNG
+        </Button>
+      );
+    }
+  };
+
   render() {
-    const additionalButtons = this.getAdditionalButtons();
+    const pdfButton = this.getPDFButton();
+    const pngButton = this.getPNGButton();
     return (
       <div className="ButtonActions">
         <Button.Group className="ExportButtonGroup" floated="right">
@@ -133,7 +136,8 @@ class ButtonActions extends Component {
               Data (.xls)
             </Button>
           </Button>
-          {additionalButtons}
+          {pngButton}
+          {pdfButton}
         </Button.Group>
       </div>
     );

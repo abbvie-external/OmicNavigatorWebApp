@@ -190,9 +190,9 @@ class PepplotResults extends Component {
           svgMarkup = svgMarkup.replace(
             /<svg/g,
             '<svg preserveAspectRatio="xMinYMid meet" style="width:' +
-              widthCalculation() * 0.7 +
+              widthCalculation() * 0.75 +
               'px; height:' +
-              heightCalculation() * 0.7 +
+              heightCalculation() * 0.75 +
               'px;" id="currentSVG-' +
               id +
               '-' +
@@ -300,7 +300,7 @@ class PepplotResults extends Component {
             columnsConfig={columns}
             // totalRows={rows}
             // use "rows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
-            itemsPerPage={500}
+            itemsPerPage={100}
             exportBaseName="Differential_Phosphorylation_Analysis"
             quickViews={quickViews}
             disableGeneralSearch
