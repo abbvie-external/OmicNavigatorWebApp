@@ -34,9 +34,7 @@ class PepplotContainer extends Component {
 
   handlePepplotSearch = searchResults => {
     //const pepplotResultsFromSearch = searchResults.pepplotResults;
-    // debugger;
     // var newPepplotResultsArr = _.map(pepplotResultsFromSearch, function(element) {
-    //   debugger;
     //     return _.extend({}, element, {formattedValue: formatValue(value)});
     // });
     const columns = this.getConfigCols(searchResults);
@@ -163,7 +161,6 @@ class PepplotContainer extends Component {
         }
       ];
     }
-    debugger;
     let relevantConfigCols = [
       'F',
       'logFC',

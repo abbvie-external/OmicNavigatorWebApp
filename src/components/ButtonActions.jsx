@@ -10,24 +10,14 @@ class ButtonActions extends Component {
     super(props);
     this.state = {
       excelVisible: true,
-      excelExporting: false,
-      excelDisabled: false,
       pngVisible: true,
-      pngExporting: false,
-      pngDisabled: false,
-      pdfVisible: true,
-      pdfExporting: false,
-      pdfDisabled: false
+      pdfVisible: true
     };
   }
 
   componentDidMount() {}
 
   PNGExport = () => {
-    this.setState({
-      pngDisabled: true,
-      pngExporting: true
-    });
     saveSvgAsPng.saveSvgAsPng(
       document.getElementsByTagName('svg')[0],
       this.props.imageInfo.title +
@@ -35,62 +25,33 @@ class ButtonActions extends Component {
         this.props.imageInfo.svg[this.props.activeSVGTabIndex].plotType +
         '.png'
     );
-    const exportingPNGCB = this.exportingPNGIndicator;
-    setTimeout(function() {
-      exportingPNGCB();
-    }, 1500);
   };
 
   ExcelExport = () => {
-    this.setState({
-      excelDisabled: true,
-      excelExporting: true
-    });
     excelService.exportAsExcelFile(
       this.props.treeDataRaw,
       this.props.imageInfo.title + '_Peptide_Data'
     );
-    const exportingExcelCB = this.exportingExcelIndicator;
-    setTimeout(function() {
-      exportingExcelCB();
-    }, 1500);
-  };
-
-  exportingPNGIndicator = () => {
-    this.setState({
-      pngDisabled: false,
-      pngExporting: false
-    });
-  };
-
-  exportingExcelIndicator = () => {
-    this.setState({
-      excelDisabled: false,
-      excelExporting: false
-    });
   };
 
   PDFExport = () => {
-    this.setState({
-      pdfDisabled: true,
-      pdfExporting: true
-    });
     pdfService.createPDF(document.getElementsByTagName('svg')[0]);
-    this.setState({
-      pdfDisabled: false,
-      pdfExporting: false
-    });
+  };
+
+  getExcelButton = () => {
+    if (this.state.pdfVisible) {
+      return (
+        <Button className="ExportButton" onClick={this.ExcelExport}>
+          Data (.xls)
+        </Button>
+      );
+    }
   };
 
   getPDFButton = () => {
     if (this.state.pdfVisible) {
       return (
-        <Button
-          className="ExportButton"
-          loading={this.state.pdfExporting}
-          disabled={this.state.pdfDisabled}
-          onClick={this.PDFExport}
-        >
+        <Button className="ExportButton" onClick={this.PDFExport}>
           PDF
         </Button>
       );
@@ -100,12 +61,7 @@ class ButtonActions extends Component {
   getPNGButton = () => {
     if (this.state.pngVisible) {
       return (
-        <Button
-          className="ExportButton"
-          loading={this.state.pngExporting}
-          disabled={this.state.pngDisabled}
-          onClick={this.PNGExport}
-        >
+        <Button className="ExportButton" onClick={this.PNGExport}>
           PNG
         </Button>
       );
@@ -113,6 +69,7 @@ class ButtonActions extends Component {
   };
 
   render() {
+    const excelButton = this.getExcelButton();
     const pdfButton = this.getPDFButton();
     const pngButton = this.getPNGButton();
     return (
@@ -127,14 +84,7 @@ class ButtonActions extends Component {
             >
               EXPORT
             </Label>
-            <Button
-              className="ExportButton"
-              loading={this.state.excelExporting}
-              disabled={this.state.excelDisabled}
-              onClick={this.ExcelExport}
-            >
-              Data (.xls)
-            </Button>
+            {excelButton}
           </Button>
           {pngButton}
           {pdfButton}
