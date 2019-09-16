@@ -4,7 +4,7 @@ import './App.scss';
 
 const App = () => (
   <div className="AppContainer">
-    <TopBar props />
+    <TopBar />
   </div>
 );
 

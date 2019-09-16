@@ -22,13 +22,12 @@ class PlotSVG extends Component {
 
   getSVGPanes(activeSVGTabIndex) {
     if (this.props.imageInfo) {
-      // const imageInfoArray = this.props.imageInfo;
       const svgArray = this.props.imageInfo.svg;
       const panes = svgArray.map(s => {
         return {
           menuItem: `${s.plotType}`,
           render: () => (
-            <Tab.Pane attached={false} as={'string'}>
+            <Tab.Pane attached="true" as="div">
               <div
                 className="svgSpan"
                 dangerouslySetInnerHTML={{ __html: s.svg }}
@@ -43,7 +42,6 @@ class PlotSVG extends Component {
           menu={{ secondary: true, pointing: true, className: 'SVGDiv' }}
           panes={panes}
           onTabChange={this.handleTabChange}
-          defaultActiveIndex={0}
           activeIndex={activeSVGTabIndex}
         />
       );

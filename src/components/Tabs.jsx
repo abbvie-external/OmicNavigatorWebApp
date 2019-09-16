@@ -7,17 +7,21 @@ import EnrichmentContainer from './Enrichment';
 class Tabs extends Component {
   constructor(props) {
     super(props);
-    const pathname = props.location.pathname;
-    const enrichment = pathname.includes('enrichment');
-    const tab = enrichment ? 'enrichment' : 'pepplot';
-    props.history.push(tab);
-    let index = tab === 'enrichment' ? 3 : 2;
     this.state = {
-      tab: { activeIndex: index }
+      activeIndex: 2
     };
   }
 
-  componentDidMount() {}
+  componentDidMount() {
+    const pathname = this.props.location.pathname;
+    const enrichment = pathname.includes('enrichment');
+    const tab = enrichment ? 'enrichment' : 'pepplot';
+    this.props.history.push(tab);
+    let index = tab === 'enrichment' ? 3 : 2;
+    this.setState({
+      activeIndex: index
+    });
+  }
 
   handleTabChange = (e, { activeIndex }) => {
     this.setState({ activeIndex });
@@ -26,7 +30,7 @@ class Tabs extends Component {
   };
 
   render() {
-    // const { activeIndex } = this.state;
+    const { activeIndex } = this.state;
     const panes = [
       {
         menuItem: (
@@ -73,8 +77,7 @@ class Tabs extends Component {
       <Tab
         onTabChange={this.handleTabChange}
         panes={panes}
-        // activeIndex={activeIndex}
-        defaultActiveIndex={2}
+        activeIndex={activeIndex}
         renderActiveOnly={false}
         menu={{
           secondary: true,
@@ -88,4 +91,3 @@ class Tabs extends Component {
 }
 
 export default withRouter(Tabs);
-// export default Tabs;

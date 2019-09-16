@@ -25,7 +25,10 @@ class PlotContainer extends Component {
     // const customPathEncodedURI = encodeURIComponent(customPath);
     // props.history.push(customPathFriendly);
     this.state = {
-      activeSVGTabIndex: 0
+      activeSVGTabIndex: 0,
+      excelVisible: true,
+      pngVisible: true,
+      pdfVisible: true
       // returningToTable: false,
     };
   }

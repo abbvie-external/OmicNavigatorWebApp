@@ -6,14 +6,11 @@ import { pdfService } from '../services/pdf.service';
 import './ButtonActions.scss';
 
 class ButtonActions extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      excelVisible: true,
-      pngVisible: true,
-      pdfVisible: true
-    };
-  }
+  static defaultProps = {
+    excelVisible: true,
+    pngVisible: true,
+    pdfVisible: true
+  };
 
   componentDidMount() {}
 
@@ -39,7 +36,7 @@ class ButtonActions extends Component {
   };
 
   getExcelButton = () => {
-    if (this.state.pdfVisible) {
+    if (this.props.excelVisible) {
       return (
         <Button className="ExportButton" onClick={this.ExcelExport}>
           Data (.xls)
@@ -49,7 +46,7 @@ class ButtonActions extends Component {
   };
 
   getPDFButton = () => {
-    if (this.state.pdfVisible) {
+    if (this.props.pdfVisible) {
       return (
         <Button className="ExportButton" onClick={this.PDFExport}>
           PDF
@@ -59,7 +56,7 @@ class ButtonActions extends Component {
   };
 
   getPNGButton = () => {
-    if (this.state.pngVisible) {
+    if (this.props.pngVisible) {
       return (
         <Button className="ExportButton" onClick={this.PNGExport}>
           PNG
@@ -76,12 +73,7 @@ class ButtonActions extends Component {
       <div className="ButtonActions">
         <Button.Group className="ExportButtonGroup" floated="right">
           <Button as="div" labelPosition="left">
-            <Label
-              as="string"
-              basic
-              pointing="right"
-              className="ExportButtonGroupLabel"
-            >
+            <Label basic pointing="right" className="ExportButtonGroupLabel">
               EXPORT
             </Label>
             {excelButton}
