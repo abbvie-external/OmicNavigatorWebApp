@@ -71,6 +71,9 @@ class PepplotContainer extends Component {
     //   wordBreak: 'break-all'
     // };
 
+    let icon = 'phosphosite.ico';
+    let iconText = 'PhosphoSitePlus';
+
     if (model === 'Differential Expression') {
       initConfigCols = [
         {
@@ -95,11 +98,20 @@ class PepplotContainer extends Component {
                   inverted
                   basic
                 />
-                <img
-                  src="phosphosite.ico"
-                  alt="Phosophosite"
-                  className="PhosphositeIcon"
-                  onClick={addParams.showPhosphositePlus(item)}
+                <Popup
+                  trigger={
+                    <img
+                      src={icon}
+                      alt="Phosophosite"
+                      className="ExternalSiteIcon"
+                      onClick={addParams.showPhosphositePlus(item)}
+                    />
+                  }
+                  // style={TableValuePopupStyle}
+                  className="TablePopupValue"
+                  content={iconText}
+                  inverted
+                  basic
                 />
               </div>
             );
@@ -149,11 +161,20 @@ class PepplotContainer extends Component {
                   inverted
                   basic
                 />
-                <img
-                  src="phosphosite.ico"
-                  alt="Phosophosite"
-                  className="PhosphositeIcon"
-                  onClick={addParams.showPhosphositePlus(item)}
+                <Popup
+                  trigger={
+                    <img
+                      src={icon}
+                      alt="Phosophosite"
+                      className="ExternalSiteIcon"
+                      onClick={addParams.showPhosphositePlus(item)}
+                    />
+                  }
+                  // style={TableValuePopupStyle}
+                  className="TablePopupValue"
+                  content={iconText}
+                  inverted
+                  basic
                 />
               </p>
             );

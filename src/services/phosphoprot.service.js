@@ -7,7 +7,7 @@ class PhosphoprotService {
   constructor() {
     // this.ocpuUrl = "***REMOVED***/ocpu/library/***REMOVED***/R"
     // this.ocpuUrl = "http://localhost:5656/ocpu/library/PhosphoProt/R"
-    this.ocpuUrl = 'http://10.239.9.76/ocpu/library/PhosphoProt/R';
+    this.ocpuUrl = 'http://10.239.9.7/ocpu/library/PhosphoProt/R';
   }
 
   setUrl() {
@@ -98,6 +98,18 @@ class PhosphoprotService {
     const promise = this.ocpuPlotCall(plottype, { idmult: id, study: study });
     const svgMarkupFromPromise = await promise;
     return svgMarkupFromPromise;
+  }
+
+  async getDatabaseInfo(study, test) {
+    this.setUrl();
+    const rName = 'getDatabases';
+    const obj = { study: study, database: test };
+    const promise = this.ocpuDataCall('getDatabases', {
+      study: study,
+      database: test
+    });
+    const dataFromPromise = await promise;
+    return dataFromPromise;
   }
 }
 

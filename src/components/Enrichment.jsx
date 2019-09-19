@@ -31,6 +31,7 @@ class EnrichmentContainer extends Component {
   };
 
   handleEnrichmentSearch = searchResults => {
+    debugger;
     const columns = this.getConfigCols(searchResults);
     this.setState({
       study: searchResults.study,
@@ -43,7 +44,7 @@ class EnrichmentContainer extends Component {
     });
   };
 
-  hidePGrid = () => {
+  hideEGrid = () => {
     this.setState({
       isValidSearchEnrichment: false
     });
@@ -51,6 +52,8 @@ class EnrichmentContainer extends Component {
 
   getConfigCols = annotationData => {
     const enrResults = annotationData.enrichmentResults;
+    const study = annotationData.study;
+    const test = annotationData.test;
     let initConfigCols = [];
 
     // const TableValuePopupStyle = {
@@ -63,6 +66,22 @@ class EnrichmentContainer extends Component {
     //   wordBreak: 'break-all'
     // };
 
+    let icon = '';
+    let iconText = '';
+    if (test === 'REACTOME') {
+      icon = 'reactome.jpg';
+      iconText = 'Reactome';
+    } else if (test.substring(0, 2) === 'GO') {
+      icon = 'go.png';
+      iconText = 'AmiGO 2';
+    } else if (test.substring(0, 4) === 'msig') {
+      icon = 'msig.ico';
+      iconText = 'GSEA MSigDB';
+    } else if (test === 'PSP') {
+      icon = 'phosphosite.ico';
+      iconText = 'PhosphoSitePlus';
+    }
+
     let allKeys = _.keys(enrResults[0]);
 
     let ***REMOVED***_text_col = _.indexOf(allKeys, 'name_1006');
@@ -71,9 +90,9 @@ class EnrichmentContainer extends Component {
         title: 'name_1006',
         field: 'name_1006',
         filterable: { type: 'alphanumericFilter' },
-        template: (value, item) => {
+        template: (value, item, addParams) => {
           return (
-            <p>
+            <div>
               <Popup
                 trigger={
                   <span className="TableValue">{splitValue(value)}</span>
@@ -84,7 +103,7 @@ class EnrichmentContainer extends Component {
                 inverted
                 basic
               />
-            </p>
+            </div>
           );
         }
       };
@@ -97,9 +116,9 @@ class EnrichmentContainer extends Component {
         title: 'Description',
         field: 'Description',
         filterable: { type: 'alphanumericFilter' },
-        template: (value, item) => {
+        template: (value, item, addParams) => {
           return (
-            <p>
+            <div>
               <Popup
                 trigger={
                   <span className="TableValue">{splitValue(value)}</span>
@@ -110,7 +129,22 @@ class EnrichmentContainer extends Component {
                 inverted
                 basic
               />
-            </p>
+              <Popup
+                trigger={
+                  <img
+                    src={icon}
+                    alt={iconText}
+                    className="ExternalSiteIcon"
+                    onClick={addParams.getLink(study, test, item)}
+                  />
+                }
+                // style={TableValuePopupStyle}
+                className="TablePopupValue"
+                content={iconText}
+                inverted
+                basic
+              />
+            </div>
           );
         }
       };
@@ -123,9 +157,9 @@ class EnrichmentContainer extends Component {
         title: 'Annotation',
         field: 'Annotation',
         filterable: { type: 'alphanumericFilter' },
-        template: (value, item) => {
+        template: (value, item, addParams) => {
           return (
-            <p>
+            <div>
               <Popup
                 trigger={
                   <span className="TableValue">{splitValue(value)}</span>
@@ -136,7 +170,7 @@ class EnrichmentContainer extends Component {
                 inverted
                 basic
               />
-            </p>
+            </div>
           );
         }
       };
@@ -156,9 +190,9 @@ class EnrichmentContainer extends Component {
         type: 'number',
         filterable: { type: 'numericFilter' },
         exportTemplate: value => (value ? `${value}` : 'N/A'),
-        template: (value, item) => {
+        template: (value, item, addParams) => {
           return (
-            <p>
+            <div>
               <Popup
                 trigger={
                   <span className="TableValue">
@@ -171,7 +205,7 @@ class EnrichmentContainer extends Component {
                 inverted
                 basic
               />
-            </p>
+            </div>
           );
         }
       };
@@ -205,7 +239,7 @@ class EnrichmentContainer extends Component {
             {...this.state}
             onSearchTransition={this.handleSearchTransition}
             onEnrichmentSearch={this.handleEnrichmentSearch}
-            onSearchCriteriaReset={this.hidePGrid}
+            onSearchCriteriaReset={this.hideEGrid}
           />
         </Grid.Column>
         <Grid.Column

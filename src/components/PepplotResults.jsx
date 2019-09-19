@@ -286,7 +286,7 @@ class PepplotResults extends Component {
   render() {
     const results = this.props.pepplotResults;
     const columns = this.props.pepplotColumns;
-    const rows = this.props.pepplotResults.length;
+    // const rows = this.props.pepplotResults.length;
     const quickViews = [];
     const additionalTemplateInfo = this.getTableHelpers(
       this.getProteinData,
