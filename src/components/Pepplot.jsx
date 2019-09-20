@@ -33,10 +33,6 @@ class PepplotContainer extends Component {
   };
 
   handlePepplotSearch = searchResults => {
-    //const pepplotResultsFromSearch = searchResults.pepplotResults;
-    // var newPepplotResultsArr = _.map(pepplotResultsFromSearch, function(element) {
-    //     return _.extend({}, element, {formattedValue: formatValue(value)});
-    // });
     const columns = this.getConfigCols(searchResults);
     this.setState({
       study: searchResults.study,
@@ -61,15 +57,15 @@ class PepplotContainer extends Component {
     const model = testData.model;
     let initConfigCols = [];
 
-    // const TableValuePopupStyle = {
-    //   backgroundColor: '2E2E2E',
-    //   borderBottom: '2px solid #FF4400',
-    //   color: '#FFF',
-    //   padding: '1em',
-    //   maxWidth: '50vw',
-    //   fontSize: '13px',
-    //   wordBreak: 'break-all'
-    // };
+    const TableValuePopupStyle = {
+      backgroundColor: '2E2E2E',
+      borderBottom: '2px solid #FF4400',
+      color: '#FFF',
+      padding: '1em',
+      maxWidth: '50vw',
+      fontSize: '13px',
+      wordBreak: 'break-all'
+    };
 
     let icon = 'phosphosite.ico';
     let iconText = 'PhosphoSitePlus';
@@ -86,14 +82,14 @@ class PepplotContainer extends Component {
                 <Popup
                   trigger={
                     <span
-                      className="ProteinNameLink"
+                      className="TableCellLink"
                       onClick={addParams.showPlot(model, item)}
                     >
                       {splitValue(value)}
                     </span>
                   }
                   content={value}
-                  // style={TableValuePopupStyle}
+                  style={TableValuePopupStyle}
                   className="TablePopupValue"
                   inverted
                   basic
@@ -107,7 +103,7 @@ class PepplotContainer extends Component {
                       onClick={addParams.showPhosphositePlus(item)}
                     />
                   }
-                  // style={TableValuePopupStyle}
+                  style={TableValuePopupStyle}
                   className="TablePopupValue"
                   content={iconText}
                   inverted
@@ -128,7 +124,7 @@ class PepplotContainer extends Component {
                   <span className="TableValue">{splitValue(value)}</span>
                 }
                 content={value}
-                // style={TableValuePopupStyle}
+                style={TableValuePopupStyle}
                 className="TablePopupValue"
                 inverted
                 basic
@@ -149,13 +145,13 @@ class PepplotContainer extends Component {
                 <Popup
                   trigger={
                     <span
-                      className="ProteinNameLink"
+                      className="TableCellLink"
                       onClick={addParams.showPlot(model, item)}
                     >
                       {splitValue(value)}
                     </span>
                   }
-                  // style={TableValuePopupStyle}
+                  style={TableValuePopupStyle}
                   className="TablePopupValue"
                   content={value}
                   inverted
@@ -170,7 +166,7 @@ class PepplotContainer extends Component {
                       onClick={addParams.showPhosphositePlus(item)}
                     />
                   }
-                  // style={TableValuePopupStyle}
+                  style={TableValuePopupStyle}
                   className="TablePopupValue"
                   content={iconText}
                   inverted
@@ -215,7 +211,7 @@ class PepplotContainer extends Component {
                     {formatNumberForDisplay(value)}
                   </span>
                 }
-                // style={TableValuePopupStyle}
+                style={TableValuePopupStyle}
                 className="TablePopupValue"
                 content={value}
                 inverted

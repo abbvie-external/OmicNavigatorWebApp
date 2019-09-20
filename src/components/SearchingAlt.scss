@@ -43,12 +43,12 @@ body {
  }
  #line {
    animation: line 5s linear infinite;
-   border-left: 4px dotted #ff4400;
+   border-left: 6px dotted #ff4400;
    height: 0px;
    width: 0px;
    position: absolute;
    top: 80px;
-   left: 80px;
+   left: 77px;
  }
  @keyframes line {
    10% { height: 80px; }

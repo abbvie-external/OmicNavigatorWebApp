@@ -18,6 +18,7 @@ class EnrichmentContainer extends Component {
   state = {
     isValidSearchEnrichment: false,
     isSearching: false,
+    isTestSelected: false,
     enrichmentResults: [],
     enrichmentColumns: []
   };
@@ -31,16 +32,13 @@ class EnrichmentContainer extends Component {
   };
 
   handleEnrichmentSearch = searchResults => {
-    debugger;
     const columns = this.getConfigCols(searchResults);
     this.setState({
-      study: searchResults.study,
-      model: searchResults.model,
-      test: searchResults.test,
       enrichmentResults: searchResults.enrichmentResults,
       enrichmentColumns: columns,
       isSearching: false,
-      isValidSearchEnrichment: true
+      isValidSearchEnrichment: true,
+      isTestSelected: false
     });
   };
 
@@ -52,32 +50,33 @@ class EnrichmentContainer extends Component {
 
   getConfigCols = annotationData => {
     const enrResults = annotationData.enrichmentResults;
-    const study = annotationData.study;
-    const test = annotationData.test;
+    const study = annotationData.enrichmentStudy;
+    const model = annotationData.enrichmentModel;
+    const annotation = annotationData.annotation;
     let initConfigCols = [];
 
-    // const TableValuePopupStyle = {
-    //   backgroundColor: '2E2E2E',
-    //   borderBottom: '2px solid #FF4400',
-    //   color: '#FFF',
-    //   padding: '1em',
-    //   maxWidth: '50vw',
-    //   fontSize: '13px',
-    //   wordBreak: 'break-all'
-    // };
+    const TableValuePopupStyle = {
+      backgroundColor: '2E2E2E',
+      borderBottom: '2px solid #FF4400',
+      color: '#FFF',
+      padding: '1em',
+      maxWidth: '50vw',
+      fontSize: '13px',
+      wordBreak: 'break-all'
+    };
 
     let icon = '';
     let iconText = '';
-    if (test === 'REACTOME') {
+    if (annotation === 'REACTOME') {
       icon = 'reactome.jpg';
       iconText = 'Reactome';
-    } else if (test.substring(0, 2) === 'GO') {
+    } else if (annotation.substring(0, 2) === 'GO') {
       icon = 'go.png';
       iconText = 'AmiGO 2';
-    } else if (test.substring(0, 4) === 'msig') {
+    } else if (annotation.substring(0, 4) === 'msig') {
       icon = 'msig.ico';
       iconText = 'GSEA MSigDB';
-    } else if (test === 'PSP') {
+    } else if (annotation === 'PSP') {
       icon = 'phosphosite.ico';
       iconText = 'PhosphoSitePlus';
     }
@@ -97,7 +96,7 @@ class EnrichmentContainer extends Component {
                 trigger={
                   <span className="TableValue">{splitValue(value)}</span>
                 }
-                // style={TableValuePopupStyle}
+                style={TableValuePopupStyle}
                 className="TablePopupValue"
                 content={value}
                 inverted
@@ -123,7 +122,7 @@ class EnrichmentContainer extends Component {
                 trigger={
                   <span className="TableValue">{splitValue(value)}</span>
                 }
-                // style={TableValuePopupStyle}
+                style={TableValuePopupStyle}
                 className="TablePopupValue"
                 content={value}
                 inverted
@@ -135,10 +134,10 @@ class EnrichmentContainer extends Component {
                     src={icon}
                     alt={iconText}
                     className="ExternalSiteIcon"
-                    onClick={addParams.getLink(study, test, item)}
+                    onClick={addParams.getLink(study, annotation, item)}
                   />
                 }
-                // style={TableValuePopupStyle}
+                style={TableValuePopupStyle}
                 className="TablePopupValue"
                 content={iconText}
                 inverted
@@ -164,7 +163,7 @@ class EnrichmentContainer extends Component {
                 trigger={
                   <span className="TableValue">{splitValue(value)}</span>
                 }
-                // style={TableValuePopupStyle}
+                style={TableValuePopupStyle}
                 className="TablePopupValue"
                 content={value}
                 inverted
@@ -191,22 +190,49 @@ class EnrichmentContainer extends Component {
         filterable: { type: 'numericFilter' },
         exportTemplate: value => (value ? `${value}` : 'N/A'),
         template: (value, item, addParams) => {
-          return (
-            <div>
-              <Popup
-                trigger={
-                  <span className="TableValue">
-                    {formatNumberForDisplay(value)}
-                  </span>
-                }
-                // style={TableValuePopupStyle}
-                className="TablePopupValue"
-                content={value}
-                inverted
-                basic
-              />
-            </div>
-          );
+          if (study === '***REMOVED***') {
+            return (
+              <div>
+                <Popup
+                  trigger={
+                    <span
+                      className="TableCellLink"
+                      onClick={addParams.barcodeData(
+                        study,
+                        model,
+                        annotation,
+                        item,
+                        c
+                      )}
+                    >
+                      {formatNumberForDisplay(value)}
+                    </span>
+                  }
+                  style={TableValuePopupStyle}
+                  className="TablePopupValue"
+                  content={value}
+                  inverted
+                  basic
+                />
+              </div>
+            );
+          } else
+            return (
+              <div>
+                <Popup
+                  trigger={
+                    <span className="TableValue">
+                      {formatNumberForDisplay(value)}
+                    </span>
+                  }
+                  style={TableValuePopupStyle}
+                  className="TablePopupValue"
+                  content={value}
+                  inverted
+                  basic
+                />
+              </div>
+            );
         }
       };
     });
@@ -217,7 +243,11 @@ class EnrichmentContainer extends Component {
   };
 
   getView = () => {
-    if (this.state.isValidSearchEnrichment && !this.state.isSearching) {
+    if (
+      this.state.isValidSearchEnrichment &&
+      !this.state.isTestSelected &&
+      !this.state.isSearching
+    ) {
       return <EnrichmentResults {...this.state} />;
     } else if (this.state.isSearching) {
       return <TransitionActive />;

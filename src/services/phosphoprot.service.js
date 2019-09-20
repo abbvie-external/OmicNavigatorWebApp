@@ -46,11 +46,18 @@ class PhosphoprotService {
     });
   }
 
-  async getTestData(tab, rName, model, test, study) {
+  async getTestData(model, test, study) {
     this.setUrl();
-    const dynamicKey = tab === 'pepplot' ? 'test' : 'annotation';
-    const obj = { testCategory: model, [dynamicKey]: test, study: study };
-    const promise = this.ocpuDataCall(rName, obj);
+    const obj = { testCategory: model, test: test, study: study };
+    const promise = this.ocpuDataCall('getInferenceResults', obj);
+    const dataFromPromise = await promise;
+    return dataFromPromise;
+  }
+
+  async getAnnotationData(model, test, study) {
+    this.setUrl();
+    const obj = { testCategory: model, annotation: test, study: study };
+    const promise = this.ocpuDataCall('getEnrichmentResults', obj);
     const dataFromPromise = await promise;
     return dataFromPromise;
   }
@@ -102,11 +109,23 @@ class PhosphoprotService {
 
   async getDatabaseInfo(study, test) {
     this.setUrl();
-    const rName = 'getDatabases';
     const obj = { study: study, database: test };
     const promise = this.ocpuDataCall('getDatabases', {
       study: study,
       database: test
+    });
+    const dataFromPromise = await promise;
+    return dataFromPromise;
+  }
+
+  async getBarcodeData(study, model, annotation, test, term) {
+    this.setUrl();
+    const promise = this.ocpuDataCall('getBarcodeData', {
+      study: study,
+      model: model,
+      database: annotation,
+      test: test,
+      term: term
     });
     const dataFromPromise = await promise;
     return dataFromPromise;

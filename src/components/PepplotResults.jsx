@@ -67,7 +67,6 @@ class PepplotResults extends Component {
       treeDataColumns: [],
       currentSVGs: []
     });
-
     let model = this.props.model;
     let study = this.props.study;
 

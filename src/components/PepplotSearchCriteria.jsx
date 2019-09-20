@@ -57,10 +57,8 @@ class PepplotSearchCriteria extends Component {
     this.props.onSearchCriteriaReset({
       isValidSearchPepplot: false
     });
-    const modelNamesParam =
-      this.props.tab === 'pepplot' ? 'inferenceNames' : 'EnrichmentNames';
     phosphoprotService
-      .getModelNames(modelNamesParam, value + 'plots')
+      .getModelNames('inferenceNames', value + 'plots')
       .then(modelsFromService => {
         this.allNames = modelsFromService;
         const modelsArr = _.map(_.keys(modelsFromService), function(modelName) {
@@ -100,18 +98,8 @@ class PepplotSearchCriteria extends Component {
     this.props.onSearchTransition({
       isSearching: true
     });
-    const testResultsParam =
-      this.props.tab === 'pepplot'
-        ? 'getInferenceResults'
-        : 'getEnrichmentResults';
     phosphoprotService
-      .getTestData(
-        this.props.tab,
-        testResultsParam,
-        this.state.model,
-        value,
-        this.state.study + 'plots'
-      )
+      .getTestData(this.state.model, value, this.state.study + 'plots')
       .then(dataFromService => {
         this.testdata = dataFromService;
         this.setState({

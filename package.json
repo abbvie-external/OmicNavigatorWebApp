@@ -25,6 +25,7 @@
     "react-pose": "^4.0.8",
     "react-router-dom": "^5.0.1",
     "react-scripts": "3.0.1",
+    "react-split-pane": "^0.1.87",
     "react-spring": "^8.0.27",
     "reselect": "^4.0.0",
     "save-svg-as-png": "^1.4.14",
