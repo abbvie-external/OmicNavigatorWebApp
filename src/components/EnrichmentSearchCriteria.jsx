@@ -8,6 +8,9 @@ import _ from 'lodash';
 class EnrichmentSearchCriteria extends Component {
   static defaultProps = {
     tab: 'enrichment',
+    enrichmentStudy: '',
+    enrichmentModel: '',
+    annotation: '',
     isValidSearchEnrichment: false,
     isSearching: false
   };
@@ -15,13 +18,10 @@ class EnrichmentSearchCriteria extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      enrichmentStudy: '',
       enrichmentStudies: [],
       enrichmentStudyHrefVisible: false,
       enrichmentStudyHref: '',
-      enrichmentModel: '',
       enrichmentModels: [],
-      annotation: '',
       annotations: [],
       enrichmentStudiesDisabled: false,
       enrichmentModelsDisabled: true,
@@ -46,13 +46,15 @@ class EnrichmentSearchCriteria extends Component {
 
   handleStudyChange = (evt, { name, value }) => {
     this.setState({
-      [name]: value,
       enrichmentStudyHrefVisible: true,
       enrichmentStudyHref: `${value}.html`,
-      enrichmentModel: '',
-      annotation: '',
       enrichmentModelsDisabled: true,
       annotationsDisabled: true
+    });
+    this.props.onSearchCriteriaChange({
+      [name]: value,
+      enrichmentModel: '',
+      annotation: ''
     });
     this.props.onSearchCriteriaReset({
       isValidSearchEnrichment: false
@@ -72,9 +74,10 @@ class EnrichmentSearchCriteria extends Component {
   };
 
   handleModelChange = (evt, { name, value }) => {
-    this.setState({
-      annotation: '',
-      [name]: value
+    this.props.onSearchCriteriaChange({
+      enrichmentStudy: this.props.enrichmentStudy,
+      [name]: value,
+      annotation: ''
     });
     this.props.onSearchCriteriaReset({
       isValidSearchEnrichment: false
@@ -96,19 +99,24 @@ class EnrichmentSearchCriteria extends Component {
 
   handleAnnotationChange = (evt, { name, value }) => {
     this.setState({
-      [name]: value,
       enrichmentStudiesDisabled: true,
       enrichmentModelsDisabled: true,
       annotationsDisabled: true
     });
+    this.props.onSearchCriteriaChange({
+      enrichmentStudy: this.props.enrichmentStudy,
+      enrichmentModel: this.props.enrichmentModel,
+      [name]: value
+    });
     this.props.onSearchTransition({
+      [name]: value,
       isSearching: true
     });
     phosphoprotService
       .getAnnotationData(
-        this.state.enrichmentModel,
+        this.props.enrichmentModel,
         value,
-        this.state.enrichmentStudy + 'plots'
+        this.props.enrichmentStudy + 'plots'
       )
       .then(dataFromService => {
         this.annotationdata = dataFromService;
@@ -118,9 +126,6 @@ class EnrichmentSearchCriteria extends Component {
           annotationsDisabled: false
         });
         this.props.onEnrichmentSearch({
-          enrichmentStudy: this.state.enrichmentStudy,
-          enrichmentModel: this.state.enrichmentModel,
-          annotation: value,
           enrichmentResults: this.annotationdata
         });
       });
@@ -128,18 +133,17 @@ class EnrichmentSearchCriteria extends Component {
 
   render() {
     const {
-      enrichmentStudy,
       enrichmentStudies,
       enrichmentStudyHref,
       enrichmentStudyHrefVisible,
-      enrichmentModel,
       enrichmentModels,
-      annotation,
       annotations,
       enrichmentStudiesDisabled,
       enrichmentModelsDisabled,
       annotationsDisabled
     } = this.state;
+
+    const { enrichmentStudy, enrichmentModel, annotation } = this.props;
 
     const StudyPopupStyle = {
       backgroundColor: '2E2E2E',

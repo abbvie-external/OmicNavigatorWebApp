@@ -31,6 +31,7 @@ class EnrichmentResults extends Component {
 
   constructor(props) {
     super(props);
+    debugger;
     this.state = {
       treeDataRaw: [],
       treeData: [],
@@ -219,6 +220,7 @@ class EnrichmentResults extends Component {
       return (
         <div>
           <SplitPanesContainer
+            {...this.props}
             {...this.state}
             onBackToTable={this.backToTable}
           ></SplitPanesContainer>

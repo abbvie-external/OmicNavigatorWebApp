@@ -15,13 +15,19 @@ class EnrichmentContainer extends Component {
     tab: 'enrichment'
   };
 
-  state = {
-    isValidSearchEnrichment: false,
-    isSearching: false,
-    isTestSelected: false,
-    enrichmentResults: [],
-    enrichmentColumns: []
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      enrichmentStudy: '',
+      enrichmentModel: '',
+      annotation: '',
+      isValidSearchEnrichment: false,
+      isSearching: false,
+      isTestSelected: false,
+      enrichmentResults: [],
+      enrichmentColumns: []
+    };
+  }
 
   componentDidMount() {}
 
@@ -42,6 +48,14 @@ class EnrichmentContainer extends Component {
     });
   };
 
+  handleSearchCriteriaChange = changes => {
+    this.setState({
+      enrichmentStudy: changes.enrichmentStudy,
+      enrichmentModel: changes.enrichmentModel,
+      annotation: changes.annotation
+    });
+  };
+
   hideEGrid = () => {
     this.setState({
       isValidSearchEnrichment: false
@@ -50,9 +64,7 @@ class EnrichmentContainer extends Component {
 
   getConfigCols = annotationData => {
     const enrResults = annotationData.enrichmentResults;
-    const study = annotationData.enrichmentStudy;
-    const model = annotationData.enrichmentModel;
-    const annotation = annotationData.annotation;
+    const { enrichmentStudy, enrichmentModel, annotation } = this.state;
     let initConfigCols = [];
 
     const TableValuePopupStyle = {
@@ -134,7 +146,11 @@ class EnrichmentContainer extends Component {
                     src={icon}
                     alt={iconText}
                     className="ExternalSiteIcon"
-                    onClick={addParams.getLink(study, annotation, item)}
+                    onClick={addParams.getLink(
+                      enrichmentStudy,
+                      annotation,
+                      item
+                    )}
                   />
                 }
                 style={TableValuePopupStyle}
@@ -190,7 +206,7 @@ class EnrichmentContainer extends Component {
         filterable: { type: 'numericFilter' },
         exportTemplate: value => (value ? `${value}` : 'N/A'),
         template: (value, item, addParams) => {
-          if (study === '***REMOVED***') {
+          if (enrichmentStudy === '***REMOVED***') {
             return (
               <div>
                 <Popup
@@ -198,8 +214,8 @@ class EnrichmentContainer extends Component {
                     <span
                       className="TableCellLink"
                       onClick={addParams.barcodeData(
-                        study,
-                        model,
+                        enrichmentStudy,
+                        enrichmentModel,
                         annotation,
                         item,
                         c
@@ -248,7 +264,7 @@ class EnrichmentContainer extends Component {
       !this.state.isTestSelected &&
       !this.state.isSearching
     ) {
-      return <EnrichmentResults {...this.state} />;
+      return <EnrichmentResults {...this.props} {...this.state} />;
     } else if (this.state.isSearching) {
       return <TransitionActive />;
     } else return <TransitionStill />;
@@ -269,6 +285,7 @@ class EnrichmentContainer extends Component {
             {...this.state}
             onSearchTransition={this.handleSearchTransition}
             onEnrichmentSearch={this.handleEnrichmentSearch}
+            onSearchCriteriaChange={this.handleSearchCriteriaChange}
             onSearchCriteriaReset={this.hideEGrid}
           />
         </Grid.Column>

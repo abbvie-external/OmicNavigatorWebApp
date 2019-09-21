@@ -9,13 +9,8 @@ import SplitPane from 'react-split-pane';
 import './SplitPanesContainer.scss';
 
 class SplitPanesContainer extends Component {
-  static defaultProps = {
-    isTestDataLoaded: false
-  };
-
   constructor(props) {
     super(props);
-
     this.state = {
       activeSVGTabIndex: 0,
       excelVisible: true,
@@ -24,6 +19,10 @@ class SplitPanesContainer extends Component {
       // returningToTable: false,
     };
   }
+
+  static defaultProps = {
+    isTestDataLoaded: false
+  };
 
   componentDidMount() {}
 
@@ -34,7 +33,18 @@ class SplitPanesContainer extends Component {
   };
 
   render() {
-    if (!this.props.isTestDataLoaded) {
+    const { enrichmentModel, isTestDataLoaded } = this.props;
+    // const splitPanes = (enrichmentModel === "Timecourse Differential Phosphorylation") ? twoPanes : threePanes;
+    // const SplitPanes = getSplitPanes(enrichmentModel);
+    // const BarcodeStyle = {
+    //   height: '30vw !important'
+    // };
+
+    // const ViolinStyle = {
+    //   width: '33% !important'
+    // };
+
+    if (!isTestDataLoaded) {
       return (
         <div>
           <Dimmer active inverted>
@@ -43,40 +53,91 @@ class SplitPanesContainer extends Component {
         </div>
       );
     } else {
-      return (
-        <div className="">
-          <Grid columns={2} className="">
-            <Grid.Row className="ActionsRow">
-              <Grid.Column mobile={8} tablet={8} largeScreen={8} widescreen={8}>
-                <Breadcrumbs
-                  {...this.props}
-                  // onNavigateBack={this.tableTransition}
-                />
-              </Grid.Column>
-              <Grid.Column mobile={8} tablet={8} largeScreen={8} widescreen={8}>
-                <ButtonActions {...this.props} {...this.state} />
-              </Grid.Column>
-            </Grid.Row>
-            <Grid.Row className="SplitPanesContainer">
-              <SplitPane split="horizontal" defaultSize={250}>
-                <div>
-                  <h2>BARCODE</h2>
-                </div>
-
-                <SplitPane split="vertical" defaultSize={400}>
+      if (enrichmentModel === 'Timecourse Differential Phosphorylation') {
+        return (
+          <div className="">
+            <Grid columns={2} className="">
+              <Grid.Row className="ActionsRow">
+                <Grid.Column
+                  mobile={8}
+                  tablet={8}
+                  largeScreen={8}
+                  widescreen={8}
+                >
+                  <Breadcrumbs
+                    {...this.props}
+                    // onNavigateBack={this.tableTransition}
+                  />
+                </Grid.Column>
+                <Grid.Column
+                  mobile={8}
+                  tablet={8}
+                  largeScreen={8}
+                  widescreen={8}
+                >
+                  <ButtonActions {...this.props} {...this.state} />
+                </Grid.Column>
+              </Grid.Row>
+              <Grid.Row className="SplitPanesContainer">
+                <SplitPane split="horizontal" defaultSize={400}>
                   <div>
-                    <h2>VIOLIN</h2>
+                    <h2>BARCODE Timcecourse</h2>
                   </div>
 
                   <div>
-                    <h2>SVG PLOTS</h2>
+                    <h2>SVG PLOTS Timecourse</h2>
                   </div>
                 </SplitPane>
-              </SplitPane>
-            </Grid.Row>
-          </Grid>
-        </div>
-      );
+              </Grid.Row>
+            </Grid>
+          </div>
+        );
+      } else {
+        return (
+          <div className="">
+            <Grid columns={2} className="">
+              <Grid.Row className="ActionsRow">
+                <Grid.Column
+                  mobile={8}
+                  tablet={8}
+                  largeScreen={8}
+                  widescreen={8}
+                >
+                  <Breadcrumbs
+                    {...this.props}
+                    // onNavigateBack={this.tableTransition}
+                  />
+                </Grid.Column>
+                <Grid.Column
+                  mobile={8}
+                  tablet={8}
+                  largeScreen={8}
+                  widescreen={8}
+                >
+                  <ButtonActions {...this.props} {...this.state} />
+                </Grid.Column>
+              </Grid.Row>
+              <Grid.Row className="SplitPanesContainer">
+                <SplitPane split="horizontal" defaultSize={250}>
+                  <div>
+                    <h2>BARCODE</h2>
+                  </div>
+
+                  <SplitPane split="vertical" defaultSize={400}>
+                    <div>
+                      <h2>VIOLIN</h2>
+                    </div>
+
+                    <div>
+                      <h2>SVG PLOTS</h2>
+                    </div>
+                  </SplitPane>
+                </SplitPane>
+              </Grid.Row>
+            </Grid>
+          </div>
+        );
+      }
     }
   }
 }
