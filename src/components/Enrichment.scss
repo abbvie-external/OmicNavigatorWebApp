@@ -24,21 +24,21 @@
   box-shadow: 2px 0px 0px #ff4400 !important;
 }
 
-.ToggleNetworkViewContainer {
+.ToggleNetworkGraphContainer {
   padding-top: 30px;
   padding-bottom: 15px !important;
   margin-bottom: 15px !important;
   margin-left: 20px;
 }
 
-.ToggleNetworkViewText {
+.ToggleNetworkGraphText {
   font-weight: bold;
   font-stretch: condensed !important;
   margin-top: 0px !important;
   padding-top: 10px !important;
 }
 
-.ToggleNetworkView {
+.ToggleNetworkGraph {
   float: right;
   margin-right: 20px;
 }
@@ -46,11 +46,3 @@
 .ui.positive.button {
   background-color: #ff4400 !important;
 }
-
-// .NetworkTableButton:focus {
-//   background-color: #ff4400 !important;
-// }
-
-// .NetworkChartButton:focus {
-//   background-color: #ff4400 !important;
-// }

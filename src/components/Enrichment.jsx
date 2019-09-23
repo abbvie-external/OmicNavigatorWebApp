@@ -36,11 +36,9 @@ class EnrichmentContainer extends Component {
       isTestSelected: false,
       enrichmentResults: [],
       enrichmentColumns: [],
+      showNetworkGraph: false,
       networkDataAvailable: false,
-      showIconContainer: false,
-      networkData: {},
-      networkView: 'chart',
-      isNetworkGraphView: false
+      networkData: {}
     };
   }
 
@@ -273,11 +271,10 @@ class EnrichmentContainer extends Component {
     return configCols;
   };
 
-  handleNetworkViewChange = choice => {
+  handleNetworkGraphChange = choice => {
     return evt => {
       this.setState({
-        networkView: choice,
-        isNetworkGraphView: !this.state.isNetworkGraphView
+        showNetworkGraph: choice
       });
     };
   };
@@ -286,7 +283,6 @@ class EnrichmentContainer extends Component {
     phosphoprotService.getEnrichmentMap().then(EMData => {
       this.setState({
         networkDataAvailable: true,
-        showIconContainer: true,
         nwData: EMData.elements
       });
     });
@@ -297,14 +293,14 @@ class EnrichmentContainer extends Component {
       this.state.isValidSearchEnrichment &&
       !this.state.isTestSelected &&
       !this.state.isSearching &&
-      !this.state.isNetworkGraphView
+      !this.state.showNetworkGraph
     ) {
       return <EnrichmentResults {...this.props} {...this.state} />;
     } else if (
       this.state.isValidSearchEnrichment &&
       !this.state.isTestSelected &&
       !this.state.isSearching &&
-      this.state.isNetworkGraphView
+      this.state.showNetworkGraph
     ) {
       return <EnrichmentNetworkGraph {...this.props} {...this.state} />;
     } else if (this.state.isSearching) {
@@ -330,37 +326,37 @@ class EnrichmentContainer extends Component {
       fontSize: '13px'
     };
 
-    let networkData = '';
-    let networkViewToggle = '';
+    let networkGraphData = '';
+    let networkGraphToggle = '';
     if (
       annotation === 'GO_CELLULAR_COMPONENT' &&
       enrichmentStudy === '***REMOVED***' &&
       enrichmentModel === 'Timecourse Differential Phosphorylation'
     ) {
-      networkData = this.getNetworkData();
+      networkGraphData = this.getNetworkData();
       // networkData will be used for Network Graph
-      networkViewToggle = (
-        <div className="ToggleNetworkViewContainer">
+      networkGraphToggle = (
+        <div className="ToggleNetworkGraphContainer">
           <Divider />
-          <span className="ToggleNetworkViewText">VIEW</span>
-          <span className="ToggleNetworkView">
+          <span className="ToggleNetworkGraphText">VIEW</span>
+          <span className="ToggleNetworkGraph">
             <Button.Group className="">
               <Button
                 type="button"
                 className="NetworkTableButton"
-                positive={this.state.networkView === 'table'}
-                onClick={this.handleNetworkViewChange('table')}
+                positive={this.state.showNetworkGraph === false}
+                onClick={this.handleNetworkGraphChange(false)}
               >
                 Table
               </Button>
               <Button.Or className="OrCircle" />
               <Button
                 type="button"
-                className="NetworkChartButton"
-                positive={this.state.networkView === 'chart'}
-                onClick={this.handleNetworkViewChange('chart')}
+                className="NetworkGraphButton"
+                positive={this.state.showNetworkGraph === true}
+                onClick={this.handleNetworkGraphChange(true)}
               >
-                Network
+                Network Graph
               </Button>
             </Button.Group>
           </span>
@@ -384,7 +380,7 @@ class EnrichmentContainer extends Component {
             onSearchCriteriaChange={this.handleSearchCriteriaChange}
             onSearchCriteriaReset={this.hideEGrid}
           />
-          {networkViewToggle}
+          {networkGraphToggle}
         </Grid.Column>
         <Grid.Column
           className="ContentContainer"

@@ -19,7 +19,6 @@ class EnrichmentNetworkGraph extends Component {
 
   constructor(props) {
     super(props);
-    debugger;
     this.state = {
       treeDataRaw: [],
       treeData: [],
