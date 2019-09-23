@@ -1,11 +1,21 @@
 import React, { Component } from 'react';
-import { Grid, Popup } from 'semantic-ui-react';
+import {
+  Grid,
+  Popup,
+  Icon,
+  Button,
+  Segment,
+  Divider,
+  Header
+} from 'semantic-ui-react';
 import { withRouter } from 'react-router-dom';
 import EnrichmentSearchCriteria from './EnrichmentSearchCriteria';
+import EnrichmentNetworkGraph from './EnrichmentNetworkGraph';
 import EnrichmentResults from './EnrichmentResults';
 import TransitionActive from './TransitionActive';
 import TransitionStill from './TransitionStill';
 import { formatNumberForDisplay, splitValue } from '../helpers';
+import { phosphoprotService } from '../services/phosphoprot.service';
 import _ from 'lodash';
 import './Enrichment.scss';
 import './Table.scss';
@@ -25,7 +35,12 @@ class EnrichmentContainer extends Component {
       isSearching: false,
       isTestSelected: false,
       enrichmentResults: [],
-      enrichmentColumns: []
+      enrichmentColumns: [],
+      networkDataAvailable: false,
+      showIconContainer: false,
+      networkData: {},
+      networkView: 'chart',
+      isNetworkGraphView: false
     };
   }
 
@@ -258,13 +273,40 @@ class EnrichmentContainer extends Component {
     return configCols;
   };
 
+  handleNetworkViewChange = choice => {
+    return evt => {
+      this.setState({
+        networkView: choice,
+        isNetworkGraphView: !this.state.isNetworkGraphView
+      });
+    };
+  };
+
+  getNetworkData = () => {
+    phosphoprotService.getEnrichmentMap().then(EMData => {
+      this.setState({
+        networkDataAvailable: true,
+        showIconContainer: true,
+        nwData: EMData.elements
+      });
+    });
+  };
+
   getView = () => {
     if (
       this.state.isValidSearchEnrichment &&
       !this.state.isTestSelected &&
-      !this.state.isSearching
+      !this.state.isSearching &&
+      !this.state.isNetworkGraphView
     ) {
       return <EnrichmentResults {...this.props} {...this.state} />;
+    } else if (
+      this.state.isValidSearchEnrichment &&
+      !this.state.isTestSelected &&
+      !this.state.isSearching &&
+      this.state.isNetworkGraphView
+    ) {
+      return <EnrichmentNetworkGraph {...this.props} {...this.state} />;
     } else if (this.state.isSearching) {
       return <TransitionActive />;
     } else return <TransitionStill />;
@@ -272,6 +314,60 @@ class EnrichmentContainer extends Component {
 
   render() {
     const enrichmentView = this.getView(this.state);
+    const {
+      enrichmentResults,
+      enrichmentColumns,
+      enrichmentStudy,
+      enrichmentModel,
+      annotation
+    } = this.state;
+
+    const NetworkTogglePopupStyle = {
+      backgroundColor: '2E2E2E',
+      borderBottom: '2px solid #FF4400',
+      color: '#FFF',
+      padding: '1em',
+      fontSize: '13px'
+    };
+
+    let networkData = '';
+    let networkViewToggle = '';
+    if (
+      annotation === 'GO_CELLULAR_COMPONENT' &&
+      enrichmentStudy === '***REMOVED***' &&
+      enrichmentModel === 'Timecourse Differential Phosphorylation'
+    ) {
+      networkData = this.getNetworkData();
+      // networkData will be used for Network Graph
+      networkViewToggle = (
+        <div className="ToggleNetworkViewContainer">
+          <Divider />
+          <span className="ToggleNetworkViewText">VIEW</span>
+          <span className="ToggleNetworkView">
+            <Button.Group className="">
+              <Button
+                type="button"
+                className="NetworkTableButton"
+                positive={this.state.networkView === 'table'}
+                onClick={this.handleNetworkViewChange('table')}
+              >
+                Table
+              </Button>
+              <Button.Or className="OrCircle" />
+              <Button
+                type="button"
+                className="NetworkChartButton"
+                positive={this.state.networkView === 'chart'}
+                onClick={this.handleNetworkViewChange('chart')}
+              >
+                Network
+              </Button>
+            </Button.Group>
+          </span>
+        </div>
+      );
+    }
+
     return (
       <Grid.Row className="EnrichmentContainer">
         <Grid.Column
@@ -288,6 +384,7 @@ class EnrichmentContainer extends Component {
             onSearchCriteriaChange={this.handleSearchCriteriaChange}
             onSearchCriteriaReset={this.hideEGrid}
           />
+          {networkViewToggle}
         </Grid.Column>
         <Grid.Column
           className="ContentContainer"

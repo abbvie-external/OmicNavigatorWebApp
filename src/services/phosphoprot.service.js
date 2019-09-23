@@ -130,6 +130,15 @@ class PhosphoprotService {
     const dataFromPromise = await promise;
     return dataFromPromise;
   }
+
+  async getEnrichmentMap() {
+    try {
+      const response = await axios.get('networkData.json');
+      return response.data;
+    } catch (error) {
+      console.error(error);
+    }
+  }
 }
 
 export const phosphoprotService = new PhosphoprotService();

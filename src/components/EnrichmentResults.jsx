@@ -31,7 +31,6 @@ class EnrichmentResults extends Component {
 
   constructor(props) {
     super(props);
-    debugger;
     this.state = {
       treeDataRaw: [],
       treeData: [],
@@ -182,8 +181,14 @@ class EnrichmentResults extends Component {
   };
 
   render() {
-    const results = this.props.enrichmentResults;
-    const columns = this.props.enrichmentColumns;
+    const {
+      enrichmentResults,
+      enrichmentColumns,
+      enrichmentStudy,
+      enrichmentModel,
+      annotation
+    } = this.props;
+
     // const rows = this.props.enrichmentResults.length;
     const quickViews = [];
     const additionalTemplateInfo = this.getTableHelpers(
@@ -194,8 +199,8 @@ class EnrichmentResults extends Component {
       return (
         <div>
           <EZGrid
-            data={results}
-            columnsConfig={columns}
+            data={enrichmentResults}
+            columnsConfig={enrichmentColumns}
             // totalRows={rows}
             // use "rows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
             itemsPerPage={100}
