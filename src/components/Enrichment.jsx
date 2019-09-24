@@ -1,13 +1,5 @@
 import React, { Component } from 'react';
-import {
-  Grid,
-  Popup,
-  Icon,
-  Button,
-  Segment,
-  Divider,
-  Header
-} from 'semantic-ui-react';
+import { Grid, Popup, Button, Divider } from 'semantic-ui-react';
 import { withRouter } from 'react-router-dom';
 import EnrichmentSearchCriteria from './EnrichmentSearchCriteria';
 import EnrichmentNetworkGraph from './EnrichmentNetworkGraph';
@@ -15,7 +7,7 @@ import EnrichmentResults from './EnrichmentResults';
 import TransitionActive from './TransitionActive';
 import TransitionStill from './TransitionStill';
 import { formatNumberForDisplay, splitValue } from '../helpers';
-import { phosphoprotService } from '../services/phosphoprot.service';
+// import { phosphoprotService } from '../services/phosphoprot.service';
 import _ from 'lodash';
 import './Enrichment.scss';
 import './Table.scss';
@@ -65,7 +57,8 @@ class EnrichmentContainer extends Component {
     this.setState({
       enrichmentStudy: changes.enrichmentStudy,
       enrichmentModel: changes.enrichmentModel,
-      annotation: changes.annotation
+      annotation: changes.annotation,
+      showNetworkGraph: false
     });
   };
 
@@ -279,16 +272,17 @@ class EnrichmentContainer extends Component {
     };
   };
 
-  getNetworkData = () => {
-    phosphoprotService.getEnrichmentMap().then(EMData => {
-      this.setState({
-        networkDataAvailable: true,
-        nwData: EMData.elements
-      });
-    });
-  };
+  // getNetworkData = () => {
+  //   phosphoprotService.getEnrichmentMap().then(EMData => {
+  //     this.setState({
+  //       networkDataAvailable: true,
+  //       nwData: EMData.elements
+  //     });
+  //   });
+  // };
 
   getView = () => {
+    debugger;
     if (
       this.state.isValidSearchEnrichment &&
       !this.state.isTestSelected &&
@@ -310,30 +304,16 @@ class EnrichmentContainer extends Component {
 
   render() {
     const enrichmentView = this.getView(this.state);
-    const {
-      enrichmentResults,
-      enrichmentColumns,
-      enrichmentStudy,
-      enrichmentModel,
-      annotation
-    } = this.state;
+    const { enrichmentStudy, enrichmentModel, annotation } = this.state;
 
-    const NetworkTogglePopupStyle = {
-      backgroundColor: '2E2E2E',
-      borderBottom: '2px solid #FF4400',
-      color: '#FFF',
-      padding: '1em',
-      fontSize: '13px'
-    };
-
-    let networkGraphData = '';
+    // let networkGraphData = '';
     let networkGraphToggle = '';
     if (
       annotation === 'GO_CELLULAR_COMPONENT' &&
       enrichmentStudy === '***REMOVED***' &&
       enrichmentModel === 'Timecourse Differential Phosphorylation'
     ) {
-      networkGraphData = this.getNetworkData();
+      // networkGraphData = this.getNetworkData();
       // networkData will be used for Network Graph
       networkGraphToggle = (
         <div className="ToggleNetworkGraphContainer">

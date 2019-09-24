@@ -109,7 +109,6 @@ class PhosphoprotService {
 
   async getDatabaseInfo(study, test) {
     this.setUrl();
-    const obj = { study: study, database: test };
     const promise = this.ocpuDataCall('getDatabases', {
       study: study,
       database: test

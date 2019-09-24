@@ -167,7 +167,7 @@ class PepplotSearchCriteria extends Component {
       studyIcon = (
         <Popup
           trigger={
-            <a target="_blank" rel="noopener noreferrer">
+            <a target="_blank" rel="noopener noreferrer" href={'/'}>
               <Icon name="line graph" size="large" circular inverted disabled />
             </a>
           }

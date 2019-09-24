@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import { Grid, Dimmer, Loader, Header } from 'semantic-ui-react';
+import { Grid, Dimmer, Loader } from 'semantic-ui-react';
 import Breadcrumbs from './Breadcrumbs';
 import ButtonActions from './ButtonActions';
-import PlotAccordion from './PlotAccordion';
-import PlotSVG from './PlotSVG';
+// import PlotSVG from './PlotSVG';
 import SplitPane from 'react-split-pane';
 import './SplitPanesContainer.scss';
 

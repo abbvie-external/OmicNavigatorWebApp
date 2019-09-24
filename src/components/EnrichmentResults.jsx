@@ -54,7 +54,7 @@ class EnrichmentResults extends Component {
         ? dataItem.Description
         : dataItem.MajorityProteinIDsHGNC
       ).split(';')[0];
-      let param = { queryId: -1, from: 0, searchStr: dataItem.Description };
+      let param = { queryId: -1, from: 0, searchStr: protein };
       phosphoprotService.postToPhosphositePlus(
         param,
         'https://www.phosphosite.org/proteinSearchSubmitAction.action'
@@ -181,13 +181,7 @@ class EnrichmentResults extends Component {
   };
 
   render() {
-    const {
-      enrichmentResults,
-      enrichmentColumns,
-      enrichmentStudy,
-      enrichmentModel,
-      annotation
-    } = this.props;
+    const { enrichmentResults, enrichmentColumns } = this.props;
 
     // const rows = this.props.enrichmentResults.length;
     const quickViews = [];

@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { Header } from 'semantic-ui-react';
-import { phosphoprotService } from '../services/phosphoprot.service';
+// import { phosphoprotService } from '../services/phosphoprot.service';
 import { withRouter } from 'react-router-dom';
-import ButtonActions from './ButtonActions';
+// import ButtonActions from './ButtonActions';
 import SplitPanesContainer from './SplitPanesContainer';
 import SearchingAlt from './SearchingAlt';
-import _ from 'lodash';
+// import _ from 'lodash';
 
 class EnrichmentNetworkGraph extends Component {
   static defaultProps = {
@@ -59,13 +59,13 @@ class EnrichmentNetworkGraph extends Component {
   };
 
   render() {
-    const {
-      enrichmentResults,
-      enrichmentColumns,
-      enrichmentStudy,
-      enrichmentModel,
-      annotation
-    } = this.props;
+    // const {
+    //   enrichmentResults,
+    //   enrichmentColumns,
+    //   enrichmentStudy,
+    //   enrichmentModel,
+    //   annotation
+    // } = this.props;
 
     if (!this.state.isTestSelected) {
       return (
