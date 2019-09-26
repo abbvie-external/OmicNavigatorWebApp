@@ -2,46 +2,22 @@ import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { Grid, Dimmer, Loader } from 'semantic-ui-react';
 import Breadcrumbs from './Breadcrumbs';
-import ButtonActions from './ButtonActions';
+// import ButtonActions from './ButtonActions';
 // import PlotSVG from './PlotSVG';
 import SplitPane from 'react-split-pane';
 import './SplitPanesContainer.scss';
+import BarcodePlot from './BarcodePlot';
 
 class SplitPanesContainer extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      activeSVGTabIndex: 0,
-      excelVisible: true,
-      pngVisible: true,
-      pdfVisible: true
-      // returningToTable: false,
-    };
-  }
-
-  static defaultProps = {
-    isTestDataLoaded: false
-  };
-
   componentDidMount() {}
 
-  handleSVGTabChange = activeTabIndex => {
-    this.setState({
-      activeSVGTabIndex: activeTabIndex
-    });
-  };
-
   render() {
-    const { enrichmentModel, isTestDataLoaded } = this.props;
-    // const splitPanes = (enrichmentModel === "Timecourse Differential Phosphorylation") ? twoPanes : threePanes;
-    // const SplitPanes = getSplitPanes(enrichmentModel);
-    // const BarcodeStyle = {
-    //   height: '30vw !important'
-    // };
-
-    // const ViolinStyle = {
-    //   width: '33% !important'
-    // };
+    const {
+      enrichmentModel,
+      isTestDataLoaded,
+      barcodeData,
+      barcodeSettings
+    } = this.props;
 
     if (!isTestDataLoaded) {
       return (
@@ -63,10 +39,10 @@ class SplitPanesContainer extends Component {
                   largeScreen={8}
                   widescreen={8}
                 >
-                  <Breadcrumbs
+                  {/* <Breadcrumbs
                     {...this.props}
                     // onNavigateBack={this.tableTransition}
-                  />
+                  /> */}
                 </Grid.Column>
                 <Grid.Column
                   mobile={8}
@@ -74,17 +50,25 @@ class SplitPanesContainer extends Component {
                   largeScreen={8}
                   widescreen={8}
                 >
-                  <ButtonActions {...this.props} {...this.state} />
+                  {/* <ButtonActions {...this.props} {...this.state} /> */}
                 </Grid.Column>
               </Grid.Row>
               <Grid.Row className="SplitPanesContainer">
-                <SplitPane split="horizontal" defaultSize={400}>
+                <SplitPane
+                  split="horizontal"
+                  defaultSize={225}
+                  minSize={200}
+                  maxSize={300}
+                >
                   <div>
-                    <h2>BARCODE Timcecourse</h2>
+                    <BarcodePlot
+                      className="BarcodePlotContainer"
+                      data={barcodeData}
+                      settings={barcodeSettings}
+                    />
                   </div>
-
                   <div>
-                    <h2>SVG PLOTS Timecourse</h2>
+                    <h2>SVG</h2>
                   </div>
                 </SplitPane>
               </Grid.Row>
@@ -102,10 +86,10 @@ class SplitPanesContainer extends Component {
                   largeScreen={8}
                   widescreen={8}
                 >
-                  <Breadcrumbs
+                  {/* <Breadcrumbs
                     {...this.props}
                     // onNavigateBack={this.tableTransition}
-                  />
+                  /> */}
                 </Grid.Column>
                 <Grid.Column
                   mobile={8}
@@ -113,22 +97,35 @@ class SplitPanesContainer extends Component {
                   largeScreen={8}
                   widescreen={8}
                 >
-                  <ButtonActions {...this.props} {...this.state} />
+                  {/* <ButtonActions {...this.props} {...this.state} /> */}
                 </Grid.Column>
               </Grid.Row>
               <Grid.Row className="SplitPanesContainer">
-                <SplitPane split="horizontal" defaultSize={250}>
+                <SplitPane
+                  split="horizontal"
+                  defaultSize={225}
+                  minSize={200}
+                  maxSize={300}
+                >
                   <div>
-                    <h2>BARCODE</h2>
+                    <BarcodePlot
+                      className="BarcodePlotContainer"
+                      data={barcodeData}
+                      settings={barcodeSettings}
+                    />
                   </div>
-
-                  <SplitPane split="vertical" defaultSize={400}>
+                  <SplitPane
+                    split="vertical"
+                    defaultSize={400}
+                    minSize={300}
+                    maxSize={700}
+                  >
                     <div>
                       <h2>VIOLIN</h2>
                     </div>
 
                     <div>
-                      <h2>SVG PLOTS</h2>
+                      <h2>SVG</h2>
                     </div>
                   </SplitPane>
                 </SplitPane>

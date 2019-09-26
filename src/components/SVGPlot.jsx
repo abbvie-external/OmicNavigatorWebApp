@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { Loader, Dimmer, Tab } from 'semantic-ui-react';
-import './PlotSVG.scss';
+import './SVGPlot.scss';
 
-class PlotSVG extends Component {
+class SVGPlot extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -65,4 +65,4 @@ class PlotSVG extends Component {
   }
 }
 
-export default PlotSVG;
+export default SVGPlot;

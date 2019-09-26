@@ -3,6 +3,7 @@ import { withRouter } from 'react-router-dom';
 import { Grid, Tab, Menu } from 'semantic-ui-react';
 import PepplotContainer from './Pepplot';
 import EnrichmentContainer from './Enrichment';
+import { updateUrl } from './UrlControl';
 
 class Tabs extends Component {
   constructor(props) {
@@ -12,22 +13,34 @@ class Tabs extends Component {
     };
   }
 
+  // componentDidMount() {
+  //   const pathname = this.props.location.pathname;
+  //   const enrichment = pathname.includes('enrichment');
+  //   const tab = enrichment ? 'enrichment' : 'pepplot';
+  //   this.props.history.push(tab);
+  //   let index = tab === 'enrichment' ? 3 : 2;
+  //   this.setState({
+  //     activeIndex: index
+  //   });
+  // }
   componentDidMount() {
-    const pathname = this.props.location.pathname;
-    const enrichment = pathname.includes('enrichment');
-    const tab = enrichment ? 'enrichment' : 'pepplot';
-    this.props.history.push(tab);
-    let index = tab === 'enrichment' ? 3 : 2;
-    this.setState({
-      activeIndex: index
-    });
+    updateUrl(this.props, this.state, 'tabInit', this.setTabIndex);
   }
 
-  handleTabChange = (e, { activeIndex }) => {
-    this.setState({ activeIndex });
-    let tab = activeIndex === 3 ? 'enrichment' : 'pepplot';
-    this.props.history.push(tab);
+  setTabIndex = tabIndex => {
+    this.setState({
+      activeIndex: tabIndex
+    });
   };
+
+  handleTabChange = (e, { activeIndex }) => {
+    updateUrl(this.props, this.state, 'tabChange', this.setTabIndex);
+  };
+  // handleTabChange = (e, { activeIndex }) => {
+  //   this.setState({ activeIndex });
+  //   let tab = activeIndex === 3 ? 'enrichment' : 'pepplot';
+  //   this.props.history.push(tab);
+  // };
 
   render() {
     const { activeIndex } = this.state;

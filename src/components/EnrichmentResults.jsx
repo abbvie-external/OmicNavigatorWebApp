@@ -42,7 +42,17 @@ class EnrichmentResults extends Component {
         svg: []
       },
       currentSVGs: [],
-      isTestDataLoaded: false
+      isTestDataLoaded: false,
+      barcodeData: [],
+      barcodeSettings: {
+        lineID: '',
+        statLabel: {},
+        statistic: '',
+        highLabel: {},
+        lowLabel: {},
+        highStat: null,
+        enableBrush: false
+      }
     };
   }
 
@@ -137,7 +147,6 @@ class EnrichmentResults extends Component {
                   return a - b;
                 });
                 xLargest = Math.ceil(sorted[sorted.length - 1]);
-
                 phosphoprotService
                   .getBarcodeData(
                     enrichmentStudy + 'plots',
@@ -159,18 +168,18 @@ class EnrichmentResults extends Component {
   };
 
   showBarcodePlot = (dataItem, barcode, test, largest) => {
-    // this.bData = barcode;
-    // this.bSettings = {
-    //   lineID: "",
-    //   statLabel: barcode[0].statLabel,
-    //   statistic: 'statistic',
-    //   highLabel: barcode[0].highLabel,
-    //   lowLabel: barcode[0].lowLabel,
-    //   highStat: largest,
-    //   enableBrush: true
-    // }
     this.setState({
-      isTestDataLoaded: true
+      isTestDataLoaded: true,
+      barcodeData: barcode,
+      barcodeSettings: {
+        lineID: '',
+        statLabel: barcode[0].statLabel,
+        statistic: 'statistic',
+        highLabel: barcode[0].highLabel,
+        lowLabel: barcode[0].lowLabel,
+        highStat: largest,
+        enableBrush: true
+      }
     });
   };
 

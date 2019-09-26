@@ -8,6 +8,7 @@ import TransitionActive from './TransitionActive';
 import TransitionStill from './TransitionStill';
 import { formatNumberForDisplay, splitValue } from '../helpers';
 // import { phosphoprotService } from '../services/phosphoprot.service';
+import { updateUrl } from './UrlControl';
 import _ from 'lodash';
 import './Enrichment.scss';
 import './Table.scss';
@@ -34,7 +35,9 @@ class EnrichmentContainer extends Component {
     };
   }
 
-  componentDidMount() {}
+  componentDidMount() {
+    // updateUrl(this.props, this.state);
+  }
 
   handleSearchTransition = () => {
     this.setState({
@@ -51,6 +54,7 @@ class EnrichmentContainer extends Component {
       isValidSearchEnrichment: true,
       isTestSelected: false
     });
+    // updateUrl(this.props, this.state);
   };
 
   handleSearchCriteriaChange = changes => {
@@ -282,7 +286,6 @@ class EnrichmentContainer extends Component {
   // };
 
   getView = () => {
-    debugger;
     if (
       this.state.isValidSearchEnrichment &&
       !this.state.isTestSelected &&

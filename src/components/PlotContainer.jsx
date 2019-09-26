@@ -4,7 +4,7 @@ import { Grid, Dimmer, Loader } from 'semantic-ui-react';
 import Breadcrumbs from './Breadcrumbs';
 import ButtonActions from './ButtonActions';
 import PlotAccordion from './PlotAccordion';
-import PlotSVG from './PlotSVG';
+import SVGPlot from './SVGPlot';
 import './PlotContainer.scss';
 
 class PlotContainer extends Component {
@@ -95,7 +95,7 @@ class PlotContainer extends Component {
                 largeScreen={12}
                 widescreen={13}
               >
-                <PlotSVG
+                <SVGPlot
                   {...this.props}
                   {...this.state}
                   onSVGTabChange={this.handleSVGTabChange}

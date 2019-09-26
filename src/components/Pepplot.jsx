@@ -6,6 +6,7 @@ import PepplotResults from './PepplotResults';
 import TransitionStill from './TransitionStill';
 import TransitionActive from './TransitionActive';
 import { formatNumberForDisplay, splitValue } from '../helpers';
+import { updateUrl } from './UrlControl';
 
 import _ from 'lodash';
 import './Pepplot.scss';
@@ -24,7 +25,9 @@ class PepplotContainer extends Component {
     pepplotColumns: []
   };
 
-  componentDidMount() {}
+  componentDidMount() {
+    // updateUrl(this.props, this.state);
+  }
 
   handleSearchTransition = () => {
     this.setState({
@@ -44,6 +47,7 @@ class PepplotContainer extends Component {
       isValidSearchPepplot: true,
       isProteinSelected: false
     });
+    updateUrl(this.props, this.state);
   };
 
   hidePGrid = () => {
