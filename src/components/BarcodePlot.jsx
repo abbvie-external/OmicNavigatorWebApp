@@ -11,6 +11,7 @@ class BarcodePlot extends Component {
       height: null,
       margin: null,
       objs: {},
+      // passed or default chart settings
       settings: {
         axes: null,
         bottomLabel: null,
@@ -47,7 +48,7 @@ class BarcodePlot extends Component {
 
   prepareAndRender() {
     const { settings } = this.state;
-
+    // prepare settings
     let margin = settings.margin;
     let width =
       settings.chartSize.width - settings.margin.left - settings.margin.right;
@@ -72,6 +73,7 @@ class BarcodePlot extends Component {
 
     let xAxis = d3.axisBottom(xScale);
 
+    // prepare chart
     let chartDiv = d3.select('#' + settings.id);
     let svg = chartDiv
       .append('svg')
@@ -128,6 +130,7 @@ class BarcodePlot extends Component {
     let tooltip = g.append('text');
     tooltip.attr('class', 'barcode-tooltip');
 
+    // render barcode plot
     var lines = g
       .selectAll('line.barcode-line')
       .data(settings.data)
@@ -152,6 +155,9 @@ class BarcodePlot extends Component {
       .style('opacity', function(d) {
         return 0.5;
       });
+
+    // setup change events
+
     // .on("mouseover", function(d) {
     //   if (self.brushing == false) {
     //     let toolTipPostition = parseInt(d3.select(this).attr("x1"));
@@ -258,7 +264,6 @@ class BarcodePlot extends Component {
       width: width,
       xScale: xScale
     });
-    debugger;
   }
 
   unhighLight() {

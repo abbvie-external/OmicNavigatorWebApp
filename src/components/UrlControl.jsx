@@ -2,7 +2,6 @@
 
 export function updateUrl(propsParam, stateParam, type, optionalCallback) {
   // const [urlVar, setUrlFunc] = useState("/pepplot");
-  debugger;
   let tab, tabIndex, lastTabIndex;
   // clear url
   propsParam.history.push('');

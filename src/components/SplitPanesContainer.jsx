@@ -6,10 +6,27 @@ import Breadcrumbs from './Breadcrumbs';
 // import PlotSVG from './PlotSVG';
 import SplitPane from 'react-split-pane';
 import './SplitPanesContainer.scss';
+import SVGPlot from './SVGPlot';
 import BarcodePlot from './BarcodePlot';
 
 class SplitPanesContainer extends Component {
+  static defaultProps = {
+    isTestDataLoaded: false
+  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      activeSVGTabIndex: 0
+    };
+  }
+
   componentDidMount() {}
+
+  handleSVGTabChange = activeTabIndex => {
+    this.setState({
+      activeSVGTabIndex: activeTabIndex
+    });
+  };
 
   render() {
     const {
@@ -39,10 +56,10 @@ class SplitPanesContainer extends Component {
                   largeScreen={8}
                   widescreen={8}
                 >
-                  {/* <Breadcrumbs
+                  <Breadcrumbs
                     {...this.props}
                     // onNavigateBack={this.tableTransition}
-                  /> */}
+                  />
                 </Grid.Column>
                 <Grid.Column
                   mobile={8}
@@ -68,7 +85,11 @@ class SplitPanesContainer extends Component {
                     />
                   </div>
                   <div>
-                    <h2>SVG</h2>
+                    <SVGPlot
+                      {...this.props}
+                      {...this.state}
+                      onSVGTabChange={this.handleSVGTabChange}
+                    />
                   </div>
                 </SplitPane>
               </Grid.Row>

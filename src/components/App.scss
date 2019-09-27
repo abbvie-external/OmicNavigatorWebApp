@@ -38,6 +38,7 @@
   }
 
   .ContentContainer {
+    margin-top: -10px !important;
     padding: 0px;  
   
     .LoaderContainer {
@@ -61,15 +62,21 @@
   //   display: none !important;
   // }
 
-  table th:first-child {
+  .QHGrid table tr th:first-child {
     background-color: #FFF !important;
-    padding-top: 0px !important;
     padding-right: 0px !important;
-    padding-bottom: 10px !important;
     padding-left: 0px !important;
   }
 
-  table {
+  .QHGrid table {
     border: none !important;
+  }
+
+  tfoot tr th {
+    border-top: 1px solid grey !important;
+  }
+
+  .QHGrid--body thead tr th {
+    border-bottom: 1px solid grey !important;
   }
 }
