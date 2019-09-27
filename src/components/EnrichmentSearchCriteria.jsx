@@ -10,7 +10,7 @@ class EnrichmentSearchCriteria extends Component {
     tab: 'enrichment',
     enrichmentStudy: '',
     enrichmentModel: '',
-    annotation: '',
+    enrichmentAnnotation: '',
     isValidSearchEnrichment: false,
     isSearching: false
   };
@@ -22,10 +22,10 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentStudyHrefVisible: false,
       enrichmentStudyHref: '',
       enrichmentModels: [],
-      annotations: [],
+      enrichmentAnnotations: [],
       enrichmentStudiesDisabled: false,
       enrichmentModelsDisabled: true,
-      annotationsDisabled: true
+      enrichmentAnnotationsDisabled: true
     };
   }
 
@@ -49,12 +49,12 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentStudyHrefVisible: true,
       enrichmentStudyHref: `${value}.html`,
       enrichmentModelsDisabled: true,
-      annotationsDisabled: true
+      enrichmentAnnotationsDisabled: true
     });
     this.props.onSearchCriteriaChange({
       [name]: value,
       enrichmentModel: '',
-      annotation: ''
+      enrichmentAnnotation: ''
     });
     this.props.onSearchCriteriaReset({
       isValidSearchEnrichment: false
@@ -77,7 +77,7 @@ class EnrichmentSearchCriteria extends Component {
     this.props.onSearchCriteriaChange({
       enrichmentStudy: this.props.enrichmentStudy,
       [name]: value,
-      annotation: ''
+      enrichmentAnnotation: ''
     });
     this.props.onSearchCriteriaReset({
       isValidSearchEnrichment: false
@@ -92,8 +92,8 @@ class EnrichmentSearchCriteria extends Component {
       };
     });
     this.setState({
-      annotationsDisabled: false,
-      annotations: annotationsArr
+      enrichmentAnnotationsDisabled: false,
+      enrichmentAnnotations: annotationsArr
     });
   };
 
@@ -101,7 +101,7 @@ class EnrichmentSearchCriteria extends Component {
     this.setState({
       enrichmentStudiesDisabled: true,
       enrichmentModelsDisabled: true,
-      annotationsDisabled: true
+      enrichmentAnnotationsDisabled: true
     });
     this.props.onSearchCriteriaChange({
       enrichmentStudy: this.props.enrichmentStudy,
@@ -123,7 +123,7 @@ class EnrichmentSearchCriteria extends Component {
         this.setState({
           enrichmentStudiesDisabled: false,
           enrichmentModelsDisabled: false,
-          annotationsDisabled: false
+          enrichmentAnnotationsDisabled: false
         });
         this.props.onEnrichmentSearch({
           enrichmentResults: this.annotationdata
@@ -137,13 +137,17 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentStudyHref,
       enrichmentStudyHrefVisible,
       enrichmentModels,
-      annotations,
+      enrichmentAnnotations,
       enrichmentStudiesDisabled,
       enrichmentModelsDisabled,
-      annotationsDisabled
+      enrichmentAnnotationsDisabled
     } = this.state;
 
-    const { enrichmentStudy, enrichmentModel, annotation } = this.props;
+    const {
+      enrichmentStudy,
+      enrichmentModel,
+      enrichmentAnnotation
+    } = this.props;
 
     const StudyPopupStyle = {
       backgroundColor: '2E2E2E',
@@ -230,12 +234,12 @@ class EnrichmentSearchCriteria extends Component {
         <Form.Field
           control={Select}
           required
-          name="annotation"
-          value={annotation}
-          options={annotations}
+          name="enrichmentAnnotation"
+          value={enrichmentAnnotation}
+          options={enrichmentAnnotations}
           placeholder="Select Database"
           onChange={this.handleAnnotationChange}
-          disabled={annotationsDisabled}
+          disabled={enrichmentAnnotationsDisabled}
           label={{
             children: 'Database',
             htmlFor: 'form-select-control-test'

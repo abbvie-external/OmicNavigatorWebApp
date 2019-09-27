@@ -93,6 +93,7 @@ class Tabs extends Component {
         activeIndex={activeIndex}
         renderActiveOnly={false}
         menu={{
+          stackable: true,
           secondary: true,
           pointing: true,
           inverted: true,

@@ -23,7 +23,7 @@ class EnrichmentResults extends Component {
   static defaultProps = {
     enrichmentStudy: '',
     enrichmentModel: '',
-    annotation: '',
+    enrichmentAnnotation: '',
     enrichmentResults: [],
     enrichmentColumns: [],
     isTestSelected: false
@@ -74,16 +74,16 @@ class EnrichmentResults extends Component {
 
   getTableHelpers = (testSelectedTransitionCb, showBarcodePlotCb) => {
     let addParams = {};
-    addParams.getLink = (enrichmentStudy, annotation, dataItem) => {
+    addParams.getLink = (enrichmentStudy, enrichmentAnnotation, dataItem) => {
       return function() {
         phosphoprotService
-          .getDatabaseInfo(enrichmentStudy + 'plots', annotation)
+          .getDatabaseInfo(enrichmentStudy + 'plots', enrichmentAnnotation)
           .then(annotationDataResponse => {
             const annotationData = JSON.parse(annotationDataResponse);
             dataItem.Annotation = _.find(annotationData, {
               Description: dataItem.Description
             }).Key;
-            const database = annotation;
+            const database = enrichmentAnnotation;
             if (database === 'REACTOME') {
               window.open(
                 'https://reactome.org/content/detail/' + dataItem.Annotation,
@@ -111,7 +111,7 @@ class EnrichmentResults extends Component {
     addParams.barcodeData = (
       enrichmentStudy,
       enrichmentModel,
-      annotation,
+      enrichmentAnnotation,
       dataItem,
       test
     ) => {
@@ -121,7 +121,7 @@ class EnrichmentResults extends Component {
         let imageInfo = { key: '', title: '', svg: [] };
         imageInfo.title = test;
         phosphoprotService
-          .getDatabaseInfo(enrichmentStudy + 'plots', annotation)
+          .getDatabaseInfo(enrichmentStudy + 'plots', enrichmentAnnotation)
           .then(annotationDataResponse => {
             const annotationData = JSON.parse(annotationDataResponse);
             dataItem.Annotation = _.find(annotationData, {
@@ -151,7 +151,7 @@ class EnrichmentResults extends Component {
                   .getBarcodeData(
                     enrichmentStudy + 'plots',
                     enrichmentModel,
-                    annotation,
+                    enrichmentAnnotation,
                     test,
                     dataItem.Annotation
                   )

@@ -22,9 +22,9 @@ export { getField, getFieldValue, typeMap };
 
 class PepplotResults extends Component {
   static defaultProps = {
-    study: '',
-    model: '',
-    test: '',
+    pepplotStudy: '',
+    pepplotModel: '',
+    pepplotTest: '',
     pepplotResults: [],
     pepplotColumns: [],
     isProteinSelected: false
@@ -67,11 +67,11 @@ class PepplotResults extends Component {
       treeDataColumns: [],
       currentSVGs: []
     });
-    let model = this.props.model;
-    let study = this.props.study;
+    let pepplotModel = this.props.pepplotModel;
+    let pepplotStudy = this.props.pepplotStudy;
 
     let plotType = ['splineplot'];
-    switch (model) {
+    switch (pepplotModel) {
       case 'DonorDifferentialPhosphorylation':
         plotType = ['dotplot'];
         break;
@@ -85,14 +85,14 @@ class PepplotResults extends Component {
         plotType = ['splineplot', 'lineplot'];
         break;
       case 'Differential Expression':
-        if (study === '***REMOVED***') {
+        if (pepplotStudy === '***REMOVED***') {
           plotType = ['proteinlineplot'];
         } else {
           plotType = ['proteindotplot'];
         }
         break;
       case 'Differential Phosphorylation':
-        if (study === '***REMOVED***') {
+        if (pepplotStudy === '***REMOVED***') {
           plotType = ['proteinlineplot'];
         } else {
           plotType = ['proteindotplot'];
@@ -102,9 +102,9 @@ class PepplotResults extends Component {
         plotType = ['dotplot'];
     }
 
-    if (model !== 'Differential Expression') {
+    if (pepplotModel !== 'Differential Expression') {
       phosphoprotService
-        .getSiteData(id, study + 'plots')
+        .getSiteData(id, pepplotStudy + 'plots')
         .then(treeDataResponse => {
           this.setState({
             treeDataRaw: treeDataResponse
@@ -132,11 +132,11 @@ class PepplotResults extends Component {
           });
         })
         .then(function() {
-          getPlotCb(id, plotType, study, imageInfo, handleSVGCb);
+          getPlotCb(id, plotType, pepplotStudy, imageInfo, handleSVGCb);
         });
     } else {
       phosphoprotService
-        .getProteinData(id, study + 'plots')
+        .getProteinData(id, pepplotStudy + 'plots')
         .then(proteinDataResponse => {
           this.setState({
             treeDataRaw: proteinDataResponse
@@ -166,18 +166,18 @@ class PepplotResults extends Component {
           });
         })
         .then(function() {
-          getPlotCb(id, plotType, study, imageInfo, handleSVGCb);
+          getPlotCb(id, plotType, pepplotStudy, imageInfo, handleSVGCb);
         });
     }
   };
 
-  getPlot = (id, plotType, study, imageInfo, handleSVGCb) => {
+  getPlot = (id, plotType, pepplotStudy, imageInfo, handleSVGCb) => {
     let currentSVGs = [];
     let heightCalculation = this.calculateHeight;
     let widthCalculation = this.calculateWidth;
     _.forEach(plotType, function(plot, i) {
       phosphoprotService
-        .getPlot(id, plotType[i], study + 'plots')
+        .getPlot(id, plotType[i], pepplotStudy + 'plots')
         .then(svgMarkupObj => {
           let svgMarkup = svgMarkupObj.data;
           svgMarkup = svgMarkup.replace(/id="/g, 'id="' + id + '-' + i + '-');
@@ -250,10 +250,10 @@ class PepplotResults extends Component {
       };
     };
 
-    addParams.showPlot = (model, dataItem) => {
+    addParams.showPlot = (pepplotModel, dataItem) => {
       return function() {
         let imageInfo = { key: '', title: '', svg: [] };
-        switch (model) {
+        switch (pepplotModel) {
           case 'Differential Expression':
             imageInfo.title =
               'Protein Intensity - ' + dataItem.MajorityProteinIDs;

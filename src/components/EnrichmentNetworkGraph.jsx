@@ -11,7 +11,7 @@ class EnrichmentNetworkGraph extends Component {
   static defaultProps = {
     enrichmentStudy: '',
     enrichmentModel: '',
-    annotation: '',
+    enrichmentAnnotation: '',
     enrichmentResults: [],
     enrichmentColumns: [],
     isTestSelected: false
@@ -64,7 +64,7 @@ class EnrichmentNetworkGraph extends Component {
     //   enrichmentColumns,
     //   enrichmentStudy,
     //   enrichmentModel,
-    //   annotation
+    //   enrichmentAnnotation
     // } = this.props;
     var divStyle = {
       marginTop: '100px',

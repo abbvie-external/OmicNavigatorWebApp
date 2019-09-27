@@ -8,7 +8,7 @@ import TransitionActive from './TransitionActive';
 import TransitionStill from './TransitionStill';
 import { formatNumberForDisplay, splitValue } from '../helpers';
 // import { phosphoprotService } from '../services/phosphoprot.service';
-import { updateUrl } from './UrlControl';
+// import { updateUrl } from './UrlControl';
 import _ from 'lodash';
 import './Enrichment.scss';
 import './Table.scss';
@@ -23,7 +23,7 @@ class EnrichmentContainer extends Component {
     this.state = {
       enrichmentStudy: '',
       enrichmentModel: '',
-      annotation: '',
+      enrichmentAnnotation: '',
       isValidSearchEnrichment: false,
       isSearching: false,
       isTestSelected: false,
@@ -61,7 +61,7 @@ class EnrichmentContainer extends Component {
     this.setState({
       enrichmentStudy: changes.enrichmentStudy,
       enrichmentModel: changes.enrichmentModel,
-      annotation: changes.annotation,
+      enrichmentAnnotation: changes.enrichmentAnnotation,
       showNetworkGraph: false
     });
   };
@@ -74,7 +74,11 @@ class EnrichmentContainer extends Component {
 
   getConfigCols = annotationData => {
     const enrResults = annotationData.enrichmentResults;
-    const { enrichmentStudy, enrichmentModel, annotation } = this.state;
+    const {
+      enrichmentStudy,
+      enrichmentModel,
+      enrichmentAnnotation
+    } = this.state;
     let initConfigCols = [];
 
     const TableValuePopupStyle = {
@@ -89,16 +93,16 @@ class EnrichmentContainer extends Component {
 
     let icon = '';
     let iconText = '';
-    if (annotation === 'REACTOME') {
+    if (enrichmentAnnotation === 'REACTOME') {
       icon = 'reactome.jpg';
       iconText = 'Reactome';
-    } else if (annotation.substring(0, 2) === 'GO') {
+    } else if (enrichmentAnnotation.substring(0, 2) === 'GO') {
       icon = 'go.png';
       iconText = 'AmiGO 2';
-    } else if (annotation.substring(0, 4) === 'msig') {
+    } else if (enrichmentAnnotation.substring(0, 4) === 'msig') {
       icon = 'msig.ico';
       iconText = 'GSEA MSigDB';
-    } else if (annotation === 'PSP') {
+    } else if (enrichmentAnnotation === 'PSP') {
       icon = 'phosphosite.ico';
       iconText = 'PhosphoSitePlus';
     }
@@ -158,7 +162,7 @@ class EnrichmentContainer extends Component {
                     className="ExternalSiteIcon"
                     onClick={addParams.getLink(
                       enrichmentStudy,
-                      annotation,
+                      enrichmentAnnotation,
                       item
                     )}
                   />
@@ -226,7 +230,7 @@ class EnrichmentContainer extends Component {
                       onClick={addParams.barcodeData(
                         enrichmentStudy,
                         enrichmentModel,
-                        annotation,
+                        enrichmentAnnotation,
                         item,
                         c
                       )}
@@ -307,12 +311,16 @@ class EnrichmentContainer extends Component {
 
   render() {
     const enrichmentView = this.getView(this.state);
-    const { enrichmentStudy, enrichmentModel, annotation } = this.state;
+    const {
+      enrichmentStudy,
+      enrichmentModel,
+      enrichmentAnnotation
+    } = this.state;
 
     // let networkGraphData = '';
     let networkGraphToggle = '';
     if (
-      annotation === 'GO_CELLULAR_COMPONENT' &&
+      enrichmentAnnotation === 'GO_CELLULAR_COMPONENT' &&
       enrichmentStudy === '***REMOVED***' &&
       enrichmentModel === 'Timecourse Differential Phosphorylation'
     ) {

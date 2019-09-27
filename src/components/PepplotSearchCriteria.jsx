@@ -8,6 +8,9 @@ import _ from 'lodash';
 class PepplotSearchCriteria extends Component {
   static defaultProps = {
     tab: 'pepplot',
+    pepplotStudy: '',
+    pepplotModel: '',
+    pepplotTest: '',
     isValidSearchPepplot: false,
     isSearching: false
   };
@@ -15,17 +18,14 @@ class PepplotSearchCriteria extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      study: '',
-      studies: [],
-      studyHrefVisible: false,
-      studyHref: '',
-      model: '',
-      models: [],
-      test: '',
-      tests: [],
-      studiesDisabled: false,
-      modelsDisabled: true,
-      testsDisabled: true
+      pepplotStudies: [],
+      pepplotStudyHrefVisible: false,
+      pepplotStudyHref: '',
+      pepplotModels: [],
+      pepplotTests: [],
+      pepplotStudiesDisabled: false,
+      pepplotModelsDisabled: true,
+      pepplotTestsDisabled: true
     };
   }
 
@@ -39,20 +39,22 @@ class PepplotSearchCriteria extends Component {
         return { key: study, text: study, value: study };
       });
       this.setState({
-        studies: studiesArr
+        pepplotStudies: studiesArr
       });
     });
   };
 
   handleStudyChange = (evt, { name, value }) => {
     this.setState({
+      pepplotStudyHrefVisible: true,
+      pepplotStudyHref: `${value}.html`,
+      pepplotModelsDisabled: true,
+      pepplotTestsDisabled: true
+    });
+    this.props.onSearchCriteriaChange({
       [name]: value,
-      studyHrefVisible: true,
-      studyHref: `${value}.html`,
-      model: '',
-      test: '',
-      modelsDisabled: true,
-      testsDisabled: true
+      pepplotModel: '',
+      pepplotTest: ''
     });
     this.props.onSearchCriteriaReset({
       isValidSearchPepplot: false
@@ -65,16 +67,17 @@ class PepplotSearchCriteria extends Component {
           return { key: modelName, text: modelName, value: modelName };
         });
         this.setState({
-          modelsDisabled: false,
-          models: modelsArr
+          pepplotModelsDisabled: false,
+          pepplotModels: modelsArr
         });
       });
   };
 
   handleModelChange = (evt, { name, value }) => {
-    this.setState({
-      test: '',
-      [name]: value
+    this.props.onSearchCriteriaChange({
+      pepplotStudy: this.props.pepplotStudy,
+      [name]: value,
+      pepplotTest: ''
     });
     this.props.onSearchCriteriaReset({
       isValidSearchPepplot: false
@@ -83,34 +86,40 @@ class PepplotSearchCriteria extends Component {
       return { key: testName, text: testName, value: testName };
     });
     this.setState({
-      testsDisabled: false,
-      tests: testsArr
+      pepplotTestsDisabled: false,
+      pepplotTests: testsArr
     });
   };
 
   handleTestChange = (evt, { name, value }) => {
     this.setState({
-      [name]: value,
-      studiesDisabled: true,
-      modelsDisabled: true,
-      testsDisabled: true
+      pepplotStudiesDisabled: true,
+      pepplotModelsDisabled: true,
+      pepplotTestsDisabled: true
+    });
+    this.props.onSearchCriteriaChange({
+      pepplotStudy: this.props.pepplotStudy,
+      pepplotModel: this.props.pepplotModel,
+      [name]: value
     });
     this.props.onSearchTransition({
+      [name]: value,
       isSearching: true
     });
     phosphoprotService
-      .getTestData(this.state.model, value, this.state.study + 'plots')
+      .getTestData(
+        this.props.pepplotModel,
+        value,
+        this.props.pepplotStudy + 'plots'
+      )
       .then(dataFromService => {
         this.testdata = dataFromService;
         this.setState({
-          studiesDisabled: false,
-          modelsDisabled: false,
-          testsDisabled: false
+          pepplotStudiesDisabled: false,
+          pepplotModelsDisabled: false,
+          pepplotTestsDisabled: false
         });
         this.props.onPepplotSearch({
-          study: this.state.study,
-          model: this.state.model,
-          test: value,
           pepplotResults: this.testdata
         });
       });
@@ -118,18 +127,17 @@ class PepplotSearchCriteria extends Component {
 
   render() {
     const {
-      study,
-      studies,
-      studyHref,
-      studyHrefVisible,
-      model,
-      models,
-      test,
-      tests,
-      studiesDisabled,
-      modelsDisabled,
-      testsDisabled
+      pepplotStudies,
+      pepplotStudyHref,
+      pepplotStudyHrefVisible,
+      pepplotModels,
+      pepplotTests,
+      pepplotStudiesDisabled,
+      pepplotModelsDisabled,
+      pepplotTestsDisabled
     } = this.state;
+
+    const { pepplotStudy, pepplotModel, pepplotTest } = this.props;
 
     const StudyPopupStyle = {
       backgroundColor: '2E2E2E',
@@ -140,13 +148,17 @@ class PepplotSearchCriteria extends Component {
     };
 
     let studyIcon;
-    let studyName = `${study} Analysis Details`;
+    let studyName = `${pepplotStudy} Analysis Details`;
 
-    if (studyHrefVisible) {
+    if (pepplotStudyHrefVisible) {
       studyIcon = (
         <Popup
           trigger={
-            <a target="_blank" rel="noopener noreferrer" href={studyHref}>
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href={pepplotStudyHref}
+            >
               <Icon
                 name="line graph"
                 size="large"
@@ -191,33 +203,33 @@ class PepplotSearchCriteria extends Component {
           control={Select}
           required
           label="Study"
-          name="study"
-          value={study}
-          options={studies}
+          name="pepplotStudy"
+          value={pepplotStudy}
+          options={pepplotStudies}
           placeholder="Select A Study"
           onChange={this.handleStudyChange}
-          disabled={studiesDisabled}
+          disabled={pepplotStudiesDisabled}
         />
         <Form.Field
           control={Select}
           required
           label="Model"
-          name="model"
-          value={model}
-          options={models}
+          name="pepplotModel"
+          value={pepplotModel}
+          options={pepplotModels}
           placeholder="Select Model"
           onChange={this.handleModelChange}
-          disabled={modelsDisabled}
+          disabled={pepplotModelsDisabled}
         />
         <Form.Field
           control={Select}
           required
-          name="test"
-          value={test}
-          options={tests}
+          name="pepplotTest"
+          value={pepplotTest}
+          options={pepplotTests}
           placeholder="Select Test"
           onChange={this.handleTestChange}
-          disabled={testsDisabled}
+          disabled={pepplotTestsDisabled}
           label={{
             children: 'Test',
             htmlFor: 'form-select-control-test'

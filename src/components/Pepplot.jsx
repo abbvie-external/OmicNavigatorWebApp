@@ -6,7 +6,7 @@ import PepplotResults from './PepplotResults';
 import TransitionStill from './TransitionStill';
 import TransitionActive from './TransitionActive';
 import { formatNumberForDisplay, splitValue } from '../helpers';
-import { updateUrl } from './UrlControl';
+// import { updateUrl } from './UrlControl';
 
 import _ from 'lodash';
 import './Pepplot.scss';
@@ -18,6 +18,9 @@ class PepplotContainer extends Component {
   };
 
   state = {
+    pepplotStudy: '',
+    pepplotModel: '',
+    pepplotTest: '',
     isValidSearchPepplot: false,
     isSearching: false,
     isProteinSelected: false,
@@ -38,16 +41,21 @@ class PepplotContainer extends Component {
   handlePepplotSearch = searchResults => {
     const columns = this.getConfigCols(searchResults);
     this.setState({
-      study: searchResults.study,
-      model: searchResults.model,
-      test: searchResults.test,
       pepplotResults: searchResults.pepplotResults,
       pepplotColumns: columns,
       isSearching: false,
       isValidSearchPepplot: true,
       isProteinSelected: false
     });
-    updateUrl(this.props, this.state);
+    // updateUrl(this.props, this.state);
+  };
+
+  handleSearchCriteriaChange = changes => {
+    this.setState({
+      pepplotStudy: changes.pepplotStudy,
+      pepplotModel: changes.pepplotModel,
+      pepplotTest: changes.pepplotTest
+    });
   };
 
   hidePGrid = () => {
@@ -246,6 +254,8 @@ class PepplotContainer extends Component {
 
   render() {
     const pepplotView = this.getView(this.state);
+    const { pepplotStudy, enrichmentModel, pepplotTest } = this.state;
+
     return (
       <Grid.Row className="PepplotContainer">
         <Grid.Column
@@ -259,6 +269,7 @@ class PepplotContainer extends Component {
             {...this.state}
             onSearchTransition={this.handleSearchTransition}
             onPepplotSearch={this.handlePepplotSearch}
+            onSearchCriteriaChange={this.handleSearchCriteriaChange}
             onSearchCriteriaReset={this.hidePGrid}
           />
         </Grid.Column>

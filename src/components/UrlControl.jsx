@@ -1,7 +1,7 @@
 // import React, { useState, useEffect } from 'react';
 
 export function updateUrl(propsParam, stateParam, type, optionalCallback) {
-  // const [urlVar, setUrlFunc] = useState("/pepplot");
+  // const [urlVar, setUrlFunc] = useState('/pepplot');
   let tab, tabIndex, lastTabIndex;
   // clear url
   propsParam.history.push('');
@@ -17,24 +17,57 @@ export function updateUrl(propsParam, stateParam, type, optionalCallback) {
     tabIndex = enrichment ? 3 : 2;
   }
 
-  const study = stateParam.study || '';
-  const model = stateParam.model || '';
-  const test = stateParam.test || '';
-  // const study = studyQuery.replace(, "")
-  // const model = modelQuery.replace(, "")
-  // const test = testQuery.replace(, "")
+  if (tab === 'pepplot') {
+    const pepplotStudy = stateParam.pepplotStudy || '';
+    const pepplotModel = stateParam.pepplotModel || '';
+    const pepplotTest = stateParam.pepplotTest || '';
+    // const pepplotStudy = pepplotStudyQuery.replace(, '')
+    // const pepplotModel = pepplotModelQuery.replace(, '')
+    // const pepplotTest = pepplotTestQuery.replace(, '')
 
-  if (test !== '') {
-    propsParam.history.push(tab + '/' + study + '/' + model + '/' + test);
-    // } else if (model !== "") {
-    //     propsParam.history.push(tab + '/' + study + '/' + model);
-    // } else if (study !== "") {
-    //     propsParam.history.push(tab + '/' + study);
-  } else if (tab !== '') {
-    propsParam.history.push(tab);
-  }
-  // });
-  // }, [url]);
+    if (pepplotTest !== '') {
+      propsParam.history.push(
+        tab + '/' + pepplotStudy + '/' + pepplotModel + '/' + pepplotTest
+      );
+    } else if (pepplotModel !== '') {
+      propsParam.history.push(tab + '/' + pepplotStudy + '/' + pepplotModel);
+    } else if (pepplotStudy !== '') {
+      propsParam.history.push(tab + '/' + pepplotStudy);
+    } else if (tab !== '') {
+      propsParam.history.push(tab);
+    }
+    // });
+    // }, [url]);
+  } else if (tab === 'enrichment') {
+    const enrichmentStudy = stateParam.enrichmentStudy || '';
+    const enrichmentModel = stateParam.enrichmentModel || '';
+    const enrichmentAnnotation = stateParam.enrichmentAnnotation || '';
+    // const enrichmentStudy = enrichmentStudyQuery.replace(, '')
+    // const enrichmentModel = enrichmentModelQuery.replace(, '')
+    // const enrichmentAnnotation = enrichmentAnnotationQuery.replace(, '')
+
+    if (enrichmentAnnotation !== '') {
+      propsParam.history.push(
+        tab +
+          '/' +
+          enrichmentStudy +
+          '/' +
+          enrichmentModel +
+          '/' +
+          enrichmentAnnotation
+      );
+    } else if (enrichmentModel !== '') {
+      propsParam.history.push(
+        tab + '/' + enrichmentStudy + '/' + enrichmentModel
+      );
+    } else if (enrichmentStudy !== '') {
+      propsParam.history.push(tab + '/' + enrichmentStudy);
+    } else if (tab !== '') {
+      propsParam.history.push(tab);
+    }
+    // });
+    // }, [url]);
+  } else return;
 
   if (optionalCallback !== undefined) {
     optionalCallback(tabIndex);
