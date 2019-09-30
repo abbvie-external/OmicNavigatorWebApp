@@ -24,7 +24,7 @@
   box-shadow: 2px 0px 0px #ff4400 !important;
 }
 
-.ToggleNetworkGraphContainer {
+.UpsetToggleContainer, .ToggleNetworkGraphContainer {
   padding-top: 30px;
   padding-bottom: 15px !important;
   margin-bottom: 15px !important;
@@ -49,4 +49,14 @@
 
 .ui.negative.button {
   background-color: grey !important;
+}
+
+.ToggleNetworkGraphContainer .ui.positive.button {
+  // background-color: #00FF40 !important;
+  background-color: #1678c2 !important;
+}
+
+.UpsetSvgSpan {
+  height: 100% !important;
+  width: 100% !important;
 }

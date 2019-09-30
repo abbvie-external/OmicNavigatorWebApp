@@ -29,9 +29,14 @@ class EnrichmentContainer extends Component {
       isTestSelected: false,
       enrichmentResults: [],
       enrichmentColumns: [],
-      showNetworkGraph: false,
+      enrichmentView: 'table',
       networkDataAvailable: false,
-      networkData: {}
+      networkData: {},
+      useUpsetAnalysis: false,
+      upsetPlotInfo: {
+        title: '',
+        svg: []
+      }
     };
   }
 
@@ -62,7 +67,7 @@ class EnrichmentContainer extends Component {
       enrichmentStudy: changes.enrichmentStudy,
       enrichmentModel: changes.enrichmentModel,
       enrichmentAnnotation: changes.enrichmentAnnotation,
-      showNetworkGraph: false
+      enrichmentView: 'table'
     });
   };
 
@@ -70,6 +75,29 @@ class EnrichmentContainer extends Component {
     this.setState({
       isValidSearchEnrichment: false
     });
+  };
+
+  handleUpsetPlot = upsetPlotResults => {
+    debugger;
+    this.setState({
+      upsetPlotInfo: {
+        title: upsetPlotResults.svgInfo.plotType,
+        svg: upsetPlotResults.svgInfo.svg
+      },
+      enrichmentView: 'upset'
+    });
+  };
+
+  handleUpsetAnalysis = changeBoolean => {
+    debugger;
+    this.setState({
+      useUpsetAnalysis: changeBoolean
+    });
+    if (changeBoolean === false) {
+      this.setState({
+        enrichmentView: 'table'
+      });
+    }
   };
 
   getConfigCols = annotationData => {
@@ -272,10 +300,10 @@ class EnrichmentContainer extends Component {
     return configCols;
   };
 
-  handleNetworkGraphChange = choice => {
+  handleEnrichmentViewChange = choice => {
     return evt => {
       this.setState({
-        showNetworkGraph: choice
+        enrichmentView: choice
       });
     };
   };
@@ -294,16 +322,28 @@ class EnrichmentContainer extends Component {
       this.state.isValidSearchEnrichment &&
       !this.state.isTestSelected &&
       !this.state.isSearching &&
-      !this.state.showNetworkGraph
+      this.state.enrichmentView === 'table'
     ) {
       return <EnrichmentResults {...this.props} {...this.state} />;
     } else if (
       this.state.isValidSearchEnrichment &&
       !this.state.isTestSelected &&
       !this.state.isSearching &&
-      this.state.showNetworkGraph
+      this.state.enrichmentView === 'network'
     ) {
       return <EnrichmentNetworkGraph {...this.props} {...this.state} />;
+    } else if (
+      this.state.isValidSearchEnrichment &&
+      !this.state.isTestSelected &&
+      !this.state.isSearching &&
+      this.state.enrichmentView === 'upset'
+    ) {
+      return (
+        <div
+          className="UpsetSvgSpan"
+          dangerouslySetInnerHTML={{ __html: this.state.upsetPlotInfo.svg }}
+        ></div>
+      );
     } else if (this.state.isSearching) {
       return <TransitionActive />;
     } else return <TransitionStill />;
@@ -314,19 +354,54 @@ class EnrichmentContainer extends Component {
     const {
       enrichmentStudy,
       enrichmentModel,
-      enrichmentAnnotation
+      enrichmentAnnotation,
+      useUpsetAnalysis
     } = this.state;
 
     // let networkGraphData = '';
-    let networkGraphToggle = '';
+    let networkViewButton = '';
     if (
       enrichmentAnnotation === 'GO_CELLULAR_COMPONENT' &&
       enrichmentStudy === '***REMOVED***' &&
       enrichmentModel === 'Timecourse Differential Phosphorylation'
     ) {
-      // networkGraphData = this.getNetworkData();
-      // networkData will be used for Network Graph
-      networkGraphToggle = (
+      networkViewButton = (
+        <React.Fragment>
+          <Button.Or className="OrCircle" />
+          <Button
+            type="button"
+            className="NetworkGraphButton"
+            positive={this.state.enrichmentView === 'network'}
+            onClick={this.handleEnrichmentViewChange('network')}
+          >
+            Network Graph
+          </Button>
+        </React.Fragment>
+      );
+    }
+
+    let upsetPlotButton = '';
+    if (useUpsetAnalysis === true) {
+      upsetPlotButton = (
+        <React.Fragment>
+          <Button.Or className="OrCircle" />
+          <Button
+            type="button"
+            className="NetworkGraphButton"
+            positive={this.state.enrichmentView === 'upset'}
+            onClick={this.handleEnrichmentViewChange('upset')}
+          >
+            Upset Plot
+          </Button>
+        </React.Fragment>
+      );
+    }
+
+    // networkGraphData = this.getNetworkData();
+    // networkData will be used for Network Graph
+    let enrichmentViewToggle = '';
+    if (this.state.isValidSearchEnrichment) {
+      enrichmentViewToggle = (
         <div className="ToggleNetworkGraphContainer">
           <Divider />
           <span className="ToggleNetworkGraphText">VIEW</span>
@@ -334,21 +409,14 @@ class EnrichmentContainer extends Component {
             <Button.Group className="">
               <Button
                 type="button"
-                className="NetworkTableButton"
-                positive={this.state.showNetworkGraph === false}
-                onClick={this.handleNetworkGraphChange(false)}
+                className="NetworkGraphButton"
+                positive={this.state.enrichmentView === 'table'}
+                onClick={this.handleEnrichmentViewChange('table')}
               >
                 Table
               </Button>
-              <Button.Or className="OrCircle" />
-              <Button
-                type="button"
-                className="NetworkGraphButton"
-                positive={this.state.showNetworkGraph === true}
-                onClick={this.handleNetworkGraphChange(true)}
-              >
-                Network Graph
-              </Button>
+              {upsetPlotButton}
+              {networkViewButton}
             </Button.Group>
           </span>
         </div>
@@ -370,8 +438,10 @@ class EnrichmentContainer extends Component {
             onEnrichmentSearch={this.handleEnrichmentSearch}
             onSearchCriteriaChange={this.handleSearchCriteriaChange}
             onSearchCriteriaReset={this.hideEGrid}
+            onGetUpsetPlot={this.handleUpsetPlot}
+            onUseUpsetAnalysis={this.handleUpsetAnalysis}
           />
-          {networkGraphToggle}
+          {enrichmentViewToggle}
         </Grid.Column>
         <Grid.Column
           className="ContentContainer"

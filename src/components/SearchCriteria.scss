@@ -1,18 +1,18 @@
 @media (min-width: 1px) and (max-width: 374px) {
   .SidebarContainer {
-    height: 45vh;
+    height: 70vh;
   }
 }
 
 @media (min-width: 375px) and (max-width: 767px) {
   .SidebarContainer {
-    height: 40vh;
+    height: 60vh;
   }
 }
 
 @media (min-width: 768px) and (max-width: 1199px) {
   .SidebarContainer {
-    height: 35vh;
+    height: 80vh;
   }
 }
 
@@ -60,4 +60,37 @@
     i.inverted.circular.icon {
       background-color: #FF4400 !important;
     }
+
+    .UpsetToggleContainer .ui.positive.button {
+      // background-color: #00FF40 !important;
+      background-color: #21BA45 !important;
+    }
+
+    .UpsetToggleText {
+      font-weight: bold;
+      font-stretch: condensed !important;
+      margin-top: 0px !important;
+      padding-top: 10px !important;
+    }
+
+    .UpsetToggle {
+      float: right;
+      margin-right: 20px;
+    }
+ 
+    .UpsetIconImg {
+      height: 35px !important;
+      margin-right: 10px !important;
+    }
+    
+    .UpsetFiltersContainer {
+      padding-top: 30px;
+      padding-bottom: 15px !important;
+      margin-bottom: 15px !important;
+      margin-left: 20px;    
+    }
+
+    // .UpsetFilters {
+    //   margin-left: 20px;
+    // }
   }

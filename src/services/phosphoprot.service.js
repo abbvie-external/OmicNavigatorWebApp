@@ -138,6 +138,39 @@ class PhosphoprotService {
       console.error(error);
     }
   }
+
+  async getUpsetEnrichmentData(
+    testCategory,
+    mustTest,
+    notTest,
+    study,
+    sigValue,
+    annotation
+  ) {
+    this.setUrl();
+    const promise = this.ocpuDataCall('getEnrichmentIntersection', {
+      testCategory: testCategory,
+      mustTests: mustTest,
+      notTests: notTest,
+      study: study,
+      sigValue: sigValue,
+      annotation: annotation
+    });
+    const dataFromPromise = await promise;
+    return dataFromPromise;
+  }
+
+  async getEnrichmentUpSetPlot(sigVal, testCategory, study, annotation) {
+    this.setUrl();
+    const promise = this.ocpuPlotCall('EnrichmentUpsetPlot', {
+      sigValue: sigVal,
+      testCategory: testCategory,
+      study: study,
+      annotation: annotation
+    });
+    const svgMarkupFromPromise = await promise;
+    return svgMarkupFromPromise;
+  }
 }
 
 export const phosphoprotService = new PhosphoprotService();
