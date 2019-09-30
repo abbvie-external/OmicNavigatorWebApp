@@ -83,8 +83,8 @@ class EnrichmentContainer extends Component {
       upsetPlotInfo: {
         title: upsetPlotResults.svgInfo.plotType,
         svg: upsetPlotResults.svgInfo.svg
-      },
-      enrichmentView: 'upset'
+      }
+      // enrichmentView: 'upset'
     });
   };
 

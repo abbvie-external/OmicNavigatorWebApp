@@ -43,9 +43,9 @@
   margin-right: 20px;
 }
 
-.ui.positive.button {
-  background-color: #ff4400 !important;
-}
+// .ui.positive.button {
+//   background-color: #ff4400 !important;
+// }
 
 .ui.negative.button {
   background-color: grey !important;
@@ -57,6 +57,11 @@
 }
 
 .UpsetSvgSpan {
+  padding-top: 25px !important;
   height: 100% !important;
   width: 100% !important;
+}
+
+.UpsetIconImg {
+  height: 42px !important;
 }

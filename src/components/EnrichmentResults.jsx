@@ -189,9 +189,29 @@ class EnrichmentResults extends Component {
     });
   };
 
-  render() {
-    const { enrichmentResults, enrichmentColumns } = this.props;
+  getUpsetIcon = useUpsetAnalysis => {
+    if (useUpsetAnalysis === false) {
+      return (
+        <img className="UpsetIconImg" src="venndiagram.png" alt="Upset Icon" />
+      );
+    } else
+      return (
+        <img
+          className="UpsetIconImg"
+          src="venndiagramChosenAltGreen.png"
+          alt="Upset Icon"
+        />
+      );
+  };
 
+  render() {
+    const {
+      enrichmentResults,
+      enrichmentColumns,
+      useUpsetAnalysis
+    } = this.props;
+    debugger;
+    const upsetIconTableHeader = this.getUpsetIcon(useUpsetAnalysis);
     // const rows = this.props.enrichmentResults.length;
     const quickViews = [];
     const additionalTemplateInfo = this.getTableHelpers(
@@ -214,7 +234,9 @@ class EnrichmentResults extends Component {
             disableColumnVisibilityToggle
             height="75vh"
             additionalTemplateInfo={additionalTemplateInfo}
-            headerAttributes={<ButtonActions />}
+            // headerAttributes={upsetIconTableHeader}
+            useUpset={useUpsetAnalysis}
+            extraHeaderItem={upsetIconTableHeader}
           />
         </div>
       );

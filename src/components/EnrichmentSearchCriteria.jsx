@@ -27,7 +27,7 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentStudiesDisabled: false,
       enrichmentModelsDisabled: true,
       enrichmentAnnotationsDisabled: true,
-      upsetIcon: 'venndiagram.png',
+      // upsetIcon: 'venndiagram.png',
       sigValue: 0.05,
       uData: [],
       uAnchor: '',
@@ -151,9 +151,9 @@ class EnrichmentSearchCriteria extends Component {
   handleUpsetToggle = choice => {
     return evt => {
       if (choice === true) {
-        this.setState({
-          upsetIcon: 'venndiagramChosenAltGreen.png'
-        });
+        // this.setState({
+        //   upsetIcon: 'venndiagramChosenAltGreen.png'
+        // });
         this.props.onUseUpsetAnalysis(true);
         this.updateQueryData({
           must: this.state.uSettings.must,
@@ -161,9 +161,9 @@ class EnrichmentSearchCriteria extends Component {
           sig: this.state.sigValue
         });
       } else {
-        this.setState({
-          upsetIcon: 'venndiagram.png'
-        });
+        // this.setState({
+        //   upsetIcon: 'venndiagram.png'
+        // });
         this.props.onUseUpsetAnalysis(false);
         // this.handleAnnotationChange(this.state.enrichmentAnnotation)
       }
@@ -285,8 +285,8 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentAnnotations,
       enrichmentStudiesDisabled,
       enrichmentModelsDisabled,
-      enrichmentAnnotationsDisabled,
-      upsetIcon
+      enrichmentAnnotationsDisabled
+      // upsetIcon
     } = this.state;
 
     const {
@@ -360,7 +360,7 @@ class EnrichmentSearchCriteria extends Component {
           <span className="UpsetToggleText">ANALYSIS</span>
           <span className="UpsetToggle">
             <Button.Group className="">
-              <img className="UpsetIconImg" src={upsetIcon} alt="Upset Icon" />
+              {/* <img className="UpsetIconImg" src={upsetIcon} alt="Upset Icon" /> */}
               <Button
                 type="button"
                 className="UpsetToggleButton"
