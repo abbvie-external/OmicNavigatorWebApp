@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-import { Header, Segment, Icon } from 'semantic-ui-react';
+import { Header, Segment, Icon, Popup } from 'semantic-ui-react';
 // import { phosphoprotService } from '../services/phosphoprot.service';
 import { withRouter } from 'react-router-dom';
 // import ButtonActions from './ButtonActions';
 import SplitPanesContainer from './SplitPanesContainer';
 import SearchingAlt from './SearchingAlt';
+import './EnrichmentNetworkGraph.scss';
 // import _ from 'lodash';
 
 class EnrichmentNetworkGraph extends Component {
@@ -66,6 +67,62 @@ class EnrichmentNetworkGraph extends Component {
     //   enrichmentModel,
     //   enrichmentAnnotation
     // } = this.props;
+
+    const IconPopupStyle = {
+      backgroundColor: '2E2E2E',
+      borderBottom: '2px solid #FF4400',
+      color: '#FFF',
+      padding: '1em',
+      maxWidth: '50vw',
+      fontSize: '13px',
+      wordBreak: 'break-all'
+    };
+
+    const enrichmentViewToggle = (
+      <div className="NetworkGraphToggle">
+        <Popup
+          trigger={
+            <Icon
+              name="table"
+              size="large"
+              type="button"
+              bordered
+              className=""
+              inverted={this.props.enrichmentView === 'table'}
+              onClick={this.props.onEnrichmentViewChange({
+                enrichmentView: 'table'
+              })}
+            />
+          }
+          style={IconPopupStyle}
+          inverted
+          basic
+          position="bottom left"
+          content="View Table"
+        />
+        <Popup
+          trigger={
+            <Icon
+              name="chart pie"
+              size="large"
+              type="button"
+              bordered
+              className=""
+              inverted={this.props.enrichmentView === 'network'}
+              onClick={this.props.onEnrichmentViewChange({
+                enrichmentView: 'network'
+              })}
+            />
+          }
+          style={IconPopupStyle}
+          inverted
+          basic
+          position="bottom left"
+          content="View Network Graph"
+        />
+      </div>
+    );
+
     var divStyle = {
       marginTop: '100px',
       marginLeft: '200px'
@@ -80,7 +137,8 @@ class EnrichmentNetworkGraph extends Component {
     };
     if (!this.state.isTestSelected) {
       return (
-        <React.Fragment>
+        <div className="NetworkGraphContainer">
+          {enrichmentViewToggle}
           <div style={divStyle}>
             <Icon
               size="big"
@@ -189,7 +247,7 @@ class EnrichmentNetworkGraph extends Component {
             <Icon size="small" color="black" name="chart pie" float="left" />
             <Icon size="big" name="chart pie" />
           </div>
-        </React.Fragment>
+        </div>
       );
     } else if (this.state.isTestSelected && !this.state.isTestDataLoaded) {
       return (

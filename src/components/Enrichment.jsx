@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Grid, Popup, Button, Divider } from 'semantic-ui-react';
+import { Grid, Popup, Button, Divider, Icon } from 'semantic-ui-react';
 import { withRouter } from 'react-router-dom';
 import EnrichmentSearchCriteria from './EnrichmentSearchCriteria';
 import EnrichmentNetworkGraph from './EnrichmentNetworkGraph';
@@ -20,6 +20,7 @@ class EnrichmentContainer extends Component {
 
   constructor(props) {
     super(props);
+    this.child = React.createRef();
     this.state = {
       enrichmentStudy: '',
       enrichmentModel: '',
@@ -29,7 +30,7 @@ class EnrichmentContainer extends Component {
       isTestSelected: false,
       enrichmentResults: [],
       enrichmentColumns: [],
-      enrichmentView: 'table',
+      enrichmentView: '',
       networkDataAvailable: false,
       networkData: {},
       useUpsetAnalysis: false,
@@ -78,7 +79,6 @@ class EnrichmentContainer extends Component {
   };
 
   handleUpsetPlot = upsetPlotResults => {
-    debugger;
     this.setState({
       upsetPlotInfo: {
         title: upsetPlotResults.svgInfo.plotType,
@@ -89,7 +89,6 @@ class EnrichmentContainer extends Component {
   };
 
   handleUpsetAnalysis = changeBoolean => {
-    debugger;
     this.setState({
       useUpsetAnalysis: changeBoolean
     });
@@ -303,7 +302,7 @@ class EnrichmentContainer extends Component {
   handleEnrichmentViewChange = choice => {
     return evt => {
       this.setState({
-        enrichmentView: choice
+        enrichmentView: choice.enrichmentView
       });
     };
   };
@@ -324,14 +323,26 @@ class EnrichmentContainer extends Component {
       !this.state.isSearching &&
       this.state.enrichmentView === 'table'
     ) {
-      return <EnrichmentResults {...this.props} {...this.state} />;
+      return (
+        <EnrichmentResults
+          {...this.props}
+          {...this.state}
+          onEnrichmentViewChange={this.handleEnrichmentViewChange}
+        />
+      );
     } else if (
       this.state.isValidSearchEnrichment &&
       !this.state.isTestSelected &&
       !this.state.isSearching &&
       this.state.enrichmentView === 'network'
     ) {
-      return <EnrichmentNetworkGraph {...this.props} {...this.state} />;
+      return (
+        <EnrichmentNetworkGraph
+          {...this.props}
+          {...this.state}
+          onEnrichmentViewChange={this.handleEnrichmentViewChange}
+        />
+      );
     } else if (
       this.state.isValidSearchEnrichment &&
       !this.state.isTestSelected &&
@@ -358,28 +369,6 @@ class EnrichmentContainer extends Component {
       useUpsetAnalysis
     } = this.state;
 
-    // let networkGraphData = '';
-    let networkViewButton = '';
-    if (
-      enrichmentAnnotation === 'GO_CELLULAR_COMPONENT' &&
-      enrichmentStudy === '***REMOVED***' &&
-      enrichmentModel === 'Timecourse Differential Phosphorylation'
-    ) {
-      networkViewButton = (
-        <React.Fragment>
-          <Button.Or className="OrCircle" />
-          <Button
-            type="button"
-            className="NetworkGraphButton"
-            positive={this.state.enrichmentView === 'network'}
-            onClick={this.handleEnrichmentViewChange('network')}
-          >
-            Network Graph
-          </Button>
-        </React.Fragment>
-      );
-    }
-
     let upsetPlotButton = '';
     if (useUpsetAnalysis === true) {
       upsetPlotButton = (
@@ -399,29 +388,6 @@ class EnrichmentContainer extends Component {
 
     // networkGraphData = this.getNetworkData();
     // networkData will be used for Network Graph
-    let enrichmentViewToggle = '';
-    if (this.state.isValidSearchEnrichment) {
-      enrichmentViewToggle = (
-        <div className="ToggleNetworkGraphContainer">
-          <Divider />
-          <span className="ToggleNetworkGraphText">VIEW</span>
-          <span className="ToggleNetworkGraph">
-            <Button.Group className="">
-              <Button
-                type="button"
-                className="NetworkGraphButton"
-                positive={this.state.enrichmentView === 'table'}
-                onClick={this.handleEnrichmentViewChange('table')}
-              >
-                Table
-              </Button>
-              {upsetPlotButton}
-              {networkViewButton}
-            </Button.Group>
-          </span>
-        </div>
-      );
-    }
 
     return (
       <Grid.Row className="EnrichmentContainer">
@@ -441,7 +407,6 @@ class EnrichmentContainer extends Component {
             onGetUpsetPlot={this.handleUpsetPlot}
             onUseUpsetAnalysis={this.handleUpsetAnalysis}
           />
-          {enrichmentViewToggle}
         </Grid.Column>
         <Grid.Column
           className="ContentContainer"

@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
+import { Grid, Popup, Slider, Button, Icon } from 'semantic-ui-react';
 import { phosphoprotService } from '../services/phosphoprot.service';
 import { withRouter } from 'react-router-dom';
 import ButtonActions from './ButtonActions';
 import SplitPanesContainer from './SplitPanesContainer';
 import SearchingAlt from './SearchingAlt';
+import './EnrichmentResults.scss';
 import _ from 'lodash';
 
 import QHGrid from '../utility/QHGrid';
@@ -26,7 +28,8 @@ class EnrichmentResults extends Component {
     enrichmentAnnotation: '',
     enrichmentResults: [],
     enrichmentColumns: [],
-    isTestSelected: false
+    isTestSelected: false,
+    enrichmentView: 'table'
   };
 
   constructor(props) {
@@ -204,13 +207,20 @@ class EnrichmentResults extends Component {
       );
   };
 
+  // enrichmentViewChange(choice) {
+  //   return evt => {
+  //     this.props.onEnrichmentViewChange({
+  //       enrichmentView: choice
+  //     });
+  //   };
+  // };
+
   render() {
     const {
       enrichmentResults,
       enrichmentColumns,
       useUpsetAnalysis
     } = this.props;
-    debugger;
     const upsetIconTableHeader = this.getUpsetIcon(useUpsetAnalysis);
     // const rows = this.props.enrichmentResults.length;
     const quickViews = [];
@@ -218,9 +228,66 @@ class EnrichmentResults extends Component {
       this.testSelectedTransition,
       this.showBarcodePlot
     );
+
+    const IconPopupStyle = {
+      backgroundColor: '2E2E2E',
+      borderBottom: '2px solid #FF4400',
+      color: '#FFF',
+      padding: '1em',
+      maxWidth: '50vw',
+      fontSize: '13px',
+      wordBreak: 'break-all'
+    };
+
+    const enrichmentViewToggle = (
+      <div className="TableVsNetworkToggle">
+        <Popup
+          trigger={
+            <Icon
+              name="table"
+              size="large"
+              type="button"
+              bordered
+              className=""
+              inverted={this.props.enrichmentView === 'table'}
+              onClick={this.props.onEnrichmentViewChange({
+                enrichmentView: 'table'
+              })}
+            />
+          }
+          style={IconPopupStyle}
+          inverted
+          basic
+          position="bottom left"
+          content="View Table"
+        />
+        <Popup
+          trigger={
+            <Icon
+              name="chart pie"
+              size="large"
+              type="button"
+              bordered
+              className=""
+              inverted={this.props.enrichmentView === 'network'}
+              onClick={this.props.onEnrichmentViewChange({
+                enrichmentView: 'network'
+              })}
+            />
+          }
+          style={IconPopupStyle}
+          inverted
+          basic
+          position="bottom left"
+          content="View Network Graph"
+        />
+      </div>
+    );
+
     if (!this.state.isTestSelected) {
       return (
         <div>
+          {enrichmentViewToggle}
           <EZGrid
             data={enrichmentResults}
             columnsConfig={enrichmentColumns}
@@ -234,9 +301,7 @@ class EnrichmentResults extends Component {
             disableColumnVisibilityToggle
             height="75vh"
             additionalTemplateInfo={additionalTemplateInfo}
-            // headerAttributes={upsetIconTableHeader}
-            useUpset={useUpsetAnalysis}
-            extraHeaderItem={upsetIconTableHeader}
+            // extraHeaderItem={enrichmentViewToggle}
           />
         </div>
       );

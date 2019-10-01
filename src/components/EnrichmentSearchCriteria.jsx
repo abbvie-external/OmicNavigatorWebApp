@@ -27,7 +27,7 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentStudiesDisabled: false,
       enrichmentModelsDisabled: true,
       enrichmentAnnotationsDisabled: true,
-      // upsetIcon: 'venndiagram.png',
+      upsetIcon: 'venndiagram.png',
       sigValue: 0.05,
       uData: [],
       uAnchor: '',
@@ -148,12 +148,12 @@ class EnrichmentSearchCriteria extends Component {
       });
   };
 
-  handleUpsetToggle = choice => {
+  handleUpsetToggle = () => {
     return evt => {
-      if (choice === true) {
-        // this.setState({
-        //   upsetIcon: 'venndiagramChosenAltGreen.png'
-        // });
+      if (this.state.upsetIcon === 'venndiagram.png') {
+        this.setState({
+          upsetIcon: 'venndiagramChosenAltGreen.png'
+        });
         this.props.onUseUpsetAnalysis(true);
         this.updateQueryData({
           must: this.state.uSettings.must,
@@ -161,13 +161,52 @@ class EnrichmentSearchCriteria extends Component {
           sig: this.state.sigValue
         });
       } else {
-        // this.setState({
-        //   upsetIcon: 'venndiagram.png'
-        // });
+        this.setState({
+          upsetIcon: 'venndiagram.png'
+        });
         this.props.onUseUpsetAnalysis(false);
-        // this.handleAnnotationChange(this.state.enrichmentAnnotation)
+        const enrichmentAnnotationName = 'enrichmentAnnotation';
+        const enrichmentAnnotationVar = this.props.enrichmentAnnotation;
+        this.upsetTriggeredAnnotationChange(
+          enrichmentAnnotationName,
+          enrichmentAnnotationVar
+        );
       }
     };
+  };
+
+  upsetTriggeredAnnotationChange = (name, value) => {
+    this.setState({
+      enrichmentStudiesDisabled: true,
+      enrichmentModelsDisabled: true,
+      enrichmentAnnotationsDisabled: true
+    });
+    this.props.onSearchCriteriaChange({
+      enrichmentStudy: this.props.enrichmentStudy,
+      enrichmentModel: this.props.enrichmentModel,
+      [name]: value
+    });
+    this.props.onSearchTransition({
+      [name]: value,
+      isSearching: true
+    });
+    phosphoprotService
+      .getAnnotationData(
+        this.props.enrichmentModel,
+        value,
+        this.props.enrichmentStudy + 'plots'
+      )
+      .then(dataFromService => {
+        this.annotationdata = dataFromService;
+        this.setState({
+          enrichmentStudiesDisabled: false,
+          enrichmentModelsDisabled: false,
+          enrichmentAnnotationsDisabled: false
+        });
+        this.props.onEnrichmentSearch({
+          enrichmentResults: this.annotationdata
+        });
+      });
   };
 
   updateQueryData(e) {
@@ -285,8 +324,8 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentAnnotations,
       enrichmentStudiesDisabled,
       enrichmentModelsDisabled,
-      enrichmentAnnotationsDisabled
-      // upsetIcon
+      enrichmentAnnotationsDisabled,
+      upsetIcon
     } = this.state;
 
     const {
@@ -357,28 +396,23 @@ class EnrichmentSearchCriteria extends Component {
       upsetToggle = (
         <div className="UpsetToggleContainer">
           {/* <Divider /> */}
-          <span className="UpsetToggleText">ANALYSIS</span>
-          <span className="UpsetToggle">
-            <Button.Group className="">
-              {/* <img className="UpsetIconImg" src={upsetIcon} alt="Upset Icon" /> */}
-              <Button
-                type="button"
-                className="UpsetToggleButton"
-                positive={useUpsetAnalysis === false}
-                onClick={this.handleUpsetToggle(false)}
-              >
-                Single Test
-              </Button>
-              <Button.Or className="OrCircle" />
-              <Button
-                type="button"
-                className="UpsetToggleButton"
-                positive={useUpsetAnalysis === true}
-                onClick={this.handleUpsetToggle(true)}
-              >
-                Multi-Set
-              </Button>
-            </Button.Group>
+          {/* <span className="UpsetToggleText">ANALYSIS</span> */}
+          <span className="">
+            <Popup
+              trigger={
+                <img
+                  className="UpsetIconImg"
+                  src={upsetIcon}
+                  alt="Upset Icon"
+                  onClick={this.handleUpsetToggle()}
+                />
+              }
+              style={StudyPopupStyle}
+              basic
+              inverted
+              position="right center"
+              content="Set Analysis"
+            />
           </span>
         </div>
       );
