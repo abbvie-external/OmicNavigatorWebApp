@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Header, Segment, Icon, Popup } from 'semantic-ui-react';
+import { Icon, Popup } from 'semantic-ui-react';
 // import { phosphoprotService } from '../services/phosphoprot.service';
 import { withRouter } from 'react-router-dom';
 // import ButtonActions from './ButtonActions';

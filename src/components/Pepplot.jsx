@@ -254,7 +254,6 @@ class PepplotContainer extends Component {
 
   render() {
     const pepplotView = this.getView(this.state);
-    const { pepplotStudy, enrichmentModel, pepplotTest } = this.state;
 
     return (
       <Grid.Row className="PepplotContainer">

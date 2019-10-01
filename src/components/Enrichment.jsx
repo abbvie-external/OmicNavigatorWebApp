@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Grid, Popup, Button, Divider, Icon } from 'semantic-ui-react';
+import { Grid, Popup } from 'semantic-ui-react';
 import { withRouter } from 'react-router-dom';
 import EnrichmentSearchCriteria from './EnrichmentSearchCriteria';
 import EnrichmentNetworkGraph from './EnrichmentNetworkGraph';
@@ -20,7 +20,6 @@ class EnrichmentContainer extends Component {
 
   constructor(props) {
     super(props);
-    this.child = React.createRef();
     this.state = {
       enrichmentStudy: '',
       enrichmentModel: '',
@@ -33,11 +32,11 @@ class EnrichmentContainer extends Component {
       enrichmentView: '',
       networkDataAvailable: false,
       networkData: {},
-      useUpsetAnalysis: false,
       upsetPlotInfo: {
         title: '',
         svg: []
-      }
+      },
+      upsetPlotAvailable: false
     };
   }
 
@@ -83,20 +82,9 @@ class EnrichmentContainer extends Component {
       upsetPlotInfo: {
         title: upsetPlotResults.svgInfo.plotType,
         svg: upsetPlotResults.svgInfo.svg
-      }
-      // enrichmentView: 'upset'
+      },
+      upsetPlotAvailable: true
     });
-  };
-
-  handleUpsetAnalysis = changeBoolean => {
-    this.setState({
-      useUpsetAnalysis: changeBoolean
-    });
-    if (changeBoolean === false) {
-      this.setState({
-        enrichmentView: 'table'
-      });
-    }
   };
 
   getConfigCols = annotationData => {
@@ -362,29 +350,6 @@ class EnrichmentContainer extends Component {
 
   render() {
     const enrichmentView = this.getView(this.state);
-    const {
-      enrichmentStudy,
-      enrichmentModel,
-      enrichmentAnnotation,
-      useUpsetAnalysis
-    } = this.state;
-
-    let upsetPlotButton = '';
-    if (useUpsetAnalysis === true) {
-      upsetPlotButton = (
-        <React.Fragment>
-          <Button.Or className="OrCircle" />
-          <Button
-            type="button"
-            className="NetworkGraphButton"
-            positive={this.state.enrichmentView === 'upset'}
-            onClick={this.handleEnrichmentViewChange('upset')}
-          >
-            Upset Plot
-          </Button>
-        </React.Fragment>
-      );
-    }
 
     // networkGraphData = this.getNetworkData();
     // networkData will be used for Network Graph
@@ -405,7 +370,6 @@ class EnrichmentContainer extends Component {
             onSearchCriteriaChange={this.handleSearchCriteriaChange}
             onSearchCriteriaReset={this.hideEGrid}
             onGetUpsetPlot={this.handleUpsetPlot}
-            onUseUpsetAnalysis={this.handleUpsetAnalysis}
           />
         </Grid.Column>
         <Grid.Column

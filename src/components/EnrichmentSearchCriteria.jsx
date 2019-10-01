@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import { Form, Select, Icon, Popup, Button } from 'semantic-ui-react';
+import { Form, Select, Icon, Popup } from 'semantic-ui-react';
 import './SearchCriteria.scss';
 import { phosphoprotService } from '../services/phosphoprot.service';
 import DOMPurify from 'dompurify';
@@ -13,7 +13,8 @@ class EnrichmentSearchCriteria extends Component {
     enrichmentModel: '',
     enrichmentAnnotation: '',
     isValidSearchEnrichment: false,
-    isSearching: false
+    isSearching: false,
+    upsetPlotAvailable: false
   };
 
   constructor(props) {
@@ -118,7 +119,9 @@ class EnrichmentSearchCriteria extends Component {
     this.setState({
       enrichmentStudiesDisabled: true,
       enrichmentModelsDisabled: true,
-      enrichmentAnnotationsDisabled: true
+      enrichmentAnnotationsDisabled: true,
+      useUpsetAnalysis: false,
+      upsetIcon: 'venndiagram.png'
     });
     this.props.onSearchCriteriaChange({
       enrichmentStudy: this.props.enrichmentStudy,
@@ -152,9 +155,9 @@ class EnrichmentSearchCriteria extends Component {
     return evt => {
       if (this.state.upsetIcon === 'venndiagram.png') {
         this.setState({
+          useUpsetAnalysis: true,
           upsetIcon: 'venndiagramChosenAltGreen.png'
         });
-        this.props.onUseUpsetAnalysis(true);
         this.updateQueryData({
           must: this.state.uSettings.must,
           not: this.state.uSettings.not,
@@ -162,9 +165,9 @@ class EnrichmentSearchCriteria extends Component {
         });
       } else {
         this.setState({
+          useUpsetAnalysis: false,
           upsetIcon: 'venndiagram.png'
         });
-        this.props.onUseUpsetAnalysis(false);
         const enrichmentAnnotationName = 'enrichmentAnnotation';
         const enrichmentAnnotationVar = this.props.enrichmentAnnotation;
         this.upsetTriggeredAnnotationChange(
@@ -222,15 +225,15 @@ class EnrichmentSearchCriteria extends Component {
       }
     });
 
-    if (sigValue == 0) {
+    if (sigValue === 0) {
       return;
     } else {
       //Turn Must Tests and Not Tests into a...
       //single string separated by a ;
       //Used for service function call
 
-      var mustString = this.testToString(e.must);
-      var notString = this.testToString(e.not);
+      mustString = this.testToString(e.must);
+      notString = this.testToString(e.not);
 
       phosphoprotService
         .getUpsetEnrichmentData(
@@ -259,14 +262,14 @@ class EnrichmentSearchCriteria extends Component {
             // this.show***REMOVED***TextCol = true;
             includeCols.push('name_1006');
           }
-          let Columns = _.map(
-            _.filter(_.keys(annotationData[0]), function(d) {
-              return !_.includes(includeCols, d);
-            }),
-            function(d) {
-              return { field: d };
-            }
-          );
+          // let Columns = _.map(
+          //   _.filter(_.keys(annotationData[0]), function(d) {
+          //     return !_.includes(includeCols, d);
+          //   }),
+          //   function(d) {
+          //     return { field: d };
+          //   }
+          // );
           // this.loadItems();
           // this.queried = true;
           // this.gridLoading = false;
@@ -282,11 +285,11 @@ class EnrichmentSearchCriteria extends Component {
 
   testToString(solution) {
     var str = '';
-    if (solution.length == 0) {
+    if (solution.length === 0) {
       return str;
     }
     for (var i = 0; i < solution.length; i++) {
-      if (i == solution.length - 1) {
+      if (i === solution.length - 1) {
         str += solution[i] + '';
       } else {
         str += solution[i] + ';';
@@ -325,7 +328,8 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentStudiesDisabled,
       enrichmentModelsDisabled,
       enrichmentAnnotationsDisabled,
-      upsetIcon
+      upsetIcon,
+      useUpsetAnalysis
     } = this.state;
 
     const {
@@ -335,7 +339,7 @@ class EnrichmentSearchCriteria extends Component {
       isValidSearchEnrichment,
       isTestSelected,
       isSearching,
-      useUpsetAnalysis
+      upsetPlotAvailable
     } = this.props;
 
     const StudyPopupStyle = {

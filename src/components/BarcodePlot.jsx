@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { Provider as BusProvider, useBus, useListener } from 'react-bus';
+// import PropTypes from 'prop-types';
+// import { Provider as BusProvider, useBus, useListener } from 'react-bus';
 import * as d3 from 'd3';
-import * as _ from 'lodash';
+// import * as _ from 'lodash';
 
 class BarcodePlot extends Component {
   constructor(props) {
@@ -56,15 +56,15 @@ class BarcodePlot extends Component {
       settings.chartSize.height - settings.margin.top - settings.margin.bottom;
 
     //Scale the range of the data
-    let domain = d3
-      .scaleLinear()
-      .range([5, width - 5])
-      .domain([
-        0,
-        d3.extent(settings.data, function(d) {
-          return d[settings.statistic];
-        })[1]
-      ]);
+    // let domain = d3
+    //   .scaleLinear()
+    //   .range([5, width - 5])
+    //   .domain([
+    //     0,
+    //     d3.extent(settings.data, function(d) {
+    //       return d[settings.statistic];
+    //     })[1]
+    //   ]);
 
     let xScale = d3
       .scaleLinear()
@@ -131,30 +131,30 @@ class BarcodePlot extends Component {
     tooltip.attr('class', 'barcode-tooltip');
 
     // render barcode plot
-    var lines = g
-      .selectAll('line.barcode-line')
-      .data(settings.data)
-      .enter()
-      .append('line')
-      .attr('class', 'barcode-line')
-      .attr('id', function(d) {
-        return 'barcode-line-' + d[settings.lineID];
-      })
-      .attr('x1', function(d, i) {
-        return xScale(d[settings.statistic]);
-      })
-      .attr('x2', function(d) {
-        return xScale(d[settings.statistic]);
-      })
-      .attr('y1', -20)
-      .attr('y2', height)
-      .style('stroke', function(d) {
-        return '#2c3b78';
-      })
-      .style('stroke-width', 2)
-      .style('opacity', function(d) {
-        return 0.5;
-      });
+    // var lines = g
+    //   .selectAll('line.barcode-line')
+    //   .data(settings.data)
+    //   .enter()
+    //   .append('line')
+    //   .attr('class', 'barcode-line')
+    //   .attr('id', function(d) {
+    //     return 'barcode-line-' + d[settings.lineID];
+    //   })
+    //   .attr('x1', function(d, i) {
+    //     return xScale(d[settings.statistic]);
+    //   })
+    //   .attr('x2', function(d) {
+    //     return xScale(d[settings.statistic]);
+    //   })
+    //   .attr('y1', -20)
+    //   .attr('y2', height)
+    //   .style('stroke', function(d) {
+    //     return '#2c3b78';
+    //   })
+    //   .style('stroke-width', 2)
+    //   .style('opacity', function(d) {
+    //     return 0.5;
+    //   });
 
     // setup change events
 
@@ -328,13 +328,13 @@ class BarcodePlot extends Component {
   }
 
   render() {
-    const {
-      data,
-      settings
-      // highLabel,
-      // lowLabel,
-      // statLabel
-    } = this.props;
+    // const {
+    // data,
+    // settings
+    // highLabel,
+    // lowLabel,
+    // statLabel
+    // } = this.props;
 
     return <div id="chart-barcode" className="BarcodeChartWrapper"></div>;
   }

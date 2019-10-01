@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import { Grid, Popup, Slider, Button, Icon } from 'semantic-ui-react';
+import { Popup, Icon } from 'semantic-ui-react';
 import { phosphoprotService } from '../services/phosphoprot.service';
 import { withRouter } from 'react-router-dom';
-import ButtonActions from './ButtonActions';
+// import ButtonActions from './ButtonActions';
 import SplitPanesContainer from './SplitPanesContainer';
 import SearchingAlt from './SearchingAlt';
 import './EnrichmentResults.scss';
@@ -192,21 +192,6 @@ class EnrichmentResults extends Component {
     });
   };
 
-  getUpsetIcon = useUpsetAnalysis => {
-    if (useUpsetAnalysis === false) {
-      return (
-        <img className="UpsetIconImg" src="venndiagram.png" alt="Upset Icon" />
-      );
-    } else
-      return (
-        <img
-          className="UpsetIconImg"
-          src="venndiagramChosenAltGreen.png"
-          alt="Upset Icon"
-        />
-      );
-  };
-
   // enrichmentViewChange(choice) {
   //   return evt => {
   //     this.props.onEnrichmentViewChange({
@@ -216,12 +201,7 @@ class EnrichmentResults extends Component {
   // };
 
   render() {
-    const {
-      enrichmentResults,
-      enrichmentColumns,
-      useUpsetAnalysis
-    } = this.props;
-    const upsetIconTableHeader = this.getUpsetIcon(useUpsetAnalysis);
+    const { enrichmentResults, enrichmentColumns } = this.props;
     // const rows = this.props.enrichmentResults.length;
     const quickViews = [];
     const additionalTemplateInfo = this.getTableHelpers(
