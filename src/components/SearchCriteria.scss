@@ -1,12 +1,12 @@
 @media (min-width: 1px) and (max-width: 374px) {
   .SidebarContainer {
-    height: 70vh;
+    height: 100vh;
   }
 }
 
 @media (min-width: 375px) and (max-width: 767px) {
   .SidebarContainer {
-    height: 60vh;
+    height: 90vh;
   }
 }
 
@@ -19,6 +19,7 @@
 @media (min-width: 1200px) {
   .SidebarContainer {
     height: 100vh;
+    margin-right: -35px !important;
   }
 }
 
@@ -94,4 +95,25 @@
     // .UpsetFilters {
     //   margin-left: 20px;
     // }
+
+    // .PlotPulltab {
+    //   padding: 10px !important;
+    //   border-radius: 25px !important;
+    //   background-color: #000 !important;
+    //   color: white !important;
+    //   font-weight: bold !important;
+    //   height: 50px !important;
+    //   width: 50px !important;
+    //   margin-right: -38px !important;
+    // }
+
+    .PlotPulltab:hover {
+      transform: scale(1.2) !important;
+    }
+
+    .PPActive {
+      background-color: #21BA45 !important;
+      color: black !important;
+      transform: scale(1.2) !important;
+    }   
   }

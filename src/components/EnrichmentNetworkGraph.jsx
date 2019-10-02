@@ -61,17 +61,17 @@ class EnrichmentNetworkGraph extends Component {
 
   render() {
     const { upsetPlotAvailable } = this.props;
-    let upsetPlotPulltab = '';
-    if (upsetPlotAvailable) {
-      upsetPlotPulltab = (
-        <Button
-          className="FloatRight PlotPulltab"
-          onClick={this.props.onHandleAnimationChange('uncover')}
-        >
-          P<br />L<br />O<br />T
-        </Button>
-      );
-    }
+    // let upsetPlotPulltab = '';
+    // if (upsetPlotAvailable) {
+    //   upsetPlotPulltab = (
+    //     <Button
+    //       className="FloatRight PlotPulltab"
+    //       onClick={this.props.onHandleAnimationChange('uncover')}
+    //     >
+    //       PLOT
+    //     </Button>
+    //   );
+    // }
 
     const IconPopupStyle = {
       backgroundColor: '2E2E2E',
@@ -252,7 +252,7 @@ class EnrichmentNetworkGraph extends Component {
             <Icon size="small" color="black" name="chart pie" float="left" />
             <Icon size="big" name="chart pie" />
           </div>
-          {upsetPlotPulltab}
+          {/* {upsetPlotPulltab} */}
         </div>
       );
     } else if (this.state.isTestSelected && !this.state.isTestDataLoaded) {

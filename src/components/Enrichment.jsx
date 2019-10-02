@@ -38,8 +38,8 @@ class EnrichmentContainer extends Component {
       upsetPlotAvailable: false,
       animation: 'uncover',
       direction: 'left',
-      dimmed: false,
-      visible: false
+      visible: false,
+      plotButtonActive: false
     };
   }
 
@@ -85,10 +85,15 @@ class EnrichmentContainer extends Component {
     });
   };
 
-  handleAnimationChange = animation => () =>
-    this.setState(prevState => ({ animation, visible: !prevState.visible }));
-
-  handleDimmedChange = (e, { checked }) => this.setState({ dimmed: checked });
+  handleAnimationChange = animation => () => {
+    this.setState(prevState => ({
+      animation,
+      visible: !prevState.visible
+    }));
+    this.setState({
+      plotButtonActive: !this.state.plotButtonActive
+    });
+  };
 
   handleDirectionChange = direction => () =>
     this.setState({ direction, visible: false });
@@ -355,7 +360,7 @@ class EnrichmentContainer extends Component {
   render() {
     const enrichmentView = this.getView(this.state);
 
-    const { upsetPlotInfo, animation, dimmed, direction, visible } = this.state;
+    const { upsetPlotInfo, animation, direction, visible } = this.state;
 
     const vertical = direction === 'bottom' || direction === 'top';
 
@@ -365,7 +370,7 @@ class EnrichmentContainer extends Component {
         animation={animation}
         direction={direction}
         icon="labeled"
-        vertical
+        vertical="true"
         visible={visible}
         width="very wide"
         className="VerticalSidebarPlot"
@@ -412,9 +417,7 @@ class EnrichmentContainer extends Component {
               direction={direction}
               visible={visible}
             />
-            <Sidebar.Pusher dimmed={dimmed && visible}>
-              {enrichmentView}
-            </Sidebar.Pusher>
+            <Sidebar.Pusher>{enrichmentView}</Sidebar.Pusher>
           </Sidebar.Pushable>
         </Grid.Column>
       </Grid.Row>

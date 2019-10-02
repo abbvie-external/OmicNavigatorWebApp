@@ -171,7 +171,6 @@ class EnrichmentResults extends Component {
   };
 
   showBarcodePlot = (dataItem, barcode, test, largest) => {
-    debugger;
     this.setState({
       isTestDataLoaded: true,
       barcodeData: barcode,
@@ -214,17 +213,17 @@ class EnrichmentResults extends Component {
       this.showBarcodePlot
     );
 
-    let upsetPlotPulltab = '';
-    if (upsetPlotAvailable) {
-      upsetPlotPulltab = (
-        <Button
-          className="FloatRight PlotPulltab"
-          onClick={this.props.onHandleAnimationChange('uncover')}
-        >
-          P<br />L<br />O<br />T
-        </Button>
-      );
-    }
+    // let upsetPlotPulltab = '';
+    // if (upsetPlotAvailable) {
+    //   upsetPlotPulltab = (
+    //     <Button
+    //       className="FloatRight PlotPulltab"
+    //       onClick={this.props.onHandleAnimationChange('uncover')}
+    //     >
+    //       PLOT
+    //     </Button>
+    //   );
+    // }
 
     const IconPopupStyle = {
       backgroundColor: '2E2E2E',
@@ -300,7 +299,7 @@ class EnrichmentResults extends Component {
             additionalTemplateInfo={additionalTemplateInfo}
             // extraHeaderItem={enrichmentViewToggle}
           />
-          {upsetPlotPulltab}
+          {/* {upsetPlotPulltab} */}
         </div>
       );
     } else if (this.state.isTestSelected && !this.state.isTestDataLoaded) {

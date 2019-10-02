@@ -14,7 +14,11 @@ class EnrichmentSearchCriteria extends Component {
     enrichmentAnnotation: '',
     isValidSearchEnrichment: false,
     isSearching: false,
-    upsetPlotAvailable: false
+    upsetPlotAvailable: false,
+    animation: 'uncover',
+    direction: 'left',
+    visible: false,
+    plotButtonActive: false
   };
 
   constructor(props) {
@@ -340,12 +344,21 @@ class EnrichmentSearchCriteria extends Component {
       isValidSearchEnrichment,
       isTestSelected,
       isSearching,
-      upsetPlotAvailable
+      upsetPlotAvailable,
+      plotButtonActive
     } = this.props;
 
     const StudyPopupStyle = {
       backgroundColor: '2E2E2E',
       borderBottom: '2px solid #FF4400',
+      color: '#FFF',
+      padding: '1em',
+      fontSize: '13px'
+    };
+
+    const SetAnalysisPopupStyle = {
+      backgroundColor: '#2E2E2E',
+      borderBottom: '2px solid #21BA45',
       color: '#FFF',
       padding: '1em',
       fontSize: '13px'
@@ -411,7 +424,7 @@ class EnrichmentSearchCriteria extends Component {
                   onClick={this.handleUpsetToggle()}
                 />
               }
-              style={StudyPopupStyle}
+              style={SetAnalysisPopupStyle}
               basic
               inverted
               position="right center"
@@ -421,6 +434,54 @@ class EnrichmentSearchCriteria extends Component {
         </div>
       );
     }
+
+    // const plotButtonColor = (plotButtonActive) ? '#21BA45 !important' : '#000000 !important';
+
+    const PlotButtonStyle = {
+      float: 'right',
+      padding: '10px',
+      borderRadius: '25px',
+      backgroundColor: '#000',
+      color: 'white',
+      fontWeight: 'bold',
+      height: '50px',
+      width: '50px',
+      marginRight: '-38px'
+    };
+
+    let NoMargin = {
+      margin: '0px'
+    };
+
+    let upsetPlotPulltab = '';
+    if (upsetPlotAvailable) {
+      upsetPlotPulltab = (
+        <Button
+          style={PlotButtonStyle}
+          className={!plotButtonActive ? 'PlotPulltab' : 'PPActive'}
+          // className={ !plotButtonActive ? "FloatRight PlotPulltab" : "FloatRight PlotPulltab PPActive" }
+          onClick={this.props.onHandleAnimationChange('uncover')}
+        >
+          PLOT
+          <Icon
+            style={NoMargin}
+            size="small"
+            name={!plotButtonActive ? 'plus' : 'minus'}
+          />
+        </Button>
+      );
+    }
+
+    // if (upsetPlotAvailable && plotButtonActive) {
+    //   upsetPlotPulltab = (
+    //     <Button
+    //       className="FloatRight PlotPulltabActive"
+    //       onClick={this.props.onHandleAnimationChange('uncover')}
+    //     >
+    //       PLOT
+    //     </Button>
+    //   );
+    // }
 
     let upsetFilters = '';
     if (
@@ -432,6 +493,7 @@ class EnrichmentSearchCriteria extends Component {
       upsetFilters = (
         <div className="UpsetFiltersContainer">
           <span className="UpsetFilters">Upset Filters Go Here</span>
+          {upsetPlotPulltab}
         </div>
       );
     }

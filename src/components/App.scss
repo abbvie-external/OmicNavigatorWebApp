@@ -39,7 +39,9 @@
 
   .ContentContainer {
     margin-top: -10px !important;
-    padding: 0px 0px 0px 0px !important;  
+    // padding: 0px 0px 0px 0px !important; 
+    padding-left: 30px !important;
+    margin-left: 35px !important; 
   
     .LoaderContainer {
       padding-top: 120px;
@@ -62,8 +64,8 @@
   //   display: none !important;
   // }
   .QHGrid {
-    padding-left: 45px !important;
-    padding-right: 30px !important;
+    padding-left: 10px !important;
+    padding-right: 0px !important;
   }
 
   .QHGrid table tr th:first-child {

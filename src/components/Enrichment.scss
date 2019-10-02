@@ -58,8 +58,9 @@
 
 .UpsetSvgSpan {
   padding-top: 25px !important;
+  padding-left: 35px !important;
   height: 100% !important;
-  width: 100% !important;
+  width: 87% !important;
 }
 
 .UpsetIconImg {
@@ -86,19 +87,22 @@
 //   width: 1000px !important;
 // }
 
-.PlotPulltab {
-  padding: 10px !important;
-  border-radius: 0% 10% 10% 0% !important;
-  background-color: #21BA45 !important;
-  color: white !important;
-  writing-mode: vertical-rl !important;
-  text-orientation: upright !important;
-  font-weight: bold !important;
-  cursor: pointer !important;
-  position: absolute !important;
-  top: 50% !important;
-}
+// .PlotPulltab {
+//   padding: 10px !important;
+//   border-radius: 25px !important;
+//   background-color: #21BA45 !important;
+//   color: white !important;
+//   // writing-mode: vertical-rl !important;
+//   // text-orientation: upright !important;
+//   font-weight: bold !important;
+//   cursor: pointer !important;
+//   position: absolute !important;
+//   top: 50% !important;
+//   height: 50px !important;
+//   width: 50px !important;
+//   left: 10px !important;
+// }
 
-.PlotPulltab:hover {
-  transform: scale(1.2) !important;
-}
+// .PlotPulltab:hover {
+//   transform: scale(1.2) !important;
+// }
