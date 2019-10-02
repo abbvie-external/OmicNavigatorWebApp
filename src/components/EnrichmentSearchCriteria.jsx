@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import { Form, Select, Icon, Popup } from 'semantic-ui-react';
+import { Form, Select, Icon, Popup, Button } from 'semantic-ui-react';
 import './SearchCriteria.scss';
 import { phosphoprotService } from '../services/phosphoprot.service';
 import DOMPurify from 'dompurify';
@@ -98,7 +98,8 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentAnnotation: ''
     });
     this.props.onSearchCriteriaReset({
-      isValidSearchEnrichment: false
+      isValidSearchEnrichment: false,
+      upsetPlotAvailable: false
     });
     const annotationsArr = _.map(this.allNames[value], function(
       annotationName
@@ -399,8 +400,6 @@ class EnrichmentSearchCriteria extends Component {
     if (isValidSearchEnrichment && !isTestSelected && !isSearching) {
       upsetToggle = (
         <div className="UpsetToggleContainer">
-          {/* <Divider /> */}
-          {/* <span className="UpsetToggleText">ANALYSIS</span> */}
           <span className="">
             <Popup
               trigger={
@@ -431,7 +430,6 @@ class EnrichmentSearchCriteria extends Component {
     ) {
       upsetFilters = (
         <div className="UpsetFiltersContainer">
-          {/* <Divider /> */}
           <span className="UpsetFilters">Upset Filters Go Here</span>
         </div>
       );
@@ -441,7 +439,7 @@ class EnrichmentSearchCriteria extends Component {
         <Form className="SearchCriteriaContainer">
           <div className="FilterStudyContainer">
             <span className="FilterText">FILTERS</span>
-            <span className="StudyHTML">{studyIcon}</span>
+            <span className="FloatRight">{studyIcon}</span>
           </div>
 
           <Form.Field

@@ -48,8 +48,10 @@
   border-color: transparent;
 }
 
-.SplitPanesContainer {
+.SplitPanesWrapper {
     height: 90vh !important;
+    padding-left: 40px !important;
+    padding-right: 30px !important;
 }
 
 .HorizontalPaneContainer {

@@ -70,8 +70,9 @@ class SplitPanesContainer extends Component {
                   {/* <ButtonActions {...this.props} {...this.state} /> */}
                 </Grid.Column>
               </Grid.Row>
-              <Grid.Row className="SplitPanesContainer">
+              <Grid.Row>
                 <SplitPane
+                  className="SplitPanesWrapper"
                   split="horizontal"
                   defaultSize={225}
                   minSize={200}
@@ -121,8 +122,9 @@ class SplitPanesContainer extends Component {
                   {/* <ButtonActions {...this.props} {...this.state} /> */}
                 </Grid.Column>
               </Grid.Row>
-              <Grid.Row className="SplitPanesContainer">
+              <Grid.Row>
                 <SplitPane
+                  className="SplitPanesWrapper"
                   split="horizontal"
                   defaultSize={225}
                   minSize={200}

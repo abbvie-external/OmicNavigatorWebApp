@@ -7,7 +7,7 @@ class PhosphoprotService {
   constructor() {
     // this.ocpuUrl = "***REMOVED***/ocpu/library/***REMOVED***/R"
     // this.ocpuUrl = "http://localhost:5656/ocpu/library/PhosphoProt/R"
-    this.ocpuUrl = 'http://10.239.9.7/ocpu/library/PhosphoProt/R';
+    this.ocpuUrl = 'http://10.239.9.49/ocpu/library/PhosphoProt/R';
   }
 
   setUrl() {

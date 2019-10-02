@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Icon, Popup } from 'semantic-ui-react';
+import { Icon, Popup, Button } from 'semantic-ui-react';
 // import { phosphoprotService } from '../services/phosphoprot.service';
 import { withRouter } from 'react-router-dom';
 // import ButtonActions from './ButtonActions';
@@ -60,13 +60,18 @@ class EnrichmentNetworkGraph extends Component {
   };
 
   render() {
-    // const {
-    //   enrichmentResults,
-    //   enrichmentColumns,
-    //   enrichmentStudy,
-    //   enrichmentModel,
-    //   enrichmentAnnotation
-    // } = this.props;
+    const { upsetPlotAvailable } = this.props;
+    let upsetPlotPulltab = '';
+    if (upsetPlotAvailable) {
+      upsetPlotPulltab = (
+        <Button
+          className="FloatRight PlotPulltab"
+          onClick={this.props.onHandleAnimationChange('uncover')}
+        >
+          P<br />L<br />O<br />T
+        </Button>
+      );
+    }
 
     const IconPopupStyle = {
       backgroundColor: '2E2E2E',
@@ -247,6 +252,7 @@ class EnrichmentNetworkGraph extends Component {
             <Icon size="small" color="black" name="chart pie" float="left" />
             <Icon size="big" name="chart pie" />
           </div>
+          {upsetPlotPulltab}
         </div>
       );
     } else if (this.state.isTestSelected && !this.state.isTestDataLoaded) {

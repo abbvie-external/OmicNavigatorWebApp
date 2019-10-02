@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Grid, Popup } from 'semantic-ui-react';
+import { Grid, Popup, Sidebar } from 'semantic-ui-react';
 import { withRouter } from 'react-router-dom';
 import EnrichmentSearchCriteria from './EnrichmentSearchCriteria';
 import EnrichmentNetworkGraph from './EnrichmentNetworkGraph';
@@ -29,14 +29,18 @@ class EnrichmentContainer extends Component {
       isTestSelected: false,
       enrichmentResults: [],
       enrichmentColumns: [],
-      enrichmentView: '',
+      enrichmentView: 'table',
       networkDataAvailable: false,
       networkData: {},
       upsetPlotInfo: {
         title: '',
         svg: []
       },
-      upsetPlotAvailable: false
+      upsetPlotAvailable: false,
+      animation: 'uncover',
+      direction: 'left',
+      dimmed: false,
+      visible: false
     };
   }
 
@@ -57,7 +61,9 @@ class EnrichmentContainer extends Component {
       enrichmentColumns: columns,
       isSearching: false,
       isValidSearchEnrichment: true,
-      isTestSelected: false
+      isTestSelected: false,
+      upsetPlotAvailable: false,
+      visible: false
     });
     // updateUrl(this.props, this.state);
   };
@@ -67,15 +73,27 @@ class EnrichmentContainer extends Component {
       enrichmentStudy: changes.enrichmentStudy,
       enrichmentModel: changes.enrichmentModel,
       enrichmentAnnotation: changes.enrichmentAnnotation,
-      enrichmentView: 'table'
+      // enrichmentView: 'table',
+      upsetPlotAvailable: false,
+      visible: false
     });
   };
 
   hideEGrid = () => {
     this.setState({
-      isValidSearchEnrichment: false
+      isValidSearchEnrichment: false,
+      upsetPlotAvailable: false,
+      visible: false
     });
   };
+
+  handleAnimationChange = animation => () =>
+    this.setState(prevState => ({ animation, visible: !prevState.visible }));
+
+  handleDimmedChange = (e, { checked }) => this.setState({ dimmed: checked });
+
+  handleDirectionChange = direction => () =>
+    this.setState({ direction, visible: false });
 
   handleUpsetPlot = upsetPlotResults => {
     this.setState({
@@ -316,6 +334,7 @@ class EnrichmentContainer extends Component {
           {...this.props}
           {...this.state}
           onEnrichmentViewChange={this.handleEnrichmentViewChange}
+          onHandleAnimationChange={this.handleAnimationChange}
         />
       );
     } else if (
@@ -329,19 +348,8 @@ class EnrichmentContainer extends Component {
           {...this.props}
           {...this.state}
           onEnrichmentViewChange={this.handleEnrichmentViewChange}
+          onHandleAnimationChange={this.handleAnimationChange}
         />
-      );
-    } else if (
-      this.state.isValidSearchEnrichment &&
-      !this.state.isTestSelected &&
-      !this.state.isSearching &&
-      this.state.enrichmentView === 'upset'
-    ) {
-      return (
-        <div
-          className="UpsetSvgSpan"
-          dangerouslySetInnerHTML={{ __html: this.state.upsetPlotInfo.svg }}
-        ></div>
       );
     } else if (this.state.isSearching) {
       return <TransitionActive />;
@@ -350,6 +358,28 @@ class EnrichmentContainer extends Component {
 
   render() {
     const enrichmentView = this.getView(this.state);
+
+    const { upsetPlotInfo, animation, dimmed, direction, visible } = this.state;
+
+    const vertical = direction === 'bottom' || direction === 'top';
+
+    const VerticalSidebar = ({ animation, direction, visible }) => (
+      <Sidebar
+        as={'div'}
+        animation={animation}
+        direction={direction}
+        icon="labeled"
+        vertical
+        visible={visible}
+        width="very wide"
+        className="VerticalSidebarPlot"
+      >
+        <div
+          className="UpsetSvgSpan"
+          dangerouslySetInnerHTML={{ __html: upsetPlotInfo.svg }}
+        ></div>
+      </Sidebar>
+    );
 
     // networkGraphData = this.getNetworkData();
     // networkData will be used for Network Graph
@@ -370,6 +400,7 @@ class EnrichmentContainer extends Component {
             onSearchCriteriaChange={this.handleSearchCriteriaChange}
             onSearchCriteriaReset={this.hideEGrid}
             onGetUpsetPlot={this.handleUpsetPlot}
+            onHandleAnimationChange={this.handleAnimationChange}
           />
         </Grid.Column>
         <Grid.Column
@@ -379,7 +410,16 @@ class EnrichmentContainer extends Component {
           largeScreen={12}
           widescreen={12}
         >
-          {enrichmentView}
+          <Sidebar.Pushable as={'span'}>
+            <VerticalSidebar
+              animation={animation}
+              direction={direction}
+              visible={visible}
+            />
+            <Sidebar.Pusher dimmed={dimmed && visible}>
+              {enrichmentView}
+            </Sidebar.Pusher>
+          </Sidebar.Pushable>
         </Grid.Column>
       </Grid.Row>
     );
