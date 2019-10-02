@@ -63,7 +63,7 @@ class PlotContainer extends Component {
       );
     } else {
       return (
-        <div className="">
+        <div className="PlotWrapper">
           <Grid columns={2} className="">
             <Grid.Row className="ActionsRow">
               <Grid.Column mobile={8} tablet={8} largeScreen={8} widescreen={8}>

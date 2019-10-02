@@ -26,7 +26,6 @@ class EnrichmentContainer extends Component {
       enrichmentAnnotation: '',
       isValidSearchEnrichment: false,
       isSearching: false,
-      isTestSelected: false,
       enrichmentResults: [],
       enrichmentColumns: [],
       enrichmentView: 'table',
@@ -61,7 +60,6 @@ class EnrichmentContainer extends Component {
       enrichmentColumns: columns,
       isSearching: false,
       isValidSearchEnrichment: true,
-      isTestSelected: false,
       upsetPlotAvailable: false,
       visible: false
     });
@@ -325,7 +323,6 @@ class EnrichmentContainer extends Component {
   getView = () => {
     if (
       this.state.isValidSearchEnrichment &&
-      !this.state.isTestSelected &&
       !this.state.isSearching &&
       this.state.enrichmentView === 'table'
     ) {
@@ -339,7 +336,6 @@ class EnrichmentContainer extends Component {
       );
     } else if (
       this.state.isValidSearchEnrichment &&
-      !this.state.isTestSelected &&
       !this.state.isSearching &&
       this.state.enrichmentView === 'network'
     ) {

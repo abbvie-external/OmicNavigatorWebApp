@@ -28,7 +28,6 @@ class EnrichmentResults extends Component {
     enrichmentAnnotation: '',
     enrichmentResults: [],
     enrichmentColumns: [],
-    isTestSelected: false,
     enrichmentView: 'table'
   };
 
@@ -45,6 +44,7 @@ class EnrichmentResults extends Component {
         svg: []
       },
       currentSVGs: [],
+      isTestSelected: false,
       isTestDataLoaded: false,
       barcodeData: [],
       barcodeSettings: {
@@ -171,6 +171,7 @@ class EnrichmentResults extends Component {
   };
 
   showBarcodePlot = (dataItem, barcode, test, largest) => {
+    debugger;
     this.setState({
       isTestDataLoaded: true,
       barcodeData: barcode,

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import { Form, Select, Icon, Popup, Button } from 'semantic-ui-react';
+import { Form, Select, Icon, Popup, Button, Divider } from 'semantic-ui-react';
 import './SearchCriteria.scss';
 import { phosphoprotService } from '../services/phosphoprot.service';
 import DOMPurify from 'dompurify';
@@ -400,6 +400,7 @@ class EnrichmentSearchCriteria extends Component {
     if (isValidSearchEnrichment && !isTestSelected && !isSearching) {
       upsetToggle = (
         <div className="UpsetToggleContainer">
+          <Divider />
           <span className="">
             <Popup
               trigger={

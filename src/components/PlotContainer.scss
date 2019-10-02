@@ -1,9 +1,16 @@
-.PlotContainer {
-  margin-top: 0px !important;
-  padding-top: 0px !important;
-  min-height: 75vh !important;
+.PlotWrapper {
+  padding-top: 10px !important;
+  padding-left: 40px !important;
+  padding-right: 30px !important;
 
-  .PlotAccordionContainer .content {
-    overflow-wrap: break-word !important;
+  .PlotContainer {
+    margin-top: 0px !important;
+    padding-top: 0px !important;
+    min-height: 75vh !important;
+
+    .PlotAccordionContainer .content {
+      overflow-wrap: break-word !important;
+    }
   }
 }
+
