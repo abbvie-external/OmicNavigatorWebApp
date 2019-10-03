@@ -194,11 +194,6 @@ class PepplotSearchCriteria extends Component {
 
     return (
       <Form className="SearchCriteriaContainer">
-        <div className="FilterStudyContainer">
-          <span className="FilterText">FILTERS</span>
-          <span className="FloatRight">{studyIcon}</span>
-        </div>
-
         <Form.Field
           control={Select}
           required

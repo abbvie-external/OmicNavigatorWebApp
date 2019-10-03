@@ -88,11 +88,12 @@ class EnrichmentNetworkGraph extends Component {
         <Popup
           trigger={
             <Icon
+              bordered
               name="table"
               size="large"
-              type="button"
-              bordered
-              className=""
+              // type="button"
+              color="orange"
+              className="NetworkGraphButtons"
               inverted={this.props.enrichmentView === 'table'}
               onClick={this.props.onEnrichmentViewChange({
                 enrichmentView: 'table'
@@ -108,11 +109,12 @@ class EnrichmentNetworkGraph extends Component {
         <Popup
           trigger={
             <Icon
+              bordered
               name="chart pie"
               size="large"
-              type="button"
-              bordered
-              className=""
+              // type="button"
+              color="orange"
+              className="NetworkGraphButtons"
               inverted={this.props.enrichmentView === 'network'}
               onClick={this.props.onEnrichmentViewChange({
                 enrichmentView: 'network'

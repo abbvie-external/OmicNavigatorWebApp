@@ -25,9 +25,9 @@
 }
 
 .UpsetToggleContainer, .ToggleNetworkGraphContainer {
-  padding-top: 30px;
-  padding-bottom: 15px !important;
-  margin-bottom: 15px !important;
+  padding-top: 15px;
+  // padding-bottom: 15px !important;
+  // margin-bottom: 15px !important;
   margin-left: 20px;
 }
 
@@ -68,7 +68,7 @@
 }
 
 .VerticalSidebarPlot {
-  width: 100% !important;
+  width: 130% !important;
 }
 
 // .ui[class*="very wide"].left.sidebar {

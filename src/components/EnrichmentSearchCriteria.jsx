@@ -1,6 +1,14 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import { Form, Select, Icon, Popup, Button, Divider } from 'semantic-ui-react';
+import {
+  Form,
+  Select,
+  Icon,
+  Popup,
+  Button,
+  Divider,
+  Radio
+} from 'semantic-ui-react';
 import './SearchCriteria.scss';
 import { phosphoprotService } from '../services/phosphoprot.service';
 import DOMPurify from 'dompurify';
@@ -397,7 +405,14 @@ class EnrichmentSearchCriteria extends Component {
         <Popup
           trigger={
             <a target="_blank" rel="noopener noreferrer" href={'/'}>
-              <Icon name="line graph" size="large" circular inverted disabled />
+              <Icon
+                name="line graph"
+                size="large"
+                className="StudyHTMLIcon"
+                circular
+                inverted
+                disabled
+              />
             </a>
           }
           style={StudyPopupStyle}
@@ -407,6 +422,49 @@ class EnrichmentSearchCriteria extends Component {
           content="Select a study to view Analysis Details"
         />
       );
+    }
+
+    // let PlotIcon;
+    // if (upsetPlotAvailable) {
+    //   PlotIcon = (
+    //     <Popup
+    //       trigger={
+    //         <Icon
+    //           name="chart bar"
+    //           size="large"
+    //           circular
+    //           className="PlotIcon"
+    //         />
+    //       }
+    //       style={SetAnalysisPopupStyle}
+    //       inverted
+    //       basic
+    //       position="bottom center"
+    //       content="View Plot"
+    //     />
+    //   );
+    // } else {
+    //   PlotIcon = (
+    //     <Popup
+    //       trigger={
+    //         <Icon name="chart bar"
+    //         size="large"
+    //         circular
+    //         className="PlotIcon"
+    //         disabled />
+    //       }
+    //       style={SetAnalysisPopupStyle}
+    //       basic
+    //       inverted
+    //       position="bottom center"
+    //       content="Loading Plot"
+    //     />
+    //   );
+    // }
+
+    let PlotRadio = '';
+    if (upsetPlotAvailable) {
+      PlotRadio = <Radio toggle label="View Plot" />;
     }
 
     let upsetToggle = '';
@@ -431,6 +489,8 @@ class EnrichmentSearchCriteria extends Component {
               content="Set Analysis"
             />
           </span>
+          {/* <span className="FloatRight PlotIconDiv">{PlotIcon}</span> */}
+          <span className="FloatRight PlotRadioDiv">{PlotRadio}</span>
         </div>
       );
     }
@@ -440,6 +500,10 @@ class EnrichmentSearchCriteria extends Component {
     const PlotButtonStyle = {
       float: 'right',
       padding: '10px',
+      marginRight: '-38px',
+      marginTop: '85px',
+      height: '50px',
+      width: '50px',
       borderRadius: '25px',
       backgroundColor: '#FFF',
       border: '2px solid #e0e1e2',
@@ -447,9 +511,6 @@ class EnrichmentSearchCriteria extends Component {
       fontWeight: 'bold',
       fontSize: '0.9em',
       textAlign: 'center',
-      height: '50px',
-      width: '50px',
-      marginRight: '-38px',
       boxShadow: '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)'
     };
 
@@ -489,6 +550,30 @@ class EnrichmentSearchCriteria extends Component {
     //   );
     // }
 
+    // const PlotButtonStyleAlt = {
+    //   float: 'right',
+    // };
+
+    // let upsetPlotPulltabAlt = '';
+    // if (upsetPlotAvailable) {
+    //   upsetPlotPulltabAlt = (
+    //     <Button
+    //       style={PlotButtonStyle}
+    //       className={!plotButtonActive ? 'PlotPulltab' : 'PPActive'}
+    //       // className={ !plotButtonActive ? "FloatRight PlotPulltab" : "FloatRight PlotPulltab PPActive" }
+    //       onClick={this.props.onHandleAnimationChange('uncover')}
+    //     >
+    //       <span style={{ fontSize: '0.8em' }}>{plotText}</span>
+    //       <br /> PLOT
+    //       {/* <Icon
+    //         style={NoMargin}
+    //         size="small"
+    //         name={!plotButtonActive ? 'plus' : 'minus'}
+    //       /> */}
+    //     </Button>
+    //   );
+    // }
+
     let upsetFilters = '';
     if (
       isValidSearchEnrichment &&
@@ -498,7 +583,11 @@ class EnrichmentSearchCriteria extends Component {
     ) {
       upsetFilters = (
         <div className="UpsetFiltersContainer">
-          <span className="UpsetFilters">Upset Filters Go Here</span>
+          <img
+            alt="Multi-Set Filters"
+            src="/multisetFilters.png"
+            className="Multi-Set Filters"
+          />
           {upsetPlotPulltab}
         </div>
       );
@@ -506,22 +595,19 @@ class EnrichmentSearchCriteria extends Component {
     return (
       <React.Fragment>
         <Form className="SearchCriteriaContainer">
-          <div className="FilterStudyContainer">
-            <span className="FilterText">FILTERS</span>
-            <span className="FloatRight">{studyIcon}</span>
-          </div>
-
           <Form.Field
             control={Select}
             required
             label="Study"
             name="enrichmentStudy"
+            className="enrichmentStudyDropdown"
             value={enrichmentStudy}
             options={enrichmentStudies}
             placeholder="Select A Study"
             onChange={this.handleStudyChange}
             disabled={enrichmentStudiesDisabled}
           />
+
           <Form.Field
             control={Select}
             required

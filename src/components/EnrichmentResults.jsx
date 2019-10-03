@@ -242,9 +242,10 @@ class EnrichmentResults extends Component {
             <Icon
               name="table"
               size="large"
-              type="button"
+              // type="button"
+              color="orange"
               bordered
-              className=""
+              className="TableVsNetworkButtons"
               inverted={this.props.enrichmentView === 'table'}
               onClick={this.props.onEnrichmentViewChange({
                 enrichmentView: 'table'
@@ -262,9 +263,10 @@ class EnrichmentResults extends Component {
             <Icon
               name="chart pie"
               size="large"
-              type="button"
+              // type="button"
+              color="orange"
               bordered
-              className=""
+              className="TableVsNetworkButtons"
               inverted={this.props.enrichmentView === 'network'}
               onClick={this.props.onEnrichmentViewChange({
                 enrichmentView: 'network'

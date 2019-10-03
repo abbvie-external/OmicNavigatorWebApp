@@ -29,10 +29,11 @@
 } */
 
 .SidebarContainer {
-    background-color: #e0e1e2;
+    // background-color: #e0e1e2;
+    background-color: #F6F6F6;
 
     .SearchCriteriaContainer {
-      padding: 0px 20px !important;
+      padding: 20px 20px !important;
     }  
     
     .FilterStudyContainer {
@@ -41,22 +42,17 @@
       margin-bottom: 15px !important;
     }
     
-    .FilterText {
-      font-weight: bold;
-      font-stretch: condensed !important;
-      margin-top: 0px !important;
-      padding-top: 10px !important;
-    }
-
     .FloatRight {
       float: right !important;
       cursor: pointer !important;
     }
 
-    .StudyHTMLIcon {
+    .StudyHTMLIconDiv {
       cursor: pointer;
-      // background-color: #FF4400 !important;
-      // background-color: #2E2E2E !important;
+    }
+
+    .StudyHTMLIcon {
+      box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.94) !important;
     }
 
     i.inverted.circular.icon {
@@ -86,9 +82,9 @@
     // }
     
     .UpsetFiltersContainer {
-      padding-top: 30px;
-      padding-bottom: 15px !important;
-      margin-bottom: 15px !important;
+      padding-top: 0px;
+      padding-bottom: 0px !important;
+      margin-bottom: 0px !important;
       margin-left: 20px;    
     }
 
@@ -116,4 +112,30 @@
       color: white !important;
       transform: scale(1.2) !important;
     }   
+
+    .PlotIconDiv {
+      padding-right: 20px !important;
+    }
+
+    .PlotIcon {
+      background-color: #21BA45 !important;
+      border-color: #21BA45 !important;
+      // box-shadow: 0 0 0 0.1em rgba(33,186,69, 1) inset !important;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.94) !important;
+      color: white !important;
+    }
+    
+    .PlotRadioDiv {
+      padding-right: 25px !important;
+      padding-top: 15px !important;
+
+      .ui.slider.checkbox input:checked~.box:before, .ui.slider.checkbox input:checked~label:before {
+        background-color: #21BA45 !important;
+      }
+
+      .ui.toggle.checkbox input:checked~.box:before, .ui.toggle.checkbox input:checked~label:before {
+        background-color: #21BA45 !important;
+      }
+    }
+
   }

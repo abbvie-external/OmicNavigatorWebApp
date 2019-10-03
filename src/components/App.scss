@@ -85,4 +85,15 @@
   .QHGrid--body thead tr th {
     border-bottom: 1px solid grey !important;
   }
+
+  i.orange.icon {
+    color: #ff4400 !important;
+  }
+  i.inverted.bordered.orange.icon, i.inverted.circular.orange.icon {
+    color: #fff !important;
+    background-color: #ff4400 !important;
+  }
+  .test {
+    color: white !important;
+  }
 }
