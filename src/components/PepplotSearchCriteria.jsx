@@ -162,7 +162,7 @@ class PepplotSearchCriteria extends Component {
               <Icon
                 name="line graph"
                 size="large"
-                className="StudyHTMLIcon"
+                className="StudyHtmlIcon"
                 inverted
                 circular
               />
@@ -193,46 +193,49 @@ class PepplotSearchCriteria extends Component {
     }
 
     return (
-      <Form className="SearchCriteriaContainer">
-        <Form.Field
-          control={Select}
-          required
-          label="Study"
-          name="pepplotStudy"
-          value={pepplotStudy}
-          options={pepplotStudies}
-          placeholder="Select A Study"
-          onChange={this.handleStudyChange}
-          disabled={pepplotStudiesDisabled}
-        />
-        <Form.Field
-          control={Select}
-          required
-          label="Model"
-          name="pepplotModel"
-          value={pepplotModel}
-          options={pepplotModels}
-          placeholder="Select Model"
-          onChange={this.handleModelChange}
-          disabled={pepplotModelsDisabled}
-        />
-        <Form.Field
-          control={Select}
-          required
-          name="pepplotTest"
-          value={pepplotTest}
-          options={pepplotTests}
-          placeholder="Select Test"
-          onChange={this.handleTestChange}
-          disabled={pepplotTestsDisabled}
-          label={{
-            children: 'Test',
-            htmlFor: 'form-select-control-test'
-          }}
-          search
-          searchInput={{ id: 'form-select-control-test' }}
-        />
-      </Form>
+      <React.Fragment>
+        <Form className="SearchCriteriaContainer">
+          <Form.Field
+            control={Select}
+            required
+            label="Study"
+            name="pepplotStudy"
+            value={pepplotStudy}
+            options={pepplotStudies}
+            placeholder="Select A Study"
+            onChange={this.handleStudyChange}
+            disabled={pepplotStudiesDisabled}
+          />
+          <Form.Field
+            control={Select}
+            required
+            label="Model"
+            name="pepplotModel"
+            value={pepplotModel}
+            options={pepplotModels}
+            placeholder="Select Model"
+            onChange={this.handleModelChange}
+            disabled={pepplotModelsDisabled}
+          />
+          <Form.Field
+            control={Select}
+            required
+            name="pepplotTest"
+            value={pepplotTest}
+            options={pepplotTests}
+            placeholder="Select Test"
+            onChange={this.handleTestChange}
+            disabled={pepplotTestsDisabled}
+            label={{
+              children: 'Test',
+              htmlFor: 'form-select-control-test'
+            }}
+            search
+            searchInput={{ id: 'form-select-control-test' }}
+          />
+        </Form>
+        <span className="StudyHtmlIconDiv">{studyIcon}</span>
+      </React.Fragment>
     );
   }
 }

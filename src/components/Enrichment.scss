@@ -9,25 +9,15 @@
 }
 
 .EnrichmentContainer ::-webkit-scrollbar-thumb:vertical {
-  // border-radius: 0 !important;
-  /* background: #ff4400 !important; */
-  // background: #0f0000 !important;
-  /* box-shadow: 0px 2px 0px rgba(0, 0, 0, 0.6) !important; */
   box-shadow: 0px 2px 0px #ff4400 !important;
 }
 
 .EnrichmentContainer ::-webkit-scrollbar-thumb:horizontal {
-  // border-radius: 0 !important;
-  /* background: #ff4400 !important; */
-  // background: #0f0000 !important;
-  /* box-shadow: 0px 2px 0px rgba(0, 0, 0, 0.6) !important; */
   box-shadow: 2px 0px 0px #ff4400 !important;
 }
 
 .UpsetToggleContainer, .ToggleNetworkGraphContainer {
   padding-top: 15px;
-  // padding-bottom: 15px !important;
-  // margin-bottom: 15px !important;
   margin-left: 20px;
 }
 
@@ -43,66 +33,25 @@
   margin-right: 20px;
 }
 
-// .ui.positive.button {
-//   background-color: #ff4400 !important;
-// }
-
 .ui.negative.button {
   background-color: grey !important;
-}
-
-.ToggleNetworkGraphContainer .ui.positive.button {
-  // background-color: #00FF40 !important;
-  background-color: #1678c2 !important;
 }
 
 .UpsetSvgSpan {
   padding-top: 25px !important;
   padding-left: 35px !important;
-  height: 100% !important;
-  width: 27% !important;
 }
 
 .UpsetIconImg {
-  height: 42px !important;
+  float: right;
+  height: 42px;
+  margin-right: 20px;
 }
 
 .VerticalSidebarPlot {
-  width: 130% !important;
+  width: 100% !important;
 }
-
-// .ui[class*="very wide"].left.sidebar {
-//   width: 100% !important;
-// }
 
 .ui.visible[class*="very wide"].left.sidebar~.pusher {
-  transform: translate3d(100%,0,0) !important;
+  transform: translate3d(105%,0,0) !important;
 }
-
-// .ui .left .sidebar {
-//   width: 1000px !important;
-// }
-
-// .ui.left.sidebar {
-//   width: 1000px !important;
-// }
-
-// .PlotPulltab {
-//   padding: 10px !important;
-//   border-radius: 25px !important;
-//   background-color: #21BA45 !important;
-//   color: white !important;
-//   // writing-mode: vertical-rl !important;
-//   // text-orientation: upright !important;
-//   font-weight: bold !important;
-//   cursor: pointer !important;
-//   position: absolute !important;
-//   top: 50% !important;
-//   height: 50px !important;
-//   width: 50px !important;
-//   left: 10px !important;
-// }
-
-// .PlotPulltab:hover {
-//   transform: scale(1.2) !important;
-// }

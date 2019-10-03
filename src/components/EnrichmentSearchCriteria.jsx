@@ -1,14 +1,6 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import {
-  Form,
-  Select,
-  Icon,
-  Popup,
-  Button,
-  Divider,
-  Radio
-} from 'semantic-ui-react';
+import { Form, Select, Icon, Popup, Divider, Radio } from 'semantic-ui-react';
 import './SearchCriteria.scss';
 import { phosphoprotService } from '../services/phosphoprot.service';
 import DOMPurify from 'dompurify';
@@ -364,14 +356,6 @@ class EnrichmentSearchCriteria extends Component {
       fontSize: '13px'
     };
 
-    const SetAnalysisPopupStyle = {
-      backgroundColor: '#2E2E2E',
-      borderBottom: '2px solid #21BA45',
-      color: '#FFF',
-      padding: '1em',
-      fontSize: '13px'
-    };
-
     let studyIcon;
     let studyName = `${enrichmentStudy} Analysis Details`;
 
@@ -387,7 +371,7 @@ class EnrichmentSearchCriteria extends Component {
               <Icon
                 name="line graph"
                 size="large"
-                className="StudyHTMLIcon"
+                className="StudyHtmlIcon"
                 inverted
                 circular
               />
@@ -405,14 +389,7 @@ class EnrichmentSearchCriteria extends Component {
         <Popup
           trigger={
             <a target="_blank" rel="noopener noreferrer" href={'/'}>
-              <Icon
-                name="line graph"
-                size="large"
-                className="StudyHTMLIcon"
-                circular
-                inverted
-                disabled
-              />
+              <Icon name="line graph" size="large" circular inverted disabled />
             </a>
           }
           style={StudyPopupStyle}
@@ -424,47 +401,40 @@ class EnrichmentSearchCriteria extends Component {
       );
     }
 
-    // let PlotIcon;
-    // if (upsetPlotAvailable) {
-    //   PlotIcon = (
-    //     <Popup
-    //       trigger={
-    //         <Icon
-    //           name="chart bar"
-    //           size="large"
-    //           circular
-    //           className="PlotIcon"
-    //         />
-    //       }
-    //       style={SetAnalysisPopupStyle}
-    //       inverted
-    //       basic
-    //       position="bottom center"
-    //       content="View Plot"
-    //     />
-    //   );
-    // } else {
-    //   PlotIcon = (
-    //     <Popup
-    //       trigger={
-    //         <Icon name="chart bar"
-    //         size="large"
-    //         circular
-    //         className="PlotIcon"
-    //         disabled />
-    //       }
-    //       style={SetAnalysisPopupStyle}
-    //       basic
-    //       inverted
-    //       position="bottom center"
-    //       content="Loading Plot"
-    //     />
-    //   );
-    // }
+    const SetAnalysisPopupStyle = {
+      backgroundColor: '#2E2E2E',
+      borderBottom: '2px solid #21BA45',
+      color: '#FFF',
+      padding: '1em',
+      fontSize: '13px'
+    };
+
+    let upsetFilters = '';
+    if (
+      isValidSearchEnrichment &&
+      !isTestSelected &&
+      !isSearching &&
+      useUpsetAnalysis === true
+    ) {
+      upsetFilters = (
+        <img
+          alt="Multi-Set Filters"
+          src="/multisetFilters.png"
+          className="Multi-Set Filters"
+        />
+      );
+    }
 
     let PlotRadio = '';
     if (upsetPlotAvailable) {
-      PlotRadio = <Radio toggle label="View Plot" />;
+      PlotRadio = (
+        <Radio
+          toggle
+          label="View Plot"
+          checked={plotButtonActive}
+          onClick={this.props.onHandleAnimationChange('uncover')}
+        />
+      );
     }
 
     let upsetToggle = '';
@@ -472,6 +442,7 @@ class EnrichmentSearchCriteria extends Component {
       upsetToggle = (
         <div className="UpsetToggleContainer">
           <Divider />
+          <span className="UpsetFiltersContainer">{upsetFilters}</span>
           <span className="">
             <Popup
               trigger={
@@ -485,7 +456,7 @@ class EnrichmentSearchCriteria extends Component {
               style={SetAnalysisPopupStyle}
               basic
               inverted
-              position="right center"
+              position="bottom center"
               content="Set Analysis"
             />
           </span>
@@ -495,103 +466,6 @@ class EnrichmentSearchCriteria extends Component {
       );
     }
 
-    // const plotButtonColor = (plotButtonActive) ? '#21BA45 !important' : '#000000 !important';
-
-    const PlotButtonStyle = {
-      float: 'right',
-      padding: '10px',
-      marginRight: '-38px',
-      marginTop: '85px',
-      height: '50px',
-      width: '50px',
-      borderRadius: '25px',
-      backgroundColor: '#FFF',
-      border: '2px solid #e0e1e2',
-      color: '#21BA45',
-      fontWeight: 'bold',
-      fontSize: '0.9em',
-      textAlign: 'center',
-      boxShadow: '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)'
-    };
-
-    let NoMargin = {
-      margin: '0px'
-    };
-
-    let upsetPlotPulltab = '';
-    let plotText = !plotButtonActive ? 'Show' : 'Hide';
-    if (upsetPlotAvailable) {
-      upsetPlotPulltab = (
-        <Button
-          style={PlotButtonStyle}
-          className={!plotButtonActive ? 'PlotPulltab' : 'PPActive'}
-          // className={ !plotButtonActive ? "FloatRight PlotPulltab" : "FloatRight PlotPulltab PPActive" }
-          onClick={this.props.onHandleAnimationChange('uncover')}
-        >
-          <span style={{ fontSize: '0.8em' }}>{plotText}</span>
-          <br /> PLOT
-          {/* <Icon
-            style={NoMargin}
-            size="small"
-            name={!plotButtonActive ? 'plus' : 'minus'}
-          /> */}
-        </Button>
-      );
-    }
-
-    // if (upsetPlotAvailable && plotButtonActive) {
-    //   upsetPlotPulltab = (
-    //     <Button
-    //       className="FloatRight PlotPulltabActive"
-    //       onClick={this.props.onHandleAnimationChange('uncover')}
-    //     >
-    //       PLOT
-    //     </Button>
-    //   );
-    // }
-
-    // const PlotButtonStyleAlt = {
-    //   float: 'right',
-    // };
-
-    // let upsetPlotPulltabAlt = '';
-    // if (upsetPlotAvailable) {
-    //   upsetPlotPulltabAlt = (
-    //     <Button
-    //       style={PlotButtonStyle}
-    //       className={!plotButtonActive ? 'PlotPulltab' : 'PPActive'}
-    //       // className={ !plotButtonActive ? "FloatRight PlotPulltab" : "FloatRight PlotPulltab PPActive" }
-    //       onClick={this.props.onHandleAnimationChange('uncover')}
-    //     >
-    //       <span style={{ fontSize: '0.8em' }}>{plotText}</span>
-    //       <br /> PLOT
-    //       {/* <Icon
-    //         style={NoMargin}
-    //         size="small"
-    //         name={!plotButtonActive ? 'plus' : 'minus'}
-    //       /> */}
-    //     </Button>
-    //   );
-    // }
-
-    let upsetFilters = '';
-    if (
-      isValidSearchEnrichment &&
-      !isTestSelected &&
-      !isSearching &&
-      useUpsetAnalysis === true
-    ) {
-      upsetFilters = (
-        <div className="UpsetFiltersContainer">
-          <img
-            alt="Multi-Set Filters"
-            src="/multisetFilters.png"
-            className="Multi-Set Filters"
-          />
-          {upsetPlotPulltab}
-        </div>
-      );
-    }
     return (
       <React.Fragment>
         <Form className="SearchCriteriaContainer">
@@ -637,7 +511,7 @@ class EnrichmentSearchCriteria extends Component {
           />
         </Form>
         {upsetToggle}
-        {upsetFilters}
+        <span className="StudyHtmlIconDiv">{studyIcon}</span>
       </React.Fragment>
     );
   }
