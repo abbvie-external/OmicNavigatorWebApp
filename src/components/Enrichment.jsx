@@ -61,6 +61,7 @@ class EnrichmentContainer extends Component {
       isSearching: false,
       isValidSearchEnrichment: true,
       upsetPlotAvailable: false,
+      plotButtonActive: false,
       visible: false
     });
     // updateUrl(this.props, this.state);
@@ -73,6 +74,7 @@ class EnrichmentContainer extends Component {
       enrichmentAnnotation: changes.enrichmentAnnotation,
       // enrichmentView: 'table',
       upsetPlotAvailable: false,
+      plotButtonActive: false,
       visible: false
     });
   };
@@ -81,6 +83,7 @@ class EnrichmentContainer extends Component {
     this.setState({
       isValidSearchEnrichment: false,
       upsetPlotAvailable: false,
+      plotButtonActive: false,
       visible: false
     });
   };

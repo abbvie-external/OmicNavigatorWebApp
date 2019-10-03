@@ -441,12 +441,16 @@ class EnrichmentSearchCriteria extends Component {
       float: 'right',
       padding: '10px',
       borderRadius: '25px',
-      backgroundColor: '#000',
-      color: 'white',
+      backgroundColor: '#FFF',
+      border: '2px solid #e0e1e2',
+      color: '#21BA45',
       fontWeight: 'bold',
+      fontSize: '0.9em',
+      textAlign: 'center',
       height: '50px',
       width: '50px',
-      marginRight: '-38px'
+      marginRight: '-38px',
+      boxShadow: '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)'
     };
 
     let NoMargin = {
@@ -454,6 +458,7 @@ class EnrichmentSearchCriteria extends Component {
     };
 
     let upsetPlotPulltab = '';
+    let plotText = !plotButtonActive ? 'Show' : 'Hide';
     if (upsetPlotAvailable) {
       upsetPlotPulltab = (
         <Button
@@ -462,12 +467,13 @@ class EnrichmentSearchCriteria extends Component {
           // className={ !plotButtonActive ? "FloatRight PlotPulltab" : "FloatRight PlotPulltab PPActive" }
           onClick={this.props.onHandleAnimationChange('uncover')}
         >
-          PLOT
-          <Icon
+          <span style={{ fontSize: '0.8em' }}>{plotText}</span>
+          <br /> PLOT
+          {/* <Icon
             style={NoMargin}
             size="small"
             name={!plotButtonActive ? 'plus' : 'minus'}
-          />
+          /> */}
         </Button>
       );
     }
