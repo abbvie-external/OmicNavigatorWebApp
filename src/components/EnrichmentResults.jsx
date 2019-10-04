@@ -213,18 +213,6 @@ class EnrichmentResults extends Component {
       this.showBarcodePlot
     );
 
-    // let upsetPlotPulltab = '';
-    // if (upsetPlotAvailable) {
-    //   upsetPlotPulltab = (
-    //     <Button
-    //       className="FloatRight PlotPulltab"
-    //       onClick={this.props.onHandleAnimationChange('uncover')}
-    //     >
-    //       PLOT
-    //     </Button>
-    //   );
-    // }
-
     const IconPopupStyle = {
       backgroundColor: '2E2E2E',
       borderBottom: '2px solid #FF4400',
@@ -242,7 +230,6 @@ class EnrichmentResults extends Component {
             <Icon
               name="table"
               size="large"
-              // type="button"
               color="orange"
               bordered
               className="TableVsNetworkButtons"
@@ -263,7 +250,6 @@ class EnrichmentResults extends Component {
             <Icon
               name="chart pie"
               size="large"
-              // type="button"
               color="orange"
               bordered
               className="TableVsNetworkButtons"
@@ -301,7 +287,6 @@ class EnrichmentResults extends Component {
             additionalTemplateInfo={additionalTemplateInfo}
             // extraHeaderItem={enrichmentViewToggle}
           />
-          {/* {upsetPlotPulltab} */}
         </div>
       );
     } else if (this.state.isTestSelected && !this.state.isTestDataLoaded) {

@@ -61,17 +61,6 @@ class EnrichmentNetworkGraph extends Component {
 
   render() {
     const { upsetPlotAvailable } = this.props;
-    // let upsetPlotPulltab = '';
-    // if (upsetPlotAvailable) {
-    //   upsetPlotPulltab = (
-    //     <Button
-    //       className="FloatRight PlotPulltab"
-    //       onClick={this.props.onHandleAnimationChange('uncover')}
-    //     >
-    //       PLOT
-    //     </Button>
-    //   );
-    // }
 
     const IconPopupStyle = {
       backgroundColor: '2E2E2E',

@@ -1,6 +1,15 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import { Form, Select, Icon, Popup, Divider, Radio } from 'semantic-ui-react';
+import {
+  Form,
+  Select,
+  Icon,
+  Popup,
+  Divider,
+  Radio,
+  Transition,
+  Image
+} from 'semantic-ui-react';
 import './SearchCriteria.scss';
 import { phosphoprotService } from '../services/phosphoprot.service';
 import DOMPurify from 'dompurify';
@@ -32,7 +41,7 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentStudiesDisabled: false,
       enrichmentModelsDisabled: true,
       enrichmentAnnotationsDisabled: true,
-      useUpsetAnalysis: false,
+      // useUpsetAnalysis: false,
       sigValue: 0.05,
       uData: [],
       uAnchor: '',
@@ -47,7 +56,8 @@ class EnrichmentSearchCriteria extends Component {
         numElements: undefined,
         maxElements: undefined,
         heightScalar: 1
-      }
+      },
+      upsetFiltersVisible: false
     };
   }
 
@@ -125,7 +135,8 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentStudiesDisabled: true,
       enrichmentModelsDisabled: true,
       enrichmentAnnotationsDisabled: true,
-      useUpsetAnalysis: false
+      // useUpsetAnalysis: false,
+      upsetFiltersVisible: false
     });
     this.props.onSearchCriteriaChange({
       enrichmentStudy: this.props.enrichmentStudy,
@@ -157,9 +168,9 @@ class EnrichmentSearchCriteria extends Component {
 
   handleUpsetToggle = () => {
     return evt => {
-      if (this.state.useUpsetAnalysis === false) {
+      if (this.state.upsetFiltersVisible === false) {
         this.setState({
-          useUpsetAnalysis: true
+          upsetFiltersVisible: true
         });
         this.updateQueryData({
           must: this.state.uSettings.must,
@@ -168,7 +179,7 @@ class EnrichmentSearchCriteria extends Component {
         });
       } else {
         this.setState({
-          useUpsetAnalysis: false
+          upsetFiltersVisible: false
         });
         const enrichmentAnnotationName = 'enrichmentAnnotation';
         const enrichmentAnnotationVar = this.props.enrichmentAnnotation;
@@ -330,7 +341,8 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentStudiesDisabled,
       enrichmentModelsDisabled,
       enrichmentAnnotationsDisabled,
-      useUpsetAnalysis
+      upsetFiltersVisible
+      // useUpsetAnalysis
     } = this.state;
 
     const {
@@ -397,50 +409,54 @@ class EnrichmentSearchCriteria extends Component {
       );
     }
 
-    let UpsetFilters = '';
+    let UpsetFilters;
     if (
-      isValidSearchEnrichment &&
-      !isTestSelected &&
-      !isSearching &&
-      useUpsetAnalysis === true
+      isValidSearchEnrichment
+      // !isTestSelected &&
+      // !isSearching
+      // upsetFiltersVisible === true
     ) {
       UpsetFilters = (
-        <img
-          alt="Multi-Set Filters"
-          src="/multisetFilters.png"
-          className="Multi-Set Filters"
-        />
+        <Transition.Group animation="scale" duration={500}>
+          {upsetFiltersVisible && (
+            <Image
+              centered
+              alt="Multi-Set Filters"
+              src="/multisetFilters.png"
+              className="Multi-Set Filters"
+            />
+          )}
+        </Transition.Group>
       );
     }
 
-    let PlotRadio = '';
-    if (upsetPlotAvailable) {
+    let PlotRadio;
+    let UpsetRadio;
+
+    if (isValidSearchEnrichment) {
       PlotRadio = (
         <Radio
           toggle
           label="View Plot"
           checked={plotButtonActive}
-          onClick={this.props.onHandleAnimationChange('uncover')}
+          onChange={this.props.onHandlePlotAnimation('uncover')}
+          disabled={!upsetPlotAvailable}
         />
       );
-    }
 
-    let UpsetRadio;
-
-    if (isValidSearchEnrichment && !isTestSelected) {
+      // let UpsetRadio;
+      // if (isValidSearchEnrichment) {
       UpsetRadio = (
         <React.Fragment>
           <Divider />
           <Radio
             toggle
             label="Set Analysis"
-            checked={useUpsetAnalysis}
-            onClick={this.handleUpsetToggle()}
+            checked={upsetFiltersVisible}
+            onChange={this.handleUpsetToggle()}
           />
         </React.Fragment>
       );
-    } else {
-      UpsetRadio = '';
     }
 
     return (

@@ -88,18 +88,19 @@ class EnrichmentContainer extends Component {
     });
   };
 
-  handleAnimationChange = animation => () => {
+  handlePlotAnimation = animation => () => {
     this.setState(prevState => ({
       animation,
-      visible: !prevState.visible
-    }));
-    this.setState({
+      visible: !prevState.visible,
       plotButtonActive: !this.state.plotButtonActive
-    });
+    }));
+    // this.setState({
+    //   plotButtonActive: !this.state.plotButtonActive
+    // });
   };
 
   handleDirectionChange = direction => () =>
-    this.setState({ direction, visible: false });
+    this.setState({ direction: direction, visible: false });
 
   handleUpsetPlot = upsetPlotResults => {
     this.setState({
@@ -339,7 +340,7 @@ class EnrichmentContainer extends Component {
           {...this.props}
           {...this.state}
           onEnrichmentViewChange={this.handleEnrichmentViewChange}
-          onHandleAnimationChange={this.handleAnimationChange}
+          onHandlePlotAnimation={this.handlePlotAnimation}
         />
       );
     } else if (
@@ -352,7 +353,7 @@ class EnrichmentContainer extends Component {
           {...this.props}
           {...this.state}
           onEnrichmentViewChange={this.handleEnrichmentViewChange}
-          onHandleAnimationChange={this.handleAnimationChange}
+          onHandlePlotAnimation={this.handlePlotAnimation}
         />
       );
     } else if (this.state.isSearching) {
@@ -364,10 +365,8 @@ class EnrichmentContainer extends Component {
     const enrichmentView = this.getView(this.state);
 
     const { upsetPlotInfo, animation, direction, visible } = this.state;
-
     const vertical = direction === 'bottom' || direction === 'top';
-
-    const VerticalSidebar = ({ animation, direction, visible }) => (
+    const VerticalSidebar = ({ animation, visible }) => (
       <Sidebar
         as={'div'}
         animation={animation}
@@ -404,7 +403,7 @@ class EnrichmentContainer extends Component {
             onSearchCriteriaChange={this.handleSearchCriteriaChange}
             onSearchCriteriaReset={this.hideEGrid}
             onGetUpsetPlot={this.handleUpsetPlot}
-            onHandleAnimationChange={this.handleAnimationChange}
+            onHandlePlotAnimation={this.handlePlotAnimation}
           />
         </Grid.Column>
         <Grid.Column
