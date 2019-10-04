@@ -32,7 +32,7 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentStudiesDisabled: false,
       enrichmentModelsDisabled: true,
       enrichmentAnnotationsDisabled: true,
-      upsetIcon: 'venndiagram.png',
+      useUpsetAnalysis: false,
       sigValue: 0.05,
       uData: [],
       uAnchor: '',
@@ -125,8 +125,7 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentStudiesDisabled: true,
       enrichmentModelsDisabled: true,
       enrichmentAnnotationsDisabled: true,
-      useUpsetAnalysis: false,
-      upsetIcon: 'venndiagram.png'
+      useUpsetAnalysis: false
     });
     this.props.onSearchCriteriaChange({
       enrichmentStudy: this.props.enrichmentStudy,
@@ -158,10 +157,9 @@ class EnrichmentSearchCriteria extends Component {
 
   handleUpsetToggle = () => {
     return evt => {
-      if (this.state.upsetIcon === 'venndiagram.png') {
+      if (this.state.useUpsetAnalysis === false) {
         this.setState({
-          useUpsetAnalysis: true,
-          upsetIcon: 'venndiagramChosenAltGreen.png'
+          useUpsetAnalysis: true
         });
         this.updateQueryData({
           must: this.state.uSettings.must,
@@ -170,8 +168,7 @@ class EnrichmentSearchCriteria extends Component {
         });
       } else {
         this.setState({
-          useUpsetAnalysis: false,
-          upsetIcon: 'venndiagram.png'
+          useUpsetAnalysis: false
         });
         const enrichmentAnnotationName = 'enrichmentAnnotation';
         const enrichmentAnnotationVar = this.props.enrichmentAnnotation;
@@ -333,7 +330,6 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentStudiesDisabled,
       enrichmentModelsDisabled,
       enrichmentAnnotationsDisabled,
-      upsetIcon,
       useUpsetAnalysis
     } = this.state;
 
@@ -401,22 +397,14 @@ class EnrichmentSearchCriteria extends Component {
       );
     }
 
-    const SetAnalysisPopupStyle = {
-      backgroundColor: '#2E2E2E',
-      borderBottom: '2px solid #21BA45',
-      color: '#FFF',
-      padding: '1em',
-      fontSize: '13px'
-    };
-
-    let upsetFilters = '';
+    let UpsetFilters = '';
     if (
       isValidSearchEnrichment &&
       !isTestSelected &&
       !isSearching &&
       useUpsetAnalysis === true
     ) {
-      upsetFilters = (
+      UpsetFilters = (
         <img
           alt="Multi-Set Filters"
           src="/multisetFilters.png"
@@ -437,33 +425,22 @@ class EnrichmentSearchCriteria extends Component {
       );
     }
 
-    let upsetToggle = '';
-    if (isValidSearchEnrichment && !isTestSelected && !isSearching) {
-      upsetToggle = (
-        <div className="UpsetToggleContainer">
+    let UpsetRadio;
+
+    if (isValidSearchEnrichment && !isTestSelected) {
+      UpsetRadio = (
+        <React.Fragment>
           <Divider />
-          <span className="UpsetFiltersContainer">{upsetFilters}</span>
-          <span className="">
-            <Popup
-              trigger={
-                <img
-                  className="UpsetIconImg"
-                  src={upsetIcon}
-                  alt="Upset Icon"
-                  onClick={this.handleUpsetToggle()}
-                />
-              }
-              style={SetAnalysisPopupStyle}
-              basic
-              inverted
-              position="bottom center"
-              content="Set Analysis"
-            />
-          </span>
-          {/* <span className="FloatRight PlotIconDiv">{PlotIcon}</span> */}
-          <span className="FloatRight PlotRadioDiv">{PlotRadio}</span>
-        </div>
+          <Radio
+            toggle
+            label="Set Analysis"
+            checked={useUpsetAnalysis}
+            onClick={this.handleUpsetToggle()}
+          />
+        </React.Fragment>
       );
+    } else {
+      UpsetRadio = '';
     }
 
     return (
@@ -510,7 +487,11 @@ class EnrichmentSearchCriteria extends Component {
             searchInput={{ id: 'form-select-control-test' }}
           />
         </Form>
-        {upsetToggle}
+        <div className="UpsetContainer">
+          <div className="SliderDiv UpsetRadio">{UpsetRadio}</div>
+          <div className="UpsetFiltersDiv">{UpsetFilters}</div>
+          <div className="SliderDiv PlotRadio">{PlotRadio}</div>
+        </div>
         <span className="StudyHtmlIconDiv">{studyIcon}</span>
       </React.Fragment>
     );

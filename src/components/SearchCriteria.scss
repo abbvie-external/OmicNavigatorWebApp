@@ -58,39 +58,24 @@
     i.inverted.circular.icon {
       background-color: #FF4400 !important;
     }
-
-    .UpsetToggleContainer .ui.positive.button {
-      background-color: #21BA45 !important;
+    
+    .UpsetContainer {
+      padding: 0px 20px 0px 20px !important;
     }
 
-    .UpsetToggleText {
-      font-weight: bold;
-      font-stretch: condensed !important;
-      margin-top: 0px !important;
-      padding-top: 10px !important;
-    }
-
-    .UpsetToggle {
-      float: right;
-      margin-right: 20px;
-    }
- 
-    .UpsetFiltersContainer {
+    .UpsetFiltersDiv {
       padding: 0px;
       margin: 0px
     }
 
-    .PlotRadioDiv {
-      padding-right: 25px !important;
-      padding-top: 15px !important;
-
-      .ui.slider.checkbox input:checked~.box:before, .ui.slider.checkbox input:checked~label:before {
-        background-color: #21BA45 !important;
-      }
-
+    .SliderDiv {
       .ui.toggle.checkbox input:checked~.box:before, .ui.toggle.checkbox input:checked~label:before {
         background-color: #21BA45 !important;
       }
+    }
+
+    .PlotRadio {
+      margin-top: 15px;
     }
 
   }

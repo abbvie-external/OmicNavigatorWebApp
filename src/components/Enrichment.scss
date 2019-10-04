@@ -16,23 +16,6 @@
   box-shadow: 2px 0px 0px #ff4400 !important;
 }
 
-.UpsetToggleContainer, .ToggleNetworkGraphContainer {
-  padding-top: 15px;
-  margin-left: 20px;
-}
-
-.ToggleNetworkGraphText {
-  font-weight: bold;
-  font-stretch: condensed !important;
-  margin-top: 0px !important;
-  padding-top: 10px !important;
-}
-
-.ToggleNetworkGraph {
-  float: right;
-  margin-right: 20px;
-}
-
 .ui.negative.button {
   background-color: grey !important;
 }
@@ -40,12 +23,6 @@
 .UpsetSvgSpan {
   padding-top: 25px !important;
   padding-left: 35px !important;
-}
-
-.UpsetIconImg {
-  float: right;
-  height: 42px;
-  margin-right: 20px;
 }
 
 .VerticalSidebarPlot {
