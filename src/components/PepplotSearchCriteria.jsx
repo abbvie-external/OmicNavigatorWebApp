@@ -92,11 +92,11 @@ class PepplotSearchCriteria extends Component {
   };
 
   handleTestChange = (evt, { name, value }) => {
-    this.setState({
-      pepplotStudiesDisabled: true,
-      pepplotModelsDisabled: true,
-      pepplotTestsDisabled: true
-    });
+    // this.setState({
+    //   pepplotStudiesDisabled: true,
+    //   pepplotModelsDisabled: true,
+    //   pepplotTestsDisabled: true
+    // });
     this.props.onSearchCriteriaChange({
       pepplotStudy: this.props.pepplotStudy,
       pepplotModel: this.props.pepplotModel,
@@ -114,11 +114,11 @@ class PepplotSearchCriteria extends Component {
       )
       .then(dataFromService => {
         this.testdata = dataFromService;
-        this.setState({
-          pepplotStudiesDisabled: false,
-          pepplotModelsDisabled: false,
-          pepplotTestsDisabled: false
-        });
+        // this.setState({
+        //   pepplotStudiesDisabled: false,
+        //   pepplotModelsDisabled: false,
+        //   pepplotTestsDisabled: false
+        // });
         this.props.onPepplotSearch({
           pepplotResults: this.testdata
         });

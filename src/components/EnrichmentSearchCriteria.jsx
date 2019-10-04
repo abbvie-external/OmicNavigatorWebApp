@@ -41,7 +41,6 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentStudiesDisabled: false,
       enrichmentModelsDisabled: true,
       enrichmentAnnotationsDisabled: true,
-      // useUpsetAnalysis: false,
       sigValue: 0.05,
       uData: [],
       uAnchor: '',
@@ -132,10 +131,9 @@ class EnrichmentSearchCriteria extends Component {
 
   handleAnnotationChange = (evt, { name, value }) => {
     this.setState({
-      enrichmentStudiesDisabled: true,
-      enrichmentModelsDisabled: true,
-      enrichmentAnnotationsDisabled: true,
-      // useUpsetAnalysis: false,
+      // enrichmentStudiesDisabled: true,
+      // enrichmentModelsDisabled: true,
+      // enrichmentAnnotationsDisabled: true,
       upsetFiltersVisible: false
     });
     this.props.onSearchCriteriaChange({
@@ -155,11 +153,11 @@ class EnrichmentSearchCriteria extends Component {
       )
       .then(dataFromService => {
         this.annotationdata = dataFromService;
-        this.setState({
-          enrichmentStudiesDisabled: false,
-          enrichmentModelsDisabled: false,
-          enrichmentAnnotationsDisabled: false
-        });
+        // this.setState({
+        // enrichmentStudiesDisabled: false,
+        // enrichmentModelsDisabled: false,
+        // enrichmentAnnotationsDisabled: false
+        // });
         this.props.onEnrichmentSearch({
           enrichmentResults: this.annotationdata
         });
@@ -192,11 +190,11 @@ class EnrichmentSearchCriteria extends Component {
   };
 
   upsetTriggeredAnnotationChange = (name, value) => {
-    this.setState({
-      enrichmentStudiesDisabled: true,
-      enrichmentModelsDisabled: true,
-      enrichmentAnnotationsDisabled: true
-    });
+    //this.setState({
+    // enrichmentStudiesDisabled: true,
+    // enrichmentModelsDisabled: true,
+    // enrichmentAnnotationsDisabled: true
+    //});
     this.props.onSearchCriteriaChange({
       enrichmentStudy: this.props.enrichmentStudy,
       enrichmentModel: this.props.enrichmentModel,
@@ -214,11 +212,11 @@ class EnrichmentSearchCriteria extends Component {
       )
       .then(dataFromService => {
         this.annotationdata = dataFromService;
-        this.setState({
-          enrichmentStudiesDisabled: false,
-          enrichmentModelsDisabled: false,
-          enrichmentAnnotationsDisabled: false
-        });
+        // this.setState({
+        //   enrichmentStudiesDisabled: false,
+        //   enrichmentModelsDisabled: false,
+        //   enrichmentAnnotationsDisabled: false
+        // });
         this.props.onEnrichmentSearch({
           enrichmentResults: this.annotationdata
         });
@@ -342,7 +340,6 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentModelsDisabled,
       enrichmentAnnotationsDisabled,
       upsetFiltersVisible
-      // useUpsetAnalysis
     } = this.state;
 
     const {
