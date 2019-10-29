@@ -47,8 +47,8 @@
     .StudyHtmlIconDiv {
       cursor: pointer;
       position: absolute;
-      left: 9%;
-      bottom: 8%;
+      right: 7%;
+      top: 4%;
     }
 
     .StudyHtmlIcon {
@@ -56,7 +56,8 @@
     }
 
     i.inverted.circular.icon {
-      background-color: #FF4400 !important;
+      background-color: #1b1c1d !important;
+      // background-color: #FF4400 !important;
     }
     
     .UpsetContainer {
@@ -64,7 +65,7 @@
     }
 
     .UpsetFiltersDiv {
-      padding: 0px;
+      padding: 10px 0px !important;
       margin: 0px;
       min-height: 250px !important;
     }

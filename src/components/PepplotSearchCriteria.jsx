@@ -197,7 +197,6 @@ class PepplotSearchCriteria extends Component {
         <Form className="SearchCriteriaContainer">
           <Form.Field
             control={Select}
-            required
             label="Study"
             name="pepplotStudy"
             value={pepplotStudy}
@@ -205,10 +204,10 @@ class PepplotSearchCriteria extends Component {
             placeholder="Select A Study"
             onChange={this.handleStudyChange}
             disabled={pepplotStudiesDisabled}
+            width={13}
           />
           <Form.Field
             control={Select}
-            required
             label="Model"
             name="pepplotModel"
             value={pepplotModel}
@@ -219,7 +218,6 @@ class PepplotSearchCriteria extends Component {
           />
           <Form.Field
             control={Select}
-            required
             name="pepplotTest"
             value={pepplotTest}
             options={pepplotTests}

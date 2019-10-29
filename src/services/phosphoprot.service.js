@@ -5,8 +5,6 @@ const ocpu = require('opencpu.js/opencpu-0.5.js');
 
 class PhosphoprotService {
   constructor() {
-    // this.ocpuUrl = "***REMOVED***/ocpu/library/***REMOVED***/R"
-    // this.ocpuUrl = "http://localhost:5656/ocpu/library/PhosphoProt/R"
     this.ocpuUrl = 'http://10.239.9.49/ocpu/library/PhosphoProt/R';
   }
 
@@ -167,6 +165,38 @@ class PhosphoprotService {
       testCategory: testCategory,
       study: study,
       annotation: annotation
+    });
+    const svgMarkupFromPromise = await promise;
+    return svgMarkupFromPromise;
+  }
+
+  async getUpsetInferenceData(
+    testCategory,
+    mustTest,
+    notTest,
+    study,
+    sigValue,
+    anchor
+  ) {
+    this.setUrl();
+    const promise = this.ocpuDataCall('getInferenceIntersection', {
+      testCategory: testCategory,
+      anchor: anchor,
+      mustTests: mustTest,
+      notTests: notTest,
+      study: study,
+      sigValue: sigValue
+    });
+    const dataFromPromise = await promise;
+    return dataFromPromise;
+  }
+
+  async getInferenceUpSetPlot(sigVal, testCategory, study) {
+    this.setUrl();
+    const promise = this.ocpuPlotCall('InferenceUpsetPlot', {
+      sigValue: sigVal,
+      testCategory: testCategory,
+      study: study
     });
     const svgMarkupFromPromise = await promise;
     return svgMarkupFromPromise;

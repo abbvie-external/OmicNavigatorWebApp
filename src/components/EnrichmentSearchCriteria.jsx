@@ -14,6 +14,8 @@ import './SearchCriteria.scss';
 import { phosphoprotService } from '../services/phosphoprot.service';
 import DOMPurify from 'dompurify';
 import _ from 'lodash';
+import * as d3 from 'd3';
+import UpSetFilters from './UpSetFilters';
 
 class EnrichmentSearchCriteria extends Component {
   static defaultProps = {
@@ -27,7 +29,8 @@ class EnrichmentSearchCriteria extends Component {
     animation: 'uncover',
     direction: 'left',
     visible: false,
-    plotButtonActive: false
+    plotButtonActive: false,
+    uData: []
   };
 
   constructor(props) {
@@ -41,10 +44,13 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentStudiesDisabled: false,
       enrichmentModelsDisabled: true,
       enrichmentAnnotationsDisabled: true,
-      sigValue: 0.05,
-      uData: [],
       uAnchor: '',
+      selectedCol: 'adj_P_Val',
+      selectedOperator: '<',
+      sigValue: 0.05,
       uSettings: {
+        defaultSelectedCol: 'adj_P_Val',
+        defaultSelectedOperator: '<',
         defaultSigValue: 0.05,
         useAnchor: false,
         must: [],
@@ -54,9 +60,13 @@ class EnrichmentSearchCriteria extends Component {
         automaticUpdates: true,
         numElements: undefined,
         maxElements: undefined,
-        heightScalar: 1
+        heightScalar: 1,
+        thresholdCols: ['adj_P_Val'],
+        thresholdOperator: ['<', '>', '|<|', '|>|']
       },
-      upsetFiltersVisible: false
+      metaSvg: '',
+      upsetFiltersVisible: false,
+      activateUpSetFilters: false
     };
   }
 
@@ -131,9 +141,6 @@ class EnrichmentSearchCriteria extends Component {
 
   handleAnnotationChange = (evt, { name, value }) => {
     this.setState({
-      // enrichmentStudiesDisabled: true,
-      // enrichmentModelsDisabled: true,
-      // enrichmentAnnotationsDisabled: true,
       upsetFiltersVisible: false
     });
     this.props.onSearchCriteriaChange({
@@ -152,12 +159,16 @@ class EnrichmentSearchCriteria extends Component {
         this.props.enrichmentStudy + 'plots'
       )
       .then(dataFromService => {
+        this.setState({
+          uSettings: {
+            ...this.state.uSettings,
+            must: [],
+            not: [],
+            defaultSigValue: 0.05
+          },
+          sigValue: 0.05
+        });
         this.annotationdata = dataFromService;
-        // this.setState({
-        // enrichmentStudiesDisabled: false,
-        // enrichmentModelsDisabled: false,
-        // enrichmentAnnotationsDisabled: false
-        // });
         this.props.onEnrichmentSearch({
           enrichmentResults: this.annotationdata
         });
@@ -173,7 +184,9 @@ class EnrichmentSearchCriteria extends Component {
         this.updateQueryData({
           must: this.state.uSettings.must,
           not: this.state.uSettings.not,
-          sig: this.state.sigValue
+          sigValue: this.state.uSettings.defaultSigValue,
+          // selectedCol: "adj_P_Val",
+          selectedOperator: this.state.uSettings.defaultSelectedOperator
         });
       } else {
         this.setState({
@@ -190,11 +203,6 @@ class EnrichmentSearchCriteria extends Component {
   };
 
   upsetTriggeredAnnotationChange = (name, value) => {
-    //this.setState({
-    // enrichmentStudiesDisabled: true,
-    // enrichmentModelsDisabled: true,
-    // enrichmentAnnotationsDisabled: true
-    //});
     this.props.onSearchCriteriaChange({
       enrichmentStudy: this.props.enrichmentStudy,
       enrichmentModel: this.props.enrichmentModel,
@@ -212,101 +220,78 @@ class EnrichmentSearchCriteria extends Component {
       )
       .then(dataFromService => {
         this.annotationdata = dataFromService;
-        // this.setState({
-        //   enrichmentStudiesDisabled: false,
-        //   enrichmentModelsDisabled: false,
-        //   enrichmentAnnotationsDisabled: false
-        // });
         this.props.onEnrichmentSearch({
           enrichmentResults: this.annotationdata
         });
       });
   };
 
-  updateQueryData(e) {
-    var sigValue = e.sig;
-    var mustString = '';
-    var notString = '';
+  updateQueryData = evt => {
+    const eSigV = evt.sigValue || this.state.sigValue;
+    const eMust = evt.must || this.state.uSettings.must;
+    const eNot = evt.not || this.state.uSettings.not;
+    const eOperator = evt.selectedOperator || this.state.selectedOperator;
+    // const eCol = evt.selectedCol;
     this.setState({
       uSettings: {
         ...this.state.uSettings,
-        must: e.must,
-        not: e.not,
-        defaultSigValue: e.sig
-      }
+        must: eMust,
+        not: eNot
+      },
+      sigValue: eSigV,
+      selectedOperator: eOperator
+      // selectedCol: eCol
     });
 
-    if (sigValue === 0) {
-      return;
-    } else {
-      //Turn Must Tests and Not Tests into a...
-      //single string separated by a ;
-      //Used for service function call
-
-      mustString = this.testToString(e.must);
-      notString = this.testToString(e.not);
-
-      phosphoprotService
-        .getUpsetEnrichmentData(
-          this.props.enrichmentModel,
-          mustString,
-          notString,
-          this.props.enrichmentStudy + 'plots',
-          this.state.sigValue,
-          this.props.enrichmentAnnotation
-        )
-        .then(annotationData => {
-          this.setState({
-            uSettings: {
-              ...this.state.uSettings,
-              numElements: annotationData.length
-            }
-          });
-          //A Heuristic solution to trigger the ngOnChange in UpSet-Query
-          // const uSettingsCopy = Object.assign({}, this.state.uSettings)
-
-          let allKeys = _.keys(annotationData[0]);
-          let ***REMOVED***_text_col = _.indexOf(allKeys, 'name_1006');
-
-          let includeCols = ['Annotation'];
-          if (***REMOVED***_text_col >= 0) {
-            // this.show***REMOVED***TextCol = true;
-            includeCols.push('name_1006');
-          }
-          // let Columns = _.map(
-          //   _.filter(_.keys(annotationData[0]), function(d) {
-          //     return !_.includes(includeCols, d);
-          //   }),
-          //   function(d) {
-          //     return { field: d };
-          //   }
-          // );
-          // this.loadItems();
-          // this.queried = true;
-          // this.gridLoading = false;
-        });
-      this.getUpSetPlot(
-        sigValue,
+    let mustString = this.testToString(eMust);
+    let notString = this.testToString(eNot);
+    phosphoprotService
+      .getUpsetEnrichmentData(
         this.props.enrichmentModel,
+        mustString,
+        notString,
         this.props.enrichmentStudy + 'plots',
-        this.props.enrichmentAnnotation
-      );
-    }
-  }
+        eSigV,
+        this.props.enrichmentAnnotation,
+        eOperator
+      )
+      .then(annotationData => {
+        const multisetResults = annotationData;
+        this.setState({
+          uSettings: {
+            ...this.state.uSettings,
+            numElements: multisetResults.length,
+            maxElements: multisetResults.length
+          },
+          activateUpSetFilters: true
+        });
+        this.props.onEnrichmentSearch({
+          enrichmentResults: multisetResults
+        });
+      });
+    this.getUpSetPlot(
+      eSigV,
+      this.props.enrichmentModel,
+      this.props.enrichmentStudy + 'plots',
+      this.props.enrichmentAnnotation
+    );
+  };
 
   testToString(solution) {
     var str = '';
-    if (solution.length === 0) {
-      return str;
-    }
-    for (var i = 0; i < solution.length; i++) {
-      if (i === solution.length - 1) {
-        str += solution[i] + '';
-      } else {
-        str += solution[i] + ';';
+    if (solution !== undefined) {
+      if (solution.length === 0) {
+        return str;
       }
-    }
-    return str;
+      for (var i = 0; i < solution.length; i++) {
+        if (i === solution.length - 1) {
+          str += solution[i] + '';
+        } else {
+          str += solution[i] + ';';
+        }
+      }
+      return str;
+    } else return str;
   }
 
   getUpSetPlot(sigVal, enrichmentModel, enrichmentStudy, enrichmentAnnotation) {
@@ -339,7 +324,8 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentStudiesDisabled,
       enrichmentModelsDisabled,
       enrichmentAnnotationsDisabled,
-      upsetFiltersVisible
+      upsetFiltersVisible,
+      activateUpSetFilters
     } = this.state;
 
     const {
@@ -407,20 +393,14 @@ class EnrichmentSearchCriteria extends Component {
     }
 
     let UpsetFilters;
-    if (
-      isValidSearchEnrichment
-      // !isTestSelected &&
-      // !isSearching
-      // upsetFiltersVisible === true
-    ) {
+    if (isValidSearchEnrichment && activateUpSetFilters) {
       UpsetFilters = (
         <Transition.Group animation="scale" duration={500}>
           {upsetFiltersVisible && (
-            <Image
-              centered
-              alt="Multi-Set Filters"
-              src="/multisetFilters.png"
-              className="Multi-Set Filters"
+            <UpSetFilters
+              {...this.props}
+              {...this.state}
+              onUpdateQueryData={this.updateQueryData}
             />
           )}
         </Transition.Group>
@@ -441,8 +421,6 @@ class EnrichmentSearchCriteria extends Component {
         />
       );
 
-      // let UpsetRadio;
-      // if (isValidSearchEnrichment) {
       UpsetRadio = (
         <React.Fragment>
           <Divider />
@@ -461,7 +439,6 @@ class EnrichmentSearchCriteria extends Component {
         <Form className="SearchCriteriaContainer">
           <Form.Field
             control={Select}
-            required
             label="Study"
             name="enrichmentStudy"
             className="enrichmentStudyDropdown"
@@ -470,11 +447,11 @@ class EnrichmentSearchCriteria extends Component {
             placeholder="Select A Study"
             onChange={this.handleStudyChange}
             disabled={enrichmentStudiesDisabled}
+            width={13}
           />
 
           <Form.Field
             control={Select}
-            required
             label="Model"
             name="enrichmentModel"
             value={enrichmentModel}
@@ -485,7 +462,6 @@ class EnrichmentSearchCriteria extends Component {
           />
           <Form.Field
             control={Select}
-            required
             name="enrichmentAnnotation"
             value={enrichmentAnnotation}
             options={enrichmentAnnotations}

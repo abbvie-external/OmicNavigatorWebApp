@@ -39,7 +39,8 @@ class EnrichmentContainer extends Component {
       animation: 'uncover',
       direction: 'left',
       visible: false,
-      plotButtonActive: false
+      plotButtonActive: false,
+      uData: []
     };
   }
 
@@ -94,9 +95,6 @@ class EnrichmentContainer extends Component {
       visible: !prevState.visible,
       plotButtonActive: !this.state.plotButtonActive
     }));
-    // this.setState({
-    //   plotButtonActive: !this.state.plotButtonActive
-    // });
   };
 
   handleDirectionChange = direction => () =>
@@ -133,12 +131,21 @@ class EnrichmentContainer extends Component {
 
     let icon = '';
     let iconText = '';
+    let dbShort = '';
     if (enrichmentAnnotation === 'REACTOME') {
       icon = 'reactome.jpg';
       iconText = 'Reactome';
+      dbShort = 'REACTOME';
     } else if (enrichmentAnnotation.substring(0, 2) === 'GO') {
       icon = 'go.png';
       iconText = 'AmiGO 2';
+      if (enrichmentAnnotation.substring(3, 4) == 'B') {
+        dbShort = 'GOBP';
+      } else if (enrichmentAnnotation.substring(3, 4) == 'C') {
+        dbShort = 'GOCC';
+      } else if (enrichmentAnnotation.substring(3, 4) == 'M') {
+        dbShort = 'GOMF';
+      }
     } else if (enrichmentAnnotation.substring(0, 4) === 'msig') {
       icon = 'msig.ico';
       iconText = 'GSEA MSigDB';
@@ -250,6 +257,14 @@ class EnrichmentContainer extends Component {
       return (
         key !== 'name_1006' && key !== 'Description' && key !== 'Annotation'
       );
+    });
+
+    const uDataRelevantFields = _.filter(allKeys, function(key) {
+      return key !== 'Description' && key !== 'Annotation';
+    });
+
+    this.setState({
+      uData: uDataRelevantFields
     });
 
     const additionalConfigColumns = relevantConfigColumns.map(c => {
