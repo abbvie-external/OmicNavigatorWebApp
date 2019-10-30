@@ -30,6 +30,64 @@ class PepplotSearchCriteria extends Component {
   }
 
   componentDidMount() {
+    const s = this.props.pepplotStudy || '';
+    const m = this.props.pepplotModel || '';
+    const t = this.props.pepplotTest || '';
+    const p = this.props.pepplotProteinSite || '';
+    if (s !== '') {
+      this.setState({
+        pepplotStudyHrefVisible: true,
+        pepplotStudyHref: `${s}.html`
+      });
+      phosphoprotService
+        .getModelNames('inferenceNames', s + 'plots')
+        .then(modelsFromService => {
+          this.allNames = modelsFromService;
+          const modelsArr = _.map(_.keys(modelsFromService), function(
+            modelName
+          ) {
+            return { key: modelName, text: modelName, value: modelName };
+          });
+          this.setState({
+            pepplotModelsDisabled: false,
+            pepplotModels: modelsArr
+          });
+          if (m !== '') {
+            const testsArr = _.map(this.allNames[m], function(testName) {
+              return { key: testName, text: testName, value: testName };
+            });
+            this.setState({
+              pepplotTestsDisabled: false,
+              pepplotTests: testsArr
+            });
+          }
+        });
+    }
+
+    if (t !== '') {
+      this.props.onSearchCriteriaChange({
+        pepplotStudy: s,
+        pepplotModel: m,
+        pepplotTest: t,
+        pepplotProteinSite: p
+      });
+      this.props.onSearchTransition({
+        isSearching: true
+      });
+      phosphoprotService
+        .getTestData(m, t, s + 'plots')
+        .then(dataFromService => {
+          this.testdata = dataFromService;
+          // this.setState({
+          //   pepplotStudiesDisabled: false,
+          //   pepplotModelsDisabled: false,
+          //   pepplotTestsDisabled: false
+          // });
+          this.props.onPepplotSearch({
+            pepplotResults: this.testdata
+          });
+        });
+    }
     this.populateStudies();
   }
 

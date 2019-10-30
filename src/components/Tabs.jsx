@@ -8,23 +8,34 @@ import { updateUrl } from './UrlControl';
 class Tabs extends Component {
   constructor(props) {
     super(props);
+    const pathname = this.props.location.pathname.substring(1) || null;
+    const params = pathname ? pathname.split('/') : '';
+    const tabFromUrl = params[0] || '';
+    const pepplotStudyFromUrl = params[1] || '';
+    const pepplotModelFromUrl = params[2] || '';
+    const pepplotTestFromUrl = params[3] || '';
+    const pepplotProteinSiteFromUrl = params[4] || '';
+
     this.state = {
-      activeIndex: 2
+      activeIndex: 2,
+      tab: tabFromUrl || 'pepplot',
+      pepplotStudy: pepplotStudyFromUrl || '',
+      pepplotModel: pepplotModelFromUrl || '',
+      pepplotTest: pepplotTestFromUrl || '',
+      pepplotProteinSite: pepplotProteinSiteFromUrl || ''
     };
   }
 
-  // componentDidMount() {
-  //   const pathname = this.props.location.pathname;
-  //   const enrichment = pathname.includes('enrichment');
-  //   const tab = enrichment ? 'enrichment' : 'pepplot';
-  //   this.props.history.push(tab);
-  //   let index = tab === 'enrichment' ? 3 : 2;
-  //   this.setState({
-  //     activeIndex: index
-  //   });
-  // }
   componentDidMount() {
-    updateUrl(this.props, this.state, 'tabInit', this.setTabIndex);
+    updateUrl(
+      this.props,
+      this.state,
+      null,
+      'tabInit',
+      this.setTabIndex,
+      false,
+      null
+    );
   }
 
   setTabIndex = tabIndex => {
@@ -34,13 +45,34 @@ class Tabs extends Component {
   };
 
   handleTabChange = (e, { activeIndex }) => {
-    updateUrl(this.props, this.state, 'tabChange', this.setTabIndex);
+    updateUrl(
+      this.props,
+      this.state,
+      null,
+      'tabChange',
+      this.setTabIndex,
+      false,
+      null
+    );
   };
-  // handleTabChange = (e, { activeIndex }) => {
-  //   this.setState({ activeIndex });
-  //   let tab = activeIndex === 3 ? 'enrichment' : 'pepplot';
-  //   this.props.history.push(tab);
-  // };
+
+  handleSearchCriteriaToTop = changes => {
+    this.setState({
+      pepplotStudy: changes.pepplotStudy || '',
+      pepplotModel: changes.pepplotModel || '',
+      pepplotTest: changes.pepplotTest || '',
+      pepplotProteinSite: changes.pepplotProteinSite || ''
+    });
+    updateUrl(
+      this.props,
+      this.state,
+      changes,
+      'tabInit',
+      this.setTabIndex,
+      true,
+      'pepplot'
+    );
+  };
 
   render() {
     const { activeIndex } = this.state;
@@ -69,7 +101,11 @@ class Tabs extends Component {
         pane: (
           <Tab.Pane key="3" className="">
             <Grid>
-              <PepplotContainer props />
+              <PepplotContainer
+                {...this.props}
+                {...this.state}
+                onSearchCriteriaToTop={this.handleSearchCriteriaToTop}
+              />
             </Grid>
           </Tab.Pane>
         )
@@ -79,7 +115,7 @@ class Tabs extends Component {
         pane: (
           <Tab.Pane key="4" className="">
             <Grid>
-              <EnrichmentContainer props />
+              <EnrichmentContainer {...this.props} {...this.state} />
             </Grid>
           </Tab.Pane>
         )

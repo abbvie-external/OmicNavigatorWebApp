@@ -6,6 +6,7 @@ import PepplotResults from './PepplotResults';
 import TransitionStill from './TransitionStill';
 import TransitionActive from './TransitionActive';
 import { formatNumberForDisplay, splitValue } from '../helpers';
+import phosphosite_icon from '../resources/phosphosite.ico';
 // import { updateUrl } from './UrlControl';
 
 import _ from 'lodash';
@@ -13,24 +14,18 @@ import './Pepplot.scss';
 import './Table.scss';
 
 class PepplotContainer extends Component {
-  static defaultProps = {
-    tab: 'pepplot'
-  };
-
-  state = {
-    pepplotStudy: '',
-    pepplotModel: '',
-    pepplotTest: '',
-    isValidSearchPepplot: false,
-    isSearching: false,
-    isProteinSelected: false,
-    pepplotResults: [],
-    pepplotColumns: []
-  };
-
-  componentDidMount() {
-    // updateUrl(this.props, this.state);
+  constructor(props) {
+    super(props);
+    this.state = {
+      isValidSearchPepplot: false,
+      isSearching: false,
+      isProteinSelected: false,
+      pepplotResults: [],
+      pepplotColumns: []
+    };
   }
+
+  componentDidMount() {}
 
   handleSearchTransition = () => {
     this.setState({
@@ -47,15 +42,10 @@ class PepplotContainer extends Component {
       isValidSearchPepplot: true,
       isProteinSelected: false
     });
-    // updateUrl(this.props, this.state);
   };
 
   handleSearchCriteriaChange = changes => {
-    this.setState({
-      pepplotStudy: changes.pepplotStudy,
-      pepplotModel: changes.pepplotModel,
-      pepplotTest: changes.pepplotTest
-    });
+    this.props.onSearchCriteriaToTop(changes);
   };
 
   hidePGrid = () => {
@@ -79,7 +69,7 @@ class PepplotContainer extends Component {
       wordBreak: 'break-all'
     };
 
-    let icon = 'phosphosite.ico';
+    let icon = phosphosite_icon;
     let iconText = 'PhosphoSitePlus';
 
     if (model === 'Differential Expression') {
@@ -246,7 +236,13 @@ class PepplotContainer extends Component {
       !this.state.isProteinSelected &&
       !this.state.isSearching
     ) {
-      return <PepplotResults {...this.state} />;
+      return (
+        <PepplotResults
+          {...this.state}
+          {...this.props}
+          onSearchCriteriaChange={this.handleSearchCriteriaChange}
+        />
+      );
     } else if (this.state.isSearching) {
       return <TransitionActive />;
     } else return <TransitionStill />;
@@ -266,6 +262,7 @@ class PepplotContainer extends Component {
         >
           <PepplotSearchCriteria
             {...this.state}
+            {...this.props}
             onSearchTransition={this.handleSearchTransition}
             onPepplotSearch={this.handlePepplotSearch}
             onSearchCriteriaChange={this.handleSearchCriteriaChange}

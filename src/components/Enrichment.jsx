@@ -12,6 +12,10 @@ import { formatNumberForDisplay, splitValue } from '../helpers';
 import _ from 'lodash';
 import './Enrichment.scss';
 import './Table.scss';
+import msig_icon from '../resources/msig.ico';
+import phosphosite_icon from '../resources/phosphosite.ico';
+import reactome_icon from '../resources/reactome.jpg';
+import go_icon from '../resources/go.png';
 
 class EnrichmentContainer extends Component {
   static defaultProps = {
@@ -133,11 +137,11 @@ class EnrichmentContainer extends Component {
     let iconText = '';
     let dbShort = '';
     if (enrichmentAnnotation === 'REACTOME') {
-      icon = 'reactome.jpg';
+      icon = reactome_icon;
       iconText = 'Reactome';
       dbShort = 'REACTOME';
     } else if (enrichmentAnnotation.substring(0, 2) === 'GO') {
-      icon = 'go.png';
+      icon = go_icon;
       iconText = 'AmiGO 2';
       if (enrichmentAnnotation.substring(3, 4) == 'B') {
         dbShort = 'GOBP';
@@ -147,10 +151,10 @@ class EnrichmentContainer extends Component {
         dbShort = 'GOMF';
       }
     } else if (enrichmentAnnotation.substring(0, 4) === 'msig') {
-      icon = 'msig.ico';
+      icon = msig_icon;
       iconText = 'GSEA MSigDB';
     } else if (enrichmentAnnotation === 'PSP') {
-      icon = 'phosphosite.ico';
+      icon = phosphosite_icon;
       iconText = 'PhosphoSitePlus';
     }
 

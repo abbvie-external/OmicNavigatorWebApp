@@ -6,7 +6,6 @@ import PlotContainer from './PlotContainer';
 import LoaderActivePlots from './LoaderActivePlots';
 import _ from 'lodash';
 import DOMPurify from 'dompurify';
-
 import QHGrid from '../utility/QHGrid';
 import EZGrid from '../utility/EZGrid';
 import QuickViewModal from '../utility/QuickViewModal';
@@ -25,6 +24,7 @@ class PepplotResults extends Component {
     pepplotStudy: '',
     pepplotModel: '',
     pepplotTest: '',
+    pepplotProteinSite: '',
     pepplotResults: [],
     pepplotColumns: [],
     isProteinSelected: false
@@ -32,6 +32,7 @@ class PepplotResults extends Component {
 
   constructor(props) {
     super(props);
+
     this.state = {
       treeDataRaw: [],
       treeData: [],
@@ -47,7 +48,46 @@ class PepplotResults extends Component {
     };
   }
 
-  componentDidMount() {}
+  componentDidMount() {
+    const ProteinSite = this.props.pepplotProteinSite || '';
+    if (ProteinSite !== '') {
+      const Proteins = this.props.pepplotResults;
+      const Index = _.findIndex(Proteins, function(p) {
+        return firstValue(p.Protein_Site) === ProteinSite;
+      });
+      const dataItem = Proteins[Index];
+      this.getProteinPageFromUrl(
+        this.getProteinData,
+        this.getPlot,
+        this.props.pepplotModel,
+        dataItem
+      );
+    }
+  }
+
+  getProteinPageFromUrl = (
+    getProteinDataCb,
+    getPlotCb,
+    pepplotModel,
+    dataItem
+  ) => {
+    let imageInfo = { key: '', title: '', svg: [] };
+    switch (pepplotModel) {
+      case 'Differential Expression':
+        imageInfo.title = 'Protein Intensity - ' + dataItem.MajorityProteinIDs;
+        imageInfo.key = dataItem.MajorityProteinIDs;
+        break;
+      default:
+        imageInfo.title = 'Phosphosite Intensity - ' + dataItem.Protein_Site;
+        imageInfo.key = dataItem.Protein_Site;
+    }
+    getProteinDataCb(
+      dataItem.id_mult ? dataItem.id_mult : dataItem.id,
+      dataItem,
+      getPlotCb,
+      imageInfo
+    );
+  };
 
   handleSVG = imageInfo => {
     this.setState({
@@ -67,9 +107,15 @@ class PepplotResults extends Component {
       treeDataColumns: [],
       currentSVGs: []
     });
+    const ProteinSiteVar = firstValue(dataItem.Protein_Site, true);
+    this.props.onSearchCriteriaChange({
+      pepplotStudy: this.props.pepplotStudy || '',
+      pepplotModel: this.props.pepplotModel || '',
+      pepplotTest: this.props.pepplotTest || '',
+      pepplotProteinSite: ProteinSiteVar || ''
+    });
     let pepplotModel = this.props.pepplotModel;
     let pepplotStudy = this.props.pepplotStudy;
-
     let plotType = ['splineplot'];
     switch (pepplotModel) {
       case 'DonorDifferentialPhosphorylation':
@@ -280,6 +326,12 @@ class PepplotResults extends Component {
       isProteinSelected: false,
       isProteinDataLoaded: false
     });
+    this.props.onSearchCriteriaChange({
+      pepplotStudy: this.props.pepplotStudy || '',
+      pepplotModel: this.props.pepplotModel || '',
+      pepplotTest: this.props.pepplotTest || '',
+      pepplotProteinSite: ''
+    });
   };
 
   render() {
@@ -334,3 +386,10 @@ class PepplotResults extends Component {
 }
 
 export default withRouter(PepplotResults);
+
+function firstValue(value) {
+  if (value) {
+    const firstValue = value.split(';')[0];
+    return firstValue;
+  }
+}
