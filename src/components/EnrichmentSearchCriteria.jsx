@@ -45,12 +45,32 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentModelsDisabled: true,
       enrichmentAnnotationsDisabled: true,
       uAnchor: '',
+      // selectedCol: {
+      //   key: 'ap',
+      //   text: 'adj_P_Val',
+      //   value: 'adj_P_Val'
+      // },
+      // selectedOperator: {
+      //       key: 'lt',
+      //       text: '<',
+      //       value: 'Less Than'
+      // },
       selectedCol: 'adj_P_Val',
       selectedOperator: '<',
       sigValue: 0.05,
       uSettings: {
         defaultSelectedCol: 'adj_P_Val',
         defaultSelectedOperator: '<',
+        // defaultSelectedCol: {
+        //   key: 'ap',
+        //   text: 'adj_P_Val',
+        //   value: 'adj_P_Val'
+        // },
+        // defaultSelectedOperator: {
+        //   key: 'lt',
+        //   text: '<',
+        //   value: 'Less Than'
+        // },
         defaultSigValue: 0.05,
         useAnchor: false,
         must: [],
@@ -60,11 +80,38 @@ class EnrichmentSearchCriteria extends Component {
         automaticUpdates: true,
         numElements: undefined,
         maxElements: undefined,
+        metaSvg: '',
         heightScalar: 1,
         thresholdCols: ['adj_P_Val'],
         thresholdOperator: ['<', '>', '|<|', '|>|']
+        //   thresholdCols: [{
+        //     key: 'ap',
+        //     text: 'adj_P_Val',
+        //     value: 'adj_P_Val'
+        //   }],
+        //   thresholdOperator: [
+        //     {
+        //       key: 'lt',
+        //       text: '<',
+        //       value: 'Less Than'
+        //     },
+        //     {
+        //       key: 'gt',
+        //       text: '>',
+        //       value: 'Greater Than'
+        //     },
+        //     {
+        //       key: 'ltet',
+        //       text: '|<|',
+        //       value: 'Less Than or Equal To'
+        //     },
+        //     {
+        //       key: 'gtet',
+        //       text: '|>|',
+        //       value: 'Greater Than or Equal To'
+        //     }
+        //   ]
       },
-      metaSvg: '',
       upsetFiltersVisible: false,
       activateUpSetFilters: false
     };
@@ -477,9 +524,11 @@ class EnrichmentSearchCriteria extends Component {
           />
         </Form>
         <div className="UpsetContainer">
-          <div className="SliderDiv UpsetRadio">{UpsetRadio}</div>
+          <div className="SliderDiv">
+            <span className="UpsetRadio">{UpsetRadio}</span>
+            <span className="PlotRadio">{PlotRadio}</span>
+          </div>
           <div className="UpsetFiltersDiv">{UpsetFilters}</div>
-          <div className="SliderDiv PlotRadio">{PlotRadio}</div>
         </div>
       </React.Fragment>
     );

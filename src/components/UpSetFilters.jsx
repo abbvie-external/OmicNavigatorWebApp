@@ -9,13 +9,33 @@ class UpSetFilters extends Component {
   static defaultProps = {
     uAnchor: '',
     uData: [],
+    // selectedCol: {
+    //   key: 'ap',
+    //   text: 'adj_P_Val',
+    //   value: 'adj_P_Val'
+    // },
+    // selectedOperator: {
+    //   key: 'lt',
+    //   text: '<',
+    //   value: 'Less Than'
+    // },
     selectedCol: 'adj_P_Val',
     selectedOperator: '<',
     sigValue: 0.05,
     uSettings: {
       defaultSelectedCol: 'adj_P_Val',
       defaultSelectedOperator: '<',
-      defaultSigValue: 0.05,
+      // defaultSelectedCol: {
+      //   key: 'ap',
+      //   text: 'adj_P_Val',
+      //   value: 'adj_P_Val'
+      // },
+      // defaultSelectedOperator: {
+      //   key: 'lt',
+      //   text: '<',
+      //   value: 'Less Than'
+      // },
+      // defaultSigValue: 0.05,
       useAnchor: true,
       must: [],
       not: [],
@@ -24,11 +44,38 @@ class UpSetFilters extends Component {
       automaticUpdates: true,
       numElements: undefined,
       maxElements: undefined,
+      metaSvg: '',
       heightScalar: 1,
       thresholdCols: ['adj_P_Val'],
       thresholdOperator: ['<', '>', '|<|', '|>|']
-    },
-    metaSvg: ''
+      // thresholdCols: [{
+      //     key: 'ap',
+      //     text: 'adj_P_Val',
+      //     value: 'adj_P_Val'
+      // }],
+      // thresholdOperator: [
+      //   {
+      //     key: 'lt',
+      //     text: '<',
+      //     value: 'Less Than'
+      //   },
+      //   {
+      //     key: 'gt',
+      //     text: '>',
+      //     value: 'Greater Than'
+      //   },
+      //   {
+      //     key: 'ltet',
+      //     text: '|<|',
+      //     value: 'Less Than or Equal To'
+      //   },
+      //   {
+      //     key: 'gtet',
+      //     text: '|>|',
+      //     value: 'Greater Than or Equal To'
+      //   }
+      // ],
+    }
   };
 
   componentDidMount() {
@@ -817,39 +864,48 @@ class UpSetFilters extends Component {
   }
 
   render() {
+    debugger;
+    const { selectedCol, selectedOperator, sigValue, uSettings } = this.props;
+    debugger;
+    const Columns = uSettings.thresholdCols;
+    const Operators = uSettings.thresholdOperator;
+
     return (
       <Fragment>
-        <p id="upset-query" className="upset-query"></p>
-        {/* <Form className="" size="mini">
-                <Form.Group size="mini">
-                    <Form.Field
-                        control={Select}
-                        name=""
-                        className="ThresholdColumnSelect"
-                        value={selectedCol}
-                        // options={Columns}
-                        width={7}
-                    >
-                    </Form.Field>
-                    <Form.Field
-                        control={Select}
-                        name=""
-                        className="ThresholdOperatorSelect"
-                        value={selectedOperator}
-                        // options={Operators}
-                        width={3}
-                    >
-                    </Form.Field>
-                    <Form.Field
-                        control={Input}
-                        name=""
-                        className="SignificantValueInput"
-                        value={sigValue}
-                        width={6}
-                    >
-                    </Form.Field>
-                </Form.Group>
-            </Form> */}
+        {/* <Form className="UpSetDropdownContainer" size="">
+          <Form.Group size="">
+              <Form.Field
+                  control={Select}
+                  label="Column"
+                  name=""
+                  className="ThresholdColumnSelect"
+                  value={selectedCol}
+                  options={Columns}
+                  width={7}
+              >
+              </Form.Field>
+              <Form.Field
+                  control={Select}
+                  label="Operator"
+                  name=""
+                  className="ThresholdOperatorSelect"
+                  value={selectedOperator}
+                  options={Operators}
+                  width={3}
+              >
+              </Form.Field>
+              <Form.Field
+                  control={Input}
+                  label="Significance"
+                  name=""
+                  className="SignificantValueInput"
+                  value={sigValue}
+                  width={6}
+              >
+              </Form.Field>
+          </Form.Group>
+        </Form> */}
+        <p id="upset-query" className="UpSetQueryContainer"></p>
       </Fragment>
     );
   }
