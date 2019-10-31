@@ -1,24 +1,12 @@
-@media (min-width: 1px) and (max-width: 374px) {
+@media (min-width: 1px) and (max-width: 1199px) {
   .SidebarContainer {
-    height: 100vh;
-  }
-}
-
-@media (min-width: 375px) and (max-width: 767px) {
-  .SidebarContainer {
-    height: 90vh;
-  }
-}
-
-@media (min-width: 768px) and (max-width: 1199px) {
-  .SidebarContainer {
-    height: 80vh;
+    height: auto !important;
   }
 }
 
 @media (min-width: 1200px) {
   .SidebarContainer {
-    height: 100vh;
+    height: 100vh !important;
   }
 }
 

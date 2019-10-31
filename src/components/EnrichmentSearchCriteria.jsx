@@ -88,7 +88,7 @@ class EnrichmentSearchCriteria extends Component {
   handleStudyChange = (evt, { name, value }) => {
     this.setState({
       enrichmentStudyHrefVisible: true,
-      enrichmentStudyHref: `${value}.html`,
+      enrichmentStudyHref: `http://www.localhost:3000/${value}.html`,
       enrichmentModelsDisabled: true,
       enrichmentAnnotationsDisabled: true
     });

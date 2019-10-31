@@ -105,7 +105,7 @@ class PepplotSearchCriteria extends Component {
   handleStudyChange = (evt, { name, value }) => {
     this.setState({
       pepplotStudyHrefVisible: true,
-      pepplotStudyHref: `${value}.html`,
+      pepplotStudyHref: `http://www.localhost:3000/${value}.html`,
       pepplotModelsDisabled: true,
       pepplotTestsDisabled: true
     });
