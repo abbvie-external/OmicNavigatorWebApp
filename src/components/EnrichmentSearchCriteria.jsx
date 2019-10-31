@@ -164,7 +164,8 @@ class EnrichmentSearchCriteria extends Component {
             ...this.state.uSettings,
             must: [],
             not: [],
-            defaultSigValue: 0.05
+            defaultSigValue: 0.05,
+            maxElements: dataFromService.length
           },
           sigValue: 0.05
         });
@@ -260,7 +261,7 @@ class EnrichmentSearchCriteria extends Component {
           uSettings: {
             ...this.state.uSettings,
             numElements: multisetResults.length,
-            maxElements: multisetResults.length
+            maxElements: this.state.uSettings.maxElements
           },
           activateUpSetFilters: true
         });
