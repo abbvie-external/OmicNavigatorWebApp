@@ -242,7 +242,6 @@ class EnrichmentSearchCriteria extends Component {
       selectedOperator: eOperator
       // selectedCol: eCol
     });
-
     let mustString = this.testToString(eMust);
     let notString = this.testToString(eNot);
     phosphoprotService

@@ -52,7 +52,7 @@ class UpSetFilters extends Component {
     );
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps, prevState, snapshot) {
     const {
       uData,
       uAnchor,
@@ -62,7 +62,9 @@ class UpSetFilters extends Component {
       selectedCol,
       selectedOperator
     } = this.props;
-    if (this.props.uData !== prevProps.uData) {
+    // if (uSettings !== prevProps.uSettings && uData !== prevProps.uData) {
+    // if (uData !== prevProps.uData) {
+    if (uSettings !== prevProps.uSettings) {
       this.makeUpset(
         uData,
         uAnchor,
@@ -160,24 +162,25 @@ class UpSetFilters extends Component {
         self.props.onUpdateQueryData({ sigValue: sValue });
       });
 
-    // if (!uSettings.automaticUpdates) {
-    // let runButton = sigBox.append('button')
-    //     .style('padding-left', '5px')
-    //     .on('click', function () {
-    //         self.props.onUpdateQueryData({ sigValue: sValue });
-    //     })
-    //     .text('Display');
-    // }
+    if (!uSettings.automaticUpdates) {
+      let runButton = sigBox
+        .append('button')
+        .style('padding-left', '5px')
+        .on('click', function() {
+          self.props.onUpdateQueryData({ sigValue: sigValue });
+        })
+        .text('Display');
+    }
 
     if (uSettings.displayMetaData) {
-      uSettings.thresholdOperator = selectedOperator;
+      // uSettings.thresholdOperator = selectedOperator;
       this.prepareUpset(uData, uAnchor, uSettings, base);
       const baseMetaSvg = base.append('svg');
-      this.metaScript(baseMetaSvg, uAnchor, uData, uSettings);
+      this.metaScript(baseMetaSvg, uAnchor, uData, uSettings, selectedOperator);
     }
   }
 
-  metaScript(metaSvg, uAnchor, uData, uSettings) {
+  metaScript(metaSvg, uAnchor, uData, uSettings, selectedOperator) {
     const svgWidth = 135 + 140; //To match the SVG above
     const heightScalar = 20; //20 per circle
     const mustData = uSettings.must;
@@ -186,7 +189,7 @@ class UpSetFilters extends Component {
       notData.length * heightScalar + mustData.length * heightScalar + 60 + 10;
     const useAnchor = uSettings.useAnchor;
 
-    switch (uSettings.thresholdOperator) {
+    switch (selectedOperator) {
       case '<':
         this.setDesc = 'Elements less than in:';
         this.notSetDesc = 'Elements greater than in:';
@@ -424,13 +427,13 @@ class UpSetFilters extends Component {
       }
     }
 
-    const toolTips = base
-      .append('div')
-      .attr('class', 'tooltip')
-      .style('opacity', 0)
-      .style('position', 'relative')
-      .style('background', 'white')
-      .style('font', '15px sans-serif');
+    // const toolTips = base
+    //   .append('div')
+    //   .attr('class', 'tooltip')
+    //   .style('opacity', 0)
+    //   .style('position', 'relative')
+    //   .style('background', 'white')
+    //   .style('font', '15px sans-serif');
 
     const topBox = base.append('div').style('padding-bottom', '5px');
 
@@ -641,23 +644,23 @@ class UpSetFilters extends Component {
       .attr('font-size', function() {
         return heightScalar * 12 + 'px';
       })
-      .attr('fill', 'black')
-      .on('mouseover', function(d) {
-        toolTips
-          .transition()
-          .duration(1)
-          .style('opacity', 1);
-        toolTips
-          .html(d)
-          .style('left', d3.mouse(this)[0] + 'px')
-          .style('top', d3.mouse(this)[1] + 'px');
-      })
-      .on('mouseout', function() {
-        toolTips
-          .transition()
-          .duration(1000)
-          .style('opacity', 0);
-      });
+      .attr('fill', 'black');
+    // .on('mouseover', function(d) {
+    //   toolTips
+    //     .transition()
+    //     .duration(1)
+    //     .style('opacity', 1);
+    //   toolTips
+    //     .html(d)
+    //     .style('left', d3.mouse(this)[0] + 'px')
+    //     .style('top', d3.mouse(this)[1] + 'px');
+    // })
+    // .on('mouseout', function() {
+    //   toolTips
+    //     .transition()
+    //     .duration(1000)
+    //     .style('opacity', 0);
+    // });
 
     svg
       .append('text')
