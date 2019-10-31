@@ -264,6 +264,7 @@ class PepplotSearchCriteria extends Component {
             disabled={pepplotStudiesDisabled}
             width={13}
           />
+          <span className="StudyHtmlIconDiv">{studyIcon}</span>
           <Form.Field
             control={Select}
             label="Model"
@@ -290,7 +291,6 @@ class PepplotSearchCriteria extends Component {
             searchInput={{ id: 'form-select-control-test' }}
           />
         </Form>
-        <span className="StudyHtmlIconDiv">{studyIcon}</span>
       </React.Fragment>
     );
   }

@@ -449,7 +449,7 @@ class EnrichmentSearchCriteria extends Component {
             disabled={enrichmentStudiesDisabled}
             width={13}
           />
-
+          <span className="StudyHtmlIconDiv">{studyIcon}</span>
           <Form.Field
             control={Select}
             label="Model"
@@ -481,7 +481,6 @@ class EnrichmentSearchCriteria extends Component {
           <div className="UpsetFiltersDiv">{UpsetFilters}</div>
           <div className="SliderDiv PlotRadio">{PlotRadio}</div>
         </div>
-        <span className="StudyHtmlIconDiv">{studyIcon}</span>
       </React.Fragment>
     );
   }
