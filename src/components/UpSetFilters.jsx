@@ -1,7 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import { Grid, Dropdown, Form, Select, Input } from 'semantic-ui-react';
-import { phosphoprotService } from '../services/phosphoprot.service';
-import DOMPurify from 'dompurify';
+import { Form, Select, Input } from 'semantic-ui-react';
 import * as d3 from 'd3';
 import './UpSetFilters.scss';
 
@@ -19,12 +17,8 @@ class UpSetFilters extends Component {
       text: '<',
       value: 'lt'
     },
-    // selectedCol: 'adj_P_Val',
-    // selectedOperator: '<',
     sigValue: 0.05,
     uSettings: {
-      // defaultSelectedCol: 'adj_P_Val',
-      // defaultSelectedOperator: '<',
       defaultSelectedCol: {
         key: 'adj_P_Val',
         text: 'adj_P_Val',
@@ -46,8 +40,6 @@ class UpSetFilters extends Component {
       maxElements: undefined,
       metaSvg: '',
       heightScalar: 1,
-      // thresholdCols: ['adj_P_Val'],
-      // thresholdOperator: ['<', '>', '|<|', '|>|']
       thresholdCols: [
         {
           key: 'adj_P_Val',
@@ -111,8 +103,7 @@ class UpSetFilters extends Component {
       selectedCol,
       selectedOperator
     } = this.props;
-    // if (uSettings !== prevProps.uSettings && uData !== prevProps.uData) {
-    // if (uData !== prevProps.uData) {
+
     if (uSettings !== prevProps.uSettings) {
       this.makeUpset(
         uData,
@@ -124,9 +115,6 @@ class UpSetFilters extends Component {
         selectedOperator
       );
     }
-    // if (this.props.uSettings !== prevProps.uSettings ) {
-    // this.metaScript(uData, uAnchor, uSettings, metaSvg, sigValue, selectedCol, selectedOperator );
-    // }
   }
 
   makeUpset(
@@ -138,7 +126,6 @@ class UpSetFilters extends Component {
     selectedCol,
     selectedOperator
   ) {
-    const self = this;
     d3.selectAll('#upset-query')
       .selectAll('*')
       .remove();
@@ -146,83 +133,8 @@ class UpSetFilters extends Component {
       .selectAll('#upset-query')
       .append('div')
       .style('padding-bottom', '5px');
-    // const sigBox = base.append('div').style('padding-bottom', '5px');
-
-    // let dropdownChangeCol = function() {
-    //   const selectedC = d3.select(this).property('value');
-    //   if (uSettings.automaticUpdates) {
-    //     self.props.onUpdateQueryData({ selectedCol: selectedC });
-    //   }
-    // };
-
-    // let dropdownChangeOperator = function() {
-    //   const selectedO = d3.select(this).property('value');
-    //   if (uSettings.automaticUpdates) {
-    //     self.props.onUpdateQueryData({ selectedOperator: selectedO });
-    //   }
-    // };
-
-    // let dropdownCols = sigBox
-    //   .insert('select', 'svg')
-    //   .on('change', dropdownChangeCol);
-
-    // let dropdownOperators = sigBox
-    //   .insert('select', 'svg')
-    //   .on('change', dropdownChangeOperator);
-
-    // dropdownCols
-    //   .selectAll('option')
-    //   .data(uSettings.thresholdCols)
-    //   .enter()
-    //   .append('option')
-    //   .property('selected', function(d) {
-    //     return d === selectedCol;
-    //   })
-    //   .attr('value', function(d: string) {
-    //     return d;
-    //   })
-    //   .text(function(d: string) {
-    //     return d;
-    //   });
-
-    // dropdownOperators
-    //   .selectAll('option')
-    //   .data(uSettings.thresholdOperator)
-    //   .enter()
-    //   .append('option')
-    //   .property('selected', function(d) {
-    //     return d === selectedOperator;
-    //   })
-    //   .attr('value', function(d: string) {
-    //     return d;
-    //   })
-    //   .text(function(d: string) {
-    //     return d;
-    //   });
-
-    // let sigValueInput = sigBox
-    //   .append('input')
-    //   .attr('size', '1')
-    //   .attr('type', 'number')
-    //   .attr('step', 0.01)
-    //   .attr('value', sigValue)
-    //   .on('change', function() {
-    //     const sValue = +this.value;
-    //     self.props.onUpdateQueryData({ sigValue: sValue });
-    //   });
-
-    // if (!uSettings.automaticUpdates) {
-    //   let runButton = sigBox
-    //     .append('button')
-    //     .style('padding-left', '5px')
-    //     .on('click', function() {
-    //       self.props.onUpdateQueryData({ sigValue: sigValue });
-    //     })
-    //     .text('Display');
-    // }
 
     if (uSettings.displayMetaData) {
-      // uSettings.thresholdOperator = selectedOperator;
       this.prepareUpset(uData, uAnchor, uSettings, base);
       const baseMetaSvg = base.append('svg');
       this.metaScript(baseMetaSvg, uAnchor, uData, uSettings, selectedOperator);
@@ -255,13 +167,15 @@ class UpSetFilters extends Component {
         this.setDesc = 'Elements absolute value greater than in:';
         this.notSetDesc = 'Elements absolute value less than in:';
         break;
+      default:
+        this.setDesc = '';
+        this.notSetDesc = '';
     }
 
     //Reset the svg
     metaSvg.selectAll('text').remove();
     metaSvg.selectAll('circle').remove();
     metaSvg.selectAll('rect').remove();
-
     if (mustData.length !== 0 || notData.length !== 0 || useAnchor) {
       metaSvg.attr('width', svgWidth).attr('height', svgHeight);
 
@@ -270,7 +184,7 @@ class UpSetFilters extends Component {
         .attr('x', 0)
         .attr('y', 15)
         .text('Set Composition:')
-        .attr('font-family', 'sans-serif')
+        .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
         .attr('font-size', '15px')
         .attr('fill', 'black');
       metaSvg
@@ -278,7 +192,7 @@ class UpSetFilters extends Component {
         .attr('x', 7)
         .attr('y', 30)
         .text('' + this.setDesc)
-        .attr('font-family', 'sans-serif')
+        .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
         .attr('font-size', '15px')
         .attr('fill', 'black');
 
@@ -294,7 +208,7 @@ class UpSetFilters extends Component {
           .attr('x', 25)
           .attr('y', 44)
           .text(this.anchor)
-          .attr('font-family', 'sans-serif')
+          .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
           .attr('font-size', '12px')
           .attr('fill', 'black');
       }
@@ -314,6 +228,7 @@ class UpSetFilters extends Component {
           }
         })
         .attr('r', 4);
+
       const mustText = metaSvg
         .selectAll('svg.dataObject')
         .data(mustData)
@@ -330,7 +245,7 @@ class UpSetFilters extends Component {
         .text(function(d) {
           return d;
         })
-        .attr('font-family', 'sans-serif')
+        .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
         .attr('font-size', '12px')
         .attr('fill', 'black');
 
@@ -346,7 +261,7 @@ class UpSetFilters extends Component {
             }
           })
           .text('' + this.setDesc)
-          .attr('font-family', 'sans-serif')
+          .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
           .attr('font-size', '15px')
           .attr('fill', 'black');
 
@@ -402,7 +317,7 @@ class UpSetFilters extends Component {
           .text(function(d) {
             return d;
           })
-          .attr('font-family', 'sans-serif')
+          .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
           .attr('font-size', '12px')
           .attr('fill', 'black');
       }
@@ -418,10 +333,7 @@ class UpSetFilters extends Component {
     let mustData = settings.must;
     let notData = settings.not;
 
-    const must = mustData;
-    const not = notData;
-
-    //Sizing//
+    // Sizing
     let heightScalar = 1;
     if (settings.heightScalar !== undefined) {
       heightScalar = settings.heightScalar;
@@ -429,7 +341,7 @@ class UpSetFilters extends Component {
 
     const circlePadding = 8 * heightScalar;
     const circleRadius = 12 * heightScalar;
-    const topBoxHeight = 40 * heightScalar;
+    const topBoxHeight = 45 * heightScalar;
     const svgHeight =
       dataset.length * 2 * circleRadius +
       (dataset.length + 1) * circlePadding +
@@ -438,7 +350,7 @@ class UpSetFilters extends Component {
     const minWidth = 250 * heightScalar;
     const maxWidth = 500 * heightScalar;
 
-    //Set the width of the svg to depending on the size of the largest test element.
+    //Set the width of the svg to depending on the size of the largest test element
     let longest = 0;
     if (dataset[0]) {
       longest = dataset[0].length;
@@ -459,11 +371,11 @@ class UpSetFilters extends Component {
       textElementWidth = svgWidth - circlesWidth;
     }
 
-    //Colors//
+    //Colors
     let chosenColorCode = '#00FF40';
     let baseColorCode = '#585858';
     let backgroundColorCode = '#E6E6E6';
-    //Adding settings colors.
+    //Adding settings colors
     if (settings.colors !== undefined) {
       if (settings.colors.chosen !== undefined) {
         chosenColorCode = settings.colors.chosen;
@@ -475,14 +387,6 @@ class UpSetFilters extends Component {
         backgroundColorCode = settings.colors.background;
       }
     }
-
-    // const toolTips = base
-    //   .append('div')
-    //   .attr('class', 'tooltip')
-    //   .style('opacity', 0)
-    //   .style('position', 'relative')
-    //   .style('background', 'white')
-    //   .style('font', '15px sans-serif');
 
     const topBox = base.append('div').style('padding-bottom', '5px');
 
@@ -538,7 +442,6 @@ class UpSetFilters extends Component {
       );
     }
 
-    //Green Circles
     const mustCircles = svg
       .selectAll('svg.dataGreenObject')
       .data(dataset)
@@ -565,12 +468,10 @@ class UpSetFilters extends Component {
             notData.splice(notData.indexOf(d), 1);
           }
           updateCircles();
-          // updateGlobalVariables();
           self.props.onUpdateQueryData({ must: mustData, not: notData });
         }
       });
 
-    //Yellow Circles
     const maybeCircles = svg
       .selectAll('svg.dataObject')
       .data(dataset)
@@ -603,7 +504,6 @@ class UpSetFilters extends Component {
         self.props.onUpdateQueryData({ must: mustData, not: notData });
       });
 
-    //Mini Yellow Circles
     const miniMaybeCircles = svg
       .selectAll('svg.dataObject')
       .data(dataset)
@@ -630,7 +530,6 @@ class UpSetFilters extends Component {
         self.props.onUpdateQueryData({ must: mustData, not: notData });
       });
 
-    //Red Circles
     const notCircles = svg
       .selectAll('svg.dataObject')
       .data(dataset)
@@ -670,7 +569,6 @@ class UpSetFilters extends Component {
       .attr('stroke', 'black')
       .attr('stroke-width', 5);
 
-    //Test Elements
     const testElements = svg
       .selectAll('svg.dataObject')
       .data(dataset)
@@ -688,28 +586,12 @@ class UpSetFilters extends Component {
       .text(function(d) {
         return d;
       })
-      .attr('font-family', 'sans-serif')
+      .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
       .attr('font-weight', d => (d === anchor ? 'bold' : 'normal'))
       .attr('font-size', function() {
         return heightScalar * 12 + 'px';
       })
       .attr('fill', 'black');
-    // .on('mouseover', function(d) {
-    //   toolTips
-    //     .transition()
-    //     .duration(1)
-    //     .style('opacity', 1);
-    //   toolTips
-    //     .html(d)
-    //     .style('left', d3.mouse(this)[0] + 'px')
-    //     .style('top', d3.mouse(this)[1] + 'px');
-    // })
-    // .on('mouseout', function() {
-    //   toolTips
-    //     .transition()
-    //     .duration(1000)
-    //     .style('opacity', 0);
-    // });
 
     svg
       .append('text')
@@ -726,9 +608,9 @@ class UpSetFilters extends Component {
           ')'
       )
       .text('Must')
-      .attr('font-family', 'sans-serif')
+      .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
       .attr('font-size', function() {
-        return heightScalar * 12 + 'px';
+        return heightScalar * 14 + 'px';
       })
       .attr('fill', 'black');
     svg
@@ -746,9 +628,9 @@ class UpSetFilters extends Component {
           ')'
       )
       .text('Maybe')
-      .attr('font-family', 'sans-serif')
+      .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
       .attr('font-size', function() {
-        return heightScalar * 12 + 'px';
+        return heightScalar * 14 + 'px';
       })
       .attr('fill', 'black');
     svg
@@ -766,9 +648,9 @@ class UpSetFilters extends Component {
           ')'
       )
       .text('Not')
-      .attr('font-family', 'sans-serif')
+      .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
       .attr('font-size', function() {
-        return heightScalar * 12 + 'px';
+        return heightScalar * 14 + 'px';
       })
       .attr('fill', 'black');
     if (
@@ -792,6 +674,7 @@ class UpSetFilters extends Component {
         .attr('y2', topBoxHeight - 10 * heightScalar)
         .attr('stroke', chosenColorCode)
         .attr('stroke-width', 10 * heightScalar);
+
       const numElements = svg
         .selectAll('svg.dataObject')
         .data([settings.numElements])
@@ -808,11 +691,12 @@ class UpSetFilters extends Component {
           );
         })
         .attr('y', topBoxHeight - 6 * heightScalar);
+
       const numElementsText = numElements
         .text(function(d) {
           return d;
         })
-        .attr('font-family', 'sans-serif')
+        .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
         .attr('font-size', function() {
           return heightScalar * 13 + 'px';
         })
@@ -875,8 +759,6 @@ class UpSetFilters extends Component {
     const { selectedCol, selectedOperator, sigValue, uSettings } = this.props;
     const Columns = uSettings.thresholdCols;
     const Operators = uSettings.thresholdOperator;
-    // const DefSelCol = uSettings.defaultSelectedCol.text;
-    // const DefSelOp = uSettings.defaultSelectedOperator.text;
     const SelCol = selectedCol.text;
     const SelOp = selectedOperator.text;
     debugger;

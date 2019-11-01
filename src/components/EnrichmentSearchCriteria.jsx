@@ -7,14 +7,12 @@ import {
   Popup,
   Divider,
   Radio,
-  Transition,
-  Image
+  Transition
 } from 'semantic-ui-react';
 import './SearchCriteria.scss';
 import { phosphoprotService } from '../services/phosphoprot.service';
 import DOMPurify from 'dompurify';
 import _ from 'lodash';
-import * as d3 from 'd3';
 import UpSetFilters from './UpSetFilters';
 
 class EnrichmentSearchCriteria extends Component {
@@ -382,8 +380,6 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentModel,
       enrichmentAnnotation,
       isValidSearchEnrichment,
-      isTestSelected,
-      isSearching,
       upsetPlotAvailable,
       plotButtonActive
     } = this.props;
@@ -442,17 +438,17 @@ class EnrichmentSearchCriteria extends Component {
     }
 
     let UpsetFilters;
-    if (isValidSearchEnrichment && activateUpSetFilters) {
+    if (
+      isValidSearchEnrichment &&
+      activateUpSetFilters &&
+      upsetFiltersVisible
+    ) {
       UpsetFilters = (
-        <Transition.Group animation="scale" duration={500}>
-          {upsetFiltersVisible && (
-            <UpSetFilters
-              {...this.props}
-              {...this.state}
-              onUpdateQueryData={this.updateQueryData}
-            />
-          )}
-        </Transition.Group>
+        <UpSetFilters
+          {...this.props}
+          {...this.state}
+          onUpdateQueryData={this.updateQueryData}
+        />
       );
     }
 
@@ -461,13 +457,19 @@ class EnrichmentSearchCriteria extends Component {
 
     if (isValidSearchEnrichment) {
       PlotRadio = (
-        <Radio
-          toggle
-          label="View Plot"
-          checked={plotButtonActive}
-          onChange={this.props.onHandlePlotAnimation('uncover')}
-          disabled={!upsetPlotAvailable}
-        />
+        <Transition
+          visible={!upsetPlotAvailable}
+          animation="flash"
+          duration={1500}
+        >
+          <Radio
+            toggle
+            label="View Plot"
+            checked={plotButtonActive}
+            onChange={this.props.onHandlePlotAnimation('uncover')}
+            disabled={!upsetPlotAvailable}
+          />
+        </Transition>
       );
 
       UpsetRadio = (

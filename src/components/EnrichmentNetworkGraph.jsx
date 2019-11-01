@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Icon, Popup, Button } from 'semantic-ui-react';
+import { Icon, Popup } from 'semantic-ui-react';
 // import { phosphoprotService } from '../services/phosphoprot.service';
 import { withRouter } from 'react-router-dom';
 // import ButtonActions from './ButtonActions';
@@ -60,8 +60,6 @@ class EnrichmentNetworkGraph extends Component {
   };
 
   render() {
-    const { upsetPlotAvailable } = this.props;
-
     const IconPopupStyle = {
       backgroundColor: '2E2E2E',
       borderBottom: '2px solid #FF4400',

@@ -135,20 +135,20 @@ class EnrichmentContainer extends Component {
 
     let icon = '';
     let iconText = '';
-    let dbShort = '';
+    // let dbShort = '';
     if (enrichmentAnnotation === 'REACTOME') {
       icon = reactome_icon;
       iconText = 'Reactome';
-      dbShort = 'REACTOME';
+      // dbShort = 'REACTOME';
     } else if (enrichmentAnnotation.substring(0, 2) === 'GO') {
       icon = go_icon;
       iconText = 'AmiGO 2';
-      if (enrichmentAnnotation.substring(3, 4) == 'B') {
-        dbShort = 'GOBP';
-      } else if (enrichmentAnnotation.substring(3, 4) == 'C') {
-        dbShort = 'GOCC';
-      } else if (enrichmentAnnotation.substring(3, 4) == 'M') {
-        dbShort = 'GOMF';
+      if (enrichmentAnnotation.substring(3, 4) === 'B') {
+        // dbShort = 'GOBP';
+      } else if (enrichmentAnnotation.substring(3, 4) === 'C') {
+        // dbShort = 'GOCC';
+      } else if (enrichmentAnnotation.substring(3, 4) === 'M') {
+        // dbShort = 'GOMF';
       }
     } else if (enrichmentAnnotation.substring(0, 4) === 'msig') {
       icon = msig_icon;
@@ -384,7 +384,6 @@ class EnrichmentContainer extends Component {
     const enrichmentView = this.getView(this.state);
 
     const { upsetPlotInfo, animation, direction, visible } = this.state;
-    const vertical = direction === 'bottom' || direction === 'top';
     const VerticalSidebar = ({ animation, visible }) => (
       <Sidebar
         as={'div'}

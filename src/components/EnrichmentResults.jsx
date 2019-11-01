@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Popup, Icon, Button } from 'semantic-ui-react';
+import { Popup, Icon } from 'semantic-ui-react';
 import { phosphoprotService } from '../services/phosphoprot.service';
 import { withRouter } from 'react-router-dom';
 // import ButtonActions from './ButtonActions';
@@ -201,11 +201,7 @@ class EnrichmentResults extends Component {
   // };
 
   render() {
-    const {
-      enrichmentResults,
-      enrichmentColumns,
-      upsetPlotAvailable
-    } = this.props;
+    const { enrichmentResults, enrichmentColumns } = this.props;
     // const rows = this.props.enrichmentResults.length;
     const quickViews = [];
     const additionalTemplateInfo = this.getTableHelpers(
