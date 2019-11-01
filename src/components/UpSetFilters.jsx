@@ -9,33 +9,33 @@ class UpSetFilters extends Component {
   static defaultProps = {
     uAnchor: '',
     uData: [],
-    // selectedCol: {
-    //   key: 'ap',
-    //   text: 'adj_P_Val',
-    //   value: 'adj_P_Val'
-    // },
-    // selectedOperator: {
-    //   key: 'lt',
-    //   text: '<',
-    //   value: 'Less Than'
-    // },
-    selectedCol: 'adj_P_Val',
-    selectedOperator: '<',
+    selectedCol: {
+      key: 'adj_P_Val',
+      text: 'adj_P_Val',
+      value: 'adj_P_Val'
+    },
+    selectedOperator: {
+      key: 'lt',
+      text: '<',
+      value: 'lt'
+    },
+    // selectedCol: 'adj_P_Val',
+    // selectedOperator: '<',
     sigValue: 0.05,
     uSettings: {
-      defaultSelectedCol: 'adj_P_Val',
-      defaultSelectedOperator: '<',
-      // defaultSelectedCol: {
-      //   key: 'ap',
-      //   text: 'adj_P_Val',
-      //   value: 'adj_P_Val'
-      // },
-      // defaultSelectedOperator: {
-      //   key: 'lt',
-      //   text: '<',
-      //   value: 'Less Than'
-      // },
-      // defaultSigValue: 0.05,
+      // defaultSelectedCol: 'adj_P_Val',
+      // defaultSelectedOperator: '<',
+      defaultSelectedCol: {
+        key: 'adj_P_Val',
+        text: 'adj_P_Val',
+        value: 'adj_P_Val'
+      },
+      defaultSelectedOperator: {
+        key: 'lt',
+        text: '<',
+        value: 'lt'
+      },
+      defaultSigValue: 0.05,
       useAnchor: true,
       must: [],
       not: [],
@@ -46,35 +46,37 @@ class UpSetFilters extends Component {
       maxElements: undefined,
       metaSvg: '',
       heightScalar: 1,
-      thresholdCols: ['adj_P_Val'],
-      thresholdOperator: ['<', '>', '|<|', '|>|']
-      // thresholdCols: [{
-      //     key: 'ap',
-      //     text: 'adj_P_Val',
-      //     value: 'adj_P_Val'
-      // }],
-      // thresholdOperator: [
-      //   {
-      //     key: 'lt',
-      //     text: '<',
-      //     value: 'Less Than'
-      //   },
-      //   {
-      //     key: 'gt',
-      //     text: '>',
-      //     value: 'Greater Than'
-      //   },
-      //   {
-      //     key: 'ltet',
-      //     text: '|<|',
-      //     value: 'Less Than or Equal To'
-      //   },
-      //   {
-      //     key: 'gtet',
-      //     text: '|>|',
-      //     value: 'Greater Than or Equal To'
-      //   }
-      // ],
+      // thresholdCols: ['adj_P_Val'],
+      // thresholdOperator: ['<', '>', '|<|', '|>|']
+      thresholdCols: [
+        {
+          key: 'adj_P_Val',
+          text: 'adj_P_Val',
+          value: 'adj_P_Val'
+        }
+      ],
+      thresholdOperator: [
+        {
+          key: 'lt',
+          text: '<',
+          value: 'lt'
+        },
+        {
+          key: 'gt',
+          text: '>',
+          value: 'gt'
+        },
+        {
+          key: 'lte',
+          text: '|<|',
+          value: 'lta'
+        },
+        {
+          key: 'gte',
+          text: '|>|',
+          value: 'gta'
+        }
+      ]
     }
   };
 
@@ -144,80 +146,80 @@ class UpSetFilters extends Component {
       .selectAll('#upset-query')
       .append('div')
       .style('padding-bottom', '5px');
-    const sigBox = base.append('div').style('padding-bottom', '5px');
+    // const sigBox = base.append('div').style('padding-bottom', '5px');
 
-    let dropdownChangeCol = function() {
-      const selectedC = d3.select(this).property('value');
-      if (uSettings.automaticUpdates) {
-        self.props.onUpdateQueryData({ selectedCol: selectedC });
-      }
-    };
+    // let dropdownChangeCol = function() {
+    //   const selectedC = d3.select(this).property('value');
+    //   if (uSettings.automaticUpdates) {
+    //     self.props.onUpdateQueryData({ selectedCol: selectedC });
+    //   }
+    // };
 
-    let dropdownChangeOperator = function() {
-      const selectedO = d3.select(this).property('value');
-      if (uSettings.automaticUpdates) {
-        self.props.onUpdateQueryData({ selectedOperator: selectedO });
-      }
-    };
+    // let dropdownChangeOperator = function() {
+    //   const selectedO = d3.select(this).property('value');
+    //   if (uSettings.automaticUpdates) {
+    //     self.props.onUpdateQueryData({ selectedOperator: selectedO });
+    //   }
+    // };
 
-    let dropdownCols = sigBox
-      .insert('select', 'svg')
-      .on('change', dropdownChangeCol);
+    // let dropdownCols = sigBox
+    //   .insert('select', 'svg')
+    //   .on('change', dropdownChangeCol);
 
-    let dropdownOperators = sigBox
-      .insert('select', 'svg')
-      .on('change', dropdownChangeOperator);
+    // let dropdownOperators = sigBox
+    //   .insert('select', 'svg')
+    //   .on('change', dropdownChangeOperator);
 
-    dropdownCols
-      .selectAll('option')
-      .data(uSettings.thresholdCols)
-      .enter()
-      .append('option')
-      .property('selected', function(d) {
-        return d === selectedCol;
-      })
-      .attr('value', function(d: string) {
-        return d;
-      })
-      .text(function(d: string) {
-        return d;
-      });
+    // dropdownCols
+    //   .selectAll('option')
+    //   .data(uSettings.thresholdCols)
+    //   .enter()
+    //   .append('option')
+    //   .property('selected', function(d) {
+    //     return d === selectedCol;
+    //   })
+    //   .attr('value', function(d: string) {
+    //     return d;
+    //   })
+    //   .text(function(d: string) {
+    //     return d;
+    //   });
 
-    dropdownOperators
-      .selectAll('option')
-      .data(uSettings.thresholdOperator)
-      .enter()
-      .append('option')
-      .property('selected', function(d) {
-        return d === selectedOperator;
-      })
-      .attr('value', function(d: string) {
-        return d;
-      })
-      .text(function(d: string) {
-        return d;
-      });
+    // dropdownOperators
+    //   .selectAll('option')
+    //   .data(uSettings.thresholdOperator)
+    //   .enter()
+    //   .append('option')
+    //   .property('selected', function(d) {
+    //     return d === selectedOperator;
+    //   })
+    //   .attr('value', function(d: string) {
+    //     return d;
+    //   })
+    //   .text(function(d: string) {
+    //     return d;
+    //   });
 
-    let sigValueInput = sigBox
-      .append('input')
-      .attr('size', '1')
-      .attr('type', 'number')
-      .attr('step', 0.01)
-      .attr('value', sigValue)
-      .on('change', function() {
-        const sValue = +this.value;
-        self.props.onUpdateQueryData({ sigValue: sValue });
-      });
+    // let sigValueInput = sigBox
+    //   .append('input')
+    //   .attr('size', '1')
+    //   .attr('type', 'number')
+    //   .attr('step', 0.01)
+    //   .attr('value', sigValue)
+    //   .on('change', function() {
+    //     const sValue = +this.value;
+    //     self.props.onUpdateQueryData({ sigValue: sValue });
+    //   });
 
-    if (!uSettings.automaticUpdates) {
-      let runButton = sigBox
-        .append('button')
-        .style('padding-left', '5px')
-        .on('click', function() {
-          self.props.onUpdateQueryData({ sigValue: sigValue });
-        })
-        .text('Display');
-    }
+    // if (!uSettings.automaticUpdates) {
+    //   let runButton = sigBox
+    //     .append('button')
+    //     .style('padding-left', '5px')
+    //     .on('click', function() {
+    //       self.props.onUpdateQueryData({ sigValue: sigValue });
+    //     })
+    //     .text('Display');
+    // }
 
     if (uSettings.displayMetaData) {
       // uSettings.thresholdOperator = selectedOperator;
@@ -237,19 +239,19 @@ class UpSetFilters extends Component {
     const useAnchor = uSettings.useAnchor;
 
     switch (selectedOperator) {
-      case '<':
+      case 'lt':
         this.setDesc = 'Elements less than in:';
         this.notSetDesc = 'Elements greater than in:';
         break;
-      case '>':
+      case 'gt':
         this.setDesc = 'Elements greater than in:';
         this.notSetDesc = 'Elements less than in:';
         break;
-      case '|<|':
+      case 'lta':
         this.setDesc = 'Elements absolute value less than in:';
         this.notSetDesc = 'Elements absolute value greater than in:';
         break;
-      case '|>|':
+      case 'gta':
         this.setDesc = 'Elements absolute value greater than in:';
         this.notSetDesc = 'Elements absolute value less than in:';
         break;
@@ -863,48 +865,61 @@ class UpSetFilters extends Component {
     }
   }
 
+  handleDropdownChange = (evt, { name, value }) => {
+    this.props.onUpdateQueryData({
+      [name]: value
+    });
+  };
+
   render() {
-    debugger;
     const { selectedCol, selectedOperator, sigValue, uSettings } = this.props;
-    debugger;
     const Columns = uSettings.thresholdCols;
     const Operators = uSettings.thresholdOperator;
+    // const DefSelCol = uSettings.defaultSelectedCol.text;
+    // const DefSelOp = uSettings.defaultSelectedOperator.text;
+    const SelCol = selectedCol.text;
+    const SelOp = selectedOperator.text;
+    debugger;
 
     return (
       <Fragment>
-        {/* <Form className="UpSetDropdownContainer" size="">
-          <Form.Group size="">
-              <Form.Field
-                  control={Select}
-                  label="Column"
-                  name=""
-                  className="ThresholdColumnSelect"
-                  value={selectedCol}
-                  options={Columns}
-                  width={7}
-              >
-              </Form.Field>
-              <Form.Field
-                  control={Select}
-                  label="Operator"
-                  name=""
-                  className="ThresholdOperatorSelect"
-                  value={selectedOperator}
-                  options={Operators}
-                  width={3}
-              >
-              </Form.Field>
-              <Form.Field
-                  control={Input}
-                  label="Significance"
-                  name=""
-                  className="SignificantValueInput"
-                  value={sigValue}
-                  width={6}
-              >
-              </Form.Field>
+        <Form className="UpSetDropdownContainer">
+          <Form.Group>
+            <Form.Field
+              control={Select}
+              label="Column"
+              name="selectedCol"
+              className="ThresholdColumnSelect"
+              // selection
+              value={SelCol}
+              options={Columns}
+              width={7}
+              onChange={this.handleDropdownChange}
+            ></Form.Field>
+            <Form.Field
+              control={Select}
+              label="Operator"
+              name="selectedOperator"
+              className="ThresholdOperatorSelect"
+              // selection
+              value={SelOp}
+              options={Operators}
+              width={3}
+              onChange={this.handleDropdownChange}
+            ></Form.Field>
+            <Form.Field
+              control={Input}
+              type="number"
+              step="0.01"
+              label="Significance"
+              name="sigValue"
+              className="SignificantValueInput"
+              value={sigValue}
+              width={6}
+              onChange={this.handleDropdownChange}
+            ></Form.Field>
           </Form.Group>
-        </Form> */}
+        </Form>
         <p id="upset-query" className="UpSetQueryContainer"></p>
       </Fragment>
     );

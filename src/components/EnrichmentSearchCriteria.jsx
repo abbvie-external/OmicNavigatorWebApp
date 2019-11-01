@@ -45,72 +45,74 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentModelsDisabled: true,
       enrichmentAnnotationsDisabled: true,
       uAnchor: '',
-      // selectedCol: {
-      //   key: 'ap',
-      //   text: 'adj_P_Val',
-      //   value: 'adj_P_Val'
-      // },
-      // selectedOperator: {
-      //       key: 'lt',
-      //       text: '<',
-      //       value: 'Less Than'
-      // },
-      selectedCol: 'adj_P_Val',
-      selectedOperator: '<',
+      selectedCol: {
+        key: 'adj_P_Val',
+        text: 'adj_P_Val',
+        value: 'adj_P_Val'
+      },
+      selectedOperator: {
+        key: 'lt',
+        text: '<',
+        value: 'lt'
+      },
+      // selectedCol: 'adj_P_Val',
+      // selectedOperator: '<',
       sigValue: 0.05,
       uSettings: {
-        defaultSelectedCol: 'adj_P_Val',
-        defaultSelectedOperator: '<',
-        // defaultSelectedCol: {
-        //   key: 'ap',
-        //   text: 'adj_P_Val',
-        //   value: 'adj_P_Val'
-        // },
-        // defaultSelectedOperator: {
-        //   key: 'lt',
-        //   text: '<',
-        //   value: 'Less Than'
-        // },
+        // defaultSelectedCol: 'adj_P_Val',
+        // defaultSelectedOperator: '<',
+        defaultSelectedCol: {
+          key: 'adj_P_Val',
+          text: 'adj_P_Val',
+          value: 'adj_P_Val'
+        },
+        defaultSelectedOperator: {
+          key: 'lt',
+          text: '<',
+          value: 'lt'
+        },
         defaultSigValue: 0.05,
         useAnchor: false,
         must: [],
         not: [],
         displayMetaData: true,
         templateName: 'enrichment-upset',
-        automaticUpdates: true,
+        // automaticUpdates: true,
         numElements: undefined,
         maxElements: undefined,
         metaSvg: '',
         heightScalar: 1,
-        thresholdCols: ['adj_P_Val'],
-        thresholdOperator: ['<', '>', '|<|', '|>|']
-        //   thresholdCols: [{
-        //     key: 'ap',
-        //     text: 'adj_P_Val',
-        //     value: 'adj_P_Val'
-        //   }],
-        //   thresholdOperator: [
-        //     {
-        //       key: 'lt',
-        //       text: '<',
-        //       value: 'Less Than'
-        //     },
-        //     {
-        //       key: 'gt',
-        //       text: '>',
-        //       value: 'Greater Than'
-        //     },
-        //     {
-        //       key: 'ltet',
-        //       text: '|<|',
-        //       value: 'Less Than or Equal To'
-        //     },
-        //     {
-        //       key: 'gtet',
-        //       text: '|>|',
-        //       value: 'Greater Than or Equal To'
-        //     }
-        //   ]
+        // thresholdCols: ['adj_P_Val'],
+        // thresholdOperator: ['<', '>', '|<|', '|>|']
+        thresholdCols: [
+          {
+            key: 'adj_P_Val',
+            text: 'adj_P_Val',
+            value: 'adj_P_Val'
+          }
+        ],
+        thresholdOperator: [
+          {
+            key: 'lt',
+            text: '<',
+            value: 'lt'
+          },
+          {
+            key: 'gt',
+            text: '>',
+            value: 'gt'
+          },
+          {
+            key: 'lte',
+            text: '|<|',
+            value: 'lta'
+          },
+          {
+            key: 'gte',
+            text: '|>|',
+            value: 'gta'
+          }
+        ]
       },
       upsetFiltersVisible: false,
       activateUpSetFilters: false
@@ -233,7 +235,7 @@ class EnrichmentSearchCriteria extends Component {
           must: this.state.uSettings.must,
           not: this.state.uSettings.not,
           sigValue: this.state.uSettings.defaultSigValue,
-          // selectedCol: "adj_P_Val",
+          selectedCol: this.state.uSettings.defaultSelectedCol,
           selectedOperator: this.state.uSettings.defaultSelectedOperator
         });
       } else {
@@ -279,7 +281,7 @@ class EnrichmentSearchCriteria extends Component {
     const eMust = evt.must || this.state.uSettings.must;
     const eNot = evt.not || this.state.uSettings.not;
     const eOperator = evt.selectedOperator || this.state.selectedOperator;
-    // const eCol = evt.selectedCol;
+    const eCol = evt.selectedCol;
     this.setState({
       uSettings: {
         ...this.state.uSettings,
@@ -287,8 +289,8 @@ class EnrichmentSearchCriteria extends Component {
         not: eNot
       },
       sigValue: eSigV,
-      selectedOperator: eOperator
-      // selectedCol: eCol
+      selectedOperator: eOperator,
+      selectedCol: eCol
     });
     let mustString = this.testToString(eMust);
     let notString = this.testToString(eNot);
