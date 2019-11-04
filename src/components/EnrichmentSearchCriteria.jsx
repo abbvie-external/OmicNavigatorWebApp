@@ -275,6 +275,7 @@ class EnrichmentSearchCriteria extends Component {
   };
 
   updateQueryData = evt => {
+    this.props.onDisablePlot();
     const eSigV = evt.sigValue || this.state.sigValue;
     const eMust = evt.must || this.state.uSettings.must;
     const eNot = evt.not || this.state.uSettings.not;

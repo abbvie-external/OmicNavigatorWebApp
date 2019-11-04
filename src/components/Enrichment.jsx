@@ -84,6 +84,12 @@ class EnrichmentContainer extends Component {
     });
   };
 
+  disablePlot = () => {
+    this.setState({
+      upsetPlotAvailable: false
+    });
+  };
+
   hideEGrid = () => {
     this.setState({
       isValidSearchEnrichment: false,
@@ -420,6 +426,7 @@ class EnrichmentContainer extends Component {
             onEnrichmentSearch={this.handleEnrichmentSearch}
             onSearchCriteriaChange={this.handleSearchCriteriaChange}
             onSearchCriteriaReset={this.hideEGrid}
+            onDisablePlot={this.disablePlot}
             onGetUpsetPlot={this.handleUpsetPlot}
             onHandlePlotAnimation={this.handlePlotAnimation}
           />
