@@ -159,7 +159,7 @@ class EnrichmentResults extends Component {
                     dataItem.Annotation
                   )
                   .then(barcodeDataResponse => {
-                    let obj = JSON.parse(barcodeDataResponse[0]);
+                    let obj = JSON.parse(barcodeDataResponse['object'][0]);
                     showBarcodePlotCb(dataItem, obj, test, xLargest);
                   });
               });

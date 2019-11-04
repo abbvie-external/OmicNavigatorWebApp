@@ -49,25 +49,21 @@ class EnrichmentSearchCriteria extends Component {
         value: 'adj_P_Val'
       },
       selectedOperator: {
-        key: 'lt',
+        key: '<',
         text: '<',
-        value: 'lt'
+        value: '<'
       },
-      // selectedCol: 'adj_P_Val',
-      // selectedOperator: '<',
       sigValue: 0.05,
       uSettings: {
-        // defaultSelectedCol: 'adj_P_Val',
-        // defaultSelectedOperator: '<',
         defaultSelectedCol: {
           key: 'adj_P_Val',
           text: 'adj_P_Val',
           value: 'adj_P_Val'
         },
         defaultSelectedOperator: {
-          key: 'lt',
+          key: '<',
           text: '<',
-          value: 'lt'
+          value: '<'
         },
         defaultSigValue: 0.05,
         useAnchor: false,
@@ -75,13 +71,10 @@ class EnrichmentSearchCriteria extends Component {
         not: [],
         displayMetaData: true,
         templateName: 'enrichment-upset',
-        // automaticUpdates: true,
         numElements: undefined,
         maxElements: undefined,
         metaSvg: '',
         heightScalar: 1,
-        // thresholdCols: ['adj_P_Val'],
-        // thresholdOperator: ['<', '>', '|<|', '|>|']
         thresholdCols: [
           {
             key: 'adj_P_Val',
@@ -91,24 +84,24 @@ class EnrichmentSearchCriteria extends Component {
         ],
         thresholdOperator: [
           {
-            key: 'lt',
+            key: '<',
             text: '<',
-            value: 'lt'
+            value: '<'
           },
           {
-            key: 'gt',
+            key: '>',
             text: '>',
-            value: 'gt'
+            value: '>'
           },
           {
-            key: 'lte',
+            key: '|<|',
             text: '|<|',
-            value: 'lta'
+            value: '|<|'
           },
           {
-            key: 'gte',
+            key: '|>|',
             text: '|>|',
-            value: 'gta'
+            value: '|>|'
           }
         ]
       },
@@ -232,9 +225,9 @@ class EnrichmentSearchCriteria extends Component {
         this.updateQueryData({
           must: this.state.uSettings.must,
           not: this.state.uSettings.not,
-          sigValue: this.state.uSettings.defaultSigValue,
-          selectedCol: this.state.uSettings.defaultSelectedCol,
-          selectedOperator: this.state.uSettings.defaultSelectedOperator
+          sigValue: this.state.sigValue,
+          selectedCol: this.state.selectedCol,
+          selectedOperator: this.state.selectedOperator
         });
       } else {
         this.setState({
@@ -280,7 +273,7 @@ class EnrichmentSearchCriteria extends Component {
     const eMust = evt.must || this.state.uSettings.must;
     const eNot = evt.not || this.state.uSettings.not;
     const eOperator = evt.selectedOperator || this.state.selectedOperator;
-    const eCol = evt.selectedCol;
+    const eCol = evt.selectedCol || this.state.selectedCol;
     this.setState({
       uSettings: {
         ...this.state.uSettings,

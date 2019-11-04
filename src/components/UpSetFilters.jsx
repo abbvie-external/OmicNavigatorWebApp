@@ -13,9 +13,9 @@ class UpSetFilters extends Component {
       value: 'adj_P_Val'
     },
     selectedOperator: {
-      key: 'lt',
+      key: '<',
       text: '<',
-      value: 'lt'
+      value: '<'
     },
     sigValue: 0.05,
     uSettings: {
@@ -25,9 +25,9 @@ class UpSetFilters extends Component {
         value: 'adj_P_Val'
       },
       defaultSelectedOperator: {
-        key: 'lt',
+        key: '<',
         text: '<',
-        value: 'lt'
+        value: '<'
       },
       defaultSigValue: 0.05,
       useAnchor: true,
@@ -49,24 +49,24 @@ class UpSetFilters extends Component {
       ],
       thresholdOperator: [
         {
-          key: 'lt',
+          key: '<',
           text: '<',
-          value: 'lt'
+          value: '<'
         },
         {
-          key: 'gt',
+          key: '>',
           text: '>',
-          value: 'gt'
+          value: '>'
         },
         {
-          key: 'lte',
+          key: '|<|',
           text: '|<|',
-          value: 'lta'
+          value: '|<|'
         },
         {
-          key: 'gte',
+          key: '|>|',
           text: '|>|',
-          value: 'gta'
+          value: '|>|'
         }
       ]
     }
@@ -151,19 +151,19 @@ class UpSetFilters extends Component {
     const useAnchor = uSettings.useAnchor;
 
     switch (selectedOperator) {
-      case 'lt':
+      case '<':
         this.setDesc = 'Elements less than in:';
         this.notSetDesc = 'Elements greater than in:';
         break;
-      case 'gt':
+      case '>':
         this.setDesc = 'Elements greater than in:';
         this.notSetDesc = 'Elements less than in:';
         break;
-      case 'lta':
+      case '|<|':
         this.setDesc = 'Elements absolute value less than in:';
         this.notSetDesc = 'Elements absolute value greater than in:';
         break;
-      case 'gta':
+      case '|>|':
         this.setDesc = 'Elements absolute value greater than in:';
         this.notSetDesc = 'Elements absolute value less than in:';
         break;
@@ -751,6 +751,16 @@ class UpSetFilters extends Component {
 
   handleDropdownChange = (evt, { name, value }) => {
     this.props.onUpdateQueryData({
+      [name]: {
+        key: value,
+        text: value,
+        value: value
+      }
+    });
+  };
+
+  handleInputChange = (evt, { name, value }) => {
+    this.props.onUpdateQueryData({
       [name]: value
     });
   };
@@ -761,8 +771,6 @@ class UpSetFilters extends Component {
     const Operators = uSettings.thresholdOperator;
     const SelCol = selectedCol.text;
     const SelOp = selectedOperator.text;
-    debugger;
-
     return (
       <Fragment>
         <Form className="UpSetDropdownContainer">
@@ -798,7 +806,7 @@ class UpSetFilters extends Component {
               className="SignificantValueInput"
               value={sigValue}
               width={6}
-              onChange={this.handleDropdownChange}
+              onChange={this.handleInputChange}
             ></Form.Field>
           </Form.Group>
         </Form>
