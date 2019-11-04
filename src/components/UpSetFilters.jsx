@@ -150,7 +150,7 @@ class UpSetFilters extends Component {
       notData.length * heightScalar + mustData.length * heightScalar + 60 + 10;
     const useAnchor = uSettings.useAnchor;
 
-    switch (selectedOperator) {
+    switch (selectedOperator.text) {
       case '<':
         this.setDesc = 'Elements less than in:';
         this.notSetDesc = 'Elements greater than in:';
