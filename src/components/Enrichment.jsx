@@ -6,6 +6,7 @@ import EnrichmentNetworkGraph from './EnrichmentNetworkGraph';
 import EnrichmentResults from './EnrichmentResults';
 import TransitionActive from './TransitionActive';
 import TransitionStill from './TransitionStill';
+import ButtonActions from './ButtonActions';
 import { formatNumberForDisplay, splitValue } from '../helpers';
 // import { phosphoprotService } from '../services/phosphoprot.service';
 // import { updateUrl } from './UrlControl';
@@ -44,7 +45,11 @@ class EnrichmentContainer extends Component {
       direction: 'left',
       visible: false,
       plotButtonActive: false,
-      uData: []
+      uData: [],
+      excelVisible: false,
+      pngVisible: true,
+      pdfVisible: false,
+      svgVisible: true
     };
   }
 
@@ -403,8 +408,21 @@ class EnrichmentContainer extends Component {
         width="very wide"
         className="VerticalSidebarPlot"
       >
+        <Grid className="">
+          <Grid.Row className="ActionsRow">
+            <Grid.Column
+              mobile={16}
+              tablet={16}
+              largeScreen={16}
+              widescreen={16}
+            >
+              <ButtonActions {...this.props} {...this.state} />
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>
         <div
           className="UpsetSvgSpan"
+          id="UpsetSvgOuter"
           dangerouslySetInnerHTML={{ __html: upsetPlotInfo.svg }}
         ></div>
       </Sidebar>

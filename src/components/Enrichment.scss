@@ -21,12 +21,14 @@
 }
 
 .UpsetSvgSpan {
-  padding-top: 25px !important;
   padding-left: 35px !important;
 }
 
 .VerticalSidebarPlot {
   width: 100% !important;
+  padding-top: 10px !important;
+  padding-left: 0px !important;
+  padding-right: 25px !important;
 }
 
 .ui.visible[class*="very wide"].left.sidebar~.pusher {

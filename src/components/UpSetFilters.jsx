@@ -104,7 +104,6 @@ class UpSetFilters extends Component {
       selectedOperator
     } = this.props;
     if (uSettings !== prevProps.uSettings) {
-      debugger;
       this.makeUpset(
         uData,
         uAnchor,

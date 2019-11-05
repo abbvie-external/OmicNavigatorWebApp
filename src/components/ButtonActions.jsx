@@ -15,13 +15,20 @@ class ButtonActions extends Component {
   componentDidMount() {}
 
   PNGExport = () => {
-    saveSvgAsPng.saveSvgAsPng(
-      document.getElementsByTagName('svg')[0],
-      this.props.imageInfo.title +
-        '-' +
-        this.props.imageInfo.svg[this.props.activeSVGTabIndex].plotType +
-        '.png'
-    );
+    if (this.props.upsetPlotInfo !== undefined) {
+      saveSvgAsPng.saveSvgAsPng(
+        document.getElementById('multisetAnalysisSVG'),
+        'Multiset_Analysis_Plot.png'
+      );
+    } else {
+      saveSvgAsPng.saveSvgAsPng(
+        document.getElementsByTagName('svg')[0],
+        this.props.imageInfo.title +
+          '-' +
+          this.props.imageInfo.svg[this.props.activeSVGTabIndex].plotType +
+          '.png'
+      );
+    }
   };
 
   ExcelExport = () => {
@@ -35,21 +42,16 @@ class ButtonActions extends Component {
     pdfService.createPDF(document.getElementsByTagName('svg')[0]);
   };
 
+  SVGExport = () => {
+    //upsetPlotInfo.svg
+    console.log('SVG export coming soon');
+  };
+
   getExcelButton = () => {
     if (this.props.excelVisible) {
       return (
         <Button className="ExportButton" onClick={this.ExcelExport}>
           Data (.xls)
-        </Button>
-      );
-    }
-  };
-
-  getPDFButton = () => {
-    if (this.props.pdfVisible) {
-      return (
-        <Button className="ExportButton" onClick={this.PDFExport}>
-          PDF
         </Button>
       );
     }
@@ -65,10 +67,31 @@ class ButtonActions extends Component {
     }
   };
 
+  getPDFButton = () => {
+    if (this.props.pdfVisible) {
+      return (
+        <Button className="ExportButton" onClick={this.PDFExport}>
+          PDF
+        </Button>
+      );
+    }
+  };
+
+  getSVGButton = () => {
+    if (this.props.svgVisible) {
+      return (
+        <Button className="ExportButton" onClick={this.SVGExport}>
+          SVG
+        </Button>
+      );
+    }
+  };
+
   render() {
     const excelButton = this.getExcelButton();
     const pdfButton = this.getPDFButton();
     const pngButton = this.getPNGButton();
+    const svgButton = this.getSVGButton();
     return (
       <div className="ButtonActions">
         <Button.Group className="ExportButtonGroup" floated="right">
@@ -80,6 +103,7 @@ class ButtonActions extends Component {
           </Button>
           {pngButton}
           {pdfButton}
+          {svgButton}
         </Button.Group>
       </div>
     );

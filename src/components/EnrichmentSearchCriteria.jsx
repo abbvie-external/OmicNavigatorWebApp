@@ -341,6 +341,8 @@ class EnrichmentSearchCriteria extends Component {
   }
 
   getUpSetPlot(sigVal, enrichmentModel, enrichmentStudy, enrichmentAnnotation) {
+    let heightCalculation = this.calculateHeight;
+    let widthCalculation = this.calculateWidth;
     phosphoprotService
       .getEnrichmentUpSetPlot(
         sigVal,
@@ -350,6 +352,27 @@ class EnrichmentSearchCriteria extends Component {
       )
       .then(svgMarkupObj => {
         let svgMarkup = svgMarkupObj.data;
+        // svgMarkup = svgMarkup.replace(
+        //   /<svg/g,
+        //   '<svg preserveAspectRatio="xMinYMid meet" id="multisetAnalysisSVG"'
+        // );
+        svgMarkup = svgMarkup.replace(
+          /<svg/g,
+          '<svg preserveAspectRatio="xMinYMid meet" style="width:' +
+            widthCalculation() * 0.8 +
+            'px; height:' +
+            heightCalculation() * 0.8 +
+            'px;" id="multisetAnalysisSVG"'
+        );
+        // DOMPurify.addHook('afterSanitizeAttributes', function(node) {
+        //   if (
+        //     node.hasAttribute('xlink:href') &&
+        //     !node.getAttribute('xlink:href').match(/^#/)
+        //   ) {
+        //     node.remove();
+        //   }
+        // });
+        // Clean HTML string and write into our DIV
         let sanitizedSVG = DOMPurify.sanitize(svgMarkup, {
           ADD_TAGS: ['use']
         });
@@ -358,6 +381,22 @@ class EnrichmentSearchCriteria extends Component {
           svgInfo
         });
       });
+  }
+
+  calculateHeight() {
+    var h = Math.max(
+      document.documentElement.clientHeight,
+      window.innerHeight || 0
+    );
+    return h;
+  }
+
+  calculateWidth() {
+    var w = Math.max(
+      document.documentElement.clientWidth,
+      window.innerWidth || 0
+    );
+    return w;
   }
 
   render() {
