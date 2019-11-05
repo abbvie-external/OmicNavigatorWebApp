@@ -503,6 +503,7 @@ class EnrichmentSearchCriteria extends Component {
           <Radio
             toggle
             label="View Plot"
+            className={upsetPlotAvailable ? 'ViewPlotRadio' : ''}
             checked={plotButtonActive}
             onChange={this.props.onHandlePlotAnimation('uncover')}
             disabled={!upsetPlotAvailable}
