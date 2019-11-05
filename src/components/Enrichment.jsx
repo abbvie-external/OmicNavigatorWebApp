@@ -272,10 +272,12 @@ class EnrichmentContainer extends Component {
     const uDataRelevantFields = _.filter(allKeys, function(key) {
       return key !== 'Description' && key !== 'Annotation';
     });
-
-    this.setState({
-      uData: uDataRelevantFields
-    });
+    // multiset svg rebuilds based on uData...if there are no results we need to override this from being passed down
+    if (uDataRelevantFields.length != 0) {
+      this.setState({
+        uData: uDataRelevantFields
+      });
+    }
 
     const additionalConfigColumns = relevantConfigColumns.map(c => {
       return {

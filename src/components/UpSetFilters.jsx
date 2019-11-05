@@ -4,73 +4,73 @@ import * as d3 from 'd3';
 import './UpSetFilters.scss';
 
 class UpSetFilters extends Component {
-  static defaultProps = {
-    uAnchor: '',
-    uData: [],
-    selectedCol: {
-      key: 'adj_P_Val',
-      text: 'adj_P_Val',
-      value: 'adj_P_Val'
-    },
-    selectedOperator: {
-      key: '<',
-      text: '<',
-      value: '<'
-    },
-    sigValue: 0.05,
-    uSettings: {
-      defaultSelectedCol: {
-        key: 'adj_P_Val',
-        text: 'adj_P_Val',
-        value: 'adj_P_Val'
-      },
-      defaultSelectedOperator: {
-        key: '<',
-        text: '<',
-        value: '<'
-      },
-      defaultSigValue: 0.05,
-      useAnchor: true,
-      must: [],
-      not: [],
-      displayMetaData: true,
-      templateName: 'enrichment-upset',
-      automaticUpdates: true,
-      numElements: undefined,
-      maxElements: undefined,
-      metaSvg: '',
-      heightScalar: 1,
-      thresholdCols: [
-        {
-          key: 'adj_P_Val',
-          text: 'adj_P_Val',
-          value: 'adj_P_Val'
-        }
-      ],
-      thresholdOperator: [
-        {
-          key: '<',
-          text: '<',
-          value: '<'
-        },
-        {
-          key: '>',
-          text: '>',
-          value: '>'
-        },
-        {
-          key: '|<|',
-          text: '|<|',
-          value: '|<|'
-        },
-        {
-          key: '|>|',
-          text: '|>|',
-          value: '|>|'
-        }
-      ]
-    }
-  };
+  // static defaultProps = {
+  //   uAnchor: '',
+  //   uData: [],
+  //   selectedCol: {
+  //     key: 'adj_P_Val',
+  //     text: 'adj_P_Val',
+  //     value: 'adj_P_Val'
+  //   },
+  //   selectedOperator: {
+  //     key: '<',
+  //     text: '<',
+  //     value: '<'
+  //   },
+  //   sigValue: 0.05,
+  //   uSettings: {
+  //     defaultSelectedCol: {
+  //       key: 'adj_P_Val',
+  //       text: 'adj_P_Val',
+  //       value: 'adj_P_Val'
+  //     },
+  //     defaultSelectedOperator: {
+  //       key: '<',
+  //       text: '<',
+  //       value: '<'
+  //     },
+  //     defaultSigValue: 0.05,
+  //     useAnchor: true,
+  //     must: [],
+  //     not: [],
+  //     displayMetaData: true,
+  //     templateName: 'enrichment-upset',
+  //     automaticUpdates: true,
+  //     numElements: undefined,
+  //     maxElements: undefined,
+  //     metaSvg: '',
+  //     heightScalar: 1,
+  //     thresholdCols: [
+  //       {
+  //         key: 'adj_P_Val',
+  //         text: 'adj_P_Val',
+  //         value: 'adj_P_Val'
+  //       }
+  //     ],
+  //     thresholdOperator: [
+  //       {
+  //         key: '<',
+  //         text: '<',
+  //         value: '<'
+  //       },
+  //       {
+  //         key: '>',
+  //         text: '>',
+  //         value: '>'
+  //       },
+  //       {
+  //         key: '|<|',
+  //         text: '|<|',
+  //         value: '|<|'
+  //       },
+  //       {
+  //         key: '|>|',
+  //         text: '|>|',
+  //         value: '|>|'
+  //       }
+  //     ]
+  //   }
+  // };
 
   componentDidMount() {
     const {
@@ -103,8 +103,8 @@ class UpSetFilters extends Component {
       selectedCol,
       selectedOperator
     } = this.props;
-
     if (uSettings !== prevProps.uSettings) {
+      debugger;
       this.makeUpset(
         uData,
         uAnchor,
@@ -801,6 +801,7 @@ class UpSetFilters extends Component {
               control={Input}
               type="number"
               step="0.01"
+              min="0"
               label="Significance"
               name="sigValue"
               className="SignificantValueInput"
