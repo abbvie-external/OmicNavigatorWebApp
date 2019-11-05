@@ -136,11 +136,18 @@ class UpSetFilters extends Component {
     if (uSettings.displayMetaData) {
       this.prepareUpset(uData, uAnchor, uSettings, base);
       const baseMetaSvg = base.append('svg');
-      this.metaScript(baseMetaSvg, uAnchor, uData, uSettings, selectedOperator);
+      this.metaScript(
+        baseMetaSvg,
+        uAnchor,
+        uData,
+        uSettings,
+        selectedOperator,
+        sigValue
+      );
     }
   }
 
-  metaScript(metaSvg, uAnchor, uData, uSettings, selectedOperator) {
+  metaScript(metaSvg, uAnchor, uData, uSettings, selectedOperator, sigValue) {
     const svgWidth = 135 + 140; //To match the SVG above
     const heightScalar = 20; //20 per circle
     const mustData = uSettings.must;
@@ -151,20 +158,20 @@ class UpSetFilters extends Component {
 
     switch (selectedOperator.text) {
       case '<':
-        this.setDesc = 'Elements less than in:';
-        this.notSetDesc = 'Elements greater than in:';
+        this.setDesc = `Elements less than ${sigValue} in:`;
+        this.notSetDesc = `Elements greater than ${sigValue} in:`;
         break;
       case '>':
-        this.setDesc = 'Elements greater than in:';
-        this.notSetDesc = 'Elements less than in:';
+        this.setDesc = `Elements greater than ${sigValue} in:`;
+        this.notSetDesc = `Elements less than ${sigValue} in:`;
         break;
       case '|<|':
-        this.setDesc = 'Elements absolute value less than in:';
-        this.notSetDesc = 'Elements absolute value greater than in:';
+        this.setDesc = `Elements absolute value less than ${sigValue} in:`;
+        this.notSetDesc = `Elements absolute value greater than ${sigValue} in:`;
         break;
       case '|>|':
-        this.setDesc = 'Elements absolute value greater than in:';
-        this.notSetDesc = 'Elements absolute value less than in:';
+        this.setDesc = `Elements absolute value greater than ${sigValue} in:`;
+        this.notSetDesc = `Elements absolute value less than ${sigValue} in:`;
         break;
       default:
         this.setDesc = '';

@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-import { Grid, Popup } from 'semantic-ui-react';
+import { Grid, Popup, Sidebar } from 'semantic-ui-react';
 import { withRouter } from 'react-router-dom';
 import PepplotSearchCriteria from './PepplotSearchCriteria';
 import PepplotResults from './PepplotResults';
-import TransitionStill from './TransitionStill';
 import TransitionActive from './TransitionActive';
+import TransitionStill from './TransitionStill';
+import ButtonActions from './ButtonActions';
 import { formatNumberForDisplay, splitValue } from '../helpers';
 import phosphosite_icon from '../resources/phosphosite.ico';
 // import { updateUrl } from './UrlControl';
@@ -21,7 +22,20 @@ class PepplotContainer extends Component {
       isSearching: false,
       isProteinSelected: false,
       pepplotResults: [],
-      pepplotColumns: []
+      pepplotColumns: [],
+      upsetPlotInfo: {
+        title: '',
+        svg: []
+      },
+      upsetPlotAvailable: false,
+      animation: 'uncover',
+      direction: 'left',
+      visible: false,
+      plotButtonActive: false,
+      excelVisible: false,
+      pngVisible: true,
+      pdfVisible: false,
+      svgVisible: true
     };
   }
 
@@ -40,17 +54,55 @@ class PepplotContainer extends Component {
       pepplotColumns: columns,
       isSearching: false,
       isValidSearchPepplot: true,
-      isProteinSelected: false
+      isProteinSelected: false,
+      upsetPlotAvailable: false,
+      plotButtonActive: false,
+      visible: false
     });
   };
 
   handleSearchCriteriaChange = changes => {
     this.props.onSearchCriteriaToTop(changes);
+    this.setState({
+      upsetPlotAvailable: false,
+      plotButtonActive: false,
+      visible: false
+    });
+  };
+
+  disablePlot = () => {
+    this.setState({
+      upsetPlotAvailable: false
+    });
   };
 
   hidePGrid = () => {
     this.setState({
-      isValidSearchPepplot: false
+      isValidSearchPepplot: false,
+      upsetPlotAvailable: false,
+      plotButtonActive: false,
+      visible: false
+    });
+  };
+
+  handlePlotAnimation = animation => () => {
+    this.setState(prevState => ({
+      animation,
+      visible: !prevState.visible,
+      plotButtonActive: !this.state.plotButtonActive
+    }));
+  };
+
+  handleDirectionChange = direction => () =>
+    this.setState({ direction: direction, visible: false });
+
+  handleUpsetPlot = upsetPlotResults => {
+    this.setState({
+      upsetPlotInfo: {
+        title: upsetPlotResults.svgInfo.plotType,
+        svg: upsetPlotResults.svgInfo.svg
+      },
+      upsetPlotAvailable: true
     });
   };
 
@@ -188,6 +240,7 @@ class PepplotContainer extends Component {
       'adj_P_Val',
       'adjPVal'
     ];
+
     let orderedTestData = JSON.parse(
       JSON.stringify(pepResults[0], relevantConfigCols)
     );
@@ -226,7 +279,6 @@ class PepplotContainer extends Component {
     });
 
     const configCols = initConfigCols.concat(additionalConfigColumns);
-
     return configCols;
   };
 
@@ -241,6 +293,7 @@ class PepplotContainer extends Component {
           {...this.state}
           {...this.props}
           onSearchCriteriaChange={this.handleSearchCriteriaChange}
+          onHandlePlotAnimation={this.handlePlotAnimation}
         />
       );
     } else if (this.state.isSearching) {
@@ -250,6 +303,38 @@ class PepplotContainer extends Component {
 
   render() {
     const pepplotView = this.getView(this.state);
+
+    const { upsetPlotInfo, animation, direction, visible } = this.state;
+    const VerticalSidebar = ({ animation, visible }) => (
+      <Sidebar
+        as={'div'}
+        animation={animation}
+        direction={direction}
+        icon="labeled"
+        vertical="true"
+        visible={visible}
+        width="very wide"
+        className="VerticalSidebarPlot"
+      >
+        <Grid className="">
+          <Grid.Row className="ActionsRow">
+            <Grid.Column
+              mobile={16}
+              tablet={16}
+              largeScreen={16}
+              widescreen={16}
+            >
+              <ButtonActions {...this.props} {...this.state} />
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>
+        <div
+          className="UpsetSvgSpan"
+          id="UpsetSvgOuter"
+          dangerouslySetInnerHTML={{ __html: upsetPlotInfo.svg }}
+        ></div>
+      </Sidebar>
+    );
 
     return (
       <Grid.Row className="PepplotContainer">
@@ -267,6 +352,9 @@ class PepplotContainer extends Component {
             onPepplotSearch={this.handlePepplotSearch}
             onSearchCriteriaChange={this.handleSearchCriteriaChange}
             onSearchCriteriaReset={this.hidePGrid}
+            onDisablePlot={this.disablePlot}
+            onGetUpsetPlot={this.handleUpsetPlot}
+            onHandlePlotAnimation={this.handlePlotAnimation}
           />
         </Grid.Column>
         <Grid.Column
@@ -276,7 +364,14 @@ class PepplotContainer extends Component {
           largeScreen={12}
           widescreen={12}
         >
-          {pepplotView}
+          <Sidebar.Pushable as={'span'}>
+            <VerticalSidebar
+              animation={animation}
+              direction={direction}
+              visible={visible}
+            />
+            <Sidebar.Pusher>{pepplotView}</Sidebar.Pusher>
+          </Sidebar.Pushable>
         </Grid.Column>
       </Grid.Row>
     );

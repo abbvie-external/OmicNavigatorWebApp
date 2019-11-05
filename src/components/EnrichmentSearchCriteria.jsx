@@ -274,16 +274,6 @@ class EnrichmentSearchCriteria extends Component {
     const eNot = evt.not || this.state.uSettings.not;
     const eOperator = evt.selectedOperator || this.state.selectedOperator;
     const eCol = evt.selectedCol || this.state.selectedCol;
-    // this.setState({
-    //   uSettings: {
-    //     ...this.state.uSettings,
-    //     must: eMust,
-    //     not: eNot
-    //   },
-    //   sigValue: eSigV,
-    //   selectedOperator: eOperator,
-    //   selectedCol: eCol
-    // });
     let mustString = this.testToString(eMust);
     let notString = this.testToString(eNot);
     phosphoprotService

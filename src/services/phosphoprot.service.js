@@ -176,7 +176,9 @@ class PhosphoprotService {
     notTest,
     study,
     sigValue,
-    anchor
+    anchor,
+    operator,
+    column
   ) {
     this.setUrl();
     const promise = this.ocpuDataCall('getInferenceIntersection', {
@@ -185,7 +187,9 @@ class PhosphoprotService {
       mustTests: mustTest,
       notTests: notTest,
       study: study,
-      sigValue: sigValue
+      sigValue: sigValue,
+      operator: operator,
+      column: column
     });
     const dataFromPromise = await promise;
     return dataFromPromise;
