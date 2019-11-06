@@ -215,7 +215,7 @@ class UpSetFilters extends Component {
           .attr('y', 44)
           .text(this.anchor)
           .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
-          .attr('font-size', '12px')
+          .attr('font-size', '13px')
           .attr('fill', 'black');
       }
 
@@ -252,7 +252,7 @@ class UpSetFilters extends Component {
           return d;
         })
         .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
-        .attr('font-size', '12px')
+        .attr('font-size', '14px')
         .attr('fill', 'black');
 
       if (notData.length !== 0) {
@@ -324,7 +324,7 @@ class UpSetFilters extends Component {
             return d;
           })
           .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
-          .attr('font-size', '12px')
+          .attr('font-size', '14px')
           .attr('fill', 'black');
       }
     }
@@ -367,7 +367,7 @@ class UpSetFilters extends Component {
       }
     }
     const circlesWidth = 4 * circlePadding + 6 * circleRadius;
-    let textElementWidth = longest * 8 * heightScalar;
+    let textElementWidth = longest * 10 * heightScalar;
     let svgWidth = circlesWidth + textElementWidth;
     if (svgWidth < minWidth) {
       svgWidth = minWidth;
@@ -378,7 +378,8 @@ class UpSetFilters extends Component {
     }
 
     //Colors
-    let chosenColorCode = '#00FF40';
+    // let chosenColorCode = '#00FF40';
+    let chosenColorCode = '#ff4400';
     let baseColorCode = '#585858';
     let backgroundColorCode = '#E6E6E6';
     //Adding settings colors
@@ -595,7 +596,7 @@ class UpSetFilters extends Component {
       .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
       .attr('font-weight', d => (d === anchor ? 'bold' : 'normal'))
       .attr('font-size', function() {
-        return heightScalar * 12 + 'px';
+        return heightScalar * 14 + 'px';
       })
       .attr('fill', 'black');
 
