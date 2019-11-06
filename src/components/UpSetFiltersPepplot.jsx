@@ -625,7 +625,7 @@ class UpSetFiltersPepplot extends Component {
           return (
             4 * circlePadding +
             6 * circleRadius +
-            (textElementWidth - 50 * heightScalarP) *
+            (textElementWidth - 80 * heightScalarP) *
               (uSettingsP.numElementsP / uSettingsP.maxElementsP) +
             3
           );
@@ -645,7 +645,7 @@ class UpSetFiltersPepplot extends Component {
           return (
             4 * circlePadding +
             6 * circleRadius +
-            (textElementWidth - 50 * heightScalarP) *
+            (textElementWidth - 80 * heightScalarP) *
               (uSettingsP.numElementsP / uSettingsP.maxElementsP) +
             6
           );
@@ -654,7 +654,11 @@ class UpSetFiltersPepplot extends Component {
 
       const numElementsPText = numElementsP
         .text(function(d) {
-          return d;
+          const dText =
+            uSettingsP.numElementsP !== uSettingsP.maxElementsP
+              ? `${d} of ${uSettingsP.maxElementsP}`
+              : d;
+          return dText;
         })
         .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
         .attr('font-size', function() {

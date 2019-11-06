@@ -85,7 +85,11 @@ class UpSetFilters extends Component {
     const mustData = uSettings.must;
     const notData = uSettings.not;
     const svgHeight =
-      notData.length * heightScalar + mustData.length * heightScalar + 60 + 10;
+      notData.length * heightScalar +
+      mustData.length * heightScalar +
+      60 +
+      10 +
+      24;
     const useAnchor = uSettings.useAnchor;
 
     switch (selectedOperator.text) {
@@ -610,7 +614,7 @@ class UpSetFilters extends Component {
           return (
             4 * circlePadding +
             6 * circleRadius +
-            (textElementWidth - 50 * heightScalar) *
+            (textElementWidth - 80 * heightScalar) *
               (settings.numElements / settings.maxElements) +
             3
           );
@@ -630,7 +634,7 @@ class UpSetFilters extends Component {
           return (
             4 * circlePadding +
             6 * circleRadius +
-            (textElementWidth - 50 * heightScalar) *
+            (textElementWidth - 80 * heightScalar) *
               (settings.numElements / settings.maxElements) +
             6
           );
@@ -639,7 +643,11 @@ class UpSetFilters extends Component {
 
       const numElementsText = numElements
         .text(function(d) {
-          return d;
+          const dText =
+            settings.numElements !== settings.maxElements
+              ? `${d} of ${settings.maxElements}`
+              : d;
+          return dText;
         })
         .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
         .attr('font-size', function() {
@@ -746,7 +754,7 @@ class UpSetFilters extends Component {
               control={Input}
               type="number"
               step="0.01"
-              min="0"
+              min="0.00"
               label="Significance"
               name="sigValue"
               className="SignificantValueInput"
