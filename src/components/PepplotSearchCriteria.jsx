@@ -13,7 +13,7 @@ import './SearchCriteria.scss';
 import { phosphoprotService } from '../services/phosphoprot.service';
 import DOMPurify from 'dompurify';
 import _ from 'lodash';
-import UpSetFilters from './UpSetFilters';
+import UpSetFiltersPepplot from './UpSetFiltersPepplot';
 
 class PepplotSearchCriteria extends Component {
   static defaultProps = {
@@ -41,47 +41,47 @@ class PepplotSearchCriteria extends Component {
       pepplotStudiesDisabled: false,
       pepplotModelsDisabled: true,
       pepplotTestsDisabled: true,
-      uAnchor: '',
-      selectedCol: {
+      uAnchorP: '',
+      selectedColP: {
         key: 'adj_P_Val',
         text: 'adj_P_Val',
         value: 'adj_P_Val'
       },
-      selectedOperator: {
+      selectedOperatorP: {
         key: '<',
         text: '<',
         value: '<'
       },
-      sigValue: 0.05,
-      uSettings: {
-        defaultSelectedCol: {
+      sigValueP: 0.05,
+      uSettingsP: {
+        defaultselectedColP: {
           key: 'adj_P_Val',
           text: 'adj_P_Val',
           value: 'adj_P_Val'
         },
-        defaultSelectedOperator: {
+        defaultselectedOperatorP: {
           key: '<',
           text: '<',
           value: '<'
         },
-        defaultSigValue: 0.05,
-        useAnchor: true,
-        must: [],
-        not: [],
-        displayMetaData: true,
+        defaultsigValueP: 0.05,
+        useAnchorP: true,
+        mustP: [],
+        notP: [],
+        displayMetaDataP: true,
         templateName: 'pepplot-upset',
-        numElements: undefined,
-        maxElements: undefined,
-        metaSvg: '',
-        heightScalar: 1,
-        thresholdCols: [
+        numElementsP: undefined,
+        maxElementsP: undefined,
+        metaSvgP: '',
+        heightScalarP: 1,
+        thresholdColsP: [
           {
             key: 'adj_P_Val',
             text: 'adj_P_Val',
             value: 'adj_P_Val'
           }
         ],
-        thresholdOperator: [
+        thresholdOperatorP: [
           {
             key: '<',
             text: '<',
@@ -104,9 +104,9 @@ class PepplotSearchCriteria extends Component {
           }
         ]
       },
-      upsetFiltersVisible: false,
-      activateUpSetFilters: false,
-      uData: []
+      upsetFiltersVisibleP: false,
+      activateUpSetFiltersP: false,
+      uDataP: []
     };
   }
 
@@ -137,11 +137,11 @@ class PepplotSearchCriteria extends Component {
             const testsArr = _.map(this.allNames[m], function(testName) {
               return { key: testName, text: testName, value: testName };
             });
-            const uDataArr = this.allNames[m];
+            const uDataPArr = this.allNames[m];
             this.setState({
               pepplotTestsDisabled: false,
               pepplotTests: testsArr,
-              uData: uDataArr
+              uDataP: uDataPArr
             });
           }
         });
@@ -155,7 +155,7 @@ class PepplotSearchCriteria extends Component {
         pepplotProteinSite: p
       });
       this.setState({
-        uAnchor: t
+        uAnchorP: t
       });
       this.props.onSearchTransition({
         isSearching: true
@@ -229,17 +229,17 @@ class PepplotSearchCriteria extends Component {
     const testsArr = _.map(this.allNames[value], function(testName) {
       return { key: testName, text: testName, value: testName };
     });
-    const uDataObj = this.allNames[value];
+    const uDataPObj = this.allNames[value];
     this.setState({
       pepplotTestsDisabled: false,
       pepplotTests: testsArr,
-      uData: uDataObj
+      uDataP: uDataPObj
     });
   };
 
   handleTestChange = (evt, { name, value }) => {
     this.setState({
-      upsetFiltersVisible: false
+      upsetFiltersVisibleP: false
     });
     // this.setState({
     //   pepplotStudiesDisabled: true,
@@ -263,15 +263,15 @@ class PepplotSearchCriteria extends Component {
       )
       .then(dataFromService => {
         this.setState({
-          uSettings: {
-            ...this.state.uSettings,
-            must: [],
-            not: [],
-            defaultSigValue: 0.05,
-            maxElements: dataFromService.length
+          uSettingsP: {
+            ...this.state.uSettingsP,
+            mustP: [],
+            notP: [],
+            defaultsigValueP: 0.05,
+            maxElementsP: dataFromService.length
           },
-          sigValue: 0.05,
-          uAnchor: value
+          sigValueP: 0.05,
+          uAnchorP: value
         });
         this.testdata = dataFromService;
         // this.setState({
@@ -287,20 +287,20 @@ class PepplotSearchCriteria extends Component {
 
   handleUpsetToggle = () => {
     return evt => {
-      if (this.state.upsetFiltersVisible === false) {
+      if (this.state.upsetFiltersVisibleP === false) {
         this.setState({
-          upsetFiltersVisible: true
+          upsetFiltersVisibleP: true
         });
-        this.updateQueryData({
-          must: this.state.uSettings.must,
-          not: this.state.uSettings.not,
-          sigValue: this.state.sigValue,
-          selectedCol: this.state.selectedCol,
-          selectedOperator: this.state.selectedOperator
+        this.updateQueryDataP({
+          mustP: this.state.uSettingsP.mustP,
+          notP: this.state.uSettingsP.notP,
+          sigValueP: this.state.sigValueP,
+          selectedColP: this.state.selectedColP,
+          selectedOperatorP: this.state.selectedOperatorP
         });
       } else {
         this.setState({
-          upsetFiltersVisible: false
+          upsetFiltersVisibleP: false
         });
         const pepplotTestName = 'pepplotTest';
         const pepplotTestVar = this.props.pepplotTest;
@@ -333,47 +333,47 @@ class PepplotSearchCriteria extends Component {
       });
   };
 
-  updateQueryData = evt => {
+  updateQueryDataP = evt => {
     this.props.onDisablePlot();
-    const eSigV = evt.sigValue || this.state.sigValue;
-    const eMust = evt.must || this.state.uSettings.must;
-    const eNot = evt.not || this.state.uSettings.not;
-    const eOperator = evt.selectedOperator || this.state.selectedOperator;
-    const eCol = evt.selectedCol || this.state.selectedCol;
-    let mustString = this.testToString(eMust);
-    let notString = this.testToString(eNot);
+    const eSigVP = evt.sigValueP || this.state.sigValueP;
+    const eMustP = evt.mustP || this.state.uSettingsP.mustP;
+    const eNotP = evt.notP || this.state.uSettingsP.notP;
+    const eOperatorP = evt.selectedOperatorP || this.state.selectedOperatorP;
+    const eColP = evt.selectedColP || this.state.selectedColP;
+    let mustPString = this.testToString(eMustP);
+    let notPString = this.testToString(eNotP);
     phosphoprotService
       .getUpsetInferenceData(
         this.props.pepplotModel,
-        mustString,
-        notString,
+        mustPString,
+        notPString,
         this.props.pepplotStudy + 'plots',
-        eSigV,
+        eSigVP,
         this.props.pepplotTest,
-        eOperator.text,
-        eCol.text
+        eOperatorP.text,
+        eColP.text
       )
       .then(inferenceData => {
-        const multisetResults = inferenceData;
+        const multisetResultsP = inferenceData;
         this.setState({
-          uSettings: {
-            ...this.state.uSettings,
-            numElements: multisetResults.length,
-            maxElements: this.state.uSettings.maxElements,
-            must: eMust,
-            not: eNot
+          uSettingsP: {
+            ...this.state.uSettingsP,
+            numElementsP: multisetResultsP.length,
+            maxElementsP: this.state.uSettingsP.maxElementsP,
+            mustP: eMustP,
+            notP: eNotP
           },
-          activateUpSetFilters: true,
-          sigValue: eSigV,
-          selectedOperator: eOperator,
-          selectedCol: eCol
+          activateUpSetFiltersP: true,
+          sigValueP: eSigVP,
+          selectedOperatorP: eOperatorP,
+          selectedColP: eColP
         });
         this.props.onPepplotSearch({
-          pepplotResults: multisetResults
+          pepplotResults: multisetResultsP
         });
       });
     this.getUpSetPlot(
-      eSigV,
+      eSigVP,
       this.props.pepplotModel,
       this.props.pepplotStudy + 'plots'
     );
@@ -460,8 +460,8 @@ class PepplotSearchCriteria extends Component {
       pepplotStudiesDisabled,
       pepplotModelsDisabled,
       pepplotTestsDisabled,
-      upsetFiltersVisible,
-      activateUpSetFilters
+      upsetFiltersVisibleP,
+      activateUpSetFiltersP
     } = this.state;
 
     const {
@@ -526,13 +526,13 @@ class PepplotSearchCriteria extends Component {
       );
     }
 
-    let UpsetFilters;
-    if (isValidSearchPepplot && activateUpSetFilters && upsetFiltersVisible) {
-      UpsetFilters = (
-        <UpSetFilters
+    let UpsetFiltersPepplot;
+    if (isValidSearchPepplot && activateUpSetFiltersP && upsetFiltersVisibleP) {
+      UpsetFiltersPepplot = (
+        <UpSetFiltersPepplot
           {...this.props}
           {...this.state}
-          onUpdateQueryData={this.updateQueryData}
+          onUpdateQueryDataP={this.updateQueryDataP}
         />
       );
     }
@@ -564,7 +564,7 @@ class PepplotSearchCriteria extends Component {
           <Radio
             toggle
             label="Set Analysis"
-            checked={upsetFiltersVisible}
+            checked={upsetFiltersVisibleP}
             onChange={this.handleUpsetToggle()}
           />
         </React.Fragment>
@@ -617,7 +617,7 @@ class PepplotSearchCriteria extends Component {
             <span className="UpsetRadio">{UpsetRadio}</span>
             <span className="PlotRadio">{PlotRadio}</span>
           </div>
-          <div className="UpsetFiltersDiv">{UpsetFilters}</div>
+          <div className="UpsetFiltersDiv">{UpsetFiltersPepplot}</div>
         </div>
       </React.Fragment>
     );

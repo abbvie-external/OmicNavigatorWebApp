@@ -4,74 +4,6 @@ import * as d3 from 'd3';
 import './UpSetFilters.scss';
 
 class UpSetFilters extends Component {
-  // static defaultProps = {
-  //   uAnchor: '',
-  //   uData: [],
-  //   selectedCol: {
-  //     key: 'adj_P_Val',
-  //     text: 'adj_P_Val',
-  //     value: 'adj_P_Val'
-  //   },
-  //   selectedOperator: {
-  //     key: '<',
-  //     text: '<',
-  //     value: '<'
-  //   },
-  //   sigValue: 0.05,
-  //   uSettings: {
-  //     defaultSelectedCol: {
-  //       key: 'adj_P_Val',
-  //       text: 'adj_P_Val',
-  //       value: 'adj_P_Val'
-  //     },
-  //     defaultSelectedOperator: {
-  //       key: '<',
-  //       text: '<',
-  //       value: '<'
-  //     },
-  //     defaultSigValue: 0.05,
-  //     useAnchor: true,
-  //     must: [],
-  //     not: [],
-  //     displayMetaData: true,
-  //     templateName: 'enrichment-upset',
-  //     automaticUpdates: true,
-  //     numElements: undefined,
-  //     maxElements: undefined,
-  //     metaSvg: '',
-  //     heightScalar: 1,
-  //     thresholdCols: [
-  //       {
-  //         key: 'adj_P_Val',
-  //         text: 'adj_P_Val',
-  //         value: 'adj_P_Val'
-  //       }
-  //     ],
-  //     thresholdOperator: [
-  //       {
-  //         key: '<',
-  //         text: '<',
-  //         value: '<'
-  //       },
-  //       {
-  //         key: '>',
-  //         text: '>',
-  //         value: '>'
-  //       },
-  //       {
-  //         key: '|<|',
-  //         text: '|<|',
-  //         value: '|<|'
-  //       },
-  //       {
-  //         key: '|>|',
-  //         text: '|>|',
-  //         value: '|>|'
-  //       }
-  //     ]
-  //   }
-  // };
-
   componentDidMount() {
     const {
       uData,
@@ -213,7 +145,7 @@ class UpSetFilters extends Component {
           .append('text')
           .attr('x', 25)
           .attr('y', 44)
-          .text(this.anchor)
+          .text(uAnchor)
           .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
           .attr('font-size', '13px')
           .attr('fill', 'black');

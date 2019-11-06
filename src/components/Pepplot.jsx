@@ -241,45 +241,48 @@ class PepplotContainer extends Component {
       'adjPVal'
     ];
 
-    let orderedTestData = JSON.parse(
-      JSON.stringify(pepResults[0], relevantConfigCols)
-    );
-    let relevantConfigColumns = _.map(
-      _.filter(_.keys(orderedTestData), function(d) {
-        return _.includes(relevantConfigCols, d);
-      })
-    );
+    debugger;
+    if (pepResults.length != 0) {
+      let orderedTestData = JSON.parse(
+        JSON.stringify(pepResults[0], relevantConfigCols)
+      );
+      let relevantConfigColumns = _.map(
+        _.filter(_.keys(orderedTestData), function(d) {
+          return _.includes(relevantConfigCols, d);
+        })
+      );
 
-    const additionalConfigColumns = relevantConfigColumns.map(c => {
-      return {
-        title: c,
-        field: c,
-        type: 'number',
-        filterable: { type: 'numericFilter' },
-        exportTemplate: value => (value ? `${value}` : 'N/A'),
-        template: (value, item, addParams) => {
-          return (
-            <p>
-              <Popup
-                trigger={
-                  <span className="TableValue">
-                    {formatNumberForDisplay(value)}
-                  </span>
-                }
-                style={TableValuePopupStyle}
-                className="TablePopupValue"
-                content={value}
-                inverted
-                basic
-              />
-            </p>
-          );
-        }
-      };
-    });
+      const additionalConfigColumns = relevantConfigColumns.map(c => {
+        return {
+          title: c,
+          field: c,
+          type: 'number',
+          filterable: { type: 'numericFilter' },
+          exportTemplate: value => (value ? `${value}` : 'N/A'),
+          template: (value, item, addParams) => {
+            return (
+              <p>
+                <Popup
+                  trigger={
+                    <span className="TableValue">
+                      {formatNumberForDisplay(value)}
+                    </span>
+                  }
+                  style={TableValuePopupStyle}
+                  className="TablePopupValue"
+                  content={value}
+                  inverted
+                  basic
+                />
+              </p>
+            );
+          }
+        };
+      });
 
-    const configCols = initConfigCols.concat(additionalConfigColumns);
-    return configCols;
+      const configCols = initConfigCols.concat(additionalConfigColumns);
+      return configCols;
+    }
   };
 
   getView = () => {
