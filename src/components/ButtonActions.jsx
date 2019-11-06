@@ -29,7 +29,6 @@ class ButtonActions extends Component {
   }
 
   PNGExport = () => {
-    debugger;
     const svgElements =
       document.getElementsByClassName('ContentContainer') || null;
     const currentContentContainer = svgElements[0] || null;

@@ -282,7 +282,9 @@ class UpSetFiltersPepplot extends Component {
   prepareUpset(uDataP, uAnchorP, uSettingsP, baseP) {
     const self = this;
     let datasetP = uDataP;
-    if (uSettingsP.useAnchorP && datasetP.indexOf(uAnchorP) < 0) {
+    if (uSettingsP.useAnchorP && datasetP.indexOf(uAnchorP) !== 0) {
+      let anchorPIndex = datasetP.indexOf(uAnchorP);
+      datasetP.splice(anchorPIndex, 1);
       datasetP.unshift(uAnchorP);
     }
     let mustDataP = uSettingsP.mustP;
