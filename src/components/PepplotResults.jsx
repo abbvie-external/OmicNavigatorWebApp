@@ -44,7 +44,8 @@ class PepplotResults extends Component {
         svg: []
       },
       currentSVGs: [],
-      isProteinDataLoaded: false
+      isSVGDataLoaded: false,
+      isProteinSVGLoaded: false
     };
   }
 
@@ -92,15 +93,21 @@ class PepplotResults extends Component {
   handleSVG = imageInfo => {
     this.setState({
       imageInfo: imageInfo,
+      isProteinSVGLoaded: true
+    });
+  };
+
+  handleProteinDataLoaded = () => {
+    this.setState({
       isProteinDataLoaded: true
     });
   };
 
   getProteinData = (id, dataItem, getPlotCb, imageInfo) => {
-    const handleSVGCb = this.handleSVG;
     this.setState({
       imageInfo: imageInfo,
       isProteinSelected: true,
+      isProteinSVGLoaded: false,
       isProteinDataLoaded: false,
       treeDataRaw: [],
       treeData: [],
@@ -147,7 +154,8 @@ class PepplotResults extends Component {
       default:
         plotType = ['dotplot'];
     }
-
+    const handleSVGCb = this.handleSVG;
+    getPlotCb(id, plotType, pepplotStudy, imageInfo, handleSVGCb);
     if (pepplotModel !== 'Differential Expression') {
       phosphoprotService
         .getSiteData(id, pepplotStudy + 'plots')
@@ -176,9 +184,6 @@ class PepplotResults extends Component {
           this.setState({
             treeData: tD
           });
-        })
-        .then(function() {
-          getPlotCb(id, plotType, pepplotStudy, imageInfo, handleSVGCb);
         });
     } else {
       phosphoprotService
@@ -205,14 +210,9 @@ class PepplotResults extends Component {
               items: entries
             };
           });
-          // console.log('this is proteinData');
-          // console.log(proteinData);
           this.setState({
             treeData: proteinData
           });
-        })
-        .then(function() {
-          getPlotCb(id, plotType, pepplotStudy, imageInfo, handleSVGCb);
         });
     }
   };
@@ -324,7 +324,8 @@ class PepplotResults extends Component {
   backToTable = () => {
     this.setState({
       isProteinSelected: false,
-      isProteinDataLoaded: false
+      isProteinDataLoaded: false,
+      isProteinSVGLoaded: false
     });
     this.props.onSearchCriteriaChange({
       pepplotStudy: this.props.pepplotStudy || '',
@@ -363,10 +364,7 @@ class PepplotResults extends Component {
           />
         </div>
       );
-    } else if (
-      this.state.isProteinSelected &&
-      !this.state.isProteinDataLoaded
-    ) {
+    } else if (this.state.isProteinSelected && !this.state.isProteinSVGLoaded) {
       return (
         <div>
           <LoaderActivePlots />
@@ -378,6 +376,7 @@ class PepplotResults extends Component {
           <PlotContainer
             {...this.state}
             onBackToTable={this.backToTable}
+            onProteinDataLoaded={this.handleProteinDataLoaded}
           ></PlotContainer>
         </div>
       );

@@ -9,7 +9,8 @@ import './PlotContainer.scss';
 
 class PlotContainer extends Component {
   static defaultProps = {
-    isProteinDataLoaded: false
+    isProteinDataLoaded: false,
+    isProteinSVGLoaded: true
   };
 
   constructor(props) {
@@ -54,7 +55,7 @@ class PlotContainer extends Component {
     // if (this.state.returningToTable) {
     //   return <LoaderActiveTable />
 
-    if (!this.props.isProteinDataLoaded) {
+    if (!this.props.isProteinSVGLoaded) {
       return (
         <div>
           <Dimmer active inverted>
