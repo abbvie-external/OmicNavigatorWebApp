@@ -87,7 +87,7 @@ class UpSetFiltersPepplot extends Component {
     selectedOperatorP,
     sigValueP
   ) {
-    const svgWidthP = 135 + 140; //To match the SVG above
+    const svgWidthP = 315;
     const heightScalarP = 20; //20 per circle
     const mustDataP = uSettingsP.mustP;
     const notDataP = uSettingsP.notP;
@@ -102,19 +102,19 @@ class UpSetFiltersPepplot extends Component {
     switch (selectedOperatorP.text) {
       case '<':
         this.setDescP = `Elements less than ${sigValueP} in:`;
-        this.notSetDescP = `Elements greater than ${sigValueP} not in:`;
+        this.notSetDescP = `Elements less than ${sigValueP} not in:`;
         break;
       case '>':
         this.setDescP = `Elements greater than ${sigValueP} in:`;
-        this.notSetDescP = `Elements less than ${sigValueP} not in:`;
+        this.notSetDescP = `Elements greater than ${sigValueP} not in:`;
         break;
       case '|<|':
         this.setDescP = `Elements absolute value less than ${sigValueP} in:`;
-        this.notSetDescP = `Elements absolute value greater than ${sigValueP} not in:`;
+        this.notSetDescP = `Elements absolute value less than ${sigValueP} not in:`;
         break;
       case '|>|':
         this.setDescP = `Elements absolute value greater than ${sigValueP} in:`;
-        this.notSetDescP = `Elements absolute value less than ${sigValueP} not in:`;
+        this.notSetDescP = `Elements absolute value greater than ${sigValueP} not in:`;
         break;
       default:
         this.setDescP = '';
@@ -196,7 +196,7 @@ class UpSetFiltersPepplot extends Component {
           return d;
         })
         .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
-        .attr('font-size', '14px')
+        .attr('font-size', '13px')
         .attr('fill', 'black');
 
       if (notDataP.length !== 0) {
@@ -273,7 +273,7 @@ class UpSetFiltersPepplot extends Component {
             return d;
           })
           .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
-          .attr('font-size', '14px')
+          .attr('font-size', '13px')
           .attr('fill', 'black');
       }
     }
@@ -767,7 +767,7 @@ class UpSetFiltersPepplot extends Component {
               // selection
               value={SelOpP}
               options={OperatorsP}
-              width={3}
+              width={4}
               onChange={this.handleDropdownChange}
             ></Form.Field>
             <Form.Field
@@ -779,7 +779,7 @@ class UpSetFiltersPepplot extends Component {
               name="sigValueP"
               className="SignificantValueInput"
               value={sigValueP}
-              width={6}
+              width={5}
               onChange={this.handleInputChange}
             ></Form.Field>
           </Form.Group>

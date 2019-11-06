@@ -80,7 +80,7 @@ class UpSetFilters extends Component {
   }
 
   metaScript(metaSvg, uAnchor, uData, uSettings, selectedOperator, sigValue) {
-    const svgWidth = 135 + 140; //To match the SVG above
+    const svgWidth = 315;
     const heightScalar = 20; //20 per circle
     const mustData = uSettings.must;
     const notData = uSettings.not;
@@ -95,19 +95,19 @@ class UpSetFilters extends Component {
     switch (selectedOperator.text) {
       case '<':
         this.setDesc = `Elements less than ${sigValue} in:`;
-        this.notSetDesc = `Elements greater than ${sigValue} not in:`;
+        this.notSetDesc = `Elements less than ${sigValue} not in:`;
         break;
       case '>':
         this.setDesc = `Elements greater than ${sigValue} in:`;
-        this.notSetDesc = `Elements less than ${sigValue} not in:`;
+        this.notSetDesc = `Elements greater than ${sigValue} not in:`;
         break;
       case '|<|':
         this.setDesc = `Elements absolute value less than ${sigValue} in:`;
-        this.notSetDesc = `Elements absolute value greater than ${sigValue} not in:`;
+        this.notSetDesc = `Elements absolute value less than ${sigValue} not in:`;
         break;
       case '|>|':
         this.setDesc = `Elements absolute value greater than ${sigValue} in:`;
-        this.notSetDesc = `Elements absolute value less than ${sigValue} not in:`;
+        this.notSetDesc = `Elements absolute value greater than ${sigValue} not in:`;
         break;
       default:
         this.setDesc = '';
@@ -189,7 +189,7 @@ class UpSetFilters extends Component {
           return d;
         })
         .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
-        .attr('font-size', '14px')
+        .attr('font-size', '13px')
         .attr('fill', 'black');
 
       if (notData.length !== 0) {
@@ -266,7 +266,7 @@ class UpSetFilters extends Component {
             return d;
           })
           .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
-          .attr('font-size', '14px')
+          .attr('font-size', '13px')
           .attr('fill', 'black');
       }
     }
@@ -747,7 +747,7 @@ class UpSetFilters extends Component {
               // selection
               value={SelOp}
               options={Operators}
-              width={3}
+              width={4}
               onChange={this.handleDropdownChange}
             ></Form.Field>
             <Form.Field
@@ -759,7 +759,7 @@ class UpSetFilters extends Component {
               name="sigValue"
               className="SignificantValueInput"
               value={sigValue}
-              width={6}
+              width={5}
               onChange={this.handleInputChange}
             ></Form.Field>
           </Form.Group>
