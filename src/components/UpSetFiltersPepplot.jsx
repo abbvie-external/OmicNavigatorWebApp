@@ -95,25 +95,26 @@ class UpSetFiltersPepplot extends Component {
       notDataP.length * heightScalarP +
       mustDataP.length * heightScalarP +
       60 +
-      10;
+      10 +
+      24;
     const useAnchorP = uSettingsP.useAnchorP;
 
     switch (selectedOperatorP.text) {
       case '<':
         this.setDescP = `Elements less than ${sigValueP} in:`;
-        this.notSetDescP = `Elements greater than ${sigValueP} in:`;
+        this.notSetDescP = `Elements greater than ${sigValueP} not in:`;
         break;
       case '>':
         this.setDescP = `Elements greater than ${sigValueP} in:`;
-        this.notSetDescP = `Elements less than ${sigValueP} in:`;
+        this.notSetDescP = `Elements less than ${sigValueP} not in:`;
         break;
       case '|<|':
         this.setDescP = `Elements absolute value less than ${sigValueP} in:`;
-        this.notSetDescP = `Elements absolute value greater than ${sigValueP} in:`;
+        this.notSetDescP = `Elements absolute value greater than ${sigValueP} not in:`;
         break;
       case '|>|':
         this.setDescP = `Elements absolute value greater than ${sigValueP} in:`;
-        this.notSetDescP = `Elements absolute value less than ${sigValueP} in:`;
+        this.notSetDescP = `Elements absolute value less than ${sigValueP} not in:`;
         break;
       default:
         this.setDescP = '';
@@ -137,6 +138,7 @@ class UpSetFiltersPepplot extends Component {
         .attr('fill', 'black');
       metaSvgP
         .append('text')
+        .attr('dy', '12px')
         .attr('x', 7)
         .attr('y', 30)
         .text('' + this.setDescP)
@@ -149,12 +151,12 @@ class UpSetFiltersPepplot extends Component {
           .append('circle')
           .style('fill', 'green')
           .attr('cx', 17)
-          .attr('cy', 40)
+          .attr('cy', 52)
           .attr('r', 4);
         metaSvgP
           .append('text')
           .attr('x', 25)
-          .attr('y', 44)
+          .attr('y', 56)
           .text(uAnchorP)
           .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
           .attr('font-size', '13px')
@@ -170,9 +172,9 @@ class UpSetFiltersPepplot extends Component {
         .attr('cx', 17)
         .attr('cy', function(d) {
           if (!useAnchorP) {
-            return mustDataP.indexOf(d) * heightScalarP + 44;
+            return mustDataP.indexOf(d) * heightScalarP + 44 + 12;
           } else {
-            return mustDataP.indexOf(d) * heightScalarP + 60;
+            return mustDataP.indexOf(d) * heightScalarP + 60 + 12;
           }
         })
         .attr('r', 4);
@@ -185,9 +187,9 @@ class UpSetFiltersPepplot extends Component {
         .attr('x', 25)
         .attr('y', function(d) {
           if (!useAnchorP) {
-            return mustDataP.indexOf(d) * heightScalarP + 48;
+            return mustDataP.indexOf(d) * heightScalarP + 48 + 12;
           } else {
-            return mustDataP.indexOf(d) * heightScalarP + 60 + 4;
+            return mustDataP.indexOf(d) * heightScalarP + 60 + 4 + 12;
           }
         })
         .text(function(d) {
@@ -200,6 +202,7 @@ class UpSetFiltersPepplot extends Component {
       if (notDataP.length !== 0) {
         metaSvgP
           .append('text')
+          .attr('dy', '24px')
           .attr('x', 7)
           .attr('y', function(d) {
             if (!useAnchorP) {
@@ -208,7 +211,7 @@ class UpSetFiltersPepplot extends Component {
               return mustDataP.length * heightScalarP + 60;
             }
           })
-          .text('' + this.setDescP)
+          .text('' + this.notSetDescP)
           .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
           .attr('font-size', '15px')
           .attr('fill', 'black');
@@ -226,14 +229,16 @@ class UpSetFiltersPepplot extends Component {
                 notDataP.indexOf(d) * heightScalarP +
                 mustDataP.length * heightScalarP +
                 44 +
-                14
+                14 +
+                24
               );
             } else {
               return (
                 notDataP.indexOf(d) * heightScalarP +
                 mustDataP.length * heightScalarP +
                 60 +
-                14
+                14 +
+                24
               );
             }
           })
@@ -251,14 +256,16 @@ class UpSetFiltersPepplot extends Component {
                 notDataP.indexOf(d) * heightScalarP +
                 mustDataP.length * heightScalarP +
                 44 +
-                18
+                18 +
+                24
               );
             } else {
               return (
                 notDataP.indexOf(d) * heightScalarP +
                 mustDataP.length * heightScalarP +
                 60 +
-                18
+                18 +
+                24
               );
             }
           })

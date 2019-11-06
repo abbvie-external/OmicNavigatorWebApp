@@ -12,17 +12,34 @@ class ButtonActions extends Component {
     pdfVisible: true
   };
 
-  componentDidMount() {}
+  // constructor(props) {
+  //   super(props);
+  //   this.state = {
+  //     currentSVG: null
+  //   };
+  // }
+
+  componentDidMount() {
+    // const svgElements = document.getElementsByClassName("ContentContainer") || null;
+    // const currentContentContainer = svgElements[0] || null;
+    // const currentSVGVar = currentContentContainer.getElementsByTagName('svg')[0] || null;
+    // this.setState({
+    //   currentSVG: currentSVGVar
+    // })
+  }
 
   PNGExport = () => {
-    if (this.props.upsetPlotInfo !== undefined) {
-      saveSvgAsPng.saveSvgAsPng(
-        document.getElementById('multisetAnalysisSVG'),
-        'Multiset_Analysis_Plot.png'
-      );
+    debugger;
+    const svgElements =
+      document.getElementsByClassName('ContentContainer') || null;
+    const currentContentContainer = svgElements[0] || null;
+    const currentSVG =
+      currentContentContainer.getElementsByTagName('svg')[0] || null;
+    if (currentSVG.id === 'multisetAnalysisSVG') {
+      saveSvgAsPng.saveSvgAsPng(currentSVG, 'Multiset_Analysis_Plot.png');
     } else {
       saveSvgAsPng.saveSvgAsPng(
-        document.getElementsByTagName('svg')[0],
+        currentSVG,
         this.props.imageInfo.title +
           '-' +
           this.props.imageInfo.svg[this.props.activeSVGTabIndex].plotType +
@@ -39,7 +56,12 @@ class ButtonActions extends Component {
   };
 
   PDFExport = () => {
-    pdfService.createPDF(document.getElementsByTagName('svg')[0]);
+    const svgElements =
+      document.getElementsByClassName('ContentContainer') || null;
+    const currentContentContainer = svgElements[0] || null;
+    const currentSVG =
+      currentContentContainer.getElementsByTagName('svg')[0] || null;
+    pdfService.createPDF(currentSVG);
   };
 
   SVGExport = () => {

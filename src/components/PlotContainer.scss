@@ -8,8 +8,15 @@
     padding-top: 0px !important;
     min-height: 75vh !important;
 
+    
     .PlotAccordionContainer .content {
+      // overflow-wrap: break-word !important;
+      word-break: break-all !important;
+    }
+
+    .PlotAccordionContainer .title {
       overflow-wrap: break-word !important;
+      // word-break: break-all !important;
     }
   }
 }

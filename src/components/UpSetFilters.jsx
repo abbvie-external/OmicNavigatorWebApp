@@ -91,19 +91,19 @@ class UpSetFilters extends Component {
     switch (selectedOperator.text) {
       case '<':
         this.setDesc = `Elements less than ${sigValue} in:`;
-        this.notSetDesc = `Elements greater than ${sigValue} in:`;
+        this.notSetDesc = `Elements greater than ${sigValue} not in:`;
         break;
       case '>':
         this.setDesc = `Elements greater than ${sigValue} in:`;
-        this.notSetDesc = `Elements less than ${sigValue} in:`;
+        this.notSetDesc = `Elements less than ${sigValue} not in:`;
         break;
       case '|<|':
         this.setDesc = `Elements absolute value less than ${sigValue} in:`;
-        this.notSetDesc = `Elements absolute value greater than ${sigValue} in:`;
+        this.notSetDesc = `Elements absolute value greater than ${sigValue} not in:`;
         break;
       case '|>|':
         this.setDesc = `Elements absolute value greater than ${sigValue} in:`;
-        this.notSetDesc = `Elements absolute value less than ${sigValue} in:`;
+        this.notSetDesc = `Elements absolute value less than ${sigValue} not in:`;
         break;
       default:
         this.setDesc = '';
@@ -127,6 +127,7 @@ class UpSetFilters extends Component {
         .attr('fill', 'black');
       metaSvg
         .append('text')
+        .attr('dy', '12px')
         .attr('x', 7)
         .attr('y', 30)
         .text('' + this.setDesc)
@@ -139,12 +140,12 @@ class UpSetFilters extends Component {
           .append('circle')
           .style('fill', 'green')
           .attr('cx', 17)
-          .attr('cy', 40)
+          .attr('cy', 52)
           .attr('r', 4);
         metaSvg
           .append('text')
           .attr('x', 25)
-          .attr('y', 44)
+          .attr('y', 56)
           .text(uAnchor)
           .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
           .attr('font-size', '13px')
@@ -160,9 +161,9 @@ class UpSetFilters extends Component {
         .attr('cx', 17)
         .attr('cy', function(d) {
           if (!useAnchor) {
-            return mustData.indexOf(d) * heightScalar + 44;
+            return mustData.indexOf(d) * heightScalar + 44 + 12;
           } else {
-            return mustData.indexOf(d) * heightScalar + 60;
+            return mustData.indexOf(d) * heightScalar + 60 + 12;
           }
         })
         .attr('r', 4);
@@ -175,9 +176,9 @@ class UpSetFilters extends Component {
         .attr('x', 25)
         .attr('y', function(d) {
           if (!useAnchor) {
-            return mustData.indexOf(d) * heightScalar + 48;
+            return mustData.indexOf(d) * heightScalar + 48 + 12;
           } else {
-            return mustData.indexOf(d) * heightScalar + 60 + 4;
+            return mustData.indexOf(d) * heightScalar + 60 + 4 + 12;
           }
         })
         .text(function(d) {
@@ -190,6 +191,7 @@ class UpSetFilters extends Component {
       if (notData.length !== 0) {
         metaSvg
           .append('text')
+          .attr('dy', '24px')
           .attr('x', 7)
           .attr('y', function(d) {
             if (!useAnchor) {
@@ -198,7 +200,7 @@ class UpSetFilters extends Component {
               return mustData.length * heightScalar + 60;
             }
           })
-          .text('' + this.setDesc)
+          .text('' + this.notSetDesc)
           .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
           .attr('font-size', '15px')
           .attr('fill', 'black');
@@ -216,14 +218,16 @@ class UpSetFilters extends Component {
                 notData.indexOf(d) * heightScalar +
                 mustData.length * heightScalar +
                 44 +
-                14
+                14 +
+                24
               );
             } else {
               return (
                 notData.indexOf(d) * heightScalar +
                 mustData.length * heightScalar +
                 60 +
-                14
+                14 +
+                24
               );
             }
           })
@@ -241,14 +245,16 @@ class UpSetFilters extends Component {
                 notData.indexOf(d) * heightScalar +
                 mustData.length * heightScalar +
                 44 +
-                18
+                18 +
+                24
               );
             } else {
               return (
                 notData.indexOf(d) * heightScalar +
                 mustData.length * heightScalar +
                 60 +
-                18
+                18 +
+                24
               );
             }
           })
