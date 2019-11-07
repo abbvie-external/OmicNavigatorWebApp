@@ -11,7 +11,6 @@ import {
 } from 'semantic-ui-react';
 import './SearchCriteria.scss';
 import { phosphoprotService } from '../services/phosphoprot.service';
-import DOMPurify from 'dompurify';
 import _ from 'lodash';
 import UpSetFilters from './UpSetFilters';
 
@@ -356,19 +355,7 @@ class EnrichmentSearchCriteria extends Component {
             heightCalculation() * 0.8 +
             'px;" id="multisetAnalysisSVG"'
         );
-        // DOMPurify.addHook('afterSanitizeAttributes', function(node) {
-        //   if (
-        //     node.hasAttribute('xlink:href') &&
-        //     !node.getAttribute('xlink:href').match(/^#/)
-        //   ) {
-        //     node.remove();
-        //   }
-        // });
-        // Clean HTML string and write into our DIV
-        let sanitizedSVG = DOMPurify.sanitize(svgMarkup, {
-          ADD_TAGS: ['use']
-        });
-        let svgInfo = { plotType: 'UpSet', svg: sanitizedSVG };
+        let svgInfo = { plotType: 'UpSet', svg: svgMarkup };
         this.props.onGetUpsetPlot({
           svgInfo
         });
