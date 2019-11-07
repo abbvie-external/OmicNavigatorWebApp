@@ -163,6 +163,13 @@ class PepplotSearchCriteria extends Component {
       phosphoprotService
         .getTestData(m, t, s + 'plots')
         .then(dataFromService => {
+          this.setState({
+            uSettingsP: {
+              ...this.state.uSettingsP,
+              maxElementsP: dataFromService.length
+            }
+          });
+          this.testdata = dataFromService;
           this.testdata = dataFromService;
           // this.setState({
           //   pepplotStudiesDisabled: false,
@@ -342,6 +349,17 @@ class PepplotSearchCriteria extends Component {
     const eColP = evt.selectedColP || this.state.selectedColP;
     let mustPString = this.testToString(eMustP);
     let notPString = this.testToString(eNotP);
+    debugger;
+    // if (eSigVP !== this.state.sigValueP) {
+    this.getUpSetPlot(
+      eSigVP,
+      this.props.pepplotModel,
+      this.props.pepplotStudy + 'plots',
+      eOperatorP,
+      eColP
+    );
+    // }
+
     phosphoprotService
       .getUpsetInferenceData(
         this.props.pepplotModel,
@@ -372,11 +390,6 @@ class PepplotSearchCriteria extends Component {
           pepplotResults: multisetResultsP
         });
       });
-    this.getUpSetPlot(
-      eSigVP,
-      this.props.pepplotModel,
-      this.props.pepplotStudy + 'plots'
-    );
   };
 
   testToString(solution) {
@@ -396,11 +409,18 @@ class PepplotSearchCriteria extends Component {
     } else return str;
   }
 
-  getUpSetPlot(sigVal, pepplotModel, pepplotStudy, pepplotAnnotation) {
+  getUpSetPlot(sigVal, pepplotModel, pepplotStudy, eOperatorP, eColP) {
+    debugger;
     let heightCalculation = this.calculateHeight;
     let widthCalculation = this.calculateWidth;
     phosphoprotService
-      .getInferenceUpSetPlot(sigVal, pepplotModel, pepplotStudy)
+      .getInferenceUpSetPlot(
+        sigVal,
+        pepplotModel,
+        pepplotStudy,
+        eOperatorP,
+        eColP
+      )
       .then(svgMarkupObj => {
         let svgMarkup = svgMarkupObj.data;
         // svgMarkup = svgMarkup.replace(

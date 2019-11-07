@@ -614,7 +614,7 @@ class UpSetFilters extends Component {
           return (
             4 * circlePadding +
             6 * circleRadius +
-            (textElementWidth - 80 * heightScalar) *
+            (textElementWidth - 85 * heightScalar) *
               (settings.numElements / settings.maxElements) +
             3
           );
@@ -634,7 +634,7 @@ class UpSetFilters extends Component {
           return (
             4 * circlePadding +
             6 * circleRadius +
-            (textElementWidth - 80 * heightScalar) *
+            (textElementWidth - 85 * heightScalar) *
               (settings.numElements / settings.maxElements) +
             6
           );

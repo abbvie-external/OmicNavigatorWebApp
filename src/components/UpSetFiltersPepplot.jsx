@@ -615,6 +615,7 @@ class UpSetFiltersPepplot extends Component {
         return heightScalarP * 14 + 'px';
       })
       .attr('fill', 'black');
+    debugger;
     if (
       uSettingsP.numElementsP !== undefined &&
       uSettingsP.maxElementsP !== undefined
@@ -627,7 +628,7 @@ class UpSetFiltersPepplot extends Component {
           return (
             4 * circlePadding +
             6 * circleRadius +
-            (textElementWidth - 80 * heightScalarP) *
+            (textElementWidth - 85 * heightScalarP) *
               (uSettingsP.numElementsP / uSettingsP.maxElementsP) +
             3
           );
@@ -647,7 +648,7 @@ class UpSetFiltersPepplot extends Component {
           return (
             4 * circlePadding +
             6 * circleRadius +
-            (textElementWidth - 80 * heightScalarP) *
+            (textElementWidth - 85 * heightScalarP) *
               (uSettingsP.numElementsP / uSettingsP.maxElementsP) +
             6
           );
