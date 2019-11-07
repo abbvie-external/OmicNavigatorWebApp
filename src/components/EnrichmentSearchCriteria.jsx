@@ -276,6 +276,17 @@ class EnrichmentSearchCriteria extends Component {
     const eCol = evt.selectedCol || this.state.selectedCol;
     let mustString = this.testToString(eMust);
     let notString = this.testToString(eNot);
+    this.setState({
+      sigValue: eSigV,
+      selectedOperator: eOperator,
+      selectedCol: eCol
+    });
+    this.getUpSetPlot(
+      eSigV,
+      this.props.enrichmentModel,
+      this.props.enrichmentStudy + 'plots',
+      this.props.enrichmentAnnotation
+    );
     phosphoprotService
       .getUpsetEnrichmentData(
         this.props.enrichmentModel,
@@ -296,21 +307,12 @@ class EnrichmentSearchCriteria extends Component {
             must: eMust,
             not: eNot
           },
-          activateUpSetFilters: true,
-          sigValue: eSigV,
-          selectedOperator: eOperator,
-          selectedCol: eCol
+          activateUpSetFilters: true
         });
         this.props.onEnrichmentSearch({
           enrichmentResults: multisetResults
         });
       });
-    this.getUpSetPlot(
-      eSigV,
-      this.props.enrichmentModel,
-      this.props.enrichmentStudy + 'plots',
-      this.props.enrichmentAnnotation
-    );
   };
 
   testToString(solution) {

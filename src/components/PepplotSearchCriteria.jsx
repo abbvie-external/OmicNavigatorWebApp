@@ -349,7 +349,11 @@ class PepplotSearchCriteria extends Component {
     const eColP = evt.selectedColP || this.state.selectedColP;
     let mustPString = this.testToString(eMustP);
     let notPString = this.testToString(eNotP);
-    debugger;
+    this.setState({
+      sigValueP: eSigVP,
+      selectedOperatorP: eOperatorP,
+      selectedColP: eColP
+    });
     // if (eSigVP !== this.state.sigValueP) {
     this.getUpSetPlot(
       eSigVP,
@@ -381,10 +385,10 @@ class PepplotSearchCriteria extends Component {
             mustP: eMustP,
             notP: eNotP
           },
-          activateUpSetFiltersP: true,
-          sigValueP: eSigVP,
-          selectedOperatorP: eOperatorP,
-          selectedColP: eColP
+          activateUpSetFiltersP: true
+          // sigValueP: eSigVP,
+          // selectedOperatorP: eOperatorP,
+          // selectedColP: eColP
         });
         this.props.onPepplotSearch({
           pepplotResults: multisetResultsP
