@@ -143,7 +143,8 @@ class PhosphoprotService {
     notTest,
     study,
     sigValue,
-    annotation
+    annotation,
+    operator
   ) {
     this.setUrl();
     const promise = this.ocpuDataCall('getEnrichmentIntersection', {
@@ -152,19 +153,27 @@ class PhosphoprotService {
       notTests: notTest,
       study: study,
       sigValue: sigValue,
-      annotation: annotation
+      annotation: annotation,
+      operator: operator
     });
     const dataFromPromise = await promise;
     return dataFromPromise;
   }
 
-  async getEnrichmentUpSetPlot(sigVal, testCategory, study, annotation) {
+  async getEnrichmentUpSetPlot(
+    sigVal,
+    testCategory,
+    study,
+    annotation,
+    operator
+  ) {
     this.setUrl();
     const promise = this.ocpuPlotCall('EnrichmentUpsetPlot', {
       sigValue: sigVal,
       testCategory: testCategory,
       study: study,
-      annotation: annotation
+      annotation: annotation,
+      operator: operator
     });
     const svgMarkupFromPromise = await promise;
     return svgMarkupFromPromise;

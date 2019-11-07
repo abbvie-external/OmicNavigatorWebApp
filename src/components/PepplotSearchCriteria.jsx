@@ -308,7 +308,8 @@ class PepplotSearchCriteria extends Component {
         });
       } else {
         this.setState({
-          upsetFiltersVisibleP: false
+          upsetFiltersVisibleP: false,
+          reloadPlot: true
         });
         const pepplotTestName = 'pepplotTest';
         const pepplotTestVar = this.props.pepplotTest;
@@ -354,7 +355,6 @@ class PepplotSearchCriteria extends Component {
       selectedOperatorP: eOperatorP,
       selectedColP: eColP
     });
-    debugger;
     if (eSigVP !== this.state.sigValueP || this.state.reloadPlot === true) {
       this.props.onDisablePlot();
       this.getUpSetPlot(
@@ -378,7 +378,6 @@ class PepplotSearchCriteria extends Component {
       )
       .then(inferenceData => {
         const multisetResultsP = inferenceData;
-        debugger;
         this.setState({
           uSettingsP: {
             ...this.state.uSettingsP,
@@ -393,7 +392,6 @@ class PepplotSearchCriteria extends Component {
           // selectedOperatorP: eOperatorP,
           // selectedColP: eColP
         });
-        debugger;
         this.props.onPepplotSearch({
           pepplotResults: multisetResultsP
         });
@@ -418,7 +416,6 @@ class PepplotSearchCriteria extends Component {
   }
 
   getUpSetPlot(sigVal, pepplotModel, pepplotStudy, eOperatorP, eColP) {
-    debugger;
     let heightCalculation = this.calculateHeight;
     let widthCalculation = this.calculateWidth;
     phosphoprotService

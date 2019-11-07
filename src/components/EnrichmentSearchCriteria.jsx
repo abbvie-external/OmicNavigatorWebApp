@@ -284,7 +284,8 @@ class EnrichmentSearchCriteria extends Component {
       eSigV,
       this.props.enrichmentModel,
       this.props.enrichmentStudy + 'plots',
-      this.props.enrichmentAnnotation
+      this.props.enrichmentAnnotation,
+      eOperator
     );
     phosphoprotService
       .getUpsetEnrichmentData(
@@ -294,7 +295,7 @@ class EnrichmentSearchCriteria extends Component {
         this.props.enrichmentStudy + 'plots',
         eSigV,
         this.props.enrichmentAnnotation,
-        eOperator
+        eOperator.value
       )
       .then(annotationData => {
         const multisetResults = annotationData;
@@ -331,7 +332,13 @@ class EnrichmentSearchCriteria extends Component {
     } else return str;
   }
 
-  getUpSetPlot(sigVal, enrichmentModel, enrichmentStudy, enrichmentAnnotation) {
+  getUpSetPlot(
+    sigVal,
+    enrichmentModel,
+    enrichmentStudy,
+    enrichmentAnnotation,
+    eOperator
+  ) {
     let heightCalculation = this.calculateHeight;
     let widthCalculation = this.calculateWidth;
     phosphoprotService
@@ -339,7 +346,8 @@ class EnrichmentSearchCriteria extends Component {
         sigVal,
         enrichmentModel,
         enrichmentStudy,
-        enrichmentAnnotation
+        enrichmentAnnotation,
+        eOperator.value
       )
       .then(svgMarkupObj => {
         let svgMarkup = svgMarkupObj.data;

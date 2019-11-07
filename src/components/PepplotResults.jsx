@@ -151,6 +151,12 @@ class PepplotResults extends Component {
           plotType = ['proteindotplot'];
         }
         break;
+      case 'No Pretreatment Timecourse Differential Phosphorylation':
+        plotType = ['splineplot.modelII', 'lineplot.modelII'];
+        break;
+      case 'Ferrostatin Pretreatment Timecourse Differential Phosphorylation':
+        plotType = ['splineplot.modelIII', 'lineplot.modelIII'];
+        break;
       default:
         plotType = ['dotplot'];
     }

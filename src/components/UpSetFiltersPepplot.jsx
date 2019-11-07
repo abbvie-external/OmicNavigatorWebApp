@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component, Fragment, UseCallback } from 'react';
 import { Form, Select, Input } from 'semantic-ui-react';
 import * as d3 from 'd3';
 import './UpSetFilters.scss';
@@ -615,7 +615,6 @@ class UpSetFiltersPepplot extends Component {
         return heightScalarP * 14 + 'px';
       })
       .attr('fill', 'black');
-    debugger;
     if (
       uSettingsP.numElementsP !== undefined &&
       uSettingsP.maxElementsP !== undefined

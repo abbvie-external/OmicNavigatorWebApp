@@ -49,7 +49,6 @@ class PepplotContainer extends Component {
 
   handlePepplotSearch = searchResults => {
     const columns = this.getConfigCols(searchResults);
-    debugger;
     this.setState({
       pepplotResults: searchResults.pepplotResults,
       pepplotColumns: columns,
