@@ -53,6 +53,7 @@ class PepplotSearchCriteria extends Component {
         value: '<'
       },
       sigValueP: 0.05,
+      reloadPlot: true,
       uSettingsP: {
         defaultselectedColP: {
           key: 'adj_P_Val',
@@ -246,6 +247,7 @@ class PepplotSearchCriteria extends Component {
 
   handleTestChange = (evt, { name, value }) => {
     this.setState({
+      reloadPlot: true,
       upsetFiltersVisibleP: false
     });
     // this.setState({
@@ -341,7 +343,6 @@ class PepplotSearchCriteria extends Component {
   };
 
   updateQueryDataP = evt => {
-    this.props.onDisablePlot();
     const eSigVP = evt.sigValueP || this.state.sigValueP;
     const eMustP = evt.mustP || this.state.uSettingsP.mustP;
     const eNotP = evt.notP || this.state.uSettingsP.notP;
@@ -354,16 +355,17 @@ class PepplotSearchCriteria extends Component {
       selectedOperatorP: eOperatorP,
       selectedColP: eColP
     });
-    // if (eSigVP !== this.state.sigValueP) {
-    this.getUpSetPlot(
-      eSigVP,
-      this.props.pepplotModel,
-      this.props.pepplotStudy + 'plots',
-      eOperatorP,
-      eColP
-    );
-    // }
-
+    debugger;
+    if (eSigVP !== this.state.sigValueP || this.state.reloadPlot === true) {
+      this.props.onDisablePlot();
+      this.getUpSetPlot(
+        eSigVP,
+        this.props.pepplotModel,
+        this.props.pepplotStudy + 'plots',
+        eOperatorP,
+        eColP
+      );
+    }
     phosphoprotService
       .getUpsetInferenceData(
         this.props.pepplotModel,
@@ -377,6 +379,7 @@ class PepplotSearchCriteria extends Component {
       )
       .then(inferenceData => {
         const multisetResultsP = inferenceData;
+        debugger;
         this.setState({
           uSettingsP: {
             ...this.state.uSettingsP,
@@ -385,11 +388,13 @@ class PepplotSearchCriteria extends Component {
             mustP: eMustP,
             notP: eNotP
           },
-          activateUpSetFiltersP: true
+          activateUpSetFiltersP: true,
+          reloadPlot: false
           // sigValueP: eSigVP,
           // selectedOperatorP: eOperatorP,
           // selectedColP: eColP
         });
+        debugger;
         this.props.onPepplotSearch({
           pepplotResults: multisetResultsP
         });

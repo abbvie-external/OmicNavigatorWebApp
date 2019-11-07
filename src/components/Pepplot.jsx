@@ -49,13 +49,13 @@ class PepplotContainer extends Component {
 
   handlePepplotSearch = searchResults => {
     const columns = this.getConfigCols(searchResults);
+    debugger;
     this.setState({
       pepplotResults: searchResults.pepplotResults,
       pepplotColumns: columns,
       isSearching: false,
       isValidSearchPepplot: true,
       isProteinSelected: false,
-      upsetPlotAvailable: false,
       plotButtonActive: false,
       visible: false
     });
