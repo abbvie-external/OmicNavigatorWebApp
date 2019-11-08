@@ -296,7 +296,7 @@ class UpSetFilters extends Component {
       topBoxHeight;
 
     const minWidth = 250 * heightScalar;
-    const maxWidth = 500 * heightScalar;
+    const maxWidth = 340 * heightScalar;
 
     //Set the width of the svg to depending on the size of the largest test element
     let longest = 0;

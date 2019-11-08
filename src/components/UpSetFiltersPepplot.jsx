@@ -305,7 +305,7 @@ class UpSetFiltersPepplot extends Component {
       topBoxHeightP;
 
     const minWidth = 250 * heightScalarP;
-    const maxWidth = 500 * heightScalarP;
+    const maxWidth = 340 * heightScalarP;
 
     //Set the width of the svg to depending on the size of the largest test element
     let longest = 0;

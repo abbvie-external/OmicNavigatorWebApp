@@ -22,6 +22,7 @@ class PhosphoprotService {
 
   async getStudies() {
     this.setUrl();
+    debugger;
     const promise = this.ocpuRPC('getStudies', {});
     const studiesFromPromise = await promise;
     return studiesFromPromise;
