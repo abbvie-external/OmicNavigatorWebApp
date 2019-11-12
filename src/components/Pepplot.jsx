@@ -35,7 +35,8 @@ class PepplotContainer extends Component {
       excelVisible: false,
       pngVisible: true,
       pdfVisible: false,
-      svgVisible: true
+      svgVisible: true,
+      multisetQueried: false
     };
   }
 
@@ -44,6 +45,12 @@ class PepplotContainer extends Component {
   handleSearchTransition = () => {
     this.setState({
       isSearching: true
+    });
+  };
+
+  handleMultisetQueried = value => {
+    this.setState({
+      multisetQueried: value
     });
   };
 
@@ -244,11 +251,17 @@ class PepplotContainer extends Component {
       let orderedTestData = JSON.parse(
         JSON.stringify(pepResults[0], relevantConfigCols)
       );
+
       let relevantConfigColumns = _.map(
         _.filter(_.keys(orderedTestData), function(d) {
           return _.includes(relevantConfigCols, d);
         })
       );
+
+      // if using multi-set analysis, show set membership column
+      if (this.state.multisetQueried) {
+        relevantConfigColumns.splice(0, 0, 'Set_Membership');
+      }
 
       const additionalConfigColumns = relevantConfigColumns.map(c => {
         return {
@@ -277,7 +290,6 @@ class PepplotContainer extends Component {
           }
         };
       });
-
       const configCols = initConfigCols.concat(additionalConfigColumns);
       return configCols;
     }
@@ -356,6 +368,7 @@ class PepplotContainer extends Component {
             onDisablePlot={this.disablePlot}
             onGetUpsetPlot={this.handleUpsetPlot}
             onHandlePlotAnimation={this.handlePlotAnimation}
+            onMultisetQueried={this.handleMultisetQueried}
           />
         </Grid.Column>
         <Grid.Column

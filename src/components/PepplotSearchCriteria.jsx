@@ -299,6 +299,7 @@ class PepplotSearchCriteria extends Component {
         this.setState({
           upsetFiltersVisibleP: true
         });
+        this.props.onMultisetQueried(true);
         this.updateQueryDataP({
           mustP: this.state.uSettingsP.mustP,
           notP: this.state.uSettingsP.notP,
@@ -311,6 +312,7 @@ class PepplotSearchCriteria extends Component {
           upsetFiltersVisibleP: false,
           reloadPlot: true
         });
+        this.props.onMultisetQueried(false);
         const pepplotTestName = 'pepplotTest';
         const pepplotTestVar = this.props.pepplotTest;
         this.upsetTriggeredTestChange(pepplotTestName, pepplotTestVar);

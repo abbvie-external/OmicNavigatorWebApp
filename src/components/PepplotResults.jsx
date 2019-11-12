@@ -97,12 +97,6 @@ class PepplotResults extends Component {
     });
   };
 
-  handleProteinDataLoaded = () => {
-    this.setState({
-      isProteinDataLoaded: true
-    });
-  };
-
   getProteinData = (id, dataItem, getPlotCb, imageInfo) => {
     this.setState({
       imageInfo: imageInfo,
@@ -383,7 +377,6 @@ class PepplotResults extends Component {
           <PlotContainer
             {...this.state}
             onBackToTable={this.backToTable}
-            onProteinDataLoaded={this.handleProteinDataLoaded}
           ></PlotContainer>
         </div>
       );

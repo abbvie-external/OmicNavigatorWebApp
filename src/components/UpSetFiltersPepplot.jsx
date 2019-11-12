@@ -401,7 +401,7 @@ class UpSetFiltersPepplot extends Component {
     }
 
     const mustCircles = svg
-      .selectAll('svg.dataGreenObject')
+      .selectAll('svg')
       .data(datasetP)
       .enter()
       .append('circle')
