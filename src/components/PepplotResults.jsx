@@ -188,7 +188,8 @@ class PepplotResults extends Component {
             };
           });
           this.setState({
-            treeData: tD
+            treeData: tD,
+            isProteinDataLoaded: true
           });
         });
     } else {

@@ -69,8 +69,7 @@ class PlotAccordion extends Component {
   }
 
   render() {
-    const Accordion = this.getAccordion();
-    if (!this.state.isAccordionReady) {
+    if (!this.props.isProteinDataLoaded) {
       return (
         <div>
           <Dimmer active inverted>
@@ -79,6 +78,7 @@ class PlotAccordion extends Component {
         </div>
       );
     } else {
+      const Accordion = this.getAccordion();
       return <div className="">{Accordion}</div>;
     }
   }

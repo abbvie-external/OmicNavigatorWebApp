@@ -278,7 +278,7 @@ class EnrichmentContainer extends Component {
       return key !== 'Description' && key !== 'Annotation';
     });
     // multiset svg rebuilds based on uData...if there are no results we need to override this from being passed down
-    if (uDataRelevantFields.length != 0) {
+    if (uDataRelevantFields.length !== 0) {
       this.setState({
         uData: uDataRelevantFields
       });
