@@ -375,6 +375,7 @@ class PepplotResults extends Component {
       return (
         <div>
           <PlotContainer
+            {...this.props}
             {...this.state}
             onBackToTable={this.backToTable}
           ></PlotContainer>

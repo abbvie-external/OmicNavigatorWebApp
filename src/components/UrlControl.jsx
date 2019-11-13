@@ -9,7 +9,6 @@ export function updateUrl(
   searchCriteriaChange,
   scTab
 ) {
-  debugger;
   if (!searchCriteriaChange) {
     // const [urlVar, setUrlFunc] = useState('/pepplot');
     let tab, tabIndex, lastTabIndex;
@@ -103,7 +102,6 @@ export function updateUrl(
     // just a search criteria change
     propsParam.history.push('');
     if (scTab === 'pepplot') {
-      debugger;
       const pepplotStudyQuery2 = stateChanges.pepplotStudy || '';
       const pepplotModelQuery2 = stateChanges.pepplotModel || '';
       const pepplotTestQuery2 = stateChanges.pepplotTest || '';
@@ -126,7 +124,6 @@ export function updateUrl(
             pepplotProteinSite
         );
       } else if (pepplotTest !== '') {
-        debugger;
         propsParam.history.push(
           scTab + '/' + pepplotStudy + '/' + pepplotModel + '/' + pepplotTest
         );

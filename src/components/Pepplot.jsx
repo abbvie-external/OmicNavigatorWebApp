@@ -13,7 +13,7 @@ import _ from 'lodash';
 import './Pepplot.scss';
 import './Table.scss';
 
-class PepplotContainer extends Component {
+class Pepplot extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -391,4 +391,4 @@ class PepplotContainer extends Component {
   }
 }
 
-export default withRouter(PepplotContainer);
+export default withRouter(Pepplot);

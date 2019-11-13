@@ -97,7 +97,6 @@ class PepplotSearchCriteria extends Component {
   }
 
   componentDidMount() {
-    debugger;
     const s = this.props.pepplotStudy || '';
     const m = this.props.pepplotModel || '';
     const t = this.props.pepplotTest || '';

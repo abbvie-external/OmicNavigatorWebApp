@@ -1,14 +1,13 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { Grid, Tab, Menu } from 'semantic-ui-react';
-import PepplotContainer from './Pepplot';
-import EnrichmentContainer from './Enrichment';
+import Pepplot from './Pepplot';
+import Enrichment from './Enrichment';
 import { updateUrl } from './UrlControl';
 
 class Tabs extends Component {
   constructor(props) {
     super(props);
-    debugger;
     const pathnameInit = this.props.location.pathname.substring(1) || null;
     const pathname =
       pathnameInit !== null ? pathnameInit.replace(/-/gi, ' ') : pathnameInit;
@@ -128,7 +127,7 @@ class Tabs extends Component {
         pane: (
           <Tab.Pane key="3" className="">
             <Grid>
-              <PepplotContainer
+              <Pepplot
                 {...this.props}
                 {...this.state}
                 onSearchCriteriaToTop={this.handleSearchCriteriaToTop}
@@ -142,7 +141,7 @@ class Tabs extends Component {
         pane: (
           <Tab.Pane key="4" className="">
             <Grid>
-              <EnrichmentContainer
+              <Enrichment
                 {...this.props}
                 {...this.state}
                 onSearchCriteriaToTop={this.handleSearchCriteriaToTop}

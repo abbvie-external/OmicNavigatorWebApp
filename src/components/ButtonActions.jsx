@@ -31,12 +31,14 @@ class ButtonActions extends Component {
   PNGExport = () => {
     const svgElements =
       document.getElementsByClassName('ContentContainer') || null;
-    const currentContentContainer = svgElements[0] || null;
-    const currentSVG =
-      currentContentContainer.getElementsByTagName('svg')[0] || null;
-    if (currentSVG.id === 'multisetAnalysisSVG') {
+    const isPlot = this.props.visible;
+    if (isPlot) {
+      const currentSVG = document.getElementById('multisetAnalysisSVG') || null;
       saveSvgAsPng.saveSvgAsPng(currentSVG, 'Multiset_Analysis_Plot.png');
     } else {
+      const currentContentContainer = svgElements[0] || null;
+      const currentSVG =
+        currentContentContainer.getElementsByTagName('svg')[0] || null;
       saveSvgAsPng.saveSvgAsPng(
         currentSVG,
         this.props.imageInfo.title +
@@ -57,10 +59,16 @@ class ButtonActions extends Component {
   PDFExport = () => {
     const svgElements =
       document.getElementsByClassName('ContentContainer') || null;
-    const currentContentContainer = svgElements[0] || null;
-    const currentSVG =
-      currentContentContainer.getElementsByTagName('svg')[0] || null;
-    pdfService.createPDF(currentSVG);
+    const isPlot = this.props.visible;
+    if (isPlot) {
+      const currentSVG = document.getElementById('multisetAnalysisSVG') || null;
+      pdfService.createPDF(currentSVG);
+    } else {
+      const currentContentContainer = svgElements[0] || null;
+      const currentSVG =
+        currentContentContainer.getElementsByTagName('svg')[0] || null;
+      pdfService.createPDF(currentSVG);
+    }
   };
 
   SVGExport = () => {

@@ -17,7 +17,7 @@ import phosphosite_icon from '../resources/phosphosite.ico';
 import reactome_icon from '../resources/reactome.jpg';
 import go_icon from '../resources/go.png';
 
-class EnrichmentContainer extends Component {
+class Enrichment extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -460,4 +460,4 @@ class EnrichmentContainer extends Component {
   }
 }
 
-export default withRouter(EnrichmentContainer);
+export default withRouter(Enrichment);
