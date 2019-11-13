@@ -8,7 +8,6 @@ import TransitionStill from './TransitionStill';
 import ButtonActions from './ButtonActions';
 import { formatNumberForDisplay, splitValue } from '../helpers';
 import phosphosite_icon from '../resources/phosphosite.ico';
-// import { updateUrl } from './UrlControl';
 
 import _ from 'lodash';
 import './Pepplot.scss';
@@ -68,7 +67,7 @@ class PepplotContainer extends Component {
   };
 
   handleSearchCriteriaChange = changes => {
-    this.props.onSearchCriteriaToTop(changes);
+    this.props.onSearchCriteriaToTop(changes, 'pepplot');
     this.setState({
       upsetPlotAvailable: false,
       plotButtonActive: false,

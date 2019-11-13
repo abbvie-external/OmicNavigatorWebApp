@@ -11,19 +11,35 @@ class Tabs extends Component {
     const pathname = this.props.location.pathname.substring(1) || null;
     const params = pathname ? pathname.split('/') : '';
     const tabFromUrl = params[0] || '';
-    const pepplotStudyFromUrl = params[1] || '';
-    const pepplotModelFromUrl = params[2] || '';
-    const pepplotTestFromUrl = params[3] || '';
-    const pepplotProteinSiteFromUrl = params[4] || '';
-
-    this.state = {
-      activeIndex: 2,
-      tab: tabFromUrl || 'pepplot',
-      pepplotStudy: pepplotStudyFromUrl || '',
-      pepplotModel: pepplotModelFromUrl || '',
-      pepplotTest: pepplotTestFromUrl || '',
-      pepplotProteinSite: pepplotProteinSiteFromUrl || ''
-    };
+    const studyFromUrl = params[1] || '';
+    const modelFromUrl = params[2] || '';
+    const testFromUrl = params[3] || '';
+    const proteinSiteFromUrl = params[4] || '';
+    if (tabFromUrl === 'pepplot') {
+      this.state = {
+        activeIndex: 2,
+        tab: tabFromUrl,
+        pepplotStudy: studyFromUrl || '',
+        pepplotModel: modelFromUrl || '',
+        pepplotTest: testFromUrl || '',
+        pepplotProteinSite: proteinSiteFromUrl || '',
+        enrichmentStudy: '',
+        enrichmentModel: '',
+        enrichmentAnnotation: ''
+      };
+    } else {
+      this.state = {
+        activeIndex: 3,
+        tab: tabFromUrl,
+        enrichmentStudy: studyFromUrl || '',
+        enrichmentModel: modelFromUrl || '',
+        enrichmentAnnotation: testFromUrl || '',
+        pepplotStudy: '',
+        pepplotModel: '',
+        pepplotTest: '',
+        pepplotProteinSite: ''
+      };
+    }
   }
 
   componentDidMount() {
@@ -56,13 +72,21 @@ class Tabs extends Component {
     );
   };
 
-  handleSearchCriteriaToTop = changes => {
-    this.setState({
-      pepplotStudy: changes.pepplotStudy || '',
-      pepplotModel: changes.pepplotModel || '',
-      pepplotTest: changes.pepplotTest || '',
-      pepplotProteinSite: changes.pepplotProteinSite || ''
-    });
+  handleSearchCriteriaToTop = (changes, tab) => {
+    if (tab === 'pepplot') {
+      this.setState({
+        pepplotStudy: changes.pepplotStudy || '',
+        pepplotModel: changes.pepplotModel || '',
+        pepplotTest: changes.pepplotTest || '',
+        pepplotProteinSite: changes.pepplotProteinSite || ''
+      });
+    } else if (tab === 'enrichment') {
+      this.setState({
+        enrichmentStudy: changes.enrichmentStudy || '',
+        enrichmentModel: changes.enrichmentModel || '',
+        enrichmentAnnotation: changes.enrichmentAnnotation || ''
+      });
+    }
     updateUrl(
       this.props,
       this.state,
@@ -70,7 +94,7 @@ class Tabs extends Component {
       'tabInit',
       this.setTabIndex,
       true,
-      'pepplot'
+      tab
     );
   };
 
@@ -115,7 +139,11 @@ class Tabs extends Component {
         pane: (
           <Tab.Pane key="4" className="">
             <Grid>
-              <EnrichmentContainer {...this.props} {...this.state} />
+              <EnrichmentContainer
+                {...this.props}
+                {...this.state}
+                onSearchCriteriaToTop={this.handleSearchCriteriaToTop}
+              />
             </Grid>
           </Tab.Pane>
         )

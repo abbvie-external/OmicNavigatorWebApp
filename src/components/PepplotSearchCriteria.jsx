@@ -15,20 +15,6 @@ import _ from 'lodash';
 import UpSetFiltersPepplot from './UpSetFiltersPepplot';
 
 class PepplotSearchCriteria extends Component {
-  static defaultProps = {
-    tab: 'pepplot',
-    pepplotStudy: '',
-    pepplotModel: '',
-    pepplotTest: '',
-    isValidSearchPepplot: false,
-    isSearching: false,
-    upsetPlotAvailable: false,
-    animation: 'uncover',
-    direction: 'left',
-    visible: false,
-    plotButtonActive: false
-  };
-
   constructor(props) {
     super(props);
     this.state = {
@@ -170,12 +156,6 @@ class PepplotSearchCriteria extends Component {
             }
           });
           this.testdata = dataFromService;
-          this.testdata = dataFromService;
-          // this.setState({
-          //   pepplotStudiesDisabled: false,
-          //   pepplotModelsDisabled: false,
-          //   pepplotTestsDisabled: false
-          // });
           this.props.onPepplotSearch({
             pepplotResults: this.testdata
           });
@@ -249,11 +229,6 @@ class PepplotSearchCriteria extends Component {
       reloadPlot: true,
       upsetFiltersVisibleP: false
     });
-    // this.setState({
-    //   pepplotStudiesDisabled: true,
-    //   pepplotModelsDisabled: true,
-    //   pepplotTestsDisabled: true
-    // });
     this.props.onSearchCriteriaChange({
       pepplotStudy: this.props.pepplotStudy,
       pepplotModel: this.props.pepplotModel,
@@ -282,11 +257,6 @@ class PepplotSearchCriteria extends Component {
           uAnchorP: value
         });
         this.testdata = dataFromService;
-        // this.setState({
-        //   pepplotStudiesDisabled: false,
-        //   pepplotModelsDisabled: false,
-        //   pepplotTestsDisabled: false
-        // });
         this.props.onPepplotSearch({
           pepplotResults: this.testdata
         });
@@ -390,9 +360,6 @@ class PepplotSearchCriteria extends Component {
           },
           activateUpSetFiltersP: true,
           reloadPlot: false
-          // sigValueP: eSigVP,
-          // selectedOperatorP: eOperatorP,
-          // selectedColP: eColP
         });
         this.props.onPepplotSearch({
           pepplotResults: multisetResultsP

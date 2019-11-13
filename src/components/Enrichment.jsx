@@ -9,7 +9,6 @@ import TransitionStill from './TransitionStill';
 import ButtonActions from './ButtonActions';
 import { formatNumberForDisplay, splitValue } from '../helpers';
 // import { phosphoprotService } from '../services/phosphoprot.service';
-// import { updateUrl } from './UrlControl';
 import _ from 'lodash';
 import './Enrichment.scss';
 import './Table.scss';
@@ -19,16 +18,9 @@ import reactome_icon from '../resources/reactome.jpg';
 import go_icon from '../resources/go.png';
 
 class EnrichmentContainer extends Component {
-  static defaultProps = {
-    tab: 'enrichment'
-  };
-
   constructor(props) {
     super(props);
     this.state = {
-      enrichmentStudy: '',
-      enrichmentModel: '',
-      enrichmentAnnotation: '',
       isValidSearchEnrichment: false,
       isSearching: false,
       enrichmentResults: [],
@@ -53,9 +45,7 @@ class EnrichmentContainer extends Component {
     };
   }
 
-  componentDidMount() {
-    // updateUrl(this.props, this.state);
-  }
+  componentDidMount() {}
 
   handleSearchTransition = () => {
     this.setState({
@@ -74,14 +64,11 @@ class EnrichmentContainer extends Component {
       plotButtonActive: false,
       visible: false
     });
-    // updateUrl(this.props, this.state);
   };
 
   handleSearchCriteriaChange = changes => {
+    this.props.onSearchCriteriaToTop(changes, 'enrichment');
     this.setState({
-      enrichmentStudy: changes.enrichmentStudy,
-      enrichmentModel: changes.enrichmentModel,
-      enrichmentAnnotation: changes.enrichmentAnnotation,
       // enrichmentView: 'table',
       upsetPlotAvailable: false,
       plotButtonActive: false,
@@ -131,7 +118,7 @@ class EnrichmentContainer extends Component {
       enrichmentStudy,
       enrichmentModel,
       enrichmentAnnotation
-    } = this.state;
+    } = this.props;
     let initConfigCols = [];
 
     const TableValuePopupStyle = {
@@ -340,7 +327,6 @@ class EnrichmentContainer extends Component {
     });
 
     const configCols = initConfigCols.concat(additionalConfigColumns);
-
     return configCols;
   };
 
@@ -371,6 +357,7 @@ class EnrichmentContainer extends Component {
         <EnrichmentResults
           {...this.props}
           {...this.state}
+          onSearchCriteriaChange={this.handleSearchCriteriaChange}
           onEnrichmentViewChange={this.handleEnrichmentViewChange}
           onHandlePlotAnimation={this.handlePlotAnimation}
         />
@@ -442,6 +429,7 @@ class EnrichmentContainer extends Component {
         >
           <EnrichmentSearchCriteria
             {...this.state}
+            {...this.props}
             onSearchTransition={this.handleSearchTransition}
             onEnrichmentSearch={this.handleEnrichmentSearch}
             onSearchCriteriaChange={this.handleSearchCriteriaChange}

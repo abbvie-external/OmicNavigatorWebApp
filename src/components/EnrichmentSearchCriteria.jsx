@@ -110,6 +110,69 @@ class EnrichmentSearchCriteria extends Component {
   }
 
   componentDidMount() {
+    const s = this.props.enrichmentStudy || '';
+    const m = this.props.enrichmentModel || '';
+    const a = this.props.enrichmentAnnotation || '';
+    if (s !== '') {
+      this.setState({
+        enrichmentStudyHrefVisible: true,
+        enrichmentStudyHref: `${s}.html`
+      });
+      phosphoprotService
+        .getModelNames('EnrichmentNames', s + 'plots')
+        .then(modelsFromService => {
+          this.allNames = modelsFromService;
+          const modelsArr = _.map(_.keys(modelsFromService), function(
+            modelName
+          ) {
+            return { key: modelName, text: modelName, value: modelName };
+          });
+          this.setState({
+            enrichmentModelsDisabled: false,
+            enrichmentModels: modelsArr
+          });
+          if (m !== '') {
+            const annotationsArr = _.map(this.allNames[m], function(
+              annotationName
+            ) {
+              return {
+                key: annotationName,
+                text: annotationName,
+                value: annotationName
+              };
+            });
+            this.setState({
+              enrichmentAnnotationsDisabled: false,
+              enrichmentAnnotations: annotationsArr
+            });
+          }
+        });
+    }
+
+    if (a !== '') {
+      this.props.onSearchCriteriaChange({
+        enrichmentStudy: s,
+        enrichmentModel: m,
+        enrichmentAnnotation: a
+      });
+      this.props.onSearchTransition({
+        isSearching: true
+      });
+      phosphoprotService
+        .getAnnotationData(m, a, s + 'plots')
+        .then(dataFromService => {
+          this.setState({
+            uSettings: {
+              ...this.state.uSettings,
+              maxElements: dataFromService.length
+            }
+          });
+          this.annotationdata = dataFromService;
+          this.props.onEnrichmentSearch({
+            enrichmentResults: this.annotationdata
+          });
+        });
+    }
     this.populateStudies();
   }
 
@@ -518,7 +581,6 @@ class EnrichmentSearchCriteria extends Component {
             control={Select}
             label="Study"
             name="enrichmentStudy"
-            className="enrichmentStudyDropdown"
             value={enrichmentStudy}
             options={enrichmentStudies}
             placeholder="Select A Study"
