@@ -9,6 +9,7 @@ export function updateUrl(
   searchCriteriaChange,
   scTab
 ) {
+  debugger;
   if (!searchCriteriaChange) {
     // const [urlVar, setUrlFunc] = useState('/pepplot');
     let tab, tabIndex, lastTabIndex;
@@ -26,13 +27,14 @@ export function updateUrl(
     }
 
     if (tab === 'pepplot') {
-      const pepplotStudy = stateParam.pepplotStudy || '';
-      const pepplotModel = stateParam.pepplotModel || '';
-      const pepplotTest = stateParam.pepplotTest || '';
-      const pepplotProteinSite = stateParam.pepplotProteinSite || '';
-      // const pepplotStudy = pepplotStudyQuery.replace(, '')
-      // const pepplotModel = pepplotModelQuery.replace(, '')
-      // const pepplotTest = pepplotTestQuery.replace(, '')
+      const pepplotStudyQuery = stateParam.pepplotStudy || '';
+      const pepplotModelQuery = stateParam.pepplotModel || '';
+      const pepplotTestQuery = stateParam.pepplotTest || '';
+      const pepplotProteinSiteQuery = stateParam.pepplotProteinSite || '';
+      const pepplotStudy = pepplotStudyQuery.replace(/ /gi, '-');
+      const pepplotModel = pepplotModelQuery.replace(/ /gi, '-');
+      const pepplotTest = pepplotTestQuery.replace(/ /gi, '-');
+      const pepplotProteinSite = pepplotProteinSiteQuery.replace(/ /gi, '-');
 
       if (pepplotProteinSite !== '') {
         propsParam.history.push(
@@ -60,12 +62,15 @@ export function updateUrl(
       // });
       // }, [url]);
     } else if (tab === 'enrichment') {
-      const enrichmentStudy = stateParam.enrichmentStudy || '';
-      const enrichmentModel = stateParam.enrichmentModel || '';
-      const enrichmentAnnotation = stateParam.enrichmentAnnotation || '';
-      // const enrichmentStudy = enrichmentStudyQuery.replace(, '')
-      // const enrichmentModel = enrichmentModelQuery.replace(, '')
-      // const enrichmentAnnotation = enrichmentAnnotationQuery.replace(, '')
+      const enrichmentStudyQuery = stateParam.enrichmentStudy || '';
+      const enrichmentModelQuery = stateParam.enrichmentModel || '';
+      const enrichmentAnnotationQuery = stateParam.enrichmentAnnotation || '';
+      const enrichmentStudy = enrichmentStudyQuery.replace(/ /gi, '-');
+      const enrichmentModel = enrichmentModelQuery.replace(/ /gi, '-');
+      const enrichmentAnnotation = enrichmentAnnotationQuery.replace(
+        / /gi,
+        '-'
+      );
 
       if (enrichmentAnnotation !== '') {
         propsParam.history.push(
@@ -98,13 +103,15 @@ export function updateUrl(
     // just a search criteria change
     propsParam.history.push('');
     if (scTab === 'pepplot') {
-      const pepplotStudy = stateChanges.pepplotStudy || '';
-      const pepplotModel = stateChanges.pepplotModel || '';
-      const pepplotTest = stateChanges.pepplotTest || '';
-      const pepplotProteinSite = stateChanges.pepplotProteinSite || '';
-      // const pepplotStudy = pepplotStudyQuery.replace(, '')
-      // const pepplotModel = pepplotModelQuery.replace(, '')
-      // const pepplotTest = pepplotTestQuery.replace(, '')
+      debugger;
+      const pepplotStudyQuery2 = stateChanges.pepplotStudy || '';
+      const pepplotModelQuery2 = stateChanges.pepplotModel || '';
+      const pepplotTestQuery2 = stateChanges.pepplotTest || '';
+      const pepplotProteinSiteQuery2 = stateChanges.pepplotProteinSite || '';
+      const pepplotStudy = pepplotStudyQuery2.replace(/ /gi, '-');
+      const pepplotModel = pepplotModelQuery2.replace(/ /gi, '-');
+      const pepplotTest = pepplotTestQuery2.replace(/ /gi, '-');
+      const pepplotProteinSite = pepplotProteinSiteQuery2.replace(/ /gi, '-');
 
       if (pepplotProteinSite !== '') {
         propsParam.history.push(
@@ -119,6 +126,7 @@ export function updateUrl(
             pepplotProteinSite
         );
       } else if (pepplotTest !== '') {
+        debugger;
         propsParam.history.push(
           scTab + '/' + pepplotStudy + '/' + pepplotModel + '/' + pepplotTest
         );
@@ -134,12 +142,15 @@ export function updateUrl(
       // });
       // }, [url]);
     } else if (scTab === 'enrichment') {
-      const enrichmentStudy = stateChanges.enrichmentStudy || '';
-      const enrichmentModel = stateChanges.enrichmentModel || '';
-      const enrichmentAnnotation = stateChanges.enrichmentAnnotation || '';
-      // const enrichmentStudy = enrichmentStudyQuery.replace(, '')
-      // const enrichmentModel = enrichmentModelQuery.replace(, '')
-      // const enrichmentAnnotation = enrichmentAnnotationQuery.replace(, '')
+      const enrichmentStudyQuery = stateChanges.enrichmentStudy || '';
+      const enrichmentModelQuery = stateChanges.enrichmentModel || '';
+      const enrichmentAnnotationQuery = stateChanges.enrichmentAnnotation || '';
+      const enrichmentStudy = enrichmentStudyQuery.replace(/ /gi, '-');
+      const enrichmentModel = enrichmentModelQuery.replace(/ /gi, '-');
+      const enrichmentAnnotation = enrichmentAnnotationQuery.replace(
+        / /gi,
+        '-'
+      );
 
       if (enrichmentAnnotation !== '') {
         propsParam.history.push(

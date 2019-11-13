@@ -8,7 +8,10 @@ import { updateUrl } from './UrlControl';
 class Tabs extends Component {
   constructor(props) {
     super(props);
-    const pathname = this.props.location.pathname.substring(1) || null;
+    debugger;
+    const pathnameInit = this.props.location.pathname.substring(1) || null;
+    const pathname =
+      pathnameInit !== null ? pathnameInit.replace(/-/gi, ' ') : pathnameInit;
     const params = pathname ? pathname.split('/') : '';
     const tabFromUrl = params[0] || '';
     const studyFromUrl = params[1] || '';
