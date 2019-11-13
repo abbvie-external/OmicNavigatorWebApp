@@ -14,7 +14,11 @@ class Tabs extends Component {
     const params = pathname ? pathname.split('/') : '';
     const tabFromUrl = params[0] || '';
     const studyFromUrl = params[1] || '';
-    const modelFromUrl = params[2] || '';
+    const modelFromUrlAndOr = params[2] || '';
+    const modelFromUrl =
+      modelFromUrlAndOr !== ''
+        ? modelFromUrlAndOr.replace('and+or', 'and/or')
+        : modelFromUrlAndOr;
     const testFromUrl = params[3] || '';
     const proteinSiteFromUrl = params[4] || '';
     if (tabFromUrl === 'pepplot') {

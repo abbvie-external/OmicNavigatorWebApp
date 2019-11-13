@@ -71,7 +71,34 @@ class ButtonActions extends Component {
     }
   };
 
+  exportSVG = svgEl => {
+    const name = 'UpSetPlot';
+    svgEl.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    const svgData = svgEl.outerHTML;
+    const preface = '<?xml version="1.0" standalone="no"?>\r\n';
+    const svgBlob = new Blob([preface, svgData], {
+      type: 'image/svg+xml;charset=utf-8'
+    });
+    const svgUrl = URL.createObjectURL(svgBlob);
+    const downloadLink = document.createElement('a');
+    downloadLink.href = svgUrl;
+    downloadLink.download = name;
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+  };
+
   SVGExport = () => {
+    // const svgElements = document.getElementsByClassName('ContentContainer') || null;
+    // const isPlot = this.props.visible;
+    // if (isPlot) {
+    //   const currentSVG = document.getElementById('multisetAnalysisSVG') || null;
+    //   this.exportSVG(currentSVG);
+    // } else {
+    //   const currentContentContainer = svgElements[0] || null;
+    //   const currentSVG = currentContentContainer.getElementsByTagName('svg')[0] || null;
+    //   this.exportSVG(currentSVG);
+    // }
     //upsetPlotInfo.svg
     console.log('SVG export coming soon');
   };
