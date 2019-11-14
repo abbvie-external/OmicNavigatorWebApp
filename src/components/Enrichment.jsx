@@ -60,20 +60,23 @@ class Enrichment extends Component {
       enrichmentColumns: columns,
       isSearching: false,
       isValidSearchEnrichment: true,
-      upsetPlotAvailable: false,
       plotButtonActive: false,
       visible: false
     });
   };
 
-  handleSearchCriteriaChange = changes => {
+  handleSearchCriteriaChange = (changes, scChange) => {
     this.props.onSearchCriteriaToTop(changes, 'enrichment');
     this.setState({
       // enrichmentView: 'table',
-      upsetPlotAvailable: false,
       plotButtonActive: false,
       visible: false
     });
+    if (scChange) {
+      this.setState({
+        upsetPlotAvailable: false
+      });
+    }
   };
 
   disablePlot = () => {

@@ -66,13 +66,17 @@ class Pepplot extends Component {
     });
   };
 
-  handleSearchCriteriaChange = changes => {
+  handleSearchCriteriaChange = (changes, scChange) => {
     this.props.onSearchCriteriaToTop(changes, 'pepplot');
     this.setState({
-      upsetPlotAvailable: false,
-      plotButtonActive: false,
-      visible: false
+      visible: false,
+      plotButtonActive: false
     });
+    if (scChange) {
+      this.setState({
+        upsetPlotAvailable: false
+      });
+    }
   };
 
   disablePlot = () => {

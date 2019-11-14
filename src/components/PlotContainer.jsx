@@ -29,8 +29,8 @@ class PlotContainer extends Component {
       activeSVGTabIndex: 0,
       excelVisible: true,
       pngVisible: true,
-      pdfVisible: true,
-      svgVisible: false
+      pdfVisible: false,
+      svgVisible: true
       // returningToTable: false,
     };
   }

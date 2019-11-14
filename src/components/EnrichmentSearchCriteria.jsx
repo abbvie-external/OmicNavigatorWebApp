@@ -150,11 +150,14 @@ class EnrichmentSearchCriteria extends Component {
     }
 
     if (a !== '') {
-      this.props.onSearchCriteriaChange({
-        enrichmentStudy: s,
-        enrichmentModel: m,
-        enrichmentAnnotation: a
-      });
+      this.props.onSearchCriteriaChange(
+        {
+          enrichmentStudy: s,
+          enrichmentModel: m,
+          enrichmentAnnotation: a
+        },
+        false
+      );
       this.props.onSearchTransition({
         isSearching: true
       });
@@ -194,11 +197,14 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentModelsDisabled: true,
       enrichmentAnnotationsDisabled: true
     });
-    this.props.onSearchCriteriaChange({
-      [name]: value,
-      enrichmentModel: '',
-      enrichmentAnnotation: ''
-    });
+    this.props.onSearchCriteriaChange(
+      {
+        [name]: value,
+        enrichmentModel: '',
+        enrichmentAnnotation: ''
+      },
+      true
+    );
     this.props.onSearchCriteriaReset({
       isValidSearchEnrichment: false
     });
@@ -217,14 +223,16 @@ class EnrichmentSearchCriteria extends Component {
   };
 
   handleModelChange = (evt, { name, value }) => {
-    this.props.onSearchCriteriaChange({
-      enrichmentStudy: this.props.enrichmentStudy,
-      [name]: value,
-      enrichmentAnnotation: ''
-    });
+    this.props.onSearchCriteriaChange(
+      {
+        enrichmentStudy: this.props.enrichmentStudy,
+        [name]: value,
+        enrichmentAnnotation: ''
+      },
+      true
+    );
     this.props.onSearchCriteriaReset({
-      isValidSearchEnrichment: false,
-      upsetPlotAvailable: false
+      isValidSearchEnrichment: false
     });
     const annotationsArr = _.map(this.allNames[value], function(
       annotationName
@@ -245,11 +253,14 @@ class EnrichmentSearchCriteria extends Component {
     this.setState({
       upsetFiltersVisible: false
     });
-    this.props.onSearchCriteriaChange({
-      enrichmentStudy: this.props.enrichmentStudy,
-      enrichmentModel: this.props.enrichmentModel,
-      [name]: value
-    });
+    this.props.onSearchCriteriaChange(
+      {
+        enrichmentStudy: this.props.enrichmentStudy,
+        enrichmentModel: this.props.enrichmentModel,
+        [name]: value
+      },
+      true
+    );
     this.props.onSearchTransition({
       [name]: value,
       isSearching: true
@@ -306,11 +317,14 @@ class EnrichmentSearchCriteria extends Component {
   };
 
   upsetTriggeredAnnotationChange = (name, value) => {
-    this.props.onSearchCriteriaChange({
-      enrichmentStudy: this.props.enrichmentStudy,
-      enrichmentModel: this.props.enrichmentModel,
-      [name]: value
-    });
+    this.props.onSearchCriteriaChange(
+      {
+        enrichmentStudy: this.props.enrichmentStudy,
+        enrichmentModel: this.props.enrichmentModel,
+        [name]: value
+      },
+      true
+    );
     this.props.onSearchTransition({
       [name]: value,
       isSearching: true

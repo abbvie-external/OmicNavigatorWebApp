@@ -134,12 +134,15 @@ class PepplotSearchCriteria extends Component {
     }
 
     if (t !== '') {
-      this.props.onSearchCriteriaChange({
-        pepplotStudy: s,
-        pepplotModel: m,
-        pepplotTest: t,
-        pepplotProteinSite: p
-      });
+      this.props.onSearchCriteriaChange(
+        {
+          pepplotStudy: s,
+          pepplotModel: m,
+          pepplotTest: t,
+          pepplotProteinSite: p
+        },
+        false
+      );
       this.setState({
         uAnchorP: t
       });
@@ -182,11 +185,14 @@ class PepplotSearchCriteria extends Component {
       pepplotModelsDisabled: true,
       pepplotTestsDisabled: true
     });
-    this.props.onSearchCriteriaChange({
-      [name]: value,
-      pepplotModel: '',
-      pepplotTest: ''
-    });
+    this.props.onSearchCriteriaChange(
+      {
+        [name]: value,
+        pepplotModel: '',
+        pepplotTest: ''
+      },
+      true
+    );
     this.props.onSearchCriteriaReset({
       isValidSearchPepplot: false
     });
@@ -205,11 +211,14 @@ class PepplotSearchCriteria extends Component {
   };
 
   handleModelChange = (evt, { name, value }) => {
-    this.props.onSearchCriteriaChange({
-      pepplotStudy: this.props.pepplotStudy,
-      [name]: value,
-      pepplotTest: ''
-    });
+    this.props.onSearchCriteriaChange(
+      {
+        pepplotStudy: this.props.pepplotStudy,
+        [name]: value,
+        pepplotTest: ''
+      },
+      true
+    );
     this.props.onSearchCriteriaReset({
       isValidSearchPepplot: false
     });
@@ -229,15 +238,21 @@ class PepplotSearchCriteria extends Component {
       reloadPlot: true,
       upsetFiltersVisibleP: false
     });
-    this.props.onSearchCriteriaChange({
-      pepplotStudy: this.props.pepplotStudy,
-      pepplotModel: this.props.pepplotModel,
-      [name]: value
-    });
-    this.props.onSearchTransition({
-      [name]: value,
-      isSearching: true
-    });
+    this.props.onSearchCriteriaChange(
+      {
+        pepplotStudy: this.props.pepplotStudy,
+        pepplotModel: this.props.pepplotModel,
+        [name]: value
+      },
+      true
+    );
+    this.props.onSearchTransition(
+      {
+        [name]: value,
+        isSearching: true
+      },
+      true
+    );
     phosphoprotService
       .getTestData(
         this.props.pepplotModel,
@@ -291,11 +306,14 @@ class PepplotSearchCriteria extends Component {
   };
 
   upsetTriggeredTestChange = (name, value) => {
-    this.props.onSearchCriteriaChange({
-      pepplotStudy: this.props.pepplotStudy,
-      pepplotModel: this.props.pepplotModel,
-      [name]: value
-    });
+    this.props.onSearchCriteriaChange(
+      {
+        pepplotStudy: this.props.pepplotStudy,
+        pepplotModel: this.props.pepplotModel,
+        [name]: value
+      },
+      true
+    );
     this.props.onSearchTransition({
       [name]: value,
       isSearching: true

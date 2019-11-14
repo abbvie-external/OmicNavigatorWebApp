@@ -109,12 +109,15 @@ class PepplotResults extends Component {
       currentSVGs: []
     });
     const ProteinSiteVar = firstValue(dataItem.Protein_Site, true);
-    this.props.onSearchCriteriaChange({
-      pepplotStudy: this.props.pepplotStudy || '',
-      pepplotModel: this.props.pepplotModel || '',
-      pepplotTest: this.props.pepplotTest || '',
-      pepplotProteinSite: ProteinSiteVar || ''
-    });
+    this.props.onSearchCriteriaChange(
+      {
+        pepplotStudy: this.props.pepplotStudy || '',
+        pepplotModel: this.props.pepplotModel || '',
+        pepplotTest: this.props.pepplotTest || '',
+        pepplotProteinSite: ProteinSiteVar || ''
+      },
+      false
+    );
     let pepplotModel = this.props.pepplotModel;
     let pepplotStudy = this.props.pepplotStudy;
     let plotType = ['splineplot'];
@@ -328,12 +331,15 @@ class PepplotResults extends Component {
       isProteinDataLoaded: false,
       isProteinSVGLoaded: false
     });
-    this.props.onSearchCriteriaChange({
-      pepplotStudy: this.props.pepplotStudy || '',
-      pepplotModel: this.props.pepplotModel || '',
-      pepplotTest: this.props.pepplotTest || '',
-      pepplotProteinSite: ''
-    });
+    this.props.onSearchCriteriaChange(
+      {
+        pepplotStudy: this.props.pepplotStudy || '',
+        pepplotModel: this.props.pepplotModel || '',
+        pepplotTest: this.props.pepplotTest || '',
+        pepplotProteinSite: ''
+      },
+      false
+    );
   };
 
   render() {

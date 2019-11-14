@@ -29,6 +29,7 @@ class SVGPlot extends Component {
           render: () => (
             <Tab.Pane attached="true" as="div">
               <div
+                id="proteinPlotSVG"
                 className="svgSpan"
                 dangerouslySetInnerHTML={{ __html: s.svg }}
               ></div>

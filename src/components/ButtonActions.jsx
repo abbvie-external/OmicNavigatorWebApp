@@ -28,27 +28,6 @@ class ButtonActions extends Component {
     // })
   }
 
-  PNGExport = () => {
-    const svgElements =
-      document.getElementsByClassName('ContentContainer') || null;
-    const isPlot = this.props.visible;
-    if (isPlot) {
-      const currentSVG = document.getElementById('multisetAnalysisSVG') || null;
-      saveSvgAsPng.saveSvgAsPng(currentSVG, 'Multiset_Analysis_Plot.png');
-    } else {
-      const currentContentContainer = svgElements[0] || null;
-      const currentSVG =
-        currentContentContainer.getElementsByTagName('svg')[0] || null;
-      saveSvgAsPng.saveSvgAsPng(
-        currentSVG,
-        this.props.imageInfo.title +
-          '-' +
-          this.props.imageInfo.svg[this.props.activeSVGTabIndex].plotType +
-          '.png'
-      );
-    }
-  };
-
   ExcelExport = () => {
     excelService.exportAsExcelFile(
       this.props.treeDataRaw,
@@ -56,23 +35,60 @@ class ButtonActions extends Component {
     );
   };
 
+  PNGExport = () => {
+    const svgElements =
+      document.getElementsByClassName('ContentContainer') || null;
+    const isMultisetPlot = this.props.visible;
+    debugger;
+    if (isMultisetPlot) {
+      const MultisetPlotName = this.getMultisetPlotName('png');
+      const currentSVG = document.getElementById('multisetAnalysisSVG') || null;
+      saveSvgAsPng.saveSvgAsPng(currentSVG, MultisetPlotName);
+    } else {
+      const currentContentContainer =
+        document.getElementById('proteinPlotSVG') || null;
+      const ProteinPlotName = `${this.props.imageInfo.title} - ${this.props.imageInfo.svg[this.props.activeSVGTabIndex].plotType}.png`;
+      const currentSVG =
+        currentContentContainer.getElementsByTagName('svg')[0] || null;
+      saveSvgAsPng.saveSvgAsPng(currentSVG, ProteinPlotName);
+    }
+  };
+
   PDFExport = () => {
     const svgElements =
       document.getElementsByClassName('ContentContainer') || null;
-    const isPlot = this.props.visible;
-    if (isPlot) {
+    const isMultisetPlot = this.props.visible;
+    if (isMultisetPlot) {
       const currentSVG = document.getElementById('multisetAnalysisSVG') || null;
       pdfService.createPDF(currentSVG);
     } else {
-      const currentContentContainer = svgElements[0] || null;
+      const currentContentContainer =
+        document.getElementById('proteinPlotSVG') || null;
       const currentSVG =
         currentContentContainer.getElementsByTagName('svg')[0] || null;
       pdfService.createPDF(currentSVG);
     }
   };
 
-  exportSVG = svgEl => {
-    const name = 'UpSetPlot';
+  SVGExport = () => {
+    const svgElements =
+      document.getElementsByClassName('ContentContainer') || null;
+    const isMultisetPlot = this.props.visible;
+    if (isMultisetPlot) {
+      const MultisetPlotName = this.getMultisetPlotName('svg');
+      const currentSVG = document.getElementById('multisetAnalysisSVG') || null;
+      this.exportSVG(currentSVG, MultisetPlotName);
+    } else {
+      const ProteinPlotName = `${this.props.imageInfo.title}-${this.props.imageInfo.svg[this.props.activeSVGTabIndex].plotType}.svg`;
+      const currentContentContainer =
+        document.getElementById('proteinPlotSVG') || null;
+      const currentSVG =
+        currentContentContainer.getElementsByTagName('svg')[0] || null;
+      this.exportSVG(currentSVG, ProteinPlotName);
+    }
+  };
+
+  exportSVG = (svgEl, name) => {
     svgEl.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
     const svgData = svgEl.outerHTML;
     const preface = '<?xml version="1.0" standalone="no"?>\r\n';
@@ -88,19 +104,12 @@ class ButtonActions extends Component {
     document.body.removeChild(downloadLink);
   };
 
-  SVGExport = () => {
-    // const svgElements = document.getElementsByClassName('ContentContainer') || null;
-    // const isPlot = this.props.visible;
-    // if (isPlot) {
-    //   const currentSVG = document.getElementById('multisetAnalysisSVG') || null;
-    //   this.exportSVG(currentSVG);
-    // } else {
-    //   const currentContentContainer = svgElements[0] || null;
-    //   const currentSVG = currentContentContainer.getElementsByTagName('svg')[0] || null;
-    //   this.exportSVG(currentSVG);
-    // }
-    //upsetPlotInfo.svg
-    console.log('SVG export coming soon');
+  getMultisetPlotName = exporttype => {
+    if (this.props.tab === 'pepplot') {
+      return `${this.props.pepplotStudy}-${this.props.pepplotModel}-MultisetPlot.${exporttype}`;
+    } else if (this.props.tab === 'enrichment') {
+      return `${this.props.enrichmentStudy}-${this.props.enrichmentModel}-MultisetPlot.${exporttype}`;
+    } else return '';
   };
 
   getExcelButton = () => {
@@ -157,9 +166,9 @@ class ButtonActions extends Component {
             </Label>
             {excelButton}
           </Button>
-          {pngButton}
-          {pdfButton}
           {svgButton}
+          {pdfButton}
+          {pngButton}
         </Button.Group>
       </div>
     );
