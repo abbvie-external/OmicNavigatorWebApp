@@ -24,7 +24,14 @@
       float: left !important;
     }
 
-    .StudyHtmlIconDiv {
+    .StudyHtmlIconDivE {
+      cursor: pointer;
+      position: absolute;
+      right: 5%;
+      top: 13%;
+    }
+
+    .StudyHtmlIconDivP {
       cursor: pointer;
       position: absolute;
       right: 5%;
@@ -53,6 +60,12 @@
     .ui.positive.button {
       background-color: #ff4400 !important;
     }
+
+    // .pValueButton {
+    //   // padding-top: 0.2rem !important;
+    //   // padding: .2em 1em .2em !important;
+    //   // font-size: 1rem !important;
+    // }
 
     .normalText {
       font-weight: bold;

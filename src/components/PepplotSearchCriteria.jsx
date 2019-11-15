@@ -570,7 +570,7 @@ class PepplotSearchCriteria extends Component {
             disabled={pepplotStudiesDisabled}
             width={13}
           />
-          <span className="StudyHtmlIconDiv">{studyIcon}</span>
+          <span className="StudyHtmlIconDivP">{studyIcon}</span>
           <Form.Field
             control={Select}
             label="Model"

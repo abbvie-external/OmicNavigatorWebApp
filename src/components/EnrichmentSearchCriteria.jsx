@@ -629,7 +629,7 @@ class EnrichmentSearchCriteria extends Component {
             disabled={enrichmentStudiesDisabled}
             width={13}
           />
-          <span className="StudyHtmlIconDiv">{studyIcon}</span>
+          <span className="StudyHtmlIconDivE">{studyIcon}</span>
           <Form.Field
             control={Select}
             label="Model"
@@ -662,10 +662,10 @@ class EnrichmentSearchCriteria extends Component {
           >
             P Values
           </label>
-          <Button.Group className="PValueTypeContainer">
+          <Button.Group className="PValueTypeContainer" size="small">
             <Button
               type="button"
-              class="pValueButton"
+              className="pValueButton"
               value="nominal"
               name="nominal"
               positive={pValueType === 'nominal'}
@@ -677,7 +677,7 @@ class EnrichmentSearchCriteria extends Component {
             <Button.Or className="OrCircle" />
             <Button
               type="button"
-              class="pValueButton"
+              className="pValueButton"
               value="adjusted"
               name="adjusted"
               positive={pValueType === 'adjusted'}
