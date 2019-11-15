@@ -31,7 +31,8 @@ class Tabs extends Component {
         pepplotProteinSite: proteinSiteFromUrl || '',
         enrichmentStudy: '',
         enrichmentModel: '',
-        enrichmentAnnotation: ''
+        enrichmentAnnotation: '',
+        pValueType: 'Nominal'
       };
     } else {
       this.state = {
@@ -43,7 +44,8 @@ class Tabs extends Component {
         pepplotStudy: '',
         pepplotModel: '',
         pepplotTest: '',
-        pepplotProteinSite: ''
+        pepplotProteinSite: '',
+        pValueType: 'Nominal'
       };
     }
   }
@@ -63,6 +65,12 @@ class Tabs extends Component {
   setTabIndex = tabIndex => {
     this.setState({
       activeIndex: tabIndex
+    });
+  };
+
+  handlePValueTypeChange = type => {
+    this.setState({
+      pValueType: type
     });
   };
 
@@ -149,6 +157,7 @@ class Tabs extends Component {
                 {...this.props}
                 {...this.state}
                 onSearchCriteriaToTop={this.handleSearchCriteriaToTop}
+                onPValueTypeChange={this.handlePValueTypeChange}
               />
             </Grid>
           </Tab.Pane>

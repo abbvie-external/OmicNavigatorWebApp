@@ -99,7 +99,7 @@ class UpSetFiltersPepplot extends Component {
       24;
     const useAnchorP = uSettingsP.useAnchorP;
 
-    switch (selectedOperatorP.text) {
+    switch (selectedOperatorP.value) {
       case '<':
         this.setDescP = `Elements less than ${sigValueP} in:`;
         this.notSetDescP = `Elements less than ${sigValueP} not in:`;
@@ -742,19 +742,21 @@ class UpSetFiltersPepplot extends Component {
     } = this.props;
     const ColumnsP = uSettingsP.thresholdColsP;
     const OperatorsP = uSettingsP.thresholdOperatorP;
-    const SelColP = selectedColP.text;
-    const SelOpP = selectedOperatorP.text;
+    const SelColP = selectedColP.value;
+    const SelOpP = selectedOperatorP.value;
+    // for now, column is displayed as label "Adjusted P Value"
+    const SelColOverride = `Adjusted P Value`;
     return (
       <Fragment>
         <Form className="UpSetDropdownContainer">
           <Form.Group>
             <Form.Field
-              control={Select}
+              control={Input}
               label="Column"
               name="selectedColP"
-              className="ThresholdColumnSelect"
+              className="ThresholdColumnReadOnly"
               // selection
-              value={SelColP}
+              value={SelColOverride}
               options={ColumnsP}
               width={7}
               onChange={this.handleDropdownChange}

@@ -6,7 +6,7 @@
     height: auto !important;
 
     .SearchCriteriaContainer {
-      padding: 20px 20px !important;
+      padding: 20px 20px 5px 20px !important;
     }  
     
     .FilterStudyContainer {
@@ -38,6 +38,24 @@
     i.inverted.circular.icon {
       background-color: #1b1c1d !important;
       // background-color: #FF4400 !important;
+    }
+
+    .PValueTypeContainer {
+      padding-top: 10px !important;
+      padding-left: 20px;
+    }
+
+    .greyText {
+      opacity: .15 !important;
+      font-weight: bold;
+    }
+
+    .ui.positive.button {
+      background-color: #ff4400 !important;
+    }
+
+    .normalText {
+      font-weight: bold;
     }
     
     .UpsetContainer {

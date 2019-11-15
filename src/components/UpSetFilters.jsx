@@ -92,7 +92,7 @@ class UpSetFilters extends Component {
       24;
     const useAnchor = uSettings.useAnchor;
 
-    switch (selectedOperator.text) {
+    switch (selectedOperator.value) {
       case '<':
         this.setDesc = `Elements less than ${sigValue} in:`;
         this.notSetDesc = `Elements less than ${sigValue} not in:`;
@@ -722,22 +722,23 @@ class UpSetFilters extends Component {
     const { selectedCol, selectedOperator, sigValue, uSettings } = this.props;
     const Columns = uSettings.thresholdCols;
     const Operators = uSettings.thresholdOperator;
-    const SelCol = selectedCol.text;
-    const SelOp = selectedOperator.text;
+    const SelCol = selectedCol.value;
+    const SelOp = selectedOperator.value;
+    // for now, column is displayed as label, just matching the "Nominal" or "Adjusted" p value type
+    const SelColOverride = `${this.props.pValueType} P Value`;
     return (
       <Fragment>
         <Form className="UpSetDropdownContainer">
           <Form.Group>
             <Form.Field
-              control={Select}
+              control={Input}
+              readOnly
               label="Column"
               name="selectedCol"
-              className="ThresholdColumnSelect"
-              // selection
-              value={SelCol}
+              className="ThresholdColumnReadOnly"
+              value={SelColOverride}
               options={Columns}
               width={7}
-              onChange={this.handleDropdownChange}
             ></Form.Field>
             <Form.Field
               control={Select}

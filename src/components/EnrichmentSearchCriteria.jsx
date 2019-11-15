@@ -7,7 +7,8 @@ import {
   Popup,
   Divider,
   Radio,
-  Transition
+  Transition,
+  Button
 } from 'semantic-ui-react';
 import './SearchCriteria.scss';
 import { phosphoprotService } from '../services/phosphoprot.service';
@@ -20,6 +21,7 @@ class EnrichmentSearchCriteria extends Component {
     enrichmentStudy: '',
     enrichmentModel: '',
     enrichmentAnnotation: '',
+    pValueType: 'nomimal',
     isValidSearchEnrichment: false,
     isSearching: false,
     upsetPlotAvailable: false,
@@ -44,7 +46,7 @@ class EnrichmentSearchCriteria extends Component {
       uAnchor: '',
       selectedCol: {
         key: 'adj_P_Val',
-        text: 'adj_P_Val',
+        text: 'Adjusted P Value',
         value: 'adj_P_Val'
       },
       selectedOperator: {
@@ -56,7 +58,7 @@ class EnrichmentSearchCriteria extends Component {
       uSettings: {
         defaultSelectedCol: {
           key: 'adj_P_Val',
-          text: 'adj_P_Val',
+          text: 'Adjusted P Value',
           value: 'adj_P_Val'
         },
         defaultSelectedOperator: {
@@ -77,7 +79,7 @@ class EnrichmentSearchCriteria extends Component {
         thresholdCols: [
           {
             key: 'adj_P_Val',
-            text: 'adj_P_Val',
+            text: 'Adjusted P Value',
             value: 'adj_P_Val'
           }
         ],
@@ -113,6 +115,8 @@ class EnrichmentSearchCriteria extends Component {
     const s = this.props.enrichmentStudy || '';
     const m = this.props.enrichmentModel || '';
     const a = this.props.enrichmentAnnotation || '';
+    const t = this.props.pValueType || 'Nominal';
+
     if (s !== '') {
       this.setState({
         enrichmentStudyHrefVisible: true,
@@ -162,7 +166,7 @@ class EnrichmentSearchCriteria extends Component {
         isSearching: true
       });
       phosphoprotService
-        .getAnnotationData(m, a, s + 'plots')
+        .getAnnotationData(m, a, s + 'plots', t)
         .then(dataFromService => {
           this.setState({
             uSettings: {
@@ -269,7 +273,35 @@ class EnrichmentSearchCriteria extends Component {
       .getAnnotationData(
         this.props.enrichmentModel,
         value,
-        this.props.enrichmentStudy + 'plots'
+        this.props.enrichmentStudy + 'plots',
+        this.props.pValueType
+      )
+      .then(dataFromService => {
+        this.setState({
+          uSettings: {
+            ...this.state.uSettings,
+            must: [],
+            not: [],
+            defaultSigValue: 0.05,
+            maxElements: dataFromService.length
+          },
+          sigValue: 0.05
+        });
+        this.annotationdata = dataFromService;
+        this.props.onEnrichmentSearch({
+          enrichmentResults: this.annotationdata
+        });
+      });
+  };
+
+  handlePValueTypeChange = (evt, { value }) => {
+    this.props.onPValueTypeChange(value);
+    phosphoprotService
+      .getAnnotationData(
+        this.props.enrichmentModel,
+        this.props.enrichmentAnnotation,
+        this.props.enrichmentStudy + 'plots',
+        value
       )
       .then(dataFromService => {
         this.setState({
@@ -333,7 +365,8 @@ class EnrichmentSearchCriteria extends Component {
       .getAnnotationData(
         this.props.enrichmentModel,
         value,
-        this.props.enrichmentStudy + 'plots'
+        this.props.enrichmentStudy + 'plots',
+        this.props.pValueType
       )
       .then(dataFromService => {
         this.annotationdata = dataFromService;
@@ -481,6 +514,7 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentStudy,
       enrichmentModel,
       enrichmentAnnotation,
+      pValueType,
       isValidSearchEnrichment,
       upsetPlotAvailable,
       plotButtonActive
@@ -628,6 +662,36 @@ class EnrichmentSearchCriteria extends Component {
             search
             searchInput={{ id: 'form-select-control-test' }}
           />
+          <label
+            className={
+              enrichmentAnnotationsDisabled ? 'greyText' : 'normalText'
+            }
+          >
+            P Values
+          </label>
+          <Button.Group className="PValueTypeContainer">
+            <Button
+              type="button"
+              class="pValueButton"
+              value="Nominal"
+              positive={pValueType === 'Nominal'}
+              onClick={this.handlePValueTypeChange}
+              disabled={enrichmentAnnotationsDisabled}
+            >
+              Nominal
+            </Button>
+            <Button.Or className="OrCircle" />
+            <Button
+              type="button"
+              class="pValueButton"
+              value="Adjusted"
+              positive={pValueType === 'Adjusted'}
+              onClick={this.handlePValueTypeChange}
+              disabled={enrichmentAnnotationsDisabled}
+            >
+              Adjusted
+            </Button>
+          </Button.Group>
         </Form>
         <div className="UpsetContainer">
           <div className="SliderDiv">

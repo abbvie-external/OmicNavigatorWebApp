@@ -39,7 +39,6 @@ class ButtonActions extends Component {
     const svgElements =
       document.getElementsByClassName('ContentContainer') || null;
     const isMultisetPlot = this.props.visible;
-    debugger;
     if (isMultisetPlot) {
       const MultisetPlotName = this.getMultisetPlotName('png');
       const currentSVG = document.getElementById('multisetAnalysisSVG') || null;
