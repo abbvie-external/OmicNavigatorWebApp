@@ -146,9 +146,7 @@ class PepplotSearchCriteria extends Component {
       this.setState({
         uAnchorP: t
       });
-      this.props.onSearchTransition({
-        isSearching: true
-      });
+      this.props.onSearchTransition();
       phosphoprotService
         .getTestData(m, t, s + 'plots')
         .then(dataFromService => {
@@ -246,13 +244,7 @@ class PepplotSearchCriteria extends Component {
       },
       true
     );
-    this.props.onSearchTransition(
-      {
-        [name]: value,
-        isSearching: true
-      },
-      true
-    );
+    this.props.onSearchTransition();
     phosphoprotService
       .getTestData(
         this.props.pepplotModel,
@@ -314,10 +306,7 @@ class PepplotSearchCriteria extends Component {
       },
       true
     );
-    this.props.onSearchTransition({
-      [name]: value,
-      isSearching: true
-    });
+    this.props.onSearchTransition();
     phosphoprotService
       .getTestData(
         this.props.pepplotModel,

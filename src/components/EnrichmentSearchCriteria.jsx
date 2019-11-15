@@ -115,7 +115,7 @@ class EnrichmentSearchCriteria extends Component {
     const s = this.props.enrichmentStudy || '';
     const m = this.props.enrichmentModel || '';
     const a = this.props.enrichmentAnnotation || '';
-    const t = this.props.pValueType || 'Nominal';
+    const t = this.props.pValueType || 'nominal';
 
     if (s !== '') {
       this.setState({
@@ -162,9 +162,7 @@ class EnrichmentSearchCriteria extends Component {
         },
         false
       );
-      this.props.onSearchTransition({
-        isSearching: true
-      });
+      this.props.onSearchTransition();
       phosphoprotService
         .getAnnotationData(m, a, s + 'plots', t)
         .then(dataFromService => {
@@ -265,10 +263,7 @@ class EnrichmentSearchCriteria extends Component {
       },
       true
     );
-    this.props.onSearchTransition({
-      [name]: value,
-      isSearching: true
-    });
+    this.props.onSearchTransition();
     phosphoprotService
       .getAnnotationData(
         this.props.enrichmentModel,
@@ -295,6 +290,7 @@ class EnrichmentSearchCriteria extends Component {
   };
 
   handlePValueTypeChange = (evt, { value }) => {
+    this.props.onSearchTransition();
     this.props.onPValueTypeChange(value);
     phosphoprotService
       .getAnnotationData(
@@ -357,10 +353,7 @@ class EnrichmentSearchCriteria extends Component {
       },
       true
     );
-    this.props.onSearchTransition({
-      [name]: value,
-      isSearching: true
-    });
+    this.props.onSearchTransition();
     phosphoprotService
       .getAnnotationData(
         this.props.enrichmentModel,
@@ -673,8 +666,9 @@ class EnrichmentSearchCriteria extends Component {
             <Button
               type="button"
               class="pValueButton"
-              value="Nominal"
-              positive={pValueType === 'Nominal'}
+              value="nominal"
+              name="nominal"
+              positive={pValueType === 'nominal'}
               onClick={this.handlePValueTypeChange}
               disabled={enrichmentAnnotationsDisabled}
             >
@@ -684,8 +678,9 @@ class EnrichmentSearchCriteria extends Component {
             <Button
               type="button"
               class="pValueButton"
-              value="Adjusted"
-              positive={pValueType === 'Adjusted'}
+              value="adjusted"
+              name="adjusted"
+              positive={pValueType === 'adjusted'}
               onClick={this.handlePValueTypeChange}
               disabled={enrichmentAnnotationsDisabled}
             >

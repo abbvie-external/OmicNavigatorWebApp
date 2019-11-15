@@ -31,8 +31,7 @@ class Tabs extends Component {
         pepplotProteinSite: proteinSiteFromUrl || '',
         enrichmentStudy: '',
         enrichmentModel: '',
-        enrichmentAnnotation: '',
-        pValueType: 'Nominal'
+        enrichmentAnnotation: ''
       };
     } else {
       this.state = {
@@ -45,7 +44,7 @@ class Tabs extends Component {
         pepplotModel: '',
         pepplotTest: '',
         pepplotProteinSite: '',
-        pValueType: 'Nominal'
+        pValueType: 'nominal'
       };
     }
   }

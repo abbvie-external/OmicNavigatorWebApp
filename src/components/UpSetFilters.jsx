@@ -724,8 +724,11 @@ class UpSetFilters extends Component {
     const Operators = uSettings.thresholdOperator;
     const SelCol = selectedCol.value;
     const SelOp = selectedOperator.value;
-    // for now, column is displayed as label, just matching the "Nominal" or "Adjusted" p value type
-    const SelColOverride = `${this.props.pValueType} P Value`;
+    // for now, column is displayed as label, just matching the "nominal" or "Adjusted" p value type
+    const SelColOverride =
+      this.props.pValueType === 'nominal'
+        ? 'Nominal P Value'
+        : 'Adjusted P Value';
     return (
       <Fragment>
         <Form className="UpSetDropdownContainer">
