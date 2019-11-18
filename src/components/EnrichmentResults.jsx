@@ -34,6 +34,7 @@ class EnrichmentResults extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      annotationData: [],
       treeDataRaw: [],
       treeData: [],
       treeDataColumns: [],
@@ -79,39 +80,6 @@ class EnrichmentResults extends Component {
 
   getTableHelpers = (testSelectedTransitionCb, showBarcodePlotCb) => {
     let addParams = {};
-    addParams.getLink = (enrichmentStudy, enrichmentAnnotation, dataItem) => {
-      return function() {
-        phosphoprotService
-          .getDatabaseInfo(enrichmentStudy + 'plots', enrichmentAnnotation)
-          .then(annotationDataResponse => {
-            const annotationData = JSON.parse(annotationDataResponse);
-            dataItem.Annotation = _.find(annotationData, {
-              Description: dataItem.Description
-            }).Key;
-            const database = enrichmentAnnotation;
-            if (database === 'REACTOME') {
-              window.open(
-                'https://reactome.org/content/detail/' + dataItem.Annotation,
-                '_blank'
-              );
-            } else if (database.substring(0, 2) === 'GO') {
-              window.open(
-                'http://amigo.geneontology.org/amigo/term/' +
-                  dataItem.Annotation,
-                '_blank'
-              );
-            } else if (database.substring(0, 4) === 'msig') {
-              window.open(
-                'http://software.broadinstitute.org/gsea/msigdb/cards/' +
-                  dataItem.Annotation,
-                '_blank'
-              );
-            } else if (database === 'PSP') {
-              this.showPhosphositePlus('', dataItem);
-            }
-          });
-      };
-    };
 
     addParams.barcodeData = (
       enrichmentStudy,
@@ -120,38 +88,33 @@ class EnrichmentResults extends Component {
       dataItem,
       test
     ) => {
+      let self = this;
       return function() {
-        testSelectedTransitionCb();
+        debugger;
+        testSelectedTransitionCb(true);
         let xLargest = 0;
         let imageInfo = { key: '', title: '', svg: [] };
-        imageInfo.title = test;
         phosphoprotService
           .getDatabaseInfo(enrichmentStudy + 'plots', enrichmentAnnotation)
           .then(annotationDataResponse => {
-            const annotationData = JSON.parse(annotationDataResponse);
-            dataItem.Annotation = _.find(annotationData, {
+            const annotationDataParsed = JSON.parse(annotationDataResponse);
+            self.setState({
+              annotationData: annotationDataParsed
+            });
+            dataItem.Annotation = _.find(annotationDataParsed, {
               Description: dataItem.Description
             }).Key;
             let term = dataItem.Annotation;
-            imageInfo.title = test + ':' + dataItem.Annotation;
+            debugger;
+            self.setState({
+              imageInfo: {
+                ...self.state.imageInfo,
+                key: `${test} : ${dataItem.Description}`,
+                title: `${test} : ${dataItem.Description}`
+              },
+              enrichmentNameLoaded: true
+            });
 
-            // phosphoprotService
-            //   .getTestData(enrichmentModel, test, enrichmentStudy + 'plots')
-            //   .then(testDataResponse => {
-            //     let result = testDataResponse.map(obj => {
-            //       if (
-            //         enrichmentModel ===
-            //         'Treatment and/or Strain Differential Phosphorylation'
-            //       ) {
-            //         return Math.abs(obj.t);
-            //       } else {
-            //         return Math.abs(obj.F);
-            //       }
-            //     });
-            //     let sorted = result.slice().sort(function(a, b) {
-            //       return a - b;
-            //     });
-            // xLargest = Math.ceil(sorted[sorted.length - 1]);
             phosphoprotService
               .getBarcodeData(
                 enrichmentStudy + 'plots',
@@ -173,6 +136,39 @@ class EnrichmentResults extends Component {
               });
             // });
           });
+      };
+    };
+
+    addParams.getLink = (enrichmentStudy, enrichmentAnnotation, dataItem) => {
+      return function() {
+        // phosphoprotService
+        //   .getDatabaseInfo(enrichmentStudy + 'plots', enrichmentAnnotation)
+        //   .then(annotationDataResponse => {
+        //     const annotationData = JSON.parse(annotationDataResponse);
+        dataItem.Annotation = _.find(this.state.annotationData, {
+          Description: dataItem.Description
+        }).Key;
+        const database = enrichmentAnnotation;
+        if (database === 'REACTOME') {
+          window.open(
+            'https://reactome.org/content/detail/' + dataItem.Annotation,
+            '_blank'
+          );
+        } else if (database.substring(0, 2) === 'GO') {
+          window.open(
+            'http://amigo.geneontology.org/amigo/term/' + dataItem.Annotation,
+            '_blank'
+          );
+        } else if (database.substring(0, 4) === 'msig') {
+          window.open(
+            'http://software.broadinstitute.org/gsea/msigdb/cards/' +
+              dataItem.Annotation,
+            '_blank'
+          );
+        } else if (database === 'PSP') {
+          this.showPhosphositePlus('', dataItem);
+        }
+        // });
       };
     };
 
@@ -233,9 +229,25 @@ class EnrichmentResults extends Component {
     });
   };
 
-  testSelectedTransition = () => {
+  backToTable = () => {
     this.setState({
-      isTestSelected: true
+      isTestSelected: false,
+      enrichmentNameLoaded: false
+    });
+    // push url prop for selected back to ''
+    // this.props.onSearchCriteriaChange(
+    //   {
+    //     enrichmentStudy: this.props.enrichmentStudy || '',
+    //     enrichmentModel: this.props.enrichmentModel || '',
+    //     enrichmentAnnotation: this.props.enrichmentAnnotation || '',
+    //   },
+    //   false
+    // );
+  };
+
+  testSelectedTransition = bool => {
+    this.setState({
+      isTestSelected: bool
     });
   };
 

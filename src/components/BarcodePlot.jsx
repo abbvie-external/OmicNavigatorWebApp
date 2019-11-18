@@ -80,15 +80,15 @@ class BarcodePlot extends Component {
       settings.margin.bottom;
 
     //Scale the range of the data
-    // let domain = d3
-    //   .scaleLinear()
-    //   .range([5, width - 5])
-    //   .domain([
-    //     0,
-    //     d3.extent(settings.data, function(d) {
-    //       return d[settings.statistic];
-    //     })[1]
-    //   ]);
+    let domain = d3
+      .scaleLinear()
+      .range([5, width - 5])
+      .domain([
+        0,
+        d3.extent(barcodeSettings.barcodeData, function(d) {
+          return d[barcodeSettings.statistic];
+        })[1]
+      ]);
 
     let xScale = d3
       .scaleLinear()

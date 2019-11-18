@@ -107,10 +107,10 @@ class SplitPanesContainer extends Component {
                   largeScreen={8}
                   widescreen={8}
                 >
-                  {/* <Breadcrumbs
+                  <Breadcrumbs
                     {...this.props}
                     // onNavigateBack={this.tableTransition}
-                  /> */}
+                  />
                 </Grid.Column>
                 <Grid.Column
                   mobile={8}

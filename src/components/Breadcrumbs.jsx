@@ -7,7 +7,9 @@ class Breadcrumbs extends Component {
   componentDidMount() {}
 
   render() {
+    debugger;
     const name = this.props.imageInfo.key;
+    // const name = ((this.props.tab === 'pepplot') || (this.props.enrichmentNameLoaded)) ? this.props.imageInfo.key : "";
     const BreadcrumbPopupStyle = {
       backgroundColor: '2E2E2E',
       borderBottom: '2px solid #FF4400',

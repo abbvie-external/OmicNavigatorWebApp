@@ -23,6 +23,7 @@ class Enrichment extends Component {
     this.state = {
       isValidSearchEnrichment: false,
       isSearching: false,
+      // annotationData: [],
       enrichmentResults: [],
       enrichmentColumns: [],
       enrichmentView: 'table',

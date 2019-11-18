@@ -31,7 +31,8 @@ class Tabs extends Component {
         pepplotProteinSite: proteinSiteFromUrl || '',
         enrichmentStudy: '',
         enrichmentModel: '',
-        enrichmentAnnotation: ''
+        enrichmentAnnotation: '',
+        pValueType: 'nominal'
       };
     } else {
       this.state = {
@@ -86,6 +87,7 @@ class Tabs extends Component {
   };
 
   handleSearchCriteriaToTop = (changes, tab) => {
+    debugger;
     if (tab === 'pepplot') {
       this.setState({
         pepplotStudy: changes.pepplotStudy || '',
