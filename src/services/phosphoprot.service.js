@@ -44,6 +44,14 @@ class PhosphoprotService {
     });
   }
 
+  ocpuDataCallAlt(method, obj) {
+    return new Promise(function(resolve, reject) {
+      window.ocpu.call(method, obj, function(session) {
+        session.getObject('.val').then(response => resolve(response));
+      });
+    });
+  }
+
   async getTestData(model, test, study) {
     this.setUrl();
     const obj = { testCategory: model, test: test, study: study };
@@ -112,7 +120,7 @@ class PhosphoprotService {
 
   async getDatabaseInfo(study, test) {
     this.setUrl();
-    const promise = this.ocpuDataCall('getDatabases', {
+    const promise = this.ocpuDataCallAlt('getDatabases', {
       study: study,
       database: test
     });
@@ -122,7 +130,7 @@ class PhosphoprotService {
 
   async getBarcodeData(study, model, annotation, test, term) {
     this.setUrl();
-    const promise = this.ocpuDataCall('getBarcodeData', {
+    const promise = this.ocpuDataCallAlt('getBarcodeData', {
       study: study,
       model: model,
       database: annotation,

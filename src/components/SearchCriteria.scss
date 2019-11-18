@@ -55,6 +55,12 @@
     .greyText {
       opacity: .15 !important;
       font-weight: bold;
+      font-size: 13px;
+    }
+
+    .normalText {
+      font-weight: bold;
+      font-size: 13px;
     }
 
     .ui.positive.button {
@@ -66,10 +72,6 @@
     //   // padding: .2em 1em .2em !important;
     //   // font-size: 1rem !important;
     // }
-
-    .normalText {
-      font-weight: bold;
-    }
     
     .UpsetContainer {
       padding: 0px 20px 0px 20px !important;

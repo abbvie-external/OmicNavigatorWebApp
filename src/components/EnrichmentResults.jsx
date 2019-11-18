@@ -46,11 +46,13 @@ class EnrichmentResults extends Component {
       currentSVGs: [],
       isTestSelected: false,
       isTestDataLoaded: false,
-      barcodeData: [],
       barcodeSettings: {
+        barcodeData: [],
+        chartSize: { height: '200', width: '960' },
         lineID: '',
         statLabel: {},
         statistic: '',
+        logFC: '',
         highLabel: {},
         lowLabel: {},
         highStat: null,
@@ -130,39 +132,46 @@ class EnrichmentResults extends Component {
             dataItem.Annotation = _.find(annotationData, {
               Description: dataItem.Description
             }).Key;
+            let term = dataItem.Annotation;
             imageInfo.title = test + ':' + dataItem.Annotation;
 
+            // phosphoprotService
+            //   .getTestData(enrichmentModel, test, enrichmentStudy + 'plots')
+            //   .then(testDataResponse => {
+            //     let result = testDataResponse.map(obj => {
+            //       if (
+            //         enrichmentModel ===
+            //         'Treatment and/or Strain Differential Phosphorylation'
+            //       ) {
+            //         return Math.abs(obj.t);
+            //       } else {
+            //         return Math.abs(obj.F);
+            //       }
+            //     });
+            //     let sorted = result.slice().sort(function(a, b) {
+            //       return a - b;
+            //     });
+            // xLargest = Math.ceil(sorted[sorted.length - 1]);
             phosphoprotService
-              .getTestData(enrichmentModel, test, enrichmentStudy + 'plots')
-              .then(testDataResponse => {
-                let result = testDataResponse.map(obj => {
-                  if (
-                    enrichmentModel ===
-                    'Treatment and/or Strain Differential Phosphorylation'
-                  ) {
-                    return Math.abs(obj.t);
-                  } else {
-                    // this.splitter.collapsedChange.emit(true);
-                    return Math.abs(obj.F);
-                  }
-                });
-                let sorted = result.slice().sort(function(a, b) {
-                  return a - b;
-                });
-                xLargest = Math.ceil(sorted[sorted.length - 1]);
-                phosphoprotService
-                  .getBarcodeData(
-                    enrichmentStudy + 'plots',
-                    enrichmentModel,
-                    enrichmentAnnotation,
-                    test,
-                    dataItem.Annotation
-                  )
-                  .then(barcodeDataResponse => {
-                    let obj = JSON.parse(barcodeDataResponse['object'][0]);
-                    showBarcodePlotCb(dataItem, obj, test, xLargest);
-                  });
+              .getBarcodeData(
+                enrichmentStudy + 'plots',
+                enrichmentModel,
+                enrichmentAnnotation,
+                test,
+                dataItem.Annotation
+              )
+              .then(barcodeDataResponse => {
+                let BardcodeInfoObj = JSON.parse(barcodeDataResponse['object']);
+                let highest = barcodeDataResponse['highest'][0];
+                // if (!this.state.modelsToRenderViolin.includes(this.enrichmentModel)){
+                //   this.setState({ sizeVal = '0%' )};
+                // } else {
+                //   this.setState({ sizeVal = '50%')};
+                // }
+
+                showBarcodePlotCb(dataItem, BardcodeInfoObj, test, highest);
               });
+            // });
           });
       };
     };
@@ -170,17 +179,55 @@ class EnrichmentResults extends Component {
     return addParams;
   };
 
-  showBarcodePlot = (dataItem, barcode, test, largest) => {
+  // setHeight(e) {
+  //   let bHeight = e;
+  //   let splitterHeight = this.dialogHeight - 77;
+  //   let height = (100 - Math.ceil(((splitterHeight - bHeight) / splitterHeight) * 100) - 1.35);
+  //   this.s = height.toString() + "%";
+  // }
+
+  calculateHeight() {
+    var h = Math.max(
+      document.documentElement.clientHeight,
+      window.innerHeight || 0
+    );
+    return h;
+  }
+
+  calculateWidth() {
+    var w = Math.max(
+      document.documentElement.clientWidth,
+      window.innerWidth || 0
+    );
+    return w;
+  }
+
+  // sizeChange(event) {
+  //   let splitter = document.getElementById('left-splitter');
+  //   if (event.substring(0, 2) > 50) {
+  //     console.log('over')
+  //     splitter.setAttribute('class', 'show-y-scroll');
+  //   } else {
+  //     console.log('under')
+  //     splitter.setAttribute('class', 'hide-y-scroll')
+  //   }
+  // }
+
+  showBarcodePlot = (dataItem, barcode, test, highest) => {
+    let containerWidth = this.calculateWidth() * 0.95;
+    let containerHeight = this.calculateHeight() * 0.95;
     this.setState({
       isTestDataLoaded: true,
-      barcodeData: barcode,
       barcodeSettings: {
+        barcodeData: barcode,
+        chartSize: { height: 330, width: containerWidth - 500 },
         lineID: '',
         statLabel: barcode[0].statLabel,
         statistic: 'statistic',
+        logFC: 'logFC',
         highLabel: barcode[0].highLabel,
         lowLabel: barcode[0].lowLabel,
-        highStat: largest,
+        highStat: highest,
         enableBrush: true
       }
     });

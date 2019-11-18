@@ -10,9 +10,6 @@ import SVGPlot from './SVGPlot';
 import BarcodePlot from './BarcodePlot';
 
 class SplitPanesContainer extends Component {
-  static defaultProps = {
-    isTestDataLoaded: false
-  };
   constructor(props) {
     super(props);
     this.state = {
@@ -81,6 +78,8 @@ class SplitPanesContainer extends Component {
                   <div>
                     <BarcodePlot
                       className="BarcodePlotContainer"
+                      {...this.state}
+                      {...this.props}
                       data={barcodeData}
                       settings={barcodeSettings}
                     />
@@ -126,15 +125,17 @@ class SplitPanesContainer extends Component {
                 <SplitPane
                   className="SplitPanesWrapper"
                   split="horizontal"
-                  defaultSize={225}
+                  defaultSize={275}
                   minSize={200}
-                  maxSize={300}
+                  maxSize={350}
                 >
                   <div>
                     <BarcodePlot
                       className="BarcodePlotContainer"
                       data={barcodeData}
                       settings={barcodeSettings}
+                      {...this.state}
+                      {...this.props}
                     />
                   </div>
                   <SplitPane
