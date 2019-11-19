@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { Grid, Dimmer, Loader } from 'semantic-ui-react';
-import Breadcrumbs from '../Shared/Breadcrumbs';
+import EnrichmentBreadcrumbs from './EnrichmentBreadcrumbs';
 // import ButtonActions from './ButtonActions';
 // import PlotSVG from './PlotSVG';
 import SplitPane from 'react-split-pane';
@@ -44,7 +44,7 @@ class SplitPanesContainer extends Component {
     } else {
       if (enrichmentModel === 'Timecourse Differential Phosphorylation') {
         return (
-          <div className="">
+          <div className="ThreePlotsWrapper">
             <Grid columns={2} className="">
               <Grid.Row className="ActionsRow">
                 <Grid.Column
@@ -53,7 +53,7 @@ class SplitPanesContainer extends Component {
                   largeScreen={8}
                   widescreen={8}
                 >
-                  <Breadcrumbs
+                  <EnrichmentBreadcrumbs
                     {...this.props}
                     // onNavigateBack={this.tableTransition}
                   />
@@ -98,7 +98,7 @@ class SplitPanesContainer extends Component {
         );
       } else {
         return (
-          <div className="">
+          <div className="ThreePlotsWrapper">
             <Grid columns={2} className="">
               <Grid.Row className="ActionsRow">
                 <Grid.Column
@@ -107,7 +107,7 @@ class SplitPanesContainer extends Component {
                   largeScreen={8}
                   widescreen={8}
                 >
-                  <Breadcrumbs
+                  <EnrichmentBreadcrumbs
                     {...this.props}
                     // onNavigateBack={this.tableTransition}
                   />

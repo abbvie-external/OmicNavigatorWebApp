@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { Grid, Dimmer, Loader } from 'semantic-ui-react';
-import Breadcrumbs from '../Shared/Breadcrumbs';
+import PepplotBreadcrumbs from './PepplotBreadcrumbs';
 import ButtonActions from '../Shared/ButtonActions';
 import PepplotAccordion from './PepplotAccordion';
 import SVGPlot from '../Shared/SVGPlot';
@@ -69,7 +69,7 @@ class PepplotPlot extends Component {
           <Grid columns={2} className="">
             <Grid.Row className="ActionsRow">
               <Grid.Column mobile={8} tablet={8} largeScreen={8} widescreen={8}>
-                <Breadcrumbs
+                <PepplotBreadcrumbs
                   {...this.props}
                   // onNavigateBack={this.tableTransition}
                 />

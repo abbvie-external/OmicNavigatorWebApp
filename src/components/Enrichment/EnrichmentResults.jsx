@@ -34,6 +34,8 @@ class EnrichmentResults extends Component {
     super(props);
     this.state = {
       annotationData: [],
+      enrichmentDataItem: [],
+      enrichmentTerm: '',
       treeDataRaw: [],
       treeData: [],
       treeDataColumns: [],
@@ -89,10 +91,12 @@ class EnrichmentResults extends Component {
     ) => {
       let self = this;
       return function() {
-        debugger;
         testSelectedTransitionCb(true);
         let xLargest = 0;
         let imageInfo = { key: '', title: '', svg: [] };
+        // if (this.state.annotationData === []) {
+        // store this data and don't call the service after the first time!  and reset it when sc changes
+        // }
         phosphoprotService
           .getDatabaseInfo(enrichmentStudy + 'plots', enrichmentAnnotation)
           .then(annotationDataResponse => {
@@ -104,14 +108,16 @@ class EnrichmentResults extends Component {
               Description: dataItem.Description
             }).Key;
             let term = dataItem.Annotation;
-            debugger;
+
             self.setState({
               imageInfo: {
                 ...self.state.imageInfo,
                 key: `${test} : ${dataItem.Description}`,
                 title: `${test} : ${dataItem.Description}`
               },
-              enrichmentNameLoaded: true
+              enrichmentNameLoaded: true,
+              enrichmentDataItem: dataItem,
+              enrichmentTerm: term
             });
 
             phosphoprotService

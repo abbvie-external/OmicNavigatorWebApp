@@ -15,7 +15,6 @@ export function updateUrl(
     // clear url
     propsParam.history.push('');
     if (type === 'tabChange') {
-      debugger;
       lastTabIndex = stateParam.activeIndex;
       tabIndex = lastTabIndex === 3 ? 2 : 3;
       tab = tabIndex === 3 ? 'enrichment' : 'pepplot';

@@ -1,15 +1,13 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { Breadcrumb, Icon, Popup } from 'semantic-ui-react';
-import './Breadcrumbs.scss';
+import '../Shared/Breadcrumbs.scss';
 
-class Breadcrumbs extends Component {
+class PepplotBreadcrumbs extends Component {
   componentDidMount() {}
 
   render() {
-    debugger;
     const name = this.props.imageInfo.key;
-    // const name = ((this.props.tab === 'pepplot') || (this.props.enrichmentNameLoaded)) ? this.props.imageInfo.key : "";
     const BreadcrumbPopupStyle = {
       backgroundColor: '2E2E2E',
       borderBottom: '2px solid #FF4400',
@@ -24,13 +22,10 @@ class Breadcrumbs extends Component {
       <div className="BreadcrumbContainer">
         <div className="deviceMargin">
           <Breadcrumb size="large">
-            {/* <Link to={this.props.history.location.pathname}> */}
-            {/* <Link onClick={this.props.onNavigateBack()}> */}
             <Breadcrumb.Section className="BreadcrumbLink">
               <Popup
                 trigger={
                   <Icon name="table" onClick={this.props.onBackToTable} />
-                  // <Icon name="table" onClick={this.props.onNavigateBack} />
                 }
                 style={BreadcrumbPopupStyle}
                 inverted
@@ -39,7 +34,6 @@ class Breadcrumbs extends Component {
                 content="Back To Table"
               />
             </Breadcrumb.Section>
-            {/* </Link> */}
             <Breadcrumb.Divider icon="right chevron" />
             <Breadcrumb.Section active={true}>
               <Popup
@@ -60,7 +54,7 @@ class Breadcrumbs extends Component {
   }
 }
 
-export default withRouter(Breadcrumbs);
+export default withRouter(PepplotBreadcrumbs);
 
 function splitValue(value) {
   if (value) {

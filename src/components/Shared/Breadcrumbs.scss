@@ -7,7 +7,19 @@
       cursor: pointer !important;
     }
 
+    .ExternalSiteIcon {
+      margin-left: 10px;
+      height: 20px;
+      width: 20px;
+      cursor: pointer;
+    }
+    
+    .ExternalSiteIcon:hover {
+      transform: scale(1.2);
+    }
+
     .active {
       color: #FF4400 !important;
     }
   }
+

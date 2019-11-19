@@ -75,6 +75,10 @@ class Tabs extends Component {
   };
 
   handleTabChange = (e, { activeIndex }) => {
+    let newTab = activeIndex === 3 ? 'pepplot' : 'enrichment';
+    this.setState({
+      tab: newTab
+    });
     updateUrl(
       this.props,
       this.state,
@@ -87,9 +91,9 @@ class Tabs extends Component {
   };
 
   handleSearchCriteriaToTop = (changes, tab) => {
-    debugger;
     if (tab === 'pepplot') {
       this.setState({
+        tab: 'pepplot',
         pepplotStudy: changes.pepplotStudy || '',
         pepplotModel: changes.pepplotModel || '',
         pepplotTest: changes.pepplotTest || '',
@@ -97,6 +101,7 @@ class Tabs extends Component {
       });
     } else if (tab === 'enrichment') {
       this.setState({
+        tab: 'enrichment',
         enrichmentStudy: changes.enrichmentStudy || '',
         enrichmentModel: changes.enrichmentModel || '',
         enrichmentAnnotation: changes.enrichmentAnnotation || ''

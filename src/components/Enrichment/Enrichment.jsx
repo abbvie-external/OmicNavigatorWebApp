@@ -7,7 +7,11 @@ import EnrichmentResults from './EnrichmentResults';
 import TransitionActive from '../Transitions/TransitionActive';
 import TransitionStill from '../Transitions/TransitionStill';
 import ButtonActions from '../Shared/ButtonActions';
-import { formatNumberForDisplay, splitValue } from '../Shared/helpers';
+import {
+  formatNumberForDisplay,
+  splitValue,
+  getIconInfo
+} from '../Shared/helpers';
 // import { phosphoprotService } from '../services/phosphoprot.service';
 import _ from 'lodash';
 import './Enrichment.scss';
@@ -23,6 +27,8 @@ class Enrichment extends Component {
     this.state = {
       isValidSearchEnrichment: false,
       isSearching: false,
+      enrichmentIcon: '',
+      enrichmentIconText: '',
       // annotationData: [],
       enrichmentResults: [],
       enrichmentColumns: [],
@@ -159,6 +165,11 @@ class Enrichment extends Component {
       icon = phosphosite_icon;
       iconText = 'PhosphoSitePlus';
     }
+
+    this.setState({
+      enrichmentIcon: icon,
+      enrichmentIconText: iconText
+    });
 
     let allKeys = _.keys(enrResults[0]);
 
