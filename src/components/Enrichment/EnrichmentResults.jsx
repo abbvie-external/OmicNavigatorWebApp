@@ -63,7 +63,22 @@ class EnrichmentResults extends Component {
     };
   }
 
-  componentDidMount() {}
+  componentDidMount() {
+    const DescriptionAndTest = this.props.enrichmentDescriptionAndTest || '';
+    // if (DescriptionAndTest !== '') {
+    //   const Proteins = this.props.pepplotResults;
+    //   const Index = _.findIndex(Proteins, function(p) {
+    //     return firstValue(p.Protein_Site) === ProteinSite;
+    //   });
+    //   const dataItem = Proteins[Index];
+    //   this.getProteinPageFromUrl(
+    //     this.getProteinData,
+    //     this.getPlot,
+    //     this.props.pepplotModel,
+    //     dataItem
+    //   );
+    // }
+  }
 
   showPhosphositePlus = dataItem => {
     return function() {
@@ -92,10 +107,19 @@ class EnrichmentResults extends Component {
       let self = this;
       return function() {
         testSelectedTransitionCb(true);
+        const TestSiteVar = `${test}:${dataItem.Description}`;
+        self.props.onSearchCriteriaChange(
+          {
+            enrichmentStudy: self.props.enrichmentStudy || '',
+            enrichmentModel: self.props.enrichmentModel || '',
+            enrichmentAnnotation: self.props.enrichmentAnnotation || '',
+            enrichmentDescriptionAndTest: TestSiteVar || ''
+          },
+          false
+        );
         let xLargest = 0;
         let imageInfo = { key: '', title: '', svg: [] };
 
-        debugger;
         if (self.state.annotationData.length == 0) {
           phosphoprotService
             .getDatabaseInfo(enrichmentStudy + 'plots', enrichmentAnnotation)
@@ -112,8 +136,8 @@ class EnrichmentResults extends Component {
               self.setState({
                 imageInfo: {
                   ...self.state.imageInfo,
-                  key: `${test} : ${dataItem.Description}`,
-                  title: `${test} : ${dataItem.Description}`
+                  key: `${test}:${dataItem.Description}`,
+                  title: `${test}:${dataItem.Description}`
                 },
                 enrichmentNameLoaded: true,
                 enrichmentDataItem: dataItem,
@@ -145,7 +169,6 @@ class EnrichmentResults extends Component {
             });
           //stored annodationdata and won't call the service after the first time...reset it when sc changes
         } else {
-          debugger;
           dataItem.Annotation = _.find(self.state.annotationData, {
             Description: dataItem.Description
           }).Key;
@@ -186,35 +209,63 @@ class EnrichmentResults extends Component {
     };
 
     addParams.getLink = (enrichmentStudy, enrichmentAnnotation, dataItem) => {
+      let self = this;
       return function() {
-        // phosphoprotService
-        //   .getDatabaseInfo(enrichmentStudy + 'plots', enrichmentAnnotation)
-        //   .then(annotationDataResponse => {
-        //     const annotationData = JSON.parse(annotationDataResponse);
-        dataItem.Annotation = _.find(this.state.annotationData, {
-          Description: dataItem.Description
-        }).Key;
-        const database = enrichmentAnnotation;
-        if (database === 'REACTOME') {
-          window.open(
-            'https://reactome.org/content/detail/' + dataItem.Annotation,
-            '_blank'
-          );
-        } else if (database.substring(0, 2) === 'GO') {
-          window.open(
-            'http://amigo.geneontology.org/amigo/term/' + dataItem.Annotation,
-            '_blank'
-          );
-        } else if (database.substring(0, 4) === 'msig') {
-          window.open(
-            'http://software.broadinstitute.org/gsea/msigdb/cards/' +
-              dataItem.Annotation,
-            '_blank'
-          );
-        } else if (database === 'PSP') {
-          this.showPhosphositePlus('', dataItem);
+        if (self.state.annotationData.length == 0) {
+          phosphoprotService
+            .getDatabaseInfo(enrichmentStudy + 'plots', enrichmentAnnotation)
+            .then(annotationDataResponse => {
+              const annotationData = JSON.parse(annotationDataResponse);
+              dataItem.Annotation = _.find(self.state.annotationData, {
+                Description: dataItem.Description
+              }).Key;
+              const database = enrichmentAnnotation;
+              if (database === 'REACTOME') {
+                window.open(
+                  'https://reactome.org/content/detail/' + dataItem.Annotation,
+                  '_blank'
+                );
+              } else if (database.substring(0, 2) === 'GO') {
+                window.open(
+                  'http://amigo.geneontology.org/amigo/term/' +
+                    dataItem.Annotation,
+                  '_blank'
+                );
+              } else if (database.substring(0, 4) === 'msig') {
+                window.open(
+                  'http://software.broadinstitute.org/gsea/msigdb/cards/' +
+                    dataItem.Annotation,
+                  '_blank'
+                );
+              } else if (database === 'PSP') {
+                self.showPhosphositePlus('', dataItem);
+              }
+            });
+        } else {
+          dataItem.Annotation = _.find(self.state.annotationData, {
+            Description: dataItem.Description
+          }).Key;
+          const database = enrichmentAnnotation;
+          if (database === 'REACTOME') {
+            window.open(
+              'https://reactome.org/content/detail/' + dataItem.Annotation,
+              '_blank'
+            );
+          } else if (database.substring(0, 2) === 'GO') {
+            window.open(
+              'http://amigo.geneontology.org/amigo/term/' + dataItem.Annotation,
+              '_blank'
+            );
+          } else if (database.substring(0, 4) === 'msig') {
+            window.open(
+              'http://software.broadinstitute.org/gsea/msigdb/cards/' +
+                dataItem.Annotation,
+              '_blank'
+            );
+          } else if (database === 'PSP') {
+            self.showPhosphositePlus('', dataItem);
+          }
         }
-        // });
       };
     };
 
@@ -280,15 +331,15 @@ class EnrichmentResults extends Component {
       isTestSelected: false,
       enrichmentNameLoaded: false
     });
-    // push url prop for selected back to ''
-    // this.props.onSearchCriteriaChange(
-    //   {
-    //     enrichmentStudy: this.props.enrichmentStudy || '',
-    //     enrichmentModel: this.props.enrichmentModel || '',
-    //     enrichmentAnnotation: this.props.enrichmentAnnotation || '',
-    //   },
-    //   false
-    // );
+    this.props.onSearchCriteriaChange(
+      {
+        enrichmentStudy: this.props.enrichmentStudy || '',
+        enrichmentModel: this.props.enrichmentModel || '',
+        enrichmentAnnotation: this.props.enrichmentAnnotation || '',
+        enrichmentDescriptionAndTest: ''
+      },
+      false
+    );
   };
 
   testSelectedTransition = bool => {

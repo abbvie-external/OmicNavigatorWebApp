@@ -29,7 +29,6 @@ class Enrichment extends Component {
       isSearching: false,
       enrichmentIcon: '',
       enrichmentIconText: '',
-      // annotationData: [],
       enrichmentResults: [],
       enrichmentColumns: [],
       enrichmentView: 'table',

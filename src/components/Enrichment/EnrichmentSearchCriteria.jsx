@@ -116,6 +116,7 @@ class EnrichmentSearchCriteria extends Component {
     const m = this.props.enrichmentModel || '';
     const a = this.props.enrichmentAnnotation || '';
     const t = this.props.pValueType || 'nominal';
+    const d = this.props.enrichmentDescriptionAndTest || '';
 
     if (s !== '') {
       this.setState({
@@ -158,7 +159,8 @@ class EnrichmentSearchCriteria extends Component {
         {
           enrichmentStudy: s,
           enrichmentModel: m,
-          enrichmentAnnotation: a
+          enrichmentAnnotation: a,
+          enrichmentDescriptionAndTest: d
         },
         false
       );
@@ -178,6 +180,7 @@ class EnrichmentSearchCriteria extends Component {
           });
         });
     }
+
     this.populateStudies();
   }
 
@@ -203,7 +206,8 @@ class EnrichmentSearchCriteria extends Component {
       {
         [name]: value,
         enrichmentModel: '',
-        enrichmentAnnotation: ''
+        enrichmentAnnotation: '',
+        enrichmentDescriptionAndTest: ''
       },
       true
     );
@@ -229,7 +233,8 @@ class EnrichmentSearchCriteria extends Component {
       {
         enrichmentStudy: this.props.enrichmentStudy,
         [name]: value,
-        enrichmentAnnotation: ''
+        enrichmentAnnotation: '',
+        enrichmentDescriptionAndTest: ''
       },
       true
     );
@@ -259,7 +264,8 @@ class EnrichmentSearchCriteria extends Component {
       {
         enrichmentStudy: this.props.enrichmentStudy,
         enrichmentModel: this.props.enrichmentModel,
-        [name]: value
+        [name]: value,
+        enrichmentDescriptionAndTest: ''
       },
       true
     );
@@ -349,7 +355,8 @@ class EnrichmentSearchCriteria extends Component {
       {
         enrichmentStudy: this.props.enrichmentStudy,
         enrichmentModel: this.props.enrichmentModel,
-        [name]: value
+        [name]: value,
+        enrichmentDescriptionAndTest: ''
       },
       true
     );

@@ -65,6 +65,8 @@ export function updateUrl(
       const enrichmentStudyQuery = stateParam.enrichmentStudy || '';
       const enrichmentModelQuery = stateParam.enrichmentModel || '';
       const enrichmentAnnotationQuery = stateParam.enrichmentAnnotation || '';
+      const enrichmentDescriptionAndTestQuery =
+        stateParam.enrichmentDescriptionAndTest || '';
       const enrichmentStudy = enrichmentStudyQuery.replace(/ /gi, '-');
       const enrichmentModelAndOr = enrichmentModelQuery.replace(/ /gi, '-');
       const enrichmentModel = enrichmentModelAndOr.replace('and/or', 'and+or');
@@ -72,8 +74,24 @@ export function updateUrl(
         / /gi,
         '-'
       );
+      const enrichmentDescriptionAndTest = enrichmentDescriptionAndTestQuery.replace(
+        / /gi,
+        '-'
+      );
 
-      if (enrichmentAnnotation !== '') {
+      if (enrichmentDescriptionAndTest !== '') {
+        propsParam.history.push(
+          tab +
+            '/' +
+            enrichmentStudy +
+            '/' +
+            enrichmentModel +
+            '/' +
+            enrichmentAnnotation +
+            '/' +
+            enrichmentDescriptionAndTest
+        );
+      } else if (enrichmentAnnotation !== '') {
         propsParam.history.push(
           tab +
             '/' +
@@ -146,6 +164,8 @@ export function updateUrl(
       const enrichmentModelQuery2 = stateChanges.enrichmentModel || '';
       const enrichmentAnnotationQuery2 =
         stateChanges.enrichmentAnnotation || '';
+      const enrichmentDescriptionAndTestQuery2 =
+        stateChanges.enrichmentDescriptionAndTest || '';
       const enrichmentStudy = enrichmentStudyQuery2.replace(/ /gi, '-');
       const enrichmentModelAndOr2 = enrichmentModelQuery2.replace(/ /gi, '-');
       const enrichmentModel = enrichmentModelAndOr2.replace('and/or', 'and+or');
@@ -153,8 +173,24 @@ export function updateUrl(
         / /gi,
         '-'
       );
+      const enrichmentDescriptionAndTest = enrichmentDescriptionAndTestQuery2.replace(
+        / /gi,
+        '-'
+      );
 
-      if (enrichmentAnnotation !== '') {
+      if (enrichmentDescriptionAndTest !== '') {
+        propsParam.history.push(
+          scTab +
+            '/' +
+            enrichmentStudy +
+            '/' +
+            enrichmentModel +
+            '/' +
+            enrichmentAnnotation +
+            '/' +
+            enrichmentDescriptionAndTest
+        );
+      } else if (enrichmentAnnotation !== '') {
         propsParam.history.push(
           scTab +
             '/' +

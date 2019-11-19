@@ -20,7 +20,7 @@ class Tabs extends Component {
         ? modelFromUrlAndOr.replace('and+or', 'and/or')
         : modelFromUrlAndOr;
     const testFromUrl = params[3] || '';
-    const proteinSiteFromUrl = params[4] || '';
+    const siteFromUrl = params[4] || '';
     if (tabFromUrl === 'pepplot') {
       this.state = {
         activeIndex: 2,
@@ -28,7 +28,7 @@ class Tabs extends Component {
         pepplotStudy: studyFromUrl || '',
         pepplotModel: modelFromUrl || '',
         pepplotTest: testFromUrl || '',
-        pepplotProteinSite: proteinSiteFromUrl || '',
+        pepplotProteinSite: siteFromUrl || '',
         enrichmentStudy: '',
         enrichmentModel: '',
         enrichmentAnnotation: '',
@@ -41,6 +41,7 @@ class Tabs extends Component {
         enrichmentStudy: studyFromUrl || '',
         enrichmentModel: modelFromUrl || '',
         enrichmentAnnotation: testFromUrl || '',
+        enrichmentDescriptionAndTest: siteFromUrl || '',
         pepplotStudy: '',
         pepplotModel: '',
         pepplotTest: '',
@@ -104,7 +105,8 @@ class Tabs extends Component {
         tab: 'enrichment',
         enrichmentStudy: changes.enrichmentStudy || '',
         enrichmentModel: changes.enrichmentModel || '',
-        enrichmentAnnotation: changes.enrichmentAnnotation || ''
+        enrichmentAnnotation: changes.enrichmentAnnotation || '',
+        enrichmentDescriptionAndTest: changes.enrichmentDescriptionAndTest || ''
       });
     }
     updateUrl(
