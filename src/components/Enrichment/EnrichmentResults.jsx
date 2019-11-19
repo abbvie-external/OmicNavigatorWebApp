@@ -94,53 +94,94 @@ class EnrichmentResults extends Component {
         testSelectedTransitionCb(true);
         let xLargest = 0;
         let imageInfo = { key: '', title: '', svg: [] };
-        // if (this.state.annotationData === []) {
-        // store this data and don't call the service after the first time!  and reset it when sc changes
-        // }
-        phosphoprotService
-          .getDatabaseInfo(enrichmentStudy + 'plots', enrichmentAnnotation)
-          .then(annotationDataResponse => {
-            const annotationDataParsed = JSON.parse(annotationDataResponse);
-            self.setState({
-              annotationData: annotationDataParsed
-            });
-            dataItem.Annotation = _.find(annotationDataParsed, {
-              Description: dataItem.Description
-            }).Key;
-            let term = dataItem.Annotation;
 
-            self.setState({
-              imageInfo: {
-                ...self.state.imageInfo,
-                key: `${test} : ${dataItem.Description}`,
-                title: `${test} : ${dataItem.Description}`
-              },
-              enrichmentNameLoaded: true,
-              enrichmentDataItem: dataItem,
-              enrichmentTerm: term
-            });
-
-            phosphoprotService
-              .getBarcodeData(
-                enrichmentStudy + 'plots',
-                enrichmentModel,
-                enrichmentAnnotation,
-                test,
-                dataItem.Annotation
-              )
-              .then(barcodeDataResponse => {
-                let BardcodeInfoObj = JSON.parse(barcodeDataResponse['object']);
-                let highest = barcodeDataResponse['highest'][0];
-                // if (!this.state.modelsToRenderViolin.includes(this.enrichmentModel)){
-                //   this.setState({ sizeVal = '0%' )};
-                // } else {
-                //   this.setState({ sizeVal = '50%')};
-                // }
-
-                showBarcodePlotCb(dataItem, BardcodeInfoObj, test, highest);
+        debugger;
+        if (self.state.annotationData.length == 0) {
+          phosphoprotService
+            .getDatabaseInfo(enrichmentStudy + 'plots', enrichmentAnnotation)
+            .then(annotationDataResponse => {
+              const annotationDataParsed = JSON.parse(annotationDataResponse);
+              self.setState({
+                annotationData: annotationDataParsed
               });
-            // });
+              dataItem.Annotation = _.find(annotationDataParsed, {
+                Description: dataItem.Description
+              }).Key;
+              let term = dataItem.Annotation;
+
+              self.setState({
+                imageInfo: {
+                  ...self.state.imageInfo,
+                  key: `${test} : ${dataItem.Description}`,
+                  title: `${test} : ${dataItem.Description}`
+                },
+                enrichmentNameLoaded: true,
+                enrichmentDataItem: dataItem,
+                enrichmentTerm: term
+              });
+
+              phosphoprotService
+                .getBarcodeData(
+                  enrichmentStudy + 'plots',
+                  enrichmentModel,
+                  enrichmentAnnotation,
+                  test,
+                  dataItem.Annotation
+                )
+                .then(barcodeDataResponse => {
+                  let BardcodeInfoObj = JSON.parse(
+                    barcodeDataResponse['object']
+                  );
+                  let highest = barcodeDataResponse['highest'][0];
+                  // if (!this.state.modelsToRenderViolin.includes(this.enrichmentModel)){
+                  //   this.setState({ sizeVal = '0%' )};
+                  // } else {
+                  //   this.setState({ sizeVal = '50%')};
+                  // }
+
+                  showBarcodePlotCb(dataItem, BardcodeInfoObj, test, highest);
+                });
+              // });
+            });
+          //stored annodationdata and won't call the service after the first time...reset it when sc changes
+        } else {
+          debugger;
+          dataItem.Annotation = _.find(self.state.annotationData, {
+            Description: dataItem.Description
+          }).Key;
+          let term = dataItem.Annotation;
+
+          self.setState({
+            imageInfo: {
+              ...self.state.imageInfo,
+              key: `${test} : ${dataItem.Description}`,
+              title: `${test} : ${dataItem.Description}`
+            },
+            enrichmentNameLoaded: true,
+            enrichmentDataItem: dataItem,
+            enrichmentTerm: term
           });
+
+          phosphoprotService
+            .getBarcodeData(
+              enrichmentStudy + 'plots',
+              enrichmentModel,
+              enrichmentAnnotation,
+              test,
+              dataItem.Annotation
+            )
+            .then(barcodeDataResponse => {
+              let BardcodeInfoObj = JSON.parse(barcodeDataResponse['object']);
+              let highest = barcodeDataResponse['highest'][0];
+              // if (!this.state.modelsToRenderViolin.includes(this.enrichmentModel)){
+              //   this.setState({ sizeVal = '0%' )};
+              // } else {
+              //   this.setState({ sizeVal = '50%')};
+              // }
+
+              showBarcodePlotCb(dataItem, BardcodeInfoObj, test, highest);
+            });
+        }
       };
     };
 

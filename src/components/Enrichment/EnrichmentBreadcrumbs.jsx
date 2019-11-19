@@ -101,17 +101,25 @@ class Breadcrumbs extends Component {
             content={name}
           />
           <span>
-            {/* {this.getExternalLink()} */}
-            <img
-              src={enrichmentIcon}
-              alt={enrichmentIconText}
-              className="ExternalSiteIcon"
-              onClick={this.getLink(
-                enrichmentStudy,
-                enrichmentAnnotation,
-                enrichmentDataItem,
-                enrichmentTerm
-              )}
+            <Popup
+              trigger={
+                <img
+                  src={enrichmentIcon}
+                  alt={enrichmentIconText}
+                  className="ExternalSiteIcon"
+                  onClick={this.getLink(
+                    enrichmentStudy,
+                    enrichmentAnnotation,
+                    enrichmentDataItem,
+                    enrichmentTerm
+                  )}
+                />
+              }
+              style={BreadcrumbPopupStyle}
+              className="TablePopupValue"
+              content={enrichmentIconText}
+              inverted
+              basic
             />
           </span>
         </Fragment>
