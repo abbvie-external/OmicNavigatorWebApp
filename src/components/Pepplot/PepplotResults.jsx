@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import { phosphoprotService } from '../services/phosphoprot.service';
+import { phosphoprotService } from '../../services/phosphoprot.service';
 import { withRouter } from 'react-router-dom';
-import ButtonActions from './ButtonActions';
-import PlotContainer from './PlotContainer';
-import LoaderActivePlots from './LoaderActivePlots';
+import ButtonActions from '../Shared/ButtonActions';
+import PepplotPlot from './PepplotPlot';
+import LoaderActivePlots from '../Transitions/LoaderActivePlots';
 import _ from 'lodash';
 import DOMPurify from 'dompurify';
 import QHGrid from '../utility/QHGrid';
@@ -380,11 +380,11 @@ class PepplotResults extends Component {
     } else {
       return (
         <div>
-          <PlotContainer
+          <PepplotPlot
             {...this.props}
             {...this.state}
             onBackToTable={this.backToTable}
-          ></PlotContainer>
+          ></PepplotPlot>
         </div>
       );
     }

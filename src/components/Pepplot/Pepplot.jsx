@@ -3,15 +3,15 @@ import { Grid, Popup, Sidebar } from 'semantic-ui-react';
 import { withRouter } from 'react-router-dom';
 import PepplotSearchCriteria from './PepplotSearchCriteria';
 import PepplotResults from './PepplotResults';
-import TransitionActive from './TransitionActive';
-import TransitionStill from './TransitionStill';
-import ButtonActions from './ButtonActions';
-import { formatNumberForDisplay, splitValue } from '../helpers';
-import phosphosite_icon from '../resources/phosphosite.ico';
+import TransitionActive from '../Transitions/TransitionActive';
+import TransitionStill from '../Transitions/TransitionStill';
+import ButtonActions from '../Shared/ButtonActions';
+import { formatNumberForDisplay, splitValue } from '../Shared/helpers';
+import phosphosite_icon from '../../resources/phosphosite.ico';
 
 import _ from 'lodash';
 import './Pepplot.scss';
-import './Table.scss';
+import '../Shared/Table.scss';
 
 class Pepplot extends Component {
   constructor(props) {
@@ -22,11 +22,11 @@ class Pepplot extends Component {
       isProteinSelected: false,
       pepplotResults: [],
       pepplotColumns: [],
-      upsetPlotInfo: {
+      multisetPlotInfo: {
         title: '',
         svg: []
       },
-      upsetPlotAvailable: false,
+      multisetPlotAvailable: false,
       animation: 'uncover',
       direction: 'left',
       visible: false,
@@ -74,21 +74,21 @@ class Pepplot extends Component {
     });
     if (scChange) {
       this.setState({
-        upsetPlotAvailable: false
+        multisetPlotAvailable: false
       });
     }
   };
 
   disablePlot = () => {
     this.setState({
-      upsetPlotAvailable: false
+      multisetPlotAvailable: false
     });
   };
 
   hidePGrid = () => {
     this.setState({
       isValidSearchPepplot: false,
-      upsetPlotAvailable: false,
+      multisetPlotAvailable: false,
       plotButtonActive: false,
       visible: false
     });
@@ -105,13 +105,13 @@ class Pepplot extends Component {
   handleDirectionChange = direction => () =>
     this.setState({ direction: direction, visible: false });
 
-  handleUpsetPlot = upsetPlotResults => {
+  handleMultisetPlot = multisetPlotResults => {
     this.setState({
-      upsetPlotInfo: {
-        title: upsetPlotResults.svgInfo.plotType,
-        svg: upsetPlotResults.svgInfo.svg
+      multisetPlotInfo: {
+        title: multisetPlotResults.svgInfo.plotType,
+        svg: multisetPlotResults.svgInfo.svg
       },
-      upsetPlotAvailable: true
+      multisetPlotAvailable: true
     });
   };
 
@@ -320,7 +320,7 @@ class Pepplot extends Component {
   render() {
     const pepplotView = this.getView(this.state);
 
-    const { upsetPlotInfo, animation, direction, visible } = this.state;
+    const { multisetPlotInfo, animation, direction, visible } = this.state;
     const VerticalSidebar = ({ animation, visible }) => (
       <Sidebar
         as={'div'}
@@ -345,9 +345,9 @@ class Pepplot extends Component {
           </Grid.Row>
         </Grid>
         <div
-          className="UpsetSvgSpan"
-          id="UpsetSvgOuter"
-          dangerouslySetInnerHTML={{ __html: upsetPlotInfo.svg }}
+          className="MultisetSvgSpan"
+          id="MultisetSvgOuter"
+          dangerouslySetInnerHTML={{ __html: multisetPlotInfo.svg }}
         ></div>
       </Sidebar>
     );
@@ -369,7 +369,7 @@ class Pepplot extends Component {
             onSearchCriteriaChange={this.handleSearchCriteriaChange}
             onSearchCriteriaReset={this.hidePGrid}
             onDisablePlot={this.disablePlot}
-            onGetUpsetPlot={this.handleUpsetPlot}
+            onGetMultisetPlot={this.handleMultisetPlot}
             onHandlePlotAnimation={this.handlePlotAnimation}
             onMultisetQueried={this.handleMultisetQueried}
           />

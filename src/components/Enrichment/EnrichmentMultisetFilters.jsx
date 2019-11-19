@@ -1,9 +1,9 @@
 import React, { Component, Fragment } from 'react';
 import { Form, Select, Input } from 'semantic-ui-react';
 import * as d3 from 'd3';
-import './UpSetFilters.scss';
+import '../Shared/MultisetFilters.scss';
 
-class UpSetFilters extends Component {
+class EnrichmentMultisetFilters extends Component {
   componentDidMount() {
     const {
       uData,
@@ -14,7 +14,7 @@ class UpSetFilters extends Component {
       selectedCol,
       selectedOperator
     } = this.props;
-    this.makeUpset(
+    this.makeMultiset(
       uData,
       uAnchor,
       uSettings,
@@ -36,7 +36,7 @@ class UpSetFilters extends Component {
       selectedOperator
     } = this.props;
     if (uSettings !== prevProps.uSettings) {
-      this.makeUpset(
+      this.makeMultiset(
         uData,
         uAnchor,
         uSettings,
@@ -48,7 +48,7 @@ class UpSetFilters extends Component {
     }
   }
 
-  makeUpset(
+  makeMultiset(
     uData,
     uAnchor,
     uSettings,
@@ -57,16 +57,16 @@ class UpSetFilters extends Component {
     selectedCol,
     selectedOperator
   ) {
-    d3.selectAll('#upset-query')
+    d3.selectAll('#multiset-query')
       .selectAll('*')
       .remove();
     const base = d3
-      .selectAll('#upset-query')
+      .selectAll('#multiset-query')
       .append('div')
       .style('padding-bottom', '5px');
 
     if (uSettings.displayMetaData) {
-      this.prepareUpset(uData, uAnchor, uSettings, base);
+      this.prepareMultiset(uData, uAnchor, uSettings, base);
       const baseMetaSvg = base.append('svg');
       this.metaScript(
         baseMetaSvg,
@@ -272,7 +272,7 @@ class UpSetFilters extends Component {
     }
   }
 
-  prepareUpset(data, anchor, settings, base) {
+  prepareMultiset(data, anchor, settings, base) {
     const self = this;
     let dataset = data;
     if (settings.useAnchor && dataset.indexOf(anchor) < 0) {
@@ -731,7 +731,7 @@ class UpSetFilters extends Component {
         : 'Adjusted P Value';
     return (
       <Fragment>
-        <Form className="UpSetDropdownContainer">
+        <Form className="MultisetDropdownContainer">
           <Form.Group>
             <Form.Field
               control={Input}
@@ -768,10 +768,10 @@ class UpSetFilters extends Component {
             ></Form.Field>
           </Form.Group>
         </Form>
-        <p id="upset-query" className="UpSetQueryContainer"></p>
+        <p id="multiset-query" className="MultisetQueryContainer"></p>
       </Fragment>
     );
   }
 }
 
-export default UpSetFilters;
+export default EnrichmentMultisetFilters;

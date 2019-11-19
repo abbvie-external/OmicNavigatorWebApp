@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { Grid, Tab, Menu } from 'semantic-ui-react';
-import Pepplot from './Pepplot';
-import Enrichment from './Enrichment';
-import { updateUrl } from './UrlControl';
+import Pepplot from './Pepplot/Pepplot';
+import Enrichment from './Enrichment/Enrichment';
+import { updateUrl } from './Shared/UrlControl';
 
 class Tabs extends Component {
   constructor(props) {

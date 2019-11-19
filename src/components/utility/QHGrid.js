@@ -25,7 +25,7 @@ import moment from 'moment';
 
 // import excel_logo from './resources/excel.png';
 // Paul changed this - custom for Phosphoprotemoic Analyzer
-import excel_logo from '../resources/excel3.png';
+import excel_logo from '../../resources/excel3.png';
 //
 
 import './QHGrid.scss';

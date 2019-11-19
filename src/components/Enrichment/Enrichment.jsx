@@ -4,18 +4,18 @@ import { withRouter } from 'react-router-dom';
 import EnrichmentSearchCriteria from './EnrichmentSearchCriteria';
 import EnrichmentNetworkGraph from './EnrichmentNetworkGraph';
 import EnrichmentResults from './EnrichmentResults';
-import TransitionActive from './TransitionActive';
-import TransitionStill from './TransitionStill';
-import ButtonActions from './ButtonActions';
-import { formatNumberForDisplay, splitValue } from '../helpers';
+import TransitionActive from '../Transitions/TransitionActive';
+import TransitionStill from '../Transitions/TransitionStill';
+import ButtonActions from '../Shared/ButtonActions';
+import { formatNumberForDisplay, splitValue } from '../Shared/helpers';
 // import { phosphoprotService } from '../services/phosphoprot.service';
 import _ from 'lodash';
 import './Enrichment.scss';
-import './Table.scss';
-import msig_icon from '../resources/msig.ico';
-import phosphosite_icon from '../resources/phosphosite.ico';
-import reactome_icon from '../resources/reactome.jpg';
-import go_icon from '../resources/go.png';
+import '../Shared/Table.scss';
+import msig_icon from '../../resources/msig.ico';
+import phosphosite_icon from '../../resources/phosphosite.ico';
+import reactome_icon from '../../resources/reactome.jpg';
+import go_icon from '../../resources/go.png';
 
 class Enrichment extends Component {
   constructor(props) {
@@ -29,11 +29,11 @@ class Enrichment extends Component {
       enrichmentView: 'table',
       networkDataAvailable: false,
       networkData: {},
-      upsetPlotInfo: {
+      multisetPlotInfo: {
         title: '',
         svg: []
       },
-      upsetPlotAvailable: false,
+      multisetPlotAvailable: false,
       animation: 'uncover',
       direction: 'left',
       visible: false,
@@ -75,21 +75,21 @@ class Enrichment extends Component {
     });
     if (scChange) {
       this.setState({
-        upsetPlotAvailable: false
+        multisetPlotAvailable: false
       });
     }
   };
 
   disablePlot = () => {
     this.setState({
-      upsetPlotAvailable: false
+      multisetPlotAvailable: false
     });
   };
 
   hideEGrid = () => {
     this.setState({
       isValidSearchEnrichment: false,
-      upsetPlotAvailable: false,
+      multisetPlotAvailable: false,
       plotButtonActive: false,
       visible: false
     });
@@ -106,13 +106,13 @@ class Enrichment extends Component {
   handleDirectionChange = direction => () =>
     this.setState({ direction: direction, visible: false });
 
-  handleUpsetPlot = upsetPlotResults => {
+  handleMultisetPlot = multisetPlotResults => {
     this.setState({
-      upsetPlotInfo: {
-        title: upsetPlotResults.svgInfo.plotType,
-        svg: upsetPlotResults.svgInfo.svg
+      multisetPlotInfo: {
+        title: multisetPlotResults.svgInfo.plotType,
+        svg: multisetPlotResults.svgInfo.svg
       },
-      upsetPlotAvailable: true
+      multisetPlotAvailable: true
     });
   };
 
@@ -387,7 +387,7 @@ class Enrichment extends Component {
   render() {
     const enrichmentView = this.getView(this.state);
 
-    const { upsetPlotInfo, animation, direction, visible } = this.state;
+    const { multisetPlotInfo, animation, direction, visible } = this.state;
     const VerticalSidebar = ({ animation, visible }) => (
       <Sidebar
         as={'div'}
@@ -412,9 +412,9 @@ class Enrichment extends Component {
           </Grid.Row>
         </Grid>
         <div
-          className="UpsetSvgSpan"
-          id="UpsetSvgOuter"
-          dangerouslySetInnerHTML={{ __html: upsetPlotInfo.svg }}
+          className="MultisetSvgSpan"
+          id="MultisetSvgOuter"
+          dangerouslySetInnerHTML={{ __html: multisetPlotInfo.svg }}
         ></div>
       </Sidebar>
     );
@@ -439,7 +439,7 @@ class Enrichment extends Component {
             onSearchCriteriaChange={this.handleSearchCriteriaChange}
             onSearchCriteriaReset={this.hideEGrid}
             onDisablePlot={this.disablePlot}
-            onGetUpsetPlot={this.handleUpsetPlot}
+            onGetMultisetPlot={this.handleMultisetPlot}
             onHandlePlotAnimation={this.handlePlotAnimation}
           />
         </Grid.Column>

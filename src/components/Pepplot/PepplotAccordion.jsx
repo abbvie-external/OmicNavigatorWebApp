@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Accordion, Loader, Dimmer } from 'semantic-ui-react';
 // import _ from 'lodash';
 
-class PlotAccordion extends Component {
+class PepplotAccordion extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -84,4 +84,4 @@ class PlotAccordion extends Component {
   }
 }
 
-export default PlotAccordion;
+export default PepplotAccordion;

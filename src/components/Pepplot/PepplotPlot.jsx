@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { Grid, Dimmer, Loader } from 'semantic-ui-react';
-import Breadcrumbs from './Breadcrumbs';
-import ButtonActions from './ButtonActions';
-import PlotAccordion from './PlotAccordion';
-import SVGPlot from './SVGPlot';
-import './PlotContainer.scss';
+import Breadcrumbs from '../Shared/Breadcrumbs';
+import ButtonActions from '../Shared/ButtonActions';
+import PepplotAccordion from './PepplotAccordion';
+import SVGPlot from '../Shared/SVGPlot';
+import './PepplotPlot.scss';
 
-class PlotContainer extends Component {
+class PepplotPlot extends Component {
   static defaultProps = {
     isProteinDataLoaded: false,
     isProteinSVGLoaded: true
@@ -83,13 +83,13 @@ class PlotContainer extends Component {
           <Grid columns={2} className="PlotContainer">
             <Grid.Row className="">
               <Grid.Column
-                className="PlotAccordionContainer"
+                className="PepplotAccordionContainer"
                 mobile={16}
                 tablet={16}
                 largeScreen={4}
                 widescreen={3}
               >
-                <PlotAccordion {...this.props} />
+                <PepplotAccordion {...this.props} />
               </Grid.Column>
               <Grid.Column
                 mobile={16}
@@ -111,4 +111,4 @@ class PlotContainer extends Component {
   }
 }
 
-export default withRouter(PlotContainer);
+export default withRouter(PepplotPlot);

@@ -1,9 +1,9 @@
 import React, { Component, Fragment, UseCallback } from 'react';
 import { Form, Select, Input } from 'semantic-ui-react';
 import * as d3 from 'd3';
-import './UpSetFilters.scss';
+import '../Shared/MultisetFilters.scss';
 
-class UpSetFiltersPepplot extends Component {
+class PepplotMultisetFilters extends Component {
   componentDidMount() {
     const {
       uDataP,
@@ -14,7 +14,7 @@ class UpSetFiltersPepplot extends Component {
       selectedColP,
       selectedOperatorP
     } = this.props;
-    this.makeUpset(
+    this.makeMultiset(
       uDataP,
       uAnchorP,
       uSettingsP,
@@ -36,7 +36,7 @@ class UpSetFiltersPepplot extends Component {
       selectedOperatorP
     } = this.props;
     if (uSettingsP !== prevProps.uSettingsP) {
-      this.makeUpset(
+      this.makeMultiset(
         uDataP,
         uAnchorP,
         uSettingsP,
@@ -48,7 +48,7 @@ class UpSetFiltersPepplot extends Component {
     }
   }
 
-  makeUpset(
+  makeMultiset(
     uDataP,
     uAnchorP,
     uSettingsP,
@@ -57,16 +57,16 @@ class UpSetFiltersPepplot extends Component {
     selectedColP,
     selectedOperatorP
   ) {
-    d3.selectAll('#upset-query-p')
+    d3.selectAll('#multiset-query-p')
       .selectAll('*')
       .remove();
     const baseP = d3
-      .selectAll('#upset-query-p')
+      .selectAll('#multiset-query-p')
       .append('div')
       .style('padding-bottom', '5px');
 
     if (uSettingsP.displayMetaDataP) {
-      this.prepareUpset(uDataP, uAnchorP, uSettingsP, baseP);
+      this.prepareMultiset(uDataP, uAnchorP, uSettingsP, baseP);
       const baseMetaSvgP = baseP.append('svg');
       this.metaScript(
         baseMetaSvgP,
@@ -279,7 +279,7 @@ class UpSetFiltersPepplot extends Component {
     }
   }
 
-  prepareUpset(uDataP, uAnchorP, uSettingsP, baseP) {
+  prepareMultiset(uDataP, uAnchorP, uSettingsP, baseP) {
     const self = this;
     let datasetP = uDataP;
     if (uSettingsP.useAnchorP && datasetP.indexOf(uAnchorP) !== 0) {
@@ -748,7 +748,7 @@ class UpSetFiltersPepplot extends Component {
     const SelColOverride = `Adjusted P Value`;
     return (
       <Fragment>
-        <Form className="UpSetDropdownContainer">
+        <Form className="MultisetDropdownContainer">
           <Form.Group>
             <Form.Field
               control={Input}
@@ -786,10 +786,10 @@ class UpSetFiltersPepplot extends Component {
             ></Form.Field>
           </Form.Group>
         </Form>
-        <p id="upset-query-p" className="UpSetQueryPContainer"></p>
+        <p id="multiset-query-p" className="MultisetQueryPContainer"></p>
       </Fragment>
     );
   }
 }
 
-export default UpSetFiltersPepplot;
+export default PepplotMultisetFilters;

@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
 import { Popup, Icon } from 'semantic-ui-react';
-import { phosphoprotService } from '../services/phosphoprot.service';
+import { phosphoprotService } from '../../services/phosphoprot.service';
 import { withRouter } from 'react-router-dom';
 // import ButtonActions from './ButtonActions';
 import SplitPanesContainer from './SplitPanesContainer';
-import SearchingAlt from './SearchingAlt';
+import SearchingAlt from '../Transitions/SearchingAlt';
 import './EnrichmentResults.scss';
 import _ from 'lodash';
-
 import QHGrid from '../utility/QHGrid';
 import EZGrid from '../utility/EZGrid';
 import QuickViewModal from '../utility/QuickViewModal';

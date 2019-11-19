@@ -150,7 +150,7 @@ class PhosphoprotService {
     }
   }
 
-  async getUpsetEnrichmentData(
+  async getMultisetEnrichmentData(
     testCategory,
     mustTest,
     notTest,
@@ -173,7 +173,7 @@ class PhosphoprotService {
     return dataFromPromise;
   }
 
-  async getEnrichmentUpSetPlot(
+  async getEnrichmentMultisetPlot(
     sigVal,
     testCategory,
     study,
@@ -192,7 +192,7 @@ class PhosphoprotService {
     return svgMarkupFromPromise;
   }
 
-  async getUpsetInferenceData(
+  async getMultisetInferenceData(
     testCategory,
     mustTest,
     notTest,
@@ -217,7 +217,7 @@ class PhosphoprotService {
     return dataFromPromise;
   }
 
-  async getInferenceUpSetPlot(sigVal, testCategory, study) {
+  async getInferenceMultisetPlot(sigVal, testCategory, study) {
     this.setUrl();
     const promise = this.ocpuPlotCall('InferenceUpsetPlot', {
       sigValue: sigVal,

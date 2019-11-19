@@ -9,10 +9,10 @@ import {
   Radio,
   Transition
 } from 'semantic-ui-react';
-import './SearchCriteria.scss';
-import { phosphoprotService } from '../services/phosphoprot.service';
+import '../Shared/SearchCriteria.scss';
+import { phosphoprotService } from '../../services/phosphoprot.service';
 import _ from 'lodash';
-import UpSetFiltersPepplot from './UpSetFiltersPepplot';
+import PepplotMultisetFilters from './PepplotMultisetFilters';
 
 class PepplotSearchCriteria extends Component {
   constructor(props) {
@@ -55,7 +55,7 @@ class PepplotSearchCriteria extends Component {
         mustP: [],
         notP: [],
         displayMetaDataP: true,
-        templateName: 'pepplot-upset',
+        templateName: 'pepplot-multiset',
         numElementsP: undefined,
         maxElementsP: undefined,
         metaSvgP: '',
@@ -90,8 +90,8 @@ class PepplotSearchCriteria extends Component {
           }
         ]
       },
-      upsetFiltersVisibleP: false,
-      activateUpSetFiltersP: false,
+      multisetFiltersVisibleP: false,
+      activateMultisetFiltersP: false,
       uDataP: []
     };
   }
@@ -234,7 +234,7 @@ class PepplotSearchCriteria extends Component {
   handleTestChange = (evt, { name, value }) => {
     this.setState({
       reloadPlot: true,
-      upsetFiltersVisibleP: false
+      multisetFiltersVisibleP: false
     });
     this.props.onSearchCriteriaChange(
       {
@@ -270,11 +270,11 @@ class PepplotSearchCriteria extends Component {
       });
   };
 
-  handleUpsetToggle = () => {
+  handleMultisetToggle = () => {
     return evt => {
-      if (this.state.upsetFiltersVisibleP === false) {
+      if (this.state.multisetFiltersVisibleP === false) {
         this.setState({
-          upsetFiltersVisibleP: true
+          multisetFiltersVisibleP: true
         });
         this.props.onMultisetQueried(true);
         this.updateQueryDataP({
@@ -286,18 +286,18 @@ class PepplotSearchCriteria extends Component {
         });
       } else {
         this.setState({
-          upsetFiltersVisibleP: false,
+          multisetFiltersVisibleP: false,
           reloadPlot: true
         });
         this.props.onMultisetQueried(false);
         const pepplotTestName = 'pepplotTest';
         const pepplotTestVar = this.props.pepplotTest;
-        this.upsetTriggeredTestChange(pepplotTestName, pepplotTestVar);
+        this.multisetTriggeredTestChange(pepplotTestName, pepplotTestVar);
       }
     };
   };
 
-  upsetTriggeredTestChange = (name, value) => {
+  multisetTriggeredTestChange = (name, value) => {
     this.props.onSearchCriteriaChange(
       {
         pepplotStudy: this.props.pepplotStudy,
@@ -336,7 +336,7 @@ class PepplotSearchCriteria extends Component {
     });
     if (eSigVP !== this.state.sigValueP || this.state.reloadPlot === true) {
       this.props.onDisablePlot();
-      this.getUpSetPlot(
+      this.getMultisetPlot(
         eSigVP,
         this.props.pepplotModel,
         this.props.pepplotStudy + 'plots',
@@ -345,7 +345,7 @@ class PepplotSearchCriteria extends Component {
       );
     }
     phosphoprotService
-      .getUpsetInferenceData(
+      .getMultisetInferenceData(
         this.props.pepplotModel,
         mustPString,
         notPString,
@@ -365,7 +365,7 @@ class PepplotSearchCriteria extends Component {
             mustP: eMustP,
             notP: eNotP
           },
-          activateUpSetFiltersP: true,
+          activateMultisetFiltersP: true,
           reloadPlot: false
         });
         this.props.onPepplotSearch({
@@ -391,11 +391,11 @@ class PepplotSearchCriteria extends Component {
     } else return str;
   }
 
-  getUpSetPlot(sigVal, pepplotModel, pepplotStudy, eOperatorP, eColP) {
+  getMultisetPlot(sigVal, pepplotModel, pepplotStudy, eOperatorP, eColP) {
     let heightCalculation = this.calculateHeight;
     let widthCalculation = this.calculateWidth;
     phosphoprotService
-      .getInferenceUpSetPlot(
+      .getInferenceMultisetPlot(
         sigVal,
         pepplotModel,
         pepplotStudy,
@@ -412,8 +412,8 @@ class PepplotSearchCriteria extends Component {
             heightCalculation() * 0.8 +
             'px;" id="multisetAnalysisSVG"'
         );
-        let svgInfo = { plotType: 'UpSet', svg: svgMarkup };
-        this.props.onGetUpsetPlot({
+        let svgInfo = { plotType: 'Multiset', svg: svgMarkup };
+        this.props.onGetMultisetPlot({
           svgInfo
         });
       });
@@ -445,8 +445,8 @@ class PepplotSearchCriteria extends Component {
       pepplotStudiesDisabled,
       pepplotModelsDisabled,
       pepplotTestsDisabled,
-      upsetFiltersVisibleP,
-      activateUpSetFiltersP
+      multisetFiltersVisibleP,
+      activateMultisetFiltersP
     } = this.state;
 
     const {
@@ -454,7 +454,7 @@ class PepplotSearchCriteria extends Component {
       pepplotModel,
       pepplotTest,
       isValidSearchPepplot,
-      upsetPlotAvailable,
+      multisetPlotAvailable,
       plotButtonActive
     } = this.props;
 
@@ -511,10 +511,10 @@ class PepplotSearchCriteria extends Component {
       );
     }
 
-    let UpsetFiltersPepplot;
-    if (isValidSearchPepplot && activateUpSetFiltersP && upsetFiltersVisibleP) {
-      UpsetFiltersPepplot = (
-        <UpSetFiltersPepplot
+    let PMultisetFilters;
+    if (isValidSearchPepplot && activateMultisetFiltersP && multisetFiltersVisibleP) {
+      PMultisetFilters = (
+        <PepplotMultisetFilters
           {...this.props}
           {...this.state}
           onUpdateQueryDataP={this.updateQueryDataP}
@@ -523,34 +523,34 @@ class PepplotSearchCriteria extends Component {
     }
 
     let PlotRadio;
-    let UpsetRadio;
+    let MultisetRadio;
 
     if (isValidSearchPepplot) {
       PlotRadio = (
         <Transition
-          visible={!upsetPlotAvailable}
+          visible={!multisetPlotAvailable}
           animation="flash"
           duration={1500}
         >
           <Radio
             toggle
             label="View Plot"
-            className={upsetPlotAvailable ? 'ViewPlotRadio' : ''}
+            className={multisetPlotAvailable ? 'ViewPlotRadio' : ''}
             checked={plotButtonActive}
             onChange={this.props.onHandlePlotAnimation('uncover')}
-            disabled={!upsetPlotAvailable}
+            disabled={!multisetPlotAvailable}
           />
         </Transition>
       );
 
-      UpsetRadio = (
+      MultisetRadio = (
         <React.Fragment>
           <Divider />
           <Radio
             toggle
             label="Set Analysis"
-            checked={upsetFiltersVisibleP}
-            onChange={this.handleUpsetToggle()}
+            checked={multisetFiltersVisibleP}
+            onChange={this.handleMultisetToggle()}
           />
         </React.Fragment>
       );
@@ -597,12 +597,12 @@ class PepplotSearchCriteria extends Component {
             searchInput={{ id: 'form-select-control-test' }}
           />
         </Form>
-        <div className="UpsetContainer">
+        <div className="MultisetContainer">
           <div className="SliderDiv">
-            <span className="UpsetRadio">{UpsetRadio}</span>
+            <span className="MultisetRadio">{MultisetRadio}</span>
             <span className="PlotRadio">{PlotRadio}</span>
           </div>
-          <div className="UpsetFiltersDiv">{UpsetFiltersPepplot}</div>
+          <div className="MultisetFiltersDiv">{PMultisetFilters}</div>
         </div>
       </React.Fragment>
     );

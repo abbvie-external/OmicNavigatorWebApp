@@ -10,10 +10,10 @@ import {
   Transition,
   Button
 } from 'semantic-ui-react';
-import './SearchCriteria.scss';
-import { phosphoprotService } from '../services/phosphoprot.service';
+import '../Shared/SearchCriteria.scss';
+import { phosphoprotService } from '../../services/phosphoprot.service';
 import _ from 'lodash';
-import UpSetFilters from './UpSetFilters';
+import EnrichmentMultisetFilters from './EnrichmentMultisetFilters';
 
 class EnrichmentSearchCriteria extends Component {
   static defaultProps = {
@@ -24,7 +24,7 @@ class EnrichmentSearchCriteria extends Component {
     pValueType: 'nomimal',
     isValidSearchEnrichment: false,
     isSearching: false,
-    upsetPlotAvailable: false,
+    multisetPlotAvailable: false,
     animation: 'uncover',
     direction: 'left',
     visible: false,
@@ -71,7 +71,7 @@ class EnrichmentSearchCriteria extends Component {
         must: [],
         not: [],
         displayMetaData: true,
-        templateName: 'enrichment-upset',
+        templateName: 'enrichment-multiset',
         numElements: undefined,
         maxElements: undefined,
         metaSvg: '',
@@ -106,8 +106,8 @@ class EnrichmentSearchCriteria extends Component {
           }
         ]
       },
-      upsetFiltersVisible: false,
-      activateUpSetFilters: false
+      multisetFiltersVisible: false,
+      activateMultisetFilters: false
     };
   }
 
@@ -253,7 +253,7 @@ class EnrichmentSearchCriteria extends Component {
 
   handleAnnotationChange = (evt, { name, value }) => {
     this.setState({
-      upsetFiltersVisible: false
+      multisetFiltersVisible: false
     });
     this.props.onSearchCriteriaChange(
       {
@@ -317,11 +317,11 @@ class EnrichmentSearchCriteria extends Component {
       });
   };
 
-  handleUpsetToggle = () => {
+  handleMultisetToggle = () => {
     return evt => {
-      if (this.state.upsetFiltersVisible === false) {
+      if (this.state.multisetFiltersVisible === false) {
         this.setState({
-          upsetFiltersVisible: true
+          multisetFiltersVisible: true
         });
         this.updateQueryData({
           must: this.state.uSettings.must,
@@ -332,11 +332,11 @@ class EnrichmentSearchCriteria extends Component {
         });
       } else {
         this.setState({
-          upsetFiltersVisible: false
+          multisetFiltersVisible: false
         });
         const enrichmentAnnotationName = 'enrichmentAnnotation';
         const enrichmentAnnotationVar = this.props.enrichmentAnnotation;
-        this.upsetTriggeredAnnotationChange(
+        this.multisetTriggeredAnnotationChange(
           enrichmentAnnotationName,
           enrichmentAnnotationVar
         );
@@ -344,7 +344,7 @@ class EnrichmentSearchCriteria extends Component {
     };
   };
 
-  upsetTriggeredAnnotationChange = (name, value) => {
+  multisetTriggeredAnnotationChange = (name, value) => {
     this.props.onSearchCriteriaChange(
       {
         enrichmentStudy: this.props.enrichmentStudy,
@@ -383,7 +383,7 @@ class EnrichmentSearchCriteria extends Component {
       selectedOperator: eOperator,
       selectedCol: eCol
     });
-    this.getUpSetPlot(
+    this.getMultisetPlot(
       eSigV,
       this.props.enrichmentModel,
       this.props.enrichmentStudy + 'plots',
@@ -391,7 +391,7 @@ class EnrichmentSearchCriteria extends Component {
       eOperator
     );
     phosphoprotService
-      .getUpsetEnrichmentData(
+      .getMultisetEnrichmentData(
         this.props.enrichmentModel,
         mustString,
         notString,
@@ -410,7 +410,7 @@ class EnrichmentSearchCriteria extends Component {
             must: eMust,
             not: eNot
           },
-          activateUpSetFilters: true
+          activateMultisetFilters: true
         });
         this.props.onEnrichmentSearch({
           enrichmentResults: multisetResults
@@ -435,7 +435,7 @@ class EnrichmentSearchCriteria extends Component {
     } else return str;
   }
 
-  getUpSetPlot(
+  getMultisetPlot(
     sigVal,
     enrichmentModel,
     enrichmentStudy,
@@ -445,7 +445,7 @@ class EnrichmentSearchCriteria extends Component {
     let heightCalculation = this.calculateHeight;
     let widthCalculation = this.calculateWidth;
     phosphoprotService
-      .getEnrichmentUpSetPlot(
+      .getEnrichmentMultisetPlot(
         sigVal,
         enrichmentModel,
         enrichmentStudy,
@@ -466,8 +466,8 @@ class EnrichmentSearchCriteria extends Component {
             heightCalculation() * 0.8 +
             'px;" id="multisetAnalysisSVG"'
         );
-        let svgInfo = { plotType: 'UpSet', svg: svgMarkup };
-        this.props.onGetUpsetPlot({
+        let svgInfo = { plotType: 'Multiset', svg: svgMarkup };
+        this.props.onGetMultisetPlot({
           svgInfo
         });
       });
@@ -499,8 +499,8 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentStudiesDisabled,
       enrichmentModelsDisabled,
       enrichmentAnnotationsDisabled,
-      upsetFiltersVisible,
-      activateUpSetFilters
+      multisetFiltersVisible,
+      activateMultisetFilters
     } = this.state;
 
     const {
@@ -509,7 +509,7 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentAnnotation,
       pValueType,
       isValidSearchEnrichment,
-      upsetPlotAvailable,
+      multisetPlotAvailable,
       plotButtonActive
     } = this.props;
 
@@ -566,14 +566,14 @@ class EnrichmentSearchCriteria extends Component {
       );
     }
 
-    let UpsetFilters;
+    let EMultisetFilters;
     if (
       isValidSearchEnrichment &&
-      activateUpSetFilters &&
-      upsetFiltersVisible
+      activateMultisetFilters &&
+      multisetFiltersVisible
     ) {
-      UpsetFilters = (
-        <UpSetFilters
+      EMultisetFilters = (
+        <EnrichmentMultisetFilters
           {...this.props}
           {...this.state}
           onUpdateQueryData={this.updateQueryData}
@@ -582,34 +582,34 @@ class EnrichmentSearchCriteria extends Component {
     }
 
     let PlotRadio;
-    let UpsetRadio;
+    let MultisetRadio;
 
     if (isValidSearchEnrichment) {
       PlotRadio = (
         <Transition
-          visible={!upsetPlotAvailable}
+          visible={!multisetPlotAvailable}
           animation="flash"
           duration={1500}
         >
           <Radio
             toggle
             label="View Plot"
-            className={upsetPlotAvailable ? 'ViewPlotRadio' : ''}
+            className={multisetPlotAvailable ? 'ViewPlotRadio' : ''}
             checked={plotButtonActive}
             onChange={this.props.onHandlePlotAnimation('uncover')}
-            disabled={!upsetPlotAvailable}
+            disabled={!multisetPlotAvailable}
           />
         </Transition>
       );
 
-      UpsetRadio = (
+      MultisetRadio = (
         <React.Fragment>
           <Divider />
           <Radio
             toggle
             label="Set Analysis"
-            checked={upsetFiltersVisible}
-            onChange={this.handleUpsetToggle()}
+            checked={multisetFiltersVisible}
+            onChange={this.handleMultisetToggle()}
           />
         </React.Fragment>
       );
@@ -688,12 +688,12 @@ class EnrichmentSearchCriteria extends Component {
             </Button>
           </Button.Group>
         </Form>
-        <div className="UpsetContainer">
+        <div className="MultisetContainer">
           <div className="SliderDiv">
-            <span className="UpsetRadio">{UpsetRadio}</span>
+            <span className="MultisetRadio">{MultisetRadio}</span>
             <span className="PlotRadio">{PlotRadio}</span>
           </div>
-          <div className="UpsetFiltersDiv">{UpsetFilters}</div>
+          <div className="MultisetFiltersDiv">{EMultisetFilters}</div>
         </div>
       </React.Fragment>
     );

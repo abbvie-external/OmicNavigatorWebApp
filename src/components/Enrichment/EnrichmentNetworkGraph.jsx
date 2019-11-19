@@ -4,7 +4,7 @@ import { Icon, Popup } from 'semantic-ui-react';
 import { withRouter } from 'react-router-dom';
 // import ButtonActions from './ButtonActions';
 import SplitPanesContainer from './SplitPanesContainer';
-import SearchingAlt from './SearchingAlt';
+import SearchingAlt from '../Transitions/SearchingAlt';
 import './EnrichmentNetworkGraph.scss';
 // import _ from 'lodash';
 
