@@ -5,6 +5,7 @@ import './SVGPlot.scss';
 class SVGPlot extends Component {
   constructor(props) {
     super(props);
+    debugger;
     this.state = {
       isSVGReady: false
     };
@@ -21,6 +22,7 @@ class SVGPlot extends Component {
   };
 
   getSVGPanes(activeSVGTabIndex) {
+    debugger;
     if (this.props.imageInfo) {
       const svgArray = this.props.imageInfo.svg;
       const panes = svgArray.map(s => {
@@ -29,7 +31,7 @@ class SVGPlot extends Component {
           render: () => (
             <Tab.Pane attached="true" as="div">
               <div
-                id="proteinPlotSVG"
+                id="PlotSVG"
                 className="svgSpan"
                 dangerouslySetInnerHTML={{ __html: s.svg }}
               ></div>
@@ -56,7 +58,7 @@ class SVGPlot extends Component {
       return (
         <div>
           <Dimmer active inverted>
-            <Loader size="large">Data Loading</Loader>
+            <Loader size="large">SVG Loading</Loader>
           </Dimmer>
         </div>
       );

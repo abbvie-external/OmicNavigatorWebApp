@@ -10,7 +10,7 @@ class Tabs extends Component {
     super(props);
     const pathnameInit = this.props.location.pathname.substring(1) || null;
     const pathname =
-      pathnameInit !== null ? pathnameInit.replace(/-/gi, ' ') : pathnameInit;
+      pathnameInit !== null ? pathnameInit.replace(/–/gi, ' ') : pathnameInit;
     const params = pathname ? pathname.split('/') : '';
     const tabFromUrl = params[0] || '';
     const studyFromUrl = params[1] || '';

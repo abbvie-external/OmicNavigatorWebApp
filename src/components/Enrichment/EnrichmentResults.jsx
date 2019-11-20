@@ -196,7 +196,8 @@ class EnrichmentResults extends Component {
                 imageInfo: {
                   ...self.state.imageInfo,
                   key: `${test}:${dataItem.Description}`,
-                  title: `${test}:${dataItem.Description}`
+                  title: `${test}:${dataItem.Description}`,
+                  dataItem: dataItem
                 },
                 enrichmentNameLoaded: true,
                 enrichmentDataItem: dataItem,
@@ -274,8 +275,8 @@ class EnrichmentResults extends Component {
           phosphoprotService
             .getDatabaseInfo(enrichmentStudy + 'plots', enrichmentAnnotation)
             .then(annotationDataResponse => {
-              const annotationData = JSON.parse(annotationDataResponse);
-              dataItem.Annotation = _.find(self.state.annotationData, {
+              const annotationDataParsed = JSON.parse(annotationDataResponse);
+              dataItem.Annotation = _.find(annotationDataParsed, {
                 Description: dataItem.Description
               }).Key;
               const database = enrichmentAnnotation;
@@ -501,12 +502,12 @@ class EnrichmentResults extends Component {
           />
         </div>
       );
-    } else if (this.state.isTestSelected && !this.state.isTestDataLoaded) {
-      return (
-        <div>
-          <SearchingAlt />
-        </div>
-      );
+      // } else if (this.state.isTestSelected && !this.state.isTestDataLoaded) {
+      //   return (
+      //     <div>
+      //       <SearchingAlt />
+      //     </div>
+      //   );
     } else {
       return (
         <div>

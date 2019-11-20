@@ -30,11 +30,11 @@ export function updateUrl(
       const pepplotModelQuery = stateParam.pepplotModel || '';
       const pepplotTestQuery = stateParam.pepplotTest || '';
       const pepplotProteinSiteQuery = stateParam.pepplotProteinSite || '';
-      const pepplotStudy = pepplotStudyQuery.replace(/ /gi, '-');
-      const pepplotModelAndOr = pepplotModelQuery.replace(/ /gi, '-');
+      const pepplotStudy = pepplotStudyQuery.replace(/ /gi, '–');
+      const pepplotModelAndOr = pepplotModelQuery.replace(/ /gi, '–');
       const pepplotModel = pepplotModelAndOr.replace('and/or', 'and+or');
-      const pepplotTest = pepplotTestQuery.replace(/ /gi, '-');
-      const pepplotProteinSite = pepplotProteinSiteQuery.replace(/ /gi, '-');
+      const pepplotTest = pepplotTestQuery.replace(/ /gi, '–');
+      const pepplotProteinSite = pepplotProteinSiteQuery.replace(/ /gi, '–');
 
       if (pepplotProteinSite !== '') {
         propsParam.history.push(
@@ -67,16 +67,16 @@ export function updateUrl(
       const enrichmentAnnotationQuery = stateParam.enrichmentAnnotation || '';
       const enrichmentDescriptionAndTestQuery =
         stateParam.enrichmentDescriptionAndTest || '';
-      const enrichmentStudy = enrichmentStudyQuery.replace(/ /gi, '-');
-      const enrichmentModelAndOr = enrichmentModelQuery.replace(/ /gi, '-');
+      const enrichmentStudy = enrichmentStudyQuery.replace(/ /gi, '–');
+      const enrichmentModelAndOr = enrichmentModelQuery.replace(/ /gi, '–');
       const enrichmentModel = enrichmentModelAndOr.replace('and/or', 'and+or');
       const enrichmentAnnotation = enrichmentAnnotationQuery.replace(
         / /gi,
-        '-'
+        '–'
       );
       const enrichmentDescriptionAndTest = enrichmentDescriptionAndTestQuery.replace(
         / /gi,
-        '-'
+        '–'
       );
 
       if (enrichmentDescriptionAndTest !== '') {
@@ -126,11 +126,11 @@ export function updateUrl(
       const pepplotModelQuery2 = stateChanges.pepplotModel || '';
       const pepplotTestQuery2 = stateChanges.pepplotTest || '';
       const pepplotProteinSiteQuery2 = stateChanges.pepplotProteinSite || '';
-      const pepplotStudy = pepplotStudyQuery2.replace(/ /gi, '-');
-      const pepplotModelAndOr2 = pepplotModelQuery2.replace(/ /gi, '-');
+      const pepplotStudy = pepplotStudyQuery2.replace(/ /gi, '–');
+      const pepplotModelAndOr2 = pepplotModelQuery2.replace(/ /gi, '–');
       const pepplotModel = pepplotModelAndOr2.replace('and/or', 'and+or');
-      const pepplotTest = pepplotTestQuery2.replace(/ /gi, '-');
-      const pepplotProteinSite = pepplotProteinSiteQuery2.replace(/ /gi, '-');
+      const pepplotTest = pepplotTestQuery2.replace(/ /gi, '–');
+      const pepplotProteinSite = pepplotProteinSiteQuery2.replace(/ /gi, '–');
 
       if (pepplotProteinSite !== '') {
         propsParam.history.push(
@@ -166,16 +166,16 @@ export function updateUrl(
         stateChanges.enrichmentAnnotation || '';
       const enrichmentDescriptionAndTestQuery2 =
         stateChanges.enrichmentDescriptionAndTest || '';
-      const enrichmentStudy = enrichmentStudyQuery2.replace(/ /gi, '-');
-      const enrichmentModelAndOr2 = enrichmentModelQuery2.replace(/ /gi, '-');
+      const enrichmentStudy = enrichmentStudyQuery2.replace(/ /gi, '–');
+      const enrichmentModelAndOr2 = enrichmentModelQuery2.replace(/ /gi, '–');
       const enrichmentModel = enrichmentModelAndOr2.replace('and/or', 'and+or');
       const enrichmentAnnotation = enrichmentAnnotationQuery2.replace(
         / /gi,
-        '-'
+        '–'
       );
       const enrichmentDescriptionAndTest = enrichmentDescriptionAndTestQuery2.replace(
         / /gi,
-        '-'
+        '–'
       );
 
       if (enrichmentDescriptionAndTest !== '') {

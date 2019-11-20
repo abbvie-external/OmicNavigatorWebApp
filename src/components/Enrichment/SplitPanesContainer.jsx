@@ -25,6 +25,34 @@ class SplitPanesContainer extends Component {
     });
   };
 
+  getBarcode = (
+    isTestDataLoaded,
+    props,
+    state,
+    barcodeData,
+    barcodeSettings
+  ) => {
+    if (!isTestDataLoaded) {
+      return (
+        <div>
+          <Dimmer active inverted>
+            <Loader size="large">Barcode Plot is Loading</Loader>
+          </Dimmer>
+        </div>
+      );
+    } else {
+      return (
+        <BarcodePlot
+          className="BarcodePlotContainer"
+          {...state}
+          {...props}
+          data={barcodeData}
+          settings={barcodeSettings}
+        />
+      );
+    }
+  };
+
   render() {
     const {
       enrichmentModel,
@@ -32,132 +60,106 @@ class SplitPanesContainer extends Component {
       barcodeData,
       barcodeSettings
     } = this.props;
+    const Barcode = this.getBarcode(
+      isTestDataLoaded,
+      this.props,
+      this.state,
+      barcodeData,
+      barcodeSettings
+    );
 
-    if (!isTestDataLoaded) {
+    // if (!isTestDataLoaded) {
+    //   return (
+    //     <div>
+    //       <Dimmer active inverted>
+    //         <Loader size="large">Barcode, Violin, Dot Plots are Loading</Loader>
+    //       </Dimmer>
+    //     </div>
+    //   );
+    // } else {
+    if (enrichmentModel === 'Timecourse Differential Phosphorylation') {
       return (
-        <div>
-          <Dimmer active inverted>
-            <Loader size="large">Barcode, Violin, Dot Plots are Loading</Loader>
-          </Dimmer>
+        <div className="ThreePlotsWrapper">
+          <Grid columns={2} className="">
+            <Grid.Row className="ActionsRow">
+              <Grid.Column mobile={8} tablet={8} largeScreen={8} widescreen={8}>
+                <EnrichmentBreadcrumbs
+                  {...this.props}
+                  // onNavigateBack={this.tableTransition}
+                />
+              </Grid.Column>
+              <Grid.Column mobile={8} tablet={8} largeScreen={8} widescreen={8}>
+                {/* <ButtonActions {...this.props} {...this.state} /> */}
+              </Grid.Column>
+            </Grid.Row>
+            <Grid.Row>
+              <SplitPane
+                className="SplitPanesWrapper"
+                split="horizontal"
+                defaultSize={225}
+                minSize={200}
+                maxSize={300}
+              >
+                <div>{Barcode}</div>
+                <div>
+                  <SVGPlot
+                    {...this.props}
+                    {...this.state}
+                    onSVGTabChange={this.handleSVGTabChange}
+                  />
+                </div>
+              </SplitPane>
+            </Grid.Row>
+          </Grid>
         </div>
       );
     } else {
-      if (enrichmentModel === 'Timecourse Differential Phosphorylation') {
-        return (
-          <div className="ThreePlotsWrapper">
-            <Grid columns={2} className="">
-              <Grid.Row className="ActionsRow">
-                <Grid.Column
-                  mobile={8}
-                  tablet={8}
-                  largeScreen={8}
-                  widescreen={8}
-                >
-                  <EnrichmentBreadcrumbs
-                    {...this.props}
-                    // onNavigateBack={this.tableTransition}
-                  />
-                </Grid.Column>
-                <Grid.Column
-                  mobile={8}
-                  tablet={8}
-                  largeScreen={8}
-                  widescreen={8}
-                >
-                  {/* <ButtonActions {...this.props} {...this.state} /> */}
-                </Grid.Column>
-              </Grid.Row>
-              <Grid.Row>
+      return (
+        <div className="ThreePlotsWrapper">
+          <Grid columns={2} className="">
+            <Grid.Row className="ActionsRow">
+              <Grid.Column mobile={8} tablet={8} largeScreen={8} widescreen={8}>
+                <EnrichmentBreadcrumbs
+                  {...this.props}
+                  // onNavigateBack={this.tableTransition}
+                />
+              </Grid.Column>
+              <Grid.Column mobile={8} tablet={8} largeScreen={8} widescreen={8}>
+                {/* <ButtonActions {...this.props} {...this.state} /> */}
+              </Grid.Column>
+            </Grid.Row>
+            <Grid.Row>
+              <SplitPane
+                className="SplitPanesWrapper"
+                split="horizontal"
+                defaultSize={275}
+                minSize={200}
+                maxSize={350}
+              >
+                <div>{Barcode}</div>
                 <SplitPane
-                  className="SplitPanesWrapper"
-                  split="horizontal"
-                  defaultSize={225}
-                  minSize={200}
-                  maxSize={300}
+                  split="vertical"
+                  defaultSize={400}
+                  minSize={300}
+                  maxSize={700}
                 >
                   <div>
-                    <BarcodePlot
-                      className="BarcodePlotContainer"
-                      {...this.state}
-                      {...this.props}
-                      data={barcodeData}
-                      settings={barcodeSettings}
-                    />
+                    <h2>VIOLIN</h2>
                   </div>
+
                   <div>
                     <SVGPlot
                       {...this.props}
                       {...this.state}
-                      onSVGTabChange={this.handleSVGTabChange}
+                      // onSVGTabChange={this.handleSVGTabChange}
                     />
                   </div>
                 </SplitPane>
-              </Grid.Row>
-            </Grid>
-          </div>
-        );
-      } else {
-        return (
-          <div className="ThreePlotsWrapper">
-            <Grid columns={2} className="">
-              <Grid.Row className="ActionsRow">
-                <Grid.Column
-                  mobile={8}
-                  tablet={8}
-                  largeScreen={8}
-                  widescreen={8}
-                >
-                  <EnrichmentBreadcrumbs
-                    {...this.props}
-                    // onNavigateBack={this.tableTransition}
-                  />
-                </Grid.Column>
-                <Grid.Column
-                  mobile={8}
-                  tablet={8}
-                  largeScreen={8}
-                  widescreen={8}
-                >
-                  {/* <ButtonActions {...this.props} {...this.state} /> */}
-                </Grid.Column>
-              </Grid.Row>
-              <Grid.Row>
-                <SplitPane
-                  className="SplitPanesWrapper"
-                  split="horizontal"
-                  defaultSize={275}
-                  minSize={200}
-                  maxSize={350}
-                >
-                  <div>
-                    <BarcodePlot
-                      className="BarcodePlotContainer"
-                      data={barcodeData}
-                      settings={barcodeSettings}
-                      {...this.state}
-                      {...this.props}
-                    />
-                  </div>
-                  <SplitPane
-                    split="vertical"
-                    defaultSize={400}
-                    minSize={300}
-                    maxSize={700}
-                  >
-                    <div>
-                      <h2>VIOLIN</h2>
-                    </div>
-
-                    <div>
-                      <h2>SVG</h2>
-                    </div>
-                  </SplitPane>
-                </SplitPane>
-              </Grid.Row>
-            </Grid>
-          </div>
-        );
-      }
+              </SplitPane>
+            </Grid.Row>
+          </Grid>
+        </div>
+      );
     }
   }
 }

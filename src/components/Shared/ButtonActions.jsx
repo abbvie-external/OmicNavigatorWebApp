@@ -45,7 +45,7 @@ class ButtonActions extends Component {
       saveSvgAsPng.saveSvgAsPng(currentSVG, MultisetPlotName);
     } else {
       const currentContentContainer =
-        document.getElementById('proteinPlotSVG') || null;
+        document.getElementById('PlotSVG') || null;
       const ProteinPlotName = `${this.props.imageInfo.title} - ${this.props.imageInfo.svg[this.props.activeSVGTabIndex].plotType}.png`;
       const currentSVG =
         currentContentContainer.getElementsByTagName('svg')[0] || null;
@@ -62,7 +62,7 @@ class ButtonActions extends Component {
       pdfService.createPDF(currentSVG);
     } else {
       const currentContentContainer =
-        document.getElementById('proteinPlotSVG') || null;
+        document.getElementById('PlotSVG') || null;
       const currentSVG =
         currentContentContainer.getElementsByTagName('svg')[0] || null;
       pdfService.createPDF(currentSVG);
@@ -80,7 +80,7 @@ class ButtonActions extends Component {
     } else {
       const ProteinPlotName = `${this.props.imageInfo.title}-${this.props.imageInfo.svg[this.props.activeSVGTabIndex].plotType}.svg`;
       const currentContentContainer =
-        document.getElementById('proteinPlotSVG') || null;
+        document.getElementById('PlotSVG') || null;
       const currentSVG =
         currentContentContainer.getElementsByTagName('svg')[0] || null;
       this.exportSVG(currentSVG, ProteinPlotName);
