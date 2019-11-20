@@ -56,20 +56,88 @@ class EnrichmentResults extends Component {
 
   componentDidMount() {
     const DescriptionAndTest = this.props.enrichmentDescriptionAndTest || '';
-    // if (DescriptionAndTest !== '') {
-    //   const Proteins = this.props.pepplotResults;
-    //   const Index = _.findIndex(Proteins, function(p) {
-    //     return firstValue(p.Protein_Site) === ProteinSite;
-    //   });
-    //   const dataItem = Proteins[Index];
-    //   this.getProteinPageFromUrl(
-    //     this.getProteinData,
-    //     this.getPlot,
-    //     this.props.pepplotModel,
-    //     dataItem
-    //   );
-    // }
+    if (DescriptionAndTest !== '') {
+      const AllDescriptionsAndTests = this.props.enrichmentResults;
+      const dataItemDescription = getDataItemDescription(DescriptionAndTest);
+      const dataItemIndex = _.findIndex(AllDescriptionsAndTests, function(d) {
+        return d.Description === dataItemDescription;
+      });
+      const dataItem = AllDescriptionsAndTests[dataItemIndex];
+      const test = getTestName(DescriptionAndTest);
+      // const testNameIndex = _.findIndex(dataItem, function(n) {
+      //   return n.key === testName;
+      // });
+      // const test = dataItem[testNameIndex];
+      this.getThreePlotsFromUrl(
+        this.props.enrichmentStudy,
+        this.props.enrichmentModel,
+        this.props.enrichmentAnnotation,
+        dataItem,
+        test,
+        this.testSelectedTransition,
+        this.showBarcodePlot
+      );
+    }
   }
+
+  getThreePlotsFromUrl = (
+    enrichmentStudy,
+    enrichmentModel,
+    enrichmentAnnotation,
+    dataItem,
+    test,
+    testSelectedTransitionCb,
+    showBarcodePlotCb
+  ) => {
+    let self = this;
+    testSelectedTransitionCb(true);
+    const TestSiteVar = `${test}:${dataItem.Description}`;
+    let xLargest = 0;
+    let imageInfo = { key: '', title: '', svg: [] };
+    phosphoprotService
+      .getDatabaseInfo(enrichmentStudy + 'plots', enrichmentAnnotation)
+      .then(annotationDataResponse => {
+        const annotationDataParsed = JSON.parse(annotationDataResponse);
+        self.setState({
+          annotationData: annotationDataParsed
+        });
+        dataItem.Annotation = _.find(annotationDataParsed, {
+          Description: dataItem.Description
+        }).Key;
+        let term = dataItem.Annotation;
+
+        self.setState({
+          imageInfo: {
+            ...self.state.imageInfo,
+            key: `${test}:${dataItem.Description}`,
+            title: `${test}:${dataItem.Description}`
+          },
+          enrichmentNameLoaded: true,
+          enrichmentDataItem: dataItem,
+          enrichmentTerm: term
+        });
+
+        phosphoprotService
+          .getBarcodeData(
+            enrichmentStudy + 'plots',
+            enrichmentModel,
+            enrichmentAnnotation,
+            test,
+            dataItem.Annotation
+          )
+          .then(barcodeDataResponse => {
+            let BardcodeInfoObj = JSON.parse(barcodeDataResponse['object']);
+            let highest = barcodeDataResponse['highest'][0];
+            // if (!this.state.modelsToRenderViolin.includes(this.enrichmentModel)){
+            //   this.setState({ sizeVal = '0%' )};
+            // } else {
+            //   this.setState({ sizeVal = '50%')};
+            // }
+
+            showBarcodePlotCb(dataItem, BardcodeInfoObj, test, highest);
+          });
+      });
+  };
 
   showPhosphositePlus = dataItem => {
     return function() {
@@ -454,3 +522,17 @@ class EnrichmentResults extends Component {
 }
 
 export default withRouter(EnrichmentResults);
+
+function getDataItemDescription(value) {
+  if (value) {
+    const dataItem = value.split(':')[1];
+    return dataItem;
+  }
+}
+
+function getTestName(value) {
+  if (value) {
+    const test = value.split(':')[0];
+    return test;
+  }
+}
