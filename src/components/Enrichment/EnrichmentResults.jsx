@@ -21,15 +21,6 @@ export { QHGrid, EZGrid, QuickViewModal };
 export { getField, getFieldValue, typeMap };
 
 class EnrichmentResults extends Component {
-  static defaultProps = {
-    enrichmentStudy: '',
-    enrichmentModel: '',
-    enrichmentAnnotation: '',
-    enrichmentResults: [],
-    enrichmentColumns: [],
-    enrichmentView: 'table'
-  };
-
   constructor(props) {
     super(props);
     this.state = {
@@ -328,6 +319,7 @@ class EnrichmentResults extends Component {
 
   backToTable = () => {
     this.setState({
+      isTestDataLoaded: false,
       isTestSelected: false,
       enrichmentNameLoaded: false
     });
