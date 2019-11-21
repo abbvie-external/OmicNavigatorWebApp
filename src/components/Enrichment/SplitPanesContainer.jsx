@@ -80,7 +80,7 @@ class SplitPanesContainer extends Component {
     if (enrichmentModel === 'Timecourse Differential Phosphorylation') {
       return (
         <div className="ThreePlotsWrapper">
-          <Grid columns={2} className="">
+          <Grid className="">
             <Grid.Row className="ActionsRow">
               <Grid.Column mobile={8} tablet={8} largeScreen={8} widescreen={8}>
                 <EnrichmentBreadcrumbs
@@ -92,24 +92,22 @@ class SplitPanesContainer extends Component {
                 {/* <ButtonActions {...this.props} {...this.state} /> */}
               </Grid.Column>
             </Grid.Row>
-            <Grid.Row>
-              <SplitPane
-                className="SplitPanesWrapper"
-                split="horizontal"
-                defaultSize={225}
-                minSize={200}
-                maxSize={300}
-              >
-                <div id="BarcodeSplitContainer">{Barcode}</div>
-                <div id="SVGSplitContainer">
-                  <SVGPlot
-                    {...this.props}
-                    {...this.state}
-                    onSVGTabChange={this.handleSVGTabChange}
-                  />
-                </div>
-              </SplitPane>
-            </Grid.Row>
+            <SplitPane
+              className="SplitPanesWrapper"
+              split="horizontal"
+              defaultSize={225}
+              minSize={200}
+              maxSize={300}
+            >
+              <div id="BarcodeSplitContainer">{Barcode}</div>
+              <div id="SVGSplitContainer">
+                <SVGPlot
+                  {...this.props}
+                  {...this.state}
+                  onSVGTabChange={this.handleSVGTabChange}
+                />
+              </div>
+            </SplitPane>
           </Grid>
         </div>
       );
