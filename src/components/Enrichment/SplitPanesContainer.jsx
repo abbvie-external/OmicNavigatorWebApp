@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { Grid, Dimmer, Loader } from 'semantic-ui-react';
 import EnrichmentBreadcrumbs from './EnrichmentBreadcrumbs';
-// import ButtonActions from './ButtonActions';
+import ButtonActions from '../Shared/ButtonActions';
 // import PlotSVG from './PlotSVG';
 import SplitPane from 'react-split-pane';
 import './SplitPanesContainer.scss';
@@ -46,8 +46,8 @@ class SplitPanesContainer extends Component {
           className="BarcodePlotContainer"
           {...state}
           {...props}
-          data={barcodeData}
-          settings={barcodeSettings}
+          // data={barcodeData}
+          // settings={barcodeSettings}
         />
       );
     }
@@ -100,8 +100,8 @@ class SplitPanesContainer extends Component {
                 minSize={200}
                 maxSize={300}
               >
-                <div>{Barcode}</div>
-                <div>
+                <div id="BarcodeSplitContainer">{Barcode}</div>
+                <div id="SVGSplitContainer">
                   <SVGPlot
                     {...this.props}
                     {...this.state}
@@ -116,7 +116,7 @@ class SplitPanesContainer extends Component {
     } else {
       return (
         <div className="ThreePlotsWrapper">
-          <Grid columns={2} className="">
+          <Grid className="">
             <Grid.Row className="ActionsRow">
               <Grid.Column mobile={8} tablet={8} largeScreen={8} widescreen={8}>
                 <EnrichmentBreadcrumbs
@@ -128,35 +128,33 @@ class SplitPanesContainer extends Component {
                 {/* <ButtonActions {...this.props} {...this.state} /> */}
               </Grid.Column>
             </Grid.Row>
-            <Grid.Row>
+            <SplitPane
+              className="SplitPanesWrapper"
+              split="horizontal"
+              defaultSize={275}
+              minSize={225}
+              maxSize={325}
+            >
+              <div id="BarcodeSplitContainer">{Barcode}</div>
               <SplitPane
-                className="SplitPanesWrapper"
-                split="horizontal"
-                defaultSize={275}
-                minSize={200}
-                maxSize={350}
+                split="vertical"
+                defaultSize={400}
+                minSize={300}
+                maxSize={700}
               >
-                <div>{Barcode}</div>
-                <SplitPane
-                  split="vertical"
-                  defaultSize={400}
-                  minSize={300}
-                  maxSize={700}
-                >
-                  <div>
-                    <h2>VIOLIN</h2>
-                  </div>
+                <div id="ViolinSplitContainer">
+                  <h2>VIOLIN</h2>
+                </div>
 
-                  <div>
-                    <SVGPlot
-                      {...this.props}
-                      {...this.state}
-                      // onSVGTabChange={this.handleSVGTabChange}
-                    />
-                  </div>
-                </SplitPane>
+                <div id="SVGSplitContainer">
+                  <SVGPlot
+                    {...this.props}
+                    {...this.state}
+                    // onSVGTabChange={this.handleSVGTabChange}
+                  />
+                </div>
               </SplitPane>
-            </Grid.Row>
+            </SplitPane>
           </Grid>
         </div>
       );

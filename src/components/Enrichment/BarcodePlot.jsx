@@ -7,6 +7,7 @@ import * as d3 from 'd3';
 class BarcodePlot extends Component {
   constructor(props) {
     super(props);
+    debugger;
     // chartSize: { height: '200', width: '960' },
     // barcodeData: this.props.barcodeData || null,
     // enableBrush: this.props.settings.enableBrush || false,
@@ -33,7 +34,7 @@ class BarcodePlot extends Component {
         axes: null,
         bottomLabel: null,
         brush: null,
-        brushing: false,
+        // brushing: false,
         chartDiv: null,
         // chartSize: { height: '200', width: '960' },
         // barcodeData: this.props.barcodeData || null,
@@ -75,6 +76,7 @@ class BarcodePlot extends Component {
   prepareAndRender() {
     const { settings } = this.state;
     const { barcodeSettings } = this.props;
+    const self = this;
     // const chartSize, barcodeData, enableBrush, height, highStat, highLabel, lowLabel, lineID, logFC, statLabel, statisticj;
     // prepare settings
     let margin = settings.margin;
@@ -94,7 +96,7 @@ class BarcodePlot extends Component {
       .domain([
         0,
         d3.extent(barcodeSettings.barcodeData, function(d) {
-          return d[barcodeSettings.statistic];
+          return d.statistic;
         })[1]
       ]);
 
@@ -164,7 +166,6 @@ class BarcodePlot extends Component {
       .attr('transform', 'translate(0,' + height + ')');
     let tooltip = g.append('text');
     tooltip.attr('class', 'barcode-tooltip');
-
     // render barcode plot
     let lines = g
       .selectAll('line.barcode-line')
@@ -173,13 +174,13 @@ class BarcodePlot extends Component {
       .append('line')
       .attr('class', 'barcode-line')
       .attr('id', function(d) {
-        return 'barcode-line-' + d[barcodeSettings.lineID];
+        return 'barcode-line-' + d.lineID;
       })
       .attr('x1', function(d, i) {
-        return xScale(d[barcodeSettings.statistic]);
+        return xScale(d.statistic);
       })
       .attr('x2', function(d) {
-        return xScale(d[barcodeSettings.statistic]);
+        return xScale(d.statistic);
       })
       .attr('y1', -20)
       .attr('y2', height)
@@ -202,7 +203,7 @@ class BarcodePlot extends Component {
             .style('stroke-width', 3)
             .style('opacity', 1);
 
-          if (xScale(d[barcodeSettings.statistic]) > width / 2) {
+          if (xScale(d.statistic) > width / 2) {
             tooltip.attr('text-anchor', 'end');
           } else {
             tooltip.attr('text-anchor', 'start');
@@ -213,14 +214,14 @@ class BarcodePlot extends Component {
             .duration(100)
             .style('opacity', 1)
             .text(function() {
-              return d.barcodeSettings.lineID;
+              return d.lineID;
             })
             .style('fill', function() {
               return '#2c3b78';
             })
             .attr('y', -22)
             .attr('x', function() {
-              if (xScale(d[barcodeSettings.statistic]) > width / 2) {
+              if (xScale(d.statistic) > width / 2) {
                 return toolTipPostition - 5;
               } else {
                 return toolTipPostition + 5;
@@ -249,22 +250,21 @@ class BarcodePlot extends Component {
       .on('click', function(d) {
         if (barcodeSettings.brushing == false) {
           debugger;
-          // self.tickData.emit(d);
+          self.props.onHandleTickData(d);
         }
       });
 
     if (barcodeSettings.enableBrush) {
-      debugger;
-      this.makeBrush();
+      self.makeBrush(self);
     }
 
     let t = svg.on('click', function() {
       debugger;
-      // this.setState({
-      //   ...barcodeSettings,
-      //     brushing: false
-      // })
-      // this.unhighLight();
+      self.props.onHandleBarcodeChanges({
+        brushing: false
+      });
+      self.unhighLight();
+      // self.props.onHandleTickBrush()
       // self.tickBrush.emit([]);
     });
 
@@ -313,32 +313,60 @@ class BarcodePlot extends Component {
       });
   }
 
-  makeBrush() {
+  makeBrush(self) {
     debugger;
-    // const highlightBrushedTicks = function() {
-    //   self.brushing = true;
-    //   const ticks = d3.selectAll("line.barcode-line");
-    //   if (d3.event.selection != null) {
-    //     self.unhighLight();
-    //     const brushedTicks = d3.brushSelection(this);
-    //     const isBrushed = function(brushedTicks, x) {
-    //       const xMin = brushedTicks[0][0],
-    //         xMax = brushedTicks[1][0];
-    //       const brushTest: boolean = xMin <= x && x <= xMax;
-    //       return brushTest;
-    //     };
-    //     const brushed = ticks
-    //       .filter(function() {
-    //         const x = d3.select(this).attr("x1");
-    //         return isBrushed(brushedTicks, x);
-    //       })
-    //       .attr("y1", -40)
-    //       .style("stroke-width", 3)
-    //       .style("opacity", 1.0);
-    //     self.brushedData = brushed.data();
-    //     self.tickBrush.emit(self.brushedData);
-    //   }
-    // };
+    const highlightBrushedTicks = function() {
+      self.props.onHandleBarcodeChanges({
+        brushing: false
+      });
+      const ticks = d3.selectAll('line.barcode-line');
+      if (d3.event.selection != null) {
+        debugger;
+        self.unhighLight();
+
+        const brushedTicks = d3.brushSelection(this);
+
+        const isBrushed = function(brushedTicks, x) {
+          const xMin = brushedTicks[0][0],
+            xMax = brushedTicks[1][0];
+
+          const brushTest: boolean = xMin <= x && x <= xMax;
+          return brushTest;
+        };
+
+        const brushed = ticks
+          .filter(function() {
+            const x = d3.select(this).attr('x1');
+            return isBrushed(brushedTicks, x);
+          })
+          .attr('y1', -40)
+          .style('stroke-width', 3)
+          .style('opacity', 1.0);
+
+        const brushedDataVar = brushed.data();
+
+        if (brushedDataVar > 0) {
+          var line = self.getMaxObject(brushedDataVar);
+
+          d3.select(
+            '#barcode-line-' +
+              line.lineID.replace(/;/g, '') +
+              '_' +
+              line.id_mult
+          )
+            .style('stroke', 'orange')
+            .attr('y1', -55);
+        }
+
+        // self.props.onHandleBarcodeChanges({
+        //   brushedData: brushedDataVar
+        // })
+        // self.tickBrush.emit(self.brushedData);
+        self.props.onHandleTickBrush({
+          brushedData: brushedDataVar
+        });
+      }
+    };
     // self.chart.objs.brush = d3
     //   .brush()
     //   .extent([
@@ -355,16 +383,42 @@ class BarcodePlot extends Component {
     // d3.selectAll(".x.barcode-axis").call(self.chart.objs.brush);
   }
 
-  endBrush() {
-    // if (this.brushedData.length == 1) {
-    //   this.tickData.emit(this.brushedData[0]);
-    //   this.brushedData = [];
-    // }
+  getMaxObject(array) {
+    console.log('array', array);
+    var max = Math.max.apply(
+      Math,
+      array.map(function(o) {
+        return o.statistic;
+      })
+    );
+    var obj = array.find(function(o) {
+      return o.statistic == max;
+    });
+    return obj;
   }
 
-  clearBrush() {
-    // self.chart.objs.g.call(self.chart.objs.brush.move, null);
+  endBrush() {
+    const brushedDataVar = this.getMaxObject(this.props.brushedData);
+    this.props.onHandleTickData(brushedDataVar);
+    this.props.onHandleTickBrush({
+      brushedData: []
+    });
   }
+
+  clearBrush(self) {
+    self.chart.objs.g.call(self.chart.objs.brush.move, null);
+  }
+
+  // endBrush() {
+  //   // if (this.brushedData.length == 1) {
+  //   //   this.tickData.emit(this.brushedData[0]);
+  //   //   this.brushedData = [];
+  //   // }
+  // }
+
+  // clearBrush() {
+  //   // self.chart.objs.g.call(self.chart.objs.brush.move, null);
+  // }
 
   render() {
     return <div id="chart-barcode" className="BarcodeChartWrapper"></div>;

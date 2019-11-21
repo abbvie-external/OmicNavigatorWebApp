@@ -7,6 +7,7 @@ import SplitPanesContainer from './SplitPanesContainer';
 import SearchingAlt from '../Transitions/SearchingAlt';
 import './EnrichmentResults.scss';
 import _ from 'lodash';
+import DOMPurify from 'dompurify';
 import QHGrid from '../utility/QHGrid';
 import EZGrid from '../utility/EZGrid';
 import QuickViewModal from '../utility/QuickViewModal';
@@ -373,7 +374,9 @@ class EnrichmentResults extends Component {
       isTestDataLoaded: true,
       barcodeSettings: {
         barcodeData: barcode,
-        chartSize: { height: 330, width: containerWidth - 500 },
+        brushing: false,
+        brushedData: [],
+        chartSize: { height: 250, width: containerWidth - 500 },
         lineID: '',
         statLabel: barcode[0].statLabel,
         statistic: 'statistic',
@@ -385,6 +388,251 @@ class EnrichmentResults extends Component {
       }
     });
   };
+
+  handleBarcodeChanges = changes => {
+    this.setState({
+      ...this.state.barcodeSettings,
+      brushing: changes.brushing || '',
+      brushedData: changes.brushedData || []
+    });
+  };
+
+  handleTickBrush = info => {
+    debugger;
+    // if (info.length > 0 && this.modelsToRenderViolin.includes(this.selectedTestCategory.testCategory)) {
+    //   var self = this;
+    // const i = _.map(info, function (d) {
+    //   d.statistic = _.find(self.barcodeInfo, { "lineID": d.lineID, "id_mult": d.id_mult }).statistic;
+    //   d.logFC = _.find(self.barcodeInfo, { "lineID": d.lineID, "id_mult": d.id_mult }).logFC;
+    //   return d;
+    // })
+
+    // this.violinDataAvailable = false;
+    // const boxPlotArray = i;
+    // if (!this.plots.includes('violin')) {
+    //   this.plots.push('violin');
+    // }
+    // const reducedBoxPlotArray = _.reduce(
+    //   boxPlotArray,
+    //   function (res, datum) {
+    //     (res[datum.statLabel] || (res[datum.statLabel] = [])).push({
+    //       cpm: datum.logFC,
+    //       sample: datum.lineID,
+    //       statistic: datum.statistic,
+    //       id_mult: datum.id_mult
+    //     });
+    //     return res;
+    //   },
+    //   {}
+    // );
+
+    // const vData = _.mapValues(reducedBoxPlotArray, function (v: any) {
+    //   return { values: v };
+    // });
+
+    // const ordered = {};
+    // Object.keys(vData)
+    //   .sort()
+    //   .forEach(function (key) {
+    //     ordered[key] = vData[key];
+    //   });
+
+    // var kLSplit = document.getElementById('left-splitter');
+    // var d = ordered;
+    // this.vData1 = d;
+    // this.vSettings1 = {
+    //   chartSize: { height: kLSplit.clientHeight + 25, width: kLSplit.clientWidth },
+    //   axisLabels: { xAxis: this.term, yAxis: "log<tspan baseline-shift='sub' font-size='14px'>2</tspan>(FC)" },
+    //   id: 'violin-graph-1',
+    //   pointUniqueId: 'sample',
+    //   pointValue: 'cpm',
+    //   title:
+    //     "",
+    //   subtitle:
+    //     ''
+    //   ,
+    //   tooltip: {
+    //     show: true,
+    //     fields: [
+    //       { label: "log(FC)", value: 'cpm', toFixed: true },
+    //       { label: 'Protien', value: 'sample' }
+    //     ]
+    //   },
+    //   xName: 'tissue'
+    // };
+    // this.violinDataAvailable = true;
+    //}
+    // else {
+    //   this.violinDataAvailable = false;
+    //   if (this.plots.includes('violin')) {
+    //     let index = this.plots.indexOf('violin');
+    //     this.plots.splice(index, 1);
+    //   }
+    // }
+  };
+
+  handleTickData = d => {
+    const { pepplotStudy, pepplotModel } = this.props;
+    debugger;
+    const dataItem = this.state.barcodeSettings.barcodeData.find(
+      i => i.lineID === d.lineID
+    );
+    // let protein = dataItem.lineID;
+    // this.plotDataAvailable = true;
+    let id = dataItem.id_mult ? dataItem.id_mult : dataItem.id;
+
+    let splitterHeight = document.getElementById('SVGSplitContainer')
+      .clientHeight;
+    // let splitterWidth = document.getElementById('right-splitter').clientWidth;
+    let splitterWidth = document.getElementById('SVGSplitContainer')
+      .clientWidth;
+
+    var w = (splitterWidth - 50) * 0.86;
+    var h = (splitterHeight - 40) * 0.94;
+
+    // var psp = document.getElementById('psp-icon');
+    // psp.style.visibility = "hidden";
+    // psp.style.left = w.toString() + "px";
+    // psp.style.bottom = h.toString() + "px";
+    let plotType = ['splineplot'];
+    switch (pepplotModel) {
+      case 'DonorDifferentialPhosphorylation':
+        plotType = ['dotplot'];
+        break;
+      case 'TreatmentDifferentialPhosphorylation':
+        plotType = ['splineplot'];
+        break;
+      case 'Treatment and/or Strain Differential Phosphorylation':
+        plotType = ['StrainStimDotplot', 'StimStrainDotplot'];
+        break;
+      case 'Timecourse Differential Phosphorylation':
+        plotType = ['splineplot', 'lineplot'];
+        break;
+      case 'Differential Expression':
+        if (pepplotStudy === '***REMOVED***') {
+          plotType = ['proteinlineplot'];
+        } else {
+          plotType = ['proteindotplot'];
+        }
+        break;
+      case 'Differential Phosphorylation':
+        if (pepplotStudy === '***REMOVED***') {
+          plotType = ['proteinlineplot'];
+        } else {
+          plotType = ['proteindotplot'];
+        }
+        break;
+      case 'No Pretreatment Timecourse Differential Phosphorylation':
+        plotType = ['splineplot.modelII', 'lineplot.modelII'];
+        break;
+      case 'Ferrostatin Pretreatment Timecourse Differential Phosphorylation':
+        plotType = ['splineplot.modelIII', 'lineplot.modelIII'];
+        break;
+      default:
+        plotType = ['dotplot'];
+    }
+
+    let imageInfo = { key: '', title: '', svg: [] };
+    switch (pepplotModel) {
+      case 'Differential Expression':
+        imageInfo.title = 'Protein Intensity - ' + dataItem.MajorityProteinIDs;
+        imageInfo.key = dataItem.MajorityProteinIDs;
+        break;
+      default:
+        imageInfo.title = 'Phosphosite Intensity - ' + dataItem.Protein_Site;
+        imageInfo.key = dataItem.Protein_Site;
+    }
+
+    const handleSVGCb = this.handleSVG;
+    this.getPlot(id, plotType, pepplotStudy, imageInfo, handleSVGCb);
+  };
+
+  getPlot = (id, plotType, pepplotStudy, imageInfo, handleSVGCb) => {
+    let currentSVGs = [];
+    let heightCalculation = this.calculateHeight;
+    let widthCalculation = this.calculateWidth;
+    _.forEach(plotType, function(plot, i) {
+      phosphoprotService
+        .getPlot(id, plotType[i], pepplotStudy + 'plots')
+        .then(svgMarkupObj => {
+          let svgMarkup = svgMarkupObj.data;
+          svgMarkup = svgMarkup.replace(/id="/g, 'id="' + id + '-' + i + '-');
+          svgMarkup = svgMarkup.replace(
+            /#glyph/g,
+            '#' + id + '-' + i + '-glyph'
+          );
+          svgMarkup = svgMarkup.replace(/#clip/g, '#' + id + '-' + i + '-clip');
+          svgMarkup = svgMarkup.replace(
+            /<svg/g,
+            '<svg preserveAspectRatio="xMinYMid meet" style="width:' +
+              widthCalculation() * 0.75 +
+              'px; height:' +
+              heightCalculation() * 0.75 +
+              'px;" id="currentSVG-' +
+              id +
+              '-' +
+              i +
+              '"'
+          );
+          DOMPurify.addHook('afterSanitizeAttributes', function(node) {
+            if (
+              node.hasAttribute('xlink:href') &&
+              !node.getAttribute('xlink:href').match(/^#/)
+            ) {
+              node.remove();
+            }
+          });
+          // Clean HTML string and write into our DIV
+          let sanitizedSVG = DOMPurify.sanitize(svgMarkup, {
+            ADD_TAGS: ['use']
+          });
+          let svgInfo = { plotType: plotType[i], svg: sanitizedSVG };
+          imageInfo.svg.push(svgInfo);
+          currentSVGs.push(sanitizedSVG);
+          handleSVGCb(imageInfo);
+        });
+    });
+  };
+
+  handleSVG = imageInfo => {
+    this.setState({
+      imageInfo: imageInfo
+      // isProteinSVGLoaded: true
+    });
+  };
+
+  //   const p = function (plot, i) {
+  //     return new Promise(resolve => setTimeout(function () {
+
+  //       if (self.plots.indexOf(plot) == -1) {
+  //         self.plots.push(plot);
+  //       }
+
+  //       self._phosphoprotService.getPlot(id, plotType[i], self.selectedStudy.study + "plots").subscribe((svgMarkup) => {
+  //         svgMarkup = svgMarkup.replace(/id="/g, 'id="' + id + '-' + i + '-');
+  //         svgMarkup = svgMarkup.replace(/#glyph/g, '#' + id + '-' + i + '-glyph');
+  //         svgMarkup = svgMarkup.replace(/#clip/g, '#' + id + '-' + i + '-clip');
+  //         // svgMarkup = svgMarkup.replace(/<svg/g, '<svg preserveAspectRatio="none" style="width:' + self.calculateWidth() * .65 + 'px; height:' + self.calculateHeight() * .70 + 'px;" id="currentSVG-' + id + '-' + i + '"');
+  //         svgMarkup = svgMarkup.replace(/<svg/g, '<svg preserveAspectRatio="none" style="width:' + (splitterWidth - 50) + 'px; height:' + (splitterHeight - 50) + 'px;" id="currentSVG-' + id + '-' + i + '"');
+  //         //console.log(svgMarkup)
+  //         var sanitizedSVG = self.sanitized.bypassSecurityTrustHtml(svgMarkup);
+
+  //         var svgInfo = { "plotType": plotType[i], "svg": sanitizedSVG }
+  //         resolve(
+  //           self.imageInfo.svg[i] = svgInfo
+  //         );
+
+  //         self.currentSVGs.push(sanitizedSVG);
+
+  //         if (i == 1){
+  //           psp.style.visibility = "visible";
+  //         }
+  //       })
+  //     }, 1000 * i))
+  //   }
+
+  //   //Promise.all(plotType.map(p))
+  // }
 
   backToTable = () => {
     this.setState({
@@ -502,12 +750,12 @@ class EnrichmentResults extends Component {
           />
         </div>
       );
-      // } else if (this.state.isTestSelected && !this.state.isTestDataLoaded) {
-      //   return (
-      //     <div>
-      //       <SearchingAlt />
-      //     </div>
-      //   );
+    } else if (this.state.isTestSelected && !this.state.isTestDataLoaded) {
+      return (
+        <div>
+          <SearchingAlt />
+        </div>
+      );
     } else {
       return (
         <div>
@@ -515,6 +763,9 @@ class EnrichmentResults extends Component {
             {...this.props}
             {...this.state}
             onBackToTable={this.backToTable}
+            onHandleBarcodeChanges={this.handleBarcodeChanges}
+            onHandleTickBrush={this.handleTickBrush}
+            onHandleTickData={this.handleTickData}
           ></SplitPanesContainer>
         </div>
       );

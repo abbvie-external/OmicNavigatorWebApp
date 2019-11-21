@@ -93,7 +93,7 @@ class Breadcrumbs extends Component {
       return (
         <Fragment>
           <Popup
-            trigger={<span className="BreadcrumbName">{splitValue(name)}</span>}
+            trigger={<span className="BreadcrumbName">{name}</span>}
             style={BreadcrumbPopupStyle}
             inverted
             basic
@@ -186,13 +186,3 @@ class Breadcrumbs extends Component {
 }
 
 export default withRouter(Breadcrumbs);
-
-function splitValue(value) {
-  if (value) {
-    const firstValue = value.split(';')[0];
-    const numberOfSemicolons = (value.match(/;/g) || []).length;
-    return numberOfSemicolons > 0
-      ? `${firstValue}...(${numberOfSemicolons})`
-      : firstValue;
-  }
-}
