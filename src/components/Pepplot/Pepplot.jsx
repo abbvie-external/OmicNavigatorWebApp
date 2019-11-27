@@ -41,9 +41,9 @@ class Pepplot extends Component {
 
   componentDidMount() {}
 
-  handleSearchTransition = () => {
+  handleSearchTransition = bool => {
     this.setState({
-      isSearching: true
+      isSearching: bool
     });
   };
 

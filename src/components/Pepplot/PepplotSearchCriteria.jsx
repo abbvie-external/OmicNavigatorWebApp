@@ -146,7 +146,7 @@ class PepplotSearchCriteria extends Component {
       this.setState({
         uAnchorP: t
       });
-      this.props.onSearchTransition();
+      this.props.onSearchTransition(true);
       phosphoprotService
         .getTestData(m, t, s + 'plots')
         .then(dataFromService => {
@@ -244,7 +244,7 @@ class PepplotSearchCriteria extends Component {
       },
       true
     );
-    this.props.onSearchTransition();
+    this.props.onSearchTransition(true);
     phosphoprotService
       .getTestData(
         this.props.pepplotModel,
@@ -306,7 +306,7 @@ class PepplotSearchCriteria extends Component {
       },
       true
     );
-    this.props.onSearchTransition();
+    this.props.onSearchTransition(true);
     phosphoprotService
       .getTestData(
         this.props.pepplotModel,
@@ -512,7 +512,11 @@ class PepplotSearchCriteria extends Component {
     }
 
     let PMultisetFilters;
-    if (isValidSearchPepplot && activateMultisetFiltersP && multisetFiltersVisibleP) {
+    if (
+      isValidSearchPepplot &&
+      activateMultisetFiltersP &&
+      multisetFiltersVisibleP
+    ) {
       PMultisetFilters = (
         <PepplotMultisetFilters
           {...this.props}

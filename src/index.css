@@ -17,12 +17,10 @@ body {
   height: 100%;
 }
 
-.Toastify__toast--error {
-  color: white;
-  background-color: #ff4400;
+.Toastify__toast--success {
+  background: linear-gradient(90deg, #1678c2 0%, #1f9eff 100.05%);
 }
 
-.Toastify__toast--info {
-  color: white;
-  background-color: #1678c2;
+.Toastify__toast--error {
+  background: linear-gradient(90deg, #ff4400 -2.66%, rgb(255, 126, 56) 99.83%);
 }

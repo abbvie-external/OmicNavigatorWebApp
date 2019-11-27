@@ -13,6 +13,7 @@ import {
 import '../Shared/SearchCriteria.scss';
 import { phosphoprotService } from '../../services/phosphoprot.service';
 import _ from 'lodash';
+import { toast } from 'react-toastify';
 import EnrichmentMultisetFilters from './EnrichmentMultisetFilters';
 
 class EnrichmentSearchCriteria extends Component {
@@ -40,6 +41,7 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentStudyHref: '',
       enrichmentModels: [],
       enrichmentAnnotations: [],
+      enrichmentResultsErrorCb: this.props.onSearchTransition || undefined,
       enrichmentStudiesDisabled: false,
       enrichmentModelsDisabled: true,
       enrichmentAnnotationsDisabled: true,
@@ -164,9 +166,16 @@ class EnrichmentSearchCriteria extends Component {
         },
         false
       );
-      this.props.onSearchTransition();
+      debugger;
+      this.props.onSearchTransition(true);
       phosphoprotService
-        .getAnnotationData(m, a, s + 'plots', t)
+        .getAnnotationData(
+          m,
+          a,
+          s + 'plots',
+          t,
+          this.state.enrichmentResultsErrorCb
+        )
         .then(dataFromService => {
           this.setState({
             uSettings: {
@@ -269,13 +278,14 @@ class EnrichmentSearchCriteria extends Component {
       },
       true
     );
-    this.props.onSearchTransition();
+    this.props.onSearchTransition(true);
     phosphoprotService
       .getAnnotationData(
         this.props.enrichmentModel,
         value,
         this.props.enrichmentStudy + 'plots',
-        this.props.pValueType
+        this.props.pValueType,
+        this.state.enrichmentResultsErrorCb
       )
       .then(dataFromService => {
         this.setState({
@@ -296,14 +306,15 @@ class EnrichmentSearchCriteria extends Component {
   };
 
   handlePValueTypeChange = (evt, { value }) => {
-    this.props.onSearchTransition();
+    this.props.onSearchTransition(true);
     this.props.onPValueTypeChange(value);
     phosphoprotService
       .getAnnotationData(
         this.props.enrichmentModel,
         this.props.enrichmentAnnotation,
         this.props.enrichmentStudy + 'plots',
-        value
+        value,
+        this.state.enrichmentResultsErrorCb
       )
       .then(dataFromService => {
         this.setState({
@@ -360,13 +371,14 @@ class EnrichmentSearchCriteria extends Component {
       },
       true
     );
-    this.props.onSearchTransition();
+    this.props.onSearchTransition(true);
     phosphoprotService
       .getAnnotationData(
         this.props.enrichmentModel,
         value,
         this.props.enrichmentStudy + 'plots',
-        this.props.pValueType
+        this.props.pValueType,
+        this.state.enrichmentResultsErrorCb
       )
       .then(dataFromService => {
         this.annotationdata = dataFromService;

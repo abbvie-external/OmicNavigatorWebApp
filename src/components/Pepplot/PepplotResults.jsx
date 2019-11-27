@@ -5,6 +5,7 @@ import ButtonActions from '../Shared/ButtonActions';
 import PepplotPlot from './PepplotPlot';
 import LoaderActivePlots from '../Transitions/LoaderActivePlots';
 import _ from 'lodash';
+import { toast } from 'react-toastify';
 import DOMPurify from 'dompurify';
 import QHGrid from '../utility/QHGrid';
 import EZGrid from '../utility/EZGrid';
@@ -222,6 +223,7 @@ class PepplotResults extends Component {
   };
 
   getPlot = (id, plotType, pepplotStudy, imageInfo, handleSVGCb) => {
+    // let self = this;
     let currentSVGs = [];
     let heightCalculation = this.calculateHeight;
     let widthCalculation = this.calculateWidth;
@@ -265,6 +267,9 @@ class PepplotResults extends Component {
           currentSVGs.push(sanitizedSVG);
           handleSVGCb(imageInfo);
         });
+      // .catch(error => {
+      //   toast.error('Failed to create plot, please try again.');
+      // });
     });
   };
 

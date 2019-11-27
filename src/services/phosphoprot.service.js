@@ -39,7 +39,8 @@ class PhosphoprotService {
     return modelsFromPromise;
   }
 
-  ocpuDataCall(method, obj) {
+  ocpuDataCall(method, obj, handleError) {
+    debugger;
     return new Promise(function(resolve, reject) {
       window.ocpu
         .call(method, obj, function(session) {
@@ -49,6 +50,10 @@ class PhosphoprotService {
         })
         .catch(error => {
           toast.error('Failed to retrieve data, please try again.');
+          debugger;
+          if (handleError !== undefined) {
+            handleError(false);
+          }
         });
     });
   }
@@ -73,7 +78,13 @@ class PhosphoprotService {
     return dataFromPromise;
   }
 
-  async getAnnotationData(model, test, study, type) {
+  async getAnnotationData(model, test, study, type, errorCb) {
+    debugger;
+    const handleError =
+      errorCb ||
+      function() {
+        return undefined;
+      };
     this.setUrl();
     const obj = {
       testCategory: model,
@@ -81,7 +92,7 @@ class PhosphoprotService {
       study: study,
       type: type
     };
-    const promise = this.ocpuDataCall('getEnrichmentResults', obj);
+    const promise = this.ocpuDataCall('getEnrichmentResults', obj, handleError);
     const dataFromPromise = await promise;
     return dataFromPromise;
   }
@@ -123,7 +134,7 @@ class PhosphoprotService {
             .then(response => resolve(response));
         })
         .catch(error => {
-          toast.error('Failed to create plot, please try again.');
+          toast.error('Failed to retrieve plot, please try again.');
         });
     });
   }
@@ -163,7 +174,7 @@ class PhosphoprotService {
       const response = await axios.get('networkData.json');
       return response.data;
     } catch (error) {
-      console.error(error);
+      toast.error('Failed to get network data, please try again.');
     }
   }
 
