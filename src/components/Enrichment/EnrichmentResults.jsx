@@ -376,7 +376,7 @@ class EnrichmentResults extends Component {
         barcodeData: barcode,
         brushing: false,
         brushedData: [],
-        chartSize: { height: 250, width: containerWidth - 500 },
+        // chartSize: { height: 250, width: containerWidth - 500 },
         lineID: '',
         statLabel: barcode[0].statLabel,
         statistic: 'statistic',

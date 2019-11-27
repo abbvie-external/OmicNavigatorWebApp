@@ -56,14 +56,36 @@ class BarcodePlot extends Component {
         title: '',
         tooltip: null
       },
-      width: null,
+      width: 0,
+      height: 0,
       xAxis: null,
       xScale: null
     };
+    this.barcodeChartRef = React.createRef();
     this.prepareAndRender = this.prepareAndRender.bind(this);
   }
 
   componentDidMount() {
+    let width = this.getWidth();
+    let height = this.getHeight();
+    this.setState({ width: width, height: height }, () => {
+      this.prepareAndRender();
+    });
+
+    let resizedFn;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizedFn);
+      resizedFn = setTimeout(() => {
+        this.prepareAndRender();
+      }, 200);
+    });
+  }
+
+  redrawChart() {
+    let width = this.setWidth();
+    this.setState({ width: width });
+    d3.select('.BarcodeChartWrapper svg').remove();
+    this.prepareAndRender = this.prepareAndRender.bind(this);
     this.prepareAndRender();
   }
 
@@ -73,21 +95,29 @@ class BarcodePlot extends Component {
   //   }
   // }
 
+  getWidth() {
+    return this.barcodeChartRef.current.parentElement.offsetWidth;
+  }
+
+  getHeight() {
+    return this.barcodeChartRef.current.parentElement.offsetHeight;
+  }
+
   prepareAndRender() {
-    const { settings } = this.state;
+    const { settings, width, height } = this.state;
     const { barcodeSettings } = this.props;
     const self = this;
     // const chartSize, barcodeData, enableBrush, height, highStat, highLabel, lowLabel, lineID, logFC, statLabel, statisticj;
     // prepare settings
     let margin = settings.margin;
-    let width =
-      barcodeSettings.chartSize.width -
-      settings.margin.left -
-      settings.margin.right;
-    let height =
-      barcodeSettings.chartSize.height -
-      settings.margin.top -
-      settings.margin.bottom;
+    // let width =
+    //   barcodeSettings.chartSize.width -
+    //   settings.margin.left -
+    //   settings.margin.right;
+    // let height =
+    //   barcodeSettings.chartSize.height -
+    //   settings.margin.top -
+    //   settings.margin.bottom;
 
     //Scale the range of the data
     let domain = d3
@@ -115,13 +145,7 @@ class BarcodePlot extends Component {
       .attr('class', 'barcode-chart-area bcChart')
       .attr('width', '100%')
       .attr('height', '100%')
-      .attr(
-        'viewBox',
-        '0 0 ' +
-          barcodeSettings.chartSize.width +
-          ' ' +
-          barcodeSettings.chartSize.height
-      )
+      .attr('viewBox', '0 0 ' + width + ' ' + height)
       .attr('preserveAspectRatio', 'xMinYMin meet');
 
     let settingsHeight = chartDiv._groups[0][0].clientHeight;

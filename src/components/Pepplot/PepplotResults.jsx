@@ -227,7 +227,7 @@ class PepplotResults extends Component {
     let widthCalculation = this.calculateWidth;
     _.forEach(plotType, function(plot, i) {
       phosphoprotService
-        .getPlot(id, plotType[i], pepplotStudy + 'plots')
+        .getPlot(id, plotType[i], pepplotStudy + '')
         .then(svgMarkupObj => {
           let svgMarkup = svgMarkupObj.data;
           svgMarkup = svgMarkup.replace(/id="/g, 'id="' + id + '-' + i + '-');

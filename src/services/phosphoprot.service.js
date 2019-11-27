@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 window.jQuery = $;
 const ocpu = require('opencpu.js/opencpu-0.5.js');
 
@@ -14,9 +15,13 @@ class PhosphoprotService {
 
   ocpuRPC(name, paramsObj) {
     return new Promise(function(resolve, reject) {
-      window.ocpu.rpc(name, paramsObj, function(session) {
-        resolve(session);
-      });
+      window.ocpu
+        .rpc(name, paramsObj, function(session) {
+          resolve(session);
+        })
+        .catch(error => {
+          toast.error('Failed to retrieve data, please try again.');
+        });
     });
   }
 
@@ -36,19 +41,27 @@ class PhosphoprotService {
 
   ocpuDataCall(method, obj) {
     return new Promise(function(resolve, reject) {
-      window.ocpu.call(method, obj, function(session) {
-        session
-          .getObject('.val', 'digits=10')
-          .then(response => resolve(response));
-      });
+      window.ocpu
+        .call(method, obj, function(session) {
+          session
+            .getObject('.val', 'digits=10')
+            .then(response => resolve(response));
+        })
+        .catch(error => {
+          toast.error('Failed to retrieve data, please try again.');
+        });
     });
   }
 
   ocpuDataCallAlt(method, obj) {
     return new Promise(function(resolve, reject) {
-      window.ocpu.call(method, obj, function(session) {
-        session.getObject('.val').then(response => resolve(response));
-      });
+      window.ocpu
+        .call(method, obj, function(session) {
+          session.getObject('.val').then(response => resolve(response));
+        })
+        .catch(error => {
+          toast.error('Failed to retrieve data, please try again.');
+        });
     });
   }
 
@@ -103,11 +116,15 @@ class PhosphoprotService {
 
   async ocpuPlotCall(plottype, obj) {
     return new Promise(function(resolve, reject) {
-      window.ocpu.call(plottype, obj, function(session) {
-        axios
-          .get(session.getLoc() + 'graphics/1/svg', { responseType: 'text' })
-          .then(response => resolve(response));
-      });
+      window.ocpu
+        .call(plottype, obj, function(session) {
+          axios
+            .get(session.getLoc() + 'graphics/1/svg', { responseType: 'text' })
+            .then(response => resolve(response));
+        })
+        .catch(error => {
+          toast.error('Failed to create plot, please try again.');
+        });
     });
   }
 
