@@ -50,7 +50,6 @@ class PhosphoprotService {
         })
         .catch(error => {
           toast.error('Failed to retrieve data, please try again.');
-          debugger;
           if (handleError !== undefined) {
             handleError(false);
           }
@@ -125,7 +124,7 @@ class PhosphoprotService {
     return proteinDataFromPromise;
   }
 
-  async ocpuPlotCall(plottype, obj) {
+  async ocpuPlotCall(plottype, obj, handleError) {
     return new Promise(function(resolve, reject) {
       window.ocpu
         .call(plottype, obj, function(session) {
@@ -134,14 +133,27 @@ class PhosphoprotService {
             .then(response => resolve(response));
         })
         .catch(error => {
+          debugger;
           toast.error('Failed to retrieve plot, please try again.');
+          if (handleError !== undefined) {
+            handleError(false);
+          }
         });
     });
   }
 
-  async getPlot(id, plottype, study) {
+  async getPlot(id, plottype, study, proteinSelectedError) {
     this.setUrl();
-    const promise = this.ocpuPlotCall(plottype, { idmult: id, study: study });
+    const handleError =
+      proteinSelectedError ||
+      function() {
+        return undefined;
+      };
+    const promise = this.ocpuPlotCall(
+      plottype,
+      { idmult: id, study: study },
+      handleError
+    );
     const svgMarkupFromPromise = await promise;
     return svgMarkupFromPromise;
   }
@@ -206,16 +218,26 @@ class PhosphoprotService {
     testCategory,
     study,
     annotation,
-    operator
+    operator,
+    errorCb
   ) {
     this.setUrl();
-    const promise = this.ocpuPlotCall('EnrichmentUpsetPlot', {
-      sigValue: sigVal,
-      testCategory: testCategory,
-      study: study,
-      annotation: annotation,
-      operator: operator
-    });
+    const handleError =
+      errorCb ||
+      function() {
+        return undefined;
+      };
+    const promise = this.ocpuPlotCall(
+      'EnrichmentUpsetPlot',
+      {
+        sigValue: sigVal,
+        testCategory: testCategory,
+        study: study,
+        annotation: annotation,
+        operator: operator
+      },
+      handleError
+    );
     const svgMarkupFromPromise = await promise;
     return svgMarkupFromPromise;
   }
@@ -245,13 +267,22 @@ class PhosphoprotService {
     return dataFromPromise;
   }
 
-  async getInferenceMultisetPlot(sigVal, testCategory, study) {
+  async getInferenceMultisetPlot(sigVal, testCategory, study, errorCb) {
     this.setUrl();
-    const promise = this.ocpuPlotCall('InferenceUpsetPlot', {
-      sigValue: sigVal,
-      testCategory: testCategory,
-      study: study
-    });
+    const handleError =
+      errorCb ||
+      function() {
+        return undefined;
+      };
+    const promise = this.ocpuPlotCall(
+      'InferenceUpsetPlot',
+      {
+        sigValue: sigVal,
+        testCategory: testCategory,
+        study: study
+      },
+      handleError
+    );
     const svgMarkupFromPromise = await promise;
     return svgMarkupFromPromise;
   }

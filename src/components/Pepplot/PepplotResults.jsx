@@ -27,8 +27,7 @@ class PepplotResults extends Component {
     pepplotTest: '',
     pepplotProteinSite: '',
     pepplotResults: [],
-    pepplotColumns: [],
-    isProteinSelected: false
+    pepplotColumns: []
   };
 
   constructor(props) {
@@ -46,6 +45,7 @@ class PepplotResults extends Component {
       },
       currentSVGs: [],
       isSVGDataLoaded: false,
+      isProteinSelected: false,
       isProteinSVGLoaded: false
     };
   }
@@ -95,6 +95,12 @@ class PepplotResults extends Component {
     this.setState({
       imageInfo: imageInfo,
       isProteinSVGLoaded: true
+    });
+  };
+
+  handleProteinSelected = bool => {
+    this.setState({
+      isProteinSelected: bool
     });
   };
 
@@ -227,9 +233,10 @@ class PepplotResults extends Component {
     let currentSVGs = [];
     let heightCalculation = this.calculateHeight;
     let widthCalculation = this.calculateWidth;
+    let handleProteinSelectedCb = this.handleProteinSelected;
     _.forEach(plotType, function(plot, i) {
       phosphoprotService
-        .getPlot(id, plotType[i], pepplotStudy + '')
+        .getPlot(id, plotType[i], pepplotStudy + '', handleProteinSelectedCb)
         .then(svgMarkupObj => {
           let svgMarkup = svgMarkupObj.data;
           svgMarkup = svgMarkup.replace(/id="/g, 'id="' + id + '-' + i + '-');

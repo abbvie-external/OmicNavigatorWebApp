@@ -19,7 +19,7 @@ class Pepplot extends Component {
     this.state = {
       isValidSearchPepplot: false,
       isSearching: false,
-      isProteinSelected: false,
+      showProteinPage: false,
       pepplotResults: [],
       pepplotColumns: [],
       multisetPlotInfo: {
@@ -60,7 +60,7 @@ class Pepplot extends Component {
       pepplotColumns: columns,
       isSearching: false,
       isValidSearchPepplot: true,
-      isProteinSelected: false,
+      showProteinPage: false,
       plotButtonActive: false,
       visible: false
     });
@@ -301,7 +301,7 @@ class Pepplot extends Component {
   getView = () => {
     if (
       this.state.isValidSearchPepplot &&
-      !this.state.isProteinSelected &&
+      !this.state.showProteinPage &&
       !this.state.isSearching
     ) {
       return (
