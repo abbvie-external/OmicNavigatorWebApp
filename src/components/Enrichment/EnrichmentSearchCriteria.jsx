@@ -123,7 +123,7 @@ class EnrichmentSearchCriteria extends Component {
     if (s !== '') {
       this.setState({
         enrichmentStudyHrefVisible: true,
-        enrichmentStudyHref: `${s}.html`
+        enrichmentStudyHref: `http://www.localhost:3000/${s}.html`
       });
       phosphoprotService
         .getModelNames('EnrichmentNames', s + 'plots')

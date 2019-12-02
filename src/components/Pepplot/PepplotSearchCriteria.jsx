@@ -104,7 +104,7 @@ class PepplotSearchCriteria extends Component {
     if (s !== '') {
       this.setState({
         pepplotStudyHrefVisible: true,
-        pepplotStudyHref: `${s}.html`
+        pepplotStudyHref: `http://www.localhost:3000/${s}.html`
       });
       phosphoprotService
         .getModelNames('inferenceNames', s + 'plots')
