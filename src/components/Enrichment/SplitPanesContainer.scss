@@ -11,35 +11,37 @@
 }
 
  .Resizer:hover {
-    -webkit-transition: all 2s ease;
-    transition: all 2s ease;
+    -webkit-transition: all 0.3s ease;
+    transition: all 0.3s ease;
 }
 
  .Resizer.horizontal {
-    height: 11px;
-    margin: -5px 0;
-    border-top: 5px solid rgba(255, 255, 255, 0);
-    border-bottom: 5px solid rgba(255, 255, 255, 0);
+    padding: 1px 0px !important;
+    height: 16px;
+    margin: -8px 0;
+    border-top: 8px solid rgba(255, 255, 255, 0);
+    border-bottom: 8px solid rgba(255, 255, 255, 0);
     cursor: row-resize;
     width: 100%;
 }
 
 .Resizer.horizontal:hover {
-    border-top: 5px solid #FF4400;
-    border-bottom: 5px solid #FF4400;
+    border-top: 8px solid #FF4400;
+    border-bottom: 8px solid #FF4400;
 }
 
 .Resizer.vertical {
-    width: 11px;
-    margin: 0 -5px;
-    border-left: 5px solid rgba(255, 255, 255, 0);
-    border-right: 5px solid rgba(255, 255, 255, 0);
+    padding: 0px 1px !important;
+    width: 16px;
+    margin: 0 -8px;
+    border-left: 8px solid rgba(255, 255, 255, 0);
+    border-right: 8px solid rgba(255, 255, 255, 0);
     cursor: col-resize;
 }
 
 .Resizer.vertical:hover {
-    border-left: 5px solid #FF4400;
-    border-right: 5px solid  #FF4400;
+    border-left: 8px solid #FF4400;
+    border-right: 8px solid  #FF4400;
 }
 .Resizer.disabled {
   cursor: not-allowed;
@@ -55,12 +57,21 @@
 }
 
 .SplitPanesWrapper {
+    width: 100% !important;
     height: 90vh !important;
     padding-left: 20px !important;
-    margin-top: 33px !important;
+    // margin-top: 33px !important;
 }
 
-.BarcodeChartWrapper {
-    width: 1111px !important;
-    // height: 232px !important;
+//.BarcodeChartWrapper {
+    // width: 1111px !important;
+    // width: 100% !important;
+    // height: 100% !important;
+    // height: 50vh !important;
+    // width: 100% !important;
+    // text-align: center !important;
+//}
+
+#BarcodeSplitContainer {
+    width: 100% !important;
 }

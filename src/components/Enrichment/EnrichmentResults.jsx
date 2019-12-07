@@ -40,9 +40,12 @@ class EnrichmentResults extends Component {
       currentSVGs: [],
       isTestSelected: false,
       isTestDataLoaded: false,
+      SVGPlotLoading: false,
+      SVGPlotLoaded: false,
+      isViolinDataAvailable: false,
       barcodeSettings: {
         barcodeData: [],
-        chartSize: { height: '200', width: '960' },
+        // chartSize: { height: '200', width: '960' },
         lineID: '',
         statLabel: {},
         statistic: '',
@@ -51,6 +54,9 @@ class EnrichmentResults extends Component {
         lowLabel: {},
         highStat: null,
         enableBrush: false
+      },
+      violinSettings: {
+        violinData: []
       }
     };
   }
@@ -368,8 +374,8 @@ class EnrichmentResults extends Component {
   // }
 
   showBarcodePlot = (dataItem, barcode, test, highest) => {
-    let containerWidth = this.calculateWidth() * 0.95;
-    let containerHeight = this.calculateHeight() * 0.95;
+    // let containerWidth = this.calculateWidth() * 0.95;
+    // let containerHeight = this.calculateHeight() * 0.95;
     this.setState({
       isTestDataLoaded: true,
       barcodeSettings: {
@@ -398,7 +404,6 @@ class EnrichmentResults extends Component {
   };
 
   handleTickBrush = info => {
-    debugger;
     // if (info.length > 0 && this.modelsToRenderViolin.includes(this.selectedTestCategory.testCategory)) {
     //   var self = this;
     // const i = _.map(info, function (d) {
@@ -406,7 +411,6 @@ class EnrichmentResults extends Component {
     //   d.logFC = _.find(self.barcodeInfo, { "lineID": d.lineID, "id_mult": d.id_mult }).logFC;
     //   return d;
     // })
-
     // this.violinDataAvailable = false;
     // const boxPlotArray = i;
     // if (!this.plots.includes('violin')) {
@@ -425,18 +429,15 @@ class EnrichmentResults extends Component {
     //   },
     //   {}
     // );
-
     // const vData = _.mapValues(reducedBoxPlotArray, function (v: any) {
     //   return { values: v };
     // });
-
     // const ordered = {};
     // Object.keys(vData)
     //   .sort()
     //   .forEach(function (key) {
     //     ordered[key] = vData[key];
     //   });
-
     // var kLSplit = document.getElementById('left-splitter');
     // var d = ordered;
     // this.vData1 = d;
@@ -471,11 +472,13 @@ class EnrichmentResults extends Component {
     // }
   };
 
-  handleTickData = d => {
-    const { pepplotStudy, pepplotModel } = this.props;
-    debugger;
+  handleTickData = info => {
+    this.setState({
+      SVGPlotLoading: true
+    });
+    const { enrichmentStudy, enrichmentModel } = this.props;
     const dataItem = this.state.barcodeSettings.barcodeData.find(
-      i => i.lineID === d.lineID
+      i => i.lineID === info.lineID
     );
     // let protein = dataItem.lineID;
     // this.plotDataAvailable = true;
@@ -494,66 +497,31 @@ class EnrichmentResults extends Component {
     // psp.style.visibility = "hidden";
     // psp.style.left = w.toString() + "px";
     // psp.style.bottom = h.toString() + "px";
-    let plotType = ['splineplot'];
-    switch (pepplotModel) {
-      case 'DonorDifferentialPhosphorylation':
-        plotType = ['dotplot'];
-        break;
-      case 'TreatmentDifferentialPhosphorylation':
-        plotType = ['splineplot'];
-        break;
-      case 'Treatment and/or Strain Differential Phosphorylation':
+    let plotType = ['splineplot', 'lineplot'];
+    switch (enrichmentModel) {
+      case 'Treatment and or Strain Differential Phosphorylation':
         plotType = ['StrainStimDotplot', 'StimStrainDotplot'];
         break;
       case 'Timecourse Differential Phosphorylation':
         plotType = ['splineplot', 'lineplot'];
         break;
-      case 'Differential Expression':
-        if (pepplotStudy === '***REMOVED***') {
-          plotType = ['proteinlineplot'];
-        } else {
-          plotType = ['proteindotplot'];
-        }
-        break;
-      case 'Differential Phosphorylation':
-        if (pepplotStudy === '***REMOVED***') {
-          plotType = ['proteinlineplot'];
-        } else {
-          plotType = ['proteindotplot'];
-        }
-        break;
-      case 'No Pretreatment Timecourse Differential Phosphorylation':
-        plotType = ['splineplot.modelII', 'lineplot.modelII'];
-        break;
-      case 'Ferrostatin Pretreatment Timecourse Differential Phosphorylation':
-        plotType = ['splineplot.modelIII', 'lineplot.modelIII'];
-        break;
       default:
-        plotType = ['dotplot'];
+        plotType = ['splineplot', 'lineplot'];
     }
-
     let imageInfo = { key: '', title: '', svg: [] };
-    switch (pepplotModel) {
-      case 'Differential Expression':
-        imageInfo.title = 'Protein Intensity - ' + dataItem.MajorityProteinIDs;
-        imageInfo.key = dataItem.MajorityProteinIDs;
-        break;
-      default:
-        imageInfo.title = 'Phosphosite Intensity - ' + dataItem.Protein_Site;
-        imageInfo.key = dataItem.Protein_Site;
-    }
-
+    imageInfo.title = this.state.imageInfo.title;
+    imageInfo.key = this.state.imageInfo.key;
     const handleSVGCb = this.handleSVG;
-    this.getPlot(id, plotType, pepplotStudy, imageInfo, handleSVGCb);
+    this.getPlot(id, plotType, enrichmentStudy, imageInfo, handleSVGCb);
   };
 
-  getPlot = (id, plotType, pepplotStudy, imageInfo, handleSVGCb) => {
+  getPlot = (id, plotType, enrichmentStudy, imageInfo, handleSVGCb) => {
     let currentSVGs = [];
     let heightCalculation = this.calculateHeight;
     let widthCalculation = this.calculateWidth;
     _.forEach(plotType, function(plot, i) {
       phosphoprotService
-        .getPlot(id, plotType[i], pepplotStudy + 'plots')
+        .getPlot(id, plotType[i], enrichmentStudy + 'plots')
         .then(svgMarkupObj => {
           let svgMarkup = svgMarkupObj.data;
           svgMarkup = svgMarkup.replace(/id="/g, 'id="' + id + '-' + i + '-');
@@ -565,9 +533,9 @@ class EnrichmentResults extends Component {
           svgMarkup = svgMarkup.replace(
             /<svg/g,
             '<svg preserveAspectRatio="xMinYMid meet" style="width:' +
-              widthCalculation() * 0.75 +
+              widthCalculation() * 0.5 +
               'px; height:' +
-              heightCalculation() * 0.75 +
+              heightCalculation() * 0.5 +
               'px;" id="currentSVG-' +
               id +
               '-' +
@@ -596,8 +564,9 @@ class EnrichmentResults extends Component {
 
   handleSVG = imageInfo => {
     this.setState({
-      imageInfo: imageInfo
-      // isProteinSVGLoaded: true
+      imageInfo: imageInfo,
+      SVGPlotLoading: false,
+      SVGPlotLoaded: true
     });
   };
 

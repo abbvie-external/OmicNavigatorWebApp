@@ -135,7 +135,7 @@ class PepplotResults extends Component {
       case 'TreatmentDifferentialPhosphorylation':
         plotType = ['splineplot'];
         break;
-      case 'Treatment and/or Strain Differential Phosphorylation':
+      case 'Treatment and or Strain Differential Phosphorylation':
         plotType = ['StrainStimDotplot', 'StimStrainDotplot'];
         break;
       case 'Timecourse Differential Phosphorylation':

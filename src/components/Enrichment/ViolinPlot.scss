@@ -1,0 +1,123 @@
+/*Primary Chart*/
+
+/*Nested divs for responsiveness*/
+.violin-chart-wrapper {
+    background-color: white;
+    display: inline-block;
+    position: relative;
+    width: 100%;
+    padding-bottom: 100%; /*aspect ratio*/
+    vertical-align: top;
+    overflow: hidden;
+  }
+  
+  .violin-chart-wrapper text {
+    font-family: Roboto;
+    font-size: 13px;
+    fill: #000;
+  }
+  
+  .axis-label {
+    font-size: 18px;
+  }
+  
+  .violin-chart-wrapper .axis path,
+  .violin-chart-wrapper .axis line {
+    fill: none;
+    stroke: #888;
+    stroke-width: 2px;
+    shape-rendering: crispEdges;
+  }
+  
+  .violin-chart-wrapper .y.axis .tick line {
+    stroke: lightgrey;
+    opacity: 0.6;
+    stroke-dasharray: 2, 1;
+    stroke-width: 1;
+    shape-rendering: crispEdges;
+  }
+  
+  .violin-chart-wrapper .y.axis .label {
+    font-weight: bold;
+    font-size: 15px;
+  }
+  .violin-chart-wrapper .x.axis {
+    font-weight: bold;
+    font-size: 15px;
+  }
+  
+  .violin-chart-wrapper .x.axis .domain {
+    display: none;
+  }
+  /*Box Plot*/
+  .violin-chart-wrapper .box-plot .box {
+    fill-opacity: 0.4;
+    stroke-width: 2;
+  }
+  .violin-chart-wrapper .box-plot line {
+    stroke-width: 2px;
+  }
+  .violin-chart-wrapper .box-plot circle {
+    fill: white;
+    stroke: black;
+  }
+  
+  .violin-chart-wrapper .box-plot .median {
+    stroke: black;
+  }
+  
+  .violin-chart-wrapper .box-plot circle.median {
+    /*the script makes the circles the same color as the box, you can override this in the js*/
+    fill: white !important;
+  }
+  
+  .violin-chart-wrapper .box-plot .mean {
+    stroke: white;
+    stroke-dasharray: 2, 1;
+    stroke-width: 1px;
+  }
+  
+  @media (max-width: 500px) {
+    .violin-chart-wrapper .box-plot circle {
+      display: none;
+    }
+  }
+  
+  /*Violin Plot*/
+  .violin-chart-wrapper .violin-plot .area {
+    shape-rendering: geometricPrecision;
+    opacity: 0.4;
+  }
+  
+  .violin-chart-wrapper .violin-plot .line {
+    fill: none;
+    stroke-width: 2px;
+    shape-rendering: geometricPrecision;
+  }
+  
+  /* Point Plots*/
+  .violin-chart-wrapper .points-plot .point {
+    stroke: black;
+  }
+  
+  .chart-area {
+    display: inline-block;
+    position: absolute;
+    top: -25px;
+    left: 7px;
+  }
+  
+  .violin-tooltip {
+    position: absolute;
+    width: auto;
+    height: auto;
+    padding: 10px;
+    background-color: white;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    -webkit-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+    -moz-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+    box-shadow: 4px 4px 10px rgba(0, 100, 100, 0.4);
+  }
+  

@@ -40,7 +40,6 @@ class PhosphoprotService {
   }
 
   ocpuDataCall(method, obj, handleError) {
-    debugger;
     return new Promise(function(resolve, reject) {
       window.ocpu
         .call(method, obj, function(session) {
@@ -49,7 +48,8 @@ class PhosphoprotService {
             .then(response => resolve(response));
         })
         .catch(error => {
-          toast.error('Failed to retrieve data, please try again.');
+          // toast.error('Failed to retrieve data, please try again.');
+          toast.error(`${error.statusText}: ${error.responseText}`);
           if (handleError !== undefined) {
             handleError(false);
           }
@@ -64,7 +64,8 @@ class PhosphoprotService {
           session.getObject('.val').then(response => resolve(response));
         })
         .catch(error => {
-          toast.error('Failed to retrieve data, please try again.');
+          // toast.error('Failed to retrieve data, please try again.');
+          toast.error(`${error.statusText}: ${error.responseText}`);
         });
     });
   }
@@ -78,7 +79,6 @@ class PhosphoprotService {
   }
 
   async getAnnotationData(model, test, study, type, errorCb) {
-    debugger;
     const handleError =
       errorCb ||
       function() {
@@ -86,8 +86,8 @@ class PhosphoprotService {
       };
     this.setUrl();
     const obj = {
-      testCategory: model,
-      annotation: test,
+      model: model,
+      database: test,
       study: study,
       type: type
     };
@@ -133,8 +133,8 @@ class PhosphoprotService {
             .then(response => resolve(response));
         })
         .catch(error => {
-          debugger;
-          toast.error('Failed to retrieve plot, please try again.');
+          // toast.error('Failed to retrieve plot, please try again.');
+          toast.error(`${error.statusText}: ${error.responseText}`);
           if (handleError !== undefined) {
             handleError(false);
           }
@@ -186,7 +186,8 @@ class PhosphoprotService {
       const response = await axios.get('networkData.json');
       return response.data;
     } catch (error) {
-      toast.error('Failed to get network data, please try again.');
+      toast.error(`${error.statusText}: ${error.responseText}`);
+      // toast.error('Failed to get network data, please try again.');
     }
   }
 

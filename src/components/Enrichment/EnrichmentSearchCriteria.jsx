@@ -166,7 +166,6 @@ class EnrichmentSearchCriteria extends Component {
         },
         false
       );
-      debugger;
       this.props.onSearchTransition(true);
       phosphoprotService
         .getAnnotationData(

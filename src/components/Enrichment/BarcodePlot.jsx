@@ -7,19 +7,6 @@ import * as d3 from 'd3';
 class BarcodePlot extends Component {
   constructor(props) {
     super(props);
-    debugger;
-    // chartSize: { height: '200', width: '960' },
-    // barcodeData: this.props.barcodeData || null,
-    // enableBrush: this.props.settings.enableBrush || false,
-    // height: this.props.settings.height || '',
-    // highStat: this.props.settings.highStat || '',
-    // highLabel: this.props.settings.highLabel || '',
-    // lowLabel: this.props.settings.lowLabel || '',
-    // lineID: this.props.settings.lineID || '',
-    // logFC: this.props.settings.logFC || '',
-    // statLabel: this.props.settings.statLabel || '',
-    // statistic: this.props.settings.statistic || '',
-
     this.state = {
       // objs: {
       //   mainDiv: null,
@@ -49,15 +36,16 @@ class BarcodePlot extends Component {
         // lineID: this.props.settings.lineID || '',
         // logFC: this.props.settings.logFC || '',
         mainDiv: null,
-        margin: { top: 65, right: 60, bottom: 75, left: 60 },
+        // margin: { top: 65, right: 60, bottom: 75, left: 60 },
+        margin: { top: 35, right: 0, bottom: 20, left: 20 },
         // statLabel: this.props.settings.statLabel || '',
         // statistic: this.props.settings.statistic || '',
         svg: null,
         title: '',
         tooltip: null
       },
-      width: 0,
-      height: 0,
+      containerWidth: 0,
+      containerHeight: this.props.barcodeSplitPaneSize || 0,
       xAxis: null,
       xScale: null
     };
@@ -67,8 +55,7 @@ class BarcodePlot extends Component {
 
   componentDidMount() {
     let width = this.getWidth();
-    let height = this.getHeight();
-    this.setState({ width: width, height: height }, () => {
+    this.setState({ containerWidth: width }, () => {
       this.prepareAndRender();
     });
 
@@ -76,49 +63,46 @@ class BarcodePlot extends Component {
     window.addEventListener('resize', () => {
       clearTimeout(resizedFn);
       resizedFn = setTimeout(() => {
-        this.prepareAndRender();
+        this.redrawChart();
       }, 200);
     });
   }
 
   redrawChart() {
-    let width = this.setWidth();
-    this.setState({ width: width });
-    d3.select('.BarcodeChartWrapper svg').remove();
-    this.prepareAndRender = this.prepareAndRender.bind(this);
-    this.prepareAndRender();
+    let width = this.getWidth();
+    this.setState({ containerWidth: width }, () => {
+      d3.select('.BarcodeChartWrapper svg').remove();
+      this.prepareAndRender();
+    });
   }
 
   // componentDidUpdate(prevProps, prevState, snapshot) {
-  //   if (this.props.barcodeSettings !== prevProps.barcodeSettings) {
-  //     this.prepareAndRender();
+  //   if (this.props.barcodeSplitPaneSize !== prevState.containerHeight) {
+  //       this.prepareAndRender();
   //   }
   // }
 
-  getWidth() {
-    return this.barcodeChartRef.current.parentElement.offsetWidth;
-  }
+  getWidth = () => {
+    if (this.barcodeChartRef.current !== null) {
+      return this.barcodeChartRef.current.parentElement.offsetWidth;
+    } else return 1200;
+  };
 
-  getHeight() {
-    return this.barcodeChartRef.current.parentElement.offsetHeight;
-  }
+  // getHeight() {
+  //   if (this.barcodeChartRef.current !== null) {
+  //     return this.barcodeChartRef.current.parentElement.offsetHeight;
+  //   } else return 200;
+  // }
 
-  prepareAndRender() {
-    const { settings, width, height } = this.state;
+  prepareAndRender = () => {
+    const { settings, containerWidth, containerHeight } = this.state;
     const { barcodeSettings } = this.props;
     const self = this;
     // const chartSize, barcodeData, enableBrush, height, highStat, highLabel, lowLabel, lineID, logFC, statLabel, statisticj;
     // prepare settings
     let margin = settings.margin;
-    // let width =
-    //   barcodeSettings.chartSize.width -
-    //   settings.margin.left -
-    //   settings.margin.right;
-    // let height =
-    //   barcodeSettings.chartSize.height -
-    //   settings.margin.top -
-    //   settings.margin.bottom;
-
+    let width = containerWidth - settings.margin.left - settings.margin.right;
+    let height = containerHeight - settings.margin.top - settings.margin.bottom;
     //Scale the range of the data
     let domain = d3
       .scaleLinear()
@@ -143,9 +127,9 @@ class BarcodePlot extends Component {
       .append('svg')
       .attr('id', 'svg-' + settings.id)
       .attr('class', 'barcode-chart-area bcChart')
-      .attr('width', '100%')
-      .attr('height', '100%')
-      .attr('viewBox', '0 0 ' + width + ' ' + height)
+      .attr('width', width)
+      .attr('height', height)
+      .attr('viewBox', '0 0 ' + containerWidth + ' ' + containerHeight)
       .attr('preserveAspectRatio', 'xMinYMin meet');
 
     let settingsHeight = chartDiv._groups[0][0].clientHeight;
@@ -273,7 +257,6 @@ class BarcodePlot extends Component {
 
       .on('click', function(d) {
         if (barcodeSettings.brushing == false) {
-          debugger;
           self.props.onHandleTickData(d);
         }
       });
@@ -283,7 +266,6 @@ class BarcodePlot extends Component {
     }
 
     let t = svg.on('click', function() {
-      debugger;
       self.props.onHandleBarcodeChanges({
         brushing: false
       });
@@ -326,7 +308,7 @@ class BarcodePlot extends Component {
     //   width: width,
     //   xScale: xScale
     // });
-  }
+  };
 
   unhighLight() {
     d3.selectAll('line.barcode-line')
@@ -338,14 +320,12 @@ class BarcodePlot extends Component {
   }
 
   makeBrush(self) {
-    debugger;
     const highlightBrushedTicks = function() {
       self.props.onHandleBarcodeChanges({
         brushing: false
       });
       const ticks = d3.selectAll('line.barcode-line');
       if (d3.event.selection != null) {
-        debugger;
         self.unhighLight();
 
         const brushedTicks = d3.brushSelection(this);
@@ -445,7 +425,13 @@ class BarcodePlot extends Component {
   // }
 
   render() {
-    return <div id="chart-barcode" className="BarcodeChartWrapper"></div>;
+    return (
+      <div
+        id="chart-barcode"
+        className="BarcodeChartWrapper"
+        ref={this.barcodeChartRef}
+      ></div>
+    );
   }
 }
 

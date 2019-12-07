@@ -31,8 +31,7 @@ export function updateUrl(
       const pepplotTestQuery = stateParam.pepplotTest || '';
       const pepplotProteinSiteQuery = stateParam.pepplotProteinSite || '';
       const pepplotStudy = pepplotStudyQuery.replace(/ /gi, '–');
-      const pepplotModelAndOr = pepplotModelQuery.replace(/ /gi, '–');
-      const pepplotModel = pepplotModelAndOr.replace('and/or', 'and+or');
+      const pepplotModel = pepplotModelQuery.replace(/ /gi, '–');
       const pepplotTest = pepplotTestQuery.replace(/ /gi, '–');
       const pepplotProteinSite = pepplotProteinSiteQuery.replace(/ /gi, '–');
 
@@ -68,8 +67,7 @@ export function updateUrl(
       const enrichmentDescriptionAndTestQuery =
         stateParam.enrichmentDescriptionAndTest || '';
       const enrichmentStudy = enrichmentStudyQuery.replace(/ /gi, '–');
-      const enrichmentModelAndOr = enrichmentModelQuery.replace(/ /gi, '–');
-      const enrichmentModel = enrichmentModelAndOr.replace('and/or', 'and+or');
+      const enrichmentModel = enrichmentModelQuery.replace(/ /gi, '–');
       const enrichmentAnnotation = enrichmentAnnotationQuery.replace(
         / /gi,
         '–'
@@ -127,8 +125,7 @@ export function updateUrl(
       const pepplotTestQuery2 = stateChanges.pepplotTest || '';
       const pepplotProteinSiteQuery2 = stateChanges.pepplotProteinSite || '';
       const pepplotStudy = pepplotStudyQuery2.replace(/ /gi, '–');
-      const pepplotModelAndOr2 = pepplotModelQuery2.replace(/ /gi, '–');
-      const pepplotModel = pepplotModelAndOr2.replace('and/or', 'and+or');
+      const pepplotModel = pepplotModelQuery2.replace(/ /gi, '–');
       const pepplotTest = pepplotTestQuery2.replace(/ /gi, '–');
       const pepplotProteinSite = pepplotProteinSiteQuery2.replace(/ /gi, '–');
 
@@ -167,8 +164,7 @@ export function updateUrl(
       const enrichmentDescriptionAndTestQuery2 =
         stateChanges.enrichmentDescriptionAndTest || '';
       const enrichmentStudy = enrichmentStudyQuery2.replace(/ /gi, '–');
-      const enrichmentModelAndOr2 = enrichmentModelQuery2.replace(/ /gi, '–');
-      const enrichmentModel = enrichmentModelAndOr2.replace('and/or', 'and+or');
+      const enrichmentModel = enrichmentModelQuery2.replace(/ /gi, '–');
       const enrichmentAnnotation = enrichmentAnnotationQuery2.replace(
         / /gi,
         '–'

@@ -137,6 +137,7 @@ class Breadcrumbs extends Component {
       enrichmentDataItem,
       enrichmentTerm
     } = this.props;
+
     const name = this.props.imageInfo.key;
     const BreadcrumbPopupStyle = {
       backgroundColor: '2E2E2E',
