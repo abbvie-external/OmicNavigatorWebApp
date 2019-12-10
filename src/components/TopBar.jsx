@@ -13,7 +13,7 @@ class TopBar extends Component {
       <Fragment>
         <ToastContainer autoClose={5000} />
         <div className="TopBar">
-          <Tabs props></Tabs>
+          <Tabs></Tabs>
         </div>
       </Fragment>
     );

@@ -376,7 +376,7 @@ class PepplotResults extends Component {
             disableGeneralSearch
             disableGrouping
             disableColumnVisibilityToggle
-            height="75vh"
+            min-height="75vh"
             additionalTemplateInfo={additionalTemplateInfo}
             headerAttributes={<ButtonActions />}
           />

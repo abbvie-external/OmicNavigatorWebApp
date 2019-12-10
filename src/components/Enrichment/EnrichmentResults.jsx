@@ -714,7 +714,7 @@ class EnrichmentResults extends Component {
             disableGeneralSearch
             disableGrouping
             disableColumnVisibilityToggle
-            height="75vh"
+            min-height="75vh"
             additionalTemplateInfo={additionalTemplateInfo}
             // extraHeaderItem={enrichmentViewToggle}
           />

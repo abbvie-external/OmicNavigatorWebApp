@@ -2,8 +2,11 @@
     // background-color: #F6F6F6;
     background-color: #e0e1e2;
     overflow: auto !important;
-    min-height: 100vh !important;
     height: auto !important;
+
+    @media (max-width: 677px) {
+      padding-right: 10px !important;
+    }
 
     .SearchCriteriaContainer {
       padding: 20px 20px 5px 20px !important;
@@ -80,7 +83,6 @@
     .MultisetFiltersDiv {
       padding: 10px 0px !important;
       margin: 0px;
-      min-height: 250px !important;
     }
 
     .SliderDiv {

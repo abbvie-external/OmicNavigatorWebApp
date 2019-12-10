@@ -16,13 +16,13 @@ export function updateUrl(
     propsParam.history.push('');
     if (type === 'tabChange') {
       lastTabIndex = stateParam.activeIndex;
-      tabIndex = lastTabIndex === 3 ? 2 : 3;
-      tab = tabIndex === 3 ? 'enrichment' : 'pepplot';
+      tabIndex = lastTabIndex === 2 ? 1 : 2;
+      tab = tabIndex === 2 ? 'enrichment' : 'pepplot';
     } else {
       const pathname = propsParam.location.pathname;
       const enrichment = pathname.includes('enrichment');
       tab = enrichment ? 'enrichment' : 'pepplot';
-      tabIndex = enrichment ? 3 : 2;
+      tabIndex = enrichment ? 2 : 1;
     }
 
     if (tab === 'pepplot') {

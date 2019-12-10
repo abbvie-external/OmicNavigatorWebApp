@@ -10,22 +10,38 @@ background-color: #2E2E2E !important;
 
     }
 
-    .LogoElement {
-        padding: 0px 0px 17px 10px !important;
-    }
-
-    .Title {
-        font-size: 18px;
-        margin: 0px !important;
-        padding-left: 10px !important;
-        padding-top: 15px !important;
-        padding-right: 70px !important;
-        
-        .TitleTextStyle {
-        font-weight: 100 !important;
-        font-style: italic;
-        color: #e0e1e2 !important;
+    .LogoAndTitle {
+        @media(max-width: 767px) {
+            margin-right: 0px !important;
         }
 
+        @media(min-width: 768px) and (max-width: 1199px) {
+            margin-right: 5% !important;
+        }
+
+        @media(min-width: 1200px) {
+            margin-right: 9.25% !important;
+        }
+
+        .LogoElement {
+            padding: 0px !important;
+            margin-right: 10px;
+        }
+    
+        .LogoImage {
+            height: 23px;
+        }
+    
+        .Header {
+            font-size: 18px !important;
+            margin: 0px !important;
+            padding-top: 0px !important;            
+        }
+
+        .HeaderSecond {
+            font-weight: 100 !important;
+            font-style: italic;
+            color: #e0e1e2 !important;
+        }
     }
 }

@@ -1,5 +1,5 @@
 .AppContainer {
-  // height: 100vh !important;
+  height: 100vh !important;
 
   @media (max-width: 1199px) {
     .deviceMargin {
@@ -13,31 +13,8 @@
     }
   }
 
-  @media (min-width: 1px) and (max-width: 374px) {
-    .ContentContainer {
-      height: 55vh;
-    }
-  }
-  
-  @media (min-width: 375px) and (max-width: 767px) {
-    .ContentContainer {
-      height: 60vh;
-    }
-  }
-  
-  @media (min-width: 768px) and (max-width: 1199px) {
-    .ContentContainer {
-      height: 65vh;
-    }
-  }
-  
-  @media (min-width: 1200px) {
-    .ContentContainer {
-      height: 100vh;
-    }
-  }
-
   .ContentContainer {
+    height: 100vh !important;
     margin-top: 0px !important;
     padding-left: 20px !important;
   

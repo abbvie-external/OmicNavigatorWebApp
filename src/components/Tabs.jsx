@@ -121,27 +121,23 @@ class Tabs extends Component {
     const panes = [
       {
         menuItem: (
-          <Menu.Item key="1" disabled className="LogoElement">
-            <img
-              alt="Phosphoproteomic Analyzer"
-              src="/icon.png"
-              className="LogoImage"
-            />
-          </Menu.Item>
-        )
-      },
-      {
-        menuItem: (
-          <Menu.Item key="2" header disabled className="Title">
-            <b>Phosphoproteomic</b>&nbsp;
-            <span className="TitleTextStyle">Analyzer</span>
+          <Menu.Item key="1" disabled header className="LogoAndTitle">
+            <span className="LogoElement">
+              <img
+                alt="Phosphoproteomic Analyzer"
+                src="/icon.png"
+                className="LogoImage"
+              />
+            </span>
+            <span className="Header HeaderFirst">Phosphoproteomic&nbsp;</span>
+            <span className="Header HeaderSecond">Analyzer</span>
           </Menu.Item>
         )
       },
       {
         menuItem: 'Differential Phosophate Analysis',
         pane: (
-          <Tab.Pane key="3" className="">
+          <Tab.Pane key="2" className="">
             <Grid>
               <Pepplot
                 {...this.props}
@@ -155,7 +151,7 @@ class Tabs extends Component {
       {
         menuItem: 'Enrichment Analysis',
         pane: (
-          <Tab.Pane key="4" className="">
+          <Tab.Pane key="3" className="">
             <Grid>
               <Enrichment
                 {...this.props}
