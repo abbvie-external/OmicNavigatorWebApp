@@ -15,7 +15,8 @@ class SplitPanesContainer extends Component {
     super(props);
     this.state = {
       activeSVGTabIndex: 0,
-      barcodeSplitPaneSize: 250
+      barcodeSplitPaneSize:
+        parseInt(localStorage.getItem('barcodeSplitPos'), 10) || 250
     };
   }
 
@@ -108,7 +109,7 @@ class SplitPanesContainer extends Component {
     this.setState({
       barcodeSplitPaneSize: size
     });
-    // localStorage.setItem('splitPos', size)
+    localStorage.setItem('barcodeSplitPos', size);
   }
 
   render() {
@@ -161,10 +162,7 @@ class SplitPanesContainer extends Component {
                 largeScreen={16}
                 widescreen={16}
               >
-                <EnrichmentBreadcrumbs
-                  {...this.props}
-                  // onNavigateBack={this.tableTransition}
-                />
+                <EnrichmentBreadcrumbs {...this.props} />
               </Grid.Column>
               {/* <Grid.Column mobile={8} tablet={8} largeScreen={8} widescreen={8}>
                 <ButtonActions {...this.props} {...this.state} />
@@ -178,15 +176,15 @@ class SplitPanesContainer extends Component {
                 <SplitPane
                   className="SplitPanesWrapper"
                   split="horizontal"
-                  defaultSize={230}
-                  // defaultSize={parseInt(localStorage.getItem('splitPos'), 10)}
+                  defaultSize={parseInt(
+                    localStorage.getItem('barcodeSplitPos'),
+                    10
+                  )}
                   minSize={200}
                   maxSize={300}
-                  // onChange={size => localStorage.setItem('splitPos', size)}
                   onChange={size => this.barcodeSplitPaneResized(size)}
-                  // onChange={size => console.log(size)}
                 >
-                  <div id="BarcodeSplitContainer">{BarcodePlot}</div>
+                  {BarcodePlot}
                   <div id="SVGSplitContainer">{SVGPlot}</div>
                 </SplitPane>
               </Grid.Column>
@@ -205,10 +203,7 @@ class SplitPanesContainer extends Component {
                 largeScreen={16}
                 widescreen={16}
               >
-                <EnrichmentBreadcrumbs
-                  {...this.props}
-                  // onNavigateBack={this.tableTransition}
-                />
+                <EnrichmentBreadcrumbs {...this.props} />
               </Grid.Column>
               {/* <Grid.Column mobile={8} tablet={8} largeScreen={8} widescreen={8}>
                 <ButtonActions {...this.props} {...this.state} />
@@ -223,19 +218,20 @@ class SplitPanesContainer extends Component {
                 <SplitPane
                   className="SplitPanesWrapper"
                   split="horizontal"
-                  defaultSize={230}
+                  defaultSize={parseInt(
+                    localStorage.getItem('barcodeSplitPos'),
+                    10
+                  )}
                   minSize={200}
                   maxSize={300}
+                  onChange={size => this.barcodeSplitPaneResized(size)}
                 >
-                  <div id="BarcodeSplitContainer">{BarcodePlot}</div>
+                  {BarcodePlot}
                   <SplitPane
                     split="vertical"
                     defaultSize={400}
                     minSize={300}
                     maxSize={700}
-                    // defaultSize={parseInt(localStorage.getItem('splitPos'), 10)}
-                    // onChange={size => localStorage.setItem('splitPos', size)}
-                    onChange={size => this.barcodeSplitPaneResized(size)}
                   >
                     <div id="ViolinSplitContainer">{ViolinPlot}</div>
                     <div id="SVGSplitContainer">{SVGPlot}</div>

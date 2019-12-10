@@ -2,13 +2,12 @@ import React, { Component, Fragment } from 'react';
 import { withRouter } from 'react-router-dom';
 import { Breadcrumb, Icon, Popup } from 'semantic-ui-react';
 import '../Shared/Breadcrumbs.scss';
-import _ from 'lodash';
 import { phosphoprotService } from '../../services/phosphoprot.service';
 
-import msig_icon from '../../resources/msig.ico';
-import phosphosite_icon from '../../resources/phosphosite.ico';
-import reactome_icon from '../../resources/reactome.jpg';
-import go_icon from '../../resources/go.png';
+// import msig_icon from '../../resources/msig.ico';
+// import phosphosite_icon from '../../resources/phosphosite.ico';
+// import reactome_icon from '../../resources/reactome.jpg';
+// import go_icon from '../../resources/go.png';
 
 class Breadcrumbs extends Component {
   componentDidMount() {}

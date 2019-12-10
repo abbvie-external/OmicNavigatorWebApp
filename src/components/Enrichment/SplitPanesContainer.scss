@@ -58,20 +58,7 @@
 
 .SplitPanesWrapper {
     width: 100% !important;
-    height: 90vh !important;
+    min-height: 90vh !important;
     padding-left: 20px !important;
     // margin-top: 33px !important;
-}
-
-//.BarcodeChartWrapper {
-    // width: 1111px !important;
-    // width: 100% !important;
-    // height: 100% !important;
-    // height: 50vh !important;
-    // width: 100% !important;
-    // text-align: center !important;
-//}
-
-#BarcodeSplitContainer {
-    width: 100% !important;
 }

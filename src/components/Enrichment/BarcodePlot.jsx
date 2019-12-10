@@ -37,7 +37,7 @@ class BarcodePlot extends Component {
         // logFC: this.props.settings.logFC || '',
         mainDiv: null,
         // margin: { top: 65, right: 60, bottom: 75, left: 60 },
-        margin: { top: 35, right: 0, bottom: 20, left: 20 },
+        margin: { top: 35, right: 20, bottom: 40, left: 20 },
         // statLabel: this.props.settings.statLabel || '',
         // statistic: this.props.settings.statistic || '',
         svg: null,
@@ -45,7 +45,7 @@ class BarcodePlot extends Component {
         tooltip: null
       },
       containerWidth: 0,
-      containerHeight: this.props.barcodeSplitPaneSize || 0,
+      // containerHeight: this.props.barcodeSplitPaneSize || 0,
       xAxis: null,
       xScale: null
     };
@@ -76,11 +76,17 @@ class BarcodePlot extends Component {
     });
   }
 
-  // componentDidUpdate(prevProps, prevState, snapshot) {
-  //   if (this.props.barcodeSplitPaneSize !== prevState.containerHeight) {
-  //       this.prepareAndRender();
-  //   }
-  // }
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (this.props.barcodeSplitPaneSize !== prevProps.barcodeSplitPaneSize) {
+      //let heightChangedFn;
+      // clearTimeout(heightChangedFn);
+      // heightChangedFn = setTimeout(() => {
+      //   this.redrawChart();
+      d3.select('.BarcodeChartWrapper svg').remove();
+      this.prepareAndRender();
+      // }, 1000);
+    }
+  }
 
   getWidth = () => {
     if (this.barcodeChartRef.current !== null) {
@@ -88,21 +94,17 @@ class BarcodePlot extends Component {
     } else return 1200;
   };
 
-  // getHeight() {
-  //   if (this.barcodeChartRef.current !== null) {
-  //     return this.barcodeChartRef.current.parentElement.offsetHeight;
-  //   } else return 200;
-  // }
-
   prepareAndRender = () => {
-    const { settings, containerWidth, containerHeight } = this.state;
-    const { barcodeSettings } = this.props;
+    const { settings, containerWidth } = this.state;
+    const { barcodeSettings, barcodeSplitPaneSize } = this.props;
     const self = this;
-    // const chartSize, barcodeData, enableBrush, height, highStat, highLabel, lowLabel, lineID, logFC, statLabel, statisticj;
+
     // prepare settings
     let margin = settings.margin;
     let width = containerWidth - settings.margin.left - settings.margin.right;
-    let height = containerHeight - settings.margin.top - settings.margin.bottom;
+    let height =
+      barcodeSplitPaneSize - settings.margin.top - settings.margin.bottom;
+
     //Scale the range of the data
     let domain = d3
       .scaleLinear()
@@ -128,8 +130,8 @@ class BarcodePlot extends Component {
       .attr('id', 'svg-' + settings.id)
       .attr('class', 'barcode-chart-area bcChart')
       .attr('width', width)
-      .attr('height', height)
-      .attr('viewBox', '0 0 ' + containerWidth + ' ' + containerHeight)
+      .attr('height', barcodeSplitPaneSize - 10)
+      .attr('viewBox', '0 0 ' + containerWidth + ' ' + barcodeSplitPaneSize)
       .attr('preserveAspectRatio', 'xMinYMin meet');
 
     let settingsHeight = chartDiv._groups[0][0].clientHeight;
@@ -145,7 +147,7 @@ class BarcodePlot extends Component {
       .append('text')
       .attr(
         'transform',
-        'translate(' + width / 2 + ' ,' + (height + margin.top - 25) + ')'
+        'translate(' + width / 2 + ' ,' + (height + margin.top) + ')'
       )
       .style('text-anchor', 'middle')
       .text(barcodeSettings.statLabel);
@@ -412,17 +414,6 @@ class BarcodePlot extends Component {
   clearBrush(self) {
     self.chart.objs.g.call(self.chart.objs.brush.move, null);
   }
-
-  // endBrush() {
-  //   // if (this.brushedData.length == 1) {
-  //   //   this.tickData.emit(this.brushedData[0]);
-  //   //   this.brushedData = [];
-  //   // }
-  // }
-
-  // clearBrush() {
-  //   // self.chart.objs.g.call(self.chart.objs.brush.move, null);
-  // }
 
   render() {
     return (

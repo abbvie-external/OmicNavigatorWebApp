@@ -5,7 +5,6 @@ import ButtonActions from '../Shared/ButtonActions';
 import PepplotPlot from './PepplotPlot';
 import LoaderActivePlots from '../Transitions/LoaderActivePlots';
 import _ from 'lodash';
-import { toast } from 'react-toastify';
 import DOMPurify from 'dompurify';
 import QHGrid from '../utility/QHGrid';
 import EZGrid from '../utility/EZGrid';

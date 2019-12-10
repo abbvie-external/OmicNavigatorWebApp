@@ -898,14 +898,14 @@ class ViolinPlot extends Component {
                   .attr('class', 'point ' + settings.id + ' vPoint')
                   .attr('stroke', 'black')
                   .attr('r', function() {
-                    if (groupObjs[cName].values[pt].statistic == max) {
+                    if (groupObjs[cName].values[pt].statistic === max) {
                       return dOpts.pointSize / 1;
                     } else {
                       return dOpts.pointSize / 2;
                     }
                   })
                   .attr('fill', function(d) {
-                    if (groupObjs[cName].values[pt].statistic == max) {
+                    if (groupObjs[cName].values[pt].statistic === max) {
                       id = groupObjs[cName].values[pt];
                       self.maxCircle = id;
                       return 'orange';
@@ -955,7 +955,7 @@ class ViolinPlot extends Component {
                 .transition()
                 .duration(300)
                 .attr('r', function(d) {
-                  if (self.maxCircle.sample != d.sample) {
+                  if (self.maxCircle.sample !== d.sample) {
                     return dOpts.pointSize / 2;
                   } else {
                     return dOpts.pointSize / 1;
@@ -1257,7 +1257,7 @@ class ViolinPlot extends Component {
   };
 
   getCircleId = (id, id_mult) => {
-    return id.replace(/\;/g, '_') + '_' + id_mult;
+    return id.replace(/;/g, '_') + '_' + id_mult;
   };
 
   addToolTiptoMax = (id, objs) => {

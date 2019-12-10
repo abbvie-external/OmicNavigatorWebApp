@@ -474,6 +474,7 @@ class EnrichmentResults extends Component {
 
   handleTickData = info => {
     this.setState({
+      SVGPlotLoaded: false,
       SVGPlotLoading: true
     });
     const { enrichmentStudy, enrichmentModel } = this.props;
@@ -565,8 +566,8 @@ class EnrichmentResults extends Component {
   handleSVG = imageInfo => {
     this.setState({
       imageInfo: imageInfo,
-      SVGPlotLoading: false,
-      SVGPlotLoaded: true
+      SVGPlotLoaded: true,
+      SVGPlotLoading: false
     });
   };
 
