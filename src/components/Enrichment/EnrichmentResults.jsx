@@ -704,6 +704,7 @@ class EnrichmentResults extends Component {
         <div>
           {enrichmentViewToggle}
           <EZGrid
+            uniqueCacheKey="enrichmentTable"
             data={enrichmentResults}
             columnsConfig={enrichmentColumns}
             // totalRows={rows}

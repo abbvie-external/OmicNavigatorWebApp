@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 import * as d3 from 'd3';
 // import * as _ from 'lodash';
 
-class BarcodePlot extends Component {
+class BarcodePlot extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -37,7 +37,7 @@ class BarcodePlot extends Component {
         // logFC: this.props.settings.logFC || '',
         mainDiv: null,
         // margin: { top: 65, right: 60, bottom: 75, left: 60 },
-        margin: { top: 35, right: 20, bottom: 40, left: 20 },
+        margin: { top: 35, right: 25, bottom: 40, left: 20 },
         // statLabel: this.props.settings.statLabel || '',
         // statistic: this.props.settings.statistic || '',
         svg: null,

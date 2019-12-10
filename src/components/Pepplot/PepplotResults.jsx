@@ -366,6 +366,7 @@ class PepplotResults extends Component {
       return (
         <div>
           <EZGrid
+            uniqueCacheKey="pepplotTable"
             data={results}
             columnsConfig={columns}
             // totalRows={rows}
