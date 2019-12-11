@@ -37,7 +37,7 @@ class BarcodePlot extends React.Component {
         // logFC: this.props.settings.logFC || '',
         mainDiv: null,
         // margin: { top: 65, right: 60, bottom: 75, left: 60 },
-        margin: { top: 35, right: 25, bottom: 40, left: 20 },
+        margin: { top: 45, right: 25, bottom: 40, left: 20 },
         // statLabel: this.props.settings.statLabel || '',
         // statistic: this.props.settings.statistic || '',
         svg: null,
@@ -100,7 +100,6 @@ class BarcodePlot extends React.Component {
     const self = this;
 
     // prepare settings
-    let margin = settings.margin;
     let width = containerWidth - settings.margin.left - settings.margin.right;
     let height =
       barcodeSplitPaneSize - settings.margin.top - settings.margin.bottom;
@@ -145,10 +144,7 @@ class BarcodePlot extends React.Component {
 
     let bottomLabel = g
       .append('text')
-      .attr(
-        'transform',
-        'translate(' + width / 2 + ' ,' + (height + margin.top) + ')'
-      )
+      .attr('transform', 'translate(' + width / 2 + ' ,' + (height + 30) + ')')
       .style('text-anchor', 'middle')
       .text(barcodeSettings.statLabel);
 

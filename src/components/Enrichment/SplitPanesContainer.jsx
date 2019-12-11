@@ -45,13 +45,7 @@ class SplitPanesContainer extends Component {
       );
     } else {
       return (
-        <BarcodePlot
-          className="BarcodePlotContainer"
-          {...state}
-          {...props}
-          // data={barcodeData}
-          // settings={barcodeSettings}
-        />
+        <BarcodePlot className="BarcodePlotContainer" {...state} {...props} />
       );
     }
   };
@@ -176,10 +170,7 @@ class SplitPanesContainer extends Component {
                 <SplitPane
                   className="SplitPanesWrapper"
                   split="horizontal"
-                  defaultSize={parseInt(
-                    localStorage.getItem('barcodeSplitPos'),
-                    10
-                  )}
+                  defaultSize={this.state.barcodeSplitPaneSize}
                   minSize={200}
                   maxSize={300}
                   onChange={size => this.barcodeSplitPaneResized(size)}
@@ -218,10 +209,7 @@ class SplitPanesContainer extends Component {
                 <SplitPane
                   className="SplitPanesWrapper"
                   split="horizontal"
-                  defaultSize={parseInt(
-                    localStorage.getItem('barcodeSplitPos'),
-                    10
-                  )}
+                  defaultSize={this.state.barcodeSplitPaneSize}
                   minSize={200}
                   maxSize={300}
                   onChange={size => this.barcodeSplitPaneResized(size)}

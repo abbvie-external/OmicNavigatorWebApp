@@ -8,7 +8,10 @@
     padding-top: 0px !important;
     min-height: 75vh !important;
 
-    
+    .svgContainer {
+      margin: 15px !important;
+    }
+
     .PepplotAccordionContainer .content {
       // overflow-wrap: break-word !important;
       word-break: break-all !important;

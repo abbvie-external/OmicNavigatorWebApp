@@ -235,7 +235,12 @@ class PepplotResults extends Component {
     let handleProteinSelectedCb = this.handleProteinSelected;
     _.forEach(plotType, function(plot, i) {
       phosphoprotService
-        .getPlot(id, plotType[i], pepplotStudy + '', handleProteinSelectedCb)
+        .getPlot(
+          id,
+          plotType[i],
+          pepplotStudy + 'plots',
+          handleProteinSelectedCb
+        )
         .then(svgMarkupObj => {
           let svgMarkup = svgMarkupObj.data;
           svgMarkup = svgMarkup.replace(/id="/g, 'id="' + id + '-' + i + '-');

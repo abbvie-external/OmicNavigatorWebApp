@@ -1,72 +1,33 @@
-@media (min-width: 1px) and (max-width: 374px) {
-  .transition-still-loader {
-    top: 75%;
-    left: 50%;
-  }
-}
-
-@media (min-width: 375px) and (max-width: 767px) {
-  .transition-still-loader {
-    top: 70%;
-    left: 50%;
-  }
-}
-
-@media (min-width: 768px) and (max-width: 1199px) {
-  .transition-still-loader {
-    top: 65%;
-    left: 50%;
-  }
-}
-
-@media (min-width: 1200px) {
-  .transition-still-loader {
-    top: 45%;
-    left: 50%;
-  }
-}
-
 /* The loader */
 .transition-still-loader {
   position: absolute;
-
   width: 190px;
   height: 190px;
-
   border-radius: 190px;
-
   margin-top: -100px;
   margin-left: -100px;
-
+  top: 40%;
+  left: 50%;
   background: linear-gradient(#cecece, transparent),
     linear-gradient(90deg, #000, transparent),
     linear-gradient(-90deg, #2e2e2e, transparent);
   background-blend-mode: screen;
-
   box-shadow: 0 0 50px 0 black;
-
   -webkit-clip-path: circle(50%, 50%, 10%);
-
   animation: transition-still-loader 3s cubic-bezier(0.55, 0.3, 0.24, 0.99)
     infinite;
 }
 
 .transition-still-loader:after {
   content: '';
-
   position: absolute;
   bottom: -30px;
   left: 0;
-
   width: 100%;
   height: 100%;
-
   border-radius: 999px;
-
   background-color: rgba(177, 196, 202, 0.3);
-
   box-shadow: 0 0 50px 20px rgba(179, 190, 194, 0.3);
-
   transform-origin: 50% 100%;
   transform: scaleX(0.7) scaleY(0.1);
 }
@@ -76,16 +37,11 @@
   position: absolute;
   top: 50%;
   right: 50%;
-
   width: 1px;
   height: 1px;
-
   border-radius: 20px;
-
   background-color: rgba(141, 154, 158, 0.4);
-
   box-shadow: 0 0 35px 20px rgba(91, 101, 104, 0.4);
-
   transform: rotateZ(30deg) translateY(-65px) scaleY(0.75);
 }
 
@@ -94,16 +50,11 @@
   position: absolute;
   top: 50%;
   right: 50%;
-
   width: 10px;
   height: 10px;
-
   border-radius: 20px;
-
   background-color: rgba(52, 59, 63, 0.1);
-
   box-shadow: 0 0 30px 20px rgba(30, 63, 87, 0.1);
-
   transform: rotateZ(-140deg) translateY(-70px) scaleY(0.5);
 }
 
@@ -113,19 +64,14 @@
   bottom: 0px;
   left: 50%;
   opacity: 0;
-
   width: 20px;
   height: 20px;
-
   border-radius: 20px;
-
   margin-left: -10px;
-
   background: linear-gradient(rgba(255, 255, 255, 0.6), transparent),
     linear-gradient(90deg, lightgrey, transparent),
     linear-gradient(-90deg, white, transparent);
   background-blend-mode: screen;
-
   animation: dot5 3s cubic-bezier(0.8, 0.1, 0.9, 0.5) infinite;
 }
 
