@@ -46,6 +46,8 @@ class EnrichmentResults extends Component {
       isViolinPlotLoaded: false,
       barcodeSettings: {
         barcodeData: [],
+        brushing: false,
+        brushedData: [],
         // chartSize: { height: '200', width: '960' },
         lineID: '',
         statLabel: {},
@@ -403,7 +405,7 @@ class EnrichmentResults extends Component {
       isTestDataLoaded: true,
       barcodeSettings: {
         barcodeData: barcode,
-        brushing: false,
+        brushing: this.state.barcodeSettings.brushing,
         brushedData: [],
         // chartSize: { height: 250, width: containerWidth - 500 },
         lineID: '',
@@ -419,103 +421,118 @@ class EnrichmentResults extends Component {
   };
 
   handleBarcodeChanges = changes => {
-    debugger;
-    this.setState({
-      ...this.state.barcodeSettings,
-      brushing: changes.brushing || '',
-      brushedData: changes.brushedData || []
-    });
+    if (changes.brushing !== undefined) {
+      this.setState({
+        ...this.state.barcodeSettings,
+        brushing: changes.brushing || false
+      });
+    }
+
+    if (changes.brushedData !== undefined) {
+      if (changes.brushedData.length > 0) {
+        this.setState({
+          ...this.state.barcodeSettings,
+          brushedData: changes.brushedData
+        });
+      } else {
+        this.setState({
+          ...this.state.barcodeSettings,
+          brushedData: []
+        });
+      }
+    }
   };
 
   handleTickBrush = info => {
-    const { barcodeSettings } = this.state;
-    if (barcodeSettings.brushedData.length > 0) {
-      const i = _.map(info, function(d) {
-        d.statistic = _.find(barcodeSettings.barcodeData, {
-          lineID: d[0].lineID,
-          id_mult: d[0].id_mult
-        }).statistic;
-        d.logFC = _.find(barcodeSettings.barcodeData, {
-          lineID: d[0].lineID,
-          id_mult: d[0].id_mult
-        }).logFC;
-        // d.statistic = _.find(barcodeSettings.barcodeData, { "lineID": d.lineID, "id_mult": d.id_mult }).statistic;
-        // d.logFC = _.find(barcodeSettings.barcodeData, { "lineID": d.lineID, "id_mult": d.id_mult }).logFC;
-        return d;
-      });
-      this.setState({
-        isViolinPlotLoading: true,
-        isViolinPlotLoaded: false
-      });
-      const boxPlotArray = i;
-      const reducedBoxPlotArray = _.reduce(
-        boxPlotArray,
-        function(res, datum) {
-          (res[datum.statLabel] || (res[datum.statLabel] = [])).push({
-            cpm: datum.logFC,
-            sample: datum.lineID,
-            statistic: datum.statistic,
-            id_mult: datum.id_mult
-          });
-          return res;
-        },
-        {}
-      );
-      const vData = _.mapValues(reducedBoxPlotArray, function(v: any) {
-        return { values: v };
-      });
-      const ordered = {};
-      Object.keys(vData)
-        .sort()
-        .forEach(function(key) {
-          ordered[key] = vData[key];
+    if (info !== undefined || info !== null) {
+      const { barcodeSettings } = this.state;
+      if (barcodeSettings.brushedData.length > 0) {
+        const i = _.map(info, function(d) {
+          d.statistic = _.find(barcodeSettings.barcodeData, {
+            lineID: d[0].lineID,
+            id_mult: d[0].id_mult
+          }).statistic;
+          d.logFC = _.find(barcodeSettings.barcodeData, {
+            lineID: d[0].lineID,
+            id_mult: d[0].id_mult
+          }).logFC;
+          // d.statistic = _.find(barcodeSettings.barcodeData, { "lineID": d.lineID, "id_mult": d.id_mult }).statistic;
+          // d.logFC = _.find(barcodeSettings.barcodeData, { "lineID": d.lineID, "id_mult": d.id_mult }).logFC;
+          return d;
         });
+        this.setState({
+          isViolinPlotLoading: true,
+          isViolinPlotLoaded: false
+        });
+        const boxPlotArray = i;
+        const reducedBoxPlotArray = _.reduce(
+          boxPlotArray,
+          function(res, datum) {
+            (res[datum.statLabel] || (res[datum.statLabel] = [])).push({
+              cpm: datum.logFC,
+              sample: datum.lineID,
+              statistic: datum.statistic,
+              id_mult: datum.id_mult
+            });
+            return res;
+          },
+          {}
+        );
+        const vData = _.mapValues(reducedBoxPlotArray, function(v: any) {
+          return { values: v };
+        });
+        const ordered = {};
+        Object.keys(vData)
+          .sort()
+          .forEach(function(key) {
+            ordered[key] = vData[key];
+          });
 
-      // var kLSplit = document.getElementById('left-splitter');
-      this.setState({
-        violinSettings: {
-          violinData: ordered,
-          // chartSize: { height: kLSplit.clientHeight + 25, width: kLSplit.clientWidth },
-          chartSize: {
-            height: 400,
-            width: 400
+        // var kLSplit = document.getElementById('left-splitter');
+        this.setState({
+          violinSettings: {
+            violinData: ordered,
+            // chartSize: { height: kLSplit.clientHeight + 25, width: kLSplit.clientWidth },
+            chartSize: {
+              height: 400,
+              width: 400
+            },
+            axisLabels: {
+              xAxis: 'change this term',
+              yAxis:
+                "log<tspan baseline-shift='sub' font-size='14px'>2</tspan>(FC)"
+            },
+            id: 'violin-graph-1',
+            pointUniqueId: 'sample',
+            pointValue: 'cpm',
+            title: '',
+            subtitle: '',
+            tooltip: {
+              show: true,
+              fields: [
+                { label: 'log(FC)', value: 'cpm', toFixed: true },
+                { label: 'Protien', value: 'sample' }
+              ]
+            },
+            xName: 'tissue'
           },
-          axisLabels: {
-            xAxis: 'change this term',
-            yAxis:
-              "log<tspan baseline-shift='sub' font-size='14px'>2</tspan>(FC)"
-          },
-          id: 'violin-graph-1',
-          pointUniqueId: 'sample',
-          pointValue: 'cpm',
-          title: '',
-          subtitle: '',
-          tooltip: {
-            show: true,
-            fields: [
-              { label: 'log(FC)', value: 'cpm', toFixed: true },
-              { label: 'Protien', value: 'sample' }
-            ]
-          },
-          xName: 'tissue'
-        },
-        isViolinPlotLoading: false,
-        isViolinPlotLoaded: true
-      });
-    } else {
-      this.setState({
-        isViolinPlotLoading: false,
-        isViolinPlotLoaded: false
-      });
-      // if (this.plots.includes('violin')) {
-      //   let index = this.plots.indexOf('violin');
-      //   this.plots.splice(index, 1);
-      // }
+          isViolinPlotLoading: false,
+          isViolinPlotLoaded: true
+        });
+      } else {
+        this.setState({
+          isViolinPlotLoading: false,
+          isViolinPlotLoaded: false
+        });
+        // if (this.plots.includes('violin')) {
+        //   let index = this.plots.indexOf('violin');
+        //   this.plots.splice(index, 1);
+        // }
+      }
     }
   };
 
   handleTickData = info => {
-    debugger;
     const { enrichmentStudy, enrichmentModel } = this.props;
     // let self = this;
     // if (this.state.barcodeSettings.barcodeData > 0) {

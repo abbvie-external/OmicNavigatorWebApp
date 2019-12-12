@@ -20,7 +20,7 @@ class PhosphoprotService {
           resolve(session);
         })
         .catch(error => {
-          toast.error('Failed to retrieve data, please try again.');
+          toast.error(`${error.statusText}: ${error.responseText}`);
         });
     });
   }

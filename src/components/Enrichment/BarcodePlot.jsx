@@ -262,9 +262,9 @@ class BarcodePlot extends React.Component {
 
     if (barcodeSettings.enableBrush) {
       const highlightBrushedTicks = function() {
-        // self.props.onHandleBarcodeChanges({
-        //   brushing: false
-        // });
+        self.props.onHandleBarcodeChanges({
+          brushing: true
+        });
         const ticks = d3.selectAll('line.barcode-line');
         if (d3.event.selection != null) {
           self.unhighLight();
@@ -308,7 +308,6 @@ class BarcodePlot extends React.Component {
           });
           // self.tickBrush.emit(self.brushedData);
           self.props.onHandleTickBrush({
-            brushing: false,
             brushedData: brushedDataVar
           });
         }
@@ -395,7 +394,7 @@ class BarcodePlot extends React.Component {
     const brushedDataVar = this.getMaxObject(this.props.brushedData);
     this.props.onHandleTickData(brushedDataVar);
     this.props.onHandleTickBrush({
-      brushedData: []
+      brushing: true
     });
   };
 
