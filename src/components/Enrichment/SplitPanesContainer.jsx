@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import { Grid, Dimmer, Loader } from 'semantic-ui-react';
+import { Grid, Dimmer, Loader, Button } from 'semantic-ui-react';
 import EnrichmentBreadcrumbs from './EnrichmentBreadcrumbs';
 import ButtonActions from '../Shared/ButtonActions';
 // import PlotSVG from './PlotSVG';
@@ -136,11 +136,16 @@ class SplitPanesContainer extends Component {
               <Grid.Column
                 mobile={16}
                 tablet={16}
-                largeScreen={16}
-                widescreen={16}
+                largeScreen={12}
+                widescreen={12}
               >
                 <EnrichmentBreadcrumbs {...this.props} />
               </Grid.Column>
+              {/* <Grid.Column mobile={16} tablet={16} largeScreen={4} widescreen={4}>
+                <Button primary className="ViewDiffTableButton" onClick={this.props.onViewDiffTable}>
+                  View Differential Table
+                </Button>
+              </Grid.Column> */}
               {/* <Grid.Column mobile={8} tablet={8} largeScreen={8} widescreen={8}>
                 <ButtonActions {...this.props} {...this.state} />
               </Grid.Column> */}

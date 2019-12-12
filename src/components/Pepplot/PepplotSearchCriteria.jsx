@@ -165,6 +165,77 @@ class PepplotSearchCriteria extends Component {
     this.populateStudies();
   }
 
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (this.props.pepplotTest !== prevProps.pepplotTest) {
+      const s = this.props.pepplotStudy || '';
+      const m = this.props.pepplotModel || '';
+      const t = this.props.pepplotTest || '';
+      const p = '';
+
+      if (s !== '') {
+        this.setState({
+          pepplotStudyHrefVisible: true,
+          pepplotStudyHref: `http://www.localhost:3000/${s}.html`
+        });
+        phosphoprotService
+          .getModelNames('inferenceNames', s + 'plots')
+          .then(modelsFromService => {
+            this.allNames = modelsFromService;
+            const modelsArr = _.map(_.keys(modelsFromService), function(
+              modelName
+            ) {
+              return { key: modelName, text: modelName, value: modelName };
+            });
+            this.setState({
+              pepplotModelsDisabled: false,
+              pepplotModels: modelsArr
+            });
+            if (m !== '') {
+              const testsArr = _.map(this.allNames[m], function(testName) {
+                return { key: testName, text: testName, value: testName };
+              });
+              const uDataPArr = this.allNames[m];
+              this.setState({
+                pepplotTestsDisabled: false,
+                pepplotTests: testsArr,
+                uDataP: uDataPArr
+              });
+            }
+          });
+      }
+      if (t !== '') {
+        this.props.onSearchCriteriaChange(
+          {
+            pepplotStudy: s,
+            pepplotModel: m,
+            pepplotTest: t,
+            pepplotProteinSite: p
+          },
+          false
+        );
+        this.setState({
+          uAnchorP: t
+        });
+        this.props.onSearchTransition(true);
+        phosphoprotService
+          .getTestData(m, t, s + 'plots')
+          .then(dataFromService => {
+            this.setState({
+              uSettingsP: {
+                ...this.state.uSettingsP,
+                maxElementsP: dataFromService.length
+              }
+            });
+            this.testdata = dataFromService;
+            this.props.onPepplotSearch({
+              pepplotResults: this.testdata
+            });
+          });
+      }
+      this.populateStudies();
+    }
+  }
+
   populateStudies = () => {
     phosphoprotService.getStudies().then(studiesFromService => {
       const studiesArr = studiesFromService.map(study => {

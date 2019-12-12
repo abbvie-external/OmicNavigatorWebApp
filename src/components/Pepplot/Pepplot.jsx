@@ -249,7 +249,6 @@ class Pepplot extends Component {
       'adj_P_Val',
       'adjPVal'
     ];
-
     if (pepResults.length !== 0) {
       let orderedTestData = JSON.parse(
         JSON.stringify(pepResults[0], relevantConfigCols)

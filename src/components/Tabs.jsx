@@ -116,6 +116,30 @@ class Tabs extends Component {
     );
   };
 
+  handleViewDiffTable = test => {
+    this.setState({
+      activeIndex: 1,
+      tab: 'pepplot',
+      pepplotStudy: this.state.enrichmentStudy || '',
+      pepplotModel: this.state.enrichmentModel || '',
+      pepplotTest: test || ''
+    });
+    let changes = {
+      pepplotStudy: this.state.enrichmentStudy || '',
+      pepplotModel: this.state.enrichmentModel || '',
+      pepplotTest: test || ''
+    };
+    updateUrl(
+      this.props,
+      this.state,
+      changes,
+      'tabChange',
+      this.setTabIndex,
+      true,
+      'pepplot'
+    );
+  };
+
   render() {
     const { activeIndex } = this.state;
     const panes = [
@@ -158,6 +182,7 @@ class Tabs extends Component {
                 {...this.state}
                 onSearchCriteriaToTop={this.handleSearchCriteriaToTop}
                 onPValueTypeChange={this.handlePValueTypeChange}
+                onViewDiffTable={this.handleViewDiffTable}
               />
             </Grid>
           </Tab.Pane>
