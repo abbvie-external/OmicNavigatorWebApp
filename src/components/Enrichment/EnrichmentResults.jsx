@@ -698,8 +698,15 @@ class EnrichmentResults extends Component {
   // };
 
   render() {
-    const { enrichmentResults, enrichmentColumns } = this.props;
+    const {
+      enrichmentResults,
+      enrichmentColumns,
+      enrichmentStudy,
+      enrichmentModel,
+      enrichmentAnnotation
+    } = this.props;
     // const rows = this.props.enrichmentResults.length;
+    const enrichmentCacheKey = `${enrichmentStudy}-${enrichmentModel}-${enrichmentAnnotation}`;
     const quickViews = [];
     const additionalTemplateInfo = this.getTableHelpers(
       this.testSelectedTransition,
@@ -766,7 +773,7 @@ class EnrichmentResults extends Component {
         <div>
           {enrichmentViewToggle}
           <EZGrid
-            uniqueCacheKey="enrichmentTable"
+            uniqueCacheKey={enrichmentCacheKey}
             data={enrichmentResults}
             columnsConfig={enrichmentColumns}
             // totalRows={rows}

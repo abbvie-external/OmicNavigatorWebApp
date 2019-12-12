@@ -359,6 +359,8 @@ class PepplotResults extends Component {
   };
 
   render() {
+    const { pepplotStudy, pepplotModel, pepplotTest } = this.props;
+    const pepplotCacheKey = `${pepplotStudy}-${pepplotModel}-${pepplotTest}`;
     const results = this.props.pepplotResults;
     const columns = this.props.pepplotColumns;
     // const rows = this.props.pepplotResults.length;
@@ -371,7 +373,7 @@ class PepplotResults extends Component {
       return (
         <div>
           <EZGrid
-            uniqueCacheKey="pepplotTable"
+            uniqueCacheKey={pepplotCacheKey}
             data={results}
             columnsConfig={columns}
             // totalRows={rows}
