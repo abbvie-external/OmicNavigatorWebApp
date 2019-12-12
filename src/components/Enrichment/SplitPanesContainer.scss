@@ -66,3 +66,16 @@
 .SVGSplitContainer {
     margin: 0px 15px 0px 15px !important;
 }
+
+.PlotInstructions {
+    height: 100%;
+}
+
+.PlotInstructionsText {
+    text-align: center !important;
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}

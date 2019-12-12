@@ -42,7 +42,8 @@ class EnrichmentResults extends Component {
       isTestDataLoaded: false,
       SVGPlotLoading: false,
       SVGPlotLoaded: false,
-      isViolinDataAvailable: false,
+      isViolinPlotLoading: false,
+      isViolinPlotLoaded: false,
       barcodeSettings: {
         barcodeData: [],
         // chartSize: { height: '200', width: '960' },
@@ -56,7 +57,29 @@ class EnrichmentResults extends Component {
         enableBrush: false
       },
       violinSettings: {
-        violinData: []
+        violinData: [],
+        // chartSize: { height: kLSplit.clientHeight + 25, width: kLSplit.clientWidth },
+        chartSize: {
+          height: 400,
+          width: 400
+        },
+        axisLabels: {
+          xAxis: '',
+          yAxis: "log<tspan baseline-shift='sub' font-size='14px'>2</tspan>(FC)"
+        },
+        id: 'violin-graph-1',
+        pointUniqueId: 'sample',
+        pointValue: 'cpm',
+        title: '',
+        subtitle: '',
+        tooltip: {
+          show: true,
+          fields: [
+            { label: 'log(FC)', value: 'cpm', toFixed: true },
+            { label: 'Protein', value: 'sample' }
+          ]
+        },
+        xName: 'tissue'
       }
     };
   }
@@ -396,6 +419,7 @@ class EnrichmentResults extends Component {
   };
 
   handleBarcodeChanges = changes => {
+    debugger;
     this.setState({
       ...this.state.barcodeSettings,
       brushing: changes.brushing || '',
@@ -404,80 +428,101 @@ class EnrichmentResults extends Component {
   };
 
   handleTickBrush = info => {
-    // if (info.length > 0 && this.modelsToRenderViolin.includes(this.selectedTestCategory.testCategory)) {
-    //   var self = this;
-    // const i = _.map(info, function (d) {
-    //   d.statistic = _.find(self.barcodeInfo, { "lineID": d.lineID, "id_mult": d.id_mult }).statistic;
-    //   d.logFC = _.find(self.barcodeInfo, { "lineID": d.lineID, "id_mult": d.id_mult }).logFC;
-    //   return d;
-    // })
-    // this.violinDataAvailable = false;
-    // const boxPlotArray = i;
-    // if (!this.plots.includes('violin')) {
-    //   this.plots.push('violin');
-    // }
-    // const reducedBoxPlotArray = _.reduce(
-    //   boxPlotArray,
-    //   function (res, datum) {
-    //     (res[datum.statLabel] || (res[datum.statLabel] = [])).push({
-    //       cpm: datum.logFC,
-    //       sample: datum.lineID,
-    //       statistic: datum.statistic,
-    //       id_mult: datum.id_mult
-    //     });
-    //     return res;
-    //   },
-    //   {}
-    // );
-    // const vData = _.mapValues(reducedBoxPlotArray, function (v: any) {
-    //   return { values: v };
-    // });
-    // const ordered = {};
-    // Object.keys(vData)
-    //   .sort()
-    //   .forEach(function (key) {
-    //     ordered[key] = vData[key];
-    //   });
-    // var kLSplit = document.getElementById('left-splitter');
-    // var d = ordered;
-    // this.vData1 = d;
-    // this.vSettings1 = {
-    //   chartSize: { height: kLSplit.clientHeight + 25, width: kLSplit.clientWidth },
-    //   axisLabels: { xAxis: this.term, yAxis: "log<tspan baseline-shift='sub' font-size='14px'>2</tspan>(FC)" },
-    //   id: 'violin-graph-1',
-    //   pointUniqueId: 'sample',
-    //   pointValue: 'cpm',
-    //   title:
-    //     "",
-    //   subtitle:
-    //     ''
-    //   ,
-    //   tooltip: {
-    //     show: true,
-    //     fields: [
-    //       { label: "log(FC)", value: 'cpm', toFixed: true },
-    //       { label: 'Protien', value: 'sample' }
-    //     ]
-    //   },
-    //   xName: 'tissue'
-    // };
-    // this.violinDataAvailable = true;
-    //}
-    // else {
-    //   this.violinDataAvailable = false;
-    //   if (this.plots.includes('violin')) {
-    //     let index = this.plots.indexOf('violin');
-    //     this.plots.splice(index, 1);
-    //   }
-    // }
+    const { barcodeSettings } = this.state;
+    if (barcodeSettings.brushedData.length > 0) {
+      const i = _.map(info, function(d) {
+        d.statistic = _.find(barcodeSettings.barcodeData, {
+          lineID: d[0].lineID,
+          id_mult: d[0].id_mult
+        }).statistic;
+        d.logFC = _.find(barcodeSettings.barcodeData, {
+          lineID: d[0].lineID,
+          id_mult: d[0].id_mult
+        }).logFC;
+        // d.statistic = _.find(barcodeSettings.barcodeData, { "lineID": d.lineID, "id_mult": d.id_mult }).statistic;
+        // d.logFC = _.find(barcodeSettings.barcodeData, { "lineID": d.lineID, "id_mult": d.id_mult }).logFC;
+        return d;
+      });
+      this.setState({
+        isViolinPlotLoading: true,
+        isViolinPlotLoaded: false
+      });
+      const boxPlotArray = i;
+      const reducedBoxPlotArray = _.reduce(
+        boxPlotArray,
+        function(res, datum) {
+          (res[datum.statLabel] || (res[datum.statLabel] = [])).push({
+            cpm: datum.logFC,
+            sample: datum.lineID,
+            statistic: datum.statistic,
+            id_mult: datum.id_mult
+          });
+          return res;
+        },
+        {}
+      );
+      const vData = _.mapValues(reducedBoxPlotArray, function(v: any) {
+        return { values: v };
+      });
+      const ordered = {};
+      Object.keys(vData)
+        .sort()
+        .forEach(function(key) {
+          ordered[key] = vData[key];
+        });
+
+      // var kLSplit = document.getElementById('left-splitter');
+      this.setState({
+        violinSettings: {
+          violinData: ordered,
+          // chartSize: { height: kLSplit.clientHeight + 25, width: kLSplit.clientWidth },
+          chartSize: {
+            height: 400,
+            width: 400
+          },
+          axisLabels: {
+            xAxis: 'change this term',
+            yAxis:
+              "log<tspan baseline-shift='sub' font-size='14px'>2</tspan>(FC)"
+          },
+          id: 'violin-graph-1',
+          pointUniqueId: 'sample',
+          pointValue: 'cpm',
+          title: '',
+          subtitle: '',
+          tooltip: {
+            show: true,
+            fields: [
+              { label: 'log(FC)', value: 'cpm', toFixed: true },
+              { label: 'Protien', value: 'sample' }
+            ]
+          },
+          xName: 'tissue'
+        },
+        isViolinPlotLoading: false,
+        isViolinPlotLoaded: true
+      });
+    } else {
+      this.setState({
+        isViolinPlotLoading: false,
+        isViolinPlotLoaded: false
+      });
+      // if (this.plots.includes('violin')) {
+      //   let index = this.plots.indexOf('violin');
+      //   this.plots.splice(index, 1);
+      // }
+    }
   };
 
   handleTickData = info => {
+    debugger;
+    const { enrichmentStudy, enrichmentModel } = this.props;
+    // let self = this;
+    // if (this.state.barcodeSettings.barcodeData > 0) {
     this.setState({
       SVGPlotLoaded: false,
       SVGPlotLoading: true
     });
-    const { enrichmentStudy, enrichmentModel } = this.props;
     const dataItem = this.state.barcodeSettings.barcodeData.find(
       i => i.lineID === info.lineID
     );
@@ -487,7 +532,6 @@ class EnrichmentResults extends Component {
 
     let splitterHeight = document.getElementById('SVGSplitContainer')
       .clientHeight;
-    // let splitterWidth = document.getElementById('right-splitter').clientWidth;
     let splitterWidth = document.getElementById('SVGSplitContainer')
       .clientWidth;
 
@@ -514,6 +558,7 @@ class EnrichmentResults extends Component {
     imageInfo.key = this.state.imageInfo.key;
     const handleSVGCb = this.handleSVG;
     this.getPlot(id, plotType, enrichmentStudy, imageInfo, handleSVGCb);
+    // }
   };
 
   getPlot = (id, plotType, enrichmentStudy, imageInfo, handleSVGCb) => {

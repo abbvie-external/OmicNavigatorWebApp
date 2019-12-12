@@ -873,129 +873,130 @@ class ViolinPlot extends Component {
         return;
       }
 
-      for (cName in groupObjs) {
-        if (groupObjs.hasOwnProperty(cName)) {
-          cPlot = groupObjs[cName].dataPlots;
+      // for (cName in groupObjs) {
+      //   if (groupObjs.hasOwnProperty(cName)) {
+      //     cPlot = groupObjs[cName].dataPlots;
 
-          // Points Plot
-          if (dOpts.showPlot) {
-            cPlot.objs.points = { g: null, pts: [] };
-            cPlot.objs.points.g = objs.g
-              .append('g')
-              .attr('class', 'points-plot');
-            for (let pt = 0; pt < groupObjs[cName].values.length; pt++) {
-              var max = self.getMaxStat(groupObjs[cName].values);
-              cPlot.objs.points.pts.push(
-                cPlot.objs.points.g
-                  .append('circle')
-                  .attr('id', function(d: any) {
-                    var id = groupObjs[cName].values[pt][
-                      settings.pointUniqueId
-                    ].replace(/\./g, '');
-                    var id_mult = groupObjs[cName].values[pt].id_mult;
-                    return 'violin_' + id.replace(/\;/g, '_') + '_' + id_mult;
-                  })
-                  .attr('class', 'point ' + settings.id + ' vPoint')
-                  .attr('stroke', 'black')
-                  .attr('r', function() {
-                    if (groupObjs[cName].values[pt].statistic === max) {
-                      return dOpts.pointSize / 1;
-                    } else {
-                      return dOpts.pointSize / 2;
-                    }
-                  })
-                  .attr('fill', function(d) {
-                    if (groupObjs[cName].values[pt].statistic === max) {
-                      id = groupObjs[cName].values[pt];
-                      self.maxCircle = id;
-                      return 'orange';
-                    } else {
-                      return dataPlots.colorFunct(cName);
-                    }
-                  })
-              );
-            }
-          }
+      //     // Points Plot
+      //     if (dOpts.showPlot) {
+      //       cPlot.objs.points = { g: null, pts: [] };
+      //       cPlot.objs.points.g = objs.g
+      //         .append('g')
+      //         .attr('class', 'points-plot');
+      //       debugger;
+      //       for (let pt = 0; pt < groupObjs[cName].values.length; pt++) {
+      //         var max = self.getMaxStat(groupObjs[cName].values);
+      //         cPlot.objs.points.pts.push(
+      //           cPlot.objs.points.g
+      //             .append('circle')
+      //             .attr('id', function(d: any) {
+      //               var id = groupObjs[cName].values[pt][
+      //                 settings.pointUniqueId
+      //               ].replace(/\./g, '');
+      //               var id_mult = groupObjs[cName].values[pt].id_mult;
+      //               return 'violin_' + id.replace(/\;/g, '_') + '_' + id_mult;
+      //             })
+      //             .attr('class', 'point ' + settings.id + ' vPoint')
+      //             .attr('stroke', 'black')
+      //             .attr('r', function() {
+      //               if (groupObjs[cName].values[pt].statistic === max) {
+      //                 return dOpts.pointSize / 1;
+      //               } else {
+      //                 return dOpts.pointSize / 2;
+      //               }
+      //             })
+      //             .attr('fill', function(d) {
+      //               if (groupObjs[cName].values[pt].statistic === max) {
+      //                 id = groupObjs[cName].values[pt];
+      //                 self.maxCircle = id;
+      //                 return 'orange';
+      //               } else {
+      //                 return dataPlots.colorFunct(cName);
+      //               }
+      //             })
+      //         );
+      //       }
+      //     }
 
-          const circleData = _.forEach(groupObjs[cName].values, function(
-            value,
-            key
-          ) {
-            value[settings.xName] = cName;
-          });
+      //     const circleData = _.forEach(groupObjs[cName].values, function(
+      //       value,
+      //       key
+      //     ) {
+      //       value[settings.xName] = cName;
+      //     });
 
-          cPlot.objs.points.g
-            .selectAll('circle')
-            .data(circleData)
-            .attr('pointer-events', 'all')
-            .on('mouseover', function(d) {
-              self.dotHover.emit({ object: d, action: 'mouseover' });
-              self.isHovering = true;
-              d3.select('#violin_' + self.getCircleId(d.sample, d.id_mult))
-                .transition()
-                .duration(100)
-                .attr('cursor', 'pointer')
-                .attr('r', 6);
-              if (settings.tooltip.show) {
-                const m = d3.mouse(objs.chartDiv.node());
-                objs.tooltip
-                  .style('left', m[0] + 10 + 'px')
-                  .style('top', m[1] - 10 + 'px');
-                objs.tooltip
-                  .transition()
-                  .delay(500)
-                  .duration(500)
-                  .style('opacity', 1)
-                  .style('display', null);
-                return self.tooltipHover(d, objs);
-              }
-            })
-            .on('mouseout', function(d) {
-              d3.select('#violin_' + self.getCircleId(d.sample, d.id_mult))
-                .transition()
-                .duration(300)
-                .attr('r', function(d) {
-                  if (self.maxCircle.sample !== d.sample) {
-                    return dOpts.pointSize / 2;
-                  } else {
-                    return dOpts.pointSize / 1;
-                  }
-                });
+      //     cPlot.objs.points.g
+      //       .selectAll('circle')
+      //       .data(circleData)
+      //       .attr('pointer-events', 'all')
+      //       .on('mouseover', function(d) {
+      //         self.dotHover.emit({ object: d, action: 'mouseover' });
+      //         self.isHovering = true;
+      //         d3.select('#violin_' + self.getCircleId(d.sample, d.id_mult))
+      //           .transition()
+      //           .duration(100)
+      //           .attr('cursor', 'pointer')
+      //           .attr('r', 6);
+      //         if (settings.tooltip.show) {
+      //           const m = d3.mouse(objs.chartDiv.node());
+      //           objs.tooltip
+      //             .style('left', m[0] + 10 + 'px')
+      //             .style('top', m[1] - 10 + 'px');
+      //           objs.tooltip
+      //             .transition()
+      //             .delay(500)
+      //             .duration(500)
+      //             .style('opacity', 1)
+      //             .style('display', null);
+      //           return self.tooltipHover(d, objs);
+      //         }
+      //       })
+      //       .on('mouseout', function(d) {
+      //         d3.select('#violin_' + self.getCircleId(d.sample, d.id_mult))
+      //           .transition()
+      //           .duration(300)
+      //           .attr('r', function(d) {
+      //             if (self.maxCircle.sample !== d.sample) {
+      //               return dOpts.pointSize / 2;
+      //             } else {
+      //               return dOpts.pointSize / 1;
+      //             }
+      //           });
 
-              self.dotHover.emit({ object: d, action: 'mouseout' });
-              if (self.isHovering) {
-                objs.tooltip
-                  .transition()
-                  .duration(500)
-                  .style('opacity', 0);
-              }
-            })
-            .on('click', function(d) {
-              self.isHovering = false;
-              var maxId = self.getCircleId(
-                self.maxCircle.sample,
-                self.maxCircle.id_mult
-              );
-              var id = self.getCircleId(d.sample, d.id_mult);
-              self.dotClick.emit(d);
+      //         self.dotHover.emit({ object: d, action: 'mouseout' });
+      //         if (self.isHovering) {
+      //           objs.tooltip
+      //             .transition()
+      //             .duration(500)
+      //             .style('opacity', 0);
+      //         }
+      //       })
+      //       .on('click', function(d) {
+      //         self.isHovering = false;
+      //         var maxId = self.getCircleId(
+      //           self.maxCircle.sample,
+      //           self.maxCircle.id_mult
+      //         );
+      //         var id = self.getCircleId(d.sample, d.id_mult);
+      //         self.dotClick.emit(d);
 
-              d3.select('#violin_' + maxId)
-                .transition()
-                .duration(300)
-                .attr('fill', '#1f77b4')
-                .attr('r', dOpts.pointSize / 2);
+      //         d3.select('#violin_' + maxId)
+      //           .transition()
+      //           .duration(300)
+      //           .attr('fill', '#1f77b4')
+      //           .attr('r', dOpts.pointSize / 2);
 
-              d3.select('#violin_' + id)
-                .transition()
-                .duration(100)
-                .attr('fill', 'orange')
-                .attr('r', dOpts.pointSize / 1);
+      //         d3.select('#violin_' + id)
+      //           .transition()
+      //           .duration(100)
+      //           .attr('fill', 'orange')
+      //           .attr('r', dOpts.pointSize / 1);
 
-              self.maxCircle = d;
-              self.addToolTiptoMax(self.maxCircle, objs);
-            });
-        }
-      }
+      //         self.maxCircle = d;
+      //         self.addToolTiptoMax(self.maxCircle, objs);
+      //       });
+      //   }
+      // }
     };
 
     dataPlots.preparePlots();

@@ -28,13 +28,9 @@ class SplitPanesContainer extends Component {
     });
   };
 
-  getBarcodePlot = (
-    isTestDataLoaded,
-    props,
-    state,
-    barcodeData,
-    barcodeSettings
-  ) => {
+  getBarcodePlot = () => {
+    const { isTestDataLoaded } = this.props;
+
     if (!isTestDataLoaded) {
       return (
         <div>
@@ -45,57 +41,69 @@ class SplitPanesContainer extends Component {
       );
     } else {
       return (
-        <BarcodePlot className="BarcodePlotContainer" {...state} {...props} />
-      );
-    }
-  };
-
-  getViolinPlot = (
-    isViolinDataAvailable,
-    isTestDataLoaded,
-    props,
-    state,
-    violinData,
-    violinSettings
-  ) => {
-    if (!isViolinDataAvailable) {
-      return (
-        <div>
-          <h4>Select barcode lines to display violin plot</h4>
-          {/* <Dimmer active inverted>
-            <Loader size="large">Violin Plot is Loading</Loader>
-          </Dimmer> */}
-        </div>
-      );
-    } else {
-      return (
-        <ViolinPlot
-          className="ViolinPlotContainer"
-          {...state}
-          {...props}
-          // data={barcodeData}
-          // settings={barcodeSettings}
+        <BarcodePlot
+          className="BarcodePlotContainer"
+          {...this.state}
+          {...this.props}
         />
       );
     }
   };
 
-  getSVGPlot = (props, state) => {
-    const tabChangeCb = this.handleSVGTabChange;
-    if (!props.SVGPlotLoaded & !props.SVGPlotLoading) {
+  getViolinPlot = () => {
+    const {
+      isViolinPlotLoading,
+      isViolinPlotLoaded,
+      violinData,
+      violinSettings
+    } = this.props;
+    // isViolinPlotLoaded
+    if (!isViolinPlotLoading && !isViolinPlotLoaded) {
       return (
-        <div>
-          <h4>Select barcode line/s to display SVG Plot</h4>
+        <div class="PlotInstructionsDiv">
+          <h4 className="PlotInstructionsText">
+            Select barcode line/s to display Violin Plot
+          </h4>
         </div>
       );
-    } else if (!props.SVGPlotLoaded & props.SVGPlotLoading) {
+    } else if (isViolinPlotLoading) {
+      return (
+        <Dimmer active inverted>
+          <Loader size="large">Violin Plot is Loading</Loader>
+        </Dimmer>
+      );
+    } else {
+      return (
+        <ViolinPlot
+          className="ViolinPlotContainer"
+          {...this.state}
+          {...this.props}
+        />
+      );
+    }
+  };
+
+  getSVGPlot = () => {
+    const tabChangeCb = this.handleSVGTabChange;
+    const { SVGPlotLoaded, SVGPlotLoading } = this.props;
+    if (!SVGPlotLoaded & !SVGPlotLoading) {
+      return (
+        <div class="PlotInstructionsDiv">
+          <h4 className="PlotInstructionsText">
+            Select barcode line/s to display SVG Plot
+          </h4>
+        </div>
+      );
+    } else if (!SVGPlotLoaded & SVGPlotLoading) {
       return (
         <Dimmer active inverted>
           <Loader size="large">SVG Plot is Loading</Loader>
         </Dimmer>
       );
     } else {
-      return <SVGPlot {...props} {...state} onSVGTabChange={tabChangeCb} />;
+      return (
+        <SVGPlot {...this.props} {...this.state} onSVGTabChange={tabChangeCb} />
+      );
     }
   };
 
@@ -107,34 +115,9 @@ class SplitPanesContainer extends Component {
   }
 
   render() {
-    const {
-      enrichmentModel,
-      isViolinDataAvailable,
-      isTestDataLoaded,
-      barcodeData,
-      barcodeSettings,
-      violinData,
-      violinSettings
-    } = this.props;
-
-    const BarcodePlot = this.getBarcodePlot(
-      isTestDataLoaded,
-      this.props,
-      this.state,
-      barcodeData,
-      barcodeSettings
-    );
-
-    const ViolinPlot = this.getViolinPlot(
-      isViolinDataAvailable,
-      isTestDataLoaded,
-      this.props,
-      this.state,
-      violinData,
-      violinSettings
-    );
-
-    const SVGPlot = this.getSVGPlot(this.props, this.state);
+    const BarcodePlot = this.getBarcodePlot();
+    const ViolinPlot = this.getViolinPlot();
+    const SVGPlot = this.getSVGPlot();
 
     // if (!isTestDataLoaded) {
     //   return (
@@ -145,45 +128,7 @@ class SplitPanesContainer extends Component {
     //     </div>
     //   );
     // } else {
-    if (enrichmentModel === 'Timecourse Differential Phosphorylation') {
-      return (
-        <div className="ThreePlotsWrapper">
-          <Grid className="">
-            <Grid.Row className="ActionsRow">
-              <Grid.Column
-                mobile={16}
-                tablet={16}
-                largeScreen={16}
-                widescreen={16}
-              >
-                <EnrichmentBreadcrumbs {...this.props} />
-              </Grid.Column>
-              {/* <Grid.Column mobile={8} tablet={8} largeScreen={8} widescreen={8}>
-                <ButtonActions {...this.props} {...this.state} />
-              </Grid.Column> */}
-              <Grid.Column
-                mobile={16}
-                tablet={16}
-                largeScreen={16}
-                widescreen={16}
-              >
-                <SplitPane
-                  className="SplitPanesWrapper"
-                  split="horizontal"
-                  defaultSize={this.state.barcodeSplitPaneSize}
-                  minSize={200}
-                  maxSize={300}
-                  onChange={size => this.barcodeSplitPaneResized(size)}
-                >
-                  {BarcodePlot}
-                  <div id="SVGSplitContainer">{SVGPlot}</div>
-                </SplitPane>
-              </Grid.Column>
-            </Grid.Row>
-          </Grid>
-        </div>
-      );
-    } else {
+    if (this.props.displayViolinPlot) {
       return (
         <div className="ThreePlotsWrapper">
           <Grid className="">
@@ -224,6 +169,44 @@ class SplitPanesContainer extends Component {
                     <div id="ViolinSplitContainer">{ViolinPlot}</div>
                     <div id="SVGSplitContainer">{SVGPlot}</div>
                   </SplitPane>
+                </SplitPane>
+              </Grid.Column>
+            </Grid.Row>
+          </Grid>
+        </div>
+      );
+    } else {
+      return (
+        <div className="ThreePlotsWrapper">
+          <Grid className="">
+            <Grid.Row className="ActionsRow">
+              <Grid.Column
+                mobile={16}
+                tablet={16}
+                largeScreen={16}
+                widescreen={16}
+              >
+                <EnrichmentBreadcrumbs {...this.props} />
+              </Grid.Column>
+              {/* <Grid.Column mobile={8} tablet={8} largeScreen={8} widescreen={8}>
+                <ButtonActions {...this.props} {...this.state} />
+              </Grid.Column> */}
+              <Grid.Column
+                mobile={16}
+                tablet={16}
+                largeScreen={16}
+                widescreen={16}
+              >
+                <SplitPane
+                  className="SplitPanesWrapper"
+                  split="horizontal"
+                  defaultSize={this.state.barcodeSplitPaneSize}
+                  minSize={200}
+                  maxSize={300}
+                  onChange={size => this.barcodeSplitPaneResized(size)}
+                >
+                  {BarcodePlot}
+                  <div id="SVGSplitContainer">{SVGPlot}</div>
                 </SplitPane>
               </Grid.Column>
             </Grid.Row>

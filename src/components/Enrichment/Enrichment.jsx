@@ -47,7 +47,8 @@ class Enrichment extends Component {
       excelVisible: false,
       pngVisible: true,
       pdfVisible: false,
-      svgVisible: true
+      svgVisible: true,
+      displayViolinPlot: false
     };
   }
 
@@ -73,6 +74,16 @@ class Enrichment extends Component {
 
   handleSearchCriteriaChange = (changes, scChange) => {
     this.props.onSearchCriteriaToTop(changes, 'enrichment');
+    if (
+      changes.enrichmentModel ===
+        'Treatment and or Strain Differential Phosphorylation' ||
+      changes.enrichmentModel ===
+        'Ferrostatin vs Untreated Differential Phosphorylation'
+    ) {
+      this.setState({
+        displayViolinPlot: true
+      });
+    }
     this.setState({
       // enrichmentView: 'table',
       plotButtonActive: false,
@@ -96,7 +107,8 @@ class Enrichment extends Component {
       isValidSearchEnrichment: false,
       multisetPlotAvailable: false,
       plotButtonActive: false,
-      visible: false
+      visible: false,
+      displayViolinPlot: false
     });
   };
 
@@ -106,6 +118,12 @@ class Enrichment extends Component {
       visible: !prevState.visible,
       plotButtonActive: !this.state.plotButtonActive
     }));
+  };
+
+  onViolinDataLoaded = bool => {
+    this.setState({
+      violinDataLoaded: bool
+    });
   };
 
   handleDirectionChange = direction => () =>
@@ -374,6 +392,7 @@ class Enrichment extends Component {
           onSearchCriteriaChange={this.handleSearchCriteriaChange}
           onEnrichmentViewChange={this.handleEnrichmentViewChange}
           onHandlePlotAnimation={this.handlePlotAnimation}
+          onDisplayViolinPlot={this.displayViolinPlot}
         />
       );
     } else if (
