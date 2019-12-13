@@ -126,12 +126,6 @@ class Breadcrumbs extends Component {
     }
   };
 
-  handleDiffTable = (evt, {}) => {
-    const key = this.props.imageInfo.key.split(':');
-    const name = key[0] || '';
-    this.props.onViewDiffTable(name);
-  };
-
   render() {
     const {
       enrichmentNameLoaded,
@@ -183,17 +177,6 @@ class Breadcrumbs extends Component {
             <Breadcrumb.Divider icon="right chevron" />
             <Breadcrumb.Section active={true}>
               {NameAndExternalLink}
-            </Breadcrumb.Section>
-            <Breadcrumb.Divider icon="" />
-            <Breadcrumb.Section className="BreadcrumbLink">
-              <Popup
-                trigger={<Icon name="random" onClick={this.handleDiffTable} />}
-                style={BreadcrumbPopupStyle}
-                inverted
-                basic
-                position="bottom left"
-                content="View Differential Table"
-              />
             </Breadcrumb.Section>
           </Breadcrumb>
         </div>

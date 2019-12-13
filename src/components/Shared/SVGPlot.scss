@@ -4,9 +4,18 @@
   margin: 0px 15px 0px 15px !important;
 }
 
+.TwoPlotsDiv  .svgContainer {
+  margin-left: 0px !important;
+}
+
 .svgDiv {
+  // margin-left: 25px !important;
   height: 100% !important;
   width: 100% !important;
+}
+
+.ui.secondary.pointing.menu {
+  margin-left: 0px !important;
 }
 
 .svgSpan {
@@ -16,4 +25,25 @@
 
 .SVGPlot {
   min-height: 75vh !important;
+}
+
+.DiffTableIcon {
+  display: none !important;
+  position: absolute !important;
+  top: 10px !important;
+  // left: -2px !important;
+  cursor: pointer !important;
+  color: #1678c2 !important;
+}
+
+.TwoPlotsDiv .DiffTableIcon {
+    display: inline-block !important;
+    // left: -2px !important;
+    right: 75% !important;
+}
+
+.ThreePlotsDiv .DiffTableIcon {
+    display: inline-block !important;
+    // left: 10px !important;
+    right: 50% !important;
 }

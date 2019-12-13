@@ -292,7 +292,13 @@ class BarcodePlot extends React.Component {
 
           if (brushedDataVar > 0) {
             var line = self.getMaxObject(brushedDataVar);
-
+            // this.props.onSetProteinForDiffView(line);
+            // this.setState({
+            //   settings: {
+            //     ...this.state.settings,
+            //     lineId: line
+            //   }
+            // })
             d3.select(
               '#barcode-line-' +
                 line.lineID.replace(/;/g, '') +
@@ -392,6 +398,7 @@ class BarcodePlot extends React.Component {
 
   endBrush = () => {
     const brushedDataVar = this.getMaxObject(this.props.brushedData);
+    this.props.onSetProteinForDiffView(brushedDataVar);
     this.props.onHandleTickData(brushedDataVar);
     this.props.onHandleTickBrush({
       brushing: true

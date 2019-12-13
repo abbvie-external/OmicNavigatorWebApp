@@ -15,6 +15,7 @@ class SplitPanesContainer extends Component {
     super(props);
     this.state = {
       activeSVGTabIndex: 0,
+      proteinForDiffView: '',
       barcodeSplitPaneSize:
         parseInt(localStorage.getItem('barcodeSplitPos'), 10) || 250
     };
@@ -25,6 +26,12 @@ class SplitPanesContainer extends Component {
   handleSVGTabChange = activeTabIndex => {
     this.setState({
       activeSVGTabIndex: activeTabIndex
+    });
+  };
+
+  setProteinForDiffView = proteinSite => {
+    this.setState({
+      proteinForDiffView: proteinSite
     });
   };
 
@@ -45,6 +52,7 @@ class SplitPanesContainer extends Component {
           className="BarcodePlotContainer"
           {...this.state}
           {...this.props}
+          onSetProteinForDiffView={this.setProteinForDiffView}
         />
       );
     }
@@ -130,7 +138,7 @@ class SplitPanesContainer extends Component {
     // } else {
     if (this.props.displayViolinPlot) {
       return (
-        <div className="ThreePlotsWrapper">
+        <div className="PlotsWrapper">
           <Grid className="">
             <Grid.Row className="ActionsRow">
               <Grid.Column
@@ -157,7 +165,7 @@ class SplitPanesContainer extends Component {
                 widescreen={16}
               >
                 <SplitPane
-                  className="SplitPanesWrapper"
+                  className="ThreePlotsDiv SplitPanesWrapper"
                   split="horizontal"
                   defaultSize={this.state.barcodeSplitPaneSize}
                   minSize={200}
@@ -182,7 +190,7 @@ class SplitPanesContainer extends Component {
       );
     } else {
       return (
-        <div className="ThreePlotsWrapper">
+        <div className="PlotsWrapper">
           <Grid className="">
             <Grid.Row className="ActionsRow">
               <Grid.Column
@@ -203,7 +211,7 @@ class SplitPanesContainer extends Component {
                 widescreen={16}
               >
                 <SplitPane
-                  className="SplitPanesWrapper"
+                  className="TwoPlotsDiv SplitPanesWrapper"
                   split="horizontal"
                   defaultSize={this.state.barcodeSplitPaneSize}
                   minSize={200}

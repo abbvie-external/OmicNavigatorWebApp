@@ -31,7 +31,7 @@ class PepplotResults extends Component {
 
   constructor(props) {
     super(props);
-
+    // let pRows = (this.props.proteinToHighlightInDiffTable === "") ?  100 : this.props.pepplotResults.length;
     this.state = {
       treeDataRaw: [],
       treeData: [],
@@ -45,7 +45,8 @@ class PepplotResults extends Component {
       currentSVGs: [],
       isSVGDataLoaded: false,
       isProteinSelected: false,
-      isProteinSVGLoaded: false
+      isProteinSVGLoaded: false,
+      pepplotRows: 100
     };
   }
 
@@ -65,6 +66,12 @@ class PepplotResults extends Component {
       );
     }
   }
+
+  // componentDidUpdate() {
+  //   if (this.props.proteinToHighlightInDiffTable !=== "") = {
+
+  //   }
+  // }
 
   getProteinPageFromUrl = (
     getProteinDataCb,
@@ -363,7 +370,7 @@ class PepplotResults extends Component {
     const pepplotCacheKey = `${pepplotStudy}-${pepplotModel}-${pepplotTest}`;
     const results = this.props.pepplotResults;
     const columns = this.props.pepplotColumns;
-    // const rows = this.props.pepplotResults.length;
+    const rows = this.state.pepplotRows;
     const quickViews = [];
     const additionalTemplateInfo = this.getTableHelpers(
       this.getProteinData,
@@ -371,14 +378,14 @@ class PepplotResults extends Component {
     );
     if (!this.state.isProteinSelected) {
       return (
-        <div>
+        <div id="PepplotGrid">
           <EZGrid
             uniqueCacheKey={pepplotCacheKey}
             data={results}
             columnsConfig={columns}
-            // totalRows={rows}
+            totalRows={rows}
             // use "rows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
-            itemsPerPage={100}
+            itemsPerPage={rows}
             exportBaseName="Differential_Phosphorylation_Analysis"
             quickViews={quickViews}
             disableGeneralSearch

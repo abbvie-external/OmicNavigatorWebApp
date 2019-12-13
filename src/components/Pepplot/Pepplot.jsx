@@ -6,7 +6,11 @@ import PepplotResults from './PepplotResults';
 import TransitionActive from '../Transitions/TransitionActive';
 import TransitionStill from '../Transitions/TransitionStill';
 import ButtonActions from '../Shared/ButtonActions';
-import { formatNumberForDisplay, splitValue } from '../Shared/helpers';
+import {
+  formatNumberForDisplay,
+  splitValue,
+  highlightRow
+} from '../Shared/helpers';
 import phosphosite_icon from '../../resources/phosphosite.ico';
 
 import _ from 'lodash';
@@ -132,6 +136,7 @@ class Pepplot extends Component {
 
     let icon = phosphosite_icon;
     let iconText = 'PhosphoSitePlus';
+    let proteinToHighlight = this.props.proteinToHighlightInDiffTable;
 
     if (model === 'Differential Expression') {
       initConfigCols = [
@@ -141,7 +146,7 @@ class Pepplot extends Component {
           filterable: { type: 'alphanumericFilter' },
           template: (value, item, addParams) => {
             return (
-              <div>
+              <div id={highlightRow(value, proteinToHighlight)}>
                 <Popup
                   trigger={
                     <span
@@ -204,7 +209,7 @@ class Pepplot extends Component {
           filterable: { type: 'alphanumericFilter' },
           template: (value, item, addParams) => {
             return (
-              <p>
+              <div id={highlightRow(value, proteinToHighlight)}>
                 <Popup
                   trigger={
                     <span
@@ -235,7 +240,7 @@ class Pepplot extends Component {
                   inverted
                   basic
                 />
-              </p>
+              </div>
             );
           }
         }

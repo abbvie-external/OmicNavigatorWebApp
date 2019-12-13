@@ -28,7 +28,8 @@ class Tabs extends Component {
         enrichmentStudy: '',
         enrichmentModel: '',
         enrichmentAnnotation: '',
-        pValueType: 'nominal'
+        pValueType: 'nominal',
+        proteinToHighlightInDiffTable: ''
       };
     } else {
       this.state = {
@@ -42,7 +43,8 @@ class Tabs extends Component {
         pepplotModel: '',
         pepplotTest: '',
         pepplotProteinSite: '',
-        pValueType: 'nominal'
+        pValueType: 'nominal',
+        proteinToHighlightInDiffTable: ''
       };
     }
   }
@@ -116,13 +118,14 @@ class Tabs extends Component {
     );
   };
 
-  handleViewDiffTable = test => {
+  handleViewDiffTable = (test, protein) => {
     this.setState({
       activeIndex: 1,
       tab: 'pepplot',
       pepplotStudy: this.state.enrichmentStudy || '',
       pepplotModel: this.state.enrichmentModel || '',
-      pepplotTest: test || ''
+      pepplotTest: test || '',
+      proteinToHighlightInDiffTable: protein
     });
     let changes = {
       pepplotStudy: this.state.enrichmentStudy || '',

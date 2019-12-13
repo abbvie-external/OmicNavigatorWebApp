@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { Loader, Dimmer, Tab } from 'semantic-ui-react';
+import React, { Component, Fragment } from 'react';
+import { Loader, Dimmer, Tab, Popup, Icon } from 'semantic-ui-react';
 import './SVGPlot.scss';
 
 class SVGPlot extends Component {
@@ -20,7 +20,24 @@ class SVGPlot extends Component {
     this.props.onSVGTabChange(activeIndex);
   };
 
+  handleDiffTable = (evt, {}) => {
+    debugger;
+    const key = this.props.imageInfo.key.split(':');
+    const name = key[0] || '';
+    const diffProtein = this.props.proteinForDiffView.lineID;
+    this.props.onViewDiffTable(name, diffProtein);
+  };
+
   getSVGPanes(activeSVGTabIndex) {
+    const BreadcrumbPopupStyle = {
+      backgroundColor: '2E2E2E',
+      borderBottom: '2px solid #FF4400',
+      color: '#FFF',
+      padding: '1em',
+      maxWidth: '50vw',
+      fontSize: '13px',
+      wordBreak: 'break-all'
+    };
     if (this.props.imageInfo) {
       const svgArray = this.props.imageInfo.svg;
       const panes = svgArray.map(s => {
@@ -51,6 +68,15 @@ class SVGPlot extends Component {
 
   render() {
     const { activeSVGTabIndex } = this.props;
+    const BreadcrumbPopupStyle = {
+      backgroundColor: '2E2E2E',
+      borderBottom: '2px solid #FF4400',
+      color: '#FFF',
+      padding: '1em',
+      maxWidth: '50vw',
+      fontSize: '13px',
+      wordBreak: 'break-all'
+    };
     const svgPanes = this.getSVGPanes(activeSVGTabIndex);
     if (!this.state.isSVGReady) {
       return (
@@ -61,7 +87,26 @@ class SVGPlot extends Component {
         </div>
       );
     } else {
-      return <div className="svgContainer">{svgPanes}</div>;
+      return (
+        <div className="svgContainer">
+          <Popup
+            trigger={
+              <Icon
+                name="random"
+                size="large"
+                onClick={this.handleDiffTable}
+                className="DiffTableIcon"
+              />
+            }
+            style={BreadcrumbPopupStyle}
+            inverted
+            basic
+            position="bottom left"
+            content="view in differential analysis section"
+          />
+          {svgPanes}
+        </div>
+      );
     }
   }
 }
