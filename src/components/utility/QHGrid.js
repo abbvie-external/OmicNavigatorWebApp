@@ -696,6 +696,11 @@ class QHGridBodyHeaders extends React.PureComponent {
 
 class QHGridBody extends React.PureComponent {
   state = { hidden: {} };
+  // rowRef = null;
+  // setRowRef = element => {
+  //   debugger;
+  //   this.rowRef = element;
+  // };
   static getDerivedStateFromProps(nextProps, prevState) {
     const newState = {};
     if (nextProps.grouping !== prevState.grouping) {
@@ -704,6 +709,7 @@ class QHGridBody extends React.PureComponent {
     }
     return newState;
   }
+
   handleToggle = key => evt => {
     this.setState(prev => update(prev, { hidden: { $toggle: [key] } }));
   };
@@ -735,8 +741,33 @@ class QHGridBody extends React.PureComponent {
         if (!hidden) {
           data_rows = _.map(data, (item, idx) => {
             const rowLevelStyle = this.props.rowLevelStyleCalc(item, ++curRow);
+            // Paul needs this highlighted
+            let highlightedRow = false;
+            if (
+              item.Protein_Site !== undefined &&
+              item.Protein_Site !== null &&
+              this.props.additionalTemplateInfo !== '' &&
+              this.props.additionalTemplateInfo !== undefined
+            ) {
+              if (
+                item.Protein_Site ===
+                this.props.additionalTemplateInfo.rowToHighlight
+              ) {
+                debugger;
+                highlightedRow =
+                  item.Protein_Site ===
+                  this.props.additionalTemplateInfo.rowToHighlight;
+              }
+            }
+            const optionalHighlight = highlightedRow ? 'highlightedRow' : '';
+            // const optionalRef = highlightedRow ? this.setRowRef : null;
             return (
-              <Table.Row key={itemKeyMap(item) || idx} style={rowLevelStyle}>
+              <Table.Row
+                key={itemKeyMap(item) || idx}
+                className={optionalHighlight}
+                // ref={optionalRef}
+                style={rowLevelStyle}
+              >
                 {_.map(grouping, (_group, group_idx) => {
                   return (
                     <Table.Cell
@@ -859,7 +890,7 @@ export class QHGrid extends React.PureComponent {
       this.setState({ activePage: data.activePage });
     }
     if (this.bodyRef) {
-      this.bodyRef.scrollTop = 0;
+      this.scrollTop = 0;
     }
   };
   handleItemsPerPageChange = (event, data) => {
@@ -871,6 +902,23 @@ export class QHGrid extends React.PureComponent {
         this.setState({ itemsPerPage: data.value });
     }
   };
+
+  scrollElement = () => {
+    const _this = this;
+    window.requestAnimationFrame(function() {
+      if (_this.bodyRef !== null) {
+        const row = _this.bodyRef.getElementsByClassName('highlightedRow');
+        if (row.length !== 0) {
+          _this.bodyRef.scrollTop = row[0].offsetTop - 40;
+        }
+      }
+    });
+  };
+
+  componentDidMount = () => {
+    this.scrollElement();
+  };
+
   componentDidUpdate = (prevProps, prevState) => {
     if (
       this.props.activePage === undefined &&
@@ -878,6 +926,7 @@ export class QHGrid extends React.PureComponent {
     ) {
       this.setState({ activePage: 1 });
     }
+    this.scrollElement();
   };
 
   //For Grouping
@@ -1120,6 +1169,8 @@ export class QHGrid extends React.PureComponent {
         visibleColumns={visibleColumns}
       />
     );
+
+    // this.scrollElement();
 
     return (
       <div

@@ -28,7 +28,10 @@ export function updateUrl(
     if (tab === 'pepplot') {
       const pepplotStudyQuery = stateParam.pepplotStudy || '';
       const pepplotModelQuery = stateParam.pepplotModel || '';
-      const pepplotTestQuery = stateParam.pepplotTest || '';
+      const pepplotTestQuery =
+        stateParam.pepplotTest !== undefined
+          ? stateParam.pepplotTest.trim()
+          : '';
       const pepplotProteinSiteQuery = stateParam.pepplotProteinSite || '';
       const pepplotStudy = pepplotStudyQuery.replace(/ /gi, '–');
       const pepplotModel = pepplotModelQuery.replace(/ /gi, '–');

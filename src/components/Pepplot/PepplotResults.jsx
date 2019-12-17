@@ -31,7 +31,6 @@ class PepplotResults extends Component {
 
   constructor(props) {
     super(props);
-    // let pRows = (this.props.proteinToHighlightInDiffTable === "") ?  100 : this.props.pepplotResults.length;
     this.state = {
       treeDataRaw: [],
       treeData: [],
@@ -46,8 +45,10 @@ class PepplotResults extends Component {
       isSVGDataLoaded: false,
       isProteinSelected: false,
       isProteinSVGLoaded: false,
-      pepplotRows: 100
+      itemsPerPageInformed: 100,
+      pepplotRows: this.props.pepplotResults.length || 1000
     };
+    this.pepplotGridRef = React.createRef();
   }
 
   componentDidMount() {
@@ -65,13 +66,46 @@ class PepplotResults extends Component {
         dataItem
       );
     }
+
+    if (
+      this.props.tab === 'pepplot' &&
+      this.props.proteinToHighlightInDiffTable !== '' &&
+      this.props.proteinToHighlightInDiffTable !== undefined
+    ) {
+      this.pageToProtein(
+        this.props.pepplotResults,
+        this.props.proteinToHighlightInDiffTable,
+        this.state.itemsPerPageInformed
+      );
+    }
   }
 
-  // componentDidUpdate() {
-  //   if (this.props.proteinToHighlightInDiffTable !=== "") = {
+  componentDidUpdate(prevProps, prevState) {
+    if (
+      this.props.tab === 'pepplot' &&
+      this.props.proteinToHighlightInDiffTable !== '' &&
+      this.props.proteinToHighlightInDiffTable !== undefined
+    ) {
+      this.pageToProtein(
+        this.props.pepplotResults,
+        this.props.proteinToHighlightInDiffTable,
+        this.state.itemsPerPageInformed
+      );
+    }
+  }
 
-  //   }
-  // }
+  pageToProtein = (data, proteinToHighlight, itemsPerPage) => {
+    const Index = _.findIndex(data, function(p) {
+      return p.Protein_Site === proteinToHighlight;
+    });
+    const pageNumber = Math.ceil(Index / itemsPerPage);
+    console.log(`Go to page ${pageNumber}`);
+    debugger;
+    this.pepplotGridRef.current.handlePageChange(
+      {},
+      { activePage: pageNumber }
+    );
+  };
 
   getProteinPageFromUrl = (
     getProteinDataCb,
@@ -307,8 +341,13 @@ class PepplotResults extends Component {
     return w;
   }
 
-  getTableHelpers = (getProteinDataCb, getPlotCb) => {
+  getTableHelpers = (
+    getProteinDataCb,
+    getPlotCb,
+    proteinToHighlightInDiffTable
+  ) => {
     let addParams = {};
+    addParams.rowToHighlight = proteinToHighlightInDiffTable;
     addParams.showPhosphositePlus = dataItem => {
       return function() {
         var protein = (dataItem.Protein
@@ -365,27 +404,52 @@ class PepplotResults extends Component {
     );
   };
 
+  informItemsPerPage = items => {
+    this.setState({
+      itemsPerPageInformed: items
+    });
+  };
+
   render() {
-    const { pepplotStudy, pepplotModel, pepplotTest } = this.props;
-    const pepplotCacheKey = `${pepplotStudy}-${pepplotModel}-${pepplotTest}`;
+    const {
+      pepplotStudy,
+      pepplotModel,
+      pepplotTest,
+      proteinToHighlightInDiffTable,
+      highlightedRowRef
+    } = this.props;
+    let pepplotCacheKey = `${pepplotStudy}-${pepplotModel}-${pepplotTest}`;
+    if (
+      proteinToHighlightInDiffTable !== '' &&
+      proteinToHighlightInDiffTable !== null &&
+      proteinToHighlightInDiffTable !== undefined
+    ) {
+      pepplotCacheKey = `${pepplotStudy}-${pepplotModel}-${pepplotTest}-${proteinToHighlightInDiffTable}`;
+    }
     const results = this.props.pepplotResults;
     const columns = this.props.pepplotColumns;
     const rows = this.state.pepplotRows;
+    const items = this.state.itemsPerPageInformed;
     const quickViews = [];
     const additionalTemplateInfo = this.getTableHelpers(
       this.getProteinData,
-      this.getPlot
+      this.getPlot,
+      proteinToHighlightInDiffTable
     );
     if (!this.state.isProteinSelected) {
       return (
         <div id="PepplotGrid">
           <EZGrid
+            ref={this.pepplotGridRef}
+            proteinToHighlight={proteinToHighlightInDiffTable}
+            onInformItemsPerPage={this.informItemsPerPage}
+            // proteinToHighlightRow={highlightedRowRef}
             uniqueCacheKey={pepplotCacheKey}
             data={results}
             columnsConfig={columns}
             totalRows={rows}
             // use "rows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
-            itemsPerPage={rows}
+            itemsPerPage={items}
             exportBaseName="Differential_Phosphorylation_Analysis"
             quickViews={quickViews}
             disableGeneralSearch

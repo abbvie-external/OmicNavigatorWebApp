@@ -2,7 +2,6 @@ import React, { PureComponent } from 'react';
 import _ from 'lodash';
 import update from 'immutability-helper';
 import Axios from 'axios';
-
 import QHGrid from './QHGrid';
 import { filterTypes } from './FilterTypeConfig';
 import { getField, getFieldValue } from './selectors/QHGridSelector';
@@ -446,6 +445,8 @@ export default class EZGrid extends PureComponent {
   };
   handleItemsPerPageChange = (evt, data) => {
     this.setState({ itemsPerPage: data.value, activePage: 1 });
+    // PAUL
+    this.props.onInformItemsPerPage(data.value);
   };
   handlePageChange = (evt, data) => {
     this.setState({ activePage: data.activePage });
@@ -485,6 +486,19 @@ export default class EZGrid extends PureComponent {
   // handleOnPageChange=()=>{
 
   // }
+  // pageToProtein = (data, proteinToHighlight, itemsPerPage) => {
+  //     const Index = _.findIndex(data, function(p) {
+  //       return firstValue(p.Protein_Site) === proteinToHighlight;
+  //     });
+  //     const pageNumber = Math.ceil(Index / itemsPerPage);
+  //     console.log(`Go to page ${pageNumber}`);
+  //     // window.scrollTo(0, this.props.proteinToHighlightRow.offsetTop);
+  //     this.handlePageChange({},{activePage: pageNumber})
+  //     // ref.current.scoolInfo
+  //     // const ele = document.getElementById("highlightedRow");
+  //     // window.scrollTo(0, ele.offsetTop);
+  // };
+
   render() {
     let {
       generalSearch,
@@ -597,4 +611,11 @@ function mapColumnsConfig(columns = []) {
     let ID = column.ID || getField(column.field);
     return { ...column, ID };
   });
+}
+
+function firstValue(value) {
+  if (value) {
+    const firstValue = value.split(';')[0];
+    return firstValue;
+  }
 }

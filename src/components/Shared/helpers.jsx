@@ -27,9 +27,3 @@ export function splitValue(value) {
       : firstValue;
   }
 }
-
-export function highlightRow(value, toHighlight) {
-  if (value) {
-    return value === toHighlight ? 'hightlightedRow' : '';
-  }
-}

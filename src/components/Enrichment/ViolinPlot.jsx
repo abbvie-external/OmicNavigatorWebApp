@@ -883,7 +883,6 @@ class ViolinPlot extends Component {
       //       cPlot.objs.points.g = objs.g
       //         .append('g')
       //         .attr('class', 'points-plot');
-      //       debugger;
       //       for (let pt = 0; pt < groupObjs[cName].values.length; pt++) {
       //         var max = self.getMaxStat(groupObjs[cName].values);
       //         cPlot.objs.points.pts.push(

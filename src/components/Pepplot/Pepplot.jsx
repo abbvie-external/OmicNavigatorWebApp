@@ -6,11 +6,7 @@ import PepplotResults from './PepplotResults';
 import TransitionActive from '../Transitions/TransitionActive';
 import TransitionStill from '../Transitions/TransitionStill';
 import ButtonActions from '../Shared/ButtonActions';
-import {
-  formatNumberForDisplay,
-  splitValue,
-  highlightRow
-} from '../Shared/helpers';
+import { formatNumberForDisplay, splitValue } from '../Shared/helpers';
 import phosphosite_icon from '../../resources/phosphosite.ico';
 
 import _ from 'lodash';
@@ -44,6 +40,18 @@ class Pepplot extends Component {
   }
 
   componentDidMount() {}
+
+  componentDidUpdate = (prevProps, prevState) => {
+    // if (this.props.proteinToHighlight !== "" && this.props.proteinToHighlight !== undefined) {
+    //   this.handlePepplotSearch(this.state.pepplotResults);
+    // }
+    //   if (prevProps.proteinToHighlightInDiffTable !== "" && prevProps.proteinToHighlightInDiffTable !== undefined) {
+    //   this.handlePepplotSearch(this.state.pepplotResults);
+    // }
+    // if (this.props.proteinToHighlightInDiffTable !== prevProps.proteinToHighlightInDiffTable) {
+    //   this.handlePepplotSearch(this.state.pepplotResults);
+    // }
+  };
 
   handleSearchTransition = bool => {
     this.setState({
@@ -119,6 +127,14 @@ class Pepplot extends Component {
     });
   };
 
+  // highlightRef = (value, toHighlight) => {
+  //   if (value) {
+  //     if (value === toHighlight) {
+  //       return this.highlightedRowRef
+  //     } else return '';
+  //   }
+  // }
+
   getConfigCols = testData => {
     const pepResults = testData.pepplotResults;
     const model = testData.model;
@@ -136,7 +152,6 @@ class Pepplot extends Component {
 
     let icon = phosphosite_icon;
     let iconText = 'PhosphoSitePlus';
-    let proteinToHighlight = this.props.proteinToHighlightInDiffTable;
 
     if (model === 'Differential Expression') {
       initConfigCols = [
@@ -146,7 +161,8 @@ class Pepplot extends Component {
           filterable: { type: 'alphanumericFilter' },
           template: (value, item, addParams) => {
             return (
-              <div id={highlightRow(value, proteinToHighlight)}>
+              <div>
+                {/* ref={this.highlightRef()}> */}
                 <Popup
                   trigger={
                     <span
@@ -209,7 +225,8 @@ class Pepplot extends Component {
           filterable: { type: 'alphanumericFilter' },
           template: (value, item, addParams) => {
             return (
-              <div id={highlightRow(value, proteinToHighlight)}>
+              <div>
+                {/* ref={this.highlightRef()} */}
                 <Popup
                   trigger={
                     <span
@@ -254,7 +271,7 @@ class Pepplot extends Component {
       'adj_P_Val',
       'adjPVal'
     ];
-    if (pepResults.length !== 0) {
+    if (pepResults.length !== 0 && pepResults.length !== undefined) {
       let orderedTestData = JSON.parse(
         JSON.stringify(pepResults[0], relevantConfigCols)
       );
@@ -312,6 +329,7 @@ class Pepplot extends Component {
         <PepplotResults
           {...this.state}
           {...this.props}
+          // highlightedRowRef={this.highlightedRowRef}
           onSearchCriteriaChange={this.handleSearchCriteriaChange}
           onHandlePlotAnimation={this.handlePlotAnimation}
         />

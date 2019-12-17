@@ -23,10 +23,11 @@
   box-shadow: 2px 0px 0px #ff4400 !important;
 }
 
-#PepplotGrid #hightlightedRow {
+#PepplotGrid .highlightedRow {
   background: #ff4400 !important;
+  color: white !important;
 }
 
-#PepplotGrid #hightlightedRow > span {
-  color: white !important;
+.ui.red.button, .ui.red.buttons .button {
+  background-color: #ff4400 !important;
 }

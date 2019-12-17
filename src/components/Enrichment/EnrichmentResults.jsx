@@ -705,7 +705,6 @@ class EnrichmentResults extends Component {
       enrichmentModel,
       enrichmentAnnotation
     } = this.props;
-    // const rows = this.props.enrichmentResults.length;
     const enrichmentCacheKey = `${enrichmentStudy}-${enrichmentModel}-${enrichmentAnnotation}`;
     const quickViews = [];
     const additionalTemplateInfo = this.getTableHelpers(
