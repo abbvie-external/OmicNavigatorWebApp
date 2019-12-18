@@ -29,7 +29,8 @@ class Tabs extends Component {
         enrichmentModel: '',
         enrichmentAnnotation: '',
         pValueType: 'nominal',
-        proteinToHighlightInDiffTable: ''
+        proteinToHighlightInDiffTable: '',
+        proteinHighlightInProgress: false
       };
     } else {
       this.state = {
@@ -44,7 +45,8 @@ class Tabs extends Component {
         pepplotTest: '',
         pepplotProteinSite: '',
         pValueType: 'nominal',
-        proteinToHighlightInDiffTable: ''
+        proteinToHighlightInDiffTable: '',
+        proteinHighlightInProgress: false
       };
     }
   }
@@ -96,7 +98,8 @@ class Tabs extends Component {
         pepplotStudy: changes.pepplotStudy || '',
         pepplotModel: changes.pepplotModel || '',
         pepplotTest: changes.pepplotTest || '',
-        pepplotProteinSite: changes.pepplotProteinSite || ''
+        pepplotProteinSite: changes.pepplotProteinSite || '',
+        proteinHighlightInProgress: false
       });
     } else if (tab === 'enrichment') {
       this.setState({
@@ -104,7 +107,9 @@ class Tabs extends Component {
         enrichmentStudy: changes.enrichmentStudy || '',
         enrichmentModel: changes.enrichmentModel || '',
         enrichmentAnnotation: changes.enrichmentAnnotation || '',
-        enrichmentDescriptionAndTest: changes.enrichmentDescriptionAndTest || ''
+        enrichmentDescriptionAndTest:
+          changes.enrichmentDescriptionAndTest || '',
+        proteinHighlightInProgress: false
       });
     }
     updateUrl(
@@ -125,7 +130,8 @@ class Tabs extends Component {
       pepplotStudy: this.state.enrichmentStudy || '',
       pepplotModel: this.state.enrichmentModel || '',
       pepplotTest: test || '',
-      proteinToHighlightInDiffTable: protein
+      proteinToHighlightInDiffTable: protein,
+      proteinHighlightInProgress: true
     });
     let changes = {
       pepplotStudy: this.state.enrichmentStudy || '',

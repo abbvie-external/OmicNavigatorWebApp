@@ -95,16 +95,18 @@ class PepplotResults extends Component {
   }
 
   pageToProtein = (data, proteinToHighlight, itemsPerPage) => {
-    const Index = _.findIndex(data, function(p) {
-      return p.Protein_Site === proteinToHighlight;
-    });
-    const pageNumber = Math.ceil(Index / itemsPerPage);
-    console.log(`Go to page ${pageNumber}`);
-    debugger;
-    this.pepplotGridRef.current.handlePageChange(
-      {},
-      { activePage: pageNumber }
-    );
+    if (this.pepplotGridRef.current !== null) {
+      const Index = _.findIndex(data, function(p) {
+        return p.Protein_Site === proteinToHighlight;
+      });
+      const pageNumber = Math.ceil(Index / itemsPerPage);
+      console.log(`Go to page ${pageNumber}`);
+      debugger;
+      this.pepplotGridRef.current.handlePageChange(
+        {},
+        { activePage: pageNumber }
+      );
+    }
   };
 
   getProteinPageFromUrl = (
@@ -415,9 +417,20 @@ class PepplotResults extends Component {
       pepplotStudy,
       pepplotModel,
       pepplotTest,
+      pepplotColumns,
+      pepplotResults,
       proteinToHighlightInDiffTable,
+      proteinHighlightInProgress,
       highlightedRowRef
     } = this.props;
+
+    const {
+      isProteinSelected,
+      isProteinSVGLoaded,
+      pepplotRows,
+      itemsPerPageInformed
+    } = this.state;
+
     let pepplotCacheKey = `${pepplotStudy}-${pepplotModel}-${pepplotTest}`;
     if (
       proteinToHighlightInDiffTable !== '' &&
@@ -426,17 +439,13 @@ class PepplotResults extends Component {
     ) {
       pepplotCacheKey = `${pepplotStudy}-${pepplotModel}-${pepplotTest}-${proteinToHighlightInDiffTable}`;
     }
-    const results = this.props.pepplotResults;
-    const columns = this.props.pepplotColumns;
-    const rows = this.state.pepplotRows;
-    const items = this.state.itemsPerPageInformed;
     const quickViews = [];
     const additionalTemplateInfo = this.getTableHelpers(
       this.getProteinData,
       this.getPlot,
       proteinToHighlightInDiffTable
     );
-    if (!this.state.isProteinSelected) {
+    if (!isProteinSelected || proteinHighlightInProgress) {
       return (
         <div id="PepplotGrid">
           <EZGrid
@@ -445,11 +454,11 @@ class PepplotResults extends Component {
             onInformItemsPerPage={this.informItemsPerPage}
             // proteinToHighlightRow={highlightedRowRef}
             uniqueCacheKey={pepplotCacheKey}
-            data={results}
-            columnsConfig={columns}
-            totalRows={rows}
-            // use "rows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
-            itemsPerPage={items}
+            data={pepplotResults}
+            columnsConfig={pepplotColumns}
+            totalRows={pepplotRows}
+            // use "pepplotRows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
+            itemsPerPage={itemsPerPageInformed}
             exportBaseName="Differential_Phosphorylation_Analysis"
             quickViews={quickViews}
             disableGeneralSearch
@@ -461,7 +470,7 @@ class PepplotResults extends Component {
           />
         </div>
       );
-    } else if (this.state.isProteinSelected && !this.state.isProteinSVGLoaded) {
+    } else if (isProteinSelected && !isProteinSVGLoaded) {
       return (
         <div>
           <LoaderActivePlots />
