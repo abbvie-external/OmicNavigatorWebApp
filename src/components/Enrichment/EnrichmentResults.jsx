@@ -559,16 +559,31 @@ class EnrichmentResults extends Component {
     // psp.style.visibility = "hidden";
     // psp.style.left = w.toString() + "px";
     // psp.style.bottom = h.toString() + "px";
-    let plotType = ['splineplot', 'lineplot'];
+    let plotType = ['splineplot'];
     switch (enrichmentModel) {
+      case 'DonorDifferentialPhosphorylation':
+        plotType = ['dotplot'];
+        break;
       case 'Treatment and or Strain Differential Phosphorylation':
         plotType = ['StrainStimDotplot', 'StimStrainDotplot'];
         break;
       case 'Timecourse Differential Phosphorylation':
-        plotType = ['splineplot', 'lineplot'];
+        plotType = ['lineplot', 'splineplot'];
+        break;
+      case 'Differential Expression':
+        plotType = ['proteindotplot'];
+        break;
+      case 'Differential Phosphorylation':
+        plotType = ['phosphodotplot'];
+        break;
+      case 'No Pretreatment Timecourse Differential Phosphorylation':
+        plotType = ['lineplot.modelII', 'splineplot.modelII'];
+        break;
+      case 'Ferrostatin Pretreatment Timecourse Differential Phosphorylation':
+        plotType = ['lineplot.modelIII', 'splineplot.modelIII'];
         break;
       default:
-        plotType = ['splineplot', 'lineplot'];
+        plotType = ['dotplot'];
     }
     let imageInfo = { key: '', title: '', svg: [] };
     imageInfo.title = this.state.imageInfo.title;
@@ -583,6 +598,7 @@ class EnrichmentResults extends Component {
     let heightCalculation = this.calculateHeight;
     let widthCalculation = this.calculateWidth;
     _.forEach(plotType, function(plot, i) {
+      debugger;
       phosphoprotService
         .getPlot(id, plotType[i], enrichmentStudy + 'plots')
         .then(svgMarkupObj => {
