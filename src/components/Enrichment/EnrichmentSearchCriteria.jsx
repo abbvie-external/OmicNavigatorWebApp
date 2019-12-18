@@ -319,12 +319,12 @@ class EnrichmentSearchCriteria extends Component {
         this.setState({
           uSettings: {
             ...this.state.uSettings,
-            must: [],
-            not: [],
-            defaultSigValue: 0.05,
+            // must: [],
+            // not: [],
+            // defaultSigValue: 0.05,
             maxElements: dataFromService.length
-          },
-          sigValue: 0.05
+          }
+          // sigValue: 0.05
         });
         this.annotationdata = dataFromService;
         this.props.onEnrichmentSearch({
