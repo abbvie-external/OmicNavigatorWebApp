@@ -326,12 +326,12 @@ class PepplotSearchCriteria extends Component {
         this.setState({
           uSettingsP: {
             ...this.state.uSettingsP,
-            // mustP: [],
-            // notP: [],
-            // defaultsigValueP: 0.05,
+            mustP: [],
+            notP: [],
+            defaultsigValueP: 0.05,
             maxElementsP: dataFromService.length
           },
-          // sigValueP: 0.05,
+          sigValueP: 0.05,
           uAnchorP: value
         });
         this.testdata = dataFromService;
