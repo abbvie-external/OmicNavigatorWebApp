@@ -101,7 +101,6 @@ class PepplotResults extends Component {
       });
       const pageNumber = Math.ceil(Index / itemsPerPage);
       console.log(`Go to page ${pageNumber}`);
-      debugger;
       this.pepplotGridRef.current.handlePageChange(
         {},
         { activePage: pageNumber }

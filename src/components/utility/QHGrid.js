@@ -698,7 +698,6 @@ class QHGridBody extends React.PureComponent {
   state = { hidden: {} };
   // rowRef = null;
   // setRowRef = element => {
-  //   debugger;
   //   this.rowRef = element;
   // };
   static getDerivedStateFromProps(nextProps, prevState) {
@@ -753,7 +752,6 @@ class QHGridBody extends React.PureComponent {
                 item.Protein_Site ===
                 this.props.additionalTemplateInfo.rowToHighlight
               ) {
-                debugger;
                 highlightedRow =
                   item.Protein_Site ===
                   this.props.additionalTemplateInfo.rowToHighlight;

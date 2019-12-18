@@ -311,7 +311,7 @@ class Enrichment extends Component {
         filterable: { type: 'numericFilter' },
         exportTemplate: value => (value ? `${value}` : 'N/A'),
         template: (value, item, addParams) => {
-          if (enrichmentStudy === '***REMOVED***') {
+          if (enrichmentStudy === '***REMOVED***' || '***REMOVED***') {
             return (
               <div>
                 <Popup

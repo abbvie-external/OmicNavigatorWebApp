@@ -28,6 +28,11 @@
   color: white !important;
 }
 
+#PepplotGrid .highlightedRow .TableCellLink {
+  color: white !important;
+  cursor: pointer !important;
+}
+
 .ui.red.button, .ui.red.buttons .button {
   background-color: #ff4400 !important;
 }

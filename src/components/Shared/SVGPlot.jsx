@@ -91,7 +91,7 @@ class SVGPlot extends Component {
           <Popup
             trigger={
               <Icon
-                name="random"
+                name="exchange"
                 size="large"
                 onClick={this.handleDiffTable}
                 className="DiffTableIcon"
