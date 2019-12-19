@@ -70,10 +70,8 @@ class BarcodePlot extends React.Component {
 
   redrawChart() {
     let width = this.getWidth();
-    this.setState({ containerWidth: width }, () => {
-      d3.select('.BarcodeChartWrapper svg').remove();
-      this.prepareAndRender();
-    });
+    d3.select('.BarcodeChartWrapper svg').remove();
+    this.prepareAndRender(width);
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
@@ -94,13 +92,13 @@ class BarcodePlot extends React.Component {
     } else return 1200;
   };
 
-  prepareAndRender = () => {
+  prepareAndRender = newWidth => {
     const { settings, containerWidth } = this.state;
     const { barcodeSettings, barcodeSplitPaneSize } = this.props;
     const self = this;
-
+    let calculatedWidth = newWidth !== undefined ? newWidth : containerWidth;
     // prepare settings
-    let width = containerWidth - settings.margin.left - settings.margin.right;
+    let width = calculatedWidth - settings.margin.left - settings.margin.right;
     let height =
       barcodeSplitPaneSize - settings.margin.top - settings.margin.bottom;
 
@@ -130,7 +128,7 @@ class BarcodePlot extends React.Component {
       .attr('class', 'barcode-chart-area bcChart')
       .attr('width', width)
       .attr('height', barcodeSplitPaneSize - 10)
-      .attr('viewBox', '0 0 ' + containerWidth + ' ' + barcodeSplitPaneSize)
+      .attr('viewBox', '0 0 ' + calculatedWidth + ' ' + barcodeSplitPaneSize)
       .attr('preserveAspectRatio', 'xMinYMin meet')
       .attr('cursor', 'crosshair');
 
@@ -292,13 +290,6 @@ class BarcodePlot extends React.Component {
 
           if (brushedDataVar > 0) {
             var line = self.getMaxObject(brushedDataVar);
-            // this.props.onSetProteinForDiffView(line);
-            // this.setState({
-            //   settings: {
-            //     ...this.state.settings,
-            //     lineId: line
-            //   }
-            // })
             d3.select(
               '#barcode-line-' +
                 line.lineID.replace(/;/g, '') +
@@ -312,7 +303,6 @@ class BarcodePlot extends React.Component {
           self.props.onHandleBarcodeChanges({
             brushedData: brushedDataVar
           });
-          // self.tickBrush.emit(self.brushedData);
           self.props.onHandleTickBrush({
             brushedData: brushedDataVar
           });
@@ -320,7 +310,7 @@ class BarcodePlot extends React.Component {
       };
       let objsBrush = d3
         .brush()
-        .extent([[0, -50], [containerWidth, barcodeSplitPaneSize]])
+        .extent([[0, -50], [calculatedWidth, barcodeSplitPaneSize]])
         .on('brush', highlightBrushedTicks)
         .on('end', function() {
           self.endBrush();
@@ -337,40 +327,48 @@ class BarcodePlot extends React.Component {
       // self.tickBrush.emit([]);
     });
 
-    // this.setState({
-    //   height: settingsHeight,
-    //   margin: margin,
-    //   objs: {
-    //     axes: axes,
-    //     bottomLabel: bottomLabel,
-    //     // brush: brush || null,
-    //     chartDiv: chartDiv || null,
-    //     g: g || null,
-    //     highLabel: highLabel,
-    //     lowLabel: lowLabel,
-    //     // mainDiv: mainDiv || null,
-    //     svg: svg,
-    //     tooltip: tooltip || null,
-    //     xAxis: xAxis || null
-    //   },
-    //   settings: {
-    //     chartSize: { height: '200', width: '960' },
-    //     data: this.props.data,
-    //     // enableBrush: enableBrush,
-    //     height: height,
-    //     highLabel: settings.highLabel || '',
-    //     highStat: settings.highStat || '',
-    //     id: 'chart-barcode',
-    //     lineID: settings.lineID,
-    //     lowLabel: lowLabel,
-    //     margin: { top: 65, right: 60, bottom: 75, left: 60 },
-    //     statLabel: settings.statLabel,
-    //     statistic: settings.statistic,
-    //     title: 'title test'
-    //   },
-    //   width: width,
-    //   xScale: xScale
-    // });
+    this.setState = {
+      objs: {
+        mainDiv: null,
+        chartDiv: chartDiv,
+        g: g,
+        xAxis: xAxis,
+        tooltip: tooltip,
+        brush: null
+      },
+      // passed or default chart settings
+      settings: {
+        axes: null,
+        bottomLabel: null,
+        brush: null,
+        // brushing: false,
+        chartDiv: chartDiv,
+        // chartSize: { height: '200', width: '960' },
+        // barcodeData: this.props.barcodeData || null,
+        // enableBrush: this.props.settings.enableBrush || false,
+        g: g,
+        // height: this.props.settings.height || '',
+        // highStat: this.props.settings.highStat || '',
+        height: height,
+        id: 'chart-barcode',
+        // highLabel: this.props.settings.highLabel || '',
+        // lowLabel: this.props.settings.lowLabel || '',
+        // lineID: this.props.settings.lineID || '',
+        // logFC: this.props.settings.logFC || '',
+        mainDiv: null,
+        // margin: { top: 65, right: 60, bottom: 75, left: 60 },
+        margin: { top: 45, right: 25, bottom: 40, left: 20 },
+        // statLabel: this.props.settings.statLabel || '',
+        // statistic: this.props.settings.statistic || '',
+        svg: svg,
+        title: '',
+        tooltip: tooltip
+      },
+      containerWidth: calculatedWidth,
+      // containerHeight: this.props.barcodeSplitPaneSize || 0,
+      xAxis: xAxis,
+      xScale: xScale
+    };
   };
 
   unhighLight() {

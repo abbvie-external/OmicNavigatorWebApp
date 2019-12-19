@@ -907,7 +907,11 @@ export class QHGrid extends React.PureComponent {
       if (_this.bodyRef !== null) {
         const row = _this.bodyRef.getElementsByClassName('highlightedRow');
         if (row.length !== 0) {
-          _this.bodyRef.scrollTop = row[0].offsetTop - 40;
+          _this.bodyRef.scrollTo({
+            top: row[0].offsetTop - 40,
+            left: 0,
+            behavior: 'smooth'
+          });
         }
       }
     });

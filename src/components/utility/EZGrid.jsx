@@ -486,18 +486,6 @@ export default class EZGrid extends PureComponent {
   // handleOnPageChange=()=>{
 
   // }
-  // pageToProtein = (data, proteinToHighlight, itemsPerPage) => {
-  //     const Index = _.findIndex(data, function(p) {
-  //       return firstValue(p.Protein_Site) === proteinToHighlight;
-  //     });
-  //     const pageNumber = Math.ceil(Index / itemsPerPage);
-  //     console.log(`Go to page ${pageNumber}`);
-  //     // window.scrollTo(0, this.props.proteinToHighlightRow.offsetTop);
-  //     this.handlePageChange({},{activePage: pageNumber})
-  //     // ref.current.scoolInfo
-  //     // const ele = document.getElementById("highlightedRow");
-  //     // window.scrollTo(0, ele.offsetTop);
-  // };
 
   render() {
     let {

@@ -598,7 +598,6 @@ class EnrichmentResults extends Component {
     let heightCalculation = this.calculateHeight;
     let widthCalculation = this.calculateWidth;
     _.forEach(plotType, function(plot, i) {
-      debugger;
       phosphoprotService
         .getPlot(id, plotType[i], enrichmentStudy + 'plots')
         .then(svgMarkupObj => {
