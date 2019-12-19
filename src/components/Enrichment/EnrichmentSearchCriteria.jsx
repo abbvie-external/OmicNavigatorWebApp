@@ -307,6 +307,7 @@ class EnrichmentSearchCriteria extends Component {
   handlePValueTypeChange = (evt, { value }) => {
     this.props.onSearchTransition(true);
     this.props.onPValueTypeChange(value);
+
     phosphoprotService
       .getAnnotationData(
         this.props.enrichmentModel,
@@ -331,6 +332,9 @@ class EnrichmentSearchCriteria extends Component {
           enrichmentResults: this.annotationdata
         });
       });
+
+    //     if (this.state.activateMultisetFilters) {
+    // call getMultisetEnrichmentData include nominal vs adjusted
   };
 
   handleMultisetToggle = () => {
