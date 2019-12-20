@@ -12,7 +12,6 @@ import {
   splitValue,
   getIconInfo
 } from '../Shared/helpers';
-// import { phosphoprotService } from '../services/phosphoprot.service';
 import _ from 'lodash';
 import './Enrichment.scss';
 import '../Shared/Table.scss';
@@ -85,7 +84,6 @@ class Enrichment extends Component {
       });
     }
     this.setState({
-      // enrichmentView: 'table',
       plotButtonActive: false,
       visible: false
     });

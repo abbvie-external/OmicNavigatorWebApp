@@ -387,17 +387,6 @@ class EnrichmentResults extends Component {
     return w;
   }
 
-  // sizeChange(event) {
-  //   let splitter = document.getElementById('left-splitter');
-  //   if (event.substring(0, 2) > 50) {
-  //     console.log('over')
-  //     splitter.setAttribute('class', 'show-y-scroll');
-  //   } else {
-  //     console.log('under')
-  //     splitter.setAttribute('class', 'hide-y-scroll')
-  //   }
-  // }
-
   showBarcodePlot = (dataItem, barcode, test, highest) => {
     // let containerWidth = this.calculateWidth() * 0.95;
     // let containerHeight = this.calculateHeight() * 0.95;
@@ -405,7 +394,7 @@ class EnrichmentResults extends Component {
       isTestDataLoaded: true,
       barcodeSettings: {
         barcodeData: barcode,
-        brushing: this.state.barcodeSettings.brushing,
+        brushing: false,
         brushedData: [],
         // chartSize: { height: 250, width: containerWidth - 500 },
         lineID: '',
@@ -421,6 +410,7 @@ class EnrichmentResults extends Component {
   };
 
   handleBarcodeChanges = changes => {
+    debugger;
     if (changes.brushing !== undefined) {
       this.setState({
         ...this.state.barcodeSettings,
@@ -444,6 +434,7 @@ class EnrichmentResults extends Component {
   };
 
   handleTickBrush = info => {
+    debugger;
     if (info !== undefined || info !== null) {
       const { barcodeSettings } = this.state;
       if (barcodeSettings.brushedData.length > 0) {
@@ -533,6 +524,7 @@ class EnrichmentResults extends Component {
   };
 
   handleTickData = info => {
+    debugger;
     const { enrichmentStudy, enrichmentModel } = this.props;
     // let self = this;
     // if (this.state.barcodeSettings.barcodeData > 0) {
