@@ -18,8 +18,8 @@ class ViolinPlot extends Component {
         // },
         constrainExtremes: false,
         color: d3.scaleOrdinal(d3.schemeCategory10),
-        chartSize: { height: '700', width: '960' },
-        data: this.props.barcodeSettings.barcodeData || null,
+        // chartSize: { height: '700', width: '960' },
+        // data: this.props.barcodeSettings.barcodeData || null,
         id: 'chart-violin',
         margin: { top: 50, right: 40, bottom: 40, left: 50 },
         pointUniqueId: '',
@@ -103,8 +103,11 @@ class ViolinPlot extends Component {
 
   makeChart = () => {
     const self = this;
+    const { violinSettings } = this.props;
     const { settings, objs, violinPlots, dataPlots, boxPlots } = this.state;
     // groupObjs The data organized by grouping and sorted as well as any metadata for the groups
+
+    const data = violinSettings.violinData;
 
     function calcMetrics(values) {
       const metrics = {

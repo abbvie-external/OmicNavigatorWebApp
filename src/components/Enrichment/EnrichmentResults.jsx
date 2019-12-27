@@ -410,179 +410,198 @@ class EnrichmentResults extends Component {
   };
 
   handleBarcodeChanges = changes => {
-    debugger;
     if (changes.brushing !== undefined) {
       this.setState({
-        ...this.state.barcodeSettings,
-        brushing: changes.brushing || false
+        barcodeSettings: {
+          ...this.state.barcodeSettings,
+          brushing: changes.brushing
+        }
       });
     }
 
     if (changes.brushedData !== undefined) {
       if (changes.brushedData.length > 0) {
         this.setState({
-          ...this.state.barcodeSettings,
-          brushedData: changes.brushedData
+          barcodeSettings: {
+            ...this.state.barcodeSettings,
+            brushedData: changes.brushedData
+          }
         });
       } else {
         this.setState({
-          ...this.state.barcodeSettings,
-          brushedData: []
+          barcodeSettings: {
+            ...this.state.barcodeSettings,
+            brushedData: []
+          }
         });
       }
     }
   };
 
   handleTickBrush = info => {
-    debugger;
-    if (info !== undefined || info !== null) {
+    if (info !== undefined) {
       const { barcodeSettings } = this.state;
-      if (barcodeSettings.brushedData.length > 0) {
-        const i = _.map(info, function(d) {
-          d.statistic = _.find(barcodeSettings.barcodeData, {
-            lineID: d[0].lineID,
-            id_mult: d[0].id_mult
-          }).statistic;
-          d.logFC = _.find(barcodeSettings.barcodeData, {
-            lineID: d[0].lineID,
-            id_mult: d[0].id_mult
-          }).logFC;
-          // d.statistic = _.find(barcodeSettings.barcodeData, { "lineID": d.lineID, "id_mult": d.id_mult }).statistic;
-          // d.logFC = _.find(barcodeSettings.barcodeData, { "lineID": d.lineID, "id_mult": d.id_mult }).logFC;
-          return d;
-        });
-        this.setState({
-          isViolinPlotLoading: true,
-          isViolinPlotLoaded: false
-        });
-        const boxPlotArray = i;
-        const reducedBoxPlotArray = _.reduce(
-          boxPlotArray,
-          function(res, datum) {
-            (res[datum.statLabel] || (res[datum.statLabel] = [])).push({
-              cpm: datum.logFC,
-              sample: datum.lineID,
-              statistic: datum.statistic,
-              id_mult: datum.id_mult
-            });
-            return res;
-          },
-          {}
-        );
-        const vData = _.mapValues(reducedBoxPlotArray, function(v: any) {
-          return { values: v };
-        });
-        const ordered = {};
-        Object.keys(vData)
-          .sort()
-          .forEach(function(key) {
-            ordered[key] = vData[key];
+      // if (barcodeSettings.brushedData.length > 0) {
+      if (info.brushedData !== undefined) {
+        if (info.brushedData.length > 0) {
+          // const barcodeInfo = JSON.parse(info.brushedData);
+          const i = _.map(info.brushedData, function(d) {
+            // d.statistic = _.find(barcodeSettings.barcodeData, {
+            //   lineID: d[0].lineID,
+            //   id_mult: d[0].id_mult
+            // }).statistic;
+            // d.logFC = _.find(barcodeSettings.barcodeData, {
+            //   lineID: d[0].lineID,
+            //   id_mult: d[0].id_mult
+            // }).logFC;
+            d.statistic = _.find(barcodeSettings.barcodeData, {
+              lineID: d.lineID,
+              id_mult: d.id_mult
+            }).statistic;
+            d.logFC = _.find(barcodeSettings.barcodeData, {
+              lineID: d.lineID,
+              id_mult: d.id_mult
+            }).logFC;
+            return d;
           });
+          this.setState({
+            isViolinPlotLoading: true,
+            isViolinPlotLoaded: false
+          });
+          const boxPlotArray = i;
+          const reducedBoxPlotArray = _.reduce(
+            boxPlotArray,
+            function(res, datum) {
+              (res[datum.statLabel] || (res[datum.statLabel] = [])).push({
+                cpm: datum.logFC,
+                sample: datum.lineID,
+                statistic: datum.statistic,
+                id_mult: datum.id_mult
+              });
+              return res;
+            },
+            {}
+          );
+          const vData = _.mapValues(reducedBoxPlotArray, function(v: any) {
+            return { values: v };
+          });
+          const ordered = {};
+          Object.keys(vData)
+            .sort()
+            .forEach(function(key) {
+              ordered[key] = vData[key];
+            });
 
-        // var kLSplit = document.getElementById('left-splitter');
-        this.setState({
-          violinSettings: {
-            violinData: ordered,
-            // chartSize: { height: kLSplit.clientHeight + 25, width: kLSplit.clientWidth },
-            chartSize: {
-              height: 400,
-              width: 400
+          // var kLSplit = document.getElementById('left-splitter');
+          this.setState({
+            violinSettings: {
+              violinData: ordered,
+              // chartSize: { height: kLSplit.clientHeight + 25, width: kLSplit.clientWidth },
+              chartSize: {
+                height: 400,
+                width: 400
+              },
+              axisLabels: {
+                xAxis: 'change this term',
+                yAxis:
+                  "log<tspan baseline-shift='sub' font-size='14px'>2</tspan>(FC)"
+              },
+              id: 'violin-graph-1',
+              pointUniqueId: 'sample',
+              pointValue: 'cpm',
+              title: '',
+              subtitle: '',
+              tooltip: {
+                show: true,
+                fields: [
+                  { label: 'log(FC)', value: 'cpm', toFixed: true },
+                  { label: 'Protien', value: 'sample' }
+                ]
+              },
+              xName: 'tissue'
             },
-            axisLabels: {
-              xAxis: 'change this term',
-              yAxis:
-                "log<tspan baseline-shift='sub' font-size='14px'>2</tspan>(FC)"
-            },
-            id: 'violin-graph-1',
-            pointUniqueId: 'sample',
-            pointValue: 'cpm',
-            title: '',
-            subtitle: '',
-            tooltip: {
-              show: true,
-              fields: [
-                { label: 'log(FC)', value: 'cpm', toFixed: true },
-                { label: 'Protien', value: 'sample' }
-              ]
-            },
-            xName: 'tissue'
-          },
-          isViolinPlotLoading: false,
-          isViolinPlotLoaded: true
-        });
-      } else {
-        this.setState({
-          isViolinPlotLoading: false,
-          isViolinPlotLoaded: false
-        });
-        // if (this.plots.includes('violin')) {
-        //   let index = this.plots.indexOf('violin');
-        //   this.plots.splice(index, 1);
-        // }
+            isViolinPlotLoading: false
+            // isViolinPlotLoaded: true
+          });
+        } else {
+          this.setState({
+            isViolinPlotLoading: false,
+            isViolinPlotLoaded: false
+          });
+          // if (this.plots.includes('violin')) {
+          //   let index = this.plots.indexOf('violin');
+          //   this.plots.splice(index, 1);
+          // }
+        }
       }
     }
   };
 
   handleTickData = info => {
-    debugger;
     const { enrichmentStudy, enrichmentModel } = this.props;
     // let self = this;
     // if (this.state.barcodeSettings.barcodeData > 0) {
-    this.setState({
-      SVGPlotLoaded: false,
-      SVGPlotLoading: true
-    });
-    const dataItem = this.state.barcodeSettings.barcodeData.find(
-      i => i.lineID === info.lineID
-    );
-    // let protein = dataItem.lineID;
-    // this.plotDataAvailable = true;
-    let id = dataItem.id_mult ? dataItem.id_mult : dataItem.id;
+    if (info !== undefined) {
+      if (this.state.barcodeSettings.barcodeData) {
+        if (this.state.barcodeSettings.barcodeData.length > 0) {
+          this.setState({
+            SVGPlotLoaded: false,
+            SVGPlotLoading: true
+          });
+          const dataItem = this.state.barcodeSettings.barcodeData.find(
+            i => i.lineID === info.lineID
+          );
+          // let protein = dataItem.lineID;
+          // this.plotDataAvailable = true;
+          let id = dataItem.id_mult ? dataItem.id_mult : dataItem.id;
 
-    let splitterHeight = document.getElementById('SVGSplitContainer')
-      .clientHeight;
-    let splitterWidth = document.getElementById('SVGSplitContainer')
-      .clientWidth;
+          let splitterHeight = document.getElementById('SVGSplitContainer')
+            .clientHeight;
+          let splitterWidth = document.getElementById('SVGSplitContainer')
+            .clientWidth;
 
-    var w = (splitterWidth - 50) * 0.86;
-    var h = (splitterHeight - 40) * 0.94;
+          var w = (splitterWidth - 50) * 0.86;
+          var h = (splitterHeight - 40) * 0.94;
 
-    // var psp = document.getElementById('psp-icon');
-    // psp.style.visibility = "hidden";
-    // psp.style.left = w.toString() + "px";
-    // psp.style.bottom = h.toString() + "px";
-    let plotType = ['splineplot'];
-    switch (enrichmentModel) {
-      case 'DonorDifferentialPhosphorylation':
-        plotType = ['dotplot'];
-        break;
-      case 'Treatment and or Strain Differential Phosphorylation':
-        plotType = ['StrainStimDotplot', 'StimStrainDotplot'];
-        break;
-      case 'Timecourse Differential Phosphorylation':
-        plotType = ['lineplot', 'splineplot'];
-        break;
-      case 'Differential Expression':
-        plotType = ['proteindotplot'];
-        break;
-      case 'Differential Phosphorylation':
-        plotType = ['phosphodotplot'];
-        break;
-      case 'No Pretreatment Timecourse Differential Phosphorylation':
-        plotType = ['lineplot.modelII', 'splineplot.modelII'];
-        break;
-      case 'Ferrostatin Pretreatment Timecourse Differential Phosphorylation':
-        plotType = ['lineplot.modelIII', 'splineplot.modelIII'];
-        break;
-      default:
-        plotType = ['dotplot'];
+          // var psp = document.getElementById('psp-icon');
+          // psp.style.visibility = "hidden";
+          // psp.style.left = w.toString() + "px";
+          // psp.style.bottom = h.toString() + "px";
+          let plotType = ['splineplot'];
+          switch (enrichmentModel) {
+            case 'DonorDifferentialPhosphorylation':
+              plotType = ['dotplot'];
+              break;
+            case 'Treatment and or Strain Differential Phosphorylation':
+              plotType = ['StrainStimDotplot', 'StimStrainDotplot'];
+              break;
+            case 'Timecourse Differential Phosphorylation':
+              plotType = ['lineplot', 'splineplot'];
+              break;
+            case 'Differential Expression':
+              plotType = ['proteindotplot'];
+              break;
+            case 'Differential Phosphorylation':
+              plotType = ['phosphodotplot'];
+              break;
+            case 'No Pretreatment Timecourse Differential Phosphorylation':
+              plotType = ['lineplot.modelII', 'splineplot.modelII'];
+              break;
+            case 'Ferrostatin Pretreatment Timecourse Differential Phosphorylation':
+              plotType = ['lineplot.modelIII', 'splineplot.modelIII'];
+              break;
+            default:
+              plotType = ['dotplot'];
+          }
+          let imageInfo = { key: '', title: '', svg: [] };
+          imageInfo.title = this.state.imageInfo.title;
+          imageInfo.key = this.state.imageInfo.key;
+          const handleSVGCb = this.handleSVG;
+          this.getPlot(id, plotType, enrichmentStudy, imageInfo, handleSVGCb);
+          // }
+        }
+      }
     }
-    let imageInfo = { key: '', title: '', svg: [] };
-    imageInfo.title = this.state.imageInfo.title;
-    imageInfo.key = this.state.imageInfo.key;
-    const handleSVGCb = this.handleSVG;
-    this.getPlot(id, plotType, enrichmentStudy, imageInfo, handleSVGCb);
-    // }
   };
 
   getPlot = (id, plotType, enrichmentStudy, imageInfo, handleSVGCb) => {

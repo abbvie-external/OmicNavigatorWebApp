@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 // import PropTypes from 'prop-types';
 // import { Provider as BusProvider, useBus, useListener } from 'react-bus';
 import * as d3 from 'd3';
-// import * as _ from 'lodash';
+import * as _ from 'lodash';
 
 class BarcodePlot extends React.Component {
   constructor(props) {
@@ -50,7 +50,7 @@ class BarcodePlot extends React.Component {
       xScale: null
     };
     this.barcodeChartRef = React.createRef();
-    this.prepareAndRender = this.prepareAndRender.bind(this);
+    // this.prepareAndRender = this.prepareAndRender.bind(this);
   }
 
   componentDidMount() {
@@ -75,10 +75,11 @@ class BarcodePlot extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
-    debugger;
     if (
-      this.props.barcodeSettings.brushing !==
-        prevProps.barcodeSettings.brushing ||
+      // this.props.barcodeSettings.brushing !==
+      //   prevProps.barcodeSettings.brushing ||
+      // this.props.barcodeSettings.brushedData !==
+      //   prevProps.barcodeSettings.brushedData ||
       this.props.barcodeSplitPaneSize !== prevProps.barcodeSplitPaneSize
     ) {
       //let heightChangedFn;
@@ -91,13 +92,13 @@ class BarcodePlot extends React.Component {
     }
   }
 
-  getWidth = () => {
+  getWidth() {
     if (this.barcodeChartRef.current !== null) {
       return this.barcodeChartRef.current.parentElement.offsetWidth;
     } else return 1200;
-  };
+  }
 
-  prepareAndRender = newWidth => {
+  prepareAndRender(newWidth) {
     const { settings, containerWidth } = this.state;
     const { barcodeSettings, barcodeSplitPaneSize } = this.props;
     const self = this;
@@ -186,6 +187,9 @@ class BarcodePlot extends React.Component {
       .attr('id', function(d) {
         return 'barcode-line-' + d.lineID;
       })
+      .attr('className', function(d) {
+        return 'barcode-line-' + d.lineID;
+      })
       .attr('x1', function(d, i) {
         return xScale(d.statistic);
       })
@@ -204,9 +208,8 @@ class BarcodePlot extends React.Component {
 
       // setup change events
       .on('mouseover', function(d) {
-        debugger;
         if (barcodeSettings.brushing === false) {
-          let toolTipPostition = parseInt(d3.select(this).attr('x1'));
+          let toolTipPosition = parseInt(d3.select(this).attr('x1'));
           d3.select(this)
             .transition()
             .duration(100)
@@ -233,9 +236,9 @@ class BarcodePlot extends React.Component {
             .attr('y', -22)
             .attr('x', function() {
               if (xScale(d.statistic) > width / 2) {
-                return toolTipPostition - 5;
+                return toolTipPosition - 5;
               } else {
-                return toolTipPostition + 5;
+                return toolTipPosition + 5;
               }
             });
         }
@@ -263,10 +266,36 @@ class BarcodePlot extends React.Component {
           self.props.onHandleTickData(d);
         }
       });
+
+    // add this logic once you figure our how to default select box via props...
+    // if (barcodeSettings.brushedData.length > 0) {
+    //   debugger;
+    //   const brushedLineIds = barcodeSettings.brushedData.map(l => `barcode-line-${l.lineID}`);
+    //   const allTicks = d3.selectAll('line.barcode-line');
+    // const allTickGroups = d3.selectAll('line.barcode-line')._groups[0];
+    // const allTicksArr = Array.from(allTicks);
+    // const allTickIds = allTicksArr.map(t => t.id);
+    // const alreadyBrushedTicks = _.intersectionWith(brushedLineIds, allTickIds, _.isEqual);
+
+    // const isAlreadyBrushed = function(brushedTicks, x) {
+    //   const xMin = brushedTicks[0][0],
+    //   xMax = brushedTicks[1][0];
+    //   const brushTest = xMin <= x && x <= xMax;
+    //   return brushTest;
+    // };
+    //  allTicks
+    // .filter(function() {
+    //   const x = d3.select(this).attr('x1');
+    //   return isAlreadyBrushed(brushedTicks, x);
+    // })
+    // .attr('y1', -40)
+    // .style('stroke-width', 3)
+    // .style('opacity', 1.0);
+    //}
+
     let objsBrush = {};
     if (barcodeSettings.enableBrush) {
       const highlightBrushedTicks = function() {
-        debugger;
         self.props.onHandleBarcodeChanges({
           brushing: true
         });
@@ -292,9 +321,14 @@ class BarcodePlot extends React.Component {
             .attr('y1', -40)
             .style('stroke-width', 3)
             .style('opacity', 1.0);
-          debugger;
           const brushedDataVar = brushed.data();
           // const brushedDataVar = self.props.brushedData;
+          self.props.onHandleBarcodeChanges({
+            brushedData: brushedDataVar
+          });
+          self.props.onHandleTickBrush({
+            brushedData: brushedDataVar
+          });
           if (brushedDataVar.length > 0) {
             let line = self.getMaxObject(brushedDataVar);
             let maxTick = line;
@@ -304,22 +338,13 @@ class BarcodePlot extends React.Component {
               '_' +
               line.id_mult;
             // self.updateToolTip(line, id, self);
-            d3.select(
-              '#barcode-line-' +
-                line.lineID.replace(/;/g, '') +
-                '_' +
-                line.id_mult
-            )
+            debugger;
+            d3.select('#' + id)
+              .transition()
+              .duration(300)
               .style('stroke', 'orange')
               .attr('y1', -55);
           }
-
-          self.props.onHandleBarcodeChanges({
-            brushedData: brushedDataVar
-          });
-          self.props.onHandleTickBrush({
-            brushedData: brushedDataVar
-          });
         }
       };
       objsBrush = d3
@@ -336,55 +361,38 @@ class BarcodePlot extends React.Component {
       self.props.onHandleBarcodeChanges({
         brushing: false
       });
-      debugger;
       self.unhighLight();
       self.props.onHandleTickBrush();
-      // self.tickBrush.emit([]);
     });
 
-    this.setState = {
-      objs: {
-        mainDiv: null,
-        chartDiv: chartDiv,
-        g: g,
-        xAxis: xAxis,
-        tooltip: tooltip,
-        brush: objsBrush
-      },
-      // passed or default chart settings
-      settings: {
-        axes: null,
-        bottomLabel: null,
-        brush: objsBrush,
-        // brushing: false,
-        chartDiv: chartDiv,
-        // chartSize: { height: '200', width: '960' },
-        // barcodeData: this.props.barcodeData || null,
-        // enableBrush: this.props.settings.enableBrush || false,
-        g: g,
-        // height: this.props.settings.height || '',
-        // highStat: this.props.settings.highStat || '',
-        height: height,
-        id: 'chart-barcode',
-        // highLabel: this.props.settings.highLabel || '',
-        // lowLabel: this.props.settings.lowLabel || '',
-        // lineID: this.props.settings.lineID || '',
-        // logFC: this.props.settings.logFC || '',
-        mainDiv: null,
-        // margin: { top: 65, right: 60, bottom: 75, left: 60 },
-        margin: { top: 45, right: 25, bottom: 40, left: 20 },
-        // statLabel: this.props.settings.statLabel || '',
-        // statistic: this.props.settings.statistic || '',
-        svg: svg,
-        title: '',
-        tooltip: tooltip
-      },
-      containerWidth: calculatedWidth,
-      // containerHeight: this.props.barcodeSplitPaneSize || 0,
-      xAxis: xAxis,
-      xScale: xScale
-    };
-  };
+    // this.setState = {
+    //   objs: {
+    //     mainDiv: null,
+    //     chartDiv: chartDiv,
+    //     g: g,
+    //     xAxis: xAxis,
+    //     tooltip: tooltip,
+    //     brush: objsBrush
+    //   },
+    //   settings: {
+    //     axes: null,
+    //     bottomLabel: null,
+    //     brush: objsBrush,
+    //     chartDiv: chartDiv,
+    //     g: g,
+    //     height: height,
+    //     id: 'chart-barcode',
+    //     mainDiv: null,
+    //     margin: { top: 45, right: 25, bottom: 40, left: 20 },
+    //     svg: svg,
+    //     title: '',
+    //     tooltip: tooltip
+    //   },
+    //   containerWidth: calculatedWidth,
+    //   xAxis: xAxis,
+    //   xScale: xScale
+    // };
+  }
 
   unhighLight() {
     d3.selectAll('line.barcode-line')
@@ -411,18 +419,20 @@ class BarcodePlot extends React.Component {
     }
   }
 
-  endBrush = () => {
-    const brushedDataVar = this.getMaxObject(this.props.brushedData);
+  endBrush() {
+    const brushedDataVar = this.getMaxObject(
+      this.props.barcodeSettings.brushedData
+    );
     this.props.onSetProteinForDiffView(brushedDataVar);
     this.props.onHandleTickData(brushedDataVar);
     this.props.onHandleTickBrush({
       brushing: true
     });
-  };
+  }
 
-  clearBrush = () => {
+  clearBrush() {
     this.state.objs.g.call(this.state.objs.brush.move, null);
-  };
+  }
 
   // updateTick(tick) {
   // 	let id = this.getId(tick.sample, tick.id_mult);
@@ -473,36 +483,39 @@ class BarcodePlot extends React.Component {
   // }
 
   updateToolTip(tick, id, self) {
-    let t = document.getElementById(id);
-    let toolTipPostition = parseInt(d3.select('#' + id).attr('x1'));
-    let objsVar = self.state.objs;
-    if (parseInt(t.getAttribute('x1')) > this.width / 2) {
-      objsVar.tooltip.attr('text-anchor', 'end');
-    } else {
-      objsVar.tooltip.attr('text-anchor', 'start');
-    }
+    debugger;
+    if (self.barcodeChartRef.current !== null) {
+      let t = self.barcodeChartRef.current.getElementsByClassName(id);
+      let toolTipPosition = parseInt(d3.select('#' + id).attr('x1'));
+      let objsVar = self.state.objs;
+      if (parseInt(t.getAttribute('x1')) > this.width / 2) {
+        objsVar.tooltip.attr('text-anchor', 'end');
+      } else {
+        objsVar.tooltip.attr('text-anchor', 'start');
+      }
 
-    objsVar.tooltip
-      .transition()
-      .duration(100)
-      .style('opacity', 1)
-      .text(function() {
-        return tick.sample ? tick.sample : tick.lineID;
-      })
-      .style('fill', function() {
-        return '#2c3b78';
-      })
-      .attr('y', -45)
-      .attr('x', function() {
-        if (parseInt(t.getAttribute('x1')) > this.width / 2) {
-          return toolTipPostition - 5;
-        } else {
-          return toolTipPostition + 5;
-        }
-      });
-    self.updateState({
-      objs: objsVar
-    });
+      objsVar.tooltip
+        .transition()
+        .duration(100)
+        .style('opacity', 1)
+        .text(function() {
+          return tick.sample ? tick.sample : tick.lineID;
+        })
+        .style('fill', function() {
+          return '#2c3b78';
+        })
+        .attr('y', -45)
+        .attr('x', function() {
+          if (parseInt(t.getAttribute('x1')) > this.width / 2) {
+            return toolTipPosition - 5;
+          } else {
+            return toolTipPosition + 5;
+          }
+        });
+      // self.updateState({
+      //   objs: objsVar
+      // });
+    }
   }
 
   render() {
@@ -511,6 +524,7 @@ class BarcodePlot extends React.Component {
         id="chart-barcode"
         className="BarcodeChartWrapper"
         ref={this.barcodeChartRef}
+        // dangerouslySetInnerHTML={{ __html: this.state.settings.svg }}>
       ></div>
     );
   }
