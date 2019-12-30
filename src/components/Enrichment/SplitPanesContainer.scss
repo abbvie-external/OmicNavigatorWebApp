@@ -61,6 +61,10 @@
     min-height: 90vh !important;
     padding-left: 20px !important;
     // margin-top: 33px !important;
+
+    // .QHGrid table tr th {
+    //     display: none !important;
+    //   }    
 }
 
 .SVGSplitContainer {
@@ -80,14 +84,22 @@
     transform: translate(-50%, -50%);
 }
 
+.ViolinPlotTab {
+    padding-left: 20px !important;
+    padding-top: 10px !important;
+}
+
+.TableResultsTab {
+    padding-left: 0px !important;
+    padding-top: 0px !important;
+}
+
 .ViolinPlotTab, .TableResultsTab {
     min-height: 400px !important;
     margin-top: 0px !important;
-    padding-left: 20px !important;
-    padding-top: 10px !important;
     border: none !important;
 }
 
-.violinAndTableMenu {
-    margin-bottom: 0px !important;
+.ViolinAndTableMenu {
+    margin: 0px 10px 0px 0px !important;
 }

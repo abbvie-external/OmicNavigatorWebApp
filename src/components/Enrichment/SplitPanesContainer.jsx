@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import { Grid, Dimmer, Loader, Button, Tab } from 'semantic-ui-react';
+import { Grid, Dimmer, Loader, Button, Tab, Popup } from 'semantic-ui-react';
 import EnrichmentBreadcrumbs from './EnrichmentBreadcrumbs';
 import ButtonActions from '../Shared/ButtonActions';
 // import PlotSVG from './PlotSVG';
@@ -9,6 +9,25 @@ import './SplitPanesContainer.scss';
 import SVGPlot from '../Shared/SVGPlot';
 import BarcodePlot from './BarcodePlot';
 import ViolinPlot from './ViolinPlot';
+import FilteredPepplotTable from './FilteredPepplotTable';
+
+import { phosphoprotService } from '../../services/phosphoprot.service';
+import _ from 'lodash';
+import { formatNumberForDisplay, splitValue } from '../Shared/helpers';
+import phosphosite_icon from '../../resources/phosphosite.ico';
+
+import QHGrid from '../utility/QHGrid';
+import EZGrid from '../utility/EZGrid';
+import QuickViewModal from '../utility/QuickViewModal';
+import {
+  getFieldValue,
+  getField,
+  typeMap
+} from '../utility/selectors/QHGridSelector';
+export * from '../utility/FilterTypeConfig';
+export * from '../utility/selectors/quickViewSelector';
+export { QHGrid, EZGrid, QuickViewModal };
+export { getField, getFieldValue, typeMap };
 
 class SplitPanesContainer extends Component {
   constructor(props) {
@@ -18,11 +37,21 @@ class SplitPanesContainer extends Component {
       proteinForDiffView: '',
       barcodeSplitPaneSize:
         parseInt(localStorage.getItem('barcodeSplitPos'), 10) || 250,
-      activeViolinTableIndex: 0
+      activeViolinTableIndex: 0,
+      filteredBarcodeData: [],
+      filteredPepplotConfigCols: []
     };
   }
 
-  componentDidMount() {}
+  componentDidMount() {
+    // this.getFilteredPepplotConfigCols(this.props.barcodeSettings.barcodeData);
+    const filteredPepplotConfigCols = this.getFilteredPepplotConfigCols(
+      this.props.barcodeSettings.barcodeData
+    );
+    this.setState({
+      filteredPepplotColumns: filteredPepplotConfigCols
+    });
+  }
 
   handleSVGTabChange = activeTabIndex => {
     this.setState({
@@ -59,6 +88,20 @@ class SplitPanesContainer extends Component {
     }
   };
 
+  getTableData = () => {
+    if (this.props.barcodeSettings.brushedData.length > 0) {
+      const brushedMultIds = this.props.barcodeSettings.brushedData.map(
+        b => b.id_mult
+      );
+      const filteredPepplotData = this.state.filteredBarcodeData.filter(d =>
+        brushedMultIds.includes(d.id_mult)
+      );
+      return filteredPepplotData;
+    } else {
+      return [];
+    }
+  };
+
   getViolinPlot = () => {
     const {
       isViolinPlotLoading,
@@ -67,7 +110,6 @@ class SplitPanesContainer extends Component {
       violinSettings
     } = this.props;
     // isViolinPlotLoaded
-    debugger;
     if (!isViolinPlotLoading && !isViolinPlotLoaded) {
       return (
         <div className="PlotInstructionsDiv">
@@ -94,15 +136,231 @@ class SplitPanesContainer extends Component {
   };
 
   handleViolinTableTabChange = (e, { activeIndex }) => {
-    debugger;
     this.setState({
       activeViolinTableIndex: activeIndex
     });
   };
 
+  getFilteredPepplotConfigCols = barcodeData => {
+    if (this.state.filteredBarcodeData.length > 0) {
+      this.setConfigCols(this.state.filteredBarcodeData);
+    } else {
+      const key = this.props.imageInfo.key.split(':');
+      const name = key[0] || '';
+      phosphoprotService
+        .getTestData(
+          this.props.enrichmentModel,
+          name,
+          this.props.enrichmentStudy + 'plots'
+        )
+        .then(dataFromService => {
+          // const dataParsed = JSON.parse(dataFromService);
+          const barcodeMultIds = barcodeData.map(b => b.id_mult);
+          const filteredData = dataFromService.filter(d =>
+            barcodeMultIds.includes(d.id_mult)
+          );
+          // const filteredData = _.intersectionWith(datafFromService, allTickIds, _.isEqual);
+          // const diffProtein = this.props.proteinForDiffView.lineID;
+          // this.props.onViewDiffTable(name, diffProtein);
+          const cols = this.setConfigCols(filteredData);
+          return cols;
+        });
+    }
+  };
+
+  setConfigCols = filteredData => {
+    let self = this;
+    const model = this.props.enrichmentModel;
+    let initConfigCols = [];
+
+    const TableValuePopupStyle = {
+      backgroundColor: '2E2E2E',
+      borderBottom: '2px solid #FF4400',
+      color: '#FFF',
+      padding: '1em',
+      maxWidth: '50vw',
+      fontSize: '13px',
+      wordBreak: 'break-all'
+    };
+
+    let icon = phosphosite_icon;
+    let iconText = 'PhosphoSitePlus';
+
+    if (model === 'Differential Expression') {
+      initConfigCols = [
+        {
+          title: 'MajorityProteinIDsHGNC',
+          field: 'MajorityProteinIDsHGNC',
+          filterable: { type: 'alphanumericFilter' },
+          template: (value, item, addParams) => {
+            return (
+              <div>
+                {/* ref={this.highlightRef()}> */}
+                <Popup
+                  trigger={
+                    <span
+                      className="TableCellLink"
+                      // onClick={addParams.showPlot(model, item)}
+                    >
+                      {splitValue(value)}
+                    </span>
+                  }
+                  content={value}
+                  style={TableValuePopupStyle}
+                  className="TablePopupValue"
+                  inverted
+                  basic
+                />
+                <Popup
+                  trigger={
+                    <img
+                      src={icon}
+                      alt="Phosophosite"
+                      className="ExternalSiteIcon"
+                      // onClick={addParams.showPhosphositePlus(item)}
+                    />
+                  }
+                  style={TableValuePopupStyle}
+                  className="TablePopupValue"
+                  content={iconText}
+                  inverted
+                  basic
+                />
+              </div>
+            );
+          }
+        },
+        {
+          title: 'MajorityProteinIDs',
+          field: 'MajorityProteinIDs',
+          filterable: { type: 'alphanumericFilter' },
+          template: (value, item, addParams) => {
+            return (
+              <Popup
+                trigger={
+                  <span className="TableValue">{splitValue(value)}</span>
+                }
+                content={value}
+                style={TableValuePopupStyle}
+                className="TablePopupValue"
+                inverted
+                basic
+              />
+            );
+          }
+        }
+      ];
+    } else {
+      initConfigCols = [
+        {
+          title: 'Protein_Site',
+          field: 'Protein_Site',
+          filterable: { type: 'alphanumericFilter' },
+          template: (value, item, addParams) => {
+            return (
+              <div>
+                {/* ref={this.highlightRef()} */}
+                <Popup
+                  trigger={
+                    <span
+                      className="TableCellLink"
+                      // onClick={addParams.showPlot(model, item)}
+                    >
+                      {splitValue(value)}
+                    </span>
+                  }
+                  style={TableValuePopupStyle}
+                  className="TablePopupValue"
+                  content={value}
+                  inverted
+                  basic
+                />
+                <Popup
+                  trigger={
+                    <img
+                      src={icon}
+                      alt="Phosophosite"
+                      className="ExternalSiteIcon"
+                      // onClick={addParams.showPhosphositePlus(item)}
+                    />
+                  }
+                  style={TableValuePopupStyle}
+                  className="TablePopupValue"
+                  content={iconText}
+                  inverted
+                  basic
+                />
+              </div>
+            );
+          }
+        }
+      ];
+    }
+    let relevantConfigCols = [
+      'F',
+      'logFC',
+      't',
+      'P_Value',
+      'adj_P_Val',
+      'adjPVal'
+    ];
+    if (filteredData.length !== 0 && filteredData.length !== undefined) {
+      let orderedTestData = JSON.parse(
+        JSON.stringify(filteredData[0], relevantConfigCols)
+      );
+
+      let relevantConfigColumns = _.map(
+        _.filter(_.keys(orderedTestData), function(d) {
+          return _.includes(relevantConfigCols, d);
+        })
+      );
+
+      // if using multi-set analysis, show set membership column
+      if (this.state.multisetQueried) {
+        relevantConfigColumns.splice(0, 0, 'Set_Membership');
+      }
+
+      const additionalConfigColumns = relevantConfigColumns.map(c => {
+        return {
+          title: c,
+          field: c,
+          type: 'number',
+          filterable: { type: 'numericFilter' },
+          exportTemplate: value => (value ? `${value}` : 'N/A'),
+          template: (value, item, addParams) => {
+            return (
+              <p>
+                <Popup
+                  trigger={
+                    <span className="TableValue">
+                      {formatNumberForDisplay(value)}
+                    </span>
+                  }
+                  style={TableValuePopupStyle}
+                  className="TablePopupValue"
+                  content={value}
+                  inverted
+                  basic
+                />
+              </p>
+            );
+          }
+        };
+      });
+      const configCols = initConfigCols.concat(additionalConfigColumns);
+      debugger;
+      self.setState({
+        filteredBarcodeData: filteredData
+        // filteredPepplotConfigCols: configCols
+      });
+      return configCols;
+    }
+  };
+
   getViolinAndTable = () => {
     const { activeViolinTableIndex } = this.state;
     const violinPlot = this.getViolinPlot();
+    const tableData = this.getTableData();
     const violinAndTablePanes = [
       {
         menuItem: 'Violin Plot',
@@ -130,9 +388,7 @@ class SplitPanesContainer extends Component {
             className="TableResultsTab"
             // as="div"
           >
-            <div id="" className="">
-              table
-            </div>
+            <FilteredPepplotTable {...this.state} {...this.props} />
           </Tab.Pane>
         )
       }
@@ -148,7 +404,7 @@ class SplitPanesContainer extends Component {
           stackable: true,
           secondary: true,
           pointing: true,
-          className: 'violinAndTableMenu'
+          className: 'ViolinAndTableMenu'
         }}
       />
     );

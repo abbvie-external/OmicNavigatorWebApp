@@ -269,7 +269,6 @@ class BarcodePlot extends React.Component {
 
     // add this logic once you figure our how to default select box via props...
     // if (barcodeSettings.brushedData.length > 0) {
-    //   debugger;
     //   const brushedLineIds = barcodeSettings.brushedData.map(l => `barcode-line-${l.lineID}`);
     //   const allTicks = d3.selectAll('line.barcode-line');
     // const allTickGroups = d3.selectAll('line.barcode-line')._groups[0];
@@ -338,7 +337,6 @@ class BarcodePlot extends React.Component {
               '_' +
               line.id_mult;
             // self.updateToolTip(line, id, self);
-            debugger;
             d3.select('#' + id)
               .transition()
               .duration(300)
@@ -483,7 +481,6 @@ class BarcodePlot extends React.Component {
   // }
 
   updateToolTip(tick, id, self) {
-    debugger;
     if (self.barcodeChartRef.current !== null) {
       let t = self.barcodeChartRef.current.getElementsByClassName(id);
       let toolTipPosition = parseInt(d3.select('#' + id).attr('x1'));
