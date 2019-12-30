@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import { Grid, Dimmer, Loader, Button } from 'semantic-ui-react';
+import { Grid, Dimmer, Loader, Button, Tab } from 'semantic-ui-react';
 import EnrichmentBreadcrumbs from './EnrichmentBreadcrumbs';
 import ButtonActions from '../Shared/ButtonActions';
 // import PlotSVG from './PlotSVG';
@@ -17,7 +17,8 @@ class SplitPanesContainer extends Component {
       activeSVGTabIndex: 0,
       proteinForDiffView: '',
       barcodeSplitPaneSize:
-        parseInt(localStorage.getItem('barcodeSplitPos'), 10) || 250
+        parseInt(localStorage.getItem('barcodeSplitPos'), 10) || 250,
+      activeViolinTableIndex: 0
     };
   }
 
@@ -66,6 +67,7 @@ class SplitPanesContainer extends Component {
       violinSettings
     } = this.props;
     // isViolinPlotLoaded
+    debugger;
     if (!isViolinPlotLoading && !isViolinPlotLoaded) {
       return (
         <div className="PlotInstructionsDiv">
@@ -89,6 +91,67 @@ class SplitPanesContainer extends Component {
         />
       );
     }
+  };
+
+  handleViolinTableTabChange = (e, { activeIndex }) => {
+    debugger;
+    this.setState({
+      activeViolinTableIndex: activeIndex
+    });
+  };
+
+  getViolinAndTable = () => {
+    const { activeViolinTableIndex } = this.state;
+    const violinPlot = this.getViolinPlot();
+    const violinAndTablePanes = [
+      {
+        menuItem: 'Violin Plot',
+        pane: (
+          <Tab.Pane
+            attached="true"
+            key="1"
+            id="ViolinPlotTab"
+            className="ViolinPlotTab"
+            // as="div"
+          >
+            <div id="" className="">
+              {violinPlot}
+            </div>
+          </Tab.Pane>
+        )
+      },
+      {
+        menuItem: 'Table Results',
+        pane: (
+          <Tab.Pane
+            attached="true"
+            key="2"
+            id="TableResultsTab"
+            className="TableResultsTab"
+            // as="div"
+          >
+            <div id="" className="">
+              table
+            </div>
+          </Tab.Pane>
+        )
+      }
+    ];
+
+    return (
+      <Tab
+        onTabChange={this.handleViolinTableTabChange}
+        panes={violinAndTablePanes}
+        activeIndex={activeViolinTableIndex}
+        renderActiveOnly={false}
+        menu={{
+          stackable: true,
+          secondary: true,
+          pointing: true,
+          className: 'violinAndTableMenu'
+        }}
+      />
+    );
   };
 
   getSVGPlot = () => {
@@ -124,7 +187,7 @@ class SplitPanesContainer extends Component {
 
   render() {
     const BarcodePlot = this.getBarcodePlot();
-    const ViolinPlot = this.getViolinPlot();
+    const ViolinAndTable = this.getViolinAndTable();
     const SVGPlot = this.getSVGPlot();
 
     // if (!isTestDataLoaded) {
@@ -179,7 +242,9 @@ class SplitPanesContainer extends Component {
                     minSize={300}
                     maxSize={700}
                   >
-                    <div id="ViolinSplitContainer">{ViolinPlot}</div>
+                    <div id="ViolinAndTableSplitContainer">
+                      {ViolinAndTable}
+                    </div>
                     <div id="SVGSplitContainer">{SVGPlot}</div>
                   </SplitPane>
                 </SplitPane>
