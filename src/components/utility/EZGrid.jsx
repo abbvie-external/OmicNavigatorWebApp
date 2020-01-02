@@ -445,8 +445,9 @@ export default class EZGrid extends PureComponent {
   };
   handleItemsPerPageChange = (evt, data) => {
     this.setState({ itemsPerPage: data.value, activePage: 1 });
-    // PAUL
+    // Paul start
     this.props.onInformItemsPerPage(data.value);
+    // Paul end
   };
   handlePageChange = (evt, data) => {
     this.setState({ activePage: data.activePage });

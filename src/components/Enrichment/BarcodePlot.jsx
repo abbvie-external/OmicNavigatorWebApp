@@ -45,7 +45,7 @@ class BarcodePlot extends React.Component {
         tooltip: null
       },
       containerWidth: 0,
-      // containerHeight: this.props.barcodeSplitPaneSize || 0,
+      // containerHeight: this.props.horizontalSplitPaneSize || 0,
       xAxis: null,
       xScale: null
     };
@@ -80,7 +80,7 @@ class BarcodePlot extends React.Component {
       //   prevProps.barcodeSettings.brushing ||
       // this.props.barcodeSettings.brushedData !==
       //   prevProps.barcodeSettings.brushedData ||
-      this.props.barcodeSplitPaneSize !== prevProps.barcodeSplitPaneSize
+      this.props.horizontalSplitPaneSize !== prevProps.horizontalSplitPaneSize
     ) {
       //let heightChangedFn;
       // clearTimeout(heightChangedFn);
@@ -100,13 +100,13 @@ class BarcodePlot extends React.Component {
 
   prepareAndRender(newWidth) {
     const { settings, containerWidth } = this.state;
-    const { barcodeSettings, barcodeSplitPaneSize } = this.props;
+    const { barcodeSettings, horizontalSplitPaneSize } = this.props;
     const self = this;
     let calculatedWidth = newWidth !== undefined ? newWidth : containerWidth;
     // prepare settings
     let width = calculatedWidth - settings.margin.left - settings.margin.right;
     let height =
-      barcodeSplitPaneSize - settings.margin.top - settings.margin.bottom;
+      horizontalSplitPaneSize - settings.margin.top - settings.margin.bottom;
 
     //Scale the range of the data
     let domain = d3
@@ -133,8 +133,8 @@ class BarcodePlot extends React.Component {
       .attr('id', 'svg-' + settings.id)
       .attr('class', 'barcode-chart-area bcChart')
       .attr('width', width)
-      .attr('height', barcodeSplitPaneSize - 10)
-      .attr('viewBox', '0 0 ' + calculatedWidth + ' ' + barcodeSplitPaneSize)
+      .attr('height', horizontalSplitPaneSize - 10)
+      .attr('viewBox', '0 0 ' + calculatedWidth + ' ' + horizontalSplitPaneSize)
       .attr('preserveAspectRatio', 'xMinYMin meet')
       .attr('cursor', 'crosshair');
 
@@ -347,7 +347,7 @@ class BarcodePlot extends React.Component {
       };
       objsBrush = d3
         .brush()
-        .extent([[0, -50], [calculatedWidth, barcodeSplitPaneSize]])
+        .extent([[0, -50], [calculatedWidth, horizontalSplitPaneSize]])
         .on('brush', highlightBrushedTicks)
         .on('end', function() {
           self.endBrush();

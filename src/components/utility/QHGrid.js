@@ -22,11 +22,10 @@ import { filterTypes } from './FilterTypeConfig';
 
 import _ from 'lodash';
 import moment from 'moment';
-
+// Paul start
 // import excel_logo from './resources/excel.png';
-// Paul changed this - custom for Phosphoprotemoic Analyzer
 import excel_logo from '../../resources/excel3.png';
-//
+// Paul end
 
 import './QHGrid.scss';
 import {
@@ -517,9 +516,10 @@ class QHGridHeader extends React.PureComponent {
               {!this.props.loading && !!this.props.exportBaseName && (
                 <Image
                   src={excel_logo}
-                  // Paul commented this out - custom for Phosphoprotemoic Analyzer
+                  // Paul start
                   // avatar
                   // size="mini"
+                  // Paul end
                   onClick={this.props.exportExcel(columns)}
                   style={{ float: 'right', cursor: 'pointer' }}
                 />
@@ -740,7 +740,7 @@ class QHGridBody extends React.PureComponent {
         if (!hidden) {
           data_rows = _.map(data, (item, idx) => {
             const rowLevelStyle = this.props.rowLevelStyleCalc(item, ++curRow);
-            // Paul needs this highlighted
+            // Paul start
             let highlightedRow = false;
             if (
               item.Protein_Site !== undefined &&
@@ -758,6 +758,7 @@ class QHGridBody extends React.PureComponent {
               }
             }
             const optionalHighlight = highlightedRow ? 'highlightedRow' : '';
+            // Paul end
             return (
               <Table.Row
                 key={itemKeyMap(item) || idx}
@@ -899,7 +900,7 @@ export class QHGrid extends React.PureComponent {
         this.setState({ itemsPerPage: data.value });
     }
   };
-  // Paul
+  // Paul start
   scrollElement = () => {
     const _this = this;
     window.requestAnimationFrame(function() {
@@ -915,6 +916,7 @@ export class QHGrid extends React.PureComponent {
       }
     });
   };
+  // Paul end
 
   componentDidMount = () => {
     this.scrollElement();
@@ -1186,9 +1188,9 @@ export class QHGrid extends React.PureComponent {
         </Dimmer>
         <QHGridHeader {...headerProps} />
         <div
-          // Paul
+          // Paul start
           className="QHGridHeaderDiv"
-          //
+          // Paul end
           style={{
             margin: 0,
             padding: 0,

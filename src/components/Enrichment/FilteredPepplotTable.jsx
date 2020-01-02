@@ -73,15 +73,17 @@ class FilteredPepplotTable extends Component {
           this.props.enrichmentStudy + 'plots'
         )
         .then(dataFromService => {
-          const barcodeMultIds = barcodeData.map(b => b.id_mult);
-          const filteredData = dataFromService.filter(d =>
-            barcodeMultIds.includes(d.id_mult)
-          );
-          // const filteredData = _.intersectionWith(datafFromService, allTickIds, _.isEqual);
-          // const diffProtein = this.props.proteinForDiffView.lineID;
-          // this.props.onViewDiffTable(name, diffProtein);
-          const cols = this.setConfigCols(filteredData);
-          return cols;
+          if (dataFromService.length > 0) {
+            const barcodeMultIds = barcodeData.map(b => b.id_mult);
+            const filteredData = dataFromService.filter(d =>
+              barcodeMultIds.includes(d.id_mult)
+            );
+            // const filteredData = _.intersectionWith(datafFromService, allTickIds, _.isEqual);
+            // const diffProtein = this.props.proteinForDiffView.lineID;
+            // this.props.onViewDiffTable(name, diffProtein);
+            const cols = this.setConfigCols(filteredData);
+            return cols;
+          }
         });
     }
   };

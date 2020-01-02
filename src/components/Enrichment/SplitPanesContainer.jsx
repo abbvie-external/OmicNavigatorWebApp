@@ -17,8 +17,10 @@ class SplitPanesContainer extends Component {
     this.state = {
       activeSVGTabIndex: 0,
       proteinForDiffView: '',
-      barcodeSplitPaneSize:
-        parseInt(localStorage.getItem('barcodeSplitPos'), 10) || 250,
+      horizontalSplitPaneSize:
+        parseInt(localStorage.getItem('horizontalSplitPaneSize'), 10) || 250,
+      verticalSplitPaneSize:
+        parseInt(localStorage.getItem('verticalSplitPaneSize'), 10) || 415,
       activeViolinTableIndex: 0
     };
   }
@@ -120,7 +122,7 @@ class SplitPanesContainer extends Component {
         )
       },
       {
-        menuItem: 'Table Results',
+        menuItem: 'Differential Table',
         pane: (
           <Tab.Pane
             attached="true"
@@ -175,11 +177,18 @@ class SplitPanesContainer extends Component {
     }
   };
 
-  barcodeSplitPaneResized(size) {
-    this.setState({
-      barcodeSplitPaneSize: size
-    });
-    localStorage.setItem('barcodeSplitPos', size);
+  splitPaneResized(size, paneType) {
+    debugger;
+    if (paneType === 'horizontal') {
+      this.setState({
+        horizontalSplitPaneSize: size
+      });
+    } else {
+      this.setState({
+        verticalSplitPaneSize: size
+      });
+    }
+    localStorage.setItem(`${paneType}SplitPaneSize`, size);
   }
 
   render() {
@@ -227,18 +236,19 @@ class SplitPanesContainer extends Component {
                 <SplitPane
                   className="ThreePlotsDiv SplitPanesWrapper"
                   split="horizontal"
-                  defaultSize={this.state.barcodeSplitPaneSize}
+                  defaultSize={this.state.horizontalSplitPaneSize}
                   minSize={150}
                   maxSize={400}
-                  onChange={size => this.barcodeSplitPaneResized(size)}
+                  onChange={size => this.splitPaneResized(size, 'horizontal')}
                 >
                   {BarcodePlot}
                   <SplitPane
                     className="BottomSplitPaneContainer"
                     split="vertical"
-                    defaultSize={415}
+                    defaultSize={this.state.verticalSplitPaneSize}
                     minSize={415}
                     maxSize={1000}
+                    onChange={size => this.splitPaneResized(size, 'vertical')}
                   >
                     <div id="ViolinAndTableSplitContainer">
                       {ViolinAndTable}
@@ -276,10 +286,10 @@ class SplitPanesContainer extends Component {
                 <SplitPane
                   className="TwoPlotsDiv SplitPanesWrapper"
                   split="horizontal"
-                  defaultSize={this.state.barcodeSplitPaneSize}
-                  minSize={200}
-                  maxSize={300}
-                  onChange={size => this.barcodeSplitPaneResized(size)}
+                  defaultSize={this.state.horizontalSplitPaneSize}
+                  minSize={150}
+                  maxSize={400}
+                  onChange={size => this.splitPaneResized(size, 'horizontal')}
                 >
                   {BarcodePlot}
                   <div id="SVGSplitContainer">{SVGPlot}</div>
