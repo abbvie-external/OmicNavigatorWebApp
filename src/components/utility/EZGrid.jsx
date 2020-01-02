@@ -104,7 +104,6 @@ export default class EZGrid extends PureComponent {
   };
 
   componentDidUpdate = (prevProps, prevState) => {
-    debugger;
     // let state={};
     if (this.props.columnsConfig !== prevProps.columnsConfig) {
       let columnsConfig = mapColumnsConfig(this.props.columnsConfig);
