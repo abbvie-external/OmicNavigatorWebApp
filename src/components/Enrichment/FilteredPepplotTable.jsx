@@ -24,18 +24,13 @@ class FilteredPepplotTable extends Component {
     this.state = {
       filteredTableConfigCols: [],
       filteredTableData: [],
-      filteredBarcodeData: []
+      filteredBarcodeData: [],
+      itemsPerPageInformedEnrichment: null
     };
   }
 
   componentDidMount() {
     this.getfilteredTableConfigCols(this.props.barcodeSettings.barcodeData);
-    // const filteredPepplotCols = this.getfilteredTableConfigCols(
-    //   this.props.barcodeSettings.barcodeData
-    // );
-    // this.setState({
-    //   filteredTableConfigCols: filteredPepplotCols
-    // });
   }
 
   componentDidUpdate = (prevProps, prevState) => {
@@ -55,12 +50,13 @@ class FilteredPepplotTable extends Component {
       const filteredPepplotData = this.state.filteredBarcodeData.filter(d =>
         brushedMultIds.includes(d.id_mult)
       );
-      // return filteredPepplotData;
       this.setState({
         filteredTableData: filteredPepplotData
       });
     } else {
-      // return [];
+      this.setState({
+        filteredTableData: []
+      });
     }
   };
 
@@ -77,7 +73,6 @@ class FilteredPepplotTable extends Component {
           this.props.enrichmentStudy + 'plots'
         )
         .then(dataFromService => {
-          // const dataParsed = JSON.parse(dataFromService);
           const barcodeMultIds = barcodeData.map(b => b.id_mult);
           const filteredData = dataFromService.filter(d =>
             barcodeMultIds.includes(d.id_mult)
@@ -118,12 +113,10 @@ class FilteredPepplotTable extends Component {
           template: (value, item, addParams) => {
             return (
               <div>
-                {/* ref={this.highlightRef()}> */}
                 <Popup
                   trigger={
                     <span
-                      className="TableCellLink"
-                      // onClick={addParams.showPlot(model, item)}
+                    // className="TableCellLink"
                     >
                       {splitValue(value)}
                     </span>
@@ -140,7 +133,7 @@ class FilteredPepplotTable extends Component {
                       src={icon}
                       alt="Phosophosite"
                       className="ExternalSiteIcon"
-                      // onClick={addParams.showPhosphositePlus(item)}
+                      onClick={addParams.showPhosphositePlus(item)}
                     />
                   }
                   style={TableValuePopupStyle}
@@ -182,12 +175,10 @@ class FilteredPepplotTable extends Component {
           template: (value, item, addParams) => {
             return (
               <div>
-                {/* ref={this.highlightRef()} */}
                 <Popup
                   trigger={
                     <span
-                      className="TableCellLink"
-                      // onClick={addParams.showPlot(model, item)}
+                    // className="TableCellLink"
                     >
                       {splitValue(value)}
                     </span>
@@ -204,7 +195,7 @@ class FilteredPepplotTable extends Component {
                       src={icon}
                       alt="Phosophosite"
                       className="ExternalSiteIcon"
-                      // onClick={addParams.showPhosphositePlus(item)}
+                      onClick={addParams.showPhosphositePlus(item)}
                     />
                   }
                   style={TableValuePopupStyle}
@@ -275,46 +266,70 @@ class FilteredPepplotTable extends Component {
         filteredBarcodeData: filteredData,
         filteredTableConfigCols: configCols
       });
-      // return configCols;
     }
   };
 
+  getTableHelpers = proteinToHighlightInDiffTable => {
+    let addParams = {};
+    // addParams.rowToHighlight = proteinToHighlightInDiffTable;
+    addParams.showPhosphositePlus = dataItem => {
+      return function() {
+        var protein = (dataItem.Protein
+          ? dataItem.Protein
+          : dataItem.MajorityProteinIDsHGNC
+        ).split(';')[0];
+        let param = { proteinNames: protein, queryId: -1, from: 0 };
+        phosphoprotService.postToPhosphositePlus(
+          param,
+          'https://www.phosphosite.org/proteinSearchSubmitAction.action'
+        );
+      };
+    };
+    return addParams;
+  };
+
+  informItemsPerPage = items => {
+    this.setState({
+      itemsPerPageInformedEnrichment: items
+    });
+  };
+
   render() {
-    const { filteredTableConfigCols, filteredTableData } = this.state;
-
-    // const enrichmentCacheKey = `${enrichmentStudy}-${enrichmentModel}-${enrichmentAnnotation}`;
+    const { proteinToHighlightInDiffTable } = this.props;
+    const {
+      filteredTableConfigCols,
+      filteredTableData,
+      itemsPerPageInformedEnrichment
+    } = this.state;
     const quickViews = [];
-    // const additionalTemplateInfo = this.getTableHelpers(
-    //   this.testSelectedTransition,
-    //   this.showBarcodePlot
-    // );
+    const additionalTemplateInfo = this.getTableHelpers(
+      proteinToHighlightInDiffTable
+    );
 
-    // if (!this.state.isTestSelected) {
     return (
       <div>
         <EZGrid
           // ref={this.filteredPepplotGridRef}
           // proteinToHighlight={proteinToHighlightInDiffTable}
-          // onInformItemsPerPage={this.informItemsPerPage}
+          onInformItemsPerPage={this.informItemsPerPage}
           // proteinToHighlightRow={highlightedRowRef}
           // uniqueCacheKey={pepplotCacheKey}
           data={filteredTableData}
           columnsConfig={filteredTableConfigCols}
           // totalRows={pepplotRows}
           // use "pepplotRows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
-          // itemsPerPage={itemsPerPageInformed}
+          itemsPerPage={itemsPerPageInformedEnrichment}
           // exportBaseName="Differential_Phosphorylation_Analysis"
           // quickViews={quickViews}
           disableGeneralSearch
           disableGrouping
           disableColumnVisibilityToggle
-          // min-height="75vh"
-          // additionalTemplateInfo={additionalTemplateInfo}
+          min-height="5vh"
+          additionalTemplateInfo={additionalTemplateInfo}
           // headerAttributes={<ButtonActions />}
         />
       </div>
     );
-    // }
   }
 }
 

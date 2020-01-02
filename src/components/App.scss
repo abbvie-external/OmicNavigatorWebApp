@@ -76,4 +76,10 @@
   .test {
     color: white !important;
   }
+
+  .ui.selectable.table tbody .highlightedRow:hover {
+    background: #f14000 !important;
+    color: white !important;
+  }
+
 }

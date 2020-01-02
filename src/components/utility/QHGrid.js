@@ -758,7 +758,6 @@ class QHGridBody extends React.PureComponent {
               }
             }
             const optionalHighlight = highlightedRow ? 'highlightedRow' : '';
-            // const optionalRef = highlightedRow ? this.setRowRef : null;
             return (
               <Table.Row
                 key={itemKeyMap(item) || idx}
@@ -900,7 +899,7 @@ export class QHGrid extends React.PureComponent {
         this.setState({ itemsPerPage: data.value });
     }
   };
-
+  // Paul
   scrollElement = () => {
     const _this = this;
     window.requestAnimationFrame(function() {
@@ -1187,6 +1186,9 @@ export class QHGrid extends React.PureComponent {
         </Dimmer>
         <QHGridHeader {...headerProps} />
         <div
+          // Paul
+          className="QHGridHeaderDiv"
+          //
           style={{
             margin: 0,
             padding: 0,

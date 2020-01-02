@@ -127,14 +127,6 @@ class Pepplot extends Component {
     });
   };
 
-  // highlightRef = (value, toHighlight) => {
-  //   if (value) {
-  //     if (value === toHighlight) {
-  //       return this.highlightedRowRef
-  //     } else return '';
-  //   }
-  // }
-
   getConfigCols = testData => {
     const pepResults = testData.pepplotResults;
     const model = testData.model;
@@ -162,7 +154,6 @@ class Pepplot extends Component {
           template: (value, item, addParams) => {
             return (
               <div>
-                {/* ref={this.highlightRef()}> */}
                 <Popup
                   trigger={
                     <span
@@ -226,7 +217,6 @@ class Pepplot extends Component {
           template: (value, item, addParams) => {
             return (
               <div>
-                {/* ref={this.highlightRef()} */}
                 <Popup
                   trigger={
                     <span

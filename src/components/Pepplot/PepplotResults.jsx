@@ -419,8 +419,7 @@ class PepplotResults extends Component {
       pepplotColumns,
       pepplotResults,
       proteinToHighlightInDiffTable,
-      proteinHighlightInProgress,
-      highlightedRowRef
+      proteinHighlightInProgress
     } = this.props;
 
     const {
@@ -451,7 +450,6 @@ class PepplotResults extends Component {
             ref={this.pepplotGridRef}
             proteinToHighlight={proteinToHighlightInDiffTable}
             onInformItemsPerPage={this.informItemsPerPage}
-            // proteinToHighlightRow={highlightedRowRef}
             uniqueCacheKey={pepplotCacheKey}
             data={pepplotResults}
             columnsConfig={pepplotColumns}

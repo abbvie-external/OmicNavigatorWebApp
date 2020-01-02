@@ -228,16 +228,17 @@ class SplitPanesContainer extends Component {
                   className="ThreePlotsDiv SplitPanesWrapper"
                   split="horizontal"
                   defaultSize={this.state.barcodeSplitPaneSize}
-                  minSize={200}
-                  maxSize={300}
+                  minSize={150}
+                  maxSize={400}
                   onChange={size => this.barcodeSplitPaneResized(size)}
                 >
                   {BarcodePlot}
                   <SplitPane
+                    className="BottomSplitPaneContainer"
                     split="vertical"
-                    defaultSize={400}
-                    minSize={300}
-                    maxSize={700}
+                    defaultSize={415}
+                    minSize={415}
+                    maxSize={1000}
                   >
                     <div id="ViolinAndTableSplitContainer">
                       {ViolinAndTable}

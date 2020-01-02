@@ -108,3 +108,15 @@ i.icon.quickViewIcon {
 // .QHGrid--generalSearch.ui.input > input {
 //   border: 0;
 // }
+
+
+// Paul added
+.highlightedRow {
+  background: #ff4400 !important;
+  color: white !important;
+}
+
+.highlightedRow .TableCellLink {
+  color: white !important;
+  cursor: pointer !important;
+}
