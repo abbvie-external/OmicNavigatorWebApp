@@ -35,8 +35,8 @@ class ViolinPlot extends Component {
         yName: null,
         yTicks: 1
       },
-      width: 0,
-      height: 0,
+      width: 400,
+      height: 400,
       groupObjs: {},
       objs: {
         mainDiv: null,
@@ -74,11 +74,11 @@ class ViolinPlot extends Component {
   //   }
 
   componentDidMount() {
-    // let width = this.getWidth();
-    // let height = this.getHeight();
-    // this.setState({ width: width, height: height }, () => {
-    this.makeChart();
-    // });
+    let width = this.getWidth();
+    let height = this.getHeight();
+    this.setState({ violinWidth: width, violinHeight: height }, () => {
+      this.makeChart();
+    });
 
     // let resizedFn;
     // window.addEventListener('resize', () => {
@@ -89,25 +89,56 @@ class ViolinPlot extends Component {
     // });
   }
 
-  // getWidth = () => {
-  //     if (this.violinChartRef.current !== null) {
-  //     return this.violinChartRef.current.parentElement.offsetWidth;
-  //     } else return 380;
+  // componentDidUpdate(prevProps, prevState, snapshot) {
+  //   if (
+  //     this.props.violinSettings.violinData !==
+  //       prevProps.violinSettings.violinData
+  //     //||
+  //     // this.props.horizontalSplitPaneSize !== prevProps.horizontalSplitPaneSize
+  //   ) {
+  //     debugger;
+  //     //let heightChangedFn;
+  //     // clearTimeout(heightChangedFn);
+  //     // heightChangedFn = setTimeout(() => {
+  //     //   this.redrawChart();
+  //     // d3.select('.BarcodeChartWrapper svg').remove();
+  //     d3.select('.violin-chart-wrapper')
+  //     .selectAll('*')
+  //     .remove();
+  //     this.makeChart();
+  //     // }, 1000);
+  //   }
   // }
 
-  // getHeight = () => {
-  //     if (this.violinChartRef.current !== null) {
-  //     return this.violinChartRef.current.parentElement.offsetHeight;
-  //     } else return 450;
-  // }
+  getWidth = () => {
+    if (this.violinChartRef.current !== null) {
+      return this.violinChartRef.current.parentElement.offsetWidth;
+    } else return 350;
+  };
+
+  getHeight = () => {
+    // if (this.violinChartRef.current !== null) {
+    // return this.violinChartRef.current.parentElement.offsetHeight;
+    // } else return 700;
+    return 600;
+  };
 
   makeChart = () => {
+    debugger;
     const self = this;
     const { violinSettings } = this.props;
-    const { settings, objs, violinPlots, dataPlots, boxPlots } = this.state;
+    const {
+      violinHeight,
+      violinWidth,
+      settings,
+      objs,
+      violinPlots,
+      dataPlots,
+      boxPlots
+    } = this.state;
     // groupObjs The data organized by grouping and sorted as well as any metadata for the groups
 
-    const data = violinSettings.violinData;
+    // const data = violinSettings.violinData;
 
     function calcMetrics(values) {
       const metrics = {
@@ -172,7 +203,8 @@ class ViolinPlot extends Component {
       return metrics;
     }
 
-    let groupObjs = settings.data;
+    let groupObjs = violinSettings.violinData;
+    // let groupObjs = settings.data;
     let pointValue = settings.pointValue;
 
     for (const cName in groupObjs) {
@@ -195,14 +227,16 @@ class ViolinPlot extends Component {
     }
 
     // Set base settings
-    let divWidth = settings.chartSize.width;
-    let divHeight = settings.chartSize.height;
+    let divWidth = violinWidth;
+    let divHeight = violinHeight;
+    // let divWidth = settings.chartSize.width;
+    // let divHeight = settings.chartSize.height;
 
-    let width =
-      settings.chartSize.width - settings.margin.left - settings.margin.right;
+    let width = violinWidth - settings.margin.left - settings.margin.right;
+    // settings.chartSize.width - settings.margin.left - settings.margin.right;
 
-    let height =
-      settings.chartSize.height - settings.margin.top - settings.margin.bottom;
+    let height = violinHeight - settings.margin.top - settings.margin.bottom;
+    // settings.chartSize.height - settings.margin.top - settings.margin.bottom;
 
     let xAxisLabel = settings.xAxisLabel || '';
     let yAxisLabel = settings.yAxisLabel || '';
@@ -303,9 +337,11 @@ class ViolinPlot extends Component {
         return xAxisLabel;
       })
       .attr('x', function() {
+        debugger;
         let elem = d3.select('.label');
-        let size = elem.node().getBBox();
-        return width / 2 - size.width / 2;
+        // let size = elem.node().getBBox();
+        // return width / 2 - size.width / 2;
+        return width / 2;
       });
 
     objs.axes
@@ -400,7 +436,7 @@ class ViolinPlot extends Component {
           groupObjs[cName].violin.objs.g.remove();
         }
       }
-
+      debugger;
       violinPlots.prepareViolin();
       violinPlots.update();
     };
@@ -623,6 +659,7 @@ class ViolinPlot extends Component {
 
       // Create the svg elements for the violin plot
       violinPlots.prepareViolin = function() {
+        debugger;
         let cName, cViolinPlot;
 
         if (vOpts.colors) {
@@ -1003,7 +1040,8 @@ class ViolinPlot extends Component {
 
     dataPlots.preparePlots();
     dataPlots.update();
-    this.addToolTiptoMax(id, objs);
+    // Paul uncomment after foundation set
+    // this.addToolTiptoMax(id, objs);
 
     // Defaults
     const defaultOptions3 = {
@@ -1260,10 +1298,12 @@ class ViolinPlot extends Component {
   };
 
   getCircleId = (id, id_mult) => {
+    debugger;
     return id.replace(/;/g, '_') + '_' + id_mult;
   };
 
   addToolTiptoMax = (id, objs) => {
+    debugger;
     var cx = Math.ceil(
       d3.select('#violin_' + this.getCircleId(id.sample, id.id_mult)).attr('cx')
     );
@@ -1363,16 +1403,16 @@ class ViolinPlot extends Component {
     objs.tooltip.style('z-index', 100);
   };
 
-  dUpdate = (chart, data, settings) => {
-    d3.select('.violin-chart-wrapper')
-      .selectAll('*')
-      .remove();
-
-    this.chart.settings.data = data;
-    this.settings = settings;
-    const self = this;
-    this.makeChart();
-  };
+  // moving this to ComponentDidUpdate
+  // dUpdate = (chart, data, settings) => {
+  //   d3.select('.violin-chart-wrapper')
+  //     .selectAll('*')
+  //     .remove();
+  //   this.chart.settings.data = data;
+  //   this.settings = settings;
+  //   const self = this;
+  //   this.makeChart();
+  // };
 
   getColorFunct = (colorOptions, groupObjs) => {
     if (typeof colorOptions === 'function') {
@@ -1440,7 +1480,7 @@ class ViolinPlot extends Component {
     return (
       <div
         id={this.state.settings.id}
-        id="violin-chart-wrapper"
+        id="chart-violin"
         className="ViolinChartWrapper"
         ref={this.violinChartRef}
       ></div>

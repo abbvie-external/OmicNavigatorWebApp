@@ -63,12 +63,7 @@ class SplitPanesContainer extends Component {
   };
 
   getViolinPlot = () => {
-    const {
-      isViolinPlotLoading,
-      isViolinPlotLoaded,
-      violinData,
-      violinSettings
-    } = this.props;
+    const { isViolinPlotLoading, isViolinPlotLoaded } = this.props;
     // isViolinPlotLoaded
     if (!isViolinPlotLoading && !isViolinPlotLoaded) {
       return (
@@ -178,7 +173,6 @@ class SplitPanesContainer extends Component {
   };
 
   splitPaneResized(size, paneType) {
-    debugger;
     if (paneType === 'horizontal') {
       this.setState({
         horizontalSplitPaneSize: size

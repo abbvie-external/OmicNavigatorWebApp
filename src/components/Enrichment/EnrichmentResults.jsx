@@ -520,8 +520,8 @@ class EnrichmentResults extends Component {
               },
               xName: 'tissue'
             },
-            isViolinPlotLoading: false
-            // isViolinPlotLoaded: true
+            isViolinPlotLoading: false,
+            isViolinPlotLoaded: true
           });
         } else {
           this.setState({
