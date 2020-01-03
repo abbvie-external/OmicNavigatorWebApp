@@ -4,6 +4,7 @@ import { phosphoprotService } from '../../services/phosphoprot.service';
 import _ from 'lodash';
 import { formatNumberForDisplay, splitValue } from '../Shared/helpers';
 import phosphosite_icon from '../../resources/phosphosite.ico';
+import './FilteredPepplotTable.scss';
 
 import QHGrid from '../utility/QHGrid';
 import EZGrid from '../utility/EZGrid';
@@ -309,7 +310,7 @@ class FilteredPepplotTable extends Component {
     );
 
     return (
-      <div>
+      <div className="FilteredPepplotTableDiv">
         <EZGrid
           // ref={this.filteredPepplotGridRef}
           // proteinToHighlight={proteinToHighlightInDiffTable}

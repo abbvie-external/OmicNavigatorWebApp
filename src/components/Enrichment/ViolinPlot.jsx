@@ -11,27 +11,35 @@ class ViolinPlot extends Component {
     super(props);
     this.state = {
       settings: {
-        axisLabels: null,
-        // axisLabels: {
-        //     xAxisLabel: "",
-        //     yAxisLabel: ""
-        // },
+        axisLabels: {
+          xAxis: 'change this term',
+          yAxis: "log<tspan baseline-shift='sub' font-size='16px'>2</tspan>(FC)"
+        },
         constrainExtremes: false,
         color: d3.scaleOrdinal(d3.schemeCategory10),
         // chartSize: { height: '700', width: '960' },
         // data: this.props.barcodeSettings.barcodeData || null,
         id: 'chart-violin',
+        // id: 'violin-graph-1',
         margin: { top: 50, right: 40, bottom: 40, left: 50 },
-        pointUniqueId: '',
-        pointValue: '',
+        pointUniqueId: 'sample',
+        pointValue: 'cpm',
         scale: 'linear',
         subtitle: '',
         title: '',
         tooltip: {
           show: true,
-          fields: [{ label: 'label1', value: 'value1', toFixed: true }]
+          fields: [
+            { label: 'log(FC)', value: 'cpm', toFixed: true },
+            { label: 'Protien', value: 'sample' }
+          ]
         },
-        xName: null,
+        // tooltip: {
+        //   show: true,
+        //   fields: [{ label: 'label1', value: 'value1', toFixed: true }]
+        // },
+        // xName: null,
+        xName: 'tissue',
         yName: null,
         yTicks: 1
       },
@@ -89,26 +97,25 @@ class ViolinPlot extends Component {
     // });
   }
 
-  // componentDidUpdate(prevProps, prevState, snapshot) {
-  //   if (
-  //     this.props.violinSettings.violinData !==
-  //       prevProps.violinSettings.violinData
-  //     //||
-  //     // this.props.horizontalSplitPaneSize !== prevProps.horizontalSplitPaneSize
-  //   ) {
-  //     debugger;
-  //     //let heightChangedFn;
-  //     // clearTimeout(heightChangedFn);
-  //     // heightChangedFn = setTimeout(() => {
-  //     //   this.redrawChart();
-  //     // d3.select('.BarcodeChartWrapper svg').remove();
-  //     d3.select('.violin-chart-wrapper')
-  //     .selectAll('*')
-  //     .remove();
-  //     this.makeChart();
-  //     // }, 1000);
-  //   }
-  // }
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (
+      this.props.violinData !== prevProps.violinData
+      //||
+      // this.props.horizontalSplitPaneSize !== prevProps.horizontalSplitPaneSize
+    ) {
+      debugger;
+      //let heightChangedFn;
+      // clearTimeout(heightChangedFn);
+      // heightChangedFn = setTimeout(() => {
+      //   this.redrawChart();
+      // d3.select('.BarcodeChartWrapper svg').remove();
+      d3.select('.violin-chart-wrapper')
+        .selectAll('*')
+        .remove();
+      this.makeChart();
+      // }, 1000);
+    }
+  }
 
   getWidth = () => {
     if (this.violinChartRef.current !== null) {
@@ -126,7 +133,7 @@ class ViolinPlot extends Component {
   makeChart = () => {
     debugger;
     const self = this;
-    const { violinSettings } = this.props;
+    const { violinData } = this.props;
     const {
       violinHeight,
       violinWidth,
@@ -137,8 +144,6 @@ class ViolinPlot extends Component {
       boxPlots
     } = this.state;
     // groupObjs The data organized by grouping and sorted as well as any metadata for the groups
-
-    // const data = violinSettings.violinData;
 
     function calcMetrics(values) {
       const metrics = {
@@ -203,7 +208,7 @@ class ViolinPlot extends Component {
       return metrics;
     }
 
-    let groupObjs = violinSettings.violinData;
+    let groupObjs = violinData;
     // let groupObjs = settings.data;
     let pointValue = settings.pointValue;
 
@@ -330,7 +335,7 @@ class ViolinPlot extends Component {
       .attr('y', -7)
       .style('font-size', '18px')
       .style('font-weight', 'bold')
-      .style('font-family', 'Roboto')
+      .style('font-family', 'Lato')
       .style('text-ancohor', 'middle')
       .append('tspan')
       .html(function() {
@@ -358,7 +363,7 @@ class ViolinPlot extends Component {
       .style('fill', '#000')
       .style('font-size', '18px')
       .style('font-weight', 'bold')
-      .style('font-family', 'Roboto')
+      .style('font-family', 'Lato')
       .style('text-ancohor', 'middle')
       .append('tspan')
       .html(function() {
@@ -374,7 +379,7 @@ class ViolinPlot extends Component {
       .style('fill', '#000')
       .style('font-size', '25px')
       .style('font-weight', 'bold')
-      .style('font-family', 'Roboto')
+      .style('font-family', 'Lato')
       .style('text-anchor', 'left')
       .text(settings.title);
 
@@ -387,7 +392,7 @@ class ViolinPlot extends Component {
       .style('fill', '#000')
       .style('font-size', '15px')
       //.style('font-weight', 'bold')
-      .style('font-family', 'Roboto')
+      .style('font-family', 'Lato')
       .style('text-anchor', 'left')
       .text(settings.subtitle);
 

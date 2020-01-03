@@ -58,31 +58,31 @@ class EnrichmentResults extends Component {
         highStat: null,
         enableBrush: false
       },
-      violinSettings: {
-        violinData: [],
-        // chartSize: { height: kLSplit.clientHeight + 25, width: kLSplit.clientWidth },
-        chartSize: {
-          height: 400,
-          width: 400
-        },
-        axisLabels: {
-          xAxis: '',
-          yAxis: "log<tspan baseline-shift='sub' font-size='14px'>2</tspan>(FC)"
-        },
-        id: 'violin-graph-1',
-        pointUniqueId: 'sample',
-        pointValue: 'cpm',
-        title: '',
-        subtitle: '',
-        tooltip: {
-          show: true,
-          fields: [
-            { label: 'log(FC)', value: 'cpm', toFixed: true },
-            { label: 'Protein', value: 'sample' }
-          ]
-        },
-        xName: 'tissue'
-      }
+      // violinSettings: {
+      violinData: []
+      // chartSize: { height: kLSplit.clientHeight + 25, width: kLSplit.clientWidth },
+      //   chartSize: {
+      //     height: 400,
+      //     width: 400
+      //   },
+      //   axisLabels: {
+      //     xAxis: '',
+      //     yAxis: "log<tspan baseline-shift='sub' font-size='14px'>2</tspan>(FC)"
+      //   },
+      //   id: 'violin-graph-1',
+      //   pointUniqueId: 'sample',
+      //   pointValue: 'cpm',
+      //   title: '',
+      //   subtitle: '',
+      //   tooltip: {
+      //     show: true,
+      //     fields: [
+      //       { label: 'log(FC)', value: 'cpm', toFixed: true },
+      //       { label: 'Protein', value: 'sample' }
+      //     ]
+      //   },
+      //   xName: 'tissue'
+      // }
     };
   }
 
@@ -494,37 +494,38 @@ class EnrichmentResults extends Component {
 
           // var kLSplit = document.getElementById('left-splitter');
           this.setState({
-            violinSettings: {
-              violinData: ordered,
-              // chartSize: { height: kLSplit.clientHeight + 25, width: kLSplit.clientWidth },
-              chartSize: {
-                height: 400,
-                width: 400
-              },
-              axisLabels: {
-                xAxis: 'change this term',
-                yAxis:
-                  "log<tspan baseline-shift='sub' font-size='14px'>2</tspan>(FC)"
-              },
-              id: 'violin-graph-1',
-              pointUniqueId: 'sample',
-              pointValue: 'cpm',
-              title: '',
-              subtitle: '',
-              tooltip: {
-                show: true,
-                fields: [
-                  { label: 'log(FC)', value: 'cpm', toFixed: true },
-                  { label: 'Protien', value: 'sample' }
-                ]
-              },
-              xName: 'tissue'
-            },
+            // violinSettings: {
+            violinData: ordered,
+            // chartSize: { height: kLSplit.clientHeight + 25, width: kLSplit.clientWidth },
+            // chartSize: {
+            //   height: 400,
+            //   width: 400
+            // },
+            // axisLabels: {
+            //   xAxis: 'change this term',
+            //   yAxis:
+            //     "log<tspan baseline-shift='sub' font-size='14px'>2</tspan>(FC)"
+            // },
+            // id: 'violin-graph-1',
+            // pointUniqueId: 'sample',
+            // pointValue: 'cpm',
+            // title: '',
+            // subtitle: '',
+            // tooltip: {
+            //   show: true,
+            //   fields: [
+            //     { label: 'log(FC)', value: 'cpm', toFixed: true },
+            //     { label: 'Protien', value: 'sample' }
+            //   ]
+            // },
+            // xName: 'tissue'
+            // },
             isViolinPlotLoading: false,
             isViolinPlotLoaded: true
           });
         } else {
           this.setState({
+            violinData: [],
             isViolinPlotLoading: false,
             isViolinPlotLoaded: false
           });

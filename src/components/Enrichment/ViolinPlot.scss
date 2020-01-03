@@ -12,7 +12,8 @@
   }
   
   .violin-chart-wrapper text {
-    font-family: Roboto;
+    // font-family: Roboto;
+    font-family: 'Lato','Helvetica Neue',Arial,Helvetica,sans-serif;
     font-size: 13px;
     fill: #000;
   }
@@ -103,8 +104,8 @@
   .chart-area {
     display: inline-block;
     position: absolute;
-    top: -25px;
-    left: 7px;
+    // top: -25px;
+    // left: 7px;
   }
   
   .violin-tooltip {

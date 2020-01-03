@@ -102,6 +102,7 @@
 
 .ViolinAndTableMenu {
     margin: 0px 10px 0px 0px !important;
+    direction: ltr !important;
 }
 
 // .BottomSplitPaneContainer, 
@@ -110,6 +111,7 @@
     // overflow-y: scroll !important;
     min-height: 1px !important;
     height: 100% !important;
+    direction: rtl !important;
 }
 
 #TableResultsTab .QHGrid {
