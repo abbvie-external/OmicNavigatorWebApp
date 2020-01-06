@@ -39,6 +39,7 @@ class FilteredPepplotTable extends Component {
       this.props.barcodeSettings.brushedData !==
       prevProps.barcodeSettings.brushedData
     ) {
+      debugger;
       this.getTableData();
     }
   };
@@ -83,7 +84,7 @@ class FilteredPepplotTable extends Component {
             // const diffProtein = this.props.proteinForDiffView.lineID;
             // this.props.onViewDiffTable(name, diffProtein);
             const cols = this.setConfigCols(filteredData);
-            return cols;
+            // return cols;
           }
         });
     }
@@ -112,7 +113,7 @@ class FilteredPepplotTable extends Component {
         {
           title: 'MajorityProteinIDsHGNC',
           field: 'MajorityProteinIDsHGNC',
-          filterable: { type: 'alphanumericFilter' },
+          // filterable: { type: 'alphanumericFilter' },
           template: (value, item, addParams) => {
             return (
               <div>
@@ -152,7 +153,7 @@ class FilteredPepplotTable extends Component {
         {
           title: 'MajorityProteinIDs',
           field: 'MajorityProteinIDs',
-          filterable: { type: 'alphanumericFilter' },
+          // filterable: { type: 'alphanumericFilter' },
           template: (value, item, addParams) => {
             return (
               <Popup
@@ -174,7 +175,7 @@ class FilteredPepplotTable extends Component {
         {
           title: 'Protein_Site',
           field: 'Protein_Site',
-          filterable: { type: 'alphanumericFilter' },
+          // filterable: { type: 'alphanumericFilter' },
           template: (value, item, addParams) => {
             return (
               <div>
@@ -242,7 +243,7 @@ class FilteredPepplotTable extends Component {
           title: c,
           field: c,
           type: 'number',
-          filterable: { type: 'numericFilter' },
+          // filterable: { type: 'numericFilter' },
           exportTemplate: value => (value ? `${value}` : 'N/A'),
           template: (value, item, addParams) => {
             return (
@@ -326,7 +327,9 @@ class FilteredPepplotTable extends Component {
           // quickViews={quickViews}
           disableGeneralSearch
           disableGrouping
+          disableSort
           disableColumnVisibilityToggle
+          // disableFilters
           min-height="5vh"
           additionalTemplateInfo={additionalTemplateInfo}
           // headerAttributes={<ButtonActions />}

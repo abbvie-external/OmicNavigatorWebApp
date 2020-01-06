@@ -101,10 +101,10 @@ class SplitPanesContainer extends Component {
     const violinPlot = this.getViolinPlot();
     const violinAndTablePanes = [
       {
-        menuItem: 'Violin Plot',
+        menuItem: 'Box Plot',
         pane: (
           <Tab.Pane
-            attached="true"
+            attached
             key="1"
             id="ViolinPlotTab"
             className="ViolinPlotTab"
@@ -117,10 +117,10 @@ class SplitPanesContainer extends Component {
         )
       },
       {
-        menuItem: 'Differential Table',
+        menuItem: 'Statistic Table',
         pane: (
           <Tab.Pane
-            attached="true"
+            attached
             key="2"
             id="TableResultsTab"
             className="TableResultsTab"

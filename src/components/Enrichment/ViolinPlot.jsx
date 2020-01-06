@@ -12,7 +12,7 @@ class ViolinPlot extends Component {
     this.state = {
       settings: {
         axisLabels: {
-          xAxis: 'change this term',
+          xAxis: this.props.enrichmentTerm,
           yAxis: "log<tspan baseline-shift='sub' font-size='16px'>2</tspan>(FC)"
         },
         constrainExtremes: false,
@@ -99,9 +99,8 @@ class ViolinPlot extends Component {
 
   componentDidUpdate(prevProps, prevState, snapshot) {
     if (
-      this.props.violinData !== prevProps.violinData
-      //||
-      // this.props.horizontalSplitPaneSize !== prevProps.horizontalSplitPaneSize
+      this.props.violinData !== prevProps.violinData ||
+      this.props.verticalSplitPaneSize !== prevProps.verticalSplitPaneSize
     ) {
       debugger;
       //let heightChangedFn;
@@ -334,7 +333,7 @@ class ViolinPlot extends Component {
       .attr('dy', '1.50em')
       .attr('y', -7)
       .style('font-size', '18px')
-      .style('font-weight', 'bold')
+      // .style('font-weight', 'bold')
       .style('font-family', 'Lato')
       .style('text-ancohor', 'middle')
       .append('tspan')
@@ -342,7 +341,6 @@ class ViolinPlot extends Component {
         return xAxisLabel;
       })
       .attr('x', function() {
-        debugger;
         let elem = d3.select('.label');
         // let size = elem.node().getBBox();
         // return width / 2 - size.width / 2;
@@ -362,7 +360,7 @@ class ViolinPlot extends Component {
       .attr('id', 'yaxis-label')
       .style('fill', '#000')
       .style('font-size', '18px')
-      .style('font-weight', 'bold')
+      // .style('font-weight', 'bold')
       .style('font-family', 'Lato')
       .style('text-ancohor', 'middle')
       .append('tspan')
@@ -378,7 +376,7 @@ class ViolinPlot extends Component {
       .attr('y', -30)
       .style('fill', '#000')
       .style('font-size', '25px')
-      .style('font-weight', 'bold')
+      // .style('font-weight', 'bold')
       .style('font-family', 'Lato')
       .style('text-anchor', 'left')
       .text(settings.title);

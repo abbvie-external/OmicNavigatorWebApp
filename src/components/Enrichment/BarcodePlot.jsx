@@ -137,7 +137,7 @@ class BarcodePlot extends React.Component {
       .attr('viewBox', '0 0 ' + calculatedWidth + ' ' + horizontalSplitPaneSize)
       .attr('preserveAspectRatio', 'xMinYMin meet')
       .attr('cursor', 'crosshair');
-
+    debugger;
     let settingsHeight = chartDiv._groups[0][0].clientHeight;
     let g = svg
       .append('g')
