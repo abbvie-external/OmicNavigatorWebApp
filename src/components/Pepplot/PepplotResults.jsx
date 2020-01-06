@@ -448,7 +448,6 @@ class PepplotResults extends Component {
         <div id="PepplotGrid">
           <EZGrid
             ref={this.pepplotGridRef}
-            proteinToHighlight={proteinToHighlightInDiffTable}
             onInformItemsPerPage={this.informItemsPerPage}
             uniqueCacheKey={pepplotCacheKey}
             data={pepplotResults}

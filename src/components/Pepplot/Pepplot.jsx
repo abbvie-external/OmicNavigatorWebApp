@@ -319,7 +319,6 @@ class Pepplot extends Component {
         <PepplotResults
           {...this.state}
           {...this.props}
-          // highlightedRowRef={this.highlightedRowRef}
           onSearchCriteriaChange={this.handleSearchCriteriaChange}
           onHandlePlotAnimation={this.handlePlotAnimation}
         />

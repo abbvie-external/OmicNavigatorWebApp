@@ -273,9 +273,11 @@ class FilteredPepplotTable extends Component {
     }
   };
 
-  getTableHelpers = proteinToHighlightInDiffTable => {
+  getTableHelpers = proteinForDiffView => {
     let addParams = {};
-    // addParams.rowToHighlight = proteinToHighlightInDiffTable;
+    if (proteinForDiffView !== '') {
+      addParams.rowToHighlight = proteinForDiffView.lineID;
+    }
     addParams.showPhosphositePlus = dataItem => {
       return function() {
         var protein = (dataItem.Protein
@@ -299,24 +301,20 @@ class FilteredPepplotTable extends Component {
   };
 
   render() {
-    const { proteinToHighlightInDiffTable } = this.props;
+    const { proteinForDiffView } = this.props;
+    debugger;
     const {
       filteredTableConfigCols,
       filteredTableData,
       itemsPerPageInformedEnrichment
     } = this.state;
     const quickViews = [];
-    const additionalTemplateInfo = this.getTableHelpers(
-      proteinToHighlightInDiffTable
-    );
+    const additionalTemplateInfo = this.getTableHelpers(proteinForDiffView);
 
     return (
       <div className="FilteredPepplotTableDiv">
         <EZGrid
-          // ref={this.filteredPepplotGridRef}
-          // proteinToHighlight={proteinToHighlightInDiffTable}
           onInformItemsPerPage={this.informItemsPerPage}
-          // proteinToHighlightRow={highlightedRowRef}
           // uniqueCacheKey={pepplotCacheKey}
           data={filteredTableData}
           columnsConfig={filteredTableConfigCols}

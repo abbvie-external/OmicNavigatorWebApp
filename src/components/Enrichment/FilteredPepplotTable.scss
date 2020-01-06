@@ -1,9 +1,13 @@
 .FilteredPepplotTableDiv {
     direction: ltr !important;
 
-    .ui.selectable.table tbody tr:first-child, .ui.selectable.table tbody tr:first-child:hover {
-        background: #f14000 !important;
-        color: white !important;
+    // .ui.selectable.table tbody tr:first-child, .ui.selectable.table tbody tr:first-child:hover {
+    //     background: #f14000 !important;
+    //     color: white !important;
+    // }
+    
+    .TableValue {
+        cursor: auto !important;
     }
 }
 
