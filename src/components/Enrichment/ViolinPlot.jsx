@@ -102,7 +102,6 @@ class ViolinPlot extends Component {
       this.props.violinData !== prevProps.violinData ||
       this.props.verticalSplitPaneSize !== prevProps.verticalSplitPaneSize
     ) {
-      debugger;
       //let heightChangedFn;
       // clearTimeout(heightChangedFn);
       // heightChangedFn = setTimeout(() => {
@@ -130,7 +129,6 @@ class ViolinPlot extends Component {
   };
 
   makeChart = () => {
-    debugger;
     const self = this;
     const { violinData } = this.props;
     const {
@@ -439,7 +437,6 @@ class ViolinPlot extends Component {
           groupObjs[cName].violin.objs.g.remove();
         }
       }
-      debugger;
       violinPlots.prepareViolin();
       violinPlots.update();
     };
@@ -662,7 +659,6 @@ class ViolinPlot extends Component {
 
       // Create the svg elements for the violin plot
       violinPlots.prepareViolin = function() {
-        debugger;
         let cName, cViolinPlot;
 
         if (vOpts.colors) {
@@ -1301,12 +1297,10 @@ class ViolinPlot extends Component {
   };
 
   getCircleId = (id, id_mult) => {
-    debugger;
     return id.replace(/;/g, '_') + '_' + id_mult;
   };
 
   addToolTiptoMax = (id, objs) => {
-    debugger;
     var cx = Math.ceil(
       d3.select('#violin_' + this.getCircleId(id.sample, id.id_mult)).attr('cx')
     );

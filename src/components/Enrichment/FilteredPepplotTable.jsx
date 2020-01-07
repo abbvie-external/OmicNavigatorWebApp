@@ -39,7 +39,6 @@ class FilteredPepplotTable extends Component {
       this.props.barcodeSettings.brushedData !==
       prevProps.barcodeSettings.brushedData
     ) {
-      debugger;
       this.getTableData();
     }
   };
@@ -275,8 +274,10 @@ class FilteredPepplotTable extends Component {
 
   getTableHelpers = proteinForDiffView => {
     let addParams = {};
-    if (proteinForDiffView !== '') {
-      addParams.rowToHighlight = proteinForDiffView.lineID;
+    if (proteinForDiffView !== undefined) {
+      if (proteinForDiffView.lineID !== undefined) {
+        addParams.rowToHighlight = proteinForDiffView.lineID;
+      }
     }
     addParams.showPhosphositePlus = dataItem => {
       return function() {
@@ -302,7 +303,6 @@ class FilteredPepplotTable extends Component {
 
   render() {
     const { proteinForDiffView } = this.props;
-    debugger;
     const {
       filteredTableConfigCols,
       filteredTableData,

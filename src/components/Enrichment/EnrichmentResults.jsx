@@ -42,7 +42,6 @@ class EnrichmentResults extends Component {
       isTestDataLoaded: false,
       SVGPlotLoading: false,
       SVGPlotLoaded: false,
-      isViolinPlotLoading: false,
       isViolinPlotLoaded: false,
       barcodeSettings: {
         barcodeData: [],
@@ -51,8 +50,8 @@ class EnrichmentResults extends Component {
         // chartSize: { height: '200', width: '960' },
         lineID: '',
         statLabel: {},
-        statistic: '',
-        logFC: '',
+        statistic: 'statistic',
+        logFC: 'logFC',
         highLabel: {},
         lowLabel: {},
         highStat: null,
@@ -388,19 +387,12 @@ class EnrichmentResults extends Component {
   }
 
   showBarcodePlot = (dataItem, barcode, test, highest) => {
-    // let containerWidth = this.calculateWidth() * 0.95;
-    // let containerHeight = this.calculateHeight() * 0.95;
     this.setState({
       isTestDataLoaded: true,
       barcodeSettings: {
+        ...this.state.barcodeSettings,
         barcodeData: barcode,
-        brushing: false,
-        brushedData: [],
-        // chartSize: { height: 250, width: containerWidth - 500 },
-        lineID: '',
         statLabel: barcode[0].statLabel,
-        statistic: 'statistic',
-        logFC: 'logFC',
         highLabel: barcode[0].highLabel,
         lowLabel: barcode[0].lowLabel,
         highStat: highest,
@@ -409,7 +401,8 @@ class EnrichmentResults extends Component {
     });
   };
 
-  handleBarcodeChanges = changes => {
+  handleBrushingStatus = changes => {
+    debugger;
     if (changes.brushing !== undefined) {
       this.setState({
         barcodeSettings: {
@@ -418,127 +411,74 @@ class EnrichmentResults extends Component {
         }
       });
     }
-
-    if (changes.brushedData !== undefined) {
-      if (changes.brushedData.length > 0) {
-        this.setState({
-          barcodeSettings: {
-            ...this.state.barcodeSettings,
-            brushedData: changes.brushedData
-          }
-        });
-      } else {
-        this.setState({
-          barcodeSettings: {
-            ...this.state.barcodeSettings,
-            brushedData: []
-          }
-        });
-      }
-    }
   };
 
-  handleTickBrush = info => {
-    if (info !== undefined) {
-      const { barcodeSettings } = this.state;
-      // if (barcodeSettings.brushedData.length > 0) {
-      if (info.brushedData !== undefined) {
-        if (info.brushedData.length > 0) {
-          // const barcodeInfo = JSON.parse(info.brushedData);
-          const i = _.map(info.brushedData, function(d) {
-            // d.statistic = _.find(barcodeSettings.barcodeData, {
-            //   lineID: d[0].lineID,
-            //   id_mult: d[0].id_mult
-            // }).statistic;
-            // d.logFC = _.find(barcodeSettings.barcodeData, {
-            //   lineID: d[0].lineID,
-            //   id_mult: d[0].id_mult
-            // }).logFC;
-            d.statistic = _.find(barcodeSettings.barcodeData, {
-              lineID: d.lineID,
-              id_mult: d.id_mult
-            }).statistic;
-            d.logFC = _.find(barcodeSettings.barcodeData, {
-              lineID: d.lineID,
-              id_mult: d.id_mult
-            }).logFC;
-            return d;
-          });
-          this.setState({
-            isViolinPlotLoading: true,
-            isViolinPlotLoaded: false
-          });
-          const boxPlotArray = i;
-          const reducedBoxPlotArray = _.reduce(
-            boxPlotArray,
-            function(res, datum) {
-              (res[datum.statLabel] || (res[datum.statLabel] = [])).push({
-                cpm: datum.logFC,
-                sample: datum.lineID,
-                statistic: datum.statistic,
-                id_mult: datum.id_mult
-              });
-              return res;
-            },
-            {}
-          );
-          const vData = _.mapValues(reducedBoxPlotArray, function(v: any) {
-            return { values: v };
-          });
-          const ordered = {};
-          Object.keys(vData)
-            .sort()
-            .forEach(function(key) {
-              ordered[key] = vData[key];
-            });
+  handleBarcodeChanges = changes => {
+    // const { barcodeSettings } = this.state;
+    let self = this;
+    if (changes.brushedData.length > 0) {
+      const boxPlotArray = _.map(changes.brushedData, function(d) {
+        d.statistic = _.find(self.state.barcodeSettings.barcodeData, {
+          lineID: d.lineID,
+          id_mult: d.id_mult
+        }).statistic;
+        d.logFC = _.find(self.state.barcodeSettings.barcodeData, {
+          lineID: d.lineID,
+          id_mult: d.id_mult
+        }).logFC;
+        return d;
+      });
 
-          // var kLSplit = document.getElementById('left-splitter');
-          this.setState({
-            // violinSettings: {
-            violinData: ordered,
-            // chartSize: { height: kLSplit.clientHeight + 25, width: kLSplit.clientWidth },
-            // chartSize: {
-            //   height: 400,
-            //   width: 400
-            // },
-            // axisLabels: {
-            //   xAxis: 'change this term',
-            //   yAxis:
-            //     "log<tspan baseline-shift='sub' font-size='14px'>2</tspan>(FC)"
-            // },
-            // id: 'violin-graph-1',
-            // pointUniqueId: 'sample',
-            // pointValue: 'cpm',
-            // title: '',
-            // subtitle: '',
-            // tooltip: {
-            //   show: true,
-            //   fields: [
-            //     { label: 'log(FC)', value: 'cpm', toFixed: true },
-            //     { label: 'Protien', value: 'sample' }
-            //   ]
-            // },
-            // xName: 'tissue'
-            // },
-            isViolinPlotLoading: false,
-            isViolinPlotLoaded: true
+      // this.setState({
+      //   isViolinPlotLoaded: false
+      // });
+
+      const reducedBoxPlotArray = _.reduce(
+        boxPlotArray,
+        function(res, datum) {
+          (res[datum.statLabel] || (res[datum.statLabel] = [])).push({
+            cpm: datum.logFC,
+            sample: datum.lineID,
+            statistic: datum.statistic,
+            id_mult: datum.id_mult
           });
-        } else {
-          this.setState({
-            violinData: [],
-            isViolinPlotLoading: false,
-            isViolinPlotLoaded: false
-          });
-          // if (this.plots.includes('violin')) {
-          //   let index = this.plots.indexOf('violin');
-          //   this.plots.splice(index, 1);
-          // }
+          return res;
+        },
+        {}
+      );
+
+      const vData = _.mapValues(reducedBoxPlotArray, function(v: any) {
+        return { values: v };
+      });
+
+      const ordered = {};
+      Object.keys(vData)
+        .sort()
+        .forEach(function(key) {
+          ordered[key] = vData[key];
+        });
+
+      this.setState({
+        violinData: ordered,
+        isViolinPlotLoaded: true,
+        barcodeSettings: {
+          ...this.state.barcodeSettings,
+          brushedData: changes.brushedData
         }
-      }
+      });
+    } else {
+      this.setState({
+        violinData: [],
+        isViolinPlotLoaded: false,
+        barcodeSettings: {
+          ...this.state.barcodeSettings,
+          brushedData: []
+        }
+      });
     }
   };
 
-  handleTickData = info => {
+  handleMaxLinePlot = info => {
     const { enrichmentStudy, enrichmentModel } = this.props;
     // let self = this;
     // if (this.state.barcodeSettings.barcodeData > 0) {
@@ -659,39 +599,6 @@ class EnrichmentResults extends Component {
       SVGPlotLoading: false
     });
   };
-
-  //   const p = function (plot, i) {
-  //     return new Promise(resolve => setTimeout(function () {
-
-  //       if (self.plots.indexOf(plot) == -1) {
-  //         self.plots.push(plot);
-  //       }
-
-  //       self._phosphoprotService.getPlot(id, plotType[i], self.selectedStudy.study + "plots").subscribe((svgMarkup) => {
-  //         svgMarkup = svgMarkup.replace(/id="/g, 'id="' + id + '-' + i + '-');
-  //         svgMarkup = svgMarkup.replace(/#glyph/g, '#' + id + '-' + i + '-glyph');
-  //         svgMarkup = svgMarkup.replace(/#clip/g, '#' + id + '-' + i + '-clip');
-  //         // svgMarkup = svgMarkup.replace(/<svg/g, '<svg preserveAspectRatio="none" style="width:' + self.calculateWidth() * .65 + 'px; height:' + self.calculateHeight() * .70 + 'px;" id="currentSVG-' + id + '-' + i + '"');
-  //         svgMarkup = svgMarkup.replace(/<svg/g, '<svg preserveAspectRatio="none" style="width:' + (splitterWidth - 50) + 'px; height:' + (splitterHeight - 50) + 'px;" id="currentSVG-' + id + '-' + i + '"');
-  //         //console.log(svgMarkup)
-  //         var sanitizedSVG = self.sanitized.bypassSecurityTrustHtml(svgMarkup);
-
-  //         var svgInfo = { "plotType": plotType[i], "svg": sanitizedSVG }
-  //         resolve(
-  //           self.imageInfo.svg[i] = svgInfo
-  //         );
-
-  //         self.currentSVGs.push(sanitizedSVG);
-
-  //         if (i == 1){
-  //           psp.style.visibility = "visible";
-  //         }
-  //       })
-  //     }, 1000 * i))
-  //   }
-
-  //   //Promise.all(plotType.map(p))
-  // }
 
   backToTable = () => {
     this.setState({
@@ -829,9 +736,9 @@ class EnrichmentResults extends Component {
             {...this.props}
             {...this.state}
             onBackToTable={this.backToTable}
+            onHandleBrushingStatus={this.handleBrushingStatus}
+            onHandleMaxLinePlot={this.handleMaxLinePlot}
             onHandleBarcodeChanges={this.handleBarcodeChanges}
-            onHandleTickBrush={this.handleTickBrush}
-            onHandleTickData={this.handleTickData}
           ></SplitPanesContainer>
         </div>
       );

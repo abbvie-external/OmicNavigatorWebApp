@@ -21,36 +21,21 @@ class BarcodePlot extends React.Component {
         axes: null,
         bottomLabel: null,
         brush: null,
-        // brushing: false,
         chartDiv: null,
-        // chartSize: { height: '200', width: '960' },
-        // barcodeData: this.props.barcodeData || null,
-        // enableBrush: this.props.settings.enableBrush || false,
         g: null,
-        // height: this.props.settings.height || '',
-        // highStat: this.props.settings.highStat || '',
         height: null,
         id: 'chart-barcode',
-        // highLabel: this.props.settings.highLabel || '',
-        // lowLabel: this.props.settings.lowLabel || '',
-        // lineID: this.props.settings.lineID || '',
-        // logFC: this.props.settings.logFC || '',
         mainDiv: null,
-        // margin: { top: 65, right: 60, bottom: 75, left: 60 },
         margin: { top: 45, right: 25, bottom: 40, left: 20 },
-        // statLabel: this.props.settings.statLabel || '',
-        // statistic: this.props.settings.statistic || '',
         svg: null,
         title: '',
         tooltip: null
       },
       containerWidth: 0,
-      // containerHeight: this.props.horizontalSplitPaneSize || 0,
       xAxis: null,
       xScale: null
     };
     this.barcodeChartRef = React.createRef();
-    // this.prepareAndRender = this.prepareAndRender.bind(this);
   }
 
   componentDidMount() {
@@ -128,6 +113,15 @@ class BarcodePlot extends React.Component {
 
     // prepare chart
     let chartDiv = d3.select('#' + settings.id);
+
+    let svgClicked = function() {
+      self.unhighLight();
+      self.props.onHandleBarcodeChanges({
+        brushedData: []
+      });
+      self.props.onHandleBrushingStatus({ brushing: false });
+    };
+
     let svg = chartDiv
       .append('svg')
       .attr('id', 'svg-' + settings.id)
@@ -136,8 +130,9 @@ class BarcodePlot extends React.Component {
       .attr('height', horizontalSplitPaneSize - 10)
       .attr('viewBox', '0 0 ' + calculatedWidth + ' ' + horizontalSplitPaneSize)
       .attr('preserveAspectRatio', 'xMinYMin meet')
-      .attr('cursor', 'crosshair');
-    debugger;
+      .attr('cursor', 'crosshair')
+      .on('click', svgClicked);
+
     let settingsHeight = chartDiv._groups[0][0].clientHeight;
     let g = svg
       .append('g')
@@ -177,6 +172,7 @@ class BarcodePlot extends React.Component {
       .attr('transform', 'translate(0,' + height + ')');
     let tooltip = g.append('text');
     tooltip.attr('class', 'barcode-tooltip');
+
     // render barcode plot
     let lines = g
       .selectAll('line.barcode-line')
@@ -261,11 +257,20 @@ class BarcodePlot extends React.Component {
         }
       })
 
-      .on('click', function(d) {
-        if (barcodeSettings.brushing == false) {
-          self.props.onHandleTickData(d);
-        }
+      .on('click', function() {
+        debugger;
+        self.unhighLight();
+        self.props.onHandleBarcodeChanges({
+          brushedData: []
+        });
+        self.props.onHandleBrushingStatus({ brushing: false });
       });
+
+    // .on('click', function(d) {
+    //   if (barcodeSettings.brushing == false) {
+    //     self.props.onHandleTickData(d);
+    //   }
+    // });
 
     // add this logic once you figure our how to default select box via props...
     // if (barcodeSettings.brushedData.length > 0) {
@@ -295,9 +300,7 @@ class BarcodePlot extends React.Component {
     let objsBrush = {};
     if (barcodeSettings.enableBrush) {
       const highlightBrushedTicks = function() {
-        self.props.onHandleBarcodeChanges({
-          brushing: true
-        });
+        self.props.onHandleBrushingStatus({ brushing: true });
         const ticks = d3.selectAll('line.barcode-line');
         if (d3.event.selection !== undefined && d3.event.selection !== null) {
           self.unhighLight();
@@ -325,9 +328,6 @@ class BarcodePlot extends React.Component {
           self.props.onHandleBarcodeChanges({
             brushedData: brushedDataVar
           });
-          self.props.onHandleTickBrush({
-            brushedData: brushedDataVar
-          });
           if (brushedDataVar.length > 0) {
             let line = self.getMaxObject(brushedDataVar);
             let maxTick = line;
@@ -345,23 +345,32 @@ class BarcodePlot extends React.Component {
           }
         }
       };
+
+      const endBrush = function() {
+        const maxLineData = self.getMaxObject(
+          self.props.barcodeSettings.brushedData
+        );
+        self.props.onSetProteinForDiffView(maxLineData);
+        self.props.onHandleMaxLinePlot(maxLineData);
+        self.props.onHandleBrushingStatus({ brushing: true });
+      };
+
       objsBrush = d3
         .brush()
         .extent([[0, -50], [calculatedWidth, horizontalSplitPaneSize]])
         .on('brush', highlightBrushedTicks)
-        .on('end', function() {
-          self.endBrush();
-        });
+        .on('end', endBrush);
+
       d3.selectAll('.x.barcode-axis').call(objsBrush);
     }
 
-    let t = svg.on('click', function() {
-      self.props.onHandleBarcodeChanges({
-        brushing: false
-      });
-      self.unhighLight();
-      self.props.onHandleTickBrush();
-    });
+    // let t = svg.on('click', function() {
+    //   self.unhighLight();
+    //   self.props.onHandleBarcodeChanges({
+    //     brushedData: []
+    //   });
+    //   self.props.onHandleBrushingStatus({brushing: false});
+    // });
 
     // this.setState = {
     //   objs: {
@@ -415,17 +424,6 @@ class BarcodePlot extends React.Component {
 
       return obj;
     }
-  }
-
-  endBrush() {
-    const brushedDataVar = this.getMaxObject(
-      this.props.barcodeSettings.brushedData
-    );
-    this.props.onSetProteinForDiffView(brushedDataVar);
-    this.props.onHandleTickData(brushedDataVar);
-    this.props.onHandleTickBrush({
-      brushing: true
-    });
   }
 
   clearBrush() {

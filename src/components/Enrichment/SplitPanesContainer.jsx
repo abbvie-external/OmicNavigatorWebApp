@@ -62,22 +62,16 @@ class SplitPanesContainer extends Component {
     }
   };
 
-  getViolinPlot = () => {
+  getViolinPlot() {
     const { isViolinPlotLoading, isViolinPlotLoaded } = this.props;
     // isViolinPlotLoaded
-    if (!isViolinPlotLoading && !isViolinPlotLoaded) {
+    if (!isViolinPlotLoaded) {
       return (
         <div className="PlotInstructionsDiv">
           <h4 className="PlotInstructionsText">
             Select barcode line/s to display Violin Plot
           </h4>
         </div>
-      );
-    } else if (isViolinPlotLoading) {
-      return (
-        <Dimmer active inverted>
-          <Loader size="large">Violin Plot is Loading</Loader>
-        </Dimmer>
       );
     } else {
       return (
@@ -88,7 +82,7 @@ class SplitPanesContainer extends Component {
         />
       );
     }
-  };
+  }
 
   handleViolinTableTabChange = (e, { activeIndex }) => {
     this.setState({
