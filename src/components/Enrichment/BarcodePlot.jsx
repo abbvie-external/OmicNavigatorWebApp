@@ -133,7 +133,6 @@ class BarcodePlot extends React.Component {
       .attr('cursor', 'crosshair')
       .on('click', svgClicked);
 
-    let settingsHeight = chartDiv._groups[0][0].clientHeight;
     let g = svg
       .append('g')
       .attr(
@@ -258,7 +257,6 @@ class BarcodePlot extends React.Component {
       })
 
       .on('click', function() {
-        debugger;
         self.unhighLight();
         self.props.onHandleBarcodeChanges({
           brushedData: []

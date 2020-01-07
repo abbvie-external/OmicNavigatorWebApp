@@ -31,7 +31,7 @@ class FilteredPepplotTable extends Component {
   }
 
   componentDidMount() {
-    this.getfilteredTableConfigCols(this.props.barcodeSettings.barcodeData);
+    this.getFilteredTableConfigCols(this.props.barcodeSettings.barcodeData);
   }
 
   componentDidUpdate = (prevProps, prevState) => {
@@ -61,12 +61,13 @@ class FilteredPepplotTable extends Component {
     }
   };
 
-  getfilteredTableConfigCols = barcodeData => {
+  getFilteredTableConfigCols = barcodeData => {
+    debugger;
     if (this.state.filteredBarcodeData.length > 0) {
       this.setConfigCols(this.state.filteredBarcodeData);
     } else {
       const key = this.props.imageInfo.key.split(':');
-      const name = key[0] || '';
+      const name = key[0].trim() || '';
       phosphoprotService
         .getTestData(
           this.props.enrichmentModel,

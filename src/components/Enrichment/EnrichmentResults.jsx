@@ -402,7 +402,6 @@ class EnrichmentResults extends Component {
   };
 
   handleBrushingStatus = changes => {
-    debugger;
     if (changes.brushing !== undefined) {
       this.setState({
         barcodeSettings: {
