@@ -207,7 +207,7 @@ class BarcodePlot extends React.Component {
           let toolTipPosition = parseInt(d3.select(this).attr('x1'));
           d3.select(this)
             .transition()
-            .duration(100)
+            // .duration(100)
             .attr('y1', -40)
             .style('stroke-width', 3)
             .style('opacity', 1);
@@ -329,17 +329,18 @@ class BarcodePlot extends React.Component {
           if (brushedDataVar.length > 0) {
             let line = self.getMaxObject(brushedDataVar);
             let maxTick = line;
-            let id =
-              'barcode-line-' +
-              line.lineID.replace(/\;/g, '') +
-              '_' +
-              line.id_mult;
+            debugger;
+            let id = 'barcode-line-' + line.lineID;
+            // line.lineID.replace(/\;/g, '') +
+            // '_' +
+            // line.id_mult;
             // self.updateToolTip(line, id, self);
             d3.select('#' + id)
               .transition()
-              .duration(300)
-              .style('stroke', 'orange')
+              // .duration(300)
+              .style('stroke', '#ff4400')
               .attr('y1', -55);
+            debugger;
           }
         }
       };
@@ -403,6 +404,7 @@ class BarcodePlot extends React.Component {
     d3.selectAll('line.barcode-line')
       .attr('y1', -20)
       .style('stroke-width', 2)
+      .style('stroke', '#2c3b78')
       .style('opacity', function(d) {
         return 0.5;
       });
@@ -443,7 +445,7 @@ class BarcodePlot extends React.Component {
   // 	d3.select("#" + id)
   // 		.transition()
   // 		.duration(300)
-  // 		.style("stroke", "orange")
+  // 		.style("stroke", "#ff4400")
   // 		.attr("y1", -55);
 
   // 	this.maxTick = {};
@@ -489,7 +491,7 @@ class BarcodePlot extends React.Component {
 
       objsVar.tooltip
         .transition()
-        .duration(100)
+        // .duration(100)
         .style('opacity', 1)
         .text(function() {
           return tick.sample ? tick.sample : tick.lineID;
