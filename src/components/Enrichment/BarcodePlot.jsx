@@ -329,7 +329,6 @@ class BarcodePlot extends React.Component {
           if (brushedDataVar.length > 0) {
             let line = self.getMaxObject(brushedDataVar);
             let maxTick = line;
-            debugger;
             let id = 'barcode-line-' + line.lineID;
             // line.lineID.replace(/\;/g, '') +
             // '_' +
@@ -340,7 +339,6 @@ class BarcodePlot extends React.Component {
               // .duration(300)
               .style('stroke', '#ff4400')
               .attr('y1', -55);
-            debugger;
           }
         }
       };

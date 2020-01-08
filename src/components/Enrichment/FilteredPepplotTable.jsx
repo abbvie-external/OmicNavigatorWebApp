@@ -62,7 +62,6 @@ class FilteredPepplotTable extends Component {
   };
 
   getFilteredTableConfigCols = barcodeData => {
-    debugger;
     if (this.state.filteredBarcodeData.length > 0) {
       this.setConfigCols(this.state.filteredBarcodeData);
     } else {

@@ -104,7 +104,7 @@ class SplitPanesContainer extends Component {
             className="ViolinPlotTab"
             // as="div"
           >
-            <div id="" className="">
+            <div id="" className="ViolinPlotDiv">
               {violinPlot}
             </div>
           </Tab.Pane>
@@ -128,6 +128,7 @@ class SplitPanesContainer extends Component {
 
     return (
       <Tab
+        className="ViolinAndTableTabsDiv"
         onTabChange={this.handleViolinTableTabChange}
         panes={violinAndTablePanes}
         activeIndex={activeViolinTableIndex}
@@ -234,7 +235,7 @@ class SplitPanesContainer extends Component {
                     className="BottomSplitPaneContainer"
                     split="vertical"
                     defaultSize={this.state.verticalSplitPaneSize}
-                    minSize={415}
+                    minSize={315}
                     maxSize={1000}
                     onChange={size => this.splitPaneResized(size, 'vertical')}
                   >

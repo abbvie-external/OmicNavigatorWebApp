@@ -13,7 +13,7 @@ class ViolinPlot extends Component {
       settings: {
         axisLabels: {
           xAxis: this.props.enrichmentTerm,
-          yAxis: "log<tspan baseline-shift='sub' font-size='16px'>2</tspan>(FC)"
+          yAxis: "log<tspan baseline-shift='sub' font-size='13px'>2</tspan>(FC)"
         },
         constrainExtremes: false,
         color: d3.scaleOrdinal(d3.schemeCategory10),
@@ -122,10 +122,10 @@ class ViolinPlot extends Component {
   };
 
   getHeight = () => {
-    // if (this.violinChartRef.current !== null) {
-    // return this.violinChartRef.current.parentElement.offsetHeight;
-    // } else return 700;
-    return 600;
+    if (this.violinChartRef.current !== null) {
+      return this.violinChartRef.current.parentElement.offsetHeight;
+    } else return 600;
+    // return 600;
   };
 
   makeChart = () => {
@@ -233,7 +233,6 @@ class ViolinPlot extends Component {
     let divHeight = violinHeight;
     // let divWidth = settings.chartSize.width;
     // let divHeight = settings.chartSize.height;
-
     let width = violinWidth - settings.margin.left - settings.margin.right;
     // settings.chartSize.width - settings.margin.left - settings.margin.right;
 
@@ -330,7 +329,7 @@ class ViolinPlot extends Component {
       .attr('class', 'label')
       .attr('dy', '1.50em')
       .attr('y', -7)
-      .style('font-size', '18px')
+      .style('font-size', '16px')
       // .style('font-weight', 'bold')
       .style('font-family', 'Lato')
       .style('text-ancohor', 'middle')
@@ -357,7 +356,7 @@ class ViolinPlot extends Component {
       .attr('y', -48)
       .attr('id', 'yaxis-label')
       .style('fill', '#000')
-      .style('font-size', '18px')
+      .style('font-size', '16px')
       // .style('font-weight', 'bold')
       .style('font-family', 'Lato')
       .style('text-ancohor', 'middle')
@@ -373,7 +372,7 @@ class ViolinPlot extends Component {
       .attr('x', 10)
       .attr('y', -30)
       .style('fill', '#000')
-      .style('font-size', '25px')
+      .style('font-size', '23px')
       // .style('font-weight', 'bold')
       .style('font-family', 'Lato')
       .style('text-anchor', 'left')
@@ -386,7 +385,7 @@ class ViolinPlot extends Component {
       .attr('x', 10)
       .attr('y', -10)
       .style('fill', '#000')
-      .style('font-size', '15px')
+      .style('font-size', '13px')
       //.style('font-weight', 'bold')
       .style('font-family', 'Lato')
       .style('text-anchor', 'left')
@@ -1477,8 +1476,7 @@ class ViolinPlot extends Component {
     return (
       <div
         id={this.state.settings.id}
-        id="chart-violin"
-        className="ViolinChartWrapper"
+        className="violin-chart-wrapper"
         ref={this.violinChartRef}
       ></div>
     );
