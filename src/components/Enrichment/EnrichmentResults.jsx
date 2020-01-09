@@ -28,6 +28,7 @@ class EnrichmentResults extends Component {
       annotationData: [],
       enrichmentDataItem: [],
       enrichmentTerm: '',
+      itemsPerPageInformedEnrichmentMain: null,
       treeDataRaw: [],
       treeData: [],
       treeDataColumns: [],
@@ -630,6 +631,12 @@ class EnrichmentResults extends Component {
   //   };
   // };
 
+  informItemsPerPage = items => {
+    this.setState({
+      itemsPerPageInformedEnrichmentMain: items
+    });
+  };
+
   render() {
     const {
       enrichmentResults,
@@ -719,6 +726,7 @@ class EnrichmentResults extends Component {
             min-height="75vh"
             additionalTemplateInfo={additionalTemplateInfo}
             // extraHeaderItem={enrichmentViewToggle}
+            onInformItemsPerPage={this.informItemsPerPage}
           />
         </div>
       );

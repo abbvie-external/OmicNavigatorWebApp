@@ -329,12 +329,10 @@ class BarcodePlot extends React.Component {
           if (brushedDataVar.length > 0) {
             let line = self.getMaxObject(brushedDataVar);
             let maxTick = line;
-            let id = 'barcode-line-' + line.lineID;
-            // line.lineID.replace(/\;/g, '') +
-            // '_' +
-            // line.id_mult;
+            let idAlt = 'barcode-line-' + line.lineID;
+            let id = line.lineID.replace(/\;/g, '') + '_' + line.id_mult;
             // self.updateToolTip(line, id, self);
-            d3.select('#' + id)
+            d3.select('#' + idAlt)
               .transition()
               // .duration(300)
               .style('stroke', '#ff4400')
@@ -479,7 +477,8 @@ class BarcodePlot extends React.Component {
   updateToolTip(tick, id, self) {
     if (self.barcodeChartRef.current !== null) {
       let t = self.barcodeChartRef.current.getElementsByClassName(id);
-      let toolTipPosition = parseInt(d3.select('#' + id).attr('x1'));
+      // let toolTipPosition = parseInt(d3.select('#' + id).attr('x1'));
+      let toolTipPosition = 100;
       let objsVar = self.state.objs;
       if (parseInt(t.getAttribute('x1')) > this.width / 2) {
         objsVar.tooltip.attr('text-anchor', 'end');

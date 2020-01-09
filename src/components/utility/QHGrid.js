@@ -23,8 +23,8 @@ import { filterTypes } from './FilterTypeConfig';
 import _ from 'lodash';
 import moment from 'moment';
 // Paul start
-// import excel_logo from './resources/excel.png';
-import excel_logo from '../../resources/excel3.png';
+import excel_logo from '../../resources/excel.png';
+import excel_logo_custom from '../../resources/excel3.png';
 // Paul end
 
 import './QHGrid.scss';
@@ -199,6 +199,51 @@ class QHGridHeader extends React.PureComponent {
     // console.log('remove QuickView', props.name);
     this.props.onShareQuickView(props.name, this.props);
   };
+  // Paul start
+  getExportButton = columns => {
+    const BreadcrumbPopupStyle = {
+      backgroundColor: '2E2E2E',
+      borderBottom: '2px solid #FF4400',
+      color: '#FFF',
+      padding: '1em',
+      maxWidth: '50vw',
+      fontSize: '13px',
+      wordBreak: 'break-all'
+    };
+
+    if (
+      this.props.exportBaseName === 'Enrichment_Analysis' ||
+      this.props.exportBaseName === 'Differential_Phosphorylation_Analysis'
+    ) {
+      return (
+        <Image
+          src={excel_logo_custom}
+          onClick={this.props.exportExcel(columns)}
+          style={{ float: 'right', cursor: 'pointer' }}
+        />
+      );
+    } else {
+      return (
+        <Popup
+          trigger={
+            <Image
+              src={excel_logo}
+              avatar
+              size="mini"
+              onClick={this.props.exportExcel(columns)}
+              style={{ float: 'right', cursor: 'pointer' }}
+            />
+          }
+          style={BreadcrumbPopupStyle}
+          inverted
+          basic
+          position="bottom right"
+          content="Export Data to Excel"
+        />
+      );
+    }
+  };
+  // Paul end
   render() {
     const { customizeOpen, columnOpen, filtersOpen, quickOpen } = this.state;
     const { columns, grouping, numColumns } = this.props;
@@ -338,6 +383,9 @@ class QHGridHeader extends React.PureComponent {
       this.props.onResetFiltersAll ||
       this.props.onResetFiltersToCustomView ||
       this.props.onResetFiltersToDefaultView;
+    // Paul start
+    const ExportButton = this.getExportButton(columns);
+    // Paul end
     return (
       <Table
         compact="very"
@@ -513,17 +561,9 @@ class QHGridHeader extends React.PureComponent {
                   children={this.props.legend}
                 />
               )}
-              {!this.props.loading && !!this.props.exportBaseName && (
-                <Image
-                  src={excel_logo}
-                  // Paul start
-                  // avatar
-                  // size="mini"
-                  // Paul end
-                  onClick={this.props.exportExcel(columns)}
-                  style={{ float: 'right', cursor: 'pointer' }}
-                />
-              )}
+              {!this.props.loading &&
+                !!this.props.exportBaseName &&
+                ExportButton}
               {this.props.extraHeaderItem}
             </Table.HeaderCell>
           </Table.Row>
@@ -1394,7 +1434,8 @@ QHGrid.propTypes = propTypes.forbidExtraProps({
   getExportData: PropTypes.func,
 
   height: PropTypes.string,
-  extraHeaderItem: PropTypes.node
+  extraHeaderItem: PropTypes.node,
+  excelLogo: PropTypes.string
 });
 
 export default QHGrid;

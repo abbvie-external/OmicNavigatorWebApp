@@ -321,7 +321,7 @@ class FilteredPepplotTable extends Component {
           // totalRows={pepplotRows}
           // use "pepplotRows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
           itemsPerPage={itemsPerPageInformedEnrichment}
-          // exportBaseName="Differential_Phosphorylation_Analysis"
+          exportBaseName="Differential_Phosphorylation_Analysis_Filtered"
           // quickViews={quickViews}
           disableGeneralSearch
           disableGrouping

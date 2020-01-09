@@ -8,6 +8,7 @@ import SplitPane from 'react-split-pane';
 import './SplitPanesContainer.scss';
 import SVGPlot from '../Shared/SVGPlot';
 import BarcodePlot from './BarcodePlot';
+// import BarcodeGraph from './BarcodeGraph';
 import ViolinPlot from './ViolinPlot';
 import FilteredPepplotTable from './FilteredPepplotTable';
 
@@ -40,7 +41,7 @@ class SplitPanesContainer extends Component {
   };
 
   getBarcodePlot = () => {
-    const { isTestDataLoaded } = this.props;
+    const { isTestDataLoaded, barcodeSettings } = this.props;
 
     if (!isTestDataLoaded) {
       return (
@@ -58,6 +59,9 @@ class SplitPanesContainer extends Component {
           {...this.props}
           onSetProteinForDiffView={this.setProteinForDiffView}
         />
+        // <BarcodeGraph
+        //   data={barcodeSettings.barcodeData}
+        // />
       );
     }
   };
@@ -231,6 +235,9 @@ class SplitPanesContainer extends Component {
                   onChange={size => this.splitPaneResized(size, 'horizontal')}
                 >
                   {BarcodePlot}
+                  {/* <BarcodeGraph
+                    data={this.props.barcodeSettings.barcodeData}
+                  /> */}
                   <SplitPane
                     className="BottomSplitPaneContainer"
                     split="vertical"
@@ -281,6 +288,9 @@ class SplitPanesContainer extends Component {
                   onChange={size => this.splitPaneResized(size, 'horizontal')}
                 >
                   {BarcodePlot}
+                  {/* <BarcodeGraph
+                    data={this.props.barcodeSettings.barcodeData}
+                  /> */}
                   <div id="SVGSplitContainer">{SVGPlot}</div>
                 </SplitPane>
               </Grid.Column>
