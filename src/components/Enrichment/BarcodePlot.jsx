@@ -180,10 +180,12 @@ class BarcodePlot extends React.Component {
       .append('line')
       .attr('class', 'barcode-line')
       .attr('id', function(d) {
-        return 'barcode-line-' + d.lineID;
+        let idAlt = d.lineID.replace(/\;/g, '') + '_' + d.id_mult;
+        return 'barcode-line-' + idAlt;
       })
       .attr('className', function(d) {
-        return 'barcode-line-' + d.lineID;
+        let classAlt = d.lineID.replace(/\;/g, '') + '_' + d.id_mult;
+        return 'barcode-line-' + classAlt;
       })
       .attr('x1', function(d, i) {
         return xScale(d.statistic);
@@ -329,10 +331,9 @@ class BarcodePlot extends React.Component {
           if (brushedDataVar.length > 0) {
             let line = self.getMaxObject(brushedDataVar);
             let maxTick = line;
-            let idAlt = 'barcode-line-' + line.lineID;
             let id = line.lineID.replace(/\;/g, '') + '_' + line.id_mult;
             // self.updateToolTip(line, id, self);
-            d3.select('#' + idAlt)
+            d3.select('#' + 'barcode-line-' + id)
               .transition()
               // .duration(300)
               .style('stroke', '#ff4400')

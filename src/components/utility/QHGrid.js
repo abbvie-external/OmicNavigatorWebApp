@@ -228,6 +228,7 @@ class QHGridHeader extends React.PureComponent {
           trigger={
             <Image
               src={excel_logo}
+              className="ExcelLogo"
               avatar
               size="mini"
               onClick={this.props.exportExcel(columns)}
