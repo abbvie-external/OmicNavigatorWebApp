@@ -46,7 +46,6 @@ class EnrichmentResults extends Component {
       isViolinPlotLoaded: false,
       barcodeSettings: {
         barcodeData: [],
-        brushing: false,
         brushedData: [],
         // chartSize: { height: '200', width: '960' },
         lineID: '',
@@ -402,17 +401,6 @@ class EnrichmentResults extends Component {
     });
   };
 
-  handleBrushingStatus = changes => {
-    if (changes.brushing !== undefined) {
-      this.setState({
-        barcodeSettings: {
-          ...this.state.barcodeSettings,
-          brushing: changes.brushing
-        }
-      });
-    }
-  };
-
   handleBarcodeChanges = changes => {
     // const { barcodeSettings } = this.state;
     let self = this;
@@ -743,7 +731,6 @@ class EnrichmentResults extends Component {
             {...this.props}
             {...this.state}
             onBackToTable={this.backToTable}
-            onHandleBrushingStatus={this.handleBrushingStatus}
             onHandleMaxLinePlot={this.handleMaxLinePlot}
             onHandleBarcodeChanges={this.handleBarcodeChanges}
           ></SplitPanesContainer>

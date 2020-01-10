@@ -1435,8 +1435,7 @@ QHGrid.propTypes = propTypes.forbidExtraProps({
   getExportData: PropTypes.func,
 
   height: PropTypes.string,
-  extraHeaderItem: PropTypes.node,
-  excelLogo: PropTypes.string
+  extraHeaderItem: PropTypes.node
 });
 
 export default QHGrid;

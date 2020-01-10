@@ -23,6 +23,7 @@
     border-bottom: 8px solid rgba(255, 255, 255, 0);
     cursor: row-resize;
     width: 100%;
+    z-index: 11113 !important;
 }
 
 .Resizer.horizontal:hover {

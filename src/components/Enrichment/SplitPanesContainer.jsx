@@ -8,7 +8,8 @@ import SplitPane from 'react-split-pane';
 import './SplitPanesContainer.scss';
 import SVGPlot from '../Shared/SVGPlot';
 import BarcodePlot from './BarcodePlot';
-// import BarcodeGraph from './BarcodeGraph';
+import BarcodePlotReact from './BarcodePlotReact';
+// import BarcodePlotReusable from './BarcodePlotReusable';
 import ViolinPlot from './ViolinPlot';
 import FilteredPepplotTable from './FilteredPepplotTable';
 
@@ -42,7 +43,8 @@ class SplitPanesContainer extends Component {
 
   getBarcodePlot = () => {
     const { isTestDataLoaded, barcodeSettings } = this.props;
-
+    const d = barcodeSettings.barcodeData;
+    const absTAccessor = d => d.statistic;
     if (!isTestDataLoaded) {
       return (
         <div>
@@ -53,14 +55,22 @@ class SplitPanesContainer extends Component {
       );
     } else {
       return (
+        // <BarcodePlotReact
+        //   className="BarcodePlotContainer"
+        //   {...this.state}
+        //   {...this.props}
+        //   onSetProteinForDiffView={this.setProteinForDiffView}
+        // />
         <BarcodePlot
           className="BarcodePlotContainer"
           {...this.state}
           {...this.props}
           onSetProteinForDiffView={this.setProteinForDiffView}
         />
-        // <BarcodeGraph
+        // <BarcodePlotReusable
         //   data={barcodeSettings.barcodeData}
+        //   xAccessor={absTAccessor}
+        //   label="test"
         // />
       );
     }
@@ -235,7 +245,7 @@ class SplitPanesContainer extends Component {
                   onChange={size => this.splitPaneResized(size, 'horizontal')}
                 >
                   {BarcodePlot}
-                  {/* <BarcodeGraph
+                  {/* <BarcodePlotReusable
                     data={this.props.barcodeSettings.barcodeData}
                   /> */}
                   <SplitPane
@@ -288,7 +298,7 @@ class SplitPanesContainer extends Component {
                   onChange={size => this.splitPaneResized(size, 'horizontal')}
                 >
                   {BarcodePlot}
-                  {/* <BarcodeGraph
+                  {/* <BarcodePlotReusable
                     data={this.props.barcodeSettings.barcodeData}
                   /> */}
                   <div id="SVGSplitContainer">{SVGPlot}</div>

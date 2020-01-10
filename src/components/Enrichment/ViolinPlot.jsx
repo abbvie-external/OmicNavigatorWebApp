@@ -99,7 +99,7 @@ class ViolinPlot extends Component {
 
   componentDidUpdate(prevProps, prevState, snapshot) {
     if (
-      this.props.violinData !== prevProps.violinData ||
+      // this.props.violinData !== prevProps.violinData ||
       this.props.verticalSplitPaneSize !== prevProps.verticalSplitPaneSize
     ) {
       //let heightChangedFn;
