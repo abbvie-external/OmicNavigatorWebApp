@@ -37,7 +37,7 @@ const BarcodePlotReusable = ({ data, xAccessor, label }) => {
   const yAccessor = d => d.length;
   const yScale = d3
     .scaleLinear()
-    .domain([0, d3.max(bins, yAccessor)])
+    .domain([0, d3.max([], yAccessor)])
     .range([dimensions.boundedHeight, 0])
     .nice();
 

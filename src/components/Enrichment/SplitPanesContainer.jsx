@@ -9,7 +9,7 @@ import './SplitPanesContainer.scss';
 import SVGPlot from '../Shared/SVGPlot';
 import BarcodePlot from './BarcodePlot';
 import BarcodePlotReact from './BarcodePlotReact';
-// import BarcodePlotReusable from './BarcodePlotReusable';
+import BarcodePlotReusable from './BarcodePlotReusable';
 import ViolinPlot from './ViolinPlot';
 import FilteredPepplotTable from './FilteredPepplotTable';
 

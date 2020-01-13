@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Axis from './Axis';
 // import PropTypes from 'prop-types';
 // import { Provider as BusProvider, useBus, useListener } from 'react-bus';
 import * as d3 from 'd3';
@@ -26,10 +27,12 @@ class BarcodePlotReact extends React.Component {
         height: null,
         id: 'chart-barcode',
         mainDiv: null,
-        margin: { top: 45, right: 25, bottom: 40, left: 20 },
+        margin: { top: 35, right: 25, bottom: 10, left: 20 },
         svg: null,
         title: '',
-        tooltip: null
+        tooltip: null,
+        mainStrokeColor: '#2c3b78',
+        alternativeStrokeColor: '#ff4400'
       },
       containerWidth: 0,
       xAxis: null,
@@ -121,7 +124,7 @@ class BarcodePlotReact extends React.Component {
     //         return d.lineID;
     //       })
     //       .style("fill", function() {
-    //         return "#2c3b78";
+    //         return settings.mainStrokeColor;
     //       })
     //       .attr("y", -22)
     //       .attr("x", function() {
@@ -153,126 +156,199 @@ class BarcodePlotReact extends React.Component {
   };
 
   unhighLight = () => {
+    const { settings } = this.state;
     d3.selectAll('line.barcode-line')
-      .attr('y1', -20)
+      .attr('y1', settings.margin.top)
       .style('stroke-width', 2)
-      .style('stroke', '#2c3b78')
+      .style('stroke', settings.mainStrokeColor)
       .style('opacity', function(d) {
         return 0.5;
       });
   };
 
+  getMaxObject(array) {
+    if (array) {
+      const max = Math.max.apply(
+        Math,
+        array.map(function(o) {
+          return o.statistic;
+        })
+      );
+      const obj = array.find(function(o) {
+        return o.statistic == max;
+      });
+
+      return obj;
+    }
+  }
+
+  setupBrush(
+    barcodeSettings,
+    settings,
+    horizontalSplitPaneSize,
+    containerWidth,
+    xAxis
+  ) {
+    debugger;
+    const self = this;
+    let objsBrush = {};
+    const highlightBrushedTicks = function() {
+      self.brushing = true;
+      const ticks = d3.selectAll('line.barcode-line');
+      debugger;
+      if (d3.event.selection !== undefined && d3.event.selection !== null) {
+        self.unhighLight();
+        const brushedTicks = d3.brushSelection(this);
+        const isBrushed = function(brushedTicks, x) {
+          const xMin = brushedTicks[0][0];
+          const xMax = brushedTicks[1][0];
+          const brushTest = xMin <= x && x <= xMax;
+          return brushTest;
+        };
+
+        const brushed = ticks
+          .filter(function() {
+            const x = d3.select(this).attr('x1');
+            return isBrushed(brushedTicks, x);
+          })
+          .attr('y1', -40)
+          .style('stroke-width', 3)
+          .style('opacity', 1.0);
+        const brushedDataVar = brushed.data();
+        debugger;
+        // const brushedDataVar = self.props.brushedData;
+        self.props.onHandleBarcodeChanges({
+          brushedData: brushedDataVar
+        });
+        if (brushedDataVar.length > 0) {
+          const line = self.getMaxObject(brushedDataVar);
+          const maxTick = line;
+          const id = line.lineID.replace(/\;/g, '') + '_' + line.id_mult;
+          // self.updateToolTip(line, id, self);
+          d3.selectAll('line.barcode-line').style(
+            'stroke',
+            settings.mainStrokeColor
+          );
+          d3.select('#' + 'barcode-line-' + id)
+            .transition()
+            .style('stroke', settings.alternativeStrokeColor)
+            .attr('y1', -55);
+        }
+      }
+    };
+
+    const endBrush = function() {
+      const maxLineData = self.getMaxObject(
+        self.props.barcodeSettings.brushedData
+      );
+      self.props.onSetProteinForDiffView(maxLineData);
+      self.props.onHandleMaxLinePlot(maxLineData);
+      self.brushing = true;
+    };
+
+    objsBrush = d3
+      .brush()
+      .extent([[0, -50], [containerWidth, horizontalSplitPaneSize]])
+      .on('brush', highlightBrushedTicks)
+      .on('end', endBrush);
+    // d3.selectAll('.barcode-axis').call(objsBrush);
+    // d3.selectAll('.barcode-axis').call(objsBrush);
+    // d3.selectAll(this.barcodeSVGRef.current).call(objsBrush);
+  }
+
   render() {
     const { settings, containerWidth } = this.state;
     const { barcodeSettings, horizontalSplitPaneSize } = this.props;
+    const barcodeData = barcodeSettings.barcodeData || [];
     const width = containerWidth - settings.margin.left - settings.margin.right;
     const height =
       horizontalSplitPaneSize - settings.margin.top - settings.margin.bottom;
-    const domain = d3
-      .scaleLinear()
-      .range([5, width - 5])
-      .domain([
-        0,
-        d3.extent(barcodeSettings.barcodeData, function(d) {
-          return d.statistic;
-        })[1]
-      ]);
 
     const xScale = d3
       .scaleLinear()
       .domain([0, barcodeSettings.highStat])
       .range([5, width - 5]);
+    // .padding(0.1);
+
+    const ticks = xScale.ticks().map(value => ({
+      value,
+      xOffset: xScale(value)
+    }));
 
     const xAxis = d3.axisBottom(xScale);
+    this.setupBrush(
+      barcodeSettings,
+      settings,
+      horizontalSplitPaneSize,
+      containerWidth,
+      xAxis
+    );
 
     return (
       <div
         ref={this.barcodeWrapperRef}
-        id="chart-barcode"
+        id={settings.id}
         className="BarcodeChartWrapper"
       >
         <svg
           ref={this.barcodeSVGRef}
           id={`svg-${settings.id}`}
           className="barcode-chart-area bcChart barcode"
-          height={height}
-          width={width}
+          height={horizontalSplitPaneSize}
+          width={containerWidth}
           viewBox={`0 0 ${containerWidth} ${horizontalSplitPaneSize}`}
           preserveAspectRatio="xMinYMin meet"
           onClick={this.handleSVGClick}
           cursor="crosshair"
           // {...props}
         >
+          {/* <g
+            id="tickAxis"
+            transform={`translate(${settings.margin.left, settings.margin.top})`}
+          > */}
           <text
-            transform={`translate(${width / 2}, ${height + 30})`}
+            transform={`translate(${width / 2}, ${height + 35})`}
             textAnchor="middle"
           >
             {barcodeSettings.statLabel}
           </text>
-          <text transform="rotate(-90)" y={-5} x={0 - height / 1 + 10}>
+          <text transform="rotate(-90)" y={15} x={0 - height / 1 + 10}>
             {barcodeSettings.lowLabel}
           </text>
           <text transform="rotate(-90)" y={width + 20} x={0 - height / 1 + 10}>
             {barcodeSettings.highLabel}
           </text>
-
-          <g
-            className="barcode-axis"
-            fill="none"
-            pointerEvents="all"
-            style={{
-              WebkitTapHighlightColor: 'transparent'
-            }}
-          >
-            <g
-              className="x axis"
-              // not sure about this
-              transform={`translate(0, ${height})`}
-              // end
-              fontSize={10}
-              fontFamily="sans-serif"
-              textAnchor="middle"
-            >
-              <path
-                className="domain"
-                stroke="#2c3b78"
-                d="M65.5 161v-5.5h1194v5.5"
-              />
-
-              {barcodeSettings.barcodeData.map(b => (
-                <g className="tick">
-                  <path stroke="#2c3b78" d={`${b.statistic}`} />
-                  <text
-                    fill="#2c3b78"
-                    y={9}
-                    dy=".71em"
-                    transform="translate(1259.5 155)"
-                  >
-                    {'5'}
-                  </text>
-                </g>
-              ))}
+          <path
+            d={`M 25 ${height} H ${width + 15}`}
+            stroke="currentColor"
+            class="barcode-axis"
+          />
+          {ticks.map(({ value, xOffset }) => (
+            <g key={value} transform={`translate(${xOffset + 20}, ${height})`}>
+              <line y2="6" stroke="currentColor" />
+              <text
+                key={value}
+                style={{
+                  fontSize: '10px',
+                  textAnchor: 'middle',
+                  transform: 'translateY(20px)'
+                }}
+              >
+                {value}
+              </text>
             </g>
-          </g>
+          ))}
 
-          {/* <path
-                className="prefix__barcode-line"
-                stroke="#2c3b78"
-                strokeWidth={2}
-                opacity={0.5}
-                d="M332.836 45v110M270.379 45v110M160.39 45v110M155.364 45v110M151.348 45v110M110.546 45v110M109.33 45v110M72.989 45v110M65.608 45v110"
-            /> */}
-
-          {barcodeSettings.barcodeData.map(d => (
+          {barcodeData.map(d => (
             <line
               id={`barcode-line-${d.lineID}-${d.id_mult}`}
-              className={`barcode-line-${d.lineID}-${d.id_mult}`}
+              className="barcode-line"
               key={`${d.lineID}_${d.id_mult}`}
-              x1={xScale(d.statistic)}
-              x2={xScale(d.statistic)}
-              y1={-20}
+              x1={xScale(d.statistic) + settings.margin.left}
+              x2={xScale(d.statistic) + settings.margin.left}
+              y1={settings.margin.top}
               y2={height}
-              stroke="#2c3b78"
+              stroke={settings.mainStrokeColor}
               strokeWidth={2}
               opacity={0.5}
               onClick={this.handleLineClick}
@@ -281,6 +357,7 @@ class BarcodePlotReact extends React.Component {
               // d={`${d.statistic}`}
             />
           ))}
+          {/* </g> */}
         </svg>
       </div>
     );
