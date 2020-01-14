@@ -402,6 +402,7 @@ class EnrichmentResults extends Component {
   };
 
   handleBarcodeChanges = changes => {
+    debugger;
     // const { barcodeSettings } = this.state;
     let self = this;
     if (changes.brushedData.length > 0) {

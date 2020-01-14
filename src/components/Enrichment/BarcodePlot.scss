@@ -1,0 +1,17 @@
+.barcode-line {
+    stroke: #838383;
+    stroke-width: 2px;
+    opacity: 0.5;
+}
+
+.barcode-line.selected {
+    stroke: #2c3b78;
+    stroke-width: 3px;
+    opacity: 0.5;
+}
+
+.barcode-line.MaxLine {
+    stroke: #ff4400;
+    stroke-width: 3px;
+    opacity: 1;
+}

@@ -114,7 +114,6 @@ class BarcodePlot extends React.Component {
     const chartDiv = d3.select('#' + settings.id);
 
     const svgClicked = function() {
-      debugger;
       self.unhighLight();
       self.props.onHandleBarcodeChanges({
         brushedData: []
@@ -306,7 +305,7 @@ class BarcodePlot extends React.Component {
           self.unhighLight();
 
           const brushedTicks = d3.brushSelection(this);
-
+          debugger;
           const isBrushed = function(brushedTicks, x) {
             const xMin = brushedTicks[0][0],
               xMax = brushedTicks[1][0];
@@ -324,7 +323,7 @@ class BarcodePlot extends React.Component {
             .style('stroke-width', 3)
             .style('opacity', 1.0);
           const brushedDataVar = brushed.data();
-          // const brushedDataVar = self.props.brushedData;
+          debugger;
           self.props.onHandleBarcodeChanges({
             brushedData: brushedDataVar
           });

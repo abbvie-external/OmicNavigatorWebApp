@@ -55,18 +55,18 @@ class SplitPanesContainer extends Component {
       );
     } else {
       return (
-        // <BarcodePlotReact
-        //   className="BarcodePlotContainer"
-        //   {...this.state}
-        //   {...this.props}
-        //   onSetProteinForDiffView={this.setProteinForDiffView}
-        // />
-        <BarcodePlot
+        <BarcodePlotReact
           className="BarcodePlotContainer"
           {...this.state}
           {...this.props}
           onSetProteinForDiffView={this.setProteinForDiffView}
         />
+        // <BarcodePlot
+        //   className="BarcodePlotContainer"
+        //   {...this.state}
+        //   {...this.props}
+        //   onSetProteinForDiffView={this.setProteinForDiffView}
+        // />
         // <BarcodePlotReusable
         //   data={barcodeSettings.barcodeData}
         //   xAccessor={absTAccessor}
