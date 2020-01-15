@@ -7,11 +7,15 @@
 .barcode-line.selected {
     stroke: #2c3b78;
     stroke-width: 3px;
-    opacity: 0.5;
+    opacity: 1;
 }
 
 .barcode-line.MaxLine {
     stroke: #ff4400;
     stroke-width: 3px;
     opacity: 1;
+}
+
+.barcode {
+    cursor: crosshair !important;
 }
