@@ -1,9 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import * as d3 from 'd3';
-
+// import Lines from "./Chart/Lines"
 import Chart from './Chart/Chart';
-import Bars from './Chart/Bars';
 import Axis from './Chart/Axis';
 import {
   useChartDimensions,
@@ -65,14 +64,14 @@ const BarcodePlotReusable = ({ data, xAccessor, label }) => {
           scale={yScale}
           label="Count"
         />
-        <Bars
+        {/* <Lines
           // data={bins}
           keyAccessor={keyAccessor}
           xAccessor={xAccessorScaled}
           yAccessor={yAccessorScaled}
           widthAccessor={widthAccessorScaled}
           heightAccessor={heightAccessorScaled}
-        />
+        /> */}
       </Chart>
     </div>
   );

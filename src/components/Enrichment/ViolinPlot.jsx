@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 // import PropTypes from 'prop-types';
 // import { Provider as BusProvider, useBus, useListener } from 'react-bus';
 import * as d3 from 'd3';
@@ -58,7 +58,9 @@ class ViolinPlot extends Component {
       colorFunct: null,
       violinPlots: {},
       dataPlots: {},
-      boxPlots: {}
+      boxPlots: {},
+      violinHeight: 400,
+      violinWidth: 400
     };
     this.violinChartRef = React.createRef();
   }
@@ -1472,13 +1474,34 @@ class ViolinPlot extends Component {
     return objSize;
   };
 
+  handleViolinDotClickTest = () => {
+    this.props.onViolinDotClick({
+      dotHighlighted: []
+    });
+  };
+
   render() {
+    const { violinHeight, violinWidth } = this.state;
     return (
-      <div
-        id={this.state.settings.id}
-        className="violin-chart-wrapper"
-        ref={this.violinChartRef}
-      ></div>
+      <Fragment>
+        <div
+          id={this.state.settings.id}
+          className="violin-chart-wrapper"
+          ref={this.violinChartRef}
+        ></div>
+        <svg
+          ref={this.violinSVGRef}
+          id="test-violin-dot"
+          // className=""
+          height={violinHeight}
+          width={violinWidth}
+          viewBox={`0 0 ${violinWidth} ${violinHeight}`}
+          preserveAspectRatio="xMinYMin meet"
+          onClick={e => this.props.onHandleViolinDotSelected(this.id, e)}
+          // cursor="crosshair"
+          // {...props}
+        ></svg>
+      </Fragment>
     );
   }
 }

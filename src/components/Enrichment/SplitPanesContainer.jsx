@@ -23,7 +23,8 @@ class SplitPanesContainer extends Component {
         parseInt(localStorage.getItem('horizontalSplitPaneSize'), 10) || 250,
       verticalSplitPaneSize:
         parseInt(localStorage.getItem('verticalSplitPaneSize'), 10) || 415,
-      activeViolinTableIndex: 0
+      activeViolinTableIndex: 0,
+      violinDotSelected: null
     };
   }
 
@@ -93,10 +94,18 @@ class SplitPanesContainer extends Component {
           className="ViolinPlotContainer"
           {...this.state}
           {...this.props}
+          onHandleViolinDotSelected={this.handleViolinDotSelected}
         />
       );
     }
   }
+
+  handleViolinDotSelected = e => {
+    debugger;
+    this.setState({
+      violinDotSelected: 'test'
+    });
+  };
 
   handleViolinTableTabChange = (e, { activeIndex }) => {
     this.setState({

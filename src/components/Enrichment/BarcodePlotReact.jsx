@@ -14,6 +14,7 @@ class BarcodePlotReact extends React.Component {
       hoveredLine: null,
       highlightedLine: null,
       tooltipPosition: null,
+      tooltipTextAnchor: 'start',
       objs: {
         mainDiv: null,
         chartDiv: null,
@@ -30,7 +31,7 @@ class BarcodePlotReact extends React.Component {
         brushing: false,
         chartDiv: null,
         g: null,
-        height: null,
+        height: props.horizontalSplitPaneSize - 50,
         id: 'chart-barcode',
         mainDiv: null,
         margin: {
@@ -38,8 +39,8 @@ class BarcodePlotReact extends React.Component {
           right: 25,
           bottom: 20,
           left: 20,
-          selected: 20,
-          max: 10
+          selected: 15,
+          max: 0
         },
         svg: null,
         title: '',
@@ -62,17 +63,31 @@ class BarcodePlotReact extends React.Component {
     window.addEventListener('resize', () => {
       clearTimeout(resizedFn);
       resizedFn = setTimeout(() => {
-        this.setWidth();
+        this.windowResized();
       }, 200);
     });
   }
 
-  setWidth() {
+  windowResized = () => {
+    this.setState({
+      highlightedLine: null,
+      hoveredLine: null
+    });
+    debugger;
+    // this.barcodeSVGRef.current.getElementsByClassName('selection')[0].remove();
+    // this.barcodeSVGRef.current = null;
+    // const brush = d3.selectAll('.selection');
+    // d3.selectAll('.selection').call(brush.move, null);
+    // this.barcodeSVGRef.current.select(".brush").call(this.brushRef.move, null);
+    this.setWidth();
+  };
+
+  setWidth = () => {
     const width = this.getWidth();
     this.setState({
       containerWidth: width
     });
-  }
+  };
 
   componentDidUpdate(prevProps, prevState, snapshot) {
     if (
@@ -120,11 +135,18 @@ class BarcodePlotReact extends React.Component {
   handleLineEnter = event => {
     if (this.state.settings.brushing === false) {
       const lineDataId = event.target.attributes[7].nodeValue;
-      const ttPosition = event.target.attributes[2].nodeValue;
+      const statistic = event.target.attributes[9].nodeValue;
+      const textAnchor = statistic > this.state.width / 2 ? 'end' : 'start';
+      const ttPosition =
+        textAnchor === 'end'
+          ? event.target.attributes[2].nodeValue - 5
+          : event.target.attributes[2].nodeValue + 5;
+
       this.setState({
-        highlightedLine: null,
+        // highlightedLine: null,
         hoveredLine: lineDataId,
-        tooltipPosition: ttPosition
+        tooltipPosition: ttPosition,
+        tooltipTextAnchor: textAnchor
       });
 
       //   d3.select(this)
@@ -158,10 +180,10 @@ class BarcodePlotReact extends React.Component {
     }
   };
 
-  handleLineLeave = event => {
+  handleLineLeave = () => {
     if (this.state.settings.brushing === false) {
       this.setState({
-        highlightedLine: null,
+        // highlightedLine: null,
         hoveredLine: null
       });
     }
@@ -195,7 +217,8 @@ class BarcodePlotReact extends React.Component {
     settings,
     horizontalSplitPaneSize,
     containerWidth,
-    xAxis
+    xAxis,
+    height
   ) {
     const self = this;
     let objsBrush = {};
@@ -258,11 +281,16 @@ class BarcodePlotReact extends React.Component {
           const maxLine = d3.select('#' + 'barcode-line-' + maxLineId);
           maxLine.classed('MaxLine', true).attr('y1', settings.margin.max);
 
-          const ttPosition = maxLineObject.x2;
+          const statistic = maxLineObject.statisic;
+          const textAnchor = statistic > self.state.width / 2 ? 'end' : 'start';
+          const ttPosition =
+            textAnchor === 'end' ? maxLineObject.x2 - 5 : maxLineObject.x2 + 5;
+
           self.setState({
             hoveredLine: null,
             highlightedLine: maxLineObject.lineID,
-            tooltipPosition: ttPosition
+            tooltipPosition: ttPosition,
+            tooltipTextAnchor: textAnchor
           });
         }
       }
@@ -280,7 +308,7 @@ class BarcodePlotReact extends React.Component {
     objsBrush = d3
       // .brush()
       .brush()
-      .extent([[0, -50], [containerWidth, horizontalSplitPaneSize]])
+      .extent([[0, 0], [containerWidth, height]])
       .on('start', brushingStart)
       .on('brush', highlightBrushedLines)
       .on('end', endBrush);
@@ -289,13 +317,18 @@ class BarcodePlotReact extends React.Component {
   }
 
   getTooltip = () => {
-    const { hoveredLine, highlightedLine, tooltipPosition } = this.state;
+    const {
+      hoveredLine,
+      highlightedLine,
+      tooltipPosition,
+      tooltipTextAnchor
+    } = this.state;
     if (hoveredLine) {
       return (
         <text
           transform={`translate(${tooltipPosition}, 25)`}
           fontSize="14px"
-          // textAnchor='end'
+          textAnchor={tooltipTextAnchor}
         >
           {hoveredLine}
         </text>
@@ -303,9 +336,9 @@ class BarcodePlotReact extends React.Component {
     } else if (highlightedLine) {
       return (
         <text
-          transform={`translate(${tooltipPosition}, 25)`}
+          transform={`translate(${tooltipPosition}, 10)`}
           fontSize="14px"
-          // textAnchor='end'
+          textAnchor={tooltipTextAnchor}
         >
           {highlightedLine}
         </text>
@@ -320,7 +353,12 @@ class BarcodePlotReact extends React.Component {
       hoveredLine,
       tooltipPosition
     } = this.state;
-    const { barcodeSettings, horizontalSplitPaneSize } = this.props;
+    debugger;
+    const {
+      barcodeSettings,
+      horizontalSplitPaneSize,
+      violinDotSelected
+    } = this.props;
     const barcodeData = barcodeSettings.barcodeData || [];
     const width = containerWidth - settings.margin.left - settings.margin.right;
     const height =
@@ -359,7 +397,6 @@ class BarcodePlotReact extends React.Component {
     ));
 
     const barcodeLines = barcodeData.map(d => (
-      // <Fragment>
       <line
         id={`barcode-line-${d.lineID.replace(/\;/g, '')}_${d.id_mult}`}
         // id={`barcode-line-${d.lineID}-${d.id_mult}`}
@@ -374,13 +411,13 @@ class BarcodePlotReact extends React.Component {
         logfc={d.logFC}
         statistic={d.statistic}
         // stroke={settings.mainStrokeColor}
-        // strokeWidth={2}
-        // opacity={0.5}
+        strokeWidth={2}
+        opacity={0.5}
         onClick={this.handleLineClick}
         // onMouseEnter={this.handleLineEnter}
         // onMouseLeave={this.handleLineLeave}
-        onMouseOver={e => this.handleLineEnter(e)}
-        onMouseOut={this.handleLineLeave}
+        onMouseEnter={e => this.handleLineEnter(e)}
+        onMouseLeave={this.handleLineLeave}
         cursor="crosshair"
       />
     ));
@@ -397,7 +434,8 @@ class BarcodePlotReact extends React.Component {
       settings,
       horizontalSplitPaneSize,
       containerWidth,
-      xAxis
+      xAxis,
+      height
     );
 
     return (

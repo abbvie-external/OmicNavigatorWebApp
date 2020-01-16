@@ -440,6 +440,7 @@ class EnrichmentResults extends Component {
       });
 
       const ordered = {};
+      debugger;
       Object.keys(vData)
         .sort()
         .forEach(function(key) {
