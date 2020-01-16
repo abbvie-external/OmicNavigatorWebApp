@@ -229,7 +229,7 @@ class QHGridHeader extends React.PureComponent {
             <Image
               src={excel_logo}
               className="ExcelLogo"
-              avatar
+              // avatar
               size="mini"
               onClick={this.props.exportExcel(columns)}
               style={{ float: 'right', cursor: 'pointer' }}

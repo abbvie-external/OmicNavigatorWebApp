@@ -113,11 +113,11 @@
 
 .ViolinAndTableMenu {
     direction: ltr !important;
-    position: absolute !important;
+    // position: absolute !important;
     z-index: 11111 !important;
     left: 0 !important;
-    margin-left: 25px !important;
-    width: 90% !important;
+    // margin-left: 25px !important;
+    // width: 90% !important;
     background: white !important;
     // border-bottom: none !important;
 }
@@ -133,11 +133,17 @@
 
 #TableResultsTab .QHGrid {
     margin-top: 0px !important;
+    input {
+        border: 1px solid lightgrey !important;
+    }
 }
 
 #TableResultsTab .QHGridHeaderDiv {
     min-height: 275px !important;
     height: 100% !important;
+
+
+
 }
 
 .BarcodeChartWrapper {

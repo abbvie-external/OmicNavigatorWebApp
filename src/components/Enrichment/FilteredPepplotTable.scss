@@ -5,20 +5,18 @@
     //     color: white !important;
     // }
     .ui.mini.image {
-        width: 25px !important;
+        width: 35px !important;
+        //     z-index: 11112 !important;
+        //     height: 35px !important;
     }
 
     .QHGrid table th:first-child {
         padding-top: 7px !important;
-        padding-bottom: 25px !important;
+        padding-bottom: 15px !important;
     }
     
     .TableValue {
         cursor: auto !important;
-    }
-
-    .ExcelLogo {
-        z-index: 11112 !important;
     }
 }
 

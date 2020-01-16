@@ -1474,11 +1474,11 @@ class ViolinPlot extends Component {
     return objSize;
   };
 
-  handleViolinDotClickTest = () => {
-    this.props.onViolinDotClick({
-      dotHighlighted: []
-    });
-  };
+  // handleViolinDotClickTest = () => {
+  //   this.props.onViolinDotClick({
+  //     dotHighlighted: []
+  //   });
+  // };
 
   render() {
     const { violinHeight, violinWidth } = this.state;
@@ -1489,7 +1489,7 @@ class ViolinPlot extends Component {
           className="violin-chart-wrapper"
           ref={this.violinChartRef}
         ></div>
-        <svg
+        {/* <svg
           ref={this.violinSVGRef}
           id="test-violin-dot"
           // className=""
@@ -1500,7 +1500,7 @@ class ViolinPlot extends Component {
           onClick={e => this.props.onHandleViolinDotSelected(this.id, e)}
           // cursor="crosshair"
           // {...props}
-        ></svg>
+        ></svg> */}
       </Fragment>
     );
   }

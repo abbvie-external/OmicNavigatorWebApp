@@ -456,10 +456,11 @@ class PepplotResults extends Component {
             // use "pepplotRows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
             itemsPerPage={itemsPerPageInformed}
             exportBaseName="Differential_Phosphorylation_Analysis"
-            quickViews={quickViews}
+            // quickViews={quickViews}
             disableGeneralSearch
             disableGrouping
             disableColumnVisibilityToggle
+            // disableFilters
             min-height="75vh"
             additionalTemplateInfo={additionalTemplateInfo}
             headerAttributes={<ButtonActions />}

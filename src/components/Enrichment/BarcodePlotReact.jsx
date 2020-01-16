@@ -40,7 +40,7 @@ class BarcodePlotReact extends React.Component {
           bottom: 20,
           left: 20,
           selected: 15,
-          max: 0
+          max: 5
         },
         svg: null,
         title: '',
@@ -100,7 +100,7 @@ class BarcodePlotReact extends React.Component {
   }
 
   getWidth() {
-    if (this.barcodeWrapperRef.current !== undefined) {
+    if (this.barcodeWrapperRef.current !== null) {
       return this.barcodeWrapperRef.current.parentElement.offsetWidth;
     } else return 1200;
   }
@@ -216,7 +216,7 @@ class BarcodePlotReact extends React.Component {
     barcodeSettings,
     settings,
     horizontalSplitPaneSize,
-    containerWidth,
+    width,
     xAxis,
     height
   ) {
@@ -308,7 +308,7 @@ class BarcodePlotReact extends React.Component {
     objsBrush = d3
       // .brush()
       .brush()
-      .extent([[0, 0], [containerWidth, height]])
+      .extent([[settings.margin.left + 4, 0], [width + 15, height]])
       .on('start', brushingStart)
       .on('brush', highlightBrushedLines)
       .on('end', endBrush);
@@ -336,7 +336,7 @@ class BarcodePlotReact extends React.Component {
     } else if (highlightedLine) {
       return (
         <text
-          transform={`translate(${tooltipPosition}, 10)`}
+          transform={`translate(${tooltipPosition}, 15)`}
           fontSize="14px"
           textAnchor={tooltipTextAnchor}
         >
@@ -433,7 +433,7 @@ class BarcodePlotReact extends React.Component {
       barcodeSettings,
       settings,
       horizontalSplitPaneSize,
-      containerWidth,
+      width,
       xAxis,
       height
     );
@@ -470,13 +470,13 @@ class BarcodePlotReact extends React.Component {
             {barcodeSettings.statLabel}
           </text>
 
-          {/* Y Axis Right Label */}
+          {/* Y Axis Left Label */}
           <text transform="rotate(-90)" y={15} x={0 - height / 1 + 10}>
             {barcodeSettings.lowLabel}
           </text>
 
-          {/* Y Axis Left Label */}
-          <text transform="rotate(-90)" y={width + 20} x={0 - height / 1 + 10}>
+          {/* Y Axis Right Label */}
+          <text transform="rotate(-90)" y={width + 27} x={0 - height / 1 + 10}>
             {barcodeSettings.highLabel}
           </text>
           <g className="x barcode-axis"></g>
