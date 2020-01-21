@@ -533,7 +533,6 @@ class EnrichmentResults extends Component {
         }
       }
     } else {
-      debugger;
       this.setState({
         SVGPlotLoaded: false,
         SVGPlotLoading: false

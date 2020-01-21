@@ -22,7 +22,7 @@ class SplitPanesContainer extends Component {
       horizontalSplitPaneSize:
         parseInt(localStorage.getItem('horizontalSplitPaneSize'), 10) || 250,
       verticalSplitPaneSize:
-        parseInt(localStorage.getItem('verticalSplitPaneSize'), 10) || 415,
+        parseInt(localStorage.getItem('verticalSplitPaneSize'), 10) || 525,
       activeViolinTableIndex: 0,
       violinDotSelected: null
     };
@@ -80,24 +80,24 @@ class SplitPanesContainer extends Component {
   getViolinPlot() {
     const { isViolinPlotLoading, isViolinPlotLoaded } = this.props;
     // isViolinPlotLoaded
-    if (!isViolinPlotLoaded) {
-      return (
-        <div className="PlotInstructionsDiv">
-          <h4 className="PlotInstructionsText">
-            Select barcode line/s to display Violin Plot
-          </h4>
-        </div>
-      );
-    } else {
-      return (
-        <ViolinPlot
-          className="ViolinPlotContainer"
-          {...this.state}
-          {...this.props}
-          onHandleViolinDotSelected={this.handleViolinDotSelected}
-        />
-      );
-    }
+    // if (!isViolinPlotLoaded) {
+    //   return (
+    //     <div className="PlotInstructionsDiv">
+    //       <h4 className="PlotInstructionsText">
+    //         Select barcode line/s to display Violin Plot
+    //       </h4>
+    //     </div>
+    //   );
+    // } else {
+    return (
+      <ViolinPlot
+        className="ViolinPlotContainer"
+        {...this.state}
+        {...this.props}
+        onHandleViolinDotSelected={this.handleViolinDotSelected}
+      />
+    );
+    // }
   }
 
   handleViolinDotSelected = e => {
@@ -269,7 +269,7 @@ class SplitPanesContainer extends Component {
                   split="vertical"
                   defaultSize={this.state.verticalSplitPaneSize}
                   minSize={315}
-                  maxSize={1000}
+                  maxSize={800}
                   onChange={size => this.splitPaneResized(size, 'vertical')}
                 >
                   <div id="ViolinAndTableSplitContainer">{ViolinAndTable}</div>

@@ -147,7 +147,6 @@ class BarcodePlotReact extends React.Component {
       const lineIdMult = event.target.attributes[6].nodeValue;
       const lineDataId = event.target.attributes[7].nodeValue;
       const statistic = event.target.attributes[9].nodeValue;
-      debugger;
       const textAnchor =
         statistic > this.props.barcodeSettings.highStat / 2 ? 'end' : 'start';
       const ttPosition =
@@ -297,7 +296,6 @@ class BarcodePlotReact extends React.Component {
     };
 
     const endBrush = function() {
-      debugger;
       const maxLineData = self.getMaxObject(
         self.props.barcodeSettings.brushedData
       );
