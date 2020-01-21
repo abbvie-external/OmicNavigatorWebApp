@@ -11,7 +11,8 @@ class BarcodePlotReact extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      hoveredLine: null,
+      hoveredLineId: null,
+      hoveredLineName: null,
       highlightedLine: null,
       tooltipPosition: null,
       tooltipTextAnchor: 'start',
@@ -39,6 +40,7 @@ class BarcodePlotReact extends React.Component {
           right: 25,
           bottom: 20,
           left: 20,
+          hovered: 15,
           selected: 15,
           max: 5
         },
@@ -71,9 +73,9 @@ class BarcodePlotReact extends React.Component {
   windowResized = () => {
     this.setState({
       highlightedLine: null,
-      hoveredLine: null
+      hoveredLineId: null,
+      hoveredLineName: null
     });
-    debugger;
     // this.barcodeSVGRef.current.getElementsByClassName('selection')[0].remove();
     // this.barcodeSVGRef.current = null;
     // const brush = d3.selectAll('.selection');
@@ -134,17 +136,24 @@ class BarcodePlotReact extends React.Component {
 
   handleLineEnter = event => {
     if (this.state.settings.brushing === false) {
+      const lineMultId = event.target.attributes[6].nodeValue;
       const lineDataId = event.target.attributes[7].nodeValue;
       const statistic = event.target.attributes[9].nodeValue;
-      const textAnchor = statistic > this.state.width / 2 ? 'end' : 'start';
+      const textAnchor =
+        statistic > this.state.containerWidth / 250 ? 'end' : 'start';
       const ttPosition =
         textAnchor === 'end'
           ? event.target.attributes[2].nodeValue - 5
           : event.target.attributes[2].nodeValue + 5;
-
+      const hoveredId = `#barcode-line-${lineDataId}_${lineMultId}`;
+      const hoveredLine = d3.select(hoveredId);
+      hoveredLine
+        .classed('HoveredLine', true)
+        .attr('y1', this.state.settings.margin.hovered);
       this.setState({
         // highlightedLine: null,
-        hoveredLine: lineDataId,
+        hoveredLineId: hoveredId,
+        hoveredLineName: lineDataId,
         tooltipPosition: ttPosition,
         tooltipTextAnchor: textAnchor
       });
@@ -182,9 +191,14 @@ class BarcodePlotReact extends React.Component {
 
   handleLineLeave = () => {
     if (this.state.settings.brushing === false) {
+      const hoveredLine = d3.select(this.state.hoveredLineId);
+      hoveredLine
+        .classed('HoveredLine', false)
+        .attr('y1', this.state.settings.margin.top);
       this.setState({
         // highlightedLine: null,
-        hoveredLine: null
+        hoveredLineId: null,
+        hoveredLineName: null
       });
     }
   };
@@ -230,7 +244,8 @@ class BarcodePlotReact extends React.Component {
           brushing: true
         },
         highlightedLine: null,
-        hoveredLine: null
+        hoveredLineId: null,
+        hoveredLineName: null
       });
     };
 
@@ -287,7 +302,8 @@ class BarcodePlotReact extends React.Component {
             textAnchor === 'end' ? maxLineObject.x2 - 5 : maxLineObject.x2 + 5;
 
           self.setState({
-            hoveredLine: null,
+            hoveredLineId: null,
+            hoveredLineName: null,
             highlightedLine: maxLineObject.lineID,
             tooltipPosition: ttPosition,
             tooltipTextAnchor: textAnchor
@@ -318,19 +334,20 @@ class BarcodePlotReact extends React.Component {
 
   getTooltip = () => {
     const {
-      hoveredLine,
+      hoveredLineId,
+      hoveredLineName,
       highlightedLine,
       tooltipPosition,
       tooltipTextAnchor
     } = this.state;
-    if (hoveredLine) {
+    if (hoveredLineName) {
       return (
         <text
           transform={`translate(${tooltipPosition}, 25)`}
           fontSize="14px"
           textAnchor={tooltipTextAnchor}
         >
-          {hoveredLine}
+          {hoveredLineName}
         </text>
       );
     } else if (highlightedLine) {
@@ -350,10 +367,10 @@ class BarcodePlotReact extends React.Component {
     const {
       settings,
       containerWidth,
-      hoveredLine,
+      hoveredLineId,
+      hoveredLineName,
       tooltipPosition
     } = this.state;
-    debugger;
     const {
       barcodeSettings,
       horizontalSplitPaneSize,

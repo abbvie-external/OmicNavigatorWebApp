@@ -101,7 +101,6 @@ class SplitPanesContainer extends Component {
   }
 
   handleViolinDotSelected = e => {
-    debugger;
     this.setState({
       violinDotSelected: 'test'
     });

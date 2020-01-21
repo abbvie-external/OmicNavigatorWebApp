@@ -420,11 +420,14 @@ class EnrichmentResults extends Component {
       // this.setState({
       //   isViolinPlotLoaded: false
       // });
-
       const reducedBoxPlotArray = _.reduce(
         boxPlotArray,
         function(res, datum) {
-          (res[datum.statLabel] || (res[datum.statLabel] = [])).push({
+          // (res[datum.statLabel] || (res[datum.statLabel] = [])).push({
+          (
+            res[self.state.barcodeSettings.statLabel] ||
+            (res[self.state.barcodeSettings.statLabel] = [])
+          ).push({
             cpm: datum.logFC,
             sample: datum.lineID,
             statistic: datum.statistic,
@@ -435,12 +438,11 @@ class EnrichmentResults extends Component {
         {}
       );
 
-      const vData = _.mapValues(reducedBoxPlotArray, function(v: any) {
+      const vData = _.mapValues(reducedBoxPlotArray, function(v) {
         return { values: v };
       });
 
       const ordered = {};
-      debugger;
       Object.keys(vData)
         .sort()
         .forEach(function(key) {
