@@ -82,6 +82,7 @@ class ViolinPlot extends Component {
   };
 
   setHeight = () => {
+    debugger;
     const cHeight = this.getHeight();
     const height =
       cHeight -

@@ -113,6 +113,7 @@ class SplitPanesContainer extends Component {
   };
 
   getViolinAndTable = () => {
+    const { displayViolinPlot } = this.props;
     const { activeViolinTableIndex } = this.state;
     const violinPlot = this.getViolinPlot();
     const violinAndTablePanes = [
@@ -148,11 +149,28 @@ class SplitPanesContainer extends Component {
       }
     ];
 
+    const onlyTablePane = [
+      {
+        menuItem: 'Statistic Table',
+        pane: (
+          <Tab.Pane
+            attached
+            key="2"
+            id="TableResultsTab"
+            className="TableResultsTab"
+            // as="div"
+          >
+            <FilteredPepplotTable {...this.state} {...this.props} />
+          </Tab.Pane>
+        )
+      }
+    ];
+
     return (
       <Tab
         className="ViolinAndTableTabsDiv"
         onTabChange={this.handleViolinTableTabChange}
-        panes={violinAndTablePanes}
+        panes={displayViolinPlot ? violinAndTablePanes : onlyTablePane}
         activeIndex={activeViolinTableIndex}
         renderActiveOnly={false}
         menu={{
@@ -207,116 +225,62 @@ class SplitPanesContainer extends Component {
     const ViolinAndTable = this.getViolinAndTable();
     const SVGPlot = this.getSVGPlot();
 
-    // if (!isTestDataLoaded) {
-    //   return (
-    //     <div>
-    //       <Dimmer active inverted>
-    //         <Loader size="large">Barcode, Violin, Dot Plots are Loading</Loader>
-    //       </Dimmer>
-    //     </div>
-    //   );
-    // } else {
-    if (this.props.displayViolinPlot) {
-      return (
-        <div className="PlotsWrapper">
-          <Grid className="">
-            <Grid.Row className="ActionsRow">
-              <Grid.Column
-                mobile={16}
-                tablet={16}
-                largeScreen={12}
-                widescreen={12}
-              >
-                <EnrichmentBreadcrumbs {...this.props} />
-              </Grid.Column>
-              {/* <Grid.Column mobile={16} tablet={16} largeScreen={4} widescreen={4}>
-                <Button primary className="ViewDiffTableButton" onClick={this.props.onViewDiffTable}>
-                  View Differential Table
-                </Button>
-              </Grid.Column> */}
-              {/* <Grid.Column mobile={8} tablet={8} largeScreen={8} widescreen={8}>
-                <ButtonActions {...this.props} {...this.state} />
-              </Grid.Column> */}
+    return (
+      <div className="PlotsWrapper">
+        <Grid className="">
+          <Grid.Row className="ActionsRow">
+            <Grid.Column
+              mobile={16}
+              tablet={16}
+              largeScreen={12}
+              widescreen={12}
+            >
+              <EnrichmentBreadcrumbs {...this.props} />
+            </Grid.Column>
+            {/* <Grid.Column mobile={16} tablet={16} largeScreen={4} widescreen={4}>
+              <Button primary className="ViewDiffTableButton" onClick={this.props.onViewDiffTable}>
+                View Differential Table
+              </Button>
+            </Grid.Column> */}
+            {/* <Grid.Column mobile={8} tablet={8} largeScreen={8} widescreen={8}>
+              <ButtonActions {...this.props} {...this.state} />
+            </Grid.Column> */}
 
-              <Grid.Column
-                mobile={16}
-                tablet={16}
-                largeScreen={16}
-                widescreen={16}
+            <Grid.Column
+              mobile={16}
+              tablet={16}
+              largeScreen={16}
+              widescreen={16}
+            >
+              <SplitPane
+                className="ThreePlotsDiv SplitPanesWrapper"
+                split="horizontal"
+                defaultSize={this.state.horizontalSplitPaneSize}
+                minSize={150}
+                maxSize={400}
+                onChange={size => this.splitPaneResized(size, 'horizontal')}
               >
+                {BarcodePlot}
+                {/* <BarcodePlotReusable
+                  data={this.props.barcodeSettings.barcodeData}
+                /> */}
                 <SplitPane
-                  className="ThreePlotsDiv SplitPanesWrapper"
-                  split="horizontal"
-                  defaultSize={this.state.horizontalSplitPaneSize}
-                  minSize={150}
-                  maxSize={400}
-                  onChange={size => this.splitPaneResized(size, 'horizontal')}
+                  className="BottomSplitPaneContainer"
+                  split="vertical"
+                  defaultSize={this.state.verticalSplitPaneSize}
+                  minSize={315}
+                  maxSize={1000}
+                  onChange={size => this.splitPaneResized(size, 'vertical')}
                 >
-                  {BarcodePlot}
-                  {/* <BarcodePlotReusable
-                    data={this.props.barcodeSettings.barcodeData}
-                  /> */}
-                  <SplitPane
-                    className="BottomSplitPaneContainer"
-                    split="vertical"
-                    defaultSize={this.state.verticalSplitPaneSize}
-                    minSize={315}
-                    maxSize={1000}
-                    onChange={size => this.splitPaneResized(size, 'vertical')}
-                  >
-                    <div id="ViolinAndTableSplitContainer">
-                      {ViolinAndTable}
-                    </div>
-                    <div id="SVGSplitContainer">{SVGPlot}</div>
-                  </SplitPane>
-                </SplitPane>
-              </Grid.Column>
-            </Grid.Row>
-          </Grid>
-        </div>
-      );
-    } else {
-      return (
-        <div className="PlotsWrapper">
-          <Grid className="">
-            <Grid.Row className="ActionsRow">
-              <Grid.Column
-                mobile={16}
-                tablet={16}
-                largeScreen={16}
-                widescreen={16}
-              >
-                <EnrichmentBreadcrumbs {...this.props} />
-              </Grid.Column>
-              {/* <Grid.Column mobile={8} tablet={8} largeScreen={8} widescreen={8}>
-                <ButtonActions {...this.props} {...this.state} />
-              </Grid.Column> */}
-              <Grid.Column
-                mobile={16}
-                tablet={16}
-                largeScreen={16}
-                widescreen={16}
-              >
-                <SplitPane
-                  className="TwoPlotsDiv SplitPanesWrapper"
-                  split="horizontal"
-                  defaultSize={this.state.horizontalSplitPaneSize}
-                  minSize={150}
-                  maxSize={400}
-                  onChange={size => this.splitPaneResized(size, 'horizontal')}
-                >
-                  {BarcodePlot}
-                  {/* <BarcodePlotReusable
-                    data={this.props.barcodeSettings.barcodeData}
-                  /> */}
+                  <div id="ViolinAndTableSplitContainer">{ViolinAndTable}</div>
                   <div id="SVGSplitContainer">{SVGPlot}</div>
                 </SplitPane>
-              </Grid.Column>
-            </Grid.Row>
-          </Grid>
-        </div>
-      );
-    }
+              </SplitPane>
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>
+      </div>
+    );
   }
 }
 
