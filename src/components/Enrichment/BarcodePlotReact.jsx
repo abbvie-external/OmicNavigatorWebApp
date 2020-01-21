@@ -401,7 +401,6 @@ class BarcodePlotReact extends React.Component {
     const barcodeLines = barcodeData.map(d => (
       <line
         id={`barcode-line-${d.lineID.replace(/\;/g, '')}_${d.id_mult}`}
-        // id={`barcode-line-${d.lineID}-${d.id_mult}`}
         className="barcode-line"
         key={`${d.lineID}_${d.id_mult}`}
         x1={xScale(d.statistic) + settings.margin.left}
@@ -413,8 +412,8 @@ class BarcodePlotReact extends React.Component {
         logfc={d.logFC}
         statistic={d.statistic}
         // stroke={settings.mainStrokeColor}
-        strokeWidth={2}
-        opacity={0.5}
+        // strokeWidth={2}
+        // opacity={0.5}
         onClick={this.handleLineClick}
         onMouseEnter={e => this.handleLineEnter(e)}
         onMouseLeave={this.handleLineLeave}
