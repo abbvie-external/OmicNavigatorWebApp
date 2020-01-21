@@ -604,7 +604,6 @@ function mapColumnsConfig(columns = []) {
 
 function firstValue(value) {
   if (value) {
-    const firstValue = value.split(';')[0];
-    return firstValue;
+    return value.split(';')[0];
   }
 }

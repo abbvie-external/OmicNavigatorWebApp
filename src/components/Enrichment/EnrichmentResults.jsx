@@ -473,7 +473,7 @@ class EnrichmentResults extends Component {
     const { enrichmentStudy, enrichmentModel } = this.props;
     // let self = this;
     // if (this.state.barcodeSettings.barcodeData > 0) {
-    if (info !== undefined) {
+    if (info !== undefined && info !== null) {
       if (this.state.barcodeSettings.barcodeData) {
         if (this.state.barcodeSettings.barcodeData.length > 0) {
           this.setState({
@@ -530,9 +530,18 @@ class EnrichmentResults extends Component {
           imageInfo.key = this.state.imageInfo.key;
           const handleSVGCb = this.handleSVG;
           this.getPlot(id, plotType, enrichmentStudy, imageInfo, handleSVGCb);
-          // }
         }
       }
+    } else {
+      debugger;
+      this.setState({
+        SVGPlotLoaded: false,
+        SVGPlotLoading: false
+        // imageInfo: {
+        //   ...this.state.imageInfo,
+        //   svg: []
+        // },
+      });
     }
   };
 

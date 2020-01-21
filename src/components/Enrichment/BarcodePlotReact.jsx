@@ -50,6 +50,7 @@ class BarcodePlotReact extends React.Component {
         mainStrokeColor: '#2c3b78',
         alternativeStrokeColor: '#ff4400'
       },
+      width: 0,
       containerWidth: 0,
       xAxis: null,
       xScale: null
@@ -85,9 +86,14 @@ class BarcodePlotReact extends React.Component {
   };
 
   setWidth = () => {
-    const width = this.getWidth();
+    const cWidth = this.getWidth();
+    const width =
+      cWidth -
+      this.state.settings.margin.left -
+      this.state.settings.margin.right;
     this.setState({
-      containerWidth: width
+      containerWidth: cWidth,
+      width: width
     });
   };
 
@@ -107,12 +113,13 @@ class BarcodePlotReact extends React.Component {
     } else return 1200;
   }
 
-  handleSVGClick = () => {
+  handleSVGClick = event => {
     this.unhighlightBrushedLines();
     // this.barcodeSVGRef.select(".brush").call(this.brushRef.move, null)
     this.props.onHandleBarcodeChanges({
       brushedData: []
     });
+    this.props.onHandleMaxLinePlot(null);
     this.setState({
       settings: {
         ...this.state.settings,
@@ -132,60 +139,35 @@ class BarcodePlotReact extends React.Component {
     this.props.onHandleBarcodeChanges({
       brushedData: []
     });
+    this.props.onHandleMaxLinePlot(null);
   };
 
   handleLineEnter = event => {
     if (this.state.settings.brushing === false) {
-      const lineMultId = event.target.attributes[6].nodeValue;
+      const lineIdMult = event.target.attributes[6].nodeValue;
       const lineDataId = event.target.attributes[7].nodeValue;
       const statistic = event.target.attributes[9].nodeValue;
+      debugger;
       const textAnchor =
-        statistic > this.state.containerWidth / 250 ? 'end' : 'start';
+        statistic > this.props.barcodeSettings.highStat / 2 ? 'end' : 'start';
       const ttPosition =
         textAnchor === 'end'
           ? event.target.attributes[2].nodeValue - 5
           : event.target.attributes[2].nodeValue + 5;
-      const hoveredId = `#barcode-line-${lineDataId}_${lineMultId}`;
+      const hoveredId = `#barcode-line-${lineDataId.replace(
+        /\;/g,
+        ''
+      )}_${lineIdMult}`;
       const hoveredLine = d3.select(hoveredId);
       hoveredLine
         .classed('HoveredLine', true)
         .attr('y1', this.state.settings.margin.hovered);
       this.setState({
-        // highlightedLine: null,
         hoveredLineId: hoveredId,
         hoveredLineName: lineDataId,
         tooltipPosition: ttPosition,
         tooltipTextAnchor: textAnchor
       });
-
-      //   d3.select(this)
-      //     .attr("y1", -40)
-      //     .style("stroke-width", 3)
-      //     .style("opacity", 1);
-
-      //   if (xScale(d.statistic) > width / 2) {
-      //     tooltip.attr("text-anchor", "end");
-      //   } else {
-      //     tooltip.attr("text-anchor", "start");
-      //   }
-
-      //   tooltip
-      //     .style("opacity", 1)
-      //     .text(function() {
-      //       return d.lineID;
-      //     })
-      //     .style("fill", function() {
-      //       return settings.mainStrokeColor;
-      //     })
-      //     .attr("y", -22)
-      //     .attr("x", function() {
-      //       if (xScale(d.statistic) > width / 2) {
-      //         return toolTipPosition - 5;
-      //       } else {
-      //         return toolTipPosition + 5;
-      //       }
-      //     });
-      // }
     }
   };
 
@@ -196,7 +178,6 @@ class BarcodePlotReact extends React.Component {
         .classed('HoveredLine', false)
         .attr('y1', this.state.settings.margin.top);
       this.setState({
-        // highlightedLine: null,
         hoveredLineId: null,
         hoveredLineName: null
       });
@@ -274,6 +255,7 @@ class BarcodePlotReact extends React.Component {
           .classed('selected', true);
 
         const brushedArr = brushed._groups[0];
+        // const brushedDataVar = brushed.data();
         const brushedDataVar = brushedArr.map(a => {
           return {
             x2: a.attributes[2].nodeValue,
@@ -283,7 +265,6 @@ class BarcodePlotReact extends React.Component {
             statistic: a.attributes[9].nodeValue
           };
         });
-        // const brushedDataVar = brushed.data();
         self.props.onHandleBarcodeChanges({
           brushedData: brushedDataVar
         });
@@ -297,7 +278,10 @@ class BarcodePlotReact extends React.Component {
           maxLine.classed('MaxLine', true).attr('y1', settings.margin.max);
 
           const statistic = maxLineObject.statisic;
-          const textAnchor = statistic > self.state.width / 2 ? 'end' : 'start';
+          const textAnchor =
+            statistic > self.props.barcodeSettings.highStat / 2
+              ? 'end'
+              : 'start';
           const ttPosition =
             textAnchor === 'end' ? maxLineObject.x2 - 5 : maxLineObject.x2 + 5;
 
@@ -313,6 +297,7 @@ class BarcodePlotReact extends React.Component {
     };
 
     const endBrush = function() {
+      debugger;
       const maxLineData = self.getMaxObject(
         self.props.barcodeSettings.brushedData
       );
@@ -366,6 +351,7 @@ class BarcodePlotReact extends React.Component {
   render() {
     const {
       settings,
+      width,
       containerWidth,
       hoveredLineId,
       hoveredLineName,
@@ -377,7 +363,6 @@ class BarcodePlotReact extends React.Component {
       violinDotSelected
     } = this.props;
     const barcodeData = barcodeSettings.barcodeData || [];
-    const width = containerWidth - settings.margin.left - settings.margin.right;
     const height =
       horizontalSplitPaneSize - settings.margin.top - settings.margin.bottom;
 
@@ -431,8 +416,6 @@ class BarcodePlotReact extends React.Component {
         strokeWidth={2}
         opacity={0.5}
         onClick={this.handleLineClick}
-        // onMouseEnter={this.handleLineEnter}
-        // onMouseLeave={this.handleLineLeave}
         onMouseEnter={e => this.handleLineEnter(e)}
         onMouseLeave={this.handleLineLeave}
         cursor="crosshair"
@@ -469,7 +452,7 @@ class BarcodePlotReact extends React.Component {
           width={containerWidth}
           viewBox={`0 0 ${containerWidth} ${horizontalSplitPaneSize}`}
           preserveAspectRatio="xMinYMin meet"
-          onClick={this.handleSVGClick}
+          onClick={e => this.handleSVGClick(e)}
           // cursor="crosshair"
           // {...props}
         >
