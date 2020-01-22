@@ -19,10 +19,10 @@ class SplitPanesContainer extends Component {
     this.state = {
       activeSVGTabIndex: 0,
       proteinForDiffView: '',
-      horizontalSplitPaneSize:
-        parseInt(localStorage.getItem('horizontalSplitPaneSize'), 10) || 250,
-      verticalSplitPaneSize:
-        parseInt(localStorage.getItem('verticalSplitPaneSize'), 10) || 525,
+      horizontalSplitPaneHeight:
+        parseInt(localStorage.getItem('horizontalSplitPaneHeight'), 10) || 250,
+      verticalSplitPaneWidth:
+        parseInt(localStorage.getItem('verticalSplitPaneWidth'), 10) || 525,
       activeViolinTableIndex: 0,
       violinDotSelected: null
     };
@@ -210,11 +210,11 @@ class SplitPanesContainer extends Component {
   splitPaneResized(size, paneType) {
     if (paneType === 'horizontal') {
       this.setState({
-        horizontalSplitPaneSize: size
+        horizontalSplitPaneHeight: size
       });
     } else {
       this.setState({
-        verticalSplitPaneSize: size
+        verticalSplitPaneWidth: size
       });
     }
     localStorage.setItem(`${paneType}SplitPaneSize`, size);
@@ -255,7 +255,7 @@ class SplitPanesContainer extends Component {
               <SplitPane
                 className="ThreePlotsDiv SplitPanesWrapper"
                 split="horizontal"
-                defaultSize={this.state.horizontalSplitPaneSize}
+                defaultSize={this.state.horizontalSplitPaneHeight}
                 minSize={150}
                 maxSize={400}
                 onChange={size => this.splitPaneResized(size, 'horizontal')}
@@ -267,7 +267,7 @@ class SplitPanesContainer extends Component {
                 <SplitPane
                   className="BottomSplitPaneContainer"
                   split="vertical"
-                  defaultSize={this.state.verticalSplitPaneSize}
+                  defaultSize={this.state.verticalSplitPaneWidth}
                   minSize={315}
                   maxSize={800}
                   onChange={size => this.splitPaneResized(size, 'vertical')}
