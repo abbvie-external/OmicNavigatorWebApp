@@ -275,7 +275,7 @@ class FilteredPepplotTable extends Component {
 
   getTableHelpers = proteinForDiffView => {
     let addParams = {};
-    if (proteinForDiffView !== undefined) {
+    if (proteinForDiffView !== undefined && proteinForDiffView !== null) {
       if (proteinForDiffView.lineID !== undefined) {
         addParams.rowToHighlight = proteinForDiffView.lineID;
       }

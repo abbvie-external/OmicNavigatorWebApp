@@ -34,8 +34,6 @@ class ViolinPlot extends Component {
         },
         constrainExtremes: false,
         color: d3.scaleOrdinal(d3.schemeCategory10),
-        // chartSize: { height: '700', width: '960' },
-        // data: this.props.barcodeSettings.barcodeData || null,
         id: 'chart-violin',
         // id: 'violin-graph-1',
         margin: { top: 50, right: 40, bottom: 40, left: 50 },
@@ -61,7 +59,7 @@ class ViolinPlot extends Component {
         yTicks: 1
       }
     };
-    this.violinWrapperRef = React.createRef();
+    this.violinContainerRef = React.createRef();
     this.violinSVGRef = React.createRef();
   }
 
@@ -76,23 +74,6 @@ class ViolinPlot extends Component {
     });
   }
 
-  windowResized = () => {
-    this.setHeight();
-  };
-
-  setHeight = () => {
-    debugger;
-    const cHeight = this.getHeight();
-    const height =
-      cHeight -
-      this.state.settings.margin.top -
-      this.state.settings.margin.bottom;
-    this.setState({
-      violinContainerHeight: cHeight,
-      violinHeight: height
-    });
-  };
-
   componentDidUpdate(prevProps, prevState, snapshot) {
     if (
       // this.props.violinData !== prevProps.violinData ||
@@ -102,10 +83,25 @@ class ViolinPlot extends Component {
     }
   }
 
+  windowResized = () => {
+    this.setHeight();
+  };
+
+  setHeight = () => {
+    const containerHeight = this.getHeight();
+    const height =
+      containerHeight -
+      this.state.settings.margin.top -
+      this.state.settings.margin.bottom;
+    this.setState({
+      violinContainerHeight: containerHeight,
+      violinHeight: height
+    });
+  };
+
   getHeight = () => {
-    debugger;
-    if (this.violinWrapperRef.current !== null) {
-      return this.violinWrapperRef.current.parentElement.offsetHeight;
+    if (this.violinContainerRef.current !== null) {
+      return this.violinContainerRef.current.parentElement.offsetHeight;
     } else return 600;
   };
 
@@ -149,7 +145,7 @@ class ViolinPlot extends Component {
         <div
           id={settings.id}
           className="violin-chart-wrapper"
-          ref={this.violinWrapperRef}
+          ref={this.violinContainerRef}
         ></div>
         <svg
           ref={this.violinSVGRef}
