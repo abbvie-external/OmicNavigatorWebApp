@@ -18,9 +18,17 @@ body {
 }
 
 .Toastify__toast--success {
-  background: linear-gradient(90deg, #1678c2 0%, #1f9eff 100.05%);
+  background: linear-gradient(
+    90deg,
+    var(--color-primary) 0%,
+    var(--color-primary-gradient) 100.05%
+  );
 }
 
 .Toastify__toast--error {
-  background: linear-gradient(90deg, #ff4400 -2.66%, rgb(255, 126, 56) 99.83%);
+  background: linear-gradient(
+    90deg,
+    var(--color-primary) -2.66%,
+    var(--color-primary-gradient) 99.83%
+  );
 }

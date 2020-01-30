@@ -1,6 +1,18 @@
+:root {
+  --color-primary: #ff4400;
+  --color-primary-gradient: #ff7e38;
+  --color-secondary: #2c3b78;
+  --color-secondary-gradient: #465fc5;
+  --color-tertiary: #4cd2d5;
+  --color-link: #1678c2;
+  --color-white: #fff;
+  --color-light: #e0e1e2;
+  --color-dark: #2e2e2e;
+}
+
 .AppContainer {
   height: 100vh !important;
-  
+
   @media (max-width: 1199px) {
     .deviceMargin {
       margin: 20px 15px 30px 15px !important;
@@ -17,7 +29,7 @@
     height: 100vh !important;
     margin-top: 0px !important;
     padding-left: 20px !important;
-  
+
     .LoaderContainer {
       padding-top: 120px;
     }
@@ -48,7 +60,7 @@
   }
 
   .QHGrid table tr th:first-child {
-    background-color: #FFF !important;
+    background-color: #fff !important;
     padding-right: 0px !important;
     padding-left: 0px !important;
   }
@@ -67,11 +79,12 @@
   }
 
   i.orange.icon {
-    color: #ff4400 !important;
+    color: var(--color-primary) !important;
   }
-  i.inverted.bordered.orange.icon, i.inverted.circular.orange.icon {
+  i.inverted.bordered.orange.icon,
+  i.inverted.circular.orange.icon {
     color: #fff !important;
-    background-color: #ff4400 !important;
+    background-color: var(--color-primary) !important;
   }
   .test {
     color: white !important;
@@ -81,5 +94,4 @@
     background: #f14000 !important;
     color: white !important;
   }
-
 }

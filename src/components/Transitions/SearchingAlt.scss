@@ -15,7 +15,7 @@ body {
  }
  #top {
    animation: top 5s linear infinite;
-   border-top: 80px solid #ff4400;
+   border-top: 80px solid var(--color-primary);
    border-right: 80px solid transparent;
    border-left: 80px solid transparent;
    height: 0px;
@@ -29,7 +29,7 @@ body {
  #bottom {
    animation: bottom 5s linear infinite;
    border-right: 80px solid transparent;
-   border-bottom: 80px solid #ff4400;
+   border-bottom: 80px solid var(--color-primary);
    border-left: 80px solid transparent;
    height: 0px;
    width: 4px;
@@ -43,7 +43,7 @@ body {
  }
  #line {
    animation: line 5s linear infinite;
-   border-left: 6px dotted #ff4400;
+   border-left: 6px dotted var(--color-primary);
    height: 0px;
    width: 0px;
    position: absolute;

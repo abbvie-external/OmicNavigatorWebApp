@@ -53,7 +53,7 @@ $loader-still-dot-positions: (
         content: "";
         display: inline-block;
         width: $loader-still-dot-width; height: $loader-still-dot-width;
-        background-color: #ff4400;
+        background-color: var(--color-primary);
         border-radius: 50%;
         position: absolute;
         transform: scale(0.17);

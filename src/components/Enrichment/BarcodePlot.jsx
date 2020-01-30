@@ -337,7 +337,7 @@ class BarcodePlot extends React.Component {
             d3.selectAll('line.barcode-line').style('stroke', '#2c3b78');
             d3.select('#' + 'barcode-line-' + id)
               .transition()
-              .style('stroke', '#ff4400')
+              .style('stroke', 'var(--color-primary)')
               .attr('y1', -55);
           }
         }
@@ -443,7 +443,7 @@ class BarcodePlot extends React.Component {
   // 	d3.select("#" + id)
   // 		.transition()
   // 		.duration(300)
-  // 		.style("stroke", "#ff4400")
+  // 		.style("stroke", "var(--color-primary)")
   // 		.attr("y1", -55);
 
   // 	this.maxTick = {};

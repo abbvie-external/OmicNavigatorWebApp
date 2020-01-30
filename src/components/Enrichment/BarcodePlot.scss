@@ -1,27 +1,27 @@
 .barcode-line {
-    stroke: #838383;
-    stroke-width: 2px;
-    opacity: 0.5;
+  stroke: #838383;
+  stroke-width: 2px;
+  opacity: 0.5;
 }
 
 .barcode-line.HoveredLine {
-    stroke: #00aeff;
-    stroke-width: 3px;
-    opacity: 1;
+  stroke: #00aeff;
+  stroke-width: 3px;
+  opacity: 1;
 }
 
 .barcode-line.selected {
-    stroke: #2c3b78;
-    stroke-width: 3px;
-    opacity: 1;
+  stroke: #2c3b78;
+  stroke-width: 3px;
+  opacity: 1;
 }
 
 .barcode-line.MaxLine {
-    stroke: #ff4400;
-    stroke-width: 3px;
-    opacity: 1;
+  stroke: var(--color-primary);
+  stroke-width: 3px;
+  opacity: 1;
 }
 
 .barcode {
-    cursor: crosshair !important;
+  cursor: crosshair !important;
 }

@@ -2,7 +2,7 @@
     padding-top: 26px !important;
     
     .NetworkGraphFilters .ui.toggle.checkbox input:checked~.box:before, .ui.toggle.checkbox input:checked~label:before {
-        background-color: #ff4400 !important;
+        background-color: var(--color-primary) !important;
     }
 
     .NetworkChartWrapper {

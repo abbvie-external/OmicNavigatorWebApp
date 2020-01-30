@@ -63,7 +63,7 @@ class EnrichmentNetworkGraph extends Component {
   render() {
     const IconPopupStyle = {
       backgroundColor: '2E2E2E',
-      borderBottom: '2px solid #FF4400',
+      borderBottom: '2px solid var(--color-primary)',
       color: '#FFF',
       padding: '1em',
       maxWidth: '50vw',

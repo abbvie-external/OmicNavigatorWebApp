@@ -8,9 +8,9 @@
   margin-left: -100px;
   top: 45%;
   left: 50%;
-  background: linear-gradient(#bd2300, transparent),
-    linear-gradient(90deg, #ff4400, transparent),
-    linear-gradient(-90deg, #2e2e2e, transparent);
+  background: linear-gradient(var(--color-primary-gradient), transparent),
+    linear-gradient(90deg, var(--color-primary), transparent),
+    linear-gradient(-90deg, var(--color-dark), transparent);
   background-blend-mode: screen;
   box-shadow: 0 0 50px 0 black;
   -webkit-clip-path: circle(50%, 50%, 10%);

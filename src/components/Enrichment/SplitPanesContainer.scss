@@ -27,8 +27,8 @@
 }
 
 .Resizer.horizontal:hover {
-    border-top: 8px solid #FF4400;
-    border-bottom: 8px solid #FF4400;
+    border-top: 8px solid var(--color-primary);
+    border-bottom: 8px solid var(--color-primary);
 }
 
 .Resizer.vertical {
@@ -41,8 +41,8 @@
 }
 
 .Resizer.vertical:hover {
-    border-left: 8px solid #FF4400;
-    border-right: 8px solid  #FF4400;
+    border-left: 8px solid var(--color-primary);
+    border-right: 8px solid  var(--color-primary);
 }
 .Resizer.disabled {
   cursor: not-allowed;

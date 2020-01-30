@@ -330,7 +330,7 @@ class PepplotMultisetFilters extends Component {
 
     //Colors
     // let chosenColorCodeP = '#00FF40';
-    let chosenColorCodeP = '#ff4400';
+    let chosenColorCodeP = 'var(--color-primary)';
     let baseColorCodeP = '#585858';
     let backgroundColorCodeP = '#E6E6E6';
     //Adding settings colors

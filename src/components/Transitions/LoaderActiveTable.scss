@@ -53,7 +53,7 @@ $loader-active-table-dot-positions: (
         content: "";
         display: inline-block;
         width: $loader-active-table-dot-width; height: $loader-active-table-dot-width;
-        background-color: #ff4400;
+        background-color: var(--color-primary);
         border-radius: 50%;
         position: absolute;
         transform: scale(0.17);

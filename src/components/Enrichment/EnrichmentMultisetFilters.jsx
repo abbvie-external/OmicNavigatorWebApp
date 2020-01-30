@@ -321,7 +321,7 @@ class EnrichmentMultisetFilters extends Component {
 
     //Colors
     // let chosenColorCode = '#00FF40';
-    let chosenColorCode = '#ff4400';
+    let chosenColorCode = 'var(--color-primary)';
     let baseColorCode = '#585858';
     let backgroundColorCode = '#E6E6E6';
     //Adding settings colors

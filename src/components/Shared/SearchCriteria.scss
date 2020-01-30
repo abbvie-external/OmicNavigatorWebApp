@@ -1,102 +1,101 @@
 .SidebarContainer {
-    // background-color: #F6F6F6;
-    background-color: #e0e1e2;
-    overflow: auto !important;
-    height: auto !important;
+  // background-color: #F6F6F6;
+  background-color: #e0e1e2;
+  overflow: auto !important;
+  height: auto !important;
 
-    @media (max-width: 677px) {
-      padding-right: 10px !important;
-    }
-
-    .SearchCriteriaContainer {
-      padding: 20px 20px 5px 20px !important;
-    }  
-    
-    .FilterStudyContainer {
-      padding-top: 15px;
-      padding-bottom: 15px !important;
-      margin-bottom: 15px !important;
-    }
-    
-    .FloatRight {
-      float: right !important;
-      cursor: pointer !important;
-    }
-
-    .FloatLeft {
-      float: left !important;
-    }
-
-    .StudyHtmlIconDivE {
-      cursor: pointer;
-      position: absolute;
-      right: 5%;
-      top: 13%;
-    }
-
-    .StudyHtmlIconDivP {
-      cursor: pointer;
-      position: absolute;
-      right: 5%;
-      top: 16%;
-    }
-
-    .StudyHtmlIcon {
-      box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.94) !important;
-    }
-
-    i.inverted.circular.icon {
-      background-color: #1b1c1d !important;
-      // background-color: #FF4400 !important;
-    }
-
-    .PValueTypeContainer {
-      padding-top: 10px !important;
-      padding-left: 20px;
-    }
-
-    .greyText {
-      opacity: .15 !important;
-      font-weight: bold;
-      font-size: 13px;
-    }
-
-    .normalText {
-      font-weight: bold;
-      font-size: 13px;
-    }
-
-    .ui.positive.button {
-      background-color: #ff4400 !important;
-    }
-
-    // .pValueButton {
-    //   // padding-top: 0.2rem !important;
-    //   // padding: .2em 1em .2em !important;
-    //   // font-size: 1rem !important;
-    // }
-    
-    .MultisetContainer {
-      padding: 0px 20px 0px 20px !important;
-    }
-
-    .MultisetFiltersDiv {
-      padding: 10px 0px !important;
-      margin: 0px;
-    }
-
-    .SliderDiv {
-      .ui.toggle.checkbox input:checked~.box:before, .ui.toggle.checkbox input:checked~label:before {
-        background-color: #ff4400 !important;
-      }
-    }
-
-    .PlotRadio {
-      float: right;
-    }
-
-    .ViewPlotRadio label {
-      color: #ff4400 !important;
-    }
-
+  @media (max-width: 677px) {
+    padding-right: 10px !important;
   }
+
+  .SearchCriteriaContainer {
+    padding: 20px 20px 5px 20px !important;
+  }
+
+  .FilterStudyContainer {
+    padding-top: 15px;
+    padding-bottom: 15px !important;
+    margin-bottom: 15px !important;
+  }
+
+  .FloatRight {
+    float: right !important;
+    cursor: pointer !important;
+  }
+
+  .FloatLeft {
+    float: left !important;
+  }
+
+  .StudyHtmlIconDivE {
+    cursor: pointer;
+    position: absolute;
+    right: 5%;
+    top: 13%;
+  }
+
+  .StudyHtmlIconDivP {
+    cursor: pointer;
+    position: absolute;
+    right: 5%;
+    top: 16%;
+  }
+
+  .StudyHtmlIcon {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.94) !important;
+  }
+
+  i.inverted.circular.icon {
+    background-color: var(--color-dark) !important;
+  }
+
+  .PValueTypeContainer {
+    padding-top: 10px !important;
+    padding-left: 20px;
+  }
+
+  .greyText {
+    opacity: 0.15 !important;
+    font-weight: bold;
+    font-size: 13px;
+  }
+
+  .normalText {
+    font-weight: bold;
+    font-size: 13px;
+  }
+
+  .ui.positive.button {
+    background-color: var(--color-primary) !important;
+  }
+
+  // .pValueButton {
+  //   // padding-top: 0.2rem !important;
+  //   // padding: .2em 1em .2em !important;
+  //   // font-size: 1rem !important;
+  // }
+
+  .MultisetContainer {
+    padding: 0px 20px 0px 20px !important;
+  }
+
+  .MultisetFiltersDiv {
+    padding: 10px 0px !important;
+    margin: 0px;
+  }
+
+  .SliderDiv {
+    .ui.toggle.checkbox input:checked ~ .box:before,
+    .ui.toggle.checkbox input:checked ~ label:before {
+      background-color: var(--color-primary) !important;
+    }
+  }
+
+  .PlotRadio {
+    float: right;
+  }
+
+  .ViewPlotRadio label {
+    color: var(--color-primary) !important;
+  }
+}

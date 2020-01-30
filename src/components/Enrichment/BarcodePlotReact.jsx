@@ -48,6 +48,15 @@ class BarcodePlotReact extends React.Component {
     });
   }
 
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (
+      this.props.horizontalSplitPaneHeight !==
+      prevProps.horizontalSplitPaneHeight
+    ) {
+      this.setWidth();
+    }
+  }
+
   windowResized = () => {
     this.setState({
       highlightedLineName: null,
@@ -76,15 +85,6 @@ class BarcodePlotReact extends React.Component {
     if (this.barcodeContainerRef.current !== null) {
       return this.barcodeContainerRef.current.parentElement.offsetWidth;
     } else return 1200;
-  }
-
-  componentDidUpdate(prevProps, prevState, snapshot) {
-    if (
-      this.props.horizontalSplitPaneHeight !==
-      prevProps.horizontalSplitPaneHeight
-    ) {
-      this.setWidth();
-    }
   }
 
   handleSVGClick = event => {
