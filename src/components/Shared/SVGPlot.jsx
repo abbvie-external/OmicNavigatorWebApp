@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import { Loader, Dimmer, Tab, Popup, Icon } from 'semantic-ui-react';
 import './SVGPlot.scss';
 
@@ -29,7 +29,7 @@ class SVGPlot extends Component {
     this.props.onSVGTabChange(activeIndex);
   };
 
-  handleDiffTable = (evt, {}) => {
+  handleDiffTable = evt => {
     const key = this.props.imageInfo.key.split(':');
     const name = key[0] || '';
     const diffProtein = this.props.proteinForDiffView.lineID;
@@ -37,15 +37,15 @@ class SVGPlot extends Component {
   };
 
   getSVGPanes(activeSVGTabIndex) {
-    const BreadcrumbPopupStyle = {
-      backgroundColor: '2E2E2E',
-      borderBottom: '2px solid var(--color-primary)',
-      color: '#FFF',
-      padding: '1em',
-      maxWidth: '50vw',
-      fontSize: '13px',
-      wordBreak: 'break-all'
-    };
+    // const BreadcrumbPopupStyle = {
+    //   backgroundColor: "2E2E2E",
+    //   borderBottom: "2px solid var(--color-primary)",
+    //   color: "#FFF",
+    //   padding: "1em",
+    //   maxWidth: "50vw",
+    //   fontSize: "13px",
+    //   wordBreak: "break-all"
+    // };
     if (this.props.imageInfo) {
       const svgArray = this.props.imageInfo.svg;
       const panes = svgArray.map(s => {

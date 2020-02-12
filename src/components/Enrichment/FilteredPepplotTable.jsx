@@ -83,7 +83,7 @@ class FilteredPepplotTable extends Component {
             // const filteredData = _.intersectionWith(datafFromService, allTickIds, _.isEqual);
             // const diffProtein = this.props.proteinForDiffView.lineID;
             // this.props.onViewDiffTable(name, diffProtein);
-            const cols = this.setConfigCols(filteredData);
+            this.setConfigCols(filteredData);
             // return cols;
           }
         });
@@ -309,7 +309,7 @@ class FilteredPepplotTable extends Component {
       filteredTableData,
       itemsPerPageInformedEnrichment
     } = this.state;
-    const quickViews = [];
+    // const quickViews = [];
     const additionalTemplateInfo = this.getTableHelpers(proteinForDiffView);
 
     return (

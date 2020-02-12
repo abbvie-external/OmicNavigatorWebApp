@@ -100,7 +100,6 @@ class PepplotResults extends Component {
         return p.Protein_Site === proteinToHighlight;
       });
       const pageNumber = Math.ceil(Index / itemsPerPage);
-      console.log(`Go to page ${pageNumber}`);
       this.pepplotGridRef.current.handlePageChange(
         {},
         { activePage: pageNumber }
@@ -437,7 +436,7 @@ class PepplotResults extends Component {
     ) {
       pepplotCacheKey = `${pepplotStudy}-${pepplotModel}-${pepplotTest}-${proteinToHighlightInDiffTable}`;
     }
-    const quickViews = [];
+    // const quickViews = [];
     const additionalTemplateInfo = this.getTableHelpers(
       this.getProteinData,
       this.getPlot,

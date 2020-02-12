@@ -122,9 +122,9 @@ class EnrichmentResults extends Component {
   ) => {
     let self = this;
     testSelectedTransitionCb(true);
-    const TestSiteVar = `${test}:${dataItem.Description}`;
-    let xLargest = 0;
-    let imageInfo = { key: '', title: '', svg: [] };
+    // const TestSiteVar = `${test}:${dataItem.Description}`;
+    // let xLargest = 0;
+    // let imageInfo = { key: '', title: '', svg: [] };
     phosphoprotService
       .getDatabaseInfo(enrichmentStudy + 'plots', enrichmentAnnotation)
       .then(annotationDataResponse => {
@@ -207,10 +207,10 @@ class EnrichmentResults extends Component {
           },
           false
         );
-        let xLargest = 0;
-        let imageInfo = { key: '', title: '', svg: [] };
+        // let xLargest = 0;
+        // let imageInfo = { key: '', title: '', svg: [] };
 
-        if (self.state.annotationData.length == 0) {
+        if (self.state.annotationData.length === 0) {
           phosphoprotService
             .getDatabaseInfo(enrichmentStudy + 'plots', enrichmentAnnotation)
             .then(annotationDataResponse => {
@@ -302,7 +302,7 @@ class EnrichmentResults extends Component {
     addParams.getLink = (enrichmentStudy, enrichmentAnnotation, dataItem) => {
       let self = this;
       return function() {
-        if (self.state.annotationData.length == 0) {
+        if (self.state.annotationData.length === 0) {
           phosphoprotService
             .getDatabaseInfo(enrichmentStudy + 'plots', enrichmentAnnotation)
             .then(annotationDataResponse => {
@@ -487,13 +487,13 @@ class EnrichmentResults extends Component {
           // this.plotDataAvailable = true;
           let id = dataItem.id_mult ? dataItem.id_mult : dataItem.id;
 
-          let splitterHeight = document.getElementById('SVGSplitContainer')
-            .clientHeight;
-          let splitterWidth = document.getElementById('SVGSplitContainer')
-            .clientWidth;
+          // let splitterHeight = document.getElementById("SVGSplitContainer")
+          //   .clientHeight;
+          // let splitterWidth = document.getElementById("SVGSplitContainer")
+          //   .clientWidth;
 
-          var w = (splitterWidth - 50) * 0.86;
-          var h = (splitterHeight - 40) * 0.94;
+          // var w = (splitterWidth - 50) * 0.86;
+          // var h = (splitterHeight - 40) * 0.94;
 
           // var psp = document.getElementById('psp-icon');
           // psp.style.visibility = "hidden";

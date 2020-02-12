@@ -19,7 +19,6 @@ class BarcodePlot extends React.Component {
       // passed or default chart settings
       settings: {
         axes: null,
-        bottomLabel: null,
         brush: null,
         chartDiv: null,
         g: null,

@@ -1,4 +1,4 @@
-import React, { Component, Fragment, UseCallback } from 'react';
+import React, { Component, Fragment } from 'react';
 import { Form, Select, Input } from 'semantic-ui-react';
 import * as d3 from 'd3';
 import '../Shared/MultisetFilters.scss';
@@ -163,7 +163,8 @@ class PepplotMultisetFilters extends Component {
           .attr('fill', 'black');
       }
 
-      const mustTestCirclesP = metaSvgP
+      // const mustTestCirclesP =
+      metaSvgP
         .selectAll('dataObject')
         .data(mustDataP)
         .enter()
@@ -179,7 +180,8 @@ class PepplotMultisetFilters extends Component {
         })
         .attr('r', 4);
 
-      const mustTextP = metaSvgP
+      // const mustTextP =
+      metaSvgP
         .selectAll('svg.dataObject')
         .data(mustDataP)
         .enter()
@@ -216,7 +218,8 @@ class PepplotMultisetFilters extends Component {
           .attr('font-size', '15px')
           .attr('fill', 'black');
 
-        const notTestCirclesP = metaSvgP
+        // const notTestCirclesP =
+        metaSvgP
           .selectAll('dataObject')
           .data(notDataP)
           .enter()
@@ -244,7 +247,8 @@ class PepplotMultisetFilters extends Component {
           })
           .attr('r', 4);
 
-        const notTextP = metaSvgP
+        // const notTextP =
+        metaSvgP
           .selectAll('svg.dataObject')
           .data(notDataP)
           .enter()
@@ -346,7 +350,8 @@ class PepplotMultisetFilters extends Component {
       }
     }
 
-    const topBox = baseP.append('div').style('padding-bottom', '5px');
+    // const topBox =
+    baseP.append('div').style('padding-bottom', '5px');
 
     const svg = baseP
       .append('svg')
@@ -354,7 +359,8 @@ class PepplotMultisetFilters extends Component {
       .attr('height', svgHeightP)
       .style('padding-bottom', '5px');
 
-    const rect = svg
+    // const rect =
+    svg
       .append('path')
       .attr(
         'd',
@@ -464,7 +470,8 @@ class PepplotMultisetFilters extends Component {
         self.props.onUpdateQueryDataP({ mustP: mustDataP, notP: notDataP });
       });
 
-    const miniMaybeCircles = svg
+    // const miniMaybeCircles =
+    svg
       .selectAll('svg.dataObject')
       .data(datasetP)
       .enter()
@@ -522,7 +529,8 @@ class PepplotMultisetFilters extends Component {
         }
       });
 
-    const lineVert = svg
+    // const lineVert =
+    svg
       .append('line')
       .attr('x1', 4 * circlePadding + 6 * circleRadius)
       .attr('x2', 4 * circlePadding + 6 * circleRadius)
@@ -531,7 +539,8 @@ class PepplotMultisetFilters extends Component {
       .attr('stroke', 'black')
       .attr('stroke-width', 5);
 
-    const testElements = svg
+    // const testElements =
+    svg
       .selectAll('svg.dataObject')
       .data(datasetP)
       .enter()
@@ -619,7 +628,8 @@ class PepplotMultisetFilters extends Component {
       uSettingsP.numElementsP !== undefined &&
       uSettingsP.maxElementsP !== undefined
     ) {
-      const numElementsPLine = svg
+      // const numElementsPLine =
+      svg
         .append('line')
         .attr('class', 'numElements')
         .attr('x1', 4 * circlePadding + 6 * circleRadius)
@@ -654,7 +664,8 @@ class PepplotMultisetFilters extends Component {
         })
         .attr('y', topBoxHeightP - 6 * heightScalarP);
 
-      const numElementsPText = numElementsP
+      // const numElementsPText =
+      numElementsP
         .text(function(d) {
           const dText =
             uSettingsP.numElementsP !== uSettingsP.maxElementsP
@@ -735,14 +746,14 @@ class PepplotMultisetFilters extends Component {
 
   render() {
     const {
-      selectedColP,
+      // selectedColP,
       selectedOperatorP,
       sigValueP,
       uSettingsP
     } = this.props;
     const ColumnsP = uSettingsP.thresholdColsP;
     const OperatorsP = uSettingsP.thresholdOperatorP;
-    const SelColP = selectedColP.value;
+    // const SelColP = selectedColP.value;
     const SelOpP = selectedOperatorP.value;
     // for now, column is displayed as label "Adjusted P Value"
     const SelColOverride = `Adjusted P Value`;

@@ -602,8 +602,8 @@ function mapColumnsConfig(columns = []) {
   });
 }
 
-function firstValue(value) {
-  if (value) {
-    return value.split(';')[0];
-  }
-}
+// function firstValue(value) {
+//   if (value) {
+//     return value.split(';')[0];
+//   }
+// }

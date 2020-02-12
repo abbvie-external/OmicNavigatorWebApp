@@ -2,8 +2,8 @@ import React, { Component, Fragment } from 'react';
 // import PropTypes from 'prop-types';
 // import { Provider as BusProvider, useBus, useListener } from 'react-bus';
 import * as d3 from 'd3';
-import * as _ from 'lodash';
-import { select } from 'd3-selection';
+// import * as _ from "lodash";
+// import { select } from "d3-selection";
 import './ViolinPlot.scss';
 
 class ViolinPlot extends Component {
@@ -114,18 +114,18 @@ class ViolinPlot extends Component {
   render() {
     const {
       settings,
-      violinHeight,
-      violinContainerHeight,
-      violinContainerWidth,
-      violinPlots,
-      dataPlots,
-      boxPlots,
-      objs
+      violinHeight
+      // violinContainerHeight,
+      // violinContainerWidth,
+      // violinPlots,
+      // dataPlots,
+      // boxPlots,
+      // objs
     } = this.state;
     const {
-      verticalSplitPaneWidth,
-      violinData,
-      isViolinPlotLoaded
+      verticalSplitPaneWidth
+      // violinData,
+      // isViolinPlotLoaded
     } = this.props;
 
     const violinWidth =

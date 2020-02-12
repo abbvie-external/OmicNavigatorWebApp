@@ -1,5 +1,5 @@
-import jsPDF from 'jspdf';
-import canvg from 'canvg';
+// import jsPDF from 'jspdf';
+// import canvg from 'canvg';
 
 class PdfService {
   createPDF(svg) {

@@ -6,8 +6,8 @@ import Chart from './Chart/Chart';
 import Axis from './Chart/Axis';
 import {
   useChartDimensions,
-  accessorPropsType,
-  useUniqueId
+  accessorPropsType
+  // useUniqueId
 } from './Chart/utils';
 
 const BarcodePlotReusable = ({ data, xAccessor, label }) => {
@@ -40,14 +40,14 @@ const BarcodePlotReusable = ({ data, xAccessor, label }) => {
     .range([dimensions.boundedHeight, 0])
     .nice();
 
-  const barPadding = 2;
+  // const barPadding = 2;
 
-  const xAccessorScaled = d => xScale(d.x0) + barPadding;
-  const yAccessorScaled = d => yScale(yAccessor(d));
-  const widthAccessorScaled = d => xScale(d.x1) - xScale(d.x0) - barPadding;
-  const heightAccessorScaled = d =>
-    dimensions.boundedHeight - yScale(yAccessor(d));
-  const keyAccessor = (d, i) => i;
+  // const xAccessorScaled = d => xScale(d.x0) + barPadding;
+  // const yAccessorScaled = d => yScale(yAccessor(d));
+  // const widthAccessorScaled = d => xScale(d.x1) - xScale(d.x0) - barPadding;
+  // const heightAccessorScaled = d =>
+  //   dimensions.boundedHeight - yScale(yAccessor(d));
+  // const keyAccessor = (d, i) => i;
 
   return (
     <div className="BarcodePlotReusable" ref={ref}>

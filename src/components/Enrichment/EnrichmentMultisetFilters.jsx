@@ -156,7 +156,8 @@ class EnrichmentMultisetFilters extends Component {
           .attr('fill', 'black');
       }
 
-      const mustTestCircles = metaSvg
+      // const mustTestCircles =
+      metaSvg
         .selectAll('dataObject')
         .data(mustData)
         .enter()
@@ -172,7 +173,8 @@ class EnrichmentMultisetFilters extends Component {
         })
         .attr('r', 4);
 
-      const mustText = metaSvg
+      // const mustText =
+      metaSvg
         .selectAll('svg.dataObject')
         .data(mustData)
         .enter()
@@ -209,7 +211,8 @@ class EnrichmentMultisetFilters extends Component {
           .attr('font-size', '15px')
           .attr('fill', 'black');
 
-        const notTestCircles = metaSvg
+        // const notTestCircles =
+        metaSvg
           .selectAll('dataObject')
           .data(notData)
           .enter()
@@ -237,7 +240,8 @@ class EnrichmentMultisetFilters extends Component {
           })
           .attr('r', 4);
 
-        const notText = metaSvg
+        // const notText =
+        metaSvg
           .selectAll('svg.dataObject')
           .data(notData)
           .enter()
@@ -337,7 +341,8 @@ class EnrichmentMultisetFilters extends Component {
       }
     }
 
-    const topBox = base.append('div').style('padding-bottom', '5px');
+    // const topBox =
+    base.append('div').style('padding-bottom', '5px');
 
     const svg = base
       .append('svg')
@@ -345,7 +350,8 @@ class EnrichmentMultisetFilters extends Component {
       .attr('height', svgHeight)
       .style('padding-bottom', '5px');
 
-    const rect = svg
+    // const rect =
+    svg
       .append('path')
       .attr(
         'd',
@@ -453,7 +459,8 @@ class EnrichmentMultisetFilters extends Component {
         self.props.onUpdateQueryData({ must: mustData, not: notData });
       });
 
-    const miniMaybeCircles = svg
+    // const miniMaybeCircles =
+    svg
       .selectAll('svg.dataObject')
       .data(dataset)
       .enter()
@@ -509,7 +516,8 @@ class EnrichmentMultisetFilters extends Component {
         }
       });
 
-    const lineVert = svg
+    // const lineVert =
+    svg
       .append('line')
       .attr('x1', 4 * circlePadding + 6 * circleRadius)
       .attr('x2', 4 * circlePadding + 6 * circleRadius)
@@ -518,7 +526,8 @@ class EnrichmentMultisetFilters extends Component {
       .attr('stroke', 'black')
       .attr('stroke-width', 5);
 
-    const testElements = svg
+    // const testElements =
+    svg
       .selectAll('svg.dataObject')
       .data(dataset)
       .enter()
@@ -606,7 +615,8 @@ class EnrichmentMultisetFilters extends Component {
       settings.numElements !== undefined &&
       settings.maxElements !== undefined
     ) {
-      const numElementsLine = svg
+      // const numElementsLine =
+      svg
         .append('line')
         .attr('class', 'numElements')
         .attr('x1', 4 * circlePadding + 6 * circleRadius)
@@ -641,7 +651,8 @@ class EnrichmentMultisetFilters extends Component {
         })
         .attr('y', topBoxHeight - 6 * heightScalar);
 
-      const numElementsText = numElements
+      // const numElementsText =
+      numElements
         .text(function(d) {
           const dText =
             settings.numElements !== settings.maxElements
@@ -719,10 +730,10 @@ class EnrichmentMultisetFilters extends Component {
   };
 
   render() {
-    const { selectedCol, selectedOperator, sigValue, uSettings } = this.props;
+    const { selectedOperator, sigValue, uSettings } = this.props;
     const Columns = uSettings.thresholdCols;
     const Operators = uSettings.thresholdOperator;
-    const SelCol = selectedCol.value;
+    // const SelCol = selectedCol.value;
     const SelOp = selectedOperator.value;
     // for now, column is displayed as label, just matching the "nominal" or "Adjusted" p value type
     const SelColOverride =

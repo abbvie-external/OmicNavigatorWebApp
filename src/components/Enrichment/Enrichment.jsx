@@ -9,8 +9,8 @@ import TransitionStill from '../Transitions/TransitionStill';
 import ButtonActions from '../Shared/ButtonActions';
 import {
   formatNumberForDisplay,
-  splitValue,
-  getIconInfo
+  splitValue
+  // getIconInfo
 } from '../Shared/helpers';
 import _ from 'lodash';
 import './Enrichment.scss';
@@ -21,35 +21,32 @@ import reactome_icon from '../../resources/reactome.jpg';
 import go_icon from '../../resources/go.png';
 
 class Enrichment extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      isValidSearchEnrichment: false,
-      isSearching: false,
-      enrichmentIcon: '',
-      enrichmentIconText: '',
-      enrichmentResults: [],
-      enrichmentColumns: [],
-      enrichmentView: 'table',
-      networkDataAvailable: false,
-      networkData: {},
-      multisetPlotInfo: {
-        title: '',
-        svg: []
-      },
-      multisetPlotAvailable: false,
-      animation: 'uncover',
-      direction: 'left',
-      visible: false,
-      plotButtonActive: false,
-      uData: [],
-      excelVisible: false,
-      pngVisible: true,
-      pdfVisible: false,
-      svgVisible: true,
-      displayViolinPlot: false
-    };
-  }
+  state = {
+    isValidSearchEnrichment: false,
+    isSearching: false,
+    enrichmentIcon: '',
+    enrichmentIconText: '',
+    enrichmentResults: [],
+    enrichmentColumns: [],
+    enrichmentView: 'table',
+    networkDataAvailable: false,
+    networkData: {},
+    multisetPlotInfo: {
+      title: '',
+      svg: []
+    },
+    multisetPlotAvailable: false,
+    animation: 'uncover',
+    direction: 'left',
+    visible: false,
+    plotButtonActive: false,
+    uData: [],
+    excelVisible: false,
+    pngVisible: true,
+    pdfVisible: false,
+    svgVisible: true,
+    displayViolinPlot: false
+  };
 
   componentDidMount() {}
 

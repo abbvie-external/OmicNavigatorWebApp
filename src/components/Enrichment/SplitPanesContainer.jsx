@@ -1,15 +1,15 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import { Grid, Dimmer, Loader, Button, Tab } from 'semantic-ui-react';
+import { Grid, Dimmer, Loader, Tab } from 'semantic-ui-react';
 import EnrichmentBreadcrumbs from './EnrichmentBreadcrumbs';
-import ButtonActions from '../Shared/ButtonActions';
+// import ButtonActions from "../Shared/ButtonActions";
 // import PlotSVG from './PlotSVG';
 import SplitPane from 'react-split-pane';
 import './SplitPanesContainer.scss';
 import SVGPlot from '../Shared/SVGPlot';
-import BarcodePlot from './BarcodePlot';
+// import BarcodePlot from "./BarcodePlot";
 import BarcodePlotReact from './BarcodePlotReact';
-import BarcodePlotReusable from './BarcodePlotReusable';
+// import BarcodePlotReusable from "./BarcodePlotReusable";
 import ViolinPlot from './ViolinPlot';
 import FilteredPepplotTable from './FilteredPepplotTable';
 
@@ -43,9 +43,9 @@ class SplitPanesContainer extends Component {
   };
 
   getBarcodePlot = () => {
-    const { isTestDataLoaded, barcodeSettings } = this.props;
-    const d = barcodeSettings.barcodeData;
-    const absTAccessor = d => d.statistic;
+    const { isTestDataLoaded } = this.props;
+    // const d = barcodeSettings.barcodeData;
+    // const absTAccessor = d => d.statistic;
     if (!isTestDataLoaded) {
       return (
         <div>
@@ -78,7 +78,7 @@ class SplitPanesContainer extends Component {
   };
 
   getViolinPlot() {
-    const { isViolinPlotLoading, isViolinPlotLoaded } = this.props;
+    // const { isViolinPlotLoading, isViolinPlotLoaded } = this.props;
     // isViolinPlotLoaded
     // if (!isViolinPlotLoaded) {
     //   return (

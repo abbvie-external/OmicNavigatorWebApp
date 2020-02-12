@@ -36,8 +36,8 @@ class ButtonActions extends Component {
   };
 
   PNGExport = () => {
-    const svgElements =
-      document.getElementsByClassName('ContentContainer') || null;
+    // const svgElements =
+    //   document.getElementsByClassName('ContentContainer') || null;
     const isMultisetPlot = this.props.visible;
     if (isMultisetPlot) {
       const MultisetPlotName = this.getMultisetPlotName('png');
@@ -54,8 +54,8 @@ class ButtonActions extends Component {
   };
 
   PDFExport = () => {
-    const svgElements =
-      document.getElementsByClassName('ContentContainer') || null;
+    // const svgElements =
+    //   document.getElementsByClassName('ContentContainer') || null;
     const isMultisetPlot = this.props.visible;
     if (isMultisetPlot) {
       const currentSVG = document.getElementById('multisetAnalysisSVG') || null;
@@ -70,8 +70,8 @@ class ButtonActions extends Component {
   };
 
   SVGExport = () => {
-    const svgElements =
-      document.getElementsByClassName('ContentContainer') || null;
+    // const svgElements =
+    //   document.getElementsByClassName('ContentContainer') || null;
     const isMultisetPlot = this.props.visible;
     if (isMultisetPlot) {
       const MultisetPlotName = this.getMultisetPlotName('svg');

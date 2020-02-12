@@ -6,6 +6,7 @@ const ocpu = require('opencpu.js/opencpu-0.5.js');
 
 class PhosphoprotService {
   constructor() {
+    console.log(ocpu);
     this.ocpuUrl = 'http://10.239.9.49/ocpu/library/PhosphoProt/R';
   }
 

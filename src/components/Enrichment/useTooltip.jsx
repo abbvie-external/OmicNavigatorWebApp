@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+// import React, { useState } from 'react';
+import React from 'react';
 
 export default ({ hoveredLine, scales }) => {
-  const { xScale, yScale } = scales;
+  const { xScale } = scales;
+  // const { xScale, yScale } = scales;
   const styles = {
     left: `${xScale(hoveredLine) - 30}px`
     // top: `${yScale(hoveredLine)}px`

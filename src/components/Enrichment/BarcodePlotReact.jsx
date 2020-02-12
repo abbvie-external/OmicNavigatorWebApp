@@ -1,11 +1,11 @@
-import React, { Component, Fragment } from 'react';
-import Axis from './Axis';
+import React, { Component } from 'react';
+// import Axis from "./Axis";
 import './BarcodePlot.scss';
-import Tooltip from './useTooltip';
+// import Tooltip from "./useTooltip";
 import * as d3 from 'd3';
-import * as _ from 'lodash';
+// import * as _ from "lodash";
 
-class BarcodePlotReact extends React.Component {
+class BarcodePlotReact extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -19,8 +19,8 @@ class BarcodePlotReact extends React.Component {
       tooltipTextAnchor: 'start',
       settings: {
         brushing: false,
-        bottomLabel: props.barcodeSettings.statLabel,
-        barcodeHeight: props.horizontalSplitPaneHeight - 50,
+        bottomLabel: '',
+        barcodeHeight: 0,
         id: 'chart-barcode',
         margin: {
           top: 30,
@@ -116,7 +116,7 @@ class BarcodePlotReact extends React.Component {
           ? event.target.attributes[2].nodeValue - 5
           : event.target.attributes[2].nodeValue + 5;
       const lineId = `#barcode-line-${lineName.replace(
-        /\;/g,
+        /;/g,
         ''
       )}_${lineIdMult}`;
       const hoveredLine = d3.select(lineId);
@@ -164,7 +164,7 @@ class BarcodePlotReact extends React.Component {
         })
       );
       const obj = array.find(function(o) {
-        return o.statistic == max;
+        return o.statistic === max;
       });
       return obj;
     }
@@ -226,10 +226,10 @@ class BarcodePlotReact extends React.Component {
         });
         if (brushedDataVar.length > 0) {
           const maxLineObject = self.getMaxObject(brushedDataVar);
-          const maxLineId = `${maxLineObject.lineID.replace(/\;/g, '')}_${
+          const maxLineId = `${maxLineObject.lineID.replace(/;/g, '')}_${
             maxLineObject.id_mult
           }`;
-          const maxLine = d3.select('#' + 'barcode-line-' + maxLineId);
+          const maxLine = d3.select(`#barcode-line-${maxLineId}`);
           maxLine.classed('MaxLine', true).attr('y1', settings.margin.max);
           const statistic = maxLineObject.statisic;
           const textAnchor =
@@ -282,7 +282,7 @@ class BarcodePlotReact extends React.Component {
 
   getTooltip = () => {
     const {
-      hoveredLineId,
+      // hoveredLineId,
       hoveredLineName,
       highlightedLineName,
       tooltipPosition,
@@ -315,24 +315,24 @@ class BarcodePlotReact extends React.Component {
     const {
       barcodeWidth,
       barcodeContainerWidth,
-      settings,
-      hoveredLineId,
-      hoveredLineName,
-      tooltipPosition
+      settings
+      // hoveredLineId,
+      // hoveredLineName,
+      // tooltipPosition
     } = this.state;
 
     const {
       horizontalSplitPaneHeight,
-      barcodeSettings,
-      violinDotSelected
+      barcodeSettings
+      // violinDotSelected
     } = this.props;
 
     const barcodeHeight =
       horizontalSplitPaneHeight - settings.margin.top - settings.margin.bottom;
-    const yScale = d3
-      .scaleLinear()
-      .domain([0, barcodeHeight])
-      .range([barcodeHeight - settings.margin.bottom, settings.margin.top]);
+    // const yScale = d3
+    //   .scaleLinear()
+    //   .domain([0, barcodeHeight])
+    //   .range([barcodeHeight - settings.margin.bottom, settings.margin.top]);
 
     const xScale = d3
       .scaleLinear()
@@ -366,7 +366,7 @@ class BarcodePlotReact extends React.Component {
 
     const barcodeLines = barcodeSettings.barcodeData.map(d => (
       <line
-        id={`barcode-line-${d.lineID.replace(/\;/g, '')}_${d.id_mult}`}
+        id={`barcode-line-${d.lineID.replace(/;/g, '')}_${d.id_mult}`}
         className="barcode-line"
         key={`${d.lineID}_${d.id_mult}`}
         x1={xScale(d.statistic) + settings.margin.left}

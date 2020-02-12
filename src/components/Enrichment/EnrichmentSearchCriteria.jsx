@@ -13,7 +13,7 @@ import {
 import '../Shared/SearchCriteria.scss';
 import { phosphoprotService } from '../../services/phosphoprot.service';
 import _ from 'lodash';
-import { toast } from 'react-toastify';
+// import { toast } from 'react-toastify';
 import EnrichmentMultisetFilters from './EnrichmentMultisetFilters';
 
 class EnrichmentSearchCriteria extends Component {

@@ -118,18 +118,6 @@ class EnrichmentNetworkGraph extends Component {
       </div>
     );
 
-    var divStyle = {
-      marginTop: '100px',
-      marginLeft: '200px'
-    };
-    var divStyle2 = {
-      marginTop: '0px',
-      marginLeft: '700px'
-    };
-    var divStyle3 = {
-      marginTop: '100px',
-      marginLeft: '400px'
-    };
     if (!this.state.isTestSelected) {
       return (
         <div className="NetworkGraphContainer">
