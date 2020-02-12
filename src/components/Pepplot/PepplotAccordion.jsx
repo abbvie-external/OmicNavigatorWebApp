@@ -3,14 +3,9 @@ import { Accordion, Loader, Dimmer } from 'semantic-ui-react';
 // import _ from 'lodash';
 
 class PepplotAccordion extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      isAccordionReady: false
-    };
-    this.getAccordion = this.getAccordion.bind(this);
-    this.getRootPanels = this.getRootPanels.bind(this);
-  }
+  state = {
+    isAccordionReady: false
+  };
 
   componentDidMount() {
     this.setState({
@@ -18,16 +13,16 @@ class PepplotAccordion extends Component {
     });
   }
 
-  getPeptideNestedItems(itemsObjItemsArray) {
+  getPeptideNestedItems = itemsObjItemsArray => {
     const itemsObjItemsArrayText = itemsObjItemsArray.map(c => {
       return `${c.text}`;
     });
     if (itemsObjItemsArrayText) {
       return itemsObjItemsArrayText;
     } else return [];
-  }
+  };
 
-  getPeptideContent(itemsObj) {
+  getPeptideContent = itemsObj => {
     const PeptidePanelsArray = itemsObj.map(b => {
       return {
         key: `${b.key}`,
@@ -39,9 +34,9 @@ class PepplotAccordion extends Component {
     if (PeptideContent) {
       return PeptideContent;
     } else return [];
-  }
+  };
 
-  getRootPanels() {
+  getRootPanels = () => {
     if (this.props.treeData) {
       const treeDataArray = this.props.treeData;
       const rootPanels = treeDataArray.map(a => {
@@ -53,9 +48,9 @@ class PepplotAccordion extends Component {
       });
       return rootPanels;
     } else return [];
-  }
+  };
 
-  getAccordion() {
+  getAccordion = () => {
     const rootPanels = this.getRootPanels();
     return (
       <Accordion
@@ -66,7 +61,7 @@ class PepplotAccordion extends Component {
         // styled
       />
     );
-  }
+  };
 
   render() {
     if (!this.props.isProteinDataLoaded) {

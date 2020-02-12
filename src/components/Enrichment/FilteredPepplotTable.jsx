@@ -20,16 +20,13 @@ export { QHGrid, EZGrid, QuickViewModal };
 export { getField, getFieldValue, typeMap };
 
 class FilteredPepplotTable extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      filteredTableConfigCols: [],
-      filteredTableData: [],
-      filteredBarcodeData: [],
-      itemsPerPageInformedEnrichment: null
-    };
-    this.filteredPepplotGridRef = React.createRef();
-  }
+  state = {
+    filteredTableConfigCols: [],
+    filteredTableData: [],
+    filteredBarcodeData: [],
+    itemsPerPageInformedEnrichment: null
+  };
+  filteredPepplotGridRef = React.createRef();
 
   componentDidMount() {
     this.getFilteredTableConfigCols(this.props.barcodeSettings.barcodeData);

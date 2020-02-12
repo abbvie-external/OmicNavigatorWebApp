@@ -1,5 +1,5 @@
 import React from 'react';
-import { Header, Image } from 'semantic-ui-react';
+import { Header } from 'semantic-ui-react';
 import './LoaderStill.scss';
 
 const LoaderStill = () => (

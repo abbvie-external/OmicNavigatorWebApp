@@ -1,25 +1,24 @@
 .NetworkGraphContainer {
-    padding-top: 26px !important;
-    
-    .NetworkGraphFilters .ui.toggle.checkbox input:checked~.box:before, .ui.toggle.checkbox input:checked~label:before {
-        background-color: var(--color-primary) !important;
-    }
+  padding-top: 26px !important;
 
-    .NetworkChartWrapper {
-        margin: 25px 20px 20px 15px !important
-    }
+  .NetworkGraphFilters .ui.toggle.checkbox input:checked ~ .box:before,
+  .ui.toggle.checkbox input:checked ~ label:before {
+    background-color: var(--color-primary) !important;
+  }
+
+  .NetworkChartWrapper {
+    margin: 25px 20px 20px 15px !important;
+  }
 }
 
 .NetworkGraphToggle {
-    position: absolute !important;
-    padding-left: 15px !important;
-    cursor: pointer !important;
-    z-index: 11111 !important;
+  position: absolute !important;
+  padding-left: 15px !important;
+  cursor: pointer !important;
+  z-index: 11111 !important;
 }
 
 .NetworkGraphButtons {
-    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.54) !important;
-    margin-right: 15px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.54) !important;
+  margin-right: 15px !important;
 }
-
-

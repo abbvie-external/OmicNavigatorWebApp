@@ -14,21 +14,16 @@ import ViolinPlot from './ViolinPlot';
 import FilteredPepplotTable from './FilteredPepplotTable';
 
 class SplitPanesContainer extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      activeSVGTabIndex: 0,
-      proteinForDiffView: '',
-      horizontalSplitPaneHeight:
-        parseInt(localStorage.getItem('horizontalSplitPaneHeight'), 10) || 250,
-      verticalSplitPaneWidth:
-        parseInt(localStorage.getItem('verticalSplitPaneWidth'), 10) || 525,
-      activeViolinTableIndex: 0,
-      violinDotSelected: null
-    };
-  }
-
-  componentDidMount() {}
+  state = {
+    activeSVGTabIndex: 0,
+    proteinForDiffView: '',
+    horizontalSplitPaneHeight:
+      parseInt(localStorage.getItem('horizontalSplitPaneHeight'), 10) || 250,
+    verticalSplitPaneWidth:
+      parseInt(localStorage.getItem('verticalSplitPaneWidth'), 10) || 525,
+    activeViolinTableIndex: 0,
+    violinDotSelected: null
+  };
 
   handleSVGTabChange = activeTabIndex => {
     this.setState({

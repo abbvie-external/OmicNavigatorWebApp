@@ -33,85 +33,82 @@ class EnrichmentSearchCriteria extends Component {
     uData: []
   };
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      enrichmentStudies: [],
-      enrichmentStudyHrefVisible: false,
-      enrichmentStudyHref: '',
-      enrichmentModels: [],
-      enrichmentAnnotations: [],
-      enrichmentResultsErrorCb: this.props.onSearchTransition || undefined,
-      enrichmentStudiesDisabled: false,
-      enrichmentModelsDisabled: true,
-      enrichmentAnnotationsDisabled: true,
-      uAnchor: '',
-      selectedCol: {
+  state = {
+    enrichmentStudies: [],
+    enrichmentStudyHrefVisible: false,
+    enrichmentStudyHref: '',
+    enrichmentModels: [],
+    enrichmentAnnotations: [],
+    enrichmentResultsErrorCb: this.props.onSearchTransition || undefined,
+    enrichmentStudiesDisabled: false,
+    enrichmentModelsDisabled: true,
+    enrichmentAnnotationsDisabled: true,
+    uAnchor: '',
+    selectedCol: {
+      key: 'adj_P_Val',
+      text: 'Adjusted P Value',
+      value: 'adj_P_Val'
+    },
+    selectedOperator: {
+      key: '<',
+      text: '<',
+      value: '<'
+    },
+    sigValue: 0.05,
+    uSettings: {
+      defaultSelectedCol: {
         key: 'adj_P_Val',
         text: 'Adjusted P Value',
         value: 'adj_P_Val'
       },
-      selectedOperator: {
+      defaultSelectedOperator: {
         key: '<',
         text: '<',
         value: '<'
       },
-      sigValue: 0.05,
-      uSettings: {
-        defaultSelectedCol: {
+      defaultSigValue: 0.05,
+      useAnchor: false,
+      must: [],
+      not: [],
+      displayMetaData: true,
+      templateName: 'enrichment-multiset',
+      numElements: undefined,
+      maxElements: undefined,
+      metaSvg: '',
+      heightScalar: 1,
+      thresholdCols: [
+        {
           key: 'adj_P_Val',
           text: 'Adjusted P Value',
           value: 'adj_P_Val'
-        },
-        defaultSelectedOperator: {
+        }
+      ],
+      thresholdOperator: [
+        {
           key: '<',
           text: '<',
           value: '<'
         },
-        defaultSigValue: 0.05,
-        useAnchor: false,
-        must: [],
-        not: [],
-        displayMetaData: true,
-        templateName: 'enrichment-multiset',
-        numElements: undefined,
-        maxElements: undefined,
-        metaSvg: '',
-        heightScalar: 1,
-        thresholdCols: [
-          {
-            key: 'adj_P_Val',
-            text: 'Adjusted P Value',
-            value: 'adj_P_Val'
-          }
-        ],
-        thresholdOperator: [
-          {
-            key: '<',
-            text: '<',
-            value: '<'
-          },
-          {
-            key: '>',
-            text: '>',
-            value: '>'
-          },
-          {
-            key: '|<|',
-            text: '|<|',
-            value: '|<|'
-          },
-          {
-            key: '|>|',
-            text: '|>|',
-            value: '|>|'
-          }
-        ]
-      },
-      multisetFiltersVisible: false,
-      activateMultisetFilters: false
-    };
-  }
+        {
+          key: '>',
+          text: '>',
+          value: '>'
+        },
+        {
+          key: '|<|',
+          text: '|<|',
+          value: '|<|'
+        },
+        {
+          key: '|>|',
+          text: '|>|',
+          value: '|>|'
+        }
+      ]
+    },
+    multisetFiltersVisible: false,
+    activateMultisetFilters: false
+  };
 
   componentDidMount() {
     const s = this.props.enrichmentStudy || '';

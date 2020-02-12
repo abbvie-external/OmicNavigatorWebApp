@@ -19,22 +19,19 @@ class EnrichmentNetworkGraph extends Component {
     showNetworkLabels: true
   };
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      treeDataRaw: [],
-      treeData: [],
-      treeDataColumns: [],
-      plotType: [],
-      imageInfo: {
-        key: null,
-        title: '',
-        svg: []
-      },
-      currentSVGs: [],
-      isTestDataLoaded: false
-    };
-  }
+  state = {
+    treeDataRaw: [],
+    treeData: [],
+    treeDataColumns: [],
+    plotType: [],
+    imageInfo: {
+      key: null,
+      title: '',
+      svg: []
+    },
+    currentSVGs: [],
+    isTestDataLoaded: false
+  };
 
   componentDidMount() {}
 

@@ -13,29 +13,13 @@ class PepplotPlot extends Component {
     isProteinSVGLoaded: true
   };
 
-  constructor(props) {
-    super(props);
-
-    // const tab = props.history.location.pathname;
-    // const study = props.study;
-    // const model = props.model;
-    // const test = props.test;
-    // const protein = props.imageInfo.key;
-    // const customPath = `${tab + '/' + study + '/' + model + '/' + test + '/' + protein}`;
-    // const customPathFriendly = customPath.replace(/[^a-zA-Z0-9-_/]/g, '');
-    // const customPathEncodedURI = encodeURIComponent(customPath);
-    // props.history.push(customPathFriendly);
-    this.state = {
-      activeSVGTabIndex: 0,
-      excelVisible: true,
-      pngVisible: true,
-      pdfVisible: false,
-      svgVisible: true
-      // returningToTable: false,
-    };
-  }
-
-  componentDidMount() {}
+  state = {
+    activeSVGTabIndex: 0,
+    excelVisible: true,
+    pngVisible: true,
+    pdfVisible: false,
+    svgVisible: true
+  };
 
   handleSVGTabChange = activeTabIndex => {
     this.setState({
@@ -43,18 +27,7 @@ class PepplotPlot extends Component {
     });
   };
 
-  // tableTransition = () => {
-  //   this.setState({
-  //     returningToTable: true
-  //   });
-  //   this.props.onBackToTable();
-  // };
-
   render() {
-    // const { returningToTable } = this.state;
-    // if (this.state.returningToTable) {
-    //   return <LoaderActiveTable />
-
     if (!this.props.isProteinSVGLoaded) {
       return (
         <div>
@@ -69,10 +42,7 @@ class PepplotPlot extends Component {
           <Grid columns={2} className="">
             <Grid.Row className="ActionsRow">
               <Grid.Column mobile={8} tablet={8} largeScreen={8} widescreen={8}>
-                <PepplotBreadcrumbs
-                  {...this.props}
-                  // onNavigateBack={this.tableTransition}
-                />
+                <PepplotBreadcrumbs {...this.props} />
               </Grid.Column>
               <Grid.Column mobile={8} tablet={8} largeScreen={8} widescreen={8}>
                 <ButtonActions {...this.props} {...this.state} />

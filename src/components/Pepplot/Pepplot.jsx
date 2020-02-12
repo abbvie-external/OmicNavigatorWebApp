@@ -14,32 +14,27 @@ import './Pepplot.scss';
 import '../Shared/Table.scss';
 
 class Pepplot extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      isValidSearchPepplot: false,
-      isSearching: false,
-      showProteinPage: false,
-      pepplotResults: [],
-      pepplotColumns: [],
-      multisetPlotInfo: {
-        title: '',
-        svg: []
-      },
-      multisetPlotAvailable: false,
-      animation: 'uncover',
-      direction: 'left',
-      visible: false,
-      plotButtonActive: false,
-      excelVisible: false,
-      pngVisible: true,
-      pdfVisible: false,
-      svgVisible: true,
-      multisetQueried: false
-    };
-  }
-
-  componentDidMount() {}
+  state = {
+    isValidSearchPepplot: false,
+    isSearching: false,
+    showProteinPage: false,
+    pepplotResults: [],
+    pepplotColumns: [],
+    multisetPlotInfo: {
+      title: '',
+      svg: []
+    },
+    multisetPlotAvailable: false,
+    animation: 'uncover',
+    direction: 'left',
+    visible: false,
+    plotButtonActive: false,
+    excelVisible: false,
+    pngVisible: true,
+    pdfVisible: false,
+    svgVisible: true,
+    multisetQueried: false
+  };
 
   componentDidUpdate = (prevProps, prevState) => {
     // if (this.props.proteinToHighlight !== "" && this.props.proteinToHighlight !== undefined) {

@@ -5,37 +5,34 @@ import * as d3 from 'd3';
 import * as _ from 'lodash';
 
 class BarcodePlot extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      objs: {
-        mainDiv: null,
-        chartDiv: null,
-        g: null,
-        xAxis: null,
-        tooltip: null,
-        brush: null
-      },
-      // passed or default chart settings
-      settings: {
-        axes: null,
-        brush: null,
-        chartDiv: null,
-        g: null,
-        height: null,
-        id: 'chart-barcode',
-        mainDiv: null,
-        margin: { top: 45, right: 25, bottom: 40, left: 20 },
-        svg: null,
-        title: '',
-        tooltip: null
-      },
-      containerWidth: 0,
+  state = {
+    objs: {
+      mainDiv: null,
+      chartDiv: null,
+      g: null,
       xAxis: null,
-      xScale: null
-    };
-    this.barcodeChartRef = React.createRef();
-  }
+      tooltip: null,
+      brush: null
+    },
+    // passed or default chart settings
+    settings: {
+      axes: null,
+      brush: null,
+      chartDiv: null,
+      g: null,
+      height: null,
+      id: 'chart-barcode',
+      mainDiv: null,
+      margin: { top: 45, right: 25, bottom: 40, left: 20 },
+      svg: null,
+      title: '',
+      tooltip: null
+    },
+    containerWidth: 0,
+    xAxis: null,
+    xScale: null
+  };
+  barcodeChartRef = React.createRef();
 
   componentDidMount() {
     const width = this.getWidth();

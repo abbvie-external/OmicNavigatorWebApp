@@ -29,27 +29,24 @@ class PepplotResults extends Component {
     pepplotColumns: []
   };
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      treeDataRaw: [],
-      treeData: [],
-      treeDataColumns: [],
-      plotType: [],
-      imageInfo: {
-        key: null,
-        title: '',
-        svg: []
-      },
-      currentSVGs: [],
-      isSVGDataLoaded: false,
-      isProteinSelected: false,
-      isProteinSVGLoaded: false,
-      itemsPerPageInformed: 100,
-      pepplotRows: this.props.pepplotResults.length || 1000
-    };
-    this.pepplotGridRef = React.createRef();
-  }
+  state = {
+    treeDataRaw: [],
+    treeData: [],
+    treeDataColumns: [],
+    plotType: [],
+    imageInfo: {
+      key: null,
+      title: '',
+      svg: []
+    },
+    currentSVGs: [],
+    isSVGDataLoaded: false,
+    isProteinSelected: false,
+    isProteinSVGLoaded: false,
+    itemsPerPageInformed: 100,
+    pepplotRows: this.props.pepplotResults.length || 1000
+  };
+  pepplotGridRef = React.createRef();
 
   componentDidMount() {
     const ProteinSite = this.props.pepplotProteinSite || '';

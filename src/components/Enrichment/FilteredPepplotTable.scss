@@ -1,22 +1,21 @@
 .FilteredPepplotTableDiv {
-    direction: ltr !important;
-    // .ui.selectable.table tbody tr:first-child, .ui.selectable.table tbody tr:first-child:hover {
-    //     background: #f14000 !important;
-    //     color: white !important;
-    // }
-    .ui.mini.image {
-        width: 35px !important;
-        //     z-index: 11112 !important;
-        //     height: 35px !important;
-    }
+  direction: ltr !important;
+  // .ui.selectable.table tbody tr:first-child, .ui.selectable.table tbody tr:first-child:hover {
+  //     background: #f14000 !important;
+  //     color: white !important;
+  // }
+  .ui.mini.image {
+    width: 35px !important;
+    //     z-index: 11112 !important;
+    //     height: 35px !important;
+  }
 
-    .QHGrid table th:first-child {
-        padding-top: 7px !important;
-        padding-bottom: 15px !important;
-    }
-    
-    .TableValue {
-        cursor: auto !important;
-    }
+  .QHGrid table th:first-child {
+    padding-top: 7px !important;
+    padding-bottom: 15px !important;
+  }
+
+  .TableValue {
+    cursor: auto !important;
+  }
 }
-
