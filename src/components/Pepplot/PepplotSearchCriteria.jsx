@@ -15,86 +15,83 @@ import _ from 'lodash';
 import PepplotMultisetFilters from './PepplotMultisetFilters';
 
 class PepplotSearchCriteria extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      pepplotStudies: [],
-      pepplotStudyHrefVisible: false,
-      pepplotStudyHref: '',
-      pepplotModels: [],
-      pepplotTests: [],
-      pepplotStudiesDisabled: false,
-      pepplotModelsDisabled: true,
-      pepplotTestsDisabled: true,
-      uAnchorP: '',
-      selectedColP: {
+  state = {
+    pepplotStudies: [],
+    pepplotStudyHrefVisible: false,
+    pepplotStudyHref: '',
+    pepplotModels: [],
+    pepplotTests: [],
+    pepplotStudiesDisabled: false,
+    pepplotModelsDisabled: true,
+    pepplotTestsDisabled: true,
+    uAnchorP: '',
+    selectedColP: {
+      key: 'adj_P_Val',
+      text: 'adj_P_Val',
+      value: 'adj_P_Val'
+    },
+    selectedOperatorP: {
+      key: '<',
+      text: '<',
+      value: '<'
+    },
+    sigValueP: 0.05,
+    reloadPlot: true,
+    uSettingsP: {
+      defaultselectedColP: {
         key: 'adj_P_Val',
         text: 'adj_P_Val',
         value: 'adj_P_Val'
       },
-      selectedOperatorP: {
+      defaultselectedOperatorP: {
         key: '<',
         text: '<',
         value: '<'
       },
-      sigValueP: 0.05,
-      reloadPlot: true,
-      uSettingsP: {
-        defaultselectedColP: {
+      defaultsigValueP: 0.05,
+      useAnchorP: true,
+      mustP: [],
+      notP: [],
+      displayMetaDataP: true,
+      templateName: 'pepplot-multiset',
+      numElementsP: undefined,
+      maxElementsP: undefined,
+      metaSvgP: '',
+      heightScalarP: 1,
+      thresholdColsP: [
+        {
           key: 'adj_P_Val',
           text: 'adj_P_Val',
           value: 'adj_P_Val'
-        },
-        defaultselectedOperatorP: {
+        }
+      ],
+      thresholdOperatorP: [
+        {
           key: '<',
           text: '<',
           value: '<'
         },
-        defaultsigValueP: 0.05,
-        useAnchorP: true,
-        mustP: [],
-        notP: [],
-        displayMetaDataP: true,
-        templateName: 'pepplot-multiset',
-        numElementsP: undefined,
-        maxElementsP: undefined,
-        metaSvgP: '',
-        heightScalarP: 1,
-        thresholdColsP: [
-          {
-            key: 'adj_P_Val',
-            text: 'adj_P_Val',
-            value: 'adj_P_Val'
-          }
-        ],
-        thresholdOperatorP: [
-          {
-            key: '<',
-            text: '<',
-            value: '<'
-          },
-          {
-            key: '>',
-            text: '>',
-            value: '>'
-          },
-          {
-            key: '|<|',
-            text: '|<|',
-            value: '|<|'
-          },
-          {
-            key: '|>|',
-            text: '|>|',
-            value: '|>|'
-          }
-        ]
-      },
-      multisetFiltersVisibleP: false,
-      activateMultisetFiltersP: false,
-      uDataP: []
-    };
-  }
+        {
+          key: '>',
+          text: '>',
+          value: '>'
+        },
+        {
+          key: '|<|',
+          text: '|<|',
+          value: '|<|'
+        },
+        {
+          key: '|>|',
+          text: '|>|',
+          value: '|>|'
+        }
+      ]
+    },
+    multisetFiltersVisibleP: false,
+    activateMultisetFiltersP: false,
+    uDataP: []
+  };
 
   componentDidMount() {
     const s = this.props.pepplotStudy || '';

@@ -12,13 +12,6 @@ class ButtonActions extends Component {
     pdfVisible: true
   };
 
-  // constructor(props) {
-  //   super(props);
-  //   this.state = {
-  //     currentSVG: null
-  //   };
-  // }
-
   componentDidMount() {
     // const svgElements = document.getElementsByClassName("ContentContainer") || null;
     // const currentContentContainer = svgElements[0] || null;

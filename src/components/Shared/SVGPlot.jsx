@@ -3,12 +3,9 @@ import { Loader, Dimmer, Tab, Popup, Icon } from 'semantic-ui-react';
 import './SVGPlot.scss';
 
 class SVGPlot extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      isSVGReady: false
-    };
-  }
+  state = {
+    isSVGReady: false
+  };
 
   componentDidMount() {
     this.setState({

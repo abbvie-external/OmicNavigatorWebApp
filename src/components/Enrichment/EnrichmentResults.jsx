@@ -22,68 +22,65 @@ export { QHGrid, EZGrid, QuickViewModal };
 export { getField, getFieldValue, typeMap };
 
 class EnrichmentResults extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      annotationData: [],
-      enrichmentDataItem: [],
-      enrichmentTerm: '',
-      itemsPerPageInformedEnrichmentMain: null,
-      treeDataRaw: [],
-      treeData: [],
-      treeDataColumns: [],
-      plotType: [],
-      imageInfo: {
-        key: null,
-        title: '',
-        svg: []
-      },
-      currentSVGs: [],
-      isTestSelected: false,
-      isTestDataLoaded: false,
-      SVGPlotLoading: false,
-      SVGPlotLoaded: false,
-      isViolinPlotLoaded: false,
-      barcodeSettings: {
-        barcodeData: [],
-        brushedData: [],
-        // chartSize: { height: '200', width: '960' },
-        lineID: '',
-        statLabel: {},
-        statistic: 'statistic',
-        logFC: 'logFC',
-        highLabel: {},
-        lowLabel: {},
-        highStat: null,
-        enableBrush: false
-      },
-      // violinSettings: {
-      violinData: []
-      // chartSize: { height: kLSplit.clientHeight + 25, width: kLSplit.clientWidth },
-      //   chartSize: {
-      //     height: 400,
-      //     width: 400
-      //   },
-      //   axisLabels: {
-      //     xAxis: '',
-      //     yAxis: "log<tspan baseline-shift='sub' font-size='14px'>2</tspan>(FC)"
-      //   },
-      //   id: 'violin-graph-1',
-      //   pointUniqueId: 'sample',
-      //   pointValue: 'cpm',
-      //   title: '',
-      //   subtitle: '',
-      //   tooltip: {
-      //     show: true,
-      //     fields: [
-      //       { label: 'log(FC)', value: 'cpm', toFixed: true },
-      //       { label: 'Protein', value: 'sample' }
-      //     ]
-      //   },
-      //   xName: 'tissue'
-      // }
-    };
-  }
+  state = {
+    annotationData: [],
+    enrichmentDataItem: [],
+    enrichmentTerm: '',
+    itemsPerPageInformedEnrichmentMain: null,
+    treeDataRaw: [],
+    treeData: [],
+    treeDataColumns: [],
+    plotType: [],
+    imageInfo: {
+      key: null,
+      title: '',
+      svg: []
+    },
+    currentSVGs: [],
+    isTestSelected: false,
+    isTestDataLoaded: false,
+    SVGPlotLoading: false,
+    SVGPlotLoaded: false,
+    isViolinPlotLoaded: false,
+    barcodeSettings: {
+      barcodeData: [],
+      brushedData: [],
+      // chartSize: { height: '200', width: '960' },
+      lineID: '',
+      statLabel: {},
+      statistic: 'statistic',
+      logFC: 'logFC',
+      highLabel: {},
+      lowLabel: {},
+      highStat: null,
+      enableBrush: false
+    },
+    // violinSettings: {
+    violinData: []
+    // chartSize: { height: kLSplit.clientHeight + 25, width: kLSplit.clientWidth },
+    //   chartSize: {
+    //     height: 400,
+    //     width: 400
+    //   },
+    //   axisLabels: {
+    //     xAxis: '',
+    //     yAxis: "log<tspan baseline-shift='sub' font-size='14px'>2</tspan>(FC)"
+    //   },
+    //   id: 'violin-graph-1',
+    //   pointUniqueId: 'sample',
+    //   pointValue: 'cpm',
+    //   title: '',
+    //   subtitle: '',
+    //   tooltip: {
+    //     show: true,
+    //     fields: [
+    //       { label: 'log(FC)', value: 'cpm', toFixed: true },
+    //       { label: 'Protein', value: 'sample' }
+    //     ]
+    //   },
+    //   xName: 'tissue'
+    // }
+  };
 
   componentDidMount() {
     const DescriptionAndTest = this.props.enrichmentDescriptionAndTest || '';

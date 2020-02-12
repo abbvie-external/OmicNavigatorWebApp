@@ -6,36 +6,33 @@ import * as d3 from 'd3';
 // import * as _ from "lodash";
 
 class BarcodePlotReact extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      barcodeWidth: 0,
-      barcodeContainerWidth: 0,
-      xScale: null,
-      hoveredLineId: null,
-      hoveredLineName: null,
-      highlightedLineName: null,
-      tooltipPosition: null,
-      tooltipTextAnchor: 'start',
-      settings: {
-        brushing: false,
-        bottomLabel: '',
-        barcodeHeight: 0,
-        id: 'chart-barcode',
-        margin: {
-          top: 30,
-          right: 25,
-          bottom: 20,
-          left: 20,
-          hovered: 15,
-          selected: 15,
-          max: 5
-        }
+  state = {
+    barcodeWidth: 0,
+    barcodeContainerWidth: 0,
+    xScale: null,
+    hoveredLineId: null,
+    hoveredLineName: null,
+    highlightedLineName: null,
+    tooltipPosition: null,
+    tooltipTextAnchor: 'start',
+    settings: {
+      brushing: false,
+      bottomLabel: '',
+      barcodeHeight: 0,
+      id: 'chart-barcode',
+      margin: {
+        top: 30,
+        right: 25,
+        bottom: 20,
+        left: 20,
+        hovered: 15,
+        selected: 15,
+        max: 5
       }
-    };
-    this.barcodeContainerRef = React.createRef();
-    this.barcodeSVGRef = React.createRef();
-  }
+    }
+  };
+  barcodeContainerRef = React.createRef();
+  barcodeSVGRef = React.createRef();
 
   componentDidMount() {
     this.setWidth();

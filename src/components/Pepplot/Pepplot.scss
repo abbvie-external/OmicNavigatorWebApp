@@ -33,6 +33,7 @@
 //   cursor: pointer !important;
 // }
 
-.ui.red.button, .ui.red.buttons .button {
+.ui.red.button,
+.ui.red.buttons .button {
   background-color: var(--color-primary) !important;
 }

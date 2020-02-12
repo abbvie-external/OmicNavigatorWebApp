@@ -7,61 +7,58 @@ import * as d3 from 'd3';
 import './ViolinPlot.scss';
 
 class ViolinPlot extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      violinContainerHeight: 0,
-      violinContainerWidth: 0,
-      violinHeight: 0,
-      colorFunct: null,
-      violinPlots: {},
-      dataPlots: {},
-      boxPlots: {},
-      groupObjs: {},
-      objs: {
-        mainDiv: null,
-        chartDiv: null,
-        g: null,
-        xAxis: null,
-        yAxis: null,
-        brush: null,
-        tooltip: null
+  state = {
+    violinContainerHeight: 0,
+    violinContainerWidth: 0,
+    violinHeight: 0,
+    colorFunct: null,
+    violinPlots: {},
+    dataPlots: {},
+    boxPlots: {},
+    groupObjs: {},
+    objs: {
+      mainDiv: null,
+      chartDiv: null,
+      g: null,
+      xAxis: null,
+      yAxis: null,
+      brush: null,
+      tooltip: null
+    },
+    settings: {
+      axisLabels: {
+        xAxis: this.props.enrichmentTerm,
+        yAxis: "log<tspan baseline-shift='sub' font-size='13px'>2</tspan>(FC)"
       },
-      settings: {
-        axisLabels: {
-          xAxis: this.props.enrichmentTerm,
-          yAxis: "log<tspan baseline-shift='sub' font-size='13px'>2</tspan>(FC)"
-        },
-        constrainExtremes: false,
-        color: d3.scaleOrdinal(d3.schemeCategory10),
-        id: 'chart-violin',
-        // id: 'violin-graph-1',
-        margin: { top: 50, right: 40, bottom: 40, left: 50 },
-        pointUniqueId: 'sample',
-        pointValue: 'cpm',
-        scale: 'linear',
-        subtitle: '',
-        title: '',
-        tooltip: {
-          show: true,
-          fields: [
-            { label: 'log(FC)', value: 'cpm', toFixed: true },
-            { label: 'Protien', value: 'sample' }
-          ]
-        },
-        // tooltip: {
-        //   show: true,
-        //   fields: [{ label: 'label1', value: 'value1', toFixed: true }]
-        // },
-        // xName: null,
-        xName: 'tissue',
-        yName: null,
-        yTicks: 1
-      }
-    };
-    this.violinContainerRef = React.createRef();
-    this.violinSVGRef = React.createRef();
-  }
+      constrainExtremes: false,
+      color: d3.scaleOrdinal(d3.schemeCategory10),
+      id: 'chart-violin',
+      // id: 'violin-graph-1',
+      margin: { top: 50, right: 40, bottom: 40, left: 50 },
+      pointUniqueId: 'sample',
+      pointValue: 'cpm',
+      scale: 'linear',
+      subtitle: '',
+      title: '',
+      tooltip: {
+        show: true,
+        fields: [
+          { label: 'log(FC)', value: 'cpm', toFixed: true },
+          { label: 'Protien', value: 'sample' }
+        ]
+      },
+      // tooltip: {
+      //   show: true,
+      //   fields: [{ label: 'label1', value: 'value1', toFixed: true }]
+      // },
+      // xName: null,
+      xName: 'tissue',
+      yName: null,
+      yTicks: 1
+    }
+  };
+  violinContainerRef = React.createRef();
+  violinSVGRef = React.createRef();
 
   componentDidMount() {
     this.setHeight();
