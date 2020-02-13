@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import { Grid, Popup, Sidebar } from 'semantic-ui-react';
 import { withRouter } from 'react-router-dom';
 import EnrichmentSearchCriteria from './EnrichmentSearchCriteria';
-import EnrichmentNetworkGraph from './EnrichmentNetworkGraph';
-import EnrichmentResults from './EnrichmentResults';
+import EnrichmentResultsGraph from './EnrichmentResultsGraph';
+import EnrichmentResultsTable from './EnrichmentResultsTable';
 import TransitionActive from '../Transitions/TransitionActive';
 import TransitionStill from '../Transitions/TransitionStill';
 import ButtonActions from '../Shared/ButtonActions';
@@ -19,6 +19,7 @@ import msig_icon from '../../resources/msig.ico';
 import phosphosite_icon from '../../resources/phosphosite.ico';
 import reactome_icon from '../../resources/reactome.jpg';
 import go_icon from '../../resources/go.png';
+import { phosphoprotService } from '../../services/phosphoprot.service';
 
 class Enrichment extends Component {
   state = {
@@ -29,8 +30,6 @@ class Enrichment extends Component {
     enrichmentResults: [],
     enrichmentColumns: [],
     enrichmentView: 'table',
-    networkDataAvailable: false,
-    networkData: {},
     multisetPlotInfo: {
       title: '',
       svg: []
@@ -45,7 +44,27 @@ class Enrichment extends Component {
     pngVisible: true,
     pdfVisible: false,
     svgVisible: true,
-    displayViolinPlot: false
+    displayViolinPlot: false,
+    networkDataAvailable: false,
+    networkData: {},
+    tests: {},
+    nwSettings: {
+      facets: {},
+      propLabel: {},
+      metaLabels: ['Description', 'Ontology'],
+      meta: ['EnrichmentMap_GS_DESCR', 'EnrichmentMap_Name'],
+      facetAndValueLabel: ['Test', 'pValue'],
+      nodeLabel: 'EnrichmentMap_GS_DESCR',
+      radiusScale: [10, 50],
+      lineScale: [1, 10],
+      nodeSize: 'EnrichmentMap_gs_size',
+      linkSize: 'EnrichmentMap_Overlap_size',
+      linkMetaLabels: ['Overlap Size', 'Source', 'Target'],
+      linkMeta: ['EnrichmentMap_Overlap_size', 'source', 'target'],
+      linkMetaLookup: ['EnrichmentMap_GS_DESCR', 'EnrichmentMap_GS_DESCR'],
+      nodeColorScale: [0, 0.1, 1],
+      nodeColors: ['red', 'white', 'blue']
+    }
   };
 
   componentDidMount() {}
@@ -58,6 +77,8 @@ class Enrichment extends Component {
 
   handleEnrichmentSearch = searchResults => {
     const columns = this.getConfigCols(searchResults);
+    this.getNetworkData();
+
     this.setState({
       enrichmentResults: searchResults.enrichmentResults,
       enrichmentColumns: columns,
@@ -357,6 +378,62 @@ class Enrichment extends Component {
     return configCols;
   };
 
+  getNetworkData = () => {
+    const {
+      enrichmentModel,
+      enrichmentAnnotation,
+      pValueType,
+      enrichmentStudy
+    } = this.props;
+    const pValueTypeParam = pValueType === 'adjusted' ? 0.1 : 1;
+    phosphoprotService
+      .getEnrichmentMap(
+        enrichmentModel,
+        enrichmentAnnotation,
+        '',
+        pValueTypeParam,
+        enrichmentStudy + 'plots'
+      )
+      .then(EMData => {
+        debugger;
+        // this.showIconContainer = true;
+        this.setState({
+          networkDataAvailable: true,
+          nwData: EMData.elements
+          // tests: EMData.tests
+        });
+
+        let facets = [];
+        // for (var i = 0; i < EMData.tests.length; i++) {
+        //   let rplcSpaces = EMData.tests[i].replace(/ /g, "_");
+        //   facets.push("EnrichmentMap_pvalue_" + rplcSpaces + "_");
+        // }
+        this.setState({
+          nwSettings: {
+            ...this.state.nwSettings,
+            facets: facets
+            // propLabel: EMData.tests
+            // metaLabels: ["Description", "Ontology"],
+            // meta: ["EnrichmentMap_GS_DESCR", "EnrichmentMap_Name"],
+            // facetAndValueLabel: ["Test", "pValue"],
+            // nodeLabel: "EnrichmentMap_GS_DESCR",
+            // radiusScale: [10, 50],
+            // lineScale: [1, 10],
+            // nodeSize: "EnrichmentMap_gs_size",
+            // linkSize: "EnrichmentMap_Overlap_size",
+            // linkMetaLabels: ["Overlap Size", "Source", "Target"],
+            // linkMeta: ["EnrichmentMap_Overlap_size", "source", "target"],
+            // linkMetaLookup: [
+            //   "EnrichmentMap_GS_DESCR",
+            //   "EnrichmentMap_GS_DESCR"
+            // ],
+            // nodeColorScale: [0, 0.1, 1],
+            // nodeColors: ["red", "white", "blue"]
+          }
+        });
+      });
+  };
+
   handleEnrichmentViewChange = choice => {
     return evt => {
       this.setState({
@@ -365,15 +442,6 @@ class Enrichment extends Component {
     };
   };
 
-  // getNetworkData = () => {
-  //   phosphoprotService.getEnrichmentMap().then(EMData => {
-  //     this.setState({
-  //       networkDataAvailable: true,
-  //       nwData: EMData.elements
-  //     });
-  //   });
-  // };
-
   getView = () => {
     if (
       this.state.isValidSearchEnrichment &&
@@ -381,7 +449,7 @@ class Enrichment extends Component {
       this.state.enrichmentView === 'table'
     ) {
       return (
-        <EnrichmentResults
+        <EnrichmentResultsTable
           {...this.props}
           {...this.state}
           onSearchCriteriaChange={this.handleSearchCriteriaChange}
@@ -396,7 +464,7 @@ class Enrichment extends Component {
       this.state.enrichmentView === 'network'
     ) {
       return (
-        <EnrichmentNetworkGraph
+        <EnrichmentResultsGraph
           {...this.props}
           {...this.state}
           onEnrichmentViewChange={this.handleEnrichmentViewChange}
@@ -442,9 +510,6 @@ class Enrichment extends Component {
         ></div>
       </Sidebar>
     );
-
-    // networkGraphData = this.getNetworkData();
-    // networkData will be used for Network Graph
 
     return (
       <Grid.Row className="EnrichmentContainer">
