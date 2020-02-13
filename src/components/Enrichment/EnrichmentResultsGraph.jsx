@@ -60,7 +60,7 @@ class EnrichmentResultsGraph extends Component {
     if (!this.state.isTestSelected) {
       return (
         <div>
-          <NetworkGraph {...this.props} {...this.state}></NetworkGraph>;
+          <NetworkGraph {...this.props} {...this.state}></NetworkGraph>
         </div>
       );
     } else if (this.state.isTestSelected && !this.state.isTestDataLoaded) {

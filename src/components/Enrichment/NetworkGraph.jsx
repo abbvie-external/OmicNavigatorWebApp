@@ -1,22 +1,562 @@
 import React, { Component } from 'react';
 import { Icon, Popup, Grid, Search, Radio } from 'semantic-ui-react';
+import _ from 'lodash';
+import * as d3 from 'd3';
+import './NetworkGraph.scss';
 
 export default class NetworkGraph extends Component {
+  // static defaultProps = {
+  //   networkDataAvailable: false,
+  //   networkData: {},
+  //   tests: {},
+  //   networkSettings: {
+  //     facets: {},
+  //     propLabel: {},
+  //     metaLabels: ['Description', 'Ontology'],
+  //     meta: ['EnrichmentMap_GS_DESCR', 'EnrichmentMap_Name'],
+  //     facetAndValueLabel: ['Test', 'pValue'],
+  //     nodeLabel: 'EnrichmentMap_GS_DESCR',
+  //     radiusScale: [10, 50],
+  //     lineScale: [1, 10],
+  //     nodeSize: 'EnrichmentMap_gs_size',
+  //     linkSize: 'EnrichmentMap_Overlap_size',
+  //     linkMetaLabels: ['Overlap Size', 'Source', 'Target'],
+  //     linkMeta: ['EnrichmentMap_Overlap_size', 'source', 'target'],
+  //     linkMetaLookup: ['EnrichmentMap_GS_DESCR', 'EnrichmentMap_GS_DESCR'],
+  //     nodeColorScale: [0, 0.1, 1],
+  //     nodeColors: ['red', 'white', 'blue']
+  //   }
+  // }
+
   state = {
+    dataCombined: [],
+    networkWidth: 0,
+    networkContainerWidth: 0,
+    networkHeight: 0,
+    networkContainerHeight: 0,
     chartSettings: {
       title: '',
-      data: null,
+      // data: null,
       id: 'chart-network',
-      chartSize: { height: '900', width: '1600' },
+      // chartSize: { height: "900", width: "1600" },
       margin: { top: 0, right: 0, bottom: 0, left: 0 },
       statLabel: '',
       statistic: '',
       formattedData: {},
-      facets: [],
-      propLabel: []
+      facets: []
+      // propLabel: []
+    },
+    chartObjs: {
+      svg: null,
+      mainDiv: null,
+      chartDiv: null,
+      g: null,
+      gLinks: null,
+      gNodes: null,
+      tooltip: null
     }
   };
+  networkContainerRef = React.createRef();
+  networkSVGRef = React.createRef();
+
+  // static getDerivedStateFromProps(nextProps, prevState) {
+  //   let newState = {};
+  //   if (nextProps.networkData !== prevState.prevNetworkData) {
+  //     newState.networkData = nextProps.networkData;
+  //     newState.prevNetworkData = nextProps.networkData;
+  //   }
+
+  //   if (nextProps.networkSettings !== prevState.prevNetworkSettings) {
+  //     newState.networkSettings = nextProps.networkSettings;
+  //     newState.prevNetworkSettings = nextProps.networkSettings;
+  //   }
+  //   return newState;
+  // }
+
+  componentDidMount() {
+    debugger;
+    this.setDimensions();
+    let resizedFn;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizedFn);
+      resizedFn = setTimeout(() => {
+        this.windowResized();
+      }, 200);
+    });
+  }
+
+  windowResized = () => {
+    this.setDimensions();
+  };
+
+  setDimensions = () => {
+    const { chartSettings } = this.state;
+    const containerWidth = this.getWidth();
+    const containerHeight = this.getHeight();
+    const width =
+      containerWidth - chartSettings.margin.left - chartSettings.margin.right;
+    const height =
+      containerHeight - chartSettings.margin.top - chartSettings.margin.bottom;
+    this.setState({
+      networkContainerWidth: containerWidth,
+      networkWidth: width,
+      networkContainerHeight: containerHeight,
+      networkHeight: height
+    });
+  };
+
+  getHeight() {
+    if (this.networkContainerRef.current !== null) {
+      return this.networkSVGRef.current.parentElement.offsetHeight;
+    } else return 900;
+  }
+  getWidth() {
+    if (this.networkContainerRef.current !== null) {
+      return this.networkSVGRef.current.parentElement.offsetWidth;
+    } else return 1200;
+  }
+
+  // makeChart = () => {
+  //   this.setState({
+  //     chartObj: {
+  //       svg: null,
+  //       mainDiv: null,
+  //       chartDiv: null,
+  //       g: null,
+  //       gLinks: null,
+  //       gNodes: null,
+  //       tooltip: null
+  //     }
+  //   });
+  // };
+
+  prepareAndRender = () => {
+    const {
+      chartObjs,
+      networkContainerWidth,
+      networkWidth,
+      networkContainerHeight,
+      networkHeight
+    } = this.state;
+    // Make Chart (already have chartObj null defaults in state)
+    // Prepare Data
+    debugger;
+    // const { chartSettings } = this.state;
+    const { networkData, networkSettings } = this.props;
+    // console.log(chartSettings.data.nodes);
+
+    let formattedNodes = _.map(networkData.nodes, function(o) {
+      return o.data;
+    });
+
+    let formattedLinks = _.map(networkData.edges, function(o) {
+      return o.data;
+    });
+
+    this.setState({
+      chartSettings: {
+        formattedData: {
+          nodes: formattedNodes,
+          links: formattedLinks
+        }
+      }
+    });
+
+    _.forEach(formattedNodes, function(o1) {
+      // console.log('here is o1')
+      // console.log(o1)
+      var picked = _.pick(o1, networkSettings.facets);
+      // console.log("here is picked")
+      // console.log(picked)
+
+      let annotation = o1.EnrichmentMap_Name;
+      let description = o1.EnrichmentMap_GS_DESCR;
+
+      let metaData = { Annotation: annotation, Description: description };
+
+      //var merged = _.merge({}, chartSettings.comparisons2, picked)
+      //console.log('here is merged');
+      //console.log(merged)
+      let i = 0;
+      o1.facets = _.map(picked, value => {
+        let prop = networkSettings.propLabel[i];
+        i++;
+        return {
+          prop,
+          value,
+          metaData
+        };
+      });
+      // console.log('here is o1.facets')
+      // console.log(o1.facets)
+    });
+
+    let dataCombinedVar = {
+      nodes: formattedNodes,
+      links: formattedLinks
+    };
+    // this.setState({
+    //   dataCombined: {
+    //     nodes: formattedNodes,
+    //     links: formattedLinks
+    //   }
+    // });
+    var minSet = _.min(
+      _.map(formattedNodes, function(o) {
+        return o.EnrichmentMap_gs_size;
+      })
+    );
+    var maxSet = _.max(
+      _.map(formattedNodes, function(o) {
+        return o.EnrichmentMap_gs_size;
+      })
+    );
+    var minLine = _.min(
+      _.map(formattedLinks, function(o) {
+        return o.EnrichmentMap_Overlap_size;
+      })
+    );
+    var maxLine = _.max(
+      _.map(formattedLinks, function(o) {
+        return o.EnrichmentMap_Overlap_size;
+      })
+    );
+
+    let radiusVar = d3.scaleSqrt().range([10, 50]);
+    let lineScaleVar = d3.scaleLinear().range([1, 10]);
+
+    radiusVar.domain([minSet, maxSet]);
+    lineScaleVar.domain([minLine, maxLine]);
+
+    // Prepare Settings (dimensions already calculated)
+
+    // Prepare Chart (svg is already inline JSX with attributes created in this function)
+
+    // Prepare NetworkPlot
+    let color = d3
+      .scaleLinear()
+      .domain([0, 0.05, 0.1])
+      .range(['red', 'white', 'blue']);
+
+    let arc = d3.arc();
+
+    let pie = d3
+      .pie()
+      .sort(null)
+      .value(function(d) {
+        return 1;
+      });
+
+    let svg = chartObjs.svg;
+    let width = networkWidth;
+    let height = networkHeight;
+
+    let simulation = d3
+      .forceSimulation()
+      .force(
+        'link',
+        d3.forceLink().id(function(d) {
+          return d.id;
+        })
+      )
+      .force(
+        'charge',
+        d3
+          .forceManyBody()
+          .strength([-800])
+          .distanceMax([500])
+      )
+      .force('center', d3.forceCenter(width / 2, height / 2))
+      .force(
+        'collision',
+        d3.forceCollide().radius(function(d) {
+          return radiusVar(d.EnrichmentMap_gs_size);
+        })
+      )
+      .force('x', d3.forceX())
+      .force('y', d3.forceY())
+      .stop();
+
+    d3.timeout(
+      function() {
+        let self = this;
+        for (
+          let i = 0,
+            n = Math.ceil(
+              Math.log(simulation.alphaMin()) /
+                Math.log(1 - simulation.alphaDecay())
+            );
+          i < n;
+          ++i
+        ) {
+          simulation.nodes(dataCombinedVar.nodes);
+
+          simulation.force('link').links(dataCombinedVar.links);
+
+          simulation.tick();
+        }
+
+        let link = svg
+          .append('g')
+          .attr('class', 'links')
+          .selectAll('line')
+          .data(dataCombinedVar.links)
+          .enter()
+          .append('line')
+          .style('stroke', function(d) {
+            return '#0080ff';
+          })
+          .style('stroke-opacity', function(d) {
+            return 0.3;
+          })
+          .style('stroke-width', function(d) {
+            return lineScaleVar(d.EnrichmentMap_Overlap_size);
+          })
+          .attr('x1', function(d) {
+            return d.source.x;
+          })
+          .attr('y1', function(d) {
+            return d.source.y;
+          })
+          .attr('x2', function(d) {
+            return d.target.x;
+          })
+          .attr('y2', function(d) {
+            return d.target.y;
+          });
+
+        let node = svg
+          .append('g')
+          .attr('class', 'nodes')
+          .selectAll('g')
+          .data(dataCombinedVar.nodes)
+          .enter()
+          .append('g')
+          .attr('transform', function(d) {
+            return (
+              'translate(' +
+              Math.max(
+                radiusVar(d.EnrichmentMap_gs_size),
+                Math.min(networkWidth - radiusVar(d.EnrichmentMap_gs_size), d.x)
+              ) +
+              ',' +
+              Math.max(
+                radiusVar(d.EnrichmentMap_gs_size),
+                Math.min(
+                  networkHeight - radiusVar(d.EnrichmentMap_gs_size),
+                  d.y
+                )
+              ) +
+              ')'
+            );
+          })
+          .call(
+            d3
+              .drag()
+              .on('start', function() {
+                dragstarted(this);
+              })
+              .on('drag', dragged)
+              .on('end', dragended)
+          );
+
+        node.each(multiple);
+
+        let labels = node
+          .append('text')
+          .attr('class', 'node-label')
+          .text(function(d) {
+            return d.EnrichmentMap_GS_DESCR;
+          })
+          .style('font-size', '1em')
+          .style('opacity', 1)
+          .attr('x', 6)
+          .attr('y', 3);
+
+        // function doSomething(o) {
+        //     if (d3.event.defaultPrevented) return;
+        //     console.log('click')
+
+        //     d3.selectAll("circle").style("fill", "white")
+        //     d3.selectAll("path").style("opacity", .75)
+        //     d3.selectAll(".node-label").style("opacity", 0)
+        //     d3.select(o).selectAll("circle").style("fill", "yellow")
+        //     d3.select(o).selectAll("path").style("opacity", 1)
+        //     d3.select(o).selectAll(".node-label").style("opacity", 1)
+        // }
+
+        // node.append("title")
+        //     .text(function (d) { return d; });
+
+        let div = d3
+          .select('body')
+          .append('div')
+          .attr('class', 'tooltip-pieSlice')
+          .style('opacity', 0);
+
+        function multiple(d) {
+          // console.log('d is' )
+          // console.log(d)
+          let geneSetSize = d.EnrichmentMap_gs_size;
+          let r = radiusVar(geneSetSize);
+
+          let node = d3.select(this);
+
+          node
+            .selectAll('path')
+            .data(function(d) {
+              //console.log(d.comparisons)
+              //console.log(pie(d.comparisons))
+              return pie(d.facets);
+            })
+            .enter()
+            .append('svg:path')
+            //.attr("d", arc.outerRadius(r - (r * .15)).innerRadius(0))
+            .attr('d', arc.outerRadius(r).innerRadius(0))
+            .attr('opacity', 0.75)
+            .style('cursor', 'pointer')
+            .attr('stroke', 'black')
+            .style('fill', function(d) {
+              if (d.data.value != null) return color(d.data.value);
+              return '#d3d3d3';
+            })
+            .on('click', function(d) {
+              pieClickEvent(d, this);
+            })
+            .on('mouseover', function(d, i) {
+              d3.select(this)
+                .transition()
+                .duration('50')
+                .attr('opacity', '.50')
+                .attr('d', arc.outerRadius(50).innerRadius(0));
+              div
+                .transition()
+                .duration(50)
+                .style('opacity', 1);
+              let pValueDisplay;
+              if (Math.abs(d.data.value) > 0.001)
+                pValueDisplay = d.data.value.toPrecision(3);
+              else pValueDisplay = d.data.value.toExponential(3);
+
+              div
+                .html(
+                  `<b>Description: </b>` +
+                    d.data.metaData.Description +
+                    `<br/><b>Test: </b>` +
+                    d.data.prop +
+                    `<br/><b>pValue: </b>` +
+                    pValueDisplay +
+                    `<br/><b>Ontology: </b>` +
+                    d.data.metaData.Annotation
+                )
+                .style('left', d3.event.pageX + 10 + 'px')
+                .style('top', d3.event.pageY - 15 + 'px');
+            })
+            .on('mouseout', function(d, i) {
+              d3.select(this)
+                .transition()
+                .duration('50')
+                .attr('opacity', '.75')
+                .attr('d', arc.outerRadius(r).innerRadius(0));
+              div
+                .transition()
+                .duration('50')
+                .style('opacity', 0);
+            });
+
+          //.append("title").text(function (d) { return d })
+        }
+
+        function pieClickEvent(d, o) {
+          if (d3.event.defaultPrevented) return;
+          //console.log('click')
+          //console.log(d)
+          //console.log(o.parentNode)
+
+          //d3.selectAll("circle").style("fill", "white")
+          //d3.selectAll("path").style("opacity", .75)
+          //d3.selectAll(".node-label").style("opacity", 0)
+          //d3.select(o.parentNode).selectAll("circle").style("fill", "yellow")
+          //d3.select(o.ParentNode).selectAll("path").style("opacity", 1)
+          //d3.select(o.ParentNode).selectAll(".node-label").style("opacity", 1)
+
+          // UNCOMMENT WHEN READY, PAUL
+          // self.pieClick.emit(d.data);
+        }
+
+        function dragstarted(o) {
+          d3.event.sourceEvent.stopPropagation();
+          d3.event.sourceEvent.preventDefault();
+          //console.log('drag')
+          d3.selectAll('circle').style('fill', 'white');
+          //d3.selectAll("path").style("opacity", .75)
+          //d3.select(o).selectAll("circle").style("fill", "yellow")
+          //d3.select(o).selectAll("path").style("opacity", 1)
+        }
+
+        function dragged(d) {
+          d.x = d3.event.x;
+          d.y = d3.event.y;
+          let xPos = Math.max(
+            radiusVar(d.EnrichmentMap_gs_size),
+            Math.min(networkWidth - radiusVar(d.EnrichmentMap_gs_size), d.x)
+          );
+          let yPos = Math.max(
+            radiusVar(d.EnrichmentMap_gs_size),
+            Math.min(networkHeight - radiusVar(d.EnrichmentMap_gs_size), d.y)
+          );
+
+          d3.select(this).attr('transform', function(d) {
+            return (
+              'translate(' +
+              Math.max(
+                radiusVar(d.EnrichmentMap_gs_size),
+                Math.min(networkWidth - radiusVar(d.EnrichmentMap_gs_size), d.x)
+              ) +
+              ',' +
+              Math.max(
+                radiusVar(d.EnrichmentMap_gs_size),
+                Math.min(
+                  networkHeight - radiusVar(d.EnrichmentMap_gs_size),
+                  d.y
+                )
+              ) +
+              ')'
+            );
+          });
+
+          link
+            .filter(function(l) {
+              return l.source === d;
+            })
+            .attr('x1', xPos)
+            .attr('y1', yPos);
+          link
+            .filter(function(l) {
+              return l.target === d;
+            })
+            .attr('x2', xPos)
+            .attr('y2', yPos);
+        }
+
+        function dragended(d) {
+          if (!d3.event.active) simulation.alphaTarget(0);
+          d.fx = d3.event.x;
+          d.fy = d3.event.y;
+        }
+      }.bind(this)
+    );
+  };
+
   render() {
+    const {
+      networkWidth,
+      networkContainerWidth,
+      networkHeight,
+      networkContainerHeight
+    } = this.state;
+    const { networkData, networkSettings } = this.props;
+
     const IconPopupStyle = {
       backgroundColor: '2E2E2E',
       borderBottom: '2px solid var(--color-primary)',
@@ -74,7 +614,7 @@ export default class NetworkGraph extends Component {
       </div>
     );
     return (
-      <div className="NetworkGraphContainer">
+      <div className="NetworkGraphWrapper">
         {enrichmentViewToggle}
         <Grid>
           <Grid.Row>
@@ -138,10 +678,16 @@ export default class NetworkGraph extends Component {
             </Grid.Column>
           </Grid.Row>
         </Grid>
-        <div className="NetworkChartWrapper">
+        <div
+          ref={this.networkContainerRef}
+          id={networkSettings.id}
+          className="NetworkChartContainer"
+        >
           <svg
-            className="prefix__network-chart-area prefix__nwChart"
-            viewBox="0 0 1600 900"
+            ref={this.networkSVGRef}
+            id={`svg-${networkSettings.id}`}
+            className="network-chart-area nwChart"
+            viewBox={`0 0 ${networkContainerWidth} ${networkContainerHeight}`}
             preserveAspectRatio="xMinYMin meet"
             // {...this.props}
           >

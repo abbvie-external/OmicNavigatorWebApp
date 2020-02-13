@@ -48,7 +48,7 @@ class Enrichment extends Component {
     networkDataAvailable: false,
     networkData: {},
     tests: {},
-    nwSettings: {
+    networkSettings: {
       facets: {},
       propLabel: {},
       metaLabels: ['Description', 'Ontology'],
@@ -395,11 +395,10 @@ class Enrichment extends Component {
         enrichmentStudy + 'plots'
       )
       .then(EMData => {
-        debugger;
         // this.showIconContainer = true;
         this.setState({
           networkDataAvailable: true,
-          nwData: EMData.elements
+          networkData: EMData.elements
           // tests: EMData.tests
         });
 
@@ -409,8 +408,8 @@ class Enrichment extends Component {
         //   facets.push("EnrichmentMap_pvalue_" + rplcSpaces + "_");
         // }
         this.setState({
-          nwSettings: {
-            ...this.state.nwSettings,
+          networkSettings: {
+            ...this.state.networkSettings,
             facets: facets
             // propLabel: EMData.tests
             // metaLabels: ["Description", "Ontology"],
