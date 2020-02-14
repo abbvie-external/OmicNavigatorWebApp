@@ -137,7 +137,9 @@ class PhosphoprotService {
       window.ocpu
         .call(plottype, obj, function(session) {
           axios
-            .get(session.getLoc() + 'graphics/1/svg', { responseType: 'text' })
+            .get(session.getLoc() + 'graphics/1/svg', {
+              responseType: 'text'
+            })
             .then(response => resolve(response));
         })
         .catch(error => {
@@ -303,8 +305,7 @@ class PhosphoprotService {
     pValueType,
     enrichmentStudy
   ) {
-    debugger;
-    this.setUrl();
+    // this.setUrl()
     // const promise = this.ocpuRPC('getCytoscapeEM', {
     //   model: enrichmentModel,
     //   db: enrichmentAnnotation,

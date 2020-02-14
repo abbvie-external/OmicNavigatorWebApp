@@ -22,7 +22,10 @@ th.dragging > * {
     top: 150%;
   }
 }
-.QHGrid .QHGrid--body.QHGrid--body.QHGrid--body.QHGrid--body.QHGrid--body thead th {
+.QHGrid
+  .QHGrid--body.QHGrid--body.QHGrid--body.QHGrid--body.QHGrid--body
+  thead
+  th {
   background: #f9fafb;
 }
 .QHGrid .QHGrid--body.QHGrid--body.QHGrid--body.QHGrid--body thead th:hover {
@@ -108,7 +111,6 @@ i.icon.quickViewIcon {
 // .QHGrid--generalSearch.ui.input > input {
 //   border: 0;
 // }
-
 
 // Paul start
 .highlightedRow {

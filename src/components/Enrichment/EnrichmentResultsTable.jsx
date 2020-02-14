@@ -1,23 +1,23 @@
-import React, { Component } from "react";
-import { Popup, Icon } from "semantic-ui-react";
-import { phosphoprotService } from "../../services/phosphoprot.service";
-import { withRouter } from "react-router-dom";
+import React, { Component } from 'react';
+import { Popup, Icon } from 'semantic-ui-react';
+import { phosphoprotService } from '../../services/phosphoprot.service';
+import { withRouter } from 'react-router-dom';
 // import ButtonActions from './ButtonActions';
-import SplitPanesContainer from "./SplitPanesContainer";
-import SearchingAlt from "../Transitions/SearchingAlt";
-import "./EnrichmentResultsTable.scss";
-import _ from "lodash";
-import DOMPurify from "dompurify";
-import QHGrid from "../utility/QHGrid";
-import EZGrid from "../utility/EZGrid";
-import QuickViewModal from "../utility/QuickViewModal";
+import SplitPanesContainer from './SplitPanesContainer';
+import SearchingAlt from '../Transitions/SearchingAlt';
+import './EnrichmentResultsTable.scss';
+import _ from 'lodash';
+import DOMPurify from 'dompurify';
+import QHGrid from '../utility/QHGrid';
+import EZGrid from '../utility/EZGrid';
+import QuickViewModal from '../utility/QuickViewModal';
 import {
   getFieldValue,
   getField,
   typeMap
-} from "../utility/selectors/QHGridSelector";
-export * from "../utility/FilterTypeConfig";
-export * from "../utility/selectors/quickViewSelector";
+} from '../utility/selectors/QHGridSelector';
+export * from '../utility/FilterTypeConfig';
+export * from '../utility/selectors/quickViewSelector';
 export { QHGrid, EZGrid, QuickViewModal };
 export { getField, getFieldValue, typeMap };
 
@@ -25,7 +25,7 @@ class EnrichmentResultsTable extends Component {
   state = {
     annotationData: [],
     enrichmentDataItem: [],
-    enrichmentTerm: "",
+    enrichmentTerm: '',
     itemsPerPageInformedEnrichmentMain: null,
     treeDataRaw: [],
     treeData: [],
@@ -33,7 +33,7 @@ class EnrichmentResultsTable extends Component {
     plotType: [],
     imageInfo: {
       key: null,
-      title: "",
+      title: '',
       svg: []
     },
     currentSVGs: [],
@@ -46,10 +46,10 @@ class EnrichmentResultsTable extends Component {
       barcodeData: [],
       brushedData: [],
       // chartSize: { height: '200', width: '960' },
-      lineID: "",
+      lineID: '',
       statLabel: {},
-      statistic: "statistic",
-      logFC: "logFC",
+      statistic: 'statistic',
+      logFC: 'logFC',
       highLabel: {},
       lowLabel: {},
       highStat: null,
@@ -83,8 +83,8 @@ class EnrichmentResultsTable extends Component {
   };
 
   componentDidMount() {
-    const DescriptionAndTest = this.props.enrichmentDescriptionAndTest || "";
-    if (DescriptionAndTest !== "") {
+    const DescriptionAndTest = this.props.enrichmentDescriptionAndTest || '';
+    if (DescriptionAndTest !== '') {
       const AllDescriptionsAndTests = this.props.enrichmentResults;
       const dataItemDescription = getDataItemDescription(DescriptionAndTest);
       const dataItemIndex = _.findIndex(AllDescriptionsAndTests, function(d) {
@@ -123,7 +123,7 @@ class EnrichmentResultsTable extends Component {
     // let xLargest = 0;
     // let imageInfo = { key: '', title: '', svg: [] };
     phosphoprotService
-      .getDatabaseInfo(enrichmentStudy + "plots", enrichmentAnnotation)
+      .getDatabaseInfo(enrichmentStudy + 'plots', enrichmentAnnotation)
       .then(annotationDataResponse => {
         const annotationDataParsed = JSON.parse(annotationDataResponse);
         self.setState({
@@ -147,15 +147,15 @@ class EnrichmentResultsTable extends Component {
 
         phosphoprotService
           .getBarcodeData(
-            enrichmentStudy + "plots",
+            enrichmentStudy + 'plots',
             enrichmentModel,
             enrichmentAnnotation,
             test,
             dataItem.Annotation
           )
           .then(barcodeDataResponse => {
-            let BardcodeInfoObj = JSON.parse(barcodeDataResponse["object"]);
-            let highest = barcodeDataResponse["highest"][0];
+            let BardcodeInfoObj = JSON.parse(barcodeDataResponse['object']);
+            let highest = barcodeDataResponse['highest'][0];
             // if (!this.state.modelsToRenderViolin.includes(this.enrichmentModel)){
             //   this.setState({ sizeVal = '0%' )};
             // } else {
@@ -172,11 +172,11 @@ class EnrichmentResultsTable extends Component {
       var protein = (dataItem.Description
         ? dataItem.Description
         : dataItem.MajorityProteinIDsHGNC
-      ).split(";")[0];
+      ).split(';')[0];
       let param = { queryId: -1, from: 0, searchStr: protein };
       phosphoprotService.postToPhosphositePlus(
         param,
-        "https://www.phosphosite.org/proteinSearchSubmitAction.action"
+        'https://www.phosphosite.org/proteinSearchSubmitAction.action'
       );
     };
   };
@@ -197,10 +197,10 @@ class EnrichmentResultsTable extends Component {
         const TestSiteVar = `${test}:${dataItem.Description}`;
         self.props.onSearchCriteriaChange(
           {
-            enrichmentStudy: self.props.enrichmentStudy || "",
-            enrichmentModel: self.props.enrichmentModel || "",
-            enrichmentAnnotation: self.props.enrichmentAnnotation || "",
-            enrichmentDescriptionAndTest: TestSiteVar || ""
+            enrichmentStudy: self.props.enrichmentStudy || '',
+            enrichmentModel: self.props.enrichmentModel || '',
+            enrichmentAnnotation: self.props.enrichmentAnnotation || '',
+            enrichmentDescriptionAndTest: TestSiteVar || ''
           },
           false
         );
@@ -209,7 +209,7 @@ class EnrichmentResultsTable extends Component {
 
         if (self.state.annotationData.length === 0) {
           phosphoprotService
-            .getDatabaseInfo(enrichmentStudy + "plots", enrichmentAnnotation)
+            .getDatabaseInfo(enrichmentStudy + 'plots', enrichmentAnnotation)
             .then(annotationDataResponse => {
               const annotationDataParsed = JSON.parse(annotationDataResponse);
               self.setState({
@@ -234,7 +234,7 @@ class EnrichmentResultsTable extends Component {
 
               phosphoprotService
                 .getBarcodeData(
-                  enrichmentStudy + "plots",
+                  enrichmentStudy + 'plots',
                   enrichmentModel,
                   enrichmentAnnotation,
                   test,
@@ -242,9 +242,9 @@ class EnrichmentResultsTable extends Component {
                 )
                 .then(barcodeDataResponse => {
                   let BardcodeInfoObj = JSON.parse(
-                    barcodeDataResponse["object"]
+                    barcodeDataResponse['object']
                   );
-                  let highest = barcodeDataResponse["highest"][0];
+                  let highest = barcodeDataResponse['highest'][0];
                   // if (!this.state.modelsToRenderViolin.includes(this.enrichmentModel)){
                   //   this.setState({ sizeVal = '0%' )};
                   // } else {
@@ -275,15 +275,15 @@ class EnrichmentResultsTable extends Component {
 
           phosphoprotService
             .getBarcodeData(
-              enrichmentStudy + "plots",
+              enrichmentStudy + 'plots',
               enrichmentModel,
               enrichmentAnnotation,
               test,
               dataItem.Annotation
             )
             .then(barcodeDataResponse => {
-              let BardcodeInfoObj = JSON.parse(barcodeDataResponse["object"]);
-              let highest = barcodeDataResponse["highest"][0];
+              let BardcodeInfoObj = JSON.parse(barcodeDataResponse['object']);
+              let highest = barcodeDataResponse['highest'][0];
               // if (!this.state.modelsToRenderViolin.includes(this.enrichmentModel)){
               //   this.setState({ sizeVal = '0%' )};
               // } else {
@@ -301,32 +301,32 @@ class EnrichmentResultsTable extends Component {
       return function() {
         if (self.state.annotationData.length === 0) {
           phosphoprotService
-            .getDatabaseInfo(enrichmentStudy + "plots", enrichmentAnnotation)
+            .getDatabaseInfo(enrichmentStudy + 'plots', enrichmentAnnotation)
             .then(annotationDataResponse => {
               const annotationDataParsed = JSON.parse(annotationDataResponse);
               dataItem.Annotation = _.find(annotationDataParsed, {
                 Description: dataItem.Description
               }).Key;
               const database = enrichmentAnnotation;
-              if (database === "REACTOME") {
+              if (database === 'REACTOME') {
                 window.open(
-                  "https://reactome.org/content/detail/" + dataItem.Annotation,
-                  "_blank"
+                  'https://reactome.org/content/detail/' + dataItem.Annotation,
+                  '_blank'
                 );
-              } else if (database.substring(0, 2) === "GO") {
+              } else if (database.substring(0, 2) === 'GO') {
                 window.open(
-                  "http://amigo.geneontology.org/amigo/term/" +
+                  'http://amigo.geneontology.org/amigo/term/' +
                     dataItem.Annotation,
-                  "_blank"
+                  '_blank'
                 );
-              } else if (database.substring(0, 4) === "msig") {
+              } else if (database.substring(0, 4) === 'msig') {
                 window.open(
-                  "http://software.broadinstitute.org/gsea/msigdb/cards/" +
+                  'http://software.broadinstitute.org/gsea/msigdb/cards/' +
                     dataItem.Annotation,
-                  "_blank"
+                  '_blank'
                 );
-              } else if (database === "PSP") {
-                self.showPhosphositePlus("", dataItem);
+              } else if (database === 'PSP') {
+                self.showPhosphositePlus('', dataItem);
               }
             });
         } else {
@@ -334,24 +334,24 @@ class EnrichmentResultsTable extends Component {
             Description: dataItem.Description
           }).Key;
           const database = enrichmentAnnotation;
-          if (database === "REACTOME") {
+          if (database === 'REACTOME') {
             window.open(
-              "https://reactome.org/content/detail/" + dataItem.Annotation,
-              "_blank"
+              'https://reactome.org/content/detail/' + dataItem.Annotation,
+              '_blank'
             );
-          } else if (database.substring(0, 2) === "GO") {
+          } else if (database.substring(0, 2) === 'GO') {
             window.open(
-              "http://amigo.geneontology.org/amigo/term/" + dataItem.Annotation,
-              "_blank"
+              'http://amigo.geneontology.org/amigo/term/' + dataItem.Annotation,
+              '_blank'
             );
-          } else if (database.substring(0, 4) === "msig") {
+          } else if (database.substring(0, 4) === 'msig') {
             window.open(
-              "http://software.broadinstitute.org/gsea/msigdb/cards/" +
+              'http://software.broadinstitute.org/gsea/msigdb/cards/' +
                 dataItem.Annotation,
-              "_blank"
+              '_blank'
             );
-          } else if (database === "PSP") {
-            self.showPhosphositePlus("", dataItem);
+          } else if (database === 'PSP') {
+            self.showPhosphositePlus('', dataItem);
           }
         }
       };
@@ -496,33 +496,33 @@ class EnrichmentResultsTable extends Component {
           // psp.style.visibility = "hidden";
           // psp.style.left = w.toString() + "px";
           // psp.style.bottom = h.toString() + "px";
-          let plotType = ["splineplot"];
+          let plotType = ['splineplot'];
           switch (enrichmentModel) {
-            case "DonorDifferentialPhosphorylation":
-              plotType = ["dotplot"];
+            case 'DonorDifferentialPhosphorylation':
+              plotType = ['dotplot'];
               break;
-            case "Treatment and or Strain Differential Phosphorylation":
-              plotType = ["StrainStimDotplot", "StimStrainDotplot"];
+            case 'Treatment and or Strain Differential Phosphorylation':
+              plotType = ['StrainStimDotplot', 'StimStrainDotplot'];
               break;
-            case "Timecourse Differential Phosphorylation":
-              plotType = ["lineplot", "splineplot"];
+            case 'Timecourse Differential Phosphorylation':
+              plotType = ['lineplot', 'splineplot'];
               break;
-            case "Differential Expression":
-              plotType = ["proteindotplot"];
+            case 'Differential Expression':
+              plotType = ['proteindotplot'];
               break;
-            case "Differential Phosphorylation":
-              plotType = ["phosphodotplot"];
+            case 'Differential Phosphorylation':
+              plotType = ['phosphodotplot'];
               break;
-            case "No Pretreatment Timecourse Differential Phosphorylation":
-              plotType = ["lineplot.modelII", "splineplot.modelII"];
+            case 'No Pretreatment Timecourse Differential Phosphorylation':
+              plotType = ['lineplot.modelII', 'splineplot.modelII'];
               break;
-            case "Ferrostatin Pretreatment Timecourse Differential Phosphorylation":
-              plotType = ["lineplot.modelIII", "splineplot.modelIII"];
+            case 'Ferrostatin Pretreatment Timecourse Differential Phosphorylation':
+              plotType = ['lineplot.modelIII', 'splineplot.modelIII'];
               break;
             default:
-              plotType = ["dotplot"];
+              plotType = ['dotplot'];
           }
-          let imageInfo = { key: "", title: "", svg: [] };
+          let imageInfo = { key: '', title: '', svg: [] };
           imageInfo.title = this.state.imageInfo.title;
           imageInfo.key = this.state.imageInfo.key;
           const handleSVGCb = this.handleSVG;
@@ -547,38 +547,38 @@ class EnrichmentResultsTable extends Component {
     let widthCalculation = this.calculateWidth;
     _.forEach(plotType, function(plot, i) {
       phosphoprotService
-        .getPlot(id, plotType[i], enrichmentStudy + "plots")
+        .getPlot(id, plotType[i], enrichmentStudy + 'plots')
         .then(svgMarkupObj => {
           let svgMarkup = svgMarkupObj.data;
-          svgMarkup = svgMarkup.replace(/id="/g, 'id="' + id + "-" + i + "-");
+          svgMarkup = svgMarkup.replace(/id="/g, 'id="' + id + '-' + i + '-');
           svgMarkup = svgMarkup.replace(
             /#glyph/g,
-            "#" + id + "-" + i + "-glyph"
+            '#' + id + '-' + i + '-glyph'
           );
-          svgMarkup = svgMarkup.replace(/#clip/g, "#" + id + "-" + i + "-clip");
+          svgMarkup = svgMarkup.replace(/#clip/g, '#' + id + '-' + i + '-clip');
           svgMarkup = svgMarkup.replace(
             /<svg/g,
             '<svg preserveAspectRatio="xMinYMid meet" style="width:' +
               widthCalculation() * 0.5 +
-              "px; height:" +
+              'px; height:' +
               heightCalculation() * 0.5 +
               'px;" id="currentSVG-' +
               id +
-              "-" +
+              '-' +
               i +
               '"'
           );
-          DOMPurify.addHook("afterSanitizeAttributes", function(node) {
+          DOMPurify.addHook('afterSanitizeAttributes', function(node) {
             if (
-              node.hasAttribute("xlink:href") &&
-              !node.getAttribute("xlink:href").match(/^#/)
+              node.hasAttribute('xlink:href') &&
+              !node.getAttribute('xlink:href').match(/^#/)
             ) {
               node.remove();
             }
           });
           // Clean HTML string and write into our DIV
           let sanitizedSVG = DOMPurify.sanitize(svgMarkup, {
-            ADD_TAGS: ["use"]
+            ADD_TAGS: ['use']
           });
           let svgInfo = { plotType: plotType[i], svg: sanitizedSVG };
           imageInfo.svg.push(svgInfo);
@@ -604,10 +604,10 @@ class EnrichmentResultsTable extends Component {
     });
     this.props.onSearchCriteriaChange(
       {
-        enrichmentStudy: this.props.enrichmentStudy || "",
-        enrichmentModel: this.props.enrichmentModel || "",
-        enrichmentAnnotation: this.props.enrichmentAnnotation || "",
-        enrichmentDescriptionAndTest: ""
+        enrichmentStudy: this.props.enrichmentStudy || '',
+        enrichmentModel: this.props.enrichmentModel || '',
+        enrichmentAnnotation: this.props.enrichmentAnnotation || '',
+        enrichmentDescriptionAndTest: ''
       },
       false
     );
@@ -649,13 +649,13 @@ class EnrichmentResultsTable extends Component {
     );
 
     const IconPopupStyle = {
-      backgroundColor: "2E2E2E",
-      borderBottom: "2px solid var(--color-primary)",
-      color: "#FFF",
-      padding: "1em",
-      maxWidth: "50vw",
-      fontSize: "13px",
-      wordBreak: "break-all"
+      backgroundColor: '2E2E2E',
+      borderBottom: '2px solid var(--color-primary)',
+      color: '#FFF',
+      padding: '1em',
+      maxWidth: '50vw',
+      fontSize: '13px',
+      wordBreak: 'break-all'
     };
 
     const enrichmentViewToggle = (
@@ -668,9 +668,9 @@ class EnrichmentResultsTable extends Component {
               color="orange"
               bordered
               className="TableVsNetworkButtons"
-              inverted={this.props.enrichmentView === "table"}
+              inverted={this.props.enrichmentView === 'table'}
               onClick={this.props.onEnrichmentViewChange({
-                enrichmentView: "table"
+                enrichmentView: 'table'
               })}
             />
           }
@@ -688,9 +688,9 @@ class EnrichmentResultsTable extends Component {
               color="orange"
               bordered
               className="TableVsNetworkButtons"
-              inverted={this.props.enrichmentView === "network"}
+              inverted={this.props.enrichmentView === 'network'}
               onClick={this.props.onEnrichmentViewChange({
-                enrichmentView: "network"
+                enrichmentView: 'network'
               })}
             />
           }
@@ -752,14 +752,14 @@ export default withRouter(EnrichmentResultsTable);
 
 function getDataItemDescription(value) {
   if (value) {
-    const dataItem = value.split(":")[1];
+    const dataItem = value.split(':')[1];
     return dataItem;
   }
 }
 
 function getTestName(value) {
   if (value) {
-    const test = value.split(":")[0];
+    const test = value.split(':')[0];
     return test;
   }
 }

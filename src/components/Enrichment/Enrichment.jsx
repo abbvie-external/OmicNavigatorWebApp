@@ -398,20 +398,20 @@ class Enrichment extends Component {
         // this.showIconContainer = true;
         this.setState({
           networkDataAvailable: true,
-          networkData: EMData.elements
-          // tests: EMData.tests
+          networkData: EMData.elements,
+          tests: EMData.tests
         });
-
+        debugger;
         let facets = [];
-        // for (var i = 0; i < EMData.tests.length; i++) {
-        //   let rplcSpaces = EMData.tests[i].replace(/ /g, "_");
-        //   facets.push("EnrichmentMap_pvalue_" + rplcSpaces + "_");
-        // }
+        for (var i = 0; i < EMData.tests.length; i++) {
+          let rplcSpaces = EMData.tests[i].replace(/ /g, '_');
+          facets.push('EnrichmentMap_pvalue_' + rplcSpaces + '_');
+        }
         this.setState({
           networkSettings: {
             ...this.state.networkSettings,
-            facets: facets
-            // propLabel: EMData.tests
+            facets: facets,
+            propLabel: EMData.tests
             // metaLabels: ["Description", "Ontology"],
             // meta: ["EnrichmentMap_GS_DESCR", "EnrichmentMap_Name"],
             // facetAndValueLabel: ["Test", "pValue"],

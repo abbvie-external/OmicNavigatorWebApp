@@ -279,7 +279,7 @@ export default class NetworkGraph extends Component {
 
     d3.timeout(
       function() {
-        let self = this;
+        // let self = this;
         for (
           let i = 0,
             n = Math.ceil(
