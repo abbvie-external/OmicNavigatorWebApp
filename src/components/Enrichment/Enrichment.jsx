@@ -401,7 +401,6 @@ class Enrichment extends Component {
           networkData: EMData.elements,
           tests: EMData.tests
         });
-        debugger;
         let facets = [];
         for (var i = 0; i < EMData.tests.length; i++) {
           let rplcSpaces = EMData.tests[i].replace(/ /g, '_');

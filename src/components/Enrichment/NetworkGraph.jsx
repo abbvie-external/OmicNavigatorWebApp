@@ -30,10 +30,10 @@ export default class NetworkGraph extends Component {
 
   state = {
     dataCombined: [],
-    networkWidth: 0,
-    networkContainerWidth: 0,
-    networkHeight: 0,
-    networkContainerHeight: 0,
+    networkWidth: 1200,
+    networkContainerWidth: 1200,
+    networkHeight: 900,
+    networkContainerHeight: 900,
     chartSettings: {
       title: '',
       // data: null,
@@ -54,7 +54,14 @@ export default class NetworkGraph extends Component {
       gLinks: null,
       gNodes: null,
       tooltip: null
-    }
+    },
+    o1facets: [],
+    minSet: null,
+    maxSet: null,
+    minLine: null,
+    maxLine: null,
+    radius: null,
+    lineScale: null
   };
   networkContainerRef = React.createRef();
   networkSVGRef = React.createRef();
@@ -74,7 +81,6 @@ export default class NetworkGraph extends Component {
   // }
 
   componentDidMount() {
-    debugger;
     this.setDimensions();
     let resizedFn;
     window.addEventListener('resize', () => {
@@ -84,6 +90,12 @@ export default class NetworkGraph extends Component {
       }, 200);
     });
   }
+
+  // componentDidUpdate(prevProps, prevState, snapshot) {
+  //   if (this.props.networkData !== prevProps.networkData) {
+  //     this.prepareAndRender();
+  //   }
+  // }
 
   windowResized = () => {
     this.setDimensions();
@@ -103,6 +115,7 @@ export default class NetworkGraph extends Component {
       networkContainerHeight: containerHeight,
       networkHeight: height
     });
+    this.prepareAndRender();
   };
 
   getHeight() {
@@ -116,34 +129,19 @@ export default class NetworkGraph extends Component {
     } else return 1200;
   }
 
-  // makeChart = () => {
-  //   this.setState({
-  //     chartObj: {
-  //       svg: null,
-  //       mainDiv: null,
-  //       chartDiv: null,
-  //       g: null,
-  //       gLinks: null,
-  //       gNodes: null,
-  //       tooltip: null
-  //     }
-  //   });
-  // };
-
   prepareAndRender = () => {
     const {
-      chartObjs,
-      networkContainerWidth,
+      chartSettings,
+      // chartObjs,
       networkWidth,
-      networkContainerHeight,
       networkHeight
     } = this.state;
     // Make Chart (already have chartObj null defaults in state)
+
     // Prepare Data
-    debugger;
-    // const { chartSettings } = this.state;
     const { networkData, networkSettings } = this.props;
-    // console.log(chartSettings.data.nodes);
+
+    const self = this;
 
     let formattedNodes = _.map(networkData.nodes, function(o) {
       return o.data;
@@ -155,6 +153,7 @@ export default class NetworkGraph extends Component {
 
     this.setState({
       chartSettings: {
+        ...this.state.chartSettings,
         formattedData: {
           nodes: formattedNodes,
           links: formattedLinks
@@ -163,20 +162,10 @@ export default class NetworkGraph extends Component {
     });
 
     _.forEach(formattedNodes, function(o1) {
-      // console.log('here is o1')
-      // console.log(o1)
       var picked = _.pick(o1, networkSettings.facets);
-      // console.log("here is picked")
-      // console.log(picked)
-
       let annotation = o1.EnrichmentMap_Name;
       let description = o1.EnrichmentMap_GS_DESCR;
-
       let metaData = { Annotation: annotation, Description: description };
-
-      //var merged = _.merge({}, chartSettings.comparisons2, picked)
-      //console.log('here is merged');
-      //console.log(merged)
       let i = 0;
       o1.facets = _.map(picked, value => {
         let prop = networkSettings.propLabel[i];
@@ -187,36 +176,37 @@ export default class NetworkGraph extends Component {
           metaData
         };
       });
-      // console.log('here is o1.facets')
-      // console.log(o1.facets)
+      self.setState({
+        o1facets: o1.facets
+      });
     });
 
     let dataCombinedVar = {
       nodes: formattedNodes,
       links: formattedLinks
     };
-    // this.setState({
-    //   dataCombined: {
-    //     nodes: formattedNodes,
-    //     links: formattedLinks
-    //   }
-    // });
-    var minSet = _.min(
+    this.setState({
+      dataCombined: {
+        nodes: formattedNodes,
+        links: formattedLinks
+      }
+    });
+    var minSetVar = _.min(
       _.map(formattedNodes, function(o) {
         return o.EnrichmentMap_gs_size;
       })
     );
-    var maxSet = _.max(
+    var maxSetVar = _.max(
       _.map(formattedNodes, function(o) {
         return o.EnrichmentMap_gs_size;
       })
     );
-    var minLine = _.min(
+    var minLineVar = _.min(
       _.map(formattedLinks, function(o) {
         return o.EnrichmentMap_Overlap_size;
       })
     );
-    var maxLine = _.max(
+    var maxLineVar = _.max(
       _.map(formattedLinks, function(o) {
         return o.EnrichmentMap_Overlap_size;
       })
@@ -225,8 +215,17 @@ export default class NetworkGraph extends Component {
     let radiusVar = d3.scaleSqrt().range([10, 50]);
     let lineScaleVar = d3.scaleLinear().range([1, 10]);
 
-    radiusVar.domain([minSet, maxSet]);
-    lineScaleVar.domain([minLine, maxLine]);
+    radiusVar.domain([minSetVar, maxSetVar]);
+    lineScaleVar.domain([minLineVar, maxLineVar]);
+
+    this.setState({
+      minSet: minSetVar,
+      maxSet: maxSetVar,
+      minLine: minLineVar,
+      maxLine: maxLineVar,
+      radius: radiusVar,
+      lineScale: lineScaleVar
+    });
 
     // Prepare Settings (dimensions already calculated)
 
@@ -247,7 +246,8 @@ export default class NetworkGraph extends Component {
         return 1;
       });
 
-    let svg = chartObjs.svg;
+    // let svg = chartObjs.svg;
+    // let svg = d3.select(`svg-${chartSettings.id}`);
     let width = networkWidth;
     let height = networkHeight;
 
@@ -277,285 +277,274 @@ export default class NetworkGraph extends Component {
       .force('y', d3.forceY())
       .stop();
 
-    d3.timeout(
-      function() {
-        // let self = this;
-        for (
-          let i = 0,
-            n = Math.ceil(
-              Math.log(simulation.alphaMin()) /
-                Math.log(1 - simulation.alphaDecay())
-            );
-          i < n;
-          ++i
-        ) {
-          simulation.nodes(dataCombinedVar.nodes);
+    //   d3.timeout(function() {
+    //     for (
+    //       let i = 0,
+    //         n = Math.ceil(
+    //           Math.log(simulation.alphaMin()) /
+    //             Math.log(1 - simulation.alphaDecay())
+    //         );
+    //       i < n;
+    //       ++i
+    //     ) {
+    //       simulation.nodes(dataCombinedVar.nodes);
 
-          simulation.force('link').links(dataCombinedVar.links);
+    //       simulation.force('link').links(dataCombinedVar.links);
 
-          simulation.tick();
-        }
+    //       simulation.tick();
+    //     }
 
-        let link = svg
-          .append('g')
-          .attr('class', 'links')
-          .selectAll('line')
-          .data(dataCombinedVar.links)
-          .enter()
-          .append('line')
-          .style('stroke', function(d) {
-            return '#0080ff';
-          })
-          .style('stroke-opacity', function(d) {
-            return 0.3;
-          })
-          .style('stroke-width', function(d) {
-            return lineScaleVar(d.EnrichmentMap_Overlap_size);
-          })
-          .attr('x1', function(d) {
-            return d.source.x;
-          })
-          .attr('y1', function(d) {
-            return d.source.y;
-          })
-          .attr('x2', function(d) {
-            return d.target.x;
-          })
-          .attr('y2', function(d) {
-            return d.target.y;
-          });
+    //     let svg = d3.select(`svg-${chartSettings.id}`);
+    //     let link = svg
+    //       .append('g')
+    //       .attr('class', 'links')
+    //       .selectAll('line')
+    //       .data(dataCombinedVar.links)
+    //       .enter()
+    //       .append('line')
+    //       .style('stroke', function(d) {
+    //         return '#0080ff';
+    //       })
+    //       .style('stroke-opacity', function(d) {
+    //         return 0.3;
+    //       })
+    //       .style('stroke-width', function(d) {
+    //         return lineScaleVar(d.EnrichmentMap_Overlap_size);
+    //       })
+    //       .attr('x1', function(d) {
+    //         return d.source.x;
+    //       })
+    //       .attr('y1', function(d) {
+    //         return d.source.y;
+    //       })
+    //       .attr('x2', function(d) {
+    //         return d.target.x;
+    //       })
+    //       .attr('y2', function(d) {
+    //         return d.target.y;
+    //       });
 
-        let node = svg
-          .append('g')
-          .attr('class', 'nodes')
-          .selectAll('g')
-          .data(dataCombinedVar.nodes)
-          .enter()
-          .append('g')
-          .attr('transform', function(d) {
-            return (
-              'translate(' +
-              Math.max(
-                radiusVar(d.EnrichmentMap_gs_size),
-                Math.min(networkWidth - radiusVar(d.EnrichmentMap_gs_size), d.x)
-              ) +
-              ',' +
-              Math.max(
-                radiusVar(d.EnrichmentMap_gs_size),
-                Math.min(
-                  networkHeight - radiusVar(d.EnrichmentMap_gs_size),
-                  d.y
-                )
-              ) +
-              ')'
-            );
-          })
-          .call(
-            d3
-              .drag()
-              .on('start', function() {
-                dragstarted(this);
-              })
-              .on('drag', dragged)
-              .on('end', dragended)
-          );
+    //     let node = svg
+    //       .append('g')
+    //       .attr('class', 'nodes')
+    //       .selectAll('g')
+    //       .data(dataCombinedVar.nodes)
+    //       .enter()
+    //       .append('g')
+    //       .attr('transform', function(d) {
+    //         return (
+    //           'translate(' +
+    //           Math.max(
+    //             radiusVar(d.EnrichmentMap_gs_size),
+    //             Math.min(networkWidth - radiusVar(d.EnrichmentMap_gs_size), d.x)
+    //           ) +
+    //           ',' +
+    //           Math.max(
+    //             radiusVar(d.EnrichmentMap_gs_size),
+    //             Math.min(networkHeight - radiusVar(d.EnrichmentMap_gs_size), d.y)
+    //           ) +
+    //           ')'
+    //         );
+    //       })
+    //       .call(
+    //         d3
+    //           .drag()
+    //           .on('start', function() {
+    //             dragstarted(this);
+    //           })
+    //           .on('drag', dragged)
+    //           .on('end', dragended)
+    //       );
 
-        node.each(multiple);
+    //     node.each(multiple);
 
-        let labels = node
-          .append('text')
-          .attr('class', 'node-label')
-          .text(function(d) {
-            return d.EnrichmentMap_GS_DESCR;
-          })
-          .style('font-size', '1em')
-          .style('opacity', 1)
-          .attr('x', 6)
-          .attr('y', 3);
+    //     let labels = node
+    //       .append('text')
+    //       .attr('class', 'node-label')
+    //       .text(function(d) {
+    //         return d.EnrichmentMap_GS_DESCR;
+    //       })
+    //       .style('font-size', '1em')
+    //       .style('opacity', 1)
+    //       .attr('x', 6)
+    //       .attr('y', 3);
 
-        // function doSomething(o) {
-        //     if (d3.event.defaultPrevented) return;
-        //     console.log('click')
+    //     let div = d3
+    //       .select('body')
+    //       .append('div')
+    //       .attr('class', 'tooltip-pieSlice')
+    //       .style('opacity', 0);
 
-        //     d3.selectAll("circle").style("fill", "white")
-        //     d3.selectAll("path").style("opacity", .75)
-        //     d3.selectAll(".node-label").style("opacity", 0)
-        //     d3.select(o).selectAll("circle").style("fill", "yellow")
-        //     d3.select(o).selectAll("path").style("opacity", 1)
-        //     d3.select(o).selectAll(".node-label").style("opacity", 1)
-        // }
+    //     function multiple(d) {
+    //       let geneSetSize = d.EnrichmentMap_gs_size;
+    //       let r = radiusVar(geneSetSize);
 
-        // node.append("title")
-        //     .text(function (d) { return d; });
+    //       let node = d3.select(this);
 
-        let div = d3
-          .select('body')
-          .append('div')
-          .attr('class', 'tooltip-pieSlice')
-          .style('opacity', 0);
+    //       node
+    //         .selectAll('path')
+    //         .data(function(d) {
+    //           return pie(d.facets);
+    //         })
+    //         .enter()
+    //         .append('svg:path')
+    //         .attr('d', arc.outerRadius(r).innerRadius(0))
+    //         .attr('opacity', 0.75)
+    //         .style('cursor', 'pointer')
+    //         .attr('stroke', 'black')
+    //         .style('fill', function(d) {
+    //           if (d.data.value != null) return color(d.data.value);
+    //           return '#d3d3d3';
+    //         })
+    //         .on('click', function(d) {
+    //           pieClickEvent(d, this);
+    //         })
+    //         .on('mouseover', function(d, i) {
+    //           d3.select(this)
+    //             .transition()
+    //             .duration('50')
+    //             .attr('opacity', '.50')
+    //             .attr('d', arc.outerRadius(50).innerRadius(0));
+    //           div
+    //             .transition()
+    //             .duration(50)
+    //             .style('opacity', 1);
+    //           let pValueDisplay;
+    //           if (Math.abs(d.data.value) > 0.001)
+    //             pValueDisplay = d.data.value.toPrecision(3);
+    //           else pValueDisplay = d.data.value.toExponential(3);
 
-        function multiple(d) {
-          // console.log('d is' )
-          // console.log(d)
-          let geneSetSize = d.EnrichmentMap_gs_size;
-          let r = radiusVar(geneSetSize);
+    //           div
+    //             .html(
+    //               `<b>Description: </b>` +
+    //                 d.data.metaData.Description +
+    //                 `<br/><b>Test: </b>` +
+    //                 d.data.prop +
+    //                 `<br/><b>pValue: </b>` +
+    //                 pValueDisplay +
+    //                 `<br/><b>Ontology: </b>` +
+    //                 d.data.metaData.Annotation
+    //             )
+    //             .style('left', d3.event.pageX + 10 + 'px')
+    //             .style('top', d3.event.pageY - 15 + 'px');
+    //         })
+    //         .on('mouseout', function(d, i) {
+    //           d3.select(this)
+    //             .transition()
+    //             .duration('50')
+    //             .attr('opacity', '.75')
+    //             .attr('d', arc.outerRadius(r).innerRadius(0));
+    //           div
+    //             .transition()
+    //             .duration('50')
+    //             .style('opacity', 0);
+    //         });
+    //     }
 
-          let node = d3.select(this);
+    //     function pieClickEvent(d, o) {
+    //       if (d3.event.defaultPrevented) return;
+    //       // UNCOMMENT WHEN READY, PAUL
+    //       // self.pieClick.emit(d.data);
+    //     }
 
-          node
-            .selectAll('path')
-            .data(function(d) {
-              //console.log(d.comparisons)
-              //console.log(pie(d.comparisons))
-              return pie(d.facets);
-            })
-            .enter()
-            .append('svg:path')
-            //.attr("d", arc.outerRadius(r - (r * .15)).innerRadius(0))
-            .attr('d', arc.outerRadius(r).innerRadius(0))
-            .attr('opacity', 0.75)
-            .style('cursor', 'pointer')
-            .attr('stroke', 'black')
-            .style('fill', function(d) {
-              if (d.data.value != null) return color(d.data.value);
-              return '#d3d3d3';
-            })
-            .on('click', function(d) {
-              pieClickEvent(d, this);
-            })
-            .on('mouseover', function(d, i) {
-              d3.select(this)
-                .transition()
-                .duration('50')
-                .attr('opacity', '.50')
-                .attr('d', arc.outerRadius(50).innerRadius(0));
-              div
-                .transition()
-                .duration(50)
-                .style('opacity', 1);
-              let pValueDisplay;
-              if (Math.abs(d.data.value) > 0.001)
-                pValueDisplay = d.data.value.toPrecision(3);
-              else pValueDisplay = d.data.value.toExponential(3);
+    //     function dragstarted(o) {
+    //       d3.event.sourceEvent.stopPropagation();
+    //       d3.event.sourceEvent.preventDefault();
+    //       d3.selectAll('circle').style('fill', 'white');
+    //     }
 
-              div
-                .html(
-                  `<b>Description: </b>` +
-                    d.data.metaData.Description +
-                    `<br/><b>Test: </b>` +
-                    d.data.prop +
-                    `<br/><b>pValue: </b>` +
-                    pValueDisplay +
-                    `<br/><b>Ontology: </b>` +
-                    d.data.metaData.Annotation
-                )
-                .style('left', d3.event.pageX + 10 + 'px')
-                .style('top', d3.event.pageY - 15 + 'px');
-            })
-            .on('mouseout', function(d, i) {
-              d3.select(this)
-                .transition()
-                .duration('50')
-                .attr('opacity', '.75')
-                .attr('d', arc.outerRadius(r).innerRadius(0));
-              div
-                .transition()
-                .duration('50')
-                .style('opacity', 0);
-            });
+    //     function dragged(d) {
+    //       d.x = d3.event.x;
+    //       d.y = d3.event.y;
+    //       let xPos = Math.max(
+    //         radiusVar(d.EnrichmentMap_gs_size),
+    //         Math.min(networkWidth - radiusVar(d.EnrichmentMap_gs_size), d.x)
+    //       );
+    //       let yPos = Math.max(
+    //         radiusVar(d.EnrichmentMap_gs_size),
+    //         Math.min(networkHeight - radiusVar(d.EnrichmentMap_gs_size), d.y)
+    //       );
 
-          //.append("title").text(function (d) { return d })
-        }
+    //       d3.select(this).attr('transform', function(d) {
+    //         return (
+    //           'translate(' +
+    //           Math.max(
+    //             radiusVar(d.EnrichmentMap_gs_size),
+    //             Math.min(networkWidth - radiusVar(d.EnrichmentMap_gs_size), d.x)
+    //           ) +
+    //           ',' +
+    //           Math.max(
+    //             radiusVar(d.EnrichmentMap_gs_size),
+    //             Math.min(networkHeight - radiusVar(d.EnrichmentMap_gs_size), d.y)
+    //           ) +
+    //           ')'
+    //         );
+    //       });
 
-        function pieClickEvent(d, o) {
-          if (d3.event.defaultPrevented) return;
-          //console.log('click')
-          //console.log(d)
-          //console.log(o.parentNode)
+    //       link
+    //         .filter(function(l) {
+    //           return l.source === d;
+    //         })
+    //         .attr('x1', xPos)
+    //         .attr('y1', yPos);
+    //       link
+    //         .filter(function(l) {
+    //           return l.target === d;
+    //         })
+    //         .attr('x2', xPos)
+    //         .attr('y2', yPos);
+    //     }
 
-          //d3.selectAll("circle").style("fill", "white")
-          //d3.selectAll("path").style("opacity", .75)
-          //d3.selectAll(".node-label").style("opacity", 0)
-          //d3.select(o.parentNode).selectAll("circle").style("fill", "yellow")
-          //d3.select(o.ParentNode).selectAll("path").style("opacity", 1)
-          //d3.select(o.ParentNode).selectAll(".node-label").style("opacity", 1)
-
-          // UNCOMMENT WHEN READY, PAUL
-          // self.pieClick.emit(d.data);
-        }
-
-        function dragstarted(o) {
-          d3.event.sourceEvent.stopPropagation();
-          d3.event.sourceEvent.preventDefault();
-          //console.log('drag')
-          d3.selectAll('circle').style('fill', 'white');
-          //d3.selectAll("path").style("opacity", .75)
-          //d3.select(o).selectAll("circle").style("fill", "yellow")
-          //d3.select(o).selectAll("path").style("opacity", 1)
-        }
-
-        function dragged(d) {
-          d.x = d3.event.x;
-          d.y = d3.event.y;
-          let xPos = Math.max(
-            radiusVar(d.EnrichmentMap_gs_size),
-            Math.min(networkWidth - radiusVar(d.EnrichmentMap_gs_size), d.x)
-          );
-          let yPos = Math.max(
-            radiusVar(d.EnrichmentMap_gs_size),
-            Math.min(networkHeight - radiusVar(d.EnrichmentMap_gs_size), d.y)
-          );
-
-          d3.select(this).attr('transform', function(d) {
-            return (
-              'translate(' +
-              Math.max(
-                radiusVar(d.EnrichmentMap_gs_size),
-                Math.min(networkWidth - radiusVar(d.EnrichmentMap_gs_size), d.x)
-              ) +
-              ',' +
-              Math.max(
-                radiusVar(d.EnrichmentMap_gs_size),
-                Math.min(
-                  networkHeight - radiusVar(d.EnrichmentMap_gs_size),
-                  d.y
-                )
-              ) +
-              ')'
-            );
-          });
-
-          link
-            .filter(function(l) {
-              return l.source === d;
-            })
-            .attr('x1', xPos)
-            .attr('y1', yPos);
-          link
-            .filter(function(l) {
-              return l.target === d;
-            })
-            .attr('x2', xPos)
-            .attr('y2', yPos);
-        }
-
-        function dragended(d) {
-          if (!d3.event.active) simulation.alphaTarget(0);
-          d.fx = d3.event.x;
-          d.fy = d3.event.y;
-        }
-      }.bind(this)
-    );
+    //     function dragended(d) {
+    //       if (!d3.event.active) simulation.alphaTarget(0);
+    //       d.fx = d3.event.x;
+    //       d.fy = d3.event.y;
+    //     }
+    //   });
   };
 
   render() {
     const {
-      networkWidth,
-      networkContainerWidth,
-      networkHeight,
-      networkContainerHeight
+      chartSettings,
+      networkContainerHeight,
+      networkContainerWidth
+      // networkWidth,
+      // networkHeight,
+      // o1facets,
+      // dataCombined,
+      // minSet,
+      // maxSet,
+      // minLine,
+      // maxLine,
+      // radius,
+      // lineScale
     } = this.state;
-    const { networkData, networkSettings } = this.props;
+    // const { networkData, networkSettings } = this.props;
+    // debugger;
+
+    // const formattedD = chartSettings.formattedData;
+    // const fdNodes = formattedD.nodes;
+    // const fdLinks = formattedD.links;
+    // const o1F = o1facets;
+    // const dataC = dataCombined;
+    // const minS = minSet;
+    // const maxS = maxSet;
+    // const minL = minLine;
+    // const maxL = maxLine;
+    // const rad = radius;
+    // const lineS = lineScale;
+
+    // const lineLinks = fdLinks.map(l => {
+    //   return (
+    //     <g className="prefix__links" stroke="#0080ff" strokeOpacity={0.3}>
+    //       <path
+    //         opacity={0.5}
+    //         strokeWidth={1.268}
+    //         d="M746.499 280.228l-113.421-87.21"
+    //       />
+    //     </g>
+    //   );
+    // });
 
     const IconPopupStyle = {
       backgroundColor: '2E2E2E',
@@ -680,27 +669,30 @@ export default class NetworkGraph extends Component {
         </Grid>
         <div
           ref={this.networkContainerRef}
-          id={networkSettings.id}
+          id={chartSettings.id}
           className="NetworkChartContainer"
         >
           <svg
             ref={this.networkSVGRef}
-            id={`svg-${networkSettings.id}`}
+            id={`svg-${chartSettings.id}`}
             className="network-chart-area nwChart"
+            height={networkContainerHeight}
+            width={networkContainerWidth}
             viewBox={`0 0 ${networkContainerWidth} ${networkContainerHeight}`}
             preserveAspectRatio="xMinYMin meet"
             // {...this.props}
           >
             {/* LINE LINKS */}
-            <g className="prefix__links" stroke="#0080ff" strokeOpacity={0.3}>
+            {/* {lineLinks} */}
+            {/* <g className="prefix__links" stroke="#0080ff" strokeOpacity={0.3}>
               <path
                 opacity={0.5}
                 strokeWidth={1.268}
                 d="M746.499 280.228l-113.421-87.21"
               />
-            </g>
+            </g> */}
             {/* NODES */}
-            <g className="prefix__nodes">
+            {/* <g className="prefix__nodes">
               <path
                 d="M712.615 288.599a28.622 28.622 0 0118.397 6.696l-18.397 21.926z"
                 opacity={0.75}
@@ -763,9 +755,9 @@ export default class NetworkGraph extends Component {
                 stroke="#000"
                 cursor="pointer"
                 fill="#3131ff"
-              />
-              {/* NODE TEXT */}
-              <text
+              /> */}
+            {/* NODE TEXT */}
+            {/* <text
                 className="prefix__node-label"
                 x={6}
                 y={3}
@@ -774,7 +766,7 @@ export default class NetworkGraph extends Component {
               >
                 {'enzyme binding'}
               </text>
-            </g>
+            </g> */}
           </svg>
         </div>
       </div>
