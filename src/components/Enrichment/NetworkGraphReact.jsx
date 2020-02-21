@@ -520,7 +520,6 @@ export default class NetworkGraph extends Component {
       // lineScale
     } = this.state;
     // const { networkData, networkSettings } = this.props;
-    // debugger;
 
     // const formattedD = chartSettings.formattedData;
     // const fdNodes = formattedD.nodes;
