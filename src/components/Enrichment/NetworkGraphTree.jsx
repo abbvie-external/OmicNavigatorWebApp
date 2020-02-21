@@ -91,7 +91,10 @@ export default class NetworkGraph extends Component {
 
   componentDidUpdate(prevProps, prevState, snapshot) {
     if (this.props.networkData !== prevProps.networkData) {
-      this.prepareAndRenderTree(this.state.width, this.state.height);
+      this.prepareAndRenderTree(
+        this.state.networkWidth,
+        this.state.networkHeight
+      );
     }
   }
 
@@ -106,10 +109,16 @@ export default class NetworkGraph extends Component {
   setDimensions = () => {
     d3.select(`#svg-${this.state.chartSettings.id}`).remove();
     const { chartSettings } = this.state;
-    const containerWidth = this.getWidth();
+    debugger;
+    console.log(
+      this.props.networkData.nodes.length,
+      this.props.networkData.edges.length
+    );
+    const containerWidth = this.props.networkData.nodes.length * 20;
+    // const containerWidth = this.getWidth();
     // let's calculate height based on data...
-    // const containerHeight = this.getHeight();
-    const containerHeight = 5000;
+    const containerHeight = this.getHeight();
+    // const containerHeight = 5000;
     const width =
       containerWidth - chartSettings.margin.left - chartSettings.margin.right;
     const height =
@@ -125,14 +134,15 @@ export default class NetworkGraph extends Component {
 
   getHeight() {
     if (this.networkContainerRef.current !== null) {
+      debugger;
       return this.networkContainerRef.current.parentElement.offsetHeight;
     } else return 900;
   }
-  getWidth() {
-    if (this.networkContainerRef.current !== null) {
-      return this.networkContainerRef.current.parentElement.offsetWidth;
-    } else return 1200;
-  }
+  // getWidth() {
+  //   if (this.networkContainerRef.current !== null) {
+  //     return this.networkContainerRef.current.parentElement.offsetWidth;
+  //   } else return 1200;
+  // }
 
   prepareAndRenderTree = (width, height) => {
     const { chartSettings } = this.state;
