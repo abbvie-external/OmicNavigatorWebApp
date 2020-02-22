@@ -25,8 +25,18 @@
     }
   }
 
-  .ContentContainer {
+  .EnrichmentContentContainer {
     height: calc(100vh - 57px) !important;
+    margin-top: 0px !important;
+    padding-left: 20px !important;
+
+    .LoaderContainer {
+      padding-top: 120px;
+    }
+  }
+
+  .PepplotContentContainer {
+    height: calc(100vh - 71px) !important;
     margin-top: 0px !important;
     padding-left: 20px !important;
 
@@ -94,4 +104,11 @@
     background: #f14000 !important;
     color: white !important;
   }
+}
+
+.VerticalSidebarPlot {
+  width: 100% !important;
+  padding-top: 10px !important;
+  padding-left: 0px !important;
+  padding-right: 25px !important;
 }

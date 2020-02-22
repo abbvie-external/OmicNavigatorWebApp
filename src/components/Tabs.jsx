@@ -171,13 +171,11 @@ class Tabs extends Component {
         menuItem: 'Differential Phosophate Analysis',
         pane: (
           <Tab.Pane key="2" className="">
-            <Grid>
-              <Pepplot
-                {...this.props}
-                {...this.state}
-                onSearchCriteriaToTop={this.handleSearchCriteriaToTop}
-              />
-            </Grid>
+            <Pepplot
+              {...this.props}
+              {...this.state}
+              onSearchCriteriaToTop={this.handleSearchCriteriaToTop}
+            />
           </Tab.Pane>
         )
       },
@@ -185,15 +183,13 @@ class Tabs extends Component {
         menuItem: 'Enrichment Analysis',
         pane: (
           <Tab.Pane key="3" className="">
-            <Grid>
-              <Enrichment
-                {...this.props}
-                {...this.state}
-                onSearchCriteriaToTop={this.handleSearchCriteriaToTop}
-                onPValueTypeChange={this.handlePValueTypeChange}
-                onViewDiffTable={this.handleViewDiffTable}
-              />
-            </Grid>
+            <Enrichment
+              {...this.props}
+              {...this.state}
+              onSearchCriteriaToTop={this.handleSearchCriteriaToTop}
+              onPValueTypeChange={this.handlePValueTypeChange}
+              onViewDiffTable={this.handleViewDiffTable}
+            />
           </Tab.Pane>
         )
       }

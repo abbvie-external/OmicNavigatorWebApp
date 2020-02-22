@@ -510,43 +510,45 @@ class Enrichment extends Component {
     );
 
     return (
-      <Grid.Row className="EnrichmentContainer">
-        <Grid.Column
-          className="SidebarContainer"
-          mobile={16}
-          tablet={16}
-          largeScreen={4}
-          widescreen={4}
-        >
-          <EnrichmentSearchCriteria
-            {...this.state}
-            {...this.props}
-            onSearchTransition={this.handleSearchTransition}
-            onEnrichmentSearch={this.handleEnrichmentSearch}
-            onSearchCriteriaChange={this.handleSearchCriteriaChange}
-            onSearchCriteriaReset={this.hideEGrid}
-            onDisablePlot={this.disablePlot}
-            onGetMultisetPlot={this.handleMultisetPlot}
-            onHandlePlotAnimation={this.handlePlotAnimation}
-          />
-        </Grid.Column>
-        <Grid.Column
-          className="ContentContainer"
-          mobile={16}
-          tablet={16}
-          largeScreen={12}
-          widescreen={12}
-        >
-          <Sidebar.Pushable as={'span'}>
-            <VerticalSidebar
-              animation={animation}
-              direction={direction}
-              visible={visible}
+      <Grid>
+        <Grid.Row className="EnrichmentContainer">
+          <Grid.Column
+            className="SidebarContainer"
+            mobile={16}
+            tablet={16}
+            largeScreen={4}
+            widescreen={4}
+          >
+            <EnrichmentSearchCriteria
+              {...this.state}
+              {...this.props}
+              onSearchTransition={this.handleSearchTransition}
+              onEnrichmentSearch={this.handleEnrichmentSearch}
+              onSearchCriteriaChange={this.handleSearchCriteriaChange}
+              onSearchCriteriaReset={this.hideEGrid}
+              onDisablePlot={this.disablePlot}
+              onGetMultisetPlot={this.handleMultisetPlot}
+              onHandlePlotAnimation={this.handlePlotAnimation}
             />
-            <Sidebar.Pusher>{enrichmentView}</Sidebar.Pusher>
-          </Sidebar.Pushable>
-        </Grid.Column>
-      </Grid.Row>
+          </Grid.Column>
+          <Grid.Column
+            className="EnrichmentContentContainer"
+            mobile={16}
+            tablet={16}
+            largeScreen={12}
+            widescreen={12}
+          >
+            <Sidebar.Pushable as={'span'}>
+              <VerticalSidebar
+                animation={animation}
+                direction={direction}
+                visible={visible}
+              />
+              <Sidebar.Pusher>{enrichmentView}</Sidebar.Pusher>
+            </Sidebar.Pushable>
+          </Grid.Column>
+        </Grid.Row>
+      </Grid>
     );
   }
 }

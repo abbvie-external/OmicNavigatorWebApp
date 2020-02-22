@@ -28,7 +28,7 @@ class ViolinPlot extends Component {
     settings: {
       axisLabels: {
         xAxis: this.props.enrichmentTerm,
-        yAxis: "log<tspan baseline-shift='sub' font-size='13px'>2</tspan>(FC)"
+        yAxis: "log<tspan baselineShift='sub' fontSize='13px'>2</tspan>(FC)"
       },
       constrainExtremes: false,
       color: d3.scaleOrdinal(d3.schemeCategory10),
