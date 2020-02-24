@@ -465,8 +465,10 @@ class Enrichment extends Component {
         <EnrichmentResultsGraph
           {...this.props}
           {...this.state}
+          onSearchCriteriaChange={this.handleSearchCriteriaChange}
           onEnrichmentViewChange={this.handleEnrichmentViewChange}
           onHandlePlotAnimation={this.handlePlotAnimation}
+          onDisplayViolinPlot={this.displayViolinPlot}
         />
       );
     } else if (this.state.isSearching) {
