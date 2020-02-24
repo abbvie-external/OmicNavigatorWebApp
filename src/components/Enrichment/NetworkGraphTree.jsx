@@ -108,7 +108,6 @@ export default class NetworkGraph extends Component {
   setDimensions = () => {
     d3.select(`#svg-${this.state.chartSettings.id}`).remove();
     const { chartSettings } = this.state;
-    debugger;
     console.log(
       this.props.networkData.nodes.length,
       this.props.networkData.edges.length
@@ -133,7 +132,6 @@ export default class NetworkGraph extends Component {
 
   getHeight() {
     if (this.networkContainerRef.current !== null) {
-      debugger;
       return this.networkContainerRef.current.parentElement.offsetHeight;
     } else return 900;
   }
@@ -657,6 +655,7 @@ export default class NetworkGraph extends Component {
       }
       function pieClickEvent(d, o) {
         if (d3.event.defaultPrevented) return;
+        d3.select('.tooltip-pieSlice').remove();
         self.props.onPieClick(d.data);
       }
 

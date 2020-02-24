@@ -1,37 +1,25 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import { Icon, Popup, Grid, Search, Radio } from 'semantic-ui-react';
-// import ButtonActions from './ButtonActions';
-import SplitPanesContainer from './SplitPanesContainer';
-import NetworkGraphTree from './NetworkGraphTree';
-import SearchingAlt from '../Transitions/SearchingAlt';
-import './EnrichmentResultsGraph.scss';
 import * as d3 from 'd3';
-// import _ from 'lodash';
+import _ from 'lodash';
+import {
+  Icon,
+  Popup,
+  Grid,
+  Search,
+  Radio,
+  Header,
+  Segment
+} from 'semantic-ui-react';
+import NetworkGraphTree from './NetworkGraphTree';
+import './EnrichmentResultsGraph.scss';
 
 class EnrichmentResultsGraph extends Component {
-  // static defaultProps = {
-  //   enrichmentStudy: '',
-  //   enrichmentModel: '',
-  //   enrichmentAnnotation: '',
-  //   enrichmentResults: [],
-  //   enrichmentColumns: [],
-  //   isTestSelected: false,
-  //   showNetworkLabels: true
-  // };
-
   state = {
-    treeDataRaw: [],
-    treeData: [],
-    treeDataColumns: [],
-    plotType: [],
-    imageInfo: {
-      key: null,
-      title: '',
-      svg: []
-    },
-    currentSVGs: [],
-    isTestDataLoaded: false
+    showNetworkLabels: true,
+    searchIsLoading: false,
+    searchResults: [],
+    searchValue: ''
   };
 
   componentDidMount() {}
@@ -39,28 +27,6 @@ class EnrichmentResultsGraph extends Component {
   // componentWillUnmount() {
   //   d3.select("#svg-chart-network").remove();
   // }
-
-  showBarcodePlot = (dataItem, barcode, test, largest) => {
-    // this.bData = barcode;
-    // this.bSettings = {
-    //   lineID: "",
-    //   statLabel: barcode[0].statLabel,
-    //   statistic: 'statistic',
-    //   highLabel: barcode[0].highLabel,
-    //   lowLabel: barcode[0].lowLabel,
-    //   highStat: largest,
-    //   enableBrush: true
-    // }
-    this.setState({
-      isTestDataLoaded: true
-    });
-  };
-
-  testSelectedTransition = () => {
-    this.setState({
-      isTestSelected: true
-    });
-  };
 
   getEnrichmentViewToggle = () => {
     const IconPopupStyle = {
@@ -120,7 +86,43 @@ class EnrichmentResultsGraph extends Component {
   };
 
   handlePieClick = data => {
-    debugger;
+    this.props.onHandlePieClick(
+      this.props.enrichmentStudy,
+      this.props.enrichmentModel,
+      this.props.enrichmentAnnotation,
+      data.metaData,
+      data.prop
+    );
+  };
+
+  handleLabels = () => {
+    this.setState(prevState => ({
+      showNetworkLabels: !prevState.showNetworkLabels
+    }));
+    if (this.state.showNetworkLabels) {
+      d3.selectAll('.node-label').style('opacity', 0);
+    } else {
+      d3.selectAll('.node-label').style('opacity', 1);
+    }
+  };
+
+  handleResultSelect = (e, { result }) =>
+    this.setState({ value: result.title });
+
+  handleSearchChange = (e, { value }) => {
+    this.setState({ isLoading: true, value });
+
+    setTimeout(() => {
+      if (this.state.value.length < 1) return this.setState('');
+
+      const re = new RegExp(_.escapeRegExp(this.state.value), 'i');
+      const isMatch = result => re.test(result.title);
+
+      this.setState({
+        isLoading: false,
+        results: _.filter(this.props.enrichmentResults, isMatch)
+      });
+    }, 300);
   };
 
   render() {
@@ -132,115 +134,96 @@ class EnrichmentResultsGraph extends Component {
     //   enrichmentAnnotation
     // } = this.props;
 
+    // const { showNetworkLabels } = this.state;
+    const { searchIsLoading, searchValue, searchResults } = this.state;
+
     const enrichmentViewToggle = this.getEnrichmentViewToggle();
 
-    if (!this.state.isTestSelected) {
-      return (
-        <div className="NetworkGraphWrapper">
-          {enrichmentViewToggle}
-          <Grid>
-            <Grid.Row>
-              <Grid.Column
-                className="NetworkGraphFilters"
-                mobile={6}
-                tablet={6}
-                largeScreen={3}
-                widescreen={2}
-              ></Grid.Column>
-              <Grid.Column
-                className="NetworkGraphFilters"
-                mobile={6}
-                tablet={6}
-                largeScreen={4}
-                widescreen={4}
-              >
-                <Search
-                  placeholder="Search Network"
-                  // loading={isLoading}
-                  // onResultSelect={this.handleResultSelect}
-                  // onSearchChange={_.debounce(this.handleSearchChange, 500, {
-                  //   leading: true,
-                  // })}
-                  // results={results}
-                  // value={value}
-                  // {...this.props}
-                />
-              </Grid.Column>
-              <Grid.Column
-                className="NetworkGraphFilters"
-                id="NetworkGraphLabelsToggle"
-                mobile={6}
-                tablet={6}
-                largeScreen={3}
-                widescreen={4}
-              >
-                <Radio
-                  toggle
-                  label="Show Labels"
-                  checked={this.state.showNetworkLabels}
-                />
-              </Grid.Column>
-              <Grid.Column
-                className="NetworkGraphFilters"
-                mobile={6}
-                tablet={6}
-                largeScreen={3}
-                widescreen={3}
-              >
-                <h3>toggle tbd</h3>
-              </Grid.Column>
-              <Grid.Column
-                className="NetworkGraphFilters"
-                mobile={6}
-                tablet={6}
-                largeScreen={3}
-                widescreen={3}
-              >
-                <h3>legend</h3>
-              </Grid.Column>
-            </Grid.Row>
-          </Grid>{' '}
-          <NetworkGraphTree
-            {...this.props}
-            {...this.state}
-            onPieClick={this.handlePieClick}
-          ></NetworkGraphTree>
-        </div>
-      );
-    } else if (this.state.isTestSelected && !this.state.isTestDataLoaded) {
-      return (
-        <div>
-          <SearchingAlt />
-        </div>
-      );
-    } else {
-      return (
-        <div>
-          <SplitPanesContainer
-            {...this.props}
-            {...this.state}
-            onBackToTable={this.backToTable}
-            onHandleMaxLinePlot={this.handleMaxLinePlot}
-            onHandleBarcodeChanges={this.handleBarcodeChanges}
-          ></SplitPanesContainer>
-        </div>
-      );
-    }
+    return (
+      <div className="NetworkGraphWrapper">
+        {enrichmentViewToggle}
+        <Grid>
+          <Grid.Row>
+            <Grid.Column
+              className="NetworkGraphFilters"
+              mobile={6}
+              tablet={6}
+              largeScreen={3}
+              widescreen={2}
+            ></Grid.Column>
+            <Grid.Column
+              className="NetworkGraphFilters"
+              mobile={6}
+              tablet={6}
+              largeScreen={4}
+              widescreen={4}
+            >
+              <Search
+                placeholder="Search Network"
+                // loading={searchIsLoading}
+                // onResultSelect={this.handleResultSelect}
+                // onSearchChange={_.debounce(this.handleSearchChange, 500, {
+                //   leading: true
+                // })}
+                // results={searchResults}
+                // value={searchValue}
+                // {...this.props}
+              />
+            </Grid.Column>
+            {/* <Grid.Column width={4}>
+              <Segment>
+                <Header>State</Header>
+                <pre style={{ overflowX: 'auto' }}>
+                  {JSON.stringify(this.state, null, 2)}
+                </pre>
+                <Header>Options</Header>
+                <pre style={{ overflowX: 'auto' }}>
+                  {JSON.stringify(this.props.enrichmentResults, null, 2)}
+                </pre>
+              </Segment>
+            </Grid.Column> */}
+            <Grid.Column
+              className="NetworkGraphFilters"
+              id="NetworkGraphLabelsToggle"
+              mobile={6}
+              tablet={6}
+              largeScreen={3}
+              widescreen={4}
+            >
+              <Radio
+                toggle
+                label="Show Labels"
+                checked={this.state.showNetworkLabels}
+                onChange={this.handleLabels}
+              />
+            </Grid.Column>
+            <Grid.Column
+              className="NetworkGraphFilters"
+              mobile={6}
+              tablet={6}
+              largeScreen={3}
+              widescreen={3}
+            >
+              <h3>toggle tbd</h3>
+            </Grid.Column>
+            <Grid.Column
+              className="NetworkGraphFilters"
+              mobile={6}
+              tablet={6}
+              largeScreen={3}
+              widescreen={3}
+            >
+              <h3>legend</h3>
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>{' '}
+        <NetworkGraphTree
+          {...this.props}
+          onPieClick={this.handlePieClick}
+        ></NetworkGraphTree>
+      </div>
+    );
   }
 }
 
 export default withRouter(EnrichmentResultsGraph);
-
-function getDataItemDescription(value) {
-  if (value) {
-    const dataItem = value.split(':')[1];
-    return dataItem;
-  }
-}
-
-function getTestName(value) {
-  if (value) {
-    const test = value.split(':')[0];
-    return test;
-  }
-}
