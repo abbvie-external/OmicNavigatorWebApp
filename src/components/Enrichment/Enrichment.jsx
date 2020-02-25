@@ -10,6 +10,7 @@ import TransitionStill from '../Transitions/TransitionStill';
 import SplitPanesContainer from './SplitPanesContainer';
 import SearchingAlt from '../Transitions/SearchingAlt';
 import ButtonActions from '../Shared/ButtonActions';
+import networkDataNew from '../../services/networkDataNew.json';
 import {
   formatNumberForDisplay,
   splitValue
@@ -50,6 +51,7 @@ class Enrichment extends Component {
     displayViolinPlot: false,
     networkDataAvailable: false,
     networkData: {},
+    networkDataNew: {},
     tests: {},
     networkSettings: {
       facets: {},
@@ -560,7 +562,8 @@ class Enrichment extends Component {
         this.setState({
           networkDataAvailable: true,
           networkData: EMData.elements,
-          tests: EMData.tests
+          tests: EMData.tests,
+          networkDataNew: networkDataNew
         });
         let facets = [];
         for (var i = 0; i < EMData.tests.length; i++) {

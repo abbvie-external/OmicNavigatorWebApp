@@ -8,21 +8,56 @@ import {
   Grid,
   Search,
   Radio,
+  Label,
   Header,
   Segment
 } from 'semantic-ui-react';
 import NetworkGraphTree from './NetworkGraphTree';
 import './EnrichmentResultsGraph.scss';
+const initialState = {
+  showNetworkLabels: true,
+  descriptions: [],
+  results: [],
+  value: ''
+};
+
+const resultRenderer = ({ title }) => <Label content={title} />;
 
 class EnrichmentResultsGraph extends Component {
-  state = {
-    showNetworkLabels: true,
-    searchIsLoading: false,
-    searchResults: [],
-    searchValue: ''
-  };
+  state = initialState;
 
-  componentDidMount() {}
+  componentDidMount() {
+    debugger;
+    const enrichmentResultsDescriptions = this.props.enrichmentResults.map(
+      r => ({
+        title: r.Description
+        // title: r.metaData.Description,
+        // prop: r.prop,
+        // value: r.value,
+        // ontology: r.metaData.Ontology
+      })
+    );
+    this.setState({
+      descriptions: enrichmentResultsDescriptions
+    });
+  }
+
+  // let clusters = this.props.networkDataNew.clusters;
+  // const nodes = clusters.map(c => c.nodes);
+  // const nodesMapped = nodes.map(n => ({
+  //   key: n.id,
+  //   title: n.description
+  //   // ontology: n.ontology,
+  //   // size: n.geneSetSize,
+  //   // genes: n.genes
+  //   // title: r.metaData.Description,
+  //   // prop: r.prop,
+  //   // value: r.value,
+  //   // ontology: r.metaData.Ontology
+  // }));
+  // this.setState({
+  //   descriptions: nodesMapped
+  // });
 
   // componentWillUnmount() {
   //   d3.select("#svg-chart-network").remove();
@@ -106,21 +141,32 @@ class EnrichmentResultsGraph extends Component {
     }
   };
 
+  // highlightLabels(str) {
+  //   if (str.length === 0) {
+  //     d3.selectAll('.node-label').style('opacity', 0);
+  //   } else {
+  //     d3.selectAll('.node-label').style('opacity', 0);
+  //     var keep = d3.selectAll('.node-label').filter(function(d) {
+  //       return d[self.chart.settings.nodeLabel].toLowerCase().includes(str);
+  //     });
+  //     keep.style('opacity', 1);
+  //   }
+  // }
+
   handleResultSelect = (e, { result }) =>
     this.setState({ value: result.title });
 
   handleSearchChange = (e, { value }) => {
-    this.setState({ isLoading: true, value });
+    this.setState({ value });
 
     setTimeout(() => {
-      if (this.state.value.length < 1) return this.setState('');
+      if (this.state.value.length < 1) return this.setState(initialState);
 
       const re = new RegExp(_.escapeRegExp(this.state.value), 'i');
       const isMatch = result => re.test(result.title);
 
       this.setState({
-        isLoading: false,
-        results: _.filter(this.props.enrichmentResults, isMatch)
+        results: _.filter(this.state.descriptions, isMatch)
       });
     }, 300);
   };
@@ -134,15 +180,14 @@ class EnrichmentResultsGraph extends Component {
     //   enrichmentAnnotation
     // } = this.props;
 
-    // const { showNetworkLabels } = this.state;
-    const { searchIsLoading, searchValue, searchResults } = this.state;
+    const { value, results } = this.state;
 
     const enrichmentViewToggle = this.getEnrichmentViewToggle();
 
     return (
       <div className="NetworkGraphWrapper">
         {enrichmentViewToggle}
-        <Grid>
+        <Grid className="NetworkGraphFiltersContainer">
           <Grid.Row>
             <Grid.Column
               className="NetworkGraphFilters"
@@ -152,7 +197,7 @@ class EnrichmentResultsGraph extends Component {
               widescreen={2}
             ></Grid.Column>
             <Grid.Column
-              className="NetworkGraphFilters"
+              // className="NetworkGraphFilters"
               mobile={6}
               tablet={6}
               largeScreen={4}
@@ -160,28 +205,16 @@ class EnrichmentResultsGraph extends Component {
             >
               <Search
                 placeholder="Search Network"
-                // loading={searchIsLoading}
-                // onResultSelect={this.handleResultSelect}
-                // onSearchChange={_.debounce(this.handleSearchChange, 500, {
-                //   leading: true
-                // })}
-                // results={searchResults}
-                // value={searchValue}
-                // {...this.props}
+                onResultSelect={this.handleResultSelect}
+                onSearchChange={_.debounce(this.handleSearchChange, 500, {
+                  leading: true
+                })}
+                results={results}
+                value={value}
+                resultRenderer={resultRenderer}
+                {...this.props}
               />
             </Grid.Column>
-            {/* <Grid.Column width={4}>
-              <Segment>
-                <Header>State</Header>
-                <pre style={{ overflowX: 'auto' }}>
-                  {JSON.stringify(this.state, null, 2)}
-                </pre>
-                <Header>Options</Header>
-                <pre style={{ overflowX: 'auto' }}>
-                  {JSON.stringify(this.props.enrichmentResults, null, 2)}
-                </pre>
-              </Segment>
-            </Grid.Column> */}
             <Grid.Column
               className="NetworkGraphFilters"
               id="NetworkGraphLabelsToggle"
@@ -216,7 +249,7 @@ class EnrichmentResultsGraph extends Component {
               <h3>legend</h3>
             </Grid.Column>
           </Grid.Row>
-        </Grid>{' '}
+        </Grid>
         <NetworkGraphTree
           {...this.props}
           onPieClick={this.handlePieClick}

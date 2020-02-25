@@ -2,6 +2,7 @@ import $ from 'jquery';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import networkData from './networkData.json';
+// import networkDataNew from './networkDataNew.json';
 window.jQuery = $;
 const ocpu = require('opencpu.js/opencpu-0.5.js');
 

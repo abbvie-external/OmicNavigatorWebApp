@@ -2,17 +2,20 @@
   padding-top: 26px !important;
   width: 100%;
 
-  .NetworkGraphFilters .ui.toggle.checkbox input:checked ~ .box:before,
-  .ui.toggle.checkbox input:checked ~ label:before {
-    background-color: var(--color-primary) !important;
-  }
+  // .NetworkGraphFiltersContainer {
+  //   min-height: 50px;
+  // }
+
+  // .NetworkGraphFilters .ui.toggle.checkbox input:checked ~ .box:before,
+  // .ui.toggle.checkbox input:checked ~ label:before {
+  //   background-color: var(--color-primary) !important;
+  // }
 
   .NetworkChartWrapper {
     margin: 25px 20px 20px 15px !important;
   }
 
   .NetworkLabelsVisible {
-    
     display: block !important;
   }
   .NetworkLabelsHidden {
