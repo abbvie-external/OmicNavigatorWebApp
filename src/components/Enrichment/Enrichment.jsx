@@ -695,7 +695,14 @@ class Enrichment extends Component {
         barcodeSettings: {
           ...this.state.barcodeSettings,
           brushedData: []
-        }
+        },
+        SVGPlotLoaded: false,
+        SVGPlotLoading: false
+        // imageInfo: {
+        //   key: null,
+        //   title: '',
+        //   svg: []
+        // }
       });
     }
   };
@@ -1015,7 +1022,14 @@ class Enrichment extends Component {
     this.setState({
       isTestDataLoaded: false,
       isTestSelected: false,
-      enrichmentNameLoaded: false
+      enrichmentNameLoaded: false,
+      SVGPlotLoaded: false,
+      SVGPlotLoading: false,
+      imageInfo: {
+        key: null,
+        title: '',
+        svg: []
+      }
     });
     this.handleSearchCriteriaChange(
       {

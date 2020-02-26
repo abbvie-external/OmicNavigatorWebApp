@@ -23,10 +23,6 @@ class SVGPlot extends Component {
   //   }
   // };
 
-  componentWillUnmount() {
-    d3.select('.svgContainer').remove();
-  }
-
   handleTabChange = (e, { activeIndex }) => {
     this.props.onSVGTabChange(activeIndex);
   };
