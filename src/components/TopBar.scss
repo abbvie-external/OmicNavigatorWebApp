@@ -1,8 +1,13 @@
 .TopBar {
+  margin: 0px;
   background-color: var(--color-dark) !important;
 
   .MenuContainer {
     margin-bottom: 0px !important;
+
+    .ui.segment[class*='bottom attached'] {
+      margin-bottom: 0rem !important;
+    }
 
     .active {
       border-color: var(--color-primary) !important;

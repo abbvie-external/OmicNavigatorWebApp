@@ -1,0 +1,117 @@
+{
+  "database": "GO_BIOLOGICAL_PROCESS",
+  "geneSetSimilarityFiltering": {
+    "cutoff": 0.375,
+    "metric": { "type": "Jaccard+Overlap Combined", "ratio": [50, 50] }
+  },
+  "clusters": [
+    {
+      "id": 1,
+      "size": 81,
+      "nodes": [
+        {
+          "id": 11,
+          "genes": [
+            "PRPF3",
+            "MPHOSPH10",
+            "SF3B1",
+            "SF3A3",
+            "SRSF4",
+            "TRA2B",
+            "SRSF10",
+            "SRRM1",
+            "DBR1",
+            "KHSRP",
+            "S***REMOVED***11"
+          ],
+          "geneSetSize": 11,
+          "description": "RNA splicing, via transesterification reactions",
+          "ontology": "GO:0000375"
+        },
+        {
+          "id": 12,
+          "genes": [
+            "PRPF3",
+            "MPHOSPH10",
+            "SF3B1",
+            "SF3A3",
+            "SRSF4",
+            "TRA2B",
+            "SRSF10",
+            "SRRM1",
+            "DBR1",
+            "KHSRP",
+            "S***REMOVED***11"
+          ],
+          "geneSetSize": 11,
+          "description": "another node",
+          "ontology": "GO:0000376"
+        }
+      ],
+      "links": [
+        {
+          "id": 111,
+          "source": 11,
+          "target": 12,
+          "overlapSize": 4,
+          "overlapGenes": ["AHCTF1", "NUP98", "NUP153", "NDC1"],
+          "similarityCoefficient": 0.3889
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "size": 81,
+      "nodes": [
+        {
+          "id": 13,
+          "genes": [
+            "PRPF3",
+            "MPHOSPH10",
+            "SF3B1",
+            "SF3A3",
+            "SRSF4",
+            "TRA2B",
+            "SRSF10",
+            "SRRM1",
+            "DBR1",
+            "KHSRP",
+            "S***REMOVED***11"
+          ],
+          "geneSetSize": 11,
+          "description": "RNA splicing, via transesterification reactions",
+          "ontology": "GO:0000375"
+        },
+        {
+          "id": 14,
+          "genes": [
+            "PRPF3",
+            "MPHOSPH10",
+            "SF3B1",
+            "SF3A3",
+            "SRSF4",
+            "TRA2B",
+            "SRSF10",
+            "SRRM1",
+            "DBR1",
+            "KHSRP",
+            "S***REMOVED***11"
+          ],
+          "geneSetSize": 11,
+          "description": "another node",
+          "ontology": "GO:0000376"
+        }
+      ],
+      "links": [
+        {
+          "id": 211,
+          "source": 13,
+          "target": 14,
+          "overlapSize": 4,
+          "overlapGenes": ["AHCTF1", "NUP98", "NUP153", "NDC1"],
+          "similarityCoefficient": 0.3889
+        }
+      ]
+    }
+  ]
+}

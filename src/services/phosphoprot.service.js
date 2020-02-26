@@ -1,6 +1,8 @@
 import $ from 'jquery';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import networkData from './networkData.json';
+// import networkDataNew from './networkDataNew.json';
 window.jQuery = $;
 const ocpu = require('opencpu.js/opencpu-0.5.js');
 
@@ -8,10 +10,16 @@ class PhosphoprotService {
   constructor() {
     console.log(ocpu);
     this.ocpuUrl = 'http://10.239.9.49/ocpu/library/PhosphoProt/R';
+    // this.ocpuUrlAlt = 'http://localhost:5656/ocpu/library/PhosphoProt/R'
+    // this.ocpuUrlAlt = 'http://localhost:1234/v1'
   }
 
   setUrl() {
     window.ocpu.seturl(this.ocpuUrl);
+  }
+
+  setUrlAlt() {
+    window.ocpu.seturl(this.ocpuUrlAlt);
   }
 
   ocpuRPC(name, paramsObj) {
@@ -130,7 +138,9 @@ class PhosphoprotService {
       window.ocpu
         .call(plottype, obj, function(session) {
           axios
-            .get(session.getLoc() + 'graphics/1/svg', { responseType: 'text' })
+            .get(session.getLoc() + 'graphics/1/svg', {
+              responseType: 'text'
+            })
             .then(response => resolve(response));
         })
         .catch(error => {
@@ -182,15 +192,15 @@ class PhosphoprotService {
     return dataFromPromise;
   }
 
-  async getEnrichmentMap() {
-    try {
-      const response = await axios.get('networkData.json');
-      return response.data;
-    } catch (error) {
-      toast.error(`${error.statusText}: ${error.responseText}`);
-      // toast.error('Failed to get network data, please try again.');
-    }
-  }
+  // async getEnrichmentMap() {
+  //   try {
+  //     const response = await axios.get('networkData.json');
+  //     return response.data;
+  //   } catch (error) {
+  //     toast.error(`${error.statusText}: ${error.responseText}`);
+  //     // toast.error('Failed to get network data, please try again.');
+  //   }
+  // }
 
   async getMultisetEnrichmentData(
     testCategory,
@@ -287,6 +297,27 @@ class PhosphoprotService {
     );
     const svgMarkupFromPromise = await promise;
     return svgMarkupFromPromise;
+  }
+
+  async getEnrichmentMap(
+    enrichmentModel,
+    enrichmentAnnotation,
+    tests,
+    pValueType,
+    enrichmentStudy
+  ) {
+    // this.setUrl()
+    // const promise = this.ocpuRPC('getCytoscapeEM', {
+    //   model: enrichmentModel,
+    //   db: enrichmentAnnotation,
+    //   tests: tests,
+    //   q: pValueType,
+    //   study: enrichmentStudy,
+    //   isDev: true
+    // })
+    // const nodesFromPromise = await promise
+    // return nodesFromPromise
+    return networkData;
   }
 }
 

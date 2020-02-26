@@ -359,44 +359,46 @@ class Pepplot extends Component {
     );
 
     return (
-      <Grid.Row className="PepplotContainer">
-        <Grid.Column
-          className="SidebarContainer"
-          mobile={16}
-          tablet={16}
-          largeScreen={4}
-          widescreen={4}
-        >
-          <PepplotSearchCriteria
-            {...this.state}
-            {...this.props}
-            onSearchTransition={this.handleSearchTransition}
-            onPepplotSearch={this.handlePepplotSearch}
-            onSearchCriteriaChange={this.handleSearchCriteriaChange}
-            onSearchCriteriaReset={this.hidePGrid}
-            onDisablePlot={this.disablePlot}
-            onGetMultisetPlot={this.handleMultisetPlot}
-            onHandlePlotAnimation={this.handlePlotAnimation}
-            onMultisetQueried={this.handleMultisetQueried}
-          />
-        </Grid.Column>
-        <Grid.Column
-          className="ContentContainer"
-          mobile={16}
-          tablet={16}
-          largeScreen={12}
-          widescreen={12}
-        >
-          <Sidebar.Pushable as={'span'}>
-            <VerticalSidebar
-              animation={animation}
-              direction={direction}
-              visible={visible}
+      <Grid>
+        <Grid.Row className="PepplotContainer">
+          <Grid.Column
+            className="SidebarContainer"
+            mobile={16}
+            tablet={16}
+            largeScreen={4}
+            widescreen={4}
+          >
+            <PepplotSearchCriteria
+              {...this.state}
+              {...this.props}
+              onSearchTransition={this.handleSearchTransition}
+              onPepplotSearch={this.handlePepplotSearch}
+              onSearchCriteriaChange={this.handleSearchCriteriaChange}
+              onSearchCriteriaReset={this.hidePGrid}
+              onDisablePlot={this.disablePlot}
+              onGetMultisetPlot={this.handleMultisetPlot}
+              onHandlePlotAnimation={this.handlePlotAnimation}
+              onMultisetQueried={this.handleMultisetQueried}
             />
-            <Sidebar.Pusher>{pepplotView}</Sidebar.Pusher>
-          </Sidebar.Pushable>
-        </Grid.Column>
-      </Grid.Row>
+          </Grid.Column>
+          <Grid.Column
+            className="PepplotContentContainer"
+            mobile={16}
+            tablet={16}
+            largeScreen={12}
+            widescreen={12}
+          >
+            <Sidebar.Pushable as={'span'}>
+              <VerticalSidebar
+                animation={animation}
+                direction={direction}
+                visible={visible}
+              />
+              <Sidebar.Pusher>{pepplotView}</Sidebar.Pusher>
+            </Sidebar.Pushable>
+          </Grid.Column>
+        </Grid.Row>
+      </Grid>
     );
   }
 }

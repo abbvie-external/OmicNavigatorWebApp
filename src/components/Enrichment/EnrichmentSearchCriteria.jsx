@@ -17,21 +17,21 @@ import _ from 'lodash';
 import EnrichmentMultisetFilters from './EnrichmentMultisetFilters';
 
 class EnrichmentSearchCriteria extends Component {
-  static defaultProps = {
-    tab: 'enrichment',
-    enrichmentStudy: '',
-    enrichmentModel: '',
-    enrichmentAnnotation: '',
-    pValueType: 'nomimal',
-    isValidSearchEnrichment: false,
-    isSearching: false,
-    multisetPlotAvailable: false,
-    animation: 'uncover',
-    direction: 'left',
-    visible: false,
-    plotButtonActive: false,
-    uData: []
-  };
+  // static defaultProps = {
+  //   tab: 'enrichment',
+  //   enrichmentStudy: '',
+  //   enrichmentModel: '',
+  //   enrichmentAnnotation: '',
+  //   pValueType: 'nomimal',
+  //   isValidSearchEnrichment: false,
+  //   isSearching: false,
+  //   multisetPlotAvailable: false,
+  //   animation: 'uncover',
+  //   direction: 'left',
+  //   visible: false,
+  //   plotButtonActive: false,
+  //   uData: []
+  // };
 
   state = {
     enrichmentStudies: [],
