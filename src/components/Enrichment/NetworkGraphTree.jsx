@@ -95,11 +95,51 @@ export default class NetworkGraph extends Component {
         this.state.networkHeight
       );
     }
+    if (this.props.networkSearchValue !== prevProps.networkSearchValue) {
+      this.handleNodeSearch();
+    }
   }
 
   // componentWillUnmount() {
   //   d3.select(`#svg-${this.state.chartSettings.id}`).remove();
   // }
+
+  // handleNodeSearch = () => {
+  //   let self = this;
+  //   let svg = d3.select(`#svg-${this.state.chartSettings.id}`);
+  //   let nodeLabels = svg.selectAll('.node-label');
+  //   if (this.props.networkSearchValue === '') {
+  //     nodeLabels.style('opactity', '1');
+  //   } else {
+  //     let keep = nodeLabels.filter(function(d, i) {
+  //       let string = d.EnrichmentMap_GS_DESCR;
+  //       return string.includes(self.props.networkSearchValue);
+  //     });
+  //     keep.style('opacity', '1');
+  //     var link = svg.selectAll('.links');
+  //     link.style('opacity', '0');
+  //     d3.selectAll('.nodes, .links')
+  //       .transition()
+  //       .duration(5000)
+  //       .style('opacity', 1);
+  //   }
+  // };
+
+  handleNodeSearch = () => {
+    // setTimeout(() => {
+    let str = this.props.networkSearchValue;
+    let nodeLabel = this.props.networkSettings.nodeLabel;
+    if (str.length === 0) {
+      d3.selectAll('.node-label').style('opacity', 1);
+    } else {
+      d3.selectAll('.node-label').style('opacity', 0);
+      var keep = d3.selectAll('.node-label').filter(function(d) {
+        return d[nodeLabel].toLowerCase().includes(str);
+      });
+      keep.style('opacity', 1);
+    }
+    // }, 300);
+  };
 
   windowResized = () => {
     this.setDimensions();

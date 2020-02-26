@@ -14,31 +14,27 @@ import {
 } from 'semantic-ui-react';
 import NetworkGraphTree from './NetworkGraphTree';
 import './EnrichmentResultsGraph.scss';
-const initialState = {
-  showNetworkLabels: true,
-  descriptions: [],
-  results: [],
-  value: ''
-};
 
 const resultRenderer = ({ title }) => <Label content={title} />;
 
 class EnrichmentResultsGraph extends Component {
-  state = initialState;
+  state = {
+    showNetworkLabels: true,
+    results: [],
+    networkSearchValue: '',
+    descriptions: []
+  };
 
   componentDidMount() {
-    debugger;
-    const enrichmentResultsDescriptions = this.props.enrichmentResults.map(
-      r => ({
-        title: r.Description
-        // title: r.metaData.Description,
-        // prop: r.prop,
-        // value: r.value,
-        // ontology: r.metaData.Ontology
-      })
-    );
+    const networkDataNodeDescriptions = this.props.networkData.nodes.map(r => ({
+      title: r.data.EnrichmentMap_GS_DESCR.toLowerCase()
+      // title: r.metaData.Description,
+      // prop: r.prop,
+      // value: r.value,
+      // ontology: r.metaData.Ontology
+    }));
     this.setState({
-      descriptions: enrichmentResultsDescriptions
+      descriptions: networkDataNodeDescriptions
     });
   }
 
@@ -141,28 +137,21 @@ class EnrichmentResultsGraph extends Component {
     }
   };
 
-  // highlightLabels(str) {
-  //   if (str.length === 0) {
-  //     d3.selectAll('.node-label').style('opacity', 0);
-  //   } else {
-  //     d3.selectAll('.node-label').style('opacity', 0);
-  //     var keep = d3.selectAll('.node-label').filter(function(d) {
-  //       return d[self.chart.settings.nodeLabel].toLowerCase().includes(str);
-  //     });
-  //     keep.style('opacity', 1);
-  //   }
-  // }
-
   handleResultSelect = (e, { result }) =>
-    this.setState({ value: result.title });
+    this.setState({ networkSearchValue: result.title });
 
   handleSearchChange = (e, { value }) => {
-    this.setState({ value });
+    this.setState({ networkSearchValue: value.toLowerCase() });
 
     setTimeout(() => {
-      if (this.state.value.length < 1) return this.setState(initialState);
+      if (this.state.networkSearchValue.length < 1)
+        return this.setState({
+          ...this.state,
+          results: [],
+          networkSearchValue: ''
+        });
 
-      const re = new RegExp(_.escapeRegExp(this.state.value), 'i');
+      const re = new RegExp(_.escapeRegExp(this.state.networkSearchValue), 'i');
       const isMatch = result => re.test(result.title);
 
       this.setState({
@@ -180,7 +169,7 @@ class EnrichmentResultsGraph extends Component {
     //   enrichmentAnnotation
     // } = this.props;
 
-    const { value, results } = this.state;
+    const { networkSearchValue, results } = this.state;
 
     const enrichmentViewToggle = this.getEnrichmentViewToggle();
 
@@ -210,7 +199,7 @@ class EnrichmentResultsGraph extends Component {
                   leading: true
                 })}
                 results={results}
-                value={value}
+                value={networkSearchValue}
                 resultRenderer={resultRenderer}
                 {...this.props}
               />
@@ -252,6 +241,7 @@ class EnrichmentResultsGraph extends Component {
         </Grid>
         <NetworkGraphTree
           {...this.props}
+          {...this.state}
           onPieClick={this.handlePieClick}
         ></NetworkGraphTree>
       </div>

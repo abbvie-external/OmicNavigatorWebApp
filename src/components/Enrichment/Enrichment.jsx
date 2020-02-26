@@ -135,7 +135,6 @@ class Enrichment extends Component {
 
   componentDidUpdate(prevProps, prevState, snapshot) {
     if (this.state.enrichmentResults !== prevState.enrichmentResults) {
-      debugger;
       const DescriptionAndTest = this.props.enrichmentDescriptionAndTest || '';
       if (DescriptionAndTest !== '') {
         const AllDescriptionsAndTests = this.state.enrichmentResults;
@@ -190,7 +189,6 @@ class Enrichment extends Component {
         self.setState({
           annotationData: annotationDataParsed
         });
-        debugger;
         dataItem.Annotation = _.find(annotationDataParsed, {
           Description: dataItem.Description
         }).Key;
@@ -828,7 +826,6 @@ class Enrichment extends Component {
     dataItem,
     test
   ) => {
-    debugger;
     this.testSelectedTransition(true);
     const TestSiteVar = `${test}:${dataItem.Description}`;
     this.handleSearchCriteriaChange(
@@ -909,7 +906,6 @@ class Enrichment extends Component {
         );
         //stored annodationdata and won't call the service after the first time...reset it when sc changes
         // } else {
-        //   debugger;
         //   dataItem.Annotation = _.find(self.state.annotationData, {
         //     Description: dataItem.Description
         //   }).Key;
@@ -957,7 +953,6 @@ class Enrichment extends Component {
             .getDatabaseInfo(enrichmentStudy + 'plots', enrichmentAnnotation)
             .then(annotationDataResponse => {
               const annotationDataParsed = JSON.parse(annotationDataResponse);
-              debugger;
               dataItem.Annotation = _.find(annotationDataParsed, {
                 Description: dataItem.Description
               }).Key;
