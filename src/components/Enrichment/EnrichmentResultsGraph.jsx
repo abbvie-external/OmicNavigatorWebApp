@@ -9,14 +9,66 @@ import {
   Search,
   Radio,
   Label,
-  Header,
-  Segment
+  LabelGroup
 } from 'semantic-ui-react';
+import phosphosite_icon from '../../resources/phosphosite.ico';
+// import NetworkGraphOld from './NetworkGraphOld';
+// import NetworkGraphNew from './NetworkGraphNew';
 import NetworkGraphTree from './NetworkGraphTree';
+// import NetworkGraphReact from './NetworkGraphReact';
+// import NetworkGraphCarousel from './NetworkGraphCarousel';
 import './EnrichmentResultsGraph.scss';
 
-const resultRenderer = ({ title }) => <Label content={title} />;
+function getLink(ontology) {
+  let link = `http://amigo.geneontology.org/amigo/term/${ontology}`;
+  return (
+    <a target="_blank" rel="noopener noreferrer" href={link}>
+      <img
+        src={phosphosite_icon}
+        alt="External Link to Ontology"
+        className="SearchResultsExternalIcon"
+      />
+      {ontology}
+    </a>
+  );
+}
 
+const resultRenderer = ({ description, ontology, genes, size }) => {
+  debugger;
+  let ontologyLink = getLink(ontology);
+  let genesFormatted = genes.join(', ');
+  const TableValuePopupStyle = {
+    backgroundColor: '2E2E2E',
+    borderBottom: '2px solid var(--color-primary)',
+    color: '#FFF',
+    padding: '1em',
+    maxWidth: '50vw',
+    fontSize: '13px',
+    wordBreak: 'break-all'
+  };
+  return (
+    <LabelGroup>
+      <Label>{description}</Label>
+      <br></br>
+      <Label.Detail as="a" className="OntologyLink">
+        {ontologyLink}
+      </Label.Detail>
+      <Popup
+        trigger={
+          <Label circular color="blue" key={description}>
+            {size}
+          </Label>
+        }
+        style={TableValuePopupStyle}
+        inverted
+        basic
+        position="right center"
+      >
+        {genesFormatted}
+      </Popup>
+    </LabelGroup>
+  );
+};
 class EnrichmentResultsGraph extends Component {
   state = {
     showNetworkLabels: true,
@@ -26,12 +78,12 @@ class EnrichmentResultsGraph extends Component {
   };
 
   componentDidMount() {
+    debugger;
     const networkDataNodeDescriptions = this.props.networkData.nodes.map(r => ({
-      title: r.data.EnrichmentMap_GS_DESCR.toLowerCase()
-      // title: r.metaData.Description,
-      // prop: r.prop,
-      // value: r.value,
-      // ontology: r.metaData.Ontology
+      description: r.data.EnrichmentMap_GS_DESCR.toLowerCase(),
+      ontology: r.data.name,
+      genes: r.data.EnrichmentMap_Genes,
+      size: r.data.EnrichmentMap_Genes.length
     }));
     this.setState({
       descriptions: networkDataNodeDescriptions
@@ -138,7 +190,7 @@ class EnrichmentResultsGraph extends Component {
   };
 
   handleResultSelect = (e, { result }) =>
-    this.setState({ networkSearchValue: result.title });
+    this.setState({ networkSearchValue: result.description });
 
   handleSearchChange = (e, { value }) => {
     this.setState({ networkSearchValue: value.toLowerCase() });
@@ -152,7 +204,7 @@ class EnrichmentResultsGraph extends Component {
         });
 
       const re = new RegExp(_.escapeRegExp(this.state.networkSearchValue), 'i');
-      const isMatch = result => re.test(result.title);
+      const isMatch = result => re.test(result.description);
 
       this.setState({
         results: _.filter(this.state.descriptions, isMatch)

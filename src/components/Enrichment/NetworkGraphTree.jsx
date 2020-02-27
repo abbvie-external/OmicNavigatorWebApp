@@ -4,7 +4,7 @@ import * as d3 from 'd3';
 import './NetworkGraph.scss';
 import { networkByCluster } from '../Shared/helpers';
 
-export default class NetworkGraph extends Component {
+export default class NetworkGraphTree extends Component {
   // static defaultProps = {
   //   networkDataAvailable: false,
   //   networkData: {},
@@ -662,6 +662,7 @@ export default class NetworkGraph extends Component {
             if (Math.abs(d.data.value) > 0.001)
               pValueDisplay = d.data.value.toPrecision(3);
             else pValueDisplay = d.data.value.toExponential(3);
+            debugger;
 
             div
               .html(
@@ -672,7 +673,7 @@ export default class NetworkGraph extends Component {
                   `<br/><b>pValue: </b>` +
                   pValueDisplay +
                   `<br/><b>Ontology: </b>` +
-                  d.data.metaData.Annotation
+                  d.data.metaData.Ontology
               )
               .style('left', d3.event.pageX + 10 + 'px')
               .style('top', d3.event.pageY - 15 + 'px');
@@ -694,6 +695,7 @@ export default class NetworkGraph extends Component {
         d3.event.sourceEvent.preventDefault();
       }
       function pieClickEvent(d, o) {
+        debugger;
         if (d3.event.defaultPrevented) return;
         d3.select('.tooltip-pieSlice').remove();
         self.props.onPieClick(d.data);

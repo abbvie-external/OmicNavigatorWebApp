@@ -192,16 +192,6 @@ class PhosphoprotService {
     return dataFromPromise;
   }
 
-  // async getEnrichmentMap() {
-  //   try {
-  //     const response = await axios.get('networkData.json');
-  //     return response.data;
-  //   } catch (error) {
-  //     toast.error(`${error.statusText}: ${error.responseText}`);
-  //     // toast.error('Failed to get network data, please try again.');
-  //   }
-  // }
-
   async getMultisetEnrichmentData(
     testCategory,
     mustTest,
