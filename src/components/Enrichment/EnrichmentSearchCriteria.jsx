@@ -639,7 +639,6 @@ class EnrichmentSearchCriteria extends Component {
         <Form className="SearchCriteriaContainer">
           <Form.Field
             control={Select}
-            label="Study"
             name="enrichmentStudy"
             value={enrichmentStudy}
             options={enrichmentStudies}
@@ -647,17 +646,32 @@ class EnrichmentSearchCriteria extends Component {
             onChange={this.handleStudyChange}
             disabled={enrichmentStudiesDisabled}
             width={13}
+            label={{
+              children: 'Study',
+              htmlFor: 'form-select-control-estudy'
+            }}
+            search
+            searchInput={{ id: 'form-select-control-estudy' }}
+            selectOnBlur={false}
+            selectOnNavigation={false}
           />
           <span className="StudyHtmlIconDivE">{studyIcon}</span>
           <Form.Field
             control={Select}
-            label="Model"
             name="enrichmentModel"
             value={enrichmentModel}
             options={enrichmentModels}
             placeholder="Select Model"
             onChange={this.handleModelChange}
             disabled={enrichmentModelsDisabled}
+            label={{
+              children: 'Model',
+              htmlFor: 'form-select-control-emodel'
+            }}
+            search
+            searchInput={{ id: 'form-select-control-emodel' }}
+            selectOnBlur={false}
+            selectOnNavigation={false}
           />
           <Form.Field
             control={Select}
@@ -669,10 +683,12 @@ class EnrichmentSearchCriteria extends Component {
             disabled={enrichmentAnnotationsDisabled}
             label={{
               children: 'Database',
-              htmlFor: 'form-select-control-test'
+              htmlFor: 'form-select-control-edatabase'
             }}
             search
-            searchInput={{ id: 'form-select-control-test' }}
+            searchInput={{ id: 'form-select-control-edatabase' }}
+            selectOnBlur={false}
+            selectOnNavigation={false}
           />
           <label
             className={
