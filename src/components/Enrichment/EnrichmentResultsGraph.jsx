@@ -2,16 +2,7 @@ import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import * as d3 from 'd3';
 import _ from 'lodash';
-import {
-  Icon,
-  Popup,
-  Grid,
-  Search,
-  Radio,
-  Label,
-  Header,
-  Segment
-} from 'semantic-ui-react';
+import { Grid, Search, Radio, Label } from 'semantic-ui-react';
 import NetworkGraphTree from './NetworkGraphTree';
 import './EnrichmentResultsGraph.scss';
 
@@ -59,63 +50,6 @@ class EnrichmentResultsGraph extends Component {
   //   d3.select("#svg-chart-network").remove();
   // }
 
-  getEnrichmentViewToggle = () => {
-    const IconPopupStyle = {
-      backgroundColor: '2E2E2E',
-      borderBottom: '2px solid var(--color-primary)',
-      color: '#FFF',
-      padding: '1em',
-      maxWidth: '50vw',
-      fontSize: '13px',
-      wordBreak: 'break-all'
-    };
-
-    return (
-      <div className="NetworkGraphToggle">
-        <Popup
-          trigger={
-            <Icon
-              name="table"
-              size="large"
-              color="orange"
-              bordered
-              className="TableVsNetworkButtons"
-              inverted={this.props.enrichmentView === 'table'}
-              onClick={this.props.onEnrichmentViewChange({
-                enrichmentView: 'table'
-              })}
-            />
-          }
-          style={IconPopupStyle}
-          inverted
-          basic
-          position="bottom left"
-          content="View Table"
-        />
-        <Popup
-          trigger={
-            <Icon
-              name="chart pie"
-              size="large"
-              color="orange"
-              bordered
-              className="TableVsNetworkButtons"
-              inverted={this.props.enrichmentView === 'network'}
-              onClick={this.props.onEnrichmentViewChange({
-                enrichmentView: 'network'
-              })}
-            />
-          }
-          style={IconPopupStyle}
-          inverted
-          basic
-          position="bottom left"
-          content="View Network Graph"
-        />
-      </div>
-    );
-  };
-
   handlePieClick = data => {
     this.props.onHandlePieClick(
       this.props.enrichmentStudy,
@@ -161,90 +95,87 @@ class EnrichmentResultsGraph extends Component {
   };
 
   render() {
-    // const {
-    //   enrichmentResults,
-    //   enrichmentColumns,
-    //   enrichmentStudy,
-    //   enrichmentModel,
-    //   enrichmentAnnotation
-    // } = this.props;
-
     const { networkSearchValue, results } = this.state;
 
-    const enrichmentViewToggle = this.getEnrichmentViewToggle();
-
     return (
-      <div className="NetworkGraphWrapper">
-        {enrichmentViewToggle}
-        <Grid className="NetworkGraphFiltersContainer">
-          <Grid.Row>
-            <Grid.Column
-              className="NetworkGraphFilters"
-              mobile={6}
-              tablet={6}
-              largeScreen={3}
-              widescreen={2}
-            ></Grid.Column>
-            <Grid.Column
-              // className="NetworkGraphFilters"
-              mobile={6}
-              tablet={6}
-              largeScreen={4}
-              widescreen={4}
-            >
-              <Search
-                placeholder="Search Network"
-                onResultSelect={this.handleResultSelect}
-                onSearchChange={_.debounce(this.handleSearchChange, 500, {
-                  leading: true
-                })}
-                results={results}
-                value={networkSearchValue}
-                resultRenderer={resultRenderer}
-                {...this.props}
-              />
-            </Grid.Column>
-            <Grid.Column
-              className="NetworkGraphFilters"
-              id="NetworkGraphLabelsToggle"
-              mobile={6}
-              tablet={6}
-              largeScreen={3}
-              widescreen={4}
-            >
-              <Radio
-                toggle
-                label="Show Labels"
-                checked={this.state.showNetworkLabels}
-                onChange={this.handleLabels}
-              />
-            </Grid.Column>
-            <Grid.Column
-              className="NetworkGraphFilters"
-              mobile={6}
-              tablet={6}
-              largeScreen={3}
-              widescreen={3}
-            >
-              <h3>toggle tbd</h3>
-            </Grid.Column>
-            <Grid.Column
-              className="NetworkGraphFilters"
-              mobile={6}
-              tablet={6}
-              largeScreen={3}
-              widescreen={3}
-            >
-              <h3>legend</h3>
-            </Grid.Column>
-          </Grid.Row>
-        </Grid>
-        <NetworkGraphTree
-          {...this.props}
-          {...this.state}
-          onPieClick={this.handlePieClick}
-        ></NetworkGraphTree>
-      </div>
+      <Grid className="NetworkGraphFiltersContainer">
+        <Grid.Row>
+          <Grid.Column
+            className="NetworkGraphFilters"
+            mobile={6}
+            tablet={6}
+            largeScreen={3}
+            widescreen={2}
+          ></Grid.Column>
+          <Grid.Column
+            // className="NetworkGraphFilters"
+            mobile={6}
+            tablet={6}
+            largeScreen={4}
+            widescreen={4}
+          >
+            <Search
+              placeholder="Search Network"
+              onResultSelect={this.handleResultSelect}
+              onSearchChange={_.debounce(this.handleSearchChange, 500, {
+                leading: true
+              })}
+              results={results}
+              value={networkSearchValue}
+              resultRenderer={resultRenderer}
+              {...this.props}
+            />
+          </Grid.Column>
+          <Grid.Column
+            className="NetworkGraphFilters"
+            id="NetworkGraphLabelsToggle"
+            mobile={6}
+            tablet={6}
+            largeScreen={3}
+            widescreen={4}
+          >
+            <Radio
+              toggle
+              label="Show Labels"
+              checked={this.state.showNetworkLabels}
+              onChange={this.handleLabels}
+            />
+          </Grid.Column>
+          <Grid.Column
+            className="NetworkGraphFilters"
+            mobile={6}
+            tablet={6}
+            largeScreen={3}
+            widescreen={3}
+          >
+            <h3>toggle tbd</h3>
+          </Grid.Column>
+          <Grid.Column
+            className="NetworkGraphFilters"
+            mobile={6}
+            tablet={6}
+            largeScreen={3}
+            widescreen={3}
+          >
+            <h3>legend</h3>
+          </Grid.Column>
+        </Grid.Row>
+        <Grid.Row className="NetworkGraphContainer">
+          <Grid.Column
+            className=""
+            mobile={16}
+            tablet={16}
+            largeScreen={16}
+            widescreen={16}
+          >
+            <NetworkGraphTree
+              {...this.props}
+              {...this.state}
+              onPieClick={this.handlePieClick}
+            ></NetworkGraphTree>
+          </Grid.Column>
+        </Grid.Row>
+      </Grid>
     );
   }
 }

@@ -1,10 +1,36 @@
 import React, { Component } from 'react';
 import _ from 'lodash';
+import Slider from 'react-slick';
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
 import * as d3 from 'd3';
 import './NetworkGraph.scss';
 import { networkByCluster } from '../Shared/helpers';
 
-export default class NetworkGraph extends Component {
+export default class NetworkGraphCarousel extends Component {
+  // static defaultProps = {
+  //   networkDataAvailable: false,
+  //   networkData: {},
+  //   tests: {},
+  //   networkSettings: {
+  //     facets: {},
+  //     propLabel: {},
+  //     metaLabels: ['Description', 'Ontology'],
+  //     meta: ['EnrichmentMap_GS_DESCR', 'EnrichmentMap_Name'],
+  //     facetAndValueLabel: ['Test', 'pValue'],
+  //     nodeLabel: 'EnrichmentMap_GS_DESCR',
+  //     radiusScale: [10, 50],
+  //     lineScale: [1, 10],
+  //     nodeSize: 'EnrichmentMap_gs_size',
+  //     linkSize: 'EnrichmentMap_Overlap_size',
+  //     linkMetaLabels: ['Overlap Size', 'Source', 'Target'],
+  //     linkMeta: ['EnrichmentMap_Overlap_size', 'source', 'target'],
+  //     linkMetaLookup: ['EnrichmentMap_GS_DESCR', 'EnrichmentMap_GS_DESCR'],
+  //     nodeColorScale: [0, 0.1, 1],
+  //     nodeColors: ['red', 'white', 'blue']
+  //   }
+  // }
+
   state = {
     dataCombined: [],
     networkWidth: 0,
@@ -171,15 +197,15 @@ export default class NetworkGraph extends Component {
       return o.data;
     });
 
-    // this.setState({
-    //   chartSettings: {
-    //     ...this.state.chartSettings,
-    //     formattedData: {
-    //       nodes: formattedNodes,
-    //       links: formattedLinks
-    //     }
-    //   }
-    // });
+    this.setState({
+      chartSettings: {
+        ...this.state.chartSettings,
+        formattedData: {
+          nodes: formattedNodes,
+          links: formattedLinks
+        }
+      }
+    });
 
     _.forEach(formattedNodes, function(o1) {
       let picked = _.pick(o1, networkSettings.facets);
@@ -370,8 +396,88 @@ export default class NetworkGraph extends Component {
         i < n;
         ++i
       ) {
+        // simulation
+        //     .nodes(d.data.nodes)
+
+        // simulation.force("link")
+        //     .links(d.data.links);
+
         simulation.tick();
       }
+
+      // let simulation = d3
+      //   .forceSimulation()
+      //   .force(
+      //     'link',
+      //     d3.forceLink().id(function(d) {
+      //       return d.id;
+      //     })
+      //   )
+      //   .force(
+      //     'charge',
+      //     d3
+      //       .forceManyBody()
+      //       .strength([-800])
+      //       .distanceMax([500])
+      //   )
+      //   .force('center', d3.forceCenter(width / 2, height / 2))
+      //   .force(
+      //     'collision',
+      //     d3.forceCollide().radius(function(d) {
+      //       return radiusVar(d[networkSettings.nodeSize]);
+      //     })
+      //   )
+      //   .force('x', d3.forceX())
+      //   .force('y', d3.forceY())
+      //   .stop();
+
+      //   for (
+      //     let i = 0,
+      //       n = Math.ceil(
+      //         Math.log(simulation.alphaMin()) /
+      //           Math.log(1 - simulation.alphaDecay())
+      //       );
+      //     i < n;
+      //     ++i
+      //   ) {
+      //     simulation.nodes(dataCombinedVar.nodes);
+
+      //     simulation.force('link').links(dataCombinedVar.links);
+
+      //     simulation.tick();
+      //   }
+
+      //   let link = chartSVG
+      //     .append('g')
+      //     .attr('class', 'links')
+      //     .selectAll('line')
+      //     .data(dataCombinedVar.links)
+      //     .enter()
+      //     .append('line')
+      //     .style('stroke', function(d) {
+      //       return '#0080ff';
+      //     })
+      //     .style('stroke-opacity', function(d) {
+      //       return 0.3;
+      //     })
+      //     .style('stroke-width', function(d) {
+      //       return lineScaleVar(d.EnrichmentMap_Overlap_size);
+      //     })
+      //     .attr('x1', function(d) {
+      //       return d.source.x;
+      //     })
+      //     .attr('y1', function(d) {
+      //       return d.source.y;
+      //     })
+      //     .attr('x2', function(d) {
+      //       return d.target.x;
+      //     })
+      //     .attr('y2', function(d) {
+      //       return d.target.y;
+      //     });
+      //   chartSVG = d3.select(`#svg-${chartSettings.id}`);
+
+      //   let link = chartSVG
       let link = d3
         .select(this)
         .append('g')
@@ -513,7 +619,7 @@ export default class NetworkGraph extends Component {
         })
         .style('font-size', '1em')
         .style('opacity', 1)
-        .attr('x', 12)
+        .attr('x', 6)
         .attr('y', 3);
 
       let div = d3
@@ -649,12 +755,309 @@ export default class NetworkGraph extends Component {
 
   render() {
     const { chartSettings } = this.state;
+
+    let sliderSettings = {
+      className: '',
+      dots: true,
+      infinite: true,
+      slidesToShow: 1,
+      slidesToScroll: 1,
+      adaptiveHeight: true
+    };
     return (
-      <div
-        ref={this.networkContainerRef}
-        id={chartSettings.id}
-        className="NetworkChartContainer"
-      ></div>
+      //   <div
+      //     ref={this.networkContainerRef}
+      //     id={chartSettings.id}
+      //     className="NetworkChartContainer"
+      //   ></div>
+      <div>
+        <Slider {...sliderSettings}>
+          <div>
+            <svg
+              className="prefix__network-chart-area prefix__nwChart"
+              viewBox="0 0 1600 900"
+              preserveAspectRatio="xMinYMin meet"
+              // {...props}
+            >
+              <path
+                fill="#fdfcfb"
+                strokeOpacity={0.25}
+                stroke="gray"
+                d="M0 0h1202v900H0z"
+              />
+              <g className="prefix__links" stroke="#0080ff" strokeOpacity={0.3}>
+                <path strokeWidth={10} d="M592.583 467.121l-32.523-81.27" />
+                <path d="M592.583 467.121l57.773 29.917" />
+              </g>
+              <g className="prefix__nodes">
+                <path
+                  d="M560.06 348.314a37.537 37.537 0 0137.536 37.537H560.06z"
+                  opacity={0.75}
+                  stroke="#000"
+                  cursor="pointer"
+                  fill="#ff0101"
+                />
+                <path
+                  d="M597.596 385.85a37.537 37.537 0 01-37.536 37.537v-37.536z"
+                  opacity={0.75}
+                  stroke="#000"
+                  cursor="pointer"
+                  fill="red"
+                />
+                <path
+                  d="M560.06 423.387a37.537 37.537 0 01-37.537-37.536h37.537z"
+                  opacity={0.75}
+                  stroke="#000"
+                  cursor="pointer"
+                  fill="#ff1212"
+                />
+                <path
+                  d="M522.523 385.85a37.537 37.537 0 0137.537-37.536v37.537z"
+                  opacity={0.75}
+                  stroke="#000"
+                  cursor="pointer"
+                  fill="#c4c4ff"
+                />
+                <text
+                  className="prefix__node-label"
+                  x={6}
+                  y={3}
+                  fontSize="1em"
+                  transform="translate(560.06 385.85)"
+                >
+                  {'nucleoplasm'}
+                </text>
+                <g>
+                  <path
+                    d="M650.356 481.979a15.06 15.06 0 0115.06 15.06h-15.06z"
+                    opacity={0.75}
+                    stroke="#000"
+                    cursor="pointer"
+                    fill="#ff0707"
+                  />
+                  <path
+                    d="M665.415 497.038a15.06 15.06 0 01-15.06 15.06v-15.06z"
+                    opacity={0.75}
+                    stroke="#000"
+                    cursor="pointer"
+                    fill="#ff0505"
+                  />
+                  <path
+                    d="M650.356 512.098a15.06 15.06 0 01-15.06-15.06h15.06z"
+                    opacity={0.75}
+                    stroke="#000"
+                    cursor="pointer"
+                    fill="#fdfdff"
+                  />
+                  <path
+                    d="M635.296 497.038a15.06 15.06 0 0115.06-15.06v15.06z"
+                    opacity={0.75}
+                    stroke="#000"
+                    cursor="pointer"
+                    fill="#ffa6a6"
+                  />
+                  <text
+                    className="prefix__node-label"
+                    x={6}
+                    y={3}
+                    fontSize="1em"
+                    transform="translate(650.356 497.038)"
+                  >
+                    {'fibrillar center'}
+                  </text>
+                </g>
+                <g>
+                  <path
+                    d="M592.583 417.12a50 50 0 0150 50h-50zM642.583 467.12a50 50 0 01-50 50v-50z"
+                    opacity={0.75}
+                    stroke="#000"
+                    cursor="pointer"
+                    fill="red"
+                  />
+                  <path
+                    d="M592.583 517.12a50 50 0 01-50-50h50z"
+                    opacity={0.75}
+                    stroke="#000"
+                    cursor="pointer"
+                    fill="#f7f7ff"
+                  />
+                  <path
+                    d="M542.583 467.12a50 50 0 0150-50v50z"
+                    opacity={0.75}
+                    stroke="#000"
+                    cursor="pointer"
+                    fill="#ff3232"
+                  />
+                  <text
+                    className="prefix__node-label"
+                    x={6}
+                    y={3}
+                    fontSize="1em"
+                    transform="translate(592.583 467.12)"
+                  >
+                    {'nucleus'}
+                  </text>
+                </g>
+              </g>
+              <path
+                fill="#fdfcfb"
+                strokeOpacity={0.25}
+                stroke="gray"
+                d="M1203 0h397v327h-397z"
+              />
+              <g className="prefix__nodes">
+                <path
+                  d="M1401.5 151.778a11.722 11.722 0 0111.722 11.722H1401.5z"
+                  opacity={0.75}
+                  stroke="#000"
+                  cursor="pointer"
+                  fill="#ff0e0e"
+                />
+                <path
+                  d="M1413.222 163.5a11.722 11.722 0 01-11.722 11.722V163.5z"
+                  opacity={0.75}
+                  stroke="#000"
+                  cursor="pointer"
+                  fill="#ff0505"
+                />
+                <path
+                  d="M1401.5 175.222a11.722 11.722 0 01-11.722-11.722h11.722z"
+                  opacity={0.75}
+                  stroke="#000"
+                  cursor="pointer"
+                  fill="#a3a3ff"
+                />
+                <path
+                  d="M1389.778 163.5a11.722 11.722 0 0111.722-11.722V163.5z"
+                  opacity={0.75}
+                  stroke="#000"
+                  cursor="pointer"
+                  fill="#3f3fff"
+                />
+                <text
+                  className="prefix__node-label"
+                  x={6}
+                  y={3}
+                  fontSize="1em"
+                  transform="translate(1401.5 163.5)"
+                >
+                  {'ribosome'}
+                </text>
+              </g>
+              <g>
+                <path
+                  fill="#fdfcfb"
+                  strokeOpacity={0.25}
+                  stroke="gray"
+                  d="M1203 328h200v572h-200z"
+                />
+                <g className="prefix__nodes">
+                  <path
+                    d="M1303 603.763A10.237 10.237 0 011313.237 614H1303z"
+                    opacity={0.75}
+                    stroke="#000"
+                    cursor="pointer"
+                    fill="#ff2121"
+                  />
+                  <path
+                    d="M1313.237 614A10.237 10.237 0 011303 624.237V614z"
+                    opacity={0.75}
+                    stroke="#000"
+                    cursor="pointer"
+                    fill="#ff0303"
+                  />
+                  <path
+                    d="M1303 624.237A10.237 10.237 0 011292.763 614H1303z"
+                    opacity={0.75}
+                    stroke="#000"
+                    cursor="pointer"
+                    fill="#fcfcff"
+                  />
+                  <path
+                    d="M1292.763 614A10.237 10.237 0 011303 603.763V614z"
+                    opacity={0.75}
+                    stroke="#000"
+                    cursor="pointer"
+                    fill="#99f"
+                  />
+                  <text
+                    className="prefix__node-label"
+                    x={6}
+                    y={3}
+                    fontSize="1em"
+                    transform="translate(1303 614)"
+                  >
+                    {'intermediate filament'}
+                  </text>
+                </g>
+              </g>
+              <g>
+                <path
+                  fill="#fdfcfb"
+                  strokeOpacity={0.25}
+                  stroke="gray"
+                  d="M1404 328h196v572h-196z"
+                />
+                <g className="prefix__nodes">
+                  <path
+                    d="M1502 604a10 10 0 0110 10h-10z"
+                    opacity={0.75}
+                    stroke="#000"
+                    cursor="pointer"
+                    fill="#ff0202"
+                  />
+                  <path
+                    d="M1512 614a10 10 0 01-10 10v-10z"
+                    opacity={0.75}
+                    stroke="#000"
+                    cursor="pointer"
+                    fill="#ff0101"
+                  />
+                  <path
+                    d="M1502 624a10 10 0 01-10-10h10z"
+                    opacity={0.75}
+                    stroke="#000"
+                    cursor="pointer"
+                    fill="#e3e3ff"
+                  />
+                  <path
+                    d="M1492 614a10 10 0 0110-10v10z"
+                    opacity={0.75}
+                    stroke="#000"
+                    cursor="pointer"
+                    fill="#acacff"
+                  />
+                  <text
+                    className="prefix__node-label"
+                    x={6}
+                    y={3}
+                    fontSize="1em"
+                    transform="translate(1502 614)"
+                  >
+                    {'dendrite cytoplasm'}
+                  </text>
+                </g>
+              </g>
+            </svg>
+          </div>
+          <div>
+            <h3>2</h3>
+            <p>Hello</p>
+          </div>
+          <div>
+            <h3>3</h3>
+          </div>
+          <div>
+            <h3>4</h3>
+          </div>
+          <div>
+            <h3>5</h3>
+          </div>
+          <div>
+            <h3>6</h3>
+          </div>
+        </Slider>
+      </div>
     );
   }
 }

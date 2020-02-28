@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { Grid, Popup, Sidebar } from 'semantic-ui-react';
+import React, { Component, Fragment } from 'react';
+import { Grid, Popup, Sidebar, Menu, Icon, Button } from 'semantic-ui-react';
 import { withRouter } from 'react-router-dom';
 import DOMPurify from 'dompurify';
 import EnrichmentSearchCriteria from './EnrichmentSearchCriteria';
@@ -1063,6 +1063,8 @@ class Enrichment extends Component {
   };
 
   getView = () => {
+    const enrichmentViewToggle = this.getEnrichmentViewToggle();
+
     if (this.state.isTestSelected && !this.state.isTestDataLoaded) {
       return (
         <div>
@@ -1087,13 +1089,16 @@ class Enrichment extends Component {
       this.state.enrichmentView === 'table'
     ) {
       return (
-        <EnrichmentResultsTable
-          {...this.props}
-          {...this.state}
-          onEnrichmentViewChange={this.handleEnrichmentViewChange}
-          onHandlePlotAnimation={this.handlePlotAnimation}
-          onDisplayViolinPlot={this.displayViolinPlot}
-        />
+        <Fragment>
+          {enrichmentViewToggle}
+          <EnrichmentResultsTable
+            {...this.props}
+            {...this.state}
+            onEnrichmentViewChange={this.handleEnrichmentViewChange}
+            onHandlePlotAnimation={this.handlePlotAnimation}
+            onDisplayViolinPlot={this.displayViolinPlot}
+          />
+        </Fragment>
       );
     } else if (
       this.state.isValidSearchEnrichment &&
@@ -1101,23 +1106,119 @@ class Enrichment extends Component {
       this.state.enrichmentView === 'network'
     ) {
       return (
-        <EnrichmentResultsGraph
-          {...this.props}
-          {...this.state}
-          onEnrichmentViewChange={this.handleEnrichmentViewChange}
-          onHandlePlotAnimation={this.handlePlotAnimation}
-          onDisplayViolinPlot={this.displayViolinPlot}
-          onHandlePieClick={this.testSelected}
-        />
+        <Fragment>
+          {enrichmentViewToggle}
+          <EnrichmentResultsGraph
+            {...this.props}
+            {...this.state}
+            onEnrichmentViewChange={this.handleEnrichmentViewChange}
+            onHandlePlotAnimation={this.handlePlotAnimation}
+            onDisplayViolinPlot={this.displayViolinPlot}
+            onHandlePieClick={this.testSelected}
+          />
+        </Fragment>
       );
     } else if (this.state.isSearching) {
       return <TransitionActive />;
     } else return <TransitionStill />;
   };
 
+  getEnrichmentViewToggle = () => {
+    const IconPopupStyle = {
+      backgroundColor: '2E2E2E',
+      borderBottom: '2px solid var(--color-primary)',
+      color: '#FFF',
+      padding: '1em',
+      maxWidth: '50vw',
+      fontSize: '13px',
+      wordBreak: 'break-all'
+    };
+
+    return (
+      <div className="TableVsNetworkToggle">
+        {/* <Popup
+          trigger={
+            <Icon
+              name="table"
+              size="large"
+              color="orange"
+              bordered
+              className="TableVsNetworkButtons"
+              inverted={this.state.enrichmentView === 'table'}
+              onClick={this.handleEnrichmentViewChange({
+                enrichmentView: 'table'
+              })}
+            />
+          }
+          style={IconPopupStyle}
+          inverted
+          basic
+          position="bottom left"
+          content="View Table"
+        />
+        <Popup
+          trigger={
+            <Icon
+              name="chart pie"
+              size="large"
+              color="orange"
+              bordered
+              className="TableVsNetworkButtons"
+              inverted={this.state.enrichmentView === 'network'}
+              onClick={this.handleEnrichmentViewChange({
+                enrichmentView: 'network'
+              })}
+            />
+          }
+          style={IconPopupStyle}
+          inverted
+          basic
+          position="bottom left"
+          content="View Network Graph"
+        /> */}
+        <Menu icon className="TableVsNetworkMenu">
+          <Menu.Item
+            className="TableVsNetworkButtons"
+            name="table"
+            color="orange"
+            active={this.state.enrichmentView === 'table'}
+            onClick={this.handleEnrichmentViewChange({
+              enrichmentView: 'table'
+            })}
+            inverted={this.state.enrichmentView === 'table'}
+          >
+            <Icon
+              name="table"
+              size="large"
+              color="orange"
+              inverted={this.state.enrichmentView === 'table'}
+            />
+          </Menu.Item>
+
+          <Menu.Item
+            className="TableVsNetworkButtons"
+            name="network"
+            color="orange"
+            active={this.state.enrichmentView === 'network'}
+            onClick={this.handleEnrichmentViewChange({
+              enrichmentView: 'network'
+            })}
+            inverted={this.state.enrichmentView === 'table'}
+          >
+            <Icon
+              name="chart pie"
+              size="large"
+              color="orange"
+              inverted={this.state.enrichmentView === 'network'}
+            />
+          </Menu.Item>
+        </Menu>
+      </div>
+    );
+  };
+
   render() {
     const enrichmentView = this.getView();
-
     const { multisetPlotInfo, animation, direction, visible } = this.state;
     const VerticalSidebar = ({ animation, visible }) => (
       <Sidebar
@@ -1185,7 +1286,9 @@ class Enrichment extends Component {
                 direction={direction}
                 visible={visible}
               />
-              <Sidebar.Pusher>{enrichmentView}</Sidebar.Pusher>
+              <Sidebar.Pusher>
+                <div className="NetworkGraphWrapper">{enrichmentView}</div>
+              </Sidebar.Pusher>
             </Sidebar.Pushable>
           </Grid.Column>
         </Grid.Row>
