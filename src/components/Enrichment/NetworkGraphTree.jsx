@@ -4,7 +4,30 @@ import * as d3 from 'd3';
 import './NetworkGraph.scss';
 import { networkByCluster } from '../Shared/helpers';
 
-export default class NetworkGraph extends Component {
+export default class NetworkGraphTree extends Component {
+  // static defaultProps = {
+  //   networkDataAvailable: false,
+  //   networkData: {},
+  //   tests: {},
+  //   networkSettings: {
+  //     facets: {},
+  //     propLabel: {},
+  //     metaLabels: ['Description', 'Ontology'],
+  //     meta: ['EnrichmentMap_GS_DESCR', 'EnrichmentMap_Name'],
+  //     facetAndValueLabel: ['Test', 'pValue'],
+  //     nodeLabel: 'EnrichmentMap_GS_DESCR',
+  //     radiusScale: [10, 50],
+  //     lineScale: [1, 10],
+  //     nodeSize: 'EnrichmentMap_gs_size',
+  //     linkSize: 'EnrichmentMap_Overlap_size',
+  //     linkMetaLabels: ['Overlap Size', 'Source', 'Target'],
+  //     linkMeta: ['EnrichmentMap_Overlap_size', 'source', 'target'],
+  //     linkMetaLookup: ['EnrichmentMap_GS_DESCR', 'EnrichmentMap_GS_DESCR'],
+  //     nodeColorScale: [0, 0.1, 1],
+  //     nodeColors: ['red', 'white', 'blue']
+  //   }
+  // }
+
   state = {
     dataCombined: [],
     networkWidth: 0,
@@ -559,6 +582,7 @@ export default class NetworkGraph extends Component {
             if (Math.abs(d.data.value) > 0.001)
               pValueDisplay = d.data.value.toPrecision(3);
             else pValueDisplay = d.data.value.toExponential(3);
+            debugger;
 
             div
               .html(
@@ -569,7 +593,7 @@ export default class NetworkGraph extends Component {
                   `<br/><b>pValue: </b>` +
                   pValueDisplay +
                   `<br/><b>Ontology: </b>` +
-                  d.data.metaData.Annotation
+                  d.data.metaData.Ontology
               )
               .style('left', d3.event.pageX + 10 + 'px')
               .style('top', d3.event.pageY - 15 + 'px');
@@ -592,8 +616,7 @@ export default class NetworkGraph extends Component {
       }
       function pieClickEvent(d, o) {
         // if (d3.event.defaultPrevented) return;
-        d3.select('.tooltip-pieSlice').style('opacity', 0);
-        // d3.select('.tooltip-pieSlice').remove();
+        d3.select('.tooltip-pieSlice').remove();
         self.props.onPieClick(d.data);
       }
 
