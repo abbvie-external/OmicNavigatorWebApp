@@ -78,22 +78,28 @@ export default class NetworkGraphTree extends Component {
   // }
 
   componentDidMount() {
-    this.setDimensions();
-    let resizedFn;
-    window.addEventListener('resize', () => {
-      clearTimeout(resizedFn);
-      resizedFn = setTimeout(() => {
-        this.windowResized();
-      }, 200);
-    });
+    if (this.props.networkData.nodes.length > 0) {
+      this.setDimensions();
+      let resizedFn;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizedFn);
+        resizedFn = setTimeout(() => {
+          this.windowResized();
+        }, 200);
+      });
+    }
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
     if (this.props.networkData !== prevProps.networkData) {
-      this.prepareAndRenderTree(
-        this.state.networkWidth,
-        this.state.networkHeight
-      );
+      if (this.state.networkHeight === 0) {
+        this.setDimensions();
+      } else {
+        this.prepareAndRenderTree(
+          this.state.networkWidth,
+          this.state.networkHeight
+        );
+      }
     }
     if (this.props.networkSearchValue !== prevProps.networkSearchValue) {
       this.handleNodeSearch();
@@ -148,32 +154,38 @@ export default class NetworkGraphTree extends Component {
   setDimensions = () => {
     d3.select(`#svg-${this.state.chartSettings.id}`).remove();
     const { chartSettings } = this.state;
-    console.log(
-      this.props.networkData.nodes.length,
-      this.props.networkData.edges.length
-    );
-    const containerWidth = this.props.networkData.nodes.length * 20;
-    // const containerWidth = this.getWidth();
-    // let's calculate height based on data...
-    const containerHeight = this.getHeight();
-    // const containerHeight = 5000;
-    const width =
-      containerWidth - chartSettings.margin.left - chartSettings.margin.right;
-    const height =
-      containerHeight - chartSettings.margin.top - chartSettings.margin.bottom;
-    this.setState({
-      networkContainerWidth: containerWidth,
-      networkWidth: width,
-      networkContainerHeight: containerHeight,
-      networkHeight: height
-    });
-    this.prepareAndRenderTree(width, height);
+    if (this.props.networkData.nodes.length > 0) {
+      console.log(
+        this.props.networkData.nodes.length,
+        this.props.networkData.edges.length
+      );
+      const containerWidth = this.props.networkData.nodes.length * 20;
+      // const containerWidth = this.getWidth();
+      // let's calculate height based on data...
+      const containerHeight = this.getHeight();
+      // const containerHeight = 5000;
+      const width =
+        containerWidth - chartSettings.margin.left - chartSettings.margin.right;
+      const height =
+        containerHeight -
+        chartSettings.margin.top -
+        chartSettings.margin.bottom;
+      this.setState({
+        networkContainerWidth: containerWidth,
+        networkWidth: width,
+        networkContainerHeight: containerHeight,
+        networkHeight: height
+      });
+      this.prepareAndRenderTree(width, height);
+    }
   };
 
   getHeight() {
     if (this.networkContainerRef.current !== null) {
-      return this.networkContainerRef.current.parentElement.offsetHeight;
-    } else return 900;
+      return this.networkContainerRef.current.parentElement.offsetHeight > 0
+        ? this.networkContainerRef.current.parentElement.offsetHeight
+        : 715;
+    } else return 715;
   }
   // getWidth() {
   //   if (this.networkContainerRef.current !== null) {
@@ -489,6 +501,7 @@ export default class NetworkGraphTree extends Component {
       //   chartSVG = d3.select(`#svg-${chartSettings.id}`);
 
       //   let node = chartSVG
+      debugger;
       var node = d3
         .select(this)
         .append('g')
@@ -582,7 +595,6 @@ export default class NetworkGraphTree extends Component {
             if (Math.abs(d.data.value) > 0.001)
               pValueDisplay = d.data.value.toPrecision(3);
             else pValueDisplay = d.data.value.toExponential(3);
-            debugger;
 
             div
               .html(

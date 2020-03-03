@@ -59,8 +59,7 @@ class BarcodePlot extends React.Component {
     if (
       // this.props.barcodeSettings.brushedData !==
       //   prevProps.barcodeSettings.brushedData ||
-      this.props.horizontalSplitPaneHeight !==
-      prevProps.horizontalSplitPaneHeight
+      this.props.horizontalSplitPaneSize !== prevProps.horizontalSplitPaneSize
     ) {
       //const heightChangedFn;
       // clearTimeout(heightChangedFn);
@@ -80,14 +79,14 @@ class BarcodePlot extends React.Component {
 
   prepareAndRender(newWidth) {
     const { settings, containerWidth } = this.state;
-    const { barcodeSettings, horizontalSplitPaneHeight } = this.props;
+    const { barcodeSettings, horizontalSplitPaneSize } = this.props;
     const self = this;
     const calculatedWidth = newWidth !== undefined ? newWidth : containerWidth;
     // prepare settings
     const width =
       calculatedWidth - settings.margin.left - settings.margin.right;
     const height =
-      horizontalSplitPaneHeight - settings.margin.top - settings.margin.bottom;
+      horizontalSplitPaneSize - settings.margin.top - settings.margin.bottom;
 
     //Scale the range of the data
     const domain = d3
@@ -123,11 +122,8 @@ class BarcodePlot extends React.Component {
       .attr('id', 'svg-' + settings.id)
       .attr('class', 'barcode-chart-area bcChart')
       .attr('width', width)
-      .attr('height', horizontalSplitPaneHeight - 10)
-      .attr(
-        'viewBox',
-        '0 0 ' + calculatedWidth + ' ' + horizontalSplitPaneHeight
-      )
+      .attr('height', horizontalSplitPaneSize - 10)
+      .attr('viewBox', '0 0 ' + calculatedWidth + ' ' + horizontalSplitPaneSize)
       .attr('preserveAspectRatio', 'xMinYMin meet')
       .attr('cursor', 'crosshair')
       .on('click', svgClicked);
@@ -350,7 +346,7 @@ class BarcodePlot extends React.Component {
 
       objsBrush = d3
         .brush()
-        .extent([[0, -50], [calculatedWidth, horizontalSplitPaneHeight]])
+        .extent([[0, -50], [calculatedWidth, horizontalSplitPaneSize]])
         .on('brush', highlightBrushedTicks)
         .on('end', endBrush);
 

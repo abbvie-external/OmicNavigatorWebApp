@@ -168,7 +168,7 @@ class Tabs extends Component {
         )
       },
       {
-        menuItem: 'Differential Phosophate Analysis',
+        menuItem: 'Differential Analysis',
         pane: (
           <Tab.Pane key="2" className="">
             <Pepplot

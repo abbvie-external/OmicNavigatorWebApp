@@ -23,7 +23,7 @@
   border-bottom: 8px solid rgba(255, 255, 255, 0);
   cursor: row-resize;
   width: 100%;
-  z-index: 11113 !important;
+  z-index: 4 !important;
 }
 
 .Resizer.horizontal:hover {
@@ -114,7 +114,7 @@
 .ViolinAndTableMenu {
   direction: ltr !important;
   // position: absolute !important;
-  z-index: 11111 !important;
+  z-index: 3 !important;
   left: 0 !important;
   // margin-left: 25px !important;
   // width: 90% !important;

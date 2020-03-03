@@ -74,7 +74,7 @@ class ViolinPlot extends Component {
   componentDidUpdate(prevProps, prevState, snapshot) {
     if (
       // this.props.violinData !== prevProps.violinData ||
-      this.props.verticalSplitPaneWidth !== prevProps.verticalSplitPaneWidth
+      this.props.verticalSplitPaneSize !== prevProps.verticalSplitPaneSize
     ) {
       this.setHeight();
     }
@@ -120,13 +120,13 @@ class ViolinPlot extends Component {
       // objs
     } = this.state;
     const {
-      verticalSplitPaneWidth
+      verticalSplitPaneSize
       // violinData,
       // isViolinPlotLoaded
     } = this.props;
 
     const violinWidth =
-      verticalSplitPaneWidth - settings.margin.left - settings.margin.right;
+      verticalSplitPaneSize - settings.margin.left - settings.margin.right;
 
     // if (!isViolinPlotLoaded) {
     //   return (
@@ -156,7 +156,7 @@ class ViolinPlot extends Component {
         >
           {/* X Axis Label */}
           <text
-            transform={`translate(${verticalSplitPaneWidth /
+            transform={`translate(${verticalSplitPaneSize /
               2}, ${violinHeight})`}
             textAnchor="middle"
           >
