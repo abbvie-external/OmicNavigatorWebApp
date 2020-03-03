@@ -1,72 +1,62 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
+import { Slider } from 'react-semantic-ui-range';
+// import styled from 'styled-components';
 import * as d3 from 'd3';
 import _ from 'lodash';
 import {
-  Icon,
   Popup,
   Grid,
   Search,
   Radio,
   Label,
-  LabelGroup
+  Input
+  // Input
 } from 'semantic-ui-react';
-import phosphosite_icon from '../../resources/phosphosite.ico';
 // import NetworkGraphOld from './NetworkGraphOld';
 // import NetworkGraphNew from './NetworkGraphNew';
 import NetworkGraphTree from './NetworkGraphTree';
 // import NetworkGraphReact from './NetworkGraphReact';
 // import NetworkGraphCarousel from './NetworkGraphCarousel';
 import './EnrichmentResultsGraph.scss';
+// const StyledInput = styled(Input)`
+//   border: unset;
+// `;
 
-function getLink(ontology) {
-  let link = `http://amigo.geneontology.org/amigo/term/${ontology}`;
-  return (
-    <a target="_blank" rel="noopener noreferrer" href={link}>
-      <img
-        src={phosphosite_icon}
-        alt="External Link to Ontology"
-        className="SearchResultsExternalIcon"
-      />
-      {ontology}
-    </a>
-  );
-}
-
-const resultRenderer = ({ description, ontology, genes, size }) => {
-  debugger;
-  let ontologyLink = getLink(ontology);
+const resultRenderer = ({ description, genes, size }) => {
   let genesFormatted = genes.join(', ');
-  const TableValuePopupStyle = {
+  const SearchValuePopupStyle = {
     backgroundColor: '2E2E2E',
     borderBottom: '2px solid var(--color-primary)',
     color: '#FFF',
     padding: '1em',
-    maxWidth: '50vw',
+    maxWidth: '25vw',
     fontSize: '13px',
     wordBreak: 'break-all'
+    // zIndex: 333,
+    // overflow: 'auto'
   };
   return (
-    <LabelGroup>
-      <Label>{description}</Label>
-      <br></br>
-      <Label.Detail as="a" className="OntologyLink">
-        {ontologyLink}
-      </Label.Detail>
-      <Popup
-        trigger={
-          <Label circular color="blue" key={description}>
-            {size}
-          </Label>
-        }
-        style={TableValuePopupStyle}
-        inverted
-        basic
-        position="right center"
-      >
-        {genesFormatted}
-      </Popup>
-    </LabelGroup>
+    <Grid className="NetworkSearchResultsContainer">
+      <Grid.Column width={13}>
+        <Label>{description}</Label>
+      </Grid.Column>
+      <Grid.Column width={3}>
+        <Popup
+          trigger={
+            <Label circular color="blue" key={description}>
+              {size}
+            </Label>
+          }
+          basic
+          style={SearchValuePopupStyle}
+          inverted
+          // position="bottom left"
+        >
+          {genesFormatted}
+        </Popup>
+      </Grid.Column>
+    </Grid>
   );
 };
 class EnrichmentResultsGraph extends Component {
@@ -74,14 +64,14 @@ class EnrichmentResultsGraph extends Component {
     showNetworkLabels: true,
     results: [],
     networkSearchValue: '',
-    descriptions: []
+    descriptions: [],
+    edgeValue: 0.5
+    // legendIsOpen: true
   };
 
   componentDidMount() {
-    debugger;
     const networkDataNodeDescriptions = this.props.networkData.nodes.map(r => ({
       description: r.data.EnrichmentMap_GS_DESCR.toLowerCase(),
-      ontology: r.data.name,
       genes: r.data.EnrichmentMap_Genes,
       size: r.data.EnrichmentMap_Genes.length
     }));
@@ -110,63 +100,6 @@ class EnrichmentResultsGraph extends Component {
   // componentWillUnmount() {
   //   d3.select("#svg-chart-network").remove();
   // }
-
-  getEnrichmentViewToggle = () => {
-    const IconPopupStyle = {
-      backgroundColor: '2E2E2E',
-      borderBottom: '2px solid var(--color-primary)',
-      color: '#FFF',
-      padding: '1em',
-      maxWidth: '50vw',
-      fontSize: '13px',
-      wordBreak: 'break-all'
-    };
-
-    return (
-      <div className="NetworkGraphToggle">
-        <Popup
-          trigger={
-            <Icon
-              name="table"
-              size="large"
-              color="orange"
-              bordered
-              className="TableVsNetworkButtons"
-              inverted={this.props.enrichmentView === 'table'}
-              onClick={this.props.onEnrichmentViewChange({
-                enrichmentView: 'table'
-              })}
-            />
-          }
-          style={IconPopupStyle}
-          inverted
-          basic
-          position="bottom left"
-          content="View Table"
-        />
-        <Popup
-          trigger={
-            <Icon
-              name="chart pie"
-              size="large"
-              color="orange"
-              bordered
-              className="TableVsNetworkButtons"
-              inverted={this.props.enrichmentView === 'network'}
-              onClick={this.props.onEnrichmentViewChange({
-                enrichmentView: 'network'
-              })}
-            />
-          }
-          style={IconPopupStyle}
-          inverted
-          basic
-          position="bottom left"
-          content="View Network Graph"
-        />
-      </div>
-    );
-  };
 
   handlePieClick = data => {
     this.props.onHandlePieClick(
@@ -212,91 +145,282 @@ class EnrichmentResultsGraph extends Component {
     }, 300);
   };
 
-  render() {
-    // const {
-    //   enrichmentResults,
-    //   enrichmentColumns,
-    //   enrichmentStudy,
-    //   enrichmentModel,
-    //   enrichmentAnnotation
-    // } = this.props;
+  handleInputChange = (evt, { name, value }) => {
+    this.setState({
+      [name]: value
+    });
+  };
 
-    const { networkSearchValue, results } = this.state;
-
-    const enrichmentViewToggle = this.getEnrichmentViewToggle();
-
+  getLegend = () => {
     return (
-      <div className="NetworkGraphWrapper">
-        {enrichmentViewToggle}
-        <Grid className="NetworkGraphFiltersContainer">
-          <Grid.Row>
-            <Grid.Column
-              className="NetworkGraphFilters"
-              mobile={6}
-              tablet={6}
-              largeScreen={3}
-              widescreen={2}
-            ></Grid.Column>
-            <Grid.Column
-              // className="NetworkGraphFilters"
-              mobile={6}
-              tablet={6}
-              largeScreen={4}
-              widescreen={4}
+      <svg viewBox="0 0 300 250" preserveAspectRatio="xMinYMin meet">
+        <g className="prefix__slices">
+          <path
+            className="prefix__slice"
+            stroke="#000"
+            d="M150 50a50 50 0 0150 50h-50zM200 100a50 50 0 01-50 50v-50zM150 150a50 50 0 01-50-50h50zM100 100a50 50 0 0150-50v50z"
+            fill="#d3d3d3"
+          />
+        </g>
+        <g className="prefix__labels">
+          <text
+            dy=".35em"
+            x={56.569}
+            y={-56.569}
+            fontSize=".75em"
+            textAnchor="middle"
+            transform="translate(150 100)"
+          >
+            {'mut Time Change'}
+          </text>
+          <text
+            dy=".35em"
+            x={56.569}
+            y={56.569}
+            fontSize=".75em"
+            textAnchor="middle"
+            transform="translate(150 100)"
+          >
+            {'wt Time Change'}
+          </text>
+          <text
+            dy=".35em"
+            x={-56.569}
+            y={56.569}
+            fontSize=".75em"
+            textAnchor="middle"
+            transform="translate(150 100)"
+          >
+            {'wt VS mut'}
+          </text>
+          <text
+            dy=".35em"
+            x={-56.569}
+            y={-56.569}
+            fontSize=".75em"
+            textAnchor="middle"
+            transform="translate(150 100)"
+          >
+            {'wt VS mut Time'}
+          </text>
+          <path
+            className="prefix__pointer"
+            d="M250.108 48.431h-87.079l15.255 23.285M247.162 161.569h-81.187l12.31-33.285M66.736 161.569h53.39l1.59-33.285M132.853 48.431H54.01l67.706 23.285"
+            fill="none"
+            stroke="#000"
+          />
+        </g>
+        <g className="prefix__gradient">
+          <path className="prefix__filled" d="M100 200h100v15H100z" />
+          <g
+            className="prefix__y prefix__axis"
+            fill="none"
+            fontSize={10}
+            fontFamily="sans-serif"
+            textAnchor="middle"
+          >
+            <path
+              className="prefix__domain"
+              stroke="currentColor"
+              d="M100.5 221v-5.5h100v5.5"
+            />
+            <g className="prefix__tick">
+              <path stroke="currentColor" d="M100.5 215v6" />
+              <text
+                fill="currentColor"
+                y={9}
+                dy=".71em"
+                transform="translate(100.5 215)"
+              >
+                {'0.0'}
+              </text>
+            </g>
+            <g className="prefix__tick">
+              <path stroke="currentColor" d="M172.722 215v6" />
+              <text
+                fill="currentColor"
+                y={9}
+                dy=".71em"
+                transform="translate(172.722 215)"
+              >
+                {'0.5'}
+              </text>
+            </g>
+            <g className="prefix__tick">
+              <path stroke="currentColor" d="M200.5 215v6" />
+              <text
+                fill="currentColor"
+                y={9}
+                dy=".71em"
+                transform="translate(200.5 215)"
+              >
+                {'1.0'}
+              </text>
+            </g>
+          </g>
+          <text y={2} dy=".35em" transform="translate(65 205)">
+            {'pValue'}
+          </text>
+        </g>
+        <defs>
+          <linearGradient id="prefix__mainGradient">
+            <stop offset={0} stopColor="red" />
+            <stop offset={0.5} stopColor="#fff" />
+            <stop offset={1} stopColor="#00f" />
+          </linearGradient>
+        </defs>
+      </svg>
+    );
+  };
+
+  // handleLegendOpen = () => {
+  //   this.setState({ legendIsOpen: true });
+
+  //   this.timeout = setTimeout(() => {
+  //     this.setState({ legendIsOpen: false });
+  //   }, 2500);
+  // };
+
+  // handleLegendClose = () => {
+  //   this.setState({ legendIsOpen: false });
+  //   clearTimeout(this.timeout);
+  // };
+
+  render() {
+    const { networkSearchValue, results, edgeValue } = this.state;
+    const legend = this.getLegend();
+    const LegendPopupStyle = {
+      padding: '1em',
+      width: '250px'
+    };
+    return (
+      <Grid className="NetworkGraphFiltersContainer">
+        <Grid.Row className="NetworkGraphFiltersRow">
+          <Grid.Column
+            className="NetworkGraphFilters"
+            mobile={6}
+            tablet={6}
+            largeScreen={3}
+            widescreen={3}
+          ></Grid.Column>
+          <Grid.Column
+            // className="NetworkGraphFilters"
+            mobile={10}
+            tablet={10}
+            largeScreen={4}
+            widescreen={4}
+          >
+            <Search
+              // className="NetworkSearchResultsContainer"
+              placeholder="Search Network"
+              onResultSelect={this.handleResultSelect}
+              onSearchChange={_.debounce(this.handleSearchChange, 500, {
+                leading: true
+              })}
+              results={results}
+              value={networkSearchValue}
+              resultRenderer={resultRenderer}
+              {...this.props}
+            />
+            <br></br>
+            {/* <Radio
+              toggle
+              label="Show Labels"
+              checked={this.state.showNetworkLabels}
+              onChange={this.handleLabels}
+            /> */}
+          </Grid.Column>
+          <Grid.Column
+            className="NetworkGraphFilters"
+            id="NetworkGraphLabelsToggle"
+            mobile={6}
+            tablet={6}
+            largeScreen={3}
+            widescreen={3}
+          >
+            <Radio
+              toggle
+              label="Show Labels"
+              checked={this.state.showNetworkLabels}
+              onChange={this.handleLabels}
+            />
+          </Grid.Column>
+          <Grid.Column
+            className="NetworkGraphFilters"
+            mobile={10}
+            tablet={10}
+            largeScreen={3}
+            widescreen={3}
+          >
+            <Input
+              placeholder="Enter Value"
+              type="number"
+              step="0.05"
+              min="0.05"
+              max="1.00"
+              default="0.35"
+              label="Edge Value"
+              name="edgeValue"
+              className="EdgeValueInput"
+              value={edgeValue}
+              onChange={this.handleInputChange}
+            />
+            <Slider
+              className="EdgeValueSlider"
+              inverted={false}
+              value={edgeValue}
+              settings={{
+                start: edgeValue,
+                min: 0.05,
+                max: 1,
+                step: 0.05,
+                onChange: value => {
+                  this.setState({
+                    edgeValue: value
+                  });
+                }
+              }}
+            />
+          </Grid.Column>
+          <Grid.Column
+            className="NetworkGraphFilters"
+            mobile={8}
+            tablet={8}
+            largeScreen={3}
+            widescreen={3}
+          >
+            <Popup
+              trigger={<Label color="blue">Legend</Label>}
+              wide
+              basic
+              hideOnScroll
+              hoverable
+              style={LegendPopupStyle}
+              // position="bottom center"
+              // open={this.state.legendIsOpen}
+              // onClose={this.handleLegendClose}
+              // onOpen={this.handleLegendOpen}
             >
-              <Search
-                placeholder="Search Network"
-                onResultSelect={this.handleResultSelect}
-                onSearchChange={_.debounce(this.handleSearchChange, 500, {
-                  leading: true
-                })}
-                results={results}
-                value={networkSearchValue}
-                resultRenderer={resultRenderer}
-                {...this.props}
-              />
-            </Grid.Column>
-            <Grid.Column
-              className="NetworkGraphFilters"
-              id="NetworkGraphLabelsToggle"
-              mobile={6}
-              tablet={6}
-              largeScreen={3}
-              widescreen={4}
-            >
-              <Radio
-                toggle
-                label="Show Labels"
-                checked={this.state.showNetworkLabels}
-                onChange={this.handleLabels}
-              />
-            </Grid.Column>
-            <Grid.Column
-              className="NetworkGraphFilters"
-              mobile={6}
-              tablet={6}
-              largeScreen={3}
-              widescreen={3}
-            >
-              <h3>toggle tbd</h3>
-            </Grid.Column>
-            <Grid.Column
-              className="NetworkGraphFilters"
-              mobile={6}
-              tablet={6}
-              largeScreen={3}
-              widescreen={3}
-            >
-              <h3>legend</h3>
-            </Grid.Column>
-          </Grid.Row>
-        </Grid>
-        <NetworkGraphTree
-          {...this.props}
-          {...this.state}
-          onPieClick={this.handlePieClick}
-        ></NetworkGraphTree>
-      </div>
+              {legend}
+            </Popup>
+          </Grid.Column>
+        </Grid.Row>
+        <Grid.Row className="NetworkGraphContainer">
+          <Grid.Column
+            className=""
+            mobile={16}
+            tablet={16}
+            largeScreen={16}
+            widescreen={16}
+          >
+            <NetworkGraphTree
+              {...this.props}
+              {...this.state}
+              onPieClick={this.handlePieClick}
+            ></NetworkGraphTree>
+          </Grid.Column>
+        </Grid.Row>
+      </Grid>
     );
   }
 }

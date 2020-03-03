@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { Grid, Popup, Sidebar } from 'semantic-ui-react';
+import React, { Component, Fragment } from 'react';
+import { Grid, Popup, Sidebar, Menu, Icon, Tab } from 'semantic-ui-react';
 import { withRouter } from 'react-router-dom';
 import DOMPurify from 'dompurify';
 import EnrichmentSearchCriteria from './EnrichmentSearchCriteria';
@@ -11,6 +11,10 @@ import SplitPanesContainer from './SplitPanesContainer';
 import SearchingAlt from '../Transitions/SearchingAlt';
 import ButtonActions from '../Shared/ButtonActions';
 import networkDataNew from '../../services/networkDataNew.json';
+import tableIcon from '../../resources/tableIcon.png';
+import tableIconSelected from '../../resources/tableIconSelected.png';
+import networkIcon from '../../resources/networkIcon.png';
+import networkIconSelected from '../../resources/networkIconSelected.png';
 import {
   formatNumberForDisplay,
   splitValue
@@ -33,7 +37,7 @@ class Enrichment extends Component {
     enrichmentIconText: '',
     enrichmentResults: [],
     enrichmentColumns: [],
-    enrichmentView: 'table',
+    activeIndex: 1,
     multisetPlotInfo: {
       title: '',
       svg: []
@@ -50,7 +54,10 @@ class Enrichment extends Component {
     svgVisible: true,
     displayViolinPlot: false,
     networkDataAvailable: false,
-    networkData: {},
+    networkData: {
+      nodes: [],
+      edges: []
+    },
     networkDataNew: {},
     tests: {},
     networkSettings: {
@@ -1054,13 +1061,8 @@ class Enrichment extends Component {
     });
   };
 
-  handleEnrichmentViewChange = choice => {
-    return evt => {
-      this.setState({
-        enrichmentView: choice.enrichmentView
-      });
-    };
-  };
+  handleTableNetworkTabChange = (e, { activeIndex }) =>
+    this.setState({ activeIndex });
 
   getView = () => {
     if (this.state.isTestSelected && !this.state.isTestDataLoaded) {
@@ -1081,33 +1083,25 @@ class Enrichment extends Component {
           ></SplitPanesContainer>
         </div>
       );
-    } else if (
-      this.state.isValidSearchEnrichment &&
-      !this.state.isSearching &&
-      this.state.enrichmentView === 'table'
-    ) {
+    } else if (this.state.isValidSearchEnrichment && !this.state.isSearching) {
+      const TableAndNetworkPanes = this.getTableAndNetworkPanes();
       return (
-        <EnrichmentResultsTable
-          {...this.props}
-          {...this.state}
-          onEnrichmentViewChange={this.handleEnrichmentViewChange}
-          onHandlePlotAnimation={this.handlePlotAnimation}
-          onDisplayViolinPlot={this.displayViolinPlot}
-        />
-      );
-    } else if (
-      this.state.isValidSearchEnrichment &&
-      !this.state.isSearching &&
-      this.state.enrichmentView === 'network'
-    ) {
-      return (
-        <EnrichmentResultsGraph
-          {...this.props}
-          {...this.state}
-          onEnrichmentViewChange={this.handleEnrichmentViewChange}
-          onHandlePlotAnimation={this.handlePlotAnimation}
-          onDisplayViolinPlot={this.displayViolinPlot}
-          onHandlePieClick={this.testSelected}
+        <Tab
+          className="TableAndNetworkContainer"
+          onTabChange={this.handleTableNetworkTabChange}
+          panes={TableAndNetworkPanes}
+          activeIndex={this.state.activeIndex}
+          renderActiveOnly={false}
+          menu={{
+            attached: true,
+            className: 'TableAndNetworkMenuContainer'
+            // tabular: false
+            // stackable: true,
+            // secondary: true,
+            // pointing: true,
+            // color: 'orange',
+            // inverted: true,
+          }}
         />
       );
     } else if (this.state.isSearching) {
@@ -1115,9 +1109,74 @@ class Enrichment extends Component {
     } else return <TransitionStill />;
   };
 
+  getTableAndNetworkPanes = () => {
+    return [
+      {
+        menuItem: (
+          <Menu.Item
+            className="TableAndNetworkButtons TableButton"
+            name="table"
+            color="orange"
+            // active={this.state.activeIndex === 0}
+            inverted={this.state.activeIndex === 0}
+          >
+            {/* <Icon
+              name="table"
+              size="large"
+              color="orange"
+              inverted={this.state.activeIndex === 0}
+            /> */}
+            <img
+              src={this.state.activeIndex === 0 ? tableIconSelected : tableIcon}
+              alt="Table Icon"
+              id="TableButton"
+            />
+          </Menu.Item>
+        ),
+        pane: (
+          <Tab.Pane key="0">
+            <EnrichmentResultsTable
+              {...this.props}
+              {...this.state}
+              onHandlePlotAnimation={this.handlePlotAnimation}
+              onDisplayViolinPlot={this.displayViolinPlot}
+              onHandlePieClick={this.testSelected}
+            />
+          </Tab.Pane>
+        )
+      },
+      {
+        menuItem: (
+          <Menu.Item
+            className="TableAndNetworkButtons NetworkButton"
+            name="network"
+          >
+            <img
+              src={
+                this.state.activeIndex === 1 ? networkIconSelected : networkIcon
+              }
+              alt="Network Icon"
+              id="NetworkButton"
+            />
+          </Menu.Item>
+        ),
+        pane: (
+          <Tab.Pane key="1">
+            <EnrichmentResultsGraph
+              {...this.props}
+              {...this.state}
+              onHandlePlotAnimation={this.handlePlotAnimation}
+              onDisplayViolinPlot={this.displayViolinPlot}
+              onHandlePieClick={this.testSelected}
+            />
+          </Tab.Pane>
+        )
+      }
+    ];
+  };
+
   render() {
     const enrichmentView = this.getView();
-
     const { multisetPlotInfo, animation, direction, visible } = this.state;
     const VerticalSidebar = ({ animation, visible }) => (
       <Sidebar
@@ -1185,7 +1244,9 @@ class Enrichment extends Component {
                 direction={direction}
                 visible={visible}
               />
-              <Sidebar.Pusher>{enrichmentView}</Sidebar.Pusher>
+              <Sidebar.Pusher>
+                <div className="EnrichmentViewContainer">{enrichmentView}</div>
+              </Sidebar.Pusher>
             </Sidebar.Pushable>
           </Grid.Column>
         </Grid.Row>

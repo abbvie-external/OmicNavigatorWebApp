@@ -27,7 +27,7 @@ class PepplotSearchCriteria extends Component {
     uAnchorP: '',
     selectedColP: {
       key: 'adj_P_Val',
-      text: 'adj_P_Val',
+      text: 'Adjusted P Value',
       value: 'adj_P_Val'
     },
     selectedOperatorP: {
@@ -40,7 +40,7 @@ class PepplotSearchCriteria extends Component {
     uSettingsP: {
       defaultselectedColP: {
         key: 'adj_P_Val',
-        text: 'adj_P_Val',
+        text: 'Adjusted P',
         value: 'adj_P_Val'
       },
       defaultselectedOperatorP: {
@@ -390,7 +390,7 @@ class PepplotSearchCriteria extends Component {
   };
 
   updateQueryDataP = evt => {
-    const eSigVP = evt.sigValueP || this.state.sigValueP;
+    const eSigVP = Number(evt.sigValueP) || Number(this.state.sigValueP);
     const eMustP = evt.mustP || this.state.uSettingsP.mustP;
     const eNotP = evt.notP || this.state.uSettingsP.notP;
     const eOperatorP = evt.selectedOperatorP || this.state.selectedOperatorP;

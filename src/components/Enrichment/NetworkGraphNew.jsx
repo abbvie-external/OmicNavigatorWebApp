@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import { Icon, Popup, Grid, Search, Radio } from 'semantic-ui-react';
 import _ from 'lodash';
 import * as d3 from 'd3';
 import './NetworkGraph.scss';
+import { networkByCluster } from '../Shared/helpers';
 
 export default class NetworkGraph extends Component {
   // static defaultProps = {
@@ -93,11 +93,30 @@ export default class NetworkGraph extends Component {
     if (this.props.networkData !== prevProps.networkData) {
       this.prepareAndRenderNew(this.state.width, this.state.height);
     }
+    // if (this.props.networkSearchValue !== prevProps.networkSearchValue) {
+    //   this.handleNodeSearch();
+    // }
   }
 
   // componentWillUnmount() {
   //   d3.select(`#svg-${this.state.chartSettings.id}`).remove();
   // }
+
+  handleNodeSearch = () => {
+    // setTimeout(() => {
+    let str = this.props.networkSearchValue;
+    let nodeLabel = this.props.networkSettings.nodeLabel;
+    if (str.length === 0) {
+      d3.selectAll('.node-label').style('opacity', 1);
+    } else {
+      d3.selectAll('.node-label').style('opacity', 0);
+      var keep = d3.selectAll('.node-label').filter(function(d) {
+        return d[nodeLabel].toLowerCase().includes(str);
+      });
+      keep.style('opacity', 1);
+    }
+    // }, 300);
+  };
 
   windowResized = () => {
     this.setDimensions();
@@ -106,10 +125,15 @@ export default class NetworkGraph extends Component {
   setDimensions = () => {
     d3.select(`#svg-${this.state.chartSettings.id}`).remove();
     const { chartSettings } = this.state;
+    console.log(
+      this.props.networkData.nodes.length,
+      this.props.networkData.edges.length
+    );
+    // const containerWidth = this.props.networkData.nodes.length * 20;
     const containerWidth = this.getWidth();
     // let's calculate height based on data...
-    // const containerHeight = this.getHeight();
-    const containerHeight = 2000;
+    const containerHeight = this.getHeight();
+    // const containerHeight = 5000;
     const width =
       containerWidth - chartSettings.margin.left - chartSettings.margin.right;
     const height =
@@ -138,10 +162,7 @@ export default class NetworkGraph extends Component {
     const { chartSettings } = this.state;
 
     // Prepare Data
-    const {
-      networkData
-      // networkSettings
-    } = this.props;
+    const { networkData, networkSettings } = this.props;
     // const self = this;
     let formattedNodes = _.map(networkData.nodes, function(o) {
       return o.data;
@@ -164,7 +185,6 @@ export default class NetworkGraph extends Component {
           .strength([-300])
           .distanceMax([500])
       )
-
       .force('center', d3.forceCenter(width / 2, height / 2));
 
     const chartDiv = d3.select(`#${chartSettings.id}`);
@@ -237,7 +257,7 @@ export default class NetworkGraph extends Component {
       // .selectAll('g')
       .data(nodes)
       .join('circle')
-      .attr('r', 15)
+      .attr('r', 5)
       // .attr('r', d => this.getRadius(d, radiusVar, width, height))
       // .enter()
       // .append('g')
@@ -269,7 +289,10 @@ export default class NetworkGraph extends Component {
     //   );
     // })
 
-    node.append('title').text(d => d.id);
+    node
+      .append('title')
+      .attr('class', 'node-label')
+      .text(d => d[networkSettings.nodeLabel]);
 
     simulation.on('tick', () => {
       link
@@ -332,131 +355,12 @@ export default class NetworkGraph extends Component {
   render() {
     const { chartSettings } = this.state;
 
-    const IconPopupStyle = {
-      backgroundColor: '2E2E2E',
-      borderBottom: '2px solid var(--color-primary)',
-      color: '#FFF',
-      padding: '1em',
-      maxWidth: '50vw',
-      fontSize: '13px',
-      wordBreak: 'break-all'
-    };
-
-    const enrichmentViewToggle = (
-      <div className="NetworkGraphToggle">
-        <Popup
-          trigger={
-            <Icon
-              bordered
-              name="table"
-              size="large"
-              color="orange"
-              className="NetworkGraphButtons"
-              inverted={this.props.enrichmentView === 'table'}
-              onClick={this.props.onEnrichmentViewChange({
-                enrichmentView: 'table'
-              })}
-            />
-          }
-          style={IconPopupStyle}
-          inverted
-          basic
-          position="bottom left"
-          content="View Table"
-        />
-        <Popup
-          trigger={
-            <Icon
-              bordered
-              name="chart pie"
-              size="large"
-              color="orange"
-              className="NetworkGraphButtons"
-              inverted={this.props.enrichmentView === 'network'}
-              onClick={this.props.onEnrichmentViewChange({
-                enrichmentView: 'network'
-              })}
-            />
-          }
-          style={IconPopupStyle}
-          inverted
-          basic
-          position="bottom left"
-          content="View Network Graph"
-        />
-      </div>
-    );
     return (
-      <div className="NetworkGraphWrapper">
-        {enrichmentViewToggle}
-        <Grid>
-          <Grid.Row>
-            <Grid.Column
-              className="NetworkGraphFilters"
-              mobile={6}
-              tablet={6}
-              largeScreen={3}
-              widescreen={2}
-            ></Grid.Column>
-            <Grid.Column
-              className="NetworkGraphFilters"
-              mobile={6}
-              tablet={6}
-              largeScreen={4}
-              widescreen={4}
-            >
-              <Search
-                placeholder="Search Network"
-                // loading={isLoading}
-                // onResultSelect={this.handleResultSelect}
-                // onSearchChange={_.debounce(this.handleSearchChange, 500, {
-                //   leading: true,
-                // })}
-                // results={results}
-                // value={value}
-                // {...this.props}
-              />
-            </Grid.Column>
-            <Grid.Column
-              className="NetworkGraphFilters"
-              id="NetworkGraphLabelsToggle"
-              mobile={6}
-              tablet={6}
-              largeScreen={3}
-              widescreen={4}
-            >
-              <Radio
-                toggle
-                label="Show Labels"
-                checked={this.state.showNetworkLabels}
-              />
-            </Grid.Column>
-            <Grid.Column
-              className="NetworkGraphFilters"
-              mobile={6}
-              tablet={6}
-              largeScreen={3}
-              widescreen={3}
-            >
-              <h3>toggle tbd</h3>
-            </Grid.Column>
-            <Grid.Column
-              className="NetworkGraphFilters"
-              mobile={6}
-              tablet={6}
-              largeScreen={3}
-              widescreen={3}
-            >
-              <h3>legend</h3>
-            </Grid.Column>
-          </Grid.Row>
-        </Grid>
-        <div
-          ref={this.networkContainerRef}
-          id={chartSettings.id}
-          className="NetworkChartContainer"
-        ></div>
-      </div>
+      <div
+        ref={this.networkContainerRef}
+        id={chartSettings.id}
+        className="NetworkChartContainer"
+      ></div>
     );
   }
 }

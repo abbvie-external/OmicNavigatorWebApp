@@ -73,6 +73,7 @@ class PepplotMultisetFilters extends Component {
         uAnchorP,
         uDataP,
         uSettingsP,
+        selectedColP,
         selectedOperatorP,
         sigValueP
       );
@@ -84,6 +85,7 @@ class PepplotMultisetFilters extends Component {
     uAnchorP,
     uDataP,
     uSettingsP,
+    selectedColP,
     selectedOperatorP,
     sigValueP
   ) {
@@ -101,20 +103,20 @@ class PepplotMultisetFilters extends Component {
 
     switch (selectedOperatorP.value) {
       case '<':
-        this.setDescP = `Elements less than ${sigValueP} in:`;
-        this.notSetDescP = `Elements less than ${sigValueP} not in:`;
+        this.setDescP = `Elements with ${selectedColP.text} less than ${sigValueP} in:`;
+        this.notSetDescP = `Elements with ${selectedColP.text} less than ${sigValueP} not in:`;
         break;
       case '>':
-        this.setDescP = `Elements greater than ${sigValueP} in:`;
-        this.notSetDescP = `Elements greater than ${sigValueP} not in:`;
+        this.setDescP = `Elements with ${selectedColP.text} greater than ${sigValueP} in:`;
+        this.notSetDescP = `Elements with ${selectedColP.text} greater than ${sigValueP} not in:`;
         break;
       case '|<|':
-        this.setDescP = `Elements absolute value less than ${sigValueP} in:`;
-        this.notSetDescP = `Elements absolute value less than ${sigValueP} not in:`;
+        this.setDescP = `Elements with ${selectedColP.text} absolute value less than ${sigValueP} in:`;
+        this.notSetDescP = `Elements with ${selectedColP.text} absolute value less than ${sigValueP} not in:`;
         break;
       case '|>|':
-        this.setDescP = `Elements absolute value greater than ${sigValueP} in:`;
-        this.notSetDescP = `Elements absolute value greater than ${sigValueP} not in:`;
+        this.setDescP = `Elements with ${selectedColP.text} absolute value greater than ${sigValueP} in:`;
+        this.notSetDescP = `Elements with ${selectedColP.text} absolute value greater than ${sigValueP} not in:`;
         break;
       default:
         this.setDescP = '';
@@ -143,7 +145,7 @@ class PepplotMultisetFilters extends Component {
         .attr('y', 30)
         .text('' + this.setDescP)
         .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
-        .attr('font-size', '15px')
+        .attr('font-size', '14px')
         .attr('fill', 'black');
 
       if (useAnchorP) {
@@ -215,7 +217,7 @@ class PepplotMultisetFilters extends Component {
           })
           .text('' + this.notSetDescP)
           .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
-          .attr('font-size', '15px')
+          .attr('font-size', '14px')
           .attr('fill', 'black');
 
         // const notTestCirclesP =

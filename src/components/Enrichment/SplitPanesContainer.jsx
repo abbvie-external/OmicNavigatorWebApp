@@ -14,16 +14,19 @@ import ViolinPlot from './ViolinPlot';
 import FilteredPepplotTable from './FilteredPepplotTable';
 
 class SplitPanesContainer extends Component {
-  state = {
-    activeSVGTabIndex: 0,
-    proteinForDiffView: '',
-    horizontalSplitPaneHeight:
-      parseInt(localStorage.getItem('horizontalSplitPaneHeight'), 10) || 250,
-    verticalSplitPaneWidth:
-      parseInt(localStorage.getItem('verticalSplitPaneWidth'), 10) || 525,
-    activeViolinTableIndex: 0,
-    violinDotSelected: null
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      activeSVGTabIndex: 0,
+      proteinForDiffView: '',
+      horizontalSplitPaneSize:
+        parseInt(localStorage.getItem('horizontalSplitPaneSize'), 10) || 250,
+      verticalSplitPaneSize:
+        parseInt(localStorage.getItem('verticalSplitPaneSize'), 10) || 525,
+      activeViolinTableIndex: 0,
+      violinDotSelected: null
+    };
+  }
 
   handleSVGTabChange = activeTabIndex => {
     this.setState({
@@ -205,11 +208,11 @@ class SplitPanesContainer extends Component {
   splitPaneResized(size, paneType) {
     if (paneType === 'horizontal') {
       this.setState({
-        horizontalSplitPaneHeight: size
+        horizontalSplitPaneSize: size
       });
     } else {
       this.setState({
-        verticalSplitPaneWidth: size
+        verticalSplitPaneSize: size
       });
     }
     localStorage.setItem(`${paneType}SplitPaneSize`, size);
@@ -250,7 +253,7 @@ class SplitPanesContainer extends Component {
               <SplitPane
                 className="ThreePlotsDiv SplitPanesWrapper"
                 split="horizontal"
-                defaultSize={this.state.horizontalSplitPaneHeight}
+                defaultSize={this.state.horizontalSplitPaneSize}
                 minSize={150}
                 maxSize={400}
                 onChange={size => this.splitPaneResized(size, 'horizontal')}
@@ -262,7 +265,7 @@ class SplitPanesContainer extends Component {
                 <SplitPane
                   className="BottomSplitPaneContainer"
                   split="vertical"
-                  defaultSize={this.state.verticalSplitPaneWidth}
+                  defaultSize={this.state.verticalSplitPaneSize}
                   minSize={315}
                   maxSize={800}
                   onChange={size => this.splitPaneResized(size, 'vertical')}

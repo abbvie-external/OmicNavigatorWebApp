@@ -30,6 +30,8 @@
     "react-pose": "^4.0.8",
     "react-router-dom": "^5.0.1",
     "react-scripts": "^3.3.1",
+    "react-semantic-ui-range": "^0.7.0",
+    "react-slick": "^0.25.2",
     "react-split-pane": "^0.1.87",
     "react-spring": "^8.0.27",
     "react-toastify": "^5.4.1",
@@ -39,6 +41,8 @@
     "semantic-ui-css": "^2.4.1",
     "semantic-ui-react": "^0.87.3",
     "semiotic": "^1.20.5",
+    "slick-carousel": "^1.8.1",
+    "styled-components": "^5.0.1",
     "svg-to-pdfkit": "^0.1.7"
   },
   "husky": {

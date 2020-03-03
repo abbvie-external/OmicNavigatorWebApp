@@ -46,6 +46,7 @@ class SVGPlot extends Component {
     // };
     if (this.props.imageInfo) {
       const svgArray = this.props.imageInfo.svg;
+      // const svgArrayReversed = svgArray.reverse();
       const panes = svgArray.map(s => {
         return {
           menuItem: `${s.plotType}`,

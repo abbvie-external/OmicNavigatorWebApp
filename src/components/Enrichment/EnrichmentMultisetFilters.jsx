@@ -73,13 +73,22 @@ class EnrichmentMultisetFilters extends Component {
         uAnchor,
         uData,
         uSettings,
+        selectedCol,
         selectedOperator,
         sigValue
       );
     }
   }
 
-  metaScript(metaSvg, uAnchor, uData, uSettings, selectedOperator, sigValue) {
+  metaScript(
+    metaSvg,
+    uAnchor,
+    uData,
+    uSettings,
+    selectedCol,
+    selectedOperator,
+    sigValue
+  ) {
     const svgWidth = 315;
     const heightScalar = 20; //20 per circle
     const mustData = uSettings.must;
@@ -94,20 +103,20 @@ class EnrichmentMultisetFilters extends Component {
 
     switch (selectedOperator.value) {
       case '<':
-        this.setDesc = `Elements less than ${sigValue} in:`;
-        this.notSetDesc = `Elements less than ${sigValue} not in:`;
+        this.setDesc = `Elements with ${selectedCol.text} less than ${sigValue} in:`;
+        this.notSetDesc = `Elements with ${selectedCol.text} less than ${sigValue} not in:`;
         break;
       case '>':
-        this.setDesc = `Elements greater than ${sigValue} in:`;
-        this.notSetDesc = `Elements greater than ${sigValue} not in:`;
+        this.setDesc = `Elements with ${selectedCol.text} greater than ${sigValue} in:`;
+        this.notSetDesc = `Elements with ${selectedCol.text} greater than ${sigValue} not in:`;
         break;
       case '|<|':
-        this.setDesc = `Elements absolute value less than ${sigValue} in:`;
-        this.notSetDesc = `Elements absolute value less than ${sigValue} not in:`;
+        this.setDesc = `Elements with ${selectedCol.text} absolute value less than ${sigValue} in:`;
+        this.notSetDesc = `Elements with ${selectedCol.text} absolute value less than ${sigValue} not in:`;
         break;
       case '|>|':
-        this.setDesc = `Elements absolute value greater than ${sigValue} in:`;
-        this.notSetDesc = `Elements absolute value greater than ${sigValue} not in:`;
+        this.setDesc = `Elements with ${selectedCol.text} absolute value greater than ${sigValue} in:`;
+        this.notSetDesc = `Elements with ${selectedCol.text} absolute value greater than ${sigValue} not in:`;
         break;
       default:
         this.setDesc = '';
@@ -136,7 +145,7 @@ class EnrichmentMultisetFilters extends Component {
         .attr('y', 30)
         .text('' + this.setDesc)
         .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
-        .attr('font-size', '15px')
+        .attr('font-size', '14px')
         .attr('fill', 'black');
 
       if (useAnchor) {
@@ -208,7 +217,7 @@ class EnrichmentMultisetFilters extends Component {
           })
           .text('' + this.notSetDesc)
           .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
-          .attr('font-size', '15px')
+          .attr('font-size', '14px')
           .attr('fill', 'black');
 
         // const notTestCircles =
