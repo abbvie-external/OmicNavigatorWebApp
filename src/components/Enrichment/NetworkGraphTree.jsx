@@ -501,7 +501,6 @@ export default class NetworkGraphTree extends Component {
       //   chartSVG = d3.select(`#svg-${chartSettings.id}`);
 
       //   let node = chartSVG
-      debugger;
       var node = d3
         .select(this)
         .append('g')

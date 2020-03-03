@@ -65,8 +65,8 @@ class EnrichmentResultsGraph extends Component {
     results: [],
     networkSearchValue: '',
     descriptions: [],
-    edgeValue: 0.5,
-    legendIsOpen: true
+    edgeValue: 0.5
+    // legendIsOpen: true
   };
 
   componentDidMount() {
@@ -273,33 +273,25 @@ class EnrichmentResultsGraph extends Component {
     );
   };
 
-  handleLegendOpen = () => {
-    this.setState({ legendIsOpen: true });
+  // handleLegendOpen = () => {
+  //   this.setState({ legendIsOpen: true });
 
-    this.timeout = setTimeout(() => {
-      this.setState({ legendIsOpen: false });
-    }, 2500);
-  };
+  //   this.timeout = setTimeout(() => {
+  //     this.setState({ legendIsOpen: false });
+  //   }, 2500);
+  // };
 
-  handleLegendClose = () => {
-    this.setState({ legendIsOpen: false });
-    clearTimeout(this.timeout);
-  };
+  // handleLegendClose = () => {
+  //   this.setState({ legendIsOpen: false });
+  //   clearTimeout(this.timeout);
+  // };
 
   render() {
     const { networkSearchValue, results, edgeValue } = this.state;
     const legend = this.getLegend();
     const LegendPopupStyle = {
-      // backgroundColor: '2E2E2E',
-      // borderBottom: '2px solid var(--color-primary)',
-      // color: '#FFF',
       padding: '1em',
       width: '250px'
-      // maxWidth: '25vw'
-      // fontSize: '13px',
-      // wordBreak: 'break-all'
-      // zIndex: 333,
-      // overflow: 'auto'
     };
     return (
       <Grid className="NetworkGraphFiltersContainer">
@@ -373,24 +365,22 @@ class EnrichmentResultsGraph extends Component {
               value={edgeValue}
               onChange={this.handleInputChange}
             />
-            <p>
-              <Slider
-                color="EdgeValueSlider"
-                inverted={false}
-                value={edgeValue}
-                settings={{
-                  start: edgeValue,
-                  min: 0.05,
-                  max: 1,
-                  step: 0.05,
-                  onChange: value => {
-                    this.setState({
-                      edgeValue: value
-                    });
-                  }
-                }}
-              />
-            </p>
+            <Slider
+              className="EdgeValueSlider"
+              inverted={false}
+              value={edgeValue}
+              settings={{
+                start: edgeValue,
+                min: 0.05,
+                max: 1,
+                step: 0.05,
+                onChange: value => {
+                  this.setState({
+                    edgeValue: value
+                  });
+                }
+              }}
+            />
           </Grid.Column>
           <Grid.Column
             className="NetworkGraphFilters"
@@ -404,11 +394,12 @@ class EnrichmentResultsGraph extends Component {
               wide
               basic
               hideOnScroll
+              hoverable
               style={LegendPopupStyle}
               // position="bottom center"
-              open={this.state.legendIsOpen}
-              onClose={this.handleLegendClose}
-              onOpen={this.handleLegendOpen}
+              // open={this.state.legendIsOpen}
+              // onClose={this.handleLegendClose}
+              // onOpen={this.handleLegendOpen}
             >
               {legend}
             </Popup>
