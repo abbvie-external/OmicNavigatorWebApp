@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { Slider } from 'react-semantic-ui-range';
+import legendIcon from '../../resources/legend.jpg';
 // import styled from 'styled-components';
 import * as d3 from 'd3';
 import _ from 'lodash';
@@ -390,7 +391,10 @@ class EnrichmentResultsGraph extends Component {
             widescreen={3}
           >
             <Popup
-              trigger={<Label color="blue">Legend</Label>}
+              // trigger={<Label color="blue">Legend</Label>}
+              trigger={
+                <img src={legendIcon} alt="Legend Icon" id="LegendIcon" />
+              }
               wide
               basic
               hideOnScroll

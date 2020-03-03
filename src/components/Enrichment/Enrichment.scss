@@ -114,20 +114,3 @@
     width: 45px !important;
   }
 }
-// .ui.search {
-//   position: initial;
-// }
-.ui.search > .results {
-  max-height: 75vh !important;
-  overflow-y: scroll !important;
-  // overflow-x: inherit;
-  // direction: rtl !important;
-}
-
-.semantic_ui_range_inner div:nth-of-type(2) {
-  background-color: var(--color-primary) !important;
-}
-
-// .GenesCircle {
-//   z-index: 1111111 !important;
-// }
