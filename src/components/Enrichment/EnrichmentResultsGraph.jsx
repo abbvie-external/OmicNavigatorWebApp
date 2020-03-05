@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { withRouter } from 'react-router-dom';
 import { Slider } from 'react-semantic-ui-range';
 import legendIcon from '../../resources/legend.jpg';
 // import styled from 'styled-components';
@@ -15,10 +14,17 @@ import {
   // Input
 } from 'semantic-ui-react';
 // import NetworkGraphOld from './NetworkGraphOld';
-// import NetworkGraphNew from './NetworkGraphNew';
+// import NetworkGraphNew from './NetworkGraphNew'
+import NetworkGraphSemioticForce from './NetworkGraphSemioticForce';
+import NetworkGraphSemioticHierarchy from './NetworkGraphSemioticHierarchy';
+import NetworkGraphOld from './NetworkGraphOld';
 import NetworkGraphTree from './NetworkGraphTree';
-// import NetworkGraphReact from './NetworkGraphReact';
+import NetworkGraphReact from './NetworkGraphReact';
+import NetworkGraphThresholdSlider from './NetworkGraphThresholdSlider';
+import NetworkGraphAdjacencyMatrix from './NetworkGraphAdjacencyMatrix';
+import NetworkGraphCustomLayout from './NetworkGraphCustomLayout';
 // import NetworkGraphCarousel from './NetworkGraphCarousel';
+import TransitionActive from '../Transitions/TransitionActive';
 import './EnrichmentResultsGraph.scss';
 // const StyledInput = styled(Input)`
 //   border: unset;
@@ -66,19 +72,24 @@ class EnrichmentResultsGraph extends Component {
     results: [],
     networkSearchValue: '',
     descriptions: [],
-    edgeValue: 0.5
+    nodeCutoff: 0.5,
+    edgeCutoff: 0.375
     // legendIsOpen: true
   };
 
   componentDidMount() {
-    const networkDataNodeDescriptions = this.props.networkData.nodes.map(r => ({
-      description: r.data.EnrichmentMap_GS_DESCR.toLowerCase(),
-      genes: r.data.EnrichmentMap_Genes,
-      size: r.data.EnrichmentMap_Genes.length
-    }));
-    this.setState({
-      descriptions: networkDataNodeDescriptions
-    });
+    // if (this.props.networkDataLoaded) {
+    //   this.setupSearch();
+    // }
+  }
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (
+      // this.props.networkDataLoaded &&
+      this.props.networkData !== prevProps.networkData
+    ) {
+      this.setupSearch();
+    }
   }
 
   // let clusters = this.props.networkDataNew.clusters;
@@ -287,51 +298,70 @@ class EnrichmentResultsGraph extends Component {
   //   clearTimeout(this.timeout);
   // };
 
+  setupSearch = () => {
+    const networkDataNodeDescriptions = this.props.networkData.nodes.map(r => ({
+      description: r.data.EnrichmentMap_GS_DESCR.toLowerCase(),
+      genes: r.data.EnrichmentMap_Genes,
+      size: r.data.EnrichmentMap_Genes.length
+    }));
+    this.setState({
+      descriptions: networkDataNodeDescriptions
+    });
+  };
+
   render() {
-    const { networkSearchValue, results, edgeValue } = this.state;
+    const { networkDataLoaded } = this.props;
+    const { networkSearchValue, results, nodeCutoff, edgeCutoff } = this.state;
     const legend = this.getLegend();
     const LegendPopupStyle = {
       padding: '1em',
       width: '250px'
     };
-    return (
-      <Grid className="NetworkGraphFiltersContainer">
-        <Grid.Row className="NetworkGraphFiltersRow">
-          <Grid.Column
-            className="NetworkGraphFilters"
-            mobile={6}
-            tablet={6}
-            largeScreen={3}
-            widescreen={3}
-          ></Grid.Column>
-          <Grid.Column
-            // className="NetworkGraphFilters"
-            mobile={10}
-            tablet={10}
-            largeScreen={4}
-            widescreen={4}
-          >
-            <Search
-              // className="NetworkSearchResultsContainer"
-              placeholder="Search Network"
-              onResultSelect={this.handleResultSelect}
-              onSearchChange={_.debounce(this.handleSearchChange, 500, {
-                leading: true
-              })}
-              results={results}
-              value={networkSearchValue}
-              resultRenderer={resultRenderer}
-              {...this.props}
-            />
-            <br></br>
-            {/* <Radio
-              toggle
-              label="Show Labels"
-              checked={this.state.showNetworkLabels}
-              onChange={this.handleLabels}
-            /> */}
-          </Grid.Column>
-          <Grid.Column
+    if (!networkDataLoaded) {
+      return (
+        <div className="PlotInstructionsDiv">
+          <h4 className="PlotInstructionsText">Network Data is Loading</h4>
+        </div>
+      );
+    } else {
+      return (
+        <Grid className="NetworkGraphFiltersContainer">
+          <Grid.Row className="NetworkGraphFiltersRow">
+            <Grid.Column
+              className="NetworkGraphFilters"
+              mobile={4}
+              tablet={4}
+              largeScreen={2}
+              widescreen={3}
+            ></Grid.Column>
+            <Grid.Column
+              // className="NetworkGraphFilters"
+              mobile={10}
+              tablet={10}
+              largeScreen={4}
+              widescreen={4}
+            >
+              <Search
+                // className="NetworkSearchResultsContainer"
+                placeholder="Search Network"
+                onResultSelect={this.handleResultSelect}
+                onSearchChange={_.debounce(this.handleSearchChange, 500, {
+                  leading: true
+                })}
+                results={results}
+                value={networkSearchValue}
+                resultRenderer={resultRenderer}
+                {...this.props}
+              />
+              <br></br>
+              <Radio
+                toggle
+                label="Show Labels"
+                checked={this.state.showNetworkLabels}
+                onChange={this.handleLabels}
+              />
+            </Grid.Column>
+            {/* <Grid.Column
             className="NetworkGraphFilters"
             id="NetworkGraphLabelsToggle"
             mobile={6}
@@ -345,88 +375,165 @@ class EnrichmentResultsGraph extends Component {
               checked={this.state.showNetworkLabels}
               onChange={this.handleLabels}
             />
-          </Grid.Column>
-          <Grid.Column
-            className="NetworkGraphFilters"
-            mobile={10}
-            tablet={10}
-            largeScreen={3}
-            widescreen={3}
-          >
-            <Input
-              placeholder="Enter Value"
-              type="number"
-              step="0.05"
-              min="0.05"
-              max="1.00"
-              default="0.35"
-              label="Edge Value"
-              name="edgeValue"
-              className="EdgeValueInput"
-              value={edgeValue}
-              onChange={this.handleInputChange}
-            />
-            <Slider
-              className="EdgeValueSlider"
-              inverted={false}
-              value={edgeValue}
-              settings={{
-                start: edgeValue,
-                min: 0.05,
-                max: 1,
-                step: 0.05,
-                onChange: value => {
-                  this.setState({
-                    edgeValue: value
-                  });
-                }
-              }}
-            />
-          </Grid.Column>
-          <Grid.Column
-            className="NetworkGraphFilters"
-            mobile={8}
-            tablet={8}
-            largeScreen={3}
-            widescreen={3}
-          >
-            <Popup
-              // trigger={<Label color="blue">Legend</Label>}
-              trigger={
-                <img src={legendIcon} alt="Legend Icon" id="LegendIcon" />
-              }
-              wide
-              basic
-              hideOnScroll
-              hoverable
-              style={LegendPopupStyle}
-              // position="bottom center"
-              // open={this.state.legendIsOpen}
-              // onClose={this.handleLegendClose}
-              // onOpen={this.handleLegendOpen}
+          </Grid.Column> */}
+            <Grid.Column
+              className="NetworkGraphFilters"
+              mobile={8}
+              tablet={8}
+              largeScreen={4}
+              widescreen={3}
             >
-              {legend}
-            </Popup>
-          </Grid.Column>
-        </Grid.Row>
-        <Grid.Row className="NetworkGraphContainer">
-          <Grid.Column
-            className=""
-            mobile={16}
-            tablet={16}
-            largeScreen={16}
-            widescreen={16}
-          >
-            <NetworkGraphTree
+              <Input
+                type="number"
+                step="0.05"
+                min="0"
+                max="1"
+                default="0.50"
+                label="Node Cutoff"
+                name="nodeCutoff"
+                className="NetworkSliderInput"
+                value={nodeCutoff}
+                onChange={this.handleInputChange}
+              />
+              <Slider
+                className="NetworkSlider"
+                inverted={false}
+                value={nodeCutoff}
+                settings={{
+                  start: nodeCutoff,
+                  min: 0,
+                  max: 1,
+                  step: 0.05,
+                  onChange: value => {
+                    this.setState({
+                      nodeCutoff: value
+                    });
+                  }
+                }}
+              />
+            </Grid.Column>
+            <Grid.Column
+              className="NetworkGraphFilters"
+              mobile={8}
+              tablet={8}
+              largeScreen={4}
+              widescreen={3}
+            >
+              <Input
+                type="number"
+                step="0.025"
+                min="0.050"
+                max="1.000"
+                default="0.375"
+                label="Edge Cutoff"
+                name="edgeCutoff"
+                className="NetworkSliderInput"
+                value={edgeCutoff}
+                onChange={this.handleInputChange}
+              />
+              <Slider
+                className="NetworkSlider"
+                inverted={false}
+                value={edgeCutoff}
+                settings={{
+                  start: edgeCutoff,
+                  min: 0.05,
+                  max: 1,
+                  step: 0.025,
+                  onChange: value => {
+                    this.setState({
+                      edgeCutoff: value
+                    });
+                  }
+                }}
+              />
+            </Grid.Column>
+            <Grid.Column
+              className="NetworkGraphFilters LegendColumn"
+              mobile={2}
+              tablet={2}
+              largeScreen={2}
+              widescreen={2}
+            >
+              <Popup
+                // trigger={<Label color="blue">Legend</Label>}
+                trigger={
+                  <img src={legendIcon} alt="Legend Icon" id="LegendIcon" />
+                }
+                wide
+                basic
+                on="click"
+                style={LegendPopupStyle}
+                // position="bottom center"
+                // open={this.state.legendIsOpen}
+                // onClose={this.handleLegendClose}
+                // onOpen={this.handleLegendOpen}
+              >
+                {legend}
+              </Popup>
+            </Grid.Column>
+          </Grid.Row>
+          <Grid.Row className="NetworkGraphContainer">
+            <Grid.Column
+              className=""
+              mobile={3}
+              tablet={3}
+              largeScreen={16}
+              widescreen={16}
+            >
+              {/* <NetworkGraphOld
+                {...this.props}
+                {...this.state}
+                onPieClick={this.handlePieClick}
+              ></NetworkGraphOld> */}
+
+              <NetworkGraphTree
+                {...this.props}
+                {...this.state}
+                onPieClick={this.handlePieClick}
+              ></NetworkGraphTree>
+
+              {/* <NetworkGraphReact
+                {...this.props}
+                {...this.state}
+                onPieClick={this.handlePieClick}
+              ></NetworkGraphReact> */}
+
+              {/* <NetworkGraphThresholdSlider
               {...this.props}
               {...this.state}
               onPieClick={this.handlePieClick}
-            ></NetworkGraphTree>
-          </Grid.Column>
-        </Grid.Row>
-      </Grid>
-    );
+            ></NetworkGraphThresholdSlider> */}
+
+              {/* <NetworkGraphSemioticForce
+              {...this.props}
+              {...this.state}
+              onPieClick={this.handlePieClick}
+            ></NetworkGraphSemioticForce> */}
+
+              {/* <NetworkGraphSemioticHierarchy
+              {...this.props}
+              {...this.state}
+              onPieClick={this.handlePieClick}
+            ></NetworkGraphSemioticHierarchy> */}
+
+              {/* <NetworkGraphAdjacencyMatrix
+              {...this.props}
+              {...this.state}
+              onPieClick={this.handlePieClick}
+            ></NetworkGraphAdjacencyMatrix> */}
+
+              {/* <NetworkGraphCustomLayout
+              {...this.props}
+              {...this.state}
+              onPieClick={this.handlePieClick}
+            ></NetworkGraphCustomLayout> */}
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>
+      );
+    }
   }
 }
 
-export default withRouter(EnrichmentResultsGraph);
+export default EnrichmentResultsGraph;

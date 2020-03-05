@@ -1,14 +1,13 @@
 import $ from 'jquery';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import networkData from './networkData.json';
-// import networkDataNew from './networkDataNew.json';
+import networkDataOld from './networkDataOld.json';
+import networkDataNew from './networkDataNew.json';
 window.jQuery = $;
 const ocpu = require('opencpu.js/opencpu-0.5.js');
 
 class PhosphoprotService {
   constructor() {
-    console.log(ocpu);
     this.ocpuUrl = 'http://10.239.9.49/ocpu/library/PhosphoProt/R';
     // this.ocpuUrlAlt = 'http://localhost:5656/ocpu/library/PhosphoProt/R'
     // this.ocpuUrlAlt = 'http://localhost:1234/v1'
@@ -307,7 +306,7 @@ class PhosphoprotService {
     // })
     // const nodesFromPromise = await promise
     // return nodesFromPromise
-    return networkData;
+    return networkDataOld;
   }
 }
 

@@ -4,7 +4,7 @@ import * as d3 from 'd3';
 import './NetworkGraph.scss';
 import { networkByCluster } from '../Shared/helpers';
 
-export default class NetworkGraphTree extends Component {
+export default class NetworkGraph extends Component {
   // static defaultProps = {
   //   networkDataAvailable: false,
   //   networkData: {},
@@ -78,28 +78,22 @@ export default class NetworkGraphTree extends Component {
   // }
 
   componentDidMount() {
-    if (this.props.networkData.nodes.length > 0) {
-      this.setDimensions();
-      let resizedFn;
-      window.addEventListener('resize', () => {
-        clearTimeout(resizedFn);
-        resizedFn = setTimeout(() => {
-          this.windowResized();
-        }, 200);
-      });
-    }
+    this.setDimensions();
+    let resizedFn;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizedFn);
+      resizedFn = setTimeout(() => {
+        this.windowResized();
+      }, 200);
+    });
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
     if (this.props.networkData !== prevProps.networkData) {
-      if (this.state.networkHeight === 0) {
-        this.setDimensions();
-      } else {
-        this.prepareAndRenderTree(
-          this.state.networkWidth,
-          this.state.networkHeight
-        );
-      }
+      this.prepareAndRenderTree(
+        this.state.networkWidth,
+        this.state.networkHeight
+      );
     }
     if (this.props.networkSearchValue !== prevProps.networkSearchValue) {
       this.handleNodeSearch();
@@ -154,38 +148,32 @@ export default class NetworkGraphTree extends Component {
   setDimensions = () => {
     d3.select(`#svg-${this.state.chartSettings.id}`).remove();
     const { chartSettings } = this.state;
-    if (this.props.networkData.nodes.length > 0) {
-      console.log(
-        this.props.networkData.nodes.length,
-        this.props.networkData.edges.length
-      );
-      const containerWidth = this.props.networkData.nodes.length * 20;
-      // const containerWidth = this.getWidth();
-      // let's calculate height based on data...
-      const containerHeight = this.getHeight();
-      // const containerHeight = 5000;
-      const width =
-        containerWidth - chartSettings.margin.left - chartSettings.margin.right;
-      const height =
-        containerHeight -
-        chartSettings.margin.top -
-        chartSettings.margin.bottom;
-      this.setState({
-        networkContainerWidth: containerWidth,
-        networkWidth: width,
-        networkContainerHeight: containerHeight,
-        networkHeight: height
-      });
-      this.prepareAndRenderTree(width, height);
-    }
+    console.log(
+      this.props.networkData.nodes.length,
+      this.props.networkData.edges.length
+    );
+    const containerWidth = this.props.networkData.nodes.length * 20;
+    // const containerWidth = this.getWidth();
+    // let's calculate height based on data...
+    const containerHeight = this.getHeight();
+    // const containerHeight = 5000;
+    const width =
+      containerWidth - chartSettings.margin.left - chartSettings.margin.right;
+    const height =
+      containerHeight - chartSettings.margin.top - chartSettings.margin.bottom;
+    this.setState({
+      networkContainerWidth: containerWidth,
+      networkWidth: width,
+      networkContainerHeight: containerHeight,
+      networkHeight: height
+    });
+    this.prepareAndRenderTree(width, height);
   };
 
   getHeight() {
     if (this.networkContainerRef.current !== null) {
-      return this.networkContainerRef.current.parentElement.offsetHeight > 0
-        ? this.networkContainerRef.current.parentElement.offsetHeight
-        : 715;
-    } else return 715;
+      return this.networkContainerRef.current.parentElement.offsetHeight;
+    } else return 900;
   }
   // getWidth() {
   //   if (this.networkContainerRef.current !== null) {
@@ -206,15 +194,15 @@ export default class NetworkGraphTree extends Component {
       return o.data;
     });
 
-    // this.setState({
-    //   chartSettings: {
-    //     ...this.state.chartSettings,
-    //     formattedData: {
-    //       nodes: formattedNodes,
-    //       links: formattedLinks
-    //     }
-    //   }
-    // });
+    this.setState({
+      chartSettings: {
+        ...this.state.chartSettings,
+        formattedData: {
+          nodes: formattedNodes,
+          links: formattedLinks
+        }
+      }
+    });
 
     _.forEach(formattedNodes, function(o1) {
       let picked = _.pick(o1, networkSettings.facets);
@@ -290,7 +278,6 @@ export default class NetworkGraphTree extends Component {
     //   lineScale: lineScaleVar
     // });
     dataCombinedVar = networkByCluster(dataCombinedVar);
-
     // Prepare Settings (dimensions already calculated)
 
     // Prepare Chart
@@ -405,8 +392,88 @@ export default class NetworkGraphTree extends Component {
         i < n;
         ++i
       ) {
+        // simulation
+        //     .nodes(d.data.nodes)
+
+        // simulation.force("link")
+        //     .links(d.data.links);
+
         simulation.tick();
       }
+
+      // let simulation = d3
+      //   .forceSimulation()
+      //   .force(
+      //     'link',
+      //     d3.forceLink().id(function(d) {
+      //       return d.id;
+      //     })
+      //   )
+      //   .force(
+      //     'charge',
+      //     d3
+      //       .forceManyBody()
+      //       .strength([-800])
+      //       .distanceMax([500])
+      //   )
+      //   .force('center', d3.forceCenter(width / 2, height / 2))
+      //   .force(
+      //     'collision',
+      //     d3.forceCollide().radius(function(d) {
+      //       return radiusVar(d[networkSettings.nodeSize]);
+      //     })
+      //   )
+      //   .force('x', d3.forceX())
+      //   .force('y', d3.forceY())
+      //   .stop();
+
+      //   for (
+      //     let i = 0,
+      //       n = Math.ceil(
+      //         Math.log(simulation.alphaMin()) /
+      //           Math.log(1 - simulation.alphaDecay())
+      //       );
+      //     i < n;
+      //     ++i
+      //   ) {
+      //     simulation.nodes(dataCombinedVar.nodes);
+
+      //     simulation.force('link').links(dataCombinedVar.links);
+
+      //     simulation.tick();
+      //   }
+
+      //   let link = chartSVG
+      //     .append('g')
+      //     .attr('class', 'links')
+      //     .selectAll('line')
+      //     .data(dataCombinedVar.links)
+      //     .enter()
+      //     .append('line')
+      //     .style('stroke', function(d) {
+      //       return '#0080ff';
+      //     })
+      //     .style('stroke-opacity', function(d) {
+      //       return 0.3;
+      //     })
+      //     .style('stroke-width', function(d) {
+      //       return lineScaleVar(d.EnrichmentMap_Overlap_size);
+      //     })
+      //     .attr('x1', function(d) {
+      //       return d.source.x;
+      //     })
+      //     .attr('y1', function(d) {
+      //       return d.source.y;
+      //     })
+      //     .attr('x2', function(d) {
+      //       return d.target.x;
+      //     })
+      //     .attr('y2', function(d) {
+      //       return d.target.y;
+      //     });
+      //   chartSVG = d3.select(`#svg-${chartSettings.id}`);
+
+      //   let link = chartSVG
       let link = d3
         .select(this)
         .append('g')
@@ -548,7 +615,7 @@ export default class NetworkGraphTree extends Component {
         })
         .style('font-size', '1em')
         .style('opacity', 1)
-        .attr('x', 12)
+        .attr('x', 6)
         .attr('y', 3);
 
       let div = d3
@@ -604,7 +671,7 @@ export default class NetworkGraphTree extends Component {
                   `<br/><b>pValue: </b>` +
                   pValueDisplay +
                   `<br/><b>Ontology: </b>` +
-                  d.data.metaData.Ontology
+                  d.data.metaData.Annotation
               )
               .style('left', d3.event.pageX + 10 + 'px')
               .style('top', d3.event.pageY - 15 + 'px');
@@ -626,7 +693,7 @@ export default class NetworkGraphTree extends Component {
         d3.event.sourceEvent.preventDefault();
       }
       function pieClickEvent(d, o) {
-        // if (d3.event.defaultPrevented) return;
+        if (d3.event.defaultPrevented) return;
         d3.select('.tooltip-pieSlice').remove();
         self.props.onPieClick(d.data);
       }
@@ -683,6 +750,7 @@ export default class NetworkGraphTree extends Component {
 
   render() {
     const { chartSettings } = this.state;
+
     return (
       <div
         ref={this.networkContainerRef}

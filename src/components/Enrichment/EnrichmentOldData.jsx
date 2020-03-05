@@ -11,7 +11,6 @@ import SplitPanesContainer from './SplitPanesContainer';
 import SearchingAlt from '../Transitions/SearchingAlt';
 import ButtonActions from '../Shared/ButtonActions';
 import networkDataNew from '../../services/networkDataNew.json';
-import networkDataMock from '../../services/networkDataMock.json';
 import tableIcon from '../../resources/tableIcon.png';
 import tableIconSelected from '../../resources/tableIconSelected.png';
 import networkIcon from '../../resources/networkIcon.png';
@@ -60,8 +59,6 @@ class Enrichment extends Component {
       edges: []
     },
     networkDataNew: {},
-    networkDataMock: {},
-    networkDataLoaded: false,
     tests: {},
     networkSettings: {
       facets: {},
@@ -566,14 +563,6 @@ class Enrichment extends Component {
         pValueTypeParam,
         enrichmentStudy + 'plots'
       )
-      // .then(EMData => {
-      //   this.setState({
-      //     networkDataAvailable: true,
-      //     networkData: EMData.elements,
-      //     // networkData: networkDataMock,
-      //     networkDataLoaded: true
-      //   });
-      // });
       .then(EMData => {
         this.setState({
           networkDataAvailable: true,
@@ -607,8 +596,7 @@ class Enrichment extends Component {
             // ],
             // nodeColorScale: [0, 0.1, 1],
             // nodeColors: ["red", "white", "blue"]
-          },
-          networkDataLoaded: true
+          }
         });
       });
   };

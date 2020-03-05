@@ -32,6 +32,7 @@ export function splitValue(value) {
 }
 
 export function networkByCluster(network) {
+  network = _.cloneDeep(network);
   function bucket() {
     let keepGoing = true;
     let nodeArray = [];
