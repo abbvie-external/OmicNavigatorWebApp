@@ -1,5 +1,6 @@
 .NetworkGraphContainer {
   padding-top: 0px !important;
+  min-height: 70vh !important;
 
   text {
     font-family: sans-serif;
@@ -7,12 +8,16 @@
   }
 }
 
-.network-chart-wrapper {
-  border-width: thin;
-  border-radius: 3px;
-  display: -webkit-flex; /* Safari */
-  display: flex; /* Standard syntax */
+.ui.positive.button {
+  background-color: var(--color-primary) !important;
 }
+
+// .network-chart-wrapper {
+//   border-width: thin;
+//   border-radius: 3px;
+//   display: -webkit-flex; /* Safari */
+//   display: flex; /* Standard syntax */
+// }
 
 // .ui.search {
 //   position: initial;
@@ -32,36 +37,36 @@
 //   z-index: 1111111 !important;
 // }
 
-.controlBox {
-  background-color: #f7f7ee;
-  /* position: absolute; */
-  margin: 5px 5px 5px 5px;
-  width: 1%;
-  border-style: solid;
-  border-color: black;
-  border-width: thin;
-  border-radius: 3px;
-  -moz-box-shadow-bottom: 4px 4px 4px;
-  -webkit-box-shadow-bottom: 4px 4px 4px grey;
-  box-shadow: 4px 4px 4px grey;
-  -webkit-flex: 1; /* Safari */
-  -ms-flex: 1; /* IE 10 */
-  flex: 0.15; /* Standard syntax */
-}
+// .controlBox {
+//   background-color: #f7f7ee;
+//   /* position: absolute; */
+//   margin: 5px 5px 5px 5px;
+//   width: 1%;
+//   border-style: solid;
+//   border-color: black;
+//   border-width: thin;
+//   border-radius: 3px;
+//   -moz-box-shadow-bottom: 4px 4px 4px;
+//   -webkit-box-shadow-bottom: 4px 4px 4px grey;
+//   box-shadow: 4px 4px 4px grey;
+//   -webkit-flex: 1; /* Safari */
+//   -ms-flex: 1; /* IE 10 */
+//   flex: 0.15; /* Standard syntax */
+// }
 
-#chart-network {
-  background-color: #f7f7ee;
-  margin: 5px 5px 5px 5px;
-  width: 15%;
-  border-style: solid;
-  border-color: black;
-  border-width: thin;
-  border-radius: 3px;
-  -moz-box-shadow-bottom: 4px 4px 4px grey;
-  -webkit-box-shadow-bottom: 4px 4px 4px grey;
-  box-shadow: 4px 4px 4px grey;
-  flex: 0.85;
-}
+// #chart-network {
+//   background-color: #f7f7ee;
+//   margin: 5px 5px 5px 5px;
+//   width: 15%;
+//   border-style: solid;
+//   border-color: black;
+//   border-width: thin;
+//   border-radius: 3px;
+//   -moz-box-shadow-bottom: 4px 4px 4px grey;
+//   -webkit-box-shadow-bottom: 4px 4px 4px grey;
+//   box-shadow: 4px 4px 4px grey;
+//   flex: 0.85;
+// }
 
 .networkSearch {
   margin: 5px 5px 5px 5px;

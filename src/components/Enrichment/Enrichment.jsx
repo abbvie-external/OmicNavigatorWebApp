@@ -138,6 +138,7 @@ class Enrichment extends Component {
     //   xName: 'tissue'
     // }
   };
+  EnrichmentViewContainerRef = React.createRef();
 
   componentDidMount() {
     this.getTableHelpers(this.testSelectedTransition, this.showBarcodePlot);
@@ -613,27 +614,26 @@ class Enrichment extends Component {
       });
   };
 
-  // setHeight(e) {
-  //   let bHeight = e;
-  //   let splitterHeight = this.dialogHeight - 77;
-  //   let height = (100 - Math.ceil(((splitterHeight - bHeight) / splitterHeight) * 100) - 1.35);
-  //   this.s = height.toString() + "%";
-  // }
-
-  calculateHeight() {
-    var h = Math.max(
-      document.documentElement.clientHeight,
-      window.innerHeight || 0
-    );
-    return h;
+  calculateHeight(self) {
+    let containerHeight =
+      self.EnrichmentViewContainerRef.current !== null
+        ? self.EnrichmentViewContainerRef.current.parentElement.offsetHeight
+        : 900;
+    let barcodeHeight =
+      parseInt(localStorage.getItem('horizontalSplitPaneSize'), 10) || 250;
+    // subtracting 120 due to menu and plot margin
+    return containerHeight - barcodeHeight - 120;
   }
 
-  calculateWidth() {
-    var w = Math.max(
-      document.documentElement.clientWidth,
-      window.innerWidth || 0
-    );
-    return w;
+  calculateWidth(self) {
+    let containerWidth =
+      self.EnrichmentViewContainerRef.current !== null
+        ? self.EnrichmentViewContainerRef.current.parentElement.offsetWidth
+        : 1200;
+    let violinWidth =
+      parseInt(localStorage.getItem('verticalSplitPaneSize'), 10) || 525;
+    // subtracting 80 due to plot margin
+    return containerWidth - violinWidth - 60;
   }
 
   showBarcodePlot = (dataItem, barcode, test, highest) => {
@@ -792,8 +792,16 @@ class Enrichment extends Component {
 
   getPlot = (id, plotType, enrichmentStudy, imageInfo, handleSVGCb) => {
     let currentSVGs = [];
-    let heightCalculation = this.calculateHeight;
-    let widthCalculation = this.calculateWidth;
+    // keep whatever dimension is less (height or width)
+    // then multiply the other dimension by original svg ratio (height 595px, width 841px)
+    let EnrichmentPlotSVGHeight = this.calculateHeight(this);
+    let EnrichmentPlotSVGWidth = this.calculateWidth(this);
+    if (EnrichmentPlotSVGHeight + 60 > EnrichmentPlotSVGWidth) {
+      EnrichmentPlotSVGHeight = EnrichmentPlotSVGWidth * 0.70749;
+    } else {
+      EnrichmentPlotSVGWidth = EnrichmentPlotSVGHeight * 1.41344;
+    }
+
     _.forEach(plotType, function(plot, i) {
       phosphoprotService
         .getPlot(id, plotType[i], enrichmentStudy + 'plots')
@@ -807,15 +815,7 @@ class Enrichment extends Component {
           svgMarkup = svgMarkup.replace(/#clip/g, '#' + id + '-' + i + '-clip');
           svgMarkup = svgMarkup.replace(
             /<svg/g,
-            '<svg preserveAspectRatio="xMinYMid meet" style="width:' +
-              widthCalculation() * 0.5 +
-              'px; height:' +
-              heightCalculation() * 0.5 +
-              'px;" id="currentSVG-' +
-              id +
-              '-' +
-              i +
-              '"'
+            `<svg preserveAspectRatio="xMinYMin meet" style="width:${EnrichmentPlotSVGWidth}px" height:${EnrichmentPlotSVGHeight} id="currentSVG-${id}-${i}"`
           );
           DOMPurify.addHook('afterSanitizeAttributes', function(node) {
             if (
@@ -830,8 +830,17 @@ class Enrichment extends Component {
             ADD_TAGS: ['use']
           });
           let svgInfo = { plotType: plotType[i], svg: sanitizedSVG };
-          imageInfo.svg.push(svgInfo);
-          currentSVGs.push(sanitizedSVG);
+
+          // we want spline plot in zero index, rather than lineplot
+          if (i === 0) {
+            imageInfo.svg.push(svgInfo);
+            currentSVGs.push(sanitizedSVG);
+          } else {
+            // splice(position, numberOfItemsToRemove, item)
+            // imageInfo.svg.u
+            imageInfo.svg.unshift(svgInfo);
+            currentSVGs.unshift(sanitizedSVG);
+          }
           handleSVGCb(imageInfo);
         });
     });
@@ -1257,7 +1266,12 @@ class Enrichment extends Component {
                 visible={visible}
               />
               <Sidebar.Pusher>
-                <div className="EnrichmentViewContainer">{enrichmentView}</div>
+                <div
+                  className="EnrichmentViewContainer"
+                  ref={this.EnrichmentViewContainerRef}
+                >
+                  {enrichmentView}
+                </div>
               </Sidebar.Pusher>
             </Sidebar.Pushable>
           </Grid.Column>

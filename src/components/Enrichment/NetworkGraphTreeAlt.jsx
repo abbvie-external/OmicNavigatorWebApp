@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import _ from 'lodash';
 import * as d3 from 'd3';
-import './NetworkGraph.scss';
+import './NetworkGraphTreeAlt.scss';
 import { networkByCluster } from '../Shared/helpers';
 
-export default class NetworkGraph extends Component {
+export default class NetworkGraphTreeAlt extends Component {
   // static defaultProps = {
   //   networkDataAvailable: false,
   //   networkData: {},
@@ -89,15 +89,11 @@ export default class NetworkGraph extends Component {
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
-    if (
-      this.props.networkData !== prevProps.networkData ||
-      this.props.networkSortBy !== prevProps.networkSortBy
-    ) {
-      // this.prepareAndRenderTree(
-      //   this.state.networkWidth,
-      //   this.state.networkHeight
-      //);
-      this.setDimensions();
+    if (this.props.networkData !== prevProps.networkData) {
+      this.prepareAndRenderTree(
+        this.state.networkWidth,
+        this.state.networkHeight
+      );
     }
     if (this.props.networkSearchValue !== prevProps.networkSearchValue) {
       this.handleNodeSearch();
@@ -107,6 +103,27 @@ export default class NetworkGraph extends Component {
   // componentWillUnmount() {
   //   d3.select(`#svg-${this.state.chartSettings.id}`).remove();
   // }
+
+  // handleNodeSearch = () => {
+  //   let self = this;
+  //   let svg = d3.select(`#svg-${this.state.chartSettings.id}`);
+  //   let nodeLabels = svg.selectAll('.node-label');
+  //   if (this.props.networkSearchValue === '') {
+  //     nodeLabels.style('opactity', '1');
+  //   } else {
+  //     let keep = nodeLabels.filter(function(d, i) {
+  //       let string = d.EnrichmentMap_GS_DESCR;
+  //       return string.includes(self.props.networkSearchValue);
+  //     });
+  //     keep.style('opacity', '1');
+  //     var link = svg.selectAll('.links');
+  //     link.style('opacity', '0');
+  //     d3.selectAll('.nodes, .links')
+  //       .transition()
+  //       .duration(5000)
+  //       .style('opacity', 1);
+  //   }
+  // };
 
   handleNodeSearch = () => {
     // setTimeout(() => {
@@ -177,15 +194,15 @@ export default class NetworkGraph extends Component {
       return o.data;
     });
 
-    // this.setState({
-    //   chartSettings: {
-    //     ...this.state.chartSettings,
-    //     formattedData: {
-    //       nodes: formattedNodes,
-    //       links: formattedLinks
-    //     }
-    //   }
-    // });
+    this.setState({
+      chartSettings: {
+        ...this.state.chartSettings,
+        formattedData: {
+          nodes: formattedNodes,
+          links: formattedLinks
+        }
+      }
+    });
 
     _.forEach(formattedNodes, function(o1) {
       let picked = _.pick(o1, networkSettings.facets);
@@ -222,7 +239,6 @@ export default class NetworkGraph extends Component {
     //     links: formattedLinks
     //   }
     // });
-
     let minSetVar = _.min(
       _.map(formattedNodes, function(o) {
         return o[networkSettings.nodeSize];
@@ -261,34 +277,7 @@ export default class NetworkGraph extends Component {
     //   radius: radiusVar,
     //   lineScale: lineScaleVar
     // });
-
-    let clusters = networkByCluster(dataCombinedVar);
-
-    function getlowestTestValues(nodes) {
-      let facetsArr = nodes.flatMap(node => node.facets);
-      return Math.min(
-        ...facetsArr.map(f => f.value).filter(v => v != null)
-        // ...nodes.map(node => node.value).filter(value => value != null)
-      );
-    }
-
-    function getHighestCoefficient(links) {
-      return Math.max(
-        ...links
-          .map(link => link.EnrichmentMap_similarity_coefficient)
-          .filter(coeff => coeff != null)
-      );
-    }
-
-    clusters.children.forEach(cluster => {
-      _.forEach(clusters.children, function(cluster, i) {
-        let lowestTestValue = getlowestTestValues(cluster.nodes);
-        let highestCoefficientValue = getHighestCoefficient(cluster.links);
-        cluster.lowestTestValue = lowestTestValue;
-        cluster.highestCoefficientValue = highestCoefficientValue;
-      });
-    });
-
+    dataCombinedVar = networkByCluster(dataCombinedVar);
     // Prepare Settings (dimensions already calculated)
 
     // Prepare Chart
@@ -324,60 +313,93 @@ export default class NetworkGraph extends Component {
       //return Math.sqrt(sumofRadii + d.size);
       return sumofRadii + d.size;
     }
-
     let treemap = d3
       .treemap()
       .tile(d3.treemapResquarify)
       .size([width, height])
       .round(true)
       .paddingInner(1);
-    let root = d3
-      .hierarchy(clusters)
-      .eachBefore(function(d) {
-        d.data.id = (d.parent ? d.parent.data.id + '.' : '') + d.data.name;
-        d.key = d.data.id;
-      })
-      .sum(sumBySize)
-      .sort(function(a, b) {
-        if (self.props.networkSortBy === 'lowestTestValue') {
-          return a.data.lowestTestValue - b.data.lowestTestValue;
-        } else if (self.props.networkSortBy === 'highestLinkCoefficient') {
-          return a.data.highestLinkCoefficient - b.data.highestLinkCoefficient;
-        } else {
-          return a.height - b.height || a.value - b.value;
-        }
-        // return (
-        //   b.data.nodes[0].facets[0].value - a.data.nodes[0].facets[0].value
-        // );
-      });
 
-    treemap(root);
+    const root = d3
+      .hierarchy(dataCombinedVar, d => d.children)
+      .sum(d => d.size);
 
+    const tree = treemap(root);
     let chartSVG = d3.select(`#svg-${chartSettings.id}`);
-    let cell = chartSVG
-      .selectAll('g')
-      .data(root.leaves())
-      .enter()
-      .append('g')
-      .attr('transform', function(d) {
-        return 'translate(' + d.x0 + ',' + d.y0 + ')';
-      });
 
-    cell
-      .append('rect')
-      .attr('id', function(d) {
-        return d.data.id;
-      })
-      .attr('width', function(d) {
-        return d.x1 - d.x0;
-      })
-      .attr('height', function(d) {
-        return d.y1 - d.y0;
-      })
-      .attr('fill', '#fdfcfb')
-      .style('stroke-opacity', 0.25)
-      .style('stroke', 'grey');
-    cell.each(function(d, i) {
+    const node = chartSVG
+      .datum(root)
+      .selectAll('.node')
+      .data(tree.leaves())
+      .enter()
+      .append('div')
+      .attr('class', 'node')
+      .style('left', d => d.x0 + 'px')
+      .style('top', d => d.y0 + 'px')
+      .style('width', d => Math.max(0, d.x1 - d.x0 - 1) + 'px')
+      .style('height', d => Math.max(0, d.y1 - d.y0 - 1) + 'px')
+      .style('background', d => color(d.parent.data.name))
+      .text(d => d.data.name);
+
+    d3.selectAll('input').on('change', function change() {
+      const value =
+        this.value === 'count'
+          ? d => {
+              return d.size ? 1 : 0;
+            }
+          : d => {
+              return d.size;
+            };
+
+      const newRoot = d3.hierarchy(dataCombinedVar, d => d.children).sum(value);
+
+      node
+        .data(treemap(newRoot).leaves())
+        .transition()
+        .duration(1500)
+        .style('left', d => d.x0 + 'px')
+        .style('top', d => d.y0 + 'px')
+        .style('width', d => Math.max(0, d.x1 - d.x0 - 1) + 'px')
+        .style('height', d => Math.max(0, d.y1 - d.y0 - 1) + 'px');
+    });
+
+    // let root = d3
+    //   .hierarchy(dataCombinedVar)
+    //   .eachBefore(function(d) {
+    //     d.data.id = (d.parent ? d.parent.data.id + '.' : '') + d.data.name;
+    //   })
+    //   .sum(sumBySize)
+    //   .sort(function(a, b) {
+    //     return b.height - a.height || b.value - a.value;
+    //   });
+
+    // treemap(root);
+
+    // let chartSVG = d3.select(`#svg-${chartSettings.id}`);
+    // let cell = chartSVG
+    //   .selectAll('g')
+    //   .data(root.leaves())
+    //   .enter()
+    //   .append('g')
+    //   .attr('transform', function(d) {
+    //     return 'translate(' + d.x0 + ',' + d.y0 + ')';
+    //   });
+
+    // cell
+    //   .append('rect')
+    //   .attr('id', function(d) {
+    //     return d.data.id;
+    //   })
+    //   .attr('width', function(d) {
+    //     return d.x1 - d.x0;
+    //   })
+    //   .attr('height', function(d) {
+    //     return d.y1 - d.y0;
+    //   })
+    //   .attr('fill', '#fdfcfb')
+    //   .style('stroke-opacity', 0.25)
+    //   .style('stroke', 'grey');
+    node.each(function(d, i) {
       let cellWidth = d.x1 - d.x0;
       let cellHeight = d.y1 - d.y0;
 
@@ -458,9 +480,9 @@ export default class NetworkGraph extends Component {
       //     i < n;
       //     ++i
       //   ) {
-      //     simulation.nodes(clusters.nodes);
+      //     simulation.nodes(dataCombinedVar.nodes);
 
-      //     simulation.force('link').links(clusters.links);
+      //     simulation.force('link').links(dataCombinedVar.links);
 
       //     simulation.tick();
       //   }
@@ -469,7 +491,7 @@ export default class NetworkGraph extends Component {
       //     .append('g')
       //     .attr('class', 'links')
       //     .selectAll('line')
-      //     .data(clusters.links)
+      //     .data(dataCombinedVar.links)
       //     .enter()
       //     .append('line')
       //     .style('stroke', function(d) {

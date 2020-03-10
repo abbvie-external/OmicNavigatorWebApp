@@ -47,6 +47,7 @@ class PepplotResults extends Component {
     pepplotRows: this.props.pepplotResults.length || 1000
   };
   pepplotGridRef = React.createRef();
+  PepplotViewContainerRef = React.createRef();
 
   componentDidMount() {
     const ProteinSite = this.props.pepplotProteinSite || '';
@@ -268,9 +269,17 @@ class PepplotResults extends Component {
   getPlot = (id, plotType, pepplotStudy, imageInfo, handleSVGCb) => {
     // let self = this;
     let currentSVGs = [];
-    let heightCalculation = this.calculateHeight;
-    let widthCalculation = this.calculateWidth;
+    // keep whatever dimension is less (height or width)
+    // then multiply the other dimension by original svg ratio (height 595px, width 841px)
+    let PepplotPlotSVGHeight = this.calculateHeight(this);
+    let PepplotPlotSVGWidth = this.calculateWidth(this);
+    if (PepplotPlotSVGHeight + 60 > PepplotPlotSVGWidth) {
+      PepplotPlotSVGHeight = PepplotPlotSVGWidth * 0.70749;
+    } else {
+      PepplotPlotSVGWidth = PepplotPlotSVGHeight * 1.41344;
+    }
     let handleProteinSelectedCb = this.handleProteinSelected;
+
     _.forEach(plotType, function(plot, i) {
       phosphoprotService
         .getPlot(
@@ -289,15 +298,7 @@ class PepplotResults extends Component {
           svgMarkup = svgMarkup.replace(/#clip/g, '#' + id + '-' + i + '-clip');
           svgMarkup = svgMarkup.replace(
             /<svg/g,
-            '<svg preserveAspectRatio="xMinYMid meet" style="width:' +
-              widthCalculation() * 0.75 +
-              'px; height:' +
-              heightCalculation() * 0.75 +
-              'px;" id="currentSVG-' +
-              id +
-              '-' +
-              i +
-              '"'
+            `<svg preserveAspectRatio="xMinYMin meet" style="width:${PepplotPlotSVGWidth}px" height:${PepplotPlotSVGHeight} id="currentSVG-${id}-${i}"`
           );
           DOMPurify.addHook('afterSanitizeAttributes', function(node) {
             if (
@@ -308,13 +309,19 @@ class PepplotResults extends Component {
             }
           });
           // Clean HTML string and write into our DIV
-          // let sanitizedSVG = DOMPurify.sanitize(svgMarkup, {
-          //   ADD_TAGS: ['use']
-          // });
+          let sanitizedSVG = DOMPurify.sanitize(svgMarkup, {
+            ADD_TAGS: ['use']
+          });
+          let svgInfo = { plotType: plotType[i], svg: sanitizedSVG };
 
-          let svgInfo = { plotType: plotType[i], svg: svgMarkup };
+          // we want spline plot in zero index, rather than lineplot
+          // if (i === 0) {
           imageInfo.svg.push(svgInfo);
-          currentSVGs.push(svgMarkup);
+          currentSVGs.push(sanitizedSVG);
+          // } else {
+          // imageInfo.svg.unshift(svgInfo);
+          // currentSVGs.unshift(sanitizedSVG);
+          // }
           handleSVGCb(imageInfo);
         });
       // .catch(error => {
@@ -323,20 +330,39 @@ class PepplotResults extends Component {
     });
   };
 
-  calculateHeight() {
-    var h = Math.max(
-      document.documentElement.clientHeight,
-      window.innerHeight || 0
-    );
-    return h;
+  // calculateHeight() {
+  //   var h = Math.max(
+  //     document.documentElement.clientHeight,
+  //     window.innerHeight || 0
+  //   );
+  //   return h;
+  // }
+
+  // calculateWidth() {
+  //   var w = Math.max(
+  //     document.documentElement.clientWidth,
+  //     window.innerWidth || 0
+  //   );
+  //   return w;
+  // }
+
+  calculateHeight(self) {
+    let containerHeight =
+      self.PepplotViewContainerRef.current !== null
+        ? self.PepplotViewContainerRef.current.parentElement.offsetHeight
+        : 900;
+    // subtracting 120 due to menu and plot margin
+    return containerHeight - -120;
   }
 
-  calculateWidth() {
-    var w = Math.max(
-      document.documentElement.clientWidth,
-      window.innerWidth || 0
-    );
-    return w;
+  calculateWidth(self) {
+    let containerWidth =
+      self.PepplotViewContainerRef.current !== null
+        ? self.PepplotViewContainerRef.current.parentElement.offsetWidth
+        : 1200;
+
+    // subtracting 80 due to plot margin
+    return containerWidth - 60;
   }
 
   getTableHelpers = (
@@ -472,7 +498,7 @@ class PepplotResults extends Component {
       );
     } else {
       return (
-        <div>
+        <div ref={this.PepplotViewContainerRef}>
           <PepplotPlot
             {...this.props}
             {...this.state}

@@ -10,7 +10,8 @@ import {
   Search,
   Radio,
   Label,
-  Input
+  Input,
+  Button
   // Input
 } from 'semantic-ui-react';
 // import NetworkGraphOld from './NetworkGraphOld';
@@ -19,6 +20,9 @@ import NetworkGraphSemioticForce from './NetworkGraphSemioticForce';
 import NetworkGraphSemioticHierarchy from './NetworkGraphSemioticHierarchy';
 import NetworkGraphOld from './NetworkGraphOld';
 import NetworkGraphTree from './NetworkGraphTree';
+import NetworkGraphTreeEx from './NetworkGraphTreeEx';
+import NetworkGraphTreeAlt from './NetworkGraphTreeAlt';
+import NetworkGraphAlt from './NetworkGraphTree';
 import NetworkGraphReact from './NetworkGraphReact';
 import NetworkGraphThresholdSlider from './NetworkGraphThresholdSlider';
 import NetworkGraphAdjacencyMatrix from './NetworkGraphAdjacencyMatrix';
@@ -73,14 +77,15 @@ class EnrichmentResultsGraph extends Component {
     networkSearchValue: '',
     descriptions: [],
     nodeCutoff: 0.5,
-    edgeCutoff: 0.375
+    edgeCutoff: 0.375,
+    networkSortBy: 'lowestTestValue'
     // legendIsOpen: true
   };
 
   componentDidMount() {
     // if (this.props.networkDataLoaded) {
-    //   this.setupSearch();
-    // }
+    this.setupSearch();
+    //}
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
@@ -134,28 +139,40 @@ class EnrichmentResultsGraph extends Component {
     }
   };
 
-  handleResultSelect = (e, { result }) =>
+  handleResultSelect = (e, { result }) => {
+    debugger;
     this.setState({ networkSearchValue: result.description });
-
-  handleSearchChange = (e, { value }) => {
-    this.setState({ networkSearchValue: value.toLowerCase() });
-
-    setTimeout(() => {
-      if (this.state.networkSearchValue.length < 1)
-        return this.setState({
-          ...this.state,
-          results: [],
-          networkSearchValue: ''
-        });
-
-      const re = new RegExp(_.escapeRegExp(this.state.networkSearchValue), 'i');
-      const isMatch = result => re.test(result.description);
-
-      this.setState({
-        results: _.filter(this.state.descriptions, isMatch)
-      });
-    }, 300);
   };
+
+  // handleSearchChange = (e, { value }) => {
+  //   if (value.length < 1) {
+  //     return this.setState({
+  //       results: [],
+  //       networkSearchValue: ''
+  //     });
+  //   } else {
+  //     this.setState(
+  //       { networkSearchValue: value.toLowerCase() },
+  //       this.debounceSearchChange
+  //     );
+  //   }
+  // };
+  handleSearchChange = _.debounce((e, { value: networkSearchValue }) => {
+    if (networkSearchValue.length < 1) {
+      return this.setState({
+        results: [],
+        networkSearchValue
+      });
+    }
+    networkSearchValue = networkSearchValue.toLowerCase();
+    const re = new RegExp(_.escapeRegExp(networkSearchValue), 'i');
+    const isMatch = result => re.test(result.description);
+
+    this.setState({
+      results: _.filter(this.state.descriptions, isMatch),
+      networkSearchValue
+    });
+  }, 500);
 
   handleInputChange = (evt, { name, value }) => {
     this.setState({
@@ -298,6 +315,12 @@ class EnrichmentResultsGraph extends Component {
   //   clearTimeout(this.timeout);
   // };
 
+  handleNetworkSortByChange = (evt, { value }) => {
+    this.setState({
+      networkSortBy: value
+    });
+  };
+
   setupSearch = () => {
     const networkDataNodeDescriptions = this.props.networkData.nodes.map(r => ({
       description: r.data.EnrichmentMap_GS_DESCR.toLowerCase(),
@@ -311,7 +334,7 @@ class EnrichmentResultsGraph extends Component {
 
   render() {
     const { networkDataLoaded } = this.props;
-    const { networkSearchValue, results, nodeCutoff, edgeCutoff } = this.state;
+    const { results, nodeCutoff, edgeCutoff, networkSortBy } = this.state;
     const legend = this.getLegend();
     const LegendPopupStyle = {
       padding: '1em',
@@ -332,24 +355,22 @@ class EnrichmentResultsGraph extends Component {
               mobile={4}
               tablet={4}
               largeScreen={2}
-              widescreen={3}
+              widescreen={2}
             ></Grid.Column>
             <Grid.Column
               // className="NetworkGraphFilters"
               mobile={10}
               tablet={10}
-              largeScreen={4}
-              widescreen={4}
+              largeScreen={3}
+              widescreen={3}
             >
               <Search
                 // className="NetworkSearchResultsContainer"
                 placeholder="Search Network"
                 onResultSelect={this.handleResultSelect}
-                onSearchChange={_.debounce(this.handleSearchChange, 500, {
-                  leading: true
-                })}
+                onSearchChange={this.handleSearchChange}
                 results={results}
-                value={networkSearchValue}
+                // value={networkSearchValue}
                 resultRenderer={resultRenderer}
                 {...this.props}
               />
@@ -361,26 +382,44 @@ class EnrichmentResultsGraph extends Component {
                 onChange={this.handleLabels}
               />
             </Grid.Column>
-            {/* <Grid.Column
-            className="NetworkGraphFilters"
-            id="NetworkGraphLabelsToggle"
-            mobile={6}
-            tablet={6}
-            largeScreen={3}
-            widescreen={3}
-          >
-            <Radio
-              toggle
-              label="Show Labels"
-              checked={this.state.showNetworkLabels}
-              onChange={this.handleLabels}
-            />
-          </Grid.Column> */}
+            <Grid.Column
+              className="NetworkGraphFilters"
+              id="NetworkGraphLabelsToggle"
+              mobile={6}
+              tablet={6}
+              largeScreen={3}
+              widescreen={3}
+            >
+              <label>Sort By: </label>
+              <Button.Group className="PValueTypeContainer" size="small">
+                <Button
+                  type="button"
+                  className="pValueButton"
+                  value="lowestTestValue"
+                  name="lowestttestvalue"
+                  positive={networkSortBy === 'lowestTestValue'}
+                  onClick={this.handleNetworkSortByChange}
+                >
+                  Value
+                </Button>
+                <Button.Or className="OrCircle" />
+                <Button
+                  type="button"
+                  className="pValueButton"
+                  value="highestLinkCoefficient"
+                  name="highestLinkCoefficient"
+                  positive={networkSortBy === 'highestLinkCoefficient'}
+                  onClick={this.handleNetworkSortByChange}
+                >
+                  Coefficient
+                </Button>
+              </Button.Group>
+            </Grid.Column>
             <Grid.Column
               className="NetworkGraphFilters"
               mobile={8}
               tablet={8}
-              largeScreen={4}
+              largeScreen={3}
               widescreen={3}
             >
               <Input
@@ -416,7 +455,7 @@ class EnrichmentResultsGraph extends Component {
               className="NetworkGraphFilters"
               mobile={8}
               tablet={8}
-              largeScreen={4}
+              largeScreen={3}
               widescreen={3}
             >
               <Input
@@ -492,6 +531,18 @@ class EnrichmentResultsGraph extends Component {
                 {...this.state}
                 onPieClick={this.handlePieClick}
               ></NetworkGraphTree>
+
+              {/* <NetworkGraphTreeAlt
+                {...this.props}
+                {...this.state}
+                onPieClick={this.handlePieClick}
+              ></NetworkGraphTreeAlt> */}
+
+              {/* <NetworkGraphTreeEx
+                {...this.props}
+                {...this.state}
+                onPieClick={this.handlePieClick}
+              ></NetworkGraphTreeEx> */}
 
               {/* <NetworkGraphReact
                 {...this.props}
