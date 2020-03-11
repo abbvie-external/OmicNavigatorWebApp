@@ -25,17 +25,17 @@ class PepplotSearchCriteria extends Component {
     pepplotModelsDisabled: true,
     pepplotTestsDisabled: true,
     uAnchorP: '',
-    selectedColP: {
+    selectedColP: [{
       key: 'adj_P_Val',
       text: 'Adjusted P Value',
       value: 'adj_P_Val'
-    },
-    selectedOperatorP: {
+    }],
+    selectedOperatorP: [{
       key: '<',
       text: '<',
       value: '<'
-    },
-    sigValueP: 0.05,
+    }],
+    sigValueP: [0.05],
     reloadPlot: true,
     uSettingsP: {
       defaultselectedColP: {
@@ -50,12 +50,14 @@ class PepplotSearchCriteria extends Component {
       },
       defaultsigValueP: 0.05,
       useAnchorP: true,
+      hoveredFilter:-1,
       mustP: [],
       notP: [],
       displayMetaDataP: true,
       templateName: 'pepplot-multiset',
       numElementsP: undefined,
       maxElementsP: undefined,
+      indexFiltersP: [0],
       metaSvgP: '',
       heightScalarP: 1,
       thresholdColsP: [
@@ -63,6 +65,16 @@ class PepplotSearchCriteria extends Component {
           key: 'adj_P_Val',
           text: 'adj_P_Val',
           value: 'adj_P_Val'
+        },
+        {
+          key: 'F',
+          text: 'F',
+          value: 'F'
+        },
+        {
+          key: 'P_Value',
+          text: 'P_Value',
+          value: 'P_Value'
         }
       ],
       thresholdOperatorP: [
@@ -328,7 +340,7 @@ class PepplotSearchCriteria extends Component {
             defaultsigValueP: 0.05,
             maxElementsP: dataFromService.length
           },
-          sigValueP: 0.05,
+          sigValueP: [0.05],
           uAnchorP: value
         });
         this.testdata = dataFromService;
@@ -389,39 +401,90 @@ class PepplotSearchCriteria extends Component {
       });
   };
 
-  updateQueryDataP = evt => {
-    const eSigVP = Number(evt.sigValueP) || Number(this.state.sigValueP);
-    const eMustP = evt.mustP || this.state.uSettingsP.mustP;
-    const eNotP = evt.notP || this.state.uSettingsP.notP;
-    const eOperatorP = evt.selectedOperatorP || this.state.selectedOperatorP;
-    const eColP = evt.selectedColP || this.state.selectedColP;
-    let mustPString = this.testToString(eMustP);
-    let notPString = this.testToString(eNotP);
+  addFilter =()=> {
+    const uSetVP = {...this.state.uSettingsP}
+    uSetVP.indexFiltersP = [...this.state.uSettingsP.indexFiltersP].concat(this.state.uSettingsP.indexFiltersP.length)
+
     this.setState({
-      sigValueP: eSigVP,
-      selectedOperatorP: eOperatorP,
-      selectedColP: eColP
+      selectedColP: [...this.state.selectedColP].concat(this.state.uSettingsP.defaultselectedColP),
+      selectedOperatorP: [...this.state.selectedOperatorP].concat(this.state.uSettingsP.defaultselectedOperatorP),
+      sigValueP: [...this.state.sigValueP].concat(this.state.uSettingsP.defaultsigValueP),
+      uSettingsP: uSetVP
     });
-    if (eSigVP !== this.state.sigValueP || this.state.reloadPlot === true) {
+  }
+  removeFilter=(index)=>{
+    const uSetVP = {...this.state.uSettingsP}
+    uSetVP.indexFiltersP = [...uSetVP.indexFiltersP].slice(0,index).concat([...uSetVP.indexFiltersP].slice(index+1));
+    for(var i = index; i < uSetVP.indexFiltersP.length; i++){uSetVP.indexFiltersP[i]--}
+    this.setState({
+      selectedColP: [...this.state.selectedColP].slice(0,index).concat([...this.state.selectedColP].slice(index+1)),
+      selectedOperatorP: [...this.state.selectedOperatorP].slice(0,index).concat([...this.state.selectedOperatorP].slice(index+1)),
+      sigValueP: [...this.state.sigValueP].slice(0,index).concat([...this.state.sigValueP].slice(index+1)),
+      uSettingsP: uSetVP
+    });
+  }
+  changeHoveredFilter=(index)=>{
+    const uSetVP = {...this.state.uSettingsP}
+    uSetVP.hoveredFilter = index;
+    this.setState({uSettingsP: uSetVP})
+  }
+  handleDropdownChange=(evt, { name, value, index })=>{
+    const uSelVP = [...this.state[name]]
+    uSelVP[index] = {
+          key: value,
+          text: value,
+          value: value
+        };
+    this.setState({
+      [name]: uSelVP,
+      reloadPlot: true
+    },function(){this.updateQueryDataP()});
+  }
+  handleInputChange=(evt, { name, value, index })=>{
+    const uSelVP = [...this.state[name]]
+    uSelVP[index] = parseFloat(value);
+    this.setState({
+      [name]: uSelVP,
+      reloadPlot: true
+    },function(){this.updateQueryDataP()});
+  }
+  handleSetChange=({mustP, notP})=>{
+    const uSettingsVP = this.state.uSettingsP;
+    uSettingsVP.mustP = mustP;
+    uSettingsVP.notP = notP;
+    this.setState({
+      uSettingsP: uSettingsVP,
+      reloadPlot:false
+    },function(){this.updateQueryDataP()});
+  }
+
+  updateQueryDataP = () => {
+    const eSigVP = this.state.sigValueP;
+    const eMustP = this.state.uSettingsP.mustP;
+    const eNotP = this.state.uSettingsP.notP;
+    const eOperatorP = this.state.selectedOperatorP;
+    const eColP = this.state.selectedColP;
+
+    if (this.state.reloadPlot === true) {
       this.props.onDisablePlot();
       this.getMultisetPlot(
         eSigVP,
         this.props.pepplotModel,
         this.props.pepplotStudy + 'plots',
-        eOperatorP,
-        eColP
+        this.jsonToList(eOperatorP),
+        this.jsonToList(eColP)
       );
     }
     phosphoprotService
       .getMultisetInferenceData(
         this.props.pepplotModel,
-        mustPString,
-        notPString,
+        eMustP,
+        eNotP,
         this.props.pepplotStudy + 'plots',
         eSigVP,
         this.props.pepplotTest,
-        eOperatorP.text,
-        eColP.text
+        this.jsonToList(eOperatorP),
+        this.jsonToList(eColP)
       )
       .then(inferenceData => {
         const multisetResultsP = inferenceData;
@@ -442,21 +505,12 @@ class PepplotSearchCriteria extends Component {
       });
   };
 
-  testToString(solution) {
-    var str = '';
-    if (solution !== undefined) {
-      if (solution.length === 0) {
-        return str;
-      }
-      for (var i = 0; i < solution.length; i++) {
-        if (i === solution.length - 1) {
-          str += solution[i] + '';
-        } else {
-          str += solution[i] + ';';
-        }
-      }
-      return str;
-    } else return str;
+  jsonToList(json){
+    var valueList = [];
+    for(var i=0;i<json.length;i++){
+      valueList.push(json[i].value);
+    }
+    return valueList;
   }
 
   getMultisetPlot(sigVal, pepplotModel, pepplotStudy, eOperatorP, eColP) {
@@ -465,10 +519,10 @@ class PepplotSearchCriteria extends Component {
     phosphoprotService
       .getInferenceMultisetPlot(
         sigVal,
-        pepplotModel,
-        pepplotStudy,
         eOperatorP,
-        eColP
+        eColP,
+        pepplotModel,
+        pepplotStudy
       )
       .then(svgMarkupObj => {
         let svgMarkup = svgMarkupObj.data;
@@ -589,7 +643,12 @@ class PepplotSearchCriteria extends Component {
         <PepplotMultisetFilters
           {...this.props}
           {...this.state}
-          onUpdateQueryDataP={this.updateQueryDataP}
+          onHandleDropdownChange={this.handleDropdownChange}
+          onHandleInputChange={this.handleInputChange}
+          onHandleSetChange={this.handleSetChange}
+          onAddFilter={this.addFilter}
+          onRemoveFilter={this.removeFilter}
+          onChangeHoveredFilter={this.changeHoveredFilter}
         />
       );
     }
