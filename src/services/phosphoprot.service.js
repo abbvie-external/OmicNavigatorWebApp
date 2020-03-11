@@ -269,7 +269,7 @@ class PhosphoprotService {
     return dataFromPromise;
   }
 
-  async getInferenceMultisetPlot(sigVal, testCategory, study, errorCb) {
+  async getInferenceMultisetPlot(sigVal,operator, column, testCategory, study, errorCb) {
     this.setUrl();
     const handleError =
       errorCb ||
@@ -281,7 +281,9 @@ class PhosphoprotService {
       {
         sigValue: sigVal,
         testCategory: testCategory,
-        study: study
+        study: study,
+        operator: operator,
+        column: column
       },
       handleError
     );

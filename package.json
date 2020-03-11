@@ -13,7 +13,7 @@
     "file-saver": "^2.0.2",
     "husky": "^3.0.3",
     "jquery": "^3.4.1",
-    "jspdf": "^1.5.3",
+    "jspdf": "^1.5.2",
     "lint-staged": "^9.2.1",
     "lodash": "^4.17.15",
     "moment": "^2.24.0",

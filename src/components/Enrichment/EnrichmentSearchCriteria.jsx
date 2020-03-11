@@ -44,17 +44,17 @@ class EnrichmentSearchCriteria extends Component {
     enrichmentModelsDisabled: true,
     enrichmentAnnotationsDisabled: true,
     uAnchor: '',
-    selectedCol: {
+    selectedCol: [{
       key: 'adj_P_Val',
       text: 'Adjusted P Value',
       value: 'adj_P_Val'
-    },
-    selectedOperator: {
+    }],
+    selectedOperator: [{
       key: '<',
       text: '<',
       value: '<'
-    },
-    sigValue: 0.05,
+    }],
+    sigValue: [0.05],
     uSettings: {
       defaultSelectedCol: {
         key: 'adj_P_Val',
@@ -68,6 +68,8 @@ class EnrichmentSearchCriteria extends Component {
       },
       defaultSigValue: 0.05,
       useAnchor: false,
+      hoveredFilter:-1,
+      indexFilters: [0],
       must: [],
       not: [],
       displayMetaData: true,
@@ -76,10 +78,10 @@ class EnrichmentSearchCriteria extends Component {
       maxElements: undefined,
       metaSvg: '',
       heightScalar: 1,
-      thresholdCols: [
+      thresholdColsP: [
         {
           key: 'adj_P_Val',
-          text: 'Adjusted P Value',
+          text: 'adj_P_Val',
           value: 'adj_P_Val'
         }
       ],
@@ -93,16 +95,6 @@ class EnrichmentSearchCriteria extends Component {
           key: '>',
           text: '>',
           value: '>'
-        },
-        {
-          key: '|<|',
-          text: '|<|',
-          value: '|<|'
-        },
-        {
-          key: '|>|',
-          text: '|>|',
-          value: '|>|'
         }
       ]
     },
@@ -292,7 +284,7 @@ class EnrichmentSearchCriteria extends Component {
             defaultSigValue: 0.05,
             maxElements: dataFromService.length
           },
-          sigValue: 0.05
+          sigValue: [0.05]
         });
         this.annotationdata = dataFromService;
         this.props.onEnrichmentSearch({
@@ -305,6 +297,7 @@ class EnrichmentSearchCriteria extends Component {
     this.props.onSearchTransition(true);
     this.props.onPValueTypeChange(value);
 
+    if(!this.state.multisetFiltersVisible){
     phosphoprotService
       .getAnnotationData(
         this.props.enrichmentModel,
@@ -329,6 +322,9 @@ class EnrichmentSearchCriteria extends Component {
           enrichmentResults: this.annotationdata
         });
       });
+    }else{
+      this.updateQueryData();
+    }
 
     //     if (this.state.activateMultisetFilters) {
     // call getMultisetEnrichmentData include nominal vs adjusted
@@ -387,37 +383,86 @@ class EnrichmentSearchCriteria extends Component {
         });
       });
   };
-
-  updateQueryData = evt => {
-    this.props.onDisablePlot();
-    const eSigV = evt.sigValue || this.state.sigValue;
-    const eMust = evt.must || this.state.uSettings.must;
-    const eNot = evt.not || this.state.uSettings.not;
-    const eOperator = evt.selectedOperator || this.state.selectedOperator;
-    const eCol = evt.selectedCol || this.state.selectedCol;
-    let mustString = this.testToString(eMust);
-    let notString = this.testToString(eNot);
+  addFilter =()=> {
+    const uSetVP = {...this.state.uSettings}
+    uSetVP.indexFilters = [...this.state.uSettings.indexFilters].concat(this.state.uSettings.indexFilters.length)
     this.setState({
-      sigValue: eSigV,
-      selectedOperator: eOperator,
-      selectedCol: eCol
+      selectedCol: [...this.state.selectedCol].concat(this.state.uSettings.defaultSelectedCol),
+      selectedOperator: [...this.state.selectedOperator].concat(this.state.uSettings.defaultSelectedOperator),
+      sigValue: [...this.state.sigValue].concat(this.state.uSettings.defaultSigValue),
+      uSettings: uSetVP
     });
+  }
+  removeFilter=(index)=>{
+    const uSetVP = {...this.state.uSettings}
+    uSetVP.indexFilters = [...uSetVP.indexFilters].slice(0,index).concat([...uSetVP.indexFilters].slice(index+1));
+    for(var i = index; i < uSetVP.indexFilters.length; i++){uSetVP.indexFilters[i]--}
+    this.setState({
+      selectedCol: [...this.state.selectedCol].slice(0,index).concat([...this.state.selectedCol].slice(index+1)),
+      selectedOperator: [...this.state.selectedOperator].slice(0,index).concat([...this.state.selectedOperator].slice(index+1)),
+      sigValue: [...this.state.sigValue].slice(0,index).concat([...this.state.sigValue].slice(index+1)),
+      uSettings: uSetVP
+    });
+  }
+  changeHoveredFilter=(index)=>{
+    const uSetVP = {...this.state.uSettings}
+    uSetVP.hoveredFilter = index;
+    this.setState({uSettings: uSetVP})
+  }
+  handleDropdownChange=(evt, { name, value, index })=>{
+    const uSelVP = [...this.state[name]]
+    uSelVP[index] = {
+          key: value,
+          text: value,
+          value: value
+        };
+    this.setState({
+      [name]: uSelVP,
+      reloadPlot: true
+    },function(){this.updateQueryData()});
+  }
+  handleInputChange=(evt, { name, value, index })=>{
+    const uSelVP = [...this.state[name]]
+    uSelVP[index] = parseFloat(value);
+    this.setState({
+      [name]: uSelVP,
+      reloadPlot: true
+    },function(){this.updateQueryData()});
+  }
+  handleSetChange=({must, not})=>{
+    const uSettingsVP = this.state.uSettings;
+    uSettingsVP.must = must;
+    uSettingsVP.not = not;
+    this.setState({
+      uSettings: uSettingsVP,
+      reloadPlot:false
+    },function(){this.updateQueryData()});
+  }
+
+  updateQueryData = () => {
+    this.props.onDisablePlot();
+    const eSigV = this.state.sigValue;
+    const eMust = this.state.uSettings.must;
+    const eNot = this.state.uSettings.not;
+    const eOperator = this.state.selectedOperator;
+    console.log(this.props.pValueType)
+    
     this.getMultisetPlot(
       eSigV,
       this.props.enrichmentModel,
       this.props.enrichmentStudy + 'plots',
       this.props.enrichmentAnnotation,
-      eOperator
+      this.jsonToList(eOperator)
     );
     phosphoprotService
       .getMultisetEnrichmentData(
         this.props.enrichmentModel,
-        mustString,
-        notString,
+        eMust,
+        eNot,
         this.props.enrichmentStudy + 'plots',
         eSigV,
         this.props.enrichmentAnnotation,
-        eOperator.value
+        this.jsonToList(eOperator)
       )
       .then(annotationData => {
         const multisetResults = annotationData;
@@ -436,22 +481,12 @@ class EnrichmentSearchCriteria extends Component {
         });
       });
   };
-
-  testToString(solution) {
-    var str = '';
-    if (solution !== undefined) {
-      if (solution.length === 0) {
-        return str;
-      }
-      for (var i = 0; i < solution.length; i++) {
-        if (i === solution.length - 1) {
-          str += solution[i] + '';
-        } else {
-          str += solution[i] + ';';
-        }
-      }
-      return str;
-    } else return str;
+  jsonToList(json){
+    var valueList = [];
+    for(var i=0;i<json.length;i++){
+      valueList.push(json[i].value);
+    }
+    return valueList;
   }
 
   getMultisetPlot(
@@ -469,7 +504,7 @@ class EnrichmentSearchCriteria extends Component {
         enrichmentModel,
         enrichmentStudy,
         enrichmentAnnotation,
-        eOperator.value
+        eOperator
       )
       .then(svgMarkupObj => {
         let svgMarkup = svgMarkupObj.data;
@@ -595,7 +630,12 @@ class EnrichmentSearchCriteria extends Component {
         <EnrichmentMultisetFilters
           {...this.props}
           {...this.state}
-          onUpdateQueryData={this.updateQueryData}
+          onHandleDropdownChange={this.handleDropdownChange}
+          onHandleInputChange={this.handleInputChange}
+          onHandleSetChange={this.handleSetChange}
+          onAddFilter={this.addFilter}
+          onRemoveFilter={this.removeFilter}
+          onChangeHoveredFilter={this.changeHoveredFilter}
         />
       );
     }
