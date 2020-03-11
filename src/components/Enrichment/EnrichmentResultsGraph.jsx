@@ -365,6 +365,7 @@ class EnrichmentResultsGraph extends Component {
               widescreen={3}
             >
               <Search
+                // size="small"
                 // className="NetworkSearchResultsContainer"
                 placeholder="Search Network"
                 onResultSelect={this.handleResultSelect}
@@ -374,8 +375,8 @@ class EnrichmentResultsGraph extends Component {
                 resultRenderer={resultRenderer}
                 {...this.props}
               />
-              <br></br>
               <Radio
+                className="RadioLabelsDisplay"
                 toggle
                 label="Show Labels"
                 checked={this.state.showNetworkLabels}
@@ -423,6 +424,7 @@ class EnrichmentResultsGraph extends Component {
               widescreen={3}
             >
               <Input
+                size="small"
                 type="number"
                 step="0.05"
                 min="0"
@@ -459,6 +461,7 @@ class EnrichmentResultsGraph extends Component {
               widescreen={3}
             >
               <Input
+                size="small"
                 type="number"
                 step="0.025"
                 min="0.050"

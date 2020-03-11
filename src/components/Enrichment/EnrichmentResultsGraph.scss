@@ -81,8 +81,19 @@
   width: 75%;
 }
 
+.RadioLabelsDisplay {
+  margin-top: 10px;
+  margin-left: 30px;
+}
+
 .NetworkSliderInput {
   margin: 0px 10px 10px 25px !important;
+}
+
+@media (max-width: 1600px) {
+  .NetworkSliderInput {
+    margin: 0px 10px 10px 0px !important;
+  }
 }
 
 #LegendIcon {

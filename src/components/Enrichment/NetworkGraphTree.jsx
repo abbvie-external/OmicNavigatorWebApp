@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import _ from 'lodash';
 import * as d3 from 'd3';
 import './NetworkGraph.scss';
+// import LoaderActivePlots from '../Transitions/LoaderActivePlots';
 import { networkByCluster } from '../Shared/helpers';
 
 export default class NetworkGraph extends Component {
@@ -29,6 +30,7 @@ export default class NetworkGraph extends Component {
   // }
 
   state = {
+    networkGraphLoading: true,
     dataCombined: [],
     networkWidth: 0,
     networkContainerWidth: 0,
@@ -129,6 +131,9 @@ export default class NetworkGraph extends Component {
   };
 
   setDimensions = () => {
+    this.setState({
+      networkGraphLoading: true
+    });
     d3.select(`#svg-${this.state.chartSettings.id}`).remove();
     const { chartSettings } = this.state;
     console.log(
@@ -768,17 +773,37 @@ export default class NetworkGraph extends Component {
         d.fy = d3.event.y;
       }
     });
+    this.setState({
+      networkGraphLoading: false
+    });
   };
 
-  render() {
-    const { chartSettings } = this.state;
+  // getOverlay = loading => {
+  //   if (loading) {
+  //     return (
+  //       <div>
+  //         <LoaderActivePlots />
+  //       </div>
+  //     );
+  //   }
+  // };
 
+  render() {
+    const {
+      chartSettings
+      // networkGraphLoading
+    } = this.state;
+    debugger;
+    // let overlay = this.getOverlay(networkGraphLoading);
     return (
-      <div
-        ref={this.networkContainerRef}
-        id={chartSettings.id}
-        className="NetworkChartContainer"
-      ></div>
+      <>
+        {/* {overlay} */}
+        <div
+          ref={this.networkContainerRef}
+          id={chartSettings.id}
+          className="NetworkChartContainer"
+        ></div>
+      </>
     );
   }
 }
