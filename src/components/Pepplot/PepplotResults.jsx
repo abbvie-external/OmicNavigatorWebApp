@@ -47,7 +47,7 @@ class PepplotResults extends Component {
     pepplotRows: this.props.pepplotResults.length || 1000
   };
   pepplotGridRef = React.createRef();
-  PepplotViewContainerRef = React.createRef();
+  // PepplotViewContainerRef = React.createRef();
 
   componentDidMount() {
     const ProteinSite = this.props.pepplotProteinSite || '';
@@ -271,13 +271,13 @@ class PepplotResults extends Component {
     let currentSVGs = [];
     // keep whatever dimension is less (height or width)
     // then multiply the other dimension by original svg ratio (height 595px, width 841px)
-    let PepplotPlotSVGHeight = this.calculateHeight(this);
+    // let PepplotPlotSVGHeight = this.calculateHeight(this);
     let PepplotPlotSVGWidth = this.calculateWidth(this);
-    if (PepplotPlotSVGHeight + 60 > PepplotPlotSVGWidth) {
-      PepplotPlotSVGHeight = PepplotPlotSVGWidth * 0.70749;
-    } else {
-      PepplotPlotSVGWidth = PepplotPlotSVGHeight * 1.41344;
-    }
+    // if (PepplotPlotSVGHeight > PepplotPlotSVGWidth) {
+    let PepplotPlotSVGHeight = PepplotPlotSVGWidth * 0.70749;
+    // } else {
+    //   PepplotPlotSVGWidth = PepplotPlotSVGHeight * 1.41344;
+    // }
     let handleProteinSelectedCb = this.handleProteinSelected;
 
     _.forEach(plotType, function(plot, i) {
@@ -335,35 +335,38 @@ class PepplotResults extends Component {
   //     document.documentElement.clientHeight,
   //     window.innerHeight || 0
   //   );
-  //   return h;
+  //   // 90 for top menu and header
+  //   return h - 90;
   // }
 
-  // calculateWidth() {
-  //   var w = Math.max(
-  //     document.documentElement.clientWidth,
-  //     window.innerWidth || 0
-  //   );
-  //   return w;
+  calculateWidth() {
+    var w = Math.max(
+      document.documentElement.clientWidth,
+      window.innerWidth || 0
+    );
+    if (w > 1199) {
+      return w * 0.5;
+    } else if (w < 1200 && w > 767) {
+      return w * 0.4;
+    } else return w * 0.8;
+  }
+
+  // calculateHeight(self) {
+  //   debugger;
+  //   let containerHeight =
+  //     self.PepplotViewContainerRef.current !== null
+  //       ? self.PepplotViewContainerRef.current.parentElement.offsetHeight
+  //       : document.documentElement.clientHeight * .95;
+  //   return containerHeight;
   // }
 
-  calculateHeight(self) {
-    let containerHeight =
-      self.PepplotViewContainerRef.current !== null
-        ? self.PepplotViewContainerRef.current.parentElement.offsetHeight
-        : 900;
-    // subtracting 120 due to menu and plot margin
-    return containerHeight - -120;
-  }
-
-  calculateWidth(self) {
-    let containerWidth =
-      self.PepplotViewContainerRef.current !== null
-        ? self.PepplotViewContainerRef.current.parentElement.offsetWidth
-        : 1200;
-
-    // subtracting 80 due to plot margin
-    return containerWidth - 60;
-  }
+  // calculateWidth(self) {
+  //   let containerWidth =
+  //     self.PepplotViewContainerRef.current !== null
+  //       ? self.PepplotViewContainerRef.current.parentElement.offsetWidth
+  //       : document.documentElement.clientWidth * 0.95;
+  //   return containerWidth;
+  //}
 
   getTableHelpers = (
     getProteinDataCb,
@@ -498,8 +501,9 @@ class PepplotResults extends Component {
       );
     } else {
       return (
-        <div ref={this.PepplotViewContainerRef}>
+        <div>
           <PepplotPlot
+            // ref={this.PepplotViewContainerRef}
             {...this.props}
             {...this.state}
             onBackToTable={this.backToTable}

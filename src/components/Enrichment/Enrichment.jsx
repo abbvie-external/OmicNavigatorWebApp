@@ -1,35 +1,36 @@
-import React, { Component, Fragment } from 'react';
-import { Grid, Popup, Sidebar, Menu, Icon, Tab } from 'semantic-ui-react';
-import { withRouter } from 'react-router-dom';
 import DOMPurify from 'dompurify';
-import EnrichmentSearchCriteria from './EnrichmentSearchCriteria';
-import EnrichmentResultsGraph from './EnrichmentResultsGraph';
-import EnrichmentResultsTable from './EnrichmentResultsTable';
-import TransitionActive from '../Transitions/TransitionActive';
-import TransitionStill from '../Transitions/TransitionStill';
-import SplitPanesContainer from './SplitPanesContainer';
-import SearchingAlt from '../Transitions/SearchingAlt';
-import ButtonActions from '../Shared/ButtonActions';
-import networkDataNew from '../../services/networkDataNew.json';
-import networkDataMock from '../../services/networkDataMock.json';
-import tableIcon from '../../resources/tableIcon.png';
-import tableIconSelected from '../../resources/tableIconSelected.png';
+import _ from 'lodash';
+import React, { Component } from 'react';
+import { withRouter } from 'react-router-dom';
+import { Grid, Menu, Popup, Sidebar, Tab } from 'semantic-ui-react';
+import { CancelToken } from 'axios';
+import go_icon from '../../resources/go.png';
+import msig_icon from '../../resources/msig.ico';
 import networkIcon from '../../resources/networkIcon.png';
 import networkIconSelected from '../../resources/networkIconSelected.png';
+import phosphosite_icon from '../../resources/phosphosite.ico';
+import reactome_icon from '../../resources/reactome.jpg';
+import tableIcon from '../../resources/tableIcon.png';
+import tableIconSelected from '../../resources/tableIconSelected.png';
+import networkDataNew from '../../services/networkDataNew.json';
+import { phosphoprotService } from '../../services/phosphoprot.service';
+import ButtonActions from '../Shared/ButtonActions';
 import {
   formatNumberForDisplay,
   splitValue
   // getIconInfo
 } from '../Shared/helpers';
-import _ from 'lodash';
-import './Enrichment.scss';
 import '../Shared/Table.scss';
-import msig_icon from '../../resources/msig.ico';
-import phosphosite_icon from '../../resources/phosphosite.ico';
-import reactome_icon from '../../resources/reactome.jpg';
-import go_icon from '../../resources/go.png';
-import { phosphoprotService } from '../../services/phosphoprot.service';
+import SearchingAlt from '../Transitions/SearchingAlt';
+import TransitionActive from '../Transitions/TransitionActive';
+import TransitionStill from '../Transitions/TransitionStill';
+import './Enrichment.scss';
+import EnrichmentResultsGraph from './EnrichmentResultsGraph';
+import EnrichmentResultsTable from './EnrichmentResultsTable';
+import EnrichmentSearchCriteria from './EnrichmentSearchCriteria';
+import SplitPanesContainer from './SplitPanesContainer';
 
+let plotCancel = () => {};
 class Enrichment extends Component {
   state = {
     isValidSearchEnrichment: false,
@@ -730,55 +731,54 @@ class Enrichment extends Component {
     const { enrichmentStudy, enrichmentModel } = this.props;
     // let self = this;
     // if (this.state.barcodeSettings.barcodeData > 0) {
-    if (info !== undefined && info !== null) {
-      if (this.state.barcodeSettings.barcodeData) {
-        if (this.state.barcodeSettings.barcodeData.length > 0) {
-          this.setState({
-            SVGPlotLoaded: false,
-            SVGPlotLoading: true
-          });
-          const dataItem = this.state.barcodeSettings.barcodeData.find(
-            i => i.lineID === info.lineID
-          );
-          let id = dataItem.id_mult ? dataItem.id_mult : dataItem.id;
-          // var psp = document.getElementById('psp-icon');
-          // psp.style.visibility = "hidden";
-          // psp.style.left = w.toString() + "px";
-          // psp.style.bottom = h.toString() + "px";
-          let plotType = ['splineplot'];
-          switch (enrichmentModel) {
-            case 'DonorDifferentialPhosphorylation':
-              plotType = ['dotplot'];
-              break;
-            case 'Treatment and or Strain Differential Phosphorylation':
-              plotType = ['StrainStimDotplot', 'StimStrainDotplot'];
-              break;
-            case 'Timecourse Differential Phosphorylation':
-              plotType = ['lineplot', 'splineplot'];
-              break;
-            case 'Differential Expression':
-              plotType = ['proteindotplot'];
-              break;
-            case 'Differential Phosphorylation':
-              plotType = ['phosphodotplot'];
-              break;
-            case 'No Pretreatment Timecourse Differential Phosphorylation':
-              plotType = ['lineplot.modelII', 'splineplot.modelII'];
-              break;
-            case 'Ferrostatin Pretreatment Timecourse Differential Phosphorylation':
-              plotType = ['lineplot.modelIII', 'splineplot.modelIII'];
-              break;
-            default:
-              plotType = ['dotplot'];
-          }
-          let imageInfo = { key: '', title: '', svg: [] };
-          imageInfo.title = this.state.imageInfo.title;
-          imageInfo.key = this.state.imageInfo.key;
-          const handleSVGCb = this.handleSVG;
-          this.getPlot(id, plotType, enrichmentStudy, imageInfo, handleSVGCb);
+    if (info != null) {
+      if (this.state.barcodeSettings.barcodeData?.length > 0) {
+        this.setState({
+          SVGPlotLoaded: false,
+          SVGPlotLoading: true
+        });
+        const dataItem = this.state.barcodeSettings.barcodeData.find(
+          i => i.lineID === info.lineID
+        );
+        let id = dataItem.id_mult ? dataItem.id_mult : dataItem.id;
+        // var psp = document.getElementById('psp-icon');
+        // psp.style.visibility = "hidden";
+        // psp.style.left = w.toString() + "px";
+        // psp.style.bottom = h.toString() + "px";
+        let plotType = ['splineplot'];
+        switch (enrichmentModel) {
+          case 'DonorDifferentialPhosphorylation':
+            plotType = ['dotplot'];
+            break;
+          case 'Treatment and or Strain Differential Phosphorylation':
+            plotType = ['StrainStimDotplot', 'StimStrainDotplot'];
+            break;
+          case 'Timecourse Differential Phosphorylation':
+            plotType = ['lineplot', 'splineplot'];
+            break;
+          case 'Differential Expression':
+            plotType = ['proteindotplot'];
+            break;
+          case 'Differential Phosphorylation':
+            plotType = ['phosphodotplot'];
+            break;
+          case 'No Pretreatment Timecourse Differential Phosphorylation':
+            plotType = ['lineplot.modelII', 'splineplot.modelII'];
+            break;
+          case 'Ferrostatin Pretreatment Timecourse Differential Phosphorylation':
+            plotType = ['lineplot.modelIII', 'splineplot.modelIII'];
+            break;
+          default:
+            plotType = ['dotplot'];
         }
+        let imageInfo = { key: '', title: '', svg: [] };
+        imageInfo.title = this.state.imageInfo.title;
+        imageInfo.key = this.state.imageInfo.key;
+        const handleSVGCb = this.handleSVG;
+        this.getPlot(id, plotType, enrichmentStudy, imageInfo, handleSVGCb);
       }
     } else {
+      plotCancel();
       this.setState({
         SVGPlotLoaded: false,
         SVGPlotLoading: false
@@ -801,10 +801,20 @@ class Enrichment extends Component {
     } else {
       EnrichmentPlotSVGWidth = EnrichmentPlotSVGHeight * 1.41344;
     }
+    plotCancel();
+    let cancelToken = new CancelToken(e => {
+      plotCancel = e;
+    });
 
     _.forEach(plotType, function(plot, i) {
       phosphoprotService
-        .getPlot(id, plotType[i], enrichmentStudy + 'plots')
+        .getPlot(
+          id,
+          plotType[i],
+          enrichmentStudy + 'plots',
+          undefined,
+          cancelToken
+        )
         .then(svgMarkupObj => {
           let svgMarkup = svgMarkupObj.data;
           svgMarkup = svgMarkup.replace(/id="/g, 'id="' + id + '-' + i + '-');

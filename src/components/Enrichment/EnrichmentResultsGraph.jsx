@@ -165,11 +165,11 @@ class EnrichmentResultsGraph extends Component {
       });
     }
     networkSearchValue = networkSearchValue.toLowerCase();
-    const re = new RegExp(_.escapeRegExp(networkSearchValue), 'i');
-    const isMatch = result => re.test(result.description);
 
     this.setState({
-      results: _.filter(this.state.descriptions, isMatch),
+      results: this.state.descriptions.filter(result =>
+        result.description.toLowerCase().includes(networkSearchValue)
+      ),
       networkSearchValue
     });
   }, 500);
@@ -390,7 +390,7 @@ class EnrichmentResultsGraph extends Component {
               largeScreen={3}
               widescreen={3}
             >
-              <label>Sort By: </label>
+              <label className="sortByLabel">Sort By </label>
               <Button.Group className="PValueTypeContainer" size="small">
                 <Button
                   type="button"

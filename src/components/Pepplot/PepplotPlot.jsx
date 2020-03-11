@@ -55,7 +55,7 @@ class PepplotPlot extends Component {
               <Grid.Column
                 className="PepplotAccordionContainer"
                 mobile={16}
-                tablet={16}
+                tablet={4}
                 largeScreen={4}
                 widescreen={3}
               >
@@ -63,7 +63,7 @@ class PepplotPlot extends Component {
               </Grid.Column>
               <Grid.Column
                 mobile={16}
-                tablet={16}
+                tablet={11}
                 largeScreen={12}
                 widescreen={13}
               >

@@ -5,7 +5,7 @@ import networkDataOld from './networkDataOld.json';
 import networkDataNew from './networkDataNew.json';
 window.jQuery = $;
 const ocpu = require('opencpu.js/opencpu-0.5.js');
-
+let getPlotCancel = () => {};
 class PhosphoprotService {
   constructor() {
     this.ocpuUrl = 'http://10.239.9.49/ocpu/library/PhosphoProt/R';
@@ -132,13 +132,14 @@ class PhosphoprotService {
     return proteinDataFromPromise;
   }
 
-  async ocpuPlotCall(plottype, obj, handleError) {
+  async ocpuPlotCall(plottype, obj, handleError, cancelToken) {
     return new Promise(function(resolve, reject) {
       window.ocpu
         .call(plottype, obj, function(session) {
           axios
             .get(session.getLoc() + 'graphics/1/svg', {
-              responseType: 'text'
+              responseType: 'text',
+              cancelToken
             })
             .then(response => resolve(response));
         })
@@ -152,7 +153,8 @@ class PhosphoprotService {
     });
   }
 
-  async getPlot(id, plottype, study, proteinSelectedError) {
+  async getPlot(id, plottype, study, proteinSelectedError, cancelToken) {
+    // getPlotCancel();
     this.setUrl();
     const handleError =
       proteinSelectedError ||
@@ -162,10 +164,11 @@ class PhosphoprotService {
     const promise = this.ocpuPlotCall(
       plottype,
       { idmult: id, study: study },
-      handleError
+      handleError,
+      cancelToken
     );
-    const svgMarkupFromPromise = await promise;
-    return svgMarkupFromPromise;
+    //const svgMarkupFromPromise = await promise;
+    return promise;
   }
 
   async getDatabaseInfo(study, test) {

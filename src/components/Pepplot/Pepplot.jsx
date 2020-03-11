@@ -105,7 +105,7 @@ class Pepplot extends Component {
     this.setState(prevState => ({
       animation,
       visible: !prevState.visible,
-      plotButtonActive: !this.state.plotButtonActive
+      plotButtonActive: !prevState.plotButtonActive
     }));
   };
 
