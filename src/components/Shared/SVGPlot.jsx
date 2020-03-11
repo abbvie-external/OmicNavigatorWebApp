@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Loader, Dimmer, Tab, Popup, Icon } from 'semantic-ui-react';
+import * as d3 from 'd3';
 import './SVGPlot.scss';
 
 class SVGPlot extends Component {
@@ -45,6 +46,7 @@ class SVGPlot extends Component {
     // };
     if (this.props.imageInfo) {
       const svgArray = this.props.imageInfo.svg;
+      // const svgArrayReversed = svgArray.reverse();
       const panes = svgArray.map(s => {
         return {
           menuItem: `${s.plotType}`,

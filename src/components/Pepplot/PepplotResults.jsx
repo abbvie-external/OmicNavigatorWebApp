@@ -308,12 +308,13 @@ class PepplotResults extends Component {
             }
           });
           // Clean HTML string and write into our DIV
-          let sanitizedSVG = DOMPurify.sanitize(svgMarkup, {
-            ADD_TAGS: ['use']
-          });
-          let svgInfo = { plotType: plotType[i], svg: sanitizedSVG };
+          // let sanitizedSVG = DOMPurify.sanitize(svgMarkup, {
+          //   ADD_TAGS: ['use']
+          // });
+
+          let svgInfo = { plotType: plotType[i], svg: svgMarkup };
           imageInfo.svg.push(svgInfo);
-          currentSVGs.push(sanitizedSVG);
+          currentSVGs.push(svgMarkup);
           handleSVGCb(imageInfo);
         });
       // .catch(error => {

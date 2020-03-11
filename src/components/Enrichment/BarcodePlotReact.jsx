@@ -47,8 +47,7 @@ class BarcodePlotReact extends Component {
 
   componentDidUpdate(prevProps, prevState, snapshot) {
     if (
-      this.props.horizontalSplitPaneHeight !==
-      prevProps.horizontalSplitPaneHeight
+      this.props.horizontalSplitPaneSize !== prevProps.horizontalSplitPaneSize
     ) {
       this.setWidth();
     }
@@ -319,13 +318,13 @@ class BarcodePlotReact extends Component {
     } = this.state;
 
     const {
-      horizontalSplitPaneHeight,
+      horizontalSplitPaneSize,
       barcodeSettings
       // violinDotSelected
     } = this.props;
 
     const barcodeHeight =
-      horizontalSplitPaneHeight - settings.margin.top - settings.margin.bottom;
+      horizontalSplitPaneSize - settings.margin.top - settings.margin.bottom;
     // const yScale = d3
     //   .scaleLinear()
     //   .domain([0, barcodeHeight])
@@ -395,9 +394,9 @@ class BarcodePlotReact extends Component {
           ref={this.barcodeSVGRef}
           id={`svg-${settings.id}`}
           className="barcode-chart-area bcChart barcode"
-          height={horizontalSplitPaneHeight}
+          height={horizontalSplitPaneSize}
           width={barcodeContainerWidth}
-          viewBox={`0 0 ${barcodeContainerWidth} ${horizontalSplitPaneHeight}`}
+          viewBox={`0 0 ${barcodeContainerWidth} ${horizontalSplitPaneSize}`}
           preserveAspectRatio="xMinYMin meet"
           onClick={e => this.handleSVGClick(e)}
         >

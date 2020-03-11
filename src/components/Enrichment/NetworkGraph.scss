@@ -1,0 +1,36 @@
+.NetworkChartContainer {
+  margin: 20px 15px !important;
+  width: auto !important;
+  height: 80vh !important;
+  overflow-x: scroll !important;
+  overflow-y: hidden !important;
+}
+
+.network-chart-area {
+  background-color: #e0e1e2;
+  height: 100% !important;
+  overflow-x: scroll !important;
+  width: auto !important;
+}
+
+.node-label {
+  pointer-events: none;
+}
+
+div.tooltip-pieSlice {
+  position: absolute;
+  text-align: left;
+  padding: 0.5rem;
+  background: #ffffff;
+  color: #313639;
+  border: 1px solid #313639;
+  border-radius: 8px;
+  pointer-events: none;
+  font-size: 1rem;
+  z-index: 2 !important;
+}
+
+.OntologyLink {
+  cursor: pointer !important;
+  margin-right: 15px !important;
+}

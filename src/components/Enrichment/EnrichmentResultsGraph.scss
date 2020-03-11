@@ -1,0 +1,83 @@
+.NetworkGraphContainer {
+  padding-top: 0px !important;
+
+  text {
+    font-family: sans-serif;
+    font-size: 10px;
+  }
+}
+
+.network-chart-wrapper {
+  border-width: thin;
+  border-radius: 3px;
+  display: -webkit-flex; /* Safari */
+  display: flex; /* Standard syntax */
+}
+
+// .ui.search {
+//   position: initial;
+// }
+.ui.search > .results {
+  max-height: 75vh !important;
+  overflow-y: scroll !important;
+  // overflow-x: inherit;
+  // direction: rtl !important;
+}
+
+.semantic_ui_range_inner div:nth-of-type(2) {
+  background-color: var(--color-primary) !important;
+}
+
+// .GenesCircle {
+//   z-index: 1111111 !important;
+// }
+
+.controlBox {
+  background-color: #f7f7ee;
+  /* position: absolute; */
+  margin: 5px 5px 5px 5px;
+  width: 1%;
+  border-style: solid;
+  border-color: black;
+  border-width: thin;
+  border-radius: 3px;
+  -moz-box-shadow-bottom: 4px 4px 4px;
+  -webkit-box-shadow-bottom: 4px 4px 4px grey;
+  box-shadow: 4px 4px 4px grey;
+  -webkit-flex: 1; /* Safari */
+  -ms-flex: 1; /* IE 10 */
+  flex: 0.15; /* Standard syntax */
+}
+
+#chart-network {
+  background-color: #f7f7ee;
+  margin: 5px 5px 5px 5px;
+  width: 15%;
+  border-style: solid;
+  border-color: black;
+  border-width: thin;
+  border-radius: 3px;
+  -moz-box-shadow-bottom: 4px 4px 4px grey;
+  -webkit-box-shadow-bottom: 4px 4px 4px grey;
+  box-shadow: 4px 4px 4px grey;
+  flex: 0.85;
+}
+
+.networkSearch {
+  margin: 5px 5px 5px 5px;
+  border-radius: 3px;
+  outline-width: 1px;
+  outline-color: 'blue';
+  font-family: 'Roboto', sans-serif;
+  width: 75%;
+}
+
+.EdgeValueInput {
+  margin: 0px 10px 10px 25px !important;
+}
+
+#LegendIcon {
+  float: right;
+  width: 60px;
+  height: 60px;
+}

@@ -27,7 +27,7 @@ class PepplotSearchCriteria extends Component {
     uAnchorP: '',
     selectedColP: [{
       key: 'adj_P_Val',
-      text: 'adj_P_Val',
+      text: 'Adjusted P Value',
       value: 'adj_P_Val'
     }],
     selectedOperatorP: [{
@@ -40,7 +40,7 @@ class PepplotSearchCriteria extends Component {
     uSettingsP: {
       defaultselectedColP: {
         key: 'adj_P_Val',
-        text: 'adj_P_Val',
+        text: 'Adjusted P',
         value: 'adj_P_Val'
       },
       defaultselectedOperatorP: {
@@ -404,6 +404,7 @@ class PepplotSearchCriteria extends Component {
   addFilter =()=> {
     const uSetVP = {...this.state.uSettingsP}
     uSetVP.indexFiltersP = [...this.state.uSettingsP.indexFiltersP].concat(this.state.uSettingsP.indexFiltersP.length)
+
     this.setState({
       selectedColP: [...this.state.selectedColP].concat(this.state.uSettingsP.defaultselectedColP),
       selectedOperatorP: [...this.state.selectedOperatorP].concat(this.state.uSettingsP.defaultselectedOperatorP),
@@ -691,25 +692,39 @@ class PepplotSearchCriteria extends Component {
         <Form className="SearchCriteriaContainer">
           <Form.Field
             control={Select}
-            label="Study"
             name="pepplotStudy"
             value={pepplotStudy}
             options={pepplotStudies}
             placeholder="Select A Study"
             onChange={this.handleStudyChange}
             disabled={pepplotStudiesDisabled}
+            label={{
+              children: 'Study',
+              htmlFor: 'form-select-control-pstudy'
+            }}
+            search
+            searchInput={{ id: 'form-select-control-pstudy' }}
             width={13}
+            selectOnBlur={false}
+            selectOnNavigation={false}
           />
           <span className="StudyHtmlIconDivP">{studyIcon}</span>
           <Form.Field
             control={Select}
-            label="Model"
             name="pepplotModel"
             value={pepplotModel}
             options={pepplotModels}
             placeholder="Select Model"
             onChange={this.handleModelChange}
             disabled={pepplotModelsDisabled}
+            label={{
+              children: 'Model',
+              htmlFor: 'form-select-control-pmodel'
+            }}
+            search
+            searchInput={{ id: 'form-select-control-pmodel' }}
+            selectOnBlur={false}
+            selectOnNavigation={false}
           />
           <Form.Field
             control={Select}
@@ -721,10 +736,12 @@ class PepplotSearchCriteria extends Component {
             disabled={pepplotTestsDisabled}
             label={{
               children: 'Test',
-              htmlFor: 'form-select-control-test'
+              htmlFor: 'form-select-control-ptest'
             }}
             search
-            searchInput={{ id: 'form-select-control-test' }}
+            searchInput={{ id: 'form-select-control-ptest' }}
+            selectOnBlur={false}
+            selectOnNavigation={false}
           />
         </Form>
         <div className="MultisetContainer">

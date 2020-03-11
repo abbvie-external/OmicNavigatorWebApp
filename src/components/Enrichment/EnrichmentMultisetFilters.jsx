@@ -73,13 +73,22 @@ class EnrichmentMultisetFilters extends Component {
         uAnchor,
         uData,
         uSettings,
+        selectedCol,
         selectedOperator,
         sigValue
       );
     }
   }
 
-  metaScript(metaSvg, uAnchor, uData, uSettings, selectedOperator, sigValue) {
+  metaScript(
+    metaSvg,
+    uAnchor,
+    uData,
+    uSettings,
+    selectedCol,
+    selectedOperator,
+    sigValue
+  ) {
     const svgWidth = 315;
     const heightScalar = 15;
     const mustData = uSettings.must;
@@ -139,7 +148,7 @@ class EnrichmentMultisetFilters extends Component {
         .attr('y', function (d, i) { return (30+heightScalar*i) })
         .text(function (d) { return d })
         .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
-        .attr('font-size', '15px')
+        .attr('font-size', '14px')
         .attr('fill', 'black');
 
         if (useAnchor) {
@@ -211,7 +220,7 @@ class EnrichmentMultisetFilters extends Component {
           })
           .text(function (d) { return d })
           .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
-          .attr('font-size', '15px')
+          .attr('font-size', '14px')
           .attr('fill', 'black');
 
         // const notTestCircles =

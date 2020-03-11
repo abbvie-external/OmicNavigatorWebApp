@@ -17,21 +17,21 @@ import _ from 'lodash';
 import EnrichmentMultisetFilters from './EnrichmentMultisetFilters';
 
 class EnrichmentSearchCriteria extends Component {
-  static defaultProps = {
-    tab: 'enrichment',
-    enrichmentStudy: '',
-    enrichmentModel: '',
-    enrichmentAnnotation: '',
-    pValueType: 'nomimal',
-    isValidSearchEnrichment: false,
-    isSearching: false,
-    multisetPlotAvailable: false,
-    animation: 'uncover',
-    direction: 'left',
-    visible: false,
-    plotButtonActive: false,
-    uData: []
-  };
+  // static defaultProps = {
+  //   tab: 'enrichment',
+  //   enrichmentStudy: '',
+  //   enrichmentModel: '',
+  //   enrichmentAnnotation: '',
+  //   pValueType: 'nomimal',
+  //   isValidSearchEnrichment: false,
+  //   isSearching: false,
+  //   multisetPlotAvailable: false,
+  //   animation: 'uncover',
+  //   direction: 'left',
+  //   visible: false,
+  //   plotButtonActive: false,
+  //   uData: []
+  // };
 
   state = {
     enrichmentStudies: [],
@@ -386,6 +386,7 @@ class EnrichmentSearchCriteria extends Component {
   addFilter =()=> {
     const uSetVP = {...this.state.uSettings}
     uSetVP.indexFilters = [...this.state.uSettings.indexFilters].concat(this.state.uSettings.indexFilters.length)
+
     this.setState({
       selectedCol: [...this.state.selectedCol].concat(this.state.uSettings.defaultSelectedCol),
       selectedOperator: [...this.state.selectedOperator].concat(this.state.uSettings.defaultSelectedOperator),
@@ -679,7 +680,6 @@ class EnrichmentSearchCriteria extends Component {
         <Form className="SearchCriteriaContainer">
           <Form.Field
             control={Select}
-            label="Study"
             name="enrichmentStudy"
             value={enrichmentStudy}
             options={enrichmentStudies}
@@ -687,17 +687,32 @@ class EnrichmentSearchCriteria extends Component {
             onChange={this.handleStudyChange}
             disabled={enrichmentStudiesDisabled}
             width={13}
+            label={{
+              children: 'Study',
+              htmlFor: 'form-select-control-estudy'
+            }}
+            search
+            searchInput={{ id: 'form-select-control-estudy' }}
+            selectOnBlur={false}
+            selectOnNavigation={false}
           />
           <span className="StudyHtmlIconDivE">{studyIcon}</span>
           <Form.Field
             control={Select}
-            label="Model"
             name="enrichmentModel"
             value={enrichmentModel}
             options={enrichmentModels}
             placeholder="Select Model"
             onChange={this.handleModelChange}
             disabled={enrichmentModelsDisabled}
+            label={{
+              children: 'Model',
+              htmlFor: 'form-select-control-emodel'
+            }}
+            search
+            searchInput={{ id: 'form-select-control-emodel' }}
+            selectOnBlur={false}
+            selectOnNavigation={false}
           />
           <Form.Field
             control={Select}
@@ -709,10 +724,12 @@ class EnrichmentSearchCriteria extends Component {
             disabled={enrichmentAnnotationsDisabled}
             label={{
               children: 'Database',
-              htmlFor: 'form-select-control-test'
+              htmlFor: 'form-select-control-edatabase'
             }}
             search
-            searchInput={{ id: 'form-select-control-test' }}
+            searchInput={{ id: 'form-select-control-edatabase' }}
+            selectOnBlur={false}
+            selectOnNavigation={false}
           />
           <label
             className={

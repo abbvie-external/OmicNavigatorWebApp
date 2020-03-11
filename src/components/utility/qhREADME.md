@@ -29,7 +29,7 @@ We'll try and get the package set up to not require these steps at some point.
 
 The EZGrid versions are by far the easiest way of using the grid. As long as your customizations fit within the EZGrid framework.
 
-The only props that are explicitly needed are data and columnsConfig. 
+The only props that are explicitly needed are data and columnsConfig.
 
 ## EZGrid Props
 
@@ -140,7 +140,7 @@ quickViews: {{}}? A collection of views that are easily switched between. There 
         custom: {boolean}? Indicates that this quick view is not a default view and thus should be editable/removeable. Don't set this in default views.
       }
     }
-      
+
     Different possibilities:
     *  1 quickViews defined
     *  2 quickViewsId defined
@@ -213,9 +213,11 @@ uniqueCacheKey: {string}? A unique key used to store the current state of the gr
 height: {string}? The height you want the grid to have. Defaults to '70vh'
 
 # Usage EZ Network Grid
+
 This grid is very similar to the EZGrid, but with the purpose of supporting server side pagination.
 
 ## EZ Network Grid Props
+
 These are mostly the same as the props in EZGrid, so here are the differences:
 
 fetchData: {function(state {{}},props {{}})} this prop is required, and will be called with the the current view settings so the call to the server can be performed.
@@ -232,18 +234,23 @@ fetchData: {function(state {{}},props {{}})} this prop is required, and will be 
         activePage: {number}
       }
     props {} the props that were passed into the EZNetworkGrid
+
 fetchReportData {fetchData}? The same signature as the fetchData function, but needs to return all rows that apply. This allows for exporting an excel document from a network grid, otherwise it would only be able to export the current page.
 
 totalRows: {number} This is the total number of rows that exist in the data in the current view settings so that the grid can know where how many pages exist.
 
-
 # QHGrid Usage
+
 Using the QHGrid by itself is not recommended as you'll have to support all the pieces of the grid through your code.
+
 # QuickViewModal
+
 The modal used to create/edit quick views. Is already included in the EZ Grids
 
 # Extending the default capabilities of the grids
+
 ## Custom Filters
+
 If you desire more filter types, import {filterTypes} from the quick-hits-grid folder and add new properties to the filterTypes object.
 
     The format is:
@@ -253,12 +260,14 @@ If you desire more filter types, import {filterTypes} from the quick-hits-grid f
           {
             item: {{}} the item being filtered
             filterField: {string} the string field accessor to get the value in question
-            filter_values: {any} based on the type of filter desired 
+            filter_values: {any} based on the type of filter desired
           }
         component: {React Component} The component to render in the grid (not a Node, just the Class/functional component itself)
       }
     }
+
 ## Custom Types
+
 If you have many columns in your application that have a very similar type, then you can specify additional types by extending the {typeMap} object from quick-hits-grid. You can also adjust the default ones if desired.
 
     the format is:

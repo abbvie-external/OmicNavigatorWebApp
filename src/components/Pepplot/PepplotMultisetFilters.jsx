@@ -77,6 +77,7 @@ class PepplotMultisetFilters extends Component {
         uAnchorP,
         uDataP,
         uSettingsP,
+        selectedColP,
         selectedOperatorP,
         selectedColP,
         sigValueP
@@ -89,6 +90,7 @@ class PepplotMultisetFilters extends Component {
     uAnchorP,
     uDataP,
     uSettingsP,
+    selectedColP,
     selectedOperatorP,
     selectedColP,
     sigValueP
@@ -228,7 +230,7 @@ class PepplotMultisetFilters extends Component {
           })
           .text(function (d) { return d })
           .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
-          .attr('font-size', '15px')
+          .attr('font-size', '14px')
           .attr('fill', 'black');
 
         // const notTestCirclesP =
