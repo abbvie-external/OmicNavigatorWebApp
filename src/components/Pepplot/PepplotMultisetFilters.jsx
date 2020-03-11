@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import { Form, Select, Input } from 'semantic-ui-react';
+import { Form, Select, Input, Icon, Button } from 'semantic-ui-react';
 import * as d3 from 'd3';
 import '../Shared/MultisetFilters.scss';
 
@@ -12,7 +12,9 @@ class PepplotMultisetFilters extends Component {
       metaSvgP,
       sigValueP,
       selectedColP,
-      selectedOperatorP
+      selectedOperatorP,
+      thresholdColsP,
+      thresholdOperatorP
     } = this.props;
     this.makeMultiset(
       uDataP,
@@ -21,7 +23,9 @@ class PepplotMultisetFilters extends Component {
       metaSvgP,
       sigValueP,
       selectedColP,
-      selectedOperatorP
+      selectedOperatorP,
+      thresholdColsP,
+      thresholdOperatorP
     );
   }
 
@@ -75,6 +79,7 @@ class PepplotMultisetFilters extends Component {
         uSettingsP,
         selectedColP,
         selectedOperatorP,
+        selectedColP,
         sigValueP
       );
     }
@@ -87,10 +92,11 @@ class PepplotMultisetFilters extends Component {
     uSettingsP,
     selectedColP,
     selectedOperatorP,
+    selectedColP,
     sigValueP
   ) {
     const svgWidthP = 315;
-    const heightScalarP = 20; //20 per circle
+    const heightScalarP = 15;
     const mustDataP = uSettingsP.mustP;
     const notDataP = uSettingsP.notP;
     const svgHeightP =
@@ -100,28 +106,32 @@ class PepplotMultisetFilters extends Component {
       10 +
       24;
     const useAnchorP = uSettingsP.useAnchorP;
+    const setDescP=[];
+    const notSetDescP=[];
+    //var mustTextScalar = (15 * Number(mustDataP.length !== 0))
+    //var notTextScalar = (15 * Number(notDataP.length !== 0))
 
-    switch (selectedOperatorP.value) {
+    for(var i = 0;i < selectedOperatorP.length; i++){
+    switch (selectedOperatorP[i].value) {
       case '<':
-        this.setDescP = `Elements with ${selectedColP.text} less than ${sigValueP} in:`;
-        this.notSetDescP = `Elements with ${selectedColP.text} less than ${sigValueP} not in:`;
+        setDescP.push(`Elements ${selectedColP[i].text} less than ${sigValueP[i]} in:`);
+        notSetDescP.push(`Elements ${selectedColP[i].text} less than ${sigValueP[i]} not in:`);
         break;
       case '>':
-        this.setDescP = `Elements with ${selectedColP.text} greater than ${sigValueP} in:`;
-        this.notSetDescP = `Elements with ${selectedColP.text} greater than ${sigValueP} not in:`;
+        setDescP.push(`Elements ${selectedColP[i].text} greater than ${sigValueP[i]} in:`);
+        notSetDescP.push(`Elements ${selectedColP[i].text} greater than ${sigValueP[i]} not in:`);
         break;
       case '|<|':
-        this.setDescP = `Elements with ${selectedColP.text} absolute value less than ${sigValueP} in:`;
-        this.notSetDescP = `Elements with ${selectedColP.text} absolute value less than ${sigValueP} not in:`;
+        setDescP.push(`Elements ${selectedColP[i].text} absolute value less than ${sigValueP[i]} in:`);
+        notSetDescP.push(`Elements ${selectedColP[i].text} absolute value less than ${sigValueP[i]} not in:`);
         break;
       case '|>|':
-        this.setDescP = `Elements with ${selectedColP.text} absolute value greater than ${sigValueP} in:`;
-        this.notSetDescP = `Elements with ${selectedColP.text} absolute value greater than ${sigValueP} not in:`;
+        setDescP.push(`Elements ${selectedColP[i].text} absolute value greater than ${sigValueP[i]} in:`);
+        notSetDescP.push(`Elements ${selectedColP[i].text} absolute value greater than ${sigValueP[i]} not in:`);
         break;
       default:
-        this.setDescP = '';
-        this.notsetDescP = '';
     }
+  }
 
     //Reset the svg
     metaSvgP.selectAll('text').remove();
@@ -138,27 +148,28 @@ class PepplotMultisetFilters extends Component {
         .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
         .attr('font-size', '15px')
         .attr('fill', 'black');
-      metaSvgP
-        .append('text')
-        .attr('dy', '12px')
-        .attr('x', 7)
-        .attr('y', 30)
-        .text('' + this.setDescP)
-        .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
-        .attr('font-size', '14px')
-        .attr('fill', 'black');
+      metaSvgP.selectAll("dataObject")
+          .data(setDescP)
+          .enter()
+          .append('text')
+          .attr('x', 7)
+          .attr('y', function (d, i) { return (30+heightScalarP*i) })
+          .text(function (d) { return d })
+          .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
+          .attr('font-size', '15px')
+          .attr('fill', 'black');
 
       if (useAnchorP) {
         metaSvgP
           .append('circle')
           .style('fill', 'green')
           .attr('cx', 17)
-          .attr('cy', 52)
+          .attr('cy', function () { return (30+(heightScalarP*setDescP.length)) })
           .attr('r', 4);
         metaSvgP
           .append('text')
           .attr('x', 25)
-          .attr('y', 56)
+          .attr('y', function () { return (30+(heightScalarP*setDescP.length)+4) })
           .text(uAnchorP)
           .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
           .attr('font-size', '13px')
@@ -173,11 +184,11 @@ class PepplotMultisetFilters extends Component {
         .append('circle')
         .style('fill', 'green')
         .attr('cx', 17)
-        .attr('cy', function(d) {
+        .attr('cy', function(d,i) {
           if (!useAnchorP) {
-            return mustDataP.indexOf(d) * heightScalarP + 44 + 12;
+            return 30+(heightScalarP*setDescP.length)+mustDataP.indexOf(d) * heightScalarP;
           } else {
-            return mustDataP.indexOf(d) * heightScalarP + 60 + 12;
+            return 30+(heightScalarP*setDescP.length)+(mustDataP.indexOf(d)+1) * heightScalarP;
           }
         })
         .attr('r', 4);
@@ -191,9 +202,9 @@ class PepplotMultisetFilters extends Component {
         .attr('x', 25)
         .attr('y', function(d) {
           if (!useAnchorP) {
-            return mustDataP.indexOf(d) * heightScalarP + 48 + 12;
+            return 30+(heightScalarP*setDescP.length)+mustDataP.indexOf(d) * heightScalarP + 4;
           } else {
-            return mustDataP.indexOf(d) * heightScalarP + 60 + 4 + 12;
+            return 30+(heightScalarP*setDescP.length)+(mustDataP.indexOf(d)+1) * heightScalarP + 4;
           }
         })
         .text(function(d) {
@@ -204,18 +215,20 @@ class PepplotMultisetFilters extends Component {
         .attr('fill', 'black');
 
       if (notDataP.length !== 0) {
-        metaSvgP
+        metaSvgP.selectAll("dataObject")
+          .data(notSetDescP)
+          .enter()
           .append('text')
           .attr('dy', '24px')
           .attr('x', 7)
-          .attr('y', function(d) {
+          .attr('y', function(d,i) {
             if (!useAnchorP) {
-              return mustDataP.length * heightScalarP + 44;
+              return 30+(heightScalarP*setDescP.length)+(i+mustDataP.length-1) * heightScalarP;
             } else {
-              return mustDataP.length * heightScalarP + 60;
+              return 30+(heightScalarP*setDescP.length)+(i+mustDataP.length) * heightScalarP;
             }
           })
-          .text('' + this.notSetDescP)
+          .text(function (d) { return d })
           .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
           .attr('font-size', '14px')
           .attr('fill', 'black');
@@ -228,23 +241,11 @@ class PepplotMultisetFilters extends Component {
           .append('circle')
           .style('fill', 'red')
           .attr('cx', 17)
-          .attr('cy', function(d) {
+          .attr('cy', function(d,i) {
             if (!useAnchorP) {
-              return (
-                notDataP.indexOf(d) * heightScalarP +
-                mustDataP.length * heightScalarP +
-                44 +
-                14 +
-                24
-              );
+              return 30+4+heightScalarP*(i+setDescP.length+notSetDescP.length+mustDataP.length);
             } else {
-              return (
-                notDataP.indexOf(d) * heightScalarP +
-                mustDataP.length * heightScalarP +
-                60 +
-                14 +
-                24
-              );
+              return 30+4+heightScalarP*(i+setDescP.length+notSetDescP.length+mustDataP.length+1);
             }
           })
           .attr('r', 4);
@@ -256,23 +257,11 @@ class PepplotMultisetFilters extends Component {
           .enter()
           .append('text')
           .attr('x', 25)
-          .attr('y', function(d) {
+          .attr('y', function(d,i) {
             if (!useAnchorP) {
-              return (
-                notDataP.indexOf(d) * heightScalarP +
-                mustDataP.length * heightScalarP +
-                44 +
-                18 +
-                24
-              );
+              return 30+8+heightScalarP*(i+setDescP.length+notSetDescP.length+mustDataP.length);
             } else {
-              return (
-                notDataP.indexOf(d) * heightScalarP +
-                mustDataP.length * heightScalarP +
-                60 +
-                18 +
-                24
-              );
+              return 30+8+heightScalarP*(i+setDescP.length+notSetDescP.length+mustDataP.length+1);
             }
           })
           .text(function(d) {
@@ -436,7 +425,7 @@ class PepplotMultisetFilters extends Component {
             notDataP.splice(notDataP.indexOf(d), 1);
           }
           updateCircles();
-          self.props.onUpdateQueryDataP({ mustP: mustDataP, notP: notDataP });
+          self.props.onHandleSetChange({ mustP: mustDataP, notP: notDataP });
         }
       });
 
@@ -469,7 +458,7 @@ class PepplotMultisetFilters extends Component {
           notDataP.splice(notDataP.indexOf(d), 1);
         }
         updateCircles();
-        self.props.onUpdateQueryDataP({ mustP: mustDataP, notP: notDataP });
+        self.props.onHandleSetChange({ mustP: mustDataP, notP: notDataP });
       });
 
     // const miniMaybeCircles =
@@ -496,7 +485,7 @@ class PepplotMultisetFilters extends Component {
           notDataP.splice(notDataP.indexOf(d), 1);
         }
         updateCircles();
-        self.props.onUpdateQueryDataP({ mustP: mustDataP, notP: notDataP });
+        self.props.onHandleSetChange({ mustP: mustDataP, notP: notDataP });
       });
 
     const notCircles = svg
@@ -527,7 +516,7 @@ class PepplotMultisetFilters extends Component {
             mustDataP.splice(mustDataP.indexOf(d), 1);
           }
           updateCircles();
-          self.props.onUpdateQueryDataP({ mustP: mustDataP, notP: notDataP }); // updateGlobalVariables();
+          self.props.onHandleSetChange({ mustP: mustDataP, notP: notDataP }); // updateGlobalVariables();
         }
       });
 
@@ -730,57 +719,74 @@ class PepplotMultisetFilters extends Component {
     }
   }
 
-  handleDropdownChange = (evt, { name, value }) => {
-    this.props.onUpdateQueryDataP({
-      [name]: {
-        key: value,
-        text: value,
-        value: value
-      }
-    });
+  handleDropdownChange = (evt, { name, value, index}) => {
+    this.props.onHandleDropdownChange(evt, { name, value, index});
   };
 
-  handleInputChange = (evt, { name, value }) => {
-    this.props.onUpdateQueryDataP({
-      [name]: value
-    });
+  handleInputChange = (evt, { name, value, index }) => {
+    this.props.onHandleInputChange(evt, { name, value, index });
   };
+  addFilter=()=>{ 
+    this.props.onAddFilter();
+  };
+  removeFilter=(index)=>{
+    this.props.onRemoveFilter(index)
+  }
+  changeHoveredFilter=(index)=>{
+    this.props.onChangeHoveredFilter(index);
+  }
 
   render() {
     const {
-      // selectedColP,
       selectedOperatorP,
+      selectedColP,
       sigValueP,
       uSettingsP
     } = this.props;
     const ColumnsP = uSettingsP.thresholdColsP;
     const OperatorsP = uSettingsP.thresholdOperatorP;
-    // const SelColP = selectedColP.value;
-    const SelOpP = selectedOperatorP.value;
-    // for now, column is displayed as label "Adjusted P Value"
-    const SelColOverride = `Adjusted P Value`;
+    const SelOpP = selectedOperatorP;
+    const SelColP = selectedColP;
+    const indexFiltersP = uSettingsP.indexFiltersP;
+    const hoveredFilter = uSettingsP.hoveredFilter;
+    const removeButtonStyling = {
+      position: "absolute",
+      marginTop: "15px"
+    }
+
     return (
       <Fragment>
         <Form className="MultisetDropdownContainer">
-          <Form.Group>
+          <ul style={{padding:"0px"}}>
+          {indexFiltersP.map(index =><Form.Group
+            key={index} 
+            onMouseEnter={()=>this.changeHoveredFilter(index)}
+            onMouseLeave={()=>this.changeHoveredFilter(-1)}
+            >
             <Form.Field
-              control={Input}
+              control={Select}
               label="Column"
               name="selectedColP"
               className="ThresholdColumnReadOnly"
+              index={index}
               // selection
-              value={SelColOverride}
+              value={SelColP[index].value}
               options={ColumnsP}
               width={7}
               onChange={this.handleDropdownChange}
             ></Form.Field>
+            {hoveredFilter===index && indexFiltersP.length !== 1 &&
+            <Button circular icon style={removeButtonStyling} size="mini" compact onClick={()=>this.removeFilter(index)}>
+              <Icon name="minus circle" color={"red"}/>
+            </Button>}
             <Form.Field
               control={Select}
               label="Operator"
               name="selectedOperatorP"
               className="ThresholdOperatorSelect"
+              index={index}
               // selection
-              value={SelOpP}
+              value={SelOpP[index].value}
               options={OperatorsP}
               width={4}
               onChange={this.handleDropdownChange}
@@ -793,11 +799,16 @@ class PepplotMultisetFilters extends Component {
               label="Significance"
               name="sigValueP"
               className="SignificantValueInput"
-              value={sigValueP}
+              index={index}
+              value={sigValueP[index]}
               width={5}
               onChange={this.handleInputChange}
             ></Form.Field>
           </Form.Group>
+        )}</ul>
+        <Button circular compact size="mini" icon onClick={this.addFilter}>
+          <Icon name="plus circle" color={"green"}/>
+        </Button>
         </Form>
         <p id="multiset-query-p" className="MultisetQueryPContainer"></p>
       </Fragment>
