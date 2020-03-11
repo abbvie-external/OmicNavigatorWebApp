@@ -79,7 +79,6 @@ class PepplotMultisetFilters extends Component {
         uSettingsP,
         selectedColP,
         selectedOperatorP,
-        selectedColP,
         sigValueP
       );
     }
