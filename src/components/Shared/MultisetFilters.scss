@@ -18,3 +18,7 @@
   background: #e0e1e2 !important;
   border: none !important;
 }
+
+svg:not(:root) {
+  overflow: visible !important;
+}
