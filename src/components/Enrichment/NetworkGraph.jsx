@@ -106,10 +106,6 @@ class NetworkGraph extends Component {
     }
   }
 
-  // componentWillUnmount() {
-  //   d3.select(`#svg-${this.state.chartSettings.id}`).remove();
-  // }
-
   handleNodeSearch = () => {
     // setTimeout(() => {
     let str = this.props.networkSearchValue;
@@ -137,11 +133,10 @@ class NetworkGraph extends Component {
       this.props.networkData.nodes.length,
       this.props.networkData.edges.length
     );
-    let containerWidth = this.props.networkData.nodes.length * 15;
-    // containerWidth = this.getWidth();
-    // let's calculate height based on data...
+    // we'll want to calculate a reasonable container width based on data...
+    const containerWidth = this.getWidth(this.props);
+    // we calculate height based on the containerRef
     const containerHeight = this.getHeight();
-    // const containerHeight = 5000;
     const width =
       containerWidth - chartSettings.margin.left - chartSettings.margin.right;
     const height =
@@ -161,10 +156,14 @@ class NetworkGraph extends Component {
     } else return 900;
   }
 
-  getWidth() {
-    if (this.networkContainerRef.current !== null) {
-      return this.networkContainerRef.current.parentElement.offsetWidth;
-    } else return 1200;
+  getWidth(props) {
+    if (props.networkData.nodes.length > 75) {
+      return props.networkData.nodes.length * 15;
+    } else {
+      if (this.networkContainerRef.current !== null) {
+        return this.networkContainerRef.current.parentElement.offsetWidth;
+      } else return 1200;
+    }
   }
 
   prepareAndRenderTree = (width, height) => {
@@ -179,16 +178,6 @@ class NetworkGraph extends Component {
     let formattedLinks = _.map(networkData.edges, function(o) {
       return o.data;
     });
-
-    // this.setState({
-    //   chartSettings: {
-    //     ...this.state.chartSettings,
-    //     formattedData: {
-    //       nodes: formattedNodes,
-    //       links: formattedLinks
-    //     }
-    //   }
-    // });
 
     _.forEach(formattedNodes, function(o1) {
       let picked = _.pick(o1, networkSettings.facets);
@@ -210,22 +199,12 @@ class NetworkGraph extends Component {
           metaData
         };
       });
-      //   self.setState({
-      //     o1facets: o1.facets
-      //   });
     });
 
     let dataCombinedVar = {
       nodes: formattedNodes,
       links: formattedLinks
     };
-    // this.setState({
-    //   dataCombined: {
-    //     nodes: formattedNodes,
-    //     links: formattedLinks
-    //   }
-    // });
-
     let minSetVar = _.min(
       _.map(formattedNodes, function(o) {
         return o[networkSettings.nodeSize];
@@ -252,28 +231,16 @@ class NetworkGraph extends Component {
       .range(networkSettings.radiusScale)
       .domain([minSetVar, maxSetVar]);
     let lineScaleBase = d3.scaleLinear();
-    let lineScaleBaseCopy = lineScaleBase.copy();
+    // let lineScaleBaseCopy = lineScaleBase.copy();
     let lineScaleVar = lineScaleBase
       .range(networkSettings.lineScale)
       .domain([minLineVar, maxLineVar]);
-
-    // this.setState({
-    //   minSet: minSetVar,
-    //   maxSet: maxSetVar,
-    //   minLine: minLineVar,
-    //   maxLine: maxLineVar,
-    //   radius: radiusVar,
-    //   lineScale: lineScaleVar
-    // });
 
     let clusters = networkByCluster(dataCombinedVar);
 
     function getlowestTestValues(nodes) {
       let facetsArr = nodes.flatMap(node => node.facets);
-      return Math.min(
-        ...facetsArr.map(f => f.value).filter(v => v != null)
-        // ...nodes.map(node => node.value).filter(value => value != null)
-      );
+      return Math.min(...facetsArr.map(f => f.value).filter(v => v != null));
     }
 
     function getHighestCoefficient(links) {
@@ -382,9 +349,6 @@ class NetworkGraph extends Component {
         } else {
           return a.height - b.height || a.value - b.value;
         }
-        // return (
-        //   b.data.nodes[0].facets[0].value - a.data.nodes[0].facets[0].value
-        // );
       });
 
     treemap(root);
@@ -399,18 +363,6 @@ class NetworkGraph extends Component {
       .attr('transform', function(d) {
         return `translate(${d.x0}, ${d.y0})`;
       });
-
-    // function zoomed() {
-    //   chartSVG.attr('transform', d3.event.transform);
-    // }
-
-    // chartSVG.call(
-    //   d3
-    //     .zoom()
-    //     .extent([[0, 0], [width, height]])
-    //     .scaleExtent([1, 8])
-    //     .on('zoom', zoomed)
-    // );
 
     cell
       .append('rect')
@@ -451,8 +403,9 @@ class NetworkGraph extends Component {
           'collision',
           // collide(0.5)
           d3.forceCollide().radius(function(d) {
-            let r = radiusVar(d[networkSettings.nodeSize]);
-            return 2 * r - 1;
+            return radiusVar(d[networkSettings.nodeSize]);
+            // let r = radiusVar(d[networkSettings.nodeSize]);
+            // return 3 * r - 1;
           })
         )
         .stop();
@@ -560,7 +513,6 @@ class NetworkGraph extends Component {
             .transition()
             .duration(50)
             .style('opacity', 1);
-          debugger;
           div
             .html(
               `<b>Overlap Size: </b>${d.EnrichmentMap_Overlap_size}<br/><b>Source: </b>${d.source.EnrichmentMap_GS_DESCR}<br/><b>Target: </b>${d.target.EnrichmentMap_GS_DESCR}`
@@ -569,7 +521,6 @@ class NetworkGraph extends Component {
             .style('top', d3.event.pageY - 15 + 'px');
         })
         .on('mouseout', function(d, i) {
-          console.log('mouseout');
           // d3.select(this).transition()
           //     .duration('50')
           //     .attr('opacity', '.75')
@@ -580,9 +531,6 @@ class NetworkGraph extends Component {
             .style('opacity', 0);
         });
 
-      //   chartSVG = d3.select(`#svg-${chartSettings.id}`);
-
-      //   let node = chartSVG
       var node = d3
         .select(this)
         .append('g')
@@ -597,8 +545,6 @@ class NetworkGraph extends Component {
             Math.min(cellWidth - radiusVar(d[networkSettings.nodeSize]), d.x)
           )},${Math.max(radiusVar(d[networkSettings.nodeSize]), Math.min(cellHeight - radiusVar(d[networkSettings.nodeSize]), d.y))})`;
         })
-
-        // .on("click", function (d) { doSomething(this) })
         .call(
           d3
             .drag()
@@ -631,7 +577,6 @@ class NetworkGraph extends Component {
         .style('opacity', 0);
 
       function multiple(d) {
-        // let geneSetSize = networkSettings.nodeSize;
         let r = radiusVar(d[networkSettings.nodeSize]);
         let node = d3.select(this);
 

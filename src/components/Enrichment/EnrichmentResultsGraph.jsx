@@ -122,7 +122,6 @@ class EnrichmentResultsGraph extends Component {
   };
 
   handleResultSelect = (e, { result }) => {
-    debugger;
     this.setState({ networkSearchValue: result.description });
   };
 
@@ -313,7 +312,6 @@ class EnrichmentResultsGraph extends Component {
       document.documentElement.clientWidth,
       window.innerWidth || 0
     );
-    debugger;
     if (w < 1200) {
       return 'small';
     } else if (w > 1199 && w < 1600) {

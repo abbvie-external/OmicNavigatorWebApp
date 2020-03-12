@@ -482,7 +482,6 @@ class EnrichmentSearchCriteria extends Component {
     const eMust = this.state.uSettings.must;
     const eNot = this.state.uSettings.not;
     const eOperator = this.state.selectedOperator;
-    console.log(this.props.pValueType);
 
     this.getMultisetPlot(
       eSigV,

@@ -352,7 +352,6 @@ class PepplotResults extends Component {
   }
 
   // calculateHeight(self) {
-  //   debugger;
   //   let containerHeight =
   //     self.PepplotViewContainerRef.current !== null
   //       ? self.PepplotViewContainerRef.current.parentElement.offsetHeight
