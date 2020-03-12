@@ -377,7 +377,7 @@ class EnrichmentResultsGraph extends Component {
                 results={results}
                 // value={networkSearchValue}
                 resultRenderer={resultRenderer}
-                {...this.props}
+                // {...this.props}
               />
               <Radio
                 className="RadioLabelsDisplay"

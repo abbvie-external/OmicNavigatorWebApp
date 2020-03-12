@@ -1145,11 +1145,12 @@ class Enrichment extends Component {
       {
         menuItem: (
           <Menu.Item
+            key="0"
             className="TableAndNetworkButtons TableButton"
             name="table"
             color="orange"
             // active={this.state.activeIndex === 0}
-            inverted={this.state.activeIndex === 0}
+            inverted={(this.state.activeIndex === 0).toString()}
           >
             {/* <Icon
               name="table"
@@ -1178,6 +1179,7 @@ class Enrichment extends Component {
       {
         menuItem: (
           <Menu.Item
+            key="1"
             className="TableAndNetworkButtons NetworkButton"
             name="network"
           >
