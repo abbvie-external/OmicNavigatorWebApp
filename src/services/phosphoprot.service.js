@@ -2,10 +2,11 @@ import $ from 'jquery';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import networkDataOld from './networkDataOld.json';
-import networkDataNew from './networkDataNew.json';
+// import networkDataNew from './networkDataNew.json';
 window.jQuery = $;
-const ocpu = require('opencpu.js/opencpu-0.5.js');
-let getPlotCancel = () => {};
+require('opencpu.js/opencpu-0.5.js');
+// const ocpu = require('opencpu.js/opencpu-0.5.js');
+// let getPlotCancel = () => {};
 class PhosphoprotService {
   constructor() {
     this.ocpuUrl = 'http://10.239.9.49/ocpu/library/PhosphoProt/R';
@@ -271,7 +272,14 @@ class PhosphoprotService {
     return dataFromPromise;
   }
 
-  async getInferenceMultisetPlot(sigVal,operator, column, testCategory, study, errorCb) {
+  async getInferenceMultisetPlot(
+    sigVal,
+    operator,
+    column,
+    testCategory,
+    study,
+    errorCb
+  ) {
     this.setUrl();
     const handleError =
       errorCb ||

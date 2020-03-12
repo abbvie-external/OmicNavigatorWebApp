@@ -100,15 +100,15 @@ class EnrichmentResultsGraph extends Component {
   //   d3.select("#svg-chart-network").remove();
   // }
 
-  handlePieClick = data => {
-    this.props.onHandlePieClick(
-      this.props.enrichmentStudy,
-      this.props.enrichmentModel,
-      this.props.enrichmentAnnotation,
-      data.metaData,
-      data.prop
-    );
-  };
+  // handlePieClick = data => {
+  //   this.props.onHandlePieClick(
+  //     this.props.enrichmentStudy,
+  //     this.props.enrichmentModel,
+  //     this.props.enrichmentAnnotation,
+  //     data.metaData,
+  //     data.prop
+  //   );
+  // };
 
   handleLabels = () => {
     this.setState(prevState => ({
@@ -533,7 +533,7 @@ class EnrichmentResultsGraph extends Component {
               <NetworkGraph
                 {...this.props}
                 {...this.state}
-                onPieClick={this.handlePieClick}
+                // onPieClick={this.handlePieClick}
                 // onNetworkGraphReady={this.handleNetworkGraphReady}
               ></NetworkGraph>
             </Grid.Column>

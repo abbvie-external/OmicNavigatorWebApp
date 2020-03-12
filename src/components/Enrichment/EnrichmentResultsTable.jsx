@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { Grid } from 'semantic-ui-react';
 import { phosphoprotService } from '../../services/phosphoprot.service';
 import './EnrichmentResultsTable.scss';
-import _ from 'lodash';
 import QHGrid from '../utility/QHGrid';
 import EZGrid from '../utility/EZGrid';
 import QuickViewModal from '../utility/QuickViewModal';

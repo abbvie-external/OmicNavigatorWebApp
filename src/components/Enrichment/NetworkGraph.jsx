@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import _ from 'lodash';
 import * as d3 from 'd3';
 import './NetworkGraph.scss';
-import LoaderActivePlots from '../Transitions/LoaderActivePlots';
+// import LoaderActivePlots from '../Transitions/LoaderActivePlots';
 import { networkByCluster } from '../Shared/helpers';
 
 class NetworkGraph extends Component {
@@ -559,7 +559,8 @@ class NetworkGraph extends Component {
 
       node.each(multiple);
 
-      let labels = node
+      // labels
+      node
         .append('text')
         .attr('class', 'node-label')
         .text(function(d) {
@@ -596,7 +597,8 @@ class NetworkGraph extends Component {
             return '#d3d3d3';
           })
           .on('click', function(d) {
-            pieClickEvent(d, this);
+            this.props.onHandlePieClick(d);
+            // pieClickEvent(d, this);
           })
           .on('mouseover', function(d, i) {
             d3.select(this)
@@ -635,11 +637,11 @@ class NetworkGraph extends Component {
         d3.event.sourceEvent.stopPropagation();
         d3.event.sourceEvent.preventDefault();
       }
-      function pieClickEvent(d, o) {
-        if (d3.event.defaultPrevented) return;
-        d3.select('.tooltip-pieSlice').remove();
-        self.props.onPieClick(d.data);
-      }
+      // function pieClickEvent(d, o) {
+      //   if (d3.event.defaultPrevented) return;
+      //   d3.select('.tooltip-pieSlice').remove();
+      //   self.props.onPieClick(d.data);
+      // }
 
       function ondrag(d, cellHeight, cellWidth, me) {
         d.x = d3.event.x;

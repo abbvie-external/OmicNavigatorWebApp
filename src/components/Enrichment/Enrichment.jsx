@@ -1171,7 +1171,6 @@ class Enrichment extends Component {
               {...this.state}
               onHandlePlotAnimation={this.handlePlotAnimation}
               onDisplayViolinPlot={this.displayViolinPlot}
-              onHandlePieClick={this.testSelected}
             />
           </Tab.Pane>
         )
