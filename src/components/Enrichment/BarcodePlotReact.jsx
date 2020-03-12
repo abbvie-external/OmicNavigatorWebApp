@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 // import Axis from "./Axis";
-import './BarcodePlot.scss';
+import './BarcodePlotReact.scss';
 // import Tooltip from "./useTooltip";
 import * as d3 from 'd3';
 // import * as _ from "lodash";

@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
 import { Slider } from 'react-semantic-ui-range';
-import legendIcon from '../../resources/legend.jpg';
-// import styled from 'styled-components';
 import * as d3 from 'd3';
 import _ from 'lodash';
 import {
@@ -15,26 +13,9 @@ import {
   Icon
   // Input
 } from 'semantic-ui-react';
-// import NetworkGraphOld from './NetworkGraphOld';
-// import NetworkGraphNew from './NetworkGraphNew'
-import NetworkGraphSemioticForce from './NetworkGraphSemioticForce';
-import NetworkGraphSemioticHierarchy from './NetworkGraphSemioticHierarchy';
-import NetworkGraphOld from './NetworkGraphOld';
-import NetworkGraphTree from './NetworkGraphTree';
-import NetworkGraphTreeEx from './NetworkGraphTreeEx';
-import NetworkGraphTreeAlt from './NetworkGraphTreeAlt';
-import NetworkGraphAlt from './NetworkGraphTree';
-import NetworkGraphReact from './NetworkGraphReact';
-import NetworkGraphThresholdSlider from './NetworkGraphThresholdSlider';
-import NetworkGraphAdjacencyMatrix from './NetworkGraphAdjacencyMatrix';
-import NetworkGraphCustomLayout from './NetworkGraphCustomLayout';
+import NetworkGraph from './NetworkGraph';
 import LoaderActivePlots from '../Transitions/LoaderActivePlots';
-// import NetworkGraphCarousel from './NetworkGraphCarousel';
-import TransitionActive from '../Transitions/TransitionActive';
 import './EnrichmentResultsGraph.scss';
-// const StyledInput = styled(Input)`
-//   border: unset;
-// `;
 
 const resultRenderer = ({ description, genes, size }) => {
   let genesFormatted = genes.join(', ');
@@ -46,8 +27,6 @@ const resultRenderer = ({ description, genes, size }) => {
     maxWidth: '25vw',
     fontSize: '13px',
     wordBreak: 'break-all'
-    // zIndex: 333,
-    // overflow: 'auto'
   };
   return (
     <Grid className="NetworkSearchResultsContainer">
@@ -147,19 +126,6 @@ class EnrichmentResultsGraph extends Component {
     this.setState({ networkSearchValue: result.description });
   };
 
-  // handleSearchChange = (e, { value }) => {
-  //   if (value.length < 1) {
-  //     return this.setState({
-  //       results: [],
-  //       networkSearchValue: ''
-  //     });
-  //   } else {
-  //     this.setState(
-  //       { networkSearchValue: value.toLowerCase() },
-  //       this.debounceSearchChange
-  //     );
-  //   }
-  // };
   handleSearchChange = _.debounce((e, { value: networkSearchValue }) => {
     if (networkSearchValue.length < 1) {
       return this.setState({
@@ -351,7 +317,7 @@ class EnrichmentResultsGraph extends Component {
     if (w < 1200) {
       return 'small';
     } else if (w > 1199 && w < 1600) {
-      return 'mini';
+      return 'small';
     } else if (w > 1599 && w < 2600) {
       return 'medium';
     } else if (w > 2599) return 'large';
@@ -401,8 +367,8 @@ class EnrichmentResultsGraph extends Component {
               // className="NetworkGraphFilters"
               mobile={10}
               tablet={10}
-              largeScreen={3}
-              widescreen={3}
+              largeScreen={4}
+              widescreen={4}
             >
               <Search
                 size={dynamicSize}
@@ -429,8 +395,8 @@ class EnrichmentResultsGraph extends Component {
               id="NetworkGraphLabelsToggle"
               mobile={6}
               tablet={6}
-              largeScreen={3}
-              widescreen={3}
+              largeScreen={4}
+              widescreen={4}
             >
               <Button.Group className="PValueTypeContainer" size={dynamicSize}>
                 <Button
@@ -533,32 +499,32 @@ class EnrichmentResultsGraph extends Component {
                 }}
               />
             </Grid.Column>
-            <Grid.Column
-              className="NetworkGraphFilters LegendColumn"
-              mobile={2}
-              tablet={2}
-              largeScreen={2}
-              widescreen={2}
-            >
-              <Popup
-                // trigger={<Label color="blue">Legend</Label>}
-                trigger={
-                  <img src={legendIcon} alt="Legend Icon" id="LegendIcon" />
-                }
-                wide
-                basic
-                on="click"
-                style={LegendPopupStyle}
-                position="left center"
-                // open={this.state.legendIsOpen}
-                // onClose={this.handleLegendClose}
-                // onOpen={this.handleLegendOpen}
-              >
-                {legend}
-              </Popup>
-            </Grid.Column>
           </Grid.Row>
           <Grid.Row className="NetworkGraphContainer">
+            <Popup
+              trigger={
+                <Button
+                  icon
+                  labelPosition="left"
+                  color="blue"
+                  id="LegendIconButton"
+                  size="mini"
+                >
+                  Legend
+                  <Icon name="info" />
+                </Button>
+              }
+              wide
+              basic
+              on="click"
+              style={LegendPopupStyle}
+              position="top left"
+              // open={this.state.legendIsOpen}
+              // onClose={this.handleLegendClose}
+              // onOpen={this.handleLegendOpen}
+            >
+              {legend}
+            </Popup>
             <Grid.Column
               className=""
               mobile={16}
@@ -566,66 +532,12 @@ class EnrichmentResultsGraph extends Component {
               largeScreen={16}
               widescreen={16}
             >
-              {/* <NetworkGraphOld
-                {...this.props}
-                {...this.state}
-                onPieClick={this.handlePieClick}
-              ></NetworkGraphOld> */}
-
-              <NetworkGraphTree
+              <NetworkGraph
                 {...this.props}
                 {...this.state}
                 onPieClick={this.handlePieClick}
                 // onNetworkGraphReady={this.handleNetworkGraphReady}
-              ></NetworkGraphTree>
-
-              {/* <NetworkGraphTreeAlt
-                {...this.props}
-                {...this.state}
-                onPieClick={this.handlePieClick}
-              ></NetworkGraphTreeAlt> */}
-
-              {/* <NetworkGraphTreeEx
-                {...this.props}
-                {...this.state}
-                onPieClick={this.handlePieClick}
-              ></NetworkGraphTreeEx> */}
-
-              {/* <NetworkGraphReact
-                {...this.props}
-                {...this.state}
-                onPieClick={this.handlePieClick}
-              ></NetworkGraphReact> */}
-
-              {/* <NetworkGraphThresholdSlider
-              {...this.props}
-              {...this.state}
-              onPieClick={this.handlePieClick}
-            ></NetworkGraphThresholdSlider> */}
-
-              {/* <NetworkGraphSemioticForce
-              {...this.props}
-              {...this.state}
-              onPieClick={this.handlePieClick}
-            ></NetworkGraphSemioticForce> */}
-
-              {/* <NetworkGraphSemioticHierarchy
-              {...this.props}
-              {...this.state}
-              onPieClick={this.handlePieClick}
-            ></NetworkGraphSemioticHierarchy> */}
-
-              {/* <NetworkGraphAdjacencyMatrix
-              {...this.props}
-              {...this.state}
-              onPieClick={this.handlePieClick}
-            ></NetworkGraphAdjacencyMatrix> */}
-
-              {/* <NetworkGraphCustomLayout
-              {...this.props}
-              {...this.state}
-              onPieClick={this.handlePieClick}
-            ></NetworkGraphCustomLayout> */}
+              ></NetworkGraph>
             </Grid.Column>
           </Grid.Row>
         </Grid>

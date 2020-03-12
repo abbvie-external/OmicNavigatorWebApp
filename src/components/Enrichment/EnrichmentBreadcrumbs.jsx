@@ -1,5 +1,4 @@
 import React, { Component, Fragment } from 'react';
-import { withRouter } from 'react-router-dom';
 import { Breadcrumb, Icon, Popup } from 'semantic-ui-react';
 import '../Shared/Breadcrumbs.scss';
 import { phosphoprotService } from '../../services/phosphoprot.service';
@@ -9,7 +8,7 @@ import { phosphoprotService } from '../../services/phosphoprot.service';
 // import reactome_icon from '../../resources/reactome.jpg';
 // import go_icon from '../../resources/go.png';
 
-class Breadcrumbs extends Component {
+class EnrichmentBreadcrumbs extends Component {
   componentDidMount() {}
 
   getLink = (enrichmentStudy, enrichmentAnnotation, dataItem, term) => {
@@ -185,4 +184,4 @@ class Breadcrumbs extends Component {
   }
 }
 
-export default withRouter(Breadcrumbs);
+export default EnrichmentBreadcrumbs;

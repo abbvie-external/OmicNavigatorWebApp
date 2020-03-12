@@ -29,6 +29,12 @@
   // direction: rtl !important;
 }
 
+@media (max-width: 1600px) {
+  .semantic_ui_range_inner {
+    margin-left: 0px !important;
+  }
+}
+
 .semantic_ui_range_inner div:nth-of-type(2) {
   background-color: var(--color-primary) !important;
 }
@@ -91,6 +97,13 @@
 .RadioLabelsDisplay {
   margin-top: 10px;
   margin-left: 20px;
+  font-size: 1rem !important;
+}
+
+@media (max-width: 1600px) {
+  .RadioLabelsDisplay {
+    font-size: 0.9rem !important;
+  }
 }
 
 .NetworkSliderInput {
@@ -103,17 +116,26 @@
   }
 }
 
-#LegendIcon {
-  float: right;
-  width: 60px;
-  height: 60px;
+// #LegendIcon {
+//   float: right;
+//   width: 60px;
+//   height: 60px;
+// }
+
+#LegendIconButton {
+  position: absolute !important;
+  left: 15px !important;
+  top: -20px !important;
+  z-index: 2;
+  // width: 60px;
+  // height: 60px;
 }
 
-@media (max-width: 768px) {
-  .LegendColumn {
-    position: absolute !important;
-    right: 0 !important;
-    top: 0 !important;
-    padding: 0px !important;
-  }
-}
+// @media (max-width: 768px) {
+//   .LegendColumn {
+//     position: absolute !important;
+//     right: 0 !important;
+//     top: 0 !important;
+//     padding: 0px !important;
+//   }
+// }
