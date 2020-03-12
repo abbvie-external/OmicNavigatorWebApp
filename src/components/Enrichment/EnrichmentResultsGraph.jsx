@@ -11,7 +11,8 @@ import {
   Radio,
   Label,
   Input,
-  Button
+  Button,
+  Icon
   // Input
 } from 'semantic-ui-react';
 // import NetworkGraphOld from './NetworkGraphOld';
@@ -27,6 +28,7 @@ import NetworkGraphReact from './NetworkGraphReact';
 import NetworkGraphThresholdSlider from './NetworkGraphThresholdSlider';
 import NetworkGraphAdjacencyMatrix from './NetworkGraphAdjacencyMatrix';
 import NetworkGraphCustomLayout from './NetworkGraphCustomLayout';
+import LoaderActivePlots from '../Transitions/LoaderActivePlots';
 // import NetworkGraphCarousel from './NetworkGraphCarousel';
 import TransitionActive from '../Transitions/TransitionActive';
 import './EnrichmentResultsGraph.scss';
@@ -79,6 +81,7 @@ class EnrichmentResultsGraph extends Component {
     nodeCutoff: 0.5,
     edgeCutoff: 0.375,
     networkSortBy: 'lowestTestValue'
+    // networkGraphReady: false
     // legendIsOpen: true
   };
 
@@ -318,6 +321,7 @@ class EnrichmentResultsGraph extends Component {
   handleNetworkSortByChange = (evt, { value }) => {
     this.setState({
       networkSortBy: value
+      // networkGraphReady: false
     });
   };
 
@@ -332,21 +336,57 @@ class EnrichmentResultsGraph extends Component {
     });
   };
 
+  // handleNetworkGraphReady = bool => {
+  //   this.setState({
+  //     networkGraphReady: bool
+  //   });
+  // };
+
+  getDynamicSize = () => {
+    let w = Math.max(
+      document.documentElement.clientWidth,
+      window.innerWidth || 0
+    );
+    debugger;
+    if (w < 1200) {
+      return 'small';
+    } else if (w > 1199 && w < 1600) {
+      return 'mini';
+    } else if (w > 1599 && w < 2600) {
+      return 'medium';
+    } else if (w > 2599) return 'large';
+  };
+
   render() {
     const { networkDataLoaded } = this.props;
-    const { results, nodeCutoff, edgeCutoff, networkSortBy } = this.state;
+    const {
+      results,
+      nodeCutoff,
+      edgeCutoff,
+      networkSortBy
+      // networkGraphReady
+    } = this.state;
     const legend = this.getLegend();
     const LegendPopupStyle = {
       padding: '1em',
       width: '250px'
     };
+
+    const dynamicSize = this.getDynamicSize();
     if (!networkDataLoaded) {
       return (
-        <div className="PlotInstructionsDiv">
-          <h4 className="PlotInstructionsText">Network Data is Loading</h4>
+        <div>
+          <LoaderActivePlots />
         </div>
       );
     } else {
+      // if (!networkGraphReady) {
+      //   return (
+      //     <div>
+      //       <LoaderActivePlots />
+      //     </div>
+      //   );
+      // } else {
       return (
         <Grid className="NetworkGraphFiltersContainer">
           <Grid.Row className="NetworkGraphFiltersRow">
@@ -365,7 +405,7 @@ class EnrichmentResultsGraph extends Component {
               widescreen={3}
             >
               <Search
-                // size="small"
+                size={dynamicSize}
                 // className="NetworkSearchResultsContainer"
                 placeholder="Search Network"
                 onResultSelect={this.handleResultSelect}
@@ -378,6 +418,7 @@ class EnrichmentResultsGraph extends Component {
               <Radio
                 className="RadioLabelsDisplay"
                 toggle
+                size={dynamicSize}
                 label="Show Labels"
                 checked={this.state.showNetworkLabels}
                 onChange={this.handleLabels}
@@ -391,9 +432,10 @@ class EnrichmentResultsGraph extends Component {
               largeScreen={3}
               widescreen={3}
             >
-              <label className="sortByLabel">Sort By </label>
-              <Button.Group className="PValueTypeContainer" size="small">
+              <Button.Group className="PValueTypeContainer" size={dynamicSize}>
                 <Button
+                  icon
+                  labelPosition="right"
                   type="button"
                   className="pValueButton"
                   value="lowestTestValue"
@@ -402,8 +444,9 @@ class EnrichmentResultsGraph extends Component {
                   onClick={this.handleNetworkSortByChange}
                 >
                   Value
+                  <Icon name="sort" className="NetworkSortIcon" />
                 </Button>
-                <Button.Or className="OrCircle" />
+                {/* <Button.Or className="OrCircle" /> */}
                 <Button
                   type="button"
                   className="pValueButton"
@@ -424,7 +467,7 @@ class EnrichmentResultsGraph extends Component {
               widescreen={3}
             >
               <Input
-                size="small"
+                size={dynamicSize}
                 type="number"
                 step="0.05"
                 min="0"
@@ -461,7 +504,7 @@ class EnrichmentResultsGraph extends Component {
               widescreen={3}
             >
               <Input
-                size="small"
+                size={dynamicSize}
                 type="number"
                 step="0.025"
                 min="0.050"
@@ -506,7 +549,7 @@ class EnrichmentResultsGraph extends Component {
                 basic
                 on="click"
                 style={LegendPopupStyle}
-                // position="bottom center"
+                position="left center"
                 // open={this.state.legendIsOpen}
                 // onClose={this.handleLegendClose}
                 // onOpen={this.handleLegendOpen}
@@ -518,8 +561,8 @@ class EnrichmentResultsGraph extends Component {
           <Grid.Row className="NetworkGraphContainer">
             <Grid.Column
               className=""
-              mobile={3}
-              tablet={3}
+              mobile={16}
+              tablet={16}
               largeScreen={16}
               widescreen={16}
             >
@@ -533,6 +576,7 @@ class EnrichmentResultsGraph extends Component {
                 {...this.props}
                 {...this.state}
                 onPieClick={this.handlePieClick}
+                // onNetworkGraphReady={this.handleNetworkGraphReady}
               ></NetworkGraphTree>
 
               {/* <NetworkGraphTreeAlt
@@ -586,6 +630,7 @@ class EnrichmentResultsGraph extends Component {
           </Grid.Row>
         </Grid>
       );
+      // }
     }
   }
 }

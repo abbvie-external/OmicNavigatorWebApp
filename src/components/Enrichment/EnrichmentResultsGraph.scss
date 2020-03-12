@@ -1,5 +1,5 @@
 .NetworkGraphContainer {
-  padding-top: 0px !important;
+  padding-top: 10px !important;
   min-height: 70vh !important;
 
   text {
@@ -33,10 +33,17 @@
   background-color: var(--color-primary) !important;
 }
 
-.sortByLabel {
-  font-weight: bold;
-  margin-right: 5px;
+.NetworkSortIcon {
+  background: white !important;
+  color: grey !important;
+  opacity: 1 !important;
+  border: 1px solid lightgrey;
 }
+
+// .sortByLabel {
+//   font-weight: bold;
+//   margin-right: 5px;
+// }
 // .GenesCircle {
 //   z-index: 1111111 !important;
 // }
@@ -83,7 +90,7 @@
 
 .RadioLabelsDisplay {
   margin-top: 10px;
-  margin-left: 30px;
+  margin-left: 20px;
 }
 
 .NetworkSliderInput {
