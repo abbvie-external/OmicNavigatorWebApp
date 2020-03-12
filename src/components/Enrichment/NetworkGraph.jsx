@@ -151,9 +151,17 @@ class NetworkGraph extends Component {
   };
 
   getHeight() {
-    if (this.networkContainerRef.current !== null) {
-      return this.networkContainerRef.current.parentElement.offsetHeight;
-    } else return 900;
+    // if (
+    //   this.networkContainerRef.current !== null &&
+    //   this.networkContainerRef.current.parentElement.offsetHeight !== 0
+    // ) {
+    //   return this.networkContainerRef.current.parentElement.offsetHeight;
+    // } else {
+    return Math.max(
+      document.documentElement.clientHeight,
+      window.innerHeight || 0
+    );
+    //}
   }
 
   getWidth(props) {
@@ -531,7 +539,7 @@ class NetworkGraph extends Component {
             .style('opacity', 0);
         });
 
-      var node = d3
+      const node = d3
         .select(this)
         .append('g')
         .attr('class', 'nodes')
@@ -560,16 +568,31 @@ class NetworkGraph extends Component {
       node.each(multiple);
 
       // labels
-      node
-        .append('text')
-        .attr('class', 'node-label')
-        .text(function(d) {
-          return d[networkSettings.nodeLabel];
-        })
-        .style('font-size', '.9em')
-        .style('opacity', 1)
-        .attr('x', 15)
-        .attr('y', 3);
+      // if there are only x number of nodes or less in a cluster, then place label above them
+      let clusterNodeLength = d.data.nodes.length;
+      if (clusterNodeLength === 1) {
+        node
+          .append('text')
+          .attr('class', 'node-label')
+          .text(function(d) {
+            return d[networkSettings.nodeLabel];
+          })
+          .style('font-size', '.9em')
+          .style('opacity', 1)
+          .attr('x', -75)
+          .attr('y', -20);
+      } else {
+        node
+          .append('text')
+          .attr('class', 'node-label')
+          .text(function(d) {
+            return d[networkSettings.nodeLabel];
+          })
+          .style('font-size', '.9em')
+          .style('opacity', 1)
+          .attr('x', 15)
+          .attr('y', 3);
+      }
 
       let div = d3
         .select('body')

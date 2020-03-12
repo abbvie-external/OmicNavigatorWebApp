@@ -32,6 +32,9 @@ import SplitPanesContainer from './SplitPanesContainer';
 
 let plotCancel = () => {};
 class Enrichment extends Component {
+  defaultActiveIndex =
+    parseInt(sessionStorage.getItem('enrichmentViewTab'), 10) || 0;
+
   state = {
     isValidSearchEnrichment: false,
     isSearching: false,
@@ -39,7 +42,7 @@ class Enrichment extends Component {
     enrichmentIconText: '',
     enrichmentResults: [],
     enrichmentColumns: [],
-    activeIndex: 1,
+    activeIndex: this.defaultActiveIndex || 0,
     multisetPlotInfo: {
       title: '',
       svg: []
@@ -621,7 +624,7 @@ class Enrichment extends Component {
         ? self.EnrichmentViewContainerRef.current.parentElement.offsetHeight
         : 900;
     let barcodeHeight =
-      parseInt(localStorage.getItem('horizontalSplitPaneSize'), 10) || 250;
+      parseInt(sessionStorage.getItem('horizontalSplitPaneSize'), 10) || 250;
     // subtracting 120 due to menu and plot margin
     return containerHeight - barcodeHeight - 120;
   }
@@ -632,7 +635,7 @@ class Enrichment extends Component {
         ? self.EnrichmentViewContainerRef.current.parentElement.offsetWidth
         : 1200;
     let violinWidth =
-      parseInt(localStorage.getItem('verticalSplitPaneSize'), 10) || 525;
+      parseInt(sessionStorage.getItem('verticalSplitPaneSize'), 10) || 525;
     // subtracting 80 due to plot margin
     return containerWidth - violinWidth - 60;
   }
@@ -1092,8 +1095,10 @@ class Enrichment extends Component {
     });
   };
 
-  handleTableNetworkTabChange = (e, { activeIndex }) =>
+  handleTableNetworkTabChange = (e, { activeIndex }) => {
+    sessionStorage.setItem(`enrichmentViewTab`, activeIndex);
     this.setState({ activeIndex });
+  };
 
   getView = () => {
     if (this.state.isTestSelected && !this.state.isTestDataLoaded) {
@@ -1166,7 +1171,11 @@ class Enrichment extends Component {
           </Menu.Item>
         ),
         pane: (
-          <Tab.Pane key="0">
+          <Tab.Pane
+            key="0"
+            className="EnrichmentContentPane"
+            // ref="EnrichmentContentPaneTable"
+          >
             <EnrichmentResultsTable
               {...this.props}
               {...this.state}
@@ -1193,7 +1202,11 @@ class Enrichment extends Component {
           </Menu.Item>
         ),
         pane: (
-          <Tab.Pane key="1">
+          <Tab.Pane
+            key="1"
+            className="EnrichmentContentPane"
+            // ref="EnrichmentContentPaneGraph"
+          >
             <EnrichmentResultsGraph
               {...this.props}
               {...this.state}

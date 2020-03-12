@@ -317,7 +317,7 @@ class EnrichmentResultsGraph extends Component {
     } else if (w > 1199 && w < 1600) {
       return 'small';
     } else if (w > 1599 && w < 2600) {
-      return 'medium';
+      return undefined;
     } else if (w > 2599) return 'large';
   };
 
