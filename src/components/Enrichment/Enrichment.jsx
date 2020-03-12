@@ -1,35 +1,40 @@
-import React, { Component, Fragment } from 'react';
-import { Grid, Popup, Sidebar, Menu, Icon, Tab } from 'semantic-ui-react';
-import { withRouter } from 'react-router-dom';
 import DOMPurify from 'dompurify';
-import EnrichmentSearchCriteria from './EnrichmentSearchCriteria';
-import EnrichmentResultsGraph from './EnrichmentResultsGraph';
-import EnrichmentResultsTable from './EnrichmentResultsTable';
-import TransitionActive from '../Transitions/TransitionActive';
-import TransitionStill from '../Transitions/TransitionStill';
-import SplitPanesContainer from './SplitPanesContainer';
-import SearchingAlt from '../Transitions/SearchingAlt';
-import ButtonActions from '../Shared/ButtonActions';
-import networkDataNew from '../../services/networkDataNew.json';
-import tableIcon from '../../resources/tableIcon.png';
-import tableIconSelected from '../../resources/tableIconSelected.png';
+import _ from 'lodash';
+import React, { Component } from 'react';
+import { withRouter } from 'react-router-dom';
+import { Grid, Menu, Popup, Sidebar, Tab } from 'semantic-ui-react';
+import { CancelToken } from 'axios';
+import go_icon from '../../resources/go.png';
+import msig_icon from '../../resources/msig.ico';
 import networkIcon from '../../resources/networkIcon.png';
 import networkIconSelected from '../../resources/networkIconSelected.png';
+import phosphosite_icon from '../../resources/phosphosite.ico';
+import reactome_icon from '../../resources/reactome.jpg';
+import tableIcon from '../../resources/tableIcon.png';
+import tableIconSelected from '../../resources/tableIconSelected.png';
+import networkDataNew from '../../services/networkDataNew.json';
+import { phosphoprotService } from '../../services/phosphoprot.service';
+import ButtonActions from '../Shared/ButtonActions';
 import {
   formatNumberForDisplay,
   splitValue
   // getIconInfo
 } from '../Shared/helpers';
-import _ from 'lodash';
-import './Enrichment.scss';
 import '../Shared/Table.scss';
-import msig_icon from '../../resources/msig.ico';
-import phosphosite_icon from '../../resources/phosphosite.ico';
-import reactome_icon from '../../resources/reactome.jpg';
-import go_icon from '../../resources/go.png';
-import { phosphoprotService } from '../../services/phosphoprot.service';
+import SearchingAlt from '../Transitions/SearchingAlt';
+import TransitionActive from '../Transitions/TransitionActive';
+import TransitionStill from '../Transitions/TransitionStill';
+import './Enrichment.scss';
+import EnrichmentResultsGraph from './EnrichmentResultsGraph';
+import EnrichmentResultsTable from './EnrichmentResultsTable';
+import EnrichmentSearchCriteria from './EnrichmentSearchCriteria';
+import SplitPanesContainer from './SplitPanesContainer';
 
+let plotCancel = () => {};
 class Enrichment extends Component {
+  defaultActiveIndex =
+    parseInt(sessionStorage.getItem('enrichmentViewTab'), 10) || 0;
+
   state = {
     isValidSearchEnrichment: false,
     isSearching: false,
@@ -37,7 +42,7 @@ class Enrichment extends Component {
     enrichmentIconText: '',
     enrichmentResults: [],
     enrichmentColumns: [],
-    activeIndex: 1,
+    activeIndex: this.defaultActiveIndex || 0,
     multisetPlotInfo: {
       title: '',
       svg: []
@@ -59,6 +64,8 @@ class Enrichment extends Component {
       edges: []
     },
     networkDataNew: {},
+    networkDataMock: {},
+    networkDataLoaded: false,
     tests: {},
     networkSettings: {
       facets: {},
@@ -135,6 +142,7 @@ class Enrichment extends Component {
     //   xName: 'tissue'
     // }
   };
+  EnrichmentViewContainerRef = React.createRef();
 
   componentDidMount() {
     this.getTableHelpers(this.testSelectedTransition, this.showBarcodePlot);
@@ -563,6 +571,14 @@ class Enrichment extends Component {
         pValueTypeParam,
         enrichmentStudy + 'plots'
       )
+      // .then(EMData => {
+      //   this.setState({
+      //     networkDataAvailable: true,
+      //     networkData: EMData.elements,
+      //     // networkData: networkDataMock,
+      //     networkDataLoaded: true
+      //   });
+      // });
       .then(EMData => {
         this.setState({
           networkDataAvailable: true,
@@ -596,32 +612,32 @@ class Enrichment extends Component {
             // ],
             // nodeColorScale: [0, 0.1, 1],
             // nodeColors: ["red", "white", "blue"]
-          }
+          },
+          networkDataLoaded: true
         });
       });
   };
 
-  // setHeight(e) {
-  //   let bHeight = e;
-  //   let splitterHeight = this.dialogHeight - 77;
-  //   let height = (100 - Math.ceil(((splitterHeight - bHeight) / splitterHeight) * 100) - 1.35);
-  //   this.s = height.toString() + "%";
-  // }
-
-  calculateHeight() {
-    var h = Math.max(
-      document.documentElement.clientHeight,
-      window.innerHeight || 0
-    );
-    return h;
+  calculateHeight(self) {
+    let containerHeight =
+      self.EnrichmentViewContainerRef.current !== null
+        ? self.EnrichmentViewContainerRef.current.parentElement.offsetHeight
+        : 900;
+    let barcodeHeight =
+      parseInt(sessionStorage.getItem('horizontalSplitPaneSize'), 10) || 250;
+    // subtracting 120 due to menu and plot margin
+    return containerHeight - barcodeHeight - 120;
   }
 
-  calculateWidth() {
-    var w = Math.max(
-      document.documentElement.clientWidth,
-      window.innerWidth || 0
-    );
-    return w;
+  calculateWidth(self) {
+    let containerWidth =
+      self.EnrichmentViewContainerRef.current !== null
+        ? self.EnrichmentViewContainerRef.current.parentElement.offsetWidth
+        : 1200;
+    let violinWidth =
+      parseInt(sessionStorage.getItem('verticalSplitPaneSize'), 10) || 525;
+    // subtracting 80 due to plot margin
+    return containerWidth - violinWidth - 60;
   }
 
   showBarcodePlot = (dataItem, barcode, test, highest) => {
@@ -718,55 +734,54 @@ class Enrichment extends Component {
     const { enrichmentStudy, enrichmentModel } = this.props;
     // let self = this;
     // if (this.state.barcodeSettings.barcodeData > 0) {
-    if (info !== undefined && info !== null) {
-      if (this.state.barcodeSettings.barcodeData) {
-        if (this.state.barcodeSettings.barcodeData.length > 0) {
-          this.setState({
-            SVGPlotLoaded: false,
-            SVGPlotLoading: true
-          });
-          const dataItem = this.state.barcodeSettings.barcodeData.find(
-            i => i.lineID === info.lineID
-          );
-          let id = dataItem.id_mult ? dataItem.id_mult : dataItem.id;
-          // var psp = document.getElementById('psp-icon');
-          // psp.style.visibility = "hidden";
-          // psp.style.left = w.toString() + "px";
-          // psp.style.bottom = h.toString() + "px";
-          let plotType = ['splineplot'];
-          switch (enrichmentModel) {
-            case 'DonorDifferentialPhosphorylation':
-              plotType = ['dotplot'];
-              break;
-            case 'Treatment and or Strain Differential Phosphorylation':
-              plotType = ['StrainStimDotplot', 'StimStrainDotplot'];
-              break;
-            case 'Timecourse Differential Phosphorylation':
-              plotType = ['lineplot', 'splineplot'];
-              break;
-            case 'Differential Expression':
-              plotType = ['proteindotplot'];
-              break;
-            case 'Differential Phosphorylation':
-              plotType = ['phosphodotplot'];
-              break;
-            case 'No Pretreatment Timecourse Differential Phosphorylation':
-              plotType = ['lineplot.modelII', 'splineplot.modelII'];
-              break;
-            case 'Ferrostatin Pretreatment Timecourse Differential Phosphorylation':
-              plotType = ['lineplot.modelIII', 'splineplot.modelIII'];
-              break;
-            default:
-              plotType = ['dotplot'];
-          }
-          let imageInfo = { key: '', title: '', svg: [] };
-          imageInfo.title = this.state.imageInfo.title;
-          imageInfo.key = this.state.imageInfo.key;
-          const handleSVGCb = this.handleSVG;
-          this.getPlot(id, plotType, enrichmentStudy, imageInfo, handleSVGCb);
+    if (info != null) {
+      if (this.state.barcodeSettings.barcodeData?.length > 0) {
+        this.setState({
+          SVGPlotLoaded: false,
+          SVGPlotLoading: true
+        });
+        const dataItem = this.state.barcodeSettings.barcodeData.find(
+          i => i.lineID === info.lineID
+        );
+        let id = dataItem.id_mult ? dataItem.id_mult : dataItem.id;
+        // var psp = document.getElementById('psp-icon');
+        // psp.style.visibility = "hidden";
+        // psp.style.left = w.toString() + "px";
+        // psp.style.bottom = h.toString() + "px";
+        let plotType = ['splineplot'];
+        switch (enrichmentModel) {
+          case 'DonorDifferentialPhosphorylation':
+            plotType = ['dotplot'];
+            break;
+          case 'Treatment and or Strain Differential Phosphorylation':
+            plotType = ['StrainStimDotplot', 'StimStrainDotplot'];
+            break;
+          case 'Timecourse Differential Phosphorylation':
+            plotType = ['lineplot', 'splineplot'];
+            break;
+          case 'Differential Expression':
+            plotType = ['proteindotplot'];
+            break;
+          case 'Differential Phosphorylation':
+            plotType = ['phosphodotplot'];
+            break;
+          case 'No Pretreatment Timecourse Differential Phosphorylation':
+            plotType = ['lineplot.modelII', 'splineplot.modelII'];
+            break;
+          case 'Ferrostatin Pretreatment Timecourse Differential Phosphorylation':
+            plotType = ['lineplot.modelIII', 'splineplot.modelIII'];
+            break;
+          default:
+            plotType = ['dotplot'];
         }
+        let imageInfo = { key: '', title: '', svg: [] };
+        imageInfo.title = this.state.imageInfo.title;
+        imageInfo.key = this.state.imageInfo.key;
+        const handleSVGCb = this.handleSVG;
+        this.getPlot(id, plotType, enrichmentStudy, imageInfo, handleSVGCb);
       }
     } else {
+      plotCancel();
       this.setState({
         SVGPlotLoaded: false,
         SVGPlotLoading: false
@@ -780,11 +795,29 @@ class Enrichment extends Component {
 
   getPlot = (id, plotType, enrichmentStudy, imageInfo, handleSVGCb) => {
     let currentSVGs = [];
-    let heightCalculation = this.calculateHeight;
-    let widthCalculation = this.calculateWidth;
+    // keep whatever dimension is less (height or width)
+    // then multiply the other dimension by original svg ratio (height 595px, width 841px)
+    let EnrichmentPlotSVGHeight = this.calculateHeight(this);
+    let EnrichmentPlotSVGWidth = this.calculateWidth(this);
+    if (EnrichmentPlotSVGHeight + 60 > EnrichmentPlotSVGWidth) {
+      EnrichmentPlotSVGHeight = EnrichmentPlotSVGWidth * 0.70749;
+    } else {
+      EnrichmentPlotSVGWidth = EnrichmentPlotSVGHeight * 1.41344;
+    }
+    plotCancel();
+    let cancelToken = new CancelToken(e => {
+      plotCancel = e;
+    });
+
     _.forEach(plotType, function(plot, i) {
       phosphoprotService
-        .getPlot(id, plotType[i], enrichmentStudy + 'plots')
+        .getPlot(
+          id,
+          plotType[i],
+          enrichmentStudy + 'plots',
+          undefined,
+          cancelToken
+        )
         .then(svgMarkupObj => {
           let svgMarkup = svgMarkupObj.data;
           svgMarkup = svgMarkup.replace(/id="/g, 'id="' + id + '-' + i + '-');
@@ -795,15 +828,7 @@ class Enrichment extends Component {
           svgMarkup = svgMarkup.replace(/#clip/g, '#' + id + '-' + i + '-clip');
           svgMarkup = svgMarkup.replace(
             /<svg/g,
-            '<svg preserveAspectRatio="xMinYMid meet" style="width:' +
-              widthCalculation() * 0.5 +
-              'px; height:' +
-              heightCalculation() * 0.5 +
-              'px;" id="currentSVG-' +
-              id +
-              '-' +
-              i +
-              '"'
+            `<svg preserveAspectRatio="xMinYMin meet" style="width:${EnrichmentPlotSVGWidth}px" height:${EnrichmentPlotSVGHeight} id="currentSVG-${id}-${i}"`
           );
           DOMPurify.addHook('afterSanitizeAttributes', function(node) {
             if (
@@ -818,8 +843,17 @@ class Enrichment extends Component {
             ADD_TAGS: ['use']
           });
           let svgInfo = { plotType: plotType[i], svg: sanitizedSVG };
-          imageInfo.svg.push(svgInfo);
-          currentSVGs.push(sanitizedSVG);
+
+          // we want spline plot in zero index, rather than lineplot
+          if (i === 0) {
+            imageInfo.svg.push(svgInfo);
+            currentSVGs.push(sanitizedSVG);
+          } else {
+            // splice(position, numberOfItemsToRemove, item)
+            // imageInfo.svg.u
+            imageInfo.svg.unshift(svgInfo);
+            currentSVGs.unshift(sanitizedSVG);
+          }
           handleSVGCb(imageInfo);
         });
     });
@@ -1061,8 +1095,10 @@ class Enrichment extends Component {
     });
   };
 
-  handleTableNetworkTabChange = (e, { activeIndex }) =>
+  handleTableNetworkTabChange = (e, { activeIndex }) => {
+    sessionStorage.setItem(`enrichmentViewTab`, activeIndex);
     this.setState({ activeIndex });
+  };
 
   getView = () => {
     if (this.state.isTestSelected && !this.state.isTestDataLoaded) {
@@ -1114,11 +1150,12 @@ class Enrichment extends Component {
       {
         menuItem: (
           <Menu.Item
+            key="0"
             className="TableAndNetworkButtons TableButton"
             name="table"
             color="orange"
             // active={this.state.activeIndex === 0}
-            inverted={this.state.activeIndex === 0}
+            inverted={(this.state.activeIndex === 0).toString()}
           >
             {/* <Icon
               name="table"
@@ -1134,13 +1171,16 @@ class Enrichment extends Component {
           </Menu.Item>
         ),
         pane: (
-          <Tab.Pane key="0">
+          <Tab.Pane
+            key="0"
+            className="EnrichmentContentPane"
+            // ref="EnrichmentContentPaneTable"
+          >
             <EnrichmentResultsTable
               {...this.props}
               {...this.state}
               onHandlePlotAnimation={this.handlePlotAnimation}
               onDisplayViolinPlot={this.displayViolinPlot}
-              onHandlePieClick={this.testSelected}
             />
           </Tab.Pane>
         )
@@ -1148,6 +1188,7 @@ class Enrichment extends Component {
       {
         menuItem: (
           <Menu.Item
+            key="1"
             className="TableAndNetworkButtons NetworkButton"
             name="network"
           >
@@ -1161,7 +1202,11 @@ class Enrichment extends Component {
           </Menu.Item>
         ),
         pane: (
-          <Tab.Pane key="1">
+          <Tab.Pane
+            key="1"
+            className="EnrichmentContentPane"
+            // ref="EnrichmentContentPaneGraph"
+          >
             <EnrichmentResultsGraph
               {...this.props}
               {...this.state}
@@ -1245,7 +1290,12 @@ class Enrichment extends Component {
                 visible={visible}
               />
               <Sidebar.Pusher>
-                <div className="EnrichmentViewContainer">{enrichmentView}</div>
+                <div
+                  className="EnrichmentViewContainer"
+                  ref={this.EnrichmentViewContainerRef}
+                >
+                  {enrichmentView}
+                </div>
               </Sidebar.Pusher>
             </Sidebar.Pushable>
           </Grid.Column>

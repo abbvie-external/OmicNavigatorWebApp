@@ -20,9 +20,9 @@ class SplitPanesContainer extends Component {
       activeSVGTabIndex: 0,
       proteinForDiffView: '',
       horizontalSplitPaneSize:
-        parseInt(localStorage.getItem('horizontalSplitPaneSize'), 10) || 250,
+        parseInt(sessionStorage.getItem('horizontalSplitPaneSize'), 10) || 250,
       verticalSplitPaneSize:
-        parseInt(localStorage.getItem('verticalSplitPaneSize'), 10) || 525,
+        parseInt(sessionStorage.getItem('verticalSplitPaneSize'), 10) || 525,
       activeViolinTableIndex: 0,
       violinDotSelected: null
     };
@@ -215,7 +215,7 @@ class SplitPanesContainer extends Component {
         verticalSplitPaneSize: size
       });
     }
-    localStorage.setItem(`${paneType}SplitPaneSize`, size);
+    sessionStorage.setItem(`${paneType}SplitPaneSize`, size);
   }
 
   render() {

@@ -1,8 +1,5 @@
 import React, { Component } from 'react';
-import { withRouter } from 'react-router-dom';
 import { Slider } from 'react-semantic-ui-range';
-import legendIcon from '../../resources/legend.jpg';
-// import styled from 'styled-components';
 import * as d3 from 'd3';
 import _ from 'lodash';
 import {
@@ -11,18 +8,14 @@ import {
   Search,
   Radio,
   Label,
-  Input
+  Input,
+  Button,
+  Icon
   // Input
 } from 'semantic-ui-react';
-// import NetworkGraphOld from './NetworkGraphOld';
-// import NetworkGraphNew from './NetworkGraphNew';
-import NetworkGraphTree from './NetworkGraphTree';
-// import NetworkGraphReact from './NetworkGraphReact';
-// import NetworkGraphCarousel from './NetworkGraphCarousel';
+import NetworkGraph from './NetworkGraph';
+import LoaderActivePlots from '../Transitions/LoaderActivePlots';
 import './EnrichmentResultsGraph.scss';
-// const StyledInput = styled(Input)`
-//   border: unset;
-// `;
 
 const resultRenderer = ({ description, genes, size }) => {
   let genesFormatted = genes.join(', ');
@@ -34,8 +27,6 @@ const resultRenderer = ({ description, genes, size }) => {
     maxWidth: '25vw',
     fontSize: '13px',
     wordBreak: 'break-all'
-    // zIndex: 333,
-    // overflow: 'auto'
   };
   return (
     <Grid className="NetworkSearchResultsContainer">
@@ -66,19 +57,26 @@ class EnrichmentResultsGraph extends Component {
     results: [],
     networkSearchValue: '',
     descriptions: [],
-    edgeValue: 0.5
+    nodeCutoff: 0.5,
+    edgeCutoff: 0.375,
+    networkSortBy: 'lowestTestValue'
+    // networkGraphReady: false
     // legendIsOpen: true
   };
 
   componentDidMount() {
-    const networkDataNodeDescriptions = this.props.networkData.nodes.map(r => ({
-      description: r.data.EnrichmentMap_GS_DESCR.toLowerCase(),
-      genes: r.data.EnrichmentMap_Genes,
-      size: r.data.EnrichmentMap_Genes.length
-    }));
-    this.setState({
-      descriptions: networkDataNodeDescriptions
-    });
+    // if (this.props.networkDataLoaded) {
+    this.setupSearch();
+    //}
+  }
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (
+      // this.props.networkDataLoaded &&
+      this.props.networkData !== prevProps.networkData
+    ) {
+      this.setupSearch();
+    }
   }
 
   // let clusters = this.props.networkDataNew.clusters;
@@ -102,15 +100,15 @@ class EnrichmentResultsGraph extends Component {
   //   d3.select("#svg-chart-network").remove();
   // }
 
-  handlePieClick = data => {
-    this.props.onHandlePieClick(
-      this.props.enrichmentStudy,
-      this.props.enrichmentModel,
-      this.props.enrichmentAnnotation,
-      data.metaData,
-      data.prop
-    );
-  };
+  // handlePieClick = data => {
+  //   this.props.onHandlePieClick(
+  //     this.props.enrichmentStudy,
+  //     this.props.enrichmentModel,
+  //     this.props.enrichmentAnnotation,
+  //     data.metaData,
+  //     data.prop
+  //   );
+  // };
 
   handleLabels = () => {
     this.setState(prevState => ({
@@ -123,28 +121,26 @@ class EnrichmentResultsGraph extends Component {
     }
   };
 
-  handleResultSelect = (e, { result }) =>
+  handleResultSelect = (e, { result }) => {
     this.setState({ networkSearchValue: result.description });
-
-  handleSearchChange = (e, { value }) => {
-    this.setState({ networkSearchValue: value.toLowerCase() });
-
-    setTimeout(() => {
-      if (this.state.networkSearchValue.length < 1)
-        return this.setState({
-          ...this.state,
-          results: [],
-          networkSearchValue: ''
-        });
-
-      const re = new RegExp(_.escapeRegExp(this.state.networkSearchValue), 'i');
-      const isMatch = result => re.test(result.description);
-
-      this.setState({
-        results: _.filter(this.state.descriptions, isMatch)
-      });
-    }, 300);
   };
+
+  handleSearchChange = _.debounce((e, { value: networkSearchValue }) => {
+    if (networkSearchValue.length < 1) {
+      return this.setState({
+        results: [],
+        networkSearchValue
+      });
+    }
+    networkSearchValue = networkSearchValue.toLowerCase();
+
+    this.setState({
+      results: this.state.descriptions.filter(result =>
+        result.description.toLowerCase().includes(networkSearchValue)
+      ),
+      networkSearchValue
+    });
+  }, 500);
 
   handleInputChange = (evt, { name, value }) => {
     this.setState({
@@ -287,146 +283,266 @@ class EnrichmentResultsGraph extends Component {
   //   clearTimeout(this.timeout);
   // };
 
+  handleNetworkSortByChange = (evt, { value }) => {
+    this.setState({
+      networkSortBy: value
+      // networkGraphReady: false
+    });
+  };
+
+  setupSearch = () => {
+    const networkDataNodeDescriptions = this.props.networkData.nodes.map(r => ({
+      description: r.data.EnrichmentMap_GS_DESCR.toLowerCase(),
+      genes: r.data.EnrichmentMap_Genes,
+      size: r.data.EnrichmentMap_Genes.length
+    }));
+    this.setState({
+      descriptions: networkDataNodeDescriptions
+    });
+  };
+
+  // handleNetworkGraphReady = bool => {
+  //   this.setState({
+  //     networkGraphReady: bool
+  //   });
+  // };
+
+  getDynamicSize = () => {
+    let w = Math.max(
+      document.documentElement.clientWidth,
+      window.innerWidth || 0
+    );
+    if (w < 1200) {
+      return 'small';
+    } else if (w > 1199 && w < 1600) {
+      return 'small';
+    } else if (w > 1599 && w < 2600) {
+      return undefined;
+    } else if (w > 2599) return 'large';
+  };
+
   render() {
-    const { networkSearchValue, results, edgeValue } = this.state;
+    const { networkDataLoaded } = this.props;
+    const {
+      results,
+      nodeCutoff,
+      edgeCutoff,
+      networkSortBy
+      // networkGraphReady
+    } = this.state;
     const legend = this.getLegend();
     const LegendPopupStyle = {
       padding: '1em',
       width: '250px'
     };
-    return (
-      <Grid className="NetworkGraphFiltersContainer">
-        <Grid.Row className="NetworkGraphFiltersRow">
-          <Grid.Column
-            className="NetworkGraphFilters"
-            mobile={6}
-            tablet={6}
-            largeScreen={3}
-            widescreen={3}
-          ></Grid.Column>
-          <Grid.Column
-            // className="NetworkGraphFilters"
-            mobile={10}
-            tablet={10}
-            largeScreen={4}
-            widescreen={4}
-          >
-            <Search
-              // className="NetworkSearchResultsContainer"
-              placeholder="Search Network"
-              onResultSelect={this.handleResultSelect}
-              onSearchChange={_.debounce(this.handleSearchChange, 500, {
-                leading: true
-              })}
-              results={results}
-              value={networkSearchValue}
-              resultRenderer={resultRenderer}
-              {...this.props}
-            />
-            <br></br>
-            {/* <Radio
-              toggle
-              label="Show Labels"
-              checked={this.state.showNetworkLabels}
-              onChange={this.handleLabels}
-            /> */}
-          </Grid.Column>
-          <Grid.Column
-            className="NetworkGraphFilters"
-            id="NetworkGraphLabelsToggle"
-            mobile={6}
-            tablet={6}
-            largeScreen={3}
-            widescreen={3}
-          >
-            <Radio
-              toggle
-              label="Show Labels"
-              checked={this.state.showNetworkLabels}
-              onChange={this.handleLabels}
-            />
-          </Grid.Column>
-          <Grid.Column
-            className="NetworkGraphFilters"
-            mobile={10}
-            tablet={10}
-            largeScreen={3}
-            widescreen={3}
-          >
-            <Input
-              placeholder="Enter Value"
-              type="number"
-              step="0.05"
-              min="0.05"
-              max="1.00"
-              default="0.35"
-              label="Edge Value"
-              name="edgeValue"
-              className="EdgeValueInput"
-              value={edgeValue}
-              onChange={this.handleInputChange}
-            />
-            <Slider
-              className="EdgeValueSlider"
-              inverted={false}
-              value={edgeValue}
-              settings={{
-                start: edgeValue,
-                min: 0.05,
-                max: 1,
-                step: 0.05,
-                onChange: value => {
-                  this.setState({
-                    edgeValue: value
-                  });
-                }
-              }}
-            />
-          </Grid.Column>
-          <Grid.Column
-            className="NetworkGraphFilters"
-            mobile={8}
-            tablet={8}
-            largeScreen={3}
-            widescreen={3}
-          >
+
+    const dynamicSize = this.getDynamicSize();
+    if (!networkDataLoaded) {
+      return (
+        <div>
+          <LoaderActivePlots />
+        </div>
+      );
+    } else {
+      // if (!networkGraphReady) {
+      //   return (
+      //     <div>
+      //       <LoaderActivePlots />
+      //     </div>
+      //   );
+      // } else {
+      return (
+        <Grid className="NetworkGraphFiltersContainer">
+          <Grid.Row className="NetworkGraphFiltersRow">
+            <Grid.Column
+              className="NetworkGraphFilters"
+              mobile={4}
+              tablet={4}
+              largeScreen={2}
+              widescreen={2}
+            ></Grid.Column>
+            <Grid.Column
+              // className="NetworkGraphFilters"
+              mobile={10}
+              tablet={10}
+              largeScreen={4}
+              widescreen={4}
+            >
+              <Search
+                size={dynamicSize}
+                // className="NetworkSearchResultsContainer"
+                placeholder="Search Network"
+                onResultSelect={this.handleResultSelect}
+                onSearchChange={this.handleSearchChange}
+                results={results}
+                // value={networkSearchValue}
+                resultRenderer={resultRenderer}
+                // {...this.props}
+              />
+              <Radio
+                className="RadioLabelsDisplay"
+                toggle
+                size={dynamicSize}
+                label="Show Labels"
+                checked={this.state.showNetworkLabels}
+                onChange={this.handleLabels}
+              />
+            </Grid.Column>
+            <Grid.Column
+              className="NetworkGraphFilters"
+              id="NetworkGraphLabelsToggle"
+              mobile={6}
+              tablet={6}
+              largeScreen={4}
+              widescreen={4}
+            >
+              <Button.Group className="PValueTypeContainer" size={dynamicSize}>
+                <Button
+                  icon
+                  labelPosition="right"
+                  type="button"
+                  className="pValueButton"
+                  value="lowestTestValue"
+                  name="lowestttestvalue"
+                  positive={networkSortBy === 'lowestTestValue'}
+                  onClick={this.handleNetworkSortByChange}
+                >
+                  Value
+                  <Icon name="sort" className="NetworkSortIcon" />
+                </Button>
+                {/* <Button.Or className="OrCircle" /> */}
+                <Button
+                  type="button"
+                  className="pValueButton"
+                  value="highestLinkCoefficient"
+                  name="highestLinkCoefficient"
+                  positive={networkSortBy === 'highestLinkCoefficient'}
+                  onClick={this.handleNetworkSortByChange}
+                >
+                  Coefficient
+                </Button>
+              </Button.Group>
+            </Grid.Column>
+            <Grid.Column
+              className="NetworkGraphFilters"
+              mobile={8}
+              tablet={8}
+              largeScreen={3}
+              widescreen={3}
+            >
+              <Input
+                size={dynamicSize}
+                type="number"
+                step="0.05"
+                min="0"
+                max="1"
+                default="0.50"
+                label="Node Cutoff"
+                name="nodeCutoff"
+                className="NetworkSliderInput"
+                value={nodeCutoff}
+                onChange={this.handleInputChange}
+              />
+              <Slider
+                className="NetworkSlider"
+                inverted={false}
+                value={nodeCutoff}
+                settings={{
+                  start: nodeCutoff,
+                  min: 0,
+                  max: 1,
+                  step: 0.05,
+                  onChange: value => {
+                    this.setState({
+                      nodeCutoff: value
+                    });
+                  }
+                }}
+              />
+            </Grid.Column>
+            <Grid.Column
+              className="NetworkGraphFilters"
+              mobile={8}
+              tablet={8}
+              largeScreen={3}
+              widescreen={3}
+            >
+              <Input
+                size={dynamicSize}
+                type="number"
+                step="0.025"
+                min="0.050"
+                max="1.000"
+                default="0.375"
+                label="Edge Cutoff"
+                name="edgeCutoff"
+                className="NetworkSliderInput"
+                value={edgeCutoff}
+                onChange={this.handleInputChange}
+              />
+              <Slider
+                className="NetworkSlider"
+                inverted={false}
+                value={edgeCutoff}
+                settings={{
+                  start: edgeCutoff,
+                  min: 0.05,
+                  max: 1,
+                  step: 0.025,
+                  onChange: value => {
+                    this.setState({
+                      edgeCutoff: value
+                    });
+                  }
+                }}
+              />
+            </Grid.Column>
+          </Grid.Row>
+          <Grid.Row className="NetworkGraphContainer">
             <Popup
-              // trigger={<Label color="blue">Legend</Label>}
               trigger={
-                <img src={legendIcon} alt="Legend Icon" id="LegendIcon" />
+                <Button
+                  icon
+                  labelPosition="left"
+                  color="blue"
+                  id="LegendIconButton"
+                  size="mini"
+                >
+                  Legend
+                  <Icon name="info" />
+                </Button>
               }
               wide
               basic
-              hideOnScroll
-              hoverable
+              on="click"
               style={LegendPopupStyle}
-              // position="bottom center"
+              position="top left"
               // open={this.state.legendIsOpen}
               // onClose={this.handleLegendClose}
               // onOpen={this.handleLegendOpen}
             >
               {legend}
             </Popup>
-          </Grid.Column>
-        </Grid.Row>
-        <Grid.Row className="NetworkGraphContainer">
-          <Grid.Column
-            className=""
-            mobile={16}
-            tablet={16}
-            largeScreen={16}
-            widescreen={16}
-          >
-            <NetworkGraphTree
-              {...this.props}
-              {...this.state}
-              onPieClick={this.handlePieClick}
-            ></NetworkGraphTree>
-          </Grid.Column>
-        </Grid.Row>
-      </Grid>
-    );
+            <Grid.Column
+              className=""
+              mobile={16}
+              tablet={16}
+              largeScreen={16}
+              widescreen={16}
+            >
+              <NetworkGraph
+                {...this.props}
+                {...this.state}
+                // onPieClick={this.handlePieClick}
+                // onNetworkGraphReady={this.handleNetworkGraphReady}
+              ></NetworkGraph>
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>
+      );
+      // }
+    }
   }
 }
 
-export default withRouter(EnrichmentResultsGraph);
+export default EnrichmentResultsGraph;

@@ -1,5 +1,7 @@
 .NetworkGraphContainer {
-  padding-top: 0px !important;
+  padding-top: 10px !important;
+  padding-right: 25px !important;
+  min-height: 70vh !important;
 
   text {
     font-family: sans-serif;
@@ -7,12 +9,16 @@
   }
 }
 
-.network-chart-wrapper {
-  border-width: thin;
-  border-radius: 3px;
-  display: -webkit-flex; /* Safari */
-  display: flex; /* Standard syntax */
+.ui.positive.button {
+  background-color: var(--color-primary) !important;
 }
+
+// .network-chart-wrapper {
+//   border-width: thin;
+//   border-radius: 3px;
+//   display: -webkit-flex; /* Safari */
+//   display: flex; /* Standard syntax */
+// }
 
 // .ui.search {
 //   position: initial;
@@ -24,44 +30,61 @@
   // direction: rtl !important;
 }
 
+@media (max-width: 1600px) {
+  .semantic_ui_range_inner {
+    margin-left: 0px !important;
+  }
+}
+
 .semantic_ui_range_inner div:nth-of-type(2) {
   background-color: var(--color-primary) !important;
 }
 
+.NetworkSortIcon {
+  background: white !important;
+  color: grey !important;
+  opacity: 1 !important;
+  border: 1px solid lightgrey;
+}
+
+// .sortByLabel {
+//   font-weight: bold;
+//   margin-right: 5px;
+// }
 // .GenesCircle {
 //   z-index: 1111111 !important;
 // }
 
-.controlBox {
-  background-color: #f7f7ee;
-  /* position: absolute; */
-  margin: 5px 5px 5px 5px;
-  width: 1%;
-  border-style: solid;
-  border-color: black;
-  border-width: thin;
-  border-radius: 3px;
-  -moz-box-shadow-bottom: 4px 4px 4px;
-  -webkit-box-shadow-bottom: 4px 4px 4px grey;
-  box-shadow: 4px 4px 4px grey;
-  -webkit-flex: 1; /* Safari */
-  -ms-flex: 1; /* IE 10 */
-  flex: 0.15; /* Standard syntax */
-}
+// .controlBox {
+//   background-color: #f7f7ee;
+//   /* position: absolute; */
+//   margin: 5px 5px 5px 5px;
+//   width: 1%;
+//   border-style: solid;
+//   border-color: black;
+//   border-width: thin;
+//   border-radius: 3px;
+//   -moz-box-shadow-bottom: 4px 4px 4px;
+//   -webkit-box-shadow-bottom: 4px 4px 4px grey;
+//   box-shadow: 4px 4px 4px grey;
+//   -webkit-flex: 1; /* Safari */
+//   -ms-flex: 1; /* IE 10 */
+//   flex: 0.15; /* Standard syntax */
+// }
 
-#chart-network {
-  background-color: #f7f7ee;
-  margin: 5px 5px 5px 5px;
-  width: 15%;
-  border-style: solid;
-  border-color: black;
-  border-width: thin;
-  border-radius: 3px;
-  -moz-box-shadow-bottom: 4px 4px 4px grey;
-  -webkit-box-shadow-bottom: 4px 4px 4px grey;
-  box-shadow: 4px 4px 4px grey;
-  flex: 0.85;
-}
+// #chart-network {
+//   background-color: #f7f7ee;
+//   margin: 5px 5px 5px 5px;
+//   width: 15%;
+//   border-style: solid;
+//   border-color: black;
+//   border-width: thin;
+//   border-radius: 3px;
+//   -moz-box-shadow-bottom: 4px 4px 4px grey;
+//   -webkit-box-shadow-bottom: 4px 4px 4px grey;
+//   box-shadow: 4px 4px 4px grey;
+//   flex: 0.85;
+// }
 
 .networkSearch {
   margin: 5px 5px 5px 5px;
@@ -72,12 +95,48 @@
   width: 75%;
 }
 
-.EdgeValueInput {
+.RadioLabelsDisplay {
+  margin-top: 10px;
+  margin-left: 20px;
+  font-size: 1rem !important;
+}
+
+@media (max-width: 1600px) {
+  .RadioLabelsDisplay {
+    font-size: 0.9rem !important;
+  }
+}
+
+.NetworkSliderInput {
   margin: 0px 10px 10px 25px !important;
 }
 
-#LegendIcon {
-  float: right;
-  width: 60px;
-  height: 60px;
+@media (max-width: 1600px) {
+  .NetworkSliderInput {
+    margin: 0px 10px 10px 0px !important;
+  }
 }
+
+// #LegendIcon {
+//   float: right;
+//   width: 60px;
+//   height: 60px;
+// }
+
+#LegendIconButton {
+  position: absolute !important;
+  left: 15px !important;
+  top: -20px !important;
+  z-index: 2;
+  // width: 60px;
+  // height: 60px;
+}
+
+// @media (max-width: 768px) {
+//   .LegendColumn {
+//     position: absolute !important;
+//     right: 0 !important;
+//     top: 0 !important;
+//     padding: 0px !important;
+//   }
+// }

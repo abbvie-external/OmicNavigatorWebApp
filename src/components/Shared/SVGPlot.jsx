@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Loader, Dimmer, Tab, Popup, Icon } from 'semantic-ui-react';
-import * as d3 from 'd3';
+// import * as d3 from 'd3';
 import './SVGPlot.scss';
 
 class SVGPlot extends Component {

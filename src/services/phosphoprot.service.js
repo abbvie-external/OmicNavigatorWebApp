@@ -1,14 +1,14 @@
 import $ from 'jquery';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import networkData from './networkData.json';
+import networkDataOld from './networkDataOld.json';
 // import networkDataNew from './networkDataNew.json';
 window.jQuery = $;
-const ocpu = require('opencpu.js/opencpu-0.5.js');
-
+require('opencpu.js/opencpu-0.5.js');
+// const ocpu = require('opencpu.js/opencpu-0.5.js');
+// let getPlotCancel = () => {};
 class PhosphoprotService {
   constructor() {
-    console.log(ocpu);
     this.ocpuUrl = 'http://10.239.9.49/ocpu/library/PhosphoProt/R';
     // this.ocpuUrlAlt = 'http://localhost:5656/ocpu/library/PhosphoProt/R'
     // this.ocpuUrlAlt = 'http://localhost:1234/v1'
@@ -133,13 +133,14 @@ class PhosphoprotService {
     return proteinDataFromPromise;
   }
 
-  async ocpuPlotCall(plottype, obj, handleError) {
+  async ocpuPlotCall(plottype, obj, handleError, cancelToken) {
     return new Promise(function(resolve, reject) {
       window.ocpu
         .call(plottype, obj, function(session) {
           axios
             .get(session.getLoc() + 'graphics/1/svg', {
-              responseType: 'text'
+              responseType: 'text',
+              cancelToken
             })
             .then(response => resolve(response));
         })
@@ -153,7 +154,8 @@ class PhosphoprotService {
     });
   }
 
-  async getPlot(id, plottype, study, proteinSelectedError) {
+  async getPlot(id, plottype, study, proteinSelectedError, cancelToken) {
+    // getPlotCancel();
     this.setUrl();
     const handleError =
       proteinSelectedError ||
@@ -163,10 +165,11 @@ class PhosphoprotService {
     const promise = this.ocpuPlotCall(
       plottype,
       { idmult: id, study: study },
-      handleError
+      handleError,
+      cancelToken
     );
-    const svgMarkupFromPromise = await promise;
-    return svgMarkupFromPromise;
+    //const svgMarkupFromPromise = await promise;
+    return promise;
   }
 
   async getDatabaseInfo(study, test) {
@@ -269,7 +272,14 @@ class PhosphoprotService {
     return dataFromPromise;
   }
 
-  async getInferenceMultisetPlot(sigVal,operator, column, testCategory, study, errorCb) {
+  async getInferenceMultisetPlot(
+    sigVal,
+    operator,
+    column,
+    testCategory,
+    study,
+    errorCb
+  ) {
     this.setUrl();
     const handleError =
       errorCb ||
@@ -309,7 +319,7 @@ class PhosphoprotService {
     // })
     // const nodesFromPromise = await promise
     // return nodesFromPromise
-    return networkData;
+    return networkDataOld;
   }
 }
 

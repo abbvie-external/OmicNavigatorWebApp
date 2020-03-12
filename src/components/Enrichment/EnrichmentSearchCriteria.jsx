@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { withRouter } from 'react-router-dom';
 import {
   Form,
   Select,
@@ -44,16 +43,20 @@ class EnrichmentSearchCriteria extends Component {
     enrichmentModelsDisabled: true,
     enrichmentAnnotationsDisabled: true,
     uAnchor: '',
-    selectedCol: [{
-      key: 'adj_P_Val',
-      text: 'Adjusted P Value',
-      value: 'adj_P_Val'
-    }],
-    selectedOperator: [{
-      key: '<',
-      text: '<',
-      value: '<'
-    }],
+    selectedCol: [
+      {
+        key: 'adj_P_Val',
+        text: 'Adjusted P Value',
+        value: 'adj_P_Val'
+      }
+    ],
+    selectedOperator: [
+      {
+        key: '<',
+        text: '<',
+        value: '<'
+      }
+    ],
     sigValue: [0.05],
     uSettings: {
       defaultSelectedCol: {
@@ -68,7 +71,7 @@ class EnrichmentSearchCriteria extends Component {
       },
       defaultSigValue: 0.05,
       useAnchor: false,
-      hoveredFilter:-1,
+      hoveredFilter: -1,
       indexFilters: [0],
       must: [],
       not: [],
@@ -297,32 +300,32 @@ class EnrichmentSearchCriteria extends Component {
     this.props.onSearchTransition(true);
     this.props.onPValueTypeChange(value);
 
-    if(!this.state.multisetFiltersVisible){
-    phosphoprotService
-      .getAnnotationData(
-        this.props.enrichmentModel,
-        this.props.enrichmentAnnotation,
-        this.props.enrichmentStudy + 'plots',
-        value,
-        this.state.enrichmentResultsErrorCb
-      )
-      .then(dataFromService => {
-        this.setState({
-          uSettings: {
-            ...this.state.uSettings,
-            // must: [],
-            // not: [],
-            // defaultSigValue: 0.05,
-            maxElements: dataFromService.length
-          }
-          // sigValue: 0.05
+    if (!this.state.multisetFiltersVisible) {
+      phosphoprotService
+        .getAnnotationData(
+          this.props.enrichmentModel,
+          this.props.enrichmentAnnotation,
+          this.props.enrichmentStudy + 'plots',
+          value,
+          this.state.enrichmentResultsErrorCb
+        )
+        .then(dataFromService => {
+          this.setState({
+            uSettings: {
+              ...this.state.uSettings,
+              // must: [],
+              // not: [],
+              // defaultSigValue: 0.05,
+              maxElements: dataFromService.length
+            }
+            // sigValue: 0.05
+          });
+          this.annotationdata = dataFromService;
+          this.props.onEnrichmentSearch({
+            enrichmentResults: this.annotationdata
+          });
         });
-        this.annotationdata = dataFromService;
-        this.props.onEnrichmentSearch({
-          enrichmentResults: this.annotationdata
-        });
-      });
-    }else{
+    } else {
       this.updateQueryData();
     }
 
@@ -383,62 +386,95 @@ class EnrichmentSearchCriteria extends Component {
         });
       });
   };
-  addFilter =()=> {
-    const uSetVP = {...this.state.uSettings}
-    uSetVP.indexFilters = [...this.state.uSettings.indexFilters].concat(this.state.uSettings.indexFilters.length)
+  addFilter = () => {
+    const uSetVP = { ...this.state.uSettings };
+    uSetVP.indexFilters = [...this.state.uSettings.indexFilters].concat(
+      this.state.uSettings.indexFilters.length
+    );
 
     this.setState({
-      selectedCol: [...this.state.selectedCol].concat(this.state.uSettings.defaultSelectedCol),
-      selectedOperator: [...this.state.selectedOperator].concat(this.state.uSettings.defaultSelectedOperator),
-      sigValue: [...this.state.sigValue].concat(this.state.uSettings.defaultSigValue),
+      selectedCol: [...this.state.selectedCol].concat(
+        this.state.uSettings.defaultSelectedCol
+      ),
+      selectedOperator: [...this.state.selectedOperator].concat(
+        this.state.uSettings.defaultSelectedOperator
+      ),
+      sigValue: [...this.state.sigValue].concat(
+        this.state.uSettings.defaultSigValue
+      ),
       uSettings: uSetVP
     });
-  }
-  removeFilter=(index)=>{
-    const uSetVP = {...this.state.uSettings}
-    uSetVP.indexFilters = [...uSetVP.indexFilters].slice(0,index).concat([...uSetVP.indexFilters].slice(index+1));
-    for(var i = index; i < uSetVP.indexFilters.length; i++){uSetVP.indexFilters[i]--}
+  };
+  removeFilter = index => {
+    const uSetVP = { ...this.state.uSettings };
+    uSetVP.indexFilters = [...uSetVP.indexFilters]
+      .slice(0, index)
+      .concat([...uSetVP.indexFilters].slice(index + 1));
+    for (var i = index; i < uSetVP.indexFilters.length; i++) {
+      uSetVP.indexFilters[i]--;
+    }
     this.setState({
-      selectedCol: [...this.state.selectedCol].slice(0,index).concat([...this.state.selectedCol].slice(index+1)),
-      selectedOperator: [...this.state.selectedOperator].slice(0,index).concat([...this.state.selectedOperator].slice(index+1)),
-      sigValue: [...this.state.sigValue].slice(0,index).concat([...this.state.sigValue].slice(index+1)),
+      selectedCol: [...this.state.selectedCol]
+        .slice(0, index)
+        .concat([...this.state.selectedCol].slice(index + 1)),
+      selectedOperator: [...this.state.selectedOperator]
+        .slice(0, index)
+        .concat([...this.state.selectedOperator].slice(index + 1)),
+      sigValue: [...this.state.sigValue]
+        .slice(0, index)
+        .concat([...this.state.sigValue].slice(index + 1)),
       uSettings: uSetVP
     });
-  }
-  changeHoveredFilter=(index)=>{
-    const uSetVP = {...this.state.uSettings}
+  };
+  changeHoveredFilter = index => {
+    const uSetVP = { ...this.state.uSettings };
     uSetVP.hoveredFilter = index;
-    this.setState({uSettings: uSetVP})
-  }
-  handleDropdownChange=(evt, { name, value, index })=>{
-    const uSelVP = [...this.state[name]]
+    this.setState({ uSettings: uSetVP });
+  };
+  handleDropdownChange = (evt, { name, value, index }) => {
+    const uSelVP = [...this.state[name]];
     uSelVP[index] = {
-          key: value,
-          text: value,
-          value: value
-        };
-    this.setState({
-      [name]: uSelVP,
-      reloadPlot: true
-    },function(){this.updateQueryData()});
-  }
-  handleInputChange=(evt, { name, value, index })=>{
-    const uSelVP = [...this.state[name]]
+      key: value,
+      text: value,
+      value: value
+    };
+    this.setState(
+      {
+        [name]: uSelVP,
+        reloadPlot: true
+      },
+      function() {
+        this.updateQueryData();
+      }
+    );
+  };
+  handleInputChange = (evt, { name, value, index }) => {
+    const uSelVP = [...this.state[name]];
     uSelVP[index] = parseFloat(value);
-    this.setState({
-      [name]: uSelVP,
-      reloadPlot: true
-    },function(){this.updateQueryData()});
-  }
-  handleSetChange=({must, not})=>{
+    this.setState(
+      {
+        [name]: uSelVP,
+        reloadPlot: true
+      },
+      function() {
+        this.updateQueryData();
+      }
+    );
+  };
+  handleSetChange = ({ must, not }) => {
     const uSettingsVP = this.state.uSettings;
     uSettingsVP.must = must;
     uSettingsVP.not = not;
-    this.setState({
-      uSettings: uSettingsVP,
-      reloadPlot:false
-    },function(){this.updateQueryData()});
-  }
+    this.setState(
+      {
+        uSettings: uSettingsVP,
+        reloadPlot: false
+      },
+      function() {
+        this.updateQueryData();
+      }
+    );
+  };
 
   updateQueryData = () => {
     this.props.onDisablePlot();
@@ -446,8 +482,7 @@ class EnrichmentSearchCriteria extends Component {
     const eMust = this.state.uSettings.must;
     const eNot = this.state.uSettings.not;
     const eOperator = this.state.selectedOperator;
-    console.log(this.props.pValueType)
-    
+
     this.getMultisetPlot(
       eSigV,
       this.props.enrichmentModel,
@@ -482,9 +517,9 @@ class EnrichmentSearchCriteria extends Component {
         });
       });
   };
-  jsonToList(json){
+  jsonToList(json) {
     var valueList = [];
-    for(var i=0;i<json.length;i++){
+    for (var i = 0; i < json.length; i++) {
       valueList.push(json[i].value);
     }
     return valueList;
@@ -776,4 +811,4 @@ class EnrichmentSearchCriteria extends Component {
   }
 }
 
-export default withRouter(EnrichmentSearchCriteria);
+export default EnrichmentSearchCriteria;

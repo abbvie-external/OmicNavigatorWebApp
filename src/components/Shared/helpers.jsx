@@ -32,56 +32,59 @@ export function splitValue(value) {
 }
 
 export function networkByCluster(network) {
-  function bucket() {
+  network = _.cloneDeep(network);
+  let buckets = [];
+  let inBucket = false;
+  const bucket = () => {
     let keepGoing = true;
     let nodeArray = [];
     let nowInBucket = false;
 
     while (keepGoing) {
       keepGoing = false;
-      _.forEach(network.links, function(l) {
+      _.forEach(network.links, link => {
         nowInBucket = false;
-        _.forEach(buckets, function(b) {
-          if (_.includes(b, l.source) || _.includes(b, l.target)) {
+        _.forEach(buckets, bucket => {
+          if (
+            _.includes(bucket, link.source) ||
+            _.includes(bucket, link.target)
+          ) {
             nowInBucket = true;
           }
         });
         if (!nowInBucket) {
           if (
-            !_.includes(nodeArray, l.source) &&
-            !_.includes(nodeArray, l.target) &&
+            !_.includes(nodeArray, link.source) &&
+            !_.includes(nodeArray, link.target) &&
             nodeArray.length === 0
           ) {
-            nodeArray.push(l.source);
-            nodeArray.push(l.target);
+            nodeArray.push(link.source);
+            nodeArray.push(link.target);
             keepGoing = true;
           }
           if (
-            _.includes(nodeArray, l.source) &&
-            !_.includes(nodeArray, l.target)
+            _.includes(nodeArray, link.source) &&
+            !_.includes(nodeArray, link.target)
           ) {
-            nodeArray.push(l.target);
+            nodeArray.push(link.target);
             keepGoing = true;
           }
           if (
-            _.includes(nodeArray, l.target) &&
-            !_.includes(nodeArray, l.source)
+            _.includes(nodeArray, link.target) &&
+            !_.includes(nodeArray, link.source)
           ) {
-            nodeArray.push(l.source);
+            nodeArray.push(link.source);
             keepGoing = true;
           }
         }
       });
     }
     return nodeArray;
-  }
-
-  let buckets = [];
-  let inBucket = false;
-  _.forEach(network.links, function(l) {
+  };
+  _.forEach(network.links, link => {
     inBucket = false;
-    _.forEach(buckets, function(b) {
-      if (_.includes(b, l.source) || _.includes(b, l.target)) {
+    _.forEach(buckets, bucket => {
+      if (_.includes(bucket, link.source) || _.includes(bucket, link.target)) {
         inBucket = true;
       }
     });
@@ -90,31 +93,27 @@ export function networkByCluster(network) {
       buckets.push(bucket());
     }
   });
-
   let nextIndex = 1;
-  _.forEach(network.nodes, function(n) {
+  _.forEach(network.nodes, node => {
     let found = false;
-    _.forEach(buckets, function(b, i) {
-      if (_.includes(b, n.id)) {
-        n.group = i;
+    _.forEach(buckets, (bucket, i) => {
+      if (_.includes(bucket, node.id)) {
+        node.group = i;
         found = true;
       }
     });
     if (!found) {
-      n.group = buckets.length + nextIndex;
+      node.group = buckets.length + nextIndex;
       nextIndex++;
     }
   });
-  _.forEach(network.links, function(l) {
-    _.forEach(buckets, function(b, i) {
-      if (_.includes(b, l.target || _.includes(b, l.source))) {
-        l.group = i;
+  _.forEach(network.links, link => {
+    _.forEach(buckets, (bucket, i) => {
+      if (_.includes(bucket, link.target || _.includes(bucket, link.source))) {
+        link.group = i;
       }
     });
   });
-
-  //console.log(buckets)
-  console.log(network);
   network.nodes = _.sortBy(network.nodes, [
     function(o) {
       return o.group;
@@ -125,26 +124,15 @@ export function networkByCluster(network) {
       return o.group;
     }
   ]);
-
   let nodes = d3.group(network.nodes, d => d.group);
-  console.log('nodes is ');
-  console.log(nodes);
   let links = d3.group(network.links, d => d.group);
-  console.log('links is ');
-  console.log(links);
-
   let nodeArray = Array.from(nodes, function(o) {
     return { name: 'cluster' + o[0], size: o[1].length, nodes: o[1] };
   });
-  console.log('here is the node array');
-  console.log(nodeArray);
   let linkArray = Array.from(links, function(o) {
     return { name: 'cluster' + o[0], size_links: o[1].length, links: o[1] };
   });
-  console.log('here is the link array');
-  console.log(linkArray);
-
-  _.forEach(nodeArray, function(nObj) {
+  _.forEach(nodeArray, nObj => {
     let links = _.find(linkArray, function(lObj) {
       return lObj.name === nObj.name;
     });
@@ -154,11 +142,6 @@ export function networkByCluster(network) {
       nObj.links = [];
     }
   });
-  console.log(nodeArray);
-
-  //let nwArray: any = Array.from(temp, function(o) {return {name: 'cluster' + o[0], value: {size: o[1].length, obj:o[1]}}});
-  //let nwArray: any = Array.from(nodes, function (o) { return { name: 'cluster' + o[0], size: o[1].length, obj: o[1] } });
   nodeArray.sort((x, y) => d3.descending(x.size, y.size));
-
   return { name: 'Network', children: nodeArray };
 }
