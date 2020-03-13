@@ -1,0 +1,9 @@
+// [draggable='true'] {
+//   cursor: move;
+// }
+
+#NetworkGraphSortableDiv ul li {
+  list-style: none;
+  margin-bottom: 5px;
+  cursor: grab;
+}

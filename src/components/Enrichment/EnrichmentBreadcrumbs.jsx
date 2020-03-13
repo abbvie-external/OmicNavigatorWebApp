@@ -157,6 +157,10 @@ class EnrichmentBreadcrumbs extends Component {
       enrichmentDataItem,
       enrichmentTerm
     );
+    const EnrichmentViewTabDescription =
+      parseInt(sessionStorage.getItem('enrichmentViewTab'), 10) === 0
+        ? 'Back To Table'
+        : 'Back To Network';
     return (
       <div className="BreadcrumbContainer">
         <div className="deviceMargin">
@@ -164,13 +168,16 @@ class EnrichmentBreadcrumbs extends Component {
             <Breadcrumb.Section className="BreadcrumbLink">
               <Popup
                 trigger={
-                  <Icon name="table" onClick={this.props.onBackToTable} />
+                  <Icon
+                    name="arrow circle left"
+                    onClick={this.props.onBackToTable}
+                  />
                 }
                 style={BreadcrumbPopupStyle}
                 inverted
                 basic
                 position="bottom left"
-                content="Back To Table"
+                content={EnrichmentViewTabDescription}
               />
             </Breadcrumb.Section>
             <Breadcrumb.Divider icon="right chevron" />

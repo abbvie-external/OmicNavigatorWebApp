@@ -564,7 +564,7 @@ class Enrichment extends Component {
     } = this.props;
     const pValueTypeParam = pValueType === 'adjusted' ? 0.1 : 1;
     phosphoprotService
-      .getEnrichmentMap(
+      .getEnrichmentNetwork(
         enrichmentModel,
         enrichmentAnnotation,
         '',
@@ -1103,7 +1103,7 @@ class Enrichment extends Component {
   getView = () => {
     if (this.state.isTestSelected && !this.state.isTestDataLoaded) {
       return (
-        <div>
+        <div className="SearchingAltDiv">
           <SearchingAlt />
         </div>
       );

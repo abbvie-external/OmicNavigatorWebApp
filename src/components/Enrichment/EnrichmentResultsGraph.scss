@@ -1,5 +1,5 @@
 .NetworkGraphContainer {
-  padding-top: 10px !important;
+  padding-top: 0px !important;
   padding-right: 25px !important;
   min-height: 70vh !important;
 
@@ -46,15 +46,6 @@
   opacity: 1 !important;
   border: 1px solid lightgrey;
 }
-
-// .sortByLabel {
-//   font-weight: bold;
-//   margin-right: 5px;
-// }
-// .GenesCircle {
-//   z-index: 1111111 !important;
-// }
-
 // .controlBox {
 //   background-color: #f7f7ee;
 //   /* position: absolute; */
@@ -117,16 +108,10 @@
   }
 }
 
-// #LegendIcon {
-//   float: right;
-//   width: 60px;
-//   height: 60px;
-// }
-
 #LegendIconButton {
   position: absolute !important;
   left: 15px !important;
-  top: -20px !important;
+  top: -30px !important;
   z-index: 2;
   // width: 60px;
   // height: 60px;
@@ -140,3 +125,50 @@
 //     padding: 0px !important;
 //   }
 // }
+
+// [draggable='true'] {
+//   cursor: move;
+// }
+
+#NetworkGraphSortBySegment {
+  width: 110px !important;
+  height: 105px !important;
+  padding: 0px;
+}
+
+#NetworkSortByLabel {
+  background-color: var(--color-primary) !important;
+  color: white !important;
+  width: 70px !important;
+  margin-left: -90px !important;
+}
+
+#NetworkGraphSortByDiv {
+  ul {
+    padding: 2px 0px 0px 10px !important;
+  }
+  ul li {
+    list-style: none;
+    margin-bottom: 5px;
+    cursor: grab;
+  }
+  #NetworkGraphSortableLink {
+    list-style: none;
+    margin-bottom: 5px;
+    cursor: grab;
+  }
+
+  .NoSelect {
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Old versions of Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Opera and Firefox */
+  }
+}
+
+.LoaderActivePlotsNetwork {
+  height: 100vh !important;
+}
