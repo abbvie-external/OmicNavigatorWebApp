@@ -128,3 +128,8 @@
     transform: translate3d(105%, 0, 0) !important;
   }
 }
+
+.SortableHelper {
+  z-index: 3;
+  list-style: none;
+}

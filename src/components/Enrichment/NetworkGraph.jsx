@@ -246,25 +246,19 @@ class NetworkGraph extends Component {
 
     let clusters = networkByCluster(dataCombinedVar);
 
-    function getlowestTestValues(nodes) {
+    function getSignificance(nodes) {
       let facetsArr = nodes.flatMap(node => node.facets);
       return Math.min(...facetsArr.map(f => f.value).filter(v => v != null));
     }
 
-    function getHighestCoefficient(links) {
-      return Math.max(
-        ...links
-          .map(link => link.EnrichmentMap_similarity_coefficient)
-          .filter(coeff => coeff != null)
-      );
-    }
-
     clusters.children.forEach(cluster => {
       _.forEach(clusters.children, function(cluster, i) {
-        let lowestTestValue = getlowestTestValues(cluster.nodes);
-        let highestCoefficientValue = getHighestCoefficient(cluster.links);
-        cluster.lowestTestValue = lowestTestValue;
-        cluster.highestCoefficientValue = highestCoefficientValue;
+        let significance = getSignificance(cluster.nodes);
+        let edgecount = cluster.links.length;
+        let nodecount = cluster.nodes.length;
+        cluster.significance = significance;
+        cluster.edgecount = edgecount;
+        cluster.nodecount = nodecount;
       });
     });
 
@@ -342,6 +336,7 @@ class NetworkGraph extends Component {
       .size([width, height])
       .round(true)
       .paddingInner(1);
+
     let root = d3
       .hierarchy(clusters)
       .eachBefore(function(d) {
@@ -350,12 +345,40 @@ class NetworkGraph extends Component {
       })
       .sum(sumBySize)
       .sort(function(a, b) {
-        if (self.props.networkSortBy === 'lowestTestValue') {
-          return a.data.lowestTestValue - b.data.lowestTestValue;
-        } else if (self.props.networkSortBy === 'highestLinkCoefficient') {
-          return a.data.highestLinkCoefficient - b.data.highestLinkCoefficient;
+        // let significanceIndex = self.props.networkSortBy.indexOf(
+        //   'significance'
+        // );
+        // let sortFirst = self.props.networkSortBy[0];
+        // let sortSecond = self.props.networkSortBy[1];
+        // let sortThird = self.props.networkSortBy[2];
+        // let first =
+        //   significanceIndex !== 0
+        //     ? `b.data.${sortFirst} - a.data.${sortFirst}`
+        //     : `a.data.${sortFirst} - b.data.${sortFirst}`;
+        // let second =
+        //   significanceIndex !== 1
+        //     ? `b.data.${sortSecond} - a.data.${sortSecond}`
+        //     : `a.data.${sortSecond} - b.data.${sortSecond}`;
+        // let third =
+        //   significanceIndex !== 2
+        //     ? `b.data.${sortThird} - a.data.${sortThird}`
+        //     : `a.data.${sortThird} - b.data.${sortThird}`;
+
+        // return [first] || [second] || [third];
+        if (self.props.networkSortBy === 'significance') {
+          return a.data.significance - b.data.significance;
+        } else if (self.props.networkSortBy === 'edgecount') {
+          return (
+            b.data.edgecount - a.data.edgecount ||
+            a.data.significance - b.data.significance
+          );
+        } else if (self.props.networkSortBy === 'nodecount') {
+          return (
+            b.data.nodecount - a.data.nodecount ||
+            a.data.significance - b.data.significance
+          );
         } else {
-          return a.height - b.height || a.value - b.value;
+          return a.data.significance - b.data.significance;
         }
       });
 
@@ -566,7 +589,6 @@ class NetworkGraph extends Component {
         );
 
       node.each(multiple);
-
       // labels
       // if there are only x number of nodes or less in a cluster, then place label above them
       let clusterNodeLength = d.data.nodes.length;
@@ -579,7 +601,7 @@ class NetworkGraph extends Component {
           })
           .style('font-size', '.9em')
           .style('opacity', 1)
-          .attr('x', -75)
+          .attr('x', -65)
           .attr('y', -20);
       } else {
         node
@@ -620,8 +642,15 @@ class NetworkGraph extends Component {
             return '#d3d3d3';
           })
           .on('click', function(d) {
-            this.props.onHandlePieClick(d);
-            // pieClickEvent(d, this);
+            // if (d3.event.defaultPrevented) return;
+            d3.selectAll('.tooltip-pieSlice').style('opacity', 0);
+            self.props.onHandlePieClick(
+              self.props.enrichmentStudy,
+              self.props.enrichmentModel,
+              self.props.enrichmentAnnotation,
+              d.data.metaData,
+              d.data.prop
+            );
           })
           .on('mouseover', function(d, i) {
             d3.select(this)
@@ -660,11 +689,6 @@ class NetworkGraph extends Component {
         d3.event.sourceEvent.stopPropagation();
         d3.event.sourceEvent.preventDefault();
       }
-      // function pieClickEvent(d, o) {
-      //   if (d3.event.defaultPrevented) return;
-      //   d3.select('.tooltip-pieSlice').remove();
-      //   self.props.onPieClick(d.data);
-      // }
 
       function ondrag(d, cellHeight, cellWidth, me) {
         d.x = d3.event.x;

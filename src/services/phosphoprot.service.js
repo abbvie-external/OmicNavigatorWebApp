@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import networkDataOld from './networkDataOld.json';
+// import networkDataOld from './networkDataOld.json';
 // import networkDataNew from './networkDataNew.json';
 window.jQuery = $;
 require('opencpu.js/opencpu-0.5.js');
@@ -301,25 +301,25 @@ class PhosphoprotService {
     return svgMarkupFromPromise;
   }
 
-  async getEnrichmentMap(
+  async getEnrichmentNetwork(
     enrichmentModel,
     enrichmentAnnotation,
     tests,
     pValueType,
     enrichmentStudy
   ) {
-    // this.setUrl()
-    // const promise = this.ocpuRPC('getCytoscapeEM', {
-    //   model: enrichmentModel,
-    //   db: enrichmentAnnotation,
-    //   tests: tests,
-    //   q: pValueType,
-    //   study: enrichmentStudy,
-    //   isDev: true
-    // })
-    // const nodesFromPromise = await promise
-    // return nodesFromPromise
-    return networkDataOld;
+    this.setUrl();
+    const promise = this.ocpuRPC('getCytoscapeEM', {
+      model: enrichmentModel,
+      db: enrichmentAnnotation,
+      tests: tests,
+      q: pValueType,
+      study: enrichmentStudy,
+      isDev: false
+    });
+    const nodesFromPromise = await promise;
+    return nodesFromPromise;
+    // return networkDataOld;
   }
 }
 

@@ -10,9 +10,18 @@ import {
   Label,
   Input,
   Button,
-  Icon
+  Icon,
+  // Segment
+  Header,
+  Dropdown
   // Input
 } from 'semantic-ui-react';
+// import {
+//   sortableContainer,
+//   sortableElement
+//     sortableHandle
+// } from 'react-sortable-hoc';
+// import arrayMove from 'array-move';
 import NetworkGraph from './NetworkGraph';
 import LoaderActivePlots from '../Transitions/LoaderActivePlots';
 import './EnrichmentResultsGraph.scss';
@@ -51,6 +60,21 @@ const resultRenderer = ({ description, genes, size }) => {
     </Grid>
   );
 };
+
+// const DragHandle = sortableHandle(() => <span>::</span>);
+// const SortableItem = sortableElement(props => (
+//   <li className="NetworkGraphSortableLink">
+//     {/* <DragHandle /> */}
+//     <Label color="blue" size="small" key={`label-${props.value}`}>
+//       {props.sortIndex + 1}) {props.value}
+//     </Label>
+//   </li>
+// ));
+
+// const SortableContainer = sortableContainer(({ children }) => {
+//   return <ul>{children}</ul>;
+// });
+
 class EnrichmentResultsGraph extends Component {
   state = {
     showNetworkLabels: true,
@@ -59,9 +83,10 @@ class EnrichmentResultsGraph extends Component {
     descriptions: [],
     nodeCutoff: 0.5,
     edgeCutoff: 0.375,
-    networkSortBy: 'lowestTestValue'
-    // networkGraphReady: false
-    // legendIsOpen: true
+    // networkGraphReady: false,
+    legendIsOpen: true,
+    // networkSortBy: ['significance', 'edgecount', 'nodecount']
+    networkSortBy: 'significance'
   };
 
   componentDidMount() {
@@ -96,19 +121,10 @@ class EnrichmentResultsGraph extends Component {
   //   descriptions: nodesMapped
   // });
 
-  // componentWillUnmount() {
-  //   d3.select("#svg-chart-network").remove();
-  // }
-
-  // handlePieClick = data => {
-  //   this.props.onHandlePieClick(
-  //     this.props.enrichmentStudy,
-  //     this.props.enrichmentModel,
-  //     this.props.enrichmentAnnotation,
-  //     data.metaData,
-  //     data.prop
-  //   );
-  // };
+  componentWillUnmount() {
+    d3.select('#svg-chart-network').remove();
+    d3.select('div.tooltip-pieSlice').remove();
+  }
 
   handleLabels = () => {
     this.setState(prevState => ({
@@ -270,18 +286,18 @@ class EnrichmentResultsGraph extends Component {
     );
   };
 
-  // handleLegendOpen = () => {
-  //   this.setState({ legendIsOpen: true });
+  handleLegendOpen = () => {
+    this.setState({ legendIsOpen: true });
 
-  //   this.timeout = setTimeout(() => {
-  //     this.setState({ legendIsOpen: false });
-  //   }, 2500);
-  // };
+    // this.timeout = setTimeout(() => {
+    //   this.setState({ legendIsOpen: false });
+    // }, 2500);
+  };
 
-  // handleLegendClose = () => {
-  //   this.setState({ legendIsOpen: false });
-  //   clearTimeout(this.timeout);
-  // };
+  handleLegendClose = () => {
+    this.setState({ legendIsOpen: false });
+    // clearTimeout(this.timeout);
+  };
 
   handleNetworkSortByChange = (evt, { value }) => {
     this.setState({
@@ -321,6 +337,12 @@ class EnrichmentResultsGraph extends Component {
     } else if (w > 2599) return 'large';
   };
 
+  // onSortEnd = ({ oldIndex, newIndex }) => {
+  //   this.setState(({ networkSortBy }) => ({
+  //     networkSortBy: arrayMove(networkSortBy, oldIndex, newIndex)
+  //   }));
+  // };
+
   render() {
     const { networkDataLoaded } = this.props;
     const {
@@ -330,6 +352,28 @@ class EnrichmentResultsGraph extends Component {
       networkSortBy
       // networkGraphReady
     } = this.state;
+
+    const networkSortByOptions = [
+      {
+        key: 'significance',
+        text: 'Significance',
+        value: 'significance',
+        content: 'Significance'
+      },
+      {
+        key: 'edgecount',
+        text: 'Edge Count',
+        value: 'edgecount',
+        content: 'Edge Count'
+      },
+      {
+        key: 'nodecount',
+        text: 'Node Count',
+        value: 'nodecount',
+        content: 'Node Count'
+      }
+    ];
+
     const legend = this.getLegend();
     const LegendPopupStyle = {
       padding: '1em',
@@ -339,7 +383,7 @@ class EnrichmentResultsGraph extends Component {
     const dynamicSize = this.getDynamicSize();
     if (!networkDataLoaded) {
       return (
-        <div>
+        <div className="LoaderActivePlotsNetwork">
           <LoaderActivePlots />
         </div>
       );
@@ -387,41 +431,6 @@ class EnrichmentResultsGraph extends Component {
                 checked={this.state.showNetworkLabels}
                 onChange={this.handleLabels}
               />
-            </Grid.Column>
-            <Grid.Column
-              className="NetworkGraphFilters"
-              id="NetworkGraphLabelsToggle"
-              mobile={6}
-              tablet={6}
-              largeScreen={4}
-              widescreen={4}
-            >
-              <Button.Group className="PValueTypeContainer" size={dynamicSize}>
-                <Button
-                  icon
-                  labelPosition="right"
-                  type="button"
-                  className="pValueButton"
-                  value="lowestTestValue"
-                  name="lowestttestvalue"
-                  positive={networkSortBy === 'lowestTestValue'}
-                  onClick={this.handleNetworkSortByChange}
-                >
-                  Value
-                  <Icon name="sort" className="NetworkSortIcon" />
-                </Button>
-                {/* <Button.Or className="OrCircle" /> */}
-                <Button
-                  type="button"
-                  className="pValueButton"
-                  value="highestLinkCoefficient"
-                  name="highestLinkCoefficient"
-                  positive={networkSortBy === 'highestLinkCoefficient'}
-                  onClick={this.handleNetworkSortByChange}
-                >
-                  Coefficient
-                </Button>
-              </Button.Group>
             </Grid.Column>
             <Grid.Column
               className="NetworkGraphFilters"
@@ -497,6 +506,76 @@ class EnrichmentResultsGraph extends Component {
                 }}
               />
             </Grid.Column>
+            <Grid.Column
+              className="NetworkGraphFilters"
+              id="NetworkGraphSortByDiv"
+              mobile={6}
+              tablet={6}
+              largeScreen={4}
+              widescreen={4}
+            >
+              {/* <Segment id="NetworkGraphSortBySegment">
+                <Label floating id="NetworkSortByLabel">
+                  SORT BY
+                </Label>
+                <SortableContainer
+                  onSortEnd={this.onSortEnd}
+                  // useDragHandle
+                  helperClass="SortableHelper"
+                >
+                  {networkSortBy.map((value, index) => (
+                    <SortableItem
+                      key={`item-${value}`}
+                      index={index}
+                      sortIndex={index}
+                      value={value}
+                      className="SortableItem NoSelect"
+                    />
+                  ))}
+                </SortableContainer>
+              </Segment> */}
+              {/* <Header as="h4">
+                <Icon name="sort" />
+                <Header.Content>
+                  Sort By{' '} */}
+              <span>
+                <span id="NetworkGraphSortByText">Sort By </span>
+                <Dropdown
+                  inline
+                  // header="Sort By"
+                  options={networkSortByOptions}
+                  defaultValue={networkSortBy}
+                  onChange={this.handleNetworkSortByChange}
+                />
+              </span>
+              {/* </Header.Content>
+              </Header> */}
+              {/* <Button.Group className="PValueTypeContainer" size={dynamicSize}>
+                <Button
+                  icon
+                  labelPosition="right"
+                  type="button"
+                  className="pValueButton"
+                  value="lowestTestValue"
+                  name="lowestttestvalue"
+                  positive={networkSortBy === 'lowestTestValue'}
+                  onClick={this.handleNetworkSortByChange}
+                >
+                  Significance
+                  <Icon name="sort" className="NetworkSortIcon" />
+                </Button>
+                <Button
+                  type="button"
+                  className="pValueButton"
+                  value="highestEdgeCount"
+                  name="highestEdgeCount"
+                  positive={networkSortBy === 'highestEdgeCount'}
+                  onClick={this.handleNetworkSortByChange}
+                >
+                  Edge Count
+                </Button>
+              </Button.Group> */}
+            </Grid.Column>
           </Grid.Row>
           <Grid.Row className="NetworkGraphContainer">
             <Popup
@@ -504,7 +583,7 @@ class EnrichmentResultsGraph extends Component {
                 <Button
                   icon
                   labelPosition="left"
-                  color="blue"
+                  // color="blue"
                   id="LegendIconButton"
                   size="mini"
                 >
@@ -513,13 +592,12 @@ class EnrichmentResultsGraph extends Component {
                 </Button>
               }
               wide
-              basic
               on="click"
               style={LegendPopupStyle}
               position="top left"
-              // open={this.state.legendIsOpen}
-              // onClose={this.handleLegendClose}
-              // onOpen={this.handleLegendOpen}
+              open={this.state.legendIsOpen}
+              onClose={this.handleLegendClose}
+              onOpen={this.handleLegendOpen}
             >
               {legend}
             </Popup>
@@ -533,7 +611,6 @@ class EnrichmentResultsGraph extends Component {
               <NetworkGraph
                 {...this.props}
                 {...this.state}
-                // onPieClick={this.handlePieClick}
                 // onNetworkGraphReady={this.handleNetworkGraphReady}
               ></NetworkGraph>
             </Grid.Column>
