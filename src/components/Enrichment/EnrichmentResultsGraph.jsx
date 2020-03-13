@@ -583,7 +583,7 @@ class EnrichmentResultsGraph extends Component {
                 <Button
                   icon
                   labelPosition="left"
-                  color="blue"
+                  // color="blue"
                   id="LegendIconButton"
                   size="mini"
                 >
