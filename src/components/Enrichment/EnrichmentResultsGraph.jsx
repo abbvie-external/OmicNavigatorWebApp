@@ -11,17 +11,17 @@ import {
   Input,
   Button,
   Icon,
-  Segment
-  // Header,
-  // Dropdown
+  // Segment
+  Header,
+  Dropdown
   // Input
 } from 'semantic-ui-react';
-import {
-  sortableContainer,
-  sortableElement
-  //   sortableHandle
-} from 'react-sortable-hoc';
-import arrayMove from 'array-move';
+// import {
+//   sortableContainer,
+//   sortableElement
+//     sortableHandle
+// } from 'react-sortable-hoc';
+// import arrayMove from 'array-move';
 import NetworkGraph from './NetworkGraph';
 import LoaderActivePlots from '../Transitions/LoaderActivePlots';
 import './EnrichmentResultsGraph.scss';
@@ -62,18 +62,18 @@ const resultRenderer = ({ description, genes, size }) => {
 };
 
 // const DragHandle = sortableHandle(() => <span>::</span>);
-const SortableItem = sortableElement(props => (
-  <li className="NetworkGraphSortableLink">
-    {/* <DragHandle /> */}
-    <Label color="blue" size="small" key={`label-${props.value}`}>
-      {props.sortIndex + 1}) {props.value}
-    </Label>
-  </li>
-));
+// const SortableItem = sortableElement(props => (
+//   <li className="NetworkGraphSortableLink">
+//     {/* <DragHandle /> */}
+//     <Label color="blue" size="small" key={`label-${props.value}`}>
+//       {props.sortIndex + 1}) {props.value}
+//     </Label>
+//   </li>
+// ));
 
-const SortableContainer = sortableContainer(({ children }) => {
-  return <ul>{children}</ul>;
-});
+// const SortableContainer = sortableContainer(({ children }) => {
+//   return <ul>{children}</ul>;
+// });
 
 class EnrichmentResultsGraph extends Component {
   state = {
@@ -83,10 +83,10 @@ class EnrichmentResultsGraph extends Component {
     descriptions: [],
     nodeCutoff: 0.5,
     edgeCutoff: 0.375,
-    // networkSortBy: 'lowestTestValue',
     // networkGraphReady: false,
     legendIsOpen: true,
-    networkSortBy: ['significance', 'edgecount', 'nodecount']
+    // networkSortBy: ['significance', 'edgecount', 'nodecount']
+    networkSortBy: 'significance'
   };
 
   componentDidMount() {
@@ -337,11 +337,11 @@ class EnrichmentResultsGraph extends Component {
     } else if (w > 2599) return 'large';
   };
 
-  onSortEnd = ({ oldIndex, newIndex }) => {
-    this.setState(({ networkSortBy }) => ({
-      networkSortBy: arrayMove(networkSortBy, oldIndex, newIndex)
-    }));
-  };
+  // onSortEnd = ({ oldIndex, newIndex }) => {
+  //   this.setState(({ networkSortBy }) => ({
+  //     networkSortBy: arrayMove(networkSortBy, oldIndex, newIndex)
+  //   }));
+  // };
 
   render() {
     const { networkDataLoaded } = this.props;
@@ -350,30 +350,29 @@ class EnrichmentResultsGraph extends Component {
       nodeCutoff,
       edgeCutoff,
       networkSortBy
-      // networkSortBy
       // networkGraphReady
     } = this.state;
 
-    // const networkSortByOptions = [
-    //   {
-    //     key: 'significance',
-    //     text: 'Significance',
-    //     value: 'significance',
-    //     content: 'significance'
-    //   },
-    //   {
-    //     key: 'edgeCount',
-    //     text: 'Edge Count',
-    //     value: 'edgeCount',
-    //     content: 'edgeCount'
-    //   },
-    //   {
-    //     key: 'nodeCount',
-    //     text: 'Node Count',
-    //     value: 'nodeCount',
-    //     content: 'nodeCount'
-    //   }
-    // ];
+    const networkSortByOptions = [
+      {
+        key: 'significance',
+        text: 'Significance',
+        value: 'significance',
+        content: 'Significance'
+      },
+      {
+        key: 'edgecount',
+        text: 'Edge Count',
+        value: 'edgecount',
+        content: 'Edge Count'
+      },
+      {
+        key: 'nodecount',
+        text: 'Node Count',
+        value: 'nodecount',
+        content: 'Node Count'
+      }
+    ];
 
     const legend = this.getLegend();
     const LegendPopupStyle = {
@@ -515,7 +514,7 @@ class EnrichmentResultsGraph extends Component {
               largeScreen={4}
               widescreen={4}
             >
-              <Segment id="NetworkGraphSortBySegment">
+              {/* <Segment id="NetworkGraphSortBySegment">
                 <Label floating id="NetworkSortByLabel">
                   SORT BY
                 </Label>
@@ -524,7 +523,6 @@ class EnrichmentResultsGraph extends Component {
                   // useDragHandle
                   helperClass="SortableHelper"
                 >
-                  {/* Sort By */}
                   {networkSortBy.map((value, index) => (
                     <SortableItem
                       key={`item-${value}`}
@@ -535,18 +533,22 @@ class EnrichmentResultsGraph extends Component {
                     />
                   ))}
                 </SortableContainer>
-              </Segment>
+              </Segment> */}
               {/* <Header as="h4">
                 <Icon name="sort" />
                 <Header.Content>
-                  Sort By{' '}
-                  <Dropdown
-                    inline
-                    // header="Adjust time span"
-                    options={networkSortByOptions}
-                    defaultValue={networkSortBy}
-                  />
-                </Header.Content>
+                  Sort By{' '} */}
+              <span>
+                <span id="NetworkGraphSortByText">Sort By </span>
+                <Dropdown
+                  inline
+                  // header="Sort By"
+                  options={networkSortByOptions}
+                  defaultValue={networkSortBy}
+                  onChange={this.handleNetworkSortByChange}
+                />
+              </span>
+              {/* </Header.Content>
               </Header> */}
               {/* <Button.Group className="PValueTypeContainer" size={dynamicSize}>
                 <Button

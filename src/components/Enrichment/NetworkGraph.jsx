@@ -345,35 +345,41 @@ class NetworkGraph extends Component {
       })
       .sum(sumBySize)
       .sort(function(a, b) {
-        let significanceIndex = self.props.networkSortBy.indexOf(
-          'significance'
-        );
-        let sortFirst = self.props.networkSortBy[0];
-        let sortSecond = self.props.networkSortBy[1];
-        let sortThird = self.props.networkSortBy[2];
-        let first =
-          significanceIndex !== 0
-            ? `b.data.${sortFirst} - a.data.${sortFirst}`
-            : `a.data.${sortFirst} - b.data.${sortFirst}`;
-        let second =
-          significanceIndex !== 1
-            ? `b.data.${sortSecond} - a.data.${sortSecond}`
-            : `a.data.${sortSecond} - b.data.${sortSecond}`;
-        let third =
-          significanceIndex !== 2
-            ? `b.data.${sortThird} - a.data.${sortThird}`
-            : `a.data.${sortThird} - b.data.${sortThird}`;
+        // let significanceIndex = self.props.networkSortBy.indexOf(
+        //   'significance'
+        // );
+        // let sortFirst = self.props.networkSortBy[0];
+        // let sortSecond = self.props.networkSortBy[1];
+        // let sortThird = self.props.networkSortBy[2];
+        // let first =
+        //   significanceIndex !== 0
+        //     ? `b.data.${sortFirst} - a.data.${sortFirst}`
+        //     : `a.data.${sortFirst} - b.data.${sortFirst}`;
+        // let second =
+        //   significanceIndex !== 1
+        //     ? `b.data.${sortSecond} - a.data.${sortSecond}`
+        //     : `a.data.${sortSecond} - b.data.${sortSecond}`;
+        // let third =
+        //   significanceIndex !== 2
+        //     ? `b.data.${sortThird} - a.data.${sortThird}`
+        //     : `a.data.${sortThird} - b.data.${sortThird}`;
 
-        return [first] || [second] || [third];
-        // if (self.props.networkSortBy === 'significance') {
-        //   return a.data.significance - b.data.significance;
-        // } else if (self.props.networkSortBy === 'highestEdgeCount') {
-        //   return b.data.edgeCount - a.data.edgeCount;
-        // } else if (self.props.networkSortBy === 'highestNodeCount') {
-        //   return b.data.nodeCount - a.data.nodeCount;
-        // } else {
-        //   return a.height - b.height || a.value - b.value;
-        // }
+        // return [first] || [second] || [third];
+        if (self.props.networkSortBy === 'significance') {
+          return a.data.significance - b.data.significance;
+        } else if (self.props.networkSortBy === 'edgecount') {
+          return (
+            b.data.edgecount - a.data.edgecount ||
+            a.data.significance - b.data.significance
+          );
+        } else if (self.props.networkSortBy === 'nodecount') {
+          return (
+            b.data.nodecount - a.data.nodecount ||
+            a.data.significance - b.data.significance
+          );
+        } else {
+          return a.data.significance - b.data.significance;
+        }
       });
 
     treemap(root);
