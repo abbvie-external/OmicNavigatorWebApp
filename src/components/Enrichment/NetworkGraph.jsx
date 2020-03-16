@@ -266,8 +266,19 @@ class NetworkGraph extends Component {
 
     // Prepare Chart
     const chartDiv = d3.select('#' + chartSettings.id);
-
+    // const clientHeight = Math.max(
+    //   document.documentElement.clientHeight,
+    //   window.innerHeight || 0
+    // );
+    // const clientWidth = Math.max(
+    //   document.documentElement.clientWidth,
+    //   window.innerWidth || 0
+    // );
     function zoom(svg) {
+      // const extent = [
+      //   [0, 0],
+      //   [-500, 0]
+      // ];
       const extent = [
         [chartSettings.margin.left, chartSettings.margin.top],
         [width - chartSettings.margin.right, height - chartSettings.margin.top]
@@ -304,7 +315,7 @@ class NetworkGraph extends Component {
       .attr('width', '100%')
       .attr('height', '100%')
       .attr('viewBox', `0 0 ${width} ${height}`)
-      .attr('preserveAspectRatio', 'xMinYMin meet')
+      // .attr('preserveAspectRatio', 'xMinYMin meet')
       .call(zoom);
 
     // Prepare NetworkPlot
@@ -381,6 +392,8 @@ class NetworkGraph extends Component {
           return a.data.significance - b.data.significance;
         }
       });
+
+    const mostSignificantTestValue = root.children[0].data.significance;
 
     treemap(root);
 
@@ -638,6 +651,8 @@ class NetworkGraph extends Component {
           .style('cursor', 'pointer')
           .attr('stroke', 'black')
           .style('fill', function(d) {
+            if (d.data.value === mostSignificantTestValue)
+              return self.props.networkSettings.colorMostSignificantTest;
             if (d.data.value != null) return color(d.data.value);
             return '#d3d3d3';
           })

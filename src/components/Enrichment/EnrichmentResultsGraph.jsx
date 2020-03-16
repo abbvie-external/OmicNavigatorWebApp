@@ -85,6 +85,7 @@ class EnrichmentResultsGraph extends Component {
     edgeCutoff: 0.375,
     // networkGraphReady: false,
     legendIsOpen: true,
+    // legendIsOpen: JSON.parse(sessionStorage.getItem('legendOpen')) || true,
     // networkSortBy: ['significance', 'edgecount', 'nodecount']
     networkSortBy: 'significance'
   };
@@ -287,14 +288,15 @@ class EnrichmentResultsGraph extends Component {
   };
 
   handleLegendOpen = () => {
+    // sessionStorage.setItem('legendOpen', 'true');
     this.setState({ legendIsOpen: true });
-
     // this.timeout = setTimeout(() => {
     //   this.setState({ legendIsOpen: false });
     // }, 2500);
   };
 
   handleLegendClose = () => {
+    // sessionStorage.setItem('legendOpen', 'false');
     this.setState({ legendIsOpen: false });
     // clearTimeout(this.timeout);
   };
@@ -349,6 +351,7 @@ class EnrichmentResultsGraph extends Component {
       results,
       nodeCutoff,
       edgeCutoff,
+      legendIsOpen,
       networkSortBy
       // networkGraphReady
     } = this.state;
@@ -594,8 +597,8 @@ class EnrichmentResultsGraph extends Component {
               wide
               on="click"
               style={LegendPopupStyle}
-              position="top left"
-              open={this.state.legendIsOpen}
+              // position="top left"
+              open={legendIsOpen}
               onClose={this.handleLegendClose}
               onOpen={this.handleLegendOpen}
             >

@@ -82,7 +82,9 @@ class Enrichment extends Component {
       linkMeta: ['EnrichmentMap_Overlap_size', 'source', 'target'],
       linkMetaLookup: ['EnrichmentMap_GS_DESCR', 'EnrichmentMap_GS_DESCR'],
       nodeColorScale: [0, 0.1, 1],
-      nodeColors: ['red', 'white', 'blue']
+      nodeColors: ['red', 'white', 'blue'],
+      mostSignificantNodeColorScale: [0, 1],
+      colorMostSignificantTest: '#FFD700'
     },
     annotationData: [],
     enrichmentDataItem: [],
