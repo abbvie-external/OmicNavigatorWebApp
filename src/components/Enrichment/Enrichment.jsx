@@ -67,6 +67,12 @@ class Enrichment extends Component {
     networkDataMock: {},
     networkDataLoaded: false,
     tests: {},
+    nodeCutoff: 0.5,
+    edgeCutoff: 0.375,
+    // networkSortBy: ['significance', 'edgecount', 'nodecount']
+    networkSortBy: 'significance',
+    legendIsOpen: true,
+    // legendIsOpen: JSON.parse(sessionStorage.getItem('legendOpen')) || true,
     networkSettings: {
       facets: {},
       propLabel: {},
@@ -1215,11 +1221,59 @@ class Enrichment extends Component {
               onHandlePlotAnimation={this.handlePlotAnimation}
               onDisplayViolinPlot={this.displayViolinPlot}
               onHandlePieClick={this.testSelected}
+              onHandleNetworkSortByChange={this.handleNetworkSortByChange}
+              onHandleLegendOpen={this.handleLegendOpen}
+              onHandleLegendClose={this.handleLegendClose}
+              onHandleInputChange={this.handleInputChange}
+              onHandleSliderChange={this.handleSliderChange}
             />
           </Tab.Pane>
         )
       }
     ];
+  };
+
+  handleNetworkSortByChange = (evt, { value }) => {
+    this.setState({
+      networkSortBy: value
+      // networkGraphReady: false
+    });
+  };
+
+  // handleInputChange = _.debounce((evt, { name, value }) => {
+  //   this.setState({
+  //     [name]: value
+  //   });
+  // }, 500);
+
+  handleInputChange = (evt, { name, value }) => {
+    this.setState({
+      [name]: value
+    });
+  };
+
+  handleSliderChange = _.debounce(obj => {
+    debugger;
+    this.setState(obj);
+  }, 500);
+
+  handleSliderChange = obj => {
+    debugger;
+    this.setState(obj);
+  };
+
+  handleLegendOpen = () => {
+    // sessionStorage.setItem('legendOpen', 'true');
+    this.setState({ legendIsOpen: true });
+    // this.timeout = setTimeout(() => {
+    //   this.setState({ legendIsOpen: false });
+    // }, 2500);
+  };
+
+  handleLegendClose = () => {
+    // sessionStorage.setItem('legendOpen', 'false');
+    this.setState({ legendIsOpen: false });
+    // clearTimeout(this.timeout);
   };
 
   render() {

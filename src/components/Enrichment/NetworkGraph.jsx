@@ -615,7 +615,10 @@ class NetworkGraph extends Component {
           .style('font-size', '.9em')
           .style('opacity', 1)
           .attr('x', -65)
-          .attr('y', -20);
+          .attr('y', -15);
+        // .attr('y', function(d) {
+        // return -1.1 * d[networkSettings.nodeSize];
+        // });
       } else {
         node
           .append('text')

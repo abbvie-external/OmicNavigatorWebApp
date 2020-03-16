@@ -80,14 +80,8 @@ class EnrichmentResultsGraph extends Component {
     showNetworkLabels: true,
     results: [],
     networkSearchValue: '',
-    descriptions: [],
-    nodeCutoff: 0.5,
-    edgeCutoff: 0.375,
+    descriptions: []
     // networkGraphReady: false,
-    legendIsOpen: true,
-    // legendIsOpen: JSON.parse(sessionStorage.getItem('legendOpen')) || true,
-    // networkSortBy: ['significance', 'edgecount', 'nodecount']
-    networkSortBy: 'significance'
   };
 
   componentDidMount() {
@@ -158,12 +152,6 @@ class EnrichmentResultsGraph extends Component {
       networkSearchValue
     });
   }, 500);
-
-  handleInputChange = (evt, { name, value }) => {
-    this.setState({
-      [name]: value
-    });
-  };
 
   getLegend = () => {
     return (
@@ -287,27 +275,6 @@ class EnrichmentResultsGraph extends Component {
     );
   };
 
-  handleLegendOpen = () => {
-    // sessionStorage.setItem('legendOpen', 'true');
-    this.setState({ legendIsOpen: true });
-    // this.timeout = setTimeout(() => {
-    //   this.setState({ legendIsOpen: false });
-    // }, 2500);
-  };
-
-  handleLegendClose = () => {
-    // sessionStorage.setItem('legendOpen', 'false');
-    this.setState({ legendIsOpen: false });
-    // clearTimeout(this.timeout);
-  };
-
-  handleNetworkSortByChange = (evt, { value }) => {
-    this.setState({
-      networkSortBy: value
-      // networkGraphReady: false
-    });
-  };
-
   setupSearch = () => {
     const networkDataNodeDescriptions = this.props.networkData.nodes.map(r => ({
       description: r.data.EnrichmentMap_GS_DESCR.toLowerCase(),
@@ -348,13 +315,10 @@ class EnrichmentResultsGraph extends Component {
   render() {
     const { networkDataLoaded } = this.props;
     const {
-      results,
-      nodeCutoff,
-      edgeCutoff,
-      legendIsOpen,
-      networkSortBy
+      results
       // networkGraphReady
     } = this.state;
+    const { nodeCutoff, edgeCutoff, legendIsOpen, networkSortBy } = this.props;
 
     const networkSortByOptions = [
       {
@@ -453,19 +417,20 @@ class EnrichmentResultsGraph extends Component {
                 name="nodeCutoff"
                 className="NetworkSliderInput"
                 value={nodeCutoff}
-                onChange={this.handleInputChange}
+                onChange={this.props.onHandleInputChange}
               />
               <Slider
                 className="NetworkSlider"
                 inverted={false}
                 value={nodeCutoff}
+                name="nodeCutoff"
                 settings={{
                   start: nodeCutoff,
                   min: 0,
                   max: 1,
                   step: 0.05,
                   onChange: value => {
-                    this.setState({
+                    this.props.onHandleSliderChange({
                       nodeCutoff: value
                     });
                   }
@@ -490,11 +455,12 @@ class EnrichmentResultsGraph extends Component {
                 name="edgeCutoff"
                 className="NetworkSliderInput"
                 value={edgeCutoff}
-                onChange={this.handleInputChange}
+                onChange={this.props.onHandleInputChange}
               />
               <Slider
                 className="NetworkSlider"
                 inverted={false}
+                name="edgeCutoff"
                 value={edgeCutoff}
                 settings={{
                   start: edgeCutoff,
@@ -502,7 +468,7 @@ class EnrichmentResultsGraph extends Component {
                   max: 1,
                   step: 0.025,
                   onChange: value => {
-                    this.setState({
+                    this.props.onHandleSliderChange({
                       edgeCutoff: value
                     });
                   }
@@ -548,7 +514,7 @@ class EnrichmentResultsGraph extends Component {
                   // header="Sort By"
                   options={networkSortByOptions}
                   defaultValue={networkSortBy}
-                  onChange={this.handleNetworkSortByChange}
+                  onChange={this.props.onHandleNetworkSortByChange}
                 />
               </span>
               {/* </Header.Content>
@@ -599,8 +565,8 @@ class EnrichmentResultsGraph extends Component {
               style={LegendPopupStyle}
               // position="top left"
               open={legendIsOpen}
-              onClose={this.handleLegendClose}
-              onOpen={this.handleLegendOpen}
+              onClose={this.props.onHandleLegendClose}
+              onOpen={this.props.onHandleLegendOpen}
             >
               {legend}
             </Popup>
