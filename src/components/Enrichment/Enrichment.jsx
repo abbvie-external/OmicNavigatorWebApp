@@ -15,6 +15,7 @@ import tableIconSelected from '../../resources/tableIconSelected.png';
 import networkDataNew from '../../services/networkDataNew.json';
 import { phosphoprotService } from '../../services/phosphoprot.service';
 import ButtonActions from '../Shared/ButtonActions';
+import * as d3 from 'd3';
 import {
   formatNumberForDisplay,
   splitValue
@@ -66,6 +67,7 @@ class Enrichment extends Component {
     networkDataNew: {},
     networkDataMock: {},
     networkDataLoaded: false,
+    // networkGraphReady: false,
     tests: {},
     nodeCutoff: 0.5,
     edgeCutoff: 0.375,
@@ -89,8 +91,8 @@ class Enrichment extends Component {
       linkMetaLookup: ['EnrichmentMap_GS_DESCR', 'EnrichmentMap_GS_DESCR'],
       nodeColorScale: [0, 0.1, 1],
       nodeColors: ['red', 'white', 'blue'],
-      mostSignificantNodeColorScale: [0, 1],
-      colorMostSignificantTest: '#FFD700'
+      colorMostSignificantTest: '#FFD700',
+      colorHighestLinkCoefficient: '#FFD700'
     },
     annotationData: [],
     enrichmentDataItem: [],
@@ -1226,12 +1228,19 @@ class Enrichment extends Component {
               onHandleLegendClose={this.handleLegendClose}
               onHandleInputChange={this.handleInputChange}
               onHandleSliderChange={this.handleSliderChange}
+              // onNetworkGraphReady={this.handleNetworkGraphReady}
             />
           </Tab.Pane>
         )
       }
     ];
   };
+
+  // handleNetworkGraphReady = bool => {
+  //   this.setState({
+  //     networkGraphReady: bool
+  //   });
+  // };
 
   handleNetworkSortByChange = (evt, { value }) => {
     this.setState({
@@ -1249,16 +1258,18 @@ class Enrichment extends Component {
   handleInputChange = (evt, { name, value }) => {
     this.setState({
       [name]: value
+      // networkGraphReady: false
     });
   };
 
-  handleSliderChange = _.debounce(obj => {
-    debugger;
-    this.setState(obj);
-  }, 500);
+  // handleSliderChange = _.debounce(obj => {
+  //   this.setState(obj);
+  // }, 500);
 
   handleSliderChange = obj => {
-    debugger;
+    // this.setState({
+    //   networkGraphReady: false
+    // });
     this.setState(obj);
   };
 

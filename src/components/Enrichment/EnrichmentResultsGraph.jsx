@@ -12,7 +12,7 @@ import {
   Button,
   Icon,
   // Segment
-  Header,
+  // Header,
   Dropdown
   // Input
 } from 'semantic-ui-react';
@@ -81,7 +81,6 @@ class EnrichmentResultsGraph extends Component {
     results: [],
     networkSearchValue: '',
     descriptions: []
-    // networkGraphReady: false,
   };
 
   componentDidMount() {
@@ -93,6 +92,7 @@ class EnrichmentResultsGraph extends Component {
   componentDidUpdate(prevProps, prevState, snapshot) {
     if (
       // this.props.networkDataLoaded &&
+      // this.props.networkGraphReady !== prevProps.networkGraphReady ||
       this.props.networkData !== prevProps.networkData
     ) {
       this.setupSearch();
@@ -286,12 +286,6 @@ class EnrichmentResultsGraph extends Component {
     });
   };
 
-  // handleNetworkGraphReady = bool => {
-  //   this.setState({
-  //     networkGraphReady: bool
-  //   });
-  // };
-
   getDynamicSize = () => {
     let w = Math.max(
       document.documentElement.clientWidth,
@@ -314,10 +308,7 @@ class EnrichmentResultsGraph extends Component {
 
   render() {
     const { networkDataLoaded } = this.props;
-    const {
-      results
-      // networkGraphReady
-    } = this.state;
+    const { results } = this.state;
     const { nodeCutoff, edgeCutoff, legendIsOpen, networkSortBy } = this.props;
 
     const networkSortByOptions = [
@@ -355,13 +346,6 @@ class EnrichmentResultsGraph extends Component {
         </div>
       );
     } else {
-      // if (!networkGraphReady) {
-      //   return (
-      //     <div>
-      //       <LoaderActivePlots />
-      //     </div>
-      //   );
-      // } else {
       return (
         <Grid className="NetworkGraphFiltersContainer">
           <Grid.Row className="NetworkGraphFiltersRow">
@@ -577,11 +561,7 @@ class EnrichmentResultsGraph extends Component {
               largeScreen={16}
               widescreen={16}
             >
-              <NetworkGraph
-                {...this.props}
-                {...this.state}
-                // onNetworkGraphReady={this.handleNetworkGraphReady}
-              ></NetworkGraph>
+              <NetworkGraph {...this.props} {...this.state}></NetworkGraph>
             </Grid.Column>
           </Grid.Row>
         </Grid>
