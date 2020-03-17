@@ -112,20 +112,20 @@ class PepplotMultisetFilters extends Component {
     for(var i = 0;i < selectedOperatorP.length; i++){
     switch (selectedOperatorP[i].value) {
       case '<':
-        setDescP.push(`Elements ${selectedColP[i].text} less than ${sigValueP[i]} in:`);
-        notSetDescP.push(`Elements ${selectedColP[i].text} less than ${sigValueP[i]} not in:`);
+        setDescP.push(`${selectedColP[i].text} less than ${sigValueP[i]} in:`);
+        notSetDescP.push(`${selectedColP[i].text} less than ${sigValueP[i]} not in:`);
         break;
       case '>':
-        setDescP.push(`Elements ${selectedColP[i].text} greater than ${sigValueP[i]} in:`);
-        notSetDescP.push(`Elements ${selectedColP[i].text} greater than ${sigValueP[i]} not in:`);
+        setDescP.push(`${selectedColP[i].text} greater than ${sigValueP[i]} in:`);
+        notSetDescP.push(`${selectedColP[i].text} greater than ${sigValueP[i]} not in:`);
         break;
       case '|<|':
-        setDescP.push(`Elements ${selectedColP[i].text} absolute value less than ${sigValueP[i]} in:`);
-        notSetDescP.push(`Elements ${selectedColP[i].text} absolute value less than ${sigValueP[i]} not in:`);
+        setDescP.push(`${selectedColP[i].text} absolute value less than ${sigValueP[i]} in:`);
+        notSetDescP.push(`${selectedColP[i].text} absolute value less than ${sigValueP[i]} not in:`);
         break;
       case '|>|':
-        setDescP.push(`Elements ${selectedColP[i].text} absolute value greater than ${sigValueP[i]} in:`);
-        notSetDescP.push(`Elements ${selectedColP[i].text} absolute value greater than ${sigValueP[i]} not in:`);
+        setDescP.push(`${selectedColP[i].text} absolute value greater than ${sigValueP[i]} in:`);
+        notSetDescP.push(`${selectedColP[i].text} absolute value greater than ${sigValueP[i]} not in:`);
         break;
       default:
     }
@@ -747,10 +747,6 @@ class PepplotMultisetFilters extends Component {
     const SelColP = selectedColP;
     const indexFiltersP = uSettingsP.indexFiltersP;
     const hoveredFilter = uSettingsP.hoveredFilter;
-    const removeButtonStyling = {
-      position: "absolute",
-      marginTop: "15px"
-    }
 
     return (
       <Fragment>
@@ -763,7 +759,7 @@ class PepplotMultisetFilters extends Component {
             >
             <Form.Field
               control={Select}
-              label="Column"
+              label={(index===0)?"Column":""}
               name="selectedColP"
               className="ThresholdColumnReadOnly"
               index={index}
@@ -774,27 +770,29 @@ class PepplotMultisetFilters extends Component {
               onChange={this.handleDropdownChange}
             ></Form.Field>
             {hoveredFilter===index && indexFiltersP.length !== 1 &&
-            <Button circular icon style={removeButtonStyling} size="mini" compact onClick={()=>this.removeFilter(index)}>
+            <Button circular icon style={{
+              position:"absolute",
+              marginTop:index===0?"15px":"0px"}}
+              size="mini" compact onClick={()=>this.removeFilter(index)}>
               <Icon name="minus circle" color={"red"}/>
             </Button>}
             <Form.Field
               control={Select}
-              label="Operator"
+              label={(index===0)?"Operator":""}
               name="selectedOperatorP"
               className="ThresholdOperatorSelect"
               index={index}
               // selection
               value={SelOpP[index].value}
               options={OperatorsP}
-              width={4}
+              width={(SelOpP[index].value==="|<|")?5:4}
               onChange={this.handleDropdownChange}
             ></Form.Field>
             <Form.Field
               control={Input}
               type="number"
               step="0.01"
-              min="0"
-              label="Significance"
+              label={(index===0)?"Significance":""}
               name="sigValueP"
               className="SignificantValueInput"
               index={index}

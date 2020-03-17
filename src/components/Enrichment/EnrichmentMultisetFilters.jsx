@@ -106,20 +106,20 @@ class EnrichmentMultisetFilters extends Component {
     for(var i = 0;i < selectedOperator.length; i++){
       switch (selectedOperator[i].value) {
         case '<':
-          setDescP.push(`Elements less than ${sigValue[i]} in:`);
-          notSetDescP.push(`Elements less than ${sigValue[i]} not in:`);
+          setDescP.push(`less than ${sigValue[i]} in:`);
+          notSetDescP.push(`less than ${sigValue[i]} not in:`);
           break;
         case '>':
-          setDescP.push(`Elements greater than ${sigValue[i]} in:`);
-          notSetDescP.push(`Elements greater than ${sigValue[i]} not in:`);
+          setDescP.push(`greater than ${sigValue[i]} in:`);
+          notSetDescP.push(`greater than ${sigValue[i]} not in:`);
           break;
         case '|<|':
-          setDescP.push(`Elements absolute value less than ${sigValue[i]} in:`);
-          notSetDescP.push(`Elements absolute value less than ${sigValue[i]} not in:`);
+          setDescP.push(`absolute value less than ${sigValue[i]} in:`);
+          notSetDescP.push(`absolute value less than ${sigValue[i]} not in:`);
           break;
         case '|>|':
-          setDescP.push(`Elements absolute value greater than ${sigValue[i]} in:`);
-          notSetDescP.push(`Elements absolute value greater than ${sigValue[i]} not in:`);
+          setDescP.push(`absolute value greater than ${sigValue[i]} in:`);
+          notSetDescP.push(`absolute value greater than ${sigValue[i]} not in:`);
           break;
         default:
       }
@@ -725,10 +725,6 @@ class EnrichmentMultisetFilters extends Component {
     const SelOp = selectedOperator;
     const indexFilters = uSettings.indexFilters;
     const hoveredFilter = uSettings.hoveredFilter;
-    const removeButtonStyling = {
-      position: "absolute",
-      marginTop: "15px"
-    }
     // for now, column is displayed as label, just matching the "nominal" or "Adjusted" p value type
     const SelColOverride =
       this.props.pValueType === 'nominal'
@@ -746,7 +742,7 @@ class EnrichmentMultisetFilters extends Component {
             <Form.Field
               control={Input}
               readOnly
-              label="Column"
+              label={(index===0)?"Column":""}
               name="selectedCol"
               className="ThresholdColumnReadOnly"
               index={index}
@@ -755,12 +751,15 @@ class EnrichmentMultisetFilters extends Component {
               width={7}
             ></Form.Field>
             {hoveredFilter===index && indexFilters.length !== 1 &&
-            <Button circular icon style={removeButtonStyling} size="mini" compact onClick={()=>this.removeFilter(index)}>
+            <Button circular icon style={{
+              position:"absolute",
+              marginTop:index===0?"15px":"0px"}} 
+              size="mini" compact onClick={()=>this.removeFilter(index)}>
               <Icon name="minus circle" color={"red"}/>
             </Button>}
             <Form.Field
               control={Select}
-              label="Operator"
+              label={(index===0)?"Operator":""}
               name="selectedOperator"
               className="ThresholdOperatorSelect"
               index={index}
@@ -775,7 +774,7 @@ class EnrichmentMultisetFilters extends Component {
               type="number"
               step="0.01"
               min="0.00"
-              label="Significance"
+              label={(index===0)?"Significance":""}
               index={index}
               name="sigValue"
               className="SignificantValueInput"
