@@ -96,12 +96,13 @@ class Enrichment extends Component {
       title: '',
       // data: null,
       id: 'chart-network',
-      margin: { top: 30, right: 30, bottom: 30, left: 30 }
+      margin: { top: 30, right: 30, bottom: 30, left: 30 },
       // statLabel: '',
       // statistic: '',
       // formattedData: {},
       // facets: []
       // propLabel: [],
+      duration: 1000
     },
     annotationData: [],
     enrichmentDataItem: [],
