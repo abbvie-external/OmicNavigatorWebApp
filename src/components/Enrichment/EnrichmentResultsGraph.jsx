@@ -376,6 +376,7 @@ class EnrichmentResultsGraph extends Component {
               widescreen={4}
             >
               <Search
+                disabled={!networkGraphReady}
                 size={dynamicSize}
                 // className="NetworkSearchResultsContainer"
                 placeholder="Search Network"
@@ -387,6 +388,7 @@ class EnrichmentResultsGraph extends Component {
                 // {...this.props}
               />
               <Radio
+                disabled={!networkGraphReady}
                 className="RadioLabelsDisplay"
                 toggle
                 size={dynamicSize}
@@ -403,6 +405,7 @@ class EnrichmentResultsGraph extends Component {
               widescreen={3}
             >
               <Input
+                disabled={!networkGraphReady}
                 size={dynamicSize}
                 type="number"
                 step="0.01"
@@ -416,6 +419,7 @@ class EnrichmentResultsGraph extends Component {
                 onChange={this.props.onHandleInputChange}
               />
               <Slider
+                disabled={!networkGraphReady}
                 className="NetworkSlider"
                 inverted={false}
                 value={nodeCutoff}
@@ -441,6 +445,7 @@ class EnrichmentResultsGraph extends Component {
               widescreen={3}
             >
               <Input
+                disabled={!networkGraphReady}
                 size={dynamicSize}
                 type="number"
                 step="0.025"
@@ -454,6 +459,7 @@ class EnrichmentResultsGraph extends Component {
                 onChange={this.props.onHandleInputChange}
               />
               <Slider
+                disabled={!networkGraphReady}
                 className="NetworkSlider"
                 inverted={false}
                 name="edgeCutoff"
@@ -507,6 +513,7 @@ class EnrichmentResultsGraph extends Component {
                 <span id="NetworkGraphSortByText">Sort By </span>
                 <Dropdown
                   inline
+                  disabled={!networkGraphReady}
                   // header="Sort By"
                   options={networkSortByOptions}
                   defaultValue={networkSortBy}
@@ -540,7 +547,10 @@ class EnrichmentResultsGraph extends Component {
                   Edge Count
                 </Button>
               </Button.Group> */}
-              <div className={networkGraphReady ? 'Totals' : 'TotalsHidden'}>
+              <div
+                id="NodeEdgeTotals"
+                className={networkGraphReady ? 'Show' : 'Hide'}
+              >
                 <Label>Nodes {totalNodes}</Label>
                 <Label>Edges {totalEdges}</Label>
               </div>
@@ -554,6 +564,7 @@ class EnrichmentResultsGraph extends Component {
                   labelPosition="left"
                   // color="blue"
                   id="LegendIconButton"
+                  className={networkGraphReady ? 'Show' : 'Hide'}
                   size="mini"
                 >
                   Legend

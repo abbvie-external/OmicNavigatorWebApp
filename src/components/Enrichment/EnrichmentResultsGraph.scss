@@ -180,11 +180,14 @@
   height: 100vh !important;
 }
 
-.Totals {
+.Show {
   display: inline-block;
-  margin-top: 15px;
 }
 
-.TotalsHidden {
-  display: none;
+.Hide {
+  display: none !important;
+}
+
+#NodeEdgeTotals {
+  margin-top: 15px;
 }

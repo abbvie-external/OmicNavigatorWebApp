@@ -71,7 +71,6 @@ class NetworkGraph extends Component {
   // }
 
   componentDidMount(prevProps) {
-    debugger;
     if (prevProps === undefined) {
       // if (
       //   this.props.networkData !== prevProps.networkData ||
@@ -95,7 +94,6 @@ class NetworkGraph extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    debugger;
     if (
       this.props.networkData !== prevProps.networkData ||
       this.props.nodeCutoff !== prevProps.nodeCutoff ||
@@ -712,8 +710,10 @@ class NetworkGraph extends Component {
             })
             .style('font-size', '.9em')
             .style('opacity', 1)
+            .attr('text-anchor', 'middle')
             // to rotate text on boxes with one node
             // .attr('transform', 'rotate(' + 5 + ')')
+            // .attr('x', -65);
             .attr('x', function(d) {
               return d.x + d.dx / 2;
             })
@@ -721,10 +721,8 @@ class NetworkGraph extends Component {
             //   return d.y + d.dy / 2;
             // })
             // .attr('dy', '.35em')
-            .attr('text-anchor', 'middle')
-            .attr('x', -65);
-          // randomly place text below or above node
-          // .attr('y', 20 * (Math.random() < 0.5 ? -1 : 1));
+            // randomly place text below or above node
+            .attr('y', 20 * (Math.random() < 0.5 ? -1 : 1));
           // .attr('y', function(d) {
           // return -1.1 * d[networkSettings.nodeSize];
           // });
