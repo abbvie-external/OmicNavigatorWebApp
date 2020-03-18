@@ -59,7 +59,7 @@ class Enrichment extends Component {
     pdfVisible: false,
     svgVisible: true,
     displayViolinPlot: false,
-    networkDataAvailable: false,
+    // networkDataAvailable: false,
     networkData: {
       nodes: [],
       edges: []
@@ -67,9 +67,9 @@ class Enrichment extends Component {
     networkDataNew: {},
     networkDataMock: {},
     networkDataLoaded: false,
-    // networkGraphReady: false,
+    networkGraphReady: false,
     tests: {},
-    nodeCutoff: 0.5,
+    nodeCutoff: 0.1,
     edgeCutoff: 0.375,
     // networkSortBy: ['significance', 'edgecount', 'nodecount']
     networkSortBy: 'significance',
@@ -92,7 +92,16 @@ class Enrichment extends Component {
       nodeColorScale: [0, 0.1, 1],
       nodeColors: ['red', 'white', 'blue'],
       colorMostSignificantTest: '#FFD700',
-      colorHighestLinkCoefficient: '#FFD700'
+      colorHighestLinkCoefficient: '#FFD700',
+      title: '',
+      // data: null,
+      id: 'chart-network',
+      margin: { top: 30, right: 30, bottom: 30, left: 30 }
+      // statLabel: '',
+      // statistic: '',
+      // formattedData: {},
+      // facets: []
+      // propLabel: [],
     },
     annotationData: [],
     enrichmentDataItem: [],
@@ -261,8 +270,8 @@ class Enrichment extends Component {
   handleEnrichmentSearch = searchResults => {
     const columns = this.getConfigCols(searchResults);
     this.getNetworkData();
-
     this.setState({
+      networkGraphReady: false,
       enrichmentResults: searchResults.enrichmentResults,
       enrichmentColumns: columns,
       isSearching: false,
@@ -566,6 +575,7 @@ class Enrichment extends Component {
   };
 
   getNetworkData = () => {
+    this.removeNetworkSVG();
     const {
       enrichmentModel,
       enrichmentAnnotation,
@@ -591,7 +601,7 @@ class Enrichment extends Component {
       // });
       .then(EMData => {
         this.setState({
-          networkDataAvailable: true,
+          // networkDataAvailable: true,
           networkData: EMData.elements,
           tests: EMData.tests,
           networkDataNew: networkDataNew
@@ -623,7 +633,8 @@ class Enrichment extends Component {
             // nodeColorScale: [0, 0.1, 1],
             // nodeColors: ["red", "white", "blue"]
           },
-          networkDataLoaded: true
+          networkDataLoaded: true,
+          networkGraphReady: true
         });
       });
   };
@@ -1236,13 +1247,19 @@ class Enrichment extends Component {
     ];
   };
 
-  // handleNetworkGraphReady = bool => {
-  //   this.setState({
-  //     networkGraphReady: bool
-  //   });
-  // };
+  handleNetworkGraphReady = bool => {
+    this.setState({
+      networkGraphReady: bool
+    });
+  };
+
+  removeNetworkSVG = () => {
+    d3.select('div.tooltip-pieSlice').remove();
+    d3.select(`#svg-${this.state.networkSettings.id}`).remove();
+  };
 
   handleNetworkSortByChange = (evt, { value }) => {
+    this.removeNetworkSVG();
     this.setState({
       networkSortBy: value
       // networkGraphReady: false
@@ -1256,6 +1273,7 @@ class Enrichment extends Component {
   // }, 500);
 
   handleInputChange = (evt, { name, value }) => {
+    this.removeNetworkSVG();
     this.setState({
       [name]: value
       // networkGraphReady: false
@@ -1270,6 +1288,7 @@ class Enrichment extends Component {
     // this.setState({
     //   networkGraphReady: false
     // });
+    this.removeNetworkSVG();
     this.setState(obj);
   };
 

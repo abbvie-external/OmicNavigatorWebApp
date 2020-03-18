@@ -61,7 +61,7 @@ class EnrichmentResultsTable extends Component {
               itemsPerPage={100}
               exportBaseName="Enrichment_Analysis"
               quickViews={quickViews}
-              disableGeneralSearch
+              // disableGeneralSearch
               disableGrouping
               disableColumnVisibilityToggle
               min-height="75vh"

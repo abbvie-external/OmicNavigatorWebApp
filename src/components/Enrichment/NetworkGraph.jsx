@@ -37,18 +37,7 @@ class NetworkGraph extends Component {
     networkWidth: 0,
     networkContainerWidth: 0,
     networkHeight: 0,
-    networkContainerHeight: 0,
-    chartSettings: {
-      title: '',
-      // data: null,
-      id: 'chart-network',
-      margin: { top: 30, right: 30, bottom: 30, left: 30 }
-      // statLabel: '',
-      // statistic: '',
-      // formattedData: {},
-      // facets: []
-      // propLabel: [],
-    }
+    networkContainerHeight: 0
     // chartObjs: {
     //   svg: null,
     //   mainDiv: null,
@@ -81,8 +70,21 @@ class NetworkGraph extends Component {
   //   return newState;
   // }
 
-  componentDidMount() {
-    this.setDimensions();
+  componentDidMount(prevProps) {
+    debugger;
+    if (prevProps === undefined) {
+      // if (
+      //   this.props.networkData !== prevProps.networkData ||
+      //   this.props.nodeCutoff !== prevProps.nodeCutoff ||
+      //   this.props.edgeCutoff !== prevProps.edgeCutoff ||
+      //   this.props.networkSortBy !== prevProps.networkSortBy
+      // ) {
+      //   // this.prepareAndRenderTree(
+      //   //   this.state.networkWidth,
+      //   //   this.state.networkHeight
+      //   //);
+      this.setDimensions();
+    }
     let resizedFn;
     window.addEventListener('resize', () => {
       clearTimeout(resizedFn);
@@ -92,7 +94,8 @@ class NetworkGraph extends Component {
     });
   }
 
-  componentDidUpdate(prevProps, prevState, snapshot) {
+  componentDidUpdate(prevProps) {
+    debugger;
     if (
       this.props.networkData !== prevProps.networkData ||
       this.props.nodeCutoff !== prevProps.nodeCutoff ||
@@ -112,11 +115,6 @@ class NetworkGraph extends Component {
       this.handleNodeSearch();
     }
   }
-
-  // componentWillUnmount() {
-  //   d3.select(`#svg-${this.state.chartSettings.id}`).remove();
-  //   d3.select('div.tooltip-pieSlice').remove();
-  // }
 
   handleNodeSearch = () => {
     // setTimeout(() => {
@@ -139,9 +137,7 @@ class NetworkGraph extends Component {
   };
 
   setDimensions = () => {
-    d3.select('div.tooltip-pieSlice').remove();
-    d3.select(`#svg-${this.state.chartSettings.id}`).remove();
-    const { chartSettings } = this.state;
+    const { networkSettings } = this.props;
     console.log(
       this.props.networkData.nodes.length,
       this.props.networkData.edges.length
@@ -151,9 +147,13 @@ class NetworkGraph extends Component {
     // we calculate height based on the containerRef
     const containerHeight = this.getHeight();
     const width =
-      containerWidth - chartSettings.margin.left - chartSettings.margin.right;
+      containerWidth -
+      networkSettings.margin.left -
+      networkSettings.margin.right;
     const height =
-      containerHeight - chartSettings.margin.top - chartSettings.margin.bottom;
+      containerHeight -
+      networkSettings.margin.top -
+      networkSettings.margin.bottom;
     this.setState({
       networkContainerWidth: containerWidth,
       networkWidth: width,
@@ -193,10 +193,9 @@ class NetworkGraph extends Component {
   }
 
   prepareAndRenderTree = (width, height) => {
-    const { chartSettings } = this.state;
+    const { networkData, networkSettings } = this.props;
     const self = this;
     // Prepare Data
-    const { networkData, networkSettings } = this.props;
     let formattedNodes = _.map(networkData.nodes, function(o) {
       return o.data;
     });
@@ -343,7 +342,7 @@ class NetworkGraph extends Component {
       // Prepare Settings (dimensions already calculated)
 
       // Prepare Chart
-      const chartDiv = d3.select('#' + chartSettings.id);
+      const chartDiv = d3.select('#' + networkSettings.id);
       // const clientHeight = Math.max(
       //   document.documentElement.clientHeight,
       //   window.innerHeight || 0
@@ -358,10 +357,10 @@ class NetworkGraph extends Component {
         //   [-500, 0]
         // ];
         const extent = [
-          [chartSettings.margin.left, chartSettings.margin.top],
+          [networkSettings.margin.left, networkSettings.margin.top],
           [
-            width - chartSettings.margin.right,
-            height - chartSettings.margin.top
+            width - networkSettings.margin.right,
+            height - networkSettings.margin.top
           ]
         ];
 
@@ -391,7 +390,7 @@ class NetworkGraph extends Component {
 
       chartDiv
         .append('svg')
-        .attr('id', `svg-${chartSettings.id}`)
+        .attr('id', `svg-${networkSettings.id}`)
         .attr('class', 'network-chart-area nwChart')
         .attr('width', '100%')
         .attr('height', '100%')
@@ -476,7 +475,7 @@ class NetworkGraph extends Component {
 
       treemap(root);
 
-      let chartSVG = d3.select(`#svg-${chartSettings.id}`);
+      let chartSVG = d3.select(`#svg-${networkSettings.id}`);
       let cell = chartSVG
         .selectAll('g')
         .data(root.leaves())
@@ -500,9 +499,12 @@ class NetworkGraph extends Component {
           return d.y1 - d.y0;
         })
         .attr('fill', '#fdfcfb')
-        .style('stroke-opacity', 0.25)
+        // determines thickness of bounding boxes
+        .style('stroke-width', 0.25)
+        .style('stroke-opacity', 0.5)
         .style('stroke', 'grey')
-        .style('opacity', 0.33);
+        // make this opacity 0 if you don't want lines, want to see full labels
+        .style('opacity', 0.5);
       // .style('opacity', function(d) {
       //   if (d.data.length * averageLetterWidth * pt_px * font_size >= d.dx) {
       //     return 0;
@@ -527,7 +529,7 @@ class NetworkGraph extends Component {
             'charge',
             d3
               .forceManyBody()
-              .strength([-800])
+              .strength([-1200])
               .distanceMax([500])
           )
           .force('center', d3.forceCenter(cellWidth / 2, cellHeight / 2))
@@ -598,7 +600,11 @@ class NetworkGraph extends Component {
             } else return '#0080ff';
           })
           .style('stroke-opacity', function(d) {
-            return 0.3;
+            if (
+              d.EnrichmentMap_similarity_coefficient === highestLinkCoefficient
+            ) {
+              return 1;
+            } else return 0.3;
           })
           .style('stroke-width', function(d) {
             return lineScaleVar(d[networkSettings.linkSize]);
@@ -643,7 +649,7 @@ class NetworkGraph extends Component {
             d3.select(this)
               .transition()
               .duration('50')
-              .attr('opacity', '.50')
+              .attr('opacity', 0.5)
               .attr('d', arc.outerRadius(50).innerRadius(0));
             div
               .transition()
@@ -659,7 +665,7 @@ class NetworkGraph extends Component {
           .on('mouseout', function(d, i) {
             // d3.select(this).transition()
             //     .duration('50')
-            //     .attr('opacity', '.75')
+            //     .attr('opacity', .75)
             //     .attr("d", arc.outerRadius(r).innerRadius(0));
             div
               .transition()
@@ -706,6 +712,8 @@ class NetworkGraph extends Component {
             })
             .style('font-size', '.9em')
             .style('opacity', 1)
+            // to rotate text on boxes with one node
+            // .attr('transform', 'rotate(' + 5 + ')')
             .attr('x', function(d) {
               return d.x + d.dx / 2;
             })
@@ -714,8 +722,9 @@ class NetworkGraph extends Component {
             // })
             // .attr('dy', '.35em')
             .attr('text-anchor', 'middle')
-            // .attr('x', -65)
-            .attr('y', -15);
+            .attr('x', -65);
+          // randomly place text below or above node
+          // .attr('y', 20 * (Math.random() < 0.5 ? -1 : 1));
           // .attr('y', function(d) {
           // return -1.1 * d[networkSettings.nodeSize];
           // });
@@ -774,7 +783,7 @@ class NetworkGraph extends Component {
               d3.select(this)
                 .transition()
                 .duration('50')
-                .attr('opacity', '.50')
+                .attr('opacity', 0.5)
                 .attr('d', arc.outerRadius(50).innerRadius(0));
               div
                 .transition()
@@ -795,7 +804,7 @@ class NetworkGraph extends Component {
               d3.select(this)
                 .transition()
                 .duration('50')
-                .attr('opacity', '.75')
+                .attr('opacity', 0.75)
                 .attr('d', arc.outerRadius(r).innerRadius(0));
               div
                 .transition()
@@ -864,8 +873,8 @@ class NetworkGraph extends Component {
   };
 
   render() {
-    const { chartSettings, noResults } = this.state;
-    // const { networkGraphReady } = this.props;
+    const { noResults } = this.state;
+    const { networkSettings, networkGraphReady } = this.props;
     const NoResults = noResults ? (
       <Message
         className="NoResultsMessage"
@@ -876,23 +885,23 @@ class NetworkGraph extends Component {
     ) : (
       ''
     );
-    // const RerenderingOverlay = !networkGraphReady ? (
-    //   <div>
-    //     <Dimmer active inverted>
-    //       <Loader size="large">Graph Re-rendering</Loader>
-    //     </Dimmer>
-    //   </div>
-    // ) : (
-    //   ''
-    // );
+    const RerenderingOverlay = !networkGraphReady ? (
+      <div>
+        <Dimmer active inverted>
+          <Loader size="large">Graph Rendering</Loader>
+        </Dimmer>
+      </div>
+    ) : (
+      ''
+    );
 
     return (
       <>
-        {/* {RerenderingOverlay} */}
+        {RerenderingOverlay}
         {NoResults}
         <div
           ref={this.networkContainerRef}
-          id={chartSettings.id}
+          id={networkSettings.id}
           className="NetworkChartContainer"
         ></div>
       </>

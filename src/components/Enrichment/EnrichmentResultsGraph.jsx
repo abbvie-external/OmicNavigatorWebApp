@@ -80,11 +80,15 @@ class EnrichmentResultsGraph extends Component {
     showNetworkLabels: true,
     results: [],
     networkSearchValue: '',
-    descriptions: []
+    descriptions: [],
+    totalNodes: 0,
+    totalEdges: 0
   };
 
   componentDidMount() {
     // if (this.props.networkDataLoaded) {
+    d3.select(`#svg-${this.props.networkSettings.id}`).remove();
+    d3.select('div.tooltip-pieSlice').remove();
     this.setupSearch();
     //}
   }
@@ -92,7 +96,7 @@ class EnrichmentResultsGraph extends Component {
   componentDidUpdate(prevProps, prevState, snapshot) {
     if (
       // this.props.networkDataLoaded &&
-      // this.props.networkGraphReady !== prevProps.networkGraphReady ||
+      this.props.networkGraphReady !== prevProps.networkGraphReady ||
       this.props.networkData !== prevProps.networkData
     ) {
       this.setupSearch();
@@ -116,10 +120,10 @@ class EnrichmentResultsGraph extends Component {
   //   descriptions: nodesMapped
   // });
 
-  componentWillUnmount() {
-    d3.select('#svg-chart-network').remove();
-    d3.select('div.tooltip-pieSlice').remove();
-  }
+  // componentWillUnmount() {
+  //   d3.select('#svg-chart-network').remove();
+  //   d3.select('div.tooltip-pieSlice').remove();
+  // }
 
   handleLabels = () => {
     this.setState(prevState => ({
@@ -282,7 +286,9 @@ class EnrichmentResultsGraph extends Component {
       size: r.data.EnrichmentMap_Genes.length
     }));
     this.setState({
-      descriptions: networkDataNodeDescriptions
+      descriptions: networkDataNodeDescriptions,
+      totalNodes: this.props.networkData.nodes.length,
+      totalEdges: this.props.networkData.edges.length
     });
   };
 
@@ -308,8 +314,14 @@ class EnrichmentResultsGraph extends Component {
 
   render() {
     const { networkDataLoaded } = this.props;
-    const { results } = this.state;
-    const { nodeCutoff, edgeCutoff, legendIsOpen, networkSortBy } = this.props;
+    const { results, totalNodes, totalEdges } = this.state;
+    const {
+      nodeCutoff,
+      edgeCutoff,
+      legendIsOpen,
+      networkSortBy,
+      networkGraphReady
+    } = this.props;
 
     const networkSortByOptions = [
       {
@@ -393,10 +405,10 @@ class EnrichmentResultsGraph extends Component {
               <Input
                 size={dynamicSize}
                 type="number"
-                step="0.05"
+                step="0.01"
                 min="0"
                 max="1"
-                default="0.50"
+                default="0.10"
                 label="Node Cutoff"
                 name="nodeCutoff"
                 className="NetworkSliderInput"
@@ -528,6 +540,10 @@ class EnrichmentResultsGraph extends Component {
                   Edge Count
                 </Button>
               </Button.Group> */}
+              <div className={networkGraphReady ? 'Totals' : 'TotalsHidden'}>
+                <Label>Nodes {totalNodes}</Label>
+                <Label>Edges {totalEdges}</Label>
+              </div>
             </Grid.Column>
           </Grid.Row>
           <Grid.Row className="NetworkGraphContainer">
