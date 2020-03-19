@@ -46,7 +46,7 @@ class EnrichmentResultsTable extends Component {
       <Grid>
         <Grid.Row>
           <Grid.Column
-            className=""
+            className="EnrichmentResultsTable"
             mobile={16}
             tablet={16}
             largeScreen={16}

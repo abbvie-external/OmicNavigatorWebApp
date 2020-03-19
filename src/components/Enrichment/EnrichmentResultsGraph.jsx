@@ -82,15 +82,17 @@ class EnrichmentResultsGraph extends Component {
     networkSearchValue: '',
     descriptions: [],
     totalNodes: 0,
-    totalEdges: 0
+    totalEdges: 0,
+    legendIsOpen: true
+    // legendIsOpen: JSON.parse(sessionStorage.getItem('legendOpen')) || true,
   };
 
   componentDidMount() {
-    // if (this.props.networkDataLoaded) {
-    d3.select(`#svg-${this.props.networkSettings.id}`).remove();
-    d3.select('div.tooltip-pieSlice').remove();
-    this.setupSearch();
-    //}
+    if (!this.props.networkGraphReady) {
+      d3.select(`#svg-${this.props.networkSettings.id}`).remove();
+      d3.select('div.tooltip-pieSlice').remove();
+      this.setupSearch();
+    }
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
@@ -312,16 +314,35 @@ class EnrichmentResultsGraph extends Component {
   //   }));
   // };
 
+  handleLegendOpen = () => {
+    // sessionStorage.setItem('legendOpen', 'true');
+    this.setState({ legendIsOpen: true });
+    // this.timeout = setTimeout(() => {
+    //   this.setState({ legendIsOpen: false });
+    // }, 2500);
+  };
+
+  handleLegendClose = () => {
+    // sessionStorage.setItem('legendOpen', 'false');
+    this.setState({ legendIsOpen: false });
+    // clearTimeout(this.timeout);
+  };
+
   render() {
-    const { networkDataLoaded } = this.props;
-    const { results, totalNodes, totalEdges } = this.state;
+    const { results, totalNodes, totalEdges, legendIsOpen } = this.state;
     const {
       nodeCutoff,
       edgeCutoff,
-      legendIsOpen,
+      networkDataLoaded,
       networkSortBy,
-      networkGraphReady
+      networkGraphReady,
+      activeIndexEnrichmentView
     } = this.props;
+
+    const openLegend =
+      legendIsOpen && activeIndexEnrichmentView === 1 && networkGraphReady
+        ? true
+        : false;
 
     const networkSortByOptions = [
       {
@@ -378,7 +399,7 @@ class EnrichmentResultsGraph extends Component {
               <Search
                 disabled={!networkGraphReady}
                 size={dynamicSize}
-                // className="NetworkSearchResultsContainer"
+                id="NetworkSearchInput"
                 placeholder="Search Network"
                 onResultSelect={this.handleResultSelect}
                 onSearchChange={this.handleSearchChange}
@@ -547,40 +568,57 @@ class EnrichmentResultsGraph extends Component {
                   Edge Count
                 </Button>
               </Button.Group> */}
-              <div
+            </Grid.Column>
+          </Grid.Row>
+          <Grid.Row className="NetworkGraphContainer">
+            <Grid.Column
+              id="LegendColumn"
+              mobile={8}
+              tablet={8}
+              largeScreen={8}
+              widescreen={8}
+            >
+              <Popup
+                trigger={
+                  <Button
+                    icon
+                    labelPosition="left"
+                    // color="blue"
+                    id="LegendIconButton"
+                    className={networkGraphReady ? 'Show' : 'Hide'}
+                    size="mini"
+                  >
+                    Legend
+                    <Icon name="info" />
+                  </Button>
+                }
+                wide
+                on="click"
+                style={LegendPopupStyle}
+                id="LegendPopup"
+                // position="top left"
+                open={openLegend}
+                onClose={this.handleLegendClose}
+                onOpen={this.handleLegendOpen}
+              >
+                {legend}
+              </Popup>
+            </Grid.Column>
+            <Grid.Column
+              id="TotalsColumn"
+              mobile={8}
+              tablet={8}
+              largeScreen={8}
+              widescreen={8}
+            >
+              <span
                 id="NodeEdgeTotals"
                 className={networkGraphReady ? 'Show' : 'Hide'}
               >
                 <Label>Nodes {totalNodes}</Label>
                 <Label>Edges {totalEdges}</Label>
-              </div>
+              </span>
             </Grid.Column>
-          </Grid.Row>
-          <Grid.Row className="NetworkGraphContainer">
-            <Popup
-              trigger={
-                <Button
-                  icon
-                  labelPosition="left"
-                  // color="blue"
-                  id="LegendIconButton"
-                  className={networkGraphReady ? 'Show' : 'Hide'}
-                  size="mini"
-                >
-                  Legend
-                  <Icon name="info" />
-                </Button>
-              }
-              wide
-              on="click"
-              style={LegendPopupStyle}
-              // position="top left"
-              open={legendIsOpen}
-              onClose={this.props.onHandleLegendClose}
-              onOpen={this.props.onHandleLegendOpen}
-            >
-              {legend}
-            </Popup>
             <Grid.Column
               className=""
               mobile={16}

@@ -84,6 +84,7 @@ class NetworkGraph extends Component {
       //   //);
       this.setDimensions();
     }
+
     let resizedFn;
     window.addEventListener('resize', () => {
       clearTimeout(resizedFn);
@@ -106,9 +107,6 @@ class NetworkGraph extends Component {
       //);
       this.setDimensions();
     }
-    // if (this.props.networkGraphReady !== prevProps.networkGraphReady) {
-    //   this.setState({ rerendering: true });
-    // }
     if (this.props.networkSearchValue !== prevProps.networkSearchValue) {
       this.handleNodeSearch();
     }
@@ -513,7 +511,6 @@ class NetworkGraph extends Component {
 
       // let cellVar = cell.length > 1
       // if (cell._groups.length > 0) {
-      debugger;
       cell.each(function(d, i) {
         let cellWidth = d.x1 - d.x0;
         let cellHeight = d.y1 - d.y0;

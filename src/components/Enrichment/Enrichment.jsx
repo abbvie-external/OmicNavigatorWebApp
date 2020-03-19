@@ -33,7 +33,7 @@ import SplitPanesContainer from './SplitPanesContainer';
 
 let plotCancel = () => {};
 class Enrichment extends Component {
-  defaultActiveIndex =
+  defaultEnrichmentActiveIndex =
     parseInt(sessionStorage.getItem('enrichmentViewTab'), 10) || 0;
 
   state = {
@@ -43,7 +43,7 @@ class Enrichment extends Component {
     enrichmentIconText: '',
     enrichmentResults: [],
     enrichmentColumns: [],
-    activeIndex: this.defaultActiveIndex || 0,
+    activeIndexEnrichmentView: this.defaultEnrichmentActiveIndex || 0,
     multisetPlotInfo: {
       title: '',
       svg: []
@@ -73,7 +73,7 @@ class Enrichment extends Component {
     edgeCutoff: 0.375,
     // networkSortBy: ['significance', 'edgecount', 'nodecount']
     networkSortBy: 'significance',
-    legendIsOpen: true,
+    // legendIsOpen: true,
     // legendIsOpen: JSON.parse(sessionStorage.getItem('legendOpen')) || true,
     networkSettings: {
       facets: {},
@@ -96,7 +96,7 @@ class Enrichment extends Component {
       title: '',
       // data: null,
       id: 'chart-network',
-      margin: { top: 30, right: 30, bottom: 30, left: 30 },
+      margin: { top: 10, right: 10, bottom: 10, left: 10 },
       // statLabel: '',
       // statistic: '',
       // formattedData: {},
@@ -1119,7 +1119,7 @@ class Enrichment extends Component {
 
   handleTableNetworkTabChange = (e, { activeIndex }) => {
     sessionStorage.setItem(`enrichmentViewTab`, activeIndex);
-    this.setState({ activeIndex });
+    this.setState({ activeIndexEnrichmentView: activeIndex });
   };
 
   getView = () => {
@@ -1148,7 +1148,7 @@ class Enrichment extends Component {
           className="TableAndNetworkContainer"
           onTabChange={this.handleTableNetworkTabChange}
           panes={TableAndNetworkPanes}
-          activeIndex={this.state.activeIndex}
+          activeIndex={this.state.activeIndexEnrichmentView}
           renderActiveOnly={false}
           menu={{
             attached: true,
@@ -1176,17 +1176,21 @@ class Enrichment extends Component {
             className="TableAndNetworkButtons TableButton"
             name="table"
             color="orange"
-            // active={this.state.activeIndex === 0}
-            inverted={(this.state.activeIndex === 0).toString()}
+            // active={this.state.activeIndexEnrichmentView === 0}
+            inverted={(this.state.activeIndexEnrichmentView === 0).toString()}
           >
             {/* <Icon
               name="table"
               size="large"
               color="orange"
-              inverted={this.state.activeIndex === 0}
+              inverted={this.state.activeIndexEnrichmentView === 0}
             /> */}
             <img
-              src={this.state.activeIndex === 0 ? tableIconSelected : tableIcon}
+              src={
+                this.state.activeIndexEnrichmentView === 0
+                  ? tableIconSelected
+                  : tableIcon
+              }
               alt="Table Icon"
               id="TableButton"
             />
@@ -1196,6 +1200,7 @@ class Enrichment extends Component {
           <Tab.Pane
             key="0"
             className="EnrichmentContentPane"
+            id="EnrichmentContentPaneTable"
             // ref="EnrichmentContentPaneTable"
           >
             <EnrichmentResultsTable
@@ -1216,7 +1221,9 @@ class Enrichment extends Component {
           >
             <img
               src={
-                this.state.activeIndex === 1 ? networkIconSelected : networkIcon
+                this.state.activeIndexEnrichmentView === 1
+                  ? networkIconSelected
+                  : networkIcon
               }
               alt="Network Icon"
               id="NetworkButton"
@@ -1227,6 +1234,7 @@ class Enrichment extends Component {
           <Tab.Pane
             key="1"
             className="EnrichmentContentPane"
+            id="EnrichmentContentPane"
             // ref="EnrichmentContentPaneGraph"
           >
             <EnrichmentResultsGraph
@@ -1236,8 +1244,8 @@ class Enrichment extends Component {
               onDisplayViolinPlot={this.displayViolinPlot}
               onHandlePieClick={this.testSelected}
               onHandleNetworkSortByChange={this.handleNetworkSortByChange}
-              onHandleLegendOpen={this.handleLegendOpen}
-              onHandleLegendClose={this.handleLegendClose}
+              // onHandleLegendOpen={this.handleLegendOpen}
+              // onHandleLegendClose={this.handleLegendClose}
               onHandleInputChange={this.handleInputChange}
               onHandleSliderChange={this.handleSliderChange}
               // onNetworkGraphReady={this.handleNetworkGraphReady}
@@ -1293,19 +1301,19 @@ class Enrichment extends Component {
     this.setState(obj);
   };
 
-  handleLegendOpen = () => {
-    // sessionStorage.setItem('legendOpen', 'true');
-    this.setState({ legendIsOpen: true });
-    // this.timeout = setTimeout(() => {
-    //   this.setState({ legendIsOpen: false });
-    // }, 2500);
-  };
+  // handleLegendOpen = () => {
+  //   // sessionStorage.setItem('legendOpen', 'true');
+  //   this.setState({ legendIsOpen: true });
+  //   // this.timeout = setTimeout(() => {
+  //   //   this.setState({ legendIsOpen: false });
+  //   // }, 2500);
+  // };
 
-  handleLegendClose = () => {
-    // sessionStorage.setItem('legendOpen', 'false');
-    this.setState({ legendIsOpen: false });
-    // clearTimeout(this.timeout);
-  };
+  // handleLegendClose = () => {
+  //   // sessionStorage.setItem('legendOpen', 'false');
+  //   this.setState({ legendIsOpen: false });
+  //   // clearTimeout(this.timeout);
+  // };
 
   render() {
     const enrichmentView = this.getView();
