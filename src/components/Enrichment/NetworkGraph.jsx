@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import _ from 'lodash';
 import * as d3 from 'd3';
-import { Dimmer, Loader, Grid, Message } from 'semantic-ui-react';
+// import d3plus from 'd3plus';
+import { Dimmer, Loader, Message } from 'semantic-ui-react';
 import './NetworkGraph.scss';
 // import LoaderActivePlots from '../Transitions/LoaderActivePlots';
 import { networkByCluster } from '../Shared/helpers';
@@ -261,11 +262,11 @@ class NetworkGraph extends Component {
       l => l.EnrichmentMap_similarity_coefficient >= this.props.edgeCutoff
     );
 
-    const highestLinkCoefficient = Math.max(
-      ...filteredLinks
-        .map(l => l.EnrichmentMap_similarity_coefficient)
-        .filter(v => v != null)
-    );
+    // const highestLinkCoefficient = Math.max(
+    //   ...filteredLinks
+    //     .map(l => l.EnrichmentMap_similarity_coefficient)
+    //     .filter(v => v != null)
+    // );
 
     // let formattedNodesCopy = [...formattedNodes];
     // const formattedNodesCopy = _.cloneDeep(formattedNodes);
@@ -310,6 +311,7 @@ class NetworkGraph extends Component {
     let lineScaleVar = lineScaleBase
       .range(networkSettings.lineScale)
       .domain([minLineVar, maxLineVar]);
+    this.props.onHandleTotals(filteredNodes.length, filteredLinks.length);
 
     let dataCombinedVar = {
       nodes: filteredNodes,
@@ -453,16 +455,22 @@ class NetworkGraph extends Component {
 
           // return [first] || [second] || [third];
           if (self.props.networkSortBy === 'significance') {
-            return a.data.significance - b.data.significance;
+            return (
+              a.data.significance - b.data.significance ||
+              b.data.nodecount - a.data.nodecount ||
+              b.data.edgecount - a.data.edgecount
+            );
           } else if (self.props.networkSortBy === 'edgecount') {
             return (
               b.data.edgecount - a.data.edgecount ||
-              a.data.significance - b.data.significance
+              a.data.significance - b.data.significance ||
+              b.data.nodecount - a.data.nodecount
             );
           } else if (self.props.networkSortBy === 'nodecount') {
             return (
               b.data.nodecount - a.data.nodecount ||
-              a.data.significance - b.data.significance
+              a.data.significance - b.data.significance ||
+              b.data.edgecount - a.data.edgecount
             );
           } else {
             return a.data.significance - b.data.significance;
@@ -500,7 +508,7 @@ class NetworkGraph extends Component {
         .style('stroke-width', 0.25)
         .style('stroke-opacity', 0.5)
         .style('stroke', 'grey')
-        // make this opacity 0 if you don't want lines, want to see full labels
+        // Paul - make this opacity 0 if you don't want lines, want to see full labels
         .style('opacity', 0.5);
       // .style('opacity', function(d) {
       //   if (d.data.length * averageLetterWidth * pt_px * font_treesize >= d.dx) {
@@ -510,276 +518,143 @@ class NetworkGraph extends Component {
       // });
 
       // let cellVar = cell.length > 1
-      // if (cell._groups.length > 0) {
-      cell.each(function(d, i) {
-        let cellWidth = d.x1 - d.x0;
-        let cellHeight = d.y1 - d.y0;
-        if (d.data.nodes.length > 0) {
-          let simulation = d3
-            .forceSimulation(d.data.nodes)
-            .force(
-              'link',
-              d3.forceLink(d.data.links).id(function(d) {
-                return d.id;
-              })
-            )
-            .force(
-              'charge',
-              d3
-                .forceManyBody()
-                .strength([-1200])
-                .distanceMax([500])
-            )
-            .force('center', d3.forceCenter(cellWidth / 2, cellHeight / 2))
-            .force(
-              'collision',
-              // collide(0.5)
-              d3.forceCollide().radius(function(d) {
-                return radiusVar(d[networkSettings.nodeSize]);
-                // let r = radiusVar(d[networkSettings.nodeSize]);
-                // return 3 * r - 1;
-              })
-            )
-            .stop();
-          //
-          for (
-            let i = 0,
-              n = Math.ceil(
-                Math.log(simulation.alphaMin()) /
-                  Math.log(1 - simulation.alphaDecay())
-              );
-            i < n;
-            ++i
-          ) {
-            simulation.tick();
-          }
-
-          // Resolves collisions between d and all other circles.
-          // function collide(alpha) {
-          //   var quadtree = d3.quadtree(d.data.nodes);
-          //   return function(d) {
-          //     var rb = 2 * radiusVar + 1, // separation between circles
-          //       nx1 = d.x - rb,
-          //       nx2 = d.x + rb,
-          //       ny1 = d.y - rb,
-          //       ny2 = d.y + rb;
-
-          //     quadtree.visit(function(quad, x1, y1, x2, y2) {
-          //       if (quad.point && quad.point !== d) {
-          //         var x = d.x - quad.point.x,
-          //           y = d.y - quad.point.y,
-          //           l = Math.sqrt(x * x + y * y);
-          //         if (l < rb) {
-          //           l = ((l - rb) / l) * alpha;
-          //           d.x -= x *= l;
-          //           d.y -= y *= l;
-          //           quad.point.x += x;
-          //           quad.point.y += y;
-          //         }
-          //       }
-          //       return x1 > nx2 || x2 < nx1 || y1 > ny2 || y2 < ny1;
-          //     });
-          //   };
-          // }
-
-          let link = d3
-            .select(this)
-            .append('g')
-            .attr('class', 'links')
-            .selectAll('line')
-            .data(d.data.links)
-            .enter()
-            .append('line')
-            .style('stroke', function(d) {
-              if (
-                d.EnrichmentMap_similarity_coefficient ===
-                highestLinkCoefficient
-              ) {
-                return self.props.networkSettings.colorHighestLinkCoefficient;
-              } else return '#0080ff';
-            })
-            .style('stroke-opacity', function(d) {
-              if (
-                d.EnrichmentMap_similarity_coefficient ===
-                highestLinkCoefficient
-              ) {
-                return 1;
-              } else return 0.3;
-            })
-            .style('stroke-width', function(d) {
-              return lineScaleVar(d[networkSettings.linkSize]);
-            })
-            .attr('x1', function(d) {
-              return Math.max(
-                radiusVar(d.source[networkSettings.nodeSize]),
-                Math.min(
-                  cellWidth - radiusVar(d.source[networkSettings.nodeSize]),
-                  d.source.x
-                )
-              );
-            })
-            .attr('y1', function(d) {
-              return Math.max(
-                radiusVar(d.source[networkSettings.nodeSize]),
-                Math.min(
-                  cellHeight - radiusVar(d.source[networkSettings.nodeSize]),
-                  d.source.y
-                )
-              );
-            })
-            .attr('x2', function(d) {
-              return Math.max(
-                radiusVar(d.target[networkSettings.nodeSize]),
-                Math.min(
-                  cellWidth - radiusVar(d.target[networkSettings.nodeSize]),
-                  d.target.x
-                )
-              );
-            })
-            .attr('y2', function(d) {
-              return Math.max(
-                radiusVar(d.target[networkSettings.nodeSize]),
-                Math.min(
-                  cellHeight - radiusVar(d.target[networkSettings.nodeSize]),
-                  d.target.y
-                )
-              );
-            })
-            .on('mouseover', function(d, i) {
-              d3.select(this)
-                .transition()
-                .duration('50')
-                .attr('opacity', 0.5)
-                .attr('d', arc.outerRadius(50).innerRadius(0));
-              div
-                .transition()
-                .duration(50)
-                .style('opacity', 1);
-              div
-                .html(
-                  `<b>Overlap Size: </b>${d.EnrichmentMap_Overlap_size}<br/><b>Overlap Coefficient: </b>${d.EnrichmentMap_similarity_coefficient}<br/><b>Source: </b>${d.source.EnrichmentMap_GS_DESCR}<br/><b>Target: </b>${d.target.EnrichmentMap_GS_DESCR}`
-                )
-                .style('left', d3.event.pageX + 10 + 'px')
-                .style('top', d3.event.pageY - 15 + 'px');
-            })
-            .on('mouseout', function(d, i) {
-              // d3.select(this).transition()
-              //     .duration('50')
-              //     .attr('opacity', .75)
-              //     .attr("d", arc.outerRadius(r).innerRadius(0));
-              div
-                .transition()
-                .duration('50')
-                .style('opacity', 0);
-            });
-
-          const node = d3
-            .select(this)
-            .append('g')
-            .attr('class', 'nodes')
-            .selectAll('g')
-            .data(d.data.nodes)
-            .enter()
-            .append('g')
-            .attr('transform', function(d) {
-              return `translate(${Math.max(
-                radiusVar(d[networkSettings.nodeSize]),
-                Math.min(
-                  cellWidth - radiusVar(d[networkSettings.nodeSize]),
-                  d.x
-                )
-              )},${Math.max(radiusVar(d[networkSettings.nodeSize]), Math.min(cellHeight - radiusVar(d[networkSettings.nodeSize]), d.y))})`;
-            })
-            .call(
-              d3
-                .drag()
-                .on('start', function() {
-                  dragstarted(this);
+      // debugger;
+      if (cell._groups.length > 0) {
+        cell.each(function(d, i) {
+          let cellWidth = d.x1 - d.x0;
+          let cellHeight = d.y1 - d.y0;
+          if (d.data.nodes.length > 0) {
+            let simulation = d3
+              .forceSimulation(d.data.nodes)
+              .force(
+                'link',
+                d3.forceLink(d.data.links).id(function(d) {
+                  return d.id;
                 })
-                .on('drag', function(d) {
-                  ondrag(d, cellHeight, cellWidth, this);
+              )
+              .force(
+                'charge',
+                d3
+                  .forceManyBody()
+                  .strength([-1200])
+                  .distanceMax([500])
+              )
+              .force('center', d3.forceCenter(cellWidth / 2, cellHeight / 2))
+              .force(
+                'collision',
+                // collide(0.5)
+                d3.forceCollide().radius(function(d) {
+                  return radiusVar(d[networkSettings.nodeSize]);
+                  // let r = radiusVar(d[networkSettings.nodeSize]);
+                  // return 3 * r - 1;
                 })
-                .on('end', dragended)
-            );
+              )
+              .stop();
+            //
+            for (
+              let i = 0,
+                n = Math.ceil(
+                  Math.log(simulation.alphaMin()) /
+                    Math.log(1 - simulation.alphaDecay())
+                );
+              i < n;
+              ++i
+            ) {
+              simulation.tick();
+            }
 
-          node.each(multiple);
-          // labels
-          // if there are only x number of nodes or less in a cluster, then place label above them
-          let clusterNodeLength = d.data.nodes.length;
-          if (clusterNodeLength === 1) {
-            node
-              .append('text')
-              .attr('class', 'node-label')
-              .text(function(d) {
-                return d[networkSettings.nodeLabel];
-              })
-              .style('font-size', '.9em')
-              .style('opacity', 1)
-              .attr('text-anchor', 'middle')
-              // to rotate text on boxes with one node
-              // .attr('transform', 'rotate(' + 5 + ')')
-              // .attr('x', -65);
-              .attr('x', function(d) {
-                return d.x + d.dx / 2;
-              })
-              // .attr('y', function(d) {
-              //   return d.y + d.dy / 2;
-              // })
-              // .attr('dy', '.35em')
-              // randomly place text below or above node
-              .attr('y', 20 * (Math.random() < 0.5 ? -1 : 1));
-            // .attr('y', function(d) {
-            // return -1.1 * d[networkSettings.nodeSize];
-            // });
-          } else {
-            node
-              .append('text')
-              .attr('class', 'node-label')
-              .text(function(d) {
-                return d[networkSettings.nodeLabel];
-              })
-              .style('font-size', '.9em')
-              .style('opacity', 1)
-              .attr('x', 15)
-              .attr('y', 3);
-          }
+            // Resolves collisions between d and all other circles.
+            // function collide(alpha) {
+            //   var quadtree = d3.quadtree(d.data.nodes);
+            //   return function(d) {
+            //     var rb = 2 * radiusVar + 1, // separation between circles
+            //       nx1 = d.x - rb,
+            //       nx2 = d.x + rb,
+            //       ny1 = d.y - rb,
+            //       ny2 = d.y + rb;
 
-          let div = d3
-            .select('body')
-            .append('div')
-            .attr('class', 'tooltip-pieSlice')
-            .style('opacity', 0);
+            //     quadtree.visit(function(quad, x1, y1, x2, y2) {
+            //       if (quad.point && quad.point !== d) {
+            //         var x = d.x - quad.point.x,
+            //           y = d.y - quad.point.y,
+            //           l = Math.sqrt(x * x + y * y);
+            //         if (l < rb) {
+            //           l = ((l - rb) / l) * alpha;
+            //           d.x -= x *= l;
+            //           d.y -= y *= l;
+            //           quad.point.x += x;
+            //           quad.point.y += y;
+            //         }
+            //       }
+            //       return x1 > nx2 || x2 < nx1 || y1 > ny2 || y2 < ny1;
+            //     });
+            //   };
+            // }
 
-          function multiple(d) {
-            let r = radiusVar(d[networkSettings.nodeSize]);
-            let node = d3.select(this);
-
-            node
-              .selectAll('path')
-              .data(function(d) {
-                return pie(d.facets);
-              })
+            let link = d3
+              .select(this)
+              .append('g')
+              .attr('class', 'links')
+              .selectAll('line')
+              .data(d.data.links)
               .enter()
-              .append('svg:path')
-              .attr('d', arc.outerRadius(r).innerRadius(0))
-              .attr('opacity', 0.75)
-              .style('cursor', 'pointer')
-              .attr('stroke', 'black')
-              .style('fill', function(d) {
-                if (d.data.value === mostSignificantTestValue)
-                  return self.props.networkSettings.colorMostSignificantTest;
-                if (d.data.value != null) return color(d.data.value);
-                return '#d3d3d3';
+              .append('line')
+              .style('stroke', function(d) {
+                // unhighlight this if you want to highlight highest link coefficient
+                // if (
+                //   d.EnrichmentMap_similarity_coefficient ===
+                //   highestLinkCoefficient
+                // ) {
+                //   return self.props.networkSettings.colorHighestLinkCoefficient;
+                // } else
+                return '#0080ff';
               })
-              .on('click', function(d) {
-                // if (d3.event.defaultPrevented) return;
-                d3.selectAll('.tooltip-pieSlice').style('opacity', 0);
-                self.props.onHandlePieClick(
-                  self.props.enrichmentStudy,
-                  self.props.enrichmentModel,
-                  self.props.enrichmentAnnotation,
-                  d.data.metaData,
-                  d.data.prop
+              .style('stroke-opacity', 0.3)
+              // .style('stroke-opacity', function(d) {
+              //   if (
+              //     d.EnrichmentMap_similarity_coefficient ===
+              //     highestLinkCoefficient
+              //   ) {
+              //     return 1;
+              //   } else return 0.3;
+              // })
+              .style('stroke-width', function(d) {
+                return lineScaleVar(d[networkSettings.linkSize]);
+              })
+              .attr('x1', function(d) {
+                return Math.max(
+                  radiusVar(d.source[networkSettings.nodeSize]),
+                  Math.min(
+                    cellWidth - radiusVar(d.source[networkSettings.nodeSize]),
+                    d.source.x
+                  )
+                );
+              })
+              .attr('y1', function(d) {
+                return Math.max(
+                  radiusVar(d.source[networkSettings.nodeSize]),
+                  Math.min(
+                    cellHeight - radiusVar(d.source[networkSettings.nodeSize]),
+                    d.source.y
+                  )
+                );
+              })
+              .attr('x2', function(d) {
+                return Math.max(
+                  radiusVar(d.target[networkSettings.nodeSize]),
+                  Math.min(
+                    cellWidth - radiusVar(d.target[networkSettings.nodeSize]),
+                    d.target.x
+                  )
+                );
+              })
+              .attr('y2', function(d) {
+                return Math.max(
+                  radiusVar(d.target[networkSettings.nodeSize]),
+                  Math.min(
+                    cellHeight - radiusVar(d.target[networkSettings.nodeSize]),
+                    d.target.y
+                  )
                 );
               })
               .on('mouseover', function(d, i) {
@@ -792,91 +667,255 @@ class NetworkGraph extends Component {
                   .transition()
                   .duration(50)
                   .style('opacity', 1);
-                let pValueDisplay;
-                if (Math.abs(d.data.value) > 0.001)
-                  pValueDisplay = d.data.value.toPrecision(3);
-                else pValueDisplay = d.data.value.toExponential(3);
                 div
                   .html(
-                    `<b>Description: </b>${d.data.metaData.Description}<br/><b>Test: </b>${d.data.prop}<br/><b>pValue: </b>${pValueDisplay}<br/><b>Ontology: </b>${d.data.metaData.Ontology}`
+                    `<b>Overlap Size: </b>${d.EnrichmentMap_Overlap_size}<br/><b>Overlap Coefficient: </b>${d.EnrichmentMap_similarity_coefficient}<br/><b>Source: </b>${d.source.EnrichmentMap_GS_DESCR}<br/><b>Target: </b>${d.target.EnrichmentMap_GS_DESCR}`
                   )
                   .style('left', d3.event.pageX + 10 + 'px')
                   .style('top', d3.event.pageY - 15 + 'px');
               })
               .on('mouseout', function(d, i) {
-                d3.select(this)
-                  .transition()
-                  .duration('50')
-                  .attr('opacity', 0.75)
-                  .attr('d', arc.outerRadius(r).innerRadius(0));
+                // d3.select(this).transition()
+                //     .duration('50')
+                //     .attr('opacity', .75)
+                //     .attr("d", arc.outerRadius(r).innerRadius(0));
                 div
                   .transition()
                   .duration('50')
                   .style('opacity', 0);
               });
-          }
-          function dragstarted(o) {
-            d3.event.sourceEvent.stopPropagation();
-            d3.event.sourceEvent.preventDefault();
-          }
 
-          function ondrag(d, cellHeight, cellWidth, me) {
-            d.x = d3.event.x;
-            d.y = d3.event.y;
-            let xPos = Math.max(
-              radiusVar(d[networkSettings.nodeSize]),
-              Math.min(cellWidth - radiusVar(d[networkSettings.nodeSize]), d.x)
-            );
-            let yPos = Math.max(
-              radiusVar(d[networkSettings.nodeSize]),
-              Math.min(cellHeight - radiusVar(d[networkSettings.nodeSize]), d.y)
-            );
+            const node = d3
+              .select(this)
+              .append('g')
+              .attr('class', 'nodes')
+              .selectAll('g')
+              .data(d.data.nodes)
+              .enter()
+              .append('g')
+              .attr('transform', function(d) {
+                return `translate(${Math.max(
+                  radiusVar(d[networkSettings.nodeSize]),
+                  Math.min(
+                    cellWidth - radiusVar(d[networkSettings.nodeSize]),
+                    d.x
+                  )
+                )},${Math.max(radiusVar(d[networkSettings.nodeSize]), Math.min(cellHeight - radiusVar(d[networkSettings.nodeSize]), d.y))})`;
+              })
+              .call(
+                d3
+                  .drag()
+                  .on('start', function() {
+                    dragstarted(this);
+                  })
+                  .on('drag', function(d) {
+                    ondrag(d, cellHeight, cellWidth, this);
+                  })
+                  .on('end', dragended)
+              );
 
-            d3.select(me).attr('transform', function(d) {
-              return `translate(${Math.max(
+            node.each(multiple);
+            // labels
+            // if there are only x number of nodes or less in a cluster, then place label above them
+            let clusterNodeLength = d.data.nodes.length;
+            if (clusterNodeLength === 1) {
+              node
+                .append('text')
+                .attr('class', 'node-label')
+                .attr('id', 'rectWrap')
+                .text(function(d) {
+                  let text = d[networkSettings.nodeLabel];
+                  if (text.length < 25) {
+                    return text;
+                  } else {
+                    let textSubstring = text.substring(0, 23);
+                    return `${textSubstring}...`;
+                  }
+                  // return d[networkSettings.nodeLabel];
+                })
+                .style('font-size', '.9em')
+                .style('opacity', 1)
+                .attr('text-anchor', 'middle')
+                // to rotate text on boxes with one node
+                // .attr('transform', 'rotate(' + 5 + ')')
+                // .attr('x', -65);
+                .attr('x', function(d) {
+                  return d.x + d.dx / 2;
+                })
+                // .attr('y', function(d) {
+                //   return d.y + d.dy / 2;
+                // })
+                // .attr('dy', '.35em')
+                // randomly place text below or above node
+                .attr('y', 20 * (Math.random() < 0.5 ? -1 : 1));
+              // .attr('y', function(d) {
+              // return -1.1 * d[networkSettings.nodeSize];
+              // });
+            } else {
+              node
+                .append('text')
+                .attr('class', 'node-label')
+                .attr('id', 'rectWrap')
+                .text(function(d) {
+                  let text = d[networkSettings.nodeLabel];
+                  if (text.length < 30) {
+                    return text;
+                  } else {
+                    let textSubstring = text.substring(0, 28);
+                    return `${textSubstring}...`;
+                  }
+                  // return d[networkSettings.nodeLabel];
+                })
+                .style('font-size', '.9em')
+                .style('opacity', 1)
+                .attr('x', 15)
+                .attr('y', 3);
+            }
+
+            let div = d3
+              .select('body')
+              .append('div')
+              .attr('class', 'tooltip-pieSlice')
+              .style('opacity', 0);
+
+            function multiple(d) {
+              let r = radiusVar(d[networkSettings.nodeSize]);
+              let node = d3.select(this);
+
+              node
+                .selectAll('path')
+                .data(function(d) {
+                  return pie(d.facets);
+                })
+                .enter()
+                .append('svg:path')
+                .attr('d', arc.outerRadius(r).innerRadius(0))
+                .attr('opacity', 0.75)
+                .style('cursor', 'pointer')
+                .attr('stroke', 'black')
+                .style('fill', function(d) {
+                  if (d.data.value === mostSignificantTestValue)
+                    return self.props.networkSettings.colorMostSignificantTest;
+                  if (d.data.value != null) return color(d.data.value);
+                  return '#d3d3d3';
+                })
+                .on('click', function(d) {
+                  // if (d3.event.defaultPrevented) return;
+                  d3.selectAll('.tooltip-pieSlice').style('opacity', 0);
+                  self.props.onHandlePieClick(
+                    self.props.enrichmentStudy,
+                    self.props.enrichmentModel,
+                    self.props.enrichmentAnnotation,
+                    d.data.metaData,
+                    d.data.prop
+                  );
+                })
+                .on('mouseover', function(d, i) {
+                  d3.select(this)
+                    .transition()
+                    .duration('50')
+                    .attr('opacity', 0.5)
+                    .attr('d', arc.outerRadius(50).innerRadius(0));
+                  div
+                    .transition()
+                    .duration(50)
+                    .style('opacity', 1);
+                  let pValueDisplay;
+                  if (Math.abs(d.data.value) > 0.001)
+                    pValueDisplay = d.data.value.toPrecision(3);
+                  else pValueDisplay = d.data.value.toExponential(3);
+                  div
+                    .html(
+                      `<b>Description: </b>${d.data.metaData.Description}<br/><b>Test: </b>${d.data.prop}<br/><b>pValue: </b>${pValueDisplay}<br/><b>Ontology: </b>${d.data.metaData.Ontology}`
+                    )
+                    .style('left', d3.event.pageX + 10 + 'px')
+                    .style('top', d3.event.pageY - 15 + 'px');
+                })
+                .on('mouseout', function(d, i) {
+                  d3.select(this)
+                    .transition()
+                    .duration('50')
+                    .attr('opacity', 0.75)
+                    .attr('d', arc.outerRadius(r).innerRadius(0));
+                  div
+                    .transition()
+                    .duration('50')
+                    .style('opacity', 0);
+                });
+            }
+
+            // d3plus
+            //   .textwrap()
+            //   .container(d3.select('#rectWrap'))
+            //   .draw();
+            function dragstarted(o) {
+              d3.event.sourceEvent.stopPropagation();
+              d3.event.sourceEvent.preventDefault();
+            }
+
+            function ondrag(d, cellHeight, cellWidth, me) {
+              d.x = d3.event.x;
+              d.y = d3.event.y;
+              let xPos = Math.max(
                 radiusVar(d[networkSettings.nodeSize]),
                 Math.min(
                   cellWidth - radiusVar(d[networkSettings.nodeSize]),
                   d.x
                 )
-              )},${Math.max(radiusVar(d[networkSettings.nodeSize]), Math.min(cellHeight - radiusVar(d[networkSettings.nodeSize]), d.y))})`;
-            });
+              );
+              let yPos = Math.max(
+                radiusVar(d[networkSettings.nodeSize]),
+                Math.min(
+                  cellHeight - radiusVar(d[networkSettings.nodeSize]),
+                  d.y
+                )
+              );
 
-            link
-              .filter(function(l) {
-                return l.source === d;
-              })
-              .attr('x1', xPos)
-              .attr('y1', yPos);
-            link
-              .filter(function(l) {
-                return l.target === d;
-              })
-              .attr('x2', xPos)
-              .attr('y2', yPos);
-          }
+              d3.select(me).attr('transform', function(d) {
+                return `translate(${Math.max(
+                  radiusVar(d[networkSettings.nodeSize]),
+                  Math.min(
+                    cellWidth - radiusVar(d[networkSettings.nodeSize]),
+                    d.x
+                  )
+                )},${Math.max(radiusVar(d[networkSettings.nodeSize]), Math.min(cellHeight - radiusVar(d[networkSettings.nodeSize]), d.y))})`;
+              });
 
-          function dragended(d) {
-            if (!d3.event.active) simulation.alphaTarget(0);
-            d.fx = d3.event.x;
-            d.fy = d3.event.y;
+              link
+                .filter(function(l) {
+                  return l.source === d;
+                })
+                .attr('x1', xPos)
+                .attr('y1', yPos);
+              link
+                .filter(function(l) {
+                  return l.target === d;
+                })
+                .attr('x2', xPos)
+                .attr('y2', yPos);
+            }
+
+            function dragended(d) {
+              if (!d3.event.active) simulation.alphaTarget(0);
+              d.fx = d3.event.x;
+              d.fy = d3.event.y;
+            }
           }
-        }
-      });
-      this.setState({
-        noResults: false
-      });
-    } else {
-      this.setState({
-        noResults: true
-      });
+        });
+        this.setState({
+          noResults: false
+        });
+      } else {
+        this.setState({
+          noResults: true
+        });
+      }
+
+      // this.props.onNetworkGraphReady(true);
+      // this.setState({
+      //   rerendering: false
+      // });
     }
-
-    // this.props.onNetworkGraphReady(true);
-    // this.setState({
-    //   rerendering: false
-    // });
-    // }
   };
 
   render() {

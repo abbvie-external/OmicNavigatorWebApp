@@ -71,6 +71,10 @@ class Enrichment extends Component {
     tests: {},
     nodeCutoff: 0.1,
     edgeCutoff: 0.375,
+    filteredNodesTotal: 0,
+    filteredEdgesTotal: 0,
+    totalNodes: 0,
+    totalEdges: 0,
     // networkSortBy: ['significance', 'edgecount', 'nodecount']
     networkSortBy: 'significance',
     // legendIsOpen: true,
@@ -92,7 +96,7 @@ class Enrichment extends Component {
       nodeColorScale: [0, 0.1, 1],
       nodeColors: ['red', 'white', 'blue'],
       colorMostSignificantTest: '#FFD700',
-      colorHighestLinkCoefficient: '#FFD700',
+      // colorHighestLinkCoefficient: '#FFD700',
       title: '',
       // data: null,
       id: 'chart-network',
@@ -605,7 +609,9 @@ class Enrichment extends Component {
           // networkDataAvailable: true,
           networkData: EMData.elements,
           tests: EMData.tests,
-          networkDataNew: networkDataNew
+          networkDataNew: networkDataNew,
+          totalNodes: EMData.elements.nodes.length,
+          totalEdges: EMData.elements.edges.length
         });
         let facets = [];
         for (var i = 0; i < EMData.tests.length; i++) {
@@ -1248,6 +1254,7 @@ class Enrichment extends Component {
               // onHandleLegendClose={this.handleLegendClose}
               onHandleInputChange={this.handleInputChange}
               onHandleSliderChange={this.handleSliderChange}
+              onHandleTotals={this.handleTotals}
               // onNetworkGraphReady={this.handleNetworkGraphReady}
             />
           </Tab.Pane>
@@ -1265,6 +1272,13 @@ class Enrichment extends Component {
   removeNetworkSVG = () => {
     d3.select('div.tooltip-pieSlice').remove();
     d3.select(`#svg-${this.state.networkSettings.id}`).remove();
+  };
+
+  handleTotals = (filteredNodesLength, filteredEdgesLength) => {
+    this.setState({
+      filteredNodesTotal: filteredNodesLength,
+      filteredEdgesTotal: filteredEdgesLength
+    });
   };
 
   handleNetworkSortByChange = (evt, { value }) => {

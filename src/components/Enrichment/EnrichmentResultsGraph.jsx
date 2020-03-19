@@ -81,8 +81,6 @@ class EnrichmentResultsGraph extends Component {
     results: [],
     networkSearchValue: '',
     descriptions: [],
-    totalNodes: 0,
-    totalEdges: 0,
     legendIsOpen: true
     // legendIsOpen: JSON.parse(sessionStorage.getItem('legendOpen')) || true,
   };
@@ -288,9 +286,7 @@ class EnrichmentResultsGraph extends Component {
       size: r.data.EnrichmentMap_Genes.length
     }));
     this.setState({
-      descriptions: networkDataNodeDescriptions,
-      totalNodes: this.props.networkData.nodes.length,
-      totalEdges: this.props.networkData.edges.length
+      descriptions: networkDataNodeDescriptions
     });
   };
 
@@ -329,14 +325,18 @@ class EnrichmentResultsGraph extends Component {
   };
 
   render() {
-    const { results, totalNodes, totalEdges, legendIsOpen } = this.state;
+    const { results, legendIsOpen } = this.state;
     const {
       nodeCutoff,
       edgeCutoff,
       networkDataLoaded,
       networkSortBy,
       networkGraphReady,
-      activeIndexEnrichmentView
+      activeIndexEnrichmentView,
+      filteredNodesTotal,
+      filteredEdgesTotal,
+      totalNodes,
+      totalEdges
     } = this.props;
 
     const openLegend =
@@ -615,8 +615,12 @@ class EnrichmentResultsGraph extends Component {
                 id="NodeEdgeTotals"
                 className={networkGraphReady ? 'Show' : 'Hide'}
               >
-                <Label>Nodes {totalNodes}</Label>
-                <Label>Edges {totalEdges}</Label>
+                <Label>
+                  {filteredNodesTotal} of {totalNodes} Nodes
+                </Label>
+                <Label>
+                  {filteredEdgesTotal} of {totalEdges} Edges
+                </Label>
               </span>
             </Grid.Column>
             <Grid.Column
