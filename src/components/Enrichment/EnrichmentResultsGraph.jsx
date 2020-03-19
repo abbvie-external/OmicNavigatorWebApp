@@ -12,7 +12,7 @@ import {
   Button,
   Icon,
   // Segment
-  Header,
+  // Header,
   Dropdown
   // Input
 } from 'semantic-ui-react';
@@ -81,23 +81,22 @@ class EnrichmentResultsGraph extends Component {
     results: [],
     networkSearchValue: '',
     descriptions: [],
-    nodeCutoff: 0.5,
-    edgeCutoff: 0.375,
-    // networkGraphReady: false,
-    legendIsOpen: true,
-    // networkSortBy: ['significance', 'edgecount', 'nodecount']
-    networkSortBy: 'significance'
+    legendIsOpen: true
+    // legendIsOpen: JSON.parse(sessionStorage.getItem('legendOpen')) || true,
   };
 
   componentDidMount() {
-    // if (this.props.networkDataLoaded) {
-    this.setupSearch();
-    //}
+    if (!this.props.networkGraphReady) {
+      d3.select(`#svg-${this.props.networkSettings.id}`).remove();
+      d3.select('div.tooltip-pieSlice').remove();
+      this.setupSearch();
+    }
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
     if (
       // this.props.networkDataLoaded &&
+      this.props.networkGraphReady !== prevProps.networkGraphReady ||
       this.props.networkData !== prevProps.networkData
     ) {
       this.setupSearch();
@@ -121,10 +120,10 @@ class EnrichmentResultsGraph extends Component {
   //   descriptions: nodesMapped
   // });
 
-  componentWillUnmount() {
-    d3.select('#svg-chart-network').remove();
-    d3.select('div.tooltip-pieSlice').remove();
-  }
+  // componentWillUnmount() {
+  //   d3.select('#svg-chart-network').remove();
+  //   d3.select('div.tooltip-pieSlice').remove();
+  // }
 
   handleLabels = () => {
     this.setState(prevState => ({
@@ -157,12 +156,6 @@ class EnrichmentResultsGraph extends Component {
       networkSearchValue
     });
   }, 500);
-
-  handleInputChange = (evt, { name, value }) => {
-    this.setState({
-      [name]: value
-    });
-  };
 
   getLegend = () => {
     return (
@@ -286,26 +279,6 @@ class EnrichmentResultsGraph extends Component {
     );
   };
 
-  handleLegendOpen = () => {
-    this.setState({ legendIsOpen: true });
-
-    // this.timeout = setTimeout(() => {
-    //   this.setState({ legendIsOpen: false });
-    // }, 2500);
-  };
-
-  handleLegendClose = () => {
-    this.setState({ legendIsOpen: false });
-    // clearTimeout(this.timeout);
-  };
-
-  handleNetworkSortByChange = (evt, { value }) => {
-    this.setState({
-      networkSortBy: value
-      // networkGraphReady: false
-    });
-  };
-
   setupSearch = () => {
     const networkDataNodeDescriptions = this.props.networkData.nodes.map(r => ({
       description: r.data.EnrichmentMap_GS_DESCR.toLowerCase(),
@@ -316,12 +289,6 @@ class EnrichmentResultsGraph extends Component {
       descriptions: networkDataNodeDescriptions
     });
   };
-
-  // handleNetworkGraphReady = bool => {
-  //   this.setState({
-  //     networkGraphReady: bool
-  //   });
-  // };
 
   getDynamicSize = () => {
     let w = Math.max(
@@ -343,15 +310,39 @@ class EnrichmentResultsGraph extends Component {
   //   }));
   // };
 
+  handleLegendOpen = () => {
+    // sessionStorage.setItem('legendOpen', 'true');
+    this.setState({ legendIsOpen: true });
+    // this.timeout = setTimeout(() => {
+    //   this.setState({ legendIsOpen: false });
+    // }, 2500);
+  };
+
+  handleLegendClose = () => {
+    // sessionStorage.setItem('legendOpen', 'false');
+    this.setState({ legendIsOpen: false });
+    // clearTimeout(this.timeout);
+  };
+
   render() {
-    const { networkDataLoaded } = this.props;
+    const { results, legendIsOpen } = this.state;
     const {
-      results,
       nodeCutoff,
       edgeCutoff,
-      networkSortBy
-      // networkGraphReady
-    } = this.state;
+      networkDataLoaded,
+      networkSortBy,
+      networkGraphReady,
+      activeIndexEnrichmentView,
+      filteredNodesTotal,
+      filteredEdgesTotal,
+      totalNodes,
+      totalEdges
+    } = this.props;
+
+    const openLegend =
+      legendIsOpen && activeIndexEnrichmentView === 1 && networkGraphReady
+        ? true
+        : false;
 
     const networkSortByOptions = [
       {
@@ -388,13 +379,6 @@ class EnrichmentResultsGraph extends Component {
         </div>
       );
     } else {
-      // if (!networkGraphReady) {
-      //   return (
-      //     <div>
-      //       <LoaderActivePlots />
-      //     </div>
-      //   );
-      // } else {
       return (
         <Grid className="NetworkGraphFiltersContainer">
           <Grid.Row className="NetworkGraphFiltersRow">
@@ -413,8 +397,9 @@ class EnrichmentResultsGraph extends Component {
               widescreen={4}
             >
               <Search
+                disabled={!networkGraphReady}
                 size={dynamicSize}
-                // className="NetworkSearchResultsContainer"
+                id="NetworkSearchInput"
                 placeholder="Search Network"
                 onResultSelect={this.handleResultSelect}
                 onSearchChange={this.handleSearchChange}
@@ -424,6 +409,7 @@ class EnrichmentResultsGraph extends Component {
                 // {...this.props}
               />
               <Radio
+                disabled={!networkGraphReady}
                 className="RadioLabelsDisplay"
                 toggle
                 size={dynamicSize}
@@ -440,29 +426,32 @@ class EnrichmentResultsGraph extends Component {
               widescreen={3}
             >
               <Input
+                disabled={!networkGraphReady}
                 size={dynamicSize}
                 type="number"
-                step="0.05"
+                step="0.01"
                 min="0"
                 max="1"
-                default="0.50"
+                default="0.10"
                 label="Node Cutoff"
                 name="nodeCutoff"
                 className="NetworkSliderInput"
                 value={nodeCutoff}
-                onChange={this.handleInputChange}
+                onChange={this.props.onHandleInputChange}
               />
               <Slider
+                disabled={!networkGraphReady}
                 className="NetworkSlider"
                 inverted={false}
                 value={nodeCutoff}
+                name="nodeCutoff"
                 settings={{
                   start: nodeCutoff,
                   min: 0,
                   max: 1,
                   step: 0.05,
                   onChange: value => {
-                    this.setState({
+                    this.props.onHandleSliderChange({
                       nodeCutoff: value
                     });
                   }
@@ -477,6 +466,7 @@ class EnrichmentResultsGraph extends Component {
               widescreen={3}
             >
               <Input
+                disabled={!networkGraphReady}
                 size={dynamicSize}
                 type="number"
                 step="0.025"
@@ -487,11 +477,13 @@ class EnrichmentResultsGraph extends Component {
                 name="edgeCutoff"
                 className="NetworkSliderInput"
                 value={edgeCutoff}
-                onChange={this.handleInputChange}
+                onChange={this.props.onHandleInputChange}
               />
               <Slider
+                disabled={!networkGraphReady}
                 className="NetworkSlider"
                 inverted={false}
+                name="edgeCutoff"
                 value={edgeCutoff}
                 settings={{
                   start: edgeCutoff,
@@ -499,7 +491,7 @@ class EnrichmentResultsGraph extends Component {
                   max: 1,
                   step: 0.025,
                   onChange: value => {
-                    this.setState({
+                    this.props.onHandleSliderChange({
                       edgeCutoff: value
                     });
                   }
@@ -542,10 +534,11 @@ class EnrichmentResultsGraph extends Component {
                 <span id="NetworkGraphSortByText">Sort By </span>
                 <Dropdown
                   inline
+                  disabled={!networkGraphReady}
                   // header="Sort By"
                   options={networkSortByOptions}
                   defaultValue={networkSortBy}
-                  onChange={this.handleNetworkSortByChange}
+                  onChange={this.props.onHandleNetworkSortByChange}
                 />
               </span>
               {/* </Header.Content>
@@ -578,29 +571,58 @@ class EnrichmentResultsGraph extends Component {
             </Grid.Column>
           </Grid.Row>
           <Grid.Row className="NetworkGraphContainer">
-            <Popup
-              trigger={
-                <Button
-                  icon
-                  labelPosition="left"
-                  // color="blue"
-                  id="LegendIconButton"
-                  size="mini"
-                >
-                  Legend
-                  <Icon name="info" />
-                </Button>
-              }
-              wide
-              on="click"
-              style={LegendPopupStyle}
-              position="top left"
-              open={this.state.legendIsOpen}
-              onClose={this.handleLegendClose}
-              onOpen={this.handleLegendOpen}
+            <Grid.Column
+              id="LegendColumn"
+              mobile={8}
+              tablet={8}
+              largeScreen={8}
+              widescreen={8}
             >
-              {legend}
-            </Popup>
+              <Popup
+                trigger={
+                  <Button
+                    icon
+                    labelPosition="left"
+                    // color="blue"
+                    id="LegendIconButton"
+                    className={networkGraphReady ? 'Show' : 'Hide'}
+                    size="mini"
+                  >
+                    Legend
+                    <Icon name="info" />
+                  </Button>
+                }
+                wide
+                on="click"
+                style={LegendPopupStyle}
+                id="LegendPopup"
+                // position="top left"
+                open={openLegend}
+                onClose={this.handleLegendClose}
+                onOpen={this.handleLegendOpen}
+              >
+                {legend}
+              </Popup>
+            </Grid.Column>
+            <Grid.Column
+              id="TotalsColumn"
+              mobile={8}
+              tablet={8}
+              largeScreen={8}
+              widescreen={8}
+            >
+              <span
+                id="NodeEdgeTotals"
+                className={networkGraphReady ? 'Show' : 'Hide'}
+              >
+                <Label>
+                  {filteredNodesTotal} of {totalNodes} Nodes
+                </Label>
+                <Label>
+                  {filteredEdgesTotal} of {totalEdges} Edges
+                </Label>
+              </span>
+            </Grid.Column>
             <Grid.Column
               className=""
               mobile={16}
@@ -608,11 +630,7 @@ class EnrichmentResultsGraph extends Component {
               largeScreen={16}
               widescreen={16}
             >
-              <NetworkGraph
-                {...this.props}
-                {...this.state}
-                // onNetworkGraphReady={this.handleNetworkGraphReady}
-              ></NetworkGraph>
+              <NetworkGraph {...this.props} {...this.state}></NetworkGraph>
             </Grid.Column>
           </Grid.Row>
         </Grid>

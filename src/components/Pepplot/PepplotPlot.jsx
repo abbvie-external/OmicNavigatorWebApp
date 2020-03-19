@@ -51,7 +51,7 @@ class PepplotPlot extends Component {
           </Grid>
 
           <Grid columns={2} className="PlotContainer">
-            <Grid.Row className="">
+            <Grid.Row className="PlotContainerRow">
               <Grid.Column
                 className="PepplotAccordionContainer"
                 mobile={16}

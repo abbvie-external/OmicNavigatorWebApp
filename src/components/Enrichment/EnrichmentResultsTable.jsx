@@ -46,7 +46,7 @@ class EnrichmentResultsTable extends Component {
       <Grid>
         <Grid.Row>
           <Grid.Column
-            className=""
+            className="EnrichmentResultsTable"
             mobile={16}
             tablet={16}
             largeScreen={16}
@@ -61,7 +61,7 @@ class EnrichmentResultsTable extends Component {
               itemsPerPage={100}
               exportBaseName="Enrichment_Analysis"
               quickViews={quickViews}
-              disableGeneralSearch
+              // disableGeneralSearch
               disableGrouping
               disableColumnVisibilityToggle
               min-height="75vh"

@@ -1,7 +1,7 @@
 .NetworkChartContainer {
   // margin: 20px 15px !important;
   width: auto !important;
-  height: 76vh !important;
+  height: 74vh !important;
   overflow-x: auto;
   overflow-y: hidden;
 }
@@ -56,6 +56,7 @@
 
 .node-label {
   pointer-events: none;
+  // transform: rotate(5deg);
 }
 
 div.tooltip-pieSlice {
@@ -74,4 +75,15 @@ div.tooltip-pieSlice {
 .OntologyLink {
   cursor: pointer !important;
   margin-right: 15px !important;
+}
+
+.NoResultsMessage {
+  width: 33% !important;
+  margin: 40px auto !important;
+}
+
+@media (max-width: 1199px) {
+  .NoResultsMessage {
+    width: 75% !important;
+  }
 }

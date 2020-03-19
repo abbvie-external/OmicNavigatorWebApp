@@ -15,6 +15,7 @@ import tableIconSelected from '../../resources/tableIconSelected.png';
 import networkDataNew from '../../services/networkDataNew.json';
 import { phosphoprotService } from '../../services/phosphoprot.service';
 import ButtonActions from '../Shared/ButtonActions';
+import * as d3 from 'd3';
 import {
   formatNumberForDisplay,
   splitValue
@@ -32,7 +33,7 @@ import SplitPanesContainer from './SplitPanesContainer';
 
 let plotCancel = () => {};
 class Enrichment extends Component {
-  defaultActiveIndex =
+  defaultEnrichmentActiveIndex =
     parseInt(sessionStorage.getItem('enrichmentViewTab'), 10) || 0;
 
   state = {
@@ -42,7 +43,7 @@ class Enrichment extends Component {
     enrichmentIconText: '',
     enrichmentResults: [],
     enrichmentColumns: [],
-    activeIndex: this.defaultActiveIndex || 0,
+    activeIndexEnrichmentView: this.defaultEnrichmentActiveIndex || 0,
     multisetPlotInfo: {
       title: '',
       svg: []
@@ -58,7 +59,7 @@ class Enrichment extends Component {
     pdfVisible: false,
     svgVisible: true,
     displayViolinPlot: false,
-    networkDataAvailable: false,
+    // networkDataAvailable: false,
     networkData: {
       nodes: [],
       edges: []
@@ -66,7 +67,18 @@ class Enrichment extends Component {
     networkDataNew: {},
     networkDataMock: {},
     networkDataLoaded: false,
+    networkGraphReady: false,
     tests: {},
+    nodeCutoff: 0.1,
+    edgeCutoff: 0.375,
+    filteredNodesTotal: 0,
+    filteredEdgesTotal: 0,
+    totalNodes: 0,
+    totalEdges: 0,
+    // networkSortBy: ['significance', 'edgecount', 'nodecount']
+    networkSortBy: 'significance',
+    // legendIsOpen: true,
+    // legendIsOpen: JSON.parse(sessionStorage.getItem('legendOpen')) || true,
     networkSettings: {
       facets: {},
       propLabel: {},
@@ -82,7 +94,19 @@ class Enrichment extends Component {
       linkMeta: ['EnrichmentMap_Overlap_size', 'source', 'target'],
       linkMetaLookup: ['EnrichmentMap_GS_DESCR', 'EnrichmentMap_GS_DESCR'],
       nodeColorScale: [0, 0.1, 1],
-      nodeColors: ['red', 'white', 'blue']
+      nodeColors: ['red', 'white', 'blue'],
+      colorMostSignificantTest: '#FFD700',
+      // colorHighestLinkCoefficient: '#FFD700',
+      title: '',
+      // data: null,
+      id: 'chart-network',
+      margin: { top: 10, right: 10, bottom: 10, left: 10 },
+      // statLabel: '',
+      // statistic: '',
+      // formattedData: {},
+      // facets: []
+      // propLabel: [],
+      duration: 1000
     },
     annotationData: [],
     enrichmentDataItem: [],
@@ -251,8 +275,8 @@ class Enrichment extends Component {
   handleEnrichmentSearch = searchResults => {
     const columns = this.getConfigCols(searchResults);
     this.getNetworkData();
-
     this.setState({
+      networkGraphReady: false,
       enrichmentResults: searchResults.enrichmentResults,
       enrichmentColumns: columns,
       isSearching: false,
@@ -556,6 +580,7 @@ class Enrichment extends Component {
   };
 
   getNetworkData = () => {
+    this.removeNetworkSVG();
     const {
       enrichmentModel,
       enrichmentAnnotation,
@@ -581,10 +606,12 @@ class Enrichment extends Component {
       // });
       .then(EMData => {
         this.setState({
-          networkDataAvailable: true,
+          // networkDataAvailable: true,
           networkData: EMData.elements,
           tests: EMData.tests,
-          networkDataNew: networkDataNew
+          networkDataNew: networkDataNew,
+          totalNodes: EMData.elements.nodes.length,
+          totalEdges: EMData.elements.edges.length
         });
         let facets = [];
         for (var i = 0; i < EMData.tests.length; i++) {
@@ -613,7 +640,8 @@ class Enrichment extends Component {
             // nodeColorScale: [0, 0.1, 1],
             // nodeColors: ["red", "white", "blue"]
           },
-          networkDataLoaded: true
+          networkDataLoaded: true,
+          networkGraphReady: true
         });
       });
   };
@@ -1097,7 +1125,7 @@ class Enrichment extends Component {
 
   handleTableNetworkTabChange = (e, { activeIndex }) => {
     sessionStorage.setItem(`enrichmentViewTab`, activeIndex);
-    this.setState({ activeIndex });
+    this.setState({ activeIndexEnrichmentView: activeIndex });
   };
 
   getView = () => {
@@ -1126,7 +1154,7 @@ class Enrichment extends Component {
           className="TableAndNetworkContainer"
           onTabChange={this.handleTableNetworkTabChange}
           panes={TableAndNetworkPanes}
-          activeIndex={this.state.activeIndex}
+          activeIndex={this.state.activeIndexEnrichmentView}
           renderActiveOnly={false}
           menu={{
             attached: true,
@@ -1154,17 +1182,21 @@ class Enrichment extends Component {
             className="TableAndNetworkButtons TableButton"
             name="table"
             color="orange"
-            // active={this.state.activeIndex === 0}
-            inverted={(this.state.activeIndex === 0).toString()}
+            // active={this.state.activeIndexEnrichmentView === 0}
+            inverted={(this.state.activeIndexEnrichmentView === 0).toString()}
           >
             {/* <Icon
               name="table"
               size="large"
               color="orange"
-              inverted={this.state.activeIndex === 0}
+              inverted={this.state.activeIndexEnrichmentView === 0}
             /> */}
             <img
-              src={this.state.activeIndex === 0 ? tableIconSelected : tableIcon}
+              src={
+                this.state.activeIndexEnrichmentView === 0
+                  ? tableIconSelected
+                  : tableIcon
+              }
               alt="Table Icon"
               id="TableButton"
             />
@@ -1174,6 +1206,7 @@ class Enrichment extends Component {
           <Tab.Pane
             key="0"
             className="EnrichmentContentPane"
+            id="EnrichmentContentPaneTable"
             // ref="EnrichmentContentPaneTable"
           >
             <EnrichmentResultsTable
@@ -1194,7 +1227,9 @@ class Enrichment extends Component {
           >
             <img
               src={
-                this.state.activeIndex === 1 ? networkIconSelected : networkIcon
+                this.state.activeIndexEnrichmentView === 1
+                  ? networkIconSelected
+                  : networkIcon
               }
               alt="Network Icon"
               id="NetworkButton"
@@ -1205,6 +1240,7 @@ class Enrichment extends Component {
           <Tab.Pane
             key="1"
             className="EnrichmentContentPane"
+            id="EnrichmentContentPane"
             // ref="EnrichmentContentPaneGraph"
           >
             <EnrichmentResultsGraph
@@ -1213,12 +1249,85 @@ class Enrichment extends Component {
               onHandlePlotAnimation={this.handlePlotAnimation}
               onDisplayViolinPlot={this.displayViolinPlot}
               onHandlePieClick={this.testSelected}
+              onHandleNetworkSortByChange={this.handleNetworkSortByChange}
+              // onHandleLegendOpen={this.handleLegendOpen}
+              // onHandleLegendClose={this.handleLegendClose}
+              onHandleInputChange={this.handleInputChange}
+              onHandleSliderChange={this.handleSliderChange}
+              onHandleTotals={this.handleTotals}
+              // onNetworkGraphReady={this.handleNetworkGraphReady}
             />
           </Tab.Pane>
         )
       }
     ];
   };
+
+  handleNetworkGraphReady = bool => {
+    this.setState({
+      networkGraphReady: bool
+    });
+  };
+
+  removeNetworkSVG = () => {
+    d3.select('div.tooltip-pieSlice').remove();
+    d3.select(`#svg-${this.state.networkSettings.id}`).remove();
+  };
+
+  handleTotals = (filteredNodesLength, filteredEdgesLength) => {
+    this.setState({
+      filteredNodesTotal: filteredNodesLength,
+      filteredEdgesTotal: filteredEdgesLength
+    });
+  };
+
+  handleNetworkSortByChange = (evt, { value }) => {
+    this.removeNetworkSVG();
+    this.setState({
+      networkSortBy: value
+      // networkGraphReady: false
+    });
+  };
+
+  // handleInputChange = _.debounce((evt, { name, value }) => {
+  //   this.setState({
+  //     [name]: value
+  //   });
+  // }, 500);
+
+  handleInputChange = (evt, { name, value }) => {
+    this.removeNetworkSVG();
+    this.setState({
+      [name]: value
+      // networkGraphReady: false
+    });
+  };
+
+  // handleSliderChange = _.debounce(obj => {
+  //   this.setState(obj);
+  // }, 500);
+
+  handleSliderChange = obj => {
+    // this.setState({
+    //   networkGraphReady: false
+    // });
+    this.removeNetworkSVG();
+    this.setState(obj);
+  };
+
+  // handleLegendOpen = () => {
+  //   // sessionStorage.setItem('legendOpen', 'true');
+  //   this.setState({ legendIsOpen: true });
+  //   // this.timeout = setTimeout(() => {
+  //   //   this.setState({ legendIsOpen: false });
+  //   // }, 2500);
+  // };
+
+  // handleLegendClose = () => {
+  //   // sessionStorage.setItem('legendOpen', 'false');
+  //   this.setState({ legendIsOpen: false });
+  //   // clearTimeout(this.timeout);
+  // };
 
   render() {
     const enrichmentView = this.getView();
