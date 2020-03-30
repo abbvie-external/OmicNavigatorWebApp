@@ -184,7 +184,8 @@ class NetworkGraph extends Component {
       let lineScaleVar = lineScaleBase
         .range(networkSettings.lineScale)
         .domain([minLineVar, maxLineVar]);
-      this.props.onHandleTotals(filteredNodes.length, filteredLinks.length);
+
+      this.props.onHandleTotals(filteredNodes.length, relevantLinks.length);
 
       let dataCombinedVar = {
         nodes: filteredNodes,
@@ -809,6 +810,7 @@ class NetworkGraph extends Component {
       this.setState({
         noResults: true
       });
+      this.props.onHandleTotals(0, 0);
     }
   };
 
