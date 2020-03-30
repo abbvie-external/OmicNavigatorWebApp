@@ -4,86 +4,22 @@ import * as d3 from 'd3';
 // import d3plus from 'd3plus';
 import { Dimmer, Loader, Message } from 'semantic-ui-react';
 import './NetworkGraph.scss';
-// import LoaderActivePlots from '../Transitions/LoaderActivePlots';
 import { networkByCluster } from '../Shared/helpers';
 
 class NetworkGraph extends Component {
-  // static defaultProps = {
-  //   networkDataAvailable: false,
-  //   networkData: {},
-  //   tests: {},
-  //   networkSettings: {
-  //     facets: {},
-  //     propLabel: {},
-  //     metaLabels: ['Description', 'Ontology'],
-  //     meta: ['EnrichmentMap_GS_DESCR', 'EnrichmentMap_Name'],
-  //     facetAndValueLabel: ['Test', 'pValue'],
-  //     nodeLabel: 'EnrichmentMap_GS_DESCR',
-  //     radiusScale: [10, 50],
-  //     lineScale: [1, 10],
-  //     nodeSize: 'EnrichmentMap_gs_size',
-  //     linkSize: 'EnrichmentMap_Overlap_size',
-  //     linkMetaLabels: ['Overlap Size', 'Source', 'Target'],
-  //     linkMeta: ['EnrichmentMap_Overlap_size', 'source', 'target'],
-  //     linkMetaLookup: ['EnrichmentMap_GS_DESCR', 'EnrichmentMap_GS_DESCR'],
-  //     nodeColorScale: [0, 0.1, 1],
-  //     nodeColors: ['red', 'white', 'blue']
-  //   }
-  // }
-
   state = {
-    // rerendering: true,
     noResults: false,
     dataCombined: [],
     networkWidth: 0,
     networkContainerWidth: 0,
     networkHeight: 0,
     networkContainerHeight: 0
-    // chartObjs: {
-    //   svg: null,
-    //   mainDiv: null,
-    //   chartDiv: null,
-    //   g: null,
-    //   gLinks: null,
-    //   gNodes: null,
-    //   tooltip: null
-    // },
-    // o1facets: [],
-    // minSet: null,
-    // maxSet: null,
-    // minLine: null,
-    // maxLine: null,
-    // radius: null
   };
   networkContainerRef = React.createRef();
 
-  // static getDerivedStateFromProps(nextProps, prevState) {
-  //   let newState = {};
-  //   if (nextProps.networkData !== prevState.prevNetworkData) {
-  //     newState.networkData = nextProps.networkData;
-  //     newState.prevNetworkData = nextProps.networkData;
-  //   }
-
-  //   if (nextProps.networkSettings !== prevState.prevNetworkSettings) {
-  //     newState.networkSettings = nextProps.networkSettings;
-  //     newState.prevNetworkSettings = nextProps.networkSettings;
-  //   }
-  //   return newState;
-  // }
-
   componentDidMount(prevProps) {
     if (prevProps === undefined) {
-      // if (
-      //   this.props.networkData !== prevProps.networkData ||
-      //   this.props.nodeCutoff !== prevProps.nodeCutoff ||
-      //   this.props.edgeCutoff !== prevProps.edgeCutoff ||
-      //   this.props.networkSortBy !== prevProps.networkSortBy
-      // ) {
-      //   // this.prepareAndRenderTree(
-      //   //   this.state.networkWidth,
-      //   //   this.state.networkHeight
-      //   //);
-      this.setDimensions();
+      this.prepareAndRenderTree();
     }
 
     let resizedFn;
@@ -102,11 +38,7 @@ class NetworkGraph extends Component {
       this.props.edgeCutoff !== prevProps.edgeCutoff ||
       this.props.networkSortBy !== prevProps.networkSortBy
     ) {
-      // this.prepareAndRenderTree(
-      //   this.state.networkWidth,
-      //   this.state.networkHeight
-      //);
-      this.setDimensions();
+      this.prepareAndRenderTree();
     }
     if (this.props.networkSearchValue !== prevProps.networkSearchValue) {
       this.handleNodeSearch();
@@ -130,34 +62,7 @@ class NetworkGraph extends Component {
   };
 
   windowResized = () => {
-    this.setDimensions();
-  };
-
-  setDimensions = () => {
-    const { networkSettings } = this.props;
-    console.log(
-      this.props.networkData.nodes.length,
-      this.props.networkData.edges.length
-    );
-    // we'll want to calculate a reasonable container width based on data...
-    const containerWidth = this.getWidth(this.props);
-    // we calculate height based on the containerRef
-    const containerHeight = this.getHeight();
-    const width =
-      containerWidth -
-      networkSettings.margin.left -
-      networkSettings.margin.right;
-    const height =
-      containerHeight -
-      networkSettings.margin.top -
-      networkSettings.margin.bottom;
-    this.setState({
-      networkContainerWidth: containerWidth,
-      networkWidth: width,
-      networkContainerHeight: containerHeight,
-      networkHeight: height
-    });
-    this.prepareAndRenderTree(width, height);
+    this.prepareAndRenderTree();
   };
 
   getHeight() {
@@ -174,9 +79,9 @@ class NetworkGraph extends Component {
     //}
   }
 
-  getWidth(props) {
-    let networkCalculatedWidth = props.networkData.nodes.length * 20;
-    // let documentWidth = window.innerWidth;
+  getWidth(relevantNodesLength) {
+    let networkCalculatedWidth = relevantNodesLength * 25;
+    let adjustedDocumentWidth = window.innerWidth - 100;
     let networkContainerWidth = 0;
     if (this.networkContainerRef.current !== null) {
       networkContainerWidth = this.networkContainerRef.current.parentElement
@@ -184,12 +89,12 @@ class NetworkGraph extends Component {
     }
     return Math.max(
       networkCalculatedWidth,
-      // documentWidth,
+      adjustedDocumentWidth,
       networkContainerWidth
     );
   }
 
-  prepareAndRenderTree = (width, height) => {
+  prepareAndRenderTree = () => {
     const { networkData, networkSettings } = this.props;
     const self = this;
     // Prepare Data
@@ -201,25 +106,8 @@ class NetworkGraph extends Component {
       return o.data;
     });
 
-    // const Nodes = networkData.nodes;
-    // const Links = networkData.links;
-    // Nodes.map(n => {
-    //   let picked = _.pick(n, networkSettings.facets);
-    //   let metaData = {};
-    //   networkSettings.metaLabels.map(l => {
-    //     metaData[l] = n.networkSettings.meta;
-    //   });
-    //   return (n.facets = picked.map((p, value) => {
-    //     let prop = networkSettings.propLabel[p];
-    //     return { prop, value, metaData };
-    //   }));
-    // });
-
     _.forEach(formattedNodes, function(o1) {
       let picked = _.pick(o1, networkSettings.facets);
-      // let annotation = o1.EnrichmentMap_Name;
-      // let description = o1.EnrichmentMap_GS_DESCR;
-      // let metaData = { Annotation: annotation, Description: description };
       let metaData = {};
       _.forEach(networkSettings.metaLabels, (value, i) => {
         metaData[value] = o1[networkSettings.meta[i]];
@@ -243,11 +131,6 @@ class NetworkGraph extends Component {
     formattedNodes.forEach(node => {
       const lowestTestValueInNode = getNodeLowestSignificantValue(node.facets);
       node.lowestValue = lowestTestValueInNode;
-      // formattedNodes.filter(
-      //   n => n.lowestValue <= this.props.nodeCutoff)
-      // if (node.lowestValue > this.props.nodeCutoff) {
-      //   formattedNodes.splice(node);
-      // }
     });
 
     let filteredNodes = formattedNodes.filter(
@@ -264,29 +147,13 @@ class NetworkGraph extends Component {
 
     if (filteredNodes.length > 0) {
       let relevantNodeIds = filteredNodes.map(n => n.id);
-      debugger;
 
-      // now filter links out that contain source or target of node not meeting cutoff
-      // aka add and remove links from data based on availability of nodes\
+      // filter links out that contain source or target of node not meeting cutoff
       let relevantLinks = filteredLinks.filter(
         l =>
           _.includes(relevantNodeIds, l.source) &&
           _.includes(relevantNodeIds, l.target)
       );
-
-      // const highestLinkCoefficient = Math.max(
-      //   ...filteredLinks
-      //     .map(l => l.EnrichmentMap_similarity_coefficient)
-      //     .filter(v => v != null)
-      // );
-
-      // let formattedNodesCopy = [...formattedNodes];
-      // const formattedNodesCopy = _.cloneDeep(formattedNodes);
-
-      // formattedNodesCopy.forEach(node => {
-      //   const lowestTestValueInNode = getNodeLowestSignificantValue(node.facets);
-      //   node.lowestValue = lowestTestValueInNode;
-      // });
 
       let minSetVar = _.min(
         _.map(filteredNodes, function(o) {
@@ -314,7 +181,6 @@ class NetworkGraph extends Component {
         .range(networkSettings.radiusScale)
         .domain([minSetVar, maxSetVar]);
       let lineScaleBase = d3.scaleLinear();
-      // let lineScaleBaseCopy = lineScaleBase.copy();
       let lineScaleVar = lineScaleBase
         .range(networkSettings.lineScale)
         .domain([minLineVar, maxLineVar]);
@@ -348,7 +214,25 @@ class NetworkGraph extends Component {
           });
         });
 
-        // Prepare Settings (dimensions already calculated)
+        // Prepare Settings
+        let relevantNodesLength = relevantNodeIds.length;
+        const containerWidth = this.getWidth(relevantNodesLength);
+        // calculate height based on the containerRef
+        const containerHeight = this.getHeight();
+        const width =
+          containerWidth -
+          networkSettings.margin.left -
+          networkSettings.margin.right;
+        const height =
+          containerHeight -
+          networkSettings.margin.top -
+          networkSettings.margin.bottom;
+        // this.setState({
+        //   networkContainerWidth: containerWidth,
+        //   networkWidth: width,
+        //   networkContainerHeight: containerHeight,
+        //   networkHeight: height
+        // });
 
         // Prepare Chart
         const chartDiv = d3.select('#' + networkSettings.id);
@@ -367,10 +251,7 @@ class NetworkGraph extends Component {
           // ];
           const extent = [
             [networkSettings.margin.left, networkSettings.margin.top],
-            [
-              width - networkSettings.margin.right,
-              height - networkSettings.margin.top
-            ]
+            [width, height]
           ];
 
           svg.call(
@@ -939,7 +820,7 @@ class NetworkGraph extends Component {
         className="NoResultsMessage"
         icon="search"
         header="No Results"
-        content="Please Adjust Search"
+        content="Please Adjust Filters"
       />
     ) : (
       ''
