@@ -197,6 +197,26 @@
   margin-bottom: 5px;
 }
 
+.node-label {
+  pointer-events: none;
+}
+
+.stop-left {
+  stop-color: red;
+}
+
+.stop-middle {
+  stop-color: white;
+}
+
+.stop-right {
+  stop-color: blue;
+}
+
+.filled {
+  fill: url(#mainGradient);
+}
+
 #NodeEdgeTotals {
   float: right !important;
 }
