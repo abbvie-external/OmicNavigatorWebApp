@@ -213,6 +213,15 @@
   stop-color: blue;
 }
 
+#LegendPopup {
+  font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif !important;
+  border-radius: 5px;
+  pointer-events: none;
+  z-index: 3;
+  // border: 1px solid var(--color-dark);
+  // border-bottom: 2px solid var(--color-dark) !important;
+}
+
 .filled {
   fill: url(#mainGradient);
 }

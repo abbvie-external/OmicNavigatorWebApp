@@ -641,7 +641,8 @@ class NetworkGraph extends Component {
                   // })
                   // .attr('dy', '.35em')
                   // randomly place text below or above node
-                  .attr('y', 20 * (Math.random() < 0.5 ? -1 : 1));
+                  // .attr('y', 20 * (Math.random() < 0.5 ? -1 : 1));
+                  .attr('y', 25);
                 // .attr('y', function(d) {
                 // return -1.1 * d[networkSettings.nodeSize];
                 // });
@@ -715,6 +716,15 @@ class NetworkGraph extends Component {
                       .transition()
                       .duration(50)
                       .style('opacity', 1);
+                    debugger;
+                    let tooltipLRPosition =
+                      d3.event.pageX > window.innerWidth * 0.8
+                        ? `${d3.event.pageX - 275}px`
+                        : `${d3.event.pageX + 10}px`;
+                    let tooltipTBPosition =
+                      d3.event.pageY > window.innerHeight * 0.85
+                        ? `${d3.event.pageY - 100}px`
+                        : `${d3.event.pageY - 15}px`;
                     let pValueDisplay;
                     if (Math.abs(d.data.value) > 0.001)
                       pValueDisplay = d.data.value.toPrecision(3);
@@ -723,8 +733,8 @@ class NetworkGraph extends Component {
                       .html(
                         `<b>Description: </b>${d.data.metaData.Description}<br/><b>Test: </b>${d.data.prop}<br/><b>pValue: </b>${pValueDisplay}<br/><b>Ontology: </b>${d.data.metaData.Ontology}`
                       )
-                      .style('left', d3.event.pageX + 10 + 'px')
-                      .style('top', d3.event.pageY - 15 + 'px');
+                      .style('left', tooltipLRPosition)
+                      .style('top', tooltipTBPosition);
                   })
                   .on('mouseout', function(d, i) {
                     d3.select(this)
