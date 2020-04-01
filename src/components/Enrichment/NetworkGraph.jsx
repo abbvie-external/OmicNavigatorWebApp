@@ -4,7 +4,7 @@ import * as d3 from 'd3';
 // import d3plus from 'd3plus';
 import { Dimmer, Loader, Message } from 'semantic-ui-react';
 import './NetworkGraph.scss';
-import { networkByCluster } from '../Shared/helpers';
+import { networkByCluster, limitValues } from '../Shared/helpers';
 
 class NetworkGraph extends Component {
   state = {
@@ -552,13 +552,16 @@ class NetworkGraph extends Component {
                   );
                 })
                 .on('mouseover', function(d, i) {
-                  let OverlapGenes = d.EnrichmentMap_Overlap_genes.join(', ');
+                  let OverlapGenesLimited = limitValues(
+                    d.EnrichmentMap_Overlap_genes,
+                    15
+                  );
                   let tooltipLRPosition =
                     d3.event.pageX > window.innerWidth * 0.8
                       ? `${d3.event.pageX - 275}px`
                       : `${d3.event.pageX + 10}px`;
                   let tooltipTBPosition =
-                    d3.event.pageY > window.innerHeight * 0.5
+                    d3.event.pageY > window.innerHeight * 0.7
                       ? `${d3.event.pageY - 150}px`
                       : `${d3.event.pageY - 15}px`;
                   d3.select(this)
@@ -572,7 +575,7 @@ class NetworkGraph extends Component {
                     .style('opacity', 1);
                   div
                     .html(
-                      `<b>Overlap Size: </b>${d.EnrichmentMap_Overlap_size}<br/><b>Overlap Coefficient: </b>${d.EnrichmentMap_similarity_coefficient}<br/><b>Source: </b>${d.source.EnrichmentMap_GS_DESCR}<br/><b>Target: </b>${d.target.EnrichmentMap_GS_DESCR}<br/><b>Overlap Genes: </b>${OverlapGenes}`
+                      `<b>Overlap Size: </b>${d.EnrichmentMap_Overlap_size}<br/><b>Overlap Coefficient: </b>${d.EnrichmentMap_similarity_coefficient}<br/><b>Source: </b>${d.source.EnrichmentMap_GS_DESCR}<br/><b>Target: </b>${d.target.EnrichmentMap_GS_DESCR}<br/><b>Overlap Genes: </b>${OverlapGenesLimited}`
                     )
                     .style('left', tooltipLRPosition)
                     .style('top', tooltipTBPosition);

@@ -69,14 +69,14 @@ class Enrichment extends Component {
     networkDataLoaded: false,
     networkGraphReady: false,
     tests: {},
-    nodeCutoff: 0.1,
-    edgeCutoff: 0.375,
+    nodeCutoff: sessionStorage.getItem('nodeCutoff') || 0.1,
+    edgeCutoff: sessionStorage.getItem('edgeCutoff') || 0.375,
     filteredNodesTotal: 0,
     filteredEdgesTotal: 0,
     totalNodes: 0,
     totalEdges: 0,
     // networkSortBy: ['significance', 'edgecount', 'nodecount']
-    networkSortBy: 'significance',
+    networkSortBy: sessionStorage.getItem('networkSortBy') || 'significance',
     legendIsOpen: true,
     // legendIsOpen: JSON.parse(sessionStorage.getItem('legendOpen')) || true,
     networkSettings: {
@@ -1584,6 +1584,7 @@ class Enrichment extends Component {
       networkSortBy: value
       // networkGraphReady: false
     });
+    sessionStorage.setItem('networkSortBy', value);
   };
 
   // handleInputChange = _.debounce((evt, { name, value }) => {
@@ -1604,12 +1605,13 @@ class Enrichment extends Component {
   //   this.setState(obj);
   // }, 500);
 
-  handleSliderChange = obj => {
+  handleSliderChange = (type, value) => {
     // this.setState({
     //   networkGraphReady: false
     // });
     this.removeNetworkSVG();
-    this.setState(obj);
+    this.setState({ [type]: value });
+    sessionStorage.setItem(type, value);
   };
 
   // handleLegendOpen = () => {
