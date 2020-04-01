@@ -56,20 +56,26 @@
 
 .node-label {
   pointer-events: none;
+  font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif;
   // transform: rotate(5deg);
 }
 
 div.tooltip-pieSlice {
+  font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif !important;
   position: absolute;
   text-align: left;
-  padding: 0.5rem;
-  background: #ffffff;
-  color: #313639;
-  border: 1px solid #313639;
-  border-radius: 8px;
+  // color: #313639;
+  color: #fff;
+  // border: 1px solid #313639;
+  border-radius: 5px;
   pointer-events: none;
   font-size: 1rem;
   z-index: 3;
+  background-color: #2e2e2e !important;
+  border-bottom: 2px solid var(--color-primary) !important;
+  padding: 1em !important;
+  max-width: 250px !important;
+  word-break: 'break-all' !important;
 }
 
 .OntologyLink {

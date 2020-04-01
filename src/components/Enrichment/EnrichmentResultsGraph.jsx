@@ -80,9 +80,7 @@ class EnrichmentResultsGraph extends Component {
     showNetworkLabels: true,
     results: [],
     networkSearchValue: '',
-    descriptions: [],
-    legendIsOpen: true
-    // legendIsOpen: JSON.parse(sessionStorage.getItem('legendOpen')) || true,
+    descriptions: []
   };
 
   componentDidMount() {
@@ -95,35 +93,13 @@ class EnrichmentResultsGraph extends Component {
 
   componentDidUpdate(prevProps, prevState, snapshot) {
     if (
-      // this.props.networkDataLoaded &&
       this.props.networkGraphReady !== prevProps.networkGraphReady ||
       this.props.networkData !== prevProps.networkData
     ) {
       this.setupSearch();
+      this.props.onCreateLegend();
     }
   }
-
-  // let clusters = this.props.networkDataNew.clusters;
-  // const nodes = clusters.map(c => c.nodes);
-  // const nodesMapped = nodes.map(n => ({
-  //   key: n.id,
-  //   title: n.description
-  //   // ontology: n.ontology,
-  //   // size: n.geneSetSize,
-  //   // genes: n.genes
-  //   // title: r.metaData.Description,
-  //   // prop: r.prop,
-  //   // value: r.value,
-  //   // ontology: r.metaData.Ontology
-  // }));
-  // this.setState({
-  //   descriptions: nodesMapped
-  // });
-
-  // componentWillUnmount() {
-  //   d3.select('#svg-chart-network').remove();
-  //   d3.select('div.tooltip-pieSlice').remove();
-  // }
 
   handleLabels = () => {
     this.setState(prevState => ({
@@ -157,128 +133,6 @@ class EnrichmentResultsGraph extends Component {
     });
   }, 500);
 
-  getLegend = () => {
-    return (
-      <svg viewBox="0 0 300 250" preserveAspectRatio="xMinYMin meet">
-        <g className="prefix__slices">
-          <path
-            className="prefix__slice"
-            stroke="#000"
-            d="M150 50a50 50 0 0150 50h-50zM200 100a50 50 0 01-50 50v-50zM150 150a50 50 0 01-50-50h50zM100 100a50 50 0 0150-50v50z"
-            fill="#d3d3d3"
-          />
-        </g>
-        <g className="prefix__labels">
-          <text
-            dy=".35em"
-            x={56.569}
-            y={-56.569}
-            fontSize=".75em"
-            textAnchor="middle"
-            transform="translate(150 100)"
-          >
-            {'mut Time Change'}
-          </text>
-          <text
-            dy=".35em"
-            x={56.569}
-            y={56.569}
-            fontSize=".75em"
-            textAnchor="middle"
-            transform="translate(150 100)"
-          >
-            {'wt Time Change'}
-          </text>
-          <text
-            dy=".35em"
-            x={-56.569}
-            y={56.569}
-            fontSize=".75em"
-            textAnchor="middle"
-            transform="translate(150 100)"
-          >
-            {'wt VS mut'}
-          </text>
-          <text
-            dy=".35em"
-            x={-56.569}
-            y={-56.569}
-            fontSize=".75em"
-            textAnchor="middle"
-            transform="translate(150 100)"
-          >
-            {'wt VS mut Time'}
-          </text>
-          <path
-            className="prefix__pointer"
-            d="M250.108 48.431h-87.079l15.255 23.285M247.162 161.569h-81.187l12.31-33.285M66.736 161.569h53.39l1.59-33.285M132.853 48.431H54.01l67.706 23.285"
-            fill="none"
-            stroke="#000"
-          />
-        </g>
-        <g className="prefix__gradient">
-          <path className="prefix__filled" d="M100 200h100v15H100z" />
-          <g
-            className="prefix__y prefix__axis"
-            fill="none"
-            fontSize={10}
-            fontFamily="sans-serif"
-            textAnchor="middle"
-          >
-            <path
-              className="prefix__domain"
-              stroke="currentColor"
-              d="M100.5 221v-5.5h100v5.5"
-            />
-            <g className="prefix__tick">
-              <path stroke="currentColor" d="M100.5 215v6" />
-              <text
-                fill="currentColor"
-                y={9}
-                dy=".71em"
-                transform="translate(100.5 215)"
-              >
-                {'0.0'}
-              </text>
-            </g>
-            <g className="prefix__tick">
-              <path stroke="currentColor" d="M172.722 215v6" />
-              <text
-                fill="currentColor"
-                y={9}
-                dy=".71em"
-                transform="translate(172.722 215)"
-              >
-                {'0.5'}
-              </text>
-            </g>
-            <g className="prefix__tick">
-              <path stroke="currentColor" d="M200.5 215v6" />
-              <text
-                fill="currentColor"
-                y={9}
-                dy=".71em"
-                transform="translate(200.5 215)"
-              >
-                {'1.0'}
-              </text>
-            </g>
-          </g>
-          <text y={2} dy=".35em" transform="translate(65 205)">
-            {'pValue'}
-          </text>
-        </g>
-        <defs>
-          <linearGradient id="prefix__mainGradient">
-            <stop offset={0} stopColor="red" />
-            <stop offset={0.5} stopColor="#fff" />
-            <stop offset={1} stopColor="#00f" />
-          </linearGradient>
-        </defs>
-      </svg>
-    );
-  };
-
   setupSearch = () => {
     const networkDataNodeDescriptions = this.props.networkData.nodes.map(r => ({
       description: r.data.EnrichmentMap_GS_DESCR.toLowerCase(),
@@ -310,22 +164,8 @@ class EnrichmentResultsGraph extends Component {
   //   }));
   // };
 
-  handleLegendOpen = () => {
-    // sessionStorage.setItem('legendOpen', 'true');
-    this.setState({ legendIsOpen: true });
-    // this.timeout = setTimeout(() => {
-    //   this.setState({ legendIsOpen: false });
-    // }, 2500);
-  };
-
-  handleLegendClose = () => {
-    // sessionStorage.setItem('legendOpen', 'false');
-    this.setState({ legendIsOpen: false });
-    // clearTimeout(this.timeout);
-  };
-
   render() {
-    const { results, legendIsOpen } = this.state;
+    const { results } = this.state;
     const {
       nodeCutoff,
       edgeCutoff,
@@ -336,42 +176,10 @@ class EnrichmentResultsGraph extends Component {
       filteredNodesTotal,
       filteredEdgesTotal,
       totalNodes,
-      totalEdges
+      totalEdges,
+      legendIsOpen
     } = this.props;
 
-    const openLegend =
-      legendIsOpen && activeIndexEnrichmentView === 1 && networkGraphReady
-        ? true
-        : false;
-
-    const networkSortByOptions = [
-      {
-        key: 'significance',
-        text: 'Significance',
-        value: 'significance',
-        content: 'Significance'
-      },
-      {
-        key: 'edgecount',
-        text: 'Edge Count',
-        value: 'edgecount',
-        content: 'Edge Count'
-      },
-      {
-        key: 'nodecount',
-        text: 'Node Count',
-        value: 'nodecount',
-        content: 'Node Count'
-      }
-    ];
-
-    const legend = this.getLegend();
-    const LegendPopupStyle = {
-      padding: '1em',
-      width: '250px'
-    };
-
-    const dynamicSize = this.getDynamicSize();
     if (!networkDataLoaded) {
       return (
         <div className="LoaderActivePlotsNetwork">
@@ -379,6 +187,39 @@ class EnrichmentResultsGraph extends Component {
         </div>
       );
     } else {
+      const dynamicSize = this.getDynamicSize();
+
+      const openLegend =
+        legendIsOpen && activeIndexEnrichmentView === 1 && networkGraphReady
+          ? true
+          : false;
+
+      const networkSortByOptions = [
+        {
+          key: 'significance',
+          text: 'Significance',
+          value: 'significance',
+          content: 'Significance'
+        },
+        {
+          key: 'edgecount',
+          text: 'Edge Count',
+          value: 'edgecount',
+          content: 'Edge Count'
+        },
+        {
+          key: 'nodecount',
+          text: 'Node Count',
+          value: 'nodecount',
+          content: 'Node Count'
+        }
+      ];
+      // const legend = this.getLegend();
+      const LegendPopupStyle = {
+        padding: '1em',
+        width: '250px'
+      };
+
       return (
         <Grid className="NetworkGraphFiltersContainer">
           <Grid.Row className="NetworkGraphFiltersRow">
@@ -581,11 +422,12 @@ class EnrichmentResultsGraph extends Component {
               <Popup
                 trigger={
                   <Button
+                    disabled={!networkGraphReady}
                     icon
                     labelPosition="left"
                     // color="blue"
                     id="LegendIconButton"
-                    className={networkGraphReady ? 'Show' : 'Hide'}
+                    // className={networkGraphReady ? 'Show' : 'Hide'}
                     size="mini"
                   >
                     Legend
@@ -598,10 +440,12 @@ class EnrichmentResultsGraph extends Component {
                 id="LegendPopup"
                 // position="top left"
                 open={openLegend}
-                onClose={this.handleLegendClose}
-                onOpen={this.handleLegendOpen}
+                onClose={this.props.onHandleLegendClose}
+                onOpen={this.props.onHandleLegendOpen}
+                // className={(activeIndexEnrichmentView === 1
+                //   && networkGraphReady) ? 'Show' : 'Hide'}
               >
-                {legend}
+                <Popup.Content className="legend"></Popup.Content>
               </Popup>
             </Grid.Column>
             <Grid.Column

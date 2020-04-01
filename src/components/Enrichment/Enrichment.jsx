@@ -77,7 +77,7 @@ class Enrichment extends Component {
     totalEdges: 0,
     // networkSortBy: ['significance', 'edgecount', 'nodecount']
     networkSortBy: 'significance',
-    // legendIsOpen: true,
+    legendIsOpen: true,
     // legendIsOpen: JSON.parse(sessionStorage.getItem('legendOpen')) || true,
     networkSettings: {
       facets: {},
@@ -614,15 +614,18 @@ class Enrichment extends Component {
           totalEdges: EMData.elements.edges.length
         });
         let facets = [];
+        let pieData = [];
         for (var i = 0; i < EMData.tests.length; i++) {
           let rplcSpaces = EMData.tests[i].replace(/ /g, '_');
           facets.push('EnrichmentMap_pvalue_' + rplcSpaces + '_');
+          pieData.push(100 / EMData.tests.length);
         }
         this.setState({
           networkSettings: {
             ...this.state.networkSettings,
             facets: facets,
-            propLabel: EMData.tests
+            propLabel: EMData.tests,
+            propData: pieData
             // metaLabels: ["Description", "Ontology"],
             // meta: ["EnrichmentMap_GS_DESCR", "EnrichmentMap_Name"],
             // facetAndValueLabel: ["Test", "pValue"],
@@ -1087,6 +1090,296 @@ class Enrichment extends Component {
     });
   };
 
+  handleLegendOpen = () => {
+    this.setState({ legendIsOpen: true }, () => this.createLegend());
+  };
+
+  handleLegendClose = () => {
+    this.setState({ legendIsOpen: false });
+  };
+
+  createLegend = () => {
+    var svg = d3
+      .selectAll('.legend')
+      .append('svg')
+      .data([this.state.networkSettings.propLabel])
+      .attr('width', '100%')
+      .attr('height', '100%')
+      .attr('viewBox', '0 0 ' + 300 + ' ' + 250)
+      .attr('preserveAspectRatio', 'xMinYMin meet');
+    var legend = svg.append('g');
+
+    legend.append('g').attr('class', 'slices');
+    legend.append('g').attr('class', 'labels');
+    legend.append('g').attr('class', 'lines');
+    legend.append('g').attr('class', 'gradient');
+
+    var width = 300,
+      height = 300,
+      radius = 50;
+
+    var pie = d3
+      .pie()
+      .sort(null)
+      .value(1);
+
+    var arc = d3
+      .arc()
+      .outerRadius(radius)
+      .innerRadius(0);
+
+    legend.attr('transform', 'translate(' + width / 2 + ',' + height / 3 + ')');
+
+    /* ------- PIE SLICES -------*/
+    var slice = legend
+      .select('.slices')
+      .selectAll('path.slice')
+      .data(pie);
+
+    slice
+      .enter()
+      .insert('path')
+      .style('fill', '#d3d3d3')
+      .attr('class', 'slice')
+      .attr('stroke', 'black')
+      .attr('d', arc);
+
+    /* ------- TEXT LABELS -------*/
+    var text = legend
+      .select('.labels')
+      .selectAll('text')
+      .data(pie);
+    text
+      .enter()
+      .append('text')
+      .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
+      .attr('dy', '.35em')
+      .style('font-size', '.8em')
+      .text(function(d) {
+        return d.data;
+      })
+
+      .attr('x', function(d) {
+        var a = d.startAngle + (d.endAngle - d.startAngle) / 2 - Math.PI / 2;
+        d.cx = Math.cos(a) * (radius - 10);
+        return (d.x = Math.cos(a) * (radius + 30));
+      })
+      .attr('y', function(d) {
+        var a = d.startAngle + (d.endAngle - d.startAngle) / 2 - Math.PI / 2;
+        d.cy = Math.sin(a) * (radius - 10);
+        return (d.y = Math.sin(a) * (radius + 30));
+      })
+      .style('text-anchor', 'middle')
+      .each(function(d) {
+        var bbox = this.getBBox();
+        d.sx = d.x - bbox.width / 2 - 2;
+        d.ox = d.x + bbox.width / 2 + 2;
+        d.sy = d.oy = d.y + 5;
+      });
+
+    text
+      .enter()
+      .append('path')
+      .attr('class', 'pointer')
+      .style('fill', 'none')
+      .style('stroke', 'black')
+
+      .attr('d', function(d) {
+        if (d.cx > d.ox) {
+          return (
+            'M' +
+            d.sx +
+            ',' +
+            d.sy +
+            'L' +
+            d.ox +
+            ',' +
+            d.oy +
+            ' ' +
+            d.cx +
+            ',' +
+            d.cy
+          );
+        } else {
+          return (
+            'M' +
+            d.ox +
+            ',' +
+            d.oy +
+            'L' +
+            d.sx +
+            ',' +
+            d.sy +
+            ' ' +
+            d.cx +
+            ',' +
+            d.cy
+          );
+        }
+      });
+
+    // Create the svg:defs element and the main gradient definition.
+    var svgDefs = svg.append('defs');
+
+    var mainGradient = svgDefs
+      .append('linearGradient')
+      .attr('id', 'mainGradient');
+
+    // Create the stops of the main gradient. Each stop will be assigned
+    // a class to style the stop using CSS.
+    mainGradient
+      .append('stop')
+      .attr('class', 'stop-left')
+      .attr('offset', '0');
+
+    mainGradient
+      .append('stop')
+      .attr('class', 'stop-middle')
+      .attr('offset', '0.5');
+
+    mainGradient
+      .append('stop')
+      .attr('class', 'stop-right')
+      .attr('offset', '1');
+
+    // Use the gradient to set the shape fill, via CSS.
+    var gradient = legend.selectAll('.gradient');
+
+    gradient
+      .append('rect')
+      .classed('filled', true)
+      .attr('x', -50)
+      .attr('y', this.state.networkSettings.propLabel.length > 2 ? 100 : 60)
+      .attr('width', 100)
+      .attr('height', 15);
+
+    var y = d3
+      .scaleLinear()
+      .range([0, 50, 100])
+      .domain([0, 0.1, 1]);
+
+    var yAxis = d3
+      .axisBottom()
+      .scale(y)
+      .ticks(2);
+
+    gradient
+      .append('g')
+      .attr('class', 'y axis')
+      .attr('transform', 'translate(-50,115)')
+      .call(yAxis);
+    gradient
+      .append('text')
+      .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
+      .attr('x', -10)
+      .attr('y', 2)
+      .attr('dy', '.35em')
+      .text('pValue')
+      .attr('transform', 'translate(-85,105)');
+  };
+
+  // getLegend = () => {
+  //   let tests = this.state.networkSettings.propLabel;
+  //   // let pieSlices = tests.length;
+  //   let labels = {};
+  //   let lines = {};
+  //   let gradient = {};
+  //   let width = 300;
+  //   let height = 300;
+  //   let x = width / 2;
+  //   let y = height / 2;
+  //   let radius = 50;
+  //   let slices = d3.pie().value(1);
+
+  //   let arc = d3
+  //     .arc()
+  //     .outerRadius(radius)
+  //     .innerRadius(0);
+
+  //   function getXattribute(d) {
+  //     let a = d.startAngle + (d.endAngle - d.startAngle) / 2 - Math.PI / 2;
+  //     d.cx = Math.cos(a) * (radius - 10);
+  //     return (d.x = Math.cos(a) * (radius + 30));
+  //   }
+
+  //   function getYattribute(d) {
+  //     let a = d.startAngle + (d.endAngle - d.startAngle) / 2 - Math.PI / 2;
+  //     d.cy = Math.sin(a) * (radius - 10);
+  //     return (d.y = Math.sin(a) * (radius + 30));
+  //   }
+
+  //   let legend = slices.map(s => {
+  //     return (
+  //       <>
+  //         <g className="slices">
+  //           <path className="slice" stroke="#000" d={arc} fill="#d3d3d3" />
+  //         </g>
+  //         <g className="prefix__labels">
+  //           <text
+  //             dy=".35em"
+  //             x={getXattribute(s)}
+  //             y={getYattribute(s)}
+  //             fontSize=".75em"
+  //             textAnchor="middle"
+  //             transform={`translate(${width / 2} ${height / 3})`}
+  //           >
+  //             {s.data}
+  //           </text>
+  //           <path
+  //             className="prefix__pointer"
+  //             d="M250.108 48.431h-87.079l15.255 23.285M247.162 161.569h-81.187l12.31-33.285M66.736 161.569h53.39l1.59-33.285M132.853 48.431H54.01l67.706 23.285"
+  //             fill="none"
+  //             stroke="#000"
+  //           />
+  //         </g>
+  //         <g className="prefix__gradient">
+  //           <path className="prefix__filled" d="M100 200h100v15H100z" />
+  //           <g
+  //             className="prefix__y prefix__axis"
+  //             fill="none"
+  //             fontSize={10}
+  //             fontFamily="sans-serif"
+  //             textAnchor="middle"
+  //           >
+  //             <path
+  //               className="prefix__domain"
+  //               stroke="currentColor"
+  //               d="M100.5 221v-5.5h100v5.5"
+  //             />
+  //             <g className="prefix__tick">
+  //               <path stroke="currentColor" d="M100.5 215v6" />
+  //               <text
+  //                 fill="currentColor"
+  //                 y={9}
+  //                 dy=".71em"
+  //                 transform="translate(100.5 215)"
+  //               >
+  //                 {'0.0'}
+  //               </text>
+  //             </g>
+  //           </g>
+  //           <text y={s.data} dy=".35em" transform="translate(65 205)">
+  //             {'pValue'}
+  //           </text>
+  //         </g>
+  //       </>
+  //     );
+  //   });
+
+  //   return (
+  //     <svg viewBox="0 0 300 250" preserveAspectRatio="xMinYMin meet">
+  //       {legend}
+  //       <defs>
+  //         <linearGradient id="prefix__mainGradient">
+  //           <stop offset={0} stopColor="red" />
+  //           <stop offset={0.5} stopColor="#fff" />
+  //           <stop offset={1} stopColor="#00f" />
+  //         </linearGradient>
+  //       </defs>
+  //     </svg>
+  //   );
+  // };
+
   backToTable = () => {
     this.setState({
       isTestDataLoaded: false,
@@ -1126,6 +1419,9 @@ class Enrichment extends Component {
   handleTableNetworkTabChange = (e, { activeIndex }) => {
     sessionStorage.setItem(`enrichmentViewTab`, activeIndex);
     this.setState({ activeIndexEnrichmentView: activeIndex });
+    if (activeIndex === 1) {
+      this.handleLegendOpen();
+    }
   };
 
   getView = () => {
@@ -1250,12 +1546,13 @@ class Enrichment extends Component {
               onDisplayViolinPlot={this.displayViolinPlot}
               onHandlePieClick={this.testSelected}
               onHandleNetworkSortByChange={this.handleNetworkSortByChange}
-              // onHandleLegendOpen={this.handleLegendOpen}
-              // onHandleLegendClose={this.handleLegendClose}
               onHandleInputChange={this.handleInputChange}
               onHandleSliderChange={this.handleSliderChange}
               onHandleTotals={this.handleTotals}
               // onNetworkGraphReady={this.handleNetworkGraphReady}
+              onHandleLegendOpen={this.handleLegendOpen}
+              onHandleLegendClose={this.handleLegendClose}
+              onCreateLegend={this.createLegend}
             />
           </Tab.Pane>
         )
