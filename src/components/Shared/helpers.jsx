@@ -33,7 +33,6 @@ export function splitValue(value) {
 
 export function limitValues(values, size) {
   if (values) {
-    debugger;
     let commaSeparatedValues = values.join(', ');
     if (values.length < size + 1) {
       return commaSeparatedValues;

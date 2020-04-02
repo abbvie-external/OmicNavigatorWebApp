@@ -100,10 +100,10 @@ class EnrichmentMultisetFilters extends Component {
       10 +
       24;
     const useAnchor = uSettings.useAnchor;
-    const setDescP=[];
-    const notSetDescP=[];
+    const setDescP = [];
+    const notSetDescP = [];
 
-    for(var i = 0;i < selectedOperator.length; i++){
+    for (var i = 0; i < selectedOperator.length; i++) {
       switch (selectedOperator[i].value) {
         case '<':
           setDescP.push(`less than ${sigValue[i]} in:`);
@@ -140,33 +140,42 @@ class EnrichmentMultisetFilters extends Component {
         .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
         .attr('font-size', '15px')
         .attr('fill', 'black');
-      metaSvg.selectAll("dataObject")
+      metaSvg
+        .selectAll('dataObject')
         .data(setDescP)
         .enter()
         .append('text')
         .attr('x', 7)
-        .attr('y', function (d, i) { return (30+heightScalar*i) })
-        .text(function (d) { return d })
+        .attr('y', function(d, i) {
+          return 30 + heightScalar * i;
+        })
+        .text(function(d) {
+          return d;
+        })
         .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
         .attr('font-size', '14px')
         .attr('fill', 'black');
 
-        if (useAnchor) {
-          metaSvg
-            .append('circle')
-            .style('fill', 'green')
-            .attr('cx', 17)
-            .attr('cy', function () { return (30+(heightScalar*setDescP.length)) })
-            .attr('r', 4);
-          metaSvg
-            .append('text')
-            .attr('x', 25)
-            .attr('y', function () { return (30+(heightScalar*setDescP.length)+4) })
-            .text(uAnchor)
-            .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
-            .attr('font-size', '13px')
-            .attr('fill', 'black');
-        }
+      if (useAnchor) {
+        metaSvg
+          .append('circle')
+          .style('fill', 'green')
+          .attr('cx', 17)
+          .attr('cy', function() {
+            return 30 + heightScalar * setDescP.length;
+          })
+          .attr('r', 4);
+        metaSvg
+          .append('text')
+          .attr('x', 25)
+          .attr('y', function() {
+            return 30 + heightScalar * setDescP.length + 4;
+          })
+          .text(uAnchor)
+          .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
+          .attr('font-size', '13px')
+          .attr('fill', 'black');
+      }
 
       // const mustTestCircles =
       metaSvg
@@ -176,11 +185,19 @@ class EnrichmentMultisetFilters extends Component {
         .append('circle')
         .style('fill', 'green')
         .attr('cx', 17)
-        .attr('cy', function(d,i) {
+        .attr('cy', function(d, i) {
           if (!useAnchor) {
-            return 30+(heightScalar*setDescP.length)+mustData.indexOf(d) * heightScalar;
+            return (
+              30 +
+              heightScalar * setDescP.length +
+              mustData.indexOf(d) * heightScalar
+            );
           } else {
-            return 30+(heightScalar*setDescP.length)+(mustData.indexOf(d)+1) * heightScalar;
+            return (
+              30 +
+              heightScalar * setDescP.length +
+              (mustData.indexOf(d) + 1) * heightScalar
+            );
           }
         })
         .attr('r', 4);
@@ -194,31 +211,54 @@ class EnrichmentMultisetFilters extends Component {
         .attr('x', 25)
         .attr('y', function(d) {
           if (!useAnchor) {
-            return 30+(heightScalar*setDescP.length)+mustData.indexOf(d) * heightScalar + 4;
+            return (
+              30 +
+              heightScalar * setDescP.length +
+              mustData.indexOf(d) * heightScalar +
+              4
+            );
           } else {
-            return 30+(heightScalar*setDescP.length)+(mustData.indexOf(d)+1) * heightScalar + 4;
+            return (
+              30 +
+              heightScalar * setDescP.length +
+              (mustData.indexOf(d) + 1) * heightScalar +
+              4
+            );
           }
         })
-        .text(function(d) {return d;})
+        .text(function(d) {
+          return d;
+        })
         .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
         .attr('font-size', '13px')
         .attr('fill', 'black');
 
       if (notData.length !== 0) {
-        metaSvg.selectAll("dataObject")
+        metaSvg
+          .selectAll('dataObject')
           .data(notSetDescP)
           .enter()
           .append('text')
           .attr('dy', '24px')
           .attr('x', 7)
-          .attr('y', function(d,i) {
+          .attr('y', function(d, i) {
             if (!useAnchor) {
-              return 30+(heightScalar*setDescP.length)+(i+mustData.length-1) * heightScalar;
+              return (
+                30 +
+                heightScalar * setDescP.length +
+                (i + mustData.length - 1) * heightScalar
+              );
             } else {
-              return 30+(heightScalar*setDescP.length)+(i+mustData.length) * heightScalar;
+              return (
+                30 +
+                heightScalar * setDescP.length +
+                (i + mustData.length) * heightScalar
+              );
             }
           })
-          .text(function (d) { return d })
+          .text(function(d) {
+            return d;
+          })
           .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
           .attr('font-size', '14px')
           .attr('fill', 'black');
@@ -231,11 +271,25 @@ class EnrichmentMultisetFilters extends Component {
           .append('circle')
           .style('fill', 'red')
           .attr('cx', 17)
-          .attr('cy', function(d,i) {
+          .attr('cy', function(d, i) {
             if (!useAnchor) {
-              return 30+4+heightScalar*(i+setDescP.length+notSetDescP.length+mustData.length);
+              return (
+                30 +
+                4 +
+                heightScalar *
+                  (i + setDescP.length + notSetDescP.length + mustData.length)
+              );
             } else {
-              return 30+4+heightScalar*(i+setDescP.length+notSetDescP.length+mustData.length+1);
+              return (
+                30 +
+                4 +
+                heightScalar *
+                  (i +
+                    setDescP.length +
+                    notSetDescP.length +
+                    mustData.length +
+                    1)
+              );
             }
           })
           .attr('r', 4);
@@ -247,11 +301,25 @@ class EnrichmentMultisetFilters extends Component {
           .enter()
           .append('text')
           .attr('x', 25)
-          .attr('y', function(d,i) {
+          .attr('y', function(d, i) {
             if (!useAnchor) {
-              return 30+8+heightScalar*(i+setDescP.length+notSetDescP.length+mustData.length);
+              return (
+                30 +
+                8 +
+                heightScalar *
+                  (i + setDescP.length + notSetDescP.length + mustData.length)
+              );
             } else {
-              return 30+8+heightScalar*(i+setDescP.length+notSetDescP.length+mustData.length+1);
+              return (
+                30 +
+                8 +
+                heightScalar *
+                  (i +
+                    setDescP.length +
+                    notSetDescP.length +
+                    mustData.length +
+                    1)
+              );
             }
           })
           .text(function(d) {
@@ -701,22 +769,22 @@ class EnrichmentMultisetFilters extends Component {
     }
   }
 
-  handleDropdownChange = (evt, { name, value, index}) => {
-    this.props.onHandleDropdownChange(evt, { name, value, index});
+  handleDropdownChange = (evt, { name, value, index }) => {
+    this.props.onHandleDropdownChange(evt, { name, value, index });
   };
 
   handleInputChange = (evt, { name, value, index }) => {
     this.props.onHandleInputChange(evt, { name, value, index });
   };
-  addFilter=()=>{ 
+  addFilter = () => {
     this.props.onAddFilter();
   };
-  removeFilter=(index)=>{
-    this.props.onRemoveFilter(index)
-  }
-  changeHoveredFilter=(index)=>{
+  removeFilter = index => {
+    this.props.onRemoveFilter(index);
+  };
+  changeHoveredFilter = index => {
     this.props.onChangeHoveredFilter(index);
-  }
+  };
 
   render() {
     const { selectedOperator, sigValue, uSettings } = this.props;
@@ -733,60 +801,70 @@ class EnrichmentMultisetFilters extends Component {
     return (
       <Fragment>
         <Form className="MultisetDropdownContainer">
-        <ul style={{padding:"0px"}}>
-          {indexFilters.map(index =><Form.Group
-            key={index} 
-            onMouseEnter={()=>this.changeHoveredFilter(index)}
-            onMouseLeave={()=>this.changeHoveredFilter(-1)}
-            >
-            <Form.Field
-              control={Input}
-              readOnly
-              label={(index===0)?"Column":""}
-              name="selectedCol"
-              className="ThresholdColumnReadOnly"
-              index={index}
-              value={SelColOverride}
-              options={Columns}
-              width={7}
-            ></Form.Field>
-            {hoveredFilter===index && indexFilters.length !== 1 &&
-            <Button circular icon style={{
-              position:"absolute",
-              marginTop:index===0?"15px":"0px"}} 
-              size="mini" compact onClick={()=>this.removeFilter(index)}>
-              <Icon name="minus circle" color={"red"}/>
-            </Button>}
-            <Form.Field
-              control={Select}
-              label={(index===0)?"Operator":""}
-              name="selectedOperator"
-              className="ThresholdOperatorSelect"
-              index={index}
-              // selection
-              value={SelOp[index].value}
-              options={Operators}
-              width={4}
-              onChange={this.handleDropdownChange}
-            ></Form.Field>
-            <Form.Field
-              control={Input}
-              type="number"
-              step="0.01"
-              min="0.00"
-              label={(index===0)?"Significance":""}
-              index={index}
-              name="sigValue"
-              className="SignificantValueInput"
-              value={sigValue[index]}
-              width={5}
-              onChange={this.handleInputChange}
-            ></Form.Field>
-          </Form.Group>
-          )}</ul>
-        <Button circular compact size="mini" icon onClick={this.addFilter}>
-          <Icon name="plus circle" color={"green"}/>
-        </Button>
+          <ul style={{ padding: '0px' }}>
+            {indexFilters.map(index => (
+              <Form.Group
+                key={index}
+                onMouseEnter={() => this.changeHoveredFilter(index)}
+                onMouseLeave={() => this.changeHoveredFilter(-1)}
+              >
+                <Form.Field
+                  control={Input}
+                  readOnly
+                  label={index === 0 ? 'Column' : ''}
+                  name="selectedCol"
+                  className="ThresholdColumnReadOnly"
+                  index={index}
+                  value={SelColOverride}
+                  options={Columns}
+                  width={7}
+                ></Form.Field>
+                {hoveredFilter === index && indexFilters.length !== 1 && (
+                  <Button
+                    circular
+                    icon
+                    style={{
+                      position: 'absolute',
+                      marginTop: index === 0 ? '15px' : '0px'
+                    }}
+                    size="mini"
+                    compact
+                    onClick={() => this.removeFilter(index)}
+                  >
+                    <Icon name="minus circle" color={'red'} />
+                  </Button>
+                )}
+                <Form.Field
+                  control={Select}
+                  label={index === 0 ? 'Operator' : ''}
+                  name="selectedOperator"
+                  className="ThresholdOperatorSelect"
+                  index={index}
+                  // selection
+                  value={SelOp[index].value}
+                  options={Operators}
+                  width={4}
+                  onChange={this.handleDropdownChange}
+                ></Form.Field>
+                <Form.Field
+                  control={Input}
+                  type="number"
+                  step="0.01"
+                  min="0.00"
+                  label={index === 0 ? 'Significance' : ''}
+                  index={index}
+                  name="sigValue"
+                  className="SignificantValueInput"
+                  value={sigValue[index]}
+                  width={5}
+                  onChange={this.handleInputChange}
+                ></Form.Field>
+              </Form.Group>
+            ))}
+          </ul>
+          <Button circular compact size="mini" icon onClick={this.addFilter}>
+            <Icon name="plus circle" color={'green'} />
+          </Button>
         </Form>
         <p id="multiset-query" className="MultisetQueryContainer"></p>
       </Fragment>
