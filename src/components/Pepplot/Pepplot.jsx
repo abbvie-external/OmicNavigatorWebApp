@@ -263,6 +263,8 @@ class Pepplot extends Component {
         thresholdColsP: thresholdColsPepplot
       });
 
+      this.setState({filterableColumnsP:[...relevantConfigColumns]});
+
       // if using multi-set analysis, show set membership column
       if (this.state.multisetQueried) {
         relevantConfigColumns.splice(0, 0, 'Set_Membership');

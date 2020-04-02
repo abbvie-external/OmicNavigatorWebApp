@@ -325,7 +325,7 @@ class PepplotSearchCriteria extends Component {
             mustP: [],
             notP: [],
             defaultsigValueP: 0.05,
-            maxElementsP: dataFromService.length
+            maxElementsP: dataFromService.length,
           },
           sigValueP: [0.05],
           uAnchorP: value
@@ -529,17 +529,6 @@ class PepplotSearchCriteria extends Component {
       valueList.push(json[i].value);
     }
     return valueList;
-  }
-  listToJson(list) {
-    var valueJSON = [];
-    for (var i = 0; i < list.length; i++) {
-      valueJSON.push({
-        key: list[i],
-        text: list[i],
-        value: list[i]
-      });
-    }
-    return valueJSON;
   }
 
   getMultisetPlot(sigVal, pepplotModel, pepplotStudy, eOperatorP, eColP) {

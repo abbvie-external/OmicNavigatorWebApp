@@ -119,9 +119,7 @@ class EnrichmentMultisetFilters extends Component {
           break;
         case '|>|':
           setDescP.push(`absolute value greater than ${sigValue[i]} in:`);
-          notSetDescP.push(
-            `absolute value greater than ${sigValue[i]} not in:`
-          );
+          notSetDescP.push(`absolute value greater than ${sigValue[i]} not in:`);
           break;
         default:
       }
