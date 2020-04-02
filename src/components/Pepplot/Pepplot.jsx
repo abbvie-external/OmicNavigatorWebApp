@@ -20,6 +20,7 @@ class Pepplot extends Component {
     showProteinPage: false,
     pepplotResults: [],
     pepplotColumns: [],
+    filterableColumnsP:[],
     multisetPlotInfo: {
       title: '',
       svg: []
@@ -266,6 +267,8 @@ class Pepplot extends Component {
           return _.includes(relevantConfigCols, d);
         })
       );
+
+      this.setState({filterableColumnsP:[...relevantConfigColumns]});
 
       // if using multi-set analysis, show set membership column
       if (this.state.multisetQueried) {
