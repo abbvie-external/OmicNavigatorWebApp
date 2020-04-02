@@ -62,6 +62,8 @@ class NetworkGraph extends Component {
   };
 
   windowResized = () => {
+    d3.select(`#svg-${this.props.networkSettings.id}`).remove();
+    d3.select('div.tooltip-pieSlice').remove();
     this.prepareAndRenderTree();
   };
 
@@ -228,68 +230,27 @@ class NetworkGraph extends Component {
           containerHeight -
           networkSettings.margin.top -
           networkSettings.margin.bottom;
-        // this.setState({
-        //   networkContainerWidth: containerWidth,
-        //   networkWidth: width,
-        //   networkContainerHeight: containerHeight,
-        //   networkHeight: height
-        // });
+        this.setState({
+          networkContainerWidth: containerWidth,
+          networkWidth: width,
+          networkContainerHeight: containerHeight,
+          networkHeight: height
+        });
 
         // Prepare Chart
         const chartDiv = d3.select('#' + networkSettings.id);
-        // const clientHeight = Math.max(
-        //   document.documentElement.clientHeight,
-        //   window.innerHeight || 0
-        // );
-        // const clientWidth = Math.max(
-        //   document.documentElement.clientWidth,
-        //   window.innerWidth || 0
-        // );
-        function zoom(svg) {
-          // const extent = [
-          //   [0, 0],
-          //   [-500, 0]
-          // ];
-          const extent = [
-            [networkSettings.margin.left, networkSettings.margin.top],
-            [width, height]
-          ];
-
-          svg.call(
-            d3
-              .zoom()
-              .scaleExtent([1, 8])
-              .translateExtent(extent)
-              .extent(extent)
-              .on('zoom', zoomed)
-          );
-
-          function zoomed() {
-            chartSVG.attr(
-              'transform',
-              d3.event.transform
-              // d3.event.transform.rescaleX(lineScaleBaseCopy)
-            );
-          }
-
-          // function zoomed() {
-          //   x.range([margin.left, width - margin.right].map(d => d3.event.transform.applyX(d)));
-          //   svg.selectAll(".bars rect").attr("x", d => x(d.name)).attr("width", x.bandwidth());
-          //   svg.selectAll(".x-axis").call(xAxis);
-          // }
-        }
-
         chartDiv
           .append('svg')
           .attr('id', `svg-${networkSettings.id}`)
           .attr('class', 'network-chart-area nwChart')
           .attr('width', '100%')
           .attr('height', '100%')
-          .attr('viewBox', `0 0 ${width} ${height}`)
-          // .attr('preserveAspectRatio', 'xMinYMin meet')
-          .call(zoom);
+          .attr('viewBox', `0 0 ${width} ${height}`);
 
-        // Prepare NetworkPlot
+        let chartSVG = d3.select(`#svg-${networkSettings.id}`);
+        const chartView = chartSVG.append('g').attr('class', 'overlay');
+        // Prepare NetworkPlot'
+
         let color = d3
           .scaleLinear()
           .domain(networkSettings.nodeColorScale)
@@ -371,8 +332,8 @@ class NetworkGraph extends Component {
           });
 
         treemap(root);
-        let chartSVG = d3.select(`#svg-${networkSettings.id}`);
-        let cell = chartSVG
+        let cell = chartView
+          // .attr('class', 'cell')
           .selectAll('g')
           .data(root.leaves())
           .enter()
@@ -387,6 +348,7 @@ class NetworkGraph extends Component {
 
         cell
           .append('rect')
+          .attr('class', 'rect')
           .attr('id', function(d) {
             return d.data.id;
           })
@@ -396,11 +358,12 @@ class NetworkGraph extends Component {
           .attr('height', function(d) {
             return d.y1 - d.y0;
           })
-          .attr('fill', '#fdfcfb')
+          // .attr('fill', '#e0e1e2')
+          .attr('fill', '#e8e8e8 ')
           // determines thickness of bounding boxes
           .style('stroke-width', 0.25)
-          .style('stroke-opacity', 0.5)
-          .style('stroke', 'grey')
+          .style('stroke-opacity', 1)
+          .style('stroke', 'black')
           // Paul - make this opacity 0 if you don't want lines, want to see full labels
           .style('opacity', 0.5);
         // .style('opacity', function(d) {
@@ -822,10 +785,38 @@ class NetworkGraph extends Component {
             noResults: false
           });
         }
-        // this.props.onNetworkGraphReady(true);
-        // this.setState({
-        //   rerendering: false
-        // });
+
+        chartSVG.call(
+          d3
+            .zoom()
+            .extent([
+              [0, 0],
+              [width, height]
+            ])
+            .scaleExtent([1, 2])
+            .on('zoom', zoomed)
+        );
+
+        // chartView.call(
+        //   d3
+        //     .drag()
+        //     .on('start', dragstarted)
+        //     .on('drag', dragged)
+        //     .on('end', dragended)
+        // );
+
+        // function dragstarted(d) {
+        // }
+
+        // function dragged(d) {
+        // }
+
+        // function dragended(d) {
+        // }
+
+        function zoomed() {
+          chartView.attr('transform', d3.event.transform);
+        }
       }
     } else {
       this.setState({

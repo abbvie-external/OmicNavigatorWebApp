@@ -48,11 +48,16 @@
 }
 
 .network-chart-area {
-  background-color: #e0e1e2;
+  background-color: #e8e8e8;
+  // background-color: rgb(253, 252, 251);
   height: 100% !important;
   overflow-x: scroll !important;
   width: auto !important;
 }
+
+// .rect {
+//   background-color: #e0e1e2 !important;
+// }
 
 .node-label {
   pointer-events: none;
@@ -77,6 +82,11 @@ div.tooltip-pieSlice {
   max-width: 250px !important;
   word-break: 'break-all' !important;
 }
+
+// .overlay {
+//   fill: none;
+//   pointer-events: all;
+// }
 
 .OntologyLink {
   cursor: pointer !important;

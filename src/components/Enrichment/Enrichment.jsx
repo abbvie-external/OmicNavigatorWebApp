@@ -100,7 +100,7 @@ class Enrichment extends Component {
       title: '',
       // data: null,
       id: 'chart-network',
-      margin: { top: 10, right: 10, bottom: 10, left: 10 },
+      margin: { top: 0, right: 0, bottom: 0, left: 0 },
       // statLabel: '',
       // statistic: '',
       // formattedData: {},
@@ -1154,6 +1154,7 @@ class Enrichment extends Component {
       .append('text')
       .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
       .attr('dy', '.35em')
+      // .attr('transform', 'rotate(' + 10 + ')')
       .style('font-size', '.8em')
       .text(function(d) {
         return d.data;
