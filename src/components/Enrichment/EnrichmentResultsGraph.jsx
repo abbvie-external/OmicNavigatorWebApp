@@ -86,8 +86,9 @@ class EnrichmentResultsGraph extends Component {
 
   componentDidMount() {
     if (!this.props.networkGraphReady) {
-      d3.select(`#svg-${this.props.networkSettings.id}`).remove();
       d3.select('div.tooltip-pieSlice').remove();
+      d3.select('tooltipEdge').remove();
+      d3.select(`#svg-${this.props.networkSettings.id}`).remove();
       this.setupSearch();
     }
   }

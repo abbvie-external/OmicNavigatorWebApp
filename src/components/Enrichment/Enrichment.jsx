@@ -1569,6 +1569,7 @@ class Enrichment extends Component {
 
   removeNetworkSVG = () => {
     d3.select('div.tooltip-pieSlice').remove();
+    d3.select('tooltipEdge').remove();
     d3.select(`#svg-${this.state.networkSettings.id}`).remove();
   };
 

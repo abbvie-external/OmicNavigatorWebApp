@@ -62,8 +62,9 @@ class NetworkGraph extends Component {
   };
 
   windowResized = () => {
-    d3.select(`#svg-${this.props.networkSettings.id}`).remove();
     d3.select('div.tooltip-pieSlice').remove();
+    d3.select('tooltipEdge').remove();
+    d3.select(`#svg-${this.props.networkSettings.id}`).remove();
     this.prepareAndRenderTree();
   };
 
@@ -705,7 +706,7 @@ class NetworkGraph extends Component {
                     else pValueDisplay = d.data.value.toExponential(3);
                     div
                       .html(
-                        `<b>Description: </b>${d.data.metaData.Description}<br/><b>Test: </b>${d.data.prop}<br/><b>pValue: </b>${pValueDisplay}<br/><b>Ontology: </b>${d.data.metaData.Ontology}`
+                        `<div className="tooltipEdge"><b>Description: </b>${d.data.metaData.Description}<br/><b>Test: </b>${d.data.prop}<br/><b>pValue: </b>${pValueDisplay}<br/><b>Ontology: </b>${d.data.metaData.Ontology}</div>`
                       )
                       .style('left', tooltipLRPosition)
                       .style('top', tooltipTBPosition);
