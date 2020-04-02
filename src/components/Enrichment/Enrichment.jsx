@@ -69,14 +69,14 @@ class Enrichment extends Component {
     networkDataLoaded: false,
     networkGraphReady: false,
     tests: {},
-    nodeCutoff: 0.1,
-    edgeCutoff: 0.375,
+    nodeCutoff: sessionStorage.getItem('nodeCutoff') || 0.1,
+    edgeCutoff: sessionStorage.getItem('edgeCutoff') || 0.375,
     filteredNodesTotal: 0,
     filteredEdgesTotal: 0,
     totalNodes: 0,
     totalEdges: 0,
     // networkSortBy: ['significance', 'edgecount', 'nodecount']
-    networkSortBy: 'significance',
+    networkSortBy: sessionStorage.getItem('networkSortBy') || 'significance',
     legendIsOpen: true,
     // legendIsOpen: JSON.parse(sessionStorage.getItem('legendOpen')) || true,
     networkSettings: {
@@ -100,7 +100,7 @@ class Enrichment extends Component {
       title: '',
       // data: null,
       id: 'chart-network',
-      margin: { top: 10, right: 10, bottom: 10, left: 10 },
+      margin: { top: 0, right: 0, bottom: 0, left: 0 },
       // statLabel: '',
       // statistic: '',
       // formattedData: {},
@@ -1154,6 +1154,7 @@ class Enrichment extends Component {
       .append('text')
       .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
       .attr('dy', '.35em')
+      // .attr('transform', 'rotate(' + 10 + ')')
       .style('font-size', '.8em')
       .text(function(d) {
         return d.data;
@@ -1568,6 +1569,7 @@ class Enrichment extends Component {
 
   removeNetworkSVG = () => {
     d3.select('div.tooltip-pieSlice').remove();
+    d3.select('tooltipEdge').remove();
     d3.select(`#svg-${this.state.networkSettings.id}`).remove();
   };
 
@@ -1584,6 +1586,7 @@ class Enrichment extends Component {
       networkSortBy: value
       // networkGraphReady: false
     });
+    sessionStorage.setItem('networkSortBy', value);
   };
 
   // handleInputChange = _.debounce((evt, { name, value }) => {
@@ -1604,12 +1607,13 @@ class Enrichment extends Component {
   //   this.setState(obj);
   // }, 500);
 
-  handleSliderChange = obj => {
+  handleSliderChange = (type, value) => {
     // this.setState({
     //   networkGraphReady: false
     // });
     this.removeNetworkSVG();
-    this.setState(obj);
+    this.setState({ [type]: value });
+    sessionStorage.setItem(type, value);
   };
 
   // handleLegendOpen = () => {

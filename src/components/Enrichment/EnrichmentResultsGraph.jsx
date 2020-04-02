@@ -25,6 +25,7 @@ import {
 import NetworkGraph from './NetworkGraph';
 import LoaderActivePlots from '../Transitions/LoaderActivePlots';
 import './EnrichmentResultsGraph.scss';
+import { getFieldValue } from '../utility/selectors/QHGridSelector';
 
 const resultRenderer = ({ description, genes, size }) => {
   let genesFormatted = genes.join(', ');
@@ -85,8 +86,9 @@ class EnrichmentResultsGraph extends Component {
 
   componentDidMount() {
     if (!this.props.networkGraphReady) {
-      d3.select(`#svg-${this.props.networkSettings.id}`).remove();
       d3.select('div.tooltip-pieSlice').remove();
+      d3.select('tooltipEdge').remove();
+      d3.select(`#svg-${this.props.networkSettings.id}`).remove();
       this.setupSearch();
     }
   }
@@ -164,6 +166,16 @@ class EnrichmentResultsGraph extends Component {
   //   }));
   // };
 
+  getDropdownTooltip = () => {
+    const { networkSortBy } = this.props;
+    if (networkSortBy === 'significance')
+      return 'sort clusters by chosen significance metric';
+    if (networkSortBy === 'nodecount')
+      return 'sort clusters by number of nodes per cluster';
+    if (networkSortBy === 'edgecount')
+      return 'sort clusters by number of edges per cluster';
+  };
+
   render() {
     const { results } = this.state;
     const {
@@ -199,19 +211,22 @@ class EnrichmentResultsGraph extends Component {
           key: 'significance',
           text: 'Significance',
           value: 'significance',
-          content: 'Significance'
-        },
-        {
-          key: 'edgecount',
-          text: 'Edge Count',
-          value: 'edgecount',
-          content: 'Edge Count'
+          content: 'Significance',
+          tooltip: 'sort clusters by chosen significance metric'
         },
         {
           key: 'nodecount',
           text: 'Node Count',
           value: 'nodecount',
-          content: 'Node Count'
+          content: 'Node Count',
+          tooltip: 'sort clusters by number of nodes per cluster'
+        },
+        {
+          key: 'edgecount',
+          text: 'Edge Count',
+          value: 'edgecount',
+          content: 'Edge Count',
+          tooltip: 'sort clusters by number of edges per cluster'
         }
       ];
       // const legend = this.getLegend();
@@ -219,6 +234,18 @@ class EnrichmentResultsGraph extends Component {
         padding: '1em',
         width: '250px'
       };
+
+      const DropdownPopupStyle = {
+        backgroundColor: '2E2E2E',
+        borderBottom: '2px solid var(--color-primary)',
+        color: '#FFF',
+        padding: '1em',
+        maxWidth: '50vw',
+        fontSize: '13px',
+        wordBreak: 'break-all'
+      };
+
+      const DropdownTooltip = this.getDropdownTooltip();
 
       return (
         <Grid className="NetworkGraphFiltersContainer">
@@ -292,9 +319,7 @@ class EnrichmentResultsGraph extends Component {
                   max: 1,
                   step: 0.05,
                   onChange: value => {
-                    this.props.onHandleSliderChange({
-                      nodeCutoff: value
-                    });
+                    this.props.onHandleSliderChange('nodeCutoff', value);
                   }
                 }}
               />
@@ -332,9 +357,7 @@ class EnrichmentResultsGraph extends Component {
                   max: 1,
                   step: 0.025,
                   onChange: value => {
-                    this.props.onHandleSliderChange({
-                      edgeCutoff: value
-                    });
+                    this.props.onHandleSliderChange('edgeCutoff', value);
                   }
                 }}
               />
@@ -373,13 +396,22 @@ class EnrichmentResultsGraph extends Component {
                   Sort By{' '} */}
               <span>
                 <span id="NetworkGraphSortByText">Sort By </span>
-                <Dropdown
-                  inline
-                  disabled={!networkGraphReady}
-                  // header="Sort By"
-                  options={networkSortByOptions}
-                  defaultValue={networkSortBy}
-                  onChange={this.props.onHandleNetworkSortByChange}
+                <Popup
+                  trigger={
+                    <Dropdown
+                      inline
+                      disabled={!networkGraphReady}
+                      // header="Sort By"
+                      options={networkSortByOptions}
+                      defaultValue={networkSortBy}
+                      onChange={this.props.onHandleNetworkSortByChange}
+                    />
+                  }
+                  style={DropdownPopupStyle}
+                  className="TablePopupValue"
+                  content={DropdownTooltip}
+                  inverted
+                  position="left center"
                 />
               </span>
               {/* </Header.Content>
