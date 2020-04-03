@@ -75,8 +75,8 @@ class Enrichment extends Component {
     filteredEdgesTotal: 0,
     totalNodes: 0,
     totalEdges: 0,
-    // networkSortBy: ['significance', 'edgecount', 'nodecount']
-    networkSortBy: sessionStorage.getItem('networkSortBy') || 'significance',
+    // networkSortBy: ['significance', 'edgecount', 'nodecount'],
+    // networkSortBy: sessionStorage.getItem('networkSortBy') || 'significance',
     legendIsOpen: true,
     // legendIsOpen: JSON.parse(sessionStorage.getItem('legendOpen')) || true,
     networkSettings: {
@@ -1546,7 +1546,7 @@ class Enrichment extends Component {
               onHandlePlotAnimation={this.handlePlotAnimation}
               onDisplayViolinPlot={this.displayViolinPlot}
               onHandlePieClick={this.testSelected}
-              onHandleNetworkSortByChange={this.handleNetworkSortByChange}
+              // onHandleNetworkSortByChange={this.handleNetworkSortByChange}
               onHandleNetworkCutoffInputChange={
                 this.handleNetworkCutoffInputChange
               }
@@ -1582,14 +1582,14 @@ class Enrichment extends Component {
     });
   };
 
-  handleNetworkSortByChange = (evt, { value }) => {
-    this.removeNetworkSVG();
-    this.setState({
-      networkSortBy: value
-      // networkGraphReady: false
-    });
-    sessionStorage.setItem('networkSortBy', value);
-  };
+  // handleNetworkSortByChange = (evt, { value }) => {
+  //   this.removeNetworkSVG();
+  //   this.setState({
+  //     networkSortBy: value
+  //     // networkGraphReady: false
+  //   });
+  //   sessionStorage.setItem('networkSortBy', value);
+  // };
 
   // handleInputChange = _.debounce((evt, { name, value }) => {
   //   this.setState({
