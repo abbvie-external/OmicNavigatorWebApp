@@ -301,18 +301,30 @@ class EnrichmentResultsGraph extends Component {
                 min="0"
                 max="1"
                 default="0.10"
-                label="Node Cutoff"
                 name="nodeCutoff"
                 className="NetworkSliderInput"
                 value={nodeCutoff}
-                onChange={this.props.onHandleInputChange}
-              />
+                onChange={this.props.onHandleNetworkCutoffInputChange}
+              >
+                <Popup
+                  trigger={
+                    <Label className="NetworkInputLabel">
+                      Node Significance<br></br>Cutoff
+                    </Label>
+                  }
+                  // className="TablePopupValue"
+                  content="Statistical significance threshold. Nodes (database terms) with values greater than this value are removed"
+                  inverted
+                  position="left center"
+                />
+                <input />
+              </Input>
               <Slider
                 disabled={!networkGraphReady}
                 className="NetworkSlider"
                 inverted={false}
                 value={nodeCutoff}
-                name="nodeCutoff"
+                name="nodeCutoffSlider"
                 settings={{
                   start: nodeCutoff,
                   min: 0,
@@ -323,6 +335,13 @@ class EnrichmentResultsGraph extends Component {
                   }
                 }}
               />
+              <div
+                className={networkGraphReady ? 'Show NodeEdgeTotals' : 'Hide'}
+              >
+                <Label>
+                  {filteredNodesTotal} of {totalNodes} Nodes
+                </Label>
+              </div>
             </Grid.Column>
             <Grid.Column
               className="NetworkGraphFilters"
@@ -339,17 +358,29 @@ class EnrichmentResultsGraph extends Component {
                 min="0.050"
                 max="1.000"
                 default="0.375"
-                label="Edge Cutoff"
                 name="edgeCutoff"
                 className="NetworkSliderInput"
                 value={edgeCutoff}
-                onChange={this.props.onHandleInputChange}
-              />
+                onChange={this.props.onHandleNetworkCutoffInputChange}
+              >
+                <Popup
+                  trigger={
+                    <Label className="NetworkInputLabel">
+                      Edge Similarity<br></br>Cutoff
+                    </Label>
+                  }
+                  // className="TablePopupValue"
+                  content="Edge weight threshold. Edges with values greater than this value are removed"
+                  inverted
+                  position="left center"
+                />
+                <input />
+              </Input>
               <Slider
                 disabled={!networkGraphReady}
                 className="NetworkSlider"
                 inverted={false}
-                name="edgeCutoff"
+                name="edgeCutoffSlider"
                 value={edgeCutoff}
                 settings={{
                   start: edgeCutoff,
@@ -361,6 +392,13 @@ class EnrichmentResultsGraph extends Component {
                   }
                 }}
               />
+              <span
+                className={networkGraphReady ? 'Show NodeEdgeTotals' : 'Hide'}
+              >
+                <Label>
+                  {filteredEdgesTotal} of {totalEdges} Edges
+                </Label>
+              </span>
             </Grid.Column>
             <Grid.Column
               className="NetworkGraphFilters"
@@ -459,7 +497,7 @@ class EnrichmentResultsGraph extends Component {
                     labelPosition="left"
                     // color="blue"
                     id="LegendIconButton"
-                    // className={networkGraphReady ? 'Show' : 'Hide'}
+                    className={networkGraphReady ? 'Show' : 'Hide'}
                     size="mini"
                   >
                     Legend
@@ -480,7 +518,7 @@ class EnrichmentResultsGraph extends Component {
                 <Popup.Content className="legend"></Popup.Content>
               </Popup>
             </Grid.Column>
-            <Grid.Column
+            {/* <Grid.Column
               id="TotalsColumn"
               mobile={8}
               tablet={8}
@@ -498,7 +536,7 @@ class EnrichmentResultsGraph extends Component {
                   {filteredEdgesTotal} of {totalEdges} Edges
                 </Label>
               </span>
-            </Grid.Column>
+            </Grid.Column> */}
             <Grid.Column
               className=""
               mobile={16}

@@ -113,13 +113,24 @@
 }
 
 .NetworkSliderInput {
-  margin: 0px 10px 10px 25px !important;
+  // margin: 0px 0px 10px 25px !important;
+  margin: 0px 0px 10px 0px !important;
 }
 
-@media (max-width: 1600px) {
-  .NetworkSliderInput {
-    margin: 0px 10px 10px 0px !important;
-  }
+.NetworkSliderInput input {
+  border-radius: 0px 0.28571429rem 0.28571429rem 0px !important;
+}
+
+// @media (max-width: 1600px) {
+//   .NetworkSliderInput {
+//     margin: 0px 0px 10px 0px !important;
+//   }
+// }
+
+.NetworkInputLabel {
+  margin-right: -1px !important;
+  width: max-content;
+  border-radius: 0.28571429rem 0px 0px 0.28571429rem !important;
 }
 
 // @media (max-width: 768px) {
@@ -226,11 +237,12 @@
   fill: url(#mainGradient);
 }
 
-#NodeEdgeTotals {
+.NodeEdgeTotals {
+  margin-top: 10px !important;
   float: right !important;
 }
 
-// #LegendColumn,
-// #TotalsColumn {
-//   margin-top: -5px !important;
-// }
+#LegendColumn {
+  // #TotalsColumn {
+  margin-top: -25px !important;
+}

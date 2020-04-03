@@ -1547,7 +1547,9 @@ class Enrichment extends Component {
               onDisplayViolinPlot={this.displayViolinPlot}
               onHandlePieClick={this.testSelected}
               onHandleNetworkSortByChange={this.handleNetworkSortByChange}
-              onHandleInputChange={this.handleInputChange}
+              onHandleNetworkCutoffInputChange={
+                this.handleNetworkCutoffInputChange
+              }
               onHandleSliderChange={this.handleSliderChange}
               onHandleTotals={this.handleTotals}
               // onNetworkGraphReady={this.handleNetworkGraphReady}
@@ -1595,7 +1597,7 @@ class Enrichment extends Component {
   //   });
   // }, 500);
 
-  handleInputChange = (evt, { name, value }) => {
+  handleNetworkCutoffInputChange = (evt, { name, value }) => {
     this.removeNetworkSVG();
     this.setState({
       [name]: value
