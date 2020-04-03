@@ -235,14 +235,14 @@ class EnrichmentResultsGraph extends Component {
         width: '250px'
       };
 
-      const DropdownPopupStyle = {
+      const CustomPopupStyle = {
         backgroundColor: '2E2E2E',
         borderBottom: '2px solid var(--color-primary)',
         color: '#FFF',
         padding: '1em',
-        maxWidth: '50vw',
+        maxWidth: '300px',
         fontSize: '13px',
-        wordBreak: 'break-all'
+        wordBreak: 'break-word'
       };
 
       const DropdownTooltip = this.getDropdownTooltip();
@@ -312,7 +312,7 @@ class EnrichmentResultsGraph extends Component {
                       Node Significance<br></br>Cutoff
                     </Label>
                   }
-                  // className="TablePopupValue"
+                  style={CustomPopupStyle}
                   content="Statistical significance threshold. Nodes (database terms) with values greater than this value are removed"
                   inverted
                   position="left center"
@@ -369,7 +369,7 @@ class EnrichmentResultsGraph extends Component {
                       Edge Similarity<br></br>Cutoff
                     </Label>
                   }
-                  // className="TablePopupValue"
+                  style={CustomPopupStyle}
                   content="Edge weight threshold. Edges with values greater than this value are removed"
                   inverted
                   position="left center"
@@ -445,8 +445,7 @@ class EnrichmentResultsGraph extends Component {
                       onChange={this.props.onHandleNetworkSortByChange}
                     />
                   }
-                  style={DropdownPopupStyle}
-                  className="TablePopupValue"
+                  style={CustomPopupStyle}
                   content={DropdownTooltip}
                   inverted
                   position="left center"
