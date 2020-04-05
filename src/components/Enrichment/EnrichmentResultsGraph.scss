@@ -1,12 +1,18 @@
 .NetworkGraphContainer {
-  padding-top: 10px !important;
-  padding-right: 25px !important;
+  padding-top: 0px !important;
+  padding: 0px !important;
+  // padding-right: 25px !important;
   min-height: 70vh !important;
 
   text {
-    font-family: sans-serif;
+    font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif !important;
     font-size: 10px;
   }
+}
+
+.NetworkGraphFiltersRow {
+  margin-top: 11px !important;
+  padding-bottom: 0px !important;
 }
 
 .ui.positive.button {
@@ -28,6 +34,14 @@
   overflow-y: scroll !important;
   // overflow-x: inherit;
   // direction: rtl !important;
+
+  // .ui.circular.label {
+  //   margin-right: 10px !important;
+  // }
+}
+
+#NetworkSearchInput {
+  border-radius: 0.28571429rem !important;
 }
 
 @media (max-width: 1600px) {
@@ -82,7 +96,7 @@
   border-radius: 3px;
   outline-width: 1px;
   outline-color: 'blue';
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif !important;
   width: 75%;
 }
 
@@ -106,15 +120,6 @@
   .NetworkSliderInput {
     margin: 0px 10px 10px 0px !important;
   }
-}
-
-#LegendIconButton {
-  position: absolute !important;
-  left: 15px !important;
-  top: -20px !important;
-  z-index: 2;
-  // width: 60px;
-  // height: 60px;
 }
 
 // @media (max-width: 768px) {
@@ -179,3 +184,53 @@
 .LoaderActivePlotsNetwork {
   height: 100vh !important;
 }
+
+.Show {
+  display: inline-block;
+}
+
+.Hide {
+  display: none !important;
+}
+
+#LegendIconButton {
+  margin-bottom: 5px;
+}
+
+.node-label {
+  pointer-events: none;
+}
+
+.stop-left {
+  stop-color: red;
+}
+
+.stop-middle {
+  stop-color: white;
+}
+
+.stop-right {
+  stop-color: blue;
+}
+
+#LegendPopup {
+  font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif !important;
+  border-radius: 5px;
+  pointer-events: none;
+  z-index: 3;
+  // border: 1px solid var(--color-dark);
+  // border-bottom: 2px solid var(--color-dark) !important;
+}
+
+.filled {
+  fill: url(#mainGradient);
+}
+
+#NodeEdgeTotals {
+  float: right !important;
+}
+
+// #LegendColumn,
+// #TotalsColumn {
+//   margin-top: -5px !important;
+// }

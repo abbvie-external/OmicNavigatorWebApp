@@ -20,7 +20,7 @@ class Pepplot extends Component {
     showProteinPage: false,
     pepplotResults: [],
     pepplotColumns: [],
-    filterableColumnsP:[],
+    filterableColumnsP: [],
     multisetPlotInfo: {
       title: '',
       svg: []
@@ -34,20 +34,11 @@ class Pepplot extends Component {
     pngVisible: true,
     pdfVisible: false,
     svgVisible: true,
-    multisetQueried: false
+    multisetQueried: false,
+    thresholdColsP: []
   };
 
-  componentDidUpdate = (prevProps, prevState) => {
-    // if (this.props.proteinToHighlight !== "" && this.props.proteinToHighlight !== undefined) {
-    //   this.handlePepplotSearch(this.state.pepplotResults);
-    // }
-    //   if (prevProps.proteinToHighlightInDiffTable !== "" && prevProps.proteinToHighlightInDiffTable !== undefined) {
-    //   this.handlePepplotSearch(this.state.pepplotResults);
-    // }
-    // if (this.props.proteinToHighlightInDiffTable !== prevProps.proteinToHighlightInDiffTable) {
-    //   this.handlePepplotSearch(this.state.pepplotResults);
-    // }
-  };
+  componentDidUpdate = (prevProps, prevState) => {};
 
   handleSearchTransition = bool => {
     this.setState({
@@ -267,6 +258,10 @@ class Pepplot extends Component {
           return _.includes(relevantConfigCols, d);
         })
       );
+      const thresholdColsPepplot = this.listToJson(relevantConfigColumns);
+      this.setState({
+        thresholdColsP: thresholdColsPepplot
+      });
 
       this.setState({filterableColumnsP:[...relevantConfigColumns]});
 
@@ -306,6 +301,18 @@ class Pepplot extends Component {
       return configCols;
     }
   };
+
+  listToJson(list) {
+    var valueJSON = [];
+    for (var i = 0; i < list.length; i++) {
+      valueJSON.push({
+        key: list[i],
+        text: list[i],
+        value: list[i]
+      });
+    }
+    return valueJSON;
+  }
 
   getView = () => {
     if (

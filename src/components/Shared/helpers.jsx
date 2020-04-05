@@ -31,6 +31,20 @@ export function splitValue(value) {
   }
 }
 
+export function limitValues(values, size) {
+  if (values) {
+    let commaSeparatedValues = values.join(', ');
+    if (values.length < size + 1) {
+      return commaSeparatedValues;
+    } else {
+      const numberOfCommas = (commaSeparatedValues.match(/,/g) || []).length;
+      const splitValues = commaSeparatedValues.split(',');
+      const slicedValues = splitValues.slice(0, size - 1);
+      return `${slicedValues}...(${numberOfCommas - size} more)`;
+    }
+  }
+}
+
 export function networkByCluster(network) {
   network = _.cloneDeep(network);
   let buckets = [];

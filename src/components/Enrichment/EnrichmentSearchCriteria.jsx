@@ -81,7 +81,7 @@ class EnrichmentSearchCriteria extends Component {
       maxElements: undefined,
       metaSvg: '',
       heightScalar: 1,
-      thresholdColsP: [
+      thresholdCols: [
         {
           key: 'adj_P_Val',
           text: 'adj_P_Val',

@@ -404,7 +404,7 @@ class QHGridHeader extends React.PureComponent {
                   className="QHGrid--generalSearch"
                   icon="search"
                   iconPosition="left"
-                  placeholder="Search..."
+                  placeholder="Search Table"
                   value={this.state.generalSearch}
                   onChange={this.handleGeneralSearch}
                   action={{
