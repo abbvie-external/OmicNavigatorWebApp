@@ -203,7 +203,8 @@ class PhosphoprotService {
     study,
     sigValue,
     annotation,
-    operator
+    operator,
+    pValType
   ) {
     this.setUrl();
     const promise = this.ocpuDataCall('getEnrichmentIntersection', {
@@ -213,7 +214,8 @@ class PhosphoprotService {
       study: study,
       sigValue: sigValue,
       annotation: annotation,
-      operator: operator
+      operator: operator,
+      pValType: pValType
     });
     const dataFromPromise = await promise;
     return dataFromPromise;
@@ -225,6 +227,7 @@ class PhosphoprotService {
     study,
     annotation,
     operator,
+    pValType,
     errorCb
   ) {
     this.setUrl();
@@ -240,7 +243,8 @@ class PhosphoprotService {
         testCategory: testCategory,
         study: study,
         annotation: annotation,
-        operator: operator
+        operator: operator,
+        pValType: pValType
       },
       handleError
     );
