@@ -27,6 +27,20 @@ import LoaderActivePlots from '../Transitions/LoaderActivePlots';
 import './EnrichmentResultsGraph.scss';
 // import { getFieldValue } from '../utility/selectors/QHGridSelector';
 
+function getDynamicSize() {
+  let w = Math.max(
+    document.documentElement.clientWidth,
+    window.innerWidth || 0
+  );
+  if (w < 1200) {
+    return 'small';
+  } else if (w > 1199 && w < 1600) {
+    return 'small';
+  } else if (w > 1599 && w < 2600) {
+    return undefined;
+  } else if (w > 2599) return 'large';
+}
+
 const resultRenderer = ({ description, genes, size }) => {
   let genesFormatted = genes.join(', ');
   const SearchValuePopupStyle = {
@@ -38,10 +52,15 @@ const resultRenderer = ({ description, genes, size }) => {
     fontSize: '13px',
     wordBreak: 'break-all'
   };
+  // let dynamicSize = getDynamicSize();
   return (
     <Grid className="NetworkSearchResultsContainer">
       <Grid.Column width={13}>
-        <Label>{description}</Label>
+        <Label
+        // size={dynamicSize}
+        >
+          {description}
+        </Label>
       </Grid.Column>
       <Grid.Column width={3}>
         <Popup
@@ -80,14 +99,25 @@ const CustomPopupStyle = {
 // const DragHandle = sortableHandle(() => <span>::</span>);
 const SortableItem = sortableElement(props => {
   const ItemTooltip = function() {
-    if (props.value === 'Significance') {
+    if (props.value === 'significance') {
       return 'Sort clusters by chosen significance metric';
-    } else if (props.value === 'Node Count') {
+    } else if (props.value === 'nodecount') {
       return 'Sort clusters by number of nodes per cluster';
-    } else if (props.value === 'Edge Count') {
+    } else if (props.value === 'edgecount') {
       return 'Sort clusters by number of edges per cluster';
     }
   };
+  const getItemName = () => {
+    if (props.value === 'significance') {
+      return 'Significance';
+    } else if (props.value === 'nodecount') {
+      return 'Node Count';
+    } else if (props.value === 'edgecount') {
+      return 'Edge Count';
+    }
+  };
+
+  let dynamicSize = getDynamicSize();
 
   return (
     <li className="NetworkGraphSortableLink">
@@ -96,10 +126,11 @@ const SortableItem = sortableElement(props => {
         trigger={
           <Label
             // color="blue"
-            size="small"
+            // size="small"
+            size={dynamicSize}
             key={`label-${props.value}`}
           >
-            {props.sortIndex + 1}) {props.value}
+            {props.sortIndex + 1}) {getItemName(props.value)}
           </Label>
         }
         style={CustomPopupStyle}
@@ -121,7 +152,7 @@ class EnrichmentResultsGraph extends Component {
     results: [],
     networkSearchValue: '',
     descriptions: [],
-    networkSortBy: ['Significance', 'Node Count', 'Edge Count']
+    networkSortBy: ['significance', 'nodecount', 'edgecount']
     // networkSortBy: [
     //   {
     //     key: 'significance',
@@ -209,20 +240,6 @@ class EnrichmentResultsGraph extends Component {
     });
   };
 
-  getDynamicSize = () => {
-    let w = Math.max(
-      document.documentElement.clientWidth,
-      window.innerWidth || 0
-    );
-    if (w < 1200) {
-      return 'small';
-    } else if (w > 1199 && w < 1600) {
-      return 'small';
-    } else if (w > 1599 && w < 2600) {
-      return undefined;
-    } else if (w > 2599) return 'large';
-  };
-
   // onSortEnd = ({ oldIndex, newIndex }) => {
   //   this.setState(({ networkSortBy }) => ({
   //     networkSortBy: arrayMove(networkSortBy, oldIndex, newIndex)
@@ -274,7 +291,7 @@ class EnrichmentResultsGraph extends Component {
         </div>
       );
     } else {
-      const dynamicSize = this.getDynamicSize();
+      const dynamicSize = getDynamicSize();
 
       const openLegend =
         legendIsOpen && activeIndexEnrichmentView === 1 && networkGraphReady
@@ -286,14 +303,14 @@ class EnrichmentResultsGraph extends Component {
           <Grid.Row className="NetworkGraphFiltersRow">
             <Grid.Column
               className="NetworkGraphFilters"
-              mobile={4}
+              mobile={14}
               tablet={4}
               largeScreen={2}
               widescreen={2}
             ></Grid.Column>
             <Grid.Column
               // className="NetworkGraphFilters"
-              mobile={10}
+              mobile={16}
               tablet={10}
               largeScreen={4}
               widescreen={4}
@@ -322,10 +339,10 @@ class EnrichmentResultsGraph extends Component {
             </Grid.Column>
             <Grid.Column
               className="NetworkGraphFilters"
-              mobile={8}
-              tablet={8}
-              largeScreen={3}
-              widescreen={3}
+              mobile={16}
+              tablet={5}
+              largeScreen={4}
+              widescreen={4}
             >
               <Input
                 disabled={!networkGraphReady}
@@ -342,7 +359,7 @@ class EnrichmentResultsGraph extends Component {
               >
                 <Popup
                   trigger={
-                    <Label className="NetworkInputLabel">
+                    <Label className="NetworkInputLabel" size={dynamicSize}>
                       Node Significance<br></br>Cutoff
                     </Label>
                   }
@@ -355,36 +372,46 @@ class EnrichmentResultsGraph extends Component {
                 />
                 <input />
               </Input>
-              <Slider
-                disabled={!networkGraphReady}
-                className="NetworkSlider"
-                inverted={false}
-                value={nodeCutoff}
-                name="nodeCutoffSlider"
-                settings={{
-                  start: nodeCutoff,
-                  min: 0,
-                  max: 1,
-                  step: 0.05,
-                  onChange: value => {
-                    this.props.onHandleSliderChange('nodeCutoff', value);
-                  }
-                }}
-              />
-              <div
-                className={networkGraphReady ? 'Show NodeEdgeTotals' : 'Hide'}
-              >
-                <Label>
-                  {filteredNodesTotal} of {totalNodes} Nodes
-                </Label>
+              <div className="NetworkSliderAndTotalsDiv">
+                <Slider
+                  disabled={!networkGraphReady}
+                  className="NetworkSlider"
+                  inverted={false}
+                  value={nodeCutoff}
+                  name="nodeCutoffSlider"
+                  settings={{
+                    start: nodeCutoff,
+                    min: 0,
+                    max: 1,
+                    step: 0.05,
+                    onChange: value => {
+                      this.props.onHandleSliderChange('nodeCutoff', value);
+                    }
+                  }}
+                />
+                <div
+                  className={networkGraphReady ? 'Show NodeEdgeTotals' : 'Hide'}
+                >
+                  <Popup
+                    trigger={
+                      <Label size={dynamicSize}>
+                        {filteredNodesTotal} of {totalNodes} Nodes
+                      </Label>
+                    }
+                    style={CustomPopupStyle}
+                    content="Number of nodes meeting current filter requirements, of total nodes without filters"
+                    inverted
+                    position="left center"
+                  />
+                </div>
               </div>
             </Grid.Column>
             <Grid.Column
               className="NetworkGraphFilters"
-              mobile={8}
-              tablet={8}
-              largeScreen={3}
-              widescreen={3}
+              mobile={16}
+              tablet={5}
+              largeScreen={4}
+              widescreen={4}
             >
               <Input
                 disabled={!networkGraphReady}
@@ -401,7 +428,7 @@ class EnrichmentResultsGraph extends Component {
               >
                 <Popup
                   trigger={
-                    <Label className="NetworkInputLabel">
+                    <Label size={dynamicSize} className="NetworkInputLabel">
                       Edge Similarity<br></br>Cutoff
                     </Label>
                   }
@@ -414,40 +441,54 @@ class EnrichmentResultsGraph extends Component {
                 />
                 <input />
               </Input>
-              <Slider
-                disabled={!networkGraphReady}
-                className="NetworkSlider"
-                inverted={false}
-                name="edgeCutoffSlider"
-                value={edgeCutoff}
-                settings={{
-                  start: edgeCutoff,
-                  min: 0.05,
-                  max: 1,
-                  step: 0.025,
-                  onChange: value => {
-                    this.props.onHandleSliderChange('edgeCutoff', value);
-                  }
-                }}
-              />
-              <span
-                className={networkGraphReady ? 'Show NodeEdgeTotals' : 'Hide'}
-              >
-                <Label>
-                  {filteredEdgesTotal} of {totalEdges} Edges
-                </Label>
-              </span>
+              <div className="NetworkSliderAndTotalsDiv">
+                <Slider
+                  disabled={!networkGraphReady}
+                  className="NetworkSlider"
+                  inverted={false}
+                  name="edgeCutoffSlider"
+                  value={edgeCutoff}
+                  settings={{
+                    start: edgeCutoff,
+                    min: 0.05,
+                    max: 1,
+                    step: 0.025,
+                    onChange: value => {
+                      this.props.onHandleSliderChange('edgeCutoff', value);
+                    }
+                  }}
+                />
+                <span
+                  className={networkGraphReady ? 'Show NodeEdgeTotals' : 'Hide'}
+                >
+                  <Popup
+                    trigger={
+                      <Label size={dynamicSize}>
+                        {filteredEdgesTotal} of {totalEdges} Edges
+                      </Label>
+                    }
+                    style={CustomPopupStyle}
+                    content="Number of edges meeting current filter requirements, of total edges without filters"
+                    inverted
+                    position="left center"
+                  />
+                </span>
+              </div>
             </Grid.Column>
             <Grid.Column
               className="NetworkGraphFilters"
               id="NetworkGraphSortByDiv"
-              mobile={6}
+              mobile={16}
               tablet={6}
-              largeScreen={4}
-              widescreen={4}
+              largeScreen={2}
+              widescreen={2}
             >
               <Segment id="NetworkGraphSortBySegment">
-                <Label floating id="NetworkSortByLabel">
+                <Label
+                  attached="top"
+                  id="NetworkSortByLabel"
+                  size={dynamicSize}
+                >
                   SORT BY
                 </Label>
                 <SortableContainer
@@ -508,7 +549,7 @@ class EnrichmentResultsGraph extends Component {
                     // color="blue"
                     id="LegendIconButton"
                     className={networkGraphReady ? 'Show' : 'Hide'}
-                    size="mini"
+                    size={dynamicSize}
                   >
                     Legend
                     <Icon name="info" />

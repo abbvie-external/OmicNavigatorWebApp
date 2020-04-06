@@ -44,10 +44,8 @@
   border-radius: 0.28571429rem !important;
 }
 
-@media (max-width: 1600px) {
-  .semantic_ui_range_inner {
-    margin-left: 0px !important;
-  }
+.semantic_ui_range_inner {
+  margin-left: 0px !important;
 }
 
 .semantic_ui_range_inner div:nth-of-type(2) {
@@ -117,6 +115,16 @@
   }
 }
 
+.NetworkSliderAndTotalsDiv {
+  max-width: 300px !important;
+}
+
+@media (max-width: 1199px) {
+  .NetworkSliderAndTotalsDiv {
+    max-width: 215px !important;
+  }
+}
+
 .NetworkSliderInput {
   // margin: 0px 0px 10px 25px !important;
   margin: 0px 0px 10px 0px !important;
@@ -129,6 +137,16 @@
 // @media (max-width: 1600px) {
 //   .NetworkSliderInput {
 //     margin: 0px 0px 10px 0px !important;
+//   }
+// }
+
+// .ScreenSizeBreak {
+//   display: none !important;
+// }
+
+// @media (max-width: 1199px) {
+//   .ScreenSizeBreak {
+//     display: inline !important;
 //   }
 // }
 
@@ -154,13 +172,14 @@
 // }
 
 #NetworkGraphSortByDiv {
-  padding-top: 10px;
-  // color: var(--color-primary) !important;
-  color: rgba(0, 0, 0, 0.6) !important;
+  // padding-top: 10px;
+  color: var(--color-white) !important;
+  // color: rgba(0, 0, 0, 0.6) !important;
 
   #NetworkGraphSortBySegment {
-    width: 115px !important;
-    height: 115px !important;
+    width: 100% !important;
+    height: auto !important;
+    max-width: 145px !important;
     padding: 0px;
     margin: 0 auto;
 
@@ -168,15 +187,32 @@
       // background-color: var(--color-primary) !important;
       background-color: var(--color-dark) !important;
       color: white !important;
-      width: 70px !important;
-      margin-left: -90px !important;
+      // width: 90px !important;
+      // margin-left: -90px !important;
+      // margin: 0 auto !important;
     }
 
+    // @media (min-width: 1200px) and (max-width: 1599px) {
+    //   #NetworkSortByLabel {
+    //     margin-left: -100px !important;
+    //   }
+    // }
+    // @media (min-width: 1600) and (max-width: 2599px) {
+    //   #NetworkSortByLabel {
+    //     margin-left: -110px !important;
+    //   }
+    // }
+    // @media (min-width: 2600px) {
+    //   #NetworkSortByLabel {
+    //     margin-left: -115px !important;
+    //   }
+    // }
+
     #NetworkGraphSortByText {
-      color: grey;
+      color: var(--color-light) !important;
     }
     ul {
-      padding: 5px 0px 0px 12px !important;
+      padding: 12px 0px 0px 12px !important;
     }
     ul li {
       list-style: none;

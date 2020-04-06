@@ -293,7 +293,7 @@ class NetworkGraph extends Component {
               self.props.networkSortBy
                 .map(sortBy => {
                   return (
-                    (sortBy === 'Significance' ? 1 : -1) *
+                    (sortBy === 'significance' ? 1 : -1) *
                     (a.data[sortBy] - b.data[sortBy])
                   );
                 })
