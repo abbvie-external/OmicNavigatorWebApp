@@ -360,7 +360,7 @@ class EnrichmentResultsGraph extends Component {
                 <Popup
                   trigger={
                     <Label className="NetworkInputLabel" size={dynamicSize}>
-                      Node Significance<br></br>Cutoff
+                      NODE<br></br>SIGNIFICANCE<br></br>CUTOFF
                     </Label>
                   }
                   style={CustomPopupStyle}
@@ -429,7 +429,7 @@ class EnrichmentResultsGraph extends Component {
                 <Popup
                   trigger={
                     <Label size={dynamicSize} className="NetworkInputLabel">
-                      Edge Similarity<br></br>Cutoff
+                      EDGE<br></br>SIMILARITY<br></br>CUTOFF
                     </Label>
                   }
                   style={CustomPopupStyle}

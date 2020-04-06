@@ -44,6 +44,12 @@
   border-radius: 0.28571429rem !important;
 }
 
+@media (max-width: 767px) {
+  #NetworkSearchInput {
+    margin-top: 20px !important;
+  }
+}
+
 .semantic_ui_range_inner {
   margin-left: 0px !important;
 }
@@ -116,12 +122,24 @@
 }
 
 .NetworkSliderAndTotalsDiv {
-  max-width: 300px !important;
+  max-width: 225px;
+}
+
+@media (min-width: 1600px) and (max-width: 2599px) {
+  .NetworkSliderAndTotalsDiv {
+    max-width: 200px !important;
+  }
+}
+
+@media (min-width: 1200px) and (max-width: 1599px) {
+  .NetworkSliderAndTotalsDiv {
+    max-width: 180px !important;
+  }
 }
 
 @media (max-width: 1199px) {
   .NetworkSliderAndTotalsDiv {
-    max-width: 215px !important;
+    max-width: 180px !important;
   }
 }
 
@@ -189,7 +207,7 @@
       color: white !important;
       // width: 90px !important;
       // margin-left: -90px !important;
-      // margin: 0 auto !important;
+      text-align: center !important;
     }
 
     // @media (min-width: 1200px) and (max-width: 1599px) {
