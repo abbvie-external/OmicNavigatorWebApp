@@ -102,6 +102,11 @@
     color: #fff !important;
     // background-color: var(--color-primary) !important;
   }
+
+  // .ui.toggle.checkbox input:checked ~ .box:before,
+  // .ui.toggle.checkbox input:checked ~ label:before {
+  //   background-color: var(--color-primary) !important;
+  // }
   // menu
   .ui.menu .orange.active.item {
     color: #fff !important;

@@ -44,10 +44,14 @@
   border-radius: 0.28571429rem !important;
 }
 
-@media (max-width: 1600px) {
-  .semantic_ui_range_inner {
-    margin-left: 0px !important;
+@media (max-width: 767px) {
+  #NetworkSearchInput {
+    margin-top: 20px !important;
   }
+}
+
+.semantic_ui_range_inner {
+  margin-left: 0px !important;
 }
 
 .semantic_ui_range_inner div:nth-of-type(2) {
@@ -104,6 +108,11 @@
   margin-top: 10px;
   margin-left: 20px;
   font-size: 1rem !important;
+
+  //   .ui.toggle.checkbox input:checked ~ .box:before,
+  //   .ui.toggle.checkbox input:checked ~ label:before {
+  //     background-color: var(--color-primary) !important;
+  //   }
 }
 
 @media (max-width: 1600px) {
@@ -112,14 +121,59 @@
   }
 }
 
-.NetworkSliderInput {
-  margin: 0px 10px 10px 25px !important;
+.NetworkSliderAndTotalsDiv {
+  max-width: 225px;
 }
 
-@media (max-width: 1600px) {
-  .NetworkSliderInput {
-    margin: 0px 10px 10px 0px !important;
+@media (min-width: 1600px) and (max-width: 2599px) {
+  .NetworkSliderAndTotalsDiv {
+    max-width: 200px !important;
   }
+}
+
+@media (min-width: 1200px) and (max-width: 1599px) {
+  .NetworkSliderAndTotalsDiv {
+    max-width: 180px !important;
+  }
+}
+
+@media (max-width: 1199px) {
+  .NetworkSliderAndTotalsDiv {
+    max-width: 180px !important;
+  }
+}
+
+.NetworkSliderInput {
+  // margin: 0px 0px 10px 25px !important;
+  margin: 0px 0px 10px 0px !important;
+}
+
+.NetworkSliderInput input {
+  border-radius: 0px 0.28571429rem 0.28571429rem 0px !important;
+}
+
+// @media (max-width: 1600px) {
+//   .NetworkSliderInput {
+//     margin: 0px 0px 10px 0px !important;
+//   }
+// }
+
+// .ScreenSizeBreak {
+//   display: none !important;
+// }
+
+// @media (max-width: 1199px) {
+//   .ScreenSizeBreak {
+//     display: inline !important;
+//   }
+// }
+
+.NetworkInputLabel {
+  margin-right: -1px !important;
+  width: max-content;
+  border-radius: 0.28571429rem 0px 0px 0.28571429rem !important;
+  background-color: var(--color-dark) !important;
+  color: var(--color-light) !important;
 }
 
 // @media (max-width: 768px) {
@@ -135,50 +189,70 @@
 //   cursor: move;
 // }
 
-#NetworkGraphSortBySegment {
-  width: 110px !important;
-  height: 105px !important;
-  padding: 0px;
-}
-
-#NetworkSortByLabel {
-  background-color: var(--color-primary) !important;
-  color: white !important;
-  width: 70px !important;
-  margin-left: -90px !important;
-}
-
 #NetworkGraphSortByDiv {
-  padding-top: 10px;
-  // color: var(--color-primary) !important;
-  color: rgba(0, 0, 0, 0.6) !important;
+  // padding-top: 10px;
+  color: var(--color-white) !important;
+  // color: rgba(0, 0, 0, 0.6) !important;
 
-  #NetworkGraphSortByText {
-    color: grey;
+  #NetworkGraphSortBySegment {
+    width: 100% !important;
+    height: auto !important;
+    max-width: 145px !important;
+    padding: 0px;
+    margin: 0 auto;
+
+    #NetworkSortByLabel {
+      // background-color: var(--color-primary) !important;
+      background-color: var(--color-dark) !important;
+      color: white !important;
+      // width: 90px !important;
+      // margin-left: -90px !important;
+      text-align: center !important;
+    }
+
+    // @media (min-width: 1200px) and (max-width: 1599px) {
+    //   #NetworkSortByLabel {
+    //     margin-left: -100px !important;
+    //   }
+    // }
+    // @media (min-width: 1600) and (max-width: 2599px) {
+    //   #NetworkSortByLabel {
+    //     margin-left: -110px !important;
+    //   }
+    // }
+    // @media (min-width: 2600px) {
+    //   #NetworkSortByLabel {
+    //     margin-left: -115px !important;
+    //   }
+    // }
+
+    #NetworkGraphSortByText {
+      color: var(--color-light) !important;
+    }
+    ul {
+      padding: 12px 0px 0px 12px !important;
+    }
+    ul li {
+      list-style: none;
+      margin-bottom: 8px;
+      cursor: grab;
+    }
+    #NetworkGraphSortableLink {
+      list-style: none;
+      margin-bottom: 5px;
+      cursor: grab;
+    }
+
+    .NoSelect {
+      -webkit-touch-callout: none; /* iOS Safari */
+      -webkit-user-select: none; /* Safari */
+      -khtml-user-select: none; /* Konqueror HTML */
+      -moz-user-select: none; /* Old versions of Firefox */
+      -ms-user-select: none; /* Internet Explorer/Edge */
+      user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Opera and Firefox */
+    }
   }
-  // ul {
-  //   padding: 2px 0px 0px 10px !important;
-  // }
-  // ul li {
-  //   list-style: none;
-  //   margin-bottom: 5px;
-  //   cursor: grab;
-  // }
-  // #NetworkGraphSortableLink {
-  //   list-style: none;
-  //   margin-bottom: 5px;
-  //   cursor: grab;
-  // }
-
-  // .NoSelect {
-  //   -webkit-touch-callout: none; /* iOS Safari */
-  //   -webkit-user-select: none; /* Safari */
-  //   -khtml-user-select: none; /* Konqueror HTML */
-  //   -moz-user-select: none; /* Old versions of Firefox */
-  //   -ms-user-select: none; /* Internet Explorer/Edge */
-  //   user-select: none; /* Non-prefixed version, currently
-  //                                 supported by Chrome, Opera and Firefox */
-  // }
 }
 
 .LoaderActivePlotsNetwork {
@@ -194,6 +268,18 @@
 }
 
 #LegendIconButton {
+  margin-bottom: 5px;
+  background-color: var(--color-light) !important;
+  color: var(--color-dark) !important;
+}
+
+#LegendColumn {
+  // #TotalsColumn {
+  margin-top: -25px !important;
+}
+
+#LegendIconButton {
+  // margin-top: -10px;
   margin-bottom: 5px;
 }
 
@@ -226,11 +312,12 @@
   fill: url(#mainGradient);
 }
 
-#NodeEdgeTotals {
+.NodeEdgeTotals {
+  margin-top: 10px !important;
   float: right !important;
 }
 
-// #LegendColumn,
-// #TotalsColumn {
-//   margin-top: -5px !important;
-// }
+#LegendColumn {
+  // #TotalsColumn {
+  margin-top: -25px !important;
+}

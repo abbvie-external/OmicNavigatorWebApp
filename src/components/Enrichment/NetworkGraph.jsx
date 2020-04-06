@@ -283,54 +283,47 @@ class NetworkGraph extends Component {
 
         let root = d3
           .hierarchy(clusters)
-          .eachBefore(function(d) {
+          .eachBefore(d => {
             d.data.id = (d.parent ? d.parent.data.id + '.' : '') + d.data.name;
             d.key = d.data.id;
           })
           .sum(sumBySize)
-          .sort(function(a, b) {
-            // let significanceIndex = self.props.networkSortBy.indexOf(
-            //   'significance'
-            // );
-            // let sortFirst = self.props.networkSortBy[0];
-            // let sortSecond = self.props.networkSortBy[1];
-            // let sortThird = self.props.networkSortBy[2];
-            // let first =
-            //   significanceIndex !== 0
-            //     ? `b.data.${sortFirst} - a.data.${sortFirst}`
-            //     : `a.data.${sortFirst} - b.data.${sortFirst}`;
-            // let second =
-            //   significanceIndex !== 1
-            //     ? `b.data.${sortSecond} - a.data.${sortSecond}`
-            //     : `a.data.${sortSecond} - b.data.${sortSecond}`;
-            // let third =
-            //   significanceIndex !== 2
-            //     ? `b.data.${sortThird} - a.data.${sortThird}`
-            //     : `a.data.${sortThird} - b.data.${sortThird}`;
+          .sort(
+            (a, b) =>
+              self.props.networkSortBy
+                .map(sortBy => {
+                  return (
+                    (sortBy === 'significance' ? 1 : -1) *
+                    (a.data[sortBy] - b.data[sortBy])
+                  );
+                })
+                .reduce((prev, value) => {
+                  return prev || value;
+                })
 
-            // return [first] || [second] || [third];
-            if (self.props.networkSortBy === 'significance') {
-              return (
-                a.data.significance - b.data.significance ||
-                b.data.nodecount - a.data.nodecount ||
-                b.data.edgecount - a.data.edgecount
-              );
-            } else if (self.props.networkSortBy === 'edgecount') {
-              return (
-                b.data.edgecount - a.data.edgecount ||
-                a.data.significance - b.data.significance ||
-                b.data.nodecount - a.data.nodecount
-              );
-            } else if (self.props.networkSortBy === 'nodecount') {
-              return (
-                b.data.nodecount - a.data.nodecount ||
-                a.data.significance - b.data.significance ||
-                b.data.edgecount - a.data.edgecount
-              );
-            } else {
-              return a.data.significance - b.data.significance;
-            }
-          });
+            // IF YOU CHOOSE TO USE A DROPDOWN SINGLE VALUE, RATHER THAN LIST SORT, HERE IS CODE
+            // if (self.props.networkSortBy === 'Significance') {
+            //   return (
+            //     a.data.significance - b.data.significance ||
+            //     b.data.nodecount - a.data.nodecount ||
+            //     b.data.edgecount - a.data.edgecount
+            //   );
+            // } else if (self.props.networkSortBy === 'edgecount') {
+            //   return (
+            //     b.data.edgecount - a.data.edgecount ||
+            //     a.data.significance - b.data.significance ||
+            //     b.data.nodecount - a.data.nodecount
+            //   );
+            // } else if (self.props.networkSortBy === 'nodecount') {
+            //   return (
+            //     b.data.nodecount - a.data.nodecount ||
+            //     a.data.significance - b.data.significance ||
+            //     b.data.edgecount - a.data.edgecount
+            //   );
+            // } else {
+            //   return a.data.significance - b.data.significance;
+            // }
+          );
 
         treemap(root);
         let cell = chartView

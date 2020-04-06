@@ -325,7 +325,7 @@ class PepplotSearchCriteria extends Component {
             mustP: [],
             notP: [],
             defaultsigValueP: 0.05,
-            maxElementsP: dataFromService.length,
+            maxElementsP: dataFromService.length
           },
           sigValueP: [0.05],
           uAnchorP: value
@@ -622,13 +622,12 @@ class PepplotSearchCriteria extends Component {
                 name="line graph"
                 size="large"
                 className="StudyHtmlIcon"
-                inverted
                 circular
               />
             </a>
           }
-          style={StudyPopupStyle}
-          inverted
+          // style={StudyPopupStyle}
+          className="CustomTooltip"
           basic
           position="bottom center"
           content={studyName}
@@ -642,9 +641,8 @@ class PepplotSearchCriteria extends Component {
               <Icon name="line graph" size="large" circular inverted disabled />
             </a>
           }
-          style={StudyPopupStyle}
           basic
-          inverted
+          className="CustomTooltip"
           position="bottom center"
           content="Select a study to view Analysis Details"
         />

@@ -75,8 +75,6 @@ class Enrichment extends Component {
     filteredEdgesTotal: 0,
     totalNodes: 0,
     totalEdges: 0,
-    // networkSortBy: ['significance', 'edgecount', 'nodecount']
-    networkSortBy: sessionStorage.getItem('networkSortBy') || 'significance',
     legendIsOpen: true,
     // legendIsOpen: JSON.parse(sessionStorage.getItem('legendOpen')) || true,
     networkSettings: {
@@ -1546,8 +1544,9 @@ class Enrichment extends Component {
               onHandlePlotAnimation={this.handlePlotAnimation}
               onDisplayViolinPlot={this.displayViolinPlot}
               onHandlePieClick={this.testSelected}
-              onHandleNetworkSortByChange={this.handleNetworkSortByChange}
-              onHandleInputChange={this.handleInputChange}
+              onHandleNetworkCutoffInputChange={
+                this.handleNetworkCutoffInputChange
+              }
               onHandleSliderChange={this.handleSliderChange}
               onHandleTotals={this.handleTotals}
               // onNetworkGraphReady={this.handleNetworkGraphReady}
@@ -1580,22 +1579,13 @@ class Enrichment extends Component {
     });
   };
 
-  handleNetworkSortByChange = (evt, { value }) => {
-    this.removeNetworkSVG();
-    this.setState({
-      networkSortBy: value
-      // networkGraphReady: false
-    });
-    sessionStorage.setItem('networkSortBy', value);
-  };
-
   // handleInputChange = _.debounce((evt, { name, value }) => {
   //   this.setState({
   //     [name]: value
   //   });
   // }, 500);
 
-  handleInputChange = (evt, { name, value }) => {
+  handleNetworkCutoffInputChange = (evt, { name, value }) => {
     this.removeNetworkSVG();
     this.setState({
       [name]: value
