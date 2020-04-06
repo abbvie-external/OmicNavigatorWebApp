@@ -280,21 +280,6 @@ class NetworkGraph extends Component {
           .size([width, height])
           .round(true)
           .paddingInner(1);
-        debugger;
-
-        const sortOrders = self.props.networkSortBy.map(field =>
-          field === 'significance' ? 'desc' : 'asc'
-        );
-        // let rootAlt = d3
-        //   .hierarchy(clusters)
-        //   .eachBefore(d => {
-        //     d.data.id = (d.parent ? d.parent.data.id + '.' : '') + d.data.name;
-        //     d.key = d.data.id;
-        //   })
-        //   .sum(sumBySize)
-        //   .sort((a, b) =>
-        //     _.orderBy(clusters, self.props.networkSortBy, sortOrders)
-        //   );
 
         let root = d3
           .hierarchy(clusters)
@@ -316,28 +301,7 @@ class NetworkGraph extends Component {
                   return prev || value;
                 })
 
-            // LONG-WINDED WAY
-            // let significanceIndex = self.props.networkSortBy.indexOf(
-            //   'significance'
-            // );
-            // let sortFirst = self.props.networkSortBy[0];
-            // let sortSecond = self.props.networkSortBy[1];
-            // let sortThird = self.props.networkSortBy[2];
-            // let first =
-            //   significanceIndex !== 0
-            //     ? b.data[sortFirst] - a.data[sortFirst]
-            //     : a.data[sortFirst] - b.data[sortFirst];
-            // let second =
-            //   significanceIndex !== 1
-            //     ? b.data[sortSecond] - a.data[sortSecond]
-            //     : a.data[sortSecond] - b.data[sortSecond];
-            // let third =
-            //   significanceIndex !== 2
-            //     ? b.data[sortThird] - a.data[sortThird]
-            //     : a.data[sortThird] - b.data[sortThird];
-            // return first || second || third;
-
-            // IF YOU CHOOSE TO USE A DROPDOWN SINGLE VALUE, RATHER THAN LIST SORT
+            // IF YOU CHOOSE TO USE A DROPDOWN SINGLE VALUE, RATHER THAN LIST SORT, HERE IS CODE
             // if (self.props.networkSortBy === 'significance') {
             //   return (
             //     a.data.significance - b.data.significance ||

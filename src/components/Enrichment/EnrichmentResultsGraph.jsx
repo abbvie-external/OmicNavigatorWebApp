@@ -330,8 +330,10 @@ class EnrichmentResultsGraph extends Component {
                     </Label>
                   }
                   style={CustomPopupStyle}
-                  content="Statistical significance threshold. Nodes (database terms) with values greater than this value are removed"
+                  // content="Statistical significance threshold. Nodes (database terms) with values greater than this value are removed"
+                  content="Only nodes (i.e. enrichment terms) with a statistical significance value less than or equal to the cutoff are displayed in the network below. The statistic is either the nominal or adjusted p-value, depending on the currently chosen setting."
                   inverted
+                  basic
                   position="left center"
                 />
                 <input />
@@ -387,8 +389,10 @@ class EnrichmentResultsGraph extends Component {
                     </Label>
                   }
                   style={CustomPopupStyle}
-                  content="Edge weight threshold. Edges with values greater than this value are removed"
+                  // content="Edge weight threshold. Edges with values greater than this value are removed"
+                  content="Only edges that have a similarity metric greater than or equal to the cutoff are displayed in the network below. The similarity metric is either the overlap coefficient, Jaccard index, or a mixture of the two, depending on the current settings."
                   inverted
+                  basic
                   position="left center"
                 />
                 <input />
@@ -484,7 +488,7 @@ class EnrichmentResultsGraph extends Component {
                     disabled={!networkGraphReady}
                     icon
                     labelPosition="left"
-                    // color="blue"
+                    color="blue"
                     id="LegendIconButton"
                     className={networkGraphReady ? 'Show' : 'Hide'}
                     size="mini"

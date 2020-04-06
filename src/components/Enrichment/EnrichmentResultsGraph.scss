@@ -131,6 +131,8 @@
   margin-right: -1px !important;
   width: max-content;
   border-radius: 0.28571429rem 0px 0px 0.28571429rem !important;
+  background-color: var(--color-dark) !important;
+  color: var(--color-light) !important;
 }
 
 // @media (max-width: 768px) {
@@ -146,49 +148,51 @@
 //   cursor: move;
 // }
 
-#NetworkGraphSortBySegment {
-  width: 110px !important;
-  height: 105px !important;
-  padding: 0px;
-}
-
-#NetworkSortByLabel {
-  background-color: var(--color-primary) !important;
-  color: white !important;
-  width: 70px !important;
-  margin-left: -90px !important;
-}
-
 #NetworkGraphSortByDiv {
   padding-top: 10px;
   // color: var(--color-primary) !important;
   color: rgba(0, 0, 0, 0.6) !important;
 
-  #NetworkGraphSortByText {
-    color: grey;
-  }
-  ul {
-    padding: 2px 0px 0px 10px !important;
-  }
-  ul li {
-    list-style: none;
-    margin-bottom: 5px;
-    cursor: grab;
-  }
-  #NetworkGraphSortableLink {
-    list-style: none;
-    margin-bottom: 5px;
-    cursor: grab;
-  }
+  #NetworkGraphSortBySegment {
+    width: 115px !important;
+    height: 115px !important;
+    padding: 0px;
+    margin: 0 auto;
 
-  .NoSelect {
-    -webkit-touch-callout: none; /* iOS Safari */
-    -webkit-user-select: none; /* Safari */
-    -khtml-user-select: none; /* Konqueror HTML */
-    -moz-user-select: none; /* Old versions of Firefox */
-    -ms-user-select: none; /* Internet Explorer/Edge */
-    user-select: none; /* Non-prefixed version, currently
+    #NetworkSortByLabel {
+      // background-color: var(--color-primary) !important;
+      background-color: var(--color-dark) !important;
+      color: white !important;
+      width: 70px !important;
+      margin-left: -90px !important;
+    }
+
+    #NetworkGraphSortByText {
+      color: grey;
+    }
+    ul {
+      padding: 5px 0px 0px 12px !important;
+    }
+    ul li {
+      list-style: none;
+      margin-bottom: 8px;
+      cursor: grab;
+    }
+    #NetworkGraphSortableLink {
+      list-style: none;
+      margin-bottom: 5px;
+      cursor: grab;
+    }
+
+    .NoSelect {
+      -webkit-touch-callout: none; /* iOS Safari */
+      -webkit-user-select: none; /* Safari */
+      -khtml-user-select: none; /* Konqueror HTML */
+      -moz-user-select: none; /* Old versions of Firefox */
+      -ms-user-select: none; /* Internet Explorer/Edge */
+      user-select: none; /* Non-prefixed version, currently
                                   supported by Chrome, Opera and Firefox */
+    }
   }
 }
 
