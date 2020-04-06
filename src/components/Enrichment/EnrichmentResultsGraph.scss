@@ -104,6 +104,11 @@
   margin-top: 10px;
   margin-left: 20px;
   font-size: 1rem !important;
+
+  //   .ui.toggle.checkbox input:checked ~ .box:before,
+  //   .ui.toggle.checkbox input:checked ~ label:before {
+  //     background-color: var(--color-primary) !important;
+  //   }
 }
 
 @media (max-width: 1600px) {
@@ -210,6 +215,8 @@
 
 #LegendIconButton {
   margin-bottom: 5px;
+  background-color: var(--color-light) !important;
+  color: var(--color-dark) !important;
 }
 
 #LegendColumn {

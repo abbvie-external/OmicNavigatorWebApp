@@ -62,19 +62,54 @@ const resultRenderer = ({ description, genes, size }) => {
   );
 };
 
+const LegendPopupStyle = {
+  padding: '1em',
+  width: '250px'
+};
+
+const CustomPopupStyle = {
+  backgroundColor: '2E2E2E',
+  borderBottom: '2px solid var(--color-primary)',
+  color: '#FFF',
+  padding: '1em',
+  maxWidth: '300px',
+  fontSize: '13px',
+  wordBreak: 'break-word'
+};
+
 // const DragHandle = sortableHandle(() => <span>::</span>);
-const SortableItem = sortableElement(props => (
-  <li className="NetworkGraphSortableLink">
-    {/* <DragHandle /> */}
-    <Label
-      // color="blue"
-      size="small"
-      key={`label-${props.value}`}
-    >
-      {props.sortIndex + 1}) {props.value}
-    </Label>
-  </li>
-));
+const SortableItem = sortableElement(props => {
+  const ItemTooltip = function() {
+    if (props.value === 'Significance') {
+      return 'Sort clusters by chosen significance metric';
+    } else if (props.value === 'Node Count') {
+      return 'Sort clusters by number of nodes per cluster';
+    } else if (props.value === 'Edge Count') {
+      return 'Sort clusters by number of edges per cluster';
+    }
+  };
+
+  return (
+    <li className="NetworkGraphSortableLink">
+      {/* <DragHandle /> */}
+      <Popup
+        trigger={
+          <Label
+            // color="blue"
+            size="small"
+            key={`label-${props.value}`}
+          >
+            {props.sortIndex + 1}) {props.value}
+          </Label>
+        }
+        style={CustomPopupStyle}
+        content={ItemTooltip}
+        inverted
+        position="left center"
+      />
+    </li>
+  );
+});
 
 const SortableContainer = sortableContainer(({ children }) => {
   return <ul>{children}</ul>;
@@ -86,7 +121,30 @@ class EnrichmentResultsGraph extends Component {
     results: [],
     networkSearchValue: '',
     descriptions: [],
-    networkSortBy: ['significance', 'nodecount', 'edgecount']
+    networkSortBy: ['Significance', 'Node Count', 'Edge Count']
+    // networkSortBy: [
+    //   {
+    //     key: 'significance',
+    //     text: 'Significance',
+    //     value: 'significance',
+    //     content: 'Significance',
+    //     tooltip: 'sort clusters by chosen significance metric'
+    //   },
+    //   {
+    //     key: 'nodecount',
+    //     text: 'Node Count',
+    //     value: 'nodecount',
+    //     content: 'Node Count',
+    //     tooltip: 'sort clusters by number of nodes per cluster'
+    //   },
+    //   {
+    //     key: 'edgecount',
+    //     text: 'Edge Count',
+    //     value: 'edgecount',
+    //     content: 'Edge Count',
+    //     tooltip: 'sort clusters by number of edges per cluster'
+    //   }
+    // ]
   };
 
   componentDidMount() {
@@ -222,47 +280,6 @@ class EnrichmentResultsGraph extends Component {
         legendIsOpen && activeIndexEnrichmentView === 1 && networkGraphReady
           ? true
           : false;
-
-      // const networkSortByOptions = [
-      //   {
-      //     key: 'significance',
-      //     text: 'Significance',
-      //     value: 'significance',
-      //     content: 'Significance',
-      //     tooltip: 'sort clusters by chosen significance metric'
-      //   },
-      //   {
-      //     key: 'nodecount',
-      //     text: 'Node Count',
-      //     value: 'nodecount',
-      //     content: 'Node Count',
-      //     tooltip: 'sort clusters by number of nodes per cluster'
-      //   },
-      //   {
-      //     key: 'edgecount',
-      //     text: 'Edge Count',
-      //     value: 'edgecount',
-      //     content: 'Edge Count',
-      //     tooltip: 'sort clusters by number of edges per cluster'
-      //   }
-      // ];
-      // const legend = this.getLegend();
-      const LegendPopupStyle = {
-        padding: '1em',
-        width: '250px'
-      };
-
-      const CustomPopupStyle = {
-        backgroundColor: '2E2E2E',
-        borderBottom: '2px solid var(--color-primary)',
-        color: '#FFF',
-        padding: '1em',
-        maxWidth: '300px',
-        fontSize: '13px',
-        wordBreak: 'break-word'
-      };
-
-      // const DropdownTooltip = this.getDropdownTooltip();
 
       return (
         <Grid className="NetworkGraphFiltersContainer">
@@ -488,7 +505,7 @@ class EnrichmentResultsGraph extends Component {
                     disabled={!networkGraphReady}
                     icon
                     labelPosition="left"
-                    color="blue"
+                    // color="blue"
                     id="LegendIconButton"
                     className={networkGraphReady ? 'Show' : 'Hide'}
                     size="mini"

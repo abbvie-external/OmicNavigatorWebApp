@@ -293,7 +293,7 @@ class NetworkGraph extends Component {
               self.props.networkSortBy
                 .map(sortBy => {
                   return (
-                    (sortBy === 'significance' ? 1 : -1) *
+                    (sortBy === 'Significance' ? 1 : -1) *
                     (a.data[sortBy] - b.data[sortBy])
                   );
                 })
@@ -302,7 +302,7 @@ class NetworkGraph extends Component {
                 })
 
             // IF YOU CHOOSE TO USE A DROPDOWN SINGLE VALUE, RATHER THAN LIST SORT, HERE IS CODE
-            // if (self.props.networkSortBy === 'significance') {
+            // if (self.props.networkSortBy === 'Significance') {
             //   return (
             //     a.data.significance - b.data.significance ||
             //     b.data.nodecount - a.data.nodecount ||
