@@ -93,7 +93,22 @@ class Enrichment extends Component {
       linkMetaLookup: ['EnrichmentMap_GS_DESCR', 'EnrichmentMap_GS_DESCR'],
       nodeColorScale: [0, 0.1, 1],
       nodeColors: ['red', 'white', 'blue'],
-      colorMostSignificantTest: '#FFD700',
+      // colorMostSignificantTest: '#FFD700',
+      mostSignificantColorScale: [
+        // '#c79750',
+        // '#e6b964',
+        // '#f8e889',
+        // '#f8e889',
+        // '#deb15f',
+        // '#dfb461'
+
+        '#B78628',
+        '#DBA514',
+        // '#e6b964',
+        '#FCC201'
+        // '#DBA514'
+        // '#c79750'
+      ],
       // colorHighestLinkCoefficient: '#FFD700',
       title: '',
       // data: null,
@@ -1097,6 +1112,7 @@ class Enrichment extends Component {
   };
 
   createLegend = () => {
+    const self = this;
     var svg = d3
       .selectAll('.legend')
       .append('svg')
@@ -1111,6 +1127,7 @@ class Enrichment extends Component {
     legend.append('g').attr('class', 'labels');
     legend.append('g').attr('class', 'lines');
     legend.append('g').attr('class', 'gradient');
+    legend.append('g').attr('class', 'mostSignificant');
 
     var width = 300,
       height = 300,
@@ -1275,6 +1292,75 @@ class Enrichment extends Component {
       .attr('dy', '.35em')
       .text('pValue')
       .attr('transform', 'translate(-85,105)');
+
+    //most  color scale
+    var mostSignificantColorScale = d3
+      .scaleLinear()
+      .range(self.state.networkSettings.mostSignificantColorScale);
+    //Append a linearGradient element to the defs and give it a unique id
+    var mostSignificantGradient = svgDefs
+      .append('linearGradient')
+      .attr('id', 'most-significant-linear-gradient')
+      // DIAGONAL GRADIENT
+      .attr('x1', '70%')
+      .attr('y1', '70%')
+      .attr('x2', '30%')
+      .attr('y2', '30%');
+
+    //Append multiple color stops by using D3's data/enter step
+    mostSignificantGradient
+      .selectAll('stop')
+      .data(mostSignificantColorScale.range())
+      .enter()
+      .append('stop')
+      .attr('offset', function(d, i) {
+        return i / (mostSignificantColorScale.range().length - 1);
+      })
+      .attr('stop-color', function(d) {
+        return d;
+      });
+
+    const mostSignificant = legend.selectAll('.mostSignificant');
+
+    mostSignificant
+      .append('text')
+      .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
+      .attr('x', -120)
+      .attr('y', 150)
+      .attr('dy', '.35em')
+      .text('Most significant of all tests in chart');
+
+    // SQUARE
+    mostSignificant
+      .append('rect')
+      .attr('x', 100)
+      .attr('y', 141)
+      .attr('width', 20)
+      .attr('height', 20)
+      .style('stroke', '#000')
+      .style('fill', 'url(#most-significant-linear-gradient)');
+
+    // CIRCLE
+    // mostSignificant
+    //   .append('circle')
+    //   .attr('r', 10)
+    //   .attr('cx', 110)
+    //   .attr('cy', 151)
+    //   .style('stroke', 'black')
+    //   .style('fill', 'ffd700')
+    //   .style('stroke-width', '1')
+    //   .style('stroke', 'black');
+
+    // SLICE
+    // mostSignificant
+    //   .append('circle')
+    //   .attr('r', 5)
+    //   .attr('cx', 100)
+    //   .attr('cy', 151)
+    //   .style('fill', 'transparent')
+    //   .style('stroke', 'ffd700')
+    //   .style('stroke-width', '20')
+    //   .style('stroke-dasharray', 'calc(35 * 31.42 / 140) 31.42')
   };
 
   // getLegend = () => {
