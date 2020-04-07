@@ -81,7 +81,7 @@ class EnrichmentSearchCriteria extends Component {
       maxElements: undefined,
       metaSvg: '',
       heightScalar: 1,
-      thresholdColsP: [
+      thresholdCols: [
         {
           key: 'adj_P_Val',
           text: 'adj_P_Val',
@@ -326,11 +326,47 @@ class EnrichmentSearchCriteria extends Component {
           });
         });
     } else {
-      this.updateQueryData();
+      const eSigV = this.state.sigValue;
+      const eMust = this.state.uSettings.must;
+      const eNot = this.state.uSettings.not;
+      const eOperator = this.state.selectedOperator;
+      console.log(value)
+    this.getMultisetPlot(
+      eSigV,
+      this.props.enrichmentModel,
+      this.props.enrichmentStudy + 'plots',
+      this.props.enrichmentAnnotation,
+      this.jsonToList(eOperator),
+      value
+    );
+    phosphoprotService
+      .getMultisetEnrichmentData(
+        this.props.enrichmentModel,
+        eMust,
+        eNot,
+        this.props.enrichmentStudy + 'plots',
+        eSigV,
+        this.props.enrichmentAnnotation,
+        this.jsonToList(eOperator),
+        value
+      )
+      .then(annotationData => {
+        const multisetResults = annotationData;
+        this.setState({
+          uSettings: {
+            ...this.state.uSettings,
+            numElements: multisetResults.length,
+            maxElements: this.state.uSettings.maxElements,
+            must: eMust,
+            not: eNot
+          },
+          activateMultisetFilters: true
+        });
+        this.props.onEnrichmentSearch({
+          enrichmentResults: multisetResults
+        });
+      });
     }
-
-    //     if (this.state.activateMultisetFilters) {
-    // call getMultisetEnrichmentData include nominal vs adjusted
   };
 
   handleMultisetToggle = () => {
@@ -488,7 +524,8 @@ class EnrichmentSearchCriteria extends Component {
       this.props.enrichmentModel,
       this.props.enrichmentStudy + 'plots',
       this.props.enrichmentAnnotation,
-      this.jsonToList(eOperator)
+      this.jsonToList(eOperator),
+      this.props.pValueType
     );
     phosphoprotService
       .getMultisetEnrichmentData(
@@ -498,7 +535,8 @@ class EnrichmentSearchCriteria extends Component {
         this.props.enrichmentStudy + 'plots',
         eSigV,
         this.props.enrichmentAnnotation,
-        this.jsonToList(eOperator)
+        this.jsonToList(eOperator),
+        this.props.pValueType
       )
       .then(annotationData => {
         const multisetResults = annotationData;
@@ -540,7 +578,8 @@ class EnrichmentSearchCriteria extends Component {
         enrichmentModel,
         enrichmentStudy,
         enrichmentAnnotation,
-        eOperator
+        eOperator,
+        this.props.pValueType
       )
       .then(svgMarkupObj => {
         let svgMarkup = svgMarkupObj.data;

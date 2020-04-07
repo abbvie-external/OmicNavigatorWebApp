@@ -25,16 +25,20 @@ class PepplotSearchCriteria extends Component {
     pepplotModelsDisabled: true,
     pepplotTestsDisabled: true,
     uAnchorP: '',
-    selectedColP: [{
-      key: 'adj_P_Val',
-      text: 'Adjusted P Value',
-      value: 'adj_P_Val'
-    }],
-    selectedOperatorP: [{
-      key: '<',
-      text: '<',
-      value: '<'
-    }],
+    selectedColP: [
+      {
+        key: 'adj_P_Val',
+        text: 'Adjusted P Value',
+        value: 'adj_P_Val'
+      }
+    ],
+    selectedOperatorP: [
+      {
+        key: '<',
+        text: '<',
+        value: '<'
+      }
+    ],
     sigValueP: [0.05],
     reloadPlot: true,
     uSettingsP: {
@@ -50,7 +54,7 @@ class PepplotSearchCriteria extends Component {
       },
       defaultsigValueP: 0.05,
       useAnchorP: true,
-      hoveredFilter:-1,
+      hoveredFilter: -1,
       mustP: [],
       notP: [],
       displayMetaDataP: true,
@@ -60,23 +64,6 @@ class PepplotSearchCriteria extends Component {
       indexFiltersP: [0],
       metaSvgP: '',
       heightScalarP: 1,
-      thresholdColsP: [
-        {
-          key: 'adj_P_Val',
-          text: 'adj_P_Val',
-          value: 'adj_P_Val'
-        },
-        {
-          key: 'F',
-          text: 'F',
-          value: 'F'
-        },
-        {
-          key: 'P_Value',
-          text: 'P_Value',
-          value: 'P_Value'
-        }
-      ],
       thresholdOperatorP: [
         {
           key: '<',
@@ -344,10 +331,7 @@ class PepplotSearchCriteria extends Component {
           uAnchorP: value
         });
         this.testdata = dataFromService;
-        this.props.onPepplotSearch({pepplotResults: this.testdata});;
-        const uSetVP = {...this.state.uSettingsP}
-        uSetVP.thresholdColsP = this.listToJson(this.props.filterableColumnsP);
-        this.setState({uSettingsP:uSetVP})
+        this.props.onPepplotSearch({ pepplotResults: this.testdata });
       });
   };
 
@@ -402,62 +386,95 @@ class PepplotSearchCriteria extends Component {
       });
   };
 
-  addFilter =()=> {
-    const uSetVP = {...this.state.uSettingsP}
-    uSetVP.indexFiltersP = [...this.state.uSettingsP.indexFiltersP].concat(this.state.uSettingsP.indexFiltersP.length)
+  addFilter = () => {
+    const uSetVP = { ...this.state.uSettingsP };
+    uSetVP.indexFiltersP = [...this.state.uSettingsP.indexFiltersP].concat(
+      this.state.uSettingsP.indexFiltersP.length
+    );
 
     this.setState({
-      selectedColP: [...this.state.selectedColP].concat(this.state.uSettingsP.defaultselectedColP),
-      selectedOperatorP: [...this.state.selectedOperatorP].concat(this.state.uSettingsP.defaultselectedOperatorP),
-      sigValueP: [...this.state.sigValueP].concat(this.state.uSettingsP.defaultsigValueP),
+      selectedColP: [...this.state.selectedColP].concat(
+        this.state.uSettingsP.defaultselectedColP
+      ),
+      selectedOperatorP: [...this.state.selectedOperatorP].concat(
+        this.state.uSettingsP.defaultselectedOperatorP
+      ),
+      sigValueP: [...this.state.sigValueP].concat(
+        this.state.uSettingsP.defaultsigValueP
+      ),
       uSettingsP: uSetVP
     });
-  }
-  removeFilter=(index)=>{
-    const uSetVP = {...this.state.uSettingsP}
-    uSetVP.indexFiltersP = [...uSetVP.indexFiltersP].slice(0,index).concat([...uSetVP.indexFiltersP].slice(index+1));
-    for(var i = index; i < uSetVP.indexFiltersP.length; i++){uSetVP.indexFiltersP[i]--}
+  };
+  removeFilter = index => {
+    const uSetVP = { ...this.state.uSettingsP };
+    uSetVP.indexFiltersP = [...uSetVP.indexFiltersP]
+      .slice(0, index)
+      .concat([...uSetVP.indexFiltersP].slice(index + 1));
+    for (var i = index; i < uSetVP.indexFiltersP.length; i++) {
+      uSetVP.indexFiltersP[i]--;
+    }
     this.setState({
-      selectedColP: [...this.state.selectedColP].slice(0,index).concat([...this.state.selectedColP].slice(index+1)),
-      selectedOperatorP: [...this.state.selectedOperatorP].slice(0,index).concat([...this.state.selectedOperatorP].slice(index+1)),
-      sigValueP: [...this.state.sigValueP].slice(0,index).concat([...this.state.sigValueP].slice(index+1)),
+      selectedColP: [...this.state.selectedColP]
+        .slice(0, index)
+        .concat([...this.state.selectedColP].slice(index + 1)),
+      selectedOperatorP: [...this.state.selectedOperatorP]
+        .slice(0, index)
+        .concat([...this.state.selectedOperatorP].slice(index + 1)),
+      sigValueP: [...this.state.sigValueP]
+        .slice(0, index)
+        .concat([...this.state.sigValueP].slice(index + 1)),
       uSettingsP: uSetVP
     });
-  }
-  changeHoveredFilter=(index)=>{
-    const uSetVP = {...this.state.uSettingsP}
+  };
+  changeHoveredFilter = index => {
+    const uSetVP = { ...this.state.uSettingsP };
     uSetVP.hoveredFilter = index;
-    this.setState({uSettingsP: uSetVP})
-  }
-  handleDropdownChange=(evt, { name, value, index })=>{
-    const uSelVP = [...this.state[name]]
+    this.setState({ uSettingsP: uSetVP });
+  };
+  handleDropdownChange = (evt, { name, value, index }) => {
+    const uSelVP = [...this.state[name]];
     uSelVP[index] = {
-          key: value,
-          text: value,
-          value: value
-        };
-    this.setState({
-      [name]: uSelVP,
-      reloadPlot: true
-    },function(){this.updateQueryDataP()});
-  }
-  handleInputChange=(evt, { name, value, index })=>{
-    const uSelVP = [...this.state[name]]
+      key: value,
+      text: value,
+      value: value
+    };
+    this.setState(
+      {
+        [name]: uSelVP,
+        reloadPlot: true
+      },
+      function() {
+        this.updateQueryDataP();
+      }
+    );
+  };
+  handleInputChange = (evt, { name, value, index }) => {
+    const uSelVP = [...this.state[name]];
     uSelVP[index] = parseFloat(value);
-    this.setState({
-      [name]: uSelVP,
-      reloadPlot: true
-    },function(){this.updateQueryDataP()});
-  }
-  handleSetChange=({mustP, notP})=>{
+    this.setState(
+      {
+        [name]: uSelVP,
+        reloadPlot: true
+      },
+      function() {
+        this.updateQueryDataP();
+      }
+    );
+  };
+  handleSetChange = ({ mustP, notP }) => {
     const uSettingsVP = this.state.uSettingsP;
     uSettingsVP.mustP = mustP;
     uSettingsVP.notP = notP;
-    this.setState({
-      uSettingsP: uSettingsVP,
-      reloadPlot:false
-    },function(){this.updateQueryDataP()});
-  }
+    this.setState(
+      {
+        uSettingsP: uSettingsVP,
+        reloadPlot: false
+      },
+      function() {
+        this.updateQueryDataP();
+      }
+    );
+  };
 
   updateQueryDataP = () => {
     const eSigVP = this.state.sigValueP;
@@ -506,23 +523,12 @@ class PepplotSearchCriteria extends Component {
       });
   };
 
-  jsonToList(json){
+  jsonToList(json) {
     var valueList = [];
-    for(var i=0;i<json.length;i++){
+    for (var i = 0; i < json.length; i++) {
       valueList.push(json[i].value);
     }
     return valueList;
-  }
-  listToJson(list){
-    var valueJSON = [];
-    for(var i=0;i<list.length;i++){
-      valueJSON.push({
-        key:list[i],
-        text:list[i],
-        value:list[i]
-      })
-    }
-    return valueJSON;
   }
 
   getMultisetPlot(sigVal, pepplotModel, pepplotStudy, eOperatorP, eColP) {

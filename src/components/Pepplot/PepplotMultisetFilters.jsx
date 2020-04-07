@@ -12,9 +12,7 @@ class PepplotMultisetFilters extends Component {
       metaSvgP,
       sigValueP,
       selectedColP,
-      selectedOperatorP,
-      thresholdColsP,
-      thresholdOperatorP
+      selectedOperatorP
     } = this.props;
     this.makeMultiset(
       uDataP,
@@ -23,9 +21,7 @@ class PepplotMultisetFilters extends Component {
       metaSvgP,
       sigValueP,
       selectedColP,
-      selectedOperatorP,
-      thresholdColsP,
-      thresholdOperatorP
+      selectedOperatorP
     );
   }
 
@@ -104,32 +100,48 @@ class PepplotMultisetFilters extends Component {
       10 +
       24;
     const useAnchorP = uSettingsP.useAnchorP;
-    const setDescP=[];
-    const notSetDescP=[];
+    const setDescP = [];
+    const notSetDescP = [];
     //var mustTextScalar = (15 * Number(mustDataP.length !== 0))
     //var notTextScalar = (15 * Number(notDataP.length !== 0))
 
-    for(var i = 0;i < selectedOperatorP.length; i++){
-    switch (selectedOperatorP[i].value) {
-      case '<':
-        setDescP.push(`${selectedColP[i].text} less than ${sigValueP[i]} in:`);
-        notSetDescP.push(`${selectedColP[i].text} less than ${sigValueP[i]} not in:`);
-        break;
-      case '>':
-        setDescP.push(`${selectedColP[i].text} greater than ${sigValueP[i]} in:`);
-        notSetDescP.push(`${selectedColP[i].text} greater than ${sigValueP[i]} not in:`);
-        break;
-      case '|<|':
-        setDescP.push(`${selectedColP[i].text} absolute value less than ${sigValueP[i]} in:`);
-        notSetDescP.push(`${selectedColP[i].text} absolute value less than ${sigValueP[i]} not in:`);
-        break;
-      case '|>|':
-        setDescP.push(`${selectedColP[i].text} absolute value greater than ${sigValueP[i]} in:`);
-        notSetDescP.push(`${selectedColP[i].text} absolute value greater than ${sigValueP[i]} not in:`);
-        break;
-      default:
+    for (var i = 0; i < selectedOperatorP.length; i++) {
+      switch (selectedOperatorP[i].value) {
+        case '<':
+          setDescP.push(
+            `${selectedColP[i].text} less than ${sigValueP[i]} in:`
+          );
+          notSetDescP.push(
+            `${selectedColP[i].text} less than ${sigValueP[i]} not in:`
+          );
+          break;
+        case '>':
+          setDescP.push(
+            `${selectedColP[i].text} greater than ${sigValueP[i]} in:`
+          );
+          notSetDescP.push(
+            `${selectedColP[i].text} greater than ${sigValueP[i]} not in:`
+          );
+          break;
+        case '|<|':
+          setDescP.push(
+            `${selectedColP[i].text} absolute value less than ${sigValueP[i]} in:`
+          );
+          notSetDescP.push(
+            `${selectedColP[i].text} absolute value less than ${sigValueP[i]} not in:`
+          );
+          break;
+        case '|>|':
+          setDescP.push(
+            `${selectedColP[i].text} absolute value greater than ${sigValueP[i]} in:`
+          );
+          notSetDescP.push(
+            `${selectedColP[i].text} absolute value greater than ${sigValueP[i]} not in:`
+          );
+          break;
+        default:
+      }
     }
-  }
 
     //Reset the svg
     metaSvgP.selectAll('text').remove();
@@ -146,28 +158,37 @@ class PepplotMultisetFilters extends Component {
         .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
         .attr('font-size', '15px')
         .attr('fill', 'black');
-      metaSvgP.selectAll("dataObject")
-          .data(setDescP)
-          .enter()
-          .append('text')
-          .attr('x', 7)
-          .attr('y', function (d, i) { return (30+heightScalarP*i) })
-          .text(function (d) { return d })
-          .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
-          .attr('font-size', '15px')
-          .attr('fill', 'black');
+      metaSvgP
+        .selectAll('dataObject')
+        .data(setDescP)
+        .enter()
+        .append('text')
+        .attr('x', 7)
+        .attr('y', function(d, i) {
+          return 30 + heightScalarP * i;
+        })
+        .text(function(d) {
+          return d;
+        })
+        .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
+        .attr('font-size', '15px')
+        .attr('fill', 'black');
 
       if (useAnchorP) {
         metaSvgP
           .append('circle')
           .style('fill', 'green')
           .attr('cx', 17)
-          .attr('cy', function () { return (30+(heightScalarP*setDescP.length)) })
+          .attr('cy', function() {
+            return 30 + heightScalarP * setDescP.length;
+          })
           .attr('r', 4);
         metaSvgP
           .append('text')
           .attr('x', 25)
-          .attr('y', function () { return (30+(heightScalarP*setDescP.length)+4) })
+          .attr('y', function() {
+            return 30 + heightScalarP * setDescP.length + 4;
+          })
           .text(uAnchorP)
           .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
           .attr('font-size', '13px')
@@ -182,11 +203,19 @@ class PepplotMultisetFilters extends Component {
         .append('circle')
         .style('fill', 'green')
         .attr('cx', 17)
-        .attr('cy', function(d,i) {
+        .attr('cy', function(d, i) {
           if (!useAnchorP) {
-            return 30+(heightScalarP*setDescP.length)+mustDataP.indexOf(d) * heightScalarP;
+            return (
+              30 +
+              heightScalarP * setDescP.length +
+              mustDataP.indexOf(d) * heightScalarP
+            );
           } else {
-            return 30+(heightScalarP*setDescP.length)+(mustDataP.indexOf(d)+1) * heightScalarP;
+            return (
+              30 +
+              heightScalarP * setDescP.length +
+              (mustDataP.indexOf(d) + 1) * heightScalarP
+            );
           }
         })
         .attr('r', 4);
@@ -200,9 +229,19 @@ class PepplotMultisetFilters extends Component {
         .attr('x', 25)
         .attr('y', function(d) {
           if (!useAnchorP) {
-            return 30+(heightScalarP*setDescP.length)+mustDataP.indexOf(d) * heightScalarP + 4;
+            return (
+              30 +
+              heightScalarP * setDescP.length +
+              mustDataP.indexOf(d) * heightScalarP +
+              4
+            );
           } else {
-            return 30+(heightScalarP*setDescP.length)+(mustDataP.indexOf(d)+1) * heightScalarP + 4;
+            return (
+              30 +
+              heightScalarP * setDescP.length +
+              (mustDataP.indexOf(d) + 1) * heightScalarP +
+              4
+            );
           }
         })
         .text(function(d) {
@@ -213,20 +252,31 @@ class PepplotMultisetFilters extends Component {
         .attr('fill', 'black');
 
       if (notDataP.length !== 0) {
-        metaSvgP.selectAll("dataObject")
+        metaSvgP
+          .selectAll('dataObject')
           .data(notSetDescP)
           .enter()
           .append('text')
           .attr('dy', '24px')
           .attr('x', 7)
-          .attr('y', function(d,i) {
+          .attr('y', function(d, i) {
             if (!useAnchorP) {
-              return 30+(heightScalarP*setDescP.length)+(i+mustDataP.length-1) * heightScalarP;
+              return (
+                30 +
+                heightScalarP * setDescP.length +
+                (i + mustDataP.length - 1) * heightScalarP
+              );
             } else {
-              return 30+(heightScalarP*setDescP.length)+(i+mustDataP.length) * heightScalarP;
+              return (
+                30 +
+                heightScalarP * setDescP.length +
+                (i + mustDataP.length) * heightScalarP
+              );
             }
           })
-          .text(function (d) { return d })
+          .text(function(d) {
+            return d;
+          })
           .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
           .attr('font-size', '14px')
           .attr('fill', 'black');
@@ -239,11 +289,25 @@ class PepplotMultisetFilters extends Component {
           .append('circle')
           .style('fill', 'red')
           .attr('cx', 17)
-          .attr('cy', function(d,i) {
+          .attr('cy', function(d, i) {
             if (!useAnchorP) {
-              return 30+4+heightScalarP*(i+setDescP.length+notSetDescP.length+mustDataP.length);
+              return (
+                30 +
+                4 +
+                heightScalarP *
+                  (i + setDescP.length + notSetDescP.length + mustDataP.length)
+              );
             } else {
-              return 30+4+heightScalarP*(i+setDescP.length+notSetDescP.length+mustDataP.length+1);
+              return (
+                30 +
+                4 +
+                heightScalarP *
+                  (i +
+                    setDescP.length +
+                    notSetDescP.length +
+                    mustDataP.length +
+                    1)
+              );
             }
           })
           .attr('r', 4);
@@ -255,11 +319,25 @@ class PepplotMultisetFilters extends Component {
           .enter()
           .append('text')
           .attr('x', 25)
-          .attr('y', function(d,i) {
+          .attr('y', function(d, i) {
             if (!useAnchorP) {
-              return 30+8+heightScalarP*(i+setDescP.length+notSetDescP.length+mustDataP.length);
+              return (
+                30 +
+                8 +
+                heightScalarP *
+                  (i + setDescP.length + notSetDescP.length + mustDataP.length)
+              );
             } else {
-              return 30+8+heightScalarP*(i+setDescP.length+notSetDescP.length+mustDataP.length+1);
+              return (
+                30 +
+                8 +
+                heightScalarP *
+                  (i +
+                    setDescP.length +
+                    notSetDescP.length +
+                    mustDataP.length +
+                    1)
+              );
             }
           })
           .text(function(d) {
@@ -717,94 +795,102 @@ class PepplotMultisetFilters extends Component {
     }
   }
 
-  handleDropdownChange = (evt, { name, value, index}) => {
-    this.props.onHandleDropdownChange(evt, { name, value, index});
+  handleDropdownChange = (evt, { name, value, index }) => {
+    this.props.onHandleDropdownChange(evt, { name, value, index });
   };
 
   handleInputChange = (evt, { name, value, index }) => {
     this.props.onHandleInputChange(evt, { name, value, index });
   };
-  addFilter=()=>{ 
+  addFilter = () => {
     this.props.onAddFilter();
   };
-  removeFilter=(index)=>{
-    this.props.onRemoveFilter(index)
-  }
-  changeHoveredFilter=(index)=>{
+  removeFilter = index => {
+    this.props.onRemoveFilter(index);
+  };
+  changeHoveredFilter = index => {
     this.props.onChangeHoveredFilter(index);
-  }
+  };
 
   render() {
     const {
       selectedOperatorP,
       selectedColP,
       sigValueP,
-      uSettingsP
+      uSettingsP,
+      thresholdColsP
     } = this.props;
-    const ColumnsP = uSettingsP.thresholdColsP;
     const OperatorsP = uSettingsP.thresholdOperatorP;
-    const SelOpP = selectedOperatorP;
-    const SelColP = selectedColP;
     const indexFiltersP = uSettingsP.indexFiltersP;
     const hoveredFilter = uSettingsP.hoveredFilter;
 
     return (
       <Fragment>
         <Form className="MultisetDropdownContainer">
-          <ul style={{padding:"0px"}}>
-          {indexFiltersP.map(index =><Form.Group
-            key={index} 
-            onMouseEnter={()=>this.changeHoveredFilter(index)}
-            onMouseLeave={()=>this.changeHoveredFilter(-1)}
-            >
-            <Form.Field
-              control={Select}
-              label={(index===0)?"Column":""}
-              name="selectedColP"
-              className="ThresholdColumnReadOnly"
-              index={index}
-              // selection
-              value={SelColP[index].value}
-              options={ColumnsP}
-              width={7}
-              onChange={this.handleDropdownChange}
-            ></Form.Field>
-            {hoveredFilter===index && indexFiltersP.length !== 1 &&
-            <Button circular icon style={{
-              position:"absolute",
-              marginTop:index===0?"15px":"0px"}}
-              size="mini" compact onClick={()=>this.removeFilter(index)}>
-              <Icon name="minus circle" color={"red"}/>
-            </Button>}
-            <Form.Field
-              control={Select}
-              label={(index===0)?"Operator":""}
-              name="selectedOperatorP"
-              className="ThresholdOperatorSelect"
-              index={index}
-              // selection
-              value={SelOpP[index].value}
-              options={OperatorsP}
-              width={(SelOpP[index].value==="|<|")?5:4}
-              onChange={this.handleDropdownChange}
-            ></Form.Field>
-            <Form.Field
-              control={Input}
-              type="number"
-              step="0.01"
-              label={(index===0)?"Significance":""}
-              name="sigValueP"
-              className="SignificantValueInput"
-              index={index}
-              value={sigValueP[index]}
-              width={5}
-              onChange={this.handleInputChange}
-            ></Form.Field>
-          </Form.Group>
-        )}</ul>
-        <Button circular compact size="mini" icon onClick={this.addFilter}>
-          <Icon name="plus circle" color={"green"}/>
-        </Button>
+          <ul style={{ padding: '0px' }}>
+            {indexFiltersP.map(index => (
+              <Form.Group
+                key={index}
+                onMouseEnter={() => this.changeHoveredFilter(index)}
+                onMouseLeave={() => this.changeHoveredFilter(-1)}
+              >
+                <Form.Field
+                  control={Select}
+                  label={index === 0 ? 'Column' : ''}
+                  name="selectedColP"
+                  className="ThresholdColumnReadOnly"
+                  index={index}
+                  // selection
+                  value={selectedColP[index].value}
+                  options={thresholdColsP}
+                  width={7}
+                  onChange={this.handleDropdownChange}
+                ></Form.Field>
+                {hoveredFilter === index && indexFiltersP.length !== 1 && (
+                  <Button
+                    circular
+                    icon
+                    style={{
+                      position: 'absolute',
+                      marginTop: index === 0 ? '15px' : '0px'
+                    }}
+                    size="mini"
+                    compact
+                    onClick={() => this.removeFilter(index)}
+                  >
+                    <Icon name="minus circle" color={'red'} />
+                  </Button>
+                )}
+                <Form.Field
+                  control={Select}
+                  label={index === 0 ? 'Operator' : ''}
+                  name="selectedOperatorP"
+                  className="ThresholdOperatorSelect"
+                  index={index}
+                  // selection
+                  value={selectedOperatorP[index].value}
+                  options={OperatorsP}
+                  width={selectedOperatorP[index].value === '|<|' ? 5 : 4}
+                  onChange={this.handleDropdownChange}
+                ></Form.Field>
+                <Form.Field
+                  control={Input}
+                  type="number"
+                  step="0.01"
+                  label={index === 0 ? 'Significance' : ''}
+                  name="sigValueP"
+                  className="SignificantValueInput"
+                  index={index}
+                  value={sigValueP[index]}
+                  width={5}
+                  onChange={this.handleInputChange}
+                ></Form.Field>
+              </Form.Group>
+            ))}
+          </ul>
+          <Button circular compact size="mini" icon onClick={this.addFilter}>
+            <Icon name="plus circle" color={'green'} />
+          </Button>
         </Form>
         <p id="multiset-query-p" className="MultisetQueryPContainer"></p>
       </Fragment>
