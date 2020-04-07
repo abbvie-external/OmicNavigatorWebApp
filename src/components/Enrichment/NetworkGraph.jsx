@@ -654,6 +654,7 @@ class NetworkGraph extends Component {
               var mostSignificantGradient = defs
                 .append('linearGradient')
                 .attr('id', 'most-significant-linear-gradient')
+                // DIAGONAL GRADIENT
                 .attr('x1', '70%')
                 .attr('y1', '70%')
                 .attr('x2', '30%')

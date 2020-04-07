@@ -1296,7 +1296,12 @@ class Enrichment extends Component {
     //Append a linearGradient element to the defs and give it a unique id
     var mostSignificantGradient = svgDefs
       .append('linearGradient')
-      .attr('id', 'most-significant-linear-gradient');
+      .attr('id', 'most-significant-linear-gradient')
+      // DIAGONAL GRADIENT
+      .attr('x1', '70%')
+      .attr('y1', '70%')
+      .attr('x2', '30%')
+      .attr('y2', '30%');
 
     //Append multiple color stops by using D3's data/enter step
     mostSignificantGradient
