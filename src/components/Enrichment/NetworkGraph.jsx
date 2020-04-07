@@ -291,6 +291,7 @@ class NetworkGraph extends Component {
           .sort(
             (a, b) =>
               self.props.networkSortBy
+                // FOR SORT BY LIST
                 .map(sortBy => {
                   return (
                     (sortBy === 'significance' ? 1 : -1) *
@@ -301,7 +302,7 @@ class NetworkGraph extends Component {
                   return prev || value;
                 })
 
-            // IF YOU CHOOSE TO USE A DROPDOWN SINGLE VALUE, RATHER THAN LIST SORT, HERE IS CODE
+            // FOR SORT BY DROPDOWN, RATHER THAN LIST
             // if (self.props.networkSortBy === 'Significance') {
             //   return (
             //     a.data.significance - b.data.significance ||
@@ -642,6 +643,35 @@ class NetworkGraph extends Component {
                 .attr('class', 'tooltip-pieSlice')
                 .style('opacity', 0);
 
+              //Append a defs (for definition) element to your SVG
+              var defs = chartSVG.append('defs');
+
+              //most  color scale
+              var mostSignificantColorScale = d3
+                .scaleLinear()
+                .range(self.props.networkSettings.mostSignificantColorScale);
+              //Append a linearGradient element to the defs and give it a unique id
+              var mostSignificantGradient = defs
+                .append('linearGradient')
+                .attr('id', 'most-significant-linear-gradient')
+                .attr('x1', '70%')
+                .attr('y1', '70%')
+                .attr('x2', '30%')
+                .attr('y2', '30%');
+
+              //Append multiple color stops by using D3's data/enter step
+              mostSignificantGradient
+                .selectAll('stop')
+                .data(mostSignificantColorScale.range())
+                .enter()
+                .append('stop')
+                .attr('offset', function(d, i) {
+                  return i / (mostSignificantColorScale.range().length - 1);
+                })
+                .attr('stop-color', function(d) {
+                  return d;
+                });
+
               function multiple(d) {
                 let r = radiusVar(d[networkSettings.nodeSize]);
                 let node = d3.select(this);
@@ -659,8 +689,9 @@ class NetworkGraph extends Component {
                   .attr('stroke', 'black')
                   .style('fill', function(d) {
                     if (d.data.value === mostSignificantTestValue)
-                      return self.props.networkSettings
-                        .colorMostSignificantTest;
+                      // return self.props.networkSettings
+                      //   .colorMostSignificantTest;
+                      return 'url(#most-significant-linear-gradient)';
                     if (d.data.value != null) return color(d.data.value);
                     return '#d3d3d3';
                   })

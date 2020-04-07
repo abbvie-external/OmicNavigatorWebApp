@@ -483,7 +483,10 @@ class EnrichmentResultsGraph extends Component {
               largeScreen={2}
               widescreen={2}
             >
-              <Segment id="NetworkGraphSortBySegment">
+              <Segment
+                id="NetworkGraphSortBySegment"
+                className={networkGraphReady ? 'Show' : 'Hide'}
+              >
                 <Label
                   attached="top"
                   id="NetworkSortByLabel"
@@ -498,6 +501,7 @@ class EnrichmentResultsGraph extends Component {
                 >
                   {networkSortBy.map((value, index) => (
                     <SortableItem
+                      disabled={!networkGraphReady}
                       key={`item-${value}`}
                       index={index}
                       sortIndex={index}
