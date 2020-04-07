@@ -3,6 +3,7 @@ import { phosphoprotService } from '../../services/phosphoprot.service';
 import { withRouter } from 'react-router-dom';
 import ButtonActions from '../Shared/ButtonActions';
 import PepplotPlot from './PepplotPlot';
+import PepplotVolcanoPlot from './PepplotVolcanoPlot';
 import LoaderActivePlots from '../Transitions/LoaderActivePlots';
 import _ from 'lodash';
 import DOMPurify from 'dompurify';
@@ -44,7 +45,8 @@ class PepplotResults extends Component {
     isProteinSelected: false,
     isProteinSVGLoaded: false,
     itemsPerPageInformed: 100,
-    pepplotRows: this.props.pepplotResults.length || 1000
+    pepplotRows: this.props.pepplotResults.length || 1000,
+    volcanoPlotData:["Yes"]
   };
   pepplotGridRef = React.createRef();
   // PepplotViewContainerRef = React.createRef();
