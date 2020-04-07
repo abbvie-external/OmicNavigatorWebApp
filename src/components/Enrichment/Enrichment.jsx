@@ -101,9 +101,13 @@ class Enrichment extends Component {
         // '#f8e889',
         // '#deb15f',
         // '#dfb461'
+
         '#B78628',
         '#DBA514',
+        // '#e6b964',
         '#FCC201'
+        // '#DBA514'
+        // '#c79750'
       ],
       // colorHighestLinkCoefficient: '#FFD700',
       title: '',

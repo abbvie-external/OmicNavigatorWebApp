@@ -655,10 +655,10 @@ class NetworkGraph extends Component {
                 .append('linearGradient')
                 .attr('id', 'most-significant-linear-gradient')
                 // DIAGONAL GRADIENT
-                .attr('x1', '70%')
-                .attr('y1', '70%')
-                .attr('x2', '30%')
-                .attr('y2', '30%');
+                .attr('x1', '30%')
+                .attr('y1', '30%')
+                .attr('x2', '70%')
+                .attr('y2', '70%');
 
               //Append multiple color stops by using D3's data/enter step
               mostSignificantGradient
@@ -686,6 +686,11 @@ class NetworkGraph extends Component {
                   .append('svg:path')
                   .attr('d', arc.outerRadius(r).innerRadius(0))
                   .attr('opacity', 0.75)
+                  .style('opacity', function(d) {
+                    let opacity =
+                      d.data.value === mostSignificantTestValue ? 1.0 : 0.75;
+                    return opacity;
+                  })
                   .style('cursor', 'pointer')
                   .attr('stroke', 'black')
                   .style('fill', function(d) {
@@ -819,7 +824,7 @@ class NetworkGraph extends Component {
               [0, 0],
               [width, height]
             ])
-            .scaleExtent([1, 2])
+            .scaleExtent([1, 3])
             .on('zoom', zoomed)
         );
 
