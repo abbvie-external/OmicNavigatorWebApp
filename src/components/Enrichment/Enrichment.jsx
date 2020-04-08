@@ -618,6 +618,7 @@ class Enrichment extends Component {
       //   });
       // });
       .then(EMData => {
+        debugger;
         this.setState({
           // networkDataAvailable: true,
           networkData: EMData.elements,
@@ -1679,18 +1680,11 @@ class Enrichment extends Component {
     });
   };
 
-  // handleSliderChange = _.debounce(obj => {
-  //   this.setState(obj);
-  // }, 500);
-
-  handleSliderChange = (type, value) => {
-    // this.setState({
-    //   networkGraphReady: false
-    // });
+  handleSliderChange = _.debounce((type, value) => {
     this.removeNetworkSVG();
     this.setState({ [type]: value });
     sessionStorage.setItem(type, value);
-  };
+  }, 500);
 
   // handleLegendOpen = () => {
   //   // sessionStorage.setItem('legendOpen', 'true');
