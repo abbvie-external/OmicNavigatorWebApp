@@ -30,11 +30,7 @@ class ViolinPlot extends Component {
         this.windowResized();
       }, 200);
     });
-  }
-
-  componentDidUpdate() {
-    const self = this;
-    d3.select(`#svg-${self.props.violinSettings.id}`).remove();
+    d3.select(`#svg-${this.props.violinSettings.id}`).remove();
     d3.selectAll(`.violin-tooltip`).remove();
     this.makeChart();
     this.prepareData();
@@ -43,6 +39,21 @@ class ViolinPlot extends Component {
     this.renderViolinPlot({ showViolinPlot: true });
     this.renderBoxPlot({});
     this.renderDataPlots({ showPlot: true });
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.violinData !== this.props.violinData) {
+      const self = this;
+      d3.select(`#svg-${self.props.violinSettings.id}`).remove();
+      d3.selectAll(`.violin-tooltip`).remove();
+      this.makeChart();
+      this.prepareData();
+      this.prepareSettings();
+      this.prepareChart();
+      this.renderViolinPlot({ showViolinPlot: true });
+      this.renderBoxPlot({});
+      this.renderDataPlots({ showPlot: true });
+    }
   }
 
   getColorFunct = colorOptions => {
