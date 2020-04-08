@@ -24,19 +24,19 @@ class SplitPanesContainer extends Component {
       verticalSplitPaneSize:
         parseInt(sessionStorage.getItem('verticalSplitPaneSize'), 10) || 525,
       activeViolinTableIndex: 0,
-      violinDotSelected: null
+      violinDotSelected: null,
     };
   }
 
   handleSVGTabChange = activeTabIndex => {
     this.setState({
-      activeSVGTabIndex: activeTabIndex
+      activeSVGTabIndex: activeTabIndex,
     });
   };
 
   setProteinForDiffView = proteinSite => {
     this.setState({
-      proteinForDiffView: proteinSite
+      proteinForDiffView: proteinSite,
     });
   };
 
@@ -99,14 +99,17 @@ class SplitPanesContainer extends Component {
   }
 
   handleViolinDotSelected = e => {
+    console.log('violin dot selected');
+    console.log(e);
+
     this.setState({
-      violinDotSelected: 'test'
+      violinDotSelected: e,
     });
   };
 
   handleViolinTableTabChange = (e, { activeIndex }) => {
     this.setState({
-      activeViolinTableIndex: activeIndex
+      activeViolinTableIndex: activeIndex,
     });
   };
 
@@ -129,7 +132,7 @@ class SplitPanesContainer extends Component {
               {violinPlot}
             </div>
           </Tab.Pane>
-        )
+        ),
       },
       {
         menuItem: 'Statistic Table',
@@ -143,8 +146,8 @@ class SplitPanesContainer extends Component {
           >
             <FilteredPepplotTable {...this.state} {...this.props} />
           </Tab.Pane>
-        )
-      }
+        ),
+      },
     ];
 
     const onlyTablePane = [
@@ -160,8 +163,8 @@ class SplitPanesContainer extends Component {
           >
             <FilteredPepplotTable {...this.state} {...this.props} />
           </Tab.Pane>
-        )
-      }
+        ),
+      },
     ];
 
     return (
@@ -175,7 +178,7 @@ class SplitPanesContainer extends Component {
           stackable: true,
           secondary: true,
           pointing: true,
-          className: 'ViolinAndTableMenu'
+          className: 'ViolinAndTableMenu',
         }}
       />
     );
@@ -208,11 +211,11 @@ class SplitPanesContainer extends Component {
   splitPaneResized(size, paneType) {
     if (paneType === 'horizontal') {
       this.setState({
-        horizontalSplitPaneSize: size
+        horizontalSplitPaneSize: size,
       });
     } else {
       this.setState({
-        verticalSplitPaneSize: size
+        verticalSplitPaneSize: size,
       });
     }
     sessionStorage.setItem(`${paneType}SplitPaneSize`, size);

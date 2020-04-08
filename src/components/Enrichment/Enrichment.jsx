@@ -18,7 +18,7 @@ import ButtonActions from '../Shared/ButtonActions';
 import * as d3 from 'd3';
 import {
   formatNumberForDisplay,
-  splitValue
+  splitValue,
   // getIconInfo
 } from '../Shared/helpers';
 import '../Shared/Table.scss';
@@ -46,7 +46,7 @@ class Enrichment extends Component {
     activeIndexEnrichmentView: this.defaultEnrichmentActiveIndex || 0,
     multisetPlotInfo: {
       title: '',
-      svg: []
+      svg: [],
     },
     multisetPlotAvailable: false,
     animation: 'uncover',
@@ -62,7 +62,7 @@ class Enrichment extends Component {
     // networkDataAvailable: false,
     networkData: {
       nodes: [],
-      edges: []
+      edges: [],
     },
     networkDataNew: {},
     networkDataMock: {},
@@ -105,7 +105,7 @@ class Enrichment extends Component {
         '#B78628',
         '#DBA514',
         // '#e6b964',
-        '#FCC201'
+        '#FCC201',
         // '#DBA514'
         // '#c79750'
       ],
@@ -119,7 +119,7 @@ class Enrichment extends Component {
       // formattedData: {},
       // facets: []
       // propLabel: [],
-      duration: 1000
+      duration: 1000,
     },
     annotationData: [],
     enrichmentDataItem: [],
@@ -132,7 +132,7 @@ class Enrichment extends Component {
     imageInfo: {
       key: null,
       title: '',
-      svg: []
+      svg: [],
     },
     currentSVGs: [],
     isTestSelected: false,
@@ -151,33 +151,35 @@ class Enrichment extends Component {
       highLabel: {},
       lowLabel: {},
       highStat: null,
-      enableBrush: false
+      enableBrush: false,
     },
-    // violinSettings: {
-    violinData: []
-    // chartSize: { height: kLSplit.clientHeight + 25, width: kLSplit.clientWidth },
-    //   chartSize: {
-    //     height: 400,
-    //     width: 400
-    //   },
-    //   axisLabels: {
-    //     xAxis: '',
-    //     yAxis: "log<tspan baseline-shift='sub' font-size='14px'>2</tspan>(FC)"
-    //   },
-    //   id: 'violin-graph-1',
-    //   pointUniqueId: 'sample',
-    //   pointValue: 'cpm',
-    //   title: '',
-    //   subtitle: '',
-    //   tooltip: {
-    //     show: true,
-    //     fields: [
-    //       { label: 'log(FC)', value: 'cpm', toFixed: true },
-    //       { label: 'Protein', value: 'sample' }
-    //     ]
-    //   },
-    //   xName: 'tissue'
-    // }
+    violinSettings: {
+      axisLabels: {
+        xAxis: 'abs(t)',
+        yAxis: "log<tspan baseline-shift='sub' font-size='14px'>2</tspan>(FC)",
+      },
+      id: 'violin-graph-1',
+      pointUniqueId: 'sample',
+      pointValue: 'cpm',
+      title: '',
+      subtitle: '',
+      tooltip: {
+        show: true,
+        fields: [
+          { label: 'abs(t)', value: 'cpm', toFixed: true },
+          { label: 'Protien', value: 'sample' },
+        ],
+      },
+      xName: 'tissue',
+      constrainExtremes: false,
+      color: d3.scaleOrdinal(d3.schemeCategory10),
+      chartSize: { height: '700', width: '960' },
+      margin: { top: 50, right: 40, bottom: 40, left: 50 },
+      scale: 'linear',
+      yName: null,
+      yTicks: 1,
+    },
+    violinData: [],
   };
   EnrichmentViewContainerRef = React.createRef();
 
@@ -193,10 +195,10 @@ class Enrichment extends Component {
         const ResultsLength = this.state.enrichmentResults.length;
         if (ResultsLength > 0) {
           const dataItemDescription = getDataItemDescription(
-            DescriptionAndTest
+            DescriptionAndTest,
           );
           const dataItemIndex = _.findIndex(AllDescriptionsAndTests, function(
-            d
+            d,
           ) {
             return d.Description === dataItemDescription;
           });
@@ -213,7 +215,7 @@ class Enrichment extends Component {
             dataItem,
             test,
             this.testSelectedTransition,
-            this.showBarcodePlot
+            this.showBarcodePlot,
           );
         }
       }
@@ -227,7 +229,7 @@ class Enrichment extends Component {
     dataItem,
     test,
     testSelectedTransitionCb,
-    showBarcodePlotCb
+    showBarcodePlotCb,
   ) => {
     let self = this;
     testSelectedTransitionCb(true);
@@ -239,10 +241,10 @@ class Enrichment extends Component {
       .then(annotationDataResponse => {
         const annotationDataParsed = JSON.parse(annotationDataResponse);
         self.setState({
-          annotationData: annotationDataParsed
+          annotationData: annotationDataParsed,
         });
         dataItem.Annotation = _.find(annotationDataParsed, {
-          Description: dataItem.Description
+          Description: dataItem.Description,
         }).Key;
         let term = dataItem.Annotation;
 
@@ -250,11 +252,11 @@ class Enrichment extends Component {
           imageInfo: {
             ...self.state.imageInfo,
             key: `${test}:${dataItem.Description}`,
-            title: `${test}:${dataItem.Description}`
+            title: `${test}:${dataItem.Description}`,
           },
           enrichmentNameLoaded: true,
           enrichmentDataItem: dataItem,
-          enrichmentTerm: term
+          enrichmentTerm: term,
         });
 
         phosphoprotService
@@ -263,7 +265,7 @@ class Enrichment extends Component {
             enrichmentModel,
             enrichmentAnnotation,
             test,
-            dataItem.Annotation
+            dataItem.Annotation,
           )
           .then(barcodeDataResponse => {
             let BardcodeInfoObj = JSON.parse(barcodeDataResponse['object']);
@@ -281,7 +283,7 @@ class Enrichment extends Component {
 
   handleSearchTransition = bool => {
     this.setState({
-      isSearching: bool
+      isSearching: bool,
     });
   };
 
@@ -297,7 +299,7 @@ class Enrichment extends Component {
       plotButtonActive: false,
       visible: false,
       isTestSelected: false,
-      isTestDataLoaded: false
+      isTestDataLoaded: false,
     });
   };
 
@@ -310,23 +312,23 @@ class Enrichment extends Component {
         'Ferrostatin vs Untreated Differential Phosphorylation'
     ) {
       this.setState({
-        displayViolinPlot: true
+        displayViolinPlot: true,
       });
     }
     this.setState({
       plotButtonActive: false,
-      visible: false
+      visible: false,
     });
     if (scChange) {
       this.setState({
-        multisetPlotAvailable: false
+        multisetPlotAvailable: false,
       });
     }
   };
 
   disablePlot = () => {
     this.setState({
-      multisetPlotAvailable: false
+      multisetPlotAvailable: false,
     });
   };
 
@@ -338,7 +340,7 @@ class Enrichment extends Component {
       multisetPlotAvailable: false,
       plotButtonActive: false,
       visible: false,
-      displayViolinPlot: false
+      displayViolinPlot: false,
     });
   };
 
@@ -346,13 +348,13 @@ class Enrichment extends Component {
     this.setState(prevState => ({
       animation,
       visible: !prevState.visible,
-      plotButtonActive: !this.state.plotButtonActive
+      plotButtonActive: !this.state.plotButtonActive,
     }));
   };
 
   onViolinDataLoaded = bool => {
     this.setState({
-      violinDataLoaded: bool
+      violinDataLoaded: bool,
     });
   };
 
@@ -363,9 +365,9 @@ class Enrichment extends Component {
     this.setState({
       multisetPlotInfo: {
         title: multisetPlotResults.svgInfo.plotType,
-        svg: multisetPlotResults.svgInfo.svg
+        svg: multisetPlotResults.svgInfo.svg,
       },
-      multisetPlotAvailable: true
+      multisetPlotAvailable: true,
     });
   };
 
@@ -374,7 +376,7 @@ class Enrichment extends Component {
     const {
       enrichmentStudy,
       enrichmentModel,
-      enrichmentAnnotation
+      enrichmentAnnotation,
     } = this.props;
     let initConfigCols = [];
 
@@ -385,7 +387,7 @@ class Enrichment extends Component {
       padding: '1em',
       maxWidth: '50vw',
       fontSize: '13px',
-      wordBreak: 'break-all'
+      wordBreak: 'break-all',
     };
 
     let icon = '';
@@ -415,7 +417,7 @@ class Enrichment extends Component {
 
     this.setState({
       enrichmentIcon: icon,
-      enrichmentIconText: iconText
+      enrichmentIconText: iconText,
     });
 
     let allKeys = _.keys(enrResults[0]);
@@ -441,7 +443,7 @@ class Enrichment extends Component {
               />
             </div>
           );
-        }
+        },
       };
       initConfigCols.push(Col_Name_1006);
     }
@@ -474,7 +476,7 @@ class Enrichment extends Component {
                     onClick={addParams.getLink(
                       enrichmentStudy,
                       enrichmentAnnotation,
-                      item
+                      item,
                     )}
                   />
                 }
@@ -486,7 +488,7 @@ class Enrichment extends Component {
               />
             </div>
           );
-        }
+        },
       };
       initConfigCols.push(Col_Name_Description);
     }
@@ -512,7 +514,7 @@ class Enrichment extends Component {
               />
             </div>
           );
-        }
+        },
       };
       initConfigCols.push(Col_Name_Annotation);
     }
@@ -529,7 +531,7 @@ class Enrichment extends Component {
     // multiset svg rebuilds based on uData...if there are no results we need to override this from being passed down
     if (uDataRelevantFields.length !== 0) {
       this.setState({
-        uData: uDataRelevantFields
+        uData: uDataRelevantFields,
       });
     }
 
@@ -553,7 +555,7 @@ class Enrichment extends Component {
                         enrichmentModel,
                         enrichmentAnnotation,
                         item,
-                        c
+                        c,
                       )}
                     >
                       {formatNumberForDisplay(value)}
@@ -584,7 +586,7 @@ class Enrichment extends Component {
                 />
               </div>
             );
-        }
+        },
       };
     });
 
@@ -598,7 +600,7 @@ class Enrichment extends Component {
       enrichmentModel,
       enrichmentAnnotation,
       pValueType,
-      enrichmentStudy
+      enrichmentStudy,
     } = this.props;
     const pValueTypeParam = pValueType === 'adjusted' ? 0.1 : 1;
     phosphoprotService
@@ -607,7 +609,7 @@ class Enrichment extends Component {
         enrichmentAnnotation,
         '',
         pValueTypeParam,
-        enrichmentStudy + 'plots'
+        enrichmentStudy + 'plots',
       )
       // .then(EMData => {
       //   this.setState({
@@ -624,7 +626,7 @@ class Enrichment extends Component {
           tests: EMData.tests,
           networkDataNew: networkDataNew,
           totalNodes: EMData.elements.nodes.length,
-          totalEdges: EMData.elements.edges.length
+          totalEdges: EMData.elements.edges.length,
         });
         let facets = [];
         let pieData = [];
@@ -638,7 +640,7 @@ class Enrichment extends Component {
             ...this.state.networkSettings,
             facets: facets,
             propLabel: EMData.tests,
-            propData: pieData
+            propData: pieData,
             // metaLabels: ["Description", "Ontology"],
             // meta: ["EnrichmentMap_GS_DESCR", "EnrichmentMap_Name"],
             // facetAndValueLabel: ["Test", "pValue"],
@@ -657,7 +659,7 @@ class Enrichment extends Component {
             // nodeColors: ["red", "white", "blue"]
           },
           networkDataLoaded: true,
-          networkGraphReady: true
+          networkGraphReady: true,
         });
       });
   };
@@ -694,8 +696,8 @@ class Enrichment extends Component {
         highLabel: barcode[0].highLabel,
         lowLabel: barcode[0].lowLabel,
         highStat: highest,
-        enableBrush: true
-      }
+        enableBrush: true,
+      },
     });
   };
 
@@ -706,11 +708,11 @@ class Enrichment extends Component {
       const boxPlotArray = _.map(changes.brushedData, function(d) {
         d.statistic = _.find(self.state.barcodeSettings.barcodeData, {
           lineID: d.lineID,
-          id_mult: d.id_mult
+          id_mult: d.id_mult,
         }).statistic;
         d.logFC = _.find(self.state.barcodeSettings.barcodeData, {
           lineID: d.lineID,
-          id_mult: d.id_mult
+          id_mult: d.id_mult,
         }).logFC;
         return d;
       });
@@ -729,11 +731,11 @@ class Enrichment extends Component {
             cpm: datum.logFC,
             sample: datum.lineID,
             statistic: datum.statistic,
-            id_mult: datum.id_mult
+            id_mult: datum.id_mult,
           });
           return res;
         },
-        {}
+        {},
       );
 
       const vData = _.mapValues(reducedBoxPlotArray, function(v) {
@@ -752,19 +754,20 @@ class Enrichment extends Component {
         isViolinPlotLoaded: true,
         barcodeSettings: {
           ...this.state.barcodeSettings,
-          brushedData: changes.brushedData
-        }
+          brushedData: changes.brushedData,
+        },
       });
     } else {
+      console.log('in the else');
       this.setState({
         violinData: [],
         isViolinPlotLoaded: false,
         barcodeSettings: {
           ...this.state.barcodeSettings,
-          brushedData: []
+          brushedData: [],
         },
         SVGPlotLoaded: false,
-        SVGPlotLoading: false
+        SVGPlotLoading: false,
         // imageInfo: {
         //   key: null,
         //   title: '',
@@ -774,7 +777,10 @@ class Enrichment extends Component {
     }
   };
 
+  //look for violin plot
   handleMaxLinePlot = info => {
+    console.log('info is');
+    console.log(info);
     const { enrichmentStudy, enrichmentModel } = this.props;
     // let self = this;
     // if (this.state.barcodeSettings.barcodeData > 0) {
@@ -782,10 +788,10 @@ class Enrichment extends Component {
       if (this.state.barcodeSettings.barcodeData?.length > 0) {
         this.setState({
           SVGPlotLoaded: false,
-          SVGPlotLoading: true
+          SVGPlotLoading: true,
         });
         const dataItem = this.state.barcodeSettings.barcodeData.find(
-          i => i.lineID === info.lineID
+          i => i.lineID === info.lineID,
         );
         let id = dataItem.id_mult ? dataItem.id_mult : dataItem.id;
         // var psp = document.getElementById('psp-icon');
@@ -828,7 +834,7 @@ class Enrichment extends Component {
       plotCancel();
       this.setState({
         SVGPlotLoaded: false,
-        SVGPlotLoading: false
+        SVGPlotLoading: false,
         // imageInfo: {
         //   ...this.state.imageInfo,
         //   svg: []
@@ -860,19 +866,19 @@ class Enrichment extends Component {
           plotType[i],
           enrichmentStudy + 'plots',
           undefined,
-          cancelToken
+          cancelToken,
         )
         .then(svgMarkupObj => {
           let svgMarkup = svgMarkupObj.data;
           svgMarkup = svgMarkup.replace(/id="/g, 'id="' + id + '-' + i + '-');
           svgMarkup = svgMarkup.replace(
             /#glyph/g,
-            '#' + id + '-' + i + '-glyph'
+            '#' + id + '-' + i + '-glyph',
           );
           svgMarkup = svgMarkup.replace(/#clip/g, '#' + id + '-' + i + '-clip');
           svgMarkup = svgMarkup.replace(
             /<svg/g,
-            `<svg preserveAspectRatio="xMinYMin meet" style="width:${EnrichmentPlotSVGWidth}px" height:${EnrichmentPlotSVGHeight} id="currentSVG-${id}-${i}"`
+            `<svg preserveAspectRatio="xMinYMin meet" style="width:${EnrichmentPlotSVGWidth}px" height:${EnrichmentPlotSVGHeight} id="currentSVG-${id}-${i}"`,
           );
           DOMPurify.addHook('afterSanitizeAttributes', function(node) {
             if (
@@ -884,7 +890,7 @@ class Enrichment extends Component {
           });
           // Clean HTML string and write into our DIV
           let sanitizedSVG = DOMPurify.sanitize(svgMarkup, {
-            ADD_TAGS: ['use']
+            ADD_TAGS: ['use'],
           });
           let svgInfo = { plotType: plotType[i], svg: sanitizedSVG };
 
@@ -907,7 +913,7 @@ class Enrichment extends Component {
     this.setState({
       imageInfo: imageInfo,
       SVGPlotLoaded: true,
-      SVGPlotLoading: false
+      SVGPlotLoading: false,
     });
   };
 
@@ -916,7 +922,7 @@ class Enrichment extends Component {
     enrichmentModel,
     enrichmentAnnotation,
     dataItem,
-    test
+    test,
   ) => {
     this.testSelectedTransition(true);
     const TestSiteVar = `${test}:${dataItem.Description}`;
@@ -925,9 +931,9 @@ class Enrichment extends Component {
         enrichmentStudy: this.props.enrichmentStudy || '',
         enrichmentModel: this.props.enrichmentModel || '',
         enrichmentAnnotation: this.props.enrichmentAnnotation || '',
-        enrichmentDescriptionAndTest: TestSiteVar || ''
+        enrichmentDescriptionAndTest: TestSiteVar || '',
       },
-      true
+      true,
     );
     // let xLargest = 0;
     // let imageInfo = { key: '', title: '', svg: [] };
@@ -937,10 +943,10 @@ class Enrichment extends Component {
       .then(annotationDataResponse => {
         const annotationDataParsed = JSON.parse(annotationDataResponse);
         this.setState({
-          annotationData: annotationDataParsed
+          annotationData: annotationDataParsed,
         });
         dataItem.Annotation = _.find(annotationDataParsed, {
-          Description: dataItem.Description
+          Description: dataItem.Description,
         }).Key;
         let term = dataItem.Annotation;
 
@@ -949,11 +955,11 @@ class Enrichment extends Component {
             ...this.state.imageInfo,
             key: `${test}:${dataItem.Description}`,
             title: `${test}:${dataItem.Description}`,
-            dataItem: dataItem
+            dataItem: dataItem,
           },
           enrichmentNameLoaded: true,
           enrichmentDataItem: dataItem,
-          enrichmentTerm: term
+          enrichmentTerm: term,
         });
 
         phosphoprotService
@@ -962,7 +968,7 @@ class Enrichment extends Component {
             enrichmentModel,
             enrichmentAnnotation,
             test,
-            dataItem.Annotation
+            dataItem.Annotation,
           )
           .then(barcodeDataResponse => {
             let BardcodeInfoObj = JSON.parse(barcodeDataResponse['object']);
@@ -985,7 +991,7 @@ class Enrichment extends Component {
       enrichmentModel,
       enrichmentAnnotation,
       dataItem,
-      test
+      test,
     ) => {
       let self = this;
       return function() {
@@ -994,7 +1000,7 @@ class Enrichment extends Component {
           enrichmentModel,
           enrichmentAnnotation,
           dataItem,
-          test
+          test,
         );
         //stored annodationdata and won't call the service after the first time...reset it when sc changes
         // } else {
@@ -1046,25 +1052,25 @@ class Enrichment extends Component {
             .then(annotationDataResponse => {
               const annotationDataParsed = JSON.parse(annotationDataResponse);
               dataItem.Annotation = _.find(annotationDataParsed, {
-                Description: dataItem.Description
+                Description: dataItem.Description,
               }).Key;
               const database = enrichmentAnnotation;
               if (database === 'REACTOME') {
                 window.open(
                   'https://reactome.org/content/detail/' + dataItem.Annotation,
-                  '_blank'
+                  '_blank',
                 );
               } else if (database.substring(0, 2) === 'GO') {
                 window.open(
                   'http://amigo.geneontology.org/amigo/term/' +
                     dataItem.Annotation,
-                  '_blank'
+                  '_blank',
                 );
               } else if (database.substring(0, 4) === 'msig') {
                 window.open(
                   'http://software.broadinstitute.org/gsea/msigdb/cards/' +
                     dataItem.Annotation,
-                  '_blank'
+                  '_blank',
                 );
               } else if (database === 'PSP') {
                 self.showPhosphositePlus('', dataItem);
@@ -1072,24 +1078,24 @@ class Enrichment extends Component {
             });
         } else {
           dataItem.Annotation = _.find(self.state.annotationData, {
-            Description: dataItem.Description
+            Description: dataItem.Description,
           }).Key;
           const database = enrichmentAnnotation;
           if (database === 'REACTOME') {
             window.open(
               'https://reactome.org/content/detail/' + dataItem.Annotation,
-              '_blank'
+              '_blank',
             );
           } else if (database.substring(0, 2) === 'GO') {
             window.open(
               'http://amigo.geneontology.org/amigo/term/' + dataItem.Annotation,
-              '_blank'
+              '_blank',
             );
           } else if (database.substring(0, 4) === 'msig') {
             window.open(
               'http://software.broadinstitute.org/gsea/msigdb/cards/' +
                 dataItem.Annotation,
-              '_blank'
+              '_blank',
             );
           } else if (database === 'PSP') {
             self.showPhosphositePlus('', dataItem);
@@ -1099,7 +1105,7 @@ class Enrichment extends Component {
     };
 
     this.setState({
-      additionalTemplateInfoEnrichmentTable: addParams
+      additionalTemplateInfoEnrichmentTable: addParams,
     });
   };
 
@@ -1475,29 +1481,29 @@ class Enrichment extends Component {
       imageInfo: {
         key: null,
         title: '',
-        svg: []
-      }
+        svg: [],
+      },
     });
     this.handleSearchCriteriaChange(
       {
         enrichmentStudy: this.props.enrichmentStudy || '',
         enrichmentModel: this.props.enrichmentModel || '',
         enrichmentAnnotation: this.props.enrichmentAnnotation || '',
-        enrichmentDescriptionAndTest: ''
+        enrichmentDescriptionAndTest: '',
       },
-      false
+      false,
     );
   };
 
   testSelectedTransition = bool => {
     this.setState({
-      isTestSelected: bool
+      isTestSelected: bool,
     });
   };
 
   informItemsPerPage = items => {
     this.setState({
-      itemsPerPageInformedEnrichmentMain: items
+      itemsPerPageInformedEnrichmentMain: items,
     });
   };
 
@@ -1539,7 +1545,7 @@ class Enrichment extends Component {
           renderActiveOnly={false}
           menu={{
             attached: true,
-            className: 'TableAndNetworkMenuContainer'
+            className: 'TableAndNetworkMenuContainer',
             // tabular: false
             // stackable: true,
             // secondary: true,
@@ -1597,7 +1603,7 @@ class Enrichment extends Component {
               onDisplayViolinPlot={this.displayViolinPlot}
             />
           </Tab.Pane>
-        )
+        ),
       },
       {
         menuItem: (
@@ -1641,14 +1647,14 @@ class Enrichment extends Component {
               onCreateLegend={this.createLegend}
             />
           </Tab.Pane>
-        )
-      }
+        ),
+      },
     ];
   };
 
   handleNetworkGraphReady = bool => {
     this.setState({
-      networkGraphReady: bool
+      networkGraphReady: bool,
     });
   };
 
@@ -1661,7 +1667,7 @@ class Enrichment extends Component {
   handleTotals = (filteredNodesLength, filteredEdgesLength) => {
     this.setState({
       filteredNodesTotal: filteredNodesLength,
-      filteredEdgesTotal: filteredEdgesLength
+      filteredEdgesTotal: filteredEdgesLength,
     });
   };
 
@@ -1674,7 +1680,7 @@ class Enrichment extends Component {
   handleNetworkCutoffInputChange = (evt, { name, value }) => {
     this.removeNetworkSVG();
     this.setState({
-      [name]: value
+      [name]: value,
       // networkGraphReady: false
     });
   };
