@@ -69,7 +69,9 @@ class Enrichment extends Component {
     networkDataLoaded: false,
     networkGraphReady: false,
     tests: {},
+    // nodeCutoff: sessionStorage.getItem('nodeCutoff') || 0.1,
     nodeCutoff: sessionStorage.getItem('nodeCutoff') || 0.1,
+    // edgeCutoff: sessionStorage.getItem('edgeCutoff') || 0.375,
     edgeCutoff: sessionStorage.getItem('edgeCutoff') || 0.375,
     filteredNodesTotal: 0,
     filteredEdgesTotal: 0,
@@ -1672,7 +1674,16 @@ class Enrichment extends Component {
   //   });
   // }, 500);
 
+  // handleNetworkCutoffInputChange = _.debounce((evt, { name, value }) => {
+  //   this.removeNetworkSVG();
+  //   this.setState({
+  //     [name]: value
+  //     // networkGraphReady: false
+  //   });
+  // }, 500);
+
   handleNetworkCutoffInputChange = (evt, { name, value }) => {
+    debugger;
     this.removeNetworkSVG();
     this.setState({
       [name]: value
@@ -1681,8 +1692,11 @@ class Enrichment extends Component {
   };
 
   handleSliderChange = _.debounce((type, value) => {
-    this.removeNetworkSVG();
-    this.setState({ [type]: value });
+    debugger;
+    if (this.state[type] !== value) {
+      this.removeNetworkSVG();
+      this.setState({ [type]: value });
+    }
     sessionStorage.setItem(type, value);
   }, 500);
 

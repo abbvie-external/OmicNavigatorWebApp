@@ -158,15 +158,15 @@
 //   }
 // }
 
-// .ScreenSizeBreak {
-//   display: none !important;
-// }
+.DisplayOnLarge {
+  display: none !important;
+}
 
-// @media (max-width: 1199px) {
-//   .ScreenSizeBreak {
-//     display: inline !important;
-//   }
-// }
+@media (min-width: 1599px) {
+  .DisplayOnLarge {
+    display: inline !important;
+  }
+}
 
 .NetworkInputLabel {
   margin-right: -1px !important;
@@ -194,66 +194,78 @@
   color: var(--color-white) !important;
   // color: rgba(0, 0, 0, 0.6) !important;
 
-  #NetworkGraphSortBySegment {
-    width: 100% !important;
-    height: auto !important;
-    max-width: 145px !important;
-    padding: 0px;
-    margin: 0 auto;
+  // #NetworkGraphSortBySegment {
+  //   width: 100% !important;
+  //   height: auto !important;
+  //   max-width: 145px !important;
+  //   padding: 0px;
+  //   margin: 0 auto;
 
-    #NetworkSortByLabel {
-      // background-color: var(--color-primary) !important;
-      background-color: var(--color-dark) !important;
-      color: white !important;
-      // width: 90px !important;
-      // margin-left: -90px !important;
-      text-align: center !important;
-    }
+  #NetworkSortByLabel {
+    // background-color: var(--color-primary) !important;
+    background-color: var(--color-dark) !important;
+    color: white !important;
+    // width: 90px !important;
+    // margin-left: -90px !important;
+    text-align: center !important;
+  }
 
-    // @media (min-width: 1200px) and (max-width: 1599px) {
-    //   #NetworkSortByLabel {
-    //     margin-left: -100px !important;
-    //   }
-    // }
-    // @media (min-width: 1600) and (max-width: 2599px) {
-    //   #NetworkSortByLabel {
-    //     margin-left: -110px !important;
-    //   }
-    // }
-    // @media (min-width: 2600px) {
-    //   #NetworkSortByLabel {
-    //     margin-left: -115px !important;
-    //   }
-    // }
+  // @media (min-width: 1200px) and (max-width: 1599px) {
+  //   #NetworkSortByLabel {
+  //     margin-left: -100px !important;
+  //   }
+  // }
+  // @media (min-width: 1600) and (max-width: 2599px) {
+  //   #NetworkSortByLabel {
+  //     margin-left: -110px !important;
+  //   }
+  // }
+  // @media (min-width: 2600px) {
+  //   #NetworkSortByLabel {
+  //     margin-left: -115px !important;
+  //   }
+  // }
 
-    #NetworkGraphSortByText {
-      color: var(--color-light) !important;
-    }
-    ul {
-      padding: 12px 0px 0px 12px !important;
-    }
-    ul li {
-      list-style: none;
-      margin-bottom: 8px;
-      cursor: grab;
-    }
-    #NetworkGraphSortableLink {
-      list-style: none;
-      margin-bottom: 5px;
-      cursor: grab;
-    }
+  // .ui.secondary.menu
+  // #NetworkGraphSortByMenu {
+  //   border: 1px solid rgba(34, 36, 38, 0.15);
+  //   border-radius: 0px 0.28571429rem 0.28571429rem 0px;
+  //   margin-right: 1.75rem;
+  // }
 
-    .NoSelect {
-      -webkit-touch-callout: none; /* iOS Safari */
-      -webkit-user-select: none; /* Safari */
-      -khtml-user-select: none; /* Konqueror HTML */
-      -moz-user-select: none; /* Old versions of Firefox */
-      -ms-user-select: none; /* Internet Explorer/Edge */
-      user-select: none; /* Non-prefixed version, currently
+  #NetworkGraphSortByText {
+    color: var(--color-light) !important;
+  }
+  ul {
+    padding: 0px 10px 0px 10px !important;
+  }
+  ul li {
+    list-style: none;
+    margin-bottom: 8px;
+    cursor: grab;
+  }
+
+  .NetworkGraphSortableListLabel {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+  }
+  #NetworkGraphSortableList {
+    list-style: none;
+    margin-bottom: 5px;
+    cursor: grab;
+  }
+
+  .NoSelect {
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Old versions of Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently
                                   supported by Chrome, Opera and Firefox */
-    }
   }
 }
+//}
 
 .LoaderActivePlotsNetwork {
   height: 100vh !important;
