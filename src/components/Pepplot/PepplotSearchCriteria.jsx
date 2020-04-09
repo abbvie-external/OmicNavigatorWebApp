@@ -622,12 +622,14 @@ class PepplotSearchCriteria extends Component {
                 name="line graph"
                 size="large"
                 className="StudyHtmlIcon"
+                inverted
                 circular
               />
             </a>
           }
-          // style={StudyPopupStyle}
+          style={StudyPopupStyle}
           className="CustomTooltip"
+          inverted
           basic
           position="bottom center"
           content={studyName}
@@ -641,6 +643,7 @@ class PepplotSearchCriteria extends Component {
               <Icon name="line graph" size="large" circular inverted disabled />
             </a>
           }
+          style={StudyPopupStyle}
           basic
           className="CustomTooltip"
           position="bottom center"

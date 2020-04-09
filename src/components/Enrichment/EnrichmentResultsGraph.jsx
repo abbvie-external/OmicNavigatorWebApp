@@ -494,15 +494,30 @@ class EnrichmentResultsGraph extends Component {
               largeScreen={3}
               widescreen={3}
             >
-              <Menu id="NetworkGraphSortByMenu" secondary size={dynamicSize}>
-                <Label className="NetworkInputLabel" size={dynamicSize}>
-                  SORT
-                  <br></br>
-                  BY
-                </Label>
+              <Menu
+                id="NetworkGraphSortByMenu"
+                className={networkGraphReady ? 'Show' : 'Hide'}
+                // secondary
+                size={dynamicSize}
+              >
+                <Popup
+                  trigger={
+                    <Label className="NetworkInputLabel" size={dynamicSize}>
+                      SORT
+                      <br></br>
+                      BY
+                    </Label>
+                  }
+                  style={CustomPopupStyle}
+                  content="Drag and drop list determines the order in which clusters of nodes will be sorted, left to right."
+                  inverted
+                  basic
+                  position="left center"
+                />
                 <Dropdown
                   item
                   size={dynamicSize}
+                  disabled={!networkGraphReady}
                   text={getItemName(networkSortBy[0])}
                 >
                   <Dropdown.Menu>

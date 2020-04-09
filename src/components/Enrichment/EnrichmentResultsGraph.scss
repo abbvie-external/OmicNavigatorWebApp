@@ -232,6 +232,27 @@
   //   border-radius: 0px 0.28571429rem 0.28571429rem 0px;
   //   margin-right: 1.75rem;
   // }
+  // #NetworkGraphSortByMenu {
+  //   .item:before {
+  //     width: 0px;
+  //   }
+  //   #NetworkGraphSortByMenu:last-child {
+  //     display: inline-flex;
+  //     width: 0px;
+  //     box-shadow: none;
+  //     border: 1px solid rgba(34, 36, 38, 0.15);
+  //   }
+  // }
+
+  .ui.menu .item:before {
+    width: 0px;
+  }
+  .ui.menu:last-child {
+    display: inline-flex;
+    /* width: 0px; */
+    border: 1px solid rgba(34, 36, 38, 0.15);
+    box-shadow: none;
+  }
 
   #NetworkGraphSortByText {
     color: var(--color-light) !important;
