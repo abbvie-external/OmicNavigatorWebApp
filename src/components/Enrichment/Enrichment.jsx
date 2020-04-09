@@ -620,7 +620,6 @@ class Enrichment extends Component {
       //   });
       // });
       .then(EMData => {
-        debugger;
         this.setState({
           // networkDataAvailable: true,
           networkData: EMData.elements,
@@ -1683,7 +1682,6 @@ class Enrichment extends Component {
   // }, 500);
 
   handleNetworkCutoffInputChange = (evt, { name, value }) => {
-    debugger;
     this.removeNetworkSVG();
     this.setState({
       [name]: value
@@ -1692,7 +1690,6 @@ class Enrichment extends Component {
   };
 
   handleSliderChange = _.debounce((type, value) => {
-    debugger;
     if (this.state[type] !== value) {
       this.removeNetworkSVG();
       this.setState({ [type]: value });

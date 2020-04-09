@@ -133,7 +133,7 @@
 
 @media (min-width: 1200px) and (max-width: 1599px) {
   .NetworkSliderAndTotalsDiv {
-    max-width: 180px !important;
+    max-width: 155px !important;
   }
 }
 
@@ -285,13 +285,17 @@
   color: var(--color-dark) !important;
 }
 
-#LegendColumn {
-  // #TotalsColumn {
-  margin-top: -25px !important;
+#LegendColumn,
+#TotalsColumn {
+  margin-top: -10px !important;
+}
+
+.NodeEdgeTotals {
+  margin-bottom: 5px;
+  float: right !important;
 }
 
 #LegendIconButton {
-  // margin-top: -10px;
   margin-bottom: 5px;
 }
 
@@ -322,14 +326,4 @@
 
 .filled {
   fill: url(#mainGradient);
-}
-
-.NodeEdgeTotals {
-  margin-top: 10px !important;
-  float: right !important;
-}
-
-#LegendColumn {
-  // #TotalsColumn {
-  margin-top: -25px !important;
 }

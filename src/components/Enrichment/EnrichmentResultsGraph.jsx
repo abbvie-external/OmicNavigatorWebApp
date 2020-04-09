@@ -49,12 +49,12 @@ function getDynamicLegend() {
       padding: '1em',
       width: '250px'
     };
-    // else if (w > 767 && w < 1600) {
-    //   return {
-    //     padding: '1em',
-    //     width: '350px'
-    //   };
-    // } else if (w > 1599 && w < 2600) {
+  } else if (w > 767 && w < 1600) {
+    return {
+      padding: '1em',
+      width: '300px'
+    };
+    // else if (w > 1599 && w < 2600) {
     //   return {
     //     padding: '1em',
     //     width: '450px'
@@ -347,8 +347,8 @@ class EnrichmentResultsGraph extends Component {
               // className="NetworkGraphFilters"
               mobile={16}
               tablet={10}
-              largeScreen={3}
-              widescreen={3}
+              largeScreen={4}
+              widescreen={4}
             >
               <Search
                 disabled={!networkGraphReady}
@@ -427,21 +427,6 @@ class EnrichmentResultsGraph extends Component {
                     }
                   }}
                 />
-                <div
-                  className={networkGraphReady ? 'Show NodeEdgeTotals' : 'Hide'}
-                >
-                  <Popup
-                    trigger={
-                      <Label size={dynamicSize}>
-                        {filteredNodesTotal} of {totalNodes} Nodes
-                      </Label>
-                    }
-                    style={CustomPopupStyle}
-                    content="Number of nodes meeting current filter requirements, of total nodes without filters"
-                    inverted
-                    position="left center"
-                  />
-                </div>
               </div>
             </Grid.Column>
             <Grid.Column
@@ -499,21 +484,6 @@ class EnrichmentResultsGraph extends Component {
                     }
                   }}
                 />
-                <span
-                  className={networkGraphReady ? 'Show NodeEdgeTotals' : 'Hide'}
-                >
-                  <Popup
-                    trigger={
-                      <Label size={dynamicSize}>
-                        {filteredEdgesTotal} of {totalEdges} Edges
-                      </Label>
-                    }
-                    style={CustomPopupStyle}
-                    content="Number of edges meeting current filter requirements, of total edges without filters"
-                    inverted
-                    position="left center"
-                  />
-                </span>
               </div>
             </Grid.Column>
             <Grid.Column
@@ -573,7 +543,7 @@ class EnrichmentResultsGraph extends Component {
                     // color="blue"
                     id="LegendIconButton"
                     className={networkGraphReady ? 'Show' : 'Hide'}
-                    size={dynamicSize}
+                    size="mini"
                   >
                     Legend
                     <Icon name="info" />
@@ -593,25 +563,40 @@ class EnrichmentResultsGraph extends Component {
                 <Popup.Content className="legend"></Popup.Content>
               </Popup>
             </Grid.Column>
-            {/* <Grid.Column
+            <Grid.Column
               id="TotalsColumn"
               mobile={8}
               tablet={8}
               largeScreen={8}
               widescreen={8}
             >
-              <span
-                id="NodeEdgeTotals"
-                className={networkGraphReady ? 'Show' : 'Hide'}
+              <div
+                className={networkGraphReady ? 'Show NodeEdgeTotals' : 'Hide'}
               >
-                <Label>
-                  {filteredNodesTotal} of {totalNodes} Nodes
-                </Label>
-                <Label>
-                  {filteredEdgesTotal} of {totalEdges} Edges
-                </Label>
-              </span>
-            </Grid.Column> */}
+                <Popup
+                  trigger={
+                    <Label size={dynamicSize}>
+                      {filteredNodesTotal} of {totalNodes} Nodes
+                    </Label>
+                  }
+                  style={CustomPopupStyle}
+                  content="Number of nodes meeting current filter requirements, of total nodes without filters"
+                  inverted
+                  position="left center"
+                />
+                <Popup
+                  trigger={
+                    <Label size={dynamicSize}>
+                      {filteredEdgesTotal} of {totalEdges} Edges
+                    </Label>
+                  }
+                  style={CustomPopupStyle}
+                  content="Number of edges meeting current filter requirements, of total edges without filters"
+                  inverted
+                  position="left center"
+                />
+              </div>
+            </Grid.Column>
             <Grid.Column
               className=""
               mobile={16}
