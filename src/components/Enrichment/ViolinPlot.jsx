@@ -1,67 +1,28 @@
-import React, { Component, Fragment } from 'react';
+/* eslint-disable react/state-in-constructor */
+import React, { Component } from 'react';
 // import PropTypes from 'prop-types';
 // import { Provider as BusProvider, useBus, useListener } from 'react-bus';
 import * as d3 from 'd3';
-// import * as _ from "lodash";
+import * as _ from 'lodash';
 // import { select } from "d3-selection";
 import './ViolinPlot.scss';
 
 class ViolinPlot extends Component {
   state = {
     violinContainerHeight: 0,
-    violinContainerWidth: 0,
     violinHeight: 0,
-    colorFunct: null,
-    violinPlots: {},
-    dataPlots: {},
-    boxPlots: {},
-    groupObjs: {},
-    objs: {
-      mainDiv: null,
-      chartDiv: null,
-      g: null,
-      xAxis: null,
-      yAxis: null,
-      brush: null,
-      tooltip: null
-    },
-    settings: {
-      axisLabels: {
-        xAxis: this.props.enrichmentTerm,
-        yAxis: "log<tspan baselineShift='sub' fontSize='13px'>2</tspan>(FC)"
-      },
-      constrainExtremes: false,
-      color: d3.scaleOrdinal(d3.schemeCategory10),
-      id: 'chart-violin',
-      // id: 'violin-graph-1',
-      margin: { top: 50, right: 40, bottom: 40, left: 50 },
-      pointUniqueId: 'sample',
-      pointValue: 'cpm',
-      scale: 'linear',
-      subtitle: '',
-      title: '',
-      tooltip: {
-        show: true,
-        fields: [
-          { label: 'log(FC)', value: 'cpm', toFixed: true },
-          { label: 'Protien', value: 'sample' }
-        ]
-      },
-      // tooltip: {
-      //   show: true,
-      //   fields: [{ label: 'label1', value: 'value1', toFixed: true }]
-      // },
-      // xName: null,
-      xName: 'tissue',
-      yName: null,
-      yTicks: 1
-    }
+    violinContainerWidth: 0,
+    violinWidth: 0,
   };
+
+  chart = {};
+
+  maxCircle;
+
   violinContainerRef = React.createRef();
-  violinSVGRef = React.createRef();
 
   componentDidMount() {
-    this.setHeight();
+    this.setDimensions();
     let resizedFn;
     window.addEventListener('resize', () => {
       clearTimeout(resizedFn);
@@ -69,252 +30,1473 @@ class ViolinPlot extends Component {
         this.windowResized();
       }, 200);
     });
+    d3.select(`#svg-${this.props.violinSettings.id}`).remove();
+    d3.selectAll(`.violin-tooltip`).remove();
+    this.makeChart();
+    this.prepareData();
+    this.prepareSettings();
+    this.prepareChart();
+    this.renderViolinPlot({ showViolinPlot: true });
+    this.renderBoxPlot({});
+    this.renderDataPlots({ showPlot: true });
   }
 
-  componentDidUpdate(prevProps, prevState, snapshot) {
-    if (
-      // this.props.violinData !== prevProps.violinData ||
-      this.props.verticalSplitPaneSize !== prevProps.verticalSplitPaneSize
-    ) {
-      this.setHeight();
+  componentDidUpdate(prevProps) {
+    if (prevProps.violinData !== this.props.violinData) {
+      const self = this;
+      d3.select(`#svg-${self.props.violinSettings.id}`).remove();
+      d3.selectAll(`.violin-tooltip`).remove();
+      this.makeChart();
+      this.prepareData();
+      this.prepareSettings();
+      this.prepareChart();
+      this.renderViolinPlot({ showViolinPlot: true });
+      this.renderBoxPlot({});
+      this.renderDataPlots({ showPlot: true });
     }
   }
 
-  windowResized = () => {
-    this.setHeight();
+  getColorFunct = colorOptions => {
+    const self = this;
+    if (typeof colorOptions === 'function') {
+      return colorOptions;
+    }
+    if (Array.isArray(colorOptions)) {
+      //  If an array is provided, map it to the domain
+      const colorMap = {};
+      let cColor = 0;
+      Object.keys(self.chart.groupObjs).forEach(key => {
+        if (Object.prototype.hasOwnProperty.call(self.chart.groupObjs, key)) {
+          colorMap[key] = colorOptions[cColor];
+          cColor = (cColor + 1) % colorOptions.length;
+        }
+      });
+      return group => {
+        return colorMap[group];
+      };
+    }
+    if (typeof colorOptions === 'object') {
+      // if an object is provided, assume it maps to  the colors
+      return group => {
+        return colorOptions[group];
+      };
+    }
+    return d3.scaleOrdinal(d3.schemeCategory10);
   };
 
-  setHeight = () => {
-    const containerHeight = this.getHeight();
+  shallowCopy = oldObj => {
+    const newObj = {};
+    Object.keys(oldObj).forEach(key => {
+      if (Object.prototype.hasOwnProperty.call(oldObj, key)) {
+        newObj[key] = oldObj[key];
+      }
+    });
+    return newObj;
+  };
+
+  kernelDensityEstimator = (kernel, x) => {
+    return sample => {
+      return x.map(x1 => {
+        return {
+          x: x1,
+          y: d3.mean(sample, v => {
+            return kernel(x1 - v);
+          }),
+        };
+      });
+    };
+  };
+
+  eKernel = scale => {
+    return u => {
+      let u2 = u;
+      u2 /= scale;
+      // gaussian
+      return (1 / Math.sqrt(2 * Math.PI)) * Math.exp(-0.5 * u2 * u2);
+    };
+  };
+
+  // Used to find the roots for adjusting violin axis
+  // Given an array, find the value for a single point, even if it is not in the domain
+  eKernelTest = (kernel, array) => {
+    return testX => {
+      return d3.mean(array, v => {
+        return kernel(testX - v);
+      });
+    };
+  };
+
+  getObjWidth = (objWidth, gName, self) => {
+    const objSize = { left: null, right: null, middle: null };
+    const width = self.chart.xScale.bandwidth() * (objWidth / 100);
+    const padding = (self.chart.xScale.bandwidth() - width) / 2;
+    const gShift = self.chart.xScale(gName);
+    objSize.middle = self.chart.xScale.bandwidth() / 2 + gShift;
+    objSize.left = padding + gShift;
+    objSize.right = objSize.left + width;
+    return objSize;
+  };
+
+  getMaxStat = array => {
+    // finds the highest value based on t statistics
+    // used to figure out which dot gets highlighted
+
+    const statArray = array.map(o => {
+      return o.statistic;
+    });
+    const max = Math.max(...statArray);
+    return max;
+  };
+
+  addToolTiptoMax = id => {
+    const self = this;
+    const cx = Math.ceil(
+      d3
+        .select(`#violin_${self.getCircleId(id.sample, id.id_mult)}`)
+        .attr('cx'),
+    );
+    const cy = Math.ceil(
+      d3
+        .select(`#violin_${self.getCircleId(id.sample, id.id_mult)}`)
+        .attr('cy'),
+    );
+
+    const svg = document.getElementById('svg-violin-graph-1');
+
+    const parent = document
+      .getElementById('violin-graph-1')
+      .getBoundingClientRect();
+    const shape = document
+      .getElementById(`violin_${self.getCircleId(id.sample, id.id_mult)}`)
+      .getBoundingClientRect();
+    const relative = shape.left - parent.left;
+
+    const res = self.getPos(cx, cy, svg, svg);
+
+    self.chart.objs.tooltip
+      .transition()
+      .duration(300)
+      .style('left', `${relative + 20}px`)
+      .style('top', `${res.y + 20}px`)
+      .style('opacity', () => {
+        return 1;
+      })
+      .style('display', null);
+
+    this.tooltipHover(id);
+  };
+
+  getPos = (x, y, svg, element) => {
+    const p = svg.createSVGPoint();
+    const ctm = element.getCTM();
+    p.x = x;
+    p.y = y;
+    return p.matrixTransform(ctm);
+  };
+
+  getCircleId = (id, idMult) => {
+    if (id && idMult) {
+      return `${id.replace(/\;/g, '_')}_${idMult}`;
+    }
+    return null;
+  };
+
+  addJitter = (doJitter, width) => {
+    if (doJitter !== true || width === 0) {
+      return 0;
+    }
+    return Math.floor(Math.random() * width) - width / 2;
+  };
+
+  tooltipHover = d => {
+    const self = this;
+    const tooltipFields = self.props.violinSettings.tooltip.fields;
+
+    let tooltipString = '';
+    _.forEach(tooltipFields, field => {
+      tooltipString += `<span>${field.label} = ${d[field.value]}</span><br/>`;
+    });
+
+    self.chart.objs.tooltip.html(tooltipString);
+    self.chart.objs.tooltip.style('z-index', 100);
+  };
+
+  makeChart = () => {
+    const self = this;
+    self.chart.data = self.props.violinData;
+
+    self.chart.groupObjs = {}; // The data organized by grouping and sorted as well as any metadata for the groups
+    self.chart.objs = {
+      mainDiv: null,
+      chartDiv: null,
+      g: null,
+      xAxis: null,
+      yAxis: null,
+      brush: null,
+      tooltip: null,
+    };
+    self.chart.colorFunct = null;
+  };
+
+  prepareData = () => {
+    const self = this;
+    function calcMetrics(values) {
+      const metrics = {
+        // These are the original non-scaled values
+        max: null,
+        upperOuterFence: null,
+        upperInnerFence: null,
+        quartile3: null,
+        median: null,
+        mean: null,
+        iqr: null,
+        quartile1: null,
+        lowerInnerFence: null,
+        lowerOuterFence: null,
+        std: null,
+        variance: null,
+        n: null,
+        min: null,
+        bw: null,
+      };
+
+      metrics.min = d3.min(values);
+      metrics.quartile1 = d3.quantile(values, 0.25);
+      metrics.median = d3.median(values);
+      metrics.mean = d3.mean(values);
+      metrics.quartile3 = d3.quantile(values, 0.75);
+      metrics.max = d3.max(values);
+      metrics.iqr = metrics.quartile3 - metrics.quartile1;
+      metrics.std = d3.deviation(values);
+      metrics.variance = d3.variance(values);
+      metrics.n = values.length;
+      metrics.bw =
+        0.9 * d3.min([metrics.std, metrics.iqr / 1.349]) * metrics.n ** -0.2;
+
+      // The inner fences are the closest value to the IQR without going past it (assumes sorted lists)
+      const LIF = metrics.quartile1 - 1.5 * metrics.iqr;
+      const UIF = metrics.quartile3 + 1.5 * metrics.iqr;
+      for (let i = 0; i <= values.length; i += 1) {
+        if (values[i] < LIF) {
+          continue;
+        }
+        if (!metrics.lowerInnerFence && values[i] >= LIF) {
+          metrics.lowerInnerFence = values[i];
+          continue;
+        }
+        if (values[i] > UIF) {
+          metrics.upperInnerFence = values[i - 1];
+          break;
+        }
+      }
+
+      metrics.lowerOuterFence = metrics.quartile1 - 3 * metrics.iqr;
+      metrics.upperOuterFence = metrics.quartile3 + 3 * metrics.iqr;
+      if (!metrics.lowerInnerFence) {
+        metrics.lowerInnerFence = metrics.min;
+      }
+      if (!metrics.upperInnerFence) {
+        metrics.upperInnerFence = metrics.max;
+      }
+      return metrics;
+    }
+
+    self.chart.groupObjs = self.chart.data;
+
+    Object.keys(self.chart.groupObjs).forEach(key => {
+      if (Object.prototype.hasOwnProperty.call(self.chart.groupObjs, key)) {
+        const pointValues = self.chart.groupObjs[key].values.map(
+          d => d[self.props.violinSettings.pointValue],
+        );
+        pointValues.sort(d3.ascending);
+        self.chart.groupObjs[key].metrics = {};
+        self.chart.groupObjs[key].metrics = calcMetrics(pointValues);
+      }
+    });
+  };
+
+  prepareSettings = () => {
+    const self = this;
+    function formatAsFloat(d) {
+      if (d % 1 !== 0) {
+        return d3.format('.2f')(d);
+      }
+      return d3.format('.0f')(d);
+    }
+
+    // Set base settings
+    self.chart.margin = self.props.violinSettings.margin;
+    self.chart.divWidth = self.props.violinSettings.chartSize.width;
+    self.chart.divHeight = self.props.violinSettings.chartSize.height;
+
+    self.chart.width =
+      self.props.violinSettings.chartSize.width -
+      self.props.violinSettings.margin.left -
+      self.props.violinSettings.margin.right;
+    self.chart.height =
+      self.props.violinSettings.chartSize.height -
+      self.chart.margin.top -
+      self.chart.margin.bottom;
+
+    self.chart.xAxisLabel = self.props.violinSettings.axisLabels.xAxis;
+    self.chart.yAxisLabel = self.props.violinSettings.axisLabels.yAxis;
+
+    self.chart.yScale = d3.scaleLinear();
+
+    if (self.props.violinSettings.constrainExtremes === true) {
+      const fences = [];
+
+      Object.keys(self.chart.groupObjs).forEach(key => {
+        if (Object.prototype.hasOwnProperty.call(self.chart.groupObjs, key)) {
+          fences.push(self.chart.groupObjs[key].metrics.lowerInnerFence);
+          fences.push(self.chart.groupObjs[key].metrics.upperInnerFence);
+        }
+      });
+      self.chart.range = d3.extent(fences);
+    } else {
+      const fences = [];
+      Object.keys(self.chart.groupObjs).forEach(key => {
+        if (Object.prototype.hasOwnProperty.call(self.chart.groupObjs, key)) {
+          fences.push(self.chart.groupObjs[key].metrics.min);
+          fences.push(self.chart.groupObjs[key].metrics.max);
+        }
+      });
+      self.chart.range = d3.extent(fences);
+    }
+
+    self.chart.colorFunct = self.getColorFunct(
+      self.props.violinSettings.colors,
+    );
+
+    // Build Scale functions
+    const range = Math.abs(self.chart.range[1] - self.chart.range[0]) * 0.05;
+    self.chart.yScale
+      .range([self.chart.height, 0])
+      .domain([self.chart.range[0] - range, self.chart.range[1] + range])
+      .nice()
+      .clamp(true);
+    self.chart.xScale = d3
+      .scaleBand()
+      .domain(Object.keys(self.chart.groupObjs).sort())
+      .range([0, self.chart.width]);
+
+    // Build Axes Functions
+    self.chart.objs.yAxis = d3
+      .axisLeft(self.chart.yScale)
+      .tickFormat(self.formatAsFloat)
+      .tickSizeOuter(0)
+      .tickSizeInner(-self.chart.width);
+    self.chart.objs.yAxis.tickArguments(
+      self.chart.objs.yAxis.tickArguments() * self.props.violinSettings.yTicks,
+    );
+  };
+
+  prepareChart = () => {
+    const self = this;
+    self.chart.objs.chartDiv = d3.select(`#${self.props.violinSettings.id}`);
+    self.chart.objs.tooltip = self.chart.objs.chartDiv.append('div');
+    self.chart.objs.tooltip
+      .attr('class', 'violin-tooltip')
+      .style('display', 'none');
+
+    // Create the svg
+    self.chart.objs.svg = self.chart.objs.chartDiv
+      .append('svg')
+      .attr('class', 'chart-area vChart')
+      .attr('id', `svg-${self.props.violinSettings.id}`)
+      .attr('width', '100%')
+      .attr('height', '100%')
+      .attr(
+        'viewBox',
+        `0 0 ${self.props.violinSettings.chartSize.width} ${self.props.violinSettings.chartSize.height}`,
+      )
+      .attr('preserveAspectRatio', 'xMinYMin meet');
+    self.chart.objs.g = self.chart.objs.svg
+      .append('g')
+      .attr(
+        'transform',
+        `translate(${self.chart.margin.left},${self.chart.margin.top})`,
+      )
+      .attr('id', 'main-g');
+
+    // Create axes
+    self.chart.objs.axes = self.chart.objs.g.append('g').attr('class', 'axis');
+    self.chart.objs.axes
+      .append('g')
+      .attr('class', 'x axis')
+      .attr('transform', `translate(0,${self.chart.height})`)
+      // .call(self.chart.objs.xAxis)
+      .append('text')
+      .attr('class', 'vXLabel')
+      .attr('dy', '1.50em')
+      .attr('y', -7)
+      .style('font-size', '18px')
+      .style('font-weight', 'bold')
+      .style('font-family', 'Roboto')
+      .style('text-ancohor', 'middle')
+      .append('tspan')
+      .html(() => {
+        return self.chart.xAxisLabel;
+      })
+      .attr('x', () => {
+        const elem = d3.select('.vXLabel');
+        const size = elem.node().getBBox();
+        return self.chart.width / 2 - size.width / 2;
+      });
+
+    self.chart.objs.axes
+      .append('g')
+      .attr('class', 'y axis')
+      .call(self.chart.objs.yAxis)
+      .append('text')
+      .attr('class', 'label')
+      .attr('dy', '.62em')
+      .attr('transform', 'rotate(-90)')
+      .attr('x', -self.chart.height / 2)
+      .attr('y', -48)
+      .attr('id', 'yaxis-label')
+      .style('fill', '#000')
+      .style('font-size', '18px')
+      .style('font-weight', 'bold')
+      .style('font-family', 'Roboto')
+      .style('text-ancohor', 'middle')
+      .append('tspan')
+      .html(() => {
+        return self.chart.yAxisLabel;
+      });
+
+    // Create Title
+    const title = self.chart.objs.g.append('g').attr('class', 'title');
+    title
+      .append('text')
+      .attr('x', 10)
+      .attr('y', -30)
+      .style('fill', '#000')
+      .style('font-size', '25px')
+      .style('font-weight', 'bold')
+      .style('font-family', 'Roboto')
+      .style('text-anchor', 'left')
+      .text(self.props.violinSettings.title);
+
+    const subtitle = self.chart.objs.g
+      .append('g')
+      .attr('class', 'subtitle')
+      .append('text')
+      .attr('x', 10)
+      .attr('y', -10)
+      .style('fill', '#000')
+      .style('font-size', '15px')
+      // .style('font-weight', 'bold')
+      .style('font-family', 'Roboto')
+      .style('text-anchor', 'left')
+      .text(self.props.violinSettings.subtitle);
+  };
+
+  renderViolinPlot = options => {
+    const self = this;
+    self.chart.violinPlots = {};
+
+    const defaultOptions = {
+      show: true,
+      showViolinPlot: true,
+      resolution: 207,
+      bandwidth: 0.2,
+      width: 90,
+      interpolation: d3.curveCardinal,
+      clamp: 1,
+      colors: self.chart.colorFunct,
+      yDomainVP: null,
+    };
+    self.chart.violinPlots.options = self.shallowCopy(defaultOptions);
+    Object.keys(options).forEach(option => {
+      if (Object.prototype.hasOwnProperty.call(options, option)) {
+        self.chart.violinPlots.options[option] = options[option];
+      }
+    });
+    const vOpts = self.chart.violinPlots.options;
+
+    // Create violin plot objects
+    Object.keys(self.chart.groupObjs).forEach(cName => {
+      if (Object.prototype.hasOwnProperty.call(self.chart.groupObjs, cName)) {
+        self.chart.groupObjs[cName].violin = {};
+        self.chart.groupObjs[cName].violin.objs = {};
+      }
+    });
+
+    self.chart.violinPlots.change = updateOptions => {
+      if (updateOptions) {
+        Object.keys(updateOptions).forEach(key => {
+          if (Object.prototype.hasOwnProperty.call(updateOptions, key)) {
+            vOpts[key] = updateOptions[key];
+          }
+        });
+      }
+
+      Object.keys(self.chart.groupObjs).forEach(cName => {
+        if (Object.prototype.hasOwnProperty.call(self.chart.groupObjs, cName)) {
+          self.chart.groupObjs[cName].violin.objs.g.remove();
+        }
+      });
+
+      self.chart.violinPlots.prepareViolin();
+      self.chart.violinPlots.update();
+    };
+
+    self.chart.violinPlots.reset = () => {
+      self.chart.violinPlots.change(defaultOptions);
+    };
+    self.chart.violinPlots.show = opts => {
+      let tempOpts = opts;
+      if (opts !== undefined) {
+        tempOpts.show = true;
+        if (opts.reset) {
+          self.chart.violinPlots.reset();
+        }
+      } else {
+        tempOpts = { show: true };
+      }
+      self.chart.violinPlots.change(tempOpts);
+    };
+
+    self.chart.violinPlots.hide = opts => {
+      let tempOpts = opts;
+      if (opts !== undefined) {
+        tempOpts.show = false;
+        if (opts.reset) {
+          self.chart.violinPlots.reset();
+        }
+      } else {
+        tempOpts = { show: false };
+      }
+      self.chart.violinPlots.change(tempOpts);
+    };
+
+    /**
+     * Update the violin obj values
+     */
+    self.chart.violinPlots.update = () => {
+      // let cName;
+      let cViolinPlot;
+      let xVScale;
+      Object.keys(self.chart.groupObjs).forEach(cName => {
+        if (Object.prototype.hasOwnProperty.call(self.chart.groupObjs, cName)) {
+          const pointValues = _.map(self.chart.groupObjs[cName].values, d => {
+            return d[self.props.violinSettings.pointValue];
+          });
+          cViolinPlot = self.chart.groupObjs[cName].violin;
+
+          // Build the violins sideways, so use the yScale for the xScale and make a new yScale
+          // tslint:disable-next-line:no-var-keyword
+          xVScale = self.chart.yScale.copy(pointValues);
+
+          // Create the Kernel Density Estimator Function
+          cViolinPlot.kde = self.kernelDensityEstimator(
+            self.eKernel(self.chart.groupObjs[cName].metrics.bw),
+            xVScale.ticks(512),
+          );
+          cViolinPlot.kdedata = cViolinPlot.kde(pointValues);
+
+          let interpolateMax = self.chart.groupObjs[cName].metrics.max;
+          let interpolateMin = self.chart.groupObjs[cName].metrics.min;
+
+          if (vOpts.clamp === 0 || vOpts.clamp === -1) {
+            // When clamp is 0, calculate the min and max that is needed to bring the violin plot to a point
+            // interpolateMax = the Minimum value greater than the max where y = 0
+            interpolateMax = d3.min(
+              cViolinPlot.kdedata.filter(d => {
+                return (
+                  d.x > self.chart.groupObjs[cName].metrics.max && d.y === 0
+                );
+              }),
+              d => {
+                return d.x;
+              },
+            );
+            // interpolateMin = the Maximum value less than the min where y = 0
+            interpolateMin = d3.max(
+              cViolinPlot.kdedata.filter(d => {
+                return (
+                  d.x < self.chart.groupObjs[cName].metrics.min && d.y === 0
+                );
+              }),
+              d => {
+                return d.x;
+              },
+            );
+            // If clamp is -1 we need to extend the axises so that the violins come to a point
+            if (vOpts.clamp === -1) {
+              const kdeTester = self.eKernelTest(
+                self.eKernel(self.chart.groupObjs[cName].metrics.bw),
+                pointValues,
+              );
+              if (!interpolateMax) {
+                let interMaxY = kdeTester(
+                  self.chart.groupObjs[cName].metrics.max,
+                );
+                let interMaxX = self.chart.groupObjs[cName].metrics.max;
+                // tslint:disable-next-line:no-shadowed-variable
+                let count = 25; // Arbitrary limit to make sure we don't get an infinite loop
+                while (count > 0 && interMaxY !== 0) {
+                  interMaxY = kdeTester(interMaxX);
+                  interMaxX += 1;
+                  count -= 1;
+                }
+                interpolateMax = interMaxX;
+              }
+              if (!interpolateMin) {
+                let interMinY = kdeTester(
+                  self.chart.groupObjs[cName].metrics.min,
+                );
+                let interMinX = self.chart.groupObjs[cName].metrics.min;
+                let count = 25; // Arbitrary limit to make sure we don't get an infinite loop
+                while (count > 0 && interMinY !== 0) {
+                  interMinY = kdeTester(interMinX);
+                  interMinX -= 1;
+                  count -= 1;
+                }
+                interpolateMin = interMinX;
+              }
+            }
+            // Check to see if the new values are outside the existing chart range
+            //   If they are assign them to the master _yDomainVP
+            if (!vOpts.yDomainVP) {
+              vOpts.yDomainVP = self.chart.range.slice(0);
+            }
+            if (interpolateMin && interpolateMin < vOpts.yDomainVP[0]) {
+              vOpts.yDomainVP[0] = interpolateMin;
+            }
+            if (interpolateMax && interpolateMax > vOpts.yDomainVP[1]) {
+              vOpts.yDomainVP[1] = interpolateMax;
+            }
+          }
+
+          if (vOpts.showViolinPlot) {
+            xVScale = self.chart.yScale.copy();
+
+            // Need to recalculate the KDE because the xVScale changed
+            cViolinPlot.kde = self.kernelDensityEstimator(
+              self.eKernel(self.chart.groupObjs[cName].metrics.bw),
+              xVScale.ticks(512),
+            );
+            cViolinPlot.kdedata = cViolinPlot.kde(pointValues);
+          }
+
+          cViolinPlot.kdedata = cViolinPlot.kdedata
+            .filter(d => {
+              return !interpolateMin || d.x >= interpolateMin;
+            })
+            .filter(d => {
+              return !interpolateMax || d.x <= interpolateMax;
+            });
+        }
+      });
+      Object.keys(self.chart.groupObjs).forEach(cName => {
+        if (Object.prototype.hasOwnProperty.call(self.chart.groupObjs, cName)) {
+          cViolinPlot = self.chart.groupObjs[cName].violin;
+
+          // Get the violin width
+          const objBounds = self.getObjWidth(vOpts.width, cName, self);
+          const width = (objBounds.right - objBounds.left) / 2;
+
+          const max = d3.max(cViolinPlot.kdedata, d => {
+            return d.y;
+          });
+
+          if (max) {
+            const yVScale = d3
+              .scaleLinear()
+              .range([width, 0])
+              .domain([0, max])
+              .clamp(true);
+
+            const area = d3
+              .area()
+              .curve(vOpts.interpolation)
+              .x(d => {
+                return xVScale(d.x);
+              })
+              .y0(width)
+              .y1(d => {
+                return yVScale(d.y);
+              });
+
+            const line = d3
+              .line()
+              .curve(vOpts.interpolation)
+              .x(d => {
+                return xVScale(d.x);
+              })
+              .y(d => {
+                return yVScale(d.y);
+              });
+
+            if (cViolinPlot.objs.left.area) {
+              cViolinPlot.objs.left.area
+                .datum(cViolinPlot.kdedata)
+                .attr('d', area);
+              cViolinPlot.objs.left.line
+                .datum(cViolinPlot.kdedata)
+                .attr('d', line);
+
+              cViolinPlot.objs.right.area
+                .datum(cViolinPlot.kdedata)
+                .attr('d', area);
+              cViolinPlot.objs.right.line
+                .datum(cViolinPlot.kdedata)
+                .attr('d', line);
+            }
+
+            // Rotate the violins
+            cViolinPlot.objs.left.g.attr(
+              'transform',
+              `rotate(90,0,0)   translate(0,-${objBounds.left})  scale(1,-1)`,
+            );
+            cViolinPlot.objs.right.g.attr(
+              'transform',
+              `rotate(90,0,0)  translate(0,-${objBounds.right})`,
+            );
+          }
+        }
+      });
+    };
+
+    /**
+     * Create the svg elements for the violin plot
+     */
+    self.chart.violinPlots.prepareViolin = () => {
+      // let cName;
+      let cViolinPlot;
+
+      if (vOpts.colors) {
+        self.chart.violinPlots.color = self.getColorFunct(vOpts.colors, self);
+      } else {
+        self.chart.violinPlots.color = self.chart.colorFunct;
+      }
+
+      if (vOpts.show === false) {
+        return;
+      }
+
+      Object.keys(self.chart.groupObjs).forEach(cName => {
+        if (Object.prototype.hasOwnProperty.call(self.chart.groupObjs, cName)) {
+          cViolinPlot = self.chart.groupObjs[cName].violin;
+
+          cViolinPlot.objs.g = self.chart.objs.g
+            .append('g')
+            .attr('class', 'violin-plot');
+          cViolinPlot.objs.left = { area: null, line: null, g: null };
+          cViolinPlot.objs.right = { area: null, line: null, g: null };
+
+          cViolinPlot.objs.left.g = cViolinPlot.objs.g.append('g');
+          cViolinPlot.objs.right.g = cViolinPlot.objs.g.append('g');
+
+          if (vOpts.showViolinPlot !== false) {
+            // Area
+            cViolinPlot.objs.left.area = cViolinPlot.objs.left.g
+              .append('path')
+              .attr('class', 'area')
+              .style('fill', self.chart.violinPlots.color(cName))
+              .style('opacity', '.3');
+            cViolinPlot.objs.right.area = cViolinPlot.objs.right.g
+              .append('path')
+              .attr('class', 'area')
+              .style('fill', self.chart.violinPlots.color(cName))
+              .style('opacity', '.3');
+            // Lines
+            cViolinPlot.objs.left.line = cViolinPlot.objs.left.g
+              .append('path')
+              .attr('class', 'line')
+              .attr('fill', 'none')
+              .style('stroke-width', '2px')
+              .style('opacity', '1')
+              .style('stroke', self.chart.violinPlots.color(cName));
+            cViolinPlot.objs.right.line = cViolinPlot.objs.right.g
+              .append('path')
+              .attr('class', 'line')
+              .attr('fill', 'none')
+              .style('stroke-width', '2px')
+              .style('opacity', '1')
+              .style('stroke', self.chart.violinPlots.color(cName));
+          }
+        }
+      });
+    };
+
+    self.chart.violinPlots.prepareViolin();
+
+    // D3 inline style is needed to maintain style on export
+    d3.selectAll('.violin-chart-wrapper .y.axis .tick line')
+      .style('opacity', '0.6')
+      .style('shape-rendering', 'crispEdges')
+      .style('stroke', 'white')
+      .style('stroke-dasharray', '2,1')
+      .style('stroke-width', '1');
+
+    d3.select(window).on(
+      `resize.${self.chart.selector}.violinPlot`,
+      self.chart.violinPlots.update,
+    );
+    self.chart.violinPlots.update();
+    return self.chart;
+  };
+
+  renderBoxPlot = options => {
+    const self = this;
+    self.chart.boxPlots = {};
+
+    // Defaults
+    const defaultOptions = {
+      show: true,
+      showBox: true,
+      showWhiskers: true,
+      showMedian: true,
+      showMean: false,
+      medianCSize: 3.5,
+      boxWidth: 30,
+      lineWidth: null,
+      outlierCSize: 2.5,
+      colors: self.chart.colorFunct,
+    };
+    self.chart.boxPlots.options = self.shallowCopy(defaultOptions);
+    Object.keys(options).forEach(option => {
+      if (Object.prototype.hasOwnProperty.call(options, option)) {
+        self.chart.boxPlots.options[option] = options[option];
+      }
+    });
+    const bOpts = self.chart.boxPlots.options;
+
+    // Create box plot objects
+    Object.keys(self.chart.groupObjs).forEach(cName => {
+      if (Object.prototype.hasOwnProperty.call(self.chart.groupObjs, cName)) {
+        self.chart.groupObjs[cName].boxPlot = {};
+        self.chart.groupObjs[cName].boxPlot.objs = {};
+      }
+    });
+
+    self.chart.boxPlots.change = updateOptions => {
+      if (updateOptions) {
+        Object.keys(updateOptions).forEach(key => {
+          if (Object.prototype.hasOwnProperty.call(updateOptions, key)) {
+            bOpts[key] = updateOptions[key];
+          }
+        });
+      }
+
+      Object.keys(self.chart.groupObjs).forEach(cName => {
+        if (Object.prototype.hasOwnProperty.call(self.chart.groupObjs, cName)) {
+          self.chart.groupObjs[cName].boxPlot.objs.g.remove();
+        }
+      });
+      self.chart.boxPlots.prepareBoxPlot();
+      self.chart.boxPlots.update();
+    };
+
+    self.chart.boxPlots.reset = () => {
+      self.chart.boxPlots.change(defaultOptions);
+    };
+    self.chart.boxPlots.show = opts => {
+      let newOpts = opts;
+      if (opts !== undefined) {
+        newOpts.show = true;
+        if (opts.reset) {
+          self.chart.boxPlots.reset();
+        }
+      } else {
+        newOpts = { show: true };
+      }
+      self.chart.boxPlots.change(newOpts);
+    };
+    self.chart.boxPlots.hide = opts => {
+      let newOpts = opts;
+      if (opts !== undefined) {
+        newOpts.show = false;
+        if (opts.reset) {
+          self.chart.boxPlots.reset();
+        }
+      } else {
+        newOpts = { show: false };
+      }
+      self.chart.boxPlots.change(newOpts);
+    };
+
+    /**
+     * Update the box plot obj values
+     */
+    self.chart.boxPlots.update = () => {
+      // let cName;
+      let cBoxPlot;
+
+      Object.keys(self.chart.groupObjs).forEach(cName => {
+        if (Object.prototype.hasOwnProperty.call(self.chart.groupObjs, cName)) {
+          cBoxPlot = self.chart.groupObjs[cName].boxPlot;
+
+          // Get the box width
+          const objBounds = self.getObjWidth(bOpts.boxWidth, cName, self);
+          const width = objBounds.right - objBounds.left;
+
+          const sMetrics = {}; // temp var for scaled (plottable) metric values
+          Object.keys(self.chart.groupObjs[cName].metrics).forEach(attr => {
+            if (
+              Object.prototype.hasOwnProperty.call(
+                self.chart.groupObjs[cName].metrics,
+                attr,
+              )
+            ) {
+              sMetrics[attr] = null;
+              sMetrics[attr] = self.chart.yScale(
+                self.chart.groupObjs[cName].metrics[attr],
+              );
+            }
+          });
+
+          // Box
+          if (cBoxPlot.objs.box) {
+            cBoxPlot.objs.box
+              .attr('x', objBounds.left)
+              .attr('width', width)
+              .attr('y', sMetrics.quartile3)
+              .attr('rx', 1)
+              .attr('ry', 1)
+              .attr('height', -sMetrics.quartile3 + sMetrics.quartile1);
+          }
+
+          // Lines
+          let lineBounds = null;
+          if (bOpts.lineWidth) {
+            lineBounds = self.getObjWidth(bOpts.lineWidth, cName, self);
+          } else {
+            lineBounds = objBounds;
+          }
+          // --Whiskers
+          if (cBoxPlot.objs.upperWhisker) {
+            cBoxPlot.objs.upperWhisker.fence
+              .attr('x1', lineBounds.left)
+              .attr('x2', lineBounds.right)
+              .attr('y1', sMetrics.upperInnerFence)
+              .attr('y2', sMetrics.upperInnerFence);
+            cBoxPlot.objs.upperWhisker.line
+              .attr('x1', lineBounds.middle)
+              .attr('x2', lineBounds.middle)
+              .attr('y1', sMetrics.quartile3)
+              .attr('y2', sMetrics.upperInnerFence);
+
+            cBoxPlot.objs.lowerWhisker.fence
+              .attr('x1', lineBounds.left)
+              .attr('x2', lineBounds.right)
+              .attr('y1', sMetrics.lowerInnerFence)
+              .attr('y2', sMetrics.lowerInnerFence);
+            cBoxPlot.objs.lowerWhisker.line
+              .attr('x1', lineBounds.middle)
+              .attr('x2', lineBounds.middle)
+              .attr('y1', sMetrics.quartile1)
+              .attr('y2', sMetrics.lowerInnerFence);
+          }
+
+          // --Median
+          if (cBoxPlot.objs.median) {
+            cBoxPlot.objs.median.line
+              .attr('x1', lineBounds.left)
+              .attr('x2', lineBounds.right)
+              .attr('y1', sMetrics.median)
+              .attr('y2', sMetrics.median);
+            cBoxPlot.objs.median.circle
+              .attr('cx', lineBounds.middle)
+              .attr('cy', sMetrics.median);
+          }
+
+          // --Mean
+          if (cBoxPlot.objs.mean) {
+            cBoxPlot.objs.mean.line
+              .attr('x1', lineBounds.left)
+              .attr('x2', lineBounds.right)
+              .attr('y1', sMetrics.mean)
+              .attr('y2', sMetrics.mean);
+            cBoxPlot.objs.mean.circle
+              .attr('cx', lineBounds.middle)
+              .attr('cy', sMetrics.mean);
+          }
+        }
+      });
+    };
+
+    /**
+     * Create the svg elements for the box plot
+     */
+    self.chart.boxPlots.prepareBoxPlot = () => {
+      // let cName;
+      let cBoxPlot;
+
+      if (bOpts.colors) {
+        self.chart.boxPlots.colorFunct = self.getColorFunct(bOpts.colors);
+      } else {
+        self.chart.boxPlots.colorFunct = self.chart.colorFunct;
+      }
+
+      if (bOpts.show === false) {
+        return;
+      }
+
+      Object.keys(self.chart.groupObjs).forEach(cName => {
+        if (Object.prototype.hasOwnProperty.call(self.chart.groupObjs, cName)) {
+          cBoxPlot = self.chart.groupObjs[cName].boxPlot;
+
+          cBoxPlot.objs.g = self.chart.objs.g
+            .append('g')
+            .attr('class', 'box-plot');
+
+          // Plot Box (default show)
+          if (bOpts.showBox) {
+            cBoxPlot.objs.box = cBoxPlot.objs.g
+              .append('rect')
+              .attr('class', 'box')
+              .attr('fill', self.chart.boxPlots.colorFunct(cName))
+              .attr('opacity', '0.4')
+              .attr('stroke', self.chart.boxPlots.colorFunct(cName))
+              .attr('stroke-width', '2');
+            // A stroke is added to the box with the group color, it is
+            // hidden by default and can be shown through css with stroke-width
+          }
+
+          // Plot Median (default show)
+          if (bOpts.showMedian) {
+            cBoxPlot.objs.median = { line: null, circle: null };
+            cBoxPlot.objs.median.line = cBoxPlot.objs.g
+              .append('line')
+              .attr('class', 'median');
+            cBoxPlot.objs.median.circle = cBoxPlot.objs.g
+              .append('circle')
+              .attr('class', 'median')
+              .attr('r', bOpts.medianCSize)
+              .attr('fill', self.chart.boxPlots.colorFunct(cName));
+          }
+
+          // Plot Mean (default no plot)
+          if (bOpts.showMean) {
+            cBoxPlot.objs.mean = { line: null, circle: null };
+            cBoxPlot.objs.mean.line = cBoxPlot.objs.g
+              .append('line')
+              .attr('class', 'mean');
+            cBoxPlot.objs.mean.circle = cBoxPlot.objs.g
+              .append('circle')
+              .attr('class', 'mean')
+              .attr('r', bOpts.medianCSize)
+              .attr('fill', self.chart.boxPlots.colorFunct(cName));
+          }
+
+          // Plot Whiskers (default show)
+          if (bOpts.showWhiskers) {
+            cBoxPlot.objs.upperWhisker = { fence: null, line: null };
+            cBoxPlot.objs.lowerWhisker = { fence: null, line: null };
+            cBoxPlot.objs.upperWhisker.fence = cBoxPlot.objs.g
+              .append('line')
+              .attr('class', 'upper whisker')
+              .style('stroke', self.chart.boxPlots.colorFunct(cName));
+            cBoxPlot.objs.upperWhisker.line = cBoxPlot.objs.g
+              .append('line')
+              .attr('class', 'upper whisker')
+              .attr('stroke', self.chart.boxPlots.colorFunct(cName));
+
+            cBoxPlot.objs.lowerWhisker.fence = cBoxPlot.objs.g
+              .append('line')
+              .attr('class', 'lower whisker')
+              .attr('stroke', self.chart.boxPlots.colorFunct(cName));
+            cBoxPlot.objs.lowerWhisker.line = cBoxPlot.objs.g
+              .append('line')
+              .attr('class', 'lower whisker')
+              .attr('stroke', self.chart.boxPlots.colorFunct(cName));
+          }
+        }
+      });
+    };
+    self.chart.boxPlots.prepareBoxPlot();
+
+    // d3.select(window).on('resize.' + self.chart.selector + '.boxPlot', self.chart.boxPlots.update);
+    self.chart.boxPlots.update(self);
+    return self.chart;
+  };
+
+  renderDataPlots = options => {
+    const self = this;
+    const id = '';
+    self.chart.dataPlots = {};
+
+    // Defaults
+    const defaultOptions = {
+      show: true,
+      showPlot: false,
+      plotType: 'scatter',
+      pointSize: 6,
+      showBeanLines: false,
+      beanWidth: 20,
+      colors: null,
+    };
+    self.chart.dataPlots.options = self.shallowCopy(defaultOptions);
+    Object.keys(options).forEach(option => {
+      if (Object.prototype.hasOwnProperty.call(options, option)) {
+        self.chart.dataPlots.options[option] = options[option];
+      }
+    });
+    const dOpts = self.chart.dataPlots.options;
+
+    // Create notch objects
+    Object.keys(self.chart.groupObjs).forEach(cName => {
+      if (Object.prototype.hasOwnProperty.call(self.chart.groupObjs, cName)) {
+        self.chart.groupObjs[cName].dataPlots = {};
+        self.chart.groupObjs[cName].dataPlots.objs = {};
+      }
+    });
+    // The lines don't fit into a group bucket so they live under the dataPlot object
+    self.chart.dataPlots.objs = {};
+
+    self.chart.dataPlots.change = updateOptions => {
+      if (updateOptions) {
+        Object.keys(updateOptions).forEach(key => {
+          if (Object.prototype.hasOwnProperty.call(updateOptions, key)) {
+            dOpts[key] = updateOptions[key];
+          }
+        });
+      }
+
+      self.chart.dataPlots.objs.g.remove();
+      Object.keys(self.chart.groupObjs).forEach(cName => {
+        if (Object.prototype.hasOwnProperty.call(self.chart.groupObjs, cName)) {
+          self.chart.groupObjs[cName].dataPlots.objs.g.remove();
+        }
+      });
+      self.chart.dataPlots.preparePlots();
+      self.chart.dataPlots.update();
+    };
+
+    self.chart.dataPlots.reset = () => {
+      self.chart.dataPlots.change(defaultOptions);
+    };
+    self.chart.dataPlots.show = opts => {
+      let newOpts = opts;
+      if (opts !== undefined) {
+        newOpts.show = true;
+        if (opts.reset) {
+          self.chart.dataPlots.reset();
+        }
+      } else {
+        newOpts = { show: true };
+      }
+      self.chart.dataPlots.change(newOpts);
+    };
+    self.chart.dataPlots.hide = opts => {
+      let newOpts = opts;
+      if (opts !== undefined) {
+        newOpts.show = false;
+        if (opts.reset) {
+          self.chart.dataPlots.reset();
+        }
+      } else {
+        newOpts = { show: false };
+      }
+      self.chart.dataPlots.change(newOpts);
+    };
+
+    /**
+     * Update the data plot obj values
+     */
+    self.chart.dataPlots.update = () => {
+      // let cName;
+      // let cGroup;
+      let cPlot;
+
+      // Metrics lines
+      if (self.chart.dataPlots.objs.g) {
+        const halfBand = self.chart.xScale.bandwidth() / 2; // find the middle of each band
+        Object.keys(self.chart.dataPlots.objs.lines).forEach(cMetric => {
+          if (
+            Object.prototype.hasOwnProperty.call(
+              self.chart.dataPlots.objs.lines,
+              cMetric,
+            )
+          ) {
+            self.chart.dataPlots.objs.lines[cMetric].line.x(d => {
+              return self.chart.xScale(d.x) + halfBand;
+            });
+            self.chart.dataPlots.objs.lines[cMetric].g
+              .datum(self.chart.dataPlots.objs.lines[cMetric].values)
+              .attr('d', self.chart.dataPlots.objs.lines[cMetric].line);
+          }
+        });
+      }
+
+      Object.keys(self.chart.groupObjs).forEach(cName => {
+        if (Object.prototype.hasOwnProperty.call(self.chart.groupObjs, cName)) {
+          const cGroup = self.chart.groupObjs[cName];
+          cPlot = cGroup.dataPlots;
+
+          if (cPlot.objs.points) {
+            // For scatter points and points with no scatter
+            let plotBounds = null;
+            let scatterWidth = 0;
+            let width = 0;
+            if (
+              dOpts.plotType === 'scatter' ||
+              typeof dOpts.plotType === 'number'
+            ) {
+              // Default scatter percentage is 20% of box width
+              scatterWidth =
+                typeof dOpts.plotType === 'number' ? dOpts.plotType : 20;
+            }
+
+            plotBounds = self.getObjWidth(scatterWidth, cName, self);
+            width = plotBounds.right - plotBounds.left;
+
+            for (let pt = 0; pt < cGroup.values.length; pt += 1) {
+              cPlot.objs.points.pts[pt]
+                .attr('cx', () => {
+                  return plotBounds.middle + self.addJitter(true, width);
+                })
+                .attr('cy', () => {
+                  return self.chart.yScale(
+                    cGroup.values[pt][self.props.violinSettings.pointValue],
+                  );
+                });
+            }
+          }
+        }
+      });
+    };
+
+    /**
+     * Create the svg elements for the data plots
+     */
+    self.chart.dataPlots.preparePlots = () => {
+      // let cName;
+      let cPlot;
+
+      if (dOpts && dOpts.colors) {
+        self.chart.dataPlots.colorFunct = self.getColorFunct(dOpts.colors);
+      } else {
+        self.chart.dataPlots.colorFunct = self.chart.colorFunct;
+      }
+
+      if (dOpts.show === false) {
+        return;
+      }
+
+      // self.makeBrush(self);
+
+      // Single Click Behavior
+      // self.chart.objs.svg.on("dblclick", function () {
+      //   self.unhighlightPoint(null, true, self);
+      //   self.violinBrush.emit([[], []])
+      // })
+
+      Object.keys(self.chart.groupObjs).forEach(cName => {
+        if (Object.prototype.hasOwnProperty.call(self.chart.groupObjs, cName)) {
+          cPlot = self.chart.groupObjs[cName].dataPlots;
+
+          // Points Plot
+          if (dOpts.showPlot) {
+            cPlot.objs.points = { g: null, pts: [] };
+            cPlot.objs.points.g = self.chart.objs.g
+              .append('g')
+              .attr('class', 'points-plot');
+            for (
+              let pt = 0;
+              pt < self.chart.groupObjs[cName].values.length;
+              pt += 1
+            ) {
+              const max = self.getMaxStat(self.chart.groupObjs[cName].values);
+              cPlot.objs.points.pts.push(
+                cPlot.objs.points.g
+                  .append('circle')
+                  .attr('id', d => {
+                    // return (
+                    //   'violin_' +
+                    //   self.chart.groupObjs[cName].values[pt][
+                    //     self.chart.settings.pointUniqueId
+                    //   ].replace(/\./g, '')
+                    // );
+                    const id = self.chart.groupObjs[cName].values[pt][
+                      self.props.violinSettings.pointUniqueId
+                    ].replace(/\./g, '');
+                    const idMult =
+                      self.chart.groupObjs[cName].values[pt].id_mult;
+                    return `violin_${id.replace(/\;/g, '_')}_${idMult}`;
+                  })
+                  .attr('class', `point ${self.props.violinSettings.id} vPoint`)
+                  .attr('stroke', 'black')
+                  // .attr('r', dOpts.pointSize / 2) // Options is diameter, r takes radius so divide by 2
+                  .attr('r', () => {
+                    if (
+                      self.chart.groupObjs[cName].values[pt].statistic === max
+                    ) {
+                      return dOpts.pointSize * 2.5;
+                    }
+                    return dOpts.pointSize * 2;
+                  })
+                  .attr('fill', d => {
+                    if (
+                      self.chart.groupObjs[cName].values[pt].statistic === max
+                    ) {
+                      const id = self.chart.groupObjs[cName].values[pt];
+                      self.maxCircle = id;
+                      return 'orange';
+                    }
+                    return self.chart.dataPlots.colorFunct(cName);
+                  }),
+              );
+            }
+          }
+
+          const circleData = _.forEach(
+            self.chart.groupObjs[cName].values,
+            (value, key) => {
+              value[self.props.violinSettings.xName] = cName;
+            },
+          );
+
+          cPlot.objs.points.g
+            .selectAll('circle')
+            .data(circleData)
+            .attr('pointer-events', 'all')
+            .on('mouseover', d => {
+              // var id = d.sample.replace(/\;/g, "_");
+              // self.dotHover.emit({ object: d, action: 'mouseover' });
+              self.isHovering = true;
+              d3.select(`#violin_${self.getCircleId(d.sample, d.id_mult)}`)
+                .transition()
+                .duration(100)
+                .attr('cursor', 'pointer')
+                .attr('r', dOpts.pointSize * 3.5);
+              if (self.props.violinSettings.tooltip.show) {
+                const m = d3.mouse(self.chart.objs.chartDiv.node());
+                self.chart.objs.tooltip
+                  .style('left', `${m[0] + 10}px`)
+                  .style('top', `${m[1] - 10}px`)
+                  .transition()
+                  .delay(500)
+                  .duration(500)
+
+                  // console.log('self.chart.objs.tooltip is ');
+                  // console.log(self.chart.objs.tooltip);
+                  // console.log(self.chart.objs.tooltip.style('opacity'));
+                  // self.chart.objs.tooltip
+
+                  .style('opacity', () => {
+                    return 1;
+                  })
+                  .style('fill', '#f46d43')
+                  .style('display', null);
+
+                return self.tooltipHover(d);
+              }
+              return null;
+            })
+            .on('mouseout', d => {
+              // var id = d.sample.replace(/\;/g, "_");
+              d3.select(`#violin_${self.getCircleId(d.sample, d.id_mult)}`)
+                .transition()
+                .duration(300)
+                .attr('r', x => {
+                  if (self.maxCircle.sample !== x.sample) {
+                    return dOpts.pointSize * 2;
+                  }
+                  return dOpts.pointSize * 2.5;
+                });
+
+              // self.dotHover.emit({ object: d, action: 'mouseout' });
+              if (self.isHovering) {
+                self.chart.objs.tooltip
+                  .transition()
+                  .duration(500)
+                  .style('opacity', 0);
+              }
+            })
+            .on('click', d => {
+              // var maxId = self.maxCircle.sample.replace(/\;/g, "_");
+              self.isHovering = false;
+              const maxId = self.getCircleId(
+                self.maxCircle.sample,
+                self.maxCircle.id_mult,
+              );
+              // var id = d.sample.replace(/\;/g, "_");
+              const id = self.getCircleId(d.sample, d.id_mult);
+              // self.dotClick.emit(d);
+              self.props.onHandleViolinDotSelected(d);
+              //self.props.onHandleMaxLinePlot(d)
+
+              d3.select(`#violin_${maxId}`)
+                .transition()
+                .duration(300)
+                .attr('fill', '#1f77b4')
+                .attr('r', dOpts.pointSize * 2);
+
+              d3.select(`#violin_${id}`)
+                .transition()
+                .duration(100)
+                .attr('fill', 'orange')
+                .attr('r', dOpts.pointSize * 2.5);
+
+              self.maxCircle = d;
+              self.addToolTiptoMax(self.maxCircle);
+            });
+        }
+      });
+    };
+
+    self.chart.dataPlots.preparePlots();
+
+    self.chart.dataPlots.update();
+
+    // self.addToolTiptoMax(id);
+
+    return self.chart;
+  };
+
+  windowResized = () => {
+    this.setDimensions();
+  };
+
+  setDimensions = () => {
+    const self = this;
+    d3.select(`#svg-${self.props.violinSettings.id}`).remove();
+
+    // we'll want to calculate a reasonable container width based on parent container
+    // we calculate height based on the containerRef
+    const containerHeight = this.getHeight(self.props);
     const height =
       containerHeight -
-      this.state.settings.margin.top -
-      this.state.settings.margin.bottom;
+      self.props.violinSettings.margin.top -
+      self.props.violinSettings.margin.bottom;
+
+    const containerWidth = self.props.verticalSplitPaneSize;
+    const width =
+      self.props.verticalSplitPaneSize -
+      self.props.violinSettings.margin.left -
+      self.props.violinSettings.margin.right;
+
     this.setState({
       violinContainerHeight: containerHeight,
-      violinHeight: height
+      violinHeight: height,
+      violinContainerWidth: containerWidth,
+      violinWidth: width,
     });
+
+    // this.prepareViolin(width, height);
   };
 
   getHeight = () => {
     if (this.violinContainerRef.current !== null) {
       return this.violinContainerRef.current.parentElement.offsetHeight;
-    } else return 600;
+    }
+    return 600;
   };
 
-  // handleViolinDotClickTest = () => {
-  //   this.props.onViolinDotClick({
-  //     dotHighlighted: []
-  //   });
-  // };
-
   render() {
-    const {
-      settings,
-      violinHeight
-      // violinContainerHeight,
-      // violinContainerWidth,
-      // violinPlots,
-      // dataPlots,
-      // boxPlots,
-      // objs
-    } = this.state;
-    const {
-      verticalSplitPaneSize
-      // violinData,
-      // isViolinPlotLoaded
-    } = this.props;
-
-    const violinWidth =
-      verticalSplitPaneSize - settings.margin.left - settings.margin.right;
-
-    // if (!isViolinPlotLoaded) {
-    //   return (
-    //     <div className="PlotInstructionsDiv">
-    //       <h4 className="PlotInstructionsText">
-    //         Select barcode line/s to display Violin Plot
-    //       </h4>
-    //     </div>
-    //   );
-    // } else {
+    const self = this;
     return (
-      <Fragment>
-        <div
-          id={settings.id}
-          className="violin-chart-wrapper"
-          ref={this.violinContainerRef}
-        ></div>
-        <svg
-          ref={this.violinSVGRef}
-          id="test-violin-dot"
-          className="chart-area vChart"
-          height={violinHeight}
-          width={violinWidth}
-          viewBox={`0 0 ${violinWidth} ${violinHeight}`}
-          preserveAspectRatio="xMinYMin meet"
-          // {...props}
-        >
-          {/* X Axis Label */}
-          <text
-            transform={`translate(${verticalSplitPaneSize /
-              2}, ${violinHeight})`}
-            textAnchor="middle"
-          >
-            {settings.axisLabels.xAxis}
-          </text>
-
-          {/* Y Axis Left Label */}
-          <text transform="rotate(-90)" y={15} x={0 - violinHeight / 2}>
-            log
-            <tspan baseline-shift="sub" font-size="13px">
-              2
-            </tspan>
-            (FC)
-            {/* {settings.axisLabels.yAxis} */}
-          </text>
-
-          {/* <g className="axis">
-              <g className="x axis">
-                <text
-                  className="label"
-                  dy="1.5em"
-                  y={-7}
-                  fontSize={18}
-                  fontWeight={700}
-                  fontFamily="Lato"
-                  transform="translate(50 517)"
-                >
-                  <tspan x={346.875}>{'GO:0000118'}</tspan>
-                </text>
-              </g>
-              <g
-                className="y axis"
-                fill="none"
-                fontSize={10}
-                fontFamily="sans-serif"
-                textAnchor="end"
-              >
-                <path
-                  className="domain"
-                  stroke="currentColor"
-                  d="M50.5 517.5v-467"
-                />
-                <g className="tick">
-                  <path
-                    stroke="#fff"
-                    opacity={0.6}
-                    shapeRendering="crispedges"
-                    strokeDasharray="2,1"
-                    d="M50 517.5h790"
-                  />
-                  <text
-                    fill="currentColor"
-                    x={-3}
-                    dy=".32em"
-                    transform="translate(50 517.5)"
-                  >
-                    {'-5'}
-                  </text>
-                </g>
-                <text
-                  className="label"
-                  dy=".62em"
-                  transform="rotate(-90 50 0)"
-                  x={-233.5}
-                  y={-48}
-                  fill="#000"
-                  fontSize={18}
-                  fontWeight={700}
-                  fontFamily="Lato"
-                >
-                  <tspan>
-                    {'log'}
-                    <tspan baselineShift="sub" fontSize={14}>
-                      {'2'}
-                    </tspan>
-                    {'(FC)'}
-                  </tspan>
-                </text>
-              </g>
-            </g>
-            <g className="violin-plot">
-              <path
-                className="area"
-                d="M294.812 455.865l-1.746-.849a4553.803 4553.803 0 00-7.003-3.396l-1.754-.85-1.753-.848-1.754-.85a14002.021 14002.021 0 01-7.006-3.396 3944.76 3944.76 0 01-6.975-3.396 2206.349 2206.349 0 01-6.916-3.396 1477.507 1477.507 0 01-6.83-3.397 1073.05 1073.05 0 01-6.715-3.396 814.14 814.14 0 01-6.569-3.396 633.544 633.544 0 01-6.392-3.397 500.348 500.348 0 01-4.659-2.547 421.52 421.52 0 01-4.527-2.547 356.005 356.005 0 01-4.382-2.548 300.97 300.97 0 01-4.224-2.547 254.39 254.39 0 01-4.051-2.547 214.78 214.78 0 01-3.866-2.547 181.016 181.016 0 01-3.667-2.548 152.227 152.227 0 01-3.457-2.547 127.72 127.72 0 01-3.235-2.547 106.933 106.933 0 01-3.002-2.548 89.395 89.395 0 01-1.867-1.698 79.308 79.308 0 01-1.757-1.698 70.382 70.382 0 01-1.644-1.698 62.521 62.521 0 01-1.53-1.698 55.637 55.637 0 01-1.412-1.698 49.65 49.65 0 01-1.294-1.699 44.483 44.483 0 01-1.175-1.698 40.07 40.07 0 01-1.056-1.698 36.35 36.35 0 01-.934-1.698 33.263 33.263 0 01-.814-1.698 30.763 30.763 0 01-.995-2.548 28.021 28.021 0 01-.726-2.547 26.392 26.392 0 01-.559-3.396 25.84 25.84 0 01-.106-3.397 27.114 27.114 0 01.205-2.547 29.346 29.346 0 01.434-2.547 32.82 32.82 0 01.41-1.698 35.933 35.933 0 01.501-1.699 39.8 39.8 0 01.588-1.698 44.561 44.561 0 01.668-1.698 50.41 50.41 0 01.743-1.698 57.634 57.634 0 01.813-1.698 66.658 66.658 0 01.875-1.698 78.147 78.147 0 011.415-2.548 102.636 102.636 0 011.517-2.547 143.792 143.792 0 011.594-2.547 229.055 229.055 0 011.647-2.548l.556-.849.557-.849.559-.849.558-.849a755.674 755.674 0 001.664-2.547 262.785 262.785 0 001.627-2.547 155.418 155.418 0 001.563-2.548 107.6 107.6 0 001.473-2.547 80.243 80.243 0 00.92-1.698 67.666 67.666 0 00.86-1.698 57.899 57.899 0 00.794-1.699 50.146 50.146 0 00.721-1.698 43.91 43.91 0 00.642-1.698 38.866 38.866 0 00.556-1.698 34.787 34.787 0 00.464-1.698 31.518 31.518 0 00.366-1.698 28.946 28.946 0 00.355-2.548 26.223 26.223 0 00.108-2.547 24.709 24.709 0 00-.263-3.396 24.422 24.422 0 00-.752-3.397 26.1 26.1 0 00-.896-2.547 28.742 28.742 0 00-.758-1.698 31.232 31.232 0 00-.888-1.698 34.368 34.368 0 00-1.017-1.699 38.213 38.213 0 00-1.146-1.698 42.842 42.842 0 00-1.275-1.698 48.342 48.342 0 00-1.402-1.698 54.813 54.813 0 00-1.527-1.698 62.368 62.368 0 00-1.65-1.698 71.14 71.14 0 00-1.77-1.699 81.284 81.284 0 00-1.885-1.698 92.986 92.986 0 00-1.998-1.698 106.471 106.471 0 00-2.107-1.698 122.02 122.02 0 00-2.21-1.698 139.99 139.99 0 00-3.497-2.548 172.546 172.546 0 00-3.7-2.547 213.968 213.968 0 00-3.882-2.547 268.15 268.15 0 00-4.04-2.547 342.171 342.171 0 00-4.176-2.548 450.382 450.382 0 00-4.287-2.547 626.877 626.877 0 00-4.37-2.547 976.822 976.822 0 00-4.429-2.548 2060.5 2060.5 0 00-2.97-1.698l-1.489-.849-1.488-.849-1.487-.849a2566.607 2566.607 0 01-4.448-2.547 1073.747 1073.747 0 01-4.403-2.548 662.375 662.375 0 01-4.332-2.547 465.65 465.65 0 01-4.233-2.547 348.211 348.211 0 01-4.107-2.547 269.109 269.109 0 01-3.955-2.548 211.759 211.759 0 01-3.778-2.547 168.192 168.192 0 01-3.576-2.547 134.106 134.106 0 01-2.26-1.698 115.356 115.356 0 01-2.155-1.699 99.177 99.177 0 01-2.042-1.698 85.19 85.19 0 01-1.924-1.698 73.1 73.1 0 01-1.799-1.698 62.667 62.667 0 01-1.67-1.698 53.699 53.699 0 01-1.536-1.698 46.032 46.032 0 01-1.396-1.699 39.526 39.526 0 01-1.253-1.698 34.06 34.06 0 01-1.106-1.698 29.528 29.528 0 01-.955-1.698 25.833 25.833 0 01-.8-1.698 22.894 22.894 0 01-.644-1.699 20.64 20.64 0 01-.483-1.698 19.013 19.013 0 01-.323-1.698 17.968 17.968 0 01-.176-2.547 17.431 17.431 0 01.344-3.397 18.612 18.612 0 01.422-1.698 20.055 20.055 0 01.589-1.698 22.12 22.12 0 01.755-1.698 24.863 24.863 0 01.921-1.698 28.355 28.355 0 011.086-1.698 32.675 32.675 0 011.25-1.699 37.915 37.915 0 011.411-1.698 44.171 44.171 0 011.572-1.698 51.55 51.55 0 011.73-1.698 60.165 60.165 0 011.884-1.698 70.136 70.136 0 012.036-1.699 81.594 81.594 0 012.186-1.698 94.675 94.675 0 012.332-1.698 109.532 109.532 0 012.473-1.698 126.327 126.327 0 012.612-1.698 145.24 145.24 0 012.745-1.698 166.476 166.476 0 012.876-1.699 190.26 190.26 0 013-1.698 216.857 216.857 0 014.724-2.547 262.7 262.7 0 014.979-2.547 316.834 316.834 0 015.215-2.548 380.929 380.929 0 015.434-2.547 457.253 457.253 0 015.635-2.547 548.987 548.987 0 015.816-2.547 660.747 660.747 0 015.979-2.548 799.499 799.499 0 016.122-2.547 976.267 976.267 0 018.354-3.396 1304.99 1304.99 0 018.531-3.397 1829.397 1829.397 0 018.665-3.396 2812.926 2812.926 0 018.756-3.396 5391.064 5391.064 0 018.806-3.397l2.205-.849 2.206-.849 2.205-.85a12890.36 12890.36 0 008.804-3.395 4647.21 4647.21 0 008.757-3.397 2878.887 2878.887 0 008.676-3.396 2098.988 2098.988 0 008.569-3.397 1655.009 1655.009 0 0010.521-4.245 1308.173 1308.173 0 0010.272-4.245 1078.62 1078.62 0 009.988-4.246 914.236 914.236 0 009.677-4.245 790.206 790.206 0 009.344-4.246 693.156 693.156 0 008.999-4.245 615.188 615.188 0 008.644-4.246 551.285 551.285 0 008.284-4.245 498.057 498.057 0 007.927-4.246l1.542-.849c.512-.283 1.529-.849 1.529-.849H445V455.866z"
-                fill="#1f77b4"
-                opacity={0.3}
-              />
-              <path
-                className="line"
-                fill="none"
-                d="M294.812 455.865l-1.746-.849a4553.803 4553.803 0 00-7.003-3.396l-1.754-.85-1.753-.848-1.754-.85a14002.021 14002.021 0 01-7.006-3.396 3944.76 3944.76 0 01-6.975-3.396 2206.349 2206.349 0 01-6.916-3.396 1477.507 1477.507 0 01-6.83-3.397 1073.05 1073.05 0 01-6.715-3.396 814.14 814.14 0 01-6.569-3.396 633.544 633.544 0 01-6.392-3.397 500.348 500.348 0 01-4.659-2.547 421.52 421.52 0 01-4.527-2.547 356.005 356.005 0 01-4.382-2.548 300.97 300.97 0 01-4.224-2.547 254.39 254.39 0 01-4.051-2.547 214.78 214.78 0 01-3.866-2.547 181.016 181.016 0 01-3.667-2.548 152.227 152.227 0 01-3.457-2.547 127.72 127.72 0 01-3.235-2.547 106.933 106.933 0 01-3.002-2.548 89.395 89.395 0 01-1.867-1.698 79.308 79.308 0 01-1.757-1.698 70.382 70.382 0 01-1.644-1.698 62.521 62.521 0 01-1.53-1.698 55.637 55.637 0 01-1.412-1.698 49.65 49.65 0 01-1.294-1.699 44.483 44.483 0 01-1.175-1.698 40.07 40.07 0 01-1.056-1.698 36.35 36.35 0 01-.934-1.698 33.263 33.263 0 01-.814-1.698 30.763 30.763 0 01-.995-2.548 28.021 28.021 0 01-.726-2.547 26.392 26.392 0 01-.559-3.396 25.84 25.84 0 01-.106-3.397 27.114 27.114 0 01.205-2.547 29.346 29.346 0 01.434-2.547 32.82 32.82 0 01.41-1.698 35.933 35.933 0 01.501-1.699 39.8 39.8 0 01.588-1.698 44.561 44.561 0 01.668-1.698 50.41 50.41 0 01.743-1.698 57.634 57.634 0 01.813-1.698 66.658 66.658 0 01.875-1.698 78.147 78.147 0 011.415-2.548 102.636 102.636 0 011.517-2.547 143.792 143.792 0 011.594-2.547 229.055 229.055 0 011.647-2.548l.556-.849.557-.849.559-.849.558-.849a755.674 755.674 0 001.664-2.547 262.785 262.785 0 001.627-2.547 155.418 155.418 0 001.563-2.548 107.6 107.6 0 001.473-2.547 80.243 80.243 0 00.92-1.698 67.666 67.666 0 00.86-1.698 57.899 57.899 0 00.794-1.699 50.146 50.146 0 00.721-1.698 43.91 43.91 0 00.642-1.698 38.866 38.866 0 00.556-1.698 34.787 34.787 0 00.464-1.698 31.518 31.518 0 00.366-1.698 28.946 28.946 0 00.355-2.548 26.223 26.223 0 00.108-2.547 24.709 24.709 0 00-.263-3.396 24.422 24.422 0 00-.752-3.397 26.1 26.1 0 00-.896-2.547 28.742 28.742 0 00-.758-1.698 31.232 31.232 0 00-.888-1.698 34.368 34.368 0 00-1.017-1.699 38.213 38.213 0 00-1.146-1.698 42.842 42.842 0 00-1.275-1.698 48.342 48.342 0 00-1.402-1.698 54.813 54.813 0 00-1.527-1.698 62.368 62.368 0 00-1.65-1.698 71.14 71.14 0 00-1.77-1.699 81.284 81.284 0 00-1.885-1.698 92.986 92.986 0 00-1.998-1.698 106.471 106.471 0 00-2.107-1.698 122.02 122.02 0 00-2.21-1.698 139.99 139.99 0 00-3.497-2.548 172.546 172.546 0 00-3.7-2.547 213.968 213.968 0 00-3.882-2.547 268.15 268.15 0 00-4.04-2.547 342.171 342.171 0 00-4.176-2.548 450.382 450.382 0 00-4.287-2.547 626.877 626.877 0 00-4.37-2.547 976.822 976.822 0 00-4.429-2.548 2060.5 2060.5 0 00-2.97-1.698l-1.489-.849-1.488-.849-1.487-.849a2566.607 2566.607 0 01-4.448-2.547 1073.747 1073.747 0 01-4.403-2.548 662.375 662.375 0 01-4.332-2.547 465.65 465.65 0 01-4.233-2.547 348.211 348.211 0 01-4.107-2.547 269.109 269.109 0 01-3.955-2.548 211.759 211.759 0 01-3.778-2.547 168.192 168.192 0 01-3.576-2.547 134.106 134.106 0 01-2.26-1.698 115.356 115.356 0 01-2.155-1.699 99.177 99.177 0 01-2.042-1.698 85.19 85.19 0 01-1.924-1.698 73.1 73.1 0 01-1.799-1.698 62.667 62.667 0 01-1.67-1.698 53.699 53.699 0 01-1.536-1.698 46.032 46.032 0 01-1.396-1.699 39.526 39.526 0 01-1.253-1.698 34.06 34.06 0 01-1.106-1.698 29.528 29.528 0 01-.955-1.698 25.833 25.833 0 01-.8-1.698 22.894 22.894 0 01-.644-1.699 20.64 20.64 0 01-.483-1.698 19.013 19.013 0 01-.323-1.698 17.968 17.968 0 01-.176-2.547 17.431 17.431 0 01.344-3.397 18.612 18.612 0 01.422-1.698 20.055 20.055 0 01.589-1.698 22.12 22.12 0 01.755-1.698 24.863 24.863 0 01.921-1.698 28.355 28.355 0 011.086-1.698 32.675 32.675 0 011.25-1.699 37.915 37.915 0 011.411-1.698 44.171 44.171 0 011.572-1.698 51.55 51.55 0 011.73-1.698 60.165 60.165 0 011.884-1.698 70.136 70.136 0 012.036-1.699 81.594 81.594 0 012.186-1.698 94.675 94.675 0 012.332-1.698 109.532 109.532 0 012.473-1.698 126.327 126.327 0 012.612-1.698 145.24 145.24 0 012.745-1.698 166.476 166.476 0 012.876-1.699 190.26 190.26 0 013-1.698 216.857 216.857 0 014.724-2.547 262.7 262.7 0 014.979-2.547 316.834 316.834 0 015.215-2.548 380.929 380.929 0 015.434-2.547 457.253 457.253 0 015.635-2.547 548.987 548.987 0 015.816-2.547 660.747 660.747 0 015.979-2.548 799.499 799.499 0 016.122-2.547 976.267 976.267 0 018.354-3.396 1304.99 1304.99 0 018.531-3.397 1829.397 1829.397 0 018.665-3.396 2812.926 2812.926 0 018.756-3.396 5391.064 5391.064 0 018.806-3.397l2.205-.849 2.206-.849 2.205-.85a12890.36 12890.36 0 008.804-3.395 4647.21 4647.21 0 008.757-3.397 2878.887 2878.887 0 008.676-3.396 2098.988 2098.988 0 008.569-3.397 1655.009 1655.009 0 0010.521-4.245 1308.173 1308.173 0 0010.272-4.245 1078.62 1078.62 0 009.988-4.246 914.236 914.236 0 009.677-4.245 790.206 790.206 0 009.344-4.246 693.156 693.156 0 008.999-4.245 615.188 615.188 0 008.644-4.246 551.285 551.285 0 008.284-4.245 498.057 498.057 0 007.927-4.246l1.542-.849c.512-.283 1.529-.849 1.529-.849"
-                strokeWidth={2}
-                stroke="#1f77b4"
-              />
-              <g>
-                <path
-                  className="area"
-                  d="M595.188 455.865l1.746-.849a4553.803 4553.803 0 017.003-3.396l1.754-.85 1.753-.848 1.754-.85a14002.021 14002.021 0 007.006-3.396 3944.76 3944.76 0 006.975-3.396 2206.349 2206.349 0 006.916-3.396 1477.507 1477.507 0 006.83-3.397 1073.05 1073.05 0 006.715-3.396 814.14 814.14 0 006.569-3.396 633.544 633.544 0 006.392-3.397 500.348 500.348 0 004.659-2.547 421.52 421.52 0 004.527-2.547 356.005 356.005 0 004.382-2.548 300.97 300.97 0 004.224-2.547 254.39 254.39 0 004.051-2.547 214.78 214.78 0 003.866-2.547 181.016 181.016 0 003.667-2.548 152.227 152.227 0 003.457-2.547 127.72 127.72 0 003.235-2.547 106.933 106.933 0 003.002-2.548 89.395 89.395 0 001.867-1.698 79.308 79.308 0 001.757-1.698 70.382 70.382 0 001.644-1.698 62.521 62.521 0 001.53-1.698 55.637 55.637 0 001.412-1.698 49.65 49.65 0 001.294-1.699 44.483 44.483 0 001.175-1.698 40.07 40.07 0 001.056-1.698 36.35 36.35 0 00.934-1.698 33.263 33.263 0 00.814-1.698 30.763 30.763 0 00.995-2.548 28.021 28.021 0 00.726-2.547 26.392 26.392 0 00.559-3.396 25.84 25.84 0 00.106-3.397 27.114 27.114 0 00-.205-2.547 29.346 29.346 0 00-.434-2.547 32.82 32.82 0 00-.41-1.698 35.933 35.933 0 00-.501-1.699 39.8 39.8 0 00-.588-1.698 44.561 44.561 0 00-.668-1.698 50.41 50.41 0 00-.743-1.698 57.634 57.634 0 00-.813-1.698 66.658 66.658 0 00-.875-1.698 78.147 78.147 0 00-1.415-2.548 102.636 102.636 0 00-1.517-2.547 143.792 143.792 0 00-1.594-2.547 229.055 229.055 0 00-1.647-2.548l-.556-.849-.557-.849-.559-.849-.558-.849a755.674 755.674 0 01-1.664-2.547 262.785 262.785 0 01-1.627-2.547 155.418 155.418 0 01-1.563-2.548 107.6 107.6 0 01-1.473-2.547 80.243 80.243 0 01-.92-1.698 67.666 67.666 0 01-.86-1.698 57.899 57.899 0 01-.794-1.699 50.146 50.146 0 01-.721-1.698 43.91 43.91 0 01-.642-1.698 38.866 38.866 0 01-.556-1.698 34.787 34.787 0 01-.464-1.698 31.518 31.518 0 01-.366-1.698 28.946 28.946 0 01-.355-2.548 26.223 26.223 0 01-.108-2.547 24.709 24.709 0 01.263-3.396 24.422 24.422 0 01.752-3.397 26.1 26.1 0 01.896-2.547 28.742 28.742 0 01.758-1.698 31.232 31.232 0 01.888-1.698 34.368 34.368 0 011.017-1.699 38.213 38.213 0 011.146-1.698 42.842 42.842 0 011.275-1.698 48.342 48.342 0 011.402-1.698 54.813 54.813 0 011.527-1.698 62.368 62.368 0 011.65-1.698 71.14 71.14 0 011.77-1.699 81.284 81.284 0 011.885-1.698 92.986 92.986 0 011.998-1.698 106.471 106.471 0 012.107-1.698 122.02 122.02 0 012.21-1.698 139.99 139.99 0 013.497-2.548 172.546 172.546 0 013.7-2.547 213.968 213.968 0 013.882-2.547 268.15 268.15 0 014.04-2.547 342.171 342.171 0 014.176-2.548 450.382 450.382 0 014.287-2.547 626.877 626.877 0 014.37-2.547 976.822 976.822 0 014.429-2.548 2060.5 2060.5 0 012.97-1.698l1.489-.849 1.488-.849 1.487-.849a2566.607 2566.607 0 004.448-2.547 1073.747 1073.747 0 004.403-2.548 662.375 662.375 0 004.332-2.547 465.65 465.65 0 004.233-2.547 348.211 348.211 0 004.107-2.547 269.109 269.109 0 003.955-2.548 211.759 211.759 0 003.778-2.547 168.192 168.192 0 003.576-2.547 134.106 134.106 0 002.26-1.698 115.356 115.356 0 002.155-1.699 99.177 99.177 0 002.042-1.698 85.19 85.19 0 001.924-1.698 73.1 73.1 0 001.799-1.698 62.667 62.667 0 001.67-1.698 53.699 53.699 0 001.536-1.698 46.032 46.032 0 001.396-1.699 39.526 39.526 0 001.253-1.698 34.06 34.06 0 001.106-1.698 29.528 29.528 0 00.955-1.698 25.833 25.833 0 00.8-1.698 22.894 22.894 0 00.644-1.699 20.64 20.64 0 00.483-1.698 19.013 19.013 0 00.323-1.698 17.968 17.968 0 00.176-2.547 17.431 17.431 0 00-.344-3.397 18.612 18.612 0 00-.422-1.698 20.055 20.055 0 00-.589-1.698 22.12 22.12 0 00-.755-1.698 24.863 24.863 0 00-.921-1.698 28.355 28.355 0 00-1.086-1.698 32.675 32.675 0 00-1.25-1.699 37.915 37.915 0 00-1.411-1.698 44.171 44.171 0 00-1.572-1.698 51.55 51.55 0 00-1.73-1.698 60.165 60.165 0 00-1.884-1.698 70.136 70.136 0 00-2.036-1.699 81.594 81.594 0 00-2.186-1.698 94.675 94.675 0 00-2.332-1.698 109.532 109.532 0 00-2.473-1.698 126.327 126.327 0 00-2.612-1.698 145.24 145.24 0 00-2.745-1.698 166.476 166.476 0 00-2.876-1.699 190.26 190.26 0 00-3-1.698 216.857 216.857 0 00-4.724-2.547 262.7 262.7 0 00-4.979-2.547 316.834 316.834 0 00-5.215-2.548 380.929 380.929 0 00-5.434-2.547 457.253 457.253 0 00-5.635-2.547 548.987 548.987 0 00-5.816-2.547 660.747 660.747 0 00-5.979-2.548 799.499 799.499 0 00-6.122-2.547 976.267 976.267 0 00-8.354-3.396 1304.99 1304.99 0 00-8.531-3.397 1829.397 1829.397 0 00-8.665-3.396 2812.926 2812.926 0 00-8.756-3.396 5391.064 5391.064 0 00-8.806-3.397l-2.205-.849-2.206-.849-2.205-.85a12890.36 12890.36 0 01-8.804-3.395 4647.21 4647.21 0 01-8.757-3.397 2878.887 2878.887 0 01-8.676-3.396 2098.988 2098.988 0 01-8.569-3.397 1655.009 1655.009 0 01-10.521-4.245 1308.173 1308.173 0 01-10.272-4.245 1078.62 1078.62 0 01-9.988-4.246 914.236 914.236 0 01-9.677-4.245 790.206 790.206 0 01-9.344-4.246 693.156 693.156 0 01-8.999-4.245 615.188 615.188 0 01-8.644-4.246 551.285 551.285 0 01-8.284-4.245 498.057 498.057 0 01-7.927-4.246 453.097 453.097 0 01-3.07-1.698H445V455.866z"
-                  fill="#1f77b4"
-                  opacity={0.3}
-                />
-                <path
-                  className="line"
-                  fill="none"
-                  d="M595.188 455.865l1.746-.849a4553.803 4553.803 0 017.003-3.396l1.754-.85 1.753-.848 1.754-.85a14002.021 14002.021 0 007.006-3.396 3944.76 3944.76 0 006.975-3.396 2206.349 2206.349 0 006.916-3.396 1477.507 1477.507 0 006.83-3.397 1073.05 1073.05 0 006.715-3.396 814.14 814.14 0 006.569-3.396 633.544 633.544 0 006.392-3.397 500.348 500.348 0 004.659-2.547 421.52 421.52 0 004.527-2.547 356.005 356.005 0 004.382-2.548 300.97 300.97 0 004.224-2.547 254.39 254.39 0 004.051-2.547 214.78 214.78 0 003.866-2.547 181.016 181.016 0 003.667-2.548 152.227 152.227 0 003.457-2.547 127.72 127.72 0 003.235-2.547 106.933 106.933 0 003.002-2.548 89.395 89.395 0 001.867-1.698 79.308 79.308 0 001.757-1.698 70.382 70.382 0 001.644-1.698 62.521 62.521 0 001.53-1.698 55.637 55.637 0 001.412-1.698 49.65 49.65 0 001.294-1.699 44.483 44.483 0 001.175-1.698 40.07 40.07 0 001.056-1.698 36.35 36.35 0 00.934-1.698 33.263 33.263 0 00.814-1.698 30.763 30.763 0 00.995-2.548 28.021 28.021 0 00.726-2.547 26.392 26.392 0 00.559-3.396 25.84 25.84 0 00.106-3.397 27.114 27.114 0 00-.205-2.547 29.346 29.346 0 00-.434-2.547 32.82 32.82 0 00-.41-1.698 35.933 35.933 0 00-.501-1.699 39.8 39.8 0 00-.588-1.698 44.561 44.561 0 00-.668-1.698 50.41 50.41 0 00-.743-1.698 57.634 57.634 0 00-.813-1.698 66.658 66.658 0 00-.875-1.698 78.147 78.147 0 00-1.415-2.548 102.636 102.636 0 00-1.517-2.547 143.792 143.792 0 00-1.594-2.547 229.055 229.055 0 00-1.647-2.548l-.556-.849-.557-.849-.559-.849-.558-.849a755.674 755.674 0 01-1.664-2.547 262.785 262.785 0 01-1.627-2.547 155.418 155.418 0 01-1.563-2.548 107.6 107.6 0 01-1.473-2.547 80.243 80.243 0 01-.92-1.698 67.666 67.666 0 01-.86-1.698 57.899 57.899 0 01-.794-1.699 50.146 50.146 0 01-.721-1.698 43.91 43.91 0 01-.642-1.698 38.866 38.866 0 01-.556-1.698 34.787 34.787 0 01-.464-1.698 31.518 31.518 0 01-.366-1.698 28.946 28.946 0 01-.355-2.548 26.223 26.223 0 01-.108-2.547 24.709 24.709 0 01.263-3.396 24.422 24.422 0 01.752-3.397 26.1 26.1 0 01.896-2.547 28.742 28.742 0 01.758-1.698 31.232 31.232 0 01.888-1.698 34.368 34.368 0 011.017-1.699 38.213 38.213 0 011.146-1.698 42.842 42.842 0 011.275-1.698 48.342 48.342 0 011.402-1.698 54.813 54.813 0 011.527-1.698 62.368 62.368 0 011.65-1.698 71.14 71.14 0 011.77-1.699 81.284 81.284 0 011.885-1.698 92.986 92.986 0 011.998-1.698 106.471 106.471 0 012.107-1.698 122.02 122.02 0 012.21-1.698 139.99 139.99 0 013.497-2.548 172.546 172.546 0 013.7-2.547 213.968 213.968 0 013.882-2.547 268.15 268.15 0 014.04-2.547 342.171 342.171 0 014.176-2.548 450.382 450.382 0 014.287-2.547 626.877 626.877 0 014.37-2.547 976.822 976.822 0 014.429-2.548 2060.5 2060.5 0 012.97-1.698l1.489-.849 1.488-.849 1.487-.849a2566.607 2566.607 0 004.448-2.547 1073.747 1073.747 0 004.403-2.548 662.375 662.375 0 004.332-2.547 465.65 465.65 0 004.233-2.547 348.211 348.211 0 004.107-2.547 269.109 269.109 0 003.955-2.548 211.759 211.759 0 003.778-2.547 168.192 168.192 0 003.576-2.547 134.106 134.106 0 002.26-1.698 115.356 115.356 0 002.155-1.699 99.177 99.177 0 002.042-1.698 85.19 85.19 0 001.924-1.698 73.1 73.1 0 001.799-1.698 62.667 62.667 0 001.67-1.698 53.699 53.699 0 001.536-1.698 46.032 46.032 0 001.396-1.699 39.526 39.526 0 001.253-1.698 34.06 34.06 0 001.106-1.698 29.528 29.528 0 00.955-1.698 25.833 25.833 0 00.8-1.698 22.894 22.894 0 00.644-1.699 20.64 20.64 0 00.483-1.698 19.013 19.013 0 00.323-1.698 17.968 17.968 0 00.176-2.547 17.431 17.431 0 00-.344-3.397 18.612 18.612 0 00-.422-1.698 20.055 20.055 0 00-.589-1.698 22.12 22.12 0 00-.755-1.698 24.863 24.863 0 00-.921-1.698 28.355 28.355 0 00-1.086-1.698 32.675 32.675 0 00-1.25-1.699 37.915 37.915 0 00-1.411-1.698 44.171 44.171 0 00-1.572-1.698 51.55 51.55 0 00-1.73-1.698 60.165 60.165 0 00-1.884-1.698 70.136 70.136 0 00-2.036-1.699 81.594 81.594 0 00-2.186-1.698 94.675 94.675 0 00-2.332-1.698 109.532 109.532 0 00-2.473-1.698 126.327 126.327 0 00-2.612-1.698 145.24 145.24 0 00-2.745-1.698 166.476 166.476 0 00-2.876-1.699 190.26 190.26 0 00-3-1.698 216.857 216.857 0 00-4.724-2.547 262.7 262.7 0 00-4.979-2.547 316.834 316.834 0 00-5.215-2.548 380.929 380.929 0 00-5.434-2.547 457.253 457.253 0 00-5.635-2.547 548.987 548.987 0 00-5.816-2.547 660.747 660.747 0 00-5.979-2.548 799.499 799.499 0 00-6.122-2.547 976.267 976.267 0 00-8.354-3.396 1304.99 1304.99 0 00-8.531-3.397 1829.397 1829.397 0 00-8.665-3.396 2812.926 2812.926 0 00-8.756-3.396 5391.064 5391.064 0 00-8.806-3.397l-2.205-.849-2.206-.849-2.205-.85a12890.36 12890.36 0 01-8.804-3.395 4647.21 4647.21 0 01-8.757-3.397 2878.887 2878.887 0 01-8.676-3.396 2098.988 2098.988 0 01-8.569-3.397 1655.009 1655.009 0 01-10.521-4.245 1308.173 1308.173 0 01-10.272-4.245 1078.62 1078.62 0 01-9.988-4.246 914.236 914.236 0 01-9.677-4.245 790.206 790.206 0 01-9.344-4.246 693.156 693.156 0 01-8.999-4.245 615.188 615.188 0 01-8.644-4.246 551.285 551.285 0 01-8.284-4.245 498.057 498.057 0 01-7.927-4.246 453.097 453.097 0 01-3.07-1.698"
-                  strokeWidth={2}
-                  stroke="#1f77b4"
-                />
-              </g>
-            </g>
-            <g className="box-plot" transform="translate(50 50)">
-              <rect
-                className="box"
-                fill="#1f77b4"
-                opacity={0.4}
-                stroke="#1f77b4"
-                strokeWidth={2}
-                x={276.5}
-                width={237}
-                y={139.127}
-                rx={1}
-                ry={1}
-                height={175.187}
-              />
-              <path className="median" d="M276.5 199.471h237" />
-              <circle
-                className="median"
-                r={3.5}
-                fill="#1f77b4"
-                cx={395}
-                cy={199.471}
-              />
-              <path
-                className="upper whisker"
-                stroke="#1f77b4"
-                d="M276.5 29.336h237M395 139.127V29.336"
-              />
-              <path
-                className="lower whisker"
-                stroke="#1f77b4"
-                d="M276.5 406.226h237M395 314.313v91.913"
-              />
-            </g>
-            <g className="points-plot" transform="translate(50 50)">
-              <circle
-                className="point violin-graph-1 vPoint"
-                stroke="#000"
-                r={6}
-                fill="orange"
-                pointerEvents="all"
-                cx={439}
-                cy={88.429}
-              />
-            </g> */}
-        </svg>
-      </Fragment>
+      <div
+        ref={this.violinContainerRef}
+        id={self.props.violinSettings.id}
+        className="violin-chart-wrapper"
+      />
     );
-    // }
   }
 }
 
