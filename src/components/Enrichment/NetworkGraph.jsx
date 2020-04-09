@@ -80,19 +80,37 @@ class NetworkGraph extends Component {
     //}
   }
 
-  getWidth(relevantNodesLength) {
-    let networkCalculatedWidth = relevantNodesLength * 25;
+  getWidth(totalClusters, relevantNodesLength) {
     let adjustedDocumentWidth = window.innerWidth - 100;
     let networkContainerWidth = 0;
     if (this.networkContainerRef.current !== null) {
       networkContainerWidth = this.networkContainerRef.current.parentElement
         .offsetWidth;
     }
-    return Math.max(
-      networkCalculatedWidth,
-      adjustedDocumentWidth,
-      networkContainerWidth,
-    );
+
+    // we may want to discuss an algorithm using nodes and clusters to determining svg width
+    // if (totalClusters > 1 && totalClusters < 20) {
+    //   let networkCalculatedWidth = relevantNodesLength * 25;
+    //   return Math.max(
+    //     networkCalculatedWidth,
+    //     adjustedDocumentWidth,
+    //     networkContainerWidth
+    //   );
+    // }
+    // if (totalClusters >= 20) {
+    if (totalClusters !== 1) {
+      // let networkCalculatedWidth = (relevantNodesLength * .75) * totalClusters * 1.5;
+      let networkCalculatedWidth = relevantNodesLength * 35;
+      console.log(networkCalculatedWidth);
+      return Math.max(
+        networkCalculatedWidth,
+        adjustedDocumentWidth,
+        networkContainerWidth
+      );
+    } else {
+      // if (totalClusters === 1) {
+      return adjustedDocumentWidth;
+    }
   }
 
   prepareAndRenderTree = () => {
@@ -146,7 +164,7 @@ class NetworkGraph extends Component {
       l => l.EnrichmentMap_similarity_coefficient >= this.props.edgeCutoff,
     );
 
-    if (filteredNodes.length > 0) {
+    if (filteredNodes.length !== 0 && filteredNodes.length != null) {
       let relevantNodeIds = filteredNodes.map(n => n.id);
 
       // filter links out that contain source or target of node not meeting cutoff
@@ -216,9 +234,15 @@ class NetworkGraph extends Component {
           });
         });
 
+        console.log(clusters.children.length);
+        const totalClusters = clusters.children.length;
+
         // Prepare Settings
         let relevantNodesLength = relevantNodeIds.length;
-        const containerWidth = this.getWidth(relevantNodesLength);
+        const containerWidth = this.getWidth(
+          totalClusters,
+          relevantNodesLength
+        );
         // calculate height based on the containerRef
         const containerHeight = this.getHeight();
         const width =
@@ -366,7 +390,6 @@ class NetworkGraph extends Component {
         //   return 1;
         // });
 
-        // let cellVar = cell.length > 1
         if (cell._groups.length > 0) {
           cell.each(function(d, i) {
             let cellWidth = d.x1 - d.x0;
@@ -392,10 +415,12 @@ class NetworkGraph extends Component {
                   'collision',
                   // collide(0.5)
                   d3.forceCollide().radius(function(d) {
-                    return radiusVar(d[networkSettings.nodeSize]);
-                    // let r = radiusVar(d[networkSettings.nodeSize]);
-                    // return 3 * r - 1;
-                  }),
+                    // return radiusVar(d[networkSettings.nodeSize]);
+                    let r = radiusVar(d[networkSettings.nodeSize]);
+                    return r;
+                    // to space out the nodes more, use a function like this...
+                    // return 2 * r - 1;
+                  })
                 )
                 .stop();
               //
@@ -587,10 +612,10 @@ class NetworkGraph extends Component {
                   .attr('id', 'rectWrap')
                   .text(function(d) {
                     let text = d[networkSettings.nodeLabel];
-                    if (text.length < 25) {
+                    if (text.length < 40) {
                       return text;
                     } else {
-                      let textSubstring = text.substring(0, 23);
+                      let textSubstring = text.substring(0, 38);
                       return `${textSubstring}...`;
                     }
                     // return d[networkSettings.nodeLabel];

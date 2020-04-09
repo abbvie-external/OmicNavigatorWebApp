@@ -69,7 +69,9 @@ class Enrichment extends Component {
     networkDataLoaded: false,
     networkGraphReady: false,
     tests: {},
+    // nodeCutoff: sessionStorage.getItem('nodeCutoff') || 0.1,
     nodeCutoff: sessionStorage.getItem('nodeCutoff') || 0.1,
+    // edgeCutoff: sessionStorage.getItem('edgeCutoff') || 0.375,
     edgeCutoff: sessionStorage.getItem('edgeCutoff') || 0.375,
     filteredNodesTotal: 0,
     filteredEdgesTotal: 0,
@@ -113,7 +115,7 @@ class Enrichment extends Component {
       title: '',
       // data: null,
       id: 'chart-network',
-      margin: { top: 0, right: 0, bottom: 0, left: 0 },
+      margin: { top: 50, right: 50, bottom: 50, left: 0 },
       // statLabel: '',
       // statistic: '',
       // formattedData: {},
@@ -1677,6 +1679,14 @@ class Enrichment extends Component {
   //   });
   // }, 500);
 
+  // handleNetworkCutoffInputChange = _.debounce((evt, { name, value }) => {
+  //   this.removeNetworkSVG();
+  //   this.setState({
+  //     [name]: value
+  //     // networkGraphReady: false
+  //   });
+  // }, 500);
+
   handleNetworkCutoffInputChange = (evt, { name, value }) => {
     this.removeNetworkSVG();
     this.setState({
@@ -1685,18 +1695,13 @@ class Enrichment extends Component {
     });
   };
 
-  // handleSliderChange = _.debounce(obj => {
-  //   this.setState(obj);
-  // }, 500);
-
-  handleSliderChange = (type, value) => {
-    // this.setState({
-    //   networkGraphReady: false
-    // });
-    this.removeNetworkSVG();
-    this.setState({ [type]: value });
+  handleSliderChange = _.debounce((type, value) => {
+    if (this.state[type] !== value) {
+      this.removeNetworkSVG();
+      this.setState({ [type]: value });
+    }
     sessionStorage.setItem(type, value);
-  };
+  }, 500);
 
   // handleLegendOpen = () => {
   //   // sessionStorage.setItem('legendOpen', 'true');

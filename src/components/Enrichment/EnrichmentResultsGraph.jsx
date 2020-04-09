@@ -11,15 +11,13 @@ import {
   Input,
   Button,
   Icon,
-  Segment
-  // Header,
-  // Dropdown
-  // Input
+  Dropdown,
+  Menu
 } from 'semantic-ui-react';
 import {
   sortableContainer,
-  sortableElement
-  // sortableHandle
+  sortableElement,
+  SortableHandle
 } from 'react-sortable-hoc';
 import arrayMove from 'array-move';
 import NetworkGraph from './NetworkGraph';
@@ -39,6 +37,33 @@ function getDynamicSize() {
   } else if (w > 1599 && w < 2600) {
     return undefined;
   } else if (w > 2599) return 'large';
+}
+
+function getDynamicLegend() {
+  let w = Math.max(
+    document.documentElement.clientWidth,
+    window.innerWidth || 0
+  );
+  if (w < 768) {
+    return {
+      padding: '1em',
+      width: '250px'
+    };
+  } else if (w > 767 && w < 1600) {
+    return {
+      padding: '1em',
+      width: '300px'
+    };
+    // else if (w > 1599 && w < 2600) {
+    //   return {
+    //     padding: '1em',
+    //     width: '450px'
+    //   };
+  } else
+    return {
+      padding: '1em',
+      width: '350px'
+    };
 }
 
 const resultRenderer = ({ description, genes, size }) => {
@@ -81,10 +106,7 @@ const resultRenderer = ({ description, genes, size }) => {
   );
 };
 
-const LegendPopupStyle = {
-  padding: '1em',
-  width: '250px'
-};
+const LegendPopupStyle = getDynamicLegend();
 
 const CustomPopupStyle = {
   backgroundColor: '2E2E2E',
@@ -96,7 +118,17 @@ const CustomPopupStyle = {
   wordBreak: 'break-word'
 };
 
-// const DragHandle = sortableHandle(() => <span>::</span>);
+const getItemName = val => {
+  if (val === 'significance') {
+    return 'Significance';
+  } else if (val === 'nodecount') {
+    return 'Node Count';
+  } else if (val === 'edgecount') {
+    return 'Edge Count';
+  }
+};
+
+const DragHandle = SortableHandle(() => <Icon name="bars" />);
 const SortableItem = sortableElement(props => {
   const ItemTooltip = function() {
     if (props.value === 'significance') {
@@ -107,30 +139,23 @@ const SortableItem = sortableElement(props => {
       return 'Sort clusters by number of edges per cluster';
     }
   };
-  const getItemName = () => {
-    if (props.value === 'significance') {
-      return 'Significance';
-    } else if (props.value === 'nodecount') {
-      return 'Node Count';
-    } else if (props.value === 'edgecount') {
-      return 'Edge Count';
-    }
-  };
 
   let dynamicSize = getDynamicSize();
 
   return (
-    <li className="NetworkGraphSortableLink">
-      {/* <DragHandle /> */}
+    <li className="NetworkGraphSortableList">
       <Popup
         trigger={
           <Label
+            className="NetworkGraphSortableListLabel"
             // color="blue"
             // size="small"
             size={dynamicSize}
             key={`label-${props.value}`}
           >
-            {props.sortIndex + 1}) {getItemName(props.value)}
+            <DragHandle />
+            {/* {props.sortIndex + 1})  */}
+            {getItemName(props.value)}
           </Label>
         }
         style={CustomPopupStyle}
@@ -139,11 +164,21 @@ const SortableItem = sortableElement(props => {
         position="left center"
       />
     </li>
+    //   <List celled size={dynamicSize}>
+    //   <List.Item key={`label-${props.value}`}>
+    //     <List.Content>
+    //       <List.Header>
+    //         <DragHandle />
+    //         {getItemName(props.value)}
+    //       </List.Header>
+    //     </List.Content>
+    //   </List.Item>
+    // </List>
   );
 });
 
 const SortableContainer = sortableContainer(({ children }) => {
-  return <ul>{children}</ul>;
+  return <ul className="NetworkGraphSortableList">{children}</ul>;
 });
 
 class EnrichmentResultsGraph extends Component {
@@ -305,15 +340,17 @@ class EnrichmentResultsGraph extends Component {
               className="NetworkGraphFilters"
               mobile={14}
               tablet={4}
-              largeScreen={2}
+              computer={4}
+              largeScreen={3}
               widescreen={2}
             ></Grid.Column>
             <Grid.Column
               // className="NetworkGraphFilters"
               mobile={16}
               tablet={10}
+              computer={10}
               largeScreen={4}
-              widescreen={4}
+              widescreen={3}
             >
               <Search
                 disabled={!networkGraphReady}
@@ -329,6 +366,25 @@ class EnrichmentResultsGraph extends Component {
               />
               <Radio
                 disabled={!networkGraphReady}
+                className="RadioLabelsDisplay DisplayOnSmaller"
+                // only="mobile computer"
+                toggle
+                size={dynamicSize}
+                label="Show Labels"
+                checked={this.state.showNetworkLabels}
+                onChange={this.handleLabels}
+              />
+            </Grid.Column>
+            <Grid.Column
+              // className="NetworkGraphFilters"
+              only="large screen widescreen"
+              // tablet={2}
+              // computer={2}
+              largeScreen={2}
+              widescreen={2}
+            >
+              <Radio
+                disabled={!networkGraphReady}
                 className="RadioLabelsDisplay"
                 toggle
                 size={dynamicSize}
@@ -341,8 +397,9 @@ class EnrichmentResultsGraph extends Component {
               className="NetworkGraphFilters"
               mobile={16}
               tablet={5}
-              largeScreen={4}
-              widescreen={4}
+              computer={5}
+              largeScreen={3}
+              widescreen={3}
             >
               <Input
                 disabled={!networkGraphReady}
@@ -360,7 +417,10 @@ class EnrichmentResultsGraph extends Component {
                 <Popup
                   trigger={
                     <Label className="NetworkInputLabel" size={dynamicSize}>
-                      NODE<br></br>SIGNIFICANCE<br></br>CUTOFF
+                      NODE
+                      <span className="DisplayOnLarge"> SIGNIFICANCE</span>
+                      <br></br>
+                      CUTOFF
                     </Label>
                   }
                   style={CustomPopupStyle}
@@ -389,29 +449,15 @@ class EnrichmentResultsGraph extends Component {
                     }
                   }}
                 />
-                <div
-                  className={networkGraphReady ? 'Show NodeEdgeTotals' : 'Hide'}
-                >
-                  <Popup
-                    trigger={
-                      <Label size={dynamicSize}>
-                        {filteredNodesTotal} of {totalNodes} Nodes
-                      </Label>
-                    }
-                    style={CustomPopupStyle}
-                    content="Number of nodes meeting current filter requirements, of total nodes without filters"
-                    inverted
-                    position="left center"
-                  />
-                </div>
               </div>
             </Grid.Column>
             <Grid.Column
               className="NetworkGraphFilters"
               mobile={16}
               tablet={5}
-              largeScreen={4}
-              widescreen={4}
+              computer={5}
+              largeScreen={3}
+              widescreen={3}
             >
               <Input
                 disabled={!networkGraphReady}
@@ -428,8 +474,11 @@ class EnrichmentResultsGraph extends Component {
               >
                 <Popup
                   trigger={
-                    <Label size={dynamicSize} className="NetworkInputLabel">
-                      EDGE<br></br>SIMILARITY<br></br>CUTOFF
+                    <Label className="NetworkInputLabel" size={dynamicSize}>
+                      EDGE
+                      <span className="DisplayOnLarge"> SIMILARITY</span>
+                      <br></br>
+                      CUTOFF
                     </Label>
                   }
                   style={CustomPopupStyle}
@@ -458,21 +507,6 @@ class EnrichmentResultsGraph extends Component {
                     }
                   }}
                 />
-                <span
-                  className={networkGraphReady ? 'Show NodeEdgeTotals' : 'Hide'}
-                >
-                  <Popup
-                    trigger={
-                      <Label size={dynamicSize}>
-                        {filteredEdgesTotal} of {totalEdges} Edges
-                      </Label>
-                    }
-                    style={CustomPopupStyle}
-                    content="Number of edges meeting current filter requirements, of total edges without filters"
-                    inverted
-                    position="left center"
-                  />
-                </span>
               </div>
             </Grid.Column>
             <Grid.Column
@@ -480,60 +514,55 @@ class EnrichmentResultsGraph extends Component {
               id="NetworkGraphSortByDiv"
               mobile={16}
               tablet={6}
-              largeScreen={2}
-              widescreen={2}
+              computer={6}
+              largeScreen={3}
+              widescreen={3}
             >
-              <Segment
-                id="NetworkGraphSortBySegment"
+              <Menu
+                id="NetworkGraphSortByMenu"
                 className={networkGraphReady ? 'Show' : 'Hide'}
+                // secondary
+                size={dynamicSize}
               >
-                <Label
-                  attached="top"
-                  id="NetworkSortByLabel"
-                  size={dynamicSize}
-                >
-                  SORT BY
-                </Label>
-                <SortableContainer
-                  onSortEnd={this.onSortEnd}
-                  // useDragHandle
-                  helperClass="SortableHelper"
-                >
-                  {networkSortBy.map((value, index) => (
-                    <SortableItem
-                      disabled={!networkGraphReady}
-                      key={`item-${value}`}
-                      index={index}
-                      sortIndex={index}
-                      value={value}
-                      className="SortableItem NoSelect"
-                    />
-                  ))}
-                </SortableContainer>
-                {/* <SortableList
-                  networkSortBy={this.state.networkSortBy}
-                  onSortEnd={this.onSortEnd}
-                /> */}
-              </Segment>
-              {/* <span>
-                <span id="NetworkGraphSortByText">Sort By </span>
                 <Popup
                   trigger={
-                    <Dropdown
-                      inline
-                      disabled={!networkGraphReady}
-                      // header="Sort By"
-                      options={networkSortByOptions}
-                      defaultValue={networkSortBy}
-                      onChange={this.props.onHandleNetworkSortByChange}
-                    />
+                    <Label className="NetworkInputLabel" size={dynamicSize}>
+                      SORT
+                      <br></br>
+                      BY
+                    </Label>
                   }
                   style={CustomPopupStyle}
-                  content={DropdownTooltip}
+                  content="Drag and drop list determines the order in which clusters of nodes will be sorted, left to right."
                   inverted
+                  basic
                   position="left center"
                 />
-              </span> */}
+                <Dropdown
+                  item
+                  size={dynamicSize}
+                  disabled={!networkGraphReady}
+                  text={getItemName(networkSortBy[0])}
+                >
+                  <Dropdown.Menu>
+                    <SortableContainer
+                      onSortEnd={this.onSortEnd}
+                      helperClass="SortableHelper"
+                    >
+                      {networkSortBy.map((value, index) => (
+                        <SortableItem
+                          disabled={!networkGraphReady}
+                          key={`item-${value}`}
+                          index={index}
+                          sortIndex={index}
+                          value={value}
+                          className="SortableItem NoSelect"
+                        />
+                      ))}
+                    </SortableContainer>
+                  </Dropdown.Menu>
+                </Dropdown>
+              </Menu>
             </Grid.Column>
           </Grid.Row>
           <Grid.Row className="NetworkGraphContainer">
@@ -541,6 +570,7 @@ class EnrichmentResultsGraph extends Component {
               id="LegendColumn"
               mobile={8}
               tablet={8}
+              computer={8}
               largeScreen={8}
               widescreen={8}
             >
@@ -553,7 +583,7 @@ class EnrichmentResultsGraph extends Component {
                     // color="blue"
                     id="LegendIconButton"
                     className={networkGraphReady ? 'Show' : 'Hide'}
-                    size={dynamicSize}
+                    size="mini"
                   >
                     Legend
                     <Icon name="info" />
@@ -573,29 +603,46 @@ class EnrichmentResultsGraph extends Component {
                 <Popup.Content className="legend"></Popup.Content>
               </Popup>
             </Grid.Column>
-            {/* <Grid.Column
+            <Grid.Column
               id="TotalsColumn"
               mobile={8}
               tablet={8}
+              computer={8}
               largeScreen={8}
               widescreen={8}
             >
-              <span
-                id="NodeEdgeTotals"
-                className={networkGraphReady ? 'Show' : 'Hide'}
+              <div
+                className={networkGraphReady ? 'Show NodeEdgeTotals' : 'Hide'}
               >
-                <Label>
-                  {filteredNodesTotal} of {totalNodes} Nodes
-                </Label>
-                <Label>
-                  {filteredEdgesTotal} of {totalEdges} Edges
-                </Label>
-              </span>
-            </Grid.Column> */}
+                <Popup
+                  trigger={
+                    <Label size={dynamicSize}>
+                      {filteredNodesTotal} of {totalNodes} Nodes
+                    </Label>
+                  }
+                  style={CustomPopupStyle}
+                  content="Number of nodes meeting current filter requirements, of total nodes without filters"
+                  inverted
+                  position="left center"
+                />
+                <Popup
+                  trigger={
+                    <Label size={dynamicSize}>
+                      {filteredEdgesTotal} of {totalEdges} Edges
+                    </Label>
+                  }
+                  style={CustomPopupStyle}
+                  content="Number of edges meeting current filter requirements, of total edges without filters"
+                  inverted
+                  position="left center"
+                />
+              </div>
+            </Grid.Column>
             <Grid.Column
               className=""
               mobile={16}
               tablet={16}
+              computer={16}
               largeScreen={16}
               widescreen={16}
             >
