@@ -340,15 +340,17 @@ class EnrichmentResultsGraph extends Component {
               className="NetworkGraphFilters"
               mobile={14}
               tablet={4}
-              largeScreen={2}
+              computer={4}
+              largeScreen={3}
               widescreen={2}
             ></Grid.Column>
             <Grid.Column
               // className="NetworkGraphFilters"
               mobile={16}
               tablet={10}
+              computer={10}
               largeScreen={4}
-              widescreen={4}
+              widescreen={3}
             >
               <Search
                 disabled={!networkGraphReady}
@@ -364,6 +366,25 @@ class EnrichmentResultsGraph extends Component {
               />
               <Radio
                 disabled={!networkGraphReady}
+                className="RadioLabelsDisplay DisplayOnSmaller"
+                // only="mobile computer"
+                toggle
+                size={dynamicSize}
+                label="Show Labels"
+                checked={this.state.showNetworkLabels}
+                onChange={this.handleLabels}
+              />
+            </Grid.Column>
+            <Grid.Column
+              // className="NetworkGraphFilters"
+              only="large screen widescreen"
+              // tablet={2}
+              // computer={2}
+              largeScreen={2}
+              widescreen={2}
+            >
+              <Radio
+                disabled={!networkGraphReady}
                 className="RadioLabelsDisplay"
                 toggle
                 size={dynamicSize}
@@ -376,6 +397,7 @@ class EnrichmentResultsGraph extends Component {
               className="NetworkGraphFilters"
               mobile={16}
               tablet={5}
+              computer={5}
               largeScreen={3}
               widescreen={3}
             >
@@ -433,6 +455,7 @@ class EnrichmentResultsGraph extends Component {
               className="NetworkGraphFilters"
               mobile={16}
               tablet={5}
+              computer={5}
               largeScreen={3}
               widescreen={3}
             >
@@ -491,6 +514,7 @@ class EnrichmentResultsGraph extends Component {
               id="NetworkGraphSortByDiv"
               mobile={16}
               tablet={6}
+              computer={6}
               largeScreen={3}
               widescreen={3}
             >
@@ -546,6 +570,7 @@ class EnrichmentResultsGraph extends Component {
               id="LegendColumn"
               mobile={8}
               tablet={8}
+              computer={8}
               largeScreen={8}
               widescreen={8}
             >
@@ -582,6 +607,7 @@ class EnrichmentResultsGraph extends Component {
               id="TotalsColumn"
               mobile={8}
               tablet={8}
+              computer={8}
               largeScreen={8}
               widescreen={8}
             >
@@ -616,6 +642,7 @@ class EnrichmentResultsGraph extends Component {
               className=""
               mobile={16}
               tablet={16}
+              computer={16}
               largeScreen={16}
               widescreen={16}
             >

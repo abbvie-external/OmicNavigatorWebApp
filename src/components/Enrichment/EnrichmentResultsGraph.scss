@@ -168,6 +168,16 @@
   }
 }
 
+.DisplayOnSmaller {
+  display: inline !important;
+}
+
+@media (min-width: 1920px) {
+  .DisplayOnSmaller {
+    display: none !important;
+  }
+}
+
 .NetworkInputLabel {
   margin-right: -1px !important;
   width: max-content;
