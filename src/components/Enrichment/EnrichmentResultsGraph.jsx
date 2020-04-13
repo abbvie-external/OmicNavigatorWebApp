@@ -32,22 +32,19 @@ import './EnrichmentResultsGraph.scss';
 
 const StyledSlider = styled(ReactSlider)`
   width: 100%;
-  height: 16px;
-  cursor: grab;
+  height: 18px;
+  cursor: pointer;
 `;
 
 const StyledThumb = styled.div`
-  line-height: 20px;
+  line-height: 32px;
   text-align: center;
-  /* background-color: #2e2e2e; */
-  /* color: #fff; */
-  /* border-radius: 50%; */
   cursor: grab !important;
-  margin-top: -5px;
+  margin-top: -7px;
   top: 0px;
   left: 219px;
-  height: 26px;
-  width: 26px;
+  height: 30px;
+  width: 30px;
   border-radius: 100%;
   background-color: rgb(255, 255, 255);
   box-shadow: rgba(34, 36, 38, 0.15) 0px 1px 2px 0px,
@@ -382,7 +379,9 @@ class EnrichmentResultsGraph extends Component {
 
       const NodeThumb = (props, state) => (
         <StyledThumb {...props}>
-          {/* <span>{state.valueNow !== 0 ? state.valueNow / 100 : 0}</span> */}
+          <span className="ValueNowNode">
+            {state.valueNow >= 1 ? state.valueNow / 100 : 0.01}
+          </span>
         </StyledThumb>
       );
       const NodeTrack = (props, state) => (
@@ -391,7 +390,9 @@ class EnrichmentResultsGraph extends Component {
 
       const EdgeThumb = (props, state) => (
         <StyledThumb {...props}>
-          {/* <span>{state.valueNow / 100}</span> */}
+          <span className="ValueNowEdge">
+            {state.valueNow >= 5 ? state.valueNow / 100 : 0.05}
+          </span>
         </StyledThumb>
       );
       const EdgeTrack = (props, state) => (
@@ -493,7 +494,7 @@ class EnrichmentResultsGraph extends Component {
                   precision={2}
                   size={dynamicSize}
                   stepAmount={0.01}
-                  minValue={0}
+                  minValue={0.01}
                   maxValue={1.0}
                   defaultValue={0.1}
                   id="NetworkSliderNodeInput"

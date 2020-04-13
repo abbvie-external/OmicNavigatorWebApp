@@ -213,6 +213,16 @@
   width: 100% !important;
 }
 
+.ValueNowNode {
+  color: var(--color-dark) !important;
+  margin-right: -65px;
+}
+
+.ValueNowEdge {
+  color: var(--color-dark) !important;
+  margin-left: -65px;
+}
+
 .DisplayOnLarge {
   display: none !important;
 }
@@ -374,7 +384,14 @@
 
 #LegendColumn,
 #TotalsColumn {
-  margin-top: -10px !important;
+  margin-top: -10px;
+}
+
+@media (min-width: 1200px) and (max-width: 1280px) {
+  #LegendColumn,
+  #TotalsColumn {
+    margin-top: 5px;
+  }
 }
 
 .NodeEdgeTotals {

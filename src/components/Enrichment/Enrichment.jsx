@@ -1733,7 +1733,7 @@ class Enrichment extends Component {
   // }, 500);
 
   handleNodeSliderChange = _.debounce(value => {
-    let decimalValue = value === 0 ? 0.01 : value / 100;
+    let decimalValue = value >= 1 ? value / 100 : 0.01;
     if (this.state.nodeCutoff !== decimalValue) {
       this.removeNetworkSVG();
       this.setState({ nodeCutoff: decimalValue });
