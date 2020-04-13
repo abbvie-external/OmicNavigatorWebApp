@@ -275,7 +275,7 @@ class BarcodePlotReact extends Component {
           }`;
           const maxLine = d3.select(`#barcode-line-${maxLineId}`);
           maxLine.classed('MaxLine', true).attr('y1', settings.margin.max);
-          const statistic = maxLineObject.statisic;
+          const statistic = maxLineObject.statistic;
           const textAnchor =
             statistic > self.props.barcodeSettings.highStat / 2
               ? 'end'
