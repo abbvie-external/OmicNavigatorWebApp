@@ -47,6 +47,7 @@
 @media (max-width: 767px) {
   #NetworkSearchInput {
     margin-top: 20px !important;
+    width: initial;
   }
 }
 
@@ -122,41 +123,95 @@
 }
 
 .NetworkSliderAndTotalsDiv {
-  max-width: 225px;
+  margin-top: 10px;
+  margin-bottom: 5px;
+  max-width: 245px;
 }
 
 @media (min-width: 1600px) and (max-width: 2599px) {
   .NetworkSliderAndTotalsDiv {
-    max-width: 200px !important;
+    max-width: 220px !important;
   }
 }
 
-@media (min-width: 1200px) and (max-width: 1599px) {
+// @media (min-width: 1200px) and (max-width: 1599px) {
+//   .NetworkSliderAndTotalsDiv {
+//     max-width: 130px !important;
+//   }
+// }
+
+// @media (min-width: 768px) and (max-width: 1199px) {
+//   .NetworkSliderAndTotalsDiv {
+//     max-width: 135px !important;
+//   }
+// }
+
+@media (max-width: 1599px) {
   .NetworkSliderAndTotalsDiv {
-    max-width: 155px !important;
+    max-width: 135px !important;
   }
 }
 
-@media (max-width: 1199px) {
-  .NetworkSliderAndTotalsDiv {
-    max-width: 180px !important;
-  }
+.InlineFlex {
+  display: inline-flex;
+  flex-direction: row;
+  // font-size: 0;
+  // vertical-align: baseline;
+  // margin: 0 0.25em 0 0;
+  margin-bottom: 10px;
 }
 
 .NetworkSliderInput {
   // margin: 0px 0px 10px 25px !important;
-  margin: 0px 0px 10px 0px !important;
+  // margin: 0px 0px 10px 0px !important;
+  // display: inline-block !important;
+  // font-size: inherit !important;
+  font-size: inherit !important;
+}
+
+@media (min-width: 1600px) {
+  .NetworkSliderInput .ui.input > input {
+    font-size: initial !important;
+  }
 }
 
 .NetworkSliderInput input {
   border-radius: 0px 0.28571429rem 0.28571429rem 0px !important;
+  font-size: inherit !important;
+  font-weight: bold;
+  width: 53px !important;
 }
 
-// @media (max-width: 1600px) {
-//   .NetworkSliderInput {
-//     margin: 0px 0px 10px 0px !important;
+@media (min-width: 1600px) and (max-width: 2599px) {
+  .NetworkSliderInput .ui.input > input {
+    width: 65px !important;
+  }
+}
+
+@media (min-width: 2600px) {
+  .NetworkSliderInput .ui.input > input {
+    width: 75px !important;
+  }
+}
+
+// #NetworkSliderNodeInput .ui.input > input {
+//   width: 65px !important;
+// }
+
+// #NetworkSliderEdgeInput .ui.input > input {
+//   width: 75px !important;
+// }
+
+// @media (min-width: 1920px) {
+//   .NetworkSliderInput .ui.input > input {
+//     font-weight: bold;
+//     width: 70px !important;
 //   }
 // }
+
+.NetworkSlider {
+  width: 100% !important;
+}
 
 .DisplayOnLarge {
   display: none !important;
@@ -184,6 +239,7 @@
   border-radius: 0.28571429rem 0px 0px 0.28571429rem !important;
   background-color: var(--color-dark) !important;
   color: var(--color-light) !important;
+  display: inline-block !important;
 }
 
 // @media (max-width: 768px) {
