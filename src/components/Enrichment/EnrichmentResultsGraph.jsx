@@ -522,7 +522,11 @@ class EnrichmentResultsGraph extends Component {
                   renderTrack={NodeTrack}
                   renderThumb={NodeThumb}
                   disabled={!networkGraphReady}
-                  className="NetworkSlider"
+                  className={
+                    networkGraphReady
+                      ? 'NetworkSlider Show'
+                      : 'NetworkSlider Hide'
+                  }
                   value={nodeCutoff * 100}
                   name="nodeCutoffSlider"
                   onChange={this.props.onHandleNodeSliderChange}
@@ -609,7 +613,11 @@ class EnrichmentResultsGraph extends Component {
                   renderTrack={EdgeTrack}
                   renderThumb={EdgeThumb}
                   disabled={!networkGraphReady}
-                  className="NetworkSlider"
+                  className={
+                    networkGraphReady
+                      ? 'NetworkSlider Show'
+                      : 'NetworkSlider Hide'
+                  }
                   value={edgeCutoff * 100}
                   name="edgeCutoffSlider"
                   onChange={this.props.onHandleEdgeSliderChange}
