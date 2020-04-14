@@ -80,10 +80,6 @@ class SplitPanesContainer extends Component {
   }
 
   handleViolinDotSelected = e => {
-    debugger;
-    console.log('violin dot selected');
-    console.log(e);
-
     this.setState({
       violinDotSelected: e,
     });

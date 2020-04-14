@@ -780,7 +780,6 @@ class Enrichment extends Component {
   };
 
   handleHighlightedLineReset = obj => {
-    debugger;
     this.setState(obj);
   };
 
@@ -788,7 +787,6 @@ class Enrichment extends Component {
     const { enrichmentStudy, enrichmentModel } = this.props;
     // let self = this;
     // if (this.state.barcodeSettings.barcodeData > 0) {
-    debugger;
     if (lineId != null) {
       if (
         lineId !== this.state.HighlightedLineId ||

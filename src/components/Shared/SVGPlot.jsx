@@ -14,16 +14,14 @@ class SVGPlot extends Component {
     });
   }
 
-  componentDidUpdate = (prevProps, prevState) => {
-    debugger;
-
-    // if (this.props.imageInfo.svg !== prevProps.imageInfo.svg) {
-    //   this.setState({
-    //     isSVGReady: false,
-    //   });
-    //   this.getSVGPanes();
-    // }
-  };
+  //componentDidUpdate = (prevProps, prevState) => {
+  // if (this.props.imageInfo.svg !== prevProps.imageInfo.svg) {
+  //   this.setState({
+  //     isSVGReady: false,
+  //   });
+  //   this.getSVGPanes();
+  // }
+  //};
 
   handleTabChange = (e, { activeIndex }) => {
     this.props.onSVGTabChange(activeIndex);

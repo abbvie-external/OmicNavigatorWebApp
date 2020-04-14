@@ -87,7 +87,6 @@ class BarcodePlotReact extends Component {
         tooltipPosition: ttPosition,
         tooltipTextAnchor: textAnchor,
       });
-      debugger;
       self.props.onHandleLineSelected(maxLineData.lineID);
       // this.setState({
       //   highlightedLineName: self.props.violinDotSelected,
@@ -127,7 +126,6 @@ class BarcodePlotReact extends Component {
   }
 
   handleSVGClick = event => {
-    debugger;
     this.unhighlightBrushedLines();
     // this.barcodeSVGRef.select(".brush").call(this.brushRef.move, null)
     this.props.onHandleBarcodeChanges({
@@ -289,7 +287,6 @@ class BarcodePlotReact extends Component {
           });
         }
       } else {
-        debugger;
         self.handleSVGClick(null);
       }
     };
