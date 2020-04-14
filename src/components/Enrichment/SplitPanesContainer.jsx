@@ -18,7 +18,6 @@ class SplitPanesContainer extends Component {
     super(props);
     this.state = {
       activeSVGTabIndex: 0,
-      proteinForDiffView: '',
       horizontalSplitPaneSize:
         parseInt(sessionStorage.getItem('horizontalSplitPaneSize'), 10) || 250,
       verticalSplitPaneSize:
@@ -31,12 +30,6 @@ class SplitPanesContainer extends Component {
   handleSVGTabChange = activeTabIndex => {
     this.setState({
       activeSVGTabIndex: activeTabIndex,
-    });
-  };
-
-  setProteinForDiffView = proteinSite => {
-    this.setState({
-      proteinForDiffView: proteinSite,
     });
   };
 
@@ -58,19 +51,7 @@ class SplitPanesContainer extends Component {
           className="BarcodePlotContainer"
           {...this.state}
           {...this.props}
-          onSetProteinForDiffView={this.setProteinForDiffView}
         />
-        // <BarcodePlot
-        //   className="BarcodePlotContainer"
-        //   {...this.state}
-        //   {...this.props}
-        //   onSetProteinForDiffView={this.setProteinForDiffView}
-        // />
-        // <BarcodePlotReusable
-        //   data={barcodeSettings.barcodeData}
-        //   xAccessor={absTAccessor}
-        //   label="test"
-        // />
       );
     }
   };
@@ -99,6 +80,7 @@ class SplitPanesContainer extends Component {
   }
 
   handleViolinDotSelected = e => {
+    debugger;
     console.log('violin dot selected');
     console.log(e);
 
@@ -144,7 +126,11 @@ class SplitPanesContainer extends Component {
             className="TableResultsTab"
             // as="div"
           >
-            <FilteredPepplotTable {...this.state} {...this.props} />
+            <FilteredPepplotTable
+              {...this.state}
+              {...this.props}
+              onHandleViolinDotSelected={this.handleViolinDotSelected}
+            />
           </Tab.Pane>
         ),
       },

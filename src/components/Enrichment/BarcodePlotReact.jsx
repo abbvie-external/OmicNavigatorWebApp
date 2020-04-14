@@ -87,7 +87,8 @@ class BarcodePlotReact extends Component {
         tooltipPosition: ttPosition,
         tooltipTextAnchor: textAnchor,
       });
-      self.props.onHandleMaxLinePlot(maxLineData);
+      debugger;
+      self.props.onHandleLineSelected(maxLineData.lineID);
       // this.setState({
       //   highlightedLineName: self.props.violinDotSelected,
       // });
@@ -126,12 +127,13 @@ class BarcodePlotReact extends Component {
   }
 
   handleSVGClick = event => {
+    debugger;
     this.unhighlightBrushedLines();
     // this.barcodeSVGRef.select(".brush").call(this.brushRef.move, null)
     this.props.onHandleBarcodeChanges({
       brushedData: [],
     });
-    this.props.onHandleMaxLinePlot(null);
+    this.props.onHandleLineSelected(null);
     this.setState({
       settings: {
         ...this.state.settings,
@@ -222,10 +224,12 @@ class BarcodePlotReact extends Component {
         hoveredLineId: null,
         hoveredLineName: null,
       });
+      // }
+      //}
     };
 
     const highlightBrushedLines = function() {
-      if (d3.event.selection !== undefined && d3.event.selection !== null) {
+      if (d3.event.selection != null) {
         const brushedLines = d3.brushSelection(this);
         const isBrushed = function(brushedLines, x) {
           const xMin = brushedLines[0][0];
@@ -284,24 +288,30 @@ class BarcodePlotReact extends Component {
             tooltipTextAnchor: textAnchor,
           });
         }
+      } else {
+        debugger;
+        self.handleSVGClick(null);
       }
     };
 
     const endBrush = function() {
-      if (self.props.barcodeSettings.brushedData.length > 0) {
-        const maxLineData = self.getMaxObject(
-          self.props.barcodeSettings.brushedData,
-        );
-        self.props.onSetProteinForDiffView(maxLineData);
-        self.props.onHandleMaxLinePlot(maxLineData);
+      const selection = d3.event.selection;
+      if (selection == null) {
+        self.handleSVGClick(null);
       } else {
-        self.props.onSetProteinForDiffView(null);
-        self.props.onHandleMaxLinePlot(null);
-        self.setState({
-          tooltipPosition: null,
-          tooltipTextAnchor: null,
-          highlightedLineName: null,
-        });
+        if (self.props.barcodeSettings.brushedData.length > 0) {
+          const maxLineData = self.getMaxObject(
+            self.props.barcodeSettings.brushedData,
+          );
+          self.props.onHandleLineSelected(maxLineData.lineID);
+        } else {
+          self.props.onHandleLineSelected(null);
+          self.setState({
+            tooltipPosition: null,
+            tooltipTextAnchor: null,
+            highlightedLineName: null,
+          });
+        }
       }
     };
 

@@ -5,23 +5,25 @@ import './SVGPlot.scss';
 
 class SVGPlot extends Component {
   state = {
-    isSVGReady: false
+    isSVGReady: false,
   };
 
   componentDidMount() {
     this.setState({
-      isSVGReady: true
+      isSVGReady: true,
     });
   }
 
-  // componentDidUpdate = (prevProps, prevState) => {
-  //   if (
-  //     this.props.imageInfo.svg !==
-  //     prevProps.imageInfo.svg
-  //   ) {
-  //     this.getSVGPanes();
-  //   }
-  // };
+  componentDidUpdate = (prevProps, prevState) => {
+    debugger;
+
+    // if (this.props.imageInfo.svg !== prevProps.imageInfo.svg) {
+    //   this.setState({
+    //     isSVGReady: false,
+    //   });
+    //   this.getSVGPanes();
+    // }
+  };
 
   handleTabChange = (e, { activeIndex }) => {
     this.props.onSVGTabChange(activeIndex);
@@ -30,7 +32,7 @@ class SVGPlot extends Component {
   handleDiffTable = evt => {
     const key = this.props.imageInfo.key.split(':');
     const name = key[0] || '';
-    const diffProtein = this.props.proteinForDiffView.lineID;
+    const diffProtein = this.props.HighlightedLineId;
     this.props.onViewDiffTable(name, diffProtein);
   };
 
@@ -58,7 +60,7 @@ class SVGPlot extends Component {
                 dangerouslySetInnerHTML={{ __html: s.svg }}
               ></div>
             </Tab.Pane>
-          )
+          ),
         };
       });
 
@@ -82,7 +84,7 @@ class SVGPlot extends Component {
       padding: '1em',
       maxWidth: '50vw',
       fontSize: '13px',
-      wordBreak: 'break-all'
+      wordBreak: 'break-all',
     };
     const svgPanes = this.getSVGPanes(activeSVGTabIndex);
     if (!this.state.isSVGReady) {

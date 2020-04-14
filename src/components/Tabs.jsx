@@ -16,7 +16,16 @@ class Tabs extends Component {
     const studyFromUrl = params[1] || '';
     const modelFromUrl = params[2] || '';
     const testFromUrl = params[3] || '';
+    // const fourthParam = params[4] || '';
+    // const fifthParam = params[5] || '';
+    // const siteCombined = fifthParam !== '' ? `${fourthParam}/${fifthParam}` : fourthParam;
+    // let replacementString = '&';
+    // let siteFromUrl = siteRaw.replace(
+    //   /\//g,
+    //   replacementString,
+    // );
     const siteFromUrl = params[4] || '';
+
     if (tabFromUrl === 'pepplot') {
       this.state = {
         activeIndex: 2,
@@ -30,7 +39,7 @@ class Tabs extends Component {
         enrichmentAnnotation: '',
         pValueType: 'nominal',
         proteinToHighlightInDiffTable: '',
-        proteinHighlightInProgress: false
+        proteinHighlightInProgress: false,
       };
     } else {
       this.state = {
@@ -46,7 +55,7 @@ class Tabs extends Component {
         pepplotProteinSite: '',
         pValueType: 'nominal',
         proteinToHighlightInDiffTable: '',
-        proteinHighlightInProgress: false
+        proteinHighlightInProgress: false,
       };
     }
   }
@@ -59,26 +68,26 @@ class Tabs extends Component {
       'tabInit',
       this.setTabIndex,
       false,
-      null
+      null,
     );
   }
 
   setTabIndex = tabIndex => {
     this.setState({
-      activeIndex: tabIndex
+      activeIndex: tabIndex,
     });
   };
 
   handlePValueTypeChange = type => {
     this.setState({
-      pValueType: type
+      pValueType: type,
     });
   };
 
   handleTabChange = (e, { activeIndex }) => {
     let newTab = activeIndex === 3 ? 'pepplot' : 'enrichment';
     this.setState({
-      tab: newTab
+      tab: newTab,
     });
     updateUrl(
       this.props,
@@ -87,7 +96,7 @@ class Tabs extends Component {
       'tabChange',
       this.setTabIndex,
       false,
-      null
+      null,
     );
   };
 
@@ -99,7 +108,7 @@ class Tabs extends Component {
         pepplotModel: changes.pepplotModel || '',
         pepplotTest: changes.pepplotTest || '',
         pepplotProteinSite: changes.pepplotProteinSite || '',
-        proteinHighlightInProgress: false
+        proteinHighlightInProgress: false,
       });
     } else if (tab === 'enrichment') {
       this.setState({
@@ -109,7 +118,7 @@ class Tabs extends Component {
         enrichmentAnnotation: changes.enrichmentAnnotation || '',
         enrichmentDescriptionAndTest:
           changes.enrichmentDescriptionAndTest || '',
-        proteinHighlightInProgress: false
+        proteinHighlightInProgress: false,
       });
     }
     updateUrl(
@@ -119,7 +128,7 @@ class Tabs extends Component {
       'tabInit',
       this.setTabIndex,
       true,
-      tab
+      tab,
     );
   };
 
@@ -131,12 +140,12 @@ class Tabs extends Component {
       pepplotModel: this.state.enrichmentModel || '',
       pepplotTest: test || '',
       proteinToHighlightInDiffTable: protein,
-      proteinHighlightInProgress: true
+      proteinHighlightInProgress: true,
     });
     let changes = {
       pepplotStudy: this.state.enrichmentStudy || '',
       pepplotModel: this.state.enrichmentModel || '',
-      pepplotTest: test || ''
+      pepplotTest: test || '',
     };
     updateUrl(
       this.props,
@@ -145,7 +154,7 @@ class Tabs extends Component {
       'tabChange',
       this.setTabIndex,
       true,
-      'pepplot'
+      'pepplot',
     );
   };
 
@@ -165,7 +174,7 @@ class Tabs extends Component {
             <span className="Header HeaderFirst">Phosphoproteomic&nbsp;</span>
             <span className="Header HeaderSecond">Analyzer</span>
           </Menu.Item>
-        )
+        ),
       },
       {
         menuItem: 'Differential Analysis',
@@ -177,7 +186,7 @@ class Tabs extends Component {
               onSearchCriteriaToTop={this.handleSearchCriteriaToTop}
             />
           </Tab.Pane>
-        )
+        ),
       },
       {
         menuItem: 'Enrichment Analysis',
@@ -191,8 +200,8 @@ class Tabs extends Component {
               onViewDiffTable={this.handleViewDiffTable}
             />
           </Tab.Pane>
-        )
-      }
+        ),
+      },
     ];
 
     return (
@@ -206,7 +215,7 @@ class Tabs extends Component {
           secondary: true,
           pointing: true,
           inverted: true,
-          className: 'MenuContainer'
+          className: 'MenuContainer',
         }}
       />
     );
