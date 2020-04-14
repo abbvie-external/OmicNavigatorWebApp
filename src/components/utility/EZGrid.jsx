@@ -2,17 +2,26 @@ import React, { PureComponent } from 'react';
 import _ from 'lodash';
 import update from 'immutability-helper';
 import Axios from 'axios';
+
 import QHGrid from './QHGrid';
 import { filterTypes } from './FilterTypeConfig';
 import { getField, getFieldValue } from './selectors/QHGridSelector';
 import {
   stripNonCustomViews,
-  ezQuickViewSelector
+  ezQuickViewSelector,
 } from './selectors/quickViewSelector';
 import QuickViewModal from './QuickViewModal';
 
 const cache = {};
-
+/**
+ * @callback onRowClick
+ * @param {React.MouseEvent}
+ * @param {{}} itemData
+ * @param {number} index
+ */
+/**
+ * @callback onRowClick
+ */
 /**
  * @callback rowLevelStyleCalc
  * @param {{}} item
@@ -43,6 +52,7 @@ const cache = {};
              loading: boolean,
              additionalTemplateInfo: {},
              rowLevelStyleCalc: rowLevelStyleCalc,
+             onRowClick: onRowClick,
              fetchData: fetchData,
              quickViews: {},
              quickViewsId: string,
@@ -65,7 +75,7 @@ const cache = {};
              onQuickViewChange: onQuickViewChange,
              onQuickViewShare: onQuickViewShare,
              defaultQuickView: string,
-             uniqueCacheKey: string
+             uniqueCacheKey: string,
              }>}
  */
 export default class EZGrid extends PureComponent {
@@ -78,11 +88,11 @@ export default class EZGrid extends PureComponent {
     grouping: [],
     filteredData: [],
     itemsPerPage: 15,
-    activePage: 1
+    activePage: 1,
   };
   static defaultProps = {
     showError: () => {},
-    itemsPerPage: 15
+    itemsPerPage: 15,
   };
   componentDidMount = () => {
     if (
@@ -96,7 +106,7 @@ export default class EZGrid extends PureComponent {
       this.setState({
         columns: columnsConfig,
         columnsConfig,
-        itemsPerPage: this.props.itemsPerPage
+        itemsPerPage: this.props.itemsPerPage,
       });
       this.getQuickViews(true);
       this.filterData();
@@ -138,8 +148,8 @@ export default class EZGrid extends PureComponent {
         quickViews: ezQuickViewSelector(
           prev.quickViewsConfig,
           prev,
-          this.props.quickViewsId
-        )
+          this.props.quickViewsId,
+        ),
       }));
     }
     if (this.props.quickView && this.props.quickView !== prevProps.quickView) {
@@ -183,9 +193,11 @@ export default class EZGrid extends PureComponent {
       if (quickViewsURL && ownerId) {
         let params = { quickViewsId, ownerId };
         try {
-          localRemoteQuickViews = (await Axios.get(quickViewsURL, {
-            params
-          })).data;
+          localRemoteQuickViews = (
+            await Axios.get(quickViewsURL, {
+              params,
+            })
+          ).data;
         } catch (error) {
           this.props.showError('Failed to get quickviews from the service');
           console.error(error);
@@ -193,7 +205,7 @@ export default class EZGrid extends PureComponent {
       } else {
         let storageKey = `${process.env.REACT_APP_NAME}.${quickViewsId}.quickViews`;
         localRemoteQuickViews = JSON.parse(
-          localStorage.getItem(storageKey) || '{}'
+          localStorage.getItem(storageKey) || '{}',
         );
       }
     }
@@ -206,8 +218,8 @@ export default class EZGrid extends PureComponent {
         quickViews: ezQuickViewSelector(
           quickViews,
           prev,
-          this.props.quickViewsId
-        )
+          this.props.quickViewsId,
+        ),
       }),
       () => {
         if (!isMounting) return;
@@ -217,7 +229,7 @@ export default class EZGrid extends PureComponent {
             this.state.quickViews.find(view => view.name === quickView) || {};
           if (view) this.setState({ ...view });
         }
-      }
+      },
     );
   };
   saveQuickViews = async () => {
@@ -229,7 +241,7 @@ export default class EZGrid extends PureComponent {
       let params = {
         quickViewsId,
         ownerId,
-        quickViews: JSON.stringify(quickViewsConfig)
+        quickViews: JSON.stringify(quickViewsConfig),
       };
       try {
         await Axios.put(quickViewsURL, params);
@@ -253,7 +265,7 @@ export default class EZGrid extends PureComponent {
         activePage,
         itemsPerPage,
         filters,
-        columns
+        columns,
       } = prev;
       columns = columns.map(col => ({ ID: col.ID, hidden: col.hidden }));
       let props = {
@@ -269,8 +281,8 @@ export default class EZGrid extends PureComponent {
           activePage,
           itemsPerPage,
           filters,
-          columns
-        }
+          columns,
+        },
       };
       quickViewsConfig = { ...quickViewsConfig, [name]: props };
       return { quickViewsConfig };
@@ -288,7 +300,7 @@ export default class EZGrid extends PureComponent {
           activePage,
           itemsPerPage,
           filters,
-          columns
+          columns,
         } = prev;
         columns = columns.map(col => ({ ID: col.ID, hidden: col.hidden }));
         let props = {
@@ -304,13 +316,13 @@ export default class EZGrid extends PureComponent {
             activePage,
             itemsPerPage,
             filters,
-            columns
-          }
+            columns,
+          },
         };
         // quickViewsConfig = { ...quickViewsConfig, [name]: undefined, [newName]: props };
         quickViewsConfig = update(quickViewsConfig, {
           $unset: [name],
-          [newName]: { $set: props }
+          [newName]: { $set: props },
         });
         return { quickViewsConfig };
       }, this.saveQuickViews);
@@ -323,7 +335,7 @@ export default class EZGrid extends PureComponent {
         // quickViewsConfig = { ...quickViewsConfig, [name]: undefined, [newName]: { ...editView, group, icon, color } };
         quickViewsConfig = update(quickViewsConfig, {
           $unset: [name],
-          [newName]: { $set: props }
+          [newName]: { $set: props },
         });
         return { quickViewsConfig };
       }, this.saveQuickViews);
@@ -333,9 +345,9 @@ export default class EZGrid extends PureComponent {
     this.setState(
       // (prev) => ({ quickViewsConfig: { ...prev.quickViewsConfig, [name]: undefined } }),
       prev => ({
-        quickViewsConfig: update(prev.quickViewsConfig, { $unset: [name] })
+        quickViewsConfig: update(prev.quickViewsConfig, { $unset: [name] }),
       }),
-      this.saveQuickViews
+      this.saveQuickViews,
     );
   };
   handleShowQuickView = (evt, props) => {
@@ -345,7 +357,7 @@ export default class EZGrid extends PureComponent {
       this.props.onQuickViewChange(
         name,
         { ...this.props, quickView: name },
-        !custom
+        !custom,
       );
       if (this.props.quickView && this.props.quickView === name) {
         this.setState({ ...view });
@@ -377,13 +389,13 @@ export default class EZGrid extends PureComponent {
     let newGroup = { col_id: col.ID, sortOrder: 'asc' };
     this.setState(prev => ({
       grouping: _.uniqBy(_.concat(prev.grouping || [], newGroup), 'col_id'),
-      activePage: 1
+      activePage: 1,
     }));
   };
   handleRemoveGroupBy = col_id => () => {
     this.setState(prev => ({
       grouping: prev.grouping.filter(group => group.col_id !== col_id),
-      activePage: 1
+      activePage: 1,
     }));
   };
   handleGroupSortToggle = col_id => () => {
@@ -392,11 +404,11 @@ export default class EZGrid extends PureComponent {
         if (group.col_id === col_id)
           group = {
             ...group,
-            sortOrder: group.sortOrder === 'asc' ? 'desc' : 'asc'
+            sortOrder: group.sortOrder === 'asc' ? 'desc' : 'asc',
           };
         return group;
       }),
-      activePage: 1
+      activePage: 1,
     }));
   };
   handleSort = field => () => {
@@ -420,7 +432,7 @@ export default class EZGrid extends PureComponent {
       columns: prev.columns.map(col => {
         if (col.ID === col_id) col = { ...col, hidden: !col.hidden };
         return col;
-      })
+      }),
     }));
   };
   handleColumnReorder = (curIdx, newIdx) => {
@@ -434,12 +446,12 @@ export default class EZGrid extends PureComponent {
     if (value === undefined) {
       this.setState(prev => ({
         filters: update(prev.filters, { $unset: [field] }),
-        activePage: 1
+        activePage: 1,
       }));
     } else {
       this.setState(prev => ({
         filters: { ...prev.filters, [field]: { value, type } },
-        activePage: 1
+        activePage: 1,
       }));
     }
   };
@@ -467,10 +479,10 @@ export default class EZGrid extends PureComponent {
         const colFilters = _.every(
           _.concat(
             _.map(filters, (filter, field) =>
-              filterTypes[filter.type].filter(item, field, filter.value)
+              filterTypes[filter.type].filter(item, field, filter.value),
             ),
-            true
-          )
+            true,
+          ),
         );
         return (
           colFilters &&
@@ -487,7 +499,6 @@ export default class EZGrid extends PureComponent {
   // handleOnPageChange=()=>{
 
   // }
-
   render() {
     let {
       generalSearch,
@@ -500,7 +511,7 @@ export default class EZGrid extends PureComponent {
       filteredData: data,
       itemsPerPage,
       quickViews,
-      activePage
+      activePage,
     } = this.state;
     let {
       data: rawData,
@@ -508,13 +519,14 @@ export default class EZGrid extends PureComponent {
       loading,
       additionalTemplateInfo,
       rowLevelStyleCalc,
+      onRowClick,
       fetchData: reloadData,
       legend,
       extraHeaderItem,
       height,
       quickViewsId,
       quickViewsURL,
-      generalSearchDebounceTime
+      generalSearchDebounceTime,
       // columnsConfig,
       // itemsPerPage,
     } = this.props;
@@ -531,6 +543,7 @@ export default class EZGrid extends PureComponent {
       loading,
       additionalTemplateInfo,
       rowLevelStyleCalc,
+      onRowClick,
       reloadData,
       legend,
       extraHeaderItem,
@@ -539,7 +552,7 @@ export default class EZGrid extends PureComponent {
       height,
       generalSearchDebounceTime,
       activePage,
-      onPageChange: this.handlePageChange
+      onPageChange: this.handlePageChange,
     };
     if (!this.props.disableGeneralSearch)
       props.onGeneralSearch = this.handleGeneralSearch;
@@ -601,9 +614,3 @@ function mapColumnsConfig(columns = []) {
     return { ...column, ID };
   });
 }
-
-// function firstValue(value) {
-//   if (value) {
-//     return value.split(';')[0];
-//   }
-// }

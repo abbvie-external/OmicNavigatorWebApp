@@ -15,7 +15,7 @@ import {
   Dropdown,
   Dimmer,
   Loader,
-  Image
+  Image,
 } from 'semantic-ui-react';
 
 import { filterTypes } from './FilterTypeConfig';
@@ -35,7 +35,7 @@ import {
   getFieldValue,
   getField,
   getTemplate,
-  getExportTemplate
+  getExportTemplate,
 } from './selectors/QHGridSelector';
 
 //import { DragDropContext } from 'react-dnd';
@@ -44,48 +44,48 @@ import {
 const paginationOpts = [
   {
     text: '5',
-    value: 5
+    value: 5,
   },
   {
     text: '10',
-    value: 10
+    value: 10,
   },
   {
     text: '15',
-    value: 15
+    value: 15,
   },
   {
     text: '30',
-    value: 30
+    value: 30,
   },
   {
     text: '45',
-    value: 45
+    value: 45,
   },
   {
     text: '60',
-    value: 60
+    value: 60,
   },
   {
     text: '75',
-    value: 75
+    value: 75,
   },
   {
     text: '100',
-    value: 100
+    value: 100,
   },
   {
     text: '250',
-    value: 250
+    value: 250,
   },
   {
     text: '500',
-    value: 500
+    value: 500,
   },
   {
     text: '1000',
-    value: 1000
-  }
+    value: 1000,
+  },
   // {
   //   text: 'All',
   //   // title: 'Warning: Slow!',
@@ -112,7 +112,7 @@ const unfilteredIcon = <Icon name="filter" />;
 class QHGridHeader extends React.PureComponent {
   state = {
     generalSearch: this.props.generalSearch || '',
-    prevGeneralSearch: ''
+    prevGeneralSearch: '',
   };
   togglePopup = (ev, data) => {
     const name = `${data.name}Open`;
@@ -208,7 +208,7 @@ class QHGridHeader extends React.PureComponent {
       padding: '1em',
       maxWidth: '50vw',
       fontSize: '13px',
-      wordBreak: 'break-all'
+      wordBreak: 'break-all',
     };
 
     if (
@@ -322,7 +322,7 @@ class QHGridHeader extends React.PureComponent {
           style={{
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between'
+            justifyContent: 'space-between',
           }}
         >
           {qv.icon && (
@@ -398,20 +398,21 @@ class QHGridHeader extends React.PureComponent {
             <Table.HeaderCell
               colSpan={numColumns + grouping.length}
               style={{ backgroundColor: '#1678C2', color: 'white' }}
+              // className="QHGrid--header"
             >
               {this.props.onGeneralSearch && (
                 <Input
                   className="QHGrid--generalSearch"
                   icon="search"
                   iconPosition="left"
-                  placeholder="Search Table"
+                  placeholder="Search.Table"
                   value={this.state.generalSearch}
                   onChange={this.handleGeneralSearch}
                   action={{
                     color: 'red',
                     icon: 'x',
                     onClick: this.handleClearGeneralSearch,
-                    title: 'Clear Search'
+                    title: 'Clear Search',
                   }}
                   // actionPosition="right"
                 />
@@ -450,7 +451,6 @@ class QHGridHeader extends React.PureComponent {
                   </Menu>
                 </Popup>
               )}
-
               {showFiltersMenu && (
                 <Popup
                   trigger={
@@ -491,7 +491,6 @@ class QHGridHeader extends React.PureComponent {
                   </Menu>
                 </Popup>
               )}
-
               {(!!this.props.quickViews.length ||
                 !!this.props.onCreateQuickView) && (
                 <Popup
@@ -527,7 +526,6 @@ class QHGridHeader extends React.PureComponent {
                   </Menu>
                 </Popup>
               )}
-
               {this.props.onColumnVisibilityToggle && (
                 <Dropdown
                   scrolling
@@ -562,9 +560,11 @@ class QHGridHeader extends React.PureComponent {
                   children={this.props.legend}
                 />
               )}
+              {/* Paul start */}
               {!this.props.loading &&
                 !!this.props.exportBaseName &&
                 ExportButton}
+              {/* Paul end */}
               {this.props.extraHeaderItem}
             </Table.HeaderCell>
           </Table.Row>
@@ -576,7 +576,7 @@ class QHGridHeader extends React.PureComponent {
                   backgroundColor: '#1678C2',
                   color: 'white',
                   borderRadius: 0,
-                  borderTop: '2px solid white'
+                  borderTop: '2px solid white',
                 }}
                 onDrop={this.onDrop}
                 onDragOver={this.allowDrop}
@@ -596,7 +596,7 @@ class QHGridHeader extends React.PureComponent {
 class QHGridBodyHeaders extends React.PureComponent {
   state = {
     colDraggingIndex: null,
-    colHoverIndex: null
+    colHoverIndex: null,
   };
 
   setColDraggingIndex = idx => {
@@ -651,11 +651,11 @@ class QHGridBodyHeaders extends React.PureComponent {
   render() {
     const leftHoverStyle = {
       borderLeft: '5px solid #1678C2',
-      whiteSpace: 'nowrap'
+      whiteSpace: 'nowrap',
     };
     const rightHoverStyle = {
       borderRight: '5px solid #1678C2',
-      whiteSpace: 'nowrap'
+      whiteSpace: 'nowrap',
     };
     return _.map(this.props.visibleColumns, col => {
       let field = getField(col.field);
@@ -664,7 +664,7 @@ class QHGridBodyHeaders extends React.PureComponent {
         ? {}
         : {
             sorted: this.props.sortBy === ID ? this.props.sortOrder : null,
-            onClick: this.props.onSort ? this.props.onSort(ID) : null
+            onClick: this.props.onSort ? this.props.onSort(ID) : null,
           };
       const dragProps = {
         draggable: !!this.props.onColumnReorder,
@@ -673,11 +673,11 @@ class QHGridBodyHeaders extends React.PureComponent {
         onDragEnd: this.handleHeaderDragEnd,
         onDragOver: this.handleHeaderDragOver,
         onDragEnter: this.handleHeaderDragEnter(col),
-        onDragLeave: this.handleHeaderDragLeave(col)
+        onDragLeave: this.handleHeaderDragLeave(col),
       };
 
       let style = {
-        whiteSpace: 'nowrap'
+        whiteSpace: 'nowrap',
       };
       if (
         this.state.colDraggingIndex < this.state.colHoverIndex &&
@@ -698,7 +698,7 @@ class QHGridBodyHeaders extends React.PureComponent {
       const filterProps = _.get(col, 'filterable.props');
       const FilterDropdown = _.get(
         filterTypes,
-        '[' + filterType + '].component'
+        '[' + filterType + '].component',
       );
       const filterVals = _.get(this.props, 'filters.' + field + '.value'); // || stubArray;
       return (
@@ -719,7 +719,7 @@ class QHGridBodyHeaders extends React.PureComponent {
               onChange={QHGridBodyHeadersHandleFilterUpdate(
                 field,
                 filterType,
-                this.props.onFilterUpdate
+                this.props.onFilterUpdate,
               )}
               trigger={
                 filterVals /*.length > 0*/ ? filteredIcon : unfilteredIcon
@@ -737,10 +737,6 @@ class QHGridBodyHeaders extends React.PureComponent {
 
 class QHGridBody extends React.PureComponent {
   state = { hidden: {} };
-  // rowRef = null;
-  // setRowRef = element => {
-  //   this.rowRef = element;
-  // };
   static getDerivedStateFromProps(nextProps, prevState) {
     const newState = {};
     if (nextProps.grouping !== prevState.grouping) {
@@ -749,7 +745,6 @@ class QHGridBody extends React.PureComponent {
     }
     return newState;
   }
-
   handleToggle = key => evt => {
     this.setState(prev => update(prev, { hidden: { $toggle: [key] } }));
   };
@@ -760,14 +755,16 @@ class QHGridBody extends React.PureComponent {
       visibleColumns,
       groupLengths,
       slicedGroupLengths,
-      slicedData
+      slicedData,
+      startIndex,
     } = this.props;
+
     const numColumns = visibleColumns.length;
     let curRow = 0;
     const makeBody = (idx = 0, groupLengthsKey = '') => (
       data,
       groupName,
-      _ign
+      _ign,
     ) => {
       const curKey = groupLengthsKey + groupName;
       const hidden = this.state.hidden[curKey];
@@ -802,9 +799,11 @@ class QHGridBody extends React.PureComponent {
             // Paul end
             return (
               <Table.Row
+                onClick={evt =>
+                  this.props.onRowClick(evt, item, startIndex + idx)
+                }
                 key={itemKeyMap(item) || idx}
                 className={optionalHighlight}
-                // ref={optionalRef}
                 style={rowLevelStyle}
               >
                 {_.map(grouping, (_group, group_idx) => {
@@ -825,7 +824,7 @@ class QHGridBody extends React.PureComponent {
                         : template(
                             getFieldValue(item, col.field, col.type),
                             item,
-                            this.props.additionalTemplateInfo
+                            this.props.additionalTemplateInfo,
                           )}
                     </Table.Cell>
                   );
@@ -841,7 +840,7 @@ class QHGridBody extends React.PureComponent {
         if (!hidden) {
           children = _.map(
             data,
-            makeBody(idx + 1, groupLengthsKey + groupName)
+            makeBody(idx + 1, groupLengthsKey + groupName),
           );
           if (children.every(val => val === null)) {
             return null;
@@ -929,7 +928,7 @@ export class QHGrid extends React.PureComponent {
       this.setState({ activePage: data.activePage });
     }
     if (this.bodyRef) {
-      this.scrollTop = 0;
+      this.bodyRef.scrollTop = 0;
     }
   };
   handleItemsPerPageChange = (event, data) => {
@@ -951,7 +950,7 @@ export class QHGrid extends React.PureComponent {
           _this.bodyRef.scrollTo({
             top: row[0].offsetTop - 40,
             left: 0,
-            behavior: 'smooth'
+            behavior: 'smooth',
           });
         }
       }
@@ -962,7 +961,6 @@ export class QHGrid extends React.PureComponent {
   componentDidMount = () => {
     this.scrollElement();
   };
-
   componentDidUpdate = (prevProps, prevState) => {
     if (
       this.props.activePage === undefined &&
@@ -987,7 +985,7 @@ export class QHGrid extends React.PureComponent {
   exportExcel = cols => async (
     evt,
     data = (this.props.getExportData && this.props.getExportData()) ||
-      this.props.data
+      this.props.data,
   ) => {
     data = await data;
     let wb = XLSX.utils.book_new();
@@ -1027,7 +1025,7 @@ export class QHGrid extends React.PureComponent {
       [
         _.map(visibleColumns, col => {
           return col.exportTitle || col.title;
-        })
+        }),
       ],
       _.map(data, item => {
         return _.map(visibleColumns, col => {
@@ -1043,7 +1041,7 @@ export class QHGrid extends React.PureComponent {
           //return moment.isMoment(value) ? moment(value).format('D/MMM/YYYY') : value
           return moment.isMoment(value) ? moment(value).toDate() : value;
         });
-      })
+      }),
     );
     //const visibleColumns = _.filter(cols, (col) => { return !col.hidden})
     const wscols = _.map(visibleColumns, col => {
@@ -1065,22 +1063,22 @@ export class QHGrid extends React.PureComponent {
               : (value || '').length * 1.5;
 
             return col_width > 70 ? 70 : col_width < 18 ? 18 : col_width;
-          })
-        )
+          }),
+        ),
       };
     });
     //console.log(wscols)
 
     var ws = XLSX.utils.aoa_to_sheet(exportData, { cellDates: true });
     ws['!autofilter'] = {
-      ref: 'A1:' + XLSX.utils.encode_col(visibleColumns.length - 1) + '1'
+      ref: 'A1:' + XLSX.utils.encode_col(visibleColumns.length - 1) + '1',
     };
     ws['!cols'] = wscols;
     XLSX.utils.book_append_sheet(wb, ws, 'report');
     //console.log(ws)
     XLSX.writeFile(
       wb,
-      `${this.props.exportBaseName} - ${moment().format('DD/MMM/YYYY')}.xlsx`
+      `${this.props.exportBaseName} - ${moment().format('DD/MMM/YYYY')}.xlsx`,
     );
   };
 
@@ -1096,12 +1094,12 @@ export class QHGrid extends React.PureComponent {
     sortOrder: null,
     rowLevelStyleCalc: () => {},
     height: '70vh',
-    generalSearchDebounceTime: 500
+    generalSearchDebounceTime: 500,
   };
   render() {
     const data = this.props.data; // || [];
     const { columns, visibleColumns, itemKeyMap } = columnsSelector(
-      this.props.columns
+      this.props.columns,
     );
     const { columnsConfig = this.props.columns } = this.props;
 
@@ -1132,7 +1130,7 @@ export class QHGrid extends React.PureComponent {
       grouping,
       slicedData,
       groupLengths,
-      slicedGroupLengths
+      slicedGroupLengths,
     } = QHGridSelector(
       columnsConfig,
       this.props.grouping,
@@ -1141,7 +1139,7 @@ export class QHGrid extends React.PureComponent {
       this.props.sortOrder,
       startIndex,
       endIndex,
-      this.props.isPaginated
+      this.props.isPaginated,
     );
     let headerProps = {};
     {
@@ -1168,7 +1166,7 @@ export class QHGrid extends React.PureComponent {
         legend,
         exportBaseName,
         generalSearchDebounceTime,
-        extraHeaderItem
+        extraHeaderItem,
       } = this.props;
       headerProps = {
         columns,
@@ -1197,7 +1195,7 @@ export class QHGrid extends React.PureComponent {
         exportExcel: this.exportExcel,
         exportBaseName,
         generalSearchDebounceTime,
-        extraHeaderItem
+        extraHeaderItem,
       };
     }
     const headers = (
@@ -1213,8 +1211,6 @@ export class QHGrid extends React.PureComponent {
         visibleColumns={visibleColumns}
       />
     );
-
-    // this.scrollElement();
 
     return (
       <div
@@ -1238,7 +1234,7 @@ export class QHGrid extends React.PureComponent {
             width: '100%',
             height: `calc(${this.props.height})`,
             overflowX: 'auto',
-            overflowY: 'auto'
+            overflowY: 'auto',
           }}
           ref={this.setBodyRef}
         >
@@ -1257,7 +1253,7 @@ export class QHGrid extends React.PureComponent {
               borderRadius: 0,
               marginBottom: 0,
               paddingBottom: 0,
-              fontSize: 12
+              fontSize: 12,
             }}
           >
             <Table.Header>
@@ -1278,8 +1274,10 @@ export class QHGrid extends React.PureComponent {
             <Table.Body>
               {
                 /*!this.props.loading &&*/ <QHGridBody
+                  startIndex={realStartIndex}
                   rowLevelStyleCalc={this.props.rowLevelStyleCalc}
                   additionalTemplateInfo={this.props.additionalTemplateInfo}
+                  onRowClick={this.props.onRowClick}
                   itemKeyMap={itemKeyMap}
                   grouping={grouping}
                   visibleColumns={visibleColumns}
@@ -1378,14 +1376,14 @@ QHGrid.propTypes = propTypes.forbidExtraProps({
   generalSearch: propTypes.requiredBy('onGeneralSearch', PropTypes.string),
   onGeneralSearch: propTypes.mutuallyExclusiveProps(
     PropTypes.func,
-    'totalRows'
+    'totalRows',
   ),
   generalSearchDebounceTime: propTypes.nonNegativeInteger,
 
   filters: filtersType.isRequired,
   onResetFiltersToCustomView: propTypes.requiredBy(
     'onSaveSettings',
-    PropTypes.func
+    PropTypes.func,
   ),
   onResetFiltersToDefaultView: PropTypes.func,
   onResetFiltersAll: PropTypes.func, // instead of onFiltersResetAll -- name similarities
@@ -1394,7 +1392,7 @@ QHGrid.propTypes = propTypes.forbidExtraProps({
   // itemsPerPage: propTypes.nonNegativeInteger.isRequired,
   itemsPerPage: propTypes.requiredBy(
     'isPaginated',
-    propTypes.or([propTypes.nonNegativeInteger, PropTypes.oneOf([Infinity])])
+    propTypes.or([propTypes.nonNegativeInteger, PropTypes.oneOf([Infinity])]),
   ),
   totalRows: propTypes.requiredBy('isPaginated', propTypes.nonNegativeInteger),
   onPageChange: propTypes.requiredBy('activePage', PropTypes.func),
@@ -1423,6 +1421,7 @@ QHGrid.propTypes = propTypes.forbidExtraProps({
   onSaveSettings: PropTypes.func,
   showSaveSettingsSuccessful: PropTypes.bool,
   onClearSettings: propTypes.requiredBy('onSaveSettings', PropTypes.func),
+  onRowClick: PropTypes.func,
 
   additionalTemplateInfo: PropTypes.object,
   rowLevelStyleCalc: PropTypes.func,
@@ -1435,7 +1434,7 @@ QHGrid.propTypes = propTypes.forbidExtraProps({
   getExportData: PropTypes.func,
 
   height: PropTypes.string,
-  extraHeaderItem: PropTypes.node
+  extraHeaderItem: PropTypes.node,
 });
 
 export default QHGrid;

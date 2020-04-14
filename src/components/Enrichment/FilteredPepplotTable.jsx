@@ -297,6 +297,11 @@ class FilteredPepplotTable extends Component {
     });
   };
 
+  handleRowClick = (event, item, index) => {
+    event.stopPropagation();
+    this.props.onHandleLineSelected(item.Protein_Site);
+  };
+
   render() {
     const { HighlightedLineId } = this.props;
     const {
@@ -328,7 +333,7 @@ class FilteredPepplotTable extends Component {
           min-height="5vh"
           additionalTemplateInfo={additionalTemplateInfo}
           // headerAttributes={<ButtonActions />}
-          onRowClicked={this.props.onHandleViolinDotSelected}
+          onRowClick={this.handleRowClick}
         />
       </div>
     );
