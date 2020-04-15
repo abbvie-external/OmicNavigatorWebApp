@@ -270,10 +270,10 @@ class FilteredPepplotTable extends Component {
     }
   };
 
-  getTableHelpers = HighlightedLineId => {
+  getTableHelpers = lineId => {
     let addParams = {};
-    if (HighlightedLineId != null) {
-      addParams.rowToHighlight = HighlightedLineId;
+    if (lineId != null) {
+      addParams.rowToHighlight = lineId;
     }
     addParams.showPhosphositePlus = dataItem => {
       return function() {
@@ -299,7 +299,7 @@ class FilteredPepplotTable extends Component {
 
   handleRowClick = (event, item, index) => {
     event.stopPropagation();
-    this.props.onHandleLineSelected(item.Protein_Site);
+    this.props.onHandleLineSelected(item.Protein_Site, item.id_mult);
   };
 
   render() {
@@ -310,7 +310,9 @@ class FilteredPepplotTable extends Component {
       itemsPerPageInformedEnrichment,
     } = this.state;
     // const quickViews = [];
-    const additionalTemplateInfo = this.getTableHelpers(HighlightedLineId);
+    const additionalTemplateInfo = this.getTableHelpers(
+      HighlightedLineId.lineId,
+    );
 
     return (
       <div className="FilteredPepplotTableDiv">

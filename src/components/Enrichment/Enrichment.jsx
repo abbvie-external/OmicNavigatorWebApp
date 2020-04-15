@@ -182,6 +182,10 @@ class Enrichment extends Component {
       yTicks: 1,
     },
     violinData: [],
+    HighlightedLineId: {
+      lineId: '',
+      id_mult: '',
+    },
   };
   EnrichmentViewContainerRef = React.createRef();
 
@@ -783,20 +787,23 @@ class Enrichment extends Component {
     this.setState(obj);
   };
 
-  handleLineSelected = lineId => {
+  handleLineSelected = (lineId, id_mult) => {
     const { enrichmentStudy, enrichmentModel } = this.props;
     // let self = this;
     // if (this.state.barcodeSettings.barcodeData > 0) {
     if (lineId != null) {
       if (
-        lineId !== this.state.HighlightedLineId ||
+        lineId !== this.state.HighlightedLineId.lineId ||
         this.state.SVGPlotLoaded === false
       ) {
         if (this.state.barcodeSettings.barcodeData?.length > 0) {
           this.setState({
             SVGPlotLoaded: false,
             SVGPlotLoading: true,
-            HighlightedLineId: lineId,
+            HighlightedLineId: {
+              lineId: lineId,
+              id_mult: id_mult,
+            },
           });
           const dataItem = this.state.barcodeSettings.barcodeData.find(
             i => i.lineID === lineId,
@@ -844,7 +851,10 @@ class Enrichment extends Component {
       this.setState({
         SVGPlotLoaded: false,
         SVGPlotLoading: false,
-        HighlightedLineId: '',
+        HighlightedLineId: {
+          lineId: '',
+          id_mult: '',
+        },
         // imageInfo: {
         //   ...this.state.imageInfo,
         //   svg: []

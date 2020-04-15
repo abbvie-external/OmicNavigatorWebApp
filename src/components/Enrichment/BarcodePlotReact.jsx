@@ -55,42 +55,40 @@ class BarcodePlotReact extends Component {
       this.setWidth();
     }
     // Much of this code can be refactored into a function, as it is used below.
-    if (self.props.violinDotSelected !== prevProps.violinDotSelected) {
+    if (self.props.HighlightedLineId !== prevProps.HighlightedLineId) {
       d3.selectAll(`.barcode-line`)
         .classed('MaxLine', false)
         .attr('y1', self.state.settings.margin.selected);
-
-      const maxLineId = `${self.props.violinDotSelected.sample.replace(
-        /;/g,
-        '',
-      )}_${self.props.violinDotSelected.id_mult}`;
-      const maxLine = d3.select(`#barcode-line-${maxLineId}`);
-      maxLine
-        .classed('MaxLine', true)
-        .attr('y1', self.state.settings.margin.max);
-      const maxLineData = {
-        x2: maxLine.attr('x2'),
-        id_mult: maxLine.attr('id_mult'),
-        lineID: maxLine.attr('lineid'),
-        logFC: maxLine.attr('logfc'),
-        statistic: maxLine.attr('statistic'),
-      };
-      const statistic = maxLineData.statisic;
-      const textAnchor =
-        statistic > self.props.barcodeSettings.highStat / 2 ? 'end' : 'start';
-      const ttPosition =
-        textAnchor === 'end' ? maxLineData.x2 - 5 : maxLineData.x2 + 5;
-      self.setState({
-        hoveredLineId: null,
-        hoveredLineName: null,
-        highlightedLineName: maxLineData.lineID,
-        tooltipPosition: ttPosition,
-        tooltipTextAnchor: textAnchor,
-      });
-      self.props.onHandleLineSelected(maxLineData.lineID);
-      // this.setState({
-      //   highlightedLineName: self.props.violinDotSelected,
-      // });
+      if (self.props.HighlightedLineId.lineId !== '') {
+        const maxLineId = `${self.props.HighlightedLineId.lineId.replace(
+          /;/g,
+          '',
+        )}_${self.props.HighlightedLineId.id_mult}`;
+        const maxLine = d3.select(`#barcode-line-${maxLineId}`);
+        maxLine
+          .classed('MaxLine', true)
+          .attr('y1', self.state.settings.margin.max);
+        const maxLineData = {
+          x2: maxLine.attr('x2'),
+          id_mult: maxLine.attr('id_mult'),
+          lineID: maxLine.attr('lineid'),
+          logFC: maxLine.attr('logfc'),
+          statistic: maxLine.attr('statistic'),
+        };
+        const statistic = maxLineData.statistic;
+        const textAnchor =
+          statistic > self.props.barcodeSettings.highStat / 2 ? 'end' : 'start';
+        const ttPosition =
+          textAnchor === 'end' ? maxLineData.x2 - 5 : maxLineData.x2 + 5;
+        self.setState({
+          hoveredLineId: null,
+          hoveredLineName: null,
+          highlightedLineName: maxLineData.lineID,
+          tooltipPosition: ttPosition,
+          tooltipTextAnchor: textAnchor,
+        });
+        // self.props.onHandleLineSelected(maxLineData.lineID, maxLineData.id_mult);
+      }
     }
   }
 
@@ -131,7 +129,7 @@ class BarcodePlotReact extends Component {
     this.props.onHandleBarcodeChanges({
       brushedData: [],
     });
-    this.props.onHandleLineSelected(null);
+    this.props.onHandleLineSelected(null, null);
     this.setState({
       settings: {
         ...this.state.settings,
@@ -300,9 +298,12 @@ class BarcodePlotReact extends Component {
           const maxLineData = self.getMaxObject(
             self.props.barcodeSettings.brushedData,
           );
-          self.props.onHandleLineSelected(maxLineData.lineID);
+          self.props.onHandleLineSelected(
+            maxLineData.lineID,
+            maxLineData.id_mult,
+          );
         } else {
-          self.props.onHandleLineSelected(null);
+          self.props.onHandleLineSelected(null, null);
           self.setState({
             tooltipPosition: null,
             tooltipTextAnchor: null,
@@ -368,11 +369,7 @@ class BarcodePlotReact extends Component {
       // tooltipPosition
     } = this.state;
 
-    const {
-      horizontalSplitPaneSize,
-      barcodeSettings,
-      // violinDotSelected
-    } = this.props;
+    const { horizontalSplitPaneSize, barcodeSettings } = this.props;
 
     const barcodeHeight =
       horizontalSplitPaneSize - settings.margin.top - settings.margin.bottom;

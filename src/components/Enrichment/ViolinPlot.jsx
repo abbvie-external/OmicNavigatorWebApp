@@ -53,7 +53,12 @@ class ViolinPlot extends Component {
             Object.keys(o).length === Object.keys(currentValues[i]).length &&
             Object.keys(o).every(k => o[k] === currentValues[i][k]),
         );
-      if (!isSame) {
+      if (
+        !isSame
+        // ||
+        // this.props.HighlightedLineId.lineId !==
+        //   prevProps.HighlightedLineId.lineId
+      ) {
         const self = this;
         d3.select(`#svg-${self.props.violinSettings.id}`).remove();
         d3.selectAll(`.violin-tooltip`).remove();
@@ -65,6 +70,14 @@ class ViolinPlot extends Component {
         this.renderBoxPlot({});
         this.renderDataPlots({ showPlot: true });
       }
+
+      // if (
+      //   this.props.HighlightedLineId.lineId !==
+      //   prevProps.HighlightedLineId.lineId
+      // ) {
+      //   // just add code to highlight new dot
+      //   debugger;
+      // }
     }
   }
 
@@ -1437,7 +1450,7 @@ class ViolinPlot extends Component {
               // var id = d.sample.replace(/\;/g, "_");
               const id = self.getCircleId(d.sample, d.id_mult);
               // self.dotClick.emit(d);
-              self.props.onHandleViolinDotSelected(d);
+              self.props.onHandleLineSelected(d.sample, d.id_mult);
               //self.props.onHandleMaxLinePlot(d)
 
               d3.select(`#violin_${maxId}`)

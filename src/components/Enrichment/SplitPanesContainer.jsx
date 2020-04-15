@@ -23,7 +23,6 @@ class SplitPanesContainer extends Component {
       verticalSplitPaneSize:
         parseInt(sessionStorage.getItem('verticalSplitPaneSize'), 10) || 525,
       activeViolinTableIndex: 0,
-      violinDotSelected: null,
     };
   }
 
@@ -73,17 +72,10 @@ class SplitPanesContainer extends Component {
         className="ViolinPlotContainer"
         {...this.state}
         {...this.props}
-        onHandleViolinDotSelected={this.handleViolinDotSelected}
       />
     );
     // }
   }
-
-  handleViolinDotSelected = e => {
-    this.setState({
-      violinDotSelected: e,
-    });
-  };
 
   handleViolinTableTabChange = (e, { activeIndex }) => {
     this.setState({
@@ -122,11 +114,7 @@ class SplitPanesContainer extends Component {
             className="TableResultsTab"
             // as="div"
           >
-            <FilteredPepplotTable
-              {...this.state}
-              {...this.props}
-              onHandleViolinDotSelected={this.handleViolinDotSelected}
-            />
+            <FilteredPepplotTable {...this.state} {...this.props} />
           </Tab.Pane>
         ),
       },

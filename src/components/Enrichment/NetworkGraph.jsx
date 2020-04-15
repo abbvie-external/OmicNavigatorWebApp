@@ -105,7 +105,7 @@ class NetworkGraph extends Component {
       return Math.max(
         networkCalculatedWidth,
         adjustedDocumentWidth,
-        networkContainerWidth
+        networkContainerWidth,
       );
     } else {
       // if (totalClusters === 1) {
@@ -241,7 +241,7 @@ class NetworkGraph extends Component {
         let relevantNodesLength = relevantNodeIds.length;
         const containerWidth = this.getWidth(
           totalClusters,
-          relevantNodesLength
+          relevantNodesLength,
         );
         // calculate height based on the containerRef
         const containerHeight = this.getHeight();
@@ -420,7 +420,7 @@ class NetworkGraph extends Component {
                     return r;
                     // to space out the nodes more, use a function like this...
                     // return 2 * r - 1;
-                  })
+                  }),
                 )
                 .stop();
               //
