@@ -116,6 +116,12 @@ class BarcodePlotReact extends Component {
       barcodeContainerWidth: containerWidth,
       barcodeWidth: width,
     });
+
+    const barcodeHeight =
+      this.props.horizontalSplitPaneSize -
+      this.state.settings.margin.top -
+      this.state.settings.margin.bottom;
+    this.setupBrush(width, barcodeHeight, this.state.settings);
   };
 
   getWidth() {
@@ -208,7 +214,7 @@ class BarcodePlotReact extends Component {
     }
   }
 
-  setupBrush(barcodeWidth, barcodeHeight, barcodeSettings, settings) {
+  setupBrush(barcodeWidth, barcodeHeight, settings) {
     const self = this;
     let objsBrush = {};
 
@@ -269,7 +275,7 @@ class BarcodePlotReact extends Component {
           }`;
           const maxLine = d3.select(`#barcode-line-${maxLineId}`);
           maxLine.classed('MaxLine', true).attr('y1', settings.margin.max);
-          const statistic = maxLineObject.statisic;
+          const statistic = maxLineObject.statistic;
           const textAnchor =
             statistic > self.props.barcodeSettings.highStat / 2
               ? 'end'
@@ -314,7 +320,27 @@ class BarcodePlotReact extends Component {
       .on('start', brushingStart)
       .on('brush', highlightBrushedLines)
       .on('end', endBrush);
-    d3.selectAll('.barcode-axis').call(objsBrush);
+
+    d3.selectAll('.x.barcode-axis')
+      .append('g')
+      .attr('class', 'brush')
+      .call(objsBrush);
+
+    const selectTicks = d3.selectAll('line').filter(function() {
+      return d3.select(this).attr('id');
+    });
+
+    const quartile = Math.round(selectTicks.nodes().length * 0.25);
+
+    console.log('here', quartile);
+
+    setTimeout(function() {
+      d3.select('.brush').call([objsBrush][0].move, [
+        [selectTicks.nodes()[quartile].getAttribute('x1'), 60],
+        [selectTicks.nodes()[0].getAttribute('x1'), barcodeHeight - 40],
+      ]);
+    }, 1800);
+
     // d3.selectAll(this.barcodeSVGRef.current).call(objsBrush);
   }
 
@@ -425,8 +451,6 @@ class BarcodePlotReact extends Component {
     ));
 
     const tooltip = this.getTooltip();
-
-    this.setupBrush(barcodeWidth, barcodeHeight, barcodeSettings, settings);
 
     return (
       <div
