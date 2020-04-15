@@ -69,10 +69,8 @@ class Enrichment extends Component {
     networkDataLoaded: false,
     networkGraphReady: false,
     tests: {},
-    // nodeCutoff: sessionStorage.getItem('nodeCutoff') || 0.1,
     nodeCutoff: sessionStorage.getItem('nodeCutoff') || 0.1,
-    // edgeCutoff: sessionStorage.getItem('edgeCutoff') || 0.375,
-    edgeCutoff: sessionStorage.getItem('edgeCutoff') || 0.375,
+    edgeCutoff: sessionStorage.getItem('edgeCutoff') || 0.4,
     filteredNodesTotal: 0,
     filteredEdgesTotal: 0,
     totalNodes: 0,
@@ -191,6 +189,13 @@ class Enrichment extends Component {
 
   componentDidMount() {
     this.getTableHelpers(this.testSelectedTransition, this.showBarcodePlot);
+    // let resizedFn;
+    // window.addEventListener('resize', () => {
+    //   clearTimeout(resizedFn);
+    //   resizedFn = setTimeout(() => {
+    //     this.windowResized();
+    //   }, 200);
+    // });
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
@@ -227,6 +232,13 @@ class Enrichment extends Component {
       }
     }
   }
+
+  // windowResized = () => {
+  //   this.setState({
+  //     nodeCutoff: this.state.nodeCutoff,
+  //     edgeCutoff: this.state.edgeCutoff,
+  //   });
+  // };
 
   getThreePlotsFromUrl = (
     enrichmentStudy,
@@ -1657,10 +1669,11 @@ class Enrichment extends Component {
               onHandlePlotAnimation={this.handlePlotAnimation}
               onDisplayViolinPlot={this.displayViolinPlot}
               onHandlePieClick={this.testSelected}
-              onHandleNetworkCutoffInputChange={
-                this.handleNetworkCutoffInputChange
-              }
+              onHandleEdgeCutoffInputChange={this.handleEdgeCutoffInputChange}
+              onHandleNodeCutoffInputChange={this.handleNodeCutoffInputChange}
               onHandleSliderChange={this.handleSliderChange}
+              onHandleNodeSliderChange={this.handleNodeSliderChange}
+              onHandleEdgeSliderChange={this.handleEdgeSliderChange}
               onHandleTotals={this.handleTotals}
               // onNetworkGraphReady={this.handleNetworkGraphReady}
               onHandleLegendOpen={this.handleLegendOpen}
@@ -1706,20 +1719,63 @@ class Enrichment extends Component {
   //   });
   // }, 500);
 
-  handleNetworkCutoffInputChange = (evt, { name, value }) => {
+  handleNodeCutoffInputChange = value => {
     this.removeNetworkSVG();
     this.setState({
-      [name]: value,
+      nodeCutoff: value,
       // networkGraphReady: false
     });
   };
 
-  handleSliderChange = _.debounce((type, value) => {
-    if (this.state[type] !== value) {
+  handleEdgeCutoffInputChange = value => {
+    this.removeNetworkSVG();
+    this.setState({
+      edgeCutoff: value,
+      // networkGraphReady: false
+    });
+  };
+
+  // handleNetworkCutoffInputChange = (evt, { name, value }) => {
+  //   this.removeNetworkSVG();
+  //   this.setState({
+  //     [name]: value,
+  //     // networkGraphReady: false
+  //   });
+  // };
+
+  // handleSliderChange = _.debounce((type, value) => {
+  //   if (this.state[type] !== value) {
+  //     this.removeNetworkSVG();
+  //     this.setState({ [type]: value });
+  //   }
+  //   sessionStorage.setItem(type, value);
+  // }, 500);
+
+  handleNodeSliderChange = _.debounce(value => {
+    let decimalValue = value >= 1 ? value / 100 : 0.01;
+    if (this.state.nodeCutoff !== decimalValue) {
       this.removeNetworkSVG();
-      this.setState({ [type]: value });
+      this.setState({ nodeCutoff: decimalValue });
     }
-    sessionStorage.setItem(type, value);
+    // sessionStorage.setItem('nodeCutoff', decimalValue);
+  }, 500);
+  // handleNodeSliderChange = value => {
+  //   debugger;
+  //   let decimalValue = value / 100;
+  //   if (this.state.nodeCutoff !== decimalValue) {
+  //     this.removeNetworkSVG();
+  //     this.setState({ nodeCutoff: decimalValue });
+  //   }
+  //   sessionStorage.setItem('nodeCutoff', decimalValue);
+  // };
+
+  handleEdgeSliderChange = _.debounce(value => {
+    let decimalValue = value >= 5 ? value / 100 : 0.05;
+    if (this.state.edgeCutoff !== decimalValue) {
+      this.removeNetworkSVG();
+      this.setState({ edgeCutoff: decimalValue });
+    }
+    sessionStorage.setItem('edgeCutoff', decimalValue);
   }, 500);
 
   // handleLegendOpen = () => {
