@@ -157,6 +157,7 @@ class Enrichment extends Component {
         xAxis: 'abs(t)',
         yAxis: "log<tspan baseline-shift='sub' font-size='14px'>2</tspan>(FC)",
       },
+      // axisLabels: { xAxis: this.term, yAxis: "log<tspan baseline-shift='sub' font-size='14px'>2</tspan>(FC)" },
       id: 'violin-graph-1',
       pointUniqueId: 'sample',
       pointValue: 'cpm',
@@ -165,7 +166,8 @@ class Enrichment extends Component {
       tooltip: {
         show: true,
         fields: [
-          { label: 'abs(t)', value: 'cpm', toFixed: true },
+          { label: 'log(FC)', value: 'cpm', toFixed: true },
+          // { label: 'abs(t)', value: 'cpm', toFixed: true },
           { label: 'Protein', value: 'sample' },
         ],
       },
@@ -774,7 +776,6 @@ class Enrichment extends Component {
         },
       });
     } else {
-      console.log('in the else');
       this.setState({
         violinData: [],
         isViolinPlotLoaded: false,

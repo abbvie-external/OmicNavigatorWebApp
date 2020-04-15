@@ -405,7 +405,7 @@ class QHGridHeader extends React.PureComponent {
                   className="QHGrid--generalSearch"
                   icon="search"
                   iconPosition="left"
-                  placeholder="Search.Table"
+                  placeholder="Search Table"
                   value={this.state.generalSearch}
                   onChange={this.handleGeneralSearch}
                   action={{
@@ -1277,7 +1277,7 @@ export class QHGrid extends React.PureComponent {
                   startIndex={realStartIndex}
                   rowLevelStyleCalc={this.props.rowLevelStyleCalc}
                   additionalTemplateInfo={this.props.additionalTemplateInfo}
-                  onRowClick={this.props.onRowClick}
+                  onRowClick={this.props.onRowClick || stubFunction}
                   itemKeyMap={itemKeyMap}
                   grouping={grouping}
                   visibleColumns={visibleColumns}

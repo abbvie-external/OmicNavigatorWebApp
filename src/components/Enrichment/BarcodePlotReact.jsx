@@ -22,7 +22,7 @@ class BarcodePlotReact extends Component {
       id: 'chart-barcode',
       margin: {
         top: 40,
-        right: 25,
+        right: 40,
         bottom: 10,
         left: 20,
         hovered: 20,
@@ -87,7 +87,6 @@ class BarcodePlotReact extends Component {
           tooltipPosition: ttPosition,
           tooltipTextAnchor: textAnchor,
         });
-        // self.props.onHandleLineSelected(maxLineData.lineID, maxLineData.id_mult);
       }
     }
   }
@@ -363,22 +362,24 @@ class BarcodePlotReact extends Component {
     if (hoveredLineName) {
       return (
         <text
-          transform={`translate(${tooltipPosition}, 20)`}
-          fontSize="15px"
+          className="BarcodeTooltipText"
+          transform={`translate(${tooltipPosition}, 30)`}
+          fontSize="14px"
           textAnchor={tooltipTextAnchor}
         >
-          {hoveredLineName}
+          &nbsp;&nbsp;{hoveredLineName}
         </text>
       );
     }
     if (highlightedLineName) {
       return (
         <text
+          className="BarcodeTooltipText"
           transform={`translate(${tooltipPosition}, 15)`}
-          fontSize="15px"
+          fontSize="14px"
           textAnchor={tooltipTextAnchor}
         >
-          {highlightedLineName}
+          &nbsp;&nbsp;{highlightedLineName}
         </text>
       );
     }
@@ -483,6 +484,7 @@ class BarcodePlotReact extends Component {
 
           {/* X Axis Label */}
           <text
+            className="BarcodeLabel"
             transform={`translate(${barcodeWidth / 2}, ${barcodeHeight + 35})`}
             textAnchor="middle"
           >
@@ -490,12 +492,18 @@ class BarcodePlotReact extends Component {
           </text>
 
           {/* Y Axis Left Label */}
-          <text transform="rotate(-90)" y={15} x={0 - barcodeHeight / 1 + 10}>
+          <text
+            className="BarcodeLabel"
+            transform="rotate(-90)"
+            y={15}
+            x={0 - barcodeHeight / 1 + 10}
+          >
             {barcodeSettings.lowLabel}
           </text>
 
           {/* Y Axis Right Label */}
           <text
+            className="BarcodeLabel"
             transform="rotate(-90)"
             y={barcodeWidth + 27}
             x={0 - barcodeHeight / 1 + 10}

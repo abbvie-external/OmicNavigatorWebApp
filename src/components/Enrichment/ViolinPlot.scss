@@ -13,8 +13,7 @@
 }
 
 .violin-chart-wrapper text {
-  font-family: Roboto;
-  //font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif;
+  font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif;
   font-size: 13px;
   fill: #000;
 }
@@ -114,11 +113,40 @@
   width: auto;
   height: auto;
   padding: 10px;
-  background-color: white;
-  -webkit-border-radius: 10px;
-  -moz-border-radius: 10px;
-  border-radius: 10px;
-  -webkit-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
-  -moz-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
-  box-shadow: 4px 4px 10px rgba(0, 100, 100, 0.4);
+  // background-color: white;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  // -webkit-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+  // -moz-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+  // box-shadow: 4px 4px 10px rgba(0, 100, 100, 0.4);
+  background-color: #2e2e2e !important;
+  border-bottom: 2px solid var(--color-primary) !important;
+  color: #fff !important;
+  padding: 1em !important;
+  max-width: 300px !important;
+  font-size: 13px !important;
+  word-break: 'break-all' !important;
+  text-align: left !important;
+}
+
+.title {
+  font-size: 25px;
+  font-weight: bold;
+  font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif;
+  text-anchor: left;
+}
+
+.subtitle {
+  font-size: 15px;
+  // font-weight: bold;
+  font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif;
+  text-anchor: left;
+}
+
+.vLabelStyles {
+  font-size: 15px !important;
+  font-weight: bold;
+  font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif;
+  text-anchor: middle;
 }

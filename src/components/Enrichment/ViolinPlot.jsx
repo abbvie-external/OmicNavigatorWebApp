@@ -462,13 +462,9 @@ class ViolinPlot extends Component {
       .attr('transform', `translate(0,${self.chart.height})`)
       // .call(self.chart.objs.xAxis)
       .append('text')
-      .attr('class', 'vXLabel')
+      .attr('class', 'vXLabel vLabelStyles')
       .attr('dy', '1.50em')
       .attr('y', -7)
-      .style('font-size', '18px')
-      .style('font-weight', 'bold')
-      .style('font-family', 'Roboto')
-      .style('text-ancohor', 'middle')
       .append('tspan')
       .html(() => {
         return self.chart.xAxisLabel;
@@ -484,17 +480,13 @@ class ViolinPlot extends Component {
       .attr('class', 'y axis')
       .call(self.chart.objs.yAxis)
       .append('text')
-      .attr('class', 'label')
+      .attr('class', 'label vLabelStyles')
       .attr('dy', '.62em')
       .attr('transform', 'rotate(-90)')
       .attr('x', -self.chart.height / 2)
       .attr('y', -48)
       .attr('id', 'yaxis-label')
       .style('fill', '#000')
-      .style('font-size', '18px')
-      .style('font-weight', 'bold')
-      .style('font-family', 'Roboto')
-      .style('text-ancohor', 'middle')
       .append('tspan')
       .html(() => {
         return self.chart.yAxisLabel;
@@ -507,10 +499,6 @@ class ViolinPlot extends Component {
       .attr('x', 10)
       .attr('y', -30)
       .style('fill', '#000')
-      .style('font-size', '25px')
-      .style('font-weight', 'bold')
-      .style('font-family', 'Roboto')
-      .style('text-anchor', 'left')
       .text(self.props.violinSettings.title);
 
     const subtitle = self.chart.objs.g
@@ -520,10 +508,6 @@ class ViolinPlot extends Component {
       .attr('x', 10)
       .attr('y', -10)
       .style('fill', '#000')
-      .style('font-size', '15px')
-      // .style('font-weight', 'bold')
-      .style('font-family', 'Roboto')
-      .style('text-anchor', 'left')
       .text(self.props.violinSettings.subtitle);
   };
 

@@ -33,10 +33,22 @@ class FilteredPepplotTable extends Component {
   }
 
   componentDidUpdate = (prevProps, prevState) => {
-    if (
-      this.props.barcodeSettings.brushedData !==
-      prevProps.barcodeSettings.brushedData
-    ) {
+    // if (
+    //   this.props.barcodeSettings.brushedData !==
+    //   prevProps.barcodeSettings.brushedData
+    // ) {
+    //   this.getTableData();
+    // }
+    let prevValues = prevProps?.barcodeSettings?.brushedData ?? [];
+    let currentValues = this.props.barcodeSettings?.brushedData ?? [];
+    var isSame =
+      prevValues.length === currentValues.length &&
+      prevValues.every(
+        (o, i) =>
+          Object.keys(o).length === Object.keys(currentValues[i]).length &&
+          Object.keys(o).every(k => o[k] === currentValues[i][k]),
+      );
+    if (!isSame) {
       this.getTableData();
     }
   };
