@@ -1,24 +1,24 @@
 .barcode-line {
   stroke: #838383;
-  stroke-width: 2px;
+  stroke-width: 1.5px;
   opacity: 0.5;
 }
 
 .barcode-line.HoveredLine {
-  stroke: #00aeff;
-  stroke-width: 3px;
+  stroke: var(--color-tertiary);
+  stroke-width: 2.5px;
   opacity: 1;
 }
 
 .barcode-line.selected {
-  stroke: #2c3b78;
-  stroke-width: 3px;
+  stroke: var(--color-secondary);
+  stroke-width: 2.5px;
   opacity: 1;
 }
 
 .barcode-line.MaxLine {
   stroke: var(--color-primary);
-  stroke-width: 3px;
+  stroke-width: 3.5px;
   opacity: 1;
 }
 

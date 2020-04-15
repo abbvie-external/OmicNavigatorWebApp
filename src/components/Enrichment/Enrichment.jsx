@@ -143,7 +143,6 @@ class Enrichment extends Component {
     barcodeSettings: {
       barcodeData: [],
       brushedData: [],
-      // chartSize: { height: '200', width: '960' },
       lineID: '',
       statLabel: {},
       statistic: 'statistic',
@@ -173,8 +172,7 @@ class Enrichment extends Component {
       xName: 'tissue',
       constrainExtremes: false,
       color: d3.scaleOrdinal(d3.schemeCategory10),
-      chartSize: { height: '700', width: '960' },
-      margin: { top: 50, right: 40, bottom: 40, left: 50 },
+      margin: { top: 10, right: 10, bottom: 50, left: 50 },
       scale: 'linear',
       yName: null,
       yTicks: 1,
