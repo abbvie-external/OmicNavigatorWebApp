@@ -56,8 +56,8 @@ class ViolinPlot extends Component {
       if (
         !isSame
         // ||
-        // this.props.HighlightedLineId.lineId !==
-        //   prevProps.HighlightedLineId.lineId
+        // this.props.HighlightedLineId.sample !==
+        //   prevProps.HighlightedLineId.sample
       ) {
         const self = this;
         d3.select(`#svg-${self.props.violinSettings.id}`).remove();
@@ -71,13 +71,30 @@ class ViolinPlot extends Component {
         this.renderDataPlots({ showPlot: true });
       }
 
-      // if (
-      //   this.props.HighlightedLineId.lineId !==
-      //   prevProps.HighlightedLineId.lineId
-      // ) {
-      //   // just add code to highlight new dot
-      //   debugger;
-      // }
+      if (
+        this.props.HighlightedLineId.sample !==
+        prevProps.HighlightedLineId.sample
+      ) {
+        this.isHovering = false;
+        const id = this.getCircleId(
+          this.props.HighlightedLineId.sample,
+          this.props.HighlightedLineId.id_mult,
+        );
+        const dOpts = this.chart.dataPlots.options;
+        d3.selectAll(`.vPoint`)
+          .transition()
+          .duration(300)
+          .attr('fill', '#1f77b4')
+          .attr('r', dOpts.pointSize * 2);
+        d3.select(`#violin_${id}`)
+          .transition()
+          .duration(100)
+          .attr('fill', 'orange')
+          .attr('r', dOpts.pointSize * 2.5);
+        // const d = this.chart.groupObjs[cName].values[pt];
+        // this.maxCircle = id;
+        // this.addToolTiptoMax(this.props.HighlightedLineId);
+      }
     }
   }
 
@@ -187,10 +204,12 @@ class ViolinPlot extends Component {
     );
 
     const svg = document.getElementById('svg-violin-graph-1');
+    let parent = '';
+    // if (this.violinContainerRef.current !== null) {
 
-    const parent = document
-      .getElementById('violin-graph-1')
-      .getBoundingClientRect();
+    // } else {
+    parent = document.getElementById('violin-graph-1').getBoundingClientRect();
+
     const shape = document
       .getElementById(`violin_${self.getCircleId(id.sample, id.id_mult)}`)
       .getBoundingClientRect();
@@ -209,6 +228,7 @@ class ViolinPlot extends Component {
       .style('display', null);
 
     this.tooltipHover(id);
+    // }
   };
 
   getPos = (x, y, svg, element) => {
@@ -239,9 +259,12 @@ class ViolinPlot extends Component {
 
     let tooltipString = '';
     _.forEach(tooltipFields, field => {
+      // if (d[field.value] != null) {
       tooltipString += `<span>${field.label} = ${d[field.value]}</span><br/>`;
+      // } else {
+      //   tooltipString += `<span>${d.sample}</span>`;
+      // }
     });
-
     self.chart.objs.tooltip.html(tooltipString);
     self.chart.objs.tooltip.style('z-index', 100);
   };

@@ -21,12 +21,12 @@ class BarcodePlotReact extends Component {
       barcodeHeight: 0,
       id: 'chart-barcode',
       margin: {
-        top: 30,
+        top: 50,
         right: 25,
         bottom: 20,
         left: 20,
-        hovered: 15,
-        selected: 15,
+        hovered: 35,
+        selected: 20,
         max: 5,
       },
     },
@@ -56,11 +56,11 @@ class BarcodePlotReact extends Component {
     }
     // Much of this code can be refactored into a function, as it is used below.
     if (self.props.HighlightedLineId !== prevProps.HighlightedLineId) {
-      d3.selectAll(`.barcode-line`)
-        .classed('MaxLine', false)
-        .attr('y1', self.state.settings.margin.selected);
-      if (self.props.HighlightedLineId.lineId !== '') {
-        const maxLineId = `${self.props.HighlightedLineId.lineId.replace(
+      d3.selectAll(`.MaxLine`)
+        .attr('y1', self.state.settings.margin.selected)
+        .classed('MaxLine', false);
+      if (self.props.HighlightedLineId.sample !== '') {
+        const maxLineId = `${self.props.HighlightedLineId.sample.replace(
           /;/g,
           '',
         )}_${self.props.HighlightedLineId.id_mult}`;
@@ -363,8 +363,8 @@ class BarcodePlotReact extends Component {
     if (hoveredLineName) {
       return (
         <text
-          transform={`translate(${tooltipPosition}, 25)`}
-          fontSize="14px"
+          transform={`translate(${tooltipPosition}, 20)`}
+          fontSize="15px"
           textAnchor={tooltipTextAnchor}
         >
           {hoveredLineName}
@@ -375,7 +375,7 @@ class BarcodePlotReact extends Component {
       return (
         <text
           transform={`translate(${tooltipPosition}, 15)`}
-          fontSize="14px"
+          fontSize="15px"
           textAnchor={tooltipTextAnchor}
         >
           {highlightedLineName}

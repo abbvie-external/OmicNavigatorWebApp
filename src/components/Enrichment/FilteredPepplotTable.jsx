@@ -311,7 +311,7 @@ class FilteredPepplotTable extends Component {
     } = this.state;
     // const quickViews = [];
     const additionalTemplateInfo = this.getTableHelpers(
-      HighlightedLineId.lineId,
+      HighlightedLineId.sample,
     );
 
     return (

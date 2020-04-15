@@ -167,7 +167,7 @@ class Enrichment extends Component {
         show: true,
         fields: [
           { label: 'abs(t)', value: 'cpm', toFixed: true },
-          { label: 'Protien', value: 'sample' },
+          { label: 'Protein', value: 'sample' },
         ],
       },
       xName: 'tissue',
@@ -181,7 +181,7 @@ class Enrichment extends Component {
     },
     violinData: [],
     HighlightedLineId: {
-      lineId: '',
+      sample: '',
       id_mult: '',
     },
   };
@@ -805,7 +805,7 @@ class Enrichment extends Component {
     // if (this.state.barcodeSettings.barcodeData > 0) {
     if (lineId != null) {
       if (
-        lineId !== this.state.HighlightedLineId.lineId ||
+        lineId !== this.state.HighlightedLineId.sample ||
         this.state.SVGPlotLoaded === false
       ) {
         if (this.state.barcodeSettings.barcodeData?.length > 0) {
@@ -813,7 +813,7 @@ class Enrichment extends Component {
             SVGPlotLoaded: false,
             SVGPlotLoading: true,
             HighlightedLineId: {
-              lineId: lineId,
+              sample: lineId,
               id_mult: id_mult,
             },
           });
@@ -864,7 +864,7 @@ class Enrichment extends Component {
         SVGPlotLoaded: false,
         SVGPlotLoading: false,
         HighlightedLineId: {
-          lineId: '',
+          sample: '',
           id_mult: '',
         },
         // imageInfo: {
