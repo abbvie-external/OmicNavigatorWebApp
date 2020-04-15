@@ -7,7 +7,7 @@ import {
   Popup,
   Divider,
   Radio,
-  Transition
+  Transition,
 } from 'semantic-ui-react';
 import '../Shared/SearchCriteria.scss';
 import { phosphoprotService } from '../../services/phosphoprot.service';
@@ -29,15 +29,15 @@ class PepplotSearchCriteria extends Component {
       {
         key: 'adj_P_Val',
         text: 'Adjusted P Value',
-        value: 'adj_P_Val'
-      }
+        value: 'adj_P_Val',
+      },
     ],
     selectedOperatorP: [
       {
         key: '<',
         text: '<',
-        value: '<'
-      }
+        value: '<',
+      },
     ],
     sigValueP: [0.05],
     reloadPlot: true,
@@ -45,12 +45,12 @@ class PepplotSearchCriteria extends Component {
       defaultselectedColP: {
         key: 'adj_P_Val',
         text: 'Adjusted P',
-        value: 'adj_P_Val'
+        value: 'adj_P_Val',
       },
       defaultselectedOperatorP: {
         key: '<',
         text: '<',
-        value: '<'
+        value: '<',
       },
       defaultsigValueP: 0.05,
       useAnchorP: true,
@@ -68,28 +68,28 @@ class PepplotSearchCriteria extends Component {
         {
           key: '<',
           text: '<',
-          value: '<'
+          value: '<',
         },
         {
           key: '>',
           text: '>',
-          value: '>'
+          value: '>',
         },
         {
           key: '|<|',
           text: '|<|',
-          value: '|<|'
+          value: '|<|',
         },
         {
           key: '|>|',
           text: '|>|',
-          value: '|>|'
-        }
-      ]
+          value: '|>|',
+        },
+      ],
     },
     multisetFiltersVisibleP: false,
     activateMultisetFiltersP: false,
-    uDataP: []
+    uDataP: [],
   };
 
   componentDidMount() {
@@ -100,20 +100,20 @@ class PepplotSearchCriteria extends Component {
     if (s !== '') {
       this.setState({
         pepplotStudyHrefVisible: true,
-        pepplotStudyHref: `http://www.localhost:3000/${s}.html`
+        pepplotStudyHref: `http://www.localhost:3000/${s}.html`,
       });
       phosphoprotService
         .getModelNames('inferenceNames', s + 'plots')
         .then(modelsFromService => {
           this.allNames = modelsFromService;
           const modelsArr = _.map(_.keys(modelsFromService), function(
-            modelName
+            modelName,
           ) {
             return { key: modelName, text: modelName, value: modelName };
           });
           this.setState({
             pepplotModelsDisabled: false,
-            pepplotModels: modelsArr
+            pepplotModels: modelsArr,
           });
           if (m !== '') {
             const testsArr = _.map(this.allNames[m], function(testName) {
@@ -123,7 +123,7 @@ class PepplotSearchCriteria extends Component {
             this.setState({
               pepplotTestsDisabled: false,
               pepplotTests: testsArr,
-              uDataP: uDataPArr
+              uDataP: uDataPArr,
             });
           }
         });
@@ -135,12 +135,12 @@ class PepplotSearchCriteria extends Component {
           pepplotStudy: s,
           pepplotModel: m,
           pepplotTest: t,
-          pepplotProteinSite: p
+          pepplotProteinSite: p,
         },
-        false
+        false,
       );
       this.setState({
-        uAnchorP: t
+        uAnchorP: t,
       });
       this.props.onSearchTransition(true);
       phosphoprotService
@@ -149,12 +149,12 @@ class PepplotSearchCriteria extends Component {
           this.setState({
             uSettingsP: {
               ...this.state.uSettingsP,
-              maxElementsP: dataFromService.length
-            }
+              maxElementsP: dataFromService.length,
+            },
           });
           this.testdata = dataFromService;
           this.props.onPepplotSearch({
-            pepplotResults: this.testdata
+            pepplotResults: this.testdata,
           });
         });
     }
@@ -171,20 +171,20 @@ class PepplotSearchCriteria extends Component {
       if (s !== '') {
         this.setState({
           pepplotStudyHrefVisible: true,
-          pepplotStudyHref: `http://www.localhost:3000/${s}.html`
+          pepplotStudyHref: `http://www.localhost:3000/${s}.html`,
         });
         phosphoprotService
           .getModelNames('inferenceNames', s + 'plots')
           .then(modelsFromService => {
             this.allNames = modelsFromService;
             const modelsArr = _.map(_.keys(modelsFromService), function(
-              modelName
+              modelName,
             ) {
               return { key: modelName, text: modelName, value: modelName };
             });
             this.setState({
               pepplotModelsDisabled: false,
-              pepplotModels: modelsArr
+              pepplotModels: modelsArr,
             });
             if (m !== '') {
               const testsArr = _.map(this.allNames[m], function(testName) {
@@ -194,7 +194,7 @@ class PepplotSearchCriteria extends Component {
               this.setState({
                 pepplotTestsDisabled: false,
                 pepplotTests: testsArr,
-                uDataP: uDataPArr
+                uDataP: uDataPArr,
               });
             }
           });
@@ -205,12 +205,12 @@ class PepplotSearchCriteria extends Component {
             pepplotStudy: s,
             pepplotModel: m,
             pepplotTest: t,
-            pepplotProteinSite: p
+            pepplotProteinSite: p,
           },
-          false
+          false,
         );
         this.setState({
-          uAnchorP: t
+          uAnchorP: t,
         });
         this.props.onSearchTransition(true);
         phosphoprotService
@@ -219,12 +219,12 @@ class PepplotSearchCriteria extends Component {
             this.setState({
               uSettingsP: {
                 ...this.state.uSettingsP,
-                maxElementsP: dataFromService.length
-              }
+                maxElementsP: dataFromService.length,
+              },
             });
             this.testdata = dataFromService;
             this.props.onPepplotSearch({
-              pepplotResults: this.testdata
+              pepplotResults: this.testdata,
             });
           });
       }
@@ -238,7 +238,7 @@ class PepplotSearchCriteria extends Component {
         return { key: study, text: study, value: study };
       });
       this.setState({
-        pepplotStudies: studiesArr
+        pepplotStudies: studiesArr,
       });
     });
   };
@@ -248,18 +248,18 @@ class PepplotSearchCriteria extends Component {
       pepplotStudyHrefVisible: true,
       pepplotStudyHref: `http://www.localhost:3000/${value}.html`,
       pepplotModelsDisabled: true,
-      pepplotTestsDisabled: true
+      pepplotTestsDisabled: true,
     });
     this.props.onSearchCriteriaChange(
       {
         [name]: value,
         pepplotModel: '',
-        pepplotTest: ''
+        pepplotTest: '',
       },
-      true
+      true,
     );
     this.props.onSearchCriteriaReset({
-      isValidSearchPepplot: false
+      isValidSearchPepplot: false,
     });
     phosphoprotService
       .getModelNames('inferenceNames', value + 'plots')
@@ -270,7 +270,7 @@ class PepplotSearchCriteria extends Component {
         });
         this.setState({
           pepplotModelsDisabled: false,
-          pepplotModels: modelsArr
+          pepplotModels: modelsArr,
         });
       });
   };
@@ -280,12 +280,12 @@ class PepplotSearchCriteria extends Component {
       {
         pepplotStudy: this.props.pepplotStudy,
         [name]: value,
-        pepplotTest: ''
+        pepplotTest: '',
       },
-      true
+      true,
     );
     this.props.onSearchCriteriaReset({
-      isValidSearchPepplot: false
+      isValidSearchPepplot: false,
     });
     const testsArr = _.map(this.allNames[value], function(testName) {
       return { key: testName, text: testName, value: testName };
@@ -294,29 +294,29 @@ class PepplotSearchCriteria extends Component {
     this.setState({
       pepplotTestsDisabled: false,
       pepplotTests: testsArr,
-      uDataP: uDataPObj
+      uDataP: uDataPObj,
     });
   };
 
   handleTestChange = (evt, { name, value }) => {
     this.setState({
       reloadPlot: true,
-      multisetFiltersVisibleP: false
+      multisetFiltersVisibleP: false,
     });
     this.props.onSearchCriteriaChange(
       {
         pepplotStudy: this.props.pepplotStudy,
         pepplotModel: this.props.pepplotModel,
-        [name]: value
+        [name]: value,
       },
-      true
+      true,
     );
     this.props.onSearchTransition(true);
     phosphoprotService
       .getTestData(
         this.props.pepplotModel,
         value,
-        this.props.pepplotStudy + 'plots'
+        this.props.pepplotStudy + 'plots',
       )
       .then(dataFromService => {
         this.setState({
@@ -325,10 +325,10 @@ class PepplotSearchCriteria extends Component {
             mustP: [],
             notP: [],
             defaultsigValueP: 0.05,
-            maxElementsP: dataFromService.length
+            maxElementsP: dataFromService.length,
           },
           sigValueP: [0.05],
-          uAnchorP: value
+          uAnchorP: value,
         });
         this.testdata = dataFromService;
         this.props.onPepplotSearch({ pepplotResults: this.testdata });
@@ -339,7 +339,7 @@ class PepplotSearchCriteria extends Component {
     return evt => {
       if (this.state.multisetFiltersVisibleP === false) {
         this.setState({
-          multisetFiltersVisibleP: true
+          multisetFiltersVisibleP: true,
         });
         this.props.onMultisetQueried(true);
         this.updateQueryDataP({
@@ -347,12 +347,12 @@ class PepplotSearchCriteria extends Component {
           notP: this.state.uSettingsP.notP,
           sigValueP: this.state.sigValueP,
           selectedColP: this.state.selectedColP,
-          selectedOperatorP: this.state.selectedOperatorP
+          selectedOperatorP: this.state.selectedOperatorP,
         });
       } else {
         this.setState({
           multisetFiltersVisibleP: false,
-          reloadPlot: true
+          reloadPlot: true,
         });
         this.props.onMultisetQueried(false);
         const pepplotTestName = 'pepplotTest';
@@ -367,21 +367,21 @@ class PepplotSearchCriteria extends Component {
       {
         pepplotStudy: this.props.pepplotStudy,
         pepplotModel: this.props.pepplotModel,
-        [name]: value
+        [name]: value,
       },
-      true
+      true,
     );
     this.props.onSearchTransition(true);
     phosphoprotService
       .getTestData(
         this.props.pepplotModel,
         value,
-        this.props.pepplotStudy + 'plots'
+        this.props.pepplotStudy + 'plots',
       )
       .then(dataFromService => {
         this.testdata = dataFromService;
         this.props.onPepplotSearch({
-          pepplotResults: this.testdata
+          pepplotResults: this.testdata,
         });
       });
   };
@@ -389,20 +389,20 @@ class PepplotSearchCriteria extends Component {
   addFilter = () => {
     const uSetVP = { ...this.state.uSettingsP };
     uSetVP.indexFiltersP = [...this.state.uSettingsP.indexFiltersP].concat(
-      this.state.uSettingsP.indexFiltersP.length
+      this.state.uSettingsP.indexFiltersP.length,
     );
 
     this.setState({
       selectedColP: [...this.state.selectedColP].concat(
-        this.state.uSettingsP.defaultselectedColP
+        this.state.uSettingsP.defaultselectedColP,
       ),
       selectedOperatorP: [...this.state.selectedOperatorP].concat(
-        this.state.uSettingsP.defaultselectedOperatorP
+        this.state.uSettingsP.defaultselectedOperatorP,
       ),
       sigValueP: [...this.state.sigValueP].concat(
-        this.state.uSettingsP.defaultsigValueP
+        this.state.uSettingsP.defaultsigValueP,
       ),
-      uSettingsP: uSetVP
+      uSettingsP: uSetVP,
     });
   };
   removeFilter = index => {
@@ -423,7 +423,7 @@ class PepplotSearchCriteria extends Component {
       sigValueP: [...this.state.sigValueP]
         .slice(0, index)
         .concat([...this.state.sigValueP].slice(index + 1)),
-      uSettingsP: uSetVP
+      uSettingsP: uSetVP,
     });
   };
   changeHoveredFilter = index => {
@@ -436,16 +436,16 @@ class PepplotSearchCriteria extends Component {
     uSelVP[index] = {
       key: value,
       text: value,
-      value: value
+      value: value,
     };
     this.setState(
       {
         [name]: uSelVP,
-        reloadPlot: true
+        reloadPlot: true,
       },
       function() {
         this.updateQueryDataP();
-      }
+      },
     );
   };
   handleInputChange = (evt, { name, value, index }) => {
@@ -454,11 +454,11 @@ class PepplotSearchCriteria extends Component {
     this.setState(
       {
         [name]: uSelVP,
-        reloadPlot: true
+        reloadPlot: true,
       },
       function() {
         this.updateQueryDataP();
-      }
+      },
     );
   };
   handleSetChange = ({ mustP, notP }) => {
@@ -468,11 +468,11 @@ class PepplotSearchCriteria extends Component {
     this.setState(
       {
         uSettingsP: uSettingsVP,
-        reloadPlot: false
+        reloadPlot: false,
       },
       function() {
         this.updateQueryDataP();
-      }
+      },
     );
   };
 
@@ -490,7 +490,7 @@ class PepplotSearchCriteria extends Component {
         this.props.pepplotModel,
         this.props.pepplotStudy + 'plots',
         this.jsonToList(eOperatorP),
-        this.jsonToList(eColP)
+        this.jsonToList(eColP),
       );
     }
     phosphoprotService
@@ -502,7 +502,7 @@ class PepplotSearchCriteria extends Component {
         eSigVP,
         this.props.pepplotTest,
         this.jsonToList(eOperatorP),
-        this.jsonToList(eColP)
+        this.jsonToList(eColP),
       )
       .then(inferenceData => {
         const multisetResultsP = inferenceData;
@@ -512,13 +512,13 @@ class PepplotSearchCriteria extends Component {
             numElementsP: multisetResultsP.length,
             maxElementsP: this.state.uSettingsP.maxElementsP,
             mustP: eMustP,
-            notP: eNotP
+            notP: eNotP,
           },
           activateMultisetFiltersP: true,
-          reloadPlot: false
+          reloadPlot: false,
         });
         this.props.onPepplotSearch({
-          pepplotResults: multisetResultsP
+          pepplotResults: multisetResultsP,
         });
       });
   };
@@ -540,7 +540,7 @@ class PepplotSearchCriteria extends Component {
         eOperatorP,
         eColP,
         pepplotModel,
-        pepplotStudy
+        pepplotStudy,
       )
       .then(svgMarkupObj => {
         let svgMarkup = svgMarkupObj.data;
@@ -550,11 +550,11 @@ class PepplotSearchCriteria extends Component {
             widthCalculation() * 0.8 +
             'px; height:' +
             heightCalculation() * 0.8 +
-            'px;" id="multisetAnalysisSVG"'
+            'px;" id="multisetAnalysisSVG"',
         );
         let svgInfo = { plotType: 'Multiset', svg: svgMarkup };
         this.props.onGetMultisetPlot({
-          svgInfo
+          svgInfo,
         });
       });
   }
@@ -562,7 +562,7 @@ class PepplotSearchCriteria extends Component {
   calculateHeight() {
     var h = Math.max(
       document.documentElement.clientHeight,
-      window.innerHeight || 0
+      window.innerHeight || 0,
     );
     return h;
   }
@@ -570,7 +570,7 @@ class PepplotSearchCriteria extends Component {
   calculateWidth() {
     var w = Math.max(
       document.documentElement.clientWidth,
-      window.innerWidth || 0
+      window.innerWidth || 0,
     );
     return w;
   }
@@ -586,7 +586,7 @@ class PepplotSearchCriteria extends Component {
       pepplotModelsDisabled,
       pepplotTestsDisabled,
       multisetFiltersVisibleP,
-      activateMultisetFiltersP
+      activateMultisetFiltersP,
     } = this.state;
 
     const {
@@ -595,7 +595,7 @@ class PepplotSearchCriteria extends Component {
       pepplotTest,
       isValidSearchPepplot,
       multisetPlotAvailable,
-      plotButtonActive
+      plotButtonActive,
     } = this.props;
 
     const StudyPopupStyle = {
@@ -603,7 +603,7 @@ class PepplotSearchCriteria extends Component {
       borderBottom: '2px solid var(--color-primary)',
       color: '#FFF',
       padding: '1em',
-      fontSize: '13px'
+      fontSize: '13px',
     };
 
     let studyIcon;
@@ -645,6 +645,7 @@ class PepplotSearchCriteria extends Component {
           }
           style={StudyPopupStyle}
           basic
+          inverted
           className="CustomTooltip"
           position="bottom center"
           content="Select a study to view Analysis Details"
@@ -719,7 +720,7 @@ class PepplotSearchCriteria extends Component {
             disabled={pepplotStudiesDisabled}
             label={{
               children: 'Study',
-              htmlFor: 'form-select-control-pstudy'
+              htmlFor: 'form-select-control-pstudy',
             }}
             search
             searchInput={{ id: 'form-select-control-pstudy' }}
@@ -738,7 +739,7 @@ class PepplotSearchCriteria extends Component {
             disabled={pepplotModelsDisabled}
             label={{
               children: 'Model',
-              htmlFor: 'form-select-control-pmodel'
+              htmlFor: 'form-select-control-pmodel',
             }}
             search
             searchInput={{ id: 'form-select-control-pmodel' }}
@@ -755,7 +756,7 @@ class PepplotSearchCriteria extends Component {
             disabled={pepplotTestsDisabled}
             label={{
               children: 'Test',
-              htmlFor: 'form-select-control-ptest'
+              htmlFor: 'form-select-control-ptest',
             }}
             search
             searchInput={{ id: 'form-select-control-ptest' }}
