@@ -99,7 +99,7 @@ class PhosphoprotService {
       model: model,
       database: test,
       study: study,
-      type: type
+      type: type,
     };
     const promise = this.ocpuDataCall('getEnrichmentResults', obj, handleError);
     const dataFromPromise = await promise;
@@ -141,7 +141,7 @@ class PhosphoprotService {
           axios
             .get(session.getLoc() + 'graphics/1/svg', {
               responseType: 'text',
-              cancelToken
+              cancelToken,
             })
             .then(response => resolve(response));
         })
@@ -167,7 +167,7 @@ class PhosphoprotService {
       plottype,
       { idmult: id, study: study },
       handleError,
-      cancelToken
+      cancelToken,
     );
     //const svgMarkupFromPromise = await promise;
     return promise;
@@ -177,7 +177,7 @@ class PhosphoprotService {
     this.setUrl();
     const promise = this.ocpuDataCallAlt('getDatabases', {
       study: study,
-      database: test
+      database: test,
     });
     const dataFromPromise = await promise;
     return dataFromPromise;
@@ -190,7 +190,7 @@ class PhosphoprotService {
       model: model,
       database: annotation,
       test: test,
-      term: term
+      term: term,
     });
     const dataFromPromise = await promise;
     return dataFromPromise;
@@ -204,7 +204,7 @@ class PhosphoprotService {
     sigValue,
     annotation,
     operator,
-    pValType
+    pValType,
   ) {
     this.setUrl();
     const promise = this.ocpuDataCall('getEnrichmentIntersection', {
@@ -215,7 +215,7 @@ class PhosphoprotService {
       sigValue: sigValue,
       annotation: annotation,
       operator: operator,
-      pValType: pValType
+      pValType: pValType,
     });
     const dataFromPromise = await promise;
     return dataFromPromise;
@@ -228,7 +228,7 @@ class PhosphoprotService {
     annotation,
     operator,
     pValType,
-    errorCb
+    errorCb,
   ) {
     this.setUrl();
     const handleError =
@@ -244,9 +244,9 @@ class PhosphoprotService {
         study: study,
         annotation: annotation,
         operator: operator,
-        pValType: pValType
+        pValType: pValType,
       },
-      handleError
+      handleError,
     );
     const svgMarkupFromPromise = await promise;
     return svgMarkupFromPromise;
@@ -260,7 +260,7 @@ class PhosphoprotService {
     sigValue,
     anchor,
     operator,
-    column
+    column,
   ) {
     this.setUrl();
     const promise = this.ocpuDataCall('getInferenceIntersection', {
@@ -271,7 +271,7 @@ class PhosphoprotService {
       study: study,
       sigValue: sigValue,
       operator: operator,
-      column: column
+      column: column,
     });
     const dataFromPromise = await promise;
     return dataFromPromise;
@@ -283,7 +283,7 @@ class PhosphoprotService {
     column,
     testCategory,
     study,
-    errorCb
+    errorCb,
   ) {
     this.setUrl();
     const handleError =
@@ -298,9 +298,9 @@ class PhosphoprotService {
         testCategory: testCategory,
         study: study,
         operator: operator,
-        column: column
+        column: column,
       },
-      handleError
+      handleError,
     );
     const svgMarkupFromPromise = await promise;
     return svgMarkupFromPromise;
@@ -311,7 +311,7 @@ class PhosphoprotService {
     enrichmentAnnotation,
     tests,
     pValueType,
-    enrichmentStudy
+    enrichmentStudy,
   ) {
     this.setUrl();
     const promise = this.ocpuRPC('getCytoscapeEM', {
@@ -320,7 +320,7 @@ class PhosphoprotService {
       tests: tests,
       q: pValueType,
       study: enrichmentStudy,
-      isDev: false
+      isDev: false,
     });
     const nodesFromPromise = await promise;
     return nodesFromPromise;

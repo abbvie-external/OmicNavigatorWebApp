@@ -143,7 +143,6 @@ class Enrichment extends Component {
     barcodeSettings: {
       barcodeData: [],
       brushedData: [],
-      // chartSize: { height: '200', width: '960' },
       lineID: '',
       statLabel: {},
       statistic: 'statistic',
@@ -158,6 +157,7 @@ class Enrichment extends Component {
         xAxis: 'abs(t)',
         yAxis: "log<tspan baseline-shift='sub' font-size='14px'>2</tspan>(FC)",
       },
+      // axisLabels: { xAxis: this.term, yAxis: "log<tspan baseline-shift='sub' font-size='14px'>2</tspan>(FC)" },
       id: 'violin-graph-1',
       pointUniqueId: 'sample',
       pointValue: 'cpm',
@@ -166,20 +166,24 @@ class Enrichment extends Component {
       tooltip: {
         show: true,
         fields: [
-          { label: 'abs(t)', value: 'cpm', toFixed: true },
-          { label: 'Protien', value: 'sample' },
+          { label: 'log(FC)', value: 'cpm', toFixed: true },
+          // { label: 'abs(t)', value: 'cpm', toFixed: true },
+          { label: 'Protein', value: 'sample' },
         ],
       },
       xName: 'tissue',
       constrainExtremes: false,
       color: d3.scaleOrdinal(d3.schemeCategory10),
-      chartSize: { height: '700', width: '960' },
-      margin: { top: 50, right: 40, bottom: 40, left: 50 },
+      margin: { top: 10, right: 10, bottom: 50, left: 50 },
       scale: 'linear',
       yName: null,
       yTicks: 1,
     },
     violinData: [],
+    HighlightedLineId: {
+      sample: '',
+      id_mult: '',
+    },
   };
   EnrichmentViewContainerRef = React.createRef();
 
@@ -772,7 +776,6 @@ class Enrichment extends Component {
         },
       });
     } else {
-      console.log('in the else');
       this.setState({
         violinData: [],
         isViolinPlotLoaded: false,
@@ -791,64 +794,78 @@ class Enrichment extends Component {
     }
   };
 
-  //look for violin plot
-  handleMaxLinePlot = info => {
-    console.log('info is');
-    console.log(info);
+  handleHighlightedLineReset = obj => {
+    this.setState(obj);
+  };
+
+  handleLineSelected = (lineId, id_mult) => {
     const { enrichmentStudy, enrichmentModel } = this.props;
     // let self = this;
     // if (this.state.barcodeSettings.barcodeData > 0) {
-    if (info != null) {
-      if (this.state.barcodeSettings.barcodeData?.length > 0) {
-        this.setState({
-          SVGPlotLoaded: false,
-          SVGPlotLoading: true,
-        });
-        const dataItem = this.state.barcodeSettings.barcodeData.find(
-          i => i.lineID === info.lineID,
-        );
-        let id = dataItem.id_mult ? dataItem.id_mult : dataItem.id;
-        // var psp = document.getElementById('psp-icon');
-        // psp.style.visibility = "hidden";
-        // psp.style.left = w.toString() + "px";
-        // psp.style.bottom = h.toString() + "px";
-        let plotType = ['splineplot'];
-        switch (enrichmentModel) {
-          case 'DonorDifferentialPhosphorylation':
-            plotType = ['dotplot'];
-            break;
-          case 'Treatment and or Strain Differential Phosphorylation':
-            plotType = ['StrainStimDotplot', 'StimStrainDotplot'];
-            break;
-          case 'Timecourse Differential Phosphorylation':
-            plotType = ['lineplot', 'splineplot'];
-            break;
-          case 'Differential Expression':
-            plotType = ['proteindotplot'];
-            break;
-          case 'Differential Phosphorylation':
-            plotType = ['phosphodotplot'];
-            break;
-          case 'No Pretreatment Timecourse Differential Phosphorylation':
-            plotType = ['lineplot.modelII', 'splineplot.modelII'];
-            break;
-          case 'Ferrostatin Pretreatment Timecourse Differential Phosphorylation':
-            plotType = ['lineplot.modelIII', 'splineplot.modelIII'];
-            break;
-          default:
-            plotType = ['dotplot'];
+    if (lineId != null) {
+      if (
+        lineId !== this.state.HighlightedLineId.sample ||
+        this.state.SVGPlotLoaded === false
+      ) {
+        if (this.state.barcodeSettings.barcodeData?.length > 0) {
+          this.setState({
+            SVGPlotLoaded: false,
+            SVGPlotLoading: true,
+            HighlightedLineId: {
+              sample: lineId,
+              id_mult: id_mult,
+            },
+          });
+          const dataItem = this.state.barcodeSettings.barcodeData.find(
+            i => i.lineID === lineId,
+          );
+          let id = dataItem.id_mult ? dataItem.id_mult : dataItem.id;
+          // var psp = document.getElementById('psp-icon');
+          // psp.style.visibility = "hidden";
+          // psp.style.left = w.toString() + "px";
+          // psp.style.bottom = h.toString() + "px";
+          let plotType = ['splineplot'];
+          switch (enrichmentModel) {
+            case 'DonorDifferentialPhosphorylation':
+              plotType = ['dotplot'];
+              break;
+            case 'Treatment and or Strain Differential Phosphorylation':
+              plotType = ['StrainStimDotplot', 'StimStrainDotplot'];
+              break;
+            case 'Timecourse Differential Phosphorylation':
+              plotType = ['lineplot', 'splineplot'];
+              break;
+            case 'Differential Expression':
+              plotType = ['proteindotplot'];
+              break;
+            case 'Differential Phosphorylation':
+              plotType = ['phosphodotplot'];
+              break;
+            case 'No Pretreatment Timecourse Differential Phosphorylation':
+              plotType = ['lineplot.modelII', 'splineplot.modelII'];
+              break;
+            case 'Ferrostatin Pretreatment Timecourse Differential Phosphorylation':
+              plotType = ['lineplot.modelIII', 'splineplot.modelIII'];
+              break;
+            default:
+              plotType = ['dotplot'];
+          }
+          let imageInfo = { key: '', title: '', svg: [] };
+          imageInfo.title = this.state.imageInfo.title;
+          imageInfo.key = this.state.imageInfo.key;
+          const handleSVGCb = this.handleSVG;
+          this.getPlot(id, plotType, enrichmentStudy, imageInfo, handleSVGCb);
         }
-        let imageInfo = { key: '', title: '', svg: [] };
-        imageInfo.title = this.state.imageInfo.title;
-        imageInfo.key = this.state.imageInfo.key;
-        const handleSVGCb = this.handleSVG;
-        this.getPlot(id, plotType, enrichmentStudy, imageInfo, handleSVGCb);
       }
     } else {
       plotCancel();
       this.setState({
         SVGPlotLoaded: false,
         SVGPlotLoading: false,
+        HighlightedLineId: {
+          sample: '',
+          id_mult: '',
+        },
         // imageInfo: {
         //   ...this.state.imageInfo,
         //   svg: []
@@ -1543,7 +1560,8 @@ class Enrichment extends Component {
             {...this.props}
             {...this.state}
             onBackToTable={this.backToTable}
-            onHandleMaxLinePlot={this.handleMaxLinePlot}
+            onHandleLineSelected={this.handleLineSelected}
+            onHandleHighlightedLineReset={this.handleHighlightedLineReset}
             onHandleBarcodeChanges={this.handleBarcodeChanges}
           ></SplitPanesContainer>
         </div>

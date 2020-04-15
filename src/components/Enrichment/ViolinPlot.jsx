@@ -23,13 +23,13 @@ class ViolinPlot extends Component {
 
   componentDidMount() {
     this.setDimensions();
-    let resizedFn;
-    window.addEventListener('resize', () => {
-      clearTimeout(resizedFn);
-      resizedFn = setTimeout(() => {
-        this.windowResized();
-      }, 200);
-    });
+    // let resizedFn;
+    // window.addEventListener('resize', () => {
+    //   clearTimeout(resizedFn);
+    //   resizedFn = setTimeout(() => {
+    //     this.windowResized();
+    //   }, 200);
+    // });
     d3.select(`#svg-${this.props.violinSettings.id}`).remove();
     d3.selectAll(`.violin-tooltip`).remove();
     this.makeChart();
@@ -42,17 +42,58 @@ class ViolinPlot extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.violinData !== this.props.violinData) {
-      const self = this;
-      d3.select(`#svg-${self.props.violinSettings.id}`).remove();
-      d3.selectAll(`.violin-tooltip`).remove();
-      this.makeChart();
-      this.prepareData();
-      this.prepareSettings();
-      this.prepareChart();
-      this.renderViolinPlot({ showViolinPlot: true });
-      this.renderBoxPlot({});
-      this.renderDataPlots({ showPlot: true });
+    const label = this.props.violinSettings.axisLabels.xAxis;
+    if (this.props.violinData != null) {
+      let prevValues = prevProps?.violinData?.[label]?.values ?? [];
+      let currentValues = this.props.violinData?.[label]?.values ?? [];
+      var isSame =
+        prevValues.length === currentValues.length &&
+        prevValues.every(
+          (o, i) =>
+            Object.keys(o).length === Object.keys(currentValues[i]).length &&
+            Object.keys(o).every(k => o[k] === currentValues[i][k]),
+        );
+      if (
+        !isSame
+        // ||
+        // this.props.HighlightedLineId.sample !==
+        //   prevProps.HighlightedLineId.sample
+      ) {
+        d3.select(`#svg-${this.props.violinSettings.id}`).remove();
+        d3.selectAll(`.violin-tooltip`).remove();
+        this.makeChart();
+        this.prepareData();
+        this.prepareSettings();
+        this.prepareChart();
+        this.renderViolinPlot({ showViolinPlot: true });
+        this.renderBoxPlot({});
+        this.renderDataPlots({ showPlot: true });
+      }
+
+      if (
+        this.props.HighlightedLineId.sample !==
+        prevProps.HighlightedLineId.sample
+      ) {
+        this.isHovering = false;
+        const id = this.getCircleId(
+          this.props.HighlightedLineId.sample,
+          this.props.HighlightedLineId.id_mult,
+        );
+        const dOpts = this.chart.dataPlots.options;
+        d3.selectAll(`.vPoint`)
+          .transition()
+          .duration(300)
+          .attr('fill', 'var(--color-link)')
+          .attr('r', dOpts.pointSize * 2);
+        d3.select(`#violin_${id}`)
+          .transition()
+          .duration(100)
+          .attr('fill', 'var(--color-primary)')
+          .attr('r', dOpts.pointSize * 2.5);
+        // const d = this.chart.groupObjs[cName].values[pt];
+        // this.maxCircle = id;
+        // this.addToolTiptoMax(this.props.HighlightedLineId);
+      }
     }
   }
 
@@ -162,10 +203,12 @@ class ViolinPlot extends Component {
     );
 
     const svg = document.getElementById('svg-violin-graph-1');
+    let parent = '';
+    // if (this.violinContainerRef.current !== null) {
 
-    const parent = document
-      .getElementById('violin-graph-1')
-      .getBoundingClientRect();
+    // } else {
+    parent = document.getElementById('violin-graph-1').getBoundingClientRect();
+
     const shape = document
       .getElementById(`violin_${self.getCircleId(id.sample, id.id_mult)}`)
       .getBoundingClientRect();
@@ -184,6 +227,7 @@ class ViolinPlot extends Component {
       .style('display', null);
 
     this.tooltipHover(id);
+    // }
   };
 
   getPos = (x, y, svg, element) => {
@@ -214,9 +258,12 @@ class ViolinPlot extends Component {
 
     let tooltipString = '';
     _.forEach(tooltipFields, field => {
+      // if (d[field.value] != null) {
       tooltipString += `<span>${field.label} = ${d[field.value]}</span><br/>`;
+      // } else {
+      //   tooltipString += `<span>${d.sample}</span>`;
+      // }
     });
-
     self.chart.objs.tooltip.html(tooltipString);
     self.chart.objs.tooltip.style('z-index', 100);
   };
@@ -326,21 +373,12 @@ class ViolinPlot extends Component {
 
     // Set base settings
     self.chart.margin = self.props.violinSettings.margin;
-    self.chart.divWidth = self.props.violinSettings.chartSize.width;
-    self.chart.divHeight = self.props.violinSettings.chartSize.height;
-
-    self.chart.width =
-      self.props.violinSettings.chartSize.width -
-      self.props.violinSettings.margin.left -
-      self.props.violinSettings.margin.right;
-    self.chart.height =
-      self.props.violinSettings.chartSize.height -
-      self.chart.margin.top -
-      self.chart.margin.bottom;
-
+    self.chart.divWidth = self.state.violinContainerWidth;
+    self.chart.divHeight = self.state.violinContainerHeight;
+    self.chart.width = self.state.violinWidth;
+    self.chart.height = self.state.violinHeight;
     self.chart.xAxisLabel = self.props.violinSettings.axisLabels.xAxis;
     self.chart.yAxisLabel = self.props.violinSettings.axisLabels.yAxis;
-
     self.chart.yScale = d3.scaleLinear();
 
     if (self.props.violinSettings.constrainExtremes === true) {
@@ -406,11 +444,8 @@ class ViolinPlot extends Component {
       .attr('id', `svg-${self.props.violinSettings.id}`)
       .attr('width', '100%')
       .attr('height', '100%')
-      .attr(
-        'viewBox',
-        `0 0 ${self.props.violinSettings.chartSize.width} ${self.props.violinSettings.chartSize.height}`,
-      )
-      .attr('preserveAspectRatio', 'xMinYMin meet');
+      .attr('viewBox', `0 0 ${self.chart.divWidth} ${self.chart.divHeight}`);
+    // .attr('preserveAspectRatio', 'xMinYMin meet');
     self.chart.objs.g = self.chart.objs.svg
       .append('g')
       .attr(
@@ -427,13 +462,9 @@ class ViolinPlot extends Component {
       .attr('transform', `translate(0,${self.chart.height})`)
       // .call(self.chart.objs.xAxis)
       .append('text')
-      .attr('class', 'vXLabel')
+      .attr('class', 'vXLabel vLabelStyles')
       .attr('dy', '1.50em')
       .attr('y', -7)
-      .style('font-size', '18px')
-      .style('font-weight', 'bold')
-      .style('font-family', 'Roboto')
-      .style('text-ancohor', 'middle')
       .append('tspan')
       .html(() => {
         return self.chart.xAxisLabel;
@@ -449,17 +480,13 @@ class ViolinPlot extends Component {
       .attr('class', 'y axis')
       .call(self.chart.objs.yAxis)
       .append('text')
-      .attr('class', 'label')
+      .attr('class', 'label vLabelStyles')
       .attr('dy', '.62em')
       .attr('transform', 'rotate(-90)')
       .attr('x', -self.chart.height / 2)
       .attr('y', -48)
       .attr('id', 'yaxis-label')
       .style('fill', '#000')
-      .style('font-size', '18px')
-      .style('font-weight', 'bold')
-      .style('font-family', 'Roboto')
-      .style('text-ancohor', 'middle')
       .append('tspan')
       .html(() => {
         return self.chart.yAxisLabel;
@@ -472,10 +499,6 @@ class ViolinPlot extends Component {
       .attr('x', 10)
       .attr('y', -30)
       .style('fill', '#000')
-      .style('font-size', '25px')
-      .style('font-weight', 'bold')
-      .style('font-family', 'Roboto')
-      .style('text-anchor', 'left')
       .text(self.props.violinSettings.title);
 
     const subtitle = self.chart.objs.g
@@ -485,10 +508,6 @@ class ViolinPlot extends Component {
       .attr('x', 10)
       .attr('y', -10)
       .style('fill', '#000')
-      .style('font-size', '15px')
-      // .style('font-weight', 'bold')
-      .style('font-family', 'Roboto')
-      .style('text-anchor', 'left')
       .text(self.props.violinSettings.subtitle);
   };
 
@@ -1336,7 +1355,7 @@ class ViolinPlot extends Component {
                     ) {
                       const id = self.chart.groupObjs[cName].values[pt];
                       self.maxCircle = id;
-                      return 'orange';
+                      return 'var(--color-primary)';
                     }
                     return self.chart.dataPlots.colorFunct(cName);
                   }),
@@ -1346,9 +1365,10 @@ class ViolinPlot extends Component {
 
           const circleData = _.forEach(
             self.chart.groupObjs[cName].values,
-            (value, key) => {
-              value[self.props.violinSettings.xName] = cName;
-            },
+            // ,
+            // (value, key) => {
+            //   value[self.props.violinSettings.xName] = cName;
+            // },
           );
 
           cPlot.objs.points.g
@@ -1418,19 +1438,19 @@ class ViolinPlot extends Component {
               // var id = d.sample.replace(/\;/g, "_");
               const id = self.getCircleId(d.sample, d.id_mult);
               // self.dotClick.emit(d);
-              self.props.onHandleViolinDotSelected(d);
+              self.props.onHandleLineSelected(d.sample, d.id_mult);
               //self.props.onHandleMaxLinePlot(d)
 
               d3.select(`#violin_${maxId}`)
                 .transition()
                 .duration(300)
-                .attr('fill', '#1f77b4')
+                .attr('fill', 'var(--color-link)')
                 .attr('r', dOpts.pointSize * 2);
 
               d3.select(`#violin_${id}`)
                 .transition()
                 .duration(100)
-                .attr('fill', 'orange')
+                .attr('fill', 'var(--color-primary)')
                 .attr('r', dOpts.pointSize * 2.5);
 
               self.maxCircle = d;
@@ -1449,9 +1469,18 @@ class ViolinPlot extends Component {
     return self.chart;
   };
 
-  windowResized = () => {
-    this.setDimensions();
-  };
+  // windowResized = () => {
+  //   this.setDimensions();
+  //   d3.select(`#svg-${this.props.violinSettings.id}`).remove();
+  //   d3.selectAll(`.violin-tooltip`).remove();
+  //   this.makeChart();
+  //   this.prepareData();
+  //   this.prepareSettings();
+  //   this.prepareChart();
+  //   this.renderViolinPlot({ showViolinPlot: true });
+  //   this.renderBoxPlot({});
+  //   this.renderDataPlots({ showPlot: true });
+  // };
 
   setDimensions = () => {
     const self = this;
@@ -1477,11 +1506,10 @@ class ViolinPlot extends Component {
       violinContainerWidth: containerWidth,
       violinWidth: width,
     });
-
-    // this.prepareViolin(width, height);
   };
 
   getHeight = () => {
+    debugger;
     if (this.violinContainerRef.current !== null) {
       return this.violinContainerRef.current.parentElement.offsetHeight;
     }

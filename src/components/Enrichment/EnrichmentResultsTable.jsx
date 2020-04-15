@@ -8,7 +8,7 @@ import QuickViewModal from '../utility/QuickViewModal';
 import {
   getFieldValue,
   getField,
-  typeMap
+  typeMap,
 } from '../utility/selectors/QHGridSelector';
 export * from '../utility/FilterTypeConfig';
 export * from '../utility/selectors/quickViewSelector';
@@ -25,7 +25,7 @@ class EnrichmentResultsTable extends Component {
       let param = { queryId: -1, from: 0, searchStr: protein };
       phosphoprotService.postToPhosphositePlus(
         param,
-        'https://www.phosphosite.org/proteinSearchSubmitAction.action'
+        'https://www.phosphosite.org/proteinSearchSubmitAction.action',
       );
     };
   };
@@ -37,7 +37,7 @@ class EnrichmentResultsTable extends Component {
       enrichmentStudy,
       enrichmentModel,
       enrichmentAnnotation,
-      additionalTemplateInfoEnrichmentTable
+      additionalTemplateInfoEnrichmentTable,
     } = this.props;
     const enrichmentCacheKey = `${enrichmentStudy}-${enrichmentModel}-${enrichmentAnnotation}`;
     const quickViews = [];
@@ -66,7 +66,7 @@ class EnrichmentResultsTable extends Component {
               disableColumnVisibilityToggle
               min-height="75vh"
               additionalTemplateInfo={additionalTemplateInfoEnrichmentTable}
-              onInformItemsPerPage={this.informItemsPerPage}
+              // onInformItemsPerPage={this.informItemsPerPage}
             />
           </Grid.Column>
         </Grid.Row>
