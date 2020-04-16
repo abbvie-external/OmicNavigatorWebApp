@@ -84,12 +84,12 @@ class ViolinPlot extends Component {
           .transition()
           .duration(300)
           .attr('fill', 'var(--color-link)')
-          .attr('r', dOpts.pointSize * 2);
+          .attr('r', dOpts.pointSize * 1);
         d3.select(`#violin_${id}`)
           .transition()
           .duration(100)
           .attr('fill', 'var(--color-primary)')
-          .attr('r', dOpts.pointSize * 2.5);
+          .attr('r', dOpts.pointSize * 2);
         // const d = this.chart.groupObjs[cName].values[pt];
         // this.maxCircle = id;
         // this.addToolTiptoMax(this.props.HighlightedLineId);
@@ -870,7 +870,7 @@ class ViolinPlot extends Component {
       showWhiskers: true,
       showMedian: true,
       showMean: false,
-      medianCSize: 3.5,
+      medianCSize: 1,
       boxWidth: 30,
       lineWidth: null,
       outlierCSize: 2.5,
@@ -1144,7 +1144,7 @@ class ViolinPlot extends Component {
       show: true,
       showPlot: false,
       plotType: 'scatter',
-      pointSize: 6,
+      pointSize: 3,
       showBeanLines: false,
       beanWidth: 20,
       colors: null,
@@ -1345,9 +1345,9 @@ class ViolinPlot extends Component {
                     if (
                       self.chart.groupObjs[cName].values[pt].statistic === max
                     ) {
-                      return dOpts.pointSize * 2.5;
+                      return dOpts.pointSize * 2;
                     }
-                    return dOpts.pointSize * 2;
+                    return dOpts.pointSize * 1;
                   })
                   .attr('fill', d => {
                     if (
@@ -1383,7 +1383,7 @@ class ViolinPlot extends Component {
                 .transition()
                 .duration(100)
                 .attr('cursor', 'pointer')
-                .attr('r', dOpts.pointSize * 3.5);
+                .attr('r', dOpts.pointSize * 2);
               if (self.props.violinSettings.tooltip.show) {
                 const m = d3.mouse(self.chart.objs.chartDiv.node());
                 self.chart.objs.tooltip
@@ -1415,9 +1415,9 @@ class ViolinPlot extends Component {
                 .duration(300)
                 .attr('r', x => {
                   if (self.maxCircle.sample !== x.sample) {
-                    return dOpts.pointSize * 2;
+                    return dOpts.pointSize * 1;
                   }
-                  return dOpts.pointSize * 2.5;
+                  return dOpts.pointSize * 2;
                 });
 
               // self.dotHover.emit({ object: d, action: 'mouseout' });
@@ -1445,13 +1445,13 @@ class ViolinPlot extends Component {
                 .transition()
                 .duration(300)
                 .attr('fill', 'var(--color-link)')
-                .attr('r', dOpts.pointSize * 2);
+                .attr('r', dOpts.pointSize * 1);
 
               d3.select(`#violin_${id}`)
                 .transition()
                 .duration(100)
                 .attr('fill', 'var(--color-primary)')
-                .attr('r', dOpts.pointSize * 2.5);
+                .attr('r', dOpts.pointSize * 2);
 
               self.maxCircle = d;
               self.addToolTiptoMax(self.maxCircle);
@@ -1509,6 +1509,7 @@ class ViolinPlot extends Component {
   };
 
   getHeight = () => {
+    debugger;
     if (this.violinContainerRef.current !== null) {
       return this.violinContainerRef.current.parentElement.offsetHeight;
     }
