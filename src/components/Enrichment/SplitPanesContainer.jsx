@@ -56,8 +56,7 @@ class SplitPanesContainer extends Component {
   };
 
   getViolinPlot() {
-    // const { isViolinPlotLoading, isViolinPlotLoaded } = this.props;
-    // isViolinPlotLoaded
+    // const { isViolinPlotLoaded } = this.props;
     // if (!isViolinPlotLoaded) {
     //   return (
     //     <div className="PlotInstructionsDiv">

@@ -720,7 +720,6 @@ class Enrichment extends Component {
   };
 
   handleBarcodeChanges = changes => {
-    // const { barcodeSettings } = this.state;
     let self = this;
     if (changes.brushedData.length > 0) {
       const boxPlotArray = _.map(changes.brushedData, function(d) {
@@ -735,9 +734,6 @@ class Enrichment extends Component {
         return d;
       });
 
-      // this.setState({
-      //   isViolinPlotLoaded: false
-      // });
       const reducedBoxPlotArray = _.reduce(
         boxPlotArray,
         function(res, datum) {
