@@ -486,7 +486,7 @@ class EnrichmentResultsGraph extends Component {
                   mouseLeaveDelay={0}
                 />
                 <NumberInput
-                  value={nodeCutoff}
+                  value={nodeCutoff.toString()}
                   onChange={this.props.onHandleNodeCutoffInputChange}
                   disabled={!networkGraphReady}
                   buttonPlacement="right"
@@ -576,7 +576,7 @@ class EnrichmentResultsGraph extends Component {
                   mouseLeaveDelay={0}
                 />
                 <NumberInput
-                  value={edgeCutoff}
+                  value={edgeCutoff.toString()}
                   onChange={this.props.onHandleEdgeCutoffInputChange}
                   disabled={!networkGraphReady}
                   buttonPlacement="right"
