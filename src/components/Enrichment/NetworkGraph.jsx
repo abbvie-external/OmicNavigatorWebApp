@@ -34,7 +34,8 @@ class NetworkGraph extends Component {
       this.props.networkData !== prevProps.networkData ||
       this.props.nodeCutoff !== prevProps.nodeCutoff ||
       this.props.edgeCutoff !== prevProps.edgeCutoff ||
-      this.props.networkSortBy !== prevProps.networkSortBy
+      this.props.networkSortBy !== prevProps.networkSortBy ||
+      this.props.networkSettings.facets !== prevProps.networkSettings.facets
     ) {
       this.prepareAndRenderTree();
     }
@@ -626,9 +627,11 @@ class NetworkGraph extends Component {
                   // to rotate text on boxes with one node
                   // .attr('transform', 'rotate(' + 5 + ')')
                   // .attr('x', -65);
-                  .attr('x', function(d) {
-                    return d.x + d.dx / 2;
-                  })
+                  // no need to alter x, it positions text in the middle without calculation
+                  // .attr('x', function(d) {
+                  //   debugger;
+                  //   return d.x / 2;
+                  // })
                   // .attr('y', function(d) {
                   //   return d.y + d.dy / 2;
                   // })
