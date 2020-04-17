@@ -134,7 +134,7 @@ class BarcodePlotReact extends Component {
     this.props.onHandleBarcodeChanges({
       brushedData: [],
     });
-    this.props.onHandleLineSelected(null, null);
+    this.props.onHandleLineSelected(null, null, null);
     this.setState({
       settings: {
         ...this.state.settings,
@@ -260,7 +260,6 @@ class BarcodePlotReact extends Component {
           })
           .attr('y1', settings.margin.selected)
           .classed('selected', true);
-
         const brushedArr = brushed._groups[0];
         // const brushedDataVar = brushed.data();
         const brushedDataVar = brushedArr.map(a => {
@@ -317,9 +316,10 @@ class BarcodePlotReact extends Component {
           self.props.onHandleLineSelected(
             maxLineData.lineID,
             maxLineData.id_mult,
+            maxLineData.statistic,
           );
         } else {
-          self.props.onHandleLineSelected(null, null);
+          self.props.onHandleLineSelected(null, null, null);
           self.setState({
             tooltipPosition: null,
             tooltipTextAnchor: null,
@@ -353,7 +353,7 @@ class BarcodePlotReact extends Component {
           [quatileTicks.nodes()[quartile].getAttribute('x1'), 60],
           [quatileTicks.nodes()[0].getAttribute('x1'), barcodeHeight - 30],
         ]);
-      }, 1800);
+      }, 5);
     } else {
       // reposition the brushed rect on window resize, or horizontal pane resize
       const selectedTicks = d3.selectAll('line').filter(function() {

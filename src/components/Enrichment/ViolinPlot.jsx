@@ -42,8 +42,8 @@ class ViolinPlot extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    const label = this.props.violinSettings.axisLabels.xAxis;
-    if (this.props.violinData != null) {
+    if (this.props.violinData !== prevProps.violinData) {
+      const label = this.props.violinSettings.axisLabels.xAxis;
       let prevValues = prevProps?.violinData?.[label]?.values ?? [];
       let currentValues = this.props.violinData?.[label]?.values ?? [];
       var isSame =
@@ -69,11 +69,11 @@ class ViolinPlot extends Component {
         this.renderBoxPlot({});
         this.renderDataPlots({ showPlot: true });
       }
-
-      if (
-        this.props.HighlightedLineId.sample !==
-        prevProps.HighlightedLineId.sample
-      ) {
+    }
+    if (
+      this.props.HighlightedLineId.sample !== prevProps.HighlightedLineId.sample
+    ) {
+      if (this.props.HighlightedLineId.sample !== '') {
         this.isHovering = false;
         const id = this.getCircleId(
           this.props.HighlightedLineId.sample,
@@ -91,8 +91,8 @@ class ViolinPlot extends Component {
           .attr('fill', 'var(--color-primary)')
           .attr('r', dOpts.pointSize * 2);
         // const d = this.chart.groupObjs[cName].values[pt];
-        // this.maxCircle = id;
-        // this.addToolTiptoMax(this.props.HighlightedLineId);
+        this.maxCircle = id;
+        this.addToolTiptoMax(this.props.HighlightedLineId);
       }
     }
   }
@@ -255,7 +255,6 @@ class ViolinPlot extends Component {
   tooltipHover = d => {
     const self = this;
     const tooltipFields = self.props.violinSettings.tooltip.fields;
-
     let tooltipString = '';
     _.forEach(tooltipFields, field => {
       // if (d[field.value] != null) {
@@ -1438,7 +1437,7 @@ class ViolinPlot extends Component {
               // var id = d.sample.replace(/\;/g, "_");
               const id = self.getCircleId(d.sample, d.id_mult);
               // self.dotClick.emit(d);
-              self.props.onHandleLineSelected(d.sample, d.id_mult);
+              self.props.onHandleLineSelected(d.sample, d.id_mult, d.statistic);
               //self.props.onHandleMaxLinePlot(d)
 
               d3.select(`#violin_${maxId}`)

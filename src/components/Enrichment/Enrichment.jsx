@@ -370,12 +370,6 @@ class Enrichment extends Component {
     }));
   };
 
-  onViolinDataLoaded = bool => {
-    this.setState({
-      violinDataLoaded: bool,
-    });
-  };
-
   handleDirectionChange = direction => () =>
     this.setState({ direction: direction, visible: false });
 
@@ -794,7 +788,7 @@ class Enrichment extends Component {
     this.setState(obj);
   };
 
-  handleLineSelected = (lineId, id_mult) => {
+  handleLineSelected = (lineId, id_m, cpm_stat) => {
     const { enrichmentStudy, enrichmentModel } = this.props;
     // let self = this;
     // if (this.state.barcodeSettings.barcodeData > 0) {
@@ -809,7 +803,8 @@ class Enrichment extends Component {
             SVGPlotLoading: true,
             HighlightedLineId: {
               sample: lineId,
-              id_mult: id_mult,
+              id_mult: id_m,
+              cpm: cpm_stat,
             },
           });
           const dataItem = this.state.barcodeSettings.barcodeData.find(

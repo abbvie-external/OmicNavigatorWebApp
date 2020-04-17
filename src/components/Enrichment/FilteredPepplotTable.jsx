@@ -24,19 +24,33 @@ class FilteredPepplotTable extends Component {
     filteredTableConfigCols: [],
     filteredTableData: [],
     filteredBarcodeData: [],
-    itemsPerPageInformedEnrichment: null,
+    itemsPerPageFilteredPepplotTable: 15,
   };
   filteredPepplotGridRef = React.createRef();
 
   componentDidMount() {
     this.getFilteredTableConfigCols(this.props.barcodeSettings.barcodeData);
+    // if (
+    //   this.props.tab === 'enrichment' &&
+    //   this.props.HighlightedLineId !== '' &&
+    //   this.props.HighlightedLineId != null
+    // ) {
+    //   this.pageToProtein(
+    //     this.props.barcodeSettings.brushedData,
+    //     this.props.HighlightedLineId,
+    //     this.state.itemsPerPageFilteredPepplotTable,
+    //   );
+    // }
   }
 
-  componentDidUpdate = (prevProps, prevState) => {
+  componentDidUpdate(prevProps, prevState) {
     if (
       this.props.barcodeSettings.brushedData !==
       prevProps.barcodeSettings.brushedData
     ) {
+      this.getTableData();
+    }
+    if (this.state.filteredBarcodeData !== prevState.filteredBarcodeData) {
       this.getTableData();
     }
     // let prevValues = prevProps?.barcodeSettings?.brushedData ?? [];
@@ -51,6 +65,44 @@ class FilteredPepplotTable extends Component {
     // if (!isSame) {
     //   this.getTableData();
     // }
+    //if (
+    // this.props.tab === 'enrichment' &&
+    // this.props.HighlightedLineId.sample !== '' &&
+    // this.props.HighlightedLineId.sample != null &&
+    // (
+    // this.props.HighlightedLineId.sample !== prevProps.HighlightedLineId.sample
+    // this.props.filteredTableData !== prevProps.filteredTableData)
+    // ) {
+    //   this.pageToProtein(
+    //     this.state.filteredTableData,
+    //     this.props.HighlightedLineId.sample,
+    //     this.state.itemsPerPageFilteredPepplotTable,
+    //   );
+    //}
+    if (
+      this.props.activeViolinTableIndex === 1 &&
+      this.props.activeViolinTableIndex !== prevProps.activeViolinTableIndex
+    ) {
+      this.pageToProtein(
+        this.state.filteredTableData,
+        this.props.HighlightedLineId.sample,
+        this.state.itemsPerPageFilteredPepplotTable,
+      );
+    }
+  }
+
+  pageToProtein = (data, proteinToHighlight, itemsPerPage) => {
+    if (this.filteredPepplotGridRef.current !== null) {
+      const Index = _.findIndex(data, function(p) {
+        return p.Protein_Site === proteinToHighlight;
+      });
+      const pageNumber = Math.ceil(Index / itemsPerPage);
+      const pageNumberCheck = pageNumber >= 1 ? pageNumber : 1;
+      this.filteredPepplotGridRef.current.handlePageChange(
+        {},
+        { activePage: pageNumberCheck },
+      );
+    }
   };
 
   getTableData = () => {
@@ -279,6 +331,7 @@ class FilteredPepplotTable extends Component {
         filteredBarcodeData: filteredData,
         filteredTableConfigCols: configCols,
       });
+      this.getTableData();
     }
   };
 
@@ -305,13 +358,17 @@ class FilteredPepplotTable extends Component {
 
   informItemsPerPage = items => {
     this.setState({
-      itemsPerPageInformedEnrichment: items,
+      itemsPerPageFilteredPepplotTable: items,
     });
   };
 
   handleRowClick = (event, item, index) => {
     event.stopPropagation();
-    this.props.onHandleLineSelected(item.Protein_Site, item.id_mult);
+    this.props.onHandleLineSelected(
+      item.Protein_Site,
+      item.id_mult,
+      item.logFC,
+    );
   };
 
   render() {
@@ -319,7 +376,7 @@ class FilteredPepplotTable extends Component {
     const {
       filteredTableConfigCols,
       filteredTableData,
-      itemsPerPageInformedEnrichment,
+      itemsPerPageFilteredPepplotTable,
     } = this.state;
     // const quickViews = [];
     const additionalTemplateInfo = this.getTableHelpers(
@@ -336,10 +393,10 @@ class FilteredPepplotTable extends Component {
           columnsConfig={filteredTableConfigCols}
           totalRows={15}
           // use "pepplotRows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
-          itemsPerPage={itemsPerPageInformedEnrichment}
+          itemsPerPage={itemsPerPageFilteredPepplotTable}
           exportBaseName="Differential_Phosphorylation_Analysis_Filtered"
           // quickViews={quickViews}
-          // disableGeneralSearch
+          disableGeneralSearch
           disableGrouping
           // disableSort
           disableColumnVisibilityToggle
