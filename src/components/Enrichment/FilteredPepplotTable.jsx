@@ -94,10 +94,11 @@ class FilteredPepplotTable extends Component {
         return p.Protein_Site === proteinToHighlight;
       });
       const pageNumber = Math.ceil(Index / itemsPerPage);
-      console.log(pageNumber);
+      debugger;
+      const pageNumberCheck = pageNumber >= 1 ? pageNumber : 1;
       this.filteredPepplotGridRef.current.handlePageChange(
         {},
-        { activePage: pageNumber },
+        { activePage: pageNumberCheck },
       );
     }
   };
@@ -360,7 +361,11 @@ class FilteredPepplotTable extends Component {
 
   handleRowClick = (event, item, index) => {
     event.stopPropagation();
-    this.props.onHandleLineSelected(item.Protein_Site, item.id_mult);
+    this.props.onHandleLineSelected(
+      item.Protein_Site,
+      item.id_mult,
+      item.logFC,
+    );
   };
 
   render() {

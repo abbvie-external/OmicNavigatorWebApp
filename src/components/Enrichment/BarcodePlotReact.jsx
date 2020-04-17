@@ -134,7 +134,7 @@ class BarcodePlotReact extends Component {
     this.props.onHandleBarcodeChanges({
       brushedData: [],
     });
-    this.props.onHandleLineSelected(null, null);
+    this.props.onHandleLineSelected(null, null, null);
     this.setState({
       settings: {
         ...this.state.settings,
@@ -306,9 +306,10 @@ class BarcodePlotReact extends Component {
           self.props.onHandleLineSelected(
             maxLineData.lineID,
             maxLineData.id_mult,
+            maxLineData.statistic,
           );
         } else {
-          self.props.onHandleLineSelected(null, null);
+          self.props.onHandleLineSelected(null, null, null);
           self.setState({
             tooltipPosition: null,
             tooltipTextAnchor: null,

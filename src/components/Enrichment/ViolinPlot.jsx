@@ -91,8 +91,8 @@ class ViolinPlot extends Component {
           .attr('fill', 'var(--color-primary)')
           .attr('r', dOpts.pointSize * 2);
         // const d = this.chart.groupObjs[cName].values[pt];
-        // this.maxCircle = id;
-        // this.addToolTiptoMax(this.props.HighlightedLineId);
+        this.maxCircle = id;
+        this.addToolTiptoMax(this.props.HighlightedLineId);
       }
     }
   }
@@ -253,9 +253,9 @@ class ViolinPlot extends Component {
   };
 
   tooltipHover = d => {
+    debugger;
     const self = this;
     const tooltipFields = self.props.violinSettings.tooltip.fields;
-
     let tooltipString = '';
     _.forEach(tooltipFields, field => {
       // if (d[field.value] != null) {
@@ -1438,7 +1438,8 @@ class ViolinPlot extends Component {
               // var id = d.sample.replace(/\;/g, "_");
               const id = self.getCircleId(d.sample, d.id_mult);
               // self.dotClick.emit(d);
-              self.props.onHandleLineSelected(d.sample, d.id_mult);
+              debugger;
+              self.props.onHandleLineSelected(d.sample, d.id_mult, d.statistic);
               //self.props.onHandleMaxLinePlot(d)
 
               d3.select(`#violin_${maxId}`)
