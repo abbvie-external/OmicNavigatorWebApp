@@ -370,12 +370,6 @@ class Enrichment extends Component {
     }));
   };
 
-  onViolinDataLoaded = bool => {
-    this.setState({
-      violinDataLoaded: bool,
-    });
-  };
-
   handleDirectionChange = direction => () =>
     this.setState({ direction: direction, visible: false });
 

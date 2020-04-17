@@ -43,11 +43,14 @@ class FilteredPepplotTable extends Component {
     // }
   }
 
-  componentDidUpdate = (prevProps, prevState) => {
+  componentDidUpdate(prevProps, prevState) {
     if (
       this.props.barcodeSettings.brushedData !==
       prevProps.barcodeSettings.brushedData
     ) {
+      this.getTableData();
+    }
+    if (this.state.filteredBarcodeData !== prevState.filteredBarcodeData) {
       this.getTableData();
     }
     // let prevValues = prevProps?.barcodeSettings?.brushedData ?? [];
@@ -86,7 +89,7 @@ class FilteredPepplotTable extends Component {
         this.state.itemsPerPageFilteredPepplotTable,
       );
     }
-  };
+  }
 
   pageToProtein = (data, proteinToHighlight, itemsPerPage) => {
     if (this.filteredPepplotGridRef.current !== null) {
@@ -94,7 +97,6 @@ class FilteredPepplotTable extends Component {
         return p.Protein_Site === proteinToHighlight;
       });
       const pageNumber = Math.ceil(Index / itemsPerPage);
-      debugger;
       const pageNumberCheck = pageNumber >= 1 ? pageNumber : 1;
       this.filteredPepplotGridRef.current.handlePageChange(
         {},
@@ -329,6 +331,7 @@ class FilteredPepplotTable extends Component {
         filteredBarcodeData: filteredData,
         filteredTableConfigCols: configCols,
       });
+      this.getTableData();
     }
   };
 
