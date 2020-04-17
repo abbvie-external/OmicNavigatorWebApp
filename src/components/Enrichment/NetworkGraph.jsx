@@ -629,7 +629,6 @@ class NetworkGraph extends Component {
                   // .attr('x', -65);
                   // no need to alter x, it positions text in the middle without calculation
                   // .attr('x', function(d) {
-                  //   debugger;
                   //   return d.x / 2;
                   // })
                   // .attr('y', function(d) {

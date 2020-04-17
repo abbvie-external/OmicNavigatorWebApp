@@ -134,7 +134,7 @@ class BarcodePlotReact extends Component {
     this.props.onHandleBarcodeChanges({
       brushedData: [],
     });
-    this.props.onHandleLineSelected(null, null);
+    this.props.onHandleLineSelected(null, null, null);
     this.setState({
       settings: {
         ...this.state.settings,
@@ -252,7 +252,6 @@ class BarcodePlotReact extends Component {
           })
           .attr('y1', settings.margin.selected)
           .classed('selected', true);
-
         const brushedArr = brushed._groups[0];
         // const brushedDataVar = brushed.data();
         const brushedDataVar = brushedArr.map(a => {
@@ -306,9 +305,10 @@ class BarcodePlotReact extends Component {
           self.props.onHandleLineSelected(
             maxLineData.lineID,
             maxLineData.id_mult,
+            maxLineData.statistic,
           );
         } else {
-          self.props.onHandleLineSelected(null, null);
+          self.props.onHandleLineSelected(null, null, null);
           self.setState({
             tooltipPosition: null,
             tooltipTextAnchor: null,
@@ -346,7 +346,22 @@ class BarcodePlotReact extends Component {
         [selectTicks.nodes()[quartile].getAttribute('x1'), 60],
         [selectTicks.nodes()[0].getAttribute('x1'), barcodeHeight - 40],
       ]);
-    }, 1800);
+      // const brushed = d3.selectAll('.selected');
+      // const brushedArr = brushed._groups[0];
+      // // const brushedDataVar = brushed.data();
+      // const brushedDataVar = brushedArr.map(a => {
+      //   return {
+      //     x2: a.attributes[2].nodeValue,
+      //     id_mult: a.attributes[6].nodeValue,
+      //     lineID: a.attributes[7].nodeValue,
+      //     logFC: a.attributes[8].nodeValue,
+      //     statistic: a.attributes[9].nodeValue,
+      //   };
+      // });
+      // self.props.onHandleBarcodeChanges({
+      //   brushedData: brushedDataVar,
+      // });
+    }, 5);
 
     // d3.selectAll(this.barcodeSVGRef.current).call(objsBrush);
   }
