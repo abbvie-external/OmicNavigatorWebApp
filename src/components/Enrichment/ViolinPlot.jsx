@@ -1509,7 +1509,6 @@ class ViolinPlot extends Component {
   };
 
   getHeight = () => {
-    debugger;
     if (this.violinContainerRef.current !== null) {
       return this.violinContainerRef.current.parentElement.offsetHeight;
     }

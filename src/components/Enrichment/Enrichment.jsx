@@ -1755,7 +1755,6 @@ class Enrichment extends Component {
     // sessionStorage.setItem('nodeCutoff', decimalValue);
   }, 500);
   // handleNodeSliderChange = value => {
-  //   debugger;
   //   let decimalValue = value / 100;
   //   if (this.state.nodeCutoff !== decimalValue) {
   //     this.removeNetworkSVG();
