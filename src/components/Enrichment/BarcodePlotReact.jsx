@@ -213,17 +213,9 @@ class BarcodePlotReact extends Component {
 
   setupBrush(barcodeWidth, barcodeHeight, settings, initialBrush) {
     const self = this;
-    let objsBrush = d3
-      .brush()
-      .extent([
-        [settings.margin.left + 4, 0],
-        [barcodeWidth + 15, barcodeHeight],
-      ])
-      .on('start', brushingStart)
-      .on('brush', highlightBrushedLines)
-      .on('end', endBrush);
+    let objsBrush = {};
 
-    function brushingStart() {
+    const brushingStart = function() {
       self.setState({
         settings: {
           ...self.state.settings,
@@ -235,9 +227,9 @@ class BarcodePlotReact extends Component {
       });
       // }
       //}
-    }
+    };
 
-    function highlightBrushedLines() {
+    const highlightBrushedLines = function() {
       if (d3.event.selection != null) {
         const brushedLines = d3.brushSelection(this);
         const isBrushed = function(brushedLines, x) {
@@ -299,14 +291,11 @@ class BarcodePlotReact extends Component {
       } else {
         self.handleSVGClick(null);
       }
-    }
+    };
 
-    function endBrush() {
-      if (!d3.event.sourceEvent) return; // Only transition after input.
+    const endBrush = function() {
       const selection = d3.event.selection;
       if (selection == null) {
-        // d3.select('.brush').call(objsBrush.move, null);
-        // objsBrush.clear();
         self.handleSVGClick(null);
       } else {
         if (self.props.barcodeSettings.brushedData.length > 0) {
@@ -327,16 +316,17 @@ class BarcodePlotReact extends Component {
           });
         }
       }
-    }
-    // objsBrush = d3
-    //   .brush()
-    //   .extent([
-    //     [settings.margin.left + 4, 0],
-    //     [barcodeWidth + 15, barcodeHeight],
-    //   ])
-    //   .on('start', brushingStart)
-    //   .on('brush', highlightBrushedLines)
-    //   .on('end', endBrush);
+    };
+
+    objsBrush = d3
+      .brush()
+      .extent([
+        [settings.margin.left + 4, 0],
+        [barcodeWidth + 15, barcodeHeight],
+      ])
+      .on('start', brushingStart)
+      .on('brush', highlightBrushedLines)
+      .on('end', endBrush);
 
     d3.selectAll('.x.barcode-axis')
       .append('g')
@@ -373,6 +363,22 @@ class BarcodePlotReact extends Component {
         ],
       ]);
     }
+    // d3.selectAll(this.barcodeSVGRef.current).call(objsBrush);
+    // const brushed = d3.selectAll('.selected');
+    // const brushedArr = brushed._groups[0];
+    // // const brushedDataVar = brushed.data();
+    // const brushedDataVar = brushedArr.map(a => {
+    //   return {
+    //     x2: a.attributes[2].nodeValue,
+    //     id_mult: a.attributes[6].nodeValue,
+    //     lineID: a.attributes[7].nodeValue,
+    //     logFC: a.attributes[8].nodeValue,
+    //     statistic: a.attributes[9].nodeValue,
+    //   };
+    // });
+    // self.props.onHandleBarcodeChanges({
+    //   brushedData: brushedDataVar,
+    // });
   }
 
   getTooltip = () => {
