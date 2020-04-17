@@ -37,7 +37,7 @@ class BarcodePlotReact extends Component {
   barcodeSVGRef = React.createRef();
 
   componentDidMount() {
-    this.setWidth();
+    this.setWidth(true);
     let resizedFn;
     window.addEventListener('resize', () => {
       clearTimeout(resizedFn);
@@ -52,7 +52,7 @@ class BarcodePlotReact extends Component {
     if (
       self.props.horizontalSplitPaneSize !== prevProps.horizontalSplitPaneSize
     ) {
-      this.setWidth();
+      this.setWidth(false);
     }
     // Much of this code can be refactored into a function, as it is used below.
     if (self.props.HighlightedLineId !== prevProps.HighlightedLineId) {
@@ -102,10 +102,10 @@ class BarcodePlotReact extends Component {
     // const brush = d3.selectAll('.selection');
     // d3.selectAll('.selection').call(brush.move, null);
     // this.barcodeSVGRef.current.select(".brush").call(this.brushRef.move, null);
-    this.setWidth();
+    this.setWidth(false);
   };
 
-  setWidth = () => {
+  setWidth = initialBrush => {
     const { settings } = this.state;
     const containerWidth = this.getWidth();
     const width = containerWidth - settings.margin.left - settings.margin.right;
@@ -118,7 +118,7 @@ class BarcodePlotReact extends Component {
       this.props.horizontalSplitPaneSize -
       this.state.settings.margin.top -
       this.state.settings.margin.bottom;
-    this.setupBrush(width, barcodeHeight, this.state.settings);
+    this.setupBrush(width, barcodeHeight, this.state.settings, initialBrush);
   };
 
   getWidth() {
@@ -211,11 +211,19 @@ class BarcodePlotReact extends Component {
     }
   }
 
-  setupBrush(barcodeWidth, barcodeHeight, settings) {
+  setupBrush(barcodeWidth, barcodeHeight, settings, initialBrush) {
     const self = this;
-    let objsBrush = {};
+    let objsBrush = d3
+      .brush()
+      .extent([
+        [settings.margin.left + 4, 0],
+        [barcodeWidth + 15, barcodeHeight],
+      ])
+      .on('start', brushingStart)
+      .on('brush', highlightBrushedLines)
+      .on('end', endBrush);
 
-    const brushingStart = function() {
+    function brushingStart() {
       self.setState({
         settings: {
           ...self.state.settings,
@@ -227,9 +235,9 @@ class BarcodePlotReact extends Component {
       });
       // }
       //}
-    };
+    }
 
-    const highlightBrushedLines = function() {
+    function highlightBrushedLines() {
       if (d3.event.selection != null) {
         const brushedLines = d3.brushSelection(this);
         const isBrushed = function(brushedLines, x) {
@@ -291,11 +299,14 @@ class BarcodePlotReact extends Component {
       } else {
         self.handleSVGClick(null);
       }
-    };
+    }
 
-    const endBrush = function() {
+    function endBrush() {
+      if (!d3.event.sourceEvent) return; // Only transition after input.
       const selection = d3.event.selection;
       if (selection == null) {
+        // d3.select('.brush').call(objsBrush.move, null);
+        // objsBrush.clear();
         self.handleSVGClick(null);
       } else {
         if (self.props.barcodeSettings.brushedData.length > 0) {
@@ -316,54 +327,52 @@ class BarcodePlotReact extends Component {
           });
         }
       }
-    };
-
-    objsBrush = d3
-      .brush()
-      .extent([
-        [settings.margin.left + 4, 0],
-        [barcodeWidth + 15, barcodeHeight],
-      ])
-      .on('start', brushingStart)
-      .on('brush', highlightBrushedLines)
-      .on('end', endBrush);
+    }
+    // objsBrush = d3
+    //   .brush()
+    //   .extent([
+    //     [settings.margin.left + 4, 0],
+    //     [barcodeWidth + 15, barcodeHeight],
+    //   ])
+    //   .on('start', brushingStart)
+    //   .on('brush', highlightBrushedLines)
+    //   .on('end', endBrush);
 
     d3.selectAll('.x.barcode-axis')
       .append('g')
       .attr('class', 'brush')
       .call(objsBrush);
 
-    const selectTicks = d3.selectAll('line').filter(function() {
-      return d3.select(this).attr('id');
-    });
+    if (initialBrush) {
+      const quatileTicks = d3.selectAll('line').filter(function() {
+        return d3.select(this).attr('id');
+      });
+      const quartile = Math.round(quatileTicks.nodes().length * 0.25);
+      setTimeout(function() {
+        d3.select('.brush').call([objsBrush][0].move, [
+          [quatileTicks.nodes()[quartile].getAttribute('x1'), 60],
+          [quatileTicks.nodes()[0].getAttribute('x1'), barcodeHeight - 30],
+        ]);
+      }, 5);
+    } else {
+      // reposition the brushed rect on window resize, or horizontal pane resize
+      const selectedTicks = d3.selectAll('line').filter(function() {
+        return d3.select(this).classed('selected');
+      });
 
-    const quartile = Math.round(selectTicks.nodes().length * 0.25);
+      const highestTickIndex = selectedTicks.nodes().length - 1;
 
-    console.log('here', quartile);
-
-    setTimeout(function() {
       d3.select('.brush').call([objsBrush][0].move, [
-        [selectTicks.nodes()[quartile].getAttribute('x1'), 60],
-        [selectTicks.nodes()[0].getAttribute('x1'), barcodeHeight - 40],
+        [
+          selectedTicks.nodes()[highestTickIndex].getAttribute('x1'),
+          selectedTicks.nodes()[highestTickIndex].getAttribute('y1'),
+        ],
+        [
+          selectedTicks.nodes()[0].getAttribute('x1'),
+          selectedTicks.nodes()[highestTickIndex].getAttribute('y2'),
+        ],
       ]);
-      // const brushed = d3.selectAll('.selected');
-      // const brushedArr = brushed._groups[0];
-      // // const brushedDataVar = brushed.data();
-      // const brushedDataVar = brushedArr.map(a => {
-      //   return {
-      //     x2: a.attributes[2].nodeValue,
-      //     id_mult: a.attributes[6].nodeValue,
-      //     lineID: a.attributes[7].nodeValue,
-      //     logFC: a.attributes[8].nodeValue,
-      //     statistic: a.attributes[9].nodeValue,
-      //   };
-      // });
-      // self.props.onHandleBarcodeChanges({
-      //   brushedData: brushedDataVar,
-      // });
-    }, 5);
-
-    // d3.selectAll(this.barcodeSVGRef.current).call(objsBrush);
+    }
   }
 
   getTooltip = () => {
