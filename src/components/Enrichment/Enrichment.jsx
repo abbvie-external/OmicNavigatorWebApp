@@ -1709,21 +1709,21 @@ class Enrichment extends Component {
   //   });
   // }, 500);
 
-  handleNodeCutoffInputChange = value => {
+  handleNodeCutoffInputChange = _.debounce(value => {
     this.removeNetworkSVG();
     this.setState({
       nodeCutoff: value,
-      // networkGraphReady: false
     });
-  };
+    sessionStorage.setItem('nodeCutoff', value);
+  }, 500);
 
-  handleEdgeCutoffInputChange = value => {
+  handleEdgeCutoffInputChange = _.debounce(value => {
     this.removeNetworkSVG();
     this.setState({
       edgeCutoff: value,
-      // networkGraphReady: false
     });
-  };
+    sessionStorage.setItem('edgeCutoff', value);
+  }, 500);
 
   // handleNetworkCutoffInputChange = (evt, { name, value }) => {
   //   this.removeNetworkSVG();
@@ -1742,12 +1742,11 @@ class Enrichment extends Component {
   // }, 500);
 
   handleNodeSliderChange = _.debounce(value => {
-    let decimalValue = value >= 1 ? value / 100 : 0.01;
-    if (this.state.nodeCutoff !== decimalValue) {
+    if (this.state.nodeCutoff !== value) {
       this.removeNetworkSVG();
-      this.setState({ nodeCutoff: decimalValue });
+      this.setState({ nodeCutoff: value });
     }
-    // sessionStorage.setItem('nodeCutoff', decimalValue);
+    sessionStorage.setItem('nodeCutoff', value);
   }, 500);
   // handleNodeSliderChange = value => {
   //   let decimalValue = value / 100;
@@ -1759,12 +1758,11 @@ class Enrichment extends Component {
   // };
 
   handleEdgeSliderChange = _.debounce(value => {
-    let decimalValue = value >= 5 ? value / 100 : 0.05;
-    if (this.state.edgeCutoff !== decimalValue) {
+    if (this.state.edgeCutoff !== value) {
       this.removeNetworkSVG();
-      this.setState({ edgeCutoff: decimalValue });
+      this.setState({ edgeCutoff: value });
     }
-    sessionStorage.setItem('edgeCutoff', decimalValue);
+    sessionStorage.setItem('edgeCutoff', value);
   }, 500);
 
   // handleLegendOpen = () => {

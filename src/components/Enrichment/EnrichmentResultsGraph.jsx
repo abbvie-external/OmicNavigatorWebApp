@@ -234,8 +234,8 @@ class EnrichmentResultsGraph extends Component {
     networkSearchValue: '',
     descriptions: [],
     networkSortBy: ['significance', 'nodecount', 'edgecount'],
-    // nodeCutoffLocal: sessionStorage.getItem('nodeCutoff') || 0.1,
-    // edgeCutoffLocal: sessionStorage.getItem('edgeCutoff') || 0.4,
+    nodeCutoffLocal: sessionStorage.getItem('nodeCutoff') || 0.1,
+    edgeCutoffLocal: sessionStorage.getItem('edgeCutoff') || 0.4,
   };
 
   componentDidMount() {
@@ -343,16 +343,46 @@ class EnrichmentResultsGraph extends Component {
   //   <StyledTrack {...props} index={state.index} />
   // );
 
+  handleNodeCutoffInputChangeLocal = value => {
+    this.setState({
+      nodeCutoffLocal: value,
+    });
+    this.props.onHandleNodeCutoffInputChange(value);
+  };
+
+  handleEdgeCutoffInputChangeLocal = value => {
+    this.setState({
+      edgeCutoffLocal: value,
+    });
+    this.props.onHandleEdgeCutoffInputChange(value);
+  };
+
+  handleNodeSliderChange = value => {
+    let decimalValue = value >= 1 ? value / 100 : 0.01;
+    this.setState({
+      nodeCutoffLocal: decimalValue,
+    });
+    this.props.onHandleNodeSliderChange(decimalValue);
+  };
+
+  handleEdgeSliderChange = value => {
+    let decimalValue = value >= 5 ? value / 100 : 0.05;
+    this.setState({
+      edgeCutoffLocal: decimalValue,
+    });
+    this.props.onHandleEdgeSliderChange(decimalValue);
+  };
+
   render() {
     const {
       results,
       networkSortBy,
-      // nodeCutoffLocal,
-      // edgeCutoffLocal,
+      nodeCutoffLocal,
+      edgeCutoffLocal,
     } = this.state;
     const {
-      nodeCutoff,
-      edgeCutoff,
+      // nodeCutoff,
+      // edgeCutoff,
       networkDataLoaded,
       networkGraphReady,
       activeIndexEnrichmentView,
@@ -379,9 +409,9 @@ class EnrichmentResultsGraph extends Component {
 
       const NodeThumb = (props, state) => (
         <StyledThumb {...props}>
-          <span className="ValueNowNode">
+          {/* <span className="ValueNowNode">
             {state.valueNow >= 1 ? state.valueNow / 100 : 0.01}
-          </span>
+          </span> */}
         </StyledThumb>
       );
       const NodeTrack = (props, state) => (
@@ -390,9 +420,9 @@ class EnrichmentResultsGraph extends Component {
 
       const EdgeThumb = (props, state) => (
         <StyledThumb {...props}>
-          <span className="ValueNowEdge">
+          {/* <span className="ValueNowEdge">
             {state.valueNow >= 5 ? state.valueNow / 100 : 0.05}
-          </span>
+          </span> */}
         </StyledThumb>
       );
       const EdgeTrack = (props, state) => (
@@ -486,8 +516,8 @@ class EnrichmentResultsGraph extends Component {
                   mouseLeaveDelay={0}
                 />
                 <NumberInput
-                  value={nodeCutoff.toString()}
-                  onChange={this.props.onHandleNodeCutoffInputChange}
+                  value={nodeCutoffLocal.toString()}
+                  onChange={this.handleNodeCutoffInputChangeLocal}
                   disabled={!networkGraphReady}
                   buttonPlacement="right"
                   valueType="decimal"
@@ -527,9 +557,9 @@ class EnrichmentResultsGraph extends Component {
                       ? 'NetworkSlider Show'
                       : 'NetworkSlider Hide'
                   }
-                  value={nodeCutoff * 100}
+                  value={nodeCutoffLocal * 100}
                   name="nodeCutoffSlider"
-                  onChange={this.props.onHandleNodeSliderChange}
+                  onChange={this.handleNodeSliderChange}
                 />
                 {/* <Slider
                   disabled={!networkGraphReady}
@@ -576,8 +606,8 @@ class EnrichmentResultsGraph extends Component {
                   mouseLeaveDelay={0}
                 />
                 <NumberInput
-                  value={edgeCutoff.toString()}
-                  onChange={this.props.onHandleEdgeCutoffInputChange}
+                  value={edgeCutoffLocal.toString()}
+                  onChange={this.handleEdgeCutoffInputChangeLocal}
                   disabled={!networkGraphReady}
                   buttonPlacement="right"
                   valueType="decimal"
@@ -618,9 +648,9 @@ class EnrichmentResultsGraph extends Component {
                       ? 'NetworkSlider Show'
                       : 'NetworkSlider Hide'
                   }
-                  value={edgeCutoff * 100}
+                  value={edgeCutoffLocal * 100}
                   name="edgeCutoffSlider"
-                  onChange={this.props.onHandleEdgeSliderChange}
+                  onChange={this.handleEdgeSliderChange}
                 />
                 {/* <Slider
                   disabled={!networkGraphReady}
