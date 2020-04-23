@@ -177,7 +177,7 @@ class FilteredPepplotTable extends Component {
           filterable: { type: 'alphanumericFilter' },
           template: (value, item, addParams) => {
             return (
-              <div>
+              <div className="NoSelect">
                 <Popup
                   trigger={
                     <span
@@ -219,7 +219,9 @@ class FilteredPepplotTable extends Component {
             return (
               <Popup
                 trigger={
-                  <span className="TableValue">{splitValue(value)}</span>
+                  <span className="TableValue NoSelect">
+                    {splitValue(value)}
+                  </span>
                 }
                 content={value}
                 style={TableValuePopupStyle}
@@ -239,7 +241,7 @@ class FilteredPepplotTable extends Component {
           filterable: { type: 'alphanumericFilter' },
           template: (value, item, addParams) => {
             return (
-              <div>
+              <div className="NoSelect">
                 <Popup
                   trigger={
                     <span
@@ -311,7 +313,7 @@ class FilteredPepplotTable extends Component {
               <p>
                 <Popup
                   trigger={
-                    <span className="TableValue">
+                    <span className="TableValue NoSelect">
                       {formatNumberForDisplay(value)}
                     </span>
                   }
@@ -363,12 +365,25 @@ class FilteredPepplotTable extends Component {
   };
 
   handleRowClick = (event, item, index) => {
+    debugger;
     event.stopPropagation();
-    this.props.onHandleLineSelected(
-      item.Protein_Site,
-      item.id_mult,
-      item.logFC,
-    );
+    if (event.shiftKey) {
+      console.log('shift');
+      document.addEventListener('onkeydown', event => {
+        console.log('keydown');
+        console.log(event.code);
+        debugger;
+      });
+    } else if (event.ctrlKey) {
+      console.log('control');
+    } else {
+      console.log('click');
+      this.props.onHandleLineSelected(
+        item.Protein_Site,
+        item.id_mult,
+        item.logFC,
+      );
+    }
   };
 
   render() {
@@ -396,7 +411,7 @@ class FilteredPepplotTable extends Component {
           itemsPerPage={itemsPerPageFilteredPepplotTable}
           exportBaseName="Differential_Phosphorylation_Analysis_Filtered"
           // quickViews={quickViews}
-          disableGeneralSearch
+          // disableGeneralSearch
           disableGrouping
           // disableSort
           disableColumnVisibilityToggle
