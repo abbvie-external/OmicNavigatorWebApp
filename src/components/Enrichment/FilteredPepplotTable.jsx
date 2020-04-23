@@ -85,7 +85,7 @@ class FilteredPepplotTable extends Component {
     ) {
       this.pageToProtein(
         this.state.filteredTableData,
-        this.props.HighlightedLineId.sample,
+        this.props.HighlightedLineId[0]?.sample,
         this.state.itemsPerPageFilteredPepplotTable,
       );
     }
@@ -365,24 +365,40 @@ class FilteredPepplotTable extends Component {
   };
 
   handleRowClick = (event, item, index) => {
-    debugger;
+    let self = this;
     event.stopPropagation();
     if (event.shiftKey) {
-      console.log('shift');
-      document.addEventListener('onkeydown', event => {
-        console.log('keydown');
-        console.log(event.code);
-        debugger;
+      debugger;
+      const allTableData = this.state.filteredTableData;
+      const alreadySelectedIndex = _.findIndex(allTableData, function(d) {
+        return d.Protein_Site === self.props.HighlightedLineId[0]?.sample;
       });
+      const lowerIndex =
+        index < alreadySelectedIndex ? index : alreadySelectedIndex;
+      const higherIndex =
+        index > alreadySelectedIndex ? index : alreadySelectedIndex;
+      const selectedTableData = allTableData.slice(lowerIndex, higherIndex + 1);
+      const selectedTableDataArray = selectedTableData.map(function(d) {
+        return { sample: d.Protein_Site, id_mult: d.id_mult, cpm: d.F };
+      });
+      this.props.onHandleLineSelected(selectedTableDataArray);
+      // console.log('shift');
+      // document.addEventListener('onkeydown', event => {
+      //   console.log('keydown');
+      //   console.log(event.code);
+      //   debugger;
+      // });
     } else if (event.ctrlKey) {
       console.log('control');
     } else {
       console.log('click');
-      this.props.onHandleLineSelected(
-        item.Protein_Site,
-        item.id_mult,
-        item.logFC,
-      );
+      this.props.onHandleLineSelected([
+        {
+          sample: item.Protein_Site, //lineID,
+          id_mult: item.id_mult,
+          cpm: item.logFC, //statistic,
+        },
+      ]);
     }
   };
 
@@ -395,7 +411,7 @@ class FilteredPepplotTable extends Component {
     } = this.state;
     // const quickViews = [];
     const additionalTemplateInfo = this.getTableHelpers(
-      HighlightedLineId.sample,
+      HighlightedLineId[0]?.sample,
     );
 
     return (

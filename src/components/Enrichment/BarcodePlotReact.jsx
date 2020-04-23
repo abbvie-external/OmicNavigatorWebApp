@@ -55,15 +55,16 @@ class BarcodePlotReact extends Component {
       this.setWidth(false);
     }
     // Much of this code can be refactored into a function, as it is used below.
-    if (self.props.HighlightedLineId !== prevProps.HighlightedLineId) {
+    if (self.props.HighlightedLineId[0] !== prevProps.HighlightedLineId[0]) {
+      debugger;
       d3.selectAll(`.MaxLine`)
         .attr('y1', self.state.settings.margin.selected)
         .classed('MaxLine', false);
-      if (self.props.HighlightedLineId.sample !== '') {
-        const maxLineId = `${self.props.HighlightedLineId.sample.replace(
+      if (self.props.HighlightedLineId[0]?.sample !== '') {
+        const maxLineId = `${self.props.HighlightedLineId[0]?.sample.replace(
           /;/g,
           '',
-        )}_${self.props.HighlightedLineId.id_mult}`;
+        )}_${self.props.HighlightedLineId[0].id_mult}`;
         const maxLine = d3.select(`#barcode-line-${maxLineId}`);
         maxLine
           .classed('MaxLine', true)
@@ -134,7 +135,7 @@ class BarcodePlotReact extends Component {
     this.props.onHandleBarcodeChanges({
       brushedData: [],
     });
-    this.props.onHandleLineSelected(null, null, null);
+    this.props.onHandleLineSelected([]);
     this.setState({
       settings: {
         ...this.state.settings,
@@ -302,13 +303,17 @@ class BarcodePlotReact extends Component {
           const maxLineData = self.getMaxObject(
             self.props.barcodeSettings.brushedData,
           );
-          self.props.onHandleLineSelected(
-            maxLineData.lineID,
-            maxLineData.id_mult,
-            maxLineData.statistic,
-          );
+          const maxLineDataArr = [maxLineData];
+          const highlightedLineArray = maxLineDataArr.map(function(m) {
+            return {
+              sample: m.lineID,
+              id_mult: m.id_mult,
+              cpm: m.statistic,
+            };
+          });
+          self.props.onHandleLineSelected(highlightedLineArray);
         } else {
-          self.props.onHandleLineSelected(null, null, null);
+          self.props.onHandleLineSelected([]);
           self.setState({
             tooltipPosition: null,
             tooltipTextAnchor: null,

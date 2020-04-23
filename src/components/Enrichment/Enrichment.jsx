@@ -794,33 +794,31 @@ class Enrichment extends Component {
     this.setState(obj);
   };
 
-  handleLineSelected = (lineId, id_m, cpm_stat) => {
+  handleLineSelected = toHighlightArray => {
+    debugger;
+    const highestValueObject = toHighlightArray[0];
     const { enrichmentStudy, enrichmentModel } = this.props;
-    // let self = this;
-    // if (this.state.barcodeSettings.barcodeData > 0) {
-    if (lineId != null) {
-      if (
-        lineId !== this.state.HighlightedLineId.sample ||
-        this.state.SVGPlotLoaded === false
-      ) {
-        if (this.state.barcodeSettings.barcodeData?.length > 0) {
+    if (this.state.barcodeSettings.barcodeData?.length > 0) {
+      if (toHighlightArray.length > 0) {
+        if (
+          highestValueObject?.sample !==
+            this.state.HighlightedLineId[0]?.sample ||
+          this.state.SVGPlotLoaded === false
+        ) {
           this.setState({
             SVGPlotLoaded: false,
             SVGPlotLoading: true,
-            HighlightedLineId: {
-              sample: lineId,
-              id_mult: id_m,
-              cpm: cpm_stat,
-            },
+            HighlightedLineId: toHighlightArray,
+            // HighlightedLineId: {
+            //   sample: lineId,
+            //   id_mult: id_m,
+            //   cpm: cpm_stat,
+            // },
           });
           const dataItem = this.state.barcodeSettings.barcodeData.find(
-            i => i.lineID === lineId,
+            i => i.lineID === highestValueObject?.sample,
           );
-          let id = dataItem.id_mult ? dataItem.id_mult : dataItem.id;
-          // var psp = document.getElementById('psp-icon');
-          // psp.style.visibility = "hidden";
-          // psp.style.left = w.toString() + "px";
-          // psp.style.bottom = h.toString() + "px";
+          let id = dataItem?.id_mult ? dataItem?.id_mult : dataItem?.id;
           let plotType = ['splineplot'];
           switch (enrichmentModel) {
             case 'DonorDifferentialPhosphorylation':
@@ -859,10 +857,7 @@ class Enrichment extends Component {
       this.setState({
         SVGPlotLoaded: false,
         SVGPlotLoading: false,
-        HighlightedLineId: {
-          sample: '',
-          id_mult: '',
-        },
+        HighlightedLineId: [],
         // imageInfo: {
         //   ...this.state.imageInfo,
         //   svg: []

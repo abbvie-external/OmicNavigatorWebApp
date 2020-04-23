@@ -71,13 +71,14 @@ class ViolinPlot extends Component {
       }
     }
     if (
-      this.props.HighlightedLineId.sample !== prevProps.HighlightedLineId.sample
+      this.props.HighlightedLineId[0]?.sample !==
+      prevProps.HighlightedLineId[0]?.sample
     ) {
-      if (this.props.HighlightedLineId.sample !== '') {
+      if (this.props.HighlightedLineId[0]?.sample !== '') {
         this.isHovering = false;
         const id = this.getCircleId(
-          this.props.HighlightedLineId.sample,
-          this.props.HighlightedLineId.id_mult,
+          this.props.HighlightedLineId[0]?.sample,
+          this.props.HighlightedLineId[0]?.id_mult,
         );
         const dOpts = this.chart.dataPlots.options;
         d3.selectAll(`.vPoint`)
@@ -92,7 +93,7 @@ class ViolinPlot extends Component {
           .attr('r', dOpts.pointSize * 2);
         // const d = this.chart.groupObjs[cName].values[pt];
         this.maxCircle = id;
-        this.addToolTiptoMax(this.props.HighlightedLineId);
+        this.addToolTiptoMax(this.props.HighlightedLineId[0]);
       }
     }
   }
@@ -1437,8 +1438,15 @@ class ViolinPlot extends Component {
               // var id = d.sample.replace(/\;/g, "_");
               const id = self.getCircleId(d.sample, d.id_mult);
               // self.dotClick.emit(d);
-              self.props.onHandleLineSelected(d.sample, d.id_mult, d.statistic);
-              //self.props.onHandleMaxLinePlot(d)
+
+              self.props.onHandleLineSelected([
+                {
+                  sample: d.sample,
+                  id_mult: d.id_mult,
+                  cpm: d.statistic,
+                },
+              ]);
+              // self.props.onHandleMaxLinePlot(d)
 
               d3.select(`#violin_${maxId}`)
                 .transition()
