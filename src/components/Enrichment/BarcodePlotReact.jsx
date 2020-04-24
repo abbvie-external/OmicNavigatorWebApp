@@ -27,6 +27,7 @@ class BarcodePlotReact extends Component {
         left: 20,
         hovered: 20,
         selected: 20,
+        highlighted: 10,
         max: 5,
       },
     },
@@ -55,16 +56,26 @@ class BarcodePlotReact extends Component {
       this.setWidth(false);
     }
     // Much of this code can be refactored into a function, as it is used below.
-    if (self.props.HighlightedLineId[0] !== prevProps.HighlightedLineId[0]) {
-      debugger;
+    if (self.props.HighlightedProteins !== prevProps.HighlightedProteins) {
       d3.selectAll(`.MaxLine`)
         .attr('y1', self.state.settings.margin.selected)
         .classed('MaxLine', false);
-      if (self.props.HighlightedLineId[0]?.sample !== '') {
-        const maxLineId = `${self.props.HighlightedLineId[0]?.sample.replace(
+      d3.selectAll(`.HighlightedLine`)
+        .attr('y1', self.state.settings.margin.selected)
+        .classed('HighlightedLine', false);
+      const HighlightedLines = self.props.HighlightedProteins.slice(1);
+      HighlightedLines.forEach(element => {
+        const lineId = `${element.sample.replace(/;/g, '')}_${element.id_mult}`;
+        const highlightedLine = d3.select(`#barcode-line-${lineId}`);
+        highlightedLine
+          .classed('HighlightedLine', true)
+          .attr('y1', self.state.settings.margin.highlighted);
+      });
+      if (self.props.HighlightedProteins[0]?.sample !== '') {
+        const maxLineId = `${self.props.HighlightedProteins[0]?.sample.replace(
           /;/g,
           '',
-        )}_${self.props.HighlightedLineId[0].id_mult}`;
+        )}_${self.props.HighlightedProteins[0].id_mult}`;
         const maxLine = d3.select(`#barcode-line-${maxLineId}`);
         maxLine
           .classed('MaxLine', true)

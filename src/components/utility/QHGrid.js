@@ -779,23 +779,32 @@ class QHGridBody extends React.PureComponent {
           data_rows = _.map(data, (item, idx) => {
             const rowLevelStyle = this.props.rowLevelStyleCalc(item, ++curRow);
             // Paul start
-            let highlightedRow = false;
+            let rowHighlightMax = false;
+            // let rowHighlightOther = false;
             if (
-              item.Protein_Site !== undefined &&
-              item.Protein_Site !== null &&
+              item.Protein_Site != null &&
               this.props.additionalTemplateInfo !== '' &&
-              this.props.additionalTemplateInfo !== undefined
+              this.props.additionalTemplateInfo != null
             ) {
               if (
                 item.Protein_Site ===
-                this.props.additionalTemplateInfo.rowToHighlight
+                this.props.additionalTemplateInfo.rowHighlightMax
               ) {
-                highlightedRow =
+                rowHighlightMax =
                   item.Protein_Site ===
-                  this.props.additionalTemplateInfo.rowToHighlight;
+                  this.props.additionalTemplateInfo.rowHighlightMax;
               }
+              // if (
+              //   item.Protein_Site ===
+              //   this.props.additionalTemplateInfo.rowHighlightOther
+              // ) {
+              //   rowHighlightOther =
+              //     item.Protein_Site ===
+              //     this.props.additionalTemplateInfo.rowHighlightOther;
+              // }
             }
-            const optionalHighlight = highlightedRow ? 'highlightedRow' : '';
+            const maxHighlight = rowHighlightMax ? 'rowHighlightMax' : '';
+            // const otherHighlight = rowHighlightOther ? 'rowHighlightOther' : '';
             // Paul end
             return (
               <Table.Row
@@ -803,7 +812,8 @@ class QHGridBody extends React.PureComponent {
                   this.props.onRowClick(evt, item, startIndex + idx)
                 }
                 key={itemKeyMap(item) || idx}
-                className={optionalHighlight}
+                id={maxHighlight}
+                // className={otherHighlight}
                 style={rowLevelStyle}
               >
                 {_.map(grouping, (_group, group_idx) => {

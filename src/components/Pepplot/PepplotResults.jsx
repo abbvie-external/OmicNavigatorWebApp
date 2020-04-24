@@ -373,7 +373,7 @@ class PepplotResults extends Component {
     proteinToHighlightInDiffTable,
   ) => {
     let addParams = {};
-    addParams.rowToHighlight = proteinToHighlightInDiffTable;
+    addParams.rowHighlightMax = proteinToHighlightInDiffTable;
     addParams.showPhosphositePlus = dataItem => {
       return function() {
         var protein = (dataItem.Protein

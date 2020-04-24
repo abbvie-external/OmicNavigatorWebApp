@@ -113,12 +113,18 @@ i.icon.quickViewIcon {
 // }
 
 // Paul start
-.highlightedRow {
+#rowHighlightMax {
   background: var(--color-primary) !important;
   color: white !important;
 }
 
-.highlightedRow .TableCellLink {
+.rowHighlightOther {
+  background: var(--color-primary-gradient) !important;
+  color: white !important;
+}
+
+#rowHighlightMax .TableCellLink,
+.rowHighlightOther .TableCellLink {
   color: white !important;
   cursor: pointer !important;
 }

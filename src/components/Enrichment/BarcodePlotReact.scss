@@ -22,6 +22,12 @@
   opacity: 1;
 }
 
+.barcode-line.HighlightedLine {
+  stroke: var(--color-primary-gradient);
+  stroke-width: 3px;
+  opacity: 1;
+}
+
 .barcode {
   cursor: crosshair !important;
 }

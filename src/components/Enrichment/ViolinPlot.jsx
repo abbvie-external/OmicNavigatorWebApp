@@ -56,8 +56,8 @@ class ViolinPlot extends Component {
       if (
         !isSame
         // ||
-        // this.props.HighlightedLineId.sample !==
-        //   prevProps.HighlightedLineId.sample
+        // this.props.HighlightedProteins.sample !==
+        //   prevProps.HighlightedProteins.sample
       ) {
         d3.select(`#svg-${this.props.violinSettings.id}`).remove();
         d3.selectAll(`.violin-tooltip`).remove();
@@ -71,14 +71,14 @@ class ViolinPlot extends Component {
       }
     }
     if (
-      this.props.HighlightedLineId[0]?.sample !==
-      prevProps.HighlightedLineId[0]?.sample
+      this.props.HighlightedProteins[0]?.sample !==
+      prevProps.HighlightedProteins[0]?.sample
     ) {
-      if (this.props.HighlightedLineId[0]?.sample !== '') {
+      if (this.props.HighlightedProteins[0]?.sample !== '') {
         this.isHovering = false;
         const id = this.getCircleId(
-          this.props.HighlightedLineId[0]?.sample,
-          this.props.HighlightedLineId[0]?.id_mult,
+          this.props.HighlightedProteins[0]?.sample,
+          this.props.HighlightedProteins[0]?.id_mult,
         );
         const dOpts = this.chart.dataPlots.options;
         d3.selectAll(`.vPoint`)
@@ -93,7 +93,7 @@ class ViolinPlot extends Component {
           .attr('r', dOpts.pointSize * 2);
         // const d = this.chart.groupObjs[cName].values[pt];
         this.maxCircle = id;
-        this.addToolTiptoMax(this.props.HighlightedLineId[0]);
+        this.addToolTiptoMax(this.props.HighlightedProteins[0]);
       }
     }
   }
@@ -241,7 +241,7 @@ class ViolinPlot extends Component {
 
   getCircleId = (id, idMult) => {
     if (id && idMult) {
-      return `${id.replace(/\;/g, '_')}_${idMult}`;
+      return `${id.replace(/;/g, '_')}_${idMult}`;
     }
     return null;
   };
@@ -421,7 +421,7 @@ class ViolinPlot extends Component {
     // Build Axes Functions
     self.chart.objs.yAxis = d3
       .axisLeft(self.chart.yScale)
-      .tickFormat(self.formatAsFloat)
+      .tickFormat(formatAsFloat)
       .tickSizeOuter(0)
       .tickSizeInner(-self.chart.width);
     self.chart.objs.yAxis.tickArguments(

@@ -32,12 +32,12 @@ class FilteredPepplotTable extends Component {
     this.getFilteredTableConfigCols(this.props.barcodeSettings.barcodeData);
     // if (
     //   this.props.tab === 'enrichment' &&
-    //   this.props.HighlightedLineId !== '' &&
-    //   this.props.HighlightedLineId != null
+    //   this.props.HighlightedProteins !== '' &&
+    //   this.props.HighlightedProteins != null
     // ) {
     //   this.pageToProtein(
     //     this.props.barcodeSettings.brushedData,
-    //     this.props.HighlightedLineId,
+    //     this.props.HighlightedProteins,
     //     this.state.itemsPerPageFilteredPepplotTable,
     //   );
     // }
@@ -67,15 +67,15 @@ class FilteredPepplotTable extends Component {
     // }
     //if (
     // this.props.tab === 'enrichment' &&
-    // this.props.HighlightedLineId.sample !== '' &&
-    // this.props.HighlightedLineId.sample != null &&
+    // this.props.HighlightedProteins.sample !== '' &&
+    // this.props.HighlightedProteins.sample != null &&
     // (
-    // this.props.HighlightedLineId.sample !== prevProps.HighlightedLineId.sample
+    // this.props.HighlightedProteins.sample !== prevProps.HighlightedProteins.sample
     // this.props.filteredTableData !== prevProps.filteredTableData)
     // ) {
     //   this.pageToProtein(
     //     this.state.filteredTableData,
-    //     this.props.HighlightedLineId.sample,
+    //     this.props.HighlightedProteins.sample,
     //     this.state.itemsPerPageFilteredPepplotTable,
     //   );
     //}
@@ -85,7 +85,7 @@ class FilteredPepplotTable extends Component {
     ) {
       this.pageToProtein(
         this.state.filteredTableData,
-        this.props.HighlightedLineId[0]?.sample,
+        this.props.HighlightedProteins[0]?.sample,
         this.state.itemsPerPageFilteredPepplotTable,
       );
     }
@@ -142,7 +142,7 @@ class FilteredPepplotTable extends Component {
               barcodeMultIds.includes(d.id_mult),
             );
             // const filteredData = _.intersectionWith(datafFromService, allTickIds, _.isEqual);
-            // const diffProtein = this.props.HighlightedLineId.lineID;
+            // const diffProtein = this.props.HighlightedProteins.lineID;
             // this.props.onViewDiffTable(name, diffProtein);
             this.setConfigCols(filteredData);
             // return cols;
@@ -337,11 +337,18 @@ class FilteredPepplotTable extends Component {
     }
   };
 
-  getTableHelpers = lineId => {
+  getTableHelpers = HighlightedProteins => {
+    const MaxLine = this.props.HighlightedProteins[0];
+    // const HighlightedLines = this.props.HighlightedProteins.slice(1);
     let addParams = {};
-    if (lineId != null) {
-      addParams.rowToHighlight = lineId;
+    if (MaxLine !== {} && MaxLine != null) {
+      addParams.rowHighlightMax = MaxLine.sample;
     }
+    // if (HighlightedLines !== []) {
+    //   HighlightedLines?.forEach(element => {
+    //     addParams.rowHightlightOther = element.lineId;
+    //   });
+    //}
     addParams.showPhosphositePlus = dataItem => {
       return function() {
         var protein = (dataItem.Protein
@@ -368,10 +375,9 @@ class FilteredPepplotTable extends Component {
     let self = this;
     event.stopPropagation();
     if (event.shiftKey) {
-      debugger;
       const allTableData = this.state.filteredTableData;
       const alreadySelectedIndex = _.findIndex(allTableData, function(d) {
-        return d.Protein_Site === self.props.HighlightedLineId[0]?.sample;
+        return d.Protein_Site === self.props.HighlightedProteins[0]?.sample;
       });
       const lowerIndex =
         index < alreadySelectedIndex ? index : alreadySelectedIndex;
@@ -379,14 +385,17 @@ class FilteredPepplotTable extends Component {
         index > alreadySelectedIndex ? index : alreadySelectedIndex;
       const selectedTableData = allTableData.slice(lowerIndex, higherIndex + 1);
       const selectedTableDataArray = selectedTableData.map(function(d) {
-        return { sample: d.Protein_Site, id_mult: d.id_mult, cpm: d.F };
+        return {
+          sample: d.Protein_Site,
+          id_mult: d.id_mult,
+          cpm: d.F === undefined ? d.t : d.F,
+        };
       });
       this.props.onHandleLineSelected(selectedTableDataArray);
       // console.log('shift');
       // document.addEventListener('onkeydown', event => {
       //   console.log('keydown');
       //   console.log(event.code);
-      //   debugger;
       // });
     } else if (event.ctrlKey) {
       console.log('control');
@@ -403,16 +412,14 @@ class FilteredPepplotTable extends Component {
   };
 
   render() {
-    const { HighlightedLineId } = this.props;
+    const { HighlightedProteins } = this.props;
     const {
       filteredTableConfigCols,
       filteredTableData,
       itemsPerPageFilteredPepplotTable,
     } = this.state;
     // const quickViews = [];
-    const additionalTemplateInfo = this.getTableHelpers(
-      HighlightedLineId[0]?.sample,
-    );
+    const additionalTemplateInfo = this.getTableHelpers(HighlightedProteins);
 
     return (
       <div className="FilteredPepplotTableDiv">
