@@ -113,13 +113,29 @@ i.icon.quickViewIcon {
 // }
 
 // Paul start
-.highlightedRow {
+#rowHighlightMax {
   background: var(--color-primary) !important;
   color: white !important;
 }
 
-.highlightedRow .TableCellLink {
+.rowHighlightOther {
+  background: var(--color-primary-gradient) !important;
+  color: white !important;
+}
+
+#rowHighlightMax .TableCellLink,
+.rowHighlightOther .TableCellLink {
   color: white !important;
   cursor: pointer !important;
+}
+
+#rowHighlightMax:hover {
+  background: rgba(255, 68, 0, 0.9) !important;
+  color: white !important;
+}
+
+.ui.selectable.table tbody .rowHighlightOther:hover {
+  background: rgba(255, 126, 5, 0.9) !important;
+  color: white !important;
 }
 // Paul end
