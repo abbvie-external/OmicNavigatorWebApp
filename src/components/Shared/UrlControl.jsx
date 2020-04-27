@@ -7,7 +7,7 @@ export function updateUrl(
   type,
   optionalCallback,
   searchCriteriaChange,
-  scTab
+  scTab,
 ) {
   if (!searchCriteriaChange) {
     // const [urlVar, setUrlFunc] = useState('/pepplot');
@@ -48,11 +48,11 @@ export function updateUrl(
             '/' +
             pepplotTest +
             '/' +
-            pepplotProteinSite
+            pepplotProteinSite,
         );
       } else if (pepplotTest !== '') {
         propsParam.history.push(
-          tab + '/' + pepplotStudy + '/' + pepplotModel + '/' + pepplotTest
+          tab + '/' + pepplotStudy + '/' + pepplotModel + '/' + pepplotTest,
         );
       } else if (pepplotModel !== '') {
         propsParam.history.push(tab + '/' + pepplotStudy + '/' + pepplotModel);
@@ -73,11 +73,11 @@ export function updateUrl(
       const enrichmentModel = enrichmentModelQuery.replace(/ /gi, '–');
       const enrichmentAnnotation = enrichmentAnnotationQuery.replace(
         / /gi,
-        '–'
+        '–',
       );
       const enrichmentDescriptionAndTest = enrichmentDescriptionAndTestQuery.replace(
         / /gi,
-        '–'
+        '–',
       );
 
       if (enrichmentDescriptionAndTest !== '') {
@@ -90,7 +90,7 @@ export function updateUrl(
             '/' +
             enrichmentAnnotation +
             '/' +
-            enrichmentDescriptionAndTest
+            enrichmentDescriptionAndTest,
         );
       } else if (enrichmentAnnotation !== '') {
         propsParam.history.push(
@@ -100,11 +100,11 @@ export function updateUrl(
             '/' +
             enrichmentModel +
             '/' +
-            enrichmentAnnotation
+            enrichmentAnnotation,
         );
       } else if (enrichmentModel !== '') {
         propsParam.history.push(
-          tab + '/' + enrichmentStudy + '/' + enrichmentModel
+          tab + '/' + enrichmentStudy + '/' + enrichmentModel,
         );
       } else if (enrichmentStudy !== '') {
         propsParam.history.push(tab + '/' + enrichmentStudy);
@@ -142,15 +142,15 @@ export function updateUrl(
             '/' +
             pepplotTest +
             '/' +
-            pepplotProteinSite
+            pepplotProteinSite,
         );
       } else if (pepplotTest !== '') {
         propsParam.history.push(
-          scTab + '/' + pepplotStudy + '/' + pepplotModel + '/' + pepplotTest
+          scTab + '/' + pepplotStudy + '/' + pepplotModel + '/' + pepplotTest,
         );
       } else if (pepplotModel !== '') {
         propsParam.history.push(
-          scTab + '/' + pepplotStudy + '/' + pepplotModel
+          scTab + '/' + pepplotStudy + '/' + pepplotModel,
         );
       } else if (pepplotStudy !== '') {
         propsParam.history.push(scTab + '/' + pepplotStudy);
@@ -170,11 +170,21 @@ export function updateUrl(
       const enrichmentModel = enrichmentModelQuery2.replace(/ /gi, '–');
       const enrichmentAnnotation = enrichmentAnnotationQuery2.replace(
         / /gi,
-        '–'
+        '–',
       );
+      // let replacementString = '&';
+      // let enrichmentDescriptionAndTestFirstReplace = enrichmentDescriptionAndTestQuery2.replace(
+      //   /\//g,
+      //   replacementString,
+      // );
+
+      // const enrichmentDescriptionAndTest = enrichmentDescriptionAndTestFirstReplace.replace(
+      //   / /gi,
+      //   '–',
+      // );
       const enrichmentDescriptionAndTest = enrichmentDescriptionAndTestQuery2.replace(
         / /gi,
-        '–'
+        '–',
       );
 
       if (enrichmentDescriptionAndTest !== '') {
@@ -187,7 +197,7 @@ export function updateUrl(
             '/' +
             enrichmentAnnotation +
             '/' +
-            enrichmentDescriptionAndTest
+            enrichmentDescriptionAndTest,
         );
       } else if (enrichmentAnnotation !== '') {
         propsParam.history.push(
@@ -197,11 +207,11 @@ export function updateUrl(
             '/' +
             enrichmentModel +
             '/' +
-            enrichmentAnnotation
+            enrichmentAnnotation,
         );
       } else if (enrichmentModel !== '') {
         propsParam.history.push(
-          scTab + '/' + enrichmentStudy + '/' + enrichmentModel
+          scTab + '/' + enrichmentStudy + '/' + enrichmentModel,
         );
       } else if (enrichmentStudy !== '') {
         propsParam.history.push(scTab + '/' + enrichmentStudy);

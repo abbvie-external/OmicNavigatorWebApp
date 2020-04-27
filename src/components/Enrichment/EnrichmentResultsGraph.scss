@@ -44,10 +44,15 @@
   border-radius: 0.28571429rem !important;
 }
 
-@media (max-width: 1600px) {
-  .semantic_ui_range_inner {
-    margin-left: 0px !important;
+@media (max-width: 767px) {
+  #NetworkSearchInput {
+    margin-top: 20px !important;
+    width: initial;
   }
+}
+
+.semantic_ui_range_inner {
+  margin-left: 0px !important;
 }
 
 .semantic_ui_range_inner div:nth-of-type(2) {
@@ -104,6 +109,11 @@
   margin-top: 10px;
   margin-left: 20px;
   font-size: 1rem !important;
+
+  //   .ui.toggle.checkbox input:checked ~ .box:before,
+  //   .ui.toggle.checkbox input:checked ~ label:before {
+  //     background-color: var(--color-primary) !important;
+  //   }
 }
 
 @media (max-width: 1600px) {
@@ -112,14 +122,134 @@
   }
 }
 
-.NetworkSliderInput {
-  margin: 0px 10px 10px 25px !important;
+.NetworkSliderAndTotalsDiv {
+  margin-top: 10px;
+  margin-bottom: 5px;
+  max-width: 245px;
 }
 
-@media (max-width: 1600px) {
-  .NetworkSliderInput {
-    margin: 0px 10px 10px 0px !important;
+@media (min-width: 1600px) and (max-width: 2599px) {
+  .NetworkSliderAndTotalsDiv {
+    max-width: 220px !important;
   }
+}
+
+// @media (min-width: 1200px) and (max-width: 1599px) {
+//   .NetworkSliderAndTotalsDiv {
+//     max-width: 130px !important;
+//   }
+// }
+
+// @media (min-width: 768px) and (max-width: 1199px) {
+//   .NetworkSliderAndTotalsDiv {
+//     max-width: 135px !important;
+//   }
+// }
+
+@media (max-width: 1599px) {
+  .NetworkSliderAndTotalsDiv {
+    max-width: 135px !important;
+  }
+}
+
+.InlineFlex {
+  display: inline-flex;
+  flex-direction: row;
+  // font-size: 0;
+  // vertical-align: baseline;
+  // margin: 0 0.25em 0 0;
+  margin-bottom: 10px;
+}
+
+.NetworkSliderInput {
+  // margin: 0px 0px 10px 25px !important;
+  // margin: 0px 0px 10px 0px !important;
+  // display: inline-block !important;
+  // font-size: inherit !important;
+  font-size: inherit !important;
+}
+
+@media (min-width: 1600px) {
+  .NetworkSliderInput .ui.input > input {
+    font-size: initial !important;
+  }
+}
+
+.NetworkSliderInput input {
+  border-radius: 0px 0.28571429rem 0.28571429rem 0px !important;
+  font-size: inherit !important;
+  font-weight: bold;
+  width: 53px !important;
+}
+
+@media (min-width: 1600px) and (max-width: 2599px) {
+  .NetworkSliderInput .ui.input > input {
+    width: 65px !important;
+  }
+}
+
+@media (min-width: 2600px) {
+  .NetworkSliderInput .ui.input > input {
+    width: 75px !important;
+  }
+}
+
+// #NetworkSliderNodeInput .ui.input > input {
+//   width: 65px !important;
+// }
+
+// #NetworkSliderEdgeInput .ui.input > input {
+//   width: 75px !important;
+// }
+
+// @media (min-width: 1920px) {
+//   .NetworkSliderInput .ui.input > input {
+//     font-weight: bold;
+//     width: 70px !important;
+//   }
+// }
+
+.NetworkSlider {
+  width: 100% !important;
+}
+
+.ValueNowNode {
+  color: var(--color-dark) !important;
+  margin-right: -65px;
+}
+
+.ValueNowEdge {
+  color: var(--color-dark) !important;
+  margin-left: -65px;
+}
+
+.DisplayOnLarge {
+  display: none !important;
+}
+
+@media (min-width: 1599px) {
+  .DisplayOnLarge {
+    display: inline !important;
+  }
+}
+
+.DisplayOnSmaller {
+  display: inline !important;
+}
+
+@media (min-width: 1920px) {
+  .DisplayOnSmaller {
+    display: none !important;
+  }
+}
+
+.NetworkInputLabel {
+  margin-right: -1px !important;
+  width: max-content;
+  border-radius: 0.28571429rem 0px 0px 0.28571429rem !important;
+  background-color: var(--color-dark) !important;
+  color: var(--color-light) !important;
+  display: inline-block !important;
 }
 
 // @media (max-width: 768px) {
@@ -135,51 +265,104 @@
 //   cursor: move;
 // }
 
-#NetworkGraphSortBySegment {
-  width: 110px !important;
-  height: 105px !important;
-  padding: 0px;
-}
-
-#NetworkSortByLabel {
-  background-color: var(--color-primary) !important;
-  color: white !important;
-  width: 70px !important;
-  margin-left: -90px !important;
-}
-
 #NetworkGraphSortByDiv {
-  padding-top: 10px;
-  // color: var(--color-primary) !important;
-  color: rgba(0, 0, 0, 0.6) !important;
+  // padding-top: 10px;
+  color: var(--color-white) !important;
+  // color: rgba(0, 0, 0, 0.6) !important;
+
+  // #NetworkGraphSortBySegment {
+  //   width: 100% !important;
+  //   height: auto !important;
+  //   max-width: 145px !important;
+  //   padding: 0px;
+  //   margin: 0 auto;
+
+  #NetworkSortByLabel {
+    // background-color: var(--color-primary) !important;
+    background-color: var(--color-dark) !important;
+    color: white !important;
+    // width: 90px !important;
+    // margin-left: -90px !important;
+    text-align: center !important;
+  }
+
+  // @media (min-width: 1200px) and (max-width: 1599px) {
+  //   #NetworkSortByLabel {
+  //     margin-left: -100px !important;
+  //   }
+  // }
+  // @media (min-width: 1600) and (max-width: 2599px) {
+  //   #NetworkSortByLabel {
+  //     margin-left: -110px !important;
+  //   }
+  // }
+  // @media (min-width: 2600px) {
+  //   #NetworkSortByLabel {
+  //     margin-left: -115px !important;
+  //   }
+  // }
+
+  // .ui.secondary.menu
+  // #NetworkGraphSortByMenu {
+  //   border: 1px solid rgba(34, 36, 38, 0.15);
+  //   border-radius: 0px 0.28571429rem 0.28571429rem 0px;
+  //   margin-right: 1.75rem;
+  // }
+  // #NetworkGraphSortByMenu {
+  //   .item:before {
+  //     width: 0px;
+  //   }
+  //   #NetworkGraphSortByMenu:last-child {
+  //     display: inline-flex;
+  //     width: 0px;
+  //     box-shadow: none;
+  //     border: 1px solid rgba(34, 36, 38, 0.15);
+  //   }
+  // }
+
+  .ui.menu .item:before {
+    width: 0px;
+  }
+  .ui.menu:last-child {
+    display: inline-flex;
+    /* width: 0px; */
+    border: 1px solid rgba(34, 36, 38, 0.15);
+    box-shadow: none;
+  }
 
   #NetworkGraphSortByText {
-    color: grey;
+    color: var(--color-light) !important;
   }
-  // ul {
-  //   padding: 2px 0px 0px 10px !important;
-  // }
-  // ul li {
-  //   list-style: none;
-  //   margin-bottom: 5px;
-  //   cursor: grab;
-  // }
-  // #NetworkGraphSortableLink {
-  //   list-style: none;
-  //   margin-bottom: 5px;
-  //   cursor: grab;
-  // }
+  ul {
+    padding: 0px 10px 0px 10px !important;
+  }
+  ul li {
+    list-style: none;
+    margin-bottom: 8px;
+    cursor: grab;
+  }
 
-  // .NoSelect {
-  //   -webkit-touch-callout: none; /* iOS Safari */
-  //   -webkit-user-select: none; /* Safari */
-  //   -khtml-user-select: none; /* Konqueror HTML */
-  //   -moz-user-select: none; /* Old versions of Firefox */
-  //   -ms-user-select: none; /* Internet Explorer/Edge */
-  //   user-select: none; /* Non-prefixed version, currently
-  //                                 supported by Chrome, Opera and Firefox */
-  // }
+  .NetworkGraphSortableListLabel {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+  }
+  #NetworkGraphSortableList {
+    list-style: none;
+    margin-bottom: 5px;
+    cursor: grab;
+  }
+
+  .NoSelect {
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Old versions of Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Opera and Firefox */
+  }
 }
+//}
 
 .LoaderActivePlotsNetwork {
   height: 100vh !important;
@@ -191,6 +374,29 @@
 
 .Hide {
   display: none !important;
+}
+
+#LegendIconButton {
+  margin-bottom: 5px;
+  background-color: var(--color-light) !important;
+  color: var(--color-dark) !important;
+}
+
+#LegendColumn,
+#TotalsColumn {
+  margin-top: -10px;
+}
+
+@media (min-width: 1200px) and (max-width: 1280px) {
+  #LegendColumn,
+  #TotalsColumn {
+    margin-top: 5px;
+  }
+}
+
+.NodeEdgeTotals {
+  margin-bottom: 5px;
+  float: right !important;
 }
 
 #LegendIconButton {
@@ -225,12 +431,3 @@
 .filled {
   fill: url(#mainGradient);
 }
-
-#NodeEdgeTotals {
-  float: right !important;
-}
-
-// #LegendColumn,
-// #TotalsColumn {
-//   margin-top: -5px !important;
-// }

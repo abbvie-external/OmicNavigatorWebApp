@@ -13,14 +13,12 @@ class NetworkGraph extends Component {
     networkWidth: 0,
     networkContainerWidth: 0,
     networkHeight: 0,
-    networkContainerHeight: 0
+    networkContainerHeight: 0,
   };
   networkContainerRef = React.createRef();
 
-  componentDidMount(prevProps) {
-    if (prevProps === undefined) {
-      this.prepareAndRenderTree();
-    }
+  componentDidMount() {
+    this.prepareAndRenderTree();
 
     let resizedFn;
     window.addEventListener('resize', () => {
@@ -36,7 +34,8 @@ class NetworkGraph extends Component {
       this.props.networkData !== prevProps.networkData ||
       this.props.nodeCutoff !== prevProps.nodeCutoff ||
       this.props.edgeCutoff !== prevProps.edgeCutoff ||
-      this.props.networkSortBy !== prevProps.networkSortBy
+      this.props.networkSortBy !== prevProps.networkSortBy ||
+      this.props.networkSettings.facets !== prevProps.networkSettings.facets
     ) {
       this.prepareAndRenderTree();
     }
@@ -77,24 +76,42 @@ class NetworkGraph extends Component {
     // } else {
     return Math.max(
       document.documentElement.clientHeight,
-      window.innerHeight || 0
+      window.innerHeight || 0,
     );
     //}
   }
 
-  getWidth(relevantNodesLength) {
-    let networkCalculatedWidth = relevantNodesLength * 25;
+  getWidth(totalClusters, relevantNodesLength) {
     let adjustedDocumentWidth = window.innerWidth - 100;
     let networkContainerWidth = 0;
     if (this.networkContainerRef.current !== null) {
       networkContainerWidth = this.networkContainerRef.current.parentElement
         .offsetWidth;
     }
-    return Math.max(
-      networkCalculatedWidth,
-      adjustedDocumentWidth,
-      networkContainerWidth
-    );
+
+    // we may want to discuss an algorithm using nodes and clusters to determining svg width
+    // if (totalClusters > 1 && totalClusters < 20) {
+    //   let networkCalculatedWidth = relevantNodesLength * 25;
+    //   return Math.max(
+    //     networkCalculatedWidth,
+    //     adjustedDocumentWidth,
+    //     networkContainerWidth
+    //   );
+    // }
+    // if (totalClusters >= 20) {
+    if (totalClusters !== 1) {
+      // let networkCalculatedWidth = (relevantNodesLength * .75) * totalClusters * 1.5;
+      let networkCalculatedWidth = relevantNodesLength * 35;
+      console.log(networkCalculatedWidth);
+      return Math.max(
+        networkCalculatedWidth,
+        adjustedDocumentWidth,
+        networkContainerWidth,
+      );
+    } else {
+      // if (totalClusters === 1) {
+      return adjustedDocumentWidth;
+    }
   }
 
   prepareAndRenderTree = () => {
@@ -123,7 +140,7 @@ class NetworkGraph extends Component {
         return {
           prop,
           value,
-          metaData
+          metaData,
         };
       });
     });
@@ -137,46 +154,46 @@ class NetworkGraph extends Component {
     });
 
     let filteredNodes = formattedNodes.filter(
-      n => n.lowestValue <= this.props.nodeCutoff
+      n => n.lowestValue <= this.props.nodeCutoff,
     );
 
     const mostSignificantTestValue = Math.min(
-      ...filteredNodes.map(f => f.lowestValue).filter(v => v != null)
+      ...filteredNodes.map(f => f.lowestValue).filter(v => v != null),
     );
 
     let filteredLinks = formattedLinks.filter(
-      l => l.EnrichmentMap_similarity_coefficient >= this.props.edgeCutoff
+      l => l.EnrichmentMap_similarity_coefficient >= this.props.edgeCutoff,
     );
 
-    if (filteredNodes.length > 0) {
+    if (filteredNodes.length !== 0 && filteredNodes.length != null) {
       let relevantNodeIds = filteredNodes.map(n => n.id);
 
       // filter links out that contain source or target of node not meeting cutoff
       let relevantLinks = filteredLinks.filter(
         l =>
           _.includes(relevantNodeIds, l.source) &&
-          _.includes(relevantNodeIds, l.target)
+          _.includes(relevantNodeIds, l.target),
       );
 
       let minSetVar = _.min(
         _.map(filteredNodes, function(o) {
           return o[networkSettings.nodeSize];
-        })
+        }),
       );
       let maxSetVar = _.max(
         _.map(filteredNodes, function(o) {
           return o[networkSettings.nodeSize];
-        })
+        }),
       );
       let minLineVar = _.min(
         _.map(relevantLinks, function(o) {
           return o[networkSettings.linkSize];
-        })
+        }),
       );
       let maxLineVar = _.max(
         _.map(relevantLinks, function(o) {
           return o[networkSettings.linkSize];
-        })
+        }),
       );
 
       let radius = d3.scaleSqrt();
@@ -192,7 +209,7 @@ class NetworkGraph extends Component {
 
       let dataCombinedVar = {
         nodes: filteredNodes,
-        links: relevantLinks
+        links: relevantLinks,
       };
 
       let clusters = networkByCluster(dataCombinedVar);
@@ -201,14 +218,14 @@ class NetworkGraph extends Component {
         function getClusterLowestSignificantValue(nodes) {
           let facetsArr = nodes.flatMap(node => node.facets);
           return Math.min(
-            ...facetsArr.map(f => f.value).filter(v => v != null)
+            ...facetsArr.map(f => f.value).filter(v => v != null),
           );
         }
 
         clusters.children.forEach(cluster => {
           _.forEach(clusters.children, function(cluster, i) {
             let lowestTestValue = getClusterLowestSignificantValue(
-              cluster.nodes
+              cluster.nodes,
             );
             let edgecount = cluster.links.length;
             let nodecount = cluster.nodes.length;
@@ -218,9 +235,15 @@ class NetworkGraph extends Component {
           });
         });
 
+        console.log(clusters.children.length);
+        const totalClusters = clusters.children.length;
+
         // Prepare Settings
         let relevantNodesLength = relevantNodeIds.length;
-        const containerWidth = this.getWidth(relevantNodesLength);
+        const containerWidth = this.getWidth(
+          totalClusters,
+          relevantNodesLength,
+        );
         // calculate height based on the containerRef
         const containerHeight = this.getHeight();
         const width =
@@ -235,7 +258,7 @@ class NetworkGraph extends Component {
           networkContainerWidth: containerWidth,
           networkWidth: width,
           networkContainerHeight: containerHeight,
-          networkHeight: height
+          networkHeight: height,
         });
 
         // Prepare Chart
@@ -283,54 +306,48 @@ class NetworkGraph extends Component {
 
         let root = d3
           .hierarchy(clusters)
-          .eachBefore(function(d) {
+          .eachBefore(d => {
             d.data.id = (d.parent ? d.parent.data.id + '.' : '') + d.data.name;
             d.key = d.data.id;
           })
           .sum(sumBySize)
-          .sort(function(a, b) {
-            // let significanceIndex = self.props.networkSortBy.indexOf(
-            //   'significance'
-            // );
-            // let sortFirst = self.props.networkSortBy[0];
-            // let sortSecond = self.props.networkSortBy[1];
-            // let sortThird = self.props.networkSortBy[2];
-            // let first =
-            //   significanceIndex !== 0
-            //     ? `b.data.${sortFirst} - a.data.${sortFirst}`
-            //     : `a.data.${sortFirst} - b.data.${sortFirst}`;
-            // let second =
-            //   significanceIndex !== 1
-            //     ? `b.data.${sortSecond} - a.data.${sortSecond}`
-            //     : `a.data.${sortSecond} - b.data.${sortSecond}`;
-            // let third =
-            //   significanceIndex !== 2
-            //     ? `b.data.${sortThird} - a.data.${sortThird}`
-            //     : `a.data.${sortThird} - b.data.${sortThird}`;
+          .sort(
+            (a, b) =>
+              self.props.networkSortBy
+                // FOR SORT BY LIST
+                .map(sortBy => {
+                  return (
+                    (sortBy === 'significance' ? 1 : -1) *
+                    (a.data[sortBy] - b.data[sortBy])
+                  );
+                })
+                .reduce((prev, value) => {
+                  return prev || value;
+                }),
 
-            // return [first] || [second] || [third];
-            if (self.props.networkSortBy === 'significance') {
-              return (
-                a.data.significance - b.data.significance ||
-                b.data.nodecount - a.data.nodecount ||
-                b.data.edgecount - a.data.edgecount
-              );
-            } else if (self.props.networkSortBy === 'edgecount') {
-              return (
-                b.data.edgecount - a.data.edgecount ||
-                a.data.significance - b.data.significance ||
-                b.data.nodecount - a.data.nodecount
-              );
-            } else if (self.props.networkSortBy === 'nodecount') {
-              return (
-                b.data.nodecount - a.data.nodecount ||
-                a.data.significance - b.data.significance ||
-                b.data.edgecount - a.data.edgecount
-              );
-            } else {
-              return a.data.significance - b.data.significance;
-            }
-          });
+            // FOR SORT BY DROPDOWN, RATHER THAN LIST
+            // if (self.props.networkSortBy === 'Significance') {
+            //   return (
+            //     a.data.significance - b.data.significance ||
+            //     b.data.nodecount - a.data.nodecount ||
+            //     b.data.edgecount - a.data.edgecount
+            //   );
+            // } else if (self.props.networkSortBy === 'edgecount') {
+            //   return (
+            //     b.data.edgecount - a.data.edgecount ||
+            //     a.data.significance - b.data.significance ||
+            //     b.data.nodecount - a.data.nodecount
+            //   );
+            // } else if (self.props.networkSortBy === 'nodecount') {
+            //   return (
+            //     b.data.nodecount - a.data.nodecount ||
+            //     a.data.significance - b.data.significance ||
+            //     b.data.edgecount - a.data.edgecount
+            //   );
+            // } else {
+            //   return a.data.significance - b.data.significance;
+            // }
+          );
 
         treemap(root);
         let cell = chartView
@@ -374,7 +391,6 @@ class NetworkGraph extends Component {
         //   return 1;
         // });
 
-        // let cellVar = cell.length > 1
         if (cell._groups.length > 0) {
           cell.each(function(d, i) {
             let cellWidth = d.x1 - d.x0;
@@ -386,24 +402,26 @@ class NetworkGraph extends Component {
                   'link',
                   d3.forceLink(d.data.links).id(function(d) {
                     return d.id;
-                  })
+                  }),
                 )
                 .force(
                   'charge',
                   d3
                     .forceManyBody()
                     .strength([-1200])
-                    .distanceMax([500])
+                    .distanceMax([500]),
                 )
                 .force('center', d3.forceCenter(cellWidth / 2, cellHeight / 2))
                 .force(
                   'collision',
                   // collide(0.5)
                   d3.forceCollide().radius(function(d) {
-                    return radiusVar(d[networkSettings.nodeSize]);
-                    // let r = radiusVar(d[networkSettings.nodeSize]);
-                    // return 3 * r - 1;
-                  })
+                    // return radiusVar(d[networkSettings.nodeSize]);
+                    let r = radiusVar(d[networkSettings.nodeSize]);
+                    return r;
+                    // to space out the nodes more, use a function like this...
+                    // return 2 * r - 1;
+                  }),
                 )
                 .stop();
               //
@@ -411,7 +429,7 @@ class NetworkGraph extends Component {
                 let i = 0,
                   n = Math.ceil(
                     Math.log(simulation.alphaMin()) /
-                      Math.log(1 - simulation.alphaDecay())
+                      Math.log(1 - simulation.alphaDecay()),
                   );
                 i < n;
                 ++i
@@ -482,8 +500,8 @@ class NetworkGraph extends Component {
                     radiusVar(d.source[networkSettings.nodeSize]),
                     Math.min(
                       cellWidth - radiusVar(d.source[networkSettings.nodeSize]),
-                      d.source.x
-                    )
+                      d.source.x,
+                    ),
                   );
                 })
                 .attr('y1', function(d) {
@@ -492,8 +510,8 @@ class NetworkGraph extends Component {
                     Math.min(
                       cellHeight -
                         radiusVar(d.source[networkSettings.nodeSize]),
-                      d.source.y
-                    )
+                      d.source.y,
+                    ),
                   );
                 })
                 .attr('x2', function(d) {
@@ -501,8 +519,8 @@ class NetworkGraph extends Component {
                     radiusVar(d.target[networkSettings.nodeSize]),
                     Math.min(
                       cellWidth - radiusVar(d.target[networkSettings.nodeSize]),
-                      d.target.x
-                    )
+                      d.target.x,
+                    ),
                   );
                 })
                 .attr('y2', function(d) {
@@ -511,14 +529,14 @@ class NetworkGraph extends Component {
                     Math.min(
                       cellHeight -
                         radiusVar(d.target[networkSettings.nodeSize]),
-                      d.target.y
-                    )
+                      d.target.y,
+                    ),
                   );
                 })
                 .on('mouseover', function(d, i) {
                   let OverlapGenesLimited = limitValues(
                     d.EnrichmentMap_Overlap_genes,
-                    15
+                    15,
                   );
                   let tooltipLRPosition =
                     d3.event.pageX > window.innerWidth * 0.8
@@ -539,7 +557,7 @@ class NetworkGraph extends Component {
                     .style('opacity', 1);
                   div
                     .html(
-                      `<b>Overlap Size: </b>${d.EnrichmentMap_Overlap_size}<br/><b>Overlap Coefficient: </b>${d.EnrichmentMap_similarity_coefficient}<br/><b>Source: </b>${d.source.EnrichmentMap_GS_DESCR}<br/><b>Target: </b>${d.target.EnrichmentMap_GS_DESCR}<br/><b>Overlap Genes: </b>${OverlapGenesLimited}`
+                      `<b>Overlap Size: </b>${d.EnrichmentMap_Overlap_size}<br/><b>Overlap Coefficient: </b>${d.EnrichmentMap_similarity_coefficient}<br/><b>Source: </b>${d.source.EnrichmentMap_GS_DESCR}<br/><b>Target: </b>${d.target.EnrichmentMap_GS_DESCR}<br/><b>Overlap Genes: </b>${OverlapGenesLimited}`,
                     )
                     .style('left', tooltipLRPosition)
                     .style('top', tooltipTBPosition);
@@ -568,8 +586,8 @@ class NetworkGraph extends Component {
                     radiusVar(d[networkSettings.nodeSize]),
                     Math.min(
                       cellWidth - radiusVar(d[networkSettings.nodeSize]),
-                      d.x
-                    )
+                      d.x,
+                    ),
                   )},${Math.max(radiusVar(d[networkSettings.nodeSize]), Math.min(cellHeight - radiusVar(d[networkSettings.nodeSize]), d.y))})`;
                 })
                 .call(
@@ -581,7 +599,7 @@ class NetworkGraph extends Component {
                     .on('drag', function(d) {
                       ondrag(d, cellHeight, cellWidth, this);
                     })
-                    .on('end', dragended)
+                    .on('end', dragended),
                 );
 
               node.each(multiple);
@@ -595,10 +613,10 @@ class NetworkGraph extends Component {
                   .attr('id', 'rectWrap')
                   .text(function(d) {
                     let text = d[networkSettings.nodeLabel];
-                    if (text.length < 25) {
+                    if (text.length < 40) {
                       return text;
                     } else {
-                      let textSubstring = text.substring(0, 23);
+                      let textSubstring = text.substring(0, 38);
                       return `${textSubstring}...`;
                     }
                     // return d[networkSettings.nodeLabel];
@@ -609,9 +627,10 @@ class NetworkGraph extends Component {
                   // to rotate text on boxes with one node
                   // .attr('transform', 'rotate(' + 5 + ')')
                   // .attr('x', -65);
-                  .attr('x', function(d) {
-                    return d.x + d.dx / 2;
-                  })
+                  // no need to alter x, it positions text in the middle without calculation
+                  // .attr('x', function(d) {
+                  //   return d.x / 2;
+                  // })
                   // .attr('y', function(d) {
                   //   return d.y + d.dy / 2;
                   // })
@@ -649,6 +668,36 @@ class NetworkGraph extends Component {
                 .attr('class', 'tooltip-pieSlice')
                 .style('opacity', 0);
 
+              //Append a defs (for definition) element to your SVG
+              var defs = chartSVG.append('defs');
+
+              //most  color scale
+              var mostSignificantColorScale = d3
+                .scaleLinear()
+                .range(self.props.networkSettings.mostSignificantColorScale);
+              //Append a linearGradient element to the defs and give it a unique id
+              var mostSignificantGradient = defs
+                .append('linearGradient')
+                .attr('id', 'most-significant-linear-gradient')
+                // DIAGONAL GRADIENT
+                .attr('x1', '30%')
+                .attr('y1', '30%')
+                .attr('x2', '70%')
+                .attr('y2', '70%');
+
+              //Append multiple color stops by using D3's data/enter step
+              mostSignificantGradient
+                .selectAll('stop')
+                .data(mostSignificantColorScale.range())
+                .enter()
+                .append('stop')
+                .attr('offset', function(d, i) {
+                  return i / (mostSignificantColorScale.range().length - 1);
+                })
+                .attr('stop-color', function(d) {
+                  return d;
+                });
+
               function multiple(d) {
                 let r = radiusVar(d[networkSettings.nodeSize]);
                 let node = d3.select(this);
@@ -662,12 +711,18 @@ class NetworkGraph extends Component {
                   .append('svg:path')
                   .attr('d', arc.outerRadius(r).innerRadius(0))
                   .attr('opacity', 0.75)
+                  .style('opacity', function(d) {
+                    let opacity =
+                      d.data.value === mostSignificantTestValue ? 1.0 : 0.75;
+                    return opacity;
+                  })
                   .style('cursor', 'pointer')
                   .attr('stroke', 'black')
                   .style('fill', function(d) {
                     if (d.data.value === mostSignificantTestValue)
-                      return self.props.networkSettings
-                        .colorMostSignificantTest;
+                      // return self.props.networkSettings
+                      //   .colorMostSignificantTest;
+                      return 'url(#most-significant-linear-gradient)';
                     if (d.data.value != null) return color(d.data.value);
                     return '#d3d3d3';
                   })
@@ -679,7 +734,7 @@ class NetworkGraph extends Component {
                       self.props.enrichmentModel,
                       self.props.enrichmentAnnotation,
                       d.data.metaData,
-                      d.data.prop
+                      d.data.prop,
                     );
                   })
                   .on('mouseover', function(d, i) {
@@ -706,7 +761,7 @@ class NetworkGraph extends Component {
                     else pValueDisplay = d.data.value.toExponential(3);
                     div
                       .html(
-                        `<div className="tooltipEdge"><b>Description: </b>${d.data.metaData.Description}<br/><b>Test: </b>${d.data.prop}<br/><b>pValue: </b>${pValueDisplay}<br/><b>Ontology: </b>${d.data.metaData.Ontology}</div>`
+                        `<div className="tooltipEdge"><b>Description: </b>${d.data.metaData.Description}<br/><b>Test: </b>${d.data.prop}<br/><b>pValue: </b>${pValueDisplay}<br/><b>Ontology: </b>${d.data.metaData.Ontology}</div>`,
                       )
                       .style('left', tooltipLRPosition)
                       .style('top', tooltipTBPosition);
@@ -740,15 +795,15 @@ class NetworkGraph extends Component {
                   radiusVar(d[networkSettings.nodeSize]),
                   Math.min(
                     cellWidth - radiusVar(d[networkSettings.nodeSize]),
-                    d.x
-                  )
+                    d.x,
+                  ),
                 );
                 let yPos = Math.max(
                   radiusVar(d[networkSettings.nodeSize]),
                   Math.min(
                     cellHeight - radiusVar(d[networkSettings.nodeSize]),
-                    d.y
-                  )
+                    d.y,
+                  ),
                 );
 
                 d3.select(me).attr('transform', function(d) {
@@ -756,8 +811,8 @@ class NetworkGraph extends Component {
                     radiusVar(d[networkSettings.nodeSize]),
                     Math.min(
                       cellWidth - radiusVar(d[networkSettings.nodeSize]),
-                      d.x
-                    )
+                      d.x,
+                    ),
                   )},${Math.max(radiusVar(d[networkSettings.nodeSize]), Math.min(cellHeight - radiusVar(d[networkSettings.nodeSize]), d.y))})`;
                 });
 
@@ -783,7 +838,7 @@ class NetworkGraph extends Component {
             }
           });
           this.setState({
-            noResults: false
+            noResults: false,
           });
         }
 
@@ -792,10 +847,10 @@ class NetworkGraph extends Component {
             .zoom()
             .extent([
               [0, 0],
-              [width, height]
+              [width, height],
             ])
-            .scaleExtent([1, 2])
-            .on('zoom', zoomed)
+            .scaleExtent([1, 3])
+            .on('zoom', zoomed),
         );
 
         // chartView.call(
@@ -821,7 +876,7 @@ class NetworkGraph extends Component {
       }
     } else {
       this.setState({
-        noResults: true
+        noResults: true,
       });
       this.props.onHandleTotals(0, 0);
     }

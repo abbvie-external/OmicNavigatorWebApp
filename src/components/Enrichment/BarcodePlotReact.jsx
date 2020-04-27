@@ -21,21 +21,23 @@ class BarcodePlotReact extends Component {
       barcodeHeight: 0,
       id: 'chart-barcode',
       margin: {
-        top: 30,
-        right: 25,
-        bottom: 20,
+        top: 40,
+        right: 40,
+        bottom: 10,
         left: 20,
-        hovered: 15,
-        selected: 15,
-        max: 5
-      }
-    }
+        hovered: 20,
+        selected: 20,
+        max: 5,
+      },
+    },
   };
+
   barcodeContainerRef = React.createRef();
+
   barcodeSVGRef = React.createRef();
 
   componentDidMount() {
-    this.setWidth();
+    this.setWidth(true);
     let resizedFn;
     window.addEventListener('resize', () => {
       clearTimeout(resizedFn);
@@ -46,10 +48,46 @@ class BarcodePlotReact extends Component {
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
+    const self = this;
     if (
-      this.props.horizontalSplitPaneSize !== prevProps.horizontalSplitPaneSize
+      self.props.horizontalSplitPaneSize !== prevProps.horizontalSplitPaneSize
     ) {
-      this.setWidth();
+      this.setWidth(false);
+    }
+    // Much of this code can be refactored into a function, as it is used below.
+    if (self.props.HighlightedLineId !== prevProps.HighlightedLineId) {
+      d3.selectAll(`.MaxLine`)
+        .attr('y1', self.state.settings.margin.selected)
+        .classed('MaxLine', false);
+      if (self.props.HighlightedLineId.sample !== '') {
+        const maxLineId = `${self.props.HighlightedLineId.sample.replace(
+          /;/g,
+          '',
+        )}_${self.props.HighlightedLineId.id_mult}`;
+        const maxLine = d3.select(`#barcode-line-${maxLineId}`);
+        maxLine
+          .classed('MaxLine', true)
+          .attr('y1', self.state.settings.margin.max);
+        const maxLineData = {
+          x2: maxLine.attr('x2'),
+          id_mult: maxLine.attr('id_mult'),
+          lineID: maxLine.attr('lineid'),
+          logFC: maxLine.attr('logfc'),
+          statistic: maxLine.attr('statistic'),
+        };
+        const statistic = maxLineData.statistic;
+        const textAnchor =
+          statistic > self.props.barcodeSettings.highStat / 2 ? 'end' : 'start';
+        const ttPosition =
+          textAnchor === 'end' ? maxLineData.x2 - 5 : maxLineData.x2 + 5;
+        self.setState({
+          hoveredLineId: null,
+          hoveredLineName: null,
+          highlightedLineName: maxLineData.lineID,
+          tooltipPosition: ttPosition,
+          tooltipTextAnchor: textAnchor,
+        });
+      }
     }
   }
 
@@ -57,44 +95,51 @@ class BarcodePlotReact extends Component {
     this.setState({
       highlightedLineName: null,
       hoveredLineId: null,
-      hoveredLineName: null
+      hoveredLineName: null,
     });
     // this.barcodeSVGRef.current.getElementsByClassName('selection')[0].remove();
     // this.barcodeSVGRef.current = null;
     // const brush = d3.selectAll('.selection');
     // d3.selectAll('.selection').call(brush.move, null);
     // this.barcodeSVGRef.current.select(".brush").call(this.brushRef.move, null);
-    this.setWidth();
+    this.setWidth(false);
   };
 
-  setWidth = () => {
+  setWidth = initialBrush => {
     const { settings } = this.state;
     const containerWidth = this.getWidth();
     const width = containerWidth - settings.margin.left - settings.margin.right;
     this.setState({
       barcodeContainerWidth: containerWidth,
-      barcodeWidth: width
+      barcodeWidth: width,
     });
+
+    const barcodeHeight =
+      this.props.horizontalSplitPaneSize -
+      this.state.settings.margin.top -
+      this.state.settings.margin.bottom;
+    this.setupBrush(width, barcodeHeight, this.state.settings, initialBrush);
   };
 
   getWidth() {
     if (this.barcodeContainerRef.current !== null) {
       return this.barcodeContainerRef.current.parentElement.offsetWidth;
-    } else return 1200;
+    }
+    return 1200;
   }
 
   handleSVGClick = event => {
     this.unhighlightBrushedLines();
     // this.barcodeSVGRef.select(".brush").call(this.brushRef.move, null)
     this.props.onHandleBarcodeChanges({
-      brushedData: []
+      brushedData: [],
     });
-    this.props.onHandleMaxLinePlot(null);
+    this.props.onHandleLineSelected(null, null, null);
     this.setState({
       settings: {
         ...this.state.settings,
-        brushing: false
-      }
+        brushing: false,
+      },
     });
   };
 
@@ -113,7 +158,7 @@ class BarcodePlotReact extends Component {
           : event.target.attributes[2].nodeValue + 5;
       const lineId = `#barcode-line-${lineName.replace(
         /;/g,
-        ''
+        '',
       )}_${lineIdMult}`;
       const hoveredLine = d3.select(lineId);
       hoveredLine
@@ -123,7 +168,7 @@ class BarcodePlotReact extends Component {
         hoveredLineId: lineId,
         hoveredLineName: lineName,
         tooltipPosition: textPosition,
-        tooltipTextAnchor: textAnchor
+        tooltipTextAnchor: textAnchor,
       });
     }
   };
@@ -138,7 +183,7 @@ class BarcodePlotReact extends Component {
         hoveredLineId: null,
         hoveredLineName: null,
         tooltipPosition: null,
-        tooltipTextAnchor: null
+        tooltipTextAnchor: null,
       });
     }
   };
@@ -157,7 +202,7 @@ class BarcodePlotReact extends Component {
         Math,
         array.map(function(o) {
           return o.statistic;
-        })
+        }),
       );
       const obj = array.find(function(o) {
         return o.statistic === max;
@@ -166,7 +211,7 @@ class BarcodePlotReact extends Component {
     }
   }
 
-  setupBrush(barcodeWidth, barcodeHeight, barcodeSettings, settings) {
+  setupBrush(barcodeWidth, barcodeHeight, settings, initialBrush) {
     const self = this;
     let objsBrush = {};
 
@@ -174,16 +219,18 @@ class BarcodePlotReact extends Component {
       self.setState({
         settings: {
           ...self.state.settings,
-          brushing: true
+          brushing: true,
         },
         highlightedLineName: null,
         hoveredLineId: null,
-        hoveredLineName: null
+        hoveredLineName: null,
       });
+      // }
+      //}
     };
 
     const highlightBrushedLines = function() {
-      if (d3.event.selection !== undefined && d3.event.selection !== null) {
+      if (d3.event.selection != null) {
         const brushedLines = d3.brushSelection(this);
         const isBrushed = function(brushedLines, x) {
           const xMin = brushedLines[0][0];
@@ -205,7 +252,6 @@ class BarcodePlotReact extends Component {
           })
           .attr('y1', settings.margin.selected)
           .classed('selected', true);
-
         const brushedArr = brushed._groups[0];
         // const brushedDataVar = brushed.data();
         const brushedDataVar = brushedArr.map(a => {
@@ -214,11 +260,11 @@ class BarcodePlotReact extends Component {
             id_mult: a.attributes[6].nodeValue,
             lineID: a.attributes[7].nodeValue,
             logFC: a.attributes[8].nodeValue,
-            statistic: a.attributes[9].nodeValue
+            statistic: a.attributes[9].nodeValue,
           };
         });
         self.props.onHandleBarcodeChanges({
-          brushedData: brushedDataVar
+          brushedData: brushedDataVar,
         });
         if (brushedDataVar.length > 0) {
           const maxLineObject = self.getMaxObject(brushedDataVar);
@@ -227,7 +273,7 @@ class BarcodePlotReact extends Component {
           }`;
           const maxLine = d3.select(`#barcode-line-${maxLineId}`);
           maxLine.classed('MaxLine', true).attr('y1', settings.margin.max);
-          const statistic = maxLineObject.statisic;
+          const statistic = maxLineObject.statistic;
           const textAnchor =
             statistic > self.props.barcodeSettings.highStat / 2
               ? 'end'
@@ -239,41 +285,99 @@ class BarcodePlotReact extends Component {
             hoveredLineName: null,
             highlightedLineName: maxLineObject.lineID,
             tooltipPosition: ttPosition,
-            tooltipTextAnchor: textAnchor
+            tooltipTextAnchor: textAnchor,
+          });
+        }
+      } else {
+        self.handleSVGClick(null);
+      }
+    };
+
+    const endBrush = function() {
+      const selection = d3.event.selection;
+      if (selection == null) {
+        self.handleSVGClick(null);
+      } else {
+        if (self.props.barcodeSettings.brushedData.length > 0) {
+          const maxLineData = self.getMaxObject(
+            self.props.barcodeSettings.brushedData,
+          );
+          self.props.onHandleLineSelected(
+            maxLineData.lineID,
+            maxLineData.id_mult,
+            maxLineData.statistic,
+          );
+        } else {
+          self.props.onHandleLineSelected(null, null, null);
+          self.setState({
+            tooltipPosition: null,
+            tooltipTextAnchor: null,
+            highlightedLineName: null,
           });
         }
       }
     };
 
-    const endBrush = function() {
-      if (self.props.barcodeSettings.brushedData.length > 0) {
-        const maxLineData = self.getMaxObject(
-          self.props.barcodeSettings.brushedData
-        );
-        self.props.onSetProteinForDiffView(maxLineData);
-        self.props.onHandleMaxLinePlot(maxLineData);
-      } else {
-        self.props.onSetProteinForDiffView(null);
-        self.props.onHandleMaxLinePlot(null);
-        self.setState({
-          tooltipPosition: null,
-          tooltipTextAnchor: null,
-          highlightedLineName: null
-        });
-      }
-    };
+    //Remove existing brushes
+    if (d3.selectAll('.brush').nodes().length > 0) {
+      d3.selectAll('.brush').remove();
+    }
 
     objsBrush = d3
       .brush()
       .extent([
         [settings.margin.left + 4, 0],
-        [barcodeWidth + 15, barcodeHeight]
+        [barcodeWidth + 15, barcodeHeight],
       ])
       .on('start', brushingStart)
       .on('brush', highlightBrushedLines)
       .on('end', endBrush);
-    d3.selectAll('.barcode-axis').call(objsBrush);
+
+    d3.selectAll('.x.barcode-axis')
+      .append('g')
+      .attr('class', 'brush')
+      .call(objsBrush);
+
+    if (initialBrush) {
+      const quatileTicks = d3.selectAll('line').filter(function() {
+        return d3.select(this).attr('id');
+      });
+      const quartile = Math.round(quatileTicks.nodes().length * 0.25);
+      setTimeout(function() {
+        d3.select('.brush').call([objsBrush][0].move, [
+          [quatileTicks.nodes()[quartile].getAttribute('x1'), 60],
+          [quatileTicks.nodes()[0].getAttribute('x1'), barcodeHeight - 30],
+        ]);
+      }, 5);
+    } else {
+      // reposition the brushed rect on window resize, or horizontal pane resize
+      const selectedTicks = d3.selectAll('line').filter(function() {
+        return d3.select(this).classed('selected');
+      });
+
+      const highestTickIndex = selectedTicks.nodes().length - 1;
+
+      d3.select('.brush').call([objsBrush][0].move, [
+        [selectedTicks.nodes()[highestTickIndex].getAttribute('x1'), 60],
+        [selectedTicks.nodes()[0].getAttribute('x1'), barcodeHeight - 30],
+      ]);
+    }
     // d3.selectAll(this.barcodeSVGRef.current).call(objsBrush);
+    // const brushed = d3.selectAll('.selected');
+    // const brushedArr = brushed._groups[0];
+    // // const brushedDataVar = brushed.data();
+    // const brushedDataVar = brushedArr.map(a => {
+    //   return {
+    //     x2: a.attributes[2].nodeValue,
+    //     id_mult: a.attributes[6].nodeValue,
+    //     lineID: a.attributes[7].nodeValue,
+    //     logFC: a.attributes[8].nodeValue,
+    //     statistic: a.attributes[9].nodeValue,
+    //   };
+    // });
+    // self.props.onHandleBarcodeChanges({
+    //   brushedData: brushedDataVar,
+    // });
   }
 
   getTooltip = () => {
@@ -282,46 +386,46 @@ class BarcodePlotReact extends Component {
       hoveredLineName,
       highlightedLineName,
       tooltipPosition,
-      tooltipTextAnchor
+      tooltipTextAnchor,
     } = this.state;
     if (hoveredLineName) {
       return (
         <text
-          transform={`translate(${tooltipPosition}, 25)`}
+          className="BarcodeTooltipText"
+          transform={`translate(${tooltipPosition}, 30)`}
           fontSize="14px"
           textAnchor={tooltipTextAnchor}
         >
-          {hoveredLineName}
+          &nbsp;&nbsp;{hoveredLineName}
         </text>
       );
-    } else if (highlightedLineName) {
+    }
+    if (highlightedLineName) {
       return (
         <text
+          className="BarcodeTooltipText"
           transform={`translate(${tooltipPosition}, 15)`}
           fontSize="14px"
           textAnchor={tooltipTextAnchor}
         >
-          {highlightedLineName}
+          &nbsp;&nbsp;{highlightedLineName}
         </text>
       );
-    } else return null;
+    }
+    return null;
   };
 
   render() {
     const {
       barcodeWidth,
       barcodeContainerWidth,
-      settings
+      settings,
       // hoveredLineId,
       // hoveredLineName,
       // tooltipPosition
     } = this.state;
 
-    const {
-      horizontalSplitPaneSize,
-      barcodeSettings
-      // violinDotSelected
-    } = this.props;
+    const { horizontalSplitPaneSize, barcodeSettings } = this.props;
 
     const barcodeHeight =
       horizontalSplitPaneSize - settings.margin.top - settings.margin.bottom;
@@ -337,7 +441,7 @@ class BarcodePlotReact extends Component {
 
     const xAxisTicks = xScale.ticks().map(value => ({
       value,
-      xOffset: xScale(value)
+      xOffset: xScale(value),
     }));
 
     const barcodeTicks = xAxisTicks.map(({ value, xOffset }) => (
@@ -352,7 +456,7 @@ class BarcodePlotReact extends Component {
           style={{
             fontSize: '12px',
             textAnchor: 'middle',
-            transform: 'translateY(20px)'
+            transform: 'translateY(20px)',
           }}
         >
           {value}
@@ -382,8 +486,6 @@ class BarcodePlotReact extends Component {
 
     const tooltip = this.getTooltip();
 
-    this.setupBrush(barcodeWidth, barcodeHeight, barcodeSettings, settings);
-
     return (
       <div
         ref={this.barcodeContainerRef}
@@ -411,6 +513,7 @@ class BarcodePlotReact extends Component {
 
           {/* X Axis Label */}
           <text
+            className="BarcodeLabel"
             transform={`translate(${barcodeWidth / 2}, ${barcodeHeight + 35})`}
             textAnchor="middle"
           >
@@ -418,12 +521,18 @@ class BarcodePlotReact extends Component {
           </text>
 
           {/* Y Axis Left Label */}
-          <text transform="rotate(-90)" y={15} x={0 - barcodeHeight / 1 + 10}>
+          <text
+            className="BarcodeLabel"
+            transform="rotate(-90)"
+            y={15}
+            x={0 - barcodeHeight / 1 + 10}
+          >
             {barcodeSettings.lowLabel}
           </text>
 
           {/* Y Axis Right Label */}
           <text
+            className="BarcodeLabel"
             transform="rotate(-90)"
             y={barcodeWidth + 27}
             x={0 - barcodeHeight / 1 + 10}
@@ -431,7 +540,7 @@ class BarcodePlotReact extends Component {
             {barcodeSettings.highLabel}
           </text>
 
-          <g className="x barcode-axis"></g>
+          <g className="x barcode-axis" />
           {/* Barcode Lines & Tooltip */}
           {barcodeLines}
           {tooltip}

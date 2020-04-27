@@ -18,25 +18,17 @@ class SplitPanesContainer extends Component {
     super(props);
     this.state = {
       activeSVGTabIndex: 0,
-      proteinForDiffView: '',
       horizontalSplitPaneSize:
         parseInt(sessionStorage.getItem('horizontalSplitPaneSize'), 10) || 250,
       verticalSplitPaneSize:
         parseInt(sessionStorage.getItem('verticalSplitPaneSize'), 10) || 525,
       activeViolinTableIndex: 0,
-      violinDotSelected: null
     };
   }
 
   handleSVGTabChange = activeTabIndex => {
     this.setState({
-      activeSVGTabIndex: activeTabIndex
-    });
-  };
-
-  setProteinForDiffView = proteinSite => {
-    this.setState({
-      proteinForDiffView: proteinSite
+      activeSVGTabIndex: activeTabIndex,
     });
   };
 
@@ -58,26 +50,13 @@ class SplitPanesContainer extends Component {
           className="BarcodePlotContainer"
           {...this.state}
           {...this.props}
-          onSetProteinForDiffView={this.setProteinForDiffView}
         />
-        // <BarcodePlot
-        //   className="BarcodePlotContainer"
-        //   {...this.state}
-        //   {...this.props}
-        //   onSetProteinForDiffView={this.setProteinForDiffView}
-        // />
-        // <BarcodePlotReusable
-        //   data={barcodeSettings.barcodeData}
-        //   xAccessor={absTAccessor}
-        //   label="test"
-        // />
       );
     }
   };
 
   getViolinPlot() {
-    // const { isViolinPlotLoading, isViolinPlotLoaded } = this.props;
-    // isViolinPlotLoaded
+    // const { isViolinPlotLoaded } = this.props;
     // if (!isViolinPlotLoaded) {
     //   return (
     //     <div className="PlotInstructionsDiv">
@@ -92,21 +71,14 @@ class SplitPanesContainer extends Component {
         className="ViolinPlotContainer"
         {...this.state}
         {...this.props}
-        onHandleViolinDotSelected={this.handleViolinDotSelected}
       />
     );
     // }
   }
 
-  handleViolinDotSelected = e => {
-    this.setState({
-      violinDotSelected: 'test'
-    });
-  };
-
   handleViolinTableTabChange = (e, { activeIndex }) => {
     this.setState({
-      activeViolinTableIndex: activeIndex
+      activeViolinTableIndex: activeIndex,
     });
   };
 
@@ -129,7 +101,7 @@ class SplitPanesContainer extends Component {
               {violinPlot}
             </div>
           </Tab.Pane>
-        )
+        ),
       },
       {
         menuItem: 'Statistic Table',
@@ -143,8 +115,8 @@ class SplitPanesContainer extends Component {
           >
             <FilteredPepplotTable {...this.state} {...this.props} />
           </Tab.Pane>
-        )
-      }
+        ),
+      },
     ];
 
     const onlyTablePane = [
@@ -160,8 +132,8 @@ class SplitPanesContainer extends Component {
           >
             <FilteredPepplotTable {...this.state} {...this.props} />
           </Tab.Pane>
-        )
-      }
+        ),
+      },
     ];
 
     return (
@@ -175,7 +147,7 @@ class SplitPanesContainer extends Component {
           stackable: true,
           secondary: true,
           pointing: true,
-          className: 'ViolinAndTableMenu'
+          className: 'ViolinAndTableMenu',
         }}
       />
     );
@@ -208,11 +180,11 @@ class SplitPanesContainer extends Component {
   splitPaneResized(size, paneType) {
     if (paneType === 'horizontal') {
       this.setState({
-        horizontalSplitPaneSize: size
+        horizontalSplitPaneSize: size,
       });
     } else {
       this.setState({
-        verticalSplitPaneSize: size
+        verticalSplitPaneSize: size,
       });
     }
     sessionStorage.setItem(`${paneType}SplitPaneSize`, size);

@@ -3,8 +3,10 @@
   --color-primary-gradient: #ff7e38;
   --color-secondary: #2c3b78;
   --color-secondary-gradient: #465fc5;
-  --color-tertiary: #4cd2d5;
-  --color-link: #1678c2;
+  // --color-tertiary: #4cd2d5;
+  --color-tertiary: #00aeff;
+  // --color-link: #1678c2;
+  --color-link: #1678c2 !important;
   --color-white: #fff;
   --color-light: #e0e1e2;
   --color-dark: #2e2e2e;
@@ -102,6 +104,11 @@
     color: #fff !important;
     // background-color: var(--color-primary) !important;
   }
+
+  // .ui.toggle.checkbox input:checked ~ .box:before,
+  // .ui.toggle.checkbox input:checked ~ label:before {
+  //   background-color: var(--color-primary) !important;
+  // }
   // menu
   .ui.menu .orange.active.item {
     color: #fff !important;

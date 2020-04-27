@@ -18,7 +18,7 @@ import ButtonActions from '../Shared/ButtonActions';
 import * as d3 from 'd3';
 import {
   formatNumberForDisplay,
-  splitValue
+  splitValue,
   // getIconInfo
 } from '../Shared/helpers';
 import '../Shared/Table.scss';
@@ -46,7 +46,7 @@ class Enrichment extends Component {
     activeIndexEnrichmentView: this.defaultEnrichmentActiveIndex || 0,
     multisetPlotInfo: {
       title: '',
-      svg: []
+      svg: [],
     },
     multisetPlotAvailable: false,
     animation: 'uncover',
@@ -62,7 +62,7 @@ class Enrichment extends Component {
     // networkDataAvailable: false,
     networkData: {
       nodes: [],
-      edges: []
+      edges: [],
     },
     networkDataNew: {},
     networkDataMock: {},
@@ -70,13 +70,11 @@ class Enrichment extends Component {
     networkGraphReady: false,
     tests: {},
     nodeCutoff: sessionStorage.getItem('nodeCutoff') || 0.1,
-    edgeCutoff: sessionStorage.getItem('edgeCutoff') || 0.375,
+    edgeCutoff: sessionStorage.getItem('edgeCutoff') || 0.4,
     filteredNodesTotal: 0,
     filteredEdgesTotal: 0,
     totalNodes: 0,
     totalEdges: 0,
-    // networkSortBy: ['significance', 'edgecount', 'nodecount']
-    networkSortBy: sessionStorage.getItem('networkSortBy') || 'significance',
     legendIsOpen: true,
     // legendIsOpen: JSON.parse(sessionStorage.getItem('legendOpen')) || true,
     networkSettings: {
@@ -95,18 +93,33 @@ class Enrichment extends Component {
       linkMetaLookup: ['EnrichmentMap_GS_DESCR', 'EnrichmentMap_GS_DESCR'],
       nodeColorScale: [0, 0.1, 1],
       nodeColors: ['red', 'white', 'blue'],
-      colorMostSignificantTest: '#FFD700',
+      // colorMostSignificantTest: '#FFD700',
+      mostSignificantColorScale: [
+        // '#c79750',
+        // '#e6b964',
+        // '#f8e889',
+        // '#f8e889',
+        // '#deb15f',
+        // '#dfb461'
+
+        '#B78628',
+        '#DBA514',
+        // '#e6b964',
+        '#FCC201',
+        // '#DBA514'
+        // '#c79750'
+      ],
       // colorHighestLinkCoefficient: '#FFD700',
       title: '',
       // data: null,
       id: 'chart-network',
-      margin: { top: 0, right: 0, bottom: 0, left: 0 },
+      margin: { top: 50, right: 50, bottom: 50, left: 0 },
       // statLabel: '',
       // statistic: '',
       // formattedData: {},
       // facets: []
       // propLabel: [],
-      duration: 1000
+      duration: 1000,
     },
     annotationData: [],
     enrichmentDataItem: [],
@@ -119,7 +132,7 @@ class Enrichment extends Component {
     imageInfo: {
       key: null,
       title: '',
-      svg: []
+      svg: [],
     },
     currentSVGs: [],
     isTestSelected: false,
@@ -130,7 +143,6 @@ class Enrichment extends Component {
     barcodeSettings: {
       barcodeData: [],
       brushedData: [],
-      // chartSize: { height: '200', width: '960' },
       lineID: '',
       statLabel: {},
       statistic: 'statistic',
@@ -138,38 +150,52 @@ class Enrichment extends Component {
       highLabel: {},
       lowLabel: {},
       highStat: null,
-      enableBrush: false
+      enableBrush: false,
     },
-    // violinSettings: {
-    violinData: []
-    // chartSize: { height: kLSplit.clientHeight + 25, width: kLSplit.clientWidth },
-    //   chartSize: {
-    //     height: 400,
-    //     width: 400
-    //   },
-    //   axisLabels: {
-    //     xAxis: '',
-    //     yAxis: "log<tspan baseline-shift='sub' font-size='14px'>2</tspan>(FC)"
-    //   },
-    //   id: 'violin-graph-1',
-    //   pointUniqueId: 'sample',
-    //   pointValue: 'cpm',
-    //   title: '',
-    //   subtitle: '',
-    //   tooltip: {
-    //     show: true,
-    //     fields: [
-    //       { label: 'log(FC)', value: 'cpm', toFixed: true },
-    //       { label: 'Protein', value: 'sample' }
-    //     ]
-    //   },
-    //   xName: 'tissue'
-    // }
+    violinSettings: {
+      axisLabels: {
+        xAxis: 'abs(t)',
+        yAxis: "log<tspan baseline-shift='sub' font-size='14px'>2</tspan>(FC)",
+      },
+      // axisLabels: { xAxis: this.term, yAxis: "log<tspan baseline-shift='sub' font-size='14px'>2</tspan>(FC)" },
+      id: 'violin-graph-1',
+      pointUniqueId: 'sample',
+      pointValue: 'cpm',
+      title: '',
+      subtitle: '',
+      tooltip: {
+        show: true,
+        fields: [
+          { label: 'log(FC)', value: 'cpm', toFixed: true },
+          // { label: 'abs(t)', value: 'cpm', toFixed: true },
+          { label: 'Protein', value: 'sample' },
+        ],
+      },
+      xName: 'tissue',
+      constrainExtremes: false,
+      color: d3.scaleOrdinal(d3.schemeCategory10),
+      margin: { top: 10, right: 10, bottom: 50, left: 50 },
+      scale: 'linear',
+      yName: null,
+      yTicks: 1,
+    },
+    violinData: [],
+    HighlightedLineId: {
+      sample: '',
+      id_mult: '',
+    },
   };
   EnrichmentViewContainerRef = React.createRef();
 
   componentDidMount() {
     this.getTableHelpers(this.testSelectedTransition, this.showBarcodePlot);
+    // let resizedFn;
+    // window.addEventListener('resize', () => {
+    //   clearTimeout(resizedFn);
+    //   resizedFn = setTimeout(() => {
+    //     this.windowResized();
+    //   }, 200);
+    // });
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
@@ -180,10 +206,10 @@ class Enrichment extends Component {
         const ResultsLength = this.state.enrichmentResults.length;
         if (ResultsLength > 0) {
           const dataItemDescription = getDataItemDescription(
-            DescriptionAndTest
+            DescriptionAndTest,
           );
           const dataItemIndex = _.findIndex(AllDescriptionsAndTests, function(
-            d
+            d,
           ) {
             return d.Description === dataItemDescription;
           });
@@ -200,12 +226,19 @@ class Enrichment extends Component {
             dataItem,
             test,
             this.testSelectedTransition,
-            this.showBarcodePlot
+            this.showBarcodePlot,
           );
         }
       }
     }
   }
+
+  // windowResized = () => {
+  //   this.setState({
+  //     nodeCutoff: this.state.nodeCutoff,
+  //     edgeCutoff: this.state.edgeCutoff,
+  //   });
+  // };
 
   getThreePlotsFromUrl = (
     enrichmentStudy,
@@ -214,7 +247,7 @@ class Enrichment extends Component {
     dataItem,
     test,
     testSelectedTransitionCb,
-    showBarcodePlotCb
+    showBarcodePlotCb,
   ) => {
     let self = this;
     testSelectedTransitionCb(true);
@@ -226,10 +259,10 @@ class Enrichment extends Component {
       .then(annotationDataResponse => {
         const annotationDataParsed = JSON.parse(annotationDataResponse);
         self.setState({
-          annotationData: annotationDataParsed
+          annotationData: annotationDataParsed,
         });
         dataItem.Annotation = _.find(annotationDataParsed, {
-          Description: dataItem.Description
+          Description: dataItem.Description,
         }).Key;
         let term = dataItem.Annotation;
 
@@ -237,11 +270,11 @@ class Enrichment extends Component {
           imageInfo: {
             ...self.state.imageInfo,
             key: `${test}:${dataItem.Description}`,
-            title: `${test}:${dataItem.Description}`
+            title: `${test}:${dataItem.Description}`,
           },
           enrichmentNameLoaded: true,
           enrichmentDataItem: dataItem,
-          enrichmentTerm: term
+          enrichmentTerm: term,
         });
 
         phosphoprotService
@@ -250,7 +283,7 @@ class Enrichment extends Component {
             enrichmentModel,
             enrichmentAnnotation,
             test,
-            dataItem.Annotation
+            dataItem.Annotation,
           )
           .then(barcodeDataResponse => {
             let BardcodeInfoObj = JSON.parse(barcodeDataResponse['object']);
@@ -268,7 +301,7 @@ class Enrichment extends Component {
 
   handleSearchTransition = bool => {
     this.setState({
-      isSearching: bool
+      isSearching: bool,
     });
   };
 
@@ -284,7 +317,7 @@ class Enrichment extends Component {
       plotButtonActive: false,
       visible: false,
       isTestSelected: false,
-      isTestDataLoaded: false
+      isTestDataLoaded: false,
     });
   };
 
@@ -297,23 +330,23 @@ class Enrichment extends Component {
         'Ferrostatin vs Untreated Differential Phosphorylation'
     ) {
       this.setState({
-        displayViolinPlot: true
+        displayViolinPlot: true,
       });
     }
     this.setState({
       plotButtonActive: false,
-      visible: false
+      visible: false,
     });
     if (scChange) {
       this.setState({
-        multisetPlotAvailable: false
+        multisetPlotAvailable: false,
       });
     }
   };
 
   disablePlot = () => {
     this.setState({
-      multisetPlotAvailable: false
+      multisetPlotAvailable: false,
     });
   };
 
@@ -325,7 +358,7 @@ class Enrichment extends Component {
       multisetPlotAvailable: false,
       plotButtonActive: false,
       visible: false,
-      displayViolinPlot: false
+      displayViolinPlot: false,
     });
   };
 
@@ -333,14 +366,8 @@ class Enrichment extends Component {
     this.setState(prevState => ({
       animation,
       visible: !prevState.visible,
-      plotButtonActive: !this.state.plotButtonActive
+      plotButtonActive: !this.state.plotButtonActive,
     }));
-  };
-
-  onViolinDataLoaded = bool => {
-    this.setState({
-      violinDataLoaded: bool
-    });
   };
 
   handleDirectionChange = direction => () =>
@@ -350,9 +377,9 @@ class Enrichment extends Component {
     this.setState({
       multisetPlotInfo: {
         title: multisetPlotResults.svgInfo.plotType,
-        svg: multisetPlotResults.svgInfo.svg
+        svg: multisetPlotResults.svgInfo.svg,
       },
-      multisetPlotAvailable: true
+      multisetPlotAvailable: true,
     });
   };
 
@@ -361,7 +388,7 @@ class Enrichment extends Component {
     const {
       enrichmentStudy,
       enrichmentModel,
-      enrichmentAnnotation
+      enrichmentAnnotation,
     } = this.props;
     let initConfigCols = [];
 
@@ -372,7 +399,7 @@ class Enrichment extends Component {
       padding: '1em',
       maxWidth: '50vw',
       fontSize: '13px',
-      wordBreak: 'break-all'
+      wordBreak: 'break-all',
     };
 
     let icon = '';
@@ -402,7 +429,7 @@ class Enrichment extends Component {
 
     this.setState({
       enrichmentIcon: icon,
-      enrichmentIconText: iconText
+      enrichmentIconText: iconText,
     });
 
     let allKeys = _.keys(enrResults[0]);
@@ -428,7 +455,7 @@ class Enrichment extends Component {
               />
             </div>
           );
-        }
+        },
       };
       initConfigCols.push(Col_Name_1006);
     }
@@ -461,7 +488,7 @@ class Enrichment extends Component {
                     onClick={addParams.getLink(
                       enrichmentStudy,
                       enrichmentAnnotation,
-                      item
+                      item,
                     )}
                   />
                 }
@@ -473,7 +500,7 @@ class Enrichment extends Component {
               />
             </div>
           );
-        }
+        },
       };
       initConfigCols.push(Col_Name_Description);
     }
@@ -499,7 +526,7 @@ class Enrichment extends Component {
               />
             </div>
           );
-        }
+        },
       };
       initConfigCols.push(Col_Name_Annotation);
     }
@@ -516,7 +543,7 @@ class Enrichment extends Component {
     // multiset svg rebuilds based on uData...if there are no results we need to override this from being passed down
     if (uDataRelevantFields.length !== 0) {
       this.setState({
-        uData: uDataRelevantFields
+        uData: uDataRelevantFields,
       });
     }
 
@@ -540,7 +567,7 @@ class Enrichment extends Component {
                         enrichmentModel,
                         enrichmentAnnotation,
                         item,
-                        c
+                        c,
                       )}
                     >
                       {formatNumberForDisplay(value)}
@@ -571,7 +598,7 @@ class Enrichment extends Component {
                 />
               </div>
             );
-        }
+        },
       };
     });
 
@@ -585,7 +612,7 @@ class Enrichment extends Component {
       enrichmentModel,
       enrichmentAnnotation,
       pValueType,
-      enrichmentStudy
+      enrichmentStudy,
     } = this.props;
     const pValueTypeParam = pValueType === 'adjusted' ? 0.1 : 1;
     phosphoprotService
@@ -594,7 +621,7 @@ class Enrichment extends Component {
         enrichmentAnnotation,
         '',
         pValueTypeParam,
-        enrichmentStudy + 'plots'
+        enrichmentStudy + 'plots',
       )
       // .then(EMData => {
       //   this.setState({
@@ -611,7 +638,7 @@ class Enrichment extends Component {
           tests: EMData.tests,
           networkDataNew: networkDataNew,
           totalNodes: EMData.elements.nodes.length,
-          totalEdges: EMData.elements.edges.length
+          totalEdges: EMData.elements.edges.length,
         });
         let facets = [];
         let pieData = [];
@@ -625,7 +652,7 @@ class Enrichment extends Component {
             ...this.state.networkSettings,
             facets: facets,
             propLabel: EMData.tests,
-            propData: pieData
+            propData: pieData,
             // metaLabels: ["Description", "Ontology"],
             // meta: ["EnrichmentMap_GS_DESCR", "EnrichmentMap_Name"],
             // facetAndValueLabel: ["Test", "pValue"],
@@ -644,7 +671,7 @@ class Enrichment extends Component {
             // nodeColors: ["red", "white", "blue"]
           },
           networkDataLoaded: true,
-          networkGraphReady: true
+          networkGraphReady: true,
         });
       });
   };
@@ -681,30 +708,26 @@ class Enrichment extends Component {
         highLabel: barcode[0].highLabel,
         lowLabel: barcode[0].lowLabel,
         highStat: highest,
-        enableBrush: true
-      }
+        enableBrush: true,
+      },
     });
   };
 
   handleBarcodeChanges = changes => {
-    // const { barcodeSettings } = this.state;
     let self = this;
     if (changes.brushedData.length > 0) {
       const boxPlotArray = _.map(changes.brushedData, function(d) {
         d.statistic = _.find(self.state.barcodeSettings.barcodeData, {
           lineID: d.lineID,
-          id_mult: d.id_mult
+          id_mult: d.id_mult,
         }).statistic;
         d.logFC = _.find(self.state.barcodeSettings.barcodeData, {
           lineID: d.lineID,
-          id_mult: d.id_mult
+          id_mult: d.id_mult,
         }).logFC;
         return d;
       });
 
-      // this.setState({
-      //   isViolinPlotLoaded: false
-      // });
       const reducedBoxPlotArray = _.reduce(
         boxPlotArray,
         function(res, datum) {
@@ -716,11 +739,11 @@ class Enrichment extends Component {
             cpm: datum.logFC,
             sample: datum.lineID,
             statistic: datum.statistic,
-            id_mult: datum.id_mult
+            id_mult: datum.id_mult,
           });
           return res;
         },
-        {}
+        {},
       );
 
       const vData = _.mapValues(reducedBoxPlotArray, function(v) {
@@ -739,8 +762,8 @@ class Enrichment extends Component {
         isViolinPlotLoaded: true,
         barcodeSettings: {
           ...this.state.barcodeSettings,
-          brushedData: changes.brushedData
-        }
+          brushedData: changes.brushedData,
+        },
       });
     } else {
       this.setState({
@@ -748,10 +771,10 @@ class Enrichment extends Component {
         isViolinPlotLoaded: false,
         barcodeSettings: {
           ...this.state.barcodeSettings,
-          brushedData: []
+          brushedData: [],
         },
         SVGPlotLoaded: false,
-        SVGPlotLoading: false
+        SVGPlotLoading: false,
         // imageInfo: {
         //   key: null,
         //   title: '',
@@ -761,61 +784,79 @@ class Enrichment extends Component {
     }
   };
 
-  handleMaxLinePlot = info => {
+  handleHighlightedLineReset = obj => {
+    this.setState(obj);
+  };
+
+  handleLineSelected = (lineId, id_m, cpm_stat) => {
     const { enrichmentStudy, enrichmentModel } = this.props;
     // let self = this;
     // if (this.state.barcodeSettings.barcodeData > 0) {
-    if (info != null) {
-      if (this.state.barcodeSettings.barcodeData?.length > 0) {
-        this.setState({
-          SVGPlotLoaded: false,
-          SVGPlotLoading: true
-        });
-        const dataItem = this.state.barcodeSettings.barcodeData.find(
-          i => i.lineID === info.lineID
-        );
-        let id = dataItem.id_mult ? dataItem.id_mult : dataItem.id;
-        // var psp = document.getElementById('psp-icon');
-        // psp.style.visibility = "hidden";
-        // psp.style.left = w.toString() + "px";
-        // psp.style.bottom = h.toString() + "px";
-        let plotType = ['splineplot'];
-        switch (enrichmentModel) {
-          case 'DonorDifferentialPhosphorylation':
-            plotType = ['dotplot'];
-            break;
-          case 'Treatment and or Strain Differential Phosphorylation':
-            plotType = ['StrainStimDotplot', 'StimStrainDotplot'];
-            break;
-          case 'Timecourse Differential Phosphorylation':
-            plotType = ['lineplot', 'splineplot'];
-            break;
-          case 'Differential Expression':
-            plotType = ['proteindotplot'];
-            break;
-          case 'Differential Phosphorylation':
-            plotType = ['phosphodotplot'];
-            break;
-          case 'No Pretreatment Timecourse Differential Phosphorylation':
-            plotType = ['lineplot.modelII', 'splineplot.modelII'];
-            break;
-          case 'Ferrostatin Pretreatment Timecourse Differential Phosphorylation':
-            plotType = ['lineplot.modelIII', 'splineplot.modelIII'];
-            break;
-          default:
-            plotType = ['dotplot'];
+    if (lineId != null) {
+      if (
+        lineId !== this.state.HighlightedLineId.sample ||
+        this.state.SVGPlotLoaded === false
+      ) {
+        if (this.state.barcodeSettings.barcodeData?.length > 0) {
+          this.setState({
+            SVGPlotLoaded: false,
+            SVGPlotLoading: true,
+            HighlightedLineId: {
+              sample: lineId,
+              id_mult: id_m,
+              cpm: cpm_stat,
+            },
+          });
+          const dataItem = this.state.barcodeSettings.barcodeData.find(
+            i => i.lineID === lineId,
+          );
+          let id = dataItem.id_mult ? dataItem.id_mult : dataItem.id;
+          // var psp = document.getElementById('psp-icon');
+          // psp.style.visibility = "hidden";
+          // psp.style.left = w.toString() + "px";
+          // psp.style.bottom = h.toString() + "px";
+          let plotType = ['splineplot'];
+          switch (enrichmentModel) {
+            case 'DonorDifferentialPhosphorylation':
+              plotType = ['dotplot'];
+              break;
+            case 'Treatment and or Strain Differential Phosphorylation':
+              plotType = ['StrainStimDotplot', 'StimStrainDotplot'];
+              break;
+            case 'Timecourse Differential Phosphorylation':
+              plotType = ['lineplot', 'splineplot'];
+              break;
+            case 'Differential Expression':
+              plotType = ['proteindotplot'];
+              break;
+            case 'Differential Phosphorylation':
+              plotType = ['phosphodotplot'];
+              break;
+            case 'No Pretreatment Timecourse Differential Phosphorylation':
+              plotType = ['lineplot.modelII', 'splineplot.modelII'];
+              break;
+            case 'Ferrostatin Pretreatment Timecourse Differential Phosphorylation':
+              plotType = ['lineplot.modelIII', 'splineplot.modelIII'];
+              break;
+            default:
+              plotType = ['dotplot'];
+          }
+          let imageInfo = { key: '', title: '', svg: [] };
+          imageInfo.title = this.state.imageInfo.title;
+          imageInfo.key = this.state.imageInfo.key;
+          const handleSVGCb = this.handleSVG;
+          this.getPlot(id, plotType, enrichmentStudy, imageInfo, handleSVGCb);
         }
-        let imageInfo = { key: '', title: '', svg: [] };
-        imageInfo.title = this.state.imageInfo.title;
-        imageInfo.key = this.state.imageInfo.key;
-        const handleSVGCb = this.handleSVG;
-        this.getPlot(id, plotType, enrichmentStudy, imageInfo, handleSVGCb);
       }
     } else {
       plotCancel();
       this.setState({
         SVGPlotLoaded: false,
-        SVGPlotLoading: false
+        SVGPlotLoading: false,
+        HighlightedLineId: {
+          sample: '',
+          id_mult: '',
+        },
         // imageInfo: {
         //   ...this.state.imageInfo,
         //   svg: []
@@ -847,19 +888,19 @@ class Enrichment extends Component {
           plotType[i],
           enrichmentStudy + 'plots',
           undefined,
-          cancelToken
+          cancelToken,
         )
         .then(svgMarkupObj => {
           let svgMarkup = svgMarkupObj.data;
           svgMarkup = svgMarkup.replace(/id="/g, 'id="' + id + '-' + i + '-');
           svgMarkup = svgMarkup.replace(
             /#glyph/g,
-            '#' + id + '-' + i + '-glyph'
+            '#' + id + '-' + i + '-glyph',
           );
           svgMarkup = svgMarkup.replace(/#clip/g, '#' + id + '-' + i + '-clip');
           svgMarkup = svgMarkup.replace(
             /<svg/g,
-            `<svg preserveAspectRatio="xMinYMin meet" style="width:${EnrichmentPlotSVGWidth}px" height:${EnrichmentPlotSVGHeight} id="currentSVG-${id}-${i}"`
+            `<svg preserveAspectRatio="xMinYMin meet" style="width:${EnrichmentPlotSVGWidth}px" height:${EnrichmentPlotSVGHeight} id="currentSVG-${id}-${i}"`,
           );
           DOMPurify.addHook('afterSanitizeAttributes', function(node) {
             if (
@@ -871,7 +912,7 @@ class Enrichment extends Component {
           });
           // Clean HTML string and write into our DIV
           let sanitizedSVG = DOMPurify.sanitize(svgMarkup, {
-            ADD_TAGS: ['use']
+            ADD_TAGS: ['use'],
           });
           let svgInfo = { plotType: plotType[i], svg: sanitizedSVG };
 
@@ -894,7 +935,7 @@ class Enrichment extends Component {
     this.setState({
       imageInfo: imageInfo,
       SVGPlotLoaded: true,
-      SVGPlotLoading: false
+      SVGPlotLoading: false,
     });
   };
 
@@ -903,7 +944,7 @@ class Enrichment extends Component {
     enrichmentModel,
     enrichmentAnnotation,
     dataItem,
-    test
+    test,
   ) => {
     this.testSelectedTransition(true);
     const TestSiteVar = `${test}:${dataItem.Description}`;
@@ -912,9 +953,9 @@ class Enrichment extends Component {
         enrichmentStudy: this.props.enrichmentStudy || '',
         enrichmentModel: this.props.enrichmentModel || '',
         enrichmentAnnotation: this.props.enrichmentAnnotation || '',
-        enrichmentDescriptionAndTest: TestSiteVar || ''
+        enrichmentDescriptionAndTest: TestSiteVar || '',
       },
-      true
+      true,
     );
     // let xLargest = 0;
     // let imageInfo = { key: '', title: '', svg: [] };
@@ -924,10 +965,10 @@ class Enrichment extends Component {
       .then(annotationDataResponse => {
         const annotationDataParsed = JSON.parse(annotationDataResponse);
         this.setState({
-          annotationData: annotationDataParsed
+          annotationData: annotationDataParsed,
         });
         dataItem.Annotation = _.find(annotationDataParsed, {
-          Description: dataItem.Description
+          Description: dataItem.Description,
         }).Key;
         let term = dataItem.Annotation;
 
@@ -936,11 +977,11 @@ class Enrichment extends Component {
             ...this.state.imageInfo,
             key: `${test}:${dataItem.Description}`,
             title: `${test}:${dataItem.Description}`,
-            dataItem: dataItem
+            dataItem: dataItem,
           },
           enrichmentNameLoaded: true,
           enrichmentDataItem: dataItem,
-          enrichmentTerm: term
+          enrichmentTerm: term,
         });
 
         phosphoprotService
@@ -949,7 +990,7 @@ class Enrichment extends Component {
             enrichmentModel,
             enrichmentAnnotation,
             test,
-            dataItem.Annotation
+            dataItem.Annotation,
           )
           .then(barcodeDataResponse => {
             let BardcodeInfoObj = JSON.parse(barcodeDataResponse['object']);
@@ -972,7 +1013,7 @@ class Enrichment extends Component {
       enrichmentModel,
       enrichmentAnnotation,
       dataItem,
-      test
+      test,
     ) => {
       let self = this;
       return function() {
@@ -981,7 +1022,7 @@ class Enrichment extends Component {
           enrichmentModel,
           enrichmentAnnotation,
           dataItem,
-          test
+          test,
         );
         //stored annodationdata and won't call the service after the first time...reset it when sc changes
         // } else {
@@ -1033,25 +1074,25 @@ class Enrichment extends Component {
             .then(annotationDataResponse => {
               const annotationDataParsed = JSON.parse(annotationDataResponse);
               dataItem.Annotation = _.find(annotationDataParsed, {
-                Description: dataItem.Description
+                Description: dataItem.Description,
               }).Key;
               const database = enrichmentAnnotation;
               if (database === 'REACTOME') {
                 window.open(
                   'https://reactome.org/content/detail/' + dataItem.Annotation,
-                  '_blank'
+                  '_blank',
                 );
               } else if (database.substring(0, 2) === 'GO') {
                 window.open(
                   'http://amigo.geneontology.org/amigo/term/' +
                     dataItem.Annotation,
-                  '_blank'
+                  '_blank',
                 );
               } else if (database.substring(0, 4) === 'msig') {
                 window.open(
                   'http://software.broadinstitute.org/gsea/msigdb/cards/' +
                     dataItem.Annotation,
-                  '_blank'
+                  '_blank',
                 );
               } else if (database === 'PSP') {
                 self.showPhosphositePlus('', dataItem);
@@ -1059,24 +1100,24 @@ class Enrichment extends Component {
             });
         } else {
           dataItem.Annotation = _.find(self.state.annotationData, {
-            Description: dataItem.Description
+            Description: dataItem.Description,
           }).Key;
           const database = enrichmentAnnotation;
           if (database === 'REACTOME') {
             window.open(
               'https://reactome.org/content/detail/' + dataItem.Annotation,
-              '_blank'
+              '_blank',
             );
           } else if (database.substring(0, 2) === 'GO') {
             window.open(
               'http://amigo.geneontology.org/amigo/term/' + dataItem.Annotation,
-              '_blank'
+              '_blank',
             );
           } else if (database.substring(0, 4) === 'msig') {
             window.open(
               'http://software.broadinstitute.org/gsea/msigdb/cards/' +
                 dataItem.Annotation,
-              '_blank'
+              '_blank',
             );
           } else if (database === 'PSP') {
             self.showPhosphositePlus('', dataItem);
@@ -1086,7 +1127,7 @@ class Enrichment extends Component {
     };
 
     this.setState({
-      additionalTemplateInfoEnrichmentTable: addParams
+      additionalTemplateInfoEnrichmentTable: addParams,
     });
   };
 
@@ -1099,6 +1140,7 @@ class Enrichment extends Component {
   };
 
   createLegend = () => {
+    const self = this;
     var svg = d3
       .selectAll('.legend')
       .append('svg')
@@ -1113,6 +1155,7 @@ class Enrichment extends Component {
     legend.append('g').attr('class', 'labels');
     legend.append('g').attr('class', 'lines');
     legend.append('g').attr('class', 'gradient');
+    legend.append('g').attr('class', 'mostSignificant');
 
     var width = 300,
       height = 300,
@@ -1277,6 +1320,75 @@ class Enrichment extends Component {
       .attr('dy', '.35em')
       .text('pValue')
       .attr('transform', 'translate(-85,105)');
+
+    //most  color scale
+    var mostSignificantColorScale = d3
+      .scaleLinear()
+      .range(self.state.networkSettings.mostSignificantColorScale);
+    //Append a linearGradient element to the defs and give it a unique id
+    var mostSignificantGradient = svgDefs
+      .append('linearGradient')
+      .attr('id', 'most-significant-linear-gradient')
+      // DIAGONAL GRADIENT
+      .attr('x1', '70%')
+      .attr('y1', '70%')
+      .attr('x2', '30%')
+      .attr('y2', '30%');
+
+    //Append multiple color stops by using D3's data/enter step
+    mostSignificantGradient
+      .selectAll('stop')
+      .data(mostSignificantColorScale.range())
+      .enter()
+      .append('stop')
+      .attr('offset', function(d, i) {
+        return i / (mostSignificantColorScale.range().length - 1);
+      })
+      .attr('stop-color', function(d) {
+        return d;
+      });
+
+    const mostSignificant = legend.selectAll('.mostSignificant');
+
+    mostSignificant
+      .append('text')
+      .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
+      .attr('x', -120)
+      .attr('y', 150)
+      .attr('dy', '.35em')
+      .text('Most significant of all tests in chart');
+
+    // SQUARE
+    mostSignificant
+      .append('rect')
+      .attr('x', 100)
+      .attr('y', 141)
+      .attr('width', 20)
+      .attr('height', 20)
+      .style('stroke', '#000')
+      .style('fill', 'url(#most-significant-linear-gradient)');
+
+    // CIRCLE
+    // mostSignificant
+    //   .append('circle')
+    //   .attr('r', 10)
+    //   .attr('cx', 110)
+    //   .attr('cy', 151)
+    //   .style('stroke', 'black')
+    //   .style('fill', 'ffd700')
+    //   .style('stroke-width', '1')
+    //   .style('stroke', 'black');
+
+    // SLICE
+    // mostSignificant
+    //   .append('circle')
+    //   .attr('r', 5)
+    //   .attr('cx', 100)
+    //   .attr('cy', 151)
+    //   .style('fill', 'transparent')
+    //   .style('stroke', 'ffd700')
+    //   .style('stroke-width', '20')
+    //   .style('stroke-dasharray', 'calc(35 * 31.42 / 140) 31.42')
   };
 
   // getLegend = () => {
@@ -1391,29 +1503,29 @@ class Enrichment extends Component {
       imageInfo: {
         key: null,
         title: '',
-        svg: []
-      }
+        svg: [],
+      },
     });
     this.handleSearchCriteriaChange(
       {
         enrichmentStudy: this.props.enrichmentStudy || '',
         enrichmentModel: this.props.enrichmentModel || '',
         enrichmentAnnotation: this.props.enrichmentAnnotation || '',
-        enrichmentDescriptionAndTest: ''
+        enrichmentDescriptionAndTest: '',
       },
-      false
+      false,
     );
   };
 
   testSelectedTransition = bool => {
     this.setState({
-      isTestSelected: bool
+      isTestSelected: bool,
     });
   };
 
   informItemsPerPage = items => {
     this.setState({
-      itemsPerPageInformedEnrichmentMain: items
+      itemsPerPageInformedEnrichmentMain: items,
     });
   };
 
@@ -1439,7 +1551,8 @@ class Enrichment extends Component {
             {...this.props}
             {...this.state}
             onBackToTable={this.backToTable}
-            onHandleMaxLinePlot={this.handleMaxLinePlot}
+            onHandleLineSelected={this.handleLineSelected}
+            onHandleHighlightedLineReset={this.handleHighlightedLineReset}
             onHandleBarcodeChanges={this.handleBarcodeChanges}
           ></SplitPanesContainer>
         </div>
@@ -1455,7 +1568,7 @@ class Enrichment extends Component {
           renderActiveOnly={false}
           menu={{
             attached: true,
-            className: 'TableAndNetworkMenuContainer'
+            className: 'TableAndNetworkMenuContainer',
             // tabular: false
             // stackable: true,
             // secondary: true,
@@ -1513,7 +1626,7 @@ class Enrichment extends Component {
               onDisplayViolinPlot={this.displayViolinPlot}
             />
           </Tab.Pane>
-        )
+        ),
       },
       {
         menuItem: (
@@ -1546,9 +1659,11 @@ class Enrichment extends Component {
               onHandlePlotAnimation={this.handlePlotAnimation}
               onDisplayViolinPlot={this.displayViolinPlot}
               onHandlePieClick={this.testSelected}
-              onHandleNetworkSortByChange={this.handleNetworkSortByChange}
-              onHandleInputChange={this.handleInputChange}
+              onHandleEdgeCutoffInputChange={this.handleEdgeCutoffInputChange}
+              onHandleNodeCutoffInputChange={this.handleNodeCutoffInputChange}
               onHandleSliderChange={this.handleSliderChange}
+              onHandleNodeSliderChange={this.handleNodeSliderChange}
+              onHandleEdgeSliderChange={this.handleEdgeSliderChange}
               onHandleTotals={this.handleTotals}
               // onNetworkGraphReady={this.handleNetworkGraphReady}
               onHandleLegendOpen={this.handleLegendOpen}
@@ -1556,14 +1671,14 @@ class Enrichment extends Component {
               onCreateLegend={this.createLegend}
             />
           </Tab.Pane>
-        )
-      }
+        ),
+      },
     ];
   };
 
   handleNetworkGraphReady = bool => {
     this.setState({
-      networkGraphReady: bool
+      networkGraphReady: bool,
     });
   };
 
@@ -1576,17 +1691,8 @@ class Enrichment extends Component {
   handleTotals = (filteredNodesLength, filteredEdgesLength) => {
     this.setState({
       filteredNodesTotal: filteredNodesLength,
-      filteredEdgesTotal: filteredEdgesLength
+      filteredEdgesTotal: filteredEdgesLength,
     });
-  };
-
-  handleNetworkSortByChange = (evt, { value }) => {
-    this.removeNetworkSVG();
-    this.setState({
-      networkSortBy: value
-      // networkGraphReady: false
-    });
-    sessionStorage.setItem('networkSortBy', value);
   };
 
   // handleInputChange = _.debounce((evt, { name, value }) => {
@@ -1595,26 +1701,69 @@ class Enrichment extends Component {
   //   });
   // }, 500);
 
-  handleInputChange = (evt, { name, value }) => {
-    this.removeNetworkSVG();
-    this.setState({
-      [name]: value
-      // networkGraphReady: false
-    });
-  };
-
-  // handleSliderChange = _.debounce(obj => {
-  //   this.setState(obj);
+  // handleNetworkCutoffInputChange = _.debounce((evt, { name, value }) => {
+  //   this.removeNetworkSVG();
+  //   this.setState({
+  //     [name]: value
+  //     // networkGraphReady: false
+  //   });
   // }, 500);
 
-  handleSliderChange = (type, value) => {
-    // this.setState({
-    //   networkGraphReady: false
-    // });
+  handleNodeCutoffInputChange = _.debounce(value => {
     this.removeNetworkSVG();
-    this.setState({ [type]: value });
-    sessionStorage.setItem(type, value);
-  };
+    this.setState({
+      nodeCutoff: value,
+    });
+    sessionStorage.setItem('nodeCutoff', value);
+  }, 500);
+
+  handleEdgeCutoffInputChange = _.debounce(value => {
+    this.removeNetworkSVG();
+    this.setState({
+      edgeCutoff: value,
+    });
+    sessionStorage.setItem('edgeCutoff', value);
+  }, 500);
+
+  // handleNetworkCutoffInputChange = (evt, { name, value }) => {
+  //   this.removeNetworkSVG();
+  //   this.setState({
+  //     [name]: value,
+  //     // networkGraphReady: false
+  //   });
+  // };
+
+  // handleSliderChange = _.debounce((type, value) => {
+  //   if (this.state[type] !== value) {
+  //     this.removeNetworkSVG();
+  //     this.setState({ [type]: value });
+  //   }
+  //   sessionStorage.setItem(type, value);
+  // }, 500);
+
+  handleNodeSliderChange = _.debounce(value => {
+    if (this.state.nodeCutoff !== value) {
+      this.removeNetworkSVG();
+      this.setState({ nodeCutoff: value });
+    }
+    sessionStorage.setItem('nodeCutoff', value);
+  }, 500);
+  // handleNodeSliderChange = value => {
+  //   let decimalValue = value / 100;
+  //   if (this.state.nodeCutoff !== decimalValue) {
+  //     this.removeNetworkSVG();
+  //     this.setState({ nodeCutoff: decimalValue });
+  //   }
+  //   sessionStorage.setItem('nodeCutoff', decimalValue);
+  // };
+
+  handleEdgeSliderChange = _.debounce(value => {
+    if (this.state.edgeCutoff !== value) {
+      this.removeNetworkSVG();
+      this.setState({ edgeCutoff: value });
+    }
+    sessionStorage.setItem('edgeCutoff', value);
+  }, 500);
 
   // handleLegendOpen = () => {
   //   // sessionStorage.setItem('legendOpen', 'true');
