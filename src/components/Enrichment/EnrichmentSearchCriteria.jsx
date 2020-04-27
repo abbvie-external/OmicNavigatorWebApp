@@ -639,7 +639,8 @@ class EnrichmentSearchCriteria extends Component {
       pValueType,
       isValidSearchEnrichment,
       multisetPlotAvailable,
-      plotButtonActive
+      plotButtonActive,
+      isTestDataLoaded
     } = this.props;
 
     const StudyPopupStyle = {
@@ -699,7 +700,8 @@ class EnrichmentSearchCriteria extends Component {
     if (
       isValidSearchEnrichment &&
       activateMultisetFilters &&
-      multisetFiltersVisible
+      multisetFiltersVisible &&
+      !isTestDataLoaded
     ) {
       EMultisetFilters = (
         <EnrichmentMultisetFilters
