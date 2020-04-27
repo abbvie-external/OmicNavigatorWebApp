@@ -780,7 +780,7 @@ class QHGridBody extends React.PureComponent {
             const rowLevelStyle = this.props.rowLevelStyleCalc(item, ++curRow);
             // Paul start
             let rowHighlightMax = false;
-            // let rowHighlightOther = false;
+            let rowHighlightOther = false;
             if (
               item.Protein_Site != null &&
               this.props.additionalTemplateInfo !== '' &&
@@ -790,21 +790,18 @@ class QHGridBody extends React.PureComponent {
                 item.Protein_Site ===
                 this.props.additionalTemplateInfo.rowHighlightMax
               ) {
-                rowHighlightMax =
-                  item.Protein_Site ===
-                  this.props.additionalTemplateInfo.rowHighlightMax;
+                rowHighlightMax = true;
               }
-              // if (
-              //   item.Protein_Site ===
-              //   this.props.additionalTemplateInfo.rowHighlightOther
-              // ) {
-              //   rowHighlightOther =
-              //     item.Protein_Site ===
-              //     this.props.additionalTemplateInfo.rowHighlightOther;
-              // }
+              if (
+                this.props.additionalTemplateInfo?.rowHighlightOther?.includes(
+                  item.Protein_Site,
+                )
+              ) {
+                rowHighlightOther = true;
+              }
             }
             const maxHighlight = rowHighlightMax ? 'rowHighlightMax' : '';
-            // const otherHighlight = rowHighlightOther ? 'rowHighlightOther' : '';
+            const otherHighlight = rowHighlightOther ? 'rowHighlightOther' : '';
             // Paul end
             return (
               <Table.Row
@@ -813,7 +810,7 @@ class QHGridBody extends React.PureComponent {
                 }
                 key={itemKeyMap(item) || idx}
                 id={maxHighlight}
-                // className={otherHighlight}
+                className={otherHighlight}
                 style={rowLevelStyle}
               >
                 {_.map(grouping, (_group, group_idx) => {

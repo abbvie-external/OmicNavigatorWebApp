@@ -338,17 +338,18 @@ class FilteredPepplotTable extends Component {
   };
 
   getTableHelpers = HighlightedProteins => {
-    const MaxLine = this.props.HighlightedProteins[0];
-    // const HighlightedProteins = this.props.HighlightedProteins.slice(1);
+    const MaxLine = HighlightedProteins[0] || null;
     let addParams = {};
     if (MaxLine !== {} && MaxLine != null) {
       addParams.rowHighlightMax = MaxLine.sample;
     }
-    // if (HighlightedProteins !== []) {
-    //   HighlightedProteins?.forEach(element => {
-    //     addParams.rowHightlightOther = element.lineId;
-    //   });
-    //}
+    const SelectedProteins = HighlightedProteins.slice(1);
+    if (SelectedProteins.length > 0 && SelectedProteins != null) {
+      addParams.rowHighlightOther = [];
+      SelectedProteins.forEach(element => {
+        addParams.rowHighlightOther.push(element.sample);
+      });
+    }
     addParams.showPhosphositePlus = dataItem => {
       return function() {
         var protein = (dataItem.Protein
@@ -372,26 +373,24 @@ class FilteredPepplotTable extends Component {
   };
 
   handleRowClick = (event, item, index) => {
-    let self = this;
+    const PreviouslyHighlighted = this.props.HighlightedProteins;
     event.stopPropagation();
     if (event.shiftKey) {
-      const allTableData = this.state.filteredTableData;
-      const alreadySelectedIndex = _.findIndex(allTableData, function(d) {
-        return d.Protein_Site === self.props.HighlightedProteins[0]?.sample;
+      const allTableData = _.cloneDeep(this.state.filteredTableData);
+      const indexMaxProtein = _.findIndex(allTableData, function(d) {
+        return d.Protein_Site === PreviouslyHighlighted[0]?.sample;
       });
-      const lowerIndex =
-        index < alreadySelectedIndex ? index : alreadySelectedIndex;
-      const higherIndex =
-        index > alreadySelectedIndex ? index : alreadySelectedIndex;
-      const selectedTableData = allTableData.slice(lowerIndex, higherIndex + 1);
-      const selectedTableDataArray = selectedTableData.map(function(d) {
+      const sliceFirst = index < indexMaxProtein ? index : indexMaxProtein;
+      const sliceLast = index > indexMaxProtein ? index : indexMaxProtein;
+      const shiftedTableData = allTableData.slice(sliceFirst, sliceLast + 1);
+      const shiftedTableDataArray = shiftedTableData.map(function(d) {
         return {
           sample: d.Protein_Site,
           id_mult: d.id_mult,
           cpm: d.F === undefined ? d.t : d.F,
         };
       });
-      this.props.onHandleProteinSelected(selectedTableDataArray);
+      this.props.onHandleProteinSelected(shiftedTableDataArray);
       // console.log('shift');
       // document.addEventListener('onkeydown', event => {
       //   console.log('keydown');
@@ -399,6 +398,43 @@ class FilteredPepplotTable extends Component {
       // });
     } else if (event.ctrlKey) {
       console.log('control');
+      const allTableData = _.cloneDeep(this.state.filteredTableData);
+      let selectedTableDataArray = [];
+
+      const ctrlClickedObj = allTableData[index];
+      const alreadyHighlighted = PreviouslyHighlighted.some(
+        d => d.sample === ctrlClickedObj.Protein_Site,
+      );
+      // already highlighted, remove it from array
+      if (alreadyHighlighted) {
+        selectedTableDataArray = PreviouslyHighlighted.filter(
+          i => i.sample !== ctrlClickedObj.Protein_Site,
+        );
+        this.props.onHandleProteinSelected(selectedTableDataArray);
+      } else {
+        // not yet highlighted, add it to array
+        const indexMaxProtein = _.findIndex(allTableData, function(d) {
+          return d.Protein_Site === PreviouslyHighlighted[0]?.sample;
+        });
+        // map protein to fix obj entries
+        const mappedProtein = {
+          sample: ctrlClickedObj.Protein_Site,
+          id_mult: ctrlClickedObj.id_mult,
+          cpm:
+            ctrlClickedObj.F === undefined
+              ? ctrlClickedObj.t
+              : ctrlClickedObj.F,
+        };
+        const lowerIndexThanMax = index < indexMaxProtein ? true : false;
+        if (lowerIndexThanMax) {
+          // add to beginning of array if max
+          PreviouslyHighlighted.unshift(mappedProtein);
+        } else {
+          // just add to array if not max
+          PreviouslyHighlighted.push(mappedProtein);
+        }
+        this.props.onHandleProteinSelected(PreviouslyHighlighted);
+      }
     } else {
       console.log('click');
       this.props.onHandleProteinSelected([

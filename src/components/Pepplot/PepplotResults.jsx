@@ -41,7 +41,7 @@ class PepplotResults extends Component {
     },
     currentSVGs: [],
     isSVGDataLoaded: false,
-    isProteinSelected: false,
+    isItemSelected: false,
     isProteinSVGLoaded: false,
     itemsPerPageInformed: 100,
     pepplotRows: this.props.pepplotResults.length || 1000,
@@ -136,16 +136,16 @@ class PepplotResults extends Component {
     });
   };
 
-  handleProteinSelected = bool => {
+  handleItemSelected = bool => {
     this.setState({
-      isProteinSelected: bool,
+      isItemSelected: bool,
     });
   };
 
   getProteinData = (id, dataItem, getPlotCb, imageInfo) => {
     this.setState({
       imageInfo: imageInfo,
-      isProteinSelected: true,
+      isItemSelected: true,
       isProteinSVGLoaded: false,
       isProteinDataLoaded: false,
       treeDataRaw: [],
@@ -278,16 +278,11 @@ class PepplotResults extends Component {
     // } else {
     //   PepplotPlotSVGWidth = PepplotPlotSVGHeight * 1.41344;
     // }
-    let handleProteinSelectedCb = this.handleProteinSelected;
+    let handleItemSelectedCb = this.handleItemSelected;
 
     _.forEach(plotType, function(plot, i) {
       phosphoprotService
-        .getPlot(
-          id,
-          plotType[i],
-          pepplotStudy + 'plots',
-          handleProteinSelectedCb,
-        )
+        .getPlot(id, plotType[i], pepplotStudy + 'plots', handleItemSelectedCb)
         .then(svgMarkupObj => {
           let svgMarkup = svgMarkupObj.data;
           svgMarkup = svgMarkup.replace(/id="/g, 'id="' + id + '-' + i + '-');
@@ -415,7 +410,7 @@ class PepplotResults extends Component {
 
   backToTable = () => {
     this.setState({
-      isProteinSelected: false,
+      isItemSelected: false,
       isProteinDataLoaded: false,
       isProteinSVGLoaded: false,
     });
@@ -448,7 +443,7 @@ class PepplotResults extends Component {
     } = this.props;
 
     const {
-      isProteinSelected,
+      isItemSelected,
       isProteinSVGLoaded,
       pepplotRows,
       itemsPerPageInformed,
@@ -468,7 +463,7 @@ class PepplotResults extends Component {
       this.getPlot,
       proteinToHighlightInDiffTable,
     );
-    if (!isProteinSelected || proteinHighlightInProgress) {
+    if (!isItemSelected || proteinHighlightInProgress) {
       return (
         <div id="PepplotGrid">
           <EZGrid
@@ -492,7 +487,7 @@ class PepplotResults extends Component {
           />
         </div>
       );
-    } else if (isProteinSelected && !isProteinSVGLoaded) {
+    } else if (isItemSelected && !isProteinSVGLoaded) {
       return (
         <div>
           <LoaderActivePlots />
