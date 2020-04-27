@@ -63,8 +63,8 @@ class BarcodePlotReact extends Component {
       d3.selectAll(`.HighlightedLine`)
         .attr('y1', self.state.settings.margin.selected)
         .classed('HighlightedLine', false);
-      const HighlightedLines = self.props.HighlightedProteins.slice(1);
-      HighlightedLines.forEach(element => {
+      const HighlightedProteins = self.props.HighlightedProteins.slice(1);
+      HighlightedProteins.forEach(element => {
         const lineId = `${element.sample.replace(/;/g, '')}_${element.id_mult}`;
         const highlightedLine = d3.select(`#barcode-line-${lineId}`);
         highlightedLine

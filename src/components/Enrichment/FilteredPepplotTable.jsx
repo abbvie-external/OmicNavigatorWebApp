@@ -339,13 +339,13 @@ class FilteredPepplotTable extends Component {
 
   getTableHelpers = HighlightedProteins => {
     const MaxLine = this.props.HighlightedProteins[0];
-    // const HighlightedLines = this.props.HighlightedProteins.slice(1);
+    // const HighlightedProteins = this.props.HighlightedProteins.slice(1);
     let addParams = {};
     if (MaxLine !== {} && MaxLine != null) {
       addParams.rowHighlightMax = MaxLine.sample;
     }
-    // if (HighlightedLines !== []) {
-    //   HighlightedLines?.forEach(element => {
+    // if (HighlightedProteins !== []) {
+    //   HighlightedProteins?.forEach(element => {
     //     addParams.rowHightlightOther = element.lineId;
     //   });
     //}

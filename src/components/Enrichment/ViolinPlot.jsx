@@ -70,29 +70,42 @@ class ViolinPlot extends Component {
         this.renderDataPlots({ showPlot: true });
       }
     }
-    if (
-      this.props.HighlightedProteins[0]?.sample !==
-      prevProps.HighlightedProteins[0]?.sample
-    ) {
+    debugger;
+    if (this.props.HighlightedProteins !== prevProps.HighlightedProteins) {
+      this.isHovering = false;
+      // set all dots back to small, blue
+      const dOpts = this.chart.dataPlots.options;
+      d3.selectAll(`.vPoint`)
+        .transition()
+        .duration(300)
+        .attr('fill', 'var(--color-link)')
+        .attr('r', dOpts.pointSize * 1);
+      // separate max protein from the rest
+      const HighlightedProteins = this.props.HighlightedProteins.slice(1);
+      HighlightedProteins.forEach(element => {
+        const highlightedDotId = this.getCircleId(
+          element.sample,
+          element.id_mult,
+        );
+        d3.select(`#violin_${highlightedDotId}`)
+          .transition()
+          .duration(100)
+          .attr('fill', 'var(--color-primary-gradient)')
+          .attr('r', dOpts.pointSize * 1.5);
+      });
+      // if max protein exists, get id
       if (this.props.HighlightedProteins[0]?.sample !== '') {
-        this.isHovering = false;
-        const id = this.getCircleId(
+        const maxDotId = this.getCircleId(
           this.props.HighlightedProteins[0]?.sample,
           this.props.HighlightedProteins[0]?.id_mult,
         );
-        const dOpts = this.chart.dataPlots.options;
-        d3.selectAll(`.vPoint`)
-          .transition()
-          .duration(300)
-          .attr('fill', 'var(--color-link)')
-          .attr('r', dOpts.pointSize * 1);
-        d3.select(`#violin_${id}`)
+        d3.select(`#violin_${maxDotId}`)
           .transition()
           .duration(100)
           .attr('fill', 'var(--color-primary)')
           .attr('r', dOpts.pointSize * 2);
         // const d = this.chart.groupObjs[cName].values[pt];
-        this.maxCircle = id;
+        this.maxCircle = maxDotId;
         this.addToolTiptoMax(this.props.HighlightedProteins[0]);
       }
     }
@@ -194,12 +207,12 @@ class ViolinPlot extends Component {
     const self = this;
     const cx = Math.ceil(
       d3
-        .select(`#violin_${self.getCircleId(id.sample, id.id_mult)}`)
+        .select(`#violin_${self.getCircleId(id?.sample, id?.id_mult)}`)
         .attr('cx'),
     );
     const cy = Math.ceil(
       d3
-        .select(`#violin_${self.getCircleId(id.sample, id.id_mult)}`)
+        .select(`#violin_${self.getCircleId(id?.sample, id?.id_mult)}`)
         .attr('cy'),
     );
 
@@ -211,7 +224,7 @@ class ViolinPlot extends Component {
     parent = document.getElementById('violin-graph-1').getBoundingClientRect();
 
     const shape = document
-      .getElementById(`violin_${self.getCircleId(id.sample, id.id_mult)}`)
+      .getElementById(`violin_${self.getCircleId(id?.sample, id?.id_mult)}`)
       .getBoundingClientRect();
     const relative = shape.left - parent.left;
 
@@ -501,7 +514,8 @@ class ViolinPlot extends Component {
       .style('fill', '#000')
       .text(self.props.violinSettings.title);
 
-    const subtitle = self.chart.objs.g
+    //const subtitle =
+    self.chart.objs.g
       .append('g')
       .attr('class', 'subtitle')
       .append('text')
@@ -1136,7 +1150,7 @@ class ViolinPlot extends Component {
 
   renderDataPlots = options => {
     const self = this;
-    const id = '';
+    // const id = '';
     self.chart.dataPlots = {};
 
     // Defaults
@@ -1336,7 +1350,7 @@ class ViolinPlot extends Component {
                     ].replace(/\./g, '');
                     const idMult =
                       self.chart.groupObjs[cName].values[pt].id_mult;
-                    return `violin_${id.replace(/\;/g, '_')}_${idMult}`;
+                    return `violin_${id.replace(/;/g, '_')}_${idMult}`;
                   })
                   .attr('class', `point ${self.props.violinSettings.id} vPoint`)
                   .attr('stroke', 'black')
