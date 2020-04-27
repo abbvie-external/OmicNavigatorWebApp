@@ -11,7 +11,7 @@ import TransitionStill from '../Transitions/TransitionStill';
 import ButtonActions from '../Shared/ButtonActions';
 import { formatNumberForDisplay, splitValue } from '../Shared/helpers';
 import phosphosite_icon from '../../resources/phosphosite.ico';
-import PepplotVolcanoPlot from './PepplotVolcanoPlot';
+
 
 import _ from 'lodash';
 import './Pepplot.scss';
@@ -385,9 +385,6 @@ class Pepplot extends Component {
       </Menu.Item>),
       pane:(<Tab.Pane key="1">
         <div id="VolcanoPlot">
-          <PepplotVolcanoPlot
-            {...this.state}
-          />
         </div>
       </Tab.Pane>
     )

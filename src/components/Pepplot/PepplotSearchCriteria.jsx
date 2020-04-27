@@ -441,7 +441,7 @@ class PepplotSearchCriteria extends Component {
     this.setState(
       {
         [name]: uSelVP,
-        reloadPlot: true
+        reloadPlot: false
       },
       function() {
         this.updateQueryDataP();
