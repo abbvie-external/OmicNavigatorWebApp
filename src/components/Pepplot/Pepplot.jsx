@@ -327,73 +327,17 @@ class Pepplot extends Component {
       !this.state.showProteinPage &&
       !this.state.isSearching
     ) {
-      const TableAndPlotPanes = this.getTableAndPlotPanes();
       return (
-        <Tab
-        className="TableAndPlotContainer"
-        panes={TableAndPlotPanes}
-        onTabChange={this.handleTablePlotTabChange}
-        activeIndex={this.state.activeIndex}
-        renderActiveOnly={false}
-        menu={{
-          attached: true,
-          className: 'TableAndPlotMenuContainer'
-        }}
-      />
-      );
-    } else if (this.state.isSearching) {
-      return <TransitionActive />;
-    } else return <TransitionStill />;
-  };
-
-  getTableAndPlotPanes = () => {
-    return[{
-      menuItem:(<Menu.Item
-        key="0"
-        className="TableAndNPlotButtons TableButton"
-        name="Table"
-        color="orange"
-      >
-        <img
-          src={this.state.activeIndex === 0 ? tableIconSelected : tableIcon}
-          alt="Table Icon"
-          id="TableButton"
-        />
-      </Menu.Item>),
-      pane:(<Tab.Pane key="0">
         <PepplotResults
           {...this.state}
           {...this.props}
           onSearchCriteriaChange={this.handleSearchCriteriaChange}
           onHandlePlotAnimation={this.handlePlotAnimation}
         />
-      </Tab.Pane>)
-    },{
-      menuItem:(<Menu.Item
-        key="1"
-        className="TableAndPlotButtons PlotButton"
-        name="plot"
-        color="orange"
-      >
-        <img
-          src={
-            networkIcon
-          }
-          alt="Plot Icon"
-          id="PlotButton"
-        />
-      </Menu.Item>),
-      pane:(<Tab.Pane key="1">
-        <div id="VolcanoPlot">
-        </div>
-      </Tab.Pane>
-    )
-    }
-  ]
-  }
-  handleTablePlotTabChange = (e, { activeIndex }) => {
-    sessionStorage.setItem(`pepplotViewTab`, activeIndex);
-    this.setState({ activeIndex });
+      );
+    } else if (this.state.isSearching) {
+      return <TransitionActive />;
+    } else return <TransitionStill />;
   };
 
   render() {
