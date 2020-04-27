@@ -70,7 +70,6 @@ class ViolinPlot extends Component {
         this.renderDataPlots({ showPlot: true });
       }
     }
-    debugger;
     if (this.props.HighlightedProteins !== prevProps.HighlightedProteins) {
       this.isHovering = false;
       // set all dots back to small, blue
@@ -1453,7 +1452,7 @@ class ViolinPlot extends Component {
               const id = self.getCircleId(d.sample, d.id_mult);
               // self.dotClick.emit(d);
 
-              self.props.onHandleLineSelected([
+              self.props.onHandleProteinSelected([
                 {
                   sample: d.sample,
                   id_mult: d.id_mult,

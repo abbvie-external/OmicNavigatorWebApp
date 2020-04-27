@@ -791,7 +791,7 @@ class Enrichment extends Component {
     this.setState(emptyArr);
   };
 
-  handleLineSelected = toHighlightArray => {
+  handleProteinSelected = toHighlightArray => {
     const highestValueObject = toHighlightArray[0];
     const { enrichmentStudy, enrichmentModel } = this.props;
     if (this.state.barcodeSettings.barcodeData?.length > 0) {
@@ -1545,7 +1545,7 @@ class Enrichment extends Component {
             {...this.props}
             {...this.state}
             onBackToTable={this.backToTable}
-            onHandleLineSelected={this.handleLineSelected}
+            onHandleProteinSelected={this.handleProteinSelected}
             onHandleHighlightedLineReset={this.handleHighlightedLineReset}
             onHandleBarcodeChanges={this.handleBarcodeChanges}
           ></SplitPanesContainer>

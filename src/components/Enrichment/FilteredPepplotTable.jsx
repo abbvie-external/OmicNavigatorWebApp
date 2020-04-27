@@ -391,7 +391,7 @@ class FilteredPepplotTable extends Component {
           cpm: d.F === undefined ? d.t : d.F,
         };
       });
-      this.props.onHandleLineSelected(selectedTableDataArray);
+      this.props.onHandleProteinSelected(selectedTableDataArray);
       // console.log('shift');
       // document.addEventListener('onkeydown', event => {
       //   console.log('keydown');
@@ -401,7 +401,7 @@ class FilteredPepplotTable extends Component {
       console.log('control');
     } else {
       console.log('click');
-      this.props.onHandleLineSelected([
+      this.props.onHandleProteinSelected([
         {
           sample: item.Protein_Site, //lineID,
           id_mult: item.id_mult,

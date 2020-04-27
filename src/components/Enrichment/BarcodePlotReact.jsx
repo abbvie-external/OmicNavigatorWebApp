@@ -146,7 +146,7 @@ class BarcodePlotReact extends Component {
     this.props.onHandleBarcodeChanges({
       brushedData: [],
     });
-    this.props.onHandleLineSelected([]);
+    this.props.onHandleProteinSelected([]);
     this.setState({
       settings: {
         ...this.state.settings,
@@ -322,9 +322,9 @@ class BarcodePlotReact extends Component {
               cpm: m.statistic,
             };
           });
-          self.props.onHandleLineSelected(highlightedLineArray);
+          self.props.onHandleProteinSelected(highlightedLineArray);
         } else {
-          self.props.onHandleLineSelected([]);
+          self.props.onHandleProteinSelected([]);
           self.setState({
             tooltipPosition: null,
             tooltipTextAnchor: null,
