@@ -795,56 +795,63 @@ class Enrichment extends Component {
     const highestValueObject = toHighlightArray[0];
     const { enrichmentStudy, enrichmentModel } = this.props;
     if (this.state.barcodeSettings.barcodeData?.length > 0) {
-      // if (toHighlightArray.length > 0) {
-      this.setState({
-        HighlightedProteins: toHighlightArray,
-      });
-      if (
-        highestValueObject?.sample !==
-          this.state.HighlightedProteins[0]?.sample ||
-        this.state.SVGPlotLoaded === false
-      ) {
+      if (toHighlightArray.length > 0) {
+        this.setState({
+          HighlightedProteins: toHighlightArray,
+        });
+        if (
+          highestValueObject?.sample !==
+            this.state.HighlightedProteins[0]?.sample ||
+          this.state.SVGPlotLoaded === false
+        ) {
+          this.setState({
+            SVGPlotLoaded: false,
+            SVGPlotLoading: true,
+          });
+          const dataItem = this.state.barcodeSettings.barcodeData.find(
+            i => i.lineID === highestValueObject?.sample,
+          );
+          let id = dataItem?.id_mult ? dataItem?.id_mult : dataItem?.id;
+          let plotType = ['splineplot'];
+          switch (enrichmentModel) {
+            case 'DonorDifferentialPhosphorylation':
+              plotType = ['dotplot'];
+              break;
+            case 'Treatment and or Strain Differential Phosphorylation':
+              plotType = ['StrainStimDotplot', 'StimStrainDotplot'];
+              break;
+            case 'Timecourse Differential Phosphorylation':
+              plotType = ['lineplot', 'splineplot'];
+              break;
+            case 'Differential Expression':
+              plotType = ['proteindotplot'];
+              break;
+            case 'Differential Phosphorylation':
+              plotType = ['phosphodotplot'];
+              break;
+            case 'No Pretreatment Timecourse Differential Phosphorylation':
+              plotType = ['lineplot.modelII', 'splineplot.modelII'];
+              break;
+            case 'Ferrostatin Pretreatment Timecourse Differential Phosphorylation':
+              plotType = ['lineplot.modelIII', 'splineplot.modelIII'];
+              break;
+            default:
+              plotType = ['dotplot'];
+          }
+          let imageInfo = { key: '', title: '', svg: [] };
+          imageInfo.title = this.state.imageInfo.title;
+          imageInfo.key = this.state.imageInfo.key;
+          const handleSVGCb = this.handleSVG;
+          this.getPlot(id, plotType, enrichmentStudy, imageInfo, handleSVGCb);
+        }
+      } else {
+        // empty protein array
         this.setState({
           SVGPlotLoaded: false,
-          SVGPlotLoading: true,
+          SVGPlotLoading: false,
+          HighlightedProteins: [],
         });
-        const dataItem = this.state.barcodeSettings.barcodeData.find(
-          i => i.lineID === highestValueObject?.sample,
-        );
-        let id = dataItem?.id_mult ? dataItem?.id_mult : dataItem?.id;
-        let plotType = ['splineplot'];
-        switch (enrichmentModel) {
-          case 'DonorDifferentialPhosphorylation':
-            plotType = ['dotplot'];
-            break;
-          case 'Treatment and or Strain Differential Phosphorylation':
-            plotType = ['StrainStimDotplot', 'StimStrainDotplot'];
-            break;
-          case 'Timecourse Differential Phosphorylation':
-            plotType = ['lineplot', 'splineplot'];
-            break;
-          case 'Differential Expression':
-            plotType = ['proteindotplot'];
-            break;
-          case 'Differential Phosphorylation':
-            plotType = ['phosphodotplot'];
-            break;
-          case 'No Pretreatment Timecourse Differential Phosphorylation':
-            plotType = ['lineplot.modelII', 'splineplot.modelII'];
-            break;
-          case 'Ferrostatin Pretreatment Timecourse Differential Phosphorylation':
-            plotType = ['lineplot.modelIII', 'splineplot.modelIII'];
-            break;
-          default:
-            plotType = ['dotplot'];
-        }
-        let imageInfo = { key: '', title: '', svg: [] };
-        imageInfo.title = this.state.imageInfo.title;
-        imageInfo.key = this.state.imageInfo.key;
-        const handleSVGCb = this.handleSVG;
-        this.getPlot(id, plotType, enrichmentStudy, imageInfo, handleSVGCb);
       }
-      // }
     } else {
       plotCancel();
       this.setState({
