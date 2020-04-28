@@ -681,7 +681,7 @@ class EnrichmentResultsGraph extends Component {
             >
               <Menu
                 id="NetworkGraphSortByMenu"
-                // className={networkGraphReady ? 'Show' : 'Hide'}
+                // className={networkGraphReady ? 'ShowInlineBlock' : 'Hide'}
                 // secondary
                 size={dynamicSize}
               >
@@ -745,7 +745,7 @@ class EnrichmentResultsGraph extends Component {
                     labelPosition="left"
                     // color="blue"
                     id="LegendIconButton"
-                    className={networkGraphReady ? 'Show' : 'Hide'}
+                    className={networkGraphReady ? 'ShowInlineBlock' : 'Hide'}
                     size="mini"
                   >
                     Legend
@@ -761,7 +761,7 @@ class EnrichmentResultsGraph extends Component {
                 onClose={this.props.onHandleLegendClose}
                 onOpen={this.props.onHandleLegendOpen}
                 // className={(activeIndexEnrichmentView === 1
-                //   && networkGraphReady) ? 'Show' : 'Hide'}
+                //   && networkGraphReady) ? 'ShowInlineBlock' : 'Hide'}
               >
                 <Popup.Content className="legend"></Popup.Content>
               </Popup>
@@ -775,7 +775,9 @@ class EnrichmentResultsGraph extends Component {
               widescreen={8}
             >
               <div
-                className={networkGraphReady ? 'Show NodeEdgeTotals' : 'Hide'}
+                className={
+                  networkGraphReady ? 'ShowInlineBlock NodeEdgeTotals' : 'Hide'
+                }
               >
                 <Popup
                   trigger={
