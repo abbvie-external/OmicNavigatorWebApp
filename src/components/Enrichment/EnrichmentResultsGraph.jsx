@@ -419,7 +419,7 @@ class EnrichmentResultsGraph extends Component {
         <StyledThumb {...props}>
           <span className="ValueNowNode">
             {/* {state.valueNow >= 1 ? state.valueNow / 100 : 0.01} */}
-            {state.valueNow / 100}
+            {(state.valueNow / 100).toFixed(3)}
           </span>
         </StyledThumb>
       );
@@ -528,11 +528,11 @@ class EnrichmentResultsGraph extends Component {
                   value={nodeCutoffLocal}
                   onChange={this.handleNodeCutoffInputChangeLocal}
                   disabled={!networkGraphReady}
-                  precision={2}
+                  precision={3}
                   size={dynamicSize}
-                  step={0.01}
+                  step={0.005}
                   min={0.0}
-                  max={0.99}
+                  max={1}
                   id="NetworkSliderNodeInput"
                   className="NetworkSliderInput"
                 />
@@ -551,6 +551,9 @@ class EnrichmentResultsGraph extends Component {
                   name="nodeCutoffSlider"
                   // min={0}
                   // max={100}
+                  min={0.0}
+                  step={0.1}
+                  max={100}
                   onSliderClick={this.handleNodeSliderChange}
                   onAfterChange={this.handleNodeSliderChange}
                   // snapDragDisabled={true}
