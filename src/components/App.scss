@@ -1,6 +1,8 @@
 :root {
-  --color-primary: #ff4400;
-  --color-primary-gradient: #ff7e38;
+  // --color-primary: #ff4400;
+  --color-primary: rgba(255, 68, 0, 1);
+  // --color-primary-gradient: #ff7e38;
+  --color-primary-gradient: rgba(255, 126, 5, 1);
   --color-secondary: #2c3b78;
   --color-secondary-gradient: #465fc5;
   // --color-tertiary: #4cd2d5;
@@ -133,6 +135,15 @@
 
   .ui.visible[class*='very wide'].left.sidebar ~ .pusher {
     transform: translate3d(105%, 0, 0) !important;
+  }
+
+  .NoSelect {
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Old versions of Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently supported by Chrome, Opera and Firefox */
   }
 }
 
