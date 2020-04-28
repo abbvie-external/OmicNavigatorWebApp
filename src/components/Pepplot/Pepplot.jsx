@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
-import { Grid, Popup, Sidebar } from 'semantic-ui-react';
+import { Grid, Menu, Popup, Sidebar, Tab } from 'semantic-ui-react';
 import { withRouter } from 'react-router-dom';
 import PepplotSearchCriteria from './PepplotSearchCriteria';
+import networkIcon from '../../resources/networkIcon.png';
+import tableIcon from '../../resources/tableIcon.png';
+import tableIconSelected from '../../resources/tableIconSelected.png';
 import PepplotResults from './PepplotResults';
 import TransitionActive from '../Transitions/TransitionActive';
 import TransitionStill from '../Transitions/TransitionStill';
@@ -9,11 +12,14 @@ import ButtonActions from '../Shared/ButtonActions';
 import { formatNumberForDisplay, splitValue } from '../Shared/helpers';
 import phosphosite_icon from '../../resources/phosphosite.ico';
 
+
 import _ from 'lodash';
 import './Pepplot.scss';
 import '../Shared/Table.scss';
 
 class Pepplot extends Component {
+  defaultActiveIndex =
+    parseInt(sessionStorage.getItem('pepplotViewTab'), 10) || 0;
   state = {
     isValidSearchPepplot: false,
     isSearching: false,
@@ -35,7 +41,8 @@ class Pepplot extends Component {
     pdfVisible: false,
     svgVisible: true,
     multisetQueried: false,
-    thresholdColsP: [],
+    activeIndex: this.defaultActiveIndex || 0,
+    thresholdColsP: []
   };
 
   componentDidUpdate = (prevProps, prevState) => {};

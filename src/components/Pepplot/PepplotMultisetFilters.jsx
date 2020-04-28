@@ -112,7 +112,7 @@ class PepplotMultisetFilters extends Component {
             `${selectedColP[i].text} less than ${sigValueP[i]} in:`
           );
           notSetDescP.push(
-            `${selectedColP[i].text} less than ${sigValueP[i]} not in:`
+            `${selectedColP[i].text} not less than ${sigValueP[i]} in:`
           );
           break;
         case '>':
@@ -120,7 +120,7 @@ class PepplotMultisetFilters extends Component {
             `${selectedColP[i].text} greater than ${sigValueP[i]} in:`
           );
           notSetDescP.push(
-            `${selectedColP[i].text} greater than ${sigValueP[i]} not in:`
+            `${selectedColP[i].text} not greater than ${sigValueP[i]} in:`
           );
           break;
         case '|<|':
@@ -128,7 +128,7 @@ class PepplotMultisetFilters extends Component {
             `${selectedColP[i].text} absolute value less than ${sigValueP[i]} in:`
           );
           notSetDescP.push(
-            `${selectedColP[i].text} absolute value less than ${sigValueP[i]} not in:`
+            `${selectedColP[i].text} absolute value not less than ${sigValueP[i]} in:`
           );
           break;
         case '|>|':
@@ -136,7 +136,7 @@ class PepplotMultisetFilters extends Component {
             `${selectedColP[i].text} absolute value greater than ${sigValueP[i]} in:`
           );
           notSetDescP.push(
-            `${selectedColP[i].text} absolute value greater than ${sigValueP[i]} not in:`
+            `${selectedColP[i].text} absolute value not greater than ${sigValueP[i]} in:`
           );
           break;
         default:
