@@ -366,6 +366,7 @@ class EnrichmentResultsGraph extends Component {
   };
 
   handleEdgeSliderChange = value => {
+    debugger;
     let decimalValue = value >= 5 ? value / 100 : 0.05;
     this.setState({
       edgeCutoffLocal: decimalValue,
@@ -409,9 +410,9 @@ class EnrichmentResultsGraph extends Component {
 
       const NodeThumb = (props, state) => (
         <StyledThumb {...props}>
-          {/* <span className="ValueNowNode">
+          <span className="ValueNowNode">
             {state.valueNow >= 1 ? state.valueNow / 100 : 0.01}
-          </span> */}
+          </span>
         </StyledThumb>
       );
       const NodeTrack = (props, state) => (
@@ -420,9 +421,9 @@ class EnrichmentResultsGraph extends Component {
 
       const EdgeThumb = (props, state) => (
         <StyledThumb {...props}>
-          {/* <span className="ValueNowEdge">
+          <span className="ValueNowEdge">
             {state.valueNow >= 5 ? state.valueNow / 100 : 0.05}
-          </span> */}
+          </span>
         </StyledThumb>
       );
       const EdgeTrack = (props, state) => (
@@ -529,6 +530,10 @@ class EnrichmentResultsGraph extends Component {
                   defaultValue={0.1}
                   id="NetworkSliderNodeInput"
                   className="NetworkSliderInput"
+                  allowEmptyValue={true}
+                  allowMouseWheel={true}
+                  // showError={true}
+                  showTooltips={true}
                 />
               </div>
               {/* <Input
@@ -559,7 +564,8 @@ class EnrichmentResultsGraph extends Component {
                   }
                   value={nodeCutoffLocal * 100}
                   name="nodeCutoffSlider"
-                  onChange={this.handleNodeSliderChange}
+                  onSliderClick={this.handleNodeSliderChange}
+                  onAfterChange={this.handleNodeSliderChange}
                 />
                 {/* <Slider
                   disabled={!networkGraphReady}
@@ -650,7 +656,8 @@ class EnrichmentResultsGraph extends Component {
                   }
                   value={edgeCutoffLocal * 100}
                   name="edgeCutoffSlider"
-                  onChange={this.handleEdgeSliderChange}
+                  onSliderClick={this.handleEdgeSliderChange}
+                  onAfterChange={this.handleEdgeSliderChange}
                 />
                 {/* <Slider
                   disabled={!networkGraphReady}
