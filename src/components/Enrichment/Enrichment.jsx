@@ -1696,20 +1696,6 @@ class Enrichment extends Component {
     });
   };
 
-  // handleInputChange = _.debounce((evt, { name, value }) => {
-  //   this.setState({
-  //     [name]: value
-  //   });
-  // }, 500);
-
-  // handleNetworkCutoffInputChange = _.debounce((evt, { name, value }) => {
-  //   this.removeNetworkSVG();
-  //   this.setState({
-  //     [name]: value
-  //     // networkGraphReady: false
-  //   });
-  // }, 500);
-
   handleNodeCutoffInputChange = _.debounce(value => {
     this.removeNetworkSVG();
     this.setState({
@@ -1726,43 +1712,20 @@ class Enrichment extends Component {
     sessionStorage.setItem('edgeCutoff', value);
   }, 500);
 
-  // handleNetworkCutoffInputChange = (evt, { name, value }) => {
-  //   this.removeNetworkSVG();
-  //   this.setState({
-  //     [name]: value,
-  //     // networkGraphReady: false
-  //   });
-  // };
-
-  // handleSliderChange = _.debounce((type, value) => {
-  //   if (this.state[type] !== value) {
-  //     this.removeNetworkSVG();
-  //     this.setState({ [type]: value });
-  //   }
-  //   sessionStorage.setItem(type, value);
-  // }, 500);
-
   handleNodeSliderChange = _.debounce(value => {
-    if (this.state.nodeCutoff !== value) {
-      this.removeNetworkSVG();
-      this.setState({ nodeCutoff: value });
-    }
+    debugger;
+    // if (this.state.nodeCutoff !== value) {
+    this.removeNetworkSVG();
+    this.setState({ nodeCutoff: value });
+    // }
     sessionStorage.setItem('nodeCutoff', value);
   }, 500);
-  // handleNodeSliderChange = value => {
-  //   let decimalValue = value / 100;
-  //   if (this.state.nodeCutoff !== decimalValue) {
-  //     this.removeNetworkSVG();
-  //     this.setState({ nodeCutoff: decimalValue });
-  //   }
-  //   sessionStorage.setItem('nodeCutoff', decimalValue);
-  // };
 
   handleEdgeSliderChange = _.debounce(value => {
-    if (this.state.edgeCutoff !== value) {
-      this.removeNetworkSVG();
-      this.setState({ edgeCutoff: value });
-    }
+    // if (this.state.edgeCutoff !== value) {
+    this.removeNetworkSVG();
+    this.setState({ edgeCutoff: value });
+    // }
     sessionStorage.setItem('edgeCutoff', value);
   }, 500);
 
