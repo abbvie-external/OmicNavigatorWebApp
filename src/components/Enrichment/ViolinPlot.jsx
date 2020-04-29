@@ -324,6 +324,7 @@ class ViolinPlot extends Component {
         [0, 0],
         [self.state.violinContainerWidth, self.state.violinContainerHeight],
       ])
+      .on('start', e => this.unhighlightPoint([], true, self))
       .on('brush', highlightBrushedCircles)
       .on('end', function() {});
     self.chart.objs.g.call(self.chart.objs.brush);
@@ -332,7 +333,7 @@ class ViolinPlot extends Component {
   //   self.chart.objs.g.call(self.chart.objs.brush.move, null);
   // }
 
-  unhighlightPoint(unselectedArray, clearAll = false, self) {
+  unhighlightPoint = (unselectedArray, clearAll, self) => {
     if (clearAll) {
       const allPoints = d3.selectAll(
         '.' + self.props.violinSettings.id + '.vPoint',
@@ -356,7 +357,8 @@ class ViolinPlot extends Component {
         .attr('stroke', 'black')
         .attr('fill', 'var(--color-link)');
     });
-  }
+    this.props.onHandleProteinSelected([]);
+  };
 
   tooltipHover = d => {
     const self = this;

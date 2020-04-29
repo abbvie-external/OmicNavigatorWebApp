@@ -792,6 +792,8 @@ class Enrichment extends Component {
   };
 
   handleProteinSelected = toHighlightArray => {
+    debugger;
+    const prevHighestValueObject = this.state.HighlightedProteins[0]?.sample;
     const highestValueObject = toHighlightArray[0];
     const { enrichmentStudy, enrichmentModel } = this.props;
     if (this.state.barcodeSettings.barcodeData?.length > 0) {
@@ -800,8 +802,7 @@ class Enrichment extends Component {
         HighlightedProteins: toHighlightArray,
       });
       if (
-        highestValueObject?.sample !==
-          this.state.HighlightedProteins[0]?.sample ||
+        highestValueObject?.sample !== prevHighestValueObject ||
         this.state.SVGPlotLoaded === false
       ) {
         this.setState({
