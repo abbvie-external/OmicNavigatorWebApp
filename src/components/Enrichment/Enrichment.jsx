@@ -806,46 +806,61 @@ class Enrichment extends Component {
         this.state.SVGPlotLoaded === false
       ) {
         this.setState({
-          SVGPlotLoaded: false,
-          SVGPlotLoading: true,
+          HighlightedProteins: toHighlightArray,
         });
-        const dataItem = this.state.barcodeSettings.barcodeData.find(
-          i => i.lineID === highestValueObject?.sample,
-        );
-        let id = dataItem?.id_mult ? dataItem?.id_mult : dataItem?.id;
-        let plotType = ['splineplot'];
-        switch (enrichmentModel) {
-          case 'DonorDifferentialPhosphorylation':
-            plotType = ['dotplot'];
-            break;
-          case 'Treatment and or Strain Differential Phosphorylation':
-            plotType = ['StrainStimDotplot', 'StimStrainDotplot'];
-            break;
-          case 'Timecourse Differential Phosphorylation':
-            plotType = ['lineplot', 'splineplot'];
-            break;
-          case 'Differential Expression':
-            plotType = ['proteindotplot'];
-            break;
-          case 'Differential Phosphorylation':
-            plotType = ['phosphodotplot'];
-            break;
-          case 'No Pretreatment Timecourse Differential Phosphorylation':
-            plotType = ['lineplot.modelII', 'splineplot.modelII'];
-            break;
-          case 'Ferrostatin Pretreatment Timecourse Differential Phosphorylation':
-            plotType = ['lineplot.modelIII', 'splineplot.modelIII'];
-            break;
-          default:
-            plotType = ['dotplot'];
+        if (
+          highestValueObject?.sample !==
+            this.state.HighlightedProteins[0]?.sample ||
+          this.state.SVGPlotLoaded === false
+        ) {
+          this.setState({
+            SVGPlotLoaded: false,
+            SVGPlotLoading: true,
+          });
+          const dataItem = this.state.barcodeSettings.barcodeData.find(
+            i => i.lineID === highestValueObject?.sample,
+          );
+          let id = dataItem?.id_mult ? dataItem?.id_mult : dataItem?.id;
+          let plotType = ['splineplot'];
+          switch (enrichmentModel) {
+            case 'DonorDifferentialPhosphorylation':
+              plotType = ['dotplot'];
+              break;
+            case 'Treatment and or Strain Differential Phosphorylation':
+              plotType = ['StrainStimDotplot', 'StimStrainDotplot'];
+              break;
+            case 'Timecourse Differential Phosphorylation':
+              plotType = ['lineplot', 'splineplot'];
+              break;
+            case 'Differential Expression':
+              plotType = ['proteindotplot'];
+              break;
+            case 'Differential Phosphorylation':
+              plotType = ['phosphodotplot'];
+              break;
+            case 'No Pretreatment Timecourse Differential Phosphorylation':
+              plotType = ['lineplot.modelII', 'splineplot.modelII'];
+              break;
+            case 'Ferrostatin Pretreatment Timecourse Differential Phosphorylation':
+              plotType = ['lineplot.modelIII', 'splineplot.modelIII'];
+              break;
+            default:
+              plotType = ['dotplot'];
+          }
+          let imageInfo = { key: '', title: '', svg: [] };
+          imageInfo.title = this.state.imageInfo.title;
+          imageInfo.key = this.state.imageInfo.key;
+          const handleSVGCb = this.handleSVG;
+          this.getPlot(id, plotType, enrichmentStudy, imageInfo, handleSVGCb);
         }
-        let imageInfo = { key: '', title: '', svg: [] };
-        imageInfo.title = this.state.imageInfo.title;
-        imageInfo.key = this.state.imageInfo.key;
-        const handleSVGCb = this.handleSVG;
-        this.getPlot(id, plotType, enrichmentStudy, imageInfo, handleSVGCb);
+      } else {
+        // empty protein array
+        this.setState({
+          SVGPlotLoaded: false,
+          SVGPlotLoading: false,
+          HighlightedProteins: [],
+        });
       }
-      // }
     } else {
       plotCancel();
       this.setState({
@@ -1690,20 +1705,6 @@ class Enrichment extends Component {
     });
   };
 
-  // handleInputChange = _.debounce((evt, { name, value }) => {
-  //   this.setState({
-  //     [name]: value
-  //   });
-  // }, 500);
-
-  // handleNetworkCutoffInputChange = _.debounce((evt, { name, value }) => {
-  //   this.removeNetworkSVG();
-  //   this.setState({
-  //     [name]: value
-  //     // networkGraphReady: false
-  //   });
-  // }, 500);
-
   handleNodeCutoffInputChange = _.debounce(value => {
     this.removeNetworkSVG();
     this.setState({
@@ -1720,43 +1721,20 @@ class Enrichment extends Component {
     sessionStorage.setItem('edgeCutoff', value);
   }, 500);
 
-  // handleNetworkCutoffInputChange = (evt, { name, value }) => {
-  //   this.removeNetworkSVG();
-  //   this.setState({
-  //     [name]: value,
-  //     // networkGraphReady: false
-  //   });
-  // };
-
-  // handleSliderChange = _.debounce((type, value) => {
-  //   if (this.state[type] !== value) {
-  //     this.removeNetworkSVG();
-  //     this.setState({ [type]: value });
-  //   }
-  //   sessionStorage.setItem(type, value);
-  // }, 500);
-
   handleNodeSliderChange = _.debounce(value => {
-    if (this.state.nodeCutoff !== value) {
-      this.removeNetworkSVG();
-      this.setState({ nodeCutoff: value });
-    }
+    debugger;
+    // if (this.state.nodeCutoff !== value) {
+    this.removeNetworkSVG();
+    this.setState({ nodeCutoff: value });
+    // }
     sessionStorage.setItem('nodeCutoff', value);
   }, 500);
-  // handleNodeSliderChange = value => {
-  //   let decimalValue = value / 100;
-  //   if (this.state.nodeCutoff !== decimalValue) {
-  //     this.removeNetworkSVG();
-  //     this.setState({ nodeCutoff: decimalValue });
-  //   }
-  //   sessionStorage.setItem('nodeCutoff', decimalValue);
-  // };
 
   handleEdgeSliderChange = _.debounce(value => {
-    if (this.state.edgeCutoff !== value) {
-      this.removeNetworkSVG();
-      this.setState({ edgeCutoff: value });
-    }
+    // if (this.state.edgeCutoff !== value) {
+    this.removeNetworkSVG();
+    this.setState({ edgeCutoff: value });
+    // }
     sessionStorage.setItem('edgeCutoff', value);
   }, 500);
 
