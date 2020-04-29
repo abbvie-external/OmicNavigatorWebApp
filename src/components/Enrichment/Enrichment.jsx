@@ -792,12 +792,13 @@ class Enrichment extends Component {
   };
 
   handleProteinSelected = toHighlightArray => {
-    debugger;
     const prevHighestValueObject = this.state.HighlightedProteins[0]?.sample;
     const highestValueObject = toHighlightArray[0];
     const { enrichmentStudy, enrichmentModel } = this.props;
-    if (this.state.barcodeSettings.barcodeData?.length > 0) {
-      // if (toHighlightArray.length > 0) {
+    if (
+      this.state.barcodeSettings.barcodeData?.length > 0 &&
+      toHighlightArray.length > 0
+    ) {
       this.setState({
         HighlightedProteins: toHighlightArray,
       });
@@ -806,60 +807,44 @@ class Enrichment extends Component {
         this.state.SVGPlotLoaded === false
       ) {
         this.setState({
-          HighlightedProteins: toHighlightArray,
-        });
-        if (
-          highestValueObject?.sample !==
-            this.state.HighlightedProteins[0]?.sample ||
-          this.state.SVGPlotLoaded === false
-        ) {
-          this.setState({
-            SVGPlotLoaded: false,
-            SVGPlotLoading: true,
-          });
-          const dataItem = this.state.barcodeSettings.barcodeData.find(
-            i => i.lineID === highestValueObject?.sample,
-          );
-          let id = dataItem?.id_mult ? dataItem?.id_mult : dataItem?.id;
-          let plotType = ['splineplot'];
-          switch (enrichmentModel) {
-            case 'DonorDifferentialPhosphorylation':
-              plotType = ['dotplot'];
-              break;
-            case 'Treatment and or Strain Differential Phosphorylation':
-              plotType = ['StrainStimDotplot', 'StimStrainDotplot'];
-              break;
-            case 'Timecourse Differential Phosphorylation':
-              plotType = ['lineplot', 'splineplot'];
-              break;
-            case 'Differential Expression':
-              plotType = ['proteindotplot'];
-              break;
-            case 'Differential Phosphorylation':
-              plotType = ['phosphodotplot'];
-              break;
-            case 'No Pretreatment Timecourse Differential Phosphorylation':
-              plotType = ['lineplot.modelII', 'splineplot.modelII'];
-              break;
-            case 'Ferrostatin Pretreatment Timecourse Differential Phosphorylation':
-              plotType = ['lineplot.modelIII', 'splineplot.modelIII'];
-              break;
-            default:
-              plotType = ['dotplot'];
-          }
-          let imageInfo = { key: '', title: '', svg: [] };
-          imageInfo.title = this.state.imageInfo.title;
-          imageInfo.key = this.state.imageInfo.key;
-          const handleSVGCb = this.handleSVG;
-          this.getPlot(id, plotType, enrichmentStudy, imageInfo, handleSVGCb);
-        }
-      } else {
-        // empty protein array
-        this.setState({
           SVGPlotLoaded: false,
-          SVGPlotLoading: false,
-          HighlightedProteins: [],
+          SVGPlotLoading: true,
         });
+        const dataItem = this.state.barcodeSettings.barcodeData.find(
+          i => i.lineID === highestValueObject?.sample,
+        );
+        let id = dataItem?.id_mult ? dataItem?.id_mult : dataItem?.id;
+        let plotType = ['splineplot'];
+        switch (enrichmentModel) {
+          case 'DonorDifferentialPhosphorylation':
+            plotType = ['dotplot'];
+            break;
+          case 'Treatment and or Strain Differential Phosphorylation':
+            plotType = ['StrainStimDotplot', 'StimStrainDotplot'];
+            break;
+          case 'Timecourse Differential Phosphorylation':
+            plotType = ['lineplot', 'splineplot'];
+            break;
+          case 'Differential Expression':
+            plotType = ['proteindotplot'];
+            break;
+          case 'Differential Phosphorylation':
+            plotType = ['phosphodotplot'];
+            break;
+          case 'No Pretreatment Timecourse Differential Phosphorylation':
+            plotType = ['lineplot.modelII', 'splineplot.modelII'];
+            break;
+          case 'Ferrostatin Pretreatment Timecourse Differential Phosphorylation':
+            plotType = ['lineplot.modelIII', 'splineplot.modelIII'];
+            break;
+          default:
+            plotType = ['dotplot'];
+        }
+        let imageInfo = { key: '', title: '', svg: [] };
+        imageInfo.title = this.state.imageInfo.title;
+        imageInfo.key = this.state.imageInfo.key;
+        const handleSVGCb = this.handleSVG;
+        this.getPlot(id, plotType, enrichmentStudy, imageInfo, handleSVGCb);
       }
     } else {
       plotCancel();
@@ -927,15 +912,13 @@ class Enrichment extends Component {
           let svgInfo = { plotType: plotType[i], svg: sanitizedSVG };
 
           // we want spline plot in zero index, rather than lineplot
-          if (i === 0) {
-            imageInfo.svg.push(svgInfo);
-            currentSVGs.push(sanitizedSVG);
-          } else {
-            // splice(position, numberOfItemsToRemove, item)
-            // imageInfo.svg.u
-            imageInfo.svg.unshift(svgInfo);
-            currentSVGs.unshift(sanitizedSVG);
-          }
+          // if (i === 0) {
+          imageInfo.svg.push(svgInfo);
+          currentSVGs.push(sanitizedSVG);
+          // } else {
+          //   imageInfo.svg.unshift(svgInfo);
+          //   currentSVGs.unshift(sanitizedSVG);
+          // }
           handleSVGCb(imageInfo);
         });
     });
@@ -1705,6 +1688,20 @@ class Enrichment extends Component {
     });
   };
 
+  // handleInputChange = _.debounce((evt, { name, value }) => {
+  //   this.setState({
+  //     [name]: value
+  //   });
+  // }, 500);
+
+  // handleNetworkCutoffInputChange = _.debounce((evt, { name, value }) => {
+  //   this.removeNetworkSVG();
+  //   this.setState({
+  //     [name]: value
+  //     // networkGraphReady: false
+  //   });
+  // }, 500);
+
   handleNodeCutoffInputChange = _.debounce(value => {
     this.removeNetworkSVG();
     this.setState({
@@ -1721,20 +1718,43 @@ class Enrichment extends Component {
     sessionStorage.setItem('edgeCutoff', value);
   }, 500);
 
+  // handleNetworkCutoffInputChange = (evt, { name, value }) => {
+  //   this.removeNetworkSVG();
+  //   this.setState({
+  //     [name]: value,
+  //     // networkGraphReady: false
+  //   });
+  // };
+
+  // handleSliderChange = _.debounce((type, value) => {
+  //   if (this.state[type] !== value) {
+  //     this.removeNetworkSVG();
+  //     this.setState({ [type]: value });
+  //   }
+  //   sessionStorage.setItem(type, value);
+  // }, 500);
+
   handleNodeSliderChange = _.debounce(value => {
-    debugger;
-    // if (this.state.nodeCutoff !== value) {
-    this.removeNetworkSVG();
-    this.setState({ nodeCutoff: value });
-    // }
+    if (this.state.nodeCutoff !== value) {
+      this.removeNetworkSVG();
+      this.setState({ nodeCutoff: value });
+    }
     sessionStorage.setItem('nodeCutoff', value);
   }, 500);
+  // handleNodeSliderChange = value => {
+  //   let decimalValue = value / 100;
+  //   if (this.state.nodeCutoff !== decimalValue) {
+  //     this.removeNetworkSVG();
+  //     this.setState({ nodeCutoff: decimalValue });
+  //   }
+  //   sessionStorage.setItem('nodeCutoff', decimalValue);
+  // };
 
   handleEdgeSliderChange = _.debounce(value => {
-    // if (this.state.edgeCutoff !== value) {
-    this.removeNetworkSVG();
-    this.setState({ edgeCutoff: value });
-    // }
+    if (this.state.edgeCutoff !== value) {
+      this.removeNetworkSVG();
+      this.setState({ edgeCutoff: value });
+    }
     sessionStorage.setItem('edgeCutoff', value);
   }, 500);
 

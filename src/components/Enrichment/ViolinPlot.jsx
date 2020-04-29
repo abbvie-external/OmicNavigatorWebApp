@@ -81,33 +81,35 @@ class ViolinPlot extends Component {
         .duration(300)
         .attr('fill', 'var(--color-link)')
         .attr('r', dOpts.pointSize * 1);
-      // separate max protein from the rest
-      const HighlightedProteins = this.props.HighlightedProteins.slice(1);
-      HighlightedProteins.forEach(element => {
-        const highlightedDotId = this.getCircleId(
-          element.sample,
-          element.id_mult,
-        );
-        d3.select(`#violin_${highlightedDotId}`)
-          .transition()
-          .duration(100)
-          .attr('fill', 'var(--color-primary-gradient)')
-          .attr('r', dOpts.pointSize * 1.5);
-      });
-      // if max protein exists, get id
-      if (this.props.HighlightedProteins[0]?.sample !== '') {
-        const maxDotId = this.getCircleId(
-          this.props.HighlightedProteins[0]?.sample,
-          this.props.HighlightedProteins[0]?.id_mult,
-        );
-        d3.select(`#violin_${maxDotId}`)
-          .transition()
-          .duration(100)
-          .attr('fill', 'var(--color-primary)')
-          .attr('r', dOpts.pointSize * 2);
-        // const d = this.chart.groupObjs[cName].values[pt];
-        this.maxCircle = maxDotId;
-        this.addToolTiptoMax(this.props.HighlightedProteins[0]);
+      if (this.props.HighlightedProteins.length > 0) {
+        // separate max protein from the rest
+        const HighlightedProteins = this.props.HighlightedProteins.slice(1);
+        HighlightedProteins.forEach(element => {
+          const highlightedDotId = this.getCircleId(
+            element.sample,
+            element.id_mult,
+          );
+          d3.select(`#violin_${highlightedDotId}`)
+            .transition()
+            .duration(100)
+            .attr('fill', 'var(--color-primary-gradient)')
+            .attr('r', dOpts.pointSize * 1.5);
+        });
+        // if max protein exists, get id
+        if (this.props.HighlightedProteins[0]?.sample !== '') {
+          const maxDotId = this.getCircleId(
+            this.props.HighlightedProteins[0]?.sample,
+            this.props.HighlightedProteins[0]?.id_mult,
+          );
+          d3.select(`#violin_${maxDotId}`)
+            .transition()
+            .duration(100)
+            .attr('fill', 'var(--color-primary)')
+            .attr('r', dOpts.pointSize * 2);
+          // const d = this.chart.groupObjs[cName].values[pt];
+          this.maxCircle = maxDotId;
+          this.addToolTiptoMax(this.props.HighlightedProteins[0]);
+        }
       }
     }
   }
@@ -357,6 +359,7 @@ class ViolinPlot extends Component {
         .attr('stroke', 'black')
         .attr('fill', 'var(--color-link)');
     });
+    d3.selectAll(`.violin-tooltip`).style('display', 'none');
     this.props.onHandleProteinSelected([]);
   };
 
