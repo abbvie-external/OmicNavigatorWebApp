@@ -16,6 +16,9 @@ import {
   Dimmer,
   Loader,
   Image,
+  // Paul start
+  Message,
+  // Paul end
 } from 'semantic-ui-react';
 
 import { filterTypes } from './FilterTypeConfig';
@@ -1100,6 +1103,8 @@ export class QHGrid extends React.PureComponent {
     sortBy: null,
     sortOrder: null,
     rowLevelStyleCalc: () => {},
+    loadingMessage: 'Loading Data. Please Wait.',
+    emptyMessage: 'No Results',
     height: '70vh',
     generalSearchDebounceTime: 500,
   };
@@ -1224,11 +1229,8 @@ export class QHGrid extends React.PureComponent {
         className={'QHGrid'}
         style={{ width: '100%', margin: 0, padding: 0 }}
       >
-        <Dimmer
-          style={{ height: `calc(${this.props.height})` }}
-          active={this.props.loading}
-        >
-          <Loader>Caching Data Records. This May Take a Few Moments.</Loader>
+        <Dimmer active={this.props.loading}>
+          <Loader>{this.props.loadingMessage}</Loader>
         </Dimmer>
         <QHGridHeader {...headerProps} />
         <div
@@ -1306,6 +1308,24 @@ export class QHGrid extends React.PureComponent {
               )} */}
             </Table.Body>
           </Table>
+          {!this.props.loading && numRows === 0 && (
+            <div className="QHGrid--empty">
+              {typeof this.props.emptyMessage === 'string' ? (
+                // Paul start
+                // <h3>{this.props.emptyMessage}</h3>
+                <Message className="NoResultsMessageGrid">
+                  <Message.Header>
+                    <Icon name="search" />
+                    {this.props.emptyMessage}
+                  </Message.Header>
+                  <p>Please Adjust Filters</p>
+                </Message>
+              ) : (
+                // Paul end
+                this.props.emptyMessage
+              )}
+            </div>
+          )}
         </div>
 
         {/*style={{marginTop: 0, paddingTop: 0, borderRadius: 0, borderTop: ".25px solid #DFDFDF"}}*/}
@@ -1408,6 +1428,7 @@ QHGrid.propTypes = propTypes.forbidExtraProps({
   sortBy: PropTypes.string,
   sortOrder: PropTypes.string,
   loading: PropTypes.bool,
+  loadingMessage: PropTypes.string,
 
   quickViews: propTypes.requiredBy('onShowQuickView', PropTypes.array),
   onShowQuickView: PropTypes.func,
@@ -1436,6 +1457,7 @@ QHGrid.propTypes = propTypes.forbidExtraProps({
 
   isPaginated: PropTypes.bool,
   legend: PropTypes.element,
+  emptyMessage: PropTypes.oneOfType([PropTypes.element, PropTypes.string]),
 
   exportBaseName: PropTypes.string,
   getExportData: PropTypes.func,
