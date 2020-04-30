@@ -322,12 +322,27 @@ class EnrichmentResultsGraph extends Component {
     this.props.onHandleNodeSliderChange(decimalValue);
   };
 
+  handleNodeSliderChangeLocal = value => {
+    // let decimalValue = value >= 1 ? value / 100 : 0.01;
+    let decimalValue = value / 100;
+    this.setState({
+      nodeCutoffLocal: decimalValue,
+    });
+  };
+
   handleEdgeSliderChange = value => {
     let decimalValue = value >= 5 ? value / 100 : 0.05;
     this.setState({
       edgeCutoffLocal: decimalValue,
     });
     this.props.onHandleEdgeSliderChange(decimalValue);
+  };
+
+  handleEdgeSliderChangeLocal = value => {
+    let decimalValue = value >= 5 ? value / 100 : 0.05;
+    this.setState({
+      edgeCutoffLocal: decimalValue,
+    });
   };
 
   render() {
@@ -364,10 +379,10 @@ class EnrichmentResultsGraph extends Component {
 
       const NodeThumb = (props, state) => (
         <StyledThumb {...props}>
-          <span className="ValueNowNode">
-            {/* {state.valueNow >= 1 ? state.valueNow / 100 : 0.01} */}
-            {(state.valueNow / 100).toFixed(3)}
-          </span>
+          {/* <span className="ValueNowNode"> */}
+          {/* {state.valueNow >= 1 ? state.valueNow / 100 : 0.01} */}
+          {/* {(state.valueNow / 100).toFixed(3)} */}
+          {/* </span> */}
         </StyledThumb>
       );
       const NodeTrack = (props, state) => (
@@ -376,9 +391,9 @@ class EnrichmentResultsGraph extends Component {
 
       const EdgeThumb = (props, state) => (
         <StyledThumb {...props}>
-          <span className="ValueNowEdge">
-            {state.valueNow >= 5 ? state.valueNow / 100 : 0.05}
-          </span>
+          {/* <span className="ValueNowEdge"> */}
+          {/* {state.valueNow >= 5 ? state.valueNow / 100 : 0.05} */}
+          {/* </span> */}
         </StyledThumb>
       );
       const EdgeTrack = (props, state) => (
@@ -501,6 +516,7 @@ class EnrichmentResultsGraph extends Component {
                   min={0.0}
                   step={0.1}
                   max={100}
+                  onChange={this.handleNodeSliderChangeLocal}
                   onSliderClick={this.handleNodeSliderChange}
                   onAfterChange={this.handleNodeSliderChange}
                   // snapDragDisabled={true}
@@ -558,6 +574,7 @@ class EnrichmentResultsGraph extends Component {
                   }
                   value={edgeCutoffLocal * 100}
                   name="edgeCutoffSlider"
+                  onChange={this.handleEdgeSliderChangeLocal}
                   onSliderClick={this.handleEdgeSliderChange}
                   onAfterChange={this.handleEdgeSliderChange}
                 />
