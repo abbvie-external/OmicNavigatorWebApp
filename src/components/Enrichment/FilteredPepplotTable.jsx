@@ -391,13 +391,7 @@ class FilteredPepplotTable extends Component {
         };
       });
       this.props.onHandleProteinSelected(shiftedTableDataArray);
-      // console.log('shift');
-      // document.addEventListener('onkeydown', event => {
-      //   console.log('keydown');
-      //   console.log(event.code);
-      // });
     } else if (event.ctrlKey) {
-      console.log('control');
       const allTableData = _.cloneDeep(this.state.filteredTableData);
       let selectedTableDataArray = [];
 
@@ -433,10 +427,10 @@ class FilteredPepplotTable extends Component {
           // just add to array if not max
           PreviouslyHighlighted.push(mappedProtein);
         }
-        this.props.onHandleProteinSelected(PreviouslyHighlighted);
+        selectedTableDataArray = [...PreviouslyHighlighted];
+        this.props.onHandleProteinSelected(selectedTableDataArray);
       }
     } else {
-      console.log('click');
       this.props.onHandleProteinSelected([
         {
           sample: item.Protein_Site, //lineID,
