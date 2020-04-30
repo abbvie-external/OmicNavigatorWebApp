@@ -373,7 +373,6 @@ class EnrichmentResultsGraph extends Component {
   };
 
   handleEdgeSliderChange = value => {
-    debugger;
     let decimalValue = value >= 5 ? value / 100 : 0.05;
     this.setState({
       edgeCutoffLocal: decimalValue,
