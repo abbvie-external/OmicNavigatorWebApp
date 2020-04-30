@@ -9,7 +9,6 @@ import {
   Search,
   Radio,
   Label,
-  // Input,
   Button,
   Icon,
   Dropdown,
@@ -26,7 +25,6 @@ import NetworkGraph from './NetworkGraph';
 import ReactSlider from 'react-slider';
 import LoaderActivePlots from '../Transitions/LoaderActivePlots';
 import './EnrichmentResultsGraph.scss';
-// import { getFieldValue } from '../utility/selectors/QHGridSelector';
 
 const StyledSlider = styled(ReactSlider)`
   width: 100%;
@@ -196,7 +194,6 @@ const SortableItem = sortableElement(props => {
             key={`label-${props.value}`}
           >
             <DragHandle />
-            {/* {props.sortIndex + 1})  */}
             {getItemName(props.value)}
           </Label>
         }
@@ -208,16 +205,6 @@ const SortableItem = sortableElement(props => {
         mouseLeaveDelay={0}
       />
     </li>
-    //   <List celled size={dynamicSize}>
-    //   <List.Item key={`label-${props.value}`}>
-    //     <List.Content>
-    //       <List.Header>
-    //         <DragHandle />
-    //         {getItemName(props.value)}
-    //       </List.Header>
-    //     </List.Content>
-    //   </List.Item>
-    // </List>
   );
 });
 
@@ -298,12 +285,6 @@ class EnrichmentResultsGraph extends Component {
     });
   };
 
-  // onSortEnd = ({ oldIndex, newIndex }) => {
-  //   this.setState(({ networkSortBy }) => ({
-  //     networkSortBy: arrayMove(networkSortBy, oldIndex, newIndex)
-  //   }));
-  // };
-
   onSortEnd = ({ oldIndex, newIndex }) => {
     this.removeNetworkSVG();
     this.setState(({ networkSortBy }) => ({
@@ -317,43 +298,12 @@ class EnrichmentResultsGraph extends Component {
     d3.select(`#svg-${this.props.networkSettings.id}`).remove();
   };
 
-  // getDropdownTooltip = () => {
-  //   const { networkSortBy } = this.props;
-  //   if (networkSortBy === 'significance')
-  //     return 'sort clusters by chosen significance metric';
-  //   if (networkSortBy === 'nodecount')
-  //     return 'sort clusters by number of nodes per cluster';
-  //   if (networkSortBy === 'edgecount')
-  //     return 'sort clusters by number of edges per cluster';
-  // };
-
-  // const NodeThumb = (props, state) => (
-  //   <StyledThumb {...props}>{state.nodeCutoffLocal}</StyledThumb>
-  // );
-  // const NodeTrack = (props, state) => (
-  //   <StyledTrack {...props} index={state.index} />
-  // );
-
-  // const EdgeThumb = (props, state) => (
-  //   <StyledThumb {...props}>{state.edgeCutoffLocal}</StyledThumb>
-  // );
-  // const EdgeTrack = (props, state) => (
-  //   <StyledTrack {...props} index={state.index} />
-  // );
-
   handleNodeCutoffInputChangeLocal = _.debounce(value => {
     this.setState({
       nodeCutoffLocal: value,
     });
     this.props.onHandleNodeCutoffInputChange(value);
-  }, 1000);
-
-  // handleNodeCutoffInputChangeLocal = value => {
-  //   this.setState({
-  //     nodeCutoffLocal: value,
-  //   });
-  //   this.props.onHandleNodeCutoffInputChange(value);
-  // };
+  }, 1250);
 
   handleEdgeCutoffInputChangeLocal = _.debounce(value => {
     let revisedValue = value >= 0.05 ? value : 0.05;
@@ -361,7 +311,7 @@ class EnrichmentResultsGraph extends Component {
       edgeCutoffLocal: revisedValue,
     });
     this.props.onHandleEdgeCutoffInputChange(revisedValue);
-  }, 1000);
+  }, 1250);
 
   handleNodeSliderChange = value => {
     // let decimalValue = value >= 1 ? value / 100 : 0.01;
@@ -388,8 +338,6 @@ class EnrichmentResultsGraph extends Component {
       edgeCutoffLocal,
     } = this.state;
     const {
-      // nodeCutoff,
-      // edgeCutoff,
       networkDataLoaded,
       networkGraphReady,
       activeIndexEnrichmentView,

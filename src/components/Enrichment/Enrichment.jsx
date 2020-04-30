@@ -1702,61 +1702,41 @@ class Enrichment extends Component {
   //   });
   // }, 500);
 
-  handleNodeCutoffInputChange = _.debounce(value => {
-    this.removeNetworkSVG();
-    this.setState({
-      nodeCutoff: value,
-    });
-    sessionStorage.setItem('nodeCutoff', value);
-  }, 500);
+  handleNodeCutoffInputChange = value => {
+    if (this.state.nodeCutoff !== value) {
+      this.removeNetworkSVG();
+      this.setState({
+        nodeCutoff: value,
+      });
+      sessionStorage.setItem('nodeCutoff', value);
+    }
+  };
 
-  handleEdgeCutoffInputChange = _.debounce(value => {
-    this.removeNetworkSVG();
-    this.setState({
-      edgeCutoff: value,
-    });
-    sessionStorage.setItem('edgeCutoff', value);
-  }, 500);
+  handleEdgeCutoffInputChange = value => {
+    if (this.state.edgeCutoff !== value) {
+      this.removeNetworkSVG();
+      this.setState({
+        edgeCutoff: value,
+      });
+      sessionStorage.setItem('edgeCutoff', value);
+    }
+  };
 
-  // handleNetworkCutoffInputChange = (evt, { name, value }) => {
-  //   this.removeNetworkSVG();
-  //   this.setState({
-  //     [name]: value,
-  //     // networkGraphReady: false
-  //   });
-  // };
-
-  // handleSliderChange = _.debounce((type, value) => {
-  //   if (this.state[type] !== value) {
-  //     this.removeNetworkSVG();
-  //     this.setState({ [type]: value });
-  //   }
-  //   sessionStorage.setItem(type, value);
-  // }, 500);
-
-  handleNodeSliderChange = _.debounce(value => {
+  handleNodeSliderChange = value => {
     if (this.state.nodeCutoff !== value) {
       this.removeNetworkSVG();
       this.setState({ nodeCutoff: value });
     }
     sessionStorage.setItem('nodeCutoff', value);
-  }, 500);
-  // handleNodeSliderChange = value => {
-  //   let decimalValue = value / 100;
-  //   if (this.state.nodeCutoff !== decimalValue) {
-  //     this.removeNetworkSVG();
-  //     this.setState({ nodeCutoff: decimalValue });
-  //   }
-  //   sessionStorage.setItem('nodeCutoff', decimalValue);
-  // };
+  };
 
-  handleEdgeSliderChange = _.debounce(value => {
+  handleEdgeSliderChange = value => {
     if (this.state.edgeCutoff !== value) {
       this.removeNetworkSVG();
       this.setState({ edgeCutoff: value });
     }
     sessionStorage.setItem('edgeCutoff', value);
-  }, 500);
+  };
 
   // handleLegendOpen = () => {
   //   // sessionStorage.setItem('legendOpen', 'true');
