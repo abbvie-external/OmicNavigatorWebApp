@@ -30,7 +30,7 @@ class SVGPlot extends Component {
   handleDiffTable = evt => {
     const key = this.props.imageInfo.key.split(':');
     const name = key[0] || '';
-    const diffProtein = this.props.HighlightedLineId.sample;
+    const diffProtein = this.props.HighlightedProteins.sample;
     this.props.onViewDiffTable(name, diffProtein);
   };
 

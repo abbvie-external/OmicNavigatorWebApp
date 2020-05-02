@@ -180,10 +180,7 @@ class Enrichment extends Component {
       yTicks: 1,
     },
     violinData: [],
-    HighlightedLineId: {
-      sample: '',
-      id_mult: '',
-    },
+    HighlightedProteins: [],
   };
   EnrichmentViewContainerRef = React.createRef();
 
@@ -445,7 +442,9 @@ class Enrichment extends Component {
             <div>
               <Popup
                 trigger={
-                  <span className="TableValue">{splitValue(value)}</span>
+                  <span className="TableValue  NoSelect">
+                    {splitValue(value)}
+                  </span>
                 }
                 style={TableValuePopupStyle}
                 className="TablePopupValue"
@@ -471,7 +470,9 @@ class Enrichment extends Component {
             <div>
               <Popup
                 trigger={
-                  <span className="TableValue">{splitValue(value)}</span>
+                  <span className="TableValue  NoSelect">
+                    {splitValue(value)}
+                  </span>
                 }
                 style={TableValuePopupStyle}
                 className="TablePopupValue"
@@ -516,7 +517,9 @@ class Enrichment extends Component {
             <div>
               <Popup
                 trigger={
-                  <span className="TableValue">{splitValue(value)}</span>
+                  <span className="TableValue  NoSelect">
+                    {splitValue(value)}
+                  </span>
                 }
                 style={TableValuePopupStyle}
                 className="TablePopupValue"
@@ -586,7 +589,7 @@ class Enrichment extends Component {
               <div>
                 <Popup
                   trigger={
-                    <span className="TableValue">
+                    <span className="TableValue  NoSelect">
                       {formatNumberForDisplay(value)}
                     </span>
                   }
@@ -784,79 +787,70 @@ class Enrichment extends Component {
     }
   };
 
-  handleHighlightedLineReset = obj => {
-    this.setState(obj);
+  handleHighlightedLineReset = emptyArr => {
+    this.setState(emptyArr);
   };
 
-  handleLineSelected = (lineId, id_m, cpm_stat) => {
+  handleProteinSelected = toHighlightArray => {
+    const highestValueObject = toHighlightArray[0];
     const { enrichmentStudy, enrichmentModel } = this.props;
-    // let self = this;
-    // if (this.state.barcodeSettings.barcodeData > 0) {
-    if (lineId != null) {
+    if (this.state.barcodeSettings.barcodeData?.length > 0) {
+      // if (toHighlightArray.length > 0) {
+      this.setState({
+        HighlightedProteins: toHighlightArray,
+      });
       if (
-        lineId !== this.state.HighlightedLineId.sample ||
+        highestValueObject?.sample !==
+          this.state.HighlightedProteins[0]?.sample ||
         this.state.SVGPlotLoaded === false
       ) {
-        if (this.state.barcodeSettings.barcodeData?.length > 0) {
-          this.setState({
-            SVGPlotLoaded: false,
-            SVGPlotLoading: true,
-            HighlightedLineId: {
-              sample: lineId,
-              id_mult: id_m,
-              cpm: cpm_stat,
-            },
-          });
-          const dataItem = this.state.barcodeSettings.barcodeData.find(
-            i => i.lineID === lineId,
-          );
-          let id = dataItem.id_mult ? dataItem.id_mult : dataItem.id;
-          // var psp = document.getElementById('psp-icon');
-          // psp.style.visibility = "hidden";
-          // psp.style.left = w.toString() + "px";
-          // psp.style.bottom = h.toString() + "px";
-          let plotType = ['splineplot'];
-          switch (enrichmentModel) {
-            case 'DonorDifferentialPhosphorylation':
-              plotType = ['dotplot'];
-              break;
-            case 'Treatment and or Strain Differential Phosphorylation':
-              plotType = ['StrainStimDotplot', 'StimStrainDotplot'];
-              break;
-            case 'Timecourse Differential Phosphorylation':
-              plotType = ['lineplot', 'splineplot'];
-              break;
-            case 'Differential Expression':
-              plotType = ['proteindotplot'];
-              break;
-            case 'Differential Phosphorylation':
-              plotType = ['phosphodotplot'];
-              break;
-            case 'No Pretreatment Timecourse Differential Phosphorylation':
-              plotType = ['lineplot.modelII', 'splineplot.modelII'];
-              break;
-            case 'Ferrostatin Pretreatment Timecourse Differential Phosphorylation':
-              plotType = ['lineplot.modelIII', 'splineplot.modelIII'];
-              break;
-            default:
-              plotType = ['dotplot'];
-          }
-          let imageInfo = { key: '', title: '', svg: [] };
-          imageInfo.title = this.state.imageInfo.title;
-          imageInfo.key = this.state.imageInfo.key;
-          const handleSVGCb = this.handleSVG;
-          this.getPlot(id, plotType, enrichmentStudy, imageInfo, handleSVGCb);
+        this.setState({
+          SVGPlotLoaded: false,
+          SVGPlotLoading: true,
+        });
+        const dataItem = this.state.barcodeSettings.barcodeData.find(
+          i => i.lineID === highestValueObject?.sample,
+        );
+        let id = dataItem?.id_mult ? dataItem?.id_mult : dataItem?.id;
+        let plotType = ['splineplot'];
+        switch (enrichmentModel) {
+          case 'DonorDifferentialPhosphorylation':
+            plotType = ['dotplot'];
+            break;
+          case 'Treatment and or Strain Differential Phosphorylation':
+            plotType = ['StrainStimDotplot', 'StimStrainDotplot'];
+            break;
+          case 'Timecourse Differential Phosphorylation':
+            plotType = ['lineplot', 'splineplot'];
+            break;
+          case 'Differential Expression':
+            plotType = ['proteindotplot'];
+            break;
+          case 'Differential Phosphorylation':
+            plotType = ['phosphodotplot'];
+            break;
+          case 'No Pretreatment Timecourse Differential Phosphorylation':
+            plotType = ['lineplot.modelII', 'splineplot.modelII'];
+            break;
+          case 'Ferrostatin Pretreatment Timecourse Differential Phosphorylation':
+            plotType = ['lineplot.modelIII', 'splineplot.modelIII'];
+            break;
+          default:
+            plotType = ['dotplot'];
         }
+        let imageInfo = { key: '', title: '', svg: [] };
+        imageInfo.title = this.state.imageInfo.title;
+        imageInfo.key = this.state.imageInfo.key;
+        const handleSVGCb = this.handleSVG;
+        this.getPlot(id, plotType, enrichmentStudy, imageInfo, handleSVGCb);
       }
+      // }
     } else {
       plotCancel();
       this.setState({
         SVGPlotLoaded: false,
         SVGPlotLoading: false,
-        HighlightedLineId: {
-          sample: '',
-          id_mult: '',
-        },
+        HighlightedProteins: [],
         // imageInfo: {
         //   ...this.state.imageInfo,
         //   svg: []
@@ -1551,7 +1545,7 @@ class Enrichment extends Component {
             {...this.props}
             {...this.state}
             onBackToTable={this.backToTable}
-            onHandleLineSelected={this.handleLineSelected}
+            onHandleProteinSelected={this.handleProteinSelected}
             onHandleHighlightedLineReset={this.handleHighlightedLineReset}
             onHandleBarcodeChanges={this.handleBarcodeChanges}
           ></SplitPanesContainer>

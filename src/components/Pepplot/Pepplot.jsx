@@ -29,7 +29,7 @@ class Pepplot extends Component {
     filterableColumnsP: [],
     multisetPlotInfo: {
       title: '',
-      svg: []
+      svg: [],
     },
     multisetPlotAvailable: false,
     animation: 'uncover',
@@ -49,13 +49,13 @@ class Pepplot extends Component {
 
   handleSearchTransition = bool => {
     this.setState({
-      isSearching: bool
+      isSearching: bool,
     });
   };
 
   handleMultisetQueried = value => {
     this.setState({
-      multisetQueried: value
+      multisetQueried: value,
     });
   };
 
@@ -68,7 +68,7 @@ class Pepplot extends Component {
       isValidSearchPepplot: true,
       showProteinPage: false,
       plotButtonActive: false,
-      visible: false
+      visible: false,
     });
   };
 
@@ -76,18 +76,18 @@ class Pepplot extends Component {
     this.props.onSearchCriteriaToTop(changes, 'pepplot');
     this.setState({
       visible: false,
-      plotButtonActive: false
+      plotButtonActive: false,
     });
     if (scChange) {
       this.setState({
-        multisetPlotAvailable: false
+        multisetPlotAvailable: false,
       });
     }
   };
 
   disablePlot = () => {
     this.setState({
-      multisetPlotAvailable: false
+      multisetPlotAvailable: false,
     });
   };
 
@@ -96,7 +96,7 @@ class Pepplot extends Component {
       isValidSearchPepplot: false,
       multisetPlotAvailable: false,
       plotButtonActive: false,
-      visible: false
+      visible: false,
     });
   };
 
@@ -104,7 +104,7 @@ class Pepplot extends Component {
     this.setState(prevState => ({
       animation,
       visible: !prevState.visible,
-      plotButtonActive: !prevState.plotButtonActive
+      plotButtonActive: !prevState.plotButtonActive,
     }));
   };
 
@@ -115,9 +115,9 @@ class Pepplot extends Component {
     this.setState({
       multisetPlotInfo: {
         title: multisetPlotResults.svgInfo.plotType,
-        svg: multisetPlotResults.svgInfo.svg
+        svg: multisetPlotResults.svgInfo.svg,
       },
-      multisetPlotAvailable: true
+      multisetPlotAvailable: true,
     });
   };
 
@@ -133,7 +133,7 @@ class Pepplot extends Component {
       padding: '1em',
       maxWidth: '50vw',
       fontSize: '13px',
-      wordBreak: 'break-all'
+      wordBreak: 'break-all',
     };
 
     let icon = phosphosite_icon;
@@ -180,7 +180,7 @@ class Pepplot extends Component {
                 />
               </div>
             );
-          }
+          },
         },
         {
           title: 'MajorityProteinIDs',
@@ -190,7 +190,9 @@ class Pepplot extends Component {
             return (
               <Popup
                 trigger={
-                  <span className="TableValue">{splitValue(value)}</span>
+                  <span className="TableValue  NoSelect">
+                    {splitValue(value)}
+                  </span>
                 }
                 content={value}
                 style={TableValuePopupStyle}
@@ -199,8 +201,8 @@ class Pepplot extends Component {
                 basic
               />
             );
-          }
-        }
+          },
+        },
       ];
     } else {
       initConfigCols = [
@@ -243,8 +245,8 @@ class Pepplot extends Component {
                 />
               </div>
             );
-          }
-        }
+          },
+        },
       ];
     }
     let relevantConfigCols = [
@@ -253,24 +255,24 @@ class Pepplot extends Component {
       't',
       'P_Value',
       'adj_P_Val',
-      'adjPVal'
+      'adjPVal',
     ];
     if (pepResults.length !== 0 && pepResults.length !== undefined) {
       let orderedTestData = JSON.parse(
-        JSON.stringify(pepResults[0], relevantConfigCols)
+        JSON.stringify(pepResults[0], relevantConfigCols),
       );
 
       let relevantConfigColumns = _.map(
         _.filter(_.keys(orderedTestData), function(d) {
           return _.includes(relevantConfigCols, d);
-        })
+        }),
       );
       const thresholdColsPepplot = this.listToJson(relevantConfigColumns);
       this.setState({
-        thresholdColsP: thresholdColsPepplot
+        thresholdColsP: thresholdColsPepplot,
       });
 
-      this.setState({filterableColumnsP:[...relevantConfigColumns]});
+      this.setState({ filterableColumnsP: [...relevantConfigColumns] });
 
       // if using multi-set analysis, show set membership column
       if (this.state.multisetQueried) {
@@ -289,7 +291,7 @@ class Pepplot extends Component {
               <p>
                 <Popup
                   trigger={
-                    <span className="TableValue">
+                    <span className="TableValue  NoSelect">
                       {formatNumberForDisplay(value)}
                     </span>
                   }
@@ -301,7 +303,7 @@ class Pepplot extends Component {
                 />
               </p>
             );
-          }
+          },
         };
       });
       const configCols = initConfigCols.concat(additionalConfigColumns);
@@ -315,7 +317,7 @@ class Pepplot extends Component {
       valueJSON.push({
         key: list[i],
         text: list[i],
-        value: list[i]
+        value: list[i],
       });
     }
     return valueJSON;

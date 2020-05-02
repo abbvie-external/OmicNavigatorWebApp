@@ -12,7 +12,7 @@ import QuickViewModal from '../utility/QuickViewModal';
 import {
   getFieldValue,
   getField,
-  typeMap
+  typeMap,
 } from '../utility/selectors/QHGridSelector';
 export * from '../utility/FilterTypeConfig';
 export * from '../utility/selectors/quickViewSelector';
@@ -26,7 +26,7 @@ class PepplotResults extends Component {
     pepplotTest: '',
     pepplotProteinSite: '',
     pepplotResults: [],
-    pepplotColumns: []
+    pepplotColumns: [],
   };
 
   state = {
@@ -37,14 +37,14 @@ class PepplotResults extends Component {
     imageInfo: {
       key: null,
       title: '',
-      svg: []
+      svg: [],
     },
     currentSVGs: [],
     isSVGDataLoaded: false,
-    isProteinSelected: false,
+    isItemSelected: false,
     isProteinSVGLoaded: false,
     itemsPerPageInformed: 100,
-    pepplotRows: this.props.pepplotResults.length || 1000
+    pepplotRows: this.props.pepplotResults.length || 1000,
   };
   pepplotGridRef = React.createRef();
   // PepplotViewContainerRef = React.createRef();
@@ -61,7 +61,7 @@ class PepplotResults extends Component {
         this.getProteinData,
         this.getPlot,
         this.props.pepplotModel,
-        dataItem
+        dataItem,
       );
     }
 
@@ -73,7 +73,7 @@ class PepplotResults extends Component {
       this.pageToProtein(
         this.props.pepplotResults,
         this.props.proteinToHighlightInDiffTable,
-        this.state.itemsPerPageInformed
+        this.state.itemsPerPageInformed,
       );
     }
   }
@@ -87,7 +87,7 @@ class PepplotResults extends Component {
       this.pageToProtein(
         this.props.pepplotResults,
         this.props.proteinToHighlightInDiffTable,
-        this.state.itemsPerPageInformed
+        this.state.itemsPerPageInformed,
       );
     }
   }
@@ -100,7 +100,7 @@ class PepplotResults extends Component {
       const pageNumber = Math.ceil(Index / itemsPerPage);
       this.pepplotGridRef.current.handlePageChange(
         {},
-        { activePage: pageNumber }
+        { activePage: pageNumber },
       );
     }
   };
@@ -109,7 +109,7 @@ class PepplotResults extends Component {
     getProteinDataCb,
     getPlotCb,
     pepplotModel,
-    dataItem
+    dataItem,
   ) => {
     let imageInfo = { key: '', title: '', svg: [] };
     switch (pepplotModel) {
@@ -125,33 +125,33 @@ class PepplotResults extends Component {
       dataItem.id_mult ? dataItem.id_mult : dataItem.id,
       dataItem,
       getPlotCb,
-      imageInfo
+      imageInfo,
     );
   };
 
   handleSVG = imageInfo => {
     this.setState({
       imageInfo: imageInfo,
-      isProteinSVGLoaded: true
+      isProteinSVGLoaded: true,
     });
   };
 
-  handleProteinSelected = bool => {
+  handleItemSelected = bool => {
     this.setState({
-      isProteinSelected: bool
+      isItemSelected: bool,
     });
   };
 
   getProteinData = (id, dataItem, getPlotCb, imageInfo) => {
     this.setState({
       imageInfo: imageInfo,
-      isProteinSelected: true,
+      isItemSelected: true,
       isProteinSVGLoaded: false,
       isProteinDataLoaded: false,
       treeDataRaw: [],
       treeData: [],
       treeDataColumns: [],
-      currentSVGs: []
+      currentSVGs: [],
     });
     const ProteinSiteVar = firstValue(dataItem.Protein_Site, true);
     this.props.onSearchCriteriaChange(
@@ -159,9 +159,9 @@ class PepplotResults extends Component {
         pepplotStudy: this.props.pepplotStudy || '',
         pepplotModel: this.props.pepplotModel || '',
         pepplotTest: this.props.pepplotTest || '',
-        pepplotProteinSite: ProteinSiteVar || ''
+        pepplotProteinSite: ProteinSiteVar || '',
       },
-      false
+      false,
     );
     let pepplotModel = this.props.pepplotModel;
     let pepplotStudy = this.props.pepplotStudy;
@@ -209,13 +209,13 @@ class PepplotResults extends Component {
         .getSiteData(id, pepplotStudy + 'plots')
         .then(treeDataResponse => {
           this.setState({
-            treeDataRaw: treeDataResponse
+            treeDataRaw: treeDataResponse,
           });
           let tdCols = _.map(_.keys(treeDataResponse[0]), function(d) {
             return { key: d, field: d };
           });
           this.setState({
-            treeDataColumns: tdCols
+            treeDataColumns: tdCols,
           });
           let tD = _.map(treeDataResponse, function(d, i) {
             let entries = _.toPairs(d);
@@ -226,12 +226,12 @@ class PepplotResults extends Component {
             return {
               key: i + 1,
               text: 'Peptide' + (i + 1) + '  (' + d.Modified_sequence + ')',
-              items: entries
+              items: entries,
             };
           });
           this.setState({
             treeData: tD,
-            isProteinDataLoaded: true
+            isProteinDataLoaded: true,
           });
         });
     } else {
@@ -239,13 +239,13 @@ class PepplotResults extends Component {
         .getProteinData(id, pepplotStudy + 'plots')
         .then(proteinDataResponse => {
           this.setState({
-            treeDataRaw: proteinDataResponse
+            treeDataRaw: proteinDataResponse,
           });
           let tdCols = _.map(_.keys(proteinDataResponse[0]), function(d) {
             return { key: d, field: d };
           });
           this.setState({
-            treeDataColumns: tdCols
+            treeDataColumns: tdCols,
           });
 
           let proteinData = _.map(proteinDataResponse, function(d, i) {
@@ -256,11 +256,11 @@ class PepplotResults extends Component {
             return {
               key: i + 1,
               text: 'Differential Expression Data',
-              items: entries
+              items: entries,
             };
           });
           this.setState({
-            treeData: proteinData
+            treeData: proteinData,
           });
         });
     }
@@ -278,27 +278,22 @@ class PepplotResults extends Component {
     // } else {
     //   PepplotPlotSVGWidth = PepplotPlotSVGHeight * 1.41344;
     // }
-    let handleProteinSelectedCb = this.handleProteinSelected;
+    let handleItemSelectedCb = this.handleItemSelected;
 
     _.forEach(plotType, function(plot, i) {
       phosphoprotService
-        .getPlot(
-          id,
-          plotType[i],
-          pepplotStudy + 'plots',
-          handleProteinSelectedCb
-        )
+        .getPlot(id, plotType[i], pepplotStudy + 'plots', handleItemSelectedCb)
         .then(svgMarkupObj => {
           let svgMarkup = svgMarkupObj.data;
           svgMarkup = svgMarkup.replace(/id="/g, 'id="' + id + '-' + i + '-');
           svgMarkup = svgMarkup.replace(
             /#glyph/g,
-            '#' + id + '-' + i + '-glyph'
+            '#' + id + '-' + i + '-glyph',
           );
           svgMarkup = svgMarkup.replace(/#clip/g, '#' + id + '-' + i + '-clip');
           svgMarkup = svgMarkup.replace(
             /<svg/g,
-            `<svg preserveAspectRatio="xMinYMin meet" style="width:${PepplotPlotSVGWidth}px" height:${PepplotPlotSVGHeight} id="currentSVG-${id}-${i}"`
+            `<svg preserveAspectRatio="xMinYMin meet" style="width:${PepplotPlotSVGWidth}px" height:${PepplotPlotSVGHeight} id="currentSVG-${id}-${i}"`,
           );
           DOMPurify.addHook('afterSanitizeAttributes', function(node) {
             if (
@@ -310,7 +305,7 @@ class PepplotResults extends Component {
           });
           // Clean HTML string and write into our DIV
           let sanitizedSVG = DOMPurify.sanitize(svgMarkup, {
-            ADD_TAGS: ['use']
+            ADD_TAGS: ['use'],
           });
           let svgInfo = { plotType: plotType[i], svg: sanitizedSVG };
 
@@ -342,7 +337,7 @@ class PepplotResults extends Component {
   calculateWidth() {
     var w = Math.max(
       document.documentElement.clientWidth,
-      window.innerWidth || 0
+      window.innerWidth || 0,
     );
     if (w > 1199) {
       return w * 0.5;
@@ -370,10 +365,10 @@ class PepplotResults extends Component {
   getTableHelpers = (
     getProteinDataCb,
     getPlotCb,
-    proteinToHighlightInDiffTable
+    proteinToHighlightInDiffTable,
   ) => {
     let addParams = {};
-    addParams.rowToHighlight = proteinToHighlightInDiffTable;
+    addParams.rowHighlightMax = proteinToHighlightInDiffTable;
     addParams.showPhosphositePlus = dataItem => {
       return function() {
         var protein = (dataItem.Protein
@@ -383,7 +378,7 @@ class PepplotResults extends Component {
         let param = { proteinNames: protein, queryId: -1, from: 0 };
         phosphoprotService.postToPhosphositePlus(
           param,
-          'https://www.phosphosite.org/proteinSearchSubmitAction.action'
+          'https://www.phosphosite.org/proteinSearchSubmitAction.action',
         );
       };
     };
@@ -406,7 +401,7 @@ class PepplotResults extends Component {
           dataItem.id_mult ? dataItem.id_mult : dataItem.id,
           dataItem,
           getPlotCb,
-          imageInfo
+          imageInfo,
         );
       };
     };
@@ -415,24 +410,24 @@ class PepplotResults extends Component {
 
   backToTable = () => {
     this.setState({
-      isProteinSelected: false,
+      isItemSelected: false,
       isProteinDataLoaded: false,
-      isProteinSVGLoaded: false
+      isProteinSVGLoaded: false,
     });
     this.props.onSearchCriteriaChange(
       {
         pepplotStudy: this.props.pepplotStudy || '',
         pepplotModel: this.props.pepplotModel || '',
         pepplotTest: this.props.pepplotTest || '',
-        pepplotProteinSite: ''
+        pepplotProteinSite: '',
       },
-      false
+      false,
     );
   };
 
   informItemsPerPage = items => {
     this.setState({
-      itemsPerPageInformed: items
+      itemsPerPageInformed: items,
     });
   };
 
@@ -444,14 +439,14 @@ class PepplotResults extends Component {
       pepplotColumns,
       pepplotResults,
       proteinToHighlightInDiffTable,
-      proteinHighlightInProgress
+      proteinHighlightInProgress,
     } = this.props;
 
     const {
-      isProteinSelected,
+      isItemSelected,
       isProteinSVGLoaded,
       pepplotRows,
-      itemsPerPageInformed
+      itemsPerPageInformed,
     } = this.state;
 
     let pepplotCacheKey = `${pepplotStudy}-${pepplotModel}-${pepplotTest}`;
@@ -466,9 +461,9 @@ class PepplotResults extends Component {
     const additionalTemplateInfo = this.getTableHelpers(
       this.getProteinData,
       this.getPlot,
-      proteinToHighlightInDiffTable
+      proteinToHighlightInDiffTable,
     );
-    if (!isProteinSelected || proteinHighlightInProgress) {
+    if (!isItemSelected || proteinHighlightInProgress) {
       return (
         <div id="PepplotGrid">
           <EZGrid
@@ -492,7 +487,7 @@ class PepplotResults extends Component {
           />
         </div>
       );
-    } else if (isProteinSelected && !isProteinSVGLoaded) {
+    } else if (isItemSelected && !isProteinSVGLoaded) {
       return (
         <div>
           <LoaderActivePlots />
