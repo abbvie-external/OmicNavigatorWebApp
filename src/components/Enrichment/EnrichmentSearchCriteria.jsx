@@ -477,7 +477,7 @@ class EnrichmentSearchCriteria extends Component {
     this.setState(
       {
         [name]: uSelVP,
-        reloadPlot: true
+        reloadPlot: false
       },
       function() {
         this.updateQueryData();

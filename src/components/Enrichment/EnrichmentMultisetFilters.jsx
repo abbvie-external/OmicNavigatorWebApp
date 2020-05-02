@@ -107,19 +107,19 @@ class EnrichmentMultisetFilters extends Component {
       switch (selectedOperator[i].value) {
         case '<':
           setDescP.push(`less than ${sigValue[i]} in:`);
-          notSetDescP.push(`less than ${sigValue[i]} not in:`);
+          notSetDescP.push(`not less than ${sigValue[i]} in:`);
           break;
         case '>':
           setDescP.push(`greater than ${sigValue[i]} in:`);
-          notSetDescP.push(`greater than ${sigValue[i]} not in:`);
+          notSetDescP.push(`not greater than ${sigValue[i]} in:`);
           break;
         case '|<|':
           setDescP.push(`absolute value less than ${sigValue[i]} in:`);
-          notSetDescP.push(`absolute value less than ${sigValue[i]} not in:`);
+          notSetDescP.push(`absolute value not less than ${sigValue[i]} in:`);
           break;
         case '|>|':
           setDescP.push(`absolute value greater than ${sigValue[i]} in:`);
-          notSetDescP.push(`absolute value greater than ${sigValue[i]} not in:`);
+          notSetDescP.push(`absolute value not greater than ${sigValue[i]} in:`);
           break;
         default:
       }
