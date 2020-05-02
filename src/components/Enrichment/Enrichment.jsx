@@ -792,16 +792,18 @@ class Enrichment extends Component {
   };
 
   handleProteinSelected = toHighlightArray => {
+    const prevHighestValueObject = this.state.HighlightedProteins[0]?.sample;
     const highestValueObject = toHighlightArray[0];
     const { enrichmentStudy, enrichmentModel } = this.props;
-    if (this.state.barcodeSettings.barcodeData?.length > 0) {
-      // if (toHighlightArray.length > 0) {
+    if (
+      this.state.barcodeSettings.barcodeData?.length > 0 &&
+      toHighlightArray.length > 0
+    ) {
       this.setState({
         HighlightedProteins: toHighlightArray,
       });
       if (
-        highestValueObject?.sample !==
-          this.state.HighlightedProteins[0]?.sample ||
+        highestValueObject?.sample !== prevHighestValueObject ||
         this.state.SVGPlotLoaded === false
       ) {
         this.setState({
@@ -844,7 +846,6 @@ class Enrichment extends Component {
         const handleSVGCb = this.handleSVG;
         this.getPlot(id, plotType, enrichmentStudy, imageInfo, handleSVGCb);
       }
-      // }
     } else {
       plotCancel();
       this.setState({
@@ -911,15 +912,13 @@ class Enrichment extends Component {
           let svgInfo = { plotType: plotType[i], svg: sanitizedSVG };
 
           // we want spline plot in zero index, rather than lineplot
-          if (i === 0) {
-            imageInfo.svg.push(svgInfo);
-            currentSVGs.push(sanitizedSVG);
-          } else {
-            // splice(position, numberOfItemsToRemove, item)
-            // imageInfo.svg.u
-            imageInfo.svg.unshift(svgInfo);
-            currentSVGs.unshift(sanitizedSVG);
-          }
+          // if (i === 0) {
+          imageInfo.svg.push(svgInfo);
+          currentSVGs.push(sanitizedSVG);
+          // } else {
+          //   imageInfo.svg.unshift(svgInfo);
+          //   currentSVGs.unshift(sanitizedSVG);
+          // }
           handleSVGCb(imageInfo);
         });
     });
@@ -1703,61 +1702,41 @@ class Enrichment extends Component {
   //   });
   // }, 500);
 
-  handleNodeCutoffInputChange = _.debounce(value => {
-    this.removeNetworkSVG();
-    this.setState({
-      nodeCutoff: value,
-    });
-    sessionStorage.setItem('nodeCutoff', value);
-  }, 500);
+  handleNodeCutoffInputChange = value => {
+    if (this.state.nodeCutoff !== value) {
+      this.removeNetworkSVG();
+      this.setState({
+        nodeCutoff: value,
+      });
+      sessionStorage.setItem('nodeCutoff', value);
+    }
+  };
 
-  handleEdgeCutoffInputChange = _.debounce(value => {
-    this.removeNetworkSVG();
-    this.setState({
-      edgeCutoff: value,
-    });
-    sessionStorage.setItem('edgeCutoff', value);
-  }, 500);
+  handleEdgeCutoffInputChange = value => {
+    if (this.state.edgeCutoff !== value) {
+      this.removeNetworkSVG();
+      this.setState({
+        edgeCutoff: value,
+      });
+      sessionStorage.setItem('edgeCutoff', value);
+    }
+  };
 
-  // handleNetworkCutoffInputChange = (evt, { name, value }) => {
-  //   this.removeNetworkSVG();
-  //   this.setState({
-  //     [name]: value,
-  //     // networkGraphReady: false
-  //   });
-  // };
-
-  // handleSliderChange = _.debounce((type, value) => {
-  //   if (this.state[type] !== value) {
-  //     this.removeNetworkSVG();
-  //     this.setState({ [type]: value });
-  //   }
-  //   sessionStorage.setItem(type, value);
-  // }, 500);
-
-  handleNodeSliderChange = _.debounce(value => {
+  handleNodeSliderChange = value => {
     if (this.state.nodeCutoff !== value) {
       this.removeNetworkSVG();
       this.setState({ nodeCutoff: value });
     }
     sessionStorage.setItem('nodeCutoff', value);
-  }, 500);
-  // handleNodeSliderChange = value => {
-  //   let decimalValue = value / 100;
-  //   if (this.state.nodeCutoff !== decimalValue) {
-  //     this.removeNetworkSVG();
-  //     this.setState({ nodeCutoff: decimalValue });
-  //   }
-  //   sessionStorage.setItem('nodeCutoff', decimalValue);
-  // };
+  };
 
-  handleEdgeSliderChange = _.debounce(value => {
+  handleEdgeSliderChange = value => {
     if (this.state.edgeCutoff !== value) {
       this.removeNetworkSVG();
       this.setState({ edgeCutoff: value });
     }
     sessionStorage.setItem('edgeCutoff', value);
-  }, 500);
+  };
 
   // handleLegendOpen = () => {
   //   // sessionStorage.setItem('legendOpen', 'true');

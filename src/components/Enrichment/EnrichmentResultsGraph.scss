@@ -162,52 +162,20 @@
 }
 
 .NetworkSliderInput {
-  // margin: 0px 0px 10px 25px !important;
-  // margin: 0px 0px 10px 0px !important;
-  // display: inline-block !important;
-  // font-size: inherit !important;
-  font-size: inherit !important;
-}
-
-@media (min-width: 1600px) {
-  .NetworkSliderInput .ui.input > input {
-    font-size: initial !important;
-  }
-}
-
-.NetworkSliderInput input {
-  border-radius: 0px 0.28571429rem 0.28571429rem 0px !important;
-  font-size: inherit !important;
-  font-weight: bold;
-  width: 53px !important;
-}
-
-@media (min-width: 1600px) and (max-width: 2599px) {
-  .NetworkSliderInput .ui.input > input {
-    width: 65px !important;
-  }
+  font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 500;
+  height: 40px !important;
+  width: 70px !important;
+  padding-left: 10px !important;
 }
 
 @media (min-width: 2600px) {
-  .NetworkSliderInput .ui.input > input {
-    width: 75px !important;
+  .NetworkSliderInput {
+    font-size: 15px !important;
+    height: 44px !important;
   }
 }
-
-// #NetworkSliderNodeInput .ui.input > input {
-//   width: 65px !important;
-// }
-
-// #NetworkSliderEdgeInput .ui.input > input {
-//   width: 75px !important;
-// }
-
-// @media (min-width: 1920px) {
-//   .NetworkSliderInput .ui.input > input {
-//     font-weight: bold;
-//     width: 70px !important;
-//   }
-// }
 
 .NetworkSlider {
   width: 100% !important;
@@ -215,7 +183,7 @@
 
 .ValueNowNode {
   color: var(--color-dark) !important;
-  margin-right: -65px;
+  margin-right: -95px;
 }
 
 .ValueNowEdge {
@@ -355,14 +323,6 @@
 
 .LoaderActivePlotsNetwork {
   height: 100vh !important;
-}
-
-.Show {
-  display: inline-block;
-}
-
-.Hide {
-  display: none !important;
 }
 
 #LegendIconButton {
