@@ -308,7 +308,7 @@ class EnrichmentResultsGraph extends Component {
   formatNodeCutoff = numString => {
     const num = Number(numString);
     const formattedNumber =
-      num >= 0.01 || num === 0 ? num : num.toExponential();
+      num >= 0.001 || num === 0 ? num : num.toExponential();
     //.replace(/e\+?/, 'x 10^');
     return `${formattedNumber}`;
     // if we'd reather use x10 display
@@ -325,14 +325,24 @@ class EnrichmentResultsGraph extends Component {
   nodeCutoffStep = component => {
     if (component.state.btnDownActive) {
       // direction down
-      // for values less than or equal to .01, step is 0.01
-      // for values greater than .01, step is 0.01
-      return component.state.value <= 0.01 ? 0.001 : 0.01;
+      if (component.state.value <= 0.001) {
+        return 0.0001;
+      } else if (
+        component.state.value > 0.001 &&
+        component.state.value <= 0.01
+      ) {
+        return 0.001;
+      } else return 0.01;
     } else {
       // direction up
-      // for values less than .01, the step is 0.01
-      // for values greater than or equal to .01, the step is 0.01
-      return component.state.value < 0.01 ? 0.001 : 0.01;
+      if (component.state.value < 0.001) {
+        return 0.0001;
+      } else if (
+        component.state.value >= 0.001 &&
+        component.state.value < 0.01
+      ) {
+        return 0.001;
+      } else return 0.01;
     }
   };
 
