@@ -782,6 +782,8 @@ class QHGridBody extends React.PureComponent {
           data_rows = _.map(data, (item, idx) => {
             const rowLevelStyle = this.props.rowLevelStyleCalc(item, ++curRow);
             // Paul start
+            let highlightClass = '';
+            let maxHighlightId = '';
             let rowHighlightMax = false;
             let rowHighlightOther = false;
             if (
@@ -803,8 +805,15 @@ class QHGridBody extends React.PureComponent {
                 rowHighlightOther = true;
               }
             }
-            const maxHighlight = rowHighlightMax ? 'rowHighlightMax' : '';
-            const otherHighlight = rowHighlightOther ? 'rowHighlightOther' : '';
+
+            if (rowHighlightMax) {
+              highlightClass = 'rowHighlightMax';
+              maxHighlightId = 'rowHighlightMax';
+            }
+
+            if (rowHighlightOther) {
+              highlightClass = 'rowHighlightOther';
+            }
             // Paul end
             return (
               <Table.Row
@@ -812,8 +821,8 @@ class QHGridBody extends React.PureComponent {
                   this.props.onRowClick(evt, item, startIndex + idx)
                 }
                 key={itemKeyMap(item) || idx}
-                id={maxHighlight}
-                className={otherHighlight}
+                id={maxHighlightId}
+                className={highlightClass}
                 style={rowLevelStyle}
               >
                 {_.map(grouping, (_group, group_idx) => {
@@ -955,7 +964,7 @@ export class QHGrid extends React.PureComponent {
     const _this = this;
     window.requestAnimationFrame(function() {
       if (_this.bodyRef !== null) {
-        const row = _this.bodyRef.getElementsByClassName('highlightedRow');
+        const row = _this.bodyRef.getElementsByClassName('rowHighlightMax');
         if (row.length !== 0) {
           _this.bodyRef.scrollTo({
             top: row[0].offsetTop - 40,
