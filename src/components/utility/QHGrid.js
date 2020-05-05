@@ -1321,14 +1321,12 @@ export class QHGrid extends React.PureComponent {
             <div className="QHGrid--empty">
               {typeof this.props.emptyMessage === 'string' ? (
                 // Paul start
-                // <h3>{this.props.emptyMessage}</h3>
-                <Message className="NoResultsMessageGrid">
-                  <Message.Header>
-                    <Icon name="search" />
-                    {this.props.emptyMessage}
-                  </Message.Header>
-                  <p>Please Adjust Filters</p>
-                </Message>
+                <Message
+                  className=""
+                  icon="search"
+                  header="No Results"
+                  content="Please Adjust Filters"
+                />
               ) : (
                 // Paul end
                 this.props.emptyMessage
