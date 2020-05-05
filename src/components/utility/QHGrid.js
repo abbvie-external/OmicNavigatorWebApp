@@ -16,6 +16,9 @@ import {
   Dimmer,
   Loader,
   Image,
+  // Paul start
+  Message,
+  // Paul end
 } from 'semantic-ui-react';
 
 import { filterTypes } from './FilterTypeConfig';
@@ -779,6 +782,8 @@ class QHGridBody extends React.PureComponent {
           data_rows = _.map(data, (item, idx) => {
             const rowLevelStyle = this.props.rowLevelStyleCalc(item, ++curRow);
             // Paul start
+            let highlightClass = '';
+            let maxHighlightId = '';
             let rowHighlightMax = false;
             let rowHighlightOther = false;
             if (
@@ -800,8 +805,15 @@ class QHGridBody extends React.PureComponent {
                 rowHighlightOther = true;
               }
             }
-            const maxHighlight = rowHighlightMax ? 'rowHighlightMax' : '';
-            const otherHighlight = rowHighlightOther ? 'rowHighlightOther' : '';
+
+            if (rowHighlightMax) {
+              highlightClass = 'rowHighlightMax';
+              maxHighlightId = 'rowHighlightMax';
+            }
+
+            if (rowHighlightOther) {
+              highlightClass = 'rowHighlightOther';
+            }
             // Paul end
             return (
               <Table.Row
@@ -809,8 +821,8 @@ class QHGridBody extends React.PureComponent {
                   this.props.onRowClick(evt, item, startIndex + idx)
                 }
                 key={itemKeyMap(item) || idx}
-                id={maxHighlight}
-                className={otherHighlight}
+                id={maxHighlightId}
+                className={highlightClass}
                 style={rowLevelStyle}
               >
                 {_.map(grouping, (_group, group_idx) => {
@@ -952,7 +964,7 @@ export class QHGrid extends React.PureComponent {
     const _this = this;
     window.requestAnimationFrame(function() {
       if (_this.bodyRef !== null) {
-        const row = _this.bodyRef.getElementsByClassName('highlightedRow');
+        const row = _this.bodyRef.getElementsByClassName('rowHighlightMax');
         if (row.length !== 0) {
           _this.bodyRef.scrollTo({
             top: row[0].offsetTop - 40,
@@ -1100,6 +1112,8 @@ export class QHGrid extends React.PureComponent {
     sortBy: null,
     sortOrder: null,
     rowLevelStyleCalc: () => {},
+    loadingMessage: 'Loading Data. Please Wait.',
+    emptyMessage: 'No Results',
     height: '70vh',
     generalSearchDebounceTime: 500,
   };
@@ -1224,11 +1238,8 @@ export class QHGrid extends React.PureComponent {
         className={'QHGrid'}
         style={{ width: '100%', margin: 0, padding: 0 }}
       >
-        <Dimmer
-          style={{ height: `calc(${this.props.height})` }}
-          active={this.props.loading}
-        >
-          <Loader>Caching Data Records. This May Take a Few Moments.</Loader>
+        <Dimmer active={this.props.loading}>
+          <Loader>{this.props.loadingMessage}</Loader>
         </Dimmer>
         <QHGridHeader {...headerProps} />
         <div
@@ -1306,6 +1317,22 @@ export class QHGrid extends React.PureComponent {
               )} */}
             </Table.Body>
           </Table>
+          {!this.props.loading && numRows === 0 && (
+            <div className="QHGrid--empty">
+              {typeof this.props.emptyMessage === 'string' ? (
+                // Paul start
+                <Message
+                  className=""
+                  icon="search"
+                  header="No Results"
+                  content="Please Adjust Filters"
+                />
+              ) : (
+                // Paul end
+                this.props.emptyMessage
+              )}
+            </div>
+          )}
         </div>
 
         {/*style={{marginTop: 0, paddingTop: 0, borderRadius: 0, borderTop: ".25px solid #DFDFDF"}}*/}
@@ -1408,6 +1435,7 @@ QHGrid.propTypes = propTypes.forbidExtraProps({
   sortBy: PropTypes.string,
   sortOrder: PropTypes.string,
   loading: PropTypes.bool,
+  loadingMessage: PropTypes.string,
 
   quickViews: propTypes.requiredBy('onShowQuickView', PropTypes.array),
   onShowQuickView: PropTypes.func,
@@ -1436,6 +1464,7 @@ QHGrid.propTypes = propTypes.forbidExtraProps({
 
   isPaginated: PropTypes.bool,
   legend: PropTypes.element,
+  emptyMessage: PropTypes.oneOfType([PropTypes.element, PropTypes.string]),
 
   exportBaseName: PropTypes.string,
   getExportData: PropTypes.func,
