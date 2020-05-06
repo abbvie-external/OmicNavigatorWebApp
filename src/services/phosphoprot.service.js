@@ -48,42 +48,26 @@ class PhosphoprotService {
     return modelsFromPromise;
   }
 
-  ocpuTestAnnotationCall(method, obj, handleError, cancelToken) {
+  async ocpuDataCall(method, obj, handleError, cancelToken) {
     return new Promise(function(resolve, reject) {
       window.ocpu
         .call(method, obj, function(session) {
-          session
-            .getObject('.val', 'digits=10')
-            .then(response => resolve(response));
+          const url = session.getLoc() + 'R/.val/json';
+          axios
+            .get(url, {
+              params: { digits: 10 },
+              responseType: 'text',
+              cancelToken,
+            })
+            .then(response => resolve(response.data));
         })
-        .catch(error => {
-          // toast.error('Failed to retrieve data, please try again.');
-          toast.error(`${error.statusText}: ${error.responseText}`);
-          if (handleError !== undefined) {
-            handleError(false);
-          }
-        });
-    });
-  }
-
-  ocpuDataCall(method, obj, handleError, cancelToken) {
-    return new Promise(function(resolve, reject) {
-      window.ocpu
+        // you can use this function instead, if don't need the cancelToken
         // .call(method, obj, function(session) {
-        //   axios
-        //     .get(session.getObject('.val', 'digits=10'), {
-        //       responseType: 'json',
-        //       cancelToken,
-        //     })
+        //   session
+        //     .getObject('.val', 'digits=10')
         //     .then(response => resolve(response));
         // })
-        .call(method, obj, function(session) {
-          session
-            .getObject('.val', 'digits=10')
-            .then(response => resolve(response));
-        })
         .catch(error => {
-          // toast.error('Failed to retrieve data, please try again.');
           toast.error(`${error.statusText}: ${error.responseText}`);
           if (handleError !== undefined) {
             handleError(false);
@@ -92,7 +76,7 @@ class PhosphoprotService {
     });
   }
 
-  ocpuDataCallAlt(method, obj, handleError, cancelToken) {
+  async ocpuDataCallAlt(method, obj, handleError, cancelToken) {
     return new Promise(function(resolve, reject) {
       window.ocpu
         .call(method, obj, function(session) {
@@ -113,35 +97,12 @@ class PhosphoprotService {
     });
   }
 
-  // ocpuTestAnnotationCall(method, obj, handleError) {
-  //   return new Promise(function(resolve, reject) {
-  //     window.ocpu
-  //       .call(method, obj, function(session) {
-  //         session
-  //           .getObject('.val', 'digits=10')
-  //           .then(response => resolve(response));
-  //       })
-  //       .catch(error => {
-  //         // toast.error('Failed to retrieve data, please try again.');
-  //         toast.error(`${error.statusText}: ${error.responseText}`);
-  //         if (handleError !== undefined) {
-  //           handleError(false);
-  //         }
-  //       });
-  //   });
-  // }
-
   async getTestData(model, test, study, errorCb, cancelToken) {
-    debugger;
     this.setUrl();
-    // const obj = { testCategory: model, test: test, study: study };
+    const obj = { testCategory: model, test: test, study: study };
     const promise = this.ocpuDataCall(
       'getInferenceResults',
-      {
-        testCategory: model,
-        test: test,
-        study: study,
-      },
+      obj,
       errorCb,
       cancelToken,
     );
@@ -151,20 +112,16 @@ class PhosphoprotService {
 
   async getAnnotationData(model, test, study, type, errorCb, cancelToken) {
     this.setUrl();
-    // const obj = {
-    //   model: model,
-    //   database: test,
-    //   study: study,
-    //   type: type,
-    // };
+    const obj = {
+      model: model,
+      database: test,
+      study: study,
+      type: type,
+    };
+
     const promise = this.ocpuDataCall(
       'getEnrichmentResults',
-      {
-        model: model,
-        database: test,
-        study: study,
-        type: type,
-      },
+      obj,
       errorCb,
       cancelToken,
     );

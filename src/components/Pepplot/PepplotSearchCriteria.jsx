@@ -161,6 +161,7 @@ class PepplotSearchCriteria extends Component {
           cancelToken,
         )
         .then(dataFromService => {
+          debugger;
           this.setState({
             uSettingsP: {
               ...this.state.uSettingsP,
@@ -177,7 +178,6 @@ class PepplotSearchCriteria extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    debugger;
     if (this.props.pepplotTest !== prevProps.pepplotTest) {
       const s = this.props.pepplotStudy || '';
       const m = this.props.pepplotModel || '';
