@@ -5,7 +5,7 @@ import _ from 'lodash';
 import { formatNumberForDisplay, splitValue } from '../Shared/helpers';
 import phosphosite_icon from '../../resources/phosphosite.ico';
 import './FilteredPepplotTable.scss';
-
+import { CancelToken } from 'axios';
 import QHGrid from '../utility/QHGrid';
 import EZGrid from '../utility/EZGrid';
 import QuickViewModal from '../utility/QuickViewModal';
@@ -19,6 +19,7 @@ export * from '../utility/selectors/quickViewSelector';
 export { QHGrid, EZGrid, QuickViewModal };
 export { getField, getFieldValue, typeMap };
 
+let cancelRequestFPTGetTestData = () => {};
 class FilteredPepplotTable extends Component {
   state = {
     filteredTableConfigCols: [],
@@ -129,11 +130,17 @@ class FilteredPepplotTable extends Component {
     } else {
       const key = this.props.imageInfo.key.split(':');
       const name = key[0].trim() || '';
+      cancelRequestFPTGetTestData();
+      let cancelToken = new CancelToken(e => {
+        cancelRequestFPTGetTestData = e;
+      });
       phosphoprotService
         .getTestData(
           this.props.enrichmentModel,
           name,
           this.props.enrichmentStudy + 'plots',
+          undefined,
+          cancelToken,
         )
         .then(dataFromService => {
           if (dataFromService.length > 0) {

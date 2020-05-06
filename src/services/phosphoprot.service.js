@@ -6,7 +6,6 @@ import { toast } from 'react-toastify';
 window.jQuery = $;
 require('opencpu.js/opencpu-0.5.js');
 // const ocpu = require('opencpu.js/opencpu-0.5.js');
-// let getPlotCancel = () => {};
 class PhosphoprotService {
   constructor() {
     // this.ocpuUrl = 'http://10.239.9.49/ocpu/library/PhosphoProt/R';
@@ -49,7 +48,7 @@ class PhosphoprotService {
     return modelsFromPromise;
   }
 
-  ocpuDataCall(method, obj, handleError) {
+  ocpuTestAnnotationCall(method, obj, handleError, cancelToken) {
     return new Promise(function(resolve, reject) {
       window.ocpu
         .call(method, obj, function(session) {
@@ -67,41 +66,108 @@ class PhosphoprotService {
     });
   }
 
-  ocpuDataCallAlt(method, obj) {
+  ocpuDataCall(method, obj, handleError, cancelToken) {
     return new Promise(function(resolve, reject) {
       window.ocpu
+        // .call(method, obj, function(session) {
+        //   axios
+        //     .get(session.getObject('.val', 'digits=10'), {
+        //       responseType: 'json',
+        //       cancelToken,
+        //     })
+        //     .then(response => resolve(response));
+        // })
         .call(method, obj, function(session) {
-          session.getObject('.val').then(response => resolve(response));
+          session
+            .getObject('.val', 'digits=10')
+            .then(response => resolve(response));
         })
         .catch(error => {
           // toast.error('Failed to retrieve data, please try again.');
           toast.error(`${error.statusText}: ${error.responseText}`);
+          if (handleError !== undefined) {
+            handleError(false);
+          }
         });
     });
   }
 
-  async getTestData(model, test, study) {
+  ocpuDataCallAlt(method, obj, handleError, cancelToken) {
+    return new Promise(function(resolve, reject) {
+      window.ocpu
+        .call(method, obj, function(session) {
+          axios
+            .get(session.getObject('.val'), {
+              responseType: 'json',
+              cancelToken,
+            })
+            .then(response => resolve(response));
+        })
+        .catch(error => {
+          // toast.error('Failed to retrieve data, please try again.');
+          toast.error(`${error.statusText}: ${error.responseText}`);
+          if (handleError !== undefined) {
+            handleError(false);
+          }
+        });
+    });
+  }
+
+  // ocpuTestAnnotationCall(method, obj, handleError) {
+  //   return new Promise(function(resolve, reject) {
+  //     window.ocpu
+  //       .call(method, obj, function(session) {
+  //         session
+  //           .getObject('.val', 'digits=10')
+  //           .then(response => resolve(response));
+  //       })
+  //       .catch(error => {
+  //         // toast.error('Failed to retrieve data, please try again.');
+  //         toast.error(`${error.statusText}: ${error.responseText}`);
+  //         if (handleError !== undefined) {
+  //           handleError(false);
+  //         }
+  //       });
+  //   });
+  // }
+
+  async getTestData(model, test, study, errorCb, cancelToken) {
+    debugger;
     this.setUrl();
-    const obj = { testCategory: model, test: test, study: study };
-    const promise = this.ocpuDataCall('getInferenceResults', obj);
+    // const obj = { testCategory: model, test: test, study: study };
+    const promise = this.ocpuDataCall(
+      'getInferenceResults',
+      {
+        testCategory: model,
+        test: test,
+        study: study,
+      },
+      errorCb,
+      cancelToken,
+    );
     const dataFromPromise = await promise;
     return dataFromPromise;
   }
 
-  async getAnnotationData(model, test, study, type, errorCb) {
-    const handleError =
-      errorCb ||
-      function() {
-        return undefined;
-      };
+  async getAnnotationData(model, test, study, type, errorCb, cancelToken) {
     this.setUrl();
-    const obj = {
-      model: model,
-      database: test,
-      study: study,
-      type: type,
-    };
-    const promise = this.ocpuDataCall('getEnrichmentResults', obj, handleError);
+    // const obj = {
+    //   model: model,
+    //   database: test,
+    //   study: study,
+    //   type: type,
+    // };
+    const promise = this.ocpuDataCall(
+      'getEnrichmentResults',
+      {
+        model: model,
+        database: test,
+        study: study,
+        type: type,
+      },
+      errorCb,
+      cancelToken,
+    );
     const dataFromPromise = await promise;
     return dataFromPromise;
   }
@@ -155,43 +221,55 @@ class PhosphoprotService {
     });
   }
 
-  async getPlot(id, plottype, study, proteinSelectedError, cancelToken) {
-    // getPlotCancel();
+  async getPlot(id, plottype, study, errorCb, cancelToken) {
     this.setUrl();
-    const handleError =
-      proteinSelectedError ||
-      function() {
-        return undefined;
-      };
     const promise = this.ocpuPlotCall(
       plottype,
       { idmult: id, study: study },
-      handleError,
+      errorCb,
       cancelToken,
     );
     //const svgMarkupFromPromise = await promise;
     return promise;
   }
 
-  async getDatabaseInfo(study, test) {
+  async getDatabaseInfo(study, test, errorCb, cancelToken) {
     this.setUrl();
-    const promise = this.ocpuDataCallAlt('getDatabases', {
-      study: study,
-      database: test,
-    });
+    const promise = this.ocpuDataCallAlt(
+      'getDatabases',
+      {
+        study: study,
+        database: test,
+      },
+      errorCb,
+      cancelToken,
+    );
     const dataFromPromise = await promise;
     return dataFromPromise;
   }
 
-  async getBarcodeData(study, model, annotation, test, term) {
+  async getBarcodeData(
+    study,
+    model,
+    annotation,
+    test,
+    term,
+    errorCb,
+    cancelToken,
+  ) {
     this.setUrl();
-    const promise = this.ocpuDataCallAlt('getBarcodeData', {
-      study: study,
-      model: model,
-      database: annotation,
-      test: test,
-      term: term,
-    });
+    const promise = this.ocpuDataCallAlt(
+      'getBarcodeData',
+      {
+        study: study,
+        model: model,
+        database: annotation,
+        test: test,
+        term: term,
+      },
+      errorCb,
+      cancelToken,
+    );
     const dataFromPromise = await promise;
     return dataFromPromise;
   }
@@ -205,18 +283,25 @@ class PhosphoprotService {
     annotation,
     operator,
     pValType,
+    errorCb,
+    cancelToken,
   ) {
     this.setUrl();
-    const promise = this.ocpuDataCall('getEnrichmentIntersection', {
-      testCategory: testCategory,
-      mustTests: mustTest,
-      notTests: notTest,
-      study: study,
-      sigValue: sigValue,
-      annotation: annotation,
-      operator: operator,
-      pValType: pValType,
-    });
+    const promise = this.ocpuDataCall(
+      'getEnrichmentIntersection',
+      {
+        testCategory: testCategory,
+        mustTests: mustTest,
+        notTests: notTest,
+        study: study,
+        sigValue: sigValue,
+        annotation: annotation,
+        operator: operator,
+        pValType: pValType,
+      },
+      errorCb,
+      cancelToken,
+    );
     const dataFromPromise = await promise;
     return dataFromPromise;
   }
@@ -229,13 +314,9 @@ class PhosphoprotService {
     operator,
     pValType,
     errorCb,
+    cancelToken,
   ) {
     this.setUrl();
-    const handleError =
-      errorCb ||
-      function() {
-        return undefined;
-      };
     const promise = this.ocpuPlotCall(
       'EnrichmentUpsetPlot',
       {
@@ -246,7 +327,8 @@ class PhosphoprotService {
         operator: operator,
         pValType: pValType,
       },
-      handleError,
+      errorCb,
+      cancelToken,
     );
     const svgMarkupFromPromise = await promise;
     return svgMarkupFromPromise;
@@ -261,18 +343,25 @@ class PhosphoprotService {
     anchor,
     operator,
     column,
+    errorCb,
+    cancelToken,
   ) {
     this.setUrl();
-    const promise = this.ocpuDataCall('getInferenceIntersection', {
-      testCategory: testCategory,
-      anchor: anchor,
-      mustTests: mustTest,
-      notTests: notTest,
-      study: study,
-      sigValue: sigValue,
-      operator: operator,
-      column: column,
-    });
+    const promise = this.ocpuDataCall(
+      'getInferenceIntersection',
+      {
+        testCategory: testCategory,
+        anchor: anchor,
+        mustTests: mustTest,
+        notTests: notTest,
+        study: study,
+        sigValue: sigValue,
+        operator: operator,
+        column: column,
+      },
+      errorCb,
+      cancelToken,
+    );
     const dataFromPromise = await promise;
     return dataFromPromise;
   }
@@ -284,13 +373,9 @@ class PhosphoprotService {
     testCategory,
     study,
     errorCb,
+    cancelToken,
   ) {
     this.setUrl();
-    const handleError =
-      errorCb ||
-      function() {
-        return undefined;
-      };
     const promise = this.ocpuPlotCall(
       'InferenceUpsetPlot',
       {
@@ -300,7 +385,8 @@ class PhosphoprotService {
         operator: operator,
         column: column,
       },
-      handleError,
+      errorCb,
+      cancelToken,
     );
     const svgMarkupFromPromise = await promise;
     return svgMarkupFromPromise;

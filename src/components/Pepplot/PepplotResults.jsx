@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { phosphoprotService } from '../../services/phosphoprot.service';
+import { CancelToken } from 'axios';
 import { withRouter } from 'react-router-dom';
 import ButtonActions from '../Shared/ButtonActions';
 import PepplotPlot from './PepplotPlot';
@@ -19,6 +20,7 @@ export * from '../utility/selectors/quickViewSelector';
 export { QHGrid, EZGrid, QuickViewModal };
 export { getField, getFieldValue, typeMap };
 
+let cancelRequestPepplotResultsGetPlot = () => {};
 class PepplotResults extends Component {
   static defaultProps = {
     pepplotStudy: '',
@@ -279,10 +281,19 @@ class PepplotResults extends Component {
     //   PepplotPlotSVGWidth = PepplotPlotSVGHeight * 1.41344;
     // }
     let handleItemSelectedCb = this.handleItemSelected;
-
+    cancelRequestPepplotResultsGetPlot();
+    let cancelToken = new CancelToken(e => {
+      cancelRequestPepplotResultsGetPlot = e;
+    });
     _.forEach(plotType, function(plot, i) {
       phosphoprotService
-        .getPlot(id, plotType[i], pepplotStudy + 'plots', handleItemSelectedCb)
+        .getPlot(
+          id,
+          plotType[i],
+          pepplotStudy + 'plots',
+          handleItemSelectedCb,
+          cancelToken,
+        )
         .then(svgMarkupObj => {
           let svgMarkup = svgMarkupObj.data;
           svgMarkup = svgMarkup.replace(/id="/g, 'id="' + id + '-' + i + '-');
@@ -318,10 +329,10 @@ class PepplotResults extends Component {
           // currentSVGs.unshift(sanitizedSVG);
           // }
           handleSVGCb(imageInfo);
+        })
+        .catch(error => {
+          this.handleItemSelected(false);
         });
-      // .catch(error => {
-      //   toast.error('Failed to create plot, please try again.');
-      // });
     });
   };
 
