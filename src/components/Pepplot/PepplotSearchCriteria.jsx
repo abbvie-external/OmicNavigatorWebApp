@@ -161,7 +161,6 @@ class PepplotSearchCriteria extends Component {
           cancelToken,
         )
         .then(dataFromService => {
-          debugger;
           this.setState({
             uSettingsP: {
               ...this.state.uSettingsP,
