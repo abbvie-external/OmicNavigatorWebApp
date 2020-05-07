@@ -13,6 +13,7 @@ import {
   Icon,
   Dropdown,
   Menu,
+  Segment,
 } from 'semantic-ui-react';
 import {
   sortableContainer,
@@ -57,7 +58,15 @@ const NodeStyledTrack = styled.div`
   border-radius: 999px;
 `;
 
-const EdgeStyledTrack = styled.div`
+const EdgeCutoffStyledTrack = styled.div`
+  top: 0;
+  bottom: 0;
+  background: ${props =>
+    props.index === 2 ? '#fff' : props.index === 1 ? '#ff4400' : '#ddd'};
+  border-radius: 999px;
+`;
+
+const EdgeTypeStyledTrack = styled.div`
   top: 0;
   bottom: 0;
   background: ${props =>
@@ -221,6 +230,7 @@ class EnrichmentResultsGraph extends Component {
     networkSortBy: ['significance', 'nodecount', 'edgecount'],
     nodeCutoffLocal: sessionStorage.getItem('nodeCutoff') || 0.1,
     edgeCutoffLocal: sessionStorage.getItem('edgeCutoff') || 0.4,
+    edgeTypeLocal: sessionStorage.getItem('edgeType') || 0.5,
   };
 
   componentDidMount() {
@@ -322,6 +332,7 @@ class EnrichmentResultsGraph extends Component {
     // }
   };
 
+  // NODE CUTOFF
   nodeCutoffStep = component => {
     if (component.state.btnDownActive) {
       // direction down
@@ -346,6 +357,24 @@ class EnrichmentResultsGraph extends Component {
     }
   };
 
+  handleNodeCutoffSliderChange = value => {
+    // let decimalValue = value >= 1 ? value / 100 : 0.01;
+    let decimalValue = value / 100;
+    this.setState({
+      nodeCutoffLocal: decimalValue,
+    });
+    this.props.onHandleNodeCutoffSliderChange(decimalValue);
+  };
+
+  handleNodeCutoffSliderChangeLocal = value => {
+    // let decimalValue = value >= 1 ? value / 100 : 0.01;
+    let decimalValue = value / 100;
+    this.setState({
+      nodeCutoffLocal: decimalValue,
+    });
+  };
+
+  // EDGE CUTOFF
   handleEdgeCutoffInputChangeLocal = _.debounce(value => {
     let revisedValue = value >= 0.05 ? value : 0.05;
     this.setState({
@@ -354,35 +383,41 @@ class EnrichmentResultsGraph extends Component {
     this.props.onHandleEdgeCutoffInputChange(revisedValue);
   }, 1250);
 
-  handleNodeSliderChange = value => {
-    // let decimalValue = value >= 1 ? value / 100 : 0.01;
-    let decimalValue = value / 100;
-    this.setState({
-      nodeCutoffLocal: decimalValue,
-    });
-    this.props.onHandleNodeSliderChange(decimalValue);
-  };
-
-  handleNodeSliderChangeLocal = value => {
-    // let decimalValue = value >= 1 ? value / 100 : 0.01;
-    let decimalValue = value / 100;
-    this.setState({
-      nodeCutoffLocal: decimalValue,
-    });
-  };
-
-  handleEdgeSliderChange = value => {
+  handleEdgeCutoffSliderChange = value => {
     let decimalValue = value >= 5 ? value / 100 : 0.05;
     this.setState({
       edgeCutoffLocal: decimalValue,
     });
-    this.props.onHandleEdgeSliderChange(decimalValue);
+    this.props.onHandleEdgeCutoffSliderChange(decimalValue);
   };
 
-  handleEdgeSliderChangeLocal = value => {
+  handleEdgeCutoffSliderChangeLocal = value => {
     let decimalValue = value >= 5 ? value / 100 : 0.05;
     this.setState({
       edgeCutoffLocal: decimalValue,
+    });
+  };
+
+  // EDGE TYPE
+  handleEdgeTypeInputChangeLocal = _.debounce(value => {
+    this.setState({
+      edgeTypeLocal: value,
+    });
+    this.props.onHandleEdgeTypeInputChange(value);
+  }, 500);
+
+  handleEdgeTypeSliderChange = value => {
+    let decimalValue = value / 100;
+    this.setState({
+      edgeTypeLocal: decimalValue,
+    });
+    this.props.onHandleEdgeTypeSliderChange(decimalValue);
+  };
+
+  handleEdgeTypeSliderChangeLocal = value => {
+    let decimalValue = value / 100;
+    this.setState({
+      edgeTypeLocal: decimalValue,
     });
   };
 
@@ -392,6 +427,7 @@ class EnrichmentResultsGraph extends Component {
       networkSortBy,
       nodeCutoffLocal,
       edgeCutoffLocal,
+      edgeTypeLocal,
     } = this.state;
     const {
       networkDataLoaded,
@@ -430,15 +466,31 @@ class EnrichmentResultsGraph extends Component {
         <NodeStyledTrack {...props} index={state.index} />
       );
 
-      const EdgeThumb = (props, state) => (
+      const EdgeCutoffThumb = (props, state) => (
+        <StyledThumb {...props}></StyledThumb>
+      );
+      const EdgeCutoffTrack = (props, state) => (
+        <EdgeCutoffStyledTrack {...props} index={state.index} />
+      );
+
+      const EdgeTypeThumb = (props, state) => (
         <StyledThumb {...props}>
-          {/* <span className="ValueNowEdge"> */}
-          {/* {state.valueNow >= 5 ? state.valueNow / 100 : 0.05} */}
-          {/* </span> */}
+          {/* <span className="ValueNowEdgeTypeOverlapNumber">
+            {state.valueNow}%
+          </span>
+          <span className="ValueNowEdgeTypeJaccardNumber">
+            {100 - state.valueNow}%
+          </span> */}
+          {/* <span className="ValueNowEdgeTypeJaccardText">
+            {state.valueNow <= 50 ? 'Jaccard' : ''}
+          </span>
+          <span className="ValueNowEdgeTypeJaccardText">
+            {state.valueNow <= 50 ? 'Jaccard' : ''}
+          </span> */}
         </StyledThumb>
       );
-      const EdgeTrack = (props, state) => (
-        <EdgeStyledTrack {...props} index={state.index} />
+      const EdgeTypeTrack = (props, state) => (
+        <EdgeTypeStyledTrack {...props} index={state.index} />
       );
 
       return (
@@ -449,7 +501,7 @@ class EnrichmentResultsGraph extends Component {
               mobile={14}
               tablet={4}
               computer={4}
-              largeScreen={3}
+              largeScreen={2}
               widescreen={2}
             ></Grid.Column>
             <Grid.Column
@@ -457,7 +509,7 @@ class EnrichmentResultsGraph extends Component {
               mobile={16}
               tablet={10}
               computer={10}
-              largeScreen={4}
+              largeScreen={3}
               widescreen={3}
             >
               <Search
@@ -474,25 +526,6 @@ class EnrichmentResultsGraph extends Component {
               />
               <Radio
                 disabled={!networkGraphReady}
-                className="RadioLabelsDisplay DisplayOnSmaller"
-                // only="mobile computer"
-                toggle
-                size={dynamicSize}
-                label="Show Labels"
-                checked={this.state.showNetworkLabels}
-                onChange={this.handleLabels}
-              />
-            </Grid.Column>
-            <Grid.Column
-              // className="NetworkGraphFilters"
-              only="large screen widescreen"
-              // tablet={2}
-              // computer={2}
-              largeScreen={2}
-              widescreen={2}
-            >
-              <Radio
-                disabled={!networkGraphReady}
                 className="RadioLabelsDisplay"
                 toggle
                 size={dynamicSize}
@@ -506,15 +539,15 @@ class EnrichmentResultsGraph extends Component {
               mobile={16}
               tablet={5}
               computer={5}
-              largeScreen={3}
-              widescreen={3}
+              largeScreen={2}
+              widescreen={2}
             >
               <div className="InlineFlex">
                 <Popup
                   trigger={
                     <Label className="NetworkInputLabel" size={dynamicSize}>
                       NODE
-                      <span className="DisplayOnLarge"> SIGNIFICANCE</span>
+                      {/* <span className="DisplayOnLarge"> SIGNIFICANCE</span> */}
                       <br></br>
                       CUTOFF
                     </Label>
@@ -558,9 +591,9 @@ class EnrichmentResultsGraph extends Component {
                   min={0}
                   max={100}
                   // step={0.1}
-                  onChange={this.handleNodeSliderChangeLocal}
-                  onSliderClick={this.handleNodeSliderChange}
-                  onAfterChange={this.handleNodeSliderChange}
+                  onChange={this.handleNodeCutoffSliderChangeLocal}
+                  onSliderClick={this.handleNodeCutoffSliderChange}
+                  onAfterChange={this.handleNodeCutoffSliderChange}
                 />
               </div>
             </Grid.Column>
@@ -569,15 +602,15 @@ class EnrichmentResultsGraph extends Component {
               mobile={16}
               tablet={5}
               computer={5}
-              largeScreen={3}
-              widescreen={3}
+              largeScreen={2}
+              widescreen={2}
             >
               <div className="InlineFlex">
                 <Popup
                   trigger={
                     <Label className="NetworkInputLabel" size={dynamicSize}>
                       EDGE
-                      <span className="DisplayOnLarge"> SIMILARITY</span>
+                      {/* <span className="DisplayOnLarge"> SIMILARITY</span> */}
                       <br></br>
                       CUTOFF
                     </Label>
@@ -605,8 +638,8 @@ class EnrichmentResultsGraph extends Component {
               </div>
               <div className="NetworkSliderAndTotalsDiv">
                 <StyledSlider
-                  renderTrack={EdgeTrack}
-                  renderThumb={EdgeThumb}
+                  renderTrack={EdgeCutoffTrack}
+                  renderThumb={EdgeCutoffThumb}
                   disabled={!networkGraphReady}
                   className={
                     networkGraphReady
@@ -618,9 +651,109 @@ class EnrichmentResultsGraph extends Component {
                   min={0}
                   max={100}
                   // step={0.1}
-                  onChange={this.handleEdgeSliderChangeLocal}
-                  onSliderClick={this.handleEdgeSliderChange}
-                  onAfterChange={this.handleEdgeSliderChange}
+                  onChange={this.handleEdgeCutoffSliderChangeLocal}
+                  onSliderClick={this.handleEdgeCutoffSliderChange}
+                  onAfterChange={this.handleEdgeCutoffSliderChange}
+                />
+              </div>
+            </Grid.Column>
+            <Grid.Column
+              className="NetworkGraphFilters"
+              mobile={16}
+              tablet={5}
+              computer={5}
+              largeScreen={2}
+              widescreen={2}
+            >
+              <Grid columns={2} className="EdgeTypeContainer">
+                <Grid.Row>
+                  <Grid.Column width={5}>
+                    <Popup
+                      trigger={
+                        <Label className="NetworkInputLabel" size={dynamicSize}>
+                          EDGE
+                          <br></br>
+                          TYPE
+                        </Label>
+                      }
+                      style={CustomPopupStyle}
+                      content="TBD BRETT...Percent used for overlap coefficient and Jaccard index, respectfully."
+                      inverted
+                      basic
+                      position="left center"
+                      mouseEnterDelay={1000}
+                      mouseLeaveDelay={0}
+                    />
+                  </Grid.Column>
+                  <Grid.Column width={11}>
+                    <Label circular size="small" color="">
+                      {Math.round(edgeTypeLocal * 100)}
+                    </Label>
+                    <span id="OverlapText" className="EdgeTypeText">
+                      Overlap
+                    </span>
+                    {/* <span>Coefficient</span> */}
+                    {/* <Label circular size="mini" color="">
+                      {Math.round(edgeTypeLocal * 100)}
+                    </Label> */}
+                    <br></br>
+                    <span id="JaccardText" className="EdgeTypeText">
+                      Jaccard
+                    </span>
+                    <Label circular size="small" color="orange">
+                      {Math.round(100 - edgeTypeLocal * 100)}
+                    </Label>
+                  </Grid.Column>
+                </Grid.Row>
+              </Grid>
+              {/* <div className="InlineFlex">
+                <Popup
+                  trigger={
+                    <Label className="NetworkInputLabel" size={dynamicSize}>
+                      EDGE
+                      <br></br>
+                      TYPE
+                    </Label>
+                  }
+                  style={CustomPopupStyle}
+                  content="TBD BRETT...Percent used for overlap coefficient and Jaccard index, respectfully."
+                  inverted
+                  basic
+                  position="left center"
+                  mouseEnterDelay={1000}
+                  mouseLeaveDelay={0}
+                />
+                <NumericInput
+                  value={edgeTypeLocal}
+                  onChange={this.handleEdgeTypeInputChangeLocal}
+                  disabled={!networkGraphReady}
+                  precision={2}
+                  size={dynamicSize}
+                  step={0.01}
+                  min={0.0}
+                  max={1.0}
+                  id="NetworkSliderNodeInput"
+                  className="NetworkSliderInput"
+                />
+              </div> */}
+              <div className="NetworkSliderAndTotalsDiv">
+                <StyledSlider
+                  renderTrack={EdgeTypeTrack}
+                  renderThumb={EdgeTypeThumb}
+                  disabled={!networkGraphReady}
+                  className={
+                    networkGraphReady
+                      ? 'NetworkSlider Show'
+                      : 'NetworkSlider Hide'
+                  }
+                  value={edgeTypeLocal * 100}
+                  name="edgeTypeSlider"
+                  min={0}
+                  max={100}
+                  // step={0.1}
+                  onChange={this.handleEdgeTypeSliderChangeLocal}
+                  onSliderClick={this.handleEdgeTypeSliderChange}
+                  onAfterChange={this.handleEdgeTypeSliderChange}
                 />
               </div>
             </Grid.Column>

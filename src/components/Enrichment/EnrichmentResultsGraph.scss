@@ -161,6 +161,10 @@
   margin-bottom: 10px;
 }
 
+.EdgeTypeContainer {
+  margin-bottom: -5px !important;
+}
+
 .NetworkSliderInput {
   font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif !important;
   font-size: 14px !important;
@@ -190,11 +194,28 @@
   margin-right: -95px;
 }
 
-.ValueNowEdge {
+.ValueNowEdgeTypeOverlapNumber {
   color: var(--color-dark) !important;
-  margin-left: -65px;
+  margin-left: -30px;
 }
 
+.ValueNowEdgeTypeJaccardNumber {
+  color: var(--color-white) !important;
+  margin-left: 35px;
+}
+
+.EdgeTypeText {
+  font-size: 14px !important;
+  // margin-right: 5px;
+}
+
+#OverlapText {
+  margin-left: 5px;
+}
+
+#JaccardText {
+  margin-right: 5px;
+}
 .DisplayOnLarge {
   display: none !important;
 }
