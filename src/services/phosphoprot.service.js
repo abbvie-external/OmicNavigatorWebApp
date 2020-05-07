@@ -80,12 +80,13 @@ class PhosphoprotService {
     return new Promise(function(resolve, reject) {
       window.ocpu
         .call(method, obj, function(session) {
+          const url = session.getLoc() + 'R/.val/json';
           axios
-            .get(session.getObject('.val'), {
-              responseType: 'json',
+            .get(url, {
+              responseType: 'text',
               cancelToken,
             })
-            .then(response => resolve(response));
+            .then(response => resolve(response.data));
         })
         .catch(error => {
           // toast.error('Failed to retrieve data, please try again.');
