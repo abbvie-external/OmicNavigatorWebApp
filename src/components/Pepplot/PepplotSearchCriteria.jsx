@@ -9,11 +9,15 @@ import {
   Radio,
   Transition,
 } from 'semantic-ui-react';
+import { CancelToken } from 'axios';
 import '../Shared/SearchCriteria.scss';
 import { phosphoprotService } from '../../services/phosphoprot.service';
 import _ from 'lodash';
 import PepplotMultisetFilters from './PepplotMultisetFilters';
 
+let cancelRequestPSCGetTestData = () => {};
+let cancelRequestMultisetInferenceData = () => {};
+let cancelRequestInferenceMultisetPlot = () => {};
 class PepplotSearchCriteria extends Component {
   state = {
     pepplotStudies: [],
@@ -90,6 +94,7 @@ class PepplotSearchCriteria extends Component {
     multisetFiltersVisibleP: false,
     activateMultisetFiltersP: false,
     uDataP: [],
+    pepplotResultsErrorCb: this.props.onSearchTransition || undefined,
   };
 
   componentDidMount() {
@@ -142,9 +147,19 @@ class PepplotSearchCriteria extends Component {
       this.setState({
         uAnchorP: t,
       });
-      this.props.onSearchTransition(true);
+      this.state.pepplotResultsErrorCb(true);
+      cancelRequestPSCGetTestData();
+      let cancelToken = new CancelToken(e => {
+        cancelRequestPSCGetTestData = e;
+      });
       phosphoprotService
-        .getTestData(m, t, s + 'plots')
+        .getTestData(
+          m,
+          t,
+          s + 'plots',
+          this.state.pepplotResultsErrorCb,
+          cancelToken,
+        )
         .then(dataFromService => {
           this.setState({
             uSettingsP: {
@@ -161,7 +176,7 @@ class PepplotSearchCriteria extends Component {
     this.populateStudies();
   }
 
-  componentDidUpdate(prevProps, prevState, snapshot) {
+  componentDidUpdate(prevProps) {
     if (this.props.pepplotTest !== prevProps.pepplotTest) {
       const s = this.props.pepplotStudy || '';
       const m = this.props.pepplotModel || '';
@@ -212,9 +227,19 @@ class PepplotSearchCriteria extends Component {
         this.setState({
           uAnchorP: t,
         });
-        this.props.onSearchTransition(true);
+        this.state.pepplotResultsErrorCb(true);
+        cancelRequestPSCGetTestData();
+        let cancelToken = new CancelToken(e => {
+          cancelRequestPSCGetTestData = e;
+        });
         phosphoprotService
-          .getTestData(m, t, s + 'plots')
+          .getTestData(
+            m,
+            t,
+            s + 'plots',
+            this.state.pepplotResultsErrorCb,
+            cancelToken,
+          )
           .then(dataFromService => {
             this.setState({
               uSettingsP: {
@@ -311,12 +336,18 @@ class PepplotSearchCriteria extends Component {
       },
       true,
     );
-    this.props.onSearchTransition(true);
+    this.state.pepplotResultsErrorCb(true);
+    cancelRequestPSCGetTestData();
+    let cancelToken = new CancelToken(e => {
+      cancelRequestPSCGetTestData = e;
+    });
     phosphoprotService
       .getTestData(
         this.props.pepplotModel,
         value,
         this.props.pepplotStudy + 'plots',
+        this.state.pepplotResultsErrorCb,
+        cancelToken,
       )
       .then(dataFromService => {
         this.setState({
@@ -371,12 +402,18 @@ class PepplotSearchCriteria extends Component {
       },
       true,
     );
-    this.props.onSearchTransition(true);
+    this.state.pepplotResultsErrorCb(true);
+    cancelRequestPSCGetTestData();
+    let cancelToken = new CancelToken(e => {
+      cancelRequestPSCGetTestData = e;
+    });
     phosphoprotService
       .getTestData(
         this.props.pepplotModel,
         value,
         this.props.pepplotStudy + 'plots',
+        this.state.pepplotResultsErrorCb,
+        cancelToken,
       )
       .then(dataFromService => {
         this.testdata = dataFromService;
@@ -493,6 +530,10 @@ class PepplotSearchCriteria extends Component {
         this.jsonToList(eColP),
       );
     }
+    cancelRequestMultisetInferenceData();
+    let cancelToken = new CancelToken(e => {
+      cancelRequestMultisetInferenceData = e;
+    });
     phosphoprotService
       .getMultisetInferenceData(
         this.props.pepplotModel,
@@ -503,6 +544,8 @@ class PepplotSearchCriteria extends Component {
         this.props.pepplotTest,
         this.jsonToList(eOperatorP),
         this.jsonToList(eColP),
+        this.state.pepplotResultsErrorCb,
+        cancelToken,
       )
       .then(inferenceData => {
         const multisetResultsP = inferenceData;
@@ -532,6 +575,10 @@ class PepplotSearchCriteria extends Component {
   }
 
   getMultisetPlot(sigVal, pepplotModel, pepplotStudy, eOperatorP, eColP) {
+    cancelRequestInferenceMultisetPlot();
+    let cancelToken = new CancelToken(e => {
+      cancelRequestInferenceMultisetPlot = e;
+    });
     let heightCalculation = this.calculateHeight;
     let widthCalculation = this.calculateWidth;
     phosphoprotService
@@ -541,6 +588,8 @@ class PepplotSearchCriteria extends Component {
         eColP,
         pepplotModel,
         pepplotStudy,
+        undefined,
+        cancelToken,
       )
       .then(svgMarkupObj => {
         let svgMarkup = svgMarkupObj.data;

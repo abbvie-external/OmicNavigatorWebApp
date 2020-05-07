@@ -31,7 +31,7 @@ import EnrichmentResultsTable from './EnrichmentResultsTable';
 import EnrichmentSearchCriteria from './EnrichmentSearchCriteria';
 import SplitPanesContainer from './SplitPanesContainer';
 
-let plotCancel = () => {};
+let cancelRequestEnrichmentGetPlot = () => {};
 class Enrichment extends Component {
   defaultEnrichmentActiveIndex =
     parseInt(sessionStorage.getItem('enrichmentViewTab'), 10) || 0;
@@ -847,7 +847,7 @@ class Enrichment extends Component {
         this.getPlot(id, plotType, enrichmentStudy, imageInfo, handleSVGCb);
       }
     } else {
-      plotCancel();
+      cancelRequestEnrichmentGetPlot();
       this.setState({
         SVGPlotLoaded: false,
         SVGPlotLoading: false,
@@ -871,11 +871,10 @@ class Enrichment extends Component {
     } else {
       EnrichmentPlotSVGWidth = EnrichmentPlotSVGHeight * 1.41344;
     }
-    plotCancel();
+    cancelRequestEnrichmentGetPlot();
     let cancelToken = new CancelToken(e => {
-      plotCancel = e;
+      cancelRequestEnrichmentGetPlot = e;
     });
-
     _.forEach(plotType, function(plot, i) {
       phosphoprotService
         .getPlot(
