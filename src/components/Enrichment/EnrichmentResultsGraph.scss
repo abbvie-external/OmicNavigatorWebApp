@@ -216,6 +216,11 @@
 #JaccardText {
   margin-right: 5px;
 }
+
+#JaccardPercent {
+  color: var(--color-white);
+  background-color: var(--color-primary);
+}
 .DisplayOnLarge {
   display: none !important;
 }

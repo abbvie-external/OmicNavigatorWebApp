@@ -687,7 +687,7 @@ class EnrichmentResultsGraph extends Component {
                   </Grid.Column>
                   <Grid.Column width={11}>
                     <Label circular size="small" color="">
-                      {Math.round(edgeTypeLocal * 100)}
+                      {Math.round(edgeTypeLocal * 100)} %
                     </Label>
                     <span id="OverlapText" className="EdgeTypeText">
                       Overlap
@@ -700,8 +700,8 @@ class EnrichmentResultsGraph extends Component {
                     <span id="JaccardText" className="EdgeTypeText">
                       Jaccard
                     </span>
-                    <Label circular size="small" color="orange">
-                      {Math.round(100 - edgeTypeLocal * 100)}
+                    <Label circular size="small" id="JaccardPercent">
+                      {Math.round(100 - edgeTypeLocal * 100)} %
                     </Label>
                   </Grid.Column>
                 </Grid.Row>
