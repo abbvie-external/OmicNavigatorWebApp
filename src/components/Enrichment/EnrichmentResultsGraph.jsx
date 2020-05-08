@@ -663,6 +663,8 @@ class EnrichmentResultsGraph extends Component {
                 />
               </div>
             </Grid.Column>
+
+            {/* EDGE TYPE LABEL VERSION */}
             <Grid.Column
               className="NetworkGraphFilters"
               mobile={16}
@@ -711,10 +713,6 @@ class EnrichmentResultsGraph extends Component {
                     <span id="JaccardText" className="EdgeTypeText">
                       Jaccard
                     </span>
-                    {/* <span>Coefficient</span> */}
-                    {/* <Label circular size="mini" color="">
-                      {Math.round(edgeTypeLocal * 100)}
-                    </Label> */}
                     <br></br>
                     <span id="OverlapText" className="EdgeTypeText">
                       Overlap
@@ -725,6 +723,8 @@ class EnrichmentResultsGraph extends Component {
                   </Grid.Column>
                 </Grid.Row>
               </Grid>
+
+              {/* INPUT VERSION */}
               {/* <div className="InlineFlex">
                 <Popup
                   trigger={
