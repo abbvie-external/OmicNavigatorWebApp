@@ -70,7 +70,7 @@ const EdgeTypeStyledTrack = styled.div`
   top: 0;
   bottom: 0;
   background: ${props =>
-    props.index === 2 ? '#fff' : props.index === 1 ? '#ff4400' : '#ddd'};
+    props.index === 2 ? '#2e2e2e' : props.index === 1 ? '#ddd' : '#ff4400'};
   border-radius: 999px;
 `;
 
@@ -334,6 +334,7 @@ class EnrichmentResultsGraph extends Component {
 
   // NODE CUTOFF
   nodeCutoffStep = component => {
+    debugger;
     if (component.state.btnDownActive) {
       // direction down
       if (component.state.value <= 0.001) {
@@ -507,16 +508,18 @@ class EnrichmentResultsGraph extends Component {
             <Grid.Column
               // className="NetworkGraphFilters"
               mobile={16}
-              tablet={10}
-              computer={10}
-              largeScreen={3}
-              widescreen={3}
+              tablet={6}
+              computer={6}
+              largeScreen={2}
+              widescreen={2}
             >
               <Search
                 disabled={!networkGraphReady}
-                size={dynamicSize}
+                // size={dynamicSize}
+                size-="tiny"
+                input={{ icon: 'search', iconPosition: 'left' }}
                 id="NetworkSearchInput"
-                placeholder="Search Network"
+                placeholder="Search"
                 onResultSelect={this.handleResultSelect}
                 onSearchChange={this.handleSearchChange}
                 results={results}
@@ -528,7 +531,8 @@ class EnrichmentResultsGraph extends Component {
                 disabled={!networkGraphReady}
                 className="RadioLabelsDisplay"
                 toggle
-                size={dynamicSize}
+                // size={dynamicSize}
+                size="small"
                 label="Show Labels"
                 checked={this.state.showNetworkLabels}
                 onChange={this.handleLabels}
@@ -537,10 +541,11 @@ class EnrichmentResultsGraph extends Component {
             <Grid.Column
               className="NetworkGraphFilters"
               mobile={16}
-              tablet={5}
-              computer={5}
-              largeScreen={2}
-              widescreen={2}
+              tablet={6}
+              computer={6}
+              largeScreen={3}
+              widescreen={3}
+              textAlign="center"
             >
               <div className="InlineFlex">
                 <Popup
@@ -576,7 +581,7 @@ class EnrichmentResultsGraph extends Component {
                   // onInvalid={this.}
                 />
               </div>
-              <div className="NetworkSliderAndTotalsDiv">
+              <div className="NetworkSliderDiv">
                 <StyledSlider
                   renderTrack={NodeTrack}
                   renderThumb={NodeThumb}
@@ -602,8 +607,9 @@ class EnrichmentResultsGraph extends Component {
               mobile={16}
               tablet={5}
               computer={5}
-              largeScreen={2}
-              widescreen={2}
+              largeScreen={3}
+              widescreen={3}
+              textAlign="center"
             >
               <div className="InlineFlex">
                 <Popup
@@ -636,7 +642,7 @@ class EnrichmentResultsGraph extends Component {
                   className="NetworkSliderInput"
                 />
               </div>
-              <div className="NetworkSliderAndTotalsDiv">
+              <div className="NetworkSliderDiv">
                 <StyledSlider
                   renderTrack={EdgeCutoffTrack}
                   renderThumb={EdgeCutoffThumb}
@@ -662,15 +668,24 @@ class EnrichmentResultsGraph extends Component {
               mobile={16}
               tablet={5}
               computer={5}
-              largeScreen={2}
-              widescreen={2}
+              largeScreen={3}
+              widescreen={3}
+              textAlign="center"
             >
-              <Grid columns={2} className="EdgeTypeContainer">
-                <Grid.Row>
-                  <Grid.Column width={5}>
+              <Grid className="EdgeTypeContainer">
+                <Grid.Row columns={2} centered id="EdgeTypeRow">
+                  <Grid.Column
+                    id="EdgeTypeLabelColumn"
+                    textAlign="right"
+                    // width={5}
+                  >
                     <Popup
                       trigger={
-                        <Label className="NetworkInputLabel" size={dynamicSize}>
+                        <Label
+                          className="NetworkInputLabel"
+                          id="EdgeTypeLabel"
+                          size={dynamicSize}
+                        >
                           EDGE
                           <br></br>
                           TYPE
@@ -685,22 +700,26 @@ class EnrichmentResultsGraph extends Component {
                       mouseLeaveDelay={0}
                     />
                   </Grid.Column>
-                  <Grid.Column width={11}>
-                    <Label circular size="small" color="">
+                  <Grid.Column
+                    id="EdgeTextContainer"
+                    textAlign="left"
+                    // width={11}
+                  >
+                    <Label circular size="small" color="" id="JaccardPercent">
                       {Math.round(edgeTypeLocal * 100)} %
                     </Label>
-                    <span id="OverlapText" className="EdgeTypeText">
-                      Overlap
+                    <span id="JaccardText" className="EdgeTypeText">
+                      Jaccard
                     </span>
                     {/* <span>Coefficient</span> */}
                     {/* <Label circular size="mini" color="">
                       {Math.round(edgeTypeLocal * 100)}
                     </Label> */}
                     <br></br>
-                    <span id="JaccardText" className="EdgeTypeText">
-                      Jaccard
+                    <span id="OverlapText" className="EdgeTypeText">
+                      Overlap
                     </span>
-                    <Label circular size="small" id="JaccardPercent">
+                    <Label circular size="small" id="OverlapPercent">
                       {Math.round(100 - edgeTypeLocal * 100)} %
                     </Label>
                   </Grid.Column>
@@ -736,7 +755,7 @@ class EnrichmentResultsGraph extends Component {
                   className="NetworkSliderInput"
                 />
               </div> */}
-              <div className="NetworkSliderAndTotalsDiv">
+              <div className="NetworkSliderDiv" id="NetworkSliderDivEdgeType">
                 <StyledSlider
                   renderTrack={EdgeTypeTrack}
                   renderThumb={EdgeTypeThumb}
@@ -765,6 +784,7 @@ class EnrichmentResultsGraph extends Component {
               computer={6}
               largeScreen={3}
               widescreen={3}
+              textAlign="center"
             >
               <Menu
                 id="NetworkGraphSortByMenu"

@@ -42,12 +42,30 @@
 
 #NetworkSearchInput {
   border-radius: 0.28571429rem !important;
+  width: 150px;
 }
 
 @media (max-width: 767px) {
   #NetworkSearchInput {
+    max-width: 110px !important;
     margin-top: 20px !important;
-    width: initial;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 999px) {
+  #NetworkSearchInput {
+    max-width: 150px !important;
+  }
+}
+@media (min-width: 1000px) and (max-width: 1599px) {
+  #NetworkSearchInput {
+    max-width: 110px !important;
+  }
+}
+
+@media (min-width: 1600) and (max-width: 1900px) {
+  #NetworkSearchInput {
+    max-width: 145px !important;
   }
 }
 
@@ -107,7 +125,7 @@
 
 .RadioLabelsDisplay {
   margin-top: 10px;
-  margin-left: 20px;
+  // margin-left: 20px;
   font-size: 1rem !important;
 
   //   .ui.toggle.checkbox input:checked ~ .box:before,
@@ -122,34 +140,41 @@
   }
 }
 
-.NetworkSliderAndTotalsDiv {
-  margin-top: 10px;
-  margin-bottom: 5px;
+.NetworkSliderDiv {
+  margin: 0 auto !important;
+  margin-top: 10px !important;
+  margin-bottom: 5px !important;
   max-width: 245px;
 }
 
 @media (min-width: 1600px) and (max-width: 2599px) {
-  .NetworkSliderAndTotalsDiv {
+  .NetworkSliderDiv {
     max-width: 220px !important;
   }
 }
 
 // @media (min-width: 1200px) and (max-width: 1599px) {
-//   .NetworkSliderAndTotalsDiv {
+//   .NetworkSliderDiv {
 //     max-width: 130px !important;
 //   }
 // }
 
 // @media (min-width: 768px) and (max-width: 1199px) {
-//   .NetworkSliderAndTotalsDiv {
+//   .NetworkSliderDiv {
 //     max-width: 135px !important;
 //   }
 // }
 
 @media (max-width: 1599px) {
-  .NetworkSliderAndTotalsDiv {
+  .NetworkSliderDiv {
     max-width: 135px !important;
   }
+}
+
+#NetworkSliderDivEdgeType {
+  margin-top: 12px !important;
+  // margin-bottom: 5px !important;
+  // max-width: 245px;
 }
 
 .InlineFlex {
@@ -162,7 +187,24 @@
 }
 
 .EdgeTypeContainer {
-  margin-bottom: -5px !important;
+  margin-bottom: -10px !important;
+}
+
+// #EdgeTypeLabelColumn {
+//   max-width: 50px !important;
+// }
+
+#EdgeTextContainer {
+  padding-right: 0px !important;
+  padding-left: 15px !important;
+}
+
+#EdgeTypeRow div:nth-of-type(1) {
+  max-width: 60px !important;
+}
+
+#EdgeTypeLabel {
+  line-height: 1.1 !important;
 }
 
 .NetworkSliderInput {
@@ -205,15 +247,15 @@
 }
 
 .EdgeTypeText {
-  font-size: 14px !important;
+  font-size: 13px !important;
   // margin-right: 5px;
 }
 
-#OverlapText {
+#JaccardText {
   margin-left: 5px;
 }
 
-#JaccardText {
+#OverlapText {
   margin-right: 5px;
 }
 
