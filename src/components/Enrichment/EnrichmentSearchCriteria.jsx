@@ -641,6 +641,7 @@ class EnrichmentSearchCriteria extends Component {
       multisetPlotAvailable,
       plotButtonActive,
       isTestDataLoaded,
+      activeIndexEnrichmentView 
     } = this.props;
 
     const StudyPopupStyle = {
@@ -700,7 +701,8 @@ class EnrichmentSearchCriteria extends Component {
     if (
       isValidSearchEnrichment &&
       activateMultisetFilters &&
-      multisetFiltersVisible
+      multisetFiltersVisible &&
+      activeIndexEnrichmentView === 0
     ) {
       EMultisetFilters = (
         <EnrichmentMultisetFilters
@@ -719,7 +721,7 @@ class EnrichmentSearchCriteria extends Component {
     let PlotRadio;
     let MultisetRadio;
 
-    if (isValidSearchEnrichment) {
+    if (isValidSearchEnrichment && activeIndexEnrichmentView === 0) {
       PlotRadio = (
         <Transition
           visible={!multisetPlotAvailable}
@@ -736,18 +738,17 @@ class EnrichmentSearchCriteria extends Component {
           />
         </Transition>
       );
-
       MultisetRadio = (
-        <React.Fragment>
-          <Divider />
-          <Radio
-            toggle
-            label="Set Analysis"
-            checked={multisetFiltersVisible}
-            onChange={this.handleMultisetToggle()}
-          />
-        </React.Fragment>
-      );
+         <React.Fragment>
+           <Divider />
+           <Radio
+             toggle
+             label="Set Analysis"
+             checked={multisetFiltersVisible}
+             onChange={this.handleMultisetToggle()}
+           />
+         </React.Fragment>
+       );
     }
 
     return (
