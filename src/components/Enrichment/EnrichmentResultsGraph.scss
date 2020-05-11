@@ -144,14 +144,15 @@
   margin: 0 auto !important;
   margin-top: 10px !important;
   margin-bottom: 5px !important;
-  max-width: 245px;
+  // max-width: 245px;
+  max-width: 156px;
 }
 
-@media (min-width: 1600px) and (max-width: 2599px) {
-  .NetworkSliderDiv {
-    max-width: 220px !important;
-  }
-}
+// @media (min-width: 1600px) and (max-width: 2599px) {
+//   .NetworkSliderDiv {
+//     max-width: 220px !important;
+//   }
+// }
 
 // @media (min-width: 1200px) and (max-width: 1599px) {
 //   .NetworkSliderDiv {
@@ -216,10 +217,10 @@
   padding-left: 10px !important;
 }
 
-@media (min-width: 2600px) {
+@media (min-width: 1600px) {
   .NetworkSliderInput {
     font-size: 15px !important;
-    height: 44px !important;
+    height: 50px !important;
   }
 }
 
@@ -236,14 +237,19 @@
   margin-right: -95px;
 }
 
+.ValueNowEdgeTypeOverlapText,
 .ValueNowEdgeTypeOverlapNumber {
   color: var(--color-dark) !important;
-  margin-left: -30px;
+  margin-left: 37px;
+  font-size: 12px;
 }
 
+.ValueNowEdgeTypeJaccardText,
 .ValueNowEdgeTypeJaccardNumber {
-  color: var(--color-white) !important;
-  margin-left: 35px;
+  color: var(--color-dark) !important;
+  // color: var(--color-white) !important;
+  margin-left: -44px;
+  font-size: 12px;
 }
 
 .EdgeTypeText {
@@ -290,6 +296,7 @@
   background-color: var(--color-dark) !important;
   color: var(--color-light) !important;
   display: inline-block !important;
+  line-height: initial !important;
 }
 
 // @media (max-width: 768px) {

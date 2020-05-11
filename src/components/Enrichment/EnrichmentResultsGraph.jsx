@@ -26,6 +26,7 @@ import NetworkGraph from './NetworkGraph';
 import ReactSlider from 'react-slider';
 import LoaderActivePlots from '../Transitions/LoaderActivePlots';
 import './EnrichmentResultsGraph.scss';
+import NumericExponentialInput from '../Shared/NumericExponentialInput';
 
 const StyledSlider = styled(ReactSlider)`
   width: 100%;
@@ -54,7 +55,12 @@ const NodeStyledTrack = styled.div`
   top: 0;
   bottom: 0;
   background: ${props =>
-    props.index === 2 ? '#2e2e2e' : props.index === 1 ? '#ddd' : '#ff4400'};
+    props.index === 2
+      ? '#2e2e2e'
+      : props.index === 1
+      ? '#ddd'
+      : // : 'linear-gradient(90deg, var(--color-primary) -2.66%, var(--color-primary-gradient) 99.83%)'};
+        'var(--color-primary)'};
   border-radius: 999px;
 `;
 
@@ -62,7 +68,12 @@ const EdgeCutoffStyledTrack = styled.div`
   top: 0;
   bottom: 0;
   background: ${props =>
-    props.index === 2 ? '#fff' : props.index === 1 ? '#ff4400' : '#ddd'};
+    props.index === 2
+      ? '#fff'
+      : props.index === 1
+      ? 'var(--color-primary)'
+      : // ? 'linear-gradient(90deg, var(--color-primary) -2.66%, var(--color-primary-gradient) 99.83%)'};
+        '#ddd'};
   border-radius: 999px;
 `;
 
@@ -70,7 +81,12 @@ const EdgeTypeStyledTrack = styled.div`
   top: 0;
   bottom: 0;
   background: ${props =>
-    props.index === 2 ? '#2e2e2e' : props.index === 1 ? '#ddd' : '#ff4400'};
+    props.index === 2
+      ? '#2e2e2e'
+      : props.index === 1
+      ? '#ddd'
+      : 'var(--color-primary)'};
+  /* : 'linear-gradient(90deg, var(--color-primary) -2.66%, var(--color-primary-gradient) 99.83%)'}; */
   border-radius: 999px;
 `;
 
@@ -334,7 +350,6 @@ class EnrichmentResultsGraph extends Component {
 
   // NODE CUTOFF
   nodeCutoffStep = component => {
-    debugger;
     if (component.state.btnDownActive) {
       // direction down
       if (component.state.value <= 0.001) {
@@ -476,18 +491,20 @@ class EnrichmentResultsGraph extends Component {
 
       const EdgeTypeThumb = (props, state) => (
         <StyledThumb {...props}>
-          {/* <span className="ValueNowEdgeTypeOverlapNumber">
+          {/* <span className="ValueNowEdgeTypeJaccardNumber">
             {state.valueNow}%
           </span>
-          <span className="ValueNowEdgeTypeJaccardNumber">
+          <span className="ValueNowEdgeTypeOverlapNumber">
             {100 - state.valueNow}%
           </span> */}
-          {/* <span className="ValueNowEdgeTypeJaccardText">
-            {state.valueNow <= 50 ? 'Jaccard' : ''}
-          </span>
           <span className="ValueNowEdgeTypeJaccardText">
-            {state.valueNow <= 50 ? 'Jaccard' : ''}
-          </span> */}
+            Jaccard
+            {/* {state.valueNow <= 50 ? 'Jaccard' : ''} */}
+          </span>
+          <span className="ValueNowEdgeTypeOverlapText">
+            {/* {state.valueNow >= 50 ? 'Overlap' : ''} */}
+            Overlap
+          </span>
         </StyledThumb>
       );
       const EdgeTypeTrack = (props, state) => (
@@ -565,7 +582,7 @@ class EnrichmentResultsGraph extends Component {
                   mouseEnterDelay={1000}
                   mouseLeaveDelay={0}
                 />
-                <NumericInput
+                {/* <NumericInput
                   value={nodeCutoffLocal}
                   onChange={this.handleNodeCutoffInputChangeLocal}
                   disabled={!networkGraphReady}
@@ -579,6 +596,11 @@ class EnrichmentResultsGraph extends Component {
                   id="NetworkSliderNodeInput"
                   className="NetworkSliderInput"
                   // onInvalid={this.}
+                /> */}
+                <NumericExponentialInput
+                  onChange={num => {
+                    console.log(num);
+                  }}
                 />
               </div>
               <div className="NetworkSliderDiv">
@@ -663,8 +685,6 @@ class EnrichmentResultsGraph extends Component {
                 />
               </div>
             </Grid.Column>
-
-            {/* EDGE TYPE LABEL VERSION */}
             <Grid.Column
               className="NetworkGraphFilters"
               mobile={16}
@@ -674,7 +694,8 @@ class EnrichmentResultsGraph extends Component {
               widescreen={3}
               textAlign="center"
             >
-              <Grid className="EdgeTypeContainer">
+              {/* EDGE TYPE LABEL VERSION */}
+              {/* <Grid className="EdgeTypeContainer">
                 <Grid.Row columns={2} centered id="EdgeTypeRow">
                   <Grid.Column
                     id="EdgeTypeLabelColumn"
@@ -722,10 +743,10 @@ class EnrichmentResultsGraph extends Component {
                     </Label>
                   </Grid.Column>
                 </Grid.Row>
-              </Grid>
+              </Grid> */}
 
               {/* INPUT VERSION */}
-              {/* <div className="InlineFlex">
+              <div className="InlineFlex">
                 <Popup
                   trigger={
                     <Label className="NetworkInputLabel" size={dynamicSize}>
@@ -754,7 +775,7 @@ class EnrichmentResultsGraph extends Component {
                   id="NetworkSliderNodeInput"
                   className="NetworkSliderInput"
                 />
-              </div> */}
+              </div>
               <div className="NetworkSliderDiv" id="NetworkSliderDivEdgeType">
                 <StyledSlider
                   renderTrack={EdgeTypeTrack}
