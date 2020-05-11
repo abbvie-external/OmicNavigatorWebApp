@@ -31,7 +31,7 @@ import EnrichmentResultsTable from './EnrichmentResultsTable';
 import EnrichmentSearchCriteria from './EnrichmentSearchCriteria';
 import SplitPanesContainer from './SplitPanesContainer';
 
-let plotCancel = () => {};
+let cancelRequestEnrichmentGetPlot = () => {};
 class Enrichment extends Component {
   defaultEnrichmentActiveIndex =
     parseInt(sessionStorage.getItem('enrichmentViewTab'), 10) || 0;
@@ -71,6 +71,7 @@ class Enrichment extends Component {
     tests: {},
     nodeCutoff: sessionStorage.getItem('nodeCutoff') || 0.1,
     edgeCutoff: sessionStorage.getItem('edgeCutoff') || 0.4,
+    edgeType: sessionStorage.getItem('edgeType') || 0.5,
     filteredNodesTotal: 0,
     filteredEdgesTotal: 0,
     totalNodes: 0,
@@ -792,16 +793,18 @@ class Enrichment extends Component {
   };
 
   handleProteinSelected = toHighlightArray => {
+    const prevHighestValueObject = this.state.HighlightedProteins[0]?.sample;
     const highestValueObject = toHighlightArray[0];
     const { enrichmentStudy, enrichmentModel } = this.props;
-    if (this.state.barcodeSettings.barcodeData?.length > 0) {
-      // if (toHighlightArray.length > 0) {
+    if (
+      this.state.barcodeSettings.barcodeData?.length > 0 &&
+      toHighlightArray.length > 0
+    ) {
       this.setState({
         HighlightedProteins: toHighlightArray,
       });
       if (
-        highestValueObject?.sample !==
-          this.state.HighlightedProteins[0]?.sample ||
+        highestValueObject?.sample !== prevHighestValueObject ||
         this.state.SVGPlotLoaded === false
       ) {
         this.setState({
@@ -844,9 +847,8 @@ class Enrichment extends Component {
         const handleSVGCb = this.handleSVG;
         this.getPlot(id, plotType, enrichmentStudy, imageInfo, handleSVGCb);
       }
-      // }
     } else {
-      plotCancel();
+      cancelRequestEnrichmentGetPlot();
       this.setState({
         SVGPlotLoaded: false,
         SVGPlotLoading: false,
@@ -870,11 +872,10 @@ class Enrichment extends Component {
     } else {
       EnrichmentPlotSVGWidth = EnrichmentPlotSVGHeight * 1.41344;
     }
-    plotCancel();
+    cancelRequestEnrichmentGetPlot();
     let cancelToken = new CancelToken(e => {
-      plotCancel = e;
+      cancelRequestEnrichmentGetPlot = e;
     });
-
     _.forEach(plotType, function(plot, i) {
       phosphoprotService
         .getPlot(
@@ -911,15 +912,13 @@ class Enrichment extends Component {
           let svgInfo = { plotType: plotType[i], svg: sanitizedSVG };
 
           // we want spline plot in zero index, rather than lineplot
-          if (i === 0) {
-            imageInfo.svg.push(svgInfo);
-            currentSVGs.push(sanitizedSVG);
-          } else {
-            // splice(position, numberOfItemsToRemove, item)
-            // imageInfo.svg.u
-            imageInfo.svg.unshift(svgInfo);
-            currentSVGs.unshift(sanitizedSVG);
-          }
+          // if (i === 0) {
+          imageInfo.svg.push(svgInfo);
+          currentSVGs.push(sanitizedSVG);
+          // } else {
+          //   imageInfo.svg.unshift(svgInfo);
+          //   currentSVGs.unshift(sanitizedSVG);
+          // }
           handleSVGCb(imageInfo);
         });
     });
@@ -1653,11 +1652,12 @@ class Enrichment extends Component {
               onHandlePlotAnimation={this.handlePlotAnimation}
               onDisplayViolinPlot={this.displayViolinPlot}
               onHandlePieClick={this.testSelected}
-              onHandleEdgeCutoffInputChange={this.handleEdgeCutoffInputChange}
               onHandleNodeCutoffInputChange={this.handleNodeCutoffInputChange}
-              onHandleSliderChange={this.handleSliderChange}
-              onHandleNodeSliderChange={this.handleNodeSliderChange}
-              onHandleEdgeSliderChange={this.handleEdgeSliderChange}
+              onHandleNodeCutoffSliderChange={this.handleNodeCutoffSliderChange}
+              onHandleEdgeCutoffInputChange={this.handleEdgeCutoffInputChange}
+              onHandleEdgeCutoffSliderChange={this.handleEdgeCutoffSliderChange}
+              onHandleEdgeTypeInputChange={this.handleEdgeTypeInputChange}
+              onHandleEdgeTypeSliderChange={this.handleEdgeTypeSliderChange}
               onHandleTotals={this.handleTotals}
               // onNetworkGraphReady={this.handleNetworkGraphReady}
               onHandleLegendOpen={this.handleLegendOpen}
@@ -1703,61 +1703,59 @@ class Enrichment extends Component {
   //   });
   // }, 500);
 
-  handleNodeCutoffInputChange = _.debounce(value => {
-    this.removeNetworkSVG();
-    this.setState({
-      nodeCutoff: value,
-    });
-    sessionStorage.setItem('nodeCutoff', value);
-  }, 500);
+  handleNodeCutoffInputChange = value => {
+    if (this.state.nodeCutoff !== value) {
+      this.removeNetworkSVG();
+      this.setState({
+        nodeCutoff: value,
+      });
+      sessionStorage.setItem('nodeCutoff', value);
+    }
+  };
 
-  handleEdgeCutoffInputChange = _.debounce(value => {
-    this.removeNetworkSVG();
-    this.setState({
-      edgeCutoff: value,
-    });
-    sessionStorage.setItem('edgeCutoff', value);
-  }, 500);
+  handleEdgeCutoffInputChange = value => {
+    if (this.state.edgeCutoff !== value) {
+      this.removeNetworkSVG();
+      this.setState({
+        edgeCutoff: value,
+      });
+      sessionStorage.setItem('edgeCutoff', value);
+    }
+  };
 
-  // handleNetworkCutoffInputChange = (evt, { name, value }) => {
-  //   this.removeNetworkSVG();
-  //   this.setState({
-  //     [name]: value,
-  //     // networkGraphReady: false
-  //   });
-  // };
+  handleEdgeTypeInputChange = value => {
+    if (this.state.edgeCutoff !== value) {
+      // this.removeNetworkSVG();
+      this.setState({
+        edgeType: value,
+      });
+      sessionStorage.setItem('edgeType', value);
+    }
+  };
 
-  // handleSliderChange = _.debounce((type, value) => {
-  //   if (this.state[type] !== value) {
-  //     this.removeNetworkSVG();
-  //     this.setState({ [type]: value });
-  //   }
-  //   sessionStorage.setItem(type, value);
-  // }, 500);
-
-  handleNodeSliderChange = _.debounce(value => {
+  handleNodeCutoffSliderChange = value => {
     if (this.state.nodeCutoff !== value) {
       this.removeNetworkSVG();
       this.setState({ nodeCutoff: value });
     }
     sessionStorage.setItem('nodeCutoff', value);
-  }, 500);
-  // handleNodeSliderChange = value => {
-  //   let decimalValue = value / 100;
-  //   if (this.state.nodeCutoff !== decimalValue) {
-  //     this.removeNetworkSVG();
-  //     this.setState({ nodeCutoff: decimalValue });
-  //   }
-  //   sessionStorage.setItem('nodeCutoff', decimalValue);
-  // };
+  };
 
-  handleEdgeSliderChange = _.debounce(value => {
+  handleEdgeCutoffSliderChange = value => {
     if (this.state.edgeCutoff !== value) {
       this.removeNetworkSVG();
       this.setState({ edgeCutoff: value });
     }
     sessionStorage.setItem('edgeCutoff', value);
-  }, 500);
+  };
+
+  handleEdgeTypeSliderChange = value => {
+    if (this.state.edgeType !== value) {
+      // this.removeNetworkSVG();
+      this.setState({ edgeType: value });
+    }
+    sessionStorage.setItem('edgeType', value);
+  };
 
   // handleLegendOpen = () => {
   //   // sessionStorage.setItem('legendOpen', 'true');
