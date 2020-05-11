@@ -9,11 +9,16 @@ import {
   Transition,
   Button,
 } from 'semantic-ui-react';
+import { CancelToken } from 'axios';
 import '../Shared/SearchCriteria.scss';
 import { phosphoprotService } from '../../services/phosphoprot.service';
 import _ from 'lodash';
 // import { toast } from 'react-toastify';
 import EnrichmentMultisetFilters from './EnrichmentMultisetFilters';
+
+let cancelRequestAnnotationData = () => {};
+let cancelRequestMultisetEnrichmentData = () => {};
+let cancelRequestEnrichmentMultisetPlot = () => {};
 
 class EnrichmentSearchCriteria extends Component {
   // static defaultProps = {
@@ -166,6 +171,7 @@ class EnrichmentSearchCriteria extends Component {
           s + 'plots',
           t,
           this.state.enrichmentResultsErrorCb,
+          undefined,
         )
         .then(dataFromService => {
           this.setState({
@@ -270,6 +276,10 @@ class EnrichmentSearchCriteria extends Component {
       true,
     );
     this.props.onSearchTransition(true);
+    cancelRequestAnnotationData();
+    let cancelToken = new CancelToken(e => {
+      cancelRequestAnnotationData = e;
+    });
     phosphoprotService
       .getAnnotationData(
         this.props.enrichmentModel,
@@ -277,6 +287,7 @@ class EnrichmentSearchCriteria extends Component {
         this.props.enrichmentStudy + 'plots',
         this.props.pValueType,
         this.state.enrichmentResultsErrorCb,
+        cancelToken,
       )
       .then(dataFromService => {
         this.setState({
@@ -301,6 +312,10 @@ class EnrichmentSearchCriteria extends Component {
     this.props.onPValueTypeChange(value);
 
     if (!this.state.multisetFiltersVisible) {
+      cancelRequestAnnotationData();
+      let cancelToken = new CancelToken(e => {
+        cancelRequestAnnotationData = e;
+      });
       phosphoprotService
         .getAnnotationData(
           this.props.enrichmentModel,
@@ -308,6 +323,7 @@ class EnrichmentSearchCriteria extends Component {
           this.props.enrichmentStudy + 'plots',
           value,
           this.state.enrichmentResultsErrorCb,
+          cancelToken,
         )
         .then(dataFromService => {
           this.setState({
@@ -339,6 +355,10 @@ class EnrichmentSearchCriteria extends Component {
         this.jsonToList(eOperator),
         value,
       );
+      cancelRequestMultisetEnrichmentData();
+      let cancelToken = new CancelToken(e => {
+        cancelRequestMultisetEnrichmentData = e;
+      });
       phosphoprotService
         .getMultisetEnrichmentData(
           this.props.enrichmentModel,
@@ -349,6 +369,8 @@ class EnrichmentSearchCriteria extends Component {
           this.props.enrichmentAnnotation,
           this.jsonToList(eOperator),
           value,
+          undefined,
+          cancelToken,
         )
         .then(annotationData => {
           const multisetResults = annotationData;
@@ -407,6 +429,10 @@ class EnrichmentSearchCriteria extends Component {
       true,
     );
     this.props.onSearchTransition(true);
+    cancelRequestAnnotationData();
+    let cancelToken = new CancelToken(e => {
+      cancelRequestAnnotationData = e;
+    });
     phosphoprotService
       .getAnnotationData(
         this.props.enrichmentModel,
@@ -414,6 +440,7 @@ class EnrichmentSearchCriteria extends Component {
         this.props.enrichmentStudy + 'plots',
         this.props.pValueType,
         this.state.enrichmentResultsErrorCb,
+        cancelToken,
       )
       .then(dataFromService => {
         this.annotationdata = dataFromService;
@@ -527,6 +554,10 @@ class EnrichmentSearchCriteria extends Component {
       this.jsonToList(eOperator),
       this.props.pValueType,
     );
+    cancelRequestMultisetEnrichmentData();
+    let cancelToken = new CancelToken(e => {
+      cancelRequestMultisetEnrichmentData = e;
+    });
     phosphoprotService
       .getMultisetEnrichmentData(
         this.props.enrichmentModel,
@@ -537,6 +568,8 @@ class EnrichmentSearchCriteria extends Component {
         this.props.enrichmentAnnotation,
         this.jsonToList(eOperator),
         this.props.pValueType,
+        undefined,
+        cancelToken,
       )
       .then(annotationData => {
         const multisetResults = annotationData;
@@ -572,6 +605,10 @@ class EnrichmentSearchCriteria extends Component {
   ) {
     let heightCalculation = this.calculateHeight;
     let widthCalculation = this.calculateWidth;
+    cancelRequestEnrichmentMultisetPlot();
+    let cancelToken = new CancelToken(e => {
+      cancelRequestEnrichmentMultisetPlot = e;
+    });
     phosphoprotService
       .getEnrichmentMultisetPlot(
         sigVal,
@@ -580,6 +617,8 @@ class EnrichmentSearchCriteria extends Component {
         enrichmentAnnotation,
         eOperator,
         this.props.pValueType,
+        undefined,
+        cancelToken,
       )
       .then(svgMarkupObj => {
         let svgMarkup = svgMarkupObj.data;

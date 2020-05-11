@@ -31,7 +31,7 @@ import EnrichmentResultsTable from './EnrichmentResultsTable';
 import EnrichmentSearchCriteria from './EnrichmentSearchCriteria';
 import SplitPanesContainer from './SplitPanesContainer';
 
-let plotCancel = () => {};
+let cancelRequestEnrichmentGetPlot = () => {};
 class Enrichment extends Component {
   defaultEnrichmentActiveIndex =
     parseInt(sessionStorage.getItem('enrichmentViewTab'), 10) || 0;
@@ -71,6 +71,7 @@ class Enrichment extends Component {
     tests: {},
     nodeCutoff: sessionStorage.getItem('nodeCutoff') || 0.1,
     edgeCutoff: sessionStorage.getItem('edgeCutoff') || 0.4,
+    edgeType: sessionStorage.getItem('edgeType') || 0.5,
     filteredNodesTotal: 0,
     filteredEdgesTotal: 0,
     totalNodes: 0,
@@ -847,7 +848,7 @@ class Enrichment extends Component {
         this.getPlot(id, plotType, enrichmentStudy, imageInfo, handleSVGCb);
       }
     } else {
-      plotCancel();
+      cancelRequestEnrichmentGetPlot();
       this.setState({
         SVGPlotLoaded: false,
         SVGPlotLoading: false,
@@ -871,11 +872,10 @@ class Enrichment extends Component {
     } else {
       EnrichmentPlotSVGWidth = EnrichmentPlotSVGHeight * 1.41344;
     }
-    plotCancel();
+    cancelRequestEnrichmentGetPlot();
     let cancelToken = new CancelToken(e => {
-      plotCancel = e;
+      cancelRequestEnrichmentGetPlot = e;
     });
-
     _.forEach(plotType, function(plot, i) {
       phosphoprotService
         .getPlot(
@@ -1652,11 +1652,12 @@ class Enrichment extends Component {
               onHandlePlotAnimation={this.handlePlotAnimation}
               onDisplayViolinPlot={this.displayViolinPlot}
               onHandlePieClick={this.testSelected}
-              onHandleEdgeCutoffInputChange={this.handleEdgeCutoffInputChange}
               onHandleNodeCutoffInputChange={this.handleNodeCutoffInputChange}
-              onHandleSliderChange={this.handleSliderChange}
-              onHandleNodeSliderChange={this.handleNodeSliderChange}
-              onHandleEdgeSliderChange={this.handleEdgeSliderChange}
+              onHandleNodeCutoffSliderChange={this.handleNodeCutoffSliderChange}
+              onHandleEdgeCutoffInputChange={this.handleEdgeCutoffInputChange}
+              onHandleEdgeCutoffSliderChange={this.handleEdgeCutoffSliderChange}
+              onHandleEdgeTypeInputChange={this.handleEdgeTypeInputChange}
+              onHandleEdgeTypeSliderChange={this.handleEdgeTypeSliderChange}
               onHandleTotals={this.handleTotals}
               // onNetworkGraphReady={this.handleNetworkGraphReady}
               onHandleLegendOpen={this.handleLegendOpen}
@@ -1722,7 +1723,17 @@ class Enrichment extends Component {
     }
   };
 
-  handleNodeSliderChange = value => {
+  handleEdgeTypeInputChange = value => {
+    if (this.state.edgeCutoff !== value) {
+      // this.removeNetworkSVG();
+      this.setState({
+        edgeType: value,
+      });
+      sessionStorage.setItem('edgeType', value);
+    }
+  };
+
+  handleNodeCutoffSliderChange = value => {
     if (this.state.nodeCutoff !== value) {
       this.removeNetworkSVG();
       this.setState({ nodeCutoff: value });
@@ -1730,12 +1741,20 @@ class Enrichment extends Component {
     sessionStorage.setItem('nodeCutoff', value);
   };
 
-  handleEdgeSliderChange = value => {
+  handleEdgeCutoffSliderChange = value => {
     if (this.state.edgeCutoff !== value) {
       this.removeNetworkSVG();
       this.setState({ edgeCutoff: value });
     }
     sessionStorage.setItem('edgeCutoff', value);
+  };
+
+  handleEdgeTypeSliderChange = value => {
+    if (this.state.edgeType !== value) {
+      // this.removeNetworkSVG();
+      this.setState({ edgeType: value });
+    }
+    sessionStorage.setItem('edgeType', value);
   };
 
   // handleLegendOpen = () => {

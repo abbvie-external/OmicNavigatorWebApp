@@ -6,11 +6,10 @@ import { toast } from 'react-toastify';
 window.jQuery = $;
 require('opencpu.js/opencpu-0.5.js');
 // const ocpu = require('opencpu.js/opencpu-0.5.js');
-// let getPlotCancel = () => {};
 class PhosphoprotService {
   constructor() {
-    // this.ocpuUrl = 'http://10.239.9.49/ocpu/library/PhosphoProt/R';
-    this.ocpuUrl = 'http://10.239.9.76/ocpu/library/PhosphoProt/R';
+    this.ocpuUrl = 'http://10.239.9.49/ocpu/library/PhosphoProt/R';
+    // this.ocpuUrl = 'http://10.239.9.76/ocpu/library/PhosphoProt/R';
     // this.ocpuUrlAlt = 'http://localhost:5656/ocpu/library/PhosphoProt/R'
     // this.ocpuUrlAlt = 'http://localhost:1234/v1'
   }
@@ -49,13 +48,45 @@ class PhosphoprotService {
     return modelsFromPromise;
   }
 
-  ocpuDataCall(method, obj, handleError) {
+  async ocpuDataCall(method, obj, handleError, cancelToken) {
     return new Promise(function(resolve, reject) {
       window.ocpu
         .call(method, obj, function(session) {
-          session
-            .getObject('.val', 'digits=10')
-            .then(response => resolve(response));
+          const url = session.getLoc() + 'R/.val/json';
+          axios
+            .get(url, {
+              params: { digits: 10 },
+              responseType: 'text',
+              cancelToken,
+            })
+            .then(response => resolve(response.data));
+        })
+        // you can use this function instead, if don't need the cancelToken
+        // .call(method, obj, function(session) {
+        //   session
+        //     .getObject('.val', 'digits=10')
+        //     .then(response => resolve(response));
+        // })
+        .catch(error => {
+          toast.error(`${error.statusText}: ${error.responseText}`);
+          if (handleError !== undefined) {
+            handleError(false);
+          }
+        });
+    });
+  }
+
+  async ocpuDataCallAlt(method, obj, handleError, cancelToken) {
+    return new Promise(function(resolve, reject) {
+      window.ocpu
+        .call(method, obj, function(session) {
+          const url = session.getLoc() + 'R/.val/json';
+          axios
+            .get(url, {
+              responseType: 'text',
+              cancelToken,
+            })
+            .then(response => resolve(response.data));
         })
         .catch(error => {
           // toast.error('Failed to retrieve data, please try again.');
@@ -67,33 +98,20 @@ class PhosphoprotService {
     });
   }
 
-  ocpuDataCallAlt(method, obj) {
-    return new Promise(function(resolve, reject) {
-      window.ocpu
-        .call(method, obj, function(session) {
-          session.getObject('.val').then(response => resolve(response));
-        })
-        .catch(error => {
-          // toast.error('Failed to retrieve data, please try again.');
-          toast.error(`${error.statusText}: ${error.responseText}`);
-        });
-    });
-  }
-
-  async getTestData(model, test, study) {
+  async getTestData(model, test, study, errorCb, cancelToken) {
     this.setUrl();
     const obj = { testCategory: model, test: test, study: study };
-    const promise = this.ocpuDataCall('getInferenceResults', obj);
+    const promise = this.ocpuDataCall(
+      'getInferenceResults',
+      obj,
+      errorCb,
+      cancelToken,
+    );
     const dataFromPromise = await promise;
     return dataFromPromise;
   }
 
-  async getAnnotationData(model, test, study, type, errorCb) {
-    const handleError =
-      errorCb ||
-      function() {
-        return undefined;
-      };
+  async getAnnotationData(model, test, study, type, errorCb, cancelToken) {
     this.setUrl();
     const obj = {
       model: model,
@@ -101,7 +119,13 @@ class PhosphoprotService {
       study: study,
       type: type,
     };
-    const promise = this.ocpuDataCall('getEnrichmentResults', obj, handleError);
+
+    const promise = this.ocpuDataCall(
+      'getEnrichmentResults',
+      obj,
+      errorCb,
+      cancelToken,
+    );
     const dataFromPromise = await promise;
     return dataFromPromise;
   }
@@ -155,43 +179,55 @@ class PhosphoprotService {
     });
   }
 
-  async getPlot(id, plottype, study, proteinSelectedError, cancelToken) {
-    // getPlotCancel();
+  async getPlot(id, plottype, study, errorCb, cancelToken) {
     this.setUrl();
-    const handleError =
-      proteinSelectedError ||
-      function() {
-        return undefined;
-      };
     const promise = this.ocpuPlotCall(
       plottype,
       { idmult: id, study: study },
-      handleError,
+      errorCb,
       cancelToken,
     );
     //const svgMarkupFromPromise = await promise;
     return promise;
   }
 
-  async getDatabaseInfo(study, test) {
+  async getDatabaseInfo(study, test, errorCb, cancelToken) {
     this.setUrl();
-    const promise = this.ocpuDataCallAlt('getDatabases', {
-      study: study,
-      database: test,
-    });
+    const promise = this.ocpuDataCallAlt(
+      'getDatabases',
+      {
+        study: study,
+        database: test,
+      },
+      errorCb,
+      cancelToken,
+    );
     const dataFromPromise = await promise;
     return dataFromPromise;
   }
 
-  async getBarcodeData(study, model, annotation, test, term) {
+  async getBarcodeData(
+    study,
+    model,
+    annotation,
+    test,
+    term,
+    errorCb,
+    cancelToken,
+  ) {
     this.setUrl();
-    const promise = this.ocpuDataCallAlt('getBarcodeData', {
-      study: study,
-      model: model,
-      database: annotation,
-      test: test,
-      term: term,
-    });
+    const promise = this.ocpuDataCallAlt(
+      'getBarcodeData',
+      {
+        study: study,
+        model: model,
+        database: annotation,
+        test: test,
+        term: term,
+      },
+      errorCb,
+      cancelToken,
+    );
     const dataFromPromise = await promise;
     return dataFromPromise;
   }
@@ -205,18 +241,25 @@ class PhosphoprotService {
     annotation,
     operator,
     pValType,
+    errorCb,
+    cancelToken,
   ) {
     this.setUrl();
-    const promise = this.ocpuDataCall('getEnrichmentIntersection', {
-      testCategory: testCategory,
-      mustTests: mustTest,
-      notTests: notTest,
-      study: study,
-      sigValue: sigValue,
-      annotation: annotation,
-      operator: operator,
-      pValType: pValType,
-    });
+    const promise = this.ocpuDataCall(
+      'getEnrichmentIntersection',
+      {
+        testCategory: testCategory,
+        mustTests: mustTest,
+        notTests: notTest,
+        study: study,
+        sigValue: sigValue,
+        annotation: annotation,
+        operator: operator,
+        pValType: pValType,
+      },
+      errorCb,
+      cancelToken,
+    );
     const dataFromPromise = await promise;
     return dataFromPromise;
   }
@@ -229,13 +272,9 @@ class PhosphoprotService {
     operator,
     pValType,
     errorCb,
+    cancelToken,
   ) {
     this.setUrl();
-    const handleError =
-      errorCb ||
-      function() {
-        return undefined;
-      };
     const promise = this.ocpuPlotCall(
       'EnrichmentUpsetPlot',
       {
@@ -246,7 +285,8 @@ class PhosphoprotService {
         operator: operator,
         pValType: pValType,
       },
-      handleError,
+      errorCb,
+      cancelToken,
     );
     const svgMarkupFromPromise = await promise;
     return svgMarkupFromPromise;
@@ -261,18 +301,25 @@ class PhosphoprotService {
     anchor,
     operator,
     column,
+    errorCb,
+    cancelToken,
   ) {
     this.setUrl();
-    const promise = this.ocpuDataCall('getInferenceIntersection', {
-      testCategory: testCategory,
-      anchor: anchor,
-      mustTests: mustTest,
-      notTests: notTest,
-      study: study,
-      sigValue: sigValue,
-      operator: operator,
-      column: column,
-    });
+    const promise = this.ocpuDataCall(
+      'getInferenceIntersection',
+      {
+        testCategory: testCategory,
+        anchor: anchor,
+        mustTests: mustTest,
+        notTests: notTest,
+        study: study,
+        sigValue: sigValue,
+        operator: operator,
+        column: column,
+      },
+      errorCb,
+      cancelToken,
+    );
     const dataFromPromise = await promise;
     return dataFromPromise;
   }
@@ -284,13 +331,9 @@ class PhosphoprotService {
     testCategory,
     study,
     errorCb,
+    cancelToken,
   ) {
     this.setUrl();
-    const handleError =
-      errorCb ||
-      function() {
-        return undefined;
-      };
     const promise = this.ocpuPlotCall(
       'InferenceUpsetPlot',
       {
@@ -300,7 +343,8 @@ class PhosphoprotService {
         operator: operator,
         column: column,
       },
-      handleError,
+      errorCb,
+      cancelToken,
     );
     const svgMarkupFromPromise = await promise;
     return svgMarkupFromPromise;
