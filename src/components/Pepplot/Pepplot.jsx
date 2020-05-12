@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import { Grid, Menu, Popup, Sidebar, Tab } from 'semantic-ui-react';
 import { withRouter } from 'react-router-dom';
 import PepplotSearchCriteria from './PepplotSearchCriteria';
-import networkIcon from '../../resources/networkIcon.png';
+import scatterPlotIcon from '../../resources/ScatterPlotIcon.png';
+import scatterPlotIconSelected from '../../resources/ScatterPlotIconSelected.png';
 import tableIcon from '../../resources/tableIcon.png';
 import tableIconSelected from '../../resources/tableIconSelected.png';
 import PepplotResults from './PepplotResults';
@@ -11,6 +12,7 @@ import TransitionStill from '../Transitions/TransitionStill';
 import ButtonActions from '../Shared/ButtonActions';
 import { formatNumberForDisplay, splitValue } from '../Shared/helpers';
 import phosphosite_icon from '../../resources/phosphosite.ico';
+import PepplotVolcano from "./PepplotVolcano";
 
 
 import _ from 'lodash';
@@ -329,17 +331,77 @@ class Pepplot extends Component {
       !this.state.showProteinPage &&
       !this.state.isSearching
     ) {
+      const TableAndPlotPanes = this.getTableAndPlotPanes();
       return (
+        <Tab
+        className="TableAndPlotContainer"
+        panes={TableAndPlotPanes}
+        onTabChange={this.handleTablePlotTabChange}
+        activeIndex={this.state.activeIndex}
+        renderActiveOnly={false}
+        menu={{
+          attached: true,
+          className: 'TableAndPlotMenuContainer'
+        }}
+      />
+      );
+    } else if (this.state.isSearching) {
+      return <TransitionActive />;
+    } else return <TransitionStill />;
+  };
+
+getTableAndPlotPanes = () => {
+    return[{
+      menuItem:(<Menu.Item
+        key="0"
+        className="TableAndNPlotButtons TableButton"
+        name="Table"
+        color="orange"
+      >
+        <img
+          src={this.state.activeIndex === 0 ? tableIconSelected : tableIcon}
+          alt="Table Icon"
+          id="TableButton"
+        />
+      </Menu.Item>),
+      pane:(<Tab.Pane key="0">
         <PepplotResults
           {...this.state}
           {...this.props}
           onSearchCriteriaChange={this.handleSearchCriteriaChange}
           onHandlePlotAnimation={this.handlePlotAnimation}
         />
-      );
-    } else if (this.state.isSearching) {
-      return <TransitionActive />;
-    } else return <TransitionStill />;
+      </Tab.Pane>)
+    },{
+      menuItem:(<Menu.Item
+        key="1"
+        className="TableAndPlotButtons PlotButton"
+        name="plot"
+        color="orange"
+      >
+        <img
+          src={this.state.activeIndex === 1 ? scatterPlotIconSelected : scatterPlotIcon}
+          alt="Plot Icon"
+          id="PlotButton"
+        />
+      </Menu.Item>),
+      pane:(<Tab.Pane key="1">
+        <div id="VolcanoPlot">
+          <PepplotVolcano
+            {...this.state}
+            {...this.props}
+            handleVolcanoPlotSelectionChange={this.handleVolcanoPlotSelectionChange}
+            onSearchCriteriaChange={this.handleSearchCriteriaChange}            
+          />
+        </div>
+    </Tab.Pane>)
+    }
+  ]
+  }
+
+  handleTablePlotTabChange = (e, { activeIndex }) => {
+    sessionStorage.setItem(`pepplotViewTab`, activeIndex);
+    this.setState({ activeIndex });
   };
 
   render() {
