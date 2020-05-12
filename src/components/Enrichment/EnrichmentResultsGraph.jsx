@@ -35,8 +35,8 @@ const StyledSlider = styled(ReactSlider)`
 `;
 
 const StyledThumb = styled.div`
-  line-height: 63px;
-  /* line-height: 32px; */
+  /* line-height: 63px; */
+  line-height: 32px;
   text-align: center;
   cursor: grab !important;
   margin-top: -7px;
@@ -86,7 +86,8 @@ const EdgeTypeStyledTrack = styled.div`
       ? '#2e2e2e'
       : props.index === 1
       ? '#ddd'
-      : 'var(--color-primary)'};
+      : // : 'var(--color-light)'};
+        'var(--color-primary)'};
   /* : 'linear-gradient(90deg, var(--color-primary) -2.66%, var(--color-primary-gradient) 99.83%)'}; */
   border-radius: 999px;
 `;
@@ -517,15 +518,16 @@ class EnrichmentResultsGraph extends Component {
           <Grid.Row className="NetworkGraphFiltersRow">
             <Grid.Column
               className="NetworkGraphFilters"
-              mobile={14}
-              tablet={4}
-              computer={4}
+              mobile={6}
+              tablet={5}
+              computer={10}
               largeScreen={2}
               widescreen={2}
             ></Grid.Column>
             <Grid.Column
               // className="NetworkGraphFilters"
-              mobile={16}
+              id="NetworkSearchInputColumn"
+              mobile={10}
               tablet={6}
               computer={6}
               largeScreen={2}
@@ -545,22 +547,12 @@ class EnrichmentResultsGraph extends Component {
                 resultRenderer={resultRenderer}
                 // {...this.props}
               />
-              <Radio
-                disabled={!networkGraphReady}
-                className="RadioLabelsDisplay"
-                toggle
-                // size={dynamicSize}
-                size="small"
-                label="Show Labels"
-                checked={this.state.showNetworkLabels}
-                onChange={this.handleLabels}
-              />
             </Grid.Column>
             <Grid.Column
               className="NetworkGraphFilters"
-              mobile={16}
-              tablet={6}
-              computer={6}
+              mobile={8}
+              tablet={5}
+              computer={4}
               largeScreen={3}
               widescreen={3}
               textAlign="center"
@@ -627,9 +619,9 @@ class EnrichmentResultsGraph extends Component {
             </Grid.Column>
             <Grid.Column
               className="NetworkGraphFilters"
-              mobile={16}
+              mobile={8}
               tablet={5}
-              computer={5}
+              computer={4}
               largeScreen={3}
               widescreen={3}
               textAlign="center"
@@ -688,65 +680,13 @@ class EnrichmentResultsGraph extends Component {
             </Grid.Column>
             <Grid.Column
               className="NetworkGraphFilters"
-              mobile={16}
+              mobile={8}
               tablet={5}
-              computer={5}
+              computer={4}
               largeScreen={3}
               widescreen={3}
               textAlign="center"
             >
-              {/* EDGE TYPE LABEL VERSION */}
-              {/* <Grid className="EdgeTypeContainer">
-                <Grid.Row columns={2} centered id="EdgeTypeRow">
-                  <Grid.Column
-                    id="EdgeTypeLabelColumn"
-                    textAlign="right"
-                    // width={5}
-                  >
-                    <Popup
-                      trigger={
-                        <Label
-                          className="NetworkInputLabel"
-                          id="EdgeTypeLabel"
-                          size={dynamicSize}
-                        >
-                          EDGE
-                          <br></br>
-                          TYPE
-                        </Label>
-                      }
-                      style={CustomPopupStyle}
-                      content="TBD BRETT...Percent used for overlap coefficient and Jaccard index, respectfully."
-                      inverted
-                      basic
-                      position="left center"
-                      mouseEnterDelay={1000}
-                      mouseLeaveDelay={0}
-                    />
-                  </Grid.Column>
-                  <Grid.Column
-                    id="EdgeTextContainer"
-                    textAlign="left"
-                    // width={11}
-                  >
-                    <Label circular size="small" color="" id="JaccardPercent">
-                      {Math.round(edgeTypeLocal * 100)} %
-                    </Label>
-                    <span id="JaccardText" className="EdgeTypeText">
-                      Jaccard
-                    </span>
-                    <br></br>
-                    <span id="OverlapText" className="EdgeTypeText">
-                      Overlap
-                    </span>
-                    <Label circular size="small" id="OverlapPercent">
-                      {Math.round(100 - edgeTypeLocal * 100)} %
-                    </Label>
-                  </Grid.Column>
-                </Grid.Row>
-              </Grid> */}
-
-              {/* INPUT VERSION */}
               <div className="InlineFlex">
                 <Popup
                   trigger={
@@ -801,9 +741,9 @@ class EnrichmentResultsGraph extends Component {
             <Grid.Column
               className="NetworkGraphFilters"
               id="NetworkGraphSortByDiv"
-              mobile={16}
+              mobile={8}
               tablet={6}
-              computer={6}
+              computer={4}
               largeScreen={3}
               widescreen={3}
               textAlign="center"
@@ -890,10 +830,20 @@ class EnrichmentResultsGraph extends Component {
                 onClose={this.props.onHandleLegendClose}
                 onOpen={this.props.onHandleLegendOpen}
                 // className={(activeIndexEnrichmentView === 1
-                //   && networkGraphReady) ? 'ShowInlineBlock' : 'Hide'}
+                //   && networkGraphReady) ? 'ShowsearchInlineBlock' : 'Hide'}
               >
                 <Popup.Content className="legend"></Popup.Content>
               </Popup>
+              <Radio
+                disabled={!networkGraphReady}
+                className="RadioLabelsDisplay"
+                toggle
+                // size={dynamicSize}
+                size="small"
+                label="Show Labels"
+                checked={this.state.showNetworkLabels}
+                onChange={this.handleLabels}
+              />
             </Grid.Column>
             <Grid.Column
               id="TotalsColumn"
