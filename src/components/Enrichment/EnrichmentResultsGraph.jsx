@@ -147,14 +147,14 @@ const resultRenderer = ({ description, genes, size }) => {
   // let dynamicSize = getDynamicSize();
   return (
     <Grid className="NetworkSearchResultsContainer">
-      <Grid.Column width={13}>
+      <Grid.Column width={12}>
         <Label
         // size={dynamicSize}
         >
           {description}
         </Label>
       </Grid.Column>
-      <Grid.Column width={3}>
+      <Grid.Column width={4}>
         <Popup
           trigger={
             <Label circular color="blue" key={description}>
@@ -170,6 +170,27 @@ const resultRenderer = ({ description, genes, size }) => {
         </Popup>
       </Grid.Column>
     </Grid>
+
+    // ALTERNATE VERSION
+    // <div className="NetworkSearchResultsContainer">
+    //   <Popup
+    //     basic
+    //     style={SearchValuePopupStyle}
+    //     inverted
+    //     // position="bottom left"
+    //     trigger={
+    //       <Label
+    //         color="blue"
+    //         // size={dynamicSize}
+    //       >
+    //         {description}
+    //         <Label.Detail key={description}>{size}</Label.Detail>
+    //       </Label>
+    //     }
+    //   >
+    //     {genesFormatted}
+    //   </Popup>
+    // </div>
   );
 };
 
@@ -242,7 +263,8 @@ const SortableContainer = sortableContainer(({ children }) => {
 class EnrichmentResultsGraph extends Component {
   state = {
     showNetworkLabels: true,
-    results: [],
+    networkSearchResults: [],
+    networkSearchLoading: false,
     networkSearchValue: '',
     descriptions: [],
     networkSortBy: ['significance', 'nodecount', 'edgecount'],
@@ -285,22 +307,30 @@ class EnrichmentResultsGraph extends Component {
     this.setState({ networkSearchValue: result.description });
   };
 
-  handleSearchChange = _.debounce((e, { value: networkSearchValue }) => {
-    if (networkSearchValue.length < 1) {
-      return this.setState({
-        results: [],
-        networkSearchValue,
-      });
-    }
-    networkSearchValue = networkSearchValue.toLowerCase();
-
-    this.setState({
-      results: this.state.descriptions.filter(result =>
-        result.description.toLowerCase().includes(networkSearchValue),
-      ),
-      networkSearchValue,
-    });
-  }, 500);
+  handleSearchChange =
+    // _.debounce(
+    (e, { value }) => {
+      if (value.length < 1) {
+        return this.setState({
+          networkSearchResults: [],
+          networkSearchValue: '',
+          networkSearchLoading: false,
+        });
+      } else {
+        this.setState({
+          networkSearchLoading: true,
+        });
+        const valueLowercase = value.toLowerCase();
+        this.setState({
+          networkSearchResults: this.state.descriptions.filter(result =>
+            result.description.toLowerCase().includes(valueLowercase),
+          ),
+          networkSearchValue: valueLowercase,
+          networkSearchLoading: false,
+        });
+      }
+    };
+  // , 500)
 
   setupSearch = () => {
     const networkDataNodeDescriptions = this.props.networkData.nodes.map(r => ({
@@ -441,7 +471,9 @@ class EnrichmentResultsGraph extends Component {
 
   render() {
     const {
-      results,
+      networkSearchResults,
+      networkSearchLoading,
+      networkSearchValue,
       networkSortBy,
       nodeCutoffLocal,
       edgeCutoffLocal,
@@ -542,10 +574,12 @@ class EnrichmentResultsGraph extends Component {
                 placeholder="Search"
                 onResultSelect={this.handleResultSelect}
                 onSearchChange={this.handleSearchChange}
-                results={results}
-                // value={networkSearchValue}
+                results={networkSearchResults}
+                loading={networkSearchLoading}
+                value={networkSearchValue}
                 resultRenderer={resultRenderer}
                 // {...this.props}
+                spellcheck="false"
               />
             </Grid.Column>
             <Grid.Column
