@@ -85,11 +85,11 @@ class ViolinPlot extends Component {
         .attr('r', dOpts.pointSize * 1);
       if (this.props.HighlightedProteins.length > 0) {
         // separate max protein from the rest
-        const HighlightedProteins =
-          this.brushedData.length > 0
-            ? this.brushedData.slice(1)
-            : this.props.HighlightedProteins.slice(1);
-        HighlightedProteins.forEach(element => {
+        // const HighlightedProteins =
+        //   this.brushedData.length > 0
+        //     ? this.brushedData.slice(1)
+        //     : this.props.HighlightedProteins.slice(1);
+        this.props.HighlightedProteins.forEach(element => {
           const highlightedDotId = this.getCircleId(
             element.sample,
             element.id_mult,
@@ -490,16 +490,14 @@ class ViolinPlot extends Component {
     }
 
     // Set base settings
+    console.log('self.props', `(${self.props.violinSettings.axisLabels.yAxis}`);
     self.chart.margin = self.props.violinSettings.margin;
     self.chart.divWidth = self.state.violinContainerWidth;
     self.chart.divHeight = self.state.violinContainerHeight;
     self.chart.width = self.state.violinWidth;
     self.chart.height = self.state.violinHeight;
     self.chart.xAxisLabel = self.props.enrichmentTerm;
-    self.chart.yAxisLabel = self.props.violinSettings.axisLabels.yAxis.replace(
-      /\(/g,
-      '',
-    );
+    self.chart.yAxisLabel = self.props.violinSettings.axisLabels.yAxis;
     self.chart.yScale = d3.scaleLinear();
 
     if (self.props.violinSettings.constrainExtremes === true) {
@@ -544,7 +542,8 @@ class ViolinPlot extends Component {
       .axisLeft(self.chart.yScale)
       .tickFormat(formatAsFloat)
       .tickSizeOuter(0)
-      .tickSizeInner(-self.chart.width);
+      .tickSizeInner(-self.chart.width)
+      .tickPadding(+15);
     self.chart.objs.yAxis.tickArguments(
       self.chart.objs.yAxis.tickArguments() * self.props.violinSettings.yTicks,
     );
@@ -1571,11 +1570,10 @@ class ViolinPlot extends Component {
                 x => x.id_mult === d.id_mult,
               );
               if (inBrush > 0) {
-                const HighlightedProteins = this.brushedData;
+                const HighlightedProteins = [...this.brushedData];
                 HighlightedProteins.splice(inBrush, 1);
                 HighlightedProteins.unshift(d);
-                const newBrushedData = [...HighlightedProteins];
-                self.props.onHandleProteinSelected(newBrushedData);
+                self.props.onHandleProteinSelected(HighlightedProteins);
               } else {
                 this.brushedData = [];
                 this.clearBrush(self);
