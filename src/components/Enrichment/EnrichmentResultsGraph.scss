@@ -178,6 +178,11 @@
   // max-width: 245px;
 }
 
+.bmGVoB:active,
+.bmGVoB:focus {
+  outline: none !important;
+}
+
 .InlineFlex {
   display: inline-flex;
   flex-direction: row;
@@ -240,16 +245,20 @@
 .ValueNowEdgeTypeOverlapText,
 .ValueNowEdgeTypeOverlapNumber {
   color: var(--color-dark) !important;
-  margin-left: 37px;
-  font-size: 12px;
+  margin-left: 35px;
+  font-size: 13px;
+  font-weight: bold;
+  font-style: italic;
 }
 
 .ValueNowEdgeTypeJaccardText,
 .ValueNowEdgeTypeJaccardNumber {
   color: var(--color-dark) !important;
   // color: var(--color-white) !important;
-  margin-left: -44px;
-  font-size: 12px;
+  margin-left: -45px;
+  font-size: 13px;
+  font-weight: bold;
+  font-style: italic;
 }
 
 .EdgeTypeText {
@@ -257,13 +266,13 @@
   // margin-right: 5px;
 }
 
-#JaccardText {
-  margin-left: 5px;
-}
+// #JaccardText {
+//   margin-left: 5px;
+// }
 
-#OverlapText {
-  margin-right: 5px;
-}
+// #OverlapText {
+//   margin-right: 5px;
+// }
 
 #JaccardPercent {
   color: var(--color-white);

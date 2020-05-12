@@ -35,7 +35,8 @@ const StyledSlider = styled(ReactSlider)`
 `;
 
 const StyledThumb = styled.div`
-  line-height: 32px;
+  line-height: 63px;
+  /* line-height: 32px; */
   text-align: center;
   cursor: grab !important;
   margin-top: -7px;
