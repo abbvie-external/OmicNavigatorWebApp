@@ -1,21 +1,15 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-// import NumericInput from 'react-numeric-input';
-// import './NumericExponentialInput.scss';
-
+import './NumericExponentialInput.scss';
 function clamp(x, lower = -Infinity, upper = Infinity) {
   return Math.min(upper, Math.max(lower, x));
 }
-export default function NumericExponentialInput({
-  onChange,
-  min,
-  max,
-  defaultValue,
-}) {
+export default function Component({ onChange, min, max, defaultValue, value }) {
   const [numberProps, { power, base, numberValue }] = useExponentialInput({
     defaultValue,
     min,
     max,
     onChange,
+    value,
   });
 
   return (
@@ -27,13 +21,27 @@ export default function NumericExponentialInput({
   );
 }
 
-const useExponentialInput = ({ onChange, min, max, defaultValue }) => {
+const useExponentialInput = ({
+  onChange,
+  min,
+  max,
+  defaultValue,
+  value: propValue,
+}) => {
   const [power, setPower] = useState(() => {
     return +(defaultValue || 0).toExponential(0).split('e')[1];
   });
   const [base, setBase] = useState(() => {
     return +(defaultValue || 0).toExponential(0).split('e')[0];
   });
+  useEffect(() => {
+    if (propValue == null) {
+      return;
+    }
+    const [base, power] = propValue.toExponential(0).split('e');
+    setBase(+base);
+    setPower(+power);
+  }, [propValue]);
   const [fakeValue, setFakeValue] = useState(null);
   const handleChange = useCallback(
     evt => {

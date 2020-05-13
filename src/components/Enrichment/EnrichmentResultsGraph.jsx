@@ -25,7 +25,7 @@ import NetworkGraph from './NetworkGraph';
 import ReactSlider from 'react-slider';
 import LoaderActivePlots from '../Transitions/LoaderActivePlots';
 import './EnrichmentResultsGraph.scss';
-// import NumericExponentialInput from '../Shared/NumericExponentialInput';
+import NumericExponentialInput from '../Shared/NumericExponentialInput';
 import { limitValues } from '../Shared/helpers';
 
 const StyledSlider = styled(ReactSlider)`
@@ -610,7 +610,7 @@ class EnrichmentResultsGraph extends Component {
                   mouseEnterDelay={1000}
                   mouseLeaveDelay={0}
                 />
-                <NumericInput
+                {/* <NumericInput
                   value={nodeCutoffLocal}
                   onChange={this.handleNodeCutoffInputChangeLocal}
                   disabled={!networkGraphReady}
@@ -624,8 +624,8 @@ class EnrichmentResultsGraph extends Component {
                   id="NetworkSliderNodeInput"
                   className="NetworkSliderInput"
                   // onInvalid={this.}
-                />
-                {/* <NumericExponentialInput
+                /> */}
+                <NumericExponentialInput
                   className="NumericExponentialInputContainer"
                   onChange={number => {
                     this.handleNodeCutoffInputChangeLocal(number);
@@ -634,7 +634,8 @@ class EnrichmentResultsGraph extends Component {
                   max={1}
                   defaultValue={parseFloat(nodeCutoffLocal)}
                   disabled={!networkGraphReady}
-                /> */}
+                  value={parseFloat(nodeCutoffLocal)}
+                />
               </div>
               <div className="NetworkSliderDiv">
                 <StyledSlider
