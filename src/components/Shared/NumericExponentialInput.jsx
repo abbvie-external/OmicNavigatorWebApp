@@ -1,4 +1,7 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
+// import NumericInput from 'react-numeric-input';
+// import './NumericExponentialInput.scss';
+
 function clamp(x, lower = -Infinity, upper = Infinity) {
   return Math.min(upper, Math.max(lower, x));
 }
@@ -16,16 +19,22 @@ export default function NumericExponentialInput({
   });
 
   return (
+    // <div className="NumericExponentialInputDiv">
     <input
+      spellCheck="false"
       id="NetworkSliderNodeInput"
       className="NetworkSliderInput"
       {...numberProps}
     />
+    // <div className="NumericExponentialInputDiv">
+    //   <input className="NumericExponentialInput" {...numberProps} />
+    // </div>
   );
 }
 
-const useExponentialInput = ({ onChange, min, max, defaultValue = 0 }) => {
+const useExponentialInput = ({ onChange, min, max, defaultValue }) => {
   const [power, setPower] = useState(() => {
+    debugger;
     return +(defaultValue || 0).toExponential(0).split('e')[1];
   });
   const [base, setBase] = useState(() => {

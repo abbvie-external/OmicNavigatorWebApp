@@ -140,11 +140,10 @@ const resultRenderer = ({ description, genes, size }) => {
     backgroundColor: '2E2E2E',
     borderBottom: '2px solid var(--color-primary)',
     color: '#FFF',
-    // padding: '1em',
+    padding: '1em',
     maxWidth: '25vw',
     fontSize: '13px',
     wordBreak: 'break-all',
-    height: '',
   };
   // let dynamicSize = getDynamicSize();
   return (
@@ -359,6 +358,7 @@ class EnrichmentResultsGraph extends Component {
   };
 
   handleNodeCutoffInputChangeLocal = _.debounce(value => {
+    debugger;
     this.setState({
       nodeCutoffLocal: value,
     });
@@ -581,7 +581,7 @@ class EnrichmentResultsGraph extends Component {
                 value={networkSearchValue}
                 resultRenderer={resultRenderer}
                 // {...this.props}
-                spellcheck="false"
+                spellCheck="false"
               />
             </Grid.Column>
             <Grid.Column
@@ -628,9 +628,13 @@ class EnrichmentResultsGraph extends Component {
                 /> */}
                 <NumericExponentialInput
                   className="NumericExponentialInputContainer"
-                  onChange={num => {
-                    console.log(num);
+                  onChange={number => {
+                    this.handleNodeCutoffInputChangeLocal(number);
                   }}
+                  // min={0}
+                  // max={1}
+                  defaultValue={parseFloat(nodeCutoffLocal)}
+                  disabled={!networkGraphReady}
                 />
               </div>
               <div className="NetworkSliderDiv">
