@@ -29,7 +29,6 @@ export default function NumericExponentialInput({
 
 const useExponentialInput = ({ onChange, min, max, defaultValue }) => {
   const [power, setPower] = useState(() => {
-    debugger;
     return +(defaultValue || 0).toExponential(0).split('e')[1];
   });
   const [base, setBase] = useState(() => {
@@ -66,6 +65,9 @@ const useExponentialInput = ({ onChange, min, max, defaultValue }) => {
         }
       }
       if (!Number.isNaN(+val)) {
+        if (+val === max) {
+          val = max;
+        }
         const [base, power] = (+val).toExponential(0).split('e');
         setBase(+base);
         setPower(+power);
