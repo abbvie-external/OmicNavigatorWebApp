@@ -13,7 +13,6 @@ import {
   Icon,
   Dropdown,
   Menu,
-  Segment,
 } from 'semantic-ui-react';
 import {
   sortableContainer,
@@ -26,7 +25,9 @@ import NetworkGraph from './NetworkGraph';
 import ReactSlider from 'react-slider';
 import LoaderActivePlots from '../Transitions/LoaderActivePlots';
 import './EnrichmentResultsGraph.scss';
+import '../Shared/NumericExponentialInput.scss';
 import NumericExponentialInput from '../Shared/NumericExponentialInput';
+import { limitValues } from '../Shared/helpers';
 
 const StyledSlider = styled(ReactSlider)`
   width: 100%;
@@ -134,15 +135,16 @@ function getDynamicLegend() {
 }
 
 const resultRenderer = ({ description, genes, size }) => {
-  let genesFormatted = genes.join(', ');
+  let genesFormatted = limitValues(genes, 15);
   const SearchValuePopupStyle = {
     backgroundColor: '2E2E2E',
     borderBottom: '2px solid var(--color-primary)',
     color: '#FFF',
-    padding: '1em',
+    // padding: '1em',
     maxWidth: '25vw',
     fontSize: '13px',
     wordBreak: 'break-all',
+    height: '',
   };
   // let dynamicSize = getDynamicSize();
   return (
@@ -625,6 +627,7 @@ class EnrichmentResultsGraph extends Component {
                   // onInvalid={this.}
                 /> */}
                 <NumericExponentialInput
+                  className="NumericExponentialInputContainer"
                   onChange={num => {
                     console.log(num);
                   }}
@@ -687,7 +690,6 @@ class EnrichmentResultsGraph extends Component {
                   step={0.01}
                   min={0.0}
                   max={1.0}
-                  id="NetworkSliderNodeInput"
                   className="NetworkSliderInput"
                 />
               </div>
@@ -747,7 +749,6 @@ class EnrichmentResultsGraph extends Component {
                   step={0.01}
                   min={0.0}
                   max={1.0}
-                  id="NetworkSliderNodeInput"
                   className="NetworkSliderInput"
                 />
               </div>
