@@ -19,16 +19,11 @@ export default function NumericExponentialInput({
   });
 
   return (
-    // <div className="NumericExponentialInputDiv">
     <input
+      className="NumericExponentialInput"
       spellCheck="false"
-      id="NetworkSliderNodeInput"
-      className="NetworkSliderInput"
       {...numberProps}
     />
-    // <div className="NumericExponentialInputDiv">
-    //   <input className="NumericExponentialInput" {...numberProps} />
-    // </div>
   );
 }
 
