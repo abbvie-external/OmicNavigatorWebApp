@@ -34,13 +34,13 @@ export function splitValue(value) {
 export function limitValues(values, size) {
   if (values) {
     let commaSeparatedValues = values.join(', ');
-    if (values.length < size + 1) {
+    if (values.length <= size) {
       return commaSeparatedValues;
     } else {
       const numberOfCommas = (commaSeparatedValues.match(/,/g) || []).length;
       const splitValues = commaSeparatedValues.split(',');
-      const slicedValues = splitValues.slice(0, size - 1);
-      return `${slicedValues}...(${numberOfCommas - size} more)`;
+      const slicedValues = splitValues.slice(0, size);
+      return `${slicedValues}...(${numberOfCommas + 1 - size} more)`;
     }
   }
 }
@@ -131,12 +131,12 @@ export function networkByCluster(network) {
   network.nodes = _.sortBy(network.nodes, [
     function(o) {
       return o.group;
-    }
+    },
   ]);
   network.links = _.sortBy(network.links, [
     function(o) {
       return o.group;
-    }
+    },
   ]);
   let nodes = d3.group(network.nodes, d => d.group);
   let links = d3.group(network.links, d => d.group);
