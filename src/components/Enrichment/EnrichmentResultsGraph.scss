@@ -57,12 +57,16 @@
     max-width: 200px !important;
   }
 }
-@media (min-width: 1200px) and (max-width: 1599px) {
+@media (min-width: 1200px) and (max-width: 1499px) {
   #NetworkSearchInput {
     max-width: 110px !important;
   }
 }
-
+@media (min-width: 1500px) and (max-width: 1599px) {
+  #NetworkSearchInput {
+    max-width: 150px !important;
+  }
+}
 @media (min-width: 1600px) and (max-width: 1900px) {
   #NetworkSearchInput {
     max-width: 160px !important;
