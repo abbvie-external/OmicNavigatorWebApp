@@ -1,0 +1,37 @@
+.volcanoPlotContainer{
+    padding-top: 10px;
+}
+
+.volcanoPlotSVG{
+    position: relative;
+    display: block;
+    margin: auto;
+}
+
+.volcanoPlotYAxis{
+    stroke: #838383;
+    stroke-width: 2px;
+}
+.volcanoPlotXAxis{
+    stroke: #838383;
+    stroke-width: 2px;
+}
+.axisLabel{
+    font-weight: bold;
+}
+.volcanoPlot-dataPoint {
+    fill: #838383;;
+}
+.volcanoPlot-dataPoint.hovered{
+    stroke: lightskyblue;
+    stroke-width: 5;
+}
+.volcanoPlot-dataPoint.selected {
+    stroke: blue;
+    stroke-width: 3;
+}
+.volcanoPlot-dataPoint.highlighted {
+    stroke: orangered;
+    stroke-width: 4;
+    z-index: 100;
+}

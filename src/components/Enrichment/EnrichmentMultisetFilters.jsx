@@ -142,6 +142,7 @@ class EnrichmentMultisetFilters extends Component {
         .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
         .attr('font-size', '15px')
         .attr('fill', 'black');
+      if(mustData.length !== 0 || useAnchor){
       metaSvg
         .selectAll('dataObject')
         .data(setDescP)
@@ -157,6 +158,7 @@ class EnrichmentMultisetFilters extends Component {
         .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
         .attr('font-size', '14px')
         .attr('fill', 'black');
+      }
 
       if (useAnchor) {
         metaSvg
@@ -179,7 +181,6 @@ class EnrichmentMultisetFilters extends Component {
           .attr('fill', 'black');
       }
 
-      // const mustTestCircles =
       metaSvg
         .selectAll('dataObject')
         .data(mustData)
@@ -241,18 +242,14 @@ class EnrichmentMultisetFilters extends Component {
           .data(notSetDescP)
           .enter()
           .append('text')
-          .attr('dy', '24px')
           .attr('x', 7)
           .attr('y', function(d, i) {
-            if (!useAnchor) {
-              return (
-                30 +
-                heightScalar * setDescP.length +
-                (i + mustData.length - 1) * heightScalar
-              );
+            if (!useAnchor && mustData.length === 0) {
+              return 30 + heightScalar * i;
             } else {
               return (
                 30 +
+                4 +
                 heightScalar * setDescP.length +
                 (i + mustData.length) * heightScalar
               );
@@ -274,12 +271,10 @@ class EnrichmentMultisetFilters extends Component {
           .style('fill', 'red')
           .attr('cx', 17)
           .attr('cy', function(d, i) {
-            if (!useAnchor) {
+            if (!useAnchor && mustData.length === 0) {
               return (
                 30 +
-                4 +
-                heightScalar *
-                  (i + setDescP.length + notSetDescP.length + mustData.length)
+                heightScalar *(i + notSetDescP.length)
               );
             } else {
               return (
@@ -289,8 +284,7 @@ class EnrichmentMultisetFilters extends Component {
                   (i +
                     setDescP.length +
                     notSetDescP.length +
-                    mustData.length +
-                    1)
+                    mustData.length)
               );
             }
           })
@@ -304,12 +298,12 @@ class EnrichmentMultisetFilters extends Component {
           .append('text')
           .attr('x', 25)
           .attr('y', function(d, i) {
-            if (!useAnchor) {
+            if (!useAnchor && mustData.length === 0) {
               return (
                 30 +
-                8 +
+                4 +
                 heightScalar *
-                  (i + setDescP.length + notSetDescP.length + mustData.length)
+                  (i + notSetDescP.length)
               );
             } else {
               return (
@@ -319,8 +313,7 @@ class EnrichmentMultisetFilters extends Component {
                   (i +
                     setDescP.length +
                     notSetDescP.length +
-                    mustData.length +
-                    1)
+                    mustData.length)
               );
             }
           })
@@ -823,21 +816,6 @@ class EnrichmentMultisetFilters extends Component {
                   options={Columns}
                   width={7}
                 ></Form.Field>
-                {hoveredFilter === index && indexFilters.length !== 1 && (
-                  <Button
-                    circular
-                    icon
-                    style={{
-                      position: 'absolute',
-                      marginTop: index === 0 ? '15px' : '0px',
-                    }}
-                    size="mini"
-                    compact
-                    onClick={() => this.removeFilter(index)}
-                  >
-                    <Icon name="minus circle" color={'red'} />
-                  </Button>
-                )}
                 <Form.Field
                   control={Select}
                   label={index === 0 ? 'Operator' : ''}
@@ -866,9 +844,6 @@ class EnrichmentMultisetFilters extends Component {
               </Form.Group>
             ))}
           </ul>
-          <Button circular compact size="mini" icon onClick={this.addFilter}>
-            <Icon name="plus circle" color={'green'} />
-          </Button>
         </Form>
         <p id="multiset-query" className="MultisetQueryContainer"></p>
       </Fragment>

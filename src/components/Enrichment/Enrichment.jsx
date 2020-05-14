@@ -156,7 +156,7 @@ class Enrichment extends Component {
     violinSettings: {
       axisLabels: {
         xAxis: 'abs(t)',
-        yAxis: "log<tspan baseline-shift='sub' font-size='14px'>2</tspan>(FC)",
+        yAxis: "log<tspan baseline-shift='sub' font-size='14px'>2</tspan>FC",
       },
       // axisLabels: { xAxis: this.term, yAxis: "log<tspan baseline-shift='sub' font-size='14px'>2</tspan>(FC)" },
       id: 'violin-graph-1',
