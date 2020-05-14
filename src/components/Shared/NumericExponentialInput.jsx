@@ -25,7 +25,7 @@ const useExponentialInput = ({
   onChange,
   min,
   max,
-  defaultValue,
+  defaultValue = 0,
   value: propValue,
 }) => {
   const [power, setPower] = useState(() => {

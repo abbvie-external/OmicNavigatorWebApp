@@ -1724,7 +1724,7 @@ class Enrichment extends Component {
   };
 
   handleEdgeTypeInputChange = value => {
-    if (this.state.edgeCutoff !== value) {
+    if (this.state.edgeType !== value) {
       // this.removeNetworkSVG();
       this.setState({
         edgeType: value,

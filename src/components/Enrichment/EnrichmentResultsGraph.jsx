@@ -356,54 +356,66 @@ class EnrichmentResultsGraph extends Component {
     d3.select(`#svg-${this.props.networkSettings.id}`).remove();
   };
 
-  handleNodeCutoffInputChangeLocal = _.debounce(value => {
-    debugger;
+  // formatNodeCutoff = numString => {
+  //   const num = Number(numString);
+  //   const formattedNumber =
+  //     num >= 0.001 || num === 0 ? num : num.toExponential();
+  //   //.replace(/e\+?/, 'x 10^');
+  //   return `${formattedNumber}`;
+  //   // if we'd reather use x10 display
+  //   // if (num >= 0.01) {
+  //   //   return `${num}`;
+  //   // } else {
+  //   //   const n = Math.round(Math.log10(num));
+  //   //   const m = (num * Math.pow(10, Math.abs(n))).toFixed(3);
+  //   //   const formattedNumber = `${m}x 10${(<sup>n</sup>)}`;
+  //   //   return formattedNumber;
+  //   // }
+  // };
+
+  // NODE CUTOFF
+  // nodeCutoffStep = component => {
+  //   if (component.state.btnDownActive) {
+  //     // direction down
+  //     if (component.state.value <= 0.001) {
+  //       return 0.0001;
+  //     } else if (
+  //       component.state.value > 0.001 &&
+  //       component.state.value <= 0.01
+  //     ) {
+  //       return 0.001;
+  //     } else return 0.01;
+  //   } else {
+  //     // direction up
+  //     if (component.state.value < 0.001) {
+  //       return 0.0001;
+  //     } else if (
+  //       component.state.value >= 0.001 &&
+  //       component.state.value < 0.01
+  //     ) {
+  //       return 0.001;
+  //     } else return 0.01;
+  //   }
+  // };
+
+  // NODE CUTOFF
+  handleNodeCutoffInputChange = value => {
     this.setState({
       nodeCutoffLocal: value,
     });
+  };
+
+  actuallyHandleNodeCutoffInputChange = _.debounce(value => {
     this.props.onHandleNodeCutoffInputChange(value);
   }, 1250);
 
-  formatNodeCutoff = numString => {
-    const num = Number(numString);
-    const formattedNumber =
-      num >= 0.001 || num === 0 ? num : num.toExponential();
-    //.replace(/e\+?/, 'x 10^');
-    return `${formattedNumber}`;
-    // if we'd reather use x10 display
-    // if (num >= 0.01) {
-    //   return `${num}`;
-    // } else {
-    //   const n = Math.round(Math.log10(num));
-    //   const m = (num * Math.pow(10, Math.abs(n))).toFixed(3);
-    //   const formattedNumber = `${m}x 10${(<sup>n</sup>)}`;
-    //   return formattedNumber;
-    // }
-  };
-
-  // NODE CUTOFF
-  nodeCutoffStep = component => {
-    if (component.state.btnDownActive) {
-      // direction down
-      if (component.state.value <= 0.001) {
-        return 0.0001;
-      } else if (
-        component.state.value > 0.001 &&
-        component.state.value <= 0.01
-      ) {
-        return 0.001;
-      } else return 0.01;
-    } else {
-      // direction up
-      if (component.state.value < 0.001) {
-        return 0.0001;
-      } else if (
-        component.state.value >= 0.001 &&
-        component.state.value < 0.01
-      ) {
-        return 0.001;
-      } else return 0.01;
-    }
+  actuallyHandleNodeCutoffSliderChange = value => {
+    // let decimalValue = value >= 1 ? value / 100 : 0.01;
+    let decimalValue = value / 100;
+    // this.setState({
+    //   nodeCutoffLocal: decimalValue,
+    // });
+    this.props.onHandleNodeCutoffSliderChange(decimalValue);
   };
 
   handleNodeCutoffSliderChange = value => {
@@ -412,35 +424,28 @@ class EnrichmentResultsGraph extends Component {
     this.setState({
       nodeCutoffLocal: decimalValue,
     });
-    this.props.onHandleNodeCutoffSliderChange(decimalValue);
-  };
-
-  handleNodeCutoffSliderChangeLocal = value => {
-    // let decimalValue = value >= 1 ? value / 100 : 0.01;
-    let decimalValue = value / 100;
-    this.setState({
-      nodeCutoffLocal: decimalValue,
-    });
   };
 
   // EDGE CUTOFF
-  handleEdgeCutoffInputChangeLocal = _.debounce(value => {
-    let revisedValue = value >= 0.05 ? value : 0.05;
+  handleEdgeCutoffInputChange = value => {
     this.setState({
-      edgeCutoffLocal: revisedValue,
+      edgeCutoffLocal: value,
     });
-    this.props.onHandleEdgeCutoffInputChange(revisedValue);
+  };
+
+  actuallyHandleEdgeCutoffInputChange = _.debounce(value => {
+    this.props.onHandleEdgeCutoffInputChange(value);
   }, 1250);
 
-  handleEdgeCutoffSliderChange = value => {
+  actuallyHandleEdgeCutoffSliderChange = value => {
     let decimalValue = value >= 5 ? value / 100 : 0.05;
-    this.setState({
-      edgeCutoffLocal: decimalValue,
-    });
+    // this.setState({
+    //   edgeCutoffLocal: decimalValue,
+    // });
     this.props.onHandleEdgeCutoffSliderChange(decimalValue);
   };
 
-  handleEdgeCutoffSliderChangeLocal = value => {
+  handleEdgeCutoffSliderChange = value => {
     let decimalValue = value >= 5 ? value / 100 : 0.05;
     this.setState({
       edgeCutoffLocal: decimalValue,
@@ -448,18 +453,21 @@ class EnrichmentResultsGraph extends Component {
   };
 
   // EDGE TYPE
-  handleEdgeTypeInputChangeLocal = _.debounce(value => {
+  handleEdgeTypeInputChange = value => {
     this.setState({
       edgeTypeLocal: value,
     });
+  };
+
+  actuallyHandleEdgeTypeInputChange = _.debounce(value => {
     this.props.onHandleEdgeTypeInputChange(value);
-  }, 500);
+  }, 1250);
 
   handleEdgeTypeSliderChange = value => {
     let decimalValue = value / 100;
-    this.setState({
-      edgeTypeLocal: decimalValue,
-    });
+    // this.setState({
+    //   edgeTypeLocal: decimalValue,
+    // });
     this.props.onHandleEdgeTypeSliderChange(decimalValue);
   };
 
@@ -628,7 +636,8 @@ class EnrichmentResultsGraph extends Component {
                 <NumericExponentialInput
                   className="NumericExponentialInputContainer"
                   onChange={number => {
-                    this.handleNodeCutoffInputChangeLocal(number);
+                    this.handleNodeCutoffInputChange(number);
+                    this.actuallyHandleNodeCutoffInputChange(number);
                   }}
                   min={0}
                   max={1}
@@ -652,9 +661,9 @@ class EnrichmentResultsGraph extends Component {
                   min={0}
                   max={100}
                   // step={0.1}
-                  onChange={this.handleNodeCutoffSliderChangeLocal}
-                  onSliderClick={this.handleNodeCutoffSliderChange}
-                  onAfterChange={this.handleNodeCutoffSliderChange}
+                  onChange={this.handleNodeCutoffSliderChange}
+                  onSliderClick={this.actuallyHandleNodeCutoffSliderChange}
+                  onAfterChange={this.actuallyHandleNodeCutoffSliderChange}
                 />
               </div>
             </Grid.Column>
@@ -685,7 +694,7 @@ class EnrichmentResultsGraph extends Component {
                   mouseEnterDelay={1000}
                   mouseLeaveDelay={0}
                 />
-                <NumericInput
+                {/* <NumericInput
                   value={edgeCutoffLocal}
                   onChange={this.handleEdgeCutoffInputChangeLocal}
                   disabled={!networkGraphReady}
@@ -695,6 +704,19 @@ class EnrichmentResultsGraph extends Component {
                   min={0.0}
                   max={1.0}
                   className="NetworkSliderInput"
+                /> */}
+                <NumericExponentialInput
+                  className="NumericExponentialInputContainer"
+                  onChange={number => {
+                    let revisedNumber = number >= 0.1 ? number : 0.1;
+                    this.handleEdgeCutoffInputChange(revisedNumber);
+                    this.actuallyHandleEdgeCutoffInputChange(revisedNumber);
+                  }}
+                  min={0.1}
+                  max={1}
+                  defaultValue={parseFloat(edgeCutoffLocal)}
+                  disabled={!networkGraphReady}
+                  value={parseFloat(edgeCutoffLocal)}
                 />
               </div>
               <div className="NetworkSliderDiv">
@@ -709,15 +731,15 @@ class EnrichmentResultsGraph extends Component {
                   }
                   value={edgeCutoffLocal * 100}
                   name="edgeCutoffSlider"
-                  min={0}
+                  min={10}
                   max={100}
-                  // step={0.1}
-                  onChange={this.handleEdgeCutoffSliderChangeLocal}
-                  onSliderClick={this.handleEdgeCutoffSliderChange}
-                  onAfterChange={this.handleEdgeCutoffSliderChange}
+                  onChange={this.handleEdgeCutoffSliderChange}
+                  onSliderClick={this.actuallyHandleEdgeCutoffSliderChange}
+                  onAfterChange={this.actuallyHandleEdgeCutoffSliderChange}
                 />
               </div>
             </Grid.Column>
+
             <Grid.Column
               className="NetworkGraphFilters"
               mobile={8}
@@ -737,16 +759,16 @@ class EnrichmentResultsGraph extends Component {
                     </Label>
                   }
                   style={CustomPopupStyle}
-                  content="TBD BRETT...Percent used for overlap coefficient and Jaccard index, respectfully."
+                  content="TBD BRETT / JOHN...Percent used for overlap coefficient and Jaccard index, respectfully."
                   inverted
                   basic
                   position="left center"
                   mouseEnterDelay={1000}
                   mouseLeaveDelay={0}
                 />
-                <NumericInput
-                  value={edgeTypeLocal}
-                  onChange={this.handleEdgeTypeInputChangeLocal}
+                {/* <NumericInput
+                  value={edgeCutoffLocal}
+                  onChange={this.handleEdgeCutoffInputChangeLocal}
                   disabled={!networkGraphReady}
                   precision={2}
                   size={dynamicSize}
@@ -754,6 +776,18 @@ class EnrichmentResultsGraph extends Component {
                   min={0.0}
                   max={1.0}
                   className="NetworkSliderInput"
+                /> */}
+                <NumericExponentialInput
+                  className="NumericExponentialInputContainer"
+                  onChange={number => {
+                    this.handleEdgeTypeInputChange(number);
+                    this.actuallyHandleEdgeTypeInputChange(number);
+                  }}
+                  min={0}
+                  max={1}
+                  defaultValue={parseFloat(edgeTypeLocal)}
+                  disabled={!networkGraphReady}
+                  value={parseFloat(edgeTypeLocal)}
                 />
               </div>
               <div className="NetworkSliderDiv" id="NetworkSliderDivEdgeType">
@@ -770,7 +804,6 @@ class EnrichmentResultsGraph extends Component {
                   name="edgeTypeSlider"
                   min={0}
                   max={100}
-                  // step={0.1}
                   onChange={this.handleEdgeTypeSliderChangeLocal}
                   onSliderClick={this.handleEdgeTypeSliderChange}
                   onAfterChange={this.handleEdgeTypeSliderChange}
