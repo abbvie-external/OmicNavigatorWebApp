@@ -30,6 +30,7 @@
 //   position: initial;
 // }
 .ui.search > .results {
+  // min-height: 100px;
   max-height: 75vh !important;
   overflow-y: scroll !important;
   // overflow-x: inherit;
@@ -41,31 +42,30 @@
 }
 
 #NetworkSearchInput {
+  max-width: 200px;
   border-radius: 0.28571429rem !important;
-  width: 150px;
 }
 
-@media (max-width: 767px) {
-  #NetworkSearchInput {
-    max-width: 110px !important;
-    margin-top: 20px !important;
+@media (max-width: 1199px) {
+  #NetworkSearchInputColumn div {
+    float: right;
   }
 }
 
-@media (min-width: 768px) and (max-width: 999px) {
+@media (min-width: 768px) and (max-width: 1199px) {
   #NetworkSearchInput {
-    max-width: 150px !important;
+    max-width: 200px !important;
   }
 }
-@media (min-width: 1000px) and (max-width: 1599px) {
+@media (min-width: 1200px) and (max-width: 1599px) {
   #NetworkSearchInput {
     max-width: 110px !important;
   }
 }
 
-@media (min-width: 1600) and (max-width: 1900px) {
+@media (min-width: 1600px) and (max-width: 1900px) {
   #NetworkSearchInput {
-    max-width: 145px !important;
+    max-width: 160px !important;
   }
 }
 
@@ -124,7 +124,7 @@
 }
 
 .RadioLabelsDisplay {
-  margin-top: 10px;
+  margin-left: 40px;
   // margin-left: 20px;
   font-size: 1rem !important;
 
@@ -144,14 +144,15 @@
   margin: 0 auto !important;
   margin-top: 10px !important;
   margin-bottom: 5px !important;
-  max-width: 245px;
+  // max-width: 245px;
+  max-width: 156px;
 }
 
-@media (min-width: 1600px) and (max-width: 2599px) {
-  .NetworkSliderDiv {
-    max-width: 220px !important;
-  }
-}
+// @media (min-width: 1600px) and (max-width: 2599px) {
+//   .NetworkSliderDiv {
+//     max-width: 220px !important;
+//   }
+// }
 
 // @media (min-width: 1200px) and (max-width: 1599px) {
 //   .NetworkSliderDiv {
@@ -175,6 +176,15 @@
   margin-top: 12px !important;
   // margin-bottom: 5px !important;
   // max-width: 245px;
+  // .thumb:active,
+  // .thumb:focus {
+  //   outline: none !important;
+  // }
+}
+
+.thumb:active,
+.thumb:focus {
+  outline: none !important;
 }
 
 .InlineFlex {
@@ -216,15 +226,31 @@
   padding-left: 10px !important;
 }
 
-@media (min-width: 2600px) {
+@media (min-width: 1600px) {
   .NetworkSliderInput {
     font-size: 15px !important;
-    height: 44px !important;
+    height: 50px !important;
   }
 }
 
-#NetworkSliderNodeInput {
+.NumericExponentialInput {
   width: 80px !important;
+  font-size: 14px !important;
+  border: 1px solid rgb(204, 204, 204);
+  border-radius: 2px;
+  font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 500;
+  height: 40px !important;
+  width: 70px !important;
+  padding-left: 10px !important;
+}
+
+@media (min-width: 1600px) {
+  .NumericExponentialInput {
+    font-size: 15px !important;
+    height: 50px !important;
+  }
 }
 
 .NetworkSlider {
@@ -236,14 +262,23 @@
   margin-right: -95px;
 }
 
+.ValueNowEdgeTypeOverlapText,
 .ValueNowEdgeTypeOverlapNumber {
   color: var(--color-dark) !important;
-  margin-left: -30px;
+  margin-left: 35px;
+  font-size: 13px;
+  font-weight: bold;
+  font-style: italic;
 }
 
+.ValueNowEdgeTypeJaccardText,
 .ValueNowEdgeTypeJaccardNumber {
-  color: var(--color-white) !important;
-  margin-left: 35px;
+  color: var(--color-dark) !important;
+  // color: var(--color-white) !important;
+  margin-left: -45px;
+  font-size: 13px;
+  font-weight: bold;
+  font-style: italic;
 }
 
 .EdgeTypeText {
@@ -251,13 +286,13 @@
   // margin-right: 5px;
 }
 
-#JaccardText {
-  margin-left: 5px;
-}
+// #JaccardText {
+//   margin-left: 5px;
+// }
 
-#OverlapText {
-  margin-right: 5px;
-}
+// #OverlapText {
+//   margin-right: 5px;
+// }
 
 #JaccardPercent {
   color: var(--color-white);
@@ -290,6 +325,7 @@
   background-color: var(--color-dark) !important;
   color: var(--color-light) !important;
   display: inline-block !important;
+  line-height: initial !important;
 }
 
 // @media (max-width: 768px) {
