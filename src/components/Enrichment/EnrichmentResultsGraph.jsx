@@ -336,7 +336,7 @@ class EnrichmentResultsGraph extends Component {
       size: r.EnrichmentMap_Genes.length,
     }));
     this.setState({
-      networkSearchValue: '',
+      // networkSearchValue: '',
       descriptions: networkDataNodeDescriptions,
     });
   };
@@ -571,6 +571,7 @@ class EnrichmentResultsGraph extends Component {
                 placeholder="Search"
                 onResultSelect={this.handleResultSelect}
                 onSearchChange={this.handleSearchChange}
+                onFocus={this.handleSearchChange}
                 results={networkSearchResults}
                 loading={networkSearchLoading}
                 value={networkSearchValue}
