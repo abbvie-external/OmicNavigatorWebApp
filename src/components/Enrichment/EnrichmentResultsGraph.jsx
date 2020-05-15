@@ -20,7 +20,6 @@ import {
   SortableHandle,
 } from 'react-sortable-hoc';
 import arrayMove from 'array-move';
-import NumericInput from 'react-numeric-input';
 import NetworkGraph from './NetworkGraph';
 import ReactSlider from 'react-slider';
 import LoaderActivePlots from '../Transitions/LoaderActivePlots';
@@ -278,7 +277,6 @@ class EnrichmentResultsGraph extends Component {
       d3.select('div.tooltip-pieSlice').remove();
       d3.select('tooltipEdge').remove();
       d3.select(`#svg-${this.props.networkSettings.id}`).remove();
-      this.setupSearch();
     }
   }
 
@@ -287,7 +285,6 @@ class EnrichmentResultsGraph extends Component {
       this.props.networkGraphReady !== prevProps.networkGraphReady ||
       this.props.networkData !== prevProps.networkData
     ) {
-      this.setupSearch();
       this.props.onCreateLegend();
     }
   }
@@ -332,13 +329,14 @@ class EnrichmentResultsGraph extends Component {
     };
   // , 500)
 
-  setupSearch = () => {
-    const networkDataNodeDescriptions = this.props.networkData.nodes.map(r => ({
-      description: r.data.EnrichmentMap_GS_DESCR.toLowerCase(),
-      genes: r.data.EnrichmentMap_Genes,
-      size: r.data.EnrichmentMap_Genes.length,
+  setupNetworkSearch = filteredNodes => {
+    const networkDataNodeDescriptions = filteredNodes.map(r => ({
+      description: r.EnrichmentMap_GS_DESCR.toLowerCase(),
+      genes: r.EnrichmentMap_Genes,
+      size: r.EnrichmentMap_Genes.length,
     }));
     this.setState({
+      networkSearchValue: '',
       descriptions: networkDataNodeDescriptions,
     });
   };
@@ -965,7 +963,11 @@ class EnrichmentResultsGraph extends Component {
               largeScreen={16}
               widescreen={16}
             >
-              <NetworkGraph {...this.props} {...this.state}></NetworkGraph>
+              <NetworkGraph
+                {...this.props}
+                {...this.state}
+                onInformFilteredNetworkData={this.setupNetworkSearch}
+              ></NetworkGraph>
             </Grid.Column>
           </Grid.Row>
         </Grid>
