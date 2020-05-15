@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import { Form, Select, Input, Button, Icon } from 'semantic-ui-react';
+import { Form, Select, Input } from 'semantic-ui-react';
 import * as d3 from 'd3';
 import '../Shared/MultisetFilters.scss';
 
@@ -142,22 +142,22 @@ class EnrichmentMultisetFilters extends Component {
         .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
         .attr('font-size', '15px')
         .attr('fill', 'black');
-      if(mustData.length !== 0 || useAnchor){
-      metaSvg
-        .selectAll('dataObject')
-        .data(setDescP)
-        .enter()
-        .append('text')
-        .attr('x', 7)
-        .attr('y', function(d, i) {
-          return 30 + heightScalar * i;
-        })
-        .text(function(d) {
-          return d;
-        })
-        .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
-        .attr('font-size', '14px')
-        .attr('fill', 'black');
+      if (mustData.length !== 0 || useAnchor) {
+        metaSvg
+          .selectAll('dataObject')
+          .data(setDescP)
+          .enter()
+          .append('text')
+          .attr('x', 7)
+          .attr('y', function(d, i) {
+            return 30 + heightScalar * i;
+          })
+          .text(function(d) {
+            return d;
+          })
+          .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
+          .attr('font-size', '14px')
+          .attr('fill', 'black');
       }
 
       if (useAnchor) {
@@ -272,19 +272,13 @@ class EnrichmentMultisetFilters extends Component {
           .attr('cx', 17)
           .attr('cy', function(d, i) {
             if (!useAnchor && mustData.length === 0) {
-              return (
-                30 +
-                heightScalar *(i + notSetDescP.length)
-              );
+              return 30 + heightScalar * (i + notSetDescP.length);
             } else {
               return (
                 30 +
                 4 +
                 heightScalar *
-                  (i +
-                    setDescP.length +
-                    notSetDescP.length +
-                    mustData.length)
+                  (i + setDescP.length + notSetDescP.length + mustData.length)
               );
             }
           })
@@ -299,21 +293,13 @@ class EnrichmentMultisetFilters extends Component {
           .attr('x', 25)
           .attr('y', function(d, i) {
             if (!useAnchor && mustData.length === 0) {
-              return (
-                30 +
-                4 +
-                heightScalar *
-                  (i + notSetDescP.length)
-              );
+              return 30 + 4 + heightScalar * (i + notSetDescP.length);
             } else {
               return (
                 30 +
                 8 +
                 heightScalar *
-                  (i +
-                    setDescP.length +
-                    notSetDescP.length +
-                    mustData.length)
+                  (i + setDescP.length + notSetDescP.length + mustData.length)
               );
             }
           })
@@ -789,7 +775,7 @@ class EnrichmentMultisetFilters extends Component {
     const Operators = uSettings.thresholdOperator;
     const SelOp = selectedOperator;
     const indexFilters = uSettings.indexFilters;
-    const hoveredFilter = uSettings.hoveredFilter;
+    // const hoveredFilter = uSettings.hoveredFilter;
     // for now, column is displayed as label, just matching the "nominal" or "Adjusted" p value type
     const SelColOverride =
       this.props.pValueType === 'nominal'
