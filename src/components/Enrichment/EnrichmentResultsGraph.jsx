@@ -453,17 +453,7 @@ class EnrichmentResultsGraph extends Component {
   };
 
   // EDGE TYPE
-  handleEdgeTypeInputChange = value => {
-    this.setState({
-      edgeTypeLocal: value,
-    });
-  };
-
-  actuallyHandleEdgeTypeInputChange = _.debounce(value => {
-    this.props.onHandleEdgeTypeInputChange(value);
-  }, 1250);
-
-  handleEdgeTypeSliderChange = value => {
+  actuallyHandleEdgeTypeSliderChange = value => {
     let decimalValue = value / 100;
     // this.setState({
     //   edgeTypeLocal: decimalValue,
@@ -471,7 +461,7 @@ class EnrichmentResultsGraph extends Component {
     this.props.onHandleEdgeTypeSliderChange(decimalValue);
   };
 
-  handleEdgeTypeSliderChangeLocal = value => {
+  handleEdgeTypeSliderChange = value => {
     let decimalValue = value / 100;
     this.setState({
       edgeTypeLocal: decimalValue,
@@ -540,14 +530,14 @@ class EnrichmentResultsGraph extends Component {
           <span className="ValueNowEdgeTypeOverlapNumber">
             {100 - state.valueNow}%
           </span> */}
-          <span className="ValueNowEdgeTypeJaccardText">
+          {/* <span className="ValueNowEdgeTypeJaccardText">
             Jaccard
-            {/* {state.valueNow <= 50 ? 'Jaccard' : ''} */}
+            {state.valueNow <= 50 ? 'Jaccard' : ''}
           </span>
           <span className="ValueNowEdgeTypeOverlapText">
-            {/* {state.valueNow >= 50 ? 'Overlap' : ''} */}
+            {state.valueNow >= 50 ? 'Overlap' : ''}
             Overlap
-          </span>
+          </span> */}
         </StyledThumb>
       );
       const EdgeTypeTrack = (props, state) => (
@@ -749,47 +739,56 @@ class EnrichmentResultsGraph extends Component {
               widescreen={3}
               textAlign="center"
             >
-              <div className="InlineFlex">
-                <Popup
-                  trigger={
-                    <Label className="NetworkInputLabel" size={dynamicSize}>
-                      EDGE
-                      <br></br>
-                      TYPE
+              {/* EDGE TYPE LABEL VERSION */}
+              <Grid className="EdgeTypeContainer">
+                <Grid.Row columns={2} centered id="EdgeTypeRow">
+                  <Grid.Column
+                    id="EdgeTypeLabelColumn"
+                    textAlign="right"
+                    // width={5}
+                  >
+                    <Popup
+                      trigger={
+                        <Label
+                          className="NetworkInputLabel"
+                          id="EdgeTypeLabel"
+                          size={dynamicSize}
+                        >
+                          EDGE
+                          <br></br>
+                          TYPE
+                        </Label>
+                      }
+                      style={CustomPopupStyle}
+                      content="TBD BRETT...Percent used for overlap coefficient and Jaccard index, respectfully."
+                      inverted
+                      basic
+                      position="left center"
+                      mouseEnterDelay={1000}
+                      mouseLeaveDelay={0}
+                    />
+                  </Grid.Column>
+                  <Grid.Column
+                    id="EdgeTextContainer"
+                    textAlign="left"
+                    // width={11}
+                  >
+                    <Label circular size="small" color="" id="JaccardPercent">
+                      {Math.round(edgeTypeLocal * 100)} %
                     </Label>
-                  }
-                  style={CustomPopupStyle}
-                  content="TBD BRETT / JOHN...Percent used for overlap coefficient and Jaccard index, respectfully."
-                  inverted
-                  basic
-                  position="left center"
-                  mouseEnterDelay={1000}
-                  mouseLeaveDelay={0}
-                />
-                {/* <NumericInput
-                  value={edgeCutoffLocal}
-                  onChange={this.handleEdgeCutoffInputChangeLocal}
-                  disabled={!networkGraphReady}
-                  precision={2}
-                  size={dynamicSize}
-                  step={0.01}
-                  min={0.0}
-                  max={1.0}
-                  className="NetworkSliderInput"
-                /> */}
-                <NumericExponentialInput
-                  className="NumericExponentialInputContainer"
-                  onChange={number => {
-                    this.handleEdgeTypeInputChange(number);
-                    this.actuallyHandleEdgeTypeInputChange(number);
-                  }}
-                  min={0}
-                  max={1}
-                  defaultValue={parseFloat(edgeTypeLocal)}
-                  disabled={!networkGraphReady}
-                  value={parseFloat(edgeTypeLocal)}
-                />
-              </div>
+                    <span id="JaccardText" className="EdgeTypeText">
+                      Jaccard
+                    </span>
+                    <br></br>
+                    <span id="OverlapText" className="EdgeTypeText">
+                      Overlap
+                    </span>
+                    <Label circular size="small" id="OverlapPercent">
+                      {Math.round(100 - edgeTypeLocal * 100)} %
+                    </Label>
+                  </Grid.Column>
+                </Grid.Row>
+              </Grid>
               <div className="NetworkSliderDiv" id="NetworkSliderDivEdgeType">
                 <StyledSlider
                   renderTrack={EdgeTypeTrack}
@@ -804,9 +803,9 @@ class EnrichmentResultsGraph extends Component {
                   name="edgeTypeSlider"
                   min={0}
                   max={100}
-                  onChange={this.handleEdgeTypeSliderChangeLocal}
-                  onSliderClick={this.handleEdgeTypeSliderChange}
-                  onAfterChange={this.handleEdgeTypeSliderChange}
+                  onChange={this.handleEdgeTypeSliderChange}
+                  onSliderClick={this.actuallyHandleEdgeTypeSliderChange}
+                  onAfterChange={this.actuallyHandleEdgeTypeSliderChange}
                 />
               </div>
             </Grid.Column>
