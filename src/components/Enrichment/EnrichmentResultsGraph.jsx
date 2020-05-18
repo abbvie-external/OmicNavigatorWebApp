@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-
 import styled from 'styled-components';
 import * as d3 from 'd3';
 import _ from 'lodash';
@@ -26,6 +25,8 @@ import LoaderActivePlots from '../Transitions/LoaderActivePlots';
 import './EnrichmentResultsGraph.scss';
 import NumericExponentialInput from '../Shared/NumericExponentialInput';
 import { limitValues } from '../Shared/helpers';
+import { ResizableBox } from 'react-resizable';
+import '../Shared/ReactResizable.css';
 
 const StyledSlider = styled(ReactSlider)`
   width: 100%;
@@ -111,25 +112,11 @@ function getDynamicLegend() {
     window.innerWidth || 0,
   );
   if (w < 768) {
-    return {
-      padding: '1em',
-      width: '250px',
-    };
+    return 250;
   } else if (w > 767 && w < 1600) {
-    return {
-      padding: '1em',
-      width: '300px',
-    };
-    // else if (w > 1599 && w < 2600) {
-    //   return {
-    //     padding: '1em',
-    //     width: '450px'
-    //   };
-  } else
-    return {
-      padding: '1em',
-      width: '350px',
-    };
+    return 300;
+    // else if (w > 1599 && w < 2600) { return 450
+  } else return 350;
 }
 
 const resultRenderer = ({ description, genes, size }) => {
@@ -192,9 +179,6 @@ const resultRenderer = ({ description, genes, size }) => {
     // </div>
   );
 };
-
-const LegendPopupStyle = getDynamicLegend();
-
 const CustomPopupStyle = {
   backgroundColor: '2E2E2E',
   borderBottom: '2px solid var(--color-primary)',
@@ -270,6 +254,13 @@ class EnrichmentResultsGraph extends Component {
     nodeCutoffLocal: sessionStorage.getItem('nodeCutoff') || 0.1,
     edgeCutoffLocal: sessionStorage.getItem('edgeCutoff') || 0.4,
     edgeTypeLocal: sessionStorage.getItem('edgeType') || 0.5,
+    // legendHeight: parseInt(sessionStorage.getItem('legendHeight'), 10) || 250,
+    // legendWidth: parseInt(sessionStorage.getItem('legendWidth'), 10) || 250,
+    legendHeight:
+      parseInt(sessionStorage.getItem('legendHeight'), 10) ||
+      getDynamicLegend(),
+    legendWidth:
+      parseInt(sessionStorage.getItem('legendWidth'), 10) || getDynamicLegend(),
   };
 
   componentDidMount() {
@@ -464,6 +455,15 @@ class EnrichmentResultsGraph extends Component {
     this.setState({
       edgeTypeLocal: decimalValue,
     });
+  };
+
+  onResizeLegend = (event, { element, size, handle }) => {
+    this.setState({ legendWidth: size.width, legendHeight: size.height });
+  };
+
+  onResizeLegendStop = (event, { element, size, handle }) => {
+    sessionStorage.setItem(`legendWidth`, size.width);
+    sessionStorage.setItem(`legendHeight`, size.height);
   };
 
   render() {
@@ -883,7 +883,7 @@ class EnrichmentResultsGraph extends Component {
                     icon
                     labelPosition="left"
                     // color="blue"
-                    id="LegendIconButton"
+                    // id="LegendIconButton"
                     className={networkGraphReady ? 'ShowInlineBlock' : 'Hide'}
                     size="mini"
                   >
@@ -891,19 +891,59 @@ class EnrichmentResultsGraph extends Component {
                     <Icon name="info" />
                   </Button>
                 }
-                wide
-                on="click"
-                style={LegendPopupStyle}
+                // style={{
+                //   width: this.state.legendWidth + 100 + 'px',
+                //   height: this.state.legendHeight + 100 + 'px',
+                //   padding: '1rem',
+                // }}
                 id="LegendPopup"
-                // position="top left"
                 open={openLegend}
                 onClose={this.props.onHandleLegendClose}
                 onOpen={this.props.onHandleLegendOpen}
+                // children={resizableComp}
                 // className={(activeIndexEnrichmentView === 1
                 //   && networkGraphReady) ? 'ShowsearchInlineBlock' : 'Hide'}
-              >
-                <Popup.Content className="legend"></Popup.Content>
-              </Popup>
+                content={
+                  <ResizableBox
+                    className="box"
+                    minConstraints={[100, 100]}
+                    maxConstraints={[800, 800]}
+                    height={this.state.legendHeight}
+                    width={this.state.legendWidth}
+                    lockAspectRatio={true}
+                    // handle={<span className="custom-handle custom-handle-se" />}
+                    handleSize={[50, 50]}
+                    onResize={this.onResizeLegend}
+                    onResizeStop={this.onResizeLegendStop}
+                  >
+                    <span className="legend NoSelect"></span>
+                  </ResizableBox>
+                }
+                // content={
+                //   <Resizable
+                //     className="box"
+                //     // height={this.state.legendHeight}
+                //     // width={this.state.legendWidth}
+                //     // onResize={this.onResizeLegend}
+                //     resizeHandles={['se']}
+                //   >
+                //     <div
+                //       className="box"
+                //       style={{
+                //         width: this.state.legendWidth + 'px',
+                //         height: this.state.legendHeight + 'px',
+                //         padding: '1em',
+                //       }}
+                //     >
+                //       <span className="legend"></span>
+                //     </div>
+                //   </Resizable>
+                // }
+                on="click"
+                basic
+                flowing
+                padding
+              />
               <Radio
                 disabled={!networkGraphReady}
                 className="RadioLabelsDisplay"
