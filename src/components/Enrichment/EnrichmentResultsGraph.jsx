@@ -557,7 +557,7 @@ class EnrichmentResultsGraph extends Component {
               // className="NetworkGraphFilters"
               id="NetworkSearchInputColumn"
               mobile={10}
-              tablet={6}
+              tablet={5}
               computer={6}
               largeScreen={2}
               widescreen={2}
@@ -583,7 +583,7 @@ class EnrichmentResultsGraph extends Component {
             <Grid.Column
               className="NetworkGraphFilters"
               mobile={8}
-              tablet={5}
+              tablet={6}
               computer={4}
               largeScreen={3}
               widescreen={3}
@@ -594,7 +594,7 @@ class EnrichmentResultsGraph extends Component {
                   trigger={
                     <Label className="NetworkInputLabel" size={dynamicSize}>
                       NODE
-                      {/* <span className="DisplayOnLarge"> SIGNIFICANCE</span> */}
+                      <span className="DisplayOnLarge"> SIGNIFICANCE</span>
                       <br></br>
                       CUTOFF
                     </Label>
@@ -670,7 +670,7 @@ class EnrichmentResultsGraph extends Component {
                   trigger={
                     <Label className="NetworkInputLabel" size={dynamicSize}>
                       EDGE
-                      {/* <span className="DisplayOnLarge"> SIMILARITY</span> */}
+                      <span className="DisplayOnLarge"> SIMILARITY</span>
                       <br></br>
                       CUTOFF
                     </Label>

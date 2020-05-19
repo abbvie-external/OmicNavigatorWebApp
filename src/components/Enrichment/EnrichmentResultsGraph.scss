@@ -1,4 +1,5 @@
 .NetworkGraphContainer {
+  margin-top: 10px;
   padding-top: 0px !important;
   padding: 0px !important;
   // padding-right: 25px !important;
@@ -7,6 +8,12 @@
   text {
     font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif !important;
     font-size: 10px;
+  }
+}
+
+@media (min-width: 1599px) {
+  .NetworkGraphContainer {
+    margin-top: -15px !important;
   }
 }
 
@@ -46,7 +53,13 @@
   border-radius: 0.28571429rem !important;
 }
 
-@media (max-width: 1199px) {
+@media (min-width: 300px) and (max-width: 767px) {
+  #NetworkSearchInputColumn div {
+    float: right;
+  }
+}
+
+@media (min-width: 992px) and (max-width: 1199px) {
   #NetworkSearchInputColumn div {
     float: right;
   }
@@ -62,12 +75,12 @@
     max-width: 110px !important;
   }
 }
-@media (min-width: 1500px) and (max-width: 1599px) {
+@media (min-width: 1500px) and (max-width: 1598px) {
   #NetworkSearchInput {
     max-width: 150px !important;
   }
 }
-@media (min-width: 1600px) and (max-width: 1900px) {
+@media (min-width: 1599px) and (max-width: 1900px) {
   #NetworkSearchInput {
     max-width: 160px !important;
   }
@@ -138,7 +151,7 @@
   //   }
 }
 
-@media (max-width: 1600px) {
+@media (max-width: 1598px) {
   .RadioLabelsDisplay {
     font-size: 0.9rem !important;
   }
@@ -146,19 +159,19 @@
 
 .NetworkSliderDiv {
   margin: 0 auto !important;
-  margin-top: 10px !important;
+  margin-top: 8px !important;
   margin-bottom: 5px !important;
   // max-width: 245px;
   max-width: 156px;
 }
 
-// @media (min-width: 1600px) and (max-width: 2599px) {
+// @media (min-width: 1599px) and (max-width: 2599px) {
 //   .NetworkSliderDiv {
 //     max-width: 220px !important;
 //   }
 // }
 
-// @media (min-width: 1200px) and (max-width: 1599px) {
+// @media (min-width: 1200px) and (max-width: 1598px) {
 //   .NetworkSliderDiv {
 //     max-width: 130px !important;
 //   }
@@ -170,21 +183,29 @@
 //   }
 // }
 
-@media (max-width: 1599px) {
+@media (max-width: 1598px) {
   .NetworkSliderDiv {
     max-width: 135px !important;
   }
 }
 
 #NetworkSliderDivEdgeType {
-  margin-top: 0px !important;
-  padding-top: 3px !important;
+  margin-top: 2px !important;
+  padding-top: 0px !important;
+  margin-bottom: 3px !important;
+  padding-bottom: 0px !important;
   // margin-bottom: 5px !important;
   // max-width: 245px;
   // .thumb:active,
   // .thumb:focus {
   //   outline: none !important;
   // }
+}
+
+@media (min-width: 1599px) {
+  #NetworkSliderDivEdgeType {
+    margin-top: 5px !important;
+  }
 }
 
 .thumb:active,
@@ -205,21 +226,64 @@
   margin-bottom: -10px !important;
 }
 
+@media (min-width: 993px) and (max-width: 1598px) {
+  #EdgeTypeLabelColumn {
+    width: 45% !important;
+  }
+  #EdgeTextContainer {
+    width: 55% !important;
+  }
+}
 // #EdgeTypeLabelColumn {
 //   max-width: 50px !important;
 // }
 
 #EdgeTextContainer {
   padding-right: 0px !important;
-  padding-left: 10px !important;
+  padding-left: 0px !important;
 }
 
-#EdgeTypeRow div:nth-of-type(1) {
-  max-width: 60px !important;
-}
+// @media (min-width: 2600px) {
+//   #EdgeTextContainer {
+//     padding-left: 20px !important;
+//   }
+// }
+
+// @media (max-width: 1598px) {
+//   #EdgeTypeRow div:nth-of-type(1) {
+//     max-width: 60px !important;
+//   }
+// }
+// @media (min-width: 1599px) and (max-width: 1899px) {
+//   #EdgeTypeRow div:nth-of-type(1) {
+//     max-width: 65px !important;
+//   }
+// }
+// @media (min-width: 1900px) and (max-width: 2099px) {
+//   #EdgeTypeRow div:nth-of-type(1) {
+//     max-width: 70px !important;
+//   }
+// }
+// @media (min-width: 2100px) and (max-width: 2599px) {
+//   #EdgeTypeRow div:nth-of-type(1) {
+//     max-width: 75px !important;
+//   }
+// }
+// @media (min-width: 1900px) {
+//   #EdgeTypeRow div:nth-of-type(1) {
+//     max-width: 60px !important;
+//   }
+// }
 
 #EdgeTypeLabel {
-  line-height: 1.1 !important;
+  line-height: 1.1;
+  text-align: left;
+}
+
+@media (min-width: 1599px) {
+  #EdgeTypeLabel {
+    line-height: 1.49 !important;
+  }
 }
 
 .NetworkSliderInput {
@@ -231,7 +295,7 @@
   padding-left: 10px !important;
 }
 
-@media (min-width: 1600px) {
+@media (min-width: 1599px) {
   .NetworkSliderInput {
     font-size: 15px !important;
     height: 50px !important;
@@ -251,7 +315,7 @@
   padding-left: 10px !important;
 }
 
-@media (min-width: 1600px) {
+@media (min-width: 1599px) {
   .NumericExponentialInput {
     font-size: 15px !important;
     height: 50px !important;
@@ -291,6 +355,13 @@
   // margin-right: 5px;
 }
 
+@media (min-width: 1599px) {
+  .EdgeTypeText {
+    font-size: 15px !important;
+    // margin-right: 5px;
+  }
+}
+
 // #JaccardText {
 //   margin-left: 5px;
 // }
@@ -307,7 +378,7 @@
   display: none !important;
 }
 
-@media (min-width: 1599px) {
+@media (min-width: 1900px) {
   .DisplayOnLarge {
     display: inline !important;
   }
@@ -331,6 +402,7 @@
   color: var(--color-light) !important;
   display: inline-block !important;
   line-height: initial !important;
+  text-align: left;
 }
 
 // @media (max-width: 768px) {
@@ -366,40 +438,6 @@
     // margin-left: -90px !important;
     text-align: center !important;
   }
-
-  // @media (min-width: 1200px) and (max-width: 1599px) {
-  //   #NetworkSortByLabel {
-  //     margin-left: -100px !important;
-  //   }
-  // }
-  // @media (min-width: 1600) and (max-width: 2599px) {
-  //   #NetworkSortByLabel {
-  //     margin-left: -110px !important;
-  //   }
-  // }
-  // @media (min-width: 2600px) {
-  //   #NetworkSortByLabel {
-  //     margin-left: -115px !important;
-  //   }
-  // }
-
-  // .ui.secondary.menu
-  // #NetworkGraphSortByMenu {
-  //   border: 1px solid rgba(34, 36, 38, 0.15);
-  //   border-radius: 0px 0.28571429rem 0.28571429rem 0px;
-  //   margin-right: 1.75rem;
-  // }
-  // #NetworkGraphSortByMenu {
-  //   .item:before {
-  //     width: 0px;
-  //   }
-  //   #NetworkGraphSortByMenu:last-child {
-  //     display: inline-flex;
-  //     width: 0px;
-  //     box-shadow: none;
-  //     border: 1px solid rgba(34, 36, 38, 0.15);
-  //   }
-  // }
 
   .ui.menu .item:before {
     width: 0px;
@@ -444,17 +482,19 @@
   color: var(--color-dark) !important;
 }
 
-#LegendColumn,
-#TotalsColumn {
-  margin-top: -10px;
-}
+// #LegendColumn {
+//   margin-top: -12px;
+// }
+// #TotalsColumn {
+//   margin-top: -10px;
+// }
 
-@media (min-width: 1200px) and (max-width: 1280px) {
-  #LegendColumn,
-  #TotalsColumn {
-    margin-top: 5px;
-  }
-}
+// @media (min-width: 1200px) and (max-width: 1280px) {
+//   #LegendColumn,
+//   #TotalsColumn {
+//     margin-top: 5px;
+//   }
+// }
 
 .NodeEdgeTotals {
   margin-bottom: 5px;
