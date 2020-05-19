@@ -106,6 +106,22 @@ function getDynamicSize() {
   } else if (w > 2599) return 'large';
 }
 
+function getDynamicSearch() {
+  let w = Math.max(
+    document.documentElement.clientWidth,
+    window.innerWidth || 0,
+  );
+  if (w < 1200) {
+    return 'small';
+  } else if (w > 1199 && w < 1600) {
+    return 'small';
+  } else if (w > 1599 && w < 2000) {
+    return undefined;
+  } else if (w > 1999 && w < 2600) {
+    return 'large';
+  } else if (w > 2599) return 'big';
+}
+
 function getDynamicLegend() {
   let w = Math.max(
     document.documentElement.clientWidth,
@@ -495,6 +511,7 @@ class EnrichmentResultsGraph extends Component {
       );
     } else {
       const dynamicSize = getDynamicSize();
+      const dynamicSearchSize = getDynamicSearch();
 
       const openLegend =
         legendIsOpen && activeIndexEnrichmentView === 1 && networkGraphReady
@@ -564,8 +581,8 @@ class EnrichmentResultsGraph extends Component {
             >
               <Search
                 disabled={!networkGraphReady}
-                // size={dynamicSize}
-                size-="tiny"
+                size={dynamicSearchSize}
+                // size-="tiny"
                 input={{ icon: 'search', iconPosition: 'left' }}
                 id="NetworkSearchInput"
                 placeholder="Search"

@@ -116,6 +116,11 @@
     max-width: 190px !important;
   }
 }
+@media (min-width: 2300px) {
+  #NetworkSearchInput {
+    max-width: 250px !important;
+  }
+}
 
 .semantic_ui_range_inner {
   margin-left: 0px !important;
