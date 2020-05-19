@@ -1,5 +1,6 @@
 .react-resizable {
   position: relative;
+  padding: 0.8rem;
 }
 .react-resizable-handle {
   position: absolute;
@@ -62,4 +63,24 @@
 .react-resizable-handle-s {
   bottom: 0;
   transform: rotate(45deg);
+}
+
+.custom-handle {
+  position: absolute;
+  transform: rotate(45deg);
+  /* width: 30px;
+  height: 30px; */
+  /* background-repeat: no-repeat;
+  background-origin: content-box;
+  box-sizing: border-box; */
+  /* background-image: url('../../resources/expandIcon.png'); */
+  /* background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2IDYiIHN0eWxlPSJiYWNrZ3JvdW5kLWNvbG9yOiNmZmZmZmYwMCIgeD0iMHB4IiB5PSIwcHgiIHdpZHRoPSI2cHgiIGhlaWdodD0iNnB4Ij48ZyBvcGFjaXR5PSIwLjMwMiI+PHBhdGggZD0iTSA2IDYgTCAwIDYgTCAwIDQuMiBMIDQgNC4yIEwgNC4yIDQuMiBMIDQuMiAwIEwgNiAwIEwgNiA2IEwgNiA2IFoiIGZpbGw9IiMwMDAwMDAiLz48L2c+PC9zdmc+'); */
+  /* background-position: bottom right;
+  padding: 0 3px 3px 0; */
+}
+
+.custom-handle-se {
+  bottom: -10px;
+  right: -15px;
+  cursor: se-resize;
 }

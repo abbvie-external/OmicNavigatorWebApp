@@ -787,26 +787,34 @@ class EnrichmentResultsGraph extends Component {
                     </Label>
                   </Grid.Column>
                 </Grid.Row>
+                <Grid.Row
+                  className="NetworkSliderDiv"
+                  id="NetworkSliderDivEdgeType"
+                >
+                  {/* <div
+                    className="NetworkSliderDiv"
+                    id="NetworkSliderDivEdgeType"
+                  > */}
+                  <StyledSlider
+                    renderTrack={EdgeTypeTrack}
+                    renderThumb={EdgeTypeThumb}
+                    disabled={!networkGraphReady}
+                    className={
+                      networkGraphReady
+                        ? 'NetworkSlider Show'
+                        : 'NetworkSlider Hide'
+                    }
+                    value={edgeTypeLocal * 100}
+                    name="edgeTypeSlider"
+                    min={0}
+                    max={100}
+                    onChange={this.handleEdgeTypeSliderChange}
+                    onSliderClick={this.actuallyHandleEdgeTypeSliderChange}
+                    onAfterChange={this.actuallyHandleEdgeTypeSliderChange}
+                  />
+                  {/* </div> */}
+                </Grid.Row>
               </Grid>
-              <div className="NetworkSliderDiv" id="NetworkSliderDivEdgeType">
-                <StyledSlider
-                  renderTrack={EdgeTypeTrack}
-                  renderThumb={EdgeTypeThumb}
-                  disabled={!networkGraphReady}
-                  className={
-                    networkGraphReady
-                      ? 'NetworkSlider Show'
-                      : 'NetworkSlider Hide'
-                  }
-                  value={edgeTypeLocal * 100}
-                  name="edgeTypeSlider"
-                  min={0}
-                  max={100}
-                  onChange={this.handleEdgeTypeSliderChange}
-                  onSliderClick={this.actuallyHandleEdgeTypeSliderChange}
-                  onAfterChange={this.actuallyHandleEdgeTypeSliderChange}
-                />
-              </div>
             </Grid.Column>
             <Grid.Column
               className="NetworkGraphFilters"
@@ -906,39 +914,24 @@ class EnrichmentResultsGraph extends Component {
                 content={
                   <ResizableBox
                     className="box"
-                    minConstraints={[100, 100]}
-                    maxConstraints={[800, 800]}
+                    minConstraints={[250, 250]}
+                    maxConstraints={[750, 750]}
                     height={this.state.legendHeight}
                     width={this.state.legendWidth}
                     lockAspectRatio={true}
-                    // handle={<span className="custom-handle custom-handle-se" />}
+                    handle={
+                      <span className="custom-handle custom-handle-se">
+                        <Icon name="resize horizontal" size="large"></Icon>
+                      </span>
+                    }
                     handleSize={[50, 50]}
+                    resizeHandles={['se']}
                     onResize={this.onResizeLegend}
                     onResizeStop={this.onResizeLegendStop}
                   >
-                    <span className="legend NoSelect"></span>
+                    <span className="legend"></span>
                   </ResizableBox>
                 }
-                // content={
-                //   <Resizable
-                //     className="box"
-                //     // height={this.state.legendHeight}
-                //     // width={this.state.legendWidth}
-                //     // onResize={this.onResizeLegend}
-                //     resizeHandles={['se']}
-                //   >
-                //     <div
-                //       className="box"
-                //       style={{
-                //         width: this.state.legendWidth + 'px',
-                //         height: this.state.legendHeight + 'px',
-                //         padding: '1em',
-                //       }}
-                //     >
-                //       <span className="legend"></span>
-                //     </div>
-                //   </Resizable>
-                // }
                 on="click"
                 basic
                 flowing
@@ -946,7 +939,7 @@ class EnrichmentResultsGraph extends Component {
               />
               <Radio
                 disabled={!networkGraphReady}
-                className="RadioLabelsDisplay"
+                className={networkGraphReady ? 'RadioLabelsDisplay' : 'Hide'}
                 toggle
                 // size={dynamicSize}
                 size="small"
