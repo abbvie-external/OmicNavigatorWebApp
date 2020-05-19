@@ -53,6 +53,12 @@
   border-radius: 0.28571429rem !important;
 }
 
+@media (min-width: 1500px) {
+  #NetworkSearchInputColumn {
+    padding-left: 0px !important;
+  }
+}
+
 @media (min-width: 300px) and (max-width: 767px) {
   #NetworkSearchInputColumn div {
     float: right;
@@ -65,24 +71,49 @@
   }
 }
 
+@media (min-width: 300px) and (max-width: 374px) {
+  #NetworkSearchInput {
+    max-width: 140px !important;
+  }
+}
 @media (min-width: 768px) and (max-width: 1199px) {
   #NetworkSearchInput {
     max-width: 200px !important;
   }
 }
-@media (min-width: 1200px) and (max-width: 1499px) {
+@media (min-width: 1200px) and (max-width: 1299px) {
   #NetworkSearchInput {
     max-width: 110px !important;
   }
 }
-@media (min-width: 1500px) and (max-width: 1598px) {
+@media (min-width: 1300px) and (max-width: 1399px) {
   #NetworkSearchInput {
-    max-width: 150px !important;
+    max-width: 120px !important;
   }
 }
-@media (min-width: 1599px) and (max-width: 1900px) {
+@media (min-width: 1400px) and (max-width: 1499px) {
+  #NetworkSearchInput {
+    max-width: 140px !important;
+  }
+}
+@media (min-width: 1500px) and (max-width: 1598px) {
+  #NetworkSearchInput {
+    max-width: 155px !important;
+  }
+}
+@media (min-width: 1599px) and (max-width: 1699px) {
   #NetworkSearchInput {
     max-width: 160px !important;
+  }
+}
+@media (min-width: 1700px) and (max-width: 1799px) {
+  #NetworkSearchInput {
+    max-width: 175px !important;
+  }
+}
+@media (min-width: 1800px) and (max-width: 1999px) {
+  #NetworkSearchInput {
+    max-width: 190px !important;
   }
 }
 
@@ -367,7 +398,7 @@
 // }
 
 // #OverlapText {
-//   margin-right: 5px;
+//   margin-right: 5px;ui
 // }
 
 #JaccardPercent {
@@ -378,7 +409,7 @@
   display: none !important;
 }
 
-@media (min-width: 1900px) {
+@media (min-width: 2000px) {
   .DisplayOnLarge {
     display: inline !important;
   }
@@ -477,34 +508,18 @@
 }
 
 #LegendIconButton {
-  margin-bottom: 5px;
   background-color: var(--color-light) !important;
   color: var(--color-dark) !important;
 }
 
-// #LegendColumn {
-//   margin-top: -12px;
-// }
-// #TotalsColumn {
-//   margin-top: -10px;
-// }
-
-// @media (min-width: 1200px) and (max-width: 1280px) {
-//   #LegendColumn,
-//   #TotalsColumn {
-//     margin-top: 5px;
-//   }
-// }
+#LegendColumn {
+  margin-bottom: 5px;
+}
 
 .NodeEdgeTotals {
   margin-bottom: 5px;
   float: right !important;
 }
-
-#LegendIconButton {
-  margin-bottom: 5px;
-}
-
 .node-label {
   pointer-events: none;
 }

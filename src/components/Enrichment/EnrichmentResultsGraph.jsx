@@ -878,11 +878,11 @@ class EnrichmentResultsGraph extends Component {
           <Grid.Row className="NetworkGraphContainer">
             <Grid.Column
               id="LegendColumn"
-              mobile={8}
-              tablet={8}
-              computer={8}
-              largeScreen={8}
-              widescreen={8}
+              mobile={16}
+              tablet={9}
+              computer={9}
+              largeScreen={9}
+              widescreen={9}
             >
               <Popup
                 trigger={
@@ -892,7 +892,11 @@ class EnrichmentResultsGraph extends Component {
                     labelPosition="left"
                     // color="blue"
                     // id="LegendIconButton"
-                    className={networkGraphReady ? 'ShowInlineBlock' : 'Hide'}
+                    className={
+                      networkGraphReady
+                        ? 'ShowInlineBlock LegendButton'
+                        : 'Hide'
+                    }
                     size="mini"
                   >
                     Legend
@@ -950,11 +954,11 @@ class EnrichmentResultsGraph extends Component {
             </Grid.Column>
             <Grid.Column
               id="TotalsColumn"
-              mobile={8}
-              tablet={8}
-              computer={8}
-              largeScreen={8}
-              widescreen={8}
+              mobile={16}
+              tablet={7}
+              computer={7}
+              largeScreen={7}
+              widescreen={7}
             >
               <div
                 className={
