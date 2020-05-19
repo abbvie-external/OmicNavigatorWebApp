@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-
 import styled from 'styled-components';
 import * as d3 from 'd3';
 import _ from 'lodash';
@@ -26,6 +25,8 @@ import LoaderActivePlots from '../Transitions/LoaderActivePlots';
 import './EnrichmentResultsGraph.scss';
 import NumericExponentialInput from '../Shared/NumericExponentialInput';
 import { limitValues } from '../Shared/helpers';
+import { ResizableBox } from 'react-resizable';
+import '../Shared/ReactResizable.css';
 
 const StyledSlider = styled(ReactSlider)`
   width: 100%;
@@ -105,31 +106,33 @@ function getDynamicSize() {
   } else if (w > 2599) return 'large';
 }
 
+function getDynamicSearch() {
+  let w = Math.max(
+    document.documentElement.clientWidth,
+    window.innerWidth || 0,
+  );
+  if (w < 1200) {
+    return 'small';
+  } else if (w > 1199 && w < 1600) {
+    return 'small';
+  } else if (w > 1599 && w < 2000) {
+    return undefined;
+  } else if (w > 1999 && w < 2600) {
+    return 'large';
+  } else if (w > 2599) return 'big';
+}
+
 function getDynamicLegend() {
   let w = Math.max(
     document.documentElement.clientWidth,
     window.innerWidth || 0,
   );
   if (w < 768) {
-    return {
-      padding: '1em',
-      width: '250px',
-    };
+    return 250;
   } else if (w > 767 && w < 1600) {
-    return {
-      padding: '1em',
-      width: '300px',
-    };
-    // else if (w > 1599 && w < 2600) {
-    //   return {
-    //     padding: '1em',
-    //     width: '450px'
-    //   };
-  } else
-    return {
-      padding: '1em',
-      width: '350px',
-    };
+    return 300;
+    // else if (w > 1599 && w < 2600) { return 450
+  } else return 350;
 }
 
 const resultRenderer = ({ description, genes, size }) => {
@@ -192,9 +195,6 @@ const resultRenderer = ({ description, genes, size }) => {
     // </div>
   );
 };
-
-const LegendPopupStyle = getDynamicLegend();
-
 const CustomPopupStyle = {
   backgroundColor: '2E2E2E',
   borderBottom: '2px solid var(--color-primary)',
@@ -270,6 +270,13 @@ class EnrichmentResultsGraph extends Component {
     nodeCutoffLocal: sessionStorage.getItem('nodeCutoff') || 0.1,
     edgeCutoffLocal: sessionStorage.getItem('edgeCutoff') || 0.4,
     edgeTypeLocal: sessionStorage.getItem('edgeType') || 0.5,
+    // legendHeight: parseInt(sessionStorage.getItem('legendHeight'), 10) || 250,
+    // legendWidth: parseInt(sessionStorage.getItem('legendWidth'), 10) || 250,
+    legendHeight:
+      parseInt(sessionStorage.getItem('legendHeight'), 10) ||
+      getDynamicLegend(),
+    legendWidth:
+      parseInt(sessionStorage.getItem('legendWidth'), 10) || getDynamicLegend(),
   };
 
   componentDidMount() {
@@ -466,6 +473,15 @@ class EnrichmentResultsGraph extends Component {
     });
   };
 
+  onResizeLegend = (event, { element, size, handle }) => {
+    this.setState({ legendWidth: size.width, legendHeight: size.height });
+  };
+
+  onResizeLegendStop = (event, { element, size, handle }) => {
+    sessionStorage.setItem(`legendWidth`, size.width);
+    sessionStorage.setItem(`legendHeight`, size.height);
+  };
+
   render() {
     const {
       networkSearchResults,
@@ -495,6 +511,7 @@ class EnrichmentResultsGraph extends Component {
       );
     } else {
       const dynamicSize = getDynamicSize();
+      const dynamicSearchSize = getDynamicSearch();
 
       const openLegend =
         legendIsOpen && activeIndexEnrichmentView === 1 && networkGraphReady
@@ -557,15 +574,15 @@ class EnrichmentResultsGraph extends Component {
               // className="NetworkGraphFilters"
               id="NetworkSearchInputColumn"
               mobile={10}
-              tablet={6}
+              tablet={5}
               computer={6}
               largeScreen={2}
               widescreen={2}
             >
               <Search
                 disabled={!networkGraphReady}
-                // size={dynamicSize}
-                size-="tiny"
+                size={dynamicSearchSize}
+                // size-="tiny"
                 input={{ icon: 'search', iconPosition: 'left' }}
                 id="NetworkSearchInput"
                 placeholder="Search"
@@ -583,7 +600,7 @@ class EnrichmentResultsGraph extends Component {
             <Grid.Column
               className="NetworkGraphFilters"
               mobile={8}
-              tablet={5}
+              tablet={6}
               computer={4}
               largeScreen={3}
               widescreen={3}
@@ -594,7 +611,7 @@ class EnrichmentResultsGraph extends Component {
                   trigger={
                     <Label className="NetworkInputLabel" size={dynamicSize}>
                       NODE
-                      {/* <span className="DisplayOnLarge"> SIGNIFICANCE</span> */}
+                      <span className="DisplayOnLarge"> SIGNIFICANCE</span>
                       <br></br>
                       CUTOFF
                     </Label>
@@ -670,7 +687,7 @@ class EnrichmentResultsGraph extends Component {
                   trigger={
                     <Label className="NetworkInputLabel" size={dynamicSize}>
                       EDGE
-                      {/* <span className="DisplayOnLarge"> SIMILARITY</span> */}
+                      <span className="DisplayOnLarge"> SIMILARITY</span>
                       <br></br>
                       CUTOFF
                     </Label>
@@ -787,26 +804,34 @@ class EnrichmentResultsGraph extends Component {
                     </Label>
                   </Grid.Column>
                 </Grid.Row>
+                <Grid.Row
+                  className="NetworkSliderDiv"
+                  id="NetworkSliderDivEdgeType"
+                >
+                  {/* <div
+                    className="NetworkSliderDiv"
+                    id="NetworkSliderDivEdgeType"
+                  > */}
+                  <StyledSlider
+                    renderTrack={EdgeTypeTrack}
+                    renderThumb={EdgeTypeThumb}
+                    disabled={!networkGraphReady}
+                    className={
+                      networkGraphReady
+                        ? 'NetworkSlider Show'
+                        : 'NetworkSlider Hide'
+                    }
+                    value={edgeTypeLocal * 100}
+                    name="edgeTypeSlider"
+                    min={0}
+                    max={100}
+                    onChange={this.handleEdgeTypeSliderChange}
+                    onSliderClick={this.actuallyHandleEdgeTypeSliderChange}
+                    onAfterChange={this.actuallyHandleEdgeTypeSliderChange}
+                  />
+                  {/* </div> */}
+                </Grid.Row>
               </Grid>
-              <div className="NetworkSliderDiv" id="NetworkSliderDivEdgeType">
-                <StyledSlider
-                  renderTrack={EdgeTypeTrack}
-                  renderThumb={EdgeTypeThumb}
-                  disabled={!networkGraphReady}
-                  className={
-                    networkGraphReady
-                      ? 'NetworkSlider Show'
-                      : 'NetworkSlider Hide'
-                  }
-                  value={edgeTypeLocal * 100}
-                  name="edgeTypeSlider"
-                  min={0}
-                  max={100}
-                  onChange={this.handleEdgeTypeSliderChange}
-                  onSliderClick={this.actuallyHandleEdgeTypeSliderChange}
-                  onAfterChange={this.actuallyHandleEdgeTypeSliderChange}
-                />
-              </div>
             </Grid.Column>
             <Grid.Column
               className="NetworkGraphFilters"
@@ -870,11 +895,11 @@ class EnrichmentResultsGraph extends Component {
           <Grid.Row className="NetworkGraphContainer">
             <Grid.Column
               id="LegendColumn"
-              mobile={8}
-              tablet={8}
-              computer={8}
-              largeScreen={8}
-              widescreen={8}
+              mobile={16}
+              tablet={9}
+              computer={9}
+              largeScreen={9}
+              widescreen={9}
             >
               <Popup
                 trigger={
@@ -883,30 +908,59 @@ class EnrichmentResultsGraph extends Component {
                     icon
                     labelPosition="left"
                     // color="blue"
-                    id="LegendIconButton"
-                    className={networkGraphReady ? 'ShowInlineBlock' : 'Hide'}
+                    // id="LegendIconButton"
+                    className={
+                      networkGraphReady
+                        ? 'ShowInlineBlock LegendButton'
+                        : 'Hide'
+                    }
                     size="mini"
                   >
                     Legend
                     <Icon name="info" />
                   </Button>
                 }
-                wide
-                on="click"
-                style={LegendPopupStyle}
+                // style={{
+                //   width: this.state.legendWidth + 100 + 'px',
+                //   height: this.state.legendHeight + 100 + 'px',
+                //   padding: '1rem',
+                // }}
                 id="LegendPopup"
-                // position="top left"
                 open={openLegend}
                 onClose={this.props.onHandleLegendClose}
                 onOpen={this.props.onHandleLegendOpen}
+                // children={resizableComp}
                 // className={(activeIndexEnrichmentView === 1
                 //   && networkGraphReady) ? 'ShowsearchInlineBlock' : 'Hide'}
-              >
-                <Popup.Content className="legend"></Popup.Content>
-              </Popup>
+                content={
+                  <ResizableBox
+                    className="box"
+                    minConstraints={[250, 250]}
+                    maxConstraints={[750, 750]}
+                    height={this.state.legendHeight}
+                    width={this.state.legendWidth}
+                    lockAspectRatio={true}
+                    handle={
+                      <span className="custom-handle custom-handle-se">
+                        <Icon name="resize horizontal" size="large"></Icon>
+                      </span>
+                    }
+                    handleSize={[50, 50]}
+                    resizeHandles={['se']}
+                    onResize={this.onResizeLegend}
+                    onResizeStop={this.onResizeLegendStop}
+                  >
+                    <span className="legend"></span>
+                  </ResizableBox>
+                }
+                on="click"
+                basic
+                flowing
+                padding
+              />
               <Radio
                 disabled={!networkGraphReady}
-                className="RadioLabelsDisplay"
+                className={networkGraphReady ? 'RadioLabelsDisplay' : 'Hide'}
                 toggle
                 // size={dynamicSize}
                 size="small"
@@ -917,11 +971,11 @@ class EnrichmentResultsGraph extends Component {
             </Grid.Column>
             <Grid.Column
               id="TotalsColumn"
-              mobile={8}
-              tablet={8}
-              computer={8}
-              largeScreen={8}
-              widescreen={8}
+              mobile={16}
+              tablet={7}
+              computer={7}
+              largeScreen={7}
+              widescreen={7}
             >
               <div
                 className={
