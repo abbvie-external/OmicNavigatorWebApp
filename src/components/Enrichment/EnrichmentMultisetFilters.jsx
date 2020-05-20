@@ -1,9 +1,14 @@
 import React, { Component, Fragment } from 'react';
-import { Form, Select, Input, Button, Icon } from 'semantic-ui-react';
+import { Form, Select, Input } from 'semantic-ui-react';
 import * as d3 from 'd3';
+import _ from 'lodash';
 import '../Shared/MultisetFilters.scss';
+import NumericExponentialInput from '../Shared/NumericExponentialInput';
 
 class EnrichmentMultisetFilters extends Component {
+  state = {
+    sigValueELocal: [0.05],
+  };
   componentDidMount() {
     const {
       uData,
@@ -142,22 +147,22 @@ class EnrichmentMultisetFilters extends Component {
         .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
         .attr('font-size', '15px')
         .attr('fill', 'black');
-      if(mustData.length !== 0 || useAnchor){
-      metaSvg
-        .selectAll('dataObject')
-        .data(setDescP)
-        .enter()
-        .append('text')
-        .attr('x', 7)
-        .attr('y', function(d, i) {
-          return 30 + heightScalar * i;
-        })
-        .text(function(d) {
-          return d;
-        })
-        .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
-        .attr('font-size', '14px')
-        .attr('fill', 'black');
+      if (mustData.length !== 0 || useAnchor) {
+        metaSvg
+          .selectAll('dataObject')
+          .data(setDescP)
+          .enter()
+          .append('text')
+          .attr('x', 7)
+          .attr('y', function(d, i) {
+            return 30 + heightScalar * i;
+          })
+          .text(function(d) {
+            return d;
+          })
+          .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
+          .attr('font-size', '14px')
+          .attr('fill', 'black');
       }
 
       if (useAnchor) {
@@ -272,19 +277,13 @@ class EnrichmentMultisetFilters extends Component {
           .attr('cx', 17)
           .attr('cy', function(d, i) {
             if (!useAnchor && mustData.length === 0) {
-              return (
-                30 +
-                heightScalar *(i + notSetDescP.length)
-              );
+              return 30 + heightScalar * (i + notSetDescP.length);
             } else {
               return (
                 30 +
                 4 +
                 heightScalar *
-                  (i +
-                    setDescP.length +
-                    notSetDescP.length +
-                    mustData.length)
+                  (i + setDescP.length + notSetDescP.length + mustData.length)
               );
             }
           })
@@ -299,21 +298,13 @@ class EnrichmentMultisetFilters extends Component {
           .attr('x', 25)
           .attr('y', function(d, i) {
             if (!useAnchor && mustData.length === 0) {
-              return (
-                30 +
-                4 +
-                heightScalar *
-                  (i + notSetDescP.length)
-              );
+              return 30 + 4 + heightScalar * (i + notSetDescP.length);
             } else {
               return (
                 30 +
                 8 +
                 heightScalar *
-                  (i +
-                    setDescP.length +
-                    notSetDescP.length +
-                    mustData.length)
+                  (i + setDescP.length + notSetDescP.length + mustData.length)
               );
             }
           })
@@ -770,9 +761,16 @@ class EnrichmentMultisetFilters extends Component {
     this.props.onHandleDropdownChange(evt, { name, value, index });
   };
 
-  handleInputChange = (evt, { name, value, index }) => {
-    this.props.onHandleInputChange(evt, { name, value, index });
+  handleSigValueEInputChange = value => {
+    this.setState({
+      sigValueELocal: [parseFloat(value)],
+    });
   };
+
+  actuallyHandleSigValueEInputChange = _.debounce(value => {
+    this.props.onHandleSigValueEInputChange(value);
+  }, 1250);
+
   addFilter = () => {
     this.props.onAddFilter();
   };
@@ -784,7 +782,8 @@ class EnrichmentMultisetFilters extends Component {
   };
 
   render() {
-    const { selectedOperator, sigValue, uSettings } = this.props;
+    const { sigValueELocal } = this.state;
+    const { selectedOperator, uSettings } = this.props;
     const Columns = uSettings.thresholdCols;
     const Operators = uSettings.thresholdOperator;
     const SelOp = selectedOperator;
@@ -825,22 +824,25 @@ class EnrichmentMultisetFilters extends Component {
                   // selection
                   value={SelOp[index].value}
                   options={Operators}
-                  width={4}
+                  width={5}
                   onChange={this.handleDropdownChange}
                 ></Form.Field>
-                <Form.Field
-                  control={Input}
-                  type="number"
-                  step="0.01"
-                  min="0.00"
-                  label={index === 0 ? 'Significance' : ''}
-                  index={index}
-                  name="sigValue"
-                  className="SignificantValueInput"
-                  value={sigValue[index]}
-                  width={5}
-                  onChange={this.handleInputChange}
-                ></Form.Field>
+                <Form.Field width={4}>
+                  <label>{index === 0 ? 'Significance' : ''}</label>
+                  <NumericExponentialInput
+                    className="SignificantValueInput"
+                    onChange={number => {
+                      this.handleSigValueEInputChange(number);
+                      this.actuallyHandleSigValueEInputChange(number);
+                    }}
+                    min={0}
+                    max={1}
+                    name="sigValue"
+                    defaultValue={parseFloat(sigValueELocal[index])}
+                    value={parseFloat(sigValueELocal[index])}
+                    spellcheck="false"
+                  />
+                </Form.Field>
               </Form.Group>
             ))}
           </ul>

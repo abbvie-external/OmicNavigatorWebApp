@@ -634,6 +634,7 @@ class EnrichmentResultsGraph extends Component {
                   defaultValue={parseFloat(nodeCutoffLocal)}
                   disabled={!networkGraphReady}
                   value={parseFloat(nodeCutoffLocal)}
+                  spellcheck="false"
                 />
               </div>
               <div className="NetworkSliderDiv">
@@ -707,6 +708,7 @@ class EnrichmentResultsGraph extends Component {
                   defaultValue={parseFloat(edgeCutoffLocal)}
                   disabled={!networkGraphReady}
                   value={parseFloat(edgeCutoffLocal)}
+                  spellcheck="false"
                 />
               </div>
               <div className="NetworkSliderDiv">

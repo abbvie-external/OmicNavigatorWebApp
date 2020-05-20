@@ -504,19 +504,17 @@ class EnrichmentSearchCriteria extends Component {
     this.setState(
       {
         [name]: uSelVP,
-        reloadPlot: false
+        reloadPlot: false,
       },
       function() {
         this.updateQueryData();
       },
     );
   };
-  handleInputChange = (evt, { name, value, index }) => {
-    const uSelVP = [...this.state[name]];
-    uSelVP[index] = parseFloat(value);
+  handleSigValueEInputChange = value => {
     this.setState(
       {
-        [name]: uSelVP,
+        sigValue: [parseFloat(value)],
         reloadPlot: true,
       },
       function() {
@@ -680,7 +678,7 @@ class EnrichmentSearchCriteria extends Component {
       multisetPlotAvailable,
       plotButtonActive,
       isTestDataLoaded,
-      activeIndexEnrichmentView 
+      activeIndexEnrichmentView,
     } = this.props;
 
     const StudyPopupStyle = {
@@ -748,7 +746,7 @@ class EnrichmentSearchCriteria extends Component {
           {...this.props}
           {...this.state}
           onHandleDropdownChange={this.handleDropdownChange}
-          onHandleInputChange={this.handleInputChange}
+          onHandleSigValueEInputChange={this.handleSigValueEInputChange}
           onHandleSetChange={this.handleSetChange}
           onAddFilter={this.addFilter}
           onRemoveFilter={this.removeFilter}
@@ -778,16 +776,16 @@ class EnrichmentSearchCriteria extends Component {
         </Transition>
       );
       MultisetRadio = (
-         <React.Fragment>
-           <Divider />
-           <Radio
-             toggle
-             label="Set Analysis"
-             checked={multisetFiltersVisible}
-             onChange={this.handleMultisetToggle()}
-           />
-         </React.Fragment>
-       );
+        <React.Fragment>
+          <Divider />
+          <Radio
+            toggle
+            label="Set Analysis"
+            checked={multisetFiltersVisible}
+            onChange={this.handleMultisetToggle()}
+          />
+        </React.Fragment>
+      );
     }
 
     return (
