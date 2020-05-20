@@ -12,15 +12,14 @@ import TransitionStill from '../Transitions/TransitionStill';
 import ButtonActions from '../Shared/ButtonActions';
 import { formatNumberForDisplay, splitValue } from '../Shared/helpers';
 import phosphosite_icon from '../../resources/phosphosite.ico';
-import PepplotVolcano from "./PepplotVolcano";
-
+import PepplotVolcano from './PepplotVolcano';
 
 import _ from 'lodash';
 import './Pepplot.scss';
 import '../Shared/Table.scss';
 
 class Pepplot extends Component {
-  defaultActiveIndex =
+  defaultActiveIndexPepplotView =
     parseInt(sessionStorage.getItem('pepplotViewTab'), 10) || 0;
   state = {
     isValidSearchPepplot: false,
@@ -43,8 +42,8 @@ class Pepplot extends Component {
     pdfVisible: false,
     svgVisible: true,
     multisetQueried: false,
-    activeIndex: this.defaultActiveIndex || 0,
-    thresholdColsP: []
+    activeIndexPepplotView: this.defaultactiveIndexPepplotView || 0,
+    thresholdColsP: [],
   };
 
   componentDidUpdate = (prevProps, prevState) => {};
@@ -334,74 +333,94 @@ class Pepplot extends Component {
       const TableAndPlotPanes = this.getTableAndPlotPanes();
       return (
         <Tab
-        className="TableAndPlotContainer"
-        panes={TableAndPlotPanes}
-        onTabChange={this.handleTablePlotTabChange}
-        activeIndex={this.state.activeIndex}
-        renderActiveOnly={false}
-        menu={{
-          attached: true,
-          className: 'TableAndPlotMenuContainer'
-        }}
-      />
+          className="TableAndPlotContainer"
+          panes={TableAndPlotPanes}
+          onTabChange={this.handleTablePlotTabChange}
+          activeIndex={this.state.activeIndexPepplotView}
+          renderActiveOnly={false}
+          menu={{
+            attached: true,
+            className: 'TableAndPlotMenuContainer',
+          }}
+        />
       );
     } else if (this.state.isSearching) {
       return <TransitionActive />;
     } else return <TransitionStill />;
   };
 
-getTableAndPlotPanes = () => {
-    return[{
-      menuItem:(<Menu.Item
-        key="0"
-        className="TableAndNPlotButtons TableButton"
-        name="Table"
-        color="orange"
-      >
-        <img
-          src={this.state.activeIndex === 0 ? tableIconSelected : tableIcon}
-          alt="Table Icon"
-          id="TableButton"
-        />
-      </Menu.Item>),
-      pane:(<Tab.Pane key="0">
-        <PepplotResults
-          {...this.state}
-          {...this.props}
-          onSearchCriteriaChange={this.handleSearchCriteriaChange}
-          onHandlePlotAnimation={this.handlePlotAnimation}
-        />
-      </Tab.Pane>)
-    },{
-      menuItem:(<Menu.Item
-        key="1"
-        className="TableAndPlotButtons PlotButton"
-        name="plot"
-        color="orange"
-      >
-        <img
-          src={this.state.activeIndex === 1 ? scatterPlotIconSelected : scatterPlotIcon}
-          alt="Plot Icon"
-          id="PlotButton"
-        />
-      </Menu.Item>),
-      pane:(<Tab.Pane key="1">
-        <div id="VolcanoPlot">
-          <PepplotVolcano
-            {...this.state}
-            {...this.props}
-            handleVolcanoPlotSelectionChange={this.handleVolcanoPlotSelectionChange}
-            onSearchCriteriaChange={this.handleSearchCriteriaChange}            
-          />
-        </div>
-    </Tab.Pane>)
-    }
-  ]
-  }
+  getTableAndPlotPanes = () => {
+    return [
+      {
+        menuItem: (
+          <Menu.Item
+            key="0"
+            className="TableAndNPlotButtons TableButton"
+            name="Table"
+            color="orange"
+          >
+            <img
+              src={
+                this.state.activeIndexPepplotView === 0
+                  ? tableIconSelected
+                  : tableIcon
+              }
+              alt="Table Icon"
+              id="TableButton"
+            />
+          </Menu.Item>
+        ),
+        pane: (
+          <Tab.Pane key="0">
+            <PepplotResults
+              {...this.state}
+              {...this.props}
+              onSearchCriteriaChange={this.handleSearchCriteriaChange}
+              onHandlePlotAnimation={this.handlePlotAnimation}
+            />
+          </Tab.Pane>
+        ),
+      },
+      {
+        menuItem: (
+          <Menu.Item
+            key="1"
+            className="TableAndPlotButtons PlotButton"
+            name="plot"
+            color="orange"
+          >
+            <img
+              src={
+                this.state.activeIndexPepplotView === 1
+                  ? scatterPlotIconSelected
+                  : scatterPlotIcon
+              }
+              alt="Plot Icon"
+              id="PlotButton"
+            />
+          </Menu.Item>
+        ),
+        pane: (
+          <Tab.Pane key="1">
+            <div id="VolcanoPlot">
+              <PepplotVolcano
+                {...this.state}
+                {...this.props}
+                handleVolcanoPlotSelectionChange={
+                  this.handleVolcanoPlotSelectionChange
+                }
+                onSearchCriteriaChange={this.handleSearchCriteriaChange}
+              />
+            </div>
+          </Tab.Pane>
+        ),
+      },
+    ];
+  };
 
   handleTablePlotTabChange = (e, { activeIndex }) => {
     sessionStorage.setItem(`pepplotViewTab`, activeIndex);
-    this.setState({ activeIndex });
+    this.setState({ activeIndexPepplotView: activeIndex });
   };
 
   render() {

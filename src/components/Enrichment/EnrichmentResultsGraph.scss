@@ -400,3 +400,37 @@
 .filled {
   fill: url(#mainGradient);
 }
+
+.NumericExponentialInputContainer input {
+  width: 70px !important;
+  max-width: 70px !important;
+  font-size: 14px !important;
+  border: 1px solid rgb(204, 204, 204);
+  border-radius: 2px;
+  font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 500;
+  height: 40px !important;
+  padding-left: 10px !important;
+  padding-right: 0px !important;
+}
+
+@media (min-width: 1599px) and (max-width: 2599px) {
+  .NumericExponentialInputContainer input {
+    font-size: 15px !important;
+    height: 50px !important;
+  }
+}
+
+@media (min-width: 2600px) {
+  .NumericExponentialInputContainer input {
+    font-size: 20px !important;
+    height: 54px !important;
+  }
+}
+
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  opacity: 1 !important;
+  height: 50px !important;
+}

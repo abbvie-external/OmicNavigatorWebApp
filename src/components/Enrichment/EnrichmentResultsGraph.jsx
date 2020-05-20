@@ -542,7 +542,7 @@ class EnrichmentResultsGraph extends Component {
               widescreen={3}
               textAlign="center"
             >
-              <div className="InlineFlex">
+              <div className="InlineFlex NumericExponentialInputContainer">
                 <Popup
                   trigger={
                     <Label className="NetworkInputLabel" size={dynamicSize}>
@@ -561,7 +561,6 @@ class EnrichmentResultsGraph extends Component {
                   mouseLeaveDelay={0}
                 />
                 <NumericExponentialInput
-                  className="NumericExponentialInputContainer"
                   onChange={number => {
                     this.handleNodeCutoffInputChange(number);
                     this.actuallyHandleNodeCutoffInputChange(number);
@@ -603,7 +602,7 @@ class EnrichmentResultsGraph extends Component {
               widescreen={3}
               textAlign="center"
             >
-              <div className="InlineFlex">
+              <div className="InlineFlex NumericExponentialInputContainer">
                 <Popup
                   trigger={
                     <Label className="NetworkInputLabel" size={dynamicSize}>
@@ -622,7 +621,6 @@ class EnrichmentResultsGraph extends Component {
                   mouseLeaveDelay={0}
                 />
                 <NumericExponentialInput
-                  className="NumericExponentialInputContainer"
                   onChange={number => {
                     let revisedNumber = number >= 0.1 ? number : 0.1;
                     this.handleEdgeCutoffInputChange(revisedNumber);

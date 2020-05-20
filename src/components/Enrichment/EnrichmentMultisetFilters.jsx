@@ -827,7 +827,7 @@ class EnrichmentMultisetFilters extends Component {
                   width={5}
                   onChange={this.handleDropdownChange}
                 ></Form.Field>
-                <Form.Field width={4}>
+                <Form.Field width={4} id="SignificantValueInputMultisetE">
                   <label>{index === 0 ? 'Significance' : ''}</label>
                   <NumericExponentialInput
                     className="SignificantValueInput"

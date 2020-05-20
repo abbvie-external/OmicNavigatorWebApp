@@ -428,7 +428,6 @@ class PepplotSearchCriteria extends Component {
     uSetVP.indexFiltersP = [...this.state.uSettingsP.indexFiltersP].concat(
       this.state.uSettingsP.indexFiltersP.length,
     );
-
     this.setState({
       selectedColP: [...this.state.selectedColP].concat(
         this.state.uSettingsP.defaultselectedColP,
@@ -485,7 +484,7 @@ class PepplotSearchCriteria extends Component {
       },
     );
   };
-  handleInputChange = (evt, { name, value, index }) => {
+  handleSigValuePInputChange = (name, value, index) => {
     const uSelVP = [...this.state[name]];
     uSelVP[index] = parseFloat(value);
     this.setState(
@@ -714,6 +713,7 @@ class PepplotSearchCriteria extends Component {
           {...this.state}
           onHandleDropdownChange={this.handleDropdownChange}
           onHandleInputChange={this.handleInputChange}
+          onHandleSigValuePInputChange={this.handleSigValuePInputChange}
           onHandleSetChange={this.handleSetChange}
           onAddFilter={this.addFilter}
           onRemoveFilter={this.removeFilter}
