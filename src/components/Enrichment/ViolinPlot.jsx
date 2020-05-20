@@ -312,7 +312,8 @@ class ViolinPlot extends Component {
           .attr('stroke', '#8e1b54')
           .attr('opacity', 1.0);
 
-        const notBrushed = circles.filter(function() {
+        // notBrushed
+        circles.filter(function() {
           const cx = d3.select(this).attr('cx'),
             cy = d3.select(this).attr('cy');
           return !isBrushed(brush_coords, cx, cy);
@@ -591,7 +592,8 @@ class ViolinPlot extends Component {
       })
       .attr('x', () => {
         const elem = d3.select('.vXLabel');
-        const size = elem.node().getBBox();
+        // const size =
+        elem.node().getBBox();
         // return self.chart.width / 2 - size.width / 2;
         return self.chart.width / 2;
       });

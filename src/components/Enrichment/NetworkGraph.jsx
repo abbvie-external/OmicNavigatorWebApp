@@ -211,6 +211,7 @@ class NetworkGraph extends Component {
         nodes: filteredNodes,
         links: relevantLinks,
       };
+      this.props.onInformFilteredNetworkData(filteredNodes);
 
       let clusters = networkByCluster(dataCombinedVar);
       // only run if there are clusters

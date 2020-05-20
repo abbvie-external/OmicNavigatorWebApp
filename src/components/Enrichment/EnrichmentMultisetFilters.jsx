@@ -788,7 +788,7 @@ class EnrichmentMultisetFilters extends Component {
     const Operators = uSettings.thresholdOperator;
     const SelOp = selectedOperator;
     const indexFilters = uSettings.indexFilters;
-    const hoveredFilter = uSettings.hoveredFilter;
+    // const hoveredFilter = uSettings.hoveredFilter;
     // for now, column is displayed as label, just matching the "nominal" or "Adjusted" p value type
     const SelColOverride =
       this.props.pValueType === 'nominal'

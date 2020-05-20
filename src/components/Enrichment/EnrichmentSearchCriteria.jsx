@@ -9,6 +9,7 @@ import {
   Transition,
   Button,
 } from 'semantic-ui-react';
+import * as d3 from 'd3';
 import { CancelToken } from 'axios';
 import '../Shared/SearchCriteria.scss';
 import { phosphoprotService } from '../../services/phosphoprot.service';
@@ -307,10 +308,16 @@ class EnrichmentSearchCriteria extends Component {
       });
   };
 
+  removeNetworkSVG = () => {
+    d3.select('div.tooltip-pieSlice').remove();
+    d3.select('tooltipEdge').remove();
+    d3.select(`#svg-${this.props.networkSettings.id}`).remove();
+  };
+
   handlePValueTypeChange = (evt, { value }) => {
     this.props.onSearchTransition(true);
     this.props.onPValueTypeChange(value);
-
+    this.removeNetworkSVG();
     if (!this.state.multisetFiltersVisible) {
       cancelRequestAnnotationData();
       let cancelToken = new CancelToken(e => {
