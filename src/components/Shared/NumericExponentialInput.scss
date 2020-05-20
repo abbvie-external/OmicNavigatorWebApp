@@ -11,10 +11,17 @@
   padding-left: 10px !important;
 }
 
-@media (min-width: 1599px) {
+@media (min-width: 1599px) and (max-width: 2599px) {
   .NumericExponentialInput {
     font-size: 15px !important;
     height: 50px !important;
+  }
+}
+
+@media (min-width: 2600px) {
+  .NumericExponentialInput {
+    font-size: 20px !important;
+    height: 54px !important;
   }
 }
 
