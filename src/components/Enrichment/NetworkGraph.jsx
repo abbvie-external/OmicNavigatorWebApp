@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import _ from 'lodash';
 import * as d3 from 'd3';
-// import d3plus from 'd3plus';
 import { Dimmer, Loader, Message } from 'semantic-ui-react';
 import './NetworkGraph.scss';
 import { networkByCluster, limitValues } from '../Shared/helpers';
@@ -779,11 +778,6 @@ class NetworkGraph extends Component {
                       .style('opacity', 0);
                   });
               }
-
-              // d3plus
-              //   .textwrap()
-              //   .container(d3.select('#rectWrap'))
-              //   .draw();
               function dragstarted(o) {
                 d3.event.sourceEvent.stopPropagation();
                 d3.event.sourceEvent.preventDefault();
