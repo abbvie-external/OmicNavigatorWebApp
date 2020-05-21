@@ -816,9 +816,6 @@ class PepplotMultisetFilters extends Component {
     this.props.onHandleSigValuePInputChange('sigValueP', value, index);
   }, 1250);
 
-  addFilter = () => {
-    this.props.onAddFilter();
-  };
   removeFilter = index => {
     this.props.onRemoveFilter(index);
   };
@@ -838,7 +835,6 @@ class PepplotMultisetFilters extends Component {
     const indexFiltersP = uSettingsP.indexFiltersP;
     const hoveredFilter = uSettingsP.hoveredFilter;
     const defaultSigValue = uSettingsP.defaultsigValueP;
-    debugger;
     const callbackFactory = index => number => {
       this.handleSigValuePInputChange(number, index);
       this.actuallyHandleSigValuePInputChange(number, index);
@@ -907,7 +903,13 @@ class PepplotMultisetFilters extends Component {
               </Form.Group>
             ))}
           </ul>
-          <Button circular compact size="mini" icon onClick={this.addFilter}>
+          <Button
+            circular
+            compact
+            size="mini"
+            icon
+            onClick={this.props.onAddFilter}
+          >
             <Icon name="plus circle" color={'green'} />
           </Button>
         </Form>
