@@ -296,7 +296,6 @@ class EnrichmentSearchCriteria extends Component {
             ...this.state.uSettings,
             must: [],
             not: [],
-            defaultSigValue: 0.05,
             maxElements: dataFromService.length,
           },
           sigValue: [0.05],

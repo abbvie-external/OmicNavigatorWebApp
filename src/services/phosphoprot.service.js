@@ -245,6 +245,7 @@ class PhosphoprotService {
     cancelToken,
   ) {
     this.setUrl();
+    debugger;
     const promise = this.ocpuDataCall(
       'getEnrichmentIntersection',
       {

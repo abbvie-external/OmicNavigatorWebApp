@@ -3,7 +3,8 @@ function clamp(x, lower = -Infinity, upper = Infinity) {
   return Math.min(upper, Math.max(lower, x));
 }
 export default function Component({ onChange, min, max, defaultValue, value }) {
-  const [numberProps, { power, base, numberValue }] = useExponentialInput({
+  const [numberProps] = useExponentialInput({
+    // const [numberProps, { power, base, numberValue }] = useExponentialInput({
     defaultValue,
     min,
     max,

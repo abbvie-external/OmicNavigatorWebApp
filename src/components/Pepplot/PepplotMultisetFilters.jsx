@@ -837,6 +837,8 @@ class PepplotMultisetFilters extends Component {
     const OperatorsP = uSettingsP.thresholdOperatorP;
     const indexFiltersP = uSettingsP.indexFiltersP;
     const hoveredFilter = uSettingsP.hoveredFilter;
+    const defaultSigValue = uSettingsP.defaultsigValueP;
+    debugger;
     const callbackFactory = index => number => {
       this.handleSigValuePInputChange(number, index);
       this.actuallyHandleSigValuePInputChange(number, index);
@@ -896,9 +898,8 @@ class PepplotMultisetFilters extends Component {
                   <NumericExponentialInput
                     onChange={callbackFactory(index)}
                     min={0}
-                    max={1}
                     name="sigValueP"
-                    defaultValue={sigValuePLocal[index]}
+                    defaultValue={parseFloat(defaultSigValue)}
                     value={sigValuePLocal[index]}
                     spellcheck="false"
                   />

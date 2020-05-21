@@ -783,11 +783,12 @@ class EnrichmentMultisetFilters extends Component {
 
   render() {
     const { sigValueELocal } = this.state;
-    const { selectedOperator, uSettings } = this.props;
+    const { selectedOperator, uSettings, sigValue } = this.props;
     const Columns = uSettings.thresholdCols;
     const Operators = uSettings.thresholdOperator;
     const SelOp = selectedOperator;
     const indexFilters = uSettings.indexFilters;
+    const defaultSigValue = uSettings.defaultSigValue;
     // const hoveredFilter = uSettings.hoveredFilter;
     // for now, column is displayed as label, just matching the "nominal" or "Adjusted" p value type
     const SelColOverride =
@@ -838,8 +839,8 @@ class EnrichmentMultisetFilters extends Component {
                     min={0}
                     max={1}
                     name="sigValue"
-                    defaultValue={parseFloat(sigValueELocal[index])}
-                    value={parseFloat(sigValueELocal[index])}
+                    defaultValue={parseFloat(defaultSigValue)}
+                    value={sigValueELocal[index]}
                     spellcheck="false"
                   />
                 </Form.Field>

@@ -441,6 +441,7 @@ class PepplotSearchCriteria extends Component {
       uSettingsP: uSetVP,
     });
   };
+
   removeFilter = index => {
     const uSetVP = { ...this.state.uSettingsP };
     uSetVP.indexFiltersP = [...uSetVP.indexFiltersP]

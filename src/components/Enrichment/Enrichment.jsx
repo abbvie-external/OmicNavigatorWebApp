@@ -1689,20 +1689,6 @@ class Enrichment extends Component {
     });
   };
 
-  // handleInputChange = _.debounce((evt, { name, value }) => {
-  //   this.setState({
-  //     [name]: value
-  //   });
-  // }, 500);
-
-  // handleNetworkCutoffInputChange = _.debounce((evt, { name, value }) => {
-  //   this.removeNetworkSVG();
-  //   this.setState({
-  //     [name]: value
-  //     // networkGraphReady: false
-  //   });
-  // }, 500);
-
   handleNodeCutoffInputChange = value => {
     if (this.state.nodeCutoff !== value) {
       this.removeNetworkSVG();
