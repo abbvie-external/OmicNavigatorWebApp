@@ -302,9 +302,6 @@
   color: var(--color-light) !important;
   display: inline-block !important;
   text-align: left;
-  .TextPaddingTop {
-    padding-top: 5px !important;
-  }
 }
 
 @media (max-width: 1598px) {
@@ -315,7 +312,7 @@
 
 @media (min-width: 1599px) {
   .NetworkInputLabel {
-    line-height: 1.49 !important;
+    line-height: 1.4 !important;
   }
 }
 

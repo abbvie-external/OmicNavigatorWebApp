@@ -549,7 +549,7 @@ class EnrichmentResultsGraph extends Component {
                       NODE
                       <span className="DisplayOnLarge"> SIGNIFICANCE</span>
                       <br></br>
-                      <span className="TextPaddingTop">CUTOFF</span>
+                      CUTOFF
                     </Label>
                   }
                   style={CustomPopupStyle}
@@ -609,7 +609,7 @@ class EnrichmentResultsGraph extends Component {
                       EDGE
                       <span className="DisplayOnLarge"> SIMILARITY</span>
                       <br></br>
-                      <span className="TextPaddingTop">CUTOFF</span>
+                      CUTOFF
                     </Label>
                   }
                   style={CustomPopupStyle}
@@ -676,7 +676,7 @@ class EnrichmentResultsGraph extends Component {
                         >
                           EDGE
                           <br></br>
-                          <span className="TextPaddingTop">TYPE</span>
+                          TYPE
                         </Label>
                       }
                       style={CustomPopupStyle}
@@ -749,7 +749,7 @@ class EnrichmentResultsGraph extends Component {
                     <Label className="NetworkInputLabel" size={dynamicSize}>
                       SORT
                       <br></br>
-                      <span className="TextPaddingTop">BY</span>
+                      BY
                     </Label>
                   }
                   style={CustomPopupStyle}
