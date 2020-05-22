@@ -846,11 +846,12 @@ class PepplotMultisetFilters extends Component {
           <ul style={{ padding: '0px' }}>
             {indexFiltersP.map(index => (
               <Form.Group
-                key={index}
+                key={`pepplotMultiSetFiltersRow${index}`}
                 onMouseEnter={() => this.changeHoveredFilter(index)}
                 onMouseLeave={() => this.changeHoveredFilter(-1)}
               >
                 <Form.Field
+                  key={`pepplotMultiSetFiltersColumn${index}`}
                   control={Select}
                   label={index === 0 ? 'Column' : ''}
                   name="selectedColP"
@@ -878,6 +879,7 @@ class PepplotMultisetFilters extends Component {
                   </Button>
                 )}
                 <Form.Field
+                  key={`pepplotMultiSetFiltersOperator${index}`}
                   control={Select}
                   label={index === 0 ? 'Operator' : ''}
                   name="selectedOperatorP"
@@ -889,7 +891,11 @@ class PepplotMultisetFilters extends Component {
                   width={5}
                   onChange={this.handleDropdownChange}
                 ></Form.Field>
-                <Form.Field width={4} id="SignificantValueInputMultisetP">
+                <Form.Field
+                  width={4}
+                  id="SignificantValueInputMultisetP"
+                  key={`pepplotMultiSetFiltersSignificance${index}`}
+                >
                   <label>{index === 0 ? 'Significance' : ''}</label>
                   <NumericExponentialInput
                     onChange={callbackFactory(index)}
