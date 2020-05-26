@@ -61,8 +61,20 @@ class PhosphoprotService {
               params: { digits: 10 },
               responseType: 'text',
               cancelToken,
+              timeout: 10000,
             })
-            .then(response => resolve(response.data));
+            .then(response => resolve(response.data))
+            .catch(function(thrown) {
+              debugger;
+              if (axios.isCancel(thrown)) {
+                console.log('Request canceled', thrown.message);
+              } else {
+                toast.error(`${thrown.message}`);
+                if (handleError !== undefined) {
+                  handleError(false);
+                }
+              }
+            });
         })
         // you can use this function instead, if don't need the cancelToken
         // .call(method, obj, function(session) {
@@ -71,6 +83,7 @@ class PhosphoprotService {
         //     .then(response => resolve(response));
         // })
         .catch(error => {
+          // toast.error('Failed to retrieve data, please try again.');
           toast.error(`${error.statusText}: ${error.responseText}`);
           if (handleError !== undefined) {
             handleError(false);
@@ -88,8 +101,20 @@ class PhosphoprotService {
             .get(url, {
               responseType: 'text',
               cancelToken,
+              timeout: 10000,
             })
-            .then(response => resolve(response.data));
+            .then(response => resolve(response.data))
+            .catch(function(thrown) {
+              debugger;
+              if (axios.isCancel(thrown)) {
+                console.log('Request canceled', thrown.message);
+              } else {
+                toast.error(`${thrown.message}`);
+                if (handleError !== undefined) {
+                  handleError(false);
+                }
+              }
+            });
         })
         .catch(error => {
           // toast.error('Failed to retrieve data, please try again.');
@@ -173,8 +198,20 @@ class PhosphoprotService {
             .get(session.getLoc() + 'graphics/1/svg', {
               responseType: 'text',
               cancelToken,
+              timeout: 10000,
             })
-            .then(response => resolve(response));
+            .then(response => resolve(response))
+            .catch(function(thrown) {
+              debugger;
+              if (axios.isCancel(thrown)) {
+                console.log('Request canceled', thrown.message);
+              } else {
+                toast.error(`${thrown.message}`);
+                if (handleError !== undefined) {
+                  handleError(false);
+                }
+              }
+            });
         })
         .catch(error => {
           // toast.error('Failed to retrieve plot, please try again.');
