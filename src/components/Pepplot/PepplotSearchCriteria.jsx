@@ -131,6 +131,9 @@ class PepplotSearchCriteria extends Component {
               uDataP: uDataPArr,
             });
           }
+        })
+        .catch(error => {
+          console.error('Error during getModelNames', error);
         });
     }
 
@@ -171,6 +174,9 @@ class PepplotSearchCriteria extends Component {
           this.props.onPepplotSearch({
             pepplotResults: this.testdata,
           });
+        })
+        .catch(error => {
+          console.error('Error during getTestData', error);
         });
     }
     this.populateStudies();
@@ -212,6 +218,9 @@ class PepplotSearchCriteria extends Component {
                 uDataP: uDataPArr,
               });
             }
+          })
+          .catch(error => {
+            console.error('Error during getModelNames', error);
           });
       }
       if (t !== '') {
@@ -251,6 +260,9 @@ class PepplotSearchCriteria extends Component {
             this.props.onPepplotSearch({
               pepplotResults: this.testdata,
             });
+          })
+          .catch(error => {
+            console.error('Error during getTestData', error);
           });
       }
       this.populateStudies();
@@ -258,14 +270,19 @@ class PepplotSearchCriteria extends Component {
   }
 
   populateStudies = () => {
-    phosphoprotService.getStudies().then(studiesFromService => {
-      const studiesArr = studiesFromService.map(study => {
-        return { key: study, text: study, value: study };
+    phosphoprotService
+      .getStudies()
+      .then(studiesFromService => {
+        const studiesArr = studiesFromService.map(study => {
+          return { key: study, text: study, value: study };
+        });
+        this.setState({
+          pepplotStudies: studiesArr,
+        });
+      })
+      .catch(error => {
+        console.error('Error during getStudies', error);
       });
-      this.setState({
-        pepplotStudies: studiesArr,
-      });
-    });
   };
 
   handleStudyChange = (evt, { name, value }) => {
@@ -297,6 +314,9 @@ class PepplotSearchCriteria extends Component {
           pepplotModelsDisabled: false,
           pepplotModels: modelsArr,
         });
+      })
+      .catch(error => {
+        console.error('Error during getModelNames', error);
       });
   };
 
@@ -363,6 +383,9 @@ class PepplotSearchCriteria extends Component {
         });
         this.testdata = dataFromService;
         this.props.onPepplotSearch({ pepplotResults: this.testdata });
+      })
+      .catch(error => {
+        console.error('Error during getTestData', error);
       });
   };
 
@@ -420,6 +443,9 @@ class PepplotSearchCriteria extends Component {
         this.props.onPepplotSearch({
           pepplotResults: this.testdata,
         });
+      })
+      .catch(error => {
+        console.error('Error during getTestData', error);
       });
   };
 
@@ -563,6 +589,9 @@ class PepplotSearchCriteria extends Component {
         this.props.onPepplotSearch({
           pepplotResults: multisetResultsP,
         });
+      })
+      .catch(error => {
+        console.error('Error during getMultisetInferenceData', error);
       });
   };
 
@@ -605,6 +634,9 @@ class PepplotSearchCriteria extends Component {
         this.props.onGetMultisetPlot({
           svgInfo,
         });
+      })
+      .catch(error => {
+        console.error('Error during getInferenceMultisetPlot', error);
       });
   }
 

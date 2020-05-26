@@ -293,7 +293,13 @@ class Enrichment extends Component {
             // }
 
             showBarcodePlotCb(dataItem, BardcodeInfoObj, test, highest);
+          })
+          .catch(error => {
+            console.error('Error during getBarcodeData', error);
           });
+      })
+      .catch(error => {
+        console.error('Error during getDatabaseInfo', error);
       });
   };
 
@@ -677,6 +683,9 @@ class Enrichment extends Component {
           networkDataLoaded: true,
           networkGraphReady: true,
         });
+      })
+      .catch(error => {
+        console.error('Error during getEnrichmentNetwork', error);
       });
   };
 
@@ -920,6 +929,9 @@ class Enrichment extends Component {
           //   currentSVGs.unshift(sanitizedSVG);
           // }
           handleSVGCb(imageInfo);
+        })
+        .catch(error => {
+          console.error('Error during getPlot', error);
         });
     });
   };
@@ -994,8 +1006,14 @@ class Enrichment extends Component {
             //   this.setState({ sizeVal = '50%')};
             // }
             this.showBarcodePlot(dataItem, BardcodeInfoObj, test, highest);
+          })
+          .catch(error => {
+            console.error('Error during getBarcodeData', error);
           });
         // });
+      })
+      .catch(error => {
+        console.error('Error during getDatabaseInfo', error);
       });
   };
 
@@ -1090,6 +1108,9 @@ class Enrichment extends Component {
               } else if (database === 'PSP') {
                 self.showPhosphositePlus('', dataItem);
               }
+            })
+            .catch(error => {
+              console.error('Error during getDatabaseInfo', error);
             });
         } else {
           dataItem.Annotation = _.find(self.state.annotationData, {

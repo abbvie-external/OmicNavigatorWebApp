@@ -208,7 +208,7 @@ class PepplotResults extends Component {
     getPlotCb(id, plotType, pepplotStudy, imageInfo, handleSVGCb);
     if (pepplotModel !== 'Differential Expression') {
       phosphoprotService
-        .getSiteData(id, pepplotStudy + 'plots')
+        .getSiteData(id, pepplotStudy + 'plots', this.handleTreeDataError)
         .then(treeDataResponse => {
           this.setState({
             treeDataRaw: treeDataResponse,
@@ -235,10 +235,13 @@ class PepplotResults extends Component {
             treeData: tD,
             isProteinDataLoaded: true,
           });
+        })
+        .catch(error => {
+          console.error('Error during getSiteData', error);
         });
     } else {
       phosphoprotService
-        .getProteinData(id, pepplotStudy + 'plots')
+        .getProteinData(id, pepplotStudy + 'plots', this.handleTreeDataError)
         .then(proteinDataResponse => {
           this.setState({
             treeDataRaw: proteinDataResponse,
@@ -263,9 +266,31 @@ class PepplotResults extends Component {
           });
           this.setState({
             treeData: proteinData,
+            isProteinDataLoaded: true,
           });
+        })
+        .catch(error => {
+          console.error('Error during getProteinData', error);
         });
     }
+  };
+
+  handleTreeDataError = bool => {
+    this.setState({
+      isProteinDataLoaded: true,
+      treeDataRaw: [],
+      treeData: [],
+      treeDataColumns: [],
+    });
+    this.props.onSearchCriteriaChange(
+      {
+        pepplotStudy: this.props.pepplotStudy || '',
+        pepplotModel: this.props.pepplotModel || '',
+        pepplotTest: this.props.pepplotTest || '',
+        pepplotProteinSite: '',
+      },
+      false,
+    );
   };
 
   getPlot = (id, plotType, pepplotStudy, imageInfo, handleSVGCb) => {
@@ -331,7 +356,8 @@ class PepplotResults extends Component {
           handleSVGCb(imageInfo);
         })
         .catch(error => {
-          this.handleItemSelected(false);
+          console.error('Error during getPlot', error);
+          // this.handleItemSelected(false);
         });
     });
   };
@@ -459,7 +485,6 @@ class PepplotResults extends Component {
       pepplotRows,
       itemsPerPageInformed,
     } = this.state;
-
     let pepplotCacheKey = `${pepplotStudy}-${pepplotModel}-${pepplotTest}`;
     if (
       proteinToHighlightInDiffTable !== '' &&

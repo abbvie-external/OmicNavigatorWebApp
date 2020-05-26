@@ -4,12 +4,12 @@ import { Accordion, Loader, Dimmer } from 'semantic-ui-react';
 
 class PepplotAccordion extends Component {
   state = {
-    isAccordionReady: false
+    isAccordionReady: false,
   };
 
   componentDidMount() {
     this.setState({
-      isAccordionReady: true
+      isAccordionReady: true,
     });
   }
 
@@ -27,7 +27,7 @@ class PepplotAccordion extends Component {
       return {
         key: `${b.key}`,
         title: `${b.text}`,
-        content: `${this.getPeptideNestedItems(b.items)}`
+        content: `${this.getPeptideNestedItems(b.items)}`,
       };
     });
     const PeptideContent = <Accordion.Accordion panels={PeptidePanelsArray} />;
@@ -43,7 +43,7 @@ class PepplotAccordion extends Component {
         return {
           key: `${a.key}`,
           title: `${a.text}`,
-          content: { content: this.getPeptideContent(a.items) }
+          content: { content: this.getPeptideContent(a.items) },
         };
       });
       return rootPanels;
@@ -64,7 +64,8 @@ class PepplotAccordion extends Component {
   };
 
   render() {
-    if (!this.props.isProteinDataLoaded) {
+    const { isProteinDataLoaded } = this.props;
+    if (!isProteinDataLoaded) {
       return (
         <div>
           <Dimmer active inverted>

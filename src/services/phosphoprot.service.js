@@ -22,7 +22,7 @@ class PhosphoprotService {
     window.ocpu.seturl(this.ocpuUrlAlt);
   }
 
-  ocpuRPC(name, paramsObj) {
+  ocpuRPC(name, paramsObj, handleError) {
     return new Promise(function(resolve, reject) {
       window.ocpu
         .rpc(name, paramsObj, function(session) {
@@ -30,6 +30,9 @@ class PhosphoprotService {
         })
         .catch(error => {
           toast.error(`${error.statusText}: ${error.responseText}`);
+          if (handleError !== undefined) {
+            handleError(false);
+          }
         });
     });
   }
@@ -146,13 +149,17 @@ class PhosphoprotService {
     mapForm.submit();
   }
 
-  async getSiteData(id, study) {
-    const promise = this.ocpuRPC('sitedata', { idmult: id, study: study });
+  async getSiteData(id, study, errorCb) {
+    const promise = this.ocpuRPC(
+      'sitedata',
+      { idmult: id, study: study },
+      errorCb,
+    );
     const siteDataFromPromise = await promise;
     return siteDataFromPromise;
   }
 
-  async getProteinData(id, study) {
+  async getProteinData(id, study, errorCb) {
     const promise = this.ocpuRPC('proteindata', { id: id, study: study });
     const proteinDataFromPromise = await promise;
     return proteinDataFromPromise;

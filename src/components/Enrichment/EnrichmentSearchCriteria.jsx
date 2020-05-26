@@ -151,6 +151,9 @@ class EnrichmentSearchCriteria extends Component {
               enrichmentAnnotations: annotationsArr,
             });
           }
+        })
+        .catch(error => {
+          console.error('Error during getModelNames', error);
         });
     }
 
@@ -185,6 +188,9 @@ class EnrichmentSearchCriteria extends Component {
           this.props.onEnrichmentSearch({
             enrichmentResults: this.annotationdata,
           });
+        })
+        .catch(error => {
+          console.error('Error during getAnnotationData', error);
         });
     }
 
@@ -192,14 +198,19 @@ class EnrichmentSearchCriteria extends Component {
   }
 
   populateStudies = () => {
-    phosphoprotService.getStudies().then(studiesFromService => {
-      const studiesArr = studiesFromService.map(study => {
-        return { key: study, text: study, value: study };
+    phosphoprotService
+      .getStudies()
+      .then(studiesFromService => {
+        const studiesArr = studiesFromService.map(study => {
+          return { key: study, text: study, value: study };
+        });
+        this.setState({
+          enrichmentStudies: studiesArr,
+        });
+      })
+      .catch(error => {
+        console.error('Error during getStudies', error);
       });
-      this.setState({
-        enrichmentStudies: studiesArr,
-      });
-    });
   };
 
   handleStudyChange = (evt, { name, value }) => {
@@ -232,6 +243,9 @@ class EnrichmentSearchCriteria extends Component {
           enrichmentModelsDisabled: false,
           enrichmentModels: modelsArr,
         });
+      })
+      .catch(error => {
+        console.error('Error during getModelNames', error);
       });
   };
 
@@ -305,6 +319,9 @@ class EnrichmentSearchCriteria extends Component {
         this.props.onEnrichmentSearch({
           enrichmentResults: this.annotationdata,
         });
+      })
+      .catch(error => {
+        console.error('Error during getAnnotationData', error);
       });
   };
 
@@ -347,6 +364,9 @@ class EnrichmentSearchCriteria extends Component {
           this.props.onEnrichmentSearch({
             enrichmentResults: this.annotationdata,
           });
+        })
+        .catch(error => {
+          console.error('Error during getAnnotationData', error);
         });
     } else {
       const eSigV = this.state.sigValue;
@@ -394,6 +414,9 @@ class EnrichmentSearchCriteria extends Component {
           this.props.onEnrichmentSearch({
             enrichmentResults: multisetResults,
           });
+        })
+        .catch(error => {
+          console.error('Error during getMultisetEnrichmentData', error);
         });
     }
   };
@@ -454,6 +477,9 @@ class EnrichmentSearchCriteria extends Component {
         this.props.onEnrichmentSearch({
           enrichmentResults: this.annotationdata,
         });
+      })
+      .catch(error => {
+        console.error('Error during getAnnotationData', error);
       });
   };
   addFilter = () => {
@@ -593,6 +619,9 @@ class EnrichmentSearchCriteria extends Component {
         this.props.onEnrichmentSearch({
           enrichmentResults: multisetResults,
         });
+      })
+      .catch(error => {
+        console.error('Error during getMultisetEnrichmentData', error);
       });
   };
   jsonToList(json) {
@@ -645,6 +674,9 @@ class EnrichmentSearchCriteria extends Component {
         this.props.onGetMultisetPlot({
           svgInfo,
         });
+      })
+      .catch(error => {
+        console.error('Error during getEnrichmentMultisetPlot', error);
       });
   }
 
