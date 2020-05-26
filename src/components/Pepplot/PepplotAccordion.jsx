@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Accordion, Loader, Dimmer } from 'semantic-ui-react';
+import { Accordion, Loader, Dimmer, Message } from 'semantic-ui-react';
 // import _ from 'lodash';
 
 class PepplotAccordion extends Component {
@@ -51,16 +51,27 @@ class PepplotAccordion extends Component {
   };
 
   getAccordion = () => {
-    const rootPanels = this.getRootPanels();
-    return (
-      <Accordion
-        defaultActiveIndex={[0]}
-        panels={rootPanels}
-        exclusive={false}
-        fluid
-        // styled
-      />
-    );
+    if (this.props.treeData.length !== 0) {
+      const rootPanels = this.getRootPanels();
+      return (
+        <Accordion
+          defaultActiveIndex={[0]}
+          panels={rootPanels}
+          exclusive={false}
+          fluid
+          // styled
+        />
+      );
+    } else {
+      return (
+        <Message
+          className="NoDataMessage"
+          icon="question mark"
+          header="No Data Available"
+          // content="add description/instructions"
+        />
+      );
+    }
   };
 
   render() {

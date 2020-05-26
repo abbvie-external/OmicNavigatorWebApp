@@ -65,7 +65,6 @@ class PhosphoprotService {
             })
             .then(response => resolve(response.data))
             .catch(function(thrown) {
-              debugger;
               if (axios.isCancel(thrown)) {
                 console.log('Request canceled', thrown.message);
               } else {
@@ -105,7 +104,6 @@ class PhosphoprotService {
             })
             .then(response => resolve(response.data))
             .catch(function(thrown) {
-              debugger;
               if (axios.isCancel(thrown)) {
                 console.log('Request canceled', thrown.message);
               } else {
@@ -202,7 +200,6 @@ class PhosphoprotService {
             })
             .then(response => resolve(response))
             .catch(function(thrown) {
-              debugger;
               if (axios.isCancel(thrown)) {
                 console.log('Request canceled', thrown.message);
               } else {

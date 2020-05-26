@@ -392,6 +392,7 @@ class PepplotSearchCriteria extends Component {
   handleMultisetToggle = () => {
     return evt => {
       if (this.state.multisetFiltersVisibleP === false) {
+        // on toggle open
         this.setState({
           multisetFiltersVisibleP: true,
         });
@@ -404,6 +405,7 @@ class PepplotSearchCriteria extends Component {
           selectedOperatorP: this.state.selectedOperatorP,
         });
       } else {
+        // on toggle close
         this.setState({
           multisetFiltersVisibleP: false,
           reloadPlot: true,
@@ -414,6 +416,17 @@ class PepplotSearchCriteria extends Component {
         this.multisetTriggeredTestChange(pepplotTestName, pepplotTestVar);
       }
     };
+  };
+
+  handleMultisetCloseError = () => {
+    this.props.onSearchTransition(false);
+    this.setState(
+      {
+        multisetFiltersVisibleP: true,
+        reloadPlot: true,
+      },
+      this.updateQueryDataP(),
+    );
   };
 
   multisetTriggeredTestChange = (name, value) => {
@@ -431,11 +444,11 @@ class PepplotSearchCriteria extends Component {
       cancelRequestPSCGetTestData = e;
     });
     phosphoprotService
-      .getTestData(
+      .getPlot(
         this.props.pepplotModel,
         value,
         this.props.pepplotStudy + 'plots',
-        this.state.pepplotResultsErrorCb,
+        this.handleMultisetCloseError,
         cancelToken,
       )
       .then(dataFromService => {
