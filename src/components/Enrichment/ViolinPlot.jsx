@@ -491,7 +491,6 @@ class ViolinPlot extends Component {
     }
 
     // Set base settings
-    console.log('self.props', `(${self.props.violinSettings.axisLabels.yAxis}`);
     self.chart.margin = self.props.violinSettings.margin;
     self.chart.divWidth = self.state.violinContainerWidth;
     self.chart.divHeight = self.state.violinContainerHeight;
@@ -542,9 +541,15 @@ class ViolinPlot extends Component {
     self.chart.objs.yAxis = d3
       .axisLeft(self.chart.yScale)
       .tickFormat(formatAsFloat)
-      .tickSizeOuter(0)
-      .tickSizeInner(-self.chart.width)
-      .tickPadding(+15);
+      // .tickSizeOuter(0)
+      // .tickSizeInner(-self.chart.width)
+      .tickPadding(
+        Math.max.apply(Math, this.chart.yScale.ticks())
+          ? parseInt(
+              Math.max.apply(Math, this.chart.yScale.ticks()).toString().length,
+            ) * 8
+          : 0,
+      );
     self.chart.objs.yAxis.tickArguments(
       self.chart.objs.yAxis.tickArguments() * self.props.violinSettings.yTicks,
     );
@@ -607,7 +612,7 @@ class ViolinPlot extends Component {
       .attr('dy', '.62em')
       .attr('transform', 'rotate(-90)')
       .attr('x', -self.chart.height / 2)
-      .attr('y', -48)
+      .attr('y', -55)
       .attr('id', 'yaxis-label')
       .style('fill', '#000')
       .append('tspan')
