@@ -2,7 +2,7 @@ import DOMPurify from 'dompurify';
 import _ from 'lodash';
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import { Grid, Menu, Popup, Sidebar, Tab } from 'semantic-ui-react';
+import { Grid, Menu, Popup, Sidebar, Tab, Message } from 'semantic-ui-react';
 import { CancelToken } from 'axios';
 import go_icon from '../../resources/go.png';
 import msig_icon from '../../resources/msig.ico';
@@ -632,15 +632,8 @@ class Enrichment extends Component {
         '',
         pValueTypeParam,
         enrichmentStudy + 'plots',
+        this.handleNetworkError,
       )
-      // .then(EMData => {
-      //   this.setState({
-      //     networkDataAvailable: true,
-      //     networkData: EMData.elements,
-      //     // networkData: networkDataMock,
-      //     networkDataLoaded: true
-      //   });
-      // });
       .then(EMData => {
         this.setState({
           // networkDataAvailable: true,
@@ -687,6 +680,20 @@ class Enrichment extends Component {
       .catch(error => {
         console.error('Error during getEnrichmentNetwork', error);
       });
+  };
+
+  handleNetworkError = () => {
+    debugger;
+    this.setState({
+      networkSettings: {
+        ...this.state.networkSettings,
+        facets: [],
+        propLabel: [],
+        propData: [],
+      },
+      networkDataLoaded: false,
+      networkGraphReady: true,
+    });
   };
 
   calculateHeight(self) {
@@ -1597,7 +1604,42 @@ class Enrichment extends Component {
     } else return <TransitionStill />;
   };
 
+  getEnrichmentNetwork = () => {
+    if (this.state.networkDataLoaded === true) {
+      return (
+        <EnrichmentResultsGraph
+          {...this.props}
+          {...this.state}
+          onHandlePlotAnimation={this.handlePlotAnimation}
+          onDisplayViolinPlot={this.displayViolinPlot}
+          onHandlePieClick={this.testSelected}
+          onHandleNodeCutoffInputChange={this.handleNodeCutoffInputChange}
+          onHandleNodeCutoffSliderChange={this.handleNodeCutoffSliderChange}
+          onHandleEdgeCutoffInputChange={this.handleEdgeCutoffInputChange}
+          onHandleEdgeCutoffSliderChange={this.handleEdgeCutoffSliderChange}
+          onHandleEdgeTypeInputChange={this.handleEdgeTypeInputChange}
+          onHandleEdgeTypeSliderChange={this.handleEdgeTypeSliderChange}
+          onHandleTotals={this.handleTotals}
+          // onNetworkGraphReady={this.handleNetworkGraphReady}
+          onHandleLegendOpen={this.handleLegendOpen}
+          onHandleLegendClose={this.handleLegendClose}
+          onCreateLegend={this.createLegend}
+        />
+      );
+    } else {
+      return (
+        <Message
+          className="NetworkGraphUnavailableMessage"
+          icon="search"
+          header="Network Graph Unavailable"
+          content="Please Revise Search"
+        />
+      );
+    }
+  };
+
   getTableAndNetworkPanes = () => {
+    const EnrichmentNetwork = this.getEnrichmentNetwork();
     return [
       {
         menuItem: (
@@ -1667,24 +1709,7 @@ class Enrichment extends Component {
             id="EnrichmentContentPane"
             // ref="EnrichmentContentPaneGraph"
           >
-            <EnrichmentResultsGraph
-              {...this.props}
-              {...this.state}
-              onHandlePlotAnimation={this.handlePlotAnimation}
-              onDisplayViolinPlot={this.displayViolinPlot}
-              onHandlePieClick={this.testSelected}
-              onHandleNodeCutoffInputChange={this.handleNodeCutoffInputChange}
-              onHandleNodeCutoffSliderChange={this.handleNodeCutoffSliderChange}
-              onHandleEdgeCutoffInputChange={this.handleEdgeCutoffInputChange}
-              onHandleEdgeCutoffSliderChange={this.handleEdgeCutoffSliderChange}
-              onHandleEdgeTypeInputChange={this.handleEdgeTypeInputChange}
-              onHandleEdgeTypeSliderChange={this.handleEdgeTypeSliderChange}
-              onHandleTotals={this.handleTotals}
-              // onNetworkGraphReady={this.handleNetworkGraphReady}
-              onHandleLegendOpen={this.handleLegendOpen}
-              onHandleLegendClose={this.handleLegendClose}
-              onCreateLegend={this.createLegend}
-            />
+            {EnrichmentNetwork}
           </Tab.Pane>
         ),
       },

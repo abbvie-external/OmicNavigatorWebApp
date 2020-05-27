@@ -61,7 +61,7 @@ class PhosphoprotService {
               params: { digits: 10 },
               responseType: 'text',
               cancelToken,
-              timeout: 10000,
+              timeout: 8000,
             })
             .then(response => resolve(response.data))
             .catch(function(thrown) {
@@ -100,7 +100,7 @@ class PhosphoprotService {
             .get(url, {
               responseType: 'text',
               cancelToken,
-              timeout: 10000,
+              timeout: 8000,
             })
             .then(response => resolve(response.data))
             .catch(function(thrown) {
@@ -196,7 +196,7 @@ class PhosphoprotService {
             .get(session.getLoc() + 'graphics/1/svg', {
               responseType: 'text',
               cancelToken,
-              timeout: 10000,
+              timeout: 16000,
             })
             .then(response => resolve(response))
             .catch(function(thrown) {
@@ -397,16 +397,21 @@ class PhosphoprotService {
     tests,
     pValueType,
     enrichmentStudy,
+    errorCb,
   ) {
     this.setUrl();
-    const promise = this.ocpuRPC('getCytoscapeEM', {
-      model: enrichmentModel,
-      db: enrichmentAnnotation,
-      tests: tests,
-      q: pValueType,
-      study: enrichmentStudy,
-      isDev: false,
-    });
+    const promise = this.ocpuRPC(
+      'getCytoscapeEM',
+      {
+        model: enrichmentModel,
+        db: enrichmentAnnotation,
+        tests: tests,
+        q: pValueType,
+        study: enrichmentStudy,
+        isDev: false,
+      },
+      errorCb,
+    );
     const nodesFromPromise = await promise;
     return nodesFromPromise;
     // return networkDataOld;

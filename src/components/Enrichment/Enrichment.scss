@@ -121,3 +121,14 @@
     width: 45px !important;
   }
 }
+
+.NetworkGraphUnavailableMessage {
+  width: 33% !important;
+  margin: 100px auto !important;
+}
+
+@media (max-width: 1199px) {
+  .NetworkGraphUnavailableMessage {
+    width: 75% !important;
+  }
+}
