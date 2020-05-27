@@ -68,6 +68,7 @@ class Enrichment extends Component {
     networkDataMock: {},
     networkDataLoaded: false,
     networkGraphReady: false,
+    networkDataError: false,
     tests: {},
     nodeCutoff: sessionStorage.getItem('nodeCutoff') || 0.1,
     edgeCutoff: sessionStorage.getItem('edgeCutoff') || 0.4,
@@ -310,9 +311,11 @@ class Enrichment extends Component {
   };
 
   handleEnrichmentSearch = searchResults => {
+    this.removeNetworkSVG();
     const columns = this.getConfigCols(searchResults);
     this.getNetworkData();
     this.setState({
+      networkDataError: false,
       networkGraphReady: false,
       enrichmentResults: searchResults.enrichmentResults,
       enrichmentColumns: columns,
@@ -691,8 +694,9 @@ class Enrichment extends Component {
         propLabel: [],
         propData: [],
       },
-      networkDataLoaded: false,
-      networkGraphReady: true,
+      // networkDataLoaded: false,
+      // networkGraphReady: true,
+      networkDataError: true,
     });
   };
 
@@ -1604,42 +1608,7 @@ class Enrichment extends Component {
     } else return <TransitionStill />;
   };
 
-  getEnrichmentNetwork = () => {
-    if (this.state.networkDataLoaded === true) {
-      return (
-        <EnrichmentResultsGraph
-          {...this.props}
-          {...this.state}
-          onHandlePlotAnimation={this.handlePlotAnimation}
-          onDisplayViolinPlot={this.displayViolinPlot}
-          onHandlePieClick={this.testSelected}
-          onHandleNodeCutoffInputChange={this.handleNodeCutoffInputChange}
-          onHandleNodeCutoffSliderChange={this.handleNodeCutoffSliderChange}
-          onHandleEdgeCutoffInputChange={this.handleEdgeCutoffInputChange}
-          onHandleEdgeCutoffSliderChange={this.handleEdgeCutoffSliderChange}
-          onHandleEdgeTypeInputChange={this.handleEdgeTypeInputChange}
-          onHandleEdgeTypeSliderChange={this.handleEdgeTypeSliderChange}
-          onHandleTotals={this.handleTotals}
-          // onNetworkGraphReady={this.handleNetworkGraphReady}
-          onHandleLegendOpen={this.handleLegendOpen}
-          onHandleLegendClose={this.handleLegendClose}
-          onCreateLegend={this.createLegend}
-        />
-      );
-    } else {
-      return (
-        <Message
-          className="NetworkGraphUnavailableMessage"
-          icon="search"
-          header="Network Graph Unavailable"
-          content="Please Revise Search"
-        />
-      );
-    }
-  };
-
   getTableAndNetworkPanes = () => {
-    const EnrichmentNetwork = this.getEnrichmentNetwork();
     return [
       {
         menuItem: (
@@ -1709,17 +1678,40 @@ class Enrichment extends Component {
             id="EnrichmentContentPane"
             // ref="EnrichmentContentPaneGraph"
           >
-            {EnrichmentNetwork}
+            {!this.state.networkDataError ? (
+              <EnrichmentResultsGraph
+                {...this.props}
+                {...this.state}
+                onHandlePlotAnimation={this.handlePlotAnimation}
+                onDisplayViolinPlot={this.displayViolinPlot}
+                onHandlePieClick={this.testSelected}
+                onHandleNodeCutoffInputChange={this.handleNodeCutoffInputChange}
+                onHandleNodeCutoffSliderChange={
+                  this.handleNodeCutoffSliderChange
+                }
+                onHandleEdgeCutoffInputChange={this.handleEdgeCutoffInputChange}
+                onHandleEdgeCutoffSliderChange={
+                  this.handleEdgeCutoffSliderChange
+                }
+                onHandleEdgeTypeInputChange={this.handleEdgeTypeInputChange}
+                onHandleEdgeTypeSliderChange={this.handleEdgeTypeSliderChange}
+                onHandleTotals={this.handleTotals}
+                onHandleLegendOpen={this.handleLegendOpen}
+                onHandleLegendClose={this.handleLegendClose}
+                onCreateLegend={this.createLegend}
+              />
+            ) : (
+              <Message
+                className="NetworkGraphUnavailableMessage"
+                icon="search"
+                header="Network Graph Unavailable"
+                content="Please Revise Search"
+              />
+            )}
           </Tab.Pane>
         ),
       },
     ];
-  };
-
-  handleNetworkGraphReady = bool => {
-    this.setState({
-      networkGraphReady: bool,
-    });
   };
 
   removeNetworkSVG = () => {
@@ -1734,20 +1726,6 @@ class Enrichment extends Component {
       filteredEdgesTotal: filteredEdgesLength,
     });
   };
-
-  // handleInputChange = _.debounce((evt, { name, value }) => {
-  //   this.setState({
-  //     [name]: value
-  //   });
-  // }, 500);
-
-  // handleNetworkCutoffInputChange = _.debounce((evt, { name, value }) => {
-  //   this.removeNetworkSVG();
-  //   this.setState({
-  //     [name]: value
-  //     // networkGraphReady: false
-  //   });
-  // }, 500);
 
   handleNodeCutoffInputChange = value => {
     if (this.state.nodeCutoff !== value) {

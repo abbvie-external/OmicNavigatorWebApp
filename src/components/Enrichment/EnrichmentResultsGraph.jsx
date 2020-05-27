@@ -304,7 +304,9 @@ class EnrichmentResultsGraph extends Component {
   };
 
   handleResultSelect = (e, { result }) => {
-    this.setState({ networkSearchValue: result.description });
+    const value = result.description;
+    this.setState({ networkSearchValue: value });
+    this.handleSearchChange(e, { value });
   };
 
   handleSearchChange = (e, { value }) => {
