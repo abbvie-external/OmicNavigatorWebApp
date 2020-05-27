@@ -23,7 +23,7 @@ class Pepplot extends Component {
     parseInt(sessionStorage.getItem('pepplotViewTab'), 10) || 0;
   state = {
     isValidSearchPepplot: false,
-    isSearching: false,
+    isSearchingPepplot: false,
     showProteinPage: false,
     pepplotResults: [],
     pepplotColumns: [],
@@ -48,9 +48,9 @@ class Pepplot extends Component {
 
   componentDidUpdate = (prevProps, prevState) => {};
 
-  handleSearchTransition = bool => {
+  handleSearchTransitionPepplot = bool => {
     this.setState({
-      isSearching: bool,
+      isSearchingPepplot: bool,
     });
   };
 
@@ -65,7 +65,7 @@ class Pepplot extends Component {
     this.setState({
       pepplotResults: searchResults.pepplotResults,
       pepplotColumns: columns,
-      isSearching: false,
+      isSearchingPepplot: false,
       isValidSearchPepplot: true,
       showProteinPage: false,
       plotButtonActive: false,
@@ -328,7 +328,7 @@ class Pepplot extends Component {
     if (
       this.state.isValidSearchPepplot &&
       !this.state.showProteinPage &&
-      !this.state.isSearching
+      !this.state.isSearchingPepplot
     ) {
       const TableAndPlotPanes = this.getTableAndPlotPanes();
       return (
@@ -344,7 +344,7 @@ class Pepplot extends Component {
           }}
         />
       );
-    } else if (this.state.isSearching) {
+    } else if (this.state.isSearchingPepplot) {
       return <TransitionActive />;
     } else return <TransitionStill />;
   };
@@ -467,7 +467,7 @@ class Pepplot extends Component {
             <PepplotSearchCriteria
               {...this.state}
               {...this.props}
-              onSearchTransition={this.handleSearchTransition}
+              onSearchTransitionPepplot={this.handleSearchTransitionPepplot}
               onPepplotSearch={this.handlePepplotSearch}
               onSearchCriteriaChange={this.handleSearchCriteriaChange}
               onSearchCriteriaReset={this.hidePGrid}

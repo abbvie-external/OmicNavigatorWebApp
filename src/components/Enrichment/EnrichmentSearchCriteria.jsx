@@ -22,29 +22,12 @@ let cancelRequestMultisetEnrichmentData = () => {};
 let cancelRequestEnrichmentMultisetPlot = () => {};
 
 class EnrichmentSearchCriteria extends Component {
-  // static defaultProps = {
-  //   tab: 'enrichment',
-  //   enrichmentStudy: '',
-  //   enrichmentModel: '',
-  //   enrichmentAnnotation: '',
-  //   pValueType: 'nomimal',
-  //   isValidSearchEnrichment: false,
-  //   isSearching: false,
-  //   multisetPlotAvailable: false,
-  //   animation: 'uncover',
-  //   direction: 'left',
-  //   visible: false,
-  //   plotButtonActive: false,
-  //   uData: []
-  // };
-
   state = {
     enrichmentStudies: [],
     enrichmentStudyHrefVisible: false,
     enrichmentStudyHref: '',
     enrichmentModels: [],
     enrichmentAnnotations: [],
-    enrichmentResultsErrorCb: this.props.onSearchTransition || undefined,
     enrichmentStudiesDisabled: false,
     enrichmentModelsDisabled: true,
     enrichmentAnnotationsDisabled: true,
@@ -167,15 +150,14 @@ class EnrichmentSearchCriteria extends Component {
         },
         false,
       );
-      this.props.onSearchTransition(true);
+      this.props.onSearchTransitionEnrichment(true);
       phosphoprotService
         .getAnnotationData(
           m,
           a,
           s + 'plots',
           t,
-          this.state.enrichmentResultsErrorCb,
-          undefined,
+          this.props.onSearchTransitionEnrichment,
         )
         .then(dataFromService => {
           this.setState({
@@ -290,7 +272,7 @@ class EnrichmentSearchCriteria extends Component {
       },
       true,
     );
-    this.props.onSearchTransition(true);
+    this.props.onSearchTransitionEnrichment(true);
     cancelRequestAnnotationData();
     let cancelToken = new CancelToken(e => {
       cancelRequestAnnotationData = e;
@@ -301,7 +283,7 @@ class EnrichmentSearchCriteria extends Component {
         value,
         this.props.enrichmentStudy + 'plots',
         this.props.pValueType,
-        this.state.enrichmentResultsErrorCb,
+        this.props.onSearchTransitionEnrichment,
         cancelToken,
       )
       .then(dataFromService => {
@@ -332,7 +314,7 @@ class EnrichmentSearchCriteria extends Component {
   };
 
   handlePValueTypeChange = (evt, { value }) => {
-    this.props.onSearchTransition(true);
+    this.props.onSearchTransitionEnrichment(true);
     this.props.onPValueTypeChange(value);
     this.removeNetworkSVG();
     if (!this.state.multisetFiltersVisible) {
@@ -346,7 +328,7 @@ class EnrichmentSearchCriteria extends Component {
           this.props.enrichmentAnnotation,
           this.props.enrichmentStudy + 'plots',
           value,
-          this.state.enrichmentResultsErrorCb,
+          this.props.onSearchTransitionEnrichment,
           cancelToken,
         )
         .then(dataFromService => {
@@ -448,6 +430,17 @@ class EnrichmentSearchCriteria extends Component {
     };
   };
 
+  handleMultisetECloseError = () => {
+    this.props.onSearchTransitionEnrichment(false);
+    this.setState(
+      {
+        multisetFiltersVisible: true,
+        reloadPlot: true,
+      },
+      this.updateQueryData(),
+    );
+  };
+
   multisetTriggeredAnnotationChange = (name, value) => {
     this.props.onSearchCriteriaChange(
       {
@@ -458,7 +451,7 @@ class EnrichmentSearchCriteria extends Component {
       },
       true,
     );
-    this.props.onSearchTransition(true);
+    this.props.onSearchTransitionEnrichment(true);
     cancelRequestAnnotationData();
     let cancelToken = new CancelToken(e => {
       cancelRequestAnnotationData = e;
@@ -467,9 +460,9 @@ class EnrichmentSearchCriteria extends Component {
       .getAnnotationData(
         this.props.enrichmentModel,
         value,
-        this.props.enrichmentStudy + 'plots',
+        this.props.enrichmentStudy + 'plot',
         this.props.pValueType,
-        this.state.enrichmentResultsErrorCb,
+        this.handleMultisetECloseError,
         cancelToken,
       )
       .then(dataFromService => {

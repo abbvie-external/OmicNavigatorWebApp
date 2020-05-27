@@ -94,7 +94,6 @@ class PepplotSearchCriteria extends Component {
     multisetFiltersVisibleP: false,
     activateMultisetFiltersP: false,
     uDataP: [],
-    pepplotResultsErrorCb: this.props.onSearchTransition || undefined,
   };
 
   componentDidMount() {
@@ -150,19 +149,9 @@ class PepplotSearchCriteria extends Component {
       this.setState({
         uAnchorP: t,
       });
-      this.state.pepplotResultsErrorCb(true);
-      cancelRequestPSCGetTestData();
-      let cancelToken = new CancelToken(e => {
-        cancelRequestPSCGetTestData = e;
-      });
+      this.props.onSearchTransitionPepplot(true);
       phosphoprotService
-        .getTestData(
-          m,
-          t,
-          s + 'plots',
-          this.state.pepplotResultsErrorCb,
-          cancelToken,
-        )
+        .getTestData(m, t, s + 'plots', this.props.onSearchTransitionPepplot)
         .then(dataFromService => {
           this.setState({
             uSettingsP: {
@@ -182,6 +171,7 @@ class PepplotSearchCriteria extends Component {
     this.populateStudies();
   }
 
+  // used when test is updated by clicking on the bulleye within enrichment, triple pane
   componentDidUpdate(prevProps) {
     if (this.props.pepplotTest !== prevProps.pepplotTest) {
       const s = this.props.pepplotStudy || '';
@@ -236,7 +226,7 @@ class PepplotSearchCriteria extends Component {
         this.setState({
           uAnchorP: t,
         });
-        this.state.pepplotResultsErrorCb(true);
+        this.props.onSearchTransitionPepplot(true);
         cancelRequestPSCGetTestData();
         let cancelToken = new CancelToken(e => {
           cancelRequestPSCGetTestData = e;
@@ -246,7 +236,7 @@ class PepplotSearchCriteria extends Component {
             m,
             t,
             s + 'plots',
-            this.state.pepplotResultsErrorCb,
+            this.props.onSearchTransitionPepplot,
             cancelToken,
           )
           .then(dataFromService => {
@@ -356,7 +346,7 @@ class PepplotSearchCriteria extends Component {
       },
       true,
     );
-    this.state.pepplotResultsErrorCb(true);
+    this.props.onSearchTransitionPepplot(true);
     cancelRequestPSCGetTestData();
     let cancelToken = new CancelToken(e => {
       cancelRequestPSCGetTestData = e;
@@ -366,7 +356,7 @@ class PepplotSearchCriteria extends Component {
         this.props.pepplotModel,
         value,
         this.props.pepplotStudy + 'plots',
-        this.state.pepplotResultsErrorCb,
+        this.props.onSearchTransitionPepplot,
         cancelToken,
       )
       .then(dataFromService => {
@@ -418,8 +408,8 @@ class PepplotSearchCriteria extends Component {
     };
   };
 
-  handleMultisetCloseError = () => {
-    this.props.onSearchTransition(false);
+  handleMultisetPCloseError = () => {
+    this.props.onSearchTransitionPepplot(false);
     this.setState(
       {
         multisetFiltersVisibleP: true,
@@ -438,7 +428,7 @@ class PepplotSearchCriteria extends Component {
       },
       true,
     );
-    this.state.pepplotResultsErrorCb(true);
+    this.props.onSearchTransitionPepplot(true);
     cancelRequestPSCGetTestData();
     let cancelToken = new CancelToken(e => {
       cancelRequestPSCGetTestData = e;
@@ -448,7 +438,7 @@ class PepplotSearchCriteria extends Component {
         this.props.pepplotModel,
         value,
         this.props.pepplotStudy + 'plots',
-        this.handleMultisetCloseError,
+        this.handleMultisetPCloseError,
         cancelToken,
       )
       .then(dataFromService => {
@@ -583,7 +573,7 @@ class PepplotSearchCriteria extends Component {
         this.props.pepplotTest,
         this.jsonToList(eOperatorP),
         this.jsonToList(eColP),
-        this.state.pepplotResultsErrorCb,
+        this.props.onSearchTransitionPepplot,
         cancelToken,
       )
       .then(inferenceData => {

@@ -38,7 +38,7 @@ class Enrichment extends Component {
 
   state = {
     isValidSearchEnrichment: false,
-    isSearching: false,
+    isSearchingEnrichment: false,
     enrichmentIcon: '',
     enrichmentIconText: '',
     enrichmentResults: [],
@@ -309,9 +309,9 @@ class Enrichment extends Component {
       });
   };
 
-  handleSearchTransition = bool => {
+  handleSearchTransitionEnrichment = bool => {
     this.setState({
-      isSearching: bool,
+      isSearchingEnrichment: bool,
     });
   };
 
@@ -324,7 +324,7 @@ class Enrichment extends Component {
       networkGraphReady: false,
       enrichmentResults: searchResults.enrichmentResults,
       enrichmentColumns: columns,
-      isSearching: false,
+      isSearchingEnrichment: false,
       isValidSearchEnrichment: true,
       plotButtonActive: false,
       visible: false,
@@ -982,7 +982,6 @@ class Enrichment extends Component {
     test,
   ) => {
     this.testSelectedTransition(true);
-    debugger;
     const TestSiteVar = `${test}:${dataItem.Description}`;
     this.handleSearchCriteriaChange(
       {
@@ -1607,7 +1606,10 @@ class Enrichment extends Component {
           ></SplitPanesContainer>
         </div>
       );
-    } else if (this.state.isValidSearchEnrichment && !this.state.isSearching) {
+    } else if (
+      this.state.isValidSearchEnrichment &&
+      !this.state.isSearchingEnrichment
+    ) {
       const TableAndNetworkPanes = this.getTableAndNetworkPanes();
       return (
         <Tab
@@ -1628,7 +1630,7 @@ class Enrichment extends Component {
           }}
         />
       );
-    } else if (this.state.isSearching) {
+    } else if (this.state.isSearchingEnrichment) {
       return <TransitionActive />;
     } else return <TransitionStill />;
   };
@@ -1867,7 +1869,9 @@ class Enrichment extends Component {
             <EnrichmentSearchCriteria
               {...this.state}
               {...this.props}
-              onSearchTransition={this.handleSearchTransition}
+              onSearchTransitionEnrichment={
+                this.handleSearchTransitionEnrichment
+              }
               onEnrichmentSearch={this.handleEnrichmentSearch}
               onSearchCriteriaChange={this.handleSearchCriteriaChange}
               onSearchCriteriaReset={this.hideEGrid}

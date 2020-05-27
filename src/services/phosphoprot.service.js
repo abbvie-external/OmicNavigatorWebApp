@@ -61,7 +61,7 @@ class PhosphoprotService {
               params: { digits: 10 },
               responseType: 'text',
               cancelToken,
-              timeout: 8000,
+              timeout: 15000,
             })
             .then(response => resolve(response.data))
             .catch(function(thrown) {
@@ -100,7 +100,7 @@ class PhosphoprotService {
             .get(url, {
               responseType: 'text',
               cancelToken,
-              timeout: 8000,
+              timeout: 15000,
             })
             .then(response => resolve(response.data))
             .catch(function(thrown) {
@@ -196,7 +196,7 @@ class PhosphoprotService {
             .get(session.getLoc() + 'graphics/1/svg', {
               responseType: 'text',
               cancelToken,
-              timeout: 16000,
+              timeout: 15000,
             })
             .then(response => resolve(response))
             .catch(function(thrown) {

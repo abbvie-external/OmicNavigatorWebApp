@@ -138,11 +138,11 @@ class PepplotResults extends Component {
     });
   };
 
-  handleItemSelected = bool => {
-    this.setState({
-      isItemSelected: bool,
-    });
-  };
+  // handleGetPlotError = bool => {
+  //   this.setState({
+  //     isItemSelected: bool,
+  //   });
+  // };
 
   getProteinData = (id, dataItem, getPlotCb, imageInfo) => {
     this.setState({
@@ -208,7 +208,7 @@ class PepplotResults extends Component {
     getPlotCb(id, plotType, pepplotStudy, imageInfo, handleSVGCb);
     if (pepplotModel !== 'Differential Expression') {
       phosphoprotService
-        .getSiteData(id, pepplotStudy + 'plots', this.handleTreeDataError)
+        .getSiteData(id, pepplotStudy + 'plots', this.handleGetSiteDataError)
         .then(treeDataResponse => {
           this.setState({
             treeDataRaw: treeDataResponse,
@@ -241,7 +241,7 @@ class PepplotResults extends Component {
         });
     } else {
       phosphoprotService
-        .getProteinData(id, pepplotStudy + 'plots', this.handleTreeDataError)
+        .getProteinData(id, pepplotStudy + 'plots', this.handleGetSiteDataError)
         .then(proteinDataResponse => {
           this.setState({
             treeDataRaw: proteinDataResponse,
@@ -275,7 +275,7 @@ class PepplotResults extends Component {
     }
   };
 
-  handleTreeDataError = bool => {
+  handleGetSiteDataError = bool => {
     this.setState({
       isProteinDataLoaded: true,
       treeDataRaw: [],
@@ -305,7 +305,6 @@ class PepplotResults extends Component {
     // } else {
     //   PepplotPlotSVGWidth = PepplotPlotSVGHeight * 1.41344;
     // }
-    let handleItemSelectedCb = this.handleItemSelected;
     cancelRequestPepplotResultsGetPlot();
     let cancelToken = new CancelToken(e => {
       cancelRequestPepplotResultsGetPlot = e;
@@ -316,7 +315,7 @@ class PepplotResults extends Component {
           id,
           plotType[i],
           pepplotStudy + 'plots',
-          handleItemSelectedCb,
+          undefined,
           cancelToken,
         )
         .then(svgMarkupObj => {
@@ -357,7 +356,6 @@ class PepplotResults extends Component {
         })
         .catch(error => {
           console.error('Error during getPlot', error);
-          // this.handleItemSelected(false);
         });
     });
   };
