@@ -254,7 +254,11 @@ class Enrichment extends Component {
     // let xLargest = 0;
     // let imageInfo = { key: '', title: '', svg: [] };
     phosphoprotService
-      .getDatabaseInfo(enrichmentStudy + 'plots', enrichmentAnnotation)
+      .getDatabaseInfo(
+        enrichmentStudy + 'plots',
+        enrichmentAnnotation,
+        this.handleGetDatabaseInfoError,
+      )
       .then(annotationDataResponse => {
         const annotationDataParsed = JSON.parse(annotationDataResponse);
         self.setState({
@@ -955,6 +959,19 @@ class Enrichment extends Component {
     });
   };
 
+  handleGetDatabaseInfoError = () => {
+    this.testSelectedTransition(false);
+    this.handleSearchCriteriaChange(
+      {
+        enrichmentStudy: this.props.enrichmentStudy || '',
+        enrichmentModel: this.props.enrichmentModel || '',
+        enrichmentAnnotation: this.props.enrichmentAnnotation || '',
+        enrichmentDescriptionAndTest: '',
+      },
+      false,
+    );
+  };
+
   testSelected = (
     enrichmentStudy,
     enrichmentModel,
@@ -963,6 +980,7 @@ class Enrichment extends Component {
     test,
   ) => {
     this.testSelectedTransition(true);
+    debugger;
     const TestSiteVar = `${test}:${dataItem.Description}`;
     this.handleSearchCriteriaChange(
       {
@@ -977,7 +995,11 @@ class Enrichment extends Component {
     // let imageInfo = { key: '', title: '', svg: [] };
     // if (this.state.annotationData.length === 0) {
     phosphoprotService
-      .getDatabaseInfo(enrichmentStudy + 'plots', enrichmentAnnotation)
+      .getDatabaseInfo(
+        enrichmentStudy + 'plots',
+        enrichmentAnnotation,
+        this.handleGetDatabaseInfoError,
+      )
       .then(annotationDataResponse => {
         const annotationDataParsed = JSON.parse(annotationDataResponse);
         this.setState({
