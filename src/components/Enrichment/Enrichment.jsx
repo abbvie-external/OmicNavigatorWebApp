@@ -282,11 +282,12 @@ class Enrichment extends Component {
 
         phosphoprotService
           .getBarcodeData(
-            enrichmentStudy + 'plots',
+            enrichmentStudy + 'plot',
             enrichmentModel,
             enrichmentAnnotation,
             test,
             dataItem.Annotation,
+            this.handleGetBarcodeDataError,
           )
           .then(barcodeDataResponse => {
             let BardcodeInfoObj = JSON.parse(barcodeDataResponse['object']);
@@ -639,7 +640,7 @@ class Enrichment extends Component {
         '',
         pValueTypeParam,
         enrichmentStudy + 'plots',
-        this.handleNetworkError,
+        this.handleGetEnrichmentNetworkError,
       )
       .then(EMData => {
         this.setState({
@@ -689,8 +690,7 @@ class Enrichment extends Component {
       });
   };
 
-  handleNetworkError = () => {
-    debugger;
+  handleGetEnrichmentNetworkError = () => {
     this.setState({
       networkSettings: {
         ...this.state.networkSettings,
@@ -698,8 +698,6 @@ class Enrichment extends Component {
         propLabel: [],
         propData: [],
       },
-      // networkDataLoaded: false,
-      // networkGraphReady: true,
       networkDataError: true,
     });
   };
@@ -971,6 +969,10 @@ class Enrichment extends Component {
       false,
     );
   };
+  // redundant, may need more to this, so will wait to remove
+  handleGetBarcodeDataError = () => {
+    this.handleGetDatabaseInfoError();
+  };
 
   testSelected = (
     enrichmentStudy,
@@ -1029,6 +1031,7 @@ class Enrichment extends Component {
             enrichmentAnnotation,
             test,
             dataItem.Annotation,
+            this.handleGetBarcodeDataError,
           )
           .then(barcodeDataResponse => {
             let BardcodeInfoObj = JSON.parse(barcodeDataResponse['object']);
