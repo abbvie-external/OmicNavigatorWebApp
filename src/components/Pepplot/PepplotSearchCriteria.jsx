@@ -408,6 +408,14 @@ class PepplotSearchCriteria extends Component {
     };
   };
 
+  handleMultisetPOpenError = () => {
+    cancelRequestInferenceMultisetPlot();
+    this.setState({
+      multisetFiltersVisibleP: false,
+    });
+    console.log('Error during getMultisetInferenceData');
+  };
+
   handleMultisetPCloseError = () => {
     this.props.onSearchTransitionPepplot(false);
     this.setState(
@@ -417,6 +425,7 @@ class PepplotSearchCriteria extends Component {
       },
       this.updateQueryDataP(),
     );
+    console.log('Error during getPlot');
   };
 
   multisetTriggeredTestChange = (name, value) => {
@@ -573,7 +582,7 @@ class PepplotSearchCriteria extends Component {
         this.props.pepplotTest,
         this.jsonToList(eOperatorP),
         this.jsonToList(eColP),
-        this.props.onSearchTransitionPepplot,
+        this.handleMultisetPOpenError,
         cancelToken,
       )
       .then(inferenceData => {

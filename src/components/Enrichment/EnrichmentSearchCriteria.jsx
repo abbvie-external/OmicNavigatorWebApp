@@ -430,6 +430,14 @@ class EnrichmentSearchCriteria extends Component {
     };
   };
 
+  handleMultisetEOpenError = () => {
+    cancelRequestEnrichmentMultisetPlot();
+    this.setState({
+      multisetFiltersVisible: false,
+    });
+    console.log('Error during getMultisetEnrichmentData');
+  };
+
   handleMultisetECloseError = () => {
     this.props.onSearchTransitionEnrichment(false);
     this.setState(
@@ -439,6 +447,7 @@ class EnrichmentSearchCriteria extends Component {
       },
       this.updateQueryData(),
     );
+    console.log('Error during getAnnotationData');
   };
 
   multisetTriggeredAnnotationChange = (name, value) => {
@@ -460,7 +469,7 @@ class EnrichmentSearchCriteria extends Component {
       .getAnnotationData(
         this.props.enrichmentModel,
         value,
-        this.props.enrichmentStudy + 'plot',
+        this.props.enrichmentStudy + 'plots',
         this.props.pValueType,
         this.handleMultisetECloseError,
         cancelToken,
@@ -571,7 +580,6 @@ class EnrichmentSearchCriteria extends Component {
     const eMust = this.state.uSettings.must;
     const eNot = this.state.uSettings.not;
     const eOperator = this.state.selectedOperator;
-
     this.getMultisetPlot(
       eSigV,
       this.props.enrichmentModel,
@@ -594,7 +602,7 @@ class EnrichmentSearchCriteria extends Component {
         this.props.enrichmentAnnotation,
         this.jsonToList(eOperator),
         this.props.pValueType,
-        undefined,
+        this.handleMultisetEOpenError,
         cancelToken,
       )
       .then(annotationData => {
