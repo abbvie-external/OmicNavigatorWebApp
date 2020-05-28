@@ -441,6 +441,7 @@ export default class EZGrid extends PureComponent {
     this.setState(prev => {
       const columns = prev.columns.slice();
       columns.splice(newIdx, 0, columns.splice(curIdx, 1)[0]);
+      this.props.columnReorder(columns);
       return { columns };
     });
   };

@@ -4,12 +4,7 @@ import * as d3 from 'd3';
 
 class PepplotVolcanoPlot extends Component{
     state = {
-        volcanoWidth: 600,
-        volcanoHeight: 400,
         plotName:"pepplotVolcanoPlot",
-        xAxisLabel:null,
-        yAxisLabel:null,
-        identifier:null,
         hoveredCircleData:{
             position: [],
             id: null,
@@ -20,38 +15,18 @@ class PepplotVolcanoPlot extends Component{
         hoveredTextScalar: 12,
         tooltipPosition:null,
         brushedCirclesData:[],
-        brushing: false
+        brushing: false,
+        resize: false
     };
 
     volcanoSVGRef = React.createRef();
 
-    componentDidMount(){
-        const{pepplotResults}= this.props;
-        if(pepplotResults.length!==0){
-        const pepKeys = Object.keys(pepplotResults[0])
-        var id = null
-        var xAxis = null
-        var yAxis = null
-        //Temporarily hard coded for testing purposes.
-        //Will change to dynamic selection later.
-        if(pepKeys.includes("id")){id = "id"}
-        else if(pepKeys.includes("id_mult")){id = "id_mult"}
-        if(pepKeys.includes("logFC")){xAxis = "logFC"}
-        else if(pepKeys.includes("F")){xAxis = "F"}
-        else if(pepKeys.includes("t")){xAxis = "t"}
-        if(pepKeys.includes("adj_P_Val")){yAxis = "adj_P_Val"}
-        else if(pepKeys.includes("P_Value")){yAxis = "P_Value"}
-        this.setState({
-            identifier: id,
-            xAxisLabel: xAxis,
-            yAxisLabel: yAxis
-        })
-        }
-    }
-
-    componentDidUpdate(){
-        const{selectedFromTableData} = this.props;
+    componentDidUpdate(prevProps){
+        const{selectedFromTableData, volcanoWidth, pepplotResultsUnfiltered, xAxisLabel} = this.props;
         const circles = d3.selectAll('circle.volcanoPlot-dataPoint');
+        if(prevProps.volcanoWidth !== volcanoWidth){
+            this.setState({resize:true})
+        }
         circles.classed('highlighted', false);
         selectedFromTableData.forEach(element => {
             const circleid = `${element.id_mult}`;
@@ -60,18 +35,15 @@ class PepplotVolcanoPlot extends Component{
               .classed('highlighted', true)
         });
     }
-
-    getMaxAndMin(element){
-        const{pepplotResults} = this.props;
-        var values = [pepplotResults[0][element],pepplotResults[0][element]];
-        for(var i = 1; i<pepplotResults.length; i++){
-            if(pepplotResults[i][element]> values[1]){
-                values[1] = pepplotResults[i][element];
-            }else if(pepplotResults[i][element]< values[0]){
-                values[0] = pepplotResults[i][element]
-            }
+    doTransform(value, axis){
+        const{doXAxisTransformation,doYAxisTransformation} = this.props;
+        if(axis === "x" && doXAxisTransformation){
+            return(-Math.log10(value))
+        }else if(axis==="y" && doYAxisTransformation){
+            return(-Math.log10(value))
+        }else{
+            return value
         }
-        return(values)
     }
 
     unhighlightBrushedCircles = () => {
@@ -117,22 +89,27 @@ class PepplotVolcanoPlot extends Component{
         const{
             hoveredCircleData,
             hovering,
-            hoveredTextScalar,
-            identifier,
-            xAxisLabel,
-            yAxisLabel
+            hoveredTextScalar
         } = this.state;
+        const{
+            xAxisLabel,
+            yAxisLabel,
+            identifier,
+            doXAxisTransformation,
+            doYAxisTransformation
+        } = this.props;
+        
         if(hovering){
             const idText = identifier+": "+hoveredCircleData.id;
-            const xText = xAxisLabel+": "+hoveredCircleData.xstat;
-            const yText = yAxisLabel+": "+hoveredCircleData.ystat;
+            const xText = doXAxisTransformation? "-log("+xAxisLabel+"): "+parseFloat(hoveredCircleData.xstat).toFixed(4) : xAxisLabel+": "+parseFloat(hoveredCircleData.xstat).toFixed(4);
+            const yText = doYAxisTransformation? "-log("+yAxisLabel+"): "+parseFloat(hoveredCircleData.ystat).toFixed(4) : yAxisLabel+": "+parseFloat(hoveredCircleData.ystat).toFixed(4);
             return(
                     <text fontSize="14px" fontWeight="bold">
                         <tspan x={hoveredCircleData.position[0]*1+10} y={hoveredCircleData.position[1]}>{idText}</tspan>
                         <tspan x={hoveredCircleData.position[0]*1+10} y={hoveredCircleData.position[1]*1+hoveredTextScalar}>{xText}</tspan>
                         <tspan x={hoveredCircleData.position[0]*1+10} y={hoveredCircleData.position[1]*1+2*hoveredTextScalar}>{yText}</tspan>
                     </text>
-                    )
+                )
         }else{
             return(null);
         }        
@@ -194,7 +171,6 @@ class PepplotVolcanoPlot extends Component{
         if (d3.selectAll('.brush').nodes().length > 0) {
             d3.selectAll('.brush').remove();
         }
-
         objsBrush = d3
             .brush()
             .extent([
@@ -204,6 +180,7 @@ class PepplotVolcanoPlot extends Component{
             .on('start', brushingStart)
             .on('brush', highlightBrushedCircles)
             .on('end', endBrush);
+            
         d3.selectAll(".volcanoPlotD3BrushSelection").call(objsBrush);
     }
 
@@ -215,22 +192,33 @@ class PepplotVolcanoPlot extends Component{
 
     render(){
         const{
+            pepplotResults,
             volcanoWidth,
             volcanoHeight,
+            pepplotResultsUnfiltered,
             xAxisLabel,
             yAxisLabel,
-            identifier
-        } = this.state;
-        const{pepplotResults} = this.props;
+            identifier,
+            doXAxisTransformation,
+            doYAxisTransformation
+        } = this.props;
+
+        if(pepplotResultsUnfiltered.length ===0){
+            return(null)
+        }
+        var xMM=this.props.getMaxAndMin(pepplotResultsUnfiltered, xAxisLabel);
+        var yMM=this.props.getMaxAndMin(pepplotResultsUnfiltered, yAxisLabel);
+        xMM = [this.doTransform(xMM[0], "x"),this.doTransform(xMM[1], "x")]
+        yMM = [this.doTransform(yMM[0], "y"),this.doTransform(yMM[1], "y")]
 
         const xScale = d3
             .scaleLinear()
-            .domain(this.getMaxAndMin(xAxisLabel))
+            .domain([Math.min(...xMM), Math.max(...xMM)])
             .range([volcanoWidth*.1, volcanoWidth]);
 
         const yScale = d3
             .scaleLinear()
-            .domain(this.getMaxAndMin(yAxisLabel))
+            .domain([Math.min(...yMM), Math.max(...yMM)])
             .range([volcanoHeight*.9, 0]);
 
         const yAxis = <line
@@ -299,7 +287,16 @@ class PepplotVolcanoPlot extends Component{
               </text>
             </g>
           ));
-        
+        var filteredOutPlotCircles = null;
+        if(pepplotResultsUnfiltered.length !== pepplotResults.length){
+            filteredOutPlotCircles = pepplotResultsUnfiltered.map(val => (<circle
+                cx={`${xScale(this.doTransform(val[xAxisLabel], "x"))}`}
+                cy={`${yScale(this.doTransform(val[yAxisLabel], "y"))}`}
+                key={`${val[identifier]}`}
+                r={2}
+                opacity={.3}
+            ></circle>));
+        }
         const plotCircles = pepplotResults.map(val => (<circle
                 r={2}
                 className="volcanoPlot-dataPoint"
@@ -309,22 +306,26 @@ class PepplotVolcanoPlot extends Component{
                 data={`${JSON.stringify(val)}`}
                 onMouseEnter={e => this.handleCircleHover(e)}
                 onMouseLeave={()=>this.handleCircleLeave()}
-                xstatistic={`${val[xAxisLabel]}`}
-                ystatistic={`${val[yAxisLabel]}`}
-                cx={`${xScale(val[xAxisLabel])}`}
-                cy={`${yScale(val[yAxisLabel])}`}
-                cursor="crosshair"
+                onClick={e=>this.props.handleRowClick(e, JSON.parse(e.target.attributes.data.value),0)}
+                xstatistic={`${this.doTransform(val[xAxisLabel], "x")}`}
+                ystatistic={`${this.doTransform(val[yAxisLabel], "y")}`}
+                cx={`${xScale(this.doTransform(val[xAxisLabel], "x"))}`}
+                cy={`${yScale(this.doTransform(val[yAxisLabel], "y"))}`}
+                cursor="pointer"
         ></circle>
         ));
 
         const hoveredCircleTooltip = this.getToolTip();
 
         this.setupBrush(volcanoWidth, volcanoHeight);
+
+        const xAxisText = doXAxisTransformation ? "-log("+xAxisLabel+")":xAxisLabel;
+        const yAxisText = doYAxisTransformation ? "-log("+yAxisLabel+")":yAxisLabel;
         
         if(identifier !== null && xAxisLabel !== null && yAxisLabel !== null){
         return(
-        <div className="volcanoPlotContainer">
-            <svg id="pepplotVolcanoPlot"
+        <div className="volcanoPlotContainer" style={this.props.selectedFromTableData.length === 1 && this.props.isProteinSVGLoaded?{float:"left"}:{float:"none"}}>
+        <svg id="pepplotVolcanoPlot"
                 className="volcanoPlotSVG"
                 width={volcanoWidth} 
                 height={volcanoHeight}
@@ -336,15 +337,23 @@ class PepplotVolcanoPlot extends Component{
                 {xAxis}
                 {/*X Axis Label*/}
                 <text className="axisLabel" transform={`translate(${volcanoWidth / 2}, ${volcanoHeight})`}>
-                    {xAxisLabel}
+                    {xAxisText}
                 </text>
                 {/*Y Axis Label*/}
                 <text className="axisLabel" transform={`rotate(-90,0,${volcanoHeight*.5})`} x="0" y={`${volcanoHeight*.5}`}>
-                    {yAxisLabel}
+                    {yAxisText}
                 </text>
 
                 {xPlotTicks}
-                {yPlotTicks}
+                {yPlotTicks}                
+                <filter id="constantOpacity">
+                <feComponentTransfer>
+                    <feFuncA type="table" tableValues="0 .3 .3" />
+                </feComponentTransfer>
+                </filter>
+                <g filter="url(#constantOpacity)">
+                    {filteredOutPlotCircles}
+                </g>
                 {plotCircles}
                 {hoveredCircleTooltip}
             </svg>

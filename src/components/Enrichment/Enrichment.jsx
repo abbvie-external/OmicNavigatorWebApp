@@ -304,12 +304,13 @@ class Enrichment extends Component {
   };
 
   handleEnrichmentSearch = searchResults => {
-    const columns = this.getConfigCols(searchResults);
+    //const columns = this.getConfigCols(searchResults);
+    if(this.state.enrichmentColumns.length === 0){this.handleColumns(searchResults)}
     this.getNetworkData();
     this.setState({
       networkGraphReady: false,
       enrichmentResults: searchResults.enrichmentResults,
-      enrichmentColumns: columns,
+      //enrichmentColumns: columns,
       isSearching: false,
       isValidSearchEnrichment: true,
       plotButtonActive: false,
@@ -318,6 +319,10 @@ class Enrichment extends Component {
       isTestDataLoaded: false,
     });
   };
+  handleColumns = searchResults => {
+    const columns = this.getConfigCols(searchResults);
+    this.setState({enrichmentColumns: columns});
+  }
 
   handleSearchCriteriaChange = (changes, scChange) => {
     this.props.onSearchCriteriaToTop(changes, 'enrichment');
@@ -1521,6 +1526,19 @@ class Enrichment extends Component {
       itemsPerPageInformedEnrichmentMain: items,
     });
   };
+  columnReorder = columns =>{
+    this.setState({enrichmentColumns: columns})
+    const columnsArr = columns.map(e=>{return e.title})
+    const uDataRelevantFields = _.filter(columnsArr, function(key) {
+      return key !== 'Description' && key !== 'Annotation';
+    });
+    // multiset svg rebuilds based on uData...if there are no results we need to override this from being passed down
+    if (uDataRelevantFields.length !== 0) {
+      this.setState({
+        uData: uDataRelevantFields,
+      });
+    }
+  }
 
   handleTableNetworkTabChange = (e, { activeIndex }) => {
     sessionStorage.setItem(`enrichmentViewTab`, activeIndex);
@@ -1615,6 +1633,7 @@ class Enrichment extends Component {
             <EnrichmentResultsTable
               {...this.props}
               {...this.state}
+              columnReorder={this.columnReorder}
               onHandlePlotAnimation={this.handlePlotAnimation}
               onDisplayViolinPlot={this.displayViolinPlot}
             />
@@ -1820,6 +1839,7 @@ class Enrichment extends Component {
               {...this.props}
               onSearchTransition={this.handleSearchTransition}
               onEnrichmentSearch={this.handleEnrichmentSearch}
+              onColumns={this.handleColumns}
               onSearchCriteriaChange={this.handleSearchCriteriaChange}
               onSearchCriteriaReset={this.hideEGrid}
               onDisablePlot={this.disablePlot}

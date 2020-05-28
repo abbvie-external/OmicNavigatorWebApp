@@ -304,6 +304,9 @@ class EnrichmentSearchCriteria extends Component {
         this.props.onEnrichmentSearch({
           enrichmentResults: this.annotationdata,
         });
+        this.props.onColumns({
+          enrichmentResults: this.annotationdata,
+        });
       });
   };
 

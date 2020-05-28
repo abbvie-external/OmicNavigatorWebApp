@@ -35,7 +35,7 @@ class EnrichmentMultisetFilters extends Component {
       selectedCol,
       selectedOperator
     } = this.props;
-    if (uSettings !== prevProps.uSettings) {
+    if (uSettings !== prevProps.uSettings || prevProps.uData !== this.props.uData) {
       this.makeMultiset(
         uData,
         uAnchor,

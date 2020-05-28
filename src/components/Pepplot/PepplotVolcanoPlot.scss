@@ -1,11 +1,10 @@
-.volcanoPlotContainer{
-    padding-top: 10px;
-}
+// .volcanoPlotContainer{
+//     margin: 0 auto;
+// }
 
 .volcanoPlotSVG{
-    position: relative;
+    margin: 0 auto;
     display: block;
-    margin: auto;
 }
 
 .volcanoPlotYAxis{
@@ -33,5 +32,4 @@
 .volcanoPlot-dataPoint.highlighted {
     stroke: orangered;
     stroke-width: 4;
-    z-index: 100;
 }

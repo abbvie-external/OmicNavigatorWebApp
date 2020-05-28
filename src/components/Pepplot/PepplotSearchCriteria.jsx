@@ -168,9 +168,8 @@ class PepplotSearchCriteria extends Component {
             },
           });
           this.testdata = dataFromService;
-          this.props.onPepplotSearch({
-            pepplotResults: this.testdata,
-          });
+          this.props.onPepplotSearchUnfiltered({pepplotResults: this.testdata})
+          this.props.onPepplotSearch({pepplotResults: this.testdata});
         });
     }
     this.populateStudies();
@@ -248,9 +247,8 @@ class PepplotSearchCriteria extends Component {
               },
             });
             this.testdata = dataFromService;
-            this.props.onPepplotSearch({
-              pepplotResults: this.testdata,
-            });
+            this.props.onPepplotSearchUnfiltered({pepplotResults: this.testdata})
+            this.props.onPepplotSearch({pepplotResults: this.testdata});
           });
       }
       this.populateStudies();
@@ -328,6 +326,7 @@ class PepplotSearchCriteria extends Component {
       reloadPlot: true,
       multisetFiltersVisibleP: false,
     });
+    this.props.onMultisetQueried(false);
     this.props.onSearchCriteriaChange(
       {
         pepplotStudy: this.props.pepplotStudy,
@@ -362,7 +361,8 @@ class PepplotSearchCriteria extends Component {
           uAnchorP: value,
         });
         this.testdata = dataFromService;
-        this.props.onPepplotSearch({ pepplotResults: this.testdata });
+        this.props.onPepplotSearchUnfiltered({pepplotResults: this.testdata})
+        this.props.onPepplotSearch({pepplotResults: this.testdata});
       });
   };
 
@@ -417,9 +417,8 @@ class PepplotSearchCriteria extends Component {
       )
       .then(dataFromService => {
         this.testdata = dataFromService;
-        this.props.onPepplotSearch({
-          pepplotResults: this.testdata,
-        });
+        this.props.onPepplotSearchUnfiltered({pepplotResults: this.testdata})
+        this.props.onPepplotSearch({pepplotResults: this.testdata});        
       });
   };
 
