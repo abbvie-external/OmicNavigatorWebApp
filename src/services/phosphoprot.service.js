@@ -33,6 +33,7 @@ class PhosphoprotService {
           if (handleError !== undefined) {
             handleError(false);
           }
+          console.log(`${error.statusText}: ${error.responseText}`);
         });
     });
   }
@@ -72,6 +73,7 @@ class PhosphoprotService {
                 if (handleError !== undefined) {
                   handleError(false);
                 }
+                console.log(`${thrown.message}`);
               }
             });
         })
@@ -82,11 +84,11 @@ class PhosphoprotService {
         //     .then(response => resolve(response));
         // })
         .catch(error => {
-          // toast.error('Failed to retrieve data, please try again.');
           toast.error(`${error.statusText}: ${error.responseText}`);
           if (handleError !== undefined) {
             handleError(false);
           }
+          console.log(`${error.statusText}: ${error.responseText}`);
         });
     });
   }
@@ -111,15 +113,16 @@ class PhosphoprotService {
                 if (handleError !== undefined) {
                   handleError(false);
                 }
+                console.log(`${thrown.message}`);
               }
             });
         })
         .catch(error => {
-          // toast.error('Failed to retrieve data, please try again.');
           toast.error(`${error.statusText}: ${error.responseText}`);
           if (handleError !== undefined) {
             handleError(false);
           }
+          console.log(`${error.statusText}: ${error.responseText}`);
         });
     });
   }
@@ -207,15 +210,16 @@ class PhosphoprotService {
                 if (handleError !== undefined) {
                   handleError(false);
                 }
+                console.log(`${thrown.message}`);
               }
             });
         })
         .catch(error => {
-          // toast.error('Failed to retrieve plot, please try again.');
           toast.error(`${error.statusText}: ${error.responseText}`);
           if (handleError !== undefined) {
             handleError(false);
           }
+          console.log(`${error.statusText}: ${error.responseText}`);
         });
     });
   }
