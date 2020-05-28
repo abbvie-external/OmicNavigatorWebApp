@@ -282,7 +282,7 @@ class Enrichment extends Component {
 
         phosphoprotService
           .getBarcodeData(
-            enrichmentStudy + 'plot',
+            enrichmentStudy + 'plots',
             enrichmentModel,
             enrichmentAnnotation,
             test,
