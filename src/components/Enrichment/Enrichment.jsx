@@ -268,7 +268,6 @@ class Enrichment extends Component {
           Description: dataItem.Description,
         }).Key;
         let term = dataItem.Annotation;
-
         self.setState({
           imageInfo: {
             ...self.state.imageInfo,
