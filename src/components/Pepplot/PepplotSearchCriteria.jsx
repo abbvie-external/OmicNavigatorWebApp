@@ -94,7 +94,6 @@ class PepplotSearchCriteria extends Component {
     multisetFiltersVisibleP: false,
     activateMultisetFiltersP: false,
     uDataP: [],
-    pepplotResultsErrorCb: this.props.onSearchTransition || undefined,
   };
 
   componentDidMount() {
@@ -131,6 +130,9 @@ class PepplotSearchCriteria extends Component {
               uDataP: uDataPArr,
             });
           }
+        })
+        .catch(error => {
+          console.error('Error during getModelNames', error);
         });
     }
 
@@ -147,19 +149,9 @@ class PepplotSearchCriteria extends Component {
       this.setState({
         uAnchorP: t,
       });
-      this.state.pepplotResultsErrorCb(true);
-      cancelRequestPSCGetTestData();
-      let cancelToken = new CancelToken(e => {
-        cancelRequestPSCGetTestData = e;
-      });
+      this.props.onSearchTransitionPepplot(true);
       phosphoprotService
-        .getTestData(
-          m,
-          t,
-          s + 'plots',
-          this.state.pepplotResultsErrorCb,
-          cancelToken,
-        )
+        .getTestData(m, t, s + 'plots', this.props.onSearchTransitionPepplot)
         .then(dataFromService => {
           this.setState({
             uSettingsP: {
@@ -171,11 +163,15 @@ class PepplotSearchCriteria extends Component {
           this.props.onPepplotSearch({
             pepplotResults: this.testdata,
           });
+        })
+        .catch(error => {
+          console.error('Error during getTestData', error);
         });
     }
     this.populateStudies();
   }
 
+  // used when test is updated by clicking on the bulleye within enrichment, triple pane
   componentDidUpdate(prevProps) {
     if (this.props.pepplotTest !== prevProps.pepplotTest) {
       const s = this.props.pepplotStudy || '';
@@ -212,6 +208,9 @@ class PepplotSearchCriteria extends Component {
                 uDataP: uDataPArr,
               });
             }
+          })
+          .catch(error => {
+            console.error('Error during getModelNames', error);
           });
       }
       if (t !== '') {
@@ -227,7 +226,7 @@ class PepplotSearchCriteria extends Component {
         this.setState({
           uAnchorP: t,
         });
-        this.state.pepplotResultsErrorCb(true);
+        this.props.onSearchTransitionPepplot(true);
         cancelRequestPSCGetTestData();
         let cancelToken = new CancelToken(e => {
           cancelRequestPSCGetTestData = e;
@@ -237,7 +236,7 @@ class PepplotSearchCriteria extends Component {
             m,
             t,
             s + 'plots',
-            this.state.pepplotResultsErrorCb,
+            this.props.onSearchTransitionPepplot,
             cancelToken,
           )
           .then(dataFromService => {
@@ -251,6 +250,9 @@ class PepplotSearchCriteria extends Component {
             this.props.onPepplotSearch({
               pepplotResults: this.testdata,
             });
+          })
+          .catch(error => {
+            console.error('Error during getTestData', error);
           });
       }
       this.populateStudies();
@@ -258,14 +260,19 @@ class PepplotSearchCriteria extends Component {
   }
 
   populateStudies = () => {
-    phosphoprotService.getStudies().then(studiesFromService => {
-      const studiesArr = studiesFromService.map(study => {
-        return { key: study, text: study, value: study };
+    phosphoprotService
+      .getStudies()
+      .then(studiesFromService => {
+        const studiesArr = studiesFromService.map(study => {
+          return { key: study, text: study, value: study };
+        });
+        this.setState({
+          pepplotStudies: studiesArr,
+        });
+      })
+      .catch(error => {
+        console.error('Error during getStudies', error);
       });
-      this.setState({
-        pepplotStudies: studiesArr,
-      });
-    });
   };
 
   handleStudyChange = (evt, { name, value }) => {
@@ -297,6 +304,9 @@ class PepplotSearchCriteria extends Component {
           pepplotModelsDisabled: false,
           pepplotModels: modelsArr,
         });
+      })
+      .catch(error => {
+        console.error('Error during getModelNames', error);
       });
   };
 
@@ -336,7 +346,7 @@ class PepplotSearchCriteria extends Component {
       },
       true,
     );
-    this.state.pepplotResultsErrorCb(true);
+    this.props.onSearchTransitionPepplot(true);
     cancelRequestPSCGetTestData();
     let cancelToken = new CancelToken(e => {
       cancelRequestPSCGetTestData = e;
@@ -346,7 +356,7 @@ class PepplotSearchCriteria extends Component {
         this.props.pepplotModel,
         value,
         this.props.pepplotStudy + 'plots',
-        this.state.pepplotResultsErrorCb,
+        this.props.onSearchTransitionPepplot,
         cancelToken,
       )
       .then(dataFromService => {
@@ -363,12 +373,16 @@ class PepplotSearchCriteria extends Component {
         });
         this.testdata = dataFromService;
         this.props.onPepplotSearch({ pepplotResults: this.testdata });
+      })
+      .catch(error => {
+        console.error('Error during getTestData', error);
       });
   };
 
   handleMultisetToggle = () => {
     return evt => {
       if (this.state.multisetFiltersVisibleP === false) {
+        // on toggle open
         this.setState({
           multisetFiltersVisibleP: true,
         });
@@ -381,6 +395,7 @@ class PepplotSearchCriteria extends Component {
           selectedOperatorP: this.state.selectedOperatorP,
         });
       } else {
+        // on toggle close
         this.setState({
           multisetFiltersVisibleP: false,
           reloadPlot: true,
@@ -393,6 +408,26 @@ class PepplotSearchCriteria extends Component {
     };
   };
 
+  handleMultisetPOpenError = () => {
+    cancelRequestInferenceMultisetPlot();
+    this.setState({
+      multisetFiltersVisibleP: false,
+    });
+    console.log('Error during getMultisetInferenceData');
+  };
+
+  handleMultisetPCloseError = () => {
+    this.props.onSearchTransitionPepplot(false);
+    this.setState(
+      {
+        multisetFiltersVisibleP: true,
+        reloadPlot: true,
+      },
+      this.updateQueryDataP(),
+    );
+    console.log('Error during getPlot');
+  };
+
   multisetTriggeredTestChange = (name, value) => {
     this.props.onSearchCriteriaChange(
       {
@@ -402,17 +437,17 @@ class PepplotSearchCriteria extends Component {
       },
       true,
     );
-    this.state.pepplotResultsErrorCb(true);
+    this.props.onSearchTransitionPepplot(true);
     cancelRequestPSCGetTestData();
     let cancelToken = new CancelToken(e => {
       cancelRequestPSCGetTestData = e;
     });
     phosphoprotService
-      .getTestData(
+      .getPlot(
         this.props.pepplotModel,
         value,
         this.props.pepplotStudy + 'plots',
-        this.state.pepplotResultsErrorCb,
+        this.handleMultisetPCloseError,
         cancelToken,
       )
       .then(dataFromService => {
@@ -420,6 +455,9 @@ class PepplotSearchCriteria extends Component {
         this.props.onPepplotSearch({
           pepplotResults: this.testdata,
         });
+      })
+      .catch(error => {
+        console.error('Error during getTestData', error);
       });
   };
 
@@ -544,7 +582,7 @@ class PepplotSearchCriteria extends Component {
         this.props.pepplotTest,
         this.jsonToList(eOperatorP),
         this.jsonToList(eColP),
-        this.state.pepplotResultsErrorCb,
+        this.handleMultisetPOpenError,
         cancelToken,
       )
       .then(inferenceData => {
@@ -563,6 +601,9 @@ class PepplotSearchCriteria extends Component {
         this.props.onPepplotSearch({
           pepplotResults: multisetResultsP,
         });
+      })
+      .catch(error => {
+        console.error('Error during getMultisetInferenceData', error);
       });
   };
 
@@ -605,6 +646,9 @@ class PepplotSearchCriteria extends Component {
         this.props.onGetMultisetPlot({
           svgInfo,
         });
+      })
+      .catch(error => {
+        console.error('Error during getInferenceMultisetPlot', error);
       });
   }
 

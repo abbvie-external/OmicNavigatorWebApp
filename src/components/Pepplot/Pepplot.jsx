@@ -12,8 +12,7 @@ import TransitionStill from '../Transitions/TransitionStill';
 import ButtonActions from '../Shared/ButtonActions';
 import { formatNumberForDisplay, splitValue } from '../Shared/helpers';
 import phosphosite_icon from '../../resources/phosphosite.ico';
-import PepplotVolcano from "./PepplotVolcano";
-
+import PepplotVolcano from './PepplotVolcano';
 
 import _ from 'lodash';
 import './Pepplot.scss';
@@ -24,7 +23,7 @@ class Pepplot extends Component {
     parseInt(sessionStorage.getItem('pepplotViewTab'), 10) || 0;
   state = {
     isValidSearchPepplot: false,
-    isSearching: false,
+    isSearchingPepplot: false,
     showProteinPage: false,
     pepplotResults: [],
     pepplotColumns: [],
@@ -44,14 +43,14 @@ class Pepplot extends Component {
     svgVisible: true,
     multisetQueried: false,
     activeIndex: this.defaultActiveIndex || 0,
-    thresholdColsP: []
+    thresholdColsP: [],
   };
 
   componentDidUpdate = (prevProps, prevState) => {};
 
-  handleSearchTransition = bool => {
+  handleSearchTransitionPepplot = bool => {
     this.setState({
-      isSearching: bool,
+      isSearchingPepplot: bool,
     });
   };
 
@@ -66,7 +65,7 @@ class Pepplot extends Component {
     this.setState({
       pepplotResults: searchResults.pepplotResults,
       pepplotColumns: columns,
-      isSearching: false,
+      isSearchingPepplot: false,
       isValidSearchPepplot: true,
       showProteinPage: false,
       plotButtonActive: false,
@@ -125,7 +124,7 @@ class Pepplot extends Component {
 
   getConfigCols = testData => {
     const pepResults = testData.pepplotResults;
-    const model = testData.model;
+    const model = this.props.pepplotModel;
     let initConfigCols = [];
 
     const TableValuePopupStyle = {
@@ -329,75 +328,91 @@ class Pepplot extends Component {
     if (
       this.state.isValidSearchPepplot &&
       !this.state.showProteinPage &&
-      !this.state.isSearching
+      !this.state.isSearchingPepplot
     ) {
       const TableAndPlotPanes = this.getTableAndPlotPanes();
       return (
         <Tab
-        className="TableAndPlotContainer"
-        panes={TableAndPlotPanes}
-        onTabChange={this.handleTablePlotTabChange}
-        activeIndex={this.state.activeIndex}
-        renderActiveOnly={false}
-        menu={{
-          attached: true,
-          className: 'TableAndPlotMenuContainer'
-        }}
-      />
+          className="TableAndPlotContainer"
+          panes={TableAndPlotPanes}
+          onTabChange={this.handleTablePlotTabChange}
+          activeIndex={this.state.activeIndex}
+          renderActiveOnly={false}
+          menu={{
+            attached: true,
+            className: 'TableAndPlotMenuContainer',
+          }}
+        />
       );
-    } else if (this.state.isSearching) {
+    } else if (this.state.isSearchingPepplot) {
       return <TransitionActive />;
     } else return <TransitionStill />;
   };
 
-getTableAndPlotPanes = () => {
-    return[{
-      menuItem:(<Menu.Item
-        key="0"
-        className="TableAndNPlotButtons TableButton"
-        name="Table"
-        color="orange"
-      >
-        <img
-          src={this.state.activeIndex === 0 ? tableIconSelected : tableIcon}
-          alt="Table Icon"
-          id="TableButton"
-        />
-      </Menu.Item>),
-      pane:(<Tab.Pane key="0">
-        <PepplotResults
-          {...this.state}
-          {...this.props}
-          onSearchCriteriaChange={this.handleSearchCriteriaChange}
-          onHandlePlotAnimation={this.handlePlotAnimation}
-        />
-      </Tab.Pane>)
-    },{
-      menuItem:(<Menu.Item
-        key="1"
-        className="TableAndPlotButtons PlotButton"
-        name="plot"
-        color="orange"
-      >
-        <img
-          src={this.state.activeIndex === 1 ? scatterPlotIconSelected : scatterPlotIcon}
-          alt="Plot Icon"
-          id="PlotButton"
-        />
-      </Menu.Item>),
-      pane:(<Tab.Pane key="1">
-        <div id="VolcanoPlot">
-          <PepplotVolcano
-            {...this.state}
-            {...this.props}
-            handleVolcanoPlotSelectionChange={this.handleVolcanoPlotSelectionChange}
-            onSearchCriteriaChange={this.handleSearchCriteriaChange}            
-          />
-        </div>
-    </Tab.Pane>)
-    }
-  ]
-  }
+  getTableAndPlotPanes = () => {
+    return [
+      {
+        menuItem: (
+          <Menu.Item
+            key="0"
+            className="TableAndNPlotButtons TableButton"
+            name="Table"
+            color="orange"
+          >
+            <img
+              src={this.state.activeIndex === 0 ? tableIconSelected : tableIcon}
+              alt="Table Icon"
+              id="TableButton"
+            />
+          </Menu.Item>
+        ),
+        pane: (
+          <Tab.Pane key="0">
+            <PepplotResults
+              {...this.state}
+              {...this.props}
+              onSearchCriteriaChange={this.handleSearchCriteriaChange}
+              onHandlePlotAnimation={this.handlePlotAnimation}
+            />
+          </Tab.Pane>
+        ),
+      },
+      {
+        menuItem: (
+          <Menu.Item
+            key="1"
+            className="TableAndPlotButtons PlotButton"
+            name="plot"
+            color="orange"
+          >
+            <img
+              src={
+                this.state.activeIndex === 1
+                  ? scatterPlotIconSelected
+                  : scatterPlotIcon
+              }
+              alt="Plot Icon"
+              id="PlotButton"
+            />
+          </Menu.Item>
+        ),
+        pane: (
+          <Tab.Pane key="1">
+            <div id="VolcanoPlot">
+              <PepplotVolcano
+                {...this.state}
+                {...this.props}
+                handleVolcanoPlotSelectionChange={
+                  this.handleVolcanoPlotSelectionChange
+                }
+                onSearchCriteriaChange={this.handleSearchCriteriaChange}
+              />
+            </div>
+          </Tab.Pane>
+        ),
+      },
+    ];
+  };
 
   handleTablePlotTabChange = (e, { activeIndex }) => {
     sessionStorage.setItem(`pepplotViewTab`, activeIndex);
@@ -452,7 +467,7 @@ getTableAndPlotPanes = () => {
             <PepplotSearchCriteria
               {...this.state}
               {...this.props}
-              onSearchTransition={this.handleSearchTransition}
+              onSearchTransitionPepplot={this.handleSearchTransitionPepplot}
               onPepplotSearch={this.handlePepplotSearch}
               onSearchCriteriaChange={this.handleSearchCriteriaChange}
               onSearchCriteriaReset={this.hidePGrid}

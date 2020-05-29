@@ -2,7 +2,7 @@ import DOMPurify from 'dompurify';
 import _ from 'lodash';
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import { Grid, Menu, Popup, Sidebar, Tab } from 'semantic-ui-react';
+import { Grid, Menu, Popup, Sidebar, Tab, Message } from 'semantic-ui-react';
 import { CancelToken } from 'axios';
 import go_icon from '../../resources/go.png';
 import msig_icon from '../../resources/msig.ico';
@@ -38,7 +38,7 @@ class Enrichment extends Component {
 
   state = {
     isValidSearchEnrichment: false,
-    isSearching: false,
+    isSearchingEnrichment: false,
     enrichmentIcon: '',
     enrichmentIconText: '',
     enrichmentResults: [],
@@ -68,6 +68,7 @@ class Enrichment extends Component {
     networkDataMock: {},
     networkDataLoaded: false,
     networkGraphReady: false,
+    networkDataError: false,
     tests: {},
     nodeCutoff: sessionStorage.getItem('nodeCutoff') || 0.1,
     edgeCutoff: sessionStorage.getItem('edgeCutoff') || 0.4,
@@ -253,7 +254,11 @@ class Enrichment extends Component {
     // let xLargest = 0;
     // let imageInfo = { key: '', title: '', svg: [] };
     phosphoprotService
-      .getDatabaseInfo(enrichmentStudy + 'plots', enrichmentAnnotation)
+      .getDatabaseInfo(
+        enrichmentStudy + 'plots',
+        enrichmentAnnotation,
+        this.handleGetDatabaseInfoError,
+      )
       .then(annotationDataResponse => {
         const annotationDataParsed = JSON.parse(annotationDataResponse);
         self.setState({
@@ -282,6 +287,7 @@ class Enrichment extends Component {
             enrichmentAnnotation,
             test,
             dataItem.Annotation,
+            this.handleGetBarcodeDataError,
           )
           .then(barcodeDataResponse => {
             let BardcodeInfoObj = JSON.parse(barcodeDataResponse['object']);
@@ -293,24 +299,32 @@ class Enrichment extends Component {
             // }
 
             showBarcodePlotCb(dataItem, BardcodeInfoObj, test, highest);
+          })
+          .catch(error => {
+            console.error('Error during getBarcodeData', error);
           });
+      })
+      .catch(error => {
+        console.error('Error during getDatabaseInfo', error);
       });
   };
 
-  handleSearchTransition = bool => {
+  handleSearchTransitionEnrichment = bool => {
     this.setState({
-      isSearching: bool,
+      isSearchingEnrichment: bool,
     });
   };
 
   handleEnrichmentSearch = searchResults => {
+    this.removeNetworkSVG();
     const columns = this.getConfigCols(searchResults);
     this.getNetworkData();
     this.setState({
+      networkDataError: false,
       networkGraphReady: false,
       enrichmentResults: searchResults.enrichmentResults,
       enrichmentColumns: columns,
-      isSearching: false,
+      isSearchingEnrichment: false,
       isValidSearchEnrichment: true,
       plotButtonActive: false,
       visible: false,
@@ -626,15 +640,8 @@ class Enrichment extends Component {
         '',
         pValueTypeParam,
         enrichmentStudy + 'plots',
+        this.handleGetEnrichmentNetworkError,
       )
-      // .then(EMData => {
-      //   this.setState({
-      //     networkDataAvailable: true,
-      //     networkData: EMData.elements,
-      //     // networkData: networkDataMock,
-      //     networkDataLoaded: true
-      //   });
-      // });
       .then(EMData => {
         this.setState({
           // networkDataAvailable: true,
@@ -677,7 +684,22 @@ class Enrichment extends Component {
           networkDataLoaded: true,
           networkGraphReady: true,
         });
+      })
+      .catch(error => {
+        console.error('Error during getEnrichmentNetwork', error);
       });
+  };
+
+  handleGetEnrichmentNetworkError = () => {
+    this.setState({
+      networkSettings: {
+        ...this.state.networkSettings,
+        facets: [],
+        propLabel: [],
+        propData: [],
+      },
+      networkDataError: true,
+    });
   };
 
   calculateHeight(self) {
@@ -920,6 +942,9 @@ class Enrichment extends Component {
           //   currentSVGs.unshift(sanitizedSVG);
           // }
           handleSVGCb(imageInfo);
+        })
+        .catch(error => {
+          console.error('Error during getPlot', error);
         });
     });
   };
@@ -930,6 +955,23 @@ class Enrichment extends Component {
       SVGPlotLoaded: true,
       SVGPlotLoading: false,
     });
+  };
+
+  handleGetDatabaseInfoError = () => {
+    this.testSelectedTransition(false);
+    this.handleSearchCriteriaChange(
+      {
+        enrichmentStudy: this.props.enrichmentStudy || '',
+        enrichmentModel: this.props.enrichmentModel || '',
+        enrichmentAnnotation: this.props.enrichmentAnnotation || '',
+        enrichmentDescriptionAndTest: '',
+      },
+      false,
+    );
+  };
+  // redundant, may need more to this, so will wait to remove
+  handleGetBarcodeDataError = () => {
+    this.handleGetDatabaseInfoError();
   };
 
   testSelected = (
@@ -954,7 +996,11 @@ class Enrichment extends Component {
     // let imageInfo = { key: '', title: '', svg: [] };
     // if (this.state.annotationData.length === 0) {
     phosphoprotService
-      .getDatabaseInfo(enrichmentStudy + 'plots', enrichmentAnnotation)
+      .getDatabaseInfo(
+        enrichmentStudy + 'plots',
+        enrichmentAnnotation,
+        this.handleGetDatabaseInfoError,
+      )
       .then(annotationDataResponse => {
         const annotationDataParsed = JSON.parse(annotationDataResponse);
         this.setState({
@@ -984,6 +1030,7 @@ class Enrichment extends Component {
             enrichmentAnnotation,
             test,
             dataItem.Annotation,
+            this.handleGetBarcodeDataError,
           )
           .then(barcodeDataResponse => {
             let BardcodeInfoObj = JSON.parse(barcodeDataResponse['object']);
@@ -994,8 +1041,14 @@ class Enrichment extends Component {
             //   this.setState({ sizeVal = '50%')};
             // }
             this.showBarcodePlot(dataItem, BardcodeInfoObj, test, highest);
+          })
+          .catch(error => {
+            console.error('Error during getBarcodeData', error);
           });
         // });
+      })
+      .catch(error => {
+        console.error('Error during getDatabaseInfo', error);
       });
   };
 
@@ -1090,6 +1143,9 @@ class Enrichment extends Component {
               } else if (database === 'PSP') {
                 self.showPhosphositePlus('', dataItem);
               }
+            })
+            .catch(error => {
+              console.error('Error during getDatabaseInfo', error);
             });
         } else {
           dataItem.Annotation = _.find(self.state.annotationData, {
@@ -1550,7 +1606,10 @@ class Enrichment extends Component {
           ></SplitPanesContainer>
         </div>
       );
-    } else if (this.state.isValidSearchEnrichment && !this.state.isSearching) {
+    } else if (
+      this.state.isValidSearchEnrichment &&
+      !this.state.isSearchingEnrichment
+    ) {
       const TableAndNetworkPanes = this.getTableAndNetworkPanes();
       return (
         <Tab
@@ -1571,7 +1630,7 @@ class Enrichment extends Component {
           }}
         />
       );
-    } else if (this.state.isSearching) {
+    } else if (this.state.isSearchingEnrichment) {
       return <TransitionActive />;
     } else return <TransitionStill />;
   };
@@ -1646,34 +1705,40 @@ class Enrichment extends Component {
             id="EnrichmentContentPane"
             // ref="EnrichmentContentPaneGraph"
           >
-            <EnrichmentResultsGraph
-              {...this.props}
-              {...this.state}
-              onHandlePlotAnimation={this.handlePlotAnimation}
-              onDisplayViolinPlot={this.displayViolinPlot}
-              onHandlePieClick={this.testSelected}
-              onHandleNodeCutoffInputChange={this.handleNodeCutoffInputChange}
-              onHandleNodeCutoffSliderChange={this.handleNodeCutoffSliderChange}
-              onHandleEdgeCutoffInputChange={this.handleEdgeCutoffInputChange}
-              onHandleEdgeCutoffSliderChange={this.handleEdgeCutoffSliderChange}
-              onHandleEdgeTypeInputChange={this.handleEdgeTypeInputChange}
-              onHandleEdgeTypeSliderChange={this.handleEdgeTypeSliderChange}
-              onHandleTotals={this.handleTotals}
-              // onNetworkGraphReady={this.handleNetworkGraphReady}
-              onHandleLegendOpen={this.handleLegendOpen}
-              onHandleLegendClose={this.handleLegendClose}
-              onCreateLegend={this.createLegend}
-            />
+            {!this.state.networkDataError ? (
+              <EnrichmentResultsGraph
+                {...this.props}
+                {...this.state}
+                onHandlePlotAnimation={this.handlePlotAnimation}
+                onDisplayViolinPlot={this.displayViolinPlot}
+                onHandlePieClick={this.testSelected}
+                onHandleNodeCutoffInputChange={this.handleNodeCutoffInputChange}
+                onHandleNodeCutoffSliderChange={
+                  this.handleNodeCutoffSliderChange
+                }
+                onHandleEdgeCutoffInputChange={this.handleEdgeCutoffInputChange}
+                onHandleEdgeCutoffSliderChange={
+                  this.handleEdgeCutoffSliderChange
+                }
+                onHandleEdgeTypeInputChange={this.handleEdgeTypeInputChange}
+                onHandleEdgeTypeSliderChange={this.handleEdgeTypeSliderChange}
+                onHandleTotals={this.handleTotals}
+                onHandleLegendOpen={this.handleLegendOpen}
+                onHandleLegendClose={this.handleLegendClose}
+                onCreateLegend={this.createLegend}
+              />
+            ) : (
+              <Message
+                className="NetworkGraphUnavailableMessage"
+                icon="search"
+                header="Network Graph Unavailable"
+                content="Please Revise Search"
+              />
+            )}
           </Tab.Pane>
         ),
       },
     ];
-  };
-
-  handleNetworkGraphReady = bool => {
-    this.setState({
-      networkGraphReady: bool,
-    });
   };
 
   removeNetworkSVG = () => {
@@ -1688,20 +1753,6 @@ class Enrichment extends Component {
       filteredEdgesTotal: filteredEdgesLength,
     });
   };
-
-  // handleInputChange = _.debounce((evt, { name, value }) => {
-  //   this.setState({
-  //     [name]: value
-  //   });
-  // }, 500);
-
-  // handleNetworkCutoffInputChange = _.debounce((evt, { name, value }) => {
-  //   this.removeNetworkSVG();
-  //   this.setState({
-  //     [name]: value
-  //     // networkGraphReady: false
-  //   });
-  // }, 500);
 
   handleNodeCutoffInputChange = value => {
     if (this.state.nodeCutoff !== value) {
@@ -1818,7 +1869,9 @@ class Enrichment extends Component {
             <EnrichmentSearchCriteria
               {...this.state}
               {...this.props}
-              onSearchTransition={this.handleSearchTransition}
+              onSearchTransitionEnrichment={
+                this.handleSearchTransitionEnrichment
+              }
               onEnrichmentSearch={this.handleEnrichmentSearch}
               onSearchCriteriaChange={this.handleSearchCriteriaChange}
               onSearchCriteriaReset={this.hideEGrid}

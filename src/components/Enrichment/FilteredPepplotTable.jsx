@@ -154,6 +154,9 @@ class FilteredPepplotTable extends Component {
             this.setConfigCols(filteredData);
             // return cols;
           }
+        })
+        .catch(error => {
+          console.error('Error during getTestData', error);
         });
     }
   };
