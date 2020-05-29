@@ -256,7 +256,7 @@ class PepplotVolcano extends Component{
           <Grid className="VolcanoPlotGridContainer">
               <Grid.Row className="VolcanoPlotAxisSelectorsRow">
                 <Grid.Column
-                  className="NetworkGraphFilters"
+                  className="EmptyColumn"
                   tablet={4}
                   computer={4}
                   largeScreen={2}

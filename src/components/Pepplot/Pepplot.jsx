@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import { Grid, Menu, Popup, Sidebar, Tab } from 'semantic-ui-react';
 import { withRouter } from 'react-router-dom';
 import PepplotSearchCriteria from './PepplotSearchCriteria';
-import scatterPlotIcon from '../../resources/ScatterPlotIcon.png';
-import scatterPlotIconSelected from '../../resources/ScatterPlotIconSelected.png';
+import VolcanoPlotIcon from '../../resources/VolcanoPlotIcon.png';
+import VolcanoPlotIconSelected from '../../resources/VolcanoPlotIconSelected.png';
 import tableIcon from '../../resources/tableIcon.png';
 import tableIconSelected from '../../resources/tableIconSelected.png';
 import PepplotResults from './PepplotResults';
@@ -842,7 +842,7 @@ getTableAndPlotPanes = () => {
         name="plot"
       >
         <img
-          src={this.state.activeIndex === 1 ? scatterPlotIconSelected : scatterPlotIcon}
+          src={this.state.activeIndex === 1 ? VolcanoPlotIconSelected : VolcanoPlotIcon}
           alt="Plot Icon"
           id="PlotButton"
         />
