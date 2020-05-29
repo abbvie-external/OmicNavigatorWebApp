@@ -938,7 +938,6 @@ class Enrichment extends Component {
     dataItem,
     test,
   ) => {
-    debugger;
     this.testSelectedTransition(true);
     const TestSiteVar = `${test}:${dataItem.Description}`;
     this.handleSearchCriteriaChange(
