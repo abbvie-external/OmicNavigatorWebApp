@@ -18,7 +18,6 @@ class Tabs extends Component {
     const testFromUrl = params[3] || '';
     const siteFromUrl = params[4] || '';
     const descriptionFromUrl = params[5] || '';
-    debugger;
     const siteAndDescription =
       descriptionFromUrl !== ''
         ? `${siteFromUrl}/${descriptionFromUrl}`
@@ -112,7 +111,6 @@ class Tabs extends Component {
         proteinHighlightInProgress: false,
       });
     } else if (tab === 'enrichment') {
-      debugger;
       this.setState({
         tab: 'enrichment',
         enrichmentStudy: changes.enrichmentStudy || '',
