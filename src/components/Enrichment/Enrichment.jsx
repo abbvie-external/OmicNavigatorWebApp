@@ -263,7 +263,6 @@ class Enrichment extends Component {
           Description: dataItem.Description,
         }).Key;
         let term = dataItem.Annotation;
-
         self.setState({
           imageInfo: {
             ...self.state.imageInfo,
@@ -939,6 +938,7 @@ class Enrichment extends Component {
     dataItem,
     test,
   ) => {
+    debugger;
     this.testSelectedTransition(true);
     const TestSiteVar = `${test}:${dataItem.Description}`;
     this.handleSearchCriteriaChange(
