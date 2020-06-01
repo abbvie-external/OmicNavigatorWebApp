@@ -1,15 +1,15 @@
 import React, { Component } from 'react';
-import { Accordion, Loader, Dimmer } from 'semantic-ui-react';
+import { Accordion, Loader, Dimmer, Message } from 'semantic-ui-react';
 // import _ from 'lodash';
 
 class PepplotAccordion extends Component {
   state = {
-    isAccordionReady: false
+    isAccordionReady: false,
   };
 
   componentDidMount() {
     this.setState({
-      isAccordionReady: true
+      isAccordionReady: true,
     });
   }
 
@@ -27,7 +27,7 @@ class PepplotAccordion extends Component {
       return {
         key: `${b.key}`,
         title: `${b.text}`,
-        content: `${this.getPeptideNestedItems(b.items)}`
+        content: `${this.getPeptideNestedItems(b.items)}`,
       };
     });
     const PeptideContent = <Accordion.Accordion panels={PeptidePanelsArray} />;
@@ -43,7 +43,7 @@ class PepplotAccordion extends Component {
         return {
           key: `${a.key}`,
           title: `${a.text}`,
-          content: { content: this.getPeptideContent(a.items) }
+          content: { content: this.getPeptideContent(a.items) },
         };
       });
       return rootPanels;
@@ -51,20 +51,32 @@ class PepplotAccordion extends Component {
   };
 
   getAccordion = () => {
-    const rootPanels = this.getRootPanels();
-    return (
-      <Accordion
-        defaultActiveIndex={[0]}
-        panels={rootPanels}
-        exclusive={false}
-        fluid
-        // styled
-      />
-    );
+    if (this.props.treeData.length !== 0) {
+      const rootPanels = this.getRootPanels();
+      return (
+        <Accordion
+          defaultActiveIndex={[0]}
+          panels={rootPanels}
+          exclusive={false}
+          fluid
+          // styled
+        />
+      );
+    } else {
+      return (
+        <Message
+          className="NoDataMessage"
+          icon="question mark"
+          header="No Data Available"
+          // content="add description/instructions"
+        />
+      );
+    }
   };
 
   render() {
-    if (!this.props.isProteinDataLoaded) {
+    const { isProteinDataLoaded } = this.props;
+    if (!isProteinDataLoaded) {
       return (
         <div>
           <Dimmer active inverted>

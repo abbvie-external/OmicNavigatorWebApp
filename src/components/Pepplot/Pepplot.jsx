@@ -14,12 +14,10 @@ import TransitionStill from '../Transitions/TransitionStill';
 import ButtonActions from '../Shared/ButtonActions';
 import { formatNumberForDisplay, splitValue } from '../Shared/helpers';
 import phosphosite_icon from '../../resources/phosphosite.ico';
-import PepplotVolcano from "./PepplotVolcano";
-
 import DOMPurify from 'dompurify';
 import { phosphoprotService } from '../../services/phosphoprot.service';
 import { CancelToken } from 'axios';
-
+import PepplotVolcano from './PepplotVolcano';
 
 import _ from 'lodash';
 import './Pepplot.scss';
@@ -39,7 +37,7 @@ class Pepplot extends Component {
 
   state = {
     isValidSearchPepplot: false,
-    isSearching: false,
+    isSearchingPepplot: false,
     showProteinPage: false,
     pepplotResults: [],
     pepplotResultsUnfiltered:[],
@@ -75,7 +73,7 @@ class Pepplot extends Component {
     svgVisible: true,
     multisetQueried: false,
     activeIndex: this.defaultActiveIndex || 0,
-    thresholdColsP: []
+    thresholdColsP: [],
   };
 
   componentDidMount() {
@@ -99,9 +97,9 @@ class Pepplot extends Component {
     );
   }};
 
-  handleSearchTransition = bool => {
+  handleSearchTransitionPepplot = bool => {
     this.setState({
-      isSearching: bool,
+      isSearchingPepplot: bool,
     });
   };
 
@@ -116,7 +114,7 @@ class Pepplot extends Component {
     this.setState({
       pepplotResults: searchResults.pepplotResults,
       pepplotColumns: columns,
-      isSearching: false,
+      isSearchingPepplot: false,
       isValidSearchPepplot: true,
       showProteinPage: false,
       plotButtonActive: false,
@@ -576,7 +574,7 @@ getProteinData = (id, dataItem, getPlotCb, imageInfo) => {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
   getConfigCols = testData => {
     const pepResults = testData.pepplotResults;
-    const model = testData.model;
+    const model = this.props.pepplotModel;
     let initConfigCols = [];
 
     const TableValuePopupStyle = {
@@ -790,23 +788,23 @@ getProteinData = (id, dataItem, getPlotCb, imageInfo) => {
     else if (
       this.state.isValidSearchPepplot &&
       !this.state.showProteinPage &&
-      !this.state.isSearching
+      !this.state.isSearchingPepplot
     ) {
       const TableAndPlotPanes = this.getTableAndPlotPanes();
       return (
         <Tab
-        className="TableAndPlotContainer"
-        panes={TableAndPlotPanes}
-        onTabChange={this.handleTablePlotTabChange}
-        activeIndex={this.state.activeIndex}
-        renderActiveOnly={false}
-        menu={{
-          attached: true,
-          className: 'TableAndPlotMenuContainer'
-        }}
-      />
+          className="TableAndPlotContainer"
+          panes={TableAndPlotPanes}
+          onTabChange={this.handleTablePlotTabChange}
+          activeIndex={this.state.activeIndex}
+          renderActiveOnly={false}
+          menu={{
+            attached: true,
+            className: 'TableAndPlotMenuContainer',
+          }}
+        />
       );
-    } else if (this.state.isSearching) {
+    } else if (this.state.isSearchingPepplot) {
       return <TransitionActive />;
     } else return <TransitionStill />;
   };
@@ -863,7 +861,7 @@ getTableAndPlotPanes = () => {
     </Tab.Pane>),
     },
   ];
-  };
+  }
 
   handleTablePlotTabChange = (e, { activeIndex }) => {
     sessionStorage.setItem(`pepplotViewTab`, activeIndex);
@@ -872,7 +870,8 @@ getTableAndPlotPanes = () => {
 
   render() {
     const pepplotView = this.getView();
-
+    console.log("THIS:")
+    console.log(this.state.thresholdColsP)
     const { multisetPlotInfo, animation, direction, visible } = this.state;
     const VerticalSidebar = ({ animation, visible }) => (
       <Sidebar
@@ -917,7 +916,7 @@ getTableAndPlotPanes = () => {
             <PepplotSearchCriteria
               {...this.state}
               {...this.props}
-              onSearchTransition={this.handleSearchTransition}
+              onSearchTransitionPepplot={this.handleSearchTransitionPepplot}
               onPepplotSearch={this.handlePepplotSearch}
               onPepplotSearchUnfiltered={this.handlePepplotSearchUnfiltered}
               onSearchCriteriaChange={this.handleSearchCriteriaChange}

@@ -8,8 +8,8 @@ require('opencpu.js/opencpu-0.5.js');
 // const ocpu = require('opencpu.js/opencpu-0.5.js');
 class PhosphoprotService {
   constructor() {
-    this.ocpuUrl = 'http://10.239.9.49/ocpu/library/PhosphoProt/R';
-    // this.ocpuUrl = 'http://10.239.9.76/ocpu/library/PhosphoProt/R';
+    // this.ocpuUrl = 'http://10.239.9.49/ocpu/library/PhosphoProt/R';
+    this.ocpuUrl = 'http://10.239.9.76/ocpu/library/PhosphoProt/R';
     // this.ocpuUrlAlt = 'http://localhost:5656/ocpu/library/PhosphoProt/R'
     // this.ocpuUrlAlt = 'http://localhost:1234/v1'
   }
@@ -22,7 +22,7 @@ class PhosphoprotService {
     window.ocpu.seturl(this.ocpuUrlAlt);
   }
 
-  ocpuRPC(name, paramsObj) {
+  ocpuRPC(name, paramsObj, handleError) {
     return new Promise(function(resolve, reject) {
       window.ocpu
         .rpc(name, paramsObj, function(session) {
@@ -30,6 +30,10 @@ class PhosphoprotService {
         })
         .catch(error => {
           toast.error(`${error.statusText}: ${error.responseText}`);
+          if (handleError !== undefined) {
+            handleError(false);
+          }
+          console.log(`${error.statusText}: ${error.responseText}`);
         });
     });
   }
@@ -58,8 +62,20 @@ class PhosphoprotService {
               params: { digits: 10 },
               responseType: 'text',
               cancelToken,
+              timeout: 15000,
             })
-            .then(response => resolve(response.data));
+            .then(response => resolve(response.data))
+            .catch(function(thrown) {
+              if (axios.isCancel(thrown)) {
+                console.log('Request canceled', thrown.message);
+              } else {
+                toast.error(`${thrown.message}`);
+                if (handleError !== undefined) {
+                  handleError(false);
+                }
+                console.log(`${thrown.message}`);
+              }
+            });
         })
         // you can use this function instead, if don't need the cancelToken
         // .call(method, obj, function(session) {
@@ -72,6 +88,7 @@ class PhosphoprotService {
           if (handleError !== undefined) {
             handleError(false);
           }
+          console.log(`${error.statusText}: ${error.responseText}`);
         });
     });
   }
@@ -85,15 +102,27 @@ class PhosphoprotService {
             .get(url, {
               responseType: 'text',
               cancelToken,
+              timeout: 15000,
             })
-            .then(response => resolve(response.data));
+            .then(response => resolve(response.data))
+            .catch(function(thrown) {
+              if (axios.isCancel(thrown)) {
+                console.log('Request canceled', thrown.message);
+              } else {
+                toast.error(`${thrown.message}`);
+                if (handleError !== undefined) {
+                  handleError(false);
+                }
+                console.log(`${thrown.message}`);
+              }
+            });
         })
         .catch(error => {
-          // toast.error('Failed to retrieve data, please try again.');
           toast.error(`${error.statusText}: ${error.responseText}`);
           if (handleError !== undefined) {
             handleError(false);
           }
+          console.log(`${error.statusText}: ${error.responseText}`);
         });
     });
   }
@@ -146,13 +175,17 @@ class PhosphoprotService {
     mapForm.submit();
   }
 
-  async getSiteData(id, study) {
-    const promise = this.ocpuRPC('sitedata', { idmult: id, study: study });
+  async getSiteData(id, study, errorCb) {
+    const promise = this.ocpuRPC(
+      'sitedata',
+      { idmult: id, study: study },
+      errorCb,
+    );
     const siteDataFromPromise = await promise;
     return siteDataFromPromise;
   }
 
-  async getProteinData(id, study) {
+  async getProteinData(id, study, errorCb) {
     const promise = this.ocpuRPC('proteindata', { id: id, study: study });
     const proteinDataFromPromise = await promise;
     return proteinDataFromPromise;
@@ -166,15 +199,27 @@ class PhosphoprotService {
             .get(session.getLoc() + 'graphics/1/svg', {
               responseType: 'text',
               cancelToken,
+              timeout: 15000,
             })
-            .then(response => resolve(response));
+            .then(response => resolve(response))
+            .catch(function(thrown) {
+              if (axios.isCancel(thrown)) {
+                console.log('Request canceled', thrown.message);
+              } else {
+                toast.error(`${thrown.message}`);
+                if (handleError !== undefined) {
+                  handleError(false);
+                }
+                console.log(`${thrown.message}`);
+              }
+            });
         })
         .catch(error => {
-          // toast.error('Failed to retrieve plot, please try again.');
           toast.error(`${error.statusText}: ${error.responseText}`);
           if (handleError !== undefined) {
             handleError(false);
           }
+          console.log(`${error.statusText}: ${error.responseText}`);
         });
     });
   }
@@ -356,16 +401,21 @@ class PhosphoprotService {
     tests,
     pValueType,
     enrichmentStudy,
+    errorCb,
   ) {
     this.setUrl();
-    const promise = this.ocpuRPC('getCytoscapeEM', {
-      model: enrichmentModel,
-      db: enrichmentAnnotation,
-      tests: tests,
-      q: pValueType,
-      study: enrichmentStudy,
-      isDev: false,
-    });
+    const promise = this.ocpuRPC(
+      'getCytoscapeEM',
+      {
+        model: enrichmentModel,
+        db: enrichmentAnnotation,
+        tests: tests,
+        q: pValueType,
+        study: enrichmentStudy,
+        isDev: false,
+      },
+      errorCb,
+    );
     const nodesFromPromise = await promise;
     return nodesFromPromise;
     // return networkDataOld;

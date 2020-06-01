@@ -44,7 +44,6 @@ class PepplotResults extends Component {
       pepplotRows,
       itemsPerPageInformed,
     } = this.state;
-
     let pepplotCacheKey = `${pepplotStudy}-${pepplotModel}-${pepplotTest}`;
     if (
       proteinToHighlightInDiffTable !== '' &&

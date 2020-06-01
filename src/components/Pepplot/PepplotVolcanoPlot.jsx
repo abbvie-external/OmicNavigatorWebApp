@@ -22,7 +22,7 @@ class PepplotVolcanoPlot extends Component{
     volcanoSVGRef = React.createRef();
 
     componentDidUpdate(prevProps){
-        const{selectedFromTableData, volcanoWidth, pepplotResultsUnfiltered, xAxisLabel} = this.props;
+        const{selectedFromTableData, volcanoWidth} = this.props;
         const circles = d3.selectAll('circle.volcanoPlot-dataPoint');
         if(prevProps.volcanoWidth !== volcanoWidth){
             this.setState({resize:true})

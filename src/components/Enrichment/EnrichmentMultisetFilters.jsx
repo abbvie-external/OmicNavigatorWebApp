@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import { Form, Select, Input, Button, Icon } from 'semantic-ui-react';
+import { Form, Select, Input } from 'semantic-ui-react';
 import * as d3 from 'd3';
 import '../Shared/MultisetFilters.scss';
 
@@ -12,7 +12,7 @@ class EnrichmentMultisetFilters extends Component {
       metaSvg,
       sigValue,
       selectedCol,
-      selectedOperator
+      selectedOperator,
     } = this.props;
     this.makeMultiset(
       uData,
@@ -21,7 +21,7 @@ class EnrichmentMultisetFilters extends Component {
       metaSvg,
       sigValue,
       selectedCol,
-      selectedOperator
+      selectedOperator,
     );
   }
 
@@ -33,7 +33,7 @@ class EnrichmentMultisetFilters extends Component {
       metaSvg,
       sigValue,
       selectedCol,
-      selectedOperator
+      selectedOperator,
     } = this.props;
     if (uSettings !== prevProps.uSettings || prevProps.uData !== this.props.uData) {
       this.makeMultiset(
@@ -43,7 +43,7 @@ class EnrichmentMultisetFilters extends Component {
         metaSvg,
         sigValue,
         selectedCol,
-        selectedOperator
+        selectedOperator,
       );
     }
   }
@@ -55,7 +55,7 @@ class EnrichmentMultisetFilters extends Component {
     metaSvg,
     sigValue,
     selectedCol,
-    selectedOperator
+    selectedOperator,
   ) {
     d3.selectAll('#multiset-query')
       .selectAll('*')
@@ -75,7 +75,7 @@ class EnrichmentMultisetFilters extends Component {
         uSettings,
         selectedCol,
         selectedOperator,
-        sigValue
+        sigValue,
       );
     }
   }
@@ -87,7 +87,7 @@ class EnrichmentMultisetFilters extends Component {
     uSettings,
     selectedCol,
     selectedOperator,
-    sigValue
+    sigValue,
   ) {
     const svgWidth = 315;
     const heightScalar = 15;
@@ -119,7 +119,9 @@ class EnrichmentMultisetFilters extends Component {
           break;
         case '|>|':
           setDescP.push(`absolute value greater than ${sigValue[i]} in:`);
-          notSetDescP.push(`absolute value not greater than ${sigValue[i]} in:`);
+          notSetDescP.push(
+            `absolute value not greater than ${sigValue[i]} in:`,
+          );
           break;
         default:
       }
@@ -140,22 +142,22 @@ class EnrichmentMultisetFilters extends Component {
         .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
         .attr('font-size', '15px')
         .attr('fill', 'black');
-      if(mustData.length !== 0 || useAnchor){
-      metaSvg
-        .selectAll('dataObject')
-        .data(setDescP)
-        .enter()
-        .append('text')
-        .attr('x', 7)
-        .attr('y', function(d, i) {
-          return 30 + heightScalar * i;
-        })
-        .text(function(d) {
-          return d;
-        })
-        .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
-        .attr('font-size', '14px')
-        .attr('fill', 'black');
+      if (mustData.length !== 0 || useAnchor) {
+        metaSvg
+          .selectAll('dataObject')
+          .data(setDescP)
+          .enter()
+          .append('text')
+          .attr('x', 7)
+          .attr('y', function(d, i) {
+            return 30 + heightScalar * i;
+          })
+          .text(function(d) {
+            return d;
+          })
+          .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
+          .attr('font-size', '14px')
+          .attr('fill', 'black');
       }
 
       if (useAnchor) {
@@ -270,19 +272,13 @@ class EnrichmentMultisetFilters extends Component {
           .attr('cx', 17)
           .attr('cy', function(d, i) {
             if (!useAnchor && mustData.length === 0) {
-              return (
-                30 +
-                heightScalar *(i + notSetDescP.length)
-              );
+              return 30 + heightScalar * (i + notSetDescP.length);
             } else {
               return (
                 30 +
                 4 +
                 heightScalar *
-                  (i +
-                    setDescP.length +
-                    notSetDescP.length +
-                    mustData.length)
+                  (i + setDescP.length + notSetDescP.length + mustData.length)
               );
             }
           })
@@ -297,21 +293,13 @@ class EnrichmentMultisetFilters extends Component {
           .attr('x', 25)
           .attr('y', function(d, i) {
             if (!useAnchor && mustData.length === 0) {
-              return (
-                30 +
-                4 +
-                heightScalar *
-                  (i + notSetDescP.length)
-              );
+              return 30 + 4 + heightScalar * (i + notSetDescP.length);
             } else {
               return (
                 30 +
                 8 +
                 heightScalar *
-                  (i +
-                    setDescP.length +
-                    notSetDescP.length +
-                    mustData.length)
+                  (i + setDescP.length + notSetDescP.length + mustData.length)
               );
             }
           })
@@ -409,8 +397,8 @@ class EnrichmentMultisetFilters extends Component {
           topBoxHeight,
           svgWidth,
           svgHeight - topBoxHeight,
-          20
-        )
+          20,
+        ),
       )
       .attr('fill', 'white');
 
@@ -462,7 +450,7 @@ class EnrichmentMultisetFilters extends Component {
       })
       .attr('r', circleRadius)
       .style('stroke', d =>
-        mustData.includes(d) || d === anchor ? chosenColorCode : 'transparent'
+        mustData.includes(d) || d === anchor ? chosenColorCode : 'transparent',
       )
       .attr('stroke-width', circleRadius / 5)
       .on('click', function(d) {
@@ -494,7 +482,7 @@ class EnrichmentMultisetFilters extends Component {
       .style('stroke', d =>
         !notData.includes(d) && !mustData.includes(d) && d !== anchor
           ? chosenColorCode
-          : baseColorCode
+          : baseColorCode,
       )
       .attr('stroke-width', circleRadius / 5)
       .on('click', function(d) {
@@ -551,7 +539,7 @@ class EnrichmentMultisetFilters extends Component {
       })
       .attr('r', circleRadius)
       .style('stroke', d =>
-        notData.includes(d) && d !== anchor ? chosenColorCode : 'transparent'
+        notData.includes(d) && d !== anchor ? chosenColorCode : 'transparent',
       )
       .attr('stroke-width', circleRadius / 5)
       .on('click', function(d) {
@@ -612,7 +600,7 @@ class EnrichmentMultisetFilters extends Component {
           (circlePadding + circleRadius) +
           ',' +
           (topBoxHeight - 4) +
-          ')'
+          ')',
       )
       .text('Must')
       .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
@@ -632,7 +620,7 @@ class EnrichmentMultisetFilters extends Component {
           (2 * circlePadding + 3 * circleRadius) +
           ',' +
           (topBoxHeight - 4) +
-          ')'
+          ')',
       )
       .text('Maybe')
       .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
@@ -652,7 +640,7 @@ class EnrichmentMultisetFilters extends Component {
           (3 * circlePadding + 5 * circleRadius) +
           ',' +
           (topBoxHeight - 4) +
-          ')'
+          ')',
       )
       .text('Not')
       .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
@@ -724,7 +712,7 @@ class EnrichmentMultisetFilters extends Component {
         .attr('cx', circlePadding + circleRadius)
         .attr(
           'cy',
-          topBoxHeight - 1 + circleRadius + circlePadding - circleRadius / 6
+          topBoxHeight - 1 + circleRadius + circlePadding - circleRadius / 6,
         )
         .attr('r', circleRadius / 6)
         .style('stroke', 'white')
@@ -735,7 +723,7 @@ class EnrichmentMultisetFilters extends Component {
         .attr('x', circlePadding + circleRadius - circleRadius / 3)
         .attr(
           'y',
-          topBoxHeight + circleRadius + circlePadding - circleRadius / 6
+          topBoxHeight + circleRadius + circlePadding - circleRadius / 6,
         )
         .attr('width', (circleRadius * 2) / 3)
         .attr('height', (circleRadius * 2) / 3);
@@ -744,19 +732,21 @@ class EnrichmentMultisetFilters extends Component {
     function updateCircles() {
       mustCircles
         .style('stroke', d =>
-          mustData.includes(d) || d === anchor ? chosenColorCode : 'transparent'
+          mustData.includes(d) || d === anchor
+            ? chosenColorCode
+            : 'transparent',
         )
         .attr('stroke-width', circleRadius / 5);
       maybeCircles
         .style('stroke', d =>
           !notData.includes(d) && !mustData.includes(d) && d !== anchor
             ? chosenColorCode
-            : baseColorCode
+            : baseColorCode,
         )
         .attr('stroke-width', circleRadius / 5);
       notCircles
         .style('stroke', d =>
-          notData.includes(d) ? chosenColorCode : 'transparent'
+          notData.includes(d) ? chosenColorCode : 'transparent',
         )
         .attr('stroke-width', circleRadius / 5);
     }
@@ -785,7 +775,7 @@ class EnrichmentMultisetFilters extends Component {
     const Operators = uSettings.thresholdOperator;
     const SelOp = selectedOperator;
     const indexFilters = uSettings.indexFilters;
-    const hoveredFilter = uSettings.hoveredFilter;
+    // const hoveredFilter = uSettings.hoveredFilter;
     // for now, column is displayed as label, just matching the "nominal" or "Adjusted" p value type
     const SelColOverride =
       this.props.pValueType === 'nominal'

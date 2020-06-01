@@ -162,6 +162,8 @@ class PepplotVolcano extends Component{
           ]);
         }
       };
+
+
     getMaxAndMin(data, element){
         var values = [data[0][element],data[0][element]];
         for(var i = 1; i<data.length; i++){

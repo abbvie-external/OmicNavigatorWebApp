@@ -9,6 +9,7 @@ import {
   Transition,
   Button,
 } from 'semantic-ui-react';
+import * as d3 from 'd3';
 import { CancelToken } from 'axios';
 import '../Shared/SearchCriteria.scss';
 import { phosphoprotService } from '../../services/phosphoprot.service';
@@ -21,29 +22,12 @@ let cancelRequestMultisetEnrichmentData = () => {};
 let cancelRequestEnrichmentMultisetPlot = () => {};
 
 class EnrichmentSearchCriteria extends Component {
-  // static defaultProps = {
-  //   tab: 'enrichment',
-  //   enrichmentStudy: '',
-  //   enrichmentModel: '',
-  //   enrichmentAnnotation: '',
-  //   pValueType: 'nomimal',
-  //   isValidSearchEnrichment: false,
-  //   isSearching: false,
-  //   multisetPlotAvailable: false,
-  //   animation: 'uncover',
-  //   direction: 'left',
-  //   visible: false,
-  //   plotButtonActive: false,
-  //   uData: []
-  // };
-
   state = {
     enrichmentStudies: [],
     enrichmentStudyHrefVisible: false,
     enrichmentStudyHref: '',
     enrichmentModels: [],
     enrichmentAnnotations: [],
-    enrichmentResultsErrorCb: this.props.onSearchTransition || undefined,
     enrichmentStudiesDisabled: false,
     enrichmentModelsDisabled: true,
     enrichmentAnnotationsDisabled: true,
@@ -150,6 +134,9 @@ class EnrichmentSearchCriteria extends Component {
               enrichmentAnnotations: annotationsArr,
             });
           }
+        })
+        .catch(error => {
+          console.error('Error during getModelNames', error);
         });
     }
 
@@ -163,15 +150,14 @@ class EnrichmentSearchCriteria extends Component {
         },
         false,
       );
-      this.props.onSearchTransition(true);
+      this.props.onSearchTransitionEnrichment(true);
       phosphoprotService
         .getAnnotationData(
           m,
           a,
           s + 'plots',
           t,
-          this.state.enrichmentResultsErrorCb,
-          undefined,
+          this.props.onSearchTransitionEnrichment,
         )
         .then(dataFromService => {
           this.setState({
@@ -184,6 +170,9 @@ class EnrichmentSearchCriteria extends Component {
           this.props.onEnrichmentSearch({
             enrichmentResults: this.annotationdata,
           });
+        })
+        .catch(error => {
+          console.error('Error during getAnnotationData', error);
         });
     }
 
@@ -191,14 +180,19 @@ class EnrichmentSearchCriteria extends Component {
   }
 
   populateStudies = () => {
-    phosphoprotService.getStudies().then(studiesFromService => {
-      const studiesArr = studiesFromService.map(study => {
-        return { key: study, text: study, value: study };
+    phosphoprotService
+      .getStudies()
+      .then(studiesFromService => {
+        const studiesArr = studiesFromService.map(study => {
+          return { key: study, text: study, value: study };
+        });
+        this.setState({
+          enrichmentStudies: studiesArr,
+        });
+      })
+      .catch(error => {
+        console.error('Error during getStudies', error);
       });
-      this.setState({
-        enrichmentStudies: studiesArr,
-      });
-    });
   };
 
   handleStudyChange = (evt, { name, value }) => {
@@ -231,6 +225,9 @@ class EnrichmentSearchCriteria extends Component {
           enrichmentModelsDisabled: false,
           enrichmentModels: modelsArr,
         });
+      })
+      .catch(error => {
+        console.error('Error during getModelNames', error);
       });
   };
 
@@ -275,7 +272,7 @@ class EnrichmentSearchCriteria extends Component {
       },
       true,
     );
-    this.props.onSearchTransition(true);
+    this.props.onSearchTransitionEnrichment(true);
     cancelRequestAnnotationData();
     let cancelToken = new CancelToken(e => {
       cancelRequestAnnotationData = e;
@@ -286,7 +283,7 @@ class EnrichmentSearchCriteria extends Component {
         value,
         this.props.enrichmentStudy + 'plots',
         this.props.pValueType,
-        this.state.enrichmentResultsErrorCb,
+        this.props.onSearchTransitionEnrichment,
         cancelToken,
       )
       .then(dataFromService => {
@@ -307,13 +304,22 @@ class EnrichmentSearchCriteria extends Component {
         this.props.onColumns({
           enrichmentResults: this.annotationdata,
         });
+      })
+      .catch(error => {
+        console.error('Error during getAnnotationData', error);
       });
   };
 
-  handlePValueTypeChange = (evt, { value }) => {
-    this.props.onSearchTransition(true);
-    this.props.onPValueTypeChange(value);
+  removeNetworkSVG = () => {
+    d3.select('div.tooltip-pieSlice').remove();
+    d3.select('tooltipEdge').remove();
+    d3.select(`#svg-${this.props.networkSettings.id}`).remove();
+  };
 
+  handlePValueTypeChange = (evt, { value }) => {
+    this.props.onSearchTransitionEnrichment(true);
+    this.props.onPValueTypeChange(value);
+    this.removeNetworkSVG();
     if (!this.state.multisetFiltersVisible) {
       cancelRequestAnnotationData();
       let cancelToken = new CancelToken(e => {
@@ -325,7 +331,7 @@ class EnrichmentSearchCriteria extends Component {
           this.props.enrichmentAnnotation,
           this.props.enrichmentStudy + 'plots',
           value,
-          this.state.enrichmentResultsErrorCb,
+          this.props.onSearchTransitionEnrichment,
           cancelToken,
         )
         .then(dataFromService => {
@@ -343,6 +349,9 @@ class EnrichmentSearchCriteria extends Component {
           this.props.onEnrichmentSearch({
             enrichmentResults: this.annotationdata,
           });
+        })
+        .catch(error => {
+          console.error('Error during getAnnotationData', error);
         });
     } else {
       const eSigV = this.state.sigValue;
@@ -390,6 +399,9 @@ class EnrichmentSearchCriteria extends Component {
           this.props.onEnrichmentSearch({
             enrichmentResults: multisetResults,
           });
+        })
+        .catch(error => {
+          console.error('Error during getMultisetEnrichmentData', error);
         });
     }
   };
@@ -421,6 +433,26 @@ class EnrichmentSearchCriteria extends Component {
     };
   };
 
+  handleMultisetEOpenError = () => {
+    cancelRequestEnrichmentMultisetPlot();
+    this.setState({
+      multisetFiltersVisible: false,
+    });
+    console.log('Error during getMultisetEnrichmentData');
+  };
+
+  handleMultisetECloseError = () => {
+    this.props.onSearchTransitionEnrichment(false);
+    this.setState(
+      {
+        multisetFiltersVisible: true,
+        reloadPlot: true,
+      },
+      this.updateQueryData(),
+    );
+    console.log('Error during getAnnotationData');
+  };
+
   multisetTriggeredAnnotationChange = (name, value) => {
     this.props.onSearchCriteriaChange(
       {
@@ -431,7 +463,7 @@ class EnrichmentSearchCriteria extends Component {
       },
       true,
     );
-    this.props.onSearchTransition(true);
+    this.props.onSearchTransitionEnrichment(true);
     cancelRequestAnnotationData();
     let cancelToken = new CancelToken(e => {
       cancelRequestAnnotationData = e;
@@ -442,7 +474,7 @@ class EnrichmentSearchCriteria extends Component {
         value,
         this.props.enrichmentStudy + 'plots',
         this.props.pValueType,
-        this.state.enrichmentResultsErrorCb,
+        this.handleMultisetECloseError,
         cancelToken,
       )
       .then(dataFromService => {
@@ -450,6 +482,9 @@ class EnrichmentSearchCriteria extends Component {
         this.props.onEnrichmentSearch({
           enrichmentResults: this.annotationdata,
         });
+      })
+      .catch(error => {
+        console.error('Error during getAnnotationData', error);
       });
   };
   addFilter = () => {
@@ -507,7 +542,7 @@ class EnrichmentSearchCriteria extends Component {
     this.setState(
       {
         [name]: uSelVP,
-        reloadPlot: false
+        reloadPlot: false,
       },
       function() {
         this.updateQueryData();
@@ -548,7 +583,6 @@ class EnrichmentSearchCriteria extends Component {
     const eMust = this.state.uSettings.must;
     const eNot = this.state.uSettings.not;
     const eOperator = this.state.selectedOperator;
-
     this.getMultisetPlot(
       eSigV,
       this.props.enrichmentModel,
@@ -571,7 +605,7 @@ class EnrichmentSearchCriteria extends Component {
         this.props.enrichmentAnnotation,
         this.jsonToList(eOperator),
         this.props.pValueType,
-        undefined,
+        this.handleMultisetEOpenError,
         cancelToken,
       )
       .then(annotationData => {
@@ -589,6 +623,9 @@ class EnrichmentSearchCriteria extends Component {
         this.props.onEnrichmentSearch({
           enrichmentResults: multisetResults,
         });
+      })
+      .catch(error => {
+        console.error('Error during getMultisetEnrichmentData', error);
       });
   };
   jsonToList(json) {
@@ -641,6 +678,9 @@ class EnrichmentSearchCriteria extends Component {
         this.props.onGetMultisetPlot({
           svgInfo,
         });
+      })
+      .catch(error => {
+        console.error('Error during getEnrichmentMultisetPlot', error);
       });
   }
 
@@ -683,7 +723,7 @@ class EnrichmentSearchCriteria extends Component {
       multisetPlotAvailable,
       plotButtonActive,
       isTestDataLoaded,
-      activeIndexEnrichmentView 
+      activeIndexEnrichmentView,
     } = this.props;
 
     const StudyPopupStyle = {
@@ -781,16 +821,16 @@ class EnrichmentSearchCriteria extends Component {
         </Transition>
       );
       MultisetRadio = (
-         <React.Fragment>
-           <Divider />
-           <Radio
-             toggle
-             label="Set Analysis"
-             checked={multisetFiltersVisible}
-             onChange={this.handleMultisetToggle()}
-           />
-         </React.Fragment>
-       );
+        <React.Fragment>
+          <Divider />
+          <Radio
+            toggle
+            label="Set Analysis"
+            checked={multisetFiltersVisible}
+            onChange={this.handleMultisetToggle()}
+          />
+        </React.Fragment>
+      );
     }
 
     return (
