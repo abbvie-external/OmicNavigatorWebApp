@@ -16,24 +16,24 @@ class Tabs extends Component {
     const studyFromUrl = params[1] || '';
     const modelFromUrl = params[2] || '';
     const testFromUrl = params[3] || '';
-    // const fourthParam = params[4] || '';
-    // const fifthParam = params[5] || '';
-    // const siteCombined = fifthParam !== '' ? `${fourthParam}/${fifthParam}` : fourthParam;
-    // let replacementString = '&';
-    // let siteFromUrl = siteRaw.replace(
-    //   /\//g,
-    //   replacementString,
-    // );
     const siteFromUrl = params[4] || '';
-
+    const descriptionFromUrl = params[5] || '';
+    const siteAndDescription =
+      descriptionFromUrl !== ''
+        ? `${siteFromUrl}/${descriptionFromUrl}`
+        : siteFromUrl;
+    const decodedStudy = decodeURI(studyFromUrl);
+    const decodedModel = decodeURI(modelFromUrl);
+    const decodedTest = decodeURI(testFromUrl);
+    const decodedSiteAndDescription = decodeURI(siteAndDescription);
     if (tabFromUrl === 'pepplot') {
       this.state = {
         activeIndex: 2,
         tab: tabFromUrl,
-        pepplotStudy: studyFromUrl || '',
-        pepplotModel: modelFromUrl || '',
-        pepplotTest: testFromUrl || '',
-        pepplotProteinSite: siteFromUrl || '',
+        pepplotStudy: decodedStudy || '',
+        pepplotModel: decodedModel || '',
+        pepplotTest: decodedTest || '',
+        pepplotProteinSite: decodedSiteAndDescription || '',
         enrichmentStudy: '',
         enrichmentModel: '',
         enrichmentAnnotation: '',
@@ -45,10 +45,10 @@ class Tabs extends Component {
       this.state = {
         activeIndex: 3,
         tab: tabFromUrl,
-        enrichmentStudy: studyFromUrl || '',
-        enrichmentModel: modelFromUrl || '',
-        enrichmentAnnotation: testFromUrl || '',
-        enrichmentDescriptionAndTest: siteFromUrl || '',
+        enrichmentStudy: decodedStudy || '',
+        enrichmentModel: decodedModel || '',
+        enrichmentAnnotation: decodedTest || '',
+        enrichmentDescriptionAndTest: decodedSiteAndDescription || '',
         pepplotStudy: '',
         pepplotModel: '',
         pepplotTest: '',

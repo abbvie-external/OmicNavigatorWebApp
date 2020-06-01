@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import { Form, Select, Input, Icon, Button } from 'semantic-ui-react';
+import { Form, Select, Icon, Button } from 'semantic-ui-react';
 import _ from 'lodash';
 import * as d3 from 'd3';
 import NumericExponentialInput from '../Shared/NumericExponentialInput';

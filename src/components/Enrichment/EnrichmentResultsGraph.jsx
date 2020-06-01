@@ -304,7 +304,9 @@ class EnrichmentResultsGraph extends Component {
   };
 
   handleResultSelect = (e, { result }) => {
-    this.setState({ networkSearchValue: result.description });
+    const value = result.description;
+    this.setState({ networkSearchValue: value });
+    this.handleSearchChange(e, { value });
   };
 
   handleSearchChange = (e, { value }) => {
@@ -689,12 +691,7 @@ class EnrichmentResultsGraph extends Component {
                     />
                   </Grid.Column>
                   <Grid.Column id="EdgeTextContainer" textAlign="left">
-                    <Label
-                      circular
-                      size={dynamicSize}
-                      color=""
-                      id="JaccardPercent"
-                    >
+                    <Label circular size={dynamicSize} id="JaccardPercent">
                       {Math.round(edgeTypeLocal * 100)} %
                     </Label>
                     <span id="JaccardText" className="EdgeTypeText">

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Loader, Dimmer, Tab, Popup, Icon } from 'semantic-ui-react';
+import { Loader, Dimmer, Tab, Popup, Icon, Message } from 'semantic-ui-react';
 // import * as d3 from 'd3';
 import './SVGPlot.scss';
 
@@ -44,7 +44,7 @@ class SVGPlot extends Component {
     //   fontSize: "13px",
     //   wordBreak: "break-all"
     // };
-    if (this.props.imageInfo) {
+    if (this.props.imageInfo.length !== 0) {
       const svgArray = this.props.imageInfo.svg;
       // const svgArrayReversed = svgArray.reverse();
       const panes = svgArray.map(s => {
@@ -68,6 +68,15 @@ class SVGPlot extends Component {
           panes={panes}
           onTabChange={this.handleTabChange}
           activeIndex={activeSVGTabIndex}
+        />
+      );
+    } else {
+      return (
+        <Message
+          className="NoPlotsMessage"
+          icon="question mark"
+          header="No Plots Available"
+          // content="add description/instructions"
         />
       );
     }

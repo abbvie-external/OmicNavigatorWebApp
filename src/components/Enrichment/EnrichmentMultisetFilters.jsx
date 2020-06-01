@@ -40,7 +40,10 @@ class EnrichmentMultisetFilters extends Component {
       selectedCol,
       selectedOperator,
     } = this.props;
-    if (uSettings !== prevProps.uSettings) {
+    if (
+      uSettings !== prevProps.uSettings ||
+      prevProps.uData !== this.props.uData
+    ) {
       this.makeMultiset(
         uData,
         uAnchor,
@@ -783,7 +786,7 @@ class EnrichmentMultisetFilters extends Component {
 
   render() {
     const { sigValueELocal } = this.state;
-    const { selectedOperator, uSettings, sigValue } = this.props;
+    const { selectedOperator, uSettings } = this.props;
     const Columns = uSettings.thresholdCols;
     const Operators = uSettings.thresholdOperator;
     const SelOp = selectedOperator;

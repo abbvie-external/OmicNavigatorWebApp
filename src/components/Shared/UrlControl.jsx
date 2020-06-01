@@ -1,5 +1,4 @@
 // import React, { useState, useEffect } from 'react';
-
 export function updateUrl(
   propsParam,
   stateParam,
@@ -33,11 +32,20 @@ export function updateUrl(
           ? stateParam.pepplotTest.trim()
           : '';
       const pepplotProteinSiteQuery = stateParam.pepplotProteinSite || '';
-      const pepplotStudy = pepplotStudyQuery.replace(/ /gi, '–');
-      const pepplotModel = pepplotModelQuery.replace(/ /gi, '–');
-      const pepplotTest = pepplotTestQuery.replace(/ /gi, '–');
-      const pepplotProteinSite = pepplotProteinSiteQuery.replace(/ /gi, '–');
 
+      const pepplotStudyReplaced = pepplotStudyQuery
+        .replace(/ /gi, '–')
+        .replace('/');
+      const pepplotModelReplaced = pepplotModelQuery.replace(/ /gi, '–');
+      const pepplotTestReplaced = pepplotTestQuery.replace(/ /gi, '–');
+      const pepplotProteinSiteReplaced = pepplotProteinSiteQuery.replace(
+        / /gi,
+        '–',
+      );
+      const pepplotStudy = encodeURI(pepplotStudyReplaced);
+      const pepplotModel = encodeURI(pepplotModelReplaced);
+      const pepplotTest = encodeURI(pepplotTestReplaced);
+      const pepplotProteinSite = encodeURI(pepplotProteinSiteReplaced);
       if (pepplotProteinSite !== '') {
         propsParam.history.push(
           tab +
@@ -69,17 +77,24 @@ export function updateUrl(
       const enrichmentAnnotationQuery = stateParam.enrichmentAnnotation || '';
       const enrichmentDescriptionAndTestQuery =
         stateParam.enrichmentDescriptionAndTest || '';
-      const enrichmentStudy = enrichmentStudyQuery.replace(/ /gi, '–');
-      const enrichmentModel = enrichmentModelQuery.replace(/ /gi, '–');
-      const enrichmentAnnotation = enrichmentAnnotationQuery.replace(
+
+      const enrichmentStudyReplaced = enrichmentStudyQuery.replace(/ /gi, '–');
+      const enrichmentModelReplaced = enrichmentModelQuery.replace(/ /gi, '–');
+      const enrichmentAnnotationReplaced = enrichmentAnnotationQuery.replace(
         / /gi,
         '–',
       );
-      const enrichmentDescriptionAndTest = enrichmentDescriptionAndTestQuery.replace(
+      const enrichmentDescriptionAndTestReplaced = enrichmentDescriptionAndTestQuery.replace(
         / /gi,
         '–',
       );
 
+      const enrichmentStudy = encodeURI(enrichmentStudyReplaced);
+      const enrichmentModel = encodeURI(enrichmentModelReplaced);
+      const enrichmentAnnotation = encodeURI(enrichmentAnnotationReplaced);
+      const enrichmentDescriptionAndTest = encodeURI(
+        enrichmentDescriptionAndTestReplaced,
+      );
       if (enrichmentDescriptionAndTest !== '') {
         propsParam.history.push(
           tab +
@@ -127,11 +142,17 @@ export function updateUrl(
       const pepplotModelQuery2 = stateChanges.pepplotModel || '';
       const pepplotTestQuery2 = stateChanges.pepplotTest || '';
       const pepplotProteinSiteQuery2 = stateChanges.pepplotProteinSite || '';
-      const pepplotStudy = pepplotStudyQuery2.replace(/ /gi, '–');
-      const pepplotModel = pepplotModelQuery2.replace(/ /gi, '–');
-      const pepplotTest = pepplotTestQuery2.replace(/ /gi, '–');
-      const pepplotProteinSite = pepplotProteinSiteQuery2.replace(/ /gi, '–');
-
+      const pepplotStudyReplaced = pepplotStudyQuery2.replace(/ /gi, '–');
+      const pepplotModelReplaced = pepplotModelQuery2.replace(/ /gi, '–');
+      const pepplotTestReplaced = pepplotTestQuery2.replace(/ /gi, '–');
+      const pepplotProteinSiteReplaced = pepplotProteinSiteQuery2.replace(
+        / /gi,
+        '–',
+      );
+      const pepplotStudy = encodeURI(pepplotStudyReplaced);
+      const pepplotModel = encodeURI(pepplotModelReplaced);
+      const pepplotTest = encodeURI(pepplotTestReplaced);
+      const pepplotProteinSite = encodeURI(pepplotProteinSiteReplaced);
       if (pepplotProteinSite !== '') {
         propsParam.history.push(
           scTab +
@@ -166,27 +187,24 @@ export function updateUrl(
         stateChanges.enrichmentAnnotation || '';
       const enrichmentDescriptionAndTestQuery2 =
         stateChanges.enrichmentDescriptionAndTest || '';
-      const enrichmentStudy = enrichmentStudyQuery2.replace(/ /gi, '–');
-      const enrichmentModel = enrichmentModelQuery2.replace(/ /gi, '–');
-      const enrichmentAnnotation = enrichmentAnnotationQuery2.replace(
+
+      const enrichmentStudyReplaced = enrichmentStudyQuery2.replace(/ /gi, '–');
+      const enrichmentModelReplaced = enrichmentModelQuery2.replace(/ /gi, '–');
+      const enrichmentAnnotationReplaced = enrichmentAnnotationQuery2.replace(
         / /gi,
         '–',
       );
-      // let replacementString = '&';
-      // let enrichmentDescriptionAndTestFirstReplace = enrichmentDescriptionAndTestQuery2.replace(
-      //   /\//g,
-      //   replacementString,
-      // );
-
-      // const enrichmentDescriptionAndTest = enrichmentDescriptionAndTestFirstReplace.replace(
-      //   / /gi,
-      //   '–',
-      // );
-      const enrichmentDescriptionAndTest = enrichmentDescriptionAndTestQuery2.replace(
+      const enrichmentDescriptionAndTestReplaced = enrichmentDescriptionAndTestQuery2.replace(
         / /gi,
         '–',
       );
 
+      const enrichmentStudy = encodeURI(enrichmentStudyReplaced);
+      const enrichmentModel = encodeURI(enrichmentModelReplaced);
+      const enrichmentAnnotation = encodeURI(enrichmentAnnotationReplaced);
+      const enrichmentDescriptionAndTest = encodeURI(
+        enrichmentDescriptionAndTestReplaced,
+      );
       if (enrichmentDescriptionAndTest !== '') {
         propsParam.history.push(
           scTab +
