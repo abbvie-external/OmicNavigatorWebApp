@@ -160,8 +160,10 @@ class PepplotSearchCriteria extends Component {
             },
           });
           this.testdata = dataFromService;
-          this.props.onPepplotSearchUnfiltered({pepplotResults: this.testdata})
-          this.props.onPepplotSearch({pepplotResults: this.testdata});
+          this.props.onPepplotSearchUnfiltered({
+            pepplotResults: this.testdata,
+          });
+          this.props.onPepplotSearch({ pepplotResults: this.testdata });
         })
         .catch(error => {
           console.error('Error during getTestData', error);
@@ -246,8 +248,10 @@ class PepplotSearchCriteria extends Component {
               },
             });
             this.testdata = dataFromService;
-            this.props.onPepplotSearchUnfiltered({pepplotResults: this.testdata})
-            this.props.onPepplotSearch({pepplotResults: this.testdata});
+            this.props.onPepplotSearchUnfiltered({
+              pepplotResults: this.testdata,
+            });
+            this.props.onPepplotSearch({ pepplotResults: this.testdata });
           })
           .catch(error => {
             console.error('Error during getTestData', error);
@@ -371,8 +375,8 @@ class PepplotSearchCriteria extends Component {
           uAnchorP: value,
         });
         this.testdata = dataFromService;
-        this.props.onPepplotSearchUnfiltered({pepplotResults: this.testdata})
-        this.props.onPepplotSearch({pepplotResults: this.testdata});
+        this.props.onPepplotSearchUnfiltered({ pepplotResults: this.testdata });
+        this.props.onPepplotSearch({ pepplotResults: this.testdata });
       })
       .catch(error => {
         console.error('Error during getTestData', error);
@@ -398,7 +402,7 @@ class PepplotSearchCriteria extends Component {
         // on toggle close
         this.setState({
           multisetFiltersVisibleP: false,
-          reloadPlot: true,
+          reloadPlot: false,
         });
         this.props.onMultisetQueried(false);
         const pepplotTestName = 'pepplotTest';
@@ -425,7 +429,7 @@ class PepplotSearchCriteria extends Component {
       },
       this.updateQueryDataP(),
     );
-    console.log('Error during getPlot');
+    console.log('Error during getTestData');
   };
 
   multisetTriggeredTestChange = (name, value) => {
@@ -443,7 +447,8 @@ class PepplotSearchCriteria extends Component {
       cancelRequestPSCGetTestData = e;
     });
     phosphoprotService
-      .getPlot(
+      .getTestData(
+        // .getPlot(
         this.props.pepplotModel,
         value,
         this.props.pepplotStudy + 'plots',
@@ -452,8 +457,8 @@ class PepplotSearchCriteria extends Component {
       )
       .then(dataFromService => {
         this.testdata = dataFromService;
-        this.props.onPepplotSearchUnfiltered({pepplotResults: this.testdata})
-        this.props.onPepplotSearch({pepplotResults: this.testdata});
+        this.props.onPepplotSearchUnfiltered({ pepplotResults: this.testdata });
+        this.props.onPepplotSearch({ pepplotResults: this.testdata });
       })
       .catch(error => {
         console.error('Error during getTestData', error);
