@@ -160,9 +160,8 @@ class PepplotSearchCriteria extends Component {
             },
           });
           this.testdata = dataFromService;
-          this.props.onPepplotSearch({
-            pepplotResults: this.testdata,
-          });
+          this.props.onPepplotSearchUnfiltered({pepplotResults: this.testdata})
+          this.props.onPepplotSearch({pepplotResults: this.testdata});
         })
         .catch(error => {
           console.error('Error during getTestData', error);
@@ -247,9 +246,8 @@ class PepplotSearchCriteria extends Component {
               },
             });
             this.testdata = dataFromService;
-            this.props.onPepplotSearch({
-              pepplotResults: this.testdata,
-            });
+            this.props.onPepplotSearchUnfiltered({pepplotResults: this.testdata})
+            this.props.onPepplotSearch({pepplotResults: this.testdata});
           })
           .catch(error => {
             console.error('Error during getTestData', error);
@@ -338,6 +336,7 @@ class PepplotSearchCriteria extends Component {
       reloadPlot: true,
       multisetFiltersVisibleP: false,
     });
+    this.props.onMultisetQueried(false);
     this.props.onSearchCriteriaChange(
       {
         pepplotStudy: this.props.pepplotStudy,
@@ -372,7 +371,8 @@ class PepplotSearchCriteria extends Component {
           uAnchorP: value,
         });
         this.testdata = dataFromService;
-        this.props.onPepplotSearch({ pepplotResults: this.testdata });
+        this.props.onPepplotSearchUnfiltered({pepplotResults: this.testdata})
+        this.props.onPepplotSearch({pepplotResults: this.testdata});
       })
       .catch(error => {
         console.error('Error during getTestData', error);
@@ -452,9 +452,8 @@ class PepplotSearchCriteria extends Component {
       )
       .then(dataFromService => {
         this.testdata = dataFromService;
-        this.props.onPepplotSearch({
-          pepplotResults: this.testdata,
-        });
+        this.props.onPepplotSearchUnfiltered({pepplotResults: this.testdata})
+        this.props.onPepplotSearch({pepplotResults: this.testdata});
       })
       .catch(error => {
         console.error('Error during getTestData', error);
