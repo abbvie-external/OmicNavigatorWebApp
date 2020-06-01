@@ -40,7 +40,15 @@ class PepplotMultisetFilters extends Component {
       selectedColP,
       selectedOperatorP,
     } = this.props;
-    if (uSettingsP !== prevProps.uSettingsP) {
+    if (
+      uDataP !== prevProps.uDataP ||
+      uAnchorP !== prevProps.uAnchorP ||
+      uSettingsP !== prevProps.uSettingsP ||
+      metaSvgP !== prevProps.metaSvgP ||
+      sigValueP !== prevProps.sigValueP ||
+      selectedColP !== prevProps.selectedColP ||
+      selectedOperatorP !== prevProps.selectedOperatorP
+    ) {
       this.makeMultiset(
         uDataP,
         uAnchorP,
@@ -817,8 +825,9 @@ class PepplotMultisetFilters extends Component {
   }, 1250);
 
   removeFilter = index => {
-    this.props.onRemoveFilter(index);
+    this.props.onRemoveFilterPepplot(index);
   };
+
   changeHoveredFilter = index => {
     this.props.onChangeHoveredFilter(index);
   };
@@ -830,6 +839,7 @@ class PepplotMultisetFilters extends Component {
       selectedColP,
       uSettingsP,
       thresholdColsP,
+      loadingPepplotMultisetFilters,
     } = this.props;
     const OperatorsP = uSettingsP.thresholdOperatorP;
     const indexFiltersP = uSettingsP.indexFiltersP;
@@ -865,6 +875,7 @@ class PepplotMultisetFilters extends Component {
                 ></Form.Field>
                 {hoveredFilter === index && indexFiltersP.length !== 1 && (
                   <Button
+                    disabled={loadingPepplotMultisetFilters}
                     circular
                     icon
                     style={{
@@ -898,6 +909,7 @@ class PepplotMultisetFilters extends Component {
                 >
                   <label>{index === 0 ? 'Significance' : ''}</label>
                   <NumericExponentialInput
+                    key={`pepplotMultiSetFiltersInput${index}`}
                     onChange={callbackFactory(index)}
                     min={0}
                     name="sigValueP"
@@ -914,7 +926,8 @@ class PepplotMultisetFilters extends Component {
             compact
             size="mini"
             icon
-            onClick={this.props.onAddFilter}
+            onClick={this.props.onAddFilterPepplot}
+            disabled={loadingPepplotMultisetFilters}
           >
             <Icon name="plus circle" color={'green'} />
           </Button>

@@ -888,8 +888,6 @@ class Pepplot extends Component {
 
   render() {
     const pepplotView = this.getView();
-    console.log('THIS:');
-    console.log(this.state.thresholdColsP);
     const { multisetPlotInfo, animation, direction, visible } = this.state;
     const VerticalSidebar = ({ animation, visible }) => (
       <Sidebar
