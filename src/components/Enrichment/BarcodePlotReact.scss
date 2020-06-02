@@ -16,6 +16,12 @@
   opacity: 1;
 }
 
+.barcode-line.selected-hovered {
+  stroke: var(--color-secondary);
+  stroke-width: 3.8px;
+  opacity: 1;
+}
+
 .barcode-line.MaxLine {
   stroke: var(--color-primary);
   stroke-width: 3.5px;
@@ -39,4 +45,8 @@
 .BarcodeLabel {
   font-weight: 600 !important;
   font-size: 15px !important;
+}
+
+.export-container {
+  margin: 0px 30px 0px 0px;
 }

@@ -78,6 +78,10 @@
   stroke-width: 1px;
 }
 
+.export {
+  margin: 0px;
+}
+
 @media (max-width: 500px) {
   .violin-chart-wrapper .box-plot circle {
     display: none;

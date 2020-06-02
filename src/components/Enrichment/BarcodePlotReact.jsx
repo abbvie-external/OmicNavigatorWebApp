@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import ButtonActions from '../Shared/ButtonActions';
 // import Axis from "./Axis";
 import './BarcodePlotReact.scss';
 // import Tooltip from "./useTooltip";
@@ -23,7 +24,7 @@ class BarcodePlotReact extends Component {
       margin: {
         top: 40,
         right: 40,
-        bottom: 10,
+        bottom: 40,
         left: 20,
         hovered: 20,
         selected: 20,
@@ -162,48 +163,67 @@ class BarcodePlotReact extends Component {
   };
 
   handleLineEnter = event => {
-    if (this.state.settings.brushing === false) {
-      const lineIdMult = event.target.attributes[6].nodeValue;
-      const lineName = event.target.attributes[7].nodeValue;
-      const lineStatistic = event.target.attributes[9].nodeValue;
-      const textAnchor =
-        lineStatistic > this.props.barcodeSettings.highStat / 2
-          ? 'end'
-          : 'start';
-      const textPosition =
-        textAnchor === 'end'
-          ? event.target.attributes[2].nodeValue - 5
-          : event.target.attributes[2].nodeValue + 5;
-      const lineId = `#barcode-line-${lineName.replace(
-        /;/g,
-        '',
-      )}_${lineIdMult}`;
-      const hoveredLine = d3.select(lineId);
+    // if (this.state.settings.brushing === false) {
+    const lineIdMult = event.target.attributes[6].nodeValue;
+    const lineName = event.target.attributes[7].nodeValue;
+    const lineStatistic = event.target.attributes[9].nodeValue;
+    const textAnchor =
+      lineStatistic > this.props.barcodeSettings.highStat / 1.5
+        ? 'end'
+        : 'start';
+    const textPosition =
+      textAnchor === 'end'
+        ? event.target.attributes[2].nodeValue - 5
+        : event.target.attributes[2].nodeValue + 5;
+    const lineId = `#barcode-line-${lineName.replace(/;/g, '')}_${lineIdMult}`;
+    const hoveredLine = d3.select(lineId);
+    if (hoveredLine.attr('class').endsWith('selected')) {
+      hoveredLine.attr('y1', this.state.settings.margin.hovered - 10);
+    } else if (hoveredLine.attr('class').endsWith('MaxLine')) {
+      hoveredLine.attr('y1', this.state.settings.margin.hovered - 20);
+    } else if (hoveredLine.attr('class').endsWith('selected HighlightedLine')) {
+      hoveredLine.attr('y1', this.state.settings.margin.hovered - 15);
+    } else {
       hoveredLine
         .classed('HoveredLine', true)
         .attr('y1', this.state.settings.margin.hovered);
-      this.setState({
-        hoveredLineId: lineId,
-        hoveredLineName: lineName,
-        tooltipPosition: textPosition,
-        tooltipTextAnchor: textAnchor,
-      });
     }
+
+    this.setState({
+      hoveredLineId: lineId,
+      hoveredLineName: lineName,
+      tooltipPosition: textPosition,
+      tooltipTextAnchor: textAnchor,
+    });
+    // }
   };
 
   handleLineLeave = () => {
-    if (this.state.settings.brushing === false) {
-      const hoveredLine = d3.select(this.state.hoveredLineId);
-      hoveredLine
-        .classed('HoveredLine', false)
-        .attr('y1', this.state.settings.margin.top);
-      this.setState({
-        hoveredLineId: null,
-        hoveredLineName: null,
-        tooltipPosition: null,
-        tooltipTextAnchor: null,
-      });
+    // if (this.state.settings.brushing === false) {
+    const hoveredLine = d3.select(this.state.hoveredLineId);
+    if (!hoveredLine.empty()) {
+      if (hoveredLine.attr('class').endsWith('selected')) {
+        hoveredLine.attr('y1', this.state.settings.margin.hovered);
+      } else if (hoveredLine.attr('class').endsWith('MaxLine')) {
+        hoveredLine.attr('y1', this.state.settings.margin.hovered - 10);
+      } else if (
+        hoveredLine.attr('class').endsWith('selected HighlightedLine')
+      ) {
+        hoveredLine.attr('y1', this.state.settings.margin.hovered - 10);
+      } else {
+        hoveredLine
+          .classed('HoveredLine', false)
+          .attr('y1', this.state.settings.margin.top);
+      }
     }
+
+    this.setState({
+      hoveredLineId: null,
+      hoveredLineName: null,
+      tooltipPosition: null,
+      tooltipTextAnchor: null,
+    });
+    // }
   };
 
   unhighlightBrushedLines = () => {
@@ -410,30 +430,34 @@ class BarcodePlotReact extends Component {
       tooltipPosition,
       tooltipTextAnchor,
     } = this.state;
-    if (hoveredLineName) {
-      return (
-        <text
-          className="BarcodeTooltipText"
-          transform={`translate(${tooltipPosition}, 30)`}
-          fontSize="14px"
-          textAnchor={tooltipTextAnchor}
-        >
-          &nbsp;&nbsp;{hoveredLineName}
-        </text>
-      );
+
+    if (tooltipPosition) {
+      if (hoveredLineName) {
+        return (
+          <text
+            className="BarcodeTooltipText"
+            transform={`translate(${tooltipPosition}, 10)`}
+            fontSize="14px"
+            textAnchor={tooltipTextAnchor}
+          >
+            &nbsp;&nbsp;{hoveredLineName}
+          </text>
+        );
+      }
+      if (highlightedLineName) {
+        return (
+          <text
+            className="BarcodeTooltipText"
+            transform={`translate(${tooltipPosition}, 15)`}
+            fontSize="14px"
+            textAnchor={tooltipTextAnchor}
+          >
+            &nbsp;&nbsp;{highlightedLineName}
+          </text>
+        );
+      }
     }
-    if (highlightedLineName) {
-      return (
-        <text
-          className="BarcodeTooltipText"
-          transform={`translate(${tooltipPosition}, 15)`}
-          fontSize="14px"
-          textAnchor={tooltipTextAnchor}
-        >
-          &nbsp;&nbsp;{highlightedLineName}
-        </text>
-      );
-    }
+
     return null;
   };
 
@@ -514,6 +538,15 @@ class BarcodePlotReact extends Component {
         id={settings.id}
         className="BarcodeChartContainer"
       >
+        <div className="export-container">
+          <ButtonActions
+            excelVisible={false}
+            txtVisible={false}
+            pdfVisible={false}
+            plot={'barcode'}
+          />
+        </div>
+
         <svg
           ref={this.barcodeSVGRef}
           id={`svg-${settings.id}`}

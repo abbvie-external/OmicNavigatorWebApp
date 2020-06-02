@@ -540,16 +540,16 @@ class ViolinPlot extends Component {
     // Build Axes Functions
     self.chart.objs.yAxis = d3
       .axisLeft(self.chart.yScale)
-      .tickFormat(formatAsFloat)
-      // .tickSizeOuter(0)
-      // .tickSizeInner(-self.chart.width)
-      .tickPadding(
-        Math.max.apply(Math, this.chart.yScale.ticks())
-          ? parseInt(
-              Math.max.apply(Math, this.chart.yScale.ticks()).toString().length,
-            ) * 8
-          : 0,
-      );
+      .tickFormat(formatAsFloat);
+    // .tickSizeOuter(0)
+    // .tickSizeInner(-self.chart.width)
+    // .tickPadding(
+    //   Math.max.apply(Math, this.chart.yScale.ticks())
+    //     ? parseInt(
+    //         Math.max.apply(Math, this.chart.yScale.ticks()).toString().length,
+    //       ) * 8
+    //     : 0,
+    // );
     self.chart.objs.yAxis.tickArguments(
       self.chart.objs.yAxis.tickArguments() * self.props.violinSettings.yTicks,
     );
@@ -572,6 +572,7 @@ class ViolinPlot extends Component {
       .attr('height', '100%')
       .attr('viewBox', `0 0 ${self.chart.divWidth} ${self.chart.divHeight}`);
     // .attr('preserveAspectRatio', 'xMinYMin meet');
+
     self.chart.objs.g = self.chart.objs.svg
       .append('g')
       .attr(
@@ -1196,7 +1197,8 @@ class ViolinPlot extends Component {
           if (bOpts.showBox) {
             cBoxPlot.objs.box = cBoxPlot.objs.g
               .append('rect')
-              .attr('class', 'box')
+              // .attr('class', 'box')
+              .attr('fill-opacity', '0.4')
               .attr('fill', self.chart.boxPlots.colorFunct(cName))
               .attr('opacity', '0.4')
               .attr('stroke', self.chart.boxPlots.colorFunct(cName))
@@ -1210,7 +1212,7 @@ class ViolinPlot extends Component {
             cBoxPlot.objs.median = { line: null, circle: null };
             cBoxPlot.objs.median.line = cBoxPlot.objs.g
               .append('line')
-              .attr('class', 'median');
+              .attr('stroke', 'black');
             cBoxPlot.objs.median.circle = cBoxPlot.objs.g
               .append('circle')
               .attr('class', 'median')
