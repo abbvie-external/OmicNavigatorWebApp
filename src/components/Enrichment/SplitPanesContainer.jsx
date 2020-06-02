@@ -82,6 +82,16 @@ class SplitPanesContainer extends Component {
     });
   };
 
+  getButtonActionsClass = () => {
+    if (
+      this.props.enrichmentModel === 'Timecourse Differential Phosphorylation'
+    ) {
+      return 'export-violin Hide';
+    } else {
+      return 'export-violin ShowBlock';
+    }
+  };
+
   getViolinAndTable = () => {
     const { displayViolinPlot } = this.props;
     const { activeViolinTableIndex } = this.state;
@@ -143,6 +153,7 @@ class SplitPanesContainer extends Component {
 
     const selectedPlot = violinAndTablePanes[activeViolinTableIndex].menuItem;
     //const actionButtons = selectedPlot === "Statistic Table" ? <ButtonActions excelVisible={false} pngVisible={false} pdfVisible={false} txtVisible={true} exportButtonSize='mini' plot={'table'}/> : <ButtonActions excelVisible={false} pngVisibile={false} exportButtonSize='mini' plot={'violin'}/>;
+    const ButtonActionsClass = this.getButtonActionsClass();
     const actionButtons =
       selectedPlot === 'Statistic Table' ? (
         ''
@@ -156,7 +167,7 @@ class SplitPanesContainer extends Component {
       );
     return (
       <div className="main">
-        <div className="export-violin">{actionButtons}</div>
+        <div className={ButtonActionsClass}>{actionButtons}</div>
         <Tab
           className="ViolinAndTableTabsDiv"
           onTabChange={this.handleViolinTableTabChange}

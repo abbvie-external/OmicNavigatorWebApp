@@ -150,10 +150,16 @@
   width: 100% !important;
 }
 
-.export-violin  {
-  margin: 4px 6px 2px 0px;
+.export-violin {
+  margin: 4px 25px 2px 0px;
   position: absolute;
   right: 0;
+}
+
+@media (min-width: 1599px) {
+  .export-violin {
+    margin: 4px 6px 2px 0px !important;
+  }
 }
 
 .main {
