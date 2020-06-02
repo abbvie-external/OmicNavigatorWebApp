@@ -101,7 +101,7 @@ class NetworkGraph extends Component {
     if (totalClusters !== 1) {
       // let networkCalculatedWidth = (relevantNodesLength * .75) * totalClusters * 1.5;
       let networkCalculatedWidth = relevantNodesLength * 35;
-      console.log(networkCalculatedWidth);
+      // console.log(networkCalculatedWidth);
       return Math.max(
         networkCalculatedWidth,
         adjustedDocumentWidth,
@@ -235,7 +235,7 @@ class NetworkGraph extends Component {
           });
         });
 
-        console.log(clusters.children.length);
+        // console.log(clusters.children.length);
         const totalClusters = clusters.children.length;
 
         // Prepare Settings

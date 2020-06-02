@@ -838,7 +838,6 @@ class EnrichmentResultsGraph extends Component {
                 on="click"
                 basic
                 flowing
-                padding
               />
               <Radio
                 disabled={!networkGraphReady}
