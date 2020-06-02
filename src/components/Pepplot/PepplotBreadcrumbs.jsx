@@ -26,7 +26,11 @@ class PepplotBreadcrumbs extends Component {
               <Popup
                 trigger={
                   <Icon
-                    name={this.props.activeIndex === 0 ? 'table' : 'chart area'}
+                    name={
+                      this.props.activeIndexPepplotView === 0
+                        ? 'table'
+                        : 'chart area'
+                    }
                     onClick={this.props.onBackToTable}
                   />
                 }
@@ -35,7 +39,7 @@ class PepplotBreadcrumbs extends Component {
                 basic
                 position="bottom left"
                 content={
-                  this.props.activeIndex === 0
+                  this.props.activeIndexPepplotView === 0
                     ? 'Back To Table'
                     : 'Back To Plot'
                 }
