@@ -94,7 +94,7 @@ class PepplotSearchCriteria extends Component {
     multisetFiltersVisibleP: false,
     activateMultisetFiltersP: false,
     uDataP: [],
-    loadingPepplotMultisetFilters: false,
+    // loadingPepplotMultisetFilters: false,
   };
 
   componentDidMount() {
@@ -467,7 +467,7 @@ class PepplotSearchCriteria extends Component {
   };
 
   addFilterPepplot = () => {
-    this.setState({ loadingPepplotMultisetFilters: true });
+    // this.setState({ loadingPepplotMultisetFilters: true });
     // const uSetVP = _.cloneDeep(this.state.uSettingsP);
     const uSetVP = { ...this.state.uSettingsP };
     uSetVP.indexFiltersP = [...this.state.uSettingsP.indexFiltersP].concat(
@@ -488,7 +488,7 @@ class PepplotSearchCriteria extends Component {
   };
 
   removeFilterPepplot = index => {
-    this.setState({ loadingPepplotMultisetFilters: true });
+    // this.setState({ loadingPepplotMultisetFilters: true });
     const uSetVP = { ...this.state.uSettingsP };
     uSetVP.indexFiltersP = [...uSetVP.indexFiltersP]
       .slice(0, index)
@@ -531,7 +531,9 @@ class PepplotSearchCriteria extends Component {
       },
     );
   };
-  handleSigValuePInputChange = (name, value, index) => {
+
+  // handleSigValuePInputChange = (name, value, index) => {
+  handleSigValuePInputChange = (evt, { name, value, index }) => {
     const uSelVP = [...this.state[name]];
     uSelVP[index] = parseFloat(value);
     this.setState(
@@ -605,7 +607,7 @@ class PepplotSearchCriteria extends Component {
           },
           activateMultisetFiltersP: true,
           reloadPlot: false,
-          loadingPepplotMultisetFilters: false,
+          // loadingPepplotMultisetFilters: false,
         });
         this.props.onPepplotSearch({
           pepplotResults: multisetResultsP,

@@ -1,14 +1,14 @@
 import React, { Component, Fragment } from 'react';
-import { Form, Select, Icon, Button } from 'semantic-ui-react';
+import { Form, Select, Icon, Button, Input } from 'semantic-ui-react';
 import _ from 'lodash';
 import * as d3 from 'd3';
-import NumericExponentialInput from '../Shared/NumericExponentialInput';
+// import NumericExponentialInput from '../Shared/NumericExponentialInput';
 import '../Shared/MultisetFilters.scss';
 
 class PepplotMultisetFilters extends Component {
-  state = {
-    sigValuePLocal: [0.05],
-  };
+  // state = {
+  //   sigValuePLocal: [0.05],
+  // };
   componentDidMount() {
     const {
       uDataP,
@@ -40,7 +40,6 @@ class PepplotMultisetFilters extends Component {
       selectedColP,
       selectedOperatorP,
     } = this.props;
-    debugger;
     if (
       uDataP !== prevProps.uDataP ||
       uAnchorP !== prevProps.uAnchorP ||
@@ -363,7 +362,6 @@ class PepplotMultisetFilters extends Component {
           .attr('fill', 'black');
       }
     }
-    this.setState({ loadingPepplotMultisetFilters: false });
   }
 
   prepareMultiset(uDataP, uAnchorP, uSettingsP, baseP) {
@@ -815,17 +813,25 @@ class PepplotMultisetFilters extends Component {
     this.props.onHandleDropdownChange(evt, { name, value, index });
   };
 
-  handleSigValuePInputChange = (value, index) => {
-    const uSelVPLocal = [...this.state['sigValuePLocal']];
-    uSelVPLocal[index] = parseFloat(value);
-    this.setState({
-      sigValuePLocal: uSelVPLocal,
-    });
+  handleInputChange = (evt, { name, value, index }) => {
+    this.props.onHandleSigValuePInputChange(evt, { name, value, index });
   };
 
-  actuallyHandleSigValuePInputChange = _.debounce((value, index) => {
-    this.props.onHandleSigValuePInputChange('sigValueP', value, index);
-  }, 1250);
+  // handleSigValuePInputChange = (value, index) => {
+  //   const uSelVPLocal = [...this.state['sigValuePLocal']];
+  //   uSelVPLocal[index] = parseFloat(value);
+  //   this.setState({
+  //     sigValuePLocal: uSelVPLocal,
+  //   });
+  // };
+
+  // actuallyHandleSigValuePInputChange = _.debounce((value, index) => {
+  //   this.props.onHandleSigValuePInputChange('sigValueP', value, index);
+  // }, 1250);
+
+  addFilter = () => {
+    this.props.onAddFilterPepplot();
+  };
 
   removeFilter = index => {
     this.props.onRemoveFilterPepplot(index);
@@ -836,22 +842,23 @@ class PepplotMultisetFilters extends Component {
   };
 
   render() {
-    const { sigValuePLocal } = this.state;
+    // const { sigValuePLocal } = this.state;
     const {
+      sigValueP,
       selectedOperatorP,
       selectedColP,
       uSettingsP,
       thresholdColsP,
-      loadingPepplotMultisetFilters,
+      // loadingPepplotMultisetFilters,
     } = this.props;
     const OperatorsP = uSettingsP.thresholdOperatorP;
     const indexFiltersP = uSettingsP.indexFiltersP;
     const hoveredFilter = uSettingsP.hoveredFilter;
-    const defaultSigValue = uSettingsP.defaultsigValueP;
-    const callbackFactory = index => number => {
-      this.handleSigValuePInputChange(number, index);
-      this.actuallyHandleSigValuePInputChange(number, index);
-    };
+    // const defaultSigValue = uSettingsP.defaultsigValueP;
+    // const callbackFactory = index => number => {
+    //   this.handleSigValuePInputChange(number, index);
+    //   this.actuallyHandleSigValuePInputChange(number, index);
+    // };
 
     return (
       <Fragment>
@@ -878,7 +885,7 @@ class PepplotMultisetFilters extends Component {
                 ></Form.Field>
                 {hoveredFilter === index && indexFiltersP.length !== 1 && (
                   <Button
-                    disabled={loadingPepplotMultisetFilters}
+                    // disabled={loadingPepplotMultisetFilters}
                     circular
                     icon
                     style={{
@@ -906,6 +913,19 @@ class PepplotMultisetFilters extends Component {
                   onChange={this.handleDropdownChange}
                 ></Form.Field>
                 <Form.Field
+                  control={Input}
+                  type="number"
+                  step="0.01"
+                  label={index === 0 ? 'Significance' : ''}
+                  name="sigValueP"
+                  className="SignificantValueInput"
+                  id="SignificantValueInputMultisetP"
+                  index={index}
+                  value={sigValueP[index]}
+                  width={5}
+                  onChange={this.handleInputChange}
+                ></Form.Field>
+                {/* <Form.Field
                   width={4}
                   id="SignificantValueInputMultisetP"
                   key={`pepplotMultiSetFiltersSignificance${index}`}
@@ -920,7 +940,7 @@ class PepplotMultisetFilters extends Component {
                     value={sigValuePLocal[index]}
                     spellcheck="false"
                   />
-                </Form.Field>
+                </Form.Field> */}
               </Form.Group>
             ))}
           </ul>
@@ -929,8 +949,9 @@ class PepplotMultisetFilters extends Component {
             compact
             size="mini"
             icon
-            onClick={this.props.onAddFilterPepplot}
-            disabled={loadingPepplotMultisetFilters}
+            onClick={this.addFilter}
+            // onClick={this.props.onAddFilterPepplot}
+            // disabled={loadingPepplotMultisetFilters}
           >
             <Icon name="plus circle" color={'green'} />
           </Button>

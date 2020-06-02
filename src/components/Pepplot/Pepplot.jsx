@@ -70,7 +70,7 @@ class Pepplot extends Component {
     pdfVisible: false,
     svgVisible: true,
     multisetQueried: false,
-    activeIndexPepplotView: this.defaultactiveIndexPepplotView || 0,
+    activeIndexPepplotView: this.defaultActiveIndexPepplotView || 0,
     thresholdColsP: [],
   };
 
