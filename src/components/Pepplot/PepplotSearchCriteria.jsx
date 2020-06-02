@@ -403,7 +403,7 @@ class PepplotSearchCriteria extends Component {
         // on toggle close
         this.setState({
           multisetFiltersVisibleP: false,
-          reloadPlot: true,
+          reloadPlot: false,
         });
         this.props.onMultisetQueried(false);
         const pepplotTestName = 'pepplotTest';
@@ -430,7 +430,7 @@ class PepplotSearchCriteria extends Component {
       },
       this.updateQueryDataP(),
     );
-    console.log('Error during getPlot');
+    console.log('Error during getTestData');
   };
 
   multisetTriggeredTestChange = (name, value) => {
@@ -448,7 +448,8 @@ class PepplotSearchCriteria extends Component {
       cancelRequestPSCGetTestData = e;
     });
     phosphoprotService
-      .getPlot(
+      .getTestData(
+        // .getPlot(
         this.props.pepplotModel,
         value,
         this.props.pepplotStudy + 'plots',
