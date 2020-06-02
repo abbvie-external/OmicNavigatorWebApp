@@ -894,11 +894,12 @@ class Enrichment extends Component {
     // then multiply the other dimension by original svg ratio (height 595px, width 841px)
     let EnrichmentPlotSVGHeight = this.calculateHeight(this);
     let EnrichmentPlotSVGWidth = this.calculateWidth(this);
-    if (EnrichmentPlotSVGHeight + 60 > EnrichmentPlotSVGWidth) {
-      EnrichmentPlotSVGHeight = EnrichmentPlotSVGWidth * 0.70749;
-    } else {
-      EnrichmentPlotSVGWidth = EnrichmentPlotSVGHeight * 1.41344;
-    }
+    EnrichmentPlotSVGHeight = EnrichmentPlotSVGWidth * 0.70749;
+    // if (EnrichmentPlotSVGHeight + 60 > EnrichmentPlotSVGWidth) {
+    //   EnrichmentPlotSVGHeight = EnrichmentPlotSVGWidth * 0.70749;
+    // } else {
+    //   EnrichmentPlotSVGWidth = EnrichmentPlotSVGHeight * 1.41344;
+    // }
     cancelRequestEnrichmentGetPlot();
     let cancelToken = new CancelToken(e => {
       cancelRequestEnrichmentGetPlot = e;

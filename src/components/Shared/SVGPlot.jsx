@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Loader, Dimmer, Tab, Popup, Icon, Message } from 'semantic-ui-react';
+import ButtonActions from '../Shared/ButtonActions';
 // import * as d3 from 'd3';
 import './SVGPlot.scss';
 
@@ -105,6 +106,13 @@ class SVGPlot extends Component {
     } else {
       return (
         <div className="svgContainer">
+          <div className="export-svg">
+            <ButtonActions
+              excelVisible={false}
+              pdfVisible={false}
+              exportButtonSize="mini"
+            />
+          </div>
           <Popup
             trigger={
               <Icon

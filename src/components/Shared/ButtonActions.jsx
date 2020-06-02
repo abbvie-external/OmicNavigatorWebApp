@@ -9,7 +9,8 @@ class ButtonActions extends Component {
   static defaultProps = {
     excelVisible: true,
     pngVisible: true,
-    pdfVisible: true
+    pdfVisible: true,
+    exportButtonSize: 'medium',
   };
 
   componentDidMount() {
@@ -24,7 +25,7 @@ class ButtonActions extends Component {
   ExcelExport = () => {
     excelService.exportAsExcelFile(
       this.props.treeDataRaw,
-      this.props.imageInfo.title + '_Peptide_Data'
+      this.props.imageInfo.title + '_Peptide_Data',
     );
   };
 
@@ -36,10 +37,28 @@ class ButtonActions extends Component {
       const MultisetPlotName = this.getMultisetPlotName('png');
       const currentSVG = document.getElementById('multisetAnalysisSVG') || null;
       saveSvgAsPng.saveSvgAsPng(currentSVG, MultisetPlotName);
+    } else if (this.props.plot === 'barcode') {
+      const currentContentContainer =
+        document.getElementById('chart-barcode') || null;
+      const ProteinPlotName = 'Barcode.png';
+      const currentSVG =
+        currentContentContainer.getElementsByTagName('svg')[0] || null;
+      saveSvgAsPng.saveSvgAsPng(currentSVG, ProteinPlotName);
+    } else if (this.props.plot === 'violin') {
+      const currentContentContainer =
+        document.getElementById('violin-graph-1') || null;
+      const ProteinPlotName = 'violin.png';
+      const currentSVG =
+        currentContentContainer.getElementsByTagName('svg')[0] || null;
+      saveSvgAsPng.saveSvgAsPng(currentSVG, ProteinPlotName);
     } else {
       const currentContentContainer =
         document.getElementById('PlotSVG') || null;
-      const ProteinPlotName = `${this.props.imageInfo.title} - ${this.props.imageInfo.svg[this.props.activeSVGTabIndex].plotType}.png`;
+      const ProteinPlotName = this.props.imageInfo
+        ? `${this.props.imageInfo.title} - ${
+            this.props.imageInfo.svg[this.props.activeSVGTabIndex].plotType
+          }.png`
+        : 'svgPlot.png';
       const currentSVG =
         currentContentContainer.getElementsByTagName('svg')[0] || null;
       saveSvgAsPng.saveSvgAsPng(currentSVG, ProteinPlotName);
@@ -49,10 +68,18 @@ class ButtonActions extends Component {
   PDFExport = () => {
     // const svgElements =
     //   document.getElementsByClassName('ContentContainer') || null;
+    console.log(this.props);
     const isMultisetPlot = this.props.visible;
     if (isMultisetPlot) {
       const currentSVG = document.getElementById('multisetAnalysisSVG') || null;
       pdfService.createPDF(currentSVG);
+    } else if (this.props.plot === 'barcode') {
+      const currentContentContainer =
+        document.getElementById('chart-barcode') || null;
+      const currentSVG =
+        currentContentContainer.getElementsByTagName('svg')[0] || null;
+      // pdfService.createPDF(currentSVG);
+      pdfService.convertToPdf(currentSVG);
     } else {
       const currentContentContainer =
         document.getElementById('PlotSVG') || null;
@@ -71,7 +98,9 @@ class ButtonActions extends Component {
       const currentSVG = document.getElementById('multisetAnalysisSVG') || null;
       this.exportSVG(currentSVG, MultisetPlotName);
     } else {
-      const ProteinPlotName = `${this.props.imageInfo.title}-${this.props.imageInfo.svg[this.props.activeSVGTabIndex].plotType}.svg`;
+      const ProteinPlotName = `${this.props.imageInfo.title}-${
+        this.props.imageInfo.svg[this.props.activeSVGTabIndex].plotType
+      }.svg`;
       const currentContentContainer =
         document.getElementById('PlotSVG') || null;
       const currentSVG =
@@ -85,7 +114,7 @@ class ButtonActions extends Component {
     const svgData = svgEl.outerHTML;
     const preface = '<?xml version="1.0" standalone="no"?>\r\n';
     const svgBlob = new Blob([preface, svgData], {
-      type: 'image/svg+xml;charset=utf-8'
+      type: 'image/svg+xml;charset=utf-8',
     });
     const svgUrl = URL.createObjectURL(svgBlob);
     const downloadLink = document.createElement('a');
@@ -144,14 +173,31 @@ class ButtonActions extends Component {
     }
   };
 
+  getTxtButton = () => {
+    if (this.props.txtVisible) {
+      return (
+        <Button className="ExportButton" onClick={this.SVGExport}>
+          TXT
+        </Button>
+      );
+    }
+  };
+
   render() {
     const excelButton = this.getExcelButton();
     const pdfButton = this.getPDFButton();
     const pngButton = this.getPNGButton();
     const svgButton = this.getSVGButton();
+    const txtButton = this.getTxtButton();
+    const buttonSize = this.props.exportButtonSize;
+
     return (
       <div className="ButtonActions">
-        <Button.Group className="ExportButtonGroup" floated="right">
+        <Button.Group
+          className="ExportButtonGroup"
+          floated="right"
+          size={buttonSize}
+        >
           <Button as="div" labelPosition="left">
             <Label basic pointing="right" className="ExportButtonGroupLabel">
               EXPORT
@@ -161,6 +207,7 @@ class ButtonActions extends Component {
           {svgButton}
           {pdfButton}
           {pngButton}
+          {txtButton}
         </Button.Group>
       </div>
     );

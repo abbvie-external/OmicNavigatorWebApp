@@ -37,6 +37,17 @@
   }
 }
 
+.svgContainer{
+  display: flex;
+  flex-direction: column;
+}
+
+.export-svg {
+  margin: 4px 22px 5px 0px;
+  position: absolute;
+  right: 0;
+}
+
 // .TwoPlotsDiv {
 //   .DiffTableIcon {
 //     display: inline-block !important;
