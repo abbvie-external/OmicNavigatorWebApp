@@ -544,7 +544,7 @@ class EnrichmentResultsGraph extends Component {
               widescreen={3}
               textAlign="center"
             >
-              <div className="InlineFlex">
+              <div className="InlineFlex NumericExponentialInputContainer">
                 <Popup
                   trigger={
                     <Label className="NetworkInputLabel" size={dynamicSize}>
@@ -563,7 +563,6 @@ class EnrichmentResultsGraph extends Component {
                   mouseLeaveDelay={0}
                 />
                 <NumericExponentialInput
-                  className="NumericExponentialInputContainer"
                   onChange={number => {
                     this.handleNodeCutoffInputChange(number);
                     this.actuallyHandleNodeCutoffInputChange(number);
@@ -573,6 +572,7 @@ class EnrichmentResultsGraph extends Component {
                   defaultValue={parseFloat(nodeCutoffLocal)}
                   disabled={!networkGraphReady}
                   value={parseFloat(nodeCutoffLocal)}
+                  spellcheck="false"
                 />
               </div>
               <div className="NetworkSliderDiv">
@@ -604,7 +604,7 @@ class EnrichmentResultsGraph extends Component {
               widescreen={3}
               textAlign="center"
             >
-              <div className="InlineFlex">
+              <div className="InlineFlex NumericExponentialInputContainer">
                 <Popup
                   trigger={
                     <Label className="NetworkInputLabel" size={dynamicSize}>
@@ -623,7 +623,6 @@ class EnrichmentResultsGraph extends Component {
                   mouseLeaveDelay={0}
                 />
                 <NumericExponentialInput
-                  className="NumericExponentialInputContainer"
                   onChange={number => {
                     let revisedNumber = number >= 0.1 ? number : 0.1;
                     this.handleEdgeCutoffInputChange(revisedNumber);
@@ -634,6 +633,7 @@ class EnrichmentResultsGraph extends Component {
                   defaultValue={parseFloat(edgeCutoffLocal)}
                   disabled={!networkGraphReady}
                   value={parseFloat(edgeCutoffLocal)}
+                  spellcheck="false"
                 />
               </div>
               <div className="NetworkSliderDiv">
@@ -838,7 +838,6 @@ class EnrichmentResultsGraph extends Component {
                 on="click"
                 basic
                 flowing
-                padding
               />
               <Radio
                 disabled={!networkGraphReady}

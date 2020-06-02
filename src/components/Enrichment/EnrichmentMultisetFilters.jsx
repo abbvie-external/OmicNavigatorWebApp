@@ -1,9 +1,14 @@
 import React, { Component, Fragment } from 'react';
 import { Form, Select, Input } from 'semantic-ui-react';
 import * as d3 from 'd3';
+import _ from 'lodash';
 import '../Shared/MultisetFilters.scss';
+import NumericExponentialInput from '../Shared/NumericExponentialInput';
 
 class EnrichmentMultisetFilters extends Component {
+  state = {
+    sigValueELocal: [0.05],
+  };
   componentDidMount() {
     const {
       uData,
@@ -35,7 +40,10 @@ class EnrichmentMultisetFilters extends Component {
       selectedCol,
       selectedOperator,
     } = this.props;
-    if (uSettings !== prevProps.uSettings || prevProps.uData !== this.props.uData) {
+    if (
+      uSettings !== prevProps.uSettings ||
+      prevProps.uData !== this.props.uData
+    ) {
       this.makeMultiset(
         uData,
         uAnchor,
@@ -756,9 +764,16 @@ class EnrichmentMultisetFilters extends Component {
     this.props.onHandleDropdownChange(evt, { name, value, index });
   };
 
-  handleInputChange = (evt, { name, value, index }) => {
-    this.props.onHandleInputChange(evt, { name, value, index });
+  handleSigValueEInputChange = value => {
+    this.setState({
+      sigValueELocal: [parseFloat(value)],
+    });
   };
+
+  actuallyHandleSigValueEInputChange = _.debounce(value => {
+    this.props.onHandleSigValueEInputChange(value);
+  }, 1250);
+
   addFilter = () => {
     this.props.onAddFilter();
   };
@@ -770,11 +785,13 @@ class EnrichmentMultisetFilters extends Component {
   };
 
   render() {
-    const { selectedOperator, sigValue, uSettings } = this.props;
+    const { sigValueELocal } = this.state;
+    const { selectedOperator, uSettings } = this.props;
     const Columns = uSettings.thresholdCols;
     const Operators = uSettings.thresholdOperator;
     const SelOp = selectedOperator;
     const indexFilters = uSettings.indexFilters;
+    const defaultSigValue = uSettings.defaultSigValue;
     // const hoveredFilter = uSettings.hoveredFilter;
     // for now, column is displayed as label, just matching the "nominal" or "Adjusted" p value type
     const SelColOverride =
@@ -811,22 +828,25 @@ class EnrichmentMultisetFilters extends Component {
                   // selection
                   value={SelOp[index].value}
                   options={Operators}
-                  width={4}
+                  width={5}
                   onChange={this.handleDropdownChange}
                 ></Form.Field>
-                <Form.Field
-                  control={Input}
-                  type="number"
-                  step="0.01"
-                  min="0.00"
-                  label={index === 0 ? 'Significance' : ''}
-                  index={index}
-                  name="sigValue"
-                  className="SignificantValueInput"
-                  value={sigValue[index]}
-                  width={5}
-                  onChange={this.handleInputChange}
-                ></Form.Field>
+                <Form.Field width={4} id="SignificantValueInputMultisetE">
+                  <label>{index === 0 ? 'Significance' : ''}</label>
+                  <NumericExponentialInput
+                    className="SignificantValueInput"
+                    onChange={number => {
+                      this.handleSigValueEInputChange(number);
+                      this.actuallyHandleSigValueEInputChange(number);
+                    }}
+                    min={0}
+                    max={1}
+                    name="sigValue"
+                    defaultValue={parseFloat(defaultSigValue)}
+                    value={sigValueELocal[index]}
+                    spellcheck="false"
+                  />
+                </Form.Field>
               </Form.Group>
             ))}
           </ul>

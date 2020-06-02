@@ -217,7 +217,7 @@ class QHGridHeader extends React.PureComponent {
     if (
       this.props.exportBaseName === 'Enrichment_Analysis' ||
       this.props.exportBaseName === 'Differential_Phosphorylation_Analysis' ||
-      this.props.exportBaseName === 'VolcanoPlot_Filtered_Results' 
+      this.props.exportBaseName === 'VolcanoPlot_Filtered_Results'
     ) {
       return (
         <Image

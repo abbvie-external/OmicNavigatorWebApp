@@ -15,7 +15,7 @@ class PepplotBreadcrumbs extends Component {
       padding: '1em',
       maxWidth: '50vw',
       fontSize: '13px',
-      wordBreak: 'break-all'
+      wordBreak: 'break-all',
     };
 
     return (
@@ -25,13 +25,24 @@ class PepplotBreadcrumbs extends Component {
             <Breadcrumb.Section className="BreadcrumbLink">
               <Popup
                 trigger={
-                  <Icon name={this.props.activeIndex===0?"table":"chart area"} onClick={this.props.onBackToTable} />
+                  <Icon
+                    name={
+                      this.props.activeIndexPepplotView === 0
+                        ? 'table'
+                        : 'chart area'
+                    }
+                    onClick={this.props.onBackToTable}
+                  />
                 }
                 style={BreadcrumbPopupStyle}
                 inverted
                 basic
                 position="bottom left"
-                content={this.props.activeIndex===0?"Back To Table":"Back To Plot"}
+                content={
+                  this.props.activeIndexPepplotView === 0
+                    ? 'Back To Table'
+                    : 'Back To Plot'
+                }
               />
             </Breadcrumb.Section>
             <Breadcrumb.Divider icon="right chevron" />

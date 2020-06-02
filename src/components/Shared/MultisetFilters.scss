@@ -17,8 +17,24 @@
 .ThresholdColumnReadOnly input {
   background: #e0e1e2 !important;
   border: none !important;
+  padding-left: 0px !important;
 }
 
 svg:not(:root) {
   overflow: visible !important;
+}
+
+// #SignificantValueInputMultisetP input {
+#SignificantValueInputMultisetP {
+  height: 38px !important;
+  padding-right: 0px !important;
+  width: 75px !important;
+  max-width: 75px !important;
+}
+
+#SignificantValueInputMultisetE input {
+  height: 38px !important;
+  padding-right: 0px !important;
+  width: 75px !important;
+  max-width: 75px !important;
 }

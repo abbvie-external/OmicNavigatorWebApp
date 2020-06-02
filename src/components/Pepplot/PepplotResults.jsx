@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import ButtonActions from '../Shared/ButtonActions';
-import _ from 'lodash';
 import QHGrid from '../utility/QHGrid';
 import EZGrid from '../utility/EZGrid';
 import QuickViewModal from '../utility/QuickViewModal';
@@ -37,13 +36,10 @@ class PepplotResults extends Component {
       proteinToHighlightInDiffTable,
       proteinHighlightInProgress,
       isItemSelected,
-      additionalTemplateInfoPepplotTable
+      additionalTemplateInfoPepplotTable,
     } = this.props;
 
-    const {
-      pepplotRows,
-      itemsPerPageInformed,
-    } = this.state;
+    const { pepplotRows, itemsPerPageInformed } = this.state;
     let pepplotCacheKey = `${pepplotStudy}-${pepplotModel}-${pepplotTest}`;
     if (
       proteinToHighlightInDiffTable !== '' &&
@@ -77,7 +73,7 @@ class PepplotResults extends Component {
           />
         </div>
       );
-    } 
+    }
   }
 }
 

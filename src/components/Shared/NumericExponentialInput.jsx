@@ -1,11 +1,10 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import './NumericExponentialInput.scss';
 function clamp(x, lower = -Infinity, upper = Infinity) {
   return Math.min(upper, Math.max(lower, x));
 }
 export default function Component({ onChange, min, max, defaultValue, value }) {
-  // const [numberProps, { power, base, numberValue }] = useExponentialInput({
   const [numberProps] = useExponentialInput({
+    // const [numberProps, { power, base, numberValue }] = useExponentialInput({
     defaultValue,
     min,
     max,
@@ -26,8 +25,8 @@ const useExponentialInput = ({
   onChange,
   min,
   max,
-  defaultValue = 0,
   value: propValue,
+  defaultValue = propValue ?? 0,
 }) => {
   const [power, setPower] = useState(() => {
     return +(defaultValue || 0).toExponential(0).split('e')[1];

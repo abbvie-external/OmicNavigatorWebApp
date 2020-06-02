@@ -1,7 +1,5 @@
 /* eslint-disable react/state-in-constructor */
 import React, { Component } from 'react';
-// import PropTypes from 'prop-types';
-// import { Provider as BusProvider, useBus, useListener } from 'react-bus';
 import * as d3 from 'd3';
 import * as _ from 'lodash';
 // import { select } from "d3-selection";

@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import _ from 'lodash';
 import * as d3 from 'd3';
-// import d3plus from 'd3plus';
 import { Dimmer, Loader, Message } from 'semantic-ui-react';
 import './NetworkGraph.scss';
 import { networkByCluster, limitValues } from '../Shared/helpers';
@@ -102,7 +101,7 @@ class NetworkGraph extends Component {
     if (totalClusters !== 1) {
       // let networkCalculatedWidth = (relevantNodesLength * .75) * totalClusters * 1.5;
       let networkCalculatedWidth = relevantNodesLength * 35;
-      console.log(networkCalculatedWidth);
+      // console.log(networkCalculatedWidth);
       return Math.max(
         networkCalculatedWidth,
         adjustedDocumentWidth,
@@ -236,7 +235,7 @@ class NetworkGraph extends Component {
           });
         });
 
-        console.log(clusters.children.length);
+        // console.log(clusters.children.length);
         const totalClusters = clusters.children.length;
 
         // Prepare Settings
@@ -779,11 +778,6 @@ class NetworkGraph extends Component {
                       .style('opacity', 0);
                   });
               }
-
-              // d3plus
-              //   .textwrap()
-              //   .container(d3.select('#rectWrap'))
-              //   .draw();
               function dragstarted(o) {
                 d3.event.sourceEvent.stopPropagation();
                 d3.event.sourceEvent.preventDefault();

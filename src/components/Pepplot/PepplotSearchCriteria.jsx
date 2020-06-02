@@ -94,6 +94,7 @@ class PepplotSearchCriteria extends Component {
     multisetFiltersVisibleP: false,
     activateMultisetFiltersP: false,
     uDataP: [],
+    // loadingPepplotMultisetFilters: false,
   };
 
   componentDidMount() {
@@ -465,12 +466,13 @@ class PepplotSearchCriteria extends Component {
       });
   };
 
-  addFilter = () => {
+  addFilterPepplot = () => {
+    // this.setState({ loadingPepplotMultisetFilters: true });
+    // const uSetVP = _.cloneDeep(this.state.uSettingsP);
     const uSetVP = { ...this.state.uSettingsP };
     uSetVP.indexFiltersP = [...this.state.uSettingsP.indexFiltersP].concat(
       this.state.uSettingsP.indexFiltersP.length,
     );
-
     this.setState({
       selectedColP: [...this.state.selectedColP].concat(
         this.state.uSettingsP.defaultselectedColP,
@@ -484,7 +486,9 @@ class PepplotSearchCriteria extends Component {
       uSettingsP: uSetVP,
     });
   };
-  removeFilter = index => {
+
+  removeFilterPepplot = index => {
+    // this.setState({ loadingPepplotMultisetFilters: true });
     const uSetVP = { ...this.state.uSettingsP };
     uSetVP.indexFiltersP = [...uSetVP.indexFiltersP]
       .slice(0, index)
@@ -527,7 +531,9 @@ class PepplotSearchCriteria extends Component {
       },
     );
   };
-  handleInputChange = (evt, { name, value, index }) => {
+
+  // handleSigValuePInputChange = (name, value, index) => {
+  handleSigValuePInputChange = (evt, { name, value, index }) => {
     const uSelVP = [...this.state[name]];
     uSelVP[index] = parseFloat(value);
     this.setState(
@@ -601,6 +607,7 @@ class PepplotSearchCriteria extends Component {
           },
           activateMultisetFiltersP: true,
           reloadPlot: false,
+          // loadingPepplotMultisetFilters: false,
         });
         this.props.onPepplotSearch({
           pepplotResults: multisetResultsP,
@@ -761,10 +768,10 @@ class PepplotSearchCriteria extends Component {
           {...this.props}
           {...this.state}
           onHandleDropdownChange={this.handleDropdownChange}
-          onHandleInputChange={this.handleInputChange}
+          onHandleSigValuePInputChange={this.handleSigValuePInputChange}
           onHandleSetChange={this.handleSetChange}
-          onAddFilter={this.addFilter}
-          onRemoveFilter={this.removeFilter}
+          onAddFilterPepplot={this.addFilterPepplot}
+          onRemoveFilterPepplot={this.removeFilterPepplot}
           onChangeHoveredFilter={this.changeHoveredFilter}
         />
       );

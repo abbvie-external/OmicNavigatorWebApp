@@ -25,14 +25,14 @@ import '../Shared/Table.scss';
 
 let cancelRequestPepplotResultsGetPlot = () => {};
 class Pepplot extends Component {
-  defaultActiveIndex =
+  defaultActiveIndexPepplotView =
     parseInt(sessionStorage.getItem('pepplotViewTab'), 10) || 0;
 
   static defaultProps = {
-      pepplotStudy: '',
-      pepplotModel: '',
-      pepplotTest: '',
-      pepplotProteinSite: '',
+    pepplotStudy: '',
+    pepplotModel: '',
+    pepplotTest: '',
+    pepplotProteinSite: '',
   };
 
   state = {
@@ -40,14 +40,13 @@ class Pepplot extends Component {
     isSearchingPepplot: false,
     showProteinPage: false,
     pepplotResults: [],
-    pepplotResultsUnfiltered:[],
+    pepplotResultsUnfiltered: [],
     pepplotColumns: [],
     filterableColumnsP: [],
     multisetPlotInfo: {
       title: '',
       svg: [],
     },
-    /////////////////////////////////////
     isItemSelected: false,
     isProteinSVGLoaded: false,
     isProteinDataLoaded: false,
@@ -60,8 +59,7 @@ class Pepplot extends Component {
     treeDataRaw: [],
     treeData: [],
     treeDataColumns: [],
-    activeSVGTabIndex:0,
-    ///////////////////////////////////
+    activeSVGTabIndex: 0,
     multisetPlotAvailable: false,
     animation: 'uncover',
     direction: 'left',
@@ -72,7 +70,7 @@ class Pepplot extends Component {
     pdfVisible: false,
     svgVisible: true,
     multisetQueried: false,
-    activeIndex: this.defaultActiveIndex || 0,
+    activeIndexPepplotView: this.defaultActiveIndexPepplotView || 0,
     thresholdColsP: [],
   };
 
@@ -90,12 +88,13 @@ class Pepplot extends Component {
       this.props.proteinToHighlightInDiffTable !== '' &&
       this.props.proteinToHighlightInDiffTable !== undefined
     ) {
-    this.pageToProtein(
-      this.state.pepplotResults,
-      this.props.proteinToHighlightInDiffTable,
-      this.state.itemsPerPageInformed,
-    );
-  }};
+      this.pageToProtein(
+        this.state.pepplotResults,
+        this.props.proteinToHighlightInDiffTable,
+        this.state.itemsPerPageInformed,
+      );
+    }
+  };
 
   handleSearchTransitionPepplot = bool => {
     this.setState({
@@ -121,13 +120,13 @@ class Pepplot extends Component {
       visible: false,
     });
   };
-  handlePepplotSearchUnfiltered= searchResults =>{
+  handlePepplotSearchUnfiltered = searchResults => {
     this.setState({
       pepplotResultsUnfiltered: searchResults.pepplotResults,
       isProteinSVGLoaded: false,
       isProteinDataLoaded: false,
       isItemSelected: false,
-      selectedFromTableData: []
+      selectedFromTableData: [],
     });
   };
   handleSearchCriteriaChange = (changes, scChange) => {
@@ -178,129 +177,128 @@ class Pepplot extends Component {
       multisetPlotAvailable: true,
     });
   };
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-getProteinData = (id, dataItem, getPlotCb, imageInfo) => {
-  this.setState({
-    imageInfo: imageInfo,
-    isItemSelected: true,
-    isProteinSVGLoaded: false,
-    isProteinDataLoaded: false,
-    treeDataRaw: [],
-    treeData: [],
-    treeDataColumns: [],
-    currentSVGs: [],
-  });
-  const ProteinSiteVar = firstValue(dataItem.Protein_Site, true);
-  this.handleSearchCriteriaChange(
-    {
-      pepplotStudy: this.props.pepplotStudy || '',
-      pepplotModel: this.props.pepplotModel || '',
-      pepplotTest: this.props.pepplotTest || '',
-      pepplotProteinSite: ProteinSiteVar || '',
-    },
-    false,
-  );
-  let pepplotModel = this.props.pepplotModel;
-  let pepplotStudy = this.props.pepplotStudy;
-  let plotType = ['splineplot'];
-  switch (pepplotModel) {
-    case 'DonorDifferentialPhosphorylation':
-      plotType = ['dotplot'];
-      break;
-    case 'TreatmentDifferentialPhosphorylation':
-      plotType = ['splineplot'];
-      break;
-    case 'Treatment and or Strain Differential Phosphorylation':
-      plotType = ['StrainStimDotplot', 'StimStrainDotplot'];
-      break;
-    case 'Timecourse Differential Phosphorylation':
-      plotType = ['splineplot', 'lineplot'];
-      break;
-    case 'Differential Expression':
-      if (pepplotStudy === '***REMOVED***') {
-        plotType = ['proteinlineplot'];
-      } else {
-        plotType = ['proteindotplot'];
-      }
-      break;
-    case 'Differential Phosphorylation':
-      if (pepplotStudy === '***REMOVED***') {
-        plotType = ['proteinlineplot'];
-      } else {
-        plotType = ['proteindotplot'];
-      }
-      break;
-    case 'No Pretreatment Timecourse Differential Phosphorylation':
-      plotType = ['splineplot.modelII', 'lineplot.modelII'];
-      break;
-    case 'Ferrostatin Pretreatment Timecourse Differential Phosphorylation':
-      plotType = ['splineplot.modelIII', 'lineplot.modelIII'];
-      break;
-    default:
-      plotType = ['dotplot'];
-  }
-  const handleSVGCb = this.handleSVG;
-  getPlotCb(id, plotType, pepplotStudy, imageInfo, handleSVGCb);
-  if (pepplotModel !== 'Differential Expression') {
-    phosphoprotService
-      .getSiteData(id, pepplotStudy + 'plots')
-      .then(treeDataResponse => {
-        this.setState({
-          treeDataRaw: treeDataResponse,
-        });
-        let tdCols = _.map(_.keys(treeDataResponse[0]), function(d) {
-          return { key: d, field: d };
-        });
-        this.setState({
-          treeDataColumns: tdCols,
-        });
-        let tD = _.map(treeDataResponse, function(d, i) {
-          let entries = _.toPairs(d);
-
-          entries = _.map(entries, function(e) {
-            return { key: e[0], text: e[0], items: [{ text: e[1] }] };
+  getProteinData = (id, dataItem, getPlotCb, imageInfo) => {
+    this.setState({
+      imageInfo: imageInfo,
+      isItemSelected: true,
+      isProteinSVGLoaded: false,
+      isProteinDataLoaded: false,
+      treeDataRaw: [],
+      treeData: [],
+      treeDataColumns: [],
+      currentSVGs: [],
+    });
+    const ProteinSiteVar = firstValue(dataItem.Protein_Site, true);
+    this.handleSearchCriteriaChange(
+      {
+        pepplotStudy: this.props.pepplotStudy || '',
+        pepplotModel: this.props.pepplotModel || '',
+        pepplotTest: this.props.pepplotTest || '',
+        pepplotProteinSite: ProteinSiteVar || '',
+      },
+      false,
+    );
+    let pepplotModel = this.props.pepplotModel;
+    let pepplotStudy = this.props.pepplotStudy;
+    let plotType = ['splineplot'];
+    switch (pepplotModel) {
+      case 'DonorDifferentialPhosphorylation':
+        plotType = ['dotplot'];
+        break;
+      case 'TreatmentDifferentialPhosphorylation':
+        plotType = ['splineplot'];
+        break;
+      case 'Treatment and or Strain Differential Phosphorylation':
+        plotType = ['StrainStimDotplot', 'StimStrainDotplot'];
+        break;
+      case 'Timecourse Differential Phosphorylation':
+        plotType = ['splineplot', 'lineplot'];
+        break;
+      case 'Differential Expression':
+        if (pepplotStudy === '***REMOVED***') {
+          plotType = ['proteinlineplot'];
+        } else {
+          plotType = ['proteindotplot'];
+        }
+        break;
+      case 'Differential Phosphorylation':
+        if (pepplotStudy === '***REMOVED***') {
+          plotType = ['proteinlineplot'];
+        } else {
+          plotType = ['proteindotplot'];
+        }
+        break;
+      case 'No Pretreatment Timecourse Differential Phosphorylation':
+        plotType = ['splineplot.modelII', 'lineplot.modelII'];
+        break;
+      case 'Ferrostatin Pretreatment Timecourse Differential Phosphorylation':
+        plotType = ['splineplot.modelIII', 'lineplot.modelIII'];
+        break;
+      default:
+        plotType = ['dotplot'];
+    }
+    const handleSVGCb = this.handleSVG;
+    getPlotCb(id, plotType, pepplotStudy, imageInfo, handleSVGCb);
+    if (pepplotModel !== 'Differential Expression') {
+      phosphoprotService
+        .getSiteData(id, pepplotStudy + 'plots')
+        .then(treeDataResponse => {
+          this.setState({
+            treeDataRaw: treeDataResponse,
           });
-          return {
-            key: i + 1,
-            text: 'Peptide' + (i + 1) + '  (' + d.Modified_sequence + ')',
-            items: entries,
-          };
-        });
-        this.setState({
+          let tdCols = _.map(_.keys(treeDataResponse[0]), function(d) {
+            return { key: d, field: d };
+          });
+          this.setState({
+            treeDataColumns: tdCols,
+          });
+          let tD = _.map(treeDataResponse, function(d, i) {
+            let entries = _.toPairs(d);
+
+            entries = _.map(entries, function(e) {
+              return { key: e[0], text: e[0], items: [{ text: e[1] }] };
+            });
+            return {
+              key: i + 1,
+              text: 'Peptide' + (i + 1) + '  (' + d.Modified_sequence + ')',
+              items: entries,
+            };
+          });
+          this.setState({
             treeData: tD,
             isProteinDataLoaded: true,
-        });
-      });
-  } else {
-    phosphoprotService
-      .getProteinData(id, pepplotStudy + 'plots')
-      .then(proteinDataResponse => {
-        this.setState({
-          treeDataRaw: proteinDataResponse,
-        });
-        let tdCols = _.map(_.keys(proteinDataResponse[0]), function(d) {
-          return { key: d, field: d };
-        });
-        this.setState({
-          treeDataColumns: tdCols,
-        });
-
-        let proteinData = _.map(proteinDataResponse, function(d, i) {
-          var entries = _.toPairs(d);
-          entries = _.map(entries, function(e) {
-            return { key: e[0], text: e[0], items: [{ text: e[1] }] };
           });
-          return {
-            key: i + 1,
-            text: 'Differential Expression Data',
-            items: entries,
-          };
         });
-        this.setState({
-          treeData: proteinData,
+    } else {
+      phosphoprotService
+        .getProteinData(id, pepplotStudy + 'plots')
+        .then(proteinDataResponse => {
+          this.setState({
+            treeDataRaw: proteinDataResponse,
+          });
+          let tdCols = _.map(_.keys(proteinDataResponse[0]), function(d) {
+            return { key: d, field: d };
+          });
+          this.setState({
+            treeDataColumns: tdCols,
+          });
+
+          let proteinData = _.map(proteinDataResponse, function(d, i) {
+            var entries = _.toPairs(d);
+            entries = _.map(entries, function(e) {
+              return { key: e[0], text: e[0], items: [{ text: e[1] }] };
+            });
+            return {
+              key: i + 1,
+              text: 'Differential Expression Data',
+              items: entries,
+            };
+          });
+          this.setState({
+            treeData: proteinData,
+          });
         });
-      });
-  }
+    }
   };
   getTableHelpers = (
     getProteinDataCb,
@@ -308,7 +306,10 @@ getProteinData = (id, dataItem, getPlotCb, imageInfo) => {
     proteinToHighlightInDiffTable,
   ) => {
     let addParams = {};
-    if (proteinToHighlightInDiffTable.length > 0 && proteinToHighlightInDiffTable != null) {
+    if (
+      proteinToHighlightInDiffTable.length > 0 &&
+      proteinToHighlightInDiffTable != null
+    ) {
       addParams.rowHighlightOther = [];
       proteinToHighlightInDiffTable.forEach(element => {
         addParams.rowHighlightOther.push(element.Protein_Site);
@@ -350,7 +351,7 @@ getProteinData = (id, dataItem, getPlotCb, imageInfo) => {
         );
       };
     };
-    this.setState({additionalTemplateInfoPepplotTable: addParams});
+    this.setState({ additionalTemplateInfoPepplotTable: addParams });
   };
   getPlot = (id, plotType, pepplotStudy, imageInfo, handleSVGCb) => {
     // let self = this;
@@ -358,7 +359,7 @@ getProteinData = (id, dataItem, getPlotCb, imageInfo) => {
     // keep whatever dimension is less (height or width)
     // then multiply the other dimension by original svg ratio (height 595px, width 841px)
     // let PepplotPlotSVGHeight = this.calculateHeight(this);
-    let PepplotPlotSVGWidth = this.calculateWidth(this)*.7;
+    let PepplotPlotSVGWidth = this.calculateWidth(this) * 0.7;
     // if (PepplotPlotSVGHeight > PepplotPlotSVGWidth) {
     let PepplotPlotSVGHeight = PepplotPlotSVGWidth * 0.70749;
     // } else {
@@ -454,23 +455,19 @@ getProteinData = (id, dataItem, getPlotCb, imageInfo) => {
       );
     }
   };
-  handleSelectedFromTable = (toHighlightArr) =>{
-    const {pepplotStudy, pepplotModel} = this.props;
-    this.setState({selectedFromTableData: toHighlightArr});
-    this.getTableHelpers(
-      this.getProteinData,
-      this.getPlot,
-      toHighlightArr,
-    );
-    if(toHighlightArr.length === 0){
+  handleSelectedFromTable = toHighlightArr => {
+    const { pepplotStudy, pepplotModel } = this.props;
+    this.setState({ selectedFromTableData: toHighlightArr });
+    this.getTableHelpers(this.getProteinData, this.getPlot, toHighlightArr);
+    if (toHighlightArr.length === 0) {
       this.setState({
         isProteinSVGLoaded: false,
         isProteinDataLoaded: false,
         isItemSelected: false,
-        selectedFromTableData: []
-      })
-    }else if(toHighlightArr.length === 1){
-      this.setState({isProteinSVGLoaded: false})
+        selectedFromTableData: [],
+      });
+    } else if (toHighlightArr.length === 1) {
+      this.setState({ isProteinSVGLoaded: false });
       //TODO: Get SVG and plot info.
       let plotType = ['splineplot'];
       switch (pepplotModel) {
@@ -509,7 +506,9 @@ getProteinData = (id, dataItem, getPlotCb, imageInfo) => {
         default:
           plotType = ['dotplot'];
       }
-      let id = toHighlightArr[0]?.id_mult ? toHighlightArr[0]?.id_mult : toHighlightArr[0]?.id;
+      let id = toHighlightArr[0]?.id_mult
+        ? toHighlightArr[0]?.id_mult
+        : toHighlightArr[0]?.id;
       let imageInfo = { key: '', title: '', svg: [] };
       switch (pepplotModel) {
         case 'Differential Expression':
@@ -525,9 +524,9 @@ getProteinData = (id, dataItem, getPlotCb, imageInfo) => {
       const handleSVGCb = this.handleSVG;
       this.getPlot(id, plotType, pepplotStudy, imageInfo, handleSVGCb);
     } else {
-      this.setState({isProteinSVGLoaded: false});
+      this.setState({ isProteinSVGLoaded: false });
     }
-  }
+  };
   handleSVGTabChange = activeTabIndex => {
     this.setState({
       activeSVGTabIndex: activeTabIndex,
@@ -571,7 +570,6 @@ getProteinData = (id, dataItem, getPlotCb, imageInfo) => {
       false,
     );
   };
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
   getConfigCols = testData => {
     const pepResults = testData.pepplotResults;
     const model = this.props.pepplotModel;
@@ -775,17 +773,18 @@ getProteinData = (id, dataItem, getPlotCb, imageInfo) => {
   }
 
   getView = () => {
-    if(this.state.isItemSelected && !this.state.isProteinSVGLoaded){
+    if (this.state.isItemSelected && !this.state.isProteinSVGLoaded) {
       return <LoaderActivePlots />;
-    } else if (this.state.isItemSelected && this.state.isProteinSVGLoaded){
-      return <PepplotPlot
-        // ref={this.PepplotViewContainerRef}
-        {...this.props}
-        {...this.state}
-        onBackToTable={this.backToTable}
+    } else if (this.state.isItemSelected && this.state.isProteinSVGLoaded) {
+      return (
+        <PepplotPlot
+          // ref={this.PepplotViewContainerRef}
+          {...this.props}
+          {...this.state}
+          onBackToTable={this.backToTable}
         ></PepplotPlot>
-    }
-    else if (
+      );
+    } else if (
       this.state.isValidSearchPepplot &&
       !this.state.showProteinPage &&
       !this.state.isSearchingPepplot
@@ -796,7 +795,7 @@ getProteinData = (id, dataItem, getPlotCb, imageInfo) => {
           className="TableAndPlotContainer"
           panes={TableAndPlotPanes}
           onTabChange={this.handleTablePlotTabChange}
-          activeIndex={this.state.activeIndex}
+          activeIndex={this.state.activeIndexPepplotView}
           renderActiveOnly={false}
           menu={{
             attached: true,
@@ -809,69 +808,86 @@ getProteinData = (id, dataItem, getPlotCb, imageInfo) => {
     } else return <TransitionStill />;
   };
 
-getTableAndPlotPanes = () => {
-    return[{
-      menuItem:(<Menu.Item
-        key="0"
-        className="TableAndNPlotButtons TableButton"
-        name="Table"
-        color="orange"
-      >
-        <img
-          src={this.state.activeIndex === 0 ? tableIconSelected : tableIcon}
-          alt="Table Icon"
-          id="TableButton"
-        />
-      </Menu.Item>),
-      pane:(<Tab.Pane 
-        key="0"
-        className="PepplotContentPane"
-      >
-        <PepplotResults
-          {...this.state}
-          {...this.props}
-          onHandlePlotAnimation={this.handlePlotAnimation}
-        />
-      </Tab.Pane>)
-    },{
-      menuItem:(<Menu.Item
-        key="1"
-        className="TableAndPlotButtons PlotButton"
-        name="plot"
-      >
-        <img
-          src={this.state.activeIndex === 1 ? VolcanoPlotIconSelected : VolcanoPlotIcon}
-          alt="Plot Icon"
-          id="PlotButton"
-        />
-      </Menu.Item>),
-      pane:(<Tab.Pane
-        key="1"
-        className="PepplotContentPane"
-        id="PepplotContentPane"
-      >
-          <PepplotVolcano
-            {...this.state}
-            {...this.props}
-            handleVolcanoPlotSelectionChange={this.handleVolcanoPlotSelectionChange}
-            onSelectFromTable={this.handleSelectedFromTable}
-            onSearchCriteriaChange={this.handleSearchCriteriaChange}   
-            onSVGTabChange={this.handleSVGTabChange}
-          />
-    </Tab.Pane>),
-    },
-  ];
-  }
+  getTableAndPlotPanes = () => {
+    return [
+      {
+        menuItem: (
+          <Menu.Item
+            key="0"
+            className="TableAndNPlotButtons TableButton"
+            name="Table"
+            color="orange"
+          >
+            <img
+              src={
+                this.state.activeIndexPepplotView === 0
+                  ? tableIconSelected
+                  : tableIcon
+              }
+              alt="Table Icon"
+              id="TableButton"
+            />
+          </Menu.Item>
+        ),
+        pane: (
+          <Tab.Pane key="0" className="PepplotContentPane">
+            <PepplotResults
+              {...this.state}
+              {...this.props}
+              // onSearchCriteriaChange={this.handleSearchCriteriaChange}
+              onHandlePlotAnimation={this.handlePlotAnimation}
+            />
+          </Tab.Pane>
+        ),
+      },
+      {
+        menuItem: (
+          <Menu.Item
+            key="1"
+            className="TableAndPlotButtons PlotButton"
+            name="plot"
+            // color="orange"
+          >
+            <img
+              src={
+                this.state.activeIndexPepplotView === 1
+                  ? VolcanoPlotIconSelected
+                  : VolcanoPlotIcon
+              }
+              alt="Plot Icon"
+              id="PlotButton"
+            />
+          </Menu.Item>
+        ),
+        pane: (
+          <Tab.Pane
+            key="1"
+            className="PepplotContentPane"
+            id="PepplotContentPane"
+          >
+            <PepplotVolcano
+              {...this.state}
+              {...this.props}
+              handleVolcanoPlotSelectionChange={
+                this.handleVolcanoPlotSelectionChange
+              }
+              onSelectFromTable={this.handleSelectedFromTable}
+              onSearchCriteriaChange={this.handleSearchCriteriaChange}
+              onSVGTabChange={this.handleSVGTabChange}
+            />
+          </Tab.Pane>
+        ),
+      },
+    ];
+  };
 
   handleTablePlotTabChange = (e, { activeIndex }) => {
     sessionStorage.setItem(`pepplotViewTab`, activeIndex);
-    this.setState({ activeIndex });
+    this.setState({ activeIndexPepplotView: activeIndex });
   };
 
   render() {
     const pepplotView = this.getView();
-    console.log("THIS:")
-    console.log(this.state.thresholdColsP)
     const { multisetPlotInfo, animation, direction, visible } = this.state;
     const VerticalSidebar = ({ animation, visible }) => (
       <Sidebar
@@ -941,9 +957,7 @@ getTableAndPlotPanes = () => {
                 visible={visible}
               />
               <Sidebar.Pusher>
-                <div className="PepplotViewContainer">
-                  {pepplotView}
-                </div>
+                <div className="PepplotViewContainer">{pepplotView}</div>
               </Sidebar.Pusher>
             </Sidebar.Pushable>
           </Grid.Column>

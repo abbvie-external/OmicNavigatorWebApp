@@ -292,7 +292,6 @@ class EnrichmentSearchCriteria extends Component {
             ...this.state.uSettings,
             must: [],
             not: [],
-            defaultSigValue: 0.05,
             maxElements: dataFromService.length,
           },
           sigValue: [0.05],
@@ -549,12 +548,10 @@ class EnrichmentSearchCriteria extends Component {
       },
     );
   };
-  handleInputChange = (evt, { name, value, index }) => {
-    const uSelVP = [...this.state[name]];
-    uSelVP[index] = parseFloat(value);
+  handleSigValueEInputChange = value => {
     this.setState(
       {
-        [name]: uSelVP,
+        sigValue: [parseFloat(value)],
         reloadPlot: true,
       },
       function() {
@@ -791,7 +788,7 @@ class EnrichmentSearchCriteria extends Component {
           {...this.props}
           {...this.state}
           onHandleDropdownChange={this.handleDropdownChange}
-          onHandleInputChange={this.handleInputChange}
+          onHandleSigValueEInputChange={this.handleSigValueEInputChange}
           onHandleSetChange={this.handleSetChange}
           onAddFilter={this.addFilter}
           onRemoveFilter={this.removeFilter}
