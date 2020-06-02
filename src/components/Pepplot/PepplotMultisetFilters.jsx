@@ -40,12 +40,14 @@ class PepplotMultisetFilters extends Component {
       selectedColP,
       selectedOperatorP,
     } = this.props;
+    debugger;
     if (
       uDataP !== prevProps.uDataP ||
       uAnchorP !== prevProps.uAnchorP ||
       uSettingsP !== prevProps.uSettingsP ||
       metaSvgP !== prevProps.metaSvgP ||
       sigValueP !== prevProps.sigValueP ||
+      sigValueP.length !== prevProps.sigValueP.length ||
       selectedColP !== prevProps.selectedColP ||
       selectedOperatorP !== prevProps.selectedOperatorP
     ) {
@@ -361,6 +363,7 @@ class PepplotMultisetFilters extends Component {
           .attr('fill', 'black');
       }
     }
+    this.setState({ loadingPepplotMultisetFilters: false });
   }
 
   prepareMultiset(uDataP, uAnchorP, uSettingsP, baseP) {

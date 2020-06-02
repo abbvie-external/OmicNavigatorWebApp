@@ -472,24 +472,18 @@ class PepplotSearchCriteria extends Component {
     uSetVP.indexFiltersP = [...this.state.uSettingsP.indexFiltersP].concat(
       this.state.uSettingsP.indexFiltersP.length,
     );
-    console.log('addedFilter', uSetVP);
-    this.setState(
-      {
-        selectedColP: [...this.state.selectedColP].concat(
-          this.state.uSettingsP.defaultselectedColP,
-        ),
-        selectedOperatorP: [...this.state.selectedOperatorP].concat(
-          this.state.uSettingsP.defaultselectedOperatorP,
-        ),
-        sigValueP: [...this.state.sigValueP].concat(
-          this.state.uSettingsP.defaultsigValueP,
-        ),
-        uSettingsP: uSetVP,
-      },
-      function() {
-        this.updateQueryDataP();
-      },
-    );
+    this.setState({
+      selectedColP: [...this.state.selectedColP].concat(
+        this.state.uSettingsP.defaultselectedColP,
+      ),
+      selectedOperatorP: [...this.state.selectedOperatorP].concat(
+        this.state.uSettingsP.defaultselectedOperatorP,
+      ),
+      sigValueP: [...this.state.sigValueP].concat(
+        this.state.uSettingsP.defaultsigValueP,
+      ),
+      uSettingsP: uSetVP,
+    });
   };
 
   removeFilterPepplot = index => {
@@ -501,24 +495,18 @@ class PepplotSearchCriteria extends Component {
     for (var i = index; i < uSetVP.indexFiltersP.length; i++) {
       uSetVP.indexFiltersP[i]--;
     }
-    console.log('removedFilter', uSetVP);
-    this.setState(
-      {
-        selectedColP: [...this.state.selectedColP]
-          .slice(0, index)
-          .concat([...this.state.selectedColP].slice(index + 1)),
-        selectedOperatorP: [...this.state.selectedOperatorP]
-          .slice(0, index)
-          .concat([...this.state.selectedOperatorP].slice(index + 1)),
-        sigValueP: [...this.state.sigValueP]
-          .slice(0, index)
-          .concat([...this.state.sigValueP].slice(index + 1)),
-        uSettingsP: uSetVP,
-      },
-      function() {
-        this.updateQueryDataP();
-      },
-    );
+    this.setState({
+      selectedColP: [...this.state.selectedColP]
+        .slice(0, index)
+        .concat([...this.state.selectedColP].slice(index + 1)),
+      selectedOperatorP: [...this.state.selectedOperatorP]
+        .slice(0, index)
+        .concat([...this.state.selectedOperatorP].slice(index + 1)),
+      sigValueP: [...this.state.sigValueP]
+        .slice(0, index)
+        .concat([...this.state.sigValueP].slice(index + 1)),
+      uSettingsP: uSetVP,
+    });
   };
   changeHoveredFilter = index => {
     const uSetVP = { ...this.state.uSettingsP };
