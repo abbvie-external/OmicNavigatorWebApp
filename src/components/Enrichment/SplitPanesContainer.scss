@@ -127,7 +127,7 @@
   // overflow-y: scroll !important;
   // min-height: 350px !important;
   height: 100% !important;
-  direction: rtl !important;
+  // direction: rtl !important;
 }
 
 #TableResultsTab .QHGrid {
@@ -148,4 +148,15 @@
 
 .barcode-chart-area {
   width: 100% !important;
+}
+
+.export-violin  {
+  margin: 4px 6px 2px 0px;
+  position: absolute;
+  right: 0;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
 }

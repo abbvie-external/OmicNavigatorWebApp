@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { Grid, Dimmer, Loader, Tab } from 'semantic-ui-react';
 import EnrichmentBreadcrumbs from './EnrichmentBreadcrumbs';
-// import ButtonActions from "../Shared/ButtonActions";
+import ButtonActions from '../Shared/ButtonActions';
 // import PlotSVG from './PlotSVG';
 import SplitPane from 'react-split-pane';
 import './SplitPanesContainer.scss';
@@ -141,20 +141,36 @@ class SplitPanesContainer extends Component {
       },
     ];
 
+    const selectedPlot = violinAndTablePanes[activeViolinTableIndex].menuItem;
+    //const actionButtons = selectedPlot === "Statistic Table" ? <ButtonActions excelVisible={false} pngVisible={false} pdfVisible={false} txtVisible={true} exportButtonSize='mini' plot={'table'}/> : <ButtonActions excelVisible={false} pngVisibile={false} exportButtonSize='mini' plot={'violin'}/>;
+    const actionButtons =
+      selectedPlot === 'Statistic Table' ? (
+        ''
+      ) : (
+        <ButtonActions
+          excelVisible={false}
+          pdfVisible={false}
+          exportButtonSize="mini"
+          plot={'violin'}
+        />
+      );
     return (
-      <Tab
-        className="ViolinAndTableTabsDiv"
-        onTabChange={this.handleViolinTableTabChange}
-        panes={displayViolinPlot ? violinAndTablePanes : onlyTablePane}
-        activeIndex={activeViolinTableIndex}
-        renderActiveOnly={false}
-        menu={{
-          stackable: true,
-          secondary: true,
-          pointing: true,
-          className: 'ViolinAndTableMenu',
-        }}
-      />
+      <div className="main">
+        <div className="export-violin">{actionButtons}</div>
+        <Tab
+          className="ViolinAndTableTabsDiv"
+          onTabChange={this.handleViolinTableTabChange}
+          panes={displayViolinPlot ? violinAndTablePanes : onlyTablePane}
+          activeIndex={activeViolinTableIndex}
+          renderActiveOnly={false}
+          menu={{
+            stackable: true,
+            secondary: true,
+            pointing: true,
+            className: 'ViolinAndTableMenu',
+          }}
+        />
+      </div>
     );
   };
 

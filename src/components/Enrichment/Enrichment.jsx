@@ -315,7 +315,9 @@ class Enrichment extends Component {
   };
 
   handleEnrichmentSearch = searchResults => {
-    if(this.state.enrichmentColumns.length === 0){this.handleColumns(searchResults)}
+    if (this.state.enrichmentColumns.length === 0) {
+      this.handleColumns(searchResults);
+    }
     this.removeNetworkSVG();
     this.getNetworkData();
     this.setState({
@@ -333,8 +335,8 @@ class Enrichment extends Component {
   };
   handleColumns = searchResults => {
     const columns = this.getConfigCols(searchResults);
-    this.setState({enrichmentColumns: columns});
-  }
+    this.setState({ enrichmentColumns: columns });
+  };
 
   handleSearchCriteriaChange = (changes, scChange) => {
     this.props.onSearchCriteriaToTop(changes, 'enrichment');
@@ -892,11 +894,12 @@ class Enrichment extends Component {
     // then multiply the other dimension by original svg ratio (height 595px, width 841px)
     let EnrichmentPlotSVGHeight = this.calculateHeight(this);
     let EnrichmentPlotSVGWidth = this.calculateWidth(this);
-    if (EnrichmentPlotSVGHeight + 60 > EnrichmentPlotSVGWidth) {
-      EnrichmentPlotSVGHeight = EnrichmentPlotSVGWidth * 0.70749;
-    } else {
-      EnrichmentPlotSVGWidth = EnrichmentPlotSVGHeight * 1.41344;
-    }
+    EnrichmentPlotSVGHeight = EnrichmentPlotSVGWidth * 0.70749;
+    // if (EnrichmentPlotSVGHeight + 60 > EnrichmentPlotSVGWidth) {
+    //   EnrichmentPlotSVGHeight = EnrichmentPlotSVGWidth * 0.70749;
+    // } else {
+    //   EnrichmentPlotSVGWidth = EnrichmentPlotSVGHeight * 1.41344;
+    // }
     cancelRequestEnrichmentGetPlot();
     let cancelToken = new CancelToken(e => {
       cancelRequestEnrichmentGetPlot = e;
@@ -1580,9 +1583,11 @@ class Enrichment extends Component {
       itemsPerPageInformedEnrichmentMain: items,
     });
   };
-  columnReorder = columns =>{
-    this.setState({enrichmentColumns: columns})
-    const columnsArr = columns.map(e=>{return e.title})
+  columnReorder = columns => {
+    this.setState({ enrichmentColumns: columns });
+    const columnsArr = columns.map(e => {
+      return e.title;
+    });
     const uDataRelevantFields = _.filter(columnsArr, function(key) {
       return key !== 'Description' && key !== 'Annotation';
     });
@@ -1592,7 +1597,7 @@ class Enrichment extends Component {
         uData: uDataRelevantFields,
       });
     }
-  }
+  };
 
   handleTableNetworkTabChange = (e, { activeIndex }) => {
     sessionStorage.setItem(`enrichmentViewTab`, activeIndex);

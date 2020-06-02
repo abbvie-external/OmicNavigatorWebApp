@@ -7,6 +7,7 @@
     "airbnb-prop-types": "^2.13.2",
     "array-move": "^2.2.1",
     "axios": "^0.18.1",
+    "blob-stream": "^0.1.3",
     "browserify": "^16.5.1",
     "canvg": "^2.0.0",
     "d3": "^5.12.0",
@@ -15,14 +16,16 @@
     "d3plus-text": "^0.9.51",
     "dompurify": "^2.0.7",
     "file-saver": "^2.0.2",
+    "html2canvas": "^1.0.0-rc.5",
     "husky": "^3.0.3",
     "jquery": "^3.5.1",
-    "jspdf": "^1.5.2",
+    "jspdf": "^1.5.3",
     "lint-staged": "^9.2.1",
     "lodash": "^4.17.15",
     "moment": "^2.24.0",
     "node-sass": "^4.14.1",
     "opencpu.js": "^0.5.0",
+    "pdfkit": "^0.11.0",
     "re-reselect": "^3.3.0",
     "react": "^16.8.6",
     "react-bus": "^2.0.1",
@@ -48,7 +51,8 @@
     "semiotic": "^1.20.5",
     "slick-carousel": "^1.8.1",
     "styled-components": "^5.0.1",
-    "svg-to-pdfkit": "^0.1.7"
+    "svg-to-pdfkit": "^0.1.7",
+    "transform-loader": "^0.2.4"
   },
   "husky": {
     "hooks": {
