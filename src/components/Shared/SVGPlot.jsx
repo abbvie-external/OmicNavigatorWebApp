@@ -83,8 +83,22 @@ class SVGPlot extends Component {
     }
   }
 
+  getButtonActionsClass = () => {
+    if (
+      this.props.activeIndex === 1 &&
+      this.props.activeIndexPepplotView === 0
+    ) {
+      return 'export-svg Hide';
+    } else {
+      return 'export-svg ShowBlock';
+    }
+  };
+
   render() {
     const { activeSVGTabIndex } = this.props;
+    debugger;
+    const ButtonActionsClass = this.getButtonActionsClass();
+
     const BreadcrumbPopupStyle = {
       backgroundColor: '2E2E2E',
       borderBottom: '2px solid var(--color-primary)',
@@ -106,7 +120,7 @@ class SVGPlot extends Component {
     } else {
       return (
         <div className="svgContainer">
-          <div className="export-svg">
+          <div className={ButtonActionsClass}>
             <ButtonActions
               excelVisible={false}
               pdfVisible={false}
