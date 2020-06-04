@@ -266,7 +266,6 @@ class PepplotSearchCriteria extends Component {
     phosphoprotService
       .listStudies()
       .then(listStudiesResponseData => {
-        debugger;
         const studiesArr = listStudiesResponseData.map(study => {
           const studyName = study.name[0];
           return { key: studyName, text: studyName, value: studyName };
