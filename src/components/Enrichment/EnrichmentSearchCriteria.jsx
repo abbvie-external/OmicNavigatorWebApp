@@ -107,7 +107,7 @@ class EnrichmentSearchCriteria extends Component {
         enrichmentStudyHref: `http://www.localhost:3000/${s}.html`,
       });
       phosphoprotService
-        .getModelNames('EnrichmentNames', s + 'plots')
+        .getModels('EnrichmentNames', s + 'plots')
         .then(modelsFromService => {
           this.allNames = modelsFromService;
           const modelsArr = _.map(_.keys(modelsFromService), function(
@@ -136,7 +136,7 @@ class EnrichmentSearchCriteria extends Component {
           }
         })
         .catch(error => {
-          console.error('Error during getModelNames', error);
+          console.error('Error during getModels', error);
         });
     }
 
@@ -216,7 +216,7 @@ class EnrichmentSearchCriteria extends Component {
       isValidSearchEnrichment: false,
     });
     phosphoprotService
-      .getModelNames('EnrichmentNames', value + 'plots')
+      .getModels('EnrichmentNames', value + 'plots')
       .then(modelsFromService => {
         this.allNames = modelsFromService;
         const modelsArr = _.map(_.keys(modelsFromService), function(modelName) {
@@ -228,7 +228,7 @@ class EnrichmentSearchCriteria extends Component {
         });
       })
       .catch(error => {
-        console.error('Error during getModelNames', error);
+        console.error('Error during getModels', error);
       });
   };
 

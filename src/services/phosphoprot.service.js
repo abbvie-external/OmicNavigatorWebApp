@@ -46,7 +46,7 @@ class PhosphoprotService {
     return studiesFromPromise;
   }
 
-  async getModelNames(rName, study) {
+  async getModels(rName, study) {
     this.setUrl();
     const promise = this.ocpuRPC(rName, { study: study });
     const modelsFromPromise = await promise;

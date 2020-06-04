@@ -42,7 +42,7 @@ class Tabs extends Component {
       pepplotProteinSite: !isEnrichment ? decodedSiteAndDescription : '',
       pValueType: 'nominal',
       proteinToHighlightInDiffTable: isEnrichment ? false : '',
-      handleListStudiesData: [],
+      allStudiesMetadataPepplot: [],
     };
   }
 
@@ -144,8 +144,8 @@ class Tabs extends Component {
     );
   };
 
-  handleListStudiesData = listStudiesData => {
-    this.setState({ listStudiesData });
+  handleAllStudiesMetadataPepplot = listStudiesResponseData => {
+    this.setState({ allStudiesMetadataPepplot: listStudiesResponseData });
   };
 
   render() {
@@ -174,7 +174,9 @@ class Tabs extends Component {
               {...this.props}
               {...this.state}
               onSearchCriteriaToTop={this.handleSearchCriteriaToTop}
-              onHandleListStudiesData={this.handleListStudiesData}
+              onHandleAllStudiesMetadataPepplot={
+                this.handleAllStudiesMetadataPepplot
+              }
             />
           </Tab.Pane>
         ),
