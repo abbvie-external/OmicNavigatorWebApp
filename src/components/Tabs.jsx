@@ -26,38 +26,24 @@ class Tabs extends Component {
     const decodedModel = decodeURI(modelFromUrl);
     const decodedTest = decodeURI(testFromUrl);
     const decodedSiteAndDescription = decodeURI(siteAndDescription);
-    if (tabFromUrl === 'pepplot') {
-      this.state = {
-        activeIndex: 2,
-        tab: tabFromUrl,
-        pepplotStudy: decodedStudy || '',
-        pepplotModel: decodedModel || '',
-        pepplotTest: decodedTest || '',
-        pepplotProteinSite: decodedSiteAndDescription || '',
-        enrichmentStudy: '',
-        enrichmentModel: '',
-        enrichmentAnnotation: '',
-        pValueType: 'nominal',
-        proteinToHighlightInDiffTable: '',
-        proteinHighlightInProgress: false,
-      };
-    } else {
-      this.state = {
-        activeIndex: 3,
-        tab: tabFromUrl,
-        enrichmentStudy: decodedStudy || '',
-        enrichmentModel: decodedModel || '',
-        enrichmentAnnotation: decodedTest || '',
-        enrichmentDescriptionAndTest: decodedSiteAndDescription || '',
-        pepplotStudy: '',
-        pepplotModel: '',
-        pepplotTest: '',
-        pepplotProteinSite: '',
-        pValueType: 'nominal',
-        proteinToHighlightInDiffTable: '',
-        proteinHighlightInProgress: false,
-      };
-    }
+    const isEnrichment = tabFromUrl === 'enrichment';
+    this.state = {
+      activeIndex: isEnrichment ? 3 : 2,
+      tab: tabFromUrl,
+      enrichmentStudy: isEnrichment ? decodedStudy : '',
+      enrichmentModel: isEnrichment ? decodedModel : '',
+      enrichmentAnnotation: isEnrichment ? decodedTest : '',
+      enrichmentDescriptionAndTest: isEnrichment
+        ? decodedSiteAndDescription
+        : '',
+      pepplotStudy: !isEnrichment ? decodedStudy : '',
+      pepplotModel: !isEnrichment ? decodedModel : '',
+      pepplotTest: !isEnrichment ? decodedTest : '',
+      pepplotProteinSite: !isEnrichment ? decodedSiteAndDescription : '',
+      pValueType: 'nominal',
+      proteinToHighlightInDiffTable: isEnrichment ? false : '',
+      handleListStudiesData: [],
+    };
   }
 
   componentDidMount() {
@@ -158,6 +144,10 @@ class Tabs extends Component {
     );
   };
 
+  handleListStudiesData = listStudiesData => {
+    this.setState({ listStudiesData });
+  };
+
   render() {
     const { activeIndex } = this.state;
     const panes = [
@@ -184,6 +174,7 @@ class Tabs extends Component {
               {...this.props}
               {...this.state}
               onSearchCriteriaToTop={this.handleSearchCriteriaToTop}
+              onHandleListStudiesData={this.handleListStudiesData}
             />
           </Tab.Pane>
         ),
