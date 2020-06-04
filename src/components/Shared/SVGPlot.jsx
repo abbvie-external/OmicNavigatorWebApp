@@ -96,7 +96,6 @@ class SVGPlot extends Component {
 
   render() {
     const { activeSVGTabIndex } = this.props;
-    debugger;
     const ButtonActionsClass = this.getButtonActionsClass();
 
     const BreadcrumbPopupStyle = {

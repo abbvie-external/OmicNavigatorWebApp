@@ -9,7 +9,8 @@ require('opencpu.js/opencpu-0.5.js');
 class PhosphoprotService {
   constructor() {
     // this.ocpuUrl = 'http://10.239.9.49/ocpu/library/PhosphoProt/R';
-    this.ocpuUrl = 'http://10.239.9.76/ocpu/library/PhosphoProt/R';
+    // this.ocpuUrl = 'http://10.239.9.76/ocpu/library/PhosphoProt/R';
+    this.ocpuUrl = '***REMOVED***/ocpu/library/OmicAnalyzer/R';
     // this.ocpuUrlAlt = 'http://localhost:5656/ocpu/library/PhosphoProt/R'
     // this.ocpuUrlAlt = 'http://localhost:1234/v1'
   }
@@ -38,9 +39,9 @@ class PhosphoprotService {
     });
   }
 
-  async getStudies() {
+  async listStudies() {
     this.setUrl();
-    const promise = this.ocpuRPC('getStudies', {});
+    const promise = this.ocpuRPC('listStudies', {});
     const studiesFromPromise = await promise;
     return studiesFromPromise;
   }

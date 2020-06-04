@@ -181,17 +181,18 @@ class EnrichmentSearchCriteria extends Component {
 
   populateStudies = () => {
     phosphoprotService
-      .getStudies()
-      .then(studiesFromService => {
-        const studiesArr = studiesFromService.map(study => {
-          return { key: study, text: study, value: study };
+      .listStudies()
+      .then(listStudiesResponseData => {
+        const studiesArr = listStudiesResponseData.map(study => {
+          const studyName = study.name[0];
+          return { key: studyName, text: studyName, value: studyName };
         });
         this.setState({
           enrichmentStudies: studiesArr,
         });
       })
       .catch(error => {
-        console.error('Error during getStudies', error);
+        console.error('Error during listStudies', error);
       });
   };
 
