@@ -120,12 +120,12 @@ class PepplotSearchCriteria extends Component {
     phosphoprotService
       .listStudies()
       .then(listStudiesResponseData => {
-        const studiesArr = listStudiesResponseData.map(study => {
+        const studies = listStudiesResponseData.map(study => {
           const studyName = study.name[0];
           return { key: studyName, text: studyName, value: studyName };
         });
         this.setState({
-          pepplotStudies: studiesArr,
+          pepplotStudies: studies,
         });
         this.props.onHandleAllStudiesMetadataPepplot(listStudiesResponseData);
       })
@@ -142,7 +142,6 @@ class PepplotSearchCriteria extends Component {
       pepplotTest,
       pepplotProteinSite,
     } = this.props;
-    debugger;
     if (pepplotStudy !== '') {
       this.setState({
         pepplotStudyHrefVisible: true,
@@ -151,13 +150,12 @@ class PepplotSearchCriteria extends Component {
 
       // loop through studyMetadataPepplot to find the object with the name matching pepplotStudy
       const allStudiesMetadataPepplotCopy = [...allStudiesMetadataPepplot];
-      const pepplotStudyObj = allStudiesMetadataPepplotCopy.filter(
-        obj => obj.name.toString() === pepplotStudy,
+      const pepplotStudyData = allStudiesMetadataPepplotCopy.filter(
+        study => study.name.toString() === pepplotStudy,
       );
-      const pepplotModelsAndTests = pepplotStudyObj[0].results;
-      debugger;
+      const pepplotModelsAndTests = pepplotStudyData[0].results;
       this.setState({
-        pepplotStudyMetadata: pepplotStudyObj[0],
+        pepplotStudyMetadata: pepplotStudyData[0],
         pepplotModelsAndTests: pepplotModelsAndTests,
       });
       const pepplotModelsMapped = pepplotModelsAndTests.map(result => {
@@ -174,21 +172,22 @@ class PepplotSearchCriteria extends Component {
       });
 
       if (pepplotModel !== '') {
-        const pepplotModelWithTestsArr = pepplotModelsAndTests.filter(
-          obj => obj.modelID.toString() === pepplotModel,
+        const pepplotModelWithTests = pepplotModelsAndTests.filter(
+          model => model.modelID.toString() === pepplotModel,
         );
-        const pepplotTestsMapped = pepplotModelWithTestsArr[0].map(test => {
+        const pepplotTests = pepplotModelWithTests[0].tests || [];
+        const pepplotTestsMapped = pepplotTests.map(test => {
           return {
-            key: test.testID[0],
-            text: test.testDisplay[0],
-            test: test.testID[0],
+            key: test.testID,
+            text: test.testDisplay,
+            test: test.testID,
           };
         });
-        // const uDataPArr = this.allNames[pepplotModel];
+        const uDataP = pepplotTests.map(t => t.testID[0]);
         this.setState({
           pepplotTestsDisabled: false,
           pepplotTests: pepplotTestsMapped,
-          // uDataP: uDataPArr,
+          uDataP: uDataP,
         });
 
         // if (pepplotTest !== '') {
@@ -266,24 +265,23 @@ class PepplotSearchCriteria extends Component {
       isValidSearchPepplot: false,
     });
     const { pepplotModelsAndTests } = this.state;
-    debugger;
     const pepplotModelsAndTestsCopy = [...pepplotModelsAndTests];
-    const pepplotModelWithTestObj = pepplotModelsAndTestsCopy.find(
-      arr => arr.modelID.toString() === value,
+    const pepplotModelWithTests = pepplotModelsAndTestsCopy.filter(
+      model => model.modelID.toString() === value,
     );
-    const pepplotTestsArr = pepplotModelWithTestsObj.tests || [];
-    const pepplotTestsMapped = pepplotTestsArr.map(test => {
+    const pepplotTests = pepplotModelWithTests[0].tests || [];
+    const pepplotTestsMapped = pepplotTests.map(test => {
       return {
-        key: test.testID[0],
-        text: test.testDisplay[0],
-        test: test.testID[0],
+        key: test.testID,
+        text: test.testDisplay,
+        test: test.testID,
       };
     });
-    // const uDataPObj = this.allNames[value];
+    const uDataP = pepplotTests.map(t => t.testID[0]);
     this.setState({
       pepplotTestsDisabled: false,
       pepplotTests: pepplotTestsMapped,
-      // uDataP: uDataPObj,
+      uDataP: uDataP,
     });
   };
 
@@ -594,8 +592,8 @@ class PepplotSearchCriteria extends Component {
         undefined,
         cancelToken,
       )
-      .then(svgMarkupObj => {
-        let svgMarkup = svgMarkupObj.data;
+      .then(svgMarkupRaw => {
+        let svgMarkup = svgMarkupRaw.data;
         svgMarkup = svgMarkup.replace(
           /<svg/g,
           '<svg preserveAspectRatio="xMinYMid meet" style="width:' +
