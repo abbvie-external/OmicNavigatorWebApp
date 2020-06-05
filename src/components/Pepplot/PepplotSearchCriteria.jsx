@@ -25,6 +25,8 @@ class PepplotSearchCriteria extends Component {
     pepplotStudyHref: '',
     pepplotModels: [],
     pepplotTests: [],
+    pepplotModelTooltip: '',
+    pepplotTestTooltip: '',
     pepplotStudiesDisabled: false,
     pepplotModelsDisabled: true,
     pepplotTestsDisabled: true,
@@ -120,7 +122,7 @@ class PepplotSearchCriteria extends Component {
     } = this.props;
 
     const studies = allStudiesMetadata.map(study => {
-      const studyName = study.name[0];
+      const studyName = study.name;
       return { key: studyName, text: studyName, value: studyName };
     });
     this.setState({
@@ -134,19 +136,19 @@ class PepplotSearchCriteria extends Component {
 
       // loop through allStudiesMetadata to find the object with the name matching pepplotStudy
       const allStudiesMetadataCopy = [...allStudiesMetadata];
-      const pepplotStudyData = allStudiesMetadataCopy.filter(
-        study => study.name.toString() === pepplotStudy,
+      const pepplotStudyData = allStudiesMetadataCopy.find(
+        study => study.name === pepplotStudy,
       );
-      const pepplotModelsAndTests = pepplotStudyData[0].results;
+      const pepplotModelsAndTests = pepplotStudyData?.results || [];
       this.setState({
-        pepplotStudyMetadata: pepplotStudyData[0],
+        pepplotStudyMetadata: pepplotStudyData,
         pepplotModelsAndTests: pepplotModelsAndTests,
       });
       const pepplotModelsMapped = pepplotModelsAndTests.map(result => {
         return {
-          key: result.modelID[0],
-          text: result.modelDisplay[0],
-          value: result.modelID[0],
+          key: result.modelID,
+          text: result.modelID,
+          value: result.modelID,
         };
       });
 
@@ -156,18 +158,22 @@ class PepplotSearchCriteria extends Component {
       });
 
       if (pepplotModel !== '') {
-        const pepplotModelWithTests = pepplotModelsAndTests.filter(
-          model => model.modelID.toString() === pepplotModel,
+        const pepplotModelWithTests = pepplotModelsAndTests.find(
+          model => model.modelID === pepplotModel,
         );
-        const pepplotTests = pepplotModelWithTests[0].tests || [];
+        const pepplotModelTooltip = pepplotModelWithTests?.modelDisplay || '';
+        this.setState({
+          pepplotModelTooltip: pepplotModelTooltip,
+        });
+        const pepplotTests = pepplotModelWithTests?.tests || [];
         const pepplotTestsMapped = pepplotTests.map(test => {
           return {
             key: test.testID,
-            text: test.testDisplay,
+            text: test.testID,
             value: test.testID,
           };
         });
-        const uDataP = pepplotTests.map(t => t.testID[0]);
+        const uDataP = pepplotTests.map(t => t.testID);
         this.setState({
           pepplotTestsDisabled: false,
           pepplotTests: pepplotTestsMapped,
@@ -233,6 +239,8 @@ class PepplotSearchCriteria extends Component {
       pepplotStudyHref: `http://www.localhost:3000/${value}.html`,
       pepplotModelsDisabled: true,
       pepplotTestsDisabled: true,
+      pepplotModelTooltip: '',
+      pepplotTestTooltip: '',
     });
   };
 
@@ -250,18 +258,22 @@ class PepplotSearchCriteria extends Component {
     });
     const { pepplotModelsAndTests } = this.state;
     const pepplotModelsAndTestsCopy = [...pepplotModelsAndTests];
-    const pepplotModelWithTests = pepplotModelsAndTestsCopy.filter(
-      model => model.modelID.toString() === value,
+    const pepplotModelWithTests = pepplotModelsAndTestsCopy.find(
+      model => model.modelID === value,
     );
-    const pepplotTests = pepplotModelWithTests[0].tests || [];
+    const pepplotModelTooltip = pepplotModelWithTests?.modelDisplay || '';
+    this.setState({
+      pepplotModelTooltip: pepplotModelTooltip,
+    });
+    const pepplotTests = pepplotModelWithTests.tests || [];
     const pepplotTestsMapped = pepplotTests.map(test => {
       return {
         key: test.testID,
-        text: test.testDisplay,
+        text: test.testID,
         value: test.testID,
       };
     });
-    const uDataP = pepplotTests.map(t => t.testID[0]);
+    const uDataP = pepplotTests.map(t => t.testID);
     this.setState({
       pepplotTestsDisabled: false,
       pepplotTests: pepplotTestsMapped,
@@ -618,7 +630,9 @@ class PepplotSearchCriteria extends Component {
       pepplotStudyHref,
       pepplotStudyHrefVisible,
       pepplotModels,
+      pepplotModelTooltip,
       pepplotTests,
+      pepplotTestTooltip,
       pepplotStudiesDisabled,
       pepplotModelsDisabled,
       pepplotTestsDisabled,
@@ -766,39 +780,59 @@ class PepplotSearchCriteria extends Component {
             selectOnNavigation={false}
           />
           <span className="StudyHtmlIconDivP">{studyIcon}</span>
-          <Form.Field
-            control={Select}
-            name="pepplotModel"
-            value={pepplotModel}
-            options={pepplotModels}
-            placeholder="Select Model"
-            onChange={this.handleModelChange}
-            disabled={pepplotModelsDisabled}
-            label={{
-              children: 'Model',
-              htmlFor: 'form-select-control-pmodel',
-            }}
-            search
-            searchInput={{ id: 'form-select-control-pmodel' }}
-            selectOnBlur={false}
-            selectOnNavigation={false}
+          <Popup
+            trigger={
+              <Form.Field
+                control={Select}
+                name="pepplotModel"
+                value={pepplotModel}
+                options={pepplotModels}
+                placeholder="Select Model"
+                onChange={this.handleModelChange}
+                disabled={pepplotModelsDisabled}
+                label={{
+                  children: 'Model',
+                  htmlFor: 'form-select-control-pmodel',
+                }}
+                search
+                searchInput={{ id: 'form-select-control-pmodel' }}
+                selectOnBlur={false}
+                selectOnNavigation={false}
+              />
+            }
+            style={StudyPopupStyle}
+            disabled={pepplotModelTooltip === ''}
+            className="CustomTooltip"
+            inverted
+            position="bottom right"
+            content={pepplotModelTooltip}
           />
-          <Form.Field
-            control={Select}
-            name="pepplotTest"
-            value={pepplotTest}
-            options={pepplotTests}
-            placeholder="Select Test"
-            onChange={this.handleTestChange}
-            disabled={pepplotTestsDisabled}
-            label={{
-              children: 'Test',
-              htmlFor: 'form-select-control-ptest',
-            }}
-            search
-            searchInput={{ id: 'form-select-control-ptest' }}
-            selectOnBlur={false}
-            selectOnNavigation={false}
+          <Popup
+            trigger={
+              <Form.Field
+                control={Select}
+                name="pepplotTest"
+                value={pepplotTest}
+                options={pepplotTests}
+                placeholder="Select Test"
+                onChange={this.handleTestChange}
+                disabled={pepplotTestsDisabled}
+                label={{
+                  children: 'Test',
+                  htmlFor: 'form-select-control-ptest',
+                }}
+                search
+                searchInput={{ id: 'form-select-control-ptest' }}
+                selectOnBlur={false}
+                selectOnNavigation={false}
+              />
+            }
+            style={StudyPopupStyle}
+            disabled={pepplotTestTooltip === ''}
+            className="CustomTooltip"
+            inverted
+            position="bottom right"
+            content={pepplotTestTooltip}
           />
         </Form>
         <div className="MultisetContainer">

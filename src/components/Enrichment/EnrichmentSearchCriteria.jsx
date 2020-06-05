@@ -28,6 +28,8 @@ class EnrichmentSearchCriteria extends Component {
     enrichmentStudyHref: '',
     enrichmentModels: [],
     enrichmentAnnotations: [],
+    enrichmentModelTooltip: '',
+    enrichmentAnnotationTooltip: '',
     enrichmentStudiesDisabled: false,
     enrichmentModelsDisabled: true,
     enrichmentAnnotationsDisabled: true,
@@ -118,7 +120,7 @@ class EnrichmentSearchCriteria extends Component {
     } = this.props;
 
     const studies = allStudiesMetadata.map(study => {
-      const studyName = study.name[0];
+      const studyName = study.name;
       return { key: studyName, text: studyName, value: studyName };
     });
     this.setState({
@@ -132,21 +134,21 @@ class EnrichmentSearchCriteria extends Component {
 
       // loop through allStudiesMetadata to find the object with the name matching enrichmentStudy
       const allStudiesMetadataCopy = [...allStudiesMetadata];
-      const enrichmentStudyData = allStudiesMetadataCopy.filter(
-        study => study.name.toString() === enrichmentStudy,
+      const enrichmentStudyData = allStudiesMetadataCopy.find(
+        study => study.name === enrichmentStudy,
       );
       debugger;
-      const enrichmentModelsAndAnnotations = enrichmentStudyData[0].enrichments;
+      const enrichmentModelsAndAnnotations = enrichmentStudyData.enrichments;
       this.setState({
-        enrichmentStudyMetadata: enrichmentStudyData[0],
+        enrichmentStudyMetadata: enrichmentStudyData,
         enrichmentModelsAndAnnotations: enrichmentModelsAndAnnotations,
       });
       const enrichmentModelsMapped = enrichmentModelsAndAnnotations.map(
         enrichment => {
           return {
-            key: enrichment.modelID[0],
-            text: enrichment.modelDisplay[0],
-            value: enrichment.modelID[0],
+            key: enrichment.modelID,
+            text: enrichment.modelID,
+            value: enrichment.modelID,
           };
         },
       );
@@ -157,22 +159,26 @@ class EnrichmentSearchCriteria extends Component {
       });
 
       if (enrichmentModel !== '') {
-        debugger;
-        const enrichmentModelWithAnnotations = enrichmentModelsAndAnnotations.filter(
-          model => model.modelID.toString() === enrichmentModel,
+        const enrichmentModelWithAnnotations = enrichmentModelsAndAnnotations.find(
+          model => model.modelID === enrichmentModel,
         );
+        const enrichmentModelTooltip =
+          enrichmentModelWithAnnotations?.modelDisplay || '';
+        this.setState({
+          enrichmentModelTooltip: enrichmentModelTooltip,
+        });
         const enrichmentAnnotations =
-          enrichmentModelWithAnnotations[0].annotations || [];
+          enrichmentModelWithAnnotations.annotations || [];
         const enrichmentAnnotationsMapped = enrichmentAnnotations.map(
           annotation => {
             return {
               key: annotation.annotationID,
-              text: annotation.annotationDisplay,
+              text: annotation.annotationID,
               value: annotation.annotationID,
             };
           },
         );
-        const uDataP = enrichmentAnnotations.map(a => a.annotationID[0]);
+        const uDataP = enrichmentAnnotations.map(a => a.annotationID);
         this.setState({
           enrichmentAnnotationsDisabled: false,
           enrichmentAnnotations: enrichmentAnnotationsMapped,
@@ -235,6 +241,8 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentStudyHref: `http://www.localhost:3000/${value}.html`,
       enrichmentModelsDisabled: true,
       enrichmentAnnotationsDisabled: true,
+      enrichmentModelTooltip: '',
+      enrichmentAnnotationTooltip: '',
     });
   };
 
@@ -255,16 +263,21 @@ class EnrichmentSearchCriteria extends Component {
     const enrichmentModelsAndAnnotationsCopy = [
       ...enrichmentModelsAndAnnotations,
     ];
-    const enrichmentModelWithAnnotations = enrichmentModelsAndAnnotationsCopy.filter(
-      model => model.modelID.toString() === value,
+    const enrichmentModelWithAnnotations = enrichmentModelsAndAnnotationsCopy.find(
+      model => model.modelID === value,
     );
+    const enrichmentModelTooltip =
+      enrichmentModelWithAnnotations?.modelDisplay || '';
+    this.setState({
+      enrichmentModelTooltip: enrichmentModelTooltip,
+    });
     const enrichmentAnnotations =
-      enrichmentModelWithAnnotations[0].annotations || [];
+      enrichmentModelWithAnnotations.annotations || [];
     const enrichmentAnnotationsMapped = enrichmentAnnotations.map(
       annotation => {
         return {
           key: annotation.annotationID,
-          text: annotation.annotationDisplay,
+          text: annotation.annotationID,
           value: annotation.annotationID,
         };
       },
@@ -720,6 +733,8 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentStudyHrefVisible,
       enrichmentModels,
       enrichmentAnnotations,
+      enrichmentModelTooltip,
+      enrichmentAnnotationTooltip,
       enrichmentStudiesDisabled,
       enrichmentModelsDisabled,
       enrichmentAnnotationsDisabled,
@@ -868,39 +883,59 @@ class EnrichmentSearchCriteria extends Component {
             selectOnNavigation={false}
           />
           <span className="StudyHtmlIconDivE">{studyIcon}</span>
-          <Form.Field
-            control={Select}
-            name="enrichmentModel"
-            value={enrichmentModel}
-            options={enrichmentModels}
-            placeholder="Select Model"
-            onChange={this.handleModelChange}
-            disabled={enrichmentModelsDisabled}
-            label={{
-              children: 'Model',
-              htmlFor: 'form-select-control-emodel',
-            }}
-            search
-            searchInput={{ id: 'form-select-control-emodel' }}
-            selectOnBlur={false}
-            selectOnNavigation={false}
+          <Popup
+            trigger={
+              <Form.Field
+                control={Select}
+                name="enrichmentModel"
+                value={enrichmentModel}
+                options={enrichmentModels}
+                placeholder="Select Model"
+                onChange={this.handleModelChange}
+                disabled={enrichmentModelsDisabled}
+                label={{
+                  children: 'Model',
+                  htmlFor: 'form-select-control-emodel',
+                }}
+                search
+                searchInput={{ id: 'form-select-control-emodel' }}
+                selectOnBlur={false}
+                selectOnNavigation={false}
+              />
+            }
+            style={StudyPopupStyle}
+            disabled={enrichmentModelTooltip === ''}
+            className="CustomTooltip"
+            inverted
+            position="bottom right"
+            content={enrichmentModelTooltip}
           />
-          <Form.Field
-            control={Select}
-            name="enrichmentAnnotation"
-            value={enrichmentAnnotation}
-            options={enrichmentAnnotations}
-            placeholder="Select Database"
-            onChange={this.handleAnnotationChange}
-            disabled={enrichmentAnnotationsDisabled}
-            label={{
-              children: 'Database',
-              htmlFor: 'form-select-control-edatabase',
-            }}
-            search
-            searchInput={{ id: 'form-select-control-edatabase' }}
-            selectOnBlur={false}
-            selectOnNavigation={false}
+          <Popup
+            trigger={
+              <Form.Field
+                control={Select}
+                name="enrichmentAnnotation"
+                value={enrichmentAnnotation}
+                options={enrichmentAnnotations}
+                placeholder="Select Database"
+                onChange={this.handleAnnotationChange}
+                disabled={enrichmentAnnotationsDisabled}
+                label={{
+                  children: 'Database',
+                  htmlFor: 'form-select-control-edatabase',
+                }}
+                search
+                searchInput={{ id: 'form-select-control-edatabase' }}
+                selectOnBlur={false}
+                selectOnNavigation={false}
+              />
+            }
+            style={StudyPopupStyle}
+            disabled={enrichmentAnnotationTooltip === ''}
+            className="CustomTooltip"
+            inverted
+            position="bottom right"
+            content={enrichmentAnnotationTooltip}
           />
           <label
             className={
