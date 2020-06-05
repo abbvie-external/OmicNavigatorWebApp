@@ -444,7 +444,7 @@ class Pepplot extends Component {
     );
   };
   pageToProtein = (data, proteinToHighlight, itemsPerPage) => {
-    if (this.pepplotGridRef.current !== null) {
+    if (this.pepplotGridRef?.current != null) {
       const Index = _.findIndex(data, function(p) {
         return p.Protein_Site === proteinToHighlight;
       });

@@ -95,198 +95,128 @@ class PepplotSearchCriteria extends Component {
     activateMultisetFiltersP: false,
     uDataP: [],
     // loadingPepplotMultisetFilters: false,
+    pepplotStudyMetadata: [],
+    pepplotModelsAndTests: [],
   };
 
-  componentDidMount() {
-    const s = this.props.pepplotStudy || '';
-    const m = this.props.pepplotModel || '';
-    const t = this.props.pepplotTest || '';
-    const p = this.props.pepplotProteinSite || '';
-    if (s !== '') {
+  componentDidMount() {}
+
+  componentDidUpdate(prevProps) {
+    if (
+      this.props.allStudiesMetadata !== prevProps.allStudiesMetadata ||
+      this.props.pepplotStudy !== prevProps.pepplotStudy
+    ) {
+      this.populateDropdowns();
+    }
+  }
+
+  populateDropdowns = () => {
+    const {
+      allStudiesMetadata,
+      pepplotStudy,
+      pepplotModel,
+      pepplotTest,
+      pepplotProteinSite,
+    } = this.props;
+
+    const studies = allStudiesMetadata.map(study => {
+      const studyName = study.name[0];
+      return { key: studyName, text: studyName, value: studyName };
+    });
+    this.setState({
+      pepplotStudies: studies,
+    });
+    if (pepplotStudy !== '') {
       this.setState({
         pepplotStudyHrefVisible: true,
-        pepplotStudyHref: `http://www.localhost:3000/${s}.html`,
+        pepplotStudyHref: `http://www.localhost:3000/${pepplotStudy}.html`,
       });
-      phosphoprotService
-        .getModelNames('inferenceNames', s + 'plots')
-        .then(modelsFromService => {
-          this.allNames = modelsFromService;
-          const modelsArr = _.map(_.keys(modelsFromService), function(
-            modelName,
-          ) {
-            return { key: modelName, text: modelName, value: modelName };
-          });
-          this.setState({
-            pepplotModelsDisabled: false,
-            pepplotModels: modelsArr,
-          });
-          if (m !== '') {
-            const testsArr = _.map(this.allNames[m], function(testName) {
-              return { key: testName, text: testName, value: testName };
-            });
-            const uDataPArr = this.allNames[m];
-            this.setState({
-              pepplotTestsDisabled: false,
-              pepplotTests: testsArr,
-              uDataP: uDataPArr,
-            });
-          }
-        })
-        .catch(error => {
-          console.error('Error during getModelNames', error);
-        });
-    }
 
-    if (t !== '') {
-      this.props.onSearchCriteriaChange(
-        {
-          pepplotStudy: s,
-          pepplotModel: m,
-          pepplotTest: t,
-          pepplotProteinSite: p,
-        },
-        false,
+      // loop through allStudiesMetadata to find the object with the name matching pepplotStudy
+      const allStudiesMetadataCopy = [...allStudiesMetadata];
+      const pepplotStudyData = allStudiesMetadataCopy.filter(
+        study => study.name.toString() === pepplotStudy,
       );
+      const pepplotModelsAndTests = pepplotStudyData[0].results;
       this.setState({
-        uAnchorP: t,
+        pepplotStudyMetadata: pepplotStudyData[0],
+        pepplotModelsAndTests: pepplotModelsAndTests,
       });
-      this.props.onSearchTransitionPepplot(true);
-      phosphoprotService
-        .getTestData(m, t, s + 'plots', this.props.onSearchTransitionPepplot)
-        .then(dataFromService => {
-          this.setState({
-            uSettingsP: {
-              ...this.state.uSettingsP,
-              maxElementsP: dataFromService.length,
-            },
-          });
-          this.testdata = dataFromService;
-          this.props.onPepplotSearchUnfiltered({
-            pepplotResults: this.testdata,
-          });
-          this.props.onPepplotSearch({ pepplotResults: this.testdata });
-        })
-        .catch(error => {
-          console.error('Error during getTestData', error);
-        });
-    }
-    this.populateStudies();
-  }
+      const pepplotModelsMapped = pepplotModelsAndTests.map(result => {
+        return {
+          key: result.modelID[0],
+          text: result.modelDisplay[0],
+          value: result.modelID[0],
+        };
+      });
 
-  // used when test is updated by clicking on the bulleye within enrichment, triple pane
-  componentDidUpdate(prevProps) {
-    if (this.props.pepplotTest !== prevProps.pepplotTest) {
-      const s = this.props.pepplotStudy || '';
-      const m = this.props.pepplotModel || '';
-      const t = this.props.pepplotTest || '';
-      const p = '';
+      this.setState({
+        pepplotModelsDisabled: false,
+        pepplotModels: pepplotModelsMapped,
+      });
 
-      if (s !== '') {
-        this.setState({
-          pepplotStudyHrefVisible: true,
-          pepplotStudyHref: `http://www.localhost:3000/${s}.html`,
-        });
-        phosphoprotService
-          .getModelNames('inferenceNames', s + 'plots')
-          .then(modelsFromService => {
-            this.allNames = modelsFromService;
-            const modelsArr = _.map(_.keys(modelsFromService), function(
-              modelName,
-            ) {
-              return { key: modelName, text: modelName, value: modelName };
-            });
-            this.setState({
-              pepplotModelsDisabled: false,
-              pepplotModels: modelsArr,
-            });
-            if (m !== '') {
-              const testsArr = _.map(this.allNames[m], function(testName) {
-                return { key: testName, text: testName, value: testName };
-              });
-              const uDataPArr = this.allNames[m];
-              this.setState({
-                pepplotTestsDisabled: false,
-                pepplotTests: testsArr,
-                uDataP: uDataPArr,
-              });
-            }
-          })
-          .catch(error => {
-            console.error('Error during getModelNames', error);
-          });
-      }
-      if (t !== '') {
-        this.props.onSearchCriteriaChange(
-          {
-            pepplotStudy: s,
-            pepplotModel: m,
-            pepplotTest: t,
-            pepplotProteinSite: p,
-          },
-          false,
+      if (pepplotModel !== '') {
+        const pepplotModelWithTests = pepplotModelsAndTests.filter(
+          model => model.modelID.toString() === pepplotModel,
         );
+        const pepplotTests = pepplotModelWithTests[0].tests || [];
+        const pepplotTestsMapped = pepplotTests.map(test => {
+          return {
+            key: test.testID,
+            text: test.testDisplay,
+            value: test.testID,
+          };
+        });
+        const uDataP = pepplotTests.map(t => t.testID[0]);
         this.setState({
-          uAnchorP: t,
+          pepplotTestsDisabled: false,
+          pepplotTests: pepplotTestsMapped,
+          uDataP: uDataP,
         });
-        this.props.onSearchTransitionPepplot(true);
-        cancelRequestPSCGetTestData();
-        let cancelToken = new CancelToken(e => {
-          cancelRequestPSCGetTestData = e;
-        });
-        phosphoprotService
-          .getTestData(
-            m,
-            t,
-            s + 'plots',
-            this.props.onSearchTransitionPepplot,
-            cancelToken,
-          )
-          .then(dataFromService => {
-            this.setState({
-              uSettingsP: {
-                ...this.state.uSettingsP,
-                maxElementsP: dataFromService.length,
-              },
-            });
-            this.testdata = dataFromService;
-            this.props.onPepplotSearchUnfiltered({
-              pepplotResults: this.testdata,
-            });
-            this.props.onPepplotSearch({ pepplotResults: this.testdata });
-          })
-          .catch(error => {
-            console.error('Error during getTestData', error);
-          });
-      }
-      this.populateStudies();
-    }
-  }
 
-  populateStudies = () => {
-    phosphoprotService
-      .listStudies()
-      .then(listStudiesResponseData => {
-        const studiesArr = listStudiesResponseData.map(study => {
-          const studyName = study.name[0];
-          return { key: studyName, text: studyName, value: studyName };
-        });
-        this.setState({
-          pepplotStudies: studiesArr,
-        });
-        this.props.onHandleListStudiesData(listStudiesResponseData);
-      })
-      .catch(error => {
-        console.error('Error during listStudies', error);
-      });
+        // if (pepplotTest !== '') {
+        //   this.props.onSearchCriteriaChange(
+        //     {
+        //       pepplotStudy: pepplotStudy,
+        //       pepplotModel: pepplotModel,
+        //       pepplotTest: pepplotTest,
+        //       pepplotProteinSite: pepplotProteinSite,
+        //     },
+        //     false,
+        //   );
+        //   this.setState({
+        //     uAnchorP: pepplotTest,
+        //   });
+        //   this.props.onSearchTransitionPepplot(true);
+        //   phosphoprotService
+        //     .getTestData(
+        //       pepplotModel,
+        //       pepplotTest,
+        //       pepplotStudy + 'plots',
+        //       this.props.onSearchTransitionPepplot,
+        //     )
+        //     .then(dataFromService => {
+        //       this.setState({
+        //         uSettingsP: {
+        //           ...this.state.uSettingsP,
+        //           maxElementsP: dataFromService.length,
+        //         },
+        //       });
+        //       this.testdata = dataFromService;
+        //       this.props.onPepplotSearchUnfiltered({
+        //         pepplotResults: this.testdata,
+        //       });
+        //       this.props.onPepplotSearch({ pepplotResults: this.testdata });
+        //     })
+        //     .catch(error => {
+        //       console.error('Error during getTestData', error);
+        //     });
+        // }
+      }
+    }
   };
 
   handleStudyChange = (evt, { name, value }) => {
-    this.setState({
-      pepplotStudyHrefVisible: true,
-      pepplotStudyHref: `http://www.localhost:3000/${value}.html`,
-      pepplotModelsDisabled: true,
-      pepplotTestsDisabled: true,
-    });
     this.props.onSearchCriteriaChange(
       {
         [name]: value,
@@ -298,21 +228,12 @@ class PepplotSearchCriteria extends Component {
     this.props.onSearchCriteriaReset({
       isValidSearchPepplot: false,
     });
-    phosphoprotService
-      .getModelNames('inferenceNames', value + 'plots')
-      .then(modelsFromService => {
-        this.allNames = modelsFromService;
-        const modelsArr = _.map(_.keys(modelsFromService), function(modelName) {
-          return { key: modelName, text: modelName, value: modelName };
-        });
-        this.setState({
-          pepplotModelsDisabled: false,
-          pepplotModels: modelsArr,
-        });
-      })
-      .catch(error => {
-        console.error('Error during getModelNames', error);
-      });
+    this.setState({
+      pepplotStudyHrefVisible: true,
+      pepplotStudyHref: `http://www.localhost:3000/${value}.html`,
+      pepplotModelsDisabled: true,
+      pepplotTestsDisabled: true,
+    });
   };
 
   handleModelChange = (evt, { name, value }) => {
@@ -327,14 +248,24 @@ class PepplotSearchCriteria extends Component {
     this.props.onSearchCriteriaReset({
       isValidSearchPepplot: false,
     });
-    const testsArr = _.map(this.allNames[value], function(testName) {
-      return { key: testName, text: testName, value: testName };
+    const { pepplotModelsAndTests } = this.state;
+    const pepplotModelsAndTestsCopy = [...pepplotModelsAndTests];
+    const pepplotModelWithTests = pepplotModelsAndTestsCopy.filter(
+      model => model.modelID.toString() === value,
+    );
+    const pepplotTests = pepplotModelWithTests[0].tests || [];
+    const pepplotTestsMapped = pepplotTests.map(test => {
+      return {
+        key: test.testID,
+        text: test.testDisplay,
+        value: test.testID,
+      };
     });
-    const uDataPObj = this.allNames[value];
+    const uDataP = pepplotTests.map(t => t.testID[0]);
     this.setState({
       pepplotTestsDisabled: false,
-      pepplotTests: testsArr,
-      uDataP: uDataPObj,
+      pepplotTests: pepplotTestsMapped,
+      uDataP: uDataP,
     });
   };
 
@@ -645,8 +576,8 @@ class PepplotSearchCriteria extends Component {
         undefined,
         cancelToken,
       )
-      .then(svgMarkupObj => {
-        let svgMarkup = svgMarkupObj.data;
+      .then(svgMarkupRaw => {
+        let svgMarkup = svgMarkupRaw.data;
         svgMarkup = svgMarkup.replace(
           /<svg/g,
           '<svg preserveAspectRatio="xMinYMid meet" style="width:' +

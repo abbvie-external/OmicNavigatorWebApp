@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { Tab, Menu } from 'semantic-ui-react';
+import { phosphoprotService } from '../services/phosphoprot.service';
 import Pepplot from './Pepplot/Pepplot';
 import Enrichment from './Enrichment/Enrichment';
 import { updateUrl } from './Shared/UrlControl';
@@ -42,7 +43,7 @@ class Tabs extends Component {
       pepplotProteinSite: !isEnrichment ? decodedSiteAndDescription : '',
       pValueType: 'nominal',
       proteinToHighlightInDiffTable: isEnrichment ? false : '',
-      handleListStudiesData: [],
+      allStudiesMetadata: [],
     };
   }
 
@@ -56,6 +57,7 @@ class Tabs extends Component {
       false,
       null,
     );
+    this.getStudies();
   }
 
   setTabIndex = tabIndex => {
@@ -144,8 +146,17 @@ class Tabs extends Component {
     );
   };
 
-  handleListStudiesData = listStudiesData => {
-    this.setState({ listStudiesData });
+  getStudies = () => {
+    phosphoprotService
+      .listStudies()
+      .then(listStudiesResponseData => {
+        this.setState({
+          allStudiesMetadata: listStudiesResponseData,
+        });
+      })
+      .catch(error => {
+        console.error('Error during listStudies', error);
+      });
   };
 
   render() {
@@ -174,7 +185,6 @@ class Tabs extends Component {
               {...this.props}
               {...this.state}
               onSearchCriteriaToTop={this.handleSearchCriteriaToTop}
-              onHandleListStudiesData={this.handleListStudiesData}
             />
           </Tab.Pane>
         ),
