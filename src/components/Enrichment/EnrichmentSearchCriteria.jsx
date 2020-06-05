@@ -92,117 +92,132 @@ class EnrichmentSearchCriteria extends Component {
     },
     multisetFiltersVisible: false,
     activateMultisetFilters: false,
+    enrichmentStudyMetadata: [],
+    enrichmentModelsAndAnnotations: [],
   };
 
-  componentDidMount() {
-    const s = this.props.enrichmentStudy || '';
-    const m = this.props.enrichmentModel || '';
-    const a = this.props.enrichmentAnnotation || '';
-    const t = this.props.pValueType || 'nominal';
-    const d = this.props.enrichmentDescriptionAndTest || '';
+  componentDidMount() {}
 
-    if (s !== '') {
-      this.setState({
-        enrichmentStudyHrefVisible: true,
-        enrichmentStudyHref: `http://www.localhost:3000/${s}.html`,
-      });
-      phosphoprotService
-        .getModels('EnrichmentNames', s + 'plots')
-        .then(modelsFromService => {
-          this.allNames = modelsFromService;
-          const modelsArr = _.map(_.keys(modelsFromService), function(
-            modelName,
-          ) {
-            return { key: modelName, text: modelName, value: modelName };
-          });
-          this.setState({
-            enrichmentModelsDisabled: false,
-            enrichmentModels: modelsArr,
-          });
-          if (m !== '') {
-            const annotationsArr = _.map(this.allNames[m], function(
-              annotationName,
-            ) {
-              return {
-                key: annotationName,
-                text: annotationName,
-                value: annotationName,
-              };
-            });
-            this.setState({
-              enrichmentAnnotationsDisabled: false,
-              enrichmentAnnotations: annotationsArr,
-            });
-          }
-        })
-        .catch(error => {
-          console.error('Error during getModels', error);
-        });
+  componentDidUpdate(prevProps) {
+    if (
+      this.props.allStudiesMetadata !== prevProps.allStudiesMetadata ||
+      this.props.enrichmentStudy !== prevProps.enrichmentStudy
+    ) {
+      this.populateDropdowns();
     }
-
-    if (a !== '') {
-      this.props.onSearchCriteriaChange(
-        {
-          enrichmentStudy: s,
-          enrichmentModel: m,
-          enrichmentAnnotation: a,
-          enrichmentDescriptionAndTest: d,
-        },
-        false,
-      );
-      this.props.onSearchTransitionEnrichment(true);
-      phosphoprotService
-        .getAnnotationData(
-          m,
-          a,
-          s + 'plots',
-          t,
-          this.props.onSearchTransitionEnrichment,
-        )
-        .then(dataFromService => {
-          this.setState({
-            uSettings: {
-              ...this.state.uSettings,
-              maxElements: dataFromService.length,
-            },
-          });
-          this.annotationdata = dataFromService;
-          this.props.onEnrichmentSearch({
-            enrichmentResults: this.annotationdata,
-          });
-        })
-        .catch(error => {
-          console.error('Error during getAnnotationData', error);
-        });
-    }
-
-    this.populateStudies();
   }
 
-  populateStudies = () => {
-    phosphoprotService
-      .listStudies()
-      .then(listStudiesResponseData => {
-        const studiesArr = listStudiesResponseData.map(study => {
-          const studyName = study.name[0];
-          return { key: studyName, text: studyName, value: studyName };
-        });
-        this.setState({
-          enrichmentStudies: studiesArr,
-        });
-      })
-      .catch(error => {
-        console.error('Error during listStudies', error);
+  populateDropdowns = () => {
+    const {
+      allStudiesMetadata,
+      enrichmentStudy,
+      enrichmentModel,
+      enrichmentAnnotation,
+      pValueType,
+      enrichmentDescriptionAndTest,
+    } = this.props;
+
+    const studies = allStudiesMetadata.map(study => {
+      const studyName = study.name[0];
+      return { key: studyName, text: studyName, value: studyName };
+    });
+    this.setState({
+      enrichmentStudies: studies,
+    });
+    if (enrichmentStudy !== '') {
+      this.setState({
+        enrichmentStudyHrefVisible: true,
+        enrichmentStudyHref: `http://www.localhost:3000/${enrichmentStudy}.html`,
       });
+
+      // loop through allStudiesMetadata to find the object with the name matching enrichmentStudy
+      const allStudiesMetadataCopy = [...allStudiesMetadata];
+      const enrichmentStudyData = allStudiesMetadataCopy.filter(
+        study => study.name.toString() === enrichmentStudy,
+      );
+      debugger;
+      const enrichmentModelsAndAnnotations = enrichmentStudyData[0].enrichments;
+      this.setState({
+        enrichmentStudyMetadata: enrichmentStudyData[0],
+        enrichmentModelsAndAnnotations: enrichmentModelsAndAnnotations,
+      });
+      const enrichmentModelsMapped = enrichmentModelsAndAnnotations.map(
+        enrichment => {
+          return {
+            key: enrichment.modelID[0],
+            text: enrichment.modelDisplay[0],
+            value: enrichment.modelID[0],
+          };
+        },
+      );
+
+      this.setState({
+        enrichmentModelsDisabled: false,
+        enrichmentModels: enrichmentModelsMapped,
+      });
+
+      if (enrichmentModel !== '') {
+        debugger;
+        const enrichmentModelWithAnnotations = enrichmentModelsAndAnnotations.filter(
+          model => model.modelID.toString() === enrichmentModel,
+        );
+        const enrichmentAnnotations =
+          enrichmentModelWithAnnotations[0].annotations || [];
+        const enrichmentAnnotationsMapped = enrichmentAnnotations.map(
+          annotation => {
+            return {
+              key: annotation.annotationID,
+              text: annotation.annotationDisplay,
+              value: annotation.annotationID,
+            };
+          },
+        );
+        const uDataP = enrichmentAnnotations.map(a => a.annotationID[0]);
+        this.setState({
+          enrichmentAnnotationsDisabled: false,
+          enrichmentAnnotations: enrichmentAnnotationsMapped,
+        });
+
+        // if (a !== '') {
+        //   this.props.onSearchCriteriaChange(
+        //     {
+        //       enrichmentStudy: s,
+        //       enrichmentModel: m,
+        //       enrichmentAnnotation: a,
+        //       enrichmentDescriptionAndTest: d,
+        //     },
+        //     false,
+        //   );
+        //   this.props.onSearchTransitionEnrichment(true);
+        //   phosphoprotService
+        //     .getAnnotationData(
+        //       m,
+        //       a,
+        //       s + 'plots',
+        //       t,
+        //       this.props.onSearchTransitionEnrichment,
+        //     )
+        //     .then(dataFromService => {
+        //       this.setState({
+        //         uSettings: {
+        //           ...this.state.uSettings,
+        //           maxElements: dataFromService.length,
+        //         },
+        //       });
+        //       this.annotationdata = dataFromService;
+        //       this.props.onEnrichmentSearch({
+        //         enrichmentResults: this.annotationdata,
+        //       });
+        //     })
+        //     .catch(error => {
+        //       console.error('Error during getAnnotationData', error);
+        //     });
+        // }
+      }
+    }
   };
 
   handleStudyChange = (evt, { name, value }) => {
-    this.setState({
-      enrichmentStudyHrefVisible: true,
-      enrichmentStudyHref: `http://www.localhost:3000/${value}.html`,
-      enrichmentModelsDisabled: true,
-      enrichmentAnnotationsDisabled: true,
-    });
     this.props.onSearchCriteriaChange(
       {
         [name]: value,
@@ -215,21 +230,12 @@ class EnrichmentSearchCriteria extends Component {
     this.props.onSearchCriteriaReset({
       isValidSearchEnrichment: false,
     });
-    phosphoprotService
-      .getModels('EnrichmentNames', value + 'plots')
-      .then(modelsFromService => {
-        this.allNames = modelsFromService;
-        const modelsArr = _.map(_.keys(modelsFromService), function(modelName) {
-          return { key: modelName, text: modelName, value: modelName };
-        });
-        this.setState({
-          enrichmentModelsDisabled: false,
-          enrichmentModels: modelsArr,
-        });
-      })
-      .catch(error => {
-        console.error('Error during getModels', error);
-      });
+    this.setState({
+      enrichmentStudyHrefVisible: true,
+      enrichmentStudyHref: `http://www.localhost:3000/${value}.html`,
+      enrichmentModelsDisabled: true,
+      enrichmentAnnotationsDisabled: true,
+    });
   };
 
   handleModelChange = (evt, { name, value }) => {
@@ -245,18 +251,27 @@ class EnrichmentSearchCriteria extends Component {
     this.props.onSearchCriteriaReset({
       isValidSearchEnrichment: false,
     });
-    const annotationsArr = _.map(this.allNames[value], function(
-      annotationName,
-    ) {
-      return {
-        key: annotationName,
-        text: annotationName,
-        value: annotationName,
-      };
-    });
+    const { enrichmentModelsAndAnnotations } = this.state;
+    const enrichmentModelsAndAnnotationsCopy = [
+      ...enrichmentModelsAndAnnotations,
+    ];
+    const enrichmentModelWithAnnotations = enrichmentModelsAndAnnotationsCopy.filter(
+      model => model.modelID.toString() === value,
+    );
+    const enrichmentAnnotations =
+      enrichmentModelWithAnnotations[0].annotations || [];
+    const enrichmentAnnotationsMapped = enrichmentAnnotations.map(
+      annotation => {
+        return {
+          key: annotation.annotationID,
+          text: annotation.annotationDisplay,
+          value: annotation.annotationID,
+        };
+      },
+    );
     this.setState({
       enrichmentAnnotationsDisabled: false,
-      enrichmentAnnotations: annotationsArr,
+      enrichmentAnnotations: enrichmentAnnotationsMapped,
     });
   };
 

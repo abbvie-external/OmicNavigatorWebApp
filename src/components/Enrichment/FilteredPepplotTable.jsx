@@ -93,7 +93,7 @@ class FilteredPepplotTable extends Component {
   }
 
   pageToProtein = (data, proteinToHighlight, itemsPerPage) => {
-    if (this.filteredPepplotGridRef.current !== null) {
+    if (this.filteredPepplotGridRef?.current !== null) {
       const Index = _.findIndex(data, function(p) {
         return p.Protein_Site === proteinToHighlight;
       });

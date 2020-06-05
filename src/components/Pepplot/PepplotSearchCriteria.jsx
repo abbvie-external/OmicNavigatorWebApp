@@ -99,58 +99,42 @@ class PepplotSearchCriteria extends Component {
     pepplotModelsAndTests: [],
   };
 
-  componentDidMount() {
-    this.populateStudies();
-  }
+  componentDidMount() {}
 
   componentDidUpdate(prevProps) {
     if (
-      this.props.allStudiesMetadataPepplot !==
-        prevProps.allStudiesMetadataPepplot ||
+      this.props.allStudiesMetadata !== prevProps.allStudiesMetadata ||
       this.props.pepplotStudy !== prevProps.pepplotStudy
     ) {
       this.populateDropdowns();
     }
-    // if (this.props.pepplotTest !== prevProps.pepplotTest) {
-    //   this.populateStudies();
-    // }
   }
-
-  populateStudies = () => {
-    phosphoprotService
-      .listStudies()
-      .then(listStudiesResponseData => {
-        const studies = listStudiesResponseData.map(study => {
-          const studyName = study.name[0];
-          return { key: studyName, text: studyName, value: studyName };
-        });
-        this.setState({
-          pepplotStudies: studies,
-        });
-        this.props.onHandleAllStudiesMetadataPepplot(listStudiesResponseData);
-      })
-      .catch(error => {
-        console.error('Error during listStudies', error);
-      });
-  };
 
   populateDropdowns = () => {
     const {
-      allStudiesMetadataPepplot,
+      allStudiesMetadata,
       pepplotStudy,
       pepplotModel,
       pepplotTest,
       pepplotProteinSite,
     } = this.props;
+
+    const studies = allStudiesMetadata.map(study => {
+      const studyName = study.name[0];
+      return { key: studyName, text: studyName, value: studyName };
+    });
+    this.setState({
+      pepplotStudies: studies,
+    });
     if (pepplotStudy !== '') {
       this.setState({
         pepplotStudyHrefVisible: true,
         pepplotStudyHref: `http://www.localhost:3000/${pepplotStudy}.html`,
       });
 
-      // loop through studyMetadataPepplot to find the object with the name matching pepplotStudy
-      const allStudiesMetadataPepplotCopy = [...allStudiesMetadataPepplot];
-      const pepplotStudyData = allStudiesMetadataPepplotCopy.filter(
+      // loop through allStudiesMetadata to find the object with the name matching pepplotStudy
+      const allStudiesMetadataCopy = [...allStudiesMetadata];
+      const pepplotStudyData = allStudiesMetadataCopy.filter(
         study => study.name.toString() === pepplotStudy,
       );
       const pepplotModelsAndTests = pepplotStudyData[0].results;
@@ -180,7 +164,7 @@ class PepplotSearchCriteria extends Component {
           return {
             key: test.testID,
             text: test.testDisplay,
-            test: test.testID,
+            value: test.testID,
           };
         });
         const uDataP = pepplotTests.map(t => t.testID[0]);
@@ -274,7 +258,7 @@ class PepplotSearchCriteria extends Component {
       return {
         key: test.testID,
         text: test.testDisplay,
-        test: test.testID,
+        value: test.testID,
       };
     });
     const uDataP = pepplotTests.map(t => t.testID[0]);
