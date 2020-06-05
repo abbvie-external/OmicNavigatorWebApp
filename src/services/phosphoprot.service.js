@@ -39,9 +39,50 @@ class PhosphoprotService {
     });
   }
 
+  async ocpuRPCUnbox(method, obj, handleError, cancelToken) {
+    return new Promise(function(resolve, reject) {
+      window.ocpu
+        .call(method, obj, function(session) {
+          const url = session.getLoc() + 'R/.val/json?auto_unbox=true';
+          axios
+            .get(url, {
+              params: { digits: 10 },
+              responseType: 'text',
+              cancelToken,
+              timeout: 15000,
+            })
+            .then(response => resolve(response.data))
+            .catch(function(thrown) {
+              if (axios.isCancel(thrown)) {
+                console.log('Request canceled', thrown.message);
+              } else {
+                toast.error(`${thrown.message}`);
+                if (handleError !== undefined) {
+                  handleError(false);
+                }
+                console.log(`${thrown.message}`);
+              }
+            });
+        })
+        // you can use this function instead, if don't need the cancelToken
+        // .call(method, obj, function(session) {
+        //   session
+        //     .getObject('.val', 'digits=10')
+        //     .then(response => resolve(response));
+        // })
+        .catch(error => {
+          toast.error(`${error.statusText}: ${error.responseText}`);
+          if (handleError !== undefined) {
+            handleError(false);
+          }
+          console.log(`${error.statusText}: ${error.responseText}`);
+        });
+    });
+  }
+
   async listStudies() {
     this.setUrl();
-    const promise = this.ocpuRPC('listStudies', {});
+    const promise = this.ocpuRPCUnbox('listStudies', {});
     const studiesFromPromise = await promise;
     return studiesFromPromise;
   }
