@@ -588,125 +588,63 @@ class Pepplot extends Component {
     let icon = phosphosite_icon;
     let iconText = 'PhosphoSitePlus';
 
-    if (model === 'Differential Expression') {
-      initConfigCols = [
-        {
-          title: 'MajorityProteinIDsHGNC',
-          field: 'MajorityProteinIDsHGNC',
-          filterable: { type: 'alphanumericFilter' },
-          template: (value, item, addParams) => {
-            return (
-              <div>
-                <Popup
-                  trigger={
-                    <span
-                      className="TableCellLink"
-                      onClick={addParams.showPlot(model, item)}
-                    >
-                      {splitValue(value)}
-                    </span>
-                  }
-                  content={value}
-                  style={TableValuePopupStyle}
-                  className="TablePopupValue"
-                  inverted
-                  basic
-                />
-                <Popup
-                  trigger={
-                    <img
-                      src={icon}
-                      alt="Phosophosite"
-                      className="ExternalSiteIcon"
-                      onClick={addParams.showPhosphositePlus(item)}
-                    />
-                  }
-                  style={TableValuePopupStyle}
-                  className="TablePopupValue"
-                  content={iconText}
-                  inverted
-                  basic
-                />
-              </div>
-            );
-          },
-        },
-        {
-          title: 'MajorityProteinIDs',
-          field: 'MajorityProteinIDs',
-          filterable: { type: 'alphanumericFilter' },
-          template: (value, item, addParams) => {
-            return (
+    initConfigCols = [
+      {
+        title: 'Symbol',
+        field: 'symbol',
+        filterable: { type: 'alphanumericFilter' },
+        template: (value, item, addParams) => {
+          return (
+            <div>
               <Popup
                 trigger={
-                  <span className="TableValue  NoSelect">
+                  <span
+                    className="TableCellLink"
+                    onClick={addParams.showPlot(model, item)}
+                  >
                     {splitValue(value)}
                   </span>
                 }
-                content={value}
                 style={TableValuePopupStyle}
                 className="TablePopupValue"
+                content={value}
                 inverted
                 basic
               />
-            );
-          },
+              <Popup
+                trigger={
+                  <img
+                    src={icon}
+                    alt="Phosophosite"
+                    className="ExternalSiteIcon"
+                    onClick={addParams.showPhosphositePlus(item)}
+                  />
+                }
+                style={TableValuePopupStyle}
+                className="TablePopupValue"
+                content={iconText}
+                inverted
+                basic
+              />
+            </div>
+          );
         },
-      ];
-    } else {
-      initConfigCols = [
-        {
-          title: 'Protein_Site',
-          field: 'Protein_Site',
-          filterable: { type: 'alphanumericFilter' },
-          template: (value, item, addParams) => {
-            return (
-              <div>
-                <Popup
-                  trigger={
-                    <span
-                      className="TableCellLink"
-                      onClick={addParams.showPlot(model, item)}
-                    >
-                      {splitValue(value)}
-                    </span>
-                  }
-                  style={TableValuePopupStyle}
-                  className="TablePopupValue"
-                  content={value}
-                  inverted
-                  basic
-                />
-                <Popup
-                  trigger={
-                    <img
-                      src={icon}
-                      alt="Phosophosite"
-                      className="ExternalSiteIcon"
-                      onClick={addParams.showPhosphositePlus(item)}
-                    />
-                  }
-                  style={TableValuePopupStyle}
-                  className="TablePopupValue"
-                  content={iconText}
-                  inverted
-                  basic
-                />
-              </div>
-            );
-          },
-        },
-      ];
-    }
+      },
+    ];
+
     let relevantConfigCols = [
       'F',
       'logFC',
       't',
-      'P_Value',
-      'adj_P_Val',
-      'adjPVal',
+      'P.Value',
+      'adj.P.Val',
+      'AveExpr',
+      'B',
+      // 'chrom',
+      // 'entrez',
     ];
-    if (pepResults.length !== 0 && pepResults.length !== undefined) {
+
+    if (pepResults.length !== 0 && pepResults.length != null) {
       let orderedTestData = JSON.parse(
         JSON.stringify(pepResults[0], relevantConfigCols),
       );
@@ -865,16 +803,15 @@ class Pepplot extends Component {
             className="PepplotContentPane"
             id="PepplotContentPane"
           >
-            <PepplotVolcano
+            {/* <PepplotVolcano
               {...this.state}
               {...this.props}
               handleVolcanoPlotSelectionChange={
                 this.handleVolcanoPlotSelectionChange
               }
               onSelectFromTable={this.handleSelectedFromTable}
-              onSearchCriteriaChange={this.handleSearchCriteriaChange}
               onSVGTabChange={this.handleSVGTabChange}
-            />
+            /> */}
           </Tab.Pane>
         ),
       },

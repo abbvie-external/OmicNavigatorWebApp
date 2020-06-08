@@ -137,7 +137,6 @@ class EnrichmentSearchCriteria extends Component {
       const enrichmentStudyData = allStudiesMetadataCopy.find(
         study => study.name === enrichmentStudy,
       );
-      debugger;
       const enrichmentModelsAndAnnotations = enrichmentStudyData.enrichments;
       this.setState({
         enrichmentStudyMetadata: enrichmentStudyData,
