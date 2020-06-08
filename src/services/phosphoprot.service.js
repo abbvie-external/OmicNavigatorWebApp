@@ -175,17 +175,24 @@ class PhosphoprotService {
     return dataFromPromise;
   }
 
-  async getAnnotationData(model, test, study, type, errorCb, cancelToken) {
+  async getEnrichmentsTable(
+    study,
+    model,
+    annotation,
+    valueType,
+    errorCb,
+    cancelToken,
+  ) {
     this.setUrl();
     const obj = {
-      model: model,
-      database: test,
       study: study,
-      type: type,
+      modelID: model,
+      annotationID: annotation,
+      type: valueType,
     };
 
     const promise = this.ocpuDataCall(
-      'getEnrichmentResults',
+      'getEnrichmentsTable',
       obj,
       errorCb,
       cancelToken,

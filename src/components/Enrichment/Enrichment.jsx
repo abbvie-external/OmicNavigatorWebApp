@@ -448,42 +448,41 @@ class Enrichment extends Component {
       enrichmentIcon: icon,
       enrichmentIconText: iconText,
     });
-
     let allKeys = _.keys(enrResults[0]);
 
-    let ***REMOVED***_text_col = _.indexOf(allKeys, 'name_1006');
-    if (***REMOVED***_text_col >= 0) {
-      const Col_Name_1006 = {
-        title: 'name_1006',
-        field: 'name_1006',
-        filterable: { type: 'alphanumericFilter' },
-        template: (value, item, addParams) => {
-          return (
-            <div>
-              <Popup
-                trigger={
-                  <span className="TableValue  NoSelect">
-                    {splitValue(value)}
-                  </span>
-                }
-                style={TableValuePopupStyle}
-                className="TablePopupValue"
-                content={value}
-                inverted
-                basic
-              />
-            </div>
-          );
-        },
-      };
-      initConfigCols.push(Col_Name_1006);
-    }
+    // let ***REMOVED***_text_col = _.indexOf(allKeys, 'name_1006');
+    // if (***REMOVED***_text_col >= 0) {
+    //   const Col_Name_1006 = {
+    //     title: 'name_1006',
+    //     field: 'name_1006',
+    //     filterable: { type: 'alphanumericFilter' },
+    //     template: (value, item, addParams) => {
+    //       return (
+    //         <div>
+    //           <Popup
+    //             trigger={
+    //               <span className="TableValue  NoSelect">
+    //                 {splitValue(value)}
+    //               </span>
+    //             }
+    //             style={TableValuePopupStyle}
+    //             className="TablePopupValue"
+    //             content={value}
+    //             inverted
+    //             basic
+    //           />
+    //         </div>
+    //       );
+    //     },
+    //   };
+    //   initConfigCols.push(Col_Name_1006);
+    // }
 
-    let descripton_text_col = _.indexOf(allKeys, 'Description');
+    let descripton_text_col = _.indexOf(allKeys, 'description');
     if (descripton_text_col >= 0) {
       const Col_Name_Description = {
         title: 'Description',
-        field: 'Description',
+        field: 'description',
         filterable: { type: 'alphanumericFilter' },
         template: (value, item, addParams) => {
           return (
@@ -526,42 +525,45 @@ class Enrichment extends Component {
       initConfigCols.push(Col_Name_Description);
     }
 
-    let annotation_text_col = _.indexOf(allKeys, 'Annotation');
-    if (annotation_text_col >= 0) {
-      const Col_Name_Annotation = {
-        title: 'Annotation',
-        field: 'Annotation',
-        filterable: { type: 'alphanumericFilter' },
-        template: (value, item, addParams) => {
-          return (
-            <div>
-              <Popup
-                trigger={
-                  <span className="TableValue  NoSelect">
-                    {splitValue(value)}
-                  </span>
-                }
-                style={TableValuePopupStyle}
-                className="TablePopupValue"
-                content={value}
-                inverted
-                basic
-              />
-            </div>
-          );
-        },
-      };
-      initConfigCols.push(Col_Name_Annotation);
-    }
+    // let annotation_text_col = _.indexOf(allKeys, 'Annotation');
+    // if (annotation_text_col >= 0) {
+    //   const Col_Name_Annotation = {
+    //     title: 'Annotation',
+    //     field: 'Annotation',
+    //     filterable: { type: 'alphanumericFilter' },
+    //     template: (value, item, addParams) => {
+    //       return (
+    //         <div>
+    //           <Popup
+    //             trigger={
+    //               <span className="TableValue  NoSelect">
+    //                 {splitValue(value)}
+    //               </span>
+    //             }
+    //             style={TableValuePopupStyle}
+    //             className="TablePopupValue"
+    //             content={value}
+    //             inverted
+    //             basic
+    //           />
+    //         </div>
+    //       );
+    //     },
+    //   };
+    //   initConfigCols.push(Col_Name_Annotation);
+    // }
 
     const relevantConfigColumns = _.filter(allKeys, function(key) {
       return (
-        key !== 'name_1006' && key !== 'Description' && key !== 'Annotation'
+        key !== 'name_1006' &&
+        key !== 'description' &&
+        key !== 'termID' &&
+        key !== 'Annotation'
       );
     });
 
     const uDataRelevantFields = _.filter(allKeys, function(key) {
-      return key !== 'Description' && key !== 'Annotation';
+      return key !== 'description' && key !== 'termID' && key !== 'Annotation';
     });
     // multiset svg rebuilds based on uData...if there are no results we need to override this from being passed down
     if (uDataRelevantFields.length !== 0) {
