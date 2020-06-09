@@ -593,7 +593,7 @@ class Pepplot extends Component {
       'Protein',
       'symbol',
     ];
-    const pepplotAlphanumericFieldsToDisclude = [
+    const pepplotAlphanumericFieldsToExclude = [
       'termID',
       'Protein_Site',
       'SUB_SITE',
@@ -603,7 +603,7 @@ class Pepplot extends Component {
       'gene_symbol',
       'hgnc_symbol',
     ];
-    const pepplotNumericFieldsToDisclude = [
+    const pepplotNumericFieldsToExclude = [
       'idmult',
       'Amino.acid',
       'multiplicity',
@@ -664,13 +664,13 @@ class Pepplot extends Component {
     );
 
     const pepplotAllAlphanumericFields = pepplotAlphanumericFieldsToIncludeFiltered.concat(
-      pepplotAlphanumericFieldsToDisclude,
+      pepplotAlphanumericFieldsToExclude,
     );
-    const pepplotDiscludeFromNumeric = pepplotAllAlphanumericFields.concat(
-      pepplotNumericFieldsToDisclude,
+    const pepplotExcludeFromNumeric = pepplotAllAlphanumericFields.concat(
+      pepplotNumericFieldsToExclude,
     );
     const pepplotNumericFieldsFiltered = _.filter(allKeys, function(key) {
-      return !_.includes(pepplotDiscludeFromNumeric, key);
+      return !_.includes(pepplotExcludeFromNumeric, key);
     });
     if (pepResults.length !== 0 && pepResults.length != null) {
       // let orderedTestData = JSON.parse(
