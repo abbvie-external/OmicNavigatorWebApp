@@ -17,7 +17,7 @@ import phosphosite_icon from '../../resources/phosphosite.ico';
 import DOMPurify from 'dompurify';
 import { phosphoprotService } from '../../services/phosphoprot.service';
 import { CancelToken } from 'axios';
-import PepplotVolcano from './PepplotVolcano';
+// import PepplotVolcano from './PepplotVolcano';
 
 import _ from 'lodash';
 import './Pepplot.scss';
@@ -572,9 +572,7 @@ class Pepplot extends Component {
   };
   getConfigCols = testData => {
     const pepResults = testData.pepplotResults;
-    const model = this.props.pepplotModel;
-    let initConfigCols = [];
-
+    const { pepplotModel } = this.props;
     const TableValuePopupStyle = {
       backgroundColor: '2E2E2E',
       borderBottom: '2px solid var(--color-primary)',
@@ -587,161 +585,54 @@ class Pepplot extends Component {
 
     let icon = phosphosite_icon;
     let iconText = 'PhosphoSitePlus';
-
-    if (model === 'Differential Expression') {
-      initConfigCols = [
-        {
-          title: 'MajorityProteinIDsHGNC',
-          field: 'MajorityProteinIDsHGNC',
-          filterable: { type: 'alphanumericFilter' },
-          template: (value, item, addParams) => {
-            return (
-              <div>
-                <Popup
-                  trigger={
-                    <span
-                      className="TableCellLink"
-                      onClick={addParams.showPlot(model, item)}
-                    >
-                      {splitValue(value)}
-                    </span>
-                  }
-                  content={value}
-                  style={TableValuePopupStyle}
-                  className="TablePopupValue"
-                  inverted
-                  basic
-                />
-                <Popup
-                  trigger={
-                    <img
-                      src={icon}
-                      alt="Phosophosite"
-                      className="ExternalSiteIcon"
-                      onClick={addParams.showPhosphositePlus(item)}
-                    />
-                  }
-                  style={TableValuePopupStyle}
-                  className="TablePopupValue"
-                  content={iconText}
-                  inverted
-                  basic
-                />
-              </div>
-            );
-          },
-        },
-        {
-          title: 'MajorityProteinIDs',
-          field: 'MajorityProteinIDs',
-          filterable: { type: 'alphanumericFilter' },
-          template: (value, item, addParams) => {
-            return (
-              <Popup
-                trigger={
-                  <span className="TableValue  NoSelect">
-                    {splitValue(value)}
-                  </span>
-                }
-                content={value}
-                style={TableValuePopupStyle}
-                className="TablePopupValue"
-                inverted
-                basic
-              />
-            );
-          },
-        },
-      ];
-    } else {
-      initConfigCols = [
-        {
-          title: 'Protein_Site',
-          field: 'Protein_Site',
-          filterable: { type: 'alphanumericFilter' },
-          template: (value, item, addParams) => {
-            return (
-              <div>
-                <Popup
-                  trigger={
-                    <span
-                      className="TableCellLink"
-                      onClick={addParams.showPlot(model, item)}
-                    >
-                      {splitValue(value)}
-                    </span>
-                  }
-                  style={TableValuePopupStyle}
-                  className="TablePopupValue"
-                  content={value}
-                  inverted
-                  basic
-                />
-                <Popup
-                  trigger={
-                    <img
-                      src={icon}
-                      alt="Phosophosite"
-                      className="ExternalSiteIcon"
-                      onClick={addParams.showPhosphositePlus(item)}
-                    />
-                  }
-                  style={TableValuePopupStyle}
-                  className="TablePopupValue"
-                  content={iconText}
-                  inverted
-                  basic
-                />
-              </div>
-            );
-          },
-        },
-      ];
-    }
-    let relevantConfigCols = [
-      'F',
-      'logFC',
-      't',
-      'P_Value',
-      'adj_P_Val',
-      'adjPVal',
+    // add configurable json for these alphanumeric fields
+    const pepplotAlphanumericFieldsToInclude = [
+      'description',
+      'Annotation',
+      'name_1006',
+      'Protein',
+      'symbol',
     ];
-    if (pepResults.length !== 0 && pepResults.length !== undefined) {
-      let orderedTestData = JSON.parse(
-        JSON.stringify(pepResults[0], relevantConfigCols),
-      );
+    const pepplotAlphanumericFieldsToDisclude = [
+      'termID',
+      'Protein_Site',
+      'SUB_SITE',
+      'chrom',
+      'entrez',
+      'Charge',
+      'gene_symbol',
+      'hgnc_symbol',
+    ];
+    const pepplotNumericFieldsToDisclude = [
+      'idmult',
+      'Amino.acid',
+      'multiplicity',
+    ];
 
-      let relevantConfigColumns = _.map(
-        _.filter(_.keys(orderedTestData), function(d) {
-          return _.includes(relevantConfigCols, d);
-        }),
-      );
-      const thresholdColsPepplot = this.listToJson(relevantConfigColumns);
-      this.setState({
-        thresholdColsP: thresholdColsPepplot,
-      });
+    let allKeys = _.keys(pepResults[0]);
+    const pepplotAlphanumericFieldsToIncludeFiltered = pepplotAlphanumericFieldsToInclude.filter(
+      f => {
+        return _.includes(allKeys, f);
+        // return Object.keys(enrResults[0]).includes(f);
+      },
+    );
 
-      this.setState({ filterableColumnsP: [...relevantConfigColumns] });
-
-      // if using multi-set analysis, show set membership column
-      if (this.state.multisetQueried) {
-        relevantConfigColumns.splice(0, 0, 'Set_Membership');
-      }
-
-      const additionalConfigColumns = relevantConfigColumns.map(c => {
+    const pepplotAlphanumericColumnsMapped = pepplotAlphanumericFieldsToIncludeFiltered.map(
+      f => {
         return {
-          title: c,
-          field: c,
-          type: 'number',
-          filterable: { type: 'numericFilter' },
-          exportTemplate: value => (value ? `${value}` : 'N/A'),
+          title: f.toUpperCase(),
+          field: f,
+          filterable: { type: 'alphanumericFilter' },
           template: (value, item, addParams) => {
             return (
-              <p>
+              <div>
                 <Popup
                   trigger={
-                    <span className="TableValue  NoSelect">
-                      {formatNumberForDisplay(value)}
+                    <span
+                      className="TableCellLink"
+                      onClick={addParams.showPlot(pepplotModel, item)}
+                    >
+                      {splitValue(value)}
                     </span>
                   }
                   style={TableValuePopupStyle}
@@ -750,12 +641,90 @@ class Pepplot extends Component {
                   inverted
                   basic
                 />
-              </p>
+                <Popup
+                  trigger={
+                    <img
+                      src={icon}
+                      alt="Phosophosite"
+                      className="ExternalSiteIcon"
+                      onClick={addParams.showPhosphositePlus(item)}
+                    />
+                  }
+                  style={TableValuePopupStyle}
+                  className="TablePopupValue"
+                  content={iconText}
+                  inverted
+                  basic
+                />
+              </div>
             );
           },
         };
+      },
+    );
+
+    const pepplotAllAlphanumericFields = pepplotAlphanumericFieldsToIncludeFiltered.concat(
+      pepplotAlphanumericFieldsToDisclude,
+    );
+    const pepplotDiscludeFromNumeric = pepplotAllAlphanumericFields.concat(
+      pepplotNumericFieldsToDisclude,
+    );
+    const pepplotNumericFieldsFiltered = _.filter(allKeys, function(key) {
+      return !_.includes(pepplotDiscludeFromNumeric, key);
+    });
+    if (pepResults.length !== 0 && pepResults.length != null) {
+      // let orderedTestData = JSON.parse(
+      //   JSON.stringify(pepResults[0], pepplotAllNumericFields),
+      // );
+
+      // let relevantConfigColumns = _.map(
+      //   _.filter(_.keys(orderedTestData), function(d) {
+      //     return _.includes(pepplotAllNumericFields, d);
+      //   }),
+      // );
+      const thresholdColsPepplot = this.listToJson(
+        pepplotNumericFieldsFiltered,
+      );
+      this.setState({
+        thresholdColsP: thresholdColsPepplot,
       });
-      const configCols = initConfigCols.concat(additionalConfigColumns);
+      this.setState({ filterableColumnsP: [...pepplotNumericFieldsFiltered] });
+      // if using multi-set analysis, show set membership column
+      if (this.state.multisetQueried) {
+        pepplotNumericFieldsFiltered.splice(0, 0, 'Set_Membership');
+      }
+      const pepplotNumericColumnsMapped = pepplotNumericFieldsFiltered.map(
+        c => {
+          return {
+            title: c,
+            field: c,
+            type: 'number',
+            filterable: { type: 'numericFilter' },
+            exportTemplate: value => (value ? `${value}` : 'N/A'),
+            template: (value, item, addParams) => {
+              return (
+                <p>
+                  <Popup
+                    trigger={
+                      <span className="TableValue  NoSelect">
+                        {formatNumberForDisplay(value)}
+                      </span>
+                    }
+                    style={TableValuePopupStyle}
+                    className="TablePopupValue"
+                    content={value}
+                    inverted
+                    basic
+                  />
+                </p>
+              );
+            },
+          };
+        },
+      );
+      const configCols = pepplotAlphanumericColumnsMapped.concat(
+        pepplotNumericColumnsMapped,
+      );
       return configCols;
     }
   };
@@ -865,16 +834,15 @@ class Pepplot extends Component {
             className="PepplotContentPane"
             id="PepplotContentPane"
           >
-            <PepplotVolcano
+            {/* <PepplotVolcano
               {...this.state}
               {...this.props}
               handleVolcanoPlotSelectionChange={
                 this.handleVolcanoPlotSelectionChange
               }
               onSelectFromTable={this.handleSelectedFromTable}
-              onSearchCriteriaChange={this.handleSearchCriteriaChange}
               onSVGTabChange={this.handleSVGTabChange}
-            />
+            /> */}
           </Tab.Pane>
         ),
       },

@@ -12,10 +12,9 @@ import {
 import { CancelToken } from 'axios';
 import '../Shared/SearchCriteria.scss';
 import { phosphoprotService } from '../../services/phosphoprot.service';
-import _ from 'lodash';
 import PepplotMultisetFilters from './PepplotMultisetFilters';
 
-let cancelRequestPSCGetTestData = () => {};
+let cancelRequestPSCGetResultsTable = () => {};
 let cancelRequestMultisetInferenceData = () => {};
 let cancelRequestInferenceMultisetPlot = () => {};
 class PepplotSearchCriteria extends Component {
@@ -27,7 +26,7 @@ class PepplotSearchCriteria extends Component {
     pepplotTests: [],
     pepplotModelTooltip: '',
     pepplotTestTooltip: '',
-    pepplotStudiesDisabled: false,
+    pepplotStudiesDisabled: true,
     pepplotModelsDisabled: true,
     pepplotTestsDisabled: true,
     uAnchorP: '',
@@ -99,9 +98,14 @@ class PepplotSearchCriteria extends Component {
     // loadingPepplotMultisetFilters: false,
     pepplotStudyMetadata: [],
     pepplotModelsAndTests: [],
+    pepplotTestsMeta: [],
   };
 
-  componentDidMount() {}
+  componentDidMount() {
+    this.setState({
+      pepplotStudiesDisabled: false,
+    });
+  }
 
   componentDidUpdate(prevProps) {
     if (
@@ -119,11 +123,12 @@ class PepplotSearchCriteria extends Component {
       pepplotModel,
       pepplotTest,
       pepplotProteinSite,
+      onSearchCriteriaChange,
+      onSearchTransitionPepplot,
     } = this.props;
-
     const studies = allStudiesMetadata.map(study => {
       const studyName = study.name;
-      return { key: studyName, text: studyName, value: studyName };
+      return { key: `${studyName}Pepplot`, text: studyName, value: studyName };
     });
     this.setState({
       pepplotStudies: studies,
@@ -146,7 +151,7 @@ class PepplotSearchCriteria extends Component {
       });
       const pepplotModelsMapped = pepplotModelsAndTests.map(result => {
         return {
-          key: result.modelID,
+          key: `${result.modelID}Pepplot`,
           text: result.modelID,
           value: result.modelID,
         };
@@ -165,65 +170,67 @@ class PepplotSearchCriteria extends Component {
         this.setState({
           pepplotModelTooltip: pepplotModelTooltip,
         });
-        const pepplotTests = pepplotModelWithTests?.tests || [];
-        const pepplotTestsMapped = pepplotTests.map(test => {
+        const pepplotTestsMeta = pepplotModelWithTests?.tests || [];
+        const pepplotTestsMapped = pepplotTestsMeta.map(test => {
           return {
-            key: test.testID,
+            key: `${test.testID}Pepplot`,
             text: test.testID,
             value: test.testID,
           };
         });
-        const uDataP = pepplotTests.map(t => t.testID);
+        const uDataPMapped = pepplotTestsMeta.map(t => t.testID);
         this.setState({
           pepplotTestsDisabled: false,
           pepplotTests: pepplotTestsMapped,
-          uDataP: uDataP,
+          pepplotTestsMeta,
+          uDataP: uDataPMapped,
         });
 
-        // if (pepplotTest !== '') {
-        //   this.props.onSearchCriteriaChange(
-        //     {
-        //       pepplotStudy: pepplotStudy,
-        //       pepplotModel: pepplotModel,
-        //       pepplotTest: pepplotTest,
-        //       pepplotProteinSite: pepplotProteinSite,
-        //     },
-        //     false,
-        //   );
-        //   this.setState({
-        //     uAnchorP: pepplotTest,
-        //   });
-        //   this.props.onSearchTransitionPepplot(true);
-        //   phosphoprotService
-        //     .getTestData(
-        //       pepplotModel,
-        //       pepplotTest,
-        //       pepplotStudy + 'plots',
-        //       this.props.onSearchTransitionPepplot,
-        //     )
-        //     .then(dataFromService => {
-        //       this.setState({
-        //         uSettingsP: {
-        //           ...this.state.uSettingsP,
-        //           maxElementsP: dataFromService.length,
-        //         },
-        //       });
-        //       this.testdata = dataFromService;
-        //       this.props.onPepplotSearchUnfiltered({
-        //         pepplotResults: this.testdata,
-        //       });
-        //       this.props.onPepplotSearch({ pepplotResults: this.testdata });
-        //     })
-        //     .catch(error => {
-        //       console.error('Error during getTestData', error);
-        //     });
-        // }
+        if (pepplotTest !== '') {
+          onSearchCriteriaChange(
+            {
+              pepplotStudy: pepplotStudy,
+              pepplotModel: pepplotModel,
+              pepplotTest: pepplotTest,
+              pepplotProteinSite: pepplotProteinSite,
+            },
+            false,
+          );
+          const pepplotTestMeta = pepplotTestsMeta.find(
+            test => test.testID === pepplotTest,
+          );
+          const pepplotTestTooltip = pepplotTestMeta?.testDisplay || '';
+          this.setState({
+            pepplotTestTooltip,
+            uAnchorP: pepplotTest,
+          });
+          onSearchTransitionPepplot(true);
+          phosphoprotService
+            .getResultsTable(
+              pepplotStudy,
+              pepplotModel,
+              pepplotTest,
+              onSearchTransitionPepplot,
+            )
+            .then(getResultsTableData => {
+              this.handleGetResultsTableData(
+                getResultsTableData,
+                false,
+                true,
+                pepplotTest,
+              );
+            })
+            .catch(error => {
+              console.error('Error during getResultsTable', error);
+            });
+        }
       }
     }
   };
 
   handleStudyChange = (evt, { name, value }) => {
-    this.props.onSearchCriteriaChange(
+    const { onSearchCriteriaChange, onSearchCriteriaReset } = this.props;
+    onSearchCriteriaChange(
       {
         [name]: value,
         pepplotModel: '',
@@ -231,7 +238,7 @@ class PepplotSearchCriteria extends Component {
       },
       true,
     );
-    this.props.onSearchCriteriaReset({
+    onSearchCriteriaReset({
       isValidSearchPepplot: false,
     });
     this.setState({
@@ -245,15 +252,20 @@ class PepplotSearchCriteria extends Component {
   };
 
   handleModelChange = (evt, { name, value }) => {
-    this.props.onSearchCriteriaChange(
+    const {
+      pepplotStudy,
+      onSearchCriteriaChange,
+      onSearchCriteriaReset,
+    } = this.props;
+    onSearchCriteriaChange(
       {
-        pepplotStudy: this.props.pepplotStudy,
+        pepplotStudy: pepplotStudy,
         [name]: value,
         pepplotTest: '',
       },
       true,
     );
-    this.props.onSearchCriteriaReset({
+    onSearchCriteriaReset({
       isValidSearchPepplot: false,
     });
     const { pepplotModelsAndTests } = this.state;
@@ -262,71 +274,94 @@ class PepplotSearchCriteria extends Component {
       model => model.modelID === value,
     );
     const pepplotModelTooltip = pepplotModelWithTests?.modelDisplay || '';
-    this.setState({
-      pepplotModelTooltip: pepplotModelTooltip,
-    });
-    const pepplotTests = pepplotModelWithTests.tests || [];
-    const pepplotTestsMapped = pepplotTests.map(test => {
+    const pepplotTestsMeta = pepplotModelWithTests?.tests || [];
+    const pepplotTestsMapped = pepplotTestsMeta.map(test => {
       return {
         key: test.testID,
         text: test.testID,
         value: test.testID,
       };
     });
-    const uDataP = pepplotTests.map(t => t.testID);
+    const uDataP = pepplotTestsMeta.map(t => t.testID);
     this.setState({
       pepplotTestsDisabled: false,
+      pepplotTestsMeta: pepplotTestsMeta,
       pepplotTests: pepplotTestsMapped,
       uDataP: uDataP,
+      pepplotModelTooltip: pepplotModelTooltip,
+      pepplotTestTooltip: '',
     });
   };
 
   handleTestChange = (evt, { name, value }) => {
+    const {
+      pepplotStudy,
+      pepplotModel,
+      onMultisetQueried,
+      onSearchCriteriaChange,
+      onSearchTransitionPepplot,
+    } = this.props;
+    const pepplotTestMeta = this.state.pepplotTestsMeta.find(
+      test => test.testID === value,
+    );
+    const pepplotTestTooltip = pepplotTestMeta?.testDisplay || '';
     this.setState({
+      pepplotTestTooltip: pepplotTestTooltip,
       reloadPlot: true,
       multisetFiltersVisibleP: false,
     });
-    this.props.onMultisetQueried(false);
-    this.props.onSearchCriteriaChange(
+    onMultisetQueried(false);
+    onSearchCriteriaChange(
       {
-        pepplotStudy: this.props.pepplotStudy,
-        pepplotModel: this.props.pepplotModel,
+        pepplotStudy: pepplotStudy,
+        pepplotModel: pepplotModel,
         [name]: value,
       },
       true,
     );
-    this.props.onSearchTransitionPepplot(true);
-    cancelRequestPSCGetTestData();
+    onSearchTransitionPepplot(true);
+    cancelRequestPSCGetResultsTable();
     let cancelToken = new CancelToken(e => {
-      cancelRequestPSCGetTestData = e;
+      cancelRequestPSCGetResultsTable = e;
     });
     phosphoprotService
-      .getTestData(
-        this.props.pepplotModel,
+      .getResultsTable(
+        pepplotStudy,
+        pepplotModel,
         value,
-        this.props.pepplotStudy + 'plots',
-        this.props.onSearchTransitionPepplot,
+        onSearchTransitionPepplot,
         cancelToken,
       )
-      .then(dataFromService => {
-        this.setState({
-          uSettingsP: {
-            ...this.state.uSettingsP,
-            mustP: [],
-            notP: [],
-            defaultsigValueP: 0.05,
-            maxElementsP: dataFromService.length,
-          },
-          sigValueP: [0.05],
-          uAnchorP: value,
-        });
-        this.testdata = dataFromService;
-        this.props.onPepplotSearchUnfiltered({ pepplotResults: this.testdata });
-        this.props.onPepplotSearch({ pepplotResults: this.testdata });
+      .then(getResultsTableData => {
+        this.handleGetResultsTableData(getResultsTableData, true, true, value);
       })
       .catch(error => {
-        console.error('Error during getTestData', error);
+        console.error('Error during getResultsTable', error);
       });
+  };
+
+  handleGetResultsTableData = (
+    tableData,
+    resetMultiset,
+    handleMaxElements,
+    pepplotTest,
+  ) => {
+    const { onPepplotSearchUnfiltered, onPepplotSearch } = this.props;
+    if (resetMultiset) {
+      this.setState({
+        uSettingsP: {
+          ...this.state.uSettingsP,
+          mustP: [],
+          notP: [],
+          defaultsigValueP: 0.05,
+          maxElementsP: handleMaxElements ? tableData.length : undefined,
+        },
+        sigValueP: [0.05],
+        uAnchorP: pepplotTest,
+      });
+    }
+    onPepplotSearchUnfiltered({ pepplotResults: tableData });
+    onPepplotSearch({ pepplotResults: tableData });
   };
 
   handleMultisetToggle = () => {
@@ -375,39 +410,47 @@ class PepplotSearchCriteria extends Component {
       },
       this.updateQueryDataP(),
     );
-    console.log('Error during getTestData');
+    console.log('Error during getResultsTable');
   };
 
   multisetTriggeredTestChange = (name, value) => {
-    this.props.onSearchCriteriaChange(
+    const {
+      pepplotStudy,
+      pepplotModel,
+      onSearchCriteriaChange,
+      onSearchTransitionPepplot,
+    } = this.props;
+    onSearchCriteriaChange(
       {
-        pepplotStudy: this.props.pepplotStudy,
-        pepplotModel: this.props.pepplotModel,
+        pepplotStudy: pepplotStudy,
+        pepplotModel: pepplotModel,
         [name]: value,
       },
       true,
     );
-    this.props.onSearchTransitionPepplot(true);
-    cancelRequestPSCGetTestData();
+    onSearchTransitionPepplot(true);
+    cancelRequestPSCGetResultsTable();
     let cancelToken = new CancelToken(e => {
-      cancelRequestPSCGetTestData = e;
+      cancelRequestPSCGetResultsTable = e;
     });
     phosphoprotService
-      .getTestData(
-        // .getPlot(
-        this.props.pepplotModel,
+      .getResultsTable(
+        pepplotStudy,
+        pepplotModel,
         value,
-        this.props.pepplotStudy + 'plots',
         this.handleMultisetPCloseError,
         cancelToken,
       )
-      .then(dataFromService => {
-        this.testdata = dataFromService;
-        this.props.onPepplotSearchUnfiltered({ pepplotResults: this.testdata });
-        this.props.onPepplotSearch({ pepplotResults: this.testdata });
+      .then(getResultsTableData => {
+        this.handleGetResultsTableData(
+          getResultsTableData,
+          false,
+          false,
+          value,
+        );
       })
       .catch(error => {
-        console.error('Error during getTestData', error);
+        console.error('Error during getResultsTable', error);
       });
   };
 
@@ -476,8 +519,6 @@ class PepplotSearchCriteria extends Component {
       },
     );
   };
-
-  // handleSigValuePInputChange = (name, value, index) => {
   handleSigValuePInputChange = (evt, { name, value, index }) => {
     const uSelVP = [...this.state[name]];
     uSelVP[index] = parseFloat(value);
@@ -507,20 +548,30 @@ class PepplotSearchCriteria extends Component {
   };
 
   updateQueryDataP = () => {
-    const eSigVP = this.state.sigValueP;
+    const {
+      pepplotStudy,
+      pepplotModel,
+      pepplotTest,
+      onPepplotSearch,
+      onDisablePlot,
+    } = this.props;
+    const {
+      selectedOperatorP,
+      reloadPlot,
+      sigValueP,
+      selectedColP,
+    } = this.state;
     const eMustP = this.state.uSettingsP.mustP;
     const eNotP = this.state.uSettingsP.notP;
-    const eOperatorP = this.state.selectedOperatorP;
-    const eColP = this.state.selectedColP;
 
-    if (this.state.reloadPlot === true) {
-      this.props.onDisablePlot();
+    if (reloadPlot === true) {
+      onDisablePlot();
       this.getMultisetPlot(
-        eSigVP,
-        this.props.pepplotModel,
-        this.props.pepplotStudy + 'plots',
-        this.jsonToList(eOperatorP),
-        this.jsonToList(eColP),
+        sigValueP,
+        pepplotModel,
+        pepplotStudy + 'plots',
+        this.jsonToList(selectedOperatorP),
+        this.jsonToList(selectedColP),
       );
     }
     cancelRequestMultisetInferenceData();
@@ -529,14 +580,14 @@ class PepplotSearchCriteria extends Component {
     });
     phosphoprotService
       .getMultisetInferenceData(
-        this.props.pepplotModel,
+        pepplotModel,
         eMustP,
         eNotP,
-        this.props.pepplotStudy + 'plots',
-        eSigVP,
-        this.props.pepplotTest,
-        this.jsonToList(eOperatorP),
-        this.jsonToList(eColP),
+        pepplotStudy + 'plots',
+        sigValueP,
+        pepplotTest,
+        this.jsonToList(selectedOperatorP),
+        this.jsonToList(selectedColP),
         this.handleMultisetPOpenError,
         cancelToken,
       )
@@ -554,7 +605,7 @@ class PepplotSearchCriteria extends Component {
           reloadPlot: false,
           // loadingPepplotMultisetFilters: false,
         });
-        this.props.onPepplotSearch({
+        onPepplotSearch({
           pepplotResults: multisetResultsP,
         });
       })
@@ -684,6 +735,8 @@ class PepplotSearchCriteria extends Component {
           basic
           position="bottom center"
           content={studyName}
+          mouseEnterDelay={0}
+          mouseLeaveDelay={0}
         />
       );
     } else {
@@ -700,6 +753,8 @@ class PepplotSearchCriteria extends Component {
           className="CustomTooltip"
           position="bottom center"
           content="Select a study to view Analysis Details"
+          mouseEnterDelay={0}
+          mouseLeaveDelay={0}
         />
       );
     }
@@ -806,6 +861,8 @@ class PepplotSearchCriteria extends Component {
             inverted
             position="bottom right"
             content={pepplotModelTooltip}
+            mouseEnterDelay={1000}
+            mouseLeaveDelay={0}
           />
           <Popup
             trigger={
@@ -833,6 +890,8 @@ class PepplotSearchCriteria extends Component {
             inverted
             position="bottom right"
             content={pepplotTestTooltip}
+            mouseEnterDelay={1000}
+            mouseLeaveDelay={0}
           />
         </Form>
         <div className="MultisetContainer">

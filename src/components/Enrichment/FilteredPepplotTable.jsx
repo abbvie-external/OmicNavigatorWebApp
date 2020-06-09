@@ -19,7 +19,7 @@ export * from '../utility/selectors/quickViewSelector';
 export { QHGrid, EZGrid, QuickViewModal };
 export { getField, getFieldValue, typeMap };
 
-let cancelRequestFPTGetTestData = () => {};
+let cancelRequestFPTGetResultsTable = () => {};
 class FilteredPepplotTable extends Component {
   state = {
     filteredTableConfigCols: [],
@@ -130,15 +130,15 @@ class FilteredPepplotTable extends Component {
     } else {
       const key = this.props.imageInfo.key.split(':');
       const name = key[0].trim() || '';
-      cancelRequestFPTGetTestData();
+      cancelRequestFPTGetResultsTable();
       let cancelToken = new CancelToken(e => {
-        cancelRequestFPTGetTestData = e;
+        cancelRequestFPTGetResultsTable = e;
       });
       phosphoprotService
-        .getTestData(
+        .getResultsTable(
+          this.props.enrichmentStudy,
           this.props.enrichmentModel,
           name,
-          this.props.enrichmentStudy + 'plots',
           undefined,
           cancelToken,
         )
@@ -156,7 +156,7 @@ class FilteredPepplotTable extends Component {
           }
         })
         .catch(error => {
-          console.error('Error during getTestData', error);
+          console.error('Error during getResultsTable', error);
         });
     }
   };

@@ -34,12 +34,13 @@ class EnrichmentResultsTable extends Component {
     const {
       enrichmentResults,
       enrichmentColumns,
-      enrichmentStudy,
-      enrichmentModel,
-      enrichmentAnnotation,
+      // enrichmentStudy,
+      // enrichmentModel,
+      // enrichmentAnnotation,
       additionalTemplateInfoEnrichmentTable,
     } = this.props;
-    const enrichmentCacheKey = `${enrichmentStudy}-${enrichmentModel}-${enrichmentAnnotation}`;
+    // PAUL - ensure this accounts for multiset filters
+    // const enrichmentCacheKey = `${enrichmentStudy}-${enrichmentModel}-${enrichmentAnnotation}`;
     const quickViews = [];
 
     return (
@@ -53,7 +54,7 @@ class EnrichmentResultsTable extends Component {
             widescreen={16}
           >
             <EZGrid
-              uniqueCacheKey={enrichmentCacheKey}
+              // uniqueCacheKey={enrichmentCacheKey}
               data={enrichmentResults}
               columnsConfig={enrichmentColumns}
               // totalRows={rows}
