@@ -585,17 +585,13 @@ class Pepplot extends Component {
 
     let icon = phosphosite_icon;
     let iconText = 'PhosphoSitePlus';
-    // where do we add a configurable list of alphanumeric fields
+    // add configurable json for these alphanumeric fields
     const pepplotAlphanumericFieldsToInclude = [
       'description',
       'Annotation',
       'name_1006',
       'Protein',
       'symbol',
-      // 'gene_symbol',
-      // 'hgnc_symbol',
-      // 'idmult',
-      // 'Amino.acid',
     ];
     const pepplotAlphanumericFieldsToDisclude = [
       'termID',
@@ -603,6 +599,14 @@ class Pepplot extends Component {
       'SUB_SITE',
       'chrom',
       'entrez',
+      'Charge',
+      'gene_symbol',
+      'hgnc_symbol',
+    ];
+    const pepplotNumericFieldsToDisclude = [
+      'idmult',
+      'Amino.acid',
+      'multiplicity',
     ];
 
     let allKeys = _.keys(pepResults[0]);
@@ -662,59 +666,62 @@ class Pepplot extends Component {
     const pepplotAllAlphanumericFields = pepplotAlphanumericFieldsToIncludeFiltered.concat(
       pepplotAlphanumericFieldsToDisclude,
     );
-    const pepplotAllNumericFields = _.filter(allKeys, function(key) {
-      return !_.includes(pepplotAllAlphanumericFields, key);
+    const pepplotDiscludeFromNumeric = pepplotAllAlphanumericFields.concat(
+      pepplotNumericFieldsToDisclude,
+    );
+    const pepplotNumericFieldsFiltered = _.filter(allKeys, function(key) {
+      return !_.includes(pepplotDiscludeFromNumeric, key);
     });
-
     if (pepResults.length !== 0 && pepResults.length != null) {
-      let orderedTestData = JSON.parse(
-        JSON.stringify(pepResults[0], pepplotAllNumericFields),
-      );
+      // let orderedTestData = JSON.parse(
+      //   JSON.stringify(pepResults[0], pepplotAllNumericFields),
+      // );
 
-      let relevantConfigColumns = _.map(
-        _.filter(_.keys(orderedTestData), function(d) {
-          return _.includes(pepplotAllNumericFields, d);
-        }),
+      // let relevantConfigColumns = _.map(
+      //   _.filter(_.keys(orderedTestData), function(d) {
+      //     return _.includes(pepplotAllNumericFields, d);
+      //   }),
+      // );
+      const thresholdColsPepplot = this.listToJson(
+        pepplotNumericFieldsFiltered,
       );
-      const thresholdColsPepplot = this.listToJson(relevantConfigColumns);
       this.setState({
         thresholdColsP: thresholdColsPepplot,
       });
-
-      this.setState({ filterableColumnsP: [...relevantConfigColumns] });
-
+      this.setState({ filterableColumnsP: [...pepplotNumericFieldsFiltered] });
       // if using multi-set analysis, show set membership column
       if (this.state.multisetQueried) {
-        relevantConfigColumns.splice(0, 0, 'Set_Membership');
+        pepplotNumericFieldsFiltered.splice(0, 0, 'Set_Membership');
       }
-
-      const pepplotNumericColumnsMapped = pepplotAllNumericFields.map(c => {
-        return {
-          title: c,
-          field: c,
-          type: 'number',
-          filterable: { type: 'numericFilter' },
-          exportTemplate: value => (value ? `${value}` : 'N/A'),
-          template: (value, item, addParams) => {
-            return (
-              <p>
-                <Popup
-                  trigger={
-                    <span className="TableValue  NoSelect">
-                      {formatNumberForDisplay(value)}
-                    </span>
-                  }
-                  style={TableValuePopupStyle}
-                  className="TablePopupValue"
-                  content={value}
-                  inverted
-                  basic
-                />
-              </p>
-            );
-          },
-        };
-      });
+      const pepplotNumericColumnsMapped = pepplotNumericFieldsFiltered.map(
+        c => {
+          return {
+            title: c,
+            field: c,
+            type: 'number',
+            filterable: { type: 'numericFilter' },
+            exportTemplate: value => (value ? `${value}` : 'N/A'),
+            template: (value, item, addParams) => {
+              return (
+                <p>
+                  <Popup
+                    trigger={
+                      <span className="TableValue  NoSelect">
+                        {formatNumberForDisplay(value)}
+                      </span>
+                    }
+                    style={TableValuePopupStyle}
+                    className="TablePopupValue"
+                    content={value}
+                    inverted
+                    basic
+                  />
+                </p>
+              );
+            },
+          };
+        },
+      );
       const configCols = pepplotAlphanumericColumnsMapped.concat(
         pepplotNumericColumnsMapped,
       );
