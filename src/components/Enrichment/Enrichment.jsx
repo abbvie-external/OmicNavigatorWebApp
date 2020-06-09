@@ -458,7 +458,7 @@ class Enrichment extends Component {
       'Protein',
       'symbol',
     ];
-    const enrichmentAlphanumericFieldsToDisclude = [
+    const enrichmentAlphanumericFieldsToExclude = [
       'termID',
       'Protein_Site',
       'SUB_SITE',
@@ -468,7 +468,7 @@ class Enrichment extends Component {
       'gene_symbol',
       'hgnc_symbol',
     ];
-    const enrichmentNumericFieldsToDisclude = [
+    const enrichmentNumericFieldsToExclude = [
       'idmult',
       'Amino.acid',
       'multiplicity',
@@ -530,13 +530,13 @@ class Enrichment extends Component {
     );
 
     const enrichmentAllAlphanumericFields = enrichmentAlphanumericFieldsToIncludeFiltered.concat(
-      enrichmentAlphanumericFieldsToDisclude,
+      enrichmentAlphanumericFieldsToExclude,
     );
-    const enrichmentDiscludeFromNumeric = enrichmentAllAlphanumericFields.concat(
-      enrichmentNumericFieldsToDisclude,
+    const enrichmentExcludeFromNumeric = enrichmentAllAlphanumericFields.concat(
+      enrichmentNumericFieldsToExclude,
     );
     const enrichmentNumericFieldsFiltered = _.filter(allKeys, function(key) {
-      return !_.includes(enrichmentDiscludeFromNumeric, key);
+      return !_.includes(enrichmentExcludeFromNumeric, key);
     });
 
     // multiset svg rebuilds based on uData...if there are no results we need to override this from being passed down
