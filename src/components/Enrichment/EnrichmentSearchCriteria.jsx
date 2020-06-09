@@ -13,8 +13,6 @@ import * as d3 from 'd3';
 import { CancelToken } from 'axios';
 import '../Shared/SearchCriteria.scss';
 import { phosphoprotService } from '../../services/phosphoprot.service';
-import _ from 'lodash';
-// import { toast } from 'react-toastify';
 import EnrichmentMultisetFilters from './EnrichmentMultisetFilters';
 
 let cancelGetEnrichmentsTable = () => {};
@@ -125,7 +123,6 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentDescriptionAndTest,
       onSearchCriteriaChange,
       onSearchTransitionEnrichment,
-      onEnrichmentSearch,
     } = this.props;
 
     const studies = allStudiesMetadata.map(study => {
@@ -553,7 +550,6 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentModel,
       pValueType,
       onSearchTransitionEnrichment,
-      onEnrichmentSearch,
       onSearchCriteriaChange,
     } = this.props;
     onSearchCriteriaChange(

@@ -17,7 +17,7 @@ import phosphosite_icon from '../../resources/phosphosite.ico';
 import DOMPurify from 'dompurify';
 import { phosphoprotService } from '../../services/phosphoprot.service';
 import { CancelToken } from 'axios';
-import PepplotVolcano from './PepplotVolcano';
+// import PepplotVolcano from './PepplotVolcano';
 
 import _ from 'lodash';
 import './Pepplot.scss';
@@ -572,9 +572,7 @@ class Pepplot extends Component {
   };
   getConfigCols = testData => {
     const pepResults = testData.pepplotResults;
-    const model = this.props.pepplotModel;
-    let initConfigCols = [];
-
+    const { pepplotModel } = this.props;
     const TableValuePopupStyle = {
       backgroundColor: '2E2E2E',
       borderBottom: '2px solid var(--color-primary)',
@@ -587,71 +585,95 @@ class Pepplot extends Component {
 
     let icon = phosphosite_icon;
     let iconText = 'PhosphoSitePlus';
+    // where do we add a configurable list of alphanumeric fields
+    const pepplotAlphanumericFieldsToInclude = [
+      'description',
+      'Annotation',
+      'name_1006',
+      'Protein',
+      'symbol',
+      // 'gene_symbol',
+      // 'hgnc_symbol',
+      // 'idmult',
+      // 'Amino.acid',
+    ];
+    const pepplotAlphanumericFieldsToDisclude = [
+      'termID',
+      'Protein_Site',
+      'SUB_SITE',
+      'chrom',
+      'entrez',
+    ];
 
-    initConfigCols = [
-      {
-        title: 'Symbol',
-        field: 'symbol',
-        filterable: { type: 'alphanumericFilter' },
-        template: (value, item, addParams) => {
-          return (
-            <div>
-              <Popup
-                trigger={
-                  <span
-                    className="TableCellLink"
-                    onClick={addParams.showPlot(model, item)}
-                  >
-                    {splitValue(value)}
-                  </span>
-                }
-                style={TableValuePopupStyle}
-                className="TablePopupValue"
-                content={value}
-                inverted
-                basic
-              />
-              <Popup
-                trigger={
-                  <img
-                    src={icon}
-                    alt="Phosophosite"
-                    className="ExternalSiteIcon"
-                    onClick={addParams.showPhosphositePlus(item)}
-                  />
-                }
-                style={TableValuePopupStyle}
-                className="TablePopupValue"
-                content={iconText}
-                inverted
-                basic
-              />
-            </div>
-          );
-        },
+    let allKeys = _.keys(pepResults[0]);
+    const pepplotAlphanumericFieldsToIncludeFiltered = pepplotAlphanumericFieldsToInclude.filter(
+      f => {
+        return _.includes(allKeys, f);
+        // return Object.keys(enrResults[0]).includes(f);
       },
-    ];
+    );
 
-    let relevantConfigCols = [
-      'F',
-      'logFC',
-      't',
-      'P.Value',
-      'adj.P.Val',
-      'AveExpr',
-      'B',
-      // 'chrom',
-      // 'entrez',
-    ];
+    const pepplotAlphanumericColumnsMapped = pepplotAlphanumericFieldsToIncludeFiltered.map(
+      f => {
+        return {
+          title: f.toUpperCase(),
+          field: f,
+          filterable: { type: 'alphanumericFilter' },
+          template: (value, item, addParams) => {
+            return (
+              <div>
+                <Popup
+                  trigger={
+                    <span
+                      className="TableCellLink"
+                      onClick={addParams.showPlot(pepplotModel, item)}
+                    >
+                      {splitValue(value)}
+                    </span>
+                  }
+                  style={TableValuePopupStyle}
+                  className="TablePopupValue"
+                  content={value}
+                  inverted
+                  basic
+                />
+                <Popup
+                  trigger={
+                    <img
+                      src={icon}
+                      alt="Phosophosite"
+                      className="ExternalSiteIcon"
+                      onClick={addParams.showPhosphositePlus(item)}
+                    />
+                  }
+                  style={TableValuePopupStyle}
+                  className="TablePopupValue"
+                  content={iconText}
+                  inverted
+                  basic
+                />
+              </div>
+            );
+          },
+        };
+      },
+    );
+
+    const pepplotAllAlphanumericFields = pepplotAlphanumericFieldsToIncludeFiltered.concat(
+      pepplotAlphanumericFieldsToDisclude,
+    );
+    const pepplotAllNumericFields = _.filter(allKeys, function(key) {
+      return !_.includes(pepplotAllAlphanumericFields, key);
+    });
 
     if (pepResults.length !== 0 && pepResults.length != null) {
       let orderedTestData = JSON.parse(
-        JSON.stringify(pepResults[0], relevantConfigCols),
+        JSON.stringify(pepResults[0], pepplotAllNumericFields),
       );
 
       let relevantConfigColumns = _.map(
         _.filter(_.keys(orderedTestData), function(d) {
-          return _.includes(relevantConfigCols, d);
+          return _.includes(pepplotAllNumericFields, d);
         }),
       );
       const thresholdColsPepplot = this.listToJson(relevantConfigColumns);
@@ -666,7 +688,7 @@ class Pepplot extends Component {
         relevantConfigColumns.splice(0, 0, 'Set_Membership');
       }
 
-      const additionalConfigColumns = relevantConfigColumns.map(c => {
+      const pepplotNumericColumnsMapped = pepplotAllNumericFields.map(c => {
         return {
           title: c,
           field: c,
@@ -693,7 +715,9 @@ class Pepplot extends Component {
           },
         };
       });
-      const configCols = initConfigCols.concat(additionalConfigColumns);
+      const configCols = pepplotAlphanumericColumnsMapped.concat(
+        pepplotNumericColumnsMapped,
+      );
       return configCols;
     }
   };
