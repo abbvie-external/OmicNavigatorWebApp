@@ -23,21 +23,21 @@ class PhosphoprotService {
     window.ocpu.seturl(this.ocpuUrlAlt);
   }
 
-  ocpuRPC(name, paramsObj, handleError) {
-    return new Promise(function(resolve, reject) {
-      window.ocpu
-        .rpc(name, paramsObj, function(session) {
-          resolve(session);
-        })
-        .catch(error => {
-          toast.error(`${error.statusText}: ${error.responseText}`);
-          if (handleError !== undefined) {
-            handleError(false);
-          }
-          console.log(`${error.statusText}: ${error.responseText}`);
-        });
-    });
-  }
+  // ocpuRPC(name, paramsObj, handleError) {
+  //   return new Promise(function(resolve, reject) {
+  //     window.ocpu
+  //       .rpc(name, paramsObj, function(session) {
+  //         resolve(session);
+  //       })
+  //       .catch(error => {
+  //         toast.error(`${error.statusText}: ${error.responseText}`);
+  //         if (handleError !== undefined) {
+  //           handleError(false);
+  //         }
+  //         console.log(`${error.statusText}: ${error.responseText}`);
+  //       });
+  //   });
+  // }
 
   async ocpuRPCUnbox(method, obj, handleError, cancelToken) {
     return new Promise(function(resolve, reject) {
@@ -87,18 +87,11 @@ class PhosphoprotService {
     return studiesFromPromise;
   }
 
-  async getModels(rName, study) {
-    this.setUrl();
-    const promise = this.ocpuRPC(rName, { study: study });
-    const modelsFromPromise = await promise;
-    return modelsFromPromise;
-  }
-
   async ocpuDataCall(method, obj, handleError, cancelToken) {
     return new Promise(function(resolve, reject) {
       window.ocpu
         .call(method, obj, function(session) {
-          const url = session.getLoc() + 'R/.val/json';
+          const url = session.getLoc() + 'R/.val/json?auto_unbox=true';
           axios
             .get(url, {
               params: { digits: 10 },
@@ -139,7 +132,7 @@ class PhosphoprotService {
     return new Promise(function(resolve, reject) {
       window.ocpu
         .call(method, obj, function(session) {
-          const url = session.getLoc() + 'R/.val/json';
+          const url = session.getLoc() + 'R/.val/json?auto_unbox=true';
           axios
             .get(url, {
               responseType: 'text',
@@ -169,11 +162,11 @@ class PhosphoprotService {
     });
   }
 
-  async getTestData(model, test, study, errorCb, cancelToken) {
+  async getResultsTable(study, model, test, errorCb, cancelToken) {
     this.setUrl();
-    const obj = { testCategory: model, test: test, study: study };
+    const obj = { study: study, modelID: model, testID: test };
     const promise = this.ocpuDataCall(
-      'getInferenceResults',
+      'getResultsTable',
       obj,
       errorCb,
       cancelToken,
@@ -182,17 +175,24 @@ class PhosphoprotService {
     return dataFromPromise;
   }
 
-  async getAnnotationData(model, test, study, type, errorCb, cancelToken) {
+  async getEnrichmentsTable(
+    study,
+    model,
+    annotation,
+    valueType,
+    errorCb,
+    cancelToken,
+  ) {
     this.setUrl();
     const obj = {
-      model: model,
-      database: test,
       study: study,
-      type: type,
+      modelID: model,
+      annotationID: annotation,
+      type: valueType,
     };
 
     const promise = this.ocpuDataCall(
-      'getEnrichmentResults',
+      'getEnrichmentsTable',
       obj,
       errorCb,
       cancelToken,
@@ -218,7 +218,7 @@ class PhosphoprotService {
   }
 
   async getSiteData(id, study, errorCb) {
-    const promise = this.ocpuRPC(
+    const promise = this.ocpuRPCUnbox(
       'sitedata',
       { idmult: id, study: study },
       errorCb,
@@ -228,7 +228,7 @@ class PhosphoprotService {
   }
 
   async getProteinData(id, study, errorCb) {
-    const promise = this.ocpuRPC('proteindata', { id: id, study: study });
+    const promise = this.ocpuRPCUnbox('proteindata', { id: id, study: study });
     const proteinDataFromPromise = await promise;
     return proteinDataFromPromise;
   }
@@ -446,7 +446,7 @@ class PhosphoprotService {
     errorCb,
   ) {
     this.setUrl();
-    const promise = this.ocpuRPC(
+    const promise = this.ocpuRPCUnbox(
       'getCytoscapeEM',
       {
         model: enrichmentModel,

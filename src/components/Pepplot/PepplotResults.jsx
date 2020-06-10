@@ -28,26 +28,27 @@ class PepplotResults extends Component {
 
   render() {
     const {
-      pepplotStudy,
-      pepplotModel,
-      pepplotTest,
+      // pepplotStudy,
+      // pepplotModel,
+      // pepplotTest,
       pepplotColumns,
       pepplotResults,
-      proteinToHighlightInDiffTable,
+      // proteinToHighlightInDiffTable,
       proteinHighlightInProgress,
       isItemSelected,
       additionalTemplateInfoPepplotTable,
     } = this.props;
 
     const { pepplotRows, itemsPerPageInformed } = this.state;
-    let pepplotCacheKey = `${pepplotStudy}-${pepplotModel}-${pepplotTest}`;
-    if (
-      proteinToHighlightInDiffTable !== '' &&
-      proteinToHighlightInDiffTable !== null &&
-      proteinToHighlightInDiffTable !== undefined
-    ) {
-      pepplotCacheKey = `${pepplotStudy}-${pepplotModel}-${pepplotTest}-${proteinToHighlightInDiffTable}`;
-    }
+    // PAUL - ensure this accounts for multiset filters
+    // let pepplotCacheKey = `${pepplotStudy}-${pepplotModel}-${pepplotTest}`;
+    // if (
+    //   proteinToHighlightInDiffTable !== '' &&
+    //   proteinToHighlightInDiffTable !== null &&
+    //   proteinToHighlightInDiffTable !== undefined
+    // ) {
+    // pepplotCacheKey = `${pepplotStudy}-${pepplotModel}-${pepplotTest}-${proteinToHighlightInDiffTable}`;
+    // }
     // const quickViews = [];
     if (!isItemSelected || proteinHighlightInProgress) {
       return (
@@ -55,7 +56,7 @@ class PepplotResults extends Component {
           <EZGrid
             ref={this.pepplotGridRef}
             onInformItemsPerPage={this.informItemsPerPage}
-            uniqueCacheKey={pepplotCacheKey}
+            // uniqueCacheKey={pepplotCacheKey}
             data={pepplotResults}
             columnsConfig={pepplotColumns}
             totalRows={pepplotRows}

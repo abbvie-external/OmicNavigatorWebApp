@@ -13,11 +13,9 @@ import * as d3 from 'd3';
 import { CancelToken } from 'axios';
 import '../Shared/SearchCriteria.scss';
 import { phosphoprotService } from '../../services/phosphoprot.service';
-import _ from 'lodash';
-// import { toast } from 'react-toastify';
 import EnrichmentMultisetFilters from './EnrichmentMultisetFilters';
 
-let cancelRequestAnnotationData = () => {};
+let cancelGetEnrichmentsTable = () => {};
 let cancelRequestMultisetEnrichmentData = () => {};
 let cancelRequestEnrichmentMultisetPlot = () => {};
 
@@ -28,9 +26,10 @@ class EnrichmentSearchCriteria extends Component {
     enrichmentStudyHref: '',
     enrichmentModels: [],
     enrichmentAnnotations: [],
+
     enrichmentModelTooltip: '',
     enrichmentAnnotationTooltip: '',
-    enrichmentStudiesDisabled: false,
+    enrichmentStudiesDisabled: true,
     enrichmentModelsDisabled: true,
     enrichmentAnnotationsDisabled: true,
     uAnchor: '',
@@ -96,9 +95,14 @@ class EnrichmentSearchCriteria extends Component {
     activateMultisetFilters: false,
     enrichmentStudyMetadata: [],
     enrichmentModelsAndAnnotations: [],
+    enrichmentAnnotationsMeta: [],
   };
 
-  componentDidMount() {}
+  componentDidMount() {
+    this.setState({
+      enrichmentStudiesDisabled: false,
+    });
+  }
 
   componentDidUpdate(prevProps) {
     if (
@@ -117,11 +121,17 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentAnnotation,
       pValueType,
       enrichmentDescriptionAndTest,
+      onSearchCriteriaChange,
+      onSearchTransitionEnrichment,
     } = this.props;
 
     const studies = allStudiesMetadata.map(study => {
       const studyName = study.name;
-      return { key: studyName, text: studyName, value: studyName };
+      return {
+        key: `${studyName}Enrichment`,
+        text: studyName,
+        value: studyName,
+      };
     });
     this.setState({
       enrichmentStudies: studies,
@@ -137,7 +147,6 @@ class EnrichmentSearchCriteria extends Component {
       const enrichmentStudyData = allStudiesMetadataCopy.find(
         study => study.name === enrichmentStudy,
       );
-      debugger;
       const enrichmentModelsAndAnnotations = enrichmentStudyData.enrichments;
       this.setState({
         enrichmentStudyMetadata: enrichmentStudyData,
@@ -146,7 +155,7 @@ class EnrichmentSearchCriteria extends Component {
       const enrichmentModelsMapped = enrichmentModelsAndAnnotations.map(
         enrichment => {
           return {
-            key: enrichment.modelID,
+            key: `${enrichment.modelID}Enrichment`,
             text: enrichment.modelID,
             value: enrichment.modelID,
           };
@@ -167,64 +176,71 @@ class EnrichmentSearchCriteria extends Component {
         this.setState({
           enrichmentModelTooltip: enrichmentModelTooltip,
         });
-        const enrichmentAnnotations =
-          enrichmentModelWithAnnotations.annotations || [];
-        const enrichmentAnnotationsMapped = enrichmentAnnotations.map(
+        const enrichmentAnnotationsMeta =
+          enrichmentModelWithAnnotations?.annotations || [];
+        const enrichmentAnnotationsMapped = enrichmentAnnotationsMeta.map(
           annotation => {
             return {
-              key: annotation.annotationID,
+              key: `${annotation.annotationID}Enrichment`,
               text: annotation.annotationID,
               value: annotation.annotationID,
             };
           },
         );
-        const uDataP = enrichmentAnnotations.map(a => a.annotationID);
+        // PAUL - is this needed - const uDataMapped = enrichmentAnnotationsMeta.map(a => a.annotationID);
         this.setState({
           enrichmentAnnotationsDisabled: false,
           enrichmentAnnotations: enrichmentAnnotationsMapped,
+          enrichmentAnnotationsMeta,
+          // uData: uDataMapped,
         });
 
-        // if (a !== '') {
-        //   this.props.onSearchCriteriaChange(
-        //     {
-        //       enrichmentStudy: s,
-        //       enrichmentModel: m,
-        //       enrichmentAnnotation: a,
-        //       enrichmentDescriptionAndTest: d,
-        //     },
-        //     false,
-        //   );
-        //   this.props.onSearchTransitionEnrichment(true);
-        //   phosphoprotService
-        //     .getAnnotationData(
-        //       m,
-        //       a,
-        //       s + 'plots',
-        //       t,
-        //       this.props.onSearchTransitionEnrichment,
-        //     )
-        //     .then(dataFromService => {
-        //       this.setState({
-        //         uSettings: {
-        //           ...this.state.uSettings,
-        //           maxElements: dataFromService.length,
-        //         },
-        //       });
-        //       this.annotationdata = dataFromService;
-        //       this.props.onEnrichmentSearch({
-        //         enrichmentResults: this.annotationdata,
-        //       });
-        //     })
-        //     .catch(error => {
-        //       console.error('Error during getAnnotationData', error);
-        //     });
-        // }
+        if (enrichmentAnnotation !== '') {
+          onSearchCriteriaChange(
+            {
+              enrichmentStudy: enrichmentStudy,
+              enrichmentModel: enrichmentModel,
+              enrichmentAnnotation: enrichmentAnnotation,
+              enrichmentDescriptionAndTest: enrichmentDescriptionAndTest,
+            },
+            false,
+          );
+          const enrichmentAnnotationMeta = enrichmentAnnotationsMeta.find(
+            annotation => annotation.annotationID === enrichmentAnnotation,
+          );
+          const enrichmentAnnotationTooltip =
+            enrichmentAnnotationMeta?.annotationDisplay || '';
+          this.setState({
+            enrichmentAnnotationTooltip,
+          });
+          onSearchTransitionEnrichment(true);
+          phosphoprotService
+            .getEnrichmentsTable(
+              enrichmentStudy,
+              enrichmentModel,
+              enrichmentAnnotation,
+              pValueType,
+              onSearchTransitionEnrichment,
+            )
+            .then(getEnrichmentsTableData => {
+              this.handleGetEnrichmentsTableData(
+                getEnrichmentsTableData,
+                false,
+                true,
+                false,
+              );
+            })
+            .catch(error => {
+              console.error('Error during getEnrichmentsTable', error);
+            });
+        }
       }
     }
   };
 
   handleStudyChange = (evt, { name, value }) => {
-    this.props.onSearchCriteriaChange(
+    const { onSearchCriteriaChange, onSearchCriteriaReset } = this.props;
+    onSearchCriteriaChange(
       {
         [name]: value,
         enrichmentModel: '',
@@ -233,7 +249,7 @@ class EnrichmentSearchCriteria extends Component {
       },
       true,
     );
-    this.props.onSearchCriteriaReset({
+    onSearchCriteriaReset({
       isValidSearchEnrichment: false,
     });
     this.setState({
@@ -247,19 +263,24 @@ class EnrichmentSearchCriteria extends Component {
   };
 
   handleModelChange = (evt, { name, value }) => {
-    this.props.onSearchCriteriaChange(
+    const {
+      enrichmentStudy,
+      onSearchCriteriaChange,
+      onSearchCriteriaReset,
+    } = this.props;
+    const { enrichmentModelsAndAnnotations } = this.state;
+    onSearchCriteriaChange(
       {
-        enrichmentStudy: this.props.enrichmentStudy,
+        enrichmentStudy: enrichmentStudy,
         [name]: value,
         enrichmentAnnotation: '',
         enrichmentDescriptionAndTest: '',
       },
       true,
     );
-    this.props.onSearchCriteriaReset({
+    onSearchCriteriaReset({
       isValidSearchEnrichment: false,
     });
-    const { enrichmentModelsAndAnnotations } = this.state;
     const enrichmentModelsAndAnnotationsCopy = [
       ...enrichmentModelsAndAnnotations,
     ];
@@ -268,12 +289,9 @@ class EnrichmentSearchCriteria extends Component {
     );
     const enrichmentModelTooltip =
       enrichmentModelWithAnnotations?.modelDisplay || '';
-    this.setState({
-      enrichmentModelTooltip: enrichmentModelTooltip,
-    });
-    const enrichmentAnnotations =
+    const enrichmentAnnotationsMeta =
       enrichmentModelWithAnnotations.annotations || [];
-    const enrichmentAnnotationsMapped = enrichmentAnnotations.map(
+    const enrichmentAnnotationsMapped = enrichmentAnnotationsMeta.map(
       annotation => {
         return {
           key: annotation.annotationID,
@@ -285,57 +303,102 @@ class EnrichmentSearchCriteria extends Component {
     this.setState({
       enrichmentAnnotationsDisabled: false,
       enrichmentAnnotations: enrichmentAnnotationsMapped,
+      enrichmentModelTooltip: enrichmentModelTooltip,
+      enrichmentAnnotationsMeta,
+      enrichmentAnnotationTooltip: '',
     });
   };
 
   handleAnnotationChange = (evt, { name, value }) => {
+    const {
+      enrichmentStudy,
+      enrichmentModel,
+      pValueType,
+      onSearchTransitionEnrichment,
+      onSearchCriteriaChange,
+    } = this.props;
+    const enrichmentAnnotationMeta = this.state.enrichmentAnnotationsMeta.find(
+      annotation => annotation.annotationID === value,
+    );
+    const enrichmentAnnotationTooltip =
+      enrichmentAnnotationMeta?.annotationDisplay || '';
+    this.setState({
+      enrichmentAnnotationTooltip,
+      reloadPlot: true,
+      multisetFiltersVisibleP: false,
+    });
     this.setState({
       multisetFiltersVisible: false,
     });
-    this.props.onSearchCriteriaChange(
+    onSearchCriteriaChange(
       {
-        enrichmentStudy: this.props.enrichmentStudy,
-        enrichmentModel: this.props.enrichmentModel,
+        enrichmentStudy: enrichmentStudy,
+        enrichmentModel: enrichmentModel,
         [name]: value,
         enrichmentDescriptionAndTest: '',
       },
       true,
     );
-    this.props.onSearchTransitionEnrichment(true);
-    cancelRequestAnnotationData();
+    onSearchTransitionEnrichment(true);
+    cancelGetEnrichmentsTable();
     let cancelToken = new CancelToken(e => {
-      cancelRequestAnnotationData = e;
+      cancelGetEnrichmentsTable = e;
     });
     phosphoprotService
-      .getAnnotationData(
-        this.props.enrichmentModel,
+      .getEnrichmentsTable(
+        enrichmentStudy,
+        enrichmentModel,
         value,
-        this.props.enrichmentStudy + 'plots',
-        this.props.pValueType,
-        this.props.onSearchTransitionEnrichment,
+        pValueType,
+        onSearchTransitionEnrichment,
         cancelToken,
       )
-      .then(dataFromService => {
-        this.setState({
-          uSettings: {
-            ...this.state.uSettings,
-            must: [],
-            not: [],
-            maxElements: dataFromService.length,
-          },
-          sigValue: [0.05],
-        });
-        this.annotationdata = dataFromService;
-        this.props.onEnrichmentSearch({
-          enrichmentResults: this.annotationdata,
-        });
-        this.props.onColumns({
-          enrichmentResults: this.annotationdata,
-        });
+      .then(getEnrichmentsTableData => {
+        this.handleGetEnrichmentsTableData(
+          getEnrichmentsTableData,
+          true,
+          true,
+          // PAUL - this needs to be handled true for column reordering, once grid props are fixed
+          false,
+        );
       })
       .catch(error => {
-        console.error('Error during getAnnotationData', error);
+        console.error('Error during getEnrichmentsTable', error);
       });
+  };
+
+  handleGetEnrichmentsTableData = (
+    data,
+    handleUSettings,
+    handleMaxElements,
+    handleColumns,
+  ) => {
+    if (handleUSettings) {
+      this.setState({
+        uSettings: {
+          ...this.state.uSettings,
+          must: [],
+          not: [],
+        },
+        sigValue: [0.05],
+      });
+    }
+    if (handleMaxElements) {
+      this.setState({
+        uSettings: {
+          ...this.state.uSettings,
+          maxElements: data.length,
+        },
+      });
+    }
+    if (handleColumns) {
+      this.props.onColumns({
+        enrichmentResults: this.annotationdata,
+      });
+    }
+    this.props.onEnrichmentSearch({
+      enrichmentResults: data,
+    });
   };
 
   removeNetworkSVG = () => {
@@ -345,41 +408,41 @@ class EnrichmentSearchCriteria extends Component {
   };
 
   handlePValueTypeChange = (evt, { value }) => {
-    this.props.onSearchTransitionEnrichment(true);
-    this.props.onPValueTypeChange(value);
+    const {
+      enrichmentStudy,
+      enrichmentModel,
+      enrichmentAnnotation,
+      onSearchTransitionEnrichment,
+      onEnrichmentSearch,
+      onPValueTypeChange,
+    } = this.props;
+    onSearchTransitionEnrichment(true);
+    onPValueTypeChange(value);
     this.removeNetworkSVG();
     if (!this.state.multisetFiltersVisible) {
-      cancelRequestAnnotationData();
+      cancelGetEnrichmentsTable();
       let cancelToken = new CancelToken(e => {
-        cancelRequestAnnotationData = e;
+        cancelGetEnrichmentsTable = e;
       });
       phosphoprotService
-        .getAnnotationData(
-          this.props.enrichmentModel,
-          this.props.enrichmentAnnotation,
-          this.props.enrichmentStudy + 'plots',
+        .getEnrichmentsTable(
+          enrichmentStudy,
+          enrichmentModel,
+          enrichmentAnnotation,
           value,
-          this.props.onSearchTransitionEnrichment,
+          onSearchTransitionEnrichment,
           cancelToken,
         )
-        .then(dataFromService => {
-          this.setState({
-            uSettings: {
-              ...this.state.uSettings,
-              // must: [],
-              // not: [],
-              // defaultSigValue: 0.05,
-              maxElements: dataFromService.length,
-            },
-            // sigValue: 0.05
-          });
-          this.annotationdata = dataFromService;
-          this.props.onEnrichmentSearch({
-            enrichmentResults: this.annotationdata,
-          });
+        .then(getEnrichmentsTableData => {
+          this.handleGetEnrichmentsTableData(
+            getEnrichmentsTableData,
+            false,
+            true,
+            false,
+          );
         })
         .catch(error => {
-          console.error('Error during getAnnotationData', error);
+          console.error('Error during getEnrichmentsTable', error);
         });
     } else {
       const eSigV = this.state.sigValue;
@@ -389,9 +452,9 @@ class EnrichmentSearchCriteria extends Component {
       console.log(value);
       this.getMultisetPlot(
         eSigV,
-        this.props.enrichmentModel,
-        this.props.enrichmentStudy + 'plots',
-        this.props.enrichmentAnnotation,
+        enrichmentModel,
+        enrichmentStudy + 'plots',
+        enrichmentAnnotation,
         this.jsonToList(eOperator),
         value,
       );
@@ -401,12 +464,12 @@ class EnrichmentSearchCriteria extends Component {
       });
       phosphoprotService
         .getMultisetEnrichmentData(
-          this.props.enrichmentModel,
+          enrichmentModel,
           eMust,
           eNot,
-          this.props.enrichmentStudy + 'plots',
+          enrichmentStudy + 'plots',
           eSigV,
-          this.props.enrichmentAnnotation,
+          enrichmentAnnotation,
           this.jsonToList(eOperator),
           value,
           undefined,
@@ -424,7 +487,7 @@ class EnrichmentSearchCriteria extends Component {
             },
             activateMultisetFilters: true,
           });
-          this.props.onEnrichmentSearch({
+          onEnrichmentSearch({
             enrichmentResults: multisetResults,
           });
         })
@@ -478,41 +541,50 @@ class EnrichmentSearchCriteria extends Component {
       },
       this.updateQueryData(),
     );
-    console.log('Error during getAnnotationData');
+    console.log('Error during getEnrichmentsTable');
   };
 
   multisetTriggeredAnnotationChange = (name, value) => {
-    this.props.onSearchCriteriaChange(
+    const {
+      enrichmentStudy,
+      enrichmentModel,
+      pValueType,
+      onSearchTransitionEnrichment,
+      onSearchCriteriaChange,
+    } = this.props;
+    onSearchCriteriaChange(
       {
-        enrichmentStudy: this.props.enrichmentStudy,
-        enrichmentModel: this.props.enrichmentModel,
+        enrichmentStudy: enrichmentStudy,
+        enrichmentModel: enrichmentModel,
         [name]: value,
         enrichmentDescriptionAndTest: '',
       },
       true,
     );
-    this.props.onSearchTransitionEnrichment(true);
-    cancelRequestAnnotationData();
+    onSearchTransitionEnrichment(true);
+    cancelGetEnrichmentsTable();
     let cancelToken = new CancelToken(e => {
-      cancelRequestAnnotationData = e;
+      cancelGetEnrichmentsTable = e;
     });
     phosphoprotService
-      .getAnnotationData(
-        this.props.enrichmentModel,
+      .getEnrichmentsTable(
+        enrichmentStudy,
+        enrichmentModel,
         value,
-        this.props.enrichmentStudy + 'plots',
-        this.props.pValueType,
+        pValueType,
         this.handleMultisetECloseError,
         cancelToken,
       )
-      .then(dataFromService => {
-        this.annotationdata = dataFromService;
-        this.props.onEnrichmentSearch({
-          enrichmentResults: this.annotationdata,
-        });
+      .then(getEnrichmentsTableData => {
+        this.handleGetEnrichmentsTableData(
+          getEnrichmentsTableData,
+          false,
+          false,
+          false,
+        );
       })
       .catch(error => {
-        console.error('Error during getAnnotationData', error);
+        console.error('Error during getEnrichmentsTable', error);
       });
   };
   addFilter = () => {
@@ -604,18 +676,26 @@ class EnrichmentSearchCriteria extends Component {
   };
 
   updateQueryData = () => {
-    this.props.onDisablePlot();
+    const {
+      enrichmentStudy,
+      enrichmentModel,
+      enrichmentAnnotation,
+      pValueType,
+      onEnrichmentSearch,
+      onDisablePlot,
+    } = this.props;
+    onDisablePlot();
     const eSigV = this.state.sigValue;
     const eMust = this.state.uSettings.must;
     const eNot = this.state.uSettings.not;
     const eOperator = this.state.selectedOperator;
     this.getMultisetPlot(
       eSigV,
-      this.props.enrichmentModel,
-      this.props.enrichmentStudy + 'plots',
-      this.props.enrichmentAnnotation,
+      enrichmentModel,
+      enrichmentStudy + 'plots',
+      enrichmentAnnotation,
       this.jsonToList(eOperator),
-      this.props.pValueType,
+      pValueType,
     );
     cancelRequestMultisetEnrichmentData();
     let cancelToken = new CancelToken(e => {
@@ -623,14 +703,14 @@ class EnrichmentSearchCriteria extends Component {
     });
     phosphoprotService
       .getMultisetEnrichmentData(
-        this.props.enrichmentModel,
+        enrichmentModel,
         eMust,
         eNot,
-        this.props.enrichmentStudy + 'plots',
+        enrichmentStudy + 'plots',
         eSigV,
-        this.props.enrichmentAnnotation,
+        enrichmentAnnotation,
         this.jsonToList(eOperator),
-        this.props.pValueType,
+        pValueType,
         this.handleMultisetEOpenError,
         cancelToken,
       )
@@ -646,7 +726,7 @@ class EnrichmentSearchCriteria extends Component {
           },
           activateMultisetFilters: true,
         });
-        this.props.onEnrichmentSearch({
+        onEnrichmentSearch({
           enrichmentResults: multisetResults,
         });
       })
@@ -909,6 +989,8 @@ class EnrichmentSearchCriteria extends Component {
             inverted
             position="bottom right"
             content={enrichmentModelTooltip}
+            mouseEnterDelay={1000}
+            mouseLeaveDelay={0}
           />
           <Popup
             trigger={
@@ -936,6 +1018,8 @@ class EnrichmentSearchCriteria extends Component {
             inverted
             position="bottom right"
             content={enrichmentAnnotationTooltip}
+            mouseEnterDelay={1000}
+            mouseLeaveDelay={0}
           />
           <label
             className={

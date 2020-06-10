@@ -275,14 +275,22 @@ class PepplotVolcanoPlot extends Component {
 
     const xPlotTicks = xAxisTicks.map(({ value, xOffset }) => (
       <g
-        key={value}
+        key={
+          value === undefined
+            ? `xplotick-${value}-g`
+            : `xplottick-${identifier}-g`
+        }
         className="individualTick"
         transform={`translate(${xOffset}, ${volcanoHeight -
           volcanoHeight * 0.1})`}
       >
         <line y2="8" stroke="currentColor" />
         <text
-          key={value}
+          key={
+            value === undefined
+              ? `xplottick-${value}-text`
+              : `xplottick-${identifier}-text`
+          }
           style={{
             fontSize: '12px',
             textAnchor: 'middle',
@@ -300,7 +308,11 @@ class PepplotVolcanoPlot extends Component {
 
     const yPlotTicks = yAxisTicks.map(({ value, yOffset }) => (
       <g
-        key={value}
+        key={
+          value === undefined
+            ? `yplottick-${value}-g`
+            : `yplottick-${identifier}-g`
+        }
         className="individualTick"
         transform={`translate(0,${yOffset})`}
       >
@@ -310,7 +322,11 @@ class PepplotVolcanoPlot extends Component {
           stroke="currentColor"
         />
         <text
-          key={value}
+          key={
+            value === undefined
+              ? `yplottick-${value}-text`
+              : `yplottick-${identifier}-text`
+          }
           style={{
             fontSize: '12px',
             textAnchor: 'middle',
