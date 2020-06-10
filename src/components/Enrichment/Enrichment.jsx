@@ -61,65 +61,42 @@ class Enrichment extends Component {
     // networkDataAvailable: false,
     networkData: {
       nodes: [],
-      edges: [],
+      links: [],
+      tests: [],
     },
-    networkDataNew: {},
-    networkDataMock: {},
     networkDataLoaded: false,
     networkGraphReady: false,
     networkDataError: false,
     tests: {},
     nodeCutoff: sessionStorage.getItem('nodeCutoff') || 0.1,
-    edgeCutoff: sessionStorage.getItem('edgeCutoff') || 0.4,
-    edgeType: sessionStorage.getItem('edgeType') || 0.5,
+    linkCutoff: sessionStorage.getItem('linkCutoff') || 0.4,
+    linkType: sessionStorage.getItem('linkType') || 0.5,
     filteredNodesTotal: 0,
-    filteredEdgesTotal: 0,
+    filteredLinksTotal: 0,
     totalNodes: 0,
-    totalEdges: 0,
+    totalLinks: 0,
     legendIsOpen: true,
     // legendIsOpen: JSON.parse(sessionStorage.getItem('legendOpen')) || true,
     networkSettings: {
       facets: {},
       propLabel: {},
       metaLabels: ['Description', 'Ontology'],
-      meta: ['EnrichmentMap_GS_DESCR', 'EnrichmentMap_Name'],
+      meta: ['description', 'termID'],
       facetAndValueLabel: ['Test', 'pValue'],
-      nodeLabel: 'EnrichmentMap_GS_DESCR',
+      nodeLabel: 'description',
       radiusScale: [10, 50],
       lineScale: [1, 10],
-      nodeSize: 'EnrichmentMap_gs_size',
-      linkSize: 'EnrichmentMap_Overlap_size',
+      nodeSize: 'geneSetSize',
+      linkSize: 'overlapSize',
       linkMetaLabels: ['Overlap Size', 'Source', 'Target'],
-      linkMeta: ['EnrichmentMap_Overlap_size', 'source', 'target'],
-      linkMetaLookup: ['EnrichmentMap_GS_DESCR', 'EnrichmentMap_GS_DESCR'],
+      linkMeta: ['overlapSize', 'source', 'target'],
+      linkMetaLookup: ['description', 'description'],
       nodeColorScale: [0, 0.1, 1],
       nodeColors: ['red', 'white', 'blue'],
-      // colorMostSignificantTest: '#FFD700',
-      mostSignificantColorScale: [
-        // '#c79750',
-        // '#e6b964',
-        // '#f8e889',
-        // '#f8e889',
-        // '#deb15f',
-        // '#dfb461'
-
-        '#B78628',
-        '#DBA514',
-        // '#e6b964',
-        '#FCC201',
-        // '#DBA514'
-        // '#c79750'
-      ],
-      // colorHighestLinkCoefficient: '#FFD700',
+      mostSignificantColorScale: ['#B78628', '#DBA514', '#FCC201'],
       title: '',
-      // data: null,
       id: 'chart-network',
       margin: { top: 50, right: 50, bottom: 50, left: 0 },
-      // statLabel: '',
-      // statistic: '',
-      // formattedData: {},
-      // facets: []
-      // propLabel: [],
       duration: 1000,
     },
     annotationData: [],
@@ -234,7 +211,7 @@ class Enrichment extends Component {
   // windowResized = () => {
   //   this.setState({
   //     nodeCutoff: this.state.nodeCutoff,
-  //     edgeCutoff: this.state.edgeCutoff,
+  //     linkCutoff: this.state.linkCutoff,
   //   });
   // };
 
@@ -610,53 +587,61 @@ class Enrichment extends Component {
   };
 
   getNetworkData = () => {
-    // this.removeNetworkSVG();
-    // const {
-    //   enrichmentModel,
-    //   enrichmentAnnotation,
-    //   pValueType,
-    //   enrichmentStudy,
-    // } = this.props;
-    // const pValueTypeParam = pValueType === 'adjusted' ? 0.1 : 1;
-    // phosphoprotService
-    //   .getEnrichmentNetwork(
-    //     enrichmentModel,
-    //     enrichmentAnnotation,
-    //     '',
-    //     pValueTypeParam,
-    //     enrichmentStudy + 'plots',
-    //     this.handleGetEnrichmentNetworkError,
-    //   )
-    //   .then(EMData => {
-    //     this.setState({
-    //       // networkDataAvailable: true,
-    //       networkData: EMData.elements,
-    //       tests: EMData.tests,
-    //       networkDataNew: networkDataNew,
-    //       totalNodes: EMData.elements.nodes.length,
-    //       totalEdges: EMData.elements.edges.length,
-    //     });
-    //     let facets = [];
-    //     let pieData = [];
-    //     for (var i = 0; i < EMData.tests.length; i++) {
-    //       let rplcSpaces = EMData.tests[i].replace(/ /g, '_');
-    //       facets.push('EnrichmentMap_pvalue_' + rplcSpaces + '_');
-    //       pieData.push(100 / EMData.tests.length);
-    //     }
-    //     this.setState({
-    //       networkSettings: {
-    //         ...this.state.networkSettings,
-    //         facets: facets,
-    //         propLabel: EMData.tests,
-    //         propData: pieData,
-    //       },
-    //       networkDataLoaded: true,
-    //       networkGraphReady: true,
-    //     });
-    //   })
-    //   .catch(error => {
-    //     console.error('Error during getEnrichmentNetwork', error);
-    //   });
+    this.removeNetworkSVG();
+    const {
+      enrichmentModel,
+      enrichmentAnnotation,
+      // pValueType,
+      enrichmentStudy,
+    } = this.props;
+    phosphoprotService
+      .getEnrichmentsNetwork(
+        enrichmentStudy,
+        enrichmentModel,
+        enrichmentAnnotation,
+        this.handleGetEnrichmentNetworkError,
+      )
+      .then(getEnrichmentNetworkResponseData => {
+        // const pValueTypeParam = pValueType === 'adjusted' ? 0.1 : 1;
+        const tests = getEnrichmentNetworkResponseData.tests;
+        this.setState({
+          // networkDataAvailable: true,
+          networkData: getEnrichmentNetworkResponseData,
+          tests: tests,
+          totalNodes: getEnrichmentNetworkResponseData.nodes.length,
+          totalLinks: getEnrichmentNetworkResponseData.links.length,
+        });
+        let facets = [];
+        let pieData = [];
+        const isArray = Array.isArray(tests);
+        const testsLength = typeof tests === 'string' ? 1 : tests.length;
+        if (isArray) {
+          for (var i = 0; i < testsLength; i++) {
+            let rplcSpaces = getEnrichmentNetworkResponseData.tests[i].replace(
+              / /g,
+              '_',
+            );
+            facets.push('EnrichmentMap_pvalue_' + rplcSpaces + '_');
+            pieData.push(100 / testsLength);
+          }
+        } else {
+          facets.push(tests);
+          pieData.push(testsLength);
+        }
+        this.setState({
+          networkSettings: {
+            ...this.state.networkSettings,
+            facets: facets,
+            propLabel: tests,
+            propData: pieData,
+          },
+          networkDataLoaded: true,
+          networkGraphReady: true,
+        });
+      })
+      .catch(error => {
+        console.error('Error during getEnrichmentNetwork', error);
+      });
   };
 
   handleGetEnrichmentNetworkError = () => {
@@ -1702,12 +1687,12 @@ class Enrichment extends Component {
                 onHandleNodeCutoffSliderChange={
                   this.handleNodeCutoffSliderChange
                 }
-                onHandleEdgeCutoffInputChange={this.handleEdgeCutoffInputChange}
-                onHandleEdgeCutoffSliderChange={
-                  this.handleEdgeCutoffSliderChange
+                onHandleLinkCutoffInputChange={this.handleLinkCutoffInputChange}
+                onHandleLinkCutoffSliderChange={
+                  this.handleLinkCutoffSliderChange
                 }
-                onHandleEdgeTypeInputChange={this.handleEdgeTypeInputChange}
-                onHandleEdgeTypeSliderChange={this.handleEdgeTypeSliderChange}
+                onHandleLinkTypeInputChange={this.handleLinkTypeInputChange}
+                onHandleLinkTypeSliderChange={this.handleLinkTypeSliderChange}
                 onHandleTotals={this.handleTotals}
                 onHandleLegendOpen={this.handleLegendOpen}
                 onHandleLegendClose={this.handleLegendClose}
@@ -1729,14 +1714,14 @@ class Enrichment extends Component {
 
   removeNetworkSVG = () => {
     d3.select('div.tooltip-pieSlice').remove();
-    d3.select('tooltipEdge').remove();
+    d3.select('tooltipLink').remove();
     d3.select(`#svg-${this.state.networkSettings.id}`).remove();
   };
 
-  handleTotals = (filteredNodesLength, filteredEdgesLength) => {
+  handleTotals = (filteredNodesLength, filteredLinksLength) => {
     this.setState({
       filteredNodesTotal: filteredNodesLength,
-      filteredEdgesTotal: filteredEdgesLength,
+      filteredLinksTotal: filteredLinksLength,
     });
   };
 
@@ -1750,23 +1735,23 @@ class Enrichment extends Component {
     }
   };
 
-  handleEdgeCutoffInputChange = value => {
-    if (this.state.edgeCutoff !== value) {
+  handleLinkCutoffInputChange = value => {
+    if (this.state.linkCutoff !== value) {
       this.removeNetworkSVG();
       this.setState({
-        edgeCutoff: value,
+        linkCutoff: value,
       });
-      sessionStorage.setItem('edgeCutoff', value);
+      sessionStorage.setItem('linkCutoff', value);
     }
   };
 
-  handleEdgeTypeInputChange = value => {
-    if (this.state.edgeType !== value) {
+  handleLinkTypeInputChange = value => {
+    if (this.state.linkType !== value) {
       // this.removeNetworkSVG();
       this.setState({
-        edgeType: value,
+        linkType: value,
       });
-      sessionStorage.setItem('edgeType', value);
+      sessionStorage.setItem('linkType', value);
     }
   };
 
@@ -1778,20 +1763,20 @@ class Enrichment extends Component {
     sessionStorage.setItem('nodeCutoff', value);
   };
 
-  handleEdgeCutoffSliderChange = value => {
-    if (this.state.edgeCutoff !== value) {
+  handleLinkCutoffSliderChange = value => {
+    if (this.state.linkCutoff !== value) {
       this.removeNetworkSVG();
-      this.setState({ edgeCutoff: value });
+      this.setState({ linkCutoff: value });
     }
-    sessionStorage.setItem('edgeCutoff', value);
+    sessionStorage.setItem('linkCutoff', value);
   };
 
-  handleEdgeTypeSliderChange = value => {
-    if (this.state.edgeType !== value) {
-      // this.removeNetworkSVG();
-      this.setState({ edgeType: value });
+  handleLinkTypeSliderChange = value => {
+    if (this.state.linkType !== value) {
+      this.removeNetworkSVG();
+      this.setState({ linkType: value });
     }
-    sessionStorage.setItem('edgeType', value);
+    sessionStorage.setItem('linkType', value);
   };
 
   // handleLegendOpen = () => {

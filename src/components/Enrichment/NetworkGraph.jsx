@@ -32,7 +32,8 @@ class NetworkGraph extends Component {
     if (
       this.props.networkData !== prevProps.networkData ||
       this.props.nodeCutoff !== prevProps.nodeCutoff ||
-      this.props.edgeCutoff !== prevProps.edgeCutoff ||
+      this.props.linkCutoff !== prevProps.linkCutoff ||
+      this.props.linkType !== prevProps.linkType ||
       this.props.networkSortBy !== prevProps.networkSortBy ||
       this.props.networkSettings.facets !== prevProps.networkSettings.facets
     ) {
@@ -61,7 +62,7 @@ class NetworkGraph extends Component {
 
   windowResized = () => {
     d3.select('div.tooltip-pieSlice').remove();
-    d3.select('tooltipEdge').remove();
+    d3.select('tooltipLink').remove();
     d3.select(`#svg-${this.props.networkSettings.id}`).remove();
     this.prepareAndRenderTree();
   };
@@ -114,19 +115,19 @@ class NetworkGraph extends Component {
   }
 
   prepareAndRenderTree = () => {
-    const { networkData, networkSettings } = this.props;
+    const { networkData, networkSettings, pValueType, linkType } = this.props;
     const self = this;
     // Prepare Data
-    let formattedNodes = _.map(networkData.nodes, function(o) {
-      return o.data;
-    });
-
-    let formattedLinks = _.map(networkData.edges, function(o) {
-      return o.data;
-    });
-
+    let formattedNodes = networkData.nodes;
+    let formattedLinks = networkData.links;
     _.forEach(formattedNodes, function(o1) {
-      let picked = _.pick(o1, networkSettings.facets);
+      const keys = networkSettings.facets;
+      const values = o1[pValueType];
+      const picked = keys.reduce(
+        (obj, key, index) => ({ ...obj, [key]: values[index] }),
+        {},
+      );
+      // let picked = _.pick(o1, networkSettings.facets);
       let metaData = {};
       _.forEach(networkSettings.metaLabels, (value, i) => {
         metaData[value] = o1[networkSettings.meta[i]];
@@ -161,9 +162,10 @@ class NetworkGraph extends Component {
     );
 
     let filteredLinks = formattedLinks.filter(
-      l => l.EnrichmentMap_similarity_coefficient >= this.props.edgeCutoff,
+      l =>
+        linkType * l.jaccard + (1 - linkType * l.overlap) >=
+        this.props.linkCutoff,
     );
-
     if (filteredNodes.length !== 0 && filteredNodes.length != null) {
       let relevantNodeIds = filteredNodes.map(n => n.id);
 
@@ -227,10 +229,10 @@ class NetworkGraph extends Component {
             let lowestTestValue = getClusterLowestSignificantValue(
               cluster.nodes,
             );
-            let edgecount = cluster.links.length;
+            let linkcount = cluster.links.length;
             let nodecount = cluster.nodes.length;
             cluster.significance = lowestTestValue;
-            cluster.edgecount = edgecount;
+            cluster.linkcount = linkcount;
             cluster.nodecount = nodecount;
           });
         });
@@ -330,11 +332,11 @@ class NetworkGraph extends Component {
             //   return (
             //     a.data.significance - b.data.significance ||
             //     b.data.nodecount - a.data.nodecount ||
-            //     b.data.edgecount - a.data.edgecount
+            //     b.data.linkcount - a.data.linkcount
             //   );
-            // } else if (self.props.networkSortBy === 'edgecount') {
+            // } else if (self.props.networkSortBy === 'linkcount') {
             //   return (
-            //     b.data.edgecount - a.data.edgecount ||
+            //     b.data.linkcount - a.data.linkcount ||
             //     a.data.significance - b.data.significance ||
             //     b.data.nodecount - a.data.nodecount
             //   );
@@ -342,7 +344,7 @@ class NetworkGraph extends Component {
             //   return (
             //     b.data.nodecount - a.data.nodecount ||
             //     a.data.significance - b.data.significance ||
-            //     b.data.edgecount - a.data.edgecount
+            //     b.data.linkcount - a.data.linkcount
             //   );
             // } else {
             //   return a.data.significance - b.data.significance;
@@ -761,7 +763,7 @@ class NetworkGraph extends Component {
                     else pValueDisplay = d.data.value.toExponential(3);
                     div
                       .html(
-                        `<div className="tooltipEdge"><b>Description: </b>${d.data.metaData.Description}<br/><b>Test: </b>${d.data.prop}<br/><b>pValue: </b>${pValueDisplay}<br/><b>Ontology: </b>${d.data.metaData.Ontology}</div>`,
+                        `<div className="tooltipLink"><b>Description: </b>${d.data.metaData.Description}<br/><b>Test: </b>${d.data.prop}<br/><b>pValue: </b>${pValueDisplay}<br/><b>Ontology: </b>${d.data.metaData.Ontology}</div>`,
                       )
                       .style('left', tooltipLRPosition)
                       .style('top', tooltipTBPosition);

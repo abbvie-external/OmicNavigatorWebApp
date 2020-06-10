@@ -1,18 +1,11 @@
 import $ from 'jquery';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-// import networkDataOld from './networkDataOld.json';
-// import networkDataNew from './networkDataNew.json';
 window.jQuery = $;
 require('opencpu.js/opencpu-0.5.js');
-// const ocpu = require('opencpu.js/opencpu-0.5.js');
 class PhosphoprotService {
   constructor() {
-    // this.ocpuUrl = 'http://10.239.9.49/ocpu/library/PhosphoProt/R';
-    // this.ocpuUrl = 'http://10.239.9.76/ocpu/library/PhosphoProt/R';
     this.ocpuUrl = '***REMOVED***/ocpu/library/OmicAnalyzer/R';
-    // this.ocpuUrlAlt = 'http://localhost:5656/ocpu/library/PhosphoProt/R'
-    // this.ocpuUrlAlt = 'http://localhost:1234/v1'
   }
 
   setUrl() {
@@ -437,30 +430,24 @@ class PhosphoprotService {
     return svgMarkupFromPromise;
   }
 
-  async getEnrichmentNetwork(
+  async getEnrichmentsNetwork(
+    enrichmentStudy,
     enrichmentModel,
     enrichmentAnnotation,
-    tests,
-    pValueType,
-    enrichmentStudy,
     errorCb,
   ) {
     this.setUrl();
     const promise = this.ocpuRPCUnbox(
-      'getCytoscapeEM',
+      'getEnrichmentsNetwork',
       {
-        model: enrichmentModel,
-        db: enrichmentAnnotation,
-        tests: tests,
-        q: pValueType,
         study: enrichmentStudy,
-        isDev: false,
+        model: enrichmentModel,
+        annotation: enrichmentAnnotation,
       },
       errorCb,
     );
     const nodesFromPromise = await promise;
     return nodesFromPromise;
-    // return networkDataOld;
   }
 }
 
