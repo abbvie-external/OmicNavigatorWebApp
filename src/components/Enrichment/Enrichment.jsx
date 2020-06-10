@@ -611,6 +611,7 @@ class Enrichment extends Component {
           totalNodes: getEnrichmentNetworkResponseData.nodes.length,
           totalLinks: getEnrichmentNetworkResponseData.links.length,
         });
+        debugger;
         let facets = [];
         let pieData = [];
         const isArray = Array.isArray(tests);

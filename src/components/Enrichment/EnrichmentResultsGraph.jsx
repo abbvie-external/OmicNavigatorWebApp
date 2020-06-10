@@ -320,10 +320,10 @@ class EnrichmentResultsGraph extends Component {
       this.setState({
         networkSearchLoading: true,
       });
-      const valueLowercase = value.toLowerCase();
+      const valueLowercase = value?.toLowerCase();
       this.setState({
         networkSearchResults: this.state.descriptions.filter(result =>
-          result.description.toLowerCase().includes(valueLowercase),
+          result.description?.toLowerCase().includes(valueLowercase),
         ),
         networkSearchValue: valueLowercase,
         networkSearchLoading: false,
@@ -333,7 +333,7 @@ class EnrichmentResultsGraph extends Component {
 
   setupNetworkSearch = filteredNodes => {
     const networkDataNodeDescriptions = filteredNodes.map(r => ({
-      description: r.description.toLowerCase(),
+      description: r.description?.toLowerCase(),
       // genes: r.EnrichmentMap_Genes,
       size: r.geneSetSize,
     }));
