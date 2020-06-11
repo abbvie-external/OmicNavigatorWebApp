@@ -578,10 +578,6 @@ class NetworkGraph extends Component {
                     );
                   })
                   .on('mouseover', function(d, i) {
-                    let OverlapGenesLimited = limitValues(
-                      d.EnrichmentMap_Overlap_genes,
-                      15,
-                    );
                     let tooltipLRPosition =
                       d3.event.pageX > window.innerWidth * 0.8
                         ? `${d3.event.pageX - 275}px`
@@ -601,7 +597,7 @@ class NetworkGraph extends Component {
                       .style('opacity', 1);
                     div
                       .html(
-                        `<b>Overlap Size: </b>${d.EnrichmentMap_Overlap_size}<br/><b>Overlap Coefficient: </b>${d.EnrichmentMap_similarity_coefficient}<br/><b>Source: </b>${d.source.EnrichmentMap_GS_DESCR}<br/><b>Target: </b>${d.target.EnrichmentMap_GS_DESCR}<br/><b>Overlap Genes: </b>${OverlapGenesLimited}`,
+                        `<b>Overlap Size: </b>${d.overlapSize}<br/><b>Overlap Coefficient: </b>${d.overlap}<br/><b>Source: </b>${d.source.description}<br/><b>Target: </b>${d.target.description}`,
                       )
                       .style('left', tooltipLRPosition)
                       .style('top', tooltipTBPosition);
