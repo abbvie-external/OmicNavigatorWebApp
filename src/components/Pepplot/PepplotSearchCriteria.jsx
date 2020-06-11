@@ -398,7 +398,7 @@ class PepplotSearchCriteria extends Component {
     this.setState({
       multisetFiltersVisibleP: false,
     });
-    console.log('Error during getMultisetInferenceData');
+    console.log('Error during getResultsIntersection');
   };
 
   handleMultisetPCloseError = () => {
@@ -569,7 +569,7 @@ class PepplotSearchCriteria extends Component {
       this.getMultisetPlot(
         sigValueP,
         pepplotModel,
-        pepplotStudy + 'plots',
+        pepplotStudy,
         this.jsonToList(selectedOperatorP),
         this.jsonToList(selectedColP),
       );
@@ -579,13 +579,13 @@ class PepplotSearchCriteria extends Component {
       cancelRequestMultisetInferenceData = e;
     });
     phosphoprotService
-      .getMultisetInferenceData(
+      .getResultsIntersection(
+        pepplotStudy,
         pepplotModel,
+        pepplotTest,
         eMustP,
         eNotP,
-        pepplotStudy + 'plots',
         sigValueP,
-        pepplotTest,
         this.jsonToList(selectedOperatorP),
         this.jsonToList(selectedColP),
         this.handleMultisetPOpenError,
@@ -610,7 +610,7 @@ class PepplotSearchCriteria extends Component {
         });
       })
       .catch(error => {
-        console.error('Error during getMultisetInferenceData', error);
+        console.error('Error during getResultsIntersection', error);
       });
   };
 
@@ -630,12 +630,12 @@ class PepplotSearchCriteria extends Component {
     let heightCalculation = this.calculateHeight;
     let widthCalculation = this.calculateWidth;
     phosphoprotService
-      .getInferenceMultisetPlot(
+      .getResultsUpset(
+        pepplotStudy,
+        pepplotModel,
         sigVal,
         eOperatorP,
         eColP,
-        pepplotModel,
-        pepplotStudy,
         undefined,
         cancelToken,
       )
@@ -655,7 +655,7 @@ class PepplotSearchCriteria extends Component {
         });
       })
       .catch(error => {
-        console.error('Error during getInferenceMultisetPlot', error);
+        console.error('Error during getResultsUpset', error);
       });
   }
 

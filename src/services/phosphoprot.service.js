@@ -319,30 +319,30 @@ class PhosphoprotService {
     return dataFromPromise;
   }
 
-  async getMultisetEnrichmentData(
-    testCategory,
-    mustTest,
-    notTest,
+  async getEnrichmentsIntersection(
     study,
+    modelID,
+    annotationID,
+    mustTests,
+    notTests,
     sigValue,
-    annotation,
     operator,
-    pValType,
+    type,
     errorCb,
     cancelToken,
   ) {
     this.setUrl();
     const promise = this.ocpuDataCall(
-      'getEnrichmentIntersection',
+      'getEnrichmentsIntersection',
       {
-        testCategory: testCategory,
-        mustTests: mustTest,
-        notTests: notTest,
         study: study,
+        modelID: modelID,
+        annotationID: annotationID,
+        mustTests: mustTests,
+        notTests: notTests,
         sigValue: sigValue,
-        annotation: annotation,
         operator: operator,
-        pValType: pValType,
+        type: type,
       },
       errorCb,
       cancelToken,
@@ -351,26 +351,27 @@ class PhosphoprotService {
     return dataFromPromise;
   }
 
-  async getEnrichmentMultisetPlot(
-    sigVal,
-    testCategory,
+  //async getEnrichmentMultisetPlot(
+  async getEnrichmentsUpset(
     study,
-    annotation,
+    modelID,
+    annotationID,
+    sigValue,
     operator,
-    pValType,
+    type,
     errorCb,
     cancelToken,
   ) {
     this.setUrl();
     const promise = this.ocpuPlotCall(
-      'EnrichmentUpsetPlot',
+      'getEnrichmentsUpset',
       {
-        sigValue: sigVal,
-        testCategory: testCategory,
         study: study,
-        annotation: annotation,
+        modelID: modelID,
+        annotationID: annotationID,
+        sigValue: sigValue,
         operator: operator,
-        pValType: pValType,
+        type: type,
       },
       errorCb,
       cancelToken,
@@ -379,13 +380,13 @@ class PhosphoprotService {
     return svgMarkupFromPromise;
   }
 
-  async getMultisetInferenceData(
-    testCategory,
-    mustTest,
-    notTest,
+  async getResultsIntersection(
     study,
-    sigValue,
+    modelID,
     anchor,
+    mustTests,
+    notTests,
+    sigValue,
     operator,
     column,
     errorCb,
@@ -393,13 +394,13 @@ class PhosphoprotService {
   ) {
     this.setUrl();
     const promise = this.ocpuDataCall(
-      'getInferenceIntersection',
+      'getResultsIntersection',
       {
-        testCategory: testCategory,
-        anchor: anchor,
-        mustTests: mustTest,
-        notTests: notTest,
         study: study,
+        modelID: modelID,
+        anchor: anchor,
+        mustTests: mustTests,
+        notTests: notTests,
         sigValue: sigValue,
         operator: operator,
         column: column,
@@ -411,22 +412,22 @@ class PhosphoprotService {
     return dataFromPromise;
   }
 
-  async getInferenceMultisetPlot(
-    sigVal,
+  async getResultsUpset(
+    study,
+    modelID,
+    sigValue,
     operator,
     column,
-    testCategory,
-    study,
     errorCb,
     cancelToken,
   ) {
     this.setUrl();
     const promise = this.ocpuPlotCall(
-      'InferenceUpsetPlot',
+      'getResultsUpset',
       {
-        sigValue: sigVal,
-        testCategory: testCategory,
         study: study,
+        modelID: modelID,
+        sigValue: sigValue,
         operator: operator,
         column: column,
       },
