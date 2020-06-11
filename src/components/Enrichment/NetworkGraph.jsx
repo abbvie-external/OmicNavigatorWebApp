@@ -155,26 +155,29 @@ class NetworkGraph extends Component {
           });
         } else {
           // single test
-          debugger;
           const propValue = networkSettings.facets[0];
           const valueValue = o1[pValueType];
           const key1 = networkSettings.metaLabels[0];
           const key2 = networkSettings.metaLabels[1];
           const value1 = o1[networkSettings.meta[0]];
           const value2 = o1[networkSettings.meta[1]];
-          o1.metaData = {
-            prop: propValue,
-            value: valueValue,
-            metaData: {
-              [key1]: value1,
-              [key2]: value2,
+          o1.facets = [
+            {
+              prop: propValue,
+              value: valueValue,
+              metaData: {
+                [key1]: value1,
+                [key2]: value2,
+              },
             },
-          };
+          ];
         }
       });
 
       function getNodeLowestSignificantValue(facets) {
-        return Math.min(...facets.map(f => f.value).filter(v => v != null));
+        if (facets.length > 1) {
+          return Math.min(...facets.map(f => f.value).filter(v => v != null));
+        } else return facets[0].value;
       }
       formattedNodes.forEach(node => {
         const lowestTestValueInNode = getNodeLowestSignificantValue(

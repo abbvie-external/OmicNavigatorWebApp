@@ -441,7 +441,7 @@ class Enrichment extends Component {
     const enrichmentAlphanumericColumnsMapped = enrichmentAlphanumericFields.map(
       f => {
         return {
-          title: f.toUpperCase(),
+          title: f,
           field: f,
           filterable: { type: 'alphanumericFilter' },
           template: (value, item, addParams) => {
@@ -518,7 +518,6 @@ class Enrichment extends Component {
         filterable: { type: 'numericFilter' },
         exportTemplate: value => (value ? `${value}` : 'N/A'),
         template: (value, item, addParams) => {
-          debugger;
           // if (enrichmentStudy === '***REMOVED***' || '***REMOVED***') {
           return (
             <div>
@@ -597,7 +596,6 @@ class Enrichment extends Component {
           totalNodes: getEnrichmentNetworkResponseData.nodes.length,
           totalLinks: getEnrichmentNetworkResponseData.links.length,
         });
-        debugger;
         let facets = [];
         let pieData = [];
         const isArray = Array.isArray(tests);
@@ -615,6 +613,7 @@ class Enrichment extends Component {
           facets.push(tests);
           pieData.push(testsLength);
         }
+        debugger;
         this.setState({
           networkSettings: {
             ...this.state.networkSettings,
@@ -1132,6 +1131,7 @@ class Enrichment extends Component {
 
   createLegend = () => {
     const self = this;
+    const singleTest = typeof this.state.networkSettings.propLabel === 'string';
     var svg = d3
       .selectAll('.legend')
       .append('svg')
@@ -1140,8 +1140,8 @@ class Enrichment extends Component {
       .attr('height', '100%')
       .attr('viewBox', '0 0 ' + 300 + ' ' + 250)
       .attr('preserveAspectRatio', 'xMinYMin meet');
-    var legend = svg.append('g');
 
+    var legend = svg.append('g');
     legend.append('g').attr('class', 'slices');
     legend.append('g').attr('class', 'labels');
     legend.append('g').attr('class', 'lines');
@@ -1152,15 +1152,24 @@ class Enrichment extends Component {
       height = 300,
       radius = 50;
 
-    var pie = d3
+    let pie = d3
       .pie()
       .sort(null)
       .value(1);
-
-    var arc = d3
+    pie = 1;
+    let arc = d3
       .arc()
       .outerRadius(radius)
       .innerRadius(0);
+
+    if (singleTest) {
+      arc = d3
+        .arc()
+        .innerRadius(0)
+        .outerRadius(90)
+        .startAngle(0)
+        .endAngle(2 * Math.PI);
+    }
 
     legend.attr('transform', 'translate(' + width / 2 + ',' + height / 3 + ')');
 
@@ -1183,75 +1192,95 @@ class Enrichment extends Component {
       .select('.labels')
       .selectAll('text')
       .data(pie);
-    text
-      .enter()
-      .append('text')
-      .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
-      .attr('dy', '.35em')
-      // .attr('transform', 'rotate(' + 10 + ')')
-      .style('font-size', '.8em')
-      .text(function(d) {
-        return d.data;
-      })
+    if (!singleTest) {
+      text
+        .enter()
+        .append('text')
+        .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
+        .attr('dy', '.35em')
+        // .attr('transform', 'rotate(' + 10 + ')')
+        .style('font-size', '.8em')
+        .text(function(d) {
+          return d.data;
+        })
+        .attr('x', function(d) {
+          var a = d.startAngle + (d.endAngle - d.startAngle) / 2 - Math.PI / 2;
+          d.cx = Math.cos(a) * (radius - 10);
+          return (d.x = Math.cos(a) * (radius + 30));
+        })
+        .attr('y', function(d) {
+          var a = d.startAngle + (d.endAngle - d.startAngle) / 2 - Math.PI / 2;
+          d.cy = Math.sin(a) * (radius - 10);
+          return (d.y = Math.sin(a) * (radius + 30));
+        })
+        .style('text-anchor', 'middle')
+        .each(function(d) {
+          var bbox = this.getBBox();
+          d.sx = d.x - bbox.width / 2 - 2;
+          d.ox = d.x + bbox.width / 2 + 2;
+          d.sy = d.oy = d.y + 5;
+        });
 
-      .attr('x', function(d) {
-        var a = d.startAngle + (d.endAngle - d.startAngle) / 2 - Math.PI / 2;
-        d.cx = Math.cos(a) * (radius - 10);
-        return (d.x = Math.cos(a) * (radius + 30));
-      })
-      .attr('y', function(d) {
-        var a = d.startAngle + (d.endAngle - d.startAngle) / 2 - Math.PI / 2;
-        d.cy = Math.sin(a) * (radius - 10);
-        return (d.y = Math.sin(a) * (radius + 30));
-      })
-      .style('text-anchor', 'middle')
-      .each(function(d) {
-        var bbox = this.getBBox();
-        d.sx = d.x - bbox.width / 2 - 2;
-        d.ox = d.x + bbox.width / 2 + 2;
-        d.sy = d.oy = d.y + 5;
-      });
+      text
+        .enter()
+        .append('path')
+        .attr('class', 'pointer')
+        .style('fill', 'none')
+        .style('stroke', 'black')
 
-    text
-      .enter()
-      .append('path')
-      .attr('class', 'pointer')
-      .style('fill', 'none')
-      .style('stroke', 'black')
+        .attr('d', function(d) {
+          if (d.cx > d.ox) {
+            return (
+              'M' +
+              d.sx +
+              ',' +
+              d.sy +
+              'L' +
+              d.ox +
+              ',' +
+              d.oy +
+              ' ' +
+              d.cx +
+              ',' +
+              d.cy
+            );
+          } else {
+            return (
+              'M' +
+              d.ox +
+              ',' +
+              d.oy +
+              'L' +
+              d.sx +
+              ',' +
+              d.sy +
+              ' ' +
+              d.cx +
+              ',' +
+              d.cy
+            );
+          }
+        });
+    }
 
-      .attr('d', function(d) {
-        if (d.cx > d.ox) {
-          return (
-            'M' +
-            d.sx +
-            ',' +
-            d.sy +
-            'L' +
-            d.ox +
-            ',' +
-            d.oy +
-            ' ' +
-            d.cx +
-            ',' +
-            d.cy
-          );
-        } else {
-          return (
-            'M' +
-            d.ox +
-            ',' +
-            d.oy +
-            'L' +
-            d.sx +
-            ',' +
-            d.sy +
-            ' ' +
-            d.cx +
-            ',' +
-            d.cy
-          );
-        }
-      });
+    if (singleTest) {
+      text
+        .enter()
+        .append('text')
+        .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
+        .attr('dy', '.35em')
+        // .attr('transform', 'rotate(' + 10 + ')')
+        .style('font-size', '.8em')
+        .text(function(d) {
+          return d.data;
+        });
+      text
+        .enter()
+        .append('path')
+        .attr('class', 'pointer')
+        .style('fill', 'none')
+        .style('stroke', 'black');
+    }
 
     // Create the svg:defs element and the main gradient definition.
     var svgDefs = svg.append('defs');
