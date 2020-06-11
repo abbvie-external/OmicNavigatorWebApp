@@ -318,7 +318,10 @@ class Enrichment extends Component {
     // if (this.state.enrichmentColumns.length === 0) {
     //   this.handleColumns(searchResults);
     // }
-    const columns = this.getConfigCols(searchResults);
+    let columns = [];
+    if (searchResults.enrichmentResults?.length > 0) {
+      columns = this.getConfigCols(searchResults);
+    }
     this.removeNetworkSVG();
     this.getNetworkData();
     this.setState({
@@ -410,7 +413,6 @@ class Enrichment extends Component {
       enrichmentModel,
       enrichmentAnnotation,
     } = this.props;
-
     const TableValuePopupStyle = {
       backgroundColor: '2E2E2E',
       borderBottom: '2px solid var(--color-primary)',
@@ -420,7 +422,6 @@ class Enrichment extends Component {
       fontSize: '13px',
       wordBreak: 'break-all',
     };
-
     let icon = '';
     let iconText = '';
     // let dbShort = '';
@@ -445,163 +446,148 @@ class Enrichment extends Component {
       icon = phosphosite_icon;
       iconText = 'PhosphoSitePlus';
     }
-
     this.setState({
       enrichmentIcon: icon,
       enrichmentIconText: iconText,
     });
-    // add configurable json for these alphanumeric fields
-    const enrichmentAlphanumericFieldsToInclude = [
-      'description',
-      'Annotation',
-      'name_1006',
-      'Protein',
-      'symbol',
-    ];
-    const enrichmentAlphanumericFieldsToExclude = [
-      'termID',
-      'Protein_Site',
-      'SUB_SITE',
-      'chrom',
-      'entrez',
-      'Charge',
-      'gene_symbol',
-      'hgnc_symbol',
-    ];
-    const enrichmentNumericFieldsToExclude = [
-      'idmult',
-      'Amino.acid',
-      'multiplicity',
-    ];
-
-    let allKeys = _.keys(enrResults[0]);
-    const enrichmentAlphanumericFieldsToIncludeFiltered = enrichmentAlphanumericFieldsToInclude.filter(
-      f => {
-        return _.includes(allKeys, f);
-        // return Object.keys(enrResults[0]).includes(f);
-      },
-    );
-
-    const enrichmentAlphanumericColumnsMapped = enrichmentAlphanumericFieldsToIncludeFiltered.map(
+    let enrichmentAlphanumericFields = [];
+    let enrichmentNumericFields = [];
+    const firstObject = enrResults[0];
+    for (let [key, value] of Object.entries(firstObject)) {
+      if (typeof value === 'string' || value instanceof String) {
+        enrichmentAlphanumericFields.push(key);
+      } else {
+        enrichmentNumericFields.push(key);
+      }
+    }
+    const alphanumericTrigger = enrichmentAlphanumericFields[0];
+    const enrichmentAlphanumericColumnsMapped = enrichmentAlphanumericFields.map(
       f => {
         return {
           title: f.toUpperCase(),
           field: f,
           filterable: { type: 'alphanumericFilter' },
           template: (value, item, addParams) => {
-            return (
-              <div>
-                <Popup
-                  trigger={
-                    <span className="TableValue  NoSelect">
-                      {splitValue(value)}
-                    </span>
-                  }
-                  style={TableValuePopupStyle}
-                  className="TablePopupValue"
-                  content={value}
-                  inverted
-                  basic
-                />
-                <Popup
-                  trigger={
-                    <img
-                      src={icon}
-                      alt={iconText}
-                      className="ExternalSiteIcon"
-                      onClick={addParams.getLink(
-                        enrichmentStudy,
-                        enrichmentAnnotation,
-                        item,
-                      )}
-                    />
-                  }
-                  style={TableValuePopupStyle}
-                  className="TablePopupValue"
-                  content={iconText}
-                  inverted
-                  basic
-                />
-              </div>
-            );
+            if (f === alphanumericTrigger) {
+              return (
+                <div>
+                  <Popup
+                    trigger={
+                      <span className="TableValue  NoSelect">
+                        {splitValue(value)}
+                      </span>
+                    }
+                    style={TableValuePopupStyle}
+                    className="TablePopupValue"
+                    content={value}
+                    inverted
+                    basic
+                  />
+                  <Popup
+                    trigger={
+                      <img
+                        src={icon}
+                        alt={iconText}
+                        className="ExternalSiteIcon"
+                        onClick={addParams.getLink(
+                          enrichmentStudy,
+                          enrichmentAnnotation,
+                          item,
+                        )}
+                      />
+                    }
+                    style={TableValuePopupStyle}
+                    className="TablePopupValue"
+                    content={iconText}
+                    inverted
+                    basic
+                  />
+                </div>
+              );
+            } else {
+              return (
+                <div>
+                  <Popup
+                    trigger={
+                      <span className="TableValue  NoSelect">
+                        {splitValue(value)}
+                      </span>
+                    }
+                    style={TableValuePopupStyle}
+                    className="TablePopupValue"
+                    content={value}
+                    inverted
+                    basic
+                  />
+                </div>
+              );
+            }
           },
         };
       },
     );
-
-    const enrichmentAllAlphanumericFields = enrichmentAlphanumericFieldsToIncludeFiltered.concat(
-      enrichmentAlphanumericFieldsToExclude,
-    );
-    const enrichmentExcludeFromNumeric = enrichmentAllAlphanumericFields.concat(
-      enrichmentNumericFieldsToExclude,
-    );
-    const enrichmentNumericFieldsFiltered = _.filter(allKeys, function(key) {
-      return !_.includes(enrichmentExcludeFromNumeric, key);
-    });
 
     // multiset svg rebuilds based on uData...if there are no results we need to override this from being passed down
-    if (enrichmentNumericFieldsFiltered.length !== 0) {
+    if (enrichmentNumericFields.length !== 0) {
       this.setState({
-        uData: enrichmentNumericFieldsFiltered,
+        uData: enrichmentNumericFields,
       });
     }
-
-    const enrichmentNumericColumnsMapped = enrichmentNumericFieldsFiltered.map(
-      c => {
-        return {
-          title: c,
-          field: c,
-          type: 'number',
-          filterable: { type: 'numericFilter' },
-          exportTemplate: value => (value ? `${value}` : 'N/A'),
-          template: (value, item, addParams) => {
-            // if (enrichmentStudy === '***REMOVED***' || '***REMOVED***') {
-            return (
-              <div>
-                <Popup
-                  trigger={
-                    <span
-                      className="TableCellLink"
-                      onClick={addParams.barcodeData(
-                        enrichmentStudy,
-                        enrichmentModel,
-                        enrichmentAnnotation,
-                        item,
-                        c,
-                      )}
-                    >
-                      {formatNumberForDisplay(value)}
-                    </span>
-                  }
-                  style={TableValuePopupStyle}
-                  className="TablePopupValue"
-                  content={value}
-                  inverted
-                  basic
-                />
-              </div>
-            );
-            //   } else
-            //     return (
-            //       <div>
-            //         <Popup
-            //           trigger={
-            //             <span className="TableValue  NoSelect">
-            //               {formatNumberForDisplay(value)}
-            //             </span>
-            //           }
-            //           style={TableValuePopupStyle}
-            //           className="TablePopupValue"
-            //           content={value}
-            //           inverted
-            //           basic
-            //         />
-            //       </div>
-            //     );
-          },
-        };
-      },
-    );
+    const enrichmentNumericColumnsMapped = enrichmentNumericFields.map(c => {
+      return {
+        title: c,
+        field: c,
+        type: 'number',
+        filterable: { type: 'numericFilter' },
+        exportTemplate: value => (value ? `${value}` : 'N/A'),
+        template: (value, item, addParams) => {
+          debugger;
+          // if (enrichmentStudy === '***REMOVED***' || '***REMOVED***') {
+          return (
+            <div>
+              <Popup
+                trigger={
+                  <span
+                    className="TableCellLink"
+                    onClick={addParams.barcodeData(
+                      enrichmentStudy,
+                      enrichmentModel,
+                      enrichmentAnnotation,
+                      item,
+                      c,
+                    )}
+                  >
+                    {formatNumberForDisplay(value)}
+                  </span>
+                }
+                style={TableValuePopupStyle}
+                className="TablePopupValue"
+                content={value}
+                inverted
+                basic
+              />
+            </div>
+          );
+          //   } else
+          //     return (
+          //       <div>
+          //         <Popup
+          //           trigger={
+          //             <span className="TableValue  NoSelect">
+          //               {formatNumberForDisplay(value)}
+          //             </span>
+          //           }
+          //           style={TableValuePopupStyle}
+          //           className="TablePopupValue"
+          //           content={value}
+          //           inverted
+          //           basic
+          //         />
+          //       </div>
+          //     );
+        },
+      };
+    });
 
     const configCols = enrichmentAlphanumericColumnsMapped.concat(
       enrichmentNumericColumnsMapped,
