@@ -16,6 +16,7 @@ import { formatNumberForDisplay, splitValue } from '../Shared/helpers';
 import phosphosite_icon from '../../resources/phosphosite.ico';
 import DOMPurify from 'dompurify';
 import { phosphoprotService } from '../../services/phosphoprot.service';
+import PepplotVolcano from './PepplotVolcano';
 import { CancelToken } from 'axios';
 // import PepplotVolcano from './PepplotVolcano';
 
@@ -188,7 +189,7 @@ class Pepplot extends Component {
       treeDataColumns: [],
       currentSVGs: [],
     });
-    const ProteinSiteVar = firstValue(dataItem.Protein_Site, true);
+    const ProteinSiteVar = firstValue(dataItem.id, true);
     this.handleSearchCriteriaChange(
       {
         pepplotStudy: this.props.pepplotStudy || '',
@@ -312,7 +313,7 @@ class Pepplot extends Component {
     ) {
       addParams.rowHighlightOther = [];
       proteinToHighlightInDiffTable.forEach(element => {
-        addParams.rowHighlightOther.push(element.Protein_Site);
+        addParams.rowHighlightOther.push(element.id);
       });
     }
     addParams.showPhosphositePlus = dataItem => {
@@ -682,9 +683,13 @@ class Pepplot extends Component {
       //     return _.includes(pepplotAllNumericFields, d);
       //   }),
       // );
-      const thresholdColsPepplot = this.listToJson(
-        pepplotNumericFieldsFiltered,
-      );
+      const thresholdColsPepplot = pepplotNumericFieldsFiltered.map(v=>(
+        {
+          key: v,
+          text: v,
+          value: v,
+        }
+      ));
       this.setState({
         thresholdColsP: thresholdColsPepplot,
       });
@@ -728,18 +733,6 @@ class Pepplot extends Component {
       return configCols;
     }
   };
-
-  listToJson(list) {
-    var valueJSON = [];
-    for (var i = 0; i < list.length; i++) {
-      valueJSON.push({
-        key: list[i],
-        text: list[i],
-        value: list[i],
-      });
-    }
-    return valueJSON;
-  }
 
   getView = () => {
     if (this.state.isItemSelected && !this.state.isProteinSVGLoaded) {
@@ -834,7 +827,7 @@ class Pepplot extends Component {
             className="PepplotContentPane"
             id="PepplotContentPane"
           >
-            {/* <PepplotVolcano
+            <PepplotVolcano
               {...this.state}
               {...this.props}
               handleVolcanoPlotSelectionChange={
@@ -842,7 +835,7 @@ class Pepplot extends Component {
               }
               onSelectFromTable={this.handleSelectedFromTable}
               onSVGTabChange={this.handleSVGTabChange}
-            /> */}
+            />
           </Tab.Pane>
         ),
       },
