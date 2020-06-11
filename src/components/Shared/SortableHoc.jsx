@@ -3,7 +3,7 @@ import './SortableHoc.scss';
 import { Label } from 'semantic-ui-react';
 import {
   sortableContainer,
-  sortableElement
+  sortableElement,
   //   sortableHandle
 } from 'react-sortable-hoc';
 import arrayMove from 'array-move';
@@ -24,12 +24,12 @@ const SortableContainer = sortableContainer(({ children }) => {
 
 class SortableHoc extends Component {
   state = {
-    items: ['Significance', 'Edge Count', 'Node Count']
+    items: ['Significance', 'Link Count', 'Node Count'],
   };
 
   onSortEnd = ({ oldIndex, newIndex }) => {
     this.setState(({ items }) => ({
-      items: arrayMove(items, oldIndex, newIndex)
+      items: arrayMove(items, oldIndex, newIndex),
     }));
   };
 

@@ -158,7 +158,7 @@
   }
 }
 
-#NetworkSliderDivEdgeType {
+#NetworkSliderDivLinkType {
   margin-top: 0px !important;
   padding-top: 0px !important;
   margin-bottom: 3px !important;
@@ -166,7 +166,7 @@
 }
 
 @media (min-width: 1599px) {
-  #NetworkSliderDivEdgeType {
+  #NetworkSliderDivLinkType {
     margin-top: 5px !important;
   }
 }
@@ -182,29 +182,29 @@
   margin-bottom: 10px;
 }
 
-.EdgeTypeContainer {
+.LinkTypeContainer {
   margin-bottom: -10px !important;
 }
 
 @media (min-width: 493px) {
-  #EdgeTypeLabelColumn {
+  #LinkTypeLabelColumn {
     width: 45% !important;
   }
-  #EdgeTextContainer {
+  #LinkTextContainer {
     width: 55% !important;
   }
 }
 
 @media (min-width: 1200px) and (max-width: 1250px) {
-  #EdgeTypeLabelColumn {
+  #LinkTypeLabelColumn {
     width: 43% !important;
   }
-  #EdgeTextContainer {
+  #LinkTextContainer {
     width: 57% !important;
   }
 }
 
-#EdgeTextContainer {
+#LinkTextContainer {
   padding-right: 0px !important;
   padding-left: 0px !important;
 }
@@ -241,8 +241,8 @@
   margin-right: -95px;
 }
 
-.ValueNowEdgeTypeOverlapText,
-.ValueNowEdgeTypeOverlapNumber {
+.ValueNowLinkTypeOverlapText,
+.ValueNowLinkTypeOverlapNumber {
   color: var(--color-dark) !important;
   margin-left: 35px;
   font-size: 13px;
@@ -250,8 +250,8 @@
   font-style: italic;
 }
 
-.ValueNowEdgeTypeJaccardText,
-.ValueNowEdgeTypeJaccardNumber {
+.ValueNowLinkTypeJaccardText,
+.ValueNowLinkTypeJaccardNumber {
   color: var(--color-dark) !important;
   // color: var(--color-white) !important;
   margin-left: -45px;
@@ -260,12 +260,12 @@
   font-style: italic;
 }
 
-.EdgeTypeText {
+.LinkTypeText {
   font-size: 13px !important;
 }
 
 @media (min-width: 1599px) {
-  .EdgeTypeText {
+  .LinkTypeText {
     font-size: 15px !important;
   }
 }
@@ -371,7 +371,7 @@
   margin-bottom: 5px;
 }
 
-.NodeEdgeTotals {
+.NodeLinkTotals {
   margin-bottom: 5px;
   float: right !important;
 }
