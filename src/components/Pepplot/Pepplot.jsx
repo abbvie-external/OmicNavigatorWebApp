@@ -663,10 +663,6 @@ class Pepplot extends Component {
       thresholdColsP: thresholdColsPepplot,
     });
     this.setState({ filterableColumnsP: [...pepplotNumericFields] });
-    // if using multi-set analysis, show set membership column
-    if (this.state.multisetQueried) {
-      pepplotNumericFields.splice(0, 0, 'Set_Membership');
-    }
     const pepplotNumericColumnsMapped = pepplotNumericFields.map(c => {
       return {
         title: c,
