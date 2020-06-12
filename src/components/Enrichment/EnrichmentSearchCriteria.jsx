@@ -500,19 +500,21 @@ class EnrichmentSearchCriteria extends Component {
   handleMultisetToggle = () => {
     return evt => {
       if (this.state.multisetFiltersVisible === false) {
-        this.setState({
-          multisetFiltersVisible: true,
-        });
-        this.updateQueryData({
-          must: this.state.uSettings.must,
-          not: this.state.uSettings.not,
-          sigValue: this.state.sigValue,
-          selectedCol: this.state.selectedCol,
-          selectedOperator: this.state.selectedOperator,
-        });
+        // on toggle open
+        this.setState(
+          {
+            reloadPlot: true,
+            multisetFiltersVisible: true,
+          },
+          function() {
+            this.updateQueryData();
+          },
+        );
       } else {
+        // on toggle close
         this.setState({
           multisetFiltersVisible: false,
+          reloadPlotP: false,
         });
         const enrichmentAnnotationName = 'enrichmentAnnotation';
         const enrichmentAnnotationVar = this.props.enrichmentAnnotation;

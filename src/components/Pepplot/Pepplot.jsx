@@ -334,6 +334,7 @@ class Pepplot extends Component {
 
     addParams.showPlot = (pepplotModel, dataItem) => {
       return function() {
+        // allStudiesMetadata
         let imageInfo = { key: '', title: '', svg: [] };
         switch (pepplotModel) {
           case 'Differential Expression':

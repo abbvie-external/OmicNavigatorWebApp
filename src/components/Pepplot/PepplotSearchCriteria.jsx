@@ -45,7 +45,7 @@ class PepplotSearchCriteria extends Component {
       },
     ],
     sigValueP: [0.05],
-    reloadPlot: true,
+    reloadPlotP: true,
     uSettingsP: {
       defaultselectedColP: {
         key: 'adj_P_Val',
@@ -307,7 +307,7 @@ class PepplotSearchCriteria extends Component {
     const pepplotTestTooltip = pepplotTestMeta?.testDisplay || '';
     this.setState({
       pepplotTestTooltip: pepplotTestTooltip,
-      reloadPlot: true,
+      reloadPlotP: true,
       multisetFiltersVisibleP: false,
     });
     onMultisetQueried(false);
@@ -368,22 +368,21 @@ class PepplotSearchCriteria extends Component {
     return evt => {
       if (this.state.multisetFiltersVisibleP === false) {
         // on toggle open
-        this.setState({
-          multisetFiltersVisibleP: true,
-        });
+        this.setState(
+          {
+            reloadPlotP: true,
+            multisetFiltersVisibleP: true,
+          },
+          function() {
+            this.updateQueryDataP();
+          },
+        );
         this.props.onMultisetQueried(true);
-        this.updateQueryDataP({
-          mustP: this.state.uSettingsP.mustP,
-          notP: this.state.uSettingsP.notP,
-          sigValueP: this.state.sigValueP,
-          selectedColP: this.state.selectedColP,
-          selectedOperatorP: this.state.selectedOperatorP,
-        });
       } else {
         // on toggle close
         this.setState({
           multisetFiltersVisibleP: false,
-          reloadPlot: false,
+          reloadPlotP: false,
         });
         this.props.onMultisetQueried(false);
         const pepplotTestName = 'pepplotTest';
@@ -406,7 +405,7 @@ class PepplotSearchCriteria extends Component {
     this.setState(
       {
         multisetFiltersVisibleP: true,
-        reloadPlot: true,
+        reloadPlotP: true,
       },
       this.updateQueryDataP(),
     );
@@ -512,7 +511,7 @@ class PepplotSearchCriteria extends Component {
     this.setState(
       {
         [name]: uSelVP,
-        reloadPlot: false,
+        reloadPlotP: false,
       },
       function() {
         this.updateQueryDataP();
@@ -525,7 +524,7 @@ class PepplotSearchCriteria extends Component {
     this.setState(
       {
         [name]: uSelVP,
-        reloadPlot: true,
+        reloadPlotP: true,
       },
       function() {
         this.updateQueryDataP();
@@ -539,7 +538,7 @@ class PepplotSearchCriteria extends Component {
     this.setState(
       {
         uSettingsP: uSettingsVP,
-        reloadPlot: false,
+        reloadPlotP: false,
       },
       function() {
         this.updateQueryDataP();
@@ -557,14 +556,14 @@ class PepplotSearchCriteria extends Component {
     } = this.props;
     const {
       selectedOperatorP,
-      reloadPlot,
+      reloadPlotP,
       sigValueP,
       selectedColP,
     } = this.state;
     const eMustP = this.state.uSettingsP.mustP;
     const eNotP = this.state.uSettingsP.notP;
 
-    if (reloadPlot === true) {
+    if (reloadPlotP === true) {
       onDisablePlot();
       this.getMultisetPlot(
         sigValueP,
@@ -602,7 +601,7 @@ class PepplotSearchCriteria extends Component {
             notP: eNotP,
           },
           activateMultisetFiltersP: true,
-          reloadPlot: false,
+          reloadPlotP: false,
           // loadingPepplotMultisetFilters: false,
         });
         onPepplotSearch({
