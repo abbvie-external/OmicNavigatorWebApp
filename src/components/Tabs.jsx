@@ -166,13 +166,9 @@ class Tabs extends Component {
         menuItem: (
           <Menu.Item key="1" disabled header className="LogoAndTitle">
             <span className="LogoElement">
-              <img
-                alt="Phosphoproteomic Analyzer"
-                src="/icon.png"
-                className="LogoImage"
-              />
+              <img alt="Omic Analyzer" src="/icon.png" className="LogoImage" />
             </span>
-            <span className="Header HeaderFirst">Phosphoproteomic&nbsp;</span>
+            <span className="Header HeaderFirst">Omic&nbsp;</span>
             <span className="Header HeaderSecond">Analyzer</span>
           </Menu.Item>
         ),

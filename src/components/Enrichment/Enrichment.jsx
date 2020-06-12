@@ -61,65 +61,42 @@ class Enrichment extends Component {
     // networkDataAvailable: false,
     networkData: {
       nodes: [],
-      edges: [],
+      links: [],
+      tests: [],
     },
-    networkDataNew: {},
-    networkDataMock: {},
     networkDataLoaded: false,
     networkGraphReady: false,
     networkDataError: false,
     tests: {},
     nodeCutoff: sessionStorage.getItem('nodeCutoff') || 0.1,
-    edgeCutoff: sessionStorage.getItem('edgeCutoff') || 0.4,
-    edgeType: sessionStorage.getItem('edgeType') || 0.5,
+    linkCutoff: sessionStorage.getItem('linkCutoff') || 0.4,
+    linkType: sessionStorage.getItem('linkType') || 0.5,
     filteredNodesTotal: 0,
-    filteredEdgesTotal: 0,
+    filteredLinksTotal: 0,
     totalNodes: 0,
-    totalEdges: 0,
+    totalLinks: 0,
     legendIsOpen: true,
     // legendIsOpen: JSON.parse(sessionStorage.getItem('legendOpen')) || true,
     networkSettings: {
       facets: {},
       propLabel: {},
       metaLabels: ['Description', 'Ontology'],
-      meta: ['EnrichmentMap_GS_DESCR', 'EnrichmentMap_Name'],
+      meta: ['description', 'termID'],
       facetAndValueLabel: ['Test', 'pValue'],
-      nodeLabel: 'EnrichmentMap_GS_DESCR',
+      nodeLabel: 'description',
       radiusScale: [10, 50],
       lineScale: [1, 10],
-      nodeSize: 'EnrichmentMap_gs_size',
-      linkSize: 'EnrichmentMap_Overlap_size',
+      nodeSize: 'geneSetSize',
+      linkSize: 'overlapSize',
       linkMetaLabels: ['Overlap Size', 'Source', 'Target'],
-      linkMeta: ['EnrichmentMap_Overlap_size', 'source', 'target'],
-      linkMetaLookup: ['EnrichmentMap_GS_DESCR', 'EnrichmentMap_GS_DESCR'],
+      linkMeta: ['overlapSize', 'source', 'target'],
+      linkMetaLookup: ['description', 'description'],
       nodeColorScale: [0, 0.1, 1],
       nodeColors: ['red', 'white', 'blue'],
-      // colorMostSignificantTest: '#FFD700',
-      mostSignificantColorScale: [
-        // '#c79750',
-        // '#e6b964',
-        // '#f8e889',
-        // '#f8e889',
-        // '#deb15f',
-        // '#dfb461'
-
-        '#B78628',
-        '#DBA514',
-        // '#e6b964',
-        '#FCC201',
-        // '#DBA514'
-        // '#c79750'
-      ],
-      // colorHighestLinkCoefficient: '#FFD700',
+      mostSignificantColorScale: ['#B78628', '#DBA514', '#FCC201'],
       title: '',
-      // data: null,
       id: 'chart-network',
       margin: { top: 50, right: 50, bottom: 50, left: 0 },
-      // statLabel: '',
-      // statistic: '',
-      // formattedData: {},
-      // facets: []
-      // propLabel: [],
       duration: 1000,
     },
     annotationData: [],
@@ -234,7 +211,7 @@ class Enrichment extends Component {
   // windowResized = () => {
   //   this.setState({
   //     nodeCutoff: this.state.nodeCutoff,
-  //     edgeCutoff: this.state.edgeCutoff,
+  //     linkCutoff: this.state.linkCutoff,
   //   });
   // };
 
@@ -318,7 +295,10 @@ class Enrichment extends Component {
     // if (this.state.enrichmentColumns.length === 0) {
     //   this.handleColumns(searchResults);
     // }
-    const columns = this.getConfigCols(searchResults);
+    let columns = [];
+    if (searchResults.enrichmentResults?.length > 0) {
+      columns = this.getConfigCols(searchResults);
+    }
     this.removeNetworkSVG();
     this.getNetworkData();
     this.setState({
@@ -410,7 +390,6 @@ class Enrichment extends Component {
       enrichmentModel,
       enrichmentAnnotation,
     } = this.props;
-
     const TableValuePopupStyle = {
       backgroundColor: '2E2E2E',
       borderBottom: '2px solid var(--color-primary)',
@@ -420,7 +399,6 @@ class Enrichment extends Component {
       fontSize: '13px',
       wordBreak: 'break-all',
     };
-
     let icon = '';
     let iconText = '';
     // let dbShort = '';
@@ -445,163 +423,147 @@ class Enrichment extends Component {
       icon = phosphosite_icon;
       iconText = 'PhosphoSitePlus';
     }
-
     this.setState({
       enrichmentIcon: icon,
       enrichmentIconText: iconText,
     });
-    // add configurable json for these alphanumeric fields
-    const enrichmentAlphanumericFieldsToInclude = [
-      'description',
-      'Annotation',
-      'name_1006',
-      'Protein',
-      'symbol',
-    ];
-    const enrichmentAlphanumericFieldsToExclude = [
-      'termID',
-      'Protein_Site',
-      'SUB_SITE',
-      'chrom',
-      'entrez',
-      'Charge',
-      'gene_symbol',
-      'hgnc_symbol',
-    ];
-    const enrichmentNumericFieldsToExclude = [
-      'idmult',
-      'Amino.acid',
-      'multiplicity',
-    ];
-
-    let allKeys = _.keys(enrResults[0]);
-    const enrichmentAlphanumericFieldsToIncludeFiltered = enrichmentAlphanumericFieldsToInclude.filter(
-      f => {
-        return _.includes(allKeys, f);
-        // return Object.keys(enrResults[0]).includes(f);
-      },
-    );
-
-    const enrichmentAlphanumericColumnsMapped = enrichmentAlphanumericFieldsToIncludeFiltered.map(
+    let enrichmentAlphanumericFields = [];
+    let enrichmentNumericFields = [];
+    const firstObject = enrResults[0];
+    for (let [key, value] of Object.entries(firstObject)) {
+      if (typeof value === 'string' || value instanceof String) {
+        enrichmentAlphanumericFields.push(key);
+      } else {
+        enrichmentNumericFields.push(key);
+      }
+    }
+    const alphanumericTrigger = enrichmentAlphanumericFields[0];
+    const enrichmentAlphanumericColumnsMapped = enrichmentAlphanumericFields.map(
       f => {
         return {
-          title: f.toUpperCase(),
+          title: f,
           field: f,
           filterable: { type: 'alphanumericFilter' },
           template: (value, item, addParams) => {
-            return (
-              <div>
-                <Popup
-                  trigger={
-                    <span className="TableValue  NoSelect">
-                      {splitValue(value)}
-                    </span>
-                  }
-                  style={TableValuePopupStyle}
-                  className="TablePopupValue"
-                  content={value}
-                  inverted
-                  basic
-                />
-                <Popup
-                  trigger={
-                    <img
-                      src={icon}
-                      alt={iconText}
-                      className="ExternalSiteIcon"
-                      onClick={addParams.getLink(
-                        enrichmentStudy,
-                        enrichmentAnnotation,
-                        item,
-                      )}
-                    />
-                  }
-                  style={TableValuePopupStyle}
-                  className="TablePopupValue"
-                  content={iconText}
-                  inverted
-                  basic
-                />
-              </div>
-            );
+            if (f === alphanumericTrigger) {
+              return (
+                <div>
+                  <Popup
+                    trigger={
+                      <span className="TableValue  NoSelect">
+                        {splitValue(value)}
+                      </span>
+                    }
+                    style={TableValuePopupStyle}
+                    className="TablePopupValue"
+                    content={value}
+                    inverted
+                    basic
+                  />
+                  <Popup
+                    trigger={
+                      <img
+                        src={icon}
+                        alt={iconText}
+                        className="ExternalSiteIcon"
+                        onClick={addParams.getLink(
+                          enrichmentStudy,
+                          enrichmentAnnotation,
+                          item,
+                        )}
+                      />
+                    }
+                    style={TableValuePopupStyle}
+                    className="TablePopupValue"
+                    content={iconText}
+                    inverted
+                    basic
+                  />
+                </div>
+              );
+            } else {
+              return (
+                <div>
+                  <Popup
+                    trigger={
+                      <span className="TableValue  NoSelect">
+                        {splitValue(value)}
+                      </span>
+                    }
+                    style={TableValuePopupStyle}
+                    className="TablePopupValue"
+                    content={value}
+                    inverted
+                    basic
+                  />
+                </div>
+              );
+            }
           },
         };
       },
     );
-
-    const enrichmentAllAlphanumericFields = enrichmentAlphanumericFieldsToIncludeFiltered.concat(
-      enrichmentAlphanumericFieldsToExclude,
-    );
-    const enrichmentExcludeFromNumeric = enrichmentAllAlphanumericFields.concat(
-      enrichmentNumericFieldsToExclude,
-    );
-    const enrichmentNumericFieldsFiltered = _.filter(allKeys, function(key) {
-      return !_.includes(enrichmentExcludeFromNumeric, key);
-    });
 
     // multiset svg rebuilds based on uData...if there are no results we need to override this from being passed down
-    if (enrichmentNumericFieldsFiltered.length !== 0) {
+    if (enrichmentNumericFields.length !== 0) {
       this.setState({
-        uData: enrichmentNumericFieldsFiltered,
+        uData: enrichmentNumericFields,
       });
     }
-
-    const enrichmentNumericColumnsMapped = enrichmentNumericFieldsFiltered.map(
-      c => {
-        return {
-          title: c,
-          field: c,
-          type: 'number',
-          filterable: { type: 'numericFilter' },
-          exportTemplate: value => (value ? `${value}` : 'N/A'),
-          template: (value, item, addParams) => {
-            // if (enrichmentStudy === '***REMOVED***' || '***REMOVED***') {
-            return (
-              <div>
-                <Popup
-                  trigger={
-                    <span
-                      className="TableCellLink"
-                      onClick={addParams.barcodeData(
-                        enrichmentStudy,
-                        enrichmentModel,
-                        enrichmentAnnotation,
-                        item,
-                        c,
-                      )}
-                    >
-                      {formatNumberForDisplay(value)}
-                    </span>
-                  }
-                  style={TableValuePopupStyle}
-                  className="TablePopupValue"
-                  content={value}
-                  inverted
-                  basic
-                />
-              </div>
-            );
-            //   } else
-            //     return (
-            //       <div>
-            //         <Popup
-            //           trigger={
-            //             <span className="TableValue  NoSelect">
-            //               {formatNumberForDisplay(value)}
-            //             </span>
-            //           }
-            //           style={TableValuePopupStyle}
-            //           className="TablePopupValue"
-            //           content={value}
-            //           inverted
-            //           basic
-            //         />
-            //       </div>
-            //     );
-          },
-        };
-      },
-    );
+    const enrichmentNumericColumnsMapped = enrichmentNumericFields.map(c => {
+      return {
+        title: c,
+        field: c,
+        type: 'number',
+        filterable: { type: 'numericFilter' },
+        exportTemplate: value => (value ? `${value}` : 'N/A'),
+        template: (value, item, addParams) => {
+          // if (enrichmentStudy === '***REMOVED***' || '***REMOVED***') {
+          return (
+            <div>
+              <Popup
+                trigger={
+                  <span
+                    className="TableCellLink"
+                    onClick={addParams.barcodeData(
+                      enrichmentStudy,
+                      enrichmentModel,
+                      enrichmentAnnotation,
+                      item,
+                      c,
+                    )}
+                  >
+                    {formatNumberForDisplay(value)}
+                  </span>
+                }
+                style={TableValuePopupStyle}
+                className="TablePopupValue"
+                content={value}
+                inverted
+                basic
+              />
+            </div>
+          );
+          //   } else
+          //     return (
+          //       <div>
+          //         <Popup
+          //           trigger={
+          //             <span className="TableValue  NoSelect">
+          //               {formatNumberForDisplay(value)}
+          //             </span>
+          //           }
+          //           style={TableValuePopupStyle}
+          //           className="TablePopupValue"
+          //           content={value}
+          //           inverted
+          //           basic
+          //         />
+          //       </div>
+          //     );
+        },
+      };
+    });
 
     const configCols = enrichmentAlphanumericColumnsMapped.concat(
       enrichmentNumericColumnsMapped,
@@ -610,53 +572,61 @@ class Enrichment extends Component {
   };
 
   getNetworkData = () => {
-    // this.removeNetworkSVG();
-    // const {
-    //   enrichmentModel,
-    //   enrichmentAnnotation,
-    //   pValueType,
-    //   enrichmentStudy,
-    // } = this.props;
-    // const pValueTypeParam = pValueType === 'adjusted' ? 0.1 : 1;
-    // phosphoprotService
-    //   .getEnrichmentNetwork(
-    //     enrichmentModel,
-    //     enrichmentAnnotation,
-    //     '',
-    //     pValueTypeParam,
-    //     enrichmentStudy + 'plots',
-    //     this.handleGetEnrichmentNetworkError,
-    //   )
-    //   .then(EMData => {
-    //     this.setState({
-    //       // networkDataAvailable: true,
-    //       networkData: EMData.elements,
-    //       tests: EMData.tests,
-    //       networkDataNew: networkDataNew,
-    //       totalNodes: EMData.elements.nodes.length,
-    //       totalEdges: EMData.elements.edges.length,
-    //     });
-    //     let facets = [];
-    //     let pieData = [];
-    //     for (var i = 0; i < EMData.tests.length; i++) {
-    //       let rplcSpaces = EMData.tests[i].replace(/ /g, '_');
-    //       facets.push('EnrichmentMap_pvalue_' + rplcSpaces + '_');
-    //       pieData.push(100 / EMData.tests.length);
-    //     }
-    //     this.setState({
-    //       networkSettings: {
-    //         ...this.state.networkSettings,
-    //         facets: facets,
-    //         propLabel: EMData.tests,
-    //         propData: pieData,
-    //       },
-    //       networkDataLoaded: true,
-    //       networkGraphReady: true,
-    //     });
-    //   })
-    //   .catch(error => {
-    //     console.error('Error during getEnrichmentNetwork', error);
-    //   });
+    this.removeNetworkSVG();
+    const {
+      enrichmentModel,
+      enrichmentAnnotation,
+      // pValueType,
+      enrichmentStudy,
+    } = this.props;
+    phosphoprotService
+      .getEnrichmentsNetwork(
+        enrichmentStudy,
+        enrichmentModel,
+        enrichmentAnnotation,
+        this.handleGetEnrichmentNetworkError,
+      )
+      .then(getEnrichmentNetworkResponseData => {
+        // const pValueTypeParam = pValueType === 'adjusted' ? 0.1 : 1;
+        const tests = getEnrichmentNetworkResponseData.tests;
+        this.setState({
+          // networkDataAvailable: true,
+          networkData: getEnrichmentNetworkResponseData,
+          tests: tests,
+          totalNodes: getEnrichmentNetworkResponseData.nodes.length,
+          totalLinks: getEnrichmentNetworkResponseData.links.length,
+        });
+        let facets = [];
+        let pieData = [];
+        const isArray = Array.isArray(tests);
+        const testsLength = typeof tests === 'string' ? 1 : tests.length;
+        if (isArray) {
+          for (var i = 0; i < testsLength; i++) {
+            let rplcSpaces = getEnrichmentNetworkResponseData.tests[i].replace(
+              / /g,
+              '_',
+            );
+            facets.push('EnrichmentMap_pvalue_' + rplcSpaces + '_');
+            pieData.push(100 / testsLength);
+          }
+        } else {
+          facets.push(tests);
+          pieData.push(testsLength);
+        }
+        this.setState({
+          networkSettings: {
+            ...this.state.networkSettings,
+            facets: facets,
+            propLabel: tests,
+            propData: pieData,
+          },
+          networkDataLoaded: true,
+          networkGraphReady: true,
+        });
+      })
+      .catch(error => {
+        console.error('Error during getEnrichmentNetwork', error);
+      });
   };
 
   handleGetEnrichmentNetworkError = () => {
@@ -1160,6 +1130,7 @@ class Enrichment extends Component {
 
   createLegend = () => {
     const self = this;
+    const singleTest = typeof this.state.networkSettings.propLabel === 'string';
     var svg = d3
       .selectAll('.legend')
       .append('svg')
@@ -1168,8 +1139,8 @@ class Enrichment extends Component {
       .attr('height', '100%')
       .attr('viewBox', '0 0 ' + 300 + ' ' + 250)
       .attr('preserveAspectRatio', 'xMinYMin meet');
-    var legend = svg.append('g');
 
+    var legend = svg.append('g');
     legend.append('g').attr('class', 'slices');
     legend.append('g').attr('class', 'labels');
     legend.append('g').attr('class', 'lines');
@@ -1180,15 +1151,24 @@ class Enrichment extends Component {
       height = 300,
       radius = 50;
 
-    var pie = d3
+    let pie = d3
       .pie()
       .sort(null)
       .value(1);
-
-    var arc = d3
+    pie = 1;
+    let arc = d3
       .arc()
       .outerRadius(radius)
       .innerRadius(0);
+
+    if (singleTest) {
+      arc = d3
+        .arc()
+        .innerRadius(0)
+        .outerRadius(90)
+        .startAngle(0)
+        .endAngle(2 * Math.PI);
+    }
 
     legend.attr('transform', 'translate(' + width / 2 + ',' + height / 3 + ')');
 
@@ -1211,75 +1191,95 @@ class Enrichment extends Component {
       .select('.labels')
       .selectAll('text')
       .data(pie);
-    text
-      .enter()
-      .append('text')
-      .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
-      .attr('dy', '.35em')
-      // .attr('transform', 'rotate(' + 10 + ')')
-      .style('font-size', '.8em')
-      .text(function(d) {
-        return d.data;
-      })
+    if (!singleTest) {
+      text
+        .enter()
+        .append('text')
+        .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
+        .attr('dy', '.35em')
+        // .attr('transform', 'rotate(' + 10 + ')')
+        .style('font-size', '.8em')
+        .text(function(d) {
+          return d.data;
+        })
+        .attr('x', function(d) {
+          var a = d.startAngle + (d.endAngle - d.startAngle) / 2 - Math.PI / 2;
+          d.cx = Math.cos(a) * (radius - 10);
+          return (d.x = Math.cos(a) * (radius + 30));
+        })
+        .attr('y', function(d) {
+          var a = d.startAngle + (d.endAngle - d.startAngle) / 2 - Math.PI / 2;
+          d.cy = Math.sin(a) * (radius - 10);
+          return (d.y = Math.sin(a) * (radius + 30));
+        })
+        .style('text-anchor', 'middle')
+        .each(function(d) {
+          var bbox = this.getBBox();
+          d.sx = d.x - bbox.width / 2 - 2;
+          d.ox = d.x + bbox.width / 2 + 2;
+          d.sy = d.oy = d.y + 5;
+        });
 
-      .attr('x', function(d) {
-        var a = d.startAngle + (d.endAngle - d.startAngle) / 2 - Math.PI / 2;
-        d.cx = Math.cos(a) * (radius - 10);
-        return (d.x = Math.cos(a) * (radius + 30));
-      })
-      .attr('y', function(d) {
-        var a = d.startAngle + (d.endAngle - d.startAngle) / 2 - Math.PI / 2;
-        d.cy = Math.sin(a) * (radius - 10);
-        return (d.y = Math.sin(a) * (radius + 30));
-      })
-      .style('text-anchor', 'middle')
-      .each(function(d) {
-        var bbox = this.getBBox();
-        d.sx = d.x - bbox.width / 2 - 2;
-        d.ox = d.x + bbox.width / 2 + 2;
-        d.sy = d.oy = d.y + 5;
-      });
+      text
+        .enter()
+        .append('path')
+        .attr('class', 'pointer')
+        .style('fill', 'none')
+        .style('stroke', 'black')
 
-    text
-      .enter()
-      .append('path')
-      .attr('class', 'pointer')
-      .style('fill', 'none')
-      .style('stroke', 'black')
+        .attr('d', function(d) {
+          if (d.cx > d.ox) {
+            return (
+              'M' +
+              d.sx +
+              ',' +
+              d.sy +
+              'L' +
+              d.ox +
+              ',' +
+              d.oy +
+              ' ' +
+              d.cx +
+              ',' +
+              d.cy
+            );
+          } else {
+            return (
+              'M' +
+              d.ox +
+              ',' +
+              d.oy +
+              'L' +
+              d.sx +
+              ',' +
+              d.sy +
+              ' ' +
+              d.cx +
+              ',' +
+              d.cy
+            );
+          }
+        });
+    }
 
-      .attr('d', function(d) {
-        if (d.cx > d.ox) {
-          return (
-            'M' +
-            d.sx +
-            ',' +
-            d.sy +
-            'L' +
-            d.ox +
-            ',' +
-            d.oy +
-            ' ' +
-            d.cx +
-            ',' +
-            d.cy
-          );
-        } else {
-          return (
-            'M' +
-            d.ox +
-            ',' +
-            d.oy +
-            'L' +
-            d.sx +
-            ',' +
-            d.sy +
-            ' ' +
-            d.cx +
-            ',' +
-            d.cy
-          );
-        }
-      });
+    if (singleTest) {
+      text
+        .enter()
+        .append('text')
+        .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
+        .attr('dy', '.35em')
+        // .attr('transform', 'rotate(' + 10 + ')')
+        .style('font-size', '.8em')
+        .text(function(d) {
+          return d.data;
+        });
+      text
+        .enter()
+        .append('path')
+        .attr('class', 'pointer')
+        .style('fill', 'none')
+        .style('stroke', 'black');
+    }
 
     // Create the svg:defs element and the main gradient definition.
     var svgDefs = svg.append('defs');
@@ -1702,12 +1702,12 @@ class Enrichment extends Component {
                 onHandleNodeCutoffSliderChange={
                   this.handleNodeCutoffSliderChange
                 }
-                onHandleEdgeCutoffInputChange={this.handleEdgeCutoffInputChange}
-                onHandleEdgeCutoffSliderChange={
-                  this.handleEdgeCutoffSliderChange
+                onHandleLinkCutoffInputChange={this.handleLinkCutoffInputChange}
+                onHandleLinkCutoffSliderChange={
+                  this.handleLinkCutoffSliderChange
                 }
-                onHandleEdgeTypeInputChange={this.handleEdgeTypeInputChange}
-                onHandleEdgeTypeSliderChange={this.handleEdgeTypeSliderChange}
+                onHandleLinkTypeInputChange={this.handleLinkTypeInputChange}
+                onHandleLinkTypeSliderChange={this.handleLinkTypeSliderChange}
                 onHandleTotals={this.handleTotals}
                 onHandleLegendOpen={this.handleLegendOpen}
                 onHandleLegendClose={this.handleLegendClose}
@@ -1729,14 +1729,14 @@ class Enrichment extends Component {
 
   removeNetworkSVG = () => {
     d3.select('div.tooltip-pieSlice').remove();
-    d3.select('tooltipEdge').remove();
+    d3.select('tooltipLink').remove();
     d3.select(`#svg-${this.state.networkSettings.id}`).remove();
   };
 
-  handleTotals = (filteredNodesLength, filteredEdgesLength) => {
+  handleTotals = (filteredNodesLength, filteredLinksLength) => {
     this.setState({
       filteredNodesTotal: filteredNodesLength,
-      filteredEdgesTotal: filteredEdgesLength,
+      filteredLinksTotal: filteredLinksLength,
     });
   };
 
@@ -1750,23 +1750,23 @@ class Enrichment extends Component {
     }
   };
 
-  handleEdgeCutoffInputChange = value => {
-    if (this.state.edgeCutoff !== value) {
+  handleLinkCutoffInputChange = value => {
+    if (this.state.linkCutoff !== value) {
       this.removeNetworkSVG();
       this.setState({
-        edgeCutoff: value,
+        linkCutoff: value,
       });
-      sessionStorage.setItem('edgeCutoff', value);
+      sessionStorage.setItem('linkCutoff', value);
     }
   };
 
-  handleEdgeTypeInputChange = value => {
-    if (this.state.edgeType !== value) {
+  handleLinkTypeInputChange = value => {
+    if (this.state.linkType !== value) {
       // this.removeNetworkSVG();
       this.setState({
-        edgeType: value,
+        linkType: value,
       });
-      sessionStorage.setItem('edgeType', value);
+      sessionStorage.setItem('linkType', value);
     }
   };
 
@@ -1778,20 +1778,20 @@ class Enrichment extends Component {
     sessionStorage.setItem('nodeCutoff', value);
   };
 
-  handleEdgeCutoffSliderChange = value => {
-    if (this.state.edgeCutoff !== value) {
+  handleLinkCutoffSliderChange = value => {
+    if (this.state.linkCutoff !== value) {
       this.removeNetworkSVG();
-      this.setState({ edgeCutoff: value });
+      this.setState({ linkCutoff: value });
     }
-    sessionStorage.setItem('edgeCutoff', value);
+    sessionStorage.setItem('linkCutoff', value);
   };
 
-  handleEdgeTypeSliderChange = value => {
-    if (this.state.edgeType !== value) {
-      // this.removeNetworkSVG();
-      this.setState({ edgeType: value });
+  handleLinkTypeSliderChange = value => {
+    if (this.state.linkType !== value) {
+      this.removeNetworkSVG();
+      this.setState({ linkType: value });
     }
-    sessionStorage.setItem('edgeType', value);
+    sessionStorage.setItem('linkType', value);
   };
 
   // handleLegendOpen = () => {

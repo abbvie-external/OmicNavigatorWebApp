@@ -1,18 +1,11 @@
 import $ from 'jquery';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-// import networkDataOld from './networkDataOld.json';
-// import networkDataNew from './networkDataNew.json';
 window.jQuery = $;
 require('opencpu.js/opencpu-0.5.js');
-// const ocpu = require('opencpu.js/opencpu-0.5.js');
 class PhosphoprotService {
   constructor() {
-    // this.ocpuUrl = 'http://10.239.9.49/ocpu/library/PhosphoProt/R';
-    // this.ocpuUrl = 'http://10.239.9.76/ocpu/library/PhosphoProt/R';
     this.ocpuUrl = '***REMOVED***/ocpu/library/OmicAnalyzer/R';
-    // this.ocpuUrlAlt = 'http://localhost:5656/ocpu/library/PhosphoProt/R'
-    // this.ocpuUrlAlt = 'http://localhost:1234/v1'
   }
 
   setUrl() {
@@ -319,30 +312,30 @@ class PhosphoprotService {
     return dataFromPromise;
   }
 
-  async getMultisetEnrichmentData(
-    testCategory,
-    mustTest,
-    notTest,
+  async getEnrichmentsIntersection(
     study,
+    modelID,
+    annotationID,
+    mustTests,
+    notTests,
     sigValue,
-    annotation,
     operator,
-    pValType,
+    type,
     errorCb,
     cancelToken,
   ) {
     this.setUrl();
     const promise = this.ocpuDataCall(
-      'getEnrichmentIntersection',
+      'getEnrichmentsIntersection',
       {
-        testCategory: testCategory,
-        mustTests: mustTest,
-        notTests: notTest,
         study: study,
+        modelID: modelID,
+        annotationID: annotationID,
+        mustTests: mustTests,
+        notTests: notTests,
         sigValue: sigValue,
-        annotation: annotation,
         operator: operator,
-        pValType: pValType,
+        type: type,
       },
       errorCb,
       cancelToken,
@@ -351,26 +344,27 @@ class PhosphoprotService {
     return dataFromPromise;
   }
 
-  async getEnrichmentMultisetPlot(
-    sigVal,
-    testCategory,
+  //async getEnrichmentMultisetPlot(
+  async getEnrichmentsUpset(
     study,
-    annotation,
+    modelID,
+    annotationID,
+    sigValue,
     operator,
-    pValType,
+    type,
     errorCb,
     cancelToken,
   ) {
     this.setUrl();
     const promise = this.ocpuPlotCall(
-      'EnrichmentUpsetPlot',
+      'getEnrichmentsUpset',
       {
-        sigValue: sigVal,
-        testCategory: testCategory,
         study: study,
-        annotation: annotation,
+        modelID: modelID,
+        annotationID: annotationID,
+        sigValue: sigValue,
         operator: operator,
-        pValType: pValType,
+        type: type,
       },
       errorCb,
       cancelToken,
@@ -379,13 +373,13 @@ class PhosphoprotService {
     return svgMarkupFromPromise;
   }
 
-  async getMultisetInferenceData(
-    testCategory,
-    mustTest,
-    notTest,
+  async getResultsIntersection(
     study,
-    sigValue,
+    modelID,
     anchor,
+    mustTests,
+    notTests,
+    sigValue,
     operator,
     column,
     errorCb,
@@ -393,13 +387,13 @@ class PhosphoprotService {
   ) {
     this.setUrl();
     const promise = this.ocpuDataCall(
-      'getInferenceIntersection',
+      'getResultsIntersection',
       {
-        testCategory: testCategory,
-        anchor: anchor,
-        mustTests: mustTest,
-        notTests: notTest,
         study: study,
+        modelID: modelID,
+        anchor: anchor,
+        mustTests: mustTests,
+        notTests: notTests,
         sigValue: sigValue,
         operator: operator,
         column: column,
@@ -411,22 +405,22 @@ class PhosphoprotService {
     return dataFromPromise;
   }
 
-  async getInferenceMultisetPlot(
-    sigVal,
+  async getResultsUpset(
+    study,
+    modelID,
+    sigValue,
     operator,
     column,
-    testCategory,
-    study,
     errorCb,
     cancelToken,
   ) {
     this.setUrl();
     const promise = this.ocpuPlotCall(
-      'InferenceUpsetPlot',
+      'getResultsUpset',
       {
-        sigValue: sigVal,
-        testCategory: testCategory,
         study: study,
+        modelID: modelID,
+        sigValue: sigValue,
         operator: operator,
         column: column,
       },
@@ -437,30 +431,24 @@ class PhosphoprotService {
     return svgMarkupFromPromise;
   }
 
-  async getEnrichmentNetwork(
+  async getEnrichmentsNetwork(
+    enrichmentStudy,
     enrichmentModel,
     enrichmentAnnotation,
-    tests,
-    pValueType,
-    enrichmentStudy,
     errorCb,
   ) {
     this.setUrl();
     const promise = this.ocpuRPCUnbox(
-      'getCytoscapeEM',
+      'getEnrichmentsNetwork',
       {
-        model: enrichmentModel,
-        db: enrichmentAnnotation,
-        tests: tests,
-        q: pValueType,
         study: enrichmentStudy,
-        isDev: false,
+        model: enrichmentModel,
+        annotation: enrichmentAnnotation,
       },
       errorCb,
     );
     const nodesFromPromise = await promise;
     return nodesFromPromise;
-    // return networkDataOld;
   }
 }
 

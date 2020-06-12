@@ -403,7 +403,7 @@ class EnrichmentSearchCriteria extends Component {
 
   removeNetworkSVG = () => {
     d3.select('div.tooltip-pieSlice').remove();
-    d3.select('tooltipEdge').remove();
+    d3.select('tooltipLink').remove();
     d3.select(`#svg-${this.props.networkSettings.id}`).remove();
   };
 
@@ -453,7 +453,7 @@ class EnrichmentSearchCriteria extends Component {
       this.getMultisetPlot(
         eSigV,
         enrichmentModel,
-        enrichmentStudy + 'plots',
+        enrichmentStudy,
         enrichmentAnnotation,
         this.jsonToList(eOperator),
         value,
@@ -463,13 +463,13 @@ class EnrichmentSearchCriteria extends Component {
         cancelRequestMultisetEnrichmentData = e;
       });
       phosphoprotService
-        .getMultisetEnrichmentData(
+        .getEnrichmentsIntersection(
+          enrichmentStudy,
           enrichmentModel,
+          enrichmentAnnotation,
           eMust,
           eNot,
-          enrichmentStudy + 'plots',
           eSigV,
-          enrichmentAnnotation,
           this.jsonToList(eOperator),
           value,
           undefined,
@@ -492,7 +492,7 @@ class EnrichmentSearchCriteria extends Component {
           });
         })
         .catch(error => {
-          console.error('Error during getMultisetEnrichmentData', error);
+          console.error('Error during getEnrichmentsIntersection', error);
         });
     }
   };
@@ -529,7 +529,7 @@ class EnrichmentSearchCriteria extends Component {
     this.setState({
       multisetFiltersVisible: false,
     });
-    console.log('Error during getMultisetEnrichmentData');
+    console.log('Error during getEnrichmentsIntersection');
   };
 
   handleMultisetECloseError = () => {
@@ -692,7 +692,7 @@ class EnrichmentSearchCriteria extends Component {
     this.getMultisetPlot(
       eSigV,
       enrichmentModel,
-      enrichmentStudy + 'plots',
+      enrichmentStudy,
       enrichmentAnnotation,
       this.jsonToList(eOperator),
       pValueType,
@@ -702,13 +702,13 @@ class EnrichmentSearchCriteria extends Component {
       cancelRequestMultisetEnrichmentData = e;
     });
     phosphoprotService
-      .getMultisetEnrichmentData(
+      .getEnrichmentsIntersection(
+        enrichmentStudy,
         enrichmentModel,
+        enrichmentAnnotation,
         eMust,
         eNot,
-        enrichmentStudy + 'plots',
         eSigV,
-        enrichmentAnnotation,
         this.jsonToList(eOperator),
         pValueType,
         this.handleMultisetEOpenError,
@@ -731,7 +731,7 @@ class EnrichmentSearchCriteria extends Component {
         });
       })
       .catch(error => {
-        console.error('Error during getMultisetEnrichmentData', error);
+        console.error('Error during getEnrichmentsIntersection', error);
       });
   };
   jsonToList(json) {
@@ -756,11 +756,11 @@ class EnrichmentSearchCriteria extends Component {
       cancelRequestEnrichmentMultisetPlot = e;
     });
     phosphoprotService
-      .getEnrichmentMultisetPlot(
-        sigVal,
-        enrichmentModel,
+      .getEnrichmentsUpset(
         enrichmentStudy,
+        enrichmentModel,
         enrichmentAnnotation,
+        sigVal,
         eOperator,
         this.props.pValueType,
         undefined,
@@ -786,7 +786,7 @@ class EnrichmentSearchCriteria extends Component {
         });
       })
       .catch(error => {
-        console.error('Error during getEnrichmentMultisetPlot', error);
+        console.error('Error during getEnrichmentsUpset', error);
       });
   }
 

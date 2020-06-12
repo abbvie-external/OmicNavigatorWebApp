@@ -162,6 +162,7 @@ class FilteredPepplotTable extends Component {
   };
 
   setConfigCols = filteredData => {
+    debugger;
     let self = this;
     const model = this.props.enrichmentModel;
     let initConfigCols = [];
@@ -305,12 +306,6 @@ class FilteredPepplotTable extends Component {
           return _.includes(relevantConfigCols, d);
         }),
       );
-
-      // if using multi-set analysis, show set membership column
-      if (this.state.multisetQueried) {
-        relevantConfigColumns.splice(0, 0, 'Set_Membership');
-      }
-
       const additionalConfigColumns = relevantConfigColumns.map(c => {
         return {
           title: c,

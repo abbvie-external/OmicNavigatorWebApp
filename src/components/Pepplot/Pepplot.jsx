@@ -189,7 +189,7 @@ class Pepplot extends Component {
       treeDataColumns: [],
       currentSVGs: [],
     });
-    const ProteinSiteVar = firstValue(dataItem.id, true);
+    const ProteinSiteVar = firstValue(dataItem.Protein_Site, true);
     this.handleSearchCriteriaChange(
       {
         pepplotStudy: this.props.pepplotStudy || '',
@@ -313,7 +313,7 @@ class Pepplot extends Component {
     ) {
       addParams.rowHighlightOther = [];
       proteinToHighlightInDiffTable.forEach(element => {
-        addParams.rowHighlightOther.push(element.id);
+        addParams.rowHighlightOther.push(element.Protein_Site);
       });
     }
     addParams.showPhosphositePlus = dataItem => {
