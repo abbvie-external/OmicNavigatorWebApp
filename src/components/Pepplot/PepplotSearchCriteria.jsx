@@ -96,9 +96,6 @@ class PepplotSearchCriteria extends Component {
     activateMultisetFiltersP: false,
     uDataP: [],
     // loadingPepplotMultisetFilters: false,
-    pepplotStudyMetadata: [],
-    pepplotModelsAndTests: [],
-    pepplotTestsMeta: [],
   };
 
   componentDidMount() {
@@ -144,12 +141,12 @@ class PepplotSearchCriteria extends Component {
       const pepplotStudyData = allStudiesMetadataCopy.find(
         study => study.name === pepplotStudy,
       );
-      const pepplotModelsAndTests = pepplotStudyData?.results || [];
-      this.setState({
-        pepplotStudyMetadata: pepplotStudyData,
-        pepplotModelsAndTests: pepplotModelsAndTests,
-      });
-      const pepplotModelsMapped = pepplotModelsAndTests.map(result => {
+      const pepplotModelsAndTestsVar = pepplotStudyData?.results || [];
+      this.props.onSetStudyModelTestMetadata(
+        pepplotStudyData,
+        pepplotModelsAndTestsVar,
+      );
+      const pepplotModelsMapped = pepplotModelsAndTestsVar.map(result => {
         return {
           key: `${result.modelID}Pepplot`,
           text: result.modelID,
@@ -163,28 +160,28 @@ class PepplotSearchCriteria extends Component {
       });
 
       if (pepplotModel !== '') {
-        const pepplotModelWithTests = pepplotModelsAndTests.find(
+        const pepplotModelWithTests = pepplotModelsAndTestsVar.find(
           model => model.modelID === pepplotModel,
         );
         const pepplotModelTooltip = pepplotModelWithTests?.modelDisplay || '';
         this.setState({
           pepplotModelTooltip: pepplotModelTooltip,
         });
-        const pepplotTestsMeta = pepplotModelWithTests?.tests || [];
-        const pepplotTestsMapped = pepplotTestsMeta.map(test => {
+        const pepplotTestsMetadataVar = pepplotModelWithTests?.tests || [];
+        const pepplotTestsMapped = pepplotTestsMetadataVar.map(test => {
           return {
             key: `${test.testID}Pepplot`,
             text: test.testID,
             value: test.testID,
           };
         });
-        const uDataPMapped = pepplotTestsMeta.map(t => t.testID);
+        const uDataPMapped = pepplotTestsMetadataVar.map(t => t.testID);
         this.setState({
           pepplotTestsDisabled: false,
           pepplotTests: pepplotTestsMapped,
-          pepplotTestsMeta,
           uDataP: uDataPMapped,
         });
+        this.props.onSetTestsMetadata(pepplotTestsMetadataVar);
 
         if (pepplotTest !== '') {
           onSearchCriteriaChange(
@@ -196,7 +193,7 @@ class PepplotSearchCriteria extends Component {
             },
             false,
           );
-          const pepplotTestMeta = pepplotTestsMeta.find(
+          const pepplotTestMeta = pepplotTestsMetadataVar.find(
             test => test.testID === pepplotTest,
           );
           const pepplotTestTooltip = pepplotTestMeta?.testDisplay || '';
@@ -268,29 +265,29 @@ class PepplotSearchCriteria extends Component {
     onSearchCriteriaReset({
       isValidSearchPepplot: false,
     });
-    const { pepplotModelsAndTests } = this.state;
+    const { pepplotModelsAndTests } = this.props;
     const pepplotModelsAndTestsCopy = [...pepplotModelsAndTests];
     const pepplotModelWithTests = pepplotModelsAndTestsCopy.find(
       model => model.modelID === value,
     );
     const pepplotModelTooltip = pepplotModelWithTests?.modelDisplay || '';
-    const pepplotTestsMeta = pepplotModelWithTests?.tests || [];
-    const pepplotTestsMapped = pepplotTestsMeta.map(test => {
+    const pepplotTestsMetadataVar = pepplotModelWithTests?.tests || [];
+    const pepplotTestsMapped = pepplotTestsMetadataVar.map(test => {
       return {
         key: test.testID,
         text: test.testID,
         value: test.testID,
       };
     });
-    const uDataP = pepplotTestsMeta.map(t => t.testID);
+    const uDataP = pepplotTestsMetadataVar.map(t => t.testID);
     this.setState({
       pepplotTestsDisabled: false,
-      pepplotTestsMeta: pepplotTestsMeta,
       pepplotTests: pepplotTestsMapped,
       uDataP: uDataP,
       pepplotModelTooltip: pepplotModelTooltip,
       pepplotTestTooltip: '',
     });
+    this.props.onSetTestsMetadata(pepplotTestsMetadataVar);
   };
 
   handleTestChange = (evt, { name, value }) => {
@@ -301,7 +298,7 @@ class PepplotSearchCriteria extends Component {
       onSearchCriteriaChange,
       onSearchTransitionPepplot,
     } = this.props;
-    const pepplotTestMeta = this.state.pepplotTestsMeta.find(
+    const pepplotTestMeta = this.props.pepplotTestsMetadata.find(
       test => test.testID === value,
     );
     const pepplotTestTooltip = pepplotTestMeta?.testDisplay || '';
