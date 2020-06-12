@@ -154,7 +154,10 @@ class PepplotVolcanoPlot extends Component {
         },
       });
     };
-    const highlightBrushedCircles = function() {
+    // const highlightBrushedCircles = function() {
+    //   //
+    // };
+    const endBrush = function() {
       if (d3.event.selection !== undefined && d3.event.selection !== null) {
         const brushedCircles = d3.brushSelection(this);
         const isBrushed = function(x, y) {
@@ -185,8 +188,6 @@ class PepplotVolcanoPlot extends Component {
           self.setState({ brushedCirclesData: brushedDataArr });
         }
       }
-    };
-    const endBrush = function() {
       const selection = d3.event.selection;
       if (selection == null) {
         self.handleSVGClick();
@@ -207,7 +208,7 @@ class PepplotVolcanoPlot extends Component {
         [width, height],
       ])
       .on('start', brushingStart)
-      .on('brush', highlightBrushedCircles)
+      //.on('brush', highlightBrushedCircles)
       .on('end', endBrush);
 
       d3.selectAll(".volcanoPlotD3BrushSelection").call(objsBrush);
