@@ -119,18 +119,18 @@ class PepplotVolcanoPlot extends Component {
                     x={hoveredCircleData.position[0]*1+10}
                     y={hoveredCircleData.position[1]*1+10}
                     width="200"
-                    height="40"
+                    height="45"
                 >
                     <rect
                     width="200"
-                    height="40"
+                    height="46"
                     fill="white"
                     stroke="black"
                     ></rect>
                     <text fontSize="14px" fontWeight="bold">
-                         <tspan x={10} y={12}>{idText}</tspan>
-                         <tspan x={10} y={12+hoveredTextScalar}>{xText}</tspan>
-                         <tspan x={10} y={12+2*hoveredTextScalar}>{yText}</tspan>
+                         <tspan x={10} y={14}>{idText}</tspan>
+                         <tspan x={10} y={14+hoveredTextScalar}>{xText}</tspan>
+                         <tspan x={10} y={14+2*hoveredTextScalar}>{yText}</tspan>
                     </text>
                 </svg>
       );
