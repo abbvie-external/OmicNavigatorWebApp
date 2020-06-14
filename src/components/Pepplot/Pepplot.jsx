@@ -583,136 +583,36 @@ class Pepplot extends Component {
       fontSize: '13px',
       wordBreak: 'break-all',
     };
-
     let icon = phosphosite_icon;
     let iconText = 'PhosphoSitePlus';
-    // add configurable json for these alphanumeric fields
-    const pepplotAlphanumericFieldsToInclude = [
-      'description',
-      'Annotation',
-      'name_1006',
-      'Protein',
-      'symbol',
-    ];
-    const pepplotAlphanumericFieldsToExclude = [
-      'termID',
-      'Protein_Site',
-      'SUB_SITE',
-      'chrom',
-      'entrez',
-      'Charge',
-      'gene_symbol',
-      'hgnc_symbol',
-    ];
-    const pepplotNumericFieldsToExclude = [
-      'idmult',
-      'Amino.acid',
-      'multiplicity',
-    ];
-
-    let allKeys = _.keys(pepResults[0]);
-    const pepplotAlphanumericFieldsToIncludeFiltered = pepplotAlphanumericFieldsToInclude.filter(
-      f => {
-        return _.includes(allKeys, f);
-        // return Object.keys(enrResults[0]).includes(f);
-      },
-    );
-
-    const pepplotAlphanumericColumnsMapped = pepplotAlphanumericFieldsToIncludeFiltered.map(
+    let pepplotAlphanumericFields = [];
+    let pepplotNumericFields = [];
+    const firstObject = pepResults[0];
+    for (let [key, value] of Object.entries(firstObject)) {
+      if (typeof value === 'string' || value instanceof String) {
+        pepplotAlphanumericFields.push(key);
+      } else {
+        pepplotNumericFields.push(key);
+      }
+    }
+    const alphanumericTrigger = pepplotAlphanumericFields[0];
+    const pepplotAlphanumericColumnsMapped = pepplotAlphanumericFields.map(
       f => {
         return {
-          title: f.toUpperCase(),
+          title: f,
           field: f,
           filterable: { type: 'alphanumericFilter' },
           template: (value, item, addParams) => {
-            return (
-              <div>
-                <Popup
-                  trigger={
-                    <span
-                      className="TableCellLink"
-                      onClick={addParams.showPlot(pepplotModel, item)}
-                    >
-                      {splitValue(value)}
-                    </span>
-                  }
-                  style={TableValuePopupStyle}
-                  className="TablePopupValue"
-                  content={value}
-                  inverted
-                  basic
-                />
-                <Popup
-                  trigger={
-                    <img
-                      src={icon}
-                      alt="Phosophosite"
-                      className="ExternalSiteIcon"
-                      onClick={addParams.showPhosphositePlus(item)}
-                    />
-                  }
-                  style={TableValuePopupStyle}
-                  className="TablePopupValue"
-                  content={iconText}
-                  inverted
-                  basic
-                />
-              </div>
-            );
-          },
-        };
-      },
-    );
-
-    const pepplotAllAlphanumericFields = pepplotAlphanumericFieldsToIncludeFiltered.concat(
-      pepplotAlphanumericFieldsToExclude,
-    );
-    const pepplotExcludeFromNumeric = pepplotAllAlphanumericFields.concat(
-      pepplotNumericFieldsToExclude,
-    );
-    const pepplotNumericFieldsFiltered = _.filter(allKeys, function(key) {
-      return !_.includes(pepplotExcludeFromNumeric, key);
-    });
-    if (pepResults.length !== 0 && pepResults.length != null) {
-      // let orderedTestData = JSON.parse(
-      //   JSON.stringify(pepResults[0], pepplotAllNumericFields),
-      // );
-
-      // let relevantConfigColumns = _.map(
-      //   _.filter(_.keys(orderedTestData), function(d) {
-      //     return _.includes(pepplotAllNumericFields, d);
-      //   }),
-      // );
-      const thresholdColsPepplot = pepplotNumericFieldsFiltered.map(v=>(
-        {
-          key: v,
-          text: v,
-          value: v,
-        }
-      ));
-      this.setState({
-        thresholdColsP: thresholdColsPepplot,
-      });
-      this.setState({ filterableColumnsP: [...pepplotNumericFieldsFiltered] });
-      // if using multi-set analysis, show set membership column
-      if (this.state.multisetQueried) {
-        pepplotNumericFieldsFiltered.splice(0, 0, 'Set_Membership');
-      }
-      const pepplotNumericColumnsMapped = pepplotNumericFieldsFiltered.map(
-        c => {
-          return {
-            title: c,
-            field: c,
-            type: 'number',
-            filterable: { type: 'numericFilter' },
-            exportTemplate: value => (value ? `${value}` : 'N/A'),
-            template: (value, item, addParams) => {
+            if (f === alphanumericTrigger) {
               return (
-                <p>
+                <div>
                   <Popup
                     trigger={
-                      <span className="TableValue  NoSelect">
-                        {formatNumberForDisplay(value)}
+                      <span
+                        className="TableCellLink"
+                        onClick={addParams.showPlot(pepplotModel, item)}
+                      >
+                        {splitValue(value)}
                       </span>
                     }
                     style={TableValuePopupStyle}
@@ -721,18 +621,89 @@ class Pepplot extends Component {
                     inverted
                     basic
                   />
-                </p>
+                  <Popup
+                    trigger={
+                      <img
+                        src={icon}
+                        alt="Phosophosite"
+                        className="ExternalSiteIcon"
+                        onClick={addParams.showPhosphositePlus(item)}
+                      />
+                    }
+                    style={TableValuePopupStyle}
+                    className="TablePopupValue"
+                    content={iconText}
+                    inverted
+                    basic
+                  />
+                </div>
               );
-            },
-          };
+            } else {
+              return (
+                <div>
+                  <Popup
+                    trigger={<span>{splitValue(value)}</span>}
+                    style={TableValuePopupStyle}
+                    className="TablePopupValue"
+                    content={value}
+                    inverted
+                    basic
+                  />
+                </div>
+              );
+            }
+          },
+        };
+      },
+    );
+    const thresholdColsPepplot = this.listToJson(pepplotNumericFields);
+    this.setState({
+      thresholdColsP: thresholdColsPepplot,
+    });
+    this.setState({ filterableColumnsP: [...pepplotNumericFields] });
+    const pepplotNumericColumnsMapped = pepplotNumericFields.map(c => {
+      return {
+        title: c,
+        field: c,
+        type: 'number',
+        filterable: { type: 'numericFilter' },
+        exportTemplate: value => (value ? `${value}` : 'N/A'),
+        template: (value, item, addParams) => {
+          return (
+            <p>
+              <Popup
+                trigger={
+                  <span className="TableValue  NoSelect">
+                    {formatNumberForDisplay(value)}
+                  </span>
+                }
+                style={TableValuePopupStyle}
+                className="TablePopupValue"
+                content={value}
+                inverted
+                basic
+              />
+            </p>
+          );
         },
-      );
-      const configCols = pepplotAlphanumericColumnsMapped.concat(
-        pepplotNumericColumnsMapped,
-      );
-      return configCols;
-    }
+      };
+    });
+    const configCols = pepplotAlphanumericColumnsMapped.concat(
+      pepplotNumericColumnsMapped,
+    );
+    return configCols;
   };
+  listToJson(list) {
+    var valueJSON = [];
+    for (var i = 0; i < list.length; i++) {
+      valueJSON.push({
+        key: list[i],
+        text: list[i],
+        value: list[i],
+      });
+    }
+    return valueJSON;
+  }
 
   getView = () => {
     if (this.state.isItemSelected && !this.state.isProteinSVGLoaded) {
