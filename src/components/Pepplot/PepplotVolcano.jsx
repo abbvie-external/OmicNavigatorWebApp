@@ -28,7 +28,7 @@ class PepplotVolcano extends Component {
     axisLables: [],
     xAxisLabel: null,
     yAxisLabel: null,
-    identifier: null,
+    identifier: null
   };
 
   componentDidMount() {
@@ -59,59 +59,63 @@ class PepplotVolcano extends Component {
     }
   }
   getAxisLabels = () => {
-    if (this.props.pepplotResults.length !== 0) {
-      const configCols = this.props.pepplotColumns;
-      const configColsArr = configCols.map(e => {
-        return e.title;
-      });
-      configColsArr.shift();
+    if(this.props.pepplotResults.length !== 0){
+      const configColsArr = this.props.pepplotColumns.map(e=>{return e.field});
+      this.setState({identifier:configColsArr[0]})
+      configColsArr.shift()
       const index = configColsArr.indexOf('Set_Membership');
-      if (index > -1) {
-        configColsArr.splice(index, 1);
+      if (index > -1) {configColsArr.splice(index, 1);}
+      let relevantConfigCols = [
+        'F',
+        'logFC',
+        't',
+        'P_Value',
+        'adj_P_Val',
+        'adjPVal',
+        'adj.P.Val',
+        'P.Value',
+        'B',
+        'AveExpr'
+      ];
+      let relevantConfigColumns = _.map(
+        _.filter(configColsArr, function(d) {
+          return _.includes(relevantConfigCols, d);
+        }),
+      );
+      var yLabel = relevantConfigColumns[0];
+      var xLabel = relevantConfigColumns[1];
+      var doY = false;
+      if(relevantConfigColumns.includes("logFC")){
+        xLabel = "logFC";
       }
-      if (configColsArr.includes('logFC')) {
-        this.handleDropdownChange(
-          {},
-          { name: 'xAxisSelector', value: 'logFC' },
-        );
+      if(relevantConfigColumns.includes("adj_P_Val")){
+        yLabel = "adj_P_Val";
+        doY = true;
+      } else if(relevantConfigColumns.includes("adj.P.Val")){
+        yLabel = "adj.P.Val";
+        doY = true;
+      }else if(relevantConfigColumns.includes("P_Value")){
+        yLabel = "P_Value";
+        doY= true;
+      } else if(relevantConfigColumns.includes("P.Value")){
+        yLabel = "P.Value";
+        doY= true;
       } else {
-        this.handleDropdownChange(
-          {},
-          { name: 'xAxisSelector', value: configColsArr[0] },
-        );
+        this.handleDropdownChange({},{name:"yAxisSelector", value:yLabel})
       }
-      if (configColsArr.includes('adj_P_Val')) {
-        this.setState({
-          yAxisLabel: 'adj_P_Val',
-          doYAxisTransformation: true,
-        });
-      } else if (configColsArr.includes('P_Value')) {
-        this.setState({
-          yAxisLabel: 'P_Value',
-          doYAxisTransformation: true,
-        });
-      } else {
-        this.handleDropdownChange(
-          {},
-          {
-            name: 'yAxisSelector',
-            value: configColsArr[configColsArr.length - 1],
-          },
-        );
-      }
-      if (Object.keys(this.props.pepplotResults[0]).includes('id_mult')) {
-        this.setState({ identifier: 'id_mult' });
-      } else {
-        this.setState({ identifier: 'id' });
-      }
-      const axes = configColsArr.map(e => {
-        return {
+      const axes = relevantConfigColumns.map(e =>{
+        return({
           key: e,
           text: e,
           value: e,
-        };
+        })
       });
-      this.setState({ axisLables: axes });
+      this.setState({
+        axisLables: axes,
+        yAxisLabel: yLabel,
+        doYAxisTransformation: doY
+      });
+      this.handleDropdownChange({},{name:"xAxisSelector", value:xLabel})
     }
   };
   handleVolcanoPlotSelectionChange = volcanoPlotSelectedDataArr => {

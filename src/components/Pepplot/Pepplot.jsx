@@ -16,6 +16,7 @@ import { formatNumberForDisplay, splitValue } from '../Shared/helpers';
 import phosphosite_icon from '../../resources/phosphosite.ico';
 import DOMPurify from 'dompurify';
 import { phosphoprotService } from '../../services/phosphoprot.service';
+import PepplotVolcano from './PepplotVolcano';
 import { CancelToken } from 'axios';
 // import PepplotVolcano from './PepplotVolcano';
 
@@ -695,7 +696,6 @@ class Pepplot extends Component {
     );
     return configCols;
   };
-
   listToJson(list) {
     var valueJSON = [];
     for (var i = 0; i < list.length; i++) {
@@ -801,7 +801,7 @@ class Pepplot extends Component {
             className="PepplotContentPane"
             id="PepplotContentPane"
           >
-            {/* <PepplotVolcano
+            <PepplotVolcano
               {...this.state}
               {...this.props}
               handleVolcanoPlotSelectionChange={
@@ -809,7 +809,7 @@ class Pepplot extends Component {
               }
               onSelectFromTable={this.handleSelectedFromTable}
               onSVGTabChange={this.handleSVGTabChange}
-            /> */}
+            />
           </Tab.Pane>
         ),
       },
