@@ -346,10 +346,10 @@ class Pepplot extends Component {
 
     addParams.showPlot = (dataItem, alphanumericTrigger) => {
       return function() {
+        let value = dataItem[alphanumericTrigger];
         let imageInfo = { key: '', title: '', svg: [] };
-        imageInfo.title =
-          'Protein Intensity - ' + dataItem[alphanumericTrigger];
-        imageInfo.key = dataItem[alphanumericTrigger];
+        imageInfo.title = `Protein Intensity - ${alphanumericTrigger} ${value}`;
+        imageInfo.key = `${alphanumericTrigger} ${value}`;
         getProteinDataCb(
           dataItem[alphanumericTrigger],
           dataItem,
@@ -381,8 +381,8 @@ class Pepplot extends Component {
       // imageInfo,
       // handleSVGCb,
       let imageInfo = { key: '', title: '', svg: [] };
-      imageInfo.title = 'Protein Intensity - ' + pepplotFeatureIdKey;
-      imageInfo.key = pepplotFeatureIdKey;
+      imageInfo.title = `Protein Intensity - ${pepplotFeatureIdKey} ${featureId}`;
+      imageInfo.key = `${pepplotFeatureIdKey} ${featureId}`;
       let handleSVGCb = this.handleSVG;
 
       // let self = this;
@@ -464,24 +464,7 @@ class Pepplot extends Component {
         });
       }
     };
-  getProteinPageFromUrl = (
-    getProteinDataCb,
-    getPlotCb,
-    pepplotModel,
-    dataItem,
-  ) => {
-    debugger;
-    let imageInfo = { key: '', title: '', svg: [] };
-    imageInfo.title =
-      'Protein Intensity - ' + dataItem[this.state.pepplotFeatureIdKey];
-    imageInfo.key = dataItem[this.state.pepplotFeatureIdKey];
-    getProteinDataCb(
-      dataItem[this.state.pepplotFeatureIdKey],
-      dataItem,
-      getPlotCb,
-      imageInfo,
-    );
-  };
+
   pageToProtein = (data, proteinToHighlight, itemsPerPage) => {
     const { pepplotFeatureIdKey } = this.state;
     if (this.pepplotGridRef?.current != null) {
