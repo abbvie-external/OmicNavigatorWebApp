@@ -18,7 +18,6 @@ import DOMPurify from 'dompurify';
 import { phosphoprotService } from '../../services/phosphoprot.service';
 import PepplotVolcano from './PepplotVolcano';
 import { CancelToken } from 'axios';
-// import PepplotVolcano from './PepplotVolcano';
 
 import _ from 'lodash';
 import './Pepplot.scss';
@@ -461,78 +460,78 @@ class Pepplot extends Component {
       );
     }
   };
-  // handleSelectedFromTable = toHighlightArr => {
-  //   const { pepplotStudy, pepplotModel } = this.props;
-  //   this.setState({ selectedFromTableData: toHighlightArr });
-  //   this.getTableHelpers(this.getProteinData, this.getPlot, toHighlightArr);
-  //   if (toHighlightArr.length === 0) {
-  //     this.setState({
-  //       isProteinSVGLoaded: false,
-  //       // isProteinDataLoaded: false,
-  //       isItemSelected: false,
-  //       selectedFromTableData: [],
-  //     });
-  //   } else if (toHighlightArr.length === 1) {
-  //     this.setState({ isProteinSVGLoaded: false });
-  //     //TODO: Get SVG and plot info.
-  //     let plotType = ['splineplot'];
-  //     switch (pepplotModel) {
-  //       case 'DonorDifferentialPhosphorylation':
-  //         plotType = ['dotplot'];
-  //         break;
-  //       case 'TreatmentDifferentialPhosphorylation':
-  //         plotType = ['splineplot'];
-  //         break;
-  //       case 'Treatment and or Strain Differential Phosphorylation':
-  //         plotType = ['StrainStimDotplot', 'StimStrainDotplot'];
-  //         break;
-  //       case 'Timecourse Differential Phosphorylation':
-  //         plotType = ['splineplot', 'lineplot'];
-  //         break;
-  //       case 'Differential Expression':
-  //         if (pepplotStudy === '***REMOVED***') {
-  //           plotType = ['proteinlineplot'];
-  //         } else {
-  //           plotType = ['proteindotplot'];
-  //         }
-  //         break;
-  //       case 'Differential Phosphorylation':
-  //         if (pepplotStudy === '***REMOVED***') {
-  //           plotType = ['proteinlineplot'];
-  //         } else {
-  //           plotType = ['proteindotplot'];
-  //         }
-  //         break;
-  //       case 'No Pretreatment Timecourse Differential Phosphorylation':
-  //         plotType = ['splineplot.modelII', 'lineplot.modelII'];
-  //         break;
-  //       case 'Ferrostatin Pretreatment Timecourse Differential Phosphorylation':
-  //         plotType = ['splineplot.modelIII', 'lineplot.modelIII'];
-  //         break;
-  //       default:
-  //         plotType = ['dotplot'];
-  //     }
-  //     let id = toHighlightArr[0]?.id_mult
-  //       ? toHighlightArr[0]?.id_mult
-  //       : toHighlightArr[0]?.id;
-  //     let imageInfo = { key: '', title: '', svg: [] };
-  //     switch (pepplotModel) {
-  //       case 'Differential Expression':
-  //         imageInfo.title =
-  //           'Protein Intensity - ' + toHighlightArr[0].MajorityProteinIDs;
-  //         imageInfo.key = toHighlightArr[0].MajorityProteinIDs;
-  //         break;
-  //       default:
-  //         imageInfo.title =
-  //           'Phosphosite Intensity - ' + toHighlightArr[0].Protein_Site;
-  //         imageInfo.key = toHighlightArr[0].Protein_Site;
-  //     }
-  //     const handleSVGCb = this.handleSVG;
-  //     this.getPlot(id, plotType, pepplotStudy, imageInfo, handleSVGCb);
-  //   } else {
-  //     this.setState({ isProteinSVGLoaded: false });
-  //   }
-  // };
+  handleSelectedFromTable = toHighlightArr => {
+    // const { pepplotStudy, pepplotModel } = this.props;
+    // this.setState({ selectedFromTableData: toHighlightArr });
+    // this.getTableHelpers(this.getProteinData, this.getPlot, toHighlightArr);
+    // if (toHighlightArr.length === 0) {
+    //   this.setState({
+    //     isProteinSVGLoaded: false,
+    //     // isProteinDataLoaded: false,
+    //     isItemSelected: false,
+    //     selectedFromTableData: [],
+    //   });
+    // } else if (toHighlightArr.length === 1) {
+    //   this.setState({ isProteinSVGLoaded: false });
+    //   //TODO: Get SVG and plot info.
+    //   let plotType = ['splineplot'];
+    //   switch (pepplotModel) {
+    //     case 'DonorDifferentialPhosphorylation':
+    //       plotType = ['dotplot'];
+    //       break;
+    //     case 'TreatmentDifferentialPhosphorylation':
+    //       plotType = ['splineplot'];
+    //       break;
+    //     case 'Treatment and or Strain Differential Phosphorylation':
+    //       plotType = ['StrainStimDotplot', 'StimStrainDotplot'];
+    //       break;
+    //     case 'Timecourse Differential Phosphorylation':
+    //       plotType = ['splineplot', 'lineplot'];
+    //       break;
+    //     case 'Differential Expression':
+    //       if (pepplotStudy === '***REMOVED***') {
+    //         plotType = ['proteinlineplot'];
+    //       } else {
+    //         plotType = ['proteindotplot'];
+    //       }
+    //       break;
+    //     case 'Differential Phosphorylation':
+    //       if (pepplotStudy === '***REMOVED***') {
+    //         plotType = ['proteinlineplot'];
+    //       } else {
+    //         plotType = ['proteindotplot'];
+    //       }
+    //       break;
+    //     case 'No Pretreatment Timecourse Differential Phosphorylation':
+    //       plotType = ['splineplot.modelII', 'lineplot.modelII'];
+    //       break;
+    //     case 'Ferrostatin Pretreatment Timecourse Differential Phosphorylation':
+    //       plotType = ['splineplot.modelIII', 'lineplot.modelIII'];
+    //       break;
+    //     default:
+    //       plotType = ['dotplot'];
+    //   }
+    //   let id = toHighlightArr[0]?.id_mult
+    //     ? toHighlightArr[0]?.id_mult
+    //     : toHighlightArr[0]?.id;
+    //   let imageInfo = { key: '', title: '', svg: [] };
+    //   switch (pepplotModel) {
+    //     case 'Differential Expression':
+    //       imageInfo.title =
+    //         'Protein Intensity - ' + toHighlightArr[0].MajorityProteinIDs;
+    //       imageInfo.key = toHighlightArr[0].MajorityProteinIDs;
+    //       break;
+    //     default:
+    //       imageInfo.title =
+    //         'Phosphosite Intensity - ' + toHighlightArr[0].Protein_Site;
+    //       imageInfo.key = toHighlightArr[0].Protein_Site;
+    //   }
+    //   const handleSVGCb = this.handleSVG;
+    //   this.getPlot(id, plotType, pepplotStudy, imageInfo, handleSVGCb);
+    // } else {
+    //   this.setState({ isProteinSVGLoaded: false });
+    // }
+  };
   handleSVGTabChange = activeTabIndex => {
     this.setState({
       activeSVGTabIndex: activeTabIndex,
@@ -939,9 +938,9 @@ class Pepplot extends Component {
 
 export default withRouter(Pepplot);
 
-function firstValue(value) {
-  if (value) {
-    const firstValue = value.split(';')[0];
-    return firstValue;
-  }
-}
+// function firstValue(value) {
+//   if (value) {
+//     const firstValue = value.split(';')[0];
+//     return firstValue;
+//   }
+// }
