@@ -183,23 +183,6 @@ class PepplotSearchCriteria extends Component {
         });
         this.props.onSetTestsMetadata(pepplotTestsMetadataVar);
         if (pepplotTest !== '') {
-          onSearchCriteriaChange(
-            {
-              pepplotStudy: pepplotStudy,
-              pepplotModel: pepplotModel,
-              pepplotTest: pepplotTest,
-              pepplotProteinSite: pepplotProteinSite,
-            },
-            false,
-          );
-          const pepplotTestMeta = pepplotTestsMetadataVar.find(
-            test => test.testID === pepplotTest,
-          );
-          const pepplotTestTooltip = pepplotTestMeta?.testDisplay || '';
-          this.setState({
-            pepplotTestTooltip,
-            uAnchorP: pepplotTest,
-          });
           onSearchTransitionPepplot(true);
           phosphoprotService
             .getResultsTable(
@@ -219,6 +202,27 @@ class PepplotSearchCriteria extends Component {
             .catch(error => {
               console.error('Error during getResultsTable', error);
             });
+          onSearchCriteriaChange(
+            {
+              pepplotStudy: pepplotStudy,
+              pepplotModel: pepplotModel,
+              pepplotTest: pepplotTest,
+              pepplotProteinSite: pepplotProteinSite,
+            },
+            false,
+          );
+          const pepplotTestMeta = pepplotTestsMetadataVar.find(
+            test => test.testID === pepplotTest,
+          );
+          const pepplotTestTooltip = pepplotTestMeta?.testDisplay || '';
+          this.setState({
+            pepplotTestTooltip,
+            uAnchorP: pepplotTest,
+          });
+          // if (pepplotProteinSite !== '') {
+          //   debugger;
+          //   this.props.onGetPlot(pepplotProteinSite, true);
+          // }
         }
       }
     }
