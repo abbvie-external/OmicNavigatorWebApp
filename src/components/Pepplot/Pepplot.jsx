@@ -110,7 +110,10 @@ class Pepplot extends Component {
   };
 
   handlePepplotSearch = searchResults => {
-    const columns = this.getConfigCols(searchResults);
+    let columns = [];
+    if (searchResults.pepplotResults?.length > 0) {
+      columns = this.getConfigCols(searchResults);
+    }
     this.setState({
       pepplotResults: searchResults.pepplotResults,
       pepplotColumns: columns,
