@@ -252,7 +252,6 @@ class PhosphoprotService {
         .catch(error => {
           toast.error(`${error.statusText}: ${error.responseText}`);
           if (handleError !== undefined) {
-            debugger;
             handleError(false);
           }
           console.log(`${error.statusText}: ${error.responseText}`);
@@ -262,7 +261,6 @@ class PhosphoprotService {
 
   async plotStudy(study, model, id, plottype, errorCb, cancelToken) {
     this.setUrl();
-    debugger;
     const promise = this.ocpuPlotCall(
       'plotStudy',
       { study: study, modelID: model, featureID: id, plotID: plottype },

@@ -76,15 +76,15 @@ class Pepplot extends Component {
     pepplotStudyMetadata: [],
     pepplotModelsAndTests: [],
     pepplotTestsMetadata: [],
-    pepplotFeatureIdKey: 'idmult',
+    pepplotFeatureIdKey: '',
   };
 
   componentDidMount() {
-    this.getTableHelpers(
-      this.getProteinData,
-      this.getPlot,
-      this.state.selectedFromTableData,
-    );
+    // this.getTableHelpers(
+    //   this.getProteinData,
+    //   this.getPlot,
+    //   this.state.selectedFromTableData,
+    // );
   }
 
   componentDidUpdate = (prevProps, prevState) => {
@@ -114,10 +114,15 @@ class Pepplot extends Component {
   };
 
   setStudyModelTestMetadata = (studyData, modelsAndTests) => {
-    this.setState({
-      pepplotStudyMetadata: studyData,
-      pepplotModelsAndTests: modelsAndTests,
-    });
+    this.setState(
+      {
+        pepplotStudyMetadata: studyData,
+        pepplotModelsAndTests: modelsAndTests,
+      },
+      function() {
+        this.handlePlotTypes(this.props.pepplotModel);
+      },
+    );
   };
 
   setTestsMetadata = testsData => {
@@ -150,18 +155,20 @@ class Pepplot extends Component {
       selectedFromTableData: [],
     });
   };
-  handleSearchCriteriaChange = (changes, scChange) => {
-    if (changes.pepplotModel !== '') {
+  handlePlotTypes = pepplotModel => {
+    if (pepplotModel !== '') {
       if (this.state.pepplotStudyMetadata.plots != null) {
         const pepplotModelData = this.state.pepplotStudyMetadata.plots.find(
-          model => model.modelID === changes.pepplotModel,
+          model => model.modelID === pepplotModel,
         );
         this.setState({
           pepplotPlotTypes: pepplotModelData.plots,
         });
       }
     }
-
+  };
+  handleSearchCriteriaChange = (changes, scChange) => {
+    this.handlePlotTypes(changes.pepplotModel);
     this.props.onSearchCriteriaToTop(changes, 'pepplot');
     this.setState({
       visible: false,
@@ -346,7 +353,7 @@ class Pepplot extends Component {
     proteinToHighlightInDiffTable,
   ) => {
     let addParams = {};
-    const { pepplotFeatureIdKey } = this.state;
+    // const { pepplotFeatureIdKey } = this.state;
     if (
       proteinToHighlightInDiffTable.length > 0 &&
       proteinToHighlightInDiffTable != null
@@ -370,14 +377,14 @@ class Pepplot extends Component {
       };
     };
 
-    addParams.showPlot = (pepplotModel, dataItem) => {
+    addParams.showPlot = (dataItem, alphanumericTrigger) => {
       return function() {
         let imageInfo = { key: '', title: '', svg: [] };
         imageInfo.title =
-          'Protein Intensity - ' + dataItem[pepplotFeatureIdKey];
-        imageInfo.key = dataItem[pepplotFeatureIdKey];
+          'Protein Intensity - ' + dataItem[alphanumericTrigger];
+        imageInfo.key = dataItem[alphanumericTrigger];
         getProteinDataCb(
-          dataItem[pepplotFeatureIdKey],
+          dataItem[alphanumericTrigger],
           dataItem,
           getPlotCb,
           imageInfo,
@@ -386,6 +393,7 @@ class Pepplot extends Component {
     };
     this.setState({ additionalTemplateInfoPepplotTable: addParams });
   };
+
   getPlot = (
     id,
     pepplotPlotTypes,
@@ -399,14 +407,12 @@ class Pepplot extends Component {
     // keep whatever dimension is less (height or width)
     // then multiply the other dimension by original svg ratio (height 595px, width 841px)
     // let PepplotPlotSVGHeight = this.calculateHeight(this);
-    let PepplotPlotSVGWidth = this.calculateWidth();
+    let PepplotPlotSVGWidth = this.calculateWidth() * 0.7;
     // if (PepplotPlotSVGHeight > PepplotPlotSVGWidth) {
     let PepplotPlotSVGHeight = PepplotPlotSVGWidth * 0.70749;
     // } else {
     //   PepplotPlotSVGWidth = PepplotPlotSVGHeight * 1.41344;
     // }
-    debugger;
-
     let handleItemSelectedCb = this.handleItemSelected;
     cancelRequestPepplotResultsGetPlot();
     let cancelToken = new CancelToken(e => {
@@ -614,7 +620,7 @@ class Pepplot extends Component {
   };
   getConfigCols = testData => {
     const pepResults = testData.pepplotResults;
-    const { pepplotModel } = this.props;
+    // const { pepplotModel } = this.props;
     const TableValuePopupStyle = {
       backgroundColor: '2E2E2E',
       borderBottom: '2px solid var(--color-primary)',
@@ -637,7 +643,14 @@ class Pepplot extends Component {
       }
     }
     const alphanumericTrigger = pepplotAlphanumericFields[0];
-    this.setState({ pepplotFeatureIdKey: alphanumericTrigger });
+    this.setState(
+      { pepplotFeatureIdKey: alphanumericTrigger },
+      this.getTableHelpers(
+        this.getProteinData,
+        this.getPlot,
+        this.state.selectedFromTableData,
+      ),
+    );
     const pepplotAlphanumericColumnsMapped = pepplotAlphanumericFields.map(
       f => {
         return {
@@ -652,7 +665,7 @@ class Pepplot extends Component {
                     trigger={
                       <span
                         className="TableCellLink"
-                        onClick={addParams.showPlot(pepplotModel, item)}
+                        onClick={addParams.showPlot(item, alphanumericTrigger)}
                       >
                         {splitValue(value)}
                       </span>

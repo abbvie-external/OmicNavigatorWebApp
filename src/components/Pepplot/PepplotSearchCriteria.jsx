@@ -182,7 +182,6 @@ class PepplotSearchCriteria extends Component {
           uDataP: uDataPMapped,
         });
         this.props.onSetTestsMetadata(pepplotTestsMetadataVar);
-
         if (pepplotTest !== '') {
           onSearchCriteriaChange(
             {
