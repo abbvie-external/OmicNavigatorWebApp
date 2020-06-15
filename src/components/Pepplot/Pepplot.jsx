@@ -56,9 +56,9 @@ class Pepplot extends Component {
       title: '',
       svg: [],
     },
-    treeDataRaw: [],
-    treeData: [],
-    treeDataColumns: [],
+    // treeDataRaw: [],
+    // treeData: [],
+    // treeDataColumns: [],
     activeSVGTabIndex: 0,
     multisetPlotAvailable: false,
     animation: 'uncover',
@@ -155,6 +155,7 @@ class Pepplot extends Component {
       selectedFromTableData: [],
     });
   };
+
   handlePlotTypes = pepplotModel => {
     if (pepplotModel !== '') {
       if (this.state.pepplotStudyMetadata.plots != null) {
@@ -168,7 +169,6 @@ class Pepplot extends Component {
     }
   };
   handleSearchCriteriaChange = (changes, scChange) => {
-    this.handlePlotTypes(changes.pepplotModel);
     this.props.onSearchCriteriaToTop(changes, 'pepplot');
     this.setState({
       visible: false,
@@ -217,75 +217,41 @@ class Pepplot extends Component {
     });
   };
   getProteinData = (id, dataItem, getPlotCb, imageInfo) => {
+    const { pepplotFeatureIdKey } = this.state;
     this.setState({
       imageInfo: imageInfo,
       isItemSelected: true,
       isProteinSVGLoaded: false,
       // isProteinDataLoaded: false,
-      treeDataRaw: [],
-      treeData: [],
-      treeDataColumns: [],
+      // treeDataRaw: [],
+      // treeData: [],
+      // treeDataColumns: [],
       currentSVGs: [],
     });
-    const ProteinSiteVar = firstValue(dataItem.Protein_Site, true);
+    // const ProteinSiteVar = firstValue(dataItem.Protein_Site, true);
+    debugger;
     this.handleSearchCriteriaChange(
       {
         pepplotStudy: this.props.pepplotStudy || '',
         pepplotModel: this.props.pepplotModel || '',
         pepplotTest: this.props.pepplotTest || '',
-        pepplotProteinSite: ProteinSiteVar || '',
+        pepplotProteinSite: dataItem[pepplotFeatureIdKey] || '',
+        // pepplotProteinSite: ProteinSiteVar || '',
       },
       false,
     );
-    const { pepplotModel, pepplotStudy } = this.props;
-    const { pepplotPlotTypes } = this.state;
+    // const { pepplotModel, pepplotStudy } = this.props;
+    // const { pepplotPlotTypes } = this.state;
+    // const handleSVGCb = this.handleSVG;
+    getPlotCb(id);
+    // id,
+    // pepplotPlotTypes,
+    // pepplotStudy,
+    // pepplotModel,
+    // imageInfo,
+    // handleSVGCb,
 
-    // let plotType = ['splineplot'];
-    // switch (pepplotModel) {
-    //   case 'DonorDifferentialPhosphorylation':
-    //     plotType = ['dotplot'];
-    //     break;
-    //   case 'TreatmentDifferentialPhosphorylation':
-    //     plotType = ['splineplot'];
-    //     break;
-    //   case 'Treatment and or Strain Differential Phosphorylation':
-    //     plotType = ['StrainStimDotplot', 'StimStrainDotplot'];
-    //     break;
-    //   case 'Timecourse Differential Phosphorylation':
-    //     plotType = ['splineplot', 'lineplot'];
-    //     break;
-    //   case 'Differential Expression':
-    //     if (pepplotStudy === '***REMOVED***') {
-    //       plotType = ['proteinlineplot'];
-    //     } else {
-    //       plotType = ['proteindotplot'];
-    //     }
-    //     break;
-    //   case 'Differential Phosphorylation':
-    //     if (pepplotStudy === '***REMOVED***') {
-    //       plotType = ['proteinlineplot'];
-    //     } else {
-    //       plotType = ['proteindotplot'];
-    //     }
-    //     break;
-    //   case 'No Pretreatment Timecourse Differential Phosphorylation':
-    //     plotType = ['splineplot.modelII', 'lineplot.modelII'];
-    //     break;
-    //   case 'Ferrostatin Pretreatment Timecourse Differential Phosphorylation':
-    //     plotType = ['splineplot.modelIII', 'lineplot.modelIII'];
-    //     break;
-    //   default:
-    //     plotType = ['dotplot'];
-    // }
-    const handleSVGCb = this.handleSVG;
-    getPlotCb(
-      id,
-      pepplotPlotTypes,
-      pepplotStudy,
-      pepplotModel,
-      imageInfo,
-      handleSVGCb,
-    );
+    // LEAVE - will use when we add Tree Data / Accordion back in
     // if (pepplotModel !== 'Differential Expression') {
     //   phosphoprotService
     //     .getSiteData(id, pepplotStudy + 'plots')
@@ -353,14 +319,15 @@ class Pepplot extends Component {
     proteinToHighlightInDiffTable,
   ) => {
     let addParams = {};
-    // const { pepplotFeatureIdKey } = this.state;
+    const { pepplotFeatureIdKey } = this.state;
     if (
       proteinToHighlightInDiffTable.length > 0 &&
       proteinToHighlightInDiffTable != null
     ) {
       addParams.rowHighlightOther = [];
       proteinToHighlightInDiffTable.forEach(element => {
-        addParams.rowHighlightOther.push(element.Protein_Site);
+        // addParams.rowHighlightOther.push(element.Protein_Site);
+        addParams.rowHighlightOther.push(element[pepplotFeatureIdKey]);
       });
     }
     addParams.showPhosphositePlus = dataItem => {
@@ -394,92 +361,116 @@ class Pepplot extends Component {
     this.setState({ additionalTemplateInfoPepplotTable: addParams });
   };
 
-  getPlot = (
-    id,
-    pepplotPlotTypes,
-    pepplotStudy,
-    pepplotModel,
-    imageInfo,
-    handleSVGCb,
-  ) => {
-    // let self = this;
-    let currentSVGs = [];
-    // keep whatever dimension is less (height or width)
-    // then multiply the other dimension by original svg ratio (height 595px, width 841px)
-    // let PepplotPlotSVGHeight = this.calculateHeight(this);
-    let PepplotPlotSVGWidth = this.calculateWidth() * 0.7;
-    // if (PepplotPlotSVGHeight > PepplotPlotSVGWidth) {
-    let PepplotPlotSVGHeight = PepplotPlotSVGWidth * 0.70749;
-    // } else {
-    //   PepplotPlotSVGWidth = PepplotPlotSVGHeight * 1.41344;
-    // }
-    let handleItemSelectedCb = this.handleItemSelected;
-    cancelRequestPepplotResultsGetPlot();
-    let cancelToken = new CancelToken(e => {
-      cancelRequestPepplotResultsGetPlot = e;
-    });
-    if (pepplotPlotTypes.length > 0) {
-      _.forEach(pepplotPlotTypes, function(plot, i) {
-        phosphoprotService
-          .plotStudy(
-            pepplotStudy,
-            pepplotModel,
-            id,
-            pepplotPlotTypes[i].plotID,
-            handleItemSelectedCb,
-            cancelToken,
-          )
-          .then(svgMarkupObj => {
-            let svgMarkup = svgMarkupObj.data;
-            svgMarkup = svgMarkup.replace(/id="/g, 'id="' + id + '-' + i + '-');
-            svgMarkup = svgMarkup.replace(
-              /#glyph/g,
-              '#' + id + '-' + i + '-glyph',
-            );
-            svgMarkup = svgMarkup.replace(
-              /#clip/g,
-              '#' + id + '-' + i + '-clip',
-            );
-            svgMarkup = svgMarkup.replace(
-              /<svg/g,
-              `<svg preserveAspectRatio="xMinYMin meet" style="width:${PepplotPlotSVGWidth}px" height:${PepplotPlotSVGHeight} id="currentSVG-${id}-${i}"`,
-            );
-            DOMPurify.addHook('afterSanitizeAttributes', function(node) {
-              if (
-                node.hasAttribute('xlink:href') &&
-                !node.getAttribute('xlink:href').match(/^#/)
-              ) {
-                node.remove();
-              }
-            });
-            // Clean HTML string and write into our DIV
-            let sanitizedSVG = DOMPurify.sanitize(svgMarkup, {
-              ADD_TAGS: ['use'],
-            });
-            let svgInfo = { plotType: pepplotPlotTypes[i], svg: sanitizedSVG };
+  getPlot = featureId =>
+    // id
+    // pepplotPlotTypes,
+    // pepplotStudy,
+    // pepplotModel,
+    // imageInfo,
+    // handleSVGCb,
+    {
+      debugger;
+      // test this state
+      const { pepplotFeatureIdKey, pepplotPlotTypes } = this.state;
+      const { pepplotStudy, pepplotModel, pepplotProteinSite } = this.props;
+      let id = featureId != null ? featureId : pepplotProteinSite;
+      // let id = pepplotProteinSite;
+      // pepplotPlotTypes,
+      // pepplotStudy,
+      // pepplotModel,
+      // imageInfo,
+      // handleSVGCb,
+      let imageInfo = { key: '', title: '', svg: [] };
+      imageInfo.title = 'Protein Intensity - ' + pepplotFeatureIdKey;
+      imageInfo.key = pepplotFeatureIdKey;
+      let handleSVGCb = this.handleSVG;
 
-            // we want spline plot in zero index, rather than lineplot
-            // if (i === 0) {
-            imageInfo.svg.push(svgInfo);
-            currentSVGs.push(sanitizedSVG);
-            // } else {
-            // imageInfo.svg.unshift(svgInfo);
-            // currentSVGs.unshift(sanitizedSVG);
-            // }
-            handleSVGCb(imageInfo);
-          })
-          .catch(error => {
-            this.handleItemSelected(false);
-          });
+      // let self = this;
+      let currentSVGs = [];
+      // keep whatever dimension is less (height or width)
+      // then multiply the other dimension by original svg ratio (height 595px, width 841px)
+      // let PepplotPlotSVGHeight = this.calculateHeight(this);
+      let PepplotPlotSVGWidth = this.calculateWidth() * 0.7;
+      // if (PepplotPlotSVGHeight > PepplotPlotSVGWidth) {
+      let PepplotPlotSVGHeight = PepplotPlotSVGWidth * 0.70749;
+      // } else {
+      //   PepplotPlotSVGWidth = PepplotPlotSVGHeight * 1.41344;
+      // }
+      let handleItemSelectedCb = this.handleItemSelected;
+      cancelRequestPepplotResultsGetPlot();
+      let cancelToken = new CancelToken(e => {
+        cancelRequestPepplotResultsGetPlot = e;
       });
-    }
-  };
+      if (pepplotPlotTypes.length > 0) {
+        _.forEach(pepplotPlotTypes, function(plot, i) {
+          phosphoprotService
+            .plotStudy(
+              pepplotStudy,
+              pepplotModel,
+              id,
+              pepplotPlotTypes[i].plotID,
+              handleItemSelectedCb,
+              cancelToken,
+            )
+            .then(svgMarkupObj => {
+              let svgMarkup = svgMarkupObj.data;
+              svgMarkup = svgMarkup.replace(
+                /id="/g,
+                'id="' + id + '-' + i + '-',
+              );
+              svgMarkup = svgMarkup.replace(
+                /#glyph/g,
+                '#' + id + '-' + i + '-glyph',
+              );
+              svgMarkup = svgMarkup.replace(
+                /#clip/g,
+                '#' + id + '-' + i + '-clip',
+              );
+              svgMarkup = svgMarkup.replace(
+                /<svg/g,
+                `<svg preserveAspectRatio="xMinYMin meet" style="width:${PepplotPlotSVGWidth}px" height:${PepplotPlotSVGHeight} id="currentSVG-${id}-${i}"`,
+              );
+              DOMPurify.addHook('afterSanitizeAttributes', function(node) {
+                if (
+                  node.hasAttribute('xlink:href') &&
+                  !node.getAttribute('xlink:href').match(/^#/)
+                ) {
+                  node.remove();
+                }
+              });
+              // Clean HTML string and write into our DIV
+              let sanitizedSVG = DOMPurify.sanitize(svgMarkup, {
+                ADD_TAGS: ['use'],
+              });
+              let svgInfo = {
+                plotType: pepplotPlotTypes[i],
+                svg: sanitizedSVG,
+              };
+
+              // we want spline plot in zero index, rather than lineplot
+              // if (i === 0) {
+              imageInfo.svg.push(svgInfo);
+              currentSVGs.push(sanitizedSVG);
+              // } else {
+              // imageInfo.svg.unshift(svgInfo);
+              // currentSVGs.unshift(sanitizedSVG);
+              // }
+              debugger;
+              handleSVGCb(imageInfo);
+            })
+            .catch(error => {
+              this.handleItemSelected(false);
+            });
+        });
+      }
+    };
   getProteinPageFromUrl = (
     getProteinDataCb,
     getPlotCb,
     pepplotModel,
     dataItem,
   ) => {
+    debugger;
     let imageInfo = { key: '', title: '', svg: [] };
     imageInfo.title =
       'Protein Intensity - ' + dataItem[this.state.pepplotFeatureIdKey];
@@ -492,9 +483,11 @@ class Pepplot extends Component {
     );
   };
   pageToProtein = (data, proteinToHighlight, itemsPerPage) => {
+    const { pepplotFeatureIdKey } = this.state;
     if (this.pepplotGridRef?.current != null) {
       const Index = _.findIndex(data, function(p) {
-        return p.Protein_Site === proteinToHighlight;
+        return p[pepplotFeatureIdKey] === proteinToHighlight;
+        // return p.Protein_Site === proteinToHighlight;
       });
       const pageNumber = Math.ceil(Index / itemsPerPage);
       this.pepplotGridRef.current.handlePageChange(
@@ -643,6 +636,10 @@ class Pepplot extends Component {
       }
     }
     const alphanumericTrigger = pepplotAlphanumericFields[0];
+    console.log(alphanumericTrigger);
+    console.log(this.state.pepplotFeatureIdKey);
+    console.log(this.state.pepplotPlotTypes);
+    console.log(this.props.pepplotProteinSite);
     this.setState(
       { pepplotFeatureIdKey: alphanumericTrigger },
       this.getTableHelpers(
@@ -931,6 +928,7 @@ class Pepplot extends Component {
               onMultisetQueried={this.handleMultisetQueried}
               onSetStudyModelTestMetadata={this.setStudyModelTestMetadata}
               onSetTestsMetadata={this.setTestsMetadata}
+              onHandlePlotTypes={this.handlePlotTypes}
             />
           </Grid.Column>
           <Grid.Column

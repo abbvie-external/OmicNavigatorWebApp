@@ -158,8 +158,8 @@ class PepplotSearchCriteria extends Component {
         pepplotModelsDisabled: false,
         pepplotModels: pepplotModelsMapped,
       });
-
       if (pepplotModel !== '') {
+        this.props.onHandlePlotTypes(pepplotModel);
         const pepplotModelWithTests = pepplotModelsAndTestsVar.find(
           model => model.modelID === pepplotModel,
         );
@@ -253,6 +253,7 @@ class PepplotSearchCriteria extends Component {
       onSearchCriteriaChange,
       onSearchCriteriaReset,
     } = this.props;
+    this.props.onHandlePlotTypes(value);
     onSearchCriteriaChange(
       {
         pepplotStudy: pepplotStudy,
