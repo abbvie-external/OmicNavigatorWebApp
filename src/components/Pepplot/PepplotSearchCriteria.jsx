@@ -560,11 +560,11 @@ class PepplotSearchCriteria extends Component {
       reloadPlotP,
       sigValueP,
       selectedColP,
+      pepplotTests,
     } = this.state;
     const eMustP = this.state.uSettingsP.mustP;
     const eNotP = this.state.uSettingsP.notP;
-
-    if (reloadPlotP === true) {
+    if (reloadPlotP === true && pepplotTests.length > 1) {
       onDisablePlot();
       this.getMultisetPlot(
         sigValueP,
