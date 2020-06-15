@@ -259,11 +259,11 @@ class PhosphoprotService {
     });
   }
 
-  async getPlot(id, plottype, study, errorCb, cancelToken) {
+  async plotStudy(study, model, id, plottype, errorCb, cancelToken) {
     this.setUrl();
     const promise = this.ocpuPlotCall(
-      plottype,
-      { idmult: id, study: study },
+      'plotStudy',
+      { study: study, modelID: model, featureID: id, plotID: plottype },
       errorCb,
       cancelToken,
     );
