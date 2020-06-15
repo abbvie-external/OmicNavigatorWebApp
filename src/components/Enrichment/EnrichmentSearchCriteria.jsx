@@ -67,8 +67,8 @@ class EnrichmentSearchCriteria extends Component {
       not: [],
       displayMetaData: true,
       templateName: 'enrichment-multiset',
-      numElements: undefined,
-      maxElements: undefined,
+      numElements: 0,
+      maxElements: 0,
       metaSvg: '',
       heightScalar: 1,
       thresholdCols: [
@@ -96,6 +96,7 @@ class EnrichmentSearchCriteria extends Component {
     enrichmentStudyMetadata: [],
     enrichmentModelsAndAnnotations: [],
     enrichmentAnnotationsMeta: [],
+    reloadPlot: true,
   };
 
   componentDidMount() {
@@ -514,7 +515,7 @@ class EnrichmentSearchCriteria extends Component {
         // on toggle close
         this.setState({
           multisetFiltersVisible: false,
-          reloadPlotP: false,
+          reloadPlot: false,
         });
         const enrichmentAnnotationName = 'enrichmentAnnotation';
         const enrichmentAnnotationVar = this.props.enrichmentAnnotation;
@@ -685,20 +686,22 @@ class EnrichmentSearchCriteria extends Component {
       pValueType,
       onEnrichmentSearch,
       onDisablePlot,
+      // tests,
     } = this.props;
+    const { reloadPlot } = this.state;
     onDisablePlot();
     const eSigV = this.state.sigValue;
     const eMust = this.state.uSettings.must;
     const eNot = this.state.uSettings.not;
     const eOperator = this.state.selectedOperator;
-    this.getMultisetPlot(
-      eSigV,
-      enrichmentModel,
-      enrichmentStudy,
-      enrichmentAnnotation,
-      this.jsonToList(eOperator),
-      pValueType,
-    );
+    // this.getMultisetPlot(
+    //   eSigV,
+    //   enrichmentModel,
+    //   enrichmentStudy,
+    //   enrichmentAnnotation,
+    //   this.jsonToList(eOperator),
+    //   pValueType,
+    // );
     cancelRequestMultisetEnrichmentData();
     let cancelToken = new CancelToken(e => {
       cancelRequestMultisetEnrichmentData = e;
@@ -717,6 +720,26 @@ class EnrichmentSearchCriteria extends Component {
         cancelToken,
       )
       .then(annotationData => {
+        let countAlphanumericFields = [];
+        const firstObject = annotationData[0];
+        const totalLength = Object.keys(firstObject).length;
+        for (let [key, value] of Object.entries(firstObject)) {
+          if (typeof value === 'string' || value instanceof String) {
+            countAlphanumericFields.push(key);
+          }
+        }
+        const alphanumericLength = countAlphanumericFields.length;
+        const annotationTestsLength = totalLength - alphanumericLength;
+        if (reloadPlot === true && annotationTestsLength > 1) {
+          this.getMultisetPlot(
+            eSigV,
+            enrichmentModel,
+            enrichmentStudy,
+            enrichmentAnnotation,
+            this.jsonToList(eOperator),
+            pValueType,
+          );
+        }
         const multisetResults = annotationData;
         this.setState({
           uSettings: {
