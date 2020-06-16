@@ -488,6 +488,10 @@ class EnrichmentSearchCriteria extends Component {
             },
             activateMultisetFilters: true,
           });
+          this.props.onFilterNetworkFromUpset({
+            must: eMust,
+            not: eNot,
+          });
           onEnrichmentSearch({
             enrichmentResults: multisetResults,
           });
@@ -751,6 +755,10 @@ class EnrichmentSearchCriteria extends Component {
           },
           activateMultisetFilters: true,
         });
+        this.props.onFilterNetworkFromUpset({
+          must: eMust,
+          not: eNot,
+        });
         onEnrichmentSearch({
           enrichmentResults: multisetResults,
         });
@@ -856,7 +864,6 @@ class EnrichmentSearchCriteria extends Component {
       multisetPlotAvailable,
       plotButtonActive,
       isTestDataLoaded,
-      activeIndexEnrichmentView,
     } = this.props;
 
     const StudyPopupStyle = {
@@ -916,8 +923,7 @@ class EnrichmentSearchCriteria extends Component {
     if (
       isValidSearchEnrichment &&
       activateMultisetFilters &&
-      multisetFiltersVisible &&
-      activeIndexEnrichmentView === 0
+      multisetFiltersVisible
     ) {
       EMultisetFilters = (
         <EnrichmentMultisetFilters
@@ -936,7 +942,7 @@ class EnrichmentSearchCriteria extends Component {
     let PlotRadio;
     let MultisetRadio;
 
-    if (isValidSearchEnrichment && activeIndexEnrichmentView === 0) {
+    if (isValidSearchEnrichment) {
       PlotRadio = (
         <Transition
           visible={!multisetPlotAvailable}

@@ -66,21 +66,21 @@ class BarcodePlotReact extends Component {
         .attr('y1', self.state.settings.margin.selected)
         .classed('HighlightedLine', false);
       if (self.props.HighlightedProteins.length > 0) {
-        const HighlightedProteins = self.props.HighlightedProteins.slice(1);
+        // might need this splice, forgot why it's there
+        // const HighlightedProteins = self.props.HighlightedProteins.slice(1);
+        const HighlightedProteins = self.props.HighlightedProteins;
         HighlightedProteins.forEach(element => {
-          const lineId = `${element.sample.replace(/;/g, '')}_${
-            element.id_mult
-          }`;
+          // const lineId = `${element.sample.replace(/;/g, '')}_${
+          //   element.id_mult
+          // }`;
+          const lineId = `${element.id_mult}`;
           const highlightedLine = d3.select(`#barcode-line-${lineId}`);
           highlightedLine
             .classed('HighlightedLine', true)
             .attr('y1', self.state.settings.margin.highlighted);
         });
         if (self.props.HighlightedProteins[0]?.sample !== '') {
-          const maxLineId = `${self.props.HighlightedProteins[0]?.sample.replace(
-            /;/g,
-            '',
-          )}_${self.props.HighlightedProteins[0].id_mult}`;
+          const maxLineId = `${self.props.HighlightedProteins[0]?.id_mult}`;
           const maxLine = d3.select(`#barcode-line-${maxLineId}`);
           maxLine
             .classed('MaxLine', true)
@@ -511,7 +511,6 @@ class BarcodePlotReact extends Component {
         </text>
       </g>
     ));
-    debugger;
 
     const barcodeLines = barcodeSettings.barcodeData.map(d => (
       <line

@@ -64,6 +64,7 @@ class Enrichment extends Component {
       links: [],
       tests: [],
     },
+    filterNetworkFromUpset: [],
     networkDataLoaded: false,
     networkGraphReady: false,
     networkDataError: false,
@@ -80,7 +81,7 @@ class Enrichment extends Component {
     networkSettings: {
       facets: {},
       propLabel: {},
-      metaLabels: ['Description', 'Ontology'],
+      metaLabels: ['description', 'termID'],
       meta: ['description', 'termID'],
       facetAndValueLabel: ['Test', 'pValue'],
       nodeLabel: 'description',
@@ -563,6 +564,10 @@ class Enrichment extends Component {
     return configCols;
   };
 
+  filterNetworkFromUpset = upsetTestsObj => {
+    // TBC if we handle upset test filtering on FE...
+  };
+
   getNetworkData = () => {
     this.removeNetworkSVG();
     const {
@@ -675,13 +680,11 @@ class Enrichment extends Component {
     if (changes.brushedData.length > 0) {
       const boxPlotArray = _.map(changes.brushedData, function(d) {
         d.statistic = _.find(self.state.barcodeSettings.barcodeData, {
-          lineID: d.lineID,
-          id_mult: d.id_mult,
+          featureID: d.lineID,
         }).statistic;
         d.logFC = _.find(self.state.barcodeSettings.barcodeData, {
-          lineID: d.lineID,
-          id_mult: d.id_mult,
-        }).logFC;
+          featureID: d.lineID,
+        }).logFoldChange;
         return d;
       });
 
@@ -1076,7 +1079,6 @@ class Enrichment extends Component {
       .pie()
       .sort(null)
       .value(1);
-    pie = 1;
     let arc = d3
       .arc()
       .outerRadius(radius)
@@ -1786,6 +1788,7 @@ class Enrichment extends Component {
               onDisablePlot={this.disablePlot}
               onGetMultisetPlot={this.handleMultisetPlot}
               onHandlePlotAnimation={this.handlePlotAnimation}
+              onFilterNetworkFromUpset={this.filterNetworkFromUpset}
             />
           </Grid.Column>
           <Grid.Column
