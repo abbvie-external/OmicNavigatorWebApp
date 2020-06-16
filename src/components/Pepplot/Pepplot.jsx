@@ -228,7 +228,7 @@ class Pepplot extends Component {
       // treeDataColumns: [],
       currentSVGs: [],
     });
-    // const ProteinSiteVar = firstValue(dataItem.Protein_Site, true);
+    // const ProteinSiteVar = firstValue(dataItem[pepplotFeatureIdKey], true);
     this.handleSearchCriteriaChange(
       {
         pepplotStudy: this.props.pepplotStudy || '',
@@ -316,9 +316,10 @@ class Pepplot extends Component {
     getProteinDataCb,
     getPlotCb,
     proteinToHighlightInDiffTable,
+    pepplotFeatureIdKeyVar,
   ) => {
     let addParams = {};
-    const { pepplotFeatureIdKey } = this.state;
+    // const { pepplotFeatureIdKey } = this.state;
     if (
       proteinToHighlightInDiffTable.length > 0 &&
       proteinToHighlightInDiffTable != null
@@ -326,16 +327,21 @@ class Pepplot extends Component {
       addParams.rowHighlightOther = [];
       proteinToHighlightInDiffTable.forEach(element => {
         // addParams.rowHighlightOther.push(element.Protein_Site);
-        addParams.rowHighlightOther.push(element[pepplotFeatureIdKey]);
+        addParams.rowHighlightOther.push(element[pepplotFeatureIdKeyVar]);
       });
     }
     addParams.showPhosphositePlus = dataItem => {
+      debugger;
+      let protein = dataItem.symbol
+        ? dataItem.symbol
+        : dataItem[pepplotFeatureIdKeyVar];
       return function() {
-        var protein = (dataItem.Protein
-          ? dataItem.Protein
-          : dataItem.MajorityProteinIDsHGNC
-        ).split(';')[0];
-        let param = { proteinNames: protein, queryId: -1, from: 0 };
+        debugger;
+        const param = {
+          proteinNames: protein,
+          queryId: -1,
+          from: 0,
+        };
         phosphoprotService.postToPhosphositePlus(
           param,
           'https://www.phosphosite.org/proteinSearchSubmitAction.action',
@@ -363,6 +369,7 @@ class Pepplot extends Component {
   getPlot = featureId => {
     const { pepplotFeatureIdKey, pepplotPlotTypes } = this.state;
     const { pepplotStudy, pepplotModel, pepplotProteinSite } = this.props;
+    debugger;
     let id = featureId != null ? featureId : pepplotProteinSite;
     let imageInfo = { key: '', title: '', svg: [] };
     imageInfo.title = `Protein Intensity - ${pepplotFeatureIdKey} ${featureId}`;
@@ -608,6 +615,7 @@ class Pepplot extends Component {
         this.getProteinData,
         this.getPlot,
         this.state.selectedFromTableData,
+        alphanumericTrigger,
       ),
     );
     const pepplotAlphanumericColumnsMapped = pepplotAlphanumericFields.map(
