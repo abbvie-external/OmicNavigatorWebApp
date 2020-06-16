@@ -220,7 +220,6 @@ class PepplotSearchCriteria extends Component {
             uAnchorP: pepplotTest,
           });
           // if (pepplotProteinSite !== '') {
-          //   debugger;
           //   this.props.onGetPlot(pepplotProteinSite, true);
           // }
         }

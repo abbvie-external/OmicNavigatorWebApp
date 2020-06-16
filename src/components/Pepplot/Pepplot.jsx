@@ -229,7 +229,6 @@ class Pepplot extends Component {
       currentSVGs: [],
     });
     // const ProteinSiteVar = firstValue(dataItem.Protein_Site, true);
-    debugger;
     this.handleSearchCriteriaChange(
       {
         pepplotStudy: this.props.pepplotStudy || '',
@@ -436,7 +435,6 @@ class Pepplot extends Component {
             // imageInfo.svg.unshift(svgInfo);
             // currentSVGs.unshift(sanitizedSVG);
             // }
-            debugger;
             handleSVGCb(imageInfo);
           })
           .catch(error => {
@@ -708,7 +706,6 @@ class Pepplot extends Component {
       pepplotNumericColumnsMapped,
     );
     if (pepplotProteinSite !== '') {
-      debugger;
       let imageInfo = { key: '', title: '', svg: [] };
       imageInfo.title = `Protein Intensity - ${alphanumericTrigger} ${pepplotProteinSite}`;
       imageInfo.key = `${alphanumericTrigger} ${pepplotProteinSite}`;

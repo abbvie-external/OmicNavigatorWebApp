@@ -58,6 +58,7 @@ class BarcodePlotReact extends Component {
     }
     // Much of this code can be refactored into a function, as it is used below.
     if (self.props.HighlightedProteins !== prevProps.HighlightedProteins) {
+      debugger;
       d3.selectAll(`.MaxLine`)
         .attr('y1', self.state.settings.margin.selected)
         .classed('MaxLine', false);
@@ -163,6 +164,7 @@ class BarcodePlotReact extends Component {
   };
 
   handleLineEnter = event => {
+    debugger;
     // if (this.state.settings.brushing === false) {
     const lineIdMult = event.target.attributes[6].nodeValue;
     const lineName = event.target.attributes[7].nodeValue;
@@ -509,19 +511,31 @@ class BarcodePlotReact extends Component {
         </text>
       </g>
     ));
+    debugger;
 
     const barcodeLines = barcodeSettings.barcodeData.map(d => (
       <line
-        id={`barcode-line-${d.lineID.replace(/;/g, '')}_${d.id_mult}`}
+        // id={`barcode-line-${d.lineID.replace(/;/g, '')}_${d.id_mult}`}
+        // className="barcode-line"
+        // key={`${d.lineID}_${d.id_mult}`}
+        // x1={xScale(d.statistic) + settings.margin.left}
+        // x2={xScale(d.statistic) + settings.margin.left}
+        // y1={settings.margin.top}
+        // y2={barcodeHeight}
+        // id_mult={d.id_mult}
+        // lineid={d.lineID}
+        // logfc={d.logFC}
+        // statistic={d.statistic}
+        id={`barcode-line-${d.featureID}`}
         className="barcode-line"
-        key={`${d.lineID}_${d.id_mult}`}
+        key={`${d.featureID}`}
         x1={xScale(d.statistic) + settings.margin.left}
         x2={xScale(d.statistic) + settings.margin.left}
         y1={settings.margin.top}
         y2={barcodeHeight}
-        id_mult={d.id_mult}
-        lineid={d.lineID}
-        logfc={d.logFC}
+        id_mult={d.featureID}
+        lineid={d.featureID}
+        logfc={d.logFoldChange}
         statistic={d.statistic}
         onClick={e => this.handleSVGClick(e)}
         onMouseEnter={e => this.handleLineEnter(e)}

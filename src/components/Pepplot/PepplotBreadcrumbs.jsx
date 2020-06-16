@@ -8,7 +8,6 @@ class PepplotBreadcrumbs extends Component {
 
   render() {
     const name = this.props.imageInfo.key;
-    debugger;
     const BreadcrumbPopupStyle = {
       backgroundColor: '2E2E2E',
       borderBottom: '2px solid var(--color-primary)',
