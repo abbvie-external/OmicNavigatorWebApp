@@ -331,12 +331,10 @@ class Pepplot extends Component {
       });
     }
     addParams.showPhosphositePlus = dataItem => {
-      debugger;
       let protein = dataItem.symbol
         ? dataItem.symbol
         : dataItem[pepplotFeatureIdKeyVar];
       return function() {
-        debugger;
         const param = {
           proteinNames: protein,
           queryId: -1,
@@ -369,7 +367,6 @@ class Pepplot extends Component {
   getPlot = featureId => {
     const { pepplotFeatureIdKey, pepplotPlotTypes } = this.state;
     const { pepplotStudy, pepplotModel, pepplotProteinSite } = this.props;
-    debugger;
     let id = featureId != null ? featureId : pepplotProteinSite;
     let imageInfo = { key: '', title: '', svg: [] };
     imageInfo.title = `Protein Intensity - ${pepplotFeatureIdKey} ${featureId}`;

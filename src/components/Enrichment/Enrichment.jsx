@@ -180,14 +180,13 @@ class Enrichment extends Component {
         const AllDescriptionsAndTests = this.state.enrichmentResults;
         const ResultsLength = this.state.enrichmentResults.length;
         if (ResultsLength > 0) {
-          debugger;
           const dataItemDescription = getDataItemDescription(
             DescriptionAndTest,
           );
           const dataItemIndex = _.findIndex(AllDescriptionsAndTests, function(
             d,
           ) {
-            return d.Description === dataItemDescription;
+            return d.description === dataItemDescription;
           });
           const dataItem = AllDescriptionsAndTests[dataItemIndex];
           const test = getTestName(DescriptionAndTest);
@@ -227,7 +226,7 @@ class Enrichment extends Component {
   ) => {
     let self = this;
     testSelectedTransitionCb(true);
-    // const TestSiteVar = `${test}:${dataItem.Description}`;
+    // const TestSiteVar = `${test}:${dataItem.description}`;
     // let xLargest = 0;
     // let imageInfo = { key: '', title: '', svg: [] };
     // phosphoprotService
@@ -242,7 +241,7 @@ class Enrichment extends Component {
     //       annotationData: annotationDataParsed,
     //     });
     //     dataItem.Annotation = _.find(annotationDataParsed, {
-    //       Description: dataItem.Description,
+    //       Description: dataItem.description,
     //     }).Key;
     let term = dataItem.termID;
     self.setState({
@@ -972,15 +971,15 @@ class Enrichment extends Component {
         //stored annodationdata and won't call the service after the first time...reset it when sc changes
         // } else {
         //   dataItem.Annotation = _.find(self.state.annotationData, {
-        //     Description: dataItem.Description
+        //     Description: dataItem.description
         //   }).Key;
         //   let term = dataItem.Annotation;
 
         //   self.setState({
         //     imageInfo: {
         //       ...self.state.imageInfo,
-        //       key: `${test} : ${dataItem.Description}`,
-        //       title: `${test} : ${dataItem.Description}`
+        //       key: `${test} : ${dataItem.description}`,
+        //       title: `${test} : ${dataItem.description}`
         //     },
         //     enrichmentNameLoaded: true,
         //     enrichmentDataItem: dataItem,
@@ -1475,7 +1474,7 @@ class Enrichment extends Component {
       return e.title;
     });
     const uDataRelevantFields = _.filter(columnsArr, function(key) {
-      return key !== 'Description' && key !== 'Annotation';
+      return key !== 'description' && key !== 'Annotation';
     });
     // multiset svg rebuilds based on uData...if there are no results we need to override this from being passed down
     if (uDataRelevantFields.length !== 0) {
