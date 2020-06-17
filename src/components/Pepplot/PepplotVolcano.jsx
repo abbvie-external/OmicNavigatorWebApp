@@ -11,8 +11,10 @@ import {
   Checkbox,
   Dimmer,
   Loader,
+  GridColumn,
 } from 'semantic-ui-react';
 import './PepplotVolcano.scss';
+import SplitPane, {Pane} from 'react-split-pane';
 
 class PepplotVolcano extends Component {
   state = {
@@ -60,28 +62,17 @@ class PepplotVolcano extends Component {
   }
   getAxisLabels = () => {
     if(this.props.pepplotResults.length !== 0){
-      const configColsArr = this.props.pepplotColumns.map(e=>{return e.field});
-      this.setState({identifier:configColsArr[0]})
-      configColsArr.shift()
-      const index = configColsArr.indexOf('Set_Membership');
-      if (index > -1) {configColsArr.splice(index, 1);}
-      let relevantConfigCols = [
-        'F',
-        'logFC',
-        't',
-        'P_Value',
-        'adj_P_Val',
-        'adjPVal',
-        'adj.P.Val',
-        'P.Value',
-        'B',
-        'AveExpr'
-      ];
-      let relevantConfigColumns = _.map(
-        _.filter(configColsArr, function(d) {
-          return _.includes(relevantConfigCols, d);
-        }),
-      );
+      let pepplotAlphanumericFields = [];
+      let relevantConfigColumns = [];
+      const firstObject = this.props.pepplotResults[0];
+      for (let [key, value] of Object.entries(firstObject)) {
+        if (typeof value === 'string' || value instanceof String) {
+          pepplotAlphanumericFields.push(key);
+        } else {
+          relevantConfigColumns.push(key);
+        }
+      }
+      this.setState({identifier:pepplotAlphanumericFields[0]})
       var yLabel = relevantConfigColumns[0];
       var xLabel = relevantConfigColumns[1];
       var doY = false;
