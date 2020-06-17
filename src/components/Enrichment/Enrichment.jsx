@@ -186,7 +186,7 @@ class Enrichment extends Component {
           const dataItemIndex = _.findIndex(AllDescriptionsAndTests, function(
             d,
           ) {
-            return d.Description === dataItemDescription;
+            return d.description === dataItemDescription;
           });
           const dataItem = AllDescriptionsAndTests[dataItemIndex];
           const test = getTestName(DescriptionAndTest);
@@ -226,62 +226,54 @@ class Enrichment extends Component {
   ) => {
     let self = this;
     testSelectedTransitionCb(true);
-    // const TestSiteVar = `${test}:${dataItem.Description}`;
+    // const TestSiteVar = `${test}:${dataItem.description}`;
     // let xLargest = 0;
     // let imageInfo = { key: '', title: '', svg: [] };
+    // phosphoprotService
+    //   .getDatabaseInfo(
+    //     enrichmentStudy + 'plots',
+    //     enrichmentAnnotation,
+    //     this.handleGetDatabaseInfoError,
+    //   )
+    //   .then(annotationDataResponse => {
+    //     const annotationDataParsed = JSON.parse(annotationDataResponse);
+    //     self.setState({
+    //       annotationData: annotationDataParsed,
+    //     });
+    //     dataItem.Annotation = _.find(annotationDataParsed, {
+    //       Description: dataItem.description,
+    //     }).Key;
+    let term = dataItem.termID;
+    self.setState({
+      imageInfo: {
+        ...self.state.imageInfo,
+        key: `${test}:${dataItem.description}`,
+        title: `${test}:${dataItem.description}`,
+      },
+      enrichmentNameLoaded: true,
+      enrichmentDataItem: dataItem,
+      enrichmentTerm: term,
+    });
+
     phosphoprotService
-      .getDatabaseInfo(
-        enrichmentStudy + 'plots',
+      .getBarcodeData(
+        enrichmentStudy,
+        enrichmentModel,
+        test,
         enrichmentAnnotation,
-        this.handleGetDatabaseInfoError,
+        term,
+        this.handleGetBarcodeDataError,
       )
-      .then(annotationDataResponse => {
-        const annotationDataParsed = JSON.parse(annotationDataResponse);
-        self.setState({
-          annotationData: annotationDataParsed,
-        });
-        dataItem.Annotation = _.find(annotationDataParsed, {
-          Description: dataItem.Description,
-        }).Key;
-        let term = dataItem.Annotation;
-        self.setState({
-          imageInfo: {
-            ...self.state.imageInfo,
-            key: `${test}:${dataItem.Description}`,
-            title: `${test}:${dataItem.Description}`,
-          },
-          enrichmentNameLoaded: true,
-          enrichmentDataItem: dataItem,
-          enrichmentTerm: term,
-        });
-
-        phosphoprotService
-          .getBarcodeData(
-            enrichmentStudy + 'plots',
-            enrichmentModel,
-            enrichmentAnnotation,
-            test,
-            dataItem.Annotation,
-            this.handleGetBarcodeDataError,
-          )
-          .then(barcodeDataResponse => {
-            let BardcodeInfoObj = JSON.parse(barcodeDataResponse['object']);
-            let highest = barcodeDataResponse['highest'][0];
-            // if (!this.state.modelsToRenderViolin.includes(this.enrichmentModel)){
-            //   this.setState({ sizeVal = '0%' )};
-            // } else {
-            //   this.setState({ sizeVal = '50%')};
-            // }
-
-            showBarcodePlotCb(dataItem, BardcodeInfoObj, test, highest);
-          })
-          .catch(error => {
-            console.error('Error during getBarcodeData', error);
-          });
+      .then(barcodeDataResponse => {
+        showBarcodePlotCb(barcodeDataResponse);
       })
       .catch(error => {
-        console.error('Error during getDatabaseInfo', error);
+        console.error('Error during getBarcodeData', error);
       });
+    // })
+    // .catch(error => {
+    //   console.error('Error during getDatabaseInfo', error);
+    // });
   };
 
   handleSearchTransitionEnrichment = bool => {
@@ -663,16 +655,16 @@ class Enrichment extends Component {
     return containerWidth - violinWidth - 60;
   }
 
-  showBarcodePlot = (dataItem, barcode, test, highest) => {
+  showBarcodePlot = barcodeData => {
     this.setState({
       isTestDataLoaded: true,
       barcodeSettings: {
         ...this.state.barcodeSettings,
-        barcodeData: barcode,
-        statLabel: barcode[0].statLabel,
-        highLabel: barcode[0].highLabel,
-        lowLabel: barcode[0].lowLabel,
-        highStat: highest,
+        barcodeData: barcodeData.data,
+        statLabel: barcodeData.statLabel,
+        highLabel: barcodeData.labelHigh,
+        lowLabel: barcodeData.labelLow,
+        highStat: barcodeData.highest,
         enableBrush: true,
       },
     });
@@ -897,7 +889,7 @@ class Enrichment extends Component {
     });
   };
 
-  handleGetDatabaseInfoError = () => {
+  handleGetBarcodeDataError = () => {
     this.testSelectedTransition(false);
     this.handleSearchCriteriaChange(
       {
@@ -909,10 +901,6 @@ class Enrichment extends Component {
       false,
     );
   };
-  // redundant, may need more to this, so will wait to remove
-  handleGetBarcodeDataError = () => {
-    this.handleGetDatabaseInfoError();
-  };
 
   testSelected = (
     enrichmentStudy,
@@ -922,7 +910,7 @@ class Enrichment extends Component {
     test,
   ) => {
     this.testSelectedTransition(true);
-    const TestSiteVar = `${test}:${dataItem.Description}`;
+    const TestSiteVar = `${test}:${dataItem.description}`;
     this.handleSearchCriteriaChange(
       {
         enrichmentStudy: this.props.enrichmentStudy || '',
@@ -932,63 +920,33 @@ class Enrichment extends Component {
       },
       true,
     );
-    // let xLargest = 0;
-    // let imageInfo = { key: '', title: '', svg: [] };
-    // if (this.state.annotationData.length === 0) {
+    let term = dataItem.termID;
+    this.setState({
+      imageInfo: {
+        ...this.state.imageInfo,
+        key: `${test}:${dataItem.description}`,
+        title: `${test}:${dataItem.description}`,
+        dataItem: dataItem,
+      },
+      enrichmentNameLoaded: true,
+      enrichmentDataItem: dataItem,
+      enrichmentTerm: term,
+    });
+
     phosphoprotService
-      .getDatabaseInfo(
-        enrichmentStudy + 'plots',
+      .getBarcodeData(
+        enrichmentStudy,
+        enrichmentModel,
+        test,
         enrichmentAnnotation,
-        this.handleGetDatabaseInfoError,
+        term,
+        this.handleGetBarcodeDataError,
       )
-      .then(annotationDataResponse => {
-        const annotationDataParsed = JSON.parse(annotationDataResponse);
-        this.setState({
-          annotationData: annotationDataParsed,
-        });
-        dataItem.Annotation = _.find(annotationDataParsed, {
-          Description: dataItem.Description,
-        }).Key;
-        let term = dataItem.Annotation;
-
-        this.setState({
-          imageInfo: {
-            ...this.state.imageInfo,
-            key: `${test}:${dataItem.Description}`,
-            title: `${test}:${dataItem.Description}`,
-            dataItem: dataItem,
-          },
-          enrichmentNameLoaded: true,
-          enrichmentDataItem: dataItem,
-          enrichmentTerm: term,
-        });
-
-        phosphoprotService
-          .getBarcodeData(
-            enrichmentStudy + 'plots',
-            enrichmentModel,
-            enrichmentAnnotation,
-            test,
-            dataItem.Annotation,
-            this.handleGetBarcodeDataError,
-          )
-          .then(barcodeDataResponse => {
-            let BardcodeInfoObj = JSON.parse(barcodeDataResponse['object']);
-            let highest = barcodeDataResponse['highest'][0];
-            // if (!this.state.modelsToRenderViolin.includes(this.enrichmentModel)){
-            //   this.setState({ sizeVal = '0%' )};
-            // } else {
-            //   this.setState({ sizeVal = '50%')};
-            // }
-            this.showBarcodePlot(dataItem, BardcodeInfoObj, test, highest);
-          })
-          .catch(error => {
-            console.error('Error during getBarcodeData', error);
-          });
-        // });
+      .then(barcodeDataResponse => {
+        this.showBarcodePlot(barcodeDataResponse);
       })
       .catch(error => {
-        console.error('Error during getDatabaseInfo', error);
+        console.error('Error during getBarcodeData', error);
       });
   };
 
@@ -1013,15 +971,15 @@ class Enrichment extends Component {
         //stored annodationdata and won't call the service after the first time...reset it when sc changes
         // } else {
         //   dataItem.Annotation = _.find(self.state.annotationData, {
-        //     Description: dataItem.Description
+        //     Description: dataItem.description
         //   }).Key;
         //   let term = dataItem.Annotation;
 
         //   self.setState({
         //     imageInfo: {
         //       ...self.state.imageInfo,
-        //       key: `${test} : ${dataItem.Description}`,
-        //       title: `${test} : ${dataItem.Description}`
+        //       key: `${test} : ${dataItem.description}`,
+        //       title: `${test} : ${dataItem.description}`
         //     },
         //     enrichmentNameLoaded: true,
         //     enrichmentDataItem: dataItem,
@@ -1045,7 +1003,7 @@ class Enrichment extends Component {
         //       //   this.setState({ sizeVal = '50%')};
         //       // }
 
-        //       showBarcodePlotCb(dataItem, BardcodeInfoObj, test, highest);
+        //       showBarcodePlotCb(barcodeDataResponse);
         //     });
         // }
       };
@@ -1054,64 +1012,27 @@ class Enrichment extends Component {
     addParams.getLink = (enrichmentStudy, enrichmentAnnotation, dataItem) => {
       let self = this;
       return function() {
-        if (self.state.annotationData.length === 0) {
-          phosphoprotService
-            .getDatabaseInfo(enrichmentStudy + 'plots', enrichmentAnnotation)
-            .then(annotationDataResponse => {
-              const annotationDataParsed = JSON.parse(annotationDataResponse);
-              dataItem.Annotation = _.find(annotationDataParsed, {
-                Description: dataItem.Description,
-              }).Key;
-              const database = enrichmentAnnotation;
-              if (database === 'REACTOME') {
-                window.open(
-                  'https://reactome.org/content/detail/' + dataItem.Annotation,
-                  '_blank',
-                );
-              } else if (database.substring(0, 2) === 'GO') {
-                window.open(
-                  'http://amigo.geneontology.org/amigo/term/' +
-                    dataItem.Annotation,
-                  '_blank',
-                );
-              } else if (database.substring(0, 4) === 'msig') {
-                window.open(
-                  'http://software.broadinstitute.org/gsea/msigdb/cards/' +
-                    dataItem.Annotation,
-                  '_blank',
-                );
-              } else if (database === 'PSP') {
-                self.showPhosphositePlus('', dataItem);
-              }
-            })
-            .catch(error => {
-              console.error('Error during getDatabaseInfo', error);
-            });
-        } else {
-          dataItem.Annotation = _.find(self.state.annotationData, {
-            Description: dataItem.Description,
-          }).Key;
-          const database = enrichmentAnnotation;
-          if (database === 'REACTOME') {
-            window.open(
-              'https://reactome.org/content/detail/' + dataItem.Annotation,
-              '_blank',
-            );
-          } else if (database.substring(0, 2) === 'GO') {
-            window.open(
-              'http://amigo.geneontology.org/amigo/term/' + dataItem.Annotation,
-              '_blank',
-            );
-          } else if (database.substring(0, 4) === 'msig') {
-            window.open(
-              'http://software.broadinstitute.org/gsea/msigdb/cards/' +
-                dataItem.Annotation,
-              '_blank',
-            );
-          } else if (database === 'PSP') {
-            self.showPhosphositePlus('', dataItem);
-          }
+        const database = enrichmentAnnotation;
+        if (database === 'REACTOME') {
+          window.open(
+            'https://reactome.org/content/detail/' + dataItem.termID,
+            '_blank',
+          );
+        } else if (database.substring(0, 2) === 'GO') {
+          window.open(
+            'http://amigo.geneontology.org/amigo/term/' + dataItem.termID,
+            '_blank',
+          );
+        } else if (database.substring(0, 4) === 'msig') {
+          window.open(
+            'http://software.broadinstitute.org/gsea/msigdb/cards/' +
+              dataItem.termID,
+            '_blank',
+          );
+        } else if (database === 'PSP') {
+          self.showPhosphositePlus('', dataItem);
         }
+        // }
       };
     };
 
@@ -1553,7 +1474,7 @@ class Enrichment extends Component {
       return e.title;
     });
     const uDataRelevantFields = _.filter(columnsArr, function(key) {
-      return key !== 'Description' && key !== 'Annotation';
+      return key !== 'description' && key !== 'Annotation';
     });
     // multiset svg rebuilds based on uData...if there are no results we need to override this from being passed down
     if (uDataRelevantFields.length !== 0) {
