@@ -393,7 +393,7 @@ class BarcodePlotReact extends Component {
           [quatileTicks.nodes()[quartile].getAttribute('x1'), 60],
           [quatileTicks.nodes()[0].getAttribute('x1'), barcodeHeight - 30],
         ]);
-      }, 500);
+      }, 50);
     } else {
       // reposition the brushed rect on window resize, or horizontal pane resize
       const selectedTicks = d3.selectAll('line').filter(function() {
@@ -401,7 +401,6 @@ class BarcodePlotReact extends Component {
       });
 
       const highestTickIndex = selectedTicks.nodes().length - 1;
-      debugger;
       d3.select('.brush').call([objsBrush][0].move, [
         [selectedTicks.nodes()[highestTickIndex].getAttribute('x1'), 60],
         [selectedTicks.nodes()[0].getAttribute('x1'), barcodeHeight - 30],
