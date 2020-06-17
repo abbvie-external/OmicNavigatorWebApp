@@ -160,6 +160,11 @@ class Enrichment extends Component {
     },
     violinData: [],
     HighlightedProteins: [],
+    enrichmentPlotTypes: [],
+    enrichmentStudyMetadata: [],
+    enrichmentModelsAndAnnotations: [],
+    enrichmentAnnotationsMetadata: [],
+    enrichmentFeatureIdKey: '',
   };
   EnrichmentViewContainerRef = React.createRef();
 
@@ -314,6 +319,33 @@ class Enrichment extends Component {
   //   this.setState({ enrichmentColumns: columns });
   // };
 
+  handlePlotTypesEnrichment = enrichmentModel => {
+    if (enrichmentModel !== '') {
+      debugger;
+      // if (this.state.enrichmentStudyMetadata.plots != null) {
+      //   const enrichmentModelData = this.state.enrichmentStudyMetadata.plots.find(
+      //     model => model.modelID === enrichmentModel,
+      //   );
+      //   this.setState({
+      //     enrichmentPlotTypes: enrichmentModelData.plots,
+      //   });
+      // }
+    }
+  };
+
+  setStudyModelAnnotationMetadata = (studyData, modelsAndAnnotations) => {
+    this.setState({
+      enrichmentStudyMetadata: studyData,
+      enrichmentModelsAndAnnotations: modelsAndAnnotations,
+    });
+  };
+
+  setAnnotationsMetadata = annotationsData => {
+    this.setState({
+      enrichmentAnnotationsMetadata: annotationsData,
+    });
+  };
+
   handleSearchCriteriaChange = (changes, scChange) => {
     this.props.onSearchCriteriaToTop(changes, 'enrichment');
     if (
@@ -431,6 +463,7 @@ class Enrichment extends Component {
       }
     }
     const alphanumericTrigger = enrichmentAlphanumericFields[0];
+    this.setState({ enrichmentFeatureIdKey: alphanumericTrigger });
     const enrichmentAlphanumericColumnsMapped = enrichmentAlphanumericFields.map(
       f => {
         return {
@@ -1789,6 +1822,11 @@ class Enrichment extends Component {
               onGetMultisetPlot={this.handleMultisetPlot}
               onHandlePlotAnimation={this.handlePlotAnimation}
               onFilterNetworkFromUpset={this.filterNetworkFromUpset}
+              onHandlePlotTypesEnrichment={this.handlePlotTypesEnrichment}
+              onSetStudyModelAnnotationMetadata={
+                this.setStudyModelAnnotationMetadata
+              }
+              onSetAnnotationsMetadata={this.setAnnotationsMetadata}
             />
           </Grid.Column>
           <Grid.Column

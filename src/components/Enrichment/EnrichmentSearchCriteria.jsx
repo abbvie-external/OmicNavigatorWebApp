@@ -93,9 +93,6 @@ class EnrichmentSearchCriteria extends Component {
     },
     multisetFiltersVisible: false,
     activateMultisetFilters: false,
-    enrichmentStudyMetadata: [],
-    enrichmentModelsAndAnnotations: [],
-    enrichmentAnnotationsMeta: [],
     reloadPlot: true,
   };
 
@@ -148,12 +145,13 @@ class EnrichmentSearchCriteria extends Component {
       const enrichmentStudyData = allStudiesMetadataCopy.find(
         study => study.name === enrichmentStudy,
       );
-      const enrichmentModelsAndAnnotations = enrichmentStudyData.enrichments;
-      this.setState({
-        enrichmentStudyMetadata: enrichmentStudyData,
-        enrichmentModelsAndAnnotations: enrichmentModelsAndAnnotations,
-      });
-      const enrichmentModelsMapped = enrichmentModelsAndAnnotations.map(
+      const enrichmentModelsAndAnnotationsVar =
+        enrichmentStudyData?.enrichments || [];
+      this.props.onSetStudyModelAnnotationMetadata(
+        enrichmentStudyData,
+        enrichmentModelsAndAnnotationsVar,
+      );
+      const enrichmentModelsMapped = enrichmentModelsAndAnnotationsVar.map(
         enrichment => {
           return {
             key: `${enrichment.modelID}Enrichment`,
@@ -169,7 +167,8 @@ class EnrichmentSearchCriteria extends Component {
       });
 
       if (enrichmentModel !== '') {
-        const enrichmentModelWithAnnotations = enrichmentModelsAndAnnotations.find(
+        this.props.onHandlePlotTypesEnrichment(enrichmentModel);
+        const enrichmentModelWithAnnotations = enrichmentModelsAndAnnotationsVar.find(
           model => model.modelID === enrichmentModel,
         );
         const enrichmentModelTooltip =
@@ -177,9 +176,9 @@ class EnrichmentSearchCriteria extends Component {
         this.setState({
           enrichmentModelTooltip: enrichmentModelTooltip,
         });
-        const enrichmentAnnotationsMeta =
+        const enrichmentAnnotationsMetadataVar =
           enrichmentModelWithAnnotations?.annotations || [];
-        const enrichmentAnnotationsMapped = enrichmentAnnotationsMeta.map(
+        const enrichmentAnnotationsMapped = enrichmentAnnotationsMetadataVar.map(
           annotation => {
             return {
               key: `${annotation.annotationID}Enrichment`,
@@ -188,32 +187,16 @@ class EnrichmentSearchCriteria extends Component {
             };
           },
         );
-        // PAUL - is this needed - const uDataMapped = enrichmentAnnotationsMeta.map(a => a.annotationID);
+        const uDataMapped = enrichmentAnnotationsMetadataVar.map(
+          a => a.annotationID,
+        );
         this.setState({
           enrichmentAnnotationsDisabled: false,
           enrichmentAnnotations: enrichmentAnnotationsMapped,
-          enrichmentAnnotationsMeta,
-          // uData: uDataMapped,
+          uData: uDataMapped,
         });
-
+        this.props.onSetAnnotationsMetadata(enrichmentAnnotationsMetadataVar);
         if (enrichmentAnnotation !== '') {
-          onSearchCriteriaChange(
-            {
-              enrichmentStudy: enrichmentStudy,
-              enrichmentModel: enrichmentModel,
-              enrichmentAnnotation: enrichmentAnnotation,
-              enrichmentDescriptionAndTest: enrichmentDescriptionAndTest,
-            },
-            false,
-          );
-          const enrichmentAnnotationMeta = enrichmentAnnotationsMeta.find(
-            annotation => annotation.annotationID === enrichmentAnnotation,
-          );
-          const enrichmentAnnotationTooltip =
-            enrichmentAnnotationMeta?.annotationDisplay || '';
-          this.setState({
-            enrichmentAnnotationTooltip,
-          });
           onSearchTransitionEnrichment(true);
           phosphoprotService
             .getEnrichmentsTable(
@@ -234,6 +217,23 @@ class EnrichmentSearchCriteria extends Component {
             .catch(error => {
               console.error('Error during getEnrichmentsTable', error);
             });
+          onSearchCriteriaChange(
+            {
+              enrichmentStudy: enrichmentStudy,
+              enrichmentModel: enrichmentModel,
+              enrichmentAnnotation: enrichmentAnnotation,
+              enrichmentDescriptionAndTest: enrichmentDescriptionAndTest,
+            },
+            false,
+          );
+          const enrichmentAnnotationMeta = enrichmentAnnotationsMetadataVar.find(
+            annotation => annotation.annotationID === enrichmentAnnotation,
+          );
+          const enrichmentAnnotationTooltip =
+            enrichmentAnnotationMeta?.annotationDisplay || '';
+          this.setState({
+            enrichmentAnnotationTooltip,
+          });
         }
       }
     }
@@ -268,8 +268,9 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentStudy,
       onSearchCriteriaChange,
       onSearchCriteriaReset,
+      enrichmentModelsAndAnnotations,
     } = this.props;
-    const { enrichmentModelsAndAnnotations } = this.state;
+    this.props.onHandlePlotTypesEnrichment(value);
     onSearchCriteriaChange(
       {
         enrichmentStudy: enrichmentStudy,
@@ -290,9 +291,9 @@ class EnrichmentSearchCriteria extends Component {
     );
     const enrichmentModelTooltip =
       enrichmentModelWithAnnotations?.modelDisplay || '';
-    const enrichmentAnnotationsMeta =
+    const enrichmentAnnotationsMetadataVar =
       enrichmentModelWithAnnotations.annotations || [];
-    const enrichmentAnnotationsMapped = enrichmentAnnotationsMeta.map(
+    const enrichmentAnnotationsMapped = enrichmentAnnotationsMetadataVar.map(
       annotation => {
         return {
           key: annotation.annotationID,
@@ -305,9 +306,9 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentAnnotationsDisabled: false,
       enrichmentAnnotations: enrichmentAnnotationsMapped,
       enrichmentModelTooltip: enrichmentModelTooltip,
-      enrichmentAnnotationsMeta,
       enrichmentAnnotationTooltip: '',
     });
+    this.props.onSetAnnotationsMetadata(enrichmentAnnotationsMetadataVar);
   };
 
   handleAnnotationChange = (evt, { name, value }) => {
@@ -318,7 +319,7 @@ class EnrichmentSearchCriteria extends Component {
       onSearchTransitionEnrichment,
       onSearchCriteriaChange,
     } = this.props;
-    const enrichmentAnnotationMeta = this.state.enrichmentAnnotationsMeta.find(
+    const enrichmentAnnotationMeta = this.props.enrichmentAnnotationsMetadata.find(
       annotation => annotation.annotationID === value,
     );
     const enrichmentAnnotationTooltip =

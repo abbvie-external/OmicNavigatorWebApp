@@ -120,7 +120,7 @@ class Pepplot extends Component {
         pepplotModelsAndTests: modelsAndTests,
       },
       function() {
-        this.handlePlotTypes(this.props.pepplotModel);
+        this.handlePlotTypesPepplot(this.props.pepplotModel);
       },
     );
   };
@@ -156,7 +156,7 @@ class Pepplot extends Component {
     });
   };
 
-  handlePlotTypes = pepplotModel => {
+  handlePlotTypesPepplot = pepplotModel => {
     if (pepplotModel !== '') {
       if (this.state.pepplotStudyMetadata.plots != null) {
         const pepplotModelData = this.state.pepplotStudyMetadata.plots.find(
@@ -602,10 +602,6 @@ class Pepplot extends Component {
       }
     }
     const alphanumericTrigger = pepplotAlphanumericFields[0];
-    console.log(alphanumericTrigger);
-    console.log(this.state.pepplotFeatureIdKey);
-    console.log(this.state.pepplotPlotTypes);
-    console.log(this.props.pepplotProteinSite);
     this.setState(
       { pepplotFeatureIdKey: alphanumericTrigger },
       this.getTableHelpers(
@@ -910,7 +906,7 @@ class Pepplot extends Component {
               onMultisetQueried={this.handleMultisetQueried}
               onSetStudyModelTestMetadata={this.setStudyModelTestMetadata}
               onSetTestsMetadata={this.setTestsMetadata}
-              onHandlePlotTypes={this.handlePlotTypes}
+              onHandlePlotTypesPepplot={this.handlePlotTypesPepplot}
               onGetPlot={this.getPlot}
             />
           </Grid.Column>
