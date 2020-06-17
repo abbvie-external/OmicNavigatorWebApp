@@ -335,6 +335,7 @@ class BarcodePlotReact extends Component {
 
     const endBrush = function() {
       const selection = d3.event.selection;
+      debugger;
       if (selection == null) {
         self.handleSVGClick(null);
       } else {
@@ -392,7 +393,7 @@ class BarcodePlotReact extends Component {
           [quatileTicks.nodes()[quartile].getAttribute('x1'), 60],
           [quatileTicks.nodes()[0].getAttribute('x1'), barcodeHeight - 30],
         ]);
-      }, 5);
+      }, 500);
     } else {
       // reposition the brushed rect on window resize, or horizontal pane resize
       const selectedTicks = d3.selectAll('line').filter(function() {

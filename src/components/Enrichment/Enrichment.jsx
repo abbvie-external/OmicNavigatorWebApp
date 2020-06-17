@@ -339,7 +339,6 @@ class Enrichment extends Component {
 
   handlePlotTypesEnrichment = enrichmentModel => {
     if (enrichmentModel !== '') {
-      debugger;
       if (this.state.enrichmentStudyMetadata.plots != null) {
         const enrichmentModelData = this.state.enrichmentStudyMetadata.plots.find(
           model => model.modelID === enrichmentModel,
@@ -808,7 +807,6 @@ class Enrichment extends Component {
         const dataItem = this.state.barcodeSettings.barcodeData.find(
           i => i.featureID === highestValueObject?.sample,
         );
-        debugger;
         // let id = dataItem[enrichmentFeatureIdKey] || '';
         let id = dataItem.featureID || '';
         this.getPlot(id);
@@ -837,8 +835,8 @@ class Enrichment extends Component {
     // imageInfo.title = `Protein Intensity - ${enrichmentFeatureIdKey} ${featureId}`;
     // imageInfo.key = `${enrichmentFeatureIdKey} ${featureId}`;
     let handleSVGCb = this.handleSVG;
+    let handlePlotStudyError = this.handlePlotStudyError;
     let currentSVGs = [];
-
     // keep whatever dimension is less (height or width)
     // then multiply the other dimension by original svg ratio (height 595px, width 841px)
     let EnrichmentPlotSVGHeight = this.calculateHeight(this);
@@ -861,7 +859,7 @@ class Enrichment extends Component {
             enrichmentModel,
             id,
             enrichmentPlotTypes[i].plotID,
-            undefined,
+            handlePlotStudyError,
             cancelToken,
           )
           .then(svgMarkupObj => {
@@ -918,6 +916,17 @@ class Enrichment extends Component {
       imageInfo: imageInfo,
       SVGPlotLoaded: true,
       SVGPlotLoading: false,
+    });
+  };
+
+  handlePlotStudyError = () => {
+    this.setState({
+      SVGPlotLoaded: false,
+      SVGPlotLoading: false,
+      // imageInfo: {
+      //   ...this.state.imageInfo,
+      //   svg: []
+      // },
     });
   };
 
