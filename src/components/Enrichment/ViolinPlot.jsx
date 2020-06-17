@@ -246,8 +246,9 @@ class ViolinPlot extends Component {
       })
       .style('display', null);
     id.cpm = _.find(this.props.barcodeSettings.barcodeData, function(o) {
-      return o.id_mult === id.id_mult;
-    }).logFC;
+      // return o.id_mult === id.id_mult;
+      return o.featureID === id.id_mult;
+    }).logFoldChange;
     this.tooltipHover(id);
     // }
   };

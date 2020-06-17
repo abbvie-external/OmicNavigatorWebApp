@@ -64,6 +64,7 @@ class Enrichment extends Component {
       links: [],
       tests: [],
     },
+    filterNetworkFromUpset: [],
     networkDataLoaded: false,
     networkGraphReady: false,
     networkDataError: false,
@@ -80,7 +81,7 @@ class Enrichment extends Component {
     networkSettings: {
       facets: {},
       propLabel: {},
-      metaLabels: ['Description', 'Ontology'],
+      metaLabels: ['description', 'termID'],
       meta: ['description', 'termID'],
       facetAndValueLabel: ['Test', 'pValue'],
       nodeLabel: 'description',
@@ -159,6 +160,11 @@ class Enrichment extends Component {
     },
     violinData: [],
     HighlightedProteins: [],
+    enrichmentPlotTypes: [],
+    enrichmentStudyMetadata: [],
+    enrichmentModelsAndAnnotations: [],
+    enrichmentAnnotationsMetadata: [],
+    enrichmentFeatureIdKey: '',
   };
   EnrichmentViewContainerRef = React.createRef();
 
@@ -282,6 +288,24 @@ class Enrichment extends Component {
     });
   };
 
+  setStudyModelAnnotationMetadata = (studyData, modelsAndAnnotations) => {
+    this.setState(
+      {
+        enrichmentStudyMetadata: studyData,
+        enrichmentModelsAndAnnotations: modelsAndAnnotations,
+      },
+      function() {
+        this.handlePlotTypesEnrichment(this.props.enrichmentModel);
+      },
+    );
+  };
+
+  setAnnotationsMetadata = annotationsData => {
+    this.setState({
+      enrichmentAnnotationsMetadata: annotationsData,
+    });
+  };
+
   handleEnrichmentSearch = searchResults => {
     // PAUL - talk to justin about this - has to do with column reordering, i think
     // if (this.state.enrichmentColumns.length === 0) {
@@ -312,6 +336,19 @@ class Enrichment extends Component {
   //   const columns = this.getConfigCols(searchResults);
   //   this.setState({ enrichmentColumns: columns });
   // };
+
+  handlePlotTypesEnrichment = enrichmentModel => {
+    if (enrichmentModel !== '') {
+      if (this.state.enrichmentStudyMetadata.plots != null) {
+        const enrichmentModelData = this.state.enrichmentStudyMetadata.plots.find(
+          model => model.modelID === enrichmentModel,
+        );
+        this.setState({
+          enrichmentPlotTypes: enrichmentModelData.plots,
+        });
+      }
+    }
+  };
 
   handleSearchCriteriaChange = (changes, scChange) => {
     this.props.onSearchCriteriaToTop(changes, 'enrichment');
@@ -430,6 +467,7 @@ class Enrichment extends Component {
       }
     }
     const alphanumericTrigger = enrichmentAlphanumericFields[0];
+    this.setState({ enrichmentFeatureIdKey: alphanumericTrigger });
     const enrichmentAlphanumericColumnsMapped = enrichmentAlphanumericFields.map(
       f => {
         return {
@@ -563,6 +601,10 @@ class Enrichment extends Component {
     return configCols;
   };
 
+  filterNetworkFromUpset = upsetTestsObj => {
+    // TBC if we handle upset test filtering on FE...
+  };
+
   getNetworkData = () => {
     this.removeNetworkSVG();
     const {
@@ -656,11 +698,14 @@ class Enrichment extends Component {
   }
 
   showBarcodePlot = barcodeData => {
+    const barcodeDataSorted = barcodeData.data.sort(
+      (a, b) => b.statistic - a.statistic,
+    );
     this.setState({
       isTestDataLoaded: true,
       barcodeSettings: {
         ...this.state.barcodeSettings,
-        barcodeData: barcodeData.data,
+        barcodeData: barcodeDataSorted,
         statLabel: barcodeData.statLabel,
         highLabel: barcodeData.labelHigh,
         lowLabel: barcodeData.labelLow,
@@ -675,13 +720,11 @@ class Enrichment extends Component {
     if (changes.brushedData.length > 0) {
       const boxPlotArray = _.map(changes.brushedData, function(d) {
         d.statistic = _.find(self.state.barcodeSettings.barcodeData, {
-          lineID: d.lineID,
-          id_mult: d.id_mult,
+          featureID: d.lineID,
         }).statistic;
         d.logFC = _.find(self.state.barcodeSettings.barcodeData, {
-          lineID: d.lineID,
-          id_mult: d.id_mult,
-        }).logFC;
+          featureID: d.lineID,
+        }).logFoldChange;
         return d;
       });
 
@@ -746,9 +789,9 @@ class Enrichment extends Component {
   };
 
   handleProteinSelected = toHighlightArray => {
+    // const { enrichmentFeatureIdKey } = this.state;
     const prevHighestValueObject = this.state.HighlightedProteins[0]?.sample;
     const highestValueObject = toHighlightArray[0];
-    const { enrichmentStudy, enrichmentModel } = this.props;
     if (
       this.state.barcodeSettings.barcodeData?.length > 0 &&
       toHighlightArray.length > 0
@@ -765,40 +808,11 @@ class Enrichment extends Component {
           SVGPlotLoading: true,
         });
         const dataItem = this.state.barcodeSettings.barcodeData.find(
-          i => i.lineID === highestValueObject?.sample,
+          i => i.featureID === highestValueObject?.sample,
         );
-        let id = dataItem?.id_mult ? dataItem?.id_mult : dataItem?.id;
-        let plotType = ['splineplot'];
-        switch (enrichmentModel) {
-          case 'DonorDifferentialPhosphorylation':
-            plotType = ['dotplot'];
-            break;
-          case 'Treatment and or Strain Differential Phosphorylation':
-            plotType = ['StrainStimDotplot', 'StimStrainDotplot'];
-            break;
-          case 'Timecourse Differential Phosphorylation':
-            plotType = ['lineplot', 'splineplot'];
-            break;
-          case 'Differential Expression':
-            plotType = ['proteindotplot'];
-            break;
-          case 'Differential Phosphorylation':
-            plotType = ['phosphodotplot'];
-            break;
-          case 'No Pretreatment Timecourse Differential Phosphorylation':
-            plotType = ['lineplot.modelII', 'splineplot.modelII'];
-            break;
-          case 'Ferrostatin Pretreatment Timecourse Differential Phosphorylation':
-            plotType = ['lineplot.modelIII', 'splineplot.modelIII'];
-            break;
-          default:
-            plotType = ['dotplot'];
-        }
-        let imageInfo = { key: '', title: '', svg: [] };
-        imageInfo.title = this.state.imageInfo.title;
-        imageInfo.key = this.state.imageInfo.key;
-        const handleSVGCb = this.handleSVG;
-        this.getPlot(id, plotType, enrichmentStudy, imageInfo, handleSVGCb);
+        // let id = dataItem[enrichmentFeatureIdKey] || '';
+        let id = dataItem.featureID || '';
+        this.getPlot(id);
       }
     } else {
       cancelRequestEnrichmentGetPlot();
@@ -814,71 +828,90 @@ class Enrichment extends Component {
     }
   };
 
-  getPlot = (id, plotType, enrichmentStudy, imageInfo, handleSVGCb) => {
+  getPlot = featureId => {
+    const { enrichmentPlotTypes } = this.state;
+    const { enrichmentStudy, enrichmentModel } = this.props;
+    let id = featureId != null ? featureId : '';
+    let imageInfo = { key: '', title: '', svg: [] };
+    imageInfo.title = this.state.imageInfo.title;
+    imageInfo.key = this.state.imageInfo.key;
+    // imageInfo.title = `Protein Intensity - ${enrichmentFeatureIdKey} ${featureId}`;
+    // imageInfo.key = `${enrichmentFeatureIdKey} ${featureId}`;
+    let handleSVGCb = this.handleSVG;
+    let handlePlotStudyError = this.handlePlotStudyError;
     let currentSVGs = [];
     // keep whatever dimension is less (height or width)
     // then multiply the other dimension by original svg ratio (height 595px, width 841px)
     let EnrichmentPlotSVGHeight = this.calculateHeight(this);
     let EnrichmentPlotSVGWidth = this.calculateWidth(this);
-    EnrichmentPlotSVGHeight = EnrichmentPlotSVGWidth * 0.70749;
-    // if (EnrichmentPlotSVGHeight + 60 > EnrichmentPlotSVGWidth) {
-    //   EnrichmentPlotSVGHeight = EnrichmentPlotSVGWidth * 0.70749;
-    // } else {
-    //   EnrichmentPlotSVGWidth = EnrichmentPlotSVGHeight * 1.41344;
-    // }
+    // EnrichmentPlotSVGHeight = EnrichmentPlotSVGWidth * 0.70749;
+    if (EnrichmentPlotSVGHeight + 60 > EnrichmentPlotSVGWidth) {
+      EnrichmentPlotSVGHeight = EnrichmentPlotSVGWidth * 0.70749;
+    } else {
+      EnrichmentPlotSVGWidth = EnrichmentPlotSVGHeight * 1.41344;
+    }
     cancelRequestEnrichmentGetPlot();
     let cancelToken = new CancelToken(e => {
       cancelRequestEnrichmentGetPlot = e;
     });
-    _.forEach(plotType, function(plot, i) {
-      phosphoprotService
-        .getPlot(
-          id,
-          plotType[i],
-          enrichmentStudy + 'plots',
-          undefined,
-          cancelToken,
-        )
-        .then(svgMarkupObj => {
-          let svgMarkup = svgMarkupObj.data;
-          svgMarkup = svgMarkup.replace(/id="/g, 'id="' + id + '-' + i + '-');
-          svgMarkup = svgMarkup.replace(
-            /#glyph/g,
-            '#' + id + '-' + i + '-glyph',
-          );
-          svgMarkup = svgMarkup.replace(/#clip/g, '#' + id + '-' + i + '-clip');
-          svgMarkup = svgMarkup.replace(
-            /<svg/g,
-            `<svg preserveAspectRatio="xMinYMin meet" style="width:${EnrichmentPlotSVGWidth}px" height:${EnrichmentPlotSVGHeight} id="currentSVG-${id}-${i}"`,
-          );
-          DOMPurify.addHook('afterSanitizeAttributes', function(node) {
-            if (
-              node.hasAttribute('xlink:href') &&
-              !node.getAttribute('xlink:href').match(/^#/)
-            ) {
-              node.remove();
-            }
-          });
-          // Clean HTML string and write into our DIV
-          let sanitizedSVG = DOMPurify.sanitize(svgMarkup, {
-            ADD_TAGS: ['use'],
-          });
-          let svgInfo = { plotType: plotType[i], svg: sanitizedSVG };
+    if (enrichmentPlotTypes.length > 0) {
+      _.forEach(enrichmentPlotTypes, function(plot, i) {
+        phosphoprotService
+          .plotStudy(
+            enrichmentStudy,
+            enrichmentModel,
+            id,
+            enrichmentPlotTypes[i].plotID,
+            handlePlotStudyError,
+            cancelToken,
+          )
+          .then(svgMarkupObj => {
+            let svgMarkup = svgMarkupObj.data;
+            svgMarkup = svgMarkup.replace(/id="/g, 'id="' + id + '-' + i + '-');
+            svgMarkup = svgMarkup.replace(
+              /#glyph/g,
+              '#' + id + '-' + i + '-glyph',
+            );
+            svgMarkup = svgMarkup.replace(
+              /#clip/g,
+              '#' + id + '-' + i + '-clip',
+            );
+            svgMarkup = svgMarkup.replace(
+              /<svg/g,
+              `<svg preserveAspectRatio="xMinYMin meet" style="width:${EnrichmentPlotSVGWidth}px" height:${EnrichmentPlotSVGHeight} id="currentSVG-${id}-${i}"`,
+            );
+            DOMPurify.addHook('afterSanitizeAttributes', function(node) {
+              if (
+                node.hasAttribute('xlink:href') &&
+                !node.getAttribute('xlink:href').match(/^#/)
+              ) {
+                node.remove();
+              }
+            });
+            // Clean HTML string and write into our DIV
+            let sanitizedSVG = DOMPurify.sanitize(svgMarkup, {
+              ADD_TAGS: ['use'],
+            });
+            let svgInfo = {
+              plotType: enrichmentPlotTypes[i],
+              svg: sanitizedSVG,
+            };
 
-          // we want spline plot in zero index, rather than lineplot
-          // if (i === 0) {
-          imageInfo.svg.push(svgInfo);
-          currentSVGs.push(sanitizedSVG);
-          // } else {
-          //   imageInfo.svg.unshift(svgInfo);
-          //   currentSVGs.unshift(sanitizedSVG);
-          // }
-          handleSVGCb(imageInfo);
-        })
-        .catch(error => {
-          console.error('Error during getPlot', error);
-        });
-    });
+            // we want spline plot in zero index, rather than lineplot
+            // if (i === 0) {
+            imageInfo.svg.push(svgInfo);
+            currentSVGs.push(sanitizedSVG);
+            // } else {
+            //   imageInfo.svg.unshift(svgInfo);
+            //   currentSVGs.unshift(sanitizedSVG);
+            // }
+            handleSVGCb(imageInfo);
+          })
+          .catch(error => {
+            console.error('Error during getPlot', error);
+          });
+      });
+    }
   };
 
   handleSVG = imageInfo => {
@@ -886,6 +919,17 @@ class Enrichment extends Component {
       imageInfo: imageInfo,
       SVGPlotLoaded: true,
       SVGPlotLoading: false,
+    });
+  };
+
+  handlePlotStudyError = () => {
+    this.setState({
+      SVGPlotLoaded: false,
+      SVGPlotLoading: false,
+      // imageInfo: {
+      //   ...this.state.imageInfo,
+      //   svg: []
+      // },
     });
   };
 
@@ -1076,7 +1120,6 @@ class Enrichment extends Component {
       .pie()
       .sort(null)
       .value(1);
-    pie = 1;
     let arc = d3
       .arc()
       .outerRadius(radius)
@@ -1786,6 +1829,12 @@ class Enrichment extends Component {
               onDisablePlot={this.disablePlot}
               onGetMultisetPlot={this.handleMultisetPlot}
               onHandlePlotAnimation={this.handlePlotAnimation}
+              onFilterNetworkFromUpset={this.filterNetworkFromUpset}
+              onHandlePlotTypesEnrichment={this.handlePlotTypesEnrichment}
+              onSetStudyModelAnnotationMetadata={
+                this.setStudyModelAnnotationMetadata
+              }
+              onSetAnnotationsMetadata={this.setAnnotationsMetadata}
             />
           </Grid.Column>
           <Grid.Column
