@@ -172,6 +172,7 @@ class SplitPanesContainer extends Component {
           className="ViolinAndTableTabsDiv"
           onTabChange={this.handleViolinTableTabChange}
           panes={displayViolinPlot ? violinAndTablePanes : onlyTablePane}
+          // panes={violinAndTablePanes}
           activeIndex={activeViolinTableIndex}
           renderActiveOnly={false}
           menu={{
@@ -224,7 +225,7 @@ class SplitPanesContainer extends Component {
 
   render() {
     const BarcodePlot = this.getBarcodePlot();
-    // const ViolinAndTable = this.getViolinAndTable();
+    const ViolinAndTable = this.getViolinAndTable();
     const SVGPlot = this.getSVGPlot();
 
     return (
@@ -274,7 +275,7 @@ class SplitPanesContainer extends Component {
                   maxSize={800}
                   onChange={size => this.splitPaneResized(size, 'vertical')}
                 >
-                  {/* <div id="ViolinAndTableSplitContainer">{ViolinAndTable}</div> */}
+                  <div id="ViolinAndTableSplitContainer">{ViolinAndTable}</div>
                   <div id="SVGSplitContainer">{SVGPlot}</div>
                 </SplitPane>
               </SplitPane>
