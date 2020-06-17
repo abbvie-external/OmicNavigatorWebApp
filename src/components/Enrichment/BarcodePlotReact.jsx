@@ -58,7 +58,6 @@ class BarcodePlotReact extends Component {
     }
     // Much of this code can be refactored into a function, as it is used below.
     if (self.props.HighlightedProteins !== prevProps.HighlightedProteins) {
-      debugger;
       d3.selectAll(`.MaxLine`)
         .attr('y1', self.state.settings.margin.selected)
         .classed('MaxLine', false);
@@ -164,7 +163,6 @@ class BarcodePlotReact extends Component {
   };
 
   handleLineEnter = event => {
-    debugger;
     // if (this.state.settings.brushing === false) {
     const lineIdMult = event.target.attributes[6].nodeValue;
     const lineName = event.target.attributes[7].nodeValue;
@@ -335,7 +333,6 @@ class BarcodePlotReact extends Component {
 
     const endBrush = function() {
       const selection = d3.event.selection;
-      debugger;
       if (selection == null) {
         self.handleSVGClick(null);
       } else {

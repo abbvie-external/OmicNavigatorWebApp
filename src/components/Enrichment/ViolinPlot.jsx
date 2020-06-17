@@ -245,7 +245,6 @@ class ViolinPlot extends Component {
         return 1;
       })
       .style('display', null);
-    debugger;
     id.cpm = _.find(this.props.barcodeSettings.barcodeData, function(o) {
       // return o.id_mult === id.id_mult;
       return o.featureID === id.id_mult;
