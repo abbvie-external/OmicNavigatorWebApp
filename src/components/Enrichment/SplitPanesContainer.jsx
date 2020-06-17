@@ -225,7 +225,7 @@ class SplitPanesContainer extends Component {
   render() {
     const BarcodePlot = this.getBarcodePlot();
     // const ViolinAndTable = this.getViolinAndTable();
-    // const SVGPlot = this.getSVGPlot();
+    const SVGPlot = this.getSVGPlot();
 
     return (
       <div className="PlotsWrapper">
@@ -274,8 +274,8 @@ class SplitPanesContainer extends Component {
                   maxSize={800}
                   onChange={size => this.splitPaneResized(size, 'vertical')}
                 >
-                  {/* <div id="ViolinAndTableSplitContainer">{ViolinAndTable}</div>
-                  <div id="SVGSplitContainer">{SVGPlot}</div> */}
+                  {/* <div id="ViolinAndTableSplitContainer">{ViolinAndTable}</div> */}
+                  <div id="SVGSplitContainer">{SVGPlot}</div>
                 </SplitPane>
               </SplitPane>
             </Grid.Column>
