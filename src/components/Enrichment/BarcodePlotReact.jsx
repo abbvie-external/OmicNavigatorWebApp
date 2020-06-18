@@ -65,7 +65,6 @@ class BarcodePlotReact extends Component {
         .attr('y1', self.state.settings.margin.selected)
         .classed('HighlightedLine', false);
       if (self.props.HighlightedProteins.length > 0) {
-        // might need this splice, forgot why it's there
         const HighlightedProteins = self.props.HighlightedProteins.slice(1);
         HighlightedProteins.forEach(element => {
           // const lineId = `${element.sample.replace(/;/g, '')}_${
@@ -162,8 +161,9 @@ class BarcodePlotReact extends Component {
   };
 
   handleLineEnter = event => {
+    debugger;
     // if (this.state.settings.brushing === false) {
-    const lineIdMult = event.target.attributes[6].nodeValue;
+    // const lineIdMult = event.target.attributes[6].nodeValue;
     const lineName = event.target.attributes[7].nodeValue;
     const lineStatistic = event.target.attributes[9].nodeValue;
     const textAnchor =
@@ -174,7 +174,8 @@ class BarcodePlotReact extends Component {
       textAnchor === 'end'
         ? event.target.attributes[2].nodeValue - 5
         : event.target.attributes[2].nodeValue + 5;
-    const lineId = `#barcode-line-${lineName.replace(/;/g, '')}_${lineIdMult}`;
+    // const lineId = `#barcode-line-${lineName.replace(/;/g, '')}_${lineIdMult}`;
+    const lineId = `#barcode-line-${lineName}`;
     const hoveredLine = d3.select(lineId);
     if (hoveredLine.attr('class').endsWith('selected')) {
       hoveredLine.attr('y1', this.state.settings.margin.hovered - 10);
