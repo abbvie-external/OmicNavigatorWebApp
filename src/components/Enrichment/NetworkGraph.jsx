@@ -61,10 +61,13 @@ class NetworkGraph extends Component {
   };
 
   windowResized = () => {
+    this.prepareAndRenderTree();
+  };
+
+  removeNetworkSVG = () => {
     d3.select('div.tooltip-pieSlice').remove();
     d3.select('tooltipLink').remove();
     d3.select(`#svg-${this.props.networkSettings.id}`).remove();
-    this.prepareAndRenderTree();
   };
 
   getHeight() {
@@ -123,6 +126,7 @@ class NetworkGraph extends Component {
       linkCutoff,
     } = this.props;
     const self = this;
+    this.removeNetworkSVG();
     // Prepare Data
     let formattedNodes = networkData.nodes;
     let formattedLinks = networkData.links;

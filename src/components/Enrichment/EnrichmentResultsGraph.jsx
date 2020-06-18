@@ -343,16 +343,9 @@ class EnrichmentResultsGraph extends Component {
   };
 
   onSortEnd = ({ oldIndex, newIndex }) => {
-    this.removeNetworkSVG();
     this.setState(({ networkSortBy }) => ({
       networkSortBy: arrayMove(networkSortBy, oldIndex, newIndex),
     }));
-  };
-
-  removeNetworkSVG = () => {
-    d3.select('div.tooltip-pieSlice').remove();
-    d3.select('tooltipLink').remove();
-    d3.select(`#svg-${this.props.networkSettings.id}`).remove();
   };
 
   // NODE CUTOFF

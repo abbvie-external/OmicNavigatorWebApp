@@ -307,6 +307,8 @@ class Enrichment extends Component {
   };
 
   handleEnrichmentSearch = searchResults => {
+    this.removeNetworkSVG();
+
     // PAUL - talk to justin about this - has to do with column reordering, i think
     // if (this.state.enrichmentColumns.length === 0) {
     //   this.handleColumns(searchResults);
@@ -315,7 +317,6 @@ class Enrichment extends Component {
     if (searchResults.enrichmentResults?.length > 0) {
       columns = this.getConfigCols(searchResults);
     }
-    this.removeNetworkSVG();
     this.getNetworkData(searchResults.enrichmentResults);
     this.setState({
       networkDataError: false,
@@ -601,8 +602,13 @@ class Enrichment extends Component {
     return configCols;
   };
 
+  removeNetworkSVG = () => {
+    d3.select('div.tooltip-pieSlice').remove();
+    d3.select('tooltipLink').remove();
+    d3.select(`#svg-${this.state.networkSettings.id}`).remove();
+  };
+
   getNetworkData = enrichmentResults => {
-    this.removeNetworkSVG();
     const {
       enrichmentModel,
       enrichmentAnnotation,
@@ -1694,12 +1700,6 @@ class Enrichment extends Component {
     ];
   };
 
-  removeNetworkSVG = () => {
-    d3.select('div.tooltip-pieSlice').remove();
-    d3.select('tooltipLink').remove();
-    d3.select(`#svg-${this.state.networkSettings.id}`).remove();
-  };
-
   handleTotals = (filteredNodesLength, filteredLinksLength) => {
     this.setState({
       filteredNodesTotal: filteredNodesLength,
@@ -1709,7 +1709,6 @@ class Enrichment extends Component {
 
   handleNodeCutoffInputChange = value => {
     if (this.state.nodeCutoff !== value) {
-      this.removeNetworkSVG();
       this.setState({
         nodeCutoff: value,
       });
@@ -1719,7 +1718,6 @@ class Enrichment extends Component {
 
   handleLinkCutoffInputChange = value => {
     if (this.state.linkCutoff !== value) {
-      this.removeNetworkSVG();
       this.setState({
         linkCutoff: value,
       });
@@ -1729,7 +1727,6 @@ class Enrichment extends Component {
 
   handleLinkTypeInputChange = value => {
     if (this.state.linkType !== value) {
-      // this.removeNetworkSVG();
       this.setState({
         linkType: value,
       });
@@ -1739,7 +1736,6 @@ class Enrichment extends Component {
 
   handleNodeCutoffSliderChange = value => {
     if (this.state.nodeCutoff !== value) {
-      this.removeNetworkSVG();
       this.setState({ nodeCutoff: value });
     }
     sessionStorage.setItem('nodeCutoff', value);
@@ -1747,7 +1743,6 @@ class Enrichment extends Component {
 
   handleLinkCutoffSliderChange = value => {
     if (this.state.linkCutoff !== value) {
-      this.removeNetworkSVG();
       this.setState({ linkCutoff: value });
     }
     sessionStorage.setItem('linkCutoff', value);
@@ -1755,7 +1750,6 @@ class Enrichment extends Component {
 
   handleLinkTypeSliderChange = value => {
     if (this.state.linkType !== value) {
-      this.removeNetworkSVG();
       this.setState({ linkType: value });
     }
     sessionStorage.setItem('linkType', value);

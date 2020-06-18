@@ -403,12 +403,6 @@ class EnrichmentSearchCriteria extends Component {
     });
   };
 
-  removeNetworkSVG = () => {
-    d3.select('div.tooltip-pieSlice').remove();
-    d3.select('tooltipLink').remove();
-    d3.select(`#svg-${this.props.networkSettings.id}`).remove();
-  };
-
   handlePValueTypeChange = (evt, { value }) => {
     const {
       enrichmentStudy,
@@ -420,7 +414,6 @@ class EnrichmentSearchCriteria extends Component {
     } = this.props;
     onSearchTransitionEnrichment(true);
     onPValueTypeChange(value);
-    this.removeNetworkSVG();
     if (!this.state.multisetFiltersVisible) {
       cancelGetEnrichmentsTable();
       let cancelToken = new CancelToken(e => {
