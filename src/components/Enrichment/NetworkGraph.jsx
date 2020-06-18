@@ -221,6 +221,9 @@ class NetworkGraph extends Component {
         networkTestsNot.length === 0
       ) {
         filteredNodes = formattedNodes;
+        mostSignificantTestValue = Math.min(
+          ...filteredNodes.map(f => f.lowestValue).filter(v => v != null),
+        );
       } else {
         if (networkOperator === '<') {
           filteredNodes = formattedNodes.filter(
