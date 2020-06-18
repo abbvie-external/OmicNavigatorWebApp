@@ -66,8 +66,7 @@ class BarcodePlotReact extends Component {
         .classed('HighlightedLine', false);
       if (self.props.HighlightedProteins.length > 0) {
         // might need this splice, forgot why it's there
-        // const HighlightedProteins = self.props.HighlightedProteins.slice(1);
-        const HighlightedProteins = self.props.HighlightedProteins;
+        const HighlightedProteins = self.props.HighlightedProteins.slice(1);
         HighlightedProteins.forEach(element => {
           // const lineId = `${element.sample.replace(/;/g, '')}_${
           //   element.id_mult
