@@ -316,7 +316,7 @@ class Enrichment extends Component {
       columns = this.getConfigCols(searchResults);
     }
     this.removeNetworkSVG();
-    this.getNetworkData();
+    this.getNetworkData(searchResults.enrichmentResults);
     this.setState({
       networkDataError: false,
       networkGraphReady: false,
@@ -601,11 +601,7 @@ class Enrichment extends Component {
     return configCols;
   };
 
-  filterNetworkFromUpset = upsetTestsObj => {
-    // TBC if we handle upset test filtering on FE...
-  };
-
-  getNetworkData = () => {
+  getNetworkData = enrichmentResults => {
     this.removeNetworkSVG();
     const {
       enrichmentModel,
@@ -623,6 +619,14 @@ class Enrichment extends Component {
       .then(getEnrichmentNetworkResponseData => {
         // const pValueTypeParam = pValueType === 'adjusted' ? 0.1 : 1;
         const tests = getEnrichmentNetworkResponseData.tests;
+        debugger;
+        const enrichmentResultsDescriptions = [...enrichmentResults].map(
+          r => r.description,
+        );
+        const filteredNodes = getEnrichmentNetworkResponseData.nodes.filter(n =>
+          enrichmentResultsDescriptions.includes(n.description),
+        );
+        getEnrichmentNetworkResponseData.nodes = filteredNodes;
         this.setState({
           // networkDataAvailable: true,
           networkData: getEnrichmentNetworkResponseData,
@@ -1829,7 +1833,6 @@ class Enrichment extends Component {
               onDisablePlot={this.disablePlot}
               onGetMultisetPlot={this.handleMultisetPlot}
               onHandlePlotAnimation={this.handlePlotAnimation}
-              onFilterNetworkFromUpset={this.filterNetworkFromUpset}
               onHandlePlotTypesEnrichment={this.handlePlotTypesEnrichment}
               onSetStudyModelAnnotationMetadata={
                 this.setStudyModelAnnotationMetadata

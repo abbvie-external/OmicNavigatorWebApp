@@ -187,15 +187,16 @@ class EnrichmentSearchCriteria extends Component {
             };
           },
         );
-        const uDataMapped = enrichmentAnnotationsMetadataVar.map(
-          a => a.annotationID,
-        );
+        // const uDataMapped = enrichmentAnnotationsMetadataVar.map(
+        //   a => a.annotationID,
+        // );
         this.setState({
           enrichmentAnnotationsDisabled: false,
           enrichmentAnnotations: enrichmentAnnotationsMapped,
-          uData: uDataMapped,
+          // uData: uDataMapped,
         });
         this.props.onSetAnnotationsMetadata(enrichmentAnnotationsMetadataVar);
+        debugger;
         if (enrichmentAnnotation !== '') {
           onSearchTransitionEnrichment(true);
           phosphoprotService
@@ -489,10 +490,6 @@ class EnrichmentSearchCriteria extends Component {
             },
             activateMultisetFilters: true,
           });
-          this.props.onFilterNetworkFromUpset({
-            must: eMust,
-            not: eNot,
-          });
           onEnrichmentSearch({
             enrichmentResults: multisetResults,
           });
@@ -684,6 +681,7 @@ class EnrichmentSearchCriteria extends Component {
   };
 
   updateQueryData = () => {
+    debugger;
     const {
       enrichmentStudy,
       enrichmentModel,
@@ -699,14 +697,14 @@ class EnrichmentSearchCriteria extends Component {
     const eMust = this.state.uSettings.must;
     const eNot = this.state.uSettings.not;
     const eOperator = this.state.selectedOperator;
-    // this.getMultisetPlot(
-    //   eSigV,
-    //   enrichmentModel,
-    //   enrichmentStudy,
-    //   enrichmentAnnotation,
-    //   this.jsonToList(eOperator),
-    //   pValueType,
-    // );
+    this.getMultisetPlot(
+      eSigV,
+      enrichmentModel,
+      enrichmentStudy,
+      enrichmentAnnotation,
+      this.jsonToList(eOperator),
+      pValueType,
+    );
     cancelRequestMultisetEnrichmentData();
     let cancelToken = new CancelToken(e => {
       cancelRequestMultisetEnrichmentData = e;
@@ -755,10 +753,6 @@ class EnrichmentSearchCriteria extends Component {
             not: eNot,
           },
           activateMultisetFilters: true,
-        });
-        this.props.onFilterNetworkFromUpset({
-          must: eMust,
-          not: eNot,
         });
         onEnrichmentSearch({
           enrichmentResults: multisetResults,
