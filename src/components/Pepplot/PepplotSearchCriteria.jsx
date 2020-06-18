@@ -45,7 +45,7 @@ class PepplotSearchCriteria extends Component {
       },
     ],
     sigValueP: [0.05],
-    reloadPlot: true,
+    reloadPlotP: true,
     uSettingsP: {
       defaultselectedColP: {
         key: 'adj_P_Val',
@@ -64,8 +64,8 @@ class PepplotSearchCriteria extends Component {
       notP: [],
       displayMetaDataP: true,
       templateName: 'pepplot-multiset',
-      numElementsP: undefined,
-      maxElementsP: undefined,
+      numElementsP: 0,
+      maxElementsP: 0,
       indexFiltersP: [0],
       metaSvgP: '',
       heightScalarP: 1,
@@ -96,9 +96,6 @@ class PepplotSearchCriteria extends Component {
     activateMultisetFiltersP: false,
     uDataP: [],
     // loadingPepplotMultisetFilters: false,
-    pepplotStudyMetadata: [],
-    pepplotModelsAndTests: [],
-    pepplotTestsMeta: [],
   };
 
   componentDidMount() {
@@ -144,12 +141,12 @@ class PepplotSearchCriteria extends Component {
       const pepplotStudyData = allStudiesMetadataCopy.find(
         study => study.name === pepplotStudy,
       );
-      const pepplotModelsAndTests = pepplotStudyData?.results || [];
-      this.setState({
-        pepplotStudyMetadata: pepplotStudyData,
-        pepplotModelsAndTests: pepplotModelsAndTests,
-      });
-      const pepplotModelsMapped = pepplotModelsAndTests.map(result => {
+      const pepplotModelsAndTestsVar = pepplotStudyData?.results || [];
+      this.props.onSetStudyModelTestMetadata(
+        pepplotStudyData,
+        pepplotModelsAndTestsVar,
+      );
+      const pepplotModelsMapped = pepplotModelsAndTestsVar.map(result => {
         return {
           key: `${result.modelID}Pepplot`,
           text: result.modelID,
@@ -161,49 +158,31 @@ class PepplotSearchCriteria extends Component {
         pepplotModelsDisabled: false,
         pepplotModels: pepplotModelsMapped,
       });
-
       if (pepplotModel !== '') {
-        const pepplotModelWithTests = pepplotModelsAndTests.find(
+        this.props.onHandlePlotTypesPepplot(pepplotModel);
+        const pepplotModelWithTests = pepplotModelsAndTestsVar.find(
           model => model.modelID === pepplotModel,
         );
         const pepplotModelTooltip = pepplotModelWithTests?.modelDisplay || '';
         this.setState({
           pepplotModelTooltip: pepplotModelTooltip,
         });
-        const pepplotTestsMeta = pepplotModelWithTests?.tests || [];
-        const pepplotTestsMapped = pepplotTestsMeta.map(test => {
+        const pepplotTestsMetadataVar = pepplotModelWithTests?.tests || [];
+        const pepplotTestsMapped = pepplotTestsMetadataVar.map(test => {
           return {
             key: `${test.testID}Pepplot`,
             text: test.testID,
             value: test.testID,
           };
         });
-        const uDataPMapped = pepplotTestsMeta.map(t => t.testID);
+        const uDataPMapped = pepplotTestsMetadataVar.map(t => t.testID);
         this.setState({
           pepplotTestsDisabled: false,
           pepplotTests: pepplotTestsMapped,
-          pepplotTestsMeta,
           uDataP: uDataPMapped,
         });
-
+        this.props.onSetTestsMetadata(pepplotTestsMetadataVar);
         if (pepplotTest !== '') {
-          onSearchCriteriaChange(
-            {
-              pepplotStudy: pepplotStudy,
-              pepplotModel: pepplotModel,
-              pepplotTest: pepplotTest,
-              pepplotProteinSite: pepplotProteinSite,
-            },
-            false,
-          );
-          const pepplotTestMeta = pepplotTestsMeta.find(
-            test => test.testID === pepplotTest,
-          );
-          const pepplotTestTooltip = pepplotTestMeta?.testDisplay || '';
-          this.setState({
-            pepplotTestTooltip,
-            uAnchorP: pepplotTest,
-          });
           onSearchTransitionPepplot(true);
           phosphoprotService
             .getResultsTable(
@@ -223,17 +202,32 @@ class PepplotSearchCriteria extends Component {
             .catch(error => {
               console.error('Error during getResultsTable', error);
             });
+          onSearchCriteriaChange(
+            {
+              pepplotStudy: pepplotStudy,
+              pepplotModel: pepplotModel,
+              pepplotTest: pepplotTest,
+              pepplotProteinSite: pepplotProteinSite,
+            },
+            false,
+          );
+          const pepplotTestMeta = pepplotTestsMetadataVar.find(
+            test => test.testID === pepplotTest,
+          );
+          const pepplotTestTooltip = pepplotTestMeta?.testDisplay || '';
+          this.setState({
+            pepplotTestTooltip,
+            uAnchorP: pepplotTest,
+          });
+          // if (pepplotProteinSite !== '') {
+          //   this.props.onGetPlot(pepplotProteinSite, true);
+          // }
         }
       }
     }
   };
 
   handleStudyChange = (evt, { name, value }) => {
-    console.log(
-      '[PepplotSearchCriteria.jsx] handleStudyChange ',
-      window.location.href,
-    );
-
     const { onSearchCriteriaChange, onSearchCriteriaReset } = this.props;
     onSearchCriteriaChange(
       {
@@ -257,22 +251,13 @@ class PepplotSearchCriteria extends Component {
   };
 
   handleModelChange = (evt, { name, value }) => {
-    console.log(
-      '[PepplotSearchCriteria.jsx] handleModelChange ',
-      window.location.href,
-    );
-    console.log(this.props);
     const {
       pepplotStudy,
       onSearchCriteriaChange,
       onSearchCriteriaReset,
+      pepplotModelsAndTests,
     } = this.props;
-
-    console.log(
-      '[PepplotSearchCriteria.jsx] handleModelChange 1.10 ',
-      window.location.href,
-    );
-    debugger;
+    this.props.onHandlePlotTypesPepplot(value);
     onSearchCriteriaChange(
       {
         pepplotStudy: pepplotStudy,
@@ -281,60 +266,34 @@ class PepplotSearchCriteria extends Component {
       },
       true,
     );
-    console.log(
-      '[PepplotSearchCriteria.jsx] handleModelChange 1.11 ',
-      window.location.href,
-    );
     onSearchCriteriaReset({
       isValidSearchPepplot: false,
     });
-    console.log(
-      '[PepplotSearchCriteria.jsx] handleModelChange 1.12 ',
-      window.location.href,
-    );
-    const { pepplotModelsAndTests } = this.state;
     const pepplotModelsAndTestsCopy = [...pepplotModelsAndTests];
     const pepplotModelWithTests = pepplotModelsAndTestsCopy.find(
       model => model.modelID === value,
     );
-    console.log(
-      '[PepplotSearchCriteria.jsx] handleModelChange 1.25 ',
-      window.location.href,
-    );
     const pepplotModelTooltip = pepplotModelWithTests?.modelDisplay || '';
-    const pepplotTestsMeta = pepplotModelWithTests?.tests || [];
-    const pepplotTestsMapped = pepplotTestsMeta.map(test => {
+    const pepplotTestsMetadataVar = pepplotModelWithTests?.tests || [];
+    const pepplotTestsMapped = pepplotTestsMetadataVar.map(test => {
       return {
         key: test.testID,
         text: test.testID,
         value: test.testID,
       };
     });
-    console.log(
-      '[PepplotSearchCriteria.jsx] handleModelChange 1.5 ',
-      window.location.href,
-    );
-    const uDataP = pepplotTestsMeta.map(t => t.testID);
+    const uDataP = pepplotTestsMetadataVar.map(t => t.testID);
     this.setState({
       pepplotTestsDisabled: false,
-      pepplotTestsMeta: pepplotTestsMeta,
       pepplotTests: pepplotTestsMapped,
       uDataP: uDataP,
       pepplotModelTooltip: pepplotModelTooltip,
       pepplotTestTooltip: '',
     });
-    console.log(
-      '[PepplotSearchCriteria.jsx] handleModelChange 2 ',
-      window.location.href,
-    );
+    this.props.onSetTestsMetadata(pepplotTestsMetadataVar);
   };
 
   handleTestChange = (evt, { name, value }) => {
-    console.log(
-      '[PepplotSearchCriteria.jsx] handleTestChange ',
-      window.location.href,
-    );
-
     const {
       pepplotStudy,
       pepplotModel,
@@ -342,13 +301,13 @@ class PepplotSearchCriteria extends Component {
       onSearchCriteriaChange,
       onSearchTransitionPepplot,
     } = this.props;
-    const pepplotTestMeta = this.state.pepplotTestsMeta.find(
+    const pepplotTestMeta = this.props.pepplotTestsMetadata.find(
       test => test.testID === value,
     );
     const pepplotTestTooltip = pepplotTestMeta?.testDisplay || '';
     this.setState({
       pepplotTestTooltip: pepplotTestTooltip,
-      reloadPlot: true,
+      reloadPlotP: true,
       multisetFiltersVisibleP: false,
     });
     onMultisetQueried(false);
@@ -409,22 +368,21 @@ class PepplotSearchCriteria extends Component {
     return evt => {
       if (this.state.multisetFiltersVisibleP === false) {
         // on toggle open
-        this.setState({
-          multisetFiltersVisibleP: true,
-        });
+        this.setState(
+          {
+            reloadPlotP: true,
+            multisetFiltersVisibleP: true,
+          },
+          function() {
+            this.updateQueryDataP();
+          },
+        );
         this.props.onMultisetQueried(true);
-        this.updateQueryDataP({
-          mustP: this.state.uSettingsP.mustP,
-          notP: this.state.uSettingsP.notP,
-          sigValueP: this.state.sigValueP,
-          selectedColP: this.state.selectedColP,
-          selectedOperatorP: this.state.selectedOperatorP,
-        });
       } else {
         // on toggle close
         this.setState({
           multisetFiltersVisibleP: false,
-          reloadPlot: false,
+          reloadPlotP: false,
         });
         this.props.onMultisetQueried(false);
         const pepplotTestName = 'pepplotTest';
@@ -447,7 +405,7 @@ class PepplotSearchCriteria extends Component {
     this.setState(
       {
         multisetFiltersVisibleP: true,
-        reloadPlot: true,
+        reloadPlotP: true,
       },
       this.updateQueryDataP(),
     );
@@ -553,7 +511,7 @@ class PepplotSearchCriteria extends Component {
     this.setState(
       {
         [name]: uSelVP,
-        reloadPlot: false,
+        reloadPlotP: false,
       },
       function() {
         this.updateQueryDataP();
@@ -566,7 +524,7 @@ class PepplotSearchCriteria extends Component {
     this.setState(
       {
         [name]: uSelVP,
-        reloadPlot: true,
+        reloadPlotP: true,
       },
       function() {
         this.updateQueryDataP();
@@ -580,7 +538,7 @@ class PepplotSearchCriteria extends Component {
     this.setState(
       {
         uSettingsP: uSettingsVP,
-        reloadPlot: false,
+        reloadPlotP: false,
       },
       function() {
         this.updateQueryDataP();
@@ -598,14 +556,14 @@ class PepplotSearchCriteria extends Component {
     } = this.props;
     const {
       selectedOperatorP,
-      reloadPlot,
+      reloadPlotP,
       sigValueP,
       selectedColP,
+      pepplotTests,
     } = this.state;
     const eMustP = this.state.uSettingsP.mustP;
     const eNotP = this.state.uSettingsP.notP;
-
-    if (reloadPlot === true) {
+    if (reloadPlotP === true && pepplotTests.length > 1) {
       onDisablePlot();
       this.getMultisetPlot(
         sigValueP,
@@ -643,7 +601,7 @@ class PepplotSearchCriteria extends Component {
             notP: eNotP,
           },
           activateMultisetFiltersP: true,
-          reloadPlot: false,
+          reloadPlotP: false,
           // loadingPepplotMultisetFilters: false,
         });
         onPepplotSearch({

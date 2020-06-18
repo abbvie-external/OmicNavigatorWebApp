@@ -162,7 +162,6 @@ class FilteredPepplotTable extends Component {
   };
 
   setConfigCols = filteredData => {
-    debugger;
     let self = this;
     const model = this.props.enrichmentModel;
     let initConfigCols = [];

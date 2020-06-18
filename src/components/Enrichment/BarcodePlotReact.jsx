@@ -65,21 +65,21 @@ class BarcodePlotReact extends Component {
         .attr('y1', self.state.settings.margin.selected)
         .classed('HighlightedLine', false);
       if (self.props.HighlightedProteins.length > 0) {
-        const HighlightedProteins = self.props.HighlightedProteins.slice(1);
+        // might need this splice, forgot why it's there
+        // const HighlightedProteins = self.props.HighlightedProteins.slice(1);
+        const HighlightedProteins = self.props.HighlightedProteins;
         HighlightedProteins.forEach(element => {
-          const lineId = `${element.sample.replace(/;/g, '')}_${
-            element.id_mult
-          }`;
+          // const lineId = `${element.sample.replace(/;/g, '')}_${
+          //   element.id_mult
+          // }`;
+          const lineId = `${element.id_mult}`;
           const highlightedLine = d3.select(`#barcode-line-${lineId}`);
           highlightedLine
             .classed('HighlightedLine', true)
             .attr('y1', self.state.settings.margin.highlighted);
         });
         if (self.props.HighlightedProteins[0]?.sample !== '') {
-          const maxLineId = `${self.props.HighlightedProteins[0]?.sample.replace(
-            /;/g,
-            '',
-          )}_${self.props.HighlightedProteins[0].id_mult}`;
+          const maxLineId = `${self.props.HighlightedProteins[0]?.id_mult}`;
           const maxLine = d3.select(`#barcode-line-${maxLineId}`);
           maxLine
             .classed('MaxLine', true)
@@ -390,7 +390,7 @@ class BarcodePlotReact extends Component {
           [quatileTicks.nodes()[quartile].getAttribute('x1'), 60],
           [quatileTicks.nodes()[0].getAttribute('x1'), barcodeHeight - 30],
         ]);
-      }, 5);
+      }, 50);
     } else {
       // reposition the brushed rect on window resize, or horizontal pane resize
       const selectedTicks = d3.selectAll('line').filter(function() {
@@ -398,7 +398,6 @@ class BarcodePlotReact extends Component {
       });
 
       const highestTickIndex = selectedTicks.nodes().length - 1;
-
       d3.select('.brush').call([objsBrush][0].move, [
         [selectedTicks.nodes()[highestTickIndex].getAttribute('x1'), 60],
         [selectedTicks.nodes()[0].getAttribute('x1'), barcodeHeight - 30],
@@ -512,16 +511,27 @@ class BarcodePlotReact extends Component {
 
     const barcodeLines = barcodeSettings.barcodeData.map(d => (
       <line
-        id={`barcode-line-${d.lineID.replace(/;/g, '')}_${d.id_mult}`}
+        // id={`barcode-line-${d.lineID.replace(/;/g, '')}_${d.id_mult}`}
+        // className="barcode-line"
+        // key={`${d.lineID}_${d.id_mult}`}
+        // x1={xScale(d.statistic) + settings.margin.left}
+        // x2={xScale(d.statistic) + settings.margin.left}
+        // y1={settings.margin.top}
+        // y2={barcodeHeight}
+        // id_mult={d.id_mult}
+        // lineid={d.lineID}
+        // logfc={d.logFC}
+        // statistic={d.statistic}
+        id={`barcode-line-${d.featureID}`}
         className="barcode-line"
-        key={`${d.lineID}_${d.id_mult}`}
+        key={`${d.featureID}`}
         x1={xScale(d.statistic) + settings.margin.left}
         x2={xScale(d.statistic) + settings.margin.left}
         y1={settings.margin.top}
         y2={barcodeHeight}
-        id_mult={d.id_mult}
-        lineid={d.lineID}
-        logfc={d.logFC}
+        id_mult={d.featureID}
+        lineid={d.featureID}
+        logfc={d.logFoldChange}
         statistic={d.statistic}
         onClick={e => this.handleSVGClick(e)}
         onMouseEnter={e => this.handleLineEnter(e)}

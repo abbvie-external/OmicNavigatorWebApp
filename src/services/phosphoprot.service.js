@@ -88,54 +88,21 @@ class PhosphoprotService {
     return studiesFromPromise;
   }
 
-  async ocpuDataCall(method, obj, handleError, cancelToken) {
+  async ocpuDataCall(method, obj, handleError, cancelToken, params) {
+    const paramsObj = params ? { digits: 10 } : {};
     return new Promise(function(resolve, reject) {
       window.ocpu
-        .call(method, obj, function(session) {
-          const url = session.getLoc() + 'R/.val/json?auto_unbox=true';
-          axios
-            .get(url, {
-              params: { digits: 10 },
-              responseType: 'text',
-              cancelToken,
-              timeout: 15000,
-            })
-            .then(response => resolve(response.data))
-            .catch(function(thrown) {
-              if (axios.isCancel(thrown)) {
-                console.log('Request canceled', thrown.message);
-              } else {
-                toast.error(`${thrown.message}`);
-                if (handleError !== undefined) {
-                  handleError(false);
-                }
-                console.log(`${thrown.message}`);
-              }
-            });
-        })
-        // you can use this function instead, if don't need the cancelToken
+        // you can use this function instead, if don't need Axios cancelToken
         // .call(method, obj, function(session) {
         //   session
         //     .getObject('.val', 'digits=10')
         //     .then(response => resolve(response));
         // })
-        .catch(error => {
-          toast.error(`${error.statusText}: ${error.responseText}`);
-          if (handleError !== undefined) {
-            handleError(false);
-          }
-          console.log(`${error.statusText}: ${error.responseText}`);
-        });
-    });
-  }
-
-  async ocpuDataCallAlt(method, obj, handleError, cancelToken) {
-    return new Promise(function(resolve, reject) {
-      window.ocpu
         .call(method, obj, function(session) {
           const url = session.getLoc() + 'R/.val/json?auto_unbox=true';
           axios
             .get(url, {
+              params: paramsObj,
               responseType: 'text',
               cancelToken,
               timeout: 15000,
@@ -171,6 +138,7 @@ class PhosphoprotService {
       obj,
       errorCb,
       cancelToken,
+      true,
     );
     const dataFromPromise = await promise;
     return dataFromPromise;
@@ -197,6 +165,7 @@ class PhosphoprotService {
       obj,
       errorCb,
       cancelToken,
+      true,
     );
     const dataFromPromise = await promise;
     return dataFromPromise;
@@ -267,11 +236,11 @@ class PhosphoprotService {
     });
   }
 
-  async getPlot(id, plottype, study, errorCb, cancelToken) {
+  async plotStudy(study, model, id, plottype, errorCb, cancelToken) {
     this.setUrl();
     const promise = this.ocpuPlotCall(
-      plottype,
-      { idmult: id, study: study },
+      'plotStudy',
+      { study: study, modelID: model, featureID: id, plotID: plottype },
       errorCb,
       cancelToken,
     );
@@ -279,42 +248,28 @@ class PhosphoprotService {
     return promise;
   }
 
-  async getDatabaseInfo(study, test, errorCb, cancelToken) {
-    this.setUrl();
-    const promise = this.ocpuDataCallAlt(
-      'getDatabases',
-      {
-        study: study,
-        database: test,
-      },
-      errorCb,
-      cancelToken,
-    );
-    const dataFromPromise = await promise;
-    return dataFromPromise;
-  }
-
   async getBarcodeData(
     study,
     model,
-    annotation,
     test,
+    annotation,
     term,
     errorCb,
     cancelToken,
   ) {
     this.setUrl();
-    const promise = this.ocpuDataCallAlt(
+    const promise = this.ocpuDataCall(
       'getBarcodeData',
       {
         study: study,
-        model: model,
-        database: annotation,
-        test: test,
-        term: term,
+        modelID: model,
+        testID: test,
+        annotationID: annotation,
+        termID: term,
       },
       errorCb,
       cancelToken,
+      false,
     );
     const dataFromPromise = await promise;
     return dataFromPromise;
@@ -347,6 +302,7 @@ class PhosphoprotService {
       },
       errorCb,
       cancelToken,
+      true,
     );
     const dataFromPromise = await promise;
     return dataFromPromise;
@@ -408,6 +364,7 @@ class PhosphoprotService {
       },
       errorCb,
       cancelToken,
+      true,
     );
     const dataFromPromise = await promise;
     return dataFromPromise;

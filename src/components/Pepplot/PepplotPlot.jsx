@@ -3,14 +3,14 @@ import { withRouter } from 'react-router-dom';
 import { Grid, Dimmer, Loader } from 'semantic-ui-react';
 import PepplotBreadcrumbs from './PepplotBreadcrumbs';
 import ButtonActions from '../Shared/ButtonActions';
-import PepplotAccordion from './PepplotAccordion';
+// import PepplotAccordion from './PepplotAccordion';
 import SVGPlot from '../Shared/SVGPlot';
 import './PepplotPlot.scss';
 
 class PepplotPlot extends Component {
   static defaultProps = {
-    isProteinDataLoaded: false,
-    isProteinSVGLoaded: true
+    // isProteinDataLoaded: false,
+    isProteinSVGLoaded: true,
   };
 
   state = {
@@ -18,12 +18,12 @@ class PepplotPlot extends Component {
     excelVisible: true,
     pngVisible: true,
     pdfVisible: false,
-    svgVisible: true
+    svgVisible: true,
   };
 
   handleSVGTabChange = activeTabIndex => {
     this.setState({
-      activeSVGTabIndex: activeTabIndex
+      activeSVGTabIndex: activeTabIndex,
     });
   };
 
@@ -52,7 +52,7 @@ class PepplotPlot extends Component {
 
           <Grid columns={2} className="PlotContainer">
             <Grid.Row className="PlotContainerRow">
-              <Grid.Column
+              {/* <Grid.Column
                 className="PepplotAccordionContainer"
                 mobile={16}
                 tablet={4}
@@ -60,12 +60,16 @@ class PepplotPlot extends Component {
                 widescreen={3}
               >
                 <PepplotAccordion {...this.props} />
-              </Grid.Column>
+              </Grid.Column> */}
               <Grid.Column
+                // mobile={16}
+                // tablet={11}
+                // largeScreen={12}
+                // widescreen={13}
                 mobile={16}
-                tablet={11}
-                largeScreen={12}
-                widescreen={13}
+                tablet={16}
+                largeScreen={16}
+                widescreen={16}
               >
                 <SVGPlot
                   {...this.props}

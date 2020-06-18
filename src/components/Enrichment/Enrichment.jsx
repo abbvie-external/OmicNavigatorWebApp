@@ -64,6 +64,7 @@ class Enrichment extends Component {
       links: [],
       tests: [],
     },
+    filterNetworkFromUpset: [],
     networkDataLoaded: false,
     networkGraphReady: false,
     networkDataError: false,
@@ -80,7 +81,7 @@ class Enrichment extends Component {
     networkSettings: {
       facets: {},
       propLabel: {},
-      metaLabels: ['Description', 'Ontology'],
+      metaLabels: ['description', 'termID'],
       meta: ['description', 'termID'],
       facetAndValueLabel: ['Test', 'pValue'],
       nodeLabel: 'description',
@@ -159,6 +160,11 @@ class Enrichment extends Component {
     },
     violinData: [],
     HighlightedProteins: [],
+    enrichmentPlotTypes: [],
+    enrichmentStudyMetadata: [],
+    enrichmentModelsAndAnnotations: [],
+    enrichmentAnnotationsMetadata: [],
+    enrichmentFeatureIdKey: '',
   };
   EnrichmentViewContainerRef = React.createRef();
 
@@ -186,7 +192,7 @@ class Enrichment extends Component {
           const dataItemIndex = _.findIndex(AllDescriptionsAndTests, function(
             d,
           ) {
-            return d.Description === dataItemDescription;
+            return d.description === dataItemDescription;
           });
           const dataItem = AllDescriptionsAndTests[dataItemIndex];
           const test = getTestName(DescriptionAndTest);
@@ -226,67 +232,77 @@ class Enrichment extends Component {
   ) => {
     let self = this;
     testSelectedTransitionCb(true);
-    // const TestSiteVar = `${test}:${dataItem.Description}`;
+    // const TestSiteVar = `${test}:${dataItem.description}`;
     // let xLargest = 0;
     // let imageInfo = { key: '', title: '', svg: [] };
+    // phosphoprotService
+    //   .getDatabaseInfo(
+    //     enrichmentStudy + 'plots',
+    //     enrichmentAnnotation,
+    //     this.handleGetDatabaseInfoError,
+    //   )
+    //   .then(annotationDataResponse => {
+    //     const annotationDataParsed = JSON.parse(annotationDataResponse);
+    //     self.setState({
+    //       annotationData: annotationDataParsed,
+    //     });
+    //     dataItem.Annotation = _.find(annotationDataParsed, {
+    //       Description: dataItem.description,
+    //     }).Key;
+    let term = dataItem.termID;
+    self.setState({
+      imageInfo: {
+        ...self.state.imageInfo,
+        key: `${test}:${dataItem.description}`,
+        title: `${test}:${dataItem.description}`,
+      },
+      enrichmentNameLoaded: true,
+      enrichmentDataItem: dataItem,
+      enrichmentTerm: term,
+    });
+
     phosphoprotService
-      .getDatabaseInfo(
-        enrichmentStudy + 'plots',
+      .getBarcodeData(
+        enrichmentStudy,
+        enrichmentModel,
+        test,
         enrichmentAnnotation,
-        this.handleGetDatabaseInfoError,
+        term,
+        this.handleGetBarcodeDataError,
       )
-      .then(annotationDataResponse => {
-        const annotationDataParsed = JSON.parse(annotationDataResponse);
-        self.setState({
-          annotationData: annotationDataParsed,
-        });
-        dataItem.Annotation = _.find(annotationDataParsed, {
-          Description: dataItem.Description,
-        }).Key;
-        let term = dataItem.Annotation;
-        self.setState({
-          imageInfo: {
-            ...self.state.imageInfo,
-            key: `${test}:${dataItem.Description}`,
-            title: `${test}:${dataItem.Description}`,
-          },
-          enrichmentNameLoaded: true,
-          enrichmentDataItem: dataItem,
-          enrichmentTerm: term,
-        });
-
-        phosphoprotService
-          .getBarcodeData(
-            enrichmentStudy + 'plots',
-            enrichmentModel,
-            enrichmentAnnotation,
-            test,
-            dataItem.Annotation,
-            this.handleGetBarcodeDataError,
-          )
-          .then(barcodeDataResponse => {
-            let BardcodeInfoObj = JSON.parse(barcodeDataResponse['object']);
-            let highest = barcodeDataResponse['highest'][0];
-            // if (!this.state.modelsToRenderViolin.includes(this.enrichmentModel)){
-            //   this.setState({ sizeVal = '0%' )};
-            // } else {
-            //   this.setState({ sizeVal = '50%')};
-            // }
-
-            showBarcodePlotCb(dataItem, BardcodeInfoObj, test, highest);
-          })
-          .catch(error => {
-            console.error('Error during getBarcodeData', error);
-          });
+      .then(barcodeDataResponse => {
+        showBarcodePlotCb(barcodeDataResponse);
       })
       .catch(error => {
-        console.error('Error during getDatabaseInfo', error);
+        console.error('Error during getBarcodeData', error);
       });
+    // })
+    // .catch(error => {
+    //   console.error('Error during getDatabaseInfo', error);
+    // });
   };
 
   handleSearchTransitionEnrichment = bool => {
     this.setState({
       isSearchingEnrichment: bool,
+    });
+  };
+
+  setStudyModelAnnotationMetadata = (studyData, modelsAndAnnotations) => {
+    this.setState(
+      {
+        enrichmentStudyMetadata: studyData,
+        enrichmentModelsAndAnnotations: modelsAndAnnotations,
+      },
+      function() {
+        this.handlePlotTypesEnrichment(this.props.enrichmentModel);
+      },
+    );
+  };
+
+  setAnnotationsMetadata = annotationsData => {
+    this.setState({
+      enrichmentAnnotationsMetadata: annotationsData,
     });
   };
 
@@ -320,6 +336,19 @@ class Enrichment extends Component {
   //   const columns = this.getConfigCols(searchResults);
   //   this.setState({ enrichmentColumns: columns });
   // };
+
+  handlePlotTypesEnrichment = enrichmentModel => {
+    if (enrichmentModel !== '') {
+      if (this.state.enrichmentStudyMetadata.plots != null) {
+        const enrichmentModelData = this.state.enrichmentStudyMetadata.plots.find(
+          model => model.modelID === enrichmentModel,
+        );
+        this.setState({
+          enrichmentPlotTypes: enrichmentModelData.plots,
+        });
+      }
+    }
+  };
 
   handleSearchCriteriaChange = (changes, scChange) => {
     this.props.onSearchCriteriaToTop(changes, 'enrichment');
@@ -438,6 +467,7 @@ class Enrichment extends Component {
       }
     }
     const alphanumericTrigger = enrichmentAlphanumericFields[0];
+    this.setState({ enrichmentFeatureIdKey: alphanumericTrigger });
     const enrichmentAlphanumericColumnsMapped = enrichmentAlphanumericFields.map(
       f => {
         return {
@@ -571,6 +601,10 @@ class Enrichment extends Component {
     return configCols;
   };
 
+  filterNetworkFromUpset = upsetTestsObj => {
+    // TBC if we handle upset test filtering on FE...
+  };
+
   getNetworkData = () => {
     this.removeNetworkSVG();
     const {
@@ -663,16 +697,19 @@ class Enrichment extends Component {
     return containerWidth - violinWidth - 60;
   }
 
-  showBarcodePlot = (dataItem, barcode, test, highest) => {
+  showBarcodePlot = barcodeData => {
+    const barcodeDataSorted = barcodeData.data.sort(
+      (a, b) => b.statistic - a.statistic,
+    );
     this.setState({
       isTestDataLoaded: true,
       barcodeSettings: {
         ...this.state.barcodeSettings,
-        barcodeData: barcode,
-        statLabel: barcode[0].statLabel,
-        highLabel: barcode[0].highLabel,
-        lowLabel: barcode[0].lowLabel,
-        highStat: highest,
+        barcodeData: barcodeDataSorted,
+        statLabel: barcodeData.statLabel,
+        highLabel: barcodeData.labelHigh,
+        lowLabel: barcodeData.labelLow,
+        highStat: barcodeData.highest,
         enableBrush: true,
       },
     });
@@ -683,13 +720,11 @@ class Enrichment extends Component {
     if (changes.brushedData.length > 0) {
       const boxPlotArray = _.map(changes.brushedData, function(d) {
         d.statistic = _.find(self.state.barcodeSettings.barcodeData, {
-          lineID: d.lineID,
-          id_mult: d.id_mult,
+          featureID: d.lineID,
         }).statistic;
         d.logFC = _.find(self.state.barcodeSettings.barcodeData, {
-          lineID: d.lineID,
-          id_mult: d.id_mult,
-        }).logFC;
+          featureID: d.lineID,
+        }).logFoldChange;
         return d;
       });
 
@@ -754,9 +789,9 @@ class Enrichment extends Component {
   };
 
   handleProteinSelected = toHighlightArray => {
+    // const { enrichmentFeatureIdKey } = this.state;
     const prevHighestValueObject = this.state.HighlightedProteins[0]?.sample;
     const highestValueObject = toHighlightArray[0];
-    const { enrichmentStudy, enrichmentModel } = this.props;
     if (
       this.state.barcodeSettings.barcodeData?.length > 0 &&
       toHighlightArray.length > 0
@@ -773,40 +808,11 @@ class Enrichment extends Component {
           SVGPlotLoading: true,
         });
         const dataItem = this.state.barcodeSettings.barcodeData.find(
-          i => i.lineID === highestValueObject?.sample,
+          i => i.featureID === highestValueObject?.sample,
         );
-        let id = dataItem?.id_mult ? dataItem?.id_mult : dataItem?.id;
-        let plotType = ['splineplot'];
-        switch (enrichmentModel) {
-          case 'DonorDifferentialPhosphorylation':
-            plotType = ['dotplot'];
-            break;
-          case 'Treatment and or Strain Differential Phosphorylation':
-            plotType = ['StrainStimDotplot', 'StimStrainDotplot'];
-            break;
-          case 'Timecourse Differential Phosphorylation':
-            plotType = ['lineplot', 'splineplot'];
-            break;
-          case 'Differential Expression':
-            plotType = ['proteindotplot'];
-            break;
-          case 'Differential Phosphorylation':
-            plotType = ['phosphodotplot'];
-            break;
-          case 'No Pretreatment Timecourse Differential Phosphorylation':
-            plotType = ['lineplot.modelII', 'splineplot.modelII'];
-            break;
-          case 'Ferrostatin Pretreatment Timecourse Differential Phosphorylation':
-            plotType = ['lineplot.modelIII', 'splineplot.modelIII'];
-            break;
-          default:
-            plotType = ['dotplot'];
-        }
-        let imageInfo = { key: '', title: '', svg: [] };
-        imageInfo.title = this.state.imageInfo.title;
-        imageInfo.key = this.state.imageInfo.key;
-        const handleSVGCb = this.handleSVG;
-        this.getPlot(id, plotType, enrichmentStudy, imageInfo, handleSVGCb);
+        // let id = dataItem[enrichmentFeatureIdKey] || '';
+        let id = dataItem.featureID || '';
+        this.getPlot(id);
       }
     } else {
       cancelRequestEnrichmentGetPlot();
@@ -822,71 +828,90 @@ class Enrichment extends Component {
     }
   };
 
-  getPlot = (id, plotType, enrichmentStudy, imageInfo, handleSVGCb) => {
+  getPlot = featureId => {
+    const { enrichmentPlotTypes } = this.state;
+    const { enrichmentStudy, enrichmentModel } = this.props;
+    let id = featureId != null ? featureId : '';
+    let imageInfo = { key: '', title: '', svg: [] };
+    imageInfo.title = this.state.imageInfo.title;
+    imageInfo.key = this.state.imageInfo.key;
+    // imageInfo.title = `Protein Intensity - ${enrichmentFeatureIdKey} ${featureId}`;
+    // imageInfo.key = `${enrichmentFeatureIdKey} ${featureId}`;
+    let handleSVGCb = this.handleSVG;
+    let handlePlotStudyError = this.handlePlotStudyError;
     let currentSVGs = [];
     // keep whatever dimension is less (height or width)
     // then multiply the other dimension by original svg ratio (height 595px, width 841px)
     let EnrichmentPlotSVGHeight = this.calculateHeight(this);
     let EnrichmentPlotSVGWidth = this.calculateWidth(this);
-    EnrichmentPlotSVGHeight = EnrichmentPlotSVGWidth * 0.70749;
-    // if (EnrichmentPlotSVGHeight + 60 > EnrichmentPlotSVGWidth) {
-    //   EnrichmentPlotSVGHeight = EnrichmentPlotSVGWidth * 0.70749;
-    // } else {
-    //   EnrichmentPlotSVGWidth = EnrichmentPlotSVGHeight * 1.41344;
-    // }
+    // EnrichmentPlotSVGHeight = EnrichmentPlotSVGWidth * 0.70749;
+    if (EnrichmentPlotSVGHeight + 60 > EnrichmentPlotSVGWidth) {
+      EnrichmentPlotSVGHeight = EnrichmentPlotSVGWidth * 0.70749;
+    } else {
+      EnrichmentPlotSVGWidth = EnrichmentPlotSVGHeight * 1.41344;
+    }
     cancelRequestEnrichmentGetPlot();
     let cancelToken = new CancelToken(e => {
       cancelRequestEnrichmentGetPlot = e;
     });
-    _.forEach(plotType, function(plot, i) {
-      phosphoprotService
-        .getPlot(
-          id,
-          plotType[i],
-          enrichmentStudy + 'plots',
-          undefined,
-          cancelToken,
-        )
-        .then(svgMarkupObj => {
-          let svgMarkup = svgMarkupObj.data;
-          svgMarkup = svgMarkup.replace(/id="/g, 'id="' + id + '-' + i + '-');
-          svgMarkup = svgMarkup.replace(
-            /#glyph/g,
-            '#' + id + '-' + i + '-glyph',
-          );
-          svgMarkup = svgMarkup.replace(/#clip/g, '#' + id + '-' + i + '-clip');
-          svgMarkup = svgMarkup.replace(
-            /<svg/g,
-            `<svg preserveAspectRatio="xMinYMin meet" style="width:${EnrichmentPlotSVGWidth}px" height:${EnrichmentPlotSVGHeight} id="currentSVG-${id}-${i}"`,
-          );
-          DOMPurify.addHook('afterSanitizeAttributes', function(node) {
-            if (
-              node.hasAttribute('xlink:href') &&
-              !node.getAttribute('xlink:href').match(/^#/)
-            ) {
-              node.remove();
-            }
-          });
-          // Clean HTML string and write into our DIV
-          let sanitizedSVG = DOMPurify.sanitize(svgMarkup, {
-            ADD_TAGS: ['use'],
-          });
-          let svgInfo = { plotType: plotType[i], svg: sanitizedSVG };
+    if (enrichmentPlotTypes.length > 0) {
+      _.forEach(enrichmentPlotTypes, function(plot, i) {
+        phosphoprotService
+          .plotStudy(
+            enrichmentStudy,
+            enrichmentModel,
+            id,
+            enrichmentPlotTypes[i].plotID,
+            handlePlotStudyError,
+            cancelToken,
+          )
+          .then(svgMarkupObj => {
+            let svgMarkup = svgMarkupObj.data;
+            svgMarkup = svgMarkup.replace(/id="/g, 'id="' + id + '-' + i + '-');
+            svgMarkup = svgMarkup.replace(
+              /#glyph/g,
+              '#' + id + '-' + i + '-glyph',
+            );
+            svgMarkup = svgMarkup.replace(
+              /#clip/g,
+              '#' + id + '-' + i + '-clip',
+            );
+            svgMarkup = svgMarkup.replace(
+              /<svg/g,
+              `<svg preserveAspectRatio="xMinYMin meet" style="width:${EnrichmentPlotSVGWidth}px" height:${EnrichmentPlotSVGHeight} id="currentSVG-${id}-${i}"`,
+            );
+            DOMPurify.addHook('afterSanitizeAttributes', function(node) {
+              if (
+                node.hasAttribute('xlink:href') &&
+                !node.getAttribute('xlink:href').match(/^#/)
+              ) {
+                node.remove();
+              }
+            });
+            // Clean HTML string and write into our DIV
+            let sanitizedSVG = DOMPurify.sanitize(svgMarkup, {
+              ADD_TAGS: ['use'],
+            });
+            let svgInfo = {
+              plotType: enrichmentPlotTypes[i],
+              svg: sanitizedSVG,
+            };
 
-          // we want spline plot in zero index, rather than lineplot
-          // if (i === 0) {
-          imageInfo.svg.push(svgInfo);
-          currentSVGs.push(sanitizedSVG);
-          // } else {
-          //   imageInfo.svg.unshift(svgInfo);
-          //   currentSVGs.unshift(sanitizedSVG);
-          // }
-          handleSVGCb(imageInfo);
-        })
-        .catch(error => {
-          console.error('Error during getPlot', error);
-        });
-    });
+            // we want spline plot in zero index, rather than lineplot
+            // if (i === 0) {
+            imageInfo.svg.push(svgInfo);
+            currentSVGs.push(sanitizedSVG);
+            // } else {
+            //   imageInfo.svg.unshift(svgInfo);
+            //   currentSVGs.unshift(sanitizedSVG);
+            // }
+            handleSVGCb(imageInfo);
+          })
+          .catch(error => {
+            console.error('Error during getPlot', error);
+          });
+      });
+    }
   };
 
   handleSVG = imageInfo => {
@@ -897,7 +922,18 @@ class Enrichment extends Component {
     });
   };
 
-  handleGetDatabaseInfoError = () => {
+  handlePlotStudyError = () => {
+    this.setState({
+      SVGPlotLoaded: false,
+      SVGPlotLoading: false,
+      // imageInfo: {
+      //   ...this.state.imageInfo,
+      //   svg: []
+      // },
+    });
+  };
+
+  handleGetBarcodeDataError = () => {
     this.testSelectedTransition(false);
     this.handleSearchCriteriaChange(
       {
@@ -909,10 +945,6 @@ class Enrichment extends Component {
       false,
     );
   };
-  // redundant, may need more to this, so will wait to remove
-  handleGetBarcodeDataError = () => {
-    this.handleGetDatabaseInfoError();
-  };
 
   testSelected = (
     enrichmentStudy,
@@ -922,7 +954,7 @@ class Enrichment extends Component {
     test,
   ) => {
     this.testSelectedTransition(true);
-    const TestSiteVar = `${test}:${dataItem.Description}`;
+    const TestSiteVar = `${test}:${dataItem.description}`;
     this.handleSearchCriteriaChange(
       {
         enrichmentStudy: this.props.enrichmentStudy || '',
@@ -932,63 +964,33 @@ class Enrichment extends Component {
       },
       true,
     );
-    // let xLargest = 0;
-    // let imageInfo = { key: '', title: '', svg: [] };
-    // if (this.state.annotationData.length === 0) {
+    let term = dataItem.termID;
+    this.setState({
+      imageInfo: {
+        ...this.state.imageInfo,
+        key: `${test}:${dataItem.description}`,
+        title: `${test}:${dataItem.description}`,
+        dataItem: dataItem,
+      },
+      enrichmentNameLoaded: true,
+      enrichmentDataItem: dataItem,
+      enrichmentTerm: term,
+    });
+
     phosphoprotService
-      .getDatabaseInfo(
-        enrichmentStudy + 'plots',
+      .getBarcodeData(
+        enrichmentStudy,
+        enrichmentModel,
+        test,
         enrichmentAnnotation,
-        this.handleGetDatabaseInfoError,
+        term,
+        this.handleGetBarcodeDataError,
       )
-      .then(annotationDataResponse => {
-        const annotationDataParsed = JSON.parse(annotationDataResponse);
-        this.setState({
-          annotationData: annotationDataParsed,
-        });
-        dataItem.Annotation = _.find(annotationDataParsed, {
-          Description: dataItem.Description,
-        }).Key;
-        let term = dataItem.Annotation;
-
-        this.setState({
-          imageInfo: {
-            ...this.state.imageInfo,
-            key: `${test}:${dataItem.Description}`,
-            title: `${test}:${dataItem.Description}`,
-            dataItem: dataItem,
-          },
-          enrichmentNameLoaded: true,
-          enrichmentDataItem: dataItem,
-          enrichmentTerm: term,
-        });
-
-        phosphoprotService
-          .getBarcodeData(
-            enrichmentStudy + 'plots',
-            enrichmentModel,
-            enrichmentAnnotation,
-            test,
-            dataItem.Annotation,
-            this.handleGetBarcodeDataError,
-          )
-          .then(barcodeDataResponse => {
-            let BardcodeInfoObj = JSON.parse(barcodeDataResponse['object']);
-            let highest = barcodeDataResponse['highest'][0];
-            // if (!this.state.modelsToRenderViolin.includes(this.enrichmentModel)){
-            //   this.setState({ sizeVal = '0%' )};
-            // } else {
-            //   this.setState({ sizeVal = '50%')};
-            // }
-            this.showBarcodePlot(dataItem, BardcodeInfoObj, test, highest);
-          })
-          .catch(error => {
-            console.error('Error during getBarcodeData', error);
-          });
-        // });
+      .then(barcodeDataResponse => {
+        this.showBarcodePlot(barcodeDataResponse);
       })
       .catch(error => {
-        console.error('Error during getDatabaseInfo', error);
+        console.error('Error during getBarcodeData', error);
       });
   };
 
@@ -1013,15 +1015,15 @@ class Enrichment extends Component {
         //stored annodationdata and won't call the service after the first time...reset it when sc changes
         // } else {
         //   dataItem.Annotation = _.find(self.state.annotationData, {
-        //     Description: dataItem.Description
+        //     Description: dataItem.description
         //   }).Key;
         //   let term = dataItem.Annotation;
 
         //   self.setState({
         //     imageInfo: {
         //       ...self.state.imageInfo,
-        //       key: `${test} : ${dataItem.Description}`,
-        //       title: `${test} : ${dataItem.Description}`
+        //       key: `${test} : ${dataItem.description}`,
+        //       title: `${test} : ${dataItem.description}`
         //     },
         //     enrichmentNameLoaded: true,
         //     enrichmentDataItem: dataItem,
@@ -1045,7 +1047,7 @@ class Enrichment extends Component {
         //       //   this.setState({ sizeVal = '50%')};
         //       // }
 
-        //       showBarcodePlotCb(dataItem, BardcodeInfoObj, test, highest);
+        //       showBarcodePlotCb(barcodeDataResponse);
         //     });
         // }
       };
@@ -1054,64 +1056,27 @@ class Enrichment extends Component {
     addParams.getLink = (enrichmentStudy, enrichmentAnnotation, dataItem) => {
       let self = this;
       return function() {
-        if (self.state.annotationData.length === 0) {
-          phosphoprotService
-            .getDatabaseInfo(enrichmentStudy + 'plots', enrichmentAnnotation)
-            .then(annotationDataResponse => {
-              const annotationDataParsed = JSON.parse(annotationDataResponse);
-              dataItem.Annotation = _.find(annotationDataParsed, {
-                Description: dataItem.Description,
-              }).Key;
-              const database = enrichmentAnnotation;
-              if (database === 'REACTOME') {
-                window.open(
-                  'https://reactome.org/content/detail/' + dataItem.Annotation,
-                  '_blank',
-                );
-              } else if (database.substring(0, 2) === 'GO') {
-                window.open(
-                  'http://amigo.geneontology.org/amigo/term/' +
-                    dataItem.Annotation,
-                  '_blank',
-                );
-              } else if (database.substring(0, 4) === 'msig') {
-                window.open(
-                  'http://software.broadinstitute.org/gsea/msigdb/cards/' +
-                    dataItem.Annotation,
-                  '_blank',
-                );
-              } else if (database === 'PSP') {
-                self.showPhosphositePlus('', dataItem);
-              }
-            })
-            .catch(error => {
-              console.error('Error during getDatabaseInfo', error);
-            });
-        } else {
-          dataItem.Annotation = _.find(self.state.annotationData, {
-            Description: dataItem.Description,
-          }).Key;
-          const database = enrichmentAnnotation;
-          if (database === 'REACTOME') {
-            window.open(
-              'https://reactome.org/content/detail/' + dataItem.Annotation,
-              '_blank',
-            );
-          } else if (database.substring(0, 2) === 'GO') {
-            window.open(
-              'http://amigo.geneontology.org/amigo/term/' + dataItem.Annotation,
-              '_blank',
-            );
-          } else if (database.substring(0, 4) === 'msig') {
-            window.open(
-              'http://software.broadinstitute.org/gsea/msigdb/cards/' +
-                dataItem.Annotation,
-              '_blank',
-            );
-          } else if (database === 'PSP') {
-            self.showPhosphositePlus('', dataItem);
-          }
+        const database = enrichmentAnnotation;
+        if (database === 'REACTOME') {
+          window.open(
+            'https://reactome.org/content/detail/' + dataItem.termID,
+            '_blank',
+          );
+        } else if (database.substring(0, 2) === 'GO') {
+          window.open(
+            'http://amigo.geneontology.org/amigo/term/' + dataItem.termID,
+            '_blank',
+          );
+        } else if (database.substring(0, 4) === 'msig') {
+          window.open(
+            'http://software.broadinstitute.org/gsea/msigdb/cards/' +
+              dataItem.termID,
+            '_blank',
+          );
+        } else if (database === 'PSP') {
+          self.showPhosphositePlus('', dataItem);
         }
+        // }
       };
     };
 
@@ -1155,7 +1120,6 @@ class Enrichment extends Component {
       .pie()
       .sort(null)
       .value(1);
-    pie = 1;
     let arc = d3
       .arc()
       .outerRadius(radius)
@@ -1553,7 +1517,7 @@ class Enrichment extends Component {
       return e.title;
     });
     const uDataRelevantFields = _.filter(columnsArr, function(key) {
-      return key !== 'Description' && key !== 'Annotation';
+      return key !== 'description' && key !== 'Annotation';
     });
     // multiset svg rebuilds based on uData...if there are no results we need to override this from being passed down
     if (uDataRelevantFields.length !== 0) {
@@ -1865,6 +1829,12 @@ class Enrichment extends Component {
               onDisablePlot={this.disablePlot}
               onGetMultisetPlot={this.handleMultisetPlot}
               onHandlePlotAnimation={this.handlePlotAnimation}
+              onFilterNetworkFromUpset={this.filterNetworkFromUpset}
+              onHandlePlotTypesEnrichment={this.handlePlotTypesEnrichment}
+              onSetStudyModelAnnotationMetadata={
+                this.setStudyModelAnnotationMetadata
+              }
+              onSetAnnotationsMetadata={this.setAnnotationsMetadata}
             />
           </Grid.Column>
           <Grid.Column

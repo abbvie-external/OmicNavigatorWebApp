@@ -67,8 +67,8 @@ class EnrichmentSearchCriteria extends Component {
       not: [],
       displayMetaData: true,
       templateName: 'enrichment-multiset',
-      numElements: undefined,
-      maxElements: undefined,
+      numElements: 0,
+      maxElements: 0,
       metaSvg: '',
       heightScalar: 1,
       thresholdCols: [
@@ -93,9 +93,7 @@ class EnrichmentSearchCriteria extends Component {
     },
     multisetFiltersVisible: false,
     activateMultisetFilters: false,
-    enrichmentStudyMetadata: [],
-    enrichmentModelsAndAnnotations: [],
-    enrichmentAnnotationsMeta: [],
+    reloadPlot: true,
   };
 
   componentDidMount() {
@@ -147,12 +145,13 @@ class EnrichmentSearchCriteria extends Component {
       const enrichmentStudyData = allStudiesMetadataCopy.find(
         study => study.name === enrichmentStudy,
       );
-      const enrichmentModelsAndAnnotations = enrichmentStudyData.enrichments;
-      this.setState({
-        enrichmentStudyMetadata: enrichmentStudyData,
-        enrichmentModelsAndAnnotations: enrichmentModelsAndAnnotations,
-      });
-      const enrichmentModelsMapped = enrichmentModelsAndAnnotations.map(
+      const enrichmentModelsAndAnnotationsVar =
+        enrichmentStudyData?.enrichments || [];
+      this.props.onSetStudyModelAnnotationMetadata(
+        enrichmentStudyData,
+        enrichmentModelsAndAnnotationsVar,
+      );
+      const enrichmentModelsMapped = enrichmentModelsAndAnnotationsVar.map(
         enrichment => {
           return {
             key: `${enrichment.modelID}Enrichment`,
@@ -168,7 +167,8 @@ class EnrichmentSearchCriteria extends Component {
       });
 
       if (enrichmentModel !== '') {
-        const enrichmentModelWithAnnotations = enrichmentModelsAndAnnotations.find(
+        this.props.onHandlePlotTypesEnrichment(enrichmentModel);
+        const enrichmentModelWithAnnotations = enrichmentModelsAndAnnotationsVar.find(
           model => model.modelID === enrichmentModel,
         );
         const enrichmentModelTooltip =
@@ -176,9 +176,9 @@ class EnrichmentSearchCriteria extends Component {
         this.setState({
           enrichmentModelTooltip: enrichmentModelTooltip,
         });
-        const enrichmentAnnotationsMeta =
+        const enrichmentAnnotationsMetadataVar =
           enrichmentModelWithAnnotations?.annotations || [];
-        const enrichmentAnnotationsMapped = enrichmentAnnotationsMeta.map(
+        const enrichmentAnnotationsMapped = enrichmentAnnotationsMetadataVar.map(
           annotation => {
             return {
               key: `${annotation.annotationID}Enrichment`,
@@ -187,32 +187,16 @@ class EnrichmentSearchCriteria extends Component {
             };
           },
         );
-        // PAUL - is this needed - const uDataMapped = enrichmentAnnotationsMeta.map(a => a.annotationID);
+        const uDataMapped = enrichmentAnnotationsMetadataVar.map(
+          a => a.annotationID,
+        );
         this.setState({
           enrichmentAnnotationsDisabled: false,
           enrichmentAnnotations: enrichmentAnnotationsMapped,
-          enrichmentAnnotationsMeta,
-          // uData: uDataMapped,
+          uData: uDataMapped,
         });
-
+        this.props.onSetAnnotationsMetadata(enrichmentAnnotationsMetadataVar);
         if (enrichmentAnnotation !== '') {
-          onSearchCriteriaChange(
-            {
-              enrichmentStudy: enrichmentStudy,
-              enrichmentModel: enrichmentModel,
-              enrichmentAnnotation: enrichmentAnnotation,
-              enrichmentDescriptionAndTest: enrichmentDescriptionAndTest,
-            },
-            false,
-          );
-          const enrichmentAnnotationMeta = enrichmentAnnotationsMeta.find(
-            annotation => annotation.annotationID === enrichmentAnnotation,
-          );
-          const enrichmentAnnotationTooltip =
-            enrichmentAnnotationMeta?.annotationDisplay || '';
-          this.setState({
-            enrichmentAnnotationTooltip,
-          });
           onSearchTransitionEnrichment(true);
           phosphoprotService
             .getEnrichmentsTable(
@@ -233,6 +217,23 @@ class EnrichmentSearchCriteria extends Component {
             .catch(error => {
               console.error('Error during getEnrichmentsTable', error);
             });
+          onSearchCriteriaChange(
+            {
+              enrichmentStudy: enrichmentStudy,
+              enrichmentModel: enrichmentModel,
+              enrichmentAnnotation: enrichmentAnnotation,
+              enrichmentDescriptionAndTest: enrichmentDescriptionAndTest,
+            },
+            false,
+          );
+          const enrichmentAnnotationMeta = enrichmentAnnotationsMetadataVar.find(
+            annotation => annotation.annotationID === enrichmentAnnotation,
+          );
+          const enrichmentAnnotationTooltip =
+            enrichmentAnnotationMeta?.annotationDisplay || '';
+          this.setState({
+            enrichmentAnnotationTooltip,
+          });
         }
       }
     }
@@ -267,8 +268,9 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentStudy,
       onSearchCriteriaChange,
       onSearchCriteriaReset,
+      enrichmentModelsAndAnnotations,
     } = this.props;
-    const { enrichmentModelsAndAnnotations } = this.state;
+    this.props.onHandlePlotTypesEnrichment(value);
     onSearchCriteriaChange(
       {
         enrichmentStudy: enrichmentStudy,
@@ -289,9 +291,9 @@ class EnrichmentSearchCriteria extends Component {
     );
     const enrichmentModelTooltip =
       enrichmentModelWithAnnotations?.modelDisplay || '';
-    const enrichmentAnnotationsMeta =
+    const enrichmentAnnotationsMetadataVar =
       enrichmentModelWithAnnotations.annotations || [];
-    const enrichmentAnnotationsMapped = enrichmentAnnotationsMeta.map(
+    const enrichmentAnnotationsMapped = enrichmentAnnotationsMetadataVar.map(
       annotation => {
         return {
           key: annotation.annotationID,
@@ -304,9 +306,9 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentAnnotationsDisabled: false,
       enrichmentAnnotations: enrichmentAnnotationsMapped,
       enrichmentModelTooltip: enrichmentModelTooltip,
-      enrichmentAnnotationsMeta,
       enrichmentAnnotationTooltip: '',
     });
+    this.props.onSetAnnotationsMetadata(enrichmentAnnotationsMetadataVar);
   };
 
   handleAnnotationChange = (evt, { name, value }) => {
@@ -317,7 +319,7 @@ class EnrichmentSearchCriteria extends Component {
       onSearchTransitionEnrichment,
       onSearchCriteriaChange,
     } = this.props;
-    const enrichmentAnnotationMeta = this.state.enrichmentAnnotationsMeta.find(
+    const enrichmentAnnotationMeta = this.props.enrichmentAnnotationsMetadata.find(
       annotation => annotation.annotationID === value,
     );
     const enrichmentAnnotationTooltip =
@@ -487,6 +489,10 @@ class EnrichmentSearchCriteria extends Component {
             },
             activateMultisetFilters: true,
           });
+          this.props.onFilterNetworkFromUpset({
+            must: eMust,
+            not: eNot,
+          });
           onEnrichmentSearch({
             enrichmentResults: multisetResults,
           });
@@ -500,19 +506,21 @@ class EnrichmentSearchCriteria extends Component {
   handleMultisetToggle = () => {
     return evt => {
       if (this.state.multisetFiltersVisible === false) {
-        this.setState({
-          multisetFiltersVisible: true,
-        });
-        this.updateQueryData({
-          must: this.state.uSettings.must,
-          not: this.state.uSettings.not,
-          sigValue: this.state.sigValue,
-          selectedCol: this.state.selectedCol,
-          selectedOperator: this.state.selectedOperator,
-        });
+        // on toggle open
+        this.setState(
+          {
+            reloadPlot: true,
+            multisetFiltersVisible: true,
+          },
+          function() {
+            this.updateQueryData();
+          },
+        );
       } else {
+        // on toggle close
         this.setState({
           multisetFiltersVisible: false,
+          reloadPlot: false,
         });
         const enrichmentAnnotationName = 'enrichmentAnnotation';
         const enrichmentAnnotationVar = this.props.enrichmentAnnotation;
@@ -683,20 +691,22 @@ class EnrichmentSearchCriteria extends Component {
       pValueType,
       onEnrichmentSearch,
       onDisablePlot,
+      // tests,
     } = this.props;
+    const { reloadPlot } = this.state;
     onDisablePlot();
     const eSigV = this.state.sigValue;
     const eMust = this.state.uSettings.must;
     const eNot = this.state.uSettings.not;
     const eOperator = this.state.selectedOperator;
-    this.getMultisetPlot(
-      eSigV,
-      enrichmentModel,
-      enrichmentStudy,
-      enrichmentAnnotation,
-      this.jsonToList(eOperator),
-      pValueType,
-    );
+    // this.getMultisetPlot(
+    //   eSigV,
+    //   enrichmentModel,
+    //   enrichmentStudy,
+    //   enrichmentAnnotation,
+    //   this.jsonToList(eOperator),
+    //   pValueType,
+    // );
     cancelRequestMultisetEnrichmentData();
     let cancelToken = new CancelToken(e => {
       cancelRequestMultisetEnrichmentData = e;
@@ -715,6 +725,26 @@ class EnrichmentSearchCriteria extends Component {
         cancelToken,
       )
       .then(annotationData => {
+        let countAlphanumericFields = [];
+        const firstObject = annotationData[0];
+        const totalLength = Object.keys(firstObject).length;
+        for (let [key, value] of Object.entries(firstObject)) {
+          if (typeof value === 'string' || value instanceof String) {
+            countAlphanumericFields.push(key);
+          }
+        }
+        const alphanumericLength = countAlphanumericFields.length;
+        const annotationTestsLength = totalLength - alphanumericLength;
+        if (reloadPlot === true && annotationTestsLength > 1) {
+          this.getMultisetPlot(
+            eSigV,
+            enrichmentModel,
+            enrichmentStudy,
+            enrichmentAnnotation,
+            this.jsonToList(eOperator),
+            pValueType,
+          );
+        }
         const multisetResults = annotationData;
         this.setState({
           uSettings: {
@@ -725,6 +755,10 @@ class EnrichmentSearchCriteria extends Component {
             not: eNot,
           },
           activateMultisetFilters: true,
+        });
+        this.props.onFilterNetworkFromUpset({
+          must: eMust,
+          not: eNot,
         });
         onEnrichmentSearch({
           enrichmentResults: multisetResults,
@@ -831,7 +865,6 @@ class EnrichmentSearchCriteria extends Component {
       multisetPlotAvailable,
       plotButtonActive,
       isTestDataLoaded,
-      activeIndexEnrichmentView,
     } = this.props;
 
     const StudyPopupStyle = {
@@ -891,8 +924,7 @@ class EnrichmentSearchCriteria extends Component {
     if (
       isValidSearchEnrichment &&
       activateMultisetFilters &&
-      multisetFiltersVisible &&
-      activeIndexEnrichmentView === 0
+      multisetFiltersVisible
     ) {
       EMultisetFilters = (
         <EnrichmentMultisetFilters
@@ -911,7 +943,7 @@ class EnrichmentSearchCriteria extends Component {
     let PlotRadio;
     let MultisetRadio;
 
-    if (isValidSearchEnrichment && activeIndexEnrichmentView === 0) {
+    if (isValidSearchEnrichment) {
       PlotRadio = (
         <Transition
           visible={!multisetPlotAvailable}
