@@ -91,8 +91,7 @@ class EnrichmentSearchCriteria extends Component {
         },
       ],
     },
-    multisetFiltersVisible: false,
-    activateMultisetFilters: false,
+    // activateMultisetFilters: false,
     reloadPlot: true,
   };
 
@@ -324,13 +323,10 @@ class EnrichmentSearchCriteria extends Component {
     );
     const enrichmentAnnotationTooltip =
       enrichmentAnnotationMeta?.annotationDisplay || '';
+    this.props.onHandleMulisetFiltersVisible(false);
     this.setState({
       enrichmentAnnotationTooltip,
       reloadPlot: true,
-      multisetFiltersVisibleP: false,
-    });
-    this.setState({
-      multisetFiltersVisible: false,
     });
     onSearchCriteriaChange(
       {
@@ -376,6 +372,7 @@ class EnrichmentSearchCriteria extends Component {
     handleColumns,
   ) => {
     if (handleUSettings) {
+      this.props.onHandleNetworkSigValue(0.05);
       this.setState({
         uSettings: {
           ...this.state.uSettings,
@@ -411,10 +408,11 @@ class EnrichmentSearchCriteria extends Component {
       onSearchTransitionEnrichment,
       onEnrichmentSearch,
       onPValueTypeChange,
+      multisetFiltersVisible,
     } = this.props;
     onSearchTransitionEnrichment(true);
     onPValueTypeChange(value);
-    if (!this.state.multisetFiltersVisible) {
+    if (!multisetFiltersVisible) {
       cancelGetEnrichmentsTable();
       let cancelToken = new CancelToken(e => {
         cancelGetEnrichmentsTable = e;
@@ -479,7 +477,7 @@ class EnrichmentSearchCriteria extends Component {
               must: eMust,
               not: eNot,
             },
-            activateMultisetFilters: true,
+            // activateMultisetFilters: true,
           });
           onEnrichmentSearch({
             enrichmentResults: multisetResults,
@@ -493,12 +491,12 @@ class EnrichmentSearchCriteria extends Component {
 
   handleMultisetToggle = () => {
     return evt => {
-      if (this.state.multisetFiltersVisible === false) {
+      if (this.props.multisetFiltersVisible === false) {
         // on toggle open
+        this.props.onHandleMulisetFiltersVisible(true);
         this.setState(
           {
             reloadPlot: true,
-            multisetFiltersVisible: true,
           },
           function() {
             this.updateQueryData();
@@ -506,8 +504,8 @@ class EnrichmentSearchCriteria extends Component {
         );
       } else {
         // on toggle close
+        this.props.onHandleMulisetFiltersVisible(false);
         this.setState({
-          multisetFiltersVisible: false,
           reloadPlot: false,
         });
         const enrichmentAnnotationName = 'enrichmentAnnotation';
@@ -522,17 +520,15 @@ class EnrichmentSearchCriteria extends Component {
 
   handleMultisetEOpenError = () => {
     cancelRequestEnrichmentMultisetPlot();
-    this.setState({
-      multisetFiltersVisible: false,
-    });
+    this.props.onHandleMulisetFiltersVisible(false);
     console.log('Error during getEnrichmentsIntersection');
   };
 
   handleMultisetECloseError = () => {
     this.props.onSearchTransitionEnrichment(false);
+    this.props.onHandleMulisetFiltersVisible(true);
     this.setState(
       {
-        multisetFiltersVisible: true,
         reloadPlot: true,
       },
       this.updateQueryData(),
@@ -583,52 +579,13 @@ class EnrichmentSearchCriteria extends Component {
         console.error('Error during getEnrichmentsTable', error);
       });
   };
-  addFilter = () => {
-    const uSetVP = { ...this.state.uSettings };
-    uSetVP.indexFilters = [...this.state.uSettings.indexFilters].concat(
-      this.state.uSettings.indexFilters.length,
-    );
-
-    this.setState({
-      selectedCol: [...this.state.selectedCol].concat(
-        this.state.uSettings.defaultSelectedCol,
-      ),
-      selectedOperator: [...this.state.selectedOperator].concat(
-        this.state.uSettings.defaultSelectedOperator,
-      ),
-      sigValue: [...this.state.sigValue].concat(
-        this.state.uSettings.defaultSigValue,
-      ),
-      uSettings: uSetVP,
-    });
-  };
-  removeFilter = index => {
-    const uSetVP = { ...this.state.uSettings };
-    uSetVP.indexFilters = [...uSetVP.indexFilters]
-      .slice(0, index)
-      .concat([...uSetVP.indexFilters].slice(index + 1));
-    for (var i = index; i < uSetVP.indexFilters.length; i++) {
-      uSetVP.indexFilters[i]--;
-    }
-    this.setState({
-      selectedCol: [...this.state.selectedCol]
-        .slice(0, index)
-        .concat([...this.state.selectedCol].slice(index + 1)),
-      selectedOperator: [...this.state.selectedOperator]
-        .slice(0, index)
-        .concat([...this.state.selectedOperator].slice(index + 1)),
-      sigValue: [...this.state.sigValue]
-        .slice(0, index)
-        .concat([...this.state.sigValue].slice(index + 1)),
-      uSettings: uSetVP,
-    });
-  };
   changeHoveredFilter = index => {
     const uSetVP = { ...this.state.uSettings };
     uSetVP.hoveredFilter = index;
     this.setState({ uSettings: uSetVP });
   };
-  handleDropdownChange = (evt, { name, value, index }) => {
+  handleOperatorChange = (evt, { name, value, index }) => {
+    this.props.onHandleNetworkOperator(value);
     const uSelVP = [...this.state[name]];
     uSelVP[index] = {
       key: value,
@@ -646,6 +603,7 @@ class EnrichmentSearchCriteria extends Component {
     );
   };
   handleSigValueEInputChange = value => {
+    this.props.onHandleNetworkSigValue(parseFloat(value));
     this.setState(
       {
         sigValue: [parseFloat(value)],
@@ -657,6 +615,7 @@ class EnrichmentSearchCriteria extends Component {
     );
   };
   handleSetChange = ({ must, not }) => {
+    this.props.onHandleNetworkTests(must, not);
     const uSettingsVP = this.state.uSettings;
     uSettingsVP.must = must;
     uSettingsVP.not = not;
@@ -666,7 +625,7 @@ class EnrichmentSearchCriteria extends Component {
         reloadPlot: false,
       },
       function() {
-        this.updateQueryData(false);
+        this.updateQueryData();
       },
     );
   };
@@ -736,7 +695,7 @@ class EnrichmentSearchCriteria extends Component {
             must: eMust,
             not: eNot,
           },
-          activateMultisetFilters: true,
+          // activateMultisetFilters: true,
         });
         onEnrichmentSearch({
           enrichmentResults: multisetResults,
@@ -830,8 +789,7 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentStudiesDisabled,
       enrichmentModelsDisabled,
       enrichmentAnnotationsDisabled,
-      multisetFiltersVisible,
-      activateMultisetFilters,
+      // activateMultisetFilters,
     } = this.state;
 
     const {
@@ -843,6 +801,7 @@ class EnrichmentSearchCriteria extends Component {
       multisetPlotAvailable,
       plotButtonActive,
       isTestDataLoaded,
+      multisetFiltersVisible,
     } = this.props;
 
     const StudyPopupStyle = {
@@ -901,14 +860,14 @@ class EnrichmentSearchCriteria extends Component {
     let EMultisetFilters;
     if (
       isValidSearchEnrichment &&
-      activateMultisetFilters &&
+      // activateMultisetFilters &&
       multisetFiltersVisible
     ) {
       EMultisetFilters = (
         <EnrichmentMultisetFilters
           {...this.props}
           {...this.state}
-          onHandleDropdownChange={this.handleDropdownChange}
+          onHandleOperatorChange={this.handleOperatorChange}
           onHandleSigValueEInputChange={this.handleSigValueEInputChange}
           onHandleSetChange={this.handleSetChange}
           onAddFilter={this.addFilter}

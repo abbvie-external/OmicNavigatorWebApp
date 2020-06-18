@@ -165,6 +165,12 @@ class Enrichment extends Component {
     enrichmentModelsAndAnnotations: [],
     enrichmentAnnotationsMetadata: [],
     enrichmentFeatureIdKey: '',
+    multisetFiltersVisible: false,
+    reloadPlot: false,
+    networkSigValue: '0.05',
+    networkOperator: '<',
+    networkTestsMust: [],
+    networkTestsNot: [],
   };
   EnrichmentViewContainerRef = React.createRef();
 
@@ -303,6 +309,30 @@ class Enrichment extends Component {
   setAnnotationsMetadata = annotationsData => {
     this.setState({
       enrichmentAnnotationsMetadata: annotationsData,
+    });
+  };
+
+  handleMulisetFiltersVisible = bool => {
+    this.setState({
+      multisetFiltersVisible: bool,
+    });
+  };
+
+  handleNetworkSigValue = val => {
+    this.setState({
+      networkSigValue: val.toString(),
+    });
+  };
+
+  handleNetworkOperator = op => {
+    this.setState({
+      networkOperator: op,
+    });
+  };
+  handleNetworkTests = (must, not) => {
+    this.setState({
+      networkTestsMust: must,
+      networkTestsNot: not,
     });
   };
 
@@ -1831,6 +1861,10 @@ class Enrichment extends Component {
                 this.setStudyModelAnnotationMetadata
               }
               onSetAnnotationsMetadata={this.setAnnotationsMetadata}
+              onHandleMulisetFiltersVisible={this.handleMulisetFiltersVisible}
+              onHandleNetworkSigValue={this.handleNetworkSigValue}
+              onHandleNetworkOperator={this.handleNetworkOperator}
+              onHandleNetworkTests={this.handleNetworkTests}
             />
           </Grid.Column>
           <Grid.Column

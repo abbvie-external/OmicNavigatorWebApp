@@ -3,7 +3,7 @@ import _ from 'lodash';
 import * as d3 from 'd3';
 import { Dimmer, Loader, Message } from 'semantic-ui-react';
 import './NetworkGraph.scss';
-import { networkByCluster, limitValues } from '../Shared/helpers';
+import { networkByCluster } from '../Shared/helpers';
 
 class NetworkGraph extends Component {
   state = {
@@ -30,7 +30,10 @@ class NetworkGraph extends Component {
 
   componentDidUpdate(prevProps) {
     if (
-      this.props.networkData !== prevProps.networkData ||
+      this.props.networkData.nodes.length !==
+        prevProps.networkData.nodes.length ||
+      this.props.networkData.links.length !==
+        prevProps.networkData.links.length ||
       this.props.nodeCutoff !== prevProps.nodeCutoff ||
       this.props.linkCutoff !== prevProps.linkCutoff ||
       this.props.linkType !== prevProps.linkType ||
@@ -124,6 +127,12 @@ class NetworkGraph extends Component {
       pValueType,
       linkType,
       linkCutoff,
+      networkOperator,
+      multisetFiltersVisible,
+      networkSigValue,
+      nodeCutoff,
+      networkTestsMust,
+      networkTestsNot,
     } = this.props;
     const self = this;
     this.removeNetworkSVG();
@@ -183,20 +192,50 @@ class NetworkGraph extends Component {
           return Math.min(...facets.map(f => f.value).filter(v => v != null));
         } else return facets[0].value;
       }
+      function getNodeHighestSignificantValue(facets) {
+        if (facets.length > 1) {
+          return Math.max(...facets.map(f => f.value).filter(v => v != null));
+        } else return facets[0].value;
+      }
       formattedNodes.forEach(node => {
         const lowestTestValueInNode = getNodeLowestSignificantValue(
           node.facets,
         );
         node.lowestValue = lowestTestValueInNode;
       });
+      formattedNodes.forEach(node => {
+        const highestTestValueInNode = getNodeHighestSignificantValue(
+          node.facets,
+        );
+        node.highestValue = highestTestValueInNode;
+      });
+      const dynamicNodeCutoff = multisetFiltersVisible
+        ? networkSigValue
+        : nodeCutoff;
 
-      let filteredNodes = formattedNodes.filter(
-        n => n.lowestValue <= this.props.nodeCutoff,
-      );
-
-      const mostSignificantTestValue = Math.min(
-        ...filteredNodes.map(f => f.lowestValue).filter(v => v != null),
-      );
+      let filteredNodes = [];
+      let mostSignificantTestValue = 0;
+      if (
+        multisetFiltersVisible &&
+        networkTestsMust.length === 0 &&
+        networkTestsNot.length === 0
+      ) {
+        filteredNodes = formattedNodes;
+      } else {
+        if (networkOperator === '<') {
+          filteredNodes = formattedNodes.filter(
+            n => n.lowestValue <= dynamicNodeCutoff,
+          );
+        }
+        if (networkOperator === '>') {
+          filteredNodes = formattedNodes.filter(
+            n => n.highestValue >= dynamicNodeCutoff,
+          );
+        }
+        mostSignificantTestValue = Math.min(
+          ...filteredNodes.map(f => f.lowestValue).filter(v => v != null),
+        );
+      }
 
       let filteredLinks = formattedLinks.filter(function(l) {
         let jaccardTotal = linkType * l.jaccard;

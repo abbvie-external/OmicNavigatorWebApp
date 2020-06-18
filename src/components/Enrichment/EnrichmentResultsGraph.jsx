@@ -435,6 +435,7 @@ class EnrichmentResultsGraph extends Component {
       totalNodes,
       totalLinks,
       legendIsOpen,
+      multisetFiltersVisible,
     } = this.props;
 
     if (!networkDataLoaded) {
@@ -537,7 +538,13 @@ class EnrichmentResultsGraph extends Component {
               widescreen={3}
               textAlign="center"
             >
-              <div className="InlineFlex NumericExponentialInputContainer">
+              <div
+                className={
+                  multisetFiltersVisible
+                    ? 'InlineFlex NumericExponentialInputContainer Hide'
+                    : 'InlineFlex NumericExponentialInputContainer Show'
+                }
+              >
                 <Popup
                   trigger={
                     <Label className="NetworkInputLabel" size={dynamicSize}>
@@ -568,7 +575,13 @@ class EnrichmentResultsGraph extends Component {
                   spellcheck="false"
                 />
               </div>
-              <div className="NetworkSliderDiv">
+              <div
+                className={
+                  multisetFiltersVisible
+                    ? 'NetworkSliderDiv Hide'
+                    : 'NetworkSliderDiv Show'
+                }
+              >
                 <StyledSlider
                   renderTrack={NodeTrack}
                   renderThumb={NodeThumb}
