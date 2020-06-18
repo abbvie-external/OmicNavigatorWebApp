@@ -9,16 +9,31 @@ import { updateUrl } from './Shared/UrlControl';
 class Tabs extends Component {
   constructor(props) {
     super(props);
+    console.log('this.props is ', this.props);
     const pathnameInit = this.props.location.pathname.substring(1) || null;
+    console.log('pathnameInit is ', pathnameInit);
     const pathname =
       pathnameInit !== null ? pathnameInit.replace(/–/gi, ' ') : pathnameInit;
     const params = pathname ? pathname.split('/') : '';
-    const tabFromUrl = params[0] || '';
-    const studyFromUrl = params[1] || '';
-    const modelFromUrl = params[2] || '';
-    const testFromUrl = params[3] || '';
-    const siteFromUrl = params[4] || '';
-    const descriptionFromUrl = params[5] || '';
+    console.log('pathname is ', pathname);
+    console.log('params are');
+    console.log(params);
+    let i = 0;
+    if (process.env.NODE_ENV === 'production') {
+      i = 4;
+    }
+    const tabFromUrl = params[i] || '';
+    console.log('[Tabs.jsx] tabFromUrl is ', tabFromUrl);
+    const studyFromUrl = params[i + 1] || '';
+    console.log('[Tabs.jsx] studyFromUrl is ', studyFromUrl);
+    const modelFromUrl = params[i + 2] || '';
+    console.log('[Tabs.jsx] modelFromUrl is ', modelFromUrl);
+    const testFromUrl = params[i + 3] || '';
+    console.log('[Tabs.jsx] testFromUrl is ', testFromUrl);
+    const siteFromUrl = params[i + 4] || '';
+    console.log('[Tabs.jsx] siteFromUrl is ', siteFromUrl);
+    const descriptionFromUrl = params[i + 5] || '';
+    console.log('[Tabs.jsx] descriptionFromUrl is ', descriptionFromUrl);
     const siteAndDescription =
       descriptionFromUrl !== ''
         ? `${siteFromUrl}/${descriptionFromUrl}`
@@ -48,6 +63,8 @@ class Tabs extends Component {
   }
 
   componentDidMount() {
+    console.log('[Tabs.jsx] componentDidMountt()');
+    console.log('[Tabs.jsx]', window.location.href);
     updateUrl(
       this.props,
       this.state,
@@ -57,6 +74,9 @@ class Tabs extends Component {
       false,
       null,
     );
+    console.log('[Tabs.jsx] ', this.props);
+    console.log('[Tabs.jsx]', this.state);
+    console.log('[Tabs.jsx]', window.location.href);
     this.getStudies();
   }
 
@@ -166,7 +186,7 @@ class Tabs extends Component {
         menuItem: (
           <Menu.Item key="1" disabled header className="LogoAndTitle">
             <span className="LogoElement">
-              <img alt="Omic Analyzer" src="/icon.png" className="LogoImage" />
+              <img alt="Omic Analyzer" src="./icon.png" className="LogoImage" />
             </span>
             <span className="Header HeaderFirst">Omic&nbsp;</span>
             <span className="Header HeaderSecond">Analyzer</span>

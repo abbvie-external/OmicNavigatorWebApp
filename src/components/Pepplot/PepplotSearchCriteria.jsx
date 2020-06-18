@@ -229,6 +229,11 @@ class PepplotSearchCriteria extends Component {
   };
 
   handleStudyChange = (evt, { name, value }) => {
+    console.log(
+      '[PepplotSearchCriteria.jsx] handleStudyChange ',
+      window.location.href,
+    );
+
     const { onSearchCriteriaChange, onSearchCriteriaReset } = this.props;
     onSearchCriteriaChange(
       {
@@ -252,11 +257,22 @@ class PepplotSearchCriteria extends Component {
   };
 
   handleModelChange = (evt, { name, value }) => {
+    console.log(
+      '[PepplotSearchCriteria.jsx] handleModelChange ',
+      window.location.href,
+    );
+    console.log(this.props);
     const {
       pepplotStudy,
       onSearchCriteriaChange,
       onSearchCriteriaReset,
     } = this.props;
+
+    console.log(
+      '[PepplotSearchCriteria.jsx] handleModelChange 1.10 ',
+      window.location.href,
+    );
+    debugger;
     onSearchCriteriaChange(
       {
         pepplotStudy: pepplotStudy,
@@ -265,13 +281,25 @@ class PepplotSearchCriteria extends Component {
       },
       true,
     );
+    console.log(
+      '[PepplotSearchCriteria.jsx] handleModelChange 1.11 ',
+      window.location.href,
+    );
     onSearchCriteriaReset({
       isValidSearchPepplot: false,
     });
+    console.log(
+      '[PepplotSearchCriteria.jsx] handleModelChange 1.12 ',
+      window.location.href,
+    );
     const { pepplotModelsAndTests } = this.state;
     const pepplotModelsAndTestsCopy = [...pepplotModelsAndTests];
     const pepplotModelWithTests = pepplotModelsAndTestsCopy.find(
       model => model.modelID === value,
+    );
+    console.log(
+      '[PepplotSearchCriteria.jsx] handleModelChange 1.25 ',
+      window.location.href,
     );
     const pepplotModelTooltip = pepplotModelWithTests?.modelDisplay || '';
     const pepplotTestsMeta = pepplotModelWithTests?.tests || [];
@@ -282,6 +310,10 @@ class PepplotSearchCriteria extends Component {
         value: test.testID,
       };
     });
+    console.log(
+      '[PepplotSearchCriteria.jsx] handleModelChange 1.5 ',
+      window.location.href,
+    );
     const uDataP = pepplotTestsMeta.map(t => t.testID);
     this.setState({
       pepplotTestsDisabled: false,
@@ -291,9 +323,18 @@ class PepplotSearchCriteria extends Component {
       pepplotModelTooltip: pepplotModelTooltip,
       pepplotTestTooltip: '',
     });
+    console.log(
+      '[PepplotSearchCriteria.jsx] handleModelChange 2 ',
+      window.location.href,
+    );
   };
 
   handleTestChange = (evt, { name, value }) => {
+    console.log(
+      '[PepplotSearchCriteria.jsx] handleTestChange ',
+      window.location.href,
+    );
+
     const {
       pepplotStudy,
       pepplotModel,
