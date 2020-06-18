@@ -619,7 +619,6 @@ class Enrichment extends Component {
       .then(getEnrichmentNetworkResponseData => {
         // const pValueTypeParam = pValueType === 'adjusted' ? 0.1 : 1;
         const tests = getEnrichmentNetworkResponseData.tests;
-        debugger;
         const enrichmentResultsDescriptions = [...enrichmentResults].map(
           r => r.description,
         );

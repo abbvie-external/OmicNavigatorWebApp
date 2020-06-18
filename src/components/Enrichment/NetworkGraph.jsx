@@ -126,7 +126,6 @@ class NetworkGraph extends Component {
     // Prepare Data
     let formattedNodes = networkData.nodes;
     let formattedLinks = networkData.links;
-    debugger;
     if (networkSettings.facets.length < 1) {
       return;
     } else {

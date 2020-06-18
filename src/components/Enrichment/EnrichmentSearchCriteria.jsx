@@ -196,7 +196,6 @@ class EnrichmentSearchCriteria extends Component {
           // uData: uDataMapped,
         });
         this.props.onSetAnnotationsMetadata(enrichmentAnnotationsMetadataVar);
-        debugger;
         if (enrichmentAnnotation !== '') {
           onSearchTransitionEnrichment(true);
           phosphoprotService
@@ -448,17 +447,16 @@ class EnrichmentSearchCriteria extends Component {
           console.error('Error during getEnrichmentsTable', error);
         });
     } else {
-      const eSigV = this.state.sigValue;
+      const { sigValue, selectedOperator } = this.state;
       const eMust = this.state.uSettings.must;
       const eNot = this.state.uSettings.not;
-      const eOperator = this.state.selectedOperator;
       console.log(value);
       this.getMultisetPlot(
-        eSigV,
+        sigValue,
         enrichmentModel,
         enrichmentStudy,
         enrichmentAnnotation,
-        this.jsonToList(eOperator),
+        this.jsonToList(selectedOperator),
         value,
       );
       cancelRequestMultisetEnrichmentData();
@@ -472,8 +470,8 @@ class EnrichmentSearchCriteria extends Component {
           enrichmentAnnotation,
           eMust,
           eNot,
-          eSigV,
-          this.jsonToList(eOperator),
+          sigValue,
+          this.jsonToList(selectedOperator),
           value,
           undefined,
           cancelToken,
@@ -675,13 +673,12 @@ class EnrichmentSearchCriteria extends Component {
         reloadPlot: false,
       },
       function() {
-        this.updateQueryData();
+        this.updateQueryData(false);
       },
     );
   };
 
   updateQueryData = () => {
-    debugger;
     const {
       enrichmentStudy,
       enrichmentModel,
@@ -689,22 +686,14 @@ class EnrichmentSearchCriteria extends Component {
       pValueType,
       onEnrichmentSearch,
       onDisablePlot,
-      // tests,
+      tests,
     } = this.props;
-    const { reloadPlot } = this.state;
-    onDisablePlot();
-    const eSigV = this.state.sigValue;
+    const { selectedOperator, reloadPlot, sigValue } = this.state;
+    if (reloadPlot) {
+      onDisablePlot();
+    }
     const eMust = this.state.uSettings.must;
     const eNot = this.state.uSettings.not;
-    const eOperator = this.state.selectedOperator;
-    this.getMultisetPlot(
-      eSigV,
-      enrichmentModel,
-      enrichmentStudy,
-      enrichmentAnnotation,
-      this.jsonToList(eOperator),
-      pValueType,
-    );
     cancelRequestMultisetEnrichmentData();
     let cancelToken = new CancelToken(e => {
       cancelRequestMultisetEnrichmentData = e;
@@ -716,30 +705,32 @@ class EnrichmentSearchCriteria extends Component {
         enrichmentAnnotation,
         eMust,
         eNot,
-        eSigV,
-        this.jsonToList(eOperator),
+        sigValue,
+        this.jsonToList(selectedOperator),
         pValueType,
         this.handleMultisetEOpenError,
         cancelToken,
       )
       .then(annotationData => {
-        let countAlphanumericFields = [];
-        const firstObject = annotationData[0];
-        const totalLength = Object.keys(firstObject).length;
-        for (let [key, value] of Object.entries(firstObject)) {
-          if (typeof value === 'string' || value instanceof String) {
-            countAlphanumericFields.push(key);
-          }
-        }
-        const alphanumericLength = countAlphanumericFields.length;
-        const annotationTestsLength = totalLength - alphanumericLength;
-        if (reloadPlot === true && annotationTestsLength > 1) {
+        // let countAlphanumericFields = [];
+        // const firstObject = annotationData[0];
+        // const totalLength = Object.keys(firstObject).length;
+        // for (let [key, value] of Object.entries(firstObject)) {
+        //   if (typeof value === 'string' || value instanceof String) {
+        //     countAlphanumericFields.push(key);
+        //   }
+        // }
+        // const alphanumericLength = countAlphanumericFields.length;
+        // const annotationTestsLength = totalLength - alphanumericLength;
+        // if (reloadPlot === true && annotationTestsLength > 1) {
+        const testsLength = typeof tests === 'string' ? 1 : tests.length;
+        if (reloadPlot === true && testsLength > 1) {
           this.getMultisetPlot(
-            eSigV,
+            sigValue,
             enrichmentModel,
             enrichmentStudy,
             enrichmentAnnotation,
-            this.jsonToList(eOperator),
+            this.jsonToList(selectedOperator),
             pValueType,
           );
         }
@@ -775,7 +766,7 @@ class EnrichmentSearchCriteria extends Component {
     enrichmentModel,
     enrichmentStudy,
     enrichmentAnnotation,
-    eOperator,
+    selectedOperator,
   ) {
     let heightCalculation = this.calculateHeight;
     let widthCalculation = this.calculateWidth;
@@ -789,7 +780,7 @@ class EnrichmentSearchCriteria extends Component {
         enrichmentModel,
         enrichmentAnnotation,
         sigVal,
-        eOperator,
+        selectedOperator,
         this.props.pValueType,
         undefined,
         cancelToken,
