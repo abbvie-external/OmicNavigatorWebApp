@@ -24,7 +24,7 @@ import ReactSlider from 'react-slider';
 import LoaderActivePlots from '../Transitions/LoaderActivePlots';
 import './EnrichmentResultsGraph.scss';
 import NumericExponentialInput from '../Shared/NumericExponentialInput';
-import { limitValues } from '../Shared/helpers';
+// import { limitValues } from '../Shared/helpers';
 import { ResizableBox } from 'react-resizable';
 import '../Shared/ReactResizable.css';
 
@@ -136,16 +136,16 @@ function getDynamicLegend() {
 }
 
 const resultRenderer = ({ description, genes, size }) => {
-  let genesFormatted = limitValues(genes, 15);
-  const SearchValuePopupStyle = {
-    backgroundColor: '2E2E2E',
-    borderBottom: '2px solid var(--color-primary)',
-    color: '#FFF',
-    padding: '1em',
-    maxWidth: '25vw',
-    fontSize: '13px',
-    wordBreak: 'break-all',
-  };
+  // let genesFormatted = limitValues(genes, 15);
+  // const SearchValuePopupStyle = {
+  //   backgroundColor: '2E2E2E',
+  //   borderBottom: '2px solid var(--color-primary)',
+  //   color: '#FFF',
+  //   padding: '1em',
+  //   maxWidth: '25vw',
+  //   fontSize: '13px',
+  //   wordBreak: 'break-all',
+  // };
   // let dynamicSize = getDynamicSize();
   return (
     <Grid className="NetworkSearchResultsContainer">
@@ -157,7 +157,10 @@ const resultRenderer = ({ description, genes, size }) => {
         </Label>
       </Grid.Column>
       <Grid.Column width={4}>
-        <Popup
+        <Label circular color="blue" key={description}>
+          {size}
+        </Label>
+        {/* <Popup
           trigger={
             <Label circular color="blue" key={description}>
               {size}
@@ -169,7 +172,7 @@ const resultRenderer = ({ description, genes, size }) => {
           // position="bottom left"
         >
           {genesFormatted}
-        </Popup>
+        </Popup> */}
       </Grid.Column>
     </Grid>
 
@@ -343,16 +346,9 @@ class EnrichmentResultsGraph extends Component {
   };
 
   onSortEnd = ({ oldIndex, newIndex }) => {
-    this.removeNetworkSVG();
     this.setState(({ networkSortBy }) => ({
       networkSortBy: arrayMove(networkSortBy, oldIndex, newIndex),
     }));
-  };
-
-  removeNetworkSVG = () => {
-    d3.select('div.tooltip-pieSlice').remove();
-    d3.select('tooltipLink').remove();
-    d3.select(`#svg-${this.props.networkSettings.id}`).remove();
   };
 
   // NODE CUTOFF
@@ -442,6 +438,7 @@ class EnrichmentResultsGraph extends Component {
       totalNodes,
       totalLinks,
       legendIsOpen,
+      multisetFiltersVisible,
     } = this.props;
 
     if (!networkDataLoaded) {
@@ -544,7 +541,13 @@ class EnrichmentResultsGraph extends Component {
               widescreen={3}
               textAlign="center"
             >
-              <div className="InlineFlex NumericExponentialInputContainer">
+              <div
+                className={
+                  multisetFiltersVisible
+                    ? 'InlineFlex NumericExponentialInputContainer Hide'
+                    : 'InlineFlex NumericExponentialInputContainer Show'
+                }
+              >
                 <Popup
                   trigger={
                     <Label className="NetworkInputLabel" size={dynamicSize}>
@@ -575,7 +578,13 @@ class EnrichmentResultsGraph extends Component {
                   spellcheck="false"
                 />
               </div>
-              <div className="NetworkSliderDiv">
+              <div
+                className={
+                  multisetFiltersVisible
+                    ? 'NetworkSliderDiv Hide'
+                    : 'NetworkSliderDiv Show'
+                }
+              >
                 <StyledSlider
                   renderTrack={NodeTrack}
                   renderThumb={NodeThumb}
