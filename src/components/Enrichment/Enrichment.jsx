@@ -57,7 +57,7 @@ class Enrichment extends Component {
     pngVisible: true,
     pdfVisible: false,
     svgVisible: true,
-    displayViolinPlot: false,
+    displayViolinPlot: true,
     // networkDataAvailable: false,
     networkData: {
       nodes: [],
@@ -277,7 +277,7 @@ class Enrichment extends Component {
         this.handleGetBarcodeDataError,
       )
       .then(barcodeDataResponse => {
-        showBarcodePlotCb(barcodeDataResponse);
+        showBarcodePlotCb(barcodeDataResponse, dataItem);
       })
       .catch(error => {
         console.error('Error during getBarcodeData', error);
@@ -383,16 +383,16 @@ class Enrichment extends Component {
 
   handleSearchCriteriaChange = (changes, scChange) => {
     this.props.onSearchCriteriaToTop(changes, 'enrichment');
-    if (
-      changes.enrichmentModel ===
-        'Treatment and or Strain Differential Phosphorylation' ||
-      changes.enrichmentModel ===
-        'Ferrostatin vs Untreated Differential Phosphorylation'
-    ) {
-      this.setState({
-        displayViolinPlot: true,
-      });
-    }
+    // if (
+    //   changes.enrichmentModel ===
+    //     'Treatment and or Strain Differential Phosphorylation' ||
+    //   changes.enrichmentModel ===
+    //     'Ferrostatin vs Untreated Differential Phosphorylation'
+    // ) {
+    //   this.setState({
+    //     displayViolinPlot: true,
+    //   });
+    // }
     this.setState({
       plotButtonActive: false,
       visible: false,
@@ -418,7 +418,7 @@ class Enrichment extends Component {
       multisetPlotAvailable: false,
       plotButtonActive: false,
       visible: false,
-      displayViolinPlot: false,
+      // displayViolinPlot: false,
     });
   };
 
@@ -736,7 +736,7 @@ class Enrichment extends Component {
     return containerWidth - violinWidth - 60;
   }
 
-  showBarcodePlot = barcodeData => {
+  showBarcodePlot = (barcodeData, term) => {
     const barcodeDataSorted = barcodeData.data.sort(
       (a, b) => b.statistic - a.statistic,
     );
@@ -745,7 +745,7 @@ class Enrichment extends Component {
       barcodeSettings: {
         ...this.state.barcodeSettings,
         barcodeData: barcodeDataSorted,
-        statLabel: barcodeData.statLabel,
+        statLabel: barcodeData.labelStat,
         highLabel: barcodeData.labelHigh,
         lowLabel: barcodeData.labelLow,
         highStat: barcodeData.highest,
@@ -850,6 +850,7 @@ class Enrichment extends Component {
           i => i.featureID === highestValueObject?.sample,
         );
         // let id = dataItem[enrichmentFeatureIdKey] || '';
+        debugger;
         let id = dataItem.featureID || '';
         this.getPlot(id);
       }
@@ -1026,7 +1027,7 @@ class Enrichment extends Component {
         this.handleGetBarcodeDataError,
       )
       .then(barcodeDataResponse => {
-        this.showBarcodePlot(barcodeDataResponse);
+        this.showBarcodePlot(barcodeDataResponse, term);
       })
       .catch(error => {
         console.error('Error during getBarcodeData', error);
