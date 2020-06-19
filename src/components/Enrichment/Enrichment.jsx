@@ -850,6 +850,7 @@ class Enrichment extends Component {
           i => i.featureID === highestValueObject?.sample,
         );
         // let id = dataItem[enrichmentFeatureIdKey] || '';
+        debugger;
         let id = dataItem.featureID || '';
         this.getPlot(id);
       }

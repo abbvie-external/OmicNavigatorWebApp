@@ -161,7 +161,6 @@ class BarcodePlotReact extends Component {
   };
 
   handleLineEnter = event => {
-    debugger;
     // if (this.state.settings.brushing === false) {
     // const lineIdMult = event.target.attributes[6].nodeValue;
     const lineName = event.target.attributes[7].nodeValue;

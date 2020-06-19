@@ -47,11 +47,10 @@ class FilteredPepplotTable extends Component {
   componentDidUpdate(prevProps, prevState) {
     if (
       this.props.barcodeSettings.brushedData !==
-      prevProps.barcodeSettings.brushedData
+        prevProps.barcodeSettings.brushedData ||
+      // this.props.pepplotFeatureIdKey !== prevState.pepplotFeatureIdKey
+      this.state.filteredBarcodeData !== prevState.filteredBarcodeData
     ) {
-      this.getTableData();
-    }
-    if (this.state.filteredBarcodeData !== prevState.filteredBarcodeData) {
       this.getTableData();
     }
     // let prevValues = prevProps?.barcodeSettings?.brushedData ?? [];
@@ -109,10 +108,11 @@ class FilteredPepplotTable extends Component {
   getTableData = () => {
     if (this.props.barcodeSettings.brushedData.length > 0) {
       const brushedMultIds = this.props.barcodeSettings.brushedData.map(
-        b => b.id_mult,
+        b => b.lineID,
       );
+      debugger;
       const filteredPepplotData = this.state.filteredBarcodeData.filter(d =>
-        brushedMultIds.includes(d.id_mult),
+        brushedMultIds.includes(d[this.props.pepplotFeatureIdKey]),
       );
       this.setState({
         filteredTableData: filteredPepplotData,
@@ -125,6 +125,7 @@ class FilteredPepplotTable extends Component {
   };
 
   getFilteredTableConfigCols = barcodeData => {
+    debugger;
     if (this.state.filteredBarcodeData.length > 0) {
       this.setConfigCols(this.state.filteredBarcodeData);
     } else {
@@ -162,10 +163,6 @@ class FilteredPepplotTable extends Component {
   };
 
   setConfigCols = filteredData => {
-    let self = this;
-    const model = this.props.enrichmentModel;
-    let initConfigCols = [];
-
     const TableValuePopupStyle = {
       backgroundColor: '2E2E2E',
       borderBottom: '2px solid var(--color-primary)',
@@ -178,134 +175,74 @@ class FilteredPepplotTable extends Component {
 
     let icon = phosphosite_icon;
     let iconText = 'PhosphoSitePlus';
-
-    if (model === 'Differential Expression') {
-      initConfigCols = [
-        {
-          title: 'MajorityProteinIDsHGNC',
-          field: 'MajorityProteinIDsHGNC',
-          filterable: { type: 'alphanumericFilter' },
-          template: (value, item, addParams) => {
-            return (
-              <div className="NoSelect">
-                <Popup
-                  trigger={
-                    <span
-                    // className="TableCellLink"
-                    >
-                      {splitValue(value)}
-                    </span>
-                  }
-                  content={value}
-                  style={TableValuePopupStyle}
-                  className="TablePopupValue"
-                  inverted
-                  basic
-                />
-                <Popup
-                  trigger={
-                    <img
-                      src={icon}
-                      alt="Phosophosite"
-                      className="ExternalSiteIcon"
-                      onClick={addParams.showPhosphositePlus(item)}
-                    />
-                  }
-                  style={TableValuePopupStyle}
-                  className="TablePopupValue"
-                  content={iconText}
-                  inverted
-                  basic
-                />
-              </div>
-            );
-          },
-        },
-        {
-          title: 'MajorityProteinIDs',
-          field: 'MajorityProteinIDs',
-          filterable: { type: 'alphanumericFilter' },
-          template: (value, item, addParams) => {
-            return (
-              <Popup
-                trigger={
-                  <span className="TableValue NoSelect">
-                    {splitValue(value)}
-                  </span>
-                }
-                content={value}
-                style={TableValuePopupStyle}
-                className="TablePopupValue"
-                inverted
-                basic
-              />
-            );
-          },
-        },
-      ];
-    } else {
-      initConfigCols = [
-        {
-          title: 'Protein_Site',
-          field: 'Protein_Site',
-          filterable: { type: 'alphanumericFilter' },
-          template: (value, item, addParams) => {
-            return (
-              <div className="NoSelect">
-                <Popup
-                  trigger={
-                    <span
-                    // className="TableCellLink"
-                    >
-                      {splitValue(value)}
-                    </span>
-                  }
-                  style={TableValuePopupStyle}
-                  className="TablePopupValue"
-                  content={value}
-                  inverted
-                  basic
-                />
-                <Popup
-                  trigger={
-                    <img
-                      src={icon}
-                      alt="Phosophosite"
-                      className="ExternalSiteIcon"
-                      onClick={addParams.showPhosphositePlus(item)}
-                    />
-                  }
-                  style={TableValuePopupStyle}
-                  className="TablePopupValue"
-                  content={iconText}
-                  inverted
-                  basic
-                />
-              </div>
-            );
-          },
-        },
-      ];
+    let filteredPepplotAlphanumericFields = [];
+    let filteredPepplotNumericFields = [];
+    const firstObject = filteredData[0];
+    for (let [key, value] of Object.entries(firstObject)) {
+      if (typeof value === 'string' || value instanceof String) {
+        filteredPepplotAlphanumericFields.push(key);
+      } else {
+        filteredPepplotNumericFields.push(key);
+      }
     }
-    let relevantConfigCols = [
-      'F',
-      'logFC',
-      't',
-      'P_Value',
-      'adj_P_Val',
-      'adjPVal',
-    ];
-    if (filteredData.length !== 0 && filteredData.length !== undefined) {
-      let orderedTestData = JSON.parse(
-        JSON.stringify(filteredData[0], relevantConfigCols),
-      );
-
-      let relevantConfigColumns = _.map(
-        _.filter(_.keys(orderedTestData), function(d) {
-          return _.includes(relevantConfigCols, d);
-        }),
-      );
-      const additionalConfigColumns = relevantConfigColumns.map(c => {
+    const alphanumericTrigger = filteredPepplotAlphanumericFields[0];
+    debugger;
+    this.props.onHandlePepplotFeatureIdKey(alphanumericTrigger);
+    const filteredPepplotAlphanumericColumnsMapped = filteredPepplotAlphanumericFields.map(
+      f => {
+        return {
+          title: f,
+          field: f,
+          filterable: { type: 'alphanumericFilter' },
+          template: (value, item, addParams) => {
+            if (f === alphanumericTrigger) {
+              return (
+                <div className="NoSelect">
+                  <Popup
+                    trigger={<span>{splitValue(value)}</span>}
+                    style={TableValuePopupStyle}
+                    className="TablePopupValue"
+                    content={value}
+                    inverted
+                    basic
+                  />
+                  <Popup
+                    trigger={
+                      <img
+                        src={icon}
+                        alt="Phosophosite"
+                        className="ExternalSiteIcon"
+                        onClick={addParams.showPhosphositePlus(item)}
+                      />
+                    }
+                    style={TableValuePopupStyle}
+                    className="TablePopupValue"
+                    content={iconText}
+                    inverted
+                    basic
+                  />
+                </div>
+              );
+            } else {
+              return (
+                <div>
+                  <Popup
+                    trigger={<span>{splitValue(value)}</span>}
+                    style={TableValuePopupStyle}
+                    className="TablePopupValue"
+                    content={value}
+                    inverted
+                    basic
+                  />
+                </div>
+              );
+            }
+          },
+        };
+      },
+    );
+    const filteredPepplotNumericColumnsMapped = filteredPepplotNumericFields.map(
+      c => {
         return {
           title: c,
           field: c,
@@ -317,7 +254,7 @@ class FilteredPepplotTable extends Component {
               <p>
                 <Popup
                   trigger={
-                    <span className="TableValue NoSelect">
+                    <span className="TableValue  NoSelect">
                       {formatNumberForDisplay(value)}
                     </span>
                   }
@@ -331,14 +268,16 @@ class FilteredPepplotTable extends Component {
             );
           },
         };
-      });
-      const configCols = initConfigCols.concat(additionalConfigColumns);
-      self.setState({
-        filteredBarcodeData: filteredData,
-        filteredTableConfigCols: configCols,
-      });
-      this.getTableData();
-    }
+      },
+    );
+    const configCols = filteredPepplotAlphanumericColumnsMapped.concat(
+      filteredPepplotNumericColumnsMapped,
+    );
+    this.setState({
+      filteredBarcodeData: filteredData,
+      filteredTableConfigCols: configCols,
+    });
+    this.getTableData();
   };
 
   getTableHelpers = HighlightedProteins => {
@@ -377,20 +316,23 @@ class FilteredPepplotTable extends Component {
   };
 
   handleRowClick = (event, item, index) => {
+    const { pepplotFeatureIdKey } = this.props;
     const PreviouslyHighlighted = this.props.HighlightedProteins;
     event.stopPropagation();
     if (event.shiftKey) {
+      debugger;
       const allTableData = _.cloneDeep(this.state.filteredTableData);
       const indexMaxProtein = _.findIndex(allTableData, function(d) {
-        return d.Protein_Site === PreviouslyHighlighted[0]?.sample;
+        return d[pepplotFeatureIdKey] === PreviouslyHighlighted[0]?.sample;
       });
       const sliceFirst = index < indexMaxProtein ? index : indexMaxProtein;
       const sliceLast = index > indexMaxProtein ? index : indexMaxProtein;
       const shiftedTableData = allTableData.slice(sliceFirst, sliceLast + 1);
       const shiftedTableDataArray = shiftedTableData.map(function(d) {
+        debugger;
         return {
-          sample: d.Protein_Site,
-          id_mult: d.id_mult,
+          sample: d.symbol,
+          id_mult: d[pepplotFeatureIdKey],
           cpm: d.F === undefined ? d.t : d.F,
         };
       });
