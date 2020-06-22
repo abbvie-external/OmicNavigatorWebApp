@@ -57,23 +57,23 @@ class SplitPanesContainer extends Component {
 
   getViolinPlot() {
     const { isViolinPlotLoaded } = this.props;
-    // if (!isViolinPlotLoaded) {
-    return (
-      <div className="PlotInstructionsDiv">
-        <h4 className="PlotInstructionsText">
-          Select barcode line/s to display Violin Plot
-        </h4>
-      </div>
-    );
-    // } else {
-    //   return (
-    //     <ViolinPlot
-    //       className="ViolinPlotContainer"
-    //       {...this.state}
-    //       {...this.props}
-    //     />
-    //   );
-    // }
+    if (!isViolinPlotLoaded) {
+      return (
+        <div className="PlotInstructionsDiv">
+          <h4 className="PlotInstructionsText">
+            Select barcode line/s to display Violin Plot
+          </h4>
+        </div>
+      );
+    } else {
+      return (
+        <ViolinPlot
+          className="ViolinPlotContainer"
+          {...this.state}
+          {...this.props}
+        />
+      );
+    }
   }
 
   handleViolinTableTabChange = (e, { activeIndex }) => {
@@ -95,29 +95,29 @@ class SplitPanesContainer extends Component {
   getViolinAndTable = () => {
     const { displayViolinPlot } = this.props;
     const { activeViolinTableIndex } = this.state;
-    // const violinPlot = this.getViolinPlot();
+    const violinPlot = this.getViolinPlot();
     const violinAndTablePanes = [
-      // {
-      //   menuItem: 'Box Plot',
-      //   pane: (
-      //     <Tab.Pane
-      //       attached
-      //       key="1"
-      //       id="ViolinPlotTab"
-      //       className="ViolinPlotTab"
-      //       // as="div"
-      //     >
-      //       <div id="" className="ViolinPlotDiv">
-      //         {violinPlot}
-      //         <ViolinPlot
-      //           className="ViolinPlotContainer"
-      //           {...this.state}
-      //           {...this.props}
-      //         />
-      //       </div>
-      //     </Tab.Pane>
-      //   ),
-      // },
+      {
+        menuItem: 'Box Plot',
+        pane: (
+          <Tab.Pane
+            attached
+            key="1"
+            id="ViolinPlotTab"
+            className="ViolinPlotTab"
+            // as="div"
+          >
+            <div id="" className="ViolinPlotDiv">
+              {violinPlot}
+              <ViolinPlot
+                className="ViolinPlotContainer"
+                {...this.state}
+                {...this.props}
+              />
+            </div>
+          </Tab.Pane>
+        ),
+      },
       {
         menuItem: 'Statistic Table',
         pane: (
