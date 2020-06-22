@@ -717,7 +717,6 @@ class Enrichment extends Component {
       facets.push(tests);
       pieData.push(testsLength);
     }
-    debugger;
     this.setState({
       networkSettings: {
         ...this.state.networkSettings,

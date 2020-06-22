@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { BrowserRouter as Router, HashRouter } from 'react-router-dom';
+import { HashRouter } from 'react-router-dom';
 import App from './components/App';
 
 class Container extends Component {
