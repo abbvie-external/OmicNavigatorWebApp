@@ -171,6 +171,9 @@ class Enrichment extends Component {
     networkOperator: '<',
     networkTestsMust: [],
     networkTestsNot: [],
+    previousEnrichmentStudy: '',
+    previousEnrichmentModel: '',
+    previousEnrichmentAnnotation: '',
   };
   EnrichmentViewContainerRef = React.createRef();
 
@@ -338,6 +341,7 @@ class Enrichment extends Component {
 
   handleEnrichmentSearch = searchResults => {
     this.removeNetworkSVG();
+    this.setState({ networkGraphReady: false });
 
     // PAUL - talk to justin about this - has to do with column reordering, i think
     // if (this.state.enrichmentColumns.length === 0) {
@@ -350,7 +354,6 @@ class Enrichment extends Component {
     this.getNetworkData(searchResults.enrichmentResults);
     this.setState({
       networkDataError: false,
-      networkGraphReady: false,
       enrichmentResults: searchResults.enrichmentResults,
       isSearching: false,
       isSearchingEnrichment: false,
@@ -645,61 +648,86 @@ class Enrichment extends Component {
       // pValueType,
       enrichmentStudy,
     } = this.props;
-    phosphoprotService
-      .getEnrichmentsNetwork(
-        enrichmentStudy,
-        enrichmentModel,
-        enrichmentAnnotation,
-        this.handleGetEnrichmentNetworkError,
-      )
-      .then(getEnrichmentNetworkResponseData => {
-        // const pValueTypeParam = pValueType === 'adjusted' ? 0.1 : 1;
-        const tests = getEnrichmentNetworkResponseData.tests;
-        const enrichmentResultsDescriptions = [...enrichmentResults].map(
-          r => r.description,
-        );
-        const filteredNodes = getEnrichmentNetworkResponseData.nodes.filter(n =>
-          enrichmentResultsDescriptions.includes(n.description),
-        );
-        getEnrichmentNetworkResponseData.nodes = filteredNodes;
-        this.setState({
-          // networkDataAvailable: true,
-          networkData: getEnrichmentNetworkResponseData,
-          tests: tests,
-          totalNodes: getEnrichmentNetworkResponseData.nodes.length,
-          totalLinks: getEnrichmentNetworkResponseData.links.length,
-        });
-        let facets = [];
-        let pieData = [];
-        const isArray = Array.isArray(tests);
-        const testsLength = typeof tests === 'string' ? 1 : tests.length;
-        if (isArray) {
-          for (var i = 0; i < testsLength; i++) {
-            let rplcSpaces = getEnrichmentNetworkResponseData.tests[i].replace(
-              / /g,
-              '_',
-            );
-            facets.push('EnrichmentMap_pvalue_' + rplcSpaces + '_');
-            pieData.push(100 / testsLength);
-          }
-        } else {
-          facets.push(tests);
-          pieData.push(testsLength);
-        }
-        this.setState({
-          networkSettings: {
-            ...this.state.networkSettings,
-            facets: facets,
-            propLabel: tests,
-            propData: pieData,
-          },
-          networkDataLoaded: true,
-          networkGraphReady: true,
-        });
-      })
-      .catch(error => {
-        console.error('Error during getEnrichmentNetwork', error);
+    const {
+      networkData,
+      previousEnrichmentStudy,
+      previousEnrichmentModel,
+      previousEnrichmentAnnotation,
+    } = this.state;
+    if (
+      networkData.length === 0 ||
+      enrichmentStudy !== previousEnrichmentStudy ||
+      enrichmentModel !== previousEnrichmentModel ||
+      enrichmentAnnotation !== previousEnrichmentAnnotation
+    ) {
+      this.setState({
+        previousEnrichmentStudy: enrichmentStudy,
+        previousEnrichmentModel: enrichmentModel,
+        previousEnrichmentAnnotation: enrichmentAnnotation,
       });
+      phosphoprotService
+        .getEnrichmentsNetwork(
+          enrichmentStudy,
+          enrichmentModel,
+          enrichmentAnnotation,
+          this.handleGetEnrichmentNetworkError,
+        )
+        .then(getEnrichmentNetworkResponseData => {
+          this.handleEnrichmentNetworkData(
+            getEnrichmentNetworkResponseData,
+            enrichmentResults,
+          );
+        })
+        .catch(error => {
+          console.error('Error during getEnrichmentNetwork', error);
+        });
+    } else {
+      this.handleEnrichmentNetworkData(networkData, enrichmentResults);
+    }
+  };
+
+  handleEnrichmentNetworkData = (data, enrichmentResults) => {
+    // const pValueTypeParam = pValueType === 'adjusted' ? 0.1 : 1;
+    const tests = data.tests;
+    const enrichmentResultsDescriptions = [...enrichmentResults].map(
+      r => r.description,
+    );
+    const filteredNodes = data.nodes.filter(n =>
+      enrichmentResultsDescriptions.includes(n.description),
+    );
+    data.nodes = filteredNodes;
+    this.setState({
+      // networkDataAvailable: true,
+      networkData: data,
+      tests: tests,
+      totalNodes: data.nodes.length,
+      totalLinks: data.links.length,
+    });
+    let facets = [];
+    let pieData = [];
+    const isArray = Array.isArray(tests);
+    const testsLength = typeof tests === 'string' ? 1 : tests.length;
+    if (isArray) {
+      for (var i = 0; i < testsLength; i++) {
+        let rplcSpaces = data.tests[i].replace(/ /g, '_');
+        facets.push('EnrichmentMap_pvalue_' + rplcSpaces + '_');
+        pieData.push(100 / testsLength);
+      }
+    } else {
+      facets.push(tests);
+      pieData.push(testsLength);
+    }
+    debugger;
+    this.setState({
+      networkSettings: {
+        ...this.state.networkSettings,
+        facets: facets,
+        propLabel: tests,
+        propData: pieData,
+      },
+      networkDataLoaded: true,
+      networkGraphReady: true,
+    });
   };
 
   handleGetEnrichmentNetworkError = () => {
