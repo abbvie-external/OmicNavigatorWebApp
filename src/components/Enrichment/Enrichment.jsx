@@ -57,7 +57,7 @@ class Enrichment extends Component {
     pngVisible: true,
     pdfVisible: false,
     svgVisible: true,
-    displayViolinPlot: false,
+    displayViolinPlot: true,
     // networkDataAvailable: false,
     networkData: {
       nodes: [],
@@ -165,6 +165,12 @@ class Enrichment extends Component {
     enrichmentModelsAndAnnotations: [],
     enrichmentAnnotationsMetadata: [],
     enrichmentFeatureIdKey: '',
+    multisetFiltersVisible: false,
+    reloadPlot: false,
+    networkSigValue: '0.05',
+    networkOperator: '<',
+    networkTestsMust: [],
+    networkTestsNot: [],
   };
   EnrichmentViewContainerRef = React.createRef();
 
@@ -271,7 +277,7 @@ class Enrichment extends Component {
         this.handleGetBarcodeDataError,
       )
       .then(barcodeDataResponse => {
-        showBarcodePlotCb(barcodeDataResponse);
+        showBarcodePlotCb(barcodeDataResponse, dataItem);
       })
       .catch(error => {
         console.error('Error during getBarcodeData', error);
@@ -306,7 +312,33 @@ class Enrichment extends Component {
     });
   };
 
+  handleMulisetFiltersVisible = bool => {
+    this.setState({
+      multisetFiltersVisible: bool,
+    });
+  };
+
+  handleNetworkSigValue = val => {
+    this.setState({
+      networkSigValue: val.toString(),
+    });
+  };
+
+  handleNetworkOperator = op => {
+    this.setState({
+      networkOperator: op,
+    });
+  };
+  handleNetworkTests = (must, not) => {
+    this.setState({
+      networkTestsMust: must,
+      networkTestsNot: not,
+    });
+  };
+
   handleEnrichmentSearch = searchResults => {
+    this.removeNetworkSVG();
+
     // PAUL - talk to justin about this - has to do with column reordering, i think
     // if (this.state.enrichmentColumns.length === 0) {
     //   this.handleColumns(searchResults);
@@ -315,8 +347,7 @@ class Enrichment extends Component {
     if (searchResults.enrichmentResults?.length > 0) {
       columns = this.getConfigCols(searchResults);
     }
-    this.removeNetworkSVG();
-    this.getNetworkData();
+    this.getNetworkData(searchResults.enrichmentResults);
     this.setState({
       networkDataError: false,
       networkGraphReady: false,
@@ -352,16 +383,16 @@ class Enrichment extends Component {
 
   handleSearchCriteriaChange = (changes, scChange) => {
     this.props.onSearchCriteriaToTop(changes, 'enrichment');
-    if (
-      changes.enrichmentModel ===
-        'Treatment and or Strain Differential Phosphorylation' ||
-      changes.enrichmentModel ===
-        'Ferrostatin vs Untreated Differential Phosphorylation'
-    ) {
-      this.setState({
-        displayViolinPlot: true,
-      });
-    }
+    // if (
+    //   changes.enrichmentModel ===
+    //     'Treatment and or Strain Differential Phosphorylation' ||
+    //   changes.enrichmentModel ===
+    //     'Ferrostatin vs Untreated Differential Phosphorylation'
+    // ) {
+    //   this.setState({
+    //     displayViolinPlot: true,
+    //   });
+    // }
     this.setState({
       plotButtonActive: false,
       visible: false,
@@ -387,7 +418,7 @@ class Enrichment extends Component {
       multisetPlotAvailable: false,
       plotButtonActive: false,
       visible: false,
-      displayViolinPlot: false,
+      // displayViolinPlot: false,
     });
   };
 
@@ -601,12 +632,13 @@ class Enrichment extends Component {
     return configCols;
   };
 
-  filterNetworkFromUpset = upsetTestsObj => {
-    // TBC if we handle upset test filtering on FE...
+  removeNetworkSVG = () => {
+    d3.select('div.tooltip-pieSlice').remove();
+    d3.select('tooltipLink').remove();
+    d3.select(`#svg-${this.state.networkSettings.id}`).remove();
   };
 
-  getNetworkData = () => {
-    this.removeNetworkSVG();
+  getNetworkData = enrichmentResults => {
     const {
       enrichmentModel,
       enrichmentAnnotation,
@@ -623,6 +655,13 @@ class Enrichment extends Component {
       .then(getEnrichmentNetworkResponseData => {
         // const pValueTypeParam = pValueType === 'adjusted' ? 0.1 : 1;
         const tests = getEnrichmentNetworkResponseData.tests;
+        const enrichmentResultsDescriptions = [...enrichmentResults].map(
+          r => r.description,
+        );
+        const filteredNodes = getEnrichmentNetworkResponseData.nodes.filter(n =>
+          enrichmentResultsDescriptions.includes(n.description),
+        );
+        getEnrichmentNetworkResponseData.nodes = filteredNodes;
         this.setState({
           // networkDataAvailable: true,
           networkData: getEnrichmentNetworkResponseData,
@@ -697,7 +736,7 @@ class Enrichment extends Component {
     return containerWidth - violinWidth - 60;
   }
 
-  showBarcodePlot = barcodeData => {
+  showBarcodePlot = (barcodeData, term) => {
     const barcodeDataSorted = barcodeData.data.sort(
       (a, b) => b.statistic - a.statistic,
     );
@@ -706,7 +745,7 @@ class Enrichment extends Component {
       barcodeSettings: {
         ...this.state.barcodeSettings,
         barcodeData: barcodeDataSorted,
-        statLabel: barcodeData.statLabel,
+        statLabel: barcodeData.labelStat,
         highLabel: barcodeData.labelHigh,
         lowLabel: barcodeData.labelLow,
         highStat: barcodeData.highest,
@@ -811,6 +850,7 @@ class Enrichment extends Component {
           i => i.featureID === highestValueObject?.sample,
         );
         // let id = dataItem[enrichmentFeatureIdKey] || '';
+        debugger;
         let id = dataItem.featureID || '';
         this.getPlot(id);
       }
@@ -987,7 +1027,7 @@ class Enrichment extends Component {
         this.handleGetBarcodeDataError,
       )
       .then(barcodeDataResponse => {
-        this.showBarcodePlot(barcodeDataResponse);
+        this.showBarcodePlot(barcodeDataResponse, term);
       })
       .catch(error => {
         console.error('Error during getBarcodeData', error);
@@ -1691,12 +1731,6 @@ class Enrichment extends Component {
     ];
   };
 
-  removeNetworkSVG = () => {
-    d3.select('div.tooltip-pieSlice').remove();
-    d3.select('tooltipLink').remove();
-    d3.select(`#svg-${this.state.networkSettings.id}`).remove();
-  };
-
   handleTotals = (filteredNodesLength, filteredLinksLength) => {
     this.setState({
       filteredNodesTotal: filteredNodesLength,
@@ -1706,7 +1740,6 @@ class Enrichment extends Component {
 
   handleNodeCutoffInputChange = value => {
     if (this.state.nodeCutoff !== value) {
-      this.removeNetworkSVG();
       this.setState({
         nodeCutoff: value,
       });
@@ -1716,7 +1749,6 @@ class Enrichment extends Component {
 
   handleLinkCutoffInputChange = value => {
     if (this.state.linkCutoff !== value) {
-      this.removeNetworkSVG();
       this.setState({
         linkCutoff: value,
       });
@@ -1726,7 +1758,6 @@ class Enrichment extends Component {
 
   handleLinkTypeInputChange = value => {
     if (this.state.linkType !== value) {
-      // this.removeNetworkSVG();
       this.setState({
         linkType: value,
       });
@@ -1736,7 +1767,6 @@ class Enrichment extends Component {
 
   handleNodeCutoffSliderChange = value => {
     if (this.state.nodeCutoff !== value) {
-      this.removeNetworkSVG();
       this.setState({ nodeCutoff: value });
     }
     sessionStorage.setItem('nodeCutoff', value);
@@ -1744,7 +1774,6 @@ class Enrichment extends Component {
 
   handleLinkCutoffSliderChange = value => {
     if (this.state.linkCutoff !== value) {
-      this.removeNetworkSVG();
       this.setState({ linkCutoff: value });
     }
     sessionStorage.setItem('linkCutoff', value);
@@ -1752,7 +1781,6 @@ class Enrichment extends Component {
 
   handleLinkTypeSliderChange = value => {
     if (this.state.linkType !== value) {
-      this.removeNetworkSVG();
       this.setState({ linkType: value });
     }
     sessionStorage.setItem('linkType', value);
@@ -1829,12 +1857,15 @@ class Enrichment extends Component {
               onDisablePlot={this.disablePlot}
               onGetMultisetPlot={this.handleMultisetPlot}
               onHandlePlotAnimation={this.handlePlotAnimation}
-              onFilterNetworkFromUpset={this.filterNetworkFromUpset}
               onHandlePlotTypesEnrichment={this.handlePlotTypesEnrichment}
               onSetStudyModelAnnotationMetadata={
                 this.setStudyModelAnnotationMetadata
               }
               onSetAnnotationsMetadata={this.setAnnotationsMetadata}
+              onHandleMulisetFiltersVisible={this.handleMulisetFiltersVisible}
+              onHandleNetworkSigValue={this.handleNetworkSigValue}
+              onHandleNetworkOperator={this.handleNetworkOperator}
+              onHandleNetworkTests={this.handleNetworkTests}
             />
           </Grid.Column>
           <Grid.Column

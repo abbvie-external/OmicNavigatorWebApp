@@ -76,7 +76,6 @@ class Pepplot extends Component {
     pepplotStudyMetadata: [],
     pepplotModelsAndTests: [],
     pepplotTestsMetadata: [],
-    pepplotFeatureIdKey: '',
   };
 
   componentDidMount() {
@@ -217,7 +216,7 @@ class Pepplot extends Component {
     });
   };
   getProteinData = (id, dataItem, getPlotCb, imageInfo) => {
-    const { pepplotFeatureIdKey } = this.state;
+    const { pepplotFeatureIdKey } = this.props;
     this.setState({
       imageInfo: imageInfo,
       isItemSelected: true,
@@ -365,8 +364,13 @@ class Pepplot extends Component {
   };
 
   getPlot = featureId => {
-    const { pepplotFeatureIdKey, pepplotPlotTypes } = this.state;
-    const { pepplotStudy, pepplotModel, pepplotProteinSite } = this.props;
+    const { pepplotPlotTypes } = this.state;
+    const {
+      pepplotStudy,
+      pepplotModel,
+      pepplotProteinSite,
+      pepplotFeatureIdKey,
+    } = this.props;
     let id = featureId != null ? featureId : pepplotProteinSite;
     let imageInfo = { key: '', title: '', svg: [] };
     imageInfo.title = `Protein Intensity - ${pepplotFeatureIdKey} ${featureId}`;
@@ -449,7 +453,7 @@ class Pepplot extends Component {
   };
 
   pageToProtein = (data, proteinToHighlight, itemsPerPage) => {
-    const { pepplotFeatureIdKey } = this.state;
+    const { pepplotFeatureIdKey } = this.props;
     if (this.pepplotGridRef?.current != null) {
       const Index = _.findIndex(data, function(p) {
         return p[pepplotFeatureIdKey] === proteinToHighlight;
@@ -602,14 +606,12 @@ class Pepplot extends Component {
       }
     }
     const alphanumericTrigger = pepplotAlphanumericFields[0];
-    this.setState(
-      { pepplotFeatureIdKey: alphanumericTrigger },
-      this.getTableHelpers(
-        this.getProteinData,
-        this.getPlot,
-        this.state.selectedFromTableData,
-        alphanumericTrigger,
-      ),
+    this.onHandlePepplotFeatureIdKey(alphanumericTrigger);
+    this.getTableHelpers(
+      this.getProteinData,
+      this.getPlot,
+      this.state.selectedFromTableData,
+      alphanumericTrigger,
     );
     const pepplotAlphanumericColumnsMapped = pepplotAlphanumericFields.map(
       f => {

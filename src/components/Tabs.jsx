@@ -59,6 +59,7 @@ class Tabs extends Component {
       pValueType: 'nominal',
       proteinToHighlightInDiffTable: isEnrichment ? false : '',
       allStudiesMetadata: [],
+      pepplotFeatureIdKey: '',
     };
   }
 
@@ -139,7 +140,11 @@ class Tabs extends Component {
       tab,
     );
   };
-
+  handlePepplotFeatureIdKey = id => {
+    this.setState({
+      pepplotFeatureIdKey: id,
+    });
+  };
   handleViewDiffTable = (test, protein) => {
     this.setState({
       activeIndex: 1,
@@ -201,6 +206,7 @@ class Tabs extends Component {
               {...this.props}
               {...this.state}
               onSearchCriteriaToTop={this.handleSearchCriteriaToTop}
+              onHandlePepplotFeatureIdKey={this.handlePepplotFeatureIdKey}
             />
           </Tab.Pane>
         ),
@@ -215,6 +221,7 @@ class Tabs extends Component {
               onSearchCriteriaToTop={this.handleSearchCriteriaToTop}
               onPValueTypeChange={this.handlePValueTypeChange}
               onViewDiffTable={this.handleViewDiffTable}
+              onHandlePepplotFeatureIdKey={this.handlePepplotFeatureIdKey}
             />
           </Tab.Pane>
         ),

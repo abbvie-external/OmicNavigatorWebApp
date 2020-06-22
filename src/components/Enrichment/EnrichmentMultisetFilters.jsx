@@ -760,10 +760,6 @@ class EnrichmentMultisetFilters extends Component {
     }
   }
 
-  handleDropdownChange = (evt, { name, value, index }) => {
-    this.props.onHandleDropdownChange(evt, { name, value, index });
-  };
-
   handleSigValueEInputChange = value => {
     this.setState({
       sigValueELocal: [parseFloat(value)],
@@ -829,7 +825,7 @@ class EnrichmentMultisetFilters extends Component {
                   value={SelOp[index].value}
                   options={Operators}
                   width={5}
-                  onChange={this.handleDropdownChange}
+                  onChange={this.props.onHandleOperatorChange}
                 ></Form.Field>
                 <Form.Field width={4} id="SignificantValueInputMultisetE">
                   <label>{index === 0 ? 'Significance' : ''}</label>
