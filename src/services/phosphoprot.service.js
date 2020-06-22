@@ -6,10 +6,17 @@ require('opencpu.js/opencpu-0.5.js');
 class PhosphoprotService {
   constructor() {
     this.ocpuUrl = '***REMOVED***/ocpu/library/OmicAnalyzer/R';
+    //this.ocpuUrl = 'http://localhost:5656/ocpu/library/OmicAnalyzer/R';  <-- comment out before building production
   }
 
   setUrl() {
-    window.ocpu.seturl(this.ocpuUrl);
+    // console.log('the window.location.href is ', window.location.href);
+    // console.log(process.env.REACT_APP_API_URL);
+    // console.log(process.env.NODE_ENV);
+    if (process.env.NODE_ENV === 'development') {
+      console.log('we are in localhost:3000');
+      window.ocpu.seturl(this.ocpuUrl);
+    }
   }
 
   setUrlAlt() {

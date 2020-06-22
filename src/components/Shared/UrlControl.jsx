@@ -13,12 +13,14 @@ export function updateUrl(
     let tab, tabIndex, lastTabIndex;
     // clear url
     propsParam.history.push('');
+
     if (type === 'tabChange') {
       lastTabIndex = stateParam.activeIndex;
       tabIndex = lastTabIndex === 2 ? 1 : 2;
       tab = tabIndex === 2 ? 'enrichment' : 'pepplot';
     } else {
       const pathname = propsParam.location.pathname;
+
       const enrichment = pathname.includes('enrichment');
       tab = enrichment ? 'enrichment' : 'pepplot';
       tabIndex = enrichment ? 2 : 1;
