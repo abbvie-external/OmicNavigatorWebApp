@@ -529,7 +529,7 @@ class BarcodePlotReact extends Component {
         y1={settings.margin.top}
         y2={barcodeHeight}
         id_mult={d.featureID}
-        lineid={d.featureID}
+        lineid={d.featureDisplay}
         logfc={d.logFoldChange}
         statistic={d.statistic}
         onClick={e => this.handleSVGClick(e)}

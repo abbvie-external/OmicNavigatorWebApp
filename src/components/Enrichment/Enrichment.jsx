@@ -736,7 +736,7 @@ class Enrichment extends Component {
     return containerWidth - violinWidth - 60;
   }
 
-  showBarcodePlot = (barcodeData, term) => {
+  showBarcodePlot = (barcodeData, dataItem) => {
     const barcodeDataSorted = barcodeData.data.sort(
       (a, b) => b.statistic - a.statistic,
     );
@@ -759,10 +759,10 @@ class Enrichment extends Component {
     if (changes.brushedData.length > 0) {
       const boxPlotArray = _.map(changes.brushedData, function(d) {
         d.statistic = _.find(self.state.barcodeSettings.barcodeData, {
-          featureID: d.lineID,
+          featureID: d.id_mult,
         }).statistic;
         d.logFC = _.find(self.state.barcodeSettings.barcodeData, {
-          featureID: d.lineID,
+          featureID: d.id_mult,
         }).logFoldChange;
         return d;
       });
@@ -847,10 +847,9 @@ class Enrichment extends Component {
           SVGPlotLoading: true,
         });
         const dataItem = this.state.barcodeSettings.barcodeData.find(
-          i => i.featureID === highestValueObject?.sample,
+          i => i.featureDisplay === highestValueObject?.sample,
         );
         // let id = dataItem[enrichmentFeatureIdKey] || '';
-        debugger;
         let id = dataItem.featureID || '';
         this.getPlot(id);
       }
@@ -1016,7 +1015,6 @@ class Enrichment extends Component {
       enrichmentDataItem: dataItem,
       enrichmentTerm: term,
     });
-
     phosphoprotService
       .getBarcodeData(
         enrichmentStudy,
@@ -1027,7 +1025,7 @@ class Enrichment extends Component {
         this.handleGetBarcodeDataError,
       )
       .then(barcodeDataResponse => {
-        this.showBarcodePlot(barcodeDataResponse, term);
+        this.showBarcodePlot(barcodeDataResponse, dataItem);
       })
       .catch(error => {
         console.error('Error during getBarcodeData', error);

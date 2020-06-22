@@ -132,11 +132,20 @@ class Pepplot extends Component {
 
   handlePepplotSearch = searchResults => {
     let columns = [];
-    if (searchResults.pepplotResults?.length > 0) {
+    let sortedPepplotResults = searchResults.pepplotResults;
+    if (sortedPepplotResults?.length > 0) {
       columns = this.getConfigCols(searchResults);
+      // const statToSort =
+      // this.state.filteredBarcodeData[0].F === undefined ? 't' : 'F';
+      const statToSort =
+        'P.Value' in sortedPepplotResults[0] ? 'P.Value' : 'adj.P.Val';
+      sortedPepplotResults = sortedPepplotResults.sort(
+        (a, b) => a[statToSort] - b[statToSort],
+      );
     }
+
     this.setState({
-      pepplotResults: searchResults.pepplotResults,
+      pepplotResults: sortedPepplotResults,
       pepplotColumns: columns,
       isSearchingPepplot: false,
       isValidSearchPepplot: true,
