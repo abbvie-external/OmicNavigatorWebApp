@@ -44,6 +44,8 @@ class Tabs extends Component {
       pValueType: 'nominal',
       proteinToHighlightInDiffTable: isEnrichment ? false : '',
       allStudiesMetadata: [],
+      pepplotFeatureIdKey: '',
+      filteredPepplotFeatureIdKey: '',
     };
   }
 
@@ -119,7 +121,11 @@ class Tabs extends Component {
       tab,
     );
   };
-
+  handlePepplotFeatureIdKey = (name, id) => {
+    this.setState({
+      [name]: id,
+    });
+  };
   handleViewDiffTable = (test, protein) => {
     this.setState({
       activeIndex: 1,
@@ -166,7 +172,7 @@ class Tabs extends Component {
         menuItem: (
           <Menu.Item key="1" disabled header className="LogoAndTitle">
             <span className="LogoElement">
-              <img alt="Omic Analyzer" src="./icon.png" className="LogoImage" />
+              <img alt="Omic Analyzer" src="/icon.png" className="LogoImage" />
             </span>
             <span className="Header HeaderFirst">Omic&nbsp;</span>
             <span className="Header HeaderSecond">Analyzer</span>
@@ -181,6 +187,7 @@ class Tabs extends Component {
               {...this.props}
               {...this.state}
               onSearchCriteriaToTop={this.handleSearchCriteriaToTop}
+              onHandlePepplotFeatureIdKey={this.handlePepplotFeatureIdKey}
             />
           </Tab.Pane>
         ),
@@ -195,6 +202,7 @@ class Tabs extends Component {
               onSearchCriteriaToTop={this.handleSearchCriteriaToTop}
               onPValueTypeChange={this.handlePValueTypeChange}
               onViewDiffTable={this.handleViewDiffTable}
+              onHandlePepplotFeatureIdKey={this.handlePepplotFeatureIdKey}
             />
           </Tab.Pane>
         ),
