@@ -48,7 +48,7 @@ class FilteredPepplotTable extends Component {
     if (
       this.props.barcodeSettings.brushedData !==
         prevProps.barcodeSettings.brushedData ||
-      // this.props.pepplotFeatureIdKey !== prevState.pepplotFeatureIdKey
+      // this.props.filteredPepplotFeatureIdKey !== prevState.filteredPepplotFeatureIdKey
       this.state.filteredBarcodeData !== prevState.filteredBarcodeData
     ) {
       this.getTableData();
@@ -112,7 +112,7 @@ class FilteredPepplotTable extends Component {
       );
       debugger;
       const filteredPepplotData = this.state.filteredBarcodeData.filter(d =>
-        brushedMultIds.includes(d[this.props.pepplotFeatureIdKey]),
+        brushedMultIds.includes(d[this.props.filteredPepplotFeatureIdKey]),
       );
       this.setState({
         filteredTableData: filteredPepplotData,
@@ -186,8 +186,10 @@ class FilteredPepplotTable extends Component {
       }
     }
     const alphanumericTrigger = filteredPepplotAlphanumericFields[0];
-    debugger;
-    this.props.onHandlePepplotFeatureIdKey(alphanumericTrigger);
+    this.props.onHandlePepplotFeatureIdKey(
+      'filteredPepplotFeatureIdKey',
+      alphanumericTrigger,
+    );
     const filteredPepplotAlphanumericColumnsMapped = filteredPepplotAlphanumericFields.map(
       f => {
         return {
@@ -316,14 +318,16 @@ class FilteredPepplotTable extends Component {
   };
 
   handleRowClick = (event, item, index) => {
-    const { pepplotFeatureIdKey } = this.props;
+    const { filteredPepplotFeatureIdKey } = this.props;
     const PreviouslyHighlighted = this.props.HighlightedProteins;
     event.stopPropagation();
     if (event.shiftKey) {
       debugger;
       const allTableData = _.cloneDeep(this.state.filteredTableData);
       const indexMaxProtein = _.findIndex(allTableData, function(d) {
-        return d[pepplotFeatureIdKey] === PreviouslyHighlighted[0]?.sample;
+        return (
+          d[filteredPepplotFeatureIdKey] === PreviouslyHighlighted[0]?.sample
+        );
       });
       const sliceFirst = index < indexMaxProtein ? index : indexMaxProtein;
       const sliceLast = index > indexMaxProtein ? index : indexMaxProtein;
@@ -332,7 +336,7 @@ class FilteredPepplotTable extends Component {
         debugger;
         return {
           sample: d.symbol,
-          id_mult: d[pepplotFeatureIdKey],
+          id_mult: d[filteredPepplotFeatureIdKey],
           cpm: d.F === undefined ? d.t : d.F,
         };
       });

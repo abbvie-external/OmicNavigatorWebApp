@@ -45,6 +45,7 @@ class Tabs extends Component {
       proteinToHighlightInDiffTable: isEnrichment ? false : '',
       allStudiesMetadata: [],
       pepplotFeatureIdKey: '',
+      filteredPepplotFeatureIdKey: '',
     };
   }
 
@@ -120,9 +121,9 @@ class Tabs extends Component {
       tab,
     );
   };
-  handlePepplotFeatureIdKey = id => {
+  handlePepplotFeatureIdKey = (name, id) => {
     this.setState({
-      pepplotFeatureIdKey: id,
+      [name]: id,
     });
   };
   handleViewDiffTable = (test, protein) => {

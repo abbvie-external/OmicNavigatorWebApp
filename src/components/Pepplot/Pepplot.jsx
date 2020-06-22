@@ -606,7 +606,10 @@ class Pepplot extends Component {
       }
     }
     const alphanumericTrigger = pepplotAlphanumericFields[0];
-    this.onHandlePepplotFeatureIdKey(alphanumericTrigger);
+    this.props.onHandlePepplotFeatureIdKey(
+      'pepplotFeatureIdKey',
+      alphanumericTrigger,
+    );
     this.getTableHelpers(
       this.getProteinData,
       this.getPlot,
