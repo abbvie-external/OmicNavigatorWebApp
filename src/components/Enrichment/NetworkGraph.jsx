@@ -212,7 +212,6 @@ class NetworkGraph extends Component {
       const dynamicNodeCutoff = multisetFiltersVisible
         ? networkSigValue
         : nodeCutoff;
-
       let filteredNodes = [];
       let mostSignificantTestValue = 0;
       if (

@@ -9,7 +9,6 @@ import {
   Transition,
   Button,
 } from 'semantic-ui-react';
-import * as d3 from 'd3';
 import { CancelToken } from 'axios';
 import '../Shared/SearchCriteria.scss';
 import { phosphoprotService } from '../../services/phosphoprot.service';

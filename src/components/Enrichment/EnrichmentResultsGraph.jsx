@@ -359,12 +359,16 @@ class EnrichmentResultsGraph extends Component {
   };
 
   actuallyHandleNodeCutoffInputChange = _.debounce(value => {
-    this.props.onHandleNodeCutoffInputChange(value);
+    if (!this.props.multisetFiltersVisible) {
+      this.props.onHandleNodeCutoffInputChange(value);
+    }
   }, 1250);
 
   actuallyHandleNodeCutoffSliderChange = value => {
-    let decimalValue = value / 100;
-    this.props.onHandleNodeCutoffSliderChange(decimalValue);
+    if (!this.props.multisetFiltersVisible) {
+      let decimalValue = value / 100;
+      this.props.onHandleNodeCutoffSliderChange(decimalValue);
+    }
   };
 
   handleNodeCutoffSliderChange = value => {
@@ -439,6 +443,7 @@ class EnrichmentResultsGraph extends Component {
       totalLinks,
       legendIsOpen,
       multisetFiltersVisible,
+      networkSigValue,
     } = this.props;
 
     if (!networkDataLoaded) {
@@ -542,11 +547,12 @@ class EnrichmentResultsGraph extends Component {
               textAlign="center"
             >
               <div
-                className={
-                  multisetFiltersVisible
-                    ? 'InlineFlex NumericExponentialInputContainer Hide'
-                    : 'InlineFlex NumericExponentialInputContainer Show'
-                }
+                // className={
+                //   multisetFiltersVisible
+                //     ? 'InlineFlex NumericExponentialInputContainer Hide'
+                //     : 'InlineFlex NumericExponentialInputContainer Show'
+                // }
+                className="InlineFlex NumericExponentialInputContainer"
               >
                 <Popup
                   trigger={
@@ -573,28 +579,37 @@ class EnrichmentResultsGraph extends Component {
                   min={0}
                   max={1}
                   defaultValue={parseFloat(nodeCutoffLocal)}
-                  disabled={!networkGraphReady}
-                  value={parseFloat(nodeCutoffLocal)}
+                  disabled={!networkGraphReady || multisetFiltersVisible}
+                  value={
+                    !multisetFiltersVisible
+                      ? parseFloat(nodeCutoffLocal)
+                      : parseFloat(networkSigValue)
+                  }
                   spellcheck="false"
                 />
               </div>
               <div
-                className={
-                  multisetFiltersVisible
-                    ? 'NetworkSliderDiv Hide'
-                    : 'NetworkSliderDiv Show'
-                }
+                // className={
+                //   multisetFiltersVisible
+                //     ? 'NetworkSliderDiv Hide'
+                //     : 'NetworkSliderDiv Show'
+                // }
+                className="NetworkSliderDiv"
               >
                 <StyledSlider
                   renderTrack={NodeTrack}
                   renderThumb={NodeThumb}
-                  disabled={!networkGraphReady}
+                  disabled={!networkGraphReady || multisetFiltersVisible}
                   className={
                     networkGraphReady
                       ? 'NetworkSlider Show'
                       : 'NetworkSlider Hide'
                   }
-                  value={nodeCutoffLocal * 100}
+                  value={
+                    !multisetFiltersVisible
+                      ? nodeCutoffLocal * 100
+                      : networkSigValue * 100
+                  }
                   name="nodeCutoffSlider"
                   min={0}
                   max={100}
