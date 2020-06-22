@@ -9,24 +9,11 @@ export function updateUrl(
   scTab,
 ) {
   if (!searchCriteriaChange) {
-    console.log('[UrlControl.jsx] !searchCriteriaChange');
-    console.log('[UrlControl.jsx]', propsParam);
-    console.log('[UrlControl.jsx]', window.location.href);
     // const [urlVar, setUrlFunc] = useState('/pepplot');
     let tab, tabIndex, lastTabIndex;
-    console.log('[UrlControl.jsx]', window.location.href);
     // clear url
-    console.log('[UrlControl.jsx] propsParam.history', propsParam.history);
-    if (process.env.NODE_ENV === 'production') {
-      propsParam.history.push('');
-      propsParam.history.push('ocpu/library/OmicAnalyzer/www/');
-      // propsParam.history.push(propsParam.location.pathname);
-      debugger;
-    } else {
-      propsParam.history.push('');
-    }
+    propsParam.history.push('');
 
-    console.log('[UrlControl.jsx]', window.location.href);
     if (type === 'tabChange') {
       lastTabIndex = stateParam.activeIndex;
       tabIndex = lastTabIndex === 2 ? 1 : 2;
@@ -34,16 +21,12 @@ export function updateUrl(
     } else {
       const pathname = propsParam.location.pathname;
 
-      console.log('[UrlControl.jsx] pathname ', pathname);
-      console.log('[UrlControl.jsx]', window.location.href);
       const enrichment = pathname.includes('enrichment');
       tab = enrichment ? 'enrichment' : 'pepplot';
       tabIndex = enrichment ? 2 : 1;
     }
 
     if (tab === 'pepplot') {
-      console.log('[UrlControl.jsx] tab === pepplot');
-      console.log('[UrlControl.jsx]', window.location.href);
       const pepplotStudyQuery = stateParam.pepplotStudy || '';
       const pepplotModelQuery = stateParam.pepplotModel || '';
       const pepplotTestQuery =
@@ -66,10 +49,6 @@ export function updateUrl(
       const pepplotTest = encodeURI(pepplotTestReplaced);
       const pepplotProteinSite = encodeURI(pepplotProteinSiteReplaced);
       if (pepplotProteinSite !== '') {
-        console.log(
-          '[UrlControl.jsx] pepplotProteinSite !== "" ',
-          propsParam.location.pathname,
-        );
         propsParam.history.push(
           tab +
             '/' +
@@ -82,30 +61,14 @@ export function updateUrl(
             pepplotProteinSite,
         );
       } else if (pepplotTest !== '') {
-        console.log(
-          '[UrlControl.jsx] pepplotTest !== "" ',
-          propsParam.location.pathname,
-        );
         propsParam.history.push(
           tab + '/' + pepplotStudy + '/' + pepplotModel + '/' + pepplotTest,
         );
       } else if (pepplotModel !== '') {
-        console.log(
-          '[UrlControl.jsx] pepplotModel !== "" ',
-          propsParam.location.pathname,
-        );
         propsParam.history.push(tab + '/' + pepplotStudy + '/' + pepplotModel);
       } else if (pepplotStudy !== '') {
-        console.log(
-          '[UrlControl.jsx] pepplotStudy !== "" ',
-          propsParam.location.pathname,
-        );
         propsParam.history.push(tab + '/' + pepplotStudy);
       } else if (tab !== '') {
-        console.log(
-          '[UrlControl.jsx] tab !== "" ',
-          propsParam.location.pathname,
-        );
         propsParam.history.push(tab);
       }
       // });
@@ -174,26 +137,8 @@ export function updateUrl(
     }
     // condense this later!
   } else {
-    console.log('[UrlControl.jsx] searchCriteriaChange');
-    console.log('[UrlControl.jsx]', propsParam);
-    console.log('[UrlControl.jsx]', window.location.href);
-
-    console.log(
-      '[UrlControl.jsx] propsParam.history.location.pathname',
-      propsParam.history.location.pathname,
-    );
     // just a search criteria change
-    if (process.env.NODE_ENV === 'production') {
-      // propsParam.history.push(propsParam.location.pathname);
-      propsParam.history.push('');
-      propsParam.history.push('ocpu/library/OmicAnalyzer/www/');
-    } else {
-      propsParam.history.push('');
-    }
-    console.log(
-      '[UrlControl.jsx] propsParam.history.location.pathname ',
-      propsParam.history.location.pathname,
-    );
+    propsParam.history.push('');
     if (scTab === 'pepplot') {
       const pepplotStudyQuery2 = stateChanges.pepplotStudy || '';
       const pepplotModelQuery2 = stateChanges.pepplotModel || '';
@@ -211,10 +156,6 @@ export function updateUrl(
       const pepplotTest = encodeURI(pepplotTestReplaced);
       const pepplotProteinSite = encodeURI(pepplotProteinSiteReplaced);
       if (pepplotProteinSite !== '') {
-        console.log(
-          '[UrlControl.jsx] pepplotProteinSite !== "" ',
-          propsParam.location.pathname,
-        );
         propsParam.history.push(
           scTab +
             '/' +
@@ -226,71 +167,18 @@ export function updateUrl(
             '/' +
             pepplotProteinSite,
         );
-        console.log(
-          '[UrlControl.jsx] pepplotProteinSite !== "" ',
-          propsParam.location.pathname,
-        );
       } else if (pepplotTest !== '') {
-        console.log(
-          '[UrlControl.jsx] pepplotTest !== "" ',
-          propsParam.location.pathname,
-        );
         propsParam.history.push(
           scTab + '/' + pepplotStudy + '/' + pepplotModel + '/' + pepplotTest,
         );
-        console.log(
-          '[UrlControl.jsx] pepplotTest !== "" ',
-          propsParam.location.pathname,
-        );
       } else if (pepplotModel !== '') {
-        console.log(
-          '[UrlControl.jsx] pepplotModel !== "" ',
-          propsParam.location.pathname,
-        );
-        console.log(
-          '[UrlControl.jsx] propsParam.history.location.pathname ',
-          propsParam.history.location.pathname,
-        );
-        console.log('[UrlControl.jsx] scTab ', scTab);
-        console.log('[UrlControl.jsx] pepplotStudy ', pepplotStudy);
-        console.log('[UrlControl.jsx] pepplotModel ', pepplotModel);
-        // if (process.env.NODE_ENV === 'production') {
-        //   propsParam.history.push(
-        //     propsParam.location.pathname + '/' + pepplotModel,
-        //   );
-        // } else {
         propsParam.history.push(
           scTab + '/' + pepplotStudy + '/' + pepplotModel,
         );
-        // }
-        console.log(
-          '[UrlControl.jsx] pepplotModel !== "" ',
-          propsParam.location.pathname,
-        );
-        console.log(
-          '[UrlControl.jsx] propsParam.history.location.pathname ',
-          propsParam.history.location.pathname,
-        );
       } else if (pepplotStudy !== '') {
-        console.log(
-          '[UrlControl.jsx] pepplotStudy !== "" ',
-          propsParam.location.pathname,
-        );
         propsParam.history.push(scTab + '/' + pepplotStudy);
-        console.log(
-          '[UrlControl.jsx] pepplotStudy !== "" ',
-          propsParam.location.pathname,
-        );
       } else if (scTab !== '') {
-        console.log(
-          '[UrlControl.jsx] scTab !== "" ',
-          propsParam.location.pathname,
-        );
         propsParam.history.push(scTab);
-        console.log(
-          '[UrlControl.jsx] scTab !== "" ',
-          propsParam.location.pathname,
-        );
       }
       // });
       // }, [url]);

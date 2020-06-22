@@ -44,7 +44,6 @@ class PhosphoprotService {
       window.ocpu
         .call(method, obj, function(session) {
           const url = session.getLoc() + 'R/.val/json?auto_unbox=true';
-          console.log('the url is ', url);
           axios
             .get(url, {
               params: { digits: 10 },
