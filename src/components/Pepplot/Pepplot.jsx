@@ -326,8 +326,9 @@ class Pepplot extends Component {
     ) {
       addParams.rowHighlightOther = [];
       proteinToHighlightInDiffTable.forEach(element => {
-        // addParams.rowHighlightOther.push(element.Protein_Site);
-        addParams.rowHighlightOther.push(element[pepplotFeatureIdKeyVar]);
+        //addParams.rowHighlightOther.push(element.Protein_Site);
+        //addParams.rowHighlightOther.push(element[pepplotFeatureIdKeyVar]);
+        addParams.rowHighlightOther.push(element.id);
       });
     }
     addParams.showPhosphositePlus = dataItem => {
@@ -361,6 +362,7 @@ class Pepplot extends Component {
         );
       };
     };
+    addParams.elementId = pepplotFeatureIdKeyVar;
     this.setState({ additionalTemplateInfoPepplotTable: addParams });
   };
 
@@ -464,8 +466,8 @@ class Pepplot extends Component {
   };
   handleSelectedFromTable = toHighlightArr => {
     // const { pepplotStudy, pepplotModel } = this.props;
-    // this.setState({ selectedFromTableData: toHighlightArr });
-    // this.getTableHelpers(this.getProteinData, this.getPlot, toHighlightArr);
+     this.setState({selectedFromTableData: toHighlightArr})
+     this.getTableHelpers(this.getProteinData, this.getPlot, toHighlightArr, this.state.pepplotFeatureIdKey);
     // if (toHighlightArr.length === 0) {
     //   this.setState({
     //     isProteinSVGLoaded: false,

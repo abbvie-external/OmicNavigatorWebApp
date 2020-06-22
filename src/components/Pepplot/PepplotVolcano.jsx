@@ -12,14 +12,18 @@ import {
   Dimmer,
   Loader,
   GridColumn,
+  Image,
 } from 'semantic-ui-react';
 import './PepplotVolcano.scss';
 import SplitPane, {Pane} from 'react-split-pane';
+import excel_logo_custom from '../../resources/excel3.png';
 
 class PepplotVolcano extends Component {
   state = {
-    volcanoWidth: 400,
-    volcanoHeight: 400,
+    volcanoWidth: null,
+    volcanoHeight: null,
+    defaultVolcanoWidth: 500,
+    defaultVolcanoHeight: 400,
     filteredTableData: [],
     itemsPerPageInformedPepplot: null,
     volcanoPlotRows: 0,
@@ -38,6 +42,8 @@ class PepplotVolcano extends Component {
     this.setState({
       filteredTableData: this.props.pepplotResults,
       volcanoPlotRows: this.props.pepplotResults.length,
+      volcanoWidth: this.state.defaultVolcanoWidth*.95,
+      volcanoHeight: this.state.defaultVolcanoHeight*.95,
     });
   }
   componentDidUpdate(prevProps, prevState) {
@@ -48,17 +54,17 @@ class PepplotVolcano extends Component {
       });
       this.props.onSelectFromTable([]);
     }
-    if (
-      this.props.selectedFromTableData.length === 1 &&
-      this.state.volcanoWidth !== 400
-    ) {
-      this.setState({ volcanoWidth: 400 });
-    } else if (
-      this.props.selectedFromTableData.length !== 1 &&
-      this.state.volcanoWidth !== 600
-    ) {
-      this.setState({ volcanoWidth: 600 });
-    }
+    // if (
+    //   this.props.selectedFromTableData.length === 1 &&
+    //   this.state.volcanoWidth !== 400
+    // ) {
+    //   this.setState({ volcanoWidth: 400 });
+    // } else if (
+    //   this.props.selectedFromTableData.length !== 1 &&
+    //   this.state.volcanoWidth !== 600
+    // ) {
+    //   this.setState({ volcanoWidth: 600 });
+    // }
   }
   getAxisLabels = () => {
     if(this.props.pepplotResults.length !== 0){
@@ -131,21 +137,22 @@ class PepplotVolcano extends Component {
   };
 
   handleRowClick = (event, item, index) => {
+    const {identifier} = this.state;
+    const {pepplotFeatureIdKey}=this.props;
     const PreviouslyHighlighted = this.props.selectedFromTableData;
     event.stopPropagation();
     if (event.shiftKey) {
       const allTableData = _.cloneDeep(this.state.filteredTableData);
       const indexMaxProtein = _.findIndex(allTableData, function(d) {
-        return d.Protein_Site === PreviouslyHighlighted[0]?.Protein_Site;
+        return d[pepplotFeatureIdKey] === PreviouslyHighlighted[0]?.id;
       });
       const sliceFirst = index < indexMaxProtein ? index : indexMaxProtein;
       const sliceLast = index > indexMaxProtein ? index : indexMaxProtein;
       const shiftedTableData = allTableData.slice(sliceFirst, sliceLast + 1);
       const shiftedTableDataArray = shiftedTableData.map(function(d) {
         return {
-          Protein_Site: d.Protein_Site,
-          id_mult: d.id_mult,
-          cpm: d.F === undefined ? d.t : d.F,
+          id: d[pepplotFeatureIdKey],
+          key: d[identifier]
         };
       });
       this.props.onSelectFromTable(shiftedTableDataArray);
@@ -155,23 +162,19 @@ class PepplotVolcano extends Component {
 
       const ctrlClickedObj = allTableData[index];
       const alreadyHighlighted = PreviouslyHighlighted.some(
-        d => d.Protein_Site === ctrlClickedObj.Protein_Site,
+        d => d.id === ctrlClickedObj[pepplotFeatureIdKey],
       );
       // already highlighted, remove it from array
       if (alreadyHighlighted) {
         selectedTableDataArray = PreviouslyHighlighted.filter(
-          i => i.Protein_Site !== ctrlClickedObj.Protein_Site,
+          i => i.id !== ctrlClickedObj[pepplotFeatureIdKey],
         );
         this.props.onSelectFromTable(selectedTableDataArray);
       } else {
         // map protein to fix obj entries
         const mappedProtein = {
-          Protein_Site: ctrlClickedObj.Protein_Site,
-          id_mult: ctrlClickedObj.id_mult,
-          cpm:
-            ctrlClickedObj.F === undefined
-              ? ctrlClickedObj.t
-              : ctrlClickedObj.F,
+          id: ctrlClickedObj[pepplotFeatureIdKey],
+          key:ctrlClickedObj[identifier]
         };
         PreviouslyHighlighted.push(mappedProtein);
         this.props.onSelectFromTable(PreviouslyHighlighted);
@@ -179,9 +182,8 @@ class PepplotVolcano extends Component {
     } else {
       this.props.onSelectFromTable([
         {
-          Protein_Site: item.Protein_Site, //circleID,
-          id_mult: item.id_mult,
-          cpm: item.logFC, //statistic,
+          id: item[pepplotFeatureIdKey],
+          key: item[identifier]
         },
       ]);
     }
@@ -228,6 +230,7 @@ class PepplotVolcano extends Component {
     }
   };
   getSVGPlot = () => {
+    return null
     if (this.props.selectedFromTableData.length !== 1) {
       return null;
     } else if (
@@ -252,6 +255,16 @@ class PepplotVolcano extends Component {
       );
     }
   };
+
+  onSizeChange=(size, direction)=>{
+    if(direction==="horizontal"){
+      console.log("Horizontal: "+ size)
+      this.setState({volcanoHeight: size*.95})
+    }else{
+      console.log("Vertical: "+ size)
+      this.setState({volcanoWidth: size*.95})
+    }
+  }
 
   render() {
     const {
@@ -337,6 +350,11 @@ class PepplotVolcano extends Component {
                       onChange={this.handleDropdownChange.bind(this)}
                     ></Form.Field>
                     {yAxisTransformBox}
+                    {/* <Image
+                      src={excel_logo_custom}
+                      onClick={console.log("Exporting not working")}
+                      style={{ float: 'right', cursor: 'pointer' }}
+                    /> */}
                   </Form.Group>
                 </Form>
               </Fragment>
@@ -344,6 +362,21 @@ class PepplotVolcano extends Component {
           </Grid.Row>
           <Grid.Row>
             <Grid.Column>
+              <SplitPane
+                className="ThreePlotsDiv SplitPanesWrapper"
+                split="horizontal"
+                defaultSize={this.state.defaultVolcanoHeight}
+                minSize={200}
+                maxSize={800}
+                onDragFinished={size=>this.onSizeChange(size, "horizontal")}
+              >
+              <SplitPane
+                split="vertical"
+                defaultSize={this.state.defaultVolcanoWidth}
+                minSize={300}
+                maxSize={800}
+                onDragFinished={size=>this.onSizeChange(size, "vertical")}
+              >
               <PepplotVolcanoPlot
                 {...this.state}
                 {...this.props}
@@ -353,9 +386,38 @@ class PepplotVolcano extends Component {
                 getMaxAndMin={this.getMaxAndMin}
                 handleRowClick={this.handleRowClick}
               ></PepplotVolcanoPlot>
-              {svgPlot}
+              <svg
+                width={400}
+                height={400}
+              >
+                <rect
+                  x={0}
+                  y={0}
+                  width={100}
+                  height={100}
+                  fill="red"
+                ></rect>
+              </svg>
+              {/* {svgPlot} */}
+              </SplitPane>
+              <EZGrid
+                className="volcanoPlotTable"
+                data={filteredTableData}
+                totalRows={volcanoPlotRows}
+                columnsConfig={pepplotColumns}
+                itemsPerPage={itemsPerPageInformedPepplot}
+                onInformItemsPerPage={this.informItemsPerPage}
+                disableGeneralSearch
+                disableGrouping
+                disableColumnVisibilityToggle
+                exportBaseName="VolcanoPlot_Filtered_Results"
+                additionalTemplateInfo={additionalTemplateInfoPepplotTable}
+                headerAttributes={<ButtonActions />}
+                onRowClick={this.handleRowClick}
+              />
+              </SplitPane>
             </Grid.Column>
-          </Grid.Row>
+          {/* </Grid.Row>
           <Grid.Row>
             <Grid.Column>
               <EZGrid
@@ -372,7 +434,7 @@ class PepplotVolcano extends Component {
                 headerAttributes={<ButtonActions />}
                 onRowClick={this.handleRowClick}
               />
-            </Grid.Column>
+            </Grid.Column> */}
           </Grid.Row>
         </Grid>
       );
