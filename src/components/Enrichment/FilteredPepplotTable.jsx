@@ -113,9 +113,8 @@ class FilteredPepplotTable extends Component {
       let filteredPepplotData = this.state.filteredBarcodeData.filter(d =>
         brushedMultIds.includes(d[this.props.filteredPepplotFeatureIdKey]),
       );
+      // for sorting, if desired
       if (filteredPepplotData.length > 0) {
-        // const statToSort =
-        // this.state.filteredBarcodeData[0].F === undefined ? 't' : 'F';
         const statToSort =
           'P.Value' in this.state.filteredBarcodeData[0]
             ? 'P.Value'

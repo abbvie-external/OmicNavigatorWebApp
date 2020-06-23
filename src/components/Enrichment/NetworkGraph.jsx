@@ -843,7 +843,7 @@ class NetworkGraph extends Component {
                       else pValueDisplay = d.data.value.toExponential(3);
                       div
                         .html(
-                          `<div className="tooltipLink"><b>Description: </b>${d.data.metaData.description}<br/><b>Test: </b>${d.data.prop}<br/><b>${pValueType} pValue: </b>${pValueDisplay}<br/><b>Ontology: </b>${d.data.metaData.termID}</div>`,
+                          `<div className="tooltipLink"><b>Description: </b>${d.data.metaData.description}<br/><b>Test: </b>${d.data.prop}<br/><b><span className="textTransformCapitalize">${pValueType}</span> P Value: </b>${pValueDisplay}<br/><b>Ontology: </b>${d.data.metaData.termID}</div>`,
                         )
                         .style('left', tooltipLRPosition)
                         .style('top', tooltipTBPosition);

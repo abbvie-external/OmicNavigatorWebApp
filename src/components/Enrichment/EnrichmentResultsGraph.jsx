@@ -255,6 +255,7 @@ const SortableItem = sortableElement(props => {
         style={CustomPopupStyle}
         content={ItemTooltip}
         inverted
+        on="hover"
         position="left center"
         mouseEnterDelay={1000}
         mouseLeaveDelay={0}
@@ -574,6 +575,7 @@ class EnrichmentResultsGraph extends Component {
                   content="Nodes with statistics (typically p values or multiple testing adjusted versions of p values) greater than the cutoff value are removed. The statistic used is dependent on the currently chosen setting."
                   inverted
                   basic
+                  on={['hover', 'click']}
                   position="left center"
                   mouseEnterDelay={1000}
                   mouseLeaveDelay={0}
@@ -649,6 +651,7 @@ class EnrichmentResultsGraph extends Component {
                   content="Links with similarity metrics less than the cutoff are removed. The similarity metric is either the overlap coefficient, Jaccard index, or a mixture of the two, depending on the current settings."
                   inverted
                   basic
+                  on={['hover', 'click']}
                   position="left center"
                   mouseEnterDelay={1000}
                   mouseLeaveDelay={0}
@@ -713,13 +716,38 @@ class EnrichmentResultsGraph extends Component {
                         </Label>
                       }
                       style={CustomPopupStyle}
-                      content="Weighted percent used for overlap coefficient and Jaccard index, respectfully."
                       inverted
                       basic
+                      on="click"
                       position="left center"
                       mouseEnterDelay={1000}
                       mouseLeaveDelay={0}
-                    />
+                    >
+                      <Popup.Content>
+                        <p>
+                          Edges between node pairs are defined by the{' '}
+                          <a
+                            href="https://en.wikipedia.org/wiki/Jaccard_index"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="boldUnhighlighted"
+                          >
+                            <span>Jaccard Coefficient</span>
+                          </a>
+                          , the{' '}
+                          <a
+                            href="https://en.wikipedia.org/wiki/Overlap_coefficient"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="boldUnhighlighted"
+                          >
+                            <span>Overlap Coefficient</span>
+                          </a>
+                          , or a weighted mean according to the indicated
+                          percentages."
+                        </p>
+                      </Popup.Content>
+                    </Popup>
                   </Grid.Column>
                   <Grid.Column id="LinkTextContainer" textAlign="left">
                     <Label circular size={dynamicSize} id="JaccardPercent">
@@ -784,6 +812,7 @@ class EnrichmentResultsGraph extends Component {
                   content="Drag and drop list determines the order in which clusters of nodes will be sorted, left to right."
                   inverted
                   basic
+                  on={['hover', 'click']}
                   position="left center"
                   mouseEnterDelay={1000}
                   mouseLeaveDelay={0}
@@ -903,6 +932,7 @@ class EnrichmentResultsGraph extends Component {
                   style={CustomPopupStyle}
                   content="Number of nodes meeting current filter requirements, of total nodes without filters"
                   inverted
+                  on={['hover', 'click']}
                   position="left center"
                   mouseEnterDelay={1000}
                   mouseLeaveDelay={0}
@@ -916,6 +946,7 @@ class EnrichmentResultsGraph extends Component {
                   style={CustomPopupStyle}
                   content="Number of links meeting current filter requirements, of total links without filters"
                   inverted
+                  on={['hover', 'click']}
                   position="left center"
                   mouseEnterDelay={1000}
                   mouseLeaveDelay={0}
