@@ -1000,9 +1000,9 @@ class EnrichmentSearchCriteria extends Component {
             <Button
               type="button"
               className="pValueButton"
-              value="nominal"
-              name="nominal"
-              positive={pValueType === 'nominal'}
+              value="Nominal"
+              name="Nominal"
+              positive={pValueType === 'Nominal'}
               onClick={this.handlePValueTypeChange}
               disabled={enrichmentAnnotationsDisabled}
             >
@@ -1012,9 +1012,9 @@ class EnrichmentSearchCriteria extends Component {
             <Button
               type="button"
               className="pValueButton"
-              value="adjusted"
-              name="adjusted"
-              positive={pValueType === 'adjusted'}
+              value="Adjusted"
+              name="Adjusted"
+              positive={pValueType === 'Adjusted'}
               onClick={this.handlePValueTypeChange}
               disabled={enrichmentAnnotationsDisabled}
             >

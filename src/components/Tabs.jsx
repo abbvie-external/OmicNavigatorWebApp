@@ -41,7 +41,7 @@ class Tabs extends Component {
       pepplotModel: !isEnrichment ? decodedModel : '',
       pepplotTest: !isEnrichment ? decodedTest : '',
       pepplotProteinSite: !isEnrichment ? decodedSiteAndDescription : '',
-      pValueType: 'nominal',
+      pValueType: 'Nominal',
       proteinToHighlightInDiffTable: isEnrichment ? false : '',
       allStudiesMetadata: [],
       pepplotFeatureIdKey: '',

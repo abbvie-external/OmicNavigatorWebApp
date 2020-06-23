@@ -135,6 +135,8 @@ function getDynamicLegend() {
   } else return 350;
 }
 
+// const getNames = (description) =>
+
 const resultRenderer = ({ description, genes, size }) => {
   // let genesFormatted = limitValues(genes, 15);
   // const SearchValuePopupStyle = {
@@ -157,7 +159,12 @@ const resultRenderer = ({ description, genes, size }) => {
         </Label>
       </Grid.Column>
       <Grid.Column width={4}>
-        <Label circular color="blue" key={description}>
+        <Label
+          circular
+          color="blue"
+          key={description}
+          onHover={e => this.getNames(e, description)}
+        >
           {size}
         </Label>
         {/* <Popup
