@@ -2,7 +2,14 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 function clamp(x, lower = -Infinity, upper = Infinity) {
   return Math.min(upper, Math.max(lower, x));
 }
-export default function Component({ onChange, min, max, defaultValue, value }) {
+export default function Component({
+  onChange,
+  min,
+  max,
+  defaultValue,
+  value,
+  disabled,
+}) {
   const [numberProps] = useExponentialInput({
     // const [numberProps, { power, base, numberValue }] = useExponentialInput({
     defaultValue,
@@ -10,12 +17,14 @@ export default function Component({ onChange, min, max, defaultValue, value }) {
     max,
     onChange,
     value,
+    disabled,
   });
 
   return (
     <input
       className="NumericExponentialInput"
       spellCheck="false"
+      disabled={disabled}
       {...numberProps}
     />
   );
