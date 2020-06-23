@@ -302,6 +302,7 @@
   color: var(--color-light) !important;
   display: inline-block !important;
   text-align: left;
+  cursor: pointer !important;
 }
 
 @media (max-width: 1598px) {
@@ -435,4 +436,11 @@ input[type='number']::-webkit-inner-spin-button,
 input[type='number']::-webkit-outer-spin-button {
   opacity: 1 !important;
   height: 50px !important;
+}
+
+.boldUnhighlighted {
+  text-decoration: none !important;
+  // color: var(--color-primary) !important;
+  color: inherit;
+  font-weight: bold !important;
 }
