@@ -764,14 +764,15 @@ class Enrichment extends Component {
   }
 
   showBarcodePlot = (barcodeData, dataItem) => {
-    const barcodeDataSorted = barcodeData.data.sort(
-      (a, b) => b.statistic - a.statistic,
-    );
+    // sorting by statistic is being handled by backend
+    // const barcodeDataSorted = barcodeData.data.sort(
+    //   (a, b) => b.statistic - a.statistic,
+    // );
     this.setState({
       isTestDataLoaded: true,
       barcodeSettings: {
         ...this.state.barcodeSettings,
-        barcodeData: barcodeDataSorted,
+        barcodeData: barcodeData,
         statLabel: barcodeData.labelStat,
         highLabel: barcodeData.labelHigh,
         lowLabel: barcodeData.labelLow,

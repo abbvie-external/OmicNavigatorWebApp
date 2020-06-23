@@ -150,7 +150,6 @@ class NetworkGraph extends Component {
             (obj, key, index) => ({ ...obj, [key]: values[index] }),
             {},
           );
-          // let picked = _.pick(o1, networkSettings.facets);
           let metaData = {};
           _.forEach(networkSettings.metaLabels, (value, i) => {
             metaData[value] = o1[networkSettings.meta[i]];
@@ -317,8 +316,6 @@ class NetworkGraph extends Component {
               cluster.nodecount = nodecount;
             });
           });
-
-          // console.log(clusters.children.length);
           const totalClusters = clusters.children.length;
 
           // Prepare Settings
@@ -846,7 +843,7 @@ class NetworkGraph extends Component {
                       else pValueDisplay = d.data.value.toExponential(3);
                       div
                         .html(
-                          `<div className="tooltipLink"><b>Description: </b>${d.data.metaData.description}<br/><b>Test: </b>${d.data.prop}<br/><b>pValue: </b>${pValueDisplay}<br/><b>Ontology: </b>${d.data.metaData.termID}</div>`,
+                          `<div className="tooltipLink"><b>Description: </b>${d.data.metaData.description}<br/><b>Test: </b>${d.data.prop}<br/><b><span className="textTransformCapitalize">${pValueType}</span> P Value: </b>${pValueDisplay}<br/><b>Ontology: </b>${d.data.metaData.termID}</div>`,
                         )
                         .style('left', tooltipLRPosition)
                         .style('top', tooltipTBPosition);
