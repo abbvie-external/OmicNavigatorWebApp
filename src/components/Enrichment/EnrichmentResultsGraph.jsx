@@ -632,7 +632,7 @@ class EnrichmentResultsGraph extends Component {
                 <Popup
                   trigger={
                     <Label className="NetworkInputLabel" size={dynamicSize}>
-                      LINK
+                      EDGE
                       <span className="DisplayOnLarge"> SIMILARITY</span>
                       <br></br>
                       CUTOFF
@@ -700,13 +700,13 @@ class EnrichmentResultsGraph extends Component {
                           id="LinkTypeLabel"
                           size={dynamicSize}
                         >
-                          LINK
+                          EDGE
                           <br></br>
                           TYPE
                         </Label>
                       }
                       style={CustomPopupStyle}
-                      content="TBD BRETT...Percent used for overlap coefficient and Jaccard index, respectfully."
+                      content="Weighted percent used for overlap coefficient and Jaccard index, respectfully."
                       inverted
                       basic
                       position="left center"
