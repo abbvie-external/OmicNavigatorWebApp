@@ -344,6 +344,7 @@ class BarcodePlotReact extends Component {
               sample: m.lineID,
               id_mult: m.id_mult,
               cpm: m.statistic,
+              // logfc: m.cpm,
             };
           });
           self.props.onHandleProteinSelected(highlightedLineArray);

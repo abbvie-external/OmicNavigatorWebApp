@@ -151,8 +151,9 @@ class Enrichment extends Component {
         show: true,
         fields: [
           { label: 'log(FC)', value: 'cpm', toFixed: true },
-          // { label: 'abs(t)', value: 'cpm', toFixed: true },
           { label: 'Protein', value: 'sample' },
+          { label: 'Feature ID', value: 'id_mult' },
+          { label: 'abs(t)', value: 'statistic', toFixed: true },
         ],
       },
       xName: 'tissue',
@@ -810,7 +811,6 @@ class Enrichment extends Component {
         }).logFoldChange;
         return d;
       });
-
       const reducedBoxPlotArray = _.reduce(
         boxPlotArray,
         function(res, datum) {
@@ -871,8 +871,7 @@ class Enrichment extends Component {
   };
 
   handleProteinSelected = toHighlightArray => {
-    // const { enrichmentFeatureIdKey } = this.state;
-    const prevHighestValueObject = this.state.HighlightedProteins[0]?.sample;
+    const prevHighestValueObject = this.state.HighlightedProteins[0]?.id_mult;
     const highestValueObject = toHighlightArray[0];
     if (
       this.state.barcodeSettings.barcodeData?.length > 0 &&
@@ -882,7 +881,7 @@ class Enrichment extends Component {
         HighlightedProteins: toHighlightArray,
       });
       if (
-        highestValueObject?.sample !== prevHighestValueObject ||
+        highestValueObject?.id_mult !== prevHighestValueObject ||
         this.state.SVGPlotLoaded === false
       ) {
         this.setState({
@@ -890,9 +889,8 @@ class Enrichment extends Component {
           SVGPlotLoading: true,
         });
         const dataItem = this.state.barcodeSettings.barcodeData.find(
-          i => i.featureDisplay === highestValueObject?.sample,
+          i => i.featureID === highestValueObject?.id_mult,
         );
-        // let id = dataItem[enrichmentFeatureIdKey] || '';
         let id = dataItem.featureID || '';
         this.getPlot(id);
       }
@@ -1579,6 +1577,7 @@ class Enrichment extends Component {
       },
       false,
     );
+    this.handleLegendClose();
   };
 
   testSelectedTransition = bool => {

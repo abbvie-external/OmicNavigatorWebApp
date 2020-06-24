@@ -290,7 +290,7 @@ class FilteredPepplotTable extends Component {
     this.getTableData();
   };
 
-  getTableHelpers = HighlightedProteins => {
+  getTableHelpers = (HighlightedProteins, filteredPepplotFeatureIdKeyVar) => {
     const MaxLine = HighlightedProteins[0] || null;
     let addParams = {};
     if (MaxLine !== {} && MaxLine != null) {
@@ -304,12 +304,15 @@ class FilteredPepplotTable extends Component {
       });
     }
     addParams.showPhosphositePlus = dataItem => {
+      let protein = dataItem.symbol
+        ? dataItem.symbol
+        : dataItem[filteredPepplotFeatureIdKeyVar];
       return function() {
-        var protein = (dataItem.Protein
-          ? dataItem.Protein
-          : dataItem.MajorityProteinIDsHGNC
-        ).split(';')[0];
-        let param = { proteinNames: protein, queryId: -1, from: 0 };
+        const param = {
+          proteinNames: protein,
+          queryId: -1,
+          from: 0,
+        };
         phosphoprotService.postToPhosphositePlus(
           param,
           'https://www.phosphosite.org/proteinSearchSubmitAction.action',
@@ -345,8 +348,9 @@ class FilteredPepplotTable extends Component {
           // sample: d.symbol,
           sample: d.phosphosite,
           id_mult: d[filteredPepplotFeatureIdKey],
-          cpm: d[stat],
-          // cpm: d.F === undefined ? d.t : d.F,
+          // PAUL - this needs adjustment, looking for d.abs(t) instead of d.T, for example
+          // cpm: d[stat],
+          cpm: d.F == null ? d.t : d.F,
         };
       });
       this.props.onHandleProteinSelected(shiftedTableDataArray);
@@ -375,10 +379,9 @@ class FilteredPepplotTable extends Component {
         const mappedProtein = {
           sample: ctrlClickedObj.phosphosite,
           id_mult: ctrlClickedObj[filteredPepplotFeatureIdKey],
-          cpm: ctrlClickedObj[stat],
-          // ctrlClickedObj.F === undefined
-          //   ? ctrlClickedObj.t
-          //   : ctrlClickedObj.F,
+          // PAUL
+          // cpm: ctrlClickedObj[stat],
+          cpm: ctrlClickedObj.F == null ? ctrlClickedObj.t : ctrlClickedObj.F,
         };
         const lowerIndexThanMax = index < indexMaxProtein ? true : false;
         if (lowerIndexThanMax) {
@@ -407,14 +410,17 @@ class FilteredPepplotTable extends Component {
   };
 
   render() {
-    const { HighlightedProteins } = this.props;
+    const { HighlightedProteins, filteredPepplotFeatureIdKeyVar } = this.props;
     const {
       filteredTableConfigCols,
       filteredTableData,
       itemsPerPageFilteredPepplotTable,
     } = this.state;
     // const quickViews = [];
-    const additionalTemplateInfo = this.getTableHelpers(HighlightedProteins);
+    const additionalTemplateInfo = this.getTableHelpers(
+      HighlightedProteins,
+      filteredPepplotFeatureIdKeyVar,
+    );
 
     return (
       <div className="FilteredPepplotTableDiv">

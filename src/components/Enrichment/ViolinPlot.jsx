@@ -367,11 +367,9 @@ class ViolinPlot extends Component {
     const tooltipFields = self.props.violinSettings.tooltip.fields;
     let tooltipString = '';
     _.forEach(tooltipFields, field => {
-      // if (d[field.value] != null) {
-      tooltipString += `<span>${field.label} = ${d[field.value]}</span><br/>`;
-      // } else {
-      //   tooltipString += `<span>${d.sample}</span>`;
-      // }
+      if (d[field.value] != null && d[field.value] !== '') {
+        tooltipString += `<span>${field.label} = ${d[field.value]}</span><br/>`;
+      }
     });
     self.chart.objs.tooltip.html(tooltipString);
     self.chart.objs.tooltip.style('z-index', 100);
