@@ -64,6 +64,11 @@ class Enrichment extends Component {
       links: [],
       tests: [],
     },
+    unfilteredNetworkData: {
+      nodes: [],
+      links: [],
+      tests: [],
+    },
     filterNetworkFromUpset: [],
     networkDataLoaded: false,
     networkGraphReady: false,
@@ -146,8 +151,9 @@ class Enrichment extends Component {
         show: true,
         fields: [
           { label: 'log(FC)', value: 'cpm', toFixed: true },
-          // { label: 'abs(t)', value: 'cpm', toFixed: true },
           { label: 'Protein', value: 'sample' },
+          { label: 'Feature ID', value: 'id_mult' },
+          { label: 'abs(t)', value: 'statistic', toFixed: true },
         ],
       },
       xName: 'tissue',
@@ -653,12 +659,13 @@ class Enrichment extends Component {
       previousEnrichmentStudy,
       previousEnrichmentModel,
       previousEnrichmentAnnotation,
+      unfilteredNetworkData,
     } = this.state;
     if (
-      networkData.length === 0 ||
       enrichmentStudy !== previousEnrichmentStudy ||
       enrichmentModel !== previousEnrichmentModel ||
-      enrichmentAnnotation !== previousEnrichmentAnnotation
+      enrichmentAnnotation !== previousEnrichmentAnnotation ||
+      networkData.nodes.length === 0
     ) {
       this.setState({
         previousEnrichmentStudy: enrichmentStudy,
@@ -673,35 +680,45 @@ class Enrichment extends Component {
           this.handleGetEnrichmentNetworkError,
         )
         .then(getEnrichmentNetworkResponseData => {
-          this.handleEnrichmentNetworkData(
-            getEnrichmentNetworkResponseData,
-            enrichmentResults,
+          this.setState(
+            {
+              unfilteredNetworkData: getEnrichmentNetworkResponseData,
+            },
+            this.handleEnrichmentNetworkData(
+              getEnrichmentNetworkResponseData,
+              enrichmentResults,
+            ),
           );
         })
         .catch(error => {
           console.error('Error during getEnrichmentNetwork', error);
         });
     } else {
-      this.handleEnrichmentNetworkData(networkData, enrichmentResults);
+      this.handleEnrichmentNetworkData(
+        unfilteredNetworkData,
+        enrichmentResults,
+      );
     }
   };
 
-  handleEnrichmentNetworkData = (data, enrichmentResults) => {
+  handleEnrichmentNetworkData = (unfilteredNetworkData, enrichmentResults) => {
     // const pValueTypeParam = pValueType === 'adjusted' ? 0.1 : 1;
-    const tests = data.tests;
+    let networkDataVar = { ...unfilteredNetworkData };
+    const tests = unfilteredNetworkData.tests;
     const enrichmentResultsDescriptions = [...enrichmentResults].map(
       r => r.description,
     );
-    const filteredNodes = data.nodes.filter(n =>
+    const filteredNodes = unfilteredNetworkData.nodes.filter(n =>
       enrichmentResultsDescriptions.includes(n.description),
     );
-    data.nodes = filteredNodes;
+    networkDataVar.nodes = filteredNodes;
     this.setState({
       // networkDataAvailable: true,
-      networkData: data,
+      networkData: networkDataVar,
       tests: tests,
-      totalNodes: data.nodes.length,
-      totalLinks: data.links.length,
+      // totalNodes: data.nodes.length,
+      totalNodes: unfilteredNetworkData.nodes.length,
+      totalLinks: unfilteredNetworkData.links.length,
     });
     let facets = [];
     let pieData = [];
@@ -709,7 +726,7 @@ class Enrichment extends Component {
     const testsLength = typeof tests === 'string' ? 1 : tests.length;
     if (isArray) {
       for (var i = 0; i < testsLength; i++) {
-        let rplcSpaces = data.tests[i].replace(/ /g, '_');
+        let rplcSpaces = unfilteredNetworkData.tests[i].replace(/ /g, '_');
         facets.push('EnrichmentMap_pvalue_' + rplcSpaces + '_');
         pieData.push(100 / testsLength);
       }
@@ -794,7 +811,6 @@ class Enrichment extends Component {
         }).logFoldChange;
         return d;
       });
-
       const reducedBoxPlotArray = _.reduce(
         boxPlotArray,
         function(res, datum) {
@@ -816,7 +832,6 @@ class Enrichment extends Component {
       const vData = _.mapValues(reducedBoxPlotArray, function(v) {
         return { values: v };
       });
-
       const ordered = {};
       Object.keys(vData)
         .sort()
@@ -856,8 +871,7 @@ class Enrichment extends Component {
   };
 
   handleProteinSelected = toHighlightArray => {
-    // const { enrichmentFeatureIdKey } = this.state;
-    const prevHighestValueObject = this.state.HighlightedProteins[0]?.sample;
+    const prevHighestValueObject = this.state.HighlightedProteins[0]?.id_mult;
     const highestValueObject = toHighlightArray[0];
     if (
       this.state.barcodeSettings.barcodeData?.length > 0 &&
@@ -867,7 +881,7 @@ class Enrichment extends Component {
         HighlightedProteins: toHighlightArray,
       });
       if (
-        highestValueObject?.sample !== prevHighestValueObject ||
+        highestValueObject?.id_mult !== prevHighestValueObject ||
         this.state.SVGPlotLoaded === false
       ) {
         this.setState({
@@ -875,9 +889,8 @@ class Enrichment extends Component {
           SVGPlotLoading: true,
         });
         const dataItem = this.state.barcodeSettings.barcodeData.find(
-          i => i.featureDisplay === highestValueObject?.sample,
+          i => i.featureID === highestValueObject?.id_mult,
         );
-        // let id = dataItem[enrichmentFeatureIdKey] || '';
         let id = dataItem.featureID || '';
         this.getPlot(id);
       }
@@ -1564,6 +1577,7 @@ class Enrichment extends Component {
       },
       false,
     );
+    this.handleLegendClose();
   };
 
   testSelectedTransition = bool => {

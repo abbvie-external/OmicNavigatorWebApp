@@ -503,6 +503,7 @@ class EnrichmentSearchCriteria extends Component {
         );
       } else {
         // on toggle close
+        // this.props.onHandleNetworkTests([], []);
         this.props.onHandleMulisetFiltersVisible(false);
         this.setState({
           reloadPlot: false,
