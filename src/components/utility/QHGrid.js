@@ -780,6 +780,11 @@ class QHGridBody extends React.PureComponent {
           return null;
         }
         if (!hidden) {
+          // PAUL start
+          const firstObj = data[0];
+          const featureIDKey = 'idmult' in firstObj ? 'idmult' : 'entrez';
+          // let featureIDKey = this.props.filteredPepplotFeatureIdKey;
+          // PAUL end
           data_rows = _.map(data, (item, idx) => {
             const rowLevelStyle = this.props.rowLevelStyleCalc(item, ++curRow);
             // Paul start
@@ -788,19 +793,19 @@ class QHGridBody extends React.PureComponent {
             let rowHighlightMax = false;
             let rowHighlightOther = false;
             if (
-              item.Protein_Site != null &&
+              item[featureIDKey] != null &&
               this.props.additionalTemplateInfo !== '' &&
               this.props.additionalTemplateInfo != null
             ) {
               if (
-                item.Protein_Site ===
+                item[featureIDKey] ===
                 this.props.additionalTemplateInfo.rowHighlightMax
               ) {
                 rowHighlightMax = true;
               }
               if (
                 this.props.additionalTemplateInfo?.rowHighlightOther?.includes(
-                  item.Protein_Site,
+                  item[featureIDKey],
                 )
               ) {
                 rowHighlightOther = true;
