@@ -470,7 +470,7 @@ class BarcodePlotReact extends Component {
     } = this.state;
 
     const { horizontalSplitPaneSize, barcodeSettings } = this.props;
-
+    debugger;
     const barcodeHeight =
       horizontalSplitPaneSize - settings.margin.top - settings.margin.bottom;
     // const yScale = d3

@@ -64,6 +64,11 @@ class Enrichment extends Component {
       links: [],
       tests: [],
     },
+    unfilteredNetworkData: {
+      nodes: [],
+      links: [],
+      tests: [],
+    },
     filterNetworkFromUpset: [],
     networkDataLoaded: false,
     networkGraphReady: false,
@@ -653,12 +658,13 @@ class Enrichment extends Component {
       previousEnrichmentStudy,
       previousEnrichmentModel,
       previousEnrichmentAnnotation,
+      unfilteredNetworkData,
     } = this.state;
     if (
-      networkData.length === 0 ||
       enrichmentStudy !== previousEnrichmentStudy ||
       enrichmentModel !== previousEnrichmentModel ||
-      enrichmentAnnotation !== previousEnrichmentAnnotation
+      enrichmentAnnotation !== previousEnrichmentAnnotation ||
+      networkData.nodes.length === 0
     ) {
       this.setState({
         previousEnrichmentStudy: enrichmentStudy,
@@ -673,35 +679,46 @@ class Enrichment extends Component {
           this.handleGetEnrichmentNetworkError,
         )
         .then(getEnrichmentNetworkResponseData => {
-          this.handleEnrichmentNetworkData(
-            getEnrichmentNetworkResponseData,
-            enrichmentResults,
+          this.setState(
+            {
+              unfilteredNetworkData: getEnrichmentNetworkResponseData,
+            },
+            this.handleEnrichmentNetworkData(
+              getEnrichmentNetworkResponseData,
+              enrichmentResults,
+            ),
           );
         })
         .catch(error => {
           console.error('Error during getEnrichmentNetwork', error);
         });
     } else {
-      this.handleEnrichmentNetworkData(networkData, enrichmentResults);
+      this.handleEnrichmentNetworkData(
+        unfilteredNetworkData,
+        enrichmentResults,
+      );
     }
   };
 
-  handleEnrichmentNetworkData = (data, enrichmentResults) => {
+  handleEnrichmentNetworkData = (unfilteredNetworkData, enrichmentResults) => {
     // const pValueTypeParam = pValueType === 'adjusted' ? 0.1 : 1;
-    const tests = data.tests;
+    debugger;
+    let networkDataVar = { ...unfilteredNetworkData };
+    const tests = unfilteredNetworkData.tests;
     const enrichmentResultsDescriptions = [...enrichmentResults].map(
       r => r.description,
     );
-    const filteredNodes = data.nodes.filter(n =>
+    const filteredNodes = unfilteredNetworkData.nodes.filter(n =>
       enrichmentResultsDescriptions.includes(n.description),
     );
-    data.nodes = filteredNodes;
+    networkDataVar.nodes = filteredNodes;
     this.setState({
       // networkDataAvailable: true,
-      networkData: data,
+      networkData: networkDataVar,
       tests: tests,
-      totalNodes: data.nodes.length,
-      totalLinks: data.links.length,
+      // totalNodes: data.nodes.length,
+      totalNodes: unfilteredNetworkData.nodes.length,
+      totalLinks: unfilteredNetworkData.links.length,
     });
     let facets = [];
     let pieData = [];
@@ -709,7 +726,7 @@ class Enrichment extends Component {
     const testsLength = typeof tests === 'string' ? 1 : tests.length;
     if (isArray) {
       for (var i = 0; i < testsLength; i++) {
-        let rplcSpaces = data.tests[i].replace(/ /g, '_');
+        let rplcSpaces = unfilteredNetworkData.tests[i].replace(/ /g, '_');
         facets.push('EnrichmentMap_pvalue_' + rplcSpaces + '_');
         pieData.push(100 / testsLength);
       }
@@ -764,6 +781,7 @@ class Enrichment extends Component {
   }
 
   showBarcodePlot = (barcodeData, dataItem) => {
+    debugger;
     // sorting by statistic is being handled by backend
     // const barcodeDataSorted = barcodeData.data.sort(
     //   (a, b) => b.statistic - a.statistic,

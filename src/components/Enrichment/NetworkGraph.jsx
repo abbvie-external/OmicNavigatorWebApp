@@ -213,31 +213,43 @@ class NetworkGraph extends Component {
         : nodeCutoff;
       let filteredNodes = [];
       let mostSignificantTestValue = 0;
-      if (
-        multisetFiltersVisible &&
-        networkTestsMust.length === 0 &&
-        networkTestsNot.length === 0
-      ) {
-        filteredNodes = formattedNodes;
+      // multiset is not on
+      if (!multisetFiltersVisible) {
+        filteredNodes = formattedNodes.filter(
+          n => n.lowestValue <= dynamicNodeCutoff,
+        );
         mostSignificantTestValue = Math.min(
           ...filteredNodes.map(f => f.lowestValue).filter(v => v != null),
         );
       } else {
-        if (networkOperator === '<') {
-          filteredNodes = formattedNodes.filter(
-            n => n.lowestValue <= dynamicNodeCutoff,
+        /// multiset is on
+        if (
+          multisetFiltersVisible &&
+          networkTestsMust.length === 0 &&
+          networkTestsNot.length === 0
+        ) {
+          // multiset on, but no tests
+          filteredNodes = formattedNodes;
+          mostSignificantTestValue = Math.min(
+            ...filteredNodes.map(f => f.lowestValue).filter(v => v != null),
+          );
+        } else {
+          // multiset on, with tests
+          if (networkOperator === '<') {
+            filteredNodes = formattedNodes.filter(
+              n => n.lowestValue <= dynamicNodeCutoff,
+            );
+          }
+          if (networkOperator === '>') {
+            filteredNodes = formattedNodes.filter(
+              n => n.highestValue >= dynamicNodeCutoff,
+            );
+          }
+          mostSignificantTestValue = Math.min(
+            ...filteredNodes.map(f => f.lowestValue).filter(v => v != null),
           );
         }
-        if (networkOperator === '>') {
-          filteredNodes = formattedNodes.filter(
-            n => n.highestValue >= dynamicNodeCutoff,
-          );
-        }
-        mostSignificantTestValue = Math.min(
-          ...filteredNodes.map(f => f.lowestValue).filter(v => v != null),
-        );
       }
-
       let filteredLinks = formattedLinks.filter(function(l) {
         let jaccardTotal = linkType * l.jaccard;
         let overlapValue = 1 - linkType;
