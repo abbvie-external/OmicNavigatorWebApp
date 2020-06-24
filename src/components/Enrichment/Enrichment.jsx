@@ -702,7 +702,6 @@ class Enrichment extends Component {
 
   handleEnrichmentNetworkData = (unfilteredNetworkData, enrichmentResults) => {
     // const pValueTypeParam = pValueType === 'adjusted' ? 0.1 : 1;
-    debugger;
     let networkDataVar = { ...unfilteredNetworkData };
     const tests = unfilteredNetworkData.tests;
     const enrichmentResultsDescriptions = [...enrichmentResults].map(
@@ -781,7 +780,6 @@ class Enrichment extends Component {
   }
 
   showBarcodePlot = (barcodeData, dataItem) => {
-    debugger;
     // sorting by statistic is being handled by backend
     // const barcodeDataSorted = barcodeData.data.sort(
     //   (a, b) => b.statistic - a.statistic,
@@ -834,7 +832,6 @@ class Enrichment extends Component {
       const vData = _.mapValues(reducedBoxPlotArray, function(v) {
         return { values: v };
       });
-
       const ordered = {};
       Object.keys(vData)
         .sort()
