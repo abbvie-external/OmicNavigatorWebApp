@@ -772,7 +772,7 @@ class Enrichment extends Component {
       isTestDataLoaded: true,
       barcodeSettings: {
         ...this.state.barcodeSettings,
-        barcodeData: barcodeData,
+        barcodeData: barcodeData.data,
         statLabel: barcodeData.labelStat,
         highLabel: barcodeData.labelHigh,
         lowLabel: barcodeData.labelLow,

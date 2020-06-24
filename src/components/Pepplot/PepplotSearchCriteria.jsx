@@ -49,7 +49,7 @@ class PepplotSearchCriteria extends Component {
     uSettingsP: {
       defaultselectedColP: {
         key: 'adj_P_Val',
-        text: 'Adjusted P Value',
+        text: 'Adjusted P',
         value: 'adj_P_Val',
       },
       defaultselectedOperatorP: {

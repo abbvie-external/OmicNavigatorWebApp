@@ -132,17 +132,14 @@ class Pepplot extends Component {
 
   handlePepplotSearch = searchResults => {
     let columns = [];
-    // sorting, if desired
-    // let sortedPepplotResults = searchResults.pepplotResults;
-    // if (sortedPepplotResults?.length > 0) {
-    //   columns = this.getConfigCols(searchResults);
+    if (searchResults.pepplotResults?.length > 0) {
+      columns = this.getConfigCols(searchResults);
+    }
     //   const statToSort =
     //     'P.Value' in sortedPepplotResults[0] ? 'P.Value' : 'P_Value';
     //   sortedPepplotResults = sortedPepplotResults.sort(
     //     (a, b) => a[statToSort] - b[statToSort],
     //   );
-    // }
-
     this.setState({
       pepplotResults: searchResults.pepplotResults,
       pepplotColumns: columns,
