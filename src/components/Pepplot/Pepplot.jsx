@@ -167,7 +167,7 @@ class Pepplot extends Component {
           model => model.modelID === pepplotModel,
         );
         this.setState({
-          pepplotPlotTypes: pepplotModelData.plots,
+          pepplotPlotTypes: pepplotModelData?.plots,
         });
       }
     }

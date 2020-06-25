@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Popup } from 'semantic-ui-react';
+import { Popup, Dimmer, Loader } from 'semantic-ui-react';
 import { phosphoprotService } from '../../services/phosphoprot.service';
 import _ from 'lodash';
 import { formatNumberForDisplay, splitValue } from '../Shared/helpers';
@@ -26,6 +26,8 @@ class FilteredPepplotTable extends Component {
     filteredTableData: [],
     filteredBarcodeData: [],
     itemsPerPageFilteredPepplotTable: 15,
+    filteredTableLoading: true,
+    additionalTemplateInfo: [],
   };
   filteredPepplotGridRef = React.createRef();
 
@@ -52,6 +54,21 @@ class FilteredPepplotTable extends Component {
       this.state.filteredBarcodeData !== prevState.filteredBarcodeData
     ) {
       this.getTableData();
+    }
+
+    if (
+      this.props.filteredPepplotFeatureIdKey !==
+        prevProps.filteredPepplotFeatureIdKey ||
+      this.props.HighlightedProteins !== prevProps.HighlightedProteins
+    ) {
+      const additionalParameters = this.getTableHelpers(
+        this.props.HighlightedProteins,
+        this.props.filteredPepplotFeatureIdKey,
+      );
+      this.setState({
+        additionalTemplateInfo: additionalParameters,
+        filteredTableLoading: false,
+      });
     }
     // let prevValues = prevProps?.barcodeSettings?.brushedData ?? [];
     // let currentValues = this.props.barcodeSettings?.brushedData ?? [];
@@ -209,7 +226,9 @@ class FilteredPepplotTable extends Component {
               return (
                 <div className="NoSelect">
                   <Popup
-                    trigger={<span>{splitValue(value)}</span>}
+                    trigger={
+                      <span className="NoSelect">{splitValue(value)}</span>
+                    }
                     style={TableValuePopupStyle}
                     className="TablePopupValue"
                     content={value}
@@ -235,9 +254,11 @@ class FilteredPepplotTable extends Component {
               );
             } else {
               return (
-                <div>
+                <div className="NoSelect">
                   <Popup
-                    trigger={<span>{splitValue(value)}</span>}
+                    trigger={
+                      <span className="NoSelect">{splitValue(value)}</span>
+                    }
                     style={TableValuePopupStyle}
                     className="TablePopupValue"
                     content={value}
@@ -264,7 +285,7 @@ class FilteredPepplotTable extends Component {
               <p>
                 <Popup
                   trigger={
-                    <span className="TableValue  NoSelect">
+                    <span className="TableValue NoSelect">
                       {formatNumberForDisplay(value)}
                     </span>
                   }
@@ -294,13 +315,17 @@ class FilteredPepplotTable extends Component {
     const MaxLine = HighlightedProteins[0] || null;
     let addParams = {};
     if (MaxLine !== {} && MaxLine != null) {
-      addParams.rowHighlightMax = MaxLine.sample;
+      addParams.rowHighlightMax = MaxLine.id_mult;
+      // addParams.rowHighlightMax = MaxLine[filteredPepplotFeatureIdKeyVar];
     }
     const SelectedProteins = HighlightedProteins.slice(1);
     if (SelectedProteins.length > 0 && SelectedProteins != null) {
       addParams.rowHighlightOther = [];
       SelectedProteins.forEach(element => {
-        addParams.rowHighlightOther.push(element.sample);
+        addParams.rowHighlightOther.push(
+          // element[filteredPepplotFeatureIdKeyVar],
+          element.id_mult,
+        );
       });
     }
     addParams.showPhosphositePlus = dataItem => {
@@ -410,43 +435,48 @@ class FilteredPepplotTable extends Component {
   };
 
   render() {
-    const { HighlightedProteins, filteredPepplotFeatureIdKeyVar } = this.props;
     const {
       filteredTableConfigCols,
       filteredTableData,
       itemsPerPageFilteredPepplotTable,
+      filteredTableLoading,
     } = this.state;
-    // const quickViews = [];
-    const additionalTemplateInfo = this.getTableHelpers(
-      HighlightedProteins,
-      filteredPepplotFeatureIdKeyVar,
-    );
 
-    return (
-      <div className="FilteredPepplotTableDiv">
-        <EZGrid
-          ref={this.filteredPepplotGridRef}
-          onInformItemsPerPage={this.informItemsPerPage}
-          // uniqueCacheKey={pepplotCacheKey}
-          data={filteredTableData}
-          columnsConfig={filteredTableConfigCols}
-          totalRows={15}
-          // use "pepplotRows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
-          itemsPerPage={itemsPerPageFilteredPepplotTable}
-          exportBaseName="Differential_Phosphorylation_Analysis_Filtered"
-          // quickViews={quickViews}
-          // disableGeneralSearch
-          disableGrouping
-          // disableSort
-          disableColumnVisibilityToggle
-          // disableFilters={false}
-          min-height="5vh"
-          additionalTemplateInfo={additionalTemplateInfo}
-          // headerAttributes={<ButtonActions />}
-          onRowClick={this.handleRowClick}
-        />
-      </div>
-    );
+    if (!filteredTableLoading) {
+      return (
+        <div className="FilteredPepplotTableDiv">
+          <EZGrid
+            ref={this.filteredPepplotGridRef}
+            onInformItemsPerPage={this.informItemsPerPage}
+            // uniqueCacheKey={pepplotCacheKey}
+            data={filteredTableData}
+            columnsConfig={filteredTableConfigCols}
+            totalRows={15}
+            // use "pepplotRows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
+            itemsPerPage={itemsPerPageFilteredPepplotTable}
+            exportBaseName="Differential_Phosphorylation_Analysis_Filtered"
+            // quickViews={quickViews}
+            // disableGeneralSearch
+            disableGrouping
+            // disableSort
+            disableColumnVisibilityToggle
+            // disableFilters={false}
+            min-height="5vh"
+            additionalTemplateInfo={this.state.additionalTemplateInfo}
+            // headerAttributes={<ButtonActions />}
+            onRowClick={this.handleRowClick}
+          />
+        </div>
+      );
+    } else {
+      return (
+        <div className="TableLoadingDiv">
+          <Dimmer active inverted>
+            <Loader size="large">Table Loading</Loader>
+          </Dimmer>
+        </div>
+      );
+    }
   }
 }
 
