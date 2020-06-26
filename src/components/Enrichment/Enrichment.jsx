@@ -286,7 +286,22 @@ class Enrichment extends Component {
         this.handleGetBarcodeDataError,
       )
       .then(barcodeDataResponse => {
-        showBarcodePlotCb(barcodeDataResponse, dataItem);
+        if (barcodeDataResponse?.data?.length > 0) {
+          const logFoldChangeArr = barcodeDataResponse.data.map(
+            b => b.logFoldChange,
+          );
+          const isZero = logFoldChangeVal => logFoldChangeVal === 0;
+          if (logFoldChangeArr.every(isZero)) {
+            this.setState({
+              displayViolinPlot: false,
+            });
+          } else {
+            this.setState({
+              displayViolinPlot: true,
+            });
+          }
+          showBarcodePlotCb(barcodeDataResponse, dataItem);
+        }
       })
       .catch(error => {
         console.error('Error during getBarcodeData', error);
@@ -392,16 +407,6 @@ class Enrichment extends Component {
 
   handleSearchCriteriaChange = (changes, scChange) => {
     this.props.onSearchCriteriaToTop(changes, 'enrichment');
-    // if (
-    //   changes.enrichmentModel ===
-    //     'Treatment and or Strain Differential Phosphorylation' ||
-    //   changes.enrichmentModel ===
-    //     'Ferrostatin vs Untreated Differential Phosphorylation'
-    // ) {
-    //   this.setState({
-    //     displayViolinPlot: true,
-    //   });
-    // }
     this.setState({
       plotButtonActive: false,
       visible: false,
@@ -1066,7 +1071,22 @@ class Enrichment extends Component {
         this.handleGetBarcodeDataError,
       )
       .then(barcodeDataResponse => {
-        this.showBarcodePlot(barcodeDataResponse, dataItem);
+        if (barcodeDataResponse?.data?.length > 0) {
+          const logFoldChangeArr = barcodeDataResponse.data.map(
+            b => b.logFoldChange,
+          );
+          const isZero = logFoldChangeVal => logFoldChangeVal === 0;
+          if (logFoldChangeArr.every(isZero)) {
+            this.setState({
+              displayViolinPlot: false,
+            });
+          } else {
+            this.setState({
+              displayViolinPlot: true,
+            });
+          }
+          this.showBarcodePlot(barcodeDataResponse, dataItem);
+        }
       })
       .catch(error => {
         console.error('Error during getBarcodeData', error);
