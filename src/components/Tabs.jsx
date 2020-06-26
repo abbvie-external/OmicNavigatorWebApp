@@ -3,6 +3,8 @@ import { withRouter } from 'react-router-dom';
 import { Tab, Menu } from 'semantic-ui-react';
 import { phosphoprotService } from '../services/phosphoprot.service';
 import Pepplot from './Pepplot/Pepplot';
+import omicAnalyzerIcon from '../resources/icon.png';
+
 import Enrichment from './Enrichment/Enrichment';
 import { updateUrl } from './Shared/UrlControl';
 
@@ -172,7 +174,11 @@ class Tabs extends Component {
         menuItem: (
           <Menu.Item key="1" disabled header className="LogoAndTitle">
             <span className="LogoElement">
-              <img alt="Omic Analyzer" src="/icon.png" className="LogoImage" />
+              <img
+                alt="Omic Analyzer"
+                src={omicAnalyzerIcon}
+                className="LogoImage"
+              />
             </span>
             <span className="Header HeaderFirst">Omic&nbsp;</span>
             <span className="Header HeaderSecond">Analyzer</span>
