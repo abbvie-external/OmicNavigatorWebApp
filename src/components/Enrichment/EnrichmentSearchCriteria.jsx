@@ -9,7 +9,6 @@ import {
   Transition,
   Button,
 } from 'semantic-ui-react';
-import * as d3 from 'd3';
 import { CancelToken } from 'axios';
 import '../Shared/SearchCriteria.scss';
 import { phosphoprotService } from '../../services/phosphoprot.service';
@@ -504,6 +503,7 @@ class EnrichmentSearchCriteria extends Component {
         );
       } else {
         // on toggle close
+        // this.props.onHandleNetworkTests([], []);
         this.props.onHandleMulisetFiltersVisible(false);
         this.setState({
           reloadPlot: false,

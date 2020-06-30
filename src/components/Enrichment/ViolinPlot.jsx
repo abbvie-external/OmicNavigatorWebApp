@@ -14,11 +14,8 @@ class ViolinPlot extends Component {
   };
 
   chart = {};
-
   maxCircle;
-
   violinContainerRef = React.createRef();
-
   brushedData = [];
 
   componentDidMount() {
@@ -44,7 +41,8 @@ class ViolinPlot extends Component {
 
   componentDidUpdate(prevProps) {
     if (this.props.violinData !== prevProps.violinData) {
-      const label = this.props.violinSettings.axisLabels.xAxis;
+      // const label = this.props.violinSettings.axisLabels.xAxis;
+      const label = this.props.barcodeSettings.statLabel;
       let prevValues = prevProps?.violinData?.[label]?.values ?? [];
       let currentValues = this.props.violinData?.[label]?.values ?? [];
       var isSame =
@@ -88,10 +86,7 @@ class ViolinPlot extends Component {
         //     ? this.brushedData.slice(1)
         //     : this.props.HighlightedProteins.slice(1);
         this.props.HighlightedProteins.forEach(element => {
-          const highlightedDotId = this.getCircleId(
-            element.sample,
-            element.id_mult,
-          );
+          const highlightedDotId = element.id_mult;
           d3.select(`#violin_${highlightedDotId}`)
             .transition()
             .duration(100)
@@ -99,11 +94,11 @@ class ViolinPlot extends Component {
             .attr('r', dOpts.pointSize * 1.5);
         });
         // if max protein exists, get id
-        if (this.props.HighlightedProteins[0]?.sample !== '') {
-          const maxDotId = this.getCircleId(
-            this.props.HighlightedProteins[0]?.sample,
-            this.props.HighlightedProteins[0]?.id_mult,
-          );
+        if (
+          this.props.HighlightedProteins[0]?.id_mult != null &&
+          this.props.HighlightedProteins[0]?.id_mult !== ''
+        ) {
+          const maxDotId = this.props.HighlightedProteins[0].id_mult;
           d3.select(`#violin_${maxDotId}`)
             .transition()
             .duration(100)
@@ -210,47 +205,44 @@ class ViolinPlot extends Component {
   };
 
   addToolTiptoMax = id => {
-    const self = this;
-    const cx = Math.ceil(
-      d3
-        .select(`#violin_${self.getCircleId(id?.sample, id?.id_mult)}`)
-        .attr('cx'),
-    );
-    const cy = Math.ceil(
-      d3
-        .select(`#violin_${self.getCircleId(id?.sample, id?.id_mult)}`)
-        .attr('cy'),
-    );
+    if (id != null) {
+      const self = this;
+      let maxObj = d3.select(`#violin_${id.id_mult}`);
+      console.log(maxObj);
+      const cx = Math.ceil(d3.select(`#violin_${id.id_mult}`).attr('cx'));
+      const cy = Math.ceil(d3.select(`#violin_${id.id_mult}`).attr('cy'));
 
-    const svg = document.getElementById('svg-violin-graph-1');
-    let parent = '';
-    // if (this.violinContainerRef.current !== null) {
+      const svg = document.getElementById('svg-violin-graph-1');
+      let parent = '';
+      // if (this.violinContainerRef.current !== null) {
 
-    // } else {
-    parent = document.getElementById('violin-graph-1').getBoundingClientRect();
+      // } else {
+      parent = document
+        .getElementById('violin-graph-1')
+        .getBoundingClientRect();
 
-    const shape = document
-      .getElementById(`violin_${self.getCircleId(id?.sample, id?.id_mult)}`)
-      .getBoundingClientRect();
-    const relative = shape.left - parent.left;
+      const shape = document
+        .getElementById(`violin_${id.id_mult}`)
+        .getBoundingClientRect();
+      const relative = shape.left - parent.left;
 
-    const res = self.getPos(cx, cy, svg, svg);
+      const res = self.getPos(cx, cy, svg, svg);
 
-    self.chart.objs.tooltip
-      .transition()
-      .duration(300)
-      .style('left', `${relative + 20}px`)
-      .style('top', `${res.y + 20}px`)
-      .style('opacity', () => {
-        return 1;
-      })
-      .style('display', null);
-    id.cpm = _.find(this.props.barcodeSettings.barcodeData, function(o) {
-      // return o.id_mult === id.id_mult;
-      return o.featureID === id.id_mult;
-    }).logFoldChange;
-    this.tooltipHover(id);
-    // }
+      self.chart.objs.tooltip
+        .transition()
+        .duration(300)
+        .style('left', `${relative + 20}px`)
+        .style('top', `${res.y + 20}px`)
+        .style('opacity', () => {
+          return 1;
+        })
+        .style('display', null);
+      id.cpm = _.find(this.props.barcodeSettings.barcodeData, function(o) {
+        return o.featureID === id.id_mult;
+      }).logFoldChange;
+      this.tooltipHover(id);
+      // }
+    }
   };
 
   getPos = (x, y, svg, element) => {
@@ -261,12 +253,12 @@ class ViolinPlot extends Component {
     return p.matrixTransform(ctm);
   };
 
-  getCircleId = (id, idMult) => {
-    if (id && idMult) {
-      return `${id.replace(/;/g, '_')}_${idMult}`;
-    }
-    return null;
-  };
+  // getCircleId = (id, idMult) => {
+  //   if (id && idMult) {
+  //     return `${id.replace(/;/g, '_')}_${idMult}`;
+  //   }
+  //   return null;
+  // };
 
   addJitter = (doJitter, width) => {
     if (doJitter !== true || width === 0) {
@@ -285,7 +277,6 @@ class ViolinPlot extends Component {
         // revert circles to initial style
         // self.unhighlightPoint([], true, self);
         const brush_coords = d3.brushSelection(this);
-
         // style brushed circles
         // tslint:disable-next-line:no-shadowed-variable
         const isBrushed = function(brush_coords, cx, cy) {
@@ -376,11 +367,9 @@ class ViolinPlot extends Component {
     const tooltipFields = self.props.violinSettings.tooltip.fields;
     let tooltipString = '';
     _.forEach(tooltipFields, field => {
-      // if (d[field.value] != null) {
-      tooltipString += `<span>${field.label} = ${d[field.value]}</span><br/>`;
-      // } else {
-      //   tooltipString += `<span>${d.sample}</span>`;
-      // }
+      if (d[field.value] != null && d[field.value] !== '') {
+        tooltipString += `<span>${field.label} = ${d[field.value]}</span><br/>`;
+      }
     });
     self.chart.objs.tooltip.html(tooltipString);
     self.chart.objs.tooltip.style('z-index', 100);
@@ -1459,12 +1448,12 @@ class ViolinPlot extends Component {
                     //     self.chart.settings.pointUniqueId
                     //   ].replace(/\./g, '')
                     // );
-                    const id = self.chart.groupObjs[cName].values[pt][
-                      self.props.violinSettings.pointUniqueId
-                    ].replace(/\./g, '');
+                    // const id = self.chart.groupObjs[cName].values[pt][
+                    //   self.props.violinSettings.pointUniqueId
+                    // ].replace(/\./g, '');
                     const idMult =
                       self.chart.groupObjs[cName].values[pt].id_mult;
-                    return `violin_${id.replace(/;/g, '_')}_${idMult}`;
+                    return `violin_${idMult}`;
                   })
                   .attr('class', `point ${self.props.violinSettings.id} vPoint`)
                   .attr('stroke', 'black')
@@ -1507,7 +1496,7 @@ class ViolinPlot extends Component {
               // var id = d.sample.replace(/\;/g, "_");
               // self.dotHover.emit({ object: d, action: 'mouseover' });
               self.isHovering = true;
-              d3.select(`#violin_${self.getCircleId(d.sample, d.id_mult)}`)
+              d3.select(`#violin_${d.id_mult}`)
                 .transition()
                 .duration(100)
                 .attr('cursor', 'pointer')
@@ -1538,7 +1527,7 @@ class ViolinPlot extends Component {
             })
             .on('mouseout', d => {
               // var id = d.sample.replace(/\;/g, "_");
-              d3.select(`#violin_${self.getCircleId(d.sample, d.id_mult)}`)
+              d3.select(`#violin_${d.id_mult}`)
                 .transition()
                 .duration(300)
                 .attr('r', x => {
@@ -1566,17 +1555,13 @@ class ViolinPlot extends Component {
             .on('click', d => {
               // var maxId = self.maxCircle.sample.replace(/\;/g, "_");
               self.isHovering = false;
-              const maxId = self.getCircleId(
-                self.maxCircle.sample,
-                self.maxCircle.id_mult,
-              );
+              const maxId = self.maxCircle.id_mult;
               // var id = d.sample.replace(/\;/g, "_");
-              const id = self.getCircleId(d.sample, d.id_mult);
+              const id = d.id_mult;
               // self.dotClick.emit(d);
-
-              const inBrush = this.brushedData.findIndex(
-                x => x.id_mult === d.id_mult,
-              );
+              const inBrush = this.brushedData.findIndex(function(x) {
+                return x.id_mult === d.id_mult;
+              });
               if (inBrush > 0) {
                 const HighlightedProteins = [...this.brushedData];
                 HighlightedProteins.splice(inBrush, 1);
@@ -1623,11 +1608,8 @@ class ViolinPlot extends Component {
     };
 
     self.chart.dataPlots.preparePlots();
-
     self.chart.dataPlots.update();
-
     // self.addToolTiptoMax(id);
-
     return self.chart;
   };
 
@@ -1647,7 +1629,6 @@ class ViolinPlot extends Component {
   setDimensions = () => {
     const self = this;
     d3.select(`#svg-${self.props.violinSettings.id}`).remove();
-
     // we'll want to calculate a reasonable container width based on parent container
     // we calculate height based on the containerRef
     const containerHeight = this.getHeight(self.props);

@@ -162,7 +162,7 @@ class BarcodePlotReact extends Component {
 
   handleLineEnter = event => {
     // if (this.state.settings.brushing === false) {
-    // const lineIdMult = event.target.attributes[6].nodeValue;
+    const lineIdMult = event.target.attributes[6].nodeValue;
     const lineName = event.target.attributes[7].nodeValue;
     const lineStatistic = event.target.attributes[9].nodeValue;
     const textAnchor =
@@ -174,7 +174,8 @@ class BarcodePlotReact extends Component {
         ? event.target.attributes[2].nodeValue - 5
         : event.target.attributes[2].nodeValue + 5;
     // const lineId = `#barcode-line-${lineName.replace(/;/g, '')}_${lineIdMult}`;
-    const lineId = `#barcode-line-${lineName}`;
+    // const lineId = `#barcode-line-${lineName}`;
+    const lineId = `#barcode-line-${lineIdMult}`;
     const hoveredLine = d3.select(lineId);
     if (hoveredLine.attr('class').endsWith('selected')) {
       hoveredLine.attr('y1', this.state.settings.margin.hovered - 10);
@@ -305,9 +306,7 @@ class BarcodePlotReact extends Component {
         });
         if (brushedDataVar.length > 0) {
           const maxLineObject = self.getMaxObject(brushedDataVar);
-          const maxLineId = `${maxLineObject.lineID.replace(/;/g, '')}_${
-            maxLineObject.id_mult
-          }`;
+          const maxLineId = `${maxLineObject.lineID}`;
           const maxLine = d3.select(`#barcode-line-${maxLineId}`);
           maxLine.classed('MaxLine', true).attr('y1', settings.margin.max);
           const statistic = maxLineObject.statistic;
@@ -345,6 +344,7 @@ class BarcodePlotReact extends Component {
               sample: m.lineID,
               id_mult: m.id_mult,
               cpm: m.statistic,
+              // logfc: m.cpm,
             };
           });
           self.props.onHandleProteinSelected(highlightedLineArray);
@@ -470,7 +470,6 @@ class BarcodePlotReact extends Component {
     } = this.state;
 
     const { horizontalSplitPaneSize, barcodeSettings } = this.props;
-
     const barcodeHeight =
       horizontalSplitPaneSize - settings.margin.top - settings.margin.bottom;
     // const yScale = d3
@@ -507,7 +506,12 @@ class BarcodePlotReact extends Component {
         </text>
       </g>
     ));
-
+    // example data:
+    // featureDisplay: "RPL24_T83"
+    // featureEnrichment: "RPL24"
+    // featureID: "17747_1"
+    // logFoldChange: 0
+    // statistic: 19.0484
     const barcodeLines = barcodeSettings.barcodeData.map(d => (
       <line
         // id={`barcode-line-${d.lineID.replace(/;/g, '')}_${d.id_mult}`}
@@ -529,7 +533,7 @@ class BarcodePlotReact extends Component {
         y1={settings.margin.top}
         y2={barcodeHeight}
         id_mult={d.featureID}
-        lineid={d.featureID}
+        lineid={d.featureDisplay}
         logfc={d.logFoldChange}
         statistic={d.statistic}
         onClick={e => this.handleSVGClick(e)}

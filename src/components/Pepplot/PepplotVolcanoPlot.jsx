@@ -5,11 +5,11 @@ import * as d3 from 'd3';
 class PepplotVolcanoPlot extends Component {
   state = {
     plotName: 'pepplotVolcanoPlot',
-    hoveredCircleData:{
+    hoveredCircleData: {
       position: [],
       id: null,
       xstat: null,
-      ystat: null
+      ystat: null,
     },
     hovering: false,
     hoveredTextScalar: 12,
@@ -32,9 +32,11 @@ class PepplotVolcanoPlot extends Component {
       const highlightedCircle = d3.select(`#volcanoDataPoint-${circleid}`);
       highlightedCircle.classed('highlighted', true);
     });
-    const maxid = `${maxObjectData.key}`;
-    const maxCircle = d3.select(`#volcanoDataPoint-${maxid}`);
-    maxCircle.classed('highlightedMax', true);
+    if(maxObjectData){
+      const maxid = `${maxObjectData.key}`;
+      const maxCircle = d3.select(`#volcanoDataPoint-${maxid}`);
+      maxCircle.classed('highlightedMax', true);
+    }
     if(volcanoWidth !== prevProps.volcanoWidth){
       this.setState({resizeScalarX: (volcanoWidth/prevProps.volcanoWidth)})
     }
@@ -103,7 +105,7 @@ class PepplotVolcanoPlot extends Component {
       yAxisLabel,
       identifier,
       doXAxisTransformation,
-      doYAxisTransformation
+      doYAxisTransformation,
     } = this.props;
 
     if (hovering) {
@@ -121,24 +123,25 @@ class PepplotVolcanoPlot extends Component {
           parseFloat(hoveredCircleData.ystat).toFixed(4)
         : yAxisLabel + ': ' + parseFloat(hoveredCircleData.ystat).toFixed(4);
       return (
-                <svg
-                    x={hoveredCircleData.position[0]*1+10}
-                    y={hoveredCircleData.position[1]*1+10}
-                    width="200"
-                    height="45"
-                >
-                    <rect
-                    width="200"
-                    height="46"
-                    fill="white"
-                    stroke="black"
-                    ></rect>
-                    <text fontSize="14px" fontWeight="bold">
-                         <tspan x={10} y={14}>{idText}</tspan>
-                         <tspan x={10} y={14+hoveredTextScalar}>{xText}</tspan>
-                         <tspan x={10} y={14+2*hoveredTextScalar}>{yText}</tspan>
-                    </text>
-                </svg>
+        <svg
+          x={hoveredCircleData.position[0] * 1 + 10}
+          y={hoveredCircleData.position[1] * 1 + 10}
+          width="200"
+          height="45"
+        >
+          <rect width="200" height="46" fill="white" stroke="black"></rect>
+          <text fontSize="14px" fontWeight="bold">
+            <tspan x={10} y={14}>
+              {idText}
+            </tspan>
+            <tspan x={10} y={14 + hoveredTextScalar}>
+              {xText}
+            </tspan>
+            <tspan x={10} y={14 + 2 * hoveredTextScalar}>
+              {yText}
+            </tspan>
+          </text>
+        </svg>
       );
     } else {
       return null;
@@ -211,7 +214,7 @@ class PepplotVolcanoPlot extends Component {
       .brush()
       .extent([
         [-100, -20],
-        [width+100, height+20],
+        [width + 100, height + 20],
       ])
       .on('start', brushingStart)
       //.on('brush', highlightBrushedCircles)
@@ -233,7 +236,7 @@ class PepplotVolcanoPlot extends Component {
       }
   }
 
-  handleSVGClick(){
+  handleSVGClick() {
     this.unhighlightBrushedCircles();
     this.props.handleVolcanoPlotSelectionChange([]);
     this.setState({
@@ -253,7 +256,7 @@ class PepplotVolcanoPlot extends Component {
       yAxisLabel,
       identifier,
       doXAxisTransformation,
-      doYAxisTransformation
+      doYAxisTransformation,
     } = this.props;
 
     if (pepplotResultsUnfiltered.length === 0) {
@@ -364,23 +367,23 @@ class PepplotVolcanoPlot extends Component {
     ));
     var filteredOutPlotCircles = null;
     if (pepplotResultsUnfiltered.length !== pepplotResults.length) {
-      filteredOutPlotCircles = pepplotResultsUnfiltered.map((val, index) =>(
+      filteredOutPlotCircles = pepplotResultsUnfiltered.map((val, index) => (
         <circle
           cx={`${xScale(this.doTransform(val[xAxisLabel], 'x'))}`}
           cy={`${yScale(this.doTransform(val[yAxisLabel], 'y'))}`}
-          key={`${val[identifier]+"_"+index}`}
+          key={`${val[identifier] + '_' + index}`}
           r={2}
           opacity={0.3}
         ></circle>
       ));
     }
-    const plotCircles = pepplotResults.map((val, index) =>(
+    const plotCircles = pepplotResults.map((val, index) => (
       <circle
         r={2}
         className="volcanoPlot-dataPoint"
         id={`volcanoDataPoint-${val[identifier]}`}
         circleid={`${val[identifier]}`}
-        key={`${val[identifier]+"_"+index}`}
+        key={`${val[identifier] + '_' + index}`}
         data={`${JSON.stringify(val)}`}
         onMouseEnter={e => this.handleCircleHover(e)}
         onMouseLeave={() => this.handleCircleLeave()}
@@ -397,7 +400,7 @@ class PepplotVolcanoPlot extends Component {
         cy={`${yScale(this.doTransform(val[yAxisLabel], 'y'))}`}
         cursor="pointer"
       ></circle>
-      ));
+    ));
 
     const hoveredCircleTooltip = this.getToolTip();
 

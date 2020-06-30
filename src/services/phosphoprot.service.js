@@ -6,10 +6,17 @@ require('opencpu.js/opencpu-0.5.js');
 class PhosphoprotService {
   constructor() {
     this.ocpuUrl = '***REMOVED***/ocpu/library/OmicAnalyzer/R';
+    //this.ocpuUrl = 'http://localhost:5656/ocpu/library/OmicAnalyzer/R';  <-- comment out before building production
   }
 
   setUrl() {
-    window.ocpu.seturl(this.ocpuUrl);
+    // console.log('the window.location.href is ', window.location.href);
+    // console.log(process.env.REACT_APP_API_URL);
+    // console.log(process.env.NODE_ENV);
+    if (process.env.NODE_ENV === 'development') {
+      console.log('we are in localhost:3000');
+      window.ocpu.seturl(this.ocpuUrl);
+    }
   }
 
   setUrlAlt() {
@@ -32,7 +39,7 @@ class PhosphoprotService {
   //   });
   // }
 
-  async ocpuRPCUnbox(method, obj, handleError, cancelToken) {
+  async ocpuRPCUnbox(method, obj, timeoutLength, handleError, cancelToken) {
     return new Promise(function(resolve, reject) {
       window.ocpu
         .call(method, obj, function(session) {
@@ -42,7 +49,7 @@ class PhosphoprotService {
               params: { digits: 10 },
               responseType: 'text',
               cancelToken,
-              timeout: 15000,
+              timeout: timeoutLength,
             })
             .then(response => resolve(response.data))
             .catch(function(thrown) {
@@ -75,7 +82,7 @@ class PhosphoprotService {
 
   async listStudies() {
     this.setUrl();
-    const promise = this.ocpuRPCUnbox('listStudies', {});
+    const promise = this.ocpuRPCUnbox('listStudies', {}, 15000);
     const studiesFromPromise = await promise;
     return studiesFromPromise;
   }
@@ -183,6 +190,7 @@ class PhosphoprotService {
     const promise = this.ocpuRPCUnbox(
       'sitedata',
       { idmult: id, study: study },
+      15000,
       errorCb,
     );
     const siteDataFromPromise = await promise;
@@ -190,7 +198,12 @@ class PhosphoprotService {
   }
 
   async getProteinData(id, study, errorCb) {
-    const promise = this.ocpuRPCUnbox('proteindata', { id: id, study: study });
+    const promise = this.ocpuRPCUnbox(
+      'proteindata',
+      { id: id, study: study },
+      15000,
+      errorCb,
+    );
     const proteinDataFromPromise = await promise;
     return proteinDataFromPromise;
   }
@@ -402,6 +415,7 @@ class PhosphoprotService {
         model: enrichmentModel,
         annotation: enrichmentAnnotation,
       },
+      25000,
       errorCb,
     );
     const nodesFromPromise = await promise;

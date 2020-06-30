@@ -139,6 +139,11 @@ class Pepplot extends Component {
     if (searchResults.pepplotResults?.length > 0) {
       columns = this.getConfigCols(searchResults);
     }
+    //   const statToSort =
+    //     'P.Value' in sortedPepplotResults[0] ? 'P.Value' : 'P_Value';
+    //   sortedPepplotResults = sortedPepplotResults.sort(
+    //     (a, b) => a[statToSort] - b[statToSort],
+    //   );
     this.setState({
       pepplotResults: searchResults.pepplotResults,
       pepplotColumns: columns,
@@ -166,7 +171,7 @@ class Pepplot extends Component {
           model => model.modelID === pepplotModel,
         );
         this.setState({
-          pepplotPlotTypes: pepplotModelData.plots,
+          pepplotPlotTypes: pepplotModelData?.plots,
         });
       }
     }
@@ -336,7 +341,9 @@ class Pepplot extends Component {
         addParams.rowHighlightOther.push(element.id);
       });
     }
-    addParams.rowHighlightMax = maxObj.id;
+    if(maxObj){
+      addParams.rowHighlightMax = maxObj.id;
+    }
     addParams.showPhosphositePlus = dataItem => {
       let protein = dataItem.symbol
         ? dataItem.symbol
@@ -489,11 +496,11 @@ class Pepplot extends Component {
     )
   }
   handleSelectedFromTable = toHighlightArr => {
-     const { maxObjectData } = this.props;
+     const { maxObjectData } = this.state;
     if(toHighlightArr.length !== 0){
     var max = toHighlightArr[0];
     toHighlightArr.forEach(function(d){
-      if(max.value > d.value){//Look for smallest value in p value
+      if(max.value > d.value){//Look for smallest p value
         max = d;
       }
     })
@@ -503,10 +510,10 @@ class Pepplot extends Component {
     this.setState({
        selectedFromTableData: toHighlightArr,
        maxObjectData: max,
-       isProteinSVGLoaded: false,
     });
     this.getTableHelpers(this.getProteinData, this.getPlot, toHighlightArr, this.props.pepplotFeatureIdKey, max);
-    if(!this.state.isItemSelected){
+    if(!this.state.isItemSelected && max && max.id !== maxObjectData.id){
+      this.setState({isProteinSVGLoaded: false})
       this.getPlot(max.id, true)
     }
   };
@@ -578,7 +585,10 @@ class Pepplot extends Component {
       }
     }
     const alphanumericTrigger = pepplotAlphanumericFields[0];
-    this.props.onHandlePepplotFeatureIdKey(alphanumericTrigger);
+    this.props.onHandlePepplotFeatureIdKey(
+      'pepplotFeatureIdKey',
+      alphanumericTrigger,
+    );
     this.getTableHelpers(
       this.getProteinData,
       this.getPlot,

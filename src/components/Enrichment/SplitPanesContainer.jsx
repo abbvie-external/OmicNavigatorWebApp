@@ -102,7 +102,7 @@ class SplitPanesContainer extends Component {
         pane: (
           <Tab.Pane
             attached
-            key="1"
+            key="0"
             id="ViolinPlotTab"
             className="ViolinPlotTab"
             // as="div"
@@ -123,7 +123,7 @@ class SplitPanesContainer extends Component {
         pane: (
           <Tab.Pane
             attached
-            key="2"
+            key="1"
             id="TableResultsTab"
             className="TableResultsTab"
             // as="div"
@@ -140,7 +140,7 @@ class SplitPanesContainer extends Component {
         pane: (
           <Tab.Pane
             attached
-            key="2"
+            key="1"
             id="TableResultsTab"
             className="TableResultsTab"
             // as="div"

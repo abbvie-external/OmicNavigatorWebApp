@@ -64,6 +64,11 @@ class Enrichment extends Component {
       links: [],
       tests: [],
     },
+    unfilteredNetworkData: {
+      nodes: [],
+      links: [],
+      tests: [],
+    },
     filterNetworkFromUpset: [],
     networkDataLoaded: false,
     networkGraphReady: false,
@@ -146,8 +151,9 @@ class Enrichment extends Component {
         show: true,
         fields: [
           { label: 'log(FC)', value: 'cpm', toFixed: true },
-          // { label: 'abs(t)', value: 'cpm', toFixed: true },
           { label: 'Protein', value: 'sample' },
+          { label: 'Feature ID', value: 'id_mult' },
+          { label: 'abs(t)', value: 'statistic', toFixed: true },
         ],
       },
       xName: 'tissue',
@@ -171,6 +177,9 @@ class Enrichment extends Component {
     networkOperator: '<',
     networkTestsMust: [],
     networkTestsNot: [],
+    previousEnrichmentStudy: '',
+    previousEnrichmentModel: '',
+    previousEnrichmentAnnotation: '',
   };
   EnrichmentViewContainerRef = React.createRef();
 
@@ -277,7 +286,22 @@ class Enrichment extends Component {
         this.handleGetBarcodeDataError,
       )
       .then(barcodeDataResponse => {
-        showBarcodePlotCb(barcodeDataResponse, dataItem);
+        if (barcodeDataResponse?.data?.length > 0) {
+          const logFoldChangeArr = barcodeDataResponse.data.map(
+            b => b.logFoldChange,
+          );
+          const isZero = logFoldChangeVal => logFoldChangeVal === 0;
+          if (logFoldChangeArr.every(isZero)) {
+            this.setState({
+              displayViolinPlot: false,
+            });
+          } else {
+            this.setState({
+              displayViolinPlot: true,
+            });
+          }
+          showBarcodePlotCb(barcodeDataResponse, dataItem);
+        }
       })
       .catch(error => {
         console.error('Error during getBarcodeData', error);
@@ -338,6 +362,7 @@ class Enrichment extends Component {
 
   handleEnrichmentSearch = searchResults => {
     this.removeNetworkSVG();
+    this.setState({ networkGraphReady: false });
 
     // PAUL - talk to justin about this - has to do with column reordering, i think
     // if (this.state.enrichmentColumns.length === 0) {
@@ -350,7 +375,6 @@ class Enrichment extends Component {
     this.getNetworkData(searchResults.enrichmentResults);
     this.setState({
       networkDataError: false,
-      networkGraphReady: false,
       enrichmentResults: searchResults.enrichmentResults,
       isSearching: false,
       isSearchingEnrichment: false,
@@ -383,16 +407,6 @@ class Enrichment extends Component {
 
   handleSearchCriteriaChange = (changes, scChange) => {
     this.props.onSearchCriteriaToTop(changes, 'enrichment');
-    // if (
-    //   changes.enrichmentModel ===
-    //     'Treatment and or Strain Differential Phosphorylation' ||
-    //   changes.enrichmentModel ===
-    //     'Ferrostatin vs Untreated Differential Phosphorylation'
-    // ) {
-    //   this.setState({
-    //     displayViolinPlot: true,
-    //   });
-    // }
     this.setState({
       plotButtonActive: false,
       visible: false,
@@ -645,61 +659,96 @@ class Enrichment extends Component {
       // pValueType,
       enrichmentStudy,
     } = this.props;
-    phosphoprotService
-      .getEnrichmentsNetwork(
-        enrichmentStudy,
-        enrichmentModel,
-        enrichmentAnnotation,
-        this.handleGetEnrichmentNetworkError,
-      )
-      .then(getEnrichmentNetworkResponseData => {
-        // const pValueTypeParam = pValueType === 'adjusted' ? 0.1 : 1;
-        const tests = getEnrichmentNetworkResponseData.tests;
-        const enrichmentResultsDescriptions = [...enrichmentResults].map(
-          r => r.description,
-        );
-        const filteredNodes = getEnrichmentNetworkResponseData.nodes.filter(n =>
-          enrichmentResultsDescriptions.includes(n.description),
-        );
-        getEnrichmentNetworkResponseData.nodes = filteredNodes;
-        this.setState({
-          // networkDataAvailable: true,
-          networkData: getEnrichmentNetworkResponseData,
-          tests: tests,
-          totalNodes: getEnrichmentNetworkResponseData.nodes.length,
-          totalLinks: getEnrichmentNetworkResponseData.links.length,
-        });
-        let facets = [];
-        let pieData = [];
-        const isArray = Array.isArray(tests);
-        const testsLength = typeof tests === 'string' ? 1 : tests.length;
-        if (isArray) {
-          for (var i = 0; i < testsLength; i++) {
-            let rplcSpaces = getEnrichmentNetworkResponseData.tests[i].replace(
-              / /g,
-              '_',
-            );
-            facets.push('EnrichmentMap_pvalue_' + rplcSpaces + '_');
-            pieData.push(100 / testsLength);
-          }
-        } else {
-          facets.push(tests);
-          pieData.push(testsLength);
-        }
-        this.setState({
-          networkSettings: {
-            ...this.state.networkSettings,
-            facets: facets,
-            propLabel: tests,
-            propData: pieData,
-          },
-          networkDataLoaded: true,
-          networkGraphReady: true,
-        });
-      })
-      .catch(error => {
-        console.error('Error during getEnrichmentNetwork', error);
+    const {
+      networkData,
+      previousEnrichmentStudy,
+      previousEnrichmentModel,
+      previousEnrichmentAnnotation,
+      unfilteredNetworkData,
+    } = this.state;
+    if (
+      enrichmentStudy !== previousEnrichmentStudy ||
+      enrichmentModel !== previousEnrichmentModel ||
+      enrichmentAnnotation !== previousEnrichmentAnnotation ||
+      networkData.nodes.length === 0
+    ) {
+      this.setState({
+        previousEnrichmentStudy: enrichmentStudy,
+        previousEnrichmentModel: enrichmentModel,
+        previousEnrichmentAnnotation: enrichmentAnnotation,
       });
+      phosphoprotService
+        .getEnrichmentsNetwork(
+          enrichmentStudy,
+          enrichmentModel,
+          enrichmentAnnotation,
+          this.handleGetEnrichmentNetworkError,
+        )
+        .then(getEnrichmentNetworkResponseData => {
+          this.setState(
+            {
+              unfilteredNetworkData: getEnrichmentNetworkResponseData,
+            },
+            this.handleEnrichmentNetworkData(
+              getEnrichmentNetworkResponseData,
+              enrichmentResults,
+            ),
+          );
+        })
+        .catch(error => {
+          console.error('Error during getEnrichmentNetwork', error);
+        });
+    } else {
+      this.handleEnrichmentNetworkData(
+        unfilteredNetworkData,
+        enrichmentResults,
+      );
+    }
+  };
+
+  handleEnrichmentNetworkData = (unfilteredNetworkData, enrichmentResults) => {
+    // const pValueTypeParam = pValueType === 'adjusted' ? 0.1 : 1;
+    let networkDataVar = { ...unfilteredNetworkData };
+    const tests = unfilteredNetworkData.tests;
+    const enrichmentResultsDescriptions = [...enrichmentResults].map(
+      r => r.description,
+    );
+    const filteredNodes = unfilteredNetworkData.nodes.filter(n =>
+      enrichmentResultsDescriptions.includes(n.description),
+    );
+    networkDataVar.nodes = filteredNodes;
+    this.setState({
+      // networkDataAvailable: true,
+      networkData: networkDataVar,
+      tests: tests,
+      // totalNodes: data.nodes.length,
+      totalNodes: unfilteredNetworkData.nodes.length,
+      totalLinks: unfilteredNetworkData.links.length,
+    });
+    let facets = [];
+    let pieData = [];
+    const isArray = Array.isArray(tests);
+    const testsLength = typeof tests === 'string' ? 1 : tests.length;
+    if (isArray) {
+      for (var i = 0; i < testsLength; i++) {
+        let rplcSpaces = unfilteredNetworkData.tests[i].replace(/ /g, '_');
+        facets.push('EnrichmentMap_pvalue_' + rplcSpaces + '_');
+        pieData.push(100 / testsLength);
+      }
+    } else {
+      facets.push(tests);
+      pieData.push(testsLength);
+    }
+    this.setState({
+      networkSettings: {
+        ...this.state.networkSettings,
+        facets: facets,
+        propLabel: tests,
+        propData: pieData,
+      },
+      networkDataLoaded: true,
+      networkGraphReady: true,
+    });
   };
 
   handleGetEnrichmentNetworkError = () => {
@@ -736,15 +785,16 @@ class Enrichment extends Component {
     return containerWidth - violinWidth - 60;
   }
 
-  showBarcodePlot = (barcodeData, term) => {
-    const barcodeDataSorted = barcodeData.data.sort(
-      (a, b) => b.statistic - a.statistic,
-    );
+  showBarcodePlot = (barcodeData, dataItem) => {
+    // sorting by statistic is being handled by backend
+    // const barcodeDataSorted = barcodeData.data.sort(
+    //   (a, b) => b.statistic - a.statistic,
+    // );
     this.setState({
       isTestDataLoaded: true,
       barcodeSettings: {
         ...this.state.barcodeSettings,
-        barcodeData: barcodeDataSorted,
+        barcodeData: barcodeData.data,
         statLabel: barcodeData.labelStat,
         highLabel: barcodeData.labelHigh,
         lowLabel: barcodeData.labelLow,
@@ -759,14 +809,13 @@ class Enrichment extends Component {
     if (changes.brushedData.length > 0) {
       const boxPlotArray = _.map(changes.brushedData, function(d) {
         d.statistic = _.find(self.state.barcodeSettings.barcodeData, {
-          featureID: d.lineID,
+          featureID: d.id_mult,
         }).statistic;
         d.logFC = _.find(self.state.barcodeSettings.barcodeData, {
-          featureID: d.lineID,
+          featureID: d.id_mult,
         }).logFoldChange;
         return d;
       });
-
       const reducedBoxPlotArray = _.reduce(
         boxPlotArray,
         function(res, datum) {
@@ -788,7 +837,6 @@ class Enrichment extends Component {
       const vData = _.mapValues(reducedBoxPlotArray, function(v) {
         return { values: v };
       });
-
       const ordered = {};
       Object.keys(vData)
         .sort()
@@ -828,8 +876,7 @@ class Enrichment extends Component {
   };
 
   handleProteinSelected = toHighlightArray => {
-    // const { enrichmentFeatureIdKey } = this.state;
-    const prevHighestValueObject = this.state.HighlightedProteins[0]?.sample;
+    const prevHighestValueObject = this.state.HighlightedProteins[0]?.id_mult;
     const highestValueObject = toHighlightArray[0];
     if (
       this.state.barcodeSettings.barcodeData?.length > 0 &&
@@ -839,7 +886,7 @@ class Enrichment extends Component {
         HighlightedProteins: toHighlightArray,
       });
       if (
-        highestValueObject?.sample !== prevHighestValueObject ||
+        highestValueObject?.id_mult !== prevHighestValueObject ||
         this.state.SVGPlotLoaded === false
       ) {
         this.setState({
@@ -847,10 +894,8 @@ class Enrichment extends Component {
           SVGPlotLoading: true,
         });
         const dataItem = this.state.barcodeSettings.barcodeData.find(
-          i => i.featureID === highestValueObject?.sample,
+          i => i.featureID === highestValueObject?.id_mult,
         );
-        // let id = dataItem[enrichmentFeatureIdKey] || '';
-        debugger;
         let id = dataItem.featureID || '';
         this.getPlot(id);
       }
@@ -1016,7 +1061,6 @@ class Enrichment extends Component {
       enrichmentDataItem: dataItem,
       enrichmentTerm: term,
     });
-
     phosphoprotService
       .getBarcodeData(
         enrichmentStudy,
@@ -1027,7 +1071,22 @@ class Enrichment extends Component {
         this.handleGetBarcodeDataError,
       )
       .then(barcodeDataResponse => {
-        this.showBarcodePlot(barcodeDataResponse, term);
+        if (barcodeDataResponse?.data?.length > 0) {
+          const logFoldChangeArr = barcodeDataResponse.data.map(
+            b => b.logFoldChange,
+          );
+          const isZero = logFoldChangeVal => logFoldChangeVal === 0;
+          if (logFoldChangeArr.every(isZero)) {
+            this.setState({
+              displayViolinPlot: false,
+            });
+          } else {
+            this.setState({
+              displayViolinPlot: true,
+            });
+          }
+          this.showBarcodePlot(barcodeDataResponse, dataItem);
+        }
       })
       .catch(error => {
         console.error('Error during getBarcodeData', error);
@@ -1538,6 +1597,7 @@ class Enrichment extends Component {
       },
       false,
     );
+    this.handleLegendClose();
   };
 
   testSelectedTransition = bool => {

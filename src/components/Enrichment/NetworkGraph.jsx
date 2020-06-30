@@ -150,7 +150,6 @@ class NetworkGraph extends Component {
             (obj, key, index) => ({ ...obj, [key]: values[index] }),
             {},
           );
-          // let picked = _.pick(o1, networkSettings.facets);
           let metaData = {};
           _.forEach(networkSettings.metaLabels, (value, i) => {
             metaData[value] = o1[networkSettings.meta[i]];
@@ -212,34 +211,45 @@ class NetworkGraph extends Component {
       const dynamicNodeCutoff = multisetFiltersVisible
         ? networkSigValue
         : nodeCutoff;
-
       let filteredNodes = [];
       let mostSignificantTestValue = 0;
-      if (
-        multisetFiltersVisible &&
-        networkTestsMust.length === 0 &&
-        networkTestsNot.length === 0
-      ) {
-        filteredNodes = formattedNodes;
+      // multiset is not on
+      if (!multisetFiltersVisible) {
+        filteredNodes = formattedNodes.filter(
+          n => n.lowestValue <= dynamicNodeCutoff,
+        );
         mostSignificantTestValue = Math.min(
           ...filteredNodes.map(f => f.lowestValue).filter(v => v != null),
         );
       } else {
-        if (networkOperator === '<') {
-          filteredNodes = formattedNodes.filter(
-            n => n.lowestValue <= dynamicNodeCutoff,
+        /// multiset is on
+        if (
+          multisetFiltersVisible &&
+          networkTestsMust.length === 0 &&
+          networkTestsNot.length === 0
+        ) {
+          // multiset on, but no tests
+          filteredNodes = formattedNodes;
+          mostSignificantTestValue = Math.min(
+            ...filteredNodes.map(f => f.lowestValue).filter(v => v != null),
+          );
+        } else {
+          // multiset on, with tests
+          if (networkOperator === '<') {
+            filteredNodes = formattedNodes.filter(
+              n => n.lowestValue <= dynamicNodeCutoff,
+            );
+          }
+          if (networkOperator === '>') {
+            filteredNodes = formattedNodes.filter(
+              n => n.highestValue >= dynamicNodeCutoff,
+            );
+          }
+          mostSignificantTestValue = Math.min(
+            ...filteredNodes.map(f => f.lowestValue).filter(v => v != null),
           );
         }
-        if (networkOperator === '>') {
-          filteredNodes = formattedNodes.filter(
-            n => n.highestValue >= dynamicNodeCutoff,
-          );
-        }
-        mostSignificantTestValue = Math.min(
-          ...filteredNodes.map(f => f.lowestValue).filter(v => v != null),
-        );
       }
-
       let filteredLinks = formattedLinks.filter(function(l) {
         let jaccardTotal = linkType * l.jaccard;
         let overlapValue = 1 - linkType;
@@ -318,8 +328,6 @@ class NetworkGraph extends Component {
               cluster.nodecount = nodecount;
             });
           });
-
-          // console.log(clusters.children.length);
           const totalClusters = clusters.children.length;
 
           // Prepare Settings
@@ -847,7 +855,7 @@ class NetworkGraph extends Component {
                       else pValueDisplay = d.data.value.toExponential(3);
                       div
                         .html(
-                          `<div className="tooltipLink"><b>Description: </b>${d.data.metaData.description}<br/><b>Test: </b>${d.data.prop}<br/><b>pValue: </b>${pValueDisplay}<br/><b>Ontology: </b>${d.data.metaData.termID}</div>`,
+                          `<div className="tooltipLink"><b>Description: </b>${d.data.metaData.description}<br/><b>Test: </b>${d.data.prop}<br/><b><span className="textTransformCapitalize">${pValueType}</span> P Value: </b>${pValueDisplay}<br/><b>Ontology: </b>${d.data.metaData.termID}</div>`,
                         )
                         .style('left', tooltipLRPosition)
                         .style('top', tooltipTBPosition);

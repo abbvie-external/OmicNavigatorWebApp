@@ -31,7 +31,7 @@ class PepplotVolcano extends Component {
     axisLables: [],
     xAxisLabel: null,
     yAxisLabel: null,
-    identifier: null
+    identifier: null,
   };
 
   componentDidMount() {
@@ -58,7 +58,6 @@ class PepplotVolcano extends Component {
         filteredTableData: this.props.pepplotResults,
         volcanoPlotRows: this.props.pepplotResults.length,
       });
-      this.props.onSelectFromTable([]);
     }
   }
   getAxisLabels = () => {
@@ -77,37 +76,37 @@ class PepplotVolcano extends Component {
       var yLabel = relevantConfigColumns[0];
       var xLabel = relevantConfigColumns[1];
       var doY = false;
-      if(relevantConfigColumns.includes("logFC")){
-        xLabel = "logFC";
+      if (relevantConfigColumns.includes('logFC')) {
+        xLabel = 'logFC';
       }
-      if(relevantConfigColumns.includes("adj_P_Val")){
-        yLabel = "adj_P_Val";
+      if (relevantConfigColumns.includes('adj_P_Val')) {
+        yLabel = 'adj_P_Val';
         doY = true;
-      } else if(relevantConfigColumns.includes("adj.P.Val")){
-        yLabel = "adj.P.Val";
+      } else if (relevantConfigColumns.includes('adj.P.Val')) {
+        yLabel = 'adj.P.Val';
         doY = true;
-      }else if(relevantConfigColumns.includes("P_Value")){
-        yLabel = "P_Value";
-        doY= true;
-      } else if(relevantConfigColumns.includes("P.Value")){
-        yLabel = "P.Value";
-        doY= true;
+      } else if (relevantConfigColumns.includes('P_Value')) {
+        yLabel = 'P_Value';
+        doY = true;
+      } else if (relevantConfigColumns.includes('P.Value')) {
+        yLabel = 'P.Value';
+        doY = true;
       } else {
-        this.handleDropdownChange({},{name:"yAxisSelector", value:yLabel})
+        this.handleDropdownChange({}, { name: 'yAxisSelector', value: yLabel });
       }
-      const axes = relevantConfigColumns.map(e =>{
-        return({
+      const axes = relevantConfigColumns.map(e => {
+        return {
           key: e,
           text: e,
           value: e,
-        })
+        };
       });
       this.setState({
         axisLables: axes,
         yAxisLabel: yLabel,
-        doYAxisTransformation: doY
+        doYAxisTransformation: doY,
       });
-      this.handleDropdownChange({},{name:"xAxisSelector", value:xLabel})
+      this.handleDropdownChange({}, { name: 'xAxisSelector', value: xLabel });
     }
   };
   handleVolcanoPlotSelectionChange = volcanoPlotSelectedDataArr => {

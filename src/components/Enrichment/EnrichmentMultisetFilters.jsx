@@ -789,7 +789,7 @@ class EnrichmentMultisetFilters extends Component {
     const indexFilters = uSettings.indexFilters;
     const defaultSigValue = uSettings.defaultSigValue;
     // const hoveredFilter = uSettings.hoveredFilter;
-    // for now, column is displayed as label, just matching the "nominal" or "Adjusted" p value type
+    // for now, column is displayed as label, just matching the "nominal" or "adjusted" p value type
     const SelColOverride =
       this.props.pValueType === 'nominal'
         ? 'Nominal P Value'

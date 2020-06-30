@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Popup } from 'semantic-ui-react';
+import { Popup, Dimmer, Loader } from 'semantic-ui-react';
 import { phosphoprotService } from '../../services/phosphoprot.service';
 import _ from 'lodash';
 import { formatNumberForDisplay, splitValue } from '../Shared/helpers';
@@ -26,6 +26,8 @@ class FilteredPepplotTable extends Component {
     filteredTableData: [],
     filteredBarcodeData: [],
     itemsPerPageFilteredPepplotTable: 15,
+    filteredTableLoading: true,
+    additionalTemplateInfo: [],
   };
   filteredPepplotGridRef = React.createRef();
 
@@ -48,10 +50,25 @@ class FilteredPepplotTable extends Component {
     if (
       this.props.barcodeSettings.brushedData !==
         prevProps.barcodeSettings.brushedData ||
-      // this.props.pepplotFeatureIdKey !== prevState.pepplotFeatureIdKey
+      // this.props.filteredPepplotFeatureIdKey !== prevState.filteredPepplotFeatureIdKey
       this.state.filteredBarcodeData !== prevState.filteredBarcodeData
     ) {
       this.getTableData();
+    }
+
+    if (
+      this.props.filteredPepplotFeatureIdKey !==
+        prevProps.filteredPepplotFeatureIdKey ||
+      this.props.HighlightedProteins !== prevProps.HighlightedProteins
+    ) {
+      const additionalParameters = this.getTableHelpers(
+        this.props.HighlightedProteins,
+        this.props.filteredPepplotFeatureIdKey,
+      );
+      this.setState({
+        additionalTemplateInfo: additionalParameters,
+        filteredTableLoading: false,
+      });
     }
     // let prevValues = prevProps?.barcodeSettings?.brushedData ?? [];
     // let currentValues = this.props.barcodeSettings?.brushedData ?? [];
@@ -108,12 +125,21 @@ class FilteredPepplotTable extends Component {
   getTableData = () => {
     if (this.props.barcodeSettings.brushedData.length > 0) {
       const brushedMultIds = this.props.barcodeSettings.brushedData.map(
-        b => b.lineID,
+        b => b.id_mult,
       );
-      debugger;
-      const filteredPepplotData = this.state.filteredBarcodeData.filter(d =>
-        brushedMultIds.includes(d[this.props.pepplotFeatureIdKey]),
+      let filteredPepplotData = this.state.filteredBarcodeData.filter(d =>
+        brushedMultIds.includes(d[this.props.filteredPepplotFeatureIdKey]),
       );
+      // for sorting, if desired
+      if (filteredPepplotData.length > 0) {
+        const statToSort =
+          'P.Value' in this.state.filteredBarcodeData[0]
+            ? 'P.Value'
+            : 'P_Value';
+        filteredPepplotData = filteredPepplotData.sort(
+          (a, b) => a[statToSort] - b[statToSort],
+        );
+      }
       this.setState({
         filteredTableData: filteredPepplotData,
       });
@@ -125,7 +151,6 @@ class FilteredPepplotTable extends Component {
   };
 
   getFilteredTableConfigCols = barcodeData => {
-    debugger;
     if (this.state.filteredBarcodeData.length > 0) {
       this.setConfigCols(this.state.filteredBarcodeData);
     } else {
@@ -186,8 +211,10 @@ class FilteredPepplotTable extends Component {
       }
     }
     const alphanumericTrigger = filteredPepplotAlphanumericFields[0];
-    debugger;
-    this.props.onHandlePepplotFeatureIdKey(alphanumericTrigger);
+    this.props.onHandlePepplotFeatureIdKey(
+      'filteredPepplotFeatureIdKey',
+      alphanumericTrigger,
+    );
     const filteredPepplotAlphanumericColumnsMapped = filteredPepplotAlphanumericFields.map(
       f => {
         return {
@@ -199,7 +226,9 @@ class FilteredPepplotTable extends Component {
               return (
                 <div className="NoSelect">
                   <Popup
-                    trigger={<span>{splitValue(value)}</span>}
+                    trigger={
+                      <span className="NoSelect">{splitValue(value)}</span>
+                    }
                     style={TableValuePopupStyle}
                     className="TablePopupValue"
                     content={value}
@@ -225,9 +254,11 @@ class FilteredPepplotTable extends Component {
               );
             } else {
               return (
-                <div>
+                <div className="NoSelect">
                   <Popup
-                    trigger={<span>{splitValue(value)}</span>}
+                    trigger={
+                      <span className="NoSelect">{splitValue(value)}</span>
+                    }
                     style={TableValuePopupStyle}
                     className="TablePopupValue"
                     content={value}
@@ -254,7 +285,7 @@ class FilteredPepplotTable extends Component {
               <p>
                 <Popup
                   trigger={
-                    <span className="TableValue  NoSelect">
+                    <span className="TableValue NoSelect">
                       {formatNumberForDisplay(value)}
                     </span>
                   }
@@ -280,26 +311,33 @@ class FilteredPepplotTable extends Component {
     this.getTableData();
   };
 
-  getTableHelpers = HighlightedProteins => {
+  getTableHelpers = (HighlightedProteins, filteredPepplotFeatureIdKeyVar) => {
     const MaxLine = HighlightedProteins[0] || null;
     let addParams = {};
     if (MaxLine !== {} && MaxLine != null) {
-      addParams.rowHighlightMax = MaxLine.sample;
+      addParams.rowHighlightMax = MaxLine.id_mult;
+      // addParams.rowHighlightMax = MaxLine[filteredPepplotFeatureIdKeyVar];
     }
     const SelectedProteins = HighlightedProteins.slice(1);
     if (SelectedProteins.length > 0 && SelectedProteins != null) {
       addParams.rowHighlightOther = [];
       SelectedProteins.forEach(element => {
-        addParams.rowHighlightOther.push(element.sample);
+        addParams.rowHighlightOther.push(
+          // element[filteredPepplotFeatureIdKeyVar],
+          element.id_mult,
+        );
       });
     }
     addParams.showPhosphositePlus = dataItem => {
+      let protein = dataItem.symbol
+        ? dataItem.symbol
+        : dataItem[filteredPepplotFeatureIdKeyVar];
       return function() {
-        var protein = (dataItem.Protein
-          ? dataItem.Protein
-          : dataItem.MajorityProteinIDsHGNC
-        ).split(';')[0];
-        let param = { proteinNames: protein, queryId: -1, from: 0 };
+        const param = {
+          proteinNames: protein,
+          queryId: -1,
+          from: 0,
+        };
         phosphoprotService.postToPhosphositePlus(
           param,
           'https://www.phosphosite.org/proteinSearchSubmitAction.action',
@@ -316,24 +354,28 @@ class FilteredPepplotTable extends Component {
   };
 
   handleRowClick = (event, item, index) => {
-    const { pepplotFeatureIdKey } = this.props;
+    const { filteredPepplotFeatureIdKey, barcodeSettings } = this.props;
     const PreviouslyHighlighted = this.props.HighlightedProteins;
+    const stat = barcodeSettings.statLabel;
     event.stopPropagation();
     if (event.shiftKey) {
-      debugger;
       const allTableData = _.cloneDeep(this.state.filteredTableData);
       const indexMaxProtein = _.findIndex(allTableData, function(d) {
-        return d[pepplotFeatureIdKey] === PreviouslyHighlighted[0]?.sample;
+        return (
+          d[filteredPepplotFeatureIdKey] === PreviouslyHighlighted[0]?.id_mult
+        );
       });
       const sliceFirst = index < indexMaxProtein ? index : indexMaxProtein;
       const sliceLast = index > indexMaxProtein ? index : indexMaxProtein;
       const shiftedTableData = allTableData.slice(sliceFirst, sliceLast + 1);
       const shiftedTableDataArray = shiftedTableData.map(function(d) {
-        debugger;
         return {
-          sample: d.symbol,
-          id_mult: d[pepplotFeatureIdKey],
-          cpm: d.F === undefined ? d.t : d.F,
+          // sample: d.symbol,
+          sample: d.phosphosite,
+          id_mult: d[filteredPepplotFeatureIdKey],
+          // PAUL - this needs adjustment, looking for d.abs(t) instead of d.T, for example
+          // cpm: d[stat],
+          cpm: d.F == null ? d.t : d.F,
         };
       });
       this.props.onHandleProteinSelected(shiftedTableDataArray);
@@ -343,27 +385,28 @@ class FilteredPepplotTable extends Component {
 
       const ctrlClickedObj = allTableData[index];
       const alreadyHighlighted = PreviouslyHighlighted.some(
-        d => d.sample === ctrlClickedObj.Protein_Site,
+        d => d.id_mult === ctrlClickedObj[filteredPepplotFeatureIdKey],
       );
       // already highlighted, remove it from array
       if (alreadyHighlighted) {
         selectedTableDataArray = PreviouslyHighlighted.filter(
-          i => i.sample !== ctrlClickedObj.Protein_Site,
+          i => i.id_mult !== ctrlClickedObj[filteredPepplotFeatureIdKey],
         );
         this.props.onHandleProteinSelected(selectedTableDataArray);
       } else {
         // not yet highlighted, add it to array
         const indexMaxProtein = _.findIndex(allTableData, function(d) {
-          return d.Protein_Site === PreviouslyHighlighted[0]?.sample;
+          return (
+            d[filteredPepplotFeatureIdKey] === PreviouslyHighlighted[0]?.id.mult
+          );
         });
         // map protein to fix obj entries
         const mappedProtein = {
-          sample: ctrlClickedObj.Protein_Site,
-          id_mult: ctrlClickedObj.id_mult,
-          cpm:
-            ctrlClickedObj.F === undefined
-              ? ctrlClickedObj.t
-              : ctrlClickedObj.F,
+          sample: ctrlClickedObj.phosphosite,
+          id_mult: ctrlClickedObj[filteredPepplotFeatureIdKey],
+          // PAUL
+          // cpm: ctrlClickedObj[stat],
+          cpm: ctrlClickedObj.F == null ? ctrlClickedObj.t : ctrlClickedObj.F,
         };
         const lowerIndexThanMax = index < indexMaxProtein ? true : false;
         if (lowerIndexThanMax) {
@@ -379,49 +422,61 @@ class FilteredPepplotTable extends Component {
     } else {
       this.props.onHandleProteinSelected([
         {
-          sample: item.Protein_Site, //lineID,
-          id_mult: item.id_mult,
-          cpm: item.logFC, //statistic,
+          // sample: item.Protein_Site, //lineID,
+          // id_mult: item.id_mult,
+          // cpm: item.logFC, //statistic,
+          sample: item.phosphosite,
+          id_mult: item[filteredPepplotFeatureIdKey],
+          cpm: item[stat],
+          // cpm: item.F === undefined ? item.t : item.F,
         },
       ]);
     }
   };
 
   render() {
-    const { HighlightedProteins } = this.props;
     const {
       filteredTableConfigCols,
       filteredTableData,
       itemsPerPageFilteredPepplotTable,
+      filteredTableLoading,
     } = this.state;
-    // const quickViews = [];
-    const additionalTemplateInfo = this.getTableHelpers(HighlightedProteins);
 
-    return (
-      <div className="FilteredPepplotTableDiv">
-        <EZGrid
-          ref={this.filteredPepplotGridRef}
-          onInformItemsPerPage={this.informItemsPerPage}
-          // uniqueCacheKey={pepplotCacheKey}
-          data={filteredTableData}
-          columnsConfig={filteredTableConfigCols}
-          totalRows={15}
-          // use "pepplotRows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
-          itemsPerPage={itemsPerPageFilteredPepplotTable}
-          exportBaseName="Differential_Phosphorylation_Analysis_Filtered"
-          // quickViews={quickViews}
-          // disableGeneralSearch
-          disableGrouping
-          // disableSort
-          disableColumnVisibilityToggle
-          // disableFilters={false}
-          min-height="5vh"
-          additionalTemplateInfo={additionalTemplateInfo}
-          // headerAttributes={<ButtonActions />}
-          onRowClick={this.handleRowClick}
-        />
-      </div>
-    );
+    if (!filteredTableLoading) {
+      return (
+        <div className="FilteredPepplotTableDiv">
+          <EZGrid
+            ref={this.filteredPepplotGridRef}
+            onInformItemsPerPage={this.informItemsPerPage}
+            // uniqueCacheKey={pepplotCacheKey}
+            data={filteredTableData}
+            columnsConfig={filteredTableConfigCols}
+            totalRows={15}
+            // use "pepplotRows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
+            itemsPerPage={itemsPerPageFilteredPepplotTable}
+            exportBaseName="Differential_Phosphorylation_Analysis_Filtered"
+            // quickViews={quickViews}
+            // disableGeneralSearch
+            disableGrouping
+            // disableSort
+            disableColumnVisibilityToggle
+            // disableFilters={false}
+            min-height="5vh"
+            additionalTemplateInfo={this.state.additionalTemplateInfo}
+            // headerAttributes={<ButtonActions />}
+            onRowClick={this.handleRowClick}
+          />
+        </div>
+      );
+    } else {
+      return (
+        <div className="TableLoadingDiv">
+          <Dimmer active inverted>
+            <Loader size="large">Table Loading</Loader>
+          </Dimmer>
+        </div>
+      );
+    }
   }
 }
 
