@@ -522,8 +522,8 @@ class Pepplot extends Component {
     //     default:
     //       plotType = ['dotplot'];
     //   }
-    //   let id = toHighlightArr[0]?.id_mult
-    //     ? toHighlightArr[0]?.id_mult
+    //   let id = toHighlightArr[0]?.featureID
+    //     ? toHighlightArr[0]?.featureID
     //     : toHighlightArr[0]?.id;
     //   let imageInfo = { key: '', title: '', svg: [] };
     //   switch (pepplotModel) {

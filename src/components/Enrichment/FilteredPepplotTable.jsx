@@ -14,6 +14,7 @@ import {
   getField,
   typeMap,
 } from '../utility/selectors/QHGridSelector';
+// import { data } from 'pdfkit/js/reference';
 export * from '../utility/FilterTypeConfig';
 export * from '../utility/selectors/quickViewSelector';
 export { QHGrid, EZGrid, QuickViewModal };
@@ -28,6 +29,7 @@ class FilteredPepplotTable extends Component {
     itemsPerPageFilteredPepplotTable: 15,
     filteredTableLoading: true,
     additionalTemplateInfo: [],
+    identifier: null,
   };
   filteredPepplotGridRef = React.createRef();
 
@@ -63,7 +65,6 @@ class FilteredPepplotTable extends Component {
     ) {
       const additionalParameters = this.getTableHelpers(
         this.props.HighlightedProteins,
-        this.props.filteredPepplotFeatureIdKey,
       );
       this.setState({
         additionalTemplateInfo: additionalParameters,
@@ -125,7 +126,7 @@ class FilteredPepplotTable extends Component {
   getTableData = () => {
     if (this.props.barcodeSettings.brushedData.length > 0) {
       const brushedMultIds = this.props.barcodeSettings.brushedData.map(
-        b => b.id_mult,
+        b => b.featureID,
       );
       let filteredPepplotData = this.state.filteredBarcodeData.filter(d =>
         brushedMultIds.includes(d[this.props.filteredPepplotFeatureIdKey]),
@@ -152,7 +153,7 @@ class FilteredPepplotTable extends Component {
 
   getFilteredTableConfigCols = barcodeData => {
     if (this.state.filteredBarcodeData.length > 0) {
-      this.setConfigCols(this.state.filteredBarcodeData);
+      this.setConfigCols(this.state.filteredBarcodeData, null, true);
     } else {
       const key = this.props.imageInfo.key.split(':');
       const name = key[0].trim() || '';
@@ -170,14 +171,10 @@ class FilteredPepplotTable extends Component {
         )
         .then(dataFromService => {
           if (dataFromService.length > 0) {
-            const barcodeMultIds = barcodeData.map(b => b.id_mult);
-            const filteredData = dataFromService.filter(d =>
-              barcodeMultIds.includes(d.id_mult),
-            );
             // const filteredData = _.intersectionWith(datafFromService, allTickIds, _.isEqual);
             // const diffProtein = this.props.HighlightedProteins.lineID;
             // this.props.onViewDiffTable(name, diffProtein);
-            this.setConfigCols(filteredData);
+            this.setConfigCols(barcodeData, dataFromService, false);
             // return cols;
           }
         })
@@ -187,7 +184,7 @@ class FilteredPepplotTable extends Component {
     }
   };
 
-  setConfigCols = filteredData => {
+  setConfigCols = (data, dataFromService, dataAlreadyFiltered) => {
     const TableValuePopupStyle = {
       backgroundColor: '2E2E2E',
       borderBottom: '2px solid var(--color-primary)',
@@ -202,7 +199,7 @@ class FilteredPepplotTable extends Component {
     let iconText = 'PhosphoSitePlus';
     let filteredPepplotAlphanumericFields = [];
     let filteredPepplotNumericFields = [];
-    const firstObject = filteredData[0];
+    const firstObject = dataFromService[0];
     for (let [key, value] of Object.entries(firstObject)) {
       if (typeof value === 'string' || value instanceof String) {
         filteredPepplotAlphanumericFields.push(key);
@@ -215,6 +212,13 @@ class FilteredPepplotTable extends Component {
       'filteredPepplotFeatureIdKey',
       alphanumericTrigger,
     );
+    this.setState({ identifier: alphanumericTrigger });
+    if (!dataAlreadyFiltered) {
+      const barcodeMultIds = data.map(b => b.featureID);
+      data = dataFromService.filter(d =>
+        barcodeMultIds.includes(d[alphanumericTrigger]),
+      );
+    }
     const filteredPepplotAlphanumericColumnsMapped = filteredPepplotAlphanumericFields.map(
       f => {
         return {
@@ -305,33 +309,32 @@ class FilteredPepplotTable extends Component {
       filteredPepplotNumericColumnsMapped,
     );
     this.setState({
-      filteredBarcodeData: filteredData,
+      filteredBarcodeData: data,
       filteredTableConfigCols: configCols,
     });
     this.getTableData();
   };
 
-  getTableHelpers = (HighlightedProteins, filteredPepplotFeatureIdKeyVar) => {
+  getTableHelpers = HighlightedProteins => {
+    const { filteredPepplotFeatureIdKey } = this.props;
     const MaxLine = HighlightedProteins[0] || null;
     let addParams = {};
+    addParams.elementId = filteredPepplotFeatureIdKey;
     if (MaxLine !== {} && MaxLine != null) {
-      addParams.rowHighlightMax = MaxLine.id_mult;
-      // addParams.rowHighlightMax = MaxLine[filteredPepplotFeatureIdKeyVar];
+      addParams.rowHighlightMax = MaxLine.featureID;
+      // addParams.rowHighlightMax = MaxLine[filteredPepplotFeatureIdKey];
     }
     const SelectedProteins = HighlightedProteins.slice(1);
     if (SelectedProteins.length > 0 && SelectedProteins != null) {
       addParams.rowHighlightOther = [];
       SelectedProteins.forEach(element => {
-        addParams.rowHighlightOther.push(
-          // element[filteredPepplotFeatureIdKeyVar],
-          element.id_mult,
-        );
+        addParams.rowHighlightOther.push(element.featureID);
       });
     }
     addParams.showPhosphositePlus = dataItem => {
       let protein = dataItem.symbol
         ? dataItem.symbol
-        : dataItem[filteredPepplotFeatureIdKeyVar];
+        : dataItem[filteredPepplotFeatureIdKey];
       return function() {
         const param = {
           proteinNames: protein,
@@ -354,15 +357,16 @@ class FilteredPepplotTable extends Component {
   };
 
   handleRowClick = (event, item, index) => {
-    const { filteredPepplotFeatureIdKey, barcodeSettings } = this.props;
+    const { identifier } = this.state;
+    const { filteredPepplotFeatureIdKey } = this.props;
     const PreviouslyHighlighted = this.props.HighlightedProteins;
-    const stat = barcodeSettings.statLabel;
+    // const stat = barcodeSettings.statLabel;
     event.stopPropagation();
     if (event.shiftKey) {
       const allTableData = _.cloneDeep(this.state.filteredTableData);
       const indexMaxProtein = _.findIndex(allTableData, function(d) {
         return (
-          d[filteredPepplotFeatureIdKey] === PreviouslyHighlighted[0]?.id_mult
+          d[filteredPepplotFeatureIdKey] === PreviouslyHighlighted[0]?.featureID
         );
       });
       const sliceFirst = index < indexMaxProtein ? index : indexMaxProtein;
@@ -371,11 +375,12 @@ class FilteredPepplotTable extends Component {
       const shiftedTableDataArray = shiftedTableData.map(function(d) {
         return {
           // sample: d.symbol,
-          sample: d.phosphosite,
-          id_mult: d[filteredPepplotFeatureIdKey],
+          // sample: d.phosphosite,
+          featureID: d[filteredPepplotFeatureIdKey],
+          key: d[identifier],
           // PAUL - this needs adjustment, looking for d.abs(t) instead of d.T, for example
           // cpm: d[stat],
-          cpm: d.F == null ? d.t : d.F,
+          // cpm: d.F == null ? d.t : d.F,
         };
       });
       this.props.onHandleProteinSelected(shiftedTableDataArray);
@@ -385,12 +390,12 @@ class FilteredPepplotTable extends Component {
 
       const ctrlClickedObj = allTableData[index];
       const alreadyHighlighted = PreviouslyHighlighted.some(
-        d => d.id_mult === ctrlClickedObj[filteredPepplotFeatureIdKey],
+        d => d.featureID === ctrlClickedObj[filteredPepplotFeatureIdKey],
       );
       // already highlighted, remove it from array
       if (alreadyHighlighted) {
         selectedTableDataArray = PreviouslyHighlighted.filter(
-          i => i.id_mult !== ctrlClickedObj[filteredPepplotFeatureIdKey],
+          i => i.featureID !== ctrlClickedObj[filteredPepplotFeatureIdKey],
         );
         this.props.onHandleProteinSelected(selectedTableDataArray);
       } else {
@@ -402,11 +407,12 @@ class FilteredPepplotTable extends Component {
         });
         // map protein to fix obj entries
         const mappedProtein = {
-          sample: ctrlClickedObj.phosphosite,
-          id_mult: ctrlClickedObj[filteredPepplotFeatureIdKey],
+          // sample: ctrlClickedObj.phosphosite,
+          featureID: ctrlClickedObj[filteredPepplotFeatureIdKey],
+          key: ctrlClickedObj[identifier],
           // PAUL
           // cpm: ctrlClickedObj[stat],
-          cpm: ctrlClickedObj.F == null ? ctrlClickedObj.t : ctrlClickedObj.F,
+          // cpm: ctrlClickedObj.F == null ? ctrlClickedObj.t : ctrlClickedObj.F,
         };
         const lowerIndexThanMax = index < indexMaxProtein ? true : false;
         if (lowerIndexThanMax) {
@@ -423,11 +429,12 @@ class FilteredPepplotTable extends Component {
       this.props.onHandleProteinSelected([
         {
           // sample: item.Protein_Site, //lineID,
-          // id_mult: item.id_mult,
+          // featureID: item.featureID,
           // cpm: item.logFC, //statistic,
-          sample: item.phosphosite,
-          id_mult: item[filteredPepplotFeatureIdKey],
-          cpm: item[stat],
+          // sample: item.phosphosite,
+          featureID: item[filteredPepplotFeatureIdKey],
+          key: item[identifier],
+          // cpm: item[stat],
           // cpm: item.F === undefined ? item.t : item.F,
         },
       ]);

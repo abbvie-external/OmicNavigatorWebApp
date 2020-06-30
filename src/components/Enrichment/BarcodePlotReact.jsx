@@ -68,23 +68,23 @@ class BarcodePlotReact extends Component {
         const HighlightedProteins = self.props.HighlightedProteins.slice(1);
         HighlightedProteins.forEach(element => {
           // const lineId = `${element.sample.replace(/;/g, '')}_${
-          //   element.id_mult
+          //   element.featureID
           // }`;
-          const lineId = `${element.id_mult}`;
+          const lineId = `${element.featureID}`;
           const highlightedLine = d3.select(`#barcode-line-${lineId}`);
           highlightedLine
             .classed('HighlightedLine', true)
             .attr('y1', self.state.settings.margin.highlighted);
         });
         if (self.props.HighlightedProteins[0]?.sample !== '') {
-          const maxLineId = `${self.props.HighlightedProteins[0]?.id_mult}`;
+          const maxLineId = `${self.props.HighlightedProteins[0]?.featureID}`;
           const maxLine = d3.select(`#barcode-line-${maxLineId}`);
           maxLine
             .classed('MaxLine', true)
             .attr('y1', self.state.settings.margin.max);
           const maxLineData = {
             x2: maxLine.attr('x2'),
-            id_mult: maxLine.attr('id_mult'),
+            featureID: maxLine.attr('featureID'),
             lineID: maxLine.attr('lineid'),
             logFC: maxLine.attr('logfc'),
             statistic: maxLine.attr('statistic'),
@@ -295,7 +295,7 @@ class BarcodePlotReact extends Component {
         const brushedDataVar = brushedArr.map(a => {
           return {
             x2: a.attributes[2].nodeValue,
-            id_mult: a.attributes[6].nodeValue,
+            featureID: a.attributes[6].nodeValue,
             lineID: a.attributes[7].nodeValue,
             logFC: a.attributes[8].nodeValue,
             statistic: a.attributes[9].nodeValue,
@@ -342,7 +342,7 @@ class BarcodePlotReact extends Component {
           const highlightedLineArray = maxLineDataArr.map(function(m) {
             return {
               sample: m.lineID,
-              id_mult: m.id_mult,
+              featureID: m.featureID,
               cpm: m.statistic,
               // logfc: m.cpm,
             };
@@ -409,7 +409,7 @@ class BarcodePlotReact extends Component {
     // const brushedDataVar = brushedArr.map(a => {
     //   return {
     //     x2: a.attributes[2].nodeValue,
-    //     id_mult: a.attributes[6].nodeValue,
+    //     featureID: a.attributes[6].nodeValue,
     //     lineID: a.attributes[7].nodeValue,
     //     logFC: a.attributes[8].nodeValue,
     //     statistic: a.attributes[9].nodeValue,
@@ -514,14 +514,14 @@ class BarcodePlotReact extends Component {
     // statistic: 19.0484
     const barcodeLines = barcodeSettings.barcodeData.map(d => (
       <line
-        // id={`barcode-line-${d.lineID.replace(/;/g, '')}_${d.id_mult}`}
+        // id={`barcode-line-${d.lineID.replace(/;/g, '')}_${d.featureID}`}
         // className="barcode-line"
-        // key={`${d.lineID}_${d.id_mult}`}
+        // key={`${d.lineID}_${d.featureID}`}
         // x1={xScale(d.statistic) + settings.margin.left}
         // x2={xScale(d.statistic) + settings.margin.left}
         // y1={settings.margin.top}
         // y2={barcodeHeight}
-        // id_mult={d.id_mult}
+        // featureID={d.featureID}
         // lineid={d.lineID}
         // logfc={d.logFC}
         // statistic={d.statistic}
@@ -532,7 +532,7 @@ class BarcodePlotReact extends Component {
         x2={xScale(d.statistic) + settings.margin.left}
         y1={settings.margin.top}
         y2={barcodeHeight}
-        id_mult={d.featureID}
+        featureID={d.featureID}
         lineid={d.featureDisplay}
         logfc={d.logFoldChange}
         statistic={d.statistic}

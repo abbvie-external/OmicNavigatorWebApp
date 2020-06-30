@@ -151,9 +151,9 @@ class Enrichment extends Component {
         show: true,
         fields: [
           { label: 'log(FC)', value: 'cpm', toFixed: true },
-          { label: 'Protein', value: 'sample' },
-          { label: 'Feature ID', value: 'id_mult' },
-          { label: 'abs(t)', value: 'statistic', toFixed: true },
+          { label: 'Feature', value: 'sample' },
+          // { label: 'featureID', value: 'featureID' },
+          // { label: 'abs(t)', value: 'statistic', toFixed: true },
         ],
       },
       xName: 'tissue',
@@ -809,10 +809,10 @@ class Enrichment extends Component {
     if (changes.brushedData.length > 0) {
       const boxPlotArray = _.map(changes.brushedData, function(d) {
         d.statistic = _.find(self.state.barcodeSettings.barcodeData, {
-          featureID: d.id_mult,
+          featureID: d.featureID,
         }).statistic;
         d.logFC = _.find(self.state.barcodeSettings.barcodeData, {
-          featureID: d.id_mult,
+          featureID: d.featureID,
         }).logFoldChange;
         return d;
       });
@@ -827,7 +827,7 @@ class Enrichment extends Component {
             cpm: datum.logFC,
             sample: datum.lineID,
             statistic: datum.statistic,
-            id_mult: datum.id_mult,
+            featureID: datum.featureID,
           });
           return res;
         },
@@ -876,7 +876,7 @@ class Enrichment extends Component {
   };
 
   handleProteinSelected = toHighlightArray => {
-    const prevHighestValueObject = this.state.HighlightedProteins[0]?.id_mult;
+    const prevHighestValueObject = this.state.HighlightedProteins[0]?.featureID;
     const highestValueObject = toHighlightArray[0];
     if (
       this.state.barcodeSettings.barcodeData?.length > 0 &&
@@ -886,7 +886,7 @@ class Enrichment extends Component {
         HighlightedProteins: toHighlightArray,
       });
       if (
-        highestValueObject?.id_mult !== prevHighestValueObject ||
+        highestValueObject?.featureID !== prevHighestValueObject ||
         this.state.SVGPlotLoaded === false
       ) {
         this.setState({
@@ -894,7 +894,7 @@ class Enrichment extends Component {
           SVGPlotLoading: true,
         });
         const dataItem = this.state.barcodeSettings.barcodeData.find(
-          i => i.featureID === highestValueObject?.id_mult,
+          i => i.featureID === highestValueObject?.featureID,
         );
         let id = dataItem.featureID || '';
         this.getPlot(id);
