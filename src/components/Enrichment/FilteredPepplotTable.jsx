@@ -402,7 +402,8 @@ class FilteredPepplotTable extends Component {
         // not yet highlighted, add it to array
         const indexMaxProtein = _.findIndex(allTableData, function(d) {
           return (
-            d[filteredPepplotFeatureIdKey] === PreviouslyHighlighted[0]?.id.mult
+            d[filteredPepplotFeatureIdKey] ===
+            PreviouslyHighlighted[0]?.featureID
           );
         });
         // map protein to fix obj entries

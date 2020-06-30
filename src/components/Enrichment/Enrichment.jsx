@@ -593,7 +593,6 @@ class Enrichment extends Component {
         filterable: { type: 'numericFilter' },
         exportTemplate: value => (value ? `${value}` : 'N/A'),
         template: (value, item, addParams) => {
-          // if (enrichmentStudy === '***REMOVED***' || '***REMOVED***') {
           return (
             <div>
               <Popup
@@ -619,23 +618,6 @@ class Enrichment extends Component {
               />
             </div>
           );
-          //   } else
-          //     return (
-          //       <div>
-          //         <Popup
-          //           trigger={
-          //             <span className="TableValue  NoSelect">
-          //               {formatNumberForDisplay(value)}
-          //             </span>
-          //           }
-          //           style={TableValuePopupStyle}
-          //           className="TablePopupValue"
-          //           content={value}
-          //           inverted
-          //           basic
-          //         />
-          //       </div>
-          //     );
         },
       };
     });

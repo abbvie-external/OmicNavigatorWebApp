@@ -619,11 +619,11 @@ class Pepplot extends Component {
           template: (value, item, addParams) => {
             if (f === alphanumericTrigger) {
               return (
-                <div>
+                <div className="NoSelect">
                   <Popup
                     trigger={
                       <span
-                        className="TableCellLink"
+                        className="TableCellLink NoSelect"
                         onClick={addParams.showPlot(item, alphanumericTrigger)}
                       >
                         {splitValue(value)}
@@ -654,9 +654,11 @@ class Pepplot extends Component {
               );
             } else {
               return (
-                <div>
+                <div className="NoSelect">
                   <Popup
-                    trigger={<span>{splitValue(value)}</span>}
+                    trigger={
+                      <span className="NoSelect">{splitValue(value)}</span>
+                    }
                     style={TableValuePopupStyle}
                     className="TablePopupValue"
                     content={value}
@@ -684,10 +686,10 @@ class Pepplot extends Component {
         exportTemplate: value => (value ? `${value}` : 'N/A'),
         template: (value, item, addParams) => {
           return (
-            <p>
+            <div className="NoSelect">
               <Popup
                 trigger={
-                  <span className="TableValue  NoSelect">
+                  <span className="TableValue NoSelect">
                     {formatNumberForDisplay(value)}
                   </span>
                 }
@@ -697,7 +699,7 @@ class Pepplot extends Component {
                 inverted
                 basic
               />
-            </p>
+            </div>
           );
         },
       };
