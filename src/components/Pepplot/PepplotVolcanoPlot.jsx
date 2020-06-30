@@ -16,25 +16,32 @@ class PepplotVolcanoPlot extends Component {
     tooltipPosition: null,
     brushedCirclesData: [],
     brushing: false,
-    resizeScalar: 1,
+    resizeScalarX: 1,
+    resizeScalarY: 1
   };
 
   volcanoSVGRef = React.createRef();
 
   componentDidUpdate(prevProps) {
-    const { selectedFromTableData, volcanoWidth } = this.props;
+    const { selectedFromTableData, volcanoWidth, volcanoHeight, maxObjectData } = this.props;
     const circles = d3.selectAll('circle.volcanoPlot-dataPoint');
-    if (prevProps.volcanoWidth !== volcanoWidth) {
-      this.setState({ resize: true });
-    }
     circles.classed('highlighted', false);
+    circles.classed('highlightedMax', false);
     selectedFromTableData.forEach(element => {
-      const circleid = `${element.id_mult}`;
-      const highlightedLine = d3.select(`#volcanoDataPoint-${circleid}`);
-      highlightedLine.classed('highlighted', true);
+      const circleid = `${element.key}`;
+      const highlightedCircle = d3.select(`#volcanoDataPoint-${circleid}`);
+      highlightedCircle.classed('highlighted', true);
     });
-    if (volcanoWidth !== prevProps.volcanoWidth) {
-      this.setState({ resizeScalar: volcanoWidth / prevProps.volcanoWidth });
+    if(maxObjectData){
+      const maxid = `${maxObjectData.key}`;
+      const maxCircle = d3.select(`#volcanoDataPoint-${maxid}`);
+      maxCircle.classed('highlightedMax', true);
+    }
+    if(volcanoWidth !== prevProps.volcanoWidth){
+      this.setState({resizeScalarX: (volcanoWidth/prevProps.volcanoWidth)})
+    }
+    if(volcanoHeight !== prevProps.volcanoHeight){
+      this.setState({resizeScalarY: (volcanoHeight/prevProps.volcanoHeight)})
     }
   }
   doTransform(value, axis) {
@@ -52,6 +59,7 @@ class PepplotVolcanoPlot extends Component {
     const circles = d3.selectAll('circle.volcanoPlot-dataPoint');
     circles.classed('selected', false);
     circles.classed('highlighted', false);
+    circles.classed('highlightedMax', false);
   };
   handleCircleHover = e => {
     const { brushing } = this.state;
@@ -212,41 +220,31 @@ class PepplotVolcanoPlot extends Component {
       //.on('brush', highlightBrushedCircles)
       .on('end', endBrush);
 
-    d3.selectAll('.volcanoPlotD3BrushSelection').call(objsBrush);
-    const brush = d3
-      .select('.volcanoPlotD3BrushSelection')
-      .selectAll('rect.selection');
-    if (
-      brush.nodes().length !== 0 &&
-      brush.nodes()[0].getAttribute('x') !== null &&
-      self.state.resizeScalar !== 1
-    ) {
-      d3.select('.volcanoPlotD3BrushSelection').call(objsBrush.move, [
-        [
-          parseFloat(brush.nodes()[0].getAttribute('x')) *
-            self.state.resizeScalar,
-          parseFloat(brush.nodes()[0].getAttribute('y')),
-        ],
-        [
-          (parseFloat(brush.nodes()[0].getAttribute('x')) +
-            parseFloat(brush.nodes()[0].getAttribute('width'))) *
-            self.state.resizeScalar,
-          parseFloat(brush.nodes()[0].getAttribute('y')) +
-            parseFloat(brush.nodes()[0].getAttribute('height')),
-        ],
-      ]);
-      self.setState({ resizeScalar: 1 });
-    }
+      d3.selectAll(".volcanoPlotD3BrushSelection").call(objsBrush);
+      const brush = d3.select(".volcanoPlotD3BrushSelection").selectAll("rect.selection");
+      if(brush.nodes().length!==0 && brush.nodes()[0].getAttribute('x') !== null && (self.state.resizeScalarX!==1||self.state.resizeScalarY!==1)){
+          d3.select(".volcanoPlotD3BrushSelection").call(objsBrush.move, [
+              [parseFloat(brush.nodes()[0].getAttribute('x'))*self.state.resizeScalarX, 
+              parseFloat(brush.nodes()[0].getAttribute('y'))*self.state.resizeScalarY],
+              [(parseFloat(brush.nodes()[0].getAttribute('x'))+parseFloat(brush.nodes()[0].getAttribute('width')))*self.state.resizeScalarX, 
+              (parseFloat(brush.nodes()[0].getAttribute('y'))+parseFloat(brush.nodes()[0].getAttribute('height')))*self.state.resizeScalarY]
+          ])
+          self.setState({
+            resizeScalarX:1,
+            resizeScalarY:1
+          })
+      }
   }
 
   handleSVGClick() {
     this.unhighlightBrushedCircles();
     this.props.handleVolcanoPlotSelectionChange([]);
     this.setState({
-      brushing: false,
-      resizeScalar: 1,
-    });
-  }
+        brushing: false,
+        resizeScalarX:1,
+        resizeScalarY:1
+    })
+}
 
   render() {
     const {
@@ -271,12 +269,12 @@ class PepplotVolcanoPlot extends Component {
 
     const xScale = d3
       .scaleLinear()
-      .domain([Math.min(...xMM), Math.max(...xMM)])
+      .domain([Math.min(...xMM), (Math.max(...xMM)*1.1)])
       .range([volcanoWidth * 0.1, volcanoWidth]);
 
     const yScale = d3
       .scaleLinear()
-      .domain([Math.min(...yMM), Math.max(...yMM)])
+      .domain([Math.min(...yMM), (Math.max(...yMM)*1.1)])
       .range([volcanoHeight * 0.9, 0]);
 
     const yAxis = (
@@ -383,7 +381,7 @@ class PepplotVolcanoPlot extends Component {
       <circle
         r={2}
         className="volcanoPlot-dataPoint"
-        id={`volcanoDataPoint-${val[identifier] + '_' + index}`}
+        id={`volcanoDataPoint-${val[identifier]}`}
         circleid={`${val[identifier]}`}
         key={`${val[identifier] + '_' + index}`}
         data={`${JSON.stringify(val)}`}
@@ -417,15 +415,7 @@ class PepplotVolcanoPlot extends Component {
 
     if (identifier !== null && xAxisLabel !== null && yAxisLabel !== null) {
       return (
-        <div
-          className="volcanoPlotContainer"
-          style={
-            this.props.selectedFromTableData.length === 1 &&
-            this.props.isProteinSVGLoaded
-              ? { float: 'left' }
-              : { float: 'none' }
-          }
-        >
+        <div className="volcanoPlotContainer">
           <svg
             id="pepplotVolcanoPlot"
             className="volcanoPlotSVG"

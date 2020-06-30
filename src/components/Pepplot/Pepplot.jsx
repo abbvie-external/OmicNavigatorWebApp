@@ -51,6 +51,8 @@ class Pepplot extends Component {
     isProteinSVGLoaded: false,
     // isProteinDataLoaded: false,
     selectedFromTableData: [],
+    maxObjectData:{},
+    maxObjectIdentifier: null,
     imageInfo: {
       key: null,
       title: '',
@@ -76,6 +78,8 @@ class Pepplot extends Component {
     pepplotStudyMetadata: [],
     pepplotModelsAndTests: [],
     pepplotTestsMetadata: [],
+    plotSVGWidth: null,
+    plotSVGHeight: null
   };
 
   componentDidMount() {
@@ -231,7 +235,7 @@ class Pepplot extends Component {
       // treeData: [],
       // treeDataColumns: [],
       currentSVGs: [],
-    });
+    },function(){
     // const ProteinSiteVar = firstValue(dataItem[pepplotFeatureIdKey], true);
     this.handleSearchCriteriaChange(
       {
@@ -246,7 +250,8 @@ class Pepplot extends Component {
     // const { pepplotModel, pepplotStudy } = this.props;
     // const { pepplotPlotTypes } = this.state;
     // const handleSVGCb = this.handleSVG;
-    getPlotCb(id);
+    getPlotCb(id, false);
+    });
     // id,
     // pepplotPlotTypes,
     // pepplotStudy,
@@ -321,6 +326,7 @@ class Pepplot extends Component {
     getPlotCb,
     proteinToHighlightInDiffTable,
     pepplotFeatureIdKeyVar,
+    maxObj
   ) => {
     let addParams = {};
     // const { pepplotFeatureIdKey } = this.state;
@@ -330,9 +336,13 @@ class Pepplot extends Component {
     ) {
       addParams.rowHighlightOther = [];
       proteinToHighlightInDiffTable.forEach(element => {
-        // addParams.rowHighlightOther.push(element.Protein_Site);
-        addParams.rowHighlightOther.push(element[pepplotFeatureIdKeyVar]);
+        //addParams.rowHighlightOther.push(element.Protein_Site);
+        //addParams.rowHighlightOther.push(element[pepplotFeatureIdKeyVar]);
+        addParams.rowHighlightOther.push(element.id);
       });
+    }
+    if(maxObj){
+      addParams.rowHighlightMax = maxObj.id;
     }
     addParams.showPhosphositePlus = dataItem => {
       let protein = dataItem.symbol
@@ -365,10 +375,11 @@ class Pepplot extends Component {
         );
       };
     };
+    addParams.elementId = pepplotFeatureIdKeyVar;
     this.setState({ additionalTemplateInfoPepplotTable: addParams });
   };
 
-  getPlot = featureId => {
+  getPlot = (featureId, useVolcanoSVGSize) => {
     const { pepplotPlotTypes } = this.state;
     const {
       pepplotStudy,
@@ -389,6 +400,10 @@ class Pepplot extends Component {
     let PepplotPlotSVGWidth = this.calculateWidth() * 0.75;
     // if (PepplotPlotSVGHeight > PepplotPlotSVGWidth) {
     let PepplotPlotSVGHeight = PepplotPlotSVGWidth * 0.70749;
+    if(useVolcanoSVGSize === true){
+      PepplotPlotSVGHeight = this.state.plotSVGHeight;
+      PepplotPlotSVGWidth = this.state.plotSVGWidth;
+    }
     // } else {
     //   PepplotPlotSVGWidth = PepplotPlotSVGHeight * 1.41344;
     // }
@@ -471,77 +486,36 @@ class Pepplot extends Component {
       );
     }
   };
+  handleVolcanoSVGSizeChange = (height, width) =>{
+    this.setState({
+      plotSVGHeight: height,
+      plotSVGWidth:width,
+      isProteinSVGLoaded: false,
+    },
+    function(){this.getPlot(this.state.maxObjectData.id, true)}
+    )
+  }
   handleSelectedFromTable = toHighlightArr => {
-    // const { pepplotStudy, pepplotModel } = this.props;
-    // this.setState({ selectedFromTableData: toHighlightArr });
-    // this.getTableHelpers(this.getProteinData, this.getPlot, toHighlightArr);
-    // if (toHighlightArr.length === 0) {
-    //   this.setState({
-    //     isProteinSVGLoaded: false,
-    //     // isProteinDataLoaded: false,
-    //     isItemSelected: false,
-    //     selectedFromTableData: [],
-    //   });
-    // } else if (toHighlightArr.length === 1) {
-    //   this.setState({ isProteinSVGLoaded: false });
-    //   //TODO: Get SVG and plot info.
-    //   let plotType = ['splineplot'];
-    //   switch (pepplotModel) {
-    //     case 'DonorDifferentialPhosphorylation':
-    //       plotType = ['dotplot'];
-    //       break;
-    //     case 'TreatmentDifferentialPhosphorylation':
-    //       plotType = ['splineplot'];
-    //       break;
-    //     case 'Treatment and or Strain Differential Phosphorylation':
-    //       plotType = ['StrainStimDotplot', 'StimStrainDotplot'];
-    //       break;
-    //     case 'Timecourse Differential Phosphorylation':
-    //       plotType = ['splineplot', 'lineplot'];
-    //       break;
-    //     case 'Differential Expression':
-    //       if (pepplotStudy === '***REMOVED***') {
-    //         plotType = ['proteinlineplot'];
-    //       } else {
-    //         plotType = ['proteindotplot'];
-    //       }
-    //       break;
-    //     case 'Differential Phosphorylation':
-    //       if (pepplotStudy === '***REMOVED***') {
-    //         plotType = ['proteinlineplot'];
-    //       } else {
-    //         plotType = ['proteindotplot'];
-    //       }
-    //       break;
-    //     case 'No Pretreatment Timecourse Differential Phosphorylation':
-    //       plotType = ['splineplot.modelII', 'lineplot.modelII'];
-    //       break;
-    //     case 'Ferrostatin Pretreatment Timecourse Differential Phosphorylation':
-    //       plotType = ['splineplot.modelIII', 'lineplot.modelIII'];
-    //       break;
-    //     default:
-    //       plotType = ['dotplot'];
-    //   }
-    //   let id = toHighlightArr[0]?.id_mult
-    //     ? toHighlightArr[0]?.id_mult
-    //     : toHighlightArr[0]?.id;
-    //   let imageInfo = { key: '', title: '', svg: [] };
-    //   switch (pepplotModel) {
-    //     case 'Differential Expression':
-    //       imageInfo.title =
-    //         'Protein Intensity - ' + toHighlightArr[0].MajorityProteinIDs;
-    //       imageInfo.key = toHighlightArr[0].MajorityProteinIDs;
-    //       break;
-    //     default:
-    //       imageInfo.title =
-    //         'Phosphosite Intensity - ' + toHighlightArr[0].Protein_Site;
-    //       imageInfo.key = toHighlightArr[0].Protein_Site;
-    //   }
-    //   const handleSVGCb = this.handleSVG;
-    //   this.getPlot(id, plotType, pepplotStudy, imageInfo, handleSVGCb);
-    // } else {
-    //   this.setState({ isProteinSVGLoaded: false });
-    // }
+     const { maxObjectData } = this.state;
+    if(toHighlightArr.length !== 0){
+    var max = toHighlightArr[0];
+    toHighlightArr.forEach(function(d){
+      if(max.value > d.value){//Look for smallest p value
+        max = d;
+      }
+    })
+    }else{
+      var max = maxObjectData
+    }
+    this.setState({
+       selectedFromTableData: toHighlightArr,
+       maxObjectData: max,
+    });
+    this.getTableHelpers(this.getProteinData, this.getPlot, toHighlightArr, this.props.pepplotFeatureIdKey, max);
+    if(!this.state.isItemSelected && max && max.id !== maxObjectData.id){
+      this.setState({isProteinSVGLoaded: false})
+      this.getPlot(max.id, true)
+    }
   };
   handleSVGTabChange = activeTabIndex => {
     this.setState({
@@ -620,6 +594,7 @@ class Pepplot extends Component {
       this.getPlot,
       this.state.selectedFromTableData,
       alphanumericTrigger,
+      this.state.maxObjectData
     );
     const pepplotAlphanumericColumnsMapped = pepplotAlphanumericFields.map(
       f => {
@@ -730,7 +705,7 @@ class Pepplot extends Component {
         // treeDataColumns: [],
         currentSVGs: [],
       });
-      this.getPlot(pepplotProteinSite);
+      this.getPlot(pepplotProteinSite, false);
     }
     return configCols;
   };
@@ -846,6 +821,7 @@ class Pepplot extends Component {
                 this.handleVolcanoPlotSelectionChange
               }
               onSelectFromTable={this.handleSelectedFromTable}
+              onVolcanoSVGSizeChange={this.handleVolcanoSVGSizeChange}
               onSVGTabChange={this.handleSVGTabChange}
             />
           </Tab.Pane>

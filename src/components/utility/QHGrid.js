@@ -216,8 +216,7 @@ class QHGridHeader extends React.PureComponent {
 
     if (
       this.props.exportBaseName === 'Enrichment_Analysis' ||
-      this.props.exportBaseName === 'Differential_Phosphorylation_Analysis' ||
-      this.props.exportBaseName === 'VolcanoPlot_Filtered_Results'
+      this.props.exportBaseName === 'Differential_Phosphorylation_Analysis'
     ) {
       return (
         <Image
@@ -226,6 +225,8 @@ class QHGridHeader extends React.PureComponent {
           style={{ float: 'right', cursor: 'pointer' }}
         />
       );
+    } else if(this.props.exportBaseName === 'VolcanoPlot_Filtered_Results'){
+      return null
     } else {
       return (
         <Popup
@@ -806,6 +807,24 @@ class QHGridBody extends React.PureComponent {
               if (
                 this.props.additionalTemplateInfo?.rowHighlightOther?.includes(
                   item[featureIDKey],
+                )
+              ) {
+                rowHighlightOther = true;
+              }
+            }else if (
+              item[this.props.additionalTemplateInfo.elementId] != null &&
+              this.props.additionalTemplateInfo !== '' &&
+              this.props.additionalTemplateInfo != null
+            ) {
+              if (
+                item[this.props.additionalTemplateInfo.elementId] ===
+                this.props.additionalTemplateInfo.rowHighlightMax
+              ) {
+                rowHighlightMax = true;
+              }
+              if (
+                this.props.additionalTemplateInfo?.rowHighlightOther?.includes(
+                  item[this.props.additionalTemplateInfo.elementId]
                 )
               ) {
                 rowHighlightOther = true;

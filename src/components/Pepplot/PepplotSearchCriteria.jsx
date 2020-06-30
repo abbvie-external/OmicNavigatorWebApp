@@ -557,9 +557,6 @@ class PepplotSearchCriteria extends Component {
       selectedColP,
       pepplotTests,
     } = this.state;
-    console.log(this.jsonToList(selectedColP))
-    console.log(sigValueP)
-    console.log(this.jsonToList(selectedOperatorP))
     const eMustP = this.state.uSettingsP.mustP;
     const eNotP = this.state.uSettingsP.notP;
     if (reloadPlotP === true && pepplotTests.length > 1) {
