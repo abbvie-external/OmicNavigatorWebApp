@@ -397,10 +397,12 @@ class BarcodePlotReact extends Component {
       });
 
       const highestTickIndex = selectedTicks.nodes().length - 1;
-      d3.select('.brush').call([objsBrush][0].move, [
-        [selectedTicks.nodes()[highestTickIndex].getAttribute('x1'), 60],
-        [selectedTicks.nodes()[0].getAttribute('x1'), barcodeHeight - 30],
-      ]);
+      if (highestTickIndex >= 0) {
+        d3.select('.brush').call([objsBrush][0].move, [
+          [selectedTicks.nodes()[highestTickIndex].getAttribute('x1'), 60],
+          [selectedTicks.nodes()[0].getAttribute('x1'), barcodeHeight - 30],
+        ]);
+      }
     }
     // d3.selectAll(this.barcodeSVGRef.current).call(objsBrush);
     // const brushed = d3.selectAll('.selected');
