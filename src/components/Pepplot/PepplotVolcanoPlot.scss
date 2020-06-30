@@ -30,6 +30,10 @@
     stroke-width: 3;
 }
 .volcanoPlot-dataPoint.highlighted {
-    stroke: orangered;
+    stroke: var(--color-primary-gradient);
+    stroke-width: 4;
+}
+.volcanoPlot-dataPoint.highlightedMax {
+    stroke: var(--color-primary);
     stroke-width: 4;
 }

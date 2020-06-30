@@ -806,6 +806,24 @@ class QHGridBody extends React.PureComponent {
               ) {
                 rowHighlightOther = true;
               }
+            } else if (
+              item[this.props.additionalTemplateInfo.elementId] != null &&
+              this.props.additionalTemplateInfo !== '' &&
+              this.props.additionalTemplateInfo != null
+            ) {
+              if (
+                item[this.props.additionalTemplateInfo.elementId] ===
+                this.props.additionalTemplateInfo.rowHighlightMax
+              ) {
+                rowHighlightMax = true;
+              }
+              if (
+                this.props.additionalTemplateInfo?.rowHighlightOther?.includes(
+                  item[this.props.additionalTemplateInfo.elementId],
+                )
+              ) {
+                rowHighlightOther = true;
+              }
             }
 
             if (rowHighlightMax) {
