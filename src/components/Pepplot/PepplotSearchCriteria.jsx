@@ -30,13 +30,7 @@ class PepplotSearchCriteria extends Component {
     pepplotModelsDisabled: true,
     pepplotTestsDisabled: true,
     uAnchorP: '',
-    selectedColP: [
-      {
-        key: 'adj_P_Val',
-        text: 'Adjusted P Value',
-        value: 'adj_P_Val',
-      },
-    ],
+    selectedColP: [],
     selectedOperatorP: [
       {
         key: '<',
@@ -47,11 +41,7 @@ class PepplotSearchCriteria extends Component {
     sigValueP: [0.05],
     reloadPlotP: true,
     uSettingsP: {
-      defaultselectedColP: {
-        key: 'adj_P_Val',
-        text: 'Adjusted P',
-        value: 'adj_P_Val',
-      },
+      defaultselectedColP: null,
       defaultselectedOperatorP: {
         key: '<',
         text: '<',
@@ -368,10 +358,16 @@ class PepplotSearchCriteria extends Component {
     return evt => {
       if (this.state.multisetFiltersVisibleP === false) {
         // on toggle open
+        const uSetVP = { ...this.state.uSettingsP };
+        const defaultCol = this.props.thresholdColsP[0]
+        uSetVP.defaultselectedColP = defaultCol
+        console.log(defaultCol)
         this.setState(
           {
             reloadPlotP: true,
             multisetFiltersVisibleP: true,
+            selectedColP: [defaultCol],
+            uSettingsP: uSetVP
           },
           function() {
             this.updateQueryDataP();
@@ -561,6 +557,9 @@ class PepplotSearchCriteria extends Component {
       selectedColP,
       pepplotTests,
     } = this.state;
+    console.log(this.jsonToList(selectedColP))
+    console.log(sigValueP)
+    console.log(this.jsonToList(selectedOperatorP))
     const eMustP = this.state.uSettingsP.mustP;
     const eNotP = this.state.uSettingsP.notP;
     if (reloadPlotP === true && pepplotTests.length > 1) {
