@@ -11,12 +11,9 @@ import {
   Checkbox,
   Dimmer,
   Loader,
-  GridColumn,
-  Image,
 } from 'semantic-ui-react';
 import './PepplotVolcano.scss';
-import SplitPane, {Pane} from 'react-split-pane';
-import excel_logo_custom from '../../resources/excel3.png';
+import SplitPane from 'react-split-pane';
 
 class PepplotVolcano extends Component {
   state = {
@@ -38,6 +35,8 @@ class PepplotVolcano extends Component {
   };
 
   componentDidMount() {
+    const{identifier} = this.state;
+    const{maxObjectIdentifier, pepplotFeatureIdKey} = this.props;
     this.getAxisLabels();
     this.setState({
       filteredTableData: this.props.pepplotResults,
@@ -45,6 +44,13 @@ class PepplotVolcano extends Component {
       volcanoWidth: this.state.defaultVolcanoWidth*.95,
       volcanoHeight: this.state.defaultVolcanoHeight*.95,
     });
+    const defaultMaxObject = this.props.pepplotResults[0]
+      this.props.onSelectFromTable([{
+        id: defaultMaxObject[pepplotFeatureIdKey],
+        value: defaultMaxObject[maxObjectIdentifier],
+        key: defaultMaxObject[identifier]
+      }]);
+      this.props.onVolcanoSVGSizeChange(this.state.volcanoHeight*.9,1000-this.state.defaultVolcanoWidth*.95)
   }
   componentDidUpdate(prevProps, prevState) {
     if (prevProps.pepplotResults !== this.props.pepplotResults) {
@@ -54,17 +60,6 @@ class PepplotVolcano extends Component {
       });
       this.props.onSelectFromTable([]);
     }
-    // if (
-    //   this.props.selectedFromTableData.length === 1 &&
-    //   this.state.volcanoWidth !== 400
-    // ) {
-    //   this.setState({ volcanoWidth: 400 });
-    // } else if (
-    //   this.props.selectedFromTableData.length !== 1 &&
-    //   this.state.volcanoWidth !== 600
-    // ) {
-    //   this.setState({ volcanoWidth: 600 });
-    // }
   }
   getAxisLabels = () => {
     if(this.props.pepplotResults.length !== 0){
@@ -116,18 +111,31 @@ class PepplotVolcano extends Component {
     }
   };
   handleVolcanoPlotSelectionChange = volcanoPlotSelectedDataArr => {
+    const{identifier} = this.state;
+    const{maxObjectIdentifier, pepplotFeatureIdKey} = this.props;
     if (volcanoPlotSelectedDataArr.length !== 0) {
       this.setState({
         filteredTableData: volcanoPlotSelectedDataArr,
         volcanoPlotRows: volcanoPlotSelectedDataArr.length,
       });
+      const defaultMaxObject = volcanoPlotSelectedDataArr[0]
+      this.props.onSelectFromTable([{
+        id: defaultMaxObject[pepplotFeatureIdKey],
+        value: defaultMaxObject[maxObjectIdentifier],
+        key: defaultMaxObject[identifier]
+      }]);
     } else {
       this.setState({
         filteredTableData: this.props.pepplotResults,
         volcanoPlotRows: this.props.pepplotResults.length,
       });
+      const defaultMaxObject = this.props.pepplotResults[0]
+      this.props.onSelectFromTable([{
+        id: defaultMaxObject[pepplotFeatureIdKey],
+        value: defaultMaxObject[maxObjectIdentifier],
+        key: defaultMaxObject[identifier]
+      }]);
     }
-    this.props.onSelectFromTable([]);
   };
 
   informItemsPerPage = items => {
@@ -138,7 +146,7 @@ class PepplotVolcano extends Component {
 
   handleRowClick = (event, item, index) => {
     const {identifier} = this.state;
-    const {pepplotFeatureIdKey}=this.props;
+    const {pepplotFeatureIdKey, maxObjectIdentifier}=this.props;
     const PreviouslyHighlighted = this.props.selectedFromTableData;
     event.stopPropagation();
     if (event.shiftKey) {
@@ -151,30 +159,30 @@ class PepplotVolcano extends Component {
       const shiftedTableData = allTableData.slice(sliceFirst, sliceLast + 1);
       const shiftedTableDataArray = shiftedTableData.map(function(d) {
         return {
-          id: d[pepplotFeatureIdKey],
-          key: d[identifier]
+          id: item[pepplotFeatureIdKey],
+          value: item[maxObjectIdentifier],
+          key: item[identifier]
         };
       });
       this.props.onSelectFromTable(shiftedTableDataArray);
     } else if (event.ctrlKey) {
-      const allTableData = _.cloneDeep(this.state.filteredTableData);
+      //const allTableData = _.cloneDeep(this.state.filteredTableData);
       let selectedTableDataArray = [];
-
-      const ctrlClickedObj = allTableData[index];
       const alreadyHighlighted = PreviouslyHighlighted.some(
-        d => d.id === ctrlClickedObj[pepplotFeatureIdKey],
+        d => d.id === item[pepplotFeatureIdKey],
       );
       // already highlighted, remove it from array
       if (alreadyHighlighted) {
         selectedTableDataArray = PreviouslyHighlighted.filter(
-          i => i.id !== ctrlClickedObj[pepplotFeatureIdKey],
+          i => i.id !== item[pepplotFeatureIdKey],
         );
         this.props.onSelectFromTable(selectedTableDataArray);
       } else {
         // map protein to fix obj entries
         const mappedProtein = {
-          id: ctrlClickedObj[pepplotFeatureIdKey],
-          key:ctrlClickedObj[identifier]
+          id: item[pepplotFeatureIdKey],
+          value: item[maxObjectIdentifier],
+          key: item[identifier]
         };
         PreviouslyHighlighted.push(mappedProtein);
         this.props.onSelectFromTable(PreviouslyHighlighted);
@@ -183,6 +191,7 @@ class PepplotVolcano extends Component {
       this.props.onSelectFromTable([
         {
           id: item[pepplotFeatureIdKey],
+          value: item[maxObjectIdentifier],
           key: item[identifier]
         },
       ]);
@@ -230,11 +239,10 @@ class PepplotVolcano extends Component {
     }
   };
   getSVGPlot = () => {
-    return null
-    if (this.props.selectedFromTableData.length !== 1) {
+    if (this.props.imageInfo.key === null) {
       return null;
     } else if (
-      this.props.selectedFromTableData.length === 1 &&
+      this.props.imageInfo.key !== null &&
       !this.props.isProteinSVGLoaded
     ) {
       return (
@@ -258,11 +266,11 @@ class PepplotVolcano extends Component {
 
   onSizeChange=(size, direction)=>{
     if(direction==="horizontal"){
-      console.log("Horizontal: "+ size)
       this.setState({volcanoHeight: size*.95})
+      this.props.onVolcanoSVGSizeChange(size*.9, 1000-this.state.volcanoWidth)
     }else{
-      console.log("Vertical: "+ size)
       this.setState({volcanoWidth: size*.95})
+      this.props.onVolcanoSVGSizeChange(this.state.volcanoHeight*.9,1000-size*.95)
     }
   }
 
@@ -362,14 +370,7 @@ class PepplotVolcano extends Component {
           </Grid.Row>
           <Grid.Row>
             <Grid.Column>
-              <SplitPane
-                className="ThreePlotsDiv SplitPanesWrapper"
-                split="horizontal"
-                defaultSize={this.state.defaultVolcanoHeight}
-                minSize={200}
-                maxSize={800}
-                onDragFinished={size=>this.onSizeChange(size, "horizontal")}
-              >
+              <div id="volcanoDiv1">
               <SplitPane
                 split="vertical"
                 defaultSize={this.state.defaultVolcanoWidth}
@@ -386,20 +387,10 @@ class PepplotVolcano extends Component {
                 getMaxAndMin={this.getMaxAndMin}
                 handleRowClick={this.handleRowClick}
               ></PepplotVolcanoPlot>
-              <svg
-                width={400}
-                height={400}
-              >
-                <rect
-                  x={0}
-                  y={0}
-                  width={100}
-                  height={100}
-                  fill="red"
-                ></rect>
-              </svg>
-              {/* {svgPlot} */}
+              {svgPlot}
               </SplitPane>
+              </div>
+              <div id="volcanoDiv2">
               <EZGrid
                 className="volcanoPlotTable"
                 data={filteredTableData}
@@ -415,26 +406,8 @@ class PepplotVolcano extends Component {
                 headerAttributes={<ButtonActions />}
                 onRowClick={this.handleRowClick}
               />
-              </SplitPane>
+              </div>
             </Grid.Column>
-          {/* </Grid.Row>
-          <Grid.Row>
-            <Grid.Column>
-              <EZGrid
-                data={filteredTableData}
-                totalRows={volcanoPlotRows}
-                columnsConfig={pepplotColumns}
-                itemsPerPage={itemsPerPageInformedPepplot}
-                onInformItemsPerPage={this.informItemsPerPage}
-                disableGeneralSearch
-                disableGrouping
-                disableColumnVisibilityToggle
-                exportBaseName="VolcanoPlot_Filtered_Results"
-                additionalTemplateInfo={additionalTemplateInfoPepplotTable}
-                headerAttributes={<ButtonActions />}
-                onRowClick={this.handleRowClick}
-              />
-            </Grid.Column> */}
           </Grid.Row>
         </Grid>
       );

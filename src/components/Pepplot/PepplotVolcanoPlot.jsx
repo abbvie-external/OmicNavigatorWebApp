@@ -23,17 +23,18 @@ class PepplotVolcanoPlot extends Component {
   volcanoSVGRef = React.createRef();
 
   componentDidUpdate(prevProps) {
-    const { selectedFromTableData, volcanoWidth, volcanoHeight } = this.props;
+    const { selectedFromTableData, volcanoWidth, volcanoHeight, maxObjectData } = this.props;
     const circles = d3.selectAll('circle.volcanoPlot-dataPoint');
-    if (prevProps.volcanoWidth !== volcanoWidth) {
-      this.setState({ resize: true });
-    }
     circles.classed('highlighted', false);
+    circles.classed('highlightedMax', false);
     selectedFromTableData.forEach(element => {
       const circleid = `${element.key}`;
-      const highlightedLine = d3.select(`#volcanoDataPoint-${circleid}`);
-      highlightedLine.classed('highlighted', true);
+      const highlightedCircle = d3.select(`#volcanoDataPoint-${circleid}`);
+      highlightedCircle.classed('highlighted', true);
     });
+    const maxid = `${maxObjectData.key}`;
+    const maxCircle = d3.select(`#volcanoDataPoint-${maxid}`);
+    maxCircle.classed('highlightedMax', true);
     if(volcanoWidth !== prevProps.volcanoWidth){
       this.setState({resizeScalarX: (volcanoWidth/prevProps.volcanoWidth)})
     }
@@ -56,6 +57,7 @@ class PepplotVolcanoPlot extends Component {
     const circles = d3.selectAll('circle.volcanoPlot-dataPoint');
     circles.classed('selected', false);
     circles.classed('highlighted', false);
+    circles.classed('highlightedMax', false);
   };
   handleCircleHover = e => {
     const { brushing } = this.state;

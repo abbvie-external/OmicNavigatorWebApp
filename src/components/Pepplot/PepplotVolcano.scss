@@ -22,17 +22,19 @@
     padding-bottom: 0px !important;
   }
 
-  .VolcanoPlotSVGPlot{
-    max-height: 10px;
-    float:right;
-  }
-
   .VolcanoPlotSplitter {
     width: 100% !important;
     min-height: 90vh !important;
     padding-left: 20px !important;
   }
 
-  .volcanoPlotTable{
-    height: 100%;
+  #volcanoDiv1{
+    position: relative;
+    width: 100%;
+    height: auto !important;
+    overflow: auto;
+    min-height: 400px;
+  }
+  #volcanoDiv2{
+    position: relative;
   }
