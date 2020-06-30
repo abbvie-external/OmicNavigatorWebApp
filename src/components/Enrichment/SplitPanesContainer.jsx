@@ -26,6 +26,10 @@ class SplitPanesContainer extends Component {
     };
   }
 
+  // shouldComponentUpdate(nextProps, nextState) {
+  //   return this.props.isTestSelected;
+  // }
+
   handleSVGTabChange = activeTabIndex => {
     this.setState({
       activeSVGTabIndex: activeTabIndex,

@@ -35,22 +35,27 @@ class PepplotVolcano extends Component {
   };
 
   componentDidMount() {
-    const{identifier} = this.state;
-    const{maxObjectIdentifier, pepplotFeatureIdKey} = this.props;
+    const { identifier } = this.state;
+    const { maxObjectIdentifier, pepplotFeatureIdKey } = this.props;
     this.getAxisLabels();
     this.setState({
       filteredTableData: this.props.pepplotResults,
       volcanoPlotRows: this.props.pepplotResults.length,
-      volcanoWidth: this.state.defaultVolcanoWidth*.95,
-      volcanoHeight: this.state.defaultVolcanoHeight*.95,
+      volcanoWidth: this.state.defaultVolcanoWidth * 0.95,
+      volcanoHeight: this.state.defaultVolcanoHeight * 0.95,
     });
-    const defaultMaxObject = this.props.pepplotResults[0]
-      this.props.onSelectFromTable([{
+    const defaultMaxObject = this.props.pepplotResults[0];
+    this.props.onSelectFromTable([
+      {
         id: defaultMaxObject[pepplotFeatureIdKey],
         value: defaultMaxObject[maxObjectIdentifier],
-        key: defaultMaxObject[identifier]
-      }]);
-      this.props.onVolcanoSVGSizeChange(this.state.volcanoHeight*.9,1000-this.state.defaultVolcanoWidth*.95)
+        key: defaultMaxObject[identifier],
+      },
+    ]);
+    this.props.onVolcanoSVGSizeChange(
+      this.state.volcanoHeight * 0.9,
+      1000 - this.state.defaultVolcanoWidth * 0.95,
+    );
   }
   componentDidUpdate(prevProps, prevState) {
     if (prevProps.pepplotResults !== this.props.pepplotResults) {
@@ -61,7 +66,7 @@ class PepplotVolcano extends Component {
     }
   }
   getAxisLabels = () => {
-    if(this.props.pepplotResults.length !== 0){
+    if (this.props.pepplotResults.length !== 0) {
       let pepplotAlphanumericFields = [];
       let relevantConfigColumns = [];
       const firstObject = this.props.pepplotResults[0];
@@ -72,7 +77,7 @@ class PepplotVolcano extends Component {
           relevantConfigColumns.push(key);
         }
       }
-      this.setState({identifier:pepplotAlphanumericFields[0]})
+      this.setState({ identifier: pepplotAlphanumericFields[0] });
       var yLabel = relevantConfigColumns[0];
       var xLabel = relevantConfigColumns[1];
       var doY = false;
@@ -110,30 +115,34 @@ class PepplotVolcano extends Component {
     }
   };
   handleVolcanoPlotSelectionChange = volcanoPlotSelectedDataArr => {
-    const{identifier} = this.state;
-    const{maxObjectIdentifier, pepplotFeatureIdKey} = this.props;
+    const { identifier } = this.state;
+    const { maxObjectIdentifier, pepplotFeatureIdKey } = this.props;
     if (volcanoPlotSelectedDataArr.length !== 0) {
       this.setState({
         filteredTableData: volcanoPlotSelectedDataArr,
         volcanoPlotRows: volcanoPlotSelectedDataArr.length,
       });
-      const defaultMaxObject = volcanoPlotSelectedDataArr[0]
-      this.props.onSelectFromTable([{
-        id: defaultMaxObject[pepplotFeatureIdKey],
-        value: defaultMaxObject[maxObjectIdentifier],
-        key: defaultMaxObject[identifier]
-      }]);
+      const defaultMaxObject = volcanoPlotSelectedDataArr[0];
+      this.props.onSelectFromTable([
+        {
+          id: defaultMaxObject[pepplotFeatureIdKey],
+          value: defaultMaxObject[maxObjectIdentifier],
+          key: defaultMaxObject[identifier],
+        },
+      ]);
     } else {
       this.setState({
         filteredTableData: this.props.pepplotResults,
         volcanoPlotRows: this.props.pepplotResults.length,
       });
-      const defaultMaxObject = this.props.pepplotResults[0]
-      this.props.onSelectFromTable([{
-        id: defaultMaxObject[pepplotFeatureIdKey],
-        value: defaultMaxObject[maxObjectIdentifier],
-        key: defaultMaxObject[identifier]
-      }]);
+      const defaultMaxObject = this.props.pepplotResults[0];
+      this.props.onSelectFromTable([
+        {
+          id: defaultMaxObject[pepplotFeatureIdKey],
+          value: defaultMaxObject[maxObjectIdentifier],
+          key: defaultMaxObject[identifier],
+        },
+      ]);
     }
   };
 
@@ -144,8 +153,8 @@ class PepplotVolcano extends Component {
   };
 
   handleRowClick = (event, item, index) => {
-    const {identifier} = this.state;
-    const {pepplotFeatureIdKey, maxObjectIdentifier}=this.props;
+    const { identifier } = this.state;
+    const { pepplotFeatureIdKey, maxObjectIdentifier } = this.props;
     const PreviouslyHighlighted = this.props.selectedFromTableData;
     event.stopPropagation();
     if (event.shiftKey) {
@@ -160,7 +169,7 @@ class PepplotVolcano extends Component {
         return {
           id: item[pepplotFeatureIdKey],
           value: item[maxObjectIdentifier],
-          key: item[identifier]
+          key: item[identifier],
         };
       });
       this.props.onSelectFromTable(shiftedTableDataArray);
@@ -181,7 +190,7 @@ class PepplotVolcano extends Component {
         const mappedProtein = {
           id: item[pepplotFeatureIdKey],
           value: item[maxObjectIdentifier],
-          key: item[identifier]
+          key: item[identifier],
         };
         PreviouslyHighlighted.push(mappedProtein);
         this.props.onSelectFromTable(PreviouslyHighlighted);
@@ -191,7 +200,7 @@ class PepplotVolcano extends Component {
         {
           id: item[pepplotFeatureIdKey],
           value: item[maxObjectIdentifier],
-          key: item[identifier]
+          key: item[identifier],
         },
       ]);
     }
@@ -263,15 +272,21 @@ class PepplotVolcano extends Component {
     }
   };
 
-  onSizeChange=(size, direction)=>{
-    if(direction==="horizontal"){
-      this.setState({volcanoHeight: size*.95})
-      this.props.onVolcanoSVGSizeChange(size*.9, 1000-this.state.volcanoWidth)
-    }else{
-      this.setState({volcanoWidth: size*.95})
-      this.props.onVolcanoSVGSizeChange(this.state.volcanoHeight*.9,1000-size*.95)
+  onSizeChange = (size, direction) => {
+    if (direction === 'horizontal') {
+      this.setState({ volcanoHeight: size * 0.95 });
+      this.props.onVolcanoSVGSizeChange(
+        size * 0.9,
+        1000 - this.state.volcanoWidth,
+      );
+    } else {
+      this.setState({ volcanoWidth: size * 0.95 });
+      this.props.onVolcanoSVGSizeChange(
+        this.state.volcanoHeight * 0.9,
+        1000 - size * 0.95,
+      );
     }
-  }
+  };
 
   render() {
     const {
@@ -370,41 +385,41 @@ class PepplotVolcano extends Component {
           <Grid.Row>
             <Grid.Column>
               <div id="volcanoDiv1">
-              <SplitPane
-                split="vertical"
-                defaultSize={this.state.defaultVolcanoWidth}
-                minSize={300}
-                maxSize={800}
-                onDragFinished={size=>this.onSizeChange(size, "vertical")}
-              >
-              <PepplotVolcanoPlot
-                {...this.state}
-                {...this.props}
-                handleVolcanoPlotSelectionChange={
-                  this.handleVolcanoPlotSelectionChange
-                }
-                getMaxAndMin={this.getMaxAndMin}
-                handleRowClick={this.handleRowClick}
-              ></PepplotVolcanoPlot>
-              {svgPlot}
-              </SplitPane>
+                <SplitPane
+                  split="vertical"
+                  defaultSize={this.state.defaultVolcanoWidth}
+                  minSize={300}
+                  maxSize={800}
+                  onDragFinished={size => this.onSizeChange(size, 'vertical')}
+                >
+                  <PepplotVolcanoPlot
+                    {...this.state}
+                    {...this.props}
+                    handleVolcanoPlotSelectionChange={
+                      this.handleVolcanoPlotSelectionChange
+                    }
+                    getMaxAndMin={this.getMaxAndMin}
+                    handleRowClick={this.handleRowClick}
+                  ></PepplotVolcanoPlot>
+                  {svgPlot}
+                </SplitPane>
               </div>
               <div id="volcanoDiv2">
-              <EZGrid
-                className="volcanoPlotTable"
-                data={filteredTableData}
-                totalRows={volcanoPlotRows}
-                columnsConfig={pepplotColumns}
-                itemsPerPage={itemsPerPageInformedPepplot}
-                onInformItemsPerPage={this.informItemsPerPage}
-                disableGeneralSearch
-                disableGrouping
-                disableColumnVisibilityToggle
-                exportBaseName="VolcanoPlot_Filtered_Results"
-                additionalTemplateInfo={additionalTemplateInfoPepplotTable}
-                headerAttributes={<ButtonActions />}
-                onRowClick={this.handleRowClick}
-              />
+                <EZGrid
+                  className="volcanoPlotTable"
+                  data={filteredTableData}
+                  totalRows={volcanoPlotRows}
+                  columnsConfig={pepplotColumns}
+                  itemsPerPage={itemsPerPageInformedPepplot}
+                  onInformItemsPerPage={this.informItemsPerPage}
+                  disableGeneralSearch
+                  disableGrouping
+                  disableColumnVisibilityToggle
+                  exportBaseName="VolcanoPlot_Filtered_Results"
+                  additionalTemplateInfo={additionalTemplateInfoPepplotTable}
+                  headerAttributes={<ButtonActions />}
+                  onRowClick={this.handleRowClick}
+                />
               </div>
             </Grid.Column>
           </Grid.Row>

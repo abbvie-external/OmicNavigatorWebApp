@@ -225,8 +225,8 @@ class QHGridHeader extends React.PureComponent {
           style={{ float: 'right', cursor: 'pointer' }}
         />
       );
-    } else if(this.props.exportBaseName === 'VolcanoPlot_Filtered_Results'){
-      return null
+    } else if (this.props.exportBaseName === 'VolcanoPlot_Filtered_Results') {
+      return null;
     } else {
       return (
         <Popup
@@ -781,11 +781,6 @@ class QHGridBody extends React.PureComponent {
           return null;
         }
         if (!hidden) {
-          // PAUL start
-          const firstObj = data[0];
-          const featureIDKey = 'idmult' in firstObj ? 'idmult' : 'entrez';
-          // let featureIDKey = this.props.filteredPepplotFeatureIdKey;
-          // PAUL end
           data_rows = _.map(data, (item, idx) => {
             const rowLevelStyle = this.props.rowLevelStyleCalc(item, ++curRow);
             // Paul start
@@ -794,24 +789,6 @@ class QHGridBody extends React.PureComponent {
             let rowHighlightMax = false;
             let rowHighlightOther = false;
             if (
-              item[featureIDKey] != null &&
-              this.props.additionalTemplateInfo !== '' &&
-              this.props.additionalTemplateInfo != null
-            ) {
-              if (
-                item[featureIDKey] ===
-                this.props.additionalTemplateInfo.rowHighlightMax
-              ) {
-                rowHighlightMax = true;
-              }
-              if (
-                this.props.additionalTemplateInfo?.rowHighlightOther?.includes(
-                  item[featureIDKey],
-                )
-              ) {
-                rowHighlightOther = true;
-              }
-            }else if (
               item[this.props.additionalTemplateInfo.elementId] != null &&
               this.props.additionalTemplateInfo !== '' &&
               this.props.additionalTemplateInfo != null
@@ -824,7 +801,25 @@ class QHGridBody extends React.PureComponent {
               }
               if (
                 this.props.additionalTemplateInfo?.rowHighlightOther?.includes(
-                  item[this.props.additionalTemplateInfo.elementId]
+                  item[this.props.additionalTemplateInfo.elementId],
+                )
+              ) {
+                rowHighlightOther = true;
+              }
+            } else if (
+              item[this.props.additionalTemplateInfo.elementId] != null &&
+              this.props.additionalTemplateInfo !== '' &&
+              this.props.additionalTemplateInfo != null
+            ) {
+              if (
+                item[this.props.additionalTemplateInfo.elementId] ===
+                this.props.additionalTemplateInfo.rowHighlightMax
+              ) {
+                rowHighlightMax = true;
+              }
+              if (
+                this.props.additionalTemplateInfo?.rowHighlightOther?.includes(
+                  item[this.props.additionalTemplateInfo.elementId],
                 )
               ) {
                 rowHighlightOther = true;
@@ -1003,7 +998,7 @@ export class QHGrid extends React.PureComponent {
   // Paul end
 
   componentDidMount = () => {
-    this.scrollElement();
+    // this.scrollElement();
   };
   componentDidUpdate = (prevProps, prevState) => {
     if (
@@ -1012,7 +1007,7 @@ export class QHGrid extends React.PureComponent {
     ) {
       this.setState({ activePage: 1 });
     }
-    this.scrollElement();
+    // this.scrollElement();
   };
 
   //For Grouping

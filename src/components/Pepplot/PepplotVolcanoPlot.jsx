@@ -17,13 +17,18 @@ class PepplotVolcanoPlot extends Component {
     brushedCirclesData: [],
     brushing: false,
     resizeScalarX: 1,
-    resizeScalarY: 1
+    resizeScalarY: 1,
   };
 
   volcanoSVGRef = React.createRef();
 
   componentDidUpdate(prevProps) {
-    const { selectedFromTableData, volcanoWidth, volcanoHeight, maxObjectData } = this.props;
+    const {
+      selectedFromTableData,
+      volcanoWidth,
+      volcanoHeight,
+      maxObjectData,
+    } = this.props;
     const circles = d3.selectAll('circle.volcanoPlot-dataPoint');
     circles.classed('highlighted', false);
     circles.classed('highlightedMax', false);
@@ -32,16 +37,16 @@ class PepplotVolcanoPlot extends Component {
       const highlightedCircle = d3.select(`#volcanoDataPoint-${circleid}`);
       highlightedCircle.classed('highlighted', true);
     });
-    if(maxObjectData){
+    if (maxObjectData) {
       const maxid = `${maxObjectData.key}`;
       const maxCircle = d3.select(`#volcanoDataPoint-${maxid}`);
       maxCircle.classed('highlightedMax', true);
     }
-    if(volcanoWidth !== prevProps.volcanoWidth){
-      this.setState({resizeScalarX: (volcanoWidth/prevProps.volcanoWidth)})
+    if (volcanoWidth !== prevProps.volcanoWidth) {
+      this.setState({ resizeScalarX: volcanoWidth / prevProps.volcanoWidth });
     }
-    if(volcanoHeight !== prevProps.volcanoHeight){
-      this.setState({resizeScalarY: (volcanoHeight/prevProps.volcanoHeight)})
+    if (volcanoHeight !== prevProps.volcanoHeight) {
+      this.setState({ resizeScalarY: volcanoHeight / prevProps.volcanoHeight });
     }
   }
   doTransform(value, axis) {
@@ -220,31 +225,47 @@ class PepplotVolcanoPlot extends Component {
       //.on('brush', highlightBrushedCircles)
       .on('end', endBrush);
 
-      d3.selectAll(".volcanoPlotD3BrushSelection").call(objsBrush);
-      const brush = d3.select(".volcanoPlotD3BrushSelection").selectAll("rect.selection");
-      if(brush.nodes().length!==0 && brush.nodes()[0].getAttribute('x') !== null && (self.state.resizeScalarX!==1||self.state.resizeScalarY!==1)){
-          d3.select(".volcanoPlotD3BrushSelection").call(objsBrush.move, [
-              [parseFloat(brush.nodes()[0].getAttribute('x'))*self.state.resizeScalarX, 
-              parseFloat(brush.nodes()[0].getAttribute('y'))*self.state.resizeScalarY],
-              [(parseFloat(brush.nodes()[0].getAttribute('x'))+parseFloat(brush.nodes()[0].getAttribute('width')))*self.state.resizeScalarX, 
-              (parseFloat(brush.nodes()[0].getAttribute('y'))+parseFloat(brush.nodes()[0].getAttribute('height')))*self.state.resizeScalarY]
-          ])
-          self.setState({
-            resizeScalarX:1,
-            resizeScalarY:1
-          })
-      }
+    d3.selectAll('.volcanoPlotD3BrushSelection').call(objsBrush);
+    const brush = d3
+      .select('.volcanoPlotD3BrushSelection')
+      .selectAll('rect.selection');
+    if (
+      brush.nodes().length !== 0 &&
+      brush.nodes()[0].getAttribute('x') !== null &&
+      (self.state.resizeScalarX !== 1 || self.state.resizeScalarY !== 1)
+    ) {
+      d3.select('.volcanoPlotD3BrushSelection').call(objsBrush.move, [
+        [
+          parseFloat(brush.nodes()[0].getAttribute('x')) *
+            self.state.resizeScalarX,
+          parseFloat(brush.nodes()[0].getAttribute('y')) *
+            self.state.resizeScalarY,
+        ],
+        [
+          (parseFloat(brush.nodes()[0].getAttribute('x')) +
+            parseFloat(brush.nodes()[0].getAttribute('width'))) *
+            self.state.resizeScalarX,
+          (parseFloat(brush.nodes()[0].getAttribute('y')) +
+            parseFloat(brush.nodes()[0].getAttribute('height'))) *
+            self.state.resizeScalarY,
+        ],
+      ]);
+      self.setState({
+        resizeScalarX: 1,
+        resizeScalarY: 1,
+      });
+    }
   }
 
   handleSVGClick() {
     this.unhighlightBrushedCircles();
     this.props.handleVolcanoPlotSelectionChange([]);
     this.setState({
-        brushing: false,
-        resizeScalarX:1,
-        resizeScalarY:1
-    })
-}
+      brushing: false,
+      resizeScalarX: 1,
+      resizeScalarY: 1,
+    });
+  }
 
   render() {
     const {
@@ -269,12 +290,12 @@ class PepplotVolcanoPlot extends Component {
 
     const xScale = d3
       .scaleLinear()
-      .domain([Math.min(...xMM), (Math.max(...xMM)*1.1)])
+      .domain([Math.min(...xMM), Math.max(...xMM) * 1.1])
       .range([volcanoWidth * 0.1, volcanoWidth]);
 
     const yScale = d3
       .scaleLinear()
-      .domain([Math.min(...yMM), (Math.max(...yMM)*1.1)])
+      .domain([Math.min(...yMM), Math.max(...yMM) * 1.1])
       .range([volcanoHeight * 0.9, 0]);
 
     const yAxis = (

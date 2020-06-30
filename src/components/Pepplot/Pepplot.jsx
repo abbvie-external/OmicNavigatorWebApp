@@ -51,7 +51,7 @@ class Pepplot extends Component {
     isProteinSVGLoaded: false,
     // isProteinDataLoaded: false,
     selectedFromTableData: [],
-    maxObjectData:{},
+    maxObjectData: {},
     maxObjectIdentifier: null,
     imageInfo: {
       key: null,
@@ -79,7 +79,7 @@ class Pepplot extends Component {
     pepplotModelsAndTests: [],
     pepplotTestsMetadata: [],
     plotSVGWidth: null,
-    plotSVGHeight: null
+    plotSVGHeight: null,
   };
 
   componentDidMount() {
@@ -226,32 +226,35 @@ class Pepplot extends Component {
   };
   getProteinData = (id, dataItem, getPlotCb, imageInfo) => {
     const { pepplotFeatureIdKey } = this.props;
-    this.setState({
-      imageInfo: imageInfo,
-      isItemSelected: true,
-      isProteinSVGLoaded: false,
-      // isProteinDataLoaded: false,
-      // treeDataRaw: [],
-      // treeData: [],
-      // treeDataColumns: [],
-      currentSVGs: [],
-    },function(){
-    // const ProteinSiteVar = firstValue(dataItem[pepplotFeatureIdKey], true);
-    this.handleSearchCriteriaChange(
+    this.setState(
       {
-        pepplotStudy: this.props.pepplotStudy || '',
-        pepplotModel: this.props.pepplotModel || '',
-        pepplotTest: this.props.pepplotTest || '',
-        pepplotProteinSite: dataItem[pepplotFeatureIdKey] || '',
-        // pepplotProteinSite: ProteinSiteVar || '',
+        imageInfo: imageInfo,
+        isItemSelected: true,
+        isProteinSVGLoaded: false,
+        // isProteinDataLoaded: false,
+        // treeDataRaw: [],
+        // treeData: [],
+        // treeDataColumns: [],
+        currentSVGs: [],
       },
-      false,
+      function() {
+        // const ProteinSiteVar = firstValue(dataItem[pepplotFeatureIdKey], true);
+        this.handleSearchCriteriaChange(
+          {
+            pepplotStudy: this.props.pepplotStudy || '',
+            pepplotModel: this.props.pepplotModel || '',
+            pepplotTest: this.props.pepplotTest || '',
+            pepplotProteinSite: dataItem[pepplotFeatureIdKey] || '',
+            // pepplotProteinSite: ProteinSiteVar || '',
+          },
+          false,
+        );
+        // const { pepplotModel, pepplotStudy } = this.props;
+        // const { pepplotPlotTypes } = this.state;
+        // const handleSVGCb = this.handleSVG;
+        getPlotCb(id, false);
+      },
     );
-    // const { pepplotModel, pepplotStudy } = this.props;
-    // const { pepplotPlotTypes } = this.state;
-    // const handleSVGCb = this.handleSVG;
-    getPlotCb(id, false);
-    });
     // id,
     // pepplotPlotTypes,
     // pepplotStudy,
@@ -326,7 +329,7 @@ class Pepplot extends Component {
     getPlotCb,
     proteinToHighlightInDiffTable,
     pepplotFeatureIdKeyVar,
-    maxObj
+    maxObj,
   ) => {
     let addParams = {};
     // const { pepplotFeatureIdKey } = this.state;
@@ -341,7 +344,7 @@ class Pepplot extends Component {
         addParams.rowHighlightOther.push(element.id);
       });
     }
-    if(maxObj){
+    if (maxObj) {
       addParams.rowHighlightMax = maxObj.id;
     }
     addParams.showPhosphositePlus = dataItem => {
@@ -400,7 +403,7 @@ class Pepplot extends Component {
     let PepplotPlotSVGWidth = this.calculateWidth() * 0.75;
     // if (PepplotPlotSVGHeight > PepplotPlotSVGWidth) {
     let PepplotPlotSVGHeight = PepplotPlotSVGWidth * 0.70749;
-    if(useVolcanoSVGSize === true){
+    if (useVolcanoSVGSize === true) {
       PepplotPlotSVGHeight = this.state.plotSVGHeight;
       PepplotPlotSVGWidth = this.state.plotSVGWidth;
     }
@@ -486,35 +489,46 @@ class Pepplot extends Component {
       );
     }
   };
-  handleVolcanoSVGSizeChange = (height, width) =>{
-    this.setState({
-      plotSVGHeight: height,
-      plotSVGWidth:width,
-      isProteinSVGLoaded: false,
-    },
-    function(){this.getPlot(this.state.maxObjectData.id, true)}
-    )
-  }
+  handleVolcanoSVGSizeChange = (height, width) => {
+    this.setState(
+      {
+        plotSVGHeight: height,
+        plotSVGWidth: width,
+        isProteinSVGLoaded: false,
+      },
+      function() {
+        this.getPlot(this.state.maxObjectData.id, true);
+      },
+    );
+  };
   handleSelectedFromTable = toHighlightArr => {
-     const { maxObjectData } = this.state;
-    if(toHighlightArr.length !== 0){
-    var max = toHighlightArr[0];
-    toHighlightArr.forEach(function(d){
-      if(max.value > d.value){//Look for smallest p value
-        max = d;
-      }
-    })
-    }else{
-      var max = maxObjectData
+    const { maxObjectData } = this.state;
+    let max = [];
+    if (toHighlightArr.length !== 0) {
+      max = toHighlightArr[0];
+      toHighlightArr.forEach(function(d) {
+        if (max.value > d.value) {
+          //Look for smallest p value
+          max = d;
+        }
+      });
+    } else {
+      max = maxObjectData;
     }
     this.setState({
-       selectedFromTableData: toHighlightArr,
-       maxObjectData: max,
+      selectedFromTableData: toHighlightArr,
+      maxObjectData: max,
     });
-    this.getTableHelpers(this.getProteinData, this.getPlot, toHighlightArr, this.props.pepplotFeatureIdKey, max);
-    if(!this.state.isItemSelected && max && max.id !== maxObjectData.id){
-      this.setState({isProteinSVGLoaded: false})
-      this.getPlot(max.id, true)
+    this.getTableHelpers(
+      this.getProteinData,
+      this.getPlot,
+      toHighlightArr,
+      this.props.pepplotFeatureIdKey,
+      max,
+    );
+    if (!this.state.isItemSelected && max && max.id !== maxObjectData.id) {
+      this.setState({ isProteinSVGLoaded: false });
+      this.getPlot(max.id, true);
     }
   };
   handleSVGTabChange = activeTabIndex => {
@@ -594,7 +608,7 @@ class Pepplot extends Component {
       this.getPlot,
       this.state.selectedFromTableData,
       alphanumericTrigger,
-      this.state.maxObjectData
+      this.state.maxObjectData,
     );
     const pepplotAlphanumericColumnsMapped = pepplotAlphanumericFields.map(
       f => {
@@ -605,11 +619,11 @@ class Pepplot extends Component {
           template: (value, item, addParams) => {
             if (f === alphanumericTrigger) {
               return (
-                <div>
+                <div className="NoSelect">
                   <Popup
                     trigger={
                       <span
-                        className="TableCellLink"
+                        className="TableCellLink NoSelect"
                         onClick={addParams.showPlot(item, alphanumericTrigger)}
                       >
                         {splitValue(value)}
@@ -640,9 +654,11 @@ class Pepplot extends Component {
               );
             } else {
               return (
-                <div>
+                <div className="NoSelect">
                   <Popup
-                    trigger={<span>{splitValue(value)}</span>}
+                    trigger={
+                      <span className="NoSelect">{splitValue(value)}</span>
+                    }
                     style={TableValuePopupStyle}
                     className="TablePopupValue"
                     content={value}
@@ -670,10 +686,10 @@ class Pepplot extends Component {
         exportTemplate: value => (value ? `${value}` : 'N/A'),
         template: (value, item, addParams) => {
           return (
-            <p>
+            <div className="NoSelect">
               <Popup
                 trigger={
-                  <span className="TableValue  NoSelect">
+                  <span className="TableValue NoSelect">
                     {formatNumberForDisplay(value)}
                   </span>
                 }
@@ -683,7 +699,7 @@ class Pepplot extends Component {
                 inverted
                 basic
               />
-            </p>
+            </div>
           );
         },
       };
