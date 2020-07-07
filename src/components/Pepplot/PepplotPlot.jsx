@@ -4,6 +4,7 @@ import { Grid, Dimmer, Loader } from 'semantic-ui-react';
 import PepplotBreadcrumbs from './PepplotBreadcrumbs';
 import ButtonActions from '../Shared/ButtonActions';
 // import PepplotAccordion from './PepplotAccordion';
+import MetafeaturesTable from './MetafeaturesTable';
 import SVGPlot from '../Shared/SVGPlot';
 import './PepplotPlot.scss';
 
@@ -52,24 +53,25 @@ class PepplotPlot extends Component {
 
           <Grid columns={2} className="PlotContainer">
             <Grid.Row className="PlotContainerRow">
-              {/* <Grid.Column
+              <Grid.Column
                 className="PepplotAccordionContainer"
                 mobile={16}
-                tablet={4}
-                largeScreen={4}
-                widescreen={3}
+                tablet={8}
+                largeScreen={8}
+                widescreen={8}
               >
-                <PepplotAccordion {...this.props} />
-              </Grid.Column> */}
+                <MetafeaturesTable {...this.props} />
+                {/* <PepplotAccordion {...this.props} /> */}
+              </Grid.Column>
               <Grid.Column
-                // mobile={16}
-                // tablet={11}
-                // largeScreen={12}
-                // widescreen={13}
                 mobile={16}
-                tablet={16}
-                largeScreen={16}
-                widescreen={16}
+                tablet={8}
+                largeScreen={8}
+                widescreen={8}
+                // mobile={16}
+                // tablet={16}
+                // largeScreen={16}
+                // widescreen={16}
               >
                 <SVGPlot
                   {...this.props}

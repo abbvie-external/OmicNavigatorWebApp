@@ -789,7 +789,7 @@ class QHGridBody extends React.PureComponent {
             let rowHighlightMax = false;
             let rowHighlightOther = false;
             if (
-              item[this.props.additionalTemplateInfo.elementId] != null &&
+              item[this.props.additionalTemplateInfo?.elementId] != null &&
               this.props.additionalTemplateInfo !== '' &&
               this.props.additionalTemplateInfo != null
             ) {
@@ -807,7 +807,7 @@ class QHGridBody extends React.PureComponent {
                 rowHighlightOther = true;
               }
             } else if (
-              item[this.props.additionalTemplateInfo.elementId] != null &&
+              item[this.props.additionalTemplateInfo?.elementId] != null &&
               this.props.additionalTemplateInfo !== '' &&
               this.props.additionalTemplateInfo != null
             ) {

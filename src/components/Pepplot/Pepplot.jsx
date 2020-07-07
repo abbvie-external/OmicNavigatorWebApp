@@ -415,6 +415,8 @@ class Pepplot extends Component {
     let cancelToken = new CancelToken(e => {
       cancelRequestPepplotResultsGetPlot = e;
     });
+    let self = this;
+    debugger;
     if (pepplotPlotTypes.length > 0) {
       _.forEach(pepplotPlotTypes, function(plot, i) {
         phosphoprotService
@@ -469,7 +471,7 @@ class Pepplot extends Component {
             handleSVGCb(imageInfo);
           })
           .catch(error => {
-            this.handleItemSelected(false);
+            self.handleItemSelected(false);
           });
       });
     }
