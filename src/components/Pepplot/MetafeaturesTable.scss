@@ -1,4 +1,6 @@
-.FilteredPepplotTableDiv {
+.MetafeaturesTableDiv {
+  margin-top: -10px !important;
+  height: 100% !important;
   direction: ltr !important;
   // .ui.selectable.table tbody tr:first-child, .ui.selectable.table tbody tr:first-child:hover {
   //     background: #f14000 !important;
@@ -12,6 +14,11 @@
   .QHGrid table th:first-child {
     padding-top: 7px !important;
     padding-bottom: 15px !important;
+  }
+
+  .QHGridHeaderDiv {
+    min-height: 275px !important;
+    height: 100% !important;
   }
 
   .TableValue {

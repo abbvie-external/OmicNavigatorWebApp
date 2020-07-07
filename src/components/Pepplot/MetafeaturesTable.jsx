@@ -28,7 +28,7 @@ class MetafeaturesTable extends Component {
     metafeaturesTableConfigCols: [],
     metafeaturesTableData: [],
     filteredBarcodeData: [],
-    itemsPerPageMetafeaturesTable: 15,
+    itemsPerPageMetafeaturesTable: 5,
     filteredTableLoading: true,
     additionalTemplateInfo: [],
   };
@@ -5002,7 +5002,7 @@ class MetafeaturesTable extends Component {
     const {
       metafeaturesTableConfigCols,
       metafeaturesTableData,
-      // itemsPerPageMetafeaturesTable,
+      itemsPerPageMetafeaturesTable,
       // filteredTableLoading,
     } = this.state;
 
@@ -5016,8 +5016,9 @@ class MetafeaturesTable extends Component {
           columnsConfig={metafeaturesTableConfigCols}
           totalRows={15}
           // use "pepplotRows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
-          // itemsPerPage={itemsPerPageMetafeaturesTable}
-          exportBaseName="Differential_Phosphorylation_Analysis_Filtered"
+          itemsPerPage={itemsPerPageMetafeaturesTable}
+          // onInformItemsPerPage={this.informItemsPerPage}
+          exportBaseName="metaFeatures"
           // quickViews={quickViews}
           disableGeneralSearch
           disableGrouping
