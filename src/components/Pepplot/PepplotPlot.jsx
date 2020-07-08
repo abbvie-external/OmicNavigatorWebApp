@@ -4,10 +4,11 @@ import { Grid, Dimmer, Loader } from 'semantic-ui-react';
 import PepplotBreadcrumbs from './PepplotBreadcrumbs';
 import ButtonActions from '../Shared/ButtonActions';
 // import PepplotAccordion from './PepplotAccordion';
-import MetafeaturesTable from './MetafeaturesTable';
-import SplitPane from 'react-split-pane';
+// import MetafeaturesTable from './MetafeaturesTable';
+// import SplitPane from 'react-split-pane';
+import PepplotPlotTabs from './PepplotPlotTabs';
 import '../Enrichment/SplitPanesContainer.scss';
-import SVGPlot from '../Shared/SVGPlot';
+// import SVGPlot from '../Shared/SVGPlot';
 import './PepplotPlot.scss';
 
 class PepplotPlot extends Component {
@@ -62,9 +63,9 @@ class PepplotPlot extends Component {
               <Grid.Column mobile={8} tablet={8} largeScreen={8} widescreen={8}>
                 <PepplotBreadcrumbs {...this.props} />
               </Grid.Column>
-              {/* <Grid.Column mobile={8} tablet={8} largeScreen={8} widescreen={8}>
+              <Grid.Column mobile={8} tablet={8} largeScreen={8} widescreen={8}>
                 <ButtonActions {...this.props} {...this.state} />
-              </Grid.Column> */}
+              </Grid.Column>
             </Grid.Row>
           </Grid>
 
@@ -77,7 +78,7 @@ class PepplotPlot extends Component {
                 largeScreen={16}
                 widescreen={16}
               >
-                <SplitPane
+                {/* <SplitPane
                   className="BottomSplitPaneContainer"
                   split="vertical"
                   defaultSize={this.state.metafeaturesSplitPaneSize}
@@ -89,15 +90,20 @@ class PepplotPlot extends Component {
                     <MetafeaturesTable {...this.props} />
                   </div>
                   <div id="metafeaturesSVGSplitContainer">
-                    <div class="main">
-                      <SVGPlot
+                    <div class="main"> */}
+                {/* <SVGPlot
                         {...this.props}
                         {...this.state}
                         onSVGTabChange={this.handleSVGTabChange}
-                      />
-                    </div>
+                      /> */}
+                <PepplotPlotTabs
+                  {...this.props}
+                  {...this.state}
+                  onSVGTabChange={this.handleSVGTabChange}
+                />
+                {/* </div>
                   </div>
-                </SplitPane>
+                </SplitPane> */}
               </Grid.Column>
             </Grid.Row>
           </Grid>

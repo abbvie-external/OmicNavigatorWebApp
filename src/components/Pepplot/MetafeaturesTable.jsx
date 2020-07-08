@@ -28,7 +28,7 @@ class MetafeaturesTable extends Component {
     metafeaturesTableConfigCols: [],
     metafeaturesTableData: [],
     filteredBarcodeData: [],
-    itemsPerPageMetafeaturesTable: 5,
+    itemsPerPageMetafeaturesTable: 20,
     filteredTableLoading: true,
     additionalTemplateInfo: [],
   };

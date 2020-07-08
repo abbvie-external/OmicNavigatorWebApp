@@ -225,7 +225,10 @@ class QHGridHeader extends React.PureComponent {
           style={{ float: 'right', cursor: 'pointer' }}
         />
       );
-    } else if (this.props.exportBaseName === 'VolcanoPlot_Filtered_Results') {
+    } else if (
+      this.props.exportBaseName === 'VolcanoPlot_Filtered_Results' ||
+      this.props.exportBaseName === 'metaFeatures'
+    ) {
       return null;
     } else {
       return (
