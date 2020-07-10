@@ -79,8 +79,10 @@ div.tooltip-pieSlice {
   background-color: #2e2e2e !important;
   border-bottom: 2px solid var(--color-primary) !important;
   padding: 1em !important;
-  max-width: 250px !important;
+  max-width: 300px !important;
   word-break: 'break-all' !important;
+  overflow-wrap: break-word !important;
+  word-wrap: break-word !important;
 }
 
 // .overlay {

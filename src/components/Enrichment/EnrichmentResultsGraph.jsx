@@ -28,6 +28,8 @@ import { limitValues } from '../Shared/helpers';
 import { phosphoprotService } from '../../services/phosphoprot.service';
 import { ResizableBox } from 'react-resizable';
 import '../Shared/ReactResizable.css';
+import { CancelToken } from 'axios';
+let cancelRequestGetNodeFeaturesSearch = () => {};
 
 const StyledSlider = styled(ReactSlider)`
   width: 100%;
@@ -365,18 +367,20 @@ class EnrichmentResultsGraph extends Component {
     sessionStorage.setItem(`legendHeight`, size.height);
   };
 
-  getNames(enrichmentStudy, enrichmentAnnotation, termid) {
-    debugger;
-    // const { enrichmentStudy, enrichmentAnnotation } = this.props;
+  getNodeFeatures(enrichmentStudy, enrichmentAnnotation, termid) {
+    cancelRequestGetNodeFeaturesSearch();
+    let cancelToken = new CancelToken(e => {
+      cancelRequestGetNodeFeaturesSearch = e;
+    });
     phosphoprotService
       .getNodeFeatures(
         enrichmentStudy,
         enrichmentAnnotation,
         termid,
-        // this.handleGetEnrichmentNetworkError,
+        null,
+        cancelToken,
       )
       .then(getNodeFeaturesResponseData => {
-        debugger;
         this.setState({
           hoveredFeatures: getNodeFeaturesResponseData,
         });
@@ -414,7 +418,7 @@ class EnrichmentResultsGraph extends Component {
             color="blue"
             key={description}
             onHover={e =>
-              this.getNames(e, {
+              this.getNodeFeatures(e, {
                 enrichmentStudy,
                 enrichmentAnnotation,
                 description,
@@ -426,30 +430,25 @@ class EnrichmentResultsGraph extends Component {
           <Popup
             on="hover"
             onOpen={e =>
-              this.getNames(enrichmentStudy, enrichmentAnnotation, termid)
+              this.getNodeFeatures(
+                enrichmentStudy,
+                enrichmentAnnotation,
+                termid,
+              )
             }
             flowing
             basic
-            // onUnmount={e => this.setState({ hoveredFeatures: '' })}
+            onClose={e => this.setState({ hoveredFeatures: '' })}
             trigger={
-              <Label
-                circular
-                color="blue"
-                key={description}
-                // onHover={this.getNames(
-                //   enrichmentStudy,
-                //   enrichmentAnnotation,
-                //   description,
-                // )}
-              >
+              <Label circular color="blue" key={description}>
                 {size}
               </Label>
             }
             style={SearchValuePopupStyle}
             inverted
-            // position="bottom left"
+            position="bottom left"
           >
-            {limitValues(hoveredFeatures, 15)}
+            {limitValues(hoveredFeatures, 100)}
           </Popup>
         </Grid.Column>
       </Grid>
@@ -1010,6 +1009,7 @@ class EnrichmentResultsGraph extends Component {
               <NetworkGraph
                 {...this.props}
                 {...this.state}
+                onGetNodeFeatures={this.getNodeFeatures}
                 onInformFilteredNetworkData={this.setupNetworkSearch}
               ></NetworkGraph>
             </Grid.Column>

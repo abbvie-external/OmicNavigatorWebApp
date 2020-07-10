@@ -402,7 +402,13 @@ class PhosphoprotService {
     return nodesFromPromise;
   }
 
-  async getNodeFeatures(enrichmentStudy, enrichmentAnnotation, term) {
+  async getNodeFeatures(
+    enrichmentStudy,
+    enrichmentAnnotation,
+    term,
+    errorCb,
+    cancelToken,
+  ) {
     this.setUrl();
     const promise = this.ocpuDataCall(
       'getNodeFeatures',
@@ -411,13 +417,22 @@ class PhosphoprotService {
         annotationID: enrichmentAnnotation,
         termID: term,
       },
-      5000,
+      errorCb,
+      cancelToken,
+      false,
     );
     const featuresFromPromise = await promise;
     return featuresFromPromise;
   }
 
-  async getLinkFeatures(enrichmentStudy, enrichmentAnnotation, term1, term2) {
+  async getLinkFeatures(
+    enrichmentStudy,
+    enrichmentAnnotation,
+    term1,
+    term2,
+    errorCb,
+    cancelToken,
+  ) {
     this.setUrl();
     const promise = this.ocpuDataCall(
       'getNodeFeatures',
@@ -427,7 +442,9 @@ class PhosphoprotService {
         termID1: term1,
         termID2: term2,
       },
-      5000,
+      errorCb,
+      cancelToken,
+      false,
     );
     const featuresFromPromise = await promise;
     return featuresFromPromise;
