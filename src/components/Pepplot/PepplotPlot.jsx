@@ -4,7 +4,11 @@ import { Grid, Dimmer, Loader } from 'semantic-ui-react';
 import PepplotBreadcrumbs from './PepplotBreadcrumbs';
 import ButtonActions from '../Shared/ButtonActions';
 // import PepplotAccordion from './PepplotAccordion';
-import SVGPlot from '../Shared/SVGPlot';
+// import MetafeaturesTable from './MetafeaturesTable';
+// import SplitPane from 'react-split-pane';
+import PepplotPlotTabs from './PepplotPlotTabs';
+import '../Enrichment/SplitPanesContainer.scss';
+// import SVGPlot from '../Shared/SVGPlot';
 import './PepplotPlot.scss';
 
 class PepplotPlot extends Component {
@@ -14,18 +18,33 @@ class PepplotPlot extends Component {
   };
 
   state = {
-    activeSVGTabIndex: 0,
+    activePepplotPlotTabsIndex: 0,
     excelVisible: true,
     pngVisible: true,
     pdfVisible: false,
     svgVisible: true,
+    metafeaturesSplitPaneSize:
+      parseInt(sessionStorage.getItem('metafeaturesSplitPaneSize'), 10) || 525,
   };
 
-  handleSVGTabChange = activeTabIndex => {
+  handlePepplotPlotTabChange = activeTabIndex => {
     this.setState({
-      activeSVGTabIndex: activeTabIndex,
+      activePepplotPlotTabsIndex: activeTabIndex,
     });
   };
+
+  splitPaneResized(size, paneType) {
+    if (paneType === 'horizontal') {
+      this.setState({
+        horizontalSplitPaneSize: size,
+      });
+    } else {
+      this.setState({
+        verticalSplitPaneSize: size,
+      });
+    }
+    sessionStorage.setItem(`${paneType}SplitPaneSize`, size);
+  }
 
   render() {
     if (!this.props.isProteinSVGLoaded) {
@@ -52,29 +71,17 @@ class PepplotPlot extends Component {
 
           <Grid columns={2} className="PlotContainer">
             <Grid.Row className="PlotContainerRow">
-              {/* <Grid.Column
-                className="PepplotAccordionContainer"
-                mobile={16}
-                tablet={4}
-                largeScreen={4}
-                widescreen={3}
-              >
-                <PepplotAccordion {...this.props} />
-              </Grid.Column> */}
               <Grid.Column
-                // mobile={16}
-                // tablet={11}
-                // largeScreen={12}
-                // widescreen={13}
+                // className="PepplotAccordionContainer"
                 mobile={16}
                 tablet={16}
                 largeScreen={16}
                 widescreen={16}
               >
-                <SVGPlot
+                <PepplotPlotTabs
                   {...this.props}
                   {...this.state}
-                  onSVGTabChange={this.handleSVGTabChange}
+                  onPepplotPlotTableChange={this.handlePepplotPlotTabChange}
                 />
               </Grid.Column>
             </Grid.Row>

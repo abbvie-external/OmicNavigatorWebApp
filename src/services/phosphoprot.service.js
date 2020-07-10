@@ -401,6 +401,22 @@ class PhosphoprotService {
     const nodesFromPromise = await promise;
     return nodesFromPromise;
   }
+
+  async getMetaFeaturesTable(pepplotStudy, pepplotModel, feature, errorCb) {
+    this.setUrl();
+    const promise = this.ocpuRPCUnbox(
+      'getMetaFeaturesTable',
+      {
+        study: pepplotStudy,
+        model: pepplotModel,
+        featureID: feature,
+      },
+      15000,
+      errorCb,
+    );
+    const nodesFromPromise = await promise;
+    return nodesFromPromise;
+  }
 }
 
 export const phosphoprotService = new PhosphoprotService();
