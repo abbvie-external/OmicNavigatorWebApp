@@ -27,6 +27,19 @@ class PepplotPlot extends Component {
       parseInt(sessionStorage.getItem('metafeaturesSplitPaneSize'), 10) || 525,
   };
 
+  componentDidMount() {
+    this.setButtonVisibility(this.state.activePepplotPlotTabsIndex);
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (
+      this.state.activePepplotPlotTabsIndex !==
+      prevState.activePepplotPlotTabsIndex
+    ) {
+      this.setButtonVisibility(this.state.activePepplotPlotTabsIndex);
+    }
+  }
+
   handlePepplotPlotTabChange = activeTabIndex => {
     this.setState({
       activePepplotPlotTabsIndex: activeTabIndex,
@@ -46,8 +59,19 @@ class PepplotPlot extends Component {
     sessionStorage.setItem(`${paneType}SplitPaneSize`, size);
   }
 
+  setButtonVisibility = index => {
+    this.setState({
+      excelVisible: index === 2,
+      pdfVisible: index !== 2,
+      svgVisible: index !== 2,
+      pngVisible: index !== 2,
+    });
+  };
+
   render() {
-    if (!this.props.isProteinSVGLoaded) {
+    // const { activePepplotPlotTabsIndex } = this.state;
+    const { isProteinSVGLoaded } = this.props;
+    if (!isProteinSVGLoaded) {
       return (
         <div>
           <Dimmer active inverted>
