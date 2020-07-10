@@ -18,7 +18,7 @@ class PepplotPlot extends Component {
   };
 
   state = {
-    activeSVGTabIndex: 0,
+    activePepplotPlotTabsIndex: 0,
     excelVisible: true,
     pngVisible: true,
     pdfVisible: false,
@@ -27,9 +27,9 @@ class PepplotPlot extends Component {
       parseInt(sessionStorage.getItem('metafeaturesSplitPaneSize'), 10) || 525,
   };
 
-  handleSVGTabChange = activeTabIndex => {
+  handlePepplotPlotTabChange = activeTabIndex => {
     this.setState({
-      activeSVGTabIndex: activeTabIndex,
+      activePepplotPlotTabsIndex: activeTabIndex,
     });
   };
 
@@ -78,32 +78,11 @@ class PepplotPlot extends Component {
                 largeScreen={16}
                 widescreen={16}
               >
-                {/* <SplitPane
-                  className="BottomSplitPaneContainer"
-                  split="vertical"
-                  defaultSize={this.state.metafeaturesSplitPaneSize}
-                  minSize={315}
-                  maxSize={800}
-                  onChange={size => this.splitPaneResized(size, 'vertical')}
-                >
-                  <div id="metafeaturesTableSplitContainer">
-                    <MetafeaturesTable {...this.props} />
-                  </div>
-                  <div id="metafeaturesSVGSplitContainer">
-                    <div class="main"> */}
-                {/* <SVGPlot
-                        {...this.props}
-                        {...this.state}
-                        onSVGTabChange={this.handleSVGTabChange}
-                      /> */}
                 <PepplotPlotTabs
                   {...this.props}
                   {...this.state}
-                  onSVGTabChange={this.handleSVGTabChange}
+                  onPepplotPlotTableChange={this.handlePepplotPlotTabChange}
                 />
-                {/* </div>
-                  </div>
-                </SplitPane> */}
               </Grid.Column>
             </Grid.Row>
           </Grid>

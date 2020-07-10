@@ -210,6 +210,8 @@ class Pepplot extends Component {
       multisetPlotAvailable: false,
       plotButtonActive: false,
       visible: false,
+      isItemSelected: false,
+      isProteinSVGLoaded: false,
     });
   };
 
@@ -425,7 +427,6 @@ class Pepplot extends Component {
       cancelRequestPepplotResultsGetPlot = e;
     });
     let self = this;
-    debugger;
     if (pepplotPlotTypes.length > 0) {
       _.forEach(pepplotPlotTypes, function(plot, i) {
         phosphoprotService

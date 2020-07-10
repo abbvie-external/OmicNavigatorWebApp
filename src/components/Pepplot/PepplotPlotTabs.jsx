@@ -1,32 +1,54 @@
 import React, { Component } from 'react';
-import { Loader, Dimmer, Tab, Popup, Icon, Message } from 'semantic-ui-react';
-import ButtonActions from '../Shared/ButtonActions';
+import { Loader, Dimmer, Tab } from 'semantic-ui-react';
+import { phosphoprotService } from '../../services/phosphoprot.service';
+// import ButtonActions from '../Shared/ButtonActions';
 import MetafeaturesTable from './MetafeaturesTable';
 // import * as d3 from 'd3';
 import '../Shared/SVGPlot.scss';
 
 class SVGPlot extends Component {
   state = {
-    isSVGReady: false,
+    metafeaturesData: [],
+    arePepplotPlotTabsReady: false,
   };
 
   componentDidMount() {
-    this.setState({
-      isSVGReady: true,
-    });
+    phosphoprotService
+      .getMetaFeaturesTable(
+        this.props.pepplotStudy,
+        this.props.pepplotModel,
+        this.props.pepplotProteinSite,
+        this.handleGetMetaFeaturesTableError,
+      )
+      .then(getMetaFeaturesTableResponseData => {
+        const metafeaturesData =
+          getMetaFeaturesTableResponseData.length > 0
+            ? getMetaFeaturesTableResponseData
+            : [];
+        this.setState({
+          metafeaturesData: metafeaturesData,
+          arePepplotPlotTabsReady: true,
+        });
+      })
+      .catch(error => {
+        console.error('Error during getEnrichmentNetwork', error);
+      });
+    // .finally(() => {
+    //   debugger;
+    //   this.setState({
+    //     arePepplotPlotTabsReady: true,
+    //   });
+    // });
   }
 
-  //componentDidUpdate = (prevProps, prevState) => {
-  // if (this.props.imageInfo.svg !== prevProps.imageInfo.svg) {
-  //   this.setState({
-  //     isSVGReady: false,
-  //   });
-  //   this.getSVGPanes();
-  // }
-  //};
+  handleGetMetaFeaturesTableError = () => {
+    this.setState({
+      arePepplotPlotTabsReady: true,
+    });
+  };
 
   handleTabChange = (e, { activeIndex }) => {
-    this.props.onSVGTabChange(activeIndex);
+    this.props.onPepplotPlotTableChange(activeIndex);
   };
 
   handleDiffTable = evt => {
@@ -36,18 +58,9 @@ class SVGPlot extends Component {
     this.props.onViewDiffTable(name, diffProtein);
   };
 
-  getSVGPanes(activeSVGTabIndex) {
+  getSVGPanes(activePepplotPlotTabsIndex) {
+    let panes = [];
     if (this.props.imageInfo.length !== 0) {
-      let panes = [
-        {
-          menuItem: 'metaFeatures',
-          render: () => (
-            <Tab.Pane attached="true" as="div">
-              <MetafeaturesTable {...this.props} />
-            </Tab.Pane>
-          ),
-        },
-      ];
       const svgArray = this.props.imageInfo.svg;
       // const svgArrayReversed = svgArray.reverse();
       const svgPanes = svgArray.map(s => {
@@ -65,25 +78,28 @@ class SVGPlot extends Component {
         };
       });
       panes = panes.concat(svgPanes);
-
-      return (
-        <Tab
-          menu={{ secondary: true, pointing: true, className: 'SVGDiv' }}
-          panes={panes}
-          onTabChange={this.handleTabChange}
-          activeIndex={activeSVGTabIndex}
-        />
-      );
-    } else {
-      return (
-        <Message
-          className="NoPlotsMessage"
-          icon="question mark"
-          header="No Plots Available"
-          // content="add description/instructions"
-        />
-      );
     }
+    if (this.state.metafeaturesData.length !== 0) {
+      let metafeaturesTab = [
+        {
+          menuItem: 'Metafeatures',
+          render: () => (
+            <Tab.Pane attached="true" as="div">
+              <MetafeaturesTable {...this.state} {...this.props} />
+            </Tab.Pane>
+          ),
+        },
+      ];
+      panes = panes.concat(metafeaturesTab);
+    }
+    return (
+      <Tab
+        menu={{ secondary: true, pointing: true, className: 'SVGDiv' }}
+        panes={panes}
+        onTabChange={this.handleTabChange}
+        activeIndex={activePepplotPlotTabsIndex}
+      />
+    );
   }
 
   getButtonActionsClass = () => {
@@ -99,55 +115,20 @@ class SVGPlot extends Component {
   };
 
   render() {
-    const { activeSVGTabIndex } = this.props;
-    const ButtonActionsClass = this.getButtonActionsClass();
+    const { arePepplotPlotTabsReady } = this.state;
+    const { activePepplotPlotTabsIndex } = this.props;
 
-    const BreadcrumbPopupStyle = {
-      backgroundColor: '2E2E2E',
-      borderBottom: '2px solid var(--color-primary)',
-      color: '#FFF',
-      padding: '1em',
-      maxWidth: '50vw',
-      fontSize: '13px',
-      wordBreak: 'break-all',
-    };
-    const svgPanes = this.getSVGPanes(activeSVGTabIndex);
-    if (!this.state.isSVGReady) {
+    if (!arePepplotPlotTabsReady) {
       return (
         <div>
           <Dimmer active inverted>
-            <Loader size="large">SVG Loading</Loader>
+            <Loader size="large">Metafeatures Loading</Loader>
           </Dimmer>
         </div>
       );
     } else {
-      return (
-        <div className="svgContainer">
-          <div className={ButtonActionsClass}>
-            {/* <ButtonActions
-              excelVisible={true}
-              pdfVisible={true}
-              exportButtonSize="mini"
-            /> */}
-          </div>
-          <Popup
-            trigger={
-              <Icon
-                name="bullseye"
-                size="large"
-                onClick={this.handleDiffTable}
-                className="DiffTableIcon"
-              />
-            }
-            style={BreadcrumbPopupStyle}
-            inverted
-            basic
-            position="bottom left"
-            content="view in differential analysis section"
-          />
-          {svgPanes}
-        </div>
-      );
+      const svgPanes = this.getSVGPanes(activePepplotPlotTabsIndex);
+      return <div className="">{svgPanes}</div>;
     }
   }
 }
