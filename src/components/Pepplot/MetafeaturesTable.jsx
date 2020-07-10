@@ -32,7 +32,13 @@ class MetafeaturesTable extends Component {
     this.getMetafeaturesTableConfigCols(this.props.metafeaturesData);
   }
 
-  componentDidUpdate = (prevProps, prevState) => {};
+  componentDidUpdate = (prevProps, prevState) => {
+    // if (this.props.metafeaturesData !== prevProps.metafeaturesData) {
+    //   this.setState({
+    //     metafeaturesTableData: this.props.metafeaturesTableData
+    //   })
+    // }
+  };
 
   getMetafeaturesTableConfigCols = data => {
     let configCols = [];

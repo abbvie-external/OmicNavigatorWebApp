@@ -27,7 +27,7 @@ class SVGPlot extends Component {
             : [];
         this.setState({
           metafeaturesData: metafeaturesData,
-          arePepplotPlotTabsReady: true,
+          // arePepplotPlotTabsReady: true,
         });
       })
       .catch(error => {
@@ -41,11 +41,11 @@ class SVGPlot extends Component {
     // });
   }
 
-  handleGetMetaFeaturesTableError = () => {
-    this.setState({
-      arePepplotPlotTabsReady: true,
-    });
-  };
+  // handleGetMetaFeaturesTableError = () => {
+  //   this.setState({
+  //     arePepplotPlotTabsReady: true,
+  //   });
+  // };
 
   handleTabChange = (e, { activeIndex }) => {
     this.props.onPepplotPlotTableChange(activeIndex);
@@ -82,7 +82,7 @@ class SVGPlot extends Component {
     if (this.state.metafeaturesData.length !== 0) {
       let metafeaturesTab = [
         {
-          menuItem: 'Metafeatures',
+          menuItem: 'Feature Data',
           render: () => (
             <Tab.Pane attached="true" as="div">
               <MetafeaturesTable {...this.state} {...this.props} />
@@ -115,21 +115,21 @@ class SVGPlot extends Component {
   };
 
   render() {
-    const { arePepplotPlotTabsReady } = this.state;
+    // const { arePepplotPlotTabsReady } = this.state;
     const { activePepplotPlotTabsIndex } = this.props;
 
-    if (!arePepplotPlotTabsReady) {
-      return (
-        <div>
-          <Dimmer active inverted>
-            <Loader size="large">Metafeatures Loading</Loader>
-          </Dimmer>
-        </div>
-      );
-    } else {
-      const svgPanes = this.getSVGPanes(activePepplotPlotTabsIndex);
-      return <div className="">{svgPanes}</div>;
-    }
+    // if (!arePepplotPlotTabsReady) {
+    // return (
+    //   <div>
+    //     <Dimmer active inverted>
+    //       <Loader size="large">Loading Feature Data</Loader>
+    //     </Dimmer>
+    //   </div>
+    // );
+    // } else {
+    const svgPanes = this.getSVGPanes(activePepplotPlotTabsIndex);
+    return <div className="">{svgPanes}</div>;
+    // }
   }
 }
 
