@@ -81,6 +81,7 @@ class Pepplot extends Component {
     plotSVGWidth: null,
     plotSVGHeight: null,
   };
+  PepplotViewContainerRef = React.createRef();
 
   componentDidMount() {
     // this.getTableHelpers(
@@ -103,6 +104,14 @@ class Pepplot extends Component {
     //   );
     // }
   };
+
+  // calculateWidth(self) {
+  //   let containerWidth =
+  //     self.PepplotViewContainerRef.current !== null
+  //       ? self.PepplotViewContainerRef.current.parentElement.offsetWidth
+  //       : 1200;
+  //   return containerWidth;
+  // }
 
   handleSearchTransitionPepplot = bool => {
     this.setState({
@@ -201,6 +210,8 @@ class Pepplot extends Component {
       multisetPlotAvailable: false,
       plotButtonActive: false,
       visible: false,
+      isItemSelected: false,
+      isProteinSVGLoaded: false,
     });
   };
 
@@ -400,7 +411,7 @@ class Pepplot extends Component {
     // keep whatever dimension is less (height or width)
     // then multiply the other dimension by original svg ratio (height 595px, width 841px)
     // let PepplotPlotSVGHeight = this.calculateHeight(this);
-    let PepplotPlotSVGWidth = this.calculateWidth() * 0.75;
+    let PepplotPlotSVGWidth = this.calculateWidth();
     // if (PepplotPlotSVGHeight > PepplotPlotSVGWidth) {
     let PepplotPlotSVGHeight = PepplotPlotSVGWidth * 0.70749;
     if (useVolcanoSVGSize === true) {
@@ -415,6 +426,7 @@ class Pepplot extends Component {
     let cancelToken = new CancelToken(e => {
       cancelRequestPepplotResultsGetPlot = e;
     });
+    let self = this;
     if (pepplotPlotTypes.length > 0) {
       _.forEach(pepplotPlotTypes, function(plot, i) {
         phosphoprotService
@@ -469,7 +481,7 @@ class Pepplot extends Component {
             handleSVGCb(imageInfo);
           })
           .catch(error => {
-            this.handleItemSelected(false);
+            self.handleItemSelected(false);
           });
       });
     }
@@ -501,6 +513,7 @@ class Pepplot extends Component {
       },
     );
   };
+
   handleSelectedFromTable = toHighlightArr => {
     const { maxObjectData } = this.state;
     let max = [];
@@ -553,7 +566,7 @@ class Pepplot extends Component {
       window.innerWidth || 0,
     );
     if (w > 1199) {
-      return w * 0.7;
+      return w * 0.35;
     } else if (w < 1200 && w > 767) {
       return w * 0.6;
     } else return w * 0.8;
@@ -926,7 +939,12 @@ class Pepplot extends Component {
                 visible={visible}
               />
               <Sidebar.Pusher>
-                <div className="PepplotViewContainer">{pepplotView}</div>
+                <div
+                  className="PepplotViewContainer"
+                  ref={this.PepplotViewContainerRef}
+                >
+                  {pepplotView}
+                </div>
               </Sidebar.Pusher>
             </Sidebar.Pushable>
           </Grid.Column>

@@ -404,7 +404,6 @@ class PhosphoprotService {
 
   async getNodeFeatures(enrichmentStudy, enrichmentAnnotation, term) {
     this.setUrl();
-    debugger;
     const promise = this.ocpuDataCall(
       'getNodeFeatures',
       {
@@ -420,7 +419,6 @@ class PhosphoprotService {
 
   async getLinkFeatures(enrichmentStudy, enrichmentAnnotation, term1, term2) {
     this.setUrl();
-    debugger;
     const promise = this.ocpuDataCall(
       'getNodeFeatures',
       {
@@ -433,6 +431,22 @@ class PhosphoprotService {
     );
     const featuresFromPromise = await promise;
     return featuresFromPromise;
+  }
+
+  async getMetaFeaturesTable(pepplotStudy, pepplotModel, feature, errorCb) {
+    this.setUrl();
+    const promise = this.ocpuRPCUnbox(
+      'getMetaFeaturesTable',
+      {
+        study: pepplotStudy,
+        model: pepplotModel,
+        featureID: feature,
+      },
+      15000,
+      errorCb,
+    );
+    const nodesFromPromise = await promise;
+    return nodesFromPromise;
   }
 }
 
