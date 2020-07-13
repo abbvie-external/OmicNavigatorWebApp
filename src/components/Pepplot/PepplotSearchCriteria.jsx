@@ -184,7 +184,7 @@ class PepplotSearchCriteria extends Component {
             .then(getResultsTableData => {
               this.handleGetResultsTableData(
                 getResultsTableData,
-                false,
+                true,
                 true,
                 pepplotTest,
               );
