@@ -3,12 +3,15 @@ import _ from 'lodash';
 import * as d3 from 'd3';
 import { Dimmer, Loader, Message } from 'semantic-ui-react';
 import './NetworkGraph.scss';
-import { networkByCluster, limitValues } from '../Shared/helpers';
-import { phosphoprotService } from '../../services/phosphoprot.service';
-import { CancelToken } from 'axios';
+import {
+  networkByCluster,
+  // limitValues
+} from '../Shared/helpers';
+// import { phosphoprotService } from '../../services/phosphoprot.service';
+// import { CancelToken } from 'axios';
 
-let cancelRequestGetNodeFeatures = () => {};
-let cancelRequestGetLinkFeatures = () => {};
+// let cancelRequestGetNodeFeatures = () => {};
+// let cancelRequestGetLinkFeatures = () => {};
 
 class NetworkGraph extends Component {
   state = {
