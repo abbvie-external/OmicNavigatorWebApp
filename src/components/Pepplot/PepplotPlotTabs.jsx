@@ -34,7 +34,6 @@ class SVGPlot extends Component {
         console.error('Error during getEnrichmentNetwork', error);
       });
     // .finally(() => {
-    //   debugger;
     //   this.setState({
     //     arePepplotPlotTabsReady: true,
     //   });

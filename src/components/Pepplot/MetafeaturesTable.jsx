@@ -149,7 +149,7 @@ class MetafeaturesTable extends Component {
           exportBaseName="metaFeatures"
           // quickViews={quickViews}
           disableGeneralSearch
-          disableGrouping
+          // disableGrouping
           // disableSort
           disableColumnVisibilityToggle
           // disableFilters={false}
