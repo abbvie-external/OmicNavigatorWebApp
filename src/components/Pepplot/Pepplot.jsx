@@ -397,7 +397,7 @@ class Pepplot extends Component {
     // keep whatever dimension is less (height or width)
     // then multiply the other dimension by original svg ratio (height 595px, width 841px)
     // let PepplotPlotSVGHeight = this.calculateHeight(this);
-    let PepplotPlotSVGWidth = this.calculateWidth() * 0.75;
+    let PepplotPlotSVGWidth = this.calculateWidth();
     // if (PepplotPlotSVGHeight > PepplotPlotSVGWidth) {
     let PepplotPlotSVGHeight = PepplotPlotSVGWidth * 0.70749;
     if(useVolcanoSVGSize === true){

@@ -50,7 +50,7 @@ class PepplotVolcano extends Component {
         value: defaultMaxObject[maxObjectIdentifier],
         key: defaultMaxObject[identifier]
       }]);
-      this.props.onVolcanoSVGSizeChange(this.state.volcanoHeight*.9,1000-this.state.defaultVolcanoWidth*.95)
+      this.props.onVolcanoSVGSizeChange(this.state.volcanoHeight*.9,(1000-this.state.defaultVolcanoWidth)*.88)
   }
   componentDidUpdate(prevProps, prevState) {
     if (prevProps.pepplotResults !== this.props.pepplotResults) {
@@ -266,10 +266,10 @@ class PepplotVolcano extends Component {
   onSizeChange=(size, direction)=>{
     if(direction==="horizontal"){
       this.setState({volcanoHeight: size*.95})
-      this.props.onVolcanoSVGSizeChange(size*.9, 1000-this.state.volcanoWidth)
+      this.props.onVolcanoSVGSizeChange(size*.9, (1000-this.state.volcanoWidth)*.88)
     }else{
       this.setState({volcanoWidth: size*.95})
-      this.props.onVolcanoSVGSizeChange(this.state.volcanoHeight*.9,1000-size*.95)
+      this.props.onVolcanoSVGSizeChange(this.state.volcanoHeight*.9,(1000-size)*.88)
     }
   }
 
