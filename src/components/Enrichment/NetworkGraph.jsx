@@ -3,7 +3,12 @@ import _ from 'lodash';
 import * as d3 from 'd3';
 import { Dimmer, Loader, Message } from 'semantic-ui-react';
 import './NetworkGraph.scss';
-import { networkByCluster } from '../Shared/helpers';
+import { networkByCluster, limitValues } from '../Shared/helpers';
+import { phosphoprotService } from '../../services/phosphoprot.service';
+import { CancelToken } from 'axios';
+
+let cancelRequestGetNodeFeatures = () => {};
+let cancelRequestGetLinkFeatures = () => {};
 
 class NetworkGraph extends Component {
   state = {
@@ -13,6 +18,8 @@ class NetworkGraph extends Component {
     networkContainerWidth: 0,
     networkHeight: 0,
     networkContainerHeight: 0,
+    nodeFeatures: '',
+    linkFeatures: '',
   };
   networkContainerRef = React.createRef();
 
@@ -656,9 +663,61 @@ class NetworkGraph extends Component {
                       .style('left', tooltipLRPosition)
                       .style('top', tooltipTBPosition);
                   })
+                  // FOR FEATURES TO DISPLAY IN LINK TOOLTIP
+                  //   const d3Event = d3.event;
+                  //   cancelRequestGetLinkFeatures();
+                  //   let cancelToken = new CancelToken(e => {
+                  //     cancelRequestGetLinkFeatures = e;
+                  //   });
+                  //   phosphoprotService
+                  //     .getLinkFeatures(
+                  //       self.props.enrichmentStudy,
+                  //       self.props.enrichmentAnnotation,
+                  //       d.source.termID,
+                  //       d.target.termID,
+                  //       null,
+                  //       cancelToken,
+                  //     )
+                  //     .then(getLinkFeaturesResponseData => {
+                  //       self.setState({
+                  //         linkFeatures: getLinkFeaturesResponseData,
+                  //       });
+                  //       let tooltipLRPosition =
+                  //         d3Event.pageX > window.innerWidth * 0.8
+                  //           ? `${d3Event.pageX - 275}px`
+                  //           : `${d3Event.pageX + 10}px`;
+                  //       let tooltipTBPosition =
+                  //         d3Event.pageY > window.innerHeight * 0.7
+                  //           ? `${d3Event.pageY - 150}px`
+                  //           : `${d3Event.pageY - 15}px`;
+                  //       d3.select(this)
+                  //         .attr('opacity', 0.5)
+                  //         .attr('d', arc.outerRadius(50).innerRadius(0));
+                  //       div.style('opacity', 1);
+                  //       div
+                  //         .html(
+                  //           `<b>Overlap Size: </b>${
+                  //             d.overlapSize
+                  //           }<br/><b>Overlap Coefficient: </b>${
+                  //             d.overlap
+                  //           }<br/><b>Source: </b>${
+                  //             d.source.description
+                  //           }<br/><b>Target: </b>${
+                  //             d.target.description
+                  //           }</br/><b>Features: </b>${limitValues(
+                  //             getLinkFeaturesResponseData,
+                  //             15,
+                  //           )}`,
+                  //         )
+                  //         .style('left', tooltipLRPosition)
+                  //         .style('top', tooltipTBPosition);
+                  //     });
+                  // })
                   .on('mouseout', function(d, i) {
-                    // d3.select(this).transition()
-                    //     .duration('50')
+                    // self.setState({
+                    //   linkFeatures: '',
+                    // });
+                    // d3.select(this)
                     //     .attr('opacity', .75)
                     //     .attr("d", arc.outerRadius(r).innerRadius(0));
                     div
@@ -859,8 +918,66 @@ class NetworkGraph extends Component {
                         )
                         .style('left', tooltipLRPosition)
                         .style('top', tooltipTBPosition);
+                      // FOR FEATURES TO DISPLAY IN NODE TOOLTIP
+                      // const d3Event = d3.event;
+                      // cancelRequestGetNodeFeatures();
+                      // let cancelToken = new CancelToken(e => {
+                      //   cancelRequestGetNodeFeatures = e;
+                      // });
+                      // phosphoprotService
+                      //   .getNodeFeatures(
+                      //     self.props.enrichmentStudy,
+                      //     self.props.enrichmentAnnotation,
+                      //     d.data.metaData.termID,
+                      //     null,
+                      //     cancelToken,
+                      //   )
+                      //   .then(getNodeFeaturesResponseData => {
+                      //     self.setState({
+                      //       nodeFeatures: getNodeFeaturesResponseData,
+                      //     });
+                      //     d3.select(this)
+                      //       .attr('opacity', 0.5)
+                      //       .attr('d', arc.outerRadius(50).innerRadius(0));
+                      //     div.style('opacity', 1);
+                      //     let tooltipLRPosition =
+                      //       d3Event.pageX > window.innerWidth * 0.8
+                      //         ? `${d3Event.pageX - 275}px`
+                      //         : `${d3Event.pageX + 10}px`;
+                      //     let tooltipTBPosition =
+                      //       d3Event.pageY > window.innerHeight * 0.85
+                      //         ? `${d3Event.pageY - 100}px`
+                      //         : `${d3Event.pageY - 15}px`;
+                      //     let pValueDisplay;
+                      //     if (Math.abs(d.data.value) > 0.001)
+                      //       pValueDisplay = d.data.value.toPrecision(3);
+                      //     else pValueDisplay = d.data.value.toExponential(3);
+                      //     let nodeTooltip = `<div className="tooltipLink"><b>Description: </b>${
+                      //       d.data.metaData.description
+                      //     }<br/><b>Test: </b>${
+                      //       d.data.prop
+                      //     }<br/><b><span className="textTransformCapitalize">${pValueType}</span> P Value: </b>${pValueDisplay}<br/><b>Ontology: </b>${
+                      //       d.data.metaData.termID
+                      //     }</br/><b>Features: </b>${limitValues(
+                      //       getNodeFeaturesResponseData,
+                      //       15,
+                      //     )}</div>`;
+                      //     div
+                      //       .html(
+                      //         nodeTooltip,
+                      //         // `<div className="tooltipLink"><b>Description: </b>${d.data.metaData.description}<br/><b>Test: </b>${d.data.prop}<br/><b><span className="textTransformCapitalize">${pValueType}</span> P Value: </b>${pValueDisplay}<br/><b>Ontology: </b>${d.data.metaData.termID}</div>`,
+                      //       )
+                      //       .style('left', tooltipLRPosition)
+                      //       .style('top', tooltipTBPosition);
+                      //   })
+                      //   .catch(error => {
+                      //     console.error('Error during getNodeFeatures', error);
+                      //   });
                     })
                     .on('mouseout', function(d, i) {
+                      // self.setState({
+                      //   nodeFeatures: '',
+                      // });
                       d3.select(this)
                         .transition()
                         .duration('50')
@@ -973,7 +1090,11 @@ class NetworkGraph extends Component {
   };
 
   render() {
-    const { noResults } = this.state;
+    const {
+      noResults,
+      // nodeFeatures,
+      // linkFeatures
+    } = this.state;
     const { networkSettings, networkGraphReady } = this.props;
     const NoResults = noResults ? (
       <Message
@@ -1004,6 +1125,19 @@ class NetworkGraph extends Component {
           id={networkSettings.id}
           className="NetworkChartContainer"
         ></div>
+        {/* <br></br>
+        <div>
+          <Message
+            className={nodeFeatures !== '' ? 'Show nodeFeatures' : 'Hide'}
+          >
+            Features in Node: {limitValues(nodeFeatures, 200)}
+          </Message>
+          <Message
+            className={linkFeatures !== '' ? 'Show linkFeatures' : 'Hide'}
+          >
+            Features in Link: {limitValues(linkFeatures, 200)}
+          </Message>
+        </div> */}
       </>
     );
   }

@@ -109,3 +109,11 @@ div.tooltip-pieSlice {
 .testTransformCapitalize {
   text-transform: capitalize !important;
 }
+
+.linkFeatures,
+.nodeFeatures {
+  max-width: 100% !important;
+  word-break: 'break-all' !important;
+  overflow-wrap: break-word !important;
+  word-wrap: break-word !important;
+}

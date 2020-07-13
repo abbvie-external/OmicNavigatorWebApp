@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Loader, Dimmer, Tab } from 'semantic-ui-react';
+import { Tab } from 'semantic-ui-react';
 import { phosphoprotService } from '../../services/phosphoprot.service';
 // import ButtonActions from '../Shared/ButtonActions';
 import MetafeaturesTable from './MetafeaturesTable';
