@@ -359,15 +359,15 @@ class PepplotSearchCriteria extends Component {
       if (this.state.multisetFiltersVisibleP === false) {
         // on toggle open
         const uSetVP = { ...this.state.uSettingsP };
-        const defaultCol = this.props.thresholdColsP[0]
-        uSetVP.defaultselectedColP = defaultCol
-        console.log(defaultCol)
+        const defaultCol = this.props.thresholdColsP[0];
+        uSetVP.defaultselectedColP = defaultCol;
+        console.log(defaultCol);
         this.setState(
           {
             reloadPlotP: true,
             multisetFiltersVisibleP: true,
             selectedColP: [defaultCol],
-            uSettingsP: uSetVP
+            uSettingsP: uSetVP,
           },
           function() {
             this.updateQueryDataP();

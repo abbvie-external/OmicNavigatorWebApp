@@ -14,17 +14,18 @@ import ViolinPlot from './ViolinPlot';
 import FilteredPepplotTable from './FilteredPepplotTable';
 
 class SplitPanesContainer extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      activeSVGTabIndex: 0,
-      horizontalSplitPaneSize:
-        parseInt(sessionStorage.getItem('horizontalSplitPaneSize'), 10) || 250,
-      verticalSplitPaneSize:
-        parseInt(sessionStorage.getItem('verticalSplitPaneSize'), 10) || 525,
-      activeViolinTableIndex: 0,
-    };
-  }
+  state = {
+    activeSVGTabIndex: 0,
+    horizontalSplitPaneSize:
+      parseInt(sessionStorage.getItem('horizontalSplitPaneSize'), 10) || 250,
+    verticalSplitPaneSize:
+      parseInt(sessionStorage.getItem('verticalSplitPaneSize'), 10) || 525,
+    activeViolinTableIndex: 0,
+  };
+
+  // shouldComponentUpdate(nextProps, nextState) {
+  //   return this.props.isTestSelected;
+  // }
 
   handleSVGTabChange = activeTabIndex => {
     this.setState({
@@ -240,14 +241,6 @@ class SplitPanesContainer extends Component {
             >
               <EnrichmentBreadcrumbs {...this.props} />
             </Grid.Column>
-            {/* <Grid.Column mobile={16} tablet={16} largeScreen={4} widescreen={4}>
-              <Button primary className="ViewDiffTableButton" onClick={this.props.onViewDiffTable}>
-                View Differential Table
-              </Button>
-            </Grid.Column> */}
-            {/* <Grid.Column mobile={8} tablet={8} largeScreen={8} widescreen={8}>
-              <ButtonActions {...this.props} {...this.state} />
-            </Grid.Column> */}
 
             <Grid.Column
               mobile={16}

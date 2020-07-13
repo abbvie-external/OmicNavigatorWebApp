@@ -10,9 +10,6 @@ class PhosphoprotService {
   }
 
   setUrl() {
-    // console.log('the window.location.href is ', window.location.href);
-    // console.log(process.env.REACT_APP_API_URL);
-    // console.log(process.env.NODE_ENV);
     if (process.env.NODE_ENV === 'development') {
       console.log('we are in localhost:3000');
       window.ocpu.seturl(this.ocpuUrl);
@@ -22,22 +19,6 @@ class PhosphoprotService {
   setUrlAlt() {
     window.ocpu.seturl(this.ocpuUrlAlt);
   }
-
-  // ocpuRPC(name, paramsObj, handleError) {
-  //   return new Promise(function(resolve, reject) {
-  //     window.ocpu
-  //       .rpc(name, paramsObj, function(session) {
-  //         resolve(session);
-  //       })
-  //       .catch(error => {
-  //         toast.error(`${error.statusText}: ${error.responseText}`);
-  //         if (handleError !== undefined) {
-  //           handleError(false);
-  //         }
-  //         console.log(`${error.statusText}: ${error.responseText}`);
-  //       });
-  //   });
-  // }
 
   async ocpuRPCUnbox(method, obj, timeoutLength, handleError, cancelToken) {
     return new Promise(function(resolve, reject) {
@@ -64,7 +45,7 @@ class PhosphoprotService {
               }
             });
         })
-        // you can use this function instead, if don't need the cancelToken
+        // instead of line 26-35, you can use this function instead, if don't need the cancelToken
         // .call(method, obj, function(session) {
         //   session
         //     .getObject('.val', 'digits=10')
@@ -313,7 +294,6 @@ class PhosphoprotService {
     return dataFromPromise;
   }
 
-  //async getEnrichmentMultisetPlot(
   async getEnrichmentsUpset(
     study,
     modelID,
@@ -416,6 +396,22 @@ class PhosphoprotService {
         annotation: enrichmentAnnotation,
       },
       25000,
+      errorCb,
+    );
+    const nodesFromPromise = await promise;
+    return nodesFromPromise;
+  }
+
+  async getMetaFeaturesTable(pepplotStudy, pepplotModel, feature, errorCb) {
+    this.setUrl();
+    const promise = this.ocpuRPCUnbox(
+      'getMetaFeaturesTable',
+      {
+        study: pepplotStudy,
+        model: pepplotModel,
+        featureID: feature,
+      },
+      15000,
       errorCb,
     );
     const nodesFromPromise = await promise;
