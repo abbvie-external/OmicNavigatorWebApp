@@ -3,7 +3,7 @@ import { withRouter } from 'react-router-dom';
 import { Breadcrumb, Icon, Popup } from 'semantic-ui-react';
 import '../Shared/Breadcrumbs.scss';
 
-class PepplotBreadcrumbs extends Component {
+class DifferentialBreadcrumbs extends Component {
   componentDidMount() {}
 
   render() {
@@ -27,7 +27,7 @@ class PepplotBreadcrumbs extends Component {
                 trigger={
                   <Icon
                     name={
-                      this.props.activeIndexPepplotView === 0
+                      this.props.activeIndexDifferentialView === 0
                         ? 'table'
                         : 'chart area'
                     }
@@ -39,7 +39,7 @@ class PepplotBreadcrumbs extends Component {
                 basic
                 position="bottom left"
                 content={
-                  this.props.activeIndexPepplotView === 0
+                  this.props.activeIndexDifferentialView === 0
                     ? 'Back To Table'
                     : 'Back To Plot'
                 }
@@ -65,7 +65,7 @@ class PepplotBreadcrumbs extends Component {
   }
 }
 
-export default withRouter(PepplotBreadcrumbs);
+export default withRouter(DifferentialBreadcrumbs);
 
 function splitValue(value) {
   if (value) {

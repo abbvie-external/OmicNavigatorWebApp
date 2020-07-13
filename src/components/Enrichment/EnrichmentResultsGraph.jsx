@@ -24,9 +24,12 @@ import ReactSlider from 'react-slider';
 import LoaderActivePlots from '../Transitions/LoaderActivePlots';
 import './EnrichmentResultsGraph.scss';
 import NumericExponentialInput from '../Shared/NumericExponentialInput';
-// import { limitValues } from '../Shared/helpers';
+import { limitValues } from '../Shared/helpers';
+import { phosphoprotService } from '../../services/phosphoprot.service';
 import { ResizableBox } from 'react-resizable';
 import '../Shared/ReactResizable.css';
+import { CancelToken } from 'axios';
+let cancelRequestGetNodeFeaturesSearch = () => {};
 
 const StyledSlider = styled(ReactSlider)`
   width: 100%;
@@ -135,76 +138,6 @@ function getDynamicLegend() {
   } else return 350;
 }
 
-// const getNames = (description) =>
-
-const resultRenderer = ({ description, genes, size }) => {
-  // let genesFormatted = limitValues(genes, 15);
-  // const SearchValuePopupStyle = {
-  //   backgroundColor: '2E2E2E',
-  //   borderBottom: '2px solid var(--color-primary)',
-  //   color: '#FFF',
-  //   padding: '1em',
-  //   maxWidth: '25vw',
-  //   fontSize: '13px',
-  //   wordBreak: 'break-all',
-  // };
-  // let dynamicSize = getDynamicSize();
-  return (
-    <Grid className="NetworkSearchResultsContainer">
-      <Grid.Column width={12}>
-        <Label
-        // size={dynamicSize}
-        >
-          {description}
-        </Label>
-      </Grid.Column>
-      <Grid.Column width={4}>
-        <Label
-          circular
-          color="blue"
-          key={description}
-          onHover={e => this.getNames(e, description)}
-        >
-          {size}
-        </Label>
-        {/* <Popup
-          trigger={
-            <Label circular color="blue" key={description}>
-              {size}
-            </Label>
-          }
-          basic
-          style={SearchValuePopupStyle}
-          inverted
-          // position="bottom left"
-        >
-          {genesFormatted}
-        </Popup> */}
-      </Grid.Column>
-    </Grid>
-
-    // ALTERNATE VERSION
-    // <div className="NetworkSearchResultsContainer">
-    //   <Popup
-    //     basic
-    //     style={SearchValuePopupStyle}
-    //     inverted
-    //     // position="bottom left"
-    //     trigger={
-    //       <Label
-    //         color="blue"
-    //         // size={dynamicSize}
-    //       >
-    //         {description}
-    //         <Label.Detail key={description}>{size}</Label.Detail>
-    //       </Label>
-    //     }
-    //   >
-    //     {genesFormatted}
-    //   </Popup>
-    // </div>
-  );
-};
 const CustomPopupStyle = {
   backgroundColor: '2E2E2E',
   borderBottom: '2px solid var(--color-primary)',
@@ -275,6 +208,7 @@ class EnrichmentResultsGraph extends Component {
     networkSearchLoading: false,
     networkSearchValue: '',
     descriptions: [],
+    hoveredFeatures: '',
     networkSortBy: ['significance', 'nodecount', 'linkcount'],
     nodeCutoffLocal: sessionStorage.getItem('nodeCutoff') || 0.1,
     linkCutoffLocal: sessionStorage.getItem('linkCutoff') || 0.4,
@@ -345,6 +279,7 @@ class EnrichmentResultsGraph extends Component {
   setupNetworkSearch = filteredNodes => {
     const networkDataNodeDescriptions = filteredNodes.map(r => ({
       description: r.description?.toLowerCase(),
+      termid: r.termID,
       // genes: r.EnrichmentMap_Genes,
       size: r.geneSetSize,
     }));
@@ -429,6 +364,115 @@ class EnrichmentResultsGraph extends Component {
   onResizeLegendStop = (event, { element, size, handle }) => {
     sessionStorage.setItem(`legendWidth`, size.width);
     sessionStorage.setItem(`legendHeight`, size.height);
+  };
+
+  getNodeFeatures(enrichmentStudy, enrichmentAnnotation, termid) {
+    cancelRequestGetNodeFeaturesSearch();
+    let cancelToken = new CancelToken(e => {
+      cancelRequestGetNodeFeaturesSearch = e;
+    });
+    phosphoprotService
+      .getNodeFeatures(
+        enrichmentStudy,
+        enrichmentAnnotation,
+        termid,
+        null,
+        cancelToken,
+      )
+      .then(getNodeFeaturesResponseData => {
+        this.setState({
+          hoveredFeatures: getNodeFeaturesResponseData,
+        });
+      })
+      .catch(error => {
+        console.error('Error during getNodeFeatures', error);
+      });
+  }
+
+  resultRenderer = ({ description, termid, size }) => {
+    const { enrichmentStudy, enrichmentAnnotation } = this.props;
+    const { hoveredFeatures } = this.state;
+    const SearchValuePopupStyle = {
+      backgroundColor: '2E2E2E',
+      borderBottom: '2px solid var(--color-primary)',
+      color: '#FFF',
+      padding: '1em',
+      maxWidth: '25vw',
+      fontSize: '13px',
+      wordBreak: 'break-all',
+    };
+    // let dynamicSize = getDynamicSize();
+    return (
+      <Grid className="NetworkSearchResultsContainer">
+        <Grid.Column width={12}>
+          <Label
+          // size={dynamicSize}
+          >
+            {description}
+          </Label>
+        </Grid.Column>
+        <Grid.Column width={4}>
+          {/* <Label
+            circular
+            color="blue"
+            key={description}
+            onHover={e =>
+              this.getNodeFeatures(e, {
+                enrichmentStudy,
+                enrichmentAnnotation,
+                description,
+              })
+            }
+          >
+            {size}
+          </Label> */}
+          <Popup
+            on="hover"
+            onOpen={e =>
+              this.getNodeFeatures(
+                enrichmentStudy,
+                enrichmentAnnotation,
+                termid,
+              )
+            }
+            flowing
+            basic
+            onClose={e => this.setState({ hoveredFeatures: '' })}
+            trigger={
+              <Label circular color="blue" key={description}>
+                {size}
+              </Label>
+            }
+            style={SearchValuePopupStyle}
+            inverted
+            position="bottom left"
+          >
+            {limitValues(hoveredFeatures, 100)}
+          </Popup>
+        </Grid.Column>
+      </Grid>
+
+      // ALTERNATE VERSION
+      // <div className="NetworkSearchResultsContainer">
+      //   <Popup
+      //     basic
+      //     style={SearchValuePopupStyle}
+      //     inverted
+      //     // position="bottom left"
+      //     trigger={
+      //       <Label
+      //         color="blue"
+      //         // size={dynamicSize}
+      //       >
+      //         {description}
+      //         <Label.Detail key={description}>{size}</Label.Detail>
+      //       </Label>
+      //     }
+      //   >
+      //     {genesFormatted}
+      //   </Popup>
+      // </div>
+    );
   };
 
   render() {
@@ -534,14 +578,14 @@ class EnrichmentResultsGraph extends Component {
                 size={dynamicSearchSize}
                 input={{ icon: 'search', iconPosition: 'left' }}
                 id="NetworkSearchInput"
-                placeholder="Search"
+                placeholder="Search..."
                 onResultSelect={this.handleResultSelect}
                 onSearchChange={this.handleSearchChange}
                 onFocus={this.handleSearchChange}
                 results={networkSearchResults}
                 loading={networkSearchLoading}
                 value={networkSearchValue}
-                resultRenderer={resultRenderer}
+                resultRenderer={this.resultRenderer}
                 spellCheck="false"
               />
             </Grid.Column>
@@ -964,6 +1008,7 @@ class EnrichmentResultsGraph extends Component {
               <NetworkGraph
                 {...this.props}
                 {...this.state}
+                onGetNodeFeatures={this.getNodeFeatures}
                 onInformFilteredNetworkData={this.setupNetworkSearch}
               ></NetworkGraph>
             </Grid.Column>

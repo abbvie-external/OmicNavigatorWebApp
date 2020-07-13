@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Loader, Dimmer, Tab } from 'semantic-ui-react';
+import { Tab } from 'semantic-ui-react';
 import { phosphoprotService } from '../../services/phosphoprot.service';
 // import ButtonActions from '../Shared/ButtonActions';
 import MetafeaturesTable from './MetafeaturesTable';
@@ -9,15 +9,15 @@ import '../Shared/SVGPlot.scss';
 class SVGPlot extends Component {
   state = {
     metafeaturesData: [],
-    arePepplotPlotTabsReady: false,
+    areDifferentialPlotTabsReady: false,
   };
 
   componentDidMount() {
     phosphoprotService
       .getMetaFeaturesTable(
-        this.props.pepplotStudy,
-        this.props.pepplotModel,
-        this.props.pepplotProteinSite,
+        this.props.differentialStudy,
+        this.props.differentialModel,
+        this.props.differentialProteinSite,
         this.handleGetMetaFeaturesTableError,
       )
       .then(getMetaFeaturesTableResponseData => {
@@ -27,28 +27,27 @@ class SVGPlot extends Component {
             : [];
         this.setState({
           metafeaturesData: metafeaturesData,
-          arePepplotPlotTabsReady: true,
+          // areDifferentialPlotTabsReady: true,
         });
       })
       .catch(error => {
         console.error('Error during getEnrichmentNetwork', error);
       });
     // .finally(() => {
-    //   debugger;
     //   this.setState({
-    //     arePepplotPlotTabsReady: true,
+    //     areDifferentialPlotTabsReady: true,
     //   });
     // });
   }
 
-  handleGetMetaFeaturesTableError = () => {
-    this.setState({
-      arePepplotPlotTabsReady: true,
-    });
-  };
+  // handleGetMetaFeaturesTableError = () => {
+  //   this.setState({
+  //     areDifferentialPlotTabsReady: true,
+  //   });
+  // };
 
   handleTabChange = (e, { activeIndex }) => {
-    this.props.onPepplotPlotTableChange(activeIndex);
+    this.props.onDifferentialPlotTableChange(activeIndex);
   };
 
   handleDiffTable = evt => {
@@ -58,7 +57,7 @@ class SVGPlot extends Component {
     this.props.onViewDiffTable(name, diffProtein);
   };
 
-  getSVGPanes(activePepplotPlotTabsIndex) {
+  getSVGPanes(activeDifferentialPlotTabsIndex) {
     let panes = [];
     if (this.props.imageInfo.length !== 0) {
       const svgArray = this.props.imageInfo.svg;
@@ -82,7 +81,7 @@ class SVGPlot extends Component {
     if (this.state.metafeaturesData.length !== 0) {
       let metafeaturesTab = [
         {
-          menuItem: 'Metafeatures',
+          menuItem: 'Feature Data',
           render: () => (
             <Tab.Pane attached="true" as="div">
               <MetafeaturesTable {...this.state} {...this.props} />
@@ -97,7 +96,7 @@ class SVGPlot extends Component {
         menu={{ secondary: true, pointing: true, className: 'SVGDiv' }}
         panes={panes}
         onTabChange={this.handleTabChange}
-        activeIndex={activePepplotPlotTabsIndex}
+        activeIndex={activeDifferentialPlotTabsIndex}
       />
     );
   }
@@ -105,8 +104,8 @@ class SVGPlot extends Component {
   getButtonActionsClass = () => {
     // if (
     // this.props.activeIndex === 1 &&
-    // this.props.activeIndexPepplotView === 0
-    // this.props.tab === 'pepplot'
+    // this.props.activeIndexDifferentialView === 0
+    // this.props.tab === 'differential'
     // ) {
     // return 'export-svg Hide';
     // } else {
@@ -115,21 +114,21 @@ class SVGPlot extends Component {
   };
 
   render() {
-    const { arePepplotPlotTabsReady } = this.state;
-    const { activePepplotPlotTabsIndex } = this.props;
+    // const { areDifferentialPlotTabsReady } = this.state;
+    const { activeDifferentialPlotTabsIndex } = this.props;
 
-    if (!arePepplotPlotTabsReady) {
-      return (
-        <div>
-          <Dimmer active inverted>
-            <Loader size="large">Metafeatures Loading</Loader>
-          </Dimmer>
-        </div>
-      );
-    } else {
-      const svgPanes = this.getSVGPanes(activePepplotPlotTabsIndex);
-      return <div className="">{svgPanes}</div>;
-    }
+    // if (!areDifferentialPlotTabsReady) {
+    // return (
+    //   <div>
+    //     <Dimmer active inverted>
+    //       <Loader size="large">Loading Feature Data</Loader>
+    //     </Dimmer>
+    //   </div>
+    // );
+    // } else {
+    const svgPanes = this.getSVGPanes(activeDifferentialPlotTabsIndex);
+    return <div className="">{svgPanes}</div>;
+    // }
   }
 }
 

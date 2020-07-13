@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Accordion, Loader, Dimmer, Message } from 'semantic-ui-react';
 // import _ from 'lodash';
 
-class PepplotAccordion extends Component {
+class DifferentialAccordion extends Component {
   state = {
     isAccordionReady: false,
   };
@@ -91,4 +91,4 @@ class PepplotAccordion extends Component {
   }
 }
 
-export default PepplotAccordion;
+export default DifferentialAccordion;

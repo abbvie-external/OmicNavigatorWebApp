@@ -1,4 +1,4 @@
-.FilteredPepplotTableDiv {
+.DifferentialVolcano {
   direction: ltr !important;
   // .ui.selectable.table tbody tr:first-child, .ui.selectable.table tbody tr:first-child:hover {
   //     background: #f14000 !important;
@@ -18,7 +18,23 @@
     cursor: auto !important;
   }
 }
+.VolcanoPlotAxisSelectorsRow {
+  padding-bottom: 0px !important;
+}
 
-.TableLoadingDiv {
-  margin-top: 50px !important;
+.VolcanoPlotSplitter {
+  width: 100% !important;
+  min-height: 90vh !important;
+  padding-left: 20px !important;
+}
+
+#volcanoDiv1 {
+  position: relative;
+  width: 100%;
+  height: auto !important;
+  overflow: auto;
+  min-height: 400px;
+}
+#volcanoDiv2 {
+  position: relative;
 }
