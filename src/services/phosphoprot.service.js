@@ -435,7 +435,7 @@ class PhosphoprotService {
   ) {
     this.setUrl();
     const promise = this.ocpuDataCall(
-      'getNodeFeatures',
+      'getLinkFeatures',
       {
         study: enrichmentStudy,
         annotationID: enrichmentAnnotation,

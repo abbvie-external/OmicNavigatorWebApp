@@ -277,7 +277,6 @@ class EnrichmentResultsGraph extends Component {
   };
 
   setupNetworkSearch = filteredNodes => {
-    debugger;
     const networkDataNodeDescriptions = filteredNodes.map(r => ({
       description: r.description?.toLowerCase(),
       termid: r.termID,
