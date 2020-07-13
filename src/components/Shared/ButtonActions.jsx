@@ -126,8 +126,8 @@ class ButtonActions extends Component {
   };
 
   getMultisetPlotName = exporttype => {
-    if (this.props.tab === 'pepplot') {
-      return `${this.props.pepplotStudy}-${this.props.pepplotModel}-MultisetPlot.${exporttype}`;
+    if (this.props.tab === 'differential') {
+      return `${this.props.differentialStudy}-${this.props.differentialModel}-MultisetPlot.${exporttype}`;
     } else if (this.props.tab === 'enrichment') {
       return `${this.props.enrichmentStudy}-${this.props.enrichmentModel}-MultisetPlot.${exporttype}`;
     } else return '';

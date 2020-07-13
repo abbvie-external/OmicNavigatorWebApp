@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import { Grid, Menu, Popup, Sidebar, Tab } from 'semantic-ui-react';
 import { withRouter } from 'react-router-dom';
-import PepplotSearchCriteria from './PepplotSearchCriteria';
+import DifferentialSearchCriteria from './DifferentialSearchCriteria';
 import VolcanoPlotIcon from '../../resources/VolcanoPlotIcon.png';
 import VolcanoPlotIconSelected from '../../resources/VolcanoPlotIconSelected.png';
 import tableIcon from '../../resources/tableIcon.png';
 import tableIconSelected from '../../resources/tableIconSelected.png';
-import PepplotResults from './PepplotResults';
-import PepplotPlot from './PepplotPlot';
+import DifferentialResults from './DifferentialResults';
+import DifferentialPlot from './DifferentialPlot';
 import LoaderActivePlots from '../Transitions/LoaderActivePlots';
 import TransitionActive from '../Transitions/TransitionActive';
 import TransitionStill from '../Transitions/TransitionStill';
@@ -16,32 +16,32 @@ import { formatNumberForDisplay, splitValue } from '../Shared/helpers';
 import phosphosite_icon from '../../resources/phosphosite.ico';
 import DOMPurify from 'dompurify';
 import { phosphoprotService } from '../../services/phosphoprot.service';
-import PepplotVolcano from './PepplotVolcano';
+import DifferentialVolcano from './DifferentialVolcano';
 import { CancelToken } from 'axios';
 
 import _ from 'lodash';
-import './Pepplot.scss';
+import './Differential.scss';
 import '../Shared/Table.scss';
 
-let cancelRequestPepplotResultsGetPlot = () => {};
-class Pepplot extends Component {
-  defaultActiveIndexPepplotView =
-    parseInt(sessionStorage.getItem('pepplotViewTab'), 10) || 0;
+let cancelRequestDifferentialResultsGetPlot = () => {};
+class Differential extends Component {
+  defaultActiveIndexDifferentialView =
+    parseInt(sessionStorage.getItem('differentialViewTab'), 10) || 0;
 
   static defaultProps = {
-    pepplotStudy: '',
-    pepplotModel: '',
-    pepplotTest: '',
-    pepplotProteinSite: '',
+    differentialStudy: '',
+    differentialModel: '',
+    differentialTest: '',
+    differentialProteinSite: '',
   };
 
   state = {
-    isValidSearchPepplot: false,
-    isSearchingPepplot: false,
+    isValidSearchDifferential: false,
+    isSearchingDifferential: false,
     showProteinPage: false,
-    pepplotResults: [],
-    pepplotResultsUnfiltered: [],
-    pepplotColumns: [],
+    differentialResults: [],
+    differentialResultsUnfiltered: [],
+    differentialColumns: [],
     filterableColumnsP: [],
     multisetPlotInfo: {
       title: '',
@@ -72,16 +72,16 @@ class Pepplot extends Component {
     pdfVisible: false,
     svgVisible: true,
     multisetQueried: false,
-    activeIndexPepplotView: this.defaultActiveIndexPepplotView || 0,
+    activeIndexDifferentialView: this.defaultActiveIndexDifferentialView || 0,
     thresholdColsP: [],
-    pepplotPlotTypes: [],
-    pepplotStudyMetadata: [],
-    pepplotModelsAndTests: [],
-    pepplotTestsMetadata: [],
+    differentialPlotTypes: [],
+    differentialStudyMetadata: [],
+    differentialModelsAndTests: [],
+    differentialTestsMetadata: [],
     plotSVGWidth: null,
     plotSVGHeight: null,
   };
-  PepplotViewContainerRef = React.createRef();
+  DifferentialViewContainerRef = React.createRef();
 
   componentDidMount() {
     // this.getTableHelpers(
@@ -93,12 +93,12 @@ class Pepplot extends Component {
 
   componentDidUpdate = (prevProps, prevState) => {
     // if (
-    //   this.props.tab === 'pepplot' &&
+    //   this.props.tab === 'differential' &&
     //   this.props.proteinToHighlightInDiffTable !== '' &&
     //   this.props.proteinToHighlightInDiffTable !== undefined
     // ) {
     //   this.pageToProtein(
-    //     this.state.pepplotResults,
+    //     this.state.differentialResults,
     //     this.props.proteinToHighlightInDiffTable,
     //     this.state.itemsPerPageInformed,
     //   );
@@ -107,15 +107,15 @@ class Pepplot extends Component {
 
   // calculateWidth(self) {
   //   let containerWidth =
-  //     self.PepplotViewContainerRef.current !== null
-  //       ? self.PepplotViewContainerRef.current.parentElement.offsetWidth
+  //     self.DifferentialViewContainerRef.current !== null
+  //       ? self.DifferentialViewContainerRef.current.parentElement.offsetWidth
   //       : 1200;
   //   return containerWidth;
   // }
 
-  handleSearchTransitionPepplot = bool => {
+  handleSearchTransitionDifferential = bool => {
     this.setState({
-      isSearchingPepplot: bool,
+      isSearchingDifferential: bool,
     });
   };
 
@@ -128,44 +128,44 @@ class Pepplot extends Component {
   setStudyModelTestMetadata = (studyData, modelsAndTests) => {
     this.setState(
       {
-        pepplotStudyMetadata: studyData,
-        pepplotModelsAndTests: modelsAndTests,
+        differentialStudyMetadata: studyData,
+        differentialModelsAndTests: modelsAndTests,
       },
       function() {
-        this.handlePlotTypesPepplot(this.props.pepplotModel);
+        this.handlePlotTypesDifferential(this.props.differentialModel);
       },
     );
   };
 
   setTestsMetadata = testsData => {
     this.setState({
-      pepplotTestsMetadata: testsData,
+      differentialTestsMetadata: testsData,
     });
   };
 
-  handlePepplotSearch = searchResults => {
+  handleDifferentialSearch = searchResults => {
     let columns = [];
-    if (searchResults.pepplotResults?.length > 0) {
+    if (searchResults.differentialResults?.length > 0) {
       columns = this.getConfigCols(searchResults);
     }
     //   const statToSort =
-    //     'P.Value' in sortedPepplotResults[0] ? 'P.Value' : 'P_Value';
-    //   sortedPepplotResults = sortedPepplotResults.sort(
+    //     'P.Value' in sortedDifferentialResults[0] ? 'P.Value' : 'P_Value';
+    //   sortedDifferentialResults = sortedDifferentialResults.sort(
     //     (a, b) => a[statToSort] - b[statToSort],
     //   );
     this.setState({
-      pepplotResults: searchResults.pepplotResults,
-      pepplotColumns: columns,
-      isSearchingPepplot: false,
-      isValidSearchPepplot: true,
+      differentialResults: searchResults.differentialResults,
+      differentialColumns: columns,
+      isSearchingDifferential: false,
+      isValidSearchDifferential: true,
       showProteinPage: false,
       plotButtonActive: false,
       visible: false,
     });
   };
-  handlePepplotSearchUnfiltered = searchResults => {
+  handleDifferentialSearchUnfiltered = searchResults => {
     this.setState({
-      pepplotResultsUnfiltered: searchResults.pepplotResults,
+      differentialResultsUnfiltered: searchResults.differentialResults,
       isProteinSVGLoaded: false,
       // isProteinDataLoaded: false,
       isItemSelected: false,
@@ -173,20 +173,20 @@ class Pepplot extends Component {
     });
   };
 
-  handlePlotTypesPepplot = pepplotModel => {
-    if (pepplotModel !== '') {
-      if (this.state.pepplotStudyMetadata.plots != null) {
-        const pepplotModelData = this.state.pepplotStudyMetadata.plots.find(
-          model => model.modelID === pepplotModel,
+  handlePlotTypesDifferential = differentialModel => {
+    if (differentialModel !== '') {
+      if (this.state.differentialStudyMetadata.plots != null) {
+        const differentialModelData = this.state.differentialStudyMetadata.plots.find(
+          model => model.modelID === differentialModel,
         );
         this.setState({
-          pepplotPlotTypes: pepplotModelData?.plots,
+          differentialPlotTypes: differentialModelData?.plots,
         });
       }
     }
   };
   handleSearchCriteriaChange = (changes, scChange) => {
-    this.props.onSearchCriteriaToTop(changes, 'pepplot');
+    this.props.onSearchCriteriaToTop(changes, 'differential');
     this.setState({
       visible: false,
       plotButtonActive: false,
@@ -206,7 +206,7 @@ class Pepplot extends Component {
 
   hidePGrid = () => {
     this.setState({
-      isValidSearchPepplot: false,
+      isValidSearchDifferential: false,
       multisetPlotAvailable: false,
       plotButtonActive: false,
       visible: false,
@@ -236,7 +236,7 @@ class Pepplot extends Component {
     });
   };
   getProteinData = (id, dataItem, getPlotCb, imageInfo) => {
-    const { pepplotFeatureIdKey } = this.props;
+    const { differentialFeatureIdKey } = this.props;
     this.setState(
       {
         imageInfo: imageInfo,
@@ -249,34 +249,34 @@ class Pepplot extends Component {
         currentSVGs: [],
       },
       function() {
-        // const ProteinSiteVar = firstValue(dataItem[pepplotFeatureIdKey], true);
+        // const ProteinSiteVar = firstValue(dataItem[differentialFeatureIdKey], true);
         this.handleSearchCriteriaChange(
           {
-            pepplotStudy: this.props.pepplotStudy || '',
-            pepplotModel: this.props.pepplotModel || '',
-            pepplotTest: this.props.pepplotTest || '',
-            pepplotProteinSite: dataItem[pepplotFeatureIdKey] || '',
-            // pepplotProteinSite: ProteinSiteVar || '',
+            differentialStudy: this.props.differentialStudy || '',
+            differentialModel: this.props.differentialModel || '',
+            differentialTest: this.props.differentialTest || '',
+            differentialProteinSite: dataItem[differentialFeatureIdKey] || '',
+            // differentialProteinSite: ProteinSiteVar || '',
           },
           false,
         );
-        // const { pepplotModel, pepplotStudy } = this.props;
-        // const { pepplotPlotTypes } = this.state;
+        // const { differentialModel, differentialStudy } = this.props;
+        // const { differentialPlotTypes } = this.state;
         // const handleSVGCb = this.handleSVG;
         getPlotCb(id, false);
       },
     );
     // id,
-    // pepplotPlotTypes,
-    // pepplotStudy,
-    // pepplotModel,
+    // differentialPlotTypes,
+    // differentialStudy,
+    // differentialModel,
     // imageInfo,
     // handleSVGCb,
 
     // LEAVE - will use when we add Tree Data / Accordion back in
-    // if (pepplotModel !== 'Differential Expression') {
+    // if (differentialModel !== 'Differential Expression') {
     //   phosphoprotService
-    //     .getSiteData(id, pepplotStudy + 'plots')
+    //     .getSiteData(id, differentialStudy + 'plots')
     //     .then(treeDataResponse => {
     //       this.setState({
     //         treeDataRaw: treeDataResponse,
@@ -306,7 +306,7 @@ class Pepplot extends Component {
     //     });
     // } else {
     //   phosphoprotService
-    //     .getProteinData(id, pepplotStudy + 'plots')
+    //     .getProteinData(id, differentialStudy + 'plots')
     //     .then(proteinDataResponse => {
     //       this.setState({
     //         treeDataRaw: proteinDataResponse,
@@ -339,11 +339,11 @@ class Pepplot extends Component {
     getProteinDataCb,
     getPlotCb,
     proteinToHighlightInDiffTable,
-    pepplotFeatureIdKeyVar,
+    differentialFeatureIdKeyVar,
     maxObj,
   ) => {
     let addParams = {};
-    // const { pepplotFeatureIdKey } = this.state;
+    // const { differentialFeatureIdKey } = this.state;
     if (
       proteinToHighlightInDiffTable.length > 0 &&
       proteinToHighlightInDiffTable != null
@@ -351,7 +351,7 @@ class Pepplot extends Component {
       addParams.rowHighlightOther = [];
       proteinToHighlightInDiffTable.forEach(element => {
         //addParams.rowHighlightOther.push(element.Protein_Site);
-        //addParams.rowHighlightOther.push(element[pepplotFeatureIdKeyVar]);
+        //addParams.rowHighlightOther.push(element[differentialFeatureIdKeyVar]);
         addParams.rowHighlightOther.push(element.id);
       });
     }
@@ -361,7 +361,7 @@ class Pepplot extends Component {
     addParams.showPhosphositePlus = dataItem => {
       let protein = dataItem.symbol
         ? dataItem.symbol
-        : dataItem[pepplotFeatureIdKeyVar];
+        : dataItem[differentialFeatureIdKeyVar];
       return function() {
         const param = {
           proteinNames: protein,
@@ -389,52 +389,52 @@ class Pepplot extends Component {
         );
       };
     };
-    addParams.elementId = pepplotFeatureIdKeyVar;
-    this.setState({ additionalTemplateInfoPepplotTable: addParams });
+    addParams.elementId = differentialFeatureIdKeyVar;
+    this.setState({ additionalTemplateInfoDifferentialTable: addParams });
   };
 
   getPlot = (featureId, useVolcanoSVGSize) => {
-    const { pepplotPlotTypes } = this.state;
+    const { differentialPlotTypes } = this.state;
     const {
-      pepplotStudy,
-      pepplotModel,
-      pepplotProteinSite,
-      pepplotFeatureIdKey,
+      differentialStudy,
+      differentialModel,
+      differentialProteinSite,
+      differentialFeatureIdKey,
     } = this.props;
-    let id = featureId != null ? featureId : pepplotProteinSite;
+    let id = featureId != null ? featureId : differentialProteinSite;
     let imageInfo = { key: '', title: '', svg: [] };
-    imageInfo.title = `Protein Intensity - ${pepplotFeatureIdKey} ${featureId}`;
-    imageInfo.key = `${pepplotFeatureIdKey} ${featureId}`;
+    imageInfo.title = `Protein Intensity - ${differentialFeatureIdKey} ${featureId}`;
+    imageInfo.key = `${differentialFeatureIdKey} ${featureId}`;
     let handleSVGCb = this.handleSVG;
     // let self = this;
     let currentSVGs = [];
     // keep whatever dimension is less (height or width)
     // then multiply the other dimension by original svg ratio (height 595px, width 841px)
-    // let PepplotPlotSVGHeight = this.calculateHeight(this);
-    let PepplotPlotSVGWidth = this.calculateWidth();
-    // if (PepplotPlotSVGHeight > PepplotPlotSVGWidth) {
-    let PepplotPlotSVGHeight = PepplotPlotSVGWidth * 0.70749;
+    // let DifferentialPlotSVGHeight = this.calculateHeight(this);
+    let DifferentialPlotSVGWidth = this.calculateWidth();
+    // if (DifferentialPlotSVGHeight > DifferentialPlotSVGWidth) {
+    let DifferentialPlotSVGHeight = DifferentialPlotSVGWidth * 0.70749;
     if (useVolcanoSVGSize === true) {
-      PepplotPlotSVGHeight = this.state.plotSVGHeight;
-      PepplotPlotSVGWidth = this.state.plotSVGWidth;
+      DifferentialPlotSVGHeight = this.state.plotSVGHeight;
+      DifferentialPlotSVGWidth = this.state.plotSVGWidth;
     }
     // } else {
-    //   PepplotPlotSVGWidth = PepplotPlotSVGHeight * 1.41344;
+    //   DifferentialPlotSVGWidth = DifferentialPlotSVGHeight * 1.41344;
     // }
     let handleItemSelectedCb = this.handleItemSelected;
-    cancelRequestPepplotResultsGetPlot();
+    cancelRequestDifferentialResultsGetPlot();
     let cancelToken = new CancelToken(e => {
-      cancelRequestPepplotResultsGetPlot = e;
+      cancelRequestDifferentialResultsGetPlot = e;
     });
     let self = this;
-    if (pepplotPlotTypes.length > 0) {
-      _.forEach(pepplotPlotTypes, function(plot, i) {
+    if (differentialPlotTypes.length > 0) {
+      _.forEach(differentialPlotTypes, function(plot, i) {
         phosphoprotService
           .plotStudy(
-            pepplotStudy,
-            pepplotModel,
+            differentialStudy,
+            differentialModel,
             id,
-            pepplotPlotTypes[i].plotID,
+            differentialPlotTypes[i].plotID,
             handleItemSelectedCb,
             cancelToken,
           )
@@ -451,7 +451,7 @@ class Pepplot extends Component {
             );
             svgMarkup = svgMarkup.replace(
               /<svg/g,
-              `<svg preserveAspectRatio="xMinYMin meet" style="width:${PepplotPlotSVGWidth}px" height:${PepplotPlotSVGHeight} id="currentSVG-${id}-${i}"`,
+              `<svg preserveAspectRatio="xMinYMin meet" style="width:${DifferentialPlotSVGWidth}px" height:${DifferentialPlotSVGHeight} id="currentSVG-${id}-${i}"`,
             );
             DOMPurify.addHook('afterSanitizeAttributes', function(node) {
               if (
@@ -466,7 +466,7 @@ class Pepplot extends Component {
               ADD_TAGS: ['use'],
             });
             let svgInfo = {
-              plotType: pepplotPlotTypes[i],
+              plotType: differentialPlotTypes[i],
               svg: sanitizedSVG,
             };
 
@@ -488,14 +488,14 @@ class Pepplot extends Component {
   };
 
   pageToProtein = (data, proteinToHighlight, itemsPerPage) => {
-    const { pepplotFeatureIdKey } = this.props;
-    if (this.pepplotGridRef?.current != null) {
+    const { differentialFeatureIdKey } = this.props;
+    if (this.differentialGridRef?.current != null) {
       const Index = _.findIndex(data, function(p) {
-        return p[pepplotFeatureIdKey] === proteinToHighlight;
+        return p[differentialFeatureIdKey] === proteinToHighlight;
         // return p.Protein_Site === proteinToHighlight;
       });
       const pageNumber = Math.ceil(Index / itemsPerPage);
-      this.pepplotGridRef.current.handlePageChange(
+      this.differentialGridRef.current.handlePageChange(
         {},
         { activePage: pageNumber },
       );
@@ -536,7 +536,7 @@ class Pepplot extends Component {
       this.getProteinData,
       this.getPlot,
       toHighlightArr,
-      this.props.pepplotFeatureIdKey,
+      this.props.differentialFeatureIdKey,
       max,
     );
     if (!this.state.isItemSelected && max && max.id !== maxObjectData.id) {
@@ -579,17 +579,17 @@ class Pepplot extends Component {
     });
     this.handleSearchCriteriaChange(
       {
-        pepplotStudy: this.props.pepplotStudy || '',
-        pepplotModel: this.props.pepplotModel || '',
-        pepplotTest: this.props.pepplotTest || '',
-        pepplotProteinSite: '',
+        differentialStudy: this.props.differentialStudy || '',
+        differentialModel: this.props.differentialModel || '',
+        differentialTest: this.props.differentialTest || '',
+        differentialProteinSite: '',
       },
       false,
     );
   };
   getConfigCols = testData => {
-    const pepResults = testData.pepplotResults;
-    const { pepplotProteinSite } = this.props;
+    const pepResults = testData.differentialResults;
+    const { differentialProteinSite } = this.props;
     const TableValuePopupStyle = {
       backgroundColor: '2E2E2E',
       borderBottom: '2px solid var(--color-primary)',
@@ -601,19 +601,19 @@ class Pepplot extends Component {
     };
     let icon = phosphosite_icon;
     let iconText = 'PhosphoSitePlus';
-    let pepplotAlphanumericFields = [];
-    let pepplotNumericFields = [];
+    let differentialAlphanumericFields = [];
+    let differentialNumericFields = [];
     const firstObject = pepResults[0];
     for (let [key, value] of Object.entries(firstObject)) {
       if (typeof value === 'string' || value instanceof String) {
-        pepplotAlphanumericFields.push(key);
+        differentialAlphanumericFields.push(key);
       } else {
-        pepplotNumericFields.push(key);
+        differentialNumericFields.push(key);
       }
     }
-    const alphanumericTrigger = pepplotAlphanumericFields[0];
-    this.props.onHandlePepplotFeatureIdKey(
-      'pepplotFeatureIdKey',
+    const alphanumericTrigger = differentialAlphanumericFields[0];
+    this.props.onHandleDifferentialFeatureIdKey(
+      'differentialFeatureIdKey',
       alphanumericTrigger,
     );
     this.getTableHelpers(
@@ -623,7 +623,7 @@ class Pepplot extends Component {
       alphanumericTrigger,
       this.state.maxObjectData,
     );
-    const pepplotAlphanumericColumnsMapped = pepplotAlphanumericFields.map(
+    const differentialAlphanumericColumnsMapped = differentialAlphanumericFields.map(
       f => {
         return {
           title: f,
@@ -685,45 +685,49 @@ class Pepplot extends Component {
         };
       },
     );
-    const thresholdColsPepplot = this.listToJson(pepplotNumericFields);
-    this.setState({
-      thresholdColsP: thresholdColsPepplot,
-    });
-    this.setState({ filterableColumnsP: [...pepplotNumericFields] });
-    const pepplotNumericColumnsMapped = pepplotNumericFields.map(c => {
-      return {
-        title: c,
-        field: c,
-        type: 'number',
-        filterable: { type: 'numericFilter' },
-        exportTemplate: value => (value ? `${value}` : 'N/A'),
-        template: (value, item, addParams) => {
-          return (
-            <div className="NoSelect">
-              <Popup
-                trigger={
-                  <span className="TableValue NoSelect">
-                    {formatNumberForDisplay(value)}
-                  </span>
-                }
-                style={TableValuePopupStyle}
-                className="TablePopupValue"
-                content={value}
-                inverted
-                basic
-              />
-            </div>
-          );
-        },
-      };
-    });
-    const configCols = pepplotAlphanumericColumnsMapped.concat(
-      pepplotNumericColumnsMapped,
+    const thresholdColsDifferential = this.listToJson(
+      differentialNumericFields,
     );
-    if (pepplotProteinSite !== '') {
+    this.setState({
+      thresholdColsP: thresholdColsDifferential,
+    });
+    this.setState({ filterableColumnsP: [...differentialNumericFields] });
+    const differentialNumericColumnsMapped = differentialNumericFields.map(
+      c => {
+        return {
+          title: c,
+          field: c,
+          type: 'number',
+          filterable: { type: 'numericFilter' },
+          exportTemplate: value => (value ? `${value}` : 'N/A'),
+          template: (value, item, addParams) => {
+            return (
+              <div className="NoSelect">
+                <Popup
+                  trigger={
+                    <span className="TableValue NoSelect">
+                      {formatNumberForDisplay(value)}
+                    </span>
+                  }
+                  style={TableValuePopupStyle}
+                  className="TablePopupValue"
+                  content={value}
+                  inverted
+                  basic
+                />
+              </div>
+            );
+          },
+        };
+      },
+    );
+    const configCols = differentialAlphanumericColumnsMapped.concat(
+      differentialNumericColumnsMapped,
+    );
+    if (differentialProteinSite !== '') {
       let imageInfo = { key: '', title: '', svg: [] };
-      imageInfo.title = `Protein Intensity - ${alphanumericTrigger} ${pepplotProteinSite}`;
-      imageInfo.key = `${alphanumericTrigger} ${pepplotProteinSite}`;
+      imageInfo.title = `Protein Intensity - ${alphanumericTrigger} ${differentialProteinSite}`;
+      imageInfo.key = `${alphanumericTrigger} ${differentialProteinSite}`;
       this.setState({
         imageInfo: imageInfo,
         isItemSelected: true,
@@ -734,7 +738,7 @@ class Pepplot extends Component {
         // treeDataColumns: [],
         currentSVGs: [],
       });
-      this.getPlot(pepplotProteinSite, false);
+      this.getPlot(differentialProteinSite, false);
     }
     return configCols;
   };
@@ -755,17 +759,17 @@ class Pepplot extends Component {
       return <LoaderActivePlots />;
     } else if (this.state.isItemSelected && this.state.isProteinSVGLoaded) {
       return (
-        <PepplotPlot
-          // ref={this.PepplotViewContainerRef}
+        <DifferentialPlot
+          // ref={this.DifferentialViewContainerRef}
           {...this.props}
           {...this.state}
           onBackToTable={this.backToTable}
-        ></PepplotPlot>
+        ></DifferentialPlot>
       );
     } else if (
-      this.state.isValidSearchPepplot &&
+      this.state.isValidSearchDifferential &&
       !this.state.showProteinPage &&
-      !this.state.isSearchingPepplot
+      !this.state.isSearchingDifferential
     ) {
       const TableAndPlotPanes = this.getTableAndPlotPanes();
       return (
@@ -773,7 +777,7 @@ class Pepplot extends Component {
           className="TableAndPlotContainer"
           panes={TableAndPlotPanes}
           onTabChange={this.handleTablePlotTabChange}
-          activeIndex={this.state.activeIndexPepplotView}
+          activeIndex={this.state.activeIndexDifferentialView}
           renderActiveOnly={false}
           menu={{
             attached: true,
@@ -781,7 +785,7 @@ class Pepplot extends Component {
           }}
         />
       );
-    } else if (this.state.isSearchingPepplot) {
+    } else if (this.state.isSearchingDifferential) {
       return <TransitionActive />;
     } else return <TransitionStill />;
   };
@@ -798,7 +802,7 @@ class Pepplot extends Component {
           >
             <img
               src={
-                this.state.activeIndexPepplotView === 0
+                this.state.activeIndexDifferentialView === 0
                   ? tableIconSelected
                   : tableIcon
               }
@@ -808,8 +812,8 @@ class Pepplot extends Component {
           </Menu.Item>
         ),
         pane: (
-          <Tab.Pane key="0" className="PepplotContentPane">
-            <PepplotResults
+          <Tab.Pane key="0" className="DifferentialContentPane">
+            <DifferentialResults
               {...this.state}
               {...this.props}
               // onSearchCriteriaChange={this.handleSearchCriteriaChange}
@@ -828,7 +832,7 @@ class Pepplot extends Component {
           >
             <img
               src={
-                this.state.activeIndexPepplotView === 1
+                this.state.activeIndexDifferentialView === 1
                   ? VolcanoPlotIconSelected
                   : VolcanoPlotIcon
               }
@@ -840,10 +844,10 @@ class Pepplot extends Component {
         pane: (
           <Tab.Pane
             key="1"
-            className="PepplotContentPane"
-            id="PepplotContentPane"
+            className="DifferentialContentPane"
+            id="DifferentialContentPane"
           >
-            <PepplotVolcano
+            <DifferentialVolcano
               {...this.state}
               {...this.props}
               handleVolcanoPlotSelectionChange={
@@ -860,12 +864,12 @@ class Pepplot extends Component {
   };
 
   handleTablePlotTabChange = (e, { activeIndex }) => {
-    sessionStorage.setItem(`pepplotViewTab`, activeIndex);
-    this.setState({ activeIndexPepplotView: activeIndex });
+    sessionStorage.setItem(`differentialViewTab`, activeIndex);
+    this.setState({ activeIndexDifferentialView: activeIndex });
   };
 
   render() {
-    const pepplotView = this.getView();
+    const differentialView = this.getView();
     const { multisetPlotInfo, animation, direction, visible } = this.state;
     const VerticalSidebar = ({ animation, visible }) => (
       <Sidebar
@@ -899,7 +903,7 @@ class Pepplot extends Component {
     );
     return (
       <Grid>
-        <Grid.Row className="PepplotContainer">
+        <Grid.Row className="DifferentialContainer">
           <Grid.Column
             className="SidebarContainer"
             mobile={16}
@@ -907,12 +911,16 @@ class Pepplot extends Component {
             largeScreen={4}
             widescreen={4}
           >
-            <PepplotSearchCriteria
+            <DifferentialSearchCriteria
               {...this.state}
               {...this.props}
-              onSearchTransitionPepplot={this.handleSearchTransitionPepplot}
-              onPepplotSearch={this.handlePepplotSearch}
-              onPepplotSearchUnfiltered={this.handlePepplotSearchUnfiltered}
+              onSearchTransitionDifferential={
+                this.handleSearchTransitionDifferential
+              }
+              onDifferentialSearch={this.handleDifferentialSearch}
+              onDifferentialSearchUnfiltered={
+                this.handleDifferentialSearchUnfiltered
+              }
               onSearchCriteriaChange={this.handleSearchCriteriaChange}
               onSearchCriteriaReset={this.hidePGrid}
               onDisablePlot={this.disablePlot}
@@ -921,12 +929,12 @@ class Pepplot extends Component {
               onMultisetQueried={this.handleMultisetQueried}
               onSetStudyModelTestMetadata={this.setStudyModelTestMetadata}
               onSetTestsMetadata={this.setTestsMetadata}
-              onHandlePlotTypesPepplot={this.handlePlotTypesPepplot}
+              onHandlePlotTypesDifferential={this.handlePlotTypesDifferential}
               onGetPlot={this.getPlot}
             />
           </Grid.Column>
           <Grid.Column
-            className="PepplotContentContainer"
+            className="DifferentialContentContainer"
             mobile={16}
             tablet={16}
             largeScreen={12}
@@ -940,10 +948,10 @@ class Pepplot extends Component {
               />
               <Sidebar.Pusher>
                 <div
-                  className="PepplotViewContainer"
-                  ref={this.PepplotViewContainerRef}
+                  className="DifferentialViewContainer"
+                  ref={this.DifferentialViewContainerRef}
                 >
-                  {pepplotView}
+                  {differentialView}
                 </div>
               </Sidebar.Pusher>
             </Sidebar.Pushable>
@@ -954,7 +962,7 @@ class Pepplot extends Component {
   }
 }
 
-export default withRouter(Pepplot);
+export default withRouter(Differential);
 
 // function firstValue(value) {
 //   if (value) {

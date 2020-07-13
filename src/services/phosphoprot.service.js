@@ -450,13 +450,18 @@ class PhosphoprotService {
     return featuresFromPromise;
   }
 
-  async getMetaFeaturesTable(pepplotStudy, pepplotModel, feature, errorCb) {
+  async getMetaFeaturesTable(
+    differentialStudy,
+    differentialModel,
+    feature,
+    errorCb,
+  ) {
     this.setUrl();
     const promise = this.ocpuRPCUnbox(
       'getMetaFeaturesTable',
       {
-        study: pepplotStudy,
-        model: pepplotModel,
+        study: differentialStudy,
+        model: differentialModel,
         featureID: feature,
       },
       15000,

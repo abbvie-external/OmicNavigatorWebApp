@@ -139,11 +139,11 @@ class MetafeaturesTable extends Component {
       <div className="MetafeaturesTableDiv">
         <EZGrid
           ref={this.metafeaturesGridRef}
-          // uniqueCacheKey={pepplotCacheKey}
+          // uniqueCacheKey={differentialCacheKey}
           data={metafeaturesTableData}
           columnsConfig={metafeaturesTableConfigCols}
           totalRows={15}
-          // use "pepplotRows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
+          // use "differentialRows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
           itemsPerPage={itemsPerPageMetafeaturesTable}
           // onInformItemsPerPage={this.informItemsPerPage}
           exportBaseName="metaFeatures"

@@ -18,12 +18,12 @@ class EnrichmentBreadcrumbs extends Component {
       } else if (enrichmentAnnotation.substring(0, 2) === 'GO') {
         window.open(
           'http://amigo.geneontology.org/amigo/term/' + term,
-          '_blank'
+          '_blank',
         );
       } else if (enrichmentAnnotation.substring(0, 4) === 'msig') {
         window.open(
           'http://software.broadinstitute.org/gsea/msigdb/cards/' + term,
-          '_blank'
+          '_blank',
         );
       } else if (enrichmentAnnotation === 'PSP') {
         this.showPhosphositePlus('', dataItem);
@@ -41,13 +41,13 @@ class EnrichmentBreadcrumbs extends Component {
       let param = { queryId: -1, from: 0, searchStr: protein };
       phosphoprotService.postToPhosphositePlus(
         param,
-        'https://www.phosphosite.org/proteinSearchSubmitAction.action'
+        'https://www.phosphosite.org/proteinSearchSubmitAction.action',
       );
     };
   };
 
   //   getExternalLink = () => {
-  //     if (this.props.tab === 'pepplot') {
+  //     if (this.props.tab === 'differential') {
   //       return;
   //     } else {
   //       return (
@@ -75,7 +75,7 @@ class EnrichmentBreadcrumbs extends Component {
     enrichmentStudy,
     enrichmentAnnotation,
     enrichmentDataItem,
-    enrichmentTerm
+    enrichmentTerm,
   ) => {
     if (enrichmentNameLoaded === true) {
       const BreadcrumbPopupStyle = {
@@ -85,7 +85,7 @@ class EnrichmentBreadcrumbs extends Component {
         padding: '1em',
         maxWidth: '50vw',
         fontSize: '13px',
-        wordBreak: 'break-all'
+        wordBreak: 'break-all',
       };
 
       return (
@@ -109,7 +109,7 @@ class EnrichmentBreadcrumbs extends Component {
                     enrichmentStudy,
                     enrichmentAnnotation,
                     enrichmentDataItem,
-                    enrichmentTerm
+                    enrichmentTerm,
                   )}
                 />
               }
@@ -133,7 +133,7 @@ class EnrichmentBreadcrumbs extends Component {
       enrichmentStudy,
       enrichmentAnnotation,
       enrichmentDataItem,
-      enrichmentTerm
+      enrichmentTerm,
     } = this.props;
 
     const name = this.props.imageInfo.key;
@@ -144,7 +144,7 @@ class EnrichmentBreadcrumbs extends Component {
       padding: '1em',
       maxWidth: '50vw',
       fontSize: '13px',
-      wordBreak: 'break-all'
+      wordBreak: 'break-all',
     };
     const NameAndExternalLink = this.getNameAndLink(
       name,
@@ -155,7 +155,7 @@ class EnrichmentBreadcrumbs extends Component {
       enrichmentStudy,
       enrichmentAnnotation,
       enrichmentDataItem,
-      enrichmentTerm
+      enrichmentTerm,
     );
     const EnrichmentViewTabDescription =
       parseInt(sessionStorage.getItem('enrichmentViewTab'), 10) === 0

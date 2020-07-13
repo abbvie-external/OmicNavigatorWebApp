@@ -1,24 +1,24 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { Grid, Dimmer, Loader } from 'semantic-ui-react';
-import PepplotBreadcrumbs from './PepplotBreadcrumbs';
+import DifferentialBreadcrumbs from './DifferentialBreadcrumbs';
 import ButtonActions from '../Shared/ButtonActions';
-// import PepplotAccordion from './PepplotAccordion';
+// import DifferentialAccordion from './DifferentialAccordion';
 // import MetafeaturesTable from './MetafeaturesTable';
 // import SplitPane from 'react-split-pane';
-import PepplotPlotTabs from './PepplotPlotTabs';
+import DifferentialPlotTabs from './DifferentialPlotTabs';
 import '../Enrichment/SplitPanesContainer.scss';
 // import SVGPlot from '../Shared/SVGPlot';
-import './PepplotPlot.scss';
+import './DifferentialPlot.scss';
 
-class PepplotPlot extends Component {
+class DifferentialPlot extends Component {
   static defaultProps = {
     // isProteinDataLoaded: false,
     isProteinSVGLoaded: true,
   };
 
   state = {
-    activePepplotPlotTabsIndex: 0,
+    activeDifferentialPlotTabsIndex: 0,
     excelVisible: true,
     pngVisible: true,
     pdfVisible: false,
@@ -28,21 +28,21 @@ class PepplotPlot extends Component {
   };
 
   componentDidMount() {
-    this.setButtonVisibility(this.state.activePepplotPlotTabsIndex);
+    this.setButtonVisibility(this.state.activeDifferentialPlotTabsIndex);
   }
 
   componentDidUpdate(prevProps, prevState) {
     if (
-      this.state.activePepplotPlotTabsIndex !==
-      prevState.activePepplotPlotTabsIndex
+      this.state.activeDifferentialPlotTabsIndex !==
+      prevState.activeDifferentialPlotTabsIndex
     ) {
-      this.setButtonVisibility(this.state.activePepplotPlotTabsIndex);
+      this.setButtonVisibility(this.state.activeDifferentialPlotTabsIndex);
     }
   }
 
-  handlePepplotPlotTabChange = activeTabIndex => {
+  handleDifferentialPlotTabChange = activeTabIndex => {
     this.setState({
-      activePepplotPlotTabsIndex: activeTabIndex,
+      activeDifferentialPlotTabsIndex: activeTabIndex,
     });
   };
 
@@ -69,7 +69,7 @@ class PepplotPlot extends Component {
   };
 
   render() {
-    // const { activePepplotPlotTabsIndex } = this.state;
+    // const { activeDifferentialPlotTabsIndex } = this.state;
     const { isProteinSVGLoaded } = this.props;
     if (!isProteinSVGLoaded) {
       return (
@@ -85,7 +85,7 @@ class PepplotPlot extends Component {
           <Grid columns={2} className="">
             <Grid.Row className="ActionsRow">
               <Grid.Column mobile={8} tablet={8} largeScreen={8} widescreen={8}>
-                <PepplotBreadcrumbs {...this.props} />
+                <DifferentialBreadcrumbs {...this.props} />
               </Grid.Column>
               <Grid.Column mobile={8} tablet={8} largeScreen={8} widescreen={8}>
                 <ButtonActions {...this.props} {...this.state} />
@@ -96,16 +96,18 @@ class PepplotPlot extends Component {
           <Grid columns={2} className="PlotContainer">
             <Grid.Row className="PlotContainerRow">
               <Grid.Column
-                // className="PepplotAccordionContainer"
+                // className="DifferentialAccordionContainer"
                 mobile={16}
                 tablet={16}
                 largeScreen={16}
                 widescreen={16}
               >
-                <PepplotPlotTabs
+                <DifferentialPlotTabs
                   {...this.props}
                   {...this.state}
-                  onPepplotPlotTableChange={this.handlePepplotPlotTabChange}
+                  onDifferentialPlotTableChange={
+                    this.handleDifferentialPlotTabChange
+                  }
                 />
               </Grid.Column>
             </Grid.Row>
@@ -116,4 +118,4 @@ class PepplotPlot extends Component {
   }
 }
 
-export default withRouter(PepplotPlot);
+export default withRouter(DifferentialPlot);

@@ -9,7 +9,7 @@ export function updateUrl(
   scTab,
 ) {
   if (!searchCriteriaChange) {
-    // const [urlVar, setUrlFunc] = useState('/pepplot');
+    // const [urlVar, setUrlFunc] = useState('/differential');
     let tab, tabIndex, lastTabIndex;
     // clear url
     propsParam.history.push('');
@@ -17,57 +17,74 @@ export function updateUrl(
     if (type === 'tabChange') {
       lastTabIndex = stateParam.activeIndex;
       tabIndex = lastTabIndex === 2 ? 1 : 2;
-      tab = tabIndex === 2 ? 'enrichment' : 'pepplot';
+      tab = tabIndex === 2 ? 'enrichment' : 'differential';
     } else {
       const pathname = propsParam.location.pathname;
 
       const enrichment = pathname.includes('enrichment');
-      tab = enrichment ? 'enrichment' : 'pepplot';
+      tab = enrichment ? 'enrichment' : 'differential';
       tabIndex = enrichment ? 2 : 1;
     }
 
-    if (tab === 'pepplot') {
-      const pepplotStudyQuery = stateParam.pepplotStudy || '';
-      const pepplotModelQuery = stateParam.pepplotModel || '';
-      const pepplotTestQuery =
-        stateParam.pepplotTest !== undefined
-          ? stateParam.pepplotTest.trim()
+    if (tab === 'differential') {
+      const differentialStudyQuery = stateParam.differentialStudy || '';
+      const differentialModelQuery = stateParam.differentialModel || '';
+      const differentialTestQuery =
+        stateParam.differentialTest !== undefined
+          ? stateParam.differentialTest.trim()
           : '';
-      const pepplotProteinSiteQuery = stateParam.pepplotProteinSite || '';
+      const differentialProteinSiteQuery =
+        stateParam.differentialProteinSite || '';
 
-      const pepplotStudyReplaced = pepplotStudyQuery
+      const differentialStudyReplaced = differentialStudyQuery
         .replace(/ /gi, '–')
         .replace('/');
-      const pepplotModelReplaced = pepplotModelQuery.replace(/ /gi, '–');
-      const pepplotTestReplaced = pepplotTestQuery.replace(/ /gi, '–');
-      const pepplotProteinSiteReplaced = pepplotProteinSiteQuery.replace(
+      const differentialModelReplaced = differentialModelQuery.replace(
         / /gi,
         '–',
       );
-      const pepplotStudy = encodeURI(pepplotStudyReplaced);
-      const pepplotModel = encodeURI(pepplotModelReplaced);
-      const pepplotTest = encodeURI(pepplotTestReplaced);
-      const pepplotProteinSite = encodeURI(pepplotProteinSiteReplaced);
-      if (pepplotProteinSite !== '') {
+      const differentialTestReplaced = differentialTestQuery.replace(
+        / /gi,
+        '–',
+      );
+      const differentialProteinSiteReplaced = differentialProteinSiteQuery.replace(
+        / /gi,
+        '–',
+      );
+      const differentialStudy = encodeURI(differentialStudyReplaced);
+      const differentialModel = encodeURI(differentialModelReplaced);
+      const differentialTest = encodeURI(differentialTestReplaced);
+      const differentialProteinSite = encodeURI(
+        differentialProteinSiteReplaced,
+      );
+      if (differentialProteinSite !== '') {
         propsParam.history.push(
           tab +
             '/' +
-            pepplotStudy +
+            differentialStudy +
             '/' +
-            pepplotModel +
+            differentialModel +
             '/' +
-            pepplotTest +
+            differentialTest +
             '/' +
-            pepplotProteinSite,
+            differentialProteinSite,
         );
-      } else if (pepplotTest !== '') {
+      } else if (differentialTest !== '') {
         propsParam.history.push(
-          tab + '/' + pepplotStudy + '/' + pepplotModel + '/' + pepplotTest,
+          tab +
+            '/' +
+            differentialStudy +
+            '/' +
+            differentialModel +
+            '/' +
+            differentialTest,
         );
-      } else if (pepplotModel !== '') {
-        propsParam.history.push(tab + '/' + pepplotStudy + '/' + pepplotModel);
-      } else if (pepplotStudy !== '') {
-        propsParam.history.push(tab + '/' + pepplotStudy);
+      } else if (differentialModel !== '') {
+        propsParam.history.push(
+          tab + '/' + differentialStudy + '/' + differentialModel,
+        );
+      } else if (differentialStudy !== '') {
+        propsParam.history.push(tab + '/' + differentialStudy);
       } else if (tab !== '') {
         propsParam.history.push(tab);
       }
@@ -139,44 +156,62 @@ export function updateUrl(
   } else {
     // just a search criteria change
     propsParam.history.push('');
-    if (scTab === 'pepplot') {
-      const pepplotStudyQuery2 = stateChanges.pepplotStudy || '';
-      const pepplotModelQuery2 = stateChanges.pepplotModel || '';
-      const pepplotTestQuery2 = stateChanges.pepplotTest || '';
-      const pepplotProteinSiteQuery2 = stateChanges.pepplotProteinSite || '';
-      const pepplotStudyReplaced = pepplotStudyQuery2.replace(/ /gi, '–');
-      const pepplotModelReplaced = pepplotModelQuery2.replace(/ /gi, '–');
-      const pepplotTestReplaced = pepplotTestQuery2.replace(/ /gi, '–');
-      const pepplotProteinSiteReplaced = pepplotProteinSiteQuery2.replace(
+    if (scTab === 'differential') {
+      const differentialStudyQuery2 = stateChanges.differentialStudy || '';
+      const differentialModelQuery2 = stateChanges.differentialModel || '';
+      const differentialTestQuery2 = stateChanges.differentialTest || '';
+      const differentialProteinSiteQuery2 =
+        stateChanges.differentialProteinSite || '';
+      const differentialStudyReplaced = differentialStudyQuery2.replace(
         / /gi,
         '–',
       );
-      const pepplotStudy = encodeURI(pepplotStudyReplaced);
-      const pepplotModel = encodeURI(pepplotModelReplaced);
-      const pepplotTest = encodeURI(pepplotTestReplaced);
-      const pepplotProteinSite = encodeURI(pepplotProteinSiteReplaced);
-      if (pepplotProteinSite !== '') {
+      const differentialModelReplaced = differentialModelQuery2.replace(
+        / /gi,
+        '–',
+      );
+      const differentialTestReplaced = differentialTestQuery2.replace(
+        / /gi,
+        '–',
+      );
+      const differentialProteinSiteReplaced = differentialProteinSiteQuery2.replace(
+        / /gi,
+        '–',
+      );
+      const differentialStudy = encodeURI(differentialStudyReplaced);
+      const differentialModel = encodeURI(differentialModelReplaced);
+      const differentialTest = encodeURI(differentialTestReplaced);
+      const differentialProteinSite = encodeURI(
+        differentialProteinSiteReplaced,
+      );
+      if (differentialProteinSite !== '') {
         propsParam.history.push(
           scTab +
             '/' +
-            pepplotStudy +
+            differentialStudy +
             '/' +
-            pepplotModel +
+            differentialModel +
             '/' +
-            pepplotTest +
+            differentialTest +
             '/' +
-            pepplotProteinSite,
+            differentialProteinSite,
         );
-      } else if (pepplotTest !== '') {
+      } else if (differentialTest !== '') {
         propsParam.history.push(
-          scTab + '/' + pepplotStudy + '/' + pepplotModel + '/' + pepplotTest,
+          scTab +
+            '/' +
+            differentialStudy +
+            '/' +
+            differentialModel +
+            '/' +
+            differentialTest,
         );
-      } else if (pepplotModel !== '') {
+      } else if (differentialModel !== '') {
         propsParam.history.push(
-          scTab + '/' + pepplotStudy + '/' + pepplotModel,
+          scTab + '/' + differentialStudy + '/' + differentialModel,
         );
-      } else if (pepplotStudy !== '') {
-        propsParam.history.push(scTab + '/' + pepplotStudy);
+      } else if (differentialStudy !== '') {
+        propsParam.history.push(scTab + '/' + differentialStudy);
       } else if (scTab !== '') {
         propsParam.history.push(scTab);
       }
