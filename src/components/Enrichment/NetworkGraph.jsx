@@ -21,8 +21,8 @@ class NetworkGraph extends Component {
     networkContainerWidth: 0,
     networkHeight: 0,
     networkContainerHeight: 0,
-    nodeFeatures: '',
-    linkFeatures: '',
+    // nodeFeatures: '',
+    // linkFeatures: '',
   };
   networkContainerRef = React.createRef();
 
@@ -652,7 +652,7 @@ class NetworkGraph extends Component {
                         : `${d3.event.pageY - 15}px`;
                     d3.select(this)
                       .transition()
-                      .duration('50')
+                      .duration(50)
                       .attr('opacity', 0.5)
                       .attr('d', arc.outerRadius(50).innerRadius(0));
                     div
@@ -717,10 +717,8 @@ class NetworkGraph extends Component {
                   //     });
                   // })
                   .on('mouseout', function(d, i) {
-                    // self.setState({
-                    //   linkFeatures: '',
-                    // });
-                    // d3.select(this)
+                    // d3.select(this).transition()
+                    //     .duration('50')
                     //     .attr('opacity', .75)
                     //     .attr("d", arc.outerRadius(r).innerRadius(0));
                     div
@@ -896,7 +894,7 @@ class NetworkGraph extends Component {
                     .on('mouseover', function(d, i) {
                       d3.select(this)
                         .transition()
-                        .duration('50')
+                        .duration(50)
                         .attr('opacity', 0.5)
                         .attr('d', arc.outerRadius(50).innerRadius(0));
                       div
@@ -921,62 +919,63 @@ class NetworkGraph extends Component {
                         )
                         .style('left', tooltipLRPosition)
                         .style('top', tooltipTBPosition);
-                      // FOR FEATURES TO DISPLAY IN NODE TOOLTIP
-                      // const d3Event = d3.event;
-                      // cancelRequestGetNodeFeatures();
-                      // let cancelToken = new CancelToken(e => {
-                      //   cancelRequestGetNodeFeatures = e;
-                      // });
-                      // phosphoprotService
-                      //   .getNodeFeatures(
-                      //     self.props.enrichmentStudy,
-                      //     self.props.enrichmentAnnotation,
-                      //     d.data.metaData.termID,
-                      //     null,
-                      //     cancelToken,
-                      //   )
-                      //   .then(getNodeFeaturesResponseData => {
-                      //     self.setState({
-                      //       nodeFeatures: getNodeFeaturesResponseData,
-                      //     });
-                      //     d3.select(this)
-                      //       .attr('opacity', 0.5)
-                      //       .attr('d', arc.outerRadius(50).innerRadius(0));
-                      //     div.style('opacity', 1);
-                      //     let tooltipLRPosition =
-                      //       d3Event.pageX > window.innerWidth * 0.8
-                      //         ? `${d3Event.pageX - 275}px`
-                      //         : `${d3Event.pageX + 10}px`;
-                      //     let tooltipTBPosition =
-                      //       d3Event.pageY > window.innerHeight * 0.85
-                      //         ? `${d3Event.pageY - 100}px`
-                      //         : `${d3Event.pageY - 15}px`;
-                      //     let pValueDisplay;
-                      //     if (Math.abs(d.data.value) > 0.001)
-                      //       pValueDisplay = d.data.value.toPrecision(3);
-                      //     else pValueDisplay = d.data.value.toExponential(3);
-                      //     let nodeTooltip = `<div className="tooltipLink"><b>Description: </b>${
-                      //       d.data.metaData.description
-                      //     }<br/><b>Test: </b>${
-                      //       d.data.prop
-                      //     }<br/><b><span className="textTransformCapitalize">${pValueType}</span> P Value: </b>${pValueDisplay}<br/><b>Ontology: </b>${
-                      //       d.data.metaData.termID
-                      //     }</br/><b>Features: </b>${limitValues(
-                      //       getNodeFeaturesResponseData,
-                      //       15,
-                      //     )}</div>`;
-                      //     div
-                      //       .html(
-                      //         nodeTooltip,
-                      //         // `<div className="tooltipLink"><b>Description: </b>${d.data.metaData.description}<br/><b>Test: </b>${d.data.prop}<br/><b><span className="textTransformCapitalize">${pValueType}</span> P Value: </b>${pValueDisplay}<br/><b>Ontology: </b>${d.data.metaData.termID}</div>`,
-                      //       )
-                      //       .style('left', tooltipLRPosition)
-                      //       .style('top', tooltipTBPosition);
-                      //   })
-                      //   .catch(error => {
-                      //     console.error('Error during getNodeFeatures', error);
-                      //   });
                     })
+                    // FOR FEATURES TO DISPLAY IN NODE TOOLTIP
+                    // const d3Event = d3.event;
+                    // cancelRequestGetNodeFeatures();
+                    // let cancelToken = new CancelToken(e => {
+                    //   cancelRequestGetNodeFeatures = e;
+                    // });
+                    // phosphoprotService
+                    //   .getNodeFeatures(
+                    //     self.props.enrichmentStudy,
+                    //     self.props.enrichmentAnnotation,
+                    //     d.data.metaData.termID,
+                    //     null,
+                    //     cancelToken,
+                    //   )
+                    //   .then(getNodeFeaturesResponseData => {
+                    //     self.setState({
+                    //       nodeFeatures: getNodeFeaturesResponseData,
+                    //     });
+                    //     d3.select(this)
+                    //       .attr('opacity', 0.5)
+                    //       .attr('d', arc.outerRadius(50).innerRadius(0));
+                    //     div.style('opacity', 1);
+                    //     let tooltipLRPosition =
+                    //       d3Event.pageX > window.innerWidth * 0.8
+                    //         ? `${d3Event.pageX - 275}px`
+                    //         : `${d3Event.pageX + 10}px`;
+                    //     let tooltipTBPosition =
+                    //       d3Event.pageY > window.innerHeight * 0.85
+                    //         ? `${d3Event.pageY - 100}px`
+                    //         : `${d3Event.pageY - 15}px`;
+                    //     let pValueDisplay;
+                    //     if (Math.abs(d.data.value) > 0.001)
+                    //       pValueDisplay = d.data.value.toPrecision(3);
+                    //     else pValueDisplay = d.data.value.toExponential(3);
+                    //     let nodeTooltip = `<div className="tooltipLink"><b>Description: </b>${
+                    //       d.data.metaData.description
+                    //     }<br/><b>Test: </b>${
+                    //       d.data.prop
+                    //     }<br/><b><span className="textTransformCapitalize">${pValueType}</span> P Value: </b>${pValueDisplay}<br/><b>Ontology: </b>${
+                    //       d.data.metaData.termID
+                    //     }</br/><b>Features: </b>${limitValues(
+                    //       getNodeFeaturesResponseData,
+                    //       15,
+                    //     )}</div>`;
+                    //     div
+                    //       .html(
+                    //         nodeTooltip,
+                    //         // `<div className="tooltipLink"><b>Description: </b>${d.data.metaData.description}<br/><b>Test: </b>${d.data.prop}<br/><b><span className="textTransformCapitalize">${pValueType}</span> P Value: </b>${pValueDisplay}<br/><b>Ontology: </b>${d.data.metaData.termID}</div>`,
+                    //       )
+                    //       .style('left', tooltipLRPosition)
+                    //       .style('top', tooltipTBPosition);
+                    //   })
+                    //   .catch(error => {
+                    //     console.error('Error during getNodeFeatures', error);
+                    //   });
+                    //})
                     .on('mouseout', function(d, i) {
                       // self.setState({
                       //   nodeFeatures: '',
