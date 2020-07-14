@@ -457,7 +457,6 @@ class FilteredDifferentialTable extends Component {
           <EZGrid
             ref={this.filteredDifferentialGridRef}
             onInformItemsPerPage={this.informItemsPerPage}
-            // uniqueCacheKey={differentialCacheKey}
             data={filteredTableData}
             columnsConfig={filteredTableConfigCols}
             totalRows={15}
