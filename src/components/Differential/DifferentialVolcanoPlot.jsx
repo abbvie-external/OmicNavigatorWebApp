@@ -129,13 +129,25 @@ class DifferentialVolcanoPlot extends Component {
         : yAxisLabel + ': ' + parseFloat(hoveredCircleData.ystat).toFixed(4);
       return (
         <svg
-          x={hoveredCircleData.position[0] * 1 + 10}
+          x={
+            hoveredCircleData.position[0] >= 240
+              ? hoveredCircleData.position[0] * 1 - 170
+              : hoveredCircleData.position[0] * 1 + 15
+          }
           y={hoveredCircleData.position[1] * 1 + 10}
           width="200"
           height="45"
         >
-          <rect width="200" height="46" fill="white" stroke="black"></rect>
-          <text fontSize="14px" fontWeight="bold">
+          <rect width="160" height="49" fill="#ff4400" rx="5" ry="5"></rect>
+          <rect
+            width="160"
+            height="46"
+            fill="black"
+            stroke="black"
+            rx="5"
+            ry="5"
+          ></rect>
+          <text fontSize="14px" fill="white" fontFamily="sans-serif">
             <tspan x={10} y={14}>
               {idText}
             </tspan>
