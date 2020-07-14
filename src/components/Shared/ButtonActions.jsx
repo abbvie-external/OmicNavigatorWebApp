@@ -184,17 +184,27 @@ class ButtonActions extends Component {
   };
 
   render() {
+    const {
+      excelVisible,
+      pdfVisible,
+      pngVisible,
+      svgVisible,
+      txtVisible,
+    } = this.props;
     const excelButton = this.getExcelButton();
     const pdfButton = this.getPDFButton();
     const pngButton = this.getPNGButton();
     const svgButton = this.getSVGButton();
     const txtButton = this.getTxtButton();
     const buttonSize = this.props.exportButtonSize;
-
+    const noneVisible =
+      !excelVisible && !pdfVisible && !pngVisible && !svgVisible && !txtVisible;
     return (
       <div className="ButtonActions">
         <Button.Group
-          className="ExportButtonGroup"
+          className={
+            noneVisible ? 'Hide ExportButtonGroup' : 'ExportButtonGroup'
+          }
           floated="right"
           size={buttonSize}
         >
