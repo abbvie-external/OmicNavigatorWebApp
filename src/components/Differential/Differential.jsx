@@ -106,7 +106,6 @@ class Differential extends Component {
   };
 
   handleSearchTransitionDifferential = bool => {
-    debugger;
     this.setState({
       isSearchingDifferential: bool,
     });
@@ -764,7 +763,6 @@ class Differential extends Component {
   }
 
   getView = () => {
-    debugger;
     if (this.state.isItemSelected && !this.state.isProteinSVGLoaded) {
       return <LoaderActivePlots />;
     } else if (this.state.isSearchingDifferential) {
