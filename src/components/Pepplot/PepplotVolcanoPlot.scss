@@ -19,7 +19,9 @@
     font-weight: bold;
 }
 .volcanoPlot-dataPoint {
-    fill: #838383;;
+    stroke: black;
+    stroke-width: 0.4;
+    fill: #ff4400;
 }
 .volcanoPlot-dataPoint.hovered{
     stroke: lightskyblue;
