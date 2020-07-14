@@ -6,7 +6,7 @@
   .PlotContainer {
     margin-top: 0px !important;
     padding-top: 0px !important;
-    min-height: 75vh !important;
+    min-height: 85vh !important;
 
     .PlotContainerRow {
       padding-top: 0px !important;
@@ -16,14 +16,24 @@
       margin: 15px !important;
     }
 
-    .PepplotAccordionContainer .content {
+    .DifferentialAccordionContainer .content {
       // overflow-wrap: break-word !important;
       word-break: break-all !important;
     }
 
-    .PepplotAccordionContainer .title {
+    .DifferentialAccordionContainer .title {
       overflow-wrap: break-word !important;
       // word-break: break-all !important;
+    }
+
+    .main {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .Pane1 {
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
     }
   }
 }

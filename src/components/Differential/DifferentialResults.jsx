@@ -14,12 +14,12 @@ export * from '../utility/selectors/quickViewSelector';
 export { QHGrid, EZGrid, QuickViewModal };
 export { getField, getFieldValue, typeMap };
 
-class PepplotResults extends Component {
+class DifferentialResults extends Component {
   state = {
     itemsPerPageInformed: 100,
-    pepplotRows: this.props.pepplotResults.length || 1000,
+    differentialRows: this.props.differentialResults.length || 1000,
   };
-  pepplotGridRef = React.createRef();
+  differentialGridRef = React.createRef();
   informItemsPerPage = items => {
     this.setState({
       itemsPerPageInformed: items,
@@ -28,39 +28,39 @@ class PepplotResults extends Component {
 
   render() {
     const {
-      // pepplotStudy,
-      // pepplotModel,
-      // pepplotTest,
-      pepplotColumns,
-      pepplotResults,
+      // differentialStudy,
+      // differentialModel,
+      // differentialTest,
+      differentialColumns,
+      differentialResults,
       // proteinToHighlightInDiffTable,
       proteinHighlightInProgress,
       isItemSelected,
-      additionalTemplateInfoPepplotTable,
+      additionalTemplateInfoDifferentialTable,
     } = this.props;
 
-    const { pepplotRows, itemsPerPageInformed } = this.state;
+    const { differentialRows, itemsPerPageInformed } = this.state;
     // PAUL - ensure this accounts for multiset filters
-    // let pepplotCacheKey = `${pepplotStudy}-${pepplotModel}-${pepplotTest}`;
+    // let differentialCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}`;
     // if (
     //   proteinToHighlightInDiffTable !== '' &&
     //   proteinToHighlightInDiffTable !== null &&
     //   proteinToHighlightInDiffTable !== undefined
     // ) {
-    // pepplotCacheKey = `${pepplotStudy}-${pepplotModel}-${pepplotTest}-${proteinToHighlightInDiffTable}`;
+    // differentialCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-${proteinToHighlightInDiffTable}`;
     // }
     // const quickViews = [];
     if (!isItemSelected || proteinHighlightInProgress) {
       return (
-        <div id="PepplotGrid">
+        <div id="DifferentialGrid">
           <EZGrid
-            ref={this.pepplotGridRef}
+            ref={this.differentialGridRef}
             onInformItemsPerPage={this.informItemsPerPage}
-            // uniqueCacheKey={pepplotCacheKey}
-            data={pepplotResults}
-            columnsConfig={pepplotColumns}
-            totalRows={pepplotRows}
-            // use "pepplotRows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
+            // uniqueCacheKey={differentialCacheKey}
+            data={differentialResults}
+            columnsConfig={differentialColumns}
+            totalRows={differentialRows}
+            // use "differentialRows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
             itemsPerPage={itemsPerPageInformed}
             exportBaseName="Differential_Phosphorylation_Analysis"
             // quickViews={quickViews}
@@ -69,7 +69,7 @@ class PepplotResults extends Component {
             disableColumnVisibilityToggle
             // disableFilters
             min-height="75vh"
-            additionalTemplateInfo={additionalTemplateInfoPepplotTable}
+            additionalTemplateInfo={additionalTemplateInfoDifferentialTable}
             headerAttributes={<ButtonActions />}
           />
         </div>
@@ -78,4 +78,4 @@ class PepplotResults extends Component {
   }
 }
 
-export default withRouter(PepplotResults);
+export default withRouter(DifferentialResults);

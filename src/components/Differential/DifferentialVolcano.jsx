@@ -3,7 +3,7 @@ import _ from 'lodash';
 import EZGrid from '../utility/EZGrid';
 import ButtonActions from '../Shared/ButtonActions';
 import SVGPlot from '../Shared/SVGPlot';
-import PepplotVolcanoPlot from './PepplotVolcanoPlot';
+import DifferentialVolcanoPlot from './DifferentialVolcanoPlot';
 import {
   Form,
   Grid,
@@ -12,17 +12,17 @@ import {
   Dimmer,
   Loader,
 } from 'semantic-ui-react';
-import './PepplotVolcano.scss';
+import './DifferentialVolcano.scss';
 import SplitPane from 'react-split-pane';
 
-class PepplotVolcano extends Component {
+class DifferentialVolcano extends Component {
   state = {
     volcanoWidth: null,
     volcanoHeight: null,
     defaultVolcanoWidth: 500,
     defaultVolcanoHeight: 400,
     filteredTableData: [],
-    itemsPerPageInformedPepplot: null,
+    itemsPerPageInformedDifferential: null,
     volcanoPlotRows: 0,
     doXAxisTransformation: false,
     doYAxisTransformation: false,
@@ -36,48 +36,48 @@ class PepplotVolcano extends Component {
 
   componentDidMount() {
     const { identifier } = this.state;
-    const { maxObjectIdentifier, pepplotFeatureIdKey } = this.props;
+    const { maxObjectIdentifier, differentialFeatureIdKey } = this.props;
     this.getAxisLabels();
     this.setState({
-      filteredTableData: this.props.pepplotResults,
-      volcanoPlotRows: this.props.pepplotResults.length,
+      filteredTableData: this.props.differentialResults,
+      volcanoPlotRows: this.props.differentialResults.length,
       volcanoWidth: this.state.defaultVolcanoWidth * 0.95,
       volcanoHeight: this.state.defaultVolcanoHeight * 0.95,
     });
-    const defaultMaxObject = this.props.pepplotResults[0];
+    const defaultMaxObject = this.props.differentialResults[0];
     this.props.onSelectFromTable([
       {
-        id: defaultMaxObject[pepplotFeatureIdKey],
+        id: defaultMaxObject[differentialFeatureIdKey],
         value: defaultMaxObject[maxObjectIdentifier],
         key: defaultMaxObject[identifier],
       },
     ]);
     this.props.onVolcanoSVGSizeChange(
       this.state.volcanoHeight * 0.9,
-      1000 - this.state.defaultVolcanoWidth * 0.95,
+      (1000 - this.state.defaultVolcanoWidth) * 0.88,
     );
   }
   componentDidUpdate(prevProps, prevState) {
-    if (prevProps.pepplotResults !== this.props.pepplotResults) {
+    if (prevProps.differentialResults !== this.props.differentialResults) {
       this.setState({
-        filteredTableData: this.props.pepplotResults,
-        volcanoPlotRows: this.props.pepplotResults.length,
+        filteredTableData: this.props.differentialResults,
+        volcanoPlotRows: this.props.differentialResults.length,
       });
     }
   }
   getAxisLabels = () => {
-    if (this.props.pepplotResults.length !== 0) {
-      let pepplotAlphanumericFields = [];
+    if (this.props.differentialResults.length !== 0) {
+      let differentialAlphanumericFields = [];
       let relevantConfigColumns = [];
-      const firstObject = this.props.pepplotResults[0];
+      const firstObject = this.props.differentialResults[0];
       for (let [key, value] of Object.entries(firstObject)) {
         if (typeof value === 'string' || value instanceof String) {
-          pepplotAlphanumericFields.push(key);
+          differentialAlphanumericFields.push(key);
         } else {
           relevantConfigColumns.push(key);
         }
       }
-      this.setState({ identifier: pepplotAlphanumericFields[0] });
+      this.setState({ identifier: differentialAlphanumericFields[0] });
       var yLabel = relevantConfigColumns[0];
       var xLabel = relevantConfigColumns[1];
       var doY = false;
@@ -116,7 +116,7 @@ class PepplotVolcano extends Component {
   };
   handleVolcanoPlotSelectionChange = volcanoPlotSelectedDataArr => {
     const { identifier } = this.state;
-    const { maxObjectIdentifier, pepplotFeatureIdKey } = this.props;
+    const { maxObjectIdentifier, differentialFeatureIdKey } = this.props;
     if (volcanoPlotSelectedDataArr.length !== 0) {
       this.setState({
         filteredTableData: volcanoPlotSelectedDataArr,
@@ -125,20 +125,20 @@ class PepplotVolcano extends Component {
       const defaultMaxObject = volcanoPlotSelectedDataArr[0];
       this.props.onSelectFromTable([
         {
-          id: defaultMaxObject[pepplotFeatureIdKey],
+          id: defaultMaxObject[differentialFeatureIdKey],
           value: defaultMaxObject[maxObjectIdentifier],
           key: defaultMaxObject[identifier],
         },
       ]);
     } else {
       this.setState({
-        filteredTableData: this.props.pepplotResults,
-        volcanoPlotRows: this.props.pepplotResults.length,
+        filteredTableData: this.props.differentialResults,
+        volcanoPlotRows: this.props.differentialResults.length,
       });
-      const defaultMaxObject = this.props.pepplotResults[0];
+      const defaultMaxObject = this.props.differentialResults[0];
       this.props.onSelectFromTable([
         {
-          id: defaultMaxObject[pepplotFeatureIdKey],
+          id: defaultMaxObject[differentialFeatureIdKey],
           value: defaultMaxObject[maxObjectIdentifier],
           key: defaultMaxObject[identifier],
         },
@@ -148,26 +148,26 @@ class PepplotVolcano extends Component {
 
   informItemsPerPage = items => {
     this.setState({
-      itemsPerPageInformedPepplot: items,
+      itemsPerPageInformedDifferential: items,
     });
   };
 
   handleRowClick = (event, item, index) => {
     const { identifier } = this.state;
-    const { pepplotFeatureIdKey, maxObjectIdentifier } = this.props;
+    const { differentialFeatureIdKey, maxObjectIdentifier } = this.props;
     const PreviouslyHighlighted = this.props.selectedFromTableData;
     event.stopPropagation();
     if (event.shiftKey) {
       const allTableData = _.cloneDeep(this.state.filteredTableData);
       const indexMaxProtein = _.findIndex(allTableData, function(d) {
-        return d[pepplotFeatureIdKey] === PreviouslyHighlighted[0]?.id;
+        return d[differentialFeatureIdKey] === PreviouslyHighlighted[0]?.id;
       });
       const sliceFirst = index < indexMaxProtein ? index : indexMaxProtein;
       const sliceLast = index > indexMaxProtein ? index : indexMaxProtein;
       const shiftedTableData = allTableData.slice(sliceFirst, sliceLast + 1);
       const shiftedTableDataArray = shiftedTableData.map(function(d) {
         return {
-          id: item[pepplotFeatureIdKey],
+          id: item[differentialFeatureIdKey],
           value: item[maxObjectIdentifier],
           key: item[identifier],
         };
@@ -177,18 +177,18 @@ class PepplotVolcano extends Component {
       //const allTableData = _.cloneDeep(this.state.filteredTableData);
       let selectedTableDataArray = [];
       const alreadyHighlighted = PreviouslyHighlighted.some(
-        d => d.id === item[pepplotFeatureIdKey],
+        d => d.id === item[differentialFeatureIdKey],
       );
       // already highlighted, remove it from array
       if (alreadyHighlighted) {
         selectedTableDataArray = PreviouslyHighlighted.filter(
-          i => i.id !== item[pepplotFeatureIdKey],
+          i => i.id !== item[differentialFeatureIdKey],
         );
         this.props.onSelectFromTable(selectedTableDataArray);
       } else {
         // map protein to fix obj entries
         const mappedProtein = {
-          id: item[pepplotFeatureIdKey],
+          id: item[differentialFeatureIdKey],
           value: item[maxObjectIdentifier],
           key: item[identifier],
         };
@@ -198,7 +198,7 @@ class PepplotVolcano extends Component {
     } else {
       this.props.onSelectFromTable([
         {
-          id: item[pepplotFeatureIdKey],
+          id: item[differentialFeatureIdKey],
           value: item[maxObjectIdentifier],
           key: item[identifier],
         },
@@ -218,20 +218,20 @@ class PepplotVolcano extends Component {
     return values;
   }
   handleDropdownChange(evt, { name, value }) {
-    const { pepplotResultsUnfiltered } = this.props;
+    const { differentialResultsUnfiltered } = this.props;
     if (name === 'xAxisSelector') {
       this.setState({
         xAxisLabel: value,
         doXAxisTransformation: false,
         allowXTransformation:
-          this.getMaxAndMin(pepplotResultsUnfiltered, value)[0] > 0,
+          this.getMaxAndMin(differentialResultsUnfiltered, value)[0] > 0,
       });
     } else {
       this.setState({
         yAxisLabel: value,
         doYAxisTransformation: false,
         allowYTransformation:
-          this.getMaxAndMin(pepplotResultsUnfiltered, value)[0] > 0,
+          this.getMaxAndMin(differentialResultsUnfiltered, value)[0] > 0,
       });
     }
   }
@@ -262,7 +262,7 @@ class PepplotVolcano extends Component {
       return (
         <div className="VolcanoPlotSVGPlot">
           <SVGPlot
-            // ref={this.PepplotViewContainerRef}
+            // ref={this.DifferentialViewContainerRef}
             {...this.props}
             {...this.state}
             onSVGTabChange={this.props.onSVGTabChange}
@@ -277,13 +277,13 @@ class PepplotVolcano extends Component {
       this.setState({ volcanoHeight: size * 0.95 });
       this.props.onVolcanoSVGSizeChange(
         size * 0.9,
-        1000 - this.state.volcanoWidth,
+        (1000 - this.state.volcanoWidth) * 0.88,
       );
     } else {
       this.setState({ volcanoWidth: size * 0.95 });
       this.props.onVolcanoSVGSizeChange(
         this.state.volcanoHeight * 0.9,
-        1000 - size * 0.95,
+        (1000 - size) * 0.88,
       );
     }
   };
@@ -291,7 +291,7 @@ class PepplotVolcano extends Component {
   render() {
     const {
       filteredTableData,
-      itemsPerPageInformedPepplot,
+      itemsPerPageInformedDifferential,
       volcanoPlotRows,
       axisLables,
       xAxisLabel,
@@ -303,9 +303,9 @@ class PepplotVolcano extends Component {
     } = this.state;
 
     const {
-      additionalTemplateInfoPepplotTable,
+      additionalTemplateInfoDifferentialTable,
       isItemSelected,
-      pepplotColumns,
+      differentialColumns,
     } = this.props;
 
     if (!isItemSelected) {
@@ -392,7 +392,7 @@ class PepplotVolcano extends Component {
                   maxSize={800}
                   onDragFinished={size => this.onSizeChange(size, 'vertical')}
                 >
-                  <PepplotVolcanoPlot
+                  <DifferentialVolcanoPlot
                     {...this.state}
                     {...this.props}
                     handleVolcanoPlotSelectionChange={
@@ -400,7 +400,7 @@ class PepplotVolcano extends Component {
                     }
                     getMaxAndMin={this.getMaxAndMin}
                     handleRowClick={this.handleRowClick}
-                  ></PepplotVolcanoPlot>
+                  ></DifferentialVolcanoPlot>
                   {svgPlot}
                 </SplitPane>
               </div>
@@ -409,14 +409,16 @@ class PepplotVolcano extends Component {
                   className="volcanoPlotTable"
                   data={filteredTableData}
                   totalRows={volcanoPlotRows}
-                  columnsConfig={pepplotColumns}
-                  itemsPerPage={itemsPerPageInformedPepplot}
+                  columnsConfig={differentialColumns}
+                  itemsPerPage={itemsPerPageInformedDifferential}
                   onInformItemsPerPage={this.informItemsPerPage}
                   disableGeneralSearch
                   disableGrouping
                   disableColumnVisibilityToggle
                   exportBaseName="VolcanoPlot_Filtered_Results"
-                  additionalTemplateInfo={additionalTemplateInfoPepplotTable}
+                  additionalTemplateInfo={
+                    additionalTemplateInfoDifferentialTable
+                  }
                   headerAttributes={<ButtonActions />}
                   onRowClick={this.handleRowClick}
                 />
@@ -428,4 +430,4 @@ class PepplotVolcano extends Component {
     }
   }
 }
-export default PepplotVolcano;
+export default DifferentialVolcano;

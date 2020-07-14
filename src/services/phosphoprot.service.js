@@ -401,6 +401,75 @@ class PhosphoprotService {
     const nodesFromPromise = await promise;
     return nodesFromPromise;
   }
+
+  async getNodeFeatures(
+    enrichmentStudy,
+    enrichmentAnnotation,
+    term,
+    errorCb,
+    cancelToken,
+  ) {
+    this.setUrl();
+    const promise = this.ocpuDataCall(
+      'getNodeFeatures',
+      {
+        study: enrichmentStudy,
+        annotationID: enrichmentAnnotation,
+        termID: term,
+      },
+      errorCb,
+      cancelToken,
+      false,
+    );
+    const featuresFromPromise = await promise;
+    return featuresFromPromise;
+  }
+
+  async getLinkFeatures(
+    enrichmentStudy,
+    enrichmentAnnotation,
+    term1,
+    term2,
+    errorCb,
+    cancelToken,
+  ) {
+    this.setUrl();
+    const promise = this.ocpuDataCall(
+      'getLinkFeatures',
+      {
+        study: enrichmentStudy,
+        annotationID: enrichmentAnnotation,
+        termID1: term1,
+        termID2: term2,
+      },
+      errorCb,
+      cancelToken,
+      false,
+    );
+    const featuresFromPromise = await promise;
+    return featuresFromPromise;
+  }
+
+  async getMetaFeaturesTable(
+    differentialStudy,
+    differentialModel,
+    feature,
+    errorCb,
+  ) {
+    this.setUrl();
+    const promise = this.ocpuRPCUnbox(
+      'getMetaFeaturesTable',
+      {
+        study: differentialStudy,
+        model: differentialModel,
+        featureID: feature,
+      },
+      15000,
+      errorCb,
+    );
+    const nodesFromPromise = await promise;
+    return nodesFromPromise;
+  }
 }
 
 export const phosphoprotService = new PhosphoprotService();

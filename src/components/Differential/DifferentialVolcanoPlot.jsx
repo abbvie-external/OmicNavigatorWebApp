@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import './PepplotVolcanoPlot.scss';
+import './DifferentialVolcanoPlot.scss';
 import * as d3 from 'd3';
 
-class PepplotVolcanoPlot extends Component {
+class DifferentialVolcanoPlot extends Component {
   state = {
-    plotName: 'pepplotVolcanoPlot',
+    plotName: 'differentialVolcanoPlot',
     hoveredCircleData: {
       position: [],
       id: null,
@@ -281,10 +281,10 @@ class PepplotVolcanoPlot extends Component {
 
   render() {
     const {
-      pepplotResults,
+      differentialResults,
       volcanoWidth,
       volcanoHeight,
-      pepplotResultsUnfiltered,
+      differentialResultsUnfiltered,
       xAxisLabel,
       yAxisLabel,
       identifier,
@@ -292,11 +292,17 @@ class PepplotVolcanoPlot extends Component {
       doYAxisTransformation,
     } = this.props;
 
-    if (pepplotResultsUnfiltered.length === 0) {
+    if (differentialResultsUnfiltered.length === 0) {
       return null;
     }
-    var xMM = this.props.getMaxAndMin(pepplotResultsUnfiltered, xAxisLabel);
-    var yMM = this.props.getMaxAndMin(pepplotResultsUnfiltered, yAxisLabel);
+    var xMM = this.props.getMaxAndMin(
+      differentialResultsUnfiltered,
+      xAxisLabel,
+    );
+    var yMM = this.props.getMaxAndMin(
+      differentialResultsUnfiltered,
+      yAxisLabel,
+    );
     xMM = [this.doTransform(xMM[0], 'x'), this.doTransform(xMM[1], 'x')];
     yMM = [this.doTransform(yMM[0], 'y'), this.doTransform(yMM[1], 'y')];
 
@@ -399,18 +405,20 @@ class PepplotVolcanoPlot extends Component {
       </g>
     ));
     var filteredOutPlotCircles = null;
-    if (pepplotResultsUnfiltered.length !== pepplotResults.length) {
-      filteredOutPlotCircles = pepplotResultsUnfiltered.map((val, index) => (
-        <circle
-          cx={`${xScale(this.doTransform(val[xAxisLabel], 'x'))}`}
-          cy={`${yScale(this.doTransform(val[yAxisLabel], 'y'))}`}
-          key={`${val[identifier] + '_' + index}`}
-          r={2}
-          opacity={0.3}
-        ></circle>
-      ));
+    if (differentialResultsUnfiltered.length !== differentialResults.length) {
+      filteredOutPlotCircles = differentialResultsUnfiltered.map(
+        (val, index) => (
+          <circle
+            cx={`${xScale(this.doTransform(val[xAxisLabel], 'x'))}`}
+            cy={`${yScale(this.doTransform(val[yAxisLabel], 'y'))}`}
+            key={`${val[identifier] + '_' + index}`}
+            r={2}
+            opacity={0.3}
+          ></circle>
+        ),
+      );
     }
-    const plotCircles = pepplotResults.map((val, index) => (
+    const plotCircles = differentialResults.map((val, index) => (
       <circle
         r={2}
         className="volcanoPlot-dataPoint"
@@ -450,7 +458,7 @@ class PepplotVolcanoPlot extends Component {
       return (
         <div className="volcanoPlotContainer">
           <svg
-            id="pepplotVolcanoPlot"
+            id="differentialVolcanoPlot"
             className="volcanoPlotSVG"
             width={volcanoWidth}
             height={volcanoHeight}
@@ -495,4 +503,4 @@ class PepplotVolcanoPlot extends Component {
     }
   }
 }
-export default PepplotVolcanoPlot;
+export default DifferentialVolcanoPlot;

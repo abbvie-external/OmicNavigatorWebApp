@@ -225,7 +225,10 @@ class QHGridHeader extends React.PureComponent {
           style={{ float: 'right', cursor: 'pointer' }}
         />
       );
-    } else if (this.props.exportBaseName === 'VolcanoPlot_Filtered_Results') {
+    } else if (
+      this.props.exportBaseName === 'VolcanoPlot_Filtered_Results' ||
+      this.props.exportBaseName === 'metaFeatures'
+    ) {
       return null;
     } else {
       return (
@@ -410,7 +413,7 @@ class QHGridHeader extends React.PureComponent {
                   className="QHGrid--generalSearch"
                   icon="search"
                   iconPosition="left"
-                  placeholder="Search Table"
+                  placeholder="Search..."
                   value={this.state.generalSearch}
                   onChange={this.handleGeneralSearch}
                   action={{
@@ -789,7 +792,7 @@ class QHGridBody extends React.PureComponent {
             let rowHighlightMax = false;
             let rowHighlightOther = false;
             if (
-              item[this.props.additionalTemplateInfo.elementId] != null &&
+              item[this.props.additionalTemplateInfo?.elementId] != null &&
               this.props.additionalTemplateInfo !== '' &&
               this.props.additionalTemplateInfo != null
             ) {
@@ -807,7 +810,7 @@ class QHGridBody extends React.PureComponent {
                 rowHighlightOther = true;
               }
             } else if (
-              item[this.props.additionalTemplateInfo.elementId] != null &&
+              item[this.props.additionalTemplateInfo?.elementId] != null &&
               this.props.additionalTemplateInfo !== '' &&
               this.props.additionalTemplateInfo != null
             ) {
