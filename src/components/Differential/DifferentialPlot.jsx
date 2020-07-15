@@ -61,8 +61,11 @@ class DifferentialPlot extends Component {
 
   setButtonVisibility = index => {
     this.setState({
-      excelVisible: index === 2,
-      pdfVisible: index !== 2,
+      // excelVisible: index === 2,
+      // excel not ready yet
+      excelVisible: false,
+      // pdfVisible: index !== 2,
+      pdfVisible: false,
       svgVisible: index !== 2,
       pngVisible: index !== 2,
     });

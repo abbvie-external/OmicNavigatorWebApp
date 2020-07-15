@@ -105,14 +105,6 @@ class Differential extends Component {
     // }
   };
 
-  // calculateWidth(self) {
-  //   let containerWidth =
-  //     self.DifferentialViewContainerRef.current !== null
-  //       ? self.DifferentialViewContainerRef.current.parentElement.offsetWidth
-  //       : 1200;
-  //   return containerWidth;
-  // }
-
   handleSearchTransitionDifferential = bool => {
     this.setState({
       isSearchingDifferential: bool,
@@ -393,6 +385,22 @@ class Differential extends Component {
     this.setState({ additionalTemplateInfoDifferentialTable: addParams });
   };
 
+  calculateHeight(self) {
+    let containerHeight =
+      self.DifferentialViewContainerRef.current !== null
+        ? self.DifferentialViewContainerRef.current.parentElement.offsetHeight
+        : 900;
+    return containerHeight - 120;
+  }
+
+  calculateWidth(self) {
+    let containerWidth =
+      self.DifferentialViewContainerRef.current !== null
+        ? self.DifferentialViewContainerRef.current.parentElement.offsetWidth
+        : 1200;
+    return containerWidth - 60;
+  }
+
   getPlot = (featureId, useVolcanoSVGSize) => {
     const { differentialPlotTypes } = this.state;
     const {
@@ -410,17 +418,17 @@ class Differential extends Component {
     let currentSVGs = [];
     // keep whatever dimension is less (height or width)
     // then multiply the other dimension by original svg ratio (height 595px, width 841px)
-    // let DifferentialPlotSVGHeight = this.calculateHeight(this);
-    let DifferentialPlotSVGWidth = this.calculateWidth();
-    // if (DifferentialPlotSVGHeight > DifferentialPlotSVGWidth) {
-    let DifferentialPlotSVGHeight = DifferentialPlotSVGWidth * 0.70749;
+    let DifferentialPlotSVGHeight = this.calculateHeight(this);
+    let DifferentialPlotSVGWidth = this.calculateWidth(this);
+    if (DifferentialPlotSVGHeight > DifferentialPlotSVGWidth) {
+      DifferentialPlotSVGHeight = DifferentialPlotSVGWidth * 0.70749;
+    } else {
+      DifferentialPlotSVGWidth = DifferentialPlotSVGHeight * 1.41344;
+    }
     if (useVolcanoSVGSize === true) {
       DifferentialPlotSVGHeight = this.state.plotSVGHeight;
       DifferentialPlotSVGWidth = this.state.plotSVGWidth;
     }
-    // } else {
-    //   DifferentialPlotSVGWidth = DifferentialPlotSVGHeight * 1.41344;
-    // }
     let handleItemSelectedCb = this.handleItemSelected;
     cancelRequestDifferentialResultsGetPlot();
     let cancelToken = new CancelToken(e => {
@@ -560,17 +568,17 @@ class Differential extends Component {
       isProteinSVGLoaded: true,
     });
   };
-  calculateWidth() {
-    var w = Math.max(
-      document.documentElement.clientWidth,
-      window.innerWidth || 0,
-    );
-    if (w > 1199) {
-      return w * 0.35;
-    } else if (w < 1200 && w > 767) {
-      return w * 0.6;
-    } else return w * 0.8;
-  }
+  // calculateWidth() {
+  //   var w = Math.max(
+  //     document.documentElement.clientWidth,
+  //     window.innerWidth || 0,
+  //   );
+  //   if (w > 1199) {
+  //     return w * 0.;
+  //   } else if (w < 1200 && w > 767) {
+  //     return w * 0.6;
+  //   } else return w * 0.8;
+  // }
   backToTable = () => {
     this.setState({
       isItemSelected: false,
@@ -757,10 +765,12 @@ class Differential extends Component {
   getView = () => {
     if (this.state.isItemSelected && !this.state.isProteinSVGLoaded) {
       return <LoaderActivePlots />;
+    } else if (this.state.isSearchingDifferential) {
+      return <TransitionActive />;
     } else if (this.state.isItemSelected && this.state.isProteinSVGLoaded) {
       return (
         <DifferentialPlot
-          // ref={this.DifferentialViewContainerRef}
+          ref={this.DifferentialViewContainerRef}
           {...this.props}
           {...this.state}
           onBackToTable={this.backToTable}
@@ -785,8 +795,6 @@ class Differential extends Component {
           }}
         />
       );
-    } else if (this.state.isSearchingDifferential) {
-      return <TransitionActive />;
     } else return <TransitionStill />;
   };
 
