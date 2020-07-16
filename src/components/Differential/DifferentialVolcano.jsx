@@ -34,31 +34,33 @@ class DifferentialVolcano extends Component {
     identifier: null,
   };
 
-  componentDidMount() {
-    const { identifier } = this.state;
-    const { maxObjectIdentifier, differentialFeatureIdKey } = this.props;
-    this.getAxisLabels();
-    this.setState({
-      filteredTableData: this.props.differentialResults,
-      volcanoPlotRows: this.props.differentialResults.length,
-      volcanoWidth: this.state.defaultVolcanoWidth * 0.95,
-      volcanoHeight: this.state.defaultVolcanoHeight * 0.95,
-    });
-    const defaultMaxObject = this.props.differentialResults[0];
-    this.props.onSelectFromTable([
-      {
-        id: defaultMaxObject[differentialFeatureIdKey],
-        value: defaultMaxObject[maxObjectIdentifier],
-        key: defaultMaxObject[identifier],
-      },
-    ]);
-    this.props.onVolcanoSVGSizeChange(
-      this.state.volcanoHeight * 0.9,
-      (1000 - this.state.defaultVolcanoWidth) * 0.88,
-    );
-  }
+  componentDidMount() {}
   componentDidUpdate(prevProps, prevState) {
-    if (prevProps.differentialResults !== this.props.differentialResults) {
+    if (
+      prevProps.differentialResultsMounted !==
+      this.props.differentialResultsMounted
+    ) {
+      const { identifier } = this.state;
+      const { maxObjectIdentifier, differentialFeatureIdKey } = this.props;
+      this.getAxisLabels();
+      this.setState({
+        filteredTableData: this.props.differentialResults,
+        volcanoPlotRows: this.props.differentialResults.length,
+        volcanoWidth: this.state.defaultVolcanoWidth * 0.95,
+        volcanoHeight: this.state.defaultVolcanoHeight * 0.95,
+      });
+      const defaultMaxObject = this.props.differentialResults[0];
+      this.props.onSelectFromTable([
+        {
+          id: defaultMaxObject[differentialFeatureIdKey],
+          value: defaultMaxObject[maxObjectIdentifier],
+          key: defaultMaxObject[identifier],
+        },
+      ]);
+      this.props.onVolcanoSVGSizeChange(
+        this.state.volcanoHeight * 0.9,
+        (1000 - this.state.defaultVolcanoWidth) * 0.88,
+      );
       this.setState({
         filteredTableData: this.props.differentialResults,
         volcanoPlotRows: this.props.differentialResults.length,
@@ -304,11 +306,11 @@ class DifferentialVolcano extends Component {
 
     const {
       additionalTemplateInfoDifferentialTable,
-      isItemSelected,
       differentialColumns,
+      differentialResultsMounted,
     } = this.props;
 
-    if (!isItemSelected) {
+    if (differentialResultsMounted) {
       const xAxisTransformBox = allowXTransformation ? (
         <span title="-log10 Transform">
           <Form.Field
@@ -407,6 +409,8 @@ class DifferentialVolcano extends Component {
               <div id="volcanoDiv2">
                 <EZGrid
                   className="volcanoPlotTable"
+                  // note, default is 70vh; if you want a specific vh, specify like "50vh"; "auto" lets the height flow based on items per page
+                  height="auto"
                   data={filteredTableData}
                   totalRows={volcanoPlotRows}
                   columnsConfig={differentialColumns}
@@ -426,6 +430,14 @@ class DifferentialVolcano extends Component {
             </Grid.Column>
           </Grid.Row>
         </Grid>
+      );
+    } else {
+      return (
+        <div>
+          <Dimmer active inverted>
+            <Loader size="large">Plots are Loading</Loader>
+          </Dimmer>
+        </div>
       );
     }
   }

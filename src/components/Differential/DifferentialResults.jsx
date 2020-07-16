@@ -26,6 +26,10 @@ class DifferentialResults extends Component {
     });
   };
 
+  componentDidMount() {
+    this.props.differentialResultsMounted(true);
+  }
+
   render() {
     const {
       differentialStudy,
