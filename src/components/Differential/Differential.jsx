@@ -38,8 +38,8 @@ class Differential extends Component {
   state = {
     isValidSearchDifferential: false,
     isSearchingDifferential: false,
-    showProteinPage: false,
     differentialResults: [],
+    differentialResultsMounted: false,
     differentialResultsUnfiltered: [],
     differentialColumns: [],
     filterableColumnsP: [],
@@ -147,20 +147,15 @@ class Differential extends Component {
     //   );
     this.setState({
       differentialResults: searchResults.differentialResults,
+      differentialResultsUnfiltered: searchResults.differentialResults,
       differentialColumns: columns,
       isSearchingDifferential: false,
       isValidSearchDifferential: true,
-      showProteinPage: false,
+      isItemSelected: false,
+      differentialResultsMounted: false,
       plotButtonActive: false,
       visible: false,
-    });
-  };
-  handleDifferentialSearchUnfiltered = searchResults => {
-    this.setState({
-      differentialResultsUnfiltered: searchResults.differentialResults,
       isProteinSVGLoaded: false,
-      // isProteinDataLoaded: false,
-      isItemSelected: false,
       selectedFromTableData: [],
     });
   };
@@ -203,6 +198,7 @@ class Differential extends Component {
       plotButtonActive: false,
       visible: false,
       isItemSelected: false,
+      differentialResultsMounted: false,
       isProteinSVGLoaded: false,
     });
   };
@@ -233,6 +229,7 @@ class Differential extends Component {
       {
         imageInfo: imageInfo,
         isItemSelected: true,
+        differentialResultsMounted: false,
         isProteinSVGLoaded: false,
         // isProteinDataLoaded: false,
         // treeDataRaw: [],
@@ -581,6 +578,7 @@ class Differential extends Component {
   // }
   backToTable = () => {
     this.setState({
+      differentialResultsMounted: false,
       isItemSelected: false,
       // isProteinDataLoaded: false,
       isProteinSVGLoaded: true,
@@ -738,6 +736,7 @@ class Differential extends Component {
       imageInfo.key = `${alphanumericTrigger} ${differentialProteinSite}`;
       this.setState({
         imageInfo: imageInfo,
+        differentialResultsMounted: false,
         isItemSelected: true,
         isProteinSVGLoaded: false,
         // isProteinDataLoaded: false,
@@ -778,7 +777,7 @@ class Differential extends Component {
       );
     } else if (
       this.state.isValidSearchDifferential &&
-      !this.state.showProteinPage &&
+      !this.state.isItemSelected &&
       !this.state.isSearchingDifferential
     ) {
       const TableAndPlotPanes = this.getTableAndPlotPanes();
@@ -798,13 +797,19 @@ class Differential extends Component {
     } else return <TransitionStill />;
   };
 
+  handleDifferentialResultsMounted = bool => {
+    this.setState({
+      differentialResultsMounted: bool,
+    });
+  };
+
   getTableAndPlotPanes = () => {
     return [
       {
         menuItem: (
           <Menu.Item
             key="0"
-            className="TableAndNPlotButtons TableButton"
+            className="TableAndPlotButtons TableButton"
             name="Table"
             color="orange"
           >
@@ -826,6 +831,7 @@ class Differential extends Component {
               {...this.props}
               // onSearchCriteriaChange={this.handleSearchCriteriaChange}
               onHandlePlotAnimation={this.handlePlotAnimation}
+              differentialResultsMounted={this.handleDifferentialResultsMounted}
             />
           </Tab.Pane>
         ),
@@ -926,9 +932,6 @@ class Differential extends Component {
                 this.handleSearchTransitionDifferential
               }
               onDifferentialSearch={this.handleDifferentialSearch}
-              onDifferentialSearchUnfiltered={
-                this.handleDifferentialSearchUnfiltered
-              }
               onSearchCriteriaChange={this.handleSearchCriteriaChange}
               onSearchCriteriaReset={this.hidePGrid}
               onDisablePlot={this.disablePlot}
