@@ -12,23 +12,23 @@ import {
 import { CancelToken } from 'axios';
 import '../Shared/SearchCriteria.scss';
 import { phosphoprotService } from '../../services/phosphoprot.service';
-import PepplotMultisetFilters from './PepplotMultisetFilters';
+import DifferentialMultisetFilters from './DifferentialMultisetFilters';
 
 let cancelRequestPSCGetResultsTable = () => {};
 let cancelRequestMultisetInferenceData = () => {};
 let cancelRequestInferenceMultisetPlot = () => {};
-class PepplotSearchCriteria extends Component {
+class DifferentialSearchCriteria extends Component {
   state = {
-    pepplotStudies: [],
-    pepplotStudyHrefVisible: false,
-    pepplotStudyHref: '',
-    pepplotModels: [],
-    pepplotTests: [],
-    pepplotModelTooltip: '',
-    pepplotTestTooltip: '',
-    pepplotStudiesDisabled: true,
-    pepplotModelsDisabled: true,
-    pepplotTestsDisabled: true,
+    differentialStudies: [],
+    differentialStudyHrefVisible: false,
+    differentialStudyHref: '',
+    differentialModels: [],
+    differentialTests: [],
+    differentialModelTooltip: '',
+    differentialTestTooltip: '',
+    differentialStudiesDisabled: true,
+    differentialModelsDisabled: true,
+    differentialTestsDisabled: true,
     uAnchorP: '',
     selectedColP: [],
     selectedOperatorP: [
@@ -53,7 +53,7 @@ class PepplotSearchCriteria extends Component {
       mustP: [],
       notP: [],
       displayMetaDataP: true,
-      templateName: 'pepplot-multiset',
+      templateName: 'differential-multiset',
       numElementsP: 0,
       maxElementsP: 0,
       indexFiltersP: [0],
@@ -85,19 +85,19 @@ class PepplotSearchCriteria extends Component {
     multisetFiltersVisibleP: false,
     activateMultisetFiltersP: false,
     uDataP: [],
-    // loadingPepplotMultisetFilters: false,
+    // loadingDifferentialMultisetFilters: false,
   };
 
   componentDidMount() {
     this.setState({
-      pepplotStudiesDisabled: false,
+      differentialStudiesDisabled: false,
     });
   }
 
   componentDidUpdate(prevProps) {
     if (
       this.props.allStudiesMetadata !== prevProps.allStudiesMetadata ||
-      this.props.pepplotStudy !== prevProps.pepplotStudy
+      this.props.differentialStudy !== prevProps.differentialStudy
     ) {
       this.populateDropdowns();
     }
@@ -106,87 +106,98 @@ class PepplotSearchCriteria extends Component {
   populateDropdowns = () => {
     const {
       allStudiesMetadata,
-      pepplotStudy,
-      pepplotModel,
-      pepplotTest,
-      pepplotProteinSite,
+      differentialStudy,
+      differentialModel,
+      differentialTest,
+      differentialProteinSite,
       onSearchCriteriaChange,
-      onSearchTransitionPepplot,
+      onSearchTransitionDifferential,
     } = this.props;
     const studies = allStudiesMetadata.map(study => {
       const studyName = study.name;
-      return { key: `${studyName}Pepplot`, text: studyName, value: studyName };
+      return {
+        key: `${studyName}Differential`,
+        text: studyName,
+        value: studyName,
+      };
     });
     this.setState({
-      pepplotStudies: studies,
+      differentialStudies: studies,
     });
-    if (pepplotStudy !== '') {
+    if (differentialStudy !== '') {
       this.setState({
-        pepplotStudyHrefVisible: true,
-        pepplotStudyHref: `http://www.localhost:3000/${pepplotStudy}.html`,
+        differentialStudyHrefVisible: true,
+        differentialStudyHref: `http://www.localhost:3000/${differentialStudy}.html`,
       });
 
-      // loop through allStudiesMetadata to find the object with the name matching pepplotStudy
+      // loop through allStudiesMetadata to find the object with the name matching differentialStudy
       const allStudiesMetadataCopy = [...allStudiesMetadata];
-      const pepplotStudyData = allStudiesMetadataCopy.find(
-        study => study.name === pepplotStudy,
+      const differentialStudyData = allStudiesMetadataCopy.find(
+        study => study.name === differentialStudy,
       );
-      const pepplotModelsAndTestsVar = pepplotStudyData?.results || [];
+      const differentialModelsAndTestsVar =
+        differentialStudyData?.results || [];
       this.props.onSetStudyModelTestMetadata(
-        pepplotStudyData,
-        pepplotModelsAndTestsVar,
+        differentialStudyData,
+        differentialModelsAndTestsVar,
       );
-      const pepplotModelsMapped = pepplotModelsAndTestsVar.map(result => {
-        return {
-          key: `${result.modelID}Pepplot`,
-          text: result.modelID,
-          value: result.modelID,
-        };
-      });
+      const differentialModelsMapped = differentialModelsAndTestsVar.map(
+        result => {
+          return {
+            key: `${result.modelID}Differential`,
+            text: result.modelID,
+            value: result.modelID,
+          };
+        },
+      );
 
       this.setState({
-        pepplotModelsDisabled: false,
-        pepplotModels: pepplotModelsMapped,
+        differentialModelsDisabled: false,
+        differentialModels: differentialModelsMapped,
       });
-      if (pepplotModel !== '') {
-        this.props.onHandlePlotTypesPepplot(pepplotModel);
-        const pepplotModelWithTests = pepplotModelsAndTestsVar.find(
-          model => model.modelID === pepplotModel,
+      if (differentialModel !== '') {
+        this.props.onHandlePlotTypesDifferential(differentialModel);
+        const differentialModelWithTests = differentialModelsAndTestsVar.find(
+          model => model.modelID === differentialModel,
         );
-        const pepplotModelTooltip = pepplotModelWithTests?.modelDisplay || '';
+        const differentialModelTooltip =
+          differentialModelWithTests?.modelDisplay || '';
         this.setState({
-          pepplotModelTooltip: pepplotModelTooltip,
+          differentialModelTooltip: differentialModelTooltip,
         });
-        const pepplotTestsMetadataVar = pepplotModelWithTests?.tests || [];
-        const pepplotTestsMapped = pepplotTestsMetadataVar.map(test => {
-          return {
-            key: `${test.testID}Pepplot`,
-            text: test.testID,
-            value: test.testID,
-          };
-        });
-        const uDataPMapped = pepplotTestsMetadataVar.map(t => t.testID);
+        const differentialTestsMetadataVar =
+          differentialModelWithTests?.tests || [];
+        const differentialTestsMapped = differentialTestsMetadataVar.map(
+          test => {
+            return {
+              key: `${test.testID}Differential`,
+              text: test.testID,
+              value: test.testID,
+            };
+          },
+        );
+        const uDataPMapped = differentialTestsMetadataVar.map(t => t.testID);
         this.setState({
-          pepplotTestsDisabled: false,
-          pepplotTests: pepplotTestsMapped,
+          differentialTestsDisabled: false,
+          differentialTests: differentialTestsMapped,
           uDataP: uDataPMapped,
         });
-        this.props.onSetTestsMetadata(pepplotTestsMetadataVar);
-        if (pepplotTest !== '') {
-          onSearchTransitionPepplot(true);
+        this.props.onSetTestsMetadata(differentialTestsMetadataVar);
+        if (differentialTest !== '') {
+          onSearchTransitionDifferential(true);
           phosphoprotService
             .getResultsTable(
-              pepplotStudy,
-              pepplotModel,
-              pepplotTest,
-              onSearchTransitionPepplot,
+              differentialStudy,
+              differentialModel,
+              differentialTest,
+              onSearchTransitionDifferential,
             )
             .then(getResultsTableData => {
               this.handleGetResultsTableData(
                 getResultsTableData,
                 true,
                 true,
-                pepplotTest,
+                differentialTest,
               );
             })
             .catch(error => {
@@ -194,23 +205,24 @@ class PepplotSearchCriteria extends Component {
             });
           onSearchCriteriaChange(
             {
-              pepplotStudy: pepplotStudy,
-              pepplotModel: pepplotModel,
-              pepplotTest: pepplotTest,
-              pepplotProteinSite: pepplotProteinSite,
+              differentialStudy: differentialStudy,
+              differentialModel: differentialModel,
+              differentialTest: differentialTest,
+              differentialProteinSite: differentialProteinSite,
             },
             false,
           );
-          const pepplotTestMeta = pepplotTestsMetadataVar.find(
-            test => test.testID === pepplotTest,
+          const differentialTestMeta = differentialTestsMetadataVar.find(
+            test => test.testID === differentialTest,
           );
-          const pepplotTestTooltip = pepplotTestMeta?.testDisplay || '';
+          const differentialTestTooltip =
+            differentialTestMeta?.testDisplay || '';
           this.setState({
-            pepplotTestTooltip,
-            uAnchorP: pepplotTest,
+            differentialTestTooltip,
+            uAnchorP: differentialTest,
           });
-          // if (pepplotProteinSite !== '') {
-          //   this.props.onGetPlot(pepplotProteinSite, true);
+          // if (differentialProteinSite !== '') {
+          //   this.props.onGetPlot(differentialProteinSite, true);
           // }
         }
       }
@@ -222,104 +234,106 @@ class PepplotSearchCriteria extends Component {
     onSearchCriteriaChange(
       {
         [name]: value,
-        pepplotModel: '',
-        pepplotTest: '',
+        differentialModel: '',
+        differentialTest: '',
       },
       true,
     );
     onSearchCriteriaReset({
-      isValidSearchPepplot: false,
+      isValidSearchDifferential: false,
     });
     this.setState({
-      pepplotStudyHrefVisible: true,
-      pepplotStudyHref: `http://www.localhost:3000/${value}.html`,
-      pepplotModelsDisabled: true,
-      pepplotTestsDisabled: true,
-      pepplotModelTooltip: '',
-      pepplotTestTooltip: '',
+      differentialStudyHrefVisible: true,
+      differentialStudyHref: `http://www.localhost:3000/${value}.html`,
+      differentialModelsDisabled: true,
+      differentialTestsDisabled: true,
+      differentialModelTooltip: '',
+      differentialTestTooltip: '',
     });
   };
 
   handleModelChange = (evt, { name, value }) => {
     const {
-      pepplotStudy,
+      differentialStudy,
       onSearchCriteriaChange,
       onSearchCriteriaReset,
-      pepplotModelsAndTests,
+      differentialModelsAndTests,
     } = this.props;
-    this.props.onHandlePlotTypesPepplot(value);
+    this.props.onHandlePlotTypesDifferential(value);
     onSearchCriteriaChange(
       {
-        pepplotStudy: pepplotStudy,
+        differentialStudy: differentialStudy,
         [name]: value,
-        pepplotTest: '',
+        differentialTest: '',
       },
       true,
     );
     onSearchCriteriaReset({
-      isValidSearchPepplot: false,
+      isValidSearchDifferential: false,
     });
-    const pepplotModelsAndTestsCopy = [...pepplotModelsAndTests];
-    const pepplotModelWithTests = pepplotModelsAndTestsCopy.find(
+    const differentialModelsAndTestsCopy = [...differentialModelsAndTests];
+    const differentialModelWithTests = differentialModelsAndTestsCopy.find(
       model => model.modelID === value,
     );
-    const pepplotModelTooltip = pepplotModelWithTests?.modelDisplay || '';
-    const pepplotTestsMetadataVar = pepplotModelWithTests?.tests || [];
-    const pepplotTestsMapped = pepplotTestsMetadataVar.map(test => {
+    const differentialModelTooltip =
+      differentialModelWithTests?.modelDisplay || '';
+    const differentialTestsMetadataVar =
+      differentialModelWithTests?.tests || [];
+    const differentialTestsMapped = differentialTestsMetadataVar.map(test => {
       return {
         key: test.testID,
         text: test.testID,
         value: test.testID,
       };
     });
-    const uDataP = pepplotTestsMetadataVar.map(t => t.testID);
+    const uDataP = differentialTestsMetadataVar.map(t => t.testID);
     this.setState({
-      pepplotTestsDisabled: false,
-      pepplotTests: pepplotTestsMapped,
+      differentialTestsDisabled: false,
+      differentialTests: differentialTestsMapped,
       uDataP: uDataP,
-      pepplotModelTooltip: pepplotModelTooltip,
-      pepplotTestTooltip: '',
+      differentialModelTooltip: differentialModelTooltip,
+      differentialTestTooltip: '',
     });
-    this.props.onSetTestsMetadata(pepplotTestsMetadataVar);
+    this.props.onSetTestsMetadata(differentialTestsMetadataVar);
   };
 
   handleTestChange = (evt, { name, value }) => {
     const {
-      pepplotStudy,
-      pepplotModel,
+      differentialStudy,
+      differentialModel,
       onMultisetQueried,
       onSearchCriteriaChange,
-      onSearchTransitionPepplot,
+      onSearchTransitionDifferential,
     } = this.props;
-    const pepplotTestMeta = this.props.pepplotTestsMetadata.find(
+    const differentialTestMeta = this.props.differentialTestsMetadata.find(
       test => test.testID === value,
     );
-    const pepplotTestTooltip = pepplotTestMeta?.testDisplay || '';
+    const differentialTestTooltip = differentialTestMeta?.testDisplay || '';
     this.setState({
-      pepplotTestTooltip: pepplotTestTooltip,
+      differentialTestTooltip: differentialTestTooltip,
       reloadPlotP: true,
       multisetFiltersVisibleP: false,
     });
     onMultisetQueried(false);
     onSearchCriteriaChange(
       {
-        pepplotStudy: pepplotStudy,
-        pepplotModel: pepplotModel,
+        differentialStudy: differentialStudy,
+        differentialModel: differentialModel,
         [name]: value,
       },
       true,
     );
-    onSearchTransitionPepplot(true);
+    onSearchTransitionDifferential(true);
     cancelRequestPSCGetResultsTable();
     let cancelToken = new CancelToken(e => {
       cancelRequestPSCGetResultsTable = e;
     });
     phosphoprotService
       .getResultsTable(
-        pepplotStudy,
-        pepplotModel,
+        differentialStudy,
+        differentialModel,
         value,
-        onSearchTransitionPepplot,
+        onSearchTransitionDifferential,
         cancelToken,
       )
       .then(getResultsTableData => {
@@ -334,9 +348,9 @@ class PepplotSearchCriteria extends Component {
     tableData,
     resetMultiset,
     handleMaxElements,
-    pepplotTest,
+    differentialTest,
   ) => {
-    const { onPepplotSearchUnfiltered, onPepplotSearch } = this.props;
+    const { onDifferentialSearch } = this.props;
     if (resetMultiset) {
       this.setState({
         uSettingsP: {
@@ -347,11 +361,10 @@ class PepplotSearchCriteria extends Component {
           maxElementsP: handleMaxElements ? tableData.length : undefined,
         },
         sigValueP: [0.05],
-        uAnchorP: pepplotTest,
+        uAnchorP: differentialTest,
       });
     }
-    onPepplotSearchUnfiltered({ pepplotResults: tableData });
-    onPepplotSearch({ pepplotResults: tableData });
+    onDifferentialSearch({ differentialResults: tableData });
   };
 
   handleMultisetToggle = () => {
@@ -381,9 +394,12 @@ class PepplotSearchCriteria extends Component {
           reloadPlotP: false,
         });
         this.props.onMultisetQueried(false);
-        const pepplotTestName = 'pepplotTest';
-        const pepplotTestVar = this.props.pepplotTest;
-        this.multisetTriggeredTestChange(pepplotTestName, pepplotTestVar);
+        const differentialTestName = 'differentialTest';
+        const differentialTestVar = this.props.differentialTest;
+        this.multisetTriggeredTestChange(
+          differentialTestName,
+          differentialTestVar,
+        );
       }
     };
   };
@@ -397,7 +413,7 @@ class PepplotSearchCriteria extends Component {
   };
 
   handleMultisetPCloseError = () => {
-    this.props.onSearchTransitionPepplot(false);
+    this.props.onSearchTransitionDifferential(false);
     this.setState(
       {
         multisetFiltersVisibleP: true,
@@ -410,28 +426,28 @@ class PepplotSearchCriteria extends Component {
 
   multisetTriggeredTestChange = (name, value) => {
     const {
-      pepplotStudy,
-      pepplotModel,
+      differentialStudy,
+      differentialModel,
       onSearchCriteriaChange,
-      onSearchTransitionPepplot,
+      onSearchTransitionDifferential,
     } = this.props;
     onSearchCriteriaChange(
       {
-        pepplotStudy: pepplotStudy,
-        pepplotModel: pepplotModel,
+        differentialStudy: differentialStudy,
+        differentialModel: differentialModel,
         [name]: value,
       },
       true,
     );
-    onSearchTransitionPepplot(true);
+    onSearchTransitionDifferential(true);
     cancelRequestPSCGetResultsTable();
     let cancelToken = new CancelToken(e => {
       cancelRequestPSCGetResultsTable = e;
     });
     phosphoprotService
       .getResultsTable(
-        pepplotStudy,
-        pepplotModel,
+        differentialStudy,
+        differentialModel,
         value,
         this.handleMultisetPCloseError,
         cancelToken,
@@ -449,8 +465,8 @@ class PepplotSearchCriteria extends Component {
       });
   };
 
-  addFilterPepplot = () => {
-    // this.setState({ loadingPepplotMultisetFilters: true });
+  addFilterDifferential = () => {
+    // this.setState({ loadingDifferentialMultisetFilters: true });
     // const uSetVP = _.cloneDeep(this.state.uSettingsP);
     const uSetVP = { ...this.state.uSettingsP };
     uSetVP.indexFiltersP = [...this.state.uSettingsP.indexFiltersP].concat(
@@ -470,8 +486,8 @@ class PepplotSearchCriteria extends Component {
     });
   };
 
-  removeFilterPepplot = index => {
-    // this.setState({ loadingPepplotMultisetFilters: true });
+  removeFilterDifferential = index => {
+    // this.setState({ loadingDifferentialMultisetFilters: true });
     const uSetVP = { ...this.state.uSettingsP };
     uSetVP.indexFiltersP = [...uSetVP.indexFiltersP]
       .slice(0, index)
@@ -544,10 +560,10 @@ class PepplotSearchCriteria extends Component {
 
   updateQueryDataP = () => {
     const {
-      pepplotStudy,
-      pepplotModel,
-      pepplotTest,
-      onPepplotSearch,
+      differentialStudy,
+      differentialModel,
+      differentialTest,
+      onDifferentialSearch,
       onDisablePlot,
     } = this.props;
     const {
@@ -555,16 +571,16 @@ class PepplotSearchCriteria extends Component {
       reloadPlotP,
       sigValueP,
       selectedColP,
-      pepplotTests,
+      differentialTests,
     } = this.state;
     const eMustP = this.state.uSettingsP.mustP;
     const eNotP = this.state.uSettingsP.notP;
-    if (reloadPlotP === true && pepplotTests.length > 1) {
+    if (reloadPlotP === true && differentialTests.length > 1) {
       onDisablePlot();
       this.getMultisetPlot(
         sigValueP,
-        pepplotModel,
-        pepplotStudy,
+        differentialModel,
+        differentialStudy,
         this.jsonToList(selectedOperatorP),
         this.jsonToList(selectedColP),
       );
@@ -575,9 +591,9 @@ class PepplotSearchCriteria extends Component {
     });
     phosphoprotService
       .getResultsIntersection(
-        pepplotStudy,
-        pepplotModel,
-        pepplotTest,
+        differentialStudy,
+        differentialModel,
+        differentialTest,
         eMustP,
         eNotP,
         sigValueP,
@@ -598,10 +614,10 @@ class PepplotSearchCriteria extends Component {
           },
           activateMultisetFiltersP: true,
           reloadPlotP: false,
-          // loadingPepplotMultisetFilters: false,
+          // loadingDifferentialMultisetFilters: false,
         });
-        onPepplotSearch({
-          pepplotResults: multisetResultsP,
+        onDifferentialSearch({
+          differentialResults: multisetResultsP,
         });
       })
       .catch(error => {
@@ -617,7 +633,13 @@ class PepplotSearchCriteria extends Component {
     return valueList;
   }
 
-  getMultisetPlot(sigVal, pepplotModel, pepplotStudy, eOperatorP, eColP) {
+  getMultisetPlot(
+    sigVal,
+    differentialModel,
+    differentialStudy,
+    eOperatorP,
+    eColP,
+  ) {
     cancelRequestInferenceMultisetPlot();
     let cancelToken = new CancelToken(e => {
       cancelRequestInferenceMultisetPlot = e;
@@ -626,8 +648,8 @@ class PepplotSearchCriteria extends Component {
     let widthCalculation = this.calculateWidth;
     phosphoprotService
       .getResultsUpset(
-        pepplotStudy,
-        pepplotModel,
+        differentialStudy,
+        differentialModel,
         sigVal,
         eOperatorP,
         eColP,
@@ -672,25 +694,25 @@ class PepplotSearchCriteria extends Component {
 
   render() {
     const {
-      pepplotStudies,
-      pepplotStudyHref,
-      pepplotStudyHrefVisible,
-      pepplotModels,
-      pepplotModelTooltip,
-      pepplotTests,
-      pepplotTestTooltip,
-      pepplotStudiesDisabled,
-      pepplotModelsDisabled,
-      pepplotTestsDisabled,
+      differentialStudies,
+      differentialStudyHref,
+      differentialStudyHrefVisible,
+      differentialModels,
+      differentialModelTooltip,
+      differentialTests,
+      differentialTestTooltip,
+      differentialStudiesDisabled,
+      differentialModelsDisabled,
+      differentialTestsDisabled,
       multisetFiltersVisibleP,
       activateMultisetFiltersP,
     } = this.state;
 
     const {
-      pepplotStudy,
-      pepplotModel,
-      pepplotTest,
-      isValidSearchPepplot,
+      differentialStudy,
+      differentialModel,
+      differentialTest,
+      isValidSearchDifferential,
       multisetPlotAvailable,
       plotButtonActive,
     } = this.props;
@@ -704,16 +726,16 @@ class PepplotSearchCriteria extends Component {
     };
 
     let studyIcon;
-    let studyName = `${pepplotStudy} Analysis Details`;
+    let studyName = `${differentialStudy} Analysis Details`;
 
-    if (pepplotStudyHrefVisible) {
+    if (differentialStudyHrefVisible) {
       studyIcon = (
         <Popup
           trigger={
             <a
               target="_blank"
               rel="noopener noreferrer"
-              href={pepplotStudyHref}
+              href={differentialStudyHref}
             >
               <Icon
                 name="line graph"
@@ -756,19 +778,19 @@ class PepplotSearchCriteria extends Component {
 
     let PMultisetFilters;
     if (
-      isValidSearchPepplot &&
+      isValidSearchDifferential &&
       activateMultisetFiltersP &&
       multisetFiltersVisibleP
     ) {
       PMultisetFilters = (
-        <PepplotMultisetFilters
+        <DifferentialMultisetFilters
           {...this.props}
           {...this.state}
           onHandleDropdownChange={this.handleDropdownChange}
           onHandleSigValuePInputChange={this.handleSigValuePInputChange}
           onHandleSetChange={this.handleSetChange}
-          onAddFilterPepplot={this.addFilterPepplot}
-          onRemoveFilterPepplot={this.removeFilterPepplot}
+          onAddFilterDifferential={this.addFilterDifferential}
+          onRemoveFilterDifferential={this.removeFilterDifferential}
           onChangeHoveredFilter={this.changeHoveredFilter}
         />
       );
@@ -777,7 +799,7 @@ class PepplotSearchCriteria extends Component {
     let PlotRadio;
     let MultisetRadio;
 
-    if (isValidSearchPepplot) {
+    if (isValidSearchDifferential) {
       PlotRadio = (
         <Transition
           visible={!multisetPlotAvailable}
@@ -813,12 +835,12 @@ class PepplotSearchCriteria extends Component {
         <Form className="SearchCriteriaContainer">
           <Form.Field
             control={Select}
-            name="pepplotStudy"
-            value={pepplotStudy}
-            options={pepplotStudies}
+            name="differentialStudy"
+            value={differentialStudy}
+            options={differentialStudies}
             placeholder="Select A Study"
             onChange={this.handleStudyChange}
-            disabled={pepplotStudiesDisabled}
+            disabled={differentialStudiesDisabled}
             label={{
               children: 'Study',
               htmlFor: 'form-select-control-pstudy',
@@ -834,12 +856,12 @@ class PepplotSearchCriteria extends Component {
             trigger={
               <Form.Field
                 control={Select}
-                name="pepplotModel"
-                value={pepplotModel}
-                options={pepplotModels}
+                name="differentialModel"
+                value={differentialModel}
+                options={differentialModels}
                 placeholder="Select Model"
                 onChange={this.handleModelChange}
-                disabled={pepplotModelsDisabled}
+                disabled={differentialModelsDisabled}
                 label={{
                   children: 'Model',
                   htmlFor: 'form-select-control-pmodel',
@@ -851,11 +873,11 @@ class PepplotSearchCriteria extends Component {
               />
             }
             style={StudyPopupStyle}
-            disabled={pepplotModelTooltip === ''}
+            disabled={differentialModelTooltip === ''}
             className="CustomTooltip"
             inverted
             position="bottom right"
-            content={pepplotModelTooltip}
+            content={differentialModelTooltip}
             mouseEnterDelay={1000}
             mouseLeaveDelay={0}
           />
@@ -863,12 +885,12 @@ class PepplotSearchCriteria extends Component {
             trigger={
               <Form.Field
                 control={Select}
-                name="pepplotTest"
-                value={pepplotTest}
-                options={pepplotTests}
+                name="differentialTest"
+                value={differentialTest}
+                options={differentialTests}
                 placeholder="Select Test"
                 onChange={this.handleTestChange}
-                disabled={pepplotTestsDisabled}
+                disabled={differentialTestsDisabled}
                 label={{
                   children: 'Test',
                   htmlFor: 'form-select-control-ptest',
@@ -880,11 +902,11 @@ class PepplotSearchCriteria extends Component {
               />
             }
             style={StudyPopupStyle}
-            disabled={pepplotTestTooltip === ''}
+            disabled={differentialTestTooltip === ''}
             className="CustomTooltip"
             inverted
             position="bottom right"
-            content={pepplotTestTooltip}
+            content={differentialTestTooltip}
             mouseEnterDelay={1000}
             mouseLeaveDelay={0}
           />
@@ -901,4 +923,4 @@ class PepplotSearchCriteria extends Component {
   }
 }
 
-export default withRouter(PepplotSearchCriteria);
+export default withRouter(DifferentialSearchCriteria);

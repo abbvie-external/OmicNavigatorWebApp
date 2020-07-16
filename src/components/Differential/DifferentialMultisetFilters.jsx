@@ -5,7 +5,7 @@ import * as d3 from 'd3';
 // import NumericExponentialInput from '../Shared/NumericExponentialInput';
 import '../Shared/MultisetFilters.scss';
 
-class PepplotMultisetFilters extends Component {
+class DifferentialMultisetFilters extends Component {
   // state = {
   //   sigValuePLocal: [0.05],
   // };
@@ -830,11 +830,11 @@ class PepplotMultisetFilters extends Component {
   // }, 1250);
 
   addFilter = () => {
-    this.props.onAddFilterPepplot();
+    this.props.onAddFilterDifferential();
   };
 
   removeFilter = index => {
-    this.props.onRemoveFilterPepplot(index);
+    this.props.onRemoveFilterDifferential(index);
   };
 
   changeHoveredFilter = index => {
@@ -849,7 +849,7 @@ class PepplotMultisetFilters extends Component {
       selectedColP,
       uSettingsP,
       thresholdColsP,
-      // loadingPepplotMultisetFilters,
+      // loadingDifferentialMultisetFilters,
     } = this.props;
     const OperatorsP = uSettingsP.thresholdOperatorP;
     const indexFiltersP = uSettingsP.indexFiltersP;
@@ -866,12 +866,12 @@ class PepplotMultisetFilters extends Component {
           <ul style={{ padding: '0px' }}>
             {indexFiltersP.map(index => (
               <Form.Group
-                key={`pepplotMultiSetFiltersRow${index}`}
+                key={`differentialMultiSetFiltersRow${index}`}
                 onMouseEnter={() => this.changeHoveredFilter(index)}
                 onMouseLeave={() => this.changeHoveredFilter(-1)}
               >
                 <Form.Field
-                  key={`pepplotMultiSetFiltersColumn${index}`}
+                  key={`differentialMultiSetFiltersColumn${index}`}
                   control={Select}
                   label={index === 0 ? 'Column' : ''}
                   name="selectedColP"
@@ -885,7 +885,7 @@ class PepplotMultisetFilters extends Component {
                 ></Form.Field>
                 {hoveredFilter === index && indexFiltersP.length !== 1 && (
                   <Button
-                    // disabled={loadingPepplotMultisetFilters}
+                    // disabled={loadingDifferentialMultisetFilters}
                     circular
                     icon
                     style={{
@@ -900,7 +900,7 @@ class PepplotMultisetFilters extends Component {
                   </Button>
                 )}
                 <Form.Field
-                  key={`pepplotMultiSetFiltersOperator${index}`}
+                  key={`differentialMultiSetFiltersOperator${index}`}
                   control={Select}
                   label={index === 0 ? 'Operator' : ''}
                   name="selectedOperatorP"
@@ -928,11 +928,11 @@ class PepplotMultisetFilters extends Component {
                 {/* <Form.Field
                   width={4}
                   id="SignificantValueInputMultisetP"
-                  key={`pepplotMultiSetFiltersSignificance${index}`}
+                  key={`differentialMultiSetFiltersSignificance${index}`}
                 >
                   <label>{index === 0 ? 'Significance' : ''}</label>
                   <NumericExponentialInput
-                    key={`pepplotMultiSetFiltersInput${index}`}
+                    key={`differentialMultiSetFiltersInput${index}`}
                     onChange={callbackFactory(index)}
                     min={0}
                     name="sigValueP"
@@ -950,8 +950,8 @@ class PepplotMultisetFilters extends Component {
             size="mini"
             icon
             onClick={this.addFilter}
-            // onClick={this.props.onAddFilterPepplot}
-            // disabled={loadingPepplotMultisetFilters}
+            // onClick={this.props.onAddFilterDifferential}
+            // disabled={loadingDifferentialMultisetFilters}
           >
             <Icon name="plus circle" color={'green'} />
           </Button>
@@ -962,4 +962,4 @@ class PepplotMultisetFilters extends Component {
   }
 }
 
-export default PepplotMultisetFilters;
+export default DifferentialMultisetFilters;

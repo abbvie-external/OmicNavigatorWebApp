@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Popup } from 'semantic-ui-react';
-import _ from 'lodash';
+// import _ from 'lodash';
 import { formatNumberForDisplay, splitValue } from '../Shared/helpers';
 import './MetafeaturesTable.scss';
 // import { CancelToken } from 'axios';
@@ -32,7 +32,13 @@ class MetafeaturesTable extends Component {
     this.getMetafeaturesTableConfigCols(this.props.metafeaturesData);
   }
 
-  componentDidUpdate = (prevProps, prevState) => {};
+  componentDidUpdate = (prevProps, prevState) => {
+    // if (this.props.metafeaturesData !== prevProps.metafeaturesData) {
+    //   this.setState({
+    //     metafeaturesTableData: this.props.metafeaturesTableData
+    //   })
+    // }
+  };
 
   getMetafeaturesTableConfigCols = data => {
     let configCols = [];
@@ -133,17 +139,16 @@ class MetafeaturesTable extends Component {
       <div className="MetafeaturesTableDiv">
         <EZGrid
           ref={this.metafeaturesGridRef}
-          // uniqueCacheKey={pepplotCacheKey}
           data={metafeaturesTableData}
           columnsConfig={metafeaturesTableConfigCols}
           totalRows={15}
-          // use "pepplotRows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
+          // use "differentialRows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
           itemsPerPage={itemsPerPageMetafeaturesTable}
           // onInformItemsPerPage={this.informItemsPerPage}
           exportBaseName="metaFeatures"
           // quickViews={quickViews}
           disableGeneralSearch
-          disableGrouping
+          // disableGrouping
           // disableSort
           disableColumnVisibilityToggle
           // disableFilters={false}

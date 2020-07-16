@@ -11,7 +11,7 @@ import SVGPlot from '../Shared/SVGPlot';
 import BarcodePlotReact from './BarcodePlotReact';
 // import BarcodePlotReusable from "./BarcodePlotReusable";
 import ViolinPlot from './ViolinPlot';
-import FilteredPepplotTable from './FilteredPepplotTable';
+import FilteredDifferentialTable from './FilteredDifferentialTable';
 
 class SplitPanesContainer extends Component {
   state = {
@@ -129,7 +129,7 @@ class SplitPanesContainer extends Component {
             className="TableResultsTab"
             // as="div"
           >
-            <FilteredPepplotTable {...this.state} {...this.props} />
+            <FilteredDifferentialTable {...this.state} {...this.props} />
           </Tab.Pane>
         ),
       },
@@ -146,7 +146,7 @@ class SplitPanesContainer extends Component {
             className="TableResultsTab"
             // as="div"
           >
-            <FilteredPepplotTable {...this.state} {...this.props} />
+            <FilteredDifferentialTable {...this.state} {...this.props} />
           </Tab.Pane>
         ),
       },

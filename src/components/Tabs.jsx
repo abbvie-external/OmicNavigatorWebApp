@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { Tab, Menu } from 'semantic-ui-react';
 import { phosphoprotService } from '../services/phosphoprot.service';
-import Pepplot from './Pepplot/Pepplot';
+import Differential from './Differential/Differential';
 import omicAnalyzerIcon from '../resources/icon.png';
 
 import Enrichment from './Enrichment/Enrichment';
@@ -39,15 +39,15 @@ class Tabs extends Component {
       enrichmentDescriptionAndTest: isEnrichment
         ? decodedSiteAndDescription
         : '',
-      pepplotStudy: !isEnrichment ? decodedStudy : '',
-      pepplotModel: !isEnrichment ? decodedModel : '',
-      pepplotTest: !isEnrichment ? decodedTest : '',
-      pepplotProteinSite: !isEnrichment ? decodedSiteAndDescription : '',
+      differentialStudy: !isEnrichment ? decodedStudy : '',
+      differentialModel: !isEnrichment ? decodedModel : '',
+      differentialTest: !isEnrichment ? decodedTest : '',
+      differentialProteinSite: !isEnrichment ? decodedSiteAndDescription : '',
       pValueType: 'nominal',
       proteinToHighlightInDiffTable: isEnrichment ? false : '',
       allStudiesMetadata: [],
-      pepplotFeatureIdKey: '',
-      filteredPepplotFeatureIdKey: '',
+      differentialFeatureIdKey: '',
+      filteredDifferentialFeatureIdKey: '',
     };
   }
 
@@ -77,7 +77,7 @@ class Tabs extends Component {
   };
 
   handleTabChange = (e, { activeIndex }) => {
-    let newTab = activeIndex === 3 ? 'pepplot' : 'enrichment';
+    let newTab = activeIndex === 3 ? 'differential' : 'enrichment';
     this.setState({
       tab: newTab,
     });
@@ -93,13 +93,13 @@ class Tabs extends Component {
   };
 
   handleSearchCriteriaToTop = (changes, tab) => {
-    if (tab === 'pepplot') {
+    if (tab === 'differential') {
       this.setState({
-        tab: 'pepplot',
-        pepplotStudy: changes.pepplotStudy || '',
-        pepplotModel: changes.pepplotModel || '',
-        pepplotTest: changes.pepplotTest || '',
-        pepplotProteinSite: changes.pepplotProteinSite || '',
+        tab: 'differential',
+        differentialStudy: changes.differentialStudy || '',
+        differentialModel: changes.differentialModel || '',
+        differentialTest: changes.differentialTest || '',
+        differentialProteinSite: changes.differentialProteinSite || '',
         proteinHighlightInProgress: false,
       });
     } else if (tab === 'enrichment') {
@@ -123,7 +123,7 @@ class Tabs extends Component {
       tab,
     );
   };
-  handlePepplotFeatureIdKey = (name, id) => {
+  handleDifferentialFeatureIdKey = (name, id) => {
     this.setState({
       [name]: id,
     });
@@ -131,17 +131,17 @@ class Tabs extends Component {
   handleViewDiffTable = (test, protein) => {
     this.setState({
       activeIndex: 1,
-      tab: 'pepplot',
-      pepplotStudy: this.state.enrichmentStudy || '',
-      pepplotModel: this.state.enrichmentModel || '',
-      pepplotTest: test || '',
+      tab: 'differential',
+      differentialStudy: this.state.enrichmentStudy || '',
+      differentialModel: this.state.enrichmentModel || '',
+      differentialTest: test || '',
       proteinToHighlightInDiffTable: protein,
       proteinHighlightInProgress: true,
     });
     let changes = {
-      pepplotStudy: this.state.enrichmentStudy || '',
-      pepplotModel: this.state.enrichmentModel || '',
-      pepplotTest: test || '',
+      differentialStudy: this.state.enrichmentStudy || '',
+      differentialModel: this.state.enrichmentModel || '',
+      differentialTest: test || '',
     };
     updateUrl(
       this.props,
@@ -150,7 +150,7 @@ class Tabs extends Component {
       'tabChange',
       this.setTabIndex,
       true,
-      'pepplot',
+      'differential',
     );
   };
 
@@ -189,11 +189,13 @@ class Tabs extends Component {
         menuItem: 'Differential Analysis',
         pane: (
           <Tab.Pane key="2" className="">
-            <Pepplot
+            <Differential
               {...this.props}
               {...this.state}
               onSearchCriteriaToTop={this.handleSearchCriteriaToTop}
-              onHandlePepplotFeatureIdKey={this.handlePepplotFeatureIdKey}
+              onHandleDifferentialFeatureIdKey={
+                this.handleDifferentialFeatureIdKey
+              }
             />
           </Tab.Pane>
         ),
@@ -208,7 +210,9 @@ class Tabs extends Component {
               onSearchCriteriaToTop={this.handleSearchCriteriaToTop}
               onPValueTypeChange={this.handlePValueTypeChange}
               onViewDiffTable={this.handleViewDiffTable}
-              onHandlePepplotFeatureIdKey={this.handlePepplotFeatureIdKey}
+              onHandleDifferentialFeatureIdKey={
+                this.handleDifferentialFeatureIdKey
+              }
             />
           </Tab.Pane>
         ),

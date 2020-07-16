@@ -86,8 +86,8 @@ class SVGPlot extends Component {
   getButtonActionsClass = () => {
     // if (
     // this.props.activeIndex === 1 &&
-    // this.props.activeIndexPepplotView === 0
-    // this.props.tab === 'pepplot'
+    // this.props.activeIndexDifferentialView === 0
+    // this.props.tab === 'differential'
     // ) {
     // return 'export-svg Hide';
     // } else {
