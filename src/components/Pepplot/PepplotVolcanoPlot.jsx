@@ -78,11 +78,7 @@ class PepplotVolcanoPlot extends Component {
           e.target.attributes['cy'].value,
         ],
       };
-      const circle = d3
-        .selectAll('circle.volcanoPlot-dataPoint')
-        .filter(function() {
-          return d3.select(this).attr('id') === e.target.attributes['id'].value;
-        });
+      const circle = d3.select(`#volcanoDataPoint-${e.target.attributes['circleid'].value}`);
       circle.classed('hovered', true);
       this.setState({
         hoveredCircleData: hoveredData,
