@@ -234,7 +234,6 @@ class Differential extends Component {
   };
   getProteinData = (id, dataItem, getPlotCb, imageInfo) => {
     const { differentialFeatureIdKey } = this.props;
-    debugger;
     this.setState(
       {
         imageInfo: imageInfo,
@@ -632,7 +631,6 @@ class Differential extends Component {
       let imageInfo = { key: '', title: '', svg: [] };
       imageInfo.title = `Protein Intensity - ${alphanumericTrigger} ${differentialProteinSite}`;
       imageInfo.key = `${alphanumericTrigger} ${differentialProteinSite}`;
-      debugger;
       this.setState({
         imageInfo: imageInfo,
         differentialResultsMounted: false,
@@ -770,7 +768,6 @@ class Differential extends Component {
   }
 
   getView = () => {
-    debugger;
     if (this.state.isItemSelected && !this.state.isProteinSVGLoaded) {
       return <LoaderActivePlots />;
     } else if (this.state.isSearchingDifferential) {

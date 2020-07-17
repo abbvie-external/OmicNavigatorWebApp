@@ -302,16 +302,12 @@ class EnrichmentResultsGraph extends Component {
   };
 
   actuallyHandleNodeCutoffInputChange = _.debounce(value => {
-    if (!this.props.multisetFiltersVisible) {
-      this.props.onHandleNodeCutoffInputChange(value);
-    }
+    this.props.onHandleNodeCutoffInputChange(value);
   }, 1250);
 
   actuallyHandleNodeCutoffSliderChange = value => {
-    if (!this.props.multisetFiltersVisible) {
-      let decimalValue = value / 100;
-      this.props.onHandleNodeCutoffSliderChange(decimalValue);
-    }
+    let decimalValue = value / 100;
+    this.props.onHandleNodeCutoffSliderChange(decimalValue);
   };
 
   handleNodeCutoffSliderChange = value => {
@@ -494,8 +490,8 @@ class EnrichmentResultsGraph extends Component {
       totalNodes,
       totalLinks,
       legendIsOpen,
-      multisetFiltersVisible,
-      networkSigValue,
+      // multisetFiltersVisible,
+      // networkSigValue,
     } = this.props;
 
     if (!networkDataLoaded) {
@@ -645,37 +641,22 @@ class EnrichmentResultsGraph extends Component {
                   min={0}
                   max={1}
                   defaultValue={parseFloat(nodeCutoffLocal)}
-                  disabled={!networkGraphReady || multisetFiltersVisible}
-                  value={
-                    !multisetFiltersVisible
-                      ? parseFloat(nodeCutoffLocal)
-                      : parseFloat(networkSigValue)
-                  }
+                  disabled={!networkGraphReady}
+                  value={parseFloat(nodeCutoffLocal)}
                   spellcheck="false"
                 />
               </div>
-              <div
-                // className={
-                //   multisetFiltersVisible
-                //     ? 'NetworkSliderDiv Hide'
-                //     : 'NetworkSliderDiv Show'
-                // }
-                className="NetworkSliderDiv"
-              >
+              <div className="NetworkSliderDiv">
                 <StyledSlider
                   renderTrack={NodeTrack}
                   renderThumb={NodeThumb}
-                  disabled={!networkGraphReady || multisetFiltersVisible}
+                  disabled={!networkGraphReady}
                   className={
                     networkGraphReady
                       ? 'NetworkSlider Show'
                       : 'NetworkSlider Hide'
                   }
-                  value={
-                    !multisetFiltersVisible
-                      ? nodeCutoffLocal * 100
-                      : networkSigValue * 100
-                  }
+                  value={nodeCutoffLocal * 100}
                   name="nodeCutoffSlider"
                   min={0}
                   max={100}
