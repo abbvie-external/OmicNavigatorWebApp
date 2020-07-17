@@ -137,6 +137,16 @@ class Differential extends Component {
 
   handleDifferentialSearch = searchResults => {
     let columns = [];
+    // need this check for page refresh
+    if (this.props.differentialProteinSite !== '') {
+      this.setState({
+        isItemSelected: true,
+      });
+    } else {
+      this.setState({
+        isItemSelected: false,
+      });
+    }
     if (searchResults.differentialResults?.length > 0) {
       columns = this.getConfigCols(searchResults);
     }
@@ -151,7 +161,6 @@ class Differential extends Component {
       differentialColumns: columns,
       isSearchingDifferential: false,
       isValidSearchDifferential: true,
-      isItemSelected: false,
       differentialResultsMounted: false,
       plotButtonActive: false,
       visible: false,
@@ -225,6 +234,7 @@ class Differential extends Component {
   };
   getProteinData = (id, dataItem, getPlotCb, imageInfo) => {
     const { differentialFeatureIdKey } = this.props;
+    debugger;
     this.setState(
       {
         imageInfo: imageInfo,
@@ -581,7 +591,7 @@ class Differential extends Component {
       differentialResultsMounted: false,
       isItemSelected: false,
       // isProteinDataLoaded: false,
-      isProteinSVGLoaded: true,
+      isProteinSVGLoaded: false,
     });
     this.handleSearchCriteriaChange(
       {
@@ -618,6 +628,21 @@ class Differential extends Component {
       }
     }
     const alphanumericTrigger = differentialAlphanumericFields[0];
+    if (differentialProteinSite !== '') {
+      let imageInfo = { key: '', title: '', svg: [] };
+      imageInfo.title = `Protein Intensity - ${alphanumericTrigger} ${differentialProteinSite}`;
+      imageInfo.key = `${alphanumericTrigger} ${differentialProteinSite}`;
+      debugger;
+      this.setState({
+        imageInfo: imageInfo,
+        differentialResultsMounted: false,
+        isItemSelected: true,
+        isProteinSVGLoaded: false,
+        // isProteinDataLoaded: false,
+        currentSVGs: [],
+      });
+      this.getPlot(differentialProteinSite, false);
+    }
     this.props.onHandleDifferentialFeatureIdKey(
       'differentialFeatureIdKey',
       alphanumericTrigger,
@@ -730,23 +755,6 @@ class Differential extends Component {
     const configCols = differentialAlphanumericColumnsMapped.concat(
       differentialNumericColumnsMapped,
     );
-    if (differentialProteinSite !== '') {
-      let imageInfo = { key: '', title: '', svg: [] };
-      imageInfo.title = `Protein Intensity - ${alphanumericTrigger} ${differentialProteinSite}`;
-      imageInfo.key = `${alphanumericTrigger} ${differentialProteinSite}`;
-      this.setState({
-        imageInfo: imageInfo,
-        differentialResultsMounted: false,
-        isItemSelected: true,
-        isProteinSVGLoaded: false,
-        // isProteinDataLoaded: false,
-        // treeDataRaw: [],
-        // treeData: [],
-        // treeDataColumns: [],
-        currentSVGs: [],
-      });
-      this.getPlot(differentialProteinSite, false);
-    }
     return configCols;
   };
   listToJson(list) {
@@ -762,6 +770,7 @@ class Differential extends Component {
   }
 
   getView = () => {
+    debugger;
     if (this.state.isItemSelected && !this.state.isProteinSVGLoaded) {
       return <LoaderActivePlots />;
     } else if (this.state.isSearchingDifferential) {
@@ -777,8 +786,8 @@ class Differential extends Component {
       );
     } else if (
       this.state.isValidSearchDifferential &&
-      !this.state.isItemSelected &&
-      !this.state.isSearchingDifferential
+      !this.state.isSearchingDifferential &&
+      !this.state.isItemSelected
     ) {
       const TableAndPlotPanes = this.getTableAndPlotPanes();
       return (

@@ -1624,6 +1624,8 @@ class Enrichment extends Component {
           <SearchingAlt />
         </div>
       );
+    } else if (this.state.isSearchingEnrichment) {
+      return <TransitionActive />;
     } else if (this.state.isTestSelected && this.state.isTestDataLoaded) {
       return (
         <div>
@@ -1661,8 +1663,6 @@ class Enrichment extends Component {
           }}
         />
       );
-    } else if (this.state.isSearchingEnrichment) {
-      return <TransitionActive />;
     } else return <TransitionStill />;
   };
 

@@ -309,7 +309,6 @@ class DifferentialVolcano extends Component {
       differentialColumns,
       differentialResultsMounted,
     } = this.props;
-
     if (differentialResultsMounted) {
       const xAxisTransformBox = allowXTransformation ? (
         <span title="-log10 Transform">
@@ -332,6 +331,7 @@ class DifferentialVolcano extends Component {
         </span>
       ) : null;
       const svgPlot = this.getSVGPlot();
+
       return (
         <Grid className="VolcanoPlotGridContainer">
           <Grid.Row className="VolcanoPlotAxisSelectorsRow">
@@ -432,6 +432,7 @@ class DifferentialVolcano extends Component {
         </Grid>
       );
     } else {
+      debugger;
       return (
         <div>
           <Dimmer active inverted>

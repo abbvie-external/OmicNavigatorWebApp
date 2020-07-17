@@ -616,14 +616,27 @@ class EnrichmentResultsGraph extends Component {
                     </Label>
                   }
                   style={CustomPopupStyle}
-                  content="Nodes with statistics (typically p values or multiple testing adjusted versions of p values) greater than the cutoff value are removed. The statistic used is dependent on the currently chosen setting."
                   inverted
                   basic
                   on={['hover', 'click']}
                   position="left center"
                   mouseEnterDelay={1000}
                   mouseLeaveDelay={0}
-                />
+                >
+                  <Popup.Content>
+                    <p>
+                      Database terms appear as nodes if
+                      <strong>
+                        <i> any </i>
+                      </strong>
+                      enrichment test returns a statistic (typically p values or
+                      multiple testing adjusted versions of p values) below the
+                      cutoff value. The statistic used depends on the currently
+                      chosen setting. The tests used depends on the test filter
+                      selection.
+                    </p>
+                  </Popup.Content>
+                </Popup>
                 <NumericExponentialInput
                   onChange={number => {
                     this.handleNodeCutoffInputChange(number);
