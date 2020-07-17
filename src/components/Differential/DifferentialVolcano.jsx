@@ -432,7 +432,6 @@ class DifferentialVolcano extends Component {
         </Grid>
       );
     } else {
-      debugger;
       return (
         <div>
           <Dimmer active inverted>

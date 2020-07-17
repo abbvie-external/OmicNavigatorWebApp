@@ -137,12 +137,7 @@ class NetworkGraph extends Component {
       pValueType,
       linkType,
       linkCutoff,
-      networkOperator,
-      multisetFiltersVisible,
-      networkSigValue,
       nodeCutoff,
-      networkTestsMust,
-      networkTestsNot,
     } = this.props;
     const self = this;
     this.removeNetworkSVG();
@@ -201,65 +196,18 @@ class NetworkGraph extends Component {
           return Math.min(...facets.map(f => f.value).filter(v => v != null));
         } else return facets[0].value;
       }
-      function getNodeHighestSignificantValue(facets) {
-        if (facets.length > 1) {
-          return Math.max(...facets.map(f => f.value).filter(v => v != null));
-        } else return facets[0].value;
-      }
       formattedNodes.forEach(node => {
         const lowestTestValueInNode = getNodeLowestSignificantValue(
           node.facets,
         );
         node.lowestValue = lowestTestValueInNode;
       });
-      formattedNodes.forEach(node => {
-        const highestTestValueInNode = getNodeHighestSignificantValue(
-          node.facets,
-        );
-        node.highestValue = highestTestValueInNode;
-      });
-      const dynamicNodeCutoff = multisetFiltersVisible
-        ? networkSigValue
-        : nodeCutoff;
       let filteredNodes = [];
       let mostSignificantTestValue = 0;
-      // multiset is not on
-      if (!multisetFiltersVisible) {
-        filteredNodes = formattedNodes.filter(
-          n => n.lowestValue <= dynamicNodeCutoff,
-        );
-        mostSignificantTestValue = Math.min(
-          ...filteredNodes.map(f => f.lowestValue).filter(v => v != null),
-        );
-      } else {
-        /// multiset is on
-        if (
-          multisetFiltersVisible &&
-          networkTestsMust.length === 0 &&
-          networkTestsNot.length === 0
-        ) {
-          // multiset on, but no tests
-          filteredNodes = formattedNodes;
-          mostSignificantTestValue = Math.min(
-            ...filteredNodes.map(f => f.lowestValue).filter(v => v != null),
-          );
-        } else {
-          // multiset on, with tests
-          if (networkOperator === '<') {
-            filteredNodes = formattedNodes.filter(
-              n => n.lowestValue <= dynamicNodeCutoff,
-            );
-          }
-          if (networkOperator === '>') {
-            filteredNodes = formattedNodes.filter(
-              n => n.highestValue >= dynamicNodeCutoff,
-            );
-          }
-          mostSignificantTestValue = Math.min(
-            ...filteredNodes.map(f => f.lowestValue).filter(v => v != null),
-          );
-        }
-      }
+      filteredNodes = formattedNodes.filter(n => n.lowestValue <= nodeCutoff);
+      mostSignificantTestValue = Math.min(
+        ...filteredNodes.map(f => f.lowestValue).filter(v => v != null),
+      );
       let filteredLinks = formattedLinks.filter(function(l) {
         let jaccardTotal = linkType * l.jaccard;
         let overlapValue = 1 - linkType;
