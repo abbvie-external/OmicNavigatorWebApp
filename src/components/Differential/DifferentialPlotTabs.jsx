@@ -64,7 +64,7 @@ class SVGPlot extends Component {
       // const svgArrayReversed = svgArray.reverse();
       const svgPanes = svgArray.map(s => {
         return {
-          menuItem: `${s.plotType.plotID}`,
+          menuItem: `${s.plotType.plotDisplay}`,
           render: () => (
             <Tab.Pane attached="true" as="div">
               <div
