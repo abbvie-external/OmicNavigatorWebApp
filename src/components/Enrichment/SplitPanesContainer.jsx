@@ -212,20 +212,6 @@ class SplitPanesContainer extends Component {
     }
   };
 
-  // splitPaneResized = _.debounce((size, paneType) => {
-  //   if (paneType === 'horizontal') {
-  //     this.setState({
-  //       horizontalSplitPaneSize: size,
-  //     });
-  //   } else {
-  //     this.setState({
-  //       verticalSplitPaneSize: size,
-  //     });
-  //   }
-  //   sessionStorage.setItem(`${paneType}SplitPaneSize`, size);
-  //   this.props.onSplitPanesSVGSizeChange(this.props.enrichmentFeatureID);
-  // }, 1000);
-
   splitPaneResized = (size, paneType) => {
     if (paneType === 'horizontal') {
       this.setState({
@@ -237,7 +223,6 @@ class SplitPanesContainer extends Component {
       });
     }
     sessionStorage.setItem(`${paneType}SplitPaneSize`, size);
-    this.props.onHandleEnrichmentSVGSizeChange(this.props.enrichmentFeatureID);
   };
 
   render() {
