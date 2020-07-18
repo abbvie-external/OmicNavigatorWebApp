@@ -42,6 +42,9 @@ class Enrichment extends Component {
     enrichmentIconText: '',
     enrichmentResults: [],
     enrichmentColumns: [],
+    enrichmentFeatureID: '',
+    enrichmentPlotSVGHeight: 0,
+    enrichmentPlotSVGWidth: 0,
     activeIndexEnrichmentView: this.defaultEnrichmentActiveIndex || 0,
     multisetPlotInfo: {
       title: '',
@@ -117,8 +120,9 @@ class Enrichment extends Component {
       key: null,
       title: '',
       svg: [],
+      dataItem: '',
     },
-    currentSVGs: [],
+    cachedSVGs: [],
     isTestSelected: false,
     isTestDataLoaded: false,
     SVGPlotLoading: false,
@@ -745,27 +749,27 @@ class Enrichment extends Component {
     });
   };
 
-  calculateHeight(self) {
+  calculateHeight = () => {
     let containerHeight =
-      self.EnrichmentViewContainerRef.current !== null
-        ? self.EnrichmentViewContainerRef.current.parentElement.offsetHeight
+      this.EnrichmentViewContainerRef.current !== null
+        ? this.EnrichmentViewContainerRef.current.parentElement.offsetHeight
         : 900;
     let barcodeHeight =
       parseInt(sessionStorage.getItem('horizontalSplitPaneSize'), 10) || 250;
     // subtracting 120 due to menu and plot margin
     return containerHeight - barcodeHeight - 120;
-  }
+  };
 
-  calculateWidth(self) {
+  calculateWidth = () => {
     let containerWidth =
-      self.EnrichmentViewContainerRef.current !== null
-        ? self.EnrichmentViewContainerRef.current.parentElement.offsetWidth
+      this.EnrichmentViewContainerRef.current !== null
+        ? this.EnrichmentViewContainerRef.current.parentElement.offsetWidth
         : 1200;
     let violinWidth =
       parseInt(sessionStorage.getItem('verticalSplitPaneSize'), 10) || 525;
     // subtracting 80 due to plot margin
     return containerWidth - violinWidth - 60;
-  }
+  };
 
   showBarcodePlot = (barcodeData, dataItem) => {
     // sorting by statistic is being handled by backend
@@ -898,87 +902,138 @@ class Enrichment extends Component {
   getPlot = featureId => {
     const { enrichmentPlotTypes } = this.state;
     const { enrichmentStudy, enrichmentModel } = this.props;
-    let id = featureId != null ? featureId : '';
-    let imageInfo = { key: '', title: '', svg: [] };
-    imageInfo.title = this.state.imageInfo.title;
-    imageInfo.key = this.state.imageInfo.key;
-    // imageInfo.title = `Protein Intensity - ${enrichmentFeatureIdKey} ${featureId}`;
-    // imageInfo.key = `${enrichmentFeatureIdKey} ${featureId}`;
+    const self = this;
     let handleSVGCb = this.handleSVG;
-    let handlePlotStudyError = this.handlePlotStudyError;
-    let currentSVGs = [];
+    if (featureId !== this.state.enrichmentFeatureID) {
+      this.setState({
+        enrichmentFeatureID: featureId,
+      });
+      let id = featureId != null ? featureId : '';
+      let imageInfoCopy = { ...this.state.imageInfo };
+      // let imageInfo = { key: '', title: '', svg: [] };
+      // imageInfo.title = this.state.imageInfo.title;
+      // imageInfo.key = this.state.imageInfo.key;
+      // let currentSVGs = [];
+
+      let handlePlotStudyError = this.handlePlotStudyError;
+      // keep whatever dimension is less (height or width)
+      // then multiply the other dimension by original svg ratio (height 595px, width 841px)
+      let EnrichmentPlotSVGHeight = this.calculateHeight();
+      let EnrichmentPlotSVGWidth = this.calculateWidth();
+      // EnrichmentPlotSVGHeight = EnrichmentPlotSVGWidth * 0.70749;
+      if (EnrichmentPlotSVGHeight + 60 > EnrichmentPlotSVGWidth) {
+        EnrichmentPlotSVGHeight = EnrichmentPlotSVGWidth * 0.70749;
+      } else {
+        EnrichmentPlotSVGWidth = EnrichmentPlotSVGHeight * 1.41344;
+      }
+      cancelRequestEnrichmentGetPlot();
+      let cancelToken = new CancelToken(e => {
+        cancelRequestEnrichmentGetPlot = e;
+      });
+      if (enrichmentPlotTypes.length > 0) {
+        _.forEach(enrichmentPlotTypes, function(plot, i) {
+          phosphoprotService
+            .plotStudy(
+              enrichmentStudy,
+              enrichmentModel,
+              id,
+              enrichmentPlotTypes[i].plotID,
+              handlePlotStudyError,
+              cancelToken,
+            )
+            .then(svgMarkupObj => {
+              let svgMarkup = svgMarkupObj.data;
+              svgMarkup = svgMarkup.replace(
+                /id="/g,
+                'id="' + id + '-' + i + '-',
+              );
+              svgMarkup = svgMarkup.replace(
+                /#glyph/g,
+                '#' + id + '-' + i + '-glyph',
+              );
+              svgMarkup = svgMarkup.replace(
+                /#clip/g,
+                '#' + id + '-' + i + '-clip',
+              );
+              svgMarkup = svgMarkup.replace(
+                /<svg/g,
+                `<svg preserveAspectRatio="xMinYMin meet" width="${EnrichmentPlotSVGWidth}" height="${EnrichmentPlotSVGHeight}" id="currentSVG-${id}-${i}"`,
+                // `<svg preserveAspectRatio="xMinYMin meet" style="width:${EnrichmentPlotSVGWidth}px" height:${EnrichmentPlotSVGHeight} id="currentSVG-${id}-${i}"`,
+              );
+              DOMPurify.addHook('afterSanitizeAttributes', function(node) {
+                if (
+                  node.hasAttribute('xlink:href') &&
+                  !node.getAttribute('xlink:href').match(/^#/)
+                ) {
+                  node.remove();
+                }
+              });
+              // Clean HTML string and write into our DIV
+              let sanitizedSVG = DOMPurify.sanitize(svgMarkup, {
+                ADD_TAGS: ['use'],
+              });
+              let svgInfo = {
+                plotType: enrichmentPlotTypes[i],
+                svg: sanitizedSVG,
+              };
+              // imageInfo.svg.push(svgInfo);
+              // currentSVGs.push(sanitizedSVG);
+              imageInfoCopy.svg.push(svgInfo);
+              handleSVGCb(imageInfoCopy);
+              // handleSVGCb(imageInfo);
+            })
+            .catch(error => {
+              console.error('Error during getPlot', error);
+            });
+        });
+      }
+    } else {
+      const { enrichmentPlotSVGWidth, enrichmentPlotSVGHeight } = this.state;
+      let id = this.state.enrichmentFeatureID;
+      let cachedSVGs = this.state.imageInfo.svg;
+      let imageInfoCopy = { ...this.state.imageInfo };
+      if (cachedSVGs.length > 0) {
+        _.forEach(cachedSVGs, function(cachedSVG, i) {
+          const resizedSVG = cachedSVG.svg;
+          resizedSVG.replace(
+            /<svg/g,
+            // `<svg preserveAspectRatio="xMinYMin meet" style="width:${enrichmentPlotSVGWidth}px" width:${enrichmentPlotSVGWidth}pt" height:${enrichmentPlotSVGHeight}pt" id="currentSVG-${id}-${i}"`,
+            // `<svg preserveAspectRatio="xMinYMin meet" style="width:${enrichmentPlotSVGWidth}px" height:${enrichmentPlotSVGHeight} id="currentSVG-${id}-${i}"`,
+            `<svg preserveAspectRatio="xMinYMin meet" width="${enrichmentPlotSVGWidth}" height="${enrichmentPlotSVGHeight}" id="currentSVG-${id}-${i}"`,
+          );
+          let svgInfo = {
+            plotType: self.state.imageInfo.svg[i].plotType,
+            svg: resizedSVG,
+          };
+          imageInfoCopy.svg.splice(i, 1, svgInfo);
+          handleSVGCb(imageInfoCopy);
+        });
+      }
+    }
+  };
+
+  handleEnrichmentSVGSizeChange = id => {
     // keep whatever dimension is less (height or width)
     // then multiply the other dimension by original svg ratio (height 595px, width 841px)
-    let EnrichmentPlotSVGHeight = this.calculateHeight(this);
-    let EnrichmentPlotSVGWidth = this.calculateWidth(this);
+    let EnrichmentPlotSVGHeight = this.calculateHeight();
+    let EnrichmentPlotSVGWidth = this.calculateWidth();
     // EnrichmentPlotSVGHeight = EnrichmentPlotSVGWidth * 0.70749;
     if (EnrichmentPlotSVGHeight + 60 > EnrichmentPlotSVGWidth) {
       EnrichmentPlotSVGHeight = EnrichmentPlotSVGWidth * 0.70749;
     } else {
       EnrichmentPlotSVGWidth = EnrichmentPlotSVGHeight * 1.41344;
     }
-    cancelRequestEnrichmentGetPlot();
-    let cancelToken = new CancelToken(e => {
-      cancelRequestEnrichmentGetPlot = e;
-    });
-    if (enrichmentPlotTypes.length > 0) {
-      _.forEach(enrichmentPlotTypes, function(plot, i) {
-        phosphoprotService
-          .plotStudy(
-            enrichmentStudy,
-            enrichmentModel,
-            id,
-            enrichmentPlotTypes[i].plotID,
-            handlePlotStudyError,
-            cancelToken,
-          )
-          .then(svgMarkupObj => {
-            let svgMarkup = svgMarkupObj.data;
-            svgMarkup = svgMarkup.replace(/id="/g, 'id="' + id + '-' + i + '-');
-            svgMarkup = svgMarkup.replace(
-              /#glyph/g,
-              '#' + id + '-' + i + '-glyph',
-            );
-            svgMarkup = svgMarkup.replace(
-              /#clip/g,
-              '#' + id + '-' + i + '-clip',
-            );
-            svgMarkup = svgMarkup.replace(
-              /<svg/g,
-              `<svg preserveAspectRatio="xMinYMin meet" style="width:${EnrichmentPlotSVGWidth}px" height:${EnrichmentPlotSVGHeight} id="currentSVG-${id}-${i}"`,
-            );
-            DOMPurify.addHook('afterSanitizeAttributes', function(node) {
-              if (
-                node.hasAttribute('xlink:href') &&
-                !node.getAttribute('xlink:href').match(/^#/)
-              ) {
-                node.remove();
-              }
-            });
-            // Clean HTML string and write into our DIV
-            let sanitizedSVG = DOMPurify.sanitize(svgMarkup, {
-              ADD_TAGS: ['use'],
-            });
-            let svgInfo = {
-              plotType: enrichmentPlotTypes[i],
-              svg: sanitizedSVG,
-            };
-
-            // we want spline plot in zero index, rather than lineplot
-            // if (i === 0) {
-            imageInfo.svg.push(svgInfo);
-            currentSVGs.push(sanitizedSVG);
-            // } else {
-            //   imageInfo.svg.unshift(svgInfo);
-            //   currentSVGs.unshift(sanitizedSVG);
-            // }
-            handleSVGCb(imageInfo);
-          })
-          .catch(error => {
-            console.error('Error during getPlot', error);
-          });
-      });
-    }
+    this.setState(
+      {
+        SVGPlotLoaded: true,
+        SVGPlotLoading: false,
+        enrichmentPlotSVGHeight: EnrichmentPlotSVGHeight,
+        enrichmentPlotSVGWidth: EnrichmentPlotSVGWidth,
+      },
+      function() {
+        this.getPlot(id);
+      },
+    );
   };
 
   handleSVG = imageInfo => {
@@ -1568,6 +1623,7 @@ class Enrichment extends Component {
         key: null,
         title: '',
         svg: [],
+        dataItem: [],
       },
     });
     this.handleSearchCriteriaChange(
@@ -1636,6 +1692,7 @@ class Enrichment extends Component {
             onHandleProteinSelected={this.handleProteinSelected}
             onHandleHighlightedLineReset={this.handleHighlightedLineReset}
             onHandleBarcodeChanges={this.handleBarcodeChanges}
+            onHandleEnrichmentSVGSizeChange={this.handleEnrichmentSVGSizeChange}
           ></SplitPanesContainer>
         </div>
       );
