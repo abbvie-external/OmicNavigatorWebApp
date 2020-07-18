@@ -33,8 +33,27 @@
   width: 100%;
   height: auto !important;
   overflow: auto;
-  min-height: 400px;
+  min-height: 425px;
 }
-#volcanoDiv2 {
-  position: relative;
+#volcanoDiv1Row {
+  padding-bottom: 0px !important;
+  #volcanoDiv2 {
+    // margin-top: 50px !important;
+    position: relative;
+    height: auto !important;
+    min-height: 425px;
+  }
+}
+
+#volcanoDiv2Row {
+  padding-top: 0px !important;
+}
+
+.VolcanoPlotSVGPlot {
+  width: 100% !important;
+}
+
+.volcanoDiv1SplitPane {
+  position: relative !important;
+  padding-bottom: 5px !important;
 }

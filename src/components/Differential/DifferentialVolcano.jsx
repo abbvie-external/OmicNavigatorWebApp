@@ -19,8 +19,8 @@ class DifferentialVolcano extends Component {
   state = {
     volcanoWidth: null,
     volcanoHeight: null,
-    defaultVolcanoWidth: 500,
-    defaultVolcanoHeight: 400,
+    defaultVolcanoWidth: 550,
+    defaultVolcanoHeight: 425,
     filteredTableData: [],
     itemsPerPageInformedDifferential: null,
     volcanoPlotRows: 0,
@@ -57,10 +57,6 @@ class DifferentialVolcano extends Component {
           key: defaultMaxObject[identifier],
         },
       ]);
-      this.props.onVolcanoSVGSizeChange(
-        this.state.volcanoHeight * 0.9,
-        (1000 - this.state.defaultVolcanoWidth) * 0.88,
-      );
       this.setState({
         filteredTableData: this.props.differentialResults,
         volcanoPlotRows: this.props.differentialResults.length,
@@ -277,16 +273,8 @@ class DifferentialVolcano extends Component {
   onSizeChange = (size, direction) => {
     if (direction === 'horizontal') {
       this.setState({ volcanoHeight: size * 0.95 });
-      this.props.onVolcanoSVGSizeChange(
-        size * 0.9,
-        (1000 - this.state.volcanoWidth) * 0.88,
-      );
     } else {
       this.setState({ volcanoWidth: size * 0.95 });
-      this.props.onVolcanoSVGSizeChange(
-        this.state.volcanoHeight * 0.9,
-        (1000 - size) * 0.88,
-      );
     }
   };
 
@@ -384,11 +372,12 @@ class DifferentialVolcano extends Component {
               </Fragment>
             </Grid.Column>
           </Grid.Row>
-          <Grid.Row>
+          <Grid.Row id="volcanoDiv1Row">
             <Grid.Column>
               <div id="volcanoDiv1">
                 <SplitPane
                   split="vertical"
+                  className="volcanoDiv1SplitPane"
                   defaultSize={this.state.defaultVolcanoWidth}
                   minSize={300}
                   maxSize={800}
@@ -406,6 +395,10 @@ class DifferentialVolcano extends Component {
                   {svgPlot}
                 </SplitPane>
               </div>
+            </Grid.Column>
+          </Grid.Row>
+          <Grid.Row id="volcanoDiv2Row">
+            <Grid.Column>
               <div id="volcanoDiv2">
                 <EZGrid
                   className="volcanoPlotTable"
