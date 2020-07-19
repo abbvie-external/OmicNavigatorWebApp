@@ -391,22 +391,6 @@ class Differential extends Component {
     this.setState({ additionalTemplateInfoDifferentialTable: addParams });
   };
 
-  calculateHeight(self) {
-    let containerHeight =
-      self.DifferentialViewContainerRef.current !== null
-        ? self.DifferentialViewContainerRef.current.parentElement.offsetHeight
-        : 900;
-    return containerHeight - 120;
-  }
-
-  calculateWidth(self) {
-    let containerWidth =
-      self.DifferentialViewContainerRef.current !== null
-        ? self.DifferentialViewContainerRef.current.parentElement.offsetWidth
-        : 1200;
-    return containerWidth - 60;
-  }
-
   getPlot = (featureId, useVolcanoSVGSize) => {
     const { differentialPlotTypes } = this.state;
     const {
@@ -422,18 +406,9 @@ class Differential extends Component {
     let handleSVGCb = this.handleSVG;
     // let self = this;
     let currentSVGs = [];
-    // keep whatever dimension is less (height or width)
-    // then multiply the other dimension by original svg ratio (height 595px, width 841px)
-    let DifferentialPlotSVGHeight = this.calculateHeight(this);
-    let DifferentialPlotSVGWidth = this.calculateWidth(this);
-    if (DifferentialPlotSVGHeight > DifferentialPlotSVGWidth) {
-      DifferentialPlotSVGHeight = DifferentialPlotSVGWidth * 0.70749;
-    } else {
-      DifferentialPlotSVGWidth = DifferentialPlotSVGHeight * 1.41344;
-    }
+    let DifferentialPlotSVGSizing = `height="100%" width="inherit"`;
     if (useVolcanoSVGSize === true) {
-      DifferentialPlotSVGHeight = this.state.plotSVGHeight;
-      DifferentialPlotSVGWidth = this.state.plotSVGWidth;
+      DifferentialPlotSVGSizing = `height="100%" width="auto"`;
     }
     let handleItemSelectedCb = this.handleItemSelected;
     cancelRequestDifferentialResultsGetPlot();
@@ -465,7 +440,7 @@ class Differential extends Component {
             );
             svgMarkup = svgMarkup.replace(
               /<svg/g,
-              `<svg preserveAspectRatio="xMinYMin meet" style="width:${DifferentialPlotSVGWidth}px" height:${DifferentialPlotSVGHeight} id="currentSVG-${id}-${i}"`,
+              `<svg preserveAspectRatio="xMinYMin meet" ${DifferentialPlotSVGSizing} id="currentSVG-${id}-${i}"`,
             );
             DOMPurify.addHook('afterSanitizeAttributes', function(node) {
               if (
@@ -514,18 +489,6 @@ class Differential extends Component {
         { activePage: pageNumber },
       );
     }
-  };
-  handleVolcanoSVGSizeChange = (height, width) => {
-    this.setState(
-      {
-        plotSVGHeight: height,
-        plotSVGWidth: width,
-        isProteinSVGLoaded: false,
-      },
-      function() {
-        this.getPlot(this.state.maxObjectData.id, true);
-      },
-    );
   };
 
   handleSelectedFromTable = toHighlightArr => {

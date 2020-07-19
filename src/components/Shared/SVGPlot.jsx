@@ -15,14 +15,14 @@ class SVGPlot extends Component {
     });
   }
 
-  //componentDidUpdate = (prevProps, prevState) => {
-  // if (this.props.imageInfo.svg !== prevProps.imageInfo.svg) {
-  //   this.setState({
-  //     isSVGReady: false,
-  //   });
-  //   this.getSVGPanes();
-  // }
-  //};
+  // componentDidUpdate = (prevProps, prevState) => {
+  //   if (this.props.SVGPlotLoaded !== prevProps.SVGPlotLoaded) {
+  //     this.setState({
+  //       isSVGReady: false,
+  //     });
+  //     this.getSVGPanes();
+  //   }
+  // };
 
   handleTabChange = (e, { activeIndex }) => {
     this.props.onSVGTabChange(activeIndex);
@@ -50,7 +50,7 @@ class SVGPlot extends Component {
       // const svgArrayReversed = svgArray.reverse();
       const panes = svgArray.map(s => {
         return {
-          menuItem: `${s.plotType.plotID}`,
+          menuItem: `${s.plotType.plotDisplay}`,
           render: () => (
             <Tab.Pane attached="true" as="div">
               <div
@@ -59,6 +59,18 @@ class SVGPlot extends Component {
                 dangerouslySetInnerHTML={{ __html: s.svg }}
               ></div>
             </Tab.Pane>
+            //   const viewbox = `0 0 ${this.props.enrichmentPlotSVGWidth} ${this.props.enrichmentPlotSVGHeight}`;
+            //   <svg
+            //   version="1.1"
+            //   viewBox={viewbox}
+            //   height={this.props.enrichmentPlotSVGHeight}
+            //   width={this.props.enrichmentPlotSVGHeight}
+            //   xmlns="http://www.w3.org/2000/svg"
+            //   id="currentSVG-20750-0"
+            //   preserveAspectRatio="xMinYMin meet"
+            // >
+            //   {s.svg}
+            //</svg>
           ),
         };
       });
@@ -96,28 +108,20 @@ class SVGPlot extends Component {
   };
 
   render() {
-    const { activeSVGTabIndex } = this.props;
-    const ButtonActionsClass = this.getButtonActionsClass();
+    if (this.state.isSVGReady) {
+      const { activeSVGTabIndex } = this.props;
+      const ButtonActionsClass = this.getButtonActionsClass();
 
-    const BreadcrumbPopupStyle = {
-      backgroundColor: '2E2E2E',
-      borderBottom: '2px solid var(--color-primary)',
-      color: '#FFF',
-      padding: '1em',
-      maxWidth: '50vw',
-      fontSize: '13px',
-      wordBreak: 'break-all',
-    };
-    const svgPanes = this.getSVGPanes(activeSVGTabIndex);
-    if (!this.state.isSVGReady) {
-      return (
-        <div>
-          <Dimmer active inverted>
-            <Loader size="large">SVG Loading</Loader>
-          </Dimmer>
-        </div>
-      );
-    } else {
+      const BreadcrumbPopupStyle = {
+        backgroundColor: '2E2E2E',
+        borderBottom: '2px solid var(--color-primary)',
+        color: '#FFF',
+        padding: '1em',
+        maxWidth: '50vw',
+        fontSize: '13px',
+        wordBreak: 'break-all',
+      };
+      const svgPanes = this.getSVGPanes(activeSVGTabIndex);
       return (
         <div className="svgContainer">
           <div className={ButtonActionsClass}>
@@ -143,6 +147,14 @@ class SVGPlot extends Component {
             content="view in differential analysis section"
           />
           {svgPanes}
+        </div>
+      );
+    } else {
+      return (
+        <div>
+          <Dimmer active inverted>
+            <Loader size="large">SVG Loading</Loader>
+          </Dimmer>
         </div>
       );
     }

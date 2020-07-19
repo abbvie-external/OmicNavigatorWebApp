@@ -5,6 +5,7 @@ import { phosphoprotService } from '../../services/phosphoprot.service';
 import MetafeaturesTable from './MetafeaturesTable';
 // import * as d3 from 'd3';
 import '../Shared/SVGPlot.scss';
+import './DifferentialPlotTabs.scss';
 
 class SVGPlot extends Component {
   state = {
@@ -68,7 +69,7 @@ class SVGPlot extends Component {
           render: () => (
             <Tab.Pane attached="true" as="div">
               <div
-                id="PlotSVG"
+                id="DifferentialPlotTabsPlotSVG"
                 className="svgSpan"
                 dangerouslySetInnerHTML={{ __html: s.svg }}
               ></div>

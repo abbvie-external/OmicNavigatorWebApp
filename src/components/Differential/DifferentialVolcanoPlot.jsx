@@ -25,8 +25,8 @@ class DifferentialVolcanoPlot extends Component {
   componentDidUpdate(prevProps) {
     const {
       selectedFromTableData,
-      volcanoWidth,
-      volcanoHeight,
+      // volcanoWidth,
+      // volcanoHeight,
       maxObjectData,
     } = this.props;
     const circles = d3.selectAll('circle.volcanoPlot-dataPoint');
@@ -42,12 +42,12 @@ class DifferentialVolcanoPlot extends Component {
       const maxCircle = d3.select(`#volcanoDataPoint-${maxid}`);
       maxCircle.classed('highlightedMax', true);
     }
-    if (volcanoWidth !== prevProps.volcanoWidth) {
-      this.setState({ resizeScalarX: volcanoWidth / prevProps.volcanoWidth });
-    }
-    if (volcanoHeight !== prevProps.volcanoHeight) {
-      this.setState({ resizeScalarY: volcanoHeight / prevProps.volcanoHeight });
-    }
+    // if (volcanoWidth !== prevProps.volcanoWidth) {
+    //   this.setState({ resizeScalarX: volcanoWidth / prevProps.volcanoWidth });
+    // }
+    // if (volcanoHeight !== prevProps.volcanoHeight) {
+    //   this.setState({ resizeScalarY: volcanoHeight / prevProps.volcanoHeight });
+    // }
   }
   doTransform(value, axis) {
     const { doXAxisTransformation, doYAxisTransformation } = this.props;
