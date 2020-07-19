@@ -33,11 +33,11 @@
   width: 100%;
   height: auto !important;
   overflow: auto;
-  min-height: 425px;
+  min-height: 300px;
 
   #PlotSVG {
     min-height: 300px;
-    max-height: 425px !important;
+    max-height: 575px !important;
     padding-right: 25px !important;
 
     svg {
