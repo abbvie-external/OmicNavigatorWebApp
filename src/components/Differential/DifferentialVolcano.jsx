@@ -19,7 +19,8 @@ class DifferentialVolcano extends Component {
   state = {
     volcanoWidth: null,
     volcanoHeight: null,
-    defaultVolcanoWidth: 550,
+    defaultVolcanoWidth:
+      parseInt(sessionStorage.getItem('volcanoSplitPaneSize'), 10) || 550,
     defaultVolcanoHeight: 425,
     filteredTableData: [],
     itemsPerPageInformedDifferential: null,
@@ -270,12 +271,9 @@ class DifferentialVolcano extends Component {
     }
   };
 
-  onSizeChange = (size, direction) => {
-    if (direction === 'horizontal') {
-      this.setState({ volcanoHeight: size * 0.95 });
-    } else {
-      this.setState({ volcanoWidth: size * 0.95 });
-    }
+  onSizeChange = size => {
+    this.setState({ volcanoWidth: size * 0.95 });
+    sessionStorage.setItem('volcanoSplitPaneSize', size);
   };
 
   render() {
@@ -379,9 +377,9 @@ class DifferentialVolcano extends Component {
                   split="vertical"
                   className="volcanoDiv1SplitPane"
                   defaultSize={this.state.defaultVolcanoWidth}
-                  minSize={300}
+                  minSize={350}
                   maxSize={800}
-                  onDragFinished={size => this.onSizeChange(size, 'vertical')}
+                  onDragFinished={size => this.onSizeChange(size)}
                 >
                   <DifferentialVolcanoPlot
                     {...this.state}

@@ -34,9 +34,21 @@
   height: auto !important;
   overflow: auto;
   min-height: 425px;
+
+  #PlotSVG {
+    min-height: 300px;
+    max-height: 425px !important;
+    padding-right: 25px !important;
+
+    svg {
+      max-height: inherit !important;
+    }
+  }
 }
 #volcanoDiv1Row {
   padding-bottom: 0px !important;
+  min-height: 425px;
+
   #volcanoDiv2 {
     // margin-top: 50px !important;
     position: relative;
@@ -49,11 +61,66 @@
   padding-top: 0px !important;
 }
 
-.VolcanoPlotSVGPlot {
-  width: 100% !important;
-}
+// .VolcanoPlotSVGPlot {
+//   max-height: 600px !important;
+//   height: inherit !important;
+// }
 
 .volcanoDiv1SplitPane {
   position: relative !important;
   padding-bottom: 5px !important;
+  min-height: 425px !important;
+}
+
+.Resizer {
+  background: #000;
+  opacity: 0.2;
+  z-index: 1;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  -moz-background-clip: padding;
+  -webkit-background-clip: padding;
+  background-clip: padding-box;
+}
+
+.Resizer:hover {
+  -webkit-transition: all 0.3s ease;
+  transition: all 0.3s ease;
+}
+
+.Resizer.horizontal {
+  padding: 1px 0px !important;
+  height: 16px;
+  margin: -8px 0;
+  border-top: 8px solid rgba(255, 255, 255, 0);
+  border-bottom: 8px solid rgba(255, 255, 255, 0);
+  cursor: row-resize;
+  width: 100%;
+  z-index: 4 !important;
+}
+
+.Resizer.horizontal:hover {
+  border-top: 8px solid var(--color-primary);
+  border-bottom: 8px solid var(--color-primary);
+}
+
+.Resizer.vertical {
+  padding: 0px 1px !important;
+  width: 16px;
+  margin: 0 -8px;
+  border-left: 8px solid rgba(255, 255, 255, 0);
+  border-right: 8px solid rgba(255, 255, 255, 0);
+  cursor: col-resize;
+}
+
+.Resizer.vertical:hover {
+  border-left: 8px solid var(--color-primary);
+  border-right: 8px solid var(--color-primary);
+}
+.Resizer.disabled {
+  cursor: not-allowed;
+}
+.Resizer.disabled:hover {
+  border-color: transparent;
 }

@@ -939,7 +939,7 @@ class Enrichment extends Component {
             );
             svgMarkup = svgMarkup.replace(
               /<svg/g,
-              `<svg preserveAspectRatio="xMinYMin meet" width="95%" id="currentSVG-${id}-${i}"`,
+              `<svg preserveAspectRatio="xMinYMin meet" height="100%" width="auto" id="currentSVG-${id}-${i}"`,
             );
             DOMPurify.addHook('afterSanitizeAttributes', function(node) {
               if (

@@ -250,7 +250,8 @@ class SplitPanesContainer extends Component {
               widescreen={16}
             >
               <SplitPane
-                className="ThreePlotsDiv SplitPanesWrapper"
+                className="ThreePlotsDiv"
+                id="SplitPanesWrapper"
                 split="horizontal"
                 defaultSize={this.state.horizontalSplitPaneSize}
                 minSize={150}
