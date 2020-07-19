@@ -80,6 +80,7 @@ class Differential extends Component {
     differentialTestsMetadata: [],
     plotSVGWidth: null,
     plotSVGHeight: null,
+    isVolcanoPlotSVGLoaded: false,
   };
   DifferentialViewContainerRef = React.createRef();
 
@@ -492,6 +493,7 @@ class Differential extends Component {
   };
 
   handleSelectedFromTable = toHighlightArr => {
+    this.setState({ isVolcanoPlotSVGLoaded: false });
     const { maxObjectData } = this.state;
     let max = [];
     if (toHighlightArr.length !== 0) {
@@ -535,6 +537,7 @@ class Differential extends Component {
     this.setState({
       imageInfo: imageInfo,
       isProteinSVGLoaded: true,
+      isVolcanoPlotSVGLoaded: true,
     });
   };
   // calculateWidth() {
