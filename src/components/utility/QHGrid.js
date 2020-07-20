@@ -214,44 +214,57 @@ class QHGridHeader extends React.PureComponent {
       wordBreak: 'break-all',
     };
 
-    if (
-      this.props.exportBaseName === 'Enrichment_Analysis' ||
-      this.props.exportBaseName === 'Differential_Phosphorylation_Analysis'
-      // this.props.exportBaseName === 'metaFeatures'
-    ) {
-      return (
-        <Image
-          src={excel_logo_custom}
-          onClick={this.props.exportExcel(columns)}
-          style={{ float: 'right', cursor: 'pointer' }}
-        />
-      );
-    } else if (
-      this.props.exportBaseName === 'VolcanoPlot_Filtered_Results' ||
-      this.props.exportBaseName === 'metaFeatures'
-    ) {
-      return null;
-    } else {
-      return (
-        <Popup
-          trigger={
-            <Image
-              src={excel_logo}
-              className="ExcelLogo"
-              // avatar
-              size="mini"
-              onClick={this.props.exportExcel(columns)}
-              style={{ float: 'right', cursor: 'pointer' }}
-            />
-          }
-          style={BreadcrumbPopupStyle}
-          inverted
-          basic
-          position="bottom right"
-          content="Export Data to Excel"
-        />
-      );
-    }
+    // if (
+    // this.props.exportBaseName === 'Enrichment_Analysis' ||
+    // this.props.exportBaseName === 'Differential_Phosphorylation_Analysis'
+    // this.props.exportBaseName === 'metaFeatures'
+    // ) {
+    //   return (
+    //     <Image
+    //       src={excel_logo_custom}
+    //       onClick={this.props.exportExcel(columns)}
+    //       style={{ float: 'right', cursor: 'pointer' }}
+    //     />
+    //   );
+    // } else if (
+    //   this.props.exportBaseName === 'VolcanoPlot_Filtered_Results' ||
+    //   this.props.exportBaseName === 'Enrichment_Analysis' ||
+    //   this.props.exportBaseName === 'Differential_Phosphorylation_Analysis' ||
+    //   this.props.exportBaseName ===
+    //     'Differential_Phosphorylation_Analysis_Filtered' ||
+    //   this.props.exportBaseName === 'metaFeatures'
+    // ) {
+    // return (
+    //   <Image
+    //     src=""
+    //     className="ExcelLogo"
+    //     // avatar
+    //     size="mini"
+    //     style={{ float: 'right', cursor: 'pointer' }}
+    //   />
+    // );
+    // } else {
+    return (
+      <Popup
+        trigger={
+          <Image
+            src={excel_logo}
+            className="ExcelLogo"
+            // avatar
+            size="mini"
+            // onClick={this.props.exportExcel(columns)}
+            style={{ float: 'right', cursor: 'pointer' }}
+          />
+        }
+        style={BreadcrumbPopupStyle}
+        inverted
+        basic
+        position="bottom right"
+        // content="Export Data to Excel"
+        content="Export Issue - Coming Back Soon!"
+      />
+    );
+    // }
   };
   // Paul end
   render() {

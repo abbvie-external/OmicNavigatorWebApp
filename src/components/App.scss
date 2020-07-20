@@ -86,6 +86,9 @@
   .QHGrid table {
     margin-top: 0px !important;
     border: none !important;
+    thead th {
+      border-bottom: none !important;
+    }
   }
 
   tfoot tr th {
@@ -93,7 +96,12 @@
   }
 
   .QHGrid--body thead tr th {
+    border-top: 1px solid lightgrey !important;
     border-bottom: 1px solid grey !important;
+  }
+
+  .QHGridHeaderDiv {
+    margin-top: 10px !important;
   }
 
   //icons
