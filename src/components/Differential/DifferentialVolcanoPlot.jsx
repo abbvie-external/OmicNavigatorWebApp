@@ -64,7 +64,7 @@ class DifferentialVolcanoPlot extends Component {
     const circles = d3.selectAll('circle.volcanoPlot-dataPoint');
     circles.classed('selected', false);
     circles.classed('highlighted', false);
-    circles.classed('highlightedMax', false);
+    circles.classed('highlightedMax', true);
   };
   handleCircleHover = e => {
     const { brushing } = this.state;
@@ -142,12 +142,17 @@ class DifferentialVolcanoPlot extends Component {
           <rect
             width="160"
             height="46"
-            fill="black"
+            fill="#2e2e2e"
             stroke="black"
-            rx="5"
-            ry="5"
+            rx="3"
+            ry="3"
           ></rect>
-          <text fontSize="14px" fill="white" fontFamily="sans-serif">
+          <text
+            fontSize="14px"
+            fill="white"
+            font-family="Lato, Helvetica Neue, Arial, Helvetica, sans-serif"
+            text-anchor="left"
+          >
             <tspan x={10} y={14}>
               {idText}
             </tspan>
