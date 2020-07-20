@@ -415,6 +415,7 @@ class DifferentialVolcano extends Component {
                   disableGeneralSearch
                   disableGrouping
                   disableColumnVisibilityToggle
+                  disableColumnReorder
                   exportBaseName="VolcanoPlot_Filtered_Results"
                   additionalTemplateInfo={
                     additionalTemplateInfoDifferentialTable

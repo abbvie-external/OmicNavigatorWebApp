@@ -64,6 +64,7 @@ class EnrichmentResultsTable extends Component {
               quickViews={quickViews}
               // disableGeneralSearch
               columnReorder={this.props.columnReorder}
+              disableColumnReorder
               disableGrouping
               disableColumnVisibilityToggle
               min-height="75vh"

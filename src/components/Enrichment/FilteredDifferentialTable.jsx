@@ -468,6 +468,7 @@ class FilteredDifferentialTable extends Component {
             disableGrouping
             // disableSort
             disableColumnVisibilityToggle
+            disableColumnReorder
             // disableFilters={false}
             min-height="5vh"
             additionalTemplateInfo={this.state.additionalTemplateInfo}
