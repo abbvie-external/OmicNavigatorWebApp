@@ -115,8 +115,15 @@ class Differential extends Component {
   handleMultisetQueried = value => {
     this.setState({
       multisetQueried: value,
+      // isVolcanoPlotSVGLoaded: !value,
     });
   };
+
+  // handleVolcanoPlotSVGLoaded = bool => {
+  //   this.setState({
+  //     isVolcanoPlotSVGLoaded: bool,
+  //   });
+  // };
 
   setStudyModelTestMetadata = (studyData, modelsAndTests) => {
     this.setState(
@@ -540,17 +547,6 @@ class Differential extends Component {
       isVolcanoPlotSVGLoaded: true,
     });
   };
-  // calculateWidth() {
-  //   var w = Math.max(
-  //     document.documentElement.clientWidth,
-  //     window.innerWidth || 0,
-  //   );
-  //   if (w > 1199) {
-  //     return w * 0.;
-  //   } else if (w < 1200 && w > 767) {
-  //     return w * 0.6;
-  //   } else return w * 0.8;
-  // }
   backToTable = () => {
     this.setState({
       differentialResultsMounted: false,
@@ -842,6 +838,7 @@ class Differential extends Component {
               onSelectFromTable={this.handleSelectedFromTable}
               onVolcanoSVGSizeChange={this.handleVolcanoSVGSizeChange}
               onSVGTabChange={this.handleSVGTabChange}
+              // onHandleVolcanoPlotSVGLoaded={this.handleVolcanoPlotSVGLoaded}
             />
           </Tab.Pane>
         ),

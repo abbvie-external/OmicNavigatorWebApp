@@ -10,6 +10,7 @@ import {
   Transition,
 } from 'semantic-ui-react';
 import { CancelToken } from 'axios';
+// import DOMPurify from 'dompurify';
 import '../Shared/SearchCriteria.scss';
 import { phosphoprotService } from '../../services/phosphoprot.service';
 import DifferentialMultisetFilters from './DifferentialMultisetFilters';
@@ -644,8 +645,6 @@ class DifferentialSearchCriteria extends Component {
     let cancelToken = new CancelToken(e => {
       cancelRequestInferenceMultisetPlot = e;
     });
-    let heightCalculation = this.calculateHeight;
-    let widthCalculation = this.calculateWidth;
     phosphoprotService
       .getResultsUpset(
         differentialStudy,
@@ -660,12 +659,21 @@ class DifferentialSearchCriteria extends Component {
         let svgMarkup = svgMarkupRaw.data;
         svgMarkup = svgMarkup.replace(
           /<svg/g,
-          '<svg preserveAspectRatio="xMinYMid meet" style="width:' +
-            widthCalculation() * 0.8 +
-            'px; height:' +
-            heightCalculation() * 0.8 +
-            'px;" id="multisetAnalysisSVG"',
+          '<svg preserveAspectRatio="xMinYMid meet" height="100%" width="inherit" id="multisetAnalysisSVG"',
         );
+        // DOMPurify.addHook('afterSanitizeAttributes', function(node) {
+        //   if (
+        //     node.hasAttribute('xlink:href') &&
+        //     !node.getAttribute('xlink:href').match(/^#/)
+        //   ) {
+        //     node.remove();
+        //   }
+        // });
+        // // Clean HTML string and write into our DIV
+        // let sanitizedSVG = DOMPurify.sanitize(svgMarkup, {
+        //   ADD_TAGS: ['use'],
+        // });
+        // let svgInfo = { plotType: 'Multiset', svg: sanitizedSVG };
         let svgInfo = { plotType: 'Multiset', svg: svgMarkup };
         this.props.onGetMultisetPlot({
           svgInfo,
@@ -674,22 +682,6 @@ class DifferentialSearchCriteria extends Component {
       .catch(error => {
         console.error('Error during getResultsUpset', error);
       });
-  }
-
-  calculateHeight() {
-    var h = Math.max(
-      document.documentElement.clientHeight,
-      window.innerHeight || 0,
-    );
-    return h;
-  }
-
-  calculateWidth() {
-    var w = Math.max(
-      document.documentElement.clientWidth,
-      window.innerWidth || 0,
-    );
-    return w;
   }
 
   render() {
