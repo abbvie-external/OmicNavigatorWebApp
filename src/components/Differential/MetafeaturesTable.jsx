@@ -139,7 +139,6 @@ class MetafeaturesTable extends Component {
       <div className="MetafeaturesTableDiv">
         <EZGrid
           ref={this.metafeaturesGridRef}
-          // uniqueCacheKey={differentialCacheKey}
           data={metafeaturesTableData}
           columnsConfig={metafeaturesTableConfigCols}
           totalRows={15}

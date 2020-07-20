@@ -26,14 +26,18 @@ class DifferentialResults extends Component {
     });
   };
 
+  componentDidMount() {
+    this.props.differentialResultsMounted(true);
+  }
+
   render() {
     const {
-      // differentialStudy,
-      // differentialModel,
-      // differentialTest,
+      differentialStudy,
+      differentialModel,
+      differentialTest,
       differentialColumns,
       differentialResults,
-      // proteinToHighlightInDiffTable,
+      proteinToHighlightInDiffTable,
       proteinHighlightInProgress,
       isItemSelected,
       additionalTemplateInfoDifferentialTable,
@@ -41,14 +45,14 @@ class DifferentialResults extends Component {
 
     const { differentialRows, itemsPerPageInformed } = this.state;
     // PAUL - ensure this accounts for multiset filters
-    // let differentialCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}`;
-    // if (
-    //   proteinToHighlightInDiffTable !== '' &&
-    //   proteinToHighlightInDiffTable !== null &&
-    //   proteinToHighlightInDiffTable !== undefined
-    // ) {
-    // differentialCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-${proteinToHighlightInDiffTable}`;
-    // }
+    let differentialCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}`;
+    if (
+      proteinToHighlightInDiffTable !== '' &&
+      proteinToHighlightInDiffTable !== null &&
+      proteinToHighlightInDiffTable !== undefined
+    ) {
+      differentialCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-${proteinToHighlightInDiffTable}`;
+    }
     // const quickViews = [];
     if (!isItemSelected || proteinHighlightInProgress) {
       return (
@@ -56,7 +60,7 @@ class DifferentialResults extends Component {
           <EZGrid
             ref={this.differentialGridRef}
             onInformItemsPerPage={this.informItemsPerPage}
-            // uniqueCacheKey={differentialCacheKey}
+            uniqueCacheKey={differentialCacheKey}
             data={differentialResults}
             columnsConfig={differentialColumns}
             totalRows={differentialRows}

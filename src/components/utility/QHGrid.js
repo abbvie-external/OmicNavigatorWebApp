@@ -217,6 +217,7 @@ class QHGridHeader extends React.PureComponent {
     if (
       this.props.exportBaseName === 'Enrichment_Analysis' ||
       this.props.exportBaseName === 'Differential_Phosphorylation_Analysis'
+      // this.props.exportBaseName === 'metaFeatures'
     ) {
       return (
         <Image
@@ -792,24 +793,6 @@ class QHGridBody extends React.PureComponent {
             let rowHighlightMax = false;
             let rowHighlightOther = false;
             if (
-              item[this.props.additionalTemplateInfo?.elementId] != null &&
-              this.props.additionalTemplateInfo !== '' &&
-              this.props.additionalTemplateInfo != null
-            ) {
-              if (
-                item[this.props.additionalTemplateInfo.elementId] ===
-                this.props.additionalTemplateInfo.rowHighlightMax
-              ) {
-                rowHighlightMax = true;
-              }
-              if (
-                this.props.additionalTemplateInfo?.rowHighlightOther?.includes(
-                  item[this.props.additionalTemplateInfo.elementId],
-                )
-              ) {
-                rowHighlightOther = true;
-              }
-            } else if (
               item[this.props.additionalTemplateInfo?.elementId] != null &&
               this.props.additionalTemplateInfo !== '' &&
               this.props.additionalTemplateInfo != null

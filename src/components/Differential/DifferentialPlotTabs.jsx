@@ -5,6 +5,7 @@ import { phosphoprotService } from '../../services/phosphoprot.service';
 import MetafeaturesTable from './MetafeaturesTable';
 // import * as d3 from 'd3';
 import '../Shared/SVGPlot.scss';
+import './DifferentialPlotTabs.scss';
 
 class SVGPlot extends Component {
   state = {
@@ -64,11 +65,11 @@ class SVGPlot extends Component {
       // const svgArrayReversed = svgArray.reverse();
       const svgPanes = svgArray.map(s => {
         return {
-          menuItem: `${s.plotType.plotID}`,
+          menuItem: `${s.plotType.plotDisplay}`,
           render: () => (
             <Tab.Pane attached="true" as="div">
               <div
-                id="PlotSVG"
+                id="DifferentialPlotTabsPlotSVG"
                 className="svgSpan"
                 dangerouslySetInnerHTML={{ __html: s.svg }}
               ></div>
@@ -101,34 +102,10 @@ class SVGPlot extends Component {
     );
   }
 
-  getButtonActionsClass = () => {
-    // if (
-    // this.props.activeIndex === 1 &&
-    // this.props.activeIndexDifferentialView === 0
-    // this.props.tab === 'differential'
-    // ) {
-    // return 'export-svg Hide';
-    // } else {
-    return 'export-svg ShowBlock';
-    // }
-  };
-
   render() {
-    // const { areDifferentialPlotTabsReady } = this.state;
     const { activeDifferentialPlotTabsIndex } = this.props;
-
-    // if (!areDifferentialPlotTabsReady) {
-    // return (
-    //   <div>
-    //     <Dimmer active inverted>
-    //       <Loader size="large">Loading Feature Data</Loader>
-    //     </Dimmer>
-    //   </div>
-    // );
-    // } else {
     const svgPanes = this.getSVGPanes(activeDifferentialPlotTabsIndex);
     return <div className="">{svgPanes}</div>;
-    // }
   }
 }
 

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { Grid, Dimmer, Loader, Tab } from 'semantic-ui-react';
+import _ from 'lodash';
 import EnrichmentBreadcrumbs from './EnrichmentBreadcrumbs';
 import ButtonActions from '../Shared/ButtonActions';
 // import PlotSVG from './PlotSVG';
@@ -211,7 +212,7 @@ class SplitPanesContainer extends Component {
     }
   };
 
-  splitPaneResized(size, paneType) {
+  splitPaneResized = (size, paneType) => {
     if (paneType === 'horizontal') {
       this.setState({
         horizontalSplitPaneSize: size,
@@ -222,7 +223,7 @@ class SplitPanesContainer extends Component {
       });
     }
     sessionStorage.setItem(`${paneType}SplitPaneSize`, size);
-  }
+  };
 
   render() {
     const BarcodePlot = this.getBarcodePlot();
@@ -249,12 +250,15 @@ class SplitPanesContainer extends Component {
               widescreen={16}
             >
               <SplitPane
-                className="ThreePlotsDiv SplitPanesWrapper"
+                className="ThreePlotsDiv"
+                id="SplitPanesWrapper"
                 split="horizontal"
                 defaultSize={this.state.horizontalSplitPaneSize}
                 minSize={150}
                 maxSize={400}
-                onChange={size => this.splitPaneResized(size, 'horizontal')}
+                onDragFinished={size =>
+                  this.splitPaneResized(size, 'horizontal')
+                }
               >
                 {BarcodePlot}
                 {/* <BarcodePlotReusable
@@ -266,7 +270,9 @@ class SplitPanesContainer extends Component {
                   defaultSize={this.state.verticalSplitPaneSize}
                   minSize={315}
                   maxSize={800}
-                  onChange={size => this.splitPaneResized(size, 'vertical')}
+                  onDragFinished={size =>
+                    this.splitPaneResized(size, 'vertical')
+                  }
                 >
                   <div id="ViolinAndTableSplitContainer">{ViolinAndTable}</div>
                   <div id="SVGSplitContainer">{SVGPlot}</div>

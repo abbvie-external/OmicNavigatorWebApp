@@ -3,12 +3,8 @@ import { withRouter } from 'react-router-dom';
 import { Grid, Dimmer, Loader } from 'semantic-ui-react';
 import DifferentialBreadcrumbs from './DifferentialBreadcrumbs';
 import ButtonActions from '../Shared/ButtonActions';
-// import DifferentialAccordion from './DifferentialAccordion';
-// import MetafeaturesTable from './MetafeaturesTable';
-// import SplitPane from 'react-split-pane';
 import DifferentialPlotTabs from './DifferentialPlotTabs';
 import '../Enrichment/SplitPanesContainer.scss';
-// import SVGPlot from '../Shared/SVGPlot';
 import './DifferentialPlot.scss';
 
 class DifferentialPlot extends Component {
@@ -23,8 +19,6 @@ class DifferentialPlot extends Component {
     pngVisible: true,
     pdfVisible: false,
     svgVisible: true,
-    metafeaturesSplitPaneSize:
-      parseInt(sessionStorage.getItem('metafeaturesSplitPaneSize'), 10) || 525,
   };
 
   componentDidMount() {
@@ -46,23 +40,13 @@ class DifferentialPlot extends Component {
     });
   };
 
-  splitPaneResized(size, paneType) {
-    if (paneType === 'horizontal') {
-      this.setState({
-        horizontalSplitPaneSize: size,
-      });
-    } else {
-      this.setState({
-        verticalSplitPaneSize: size,
-      });
-    }
-    sessionStorage.setItem(`${paneType}SplitPaneSize`, size);
-  }
-
   setButtonVisibility = index => {
     this.setState({
-      excelVisible: index === 2,
-      pdfVisible: index !== 2,
+      // excelVisible: index === 2,
+      // excel not ready yet
+      excelVisible: false,
+      // pdfVisible: index !== 2,
+      pdfVisible: false,
       svgVisible: index !== 2,
       pngVisible: index !== 2,
     });

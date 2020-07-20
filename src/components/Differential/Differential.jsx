@@ -38,8 +38,8 @@ class Differential extends Component {
   state = {
     isValidSearchDifferential: false,
     isSearchingDifferential: false,
-    showProteinPage: false,
     differentialResults: [],
+    differentialResultsMounted: false,
     differentialResultsUnfiltered: [],
     differentialColumns: [],
     filterableColumnsP: [],
@@ -80,6 +80,7 @@ class Differential extends Component {
     differentialTestsMetadata: [],
     plotSVGWidth: null,
     plotSVGHeight: null,
+    isVolcanoPlotSVGLoaded: false,
   };
   DifferentialViewContainerRef = React.createRef();
 
@@ -104,14 +105,6 @@ class Differential extends Component {
     //   );
     // }
   };
-
-  // calculateWidth(self) {
-  //   let containerWidth =
-  //     self.DifferentialViewContainerRef.current !== null
-  //       ? self.DifferentialViewContainerRef.current.parentElement.offsetWidth
-  //       : 1200;
-  //   return containerWidth;
-  // }
 
   handleSearchTransitionDifferential = bool => {
     this.setState({
@@ -145,6 +138,16 @@ class Differential extends Component {
 
   handleDifferentialSearch = searchResults => {
     let columns = [];
+    // need this check for page refresh
+    if (this.props.differentialProteinSite !== '') {
+      this.setState({
+        isItemSelected: true,
+      });
+    } else {
+      this.setState({
+        isItemSelected: false,
+      });
+    }
     if (searchResults.differentialResults?.length > 0) {
       columns = this.getConfigCols(searchResults);
     }
@@ -155,20 +158,14 @@ class Differential extends Component {
     //   );
     this.setState({
       differentialResults: searchResults.differentialResults,
+      differentialResultsUnfiltered: searchResults.differentialResults,
       differentialColumns: columns,
       isSearchingDifferential: false,
       isValidSearchDifferential: true,
-      showProteinPage: false,
+      differentialResultsMounted: false,
       plotButtonActive: false,
       visible: false,
-    });
-  };
-  handleDifferentialSearchUnfiltered = searchResults => {
-    this.setState({
-      differentialResultsUnfiltered: searchResults.differentialResults,
       isProteinSVGLoaded: false,
-      // isProteinDataLoaded: false,
-      isItemSelected: false,
       selectedFromTableData: [],
     });
   };
@@ -211,6 +208,7 @@ class Differential extends Component {
       plotButtonActive: false,
       visible: false,
       isItemSelected: false,
+      differentialResultsMounted: false,
       isProteinSVGLoaded: false,
     });
   };
@@ -241,6 +239,7 @@ class Differential extends Component {
       {
         imageInfo: imageInfo,
         isItemSelected: true,
+        differentialResultsMounted: false,
         isProteinSVGLoaded: false,
         // isProteinDataLoaded: false,
         // treeDataRaw: [],
@@ -408,19 +407,10 @@ class Differential extends Component {
     let handleSVGCb = this.handleSVG;
     // let self = this;
     let currentSVGs = [];
-    // keep whatever dimension is less (height or width)
-    // then multiply the other dimension by original svg ratio (height 595px, width 841px)
-    // let DifferentialPlotSVGHeight = this.calculateHeight(this);
-    let DifferentialPlotSVGWidth = this.calculateWidth();
-    // if (DifferentialPlotSVGHeight > DifferentialPlotSVGWidth) {
-    let DifferentialPlotSVGHeight = DifferentialPlotSVGWidth * 0.70749;
+    let DifferentialPlotSVGSizing = `height="100%" width="inherit"`;
     if (useVolcanoSVGSize === true) {
-      DifferentialPlotSVGHeight = this.state.plotSVGHeight;
-      DifferentialPlotSVGWidth = this.state.plotSVGWidth;
+      DifferentialPlotSVGSizing = `height="100%" width="auto"`;
     }
-    // } else {
-    //   DifferentialPlotSVGWidth = DifferentialPlotSVGHeight * 1.41344;
-    // }
     let handleItemSelectedCb = this.handleItemSelected;
     cancelRequestDifferentialResultsGetPlot();
     let cancelToken = new CancelToken(e => {
@@ -451,7 +441,7 @@ class Differential extends Component {
             );
             svgMarkup = svgMarkup.replace(
               /<svg/g,
-              `<svg preserveAspectRatio="xMinYMin meet" style="width:${DifferentialPlotSVGWidth}px" height:${DifferentialPlotSVGHeight} id="currentSVG-${id}-${i}"`,
+              `<svg preserveAspectRatio="xMinYMin meet" ${DifferentialPlotSVGSizing} id="currentSVG-${id}-${i}"`,
             );
             DOMPurify.addHook('afterSanitizeAttributes', function(node) {
               if (
@@ -501,20 +491,9 @@ class Differential extends Component {
       );
     }
   };
-  handleVolcanoSVGSizeChange = (height, width) => {
-    this.setState(
-      {
-        plotSVGHeight: height,
-        plotSVGWidth: width,
-        isProteinSVGLoaded: false,
-      },
-      function() {
-        this.getPlot(this.state.maxObjectData.id, true);
-      },
-    );
-  };
 
   handleSelectedFromTable = toHighlightArr => {
+    this.setState({ isVolcanoPlotSVGLoaded: false });
     const { maxObjectData } = this.state;
     let max = [];
     if (toHighlightArr.length !== 0) {
@@ -558,24 +537,26 @@ class Differential extends Component {
     this.setState({
       imageInfo: imageInfo,
       isProteinSVGLoaded: true,
+      isVolcanoPlotSVGLoaded: true,
     });
   };
-  calculateWidth() {
-    var w = Math.max(
-      document.documentElement.clientWidth,
-      window.innerWidth || 0,
-    );
-    if (w > 1199) {
-      return w * 0.35;
-    } else if (w < 1200 && w > 767) {
-      return w * 0.6;
-    } else return w * 0.8;
-  }
+  // calculateWidth() {
+  //   var w = Math.max(
+  //     document.documentElement.clientWidth,
+  //     window.innerWidth || 0,
+  //   );
+  //   if (w > 1199) {
+  //     return w * 0.;
+  //   } else if (w < 1200 && w > 767) {
+  //     return w * 0.6;
+  //   } else return w * 0.8;
+  // }
   backToTable = () => {
     this.setState({
+      differentialResultsMounted: false,
       isItemSelected: false,
       // isProteinDataLoaded: false,
-      isProteinSVGLoaded: true,
+      isProteinSVGLoaded: false,
     });
     this.handleSearchCriteriaChange(
       {
@@ -612,6 +593,20 @@ class Differential extends Component {
       }
     }
     const alphanumericTrigger = differentialAlphanumericFields[0];
+    if (differentialProteinSite !== '') {
+      let imageInfo = { key: '', title: '', svg: [] };
+      imageInfo.title = `Protein Intensity - ${alphanumericTrigger} ${differentialProteinSite}`;
+      imageInfo.key = `${alphanumericTrigger} ${differentialProteinSite}`;
+      this.setState({
+        imageInfo: imageInfo,
+        differentialResultsMounted: false,
+        isItemSelected: true,
+        isProteinSVGLoaded: false,
+        // isProteinDataLoaded: false,
+        currentSVGs: [],
+      });
+      this.getPlot(differentialProteinSite, false);
+    }
     this.props.onHandleDifferentialFeatureIdKey(
       'differentialFeatureIdKey',
       alphanumericTrigger,
@@ -724,22 +719,6 @@ class Differential extends Component {
     const configCols = differentialAlphanumericColumnsMapped.concat(
       differentialNumericColumnsMapped,
     );
-    if (differentialProteinSite !== '') {
-      let imageInfo = { key: '', title: '', svg: [] };
-      imageInfo.title = `Protein Intensity - ${alphanumericTrigger} ${differentialProteinSite}`;
-      imageInfo.key = `${alphanumericTrigger} ${differentialProteinSite}`;
-      this.setState({
-        imageInfo: imageInfo,
-        isItemSelected: true,
-        isProteinSVGLoaded: false,
-        // isProteinDataLoaded: false,
-        // treeDataRaw: [],
-        // treeData: [],
-        // treeDataColumns: [],
-        currentSVGs: [],
-      });
-      this.getPlot(differentialProteinSite, false);
-    }
     return configCols;
   };
   listToJson(list) {
@@ -757,10 +736,12 @@ class Differential extends Component {
   getView = () => {
     if (this.state.isItemSelected && !this.state.isProteinSVGLoaded) {
       return <LoaderActivePlots />;
+    } else if (this.state.isSearchingDifferential) {
+      return <TransitionActive />;
     } else if (this.state.isItemSelected && this.state.isProteinSVGLoaded) {
       return (
         <DifferentialPlot
-          // ref={this.DifferentialViewContainerRef}
+          ref={this.DifferentialViewContainerRef}
           {...this.props}
           {...this.state}
           onBackToTable={this.backToTable}
@@ -768,8 +749,8 @@ class Differential extends Component {
       );
     } else if (
       this.state.isValidSearchDifferential &&
-      !this.state.showProteinPage &&
-      !this.state.isSearchingDifferential
+      !this.state.isSearchingDifferential &&
+      !this.state.isItemSelected
     ) {
       const TableAndPlotPanes = this.getTableAndPlotPanes();
       return (
@@ -785,9 +766,13 @@ class Differential extends Component {
           }}
         />
       );
-    } else if (this.state.isSearchingDifferential) {
-      return <TransitionActive />;
     } else return <TransitionStill />;
+  };
+
+  handleDifferentialResultsMounted = bool => {
+    this.setState({
+      differentialResultsMounted: bool,
+    });
   };
 
   getTableAndPlotPanes = () => {
@@ -796,7 +781,7 @@ class Differential extends Component {
         menuItem: (
           <Menu.Item
             key="0"
-            className="TableAndNPlotButtons TableButton"
+            className="TableAndPlotButtons TableButton"
             name="Table"
             color="orange"
           >
@@ -818,6 +803,7 @@ class Differential extends Component {
               {...this.props}
               // onSearchCriteriaChange={this.handleSearchCriteriaChange}
               onHandlePlotAnimation={this.handlePlotAnimation}
+              differentialResultsMounted={this.handleDifferentialResultsMounted}
             />
           </Tab.Pane>
         ),
@@ -918,9 +904,6 @@ class Differential extends Component {
                 this.handleSearchTransitionDifferential
               }
               onDifferentialSearch={this.handleDifferentialSearch}
-              onDifferentialSearchUnfiltered={
-                this.handleDifferentialSearchUnfiltered
-              }
               onSearchCriteriaChange={this.handleSearchCriteriaChange}
               onSearchCriteriaReset={this.hidePGrid}
               onDisablePlot={this.disablePlot}
