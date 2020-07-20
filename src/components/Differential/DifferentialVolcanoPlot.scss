@@ -1,41 +1,43 @@
-// .volcanoPlotContainer{
-//     margin: 0 auto;
-// }
-
-.volcanoPlotSVG{
+.volcanoPlotContainer {
+  .volcanoPlotSVG {
     margin: 0 auto;
     display: block;
-}
+  }
 
-.volcanoPlotYAxis{
+  .volcanoPlotYAxis {
     stroke: #838383;
     stroke-width: 2px;
-}
-.volcanoPlotXAxis{
+  }
+  .volcanoPlotXAxis {
     stroke: #838383;
     stroke-width: 2px;
-}
-.axisLabel{
+  }
+  .axisLabel {
     font-weight: bold;
-}
-.volcanoPlot-dataPoint {
+  }
+  .volcanoPlot-dataPoint {
     stroke: black;
     stroke-width: 0.4;
     fill: #ff4400;
-}
-.volcanoPlot-dataPoint.hovered{
+  }
+  .volcanoPlot-dataPoint.hovered {
     stroke: lightskyblue;
     stroke-width: 5;
-}
-.volcanoPlot-dataPoint.selected {
+  }
+  .volcanoPlot-dataPoint.selected {
     stroke: blue;
     stroke-width: 3;
-}
-.volcanoPlot-dataPoint.highlighted {
+  }
+  .volcanoPlot-dataPoint.highlighted {
     stroke: var(--color-primary-gradient);
     stroke-width: 4;
-}
-.volcanoPlot-dataPoint.highlightedMax {
+  }
+  .volcanoPlot-dataPoint.highlightedMax {
     stroke: var(--color-primary);
     stroke-width: 4;
+  }
+
+  #differentialVolcanoPlot {
+    margin-left: 20px !important;
+  }
 }
