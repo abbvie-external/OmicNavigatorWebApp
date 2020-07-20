@@ -355,7 +355,7 @@ class EnrichmentSearchCriteria extends Component {
           getEnrichmentsTableData,
           true,
           true,
-          // PAUL - this needs to be handled true for column reordering, once grid props are fixed
+          // PAUL - this needs to be handled true for column reordering, once we can freeze the first column (featureID) from being reordered
           false,
         );
       })

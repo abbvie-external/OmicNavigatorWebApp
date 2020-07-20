@@ -63,7 +63,7 @@ class EnrichmentResultsTable extends Component {
               exportBaseName="Enrichment_Analysis"
               quickViews={quickViews}
               // disableGeneralSearch
-              columnReorder={this.props.columnReorder}
+              // columnReorder={this.props.columnReorder}
               disableColumnReorder
               disableGrouping
               disableColumnVisibilityToggle
