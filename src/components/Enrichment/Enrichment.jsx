@@ -368,7 +368,7 @@ class Enrichment extends Component {
     this.removeNetworkSVG();
     this.setState({ networkGraphReady: false });
 
-    // PAUL - talk to justin about this - has to do with column reordering, i think
+    // cannot use this unless we can prevent first column (featureID) from being reordered
     // if (this.state.enrichmentColumns.length === 0) {
     //   this.handleColumns(searchResults);
     // }
@@ -1612,21 +1612,22 @@ class Enrichment extends Component {
       itemsPerPageInformedEnrichmentMain: items,
     });
   };
-  columnReorder = columns => {
-    this.setState({ enrichmentColumns: columns });
-    const columnsArr = columns.map(e => {
-      return e.title;
-    });
-    const uDataRelevantFields = _.filter(columnsArr, function(key) {
-      return key !== 'description' && key !== 'Annotation';
-    });
-    // multiset svg rebuilds based on uData...if there are no results we need to override this from being passed down
-    if (uDataRelevantFields.length !== 0) {
-      this.setState({
-        uData: uDataRelevantFields,
-      });
-    }
-  };
+  // cannot use this unless we can prevent first column (featureID) from being reordered
+  // columnReorder = columns => {
+  //   this.setState({ enrichmentColumns: columns });
+  //   const columnsArr = columns.map(e => {
+  //     return e.title;
+  //   });
+  //   const uDataRelevantFields = _.filter(columnsArr, function(key) {
+  //     return key !== 'description' && key !== 'Annotation';
+  //   });
+  //   // multiset svg rebuilds based on uData...if there are no results we need to override this from being passed down
+  //   if (uDataRelevantFields.length !== 0) {
+  //     this.setState({
+  //       uData: uDataRelevantFields,
+  //     });
+  //   }
+  // };
 
   handleTableNetworkTabChange = (e, { activeIndex }) => {
     sessionStorage.setItem(`enrichmentViewTab`, activeIndex);
@@ -1724,7 +1725,7 @@ class Enrichment extends Component {
             <EnrichmentResultsTable
               {...this.props}
               {...this.state}
-              columnReorder={this.columnReorder}
+              // columnReorder={this.columnReorder}
               onHandlePlotAnimation={this.handlePlotAnimation}
               onDisplayViolinPlot={this.displayViolinPlot}
             />

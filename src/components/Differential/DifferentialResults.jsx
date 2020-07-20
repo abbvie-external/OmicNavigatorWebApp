@@ -71,6 +71,7 @@ class DifferentialResults extends Component {
             disableGeneralSearch
             disableGrouping
             disableColumnVisibilityToggle
+            disableColumnReorder
             // disableFilters
             min-height="75vh"
             additionalTemplateInfo={additionalTemplateInfoDifferentialTable}
