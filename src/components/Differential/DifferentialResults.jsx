@@ -66,7 +66,7 @@ class DifferentialResults extends Component {
             totalRows={differentialRows}
             // use "differentialRows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
             itemsPerPage={itemsPerPageInformed}
-            exportBaseName="Differential_Phosphorylation_Analysis"
+            exportBaseName="Differential_Analysis"
             // quickViews={quickViews}
             disableGeneralSearch
             disableGrouping
