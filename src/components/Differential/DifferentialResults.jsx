@@ -27,7 +27,7 @@ class DifferentialResults extends Component {
   };
 
   componentDidMount() {
-    this.props.differentialResultsMounted(true);
+    // this.props.differentialResultsMounted(true);
   }
 
   render() {

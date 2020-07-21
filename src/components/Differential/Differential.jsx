@@ -39,7 +39,7 @@ class Differential extends Component {
     isValidSearchDifferential: false,
     isSearchingDifferential: false,
     differentialResults: [],
-    differentialResultsMounted: false,
+    // differentialResultsMounted: false,
     differentialResultsUnfiltered: [],
     differentialColumns: [],
     filterableColumnsP: [],
@@ -169,7 +169,7 @@ class Differential extends Component {
       differentialColumns: columns,
       isSearchingDifferential: false,
       isValidSearchDifferential: true,
-      differentialResultsMounted: false,
+      // differentialResultsMounted: false,
       plotButtonActive: false,
       visible: false,
       isProteinSVGLoaded: false,
@@ -215,7 +215,7 @@ class Differential extends Component {
       plotButtonActive: false,
       visible: false,
       isItemSelected: false,
-      differentialResultsMounted: false,
+      // differentialResultsMounted: false,
       isProteinSVGLoaded: false,
     });
   };
@@ -246,7 +246,7 @@ class Differential extends Component {
       {
         imageInfo: imageInfo,
         isItemSelected: true,
-        differentialResultsMounted: false,
+        // differentialResultsMounted: false,
         isProteinSVGLoaded: false,
         // isProteinDataLoaded: false,
         // treeDataRaw: [],
@@ -549,7 +549,7 @@ class Differential extends Component {
   };
   backToTable = () => {
     this.setState({
-      differentialResultsMounted: false,
+      // differentialResultsMounted: false,
       isItemSelected: false,
       // isProteinDataLoaded: false,
       isProteinSVGLoaded: false,
@@ -595,7 +595,7 @@ class Differential extends Component {
       imageInfo.key = `${alphanumericTrigger} ${differentialProteinSite}`;
       this.setState({
         imageInfo: imageInfo,
-        differentialResultsMounted: false,
+        // differentialResultsMounted: false,
         isItemSelected: true,
         isProteinSVGLoaded: false,
         // isProteinDataLoaded: false,
@@ -765,11 +765,11 @@ class Differential extends Component {
     } else return <TransitionStill />;
   };
 
-  handleDifferentialResultsMounted = bool => {
-    this.setState({
-      differentialResultsMounted: bool,
-    });
-  };
+  // handleDifferentialResultsMounted = bool => {
+  //   this.setState({
+  //     differentialResultsMounted: bool,
+  //   });
+  // };
 
   getTableAndPlotPanes = () => {
     return [
@@ -799,7 +799,7 @@ class Differential extends Component {
               {...this.props}
               // onSearchCriteriaChange={this.handleSearchCriteriaChange}
               onHandlePlotAnimation={this.handlePlotAnimation}
-              differentialResultsMounted={this.handleDifferentialResultsMounted}
+              // differentialResultsMounted={this.handleDifferentialResultsMounted}
             />
           </Tab.Pane>
         ),
