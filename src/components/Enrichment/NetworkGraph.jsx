@@ -57,6 +57,11 @@ class NetworkGraph extends Component {
     }
   }
 
+  componentWillUnmount() {
+    this.removeNetworkSVG();
+    this.props.onCancelGetEnrichmentsNetwork();
+  }
+
   handleNodeSearch = () => {
     // setTimeout(() => {
     let str = this.props.networkSearchValue;
@@ -117,7 +122,7 @@ class NetworkGraph extends Component {
     // if (totalClusters >= 20) {
     if (totalClusters !== 1) {
       // let networkCalculatedWidth = (relevantNodesLength * .75) * totalClusters * 1.5;
-      let networkCalculatedWidth = relevantNodesLength * 35;
+      let networkCalculatedWidth = relevantNodesLength * 20;
       // console.log(networkCalculatedWidth);
       return Math.max(
         networkCalculatedWidth,

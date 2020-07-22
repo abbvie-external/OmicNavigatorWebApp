@@ -72,6 +72,12 @@ class DifferentialVolcano extends Component {
       //   },
       // ]);
     }
+    //   if (this.props.featureToHighlightInDiffTable !==
+    //     prevProps.featureToHighlightInDiffTable &&
+    //     this.props.featureToHighlightInDiffTable !== '')
+    //  {
+
+    // }
   }
   getAxisLabels = () => {
     if (this.props.differentialResults.length !== 0) {

@@ -171,11 +171,7 @@ class FilteredDifferentialTable extends Component {
         )
         .then(dataFromService => {
           if (dataFromService.length > 0) {
-            // const filteredData = _.intersectionWith(datafFromService, allTickIds, _.isEqual);
-            // const diffProtein = this.props.HighlightedProteins.lineID;
-            // this.props.onViewDiffTable(name, diffProtein);
             this.setConfigCols(barcodeData, dataFromService, false);
-            // return cols;
           }
         })
         .catch(error => {

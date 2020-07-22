@@ -98,7 +98,10 @@ class DifferentialSearchCriteria extends Component {
   componentDidUpdate(prevProps) {
     if (
       this.props.allStudiesMetadata !== prevProps.allStudiesMetadata ||
-      this.props.differentialStudy !== prevProps.differentialStudy
+      this.props.differentialStudy !== prevProps.differentialStudy ||
+      (this.props.featureToHighlightInDiffTable !==
+        prevProps.featureToHighlightInDiffTable &&
+        this.props.featureToHighlightInDiffTable !== '')
     ) {
       this.populateDropdowns();
     }
@@ -110,7 +113,7 @@ class DifferentialSearchCriteria extends Component {
       differentialStudy,
       differentialModel,
       differentialTest,
-      differentialProteinSite,
+      differentialFeature,
       onSearchCriteriaChange,
       onSearchTransitionDifferential,
     } = this.props;
@@ -209,7 +212,7 @@ class DifferentialSearchCriteria extends Component {
               differentialStudy: differentialStudy,
               differentialModel: differentialModel,
               differentialTest: differentialTest,
-              differentialProteinSite: differentialProteinSite,
+              differentialFeature: differentialFeature,
             },
             false,
           );
@@ -222,8 +225,8 @@ class DifferentialSearchCriteria extends Component {
             differentialTestTooltip,
             uAnchorP: differentialTest,
           });
-          // if (differentialProteinSite !== '') {
-          //   this.props.onGetPlot(differentialProteinSite, true);
+          // if (differentialFeature !== '') {
+          //   this.props.onGetPlot(differentialFeature, true);
           // }
         }
       }

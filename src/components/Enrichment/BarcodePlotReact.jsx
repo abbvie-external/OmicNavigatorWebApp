@@ -386,7 +386,7 @@ class BarcodePlotReact extends Component {
       const quartile = Math.round(quatileTicks.nodes().length * 0.25);
       setTimeout(function() {
         d3.select('.brush').call([objsBrush][0].move, [
-          [quatileTicks.nodes()[quartile].getAttribute('x1'), 60],
+          [quatileTicks.nodes()[quartile].getAttribute('x1'), 30],
           [quatileTicks.nodes()[0].getAttribute('x1'), barcodeHeight - 30],
         ]);
       }, 50);
@@ -534,7 +534,7 @@ class BarcodePlotReact extends Component {
         x2={xScale(d.statistic) + settings.margin.left}
         y1={settings.margin.top}
         y2={barcodeHeight}
-        featureID={d.featureID}
+        featureid={d.featureID}
         lineid={d.featureDisplay}
         logfc={d.logFoldChange}
         statistic={d.statistic}

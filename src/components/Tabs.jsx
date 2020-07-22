@@ -18,17 +18,19 @@ class Tabs extends Component {
     const tabFromUrl = params[0] || '';
     const studyFromUrl = params[1] || '';
     const modelFromUrl = params[2] || '';
-    const testFromUrl = params[3] || '';
-    const siteFromUrl = params[4] || '';
+    const testOrAnnotationFromUrl = params[3] || '';
+    const featureOrTestfromUrl = params[4] || '';
     const descriptionFromUrl = params[5] || '';
-    const siteAndDescription =
+    const featureOrTestAndDescription =
       descriptionFromUrl !== ''
-        ? `${siteFromUrl}/${descriptionFromUrl}`
-        : siteFromUrl;
+        ? `${featureOrTestfromUrl}/${descriptionFromUrl}`
+        : featureOrTestfromUrl;
     const decodedStudy = decodeURI(studyFromUrl);
     const decodedModel = decodeURI(modelFromUrl);
-    const decodedTest = decodeURI(testFromUrl);
-    const decodedSiteAndDescription = decodeURI(siteAndDescription);
+    const decodedTest = decodeURI(testOrAnnotationFromUrl);
+    const decodedFeatureOrTestAndDescription = decodeURI(
+      featureOrTestAndDescription,
+    );
     const isEnrichment = tabFromUrl === 'enrichment';
     this.state = {
       activeIndex: isEnrichment ? 3 : 2,
@@ -36,18 +38,21 @@ class Tabs extends Component {
       enrichmentStudy: isEnrichment ? decodedStudy : '',
       enrichmentModel: isEnrichment ? decodedModel : '',
       enrichmentAnnotation: isEnrichment ? decodedTest : '',
-      enrichmentDescriptionAndTest: isEnrichment
-        ? decodedSiteAndDescription
+      enrichmentTestAndDescription: isEnrichment
+        ? decodedFeatureOrTestAndDescription
         : '',
       differentialStudy: !isEnrichment ? decodedStudy : '',
       differentialModel: !isEnrichment ? decodedModel : '',
       differentialTest: !isEnrichment ? decodedTest : '',
-      differentialProteinSite: !isEnrichment ? decodedSiteAndDescription : '',
+      differentialFeature: !isEnrichment
+        ? decodedFeatureOrTestAndDescription
+        : '',
       pValueType: 'nominal',
-      proteinToHighlightInDiffTable: isEnrichment ? false : '',
+      featureToHighlightInDiffTable: '',
       allStudiesMetadata: [],
       differentialFeatureIdKey: '',
       filteredDifferentialFeatureIdKey: '',
+      bullseyeHighlightInProgress: false,
     };
   }
 
@@ -99,8 +104,7 @@ class Tabs extends Component {
         differentialStudy: changes.differentialStudy || '',
         differentialModel: changes.differentialModel || '',
         differentialTest: changes.differentialTest || '',
-        differentialProteinSite: changes.differentialProteinSite || '',
-        proteinHighlightInProgress: false,
+        differentialFeature: changes.differentialFeature || '',
       });
     } else if (tab === 'enrichment') {
       this.setState({
@@ -108,9 +112,8 @@ class Tabs extends Component {
         enrichmentStudy: changes.enrichmentStudy || '',
         enrichmentModel: changes.enrichmentModel || '',
         enrichmentAnnotation: changes.enrichmentAnnotation || '',
-        enrichmentDescriptionAndTest:
-          changes.enrichmentDescriptionAndTest || '',
-        proteinHighlightInProgress: false,
+        enrichmentTestAndDescription:
+          changes.enrichmentTestAndDescription || '',
       });
     }
     updateUrl(
@@ -128,21 +131,24 @@ class Tabs extends Component {
       [name]: id,
     });
   };
-  handleViewDiffTable = (test, protein) => {
+  findDifferentialFeature = (test, featureID) => {
     this.setState({
       activeIndex: 1,
       tab: 'differential',
       differentialStudy: this.state.enrichmentStudy || '',
       differentialModel: this.state.enrichmentModel || '',
       differentialTest: test || '',
-      proteinToHighlightInDiffTable: protein,
-      proteinHighlightInProgress: true,
+      differentialFeature: '',
+      bullseyeHighlightInProgress: true,
+      featureToHighlightInDiffTable: featureID,
     });
     let changes = {
       differentialStudy: this.state.enrichmentStudy || '',
       differentialModel: this.state.enrichmentModel || '',
       differentialTest: test || '',
+      differentialFeature: '',
     };
+    debugger;
     updateUrl(
       this.props,
       this.state,
@@ -153,6 +159,40 @@ class Tabs extends Component {
       'differential',
     );
   };
+
+  // findDifferentialFeature = (test, featureID) => {
+  //   const self = this;
+  //   self.setState(
+  //     {
+  //       activeIndex: 1,
+  //       tab: 'differential',
+  //       differentialStudy: self.state.enrichmentStudy || '',
+  //       differentialModel: self.state.enrichmentModel || '',
+  //       differentialTest: test || '',
+  //       differentialFeature: '',
+  //       bullseyeHighlightInProgress: true,
+  //       featureToHighlightInDiffTable: featureID,
+  //     },
+  //     function() {
+  //       let changes = {
+  //         differentialStudy: self.state.enrichmentStudy || '',
+  //         differentialModel: self.state.enrichmentModel || '',
+  //         differentialTest: test || '',
+  //         differentialFeature: '',
+  //       };
+  //       debugger;
+  //       updateUrl(
+  //         self.props,
+  //         self.state,
+  //         changes,
+  //         'tabChange',
+  //         self.setTabIndex,
+  //         true,
+  //         'differential',
+  //       );
+  //     },
+  //   );
+  // };
 
   getStudies = () => {
     phosphoprotService
@@ -209,7 +249,7 @@ class Tabs extends Component {
               {...this.state}
               onSearchCriteriaToTop={this.handleSearchCriteriaToTop}
               onPValueTypeChange={this.handlePValueTypeChange}
-              onViewDiffTable={this.handleViewDiffTable}
+              onFindDifferentialFeature={this.findDifferentialFeature}
               onHandleDifferentialFeatureIdKey={
                 this.handleDifferentialFeatureIdKey
               }

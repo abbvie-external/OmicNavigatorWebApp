@@ -31,6 +31,8 @@ import EnrichmentSearchCriteria from './EnrichmentSearchCriteria';
 import SplitPanesContainer from './SplitPanesContainer';
 
 let cancelRequestEnrichmentGetPlot = () => {};
+let cancelRequestGetEnrichmentsNetwork = () => {};
+
 class Enrichment extends Component {
   defaultEnrichmentActiveIndex =
     parseInt(sessionStorage.getItem('enrichmentViewTab'), 10) || 0;
@@ -112,9 +114,6 @@ class Enrichment extends Component {
     enrichmentDataItem: [],
     enrichmentTerm: '',
     itemsPerPageInformedEnrichmentMain: null,
-    treeDataRaw: [],
-    treeData: [],
-    treeDataColumns: [],
     plotType: [],
     imageInfo: {
       key: null,
@@ -200,7 +199,7 @@ class Enrichment extends Component {
 
   componentDidUpdate(prevProps, prevState, snapshot) {
     if (this.state.enrichmentResults !== prevState.enrichmentResults) {
-      const DescriptionAndTest = this.props.enrichmentDescriptionAndTest || '';
+      const DescriptionAndTest = this.props.enrichmentTestAndDescription || '';
       if (DescriptionAndTest !== '') {
         const AllDescriptionsAndTests = this.state.enrichmentResults;
         const ResultsLength = this.state.enrichmentResults.length;
@@ -638,6 +637,10 @@ class Enrichment extends Component {
     d3.select(`#svg-${this.state.networkSettings.id}`).remove();
   };
 
+  handleCancelRequestGetEnrichmentsNetwork = () => {
+    cancelRequestGetEnrichmentsNetwork();
+  };
+
   getNetworkData = enrichmentResults => {
     const {
       enrichmentModel,
@@ -663,12 +666,17 @@ class Enrichment extends Component {
         previousEnrichmentModel: enrichmentModel,
         previousEnrichmentAnnotation: enrichmentAnnotation,
       });
+      cancelRequestGetEnrichmentsNetwork();
+      let cancelToken = new CancelToken(e => {
+        cancelRequestGetEnrichmentsNetwork = e;
+      });
       phosphoprotService
         .getEnrichmentsNetwork(
           enrichmentStudy,
           enrichmentModel,
           enrichmentAnnotation,
           this.handleGetEnrichmentNetworkError,
+          cancelToken,
         )
         .then(getEnrichmentNetworkResponseData => {
           this.setState(
@@ -1025,7 +1033,7 @@ class Enrichment extends Component {
         enrichmentStudy: this.props.enrichmentStudy || '',
         enrichmentModel: this.props.enrichmentModel || '',
         enrichmentAnnotation: this.props.enrichmentAnnotation || '',
-        enrichmentDescriptionAndTest: '',
+        enrichmentTestAndDescription: '',
       },
       false,
     );
@@ -1045,7 +1053,7 @@ class Enrichment extends Component {
         enrichmentStudy: this.props.enrichmentStudy || '',
         enrichmentModel: this.props.enrichmentModel || '',
         enrichmentAnnotation: this.props.enrichmentAnnotation || '',
-        enrichmentDescriptionAndTest: TestSiteVar || '',
+        enrichmentTestAndDescription: TestSiteVar || '',
       },
       true,
     );
@@ -1594,7 +1602,7 @@ class Enrichment extends Component {
         enrichmentStudy: this.props.enrichmentStudy || '',
         enrichmentModel: this.props.enrichmentModel || '',
         enrichmentAnnotation: this.props.enrichmentAnnotation || '',
-        enrichmentDescriptionAndTest: '',
+        enrichmentTestAndDescription: '',
       },
       false,
     );
@@ -1778,6 +1786,9 @@ class Enrichment extends Component {
                 onHandleLegendOpen={this.handleLegendOpen}
                 onHandleLegendClose={this.handleLegendClose}
                 onCreateLegend={this.createLegend}
+                onCancelGetEnrichmentsNetwork={
+                  this.handleCancelRequestGetEnrichmentsNetwork
+                }
               />
             ) : (
               <Message

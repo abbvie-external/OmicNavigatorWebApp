@@ -37,7 +37,7 @@ class DifferentialResults extends Component {
       differentialTest,
       differentialColumns,
       differentialResults,
-      proteinToHighlightInDiffTable,
+      featureToHighlightInDiffTable,
       proteinHighlightInProgress,
       isItemSelected,
       additionalTemplateInfoDifferentialTable,
@@ -47,11 +47,10 @@ class DifferentialResults extends Component {
     // PAUL - ensure this accounts for multiset filters
     let differentialCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}`;
     if (
-      proteinToHighlightInDiffTable !== '' &&
-      proteinToHighlightInDiffTable !== null &&
-      proteinToHighlightInDiffTable !== undefined
+      featureToHighlightInDiffTable !== '' &&
+      featureToHighlightInDiffTable != null
     ) {
-      differentialCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-${proteinToHighlightInDiffTable}`;
+      differentialCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-${featureToHighlightInDiffTable}`;
     }
     // const quickViews = [];
     if (!isItemSelected || proteinHighlightInProgress) {

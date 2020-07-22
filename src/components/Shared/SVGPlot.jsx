@@ -28,11 +28,11 @@ class SVGPlot extends Component {
     this.props.onSVGTabChange(activeIndex);
   };
 
-  handleDiffTable = evt => {
-    const key = this.props.imageInfo.key.split(':');
-    const name = key[0] || '';
-    const diffProtein = this.props.HighlightedProteins[0].sample;
-    this.props.onViewDiffTable(name, diffProtein);
+  navigateToDifferentialFeature = evt => {
+    const testAndDescription = this.props.imageInfo.key.split(':');
+    const test = testAndDescription[0] || '';
+    const featureID = this.props.HighlightedProteins[0].sample;
+    this.props.onFindDifferentialFeature(test, featureID);
   };
 
   getSVGPanes(activeSVGTabIndex) {
@@ -136,7 +136,7 @@ class SVGPlot extends Component {
               <Icon
                 name="bullseye"
                 size="large"
-                onClick={this.handleDiffTable}
+                onClick={this.navigateToDifferentialFeature}
                 className="DiffTableIcon"
               />
             }

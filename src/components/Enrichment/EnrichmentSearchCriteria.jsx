@@ -117,7 +117,7 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentModel,
       enrichmentAnnotation,
       pValueType,
-      enrichmentDescriptionAndTest,
+      enrichmentTestAndDescription,
       onSearchCriteriaChange,
       onSearchTransitionEnrichment,
     } = this.props;
@@ -221,7 +221,7 @@ class EnrichmentSearchCriteria extends Component {
               enrichmentStudy: enrichmentStudy,
               enrichmentModel: enrichmentModel,
               enrichmentAnnotation: enrichmentAnnotation,
-              enrichmentDescriptionAndTest: enrichmentDescriptionAndTest,
+              enrichmentTestAndDescription: enrichmentTestAndDescription,
             },
             false,
           );
@@ -245,7 +245,7 @@ class EnrichmentSearchCriteria extends Component {
         [name]: value,
         enrichmentModel: '',
         enrichmentAnnotation: '',
-        enrichmentDescriptionAndTest: '',
+        enrichmentTestAndDescription: '',
       },
       true,
     );
@@ -275,7 +275,7 @@ class EnrichmentSearchCriteria extends Component {
         enrichmentStudy: enrichmentStudy,
         [name]: value,
         enrichmentAnnotation: '',
-        enrichmentDescriptionAndTest: '',
+        enrichmentTestAndDescription: '',
       },
       true,
     );
@@ -333,7 +333,7 @@ class EnrichmentSearchCriteria extends Component {
         enrichmentStudy: enrichmentStudy,
         enrichmentModel: enrichmentModel,
         [name]: value,
-        enrichmentDescriptionAndTest: '',
+        enrichmentTestAndDescription: '',
       },
       true,
     );
@@ -550,7 +550,7 @@ class EnrichmentSearchCriteria extends Component {
         enrichmentStudy: enrichmentStudy,
         enrichmentModel: enrichmentModel,
         [name]: value,
-        enrichmentDescriptionAndTest: '',
+        enrichmentTestAndDescription: '',
       },
       true,
     );

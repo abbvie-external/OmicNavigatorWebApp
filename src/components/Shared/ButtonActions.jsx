@@ -22,13 +22,6 @@ class ButtonActions extends Component {
     // })
   }
 
-  ExcelExport = () => {
-    excelService.exportAsExcelFile(
-      this.props.treeDataRaw,
-      this.props.imageInfo.title + '_Peptide_Data',
-    );
-  };
-
   PNGExport = () => {
     // const svgElements =
     //   document.getElementsByClassName('ContentContainer') || null;
@@ -135,11 +128,7 @@ class ButtonActions extends Component {
 
   getExcelButton = () => {
     if (this.props.excelVisible) {
-      return (
-        <Button className="ExportButton" onClick={this.ExcelExport}>
-          Data (.xls)
-        </Button>
-      );
+      return <Button className="ExportButton">Data (.xls)</Button>;
     }
   };
 
