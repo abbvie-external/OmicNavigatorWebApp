@@ -252,7 +252,7 @@ class QHGridHeader extends React.PureComponent {
             className="ExcelLogo"
             // avatar
             size="mini"
-            // onClick={this.props.exportExcel(columns)}
+            onClick={this.props.exportExcel(columns)}
             style={{ float: 'right', cursor: 'pointer' }}
           />
         }
@@ -260,8 +260,7 @@ class QHGridHeader extends React.PureComponent {
         inverted
         basic
         position="bottom right"
-        // content="Export Data to Excel"
-        content="Export Issue - Coming Back Soon!"
+        content="Export Data to Excel"
       />
     );
     // }
