@@ -35,33 +35,42 @@ class DifferentialVolcano extends Component {
     identifier: null,
   };
 
-  componentDidMount() {}
+  componentDidMount() {
+    const { identifier } = this.state;
+    const { maxObjectIdentifier, differentialFeatureIdKey } = this.props;
+    this.getAxisLabels();
+    this.setState({
+      filteredTableData: this.props.differentialResults,
+      volcanoPlotRows: this.props.differentialResults.length,
+      volcanoWidth: this.state.defaultVolcanoWidth * 0.95,
+      volcanoHeight: this.state.defaultVolcanoHeight * 0.95,
+    });
+    const defaultMaxObject = this.props.differentialResults[0];
+    this.props.onSelectFromTable([
+      {
+        id: defaultMaxObject[differentialFeatureIdKey],
+        value: defaultMaxObject[maxObjectIdentifier],
+        key: defaultMaxObject[identifier],
+      },
+    ]);
+  }
   componentDidUpdate(prevProps, prevState) {
-    if (
-      prevProps.differentialResultsMounted !==
-      this.props.differentialResultsMounted
-    ) {
-      const { identifier } = this.state;
-      const { maxObjectIdentifier, differentialFeatureIdKey } = this.props;
-      this.getAxisLabels();
-      this.setState({
-        filteredTableData: this.props.differentialResults,
-        volcanoPlotRows: this.props.differentialResults.length,
-        volcanoWidth: this.state.defaultVolcanoWidth * 0.95,
-        volcanoHeight: this.state.defaultVolcanoHeight * 0.95,
-      });
-      const defaultMaxObject = this.props.differentialResults[0];
-      this.props.onSelectFromTable([
-        {
-          id: defaultMaxObject[differentialFeatureIdKey],
-          value: defaultMaxObject[maxObjectIdentifier],
-          key: defaultMaxObject[identifier],
-        },
-      ]);
+    if (prevProps.differentialResults !== this.props.differentialResults) {
+      // const { identifier } = this.state;
+      // const { maxObjectIdentifier, differentialFeatureIdKey } = this.props;
+      // this.getAxisLabels();
       this.setState({
         filteredTableData: this.props.differentialResults,
         volcanoPlotRows: this.props.differentialResults.length,
       });
+      // const defaultMaxObject = this.props.differentialResults[0];
+      // this.props.onSelectFromTable([
+      //   {
+      //     id: defaultMaxObject[differentialFeatureIdKey],
+      //     value: defaultMaxObject[maxObjectIdentifier],
+      //     key: defaultMaxObject[identifier],
+      //   },
+      // ]);
     }
   }
   getAxisLabels = () => {
@@ -293,7 +302,6 @@ class DifferentialVolcano extends Component {
       differentialColumns,
       // differentialResultsMounted,
     } = this.props;
-    debugger;
     // if (differentialResultsMounted) {
     const xAxisTransformBox = allowXTransformation ? (
       <span title="-log10 Transform">

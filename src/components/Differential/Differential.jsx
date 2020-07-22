@@ -39,7 +39,7 @@ class Differential extends Component {
     isValidSearchDifferential: false,
     isSearchingDifferential: false,
     differentialResults: [],
-    differentialResultsMounted: false,
+    // differentialResultsMounted: false,
     differentialResultsUnfiltered: [],
     differentialColumns: [],
     filterableColumnsP: [],
@@ -115,8 +115,15 @@ class Differential extends Component {
   handleMultisetQueried = value => {
     this.setState({
       multisetQueried: value,
+      // isVolcanoPlotSVGLoaded: !value,
     });
   };
+
+  // handleVolcanoPlotSVGLoaded = bool => {
+  //   this.setState({
+  //     isVolcanoPlotSVGLoaded: bool,
+  //   });
+  // };
 
   setStudyModelTestMetadata = (studyData, modelsAndTests) => {
     this.setState(
@@ -162,7 +169,7 @@ class Differential extends Component {
       differentialColumns: columns,
       isSearchingDifferential: false,
       isValidSearchDifferential: true,
-      differentialResultsMounted: false,
+      // differentialResultsMounted: false,
       plotButtonActive: false,
       visible: false,
       isProteinSVGLoaded: false,
@@ -208,7 +215,7 @@ class Differential extends Component {
       plotButtonActive: false,
       visible: false,
       isItemSelected: false,
-      differentialResultsMounted: false,
+      // differentialResultsMounted: false,
       isProteinSVGLoaded: false,
     });
   };
@@ -239,7 +246,7 @@ class Differential extends Component {
       {
         imageInfo: imageInfo,
         isItemSelected: true,
-        differentialResultsMounted: false,
+        // differentialResultsMounted: false,
         isProteinSVGLoaded: false,
         // isProteinDataLoaded: false,
         // treeDataRaw: [],
@@ -540,20 +547,9 @@ class Differential extends Component {
       isVolcanoPlotSVGLoaded: true,
     });
   };
-  // calculateWidth() {
-  //   var w = Math.max(
-  //     document.documentElement.clientWidth,
-  //     window.innerWidth || 0,
-  //   );
-  //   if (w > 1199) {
-  //     return w * 0.;
-  //   } else if (w < 1200 && w > 767) {
-  //     return w * 0.6;
-  //   } else return w * 0.8;
-  // }
   backToTable = () => {
     this.setState({
-      differentialResultsMounted: false,
+      // differentialResultsMounted: false,
       isItemSelected: false,
       // isProteinDataLoaded: false,
       isProteinSVGLoaded: false,
@@ -599,7 +595,7 @@ class Differential extends Component {
       imageInfo.key = `${alphanumericTrigger} ${differentialProteinSite}`;
       this.setState({
         imageInfo: imageInfo,
-        differentialResultsMounted: false,
+        // differentialResultsMounted: false,
         isItemSelected: true,
         isProteinSVGLoaded: false,
         // isProteinDataLoaded: false,
@@ -769,11 +765,11 @@ class Differential extends Component {
     } else return <TransitionStill />;
   };
 
-  handleDifferentialResultsMounted = bool => {
-    this.setState({
-      differentialResultsMounted: bool,
-    });
-  };
+  // handleDifferentialResultsMounted = bool => {
+  //   this.setState({
+  //     differentialResultsMounted: bool,
+  //   });
+  // };
 
   getTableAndPlotPanes = () => {
     return [
@@ -803,7 +799,7 @@ class Differential extends Component {
               {...this.props}
               // onSearchCriteriaChange={this.handleSearchCriteriaChange}
               onHandlePlotAnimation={this.handlePlotAnimation}
-              differentialResultsMounted={this.handleDifferentialResultsMounted}
+              // differentialResultsMounted={this.handleDifferentialResultsMounted}
             />
           </Tab.Pane>
         ),
@@ -842,6 +838,7 @@ class Differential extends Component {
               onSelectFromTable={this.handleSelectedFromTable}
               onVolcanoSVGSizeChange={this.handleVolcanoSVGSizeChange}
               onSVGTabChange={this.handleSVGTabChange}
+              // onHandleVolcanoPlotSVGLoaded={this.handleVolcanoPlotSVGLoaded}
             />
           </Tab.Pane>
         ),
