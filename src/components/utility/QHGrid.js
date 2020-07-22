@@ -216,7 +216,7 @@ class QHGridHeader extends React.PureComponent {
 
     // if (
     // this.props.exportBaseName === 'Enrichment_Analysis' ||
-    // this.props.exportBaseName === 'Differential_Phosphorylation_Analysis'
+    // this.props.exportBaseName === 'Differential_Analysis'
     // this.props.exportBaseName === 'metaFeatures'
     // ) {
     //   return (
@@ -229,9 +229,9 @@ class QHGridHeader extends React.PureComponent {
     // } else if (
     //   this.props.exportBaseName === 'VolcanoPlot_Filtered_Results' ||
     //   this.props.exportBaseName === 'Enrichment_Analysis' ||
-    //   this.props.exportBaseName === 'Differential_Phosphorylation_Analysis' ||
+    //   this.props.exportBaseName === 'Differential_Analysis' ||
     //   this.props.exportBaseName ===
-    //     'Differential_Phosphorylation_Analysis_Filtered' ||
+    //     'Differential_Analysis_Filtered' ||
     //   this.props.exportBaseName === 'metaFeatures'
     // ) {
     // return (

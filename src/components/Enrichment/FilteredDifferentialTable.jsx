@@ -462,7 +462,7 @@ class FilteredDifferentialTable extends Component {
             totalRows={15}
             // use "differentialRows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
             itemsPerPage={itemsPerPageFilteredDifferentialTable}
-            exportBaseName="Differential_Phosphorylation_Analysis_Filtered"
+            exportBaseName="Differential_Analysis_Filtered"
             // quickViews={quickViews}
             // disableGeneralSearch
             disableGrouping
