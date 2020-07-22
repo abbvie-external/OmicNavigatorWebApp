@@ -135,31 +135,32 @@ class DifferentialVolcanoPlot extends Component {
               : hoveredCircleData.position[0] * 1 + 15
           }
           y={hoveredCircleData.position[1] * 1 + 10}
-          width="200"
-          height="45"
+          width="150"
+          height="75"
         >
-          <rect width="160" height="49" fill="#ff4400" rx="5" ry="5"></rect>
+          //width = 160 height = 49 and 160, 46
+          <rect width="100%" height="100%" fill="#ff4400" rx="5" ry="5"></rect>
           <rect
-            width="160"
-            height="46"
+            width="100%"
+            height="95%"
             fill="#2e2e2e"
             stroke="black"
             rx="3"
             ry="3"
           ></rect>
           <text
-            fontSize="14px"
+            fontSize="12px"
             fill="white"
             font-family="Lato, Helvetica Neue, Arial, Helvetica, sans-serif"
             text-anchor="left"
           >
-            <tspan x={10} y={14}>
+            <tspan x={15} y={23}>
               {idText}
             </tspan>
-            <tspan x={10} y={14 + hoveredTextScalar}>
+            <tspan x={15} y={23 + 16}>
               {xText}
             </tspan>
-            <tspan x={10} y={14 + 2 * hoveredTextScalar}>
+            <tspan x={15} y={23 + 16 * 2}>
               {yText}
             </tspan>
           </text>
