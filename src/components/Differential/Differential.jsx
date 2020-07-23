@@ -6,7 +6,6 @@ import VolcanoPlotIcon from '../../resources/VolcanoPlotIcon.png';
 import VolcanoPlotIconSelected from '../../resources/VolcanoPlotIconSelected.png';
 import tableIcon from '../../resources/tableIcon.png';
 import tableIconSelected from '../../resources/tableIconSelected.png';
-import DifferentialResults from './DifferentialResults';
 import DifferentialPlot from './DifferentialPlot';
 import LoaderActivePlots from '../Transitions/LoaderActivePlots';
 import TransitionActive from '../Transitions/TransitionActive';
@@ -18,10 +17,21 @@ import DOMPurify from 'dompurify';
 import { phosphoprotService } from '../../services/phosphoprot.service';
 import DifferentialVolcano from './DifferentialVolcano';
 import { CancelToken } from 'axios';
-
+import QHGrid from '../utility/QHGrid';
+import EZGrid from '../utility/EZGrid';
+import QuickViewModal from '../utility/QuickViewModal';
+import {
+  getFieldValue,
+  getField,
+  typeMap,
+} from '../utility/selectors/QHGridSelector';
 import _ from 'lodash';
 import './Differential.scss';
 import '../Shared/Table.scss';
+export * from '../utility/FilterTypeConfig';
+export * from '../utility/selectors/quickViewSelector';
+export { QHGrid, EZGrid, QuickViewModal };
+export { getField, getFieldValue, typeMap };
 
 let cancelRequestDifferentialResultsGetPlot = () => {};
 class Differential extends Component {
@@ -78,6 +88,13 @@ class Differential extends Component {
     plotSVGWidth: null,
     plotSVGHeight: null,
     isVolcanoPlotSVGLoaded: false,
+    itemsPerPageInformed: 100,
+  };
+  differentialGridRef = React.createRef();
+  informItemsPerPage = items => {
+    this.setState({
+      itemsPerPageInformed: items,
+    });
   };
   DifferentialViewContainerRef = React.createRef();
   differentialGridRef = React.createRef();
@@ -676,6 +693,28 @@ class Differential extends Component {
   // };
 
   getTableAndPlotPanes = () => {
+    const {
+      differentialStudy,
+      differentialModel,
+      differentialTest,
+      featureToHighlightInDiffTable,
+    } = this.props;
+
+    const {
+      additionalTemplateInfoDifferentialTable,
+      differentialResults,
+      itemsPerPageInformed,
+      differentialColumns,
+    } = this.state;
+    const differentialRows = differentialResults.length || 1000;
+    // PAUL - ensure this accounts for multiset filters
+    let differentialCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}`;
+    if (
+      featureToHighlightInDiffTable !== '' &&
+      featureToHighlightInDiffTable != null
+    ) {
+      differentialCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-${featureToHighlightInDiffTable}`;
+    }
     return [
       {
         menuItem: (
@@ -698,12 +737,28 @@ class Differential extends Component {
         ),
         pane: (
           <Tab.Pane key="0" className="DifferentialContentPane">
-            <DifferentialResults
-              {...this.state}
-              {...this.props}
-              onHandlePlotAnimation={this.handlePlotAnimation}
-              // differentialResultsMounted={this.handleDifferentialResultsMounted}
-            />
+            <div id="DifferentialGrid">
+              <EZGrid
+                ref={this.differentialGridRef}
+                onInformItemsPerPage={this.informItemsPerPage}
+                uniqueCacheKey={differentialCacheKey}
+                data={differentialResults}
+                columnsConfig={differentialColumns}
+                totalRows={differentialRows}
+                // use "differentialRows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
+                itemsPerPage={itemsPerPageInformed}
+                exportBaseName="Differential_Analysis"
+                // quickViews={quickViews}
+                disableGeneralSearch
+                disableGrouping
+                disableColumnVisibilityToggle
+                disableColumnReorder
+                // disableFilters
+                min-height="75vh"
+                additionalTemplateInfo={additionalTemplateInfoDifferentialTable}
+                headerAttributes={<ButtonActions />}
+              />
+            </div>
           </Tab.Pane>
         ),
       },
