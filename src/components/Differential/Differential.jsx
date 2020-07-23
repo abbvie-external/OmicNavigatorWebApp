@@ -165,14 +165,23 @@ class Differential extends Component {
     //   );
     this.setState({
       differentialResults: searchResults.differentialResults,
-      differentialResultsUnfiltered: searchResults.differentialResults,
       differentialColumns: columns,
       isSearchingDifferential: false,
       isValidSearchDifferential: true,
       // differentialResultsMounted: false,
       plotButtonActive: false,
       visible: false,
+      // isProteinSVGLoaded: false,
+      // selectedFromTableData: [],
+    });
+  };
+
+  handleDifferentialSearchUnfiltered = searchResults => {
+    this.setState({
+      differentialResultsUnfiltered: searchResults.differentialResults,
       isProteinSVGLoaded: false,
+      // isProteinDataLoaded: false,
+      isItemSelected: false,
       selectedFromTableData: [],
     });
   };
@@ -901,6 +910,9 @@ class Differential extends Component {
                 this.handleSearchTransitionDifferential
               }
               onDifferentialSearch={this.handleDifferentialSearch}
+              onDifferentialSearchUnfiltered={
+                this.handleDifferentialSearchUnfiltered
+              }
               onSearchCriteriaChange={this.handleSearchCriteriaChange}
               onSearchCriteriaReset={this.hidePGrid}
               onDisablePlot={this.disablePlot}
