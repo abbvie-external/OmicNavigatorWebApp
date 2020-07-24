@@ -148,7 +148,6 @@ class Tabs extends Component {
       differentialTest: test || '',
       differentialFeature: '',
     };
-    debugger;
     updateUrl(
       this.props,
       this.state,
@@ -160,39 +159,12 @@ class Tabs extends Component {
     );
   };
 
-  // findDifferentialFeature = (test, featureID) => {
-  //   const self = this;
-  //   self.setState(
-  //     {
-  //       activeIndex: 1,
-  //       tab: 'differential',
-  //       differentialStudy: self.state.enrichmentStudy || '',
-  //       differentialModel: self.state.enrichmentModel || '',
-  //       differentialTest: test || '',
-  //       differentialFeature: '',
-  //       bullseyeHighlightInProgress: true,
-  //       featureToHighlightInDiffTable: featureID,
-  //     },
-  //     function() {
-  //       let changes = {
-  //         differentialStudy: self.state.enrichmentStudy || '',
-  //         differentialModel: self.state.enrichmentModel || '',
-  //         differentialTest: test || '',
-  //         differentialFeature: '',
-  //       };
-  //       debugger;
-  //       updateUrl(
-  //         self.props,
-  //         self.state,
-  //         changes,
-  //         'tabChange',
-  //         self.setTabIndex,
-  //         true,
-  //         'differential',
-  //       );
-  //     },
-  //   );
-  // };
+  handlePagedToFeature = () => {
+    this.setState({
+      bullseyeHighlightInProgress: false,
+      featureToHighlightInDiffTable: '',
+    });
+  };
 
   getStudies = () => {
     phosphoprotService
@@ -236,6 +208,7 @@ class Tabs extends Component {
               onHandleDifferentialFeatureIdKey={
                 this.handleDifferentialFeatureIdKey
               }
+              onPagedToFeature={this.handlePagedToFeature}
             />
           </Tab.Pane>
         ),

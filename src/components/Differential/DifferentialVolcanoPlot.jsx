@@ -104,7 +104,7 @@ class DifferentialVolcanoPlot extends Component {
     });
   }
   getToolTip() {
-    const { hoveredCircleData, hovering, hoveredTextScalar } = this.state;
+    const { hoveredCircleData, hovering } = this.state;
     const {
       xAxisLabel,
       yAxisLabel,
@@ -138,7 +138,6 @@ class DifferentialVolcanoPlot extends Component {
           width="150"
           height="75"
         >
-          //width = 160 height = 49 and 160, 46
           <rect width="100%" height="100%" fill="#ff4400" rx="5" ry="5"></rect>
           <rect
             width="100%"
@@ -490,7 +489,6 @@ class DifferentialVolcanoPlot extends Component {
             >
               {yAxisText}
             </text>
-
             {xPlotTicks}
             {yPlotTicks}
             <filter id="constantOpacity">

@@ -23,7 +23,7 @@ class DifferentialVolcano extends Component {
       parseInt(sessionStorage.getItem('volcanoSplitPaneSize'), 10) || 550,
     defaultVolcanoHeight: 400,
     filteredTableData: [],
-    itemsPerPageInformedDifferential: null,
+    itemsPerPageInformedVolcano: 25,
     volcanoPlotRows: 0,
     doXAxisTransformation: false,
     doYAxisTransformation: false,
@@ -34,6 +34,7 @@ class DifferentialVolcano extends Component {
     yAxisLabel: null,
     identifier: null,
   };
+  volcanoPlotFilteredGridRef = React.createRef();
 
   componentDidMount() {
     const { identifier } = this.state;
@@ -45,14 +46,16 @@ class DifferentialVolcano extends Component {
       volcanoWidth: this.state.defaultVolcanoWidth * 0.95,
       volcanoHeight: this.state.defaultVolcanoHeight * 0.95,
     });
-    const defaultMaxObject = this.props.differentialResults[0];
-    this.props.onSelectFromTable([
-      {
-        id: defaultMaxObject[differentialFeatureIdKey],
-        value: defaultMaxObject[maxObjectIdentifier],
-        key: defaultMaxObject[identifier],
-      },
-    ]);
+    if (!this.props.bullseyeHighlightInProgress) {
+      const defaultMaxObject = this.props.differentialResults[0];
+      this.props.onSelectFromTable([
+        {
+          id: defaultMaxObject[differentialFeatureIdKey],
+          value: defaultMaxObject[maxObjectIdentifier],
+          key: defaultMaxObject[identifier],
+        },
+      ]);
+    }
   }
   componentDidUpdate(prevProps, prevState) {
     if (prevProps.differentialResults !== this.props.differentialResults) {
@@ -78,7 +81,24 @@ class DifferentialVolcano extends Component {
     //  {
 
     // }
+    if (this.props.bullseyeHighlightInProgress) {
+      this.pageToFeature(this.props.featureToHighlightInDiffTable);
+    }
   }
+  pageToFeature = featureToHighlight => {
+    const { differentialFeatureIdKey, differentialResults } = this.props;
+    const { itemsPerPageInformedVolcano } = this.state;
+    if (this.volcanoPlotFilteredGridRef?.current != null) {
+      const Index = _.findIndex(differentialResults, function(p) {
+        return p[differentialFeatureIdKey] === featureToHighlight;
+      });
+      const pageNumber = Math.ceil(Index / itemsPerPageInformedVolcano);
+      this.volcanoPlotFilteredGridRef.current.handlePageChange(
+        {},
+        { activePage: pageNumber },
+      );
+    }
+  };
   getAxisLabels = () => {
     if (this.props.differentialResults.length !== 0) {
       let differentialAlphanumericFields = [];
@@ -162,7 +182,7 @@ class DifferentialVolcano extends Component {
 
   informItemsPerPage = items => {
     this.setState({
-      itemsPerPageInformedDifferential: items,
+      itemsPerPageInformedVolcano: items,
     });
   };
 
@@ -292,7 +312,7 @@ class DifferentialVolcano extends Component {
   render() {
     const {
       filteredTableData,
-      itemsPerPageInformedDifferential,
+      itemsPerPageInformedVolcano,
       volcanoPlotRows,
       axisLables,
       xAxisLabel,
@@ -412,13 +432,14 @@ class DifferentialVolcano extends Component {
           <Grid.Column>
             <div id="volcanoDiv2">
               <EZGrid
+                ref={this.volcanoPlotFilteredGridRef}
                 className="volcanoPlotTable"
                 // note, default is 70vh; if you want a specific vh, specify like "50vh"; "auto" lets the height flow based on items per page
                 height="auto"
                 data={filteredTableData}
                 totalRows={volcanoPlotRows}
                 columnsConfig={differentialColumns}
-                itemsPerPage={itemsPerPageInformedDifferential}
+                itemsPerPage={itemsPerPageInformedVolcano}
                 onInformItemsPerPage={this.informItemsPerPage}
                 disableGeneralSearch
                 disableGrouping

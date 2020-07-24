@@ -31,7 +31,7 @@ class SVGPlot extends Component {
   navigateToDifferentialFeature = evt => {
     const testAndDescription = this.props.imageInfo.key.split(':');
     const test = testAndDescription[0] || '';
-    const featureID = this.props.HighlightedProteins[0].sample;
+    const featureID = this.props.HighlightedProteins[0]?.featureID;
     this.props.onFindDifferentialFeature(test, featureID);
   };
 

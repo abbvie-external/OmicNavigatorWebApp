@@ -97,31 +97,31 @@ class FilteredDifferentialTable extends Component {
     //     this.state.itemsPerPageFilteredDifferentialTable,
     //   );
     //}
-    if (
-      this.props.activeViolinTableIndex === 1 &&
-      this.props.activeViolinTableIndex !== prevProps.activeViolinTableIndex
-    ) {
-      this.pageToProtein(
-        this.state.filteredTableData,
-        this.props.HighlightedProteins[0]?.sample,
-        this.state.itemsPerPageFilteredDifferentialTable,
-      );
-    }
+    // if (
+    //   this.props.activeViolinTableIndex === 1 &&
+    //   this.props.activeViolinTableIndex !== prevProps.activeViolinTableIndex
+    // ) {
+    //   this.pageToProtein(
+    //     this.state.filteredTableData,
+    //     this.props.HighlightedProteins[0]?.sample,
+    //     this.state.itemsPerPageFilteredDifferentialTable,
+    //   );
+    // }
   }
 
-  pageToProtein = (data, proteinToHighlight, itemsPerPage) => {
-    if (this.filteredDifferentialGridRef?.current !== null) {
-      const Index = _.findIndex(data, function(p) {
-        return p.Protein_Site === proteinToHighlight;
-      });
-      const pageNumber = Math.ceil(Index / itemsPerPage);
-      const pageNumberCheck = pageNumber >= 1 ? pageNumber : 1;
-      this.filteredDifferentialGridRef.current.handlePageChange(
-        {},
-        { activePage: pageNumberCheck },
-      );
-    }
-  };
+  // pageToProtein = (data, proteinToHighlight, itemsPerPage) => {
+  //   if (this.filteredDifferentialGridRef?.current !== null) {
+  //     const Index = _.findIndex(data, function(p) {
+  //       return p.Protein_Site === proteinToHighlight;
+  //     });
+  //     const pageNumber = Math.ceil(Index / itemsPerPage);
+  //     const pageNumberCheck = pageNumber >= 1 ? pageNumber : 1;
+  //     this.filteredDifferentialGridRef.current.handlePageChange(
+  //       {},
+  //       { activePage: pageNumberCheck },
+  //     );
+  //   }
+  // };
 
   getTableData = () => {
     if (this.props.barcodeSettings.brushedData.length > 0) {
