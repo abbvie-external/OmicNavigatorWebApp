@@ -10,6 +10,7 @@ import {
   Button,
 } from 'semantic-ui-react';
 import { CancelToken } from 'axios';
+// import DOMPurify from 'dompurify';
 import '../Shared/SearchCriteria.scss';
 import { phosphoprotService } from '../../services/phosphoprot.service';
 import EnrichmentMultisetFilters from './EnrichmentMultisetFilters';
@@ -47,7 +48,6 @@ class EnrichmentSearchCriteria extends Component {
       },
     ],
     sigValue: [0.05],
-    testsToRemove:[],
     uSettings: {
       defaultSelectedCol: {
         key: 'adj_P_Val',
@@ -357,7 +357,7 @@ class EnrichmentSearchCriteria extends Component {
           getEnrichmentsTableData,
           true,
           true,
-          // PAUL - this needs to be handled true for column reordering, once grid props are fixed
+          // PAUL - this needs to be handled true for column reordering, once we can freeze the first column (featureID) from being reordered
           false,
         );
       })
@@ -773,6 +773,19 @@ class EnrichmentSearchCriteria extends Component {
             heightCalculation() * 0.8 +
             'px;" id="multisetAnalysisSVG"',
         );
+        // DOMPurify.addHook('afterSanitizeAttributes', function(node) {
+        //   if (
+        //     node.hasAttribute('xlink:href') &&
+        //     !node.getAttribute('xlink:href').match(/^#/)
+        //   ) {
+        //     node.remove();
+        //   }
+        // });
+        // // Clean HTML string and write into our DIV
+        // let sanitizedSVG = DOMPurify.sanitize(svgMarkup, {
+        //   ADD_TAGS: ['use'],
+        // });
+        // let svgInfo = { plotType: 'Multiset', svg: sanitizedSVG };
         let svgInfo = { plotType: 'Multiset', svg: svgMarkup };
         this.props.onGetMultisetPlot({
           svgInfo,
