@@ -214,22 +214,36 @@ class QHGridHeader extends React.PureComponent {
       wordBreak: 'break-all',
     };
 
-    if (
-      this.props.exportBaseName === 'Enrichment_Analysis' ||
-      this.props.exportBaseName === 'Differential_Phosphorylation_Analysis'
-      // this.props.exportBaseName === 'metaFeatures'
-    ) {
-      return (
-        <Image
-          src={excel_logo_custom}
-          onClick={this.props.exportExcel(columns)}
-          style={{ float: 'right', cursor: 'pointer' }}
-        />
-      );
-    } else if (
-      this.props.exportBaseName === 'VolcanoPlot_Filtered_Results' ||
-      this.props.exportBaseName === 'metaFeatures'
-    ) {
+    // if (
+    // this.props.exportBaseName === 'Enrichment_Analysis' ||
+    // this.props.exportBaseName === 'Differential_Analysis'
+    // this.props.exportBaseName === 'metaFeatures'
+    // ) {
+    //   return (
+    //     <Image
+    //       src={excel_logo_custom}
+    //       onClick={this.props.exportExcel(columns)}
+    //       style={{ float: 'right', cursor: 'pointer' }}
+    //     />
+    //   );
+    // } else if (
+    //   this.props.exportBaseName === 'VolcanoPlot_Filtered_Results' ||
+    //   this.props.exportBaseName === 'Enrichment_Analysis' ||
+    //   this.props.exportBaseName === 'Differential_Analysis' ||
+    //   this.props.exportBaseName ===
+    //     'Differential_Analysis_Filtered' ||
+    //   this.props.exportBaseName === 'metaFeatures'
+    // ) {
+    // return (
+    //   <Image
+    //     src=""
+    //     className="ExcelLogo"
+    //     // avatar
+    //     size="mini"
+    //     style={{ float: 'right', cursor: 'pointer' }}
+    //   />
+    // );
+    if (this.props.exportBaseName === 'VolcanoPlot_Filtered_Results') {
       return null;
     } else {
       return (

@@ -42,6 +42,9 @@ class Enrichment extends Component {
     enrichmentIconText: '',
     enrichmentResults: [],
     enrichmentColumns: [],
+    enrichmentFeatureID: '',
+    enrichmentPlotSVGHeight: 0,
+    enrichmentPlotSVGWidth: 0,
     activeIndexEnrichmentView: this.defaultEnrichmentActiveIndex || 0,
     multisetPlotInfo: {
       title: '',
@@ -117,8 +120,9 @@ class Enrichment extends Component {
       key: null,
       title: '',
       svg: [],
+      dataItem: '',
     },
-    currentSVGs: [],
+    cachedSVGs: [],
     isTestSelected: false,
     isTestDataLoaded: false,
     SVGPlotLoading: false,
@@ -388,7 +392,7 @@ class Enrichment extends Component {
     this.removeNetworkSVG();
     this.setState({ networkGraphReady: false });
 
-    // PAUL - talk to justin about this - has to do with column reordering, i think
+    // cannot use this unless we can prevent first column (featureID) from being reordered
     // if (this.state.enrichmentColumns.length === 0) {
     //   this.handleColumnReorder(searchResults);
     // }
@@ -787,27 +791,27 @@ class Enrichment extends Component {
     });
   };
 
-  calculateHeight(self) {
+  calculateHeight = () => {
     let containerHeight =
-      self.EnrichmentViewContainerRef.current !== null
-        ? self.EnrichmentViewContainerRef.current.parentElement.offsetHeight
+      this.EnrichmentViewContainerRef.current !== null
+        ? this.EnrichmentViewContainerRef.current.parentElement.offsetHeight
         : 900;
     let barcodeHeight =
       parseInt(sessionStorage.getItem('horizontalSplitPaneSize'), 10) || 250;
     // subtracting 120 due to menu and plot margin
     return containerHeight - barcodeHeight - 120;
-  }
+  };
 
-  calculateWidth(self) {
+  calculateWidth = () => {
     let containerWidth =
-      self.EnrichmentViewContainerRef.current !== null
-        ? self.EnrichmentViewContainerRef.current.parentElement.offsetWidth
+      this.EnrichmentViewContainerRef.current !== null
+        ? this.EnrichmentViewContainerRef.current.parentElement.offsetWidth
         : 1200;
     let violinWidth =
       parseInt(sessionStorage.getItem('verticalSplitPaneSize'), 10) || 525;
     // subtracting 80 due to plot margin
     return containerWidth - violinWidth - 60;
-  }
+  };
 
   showBarcodePlot = (barcodeData, dataItem) => {
     // sorting by statistic is being handled by backend
@@ -949,16 +953,6 @@ class Enrichment extends Component {
     let handleSVGCb = this.handleSVG;
     let handlePlotStudyError = this.handlePlotStudyError;
     let currentSVGs = [];
-    // keep whatever dimension is less (height or width)
-    // then multiply the other dimension by original svg ratio (height 595px, width 841px)
-    let EnrichmentPlotSVGHeight = this.calculateHeight(this);
-    let EnrichmentPlotSVGWidth = this.calculateWidth(this);
-    // EnrichmentPlotSVGHeight = EnrichmentPlotSVGWidth * 0.70749;
-    if (EnrichmentPlotSVGHeight + 60 > EnrichmentPlotSVGWidth) {
-      EnrichmentPlotSVGHeight = EnrichmentPlotSVGWidth * 0.70749;
-    } else {
-      EnrichmentPlotSVGWidth = EnrichmentPlotSVGHeight * 1.41344;
-    }
     cancelRequestEnrichmentGetPlot();
     let cancelToken = new CancelToken(e => {
       cancelRequestEnrichmentGetPlot = e;
@@ -987,7 +981,7 @@ class Enrichment extends Component {
             );
             svgMarkup = svgMarkup.replace(
               /<svg/g,
-              `<svg preserveAspectRatio="xMinYMin meet" style="width:${EnrichmentPlotSVGWidth}px" height:${EnrichmentPlotSVGHeight} id="currentSVG-${id}-${i}"`,
+              `<svg preserveAspectRatio="xMinYMin meet" height="100%" width="auto" id="currentSVG-${id}-${i}"`,
             );
             DOMPurify.addHook('afterSanitizeAttributes', function(node) {
               if (
@@ -1021,6 +1015,30 @@ class Enrichment extends Component {
           });
       });
     }
+  };
+
+  handleEnrichmentSVGSizeChange = id => {
+    // keep whatever dimension is less (height or width)
+    // then multiply the other dimension by original svg ratio (height 595px, width 841px)
+    let EnrichmentPlotSVGHeight = this.calculateHeight();
+    let EnrichmentPlotSVGWidth = this.calculateWidth();
+    // EnrichmentPlotSVGHeight = EnrichmentPlotSVGWidth * 0.70749;
+    if (EnrichmentPlotSVGHeight + 60 > EnrichmentPlotSVGWidth) {
+      EnrichmentPlotSVGHeight = EnrichmentPlotSVGWidth * 0.70749;
+    } else {
+      EnrichmentPlotSVGWidth = EnrichmentPlotSVGHeight * 1.41344;
+    }
+    this.setState(
+      {
+        SVGPlotLoaded: true,
+        SVGPlotLoading: false,
+        enrichmentPlotSVGHeight: EnrichmentPlotSVGHeight,
+        enrichmentPlotSVGWidth: EnrichmentPlotSVGWidth,
+      },
+      function() {
+        this.getPlot(id);
+      },
+    );
   };
 
   handleSVG = imageInfo => {
@@ -1610,6 +1628,7 @@ class Enrichment extends Component {
         key: null,
         title: '',
         svg: [],
+        dataItem: [],
       },
     });
     this.handleSearchCriteriaChange(
@@ -1635,21 +1654,22 @@ class Enrichment extends Component {
       itemsPerPageInformedEnrichmentMain: items,
     });
   };
-  columnReorder = columns => {
-    this.setState({ enrichmentColumns: columns });
-    const columnsArr = columns.map(e => {
-      return e.title;
-    });
-    const uDataRelevantFields = _.filter(columnsArr, function(key) {
-      return key !== 'description' && key !== 'Annotation';
-    });
-    // multiset svg rebuilds based on uData...if there are no results we need to override this from being passed down
-    if (uDataRelevantFields.length !== 0) {
-      this.setState({
-        uData: uDataRelevantFields,
-      });
-    }
-  };
+  // cannot use this unless we can prevent first column (featureID) from being reordered
+  // columnReorder = columns => {
+  //   this.setState({ enrichmentColumns: columns });
+  //   const columnsArr = columns.map(e => {
+  //     return e.title;
+  //   });
+  //   const uDataRelevantFields = _.filter(columnsArr, function(key) {
+  //     return key !== 'description' && key !== 'Annotation';
+  //   });
+  //   // multiset svg rebuilds based on uData...if there are no results we need to override this from being passed down
+  //   if (uDataRelevantFields.length !== 0) {
+  //     this.setState({
+  //       uData: uDataRelevantFields,
+  //     });
+  //   }
+  // };
 
   handleTableNetworkTabChange = (e, { activeIndex }) => {
     sessionStorage.setItem(`enrichmentViewTab`, activeIndex);
@@ -1666,6 +1686,8 @@ class Enrichment extends Component {
           <SearchingAlt />
         </div>
       );
+    } else if (this.state.isSearchingEnrichment) {
+      return <TransitionActive />;
     } else if (this.state.isTestSelected && this.state.isTestDataLoaded) {
       return (
         <div>
@@ -1703,8 +1725,6 @@ class Enrichment extends Component {
           }}
         />
       );
-    } else if (this.state.isSearchingEnrichment) {
-      return <TransitionActive />;
     } else return <TransitionStill />;
   };
 
@@ -1747,7 +1767,7 @@ class Enrichment extends Component {
             <EnrichmentResultsTable
               {...this.props}
               {...this.state}
-              columnReorder={this.columnReorder}
+              // columnReorder={this.columnReorder}
               onHandlePlotAnimation={this.handlePlotAnimation}
               onDisplayViolinPlot={this.displayViolinPlot}
             />

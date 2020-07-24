@@ -25,8 +25,8 @@ class DifferentialVolcanoPlot extends Component {
   componentDidUpdate(prevProps) {
     const {
       selectedFromTableData,
-      volcanoWidth,
-      volcanoHeight,
+      // volcanoWidth,
+      // volcanoHeight,
       maxObjectData,
     } = this.props;
     const circles = d3.selectAll('circle.volcanoPlot-dataPoint');
@@ -42,12 +42,12 @@ class DifferentialVolcanoPlot extends Component {
       const maxCircle = d3.select(`#volcanoDataPoint-${maxid}`);
       maxCircle.classed('highlightedMax', true);
     }
-    if (volcanoWidth !== prevProps.volcanoWidth) {
-      this.setState({ resizeScalarX: volcanoWidth / prevProps.volcanoWidth });
-    }
-    if (volcanoHeight !== prevProps.volcanoHeight) {
-      this.setState({ resizeScalarY: volcanoHeight / prevProps.volcanoHeight });
-    }
+    // if (volcanoWidth !== prevProps.volcanoWidth) {
+    //   this.setState({ resizeScalarX: volcanoWidth / prevProps.volcanoWidth });
+    // }
+    // if (volcanoHeight !== prevProps.volcanoHeight) {
+    //   this.setState({ resizeScalarY: volcanoHeight / prevProps.volcanoHeight });
+    // }
   }
   doTransform(value, axis) {
     const { doXAxisTransformation, doYAxisTransformation } = this.props;
@@ -64,7 +64,7 @@ class DifferentialVolcanoPlot extends Component {
     const circles = d3.selectAll('circle.volcanoPlot-dataPoint');
     circles.classed('selected', false);
     circles.classed('highlighted', false);
-    circles.classed('highlightedMax', false);
+    circles.classed('highlightedMax', true);
   };
   handleCircleHover = e => {
     const { brushing } = this.state;
@@ -131,26 +131,32 @@ class DifferentialVolcanoPlot extends Component {
               : hoveredCircleData.position[0] * 1 + 15
           }
           y={hoveredCircleData.position[1] * 1 + 10}
-          width="200"
-          height="45"
+          width="150"
+          height="75"
         >
-          <rect width="160" height="49" fill="#ff4400" rx="5" ry="5"></rect>
+          //width = 160 height = 49 and 160, 46
+          <rect width="100%" height="100%" fill="#ff4400" rx="5" ry="5"></rect>
           <rect
-            width="160"
-            height="46"
-            fill="black"
+            width="100%"
+            height="95%"
+            fill="#2e2e2e"
             stroke="black"
-            rx="5"
-            ry="5"
+            rx="3"
+            ry="3"
           ></rect>
-          <text fontSize="14px" fill="white" fontFamily="sans-serif">
-            <tspan x={10} y={14}>
+          <text
+            fontSize="12px"
+            fill="white"
+            font-family="Lato, Helvetica Neue, Arial, Helvetica, sans-serif"
+            text-anchor="left"
+          >
+            <tspan x={15} y={23}>
               {idText}
             </tspan>
-            <tspan x={10} y={14 + hoveredTextScalar}>
+            <tspan x={15} y={23 + 16}>
               {xText}
             </tspan>
-            <tspan x={10} y={14 + 2 * hoveredTextScalar}>
+            <tspan x={15} y={23 + 16 * 2}>
               {yText}
             </tspan>
           </text>
