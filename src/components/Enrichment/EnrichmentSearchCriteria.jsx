@@ -631,12 +631,12 @@ class EnrichmentSearchCriteria extends Component {
     );
   };
   handleFilterOutChange = test => {
-    this.props.onMultisetTestsFiltered(test)
+    this.props.onMultisetTestsFiltered(test);
     const uSetVP = this.state.uSettings;
-    if(uSetVP.must.includes(test)){
-      uSetVP.must.splice(uSetVP.must.indexOf(test), 1)
-    }else if(uSetVP.not.includes(test)){
-      uSetVP.not.splice(uSetVP.not.indexOf(test), 1)
+    if (uSetVP.must.includes(test)) {
+      uSetVP.must.splice(uSetVP.must.indexOf(test), 1);
+    } else if (uSetVP.not.includes(test)) {
+      uSetVP.not.splice(uSetVP.not.indexOf(test), 1);
     }
     this.setState(
       {
@@ -647,7 +647,7 @@ class EnrichmentSearchCriteria extends Component {
         this.updateQueryData();
       },
     );
-  }
+  };
 
   updateQueryData = () => {
     const {
@@ -739,10 +739,10 @@ class EnrichmentSearchCriteria extends Component {
     enrichmentAnnotation,
     selectedOperator,
   ) {
-    const {uData, multisetTestsFilteredOut} = this.props;
-    let heightCalculation = this.calculateHeight;
-    let widthCalculation = this.calculateWidth;
-    const tests = uData.filter(function(col){return !multisetTestsFilteredOut.includes(col)})
+    const { uData, multisetTestsFilteredOut } = this.props;
+    const tests = uData.filter(function(col) {
+      return !multisetTestsFilteredOut.includes(col);
+    });
     cancelRequestEnrichmentMultisetPlot();
     let cancelToken = new CancelToken(e => {
       cancelRequestEnrichmentMultisetPlot = e;
@@ -767,11 +767,7 @@ class EnrichmentSearchCriteria extends Component {
         // );
         svgMarkup = svgMarkup.replace(
           /<svg/g,
-          '<svg preserveAspectRatio="xMinYMid meet" style="width:' +
-            widthCalculation() * 0.8 +
-            'px; height:' +
-            heightCalculation() * 0.8 +
-            'px;" id="multisetAnalysisSVG"',
+          '<svg preserveAspectRatio="xMinYMid meet" height="100%" width="inherit" id="multisetAnalysisSVG"',
         );
         // DOMPurify.addHook('afterSanitizeAttributes', function(node) {
         //   if (
@@ -794,22 +790,6 @@ class EnrichmentSearchCriteria extends Component {
       .catch(error => {
         console.error('Error during getEnrichmentsUpset', error);
       });
-  }
-
-  calculateHeight() {
-    var h = Math.max(
-      document.documentElement.clientHeight,
-      window.innerHeight || 0,
-    );
-    return h;
-  }
-
-  calculateWidth() {
-    var w = Math.max(
-      document.documentElement.clientWidth,
-      window.innerWidth || 0,
-    );
-    return w;
   }
 
   render() {
