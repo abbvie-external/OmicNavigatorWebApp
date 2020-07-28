@@ -40,10 +40,10 @@ class EnrichmentMultisetFilters extends Component {
       selectedCol,
       selectedOperator,
     } = this.props;
-    if (
-      uSettings !== prevProps.uSettings ||
-      prevProps.uData !== this.props.uData
-    ) {
+    // if (
+    //   uSettings !== prevProps.uSettings ||
+    //   prevProps.uData !== this.props.uData
+    // ) {
       this.makeMultiset(
         uData,
         uAnchor,
@@ -53,7 +53,7 @@ class EnrichmentMultisetFilters extends Component {
         selectedCol,
         selectedOperator,
       );
-    }
+    // }
   }
 
   makeMultiset(
@@ -65,6 +65,7 @@ class EnrichmentMultisetFilters extends Component {
     selectedCol,
     selectedOperator,
   ) {
+    if(this.props.multisetFiltersVisible){
     d3.selectAll('#multiset-query')
       .selectAll('*')
       .remove();
@@ -85,6 +86,15 @@ class EnrichmentMultisetFilters extends Component {
         selectedOperator,
         sigValue,
       );
+    }}else{
+      d3.selectAll('#filter-tests')
+      .selectAll('*')
+      .remove();
+      const base = d3
+      .selectAll('#filter-tests')
+      .append('div')
+      .style('padding-bottom', '5px');
+      this.prepareTestFilter(uData, uAnchor, uSettings, base);
     }
   }
 
@@ -322,6 +332,7 @@ class EnrichmentMultisetFilters extends Component {
   }
 
   prepareMultiset(data, anchor, settings, base) {
+    const{multisetTestsFilteredOut} = this.props;
     const self = this;
     let dataset = data;
     if (settings.useAnchor && dataset.indexOf(anchor) < 0) {
@@ -447,6 +458,9 @@ class EnrichmentMultisetFilters extends Component {
       .data(dataset)
       .enter()
       .append('circle')
+      .style("opacity", function(d){
+        return(multisetTestsFilteredOut.includes(d)?.5:1)
+      })
       .style('fill', baseColorCode)
       .attr('cx', circlePadding + circleRadius)
       .attr('cy', function(d) {
@@ -462,6 +476,7 @@ class EnrichmentMultisetFilters extends Component {
       )
       .attr('stroke-width', circleRadius / 5)
       .on('click', function(d) {
+        if(!multisetTestsFilteredOut.includes(d)){
         if (!mustData.includes(d) && d !== anchor) {
           mustData.push(d);
           if (notData.includes(d)) {
@@ -470,6 +485,7 @@ class EnrichmentMultisetFilters extends Component {
           updateCircles();
           self.props.onHandleSetChange({ must: mustData, not: notData });
         }
+      }
       });
 
     const maybeCircles = svg
@@ -477,6 +493,9 @@ class EnrichmentMultisetFilters extends Component {
       .data(dataset)
       .enter()
       .append('circle')
+      .style("opacity", function(d){
+        return(multisetTestsFilteredOut.includes(d)?.5:1)
+      })
       .style('fill', backgroundColorCode)
       .attr('cx', 2 * circlePadding + 3 * circleRadius)
       .attr('cy', function(d) {
@@ -494,6 +513,7 @@ class EnrichmentMultisetFilters extends Component {
       )
       .attr('stroke-width', circleRadius / 5)
       .on('click', function(d) {
+        if(!multisetTestsFilteredOut.includes(d)){
         if (mustData.includes(d) && d !== anchor) {
           mustData.splice(mustData.indexOf(d), 1);
         }
@@ -502,6 +522,7 @@ class EnrichmentMultisetFilters extends Component {
         }
         updateCircles();
         self.props.onHandleSetChange({ must: mustData, not: notData });
+      }
       });
 
     // const miniMaybeCircles =
@@ -510,6 +531,9 @@ class EnrichmentMultisetFilters extends Component {
       .data(dataset)
       .enter()
       .append('circle')
+      .style("opacity", function(d){
+        return(multisetTestsFilteredOut.includes(d)?.5:1)
+      })
       .style('fill', baseColorCode)
       .attr('cx', 2 * circlePadding + 3 * circleRadius)
       .attr('cy', function(d) {
@@ -521,6 +545,7 @@ class EnrichmentMultisetFilters extends Component {
       })
       .attr('r', circleRadius / 3)
       .on('click', function(d) {
+        if(!multisetTestsFilteredOut.includes(d)){
         if (mustData.includes(d) && d !== anchor) {
           mustData.splice(mustData.indexOf(d), 1);
         }
@@ -529,6 +554,7 @@ class EnrichmentMultisetFilters extends Component {
         }
         updateCircles();
         self.props.onHandleSetChange({ must: mustData, not: notData });
+      }
       });
 
     const notCircles = svg
@@ -537,6 +563,9 @@ class EnrichmentMultisetFilters extends Component {
       .enter()
       .append('circle')
       .style('fill', backgroundColorCode)
+      .style("opacity", function(d){
+        return(multisetTestsFilteredOut.includes(d)?.5:1)
+      })
       .attr('cx', 3 * circlePadding + 5 * circleRadius)
       .attr('cy', function(d) {
         return (
@@ -551,6 +580,7 @@ class EnrichmentMultisetFilters extends Component {
       )
       .attr('stroke-width', circleRadius / 5)
       .on('click', function(d) {
+        if(!multisetTestsFilteredOut.includes(d)){
         if (!notData.includes(d) && d !== anchor) {
           notData.push(d);
           if (mustData.includes(d)) {
@@ -559,6 +589,7 @@ class EnrichmentMultisetFilters extends Component {
           updateCircles();
           self.props.onHandleSetChange({ must: mustData, not: notData }); // updateGlobalVariables();
         }
+      }
       });
 
     // const lineVert =
@@ -589,12 +620,45 @@ class EnrichmentMultisetFilters extends Component {
       .text(function(d) {
         return d;
       })
+      .style("opacity", function(d){
+        return(multisetTestsFilteredOut.includes(d)?.5:1)
+      })
       .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
       .attr('font-weight', d => (d === anchor ? 'bold' : 'normal'))
       .attr('font-size', function() {
         return heightScalar * 14 + 'px';
       })
       .attr('fill', 'black');
+
+    //Test filtering check boxes
+    if(settings.useTestCheckBoxes){
+      svg.selectAll('svg.dataObject')
+      .data(dataset)
+      .enter()
+      .append('foreignObject')
+      .attr('x', svgWidth - 20)
+      .attr('y', function(d) {
+        return ((
+          dataset.indexOf(d) * (2 * circleRadius) +
+          (topBoxHeight + circleRadius + circlePadding) +
+          dataset.indexOf(d) * circlePadding +
+          circleRadius / 2
+        )-14);
+      })
+      .attr('width', 20)
+      .attr('height',20)
+      .append('xhtml:div')
+      .append('div')
+      .attr("class", "checkboxMultiset")
+      .append('input')
+      .attr('type','checkbox')
+      .property('checked',function(d){
+        return(!multisetTestsFilteredOut.includes(d))
+      })
+      .on('change', function(d) {
+        self.props.onFilterOutChange(d);
+      })
+    }
 
     svg
       .append('text')
@@ -759,6 +823,121 @@ class EnrichmentMultisetFilters extends Component {
         .attr('stroke-width', circleRadius / 5);
     }
   }
+  prepareTestFilter(data, anchor, settings, base){
+    const{multisetTestsFilteredOut} = this.props;
+    const self = this;
+    let dataset = data;
+    const textScalar = 20;
+    let longest = 0;
+    if (dataset[0]) {
+      longest = dataset[0].length;
+      for (let i = 1; i < dataset.length; i++) {
+        if (dataset[i].length > longest) {
+          longest = dataset[i].length;
+        }
+      }
+    }
+    const svgWidth = longest*12;
+    const svgHeight = (dataset.length * textScalar)+textScalar/2;
+    
+    base.append('div').style('padding-bottom', '5px');
+
+    const svg = base
+      .append('svg')
+      .attr('width', svgWidth)
+      .attr('height', svgHeight)
+      .style('padding-bottom', '5px');
+
+    // const rect =
+    svg
+      .append('path')
+      .attr(
+        'd',
+        rightRoundedRect(
+          0,
+          0,
+          svgWidth,
+          svgHeight,
+          20,
+        ),
+      )
+      .attr('fill', 'white');
+      function rightRoundedRect(x, y, width, height, radius) {
+        return (
+          'M' +
+          x +
+          ',' +
+          y +
+          'h' +
+          (width - radius) +
+          'a' +
+          radius +
+          ',' +
+          radius +
+          ' 0 0 1 ' +
+          radius +
+          ',' +
+          radius +
+          'v' +
+          (height - 2 * radius) +
+          'a' +
+          radius +
+          ',' +
+          radius +
+          ' 0 0 1 ' +
+          -radius +
+          ',' +
+          radius +
+          'h' +
+          (radius - width) +
+          'z'
+        );
+      }
+      svg
+      .selectAll('svg.dataObject')
+      .data(dataset)
+      .enter()
+      .append('text')
+      .attr('x', 10)
+      .attr('y', function(d) {
+        return (dataset.indexOf(d)*textScalar)+18;
+      })
+      .text(function(d) {
+        return d;
+      })
+      .style("opacity", function(d){
+        return(multisetTestsFilteredOut.includes(d)?.5:1)
+      })
+      .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
+      .attr('font-weight', d => (d === anchor ? 'bold' : 'normal'))
+      .attr('font-size', function() {
+        return 14 + 'px';
+      })
+      .attr('fill', 'black');
+
+
+      svg.selectAll('svg.dataObject')
+      .data(dataset)
+      .enter()
+      .append('foreignObject')
+      .attr('x', svgWidth - 25)
+      .attr('y', function(d) {
+        return (dataset.indexOf(d)*textScalar+6);
+      })
+      .attr('width', 20)
+      .attr('height',20)
+      .append('xhtml:div')
+      .append('div')
+      .attr("class", "checkboxMultiset")
+      .append('input')
+      .attr('type','checkbox')
+      .property('checked',function(d){
+        return(!multisetTestsFilteredOut.includes(d))
+      })
+      .on('change', function(d) {
+        self.props.onMultisetTestsFiltered(d);
+      })
+  }
 
   handleSigValueEInputChange = value => {
     this.setState({
@@ -794,6 +973,7 @@ class EnrichmentMultisetFilters extends Component {
       this.props.pValueType === 'nominal'
         ? 'Nominal P Value'
         : 'Adjusted P Value';
+    if(this.props.multisetFiltersVisible){
     return (
       <Fragment>
         <Form className="MultisetDropdownContainer">
@@ -849,7 +1029,9 @@ class EnrichmentMultisetFilters extends Component {
         </Form>
         <p id="multiset-query" className="MultisetQueryContainer"></p>
       </Fragment>
-    );
+    );}else{
+      return(<p id="filter-tests" className="FilterTestsContainer"></p>)
+    }
   }
 }
 

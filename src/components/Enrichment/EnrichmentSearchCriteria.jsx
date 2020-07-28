@@ -90,6 +90,7 @@ class EnrichmentSearchCriteria extends Component {
           value: '>',
         },
       ],
+      useTestCheckBoxes: true,
     },
     // activateMultisetFilters: false,
     reloadPlot: true,
@@ -323,7 +324,7 @@ class EnrichmentSearchCriteria extends Component {
     );
     const enrichmentAnnotationTooltip =
       enrichmentAnnotationMeta?.annotationDisplay || '';
-    this.props.onHandleMulisetFiltersVisible(false);
+    this.props.onAnnotationChange();
     this.setState({
       enrichmentAnnotationTooltip,
       reloadPlot: true,
@@ -391,7 +392,7 @@ class EnrichmentSearchCriteria extends Component {
       });
     }
     if (handleColumns) {
-      this.props.onColumns({
+      this.props.onColumnReorder({
         enrichmentResults: this.annotationdata,
       });
     }
@@ -441,7 +442,6 @@ class EnrichmentSearchCriteria extends Component {
       const { sigValue, selectedOperator } = this.state;
       const eMust = this.state.uSettings.must;
       const eNot = this.state.uSettings.not;
-      console.log(value);
       this.getMultisetPlot(
         sigValue,
         enrichmentModel,
@@ -630,6 +630,24 @@ class EnrichmentSearchCriteria extends Component {
       },
     );
   };
+  handleFilterOutChange = test => {
+    this.props.onMultisetTestsFiltered(test)
+    const uSetVP = this.state.uSettings;
+    if(uSetVP.must.includes(test)){
+      uSetVP.must.splice(uSetVP.must.indexOf(test), 1)
+    }else if(uSetVP.not.includes(test)){
+      uSetVP.not.splice(uSetVP.not.indexOf(test), 1)
+    }
+    this.setState(
+      {
+        uSettings: uSetVP,
+        reloadPlot: true,
+      },
+      function() {
+        this.updateQueryData();
+      },
+    );
+  }
 
   updateQueryData = () => {
     const {
@@ -721,6 +739,10 @@ class EnrichmentSearchCriteria extends Component {
     enrichmentAnnotation,
     selectedOperator,
   ) {
+    const {uData, multisetTestsFilteredOut} = this.props;
+    let heightCalculation = this.calculateHeight;
+    let widthCalculation = this.calculateWidth;
+    const tests = uData.filter(function(col){return !multisetTestsFilteredOut.includes(col)})
     cancelRequestEnrichmentMultisetPlot();
     let cancelToken = new CancelToken(e => {
       cancelRequestEnrichmentMultisetPlot = e;
@@ -733,14 +755,23 @@ class EnrichmentSearchCriteria extends Component {
         sigVal,
         selectedOperator,
         this.props.pValueType,
+        tests,
         undefined,
         cancelToken,
       )
       .then(svgMarkupObj => {
         let svgMarkup = svgMarkupObj.data;
+        // svgMarkup = svgMarkup.replace(
+        //   /<svg/g,
+        //   '<svg preserveAspectRatio="xMinYMid meet" id="multisetAnalysisSVG"'
+        // );
         svgMarkup = svgMarkup.replace(
           /<svg/g,
-          '<svg preserveAspectRatio="xMinYMid meet" height="100%" width="inherit" id="multisetAnalysisSVG"',
+          '<svg preserveAspectRatio="xMinYMid meet" style="width:' +
+            widthCalculation() * 0.8 +
+            'px; height:' +
+            heightCalculation() * 0.8 +
+            'px;" id="multisetAnalysisSVG"',
         );
         // DOMPurify.addHook('afterSanitizeAttributes', function(node) {
         //   if (
@@ -763,6 +794,22 @@ class EnrichmentSearchCriteria extends Component {
       .catch(error => {
         console.error('Error during getEnrichmentsUpset', error);
       });
+  }
+
+  calculateHeight() {
+    var h = Math.max(
+      document.documentElement.clientHeight,
+      window.innerHeight || 0,
+    );
+    return h;
+  }
+
+  calculateWidth() {
+    var w = Math.max(
+      document.documentElement.clientWidth,
+      window.innerWidth || 0,
+    );
+    return w;
   }
 
   render() {
@@ -847,9 +894,9 @@ class EnrichmentSearchCriteria extends Component {
 
     let EMultisetFilters;
     if (
-      isValidSearchEnrichment &&
+      isValidSearchEnrichment //&&
       // activateMultisetFilters &&
-      multisetFiltersVisible
+      //multisetFiltersVisible
     ) {
       EMultisetFilters = (
         <EnrichmentMultisetFilters
@@ -858,6 +905,7 @@ class EnrichmentSearchCriteria extends Component {
           onHandleOperatorChange={this.handleOperatorChange}
           onHandleSigValueEInputChange={this.handleSigValueEInputChange}
           onHandleSetChange={this.handleSetChange}
+          onFilterOutChange={this.handleFilterOutChange}
           onAddFilter={this.addFilter}
           onRemoveFilter={this.removeFilter}
           onChangeHoveredFilter={this.changeHoveredFilter}

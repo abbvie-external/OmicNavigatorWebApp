@@ -184,6 +184,8 @@ class Enrichment extends Component {
     previousEnrichmentStudy: '',
     previousEnrichmentModel: '',
     previousEnrichmentAnnotation: '',
+    multisetTestsFilteredOut:[],
+    enrichmentColumnsUnfiltered:[]
   };
   EnrichmentViewContainerRef = React.createRef();
 
@@ -316,6 +318,29 @@ class Enrichment extends Component {
     // });
   };
 
+  handleMultisetTestsFiltered = test => {
+    const {enrichmentColumnsUnfiltered, unfilteredNetworkData, enrichmentResults} = this.state;
+    var arr = [...this.state.multisetTestsFilteredOut]
+    const index = arr.indexOf(test)
+    if(index > -1){
+      arr.splice(index, 1)
+    }else{
+      arr.push(test)
+    }
+    var col = [...enrichmentColumnsUnfiltered]
+    if(arr.length > 0){
+     col = col.filter(function(col){return !arr.includes(col.title)})
+    }
+    this.setState({
+      multisetTestsFilteredOut: arr,
+      enrichmentColumns: col
+    });
+    this.handleEnrichmentNetworkData(
+      unfilteredNetworkData,
+      enrichmentResults,
+    );
+  }
+
   handleSearchTransitionEnrichment = bool => {
     this.setState({
       isSearchingEnrichment: bool,
@@ -341,9 +366,7 @@ class Enrichment extends Component {
   };
 
   handleMulisetFiltersVisible = bool => {
-    this.setState({
-      multisetFiltersVisible: bool,
-    });
+    this.setState({multisetFiltersVisible: bool});
   };
 
   handleNetworkSigValue = val => {
@@ -365,16 +388,21 @@ class Enrichment extends Component {
   };
 
   handleEnrichmentSearch = searchResults => {
+    const{multisetTestsFilteredOut} = this.state;
     this.removeNetworkSVG();
     this.setState({ networkGraphReady: false });
 
     // cannot use this unless we can prevent first column (featureID) from being reordered
     // if (this.state.enrichmentColumns.length === 0) {
-    //   this.handleColumns(searchResults);
+    //   this.handleColumnReorder(searchResults);
     // }
     let columns = [];
     if (searchResults.enrichmentResults?.length > 0) {
       columns = this.getConfigCols(searchResults);
+    }
+    this.setState({enrichmentColumnsUnfiltered: columns})
+    if(multisetTestsFilteredOut.length > 0){
+      columns = columns.filter(function(col){return !multisetTestsFilteredOut.includes(col.title)})
     }
     this.getNetworkData(searchResults.enrichmentResults);
     this.setState({
@@ -391,7 +419,17 @@ class Enrichment extends Component {
     });
   };
 
-  // handleColumns = searchResults => {
+  handleAnnotationChange = () => {
+    this.setState({
+      multisetTestsFilteredOut: [],
+      enrichmentColumnsUnfiltered: [],
+      multisetFiltersVisible: false,
+      enrichmentColumns:[],
+      enrichmentColumnsUnfiltered: []
+    })
+  }
+
+  // handleColumnReorder = searchResults => {
   //   const columns = this.getConfigCols(searchResults);
   //   this.setState({ enrichmentColumns: columns });
   // };
@@ -693,9 +731,10 @@ class Enrichment extends Component {
   };
 
   handleEnrichmentNetworkData = (unfilteredNetworkData, enrichmentResults) => {
+    const{multisetTestsFilteredOut}=this.state;
     // const pValueTypeParam = pValueType === 'adjusted' ? 0.1 : 1;
     let networkDataVar = { ...unfilteredNetworkData };
-    const tests = unfilteredNetworkData.tests;
+    var tests = unfilteredNetworkData.tests;
     const enrichmentResultsDescriptions = [...enrichmentResults].map(
       r => r.description,
     );
@@ -711,6 +750,9 @@ class Enrichment extends Component {
       totalNodes: unfilteredNetworkData.nodes.length,
       totalLinks: unfilteredNetworkData.links.length,
     });
+    if(multisetTestsFilteredOut.length > 0){
+      tests = tests.filter(function(col){return !multisetTestsFilteredOut.includes(col)})
+    }
     let facets = [];
     let pieData = [];
     const isArray = Array.isArray(tests);
@@ -1913,7 +1955,7 @@ class Enrichment extends Component {
                 this.handleSearchTransitionEnrichment
               }
               onEnrichmentSearch={this.handleEnrichmentSearch}
-              onColumns={this.handleColumns}
+              onColumnReorder={this.handleColumnReorder}
               onSearchCriteriaChange={this.handleSearchCriteriaChange}
               onSearchCriteriaReset={this.hideEGrid}
               onDisablePlot={this.disablePlot}
@@ -1923,11 +1965,13 @@ class Enrichment extends Component {
               onSetStudyModelAnnotationMetadata={
                 this.setStudyModelAnnotationMetadata
               }
-              onSetAnnotationsMetadata={this.setAnnotationsMetadata}
               onHandleMulisetFiltersVisible={this.handleMulisetFiltersVisible}
+              onSetAnnotationsMetadata={this.setAnnotationsMetadata}
               onHandleNetworkSigValue={this.handleNetworkSigValue}
               onHandleNetworkOperator={this.handleNetworkOperator}
               onHandleNetworkTests={this.handleNetworkTests}
+              onMultisetTestsFiltered={this.handleMultisetTestsFiltered}
+              onAnnotationChange={this.handleAnnotationChange}
             />
           </Grid.Column>
           <Grid.Column

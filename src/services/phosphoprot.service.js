@@ -6,7 +6,7 @@ require('opencpu.js/opencpu-0.5.js');
 class PhosphoprotService {
   constructor() {
     this.ocpuUrl = '***REMOVED***/ocpu/library/OmicAnalyzer/R';
-    //this.ocpuUrl = 'http://localhost:5656/ocpu/library/OmicAnalyzer/R';  <-- comment out before building production
+    //this.ocpuUrl = 'http://localhost:5656/ocpu/library/OmicAnalyzer/R';  //<-- comment out before building production
   }
 
   setUrl() {
@@ -301,6 +301,7 @@ class PhosphoprotService {
     sigValue,
     operator,
     type,
+    tests,
     errorCb,
     cancelToken,
   ) {
@@ -314,6 +315,7 @@ class PhosphoprotService {
         sigValue: sigValue,
         operator: operator,
         type: type,
+        tests: tests
       },
       errorCb,
       cancelToken,
