@@ -301,8 +301,6 @@ class Differential extends Component {
     if (bullseyeHighlightInProgress) {
       if (featureToHighlightInDiffTable != null) {
         addParams.rowHighlightBullseye.push(featureToHighlightInDiffTable);
-        // this.pageToFeature(featureToHighlightInDiffTable);
-        // this.handleSelectedFromTable(featureToHighlightInDiffTable)
       }
     }
     addParams.showPhosphositePlus = dataItem => {
@@ -441,7 +439,11 @@ class Differential extends Component {
 
   handleSelectedFromTable = toHighlightArr => {
     this.setState({ isVolcanoPlotSVGLoaded: false });
-    const { maxObjectData } = this.state;
+    const { maxObjectData, isItemSelected } = this.state;
+    const {
+      featureToHighlightInDiffTable,
+      bullseyeHighlightInProgress,
+    } = this.props;
     let max = [];
     if (toHighlightArr.length !== 0) {
       max = toHighlightArr[0];
@@ -465,9 +467,13 @@ class Differential extends Component {
       this.props.differentialFeatureIdKey,
       max,
     );
-    if (!this.state.isItemSelected && max && max.id !== maxObjectData.id) {
+    if (!isItemSelected && max && max.id !== maxObjectData.id) {
       this.setState({ isProteinSVGLoaded: false });
       this.getPlot(max.id, true);
+    }
+    if (bullseyeHighlightInProgress) {
+      this.setState({ isProteinSVGLoaded: false });
+      this.getPlot(featureToHighlightInDiffTable, true);
     }
   };
   handleSVGTabChange = activeTabIndex => {

@@ -46,16 +46,16 @@ class DifferentialVolcano extends Component {
       volcanoWidth: this.state.defaultVolcanoWidth * 0.95,
       volcanoHeight: this.state.defaultVolcanoHeight * 0.95,
     });
-    if (!this.props.bullseyeHighlightInProgress) {
-      const defaultMaxObject = this.props.differentialResults[0];
-      this.props.onSelectFromTable([
-        {
-          id: defaultMaxObject[differentialFeatureIdKey],
-          value: defaultMaxObject[maxObjectIdentifier],
-          key: defaultMaxObject[identifier],
-        },
-      ]);
-    }
+    // if (!this.props.bullseyeHighlightInProgress) {
+    const defaultMaxObject = this.props.differentialResults[0];
+    this.props.onSelectFromTable([
+      {
+        id: defaultMaxObject[differentialFeatureIdKey],
+        value: defaultMaxObject[maxObjectIdentifier],
+        key: defaultMaxObject[identifier],
+      },
+    ]);
+    // }
   }
   componentDidUpdate(prevProps, prevState) {
     if (prevProps.differentialResults !== this.props.differentialResults) {
@@ -435,7 +435,7 @@ class DifferentialVolcano extends Component {
                 ref={this.volcanoPlotFilteredGridRef}
                 className="volcanoPlotTable"
                 // note, default is 70vh; if you want a specific vh, specify like "50vh"; "auto" lets the height flow based on items per page
-                height="auto"
+                height="30vh"
                 data={filteredTableData}
                 totalRows={volcanoPlotRows}
                 columnsConfig={differentialColumns}

@@ -76,7 +76,7 @@ class BarcodePlotReact extends Component {
             .classed('HighlightedLine', true)
             .attr('y1', self.state.settings.margin.highlighted);
         });
-        if (self.props.HighlightedProteins[0]?.sample !== '') {
+        if (self.props.HighlightedProteins[0]?.featureID !== '') {
           const maxLineId = `${self.props.HighlightedProteins[0]?.featureID}`;
           const maxLine = d3.select(`#barcode-line-${maxLineId}`);
           maxLine
@@ -84,7 +84,7 @@ class BarcodePlotReact extends Component {
             .attr('y1', self.state.settings.margin.max);
           const maxLineData = {
             x2: maxLine.attr('x2'),
-            featureID: maxLine.attr('featureID'),
+            featureID: maxLine.attr('featureid'),
             lineID: maxLine.attr('lineid'),
             logFC: maxLine.attr('logfc'),
             statistic: maxLine.attr('statistic'),
@@ -399,7 +399,7 @@ class BarcodePlotReact extends Component {
       const highestTickIndex = selectedTicks.nodes().length - 1;
       if (highestTickIndex >= 0) {
         d3.select('.brush').call([objsBrush][0].move, [
-          [selectedTicks.nodes()[highestTickIndex].getAttribute('x1'), 60],
+          [selectedTicks.nodes()[highestTickIndex].getAttribute('x1'), 30],
           [selectedTicks.nodes()[0].getAttribute('x1'), barcodeHeight - 30],
         ]);
       }
