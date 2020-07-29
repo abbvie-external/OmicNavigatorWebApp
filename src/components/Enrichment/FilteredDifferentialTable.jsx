@@ -26,7 +26,11 @@ class FilteredDifferentialTable extends Component {
     filteredTableConfigCols: [],
     filteredTableData: [],
     filteredBarcodeData: [],
-    itemsPerPageFilteredDifferentialTable: 15,
+    itemsPerPageFilteredDifferentialTable:
+      parseInt(
+        sessionStorage.getItem('itemsPerPageFilteredDifferentialTable'),
+        10,
+      ) || 15,
     filteredTableLoading: true,
     additionalTemplateInfo: [],
     identifier: null,
@@ -346,10 +350,11 @@ class FilteredDifferentialTable extends Component {
     return addParams;
   };
 
-  informItemsPerPage = items => {
+  informItemsPerPageFilteredDifferentialTable = items => {
     this.setState({
       itemsPerPageFilteredDifferentialTable: items,
     });
+    sessionStorage.setItem('itemsPerPageFilteredDifferentialTable', items);
   };
 
   handleRowClick = (event, item, index) => {
@@ -452,12 +457,14 @@ class FilteredDifferentialTable extends Component {
         <div className="FilteredDifferentialTableDiv">
           <EZGrid
             ref={this.filteredDifferentialGridRef}
-            onInformItemsPerPage={this.informItemsPerPage}
             data={filteredTableData}
             columnsConfig={filteredTableConfigCols}
             totalRows={15}
             // use "differentialRows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
             itemsPerPage={itemsPerPageFilteredDifferentialTable}
+            onInformItemsPerPage={
+              this.informItemsPerPageFilteredDifferentialTable
+            }
             exportBaseName="Differential_Analysis_Filtered"
             // quickViews={quickViews}
             // disableGeneralSearch

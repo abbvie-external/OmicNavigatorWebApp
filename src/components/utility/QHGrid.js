@@ -1017,7 +1017,7 @@ export class QHGrid extends React.PureComponent {
   // Omic end
 
   componentDidMount = () => {
-    if (this.props.additionalTemplateInfo.rowHighlightBullseye?.length > 0) {
+    if (this.props.additionalTemplateInfo?.rowHighlightBullseye?.length > 0) {
       this.scrollElement();
     }
   };
@@ -1028,7 +1028,7 @@ export class QHGrid extends React.PureComponent {
     ) {
       this.setState({ activePage: 1 });
     }
-    if (this.props.additionalTemplateInfo.rowHighlightBullseye?.length > 0) {
+    if (this.props.additionalTemplateInfo?.rowHighlightBullseye?.length > 0) {
       this.scrollElement();
     }
   };

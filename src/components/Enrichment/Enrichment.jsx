@@ -195,8 +195,10 @@ class Enrichment extends Component {
     previousEnrichmentStudy: '',
     previousEnrichmentModel: '',
     previousEnrichmentAnnotation: '',
-    multisetTestsFilteredOut:[],
-    enrichmentColumnsUnfiltered:[]
+    multisetTestsFilteredOut: [],
+    enrichmentColumnsUnfiltered: [],
+    itemsPerPageEnrichmentTable:
+      parseInt(sessionStorage.getItem('itemsPerPageEnrichmentTable'), 10) || 45,
   };
   EnrichmentViewContainerRef = React.createRef();
 
@@ -330,27 +332,30 @@ class Enrichment extends Component {
   };
 
   handleMultisetTestsFiltered = test => {
-    const {enrichmentColumnsUnfiltered, unfilteredNetworkData, enrichmentResults} = this.state;
-    var arr = [...this.state.multisetTestsFilteredOut]
-    const index = arr.indexOf(test)
-    if(index > -1){
-      arr.splice(index, 1)
-    }else{
-      arr.push(test)
+    const {
+      enrichmentColumnsUnfiltered,
+      unfilteredNetworkData,
+      enrichmentResults,
+    } = this.state;
+    var arr = [...this.state.multisetTestsFilteredOut];
+    const index = arr.indexOf(test);
+    if (index > -1) {
+      arr.splice(index, 1);
+    } else {
+      arr.push(test);
     }
-    var col = [...enrichmentColumnsUnfiltered]
-    if(arr.length > 0){
-     col = col.filter(function(col){return !arr.includes(col.title)})
+    var col = [...enrichmentColumnsUnfiltered];
+    if (arr.length > 0) {
+      col = col.filter(function(col) {
+        return !arr.includes(col.title);
+      });
     }
     this.setState({
       multisetTestsFilteredOut: arr,
-      enrichmentColumns: col
+      enrichmentColumns: col,
     });
-    this.handleEnrichmentNetworkData(
-      unfilteredNetworkData,
-      enrichmentResults,
-    );
-  }
+    this.handleEnrichmentNetworkData(unfilteredNetworkData, enrichmentResults);
+  };
 
   handleSearchTransitionEnrichment = bool => {
     this.setState({
@@ -377,7 +382,7 @@ class Enrichment extends Component {
   };
 
   handleMulisetFiltersVisible = bool => {
-    this.setState({multisetFiltersVisible: bool});
+    this.setState({ multisetFiltersVisible: bool });
   };
 
   handleNetworkSigValue = val => {
@@ -399,7 +404,7 @@ class Enrichment extends Component {
   };
 
   handleEnrichmentSearch = searchResults => {
-    const{multisetTestsFilteredOut} = this.state;
+    const { multisetTestsFilteredOut } = this.state;
     this.removeNetworkSVG();
     this.setState({ networkGraphReady: false });
 
@@ -411,9 +416,11 @@ class Enrichment extends Component {
     if (searchResults.enrichmentResults?.length > 0) {
       columns = this.getConfigCols(searchResults);
     }
-    this.setState({enrichmentColumnsUnfiltered: columns})
-    if(multisetTestsFilteredOut.length > 0){
-      columns = columns.filter(function(col){return !multisetTestsFilteredOut.includes(col.title)})
+    this.setState({ enrichmentColumnsUnfiltered: columns });
+    if (multisetTestsFilteredOut.length > 0) {
+      columns = columns.filter(function(col) {
+        return !multisetTestsFilteredOut.includes(col.title);
+      });
     }
     this.getNetworkData(searchResults.enrichmentResults);
     this.setState({
@@ -435,10 +442,10 @@ class Enrichment extends Component {
       multisetTestsFilteredOut: [],
       enrichmentColumnsUnfiltered: [],
       multisetFiltersVisible: false,
-      enrichmentColumns:[],
-      enrichmentColumnsUnfiltered: []
-    })
-  }
+      enrichmentColumns: [],
+      enrichmentColumnsUnfiltered: [],
+    });
+  };
 
   // handleColumnReorder = searchResults => {
   //   const columns = this.getConfigCols(searchResults);
@@ -751,7 +758,7 @@ class Enrichment extends Component {
   };
 
   handleEnrichmentNetworkData = (unfilteredNetworkData, enrichmentResults) => {
-    const{multisetTestsFilteredOut}=this.state;
+    const { multisetTestsFilteredOut } = this.state;
     // const pValueTypeParam = pValueType === 'adjusted' ? 0.1 : 1;
     let networkDataVar = { ...unfilteredNetworkData };
     var tests = unfilteredNetworkData.tests;
@@ -770,8 +777,10 @@ class Enrichment extends Component {
       totalNodes: unfilteredNetworkData.nodes.length,
       totalLinks: unfilteredNetworkData.links.length,
     });
-    if(multisetTestsFilteredOut.length > 0){
-      tests = tests.filter(function(col){return !multisetTestsFilteredOut.includes(col)})
+    if (multisetTestsFilteredOut.length > 0) {
+      tests = tests.filter(function(col) {
+        return !multisetTestsFilteredOut.includes(col);
+      });
     }
     let facets = [];
     let pieData = [];
@@ -1762,6 +1771,13 @@ class Enrichment extends Component {
     };
   };
 
+  informItemsPerPageEnrichmentTable = items => {
+    this.setState({
+      itemsPerPageEnrichmentTable: items,
+    });
+    sessionStorage.setItem('itemsPerPageEnrichmentTable', items);
+  };
+
   getTableAndNetworkPanes = () => {
     const {
       enrichmentStudy,
@@ -1772,6 +1788,7 @@ class Enrichment extends Component {
       enrichmentResults,
       enrichmentColumns,
       additionalTemplateInfoEnrichmentTable,
+      itemsPerPageEnrichmentTable,
     } = this.state;
     // PAUL - ensure this accounts for multiset filters
     const enrichmentCacheKey = `${enrichmentStudy}-${enrichmentModel}-${enrichmentAnnotation}`;
@@ -1827,7 +1844,10 @@ class Enrichment extends Component {
                     columnsConfig={enrichmentColumns}
                     // totalRows={rows}
                     // use "rows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
-                    itemsPerPage={100}
+                    itemsPerPage={itemsPerPageEnrichmentTable}
+                    onInformItemsPerPage={
+                      this.informItemsPerPageEnrichmentTable
+                    }
                     exportBaseName="Enrichment_Analysis"
                     quickViews={quickViews}
                     // disableGeneralSearch

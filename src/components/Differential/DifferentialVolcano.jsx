@@ -23,7 +23,8 @@ class DifferentialVolcano extends Component {
       parseInt(sessionStorage.getItem('volcanoSplitPaneSize'), 10) || 550,
     defaultVolcanoHeight: 400,
     filteredTableData: [],
-    itemsPerPageInformedVolcano: 25,
+    itemsPerPageVolcanoTable:
+      parseInt(sessionStorage.getItem('itemsPerPageVolcanoTable'), 10) || 30,
     volcanoPlotRows: 0,
     doXAxisTransformation: false,
     doYAxisTransformation: false,
@@ -87,12 +88,12 @@ class DifferentialVolcano extends Component {
   }
   pageToFeature = featureToHighlight => {
     const { differentialFeatureIdKey, differentialResults } = this.props;
-    const { itemsPerPageInformedVolcano } = this.state;
+    const { itemsPerPageVolcanoTable } = this.state;
     if (this.volcanoPlotFilteredGridRef?.current != null) {
       const Index = _.findIndex(differentialResults, function(p) {
         return p[differentialFeatureIdKey] === featureToHighlight;
       });
-      const pageNumber = Math.ceil(Index / itemsPerPageInformedVolcano);
+      const pageNumber = Math.ceil(Index / itemsPerPageVolcanoTable);
       this.volcanoPlotFilteredGridRef.current.handlePageChange(
         {},
         { activePage: pageNumber },
@@ -180,10 +181,11 @@ class DifferentialVolcano extends Component {
     }
   };
 
-  informItemsPerPage = items => {
+  informItemsPerPageVolcanoTable = items => {
     this.setState({
-      itemsPerPageInformedVolcano: items,
+      itemsPerPageVolcanoTable: items,
     });
+    sessionStorage.setItem('itemsPerPageVolcanoTable', items);
   };
 
   handleRowClick = (event, item, index) => {
@@ -317,7 +319,7 @@ class DifferentialVolcano extends Component {
   render() {
     const {
       filteredTableData,
-      itemsPerPageInformedVolcano,
+      itemsPerPageVolcanoTable,
       volcanoPlotRows,
       axisLables,
       xAxisLabel,
@@ -444,8 +446,8 @@ class DifferentialVolcano extends Component {
                 data={filteredTableData}
                 totalRows={volcanoPlotRows}
                 columnsConfig={differentialColumns}
-                itemsPerPage={itemsPerPageInformedVolcano}
-                onInformItemsPerPage={this.informItemsPerPage}
+                itemsPerPage={itemsPerPageVolcanoTable}
+                onInformItemsPerPage={this.informItemsPerPageVolcanoTable}
                 disableGeneralSearch
                 disableGrouping
                 disableColumnVisibilityToggle

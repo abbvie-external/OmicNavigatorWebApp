@@ -88,7 +88,9 @@ class Differential extends Component {
     plotSVGWidth: null,
     plotSVGHeight: null,
     isVolcanoPlotSVGLoaded: false,
-    itemsPerPageInformed: 100,
+    itemsPerPageDifferentialTable:
+      parseInt(sessionStorage.getItem('itemsPerPageDifferentialTable'), 10) ||
+      45,
   };
   DifferentialViewContainerRef = React.createRef();
   differentialGridRef = React.createRef();
@@ -101,8 +103,9 @@ class Differential extends Component {
 
   informItemsPerPage = items => {
     this.setState({
-      itemsPerPageInformed: items,
+      itemsPerPageDifferentialTable: items,
     });
+    sessionStorage.setItem('itemsPerPageDifferentialTable', items);
   };
 
   handleSearchTransitionDifferential = bool => {
@@ -340,12 +343,12 @@ class Differential extends Component {
 
   pageToFeature = featureToHighlight => {
     const { differentialFeatureIdKey } = this.props;
-    const { differentialResults, itemsPerPageInformed } = this.state;
+    const { differentialResults, itemsPerPageDifferentialTable } = this.state;
     if (this.differentialGridRef?.current != null) {
       const Index = _.findIndex(differentialResults, function(p) {
         return p[differentialFeatureIdKey] === featureToHighlight;
       });
-      const pageNumber = Math.ceil(Index / itemsPerPageInformed);
+      const pageNumber = Math.ceil(Index / itemsPerPageDifferentialTable);
       this.differentialGridRef.current.handlePageChange(
         {},
         { activePage: pageNumber },
@@ -717,6 +720,13 @@ class Differential extends Component {
   //   });
   // };
 
+  informItemsPerPageDifferentialTable = items => {
+    this.setState({
+      itemsPerPageDifferentialTable: items,
+    });
+    sessionStorage.setItem('itemsPerPageDifferentialTable', items);
+  };
+
   getTableAndPlotPanes = () => {
     const {
       differentialStudy,
@@ -728,7 +738,7 @@ class Differential extends Component {
     const {
       additionalTemplateInfoDifferentialTable,
       differentialResults,
-      itemsPerPageInformed,
+      itemsPerPageDifferentialTable,
       differentialColumns,
     } = this.state;
     const differentialRows = differentialResults.length || 1000;
@@ -765,13 +775,13 @@ class Differential extends Component {
             <div id="DifferentialGrid">
               <EZGrid
                 ref={this.differentialGridRef}
-                onInformItemsPerPage={this.informItemsPerPage}
                 uniqueCacheKey={differentialCacheKey}
                 data={differentialResults}
                 columnsConfig={differentialColumns}
                 totalRows={differentialRows}
                 // use "differentialRows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
-                itemsPerPage={itemsPerPageInformed}
+                itemsPerPage={itemsPerPageDifferentialTable}
+                onInformItemsPerPage={this.informItemsPerPageDifferentialTable}
                 exportBaseName="Differential_Analysis"
                 // quickViews={quickViews}
                 disableGeneralSearch

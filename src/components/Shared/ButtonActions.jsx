@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Button, Label } from 'semantic-ui-react';
 import * as saveSvgAsPng from 'save-svg-as-png';
-import { excelService } from '../../services/excel.service';
+// import { excelService } from '../../services/excel.service';
 import { pdfService } from '../../services/pdf.service';
 import './ButtonActions.scss';
 
