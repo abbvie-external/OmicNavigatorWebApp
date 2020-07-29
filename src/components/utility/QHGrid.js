@@ -830,7 +830,6 @@ class QHGridBody extends React.PureComponent {
                   item[this.props.additionalTemplateInfo.elementId],
                 )
               ) {
-                debugger;
                 rowHighlightBullseye = true;
               }
             }
@@ -1008,6 +1007,9 @@ export class QHGrid extends React.PureComponent {
             left: 0,
             behavior: 'smooth',
           });
+          if (_this.props.onRowClick != null) {
+            _this.props.onRowClick(null, null, null);
+          }
         }
       }
     });

@@ -187,49 +187,51 @@ class DifferentialVolcano extends Component {
   };
 
   handleRowClick = (event, item, index) => {
-    const { identifier } = this.state;
-    const { differentialFeatureIdKey, maxObjectIdentifier } = this.props;
-    const PreviouslyHighlighted = this.props.selectedFromTableData;
-    event.stopPropagation();
-    if (event.shiftKey) {
-      const allTableData = _.cloneDeep(this.state.filteredTableData);
-      const indexMaxProtein = _.findIndex(allTableData, function(d) {
-        return d[differentialFeatureIdKey] === PreviouslyHighlighted[0]?.id;
-      });
-      const sliceFirst = index < indexMaxProtein ? index : indexMaxProtein;
-      const sliceLast = index > indexMaxProtein ? index : indexMaxProtein;
-      const shiftedTableData = allTableData.slice(sliceFirst, sliceLast + 1);
-      const shiftedTableDataArray = shiftedTableData.map(function(d) {
-        return {
-          id: item[differentialFeatureIdKey],
-          value: item[maxObjectIdentifier],
-          key: item[identifier],
-        };
-      });
-      this.props.onSelectFromTable(shiftedTableDataArray);
-    } else if (event.ctrlKey) {
-      //const allTableData = _.cloneDeep(this.state.filteredTableData);
-      let selectedTableDataArray = [];
-      const alreadyHighlighted = PreviouslyHighlighted.some(
-        d => d.id === item[differentialFeatureIdKey],
-      );
-      // already highlighted, remove it from array
-      if (alreadyHighlighted) {
-        selectedTableDataArray = PreviouslyHighlighted.filter(
-          i => i.id !== item[differentialFeatureIdKey],
-        );
-        this.props.onSelectFromTable(selectedTableDataArray);
-      } else {
-        // map protein to fix obj entries
-        const mappedProtein = {
-          id: item[differentialFeatureIdKey],
-          value: item[maxObjectIdentifier],
-          key: item[identifier],
-        };
-        PreviouslyHighlighted.push(mappedProtein);
-        this.props.onSelectFromTable(PreviouslyHighlighted);
-      }
-    } else {
+    if (item !== null) {
+      const { identifier } = this.state;
+      const { differentialFeatureIdKey, maxObjectIdentifier } = this.props;
+      // const PreviouslyHighlighted = this.props.selectedFromTableData;
+      // event.stopPropagation();
+      // MULTISELECT NOT IMPLEMENTED YET
+      // if (event.shiftKey) {
+      //   const allTableData = _.cloneDeep(this.state.filteredTableData);
+      //   const indexMaxProtein = _.findIndex(allTableData, function(d) {
+      //     return d[differentialFeatureIdKey] === PreviouslyHighlighted[0]?.id;
+      //   });
+      //   const sliceFirst = index < indexMaxProtein ? index : indexMaxProtein;
+      //   const sliceLast = index > indexMaxProtein ? index : indexMaxProtein;
+      //   const shiftedTableData = allTableData.slice(sliceFirst, sliceLast + 1);
+      //   const shiftedTableDataArray = shiftedTableData.map(function(d) {
+      //     return {
+      //       id: item[differentialFeatureIdKey],
+      //       value: item[maxObjectIdentifier],
+      //       key: item[identifier],
+      //     };
+      //   });
+      //   this.props.onSelectFromTable(shiftedTableDataArray);
+      // } else if (event.ctrlKey) {
+      //   //const allTableData = _.cloneDeep(this.state.filteredTableData);
+      //   let selectedTableDataArray = [];
+      //   const alreadyHighlighted = PreviouslyHighlighted.some(
+      //     d => d.id === item[differentialFeatureIdKey],
+      //   );
+      //   // already highlighted, remove it from array
+      //   if (alreadyHighlighted) {
+      //     selectedTableDataArray = PreviouslyHighlighted.filter(
+      //       i => i.id !== item[differentialFeatureIdKey],
+      //     );
+      //     this.props.onSelectFromTable(selectedTableDataArray);
+      //   } else {
+      //     // map protein to fix obj entries
+      //     const mappedProtein = {
+      //       id: item[differentialFeatureIdKey],
+      //       value: item[maxObjectIdentifier],
+      //       key: item[identifier],
+      //     };
+      //     PreviouslyHighlighted.push(mappedProtein);
+      //     this.props.onSelectFromTable(PreviouslyHighlighted);
+      //   }
+      // } else {
       this.props.onSelectFromTable([
         {
           id: item[differentialFeatureIdKey],
@@ -237,6 +239,9 @@ class DifferentialVolcano extends Component {
           key: item[identifier],
         },
       ]);
+      // }
+    } else {
+      this.props.onPagedToFeature();
     }
   };
 
@@ -435,7 +440,7 @@ class DifferentialVolcano extends Component {
                 ref={this.volcanoPlotFilteredGridRef}
                 className="volcanoPlotTable"
                 // note, default is 70vh; if you want a specific vh, specify like "50vh"; "auto" lets the height flow based on items per page
-                height="30vh"
+                height="auto"
                 data={filteredTableData}
                 totalRows={volcanoPlotRows}
                 columnsConfig={differentialColumns}

@@ -78,7 +78,9 @@ class DifferentialVolcanoPlot extends Component {
           e.target.attributes['cy'].value,
         ],
       };
-      const circle = d3.select(`#volcanoDataPoint-${e.target.attributes['circleid'].value}`);
+      const circle = d3.select(
+        `#volcanoDataPoint-${e.target.attributes['circleid'].value}`,
+      );
       circle.classed('hovered', true);
       this.setState({
         hoveredCircleData: hoveredData,
@@ -144,7 +146,7 @@ class DifferentialVolcanoPlot extends Component {
             ry="3"
           ></rect>
           <text
-            fontSize="12px"
+            fontSize="13px"
             fill="white"
             font-family="Lato, Helvetica Neue, Arial, Helvetica, sans-serif"
             text-anchor="left"
