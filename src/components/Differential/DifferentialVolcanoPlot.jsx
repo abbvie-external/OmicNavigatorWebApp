@@ -146,7 +146,7 @@ class DifferentialVolcanoPlot extends Component {
             ry="3"
           ></rect>
           <text
-            fontSize="12px"
+            fontSize="13px"
             fill="white"
             font-family="Lato, Helvetica Neue, Arial, Helvetica, sans-serif"
             text-anchor="left"

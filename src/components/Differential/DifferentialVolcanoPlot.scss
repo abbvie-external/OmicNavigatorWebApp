@@ -21,7 +21,7 @@
     fill: var(--color-link);
   }
   .volcanoPlot-dataPoint.hovered {
-    stroke: lightskyblue;
+    stroke: var(--color-tertiary);
     stroke-width: 5;
   }
   .volcanoPlot-dataPoint.selected {

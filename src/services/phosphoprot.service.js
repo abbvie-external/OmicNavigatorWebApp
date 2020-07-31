@@ -315,7 +315,7 @@ class PhosphoprotService {
         sigValue: sigValue,
         operator: operator,
         type: type,
-        tests: tests
+        tests: tests,
       },
       errorCb,
       cancelToken,
@@ -388,6 +388,7 @@ class PhosphoprotService {
     enrichmentModel,
     enrichmentAnnotation,
     errorCb,
+    cancelToken,
   ) {
     this.setUrl();
     const promise = this.ocpuRPCUnbox(
@@ -399,6 +400,7 @@ class PhosphoprotService {
       },
       25000,
       errorCb,
+      cancelToken,
     );
     const nodesFromPromise = await promise;
     return nodesFromPromise;
