@@ -131,7 +131,7 @@ class SVGPlot extends Component {
               exportButtonSize="mini"
             />
           </div>
-          <Popup
+          {/* <Popup
             trigger={
               <Icon
                 name="bullseye"
@@ -145,7 +145,7 @@ class SVGPlot extends Component {
             basic
             position="bottom left"
             content="view in differential analysis section"
-          />
+          /> */}
           {svgPanes}
         </div>
       );
