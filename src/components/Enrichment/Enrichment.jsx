@@ -432,7 +432,6 @@ class Enrichment extends Component {
       enrichmentColumnsUnfiltered: [],
       multisetFiltersVisible: false,
       enrichmentColumns: [],
-      enrichmentColumnsUnfiltered: [],
     });
   };
 
