@@ -31,6 +31,8 @@ import EnrichmentSearchCriteria from './EnrichmentSearchCriteria';
 import SplitPanesContainer from './SplitPanesContainer';
 
 let cancelRequestEnrichmentGetPlot = () => {};
+let cancelRequestGetEnrichmentsNetwork = () => {};
+
 class Enrichment extends Component {
   defaultEnrichmentActiveIndex =
     parseInt(sessionStorage.getItem('enrichmentViewTab'), 10) || 0;
@@ -184,8 +186,8 @@ class Enrichment extends Component {
     previousEnrichmentStudy: '',
     previousEnrichmentModel: '',
     previousEnrichmentAnnotation: '',
-    multisetTestsFilteredOut:[],
-    enrichmentColumnsUnfiltered:[]
+    multisetTestsFilteredOut: [],
+    enrichmentColumnsUnfiltered: [],
   };
   EnrichmentViewContainerRef = React.createRef();
 
@@ -319,27 +321,30 @@ class Enrichment extends Component {
   };
 
   handleMultisetTestsFiltered = test => {
-    const {enrichmentColumnsUnfiltered, unfilteredNetworkData, enrichmentResults} = this.state;
-    var arr = [...this.state.multisetTestsFilteredOut]
-    const index = arr.indexOf(test)
-    if(index > -1){
-      arr.splice(index, 1)
-    }else{
-      arr.push(test)
+    const {
+      enrichmentColumnsUnfiltered,
+      unfilteredNetworkData,
+      enrichmentResults,
+    } = this.state;
+    var arr = [...this.state.multisetTestsFilteredOut];
+    const index = arr.indexOf(test);
+    if (index > -1) {
+      arr.splice(index, 1);
+    } else {
+      arr.push(test);
     }
-    var col = [...enrichmentColumnsUnfiltered]
-    if(arr.length > 0){
-     col = col.filter(function(col){return !arr.includes(col.title)})
+    var col = [...enrichmentColumnsUnfiltered];
+    if (arr.length > 0) {
+      col = col.filter(function(col) {
+        return !arr.includes(col.title);
+      });
     }
     this.setState({
       multisetTestsFilteredOut: arr,
-      enrichmentColumns: col
+      enrichmentColumns: col,
     });
-    this.handleEnrichmentNetworkData(
-      unfilteredNetworkData,
-      enrichmentResults,
-    );
-  }
+    this.handleEnrichmentNetworkData(unfilteredNetworkData, enrichmentResults);
+  };
 
   handleSearchTransitionEnrichment = bool => {
     this.setState({
@@ -366,7 +371,7 @@ class Enrichment extends Component {
   };
 
   handleMulisetFiltersVisible = bool => {
-    this.setState({multisetFiltersVisible: bool});
+    this.setState({ multisetFiltersVisible: bool });
   };
 
   handleNetworkSigValue = val => {
@@ -388,7 +393,7 @@ class Enrichment extends Component {
   };
 
   handleEnrichmentSearch = searchResults => {
-    const{multisetTestsFilteredOut} = this.state;
+    const { multisetTestsFilteredOut } = this.state;
     this.removeNetworkSVG();
     this.setState({ networkGraphReady: false });
 
@@ -400,9 +405,11 @@ class Enrichment extends Component {
     if (searchResults.enrichmentResults?.length > 0) {
       columns = this.getConfigCols(searchResults);
     }
-    this.setState({enrichmentColumnsUnfiltered: columns})
-    if(multisetTestsFilteredOut.length > 0){
-      columns = columns.filter(function(col){return !multisetTestsFilteredOut.includes(col.title)})
+    this.setState({ enrichmentColumnsUnfiltered: columns });
+    if (multisetTestsFilteredOut.length > 0) {
+      columns = columns.filter(function(col) {
+        return !multisetTestsFilteredOut.includes(col.title);
+      });
     }
     this.getNetworkData(searchResults.enrichmentResults);
     this.setState({
@@ -424,10 +431,9 @@ class Enrichment extends Component {
       multisetTestsFilteredOut: [],
       enrichmentColumnsUnfiltered: [],
       multisetFiltersVisible: false,
-      enrichmentColumns:[],
-      enrichmentColumnsUnfiltered: []
-    })
-  }
+      enrichmentColumns: [],
+    });
+  };
 
   // handleColumnReorder = searchResults => {
   //   const columns = this.getConfigCols(searchResults);
@@ -676,6 +682,10 @@ class Enrichment extends Component {
     d3.select(`#svg-${this.state.networkSettings.id}`).remove();
   };
 
+  handleCancelRequestGetEnrichmentsNetwork = () => {
+    cancelRequestGetEnrichmentsNetwork();
+  };
+
   getNetworkData = enrichmentResults => {
     const {
       enrichmentModel,
@@ -701,12 +711,17 @@ class Enrichment extends Component {
         previousEnrichmentModel: enrichmentModel,
         previousEnrichmentAnnotation: enrichmentAnnotation,
       });
+      cancelRequestGetEnrichmentsNetwork();
+      let cancelToken = new CancelToken(e => {
+        cancelRequestGetEnrichmentsNetwork = e;
+      });
       phosphoprotService
         .getEnrichmentsNetwork(
           enrichmentStudy,
           enrichmentModel,
           enrichmentAnnotation,
           this.handleGetEnrichmentNetworkError,
+          cancelToken,
         )
         .then(getEnrichmentNetworkResponseData => {
           this.setState(
@@ -731,7 +746,7 @@ class Enrichment extends Component {
   };
 
   handleEnrichmentNetworkData = (unfilteredNetworkData, enrichmentResults) => {
-    const{multisetTestsFilteredOut}=this.state;
+    const { multisetTestsFilteredOut } = this.state;
     // const pValueTypeParam = pValueType === 'adjusted' ? 0.1 : 1;
     let networkDataVar = { ...unfilteredNetworkData };
     var tests = unfilteredNetworkData.tests;
@@ -750,8 +765,10 @@ class Enrichment extends Component {
       totalNodes: unfilteredNetworkData.nodes.length,
       totalLinks: unfilteredNetworkData.links.length,
     });
-    if(multisetTestsFilteredOut.length > 0){
-      tests = tests.filter(function(col){return !multisetTestsFilteredOut.includes(col)})
+    if (multisetTestsFilteredOut.length > 0) {
+      tests = tests.filter(function(col) {
+        return !multisetTestsFilteredOut.includes(col);
+      });
     }
     let facets = [];
     let pieData = [];
@@ -1820,6 +1837,9 @@ class Enrichment extends Component {
                 onHandleLegendOpen={this.handleLegendOpen}
                 onHandleLegendClose={this.handleLegendClose}
                 onCreateLegend={this.createLegend}
+                onCancelGetEnrichmentsNetwork={
+                  this.handleCancelRequestGetEnrichmentsNetwork
+                }
               />
             ) : (
               <Message

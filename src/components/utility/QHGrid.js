@@ -16,19 +16,19 @@ import {
   Dimmer,
   Loader,
   Image,
-  // Paul start
+  // Omic start
   Message,
-  // Paul end
+  // Omic end
 } from 'semantic-ui-react';
 
 import { filterTypes } from './FilterTypeConfig';
 
 import _ from 'lodash';
 import moment from 'moment';
-// Paul start
+// Omic start
 import excel_logo from '../../resources/excel.png';
-import excel_logo_custom from '../../resources/excel3.png';
-// Paul end
+// import excel_logo_custom from '../../resources/excel3.png';
+// Omic end
 
 import './QHGrid.scss';
 import {
@@ -202,7 +202,7 @@ class QHGridHeader extends React.PureComponent {
     // console.log('remove QuickView', props.name);
     this.props.onShareQuickView(props.name, this.props);
   };
-  // Paul start
+  // Omic start
   getExportButton = columns => {
     const BreadcrumbPopupStyle = {
       backgroundColor: '2E2E2E',
@@ -267,7 +267,7 @@ class QHGridHeader extends React.PureComponent {
       );
     }
   };
-  // Paul end
+  // Omic end
   render() {
     const { customizeOpen, columnOpen, filtersOpen, quickOpen } = this.state;
     const { columns, grouping, numColumns } = this.props;
@@ -407,9 +407,9 @@ class QHGridHeader extends React.PureComponent {
       this.props.onResetFiltersAll ||
       this.props.onResetFiltersToCustomView ||
       this.props.onResetFiltersToDefaultView;
-    // Paul start
+    // Omic start
     const ExportButton = this.getExportButton(columns);
-    // Paul end
+    // Omic end
     return (
       <Table
         compact="very"
@@ -583,11 +583,11 @@ class QHGridHeader extends React.PureComponent {
                   children={this.props.legend}
                 />
               )}
-              {/* Paul start */}
+              {/* Omic start */}
               {!this.props.loading &&
                 !!this.props.exportBaseName &&
                 ExportButton}
-              {/* Paul end */}
+              {/* Omic end */}
               {this.props.extraHeaderItem}
             </Table.HeaderCell>
           </Table.Row>
@@ -801,7 +801,7 @@ class QHGridBody extends React.PureComponent {
         if (!hidden) {
           data_rows = _.map(data, (item, idx) => {
             const rowLevelStyle = this.props.rowLevelStyleCalc(item, ++curRow);
-            // Paul start
+            // Omic start
             let highlightClass = '';
             let maxHighlightId = '';
             let rowHighlightMax = false;
@@ -813,14 +813,16 @@ class QHGridBody extends React.PureComponent {
             ) {
               if (
                 item[this.props.additionalTemplateInfo.elementId] ===
-                this.props.additionalTemplateInfo.rowHighlightMax
+                  this.props.additionalTemplateInfo.rowHighlightMax &&
+                this.props.exportBaseName !== 'Differential_Analysis'
               ) {
                 rowHighlightMax = true;
               }
               if (
                 this.props.additionalTemplateInfo?.rowHighlightOther?.includes(
                   item[this.props.additionalTemplateInfo.elementId],
-                )
+                ) &&
+                this.props.exportBaseName !== 'Differential_Analysis'
               ) {
                 rowHighlightOther = true;
               }
@@ -834,7 +836,7 @@ class QHGridBody extends React.PureComponent {
             if (rowHighlightOther) {
               highlightClass = 'rowHighlightOther';
             }
-            // Paul end
+            // Omic end
             return (
               <Table.Row
                 onClick={evt =>
@@ -979,7 +981,7 @@ export class QHGrid extends React.PureComponent {
         this.setState({ itemsPerPage: data.value });
     }
   };
-  // Paul start
+  // Omic start
   scrollElement = () => {
     const _this = this;
     window.requestAnimationFrame(function() {
@@ -995,7 +997,7 @@ export class QHGrid extends React.PureComponent {
       }
     });
   };
-  // Paul end
+  // Omic end
 
   componentDidMount = () => {
     // this.scrollElement();
@@ -1263,9 +1265,9 @@ export class QHGrid extends React.PureComponent {
         </Dimmer>
         <QHGridHeader {...headerProps} />
         <div
-          // Paul start
+          // Omic start
           className="QHGridHeaderDiv"
-          // Paul end
+          // Omic end
           style={{
             margin: 0,
             padding: 0,
@@ -1322,6 +1324,7 @@ export class QHGrid extends React.PureComponent {
                   groupLengths={groupLengths}
                   slicedGroupLengths={slicedGroupLengths}
                   slicedData={slicedData}
+                  exportBaseName={this.props.exportBaseName}
                 />
               }
               {/* {this.props.loading && (
@@ -1340,7 +1343,7 @@ export class QHGrid extends React.PureComponent {
           {!this.props.loading && numRows === 0 && (
             <div className="QHGrid--empty">
               {typeof this.props.emptyMessage === 'string' ? (
-                // Paul start
+                // Omic start
                 <Message
                   className=""
                   icon="search"
@@ -1348,7 +1351,7 @@ export class QHGrid extends React.PureComponent {
                   content="Please Adjust Filters"
                 />
               ) : (
-                // Paul end
+                // Omic end
                 this.props.emptyMessage
               )}
             </div>

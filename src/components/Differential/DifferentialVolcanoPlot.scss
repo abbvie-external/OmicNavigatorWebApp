@@ -18,21 +18,21 @@
   .volcanoPlot-dataPoint {
     stroke: black;
     stroke-width: 0.4;
-    fill: blue;
+    fill: var(--color-link);
   }
   .volcanoPlot-dataPoint.hovered {
-    stroke: lightskyblue;
+    stroke: var(--color-tertiary);
     stroke-width: 5;
   }
   .volcanoPlot-dataPoint.selected {
     stroke: black;
     stroke-width: 1;
-    fill: orange
+    fill: orange;
   }
   .volcanoPlot-dataPoint.highlighted {
     stroke: black;
     stroke-width: 1;
-    fill: var(--color-primary-gradient)
+    fill: var(--color-primary-gradient);
   }
   .volcanoPlot-dataPoint.highlightedMax {
     stroke: var(--color-primary);
