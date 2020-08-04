@@ -44,15 +44,15 @@ class EnrichmentMultisetFilters extends Component {
     //   uSettings !== prevProps.uSettings ||
     //   prevProps.uData !== this.props.uData
     // ) {
-      this.makeMultiset(
-        uData,
-        uAnchor,
-        uSettings,
-        metaSvg,
-        sigValue,
-        selectedCol,
-        selectedOperator,
-      );
+    this.makeMultiset(
+      uData,
+      uAnchor,
+      uSettings,
+      metaSvg,
+      sigValue,
+      selectedCol,
+      selectedOperator,
+    );
     // }
   }
 
@@ -65,35 +65,36 @@ class EnrichmentMultisetFilters extends Component {
     selectedCol,
     selectedOperator,
   ) {
-    if(this.props.multisetFiltersVisible){
-    d3.selectAll('#multiset-query')
-      .selectAll('*')
-      .remove();
-    const base = d3
-      .selectAll('#multiset-query')
-      .append('div')
-      .style('padding-bottom', '5px');
-
-    if (uSettings.displayMetaData) {
-      this.prepareMultiset(uData, uAnchor, uSettings, base);
-      const baseMetaSvg = base.append('svg');
-      this.metaScript(
-        baseMetaSvg,
-        uAnchor,
-        uData,
-        uSettings,
-        selectedCol,
-        selectedOperator,
-        sigValue,
-      );
-    }}else{
-      d3.selectAll('#filter-tests')
-      .selectAll('*')
-      .remove();
+    if (this.props.multisetFiltersVisible) {
+      d3.selectAll('#multiset-query')
+        .selectAll('*')
+        .remove();
       const base = d3
-      .selectAll('#filter-tests')
-      .append('div')
-      .style('padding-bottom', '5px');
+        .selectAll('#multiset-query')
+        .append('div')
+        .style('padding-bottom', '5px');
+
+      if (uSettings.displayMetaData) {
+        this.prepareMultiset(uData, uAnchor, uSettings, base);
+        const baseMetaSvg = base.append('svg');
+        this.metaScript(
+          baseMetaSvg,
+          uAnchor,
+          uData,
+          uSettings,
+          selectedCol,
+          selectedOperator,
+          sigValue,
+        );
+      }
+    } else {
+      d3.selectAll('#filter-tests')
+        .selectAll('*')
+        .remove();
+      const base = d3
+        .selectAll('#filter-tests')
+        .append('div')
+        .style('padding-bottom', '5px');
       this.prepareTestFilter(uData, uAnchor, uSettings, base);
     }
   }
@@ -332,7 +333,7 @@ class EnrichmentMultisetFilters extends Component {
   }
 
   prepareMultiset(data, anchor, settings, base) {
-    const{multisetTestsFilteredOut} = this.props;
+    const { multisetTestsFilteredOut } = this.props;
     const self = this;
     let dataset = data;
     if (settings.useAnchor && dataset.indexOf(anchor) < 0) {
@@ -458,8 +459,8 @@ class EnrichmentMultisetFilters extends Component {
       .data(dataset)
       .enter()
       .append('circle')
-      .style("opacity", function(d){
-        return(multisetTestsFilteredOut.includes(d)?.5:1)
+      .style('opacity', function(d) {
+        return multisetTestsFilteredOut.includes(d) ? 0.5 : 1;
       })
       .style('fill', baseColorCode)
       .attr('cx', circlePadding + circleRadius)
@@ -476,16 +477,16 @@ class EnrichmentMultisetFilters extends Component {
       )
       .attr('stroke-width', circleRadius / 5)
       .on('click', function(d) {
-        if(!multisetTestsFilteredOut.includes(d)){
-        if (!mustData.includes(d) && d !== anchor) {
-          mustData.push(d);
-          if (notData.includes(d)) {
-            notData.splice(notData.indexOf(d), 1);
+        if (!multisetTestsFilteredOut.includes(d)) {
+          if (!mustData.includes(d) && d !== anchor) {
+            mustData.push(d);
+            if (notData.includes(d)) {
+              notData.splice(notData.indexOf(d), 1);
+            }
+            updateCircles();
+            self.props.onHandleSetChange({ must: mustData, not: notData });
           }
-          updateCircles();
-          self.props.onHandleSetChange({ must: mustData, not: notData });
         }
-      }
       });
 
     const maybeCircles = svg
@@ -493,8 +494,8 @@ class EnrichmentMultisetFilters extends Component {
       .data(dataset)
       .enter()
       .append('circle')
-      .style("opacity", function(d){
-        return(multisetTestsFilteredOut.includes(d)?.5:1)
+      .style('opacity', function(d) {
+        return multisetTestsFilteredOut.includes(d) ? 0.5 : 1;
       })
       .style('fill', backgroundColorCode)
       .attr('cx', 2 * circlePadding + 3 * circleRadius)
@@ -513,16 +514,16 @@ class EnrichmentMultisetFilters extends Component {
       )
       .attr('stroke-width', circleRadius / 5)
       .on('click', function(d) {
-        if(!multisetTestsFilteredOut.includes(d)){
-        if (mustData.includes(d) && d !== anchor) {
-          mustData.splice(mustData.indexOf(d), 1);
+        if (!multisetTestsFilteredOut.includes(d)) {
+          if (mustData.includes(d) && d !== anchor) {
+            mustData.splice(mustData.indexOf(d), 1);
+          }
+          if (notData.includes(d) && d !== anchor) {
+            notData.splice(notData.indexOf(d), 1);
+          }
+          updateCircles();
+          self.props.onHandleSetChange({ must: mustData, not: notData });
         }
-        if (notData.includes(d) && d !== anchor) {
-          notData.splice(notData.indexOf(d), 1);
-        }
-        updateCircles();
-        self.props.onHandleSetChange({ must: mustData, not: notData });
-      }
       });
 
     // const miniMaybeCircles =
@@ -531,8 +532,8 @@ class EnrichmentMultisetFilters extends Component {
       .data(dataset)
       .enter()
       .append('circle')
-      .style("opacity", function(d){
-        return(multisetTestsFilteredOut.includes(d)?.5:1)
+      .style('opacity', function(d) {
+        return multisetTestsFilteredOut.includes(d) ? 0.5 : 1;
       })
       .style('fill', baseColorCode)
       .attr('cx', 2 * circlePadding + 3 * circleRadius)
@@ -545,16 +546,16 @@ class EnrichmentMultisetFilters extends Component {
       })
       .attr('r', circleRadius / 3)
       .on('click', function(d) {
-        if(!multisetTestsFilteredOut.includes(d)){
-        if (mustData.includes(d) && d !== anchor) {
-          mustData.splice(mustData.indexOf(d), 1);
+        if (!multisetTestsFilteredOut.includes(d)) {
+          if (mustData.includes(d) && d !== anchor) {
+            mustData.splice(mustData.indexOf(d), 1);
+          }
+          if (notData.includes(d) && d !== anchor) {
+            notData.splice(notData.indexOf(d), 1);
+          }
+          updateCircles();
+          self.props.onHandleSetChange({ must: mustData, not: notData });
         }
-        if (notData.includes(d) && d !== anchor) {
-          notData.splice(notData.indexOf(d), 1);
-        }
-        updateCircles();
-        self.props.onHandleSetChange({ must: mustData, not: notData });
-      }
       });
 
     const notCircles = svg
@@ -563,8 +564,8 @@ class EnrichmentMultisetFilters extends Component {
       .enter()
       .append('circle')
       .style('fill', backgroundColorCode)
-      .style("opacity", function(d){
-        return(multisetTestsFilteredOut.includes(d)?.5:1)
+      .style('opacity', function(d) {
+        return multisetTestsFilteredOut.includes(d) ? 0.5 : 1;
       })
       .attr('cx', 3 * circlePadding + 5 * circleRadius)
       .attr('cy', function(d) {
@@ -580,16 +581,16 @@ class EnrichmentMultisetFilters extends Component {
       )
       .attr('stroke-width', circleRadius / 5)
       .on('click', function(d) {
-        if(!multisetTestsFilteredOut.includes(d)){
-        if (!notData.includes(d) && d !== anchor) {
-          notData.push(d);
-          if (mustData.includes(d)) {
-            mustData.splice(mustData.indexOf(d), 1);
+        if (!multisetTestsFilteredOut.includes(d)) {
+          if (!notData.includes(d) && d !== anchor) {
+            notData.push(d);
+            if (mustData.includes(d)) {
+              mustData.splice(mustData.indexOf(d), 1);
+            }
+            updateCircles();
+            self.props.onHandleSetChange({ must: mustData, not: notData }); // updateGlobalVariables();
           }
-          updateCircles();
-          self.props.onHandleSetChange({ must: mustData, not: notData }); // updateGlobalVariables();
         }
-      }
       });
 
     // const lineVert =
@@ -620,8 +621,8 @@ class EnrichmentMultisetFilters extends Component {
       .text(function(d) {
         return d;
       })
-      .style("opacity", function(d){
-        return(multisetTestsFilteredOut.includes(d)?.5:1)
+      .style('opacity', function(d) {
+        return multisetTestsFilteredOut.includes(d) ? 0.5 : 1;
       })
       .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
       .attr('font-weight', d => (d === anchor ? 'bold' : 'normal'))
@@ -631,33 +632,35 @@ class EnrichmentMultisetFilters extends Component {
       .attr('fill', 'black');
 
     //Test filtering check boxes
-    if(settings.useTestCheckBoxes){
-      svg.selectAll('svg.dataObject')
-      .data(dataset)
-      .enter()
-      .append('foreignObject')
-      .attr('x', svgWidth - 20)
-      .attr('y', function(d) {
-        return ((
-          dataset.indexOf(d) * (2 * circleRadius) +
-          (topBoxHeight + circleRadius + circlePadding) +
-          dataset.indexOf(d) * circlePadding +
-          circleRadius / 2
-        )-14);
-      })
-      .attr('width', 20)
-      .attr('height',20)
-      .append('xhtml:div')
-      .append('div')
-      .attr("class", "checkboxMultiset")
-      .append('input')
-      .attr('type','checkbox')
-      .property('checked',function(d){
-        return(!multisetTestsFilteredOut.includes(d))
-      })
-      .on('change', function(d) {
-        self.props.onFilterOutChange(d);
-      })
+    if (settings.useTestCheckBoxes) {
+      svg
+        .selectAll('svg.dataObject')
+        .data(dataset)
+        .enter()
+        .append('foreignObject')
+        .attr('x', svgWidth - 20)
+        .attr('y', function(d) {
+          return (
+            dataset.indexOf(d) * (2 * circleRadius) +
+            (topBoxHeight + circleRadius + circlePadding) +
+            dataset.indexOf(d) * circlePadding +
+            circleRadius / 2 -
+            14
+          );
+        })
+        .attr('width', 20)
+        .attr('height', 20)
+        .append('xhtml:div')
+        .append('div')
+        .attr('class', 'checkboxMultiset')
+        .append('input')
+        .attr('type', 'checkbox')
+        .property('checked', function(d) {
+          return !multisetTestsFilteredOut.includes(d);
+        })
+        .on('change', function(d) {
+          self.props.onFilterOutChange(d);
+        });
     }
 
     svg
@@ -823,8 +826,8 @@ class EnrichmentMultisetFilters extends Component {
         .attr('stroke-width', circleRadius / 5);
     }
   }
-  prepareTestFilter(data, anchor, settings, base){
-    const{multisetTestsFilteredOut} = this.props;
+  prepareTestFilter(data, anchor, settings, base) {
+    const { multisetTestsFilteredOut } = this.props;
     const self = this;
     let dataset = data;
     const textScalar = 20;
@@ -837,9 +840,9 @@ class EnrichmentMultisetFilters extends Component {
         }
       }
     }
-    const svgWidth = longest*12;
-    const svgHeight = (dataset.length * textScalar)+textScalar/2;
-    
+    const svgWidth = longest * 12;
+    const svgHeight = dataset.length * textScalar + textScalar / 2;
+
     base.append('div').style('padding-bottom', '5px');
 
     const svg = base
@@ -851,62 +854,53 @@ class EnrichmentMultisetFilters extends Component {
     // const rect =
     svg
       .append('path')
-      .attr(
-        'd',
-        rightRoundedRect(
-          0,
-          0,
-          svgWidth,
-          svgHeight,
-          20,
-        ),
-      )
+      .attr('d', rightRoundedRect(0, 0, svgWidth, svgHeight, 20))
       .attr('fill', 'white');
-      function rightRoundedRect(x, y, width, height, radius) {
-        return (
-          'M' +
-          x +
-          ',' +
-          y +
-          'h' +
-          (width - radius) +
-          'a' +
-          radius +
-          ',' +
-          radius +
-          ' 0 0 1 ' +
-          radius +
-          ',' +
-          radius +
-          'v' +
-          (height - 2 * radius) +
-          'a' +
-          radius +
-          ',' +
-          radius +
-          ' 0 0 1 ' +
-          -radius +
-          ',' +
-          radius +
-          'h' +
-          (radius - width) +
-          'z'
-        );
-      }
-      svg
+    function rightRoundedRect(x, y, width, height, radius) {
+      return (
+        'M' +
+        x +
+        ',' +
+        y +
+        'h' +
+        (width - radius) +
+        'a' +
+        radius +
+        ',' +
+        radius +
+        ' 0 0 1 ' +
+        radius +
+        ',' +
+        radius +
+        'v' +
+        (height - 2 * radius) +
+        'a' +
+        radius +
+        ',' +
+        radius +
+        ' 0 0 1 ' +
+        -radius +
+        ',' +
+        radius +
+        'h' +
+        (radius - width) +
+        'z'
+      );
+    }
+    svg
       .selectAll('svg.dataObject')
       .data(dataset)
       .enter()
       .append('text')
       .attr('x', 10)
       .attr('y', function(d) {
-        return (dataset.indexOf(d)*textScalar)+18;
+        return dataset.indexOf(d) * textScalar + 18;
       })
       .text(function(d) {
         return d;
       })
-      .style("opacity", function(d){
-        return(multisetTestsFilteredOut.includes(d)?.5:1)
+      .style('opacity', function(d) {
+        return multisetTestsFilteredOut.includes(d) ? 0.5 : 1;
       })
       .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
       .attr('font-weight', d => (d === anchor ? 'bold' : 'normal'))
@@ -915,28 +909,28 @@ class EnrichmentMultisetFilters extends Component {
       })
       .attr('fill', 'black');
 
-
-      svg.selectAll('svg.dataObject')
+    svg
+      .selectAll('svg.dataObject')
       .data(dataset)
       .enter()
       .append('foreignObject')
       .attr('x', svgWidth - 25)
       .attr('y', function(d) {
-        return (dataset.indexOf(d)*textScalar+6);
+        return dataset.indexOf(d) * textScalar + 6;
       })
       .attr('width', 20)
-      .attr('height',20)
+      .attr('height', 20)
       .append('xhtml:div')
       .append('div')
-      .attr("class", "checkboxMultiset")
+      .attr('class', 'checkboxMultiset')
       .append('input')
-      .attr('type','checkbox')
-      .property('checked',function(d){
-        return(!multisetTestsFilteredOut.includes(d))
+      .attr('type', 'checkbox')
+      .property('checked', function(d) {
+        return !multisetTestsFilteredOut.includes(d);
       })
       .on('change', function(d) {
         self.props.onMultisetTestsFiltered(d);
-      })
+      });
   }
 
   handleSigValueEInputChange = value => {
@@ -973,64 +967,65 @@ class EnrichmentMultisetFilters extends Component {
       this.props.pValueType === 'nominal'
         ? 'Nominal P Value'
         : 'Adjusted P Value';
-    if(this.props.multisetFiltersVisible){
-    return (
-      <Fragment>
-        <Form className="MultisetDropdownContainer">
-          <ul style={{ padding: '0px' }}>
-            {indexFilters.map(index => (
-              <Form.Group
-                key={index}
-                onMouseEnter={() => this.changeHoveredFilter(index)}
-                onMouseLeave={() => this.changeHoveredFilter(-1)}
-              >
-                <Form.Field
-                  control={Input}
-                  readOnly
-                  label={index === 0 ? 'Column' : ''}
-                  name="selectedCol"
-                  className="ThresholdColumnReadOnly"
-                  index={index}
-                  value={SelColOverride}
-                  options={Columns}
-                  width={7}
-                ></Form.Field>
-                <Form.Field
-                  control={Select}
-                  label={index === 0 ? 'Operator' : ''}
-                  name="selectedOperator"
-                  className="ThresholdOperatorSelect"
-                  index={index}
-                  // selection
-                  value={SelOp[index].value}
-                  options={Operators}
-                  width={5}
-                  onChange={this.props.onHandleOperatorChange}
-                ></Form.Field>
-                <Form.Field width={4} id="SignificantValueInputMultisetE">
-                  <label>{index === 0 ? 'Significance' : ''}</label>
-                  <NumericExponentialInput
-                    className="SignificantValueInput"
-                    onChange={number => {
-                      this.handleSigValueEInputChange(number);
-                      this.actuallyHandleSigValueEInputChange(number);
-                    }}
-                    min={0}
-                    max={1}
-                    name="sigValue"
-                    defaultValue={parseFloat(defaultSigValue)}
-                    value={sigValueELocal[index]}
-                    spellcheck="false"
-                  />
-                </Form.Field>
-              </Form.Group>
-            ))}
-          </ul>
-        </Form>
-        <p id="multiset-query" className="MultisetQueryContainer"></p>
-      </Fragment>
-    );}else{
-      return(<p id="filter-tests" className="FilterTestsContainer"></p>)
+    if (this.props.multisetFiltersVisible) {
+      return (
+        <Fragment>
+          <Form className="MultisetDropdownContainer">
+            <ul style={{ padding: '0px' }}>
+              {indexFilters.map(index => (
+                <Form.Group
+                  key={index}
+                  onMouseEnter={() => this.changeHoveredFilter(index)}
+                  onMouseLeave={() => this.changeHoveredFilter(-1)}
+                >
+                  <Form.Field
+                    control={Input}
+                    readOnly
+                    label={index === 0 ? 'Column' : ''}
+                    name="selectedCol"
+                    className="ThresholdColumnReadOnly"
+                    index={index}
+                    value={SelColOverride}
+                    options={Columns}
+                    width={7}
+                  ></Form.Field>
+                  <Form.Field
+                    control={Select}
+                    label={index === 0 ? 'Operator' : ''}
+                    name="selectedOperator"
+                    className="ThresholdOperatorSelect"
+                    index={index}
+                    // selection
+                    value={SelOp[index].value}
+                    options={Operators}
+                    width={5}
+                    onChange={this.props.onHandleOperatorChange}
+                  ></Form.Field>
+                  <Form.Field width={4} id="SignificantValueInputMultisetE">
+                    <label>{index === 0 ? 'Significance' : ''}</label>
+                    <NumericExponentialInput
+                      className="SignificantValueInput"
+                      onChange={number => {
+                        this.handleSigValueEInputChange(number);
+                        this.actuallyHandleSigValueEInputChange(number);
+                      }}
+                      min={0}
+                      max={1}
+                      name="sigValue"
+                      defaultValue={parseFloat(defaultSigValue)}
+                      value={sigValueELocal[index]}
+                      spellcheck="false"
+                    />
+                  </Form.Field>
+                </Form.Group>
+              ))}
+            </ul>
+          </Form>
+          <p id="multiset-query" className="MultisetQueryContainer"></p>
+        </Fragment>
+      );
+    } else {
+      return <p id="filter-tests" className="FilterTestsContainer"></p>;
     }
   }
 }

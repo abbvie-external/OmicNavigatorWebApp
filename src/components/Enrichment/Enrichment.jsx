@@ -758,37 +758,45 @@ class Enrichment extends Component {
     );
     networkDataVar.nodes = filteredNodes;
     this.setState({
-      // networkDataAvailable: true,
       networkData: networkDataVar,
       tests: tests,
-      // totalNodes: data.nodes.length,
       totalNodes: unfilteredNetworkData.nodes.length,
       totalLinks: unfilteredNetworkData.links.length,
     });
+    let testsAfterFilter = unfilteredNetworkData.tests;
     if (multisetTestsFilteredOut.length > 0) {
-      tests = tests.filter(function(col) {
-        return !multisetTestsFilteredOut.includes(col);
-      });
+      let isArrayBeforeFilter = Array.isArray(testsAfterFilter);
+      if (isArrayBeforeFilter) {
+        testsAfterFilter = testsAfterFilter.filter(function(col) {
+          return !multisetTestsFilteredOut.includes(col);
+        });
+      } else {
+        testsAfterFilter = [];
+      }
     }
     let facets = [];
     let pieData = [];
-    const isArray = Array.isArray(tests);
-    const testsLength = typeof tests === 'string' ? 1 : tests.length;
-    if (isArray) {
-      for (var i = 0; i < testsLength; i++) {
-        let rplcSpaces = unfilteredNetworkData.tests[i].replace(/ /g, '_');
-        facets.push('EnrichmentMap_pvalue_' + rplcSpaces + '_');
-        pieData.push(100 / testsLength);
+    const isArrayAfterFilter = Array.isArray(testsAfterFilter);
+    const testsLengthAfterFilter =
+      typeof testsAfterFilter === 'string' ? 1 : testsAfterFilter.length;
+    if (isArrayAfterFilter && testsLengthAfterFilter > 0) {
+      for (var i = 0; i < testsLengthAfterFilter; i++) {
+        // let rplcSpaces = testsAfterFilter[i].replace(/ /g, '_');
+        // facets.push('EnrichmentMap_pvalue_' + rplcSpaces + '_');
+        facets.push(testsAfterFilter[i]);
+        pieData.push(100 / testsLengthAfterFilter);
       }
     } else {
-      facets.push(tests);
-      pieData.push(testsLength);
+      if (testsAfterFilter.length > 0) {
+        facets.push(testsAfterFilter);
+        pieData.push(testsAfterFilter);
+      }
     }
     this.setState({
       networkSettings: {
         ...this.state.networkSettings,
         facets: facets,
-        propLabel: tests,
+        propLabel: testsAfterFilter,
         propData: pieData,
       },
       networkDataLoaded: true,

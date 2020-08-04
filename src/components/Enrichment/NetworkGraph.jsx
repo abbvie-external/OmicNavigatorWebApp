@@ -143,6 +143,7 @@ class NetworkGraph extends Component {
       linkType,
       linkCutoff,
       nodeCutoff,
+      tests,
     } = this.props;
     const self = this;
     this.removeNetworkSVG();
@@ -176,23 +177,48 @@ class NetworkGraph extends Component {
             };
           });
         } else {
-          // single test
-          const propValue = networkSettings.facets[0];
-          const valueValue = o1[pValueType];
-          const key1 = networkSettings.metaLabels[0];
-          const key2 = networkSettings.metaLabels[1];
-          const value1 = o1[networkSettings.meta[0]];
-          const value2 = o1[networkSettings.meta[1]];
-          o1.facets = [
-            {
-              prop: propValue,
-              value: valueValue,
-              metaData: {
-                [key1]: value1,
-                [key2]: value2,
+          const testsLength = typeof tests === 'string' ? 1 : tests.length;
+          // single test none filtered
+          if (testsLength === 1) {
+            const propValue = networkSettings.facets[0];
+            const valueValue = o1[pValueType];
+            const key1 = networkSettings.metaLabels[0];
+            const key2 = networkSettings.metaLabels[1];
+            const value1 = o1[networkSettings.meta[0]];
+            const value2 = o1[networkSettings.meta[1]];
+            o1.facets = [
+              {
+                prop: propValue,
+                value: valueValue,
+                metaData: {
+                  [key1]: value1,
+                  [key2]: value2,
+                },
               },
-            },
-          ];
+            ];
+          } else {
+            // single test after filter
+            const propValue = networkSettings.facets[0];
+            const singleTestIndex = _.findIndex(
+              tests,
+              test => test === propValue,
+            );
+            const valueValue = o1[pValueType][singleTestIndex];
+            const key1 = networkSettings.metaLabels[0];
+            const key2 = networkSettings.metaLabels[1];
+            const value1 = o1[networkSettings.meta[0]];
+            const value2 = o1[networkSettings.meta[1]];
+            o1.facets = [
+              {
+                prop: propValue,
+                value: valueValue,
+                metaData: {
+                  [key1]: value1,
+                  [key2]: value2,
+                },
+              },
+            ];
+          }
         }
       });
 
