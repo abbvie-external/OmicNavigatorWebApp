@@ -743,53 +743,55 @@ class EnrichmentSearchCriteria extends Component {
     const tests = uData.filter(function(col) {
       return !multisetTestsFilteredOut.includes(col);
     });
-    cancelRequestEnrichmentMultisetPlot();
-    let cancelToken = new CancelToken(e => {
-      cancelRequestEnrichmentMultisetPlot = e;
-    });
-    phosphoprotService
-      .getEnrichmentsUpset(
-        enrichmentStudy,
-        enrichmentModel,
-        enrichmentAnnotation,
-        sigVal,
-        selectedOperator,
-        this.props.pValueType,
-        tests,
-        undefined,
-        cancelToken,
-      )
-      .then(svgMarkupObj => {
-        let svgMarkup = svgMarkupObj.data;
-        // svgMarkup = svgMarkup.replace(
-        //   /<svg/g,
-        //   '<svg preserveAspectRatio="xMinYMid meet" id="multisetAnalysisSVG"'
-        // );
-        svgMarkup = svgMarkup.replace(
-          /<svg/g,
-          '<svg preserveAspectRatio="xMinYMid meet" height="100%" width="inherit" id="multisetAnalysisSVG"',
-        );
-        // DOMPurify.addHook('afterSanitizeAttributes', function(node) {
-        //   if (
-        //     node.hasAttribute('xlink:href') &&
-        //     !node.getAttribute('xlink:href').match(/^#/)
-        //   ) {
-        //     node.remove();
-        //   }
-        // });
-        // // Clean HTML string and write into our DIV
-        // let sanitizedSVG = DOMPurify.sanitize(svgMarkup, {
-        //   ADD_TAGS: ['use'],
-        // });
-        // let svgInfo = { plotType: 'Multiset', svg: sanitizedSVG };
-        let svgInfo = { plotType: 'Multiset', svg: svgMarkup };
-        this.props.onGetMultisetPlot({
-          svgInfo,
-        });
-      })
-      .catch(error => {
-        console.error('Error during getEnrichmentsUpset', error);
+    if (tests?.length > 1) {
+      cancelRequestEnrichmentMultisetPlot();
+      let cancelToken = new CancelToken(e => {
+        cancelRequestEnrichmentMultisetPlot = e;
       });
+      phosphoprotService
+        .getEnrichmentsUpset(
+          enrichmentStudy,
+          enrichmentModel,
+          enrichmentAnnotation,
+          sigVal,
+          selectedOperator,
+          this.props.pValueType,
+          tests,
+          undefined,
+          cancelToken,
+        )
+        .then(svgMarkupObj => {
+          let svgMarkup = svgMarkupObj.data;
+          // svgMarkup = svgMarkup.replace(
+          //   /<svg/g,
+          //   '<svg preserveAspectRatio="xMinYMid meet" id="multisetAnalysisSVG"'
+          // );
+          svgMarkup = svgMarkup.replace(
+            /<svg/g,
+            '<svg preserveAspectRatio="xMinYMid meet" height="100%" width="inherit" id="multisetAnalysisSVG"',
+          );
+          // DOMPurify.addHook('afterSanitizeAttributes', function(node) {
+          //   if (
+          //     node.hasAttribute('xlink:href') &&
+          //     !node.getAttribute('xlink:href').match(/^#/)
+          //   ) {
+          //     node.remove();
+          //   }
+          // });
+          // // Clean HTML string and write into our DIV
+          // let sanitizedSVG = DOMPurify.sanitize(svgMarkup, {
+          //   ADD_TAGS: ['use'],
+          // });
+          // let svgInfo = { plotType: 'Multiset', svg: sanitizedSVG };
+          let svgInfo = { plotType: 'Multiset', svg: svgMarkup };
+          this.props.onGetMultisetPlot({
+            svgInfo,
+          });
+        })
+        .catch(error => {
+          console.error('Error during getEnrichmentsUpset', error);
+        });
+    }
   }
 
   render() {
