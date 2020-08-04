@@ -207,6 +207,7 @@ class EnrichmentResultsGraph extends Component {
     networkSearchResults: [],
     networkSearchLoading: false,
     networkSearchValue: '',
+    networkSearchResultSelected: false,
     descriptions: [],
     hoveredFeatures: '',
     networkSortBy: ['significance', 'nodecount', 'linkcount'],
@@ -250,8 +251,11 @@ class EnrichmentResultsGraph extends Component {
 
   handleResultSelect = (e, { result }) => {
     const value = result.description;
-    this.setState({ networkSearchValue: value });
-    this.handleSearchChange(e, { value });
+    this.setState({
+      networkSearchValue: value,
+      networkSearchResultSelected: true,
+    });
+    this.handleSearchChangeAlt(e, { value });
   };
 
   handleSearchChange = (e, { value }) => {
@@ -260,10 +264,12 @@ class EnrichmentResultsGraph extends Component {
         networkSearchResults: [],
         networkSearchValue: '',
         networkSearchLoading: false,
+        networkSearchResultSelected: false,
       });
     } else {
       this.setState({
         networkSearchLoading: true,
+        networkSearchResultSelected: false,
       });
       const valueLowercase = value?.toLowerCase();
       this.setState({
@@ -274,6 +280,17 @@ class EnrichmentResultsGraph extends Component {
         networkSearchLoading: false,
       });
     }
+  };
+
+  handleSearchChangeAlt = (e, { value }) => {
+    const valueLowercase = value?.toLowerCase();
+    this.setState({
+      networkSearchResults: this.state.descriptions.filter(result =>
+        result.description?.toLowerCase().includes(valueLowercase),
+      ),
+      networkSearchValue: valueLowercase,
+      networkSearchLoading: false,
+    });
   };
 
   setupNetworkSearch = filteredNodes => {
@@ -577,7 +594,7 @@ class EnrichmentResultsGraph extends Component {
                 placeholder="Search..."
                 onResultSelect={this.handleResultSelect}
                 onSearchChange={this.handleSearchChange}
-                onFocus={this.handleSearchChange}
+                // onFocus={this.handleSearchChange}
                 results={networkSearchResults}
                 loading={networkSearchLoading}
                 value={networkSearchValue}

@@ -63,9 +63,11 @@ class NetworkGraph extends Component {
   }
 
   handleNodeSearch = () => {
+    const _this = this;
     // setTimeout(() => {
     let str = this.props.networkSearchValue;
     let nodeLabel = this.props.networkSettings.nodeLabel;
+    d3.selectAll('.scrollToHere').classed('scrollToHere', false);
     if (str.length === 0) {
       d3.selectAll('.node-label').style('opacity', 1);
     } else {
@@ -74,6 +76,27 @@ class NetworkGraph extends Component {
         return d[nodeLabel].toLowerCase().includes(str);
       });
       keep.style('opacity', 1);
+      if (this.props.networkSearchResultSelected) {
+        keep.classed('scrollToHere', true);
+        window.requestAnimationFrame(function() {
+          if (_this.networkContainerRef !== null) {
+            const node = _this.networkContainerRef.current.getElementsByClassName(
+              'scrollToHere',
+            );
+            if (node.length !== 0) {
+              _this.networkContainerRef.current.scrollTo({
+                top: 0,
+                left: node[0].parentElement.parentElement.__data__.x0 - 800,
+                //   +
+                //   node[0].parentElement.parentElement.__data__.x1 -
+                //   400) /
+                // 2,
+                behavior: 'smooth',
+              });
+            }
+          }
+        });
+      }
     }
     // }, 300);
   };
