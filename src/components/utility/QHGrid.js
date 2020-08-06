@@ -814,14 +814,16 @@ class QHGridBody extends React.PureComponent {
             ) {
               if (
                 item[this.props.additionalTemplateInfo.elementId] ===
-                this.props.additionalTemplateInfo.rowHighlightMax
+                  this.props.additionalTemplateInfo.rowHighlightMax &&
+                this.props.exportBaseName !== 'Differential_Analysis'
               ) {
                 rowHighlightMax = true;
               }
               if (
                 this.props.additionalTemplateInfo?.rowHighlightOther?.includes(
                   item[this.props.additionalTemplateInfo.elementId],
-                )
+                ) &&
+                this.props.exportBaseName !== 'Differential_Analysis'
               ) {
                 rowHighlightOther = true;
               }
@@ -1345,6 +1347,7 @@ export class QHGrid extends React.PureComponent {
                   groupLengths={groupLengths}
                   slicedGroupLengths={slicedGroupLengths}
                   slicedData={slicedData}
+                  exportBaseName={this.props.exportBaseName}
                 />
               }
               {/* {this.props.loading && (

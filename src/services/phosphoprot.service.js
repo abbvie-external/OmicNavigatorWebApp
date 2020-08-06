@@ -315,7 +315,7 @@ class PhosphoprotService {
         sigValue: sigValue,
         operator: operator,
         type: type,
-        tests: tests
+        tests: tests,
       },
       errorCb,
       cancelToken,

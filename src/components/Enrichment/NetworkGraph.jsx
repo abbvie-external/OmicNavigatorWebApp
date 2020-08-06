@@ -63,9 +63,11 @@ class NetworkGraph extends Component {
   }
 
   handleNodeSearch = () => {
+    const _this = this;
     // setTimeout(() => {
     let str = this.props.networkSearchValue;
     let nodeLabel = this.props.networkSettings.nodeLabel;
+    d3.selectAll('.scrollToHere').classed('scrollToHere', false);
     if (str.length === 0) {
       d3.selectAll('.node-label').style('opacity', 1);
     } else {
@@ -74,6 +76,27 @@ class NetworkGraph extends Component {
         return d[nodeLabel].toLowerCase().includes(str);
       });
       keep.style('opacity', 1);
+      if (this.props.networkSearchResultSelected) {
+        keep.classed('scrollToHere', true);
+        window.requestAnimationFrame(function() {
+          if (_this.networkContainerRef !== null) {
+            const node = _this.networkContainerRef.current.getElementsByClassName(
+              'scrollToHere',
+            );
+            if (node.length !== 0) {
+              _this.networkContainerRef.current.scrollTo({
+                top: 0,
+                left: node[0].parentElement.parentElement.__data__.x0 - 800,
+                //   +
+                //   node[0].parentElement.parentElement.__data__.x1 -
+                //   400) /
+                // 2,
+                behavior: 'smooth',
+              });
+            }
+          }
+        });
+      }
     }
     // }, 300);
   };
@@ -143,6 +166,7 @@ class NetworkGraph extends Component {
       linkType,
       linkCutoff,
       nodeCutoff,
+      tests,
     } = this.props;
     const self = this;
     this.removeNetworkSVG();
@@ -176,23 +200,48 @@ class NetworkGraph extends Component {
             };
           });
         } else {
-          // single test
-          const propValue = networkSettings.facets[0];
-          const valueValue = o1[pValueType];
-          const key1 = networkSettings.metaLabels[0];
-          const key2 = networkSettings.metaLabels[1];
-          const value1 = o1[networkSettings.meta[0]];
-          const value2 = o1[networkSettings.meta[1]];
-          o1.facets = [
-            {
-              prop: propValue,
-              value: valueValue,
-              metaData: {
-                [key1]: value1,
-                [key2]: value2,
+          const testsLength = typeof tests === 'string' ? 1 : tests.length;
+          // single test none filtered
+          if (testsLength === 1) {
+            const propValue = networkSettings.facets[0];
+            const valueValue = o1[pValueType];
+            const key1 = networkSettings.metaLabels[0];
+            const key2 = networkSettings.metaLabels[1];
+            const value1 = o1[networkSettings.meta[0]];
+            const value2 = o1[networkSettings.meta[1]];
+            o1.facets = [
+              {
+                prop: propValue,
+                value: valueValue,
+                metaData: {
+                  [key1]: value1,
+                  [key2]: value2,
+                },
               },
-            },
-          ];
+            ];
+          } else {
+            // single test after filter
+            const propValue = networkSettings.facets[0];
+            const singleTestIndex = _.findIndex(
+              tests,
+              test => test === propValue,
+            );
+            const valueValue = o1[pValueType][singleTestIndex];
+            const key1 = networkSettings.metaLabels[0];
+            const key2 = networkSettings.metaLabels[1];
+            const value1 = o1[networkSettings.meta[0]];
+            const value2 = o1[networkSettings.meta[1]];
+            o1.facets = [
+              {
+                prop: propValue,
+                value: valueValue,
+                metaData: {
+                  [key1]: value1,
+                  [key2]: value2,
+                },
+              },
+            ];
+          }
         }
       });
 

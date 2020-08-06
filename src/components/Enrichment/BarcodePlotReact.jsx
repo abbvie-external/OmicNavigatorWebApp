@@ -388,9 +388,12 @@ class BarcodePlotReact extends Component {
         d3.select('.brush').call([objsBrush][0].move, [
           [
             quatileTicks.nodes()[quartile].getAttribute('x1'),
-            barcodeHeight * 0.25,
+            Math.ceil(barcodeHeight * 0.25),
           ],
-          [quatileTicks.nodes()[0].getAttribute('x1'), barcodeHeight * 0.75],
+          [
+            quatileTicks.nodes()[0].getAttribute('x1'),
+            Math.ceil(barcodeHeight * 0.75),
+          ],
         ]);
       }, 50);
     } else {
@@ -404,9 +407,12 @@ class BarcodePlotReact extends Component {
         d3.select('.brush').call([objsBrush][0].move, [
           [
             selectedTicks.nodes()[highestTickIndex].getAttribute('x1'),
-            barcodeHeight * 0.25,
+            Math.ceil(barcodeHeight * 0.25),
           ],
-          [selectedTicks.nodes()[0].getAttribute('x1'), barcodeHeight * 0.75],
+          [
+            selectedTicks.nodes()[0].getAttribute('x1'),
+            Math.ceil(barcodeHeight * 0.75),
+          ],
         ]);
       }
     }
