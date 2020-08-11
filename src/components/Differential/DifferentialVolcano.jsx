@@ -93,7 +93,7 @@ class DifferentialVolcano extends Component {
       const Index = _.findIndex(differentialResults, function(p) {
         return p[differentialFeatureIdKey] === featureToHighlight;
       });
-      const pageNumber = Math.ceil(Index / itemsPerPageVolcanoTable);
+      const pageNumber = Math.ceil((Index + 1) / itemsPerPageVolcanoTable);
       this.volcanoPlotFilteredGridRef.current.handlePageChange(
         {},
         { activePage: pageNumber },

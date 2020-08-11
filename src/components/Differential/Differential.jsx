@@ -348,7 +348,7 @@ class Differential extends Component {
       const Index = _.findIndex(differentialResults, function(p) {
         return p[differentialFeatureIdKey] === featureToHighlight;
       });
-      const pageNumber = Math.ceil(Index / itemsPerPageDifferentialTable);
+      const pageNumber = Math.ceil((Index + 1) / itemsPerPageDifferentialTable);
       this.differentialGridRef.current.handlePageChange(
         {},
         { activePage: pageNumber },
