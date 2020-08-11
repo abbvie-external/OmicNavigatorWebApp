@@ -728,12 +728,13 @@ class Differential extends Component {
   };
 
   getTableAndPlotPanes = () => {
-    const {
-      differentialStudy,
-      differentialModel,
-      differentialTest,
-      featureToHighlightInDiffTable,
-    } = this.props;
+    // const {
+    //   differentialStudy,
+    //   differentialModel,
+    //   differentialTest,
+    //   featureToHighlightInDiffTable,
+    //   multisetQueried,
+    // } = this.props;
 
     const {
       additionalTemplateInfoDifferentialTable,
@@ -743,13 +744,16 @@ class Differential extends Component {
     } = this.state;
     const differentialRows = differentialResults.length || 1000;
     // PAUL - ensure this accounts for multiset filters
-    let differentialCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}`;
-    if (
-      featureToHighlightInDiffTable !== '' &&
-      featureToHighlightInDiffTable != null
-    ) {
-      differentialCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-${featureToHighlightInDiffTable}`;
-    }
+    // let differentialCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}`;
+    // if (
+    //   featureToHighlightInDiffTable !== '' &&
+    //   featureToHighlightInDiffTable != null
+    // ) {
+    //   differentialCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-${featureToHighlightInDiffTable}`;
+    // }
+    // if (multisetQueried) {
+    // differentialCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-${multisetQueried}`;
+    // }
     return [
       {
         menuItem: (
@@ -775,7 +779,7 @@ class Differential extends Component {
             <div id="DifferentialGrid">
               <EZGrid
                 ref={this.differentialGridRef}
-                uniqueCacheKey={differentialCacheKey}
+                // uniqueCacheKey={differentialCacheKey}
                 data={differentialResults}
                 columnsConfig={differentialColumns}
                 totalRows={differentialRows}

@@ -1,11 +1,5 @@
 import React, { Component } from 'react';
-import {
-  Loader,
-  Dimmer,
-  Tab,
-  //Popup, Icon,
-  Message,
-} from 'semantic-ui-react';
+import { Loader, Dimmer, Tab, Popup, Icon, Message } from 'semantic-ui-react';
 import ButtonActions from '../Shared/ButtonActions';
 // import * as d3 from 'd3';
 import './SVGPlot.scss';
@@ -42,15 +36,6 @@ class SVGPlot extends Component {
   };
 
   getSVGPanes(activeSVGTabIndex) {
-    // const BreadcrumbPopupStyle = {
-    //   backgroundColor: "2E2E2E",
-    //   borderBottom: "2px solid var(--color-primary)",
-    //   color: "#FFF",
-    //   padding: "1em",
-    //   maxWidth: "50vw",
-    //   fontSize: "13px",
-    //   wordBreak: "break-all"
-    // };
     if (this.props.imageInfo.length !== 0) {
       const svgArray = this.props.imageInfo.svg;
       // const svgArrayReversed = svgArray.reverse();
@@ -118,15 +103,15 @@ class SVGPlot extends Component {
       const { activeSVGTabIndex } = this.props;
       const ButtonActionsClass = this.getButtonActionsClass();
 
-      // const BreadcrumbPopupStyle = {
-      //   backgroundColor: '2E2E2E',
-      //   borderBottom: '2px solid var(--color-primary)',
-      //   color: '#FFF',
-      //   padding: '1em',
-      //   maxWidth: '50vw',
-      //   fontSize: '13px',
-      //   wordBreak: 'break-all',
-      // };
+      const BreadcrumbPopupStyle = {
+        backgroundColor: '2E2E2E',
+        borderBottom: '2px solid var(--color-primary)',
+        color: '#FFF',
+        padding: '1em',
+        maxWidth: '50vw',
+        fontSize: '13px',
+        wordBreak: 'break-all',
+      };
       const svgPanes = this.getSVGPanes(activeSVGTabIndex);
       return (
         <div className="svgContainer">
@@ -137,7 +122,7 @@ class SVGPlot extends Component {
               exportButtonSize="mini"
             />
           </div>
-          {/* <Popup
+          <Popup
             trigger={
               <Icon
                 name="bullseye"
@@ -151,7 +136,7 @@ class SVGPlot extends Component {
             basic
             position="bottom left"
             content="view in differential analysis section"
-          /> */}
+          />
           {svgPanes}
         </div>
       );

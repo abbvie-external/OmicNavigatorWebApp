@@ -1,4 +1,4 @@
-{
+({
   "short_name": "OmicAnalyzer",
   "name": "Omic Analyzer",
   "icons": [
@@ -12,4 +12,16 @@
   "display": "standalone",
   "theme_color": "#000000",
   "background_color": "#ffffff"
-}
+},
+{
+  "name": "Chrome Extension",
+  "version": "1.0",
+  "manifest_version": 2,
+  "content_scripts": [
+    {
+      "matches": ["http://pagetoinject/script/into/*"],
+      "js": ["contentscript.js"]
+    }
+  ],
+  "web_accessible_resources": ["script.js"]
+})
