@@ -4,7 +4,6 @@ import { Tab, Menu } from 'semantic-ui-react';
 import { phosphoprotService } from '../services/phosphoprot.service';
 import Differential from './Differential/Differential';
 import omicAnalyzerIcon from '../resources/icon.png';
-
 import Enrichment from './Enrichment/Enrichment';
 import { updateUrl } from './Shared/UrlControl';
 
@@ -33,7 +32,7 @@ class Tabs extends Component {
     );
     const isEnrichment = tabFromUrl === 'enrichment';
     this.state = {
-      activeIndex: isEnrichment ? 3 : 2,
+      activeIndex: isEnrichment ? 2 : 1,
       tab: tabFromUrl,
       enrichmentStudy: isEnrichment ? decodedStudy : '',
       enrichmentModel: isEnrichment ? decodedModel : '',
@@ -82,7 +81,7 @@ class Tabs extends Component {
   };
 
   handleTabChange = (e, { activeIndex }) => {
-    let newTab = activeIndex === 3 ? 'differential' : 'enrichment';
+    let newTab = activeIndex === 2 ? 'differential' : 'enrichment';
     this.setState({
       tab: newTab,
     });
@@ -179,21 +178,58 @@ class Tabs extends Component {
       });
   };
 
+  resetApp = () => {
+    this.setState(
+      {
+        activeIndex: 1,
+        tab: 'differential',
+        enrichmentStudy: '',
+        enrichmentModel: '',
+        enrichmentAnnotation: '',
+        enrichmentTestAndDescription: '',
+        differentialStudy: '',
+        differentialModel: '',
+        differentialTest: '',
+        differentialFeature: '',
+        pValueType: 'nominal',
+        featureToHighlightInDiffTable: '',
+        allStudiesMetadata: [],
+        differentialFeatureIdKey: '',
+        filteredDifferentialFeatureIdKey: '',
+        bullseyeHighlightInProgress: false,
+      },
+      function() {
+        updateUrl(
+          this.props,
+          this.state,
+          null,
+          'tabInit',
+          this.setTabIndex,
+          false,
+          null,
+        );
+        window.location.reload(false);
+      },
+    );
+  };
+
   render() {
     const { activeIndex } = this.state;
     const panes = [
       {
         menuItem: (
           <Menu.Item key="1" disabled header className="LogoAndTitle">
-            <span className="LogoElement">
-              <img
-                alt="Omic Analyzer"
-                src={omicAnalyzerIcon}
-                className="LogoImage"
-              />
+            <span id="ResetApp" onClick={this.resetApp}>
+              <span className="LogoElement">
+                <img
+                  alt="Omic Analyzer"
+                  src={omicAnalyzerIcon}
+                  className="LogoImage"
+                />
+              </span>
+              <span className="Header HeaderFirst">Omic&nbsp;</span>
+              <span className="Header HeaderSecond">Analyzer</span>
             </span>
-            <span className="Header HeaderFirst">Omic&nbsp;</span>
-            <span className="Header HeaderSecond">Analyzer</span>
           </Menu.Item>
         ),
       },

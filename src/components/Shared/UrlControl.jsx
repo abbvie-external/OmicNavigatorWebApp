@@ -16,6 +16,7 @@ export function updateUrl(
 
     if (type === 'tabChange') {
       lastTabIndex = stateParam.activeIndex;
+      debugger;
       tabIndex = lastTabIndex === 2 ? 1 : 2;
       tab = tabIndex === 2 ? 'enrichment' : 'differential';
     } else {
