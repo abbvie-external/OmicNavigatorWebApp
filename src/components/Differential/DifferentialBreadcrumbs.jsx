@@ -49,7 +49,9 @@ class DifferentialBreadcrumbs extends Component {
             <Breadcrumb.Section active={true}>
               <Popup
                 trigger={
-                  <span className="BreadcrumbName">{splitValue(name)}</span>
+                  <span className="BreadcrumbName NoSelect">
+                    {splitValue(name)}
+                  </span>
                 }
                 style={BreadcrumbPopupStyle}
                 inverted

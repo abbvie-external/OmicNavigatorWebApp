@@ -5,6 +5,10 @@
   .MenuContainer {
     margin-bottom: 0px !important;
 
+    a {
+      cursor: pointer !important;
+    }
+
     .ui.segment[class*='bottom attached'] {
       margin-bottom: 0rem !important;
     }

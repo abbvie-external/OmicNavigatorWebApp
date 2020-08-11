@@ -441,8 +441,9 @@ class DifferentialVolcano extends Component {
               <EZGrid
                 ref={this.volcanoPlotFilteredGridRef}
                 className="volcanoPlotTable"
-                // note, default is 70vh; if you want a specific vh, specify like "50vh"; "auto" lets the height flow based on items per page
-                height="auto"
+                // note, default is 70vh; if you want a specific vh, specify like "40vh"; "auto" lets the height flow based on items per page
+                // height="auto"
+                height="40vh"
                 data={filteredTableData}
                 totalRows={volcanoPlotRows}
                 columnsConfig={differentialColumns}
