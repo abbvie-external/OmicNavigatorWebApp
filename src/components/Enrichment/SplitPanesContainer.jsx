@@ -4,13 +4,10 @@ import { Grid, Dimmer, Loader, Tab } from 'semantic-ui-react';
 // import _ from 'lodash';
 import EnrichmentBreadcrumbs from './EnrichmentBreadcrumbs';
 import ButtonActions from '../Shared/ButtonActions';
-// import PlotSVG from './PlotSVG';
 import SplitPane from 'react-split-pane';
 import './SplitPanesContainer.scss';
 import SVGPlot from '../Shared/SVGPlot';
-// import BarcodePlot from "./BarcodePlot";
 import BarcodePlotReact from './BarcodePlotReact';
-// import BarcodePlotReusable from "./BarcodePlotReusable";
 import ViolinPlot from './ViolinPlot';
 import FilteredDifferentialTable from './FilteredDifferentialTable';
 

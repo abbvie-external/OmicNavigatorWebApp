@@ -1,11 +1,5 @@
 import React, { Component } from 'react';
-import {
-  Loader,
-  Dimmer,
-  Tab,
-  //Popup, Icon,
-  Message,
-} from 'semantic-ui-react';
+import { Loader, Dimmer, Tab, Popup, Icon, Message } from 'semantic-ui-react';
 import ButtonActions from '../Shared/ButtonActions';
 // import * as d3 from 'd3';
 import './SVGPlot.scss';
@@ -34,23 +28,14 @@ class SVGPlot extends Component {
     this.props.onSVGTabChange(activeIndex);
   };
 
-  handleDiffTable = evt => {
-    const key = this.props.imageInfo.key.split(':');
-    const name = key[0] || '';
-    const diffProtein = this.props.HighlightedProteins[0].sample;
-    this.props.onViewDiffTable(name, diffProtein);
+  navigateToDifferentialFeature = evt => {
+    const testAndDescription = this.props.imageInfo.key.split(':');
+    const test = testAndDescription[0] || '';
+    const featureID = this.props.HighlightedProteins[0]?.featureID;
+    this.props.onFindDifferentialFeature(test, featureID);
   };
 
   getSVGPanes(activeSVGTabIndex) {
-    // const BreadcrumbPopupStyle = {
-    //   backgroundColor: "2E2E2E",
-    //   borderBottom: "2px solid var(--color-primary)",
-    //   color: "#FFF",
-    //   padding: "1em",
-    //   maxWidth: "50vw",
-    //   fontSize: "13px",
-    //   wordBreak: "break-all"
-    // };
     if (this.props.imageInfo.length !== 0) {
       const svgArray = this.props.imageInfo.svg;
       // const svgArrayReversed = svgArray.reverse();
@@ -118,15 +103,15 @@ class SVGPlot extends Component {
       const { activeSVGTabIndex } = this.props;
       const ButtonActionsClass = this.getButtonActionsClass();
 
-      // const BreadcrumbPopupStyle = {
-      //   backgroundColor: '2E2E2E',
-      //   borderBottom: '2px solid var(--color-primary)',
-      //   color: '#FFF',
-      //   padding: '1em',
-      //   maxWidth: '50vw',
-      //   fontSize: '13px',
-      //   wordBreak: 'break-all',
-      // };
+      const BreadcrumbPopupStyle = {
+        backgroundColor: '2E2E2E',
+        borderBottom: '2px solid var(--color-primary)',
+        color: '#FFF',
+        padding: '1em',
+        maxWidth: '50vw',
+        fontSize: '13px',
+        wordBreak: 'break-all',
+      };
       const svgPanes = this.getSVGPanes(activeSVGTabIndex);
       return (
         <div className="svgContainer">
@@ -137,12 +122,12 @@ class SVGPlot extends Component {
               exportButtonSize="mini"
             />
           </div>
-          {/* <Popup
+          <Popup
             trigger={
               <Icon
                 name="bullseye"
                 size="large"
-                onClick={this.handleDiffTable}
+                onClick={this.navigateToDifferentialFeature}
                 className="DiffTableIcon"
               />
             }
@@ -151,7 +136,7 @@ class SVGPlot extends Component {
             basic
             position="bottom left"
             content="view in differential analysis section"
-          /> */}
+          />
           {svgPanes}
         </div>
       );

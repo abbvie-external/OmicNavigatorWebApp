@@ -148,8 +148,8 @@ class DifferentialVolcanoPlot extends Component {
           <text
             fontSize="13px"
             fill="white"
-            font-family="Lato, Helvetica Neue, Arial, Helvetica, sans-serif"
-            text-anchor="left"
+            fontFamily="Lato, Helvetica Neue, Arial, Helvetica, sans-serif"
+            textAnchor="left"
           >
             <tspan x={15} y={23}>
               {idText}
@@ -487,7 +487,6 @@ class DifferentialVolcanoPlot extends Component {
             >
               {yAxisText}
             </text>
-
             {xPlotTicks}
             {yPlotTicks}
             <filter id="constantOpacity">

@@ -23,7 +23,9 @@ class MetafeaturesTable extends Component {
     metafeaturesTableConfigCols: [],
     metafeaturesTableData: [],
     filteredBarcodeData: [],
-    itemsPerPageMetafeaturesTable: 20,
+    itemsPerPageMetafeaturesTable:
+      parseInt(sessionStorage.getItem('itemsPerPageMetafeaturesTable'), 10) ||
+      60,
     additionalTemplateInfo: [],
   };
   metafeaturesGridRef = React.createRef();
@@ -126,6 +128,13 @@ class MetafeaturesTable extends Component {
     });
   };
 
+  informItemsPerPageMetafeaturesTable = items => {
+    this.setState({
+      itemsPerPageMetafeaturesTable: items,
+    });
+    sessionStorage.setItem('itemsPerPageMetafeaturesTable', items);
+  };
+
   render() {
     const {
       metafeaturesTableConfigCols,
@@ -144,7 +153,7 @@ class MetafeaturesTable extends Component {
           totalRows={15}
           // use "differentialRows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
           itemsPerPage={itemsPerPageMetafeaturesTable}
-          // onInformItemsPerPage={this.informItemsPerPage}
+          onInformItemsPerPage={this.informItemsPerPageMetafeaturesTable}
           exportBaseName="Feature Data"
           // quickViews={quickViews}
           disableGeneralSearch

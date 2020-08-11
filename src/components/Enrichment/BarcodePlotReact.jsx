@@ -380,22 +380,24 @@ class BarcodePlotReact extends Component {
       .call(objsBrush);
 
     if (initialBrush) {
-      const quatileTicks = d3.selectAll('line').filter(function() {
+      const quartileTicks = d3.selectAll('line').filter(function() {
         return d3.select(this).attr('id');
       });
-      const quartile = Math.round(quatileTicks.nodes().length * 0.25);
+      const quartile = Math.round(quartileTicks.nodes().length * 0.25);
+      debugger;
       setTimeout(function() {
         d3.select('.brush').call([objsBrush][0].move, [
           [
-            quatileTicks.nodes()[quartile].getAttribute('x1'),
-            Math.ceil(barcodeHeight * 0.25),
+            quartileTicks.nodes()[quartile].getAttribute('x1'),
+            0,
+            // Math.ceil(barcodeHeight * 0.25),
           ],
           [
-            quatileTicks.nodes()[0].getAttribute('x1'),
-            Math.ceil(barcodeHeight * 0.75),
+            quartileTicks.nodes()[0].getAttribute('x1'),
+            Math.round(barcodeHeight * 0.5),
           ],
         ]);
-      }, 50);
+      }, 150);
     } else {
       // reposition the brushed rect on window resize, or horizontal pane resize
       const selectedTicks = d3.selectAll('line').filter(function() {
@@ -407,11 +409,12 @@ class BarcodePlotReact extends Component {
         d3.select('.brush').call([objsBrush][0].move, [
           [
             selectedTicks.nodes()[highestTickIndex].getAttribute('x1'),
-            Math.ceil(barcodeHeight * 0.25),
+            0,
+            // Math.ceil(barcodeHeight * 0.25),
           ],
           [
             selectedTicks.nodes()[0].getAttribute('x1'),
-            Math.ceil(barcodeHeight * 0.75),
+            Math.round(barcodeHeight * 0.5),
           ],
         ]);
       }

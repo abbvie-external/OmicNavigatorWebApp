@@ -803,9 +803,10 @@ class QHGridBody extends React.PureComponent {
             const rowLevelStyle = this.props.rowLevelStyleCalc(item, ++curRow);
             // Omic start
             let highlightClass = '';
-            let maxHighlightId = '';
+            let highlightId = '';
             let rowHighlightMax = false;
             let rowHighlightOther = false;
+            let rowHighlightBullseye = false;
             if (
               item[this.props.additionalTemplateInfo?.elementId] != null &&
               this.props.additionalTemplateInfo !== '' &&
@@ -826,15 +827,27 @@ class QHGridBody extends React.PureComponent {
               ) {
                 rowHighlightOther = true;
               }
+              if (
+                this.props.additionalTemplateInfo?.rowHighlightBullseye?.includes(
+                  item[this.props.additionalTemplateInfo.elementId],
+                )
+              ) {
+                rowHighlightBullseye = true;
+              }
             }
 
             if (rowHighlightMax) {
               highlightClass = 'rowHighlightMax';
-              maxHighlightId = 'rowHighlightMax';
+              highlightId = 'rowHighlightMax';
             }
 
             if (rowHighlightOther) {
               highlightClass = 'rowHighlightOther';
+            }
+
+            if (rowHighlightBullseye) {
+              highlightClass = 'rowHighlightBullseye';
+              highlightId = 'rowHighlightBullseye';
             }
             // Omic end
             return (
@@ -843,7 +856,7 @@ class QHGridBody extends React.PureComponent {
                   this.props.onRowClick(evt, item, startIndex + idx)
                 }
                 key={itemKeyMap(item) || idx}
-                id={maxHighlightId}
+                id={highlightId}
                 className={highlightClass}
                 style={rowLevelStyle}
               >
@@ -969,6 +982,7 @@ export class QHGrid extends React.PureComponent {
       this.setState({ activePage: data.activePage });
     }
     if (this.bodyRef) {
+      // && this.props.additionalTemplateInfo?.rowHighlightBullseye?.length > 0) {
       this.bodyRef.scrollTop = 0;
     }
   };
@@ -986,13 +1000,18 @@ export class QHGrid extends React.PureComponent {
     const _this = this;
     window.requestAnimationFrame(function() {
       if (_this.bodyRef !== null) {
-        const row = _this.bodyRef.getElementsByClassName('rowHighlightMax');
+        const row = _this.bodyRef.getElementsByClassName(
+          'rowHighlightBullseye',
+        );
         if (row.length !== 0) {
           _this.bodyRef.scrollTo({
             top: row[0].offsetTop - 40,
             left: 0,
             behavior: 'smooth',
           });
+          if (_this.props.onRowClick != null) {
+            _this.props.onRowClick(null, null, null);
+          }
         }
       }
     });
@@ -1000,7 +1019,9 @@ export class QHGrid extends React.PureComponent {
   // Omic end
 
   componentDidMount = () => {
-    // this.scrollElement();
+    if (this.props.additionalTemplateInfo?.rowHighlightBullseye?.length > 0) {
+      this.scrollElement();
+    }
   };
   componentDidUpdate = (prevProps, prevState) => {
     if (
@@ -1009,7 +1030,9 @@ export class QHGrid extends React.PureComponent {
     ) {
       this.setState({ activePage: 1 });
     }
-    // this.scrollElement();
+    if (this.props.additionalTemplateInfo?.rowHighlightBullseye?.length > 0) {
+      this.scrollElement();
+    }
   };
 
   //For Grouping

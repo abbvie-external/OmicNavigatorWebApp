@@ -6,7 +6,6 @@ import VolcanoPlotIcon from '../../resources/VolcanoPlotIcon.png';
 import VolcanoPlotIconSelected from '../../resources/VolcanoPlotIconSelected.png';
 import tableIcon from '../../resources/tableIcon.png';
 import tableIconSelected from '../../resources/tableIconSelected.png';
-import DifferentialResults from './DifferentialResults';
 import DifferentialPlot from './DifferentialPlot';
 import LoaderActivePlots from '../Transitions/LoaderActivePlots';
 import TransitionActive from '../Transitions/TransitionActive';
@@ -18,10 +17,21 @@ import DOMPurify from 'dompurify';
 import { phosphoprotService } from '../../services/phosphoprot.service';
 import DifferentialVolcano from './DifferentialVolcano';
 import { CancelToken } from 'axios';
-
+import QHGrid from '../utility/QHGrid';
+import EZGrid from '../utility/EZGrid';
+import QuickViewModal from '../utility/QuickViewModal';
+import {
+  getFieldValue,
+  getField,
+  typeMap,
+} from '../utility/selectors/QHGridSelector';
 import _ from 'lodash';
 import './Differential.scss';
 import '../Shared/Table.scss';
+export * from '../utility/FilterTypeConfig';
+export * from '../utility/selectors/quickViewSelector';
+export { QHGrid, EZGrid, QuickViewModal };
+export { getField, getFieldValue, typeMap };
 
 let cancelRequestDifferentialResultsGetPlot = () => {};
 class Differential extends Component {
@@ -32,7 +42,7 @@ class Differential extends Component {
     differentialStudy: '',
     differentialModel: '',
     differentialTest: '',
-    differentialProteinSite: '',
+    differentialFeature: '',
   };
 
   state = {
@@ -58,9 +68,6 @@ class Differential extends Component {
       title: '',
       svg: [],
     },
-    // treeDataRaw: [],
-    // treeData: [],
-    // treeDataColumns: [],
     activeSVGTabIndex: 0,
     multisetPlotAvailable: false,
     animation: 'uncover',
@@ -81,29 +88,24 @@ class Differential extends Component {
     plotSVGWidth: null,
     plotSVGHeight: null,
     isVolcanoPlotSVGLoaded: false,
+    itemsPerPageDifferentialTable:
+      parseInt(sessionStorage.getItem('itemsPerPageDifferentialTable'), 10) ||
+      45,
   };
   DifferentialViewContainerRef = React.createRef();
+  differentialGridRef = React.createRef();
 
-  componentDidMount() {
-    // this.getTableHelpers(
-    //   this.getProteinData,
-    //   this.getPlot,
-    //   this.state.selectedFromTableData,
-    // );
+  componentDidUpdate(prevProps) {
+    if (this.props.bullseyeHighlightInProgress) {
+      this.pageToFeature(this.props.featureToHighlightInDiffTable);
+    }
   }
 
-  componentDidUpdate = (prevProps, prevState) => {
-    // if (
-    //   this.props.tab === 'differential' &&
-    //   this.props.proteinToHighlightInDiffTable !== '' &&
-    //   this.props.proteinToHighlightInDiffTable !== undefined
-    // ) {
-    //   this.pageToProtein(
-    //     this.state.differentialResults,
-    //     this.props.proteinToHighlightInDiffTable,
-    //     this.state.itemsPerPageInformed,
-    //   );
-    // }
+  informItemsPerPage = items => {
+    this.setState({
+      itemsPerPageDifferentialTable: items,
+    });
+    sessionStorage.setItem('itemsPerPageDifferentialTable', items);
   };
 
   handleSearchTransitionDifferential = bool => {
@@ -146,7 +148,7 @@ class Differential extends Component {
   handleDifferentialSearch = searchResults => {
     let columns = [];
     // need this check for page refresh
-    if (this.props.differentialProteinSite !== '') {
+    if (this.props.differentialFeature !== '') {
       this.setState({
         isItemSelected: true,
       });
@@ -258,120 +260,51 @@ class Differential extends Component {
         // differentialResultsMounted: false,
         isProteinSVGLoaded: false,
         // isProteinDataLoaded: false,
-        // treeDataRaw: [],
-        // treeData: [],
-        // treeDataColumns: [],
         currentSVGs: [],
       },
       function() {
-        // const ProteinSiteVar = firstValue(dataItem[differentialFeatureIdKey], true);
         this.handleSearchCriteriaChange(
           {
             differentialStudy: this.props.differentialStudy || '',
             differentialModel: this.props.differentialModel || '',
             differentialTest: this.props.differentialTest || '',
-            differentialProteinSite: dataItem[differentialFeatureIdKey] || '',
-            // differentialProteinSite: ProteinSiteVar || '',
+            differentialFeature: dataItem[differentialFeatureIdKey] || '',
           },
           false,
         );
-        // const { differentialModel, differentialStudy } = this.props;
-        // const { differentialPlotTypes } = this.state;
-        // const handleSVGCb = this.handleSVG;
         getPlotCb(id, false);
       },
     );
-    // id,
-    // differentialPlotTypes,
-    // differentialStudy,
-    // differentialModel,
-    // imageInfo,
-    // handleSVGCb,
-
-    // LEAVE - will use when we add Tree Data / Accordion back in
-    // if (differentialModel !== 'Differential Expression') {
-    //   phosphoprotService
-    //     .getSiteData(id, differentialStudy + 'plots')
-    //     .then(treeDataResponse => {
-    //       this.setState({
-    //         treeDataRaw: treeDataResponse,
-    //       });
-    //       let tdCols = _.map(_.keys(treeDataResponse[0]), function(d) {
-    //         return { key: d, field: d };
-    //       });
-    //       this.setState({
-    //         treeDataColumns: tdCols,
-    //       });
-    //       let tD = _.map(treeDataResponse, function(d, i) {
-    //         let entries = _.toPairs(d);
-
-    //         entries = _.map(entries, function(e) {
-    //           return { key: e[0], text: e[0], items: [{ text: e[1] }] };
-    //         });
-    //         return {
-    //           key: i + 1,
-    //           text: 'Peptide' + (i + 1) + '  (' + d.Modified_sequence + ')',
-    //           items: entries,
-    //         };
-    //       });
-    //       this.setState({
-    //         treeData: tD,
-    //         isProteinDataLoaded: true,
-    //       });
-    //     });
-    // } else {
-    //   phosphoprotService
-    //     .getProteinData(id, differentialStudy + 'plots')
-    //     .then(proteinDataResponse => {
-    //       this.setState({
-    //         treeDataRaw: proteinDataResponse,
-    //       });
-    //       let tdCols = _.map(_.keys(proteinDataResponse[0]), function(d) {
-    //         return { key: d, field: d };
-    //       });
-    //       this.setState({
-    //         treeDataColumns: tdCols,
-    //       });
-
-    //       let proteinData = _.map(proteinDataResponse, function(d, i) {
-    //         var entries = _.toPairs(d);
-    //         entries = _.map(entries, function(e) {
-    //           return { key: e[0], text: e[0], items: [{ text: e[1] }] };
-    //         });
-    //         return {
-    //           key: i + 1,
-    //           text: 'Differential Expression Data',
-    //           items: entries,
-    //         };
-    //       });
-    //       this.setState({
-    //         treeData: proteinData,
-    //       });
-    //     });
-    // }
   };
   getTableHelpers = (
     getProteinDataCb,
     getPlotCb,
-    proteinToHighlightInDiffTable,
+    toHighlightArr,
     differentialFeatureIdKeyVar,
     maxObj,
   ) => {
+    const {
+      bullseyeHighlightInProgress,
+      featureToHighlightInDiffTable,
+    } = this.props;
     let addParams = {};
-    // const { differentialFeatureIdKey } = this.state;
-    if (
-      proteinToHighlightInDiffTable.length > 0 &&
-      proteinToHighlightInDiffTable != null
-    ) {
-      addParams.rowHighlightOther = [];
-      proteinToHighlightInDiffTable.forEach(element => {
-        //addParams.rowHighlightOther.push(element.Protein_Site);
-        //addParams.rowHighlightOther.push(element[differentialFeatureIdKeyVar]);
+    addParams.rowHighlightMax = [];
+    addParams.rowHighlightOther = [];
+    addParams.rowHighlightBullseye = [];
+
+    if (toHighlightArr.length > 0 && toHighlightArr != null) {
+      toHighlightArr.forEach(element => {
         addParams.rowHighlightOther.push(element.id);
       });
     }
     if (maxObj) {
       addParams.rowHighlightMax = maxObj.id;
+    }
+    // bullseye highlighting - page to item, scroll, highlight
+    if (bullseyeHighlightInProgress) {
+      if (featureToHighlightInDiffTable != null) {
+        addParams.rowHighlightBullseye.push(featureToHighlightInDiffTable);
+      }
     }
     addParams.showPhosphositePlus = dataItem => {
       let protein = dataItem.symbol
@@ -408,20 +341,34 @@ class Differential extends Component {
     this.setState({ additionalTemplateInfoDifferentialTable: addParams });
   };
 
+  pageToFeature = featureToHighlight => {
+    const { differentialFeatureIdKey } = this.props;
+    const { differentialResults, itemsPerPageDifferentialTable } = this.state;
+    if (this.differentialGridRef?.current != null) {
+      const Index = _.findIndex(differentialResults, function(p) {
+        return p[differentialFeatureIdKey] === featureToHighlight;
+      });
+      const pageNumber = Math.ceil((Index + 1) / itemsPerPageDifferentialTable);
+      this.differentialGridRef.current.handlePageChange(
+        {},
+        { activePage: pageNumber },
+      );
+    }
+  };
+
   getPlot = (featureId, useVolcanoSVGSize) => {
     const { differentialPlotTypes } = this.state;
     const {
       differentialStudy,
       differentialModel,
-      differentialProteinSite,
+      differentialFeature,
       differentialFeatureIdKey,
     } = this.props;
-    let id = featureId != null ? featureId : differentialProteinSite;
+    let id = featureId != null ? featureId : differentialFeature;
     let imageInfo = { key: '', title: '', svg: [] };
     imageInfo.title = `Protein Intensity - ${differentialFeatureIdKey} ${featureId}`;
     imageInfo.key = `${differentialFeatureIdKey} ${featureId}`;
     let handleSVGCb = this.handleSVG;
-    // let self = this;
     let currentSVGs = [];
     let DifferentialPlotSVGSizing = `height="100%" width="inherit"`;
     if (useVolcanoSVGSize === true) {
@@ -493,24 +440,13 @@ class Differential extends Component {
     }
   };
 
-  pageToProtein = (data, proteinToHighlight, itemsPerPage) => {
-    const { differentialFeatureIdKey } = this.props;
-    if (this.differentialGridRef?.current != null) {
-      const Index = _.findIndex(data, function(p) {
-        return p[differentialFeatureIdKey] === proteinToHighlight;
-        // return p.Protein_Site === proteinToHighlight;
-      });
-      const pageNumber = Math.ceil(Index / itemsPerPage);
-      this.differentialGridRef.current.handlePageChange(
-        {},
-        { activePage: pageNumber },
-      );
-    }
-  };
-
   handleSelectedFromTable = toHighlightArr => {
     this.setState({ isVolcanoPlotSVGLoaded: false });
-    const { maxObjectData } = this.state;
+    const { maxObjectData, isItemSelected } = this.state;
+    const {
+      featureToHighlightInDiffTable,
+      bullseyeHighlightInProgress,
+    } = this.props;
     let max = [];
     if (toHighlightArr.length !== 0) {
       max = toHighlightArr[0];
@@ -534,9 +470,13 @@ class Differential extends Component {
       this.props.differentialFeatureIdKey,
       max,
     );
-    if (!this.state.isItemSelected && max && max.id !== maxObjectData.id) {
+    if (!isItemSelected && max && max.id !== maxObjectData.id) {
       this.setState({ isProteinSVGLoaded: false });
       this.getPlot(max.id, true);
+    }
+    if (bullseyeHighlightInProgress) {
+      this.setState({ isProteinSVGLoaded: false });
+      this.getPlot(featureToHighlightInDiffTable, true);
     }
   };
   handleSVGTabChange = activeTabIndex => {
@@ -568,14 +508,14 @@ class Differential extends Component {
         differentialStudy: this.props.differentialStudy || '',
         differentialModel: this.props.differentialModel || '',
         differentialTest: this.props.differentialTest || '',
-        differentialProteinSite: '',
+        differentialFeature: '',
       },
       false,
     );
   };
   getConfigCols = testData => {
     const pepResults = testData.differentialResults;
-    const { differentialProteinSite } = this.props;
+    const { differentialFeature } = this.props;
     const TableValuePopupStyle = {
       backgroundColor: '2E2E2E',
       borderBottom: '2px solid var(--color-primary)',
@@ -598,10 +538,10 @@ class Differential extends Component {
       }
     }
     const alphanumericTrigger = differentialAlphanumericFields[0];
-    if (differentialProteinSite !== '') {
+    if (differentialFeature !== '') {
       let imageInfo = { key: '', title: '', svg: [] };
-      imageInfo.title = `Protein Intensity - ${alphanumericTrigger} ${differentialProteinSite}`;
-      imageInfo.key = `${alphanumericTrigger} ${differentialProteinSite}`;
+      imageInfo.title = `Protein Intensity - ${alphanumericTrigger} ${differentialFeature}`;
+      imageInfo.key = `${alphanumericTrigger} ${differentialFeature}`;
       this.setState({
         imageInfo: imageInfo,
         // differentialResultsMounted: false,
@@ -610,7 +550,7 @@ class Differential extends Component {
         // isProteinDataLoaded: false,
         currentSVGs: [],
       });
-      this.getPlot(differentialProteinSite, false);
+      this.getPlot(differentialFeature, false);
     }
     this.props.onHandleDifferentialFeatureIdKey(
       'differentialFeatureIdKey',
@@ -780,7 +720,40 @@ class Differential extends Component {
   //   });
   // };
 
+  informItemsPerPageDifferentialTable = items => {
+    this.setState({
+      itemsPerPageDifferentialTable: items,
+    });
+    sessionStorage.setItem('itemsPerPageDifferentialTable', items);
+  };
+
   getTableAndPlotPanes = () => {
+    // const {
+    //   differentialStudy,
+    //   differentialModel,
+    //   differentialTest,
+    //   featureToHighlightInDiffTable,
+    //   multisetQueried,
+    // } = this.props;
+
+    const {
+      additionalTemplateInfoDifferentialTable,
+      differentialResults,
+      itemsPerPageDifferentialTable,
+      differentialColumns,
+    } = this.state;
+    const differentialRows = differentialResults.length || 1000;
+    // PAUL - ensure this accounts for multiset filters
+    // let differentialCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}`;
+    // if (
+    //   featureToHighlightInDiffTable !== '' &&
+    //   featureToHighlightInDiffTable != null
+    // ) {
+    //   differentialCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-${featureToHighlightInDiffTable}`;
+    // }
+    // if (multisetQueried) {
+    // differentialCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-${multisetQueried}`;
+    // }
     return [
       {
         menuItem: (
@@ -803,13 +776,28 @@ class Differential extends Component {
         ),
         pane: (
           <Tab.Pane key="0" className="DifferentialContentPane">
-            <DifferentialResults
-              {...this.state}
-              {...this.props}
-              // onSearchCriteriaChange={this.handleSearchCriteriaChange}
-              onHandlePlotAnimation={this.handlePlotAnimation}
-              // differentialResultsMounted={this.handleDifferentialResultsMounted}
-            />
+            <div id="DifferentialGrid">
+              <EZGrid
+                ref={this.differentialGridRef}
+                // uniqueCacheKey={differentialCacheKey}
+                data={differentialResults}
+                columnsConfig={differentialColumns}
+                totalRows={differentialRows}
+                // use "differentialRows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
+                itemsPerPage={itemsPerPageDifferentialTable}
+                onInformItemsPerPage={this.informItemsPerPageDifferentialTable}
+                exportBaseName="Differential_Analysis"
+                // quickViews={quickViews}
+                disableGeneralSearch
+                disableGrouping
+                disableColumnVisibilityToggle
+                disableColumnReorder
+                // disableFilters
+                min-height="75vh"
+                additionalTemplateInfo={additionalTemplateInfoDifferentialTable}
+                headerAttributes={<ButtonActions />}
+              />
+            </div>
           </Tab.Pane>
         ),
       },
@@ -955,10 +943,3 @@ class Differential extends Component {
 }
 
 export default withRouter(Differential);
-
-// function firstValue(value) {
-//   if (value) {
-//     const firstValue = value.split(';')[0];
-//     return firstValue;
-//   }
-// }

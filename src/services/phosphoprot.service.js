@@ -398,7 +398,7 @@ class PhosphoprotService {
         model: enrichmentModel,
         annotation: enrichmentAnnotation,
       },
-      25000,
+      45000,
       errorCb,
       cancelToken,
     );

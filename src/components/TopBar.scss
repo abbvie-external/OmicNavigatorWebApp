@@ -5,6 +5,10 @@
   .MenuContainer {
     margin-bottom: 0px !important;
 
+    a {
+      cursor: pointer !important;
+    }
+
     .ui.segment[class*='bottom attached'] {
       margin-bottom: 0rem !important;
     }
@@ -46,6 +50,10 @@
       font-weight: 100 !important;
       font-style: italic;
       color: #e0e1e2 !important;
+    }
+
+    #ResetApp {
+      cursor: pointer !important;
     }
   }
 }

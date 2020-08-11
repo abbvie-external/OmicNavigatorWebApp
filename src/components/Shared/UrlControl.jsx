@@ -33,8 +33,7 @@ export function updateUrl(
         stateParam.differentialTest !== undefined
           ? stateParam.differentialTest.trim()
           : '';
-      const differentialProteinSiteQuery =
-        stateParam.differentialProteinSite || '';
+      const differentialFeatureQuery = stateParam.differentialFeature || '';
 
       const differentialStudyReplaced = differentialStudyQuery
         .replace(/ /gi, '–')
@@ -47,17 +46,15 @@ export function updateUrl(
         / /gi,
         '–',
       );
-      const differentialProteinSiteReplaced = differentialProteinSiteQuery.replace(
+      const differentialFeatureReplaced = differentialFeatureQuery.replace(
         / /gi,
         '–',
       );
       const differentialStudy = encodeURI(differentialStudyReplaced);
       const differentialModel = encodeURI(differentialModelReplaced);
       const differentialTest = encodeURI(differentialTestReplaced);
-      const differentialProteinSite = encodeURI(
-        differentialProteinSiteReplaced,
-      );
-      if (differentialProteinSite !== '') {
+      const differentialFeature = encodeURI(differentialFeatureReplaced);
+      if (differentialFeature !== '') {
         propsParam.history.push(
           tab +
             '/' +
@@ -67,7 +64,7 @@ export function updateUrl(
             '/' +
             differentialTest +
             '/' +
-            differentialProteinSite,
+            differentialFeature,
         );
       } else if (differentialTest !== '') {
         propsParam.history.push(
@@ -94,8 +91,8 @@ export function updateUrl(
       const enrichmentStudyQuery = stateParam.enrichmentStudy || '';
       const enrichmentModelQuery = stateParam.enrichmentModel || '';
       const enrichmentAnnotationQuery = stateParam.enrichmentAnnotation || '';
-      const enrichmentDescriptionAndTestQuery =
-        stateParam.enrichmentDescriptionAndTest || '';
+      const enrichmentTestAndDescriptionQuery =
+        stateParam.enrichmentTestAndDescription || '';
 
       const enrichmentStudyReplaced = enrichmentStudyQuery.replace(/ /gi, '–');
       const enrichmentModelReplaced = enrichmentModelQuery.replace(/ /gi, '–');
@@ -103,7 +100,7 @@ export function updateUrl(
         / /gi,
         '–',
       );
-      const enrichmentDescriptionAndTestReplaced = enrichmentDescriptionAndTestQuery.replace(
+      const enrichmentTestAndDescriptionReplaced = enrichmentTestAndDescriptionQuery.replace(
         / /gi,
         '–',
       );
@@ -111,10 +108,10 @@ export function updateUrl(
       const enrichmentStudy = encodeURI(enrichmentStudyReplaced);
       const enrichmentModel = encodeURI(enrichmentModelReplaced);
       const enrichmentAnnotation = encodeURI(enrichmentAnnotationReplaced);
-      const enrichmentDescriptionAndTest = encodeURI(
-        enrichmentDescriptionAndTestReplaced,
+      const enrichmentTestAndDescription = encodeURI(
+        enrichmentTestAndDescriptionReplaced,
       );
-      if (enrichmentDescriptionAndTest !== '') {
+      if (enrichmentTestAndDescription !== '') {
         propsParam.history.push(
           tab +
             '/' +
@@ -124,7 +121,7 @@ export function updateUrl(
             '/' +
             enrichmentAnnotation +
             '/' +
-            enrichmentDescriptionAndTest,
+            enrichmentTestAndDescription,
         );
       } else if (enrichmentAnnotation !== '') {
         propsParam.history.push(
@@ -160,8 +157,7 @@ export function updateUrl(
       const differentialStudyQuery2 = stateChanges.differentialStudy || '';
       const differentialModelQuery2 = stateChanges.differentialModel || '';
       const differentialTestQuery2 = stateChanges.differentialTest || '';
-      const differentialProteinSiteQuery2 =
-        stateChanges.differentialProteinSite || '';
+      const differentialFeatureQuery2 = stateChanges.differentialFeature || '';
       const differentialStudyReplaced = differentialStudyQuery2.replace(
         / /gi,
         '–',
@@ -174,17 +170,15 @@ export function updateUrl(
         / /gi,
         '–',
       );
-      const differentialProteinSiteReplaced = differentialProteinSiteQuery2.replace(
+      const differentialFeatureReplaced = differentialFeatureQuery2.replace(
         / /gi,
         '–',
       );
       const differentialStudy = encodeURI(differentialStudyReplaced);
       const differentialModel = encodeURI(differentialModelReplaced);
       const differentialTest = encodeURI(differentialTestReplaced);
-      const differentialProteinSite = encodeURI(
-        differentialProteinSiteReplaced,
-      );
-      if (differentialProteinSite !== '') {
+      const differentialFeature = encodeURI(differentialFeatureReplaced);
+      if (differentialFeature !== '') {
         propsParam.history.push(
           scTab +
             '/' +
@@ -194,7 +188,7 @@ export function updateUrl(
             '/' +
             differentialTest +
             '/' +
-            differentialProteinSite,
+            differentialFeature,
         );
       } else if (differentialTest !== '') {
         propsParam.history.push(
@@ -222,8 +216,8 @@ export function updateUrl(
       const enrichmentModelQuery2 = stateChanges.enrichmentModel || '';
       const enrichmentAnnotationQuery2 =
         stateChanges.enrichmentAnnotation || '';
-      const enrichmentDescriptionAndTestQuery2 =
-        stateChanges.enrichmentDescriptionAndTest || '';
+      const enrichmentTestAndDescriptionQuery2 =
+        stateChanges.enrichmentTestAndDescription || '';
 
       const enrichmentStudyReplaced = enrichmentStudyQuery2.replace(/ /gi, '–');
       const enrichmentModelReplaced = enrichmentModelQuery2.replace(/ /gi, '–');
@@ -231,7 +225,7 @@ export function updateUrl(
         / /gi,
         '–',
       );
-      const enrichmentDescriptionAndTestReplaced = enrichmentDescriptionAndTestQuery2.replace(
+      const enrichmentTestAndDescriptionReplaced = enrichmentTestAndDescriptionQuery2.replace(
         / /gi,
         '–',
       );
@@ -239,10 +233,10 @@ export function updateUrl(
       const enrichmentStudy = encodeURI(enrichmentStudyReplaced);
       const enrichmentModel = encodeURI(enrichmentModelReplaced);
       const enrichmentAnnotation = encodeURI(enrichmentAnnotationReplaced);
-      const enrichmentDescriptionAndTest = encodeURI(
-        enrichmentDescriptionAndTestReplaced,
+      const enrichmentTestAndDescription = encodeURI(
+        enrichmentTestAndDescriptionReplaced,
       );
-      if (enrichmentDescriptionAndTest !== '') {
+      if (enrichmentTestAndDescription !== '') {
         propsParam.history.push(
           scTab +
             '/' +
@@ -252,7 +246,7 @@ export function updateUrl(
             '/' +
             enrichmentAnnotation +
             '/' +
-            enrichmentDescriptionAndTest,
+            enrichmentTestAndDescription,
         );
       } else if (enrichmentAnnotation !== '') {
         propsParam.history.push(

@@ -26,9 +26,21 @@ import TransitionActive from '../Transitions/TransitionActive';
 import TransitionStill from '../Transitions/TransitionStill';
 import './Enrichment.scss';
 import EnrichmentResultsGraph from './EnrichmentResultsGraph';
-import EnrichmentResultsTable from './EnrichmentResultsTable';
 import EnrichmentSearchCriteria from './EnrichmentSearchCriteria';
 import SplitPanesContainer from './SplitPanesContainer';
+import './EnrichmentResultsTable.scss';
+import QHGrid from '../utility/QHGrid';
+import EZGrid from '../utility/EZGrid';
+import QuickViewModal from '../utility/QuickViewModal';
+import {
+  getFieldValue,
+  getField,
+  typeMap,
+} from '../utility/selectors/QHGridSelector';
+export * from '../utility/FilterTypeConfig';
+export * from '../utility/selectors/quickViewSelector';
+export { QHGrid, EZGrid, QuickViewModal };
+export { getField, getFieldValue, typeMap };
 
 let cancelRequestEnrichmentGetPlot = () => {};
 let cancelRequestGetEnrichmentsNetwork = () => {};
@@ -114,9 +126,6 @@ class Enrichment extends Component {
     enrichmentDataItem: [],
     enrichmentTerm: '',
     itemsPerPageInformedEnrichmentMain: null,
-    treeDataRaw: [],
-    treeData: [],
-    treeDataColumns: [],
     plotType: [],
     imageInfo: {
       key: null,
@@ -188,6 +197,8 @@ class Enrichment extends Component {
     previousEnrichmentAnnotation: '',
     multisetTestsFilteredOut: [],
     enrichmentColumnsUnfiltered: [],
+    itemsPerPageEnrichmentTable:
+      parseInt(sessionStorage.getItem('itemsPerPageEnrichmentTable'), 10) || 45,
   };
   EnrichmentViewContainerRef = React.createRef();
 
@@ -204,7 +215,7 @@ class Enrichment extends Component {
 
   componentDidUpdate(prevProps, prevState, snapshot) {
     if (this.state.enrichmentResults !== prevState.enrichmentResults) {
-      const DescriptionAndTest = this.props.enrichmentDescriptionAndTest || '';
+      const DescriptionAndTest = this.props.enrichmentTestAndDescription || '';
       if (DescriptionAndTest !== '') {
         const AllDescriptionsAndTests = this.state.enrichmentResults;
         const ResultsLength = this.state.enrichmentResults.length;
@@ -1092,7 +1103,7 @@ class Enrichment extends Component {
         enrichmentStudy: this.props.enrichmentStudy || '',
         enrichmentModel: this.props.enrichmentModel || '',
         enrichmentAnnotation: this.props.enrichmentAnnotation || '',
-        enrichmentDescriptionAndTest: '',
+        enrichmentTestAndDescription: '',
       },
       false,
     );
@@ -1112,7 +1123,7 @@ class Enrichment extends Component {
         enrichmentStudy: this.props.enrichmentStudy || '',
         enrichmentModel: this.props.enrichmentModel || '',
         enrichmentAnnotation: this.props.enrichmentAnnotation || '',
-        enrichmentDescriptionAndTest: TestSiteVar || '',
+        enrichmentTestAndDescription: TestSiteVar || '',
       },
       true,
     );
@@ -1661,7 +1672,7 @@ class Enrichment extends Component {
         enrichmentStudy: this.props.enrichmentStudy || '',
         enrichmentModel: this.props.enrichmentModel || '',
         enrichmentAnnotation: this.props.enrichmentAnnotation || '',
-        enrichmentDescriptionAndTest: '',
+        enrichmentTestAndDescription: '',
       },
       false,
     );
@@ -1753,7 +1764,43 @@ class Enrichment extends Component {
     } else return <TransitionStill />;
   };
 
+  showPhosphositePlus = dataItem => {
+    return function() {
+      var protein = (dataItem.Description
+        ? dataItem.Description
+        : dataItem.MajorityProteinIDsHGNC
+      ).split(';')[0];
+      let param = { queryId: -1, from: 0, searchStr: protein };
+      phosphoprotService.postToPhosphositePlus(
+        param,
+        'https://www.phosphosite.org/proteinSearchSubmitAction.action',
+      );
+    };
+  };
+
+  informItemsPerPageEnrichmentTable = items => {
+    this.setState({
+      itemsPerPageEnrichmentTable: items,
+    });
+    sessionStorage.setItem('itemsPerPageEnrichmentTable', items);
+  };
+
   getTableAndNetworkPanes = () => {
+    const {
+      enrichmentStudy,
+      enrichmentModel,
+      enrichmentAnnotation,
+    } = this.props;
+    const {
+      enrichmentResults,
+      enrichmentColumns,
+      additionalTemplateInfoEnrichmentTable,
+      itemsPerPageEnrichmentTable,
+    } = this.state;
+    // PAUL - ensure this accounts for multiset filters
+    const enrichmentCacheKey = `${enrichmentStudy}-${enrichmentModel}-${enrichmentAnnotation}`;
+    const quickViews = [];
+
     return [
       {
         menuItem: (
@@ -1789,13 +1836,41 @@ class Enrichment extends Component {
             id="EnrichmentContentPaneTable"
             // ref="EnrichmentContentPaneTable"
           >
-            <EnrichmentResultsTable
-              {...this.props}
-              {...this.state}
-              // columnReorder={this.columnReorder}
-              onHandlePlotAnimation={this.handlePlotAnimation}
-              onDisplayViolinPlot={this.displayViolinPlot}
-            />
+            <Grid>
+              <Grid.Row>
+                <Grid.Column
+                  className="EnrichmentResultsTable"
+                  mobile={16}
+                  tablet={16}
+                  largeScreen={16}
+                  widescreen={16}
+                >
+                  <EZGrid
+                    uniqueCacheKey={enrichmentCacheKey}
+                    data={enrichmentResults}
+                    columnsConfig={enrichmentColumns}
+                    // totalRows={rows}
+                    // use "rows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
+                    itemsPerPage={itemsPerPageEnrichmentTable}
+                    onInformItemsPerPage={
+                      this.informItemsPerPageEnrichmentTable
+                    }
+                    exportBaseName="Enrichment_Analysis"
+                    quickViews={quickViews}
+                    // disableGeneralSearch
+                    // columnReorder={this.props.columnReorder}
+                    disableColumnReorder
+                    disableGrouping
+                    disableColumnVisibilityToggle
+                    min-height="75vh"
+                    additionalTemplateInfo={
+                      additionalTemplateInfoEnrichmentTable
+                    }
+                    // onInformItemsPerPage={this.informItemsPerPage}
+                  />
+                </Grid.Column>
+              </Grid.Row>
+            </Grid>
           </Tab.Pane>
         ),
       },

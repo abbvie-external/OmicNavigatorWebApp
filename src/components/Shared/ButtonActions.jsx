@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Button, Label } from 'semantic-ui-react';
 import * as saveSvgAsPng from 'save-svg-as-png';
-import { excelService } from '../../services/excel.service';
+// import { excelService } from '../../services/excel.service';
 import { pdfService } from '../../services/pdf.service';
 import './ButtonActions.scss';
 
@@ -21,13 +21,6 @@ class ButtonActions extends Component {
     //   currentSVG: currentSVGVar
     // })
   }
-
-  ExcelExport = () => {
-    excelService.exportAsExcelFile(
-      this.props.treeDataRaw,
-      this.props.imageInfo.title + '_Peptide_Data',
-    );
-  };
 
   PNGExport = () => {
     // const svgElements =
@@ -135,11 +128,7 @@ class ButtonActions extends Component {
 
   getExcelButton = () => {
     if (this.props.excelVisible) {
-      return (
-        <Button className="ExportButton" onClick={this.ExcelExport}>
-          Data (.xls)
-        </Button>
-      );
+      return <Button className="ExportButton">Data (.xls)</Button>;
     }
   };
 

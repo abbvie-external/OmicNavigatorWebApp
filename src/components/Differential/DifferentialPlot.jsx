@@ -80,7 +80,6 @@ class DifferentialPlot extends Component {
           <Grid columns={2} className="PlotContainer">
             <Grid.Row className="PlotContainerRow">
               <Grid.Column
-                // className="DifferentialAccordionContainer"
                 mobile={16}
                 tablet={16}
                 largeScreen={16}

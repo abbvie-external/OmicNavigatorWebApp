@@ -18,7 +18,7 @@ class SVGPlot extends Component {
       .getMetaFeaturesTable(
         this.props.differentialStudy,
         this.props.differentialModel,
-        this.props.differentialProteinSite,
+        this.props.differentialFeature,
         this.handleGetMetaFeaturesTableError,
       )
       .then(getMetaFeaturesTableResponseData => {
@@ -49,13 +49,6 @@ class SVGPlot extends Component {
 
   handleTabChange = (e, { activeIndex }) => {
     this.props.onDifferentialPlotTableChange(activeIndex);
-  };
-
-  handleDiffTable = evt => {
-    const key = this.props.imageInfo.key.split(':');
-    const name = key[0] || '';
-    const diffProtein = this.props.HighlightedProteins[0].sample;
-    this.props.onViewDiffTable(name, diffProtein);
   };
 
   getSVGPanes(activeDifferentialPlotTabsIndex) {
