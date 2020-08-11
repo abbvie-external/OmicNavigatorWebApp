@@ -189,7 +189,7 @@ class DifferentialVolcano extends Component {
   };
 
   handleRowClick = (event, item, index) => {
-    if (item !== null) {
+    if (item !== null && event?.target?.className !== 'ExternalSiteIcon') {
       const { identifier } = this.state;
       const { differentialFeatureIdKey, maxObjectIdentifier } = this.props;
       // const PreviouslyHighlighted = this.props.selectedFromTableData;
