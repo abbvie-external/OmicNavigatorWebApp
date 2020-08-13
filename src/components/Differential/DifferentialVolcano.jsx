@@ -305,7 +305,7 @@ class DifferentialVolcano extends Component {
     } else {
       return (
         <Dimmer active inverted>
-          <Loader size="large">SVG Plot is Loading</Loader>
+          <Loader size="large">Loading Plots</Loader>
         </Dimmer>
       );
     }

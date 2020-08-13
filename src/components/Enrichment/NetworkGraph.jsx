@@ -1113,7 +1113,7 @@ class NetworkGraph extends Component {
     const RerenderingOverlay = !networkGraphReady ? (
       <div>
         <Dimmer active inverted>
-          <Loader size="large">Graph Rendering</Loader>
+          <Loader size="large">Loading Network...</Loader>
         </Dimmer>
       </div>
     ) : (

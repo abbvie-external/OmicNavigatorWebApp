@@ -56,10 +56,9 @@ class ButtonActions extends Component {
     } else {
       const currentContentContainer =
         document.getElementById('PlotSVG') || null;
-      debugger;
       const ProteinPlotName = this.props.imageInfo
-        ? `${this.props.imageInfo.title} - ${
-            this.props.imageInfo.svg[this.props.activeSVGTabIndex].plotType
+        ? `${this.props.imageInfo?.title} - ${
+            this.props.imageInfo?.svg[this.props.activeSVGTabIndex]?.plotType
           }.png`
         : 'svgPlot.png';
       const currentSVG =
