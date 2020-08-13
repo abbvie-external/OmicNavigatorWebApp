@@ -309,6 +309,7 @@ class DifferentialSearchCriteria extends Component {
       onSearchCriteriaChange,
       onSearchTransitionDifferential,
     } = this.props;
+    onSearchTransitionDifferential(true);
     const differentialTestMeta = this.props.differentialTestsMetadata.find(
       test => test.testID === value,
     );
@@ -327,7 +328,6 @@ class DifferentialSearchCriteria extends Component {
       },
       true,
     );
-    onSearchTransitionDifferential(true);
     cancelRequestPSCGetResultsTable();
     let cancelToken = new CancelToken(e => {
       cancelRequestPSCGetResultsTable = e;
@@ -374,6 +374,8 @@ class DifferentialSearchCriteria extends Component {
 
   handleMultisetToggle = () => {
     return evt => {
+      this.props.onSearchTransitionDifferential(true);
+      this.props.onHandleDifferentialTableLoading(true);
       if (this.state.multisetFiltersVisibleP === false) {
         // on toggle open
         const uSetVP = { ...this.state.uSettingsP };
@@ -419,6 +421,7 @@ class DifferentialSearchCriteria extends Component {
 
   handleMultisetPCloseError = () => {
     this.props.onSearchTransitionDifferential(false);
+    this.props.onHandleDifferentialTableLoading(false);
     this.setState(
       {
         multisetFiltersVisibleP: true,
@@ -436,6 +439,7 @@ class DifferentialSearchCriteria extends Component {
       onSearchCriteriaChange,
       onSearchTransitionDifferential,
     } = this.props;
+    onSearchTransitionDifferential(true);
     onSearchCriteriaChange(
       {
         differentialStudy: differentialStudy,
@@ -444,7 +448,6 @@ class DifferentialSearchCriteria extends Component {
       },
       true,
     );
-    onSearchTransitionDifferential(true);
     cancelRequestPSCGetResultsTable();
     let cancelToken = new CancelToken(e => {
       cancelRequestPSCGetResultsTable = e;
@@ -471,6 +474,7 @@ class DifferentialSearchCriteria extends Component {
   };
 
   addFilterDifferential = () => {
+    this.props.onHandleDifferentialTableLoading(true);
     // this.setState({ loadingDifferentialMultisetFilters: true });
     // const uSetVP = _.cloneDeep(this.state.uSettingsP);
     const uSetVP = { ...this.state.uSettingsP };
@@ -492,6 +496,7 @@ class DifferentialSearchCriteria extends Component {
   };
 
   removeFilterDifferential = index => {
+    this.props.onHandleDifferentialTableLoading(true);
     // this.setState({ loadingDifferentialMultisetFilters: true });
     const uSetVP = { ...this.state.uSettingsP };
     uSetVP.indexFiltersP = [...uSetVP.indexFiltersP]
@@ -519,6 +524,7 @@ class DifferentialSearchCriteria extends Component {
     this.setState({ uSettingsP: uSetVP });
   };
   handleDropdownChange = (evt, { name, value, index }) => {
+    this.props.onHandleDifferentialTableLoading(true);
     const uSelVP = [...this.state[name]];
     uSelVP[index] = {
       key: value,
@@ -536,6 +542,7 @@ class DifferentialSearchCriteria extends Component {
     );
   };
   handleSigValuePInputChange = (evt, { name, value, index }) => {
+    this.props.onHandleDifferentialTableLoading(true);
     const uSelVP = [...this.state[name]];
     uSelVP[index] = parseFloat(value);
     this.setState(
@@ -549,6 +556,7 @@ class DifferentialSearchCriteria extends Component {
     );
   };
   handleSetChange = ({ mustP, notP }) => {
+    this.props.onHandleDifferentialTableLoading(true);
     const uSettingsVP = this.state.uSettingsP;
     uSettingsVP.mustP = mustP;
     uSettingsVP.notP = notP;

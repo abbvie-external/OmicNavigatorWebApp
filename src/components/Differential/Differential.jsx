@@ -48,6 +48,7 @@ class Differential extends Component {
   state = {
     isValidSearchDifferential: false,
     isSearchingDifferential: false,
+    isDifferentialTableLoading: false,
     differentialResults: [],
     // differentialResultsMounted: false,
     differentialResultsUnfiltered: [],
@@ -170,6 +171,7 @@ class Differential extends Component {
       differentialColumns: columns,
       isSearchingDifferential: false,
       isValidSearchDifferential: true,
+      isDifferentialTableLoading: false,
       // differentialResultsMounted: false,
       plotButtonActive: false,
       visible: false,
@@ -185,6 +187,12 @@ class Differential extends Component {
       // isProteinDataLoaded: false,
       isItemSelected: false,
       selectedFromTableData: [],
+    });
+  };
+
+  handleDifferentialTableLoading = bool => {
+    this.setState({
+      isDifferentialTableLoading: bool,
     });
   };
 
@@ -741,6 +749,7 @@ class Differential extends Component {
       differentialResults,
       itemsPerPageDifferentialTable,
       differentialColumns,
+      isDifferentialTableLoading,
     } = this.state;
     const differentialRows = differentialResults.length || 1000;
     // PAUL - ensure this accounts for multiset filters
@@ -787,6 +796,7 @@ class Differential extends Component {
                 itemsPerPage={itemsPerPageDifferentialTable}
                 onInformItemsPerPage={this.informItemsPerPageDifferentialTable}
                 exportBaseName="Differential_Analysis"
+                loading={isDifferentialTableLoading}
                 // quickViews={quickViews}
                 disableGeneralSearch
                 disableGrouping
@@ -795,7 +805,7 @@ class Differential extends Component {
                 // disableFilters
                 min-height="75vh"
                 additionalTemplateInfo={additionalTemplateInfoDifferentialTable}
-                headerAttributes={<ButtonActions />}
+                // headerAttributes={<ButtonActions />}
               />
             </div>
           </Tab.Pane>
@@ -911,6 +921,9 @@ class Differential extends Component {
               onSetTestsMetadata={this.setTestsMetadata}
               onHandlePlotTypesDifferential={this.handlePlotTypesDifferential}
               onGetPlot={this.getPlot}
+              onHandleDifferentialTableLoading={
+                this.handleDifferentialTableLoading
+              }
             />
           </Grid.Column>
           <Grid.Column

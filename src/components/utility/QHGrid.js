@@ -1157,7 +1157,7 @@ export class QHGrid extends React.PureComponent {
     sortBy: null,
     sortOrder: null,
     rowLevelStyleCalc: () => {},
-    loadingMessage: 'Loading Data. Please Wait.',
+    loadingMessage: 'Loading...',
     emptyMessage: 'No Results',
     height: '70vh',
     generalSearchDebounceTime: 500,
