@@ -49,6 +49,7 @@ class Differential extends Component {
     isValidSearchDifferential: false,
     isSearchingDifferential: false,
     isDifferentialTableLoading: false,
+    isVolcanoTableLoading: false,
     differentialResults: [],
     // differentialResultsMounted: false,
     differentialResultsUnfiltered: [],
@@ -172,6 +173,7 @@ class Differential extends Component {
       isSearchingDifferential: false,
       isValidSearchDifferential: true,
       isDifferentialTableLoading: false,
+      isVolcanoTableLoading: false,
       // differentialResultsMounted: false,
       plotButtonActive: false,
       visible: false,
@@ -193,6 +195,12 @@ class Differential extends Component {
   handleDifferentialTableLoading = bool => {
     this.setState({
       isDifferentialTableLoading: bool,
+    });
+  };
+
+  handleVolcanoTableLoading = bool => {
+    this.setState({
+      isVolcanoTableLoading: bool,
     });
   };
 
@@ -749,7 +757,7 @@ class Differential extends Component {
       differentialResults,
       itemsPerPageDifferentialTable,
       differentialColumns,
-      isDifferentialTableLoading,
+      isVolcanoTableLoading,
     } = this.state;
     const differentialRows = differentialResults.length || 1000;
     // PAUL - ensure this accounts for multiset filters
@@ -796,7 +804,7 @@ class Differential extends Component {
                 itemsPerPage={itemsPerPageDifferentialTable}
                 onInformItemsPerPage={this.informItemsPerPageDifferentialTable}
                 exportBaseName="Differential_Analysis"
-                loading={isDifferentialTableLoading}
+                loading={isVolcanoTableLoading}
                 // quickViews={quickViews}
                 disableGeneralSearch
                 disableGrouping
@@ -845,6 +853,7 @@ class Differential extends Component {
               onSelectFromTable={this.handleSelectedFromTable}
               onVolcanoSVGSizeChange={this.handleVolcanoSVGSizeChange}
               onSVGTabChange={this.handleSVGTabChange}
+              onHandleVolcanoTableLoading={this.handleVolcanoTableLoading}
               // onHandleVolcanoPlotSVGLoaded={this.handleVolcanoPlotSVGLoaded}
             />
           </Tab.Pane>
@@ -924,6 +933,7 @@ class Differential extends Component {
               onHandleDifferentialTableLoading={
                 this.handleDifferentialTableLoading
               }
+              onHandleVolcanoTableLoading={this.handleVolcanoTableLoading}
             />
           </Grid.Column>
           <Grid.Column
