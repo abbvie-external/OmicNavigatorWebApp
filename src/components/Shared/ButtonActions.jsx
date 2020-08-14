@@ -29,32 +29,44 @@ class ButtonActions extends Component {
     if (isMultisetPlot) {
       const MultisetPlotName = this.getMultisetPlotName('png');
       const currentSVG = document.getElementById('multisetAnalysisSVG') || null;
-      saveSvgAsPng.saveSvgAsPng(currentSVG, MultisetPlotName);
+      saveSvgAsPng.saveSvgAsPng(currentSVG, MultisetPlotName, {
+        encoderOptions: 1,
+        scale: 2,
+      });
     } else if (this.props.plot === 'barcode') {
       const currentContentContainer =
         document.getElementById('chart-barcode') || null;
       const ProteinPlotName = 'Barcode.png';
       const currentSVG =
         currentContentContainer.getElementsByTagName('svg')[0] || null;
-      saveSvgAsPng.saveSvgAsPng(currentSVG, ProteinPlotName);
+      saveSvgAsPng.saveSvgAsPng(currentSVG, ProteinPlotName, {
+        encoderOptions: 1,
+        scale: 2,
+      });
     } else if (this.props.plot === 'violin') {
       const currentContentContainer =
         document.getElementById('violin-graph-1') || null;
       const ProteinPlotName = 'violin.png';
       const currentSVG =
         currentContentContainer.getElementsByTagName('svg')[0] || null;
-      saveSvgAsPng.saveSvgAsPng(currentSVG, ProteinPlotName);
+      saveSvgAsPng.saveSvgAsPng(currentSVG, ProteinPlotName, {
+        encoderOptions: 1,
+        scale: 2,
+      });
     } else {
       const currentContentContainer =
         document.getElementById('PlotSVG') || null;
       const ProteinPlotName = this.props.imageInfo
-        ? `${this.props.imageInfo.title} - ${
-            this.props.imageInfo.svg[this.props.activeSVGTabIndex].plotType
+        ? `${this.props.imageInfo?.title} - ${
+            this.props.imageInfo?.svg[this.props.activeSVGTabIndex]?.plotType
           }.png`
         : 'svgPlot.png';
       const currentSVG =
         currentContentContainer.getElementsByTagName('svg')[0] || null;
-      saveSvgAsPng.saveSvgAsPng(currentSVG, ProteinPlotName);
+      saveSvgAsPng.saveSvgAsPng(currentSVG, ProteinPlotName, {
+        encoderOptions: 1,
+        scale: 2,
+      });
     }
   };
 

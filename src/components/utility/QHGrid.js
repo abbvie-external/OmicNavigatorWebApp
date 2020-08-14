@@ -250,6 +250,7 @@ class QHGridHeader extends React.PureComponent {
         <Popup
           trigger={
             <Image
+              disabled={!!this.props.loading}
               src={excel_logo}
               className="ExcelLogo"
               // avatar
@@ -584,9 +585,7 @@ class QHGridHeader extends React.PureComponent {
                 />
               )}
               {/* Omic start */}
-              {!this.props.loading &&
-                !!this.props.exportBaseName &&
-                ExportButton}
+              {!!this.props.exportBaseName && ExportButton}
               {/* Omic end */}
               {this.props.extraHeaderItem}
             </Table.HeaderCell>
@@ -1157,7 +1156,7 @@ export class QHGrid extends React.PureComponent {
     sortBy: null,
     sortOrder: null,
     rowLevelStyleCalc: () => {},
-    loadingMessage: 'Loading Data. Please Wait.',
+    loadingMessage: 'Loading...',
     emptyMessage: 'No Results',
     height: '70vh',
     generalSearchDebounceTime: 500,
@@ -1283,7 +1282,17 @@ export class QHGrid extends React.PureComponent {
         className={'QHGrid'}
         style={{ width: '100%', margin: 0, padding: 0 }}
       >
-        <Dimmer active={this.props.loading}>
+        <Dimmer
+          // Omic start
+          style={{
+            height: this.props.height,
+            width: '100%',
+            // margin: 0,
+            // padding: 0,
+          }}
+          // Omic end
+          active={this.props.loading}
+        >
           <Loader>{this.props.loadingMessage}</Loader>
         </Dimmer>
         <QHGridHeader {...headerProps} />

@@ -384,7 +384,6 @@ class BarcodePlotReact extends Component {
         return d3.select(this).attr('id');
       });
       const quartile = Math.round(quartileTicks.nodes().length * 0.25);
-      debugger;
       setTimeout(function() {
         d3.select('.brush').call([objsBrush][0].move, [
           [

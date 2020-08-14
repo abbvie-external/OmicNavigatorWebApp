@@ -5,11 +5,11 @@ import { Header } from 'semantic-ui-react';
 const TransitionActive = () => (
   <div className="LoaderContainer">
     <Header as="h2" textAlign="center">
-      No records available
+      No records available...
     </Header>
-    <Header as="h4" textAlign="center">
+    {/* <Header as="h4" textAlign="center">
       Use the filters to display relevant records
-    </Header>
+    </Header> */}
     <div className="transition-still-loader">
       <div className="transition-still-dot"></div>
       <div className="transition-still-dot"></div>

@@ -59,7 +59,7 @@ class DifferentialPlot extends Component {
       return (
         <div>
           <Dimmer active inverted>
-            <Loader size="large">Plots are Loading</Loader>
+            <Loader size="large">Loading Plots...</Loader>
           </Dimmer>
         </div>
       );

@@ -5,11 +5,11 @@ import './LoaderStill.scss';
 const LoaderStill = () => (
   <div className="LoaderContainer">
     <Header as="h2" textAlign="center">
-      No records available
+      No records available...
     </Header>
-    <Header as="h4" textAlign="center">
+    {/* <Header as="h4" textAlign="center">
       Use the filters to display relevant records
-    </Header>
+    </Header> */}
     <div className="loading">
       <div className="loader-still-dots">
         <div className="loader-still-dot"></div>

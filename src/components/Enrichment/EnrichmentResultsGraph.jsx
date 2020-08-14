@@ -668,17 +668,18 @@ class EnrichmentResultsGraph extends Component {
                   renderTrack={NodeTrack}
                   renderThumb={NodeThumb}
                   disabled={!networkGraphReady}
-                  className={
-                    networkGraphReady
-                      ? 'NetworkSlider Show'
-                      : 'NetworkSlider Hide'
-                  }
+                  // className={
+                  //   networkGraphReady
+                  //     ? 'NetworkSlider Show'
+                  //     : 'NetworkSlider Hide'
+                  // }
+                  className="NetworkSlider Show"
                   value={nodeCutoffLocal * 100}
                   name="nodeCutoffSlider"
                   min={0}
                   max={100}
                   onChange={this.handleNodeCutoffSliderChange}
-                  onSliderClick={this.actuallyHandleNodeCutoffSliderChange}
+                  // onSliderClick={this.actuallyHandleNodeCutoffSliderChange}
                   onAfterChange={this.actuallyHandleNodeCutoffSliderChange}
                 />
               </div>
@@ -730,17 +731,18 @@ class EnrichmentResultsGraph extends Component {
                   renderTrack={LinkCutoffTrack}
                   renderThumb={LinkCutoffThumb}
                   disabled={!networkGraphReady}
-                  className={
-                    networkGraphReady
-                      ? 'NetworkSlider Show'
-                      : 'NetworkSlider Hide'
-                  }
+                  // className={
+                  //   networkGraphReady
+                  //     ? 'NetworkSlider Show'
+                  //     : 'NetworkSlider Hide'
+                  // }
+                  className="NetworkSlider Show"
                   value={linkCutoffLocal * 100}
                   name="linkCutoffSlider"
                   min={10}
                   max={100}
                   onChange={this.handleLinkCutoffSliderChange}
-                  onSliderClick={this.actuallyHandleLinkCutoffSliderChange}
+                  // onSliderClick={this.actuallyHandleLinkCutoffSliderChange}
                   onAfterChange={this.actuallyHandleLinkCutoffSliderChange}
                 />
               </div>
@@ -828,17 +830,18 @@ class EnrichmentResultsGraph extends Component {
                     renderTrack={LinkTypeTrack}
                     renderThumb={LinkTypeThumb}
                     disabled={!networkGraphReady}
-                    className={
-                      networkGraphReady
-                        ? 'NetworkSlider Show'
-                        : 'NetworkSlider Hide'
-                    }
+                    // className={
+                    //   networkGraphReady
+                    //     ? 'NetworkSlider Show'
+                    //     : 'NetworkSlider Hide'
+                    // }
+                    className="NetworkSlider Show"
                     value={linkTypeLocal * 100}
                     name="linkTypeSlider"
                     min={0}
                     max={100}
                     onChange={this.handleLinkTypeSliderChange}
-                    onSliderClick={this.actuallyHandleLinkTypeSliderChange}
+                    // onSliderClick={this.actuallyHandleLinkTypeSliderChange}
                     onAfterChange={this.actuallyHandleLinkTypeSliderChange}
                   />
                 </Grid.Row>
@@ -914,11 +917,12 @@ class EnrichmentResultsGraph extends Component {
                     disabled={!networkGraphReady}
                     icon
                     labelPosition="left"
-                    className={
-                      networkGraphReady
-                        ? 'ShowInlineBlock LegendButton'
-                        : 'Hide'
-                    }
+                    // className={
+                    //   networkGraphReady
+                    //     ? 'ShowInlineBlock LegendButton'
+                    //     : 'Hide'
+                    // }
+                    className="ShowInlineBlock LegendButton"
                     size="mini"
                   >
                     Legend
@@ -956,7 +960,8 @@ class EnrichmentResultsGraph extends Component {
               />
               <Radio
                 disabled={!networkGraphReady}
-                className={networkGraphReady ? 'RadioLabelsDisplay' : 'Hide'}
+                // className={networkGraphReady ? 'RadioLabelsDisplay' : 'Hide'}
+                className="RadioLabelsDisplay"
                 toggle
                 // size={dynamicSize}
                 size="small"
@@ -974,9 +979,10 @@ class EnrichmentResultsGraph extends Component {
               widescreen={7}
             >
               <div
-                className={
-                  networkGraphReady ? 'ShowInlineBlock NodeLinkTotals' : 'Hide'
-                }
+                // className={
+                //   networkGraphReady ? 'ShowInlineBlock NodeLinkTotals' : 'Hide'
+                // }
+                className="ShowInlineBlock NodeLinkTotals"
               >
                 <Popup
                   trigger={

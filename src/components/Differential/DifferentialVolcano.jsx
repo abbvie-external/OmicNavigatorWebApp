@@ -47,16 +47,16 @@ class DifferentialVolcano extends Component {
       volcanoWidth: this.state.defaultVolcanoWidth * 0.95,
       volcanoHeight: this.state.defaultVolcanoHeight * 0.95,
     });
-    // if (!this.props.bullseyeHighlightInProgress) {
     const defaultMaxObject = this.props.differentialResults[0];
-    this.props.onSelectFromTable([
-      {
-        id: defaultMaxObject[differentialFeatureIdKey],
-        value: defaultMaxObject[maxObjectIdentifier],
-        key: defaultMaxObject[identifier],
-      },
-    ]);
-    // }
+    if (this.props.differentialResults.length > 0) {
+      this.props.onSelectFromTable([
+        {
+          id: defaultMaxObject[differentialFeatureIdKey],
+          value: defaultMaxObject[maxObjectIdentifier],
+          key: defaultMaxObject[identifier],
+        },
+      ]);
+    }
   }
   componentDidUpdate(prevProps, prevState) {
     if (prevProps.differentialResults !== this.props.differentialResults) {
@@ -305,7 +305,7 @@ class DifferentialVolcano extends Component {
     } else {
       return (
         <Dimmer active inverted>
-          <Loader size="large">SVG Plot is Loading</Loader>
+          <Loader size="large">Loading Plots</Loader>
         </Dimmer>
       );
     }
@@ -333,6 +333,7 @@ class DifferentialVolcano extends Component {
     const {
       additionalTemplateInfoDifferentialTable,
       differentialColumns,
+      isDifferentialTableLoading,
       // differentialResultsMounted,
     } = this.props;
     // if (differentialResultsMounted) {
@@ -453,6 +454,7 @@ class DifferentialVolcano extends Component {
                 disableGrouping
                 disableColumnVisibilityToggle
                 exportBaseName="VolcanoPlot_Filtered_Results"
+                loading={isDifferentialTableLoading}
                 additionalTemplateInfo={additionalTemplateInfoDifferentialTable}
                 headerAttributes={<ButtonActions />}
                 onRowClick={this.handleRowClick}

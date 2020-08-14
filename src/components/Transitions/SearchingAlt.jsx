@@ -5,7 +5,7 @@ import './SearchingAlt.scss';
 const SearchingAlt = () => (
   <div className="LoaderContainer">
     <Header as="h2" textAlign="center">
-      Records are loading...
+      Loading Records...
     </Header>
     <div id="hourglassLoader">
       <div id="top"></div>

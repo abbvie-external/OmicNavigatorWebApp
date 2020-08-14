@@ -39,7 +39,7 @@ class SplitPanesContainer extends Component {
       return (
         <div>
           <Dimmer active inverted>
-            <Loader size="large">Barcode Plot is Loading</Loader>
+            <Loader size="large">Loading Plot</Loader>
           </Dimmer>
         </div>
       );
@@ -199,7 +199,7 @@ class SplitPanesContainer extends Component {
     } else if (!SVGPlotLoaded & SVGPlotLoading) {
       return (
         <Dimmer active inverted>
-          <Loader size="large">SVG Plot is Loading</Loader>
+          <Loader size="large">Loading Plots</Loader>
         </Dimmer>
       );
     } else {

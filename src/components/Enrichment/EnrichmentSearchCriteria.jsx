@@ -409,9 +409,11 @@ class EnrichmentSearchCriteria extends Component {
       onSearchTransitionEnrichment,
       onEnrichmentSearch,
       onPValueTypeChange,
+      onHandleEnrichmentTableLoading,
       multisetFiltersVisible,
     } = this.props;
     onSearchTransitionEnrichment(true);
+    onHandleEnrichmentTableLoading(true);
     onPValueTypeChange(value);
     if (!multisetFiltersVisible) {
       cancelGetEnrichmentsTable();
@@ -491,6 +493,9 @@ class EnrichmentSearchCriteria extends Component {
 
   handleMultisetToggle = () => {
     return evt => {
+      this.props.onSearchTransitionEnrichment(true);
+      this.props.onHandleNetworkGraphReady(false);
+      this.props.onHandleEnrichmentTableLoading(true);
       if (this.props.multisetFiltersVisible === false) {
         // on toggle open
         this.props.onHandleMulisetFiltersVisible(true);
@@ -586,6 +591,9 @@ class EnrichmentSearchCriteria extends Component {
     this.setState({ uSettings: uSetVP });
   };
   handleOperatorChange = (evt, { name, value, index }) => {
+    this.props.onHandleNetworkGraphReady(false);
+    // this.props.onSearchTransitionEnrichment(true);
+    this.props.onHandleEnrichmentTableLoading(true);
     this.props.onHandleNetworkOperator(value);
     const uSelVP = [...this.state[name]];
     uSelVP[index] = {
@@ -604,6 +612,9 @@ class EnrichmentSearchCriteria extends Component {
     );
   };
   handleSigValueEInputChange = value => {
+    this.props.onHandleNetworkGraphReady(false);
+    // this.props.onSearchTransitionEnrichment(true);
+    this.props.onHandleEnrichmentTableLoading(true);
     this.props.onHandleNetworkSigValue(parseFloat(value));
     this.setState(
       {
@@ -616,6 +627,9 @@ class EnrichmentSearchCriteria extends Component {
     );
   };
   handleSetChange = ({ must, not }) => {
+    this.props.onHandleNetworkGraphReady(false);
+    // this.props.onSearchTransitionEnrichment(true);
+    this.props.onHandleEnrichmentTableLoading(true);
     this.props.onHandleNetworkTests(must, not);
     const uSettingsVP = this.state.uSettings;
     uSettingsVP.must = must;
@@ -631,6 +645,9 @@ class EnrichmentSearchCriteria extends Component {
     );
   };
   handleFilterOutChange = test => {
+    this.props.onHandleNetworkGraphReady(false);
+    // this.props.onSearchTransitionEnrichment(true);
+    this.props.onHandleEnrichmentTableLoading(true);
     this.props.onMultisetTestsFiltered(test);
     const uSetVP = this.state.uSettings;
     if (uSetVP.must.includes(test)) {

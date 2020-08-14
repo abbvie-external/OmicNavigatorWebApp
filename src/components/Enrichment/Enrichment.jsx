@@ -52,6 +52,7 @@ class Enrichment extends Component {
   state = {
     isValidSearchEnrichment: false,
     isSearchingEnrichment: false,
+    isEnrichmentTableLoading: false,
     enrichmentIcon: '',
     enrichmentIconText: '',
     enrichmentResults: [],
@@ -332,6 +333,9 @@ class Enrichment extends Component {
   };
 
   handleMultisetTestsFiltered = test => {
+    // this.handleSearchTransitionEnrichment(true);
+    // this.handleNetworkGraphReady(false);
+    // this.handleEnrichmentTableLoading(true);
     const {
       enrichmentColumnsUnfiltered,
       unfilteredNetworkData,
@@ -353,6 +357,8 @@ class Enrichment extends Component {
     this.setState({
       multisetTestsFilteredOut: arr,
       enrichmentColumns: col,
+      // isEnrichmentTableLoading: false,
+      // isSearchingEnrichment: false,
     });
     this.handleEnrichmentNetworkData(unfilteredNetworkData, enrichmentResults);
   };
@@ -428,12 +434,19 @@ class Enrichment extends Component {
       enrichmentResults: searchResults.enrichmentResults,
       isSearching: false,
       isSearchingEnrichment: false,
+      isEnrichmentTableLoading: false,
       isValidSearchEnrichment: true,
       plotButtonActive: false,
       visible: false,
       isTestSelected: false,
       isTestDataLoaded: false,
       enrichmentColumns: columns,
+    });
+  };
+
+  handleEnrichmentTableLoading = bool => {
+    this.setState({
+      isEnrichmentTableLoading: bool,
     });
   };
 
@@ -812,6 +825,12 @@ class Enrichment extends Component {
       },
       networkDataLoaded: true,
       networkGraphReady: true,
+    });
+  };
+
+  handleNetworkGraphReady = bool => {
+    this.setState({
+      networkGraphReady: bool,
     });
   };
 
@@ -1855,6 +1874,7 @@ class Enrichment extends Component {
                     onInformItemsPerPage={
                       this.informItemsPerPageEnrichmentTable
                     }
+                    loading={this.state.isEnrichmentTableLoading}
                     exportBaseName="Enrichment_Analysis"
                     quickViews={quickViews}
                     // disableGeneralSearch
@@ -1923,6 +1943,7 @@ class Enrichment extends Component {
                 onCancelGetEnrichmentsNetwork={
                   this.handleCancelRequestGetEnrichmentsNetwork
                 }
+                onHandleNetworkGraphReady={this.handleNetworkGraphReady}
               />
             ) : (
               <Message
@@ -2075,6 +2096,8 @@ class Enrichment extends Component {
               onHandleNetworkTests={this.handleNetworkTests}
               onMultisetTestsFiltered={this.handleMultisetTestsFiltered}
               onAnnotationChange={this.handleAnnotationChange}
+              onHandleNetworkGraphReady={this.handleNetworkGraphReady}
+              onHandleEnrichmentTableLoading={this.handleEnrichmentTableLoading}
             />
           </Grid.Column>
           <Grid.Column
