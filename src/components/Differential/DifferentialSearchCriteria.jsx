@@ -42,13 +42,13 @@ class DifferentialSearchCriteria extends Component {
     sigValueP: [0.05],
     reloadPlotP: true,
     uSettingsP: {
-      defaultselectedColP: null,
+      defaultselectedColP: [],
       defaultselectedOperatorP: {
         key: '<',
         text: '<',
         value: '<',
       },
-      defaultsigValueP: 0.05,
+      defaultSigValueP: [0.05],
       useAnchorP: true,
       hoveredFilter: -1,
       mustP: [],
@@ -86,6 +86,7 @@ class DifferentialSearchCriteria extends Component {
     multisetFiltersVisibleP: false,
     activateMultisetFiltersP: false,
     uDataP: [],
+    initialRenderP: true,
     // loadingDifferentialMultisetFilters: false,
   };
 
@@ -305,11 +306,12 @@ class DifferentialSearchCriteria extends Component {
     const {
       differentialStudy,
       differentialModel,
-      onMultisetQueried,
+      onMultisetQueriedP,
       onSearchCriteriaChange,
       onSearchTransitionDifferential,
     } = this.props;
     onSearchTransitionDifferential(true);
+    onMultisetQueriedP(false);
     const differentialTestMeta = this.props.differentialTestsMetadata.find(
       test => test.testID === value,
     );
@@ -318,8 +320,8 @@ class DifferentialSearchCriteria extends Component {
       differentialTestTooltip: differentialTestTooltip,
       reloadPlotP: true,
       multisetFiltersVisibleP: false,
+      sigValP: this.state.uSettingsP.defaultSigValueP,
     });
-    onMultisetQueried(false);
     onSearchCriteriaChange(
       {
         differentialStudy: differentialStudy,
@@ -361,8 +363,7 @@ class DifferentialSearchCriteria extends Component {
           ...this.state.uSettingsP,
           mustP: [],
           notP: [],
-          defaultsigValueP: 0.05,
-          maxElementsP: handleMaxElements ? tableData.length : undefined,
+          maxElementsP: handleMaxElements ? tableData.length : 0,
         },
         sigValueP: [0.05],
         uAnchorP: differentialTest,
@@ -374,34 +375,36 @@ class DifferentialSearchCriteria extends Component {
 
   handleMultisetToggle = () => {
     return evt => {
-      this.props.onSearchTransitionDifferential(true);
-      this.props.onHandleDifferentialTableLoading(true);
-      this.props.onHandleVolcanoTableLoading(true);
       if (this.state.multisetFiltersVisibleP === false) {
         // on toggle open
-        const uSetVP = { ...this.state.uSettingsP };
-        const defaultCol = this.props.thresholdColsP[0];
-        uSetVP.defaultselectedColP = defaultCol;
-        console.log(defaultCol);
+        this.props.onMultisetQueriedP(true);
+        this.props.onSearchTransitionDifferential(true);
+        if (this.state.selectedColP.length === 0) {
+          const uSetVP = { ...this.state.uSettingsP };
+          const defaultCol = this.props.thresholdColsP[0];
+          uSetVP.defaultselectedColP = defaultCol;
+          this.setState({
+            selectedColP: [defaultCol],
+            uSettingsP: uSetVP,
+          });
+        }
         this.setState(
           {
             reloadPlotP: true,
             multisetFiltersVisibleP: true,
-            selectedColP: [defaultCol],
-            uSettingsP: uSetVP,
           },
           function() {
             this.updateQueryDataP();
           },
         );
-        this.props.onMultisetQueried(true);
       } else {
         // on toggle close
+        this.props.onMultisetQueriedP(false);
         this.setState({
           multisetFiltersVisibleP: false,
           reloadPlotP: false,
+          initialRenderP: true,
         });
-        this.props.onMultisetQueried(false);
         const differentialTestName = 'differentialTest';
         const differentialTestVar = this.props.differentialTest;
         this.multisetTriggeredTestChange(
@@ -492,7 +495,7 @@ class DifferentialSearchCriteria extends Component {
         this.state.uSettingsP.defaultselectedOperatorP,
       ),
       sigValueP: [...this.state.sigValueP].concat(
-        this.state.uSettingsP.defaultsigValueP,
+        this.state.uSettingsP.defaultSigValueP,
       ),
       uSettingsP: uSetVP,
     });
@@ -509,18 +512,23 @@ class DifferentialSearchCriteria extends Component {
     for (var i = index; i < uSetVP.indexFiltersP.length; i++) {
       uSetVP.indexFiltersP[i]--;
     }
-    this.setState({
-      selectedColP: [...this.state.selectedColP]
-        .slice(0, index)
-        .concat([...this.state.selectedColP].slice(index + 1)),
-      selectedOperatorP: [...this.state.selectedOperatorP]
-        .slice(0, index)
-        .concat([...this.state.selectedOperatorP].slice(index + 1)),
-      sigValueP: [...this.state.sigValueP]
-        .slice(0, index)
-        .concat([...this.state.sigValueP].slice(index + 1)),
-      uSettingsP: uSetVP,
-    });
+    this.setState(
+      {
+        selectedColP: [...this.state.selectedColP]
+          .slice(0, index)
+          .concat([...this.state.selectedColP].slice(index + 1)),
+        selectedOperatorP: [...this.state.selectedOperatorP]
+          .slice(0, index)
+          .concat([...this.state.selectedOperatorP].slice(index + 1)),
+        sigValueP: [...this.state.sigValueP]
+          .slice(0, index)
+          .concat([...this.state.sigValueP].slice(index + 1)),
+        uSettingsP: uSetVP,
+      },
+      function() {
+        this.updateQueryDataP();
+      },
+    );
   };
   changeHoveredFilter = index => {
     const uSetVP = { ...this.state.uSettingsP };
@@ -546,15 +554,18 @@ class DifferentialSearchCriteria extends Component {
       },
     );
   };
-  handleSigValuePInputChange = (evt, { name, value, index }) => {
-    this.props.onHandleDifferentialTableLoading(true);
-    this.props.onHandleVolcanoTableLoading(true);
+  handleSigValuePInputChange = (name, value, index) => {
+    if (!this.state.initialRenderP) {
+      this.props.onHandleDifferentialTableLoading(true);
+      this.props.onHandleVolcanoTableLoading(true);
+    }
     const uSelVP = [...this.state[name]];
     uSelVP[index] = parseFloat(value);
     this.setState(
       {
         [name]: uSelVP,
         reloadPlotP: true,
+        initialRenderP: false,
       },
       function() {
         this.updateQueryDataP();

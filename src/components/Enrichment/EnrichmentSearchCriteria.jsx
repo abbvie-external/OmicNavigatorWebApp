@@ -94,6 +94,7 @@ class EnrichmentSearchCriteria extends Component {
     },
     // activateMultisetFilters: false,
     reloadPlot: true,
+    initialRenderE: true,
   };
 
   componentDidMount() {
@@ -316,9 +317,12 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentStudy,
       enrichmentModel,
       pValueType,
+      onMultisetQueriedE,
       onSearchTransitionEnrichment,
       onSearchCriteriaChange,
     } = this.props;
+    onSearchTransitionEnrichment(true);
+    onMultisetQueriedE(false);
     const enrichmentAnnotationMeta = this.props.enrichmentAnnotationsMetadata.find(
       annotation => annotation.annotationID === value,
     );
@@ -338,7 +342,6 @@ class EnrichmentSearchCriteria extends Component {
       },
       true,
     );
-    onSearchTransitionEnrichment(true);
     cancelGetEnrichmentsTable();
     let cancelToken = new CancelToken(e => {
       cancelGetEnrichmentsTable = e;
@@ -493,12 +496,13 @@ class EnrichmentSearchCriteria extends Component {
 
   handleMultisetToggle = () => {
     return evt => {
-      this.props.onSearchTransitionEnrichment(true);
       this.props.onHandleNetworkGraphReady(false);
-      this.props.onHandleEnrichmentTableLoading(true);
+
       if (this.props.multisetFiltersVisible === false) {
         // on toggle open
-        this.props.onHandleMulisetFiltersVisible(true);
+        this.props.onMultisetQueriedE(true);
+        this.props.onSearchTransitionEnrichment(true);
+        this.props.onHandleMultisetFiltersVisible(true);
         this.setState(
           {
             reloadPlot: true,
@@ -510,9 +514,11 @@ class EnrichmentSearchCriteria extends Component {
       } else {
         // on toggle close
         // this.props.onHandleNetworkTests([], []);
-        this.props.onHandleMulisetFiltersVisible(false);
+        this.props.onMultisetQueriedE(false);
+        this.props.onHandleMultisetFiltersVisible(false);
         this.setState({
           reloadPlot: false,
+          initialRenderE: true,
         });
         const enrichmentAnnotationName = 'enrichmentAnnotation';
         const enrichmentAnnotationVar = this.props.enrichmentAnnotation;
@@ -526,13 +532,15 @@ class EnrichmentSearchCriteria extends Component {
 
   handleMultisetEOpenError = () => {
     cancelRequestEnrichmentMultisetPlot();
-    this.props.onHandleMulisetFiltersVisible(false);
+    this.props.onHandleMultisetFiltersVisible(false);
+    this.props.onMultisetQueriedE(false);
     console.log('Error during getEnrichmentsIntersection');
   };
 
   handleMultisetECloseError = () => {
     this.props.onSearchTransitionEnrichment(false);
-    this.props.onHandleMulisetFiltersVisible(true);
+    this.props.onHandleMultisetFiltersVisible(true);
+    this.props.onMultisetQueriedE(true);
     this.setState(
       {
         reloadPlot: true,
@@ -591,10 +599,15 @@ class EnrichmentSearchCriteria extends Component {
     this.setState({ uSettings: uSetVP });
   };
   handleOperatorChange = (evt, { name, value, index }) => {
-    this.props.onHandleNetworkGraphReady(false);
-    // this.props.onSearchTransitionEnrichment(true);
-    this.props.onHandleEnrichmentTableLoading(true);
-    this.props.onHandleNetworkOperator(value);
+    if (
+      this.state.uSettings.must.length > 0 ||
+      this.state.uSettings.not.length > 0
+    ) {
+      this.props.onHandleNetworkGraphReady(false);
+      // this.props.onSearchTransitionEnrichment(true);
+      this.props.onHandleEnrichmentTableLoading(true);
+      this.props.onHandleNetworkOperator(value);
+    }
     const uSelVP = [...this.state[name]];
     uSelVP[index] = {
       key: value,
@@ -612,14 +625,21 @@ class EnrichmentSearchCriteria extends Component {
     );
   };
   handleSigValueEInputChange = value => {
-    this.props.onHandleNetworkGraphReady(false);
-    // this.props.onSearchTransitionEnrichment(true);
-    this.props.onHandleEnrichmentTableLoading(true);
-    this.props.onHandleNetworkSigValue(parseFloat(value));
+    if (
+      !this.state.initialRenderE &&
+      (this.state.uSettings.must.length > 0 ||
+        this.state.uSettings.not.length > 0)
+    ) {
+      this.props.onHandleNetworkGraphReady(false);
+      // this.props.onSearchTransitionEnrichment(true);
+      this.props.onHandleEnrichmentTableLoading(true);
+      this.props.onHandleNetworkSigValue(parseFloat(value));
+    }
     this.setState(
       {
         sigValue: [parseFloat(value)],
         reloadPlot: true,
+        initialRenderE: false,
       },
       function() {
         this.updateQueryData();
