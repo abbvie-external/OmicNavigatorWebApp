@@ -11,7 +11,6 @@ class PhosphoprotService {
 
   setUrl() {
     if (process.env.NODE_ENV === 'development') {
-      console.log('we are in localhost:3000');
       window.ocpu.seturl(this.ocpuUrl);
     }
   }

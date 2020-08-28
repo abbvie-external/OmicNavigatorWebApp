@@ -32,7 +32,8 @@ svg:not(:root) {
   max-width: 75px !important;
 }
 
-#SignificantValueInputMultisetE input {
+#SignificantValueInputMultisetE input,
+#SignificantValueInputMultisetP input {
   height: 38px !important;
   padding-right: 0px !important;
   width: 75px !important;

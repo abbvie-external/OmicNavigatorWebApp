@@ -6,9 +6,12 @@ import '../Shared/MultisetFilters.scss';
 import NumericExponentialInput from '../Shared/NumericExponentialInput';
 
 class EnrichmentMultisetFilters extends Component {
-  state = {
-    sigValueELocal: [0.05],
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      sigValueELocal: props.sigValue,
+    };
+  }
   componentDidMount() {
     const {
       uData,
@@ -39,21 +42,29 @@ class EnrichmentMultisetFilters extends Component {
       sigValue,
       selectedCol,
       selectedOperator,
+      multisetFiltersVisible,
     } = this.props;
-    // if (
-    //   uSettings !== prevProps.uSettings ||
-    //   prevProps.uData !== this.props.uData
-    // ) {
-    this.makeMultiset(
-      uData,
-      uAnchor,
-      uSettings,
-      metaSvg,
-      sigValue,
-      selectedCol,
-      selectedOperator,
-    );
-    // }
+    if (
+      multisetFiltersVisible &&
+      (uData !== prevProps.uData ||
+        uAnchor !== prevProps.uAnchor ||
+        uSettings !== prevProps.uSettings ||
+        metaSvg !== prevProps.metaSvg ||
+        sigValue !== prevProps.sigValue ||
+        sigValue.length !== prevProps.sigValue.length ||
+        selectedCol !== prevProps.selectedCol ||
+        selectedOperator !== prevProps.selectedOperator)
+    ) {
+      this.makeMultiset(
+        uData,
+        uAnchor,
+        uSettings,
+        metaSvg,
+        sigValue,
+        selectedCol,
+        selectedOperator,
+      );
+    }
   }
 
   makeMultiset(
@@ -960,7 +971,7 @@ class EnrichmentMultisetFilters extends Component {
     const Operators = uSettings.thresholdOperator;
     const SelOp = selectedOperator;
     const indexFilters = uSettings.indexFilters;
-    const defaultSigValue = uSettings.defaultSigValue;
+    // const defaultSigValue = uSettings.defaultSigValue;
     // const hoveredFilter = uSettings.hoveredFilter;
     // for now, column is displayed as label, just matching the "nominal" or "adjusted" p value type
     const SelColOverride =
@@ -1012,7 +1023,7 @@ class EnrichmentMultisetFilters extends Component {
                       min={0}
                       max={1}
                       name="sigValue"
-                      defaultValue={parseFloat(defaultSigValue)}
+                      // defaultValue={parseFloat(defaultSigValue)}
                       value={sigValueELocal[index]}
                       spellcheck="false"
                     />
