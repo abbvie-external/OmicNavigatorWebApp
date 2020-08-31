@@ -17,21 +17,23 @@ import DOMPurify from 'dompurify';
 import { phosphoprotService } from '../../services/phosphoprot.service';
 import DifferentialVolcano from './DifferentialVolcano';
 import { CancelToken } from 'axios';
-import QHGrid from '../utility/QHGrid';
-import EZGrid from '../utility/EZGrid';
-import QuickViewModal from '../utility/QuickViewModal';
-import {
-  getFieldValue,
-  getField,
-  typeMap,
-} from '../utility/selectors/QHGridSelector';
+// import QHGrid from '../utility/QHGrid';
+// import EZGrid from '../utility/EZGrid';
+// import QuickViewModal from '../utility/QuickViewModal';
+// import {
+//   getFieldValue,
+//   getField,
+//   typeMap,
+// } from '../utility/selectors/QHGridSelector';
 import _ from 'lodash';
 import './Differential.scss';
 import '../Shared/Table.scss';
-export * from '../utility/FilterTypeConfig';
-export * from '../utility/selectors/quickViewSelector';
-export { QHGrid, EZGrid, QuickViewModal };
-export { getField, getFieldValue, typeMap };
+// export * from '../utility/FilterTypeConfig';
+// export * from '../utility/selectors/quickViewSelector';
+// export { QHGrid, EZGrid, QuickViewModal };
+// export { getField, getFieldValue, typeMap };
+// eslint-disable-next-line no-unused-vars
+import QHGrid, { EZGrid } from '***REMOVED***';
 
 let cancelRequestDifferentialResultsGetPlot = () => {};
 class Differential extends Component {
@@ -53,6 +55,9 @@ class Differential extends Component {
     differentialResults: [],
     // differentialResultsMounted: false,
     differentialResultsUnfiltered: [],
+    /**
+     * @type {QHGrid.ColumnConfig[]}
+     */
     differentialColumns: [],
     filterableColumnsP: [],
     multisetPlotInfo: {
@@ -148,7 +153,10 @@ class Differential extends Component {
   };
 
   handleDifferentialSearch = searchResults => {
-    let columns = [];
+    /**
+     * @type {QHGrid.ColumnConfig<{}>[]}
+     */
+    let columns = [{}];
     // need this check for page refresh
     if (this.props.differentialFeature !== '') {
       this.setState({
