@@ -188,14 +188,21 @@ class DifferentialSearchCriteria extends Component {
           uDataP: uDataPMapped,
         });
         this.props.onSetTestsMetadata(differentialTestsMetadataVar);
-        if (differentialTest !== '') {
+        const modelSpecificResultsTableExists =
+          sessionStorage.getItem(
+            `${differentialStudy}-${differentialModel}-ResultsTableExists`,
+          ) || true;
+        if (
+          differentialTest !== '' &&
+          JSON.parse(modelSpecificResultsTableExists)
+        ) {
           onSearchTransitionDifferential(true);
           phosphoprotService
             .getResultsTable(
               differentialStudy,
               differentialModel,
               differentialTest,
-              onSearchTransitionDifferential,
+              this.handleGetResultsTableError,
             )
             .then(getResultsTableData => {
               this.handleGetResultsTableData(
@@ -232,6 +239,20 @@ class DifferentialSearchCriteria extends Component {
         }
       }
     }
+  };
+
+  handleGetResultsTableError = errorVal => {
+    debugger;
+    const {
+      differentialStudy,
+      differentialModel,
+      onSearchTransitionDifferential,
+    } = this.props;
+    sessionStorage.setItem(
+      `${differentialStudy}-${differentialModel}-ResultsTableExists`,
+      false,
+    );
+    onSearchTransitionDifferential(errorVal);
   };
 
   handleStudyChange = (evt, { name, value }) => {
@@ -330,24 +351,37 @@ class DifferentialSearchCriteria extends Component {
       },
       true,
     );
-    cancelRequestPSCGetResultsTable();
-    let cancelToken = new CancelToken(e => {
-      cancelRequestPSCGetResultsTable = e;
-    });
-    phosphoprotService
-      .getResultsTable(
-        differentialStudy,
-        differentialModel,
-        value,
-        onSearchTransitionDifferential,
-        cancelToken,
-      )
-      .then(getResultsTableData => {
-        this.handleGetResultsTableData(getResultsTableData, true, true, value);
-      })
-      .catch(error => {
-        console.error('Error during getResultsTable', error);
+    const modelSpecificResultsTableExists =
+      sessionStorage.getItem(
+        `${differentialStudy}-${differentialModel}-ResultsTableExists`,
+      ) || true;
+    if (JSON.parse(modelSpecificResultsTableExists)) {
+      cancelRequestPSCGetResultsTable();
+      let cancelToken = new CancelToken(e => {
+        cancelRequestPSCGetResultsTable = e;
       });
+      phosphoprotService
+        .getResultsTable(
+          differentialStudy,
+          differentialModel,
+          'blah',
+          this.handleGetResultsTableError,
+          cancelToken,
+        )
+        .then(getResultsTableData => {
+          this.handleGetResultsTableData(
+            getResultsTableData,
+            true,
+            true,
+            value,
+          );
+        })
+        .catch(error => {
+          console.error('Error during getResultsTable', error);
+        });
+    } else {
+      onSearchTransitionDifferential(false);
+    }
   };
 
   handleGetResultsTableData = (
