@@ -17,21 +17,9 @@ import DOMPurify from 'dompurify';
 import { phosphoprotService } from '../../services/phosphoprot.service';
 import DifferentialVolcano from './DifferentialVolcano';
 import { CancelToken } from 'axios';
-// import QHGrid from '../utility/QHGrid';
-// import EZGrid from '../utility/EZGrid';
-// import QuickViewModal from '../utility/QuickViewModal';
-// import {
-//   getFieldValue,
-//   getField,
-//   typeMap,
-// } from '../utility/selectors/QHGridSelector';
 import _ from 'lodash';
 import './Differential.scss';
 import '../Shared/Table.scss';
-// export * from '../utility/FilterTypeConfig';
-// export * from '../utility/selectors/quickViewSelector';
-// export { QHGrid, EZGrid, QuickViewModal };
-// export { getField, getFieldValue, typeMap };
 // eslint-disable-next-line no-unused-vars
 import QHGrid, { EZGrid } from '***REMOVED***';
 
@@ -592,7 +580,7 @@ class Differential extends Component {
         return {
           title: f,
           field: f,
-          filterable: { type: 'alphanumericFilter' },
+          filterable: { type: 'multiFilter' },
           template: (value, item, addParams) => {
             if (f === alphanumericTrigger) {
               return (
@@ -800,29 +788,45 @@ class Differential extends Component {
         ),
         pane: (
           <Tab.Pane key="0" className="DifferentialContentPane">
-            <div id="DifferentialGrid">
-              <EZGrid
-                ref={this.differentialGridRef}
-                uniqueCacheKey={differentialCacheKey}
-                data={differentialResults}
-                columnsConfig={differentialColumns}
-                totalRows={differentialRows}
-                // use "differentialRows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
-                itemsPerPage={itemsPerPageDifferentialTable}
-                onInformItemsPerPage={this.informItemsPerPageDifferentialTable}
-                exportBaseName="Differential_Analysis"
-                loading={isVolcanoTableLoading}
-                // quickViews={quickViews}
-                disableGeneralSearch
-                disableGrouping
-                disableColumnVisibilityToggle
-                disableColumnReorder
-                // disableFilters
-                min-height="75vh"
-                additionalTemplateInfo={additionalTemplateInfoDifferentialTable}
-                // headerAttributes={<ButtonActions />}
-              />
-            </div>
+            {/* <div id="DifferentialGrid"> */}
+            <Grid>
+              <Grid.Row>
+                <Grid.Column
+                  className="ResultsTableWrapper"
+                  mobile={16}
+                  tablet={16}
+                  largeScreen={16}
+                  widescreen={16}
+                >
+                  <EZGrid
+                    ref={this.differentialGridRef}
+                    uniqueCacheKey={differentialCacheKey}
+                    data={differentialResults}
+                    columnsConfig={differentialColumns}
+                    totalRows={differentialRows}
+                    // use "differentialRows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
+                    itemsPerPage={itemsPerPageDifferentialTable}
+                    onInformItemsPerPage={
+                      this.informItemsPerPageDifferentialTable
+                    }
+                    exportBaseName="Differential_Analysis"
+                    loading={isVolcanoTableLoading}
+                    // quickViews={quickViews}
+                    // disableGeneralSearch
+                    disableGrouping
+                    disableColumnVisibilityToggle
+                    disableColumnReorder
+                    // disableFilters
+                    min-height="75vh"
+                    additionalTemplateInfo={
+                      additionalTemplateInfoDifferentialTable
+                    }
+                    // headerAttributes={<ButtonActions />}
+                  />
+                  {/* </div> */}
+                </Grid.Column>
+              </Grid.Row>
+            </Grid>
           </Tab.Pane>
         ),
       },
