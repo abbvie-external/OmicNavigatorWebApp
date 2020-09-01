@@ -702,7 +702,6 @@ class Differential extends Component {
     } else if (this.state.isItemSelected && this.state.isProteinSVGLoaded) {
       return (
         <DifferentialPlot
-          ref={this.DifferentialViewContainerRef}
           {...this.props}
           {...this.state}
           onBackToTable={this.backToTable}
