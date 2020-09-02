@@ -111,7 +111,6 @@ class PhosphoprotService {
 
   async getReportLink(study, model, errorCb, cancelToken) {
     this.setUrl();
-    debugger;
     const obj = { study: study, modelID: model };
     const promise = this.ocpuDataCall(
       'getReportLink',

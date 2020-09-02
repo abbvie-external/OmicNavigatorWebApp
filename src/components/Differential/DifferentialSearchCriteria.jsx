@@ -186,7 +186,6 @@ class DifferentialSearchCriteria extends Component {
         phosphoprotService
           .getReportLink(differentialStudy, differentialModel)
           .then(getReportLink => {
-            debugger;
             const link = getReportLink.includes('http')
               ? getReportLink
               : `***REMOVED***/ocpu/library/${getReportLink}/`;
@@ -312,7 +311,6 @@ class DifferentialSearchCriteria extends Component {
     phosphoprotService
       .getReportLink(differentialStudy, value)
       .then(getReportLink => {
-        debugger;
         const link = getReportLink.includes('http')
           ? getReportLink
           : `***REMOVED***/ocpu/library/${getReportLink}/`;
