@@ -130,11 +130,6 @@ class DifferentialSearchCriteria extends Component {
       differentialStudies: studies,
     });
     if (differentialStudy !== '') {
-      this.setState({
-        differentialStudyHrefVisible: true,
-        differentialStudyHref: `http://www.localhost:3000/${differentialStudy}.html`,
-      });
-
       // loop through allStudiesMetadata to find the object with the name matching differentialStudy
       const allStudiesMetadataCopy = [...allStudiesMetadata];
       const differentialStudyData = allStudiesMetadataCopy.find(
@@ -188,6 +183,21 @@ class DifferentialSearchCriteria extends Component {
           uDataP: uDataPMapped,
         });
         this.props.onSetTestsMetadata(differentialTestsMetadataVar);
+        phosphoprotService
+          .getReportLink(differentialStudy, differentialModel)
+          .then(getReportLink => {
+            debugger;
+            const link = getReportLink.includes('http')
+              ? getReportLink
+              : `***REMOVED***/ocpu/library/${getReportLink}/`;
+            this.setState({
+              differentialStudyHrefVisible: true,
+              differentialStudyHref: link,
+            });
+          })
+          .catch(error => {
+            console.error('Error during getReportLink', error);
+          });
         if (differentialTest !== '') {
           onSearchTransitionDifferential(true);
           phosphoprotService
@@ -248,8 +258,7 @@ class DifferentialSearchCriteria extends Component {
       isValidSearchDifferential: false,
     });
     this.setState({
-      differentialStudyHrefVisible: true,
-      differentialStudyHref: `http://www.localhost:3000/${value}.html`,
+      differentialStudyHrefVisible: false,
       differentialModelsDisabled: true,
       differentialTestsDisabled: true,
       differentialModelTooltip: '',
@@ -300,6 +309,21 @@ class DifferentialSearchCriteria extends Component {
       differentialTestTooltip: '',
     });
     this.props.onSetTestsMetadata(differentialTestsMetadataVar);
+    phosphoprotService
+      .getReportLink(differentialStudy, value)
+      .then(getReportLink => {
+        debugger;
+        const link = getReportLink.includes('http')
+          ? getReportLink
+          : `***REMOVED***/ocpu/library/${getReportLink}/`;
+        this.setState({
+          differentialStudyHrefVisible: true,
+          differentialStudyHref: link,
+        });
+      })
+      .catch(error => {
+        console.error('Error during getReportLink', error);
+      });
   };
 
   handleTestChange = (evt, { name, value }) => {
