@@ -109,6 +109,20 @@ class PhosphoprotService {
     });
   }
 
+  async getReportLink(study, model, errorCb, cancelToken) {
+    this.setUrl();
+    const obj = { study: study, modelID: model };
+    const promise = this.ocpuDataCall(
+      'getReportLink',
+      obj,
+      errorCb,
+      null,
+      false,
+    );
+    const dataFromPromise = await promise;
+    return dataFromPromise;
+  }
+
   async getResultsTable(study, model, test, errorCb, cancelToken) {
     this.setUrl();
     const obj = { study: study, modelID: model, testID: test };

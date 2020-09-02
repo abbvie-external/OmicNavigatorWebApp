@@ -136,11 +136,6 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentStudies: studies,
     });
     if (enrichmentStudy !== '') {
-      this.setState({
-        enrichmentStudyHrefVisible: true,
-        enrichmentStudyHref: `http://www.localhost:3000/${enrichmentStudy}.html`,
-      });
-
       // loop through allStudiesMetadata to find the object with the name matching enrichmentStudy
       const allStudiesMetadataCopy = [...allStudiesMetadata];
       const enrichmentStudyData = allStudiesMetadataCopy.find(
@@ -197,6 +192,20 @@ class EnrichmentSearchCriteria extends Component {
           // uData: uDataMapped,
         });
         this.props.onSetAnnotationsMetadata(enrichmentAnnotationsMetadataVar);
+        phosphoprotService
+          .getReportLink(enrichmentStudy, enrichmentModel)
+          .then(getReportLink => {
+            const link = getReportLink.includes('http')
+              ? getReportLink
+              : `***REMOVED***/ocpu/library/${getReportLink}/`;
+            this.setState({
+              enrichmentStudyHrefVisible: true,
+              enrichmentStudyHref: link,
+            });
+          })
+          .catch(error => {
+            console.error('Error during getReportLink', error);
+          });
         if (enrichmentAnnotation !== '') {
           onSearchTransitionEnrichment(true);
           phosphoprotService
@@ -255,8 +264,7 @@ class EnrichmentSearchCriteria extends Component {
       isValidSearchEnrichment: false,
     });
     this.setState({
-      enrichmentStudyHrefVisible: true,
-      enrichmentStudyHref: `http://www.localhost:3000/${value}.html`,
+      enrichmentStudyHrefVisible: false,
       enrichmentModelsDisabled: true,
       enrichmentAnnotationsDisabled: true,
       enrichmentModelTooltip: '',
@@ -310,6 +318,20 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentAnnotationTooltip: '',
     });
     this.props.onSetAnnotationsMetadata(enrichmentAnnotationsMetadataVar);
+    phosphoprotService
+      .getReportLink(enrichmentStudy, value)
+      .then(getReportLink => {
+        const link = getReportLink.includes('http')
+          ? getReportLink
+          : `***REMOVED***/ocpu/library/${getReportLink}/`;
+        this.setState({
+          enrichmentStudyHrefVisible: true,
+          enrichmentStudyHref: link,
+        });
+      })
+      .catch(error => {
+        console.error('Error during getReportLink', error);
+      });
   };
 
   handleAnnotationChange = (evt, { name, value }) => {
