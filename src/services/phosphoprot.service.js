@@ -20,7 +20,6 @@ class PhosphoprotService {
   }
 
   async ocpuRPCUnbox(method, obj, timeoutLength, handleError, cancelToken) {
-    debugger;
     return new Promise(function(resolve, reject) {
       window.ocpu
         .call(method, obj, function(session) {
@@ -34,7 +33,6 @@ class PhosphoprotService {
             })
             .then(response => resolve(response.data))
             .catch(function(thrown) {
-              debugger;
               if (axios.isCancel(thrown)) {
                 console.log('Request canceled', thrown.message);
               } else {
@@ -52,7 +50,6 @@ class PhosphoprotService {
         //     .then(response => resolve(response));
         // })
         .catch(error => {
-          debugger;
           if (method !== 'getMetaFeaturesTable') {
             toast.error(`${error.statusText}: ${error.responseText}`);
           }
