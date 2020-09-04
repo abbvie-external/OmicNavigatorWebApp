@@ -36,7 +36,6 @@ class PhosphoprotService {
               if (axios.isCancel(thrown)) {
                 console.log('Request canceled', thrown.message);
               } else {
-                toast.error(`${thrown.message}`);
                 if (handleError !== undefined) {
                   handleError(false);
                 }
@@ -51,11 +50,12 @@ class PhosphoprotService {
         //     .then(response => resolve(response));
         // })
         .catch(error => {
-          toast.error(`${error.statusText}: ${error.responseText}`);
+          if (method !== 'getMetaFeaturesTable') {
+            toast.error(`${error.statusText}: ${error.responseText}`);
+          }
           if (handleError !== undefined) {
             handleError(false);
           }
-          console.log(`${error.statusText}: ${error.responseText}`);
         });
     });
   }

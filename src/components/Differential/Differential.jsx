@@ -91,8 +91,7 @@ class Differential extends Component {
     plotSVGHeight: null,
     isVolcanoPlotSVGLoaded: false,
     itemsPerPageDifferentialTable:
-      parseInt(sessionStorage.getItem('itemsPerPageDifferentialTable'), 10) ||
-      45,
+      parseInt(localStorage.getItem('itemsPerPageDifferentialTable'), 10) || 45,
   };
   DifferentialViewContainerRef = React.createRef();
   differentialGridRef = React.createRef();
@@ -107,7 +106,7 @@ class Differential extends Component {
     this.setState({
       itemsPerPageDifferentialTable: items,
     });
-    sessionStorage.setItem('itemsPerPageDifferentialTable', items);
+    localStorage.setItem('itemsPerPageDifferentialTable', items);
   };
 
   handleSearchTransitionDifferential = bool => {
@@ -739,7 +738,7 @@ class Differential extends Component {
     this.setState({
       itemsPerPageDifferentialTable: items,
     });
-    sessionStorage.setItem('itemsPerPageDifferentialTable', items);
+    localStorage.setItem('itemsPerPageDifferentialTable', items);
   };
 
   getTableAndPlotPanes = () => {

@@ -197,7 +197,7 @@ class EnrichmentSearchCriteria extends Component {
           .then(getReportLink => {
             const link = getReportLink.includes('http')
               ? getReportLink
-              : `***REMOVED***/ocpu/library/${getReportLink}/`;
+              : `***REMOVED***/ocpu/library/${getReportLink}`;
             this.setState({
               enrichmentStudyHrefVisible: true,
               enrichmentStudyHref: link,
@@ -323,7 +323,7 @@ class EnrichmentSearchCriteria extends Component {
       .then(getReportLink => {
         const link = getReportLink.includes('http')
           ? getReportLink
-          : `***REMOVED***/ocpu/library/${getReportLink}/`;
+          : `***REMOVED***/ocpu/library/${getReportLink}`;
         this.setState({
           enrichmentStudyHrefVisible: true,
           enrichmentStudyHref: link,
