@@ -20,11 +20,11 @@ class DifferentialVolcano extends Component {
     volcanoWidth: null,
     volcanoHeight: null,
     defaultVolcanoWidth:
-      parseInt(sessionStorage.getItem('volcanoSplitPaneSize'), 10) || 550,
+      parseInt(localStorage.getItem('volcanoSplitPaneSize'), 10) || 550,
     defaultVolcanoHeight: 400,
     filteredTableData: [],
     itemsPerPageVolcanoTable:
-      parseInt(sessionStorage.getItem('itemsPerPageVolcanoTable'), 10) || 30,
+      parseInt(localStorage.getItem('itemsPerPageVolcanoTable'), 10) || 30,
     volcanoPlotRows: 0,
     doXAxisTransformation: false,
     doYAxisTransformation: false,
@@ -185,7 +185,7 @@ class DifferentialVolcano extends Component {
     this.setState({
       itemsPerPageVolcanoTable: items,
     });
-    sessionStorage.setItem('itemsPerPageVolcanoTable', items);
+    localStorage.setItem('itemsPerPageVolcanoTable', items);
   };
 
   handleRowClick = (event, item, index) => {
@@ -313,7 +313,7 @@ class DifferentialVolcano extends Component {
 
   onSizeChange = size => {
     this.setState({ volcanoWidth: size * 0.95 });
-    sessionStorage.setItem('volcanoSplitPaneSize', size);
+    localStorage.setItem('volcanoSplitPaneSize', size);
   };
 
   render() {

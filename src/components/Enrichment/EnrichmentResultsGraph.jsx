@@ -215,10 +215,9 @@ class EnrichmentResultsGraph extends Component {
     linkCutoffLocal: sessionStorage.getItem('linkCutoff') || 0.4,
     linkTypeLocal: sessionStorage.getItem('linkType') || 0.5,
     legendHeight:
-      parseInt(sessionStorage.getItem('legendHeight'), 10) ||
-      getDynamicLegend(),
+      parseInt(localStorage.getItem('legendHeight'), 10) || getDynamicLegend(),
     legendWidth:
-      parseInt(sessionStorage.getItem('legendWidth'), 10) || getDynamicLegend(),
+      parseInt(localStorage.getItem('legendWidth'), 10) || getDynamicLegend(),
   };
 
   componentDidMount() {
@@ -375,8 +374,8 @@ class EnrichmentResultsGraph extends Component {
   };
 
   onResizeLegendStop = (event, { element, size, handle }) => {
-    sessionStorage.setItem(`legendWidth`, size.width);
-    sessionStorage.setItem(`legendHeight`, size.height);
+    localStorage.setItem(`legendWidth`, size.width);
+    localStorage.setItem(`legendHeight`, size.height);
   };
 
   getNodeFeatures(enrichmentStudy, enrichmentAnnotation, termid) {
