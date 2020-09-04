@@ -36,7 +36,7 @@ class SVGPlot extends Component {
         .getMetaFeaturesTable(
           this.props.differentialStudy,
           differentialModel,
-          differentialFeature,
+          'test',
           this.handleGetMetaFeaturesTableError,
         )
         .then(getMetaFeaturesTableResponseData => {
@@ -68,9 +68,9 @@ class SVGPlot extends Component {
       // });
     }
     if (JSON.parse(!featureidSpecificMetaFeaturesExist)) {
-      toast.error(
-        `Feature ${differentialFeature} does not have any feature data.`,
-      );
+      // toast.error(
+      //   `Feature ${differentialFeature} does not have any feature data.`,
+      // );
       this.setState({
         metafeaturesData: [],
       });
@@ -113,19 +113,17 @@ class SVGPlot extends Component {
       });
       panes = panes.concat(svgPanes);
     }
-    if (this.state.metafeaturesData.length !== 0) {
-      let metafeaturesTab = [
-        {
-          menuItem: 'Feature Data',
-          render: () => (
-            <Tab.Pane attached="true" as="div">
-              <MetafeaturesTable {...this.state} {...this.props} />
-            </Tab.Pane>
-          ),
-        },
-      ];
-      panes = panes.concat(metafeaturesTab);
-    }
+    let metafeaturesTab = [
+      {
+        menuItem: 'Feature Data',
+        render: () => (
+          <Tab.Pane attached="true" as="div">
+            <MetafeaturesTable {...this.state} {...this.props} />
+          </Tab.Pane>
+        ),
+      },
+    ];
+    panes = panes.concat(metafeaturesTab);
     return (
       <Tab
         menu={{ secondary: true, pointing: true, className: 'SVGDiv' }}
