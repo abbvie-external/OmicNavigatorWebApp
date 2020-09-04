@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Tab } from 'semantic-ui-react';
 import { phosphoprotService } from '../../services/phosphoprot.service';
+import { toast } from 'react-toastify';
 // import ButtonActions from '../Shared/ButtonActions';
 import MetafeaturesTable from './MetafeaturesTable';
 // import * as d3 from 'd3';
@@ -48,6 +49,9 @@ class SVGPlot extends Component {
               `${differentialStudy}-${differentialFeature}-MetaFeaturesExist`,
               false,
             );
+            toast.error(
+              `Feature ${differentialFeature} does not have any feature data.`,
+            );
           }
           this.setState({
             metafeaturesData: metafeaturesData,
@@ -62,6 +66,14 @@ class SVGPlot extends Component {
       //     areDifferentialPlotTabsReady: true,
       //   });
       // });
+    }
+    if (JSON.parse(!featureidSpecificMetaFeaturesExist)) {
+      toast.error(
+        `Feature ${differentialFeature} does not have any feature data.`,
+      );
+      this.setState({
+        metafeaturesData: [],
+      });
     }
   }
 
