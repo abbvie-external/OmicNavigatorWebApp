@@ -100,7 +100,9 @@ class PhosphoprotService {
             });
         })
         .catch(error => {
-          toast.error(`${error.statusText}: ${error.responseText}`);
+          if (method !== 'getReportLink') {
+            toast.error(`${error.statusText}: ${error.responseText}`);
+          }
           if (handleError !== undefined) {
             handleError(false);
           }

@@ -15,6 +15,7 @@ import '../Shared/SearchCriteria.scss';
 import { phosphoprotService } from '../../services/phosphoprot.service';
 import DifferentialMultisetFilters from './DifferentialMultisetFilters';
 
+let cancelRequestGetReportLinkDifferential = () => {};
 let cancelRequestPSCGetResultsTable = () => {};
 let cancelRequestMultisetInferenceData = () => {};
 let cancelRequestInferenceMultisetPlot = () => {};
@@ -155,6 +156,7 @@ class DifferentialSearchCriteria extends Component {
         differentialModelsDisabled: false,
         differentialModels: differentialModelsMapped,
       });
+      this.getReportLink(differentialStudy, 'default');
       if (differentialModel !== '') {
         this.props.onHandlePlotTypesDifferential(differentialModel);
         const differentialModelWithTests = differentialModelsAndTestsVar.find(
@@ -183,20 +185,7 @@ class DifferentialSearchCriteria extends Component {
           uDataP: uDataPMapped,
         });
         this.props.onSetTestsMetadata(differentialTestsMetadataVar);
-        phosphoprotService
-          .getReportLink(differentialStudy, differentialModel)
-          .then(getReportLink => {
-            const link = getReportLink.includes('http')
-              ? getReportLink
-              : `***REMOVED***/ocpu/library/${getReportLink}`;
-            this.setState({
-              differentialStudyHrefVisible: true,
-              differentialStudyHref: link,
-            });
-          })
-          .catch(error => {
-            console.error('Error during getReportLink', error);
-          });
+        this.getReportLink(differentialStudy, differentialModel);
         if (differentialTest !== '') {
           onSearchTransitionDifferential(true);
           phosphoprotService
@@ -263,6 +252,30 @@ class DifferentialSearchCriteria extends Component {
       differentialModelTooltip: '',
       differentialTestTooltip: '',
     });
+    this.getReportLink(value, 'default');
+  };
+
+  getReportLink = (study, model) => {
+    debugger;
+    cancelRequestGetReportLinkDifferential();
+    let cancelToken = new CancelToken(e => {
+      cancelRequestGetReportLinkDifferential = e;
+    });
+    phosphoprotService
+      .getReportLink(study, model, null, cancelToken)
+      .then(getReportLink => {
+        debugger;
+        const link = getReportLink.includes('http')
+          ? getReportLink
+          : `***REMOVED***/ocpu/library/${getReportLink}`;
+        this.setState({
+          differentialStudyHrefVisible: true,
+          differentialStudyHref: link,
+        });
+      })
+      .catch(error => {
+        console.error('Error during getReportLink', error);
+      });
   };
 
   handleModelChange = (evt, { name, value }) => {
@@ -308,20 +321,7 @@ class DifferentialSearchCriteria extends Component {
       differentialTestTooltip: '',
     });
     this.props.onSetTestsMetadata(differentialTestsMetadataVar);
-    phosphoprotService
-      .getReportLink(differentialStudy, value)
-      .then(getReportLink => {
-        const link = getReportLink.includes('http')
-          ? getReportLink
-          : `***REMOVED***/ocpu/library/${getReportLink}`;
-        this.setState({
-          differentialStudyHrefVisible: true,
-          differentialStudyHref: link,
-        });
-      })
-      .catch(error => {
-        console.error('Error during getReportLink', error);
-      });
+    this.getReportLink(differentialStudy, value);
   };
 
   handleTestChange = (evt, { name, value }) => {
