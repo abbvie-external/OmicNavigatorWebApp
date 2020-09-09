@@ -925,7 +925,7 @@ class EnrichmentSearchCriteria extends Component {
           basic
           inverted
           position="bottom center"
-          content="Select a study to view Analysis Details"
+          content="Select a study and model to view Analysis Details"
         />
       );
     }

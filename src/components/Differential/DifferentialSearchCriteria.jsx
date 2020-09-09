@@ -813,7 +813,7 @@ class DifferentialSearchCriteria extends Component {
           inverted
           className="CustomTooltip"
           position="bottom center"
-          content="Select a study to view Analysis Details"
+          content="Select a study and model to view Analysis Details"
           mouseEnterDelay={0}
           mouseLeaveDelay={0}
         />
