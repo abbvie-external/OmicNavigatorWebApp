@@ -15,6 +15,7 @@ import '../Shared/SearchCriteria.scss';
 import { phosphoprotService } from '../../services/phosphoprot.service';
 import EnrichmentMultisetFilters from './EnrichmentMultisetFilters';
 
+let cancelRequestGetReportLinkEnrichment = () => {};
 let cancelGetEnrichmentsTable = () => {};
 let cancelRequestMultisetEnrichmentData = () => {};
 let cancelRequestEnrichmentMultisetPlot = () => {};
@@ -156,12 +157,11 @@ class EnrichmentSearchCriteria extends Component {
           };
         },
       );
-
       this.setState({
         enrichmentModelsDisabled: false,
         enrichmentModels: enrichmentModelsMapped,
       });
-
+      this.getReportLink(enrichmentStudy, 'default');
       if (enrichmentModel !== '') {
         this.props.onHandlePlotTypesEnrichment(enrichmentModel);
         const enrichmentModelWithAnnotations = enrichmentModelsAndAnnotationsVar.find(
@@ -192,20 +192,7 @@ class EnrichmentSearchCriteria extends Component {
           // uData: uDataMapped,
         });
         this.props.onSetAnnotationsMetadata(enrichmentAnnotationsMetadataVar);
-        phosphoprotService
-          .getReportLink(enrichmentStudy, enrichmentModel)
-          .then(getReportLink => {
-            const link = getReportLink.includes('http')
-              ? getReportLink
-              : `***REMOVED***/ocpu/library/${getReportLink}`;
-            this.setState({
-              enrichmentStudyHrefVisible: true,
-              enrichmentStudyHref: link,
-            });
-          })
-          .catch(error => {
-            console.error('Error during getReportLink', error);
-          });
+        this.getReportLink(enrichmentStudy, enrichmentModel);
         if (enrichmentAnnotation !== '') {
           onSearchTransitionEnrichment(true);
           phosphoprotService
@@ -249,6 +236,28 @@ class EnrichmentSearchCriteria extends Component {
     }
   };
 
+  getReportLink = (study, model) => {
+    cancelRequestGetReportLinkEnrichment();
+    let cancelToken = new CancelToken(e => {
+      cancelRequestGetReportLinkEnrichment = e;
+    });
+    phosphoprotService
+      .getReportLink(study, model, null, cancelToken)
+      .then(getReportLink => {
+        debugger;
+        const link = getReportLink.includes('http')
+          ? getReportLink
+          : `***REMOVED***/ocpu/library/${getReportLink}`;
+        this.setState({
+          enrichmentStudyHrefVisible: true,
+          enrichmentStudyHref: link,
+        });
+      })
+      .catch(error => {
+        console.error('Error during getReportLink', error);
+      });
+  };
+
   handleStudyChange = (evt, { name, value }) => {
     const { onSearchCriteriaChange, onSearchCriteriaReset } = this.props;
     onSearchCriteriaChange(
@@ -270,6 +279,7 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentModelTooltip: '',
       enrichmentAnnotationTooltip: '',
     });
+    this.getReportLink(value, 'default');
   };
 
   handleModelChange = (evt, { name, value }) => {
@@ -318,20 +328,7 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentAnnotationTooltip: '',
     });
     this.props.onSetAnnotationsMetadata(enrichmentAnnotationsMetadataVar);
-    phosphoprotService
-      .getReportLink(enrichmentStudy, value)
-      .then(getReportLink => {
-        const link = getReportLink.includes('http')
-          ? getReportLink
-          : `***REMOVED***/ocpu/library/${getReportLink}`;
-        this.setState({
-          enrichmentStudyHrefVisible: true,
-          enrichmentStudyHref: link,
-        });
-      })
-      .catch(error => {
-        console.error('Error during getReportLink', error);
-      });
+    this.getReportLink(enrichmentStudy, value);
   };
 
   handleAnnotationChange = (evt, { name, value }) => {
