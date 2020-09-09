@@ -256,7 +256,6 @@ class DifferentialSearchCriteria extends Component {
   };
 
   getReportLink = (study, model) => {
-    debugger;
     cancelRequestGetReportLinkDifferential();
     let cancelToken = new CancelToken(e => {
       cancelRequestGetReportLinkDifferential = e;
@@ -264,7 +263,6 @@ class DifferentialSearchCriteria extends Component {
     phosphoprotService
       .getReportLink(study, model, null, cancelToken)
       .then(getReportLink => {
-        debugger;
         const link = getReportLink.includes('http')
           ? getReportLink
           : `***REMOVED***/ocpu/library/${getReportLink}`;

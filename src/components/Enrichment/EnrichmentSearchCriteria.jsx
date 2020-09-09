@@ -244,7 +244,6 @@ class EnrichmentSearchCriteria extends Component {
     phosphoprotService
       .getReportLink(study, model, null, cancelToken)
       .then(getReportLink => {
-        debugger;
         const link = getReportLink.includes('http')
           ? getReportLink
           : `***REMOVED***/ocpu/library/${getReportLink}`;

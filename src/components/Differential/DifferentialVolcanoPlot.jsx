@@ -187,8 +187,9 @@ class DifferentialVolcanoPlot extends Component {
     //   //
     // };
     const endBrush = function() {
+      debugger;
       self.props.onHandleVolcanoTableLoading(true);
-      if (d3.event.selection !== undefined && d3.event.selection !== null) {
+      if (d3.event.selection != null) {
         const brushedCircles = d3.brushSelection(this);
         const isBrushed = function(x, y) {
           const brushTest =
@@ -217,14 +218,9 @@ class DifferentialVolcanoPlot extends Component {
         if (brushedDataArr.length > 0) {
           self.setState({ brushedCirclesData: brushedDataArr });
         }
-      }
-      const selection = d3.event.selection;
-      if (selection == null) {
-        self.handleSVGClick();
+        self.props.handleVolcanoPlotSelectionChange(brushedDataArr);
       } else {
-        self.props.handleVolcanoPlotSelectionChange(
-          self.state.brushedCirclesData,
-        );
+        self.handleSVGClick(null);
       }
     };
 
