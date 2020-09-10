@@ -265,7 +265,8 @@ class DifferentialSearchCriteria extends Component {
       .then(getReportLink => {
         const link = getReportLink.includes('http')
           ? getReportLink
-          : `***REMOVED***/ocpu/library/${getReportLink}`;
+          : // : `***REMOVED***/ocpu/library/${getReportLink}`;
+            `${this.props.baseUrl}/ocpu/library/${getReportLink}`;
         this.setState({
           differentialStudyHrefVisible: true,
           differentialStudyHref: link,
