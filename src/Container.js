@@ -4,10 +4,8 @@ import App from './components/App';
 
 class Container extends Component {
   render() {
-    const isReport = window.location.pathname.includes('html') ? true : false;
-    if (isReport) {
-      return '';
-    } else {
+    const isReport = window.location.pathname.includes('ocpu') ? true : false;
+    if (!isReport) {
       return (
         <HashRouter>
           <App />
