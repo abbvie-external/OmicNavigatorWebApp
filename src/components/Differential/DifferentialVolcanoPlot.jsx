@@ -187,7 +187,6 @@ class DifferentialVolcanoPlot extends Component {
     //   //
     // };
     const endBrush = function() {
-      debugger;
       self.props.onHandleVolcanoTableLoading(true);
       if (d3.event.selection != null) {
         const brushedCircles = d3.brushSelection(this);

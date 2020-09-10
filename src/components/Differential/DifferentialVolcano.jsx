@@ -17,11 +17,8 @@ import SplitPane from 'react-split-pane';
 
 class DifferentialVolcano extends Component {
   state = {
-    volcanoWidth: null,
-    volcanoHeight: null,
-    defaultVolcanoWidth:
-      parseInt(localStorage.getItem('volcanoSplitPaneSize'), 10) || 550,
-    defaultVolcanoHeight: 400,
+    volcanoHeight: parseInt(localStorage.getItem('volcanoHeight'), 10) || 500,
+    volcanoWidth: parseInt(localStorage.getItem('volcanoWidth'), 10) || 300,
     filteredTableData: [],
     itemsPerPageVolcanoTable:
       parseInt(localStorage.getItem('itemsPerPageVolcanoTable'), 10) || 30,
@@ -36,6 +33,7 @@ class DifferentialVolcano extends Component {
     identifier: null,
   };
   volcanoPlotFilteredGridRef = React.createRef();
+  differentialVolcanoPlotRef = React.createRef();
 
   componentDidMount() {
     const { identifier } = this.state;
@@ -44,8 +42,6 @@ class DifferentialVolcano extends Component {
     this.setState({
       filteredTableData: this.props.differentialResults,
       volcanoPlotRows: this.props.differentialResults.length,
-      volcanoWidth: this.state.defaultVolcanoWidth * 0.95,
-      volcanoHeight: this.state.defaultVolcanoHeight * 0.95,
     });
     const defaultMaxObject = this.props.differentialResults[0];
     if (this.props.differentialResults.length > 0) {
@@ -311,9 +307,22 @@ class DifferentialVolcano extends Component {
     }
   };
 
-  onSizeChange = size => {
-    this.setState({ volcanoWidth: size * 0.95 });
-    localStorage.setItem('volcanoSplitPaneSize', size);
+  onSizeChange = (size, paneType) => {
+    const adjustedSize = Math.round(size * 0.95);
+    if (paneType === 'horizontal') {
+      const width = parseInt(localStorage.getItem('volcanoWidth'), 10);
+      localStorage.setItem('volcanoWidth', width + 1);
+      localStorage.setItem('volcanoHeight', adjustedSize);
+      this.setState({
+        volcanoHeight: adjustedSize,
+        volcanoWidth: width + 1,
+      });
+    } else {
+      localStorage.setItem('volcanoWidth', adjustedSize);
+      this.setState({
+        volcanoWidth: adjustedSize,
+      });
+    }
   };
 
   render() {
@@ -411,18 +420,27 @@ class DifferentialVolcano extends Component {
             </Fragment>
           </Grid.Column>
         </Grid.Row>
-        <Grid.Row id="volcanoDiv1Row">
+        <Grid.Row id="volcanoViewRow">
           <Grid.Column>
-            <div id="volcanoDiv1">
+            <SplitPane
+              split="horizontal"
+              className="volcanoSplitPane"
+              id=""
+              defaultSize={this.state.volcanoHeight * 1.05263157895}
+              minSize={200}
+              maxSize={1200}
+              onDragFinished={size => this.onSizeChange(size, 'horizontal')}
+            >
               <SplitPane
                 split="vertical"
-                className="volcanoDiv1SplitPane"
-                defaultSize={this.state.defaultVolcanoWidth}
+                className="volcanoSplitPane"
+                defaultSize={this.state.volcanoWidth * 1.05263157895}
                 minSize={300}
-                maxSize={735}
-                onDragFinished={size => this.onSizeChange(size)}
+                maxSize={1500}
+                onDragFinished={size => this.onSizeChange(size, 'vertical')}
               >
                 <DifferentialVolcanoPlot
+                  ref={this.differentialVolcanoPlotRef}
                   {...this.state}
                   {...this.props}
                   handleVolcanoPlotSelectionChange={
@@ -433,18 +451,12 @@ class DifferentialVolcano extends Component {
                 ></DifferentialVolcanoPlot>
                 {svgPlot}
               </SplitPane>
-            </div>
-          </Grid.Column>
-        </Grid.Row>
-        <Grid.Row id="volcanoDiv2Row">
-          <Grid.Column>
-            <div id="volcanoDiv2">
               <EZGrid
                 ref={this.volcanoPlotFilteredGridRef}
                 className="volcanoPlotTable"
                 // note, default is 70vh; if you want a specific vh, specify like "40vh"; "auto" lets the height flow based on items per page
-                // height="auto"
-                height="40vh"
+                height="auto"
+                // height="40vh"
                 data={filteredTableData}
                 totalRows={volcanoPlotRows}
                 columnsConfig={differentialColumns}
@@ -459,7 +471,7 @@ class DifferentialVolcano extends Component {
                 headerAttributes={<ButtonActions />}
                 onRowClick={this.handleRowClick}
               />
-            </div>
+            </SplitPane>
           </Grid.Column>
         </Grid.Row>
       </Grid>

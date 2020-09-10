@@ -386,9 +386,9 @@ class Differential extends Component {
     let handleSVGCb = this.handleSVG;
     let currentSVGs = [];
     let DifferentialPlotSVGSizing = `height="100%" width="inherit"`;
-    if (useVolcanoSVGSize === true) {
-      DifferentialPlotSVGSizing = `height="100%" width="auto"`;
-    }
+    // if (useVolcanoSVGSize === true) {
+    //   DifferentialPlotSVGSizing = `height="100%" width="auto"`;
+    // }
     let handleItemSelectedCb = this.handleItemSelected;
     cancelRequestDifferentialResultsGetPlot();
     let cancelToken = new CancelToken(e => {
