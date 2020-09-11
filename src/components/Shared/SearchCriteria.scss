@@ -102,5 +102,7 @@
 
 #multisetAnalysisSVG {
   max-height: 80vh !important;
-  height: 80h !important;
+  // height: 80vh !important;
+  height: 100% !important;
+  width: -webkit-fill-available !important;
 }

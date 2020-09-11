@@ -824,7 +824,7 @@ class EnrichmentSearchCriteria extends Component {
           // );
           svgMarkup = svgMarkup.replace(
             /<svg/g,
-            '<svg preserveAspectRatio="xMinYMid meet" height="100%" width="inherit" id="multisetAnalysisSVG"',
+            '<svg preserveAspectRatio="xMinYMid meet" id="multisetAnalysisSVG"',
           );
           // DOMPurify.addHook('afterSanitizeAttributes', function(node) {
           //   if (

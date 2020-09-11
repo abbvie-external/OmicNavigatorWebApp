@@ -175,7 +175,7 @@ class Enrichment extends Component {
       xName: 'tissue',
       constrainExtremes: false,
       color: d3.scaleOrdinal(d3.schemeCategory10),
-      margin: { top: 10, right: 10, bottom: 50, left: 50 },
+      margin: { top: 10, right: 10, bottom: 50, left: 55 },
       scale: 'linear',
       yName: null,
       yTicks: 1,
@@ -1043,7 +1043,7 @@ class Enrichment extends Component {
             );
             svgMarkup = svgMarkup.replace(
               /<svg/g,
-              `<svg preserveAspectRatio="xMinYMin meet" height="100%" width="auto" id="currentSVG-${id}-${i}"`,
+              `<svg preserveAspectRatio="xMinYMin meet" id="currentSVG-${id}-${i}"`,
             );
             DOMPurify.addHook('afterSanitizeAttributes', function(node) {
               if (
@@ -1305,7 +1305,7 @@ class Enrichment extends Component {
       .data([this.state.networkSettings.propLabel])
       .attr('width', '100%')
       .attr('height', '100%')
-      .attr('viewBox', '0 0 ' + 300 + ' ' + 250)
+      .attr('viewBox', '0 0 300 250')
       .attr('preserveAspectRatio', 'xMinYMin meet');
 
     var legend = svg.append('g');
@@ -2137,7 +2137,9 @@ export default withRouter(Enrichment);
 
 function getDataItemDescription(value) {
   if (value) {
-    const dataItem = value.split(':')[1];
+    // const dataItem = value.split(':')[1];
+    // we need everything after the first : (e.g. Home sapiens: Apotosis)
+    const dataItem = value.substr(value.indexOf(':') + 1);
     return dataItem;
   }
 }
