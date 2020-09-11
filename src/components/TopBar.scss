@@ -19,17 +19,7 @@
   }
 
   .LogoAndTitle {
-    @media (max-width: 767px) {
-      margin-right: 0px !important;
-    }
-
-    @media (min-width: 768px) and (max-width: 1199px) {
-      margin-right: 10% !important;
-    }
-
-    @media (min-width: 1200px) {
-      margin-right: 14% !important;
-    }
+    width: 25% !important;
 
     .LogoElement {
       padding: 0px !important;
