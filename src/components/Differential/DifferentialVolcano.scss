@@ -4,13 +4,19 @@
     width: 35px !important;
   }
 
-  .QHGrid table th:first-child {
-    padding-top: 7px !important;
-    padding-bottom: 15px !important;
-  }
-
   .TableValue {
     cursor: auto !important;
+  }
+}
+
+.volcanoSplitPane {
+  .QHGrid table th:first-child {
+    padding-top: 9px !important;
+    padding-bottom: 0px !important;
+  }
+
+  .QHGrid--generalSearch input {
+    border: 1px solid lightgrey !important;
   }
 }
 .VolcanoPlotAxisSelectorsRow {
@@ -69,7 +75,7 @@
   .Resizer.vertical {
     padding: 0px 1px !important;
     width: 16px;
-    margin: 0 -8px;
+    margin: 0 -8px -50px 8px;
     border-left: 8px solid rgba(255, 255, 255, 0);
     border-right: 8px solid rgba(255, 255, 255, 0);
     cursor: col-resize;

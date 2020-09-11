@@ -311,6 +311,7 @@ class DifferentialVolcano extends Component {
     const adjustedSize = Math.round(size * 0.95);
     if (paneType === 'horizontal') {
       const width = parseInt(localStorage.getItem('volcanoWidth'), 10);
+      // on up/down drag, we are forcing a svg resize by change the volcano width by 1
       localStorage.setItem('volcanoWidth', width + 1);
       localStorage.setItem('volcanoHeight', adjustedSize);
       this.setState({
@@ -426,7 +427,8 @@ class DifferentialVolcano extends Component {
               split="horizontal"
               className="volcanoSplitPane"
               id=""
-              defaultSize={this.state.volcanoHeight * 1.05263157895}
+              // defaultSize={this.state.volcanoHeight * 1.05263157895}
+              size={this.state.volcanoHeight * 1.05263157895}
               minSize={200}
               maxSize={1200}
               onDragFinished={size => this.onSizeChange(size, 'horizontal')}
@@ -434,7 +436,8 @@ class DifferentialVolcano extends Component {
               <SplitPane
                 split="vertical"
                 className="volcanoSplitPane"
-                defaultSize={this.state.volcanoWidth * 1.05263157895}
+                // defaultSize={this.state.volcanoWidth * 1.05263157895}
+                size={this.state.volcanoWidth * 1.05263157895}
                 minSize={300}
                 maxSize={1500}
                 onDragFinished={size => this.onSizeChange(size, 'vertical')}
@@ -462,7 +465,7 @@ class DifferentialVolcano extends Component {
                 columnsConfig={differentialColumns}
                 itemsPerPage={itemsPerPageVolcanoTable}
                 onInformItemsPerPage={this.informItemsPerPageVolcanoTable}
-                disableGeneralSearch
+                // disableGeneralSearch
                 disableGrouping
                 disableColumnVisibilityToggle
                 exportBaseName="VolcanoPlot_Filtered_Results"
