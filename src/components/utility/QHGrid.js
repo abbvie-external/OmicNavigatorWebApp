@@ -243,30 +243,30 @@ class QHGridHeader extends React.PureComponent {
     //     style={{ float: 'right', cursor: 'pointer' }}
     //   />
     // );
-    if (this.props.exportBaseName === 'VolcanoPlot_Filtered_Results') {
-      return null;
-    } else {
-      return (
-        <Popup
-          trigger={
-            <Image
-              disabled={!!this.props.loading}
-              src={excel_logo}
-              className="ExcelLogo"
-              // avatar
-              size="mini"
-              onClick={this.props.exportExcel(columns)}
-              style={{ float: 'right', cursor: 'pointer' }}
-            />
-          }
-          style={BreadcrumbPopupStyle}
-          inverted
-          basic
-          position="bottom right"
-          content="Export Data to Excel"
-        />
-      );
-    }
+    // if (this.props.exportBaseName === 'VolcanoPlot_Filtered_Results') {
+    //   return null;
+    // } else {
+    return (
+      <Popup
+        trigger={
+          <Image
+            disabled={!!this.props.loading}
+            src={excel_logo}
+            className="ExcelLogo"
+            // avatar
+            size="mini"
+            onClick={this.props.exportExcel(columns)}
+            style={{ float: 'right', cursor: 'pointer' }}
+          />
+        }
+        style={BreadcrumbPopupStyle}
+        inverted
+        basic
+        position="bottom right"
+        content="Export Data to Excel"
+      />
+    );
+    // }
   };
   // Omic end
   render() {

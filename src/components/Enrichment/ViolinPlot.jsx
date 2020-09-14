@@ -480,8 +480,8 @@ class ViolinPlot extends Component {
 
     // Set base settings
     self.chart.margin = self.props.violinSettings.margin;
-    self.chart.divWidth = self.state.violinContainerWidth;
-    self.chart.divHeight = self.state.violinContainerHeight;
+    // self.chart.divWidth = self.state.violinContainerWidth;
+    // self.chart.divHeight = self.state.violinContainerHeight;
     self.chart.width = self.state.violinWidth;
     self.chart.height = self.state.violinHeight;
     self.chart.xAxisLabel = self.props.enrichmentTerm;
@@ -558,7 +558,10 @@ class ViolinPlot extends Component {
       .attr('id', `svg-${self.props.violinSettings.id}`)
       .attr('width', '100%')
       .attr('height', '100%')
-      .attr('viewBox', `0 0 ${self.chart.divWidth} ${self.chart.divHeight}`);
+      .attr(
+        'viewBox',
+        `0 0 ${self.state.violinContainerWidth} ${self.state.violinContainerHeight}`,
+      );
     // .attr('preserveAspectRatio', 'xMinYMin meet');
 
     self.chart.objs.g = self.chart.objs.svg
@@ -1627,21 +1630,21 @@ class ViolinPlot extends Component {
   // };
 
   setDimensions = () => {
-    const self = this;
-    d3.select(`#svg-${self.props.violinSettings.id}`).remove();
+    const { violinSettings, verticalSplitPaneSize } = this.props;
+    d3.select(`#svg-${violinSettings.id}`).remove();
     // we'll want to calculate a reasonable container width based on parent container
     // we calculate height based on the containerRef
-    const containerHeight = this.getHeight(self.props);
+    const containerHeight = this.getHeight(this.props);
     const height =
       containerHeight -
-      self.props.violinSettings.margin.top -
-      self.props.violinSettings.margin.bottom;
+      violinSettings.margin.top -
+      violinSettings.margin.bottom;
 
-    const containerWidth = self.props.verticalSplitPaneSize;
+    const containerWidth = verticalSplitPaneSize;
     const width =
-      self.props.verticalSplitPaneSize -
-      self.props.violinSettings.margin.left -
-      self.props.violinSettings.margin.right;
+      verticalSplitPaneSize -
+      violinSettings.margin.left -
+      violinSettings.margin.right;
 
     this.setState({
       violinContainerHeight: containerHeight,

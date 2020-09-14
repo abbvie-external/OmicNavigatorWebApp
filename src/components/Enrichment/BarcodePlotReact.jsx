@@ -83,11 +83,11 @@ class BarcodePlotReact extends Component {
             .classed('MaxLine', true)
             .attr('y1', self.state.settings.margin.max);
           const maxLineData = {
-            x2: maxLine.attr('x2'),
-            featureID: maxLine.attr('featureid'),
-            lineID: maxLine.attr('lineid'),
-            logFC: maxLine.attr('logfc'),
-            statistic: maxLine.attr('statistic'),
+            x2: maxLine?.attr('x2') || null,
+            featureID: maxLine?.attr('featureid') || null,
+            lineID: maxLine?.attr('lineid') || null,
+            logFC: maxLine?.attr('logfc') || null,
+            statistic: maxLine?.attr('statistic') || null,
           };
           const statistic = maxLineData.statistic;
           const textAnchor =
@@ -394,7 +394,7 @@ class BarcodePlotReact extends Component {
             // 50,
           ],
         ]);
-      }, 500);
+      }, 50);
     } else {
       // reposition the brushed rect on window resize, or horizontal pane resize
       const selectedTicks = d3.selectAll('line').filter(function() {
