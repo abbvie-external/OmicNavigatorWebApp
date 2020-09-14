@@ -887,8 +887,7 @@ class Differential extends Component {
           </Grid.Row>
         </Grid>
         <div
-          className="MultisetSvgSpan"
-          id="MultisetSvgOuter"
+          className="MultisetSvgOuter"
           dangerouslySetInnerHTML={{ __html: multisetPlotInfo.svg }}
         ></div>
       </Sidebar>

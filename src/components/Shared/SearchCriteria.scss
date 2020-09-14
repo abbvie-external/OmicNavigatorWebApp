@@ -100,9 +100,13 @@
   }
 }
 
+.MultisetSvgOuter {
+  padding-left: 35px !important;
+  width: 100%;
+}
+
 #multisetAnalysisSVG {
-  max-height: 80vh !important;
-  // height: 80vh !important;
   height: 100% !important;
-  width: -webkit-fill-available !important;
+  max-height: 75vh !important;
+  width: inherit !important;
 }
