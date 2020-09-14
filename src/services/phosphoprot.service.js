@@ -11,7 +11,6 @@ class PhosphoprotService {
 
   setUrl() {
     if (process.env.NODE_ENV === 'development') {
-      console.log('we are in localhost:3000');
       window.ocpu.seturl(this.ocpuUrl);
     }
   }
@@ -37,7 +36,6 @@ class PhosphoprotService {
               if (axios.isCancel(thrown)) {
                 console.log('Request canceled', thrown.message);
               } else {
-                toast.error(`${thrown.message}`);
                 if (handleError !== undefined) {
                   handleError(false);
                 }
@@ -52,11 +50,12 @@ class PhosphoprotService {
         //     .then(response => resolve(response));
         // })
         .catch(error => {
-          toast.error(`${error.statusText}: ${error.responseText}`);
+          if (method !== 'getMetaFeaturesTable') {
+            toast.error(`${error.statusText}: ${error.responseText}`);
+          }
           if (handleError !== undefined) {
             handleError(false);
           }
-          console.log(`${error.statusText}: ${error.responseText}`);
         });
     });
   }
@@ -101,13 +100,29 @@ class PhosphoprotService {
             });
         })
         .catch(error => {
-          toast.error(`${error.statusText}: ${error.responseText}`);
+          if (method !== 'getReportLink') {
+            toast.error(`${error.statusText}: ${error.responseText}`);
+          }
           if (handleError !== undefined) {
             handleError(false);
           }
           console.log(`${error.statusText}: ${error.responseText}`);
         });
     });
+  }
+
+  async getReportLink(study, model, errorCb, cancelToken) {
+    this.setUrl();
+    const obj = { study: study, modelID: model };
+    const promise = this.ocpuDataCall(
+      'getReportLink',
+      obj,
+      errorCb,
+      null,
+      false,
+    );
+    const dataFromPromise = await promise;
+    return dataFromPromise;
   }
 
   async getResultsTable(study, model, test, errorCb, cancelToken) {

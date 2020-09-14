@@ -1,14 +1,17 @@
 import React, { Component, Fragment } from 'react';
-import { Form, Select, Icon, Button, Input } from 'semantic-ui-react';
-// import _ from 'lodash';
+import { Form, Select, Icon, Button } from 'semantic-ui-react';
+import _ from 'lodash';
 import * as d3 from 'd3';
-// import NumericExponentialInput from '../Shared/NumericExponentialInput';
+import NumericExponentialInput from '../Shared/NumericExponentialInput';
 import '../Shared/MultisetFilters.scss';
 
 class DifferentialMultisetFilters extends Component {
-  // state = {
-  //   sigValuePLocal: [0.05],
-  // };
+  constructor(props) {
+    super(props);
+    this.state = {
+      sigValuePLocal: props.sigValueP,
+    };
+  }
   componentDidMount() {
     const {
       uDataP,
@@ -39,16 +42,18 @@ class DifferentialMultisetFilters extends Component {
       sigValueP,
       selectedColP,
       selectedOperatorP,
+      multisetFiltersVisibleP,
     } = this.props;
     if (
-      uDataP !== prevProps.uDataP ||
-      uAnchorP !== prevProps.uAnchorP ||
-      uSettingsP !== prevProps.uSettingsP ||
-      metaSvgP !== prevProps.metaSvgP ||
-      sigValueP !== prevProps.sigValueP ||
-      sigValueP.length !== prevProps.sigValueP.length ||
-      selectedColP !== prevProps.selectedColP ||
-      selectedOperatorP !== prevProps.selectedOperatorP
+      multisetFiltersVisibleP &&
+      (uDataP !== prevProps.uDataP ||
+        uAnchorP !== prevProps.uAnchorP ||
+        uSettingsP !== prevProps.uSettingsP ||
+        metaSvgP !== prevProps.metaSvgP ||
+        sigValueP !== prevProps.sigValueP ||
+        sigValueP.length !== prevProps.sigValueP.length ||
+        selectedColP !== prevProps.selectedColP ||
+        selectedOperatorP !== prevProps.selectedOperatorP)
     ) {
       this.makeMultiset(
         uDataP,
@@ -813,21 +818,21 @@ class DifferentialMultisetFilters extends Component {
     this.props.onHandleDropdownChange(evt, { name, value, index });
   };
 
-  handleInputChange = (evt, { name, value, index }) => {
-    this.props.onHandleSigValuePInputChange(evt, { name, value, index });
-  };
-
-  // handleSigValuePInputChange = (value, index) => {
-  //   const uSelVPLocal = [...this.state['sigValuePLocal']];
-  //   uSelVPLocal[index] = parseFloat(value);
-  //   this.setState({
-  //     sigValuePLocal: uSelVPLocal,
-  //   });
+  // handleInputChange = (evt, { name, value, index }) => {
+  //   this.props.onHandleSigValuePInputChange(evt, { name, value, index });
   // };
 
-  // actuallyHandleSigValuePInputChange = _.debounce((value, index) => {
-  //   this.props.onHandleSigValuePInputChange('sigValueP', value, index);
-  // }, 1250);
+  handleSigValuePInputChange = (value, index) => {
+    const uSelVPLocal = [...this.state['sigValuePLocal']];
+    uSelVPLocal[index] = parseFloat(value);
+    this.setState({
+      sigValuePLocal: uSelVPLocal,
+    });
+  };
+
+  actuallyHandleSigValuePInputChange = _.debounce((value, index) => {
+    this.props.onHandleSigValuePInputChange('sigValueP', value, index);
+  }, 1250);
 
   addFilter = () => {
     this.props.onAddFilterDifferential();
@@ -842,7 +847,7 @@ class DifferentialMultisetFilters extends Component {
   };
 
   render() {
-    // const { sigValuePLocal } = this.state;
+    const { sigValuePLocal } = this.state;
     const {
       sigValueP,
       selectedOperatorP,
@@ -855,11 +860,10 @@ class DifferentialMultisetFilters extends Component {
     const indexFiltersP = uSettingsP.indexFiltersP;
     const hoveredFilter = uSettingsP.hoveredFilter;
     // const defaultSigValue = uSettingsP.defaultsigValueP;
-    // const callbackFactory = index => number => {
-    //   this.handleSigValuePInputChange(number, index);
-    //   this.actuallyHandleSigValuePInputChange(number, index);
-    // };
-
+    const callbackFactory = index => number => {
+      this.handleSigValuePInputChange(number, index);
+      this.actuallyHandleSigValuePInputChange(number, index);
+    };
     return (
       <Fragment>
         <Form className="MultisetDropdownContainer">
@@ -912,7 +916,7 @@ class DifferentialMultisetFilters extends Component {
                   width={5}
                   onChange={this.handleDropdownChange}
                 ></Form.Field>
-                <Form.Field
+                {/* <Form.Field
                   control={Input}
                   type="number"
                   step="0.01"
@@ -924,8 +928,8 @@ class DifferentialMultisetFilters extends Component {
                   value={sigValueP[index]}
                   width={5}
                   onChange={this.handleInputChange}
-                ></Form.Field>
-                {/* <Form.Field
+                ></Form.Field> */}
+                <Form.Field
                   width={4}
                   id="SignificantValueInputMultisetP"
                   key={`differentialMultiSetFiltersSignificance${index}`}
@@ -936,11 +940,11 @@ class DifferentialMultisetFilters extends Component {
                     onChange={callbackFactory(index)}
                     min={0}
                     name="sigValueP"
-                    defaultValue={parseFloat(defaultSigValue)}
+                    defaultValue={sigValueP[index]}
                     value={sigValuePLocal[index]}
                     spellcheck="false"
                   />
-                </Form.Field> */}
+                </Form.Field>
               </Form.Group>
             ))}
           </ul>

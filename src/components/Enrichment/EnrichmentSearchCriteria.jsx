@@ -15,6 +15,7 @@ import '../Shared/SearchCriteria.scss';
 import { phosphoprotService } from '../../services/phosphoprot.service';
 import EnrichmentMultisetFilters from './EnrichmentMultisetFilters';
 
+let cancelRequestGetReportLinkEnrichment = () => {};
 let cancelGetEnrichmentsTable = () => {};
 let cancelRequestMultisetEnrichmentData = () => {};
 let cancelRequestEnrichmentMultisetPlot = () => {};
@@ -94,6 +95,7 @@ class EnrichmentSearchCriteria extends Component {
     },
     // activateMultisetFilters: false,
     reloadPlot: true,
+    initialRenderE: true,
   };
 
   componentDidMount() {
@@ -135,11 +137,6 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentStudies: studies,
     });
     if (enrichmentStudy !== '') {
-      this.setState({
-        enrichmentStudyHrefVisible: true,
-        enrichmentStudyHref: `http://www.localhost:3000/${enrichmentStudy}.html`,
-      });
-
       // loop through allStudiesMetadata to find the object with the name matching enrichmentStudy
       const allStudiesMetadataCopy = [...allStudiesMetadata];
       const enrichmentStudyData = allStudiesMetadataCopy.find(
@@ -160,12 +157,11 @@ class EnrichmentSearchCriteria extends Component {
           };
         },
       );
-
       this.setState({
         enrichmentModelsDisabled: false,
         enrichmentModels: enrichmentModelsMapped,
       });
-
+      this.getReportLink(enrichmentStudy, 'default');
       if (enrichmentModel !== '') {
         this.props.onHandlePlotTypesEnrichment(enrichmentModel);
         const enrichmentModelWithAnnotations = enrichmentModelsAndAnnotationsVar.find(
@@ -196,6 +192,7 @@ class EnrichmentSearchCriteria extends Component {
           // uData: uDataMapped,
         });
         this.props.onSetAnnotationsMetadata(enrichmentAnnotationsMetadataVar);
+        this.getReportLink(enrichmentStudy, enrichmentModel);
         if (enrichmentAnnotation !== '') {
           onSearchTransitionEnrichment(true);
           phosphoprotService
@@ -239,6 +236,28 @@ class EnrichmentSearchCriteria extends Component {
     }
   };
 
+  getReportLink = (study, model) => {
+    cancelRequestGetReportLinkEnrichment();
+    let cancelToken = new CancelToken(e => {
+      cancelRequestGetReportLinkEnrichment = e;
+    });
+    phosphoprotService
+      .getReportLink(study, model, null, cancelToken)
+      .then(getReportLink => {
+        debugger;
+        const link = getReportLink.includes('http')
+          ? getReportLink
+          : `***REMOVED***/ocpu/library/${getReportLink}`;
+        this.setState({
+          enrichmentStudyHrefVisible: true,
+          enrichmentStudyHref: link,
+        });
+      })
+      .catch(error => {
+        console.error('Error during getReportLink', error);
+      });
+  };
+
   handleStudyChange = (evt, { name, value }) => {
     const { onSearchCriteriaChange, onSearchCriteriaReset } = this.props;
     onSearchCriteriaChange(
@@ -254,13 +273,13 @@ class EnrichmentSearchCriteria extends Component {
       isValidSearchEnrichment: false,
     });
     this.setState({
-      enrichmentStudyHrefVisible: true,
-      enrichmentStudyHref: `http://www.localhost:3000/${value}.html`,
+      enrichmentStudyHrefVisible: false,
       enrichmentModelsDisabled: true,
       enrichmentAnnotationsDisabled: true,
       enrichmentModelTooltip: '',
       enrichmentAnnotationTooltip: '',
     });
+    this.getReportLink(value, 'default');
   };
 
   handleModelChange = (evt, { name, value }) => {
@@ -309,6 +328,7 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentAnnotationTooltip: '',
     });
     this.props.onSetAnnotationsMetadata(enrichmentAnnotationsMetadataVar);
+    this.getReportLink(enrichmentStudy, value);
   };
 
   handleAnnotationChange = (evt, { name, value }) => {
@@ -316,9 +336,12 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentStudy,
       enrichmentModel,
       pValueType,
+      onMultisetQueriedE,
       onSearchTransitionEnrichment,
       onSearchCriteriaChange,
     } = this.props;
+    onSearchTransitionEnrichment(true);
+    onMultisetQueriedE(false);
     const enrichmentAnnotationMeta = this.props.enrichmentAnnotationsMetadata.find(
       annotation => annotation.annotationID === value,
     );
@@ -338,7 +361,6 @@ class EnrichmentSearchCriteria extends Component {
       },
       true,
     );
-    onSearchTransitionEnrichment(true);
     cancelGetEnrichmentsTable();
     let cancelToken = new CancelToken(e => {
       cancelGetEnrichmentsTable = e;
@@ -493,12 +515,13 @@ class EnrichmentSearchCriteria extends Component {
 
   handleMultisetToggle = () => {
     return evt => {
-      this.props.onSearchTransitionEnrichment(true);
       this.props.onHandleNetworkGraphReady(false);
-      this.props.onHandleEnrichmentTableLoading(true);
+
       if (this.props.multisetFiltersVisible === false) {
         // on toggle open
-        this.props.onHandleMulisetFiltersVisible(true);
+        this.props.onMultisetQueriedE(true);
+        this.props.onSearchTransitionEnrichment(true);
+        this.props.onHandleMultisetFiltersVisible(true);
         this.setState(
           {
             reloadPlot: true,
@@ -510,9 +533,11 @@ class EnrichmentSearchCriteria extends Component {
       } else {
         // on toggle close
         // this.props.onHandleNetworkTests([], []);
-        this.props.onHandleMulisetFiltersVisible(false);
+        this.props.onMultisetQueriedE(false);
+        this.props.onHandleMultisetFiltersVisible(false);
         this.setState({
           reloadPlot: false,
+          initialRenderE: true,
         });
         const enrichmentAnnotationName = 'enrichmentAnnotation';
         const enrichmentAnnotationVar = this.props.enrichmentAnnotation;
@@ -526,13 +551,15 @@ class EnrichmentSearchCriteria extends Component {
 
   handleMultisetEOpenError = () => {
     cancelRequestEnrichmentMultisetPlot();
-    this.props.onHandleMulisetFiltersVisible(false);
+    this.props.onHandleMultisetFiltersVisible(false);
+    this.props.onMultisetQueriedE(false);
     console.log('Error during getEnrichmentsIntersection');
   };
 
   handleMultisetECloseError = () => {
     this.props.onSearchTransitionEnrichment(false);
-    this.props.onHandleMulisetFiltersVisible(true);
+    this.props.onHandleMultisetFiltersVisible(true);
+    this.props.onMultisetQueriedE(true);
     this.setState(
       {
         reloadPlot: true,
@@ -591,10 +618,15 @@ class EnrichmentSearchCriteria extends Component {
     this.setState({ uSettings: uSetVP });
   };
   handleOperatorChange = (evt, { name, value, index }) => {
-    this.props.onHandleNetworkGraphReady(false);
-    // this.props.onSearchTransitionEnrichment(true);
-    this.props.onHandleEnrichmentTableLoading(true);
-    this.props.onHandleNetworkOperator(value);
+    if (
+      this.state.uSettings.must.length > 0 ||
+      this.state.uSettings.not.length > 0
+    ) {
+      this.props.onHandleNetworkGraphReady(false);
+      // this.props.onSearchTransitionEnrichment(true);
+      this.props.onHandleEnrichmentTableLoading(true);
+      this.props.onHandleNetworkOperator(value);
+    }
     const uSelVP = [...this.state[name]];
     uSelVP[index] = {
       key: value,
@@ -612,14 +644,21 @@ class EnrichmentSearchCriteria extends Component {
     );
   };
   handleSigValueEInputChange = value => {
-    this.props.onHandleNetworkGraphReady(false);
-    // this.props.onSearchTransitionEnrichment(true);
-    this.props.onHandleEnrichmentTableLoading(true);
-    this.props.onHandleNetworkSigValue(parseFloat(value));
+    if (
+      !this.state.initialRenderE &&
+      (this.state.uSettings.must.length > 0 ||
+        this.state.uSettings.not.length > 0)
+    ) {
+      this.props.onHandleNetworkGraphReady(false);
+      // this.props.onSearchTransitionEnrichment(true);
+      this.props.onHandleEnrichmentTableLoading(true);
+      this.props.onHandleNetworkSigValue(parseFloat(value));
+    }
     this.setState(
       {
         sigValue: [parseFloat(value)],
         reloadPlot: true,
+        initialRenderE: false,
       },
       function() {
         this.updateQueryData();

@@ -15,9 +15,9 @@ class SplitPanesContainer extends Component {
   state = {
     activeSVGTabIndex: 0,
     horizontalSplitPaneSize:
-      parseInt(sessionStorage.getItem('horizontalSplitPaneSize'), 10) || 250,
+      parseInt(localStorage.getItem('horizontalSplitPaneSize'), 10) || 250,
     verticalSplitPaneSize:
-      parseInt(sessionStorage.getItem('verticalSplitPaneSize'), 10) || 525,
+      parseInt(localStorage.getItem('verticalSplitPaneSize'), 10) || 525,
     activeViolinTableIndex: 0,
   };
 
@@ -219,7 +219,7 @@ class SplitPanesContainer extends Component {
         verticalSplitPaneSize: size,
       });
     }
-    sessionStorage.setItem(`${paneType}SplitPaneSize`, size);
+    localStorage.setItem(`${paneType}SplitPaneSize`, size);
   };
 
   render() {

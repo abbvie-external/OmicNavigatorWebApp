@@ -24,8 +24,7 @@ class MetafeaturesTable extends Component {
     metafeaturesTableData: [],
     filteredBarcodeData: [],
     itemsPerPageMetafeaturesTable:
-      parseInt(sessionStorage.getItem('itemsPerPageMetafeaturesTable'), 10) ||
-      60,
+      parseInt(localStorage.getItem('itemsPerPageMetafeaturesTable'), 10) || 60,
     additionalTemplateInfo: [],
   };
   metafeaturesGridRef = React.createRef();
@@ -132,7 +131,7 @@ class MetafeaturesTable extends Component {
     this.setState({
       itemsPerPageMetafeaturesTable: items,
     });
-    sessionStorage.setItem('itemsPerPageMetafeaturesTable', items);
+    localStorage.setItem('itemsPerPageMetafeaturesTable', items);
   };
 
   render() {

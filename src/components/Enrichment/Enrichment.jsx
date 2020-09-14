@@ -188,6 +188,7 @@ class Enrichment extends Component {
     enrichmentAnnotationsMetadata: [],
     enrichmentFeatureIdKey: '',
     multisetFiltersVisible: false,
+    multisetQueriedE: false,
     reloadPlot: false,
     networkSigValue: '0.05',
     networkOperator: '<',
@@ -199,7 +200,7 @@ class Enrichment extends Component {
     multisetTestsFilteredOut: [],
     enrichmentColumnsUnfiltered: [],
     itemsPerPageEnrichmentTable:
-      parseInt(sessionStorage.getItem('itemsPerPageEnrichmentTable'), 10) || 45,
+      parseInt(localStorage.getItem('itemsPerPageEnrichmentTable'), 10) || 45,
   };
   EnrichmentViewContainerRef = React.createRef();
 
@@ -369,6 +370,12 @@ class Enrichment extends Component {
     });
   };
 
+  handleMultisetQueriedE = value => {
+    this.setState({
+      multisetQueriedE: value,
+    });
+  };
+
   setStudyModelAnnotationMetadata = (studyData, modelsAndAnnotations) => {
     this.setState(
       {
@@ -387,7 +394,7 @@ class Enrichment extends Component {
     });
   };
 
-  handleMulisetFiltersVisible = bool => {
+  handleMultisetFiltersVisible = bool => {
     this.setState({ multisetFiltersVisible: bool });
   };
 
@@ -852,7 +859,7 @@ class Enrichment extends Component {
         ? this.EnrichmentViewContainerRef.current.parentElement.offsetHeight
         : 900;
     let barcodeHeight =
-      parseInt(sessionStorage.getItem('horizontalSplitPaneSize'), 10) || 250;
+      parseInt(localStorage.getItem('horizontalSplitPaneSize'), 10) || 250;
     // subtracting 120 due to menu and plot margin
     return containerHeight - barcodeHeight - 120;
   };
@@ -863,7 +870,7 @@ class Enrichment extends Component {
         ? this.EnrichmentViewContainerRef.current.parentElement.offsetWidth
         : 1200;
     let violinWidth =
-      parseInt(sessionStorage.getItem('verticalSplitPaneSize'), 10) || 525;
+      parseInt(localStorage.getItem('verticalSplitPaneSize'), 10) || 525;
     // subtracting 80 due to plot margin
     return containerWidth - violinWidth - 60;
   };
@@ -1801,7 +1808,7 @@ class Enrichment extends Component {
     this.setState({
       itemsPerPageEnrichmentTable: items,
     });
-    sessionStorage.setItem('itemsPerPageEnrichmentTable', items);
+    localStorage.setItem('itemsPerPageEnrichmentTable', items);
   };
 
   getTableAndNetworkPanes = () => {
@@ -1815,11 +1822,9 @@ class Enrichment extends Component {
       enrichmentColumns,
       additionalTemplateInfoEnrichmentTable,
       itemsPerPageEnrichmentTable,
+      multisetQueriedE,
     } = this.state;
-    // PAUL - ensure this accounts for multiset filters
-    const enrichmentCacheKey = `${enrichmentStudy}-${enrichmentModel}-${enrichmentAnnotation}`;
-    const quickViews = [];
-
+    let enrichmentCacheKey = `${enrichmentStudy}-${enrichmentModel}-${enrichmentAnnotation}-${multisetQueriedE}`;
     return [
       {
         menuItem: (
@@ -1876,8 +1881,6 @@ class Enrichment extends Component {
                     }
                     loading={this.state.isEnrichmentTableLoading}
                     exportBaseName="Enrichment_Analysis"
-                    quickViews={quickViews}
-                    // disableGeneralSearch
                     // columnReorder={this.props.columnReorder}
                     disableColumnReorder
                     disableGrouping
@@ -2084,12 +2087,13 @@ class Enrichment extends Component {
               onSearchCriteriaReset={this.hideEGrid}
               onDisablePlot={this.disablePlot}
               onGetMultisetPlot={this.handleMultisetPlot}
+              onMultisetQueriedE={this.handleMultisetQueriedE}
               onHandlePlotAnimation={this.handlePlotAnimation}
               onHandlePlotTypesEnrichment={this.handlePlotTypesEnrichment}
               onSetStudyModelAnnotationMetadata={
                 this.setStudyModelAnnotationMetadata
               }
-              onHandleMulisetFiltersVisible={this.handleMulisetFiltersVisible}
+              onHandleMultisetFiltersVisible={this.handleMultisetFiltersVisible}
               onSetAnnotationsMetadata={this.setAnnotationsMetadata}
               onHandleNetworkSigValue={this.handleNetworkSigValue}
               onHandleNetworkOperator={this.handleNetworkOperator}

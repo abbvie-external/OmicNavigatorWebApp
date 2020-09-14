@@ -80,7 +80,7 @@ class Differential extends Component {
     pngVisible: true,
     pdfVisible: false,
     svgVisible: true,
-    multisetQueried: false,
+    multisetQueriedP: false,
     activeIndexDifferentialView: this.defaultActiveIndexDifferentialView || 0,
     thresholdColsP: [],
     differentialPlotTypes: [],
@@ -91,8 +91,7 @@ class Differential extends Component {
     plotSVGHeight: null,
     isVolcanoPlotSVGLoaded: false,
     itemsPerPageDifferentialTable:
-      parseInt(sessionStorage.getItem('itemsPerPageDifferentialTable'), 10) ||
-      45,
+      parseInt(localStorage.getItem('itemsPerPageDifferentialTable'), 10) || 45,
   };
   DifferentialViewContainerRef = React.createRef();
   differentialGridRef = React.createRef();
@@ -107,7 +106,7 @@ class Differential extends Component {
     this.setState({
       itemsPerPageDifferentialTable: items,
     });
-    sessionStorage.setItem('itemsPerPageDifferentialTable', items);
+    localStorage.setItem('itemsPerPageDifferentialTable', items);
   };
 
   handleSearchTransitionDifferential = bool => {
@@ -116,9 +115,9 @@ class Differential extends Component {
     });
   };
 
-  handleMultisetQueried = value => {
+  handleMultisetQueriedP = value => {
     this.setState({
-      multisetQueried: value,
+      multisetQueriedP: value,
       // isVolcanoPlotSVGLoaded: !value,
     });
   };
@@ -702,7 +701,6 @@ class Differential extends Component {
     } else if (this.state.isItemSelected && this.state.isProteinSVGLoaded) {
       return (
         <DifferentialPlot
-          ref={this.DifferentialViewContainerRef}
           {...this.props}
           {...this.state}
           onBackToTable={this.backToTable}
@@ -740,17 +738,17 @@ class Differential extends Component {
     this.setState({
       itemsPerPageDifferentialTable: items,
     });
-    sessionStorage.setItem('itemsPerPageDifferentialTable', items);
+    localStorage.setItem('itemsPerPageDifferentialTable', items);
   };
 
   getTableAndPlotPanes = () => {
-    // const {
-    //   differentialStudy,
-    //   differentialModel,
-    //   differentialTest,
-    //   featureToHighlightInDiffTable,
-    //   multisetQueried,
-    // } = this.props;
+    const {
+      differentialStudy,
+      differentialModel,
+      differentialTest,
+      featureToHighlightInDiffTable,
+    } = this.props;
+    const { multisetQueriedP } = this.state;
 
     const {
       additionalTemplateInfoDifferentialTable,
@@ -760,17 +758,16 @@ class Differential extends Component {
       isVolcanoTableLoading,
     } = this.state;
     const differentialRows = differentialResults.length || 1000;
-    // PAUL - ensure this accounts for multiset filters
-    // let differentialCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}`;
-    // if (
-    //   featureToHighlightInDiffTable !== '' &&
-    //   featureToHighlightInDiffTable != null
-    // ) {
-    //   differentialCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-${featureToHighlightInDiffTable}`;
-    // }
-    // if (multisetQueried) {
-    // differentialCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-${multisetQueried}`;
-    // }
+    let differentialCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}`;
+    if (
+      featureToHighlightInDiffTable !== '' &&
+      featureToHighlightInDiffTable != null
+    ) {
+      differentialCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-${featureToHighlightInDiffTable}`;
+    }
+    if (multisetQueriedP) {
+      differentialCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-${multisetQueriedP}`;
+    }
     return [
       {
         menuItem: (
@@ -796,7 +793,7 @@ class Differential extends Component {
             <div id="DifferentialGrid">
               <EZGrid
                 ref={this.differentialGridRef}
-                // uniqueCacheKey={differentialCacheKey}
+                uniqueCacheKey={differentialCacheKey}
                 data={differentialResults}
                 columnsConfig={differentialColumns}
                 totalRows={differentialRows}
@@ -925,7 +922,7 @@ class Differential extends Component {
               onDisablePlot={this.disablePlot}
               onGetMultisetPlot={this.handleMultisetPlot}
               onHandlePlotAnimation={this.handlePlotAnimation}
-              onMultisetQueried={this.handleMultisetQueried}
+              onMultisetQueriedP={this.handleMultisetQueriedP}
               onSetStudyModelTestMetadata={this.setStudyModelTestMetadata}
               onSetTestsMetadata={this.setTestsMetadata}
               onHandlePlotTypesDifferential={this.handlePlotTypesDifferential}
