@@ -68,25 +68,23 @@ class DifferentialVolcanoPlot extends Component {
   };
   handleCircleHover = e => {
     const { brushing } = this.state;
-    if (!brushing) {
-      const hoveredData = {
-        id: e.target.attributes['circleid'].value,
-        xstat: e.target.attributes['xstatistic'].value,
-        ystat: e.target.attributes['ystatistic'].value,
-        position: [
-          e.target.attributes['cx'].value,
-          e.target.attributes['cy'].value,
-        ],
-      };
-      const circle = d3.select(
-        `#volcanoDataPoint-${e.target.attributes['circleid'].value}`,
-      );
-      circle.classed('hovered', true);
-      this.setState({
-        hoveredCircleData: hoveredData,
-        hovering: true,
-      });
-    }
+    const hoveredData = {
+      id: e.target.attributes['circleid'].value,
+      xstat: e.target.attributes['xstatistic'].value,
+      ystat: e.target.attributes['ystatistic'].value,
+      position: [
+        e.target.attributes['cx'].value,
+        e.target.attributes['cy'].value,
+      ],
+    };
+    const circle = d3.select(
+      `#volcanoDataPoint-${e.target.attributes['circleid'].value}`,
+    );
+    circle.classed('hovered', true);
+    this.setState({
+      hoveredCircleData: hoveredData,
+      hovering: true,
+    });
   };
   handleCircleLeave() {
     //const circles =
