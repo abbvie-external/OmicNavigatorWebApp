@@ -10,7 +10,7 @@ import {
   Transition,
 } from 'semantic-ui-react';
 import { CancelToken } from 'axios';
-// import DOMPurify from 'dompurify';
+import DOMPurify from 'dompurify';
 import '../Shared/SearchCriteria.scss';
 import { phosphoprotService } from '../../services/phosphoprot.service';
 import DifferentialMultisetFilters from './DifferentialMultisetFilters';
@@ -712,20 +712,20 @@ class DifferentialSearchCriteria extends Component {
           /<svg/g,
           '<svg preserveAspectRatio="xMinYMid meet" id="multisetAnalysisSVG"',
         );
-        // DOMPurify.addHook('afterSanitizeAttributes', function(node) {
-        //   if (
-        //     node.hasAttribute('xlink:href') &&
-        //     !node.getAttribute('xlink:href').match(/^#/)
-        //   ) {
-        //     node.remove();
-        //   }
-        // });
-        // // Clean HTML string and write into our DIV
-        // let sanitizedSVG = DOMPurify.sanitize(svgMarkup, {
-        //   ADD_TAGS: ['use'],
-        // });
-        // let svgInfo = { plotType: 'Multiset', svg: sanitizedSVG };
-        let svgInfo = { plotType: 'Multiset', svg: svgMarkup };
+        DOMPurify.addHook('afterSanitizeAttributes', function(node) {
+          if (
+            node.hasAttribute('xlink:href') &&
+            !node.getAttribute('xlink:href').match(/^#/)
+          ) {
+            node.remove();
+          }
+        });
+        // Clean HTML string and write into our DIV
+        let sanitizedSVG = DOMPurify.sanitize(svgMarkup, {
+          ADD_TAGS: ['use'],
+        });
+        let svgInfo = { plotType: 'Multiset', svg: sanitizedSVG };
+        // let svgInfo = { plotType: 'Multiset', svg: svgMarkup };
         this.props.onGetMultisetPlot({
           svgInfo,
         });
