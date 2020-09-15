@@ -8,13 +8,15 @@ import './ViolinPlot.scss';
 class ViolinPlot extends Component {
   state = {
     violinContainerHeight:
+      this.violinContainerRef?.current?.parentElement?.offsetHeight ||
       window.screen.height - this.props.horizontalSplitPaneSize - 51,
     violinHeight:
+      this.violinContainerRef?.current?.parentElement?.offsetHeight ||
       window.screen.height -
-      this.props.horizontalSplitPaneSize -
-      this.props.violinSettings.margin.top -
-      this.props.violinSettings.margin.bottom -
-      51,
+        this.props.horizontalSplitPaneSize -
+        this.props.violinSettings.margin.top -
+        this.props.violinSettings.margin.bottom -
+        51,
     violinContainerWidth: this.props.verticalSplitPaneSize,
     violinWidth:
       this.props.verticalSplitPaneSize -
@@ -28,7 +30,6 @@ class ViolinPlot extends Component {
   brushedData = [];
 
   componentDidMount() {
-    this.setDimensions();
     let resizedFn;
     window.addEventListener('resize', () => {
       clearTimeout(resizedFn);
@@ -36,19 +37,10 @@ class ViolinPlot extends Component {
         this.windowResized();
       }, 200);
     });
-    d3.select(`#svg-${this.props.violinSettings.id}`).remove();
-    d3.selectAll(`.violin-tooltip`).remove();
-    this.makeChart();
-    this.prepareData();
-    this.prepareSettings();
-    this.prepareChart();
-    this.renderViolinPlot({ showViolinPlot: true });
-    this.renderBoxPlot({});
-    this.makeBrush();
-    this.renderDataPlots({ showPlot: true });
+    this.initiateViolinPlot(true);
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps, prevState) {
     if (this.props.violinData !== prevProps.violinData) {
       // const label = this.props.violinSettings.axisLabels.xAxis;
       const label = this.props.barcodeSettings.statLabel;
@@ -62,16 +54,7 @@ class ViolinPlot extends Component {
             Object.keys(o).every(k => o[k] === currentValues[i][k]),
         );
       if (!isSame) {
-        d3.select(`#svg-${this.props.violinSettings.id}`).remove();
-        d3.selectAll(`.violin-tooltip`).remove();
-        this.makeChart();
-        this.prepareData();
-        this.prepareSettings();
-        this.prepareChart();
-        this.renderViolinPlot({ showViolinPlot: true });
-        this.renderBoxPlot({});
-        this.makeBrush();
-        this.renderDataPlots({ showPlot: true });
+        this.initiateViolinPlot(false);
       }
     }
     if (this.props.HighlightedProteins !== prevProps.HighlightedProteins) {
@@ -112,9 +95,27 @@ class ViolinPlot extends Component {
           this.maxCircle = maxDotId;
           this.addToolTiptoMax(this.props.HighlightedProteins[0]);
         }
+        // if (
+        //   this.state.violinContainerHeight !== prevState.violinContainerHeight
+        // ) {
+        //   this.createViolinPlot();
+        // }
       }
     }
   }
+
+  createViolinPlot = () => {
+    d3.select(`#svg-${this.props.violinSettings.id}`).remove();
+    d3.selectAll(`.violin-tooltip`).remove();
+    this.makeChart();
+    this.prepareData();
+    this.prepareSettings();
+    this.prepareChart();
+    this.renderViolinPlot({ showViolinPlot: true });
+    this.renderBoxPlot({});
+    this.makeBrush();
+    this.renderDataPlots({ showPlot: true });
+  };
 
   getColorFunct = colorOptions => {
     const self = this;
@@ -1621,40 +1622,40 @@ class ViolinPlot extends Component {
   };
 
   windowResized = () => {
-    d3.selectAll(`.violin-tooltip`).remove();
-    this.setDimensions();
-    this.makeChart();
-    this.prepareData();
-    this.prepareSettings();
-    this.prepareChart();
-    this.renderViolinPlot({ showViolinPlot: true });
-    this.renderBoxPlot({});
-    this.renderDataPlots({ showPlot: true });
+    this.initiateViolinPlot(true);
   };
 
-  setDimensions = () => {
+  initiateViolinPlot = resetDimensions => {
     const { violinSettings, verticalSplitPaneSize } = this.props;
     d3.select(`#svg-${violinSettings.id}`).remove();
-    // we'll want to calculate a reasonable container width based on parent container
-    // we calculate height based on the containerRef
-    const containerHeight = this.getHeight();
-    const height =
-      containerHeight -
-      violinSettings.margin.top -
-      violinSettings.margin.bottom;
+    if (resetDimensions) {
+      // we calculate height based on the containerRef
+      const containerHeight = this.getHeight();
+      const height =
+        containerHeight -
+        violinSettings.margin.top -
+        violinSettings.margin.bottom;
 
-    const containerWidth = verticalSplitPaneSize;
-    const width =
-      verticalSplitPaneSize -
-      violinSettings.margin.left -
-      violinSettings.margin.right;
+      const containerWidth = verticalSplitPaneSize;
+      const width =
+        verticalSplitPaneSize -
+        violinSettings.margin.left -
+        violinSettings.margin.right;
 
-    this.setState({
-      violinContainerHeight: containerHeight,
-      violinHeight: height,
-      violinContainerWidth: containerWidth,
-      violinWidth: width,
-    });
+      this.setState(
+        {
+          violinContainerHeight: containerHeight,
+          violinHeight: height,
+          violinContainerWidth: containerWidth,
+          violinWidth: width,
+        },
+        function() {
+          this.createViolinPlot();
+        },
+      );
+    } else {
+      this.createViolinPlot();
+    }
   };
 
   getHeight = () => {
