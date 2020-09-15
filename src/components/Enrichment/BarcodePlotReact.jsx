@@ -394,7 +394,7 @@ class BarcodePlotReact extends Component {
             // 50,
           ],
         ]);
-      }, 50);
+      }, 500);
     } else {
       // reposition the brushed rect on window resize, or horizontal pane resize
       const selectedTicks = d3.selectAll('line').filter(function() {

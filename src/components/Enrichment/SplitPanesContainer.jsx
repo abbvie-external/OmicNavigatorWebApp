@@ -108,11 +108,6 @@ class SplitPanesContainer extends Component {
           >
             <div id="" className="ViolinPlotDiv">
               {violinPlot}
-              <ViolinPlot
-                className="ViolinPlotContainer"
-                {...this.state}
-                {...this.props}
-              />
             </div>
           </Tab.Pane>
         ),

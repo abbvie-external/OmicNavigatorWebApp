@@ -7,10 +7,19 @@ import './ViolinPlot.scss';
 
 class ViolinPlot extends Component {
   state = {
-    violinContainerHeight: 0,
-    violinHeight: 0,
-    violinContainerWidth: 0,
-    violinWidth: 0,
+    violinContainerHeight:
+      window.screen.height - this.props.horizontalSplitPaneSize - 51,
+    violinHeight:
+      window.screen.height -
+      this.props.horizontalSplitPaneSize -
+      this.props.violinSettings.margin.top -
+      this.props.violinSettings.margin.bottom -
+      51,
+    violinContainerWidth: this.props.verticalSplitPaneSize,
+    violinWidth:
+      this.props.verticalSplitPaneSize -
+      this.props.violinSettings.margin.left -
+      this.props.violinSettings.margin.right,
   };
 
   chart = {};
@@ -20,13 +29,13 @@ class ViolinPlot extends Component {
 
   componentDidMount() {
     this.setDimensions();
-    // let resizedFn;
-    // window.addEventListener('resize', () => {
-    //   clearTimeout(resizedFn);
-    //   resizedFn = setTimeout(() => {
-    //     this.windowResized();
-    //   }, 200);
-    // });
+    let resizedFn;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizedFn);
+      resizedFn = setTimeout(() => {
+        this.windowResized();
+      }, 200);
+    });
     d3.select(`#svg-${this.props.violinSettings.id}`).remove();
     d3.selectAll(`.violin-tooltip`).remove();
     this.makeChart();
@@ -52,12 +61,7 @@ class ViolinPlot extends Component {
             Object.keys(o).length === Object.keys(currentValues[i]).length &&
             Object.keys(o).every(k => o[k] === currentValues[i][k]),
         );
-      if (
-        !isSame
-        // ||
-        // this.props.HighlightedProteins.sample !==
-        //   prevProps.HighlightedProteins.sample
-      ) {
+      if (!isSame) {
         d3.select(`#svg-${this.props.violinSettings.id}`).remove();
         d3.selectAll(`.violin-tooltip`).remove();
         this.makeChart();
@@ -1616,25 +1620,24 @@ class ViolinPlot extends Component {
     return self.chart;
   };
 
-  // windowResized = () => {
-  //   this.setDimensions();
-  //   d3.select(`#svg-${this.props.violinSettings.id}`).remove();
-  //   d3.selectAll(`.violin-tooltip`).remove();
-  //   this.makeChart();
-  //   this.prepareData();
-  //   this.prepareSettings();
-  //   this.prepareChart();
-  //   this.renderViolinPlot({ showViolinPlot: true });
-  //   this.renderBoxPlot({});
-  //   this.renderDataPlots({ showPlot: true });
-  // };
+  windowResized = () => {
+    d3.selectAll(`.violin-tooltip`).remove();
+    this.setDimensions();
+    this.makeChart();
+    this.prepareData();
+    this.prepareSettings();
+    this.prepareChart();
+    this.renderViolinPlot({ showViolinPlot: true });
+    this.renderBoxPlot({});
+    this.renderDataPlots({ showPlot: true });
+  };
 
   setDimensions = () => {
     const { violinSettings, verticalSplitPaneSize } = this.props;
     d3.select(`#svg-${violinSettings.id}`).remove();
     // we'll want to calculate a reasonable container width based on parent container
     // we calculate height based on the containerRef
-    const containerHeight = this.getHeight(this.props);
+    const containerHeight = this.getHeight();
     const height =
       containerHeight -
       violinSettings.margin.top -
@@ -1658,7 +1661,7 @@ class ViolinPlot extends Component {
     if (this.violinContainerRef.current !== null) {
       return this.violinContainerRef.current.parentElement.offsetHeight;
     }
-    return 600;
+    return window.screen.height - this.props.horizontalSplitPaneSize - 51;
   };
 
   render() {
