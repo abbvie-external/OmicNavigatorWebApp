@@ -11,7 +11,7 @@ class Container extends Component {
           <App />
         </HashRouter>
       );
-    }
+    } else return null;
   }
 }
 
