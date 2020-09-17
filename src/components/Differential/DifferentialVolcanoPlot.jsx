@@ -37,11 +37,12 @@ class DifferentialVolcanoPlot extends Component {
       const highlightedCircle = d3.select(`#volcanoDataPoint-${circleid}`);
       highlightedCircle.classed('highlighted', true);
     });
-    if (maxObjectData) {
-      const maxid = `${maxObjectData.key}`;
-      const maxCircle = d3.select(`#volcanoDataPoint-${maxid}`);
-      maxCircle.classed('highlightedMax', true);
-    }
+    // if (maxObjectData) {
+    //   const maxid = `${maxObjectData.key}`;
+    //   const maxCircle = d3.select(`#volcanoDataPoint-${maxid}`);
+    //   maxCircle.classed('highlightedMax', true);
+    // }
+
     // if (volcanoWidth !== prevProps.volcanoWidth) {
     //   this.setState({ resizeScalarX: volcanoWidth / prevProps.volcanoWidth });
     // }
@@ -64,7 +65,7 @@ class DifferentialVolcanoPlot extends Component {
     const circles = d3.selectAll('circle.volcanoPlot-dataPoint');
     circles.classed('selected', false);
     circles.classed('highlighted', false);
-    circles.classed('highlightedMax', true);
+    //circles.classed('highlightedMax', true);
   };
   handleCircleHover = e => {
     const { brushing } = this.state;
@@ -438,6 +439,15 @@ class DifferentialVolcanoPlot extends Component {
             0,
           )
         }
+        // onClick={
+        //   function(e){
+        //     this.props.handleRowClick(
+        //       e,
+        //       JSON.parse(e.target.attributes.data.value),
+        //       0,
+        //     )
+        //   }
+        // }
         xstatistic={`${this.doTransform(val[xAxisLabel], 'x')}`}
         ystatistic={`${this.doTransform(val[yAxisLabel], 'y')}`}
         cx={`${xScale(this.doTransform(val[xAxisLabel], 'x'))}`}

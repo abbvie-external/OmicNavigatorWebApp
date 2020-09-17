@@ -192,8 +192,8 @@ class DifferentialVolcano extends Component {
     if (item !== null && event?.target?.className !== 'ExternalSiteIcon') {
       const { identifier } = this.state;
       const { differentialFeatureIdKey, maxObjectIdentifier } = this.props;
-      // const PreviouslyHighlighted = this.props.selectedFromTableData;
-      // event.stopPropagation();
+      const PreviouslyHighlighted = this.props.selectedFromTableData;
+      event.stopPropagation();
       // MULTISELECT NOT IMPLEMENTED YET
       // if (event.shiftKey) {
       //   const allTableData = _.cloneDeep(this.state.filteredTableData);
