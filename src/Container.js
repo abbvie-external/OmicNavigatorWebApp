@@ -4,14 +4,11 @@ import App from './components/App';
 
 class Container extends Component {
   render() {
-    const isReport = window.location.pathname.includes('ocpu') ? true : false;
-    if (!isReport) {
-      return (
-        <HashRouter>
-          <App />
-        </HashRouter>
-      );
-    } else return null;
+    return (
+      <HashRouter>
+        <App />
+      </HashRouter>
+    );
   }
 }
 
