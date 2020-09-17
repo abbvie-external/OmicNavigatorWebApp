@@ -385,10 +385,6 @@ class Differential extends Component {
     imageInfo.key = `${differentialFeatureIdKey} ${featureId}`;
     let handleSVGCb = this.handleSVG;
     let currentSVGs = [];
-    let DifferentialPlotSVGSizing = `height="100%" width="inherit"`;
-    if (useVolcanoSVGSize === true) {
-      DifferentialPlotSVGSizing = `height="100%" width="auto"`;
-    }
     let handleItemSelectedCb = this.handleItemSelected;
     cancelRequestDifferentialResultsGetPlot();
     let cancelToken = new CancelToken(e => {
@@ -419,7 +415,7 @@ class Differential extends Component {
             );
             svgMarkup = svgMarkup.replace(
               /<svg/g,
-              `<svg preserveAspectRatio="xMinYMin meet" ${DifferentialPlotSVGSizing} id="currentSVG-${id}-${i}"`,
+              `<svg preserveAspectRatio="xMinYMin meet" id="currentSVG-${id}-${i}"`,
             );
             DOMPurify.addHook('afterSanitizeAttributes', function(node) {
               if (
@@ -891,8 +887,7 @@ class Differential extends Component {
           </Grid.Row>
         </Grid>
         <div
-          className="MultisetSvgSpan"
-          id="MultisetSvgOuter"
+          className="MultisetSvgOuter"
           dangerouslySetInnerHTML={{ __html: multisetPlotInfo.svg }}
         ></div>
       </Sidebar>

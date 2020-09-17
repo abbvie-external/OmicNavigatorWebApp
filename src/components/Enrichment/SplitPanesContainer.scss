@@ -165,5 +165,9 @@
     max-height: 55vh !important;
     height: 55vh !important;
     padding-right: 45px !important;
+    svg {
+      height: 100% !important;
+      width: inherit !important;
+    }
   }
 }
