@@ -153,14 +153,18 @@ class DifferentialVolcano extends Component {
         filteredTableData: volcanoPlotSelectedDataArr,
         volcanoPlotRows: volcanoPlotSelectedDataArr.length,
       });
-      const defaultMaxObject = volcanoPlotSelectedDataArr[0];
-      this.props.onSelectFromTable([
-        {
-          id: defaultMaxObject[differentialFeatureIdKey],
-          value: defaultMaxObject[maxObjectIdentifier],
-          key: defaultMaxObject[identifier],
-        },
-      ]);
+      if (volcanoPlotSelectedDataArr.length === 1) {
+        const defaultMaxObject = volcanoPlotSelectedDataArr[0];
+        this.props.onSelectFromTable([
+          {
+            id: defaultMaxObject[differentialFeatureIdKey],
+            value: defaultMaxObject[maxObjectIdentifier],
+            key: defaultMaxObject[identifier],
+          },
+        ]);
+      } else {
+        this.props.onSelectFromTable([]);
+      }
     } else {
       this.setState({
         filteredTableData: this.props.differentialResults,

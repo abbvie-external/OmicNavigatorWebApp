@@ -468,7 +468,7 @@ class Differential extends Component {
         }
       });
     } else {
-      max = maxObjectData;
+      max = null;
     }
     this.setState({
       selectedFromTableData: toHighlightArr,

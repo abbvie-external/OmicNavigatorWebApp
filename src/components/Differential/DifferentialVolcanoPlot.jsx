@@ -37,11 +37,11 @@ class DifferentialVolcanoPlot extends Component {
       const highlightedCircle = d3.select(`#volcanoDataPoint-${circleid}`);
       highlightedCircle.classed('highlighted', true);
     });
-    // if (maxObjectData) {
-    //   const maxid = `${maxObjectData.key}`;
-    //   const maxCircle = d3.select(`#volcanoDataPoint-${maxid}`);
-    //   maxCircle.classed('highlightedMax', true);
-    // }
+    if (maxObjectData) {
+      const maxid = `${maxObjectData.key}`;
+      const maxCircle = d3.select(`#volcanoDataPoint-${maxid}`);
+      maxCircle.classed('highlightedMax', true);
+    }
 
     // if (volcanoWidth !== prevProps.volcanoWidth) {
     //   this.setState({ resizeScalarX: volcanoWidth / prevProps.volcanoWidth });
