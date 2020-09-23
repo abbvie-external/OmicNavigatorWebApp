@@ -192,9 +192,9 @@ class DifferentialVolcano extends Component {
     if (item !== null && event?.target?.className !== 'ExternalSiteIcon') {
       const { identifier } = this.state;
       const { differentialFeatureIdKey, maxObjectIdentifier } = this.props;
-      // const PreviouslyHighlighted = this.props.selectedFromTableData;
+      const PreviouslyHighlighted = this.props.selectedFromTableData;
       event.stopPropagation();
-      // MULTISELECT NOT IMPLEMENTED YET
+      //MULTISELECT NOT IMPLEMENTED YET
       // if (event.shiftKey) {
       //   const allTableData = _.cloneDeep(this.state.filteredTableData);
       //   const indexMaxProtein = _.findIndex(allTableData, function(d) {
@@ -211,37 +211,38 @@ class DifferentialVolcano extends Component {
       //     };
       //   });
       //   this.props.onSelectFromTable(shiftedTableDataArray);
-      // } else if (event.ctrlKey) {
-      //   //const allTableData = _.cloneDeep(this.state.filteredTableData);
-      //   let selectedTableDataArray = [];
-      //   const alreadyHighlighted = PreviouslyHighlighted.some(
-      //     d => d.id === item[differentialFeatureIdKey],
-      //   );
-      //   // already highlighted, remove it from array
-      //   if (alreadyHighlighted) {
-      //     selectedTableDataArray = PreviouslyHighlighted.filter(
-      //       i => i.id !== item[differentialFeatureIdKey],
-      //     );
-      //     this.props.onSelectFromTable(selectedTableDataArray);
-      //   } else {
-      //     // map protein to fix obj entries
-      //     const mappedProtein = {
-      //       id: item[differentialFeatureIdKey],
-      //       value: item[maxObjectIdentifier],
-      //       key: item[identifier],
-      //     };
-      //     PreviouslyHighlighted.push(mappedProtein);
-      //     this.props.onSelectFromTable(PreviouslyHighlighted);
-      //   }
-      // } else {
-      this.props.onSelectFromTable([
-        {
-          id: item[differentialFeatureIdKey],
-          value: item[maxObjectIdentifier],
-          key: item[identifier],
-        },
-      ]);
-      // }
+      // } else
+      if (event.ctrlKey) {
+        //const allTableData = _.cloneDeep(this.state.filteredTableData);
+        let selectedTableDataArray = [];
+        const alreadyHighlighted = PreviouslyHighlighted.some(
+          d => d.id === item[differentialFeatureIdKey],
+        );
+        // already highlighted, remove it from array
+        if (alreadyHighlighted) {
+          selectedTableDataArray = PreviouslyHighlighted.filter(
+            i => i.id !== item[differentialFeatureIdKey],
+          );
+          this.props.onSelectFromTable(selectedTableDataArray);
+        } else {
+          // map protein to fix obj entries
+          const mappedProtein = {
+            id: item[differentialFeatureIdKey],
+            value: item[maxObjectIdentifier],
+            key: item[identifier],
+          };
+          PreviouslyHighlighted.push(mappedProtein);
+          this.props.onSelectFromTable(PreviouslyHighlighted);
+        }
+      } else {
+        this.props.onSelectFromTable([
+          {
+            id: item[differentialFeatureIdKey],
+            value: item[maxObjectIdentifier],
+            key: item[identifier],
+          },
+        ]);
+      }
     } else {
       this.props.onPagedToFeature();
     }

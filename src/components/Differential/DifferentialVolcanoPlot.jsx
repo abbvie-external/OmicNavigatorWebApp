@@ -36,6 +36,7 @@ class DifferentialVolcanoPlot extends Component {
       const circleid = `${element.key}`;
       const highlightedCircle = d3.select(`#volcanoDataPoint-${circleid}`);
       highlightedCircle.classed('highlighted', true);
+      highlightedCircle.raise();
     });
     if (maxObjectData) {
       const maxid = `${maxObjectData.key}`;
