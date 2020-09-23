@@ -43,7 +43,7 @@ class DifferentialVolcanoPlot extends Component {
       const maxCircle = d3.select(`#volcanoDataPoint-${maxid}`);
       maxCircle.classed('highlightedMax', true);
     }
-
+    console.log("hello");
     // if (volcanoWidth !== prevProps.volcanoWidth) {
     //   this.setState({ resizeScalarX: volcanoWidth / prevProps.volcanoWidth });
     // }
