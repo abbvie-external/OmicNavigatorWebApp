@@ -42,6 +42,7 @@ class DifferentialVolcanoPlot extends Component {
       const maxCircle = d3.select(`#volcanoDataPoint-${maxid}`);
       maxCircle.classed('highlightedMax', true);
     }
+
     // if (volcanoWidth !== prevProps.volcanoWidth) {
     //   this.setState({ resizeScalarX: volcanoWidth / prevProps.volcanoWidth });
     // }
@@ -64,29 +65,27 @@ class DifferentialVolcanoPlot extends Component {
     const circles = d3.selectAll('circle.volcanoPlot-dataPoint');
     circles.classed('selected', false);
     circles.classed('highlighted', false);
-    circles.classed('highlightedMax', true);
+    //circles.classed('highlightedMax', true);
   };
   handleCircleHover = e => {
     const { brushing } = this.state;
-    if (!brushing) {
-      const hoveredData = {
-        id: e.target.attributes['circleid'].value,
-        xstat: e.target.attributes['xstatistic'].value,
-        ystat: e.target.attributes['ystatistic'].value,
-        position: [
-          e.target.attributes['cx'].value,
-          e.target.attributes['cy'].value,
-        ],
-      };
-      const circle = d3.select(
-        `#volcanoDataPoint-${e.target.attributes['circleid'].value}`,
-      );
-      circle.classed('hovered', true);
-      this.setState({
-        hoveredCircleData: hoveredData,
-        hovering: true,
-      });
-    }
+    const hoveredData = {
+      id: e.target.attributes['circleid'].value,
+      xstat: e.target.attributes['xstatistic'].value,
+      ystat: e.target.attributes['ystatistic'].value,
+      position: [
+        e.target.attributes['cx'].value,
+        e.target.attributes['cy'].value,
+      ],
+    };
+    const circle = d3.select(
+      `#volcanoDataPoint-${e.target.attributes['circleid'].value}`,
+    );
+    circle.classed('hovered', true);
+    this.setState({
+      hoveredCircleData: hoveredData,
+      hovering: true,
+    });
   };
   handleCircleLeave() {
     //const circles =
@@ -435,6 +434,15 @@ class DifferentialVolcanoPlot extends Component {
             0,
           )
         }
+        // onClick={
+        //   function(e){
+        //     this.props.handleRowClick(
+        //       e,
+        //       JSON.parse(e.target.attributes.data.value),
+        //       0,
+        //     )
+        //   }
+        // }
         xstatistic={`${this.doTransform(val[xAxisLabel], 'x')}`}
         ystatistic={`${this.doTransform(val[yAxisLabel], 'y')}`}
         cx={`${xScale(this.doTransform(val[xAxisLabel], 'x'))}`}
