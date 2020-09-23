@@ -83,19 +83,23 @@ class Tabs extends Component {
   };
 
   handleTabChange = (e, { activeIndex }) => {
-    let newTab = activeIndex === 2 ? 'differential' : 'enrichment';
-    this.setState({
-      tab: newTab,
-    });
-    updateUrl(
-      this.props,
-      this.state,
-      null,
-      'tabChange',
-      this.setTabIndex,
-      false,
-      null,
-    );
+    if (activeIndex !== this.state.activeIndex) {
+      let newTab = activeIndex === 1 ? 'differential' : 'enrichment';
+      this.setState({
+        tab: newTab,
+      });
+      updateUrl(
+        this.props,
+        this.state,
+        null,
+        'tabChange',
+        this.setTabIndex,
+        false,
+        null,
+      );
+    } else {
+      return;
+    }
   };
 
   handleSearchCriteriaToTop = (changes, tab) => {
