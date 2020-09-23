@@ -79,6 +79,7 @@ class ViolinPlot extends Component {
             .duration(100)
             .attr('fill', 'var(--color-primary-gradient)')
             .attr('r', dOpts.pointSize * 1.5);
+          d3.select(`#violin_${highlightedDotId}`).raise();
         });
         // if max protein exists, get id
         if (
