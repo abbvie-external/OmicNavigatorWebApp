@@ -10,11 +10,12 @@ import {
   Button,
 } from 'semantic-ui-react';
 import { CancelToken } from 'axios';
-// import DOMPurify from 'dompurify';
+import DOMPurify from 'dompurify';
 import '../Shared/SearchCriteria.scss';
 import { phosphoprotService } from '../../services/phosphoprot.service';
 import EnrichmentMultisetFilters from './EnrichmentMultisetFilters';
 
+let cancelRequestGetReportLinkEnrichment = () => {};
 let cancelGetEnrichmentsTable = () => {};
 let cancelRequestMultisetEnrichmentData = () => {};
 let cancelRequestEnrichmentMultisetPlot = () => {};
@@ -136,11 +137,6 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentStudies: studies,
     });
     if (enrichmentStudy !== '') {
-      this.setState({
-        enrichmentStudyHrefVisible: true,
-        enrichmentStudyHref: `http://www.localhost:3000/${enrichmentStudy}.html`,
-      });
-
       // loop through allStudiesMetadata to find the object with the name matching enrichmentStudy
       const allStudiesMetadataCopy = [...allStudiesMetadata];
       const enrichmentStudyData = allStudiesMetadataCopy.find(
@@ -161,12 +157,11 @@ class EnrichmentSearchCriteria extends Component {
           };
         },
       );
-
       this.setState({
         enrichmentModelsDisabled: false,
         enrichmentModels: enrichmentModelsMapped,
       });
-
+      this.getReportLink(enrichmentStudy, 'default');
       if (enrichmentModel !== '') {
         this.props.onHandlePlotTypesEnrichment(enrichmentModel);
         const enrichmentModelWithAnnotations = enrichmentModelsAndAnnotationsVar.find(
@@ -197,6 +192,7 @@ class EnrichmentSearchCriteria extends Component {
           // uData: uDataMapped,
         });
         this.props.onSetAnnotationsMetadata(enrichmentAnnotationsMetadataVar);
+        this.getReportLink(enrichmentStudy, enrichmentModel);
         if (enrichmentAnnotation !== '') {
           onSearchTransitionEnrichment(true);
           phosphoprotService
@@ -240,6 +236,28 @@ class EnrichmentSearchCriteria extends Component {
     }
   };
 
+  getReportLink = (study, model) => {
+    cancelRequestGetReportLinkEnrichment();
+    let cancelToken = new CancelToken(e => {
+      cancelRequestGetReportLinkEnrichment = e;
+    });
+    phosphoprotService
+      .getReportLink(study, model, null, cancelToken)
+      .then(getReportLink => {
+        const link = getReportLink.includes('http')
+          ? getReportLink
+          : // : `***REMOVED***/ocpu/library/${getReportLink}`;
+            `${this.props.baseUrl}/ocpu/library/${getReportLink}`;
+        this.setState({
+          enrichmentStudyHrefVisible: true,
+          enrichmentStudyHref: link,
+        });
+      })
+      .catch(error => {
+        console.error('Error during getReportLink', error);
+      });
+  };
+
   handleStudyChange = (evt, { name, value }) => {
     const { onSearchCriteriaChange, onSearchCriteriaReset } = this.props;
     onSearchCriteriaChange(
@@ -255,13 +273,13 @@ class EnrichmentSearchCriteria extends Component {
       isValidSearchEnrichment: false,
     });
     this.setState({
-      enrichmentStudyHrefVisible: true,
-      enrichmentStudyHref: `http://www.localhost:3000/${value}.html`,
+      enrichmentStudyHrefVisible: false,
       enrichmentModelsDisabled: true,
       enrichmentAnnotationsDisabled: true,
       enrichmentModelTooltip: '',
       enrichmentAnnotationTooltip: '',
     });
+    this.getReportLink(value, 'default');
   };
 
   handleModelChange = (evt, { name, value }) => {
@@ -310,6 +328,7 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentAnnotationTooltip: '',
     });
     this.props.onSetAnnotationsMetadata(enrichmentAnnotationsMetadataVar);
+    this.getReportLink(enrichmentStudy, value);
   };
 
   handleAnnotationChange = (evt, { name, value }) => {
@@ -805,22 +824,22 @@ class EnrichmentSearchCriteria extends Component {
           // );
           svgMarkup = svgMarkup.replace(
             /<svg/g,
-            '<svg preserveAspectRatio="xMinYMid meet" height="100%" width="inherit" id="multisetAnalysisSVG"',
+            '<svg preserveAspectRatio="xMinYMid meet" id="multisetAnalysisSVG"',
           );
-          // DOMPurify.addHook('afterSanitizeAttributes', function(node) {
-          //   if (
-          //     node.hasAttribute('xlink:href') &&
-          //     !node.getAttribute('xlink:href').match(/^#/)
-          //   ) {
-          //     node.remove();
-          //   }
-          // });
-          // // Clean HTML string and write into our DIV
-          // let sanitizedSVG = DOMPurify.sanitize(svgMarkup, {
-          //   ADD_TAGS: ['use'],
-          // });
-          // let svgInfo = { plotType: 'Multiset', svg: sanitizedSVG };
-          let svgInfo = { plotType: 'Multiset', svg: svgMarkup };
+          DOMPurify.addHook('afterSanitizeAttributes', function(node) {
+            if (
+              node.hasAttribute('xlink:href') &&
+              !node.getAttribute('xlink:href').match(/^#/)
+            ) {
+              node.remove();
+            }
+          });
+          // Clean HTML string and write into our DIV
+          let sanitizedSVG = DOMPurify.sanitize(svgMarkup, {
+            ADD_TAGS: ['use'],
+          });
+          let svgInfo = { plotType: 'Multiset', svg: sanitizedSVG };
+          // let svgInfo = { plotType: 'Multiset', svg: svgMarkup };
           this.props.onGetMultisetPlot({
             svgInfo,
           });
@@ -906,7 +925,7 @@ class EnrichmentSearchCriteria extends Component {
           basic
           inverted
           position="bottom center"
-          content="Select a study to view Analysis Details"
+          content="Select a study and model to view Analysis Details"
         />
       );
     }

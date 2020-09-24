@@ -84,8 +84,7 @@ class Differential extends Component {
     plotSVGHeight: null,
     isVolcanoPlotSVGLoaded: false,
     itemsPerPageDifferentialTable:
-      parseInt(sessionStorage.getItem('itemsPerPageDifferentialTable'), 10) ||
-      45,
+      parseInt(localStorage.getItem('itemsPerPageDifferentialTable'), 10) || 45,
   };
   DifferentialViewContainerRef = React.createRef();
   differentialGridRef = React.createRef();
@@ -100,7 +99,7 @@ class Differential extends Component {
     this.setState({
       itemsPerPageDifferentialTable: items,
     });
-    sessionStorage.setItem('itemsPerPageDifferentialTable', items);
+    localStorage.setItem('itemsPerPageDifferentialTable', items);
   };
 
   handleSearchTransitionDifferential = bool => {
@@ -382,10 +381,6 @@ class Differential extends Component {
     imageInfo.key = `${differentialFeatureIdKey} ${featureId}`;
     let handleSVGCb = this.handleSVG;
     let currentSVGs = [];
-    let DifferentialPlotSVGSizing = `height="100%" width="inherit"`;
-    if (useVolcanoSVGSize === true) {
-      DifferentialPlotSVGSizing = `height="100%" width="auto"`;
-    }
     let handleItemSelectedCb = this.handleItemSelected;
     cancelRequestDifferentialResultsGetPlot();
     let cancelToken = new CancelToken(e => {
@@ -416,7 +411,7 @@ class Differential extends Component {
             );
             svgMarkup = svgMarkup.replace(
               /<svg/g,
-              `<svg preserveAspectRatio="xMinYMin meet" ${DifferentialPlotSVGSizing} id="currentSVG-${id}-${i}"`,
+              `<svg preserveAspectRatio="xMinYMin meet" id="currentSVG-${id}-${i}"`,
             );
             DOMPurify.addHook('afterSanitizeAttributes', function(node) {
               if (
@@ -469,7 +464,7 @@ class Differential extends Component {
         }
       });
     } else {
-      max = maxObjectData;
+      max = null;
     }
     this.setState({
       selectedFromTableData: toHighlightArr,
@@ -698,7 +693,6 @@ class Differential extends Component {
     } else if (this.state.isItemSelected && this.state.isProteinSVGLoaded) {
       return (
         <DifferentialPlot
-          ref={this.DifferentialViewContainerRef}
           {...this.props}
           {...this.state}
           onBackToTable={this.backToTable}
@@ -736,7 +730,7 @@ class Differential extends Component {
     this.setState({
       itemsPerPageDifferentialTable: items,
     });
-    sessionStorage.setItem('itemsPerPageDifferentialTable', items);
+    localStorage.setItem('itemsPerPageDifferentialTable', items);
   };
 
   getTableAndPlotPanes = () => {
@@ -905,8 +899,7 @@ class Differential extends Component {
           </Grid.Row>
         </Grid>
         <div
-          className="MultisetSvgSpan"
-          id="MultisetSvgOuter"
+          className="MultisetSvgOuter"
           dangerouslySetInnerHTML={{ __html: multisetPlotInfo.svg }}
         ></div>
       </Sidebar>

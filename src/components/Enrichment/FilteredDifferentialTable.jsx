@@ -28,7 +28,7 @@ class FilteredDifferentialTable extends Component {
     filteredBarcodeData: [],
     itemsPerPageFilteredDifferentialTable:
       parseInt(
-        sessionStorage.getItem('itemsPerPageFilteredDifferentialTable'),
+        localStorage.getItem('itemsPerPageFilteredDifferentialTable'),
         10,
       ) || 15,
     filteredTableLoading: true,
@@ -354,7 +354,7 @@ class FilteredDifferentialTable extends Component {
     this.setState({
       itemsPerPageFilteredDifferentialTable: items,
     });
-    sessionStorage.setItem('itemsPerPageFilteredDifferentialTable', items);
+    localStorage.setItem('itemsPerPageFilteredDifferentialTable', items);
   };
 
   handleRowClick = (event, item, index) => {

@@ -10,11 +10,12 @@ import {
   Transition,
 } from 'semantic-ui-react';
 import { CancelToken } from 'axios';
-// import DOMPurify from 'dompurify';
+import DOMPurify from 'dompurify';
 import '../Shared/SearchCriteria.scss';
 import { phosphoprotService } from '../../services/phosphoprot.service';
 import DifferentialMultisetFilters from './DifferentialMultisetFilters';
 
+let cancelRequestGetReportLinkDifferential = () => {};
 let cancelRequestPSCGetResultsTable = () => {};
 let cancelRequestMultisetInferenceData = () => {};
 let cancelRequestInferenceMultisetPlot = () => {};
@@ -130,11 +131,6 @@ class DifferentialSearchCriteria extends Component {
       differentialStudies: studies,
     });
     if (differentialStudy !== '') {
-      this.setState({
-        differentialStudyHrefVisible: true,
-        differentialStudyHref: `http://www.localhost:3000/${differentialStudy}.html`,
-      });
-
       // loop through allStudiesMetadata to find the object with the name matching differentialStudy
       const allStudiesMetadataCopy = [...allStudiesMetadata];
       const differentialStudyData = allStudiesMetadataCopy.find(
@@ -160,6 +156,7 @@ class DifferentialSearchCriteria extends Component {
         differentialModelsDisabled: false,
         differentialModels: differentialModelsMapped,
       });
+      this.getReportLink(differentialStudy, 'default');
       if (differentialModel !== '') {
         this.props.onHandlePlotTypesDifferential(differentialModel);
         const differentialModelWithTests = differentialModelsAndTestsVar.find(
@@ -188,6 +185,7 @@ class DifferentialSearchCriteria extends Component {
           uDataP: uDataPMapped,
         });
         this.props.onSetTestsMetadata(differentialTestsMetadataVar);
+        this.getReportLink(differentialStudy, differentialModel);
         if (differentialTest !== '') {
           onSearchTransitionDifferential(true);
           phosphoprotService
@@ -248,13 +246,35 @@ class DifferentialSearchCriteria extends Component {
       isValidSearchDifferential: false,
     });
     this.setState({
-      differentialStudyHrefVisible: true,
-      differentialStudyHref: `http://www.localhost:3000/${value}.html`,
+      differentialStudyHrefVisible: false,
       differentialModelsDisabled: true,
       differentialTestsDisabled: true,
       differentialModelTooltip: '',
       differentialTestTooltip: '',
     });
+    this.getReportLink(value, 'default');
+  };
+
+  getReportLink = (study, model) => {
+    cancelRequestGetReportLinkDifferential();
+    let cancelToken = new CancelToken(e => {
+      cancelRequestGetReportLinkDifferential = e;
+    });
+    phosphoprotService
+      .getReportLink(study, model, null, cancelToken)
+      .then(getReportLink => {
+        const link = getReportLink.includes('http')
+          ? getReportLink
+          : // : `***REMOVED***/ocpu/library/${getReportLink}`;
+            `${this.props.baseUrl}/ocpu/library/${getReportLink}`;
+        this.setState({
+          differentialStudyHrefVisible: true,
+          differentialStudyHref: link,
+        });
+      })
+      .catch(error => {
+        console.error('Error during getReportLink', error);
+      });
   };
 
   handleModelChange = (evt, { name, value }) => {
@@ -300,6 +320,7 @@ class DifferentialSearchCriteria extends Component {
       differentialTestTooltip: '',
     });
     this.props.onSetTestsMetadata(differentialTestsMetadataVar);
+    this.getReportLink(differentialStudy, value);
   };
 
   handleTestChange = (evt, { name, value }) => {
@@ -689,22 +710,22 @@ class DifferentialSearchCriteria extends Component {
         let svgMarkup = svgMarkupRaw.data;
         svgMarkup = svgMarkup.replace(
           /<svg/g,
-          '<svg preserveAspectRatio="xMinYMid meet" height="100%" width="inherit" id="multisetAnalysisSVG"',
+          '<svg preserveAspectRatio="xMinYMid meet" id="multisetAnalysisSVG"',
         );
-        // DOMPurify.addHook('afterSanitizeAttributes', function(node) {
-        //   if (
-        //     node.hasAttribute('xlink:href') &&
-        //     !node.getAttribute('xlink:href').match(/^#/)
-        //   ) {
-        //     node.remove();
-        //   }
-        // });
-        // // Clean HTML string and write into our DIV
-        // let sanitizedSVG = DOMPurify.sanitize(svgMarkup, {
-        //   ADD_TAGS: ['use'],
-        // });
-        // let svgInfo = { plotType: 'Multiset', svg: sanitizedSVG };
-        let svgInfo = { plotType: 'Multiset', svg: svgMarkup };
+        DOMPurify.addHook('afterSanitizeAttributes', function(node) {
+          if (
+            node.hasAttribute('xlink:href') &&
+            !node.getAttribute('xlink:href').match(/^#/)
+          ) {
+            node.remove();
+          }
+        });
+        // Clean HTML string and write into our DIV
+        let sanitizedSVG = DOMPurify.sanitize(svgMarkup, {
+          ADD_TAGS: ['use'],
+        });
+        let svgInfo = { plotType: 'Multiset', svg: sanitizedSVG };
+        // let svgInfo = { plotType: 'Multiset', svg: svgMarkup };
         this.props.onGetMultisetPlot({
           svgInfo,
         });
@@ -791,7 +812,7 @@ class DifferentialSearchCriteria extends Component {
           inverted
           className="CustomTooltip"
           position="bottom center"
-          content="Select a study to view Analysis Details"
+          content="Select a study and model to view Analysis Details"
           mouseEnterDelay={0}
           mouseLeaveDelay={0}
         />

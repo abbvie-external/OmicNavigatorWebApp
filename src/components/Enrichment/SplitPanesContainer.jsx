@@ -15,9 +15,9 @@ class SplitPanesContainer extends Component {
   state = {
     activeSVGTabIndex: 0,
     horizontalSplitPaneSize:
-      parseInt(sessionStorage.getItem('horizontalSplitPaneSize'), 10) || 250,
+      parseInt(localStorage.getItem('horizontalSplitPaneSize'), 10) || 250,
     verticalSplitPaneSize:
-      parseInt(sessionStorage.getItem('verticalSplitPaneSize'), 10) || 525,
+      parseInt(localStorage.getItem('verticalSplitPaneSize'), 10) || 525,
     activeViolinTableIndex: 0,
   };
 
@@ -108,11 +108,6 @@ class SplitPanesContainer extends Component {
           >
             <div id="" className="ViolinPlotDiv">
               {violinPlot}
-              <ViolinPlot
-                className="ViolinPlotContainer"
-                {...this.state}
-                {...this.props}
-              />
             </div>
           </Tab.Pane>
         ),
@@ -219,7 +214,7 @@ class SplitPanesContainer extends Component {
         verticalSplitPaneSize: size,
       });
     }
-    sessionStorage.setItem(`${paneType}SplitPaneSize`, size);
+    localStorage.setItem(`${paneType}SplitPaneSize`, size);
   };
 
   render() {
@@ -249,7 +244,7 @@ class SplitPanesContainer extends Component {
               <SplitPane
                 className="ThreePlotsDiv SplitPanesWrapper"
                 split="horizontal"
-                defaultSize={this.state.horizontalSplitPaneSize}
+                size={this.state.horizontalSplitPaneSize}
                 minSize={150}
                 maxSize={400}
                 onDragFinished={size =>
@@ -263,9 +258,9 @@ class SplitPanesContainer extends Component {
                 <SplitPane
                   className="BottomSplitPaneContainer"
                   split="vertical"
-                  defaultSize={this.state.verticalSplitPaneSize}
+                  size={this.state.verticalSplitPaneSize}
                   minSize={315}
-                  maxSize={800}
+                  maxSize={1300}
                   onDragFinished={size =>
                     this.splitPaneResized(size, 'vertical')
                   }

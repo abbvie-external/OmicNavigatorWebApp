@@ -55,7 +55,8 @@ class ButtonActions extends Component {
       });
     } else {
       const currentContentContainer =
-        document.getElementById('PlotSVG') || null;
+        document.getElementById('PlotSVG') ||
+        document.getElementById('DifferentialPlotTabsPlotSVG');
       const ProteinPlotName = this.props.imageInfo
         ? `${this.props.imageInfo?.title} - ${
             this.props.imageInfo?.svg[this.props.activeSVGTabIndex]?.plotType
@@ -87,7 +88,8 @@ class ButtonActions extends Component {
       pdfService.convertToPdf(currentSVG);
     } else {
       const currentContentContainer =
-        document.getElementById('PlotSVG') || null;
+        document.getElementById('PlotSVG') ||
+        document.getElementById('DifferentialPlotTabsPlotSVG');
       const currentSVG =
         currentContentContainer.getElementsByTagName('svg')[0] || null;
       pdfService.createPDF(currentSVG);
@@ -107,7 +109,8 @@ class ButtonActions extends Component {
         this.props.imageInfo.svg[this.props.activeSVGTabIndex].plotType
       }.svg`;
       const currentContentContainer =
-        document.getElementById('PlotSVG') || null;
+        document.getElementById('PlotSVG') ||
+        document.getElementById('DifferentialPlotTabsPlotSVG');
       const currentSVG =
         currentContentContainer.getElementsByTagName('svg')[0] || null;
       this.exportSVG(currentSVG, ProteinPlotName);

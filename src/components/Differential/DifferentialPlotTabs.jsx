@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Tab } from 'semantic-ui-react';
 import { phosphoprotService } from '../../services/phosphoprot.service';
+import { toast } from 'react-toastify';
 // import ButtonActions from '../Shared/ButtonActions';
 import MetafeaturesTable from './MetafeaturesTable';
 // import * as d3 from 'd3';
@@ -14,38 +15,78 @@ class SVGPlot extends Component {
   };
 
   componentDidMount() {
-    phosphoprotService
-      .getMetaFeaturesTable(
-        this.props.differentialStudy,
-        this.props.differentialModel,
-        this.props.differentialFeature,
-        this.handleGetMetaFeaturesTableError,
-      )
-      .then(getMetaFeaturesTableResponseData => {
-        const metafeaturesData =
-          getMetaFeaturesTableResponseData.length > 0
-            ? getMetaFeaturesTableResponseData
-            : [];
-        this.setState({
-          metafeaturesData: metafeaturesData,
-          // areDifferentialPlotTabsReady: true,
+    const {
+      differentialStudy,
+      differentialModel,
+      differentialFeature,
+    } = this.props;
+    const modelSpecificMetaFeaturesExist =
+      sessionStorage.getItem(
+        `${differentialStudy}-${differentialModel}-MetaFeaturesExist`,
+      ) || true;
+    const featureidSpecificMetaFeaturesExist =
+      sessionStorage.getItem(
+        `${differentialStudy}-${differentialFeature}-MetaFeaturesExist`,
+      ) || true;
+    if (
+      JSON.parse(modelSpecificMetaFeaturesExist) &&
+      JSON.parse(featureidSpecificMetaFeaturesExist)
+    ) {
+      phosphoprotService
+        .getMetaFeaturesTable(
+          this.props.differentialStudy,
+          differentialModel,
+          'test',
+          this.handleGetMetaFeaturesTableError,
+        )
+        .then(getMetaFeaturesTableResponseData => {
+          const metafeaturesData =
+            getMetaFeaturesTableResponseData.length > 0
+              ? getMetaFeaturesTableResponseData
+              : [];
+          if (getMetaFeaturesTableResponseData.length === 0) {
+            sessionStorage.setItem(
+              `${differentialStudy}-${differentialFeature}-MetaFeaturesExist`,
+              false,
+            );
+            toast.error(
+              `Feature ${differentialFeature} does not have any feature data.`,
+            );
+          }
+          this.setState({
+            metafeaturesData: metafeaturesData,
+            // areDifferentialPlotTabsReady: true,
+          });
+        })
+        .catch(error => {
+          console.error('Error during getEnrichmentNetwork', error);
         });
-      })
-      .catch(error => {
-        console.error('Error during getEnrichmentNetwork', error);
+      // .finally(() => {
+      //   this.setState({
+      //     areDifferentialPlotTabsReady: true,
+      //   });
+      // });
+    }
+    if (JSON.parse(!featureidSpecificMetaFeaturesExist)) {
+      // toast.error(
+      //   `Feature ${differentialFeature} does not have any feature data.`,
+      // );
+      this.setState({
+        metafeaturesData: [],
       });
-    // .finally(() => {
-    //   this.setState({
-    //     areDifferentialPlotTabsReady: true,
-    //   });
-    // });
+    }
   }
 
-  // handleGetMetaFeaturesTableError = () => {
-  //   this.setState({
-  //     areDifferentialPlotTabsReady: true,
-  //   });
-  // };
+  handleGetMetaFeaturesTableError = () => {
+    const { differentialStudy, differentialModel } = this.props;
+    sessionStorage.setItem(
+      `${differentialStudy}-${differentialModel}-MetaFeaturesExist`,
+      false,
+    );
+    this.setState({
+      areDifferentialPlotTabsReady: true,
+    });
+  };
 
   handleTabChange = (e, { activeIndex }) => {
     this.props.onDifferentialPlotTableChange(activeIndex);
@@ -72,19 +113,17 @@ class SVGPlot extends Component {
       });
       panes = panes.concat(svgPanes);
     }
-    if (this.state.metafeaturesData.length !== 0) {
-      let metafeaturesTab = [
-        {
-          menuItem: 'Feature Data',
-          render: () => (
-            <Tab.Pane attached="true" as="div">
-              <MetafeaturesTable {...this.state} {...this.props} />
-            </Tab.Pane>
-          ),
-        },
-      ];
-      panes = panes.concat(metafeaturesTab);
-    }
+    let metafeaturesTab = [
+      {
+        menuItem: 'Feature Data',
+        render: () => (
+          <Tab.Pane attached="true" as="div">
+            <MetafeaturesTable {...this.state} {...this.props} />
+          </Tab.Pane>
+        ),
+      },
+    ];
+    panes = panes.concat(metafeaturesTab);
     return (
       <Tab
         menu={{ secondary: true, pointing: true, className: 'SVGDiv' }}
