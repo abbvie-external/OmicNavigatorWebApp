@@ -17,7 +17,7 @@ class BarcodePlotReact extends Component {
     tooltipPosition: null,
     tooltipTextAnchor: 'start',
     settings: {
-      brushing: false,
+      // brushing: false,
       bottomLabel: '',
       barcodeHeight: 0,
       id: 'chart-barcode',
@@ -50,22 +50,21 @@ class BarcodePlotReact extends Component {
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
-    const self = this;
     if (
-      self.props.horizontalSplitPaneSize !== prevProps.horizontalSplitPaneSize
+      this.props.horizontalSplitPaneSize !== prevProps.horizontalSplitPaneSize
     ) {
       this.setWidth(false);
     }
     // Much of this code can be refactored into a function, as it is used below.
-    if (self.props.HighlightedProteins !== prevProps.HighlightedProteins) {
+    if (this.props.HighlightedProteins !== prevProps.HighlightedProteins) {
       d3.selectAll(`.MaxLine`)
-        .attr('y1', self.state.settings.margin.selected)
+        .attr('y1', this.state.settings.margin.selected)
         .classed('MaxLine', false);
       d3.selectAll(`.HighlightedLine`)
-        .attr('y1', self.state.settings.margin.selected)
+        .attr('y1', this.state.settings.margin.selected)
         .classed('HighlightedLine', false);
-      if (self.props.HighlightedProteins.length > 0) {
-        const HighlightedProteins = self.props.HighlightedProteins.slice(1);
+      if (this.props.HighlightedProteins.length > 0) {
+        const HighlightedProteins = this.props.HighlightedProteins.slice(1);
         HighlightedProteins.forEach(element => {
           // const lineId = `${element.sample.replace(/;/g, '')}_${
           //   element.featureID
@@ -74,14 +73,14 @@ class BarcodePlotReact extends Component {
           const highlightedLine = d3.select(`#barcode-line-${lineId}`);
           highlightedLine
             .classed('HighlightedLine', true)
-            .attr('y1', self.state.settings.margin.highlighted);
+            .attr('y1', this.state.settings.margin.highlighted);
         });
-        if (self.props.HighlightedProteins[0]?.featureID !== '') {
-          const maxLineId = `${self.props.HighlightedProteins[0]?.featureID}`;
+        if (this.props.HighlightedProteins[0]?.featureID !== '') {
+          const maxLineId = `${this.props.HighlightedProteins[0]?.featureID}`;
           const maxLine = d3.select(`#barcode-line-${maxLineId}`);
           maxLine
             .classed('MaxLine', true)
-            .attr('y1', self.state.settings.margin.max);
+            .attr('y1', this.state.settings.margin.max);
           const maxLineData = {
             x2: maxLine?.attr('x2') || null,
             featureID: maxLine?.attr('featureid') || null,
@@ -91,12 +90,12 @@ class BarcodePlotReact extends Component {
           };
           const statistic = maxLineData.statistic;
           const textAnchor =
-            statistic > self.props.barcodeSettings.highStat / 2
+            statistic > this.props.barcodeSettings.highStat / 2
               ? 'end'
               : 'start';
           const ttPosition =
             textAnchor === 'end' ? maxLineData.x2 - 5 : maxLineData.x2 + 5;
-          self.setState({
+          this.setState({
             hoveredLineId: null,
             hoveredLineName: null,
             highlightedLineName: maxLineData.lineID,
@@ -152,12 +151,12 @@ class BarcodePlotReact extends Component {
       brushedData: [],
     });
     this.props.onHandleProteinSelected([]);
-    this.setState({
-      settings: {
-        ...this.state.settings,
-        brushing: false,
-      },
-    });
+    // this.setState({
+    //   settings: {
+    //     ...this.state.settings,
+    //     brushing: false,
+    //   },
+    // });
   };
 
   handleLineEnter = event => {
@@ -254,11 +253,12 @@ class BarcodePlotReact extends Component {
     let objsBrush = {};
 
     const brushingStart = function() {
+      console.log(d3.event);
       self.setState({
-        settings: {
-          ...self.state.settings,
-          brushing: true,
-        },
+        // settings: {
+        //   ...self.state.settings,
+        //   brushing: true,
+        // },
         highlightedLineName: null,
         hoveredLineId: null,
         hoveredLineName: null,
@@ -271,8 +271,8 @@ class BarcodePlotReact extends Component {
       if (d3.event.selection != null) {
         const brushedLines = d3.brushSelection(this);
         const isBrushed = function(brushedLines, x) {
-          const xMin = brushedLines[0][0];
-          const xMax = brushedLines[1][0];
+          const xMin = brushedLines[0];
+          const xMax = brushedLines[1];
           const brushTest = xMin <= x && x <= xMax;
           return brushTest;
         };
@@ -365,10 +365,11 @@ class BarcodePlotReact extends Component {
     }
 
     objsBrush = d3
-      .brush()
+      .brushX()
       .extent([
         [settings.margin.left + 4, 0],
         [barcodeWidth + 15, barcodeHeight],
+        // [barcodeWidth + 15, Math.round(barcodeHeight * 0.33)],
       ])
       .on('start', brushingStart)
       .on('brush', highlightBrushedLines)
@@ -384,35 +385,26 @@ class BarcodePlotReact extends Component {
         return d3.select(this).attr('id');
       });
       const quartile = Math.round(quartileTicks.nodes().length * 0.25);
-      console.log(Math.round(barcodeHeight * 0.33));
       setTimeout(function() {
         d3.select('.brush').call([objsBrush][0].move, [
-          [quartileTicks.nodes()[quartile].getAttribute('x1'), 0],
-          [
-            quartileTicks.nodes()[0].getAttribute('x1'),
-            Math.round(barcodeHeight * 0.33),
-            // 50,
-          ],
+          quartileTicks.nodes()[quartile].getAttribute('x1'),
+          quartileTicks.nodes()[0].getAttribute('x1'),
         ]);
       }, 500);
+      d3.select('.overlay').remove();
     } else {
       // reposition the brushed rect on window resize, or horizontal pane resize
       const selectedTicks = d3.selectAll('line').filter(function() {
         return d3.select(this).classed('selected');
       });
-
       const highestTickIndex = selectedTicks.nodes().length - 1;
-      console.log(Math.round(barcodeHeight * 0.33));
       if (highestTickIndex >= 0) {
         d3.select('.brush').call([objsBrush][0].move, [
-          [selectedTicks.nodes()[highestTickIndex].getAttribute('x1'), 0],
-          [
-            selectedTicks.nodes()[0].getAttribute('x1'),
-            Math.round(barcodeHeight * 0.33),
-            // 50,
-          ],
+          selectedTicks.nodes()[highestTickIndex].getAttribute('x1'),
+          selectedTicks.nodes()[0].getAttribute('x1'),
         ]);
       }
+      d3.select('.overlay').remove();
     }
     // d3.selectAll(this.barcodeSVGRef.current).call(objsBrush);
     // const brushed = d3.selectAll('.selected');
@@ -548,7 +540,7 @@ class BarcodePlotReact extends Component {
         lineid={d.featureDisplay}
         logfc={d.logFoldChange}
         statistic={d.statistic}
-        onClick={e => this.handleSVGClick(e)}
+        // onClick={e => this.handleSVGClick(e)}
         onMouseEnter={e => this.handleLineEnter(e)}
         onMouseLeave={this.handleLineLeave}
         cursor="crosshair"
@@ -580,7 +572,7 @@ class BarcodePlotReact extends Component {
           width={barcodeContainerWidth}
           viewBox={`0 0 ${barcodeContainerWidth} ${horizontalSplitPaneSize}`}
           preserveAspectRatio="xMinYMin meet"
-          onClick={e => this.handleSVGClick(e)}
+          // onClick={e => this.handleSVGClick(e)}
         >
           {/* X Axis */}
           <path
