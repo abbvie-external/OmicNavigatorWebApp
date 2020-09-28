@@ -2,7 +2,11 @@ import React, { Component } from 'react';
 import { Popup, Dimmer, Loader } from 'semantic-ui-react';
 import { phosphoprotService } from '../../services/phosphoprot.service';
 import _ from 'lodash';
-import { formatNumberForDisplay, splitValue } from '../Shared/helpers';
+import {
+  formatNumberForDisplay,
+  splitValue,
+  scrollElement,
+} from '../Shared/helpers';
 import phosphosite_icon from '../../resources/phosphosite.ico';
 import './FilteredDifferentialTable.scss';
 import { CancelToken } from 'axios';
@@ -308,7 +312,6 @@ class FilteredDifferentialTable extends Component {
   };
 
   rowLevelStyleCalc = item => {
-    debugger;
     let backgroundColor;
     let color;
     const {
@@ -360,6 +363,7 @@ class FilteredDifferentialTable extends Component {
       filteredDifferentialTableRowMax: filteredDifferentialTableRowMaxVar,
       filteredDifferentialTableRowOther: filteredDifferentialTableRowOtherVar,
     });
+    scrollElement(this, 'filteredDifferentialGridRef', 'rowHighlightMax');
   };
 
   getTableHelpers = () => {
