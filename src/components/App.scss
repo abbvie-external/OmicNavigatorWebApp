@@ -94,8 +94,14 @@
     border-bottom: 1px solid grey !important;
   }
 
-  .QHGridHeaderDiv {
+  // .QHGridHeaderDiv {
+  .QHGridBodyDiv {
     margin-top: 10px !important;
+  }
+
+  .QHGrid--loading {
+    padding: initial !important;
+    margin: initial !important;
   }
 
   //icons

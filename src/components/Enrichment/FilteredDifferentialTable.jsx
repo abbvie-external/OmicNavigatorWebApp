@@ -6,19 +6,8 @@ import { formatNumberForDisplay, splitValue } from '../Shared/helpers';
 import phosphosite_icon from '../../resources/phosphosite.ico';
 import './FilteredDifferentialTable.scss';
 import { CancelToken } from 'axios';
-import QHGrid from '../utility/QHGrid';
-import EZGrid from '../utility/EZGrid';
-import QuickViewModal from '../utility/QuickViewModal';
-import {
-  getFieldValue,
-  getField,
-  typeMap,
-} from '../utility/selectors/QHGridSelector';
+import { EZGrid } from '***REMOVED***';
 // import { data } from 'pdfkit/js/reference';
-export * from '../utility/FilterTypeConfig';
-export * from '../utility/selectors/quickViewSelector';
-export { QHGrid, EZGrid, QuickViewModal };
-export { getField, getFieldValue, typeMap };
 
 let cancelRequestFPTGetResultsTable = () => {};
 class FilteredDifferentialTable extends Component {
@@ -34,6 +23,8 @@ class FilteredDifferentialTable extends Component {
     filteredTableLoading: true,
     additionalTemplateInfo: [],
     identifier: null,
+    filteredDifferentialTableRowMax: [],
+    filteredDifferentialTableRowOther: [],
   };
   filteredDifferentialGridRef = React.createRef();
 
@@ -64,16 +55,16 @@ class FilteredDifferentialTable extends Component {
 
     if (
       this.props.filteredDifferentialFeatureIdKey !==
-        prevProps.filteredDifferentialFeatureIdKey ||
-      this.props.HighlightedProteins !== prevProps.HighlightedProteins
+      prevProps.filteredDifferentialFeatureIdKey
     ) {
-      const additionalParameters = this.getTableHelpers(
-        this.props.HighlightedProteins,
-      );
+      const additionalParameters = this.getTableHelpers();
       this.setState({
         additionalTemplateInfo: additionalParameters,
         filteredTableLoading: false,
       });
+    }
+    if (this.props.HighlightedProteins !== prevProps.HighlightedProteins) {
+      this.highlightRows(this.props.HighlightedProteins);
     }
     // let prevValues = prevProps?.barcodeSettings?.brushedData ?? [];
     // let currentValues = this.props.barcodeSettings?.brushedData ?? [];
@@ -315,22 +306,64 @@ class FilteredDifferentialTable extends Component {
     this.getTableData();
   };
 
-  getTableHelpers = HighlightedProteins => {
+  rowLevelStyleCalc = item => {
+    debugger;
+    let backgroundColor;
+    let color;
+    const {
+      filteredDifferentialTableRowMax,
+      filteredDifferentialTableRowOther,
+    } = this.state;
     const { filteredDifferentialFeatureIdKey } = this.props;
+    /* eslint-disable eqeqeq */
+    if (
+      item[filteredDifferentialFeatureIdKey] === filteredDifferentialTableRowMax
+    ) {
+      backgroundColor = 'var(--color-primary)';
+      color = 'white';
+    }
+
+    if (
+      filteredDifferentialTableRowOther.includes(
+        item[filteredDifferentialFeatureIdKey],
+      )
+    ) {
+      backgroundColor = 'var(--color-primary-gradient)';
+      color = 'white';
+    }
+
+    // if (item[filteredDifferentialFeatureIdKey] === filteredDifferentialTableRowOtherBullseye) {
+    //   backgroundColor = 'var(--color-link)';
+    //   color = 'white';
+    // }
+    return {
+      backgroundColor,
+      color,
+    };
+  };
+
+  highlightRows = HighlightedProteins => {
     const MaxLine = HighlightedProteins[0] || null;
-    let addParams = {};
-    addParams.elementId = filteredDifferentialFeatureIdKey;
+    let filteredDifferentialTableRowMaxVar = [];
     if (MaxLine !== {} && MaxLine != null) {
-      addParams.rowHighlightMax = MaxLine.featureID;
-      // addParams.rowHighlightMax = MaxLine[filteredDifferentialFeatureIdKey];
+      filteredDifferentialTableRowMaxVar = MaxLine.featureID;
     }
     const SelectedProteins = HighlightedProteins.slice(1);
+    let filteredDifferentialTableRowOtherVar = [];
     if (SelectedProteins.length > 0 && SelectedProteins != null) {
-      addParams.rowHighlightOther = [];
       SelectedProteins.forEach(element => {
-        addParams.rowHighlightOther.push(element.featureID);
+        filteredDifferentialTableRowOtherVar.push(element.featureID);
       });
     }
+    this.setState({
+      filteredDifferentialTableRowMax: filteredDifferentialTableRowMaxVar,
+      filteredDifferentialTableRowOther: filteredDifferentialTableRowOtherVar,
+    });
+  };
+
+  getTableHelpers = () => {
+    const { filteredDifferentialFeatureIdKey } = this.props;
+    let addParams = {};
     addParams.showPhosphositePlus = dataItem => {
       let protein = dataItem.symbol
         ? dataItem.symbol
@@ -480,6 +513,7 @@ class FilteredDifferentialTable extends Component {
             additionalTemplateInfo={this.state.additionalTemplateInfo}
             // headerAttributes={<ButtonActions />}
             onRowClick={this.handleRowClick}
+            rowLevelStyleCalc={this.rowLevelStyleCalc}
           />
         </div>
       );
