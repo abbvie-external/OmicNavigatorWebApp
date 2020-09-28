@@ -6,6 +6,7 @@ import { formatNumberForDisplay, splitValue } from '../Shared/helpers';
 import phosphosite_icon from '../../resources/phosphosite.ico';
 import './FilteredDifferentialTable.scss';
 import { CancelToken } from 'axios';
+import CustomEmptyMessage from '../Shared/Templates';
 import { EZGrid } from '***REMOVED***';
 // import { data } from 'pdfkit/js/reference';
 
@@ -514,6 +515,7 @@ class FilteredDifferentialTable extends Component {
             // headerAttributes={<ButtonActions />}
             onRowClick={this.handleRowClick}
             rowLevelStyleCalc={this.rowLevelStyleCalc}
+            emptyMessage={CustomEmptyMessage}
           />
         </div>
       );
