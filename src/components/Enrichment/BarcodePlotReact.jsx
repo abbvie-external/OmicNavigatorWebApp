@@ -59,7 +59,6 @@ class BarcodePlotReact extends Component {
     // Much of this code can be refactored into a function, as it is used below.
     if (this.props.HighlightedProteins !== prevProps.HighlightedProteins) {
       // if (!this.state.initialLoad) {
-      debugger;
       d3.selectAll(`.MaxLine`)
         .attr('y1', this.state.settings.margin.selected)
         .classed('MaxLine', false);
@@ -146,7 +145,6 @@ class BarcodePlotReact extends Component {
   }
 
   handleLineEnter = event => {
-    // if (this.state.settings.brushing === false) {
     const lineIdMult = event.target.attributes[6].nodeValue;
     const lineName = event.target.attributes[7].nodeValue;
     const lineStatistic = event.target.attributes[9].nodeValue;
@@ -180,11 +178,9 @@ class BarcodePlotReact extends Component {
       tooltipPosition: textPosition,
       tooltipTextAnchor: textAnchor,
     });
-    // }
   };
 
   handleLineLeave = () => {
-    // if (this.state.settings.brushing === false) {
     const hoveredLine = d3.select(this.state.hoveredLineId);
     if (!hoveredLine.empty()) {
       if (hoveredLine.attr('class').endsWith('selected')) {
@@ -208,7 +204,6 @@ class BarcodePlotReact extends Component {
       tooltipPosition: null,
       tooltipTextAnchor: null,
     });
-    // }
   };
 
   unhighlightBrushedLines = () => {
@@ -241,16 +236,10 @@ class BarcodePlotReact extends Component {
     const brushingStart = function() {
       console.log(d3.event);
       self.setState({
-        // settings: {
-        //   ...self.state.settings,
-        //   brushing: true,
-        // },
         highlightedLineName: null,
         hoveredLineId: null,
         hoveredLineName: null,
       });
-      // }
-      //}
     };
 
     const highlightBrushedLines = function() {
@@ -277,7 +266,6 @@ class BarcodePlotReact extends Component {
           .attr('y1', settings.margin.selected)
           .classed('selected', true);
         const brushedArr = brushed._groups[0];
-        // const brushedDataVar = brushed.data();
         const brushedDataVar = brushedArr.map(a => {
           return {
             x2: a.attributes[2].nodeValue,
@@ -341,10 +329,10 @@ class BarcodePlotReact extends Component {
       }
     };
 
-    //Remove existing brushes
-    // if (d3.selectAll('.brush').nodes().length > 0) {
-    //   d3.selectAll('.brush').remove();
-    // }
+    // Remove existing brushes
+    if (d3.selectAll('.brush').nodes().length > 0) {
+      d3.selectAll('.brush').remove();
+    }
 
     objsBrush = d3
       .brushX()
@@ -386,28 +374,12 @@ class BarcodePlotReact extends Component {
           selectedTicks.nodes()[0].getAttribute('x1'),
         ]);
       }
+      d3.select('.overlay').remove();
     }
-    // d3.selectAll(this.barcodeSVGRef.current).call(objsBrush);
-    // const brushed = d3.selectAll('.selected');
-    // const brushedArr = brushed._groups[0];
-    // // const brushedDataVar = brushed.data();
-    // const brushedDataVar = brushedArr.map(a => {
-    //   return {
-    //     x2: a.attributes[2].nodeValue,
-    //     featureID: a.attributes[6].nodeValue,
-    //     lineID: a.attributes[7].nodeValue,
-    //     logFC: a.attributes[8].nodeValue,
-    //     statistic: a.attributes[9].nodeValue,
-    //   };
-    // });
-    // self.props.onHandleBarcodeChanges({
-    //   brushedData: brushedDataVar,
-    // });
   }
 
   getTooltip = () => {
     const {
-      // hoveredLineId,
       hoveredLineName,
       highlightedLineName,
       tooltipPosition,
@@ -445,22 +417,11 @@ class BarcodePlotReact extends Component {
   };
 
   render() {
-    const {
-      barcodeWidth,
-      barcodeContainerWidth,
-      settings,
-      // hoveredLineId,
-      // hoveredLineName,
-      // tooltipPosition
-    } = this.state;
+    const { barcodeWidth, barcodeContainerWidth, settings } = this.state;
 
     const { horizontalSplitPaneSize, barcodeSettings } = this.props;
     const barcodeHeight =
       horizontalSplitPaneSize - settings.margin.top - settings.margin.bottom;
-    // const yScale = d3
-    //   .scaleLinear()
-    //   .domain([0, barcodeHeight])
-    //   .range([barcodeHeight - settings.margin.bottom, settings.margin.top]);
 
     const xScale = d3
       .scaleLinear()
@@ -499,17 +460,6 @@ class BarcodePlotReact extends Component {
     // statistic: 19.0484
     const barcodeLines = barcodeSettings.barcodeData.map(d => (
       <line
-        // id={`barcode-line-${d.lineID.replace(/;/g, '')}_${d.featureID}`}
-        // className="barcode-line"
-        // key={`${d.lineID}_${d.featureID}`}
-        // x1={xScale(d.statistic) + settings.margin.left}
-        // x2={xScale(d.statistic) + settings.margin.left}
-        // y1={settings.margin.top}
-        // y2={barcodeHeight}
-        // featureID={d.featureID}
-        // lineid={d.lineID}
-        // logfc={d.logFC}
-        // statistic={d.statistic}
         id={`barcode-line-${d.featureID}`}
         className="barcode-line"
         key={`${d.featureID}`}
@@ -523,7 +473,7 @@ class BarcodePlotReact extends Component {
         statistic={d.statistic}
         onMouseEnter={e => this.handleLineEnter(e)}
         onMouseLeave={this.handleLineLeave}
-        cursor="crosshair"
+        // cursor="crosshair"
       />
     ));
 
@@ -543,7 +493,6 @@ class BarcodePlotReact extends Component {
             plot={'barcode'}
           />
         </div>
-
         <svg
           ref={this.barcodeSVGRef}
           id={`svg-${settings.id}`}
@@ -558,10 +507,8 @@ class BarcodePlotReact extends Component {
             d={`M 25 ${barcodeHeight} H ${barcodeWidth + 15}`}
             stroke="currentColor"
           />
-
           {/* X Axis Ticks */}
           {barcodeTicks}
-
           {/* X Axis Label */}
           <text
             className="BarcodeLabel"
@@ -570,7 +517,6 @@ class BarcodePlotReact extends Component {
           >
             {barcodeSettings.statLabel}
           </text>
-
           {/* Y Axis Left Label */}
           <text
             className="BarcodeLabel"
@@ -580,7 +526,6 @@ class BarcodePlotReact extends Component {
           >
             {barcodeSettings.lowLabel}
           </text>
-
           {/* Y Axis Right Label */}
           <text
             className="BarcodeLabel"
@@ -590,7 +535,6 @@ class BarcodePlotReact extends Component {
           >
             {barcodeSettings.highLabel}
           </text>
-
           <g className="x barcode-axis" />
           {/* Barcode Lines & Tooltip */}
           {barcodeLines}

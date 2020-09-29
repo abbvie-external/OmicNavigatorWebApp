@@ -5,7 +5,7 @@
 }
 
 .barcode-line.HoveredLine {
-  stroke: var(--color-tertiary);
+  // stroke: var(--color-tertiary);
   stroke-width: 2.5px;
   opacity: 1;
 }
@@ -34,9 +34,9 @@
   opacity: 1;
 }
 
-.barcode {
-  cursor: crosshair !important;
-}
+// .barcode {
+//   cursor: crosshair !important;
+// }
 
 // .BarcodeTooltipText {
 //  font-weight: 600 !important;
