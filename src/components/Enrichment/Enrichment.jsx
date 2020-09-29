@@ -28,6 +28,7 @@ import './Enrichment.scss';
 import EnrichmentResultsGraph from './EnrichmentResultsGraph';
 import EnrichmentSearchCriteria from './EnrichmentSearchCriteria';
 import SplitPanesContainer from './SplitPanesContainer';
+import CustomEmptyMessage from '../Shared/Templates';
 // eslint-disable-next-line no-unused-vars
 import QHGrid, { EZGrid } from '***REMOVED***';
 
@@ -1879,6 +1880,7 @@ class Enrichment extends Component {
                       additionalTemplateInfoEnrichmentTable
                     }
                     // onInformItemsPerPage={this.informItemsPerPage}
+                    emptyMessage={CustomEmptyMessage}
                   />
                 </Grid.Column>
               </Grid.Row>

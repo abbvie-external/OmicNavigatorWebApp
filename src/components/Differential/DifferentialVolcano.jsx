@@ -1,5 +1,8 @@
 import React, { Component, Fragment } from 'react';
 import _ from 'lodash';
+// import CustomEmptyMessage from '../Shared/Templates';
+// eslint-disable-next-line no-unused-vars
+// import QHGrid, { EZGrid } from '***REMOVED***';
 import EZGrid from '../utility/EZGrid';
 import ButtonActions from '../Shared/ButtonActions';
 import SVGPlot from '../Shared/SVGPlot';
@@ -56,31 +59,14 @@ class DifferentialVolcano extends Component {
   }
   componentDidUpdate(prevProps, prevState) {
     if (prevProps.differentialResults !== this.props.differentialResults) {
-      // const { identifier } = this.state;
-      // const { maxObjectIdentifier, differentialFeatureIdKey } = this.props;
-      // this.getAxisLabels();
       this.setState({
         filteredTableData: this.props.differentialResults,
         volcanoPlotRows: this.props.differentialResults.length,
       });
-      // const defaultMaxObject = this.props.differentialResults[0];
-      // this.props.onSelectFromTable([
-      //   {
-      //     id: defaultMaxObject[differentialFeatureIdKey],
-      //     value: defaultMaxObject[maxObjectIdentifier],
-      //     key: defaultMaxObject[identifier],
-      //   },
-      // ]);
     }
-    //   if (this.props.featureToHighlightInDiffTable !==
-    //     prevProps.featureToHighlightInDiffTable &&
-    //     this.props.featureToHighlightInDiffTable !== '')
-    //  {
-
+    // if (this.props.bullseyeHighlightInProgress) {
+    //   this.pageToFeature(this.props.featureToHighlightInDiffTable);
     // }
-    if (this.props.bullseyeHighlightInProgress) {
-      this.pageToFeature(this.props.featureToHighlightInDiffTable);
-    }
   }
   pageToFeature = featureToHighlight => {
     const { differentialFeatureIdKey, differentialResults } = this.props;
@@ -478,6 +464,8 @@ class DifferentialVolcano extends Component {
                 additionalTemplateInfo={additionalTemplateInfoDifferentialTable}
                 headerAttributes={<ButtonActions />}
                 onRowClick={this.handleRowClick}
+                // rowLevelPropsCalc={this.rowLevelPropsCalc}
+                // emptyMessage={CustomEmptyMessage}
               />
             </SplitPane>
           </Grid.Column>

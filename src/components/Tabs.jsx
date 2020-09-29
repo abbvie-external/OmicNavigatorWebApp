@@ -53,7 +53,7 @@ class Tabs extends Component {
       allStudiesMetadata: [],
       differentialFeatureIdKey: '',
       filteredDifferentialFeatureIdKey: '',
-      bullseyeHighlightInProgress: false,
+      // bullseyeHighlightInProgress: false,
     };
   }
 
@@ -144,7 +144,7 @@ class Tabs extends Component {
       differentialModel: this.state.enrichmentModel || '',
       differentialTest: test || '',
       differentialFeature: '',
-      bullseyeHighlightInProgress: true,
+      // bullseyeHighlightInProgress: true,
       featureToHighlightInDiffTable: featureID,
     });
     let changes = {
@@ -164,12 +164,12 @@ class Tabs extends Component {
     );
   };
 
-  handlePagedToFeature = () => {
-    this.setState({
-      bullseyeHighlightInProgress: false,
-      featureToHighlightInDiffTable: '',
-    });
-  };
+  // handlePagedToFeature = () => {
+  //   this.setState({
+  //     bullseyeHighlightInProgress: false,
+  //     featureToHighlightInDiffTable: '',
+  //   });
+  // };
 
   getStudies = () => {
     phosphoprotService
@@ -202,7 +202,7 @@ class Tabs extends Component {
         allStudiesMetadata: [],
         differentialFeatureIdKey: '',
         filteredDifferentialFeatureIdKey: '',
-        bullseyeHighlightInProgress: false,
+        // bullseyeHighlightInProgress: false,
       },
       function() {
         updateUrl(
@@ -250,7 +250,7 @@ class Tabs extends Component {
               onHandleDifferentialFeatureIdKey={
                 this.handleDifferentialFeatureIdKey
               }
-              onPagedToFeature={this.handlePagedToFeature}
+              // onPagedToFeature={this.handlePagedToFeature}
             />
           </Tab.Pane>
         ),

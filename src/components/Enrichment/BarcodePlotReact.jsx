@@ -391,6 +391,7 @@ class BarcodePlotReact extends Component {
         return (
           <text
             className="BarcodeTooltipText"
+            // transform={`translate(${tooltipPosition}, 50)rotate(35)`}
             transform={`translate(${tooltipPosition}, 10)`}
             fontSize="14px"
             textAnchor={tooltipTextAnchor}

@@ -90,9 +90,9 @@ class Differential extends Component {
   differentialGridRef = React.createRef();
 
   componentDidUpdate(prevProps) {
-    if (this.props.bullseyeHighlightInProgress) {
-      this.pageToFeature(this.props.featureToHighlightInDiffTable);
-    }
+    // if (this.props.bullseyeHighlightInProgress) {
+    //   this.pageToFeature(this.props.featureToHighlightInDiffTable);
+    // }
   }
 
   informItemsPerPage = items => {
@@ -294,10 +294,10 @@ class Differential extends Component {
     differentialFeatureIdKeyVar,
     maxObj,
   ) => {
-    const {
-      bullseyeHighlightInProgress,
-      featureToHighlightInDiffTable,
-    } = this.props;
+    // const {
+    //   bullseyeHighlightInProgress,
+    //   featureToHighlightInDiffTable,
+    // } = this.props;
     let addParams = {};
     addParams.rowHighlightMax = [];
     addParams.rowHighlightOther = [];
@@ -312,11 +312,11 @@ class Differential extends Component {
       addParams.rowHighlightMax = maxObj.id;
     }
     // bullseye highlighting - page to item, scroll, highlight
-    if (bullseyeHighlightInProgress) {
-      if (featureToHighlightInDiffTable != null) {
-        addParams.rowHighlightBullseye.push(featureToHighlightInDiffTable);
-      }
-    }
+    // if (bullseyeHighlightInProgress) {
+    //   if (featureToHighlightInDiffTable != null) {
+    //     addParams.rowHighlightBullseye.push(featureToHighlightInDiffTable);
+    //   }
+    // }
     addParams.showPhosphositePlus = dataItem => {
       let protein = dataItem.symbol
         ? dataItem.symbol
@@ -450,10 +450,10 @@ class Differential extends Component {
   handleSelectedFromTable = toHighlightArr => {
     this.setState({ isVolcanoPlotSVGLoaded: false });
     const { maxObjectData, isItemSelected } = this.state;
-    const {
-      featureToHighlightInDiffTable,
-      bullseyeHighlightInProgress,
-    } = this.props;
+    // const {
+    //   featureToHighlightInDiffTable,
+    //   bullseyeHighlightInProgress,
+    // } = this.props;
     let max = [];
     if (toHighlightArr.length !== 0) {
       max = toHighlightArr[0];
@@ -481,10 +481,10 @@ class Differential extends Component {
       this.setState({ isProteinSVGLoaded: false });
       this.getPlot(max.id, true);
     }
-    if (bullseyeHighlightInProgress) {
-      this.setState({ isProteinSVGLoaded: false });
-      this.getPlot(featureToHighlightInDiffTable, true);
-    }
+    // if (bullseyeHighlightInProgress) {
+    //   this.setState({ isProteinSVGLoaded: false });
+    //   this.getPlot(featureToHighlightInDiffTable, true);
+    // }
   };
   handleSVGTabChange = activeTabIndex => {
     this.setState({
@@ -738,7 +738,7 @@ class Differential extends Component {
       differentialStudy,
       differentialModel,
       differentialTest,
-      featureToHighlightInDiffTable,
+      // featureToHighlightInDiffTable,
     } = this.props;
     const { multisetQueriedP } = this.state;
 
@@ -751,12 +751,12 @@ class Differential extends Component {
     } = this.state;
     const differentialRows = differentialResults.length || 1000;
     let differentialCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}`;
-    if (
-      featureToHighlightInDiffTable !== '' &&
-      featureToHighlightInDiffTable != null
-    ) {
-      differentialCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-${featureToHighlightInDiffTable}`;
-    }
+    // if (
+    //   featureToHighlightInDiffTable !== '' &&
+    //   featureToHighlightInDiffTable != null
+    // ) {
+    //   differentialCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-${featureToHighlightInDiffTable}`;
+    // }
     if (multisetQueriedP) {
       differentialCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-${multisetQueriedP}`;
     }

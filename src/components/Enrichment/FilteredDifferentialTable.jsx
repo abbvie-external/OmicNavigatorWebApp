@@ -11,7 +11,8 @@ import phosphosite_icon from '../../resources/phosphosite.ico';
 import './FilteredDifferentialTable.scss';
 import { CancelToken } from 'axios';
 import CustomEmptyMessage from '../Shared/Templates';
-import { EZGrid } from '***REMOVED***';
+// eslint-disable-next-line no-unused-vars
+import QHGrid, { EZGrid } from '***REMOVED***';
 // import { data } from 'pdfkit/js/reference';
 
 let cancelRequestFPTGetResultsTable = () => {};
