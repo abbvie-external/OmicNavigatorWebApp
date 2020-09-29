@@ -311,9 +311,8 @@ class FilteredDifferentialTable extends Component {
     this.getTableData();
   };
 
-  rowLevelStyleCalc = item => {
-    let backgroundColor;
-    let color;
+  rowLevelPropsCalc = item => {
+    let className;
     const {
       filteredDifferentialTableRowMax,
       filteredDifferentialTableRowOther,
@@ -323,8 +322,7 @@ class FilteredDifferentialTable extends Component {
     if (
       item[filteredDifferentialFeatureIdKey] === filteredDifferentialTableRowMax
     ) {
-      backgroundColor = 'var(--color-primary)';
-      color = 'white';
+      className = 'rowHighlightMax';
     }
 
     if (
@@ -332,17 +330,14 @@ class FilteredDifferentialTable extends Component {
         item[filteredDifferentialFeatureIdKey],
       )
     ) {
-      backgroundColor = 'var(--color-primary-gradient)';
-      color = 'white';
+      className = 'rowHighlightOther';
     }
 
     // if (item[filteredDifferentialFeatureIdKey] === filteredDifferentialTableRowOtherBullseye) {
-    //   backgroundColor = 'var(--color-link)';
-    //   color = 'white';
+    //   className = 'rowHighlightBullseye
     // }
     return {
-      backgroundColor,
-      color,
+      className,
     };
   };
 
@@ -518,7 +513,7 @@ class FilteredDifferentialTable extends Component {
             additionalTemplateInfo={this.state.additionalTemplateInfo}
             // headerAttributes={<ButtonActions />}
             onRowClick={this.handleRowClick}
-            rowLevelStyleCalc={this.rowLevelStyleCalc}
+            rowLevelPropsCalc={this.rowLevelPropsCalc}
             emptyMessage={CustomEmptyMessage}
           />
         </div>

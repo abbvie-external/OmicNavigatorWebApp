@@ -125,6 +125,43 @@
     background-color: var(--color-primary) !important;
   }
 
+  .rowHighlightMax {
+    background: var(--color-primary) !important;
+    color: white !important;
+  }
+
+  .rowHighlightOther {
+    background: var(--color-primary-gradient) !important;
+    color: white !important;
+  }
+
+  .rowHighlightBullseye {
+    background: var(--color-link) !important;
+    color: white !important;
+  }
+
+  .rowHighlightMax .TableCellLink,
+  .rowHighlightOther .TableCellLink,
+  .rowHighlightBullseye .TableCellLink {
+    color: white !important;
+    cursor: pointer !important;
+  }
+
+  .ui.selectable.table tbody .rowHighlightMax:hover {
+    background: rgba(255, 68, 0, 0.9) !important;
+    color: white !important;
+  }
+
+  .ui.selectable.table tbody .rowHighlightOther:hover {
+    background: rgba(255, 126, 5, 0.9) !important;
+    color: white !important;
+  }
+
+  .rowHighlightBullseye:hover {
+    background: rgba(0, 47, 76, 0.9) !important;
+    color: white !important;
+  }
+
   .test {
     color: white !important;
   }
