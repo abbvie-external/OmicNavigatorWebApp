@@ -63,12 +63,17 @@ class FilteredDifferentialTable extends Component {
       this.props.filteredDifferentialFeatureIdKey !==
       prevProps.filteredDifferentialFeatureIdKey
     ) {
-      const additionalParameters = this.getTableHelpers();
-      this.setState({
-        additionalTemplateInfo: additionalParameters,
-        filteredTableLoading: false,
-      });
+      this.setState(
+        {
+          additionalTemplateInfo: {},
+          filteredTableLoading: true,
+        },
+        function() {
+          this.getTableHelpers();
+        },
+      );
     }
+
     if (this.props.HighlightedProteins !== prevProps.HighlightedProteins) {
       this.highlightRows(this.props.HighlightedProteins);
     }
@@ -221,7 +226,7 @@ class FilteredDifferentialTable extends Component {
         return {
           title: f,
           field: f,
-          filterable: { type: 'alphanumericFilter' },
+          filterable: { type: 'multiFilter' },
           template: (value, item, addParams) => {
             if (f === alphanumericTrigger) {
               return (
@@ -348,7 +353,8 @@ class FilteredDifferentialTable extends Component {
     if (MaxLine !== {} && MaxLine != null) {
       filteredDifferentialTableRowMaxVar = MaxLine.featureID;
     }
-    const SelectedProteins = HighlightedProteins.slice(1);
+    const HighlightedProteinsCopy = [...HighlightedProteins];
+    const SelectedProteins = HighlightedProteinsCopy.slice(1);
     let filteredDifferentialTableRowOtherVar = [];
     if (SelectedProteins.length > 0 && SelectedProteins != null) {
       SelectedProteins.forEach(element => {
@@ -381,7 +387,10 @@ class FilteredDifferentialTable extends Component {
         );
       };
     };
-    return addParams;
+    this.setState({
+      additionalTemplateInfo: addParams,
+      filteredTableLoading: false,
+    });
   };
 
   informItemsPerPageFilteredDifferentialTable = items => {
@@ -393,9 +402,8 @@ class FilteredDifferentialTable extends Component {
 
   handleRowClick = (event, item, index) => {
     if (item !== null && event?.target?.className !== 'ExternalSiteIcon') {
-      const { identifier } = this.state;
       const { filteredDifferentialFeatureIdKey } = this.props;
-      const PreviouslyHighlighted = this.props.HighlightedProteins;
+      const PreviouslyHighlighted = [...this.props.HighlightedProteins];
       // const stat = barcodeSettings.statLabel;
       event.stopPropagation();
       if (event.shiftKey) {
@@ -414,7 +422,7 @@ class FilteredDifferentialTable extends Component {
             // sample: d.symbol,
             // sample: d.phosphosite,
             featureID: d[filteredDifferentialFeatureIdKey],
-            key: d[identifier],
+            key: d[filteredDifferentialFeatureIdKey],
             // PAUL - this needs adjustment, looking for d.abs(t) instead of d.T, for example
             // cpm: d[stat],
             // cpm: d.F == null ? d.t : d.F,
@@ -425,15 +433,13 @@ class FilteredDifferentialTable extends Component {
         const allTableData = _.cloneDeep(this.state.filteredTableData);
         let selectedTableDataArray = [];
 
-        const ctrlClickedObj = allTableData[index];
         const alreadyHighlighted = PreviouslyHighlighted.some(
-          d => d.featureID === ctrlClickedObj[filteredDifferentialFeatureIdKey],
+          d => d.featureID === item[filteredDifferentialFeatureIdKey],
         );
         // already highlighted, remove it from array
         if (alreadyHighlighted) {
           selectedTableDataArray = PreviouslyHighlighted.filter(
-            i =>
-              i.featureID !== ctrlClickedObj[filteredDifferentialFeatureIdKey],
+            i => i.featureID !== item[filteredDifferentialFeatureIdKey],
           );
           this.props.onHandleProteinSelected(selectedTableDataArray);
         } else {
@@ -447,8 +453,8 @@ class FilteredDifferentialTable extends Component {
           // map protein to fix obj entries
           const mappedProtein = {
             // sample: ctrlClickedObj.phosphosite,
-            featureID: ctrlClickedObj[filteredDifferentialFeatureIdKey],
-            key: ctrlClickedObj[identifier],
+            featureID: item[filteredDifferentialFeatureIdKey],
+            key: item[filteredDifferentialFeatureIdKey],
             // PAUL
             // cpm: ctrlClickedObj[stat],
             // cpm: ctrlClickedObj.F == null ? ctrlClickedObj.t : ctrlClickedObj.F,
@@ -472,7 +478,7 @@ class FilteredDifferentialTable extends Component {
             // cpm: item.logFC, //statistic,
             // sample: item.phosphosite,
             featureID: item[filteredDifferentialFeatureIdKey],
-            key: item[identifier],
+            key: item[filteredDifferentialFeatureIdKey],
             // cpm: item[stat],
             // cpm: item.F === undefined ? item.t : item.F,
           },
@@ -487,6 +493,7 @@ class FilteredDifferentialTable extends Component {
       filteredTableData,
       itemsPerPageFilteredDifferentialTable,
       filteredTableLoading,
+      additionalTemplateInfo,
     } = this.state;
 
     if (!filteredTableLoading) {
@@ -511,7 +518,7 @@ class FilteredDifferentialTable extends Component {
             disableColumnReorder
             // disableFilters={false}
             min-height="5vh"
-            additionalTemplateInfo={this.state.additionalTemplateInfo}
+            additionalTemplateInfo={additionalTemplateInfo}
             // headerAttributes={<ButtonActions />}
             onRowClick={this.handleRowClick}
             rowLevelPropsCalc={this.rowLevelPropsCalc}

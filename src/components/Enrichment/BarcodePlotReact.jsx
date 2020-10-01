@@ -81,30 +81,32 @@ class BarcodePlotReact extends Component {
         if (this.props.HighlightedProteins[0]?.featureID !== '') {
           const maxLineId = `${this.props.HighlightedProteins[0]?.featureID}`;
           const maxLine = d3.select(`#barcode-line-${maxLineId}`);
-          maxLine
-            .classed('MaxLine', true)
-            .attr('y1', this.state.settings.margin.max);
-          const maxLineData = {
-            x2: maxLine?.attr('x2') || null,
-            featureID: maxLine?.attr('featureid') || null,
-            lineID: maxLine?.attr('lineid') || null,
-            logFC: maxLine?.attr('logfc') || null,
-            statistic: maxLine?.attr('statistic') || null,
-          };
-          const statistic = maxLineData.statistic;
-          const textAnchor =
-            statistic > this.props.barcodeSettings.highStat / 2
-              ? 'end'
-              : 'start';
-          const ttPosition =
-            textAnchor === 'end' ? maxLineData.x2 - 5 : maxLineData.x2 + 5;
-          this.setState({
-            hoveredLineId: null,
-            hoveredLineName: null,
-            highlightedLineName: maxLineData.lineID,
-            tooltipPosition: ttPosition,
-            tooltipTextAnchor: textAnchor,
-          });
+          if (maxLine != null) {
+            maxLine
+              .classed('MaxLine', true)
+              .attr('y1', this.state.settings.margin.max);
+            const maxLineData = {
+              x2: maxLine.attr('x2') || null,
+              featureID: maxLine.attr('featureid') || null,
+              lineID: maxLine.attr('lineid') || null,
+              logFC: maxLine.attr('logfc') || null,
+              statistic: maxLine.attr('statistic') || null,
+            };
+            const statistic = maxLineData.statistic;
+            const textAnchor =
+              statistic > this.props.barcodeSettings.highStat / 2
+                ? 'end'
+                : 'start';
+            const ttPosition =
+              textAnchor === 'end' ? maxLineData.x2 - 5 : maxLineData.x2 + 5;
+            this.setState({
+              hoveredLineId: null,
+              hoveredLineName: null,
+              highlightedLineName: maxLineData.lineID,
+              tooltipPosition: ttPosition,
+              tooltipTextAnchor: textAnchor,
+            });
+          }
         }
       }
       // }

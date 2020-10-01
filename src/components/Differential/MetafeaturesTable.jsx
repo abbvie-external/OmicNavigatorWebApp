@@ -57,7 +57,7 @@ class MetafeaturesTable extends Component {
           return {
             title: f,
             field: f,
-            filterable: { type: 'alphanumericFilter' },
+            filterable: { type: 'multiFilter' },
             template: (value, item, addParams) => {
               return (
                 <div className="NoSelect">
