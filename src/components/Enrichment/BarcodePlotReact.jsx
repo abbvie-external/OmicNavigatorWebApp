@@ -56,61 +56,62 @@ class BarcodePlotReact extends Component {
     ) {
       this.setWidth(false);
     }
-    // Much of this code can be refactored into a function, as it is used below.
     if (this.props.HighlightedProteins !== prevProps.HighlightedProteins) {
-      // if (!this.state.initialLoad) {
-      d3.selectAll(`.MaxLine`)
-        .attr('y1', this.state.settings.margin.selected)
-        .classed('MaxLine', false);
-      d3.selectAll(`.HighlightedLine`)
-        .attr('y1', this.state.settings.margin.selected)
-        .classed('HighlightedLine', false);
-      if (this.props.HighlightedProteins.length > 0) {
-        const HighlightedProteinsCopy = [...this.props.HighlightedProteins];
-        const HighlightedProteins = HighlightedProteinsCopy.slice(1);
-        HighlightedProteins.forEach(element => {
-          // const lineId = `${element.sample.replace(/;/g, '')}_${
-          //   element.featureID
-          // }`;
-          const lineId = `${element.featureID}`;
-          const highlightedLine = d3.select(`#barcode-line-${lineId}`);
-          highlightedLine
-            .classed('HighlightedLine', true)
-            .attr('y1', this.state.settings.margin.highlighted);
-        });
-        if (this.props.HighlightedProteins[0]?.featureID !== '') {
-          const maxLineId = `${this.props.HighlightedProteins[0]?.featureID}`;
-          const maxLine = d3.select(`#barcode-line-${maxLineId}`);
-          if (maxLine != null) {
-            maxLine
-              .classed('MaxLine', true)
-              .attr('y1', this.state.settings.margin.max);
-            const maxLineData = {
-              x2: maxLine.attr('x2') || null,
-              featureID: maxLine.attr('featureid') || null,
-              lineID: maxLine.attr('lineid') || null,
-              logFC: maxLine.attr('logfc') || null,
-              statistic: maxLine.attr('statistic') || null,
+      if (!this.state.initialLoad) {
+        console.log(prevProps.HighlightedProteins);
+        console.log(this.props.HighlightedProteins);
+        d3.selectAll(`.MaxLine`)
+          .attr('y1', this.state.settings.margin.selected)
+          .classed('MaxLine', false);
+        d3.selectAll(`.HighlightedLine`)
+          .attr('y1', this.state.settings.margin.selected)
+          .classed('HighlightedLine', false);
+        if (this.props.HighlightedProteins.length > 0) {
+          const HighlightedProteinsCopy = [...this.props.HighlightedProteins];
+          const MaxFeatureData = HighlightedProteinsCopy[0];
+          const OtherFeatures = HighlightedProteinsCopy.slice(1);
+          OtherFeatures.forEach(element => {
+            const lineId = `${element.featureID}`;
+            const OtherHighlighted = d3.select(`#barcode-line-${lineId}`);
+            OtherHighlighted.classed('HighlightedLine', true).attr(
+              'y1',
+              this.state.settings.margin.highlighted,
+            );
+          });
+          const MaxFeatureId = MaxFeatureData.featureID;
+          const MaxFeatureElement = d3.select(`#barcode-line-${MaxFeatureId}`);
+          if (MaxFeatureElement != null) {
+            MaxFeatureElement.classed('MaxLine', true).attr(
+              'y1',
+              this.state.settings.margin.max,
+            );
+            const MaxFeatureLineData = {
+              x2: MaxFeatureElement.attr('x2') || null,
+              featureID: MaxFeatureElement.attr('featureid') || null,
+              lineID: MaxFeatureElement.attr('lineid') || null,
+              logFC: MaxFeatureElement.attr('logfc') || null,
+              statistic: MaxFeatureElement.attr('statistic') || null,
             };
-            const statistic = maxLineData.statistic;
+            const statistic = MaxFeatureLineData.statistic;
             const textAnchor =
               statistic > this.props.barcodeSettings.highStat / 2
                 ? 'end'
                 : 'start';
             const ttPosition =
-              textAnchor === 'end' ? maxLineData.x2 - 5 : maxLineData.x2 + 5;
+              textAnchor === 'end'
+                ? MaxFeatureLineData.x2 - 5
+                : MaxFeatureLineData.x2 + 5;
             this.setState({
               hoveredLineId: null,
               hoveredLineName: null,
-              highlightedLineName: maxLineData.lineID,
+              highlightedLineName: MaxFeatureLineData.lineID,
               tooltipPosition: ttPosition,
               tooltipTextAnchor: textAnchor,
             });
           }
         }
       }
-      // }
-      // this.setState({ initialLoad: false });
+      this.setState({ initialLoad: false });
     }
   }
 
@@ -341,7 +342,7 @@ class BarcodePlotReact extends Component {
       .extent([
         [settings.margin.left + 4, 0],
         // [barcodeWidth + 15, barcodeHeight],
-        [barcodeWidth + 15, Math.round(barcodeHeight * 0.33)],
+        [barcodeWidth + 15, Math.round(barcodeHeight * 0.5)],
       ])
       .on('start', brushingStart)
       .on('brush', highlightBrushedLines)

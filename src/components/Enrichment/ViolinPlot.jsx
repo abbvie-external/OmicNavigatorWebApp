@@ -316,7 +316,11 @@ class ViolinPlot extends Component {
         });
         self.brushedData = brushed.data();
         if (self.brushedData.length > 0) {
-          self.props.onHandleProteinSelected(self.brushedData);
+          debugger;
+          const sortedData = self.brushedData.sort(
+            (a, b) => b.statistic - a.statistic,
+          );
+          self.props.onHandleProteinSelected(sortedData);
         }
       }
     };
