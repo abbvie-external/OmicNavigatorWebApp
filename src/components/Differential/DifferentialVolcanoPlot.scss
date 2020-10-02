@@ -27,7 +27,7 @@
   .volcanoPlot-dataPoint.selected {
     stroke: black;
     stroke-width: 1;
-    fill: orange;
+    fill: var(--color-primary-gradient);
   }
   .volcanoPlot-dataPoint.highlighted {
     stroke: black;
@@ -35,8 +35,9 @@
     fill: var(--color-primary-gradient);
   }
   .volcanoPlot-dataPoint.highlightedMax {
-    stroke: var(--color-primary);
-    stroke-width: 5;
+    //stroke: var(--color-primary);
+    // stroke-width: 5;
+    fill: var(--color-primary);
   }
 
   #differentialVolcanoPlot {

@@ -316,7 +316,6 @@ class ViolinPlot extends Component {
         });
         self.brushedData = brushed.data();
         if (self.brushedData.length > 0) {
-          debugger;
           const sortedData = self.brushedData.sort(
             (a, b) => b.statistic - a.statistic,
           );

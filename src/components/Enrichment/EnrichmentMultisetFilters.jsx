@@ -1013,7 +1013,7 @@ class EnrichmentMultisetFilters extends Component {
                     onChange={this.props.onHandleOperatorChange}
                   ></Form.Field>
                   <Form.Field width={4} id="SignificantValueInputMultisetE">
-                    <label>{index === 0 ? 'Significance' : ''}</label>
+                    <label>{index === 0 ? 'Value' : ''}</label>
                     <NumericExponentialInput
                       className="SignificantValueInput"
                       onChange={number => {
