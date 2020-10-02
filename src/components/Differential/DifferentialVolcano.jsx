@@ -1,11 +1,10 @@
 import React, { Component, Fragment } from 'react';
 import _ from 'lodash';
-// import CustomEmptyMessage from '../Shared/Templates';
+import CustomEmptyMessage from '../Shared/Templates';
 // eslint-disable-next-line no-unused-vars
-// import QHGrid, { EZGrid } from '***REMOVED***';
-import EZGrid from '../utility/EZGrid';
-import ButtonActions from '../Shared/ButtonActions';
+import QHGrid, { EZGrid } from '***REMOVED***';
 import SVGPlot from '../Shared/SVGPlot';
+// import { scrollElement } from '../Shared/helpers';
 import DifferentialVolcanoPlot from './DifferentialVolcanoPlot';
 import {
   Form,
@@ -34,28 +33,18 @@ class DifferentialVolcano extends Component {
     xAxisLabel: null,
     yAxisLabel: null,
     identifier: null,
+    volcanoDifferentialTableRowMax: [],
+    volcanoDifferentialTableRowOther: [],
   };
   volcanoPlotFilteredGridRef = React.createRef();
   differentialVolcanoPlotRef = React.createRef();
 
   componentDidMount() {
-    const { identifier } = this.state;
-    const { maxObjectIdentifier, differentialFeatureIdKey } = this.props;
     this.getAxisLabels();
     this.setState({
       filteredTableData: this.props.differentialResults,
       volcanoPlotRows: this.props.differentialResults.length,
     });
-    const defaultMaxObject = this.props.differentialResults[0];
-    if (this.props.differentialResults.length > 0) {
-      this.props.onSelectFromTable([
-        {
-          id: defaultMaxObject[differentialFeatureIdKey],
-          value: defaultMaxObject[maxObjectIdentifier],
-          key: defaultMaxObject[identifier],
-        },
-      ]);
-    }
   }
   componentDidUpdate(prevProps, prevState) {
     if (prevProps.differentialResults !== this.props.differentialResults) {
@@ -67,7 +56,15 @@ class DifferentialVolcano extends Component {
     // if (this.props.bullseyeHighlightInProgress) {
     //   this.pageToFeature(this.props.featureToHighlightInDiffTable);
     // }
+    if (
+      prevProps.HighlightedFeaturesVolcano !==
+        this.props.HighlightedFeaturesVolcano ||
+      prevProps.isItemSelected !== this.props.isItemSelected
+    ) {
+      this.highlightRows(this.props.HighlightedFeaturesVolcano);
+    }
   }
+
   pageToFeature = featureToHighlight => {
     const { differentialFeatureIdKey, differentialResults } = this.props;
     const { itemsPerPageVolcanoTable } = this.state;
@@ -82,6 +79,58 @@ class DifferentialVolcano extends Component {
       );
     }
   };
+
+  rowLevelPropsCalc = item => {
+    let className;
+    const {
+      volcanoDifferentialTableRowMax,
+      volcanoDifferentialTableRowOther,
+    } = this.state;
+    const { differentialFeatureIdKey } = this.props;
+    /* eslint-disable eqeqeq */
+    if (item[differentialFeatureIdKey] === volcanoDifferentialTableRowMax) {
+      className = 'rowHighlightMax';
+    }
+
+    if (
+      volcanoDifferentialTableRowOther.includes(item[differentialFeatureIdKey])
+    ) {
+      className = 'rowHighlightOther';
+    }
+
+    // if (item[volcanoDifferentialFeatureIdKey] === volcanoDifferentialTableRowOtherBullseye) {
+    //   className = 'rowHighlightBullseye
+    // }
+    return {
+      className,
+    };
+  };
+
+  highlightRows = HighlightedFeatures => {
+    const MaxLine = HighlightedFeatures[0] || null;
+    let volcanoDifferentialTableRowMaxVar = [];
+    if (MaxLine !== {} && MaxLine != null) {
+      volcanoDifferentialTableRowMaxVar = MaxLine.key;
+    }
+    const HighlightedFeaturesCopy = [...HighlightedFeatures];
+    const SelectedFeatures = HighlightedFeaturesCopy.slice(1);
+    let volcanoDifferentialTableRowOtherVar = [];
+    if (
+      SelectedFeatures.length > 0 &&
+      SelectedFeatures != null &&
+      SelectedFeatures != {}
+    ) {
+      SelectedFeatures.forEach(element => {
+        volcanoDifferentialTableRowOtherVar.push(element.key);
+      });
+    }
+    this.setState({
+      volcanoDifferentialTableRowMax: volcanoDifferentialTableRowMaxVar,
+      volcanoDifferentialTableRowOther: volcanoDifferentialTableRowOtherVar,
+    });
+    // scrollElement(this, 'volcanoPlotFilteredGridRef', 'rowHighlightMax');
+  };
+
   getAxisLabels = () => {
     if (this.props.differentialResults.length !== 0) {
       let differentialAlphanumericFields = [];
@@ -132,37 +181,36 @@ class DifferentialVolcano extends Component {
     }
   };
   handleVolcanoPlotSelectionChange = volcanoPlotSelectedDataArr => {
-    const { identifier } = this.state;
-    const { maxObjectIdentifier, differentialFeatureIdKey } = this.props;
+    // const { differentialFeatureIdKey } = this.props;
     if (volcanoPlotSelectedDataArr.length !== 0) {
       this.setState({
         filteredTableData: volcanoPlotSelectedDataArr,
         volcanoPlotRows: volcanoPlotSelectedDataArr.length,
       });
-      if (volcanoPlotSelectedDataArr.length === 1) {
-        const defaultMaxObject = volcanoPlotSelectedDataArr[0];
-        this.props.onSelectFromTable([
-          {
-            id: defaultMaxObject[differentialFeatureIdKey],
-            value: defaultMaxObject[maxObjectIdentifier],
-            key: defaultMaxObject[identifier],
-          },
-        ]);
-      } else {
-        this.props.onSelectFromTable([]);
-      }
+      // if (volcanoPlotSelectedDataArr.length === 1) {
+      //   const defaultMaxObject = volcanoPlotSelectedDataArr[0];
+      //   this.props.onSelectFromTable([
+      //     {
+      //       id: defaultMaxObject[differentialFeatureIdKey],
+      //       value: defaultMaxObject[differentialFeatureIdKey],
+      //       key: defaultMaxObject[differentialFeatureIdKey],
+      //     },
+      //   ]);
+      // } else {
+      this.props.onSelectFromTable([]);
+      // }
     } else {
       this.setState({
         filteredTableData: this.props.differentialResults,
         volcanoPlotRows: this.props.differentialResults.length,
       });
-      const defaultMaxObject = this.props.differentialResults[0];
+      // const defaultMaxObject = this.props.differentialResults[0];
       this.props.onSelectFromTable([
-        {
-          id: defaultMaxObject[differentialFeatureIdKey],
-          value: defaultMaxObject[maxObjectIdentifier],
-          key: defaultMaxObject[identifier],
-        },
+        // {
+        //   id: defaultMaxObject[differentialFeatureIdKey],
+        //   value: defaultMaxObject[differentialFeatureIdKey],
+        //   key: defaultMaxObject[differentialFeatureIdKey],
+        // },
       ]);
     }
   };
@@ -176,13 +224,12 @@ class DifferentialVolcano extends Component {
 
   handleRowClick = (event, item, index) => {
     if (item !== null && event?.target?.className !== 'ExternalSiteIcon') {
-      const { identifier } = this.state;
-      const { differentialFeatureIdKey, maxObjectIdentifier } = this.props;
-      const PreviouslyHighlighted = this.props.selectedFromTableData;
+      const { differentialFeatureIdKey } = this.props;
       event.stopPropagation();
-      //MULTISELECT NOT IMPLEMENTED YET
+      // 10/2/20 - This will be uncommented once we gain access to table data after sort/filter
+      // const PreviouslyHighlighted = [...this.props.HighlightedFeaturesVolcano];
       // if (event.shiftKey) {
-      //   const allTableData = _.cloneDeep(this.state.filteredTableData);
+      //   const allTableData = _.cloneDeep(this.props.differentialResults);
       //   const indexMaxProtein = _.findIndex(allTableData, function(d) {
       //     return d[differentialFeatureIdKey] === PreviouslyHighlighted[0]?.id;
       //   });
@@ -191,44 +238,56 @@ class DifferentialVolcano extends Component {
       //   const shiftedTableData = allTableData.slice(sliceFirst, sliceLast + 1);
       //   const shiftedTableDataArray = shiftedTableData.map(function(d) {
       //     return {
-      //       id: item[differentialFeatureIdKey],
-      //       value: item[maxObjectIdentifier],
-      //       key: item[identifier],
+      //       id: d[differentialFeatureIdKey],
+      //       value: d[differentialFeatureIdKey],
+      //       key: d[differentialFeatureIdKey],
       //     };
       //   });
       //   this.props.onSelectFromTable(shiftedTableDataArray);
-      // } else
-      if (event.ctrlKey) {
-        //const allTableData = _.cloneDeep(this.state.filteredTableData);
-        let selectedTableDataArray = [];
-        const alreadyHighlighted = PreviouslyHighlighted.some(
-          d => d.id === item[differentialFeatureIdKey],
-        );
-        // already highlighted, remove it from array
-        if (alreadyHighlighted) {
-          selectedTableDataArray = PreviouslyHighlighted.filter(
-            i => i.id !== item[differentialFeatureIdKey],
-          );
-          this.props.onSelectFromTable(selectedTableDataArray);
-        } else {
-          // map protein to fix obj entries
-          const mappedProtein = {
-            id: item[differentialFeatureIdKey],
-            value: item[maxObjectIdentifier],
-            key: item[identifier],
-          };
-          PreviouslyHighlighted.push(mappedProtein);
-          this.props.onSelectFromTable(PreviouslyHighlighted);
-        }
-      } else {
-        this.props.onSelectFromTable([
-          {
-            id: item[differentialFeatureIdKey],
-            value: item[maxObjectIdentifier],
-            key: item[identifier],
-          },
-        ]);
-      }
+      // } else if (event.ctrlKey) {
+      //   const allTableData = _.cloneDeep(this.props.differentialResults);
+      //   let selectedTableDataArray = [];
+
+      //   const alreadyHighlighted = PreviouslyHighlighted.some(
+      //     d => d.id === item[differentialFeatureIdKey],
+      //   );
+      //   // already highlighted, remove it from array
+      //   if (alreadyHighlighted) {
+      //     selectedTableDataArray = PreviouslyHighlighted.filter(
+      //       i => i.id !== item[differentialFeatureIdKey],
+      //     );
+      //     this.props.onSelectFromTable(selectedTableDataArray);
+      //   } else {
+      //     // not yet highlighted, add it to array
+      //     const indexMaxProtein = _.findIndex(allTableData, function(d) {
+      //       return d[differentialFeatureIdKey] === PreviouslyHighlighted[0]?.id;
+      //     });
+      //     // map protein to fix obj entries
+      //     const mappedProtein = {
+      //       id: item[differentialFeatureIdKey],
+      //       value: item[differentialFeatureIdKey],
+      //       key: item[differentialFeatureIdKey],
+      //     };
+      //     const lowerIndexThanMax = index < indexMaxProtein ? true : false;
+      //     if (lowerIndexThanMax) {
+      //       // add to beginning of array if max
+      //       PreviouslyHighlighted.unshift(mappedProtein);
+      //     } else {
+      //       // just add to array if not max
+      //       PreviouslyHighlighted.push(mappedProtein);
+      //     }
+      //     selectedTableDataArray = [...PreviouslyHighlighted];
+      //     this.props.onSelectFromTable(selectedTableDataArray);
+      //   }
+      // } else {
+      this.props.onSelectFromTable([
+        {
+          id: item[differentialFeatureIdKey],
+          value: item[differentialFeatureIdKey],
+          key: item[differentialFeatureIdKey],
+        },
+      ]);
+      // }
     } else {
       this.props.onPagedToFeature();
     }
@@ -289,11 +348,19 @@ class DifferentialVolcano extends Component {
           ></SVGPlot>
         </div>
       );
-    } else {
+    } else if (!this.props.isVolcanoPlotSVGLoaded) {
       return (
         <Dimmer active inverted>
           <Loader size="large">Loading Plots</Loader>
         </Dimmer>
+      );
+    } else {
+      return (
+        <div className="PlotInstructions">
+          <h4 className="PlotInstructionsText">
+            Select a feature to display SVG Plot
+          </h4>
+        </div>
       );
     }
   };
@@ -301,7 +368,7 @@ class DifferentialVolcano extends Component {
   onSizeChange = (size, paneType) => {
     const adjustedSize = Math.round(size * 0.95);
     if (paneType === 'horizontal') {
-      const width = parseInt(localStorage.getItem('volcanoWidth'), 10);
+      const width = parseInt(localStorage.getItem('volcanoWidth'), 10) || 300;
       // on up/down drag, we are forcing a svg resize by change the volcano width by 1
       localStorage.setItem('volcanoWidth', width + 1);
       localStorage.setItem('volcanoHeight', adjustedSize);
@@ -336,6 +403,10 @@ class DifferentialVolcano extends Component {
       differentialColumns,
       isDifferentialTableLoading,
       // differentialResultsMounted,
+      differentialStudy,
+      differentialModel,
+      differentialTest,
+      multisetQueriedP,
     } = this.props;
     // if (differentialResultsMounted) {
     const xAxisTransformBox = allowXTransformation ? (
@@ -359,7 +430,16 @@ class DifferentialVolcano extends Component {
       </span>
     ) : null;
     const svgPlot = this.getSVGPlot();
-
+    let differentialVolcanoCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-Volcano`;
+    // if (
+    //   featureToHighlightInDiffTable !== '' &&
+    //   featureToHighlightInDiffTable != null
+    // ) {
+    //   differentialCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-${featureToHighlightInDiffTable}`;
+    // }
+    if (multisetQueriedP) {
+      differentialVolcanoCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-${multisetQueriedP}-Volcano`;
+    }
     return (
       <Grid className="VolcanoPlotGridContainer">
         <Grid.Row className="VolcanoPlotAxisSelectorsRow">
@@ -447,6 +527,7 @@ class DifferentialVolcano extends Component {
               </SplitPane>
               <EZGrid
                 ref={this.volcanoPlotFilteredGridRef}
+                uniqueCacheKey={differentialVolcanoCacheKey}
                 className="volcanoPlotTable"
                 // note, default is 70vh; if you want a specific vh, specify like "40vh"; "auto" lets the height flow based on items per page
                 height="auto"
@@ -462,10 +543,9 @@ class DifferentialVolcano extends Component {
                 exportBaseName="VolcanoPlot_Filtered_Results"
                 loading={isDifferentialTableLoading}
                 additionalTemplateInfo={additionalTemplateInfoDifferentialTable}
-                headerAttributes={<ButtonActions />}
                 onRowClick={this.handleRowClick}
-                // rowLevelPropsCalc={this.rowLevelPropsCalc}
-                // emptyMessage={CustomEmptyMessage}
+                rowLevelPropsCalc={this.rowLevelPropsCalc}
+                emptyMessage={CustomEmptyMessage}
               />
             </SplitPane>
           </Grid.Column>
