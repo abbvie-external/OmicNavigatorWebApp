@@ -26,15 +26,17 @@ class DifferentialVolcanoPlot extends Component {
     const {
       // HighlightedFeaturesVolcano,
       // volcanoDifferentialTableRowOther,
+      // volcanoDifferentialTableRowBullseye,
       volcanoDifferentialTableRowMax,
     } = this.props;
-    debugger;
     if (
       // Once table multi-select is built, uncomment
       // volcanoDifferentialTableRowOther !==
       //   prevProps.volcanoDifferentialTableRowOther ||
       volcanoDifferentialTableRowMax !==
       prevProps.volcanoDifferentialTableRowMax
+      // volcanoDifferentialTableRowBullseye !==
+      // prevProps.volcanoDifferentialTableRowBullseye
     ) {
       const circles = d3.selectAll('circle.volcanoPlot-dataPoint').attr('r', 2);
       circles.classed('highlighted', false);

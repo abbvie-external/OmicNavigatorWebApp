@@ -57,7 +57,8 @@ class Differential extends Component {
     isProteinSVGLoaded: false,
     // isProteinDataLoaded: false,
     HighlightedFeaturesVolcano: [],
-    // volcanoDifferentialTableRowMax: [],
+    volcanoDifferentialTableRowMax: [],
+    volcanoDifferentialTableRowOther: [],
     maxObjectIdentifier: null,
     imageInfo: {
       key: null,
@@ -453,7 +454,29 @@ class Differential extends Component {
       HighlightedFeaturesVolcano: toHighlightArr,
     });
     if (toHighlightArr.length > 0) {
+      const MaxLine = toHighlightArr[0] || null;
+      let volcanoDifferentialTableRowMaxVar = [];
+      if (MaxLine !== {} && MaxLine != null) {
+        volcanoDifferentialTableRowMaxVar = MaxLine.key;
+      }
+      // Once table multi-select is built, uncomment
+      // const HighlightedFeaturesCopy = [...toHighlightArr];
+      // const SelectedFeatures = HighlightedFeaturesCopy.slice(1);
+      // let volcanoDifferentialTableRowOtherVar = [];
+      // if (
+      //   SelectedFeatures.length > 0 &&
+      //   SelectedFeatures != null &&
+      //   SelectedFeatures != {}
+      // ) {
+      //   SelectedFeatures.forEach(element => {
+      //     volcanoDifferentialTableRowOtherVar.push(element.key);
+      //   });
+      // }
       const maxId = toHighlightArr[0].id || '';
+      this.setState({
+        volcanoDifferentialTableRowMax: volcanoDifferentialTableRowMaxVar,
+        // volcanoDifferentialTableRowOther: volcanoDifferentialTableRowOtherVar,
+      });
       if (this.state.maxObjectIdentifier !== maxId) {
         this.setState({
           isVolcanoPlotSVGLoaded: false,
@@ -465,6 +488,8 @@ class Differential extends Component {
       this.setState({
         isVolcanoPlotSVGLoaded: true,
         maxObjectIdentifier: '',
+        volcanoDifferentialTableRowMax: [],
+        // volcanoDifferentialTableRowOther: [],
         imageInfo: {
           key: null,
           title: '',

@@ -33,8 +33,8 @@ class DifferentialVolcano extends Component {
     xAxisLabel: null,
     yAxisLabel: null,
     identifier: null,
-    volcanoDifferentialTableRowMax: [],
-    volcanoDifferentialTableRowOther: [],
+    // volcanoDifferentialTableRowMax: [],
+    // volcanoDifferentialTableRowOther: [],
   };
   volcanoPlotFilteredGridRef = React.createRef();
   differentialVolcanoPlotRef = React.createRef();
@@ -56,13 +56,6 @@ class DifferentialVolcano extends Component {
     // if (this.props.bullseyeHighlightInProgress) {
     //   this.pageToFeature(this.props.featureToHighlightInDiffTable);
     // }
-    if (
-      prevProps.HighlightedFeaturesVolcano !==
-        this.props.HighlightedFeaturesVolcano ||
-      prevProps.isItemSelected !== this.props.isItemSelected
-    ) {
-      this.highlightRows(this.props.HighlightedFeaturesVolcano);
-    }
   }
 
   pageToFeature = featureToHighlight => {
@@ -84,51 +77,28 @@ class DifferentialVolcano extends Component {
     let className;
     const {
       volcanoDifferentialTableRowMax,
-      volcanoDifferentialTableRowOther,
-    } = this.state;
-    const { differentialFeatureIdKey } = this.props;
+      // volcanoDifferentialTableRowOther,
+      volcanoDifferentialTableRowBullseye,
+      differentialFeatureIdKey,
+    } = this.props;
     /* eslint-disable eqeqeq */
     if (item[differentialFeatureIdKey] === volcanoDifferentialTableRowMax) {
       className = 'rowHighlightMax';
     }
-
-    if (
-      volcanoDifferentialTableRowOther.includes(item[differentialFeatureIdKey])
-    ) {
-      className = 'rowHighlightOther';
-    }
-
-    // if (item[volcanoDifferentialFeatureIdKey] === volcanoDifferentialTableRowOtherBullseye) {
-    //   className = 'rowHighlightBullseye
+    // Once table multi-select is built, uncomment
+    // if (
+    //   volcanoDifferentialTableRowOther.includes(item[differentialFeatureIdKey])
+    // ) {
+    //   className = 'rowHighlightOther';
+    // }
+    // if (
+    //   item[differentialFeatureIdKey] === volcanoDifferentialTableRowBullseye
+    // ) {
+    //   className = 'rowHighlightBullseye';
     // }
     return {
       className,
     };
-  };
-
-  highlightRows = HighlightedFeatures => {
-    const MaxLine = HighlightedFeatures[0] || null;
-    let volcanoDifferentialTableRowMaxVar = [];
-    if (MaxLine !== {} && MaxLine != null) {
-      volcanoDifferentialTableRowMaxVar = MaxLine.key;
-    }
-    const HighlightedFeaturesCopy = [...HighlightedFeatures];
-    const SelectedFeatures = HighlightedFeaturesCopy.slice(1);
-    let volcanoDifferentialTableRowOtherVar = [];
-    if (
-      SelectedFeatures.length > 0 &&
-      SelectedFeatures != null &&
-      SelectedFeatures != {}
-    ) {
-      SelectedFeatures.forEach(element => {
-        volcanoDifferentialTableRowOtherVar.push(element.key);
-      });
-    }
-    this.setState({
-      volcanoDifferentialTableRowMax: volcanoDifferentialTableRowMaxVar,
-      volcanoDifferentialTableRowOther: volcanoDifferentialTableRowOtherVar,
-    });
-    // scrollElement(this, 'volcanoPlotFilteredGridRef', 'rowHighlightMax');
   };
 
   getAxisLabels = () => {
@@ -288,9 +258,10 @@ class DifferentialVolcano extends Component {
         },
       ]);
       // }
-    } else {
-      this.props.onPagedToFeature();
     }
+    // else {
+    //   this.props.onPagedToFeature();
+    // }
   };
 
   getMaxAndMin(data, element) {
