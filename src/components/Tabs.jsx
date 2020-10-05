@@ -53,7 +53,6 @@ class Tabs extends Component {
       allStudiesMetadata: [],
       differentialFeatureIdKey: '',
       filteredDifferentialFeatureIdKey: '',
-      // bullseyeHighlightInProgress: false,
     };
   }
 
@@ -144,7 +143,6 @@ class Tabs extends Component {
       differentialModel: this.state.enrichmentModel || '',
       differentialTest: test || '',
       differentialFeature: '',
-      // bullseyeHighlightInProgress: true,
       featureToHighlightInDiffTable: featureID,
     });
     let changes = {
@@ -163,13 +161,6 @@ class Tabs extends Component {
       'differential',
     );
   };
-
-  // handlePagedToFeature = () => {
-  //   this.setState({
-  //     bullseyeHighlightInProgress: false,
-  //     featureToHighlightInDiffTable: '',
-  //   });
-  // };
 
   getStudies = () => {
     phosphoprotService
@@ -202,7 +193,6 @@ class Tabs extends Component {
         allStudiesMetadata: [],
         differentialFeatureIdKey: '',
         filteredDifferentialFeatureIdKey: '',
-        // bullseyeHighlightInProgress: false,
       },
       function() {
         updateUrl(

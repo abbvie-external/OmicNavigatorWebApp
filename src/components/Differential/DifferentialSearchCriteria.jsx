@@ -100,10 +100,7 @@ class DifferentialSearchCriteria extends Component {
   componentDidUpdate(prevProps) {
     if (
       this.props.allStudiesMetadata !== prevProps.allStudiesMetadata ||
-      this.props.differentialStudy !== prevProps.differentialStudy ||
-      (this.props.featureToHighlightInDiffTable !==
-        prevProps.featureToHighlightInDiffTable &&
-        this.props.featureToHighlightInDiffTable !== '')
+      this.props.differentialStudy !== prevProps.differentialStudy
     ) {
       this.populateDropdowns();
     }

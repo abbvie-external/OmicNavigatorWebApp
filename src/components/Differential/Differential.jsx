@@ -56,7 +56,7 @@ class Differential extends Component {
     isItemSelected: false,
     isProteinSVGLoaded: false,
     // isProteinDataLoaded: false,
-    HighlightedFeaturesVolcano: [],
+    HighlightedFeaturesArrVolcano: [],
     volcanoDifferentialTableRowMax: [],
     volcanoDifferentialTableRowOther: [],
     maxObjectIdentifier: null,
@@ -91,11 +91,7 @@ class Differential extends Component {
   DifferentialViewContainerRef = React.createRef();
   differentialGridRef = React.createRef();
 
-  componentDidUpdate(prevProps) {
-    // if (this.props.bullseyeHighlightInProgress) {
-    //   this.pageToFeature(this.props.featureToHighlightInDiffTable);
-    // }
-  }
+  componentDidUpdate(prevProps) {}
 
   informItemsPerPage = items => {
     this.setState({
@@ -175,7 +171,7 @@ class Differential extends Component {
       plotButtonActive: false,
       visible: false,
       // isProteinSVGLoaded: false,
-      // HighlightedFeaturesVolcano: [],
+      HighlightedFeaturesArrVolcano: [],
     });
   };
 
@@ -185,7 +181,7 @@ class Differential extends Component {
       isProteinSVGLoaded: false,
       // isProteinDataLoaded: false,
       isItemSelected: false,
-      HighlightedFeaturesVolcano: [],
+      HighlightedFeaturesArrVolcano: [],
     });
   };
 
@@ -292,33 +288,9 @@ class Differential extends Component {
   getTableHelpers = (
     getProteinDataCb,
     getPlotCb,
-    // toHighlightArr,
     differentialFeatureIdKeyVar,
-    // maxObj,
   ) => {
-    // const {
-    //   bullseyeHighlightInProgress,
-    //   featureToHighlightInDiffTable,
-    // } = this.props;
     let addParams = {};
-    // addParams.rowHighlightMax = [];
-    // addParams.rowHighlightOther = [];
-    // addParams.rowHighlightBullseye = [];
-
-    // if (toHighlightArr.length > 0 && toHighlightArr != null) {
-    //   toHighlightArr.forEach(element => {
-    //     addParams.rowHighlightOther.push(element.id);
-    //   });
-    // }
-    // if (maxObj) {
-    //   addParams.rowHighlightMax = maxObj.id;
-    // }
-    // bullseye highlighting - page to item, scroll, highlight
-    // if (bullseyeHighlightInProgress) {
-    //   if (featureToHighlightInDiffTable != null) {
-    //     addParams.rowHighlightBullseye.push(featureToHighlightInDiffTable);
-    //   }
-    // }
     addParams.showPhosphositePlus = dataItem => {
       let protein = dataItem.symbol
         ? dataItem.symbol
@@ -354,20 +326,17 @@ class Differential extends Component {
     this.setState({ additionalTemplateInfoDifferentialTable: addParams });
   };
 
-  pageToFeature = featureToHighlight => {
-    const { differentialFeatureIdKey } = this.props;
-    const { differentialResults, itemsPerPageDifferentialTable } = this.state;
-    if (this.differentialGridRef?.current != null) {
-      const Index = _.findIndex(differentialResults, function(p) {
-        return p[differentialFeatureIdKey] === featureToHighlight;
-      });
-      const pageNumber = Math.ceil((Index + 1) / itemsPerPageDifferentialTable);
-      this.differentialGridRef.current.handlePageChange(
-        {},
-        { activePage: pageNumber },
-      );
-    }
-  };
+  // pageToFeature = featureToHighlight => {
+  //   const { differentialFeatureIdKey } = this.props;
+  //   const { differentialResults, itemsPerPageDifferentialTable } = this.state;
+  //   if (this.differentialGridRef?.current != null) {
+  //     const Index = _.findIndex(differentialResults, function(p) {
+  //       return p[differentialFeatureIdKey] === featureToHighlight;
+  //     });
+  //     const pageNumber = Math.ceil((Index + 1) / itemsPerPageDifferentialTable);
+  //     this.differentialGridRef.current.handlePageChange(pageNumber);
+  //   }
+  // };
 
   getPlot = (featureId, useVolcanoSVGSize) => {
     const { differentialPlotTypes } = this.state;
@@ -449,13 +418,13 @@ class Differential extends Component {
     }
   };
 
-  handleSelectedFromTable = toHighlightArr => {
+  handleSelectedVolcano = toHighlightArr => {
     this.setState({
-      HighlightedFeaturesVolcano: toHighlightArr,
+      HighlightedFeaturesArrVolcano: toHighlightArr,
     });
     if (toHighlightArr.length > 0) {
       const MaxLine = toHighlightArr[0] || null;
-      let volcanoDifferentialTableRowMaxVar = [];
+      let volcanoDifferentialTableRowMaxVar = '';
       if (MaxLine !== {} && MaxLine != null) {
         volcanoDifferentialTableRowMaxVar = MaxLine.key;
       }
@@ -477,6 +446,21 @@ class Differential extends Component {
         volcanoDifferentialTableRowMax: volcanoDifferentialTableRowMaxVar,
         // volcanoDifferentialTableRowOther: volcanoDifferentialTableRowOtherVar,
       });
+      this.handlePlotVolcano(maxId);
+      // if (!tableClick) {
+      // this.pageToFeature(maxId);
+      // }
+    } else {
+      this.setState({
+        volcanoDifferentialTableRowMax: '',
+        // volcanoDifferentialTableRowOther: '',
+      });
+      this.handlePlotVolcano('');
+    }
+  };
+
+  handlePlotVolcano = maxId => {
+    if (maxId !== '') {
       if (this.state.maxObjectIdentifier !== maxId) {
         this.setState({
           isVolcanoPlotSVGLoaded: false,
@@ -488,8 +472,7 @@ class Differential extends Component {
       this.setState({
         isVolcanoPlotSVGLoaded: true,
         maxObjectIdentifier: '',
-        volcanoDifferentialTableRowMax: [],
-        // volcanoDifferentialTableRowOther: [],
+
         imageInfo: {
           key: null,
           title: '',
@@ -497,10 +480,6 @@ class Differential extends Component {
         },
       });
     }
-    // if (bullseyeHighlightInProgress) {
-    //   this.setState({ isProteinSVGLoaded: false });
-    //   this.getPlot(featureToHighlightInDiffTable, true);
-    // }
   };
 
   handleSVGTabChange = activeTabIndex => {
@@ -753,7 +732,6 @@ class Differential extends Component {
       differentialStudy,
       differentialModel,
       differentialTest,
-      // featureToHighlightInDiffTable,
     } = this.props;
     const { multisetQueriedP } = this.state;
 
@@ -766,12 +744,6 @@ class Differential extends Component {
     } = this.state;
     const differentialRows = differentialResults.length || 1000;
     let differentialCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}`;
-    // if (
-    //   featureToHighlightInDiffTable !== '' &&
-    //   featureToHighlightInDiffTable != null
-    // ) {
-    //   differentialCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-${featureToHighlightInDiffTable}`;
-    // }
     if (multisetQueriedP) {
       differentialCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-${multisetQueriedP}`;
     }
@@ -870,7 +842,7 @@ class Differential extends Component {
               handleVolcanoPlotSelectionChange={
                 this.handleVolcanoPlotSelectionChange
               }
-              onSelectFromTable={this.handleSelectedFromTable}
+              onHandleSelectedVolcano={this.handleSelectedVolcano}
               onVolcanoSVGSizeChange={this.handleVolcanoSVGSizeChange}
               onSVGTabChange={this.handleSVGTabChange}
               onHandleVolcanoTableLoading={this.handleVolcanoTableLoading}

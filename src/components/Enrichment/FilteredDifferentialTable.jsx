@@ -122,10 +122,7 @@ class FilteredDifferentialTable extends Component {
   //     });
   //     const pageNumber = Math.ceil(Index / itemsPerPage);
   //     const pageNumberCheck = pageNumber >= 1 ? pageNumber : 1;
-  //     this.filteredDifferentialGridRef.current.handlePageChange(
-  //       {},
-  //       { activePage: pageNumberCheck },
-  //     );
+  //     this.filteredDifferentialGridRef.current.handlePageChange(pageNumberCheck);
   //   }
   // };
 
@@ -338,10 +335,6 @@ class FilteredDifferentialTable extends Component {
     ) {
       className = 'rowHighlightOther';
     }
-
-    // if (item[filteredDifferentialFeatureIdKey] === filteredDifferentialTableRowOtherBullseye) {
-    //   className = 'rowHighlightBullseye
-    // }
     return {
       className,
     };

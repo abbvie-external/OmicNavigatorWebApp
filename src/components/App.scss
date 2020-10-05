@@ -104,6 +104,10 @@
     margin: initial !important;
   }
 
+  .QHGrid--empty {
+    height: auto !important;
+  }
+
   //icons
   i.orange.icon {
     color: var(--color-primary) !important;

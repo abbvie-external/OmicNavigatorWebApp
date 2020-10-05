@@ -24,9 +24,7 @@ class DifferentialVolcanoPlot extends Component {
 
   componentDidUpdate(prevProps) {
     const {
-      // HighlightedFeaturesVolcano,
       // volcanoDifferentialTableRowOther,
-      // volcanoDifferentialTableRowBullseye,
       volcanoDifferentialTableRowMax,
     } = this.props;
     if (
@@ -35,15 +33,13 @@ class DifferentialVolcanoPlot extends Component {
       //   prevProps.volcanoDifferentialTableRowOther ||
       volcanoDifferentialTableRowMax !==
       prevProps.volcanoDifferentialTableRowMax
-      // volcanoDifferentialTableRowBullseye !==
-      // prevProps.volcanoDifferentialTableRowBullseye
     ) {
       const circles = d3.selectAll('circle.volcanoPlot-dataPoint').attr('r', 2);
       circles.classed('highlighted', false);
       circles.classed('highlightedMax', false);
       // Once table multi-select is built, uncomment
-      // if (HighlightedFeaturesVolcano.length > 0) {
-      //   HighlightedFeaturesVolcano.forEach(element => {
+      // if (volcanoDifferentialTableRowOther.length > 0) {
+      //   volcanoDifferentialTableRowOther.forEach(element => {
       //     const circleid = `${element.key}`;
       //     const highlightedCircle = d3.select(`#volcanoDataPoint-${circleid}`);
       //     highlightedCircle.classed('highlighted', true);
@@ -442,7 +438,7 @@ class DifferentialVolcanoPlot extends Component {
         onMouseEnter={e => this.handleCircleHover(e)}
         onMouseLeave={() => this.handleCircleLeave()}
         onClick={e =>
-          this.props.handleRowClick(
+          this.props.onHandleDotClick(
             e,
             JSON.parse(e.target.attributes.data.value),
             0,
