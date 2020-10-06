@@ -1,24 +1,19 @@
 import React, { Component } from 'react';
 import { Popup, Dimmer, Loader } from 'semantic-ui-react';
 import { phosphoprotService } from '../../services/phosphoprot.service';
-import _ from 'lodash';
-import { formatNumberForDisplay, splitValue } from '../Shared/helpers';
+// import _ from 'lodash';
+import {
+  formatNumberForDisplay,
+  splitValue,
+  scrollElement,
+} from '../Shared/helpers';
 import phosphosite_icon from '../../resources/phosphosite.ico';
 import './FilteredDifferentialTable.scss';
 import { CancelToken } from 'axios';
-import QHGrid from '../utility/QHGrid';
-import EZGrid from '../utility/EZGrid';
-import QuickViewModal from '../utility/QuickViewModal';
-import {
-  getFieldValue,
-  getField,
-  typeMap,
-} from '../utility/selectors/QHGridSelector';
+import CustomEmptyMessage from '../Shared/Templates';
+// eslint-disable-next-line no-unused-vars
+import QHGrid, { EZGrid } from '***REMOVED***';
 // import { data } from 'pdfkit/js/reference';
-export * from '../utility/FilterTypeConfig';
-export * from '../utility/selectors/quickViewSelector';
-export { QHGrid, EZGrid, QuickViewModal };
-export { getField, getFieldValue, typeMap };
 
 let cancelRequestFPTGetResultsTable = () => {};
 class FilteredDifferentialTable extends Component {
@@ -34,6 +29,8 @@ class FilteredDifferentialTable extends Component {
     filteredTableLoading: true,
     additionalTemplateInfo: [],
     identifier: null,
+    filteredDifferentialTableRowMax: [],
+    filteredDifferentialTableRowOther: [],
   };
   filteredDifferentialGridRef = React.createRef();
 
@@ -64,16 +61,21 @@ class FilteredDifferentialTable extends Component {
 
     if (
       this.props.filteredDifferentialFeatureIdKey !==
-        prevProps.filteredDifferentialFeatureIdKey ||
-      this.props.HighlightedProteins !== prevProps.HighlightedProteins
+      prevProps.filteredDifferentialFeatureIdKey
     ) {
-      const additionalParameters = this.getTableHelpers(
-        this.props.HighlightedProteins,
+      this.setState(
+        {
+          additionalTemplateInfo: {},
+          filteredTableLoading: true,
+        },
+        function() {
+          this.getTableHelpers();
+        },
       );
-      this.setState({
-        additionalTemplateInfo: additionalParameters,
-        filteredTableLoading: false,
-      });
+    }
+
+    if (this.props.HighlightedProteins !== prevProps.HighlightedProteins) {
+      this.highlightRows(this.props.HighlightedProteins);
     }
     // let prevValues = prevProps?.barcodeSettings?.brushedData ?? [];
     // let currentValues = this.props.barcodeSettings?.brushedData ?? [];
@@ -120,10 +122,7 @@ class FilteredDifferentialTable extends Component {
   //     });
   //     const pageNumber = Math.ceil(Index / itemsPerPage);
   //     const pageNumberCheck = pageNumber >= 1 ? pageNumber : 1;
-  //     this.filteredDifferentialGridRef.current.handlePageChange(
-  //       {},
-  //       { activePage: pageNumberCheck },
-  //     );
+  //     this.filteredDifferentialGridRef.current.handlePageChange(pageNumberCheck);
   //   }
   // };
 
@@ -224,7 +223,7 @@ class FilteredDifferentialTable extends Component {
         return {
           title: f,
           field: f,
-          filterable: { type: 'alphanumericFilter' },
+          filterable: { type: 'multiFilter' },
           template: (value, item, addParams) => {
             if (f === alphanumericTrigger) {
               return (
@@ -315,22 +314,56 @@ class FilteredDifferentialTable extends Component {
     this.getTableData();
   };
 
-  getTableHelpers = HighlightedProteins => {
+  rowLevelPropsCalc = item => {
+    let className;
+    const {
+      filteredDifferentialTableRowMax,
+      filteredDifferentialTableRowOther,
+    } = this.state;
     const { filteredDifferentialFeatureIdKey } = this.props;
-    const MaxLine = HighlightedProteins[0] || null;
-    let addParams = {};
-    addParams.elementId = filteredDifferentialFeatureIdKey;
-    if (MaxLine !== {} && MaxLine != null) {
-      addParams.rowHighlightMax = MaxLine.featureID;
-      // addParams.rowHighlightMax = MaxLine[filteredDifferentialFeatureIdKey];
+    /* eslint-disable eqeqeq */
+    if (
+      item[filteredDifferentialFeatureIdKey] === filteredDifferentialTableRowMax
+    ) {
+      className = 'rowHighlightMax';
     }
-    const SelectedProteins = HighlightedProteins.slice(1);
+
+    if (
+      filteredDifferentialTableRowOther.includes(
+        item[filteredDifferentialFeatureIdKey],
+      )
+    ) {
+      className = 'rowHighlightOther';
+    }
+    return {
+      className,
+    };
+  };
+
+  highlightRows = HighlightedProteins => {
+    const MaxLine = HighlightedProteins[0] || null;
+    let filteredDifferentialTableRowMaxVar = [];
+    if (MaxLine !== {} && MaxLine != null) {
+      filteredDifferentialTableRowMaxVar = MaxLine.featureID;
+    }
+    const HighlightedProteinsCopy = [...HighlightedProteins];
+    const SelectedProteins = HighlightedProteinsCopy.slice(1);
+    let filteredDifferentialTableRowOtherVar = [];
     if (SelectedProteins.length > 0 && SelectedProteins != null) {
-      addParams.rowHighlightOther = [];
       SelectedProteins.forEach(element => {
-        addParams.rowHighlightOther.push(element.featureID);
+        filteredDifferentialTableRowOtherVar.push(element.featureID);
       });
     }
+    this.setState({
+      filteredDifferentialTableRowMax: filteredDifferentialTableRowMaxVar,
+      filteredDifferentialTableRowOther: filteredDifferentialTableRowOtherVar,
+    });
+    scrollElement(this, 'filteredDifferentialGridRef', 'rowHighlightMax');
+  };
+
+  getTableHelpers = () => {
+    const { filteredDifferentialFeatureIdKey } = this.props;
+    let addParams = {};
     addParams.showPhosphositePlus = dataItem => {
       let protein = dataItem.symbol
         ? dataItem.symbol
@@ -347,7 +380,10 @@ class FilteredDifferentialTable extends Component {
         );
       };
     };
-    return addParams;
+    this.setState({
+      additionalTemplateInfo: addParams,
+      filteredTableLoading: false,
+    });
   };
 
   informItemsPerPageFilteredDifferentialTable = items => {
@@ -359,91 +395,89 @@ class FilteredDifferentialTable extends Component {
 
   handleRowClick = (event, item, index) => {
     if (item !== null && event?.target?.className !== 'ExternalSiteIcon') {
-      const { identifier } = this.state;
       const { filteredDifferentialFeatureIdKey } = this.props;
-      const PreviouslyHighlighted = this.props.HighlightedProteins;
       // const stat = barcodeSettings.statLabel;
       event.stopPropagation();
-      if (event.shiftKey) {
-        const allTableData = _.cloneDeep(this.state.filteredTableData);
-        const indexMaxProtein = _.findIndex(allTableData, function(d) {
-          return (
-            d[filteredDifferentialFeatureIdKey] ===
-            PreviouslyHighlighted[0]?.featureID
-          );
-        });
-        const sliceFirst = index < indexMaxProtein ? index : indexMaxProtein;
-        const sliceLast = index > indexMaxProtein ? index : indexMaxProtein;
-        const shiftedTableData = allTableData.slice(sliceFirst, sliceLast + 1);
-        const shiftedTableDataArray = shiftedTableData.map(function(d) {
-          return {
-            // sample: d.symbol,
-            // sample: d.phosphosite,
-            featureID: d[filteredDifferentialFeatureIdKey],
-            key: d[identifier],
-            // PAUL - this needs adjustment, looking for d.abs(t) instead of d.T, for example
-            // cpm: d[stat],
-            // cpm: d.F == null ? d.t : d.F,
-          };
-        });
-        this.props.onHandleProteinSelected(shiftedTableDataArray);
-      } else if (event.ctrlKey) {
-        const allTableData = _.cloneDeep(this.state.filteredTableData);
-        let selectedTableDataArray = [];
+      // 10/2/20 - This will be uncommented once we gain access to table data after sort/filter
+      // const PreviouslyHighlighted = [...this.props.HighlightedProteins];
+      // if (event.shiftKey) {
+      //   const allTableData = _.cloneDeep(this.state.filteredTableData);
+      //   const indexMaxProtein = _.findIndex(allTableData, function(d) {
+      //     return (
+      //       d[filteredDifferentialFeatureIdKey] ===
+      //       PreviouslyHighlighted[0]?.featureID
+      //     );
+      //   });
+      //   const sliceFirst = index < indexMaxProtein ? index : indexMaxProtein;
+      //   const sliceLast = index > indexMaxProtein ? index : indexMaxProtein;
+      //   const shiftedTableData = allTableData.slice(sliceFirst, sliceLast + 1);
+      //   const shiftedTableDataArray = shiftedTableData.map(function(d) {
+      //     return {
+      //       // sample: d.symbol,
+      //       // sample: d.phosphosite,
+      //       featureID: d[filteredDifferentialFeatureIdKey],
+      //       key: d[filteredDifferentialFeatureIdKey],
+      //       // PAUL - this needs adjustment, looking for d.abs(t) instead of d.T, for example
+      //       // cpm: d[stat],
+      //       // cpm: d.F == null ? d.t : d.F,
+      //     };
+      //   });
+      //   this.props.onHandleProteinSelected(shiftedTableDataArray);
+      // } else if (event.ctrlKey) {
+      //   const allTableData = _.cloneDeep(this.state.filteredTableData);
+      //   let selectedTableDataArray = [];
 
-        const ctrlClickedObj = allTableData[index];
-        const alreadyHighlighted = PreviouslyHighlighted.some(
-          d => d.featureID === ctrlClickedObj[filteredDifferentialFeatureIdKey],
-        );
-        // already highlighted, remove it from array
-        if (alreadyHighlighted) {
-          selectedTableDataArray = PreviouslyHighlighted.filter(
-            i =>
-              i.featureID !== ctrlClickedObj[filteredDifferentialFeatureIdKey],
-          );
-          this.props.onHandleProteinSelected(selectedTableDataArray);
-        } else {
-          // not yet highlighted, add it to array
-          const indexMaxProtein = _.findIndex(allTableData, function(d) {
-            return (
-              d[filteredDifferentialFeatureIdKey] ===
-              PreviouslyHighlighted[0]?.featureID
-            );
-          });
-          // map protein to fix obj entries
-          const mappedProtein = {
-            // sample: ctrlClickedObj.phosphosite,
-            featureID: ctrlClickedObj[filteredDifferentialFeatureIdKey],
-            key: ctrlClickedObj[identifier],
-            // PAUL
-            // cpm: ctrlClickedObj[stat],
-            // cpm: ctrlClickedObj.F == null ? ctrlClickedObj.t : ctrlClickedObj.F,
-          };
-          const lowerIndexThanMax = index < indexMaxProtein ? true : false;
-          if (lowerIndexThanMax) {
-            // add to beginning of array if max
-            PreviouslyHighlighted.unshift(mappedProtein);
-          } else {
-            // just add to array if not max
-            PreviouslyHighlighted.push(mappedProtein);
-          }
-          selectedTableDataArray = [...PreviouslyHighlighted];
-          this.props.onHandleProteinSelected(selectedTableDataArray);
-        }
-      } else {
-        this.props.onHandleProteinSelected([
-          {
-            // sample: item.Protein_Site, //lineID,
-            // featureID: item.featureID,
-            // cpm: item.logFC, //statistic,
-            // sample: item.phosphosite,
-            featureID: item[filteredDifferentialFeatureIdKey],
-            key: item[identifier],
-            // cpm: item[stat],
-            // cpm: item.F === undefined ? item.t : item.F,
-          },
-        ]);
-      }
+      //   const alreadyHighlighted = PreviouslyHighlighted.some(
+      //     d => d.featureID === item[filteredDifferentialFeatureIdKey],
+      //   );
+      //   // already highlighted, remove it from array
+      //   if (alreadyHighlighted) {
+      //     selectedTableDataArray = PreviouslyHighlighted.filter(
+      //       i => i.featureID !== item[filteredDifferentialFeatureIdKey],
+      //     );
+      //     this.props.onHandleProteinSelected(selectedTableDataArray);
+      //   } else {
+      //     // not yet highlighted, add it to array
+      //     const indexMaxProtein = _.findIndex(allTableData, function(d) {
+      //       return (
+      //         d[filteredDifferentialFeatureIdKey] ===
+      //         PreviouslyHighlighted[0]?.featureID
+      //       );
+      //     });
+      //     // map protein to fix obj entries
+      //     const mappedProtein = {
+      //       // sample: ctrlClickedObj.phosphosite,
+      //       featureID: item[filteredDifferentialFeatureIdKey],
+      //       key: item[filteredDifferentialFeatureIdKey],
+      //       // PAUL
+      //       // cpm: ctrlClickedObj[stat],
+      //       // cpm: ctrlClickedObj.F == null ? ctrlClickedObj.t : ctrlClickedObj.F,
+      //     };
+      //     const lowerIndexThanMax = index < indexMaxProtein ? true : false;
+      //     if (lowerIndexThanMax) {
+      //       // add to beginning of array if max
+      //       PreviouslyHighlighted.unshift(mappedProtein);
+      //     } else {
+      //       // just add to array if not max
+      //       PreviouslyHighlighted.push(mappedProtein);
+      //     }
+      //     selectedTableDataArray = [...PreviouslyHighlighted];
+      //     this.props.onHandleProteinSelected(selectedTableDataArray);
+      //   }
+      // } else {
+      this.props.onHandleProteinSelected([
+        {
+          // sample: item.Protein_Site, //lineID,
+          // featureID: item.featureID,
+          // cpm: item.logFC, //statistic,
+          // sample: item.phosphosite,
+          featureID: item[filteredDifferentialFeatureIdKey],
+          key: item[filteredDifferentialFeatureIdKey],
+          // cpm: item[stat],
+          // cpm: item.F === undefined ? item.t : item.F,
+        },
+      ]);
+      // }
     }
   };
 
@@ -453,6 +487,7 @@ class FilteredDifferentialTable extends Component {
       filteredTableData,
       itemsPerPageFilteredDifferentialTable,
       filteredTableLoading,
+      additionalTemplateInfo,
     } = this.state;
 
     if (!filteredTableLoading) {
@@ -477,9 +512,11 @@ class FilteredDifferentialTable extends Component {
             disableColumnReorder
             // disableFilters={false}
             min-height="5vh"
-            additionalTemplateInfo={this.state.additionalTemplateInfo}
+            additionalTemplateInfo={additionalTemplateInfo}
             // headerAttributes={<ButtonActions />}
             onRowClick={this.handleRowClick}
+            rowLevelPropsCalc={this.rowLevelPropsCalc}
+            emptyMessage={CustomEmptyMessage}
           />
         </div>
       );

@@ -45,6 +45,23 @@ export function limitValues(values, size) {
   }
 }
 
+export function scrollElement(_this, grid, target) {
+  const bodyRef =
+    _this[grid].current?.qhGridRef?.current?.bodyRef?.current || null;
+  window.requestAnimationFrame(function() {
+    if (bodyRef != null) {
+      const row = bodyRef.getElementsByClassName(target);
+      if (row.length !== 0) {
+        bodyRef.scrollTo({
+          top: row[0].offsetTop - 40,
+          left: 0,
+          behavior: 'smooth',
+        });
+      }
+    }
+  });
+}
+
 export function networkByCluster(network) {
   network = _.cloneDeep(network);
   let buckets = [];

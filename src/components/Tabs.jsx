@@ -53,7 +53,6 @@ class Tabs extends Component {
       allStudiesMetadata: [],
       differentialFeatureIdKey: '',
       filteredDifferentialFeatureIdKey: '',
-      bullseyeHighlightInProgress: false,
     };
   }
 
@@ -144,7 +143,6 @@ class Tabs extends Component {
       differentialModel: this.state.enrichmentModel || '',
       differentialTest: test || '',
       differentialFeature: '',
-      bullseyeHighlightInProgress: true,
       featureToHighlightInDiffTable: featureID,
     });
     let changes = {
@@ -164,13 +162,6 @@ class Tabs extends Component {
     );
   };
 
-  handlePagedToFeature = () => {
-    this.setState({
-      bullseyeHighlightInProgress: false,
-      featureToHighlightInDiffTable: '',
-    });
-  };
-
   getStudies = () => {
     phosphoprotService
       .listStudies()
@@ -182,6 +173,10 @@ class Tabs extends Component {
       .catch(error => {
         console.error('Error during listStudies', error);
       });
+  };
+
+  resetFeatureToHighlightInDiffTable = () => {
+    this.setState({ featureToHighlightInDiffTable: '' });
   };
 
   resetApp = () => {
@@ -202,7 +197,6 @@ class Tabs extends Component {
         allStudiesMetadata: [],
         differentialFeatureIdKey: '',
         filteredDifferentialFeatureIdKey: '',
-        bullseyeHighlightInProgress: false,
       },
       function() {
         updateUrl(
@@ -250,7 +244,10 @@ class Tabs extends Component {
               onHandleDifferentialFeatureIdKey={
                 this.handleDifferentialFeatureIdKey
               }
-              onPagedToFeature={this.handlePagedToFeature}
+              onResetFeatureToHighlightInDiffTable={
+                this.resetFeatureToHighlightInDiffTable
+              }
+              // onPagedToFeature={this.handlePagedToFeature}
             />
           </Tab.Pane>
         ),

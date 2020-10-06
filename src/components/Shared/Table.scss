@@ -26,3 +26,14 @@
 .TablePopupValue {
   word-break: break-all !important;
 }
+
+.ResultsTableWrapper {
+  .QHGrid--generalSearch.QHGrid--generalSearch.QHGrid--generalSearch.QHGrid--generalSearch
+    input {
+    border: 1px solid lightgrey;
+  }
+  .QHGrid--generalSearch:nth-child(1) {
+    margin-left: 127px !important;
+    margin-bottom: 15px;
+  }
+}

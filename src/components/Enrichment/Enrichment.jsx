@@ -28,19 +28,9 @@ import './Enrichment.scss';
 import EnrichmentResultsGraph from './EnrichmentResultsGraph';
 import EnrichmentSearchCriteria from './EnrichmentSearchCriteria';
 import SplitPanesContainer from './SplitPanesContainer';
-import './EnrichmentResultsTable.scss';
-import QHGrid from '../utility/QHGrid';
-import EZGrid from '../utility/EZGrid';
-import QuickViewModal from '../utility/QuickViewModal';
-import {
-  getFieldValue,
-  getField,
-  typeMap,
-} from '../utility/selectors/QHGridSelector';
-export * from '../utility/FilterTypeConfig';
-export * from '../utility/selectors/quickViewSelector';
-export { QHGrid, EZGrid, QuickViewModal };
-export { getField, getFieldValue, typeMap };
+import CustomEmptyMessage from '../Shared/Templates';
+// eslint-disable-next-line no-unused-vars
+import QHGrid, { EZGrid } from '***REMOVED***';
 
 let cancelRequestEnrichmentGetPlot = () => {};
 let cancelRequestGetEnrichmentsNetwork = () => {};
@@ -394,8 +384,10 @@ class Enrichment extends Component {
     });
   };
 
-  handleMultisetFiltersVisible = bool => {
-    this.setState({ multisetFiltersVisible: bool });
+  handleMultisetFiltersVisible = () => {
+    this.setState(prevState => ({
+      multisetFiltersVisible: !prevState.multisetFiltersVisible,
+    }));
   };
 
   handleNetworkSigValue = val => {
@@ -597,7 +589,7 @@ class Enrichment extends Component {
         return {
           title: f,
           field: f,
-          filterable: { type: 'alphanumericFilter' },
+          filterable: { type: 'multiFilter' },
           template: (value, item, addParams) => {
             if (f === alphanumericTrigger) {
               return (
@@ -1863,7 +1855,7 @@ class Enrichment extends Component {
             <Grid>
               <Grid.Row>
                 <Grid.Column
-                  className="EnrichmentResultsTable"
+                  className="ResultsTableWrapper"
                   mobile={16}
                   tablet={16}
                   largeScreen={16}
@@ -1890,6 +1882,7 @@ class Enrichment extends Component {
                       additionalTemplateInfoEnrichmentTable
                     }
                     // onInformItemsPerPage={this.informItemsPerPage}
+                    emptyMessage={CustomEmptyMessage}
                   />
                 </Grid.Column>
               </Grid.Row>

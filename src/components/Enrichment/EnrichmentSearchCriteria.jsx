@@ -521,7 +521,8 @@ class EnrichmentSearchCriteria extends Component {
         // on toggle open
         this.props.onMultisetQueriedE(true);
         this.props.onSearchTransitionEnrichment(true);
-        this.props.onHandleMultisetFiltersVisible(true);
+        this.props.onHandleMultisetFiltersVisible();
+        // this.props.onHandleMultisetFiltersVisible(true);
         this.setState(
           {
             reloadPlot: true,
@@ -534,7 +535,8 @@ class EnrichmentSearchCriteria extends Component {
         // on toggle close
         // this.props.onHandleNetworkTests([], []);
         this.props.onMultisetQueriedE(false);
-        this.props.onHandleMultisetFiltersVisible(false);
+        this.props.onHandleMultisetFiltersVisible();
+        // this.props.onHandleMultisetFiltersVisible(false);
         this.setState({
           reloadPlot: false,
           initialRenderE: true,
@@ -551,14 +553,16 @@ class EnrichmentSearchCriteria extends Component {
 
   handleMultisetEOpenError = () => {
     cancelRequestEnrichmentMultisetPlot();
-    this.props.onHandleMultisetFiltersVisible(false);
+    this.props.onHandleMultisetFiltersVisible();
+    // this.props.onHandleMultisetFiltersVisible(false);
     this.props.onMultisetQueriedE(false);
     console.log('Error during getEnrichmentsIntersection');
   };
 
   handleMultisetECloseError = () => {
     this.props.onSearchTransitionEnrichment(false);
-    this.props.onHandleMultisetFiltersVisible(true);
+    this.props.onHandleMultisetFiltersVisible();
+    // this.props.onHandleMultisetFiltersVisible(true);
     this.props.onMultisetQueriedE(true);
     this.setState(
       {
