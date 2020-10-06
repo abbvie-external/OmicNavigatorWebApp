@@ -384,8 +384,10 @@ class Enrichment extends Component {
     });
   };
 
-  handleMultisetFiltersVisible = bool => {
-    this.setState({ multisetFiltersVisible: bool });
+  handleMultisetFiltersVisible = () => {
+    this.setState(prevState => ({
+      multisetFiltersVisible: !prevState.multisetFiltersVisible,
+    }));
   };
 
   handleNetworkSigValue = val => {

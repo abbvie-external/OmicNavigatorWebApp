@@ -52,7 +52,6 @@ class DifferentialVolcano extends Component {
           key: featureToHighlightInDiffTable,
         },
       ];
-      debugger;
       this.props.onHandleSelectedVolcano(featureToHighlightInDiffTableArr);
       // this.pageToFeature(featureToHighlightInDiffTable);
       this.props.onResetFeatureToHighlightInDiffTable();
@@ -94,7 +93,6 @@ class DifferentialVolcano extends Component {
         // differentialResults
       } = this.props;
       const { itemsPerPageVolcanoTable } = this.state;
-      debugger;
       const currentData = this.volcanoPlotFilteredGridRef?.current?.qhGridRef
         ?.current?.data;
       if (this.volcanoPlotFilteredGridRef?.current != null) {

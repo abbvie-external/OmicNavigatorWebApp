@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Popup, Dimmer, Loader } from 'semantic-ui-react';
 import { phosphoprotService } from '../../services/phosphoprot.service';
-import _ from 'lodash';
+// import _ from 'lodash';
 import {
   formatNumberForDisplay,
   splitValue,
