@@ -175,6 +175,10 @@ class Tabs extends Component {
       });
   };
 
+  resetFeatureToHighlightInDiffTable = () => {
+    this.setState({ featureToHighlightInDiffTable: '' });
+  };
+
   resetApp = () => {
     this.setState(
       {
@@ -239,6 +243,9 @@ class Tabs extends Component {
               onSearchCriteriaToTop={this.handleSearchCriteriaToTop}
               onHandleDifferentialFeatureIdKey={
                 this.handleDifferentialFeatureIdKey
+              }
+              onResetFeatureToHighlightInDiffTable={
+                this.resetFeatureToHighlightInDiffTable
               }
               // onPagedToFeature={this.handlePagedToFeature}
             />

@@ -55,6 +55,7 @@ class DifferentialVolcano extends Component {
       debugger;
       this.props.onHandleSelectedVolcano(featureToHighlightInDiffTableArr);
       // this.pageToFeature(featureToHighlightInDiffTable);
+      this.props.onResetFeatureToHighlightInDiffTable();
     }
   }
 
@@ -416,10 +417,10 @@ class DifferentialVolcano extends Component {
       differentialColumns,
       isDifferentialTableLoading,
       // differentialResultsMounted,
-      // differentialStudy,
-      // differentialModel,
-      // differentialTest,
-      // multisetQueriedP,
+      differentialStudy,
+      differentialModel,
+      differentialTest,
+      multisetQueriedP,
     } = this.props;
     // if (differentialResultsMounted) {
     const xAxisTransformBox = allowXTransformation ? (
@@ -443,10 +444,10 @@ class DifferentialVolcano extends Component {
       </span>
     ) : null;
     const svgPlot = this.getSVGPlot();
-    // let differentialVolcanoCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-Volcano`;
-    // if (multisetQueriedP) {
-    //   differentialVolcanoCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-${multisetQueriedP}-Volcano`;
-    // }
+    let differentialVolcanoCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-Volcano`;
+    if (multisetQueriedP) {
+      differentialVolcanoCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-${multisetQueriedP}-Volcano`;
+    }
     return (
       <Grid className="VolcanoPlotGridContainer">
         <Grid.Row className="VolcanoPlotAxisSelectorsRow">
@@ -534,7 +535,7 @@ class DifferentialVolcano extends Component {
               </SplitPane>
               <EZGrid
                 ref={this.volcanoPlotFilteredGridRef}
-                // uniqueCacheKey={differentialVolcanoCacheKey}
+                uniqueCacheKey={differentialVolcanoCacheKey}
                 className="volcanoPlotTable"
                 // note, default is 70vh; if you want a specific vh, specify like "40vh"; "auto" lets the height flow based on items per page
                 // height="auto"
