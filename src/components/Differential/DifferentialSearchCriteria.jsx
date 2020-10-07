@@ -104,6 +104,9 @@ class DifferentialSearchCriteria extends Component {
     ) {
       this.populateDropdowns();
     }
+    // if (this.props.multisetPlotAvailable !== prevProps.multisetPlotAvailable) {
+    //   this.forceUpdate();
+    // }
   }
 
   populateDropdowns = () => {
@@ -624,16 +627,6 @@ class DifferentialSearchCriteria extends Component {
     } = this.state;
     const eMustP = this.state.uSettingsP.mustP;
     const eNotP = this.state.uSettingsP.notP;
-    if (reloadPlotP === true && differentialTests.length > 1) {
-      onDisablePlot();
-      this.getMultisetPlot(
-        sigValueP,
-        differentialModel,
-        differentialStudy,
-        this.jsonToList(selectedOperatorP),
-        this.jsonToList(selectedColP),
-      );
-    }
     cancelRequestMultisetInferenceData();
     let cancelToken = new CancelToken(e => {
       cancelRequestMultisetInferenceData = e;
@@ -672,6 +665,19 @@ class DifferentialSearchCriteria extends Component {
       .catch(error => {
         console.error('Error during getResultsIntersection', error);
       });
+    //   const testsLength =
+    //   typeof differentialTests === 'string' ? 1 : differentialTests.length;
+    // if (reloadPlotP === true && testsLength > 1) {
+    if (reloadPlotP === true && differentialTests.length > 1) {
+      onDisablePlot();
+      this.getMultisetPlot(
+        sigValueP,
+        differentialModel,
+        differentialStudy,
+        this.jsonToList(selectedOperatorP),
+        this.jsonToList(selectedColP),
+      );
+    }
   };
 
   jsonToList(json) {

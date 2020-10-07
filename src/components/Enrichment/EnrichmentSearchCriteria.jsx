@@ -754,17 +754,6 @@ class EnrichmentSearchCriteria extends Component {
         // const alphanumericLength = countAlphanumericFields.length;
         // const annotationTestsLength = totalLength - alphanumericLength;
         // if (reloadPlot === true && annotationTestsLength > 1) {
-        const testsLength = typeof tests === 'string' ? 1 : tests.length;
-        if (reloadPlot === true && testsLength > 1) {
-          this.getMultisetPlot(
-            sigValue,
-            enrichmentModel,
-            enrichmentStudy,
-            enrichmentAnnotation,
-            this.jsonToList(selectedOperator),
-            pValueType,
-          );
-        }
         const multisetResults = annotationData;
         this.setState({
           uSettings: {
@@ -783,6 +772,17 @@ class EnrichmentSearchCriteria extends Component {
       .catch(error => {
         console.error('Error during getEnrichmentsIntersection', error);
       });
+    const testsLength = typeof tests === 'string' ? 1 : tests.length;
+    if (reloadPlot === true && testsLength > 1) {
+      this.getMultisetPlot(
+        sigValue,
+        enrichmentModel,
+        enrichmentStudy,
+        enrichmentAnnotation,
+        this.jsonToList(selectedOperator),
+        pValueType,
+      );
+    }
   };
   jsonToList(json) {
     var valueList = [];
