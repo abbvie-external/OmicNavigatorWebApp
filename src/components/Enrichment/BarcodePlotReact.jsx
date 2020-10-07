@@ -333,8 +333,8 @@ class BarcodePlotReact extends Component {
     };
 
     // Remove existing brushes
-    if (d3.selectAll('.brush').nodes().length > 0) {
-      d3.selectAll('.brush').remove();
+    if (d3.selectAll('.barcodeBrush').nodes().length > 0) {
+      d3.selectAll('.barcodeBrush').remove();
     }
 
     objsBrush = d3
@@ -350,7 +350,7 @@ class BarcodePlotReact extends Component {
 
     d3.selectAll('.x.barcode-axis')
       .append('g')
-      .attr('class', 'brush')
+      .attr('class', 'barcodeBrush')
       .call(objsBrush);
 
     if (initialBrush) {
@@ -359,7 +359,7 @@ class BarcodePlotReact extends Component {
       });
       const quartile = Math.round(quartileTicks.nodes().length * 0.25);
       setTimeout(function() {
-        d3.select('.brush').call([objsBrush][0].move, [
+        d3.select('.barcodeBrush').call([objsBrush][0].move, [
           quartileTicks.nodes()[quartile].getAttribute('x1'),
           quartileTicks.nodes()[0].getAttribute('x1'),
         ]);
@@ -372,7 +372,7 @@ class BarcodePlotReact extends Component {
       });
       const highestTickIndex = selectedTicks.nodes().length - 1;
       if (highestTickIndex >= 0) {
-        d3.select('.brush').call([objsBrush][0].move, [
+        d3.select('.barcodeBrush').call([objsBrush][0].move, [
           selectedTicks.nodes()[highestTickIndex].getAttribute('x1'),
           selectedTicks.nodes()[0].getAttribute('x1'),
         ]);
