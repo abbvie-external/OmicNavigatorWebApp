@@ -11,7 +11,6 @@ export default function Component({
   disabled,
 }) {
   const [numberProps] = useExponentialInput({
-    // const [numberProps, { power, base, numberValue }] = useExponentialInput({
     defaultValue,
     min,
     max,
@@ -52,8 +51,10 @@ const useExponentialInput = ({
     setPower(+power);
   }, [propValue]);
   const [fakeValue, setFakeValue] = useState(null);
+  const isStepRef = useRef(false);
   const handleChange = useCallback(
     evt => {
+      isStepRef.current = evt.nativeEvent.data === undefined;
       let val = evt.currentTarget.value;
       if (val >= Number.MAX_VALUE || val <= -Number.MAX_VALUE) {
         let newBase = base + Math.sign(val);
@@ -101,9 +102,14 @@ const useExponentialInput = ({
   }, [onChange]);
   useEffect(() => {
     if (onChangeRef.current && !Number.isNaN(+fakeValue)) {
-      onChangeRef.current(numberValue);
+      if (isStepRef.current) {
+        onChangeRef.current(numberValue);
+      } else {
+        const newValue = clamp(+fakeValue, min, max);
+        onChangeRef.current(newValue);
+      }
     }
-  }, [numberValue, fakeValue]);
+  }, [numberValue, fakeValue, min, max]);
   return [
     {
       onChange: handleChange,
