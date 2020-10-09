@@ -49,9 +49,10 @@ class SVGPlot extends Component {
               `${differentialStudy}-${differentialFeature}-MetaFeaturesExist`,
               false,
             );
-            toast.error(
-              `Feature ${differentialFeature} does not have any feature data.`,
-            );
+            // 10/9/20 - PAUL - revisit and make decision on metafeature alerts
+            // toast.error(
+            //   `Feature ${differentialFeature} does not have any feature data.`,
+            // );
           }
           this.setState({
             metafeaturesData: metafeaturesData,
