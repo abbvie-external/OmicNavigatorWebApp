@@ -938,11 +938,11 @@ class DifferentialMultisetFilters extends Component {
                   <NumericExponentialInput
                     key={`differentialMultiSetFiltersInput${index}`}
                     onChange={callbackFactory(index)}
-                    // min={0}
+                    min={1e-100}
+                    preventNegatives={false}
                     name="sigValueP"
                     defaultValue={sigValueP[index]}
                     value={sigValuePLocal[index]}
-                    spellcheck="false"
                   />
                 </Form.Field>
               </Form.Group>

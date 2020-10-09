@@ -1,6 +1,12 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 function clamp(x, lower = -Infinity, upper = Infinity) {
   return Math.min(upper, Math.max(lower, x));
+}
+function absClamp(x, lower = 0, upper = Infinity) {
+  return (
+    Math.sign(x) *
+    Math.min(Math.abs(upper), Math.max(Math.abs(lower), Math.abs(x)))
+  );
 }
 export default function Component({
   onChange,
@@ -8,6 +14,7 @@ export default function Component({
   max,
   defaultValue,
   value,
+  preventNegatives,
   disabled,
 }) {
   const [numberProps] = useExponentialInput({
@@ -16,15 +23,15 @@ export default function Component({
     max,
     onChange,
     value,
-    disabled,
+    preventNegatives,
   });
 
   return (
     <input
       className="NumericExponentialInput"
-      spellCheck="false"
-      disabled={disabled}
       {...numberProps}
+      disabled={disabled}
+      spellCheck={false}
     />
   );
 }
@@ -34,14 +41,19 @@ const useExponentialInput = ({
   min,
   max,
   value: propValue,
-  defaultValue = propValue ?? 0,
+  defaultValue,
+  preventNegatives,
 }) => {
   const [power, setPower] = useState(() => {
-    return +(defaultValue || 0).toExponential(0).split('e')[1];
+    return +(propValue || defaultValue || 0).toExponential(0).split('e')[1];
   });
   const [base, setBase] = useState(() => {
-    return +(defaultValue || 0).toExponential(0).split('e')[0];
+    return +(propValue || defaultValue || 0).toExponential(0).split('e')[0];
   });
+  const value = `${base}E${power}`;
+  const numberValue = preventNegatives
+    ? Math.abs(clamp(+value, min, max))
+    : clamp(+value, min, max);
   useEffect(() => {
     if (propValue == null) {
       return;
@@ -50,52 +62,53 @@ const useExponentialInput = ({
     setBase(+base);
     setPower(+power);
   }, [propValue]);
+
   const [fakeValue, setFakeValue] = useState(null);
-  const isStepRef = useRef(false);
-  const handleChange = useCallback(
-    evt => {
-      isStepRef.current = evt.nativeEvent.data === undefined;
-      let val = evt.currentTarget.value;
-      if (val >= Number.MAX_VALUE || val <= -Number.MAX_VALUE) {
-        let newBase = base + Math.sign(val);
-        let newPower = power;
-        if (newBase <= 0) {
-          newBase = 9;
-          newPower = power - 1;
-        } else if (newBase >= 10) {
-          newBase = 1;
-          newPower = power + 1;
-        }
-        const newValue = +`${newBase}E${newPower}`;
-        if (
-          newValue <= (max ?? Number.MAX_VALUE) &&
-          newValue >= (min ?? Number.MIN_VALUE)
-        ) {
-          setPower(newPower);
-          setBase(newBase);
-          setFakeValue(null);
-          return;
-        } else {
-          val = clamp(newValue, min, max)
-            .toExponential(0)
-            .replace('+', '')
-            .toUpperCase();
-        }
+  const isStepRef = useRef(true);
+  const handleChange = evt => {
+    isStepRef.current = evt.nativeEvent.data === undefined;
+    let val = evt.currentTarget.value;
+    if (isStepRef.current) {
+      const originalSign = Math.sign(base) * 1;
+      // Is a step
+      const curVal = numberValue;
+      let sign = val > curVal ? 1 : -1;
+      let newBase = base + sign;
+      let newPower = power;
+      if (
+        (originalSign === 1 && newBase <= 0) ||
+        (originalSign === -1 && newBase >= 0)
+      ) {
+        newBase = originalSign * 9;
+        newPower = power - 1;
+      } else if (
+        (originalSign === 1 && newBase >= 10) ||
+        (originalSign === -1 && newBase <= -10)
+      ) {
+        newBase = originalSign * 1;
+        newPower = power + 1;
       }
+      const newValue = +`${newBase}E${newPower}`;
+      if (
+        Math.abs(newValue) <= Math.abs(max || Infinity) &&
+        Math.abs(newValue) >= Math.abs(min || 0)
+      ) {
+        setPower(newPower);
+        setBase(preventNegatives ? Math.abs(newBase) : newBase);
+        setFakeValue(null);
+        return;
+      }
+    } else {
+      // Is typed manually
       if (!Number.isNaN(+val)) {
-        if (+val === max) {
-          val = max;
-        }
-        const [base, power] = (+val).toExponential(0).split('e');
+        const newVal = absClamp(+val, min, max);
+        const [base, power] = newVal.toExponential(0).split('e');
         setBase(+base);
         setPower(+power);
       }
       setFakeValue(val);
-    },
-    [base, power, min, max],
-  );
-  const value = `${base}E${power}`;
-  const numberValue = clamp(+value, min, max);
+    }
+  };
   const onChangeRef = useRef(onChange);
   useEffect(() => {
     onChangeRef.current = onChange;
@@ -105,17 +118,21 @@ const useExponentialInput = ({
       if (isStepRef.current) {
         onChangeRef.current(numberValue);
       } else {
-        const newValue = clamp(+fakeValue, min, max);
-        onChangeRef.current(newValue);
+        const newValue = absClamp(+fakeValue, min, max);
+        if (preventNegatives) {
+          onChangeRef.current(Math.abs(newValue));
+        } else {
+          onChangeRef.current(newValue);
+        }
       }
     }
-  }, [numberValue, fakeValue, min, max]);
+  }, [numberValue, fakeValue, min, max, preventNegatives]);
   return [
     {
       onChange: handleChange,
       value:
         fakeValue ??
-        (numberValue < 1e-3
+        (Math.abs(numberValue) < 1e-3
           ? numberValue.toExponential(0)
           : numberValue.toPrecision(1)),
       step: Number.MAX_VALUE,
