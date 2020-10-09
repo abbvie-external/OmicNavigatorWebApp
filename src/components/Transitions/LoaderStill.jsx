@@ -5,7 +5,7 @@ import './LoaderStill.scss';
 const LoaderStill = () => (
   <div className="LoaderContainer">
     <Header as="h2" textAlign="center">
-      No records available...
+      No data to display...
     </Header>
     {/* <Header as="h4" textAlign="center">
       Use the filters to display relevant records

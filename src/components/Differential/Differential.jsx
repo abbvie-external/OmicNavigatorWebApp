@@ -679,7 +679,23 @@ class Differential extends Component {
     return valueJSON;
   }
 
+  getMessage = () => {
+    const {
+      differentialStudy,
+      differentialModel,
+      differentialTest,
+    } = this.props;
+    if (differentialStudy === '') {
+      return 'study';
+    } else if (differentialModel === '') {
+      return 'model';
+    } else if (differentialTest === '') {
+      return 'test';
+    } else return '';
+  };
+
   getView = () => {
+    const message = this.getMessage();
     if (this.state.isItemSelected && !this.state.isProteinSVGLoaded) {
       return <LoaderActivePlots />;
     } else if (this.state.isSearchingDifferential) {
@@ -711,7 +727,7 @@ class Differential extends Component {
           }}
         />
       );
-    } else return <TransitionStill />;
+    } else return <TransitionStill stillMessage={message} />;
   };
 
   // handleDifferentialResultsMounted = bool => {

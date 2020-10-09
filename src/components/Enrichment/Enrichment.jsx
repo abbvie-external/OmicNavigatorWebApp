@@ -1733,7 +1733,23 @@ class Enrichment extends Component {
     }
   };
 
+  getMessage = () => {
+    const {
+      enrichmentStudy,
+      enrichmentModel,
+      enrichmentAnnotation,
+    } = this.props;
+    if (enrichmentStudy === '') {
+      return 'study';
+    } else if (enrichmentModel === '') {
+      return 'model';
+    } else if (enrichmentAnnotation === '') {
+      return 'test';
+    } else return '';
+  };
+
   getView = () => {
+    const message = this.getMessage();
     if (this.state.isTestSelected && !this.state.isTestDataLoaded) {
       return (
         <div className="SearchingAltDiv">
@@ -1779,7 +1795,7 @@ class Enrichment extends Component {
           }}
         />
       );
-    } else return <TransitionStill />;
+    } else return <TransitionStill stillMessage={message} />;
   };
 
   showPhosphositePlus = dataItem => {
