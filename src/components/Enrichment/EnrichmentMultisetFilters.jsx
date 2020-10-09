@@ -1020,12 +1020,12 @@ class EnrichmentMultisetFilters extends Component {
                         this.handleSigValueEInputChange(number);
                         this.actuallyHandleSigValueEInputChange(number);
                       }}
-                      min={0}
+                      min={1e-100}
                       max={1}
+                      preventNegatives={true}
                       name="sigValue"
                       // defaultValue={parseFloat(defaultSigValue)}
                       value={sigValueELocal[index]}
-                      spellcheck="false"
                     />
                   </Form.Field>
                 </Form.Group>

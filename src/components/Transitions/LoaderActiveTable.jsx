@@ -5,7 +5,7 @@ import './LoaderActiveTable.scss';
 const LoaderActivePlots = () => (
   <div className="LoaderContainer">
     <Header as="h2" textAlign="center">
-      Loading Records...
+      Loading Data...
     </Header>
     <div className="loading">
       <div className="loader-active-table-dots animate">

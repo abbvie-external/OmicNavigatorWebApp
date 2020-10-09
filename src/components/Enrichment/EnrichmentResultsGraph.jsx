@@ -654,12 +654,12 @@ class EnrichmentResultsGraph extends Component {
                     this.handleNodeCutoffInputChange(number);
                     this.actuallyHandleNodeCutoffInputChange(number);
                   }}
-                  min={0}
+                  min={1e-100}
                   max={1}
+                  preventNegatives={true}
                   defaultValue={parseFloat(nodeCutoffLocal)}
                   disabled={!networkGraphReady}
                   value={parseFloat(nodeCutoffLocal)}
-                  spellcheck="false"
                 />
               </div>
               <div className="NetworkSliderDiv">
@@ -717,12 +717,12 @@ class EnrichmentResultsGraph extends Component {
                     this.handleLinkCutoffInputChange(revisedNumber);
                     this.actuallyHandleLinkCutoffInputChange(revisedNumber);
                   }}
-                  min={0.1}
+                  min={1e-100}
                   max={1}
+                  preventNegatives={true}
                   defaultValue={parseFloat(linkCutoffLocal)}
                   disabled={!networkGraphReady}
                   value={parseFloat(linkCutoffLocal)}
-                  spellcheck="false"
                 />
               </div>
               <div className="NetworkSliderDiv">
