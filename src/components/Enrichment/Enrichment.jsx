@@ -18,6 +18,7 @@ import * as d3 from 'd3';
 import {
   formatNumberForDisplay,
   splitValue,
+  getLinkout,
   // getIconInfo
 } from '../Shared/helpers';
 import '../Shared/Table.scss';
@@ -591,6 +592,16 @@ class Enrichment extends Component {
           field: f,
           filterable: { type: 'multiFilter' },
           template: (value, item, addParams) => {
+            let linkout = getLinkout(
+              item,
+              addParams,
+              icon,
+              iconText,
+              TableValuePopupStyle,
+              alphanumericTrigger,
+              enrichmentStudy,
+              enrichmentAnnotation,
+            );
             if (f === alphanumericTrigger) {
               return (
                 <div>
@@ -606,25 +617,7 @@ class Enrichment extends Component {
                     inverted
                     basic
                   />
-                  <Popup
-                    trigger={
-                      <img
-                        src={icon}
-                        alt={iconText}
-                        className="ExternalSiteIcon"
-                        onClick={addParams.getLink(
-                          enrichmentStudy,
-                          enrichmentAnnotation,
-                          item,
-                        )}
-                      />
-                    }
-                    style={TableValuePopupStyle}
-                    className="TablePopupValue"
-                    content={iconText}
-                    inverted
-                    basic
-                  />
+                  {linkout}
                 </div>
               );
             } else {
@@ -1744,7 +1737,7 @@ class Enrichment extends Component {
     } else if (enrichmentModel === '') {
       return 'model';
     } else if (enrichmentAnnotation === '') {
-      return 'test';
+      return 'database';
     } else return '';
   };
 

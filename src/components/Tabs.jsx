@@ -3,7 +3,7 @@ import { withRouter } from 'react-router-dom';
 import { Tab, Menu } from 'semantic-ui-react';
 import { phosphoprotService } from '../services/phosphoprot.service';
 import Differential from './Differential/Differential';
-import omicAnalyzerIcon from '../resources/icon.png';
+import omicNavigatorIcon from '../resources/icon.png';
 import Enrichment from './Enrichment/Enrichment';
 import { updateUrl } from './Shared/UrlControl';
 
@@ -222,13 +222,13 @@ class Tabs extends Component {
             <span id="ResetApp" onClick={this.resetApp}>
               <span className="LogoElement">
                 <img
-                  alt="Omic Analyzer"
-                  src={omicAnalyzerIcon}
+                  alt="Omic Navigator"
+                  src={omicNavigatorIcon}
                   className="LogoImage"
                 />
               </span>
               <span className="Header HeaderFirst">Omic&nbsp;</span>
-              <span className="Header HeaderSecond">Analyzer</span>
+              <span className="Header HeaderSecond">Navigator</span>
             </span>
           </Menu.Item>
         ),

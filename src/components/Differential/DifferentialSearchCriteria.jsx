@@ -24,6 +24,8 @@ class DifferentialSearchCriteria extends Component {
     differentialStudies: [],
     differentialStudyHrefVisible: false,
     differentialStudyHref: '',
+    differentialStudyReportTooltip:
+      'Select a study and model to view Analysis Details',
     differentialModels: [],
     differentialTests: [],
     differentialModelTooltip: '',
@@ -255,13 +257,21 @@ class DifferentialSearchCriteria extends Component {
     this.getReportLink(value, 'default');
   };
 
+  setStudyTooltip = () => {
+    if (this.props.differentialModel !== '') {
+      this.setState({
+        differentialStudyReportTooltip: `The model "main" from the study ${this.props.differentialStudy} does not have additional analysis details available.`,
+      });
+    }
+  };
+
   getReportLink = (study, model) => {
     cancelRequestGetReportLinkDifferential();
     let cancelToken = new CancelToken(e => {
       cancelRequestGetReportLinkDifferential = e;
     });
     phosphoprotService
-      .getReportLink(study, model, null, cancelToken)
+      .getReportLink(study, model, this.setStudyTooltip, cancelToken)
       .then(getReportLink => {
         const link = getReportLink.includes('http')
           ? getReportLink
@@ -815,7 +825,7 @@ class DifferentialSearchCriteria extends Component {
           inverted
           className="CustomTooltip"
           position="bottom center"
-          content="Select a study and model to view Analysis Details"
+          content={this.state.differentialStudyReportTooltip}
           mouseEnterDelay={0}
           mouseLeaveDelay={0}
         />
