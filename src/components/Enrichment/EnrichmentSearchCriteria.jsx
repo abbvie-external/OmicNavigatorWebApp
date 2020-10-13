@@ -25,9 +25,10 @@ class EnrichmentSearchCriteria extends Component {
     enrichmentStudies: [],
     enrichmentStudyHrefVisible: false,
     enrichmentStudyHref: '',
+    enrichmentStudyReportTooltip:
+      'Select a study and model to view Analysis Details',
     enrichmentModels: [],
     enrichmentAnnotations: [],
-
     enrichmentModelTooltip: '',
     enrichmentAnnotationTooltip: '',
     enrichmentStudiesDisabled: true,
@@ -236,13 +237,21 @@ class EnrichmentSearchCriteria extends Component {
     }
   };
 
+  setStudyTooltip = () => {
+    if (this.props.enrichmentModel !== '') {
+      this.setState({
+        enrichmentStudyReportTooltip: `Study ${this.props.enrichmentStudy} does not have any elements named "reports"`,
+      });
+    }
+  };
+
   getReportLink = (study, model) => {
     cancelRequestGetReportLinkEnrichment();
     let cancelToken = new CancelToken(e => {
       cancelRequestGetReportLinkEnrichment = e;
     });
     phosphoprotService
-      .getReportLink(study, model, null, cancelToken)
+      .getReportLink(study, model, this.setStudyTooltip, cancelToken)
       .then(getReportLink => {
         const link = getReportLink.includes('http')
           ? getReportLink
@@ -929,7 +938,7 @@ class EnrichmentSearchCriteria extends Component {
           basic
           inverted
           position="bottom center"
-          content="Select a study and model to view Analysis Details"
+          content={this.state.enrichmentStudyReportTooltip}
         />
       );
     }

@@ -1744,7 +1744,7 @@ class Enrichment extends Component {
     } else if (enrichmentModel === '') {
       return 'model';
     } else if (enrichmentAnnotation === '') {
-      return 'test';
+      return 'database';
     } else return '';
   };
 

@@ -34,12 +34,12 @@ class PhosphoprotService {
             .then(response => resolve(response.data))
             .catch(function(thrown) {
               if (axios.isCancel(thrown)) {
-                console.log('Request canceled', thrown.message);
+                // console.log('Request canceled', thrown.message);
               } else {
                 if (handleError !== undefined) {
                   handleError(false);
                 }
-                console.log(`${thrown.message}`);
+                // console.log(`${thrown.message}`);
               }
             });
         })
@@ -95,25 +95,27 @@ class PhosphoprotService {
             })
             .then(response => resolve(response.data))
             .catch(function(thrown) {
+              debugger;
               if (axios.isCancel(thrown)) {
-                console.log('Request canceled', thrown.message);
+                // console.log('Request canceled', thrown.message);
               } else {
                 toast.error(`${thrown.message}`);
                 if (handleError !== undefined) {
                   handleError(false);
                 }
-                console.log(`${thrown.message}`);
+                // console.log(`${thrown.message}`);
               }
             });
         })
         .catch(error => {
+          debugger;
           if (method !== 'getReportLink') {
             toast.error(`${error.statusText}: ${error.responseText}`);
           }
           if (handleError !== undefined) {
             handleError(false);
           }
-          console.log(`${error.statusText}: ${error.responseText}`);
+          // console.log(`${error.statusText}: ${error.responseText}`);
         });
     });
   }
@@ -227,13 +229,13 @@ class PhosphoprotService {
             .then(response => resolve(response))
             .catch(function(thrown) {
               if (axios.isCancel(thrown)) {
-                console.log('Request canceled', thrown.message);
+                // console.log('Request canceled', thrown.message);
               } else {
                 toast.error(`${thrown.message}`);
                 if (handleError !== undefined) {
                   handleError(false);
                 }
-                console.log(`${thrown.message}`);
+                // console.log(`${thrown.message}`);
               }
             });
         })
@@ -242,7 +244,7 @@ class PhosphoprotService {
           if (handleError !== undefined) {
             handleError(false);
           }
-          console.log(`${error.statusText}: ${error.responseText}`);
+          // console.log(`${error.statusText}: ${error.responseText}`);
         });
     });
   }
