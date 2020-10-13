@@ -11,7 +11,11 @@ import LoaderActivePlots from '../Transitions/LoaderActivePlots';
 import TransitionActive from '../Transitions/TransitionActive';
 import TransitionStill from '../Transitions/TransitionStill';
 import ButtonActions from '../Shared/ButtonActions';
-import { formatNumberForDisplay, splitValue } from '../Shared/helpers';
+import {
+  formatNumberForDisplay,
+  splitValue,
+  getLinkout,
+} from '../Shared/helpers';
 import phosphosite_icon from '../../resources/phosphosite.ico';
 import DOMPurify from 'dompurify';
 import { phosphoprotService } from '../../services/phosphoprot.service';
@@ -571,6 +575,14 @@ class Differential extends Component {
           field: f,
           filterable: { type: 'multiFilter' },
           template: (value, item, addParams) => {
+            let linkout = getLinkout(
+              item,
+              addParams,
+              icon,
+              iconText,
+              TableValuePopupStyle,
+              alphanumericTrigger,
+            );
             if (f === alphanumericTrigger) {
               return (
                 <div className="NoSelect">
@@ -589,21 +601,7 @@ class Differential extends Component {
                     inverted
                     basic
                   />
-                  <Popup
-                    trigger={
-                      <img
-                        src={icon}
-                        alt="Phosophosite"
-                        className="ExternalSiteIcon"
-                        onClick={addParams.showPhosphositePlus(item)}
-                      />
-                    }
-                    style={TableValuePopupStyle}
-                    className="TablePopupValue"
-                    content={iconText}
-                    inverted
-                    basic
-                  />
+                  {linkout}
                 </div>
               );
             } else {
@@ -667,6 +665,7 @@ class Differential extends Component {
     );
     return configCols;
   };
+
   listToJson(list) {
     var valueJSON = [];
     for (var i = 0; i < list.length; i++) {

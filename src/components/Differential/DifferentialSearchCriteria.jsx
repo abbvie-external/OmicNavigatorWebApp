@@ -260,7 +260,7 @@ class DifferentialSearchCriteria extends Component {
   setStudyTooltip = () => {
     if (this.props.differentialModel !== '') {
       this.setState({
-        differentialStudyReportTooltip: `Study ${this.props.differentialStudy} does not have any elements named "reports"`,
+        differentialStudyReportTooltip: `The model "main" from the study ${this.props.differentialStudy} does not have additional analysis details available.`,
       });
     }
   };
@@ -273,7 +273,6 @@ class DifferentialSearchCriteria extends Component {
     phosphoprotService
       .getReportLink(study, model, this.setStudyTooltip, cancelToken)
       .then(getReportLink => {
-        debugger;
         const link = getReportLink.includes('http')
           ? getReportLink
           : // : `***REMOVED***/ocpu/library/${getReportLink}`;

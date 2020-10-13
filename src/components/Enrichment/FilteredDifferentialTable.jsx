@@ -6,6 +6,7 @@ import {
   formatNumberForDisplay,
   splitValue,
   scrollElement,
+  getLinkout,
 } from '../Shared/helpers';
 import phosphosite_icon from '../../resources/phosphosite.ico';
 import './FilteredDifferentialTable.scss';
@@ -225,6 +226,14 @@ class FilteredDifferentialTable extends Component {
           field: f,
           filterable: { type: 'multiFilter' },
           template: (value, item, addParams) => {
+            let linkout = getLinkout(
+              item,
+              addParams,
+              icon,
+              iconText,
+              TableValuePopupStyle,
+              alphanumericTrigger,
+            );
             if (f === alphanumericTrigger) {
               return (
                 <div className="NoSelect">
@@ -238,21 +247,7 @@ class FilteredDifferentialTable extends Component {
                     inverted
                     basic
                   />
-                  <Popup
-                    trigger={
-                      <img
-                        src={icon}
-                        alt="Phosophosite"
-                        className="ExternalSiteIcon"
-                        onClick={addParams.showPhosphositePlus(item)}
-                      />
-                    }
-                    style={TableValuePopupStyle}
-                    className="TablePopupValue"
-                    content={iconText}
-                    inverted
-                    basic
-                  />
+                  {linkout}
                 </div>
               );
             } else {

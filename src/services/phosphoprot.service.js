@@ -95,7 +95,6 @@ class PhosphoprotService {
             })
             .then(response => resolve(response.data))
             .catch(function(thrown) {
-              debugger;
               if (axios.isCancel(thrown)) {
                 // console.log('Request canceled', thrown.message);
               } else {
@@ -108,7 +107,6 @@ class PhosphoprotService {
             });
         })
         .catch(error => {
-          debugger;
           if (method !== 'getReportLink') {
             toast.error(`${error.statusText}: ${error.responseText}`);
           }

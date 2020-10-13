@@ -1,5 +1,57 @@
+import React from 'react';
+import { Popup } from 'semantic-ui-react';
 import _ from 'lodash';
 import * as d3 from 'd3-array';
+
+export function getLinkout(
+  item,
+  addParams,
+  icon,
+  iconText,
+  TableValuePopupStyle,
+  featureIdKey,
+  study,
+  test,
+) {
+  debugger;
+  if (featureIdKey === 'idmult') {
+    return (
+      <Popup
+        trigger={
+          <img
+            src={icon}
+            alt="Phosophosite"
+            className="ExternalSiteIcon"
+            onClick={addParams.showPhosphositePlus(item)}
+          />
+        }
+        style={TableValuePopupStyle}
+        className="TablePopupValue"
+        content={iconText}
+        inverted
+        basic
+      />
+    );
+  } else if (item[featureIdKey].includes('GO:')) {
+    return (
+      <Popup
+        trigger={
+          <img
+            src={icon}
+            alt={iconText}
+            className="ExternalSiteIcon"
+            onClick={addParams.getLink(study, test, item)}
+          />
+        }
+        style={TableValuePopupStyle}
+        className="TablePopupValue"
+        content={iconText}
+        inverted
+        basic
+      />
+    );
+  } else return null;
+}
 
 export function formatNumberForDisplay(num) {
   if (num) {
