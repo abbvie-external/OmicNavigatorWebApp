@@ -27,7 +27,7 @@ class FilteredDifferentialTable extends Component {
         localStorage.getItem('itemsPerPageFilteredDifferentialTable'),
         10,
       ) || 15,
-    filteredTableLoading: true,
+    filteredTableLoading: false,
     additionalTemplateInfo: [],
     identifier: null,
     filteredDifferentialTableRowMax: [],
