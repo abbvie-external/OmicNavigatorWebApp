@@ -432,23 +432,22 @@ class Differential extends Component {
       if (MaxLine !== {} && MaxLine != null) {
         volcanoDifferentialTableRowMaxVar = MaxLine.key;
       }
-      // Once table multi-select is built, uncomment
-      // const HighlightedFeaturesCopy = [...toHighlightArr];
-      // const SelectedFeatures = HighlightedFeaturesCopy.slice(1);
-      // let volcanoDifferentialTableRowOtherVar = [];
-      // if (
-      //   SelectedFeatures.length > 0 &&
-      //   SelectedFeatures != null &&
-      //   SelectedFeatures != {}
-      // ) {
-      //   SelectedFeatures.forEach(element => {
-      //     volcanoDifferentialTableRowOtherVar.push(element.key);
-      //   });
-      // }
+      const HighlightedFeaturesCopy = [...toHighlightArr];
+      const SelectedFeatures = HighlightedFeaturesCopy.slice(1);
+      let volcanoDifferentialTableRowOtherVar = [];
+      if (
+        SelectedFeatures.length > 0 &&
+        SelectedFeatures != null &&
+        SelectedFeatures !== {}
+      ) {
+        SelectedFeatures.forEach(element => {
+          volcanoDifferentialTableRowOtherVar.push(element.key);
+        });
+      }
       const maxId = toHighlightArr[0].id || '';
       this.setState({
         volcanoDifferentialTableRowMax: volcanoDifferentialTableRowMaxVar,
-        // volcanoDifferentialTableRowOther: volcanoDifferentialTableRowOtherVar,
+        volcanoDifferentialTableRowOther: volcanoDifferentialTableRowOtherVar,
       });
       this.handlePlotVolcano(maxId);
       // if (!tableClick) {
@@ -457,7 +456,7 @@ class Differential extends Component {
     } else {
       this.setState({
         volcanoDifferentialTableRowMax: '',
-        // volcanoDifferentialTableRowOther: '',
+        volcanoDifferentialTableRowOther: '',
       });
       this.handlePlotVolcano('');
     }

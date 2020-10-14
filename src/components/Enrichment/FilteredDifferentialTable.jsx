@@ -396,11 +396,9 @@ class FilteredDifferentialTable extends Component {
       // 10/2/20 - This will be uncommented once we gain access to table data after sort/filter
       const PreviouslyHighlighted = [...this.props.HighlightedProteins];
       if (event.shiftKey) {
-        debugger;
         const allTableData =
           this.filteredDifferentialGridRef.current?.qhGridRef.current?.getSortedData() ||
           [];
-        // const allTableData = _.cloneDeep(this.state.filteredTableData);
         const indexMaxProtein = _.findIndex(allTableData, function(d) {
           return (
             d[filteredDifferentialFeatureIdKey] ===
@@ -426,7 +424,6 @@ class FilteredDifferentialTable extends Component {
         const allTableData =
           this.filteredDifferentialGridRef.current?.qhGridRef.current?.getSortedData() ||
           [];
-        // const allTableData = _.cloneDeep(this.state.filteredTableData);
         let selectedTableDataArray = [];
 
         const alreadyHighlighted = PreviouslyHighlighted.some(

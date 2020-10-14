@@ -13,7 +13,6 @@ export function getLinkout(
   study,
   test,
 ) {
-  debugger;
   if (featureIdKey === 'idmult') {
     return (
       <Popup
