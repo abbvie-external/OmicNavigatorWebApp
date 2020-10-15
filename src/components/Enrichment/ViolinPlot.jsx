@@ -1634,7 +1634,10 @@ class ViolinPlot extends Component {
     d3.select(`#svg-${violinSettings.id}`).remove();
     if (resetDimensions) {
       // we calculate height based on the containerRef
-      const containerHeight = this.getHeight();
+      let containerHeight = this.getHeight();
+      if (containerHeight === 0) {
+        containerHeight = 400;
+      }
       const height =
         containerHeight -
         violinSettings.margin.top -

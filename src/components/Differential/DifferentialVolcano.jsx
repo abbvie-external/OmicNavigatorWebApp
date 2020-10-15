@@ -103,8 +103,10 @@ class DifferentialVolcano extends Component {
           return p[differentialFeatureIdKey] === featureToHighlight;
         });
         const pageNumber = Math.ceil((Index + 1) / itemsPerPage);
-        this.volcanoPlotFilteredGridRef.current.handlePageChange(pageNumber);
-        scrollElement(this, 'volcanoPlotFilteredGridRef', 'rowHighlightMax');
+        if (pageNumber > 0) {
+          this.volcanoPlotFilteredGridRef.current.handlePageChange(pageNumber);
+          scrollElement(this, 'volcanoPlotFilteredGridRef', 'rowHighlightMax');
+        }
       }
     } else {
       this.volcanoPlotFilteredGridRef.current.handlePageChange(1);

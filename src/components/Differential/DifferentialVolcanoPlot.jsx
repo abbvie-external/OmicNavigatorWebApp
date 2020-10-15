@@ -84,7 +84,7 @@ class DifferentialVolcanoPlot extends Component {
     const circle = d3.select(
       `#volcanoDataPoint-${e.target.attributes['circleid'].value}`,
     );
-    circle.classed('hovered', true);
+    circle.classed('hovered', true).raise();
     this.setState({
       hoveredCircleData: hoveredData,
       hovering: true,

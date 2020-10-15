@@ -101,8 +101,10 @@ class FilteredDifferentialTable extends Component {
           return p[filteredDifferentialFeatureIdKey] === featureToHighlight;
         });
         const pageNumber = Math.ceil((Index + 1) / itemsPerPage);
-        this.filteredDifferentialGridRef.current.handlePageChange(pageNumber);
-        // scrollElement(this, 'filteredDifferentialGridRef', 'rowHighlightMax');
+        if (pageNumber > 0) {
+          this.filteredDifferentialGridRef.current.handlePageChange(pageNumber);
+          // scrollElement(this, 'filteredDifferentialGridRef', 'rowHighlightMax');
+        }
       }
     } else {
       this.filteredDifferentialGridRef.current.handlePageChange(1);
@@ -373,9 +375,7 @@ class FilteredDifferentialTable extends Component {
   handleRowClick = (event, item, index) => {
     if (item !== null && event?.target?.className !== 'ExternalSiteIcon') {
       const { filteredDifferentialFeatureIdKey } = this.props;
-      // const stat = barcodeSettings.statLabel;
       event.stopPropagation();
-      // 10/2/20 - This will be uncommented once we gain access to table data after sort/filter
       const PreviouslyHighlighted = [...this.props.HighlightedProteins];
       if (event.shiftKey) {
         const allTableData =
