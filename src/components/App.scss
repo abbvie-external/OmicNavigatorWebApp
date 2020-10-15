@@ -139,14 +139,8 @@
     color: white !important;
   }
 
-  .rowHighlightBullseye {
-    background: var(--color-link) !important;
-    color: white !important;
-  }
-
   .rowHighlightMax .TableCellLink,
-  .rowHighlightOther .TableCellLink,
-  .rowHighlightBullseye .TableCellLink {
+  .rowHighlightOther .TableCellLink {
     color: white !important;
     cursor: pointer !important;
   }
@@ -158,11 +152,6 @@
 
   .ui.selectable.table tbody .rowHighlightOther:hover {
     background: rgba(255, 126, 5, 0.9) !important;
-    color: white !important;
-  }
-
-  .rowHighlightBullseye:hover {
-    background: rgba(0, 47, 76, 0.9) !important;
     color: white !important;
   }
 

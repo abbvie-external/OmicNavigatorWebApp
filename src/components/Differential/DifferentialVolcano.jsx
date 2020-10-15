@@ -82,7 +82,7 @@ class DifferentialVolcano extends Component {
         },
       ];
       this.props.onHandleSelectedVolcano(featureToHighlightInDiffTableArr);
-      // this.pageToFeature(featureToHighlightInDiffTable);
+      this.pageToFeature(featureToHighlightInDiffTable);
     }
   }
 
@@ -115,7 +115,6 @@ class DifferentialVolcano extends Component {
       differentialFeatureIdKey,
       volcanoDifferentialTableRowMax,
       volcanoDifferentialTableRowOther,
-      volcanoDifferentialTableRowBullseye,
     } = this.props;
     /* eslint-disable eqeqeq */
     if (item[differentialFeatureIdKey] === volcanoDifferentialTableRowMax) {
@@ -125,11 +124,6 @@ class DifferentialVolcano extends Component {
       volcanoDifferentialTableRowOther.includes(item[differentialFeatureIdKey])
     ) {
       className = 'rowHighlightOther';
-    }
-    if (
-      item[differentialFeatureIdKey] === volcanoDifferentialTableRowBullseye
-    ) {
-      className = 'rowHighlightBullseye';
     }
     return {
       className,
@@ -229,8 +223,7 @@ class DifferentialVolcano extends Component {
         key: item[differentialFeatureIdKey],
       },
     ]);
-    // 10/2/20 - This will be uncommented once we gain access to table data after sort/filter
-    // this.pageToFeature(item[differentialFeatureIdKey]);
+    this.pageToFeature(item[differentialFeatureIdKey]);
   };
 
   handleRowClick = (event, item, index) => {
