@@ -330,18 +330,6 @@ class Differential extends Component {
     this.setState({ additionalTemplateInfoDifferentialTable: addParams });
   };
 
-  // pageToFeature = featureToHighlight => {
-  //   const { differentialFeatureIdKey } = this.props;
-  //   const { differentialResults, itemsPerPageDifferentialTable } = this.state;
-  //   if (this.differentialGridRef?.current != null) {
-  //     const Index = _.findIndex(differentialResults, function(p) {
-  //       return p[differentialFeatureIdKey] === featureToHighlight;
-  //     });
-  //     const pageNumber = Math.ceil((Index + 1) / itemsPerPageDifferentialTable);
-  //     this.differentialGridRef.current.handlePageChange(pageNumber);
-  //   }
-  // };
-
   getPlot = (featureId, useVolcanoSVGSize) => {
     const { differentialPlotTypes } = this.state;
     const {
@@ -734,12 +722,12 @@ class Differential extends Component {
   //   });
   // };
 
-  informItemsPerPageDifferentialTable = items => {
-    this.setState({
-      itemsPerPageDifferentialTable: items,
-    });
-    localStorage.setItem('itemsPerPageDifferentialTable', items);
-  };
+  // informItemsPerPageDifferentialTable = items => {
+  //   this.setState({
+  //     itemsPerPageDifferentialTable: items,
+  //   });
+  //   localStorage.setItem('itemsPerPageDifferentialTable', items);
+  // };
 
   getTableAndPlotPanes = () => {
     const {
@@ -801,9 +789,9 @@ class Differential extends Component {
                     totalRows={differentialRows}
                     // use "differentialRows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
                     itemsPerPage={itemsPerPageDifferentialTable}
-                    onInformItemsPerPage={
-                      this.informItemsPerPageDifferentialTable
-                    }
+                    // onInformItemsPerPage={
+                    //   this.informItemsPerPageDifferentialTable
+                    // }
                     exportBaseName="Differential_Analysis"
                     loading={isVolcanoTableLoading}
                     // quickViews={quickViews}

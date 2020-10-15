@@ -53,7 +53,7 @@ class DifferentialVolcano extends Component {
         },
       ];
       this.props.onHandleSelectedVolcano(featureToHighlightInDiffTableArr);
-      // this.pageToFeature(featureToHighlightInDiffTable);
+      this.pageToFeature(featureToHighlightInDiffTable);
       this.props.onResetFeatureToHighlightInDiffTable();
     }
   }
@@ -92,15 +92,17 @@ class DifferentialVolcano extends Component {
         differentialFeatureIdKey,
         // differentialResults
       } = this.props;
-      const { itemsPerPageVolcanoTable } = this.state;
+      // const { itemsPerPageVolcanoTable } = this.state;
       const currentData = this.volcanoPlotFilteredGridRef?.current?.qhGridRef
         ?.current?.data;
-      if (this.volcanoPlotFilteredGridRef?.current != null) {
+      if (currentData != null) {
+        const itemsPerPage = this.volcanoPlotFilteredGridRef?.current?.qhGridRef
+          ?.current?.props.itemsPerPage;
         const Index = _.findIndex(currentData, function(p) {
           // const Index = _.findIndex(differentialResults, function(p) {
           return p[differentialFeatureIdKey] === featureToHighlight;
         });
-        const pageNumber = Math.ceil((Index + 1) / itemsPerPageVolcanoTable);
+        const pageNumber = Math.ceil((Index + 1) / itemsPerPage);
         this.volcanoPlotFilteredGridRef.current.handlePageChange(pageNumber);
         scrollElement(this, 'volcanoPlotFilteredGridRef', 'rowHighlightMax');
       }
@@ -195,12 +197,12 @@ class DifferentialVolcano extends Component {
     }
   };
 
-  informItemsPerPageVolcanoTable = items => {
-    this.setState({
-      itemsPerPageVolcanoTable: items,
-    });
-    localStorage.setItem('itemsPerPageVolcanoTable', items);
-  };
+  // informItemsPerPageVolcanoTable = items => {
+  //   this.setState({
+  //     itemsPerPageVolcanoTable: items,
+  //   });
+  //   localStorage.setItem('itemsPerPageVolcanoTable', items);
+  // };
 
   handleDotClick = (event, item, index) => {
     event.stopPropagation();
@@ -540,7 +542,7 @@ class DifferentialVolcano extends Component {
                 totalRows={volcanoPlotRows}
                 columnsConfig={differentialColumns}
                 itemsPerPage={itemsPerPageVolcanoTable}
-                onInformItemsPerPage={this.informItemsPerPageVolcanoTable}
+                // onInformItemsPerPage={this.informItemsPerPageVolcanoTable}
                 // disableGeneralSearch
                 disableGrouping
                 disableColumnVisibilityToggle
