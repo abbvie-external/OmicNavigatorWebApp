@@ -53,7 +53,7 @@ class DifferentialVolcano extends Component {
         },
       ];
       this.props.onHandleSelectedVolcano(featureToHighlightInDiffTableArr);
-      this.pageToFeature(featureToHighlightInDiffTable);
+      // this.pageToFeature(featureToHighlightInDiffTable);
       this.props.onResetFeatureToHighlightInDiffTable();
     }
   }
