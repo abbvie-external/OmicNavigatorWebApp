@@ -54,7 +54,7 @@ class DifferentialVolcano extends Component {
       ];
       this.props.onHandleSelectedVolcano(featureToHighlightInDiffTableArr);
       // this.pageToFeature(featureToHighlightInDiffTable);
-      this.props.onResetFeatureToHighlightInDiffTable();
+      // this.props.onResetFeatureToHighlightInDiffTable();
     }
   }
 
@@ -241,11 +241,11 @@ class DifferentialVolcano extends Component {
         const allTableData =
           this.volcanoPlotFilteredGridRef.current?.qhGridRef.current?.getSortedData() ||
           [];
-        const indexMaxProtein = _.findIndex(allTableData, function(d) {
+        const indexMaxFeature = _.findIndex(allTableData, function(d) {
           return d[differentialFeatureIdKey] === PreviouslyHighlighted[0]?.id;
         });
-        const sliceFirst = index < indexMaxProtein ? index : indexMaxProtein;
-        const sliceLast = index > indexMaxProtein ? index : indexMaxProtein;
+        const sliceFirst = index < indexMaxFeature ? index : indexMaxFeature;
+        const sliceLast = index > indexMaxFeature ? index : indexMaxFeature;
         const shiftedTableData = allTableData.slice(sliceFirst, sliceLast + 1);
         const shiftedTableDataArray = shiftedTableData.map(function(d) {
           return {
@@ -272,22 +272,22 @@ class DifferentialVolcano extends Component {
           this.props.onHandleSelectedVolcano(selectedTableDataArray);
         } else {
           // not yet highlighted, add it to array
-          const indexMaxProtein = _.findIndex(allTableData, function(d) {
+          const indexMaxFeature = _.findIndex(allTableData, function(d) {
             return d[differentialFeatureIdKey] === PreviouslyHighlighted[0]?.id;
           });
           // map protein to fix obj entries
-          const mappedProtein = {
+          const mappedFeature = {
             id: item[differentialFeatureIdKey],
             value: item[differentialFeatureIdKey],
             key: item[differentialFeatureIdKey],
           };
-          const lowerIndexThanMax = index < indexMaxProtein ? true : false;
+          const lowerIndexThanMax = index < indexMaxFeature ? true : false;
           if (lowerIndexThanMax) {
             // add to beginning of array if max
-            PreviouslyHighlighted.unshift(mappedProtein);
+            PreviouslyHighlighted.unshift(mappedFeature);
           } else {
             // just add to array if not max
-            PreviouslyHighlighted.push(mappedProtein);
+            PreviouslyHighlighted.push(mappedFeature);
           }
           selectedTableDataArray = [...PreviouslyHighlighted];
           this.props.onHandleSelectedVolcano(selectedTableDataArray);
