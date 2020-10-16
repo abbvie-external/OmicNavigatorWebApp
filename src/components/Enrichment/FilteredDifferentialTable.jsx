@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { Popup, Dimmer, Loader } from 'semantic-ui-react';
 import { phosphoprotService } from '../../services/phosphoprot.service';
-// import _ from 'lodash';
+import _ from 'lodash';
 import {
   formatNumberForDisplay,
   splitValue,
-  scrollElement,
+  // scrollElement,
   getLinkout,
 } from '../Shared/helpers';
 import phosphosite_icon from '../../resources/phosphosite.ico';
@@ -26,7 +26,7 @@ class FilteredDifferentialTable extends Component {
       parseInt(
         localStorage.getItem('itemsPerPageFilteredDifferentialTable'),
         10,
-      ) || 15,
+      ) || 10,
     filteredTableLoading: false,
     additionalTemplateInfo: [],
     identifier: null,
@@ -78,54 +78,38 @@ class FilteredDifferentialTable extends Component {
     if (this.props.HighlightedProteins !== prevProps.HighlightedProteins) {
       this.highlightRows(this.props.HighlightedProteins);
     }
-    // let prevValues = prevProps?.barcodeSettings?.brushedData ?? [];
-    // let currentValues = this.props.barcodeSettings?.brushedData ?? [];
-    // var isSame =
-    //   prevValues.length === currentValues.length &&
-    //   prevValues.every(
-    //     (o, i) =>
-    //       Object.keys(o).length === Object.keys(currentValues[i]).length &&
-    //       Object.keys(o).every(k => o[k] === currentValues[i][k]),
-    //   );
-    // if (!isSame) {
-    //   this.getTableData();
-    // }
-    //if (
-    // this.props.tab === 'enrichment' &&
-    // this.props.HighlightedProteins.sample !== '' &&
-    // this.props.HighlightedProteins.sample != null &&
-    // (
-    // this.props.HighlightedProteins.sample !== prevProps.HighlightedProteins.sample
-    // this.props.filteredTableData !== prevProps.filteredTableData)
-    // ) {
-    //   this.pageToProtein(
-    //     this.state.filteredTableData,
-    //     this.props.HighlightedProteins.sample,
-    //     this.state.itemsPerPageFilteredDifferentialTable,
-    //   );
-    //}
-    // if (
-    //   this.props.activeViolinTableIndex === 1 &&
-    //   this.props.activeViolinTableIndex !== prevProps.activeViolinTableIndex
-    // ) {
-    //   this.pageToProtein(
-    //     this.state.filteredTableData,
-    //     this.props.HighlightedProteins[0]?.sample,
-    //     this.state.itemsPerPageFilteredDifferentialTable,
-    //   );
-    // }
   }
 
-  // pageToProtein = (data, proteinToHighlight, itemsPerPage) => {
-  //   if (this.filteredDifferentialGridRef?.current !== null) {
-  //     const Index = _.findIndex(data, function(p) {
-  //       return p.Protein_Site === proteinToHighlight;
-  //     });
-  //     const pageNumber = Math.ceil(Index / itemsPerPage);
-  //     const pageNumberCheck = pageNumber >= 1 ? pageNumber : 1;
-  //     this.filteredDifferentialGridRef.current.handlePageChange(pageNumberCheck);
-  //   }
-  // };
+  pageToFeature = featureToHighlight => {
+    if (
+      featureToHighlight !== '' &&
+      featureToHighlight !== [] &&
+      featureToHighlight !== null
+    ) {
+      const {
+        filteredDifferentialFeatureIdKey,
+        // differentialResults
+      } = this.props;
+      // const { itemsPerPageFilteredDifferentialTable } = this.state;
+      const currentData = this.filteredDifferentialGridRef?.current?.qhGridRef
+        ?.current?.data;
+      if (currentData != null) {
+        const itemsPerPage = this.filteredDifferentialGridRef?.current
+          ?.qhGridRef?.current?.props.itemsPerPage;
+        const Index = _.findIndex(currentData, function(p) {
+          // const Index = _.findIndex(differentialResults, function(p) {
+          return p[filteredDifferentialFeatureIdKey] === featureToHighlight;
+        });
+        const pageNumber = Math.ceil((Index + 1) / itemsPerPage);
+        if (pageNumber > 0) {
+          this.filteredDifferentialGridRef.current.handlePageChange(pageNumber);
+          // scrollElement(this, 'filteredDifferentialGridRef', 'rowHighlightMax');
+        }
+      }
+    } else {
+      this.filteredDifferentialGridRef.current.handlePageChange(1);
+    }
+  };
 
   getTableData = () => {
     if (this.props.barcodeSettings.brushedData.length > 0) {
@@ -353,7 +337,7 @@ class FilteredDifferentialTable extends Component {
       filteredDifferentialTableRowMax: filteredDifferentialTableRowMaxVar,
       filteredDifferentialTableRowOther: filteredDifferentialTableRowOtherVar,
     });
-    scrollElement(this, 'filteredDifferentialGridRef', 'rowHighlightMax');
+    this.pageToFeature(filteredDifferentialTableRowMaxVar);
   };
 
   getTableHelpers = () => {
@@ -381,98 +365,100 @@ class FilteredDifferentialTable extends Component {
     });
   };
 
-  informItemsPerPageFilteredDifferentialTable = items => {
-    this.setState({
-      itemsPerPageFilteredDifferentialTable: items,
-    });
-    localStorage.setItem('itemsPerPageFilteredDifferentialTable', items);
-  };
+  // informItemsPerPageFilteredDifferentialTable = items => {
+  //   this.setState({
+  //     itemsPerPageFilteredDifferentialTable: items,
+  //   });
+  //   localStorage.setItem('itemsPerPageFilteredDifferentialTable', items);
+  // };
 
   handleRowClick = (event, item, index) => {
     if (item !== null && event?.target?.className !== 'ExternalSiteIcon') {
       const { filteredDifferentialFeatureIdKey } = this.props;
-      // const stat = barcodeSettings.statLabel;
       event.stopPropagation();
-      // 10/2/20 - This will be uncommented once we gain access to table data after sort/filter
-      // const PreviouslyHighlighted = [...this.props.HighlightedProteins];
-      // if (event.shiftKey) {
-      //   const allTableData = _.cloneDeep(this.state.filteredTableData);
-      //   const indexMaxProtein = _.findIndex(allTableData, function(d) {
-      //     return (
-      //       d[filteredDifferentialFeatureIdKey] ===
-      //       PreviouslyHighlighted[0]?.featureID
-      //     );
-      //   });
-      //   const sliceFirst = index < indexMaxProtein ? index : indexMaxProtein;
-      //   const sliceLast = index > indexMaxProtein ? index : indexMaxProtein;
-      //   const shiftedTableData = allTableData.slice(sliceFirst, sliceLast + 1);
-      //   const shiftedTableDataArray = shiftedTableData.map(function(d) {
-      //     return {
-      //       // sample: d.symbol,
-      //       // sample: d.phosphosite,
-      //       featureID: d[filteredDifferentialFeatureIdKey],
-      //       key: d[filteredDifferentialFeatureIdKey],
-      //       // PAUL - this needs adjustment, looking for d.abs(t) instead of d.T, for example
-      //       // cpm: d[stat],
-      //       // cpm: d.F == null ? d.t : d.F,
-      //     };
-      //   });
-      //   this.props.onHandleProteinSelected(shiftedTableDataArray);
-      // } else if (event.ctrlKey) {
-      //   const allTableData = _.cloneDeep(this.state.filteredTableData);
-      //   let selectedTableDataArray = [];
+      const PreviouslyHighlighted = [...this.props.HighlightedProteins];
+      if (event.shiftKey) {
+        const allTableData =
+          this.filteredDifferentialGridRef.current?.qhGridRef.current?.getSortedData() ||
+          [];
+        const indexMaxProtein = _.findIndex(allTableData, function(d) {
+          return (
+            d[filteredDifferentialFeatureIdKey] ===
+            PreviouslyHighlighted[0]?.featureID
+          );
+        });
+        const sliceFirst = index < indexMaxProtein ? index : indexMaxProtein;
+        const sliceLast = index > indexMaxProtein ? index : indexMaxProtein;
+        const shiftedTableData = allTableData.slice(sliceFirst, sliceLast + 1);
+        const shiftedTableDataArray = shiftedTableData.map(function(d) {
+          return {
+            // sample: d.symbol,
+            // sample: d.phosphosite,
+            featureID: d[filteredDifferentialFeatureIdKey],
+            key: d[filteredDifferentialFeatureIdKey],
+            // PAUL - this needs adjustment, looking for d.abs(t) instead of d.T, for example
+            // cpm: d[stat],
+            // cpm: d.F == null ? d.t : d.F,
+          };
+        });
+        this.props.onHandleProteinSelected(shiftedTableDataArray);
+      } else if (event.ctrlKey) {
+        const allTableData =
+          this.filteredDifferentialGridRef.current?.qhGridRef.current?.getSortedData() ||
+          [];
+        let selectedTableDataArray = [];
 
-      //   const alreadyHighlighted = PreviouslyHighlighted.some(
-      //     d => d.featureID === item[filteredDifferentialFeatureIdKey],
-      //   );
-      //   // already highlighted, remove it from array
-      //   if (alreadyHighlighted) {
-      //     selectedTableDataArray = PreviouslyHighlighted.filter(
-      //       i => i.featureID !== item[filteredDifferentialFeatureIdKey],
-      //     );
-      //     this.props.onHandleProteinSelected(selectedTableDataArray);
-      //   } else {
-      //     // not yet highlighted, add it to array
-      //     const indexMaxProtein = _.findIndex(allTableData, function(d) {
-      //       return (
-      //         d[filteredDifferentialFeatureIdKey] ===
-      //         PreviouslyHighlighted[0]?.featureID
-      //       );
-      //     });
-      //     // map protein to fix obj entries
-      //     const mappedProtein = {
-      //       // sample: ctrlClickedObj.phosphosite,
-      //       featureID: item[filteredDifferentialFeatureIdKey],
-      //       key: item[filteredDifferentialFeatureIdKey],
-      //       // PAUL
-      //       // cpm: ctrlClickedObj[stat],
-      //       // cpm: ctrlClickedObj.F == null ? ctrlClickedObj.t : ctrlClickedObj.F,
-      //     };
-      //     const lowerIndexThanMax = index < indexMaxProtein ? true : false;
-      //     if (lowerIndexThanMax) {
-      //       // add to beginning of array if max
-      //       PreviouslyHighlighted.unshift(mappedProtein);
-      //     } else {
-      //       // just add to array if not max
-      //       PreviouslyHighlighted.push(mappedProtein);
-      //     }
-      //     selectedTableDataArray = [...PreviouslyHighlighted];
-      //     this.props.onHandleProteinSelected(selectedTableDataArray);
-      //   }
-      // } else {
-      this.props.onHandleProteinSelected([
-        {
-          // sample: item.Protein_Site, //lineID,
-          // featureID: item.featureID,
-          // cpm: item.logFC, //statistic,
-          // sample: item.phosphosite,
-          featureID: item[filteredDifferentialFeatureIdKey],
-          key: item[filteredDifferentialFeatureIdKey],
-          // cpm: item[stat],
-          // cpm: item.F === undefined ? item.t : item.F,
-        },
-      ]);
-      // }
+        const alreadyHighlighted = PreviouslyHighlighted.some(
+          d => d.featureID === item[filteredDifferentialFeatureIdKey],
+        );
+        // already highlighted, remove it from array
+        if (alreadyHighlighted) {
+          selectedTableDataArray = PreviouslyHighlighted.filter(
+            i => i.featureID !== item[filteredDifferentialFeatureIdKey],
+          );
+          this.props.onHandleProteinSelected(selectedTableDataArray);
+        } else {
+          // not yet highlighted, add it to array
+          const indexMaxProtein = _.findIndex(allTableData, function(d) {
+            return (
+              d[filteredDifferentialFeatureIdKey] ===
+              PreviouslyHighlighted[0]?.featureID
+            );
+          });
+          // map protein to fix obj entries
+          const mappedProtein = {
+            // sample: ctrlClickedObj.phosphosite,
+            featureID: item[filteredDifferentialFeatureIdKey],
+            key: item[filteredDifferentialFeatureIdKey],
+            // PAUL
+            // cpm: ctrlClickedObj[stat],
+            // cpm: ctrlClickedObj.F == null ? ctrlClickedObj.t : ctrlClickedObj.F,
+          };
+          const lowerIndexThanMax = index < indexMaxProtein ? true : false;
+          if (lowerIndexThanMax) {
+            // add to beginning of array if max
+            PreviouslyHighlighted.unshift(mappedProtein);
+          } else {
+            // just add to array if not max
+            PreviouslyHighlighted.push(mappedProtein);
+          }
+          selectedTableDataArray = [...PreviouslyHighlighted];
+          this.props.onHandleProteinSelected(selectedTableDataArray);
+        }
+      } else {
+        this.props.onHandleProteinSelected([
+          {
+            // sample: item.Protein_Site, //lineID,
+            // featureID: item.featureID,
+            // cpm: item.logFC, //statistic,
+            // sample: item.phosphosite,
+            featureID: item[filteredDifferentialFeatureIdKey],
+            key: item[filteredDifferentialFeatureIdKey],
+            // cpm: item[stat],
+            // cpm: item.F === undefined ? item.t : item.F,
+          },
+        ]);
+      }
     }
   };
 
@@ -495,9 +481,9 @@ class FilteredDifferentialTable extends Component {
             totalRows={15}
             // use "differentialRows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
             itemsPerPage={itemsPerPageFilteredDifferentialTable}
-            onInformItemsPerPage={
-              this.informItemsPerPageFilteredDifferentialTable
-            }
+            // onInformItemsPerPage={
+            //   this.informItemsPerPageFilteredDifferentialTable
+            // }
             exportBaseName="Differential_Analysis_Filtered"
             // quickViews={quickViews}
             // disableGeneralSearch
@@ -507,6 +493,7 @@ class FilteredDifferentialTable extends Component {
             disableColumnReorder
             // disableFilters={false}
             min-height="5vh"
+            height="auto"
             additionalTemplateInfo={additionalTemplateInfo}
             // headerAttributes={<ButtonActions />}
             onRowClick={this.handleRowClick}

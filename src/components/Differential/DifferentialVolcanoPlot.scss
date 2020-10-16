@@ -21,13 +21,13 @@
     fill: var(--color-link);
   }
   .volcanoPlot-dataPoint.hovered {
-    stroke: var(--color-primary);
+    stroke: var(--color-tertiary);
     stroke-width: 5;
   }
   .volcanoPlot-dataPoint.selected {
-    stroke: black;
-    stroke-width: 1;
-    fill: var(--color-primary-gradient);
+    // stroke: black;
+    // stroke-width: 1;
+    fill: var(--color-tertiary);
   }
   .volcanoPlot-dataPoint.highlighted {
     stroke: black;

@@ -209,14 +209,6 @@ class BarcodePlotReact extends Component {
     });
   };
 
-  unhighlightBrushedLines = () => {
-    const { settings } = this.state;
-    const lines = d3.selectAll('line.barcode-line');
-    lines.classed('selected', false);
-    lines.classed('MaxLine', false);
-    d3.selectAll('line.barcode-line').attr('y1', settings.margin.top);
-  };
-
   getMaxObject(array) {
     if (array) {
       const max = Math.max.apply(

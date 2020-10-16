@@ -1805,12 +1805,12 @@ class Enrichment extends Component {
     };
   };
 
-  informItemsPerPageEnrichmentTable = items => {
-    this.setState({
-      itemsPerPageEnrichmentTable: items,
-    });
-    localStorage.setItem('itemsPerPageEnrichmentTable', items);
-  };
+  // informItemsPerPageEnrichmentTable = items => {
+  //   this.setState({
+  //     itemsPerPageEnrichmentTable: items,
+  //   });
+  //   localStorage.setItem('itemsPerPageEnrichmentTable', items);
+  // };
 
   getTableAndNetworkPanes = () => {
     const {
@@ -1877,9 +1877,9 @@ class Enrichment extends Component {
                     // totalRows={rows}
                     // use "rows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
                     itemsPerPage={itemsPerPageEnrichmentTable}
-                    onInformItemsPerPage={
-                      this.informItemsPerPageEnrichmentTable
-                    }
+                    // onInformItemsPerPage={
+                    //   this.informItemsPerPageEnrichmentTable
+                    // }
                     loading={this.state.isEnrichmentTableLoading}
                     exportBaseName="Enrichment_Analysis"
                     // columnReorder={this.props.columnReorder}
@@ -1890,7 +1890,6 @@ class Enrichment extends Component {
                     additionalTemplateInfo={
                       additionalTemplateInfoEnrichmentTable
                     }
-                    // onInformItemsPerPage={this.informItemsPerPage}
                     emptyMessage={CustomEmptyMessage}
                   />
                 </Grid.Column>

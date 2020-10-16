@@ -15,6 +15,7 @@ import {
   formatNumberForDisplay,
   splitValue,
   getLinkout,
+  scrollElement,
 } from '../Shared/helpers';
 import phosphosite_icon from '../../resources/phosphosite.ico';
 import DOMPurify from 'dompurify';
@@ -61,7 +62,10 @@ class Differential extends Component {
     isProteinSVGLoaded: false,
     // isProteinDataLoaded: false,
     HighlightedFeaturesArrVolcano: [],
-    volcanoDifferentialTableRowMax: [],
+    HighlightedFeaturesArrDifferential: [],
+    differentialTableRowMax: '',
+    differentialTableRowOther: [],
+    volcanoDifferentialTableRowMax: '',
     volcanoDifferentialTableRowOther: [],
     maxObjectIdentifier: null,
     imageInfo: {
@@ -95,14 +99,94 @@ class Differential extends Component {
   DifferentialViewContainerRef = React.createRef();
   differentialGridRef = React.createRef();
 
-  componentDidUpdate(prevProps) {}
+  componentDidMount() {
+    const { featureToHighlightInDiffTable } = this.props;
+    if (featureToHighlightInDiffTable !== '') {
+      // this.setState(
+      //   {
+      //     differentialTableRowMax: featureToHighlightInDiffTable,
+      //   },
+      //   function() {
+      //     this.pageToFeature(featureToHighlightInDiffTable);
+      //   },
+      // );
+      this.handleSelectedDifferential(
+        [
+          {
+            id: featureToHighlightInDiffTable,
+            value: featureToHighlightInDiffTable,
+            key: featureToHighlightInDiffTable,
+          },
+        ],
+        true,
+      );
+    }
+  }
 
-  informItemsPerPage = items => {
-    this.setState({
-      itemsPerPageDifferentialTable: items,
-    });
-    localStorage.setItem('itemsPerPageDifferentialTable', items);
+  componentDidUpdate(prevProps) {
+    const { featureToHighlightInDiffTable } = this.props;
+    const currentData = this.differentialGridRef?.current?.qhGridRef?.current
+      ?.data;
+    if (
+      featureToHighlightInDiffTable !== '' &&
+      currentData != null &&
+      prevProps.featureToHighlightInDiffTable !== featureToHighlightInDiffTable
+    ) {
+      // this.setState(
+      //   {
+      //     differentialTableRowMax: featureToHighlightInDiffTable,
+      //   },
+      //   function() {
+      //     this.pageToFeature(featureToHighlightInDiffTable);
+      //   },
+      // );
+      this.handleSelectedDifferential(
+        [
+          {
+            id: featureToHighlightInDiffTable,
+            value: featureToHighlightInDiffTable,
+            key: featureToHighlightInDiffTable,
+          },
+        ],
+        true,
+      );
+    }
+  }
+
+  pageToFeature = featureToHighlight => {
+    debugger;
+    if (featureToHighlight !== '') {
+      const {
+        differentialFeatureIdKey,
+        // differentialResults
+      } = this.props;
+      // const { itemsPerPageVolcanoTable } = this.state;
+      const currentData = this.differentialGridRef?.current?.qhGridRef?.current
+        ?.data;
+      if (currentData != null) {
+        const itemsPerPage = this.differentialGridRef?.current?.qhGridRef
+          ?.current?.props.itemsPerPage;
+        const Index = _.findIndex(currentData, function(p) {
+          // const Index = _.findIndex(differentialResults, function(p) {
+          return p[differentialFeatureIdKey] === featureToHighlight;
+        });
+        const pageNumber = Math.ceil((Index + 1) / itemsPerPage);
+        if (pageNumber > 0) {
+          this.differentialGridRef.current.handlePageChange(pageNumber);
+          scrollElement(this, 'differentialGridRef', 'rowHighlightMax');
+        }
+      }
+    } else {
+      this.differentialGridRef.current.handlePageChange(1);
+    }
   };
+
+  // informItemsPerPage = items => {
+  //   this.setState({
+  //     itemsPerPageDifferentialTable: items,
+  //   });
+  //   localStorage.setItem('itemsPerPageDifferentialTable', items);
+  // };
 
   handleSearchTransitionDifferential = bool => {
     this.setState({
@@ -176,6 +260,7 @@ class Differential extends Component {
       visible: false,
       // isProteinSVGLoaded: false,
       HighlightedFeaturesArrVolcano: [],
+      HighlightedFeaturesArrDifferential: [],
     });
   };
 
@@ -186,6 +271,7 @@ class Differential extends Component {
       // isProteinDataLoaded: false,
       isItemSelected: false,
       HighlightedFeaturesArrVolcano: [],
+      HighlightedFeaturesArrDifferential: [],
     });
   };
 
@@ -330,18 +416,6 @@ class Differential extends Component {
     this.setState({ additionalTemplateInfoDifferentialTable: addParams });
   };
 
-  // pageToFeature = featureToHighlight => {
-  //   const { differentialFeatureIdKey } = this.props;
-  //   const { differentialResults, itemsPerPageDifferentialTable } = this.state;
-  //   if (this.differentialGridRef?.current != null) {
-  //     const Index = _.findIndex(differentialResults, function(p) {
-  //       return p[differentialFeatureIdKey] === featureToHighlight;
-  //     });
-  //     const pageNumber = Math.ceil((Index + 1) / itemsPerPageDifferentialTable);
-  //     this.differentialGridRef.current.handlePageChange(pageNumber);
-  //   }
-  // };
-
   getPlot = (featureId, useVolcanoSVGSize) => {
     const { differentialPlotTypes } = this.state;
     const {
@@ -432,32 +506,28 @@ class Differential extends Component {
       if (MaxLine !== {} && MaxLine != null) {
         volcanoDifferentialTableRowMaxVar = MaxLine.key;
       }
-      // Once table multi-select is built, uncomment
-      // const HighlightedFeaturesCopy = [...toHighlightArr];
-      // const SelectedFeatures = HighlightedFeaturesCopy.slice(1);
-      // let volcanoDifferentialTableRowOtherVar = [];
-      // if (
-      //   SelectedFeatures.length > 0 &&
-      //   SelectedFeatures != null &&
-      //   SelectedFeatures != {}
-      // ) {
-      //   SelectedFeatures.forEach(element => {
-      //     volcanoDifferentialTableRowOtherVar.push(element.key);
-      //   });
-      // }
+      const HighlightedFeaturesCopy = [...toHighlightArr];
+      const SelectedFeatures = HighlightedFeaturesCopy.slice(1);
+      let volcanoDifferentialTableRowOtherVar = [];
+      if (
+        SelectedFeatures.length > 0 &&
+        SelectedFeatures != null &&
+        SelectedFeatures !== {}
+      ) {
+        SelectedFeatures.forEach(element => {
+          volcanoDifferentialTableRowOtherVar.push(element.key);
+        });
+      }
       const maxId = toHighlightArr[0].id || '';
       this.setState({
         volcanoDifferentialTableRowMax: volcanoDifferentialTableRowMaxVar,
-        // volcanoDifferentialTableRowOther: volcanoDifferentialTableRowOtherVar,
+        volcanoDifferentialTableRowOther: volcanoDifferentialTableRowOtherVar,
       });
       this.handlePlotVolcano(maxId);
-      // if (!tableClick) {
-      // this.pageToFeature(maxId);
-      // }
     } else {
       this.setState({
         volcanoDifferentialTableRowMax: '',
-        // volcanoDifferentialTableRowOther: '',
+        volcanoDifferentialTableRowOther: [],
       });
       this.handlePlotVolcano('');
     }
@@ -735,11 +805,144 @@ class Differential extends Component {
   //   });
   // };
 
-  informItemsPerPageDifferentialTable = items => {
+  // informItemsPerPageDifferentialTable = items => {
+  //   this.setState({
+  //     itemsPerPageDifferentialTable: items,
+  //   });
+  //   localStorage.setItem('itemsPerPageDifferentialTable', items);
+  // };
+
+  rowLevelPropsCalcDifferential = item => {
+    let className;
+    const { differentialFeatureIdKey } = this.props;
+    const { differentialTableRowMax, differentialTableRowOther } = this.state;
+    /* eslint-disable eqeqeq */
+    if (item[differentialFeatureIdKey] === differentialTableRowMax) {
+      className = 'rowHighlightMax';
+    }
+    if (differentialTableRowOther.includes(item[differentialFeatureIdKey])) {
+      className = 'rowHighlightOther';
+    }
+    return {
+      className,
+    };
+  };
+
+  handleRowClickDifferential = (event, item, index) => {
+    const highlightedFeature = item[this.props.differentialFeatureIdKey];
+    if (item !== null && event?.target?.className !== 'ExternalSiteIcon') {
+      const { differentialFeatureIdKey } = this.props;
+      event.stopPropagation();
+      const PreviouslyHighlighted = [
+        ...this.state.HighlightedFeaturesArrDifferential,
+      ];
+      if (event.shiftKey) {
+        const allTableData =
+          this.differentialGridRef.current?.qhGridRef.current?.getSortedData() ||
+          [];
+        const indexMaxFeature = _.findIndex(allTableData, function(d) {
+          return d[differentialFeatureIdKey] === PreviouslyHighlighted[0]?.id;
+        });
+        const sliceFirst = index < indexMaxFeature ? index : indexMaxFeature;
+        const sliceLast = index > indexMaxFeature ? index : indexMaxFeature;
+        const shiftedTableData = allTableData.slice(sliceFirst, sliceLast + 1);
+        const shiftedTableDataArray = shiftedTableData.map(function(d) {
+          return {
+            id: d[differentialFeatureIdKey],
+            value: d[differentialFeatureIdKey],
+            key: d[differentialFeatureIdKey],
+          };
+        });
+        this.handleSelectedDifferential(shiftedTableDataArray, false);
+      } else if (event.ctrlKey) {
+        const allTableData =
+          this.differentialGridRef.current?.qhGridRef.current?.getSortedData() ||
+          [];
+        let selectedTableDataArray = [];
+
+        const alreadyHighlighted = PreviouslyHighlighted.some(
+          d => d.id === highlightedFeature,
+        );
+        // already highlighted, remove it from array
+        if (alreadyHighlighted) {
+          selectedTableDataArray = PreviouslyHighlighted.filter(
+            i => i.id !== highlightedFeature,
+          );
+          this.handleSelectedDifferential(selectedTableDataArray, false);
+        } else {
+          // not yet highlighted, add it to array
+          const indexMaxFeature = _.findIndex(allTableData, function(d) {
+            return d[differentialFeatureIdKey] === PreviouslyHighlighted[0]?.id;
+          });
+          const mappedFeature = {
+            id: item[differentialFeatureIdKey],
+            value: item[differentialFeatureIdKey],
+            key: item[differentialFeatureIdKey],
+          };
+          const lowerIndexThanMax = index < indexMaxFeature ? true : false;
+          if (lowerIndexThanMax) {
+            // add to beginning of array if max
+            PreviouslyHighlighted.unshift(mappedFeature);
+          } else {
+            // just add to array if not max
+            PreviouslyHighlighted.push(mappedFeature);
+          }
+          selectedTableDataArray = [...PreviouslyHighlighted];
+          this.handleSelectedDifferential(selectedTableDataArray, false);
+        }
+      } else {
+        this.handleSelectedDifferential(
+          [
+            {
+              id: item[differentialFeatureIdKey],
+              value: item[differentialFeatureIdKey],
+              key: item[differentialFeatureIdKey],
+            },
+          ],
+          false,
+        );
+      }
+    }
+    // else {
+    //   this.props.onPagedToFeature();
+    // }
+  };
+
+  handleSelectedDifferential = (toHighlightArr, pageToFeature) => {
     this.setState({
-      itemsPerPageDifferentialTable: items,
+      HighlightedFeaturesArrDifferential: toHighlightArr,
     });
-    localStorage.setItem('itemsPerPageDifferentialTable', items);
+    if (toHighlightArr.length > 0) {
+      const MaxLine = toHighlightArr[0] || null;
+      let differentialTableRowMaxVar = '';
+      if (MaxLine !== {} && MaxLine != null) {
+        differentialTableRowMaxVar = MaxLine.key;
+      }
+      const HighlightedFeaturesCopy = [...toHighlightArr];
+      const SelectedFeatures = HighlightedFeaturesCopy.slice(1);
+      let differentialTableRowOtherVar = [];
+      if (
+        SelectedFeatures.length > 0 &&
+        SelectedFeatures != null &&
+        SelectedFeatures !== {}
+      ) {
+        SelectedFeatures.forEach(element => {
+          differentialTableRowOtherVar.push(element.key);
+        });
+      }
+      this.setState({
+        differentialTableRowMax: differentialTableRowMaxVar,
+        differentialTableRowOther: differentialTableRowOtherVar,
+      });
+      if (pageToFeature) {
+        this.pageToFeature(differentialTableRowMaxVar);
+      }
+    } else {
+      this.setState({
+        differentialTableRowMax: '',
+        differentialTableRowOther: [],
+      });
+    }
   };
 
   getTableAndPlotPanes = () => {
@@ -802,9 +1005,9 @@ class Differential extends Component {
                     totalRows={differentialRows}
                     // use "differentialRows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
                     itemsPerPage={itemsPerPageDifferentialTable}
-                    onInformItemsPerPage={
-                      this.informItemsPerPageDifferentialTable
-                    }
+                    // onInformItemsPerPage={
+                    //   this.informItemsPerPageDifferentialTable
+                    // }
                     exportBaseName="Differential_Analysis"
                     loading={isVolcanoTableLoading}
                     // quickViews={quickViews}
@@ -817,6 +1020,8 @@ class Differential extends Component {
                     additionalTemplateInfo={
                       additionalTemplateInfoDifferentialTable
                     }
+                    onRowClick={this.handleRowClickDifferential}
+                    rowLevelPropsCalc={this.rowLevelPropsCalcDifferential}
                     // headerAttributes={<ButtonActions />}
                   />
                   {/* </div> */}
