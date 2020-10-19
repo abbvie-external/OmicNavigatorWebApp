@@ -154,7 +154,6 @@ class Differential extends Component {
   }
 
   pageToFeature = featureToHighlight => {
-    debugger;
     if (featureToHighlight !== '') {
       const {
         differentialFeatureIdKey,
