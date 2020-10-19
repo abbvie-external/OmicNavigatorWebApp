@@ -58,7 +58,7 @@ class SplitPanesContainer extends Component {
     const { isViolinPlotLoaded } = this.props;
     if (!isViolinPlotLoaded) {
       return (
-        <div className="PlotInstructionsDiv">
+        <div className="PlotInstructions">
           <h4 className="PlotInstructionsText">
             Select barcode line/s to display Violin Plot
           </h4>
@@ -185,7 +185,7 @@ class SplitPanesContainer extends Component {
     const { SVGPlotLoaded, SVGPlotLoading } = this.props;
     if (!SVGPlotLoaded & !SVGPlotLoading) {
       return (
-        <div className="PlotInstructionsDiv">
+        <div className="PlotInstructions">
           <h4 className="PlotInstructionsText">
             Select barcode line/s to display SVG Plot
           </h4>

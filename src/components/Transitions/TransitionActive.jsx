@@ -5,7 +5,7 @@ import { Header } from 'semantic-ui-react';
 const TransitionActive = () => (
   <div className="LoaderContainer">
     <Header as="h2" textAlign="center">
-      Loading Records...
+      Loading Data...
     </Header>
     <div className="transition-active-loader">
       <div className="transition-active-dot"></div>

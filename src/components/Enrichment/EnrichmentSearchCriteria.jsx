@@ -25,9 +25,10 @@ class EnrichmentSearchCriteria extends Component {
     enrichmentStudies: [],
     enrichmentStudyHrefVisible: false,
     enrichmentStudyHref: '',
+    enrichmentStudyReportTooltip:
+      'Select a study and model to view Analysis Details',
     enrichmentModels: [],
     enrichmentAnnotations: [],
-
     enrichmentModelTooltip: '',
     enrichmentAnnotationTooltip: '',
     enrichmentStudiesDisabled: true,
@@ -236,13 +237,21 @@ class EnrichmentSearchCriteria extends Component {
     }
   };
 
+  setStudyTooltip = () => {
+    if (this.props.enrichmentModel !== '') {
+      this.setState({
+        enrichmentStudyReportTooltip: `The model "main" from the study ${this.props.enrichmentStudy} does not have additional analysis details available.`,
+      });
+    }
+  };
+
   getReportLink = (study, model) => {
     cancelRequestGetReportLinkEnrichment();
     let cancelToken = new CancelToken(e => {
       cancelRequestGetReportLinkEnrichment = e;
     });
     phosphoprotService
-      .getReportLink(study, model, null, cancelToken)
+      .getReportLink(study, model, this.setStudyTooltip, cancelToken)
       .then(getReportLink => {
         const link = getReportLink.includes('http')
           ? getReportLink
@@ -521,7 +530,8 @@ class EnrichmentSearchCriteria extends Component {
         // on toggle open
         this.props.onMultisetQueriedE(true);
         this.props.onSearchTransitionEnrichment(true);
-        this.props.onHandleMultisetFiltersVisible(true);
+        this.props.onHandleMultisetFiltersVisible();
+        // this.props.onHandleMultisetFiltersVisible(true);
         this.setState(
           {
             reloadPlot: true,
@@ -534,7 +544,8 @@ class EnrichmentSearchCriteria extends Component {
         // on toggle close
         // this.props.onHandleNetworkTests([], []);
         this.props.onMultisetQueriedE(false);
-        this.props.onHandleMultisetFiltersVisible(false);
+        this.props.onHandleMultisetFiltersVisible();
+        // this.props.onHandleMultisetFiltersVisible(false);
         this.setState({
           reloadPlot: false,
           initialRenderE: true,
@@ -551,14 +562,16 @@ class EnrichmentSearchCriteria extends Component {
 
   handleMultisetEOpenError = () => {
     cancelRequestEnrichmentMultisetPlot();
-    this.props.onHandleMultisetFiltersVisible(false);
+    this.props.onHandleMultisetFiltersVisible();
+    // this.props.onHandleMultisetFiltersVisible(false);
     this.props.onMultisetQueriedE(false);
     console.log('Error during getEnrichmentsIntersection');
   };
 
   handleMultisetECloseError = () => {
     this.props.onSearchTransitionEnrichment(false);
-    this.props.onHandleMultisetFiltersVisible(true);
+    this.props.onHandleMultisetFiltersVisible();
+    // this.props.onHandleMultisetFiltersVisible(true);
     this.props.onMultisetQueriedE(true);
     this.setState(
       {
@@ -750,17 +763,6 @@ class EnrichmentSearchCriteria extends Component {
         // const alphanumericLength = countAlphanumericFields.length;
         // const annotationTestsLength = totalLength - alphanumericLength;
         // if (reloadPlot === true && annotationTestsLength > 1) {
-        const testsLength = typeof tests === 'string' ? 1 : tests.length;
-        if (reloadPlot === true && testsLength > 1) {
-          this.getMultisetPlot(
-            sigValue,
-            enrichmentModel,
-            enrichmentStudy,
-            enrichmentAnnotation,
-            this.jsonToList(selectedOperator),
-            pValueType,
-          );
-        }
         const multisetResults = annotationData;
         this.setState({
           uSettings: {
@@ -779,6 +781,17 @@ class EnrichmentSearchCriteria extends Component {
       .catch(error => {
         console.error('Error during getEnrichmentsIntersection', error);
       });
+    const testsLength = typeof tests === 'string' ? 1 : tests.length;
+    if (reloadPlot === true && testsLength > 1) {
+      this.getMultisetPlot(
+        sigValue,
+        enrichmentModel,
+        enrichmentStudy,
+        enrichmentAnnotation,
+        this.jsonToList(selectedOperator),
+        pValueType,
+      );
+    }
   };
   jsonToList(json) {
     var valueList = [];
@@ -925,7 +938,7 @@ class EnrichmentSearchCriteria extends Component {
           basic
           inverted
           position="bottom center"
-          content="Select a study and model to view Analysis Details"
+          content={this.state.enrichmentStudyReportTooltip}
         />
       );
     }

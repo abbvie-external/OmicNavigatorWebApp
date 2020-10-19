@@ -94,8 +94,18 @@
     border-bottom: 1px solid grey !important;
   }
 
-  .QHGridHeaderDiv {
+  // .QHGridHeaderDiv {
+  .QHGridBodyDiv {
     margin-top: 10px !important;
+  }
+
+  .QHGrid--loading {
+    padding: initial !important;
+    margin: initial !important;
+  }
+
+  .QHGrid--empty {
+    height: auto !important;
   }
 
   //icons
@@ -117,6 +127,32 @@
   .ui.menu .orange.active.item {
     color: #fff !important;
     background-color: var(--color-primary) !important;
+  }
+
+  .rowHighlightMax {
+    background: var(--color-primary) !important;
+    color: white !important;
+  }
+
+  .rowHighlightOther {
+    background: var(--color-primary-gradient) !important;
+    color: white !important;
+  }
+
+  .rowHighlightMax .TableCellLink,
+  .rowHighlightOther .TableCellLink {
+    color: white !important;
+    cursor: pointer !important;
+  }
+
+  .ui.selectable.table tbody .rowHighlightMax:hover {
+    background: rgba(255, 68, 0, 0.9) !important;
+    color: white !important;
+  }
+
+  .ui.selectable.table tbody .rowHighlightOther:hover {
+    background: rgba(255, 126, 5, 0.9) !important;
+    color: white !important;
   }
 
   .test {

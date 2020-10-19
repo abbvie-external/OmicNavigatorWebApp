@@ -18,6 +18,7 @@ import * as d3 from 'd3';
 import {
   formatNumberForDisplay,
   splitValue,
+  getLinkout,
   // getIconInfo
 } from '../Shared/helpers';
 import '../Shared/Table.scss';
@@ -28,19 +29,9 @@ import './Enrichment.scss';
 import EnrichmentResultsGraph from './EnrichmentResultsGraph';
 import EnrichmentSearchCriteria from './EnrichmentSearchCriteria';
 import SplitPanesContainer from './SplitPanesContainer';
-import './EnrichmentResultsTable.scss';
-import QHGrid from '../utility/QHGrid';
-import EZGrid from '../utility/EZGrid';
-import QuickViewModal from '../utility/QuickViewModal';
-import {
-  getFieldValue,
-  getField,
-  typeMap,
-} from '../utility/selectors/QHGridSelector';
-export * from '../utility/FilterTypeConfig';
-export * from '../utility/selectors/quickViewSelector';
-export { QHGrid, EZGrid, QuickViewModal };
-export { getField, getFieldValue, typeMap };
+import CustomEmptyMessage from '../Shared/Templates';
+// eslint-disable-next-line no-unused-vars
+import QHGrid, { EZGrid } from '***REMOVED***';
 
 let cancelRequestEnrichmentGetPlot = () => {};
 let cancelRequestGetEnrichmentsNetwork = () => {};
@@ -175,7 +166,7 @@ class Enrichment extends Component {
       xName: 'tissue',
       constrainExtremes: false,
       color: d3.scaleOrdinal(d3.schemeCategory10),
-      margin: { top: 10, right: 10, bottom: 50, left: 55 },
+      margin: { top: 10, right: 10, bottom: 50, left: 60 },
       scale: 'linear',
       yName: null,
       yTicks: 1,
@@ -394,8 +385,10 @@ class Enrichment extends Component {
     });
   };
 
-  handleMultisetFiltersVisible = bool => {
-    this.setState({ multisetFiltersVisible: bool });
+  handleMultisetFiltersVisible = () => {
+    this.setState(prevState => ({
+      multisetFiltersVisible: !prevState.multisetFiltersVisible,
+    }));
   };
 
   handleNetworkSigValue = val => {
@@ -597,8 +590,18 @@ class Enrichment extends Component {
         return {
           title: f,
           field: f,
-          filterable: { type: 'alphanumericFilter' },
+          filterable: { type: 'multiFilter' },
           template: (value, item, addParams) => {
+            let linkout = getLinkout(
+              item,
+              addParams,
+              icon,
+              iconText,
+              TableValuePopupStyle,
+              alphanumericTrigger,
+              enrichmentStudy,
+              enrichmentAnnotation,
+            );
             if (f === alphanumericTrigger) {
               return (
                 <div>
@@ -614,25 +617,7 @@ class Enrichment extends Component {
                     inverted
                     basic
                   />
-                  <Popup
-                    trigger={
-                      <img
-                        src={icon}
-                        alt={iconText}
-                        className="ExternalSiteIcon"
-                        onClick={addParams.getLink(
-                          enrichmentStudy,
-                          enrichmentAnnotation,
-                          item,
-                        )}
-                      />
-                    }
-                    style={TableValuePopupStyle}
-                    className="TablePopupValue"
-                    content={iconText}
-                    inverted
-                    basic
-                  />
+                  {linkout}
                 </div>
               );
             } else {
@@ -1741,7 +1726,23 @@ class Enrichment extends Component {
     }
   };
 
+  getMessage = () => {
+    const {
+      enrichmentStudy,
+      enrichmentModel,
+      enrichmentAnnotation,
+    } = this.props;
+    if (enrichmentStudy === '') {
+      return 'study';
+    } else if (enrichmentModel === '') {
+      return 'model';
+    } else if (enrichmentAnnotation === '') {
+      return 'database';
+    } else return '';
+  };
+
   getView = () => {
+    const message = this.getMessage();
     if (this.state.isTestSelected && !this.state.isTestDataLoaded) {
       return (
         <div className="SearchingAltDiv">
@@ -1787,7 +1788,7 @@ class Enrichment extends Component {
           }}
         />
       );
-    } else return <TransitionStill />;
+    } else return <TransitionStill stillMessage={message} />;
   };
 
   showPhosphositePlus = dataItem => {
@@ -1804,12 +1805,12 @@ class Enrichment extends Component {
     };
   };
 
-  informItemsPerPageEnrichmentTable = items => {
-    this.setState({
-      itemsPerPageEnrichmentTable: items,
-    });
-    localStorage.setItem('itemsPerPageEnrichmentTable', items);
-  };
+  // informItemsPerPageEnrichmentTable = items => {
+  //   this.setState({
+  //     itemsPerPageEnrichmentTable: items,
+  //   });
+  //   localStorage.setItem('itemsPerPageEnrichmentTable', items);
+  // };
 
   getTableAndNetworkPanes = () => {
     const {
@@ -1863,7 +1864,7 @@ class Enrichment extends Component {
             <Grid>
               <Grid.Row>
                 <Grid.Column
-                  className="EnrichmentResultsTable"
+                  className="ResultsTableWrapper"
                   mobile={16}
                   tablet={16}
                   largeScreen={16}
@@ -1876,9 +1877,9 @@ class Enrichment extends Component {
                     // totalRows={rows}
                     // use "rows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
                     itemsPerPage={itemsPerPageEnrichmentTable}
-                    onInformItemsPerPage={
-                      this.informItemsPerPageEnrichmentTable
-                    }
+                    // onInformItemsPerPage={
+                    //   this.informItemsPerPageEnrichmentTable
+                    // }
                     loading={this.state.isEnrichmentTableLoading}
                     exportBaseName="Enrichment_Analysis"
                     // columnReorder={this.props.columnReorder}
@@ -1889,7 +1890,7 @@ class Enrichment extends Component {
                     additionalTemplateInfo={
                       additionalTemplateInfoEnrichmentTable
                     }
-                    // onInformItemsPerPage={this.informItemsPerPage}
+                    emptyMessage={CustomEmptyMessage}
                   />
                 </Grid.Column>
               </Grid.Row>

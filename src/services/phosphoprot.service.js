@@ -34,12 +34,12 @@ class PhosphoprotService {
             .then(response => resolve(response.data))
             .catch(function(thrown) {
               if (axios.isCancel(thrown)) {
-                console.log('Request canceled', thrown.message);
+                // console.log('Request canceled', thrown.message);
               } else {
                 if (handleError !== undefined) {
                   handleError(false);
                 }
-                console.log(`${thrown.message}`);
+                // console.log(`${thrown.message}`);
               }
             });
         })
@@ -67,7 +67,14 @@ class PhosphoprotService {
     return studiesFromPromise;
   }
 
-  async ocpuDataCall(method, obj, handleError, cancelToken, params) {
+  async ocpuDataCall(
+    method,
+    obj,
+    handleError,
+    cancelToken,
+    params,
+    timeoutLength,
+  ) {
     const paramsObj = params ? { digits: 10 } : {};
     return new Promise(function(resolve, reject) {
       window.ocpu
@@ -84,18 +91,18 @@ class PhosphoprotService {
               params: paramsObj,
               responseType: 'text',
               cancelToken,
-              timeout: 15000,
+              timeout: timeoutLength,
             })
             .then(response => resolve(response.data))
             .catch(function(thrown) {
               if (axios.isCancel(thrown)) {
-                console.log('Request canceled', thrown.message);
+                // console.log('Request canceled', thrown.message);
               } else {
                 toast.error(`${thrown.message}`);
                 if (handleError !== undefined) {
                   handleError(false);
                 }
-                console.log(`${thrown.message}`);
+                // console.log(`${thrown.message}`);
               }
             });
         })
@@ -106,7 +113,7 @@ class PhosphoprotService {
           if (handleError !== undefined) {
             handleError(false);
           }
-          console.log(`${error.statusText}: ${error.responseText}`);
+          // console.log(`${error.statusText}: ${error.responseText}`);
         });
     });
   }
@@ -120,6 +127,7 @@ class PhosphoprotService {
       errorCb,
       null,
       false,
+      15000,
     );
     const dataFromPromise = await promise;
     return dataFromPromise;
@@ -134,6 +142,7 @@ class PhosphoprotService {
       errorCb,
       cancelToken,
       true,
+      15000,
     );
     const dataFromPromise = await promise;
     return dataFromPromise;
@@ -161,6 +170,7 @@ class PhosphoprotService {
       errorCb,
       cancelToken,
       true,
+      15000,
     );
     const dataFromPromise = await promise;
     return dataFromPromise;
@@ -217,13 +227,13 @@ class PhosphoprotService {
             .then(response => resolve(response))
             .catch(function(thrown) {
               if (axios.isCancel(thrown)) {
-                console.log('Request canceled', thrown.message);
+                // console.log('Request canceled', thrown.message);
               } else {
                 toast.error(`${thrown.message}`);
                 if (handleError !== undefined) {
                   handleError(false);
                 }
-                console.log(`${thrown.message}`);
+                // console.log(`${thrown.message}`);
               }
             });
         })
@@ -232,7 +242,7 @@ class PhosphoprotService {
           if (handleError !== undefined) {
             handleError(false);
           }
-          console.log(`${error.statusText}: ${error.responseText}`);
+          // console.log(`${error.statusText}: ${error.responseText}`);
         });
     });
   }
@@ -271,6 +281,7 @@ class PhosphoprotService {
       errorCb,
       cancelToken,
       false,
+      15000,
     );
     const dataFromPromise = await promise;
     return dataFromPromise;
@@ -304,6 +315,7 @@ class PhosphoprotService {
       errorCb,
       cancelToken,
       true,
+      15000,
     );
     const dataFromPromise = await promise;
     return dataFromPromise;
@@ -367,6 +379,7 @@ class PhosphoprotService {
       errorCb,
       cancelToken,
       true,
+      15000,
     );
     const dataFromPromise = await promise;
     return dataFromPromise;
@@ -439,6 +452,7 @@ class PhosphoprotService {
       errorCb,
       cancelToken,
       false,
+      15000,
     );
     const featuresFromPromise = await promise;
     return featuresFromPromise;
@@ -464,6 +478,7 @@ class PhosphoprotService {
       errorCb,
       cancelToken,
       false,
+      15000,
     );
     const featuresFromPromise = await promise;
     return featuresFromPromise;

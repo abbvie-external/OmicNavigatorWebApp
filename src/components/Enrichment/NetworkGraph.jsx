@@ -572,7 +572,7 @@ class NetworkGraph extends Component {
                 //     });
                 //   };
                 // }
-
+                let edgeWeight = 0;
                 let link = d3
                   .select(this)
                   .append('g')
@@ -644,6 +644,11 @@ class NetworkGraph extends Component {
                     );
                   })
                   .on('mouseover', function(d, i) {
+                    let jaccardTotal = linkType * d.jaccard;
+                    let overlapValue = 1 - linkType;
+                    let overlapTotal = overlapValue * d.overlap;
+                    let total = jaccardTotal + overlapTotal;
+                    edgeWeight = total;
                     let tooltipLRPosition =
                       d3.event.pageX > window.innerWidth * 0.8
                         ? `${d3.event.pageX - 275}px`
@@ -663,7 +668,7 @@ class NetworkGraph extends Component {
                       .style('opacity', 1);
                     div
                       .html(
-                        `<b>Overlap Size: </b>${d.overlapSize}<br/><b>Overlap Coefficient: </b>${d.overlap}<br/><b>Source: </b>${d.source.description}<br/><b>Target: </b>${d.target.description}`,
+                        `<b>Overlap Size: </b>${d.overlapSize}<br/><b>Edge Weight: </b>${edgeWeight}<br/><b>Source: </b>${d.source.description}<br/><b>Target: </b>${d.target.description}`,
                       )
                       .style('left', tooltipLRPosition)
                       .style('top', tooltipTBPosition);

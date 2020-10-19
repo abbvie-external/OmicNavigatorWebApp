@@ -98,28 +98,30 @@ class EnrichmentBreadcrumbs extends Component {
             position="bottom left"
             content={name}
           />
-          <span>
-            <Popup
-              trigger={
-                <img
-                  src={enrichmentIcon}
-                  alt={enrichmentIconText}
-                  className="ExternalSiteIcon"
-                  onClick={this.getLink(
-                    enrichmentStudy,
-                    enrichmentAnnotation,
-                    enrichmentDataItem,
-                    enrichmentTerm,
-                  )}
-                />
-              }
-              style={BreadcrumbPopupStyle}
-              className="TablePopupValue"
-              content={enrichmentIconText}
-              inverted
-              basic
-            />
-          </span>
+          {enrichmentIcon !== '' ? (
+            <span>
+              <Popup
+                trigger={
+                  <img
+                    src={enrichmentIcon}
+                    alt={enrichmentIconText}
+                    className="ExternalSiteIcon"
+                    onClick={this.getLink(
+                      enrichmentStudy,
+                      enrichmentAnnotation,
+                      enrichmentDataItem,
+                      enrichmentTerm,
+                    )}
+                  />
+                }
+                style={BreadcrumbPopupStyle}
+                className="TablePopupValue"
+                content={enrichmentIconText}
+                inverted
+                basic
+              />
+            </span>
+          ) : null}
         </Fragment>
       );
     }

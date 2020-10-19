@@ -4,19 +4,8 @@ import { Popup } from 'semantic-ui-react';
 import { formatNumberForDisplay, splitValue } from '../Shared/helpers';
 import './MetafeaturesTable.scss';
 // import { CancelToken } from 'axios';
-import QHGrid from '../utility/QHGrid';
-import EZGrid from '../utility/EZGrid';
-import QuickViewModal from '../utility/QuickViewModal';
-import {
-  getFieldValue,
-  getField,
-  typeMap,
-} from '../utility/selectors/QHGridSelector';
-// import { data } from 'pdfkit/js/reference';
-export * from '../utility/FilterTypeConfig';
-export * from '../utility/selectors/quickViewSelector';
-export { QHGrid, EZGrid, QuickViewModal };
-export { getField, getFieldValue, typeMap };
+// eslint-disable-next-line no-unused-vars
+import QHGrid, { EZGrid } from '***REMOVED***';
 
 class MetafeaturesTable extends Component {
   state = {
@@ -68,7 +57,7 @@ class MetafeaturesTable extends Component {
           return {
             title: f,
             field: f,
-            filterable: { type: 'alphanumericFilter' },
+            filterable: { type: 'multiFilter' },
             template: (value, item, addParams) => {
               return (
                 <div className="NoSelect">
@@ -127,12 +116,12 @@ class MetafeaturesTable extends Component {
     });
   };
 
-  informItemsPerPageMetafeaturesTable = items => {
-    this.setState({
-      itemsPerPageMetafeaturesTable: items,
-    });
-    localStorage.setItem('itemsPerPageMetafeaturesTable', items);
-  };
+  // informItemsPerPageMetafeaturesTable = items => {
+  //   this.setState({
+  //     itemsPerPageMetafeaturesTable: items,
+  //   });
+  //   localStorage.setItem('itemsPerPageMetafeaturesTable', items);
+  // };
 
   render() {
     const {
@@ -152,7 +141,7 @@ class MetafeaturesTable extends Component {
           totalRows={15}
           // use "differentialRows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
           itemsPerPage={itemsPerPageMetafeaturesTable}
-          onInformItemsPerPage={this.informItemsPerPageMetafeaturesTable}
+          // onInformItemsPerPage={this.informItemsPerPageMetafeaturesTable}
           exportBaseName="Feature Data"
           // quickViews={quickViews}
           disableGeneralSearch
@@ -164,6 +153,7 @@ class MetafeaturesTable extends Component {
           min-height="5vh"
           // additionalTemplateInfo={this.state.additionalTemplateInfo}
           // headerAttributes={<ButtonActions />}
+          emptyMessage={'No Feature Data Available'}
         />
       </div>
     );

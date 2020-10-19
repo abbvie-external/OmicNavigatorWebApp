@@ -45,15 +45,15 @@ class EnrichmentMultisetFilters extends Component {
       multisetFiltersVisible,
     } = this.props;
     if (
-      multisetFiltersVisible &&
-      (uData !== prevProps.uData ||
-        uAnchor !== prevProps.uAnchor ||
-        uSettings !== prevProps.uSettings ||
-        metaSvg !== prevProps.metaSvg ||
-        sigValue !== prevProps.sigValue ||
-        sigValue.length !== prevProps.sigValue.length ||
-        selectedCol !== prevProps.selectedCol ||
-        selectedOperator !== prevProps.selectedOperator)
+      multisetFiltersVisible !== prevProps.multisetFiltersVisible ||
+      uData !== prevProps.uData ||
+      uAnchor !== prevProps.uAnchor ||
+      uSettings !== prevProps.uSettings ||
+      metaSvg !== prevProps.metaSvg ||
+      sigValue !== prevProps.sigValue ||
+      sigValue.length !== prevProps.sigValue.length ||
+      selectedCol !== prevProps.selectedCol ||
+      selectedOperator !== prevProps.selectedOperator
     ) {
       this.makeMultiset(
         uData,
@@ -851,7 +851,7 @@ class EnrichmentMultisetFilters extends Component {
         }
       }
     }
-    const svgWidth = longest * 12;
+    const svgWidth = longest * 12 > 131 ? longest * 12 : 132;
     const svgHeight = dataset.length * textScalar + textScalar / 2;
 
     base.append('div').style('padding-bottom', '5px');
@@ -865,7 +865,7 @@ class EnrichmentMultisetFilters extends Component {
     // const rect =
     svg
       .append('path')
-      .attr('d', rightRoundedRect(0, 0, svgWidth, svgHeight, 20))
+      .attr('d', rightRoundedRect(0, 0, svgWidth + 20, svgHeight, 20))
       .attr('fill', 'white');
     function rightRoundedRect(x, y, width, height, radius) {
       return (
@@ -1013,19 +1013,19 @@ class EnrichmentMultisetFilters extends Component {
                     onChange={this.props.onHandleOperatorChange}
                   ></Form.Field>
                   <Form.Field width={4} id="SignificantValueInputMultisetE">
-                    <label>{index === 0 ? 'Significance' : ''}</label>
+                    <label>{index === 0 ? 'Value' : ''}</label>
                     <NumericExponentialInput
                       className="SignificantValueInput"
                       onChange={number => {
                         this.handleSigValueEInputChange(number);
                         this.actuallyHandleSigValueEInputChange(number);
                       }}
-                      min={0}
+                      min={1e-100}
                       max={1}
+                      preventNegatives={true}
                       name="sigValue"
                       // defaultValue={parseFloat(defaultSigValue)}
                       value={sigValueELocal[index]}
-                      spellcheck="false"
                     />
                   </Form.Field>
                 </Form.Group>

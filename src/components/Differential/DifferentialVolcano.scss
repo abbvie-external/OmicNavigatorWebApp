@@ -10,10 +10,10 @@
 }
 
 .volcanoSplitPane {
-  .QHGrid table th:first-child {
-    padding-top: 9px !important;
-    padding-bottom: 0px !important;
-  }
+  // .QHGrid table th:first-child {
+  //   padding-top: 9px !important;
+  //   padding-bottom: 0px !important;
+  // }
 
   .QHGrid--generalSearch input {
     border: 1px solid lightgrey !important;
@@ -21,6 +21,19 @@
 }
 .VolcanoPlotAxisSelectorsRow {
   padding-bottom: 0px !important;
+}
+
+.PlotInstructions {
+  height: 100%;
+}
+
+.PlotInstructionsText {
+  text-align: center !important;
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 #PlotSVG {

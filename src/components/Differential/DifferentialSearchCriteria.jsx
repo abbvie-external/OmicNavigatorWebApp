@@ -24,6 +24,8 @@ class DifferentialSearchCriteria extends Component {
     differentialStudies: [],
     differentialStudyHrefVisible: false,
     differentialStudyHref: '',
+    differentialStudyReportTooltip:
+      'Select a study and model to view Analysis Details',
     differentialModels: [],
     differentialTests: [],
     differentialModelTooltip: '',
@@ -100,13 +102,13 @@ class DifferentialSearchCriteria extends Component {
   componentDidUpdate(prevProps) {
     if (
       this.props.allStudiesMetadata !== prevProps.allStudiesMetadata ||
-      this.props.differentialStudy !== prevProps.differentialStudy ||
-      (this.props.featureToHighlightInDiffTable !==
-        prevProps.featureToHighlightInDiffTable &&
-        this.props.featureToHighlightInDiffTable !== '')
+      this.props.differentialStudy !== prevProps.differentialStudy
     ) {
       this.populateDropdowns();
     }
+    // if (this.props.multisetPlotAvailable !== prevProps.multisetPlotAvailable) {
+    //   this.forceUpdate();
+    // }
   }
 
   populateDropdowns = () => {
@@ -255,13 +257,21 @@ class DifferentialSearchCriteria extends Component {
     this.getReportLink(value, 'default');
   };
 
+  setStudyTooltip = () => {
+    if (this.props.differentialModel !== '') {
+      this.setState({
+        differentialStudyReportTooltip: `The model "main" from the study ${this.props.differentialStudy} does not have additional analysis details available.`,
+      });
+    }
+  };
+
   getReportLink = (study, model) => {
     cancelRequestGetReportLinkDifferential();
     let cancelToken = new CancelToken(e => {
       cancelRequestGetReportLinkDifferential = e;
     });
     phosphoprotService
-      .getReportLink(study, model, null, cancelToken)
+      .getReportLink(study, model, this.setStudyTooltip, cancelToken)
       .then(getReportLink => {
         const link = getReportLink.includes('http')
           ? getReportLink
@@ -627,16 +637,6 @@ class DifferentialSearchCriteria extends Component {
     } = this.state;
     const eMustP = this.state.uSettingsP.mustP;
     const eNotP = this.state.uSettingsP.notP;
-    if (reloadPlotP === true && differentialTests.length > 1) {
-      onDisablePlot();
-      this.getMultisetPlot(
-        sigValueP,
-        differentialModel,
-        differentialStudy,
-        this.jsonToList(selectedOperatorP),
-        this.jsonToList(selectedColP),
-      );
-    }
     cancelRequestMultisetInferenceData();
     let cancelToken = new CancelToken(e => {
       cancelRequestMultisetInferenceData = e;
@@ -675,6 +675,19 @@ class DifferentialSearchCriteria extends Component {
       .catch(error => {
         console.error('Error during getResultsIntersection', error);
       });
+    //   const testsLength =
+    //   typeof differentialTests === 'string' ? 1 : differentialTests.length;
+    // if (reloadPlotP === true && testsLength > 1) {
+    if (reloadPlotP === true && differentialTests.length > 1) {
+      onDisablePlot();
+      this.getMultisetPlot(
+        sigValueP,
+        differentialModel,
+        differentialStudy,
+        this.jsonToList(selectedOperatorP),
+        this.jsonToList(selectedColP),
+      );
+    }
   };
 
   jsonToList(json) {
@@ -812,7 +825,7 @@ class DifferentialSearchCriteria extends Component {
           inverted
           className="CustomTooltip"
           position="bottom center"
-          content="Select a study and model to view Analysis Details"
+          content={this.state.differentialStudyReportTooltip}
           mouseEnterDelay={0}
           mouseLeaveDelay={0}
         />

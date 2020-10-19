@@ -2,23 +2,19 @@ import React, { Component } from 'react';
 import { Popup, Dimmer, Loader } from 'semantic-ui-react';
 import { phosphoprotService } from '../../services/phosphoprot.service';
 import _ from 'lodash';
-import { formatNumberForDisplay, splitValue } from '../Shared/helpers';
+import {
+  formatNumberForDisplay,
+  splitValue,
+  // scrollElement,
+  getLinkout,
+} from '../Shared/helpers';
 import phosphosite_icon from '../../resources/phosphosite.ico';
 import './FilteredDifferentialTable.scss';
 import { CancelToken } from 'axios';
-import QHGrid from '../utility/QHGrid';
-import EZGrid from '../utility/EZGrid';
-import QuickViewModal from '../utility/QuickViewModal';
-import {
-  getFieldValue,
-  getField,
-  typeMap,
-} from '../utility/selectors/QHGridSelector';
+import CustomEmptyMessage from '../Shared/Templates';
+// eslint-disable-next-line no-unused-vars
+import QHGrid, { EZGrid } from '***REMOVED***';
 // import { data } from 'pdfkit/js/reference';
-export * from '../utility/FilterTypeConfig';
-export * from '../utility/selectors/quickViewSelector';
-export { QHGrid, EZGrid, QuickViewModal };
-export { getField, getFieldValue, typeMap };
 
 let cancelRequestFPTGetResultsTable = () => {};
 class FilteredDifferentialTable extends Component {
@@ -30,10 +26,12 @@ class FilteredDifferentialTable extends Component {
       parseInt(
         localStorage.getItem('itemsPerPageFilteredDifferentialTable'),
         10,
-      ) || 15,
-    filteredTableLoading: true,
+      ) || 10,
+    filteredTableLoading: false,
     additionalTemplateInfo: [],
     identifier: null,
+    filteredDifferentialTableRowMax: [],
+    filteredDifferentialTableRowOther: [],
   };
   filteredDifferentialGridRef = React.createRef();
 
@@ -64,68 +62,54 @@ class FilteredDifferentialTable extends Component {
 
     if (
       this.props.filteredDifferentialFeatureIdKey !==
-        prevProps.filteredDifferentialFeatureIdKey ||
-      this.props.HighlightedProteins !== prevProps.HighlightedProteins
+      prevProps.filteredDifferentialFeatureIdKey
     ) {
-      const additionalParameters = this.getTableHelpers(
-        this.props.HighlightedProteins,
+      this.setState(
+        {
+          additionalTemplateInfo: {},
+          filteredTableLoading: true,
+        },
+        function() {
+          this.getTableHelpers();
+        },
       );
-      this.setState({
-        additionalTemplateInfo: additionalParameters,
-        filteredTableLoading: false,
-      });
     }
-    // let prevValues = prevProps?.barcodeSettings?.brushedData ?? [];
-    // let currentValues = this.props.barcodeSettings?.brushedData ?? [];
-    // var isSame =
-    //   prevValues.length === currentValues.length &&
-    //   prevValues.every(
-    //     (o, i) =>
-    //       Object.keys(o).length === Object.keys(currentValues[i]).length &&
-    //       Object.keys(o).every(k => o[k] === currentValues[i][k]),
-    //   );
-    // if (!isSame) {
-    //   this.getTableData();
-    // }
-    //if (
-    // this.props.tab === 'enrichment' &&
-    // this.props.HighlightedProteins.sample !== '' &&
-    // this.props.HighlightedProteins.sample != null &&
-    // (
-    // this.props.HighlightedProteins.sample !== prevProps.HighlightedProteins.sample
-    // this.props.filteredTableData !== prevProps.filteredTableData)
-    // ) {
-    //   this.pageToProtein(
-    //     this.state.filteredTableData,
-    //     this.props.HighlightedProteins.sample,
-    //     this.state.itemsPerPageFilteredDifferentialTable,
-    //   );
-    //}
-    // if (
-    //   this.props.activeViolinTableIndex === 1 &&
-    //   this.props.activeViolinTableIndex !== prevProps.activeViolinTableIndex
-    // ) {
-    //   this.pageToProtein(
-    //     this.state.filteredTableData,
-    //     this.props.HighlightedProteins[0]?.sample,
-    //     this.state.itemsPerPageFilteredDifferentialTable,
-    //   );
-    // }
+
+    if (this.props.HighlightedProteins !== prevProps.HighlightedProteins) {
+      this.highlightRows(this.props.HighlightedProteins);
+    }
   }
 
-  // pageToProtein = (data, proteinToHighlight, itemsPerPage) => {
-  //   if (this.filteredDifferentialGridRef?.current !== null) {
-  //     const Index = _.findIndex(data, function(p) {
-  //       return p.Protein_Site === proteinToHighlight;
-  //     });
-  //     const pageNumber = Math.ceil(Index / itemsPerPage);
-  //     const pageNumberCheck = pageNumber >= 1 ? pageNumber : 1;
-  //     this.filteredDifferentialGridRef.current.handlePageChange(
-  //       {},
-  //       { activePage: pageNumberCheck },
-  //     );
-  //   }
-  // };
+  pageToFeature = featureToHighlight => {
+    if (
+      featureToHighlight !== '' &&
+      featureToHighlight !== [] &&
+      featureToHighlight !== null
+    ) {
+      const {
+        filteredDifferentialFeatureIdKey,
+        // differentialResults
+      } = this.props;
+      // const { itemsPerPageFilteredDifferentialTable } = this.state;
+      const currentData = this.filteredDifferentialGridRef?.current?.qhGridRef
+        ?.current?.data;
+      if (currentData != null) {
+        const itemsPerPage = this.filteredDifferentialGridRef?.current
+          ?.qhGridRef?.current?.props.itemsPerPage;
+        const Index = _.findIndex(currentData, function(p) {
+          // const Index = _.findIndex(differentialResults, function(p) {
+          return p[filteredDifferentialFeatureIdKey] === featureToHighlight;
+        });
+        const pageNumber = Math.ceil((Index + 1) / itemsPerPage);
+        if (pageNumber > 0) {
+          this.filteredDifferentialGridRef.current.handlePageChange(pageNumber);
+          // scrollElement(this, 'filteredDifferentialGridRef', 'rowHighlightMax');
+        }
+      }
+    } else {
+      this.filteredDifferentialGridRef.current.handlePageChange(1);
+    }
+  };
 
   getTableData = () => {
     if (this.props.barcodeSettings.brushedData.length > 0) {
@@ -224,8 +208,16 @@ class FilteredDifferentialTable extends Component {
         return {
           title: f,
           field: f,
-          filterable: { type: 'alphanumericFilter' },
+          filterable: { type: 'multiFilter' },
           template: (value, item, addParams) => {
+            let linkout = getLinkout(
+              item,
+              addParams,
+              icon,
+              iconText,
+              TableValuePopupStyle,
+              alphanumericTrigger,
+            );
             if (f === alphanumericTrigger) {
               return (
                 <div className="NoSelect">
@@ -239,21 +231,7 @@ class FilteredDifferentialTable extends Component {
                     inverted
                     basic
                   />
-                  <Popup
-                    trigger={
-                      <img
-                        src={icon}
-                        alt="Phosophosite"
-                        className="ExternalSiteIcon"
-                        onClick={addParams.showPhosphositePlus(item)}
-                      />
-                    }
-                    style={TableValuePopupStyle}
-                    className="TablePopupValue"
-                    content={iconText}
-                    inverted
-                    basic
-                  />
+                  {linkout}
                 </div>
               );
             } else {
@@ -315,22 +293,56 @@ class FilteredDifferentialTable extends Component {
     this.getTableData();
   };
 
-  getTableHelpers = HighlightedProteins => {
+  rowLevelPropsCalc = item => {
+    let className;
+    const {
+      filteredDifferentialTableRowMax,
+      filteredDifferentialTableRowOther,
+    } = this.state;
     const { filteredDifferentialFeatureIdKey } = this.props;
-    const MaxLine = HighlightedProteins[0] || null;
-    let addParams = {};
-    addParams.elementId = filteredDifferentialFeatureIdKey;
-    if (MaxLine !== {} && MaxLine != null) {
-      addParams.rowHighlightMax = MaxLine.featureID;
-      // addParams.rowHighlightMax = MaxLine[filteredDifferentialFeatureIdKey];
+    /* eslint-disable eqeqeq */
+    if (
+      item[filteredDifferentialFeatureIdKey] === filteredDifferentialTableRowMax
+    ) {
+      className = 'rowHighlightMax';
     }
-    const SelectedProteins = HighlightedProteins.slice(1);
+
+    if (
+      filteredDifferentialTableRowOther.includes(
+        item[filteredDifferentialFeatureIdKey],
+      )
+    ) {
+      className = 'rowHighlightOther';
+    }
+    return {
+      className,
+    };
+  };
+
+  highlightRows = HighlightedProteins => {
+    const MaxLine = HighlightedProteins[0] || null;
+    let filteredDifferentialTableRowMaxVar = [];
+    if (MaxLine !== {} && MaxLine != null) {
+      filteredDifferentialTableRowMaxVar = MaxLine.featureID;
+    }
+    const HighlightedProteinsCopy = [...HighlightedProteins];
+    const SelectedProteins = HighlightedProteinsCopy.slice(1);
+    let filteredDifferentialTableRowOtherVar = [];
     if (SelectedProteins.length > 0 && SelectedProteins != null) {
-      addParams.rowHighlightOther = [];
       SelectedProteins.forEach(element => {
-        addParams.rowHighlightOther.push(element.featureID);
+        filteredDifferentialTableRowOtherVar.push(element.featureID);
       });
     }
+    this.setState({
+      filteredDifferentialTableRowMax: filteredDifferentialTableRowMaxVar,
+      filteredDifferentialTableRowOther: filteredDifferentialTableRowOtherVar,
+    });
+    this.pageToFeature(filteredDifferentialTableRowMaxVar);
+  };
+
+  getTableHelpers = () => {
+    const { filteredDifferentialFeatureIdKey } = this.props;
+    let addParams = {};
     addParams.showPhosphositePlus = dataItem => {
       let protein = dataItem.symbol
         ? dataItem.symbol
@@ -347,25 +359,28 @@ class FilteredDifferentialTable extends Component {
         );
       };
     };
-    return addParams;
+    this.setState({
+      additionalTemplateInfo: addParams,
+      filteredTableLoading: false,
+    });
   };
 
-  informItemsPerPageFilteredDifferentialTable = items => {
-    this.setState({
-      itemsPerPageFilteredDifferentialTable: items,
-    });
-    localStorage.setItem('itemsPerPageFilteredDifferentialTable', items);
-  };
+  // informItemsPerPageFilteredDifferentialTable = items => {
+  //   this.setState({
+  //     itemsPerPageFilteredDifferentialTable: items,
+  //   });
+  //   localStorage.setItem('itemsPerPageFilteredDifferentialTable', items);
+  // };
 
   handleRowClick = (event, item, index) => {
     if (item !== null && event?.target?.className !== 'ExternalSiteIcon') {
-      const { identifier } = this.state;
       const { filteredDifferentialFeatureIdKey } = this.props;
-      const PreviouslyHighlighted = this.props.HighlightedProteins;
-      // const stat = barcodeSettings.statLabel;
       event.stopPropagation();
+      const PreviouslyHighlighted = [...this.props.HighlightedProteins];
       if (event.shiftKey) {
-        const allTableData = _.cloneDeep(this.state.filteredTableData);
+        const allTableData =
+          this.filteredDifferentialGridRef.current?.qhGridRef.current?.getSortedData() ||
+          [];
         const indexMaxProtein = _.findIndex(allTableData, function(d) {
           return (
             d[filteredDifferentialFeatureIdKey] ===
@@ -380,7 +395,7 @@ class FilteredDifferentialTable extends Component {
             // sample: d.symbol,
             // sample: d.phosphosite,
             featureID: d[filteredDifferentialFeatureIdKey],
-            key: d[identifier],
+            key: d[filteredDifferentialFeatureIdKey],
             // PAUL - this needs adjustment, looking for d.abs(t) instead of d.T, for example
             // cpm: d[stat],
             // cpm: d.F == null ? d.t : d.F,
@@ -388,18 +403,18 @@ class FilteredDifferentialTable extends Component {
         });
         this.props.onHandleProteinSelected(shiftedTableDataArray);
       } else if (event.ctrlKey) {
-        const allTableData = _.cloneDeep(this.state.filteredTableData);
+        const allTableData =
+          this.filteredDifferentialGridRef.current?.qhGridRef.current?.getSortedData() ||
+          [];
         let selectedTableDataArray = [];
 
-        const ctrlClickedObj = allTableData[index];
         const alreadyHighlighted = PreviouslyHighlighted.some(
-          d => d.featureID === ctrlClickedObj[filteredDifferentialFeatureIdKey],
+          d => d.featureID === item[filteredDifferentialFeatureIdKey],
         );
         // already highlighted, remove it from array
         if (alreadyHighlighted) {
           selectedTableDataArray = PreviouslyHighlighted.filter(
-            i =>
-              i.featureID !== ctrlClickedObj[filteredDifferentialFeatureIdKey],
+            i => i.featureID !== item[filteredDifferentialFeatureIdKey],
           );
           this.props.onHandleProteinSelected(selectedTableDataArray);
         } else {
@@ -413,8 +428,8 @@ class FilteredDifferentialTable extends Component {
           // map protein to fix obj entries
           const mappedProtein = {
             // sample: ctrlClickedObj.phosphosite,
-            featureID: ctrlClickedObj[filteredDifferentialFeatureIdKey],
-            key: ctrlClickedObj[identifier],
+            featureID: item[filteredDifferentialFeatureIdKey],
+            key: item[filteredDifferentialFeatureIdKey],
             // PAUL
             // cpm: ctrlClickedObj[stat],
             // cpm: ctrlClickedObj.F == null ? ctrlClickedObj.t : ctrlClickedObj.F,
@@ -438,7 +453,7 @@ class FilteredDifferentialTable extends Component {
             // cpm: item.logFC, //statistic,
             // sample: item.phosphosite,
             featureID: item[filteredDifferentialFeatureIdKey],
-            key: item[identifier],
+            key: item[filteredDifferentialFeatureIdKey],
             // cpm: item[stat],
             // cpm: item.F === undefined ? item.t : item.F,
           },
@@ -453,6 +468,7 @@ class FilteredDifferentialTable extends Component {
       filteredTableData,
       itemsPerPageFilteredDifferentialTable,
       filteredTableLoading,
+      additionalTemplateInfo,
     } = this.state;
 
     if (!filteredTableLoading) {
@@ -465,9 +481,9 @@ class FilteredDifferentialTable extends Component {
             totalRows={15}
             // use "differentialRows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
             itemsPerPage={itemsPerPageFilteredDifferentialTable}
-            onInformItemsPerPage={
-              this.informItemsPerPageFilteredDifferentialTable
-            }
+            // onInformItemsPerPage={
+            //   this.informItemsPerPageFilteredDifferentialTable
+            // }
             exportBaseName="Differential_Analysis_Filtered"
             // quickViews={quickViews}
             // disableGeneralSearch
@@ -477,9 +493,12 @@ class FilteredDifferentialTable extends Component {
             disableColumnReorder
             // disableFilters={false}
             min-height="5vh"
-            additionalTemplateInfo={this.state.additionalTemplateInfo}
+            height="auto"
+            additionalTemplateInfo={additionalTemplateInfo}
             // headerAttributes={<ButtonActions />}
             onRowClick={this.handleRowClick}
+            rowLevelPropsCalc={this.rowLevelPropsCalc}
+            emptyMessage={CustomEmptyMessage}
           />
         </div>
       );

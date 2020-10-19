@@ -1,5 +1,56 @@
+import React from 'react';
+import { Popup } from 'semantic-ui-react';
 import _ from 'lodash';
 import * as d3 from 'd3-array';
+
+export function getLinkout(
+  item,
+  addParams,
+  icon,
+  iconText,
+  TableValuePopupStyle,
+  featureIdKey,
+  study,
+  test,
+) {
+  if (featureIdKey === 'idmult') {
+    return (
+      <Popup
+        trigger={
+          <img
+            src={icon}
+            alt="Phosophosite"
+            className="ExternalSiteIcon"
+            onClick={addParams.showPhosphositePlus(item)}
+          />
+        }
+        style={TableValuePopupStyle}
+        className="TablePopupValue"
+        content={iconText}
+        inverted
+        basic
+      />
+    );
+  } else if (item[featureIdKey].includes('GO:')) {
+    return (
+      <Popup
+        trigger={
+          <img
+            src={icon}
+            alt={iconText}
+            className="ExternalSiteIcon"
+            onClick={addParams.getLink(study, test, item)}
+          />
+        }
+        style={TableValuePopupStyle}
+        className="TablePopupValue"
+        content={iconText}
+        inverted
+        basic
+      />
+    );
+  } else return null;
+}
 
 export function formatNumberForDisplay(num) {
   if (num) {
@@ -43,6 +94,23 @@ export function limitValues(values, size) {
       return `${slicedValues}...(${numberOfCommas + 1 - size} more)`;
     }
   }
+}
+
+export function scrollElement(_this, grid, target) {
+  const bodyRef =
+    _this[grid].current?.qhGridRef?.current?.bodyRef?.current || null;
+  window.requestAnimationFrame(function() {
+    if (bodyRef != null) {
+      const row = bodyRef.getElementsByClassName(target);
+      if (row.length !== 0) {
+        bodyRef.scrollTo({
+          top: row[0].offsetTop - 40,
+          left: 0,
+          behavior: 'smooth',
+        });
+      }
+    }
+  });
 }
 
 export function networkByCluster(network) {
