@@ -79,10 +79,6 @@ class Differential extends Component {
     direction: 'left',
     visible: false,
     plotButtonActive: false,
-    excelVisible: false,
-    pngVisible: true,
-    pdfVisible: false,
-    svgVisible: true,
     multisetQueriedP: false,
     activeIndexDifferentialView: this.defaultActiveIndexDifferentialView || 0,
     thresholdColsP: [],
@@ -401,8 +397,8 @@ class Differential extends Component {
       return function() {
         let value = dataItem[alphanumericTrigger];
         let imageInfo = { key: '', title: '', svg: [] };
-        imageInfo.title = `Protein Intensity - ${alphanumericTrigger} ${value}`;
-        imageInfo.key = `${alphanumericTrigger} ${value}`;
+        imageInfo.title = `${alphanumericTrigger} ${value}`;
+        imageInfo.key = `${value}`;
         getProteinDataCb(
           dataItem[alphanumericTrigger],
           dataItem,
@@ -425,8 +421,8 @@ class Differential extends Component {
     } = this.props;
     let id = featureId != null ? featureId : differentialFeature;
     let imageInfo = { key: '', title: '', svg: [] };
-    imageInfo.title = `Protein Intensity - ${differentialFeatureIdKey} ${featureId}`;
-    imageInfo.key = `${differentialFeatureIdKey} ${featureId}`;
+    imageInfo.title = `${differentialFeatureIdKey} ${featureId}`;
+    imageInfo.key = `${featureId}`;
     let handleSVGCb = this.handleSVG;
     let currentSVGs = [];
     let handleItemSelectedCb = this.handleItemSelected;
@@ -616,8 +612,8 @@ class Differential extends Component {
     const alphanumericTrigger = differentialAlphanumericFields[0];
     if (differentialFeature !== '') {
       let imageInfo = { key: '', title: '', svg: [] };
-      imageInfo.title = `Protein Intensity - ${alphanumericTrigger} ${differentialFeature}`;
-      imageInfo.key = `${alphanumericTrigger} ${differentialFeature}`;
+      imageInfo.title = `${alphanumericTrigger} ${differentialFeature}`;
+      imageInfo.key = `${differentialFeature}`;
       this.setState({
         imageInfo: imageInfo,
         // differentialResultsMounted: false,
@@ -1021,7 +1017,6 @@ class Differential extends Component {
                     }
                     onRowClick={this.handleRowClickDifferential}
                     rowLevelPropsCalc={this.rowLevelPropsCalcDifferential}
-                    // headerAttributes={<ButtonActions />}
                   />
                   {/* </div> */}
                 </Grid.Column>
@@ -1081,6 +1076,7 @@ class Differential extends Component {
   render() {
     const differentialView = this.getView();
     const { multisetPlotInfo, animation, direction, visible } = this.state;
+    const { tab, differentialStudy, differentialModel } = this.props;
     const VerticalSidebar = ({ animation, visible }) => (
       <Sidebar
         as={'div'}
@@ -1100,7 +1096,16 @@ class Differential extends Component {
               largeScreen={16}
               widescreen={16}
             >
-              <ButtonActions {...this.props} {...this.state} />
+              <ButtonActions
+                excelVisible={false}
+                pngVisible={true}
+                pdfVisible={false}
+                svgVisible={true}
+                plot={'multisetDifferential'}
+                tab={tab}
+                study={differentialStudy}
+                model={differentialModel}
+              />
             </Grid.Column>
           </Grid.Row>
         </Grid>

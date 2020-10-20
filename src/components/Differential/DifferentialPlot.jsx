@@ -15,10 +15,11 @@ class DifferentialPlot extends Component {
 
   state = {
     activeDifferentialPlotTabsIndex: 0,
-    excelVisible: true,
-    pngVisible: true,
-    pdfVisible: false,
-    svgVisible: true,
+    excelFlag: true,
+    pngFlag: true,
+    pdfFlag: false,
+    svgFlag: true,
+    txtFlag: false,
   };
 
   componentDidMount() {
@@ -42,19 +43,21 @@ class DifferentialPlot extends Component {
 
   setButtonVisibility = index => {
     this.setState({
-      // excelVisible: index === 2,
+      // excelFlag: index === 2,
       // excel not ready yet
-      excelVisible: false,
-      // pdfVisible: index !== 2,
-      pdfVisible: false,
-      svgVisible: index !== 2,
-      pngVisible: index !== 2,
+      excelFlag: false,
+      // pdfFlag: index !== 2,
+      pdfFlag: false,
+      svgFlag: index !== 2,
+      pngFlag: index !== 2,
     });
   };
 
   render() {
     // const { activeDifferentialPlotTabsIndex } = this.state;
-    const { isProteinSVGLoaded } = this.props;
+    const { excelFlag, pngFlag, pdfFlag, svgFlag } = this.state;
+    const { isProteinSVGLoaded, imageInfo } = this.props;
+    const { activeDifferentialPlotTabsIndex } = this.state;
     if (!isProteinSVGLoaded) {
       return (
         <div>
@@ -72,7 +75,16 @@ class DifferentialPlot extends Component {
                 <DifferentialBreadcrumbs {...this.props} />
               </Grid.Column>
               <Grid.Column mobile={8} tablet={8} largeScreen={8} widescreen={8}>
-                <ButtonActions {...this.props} {...this.state} />
+                <ButtonActions
+                  excelVisible={excelFlag}
+                  pngVisible={pngFlag}
+                  pdfVisible={pdfFlag}
+                  svgVisible={svgFlag}
+                  txtVisible={false}
+                  exportButtonSize="medium"
+                  imageInfo={imageInfo}
+                  tabIndex={activeDifferentialPlotTabsIndex}
+                />
               </Grid.Column>
             </Grid.Row>
           </Grid>
