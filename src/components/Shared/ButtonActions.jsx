@@ -7,9 +7,11 @@ import './ButtonActions.scss';
 
 class ButtonActions extends Component {
   static defaultProps = {
-    excelVisible: true,
-    pngVisible: true,
-    pdfVisible: true,
+    excelVisible: false,
+    pngVisible: false,
+    pdfVisible: false,
+    svgVisible: false,
+    txtVisible: false,
     exportButtonSize: 'medium',
   };
 
@@ -25,10 +27,18 @@ class ButtonActions extends Component {
   PNGExport = () => {
     // const svgElements =
     //   document.getElementsByClassName('ContentContainer') || null;
-    const isMultisetPlot = this.props.visible;
-    if (isMultisetPlot) {
+    if (this.props.plot === 'multisetDifferential') {
       const MultisetPlotName = this.getMultisetPlotName('png');
-      const currentSVG = document.getElementById('multisetAnalysisSVG') || null;
+      const currentSVG =
+        document.getElementById('multisetAnalysisSVGDifferential') || null;
+      saveSvgAsPng.saveSvgAsPng(currentSVG, MultisetPlotName, {
+        encoderOptions: 1,
+        scale: 2,
+      });
+    } else if (this.props.plot === 'multisetEnrichment') {
+      const MultisetPlotName = this.getMultisetPlotName('png');
+      const currentSVG =
+        document.getElementById('multisetAnalysisSVGEnrichment') || null;
       saveSvgAsPng.saveSvgAsPng(currentSVG, MultisetPlotName, {
         encoderOptions: 1,
         scale: 2,
@@ -58,8 +68,8 @@ class ButtonActions extends Component {
         document.getElementById('PlotSVG') ||
         document.getElementById('DifferentialPlotTabsPlotSVG');
       const ProteinPlotName = this.props.imageInfo
-        ? `${this.props.imageInfo?.title} - ${
-            this.props.imageInfo?.svg[this.props.activeSVGTabIndex]?.plotType
+        ? `${this.props.imageInfo?.svg[this.props.tabIndex]?.plotType.plotID}_${
+            this.props.imageInfo?.key
           }.png`
         : 'svgPlot.png';
       const currentSVG =
@@ -99,15 +109,20 @@ class ButtonActions extends Component {
   SVGExport = () => {
     // const svgElements =
     //   document.getElementsByClassName('ContentContainer') || null;
-    const isMultisetPlot = this.props.visible;
-    if (isMultisetPlot) {
+    if (this.props.plot === 'multisetDifferential') {
       const MultisetPlotName = this.getMultisetPlotName('svg');
-      const currentSVG = document.getElementById('multisetAnalysisSVG') || null;
+      const currentSVG =
+        document.getElementById('multisetAnalysisSVGDifferential') || null;
+      this.exportSVG(currentSVG, MultisetPlotName);
+    } else if (this.props.plot === 'multisetEnrichment') {
+      const MultisetPlotName = this.getMultisetPlotName('svg');
+      const currentSVG =
+        document.getElementById('multisetAnalysisSVGEnrichment') || null;
       this.exportSVG(currentSVG, MultisetPlotName);
     } else {
-      const ProteinPlotName = `${this.props.imageInfo.title}-${
-        this.props.imageInfo.svg[this.props.activeSVGTabIndex].plotType
-      }.svg`;
+      const ProteinPlotName = `${
+        this.props.imageInfo.svg[this.props.tabIndex].plotType.plotID
+      }_${this.props.imageInfo.key}.svg`;
       const currentContentContainer =
         document.getElementById('PlotSVG') ||
         document.getElementById('DifferentialPlotTabsPlotSVG');
@@ -134,11 +149,7 @@ class ButtonActions extends Component {
   };
 
   getMultisetPlotName = exporttype => {
-    if (this.props.tab === 'differential') {
-      return `${this.props.differentialStudy}-${this.props.differentialModel}-MultisetPlot.${exporttype}`;
-    } else if (this.props.tab === 'enrichment') {
-      return `${this.props.enrichmentStudy}-${this.props.enrichmentModel}-MultisetPlot.${exporttype}`;
-    } else return '';
+    return `${this.props.study}_${this.props.model}_MultisetPlot.${exporttype}`;
   };
 
   getExcelButton = () => {
