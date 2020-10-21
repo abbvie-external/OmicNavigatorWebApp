@@ -218,13 +218,15 @@ class ViolinPlot extends Component {
       const cx = Math.ceil(d3.select(`#violin_${id.featureID}`).attr('cx'));
       const cy = Math.ceil(d3.select(`#violin_${id.featureID}`).attr('cy'));
 
-      const svg = document.getElementById('svg-violin-graph-1');
+      const svg = document.getElementById(
+        `svg-${this.props.violinSettings.id}`,
+      );
       let parent = '';
       // if (this.violinContainerRef.current !== null) {
 
       // } else {
       parent = document
-        .getElementById('violin-graph-1')
+        .getElementById(this.props.violinSettings.id)
         .getBoundingClientRect();
 
       const shape = document

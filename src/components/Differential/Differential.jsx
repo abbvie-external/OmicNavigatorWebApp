@@ -1103,7 +1103,7 @@ class Differential extends Component {
                 pdfVisible={false}
                 svgVisible={true}
                 txtVisible={false}
-                plot={'multisetDifferential'}
+                plot={'differentialMultisetAnalysisSVG'}
                 tab={tab}
                 study={differentialStudy}
                 model={differentialModel}

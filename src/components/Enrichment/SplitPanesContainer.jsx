@@ -157,7 +157,7 @@ class SplitPanesContainer extends Component {
           pdfVisible={false}
           svgVisible={true}
           txtVisible={false}
-          plot={'violin'}
+          plot={`svg-${this.props.violinSettings.id}`}
           exportButtonSize={'mini'}
         />
       );

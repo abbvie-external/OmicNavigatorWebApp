@@ -21,7 +21,6 @@ class BarcodePlotReact extends Component {
       // brushing: false,
       bottomLabel: '',
       barcodeHeight: 0,
-      id: 'chart-barcode',
       margin: {
         top: 40,
         right: 40,
@@ -476,11 +475,7 @@ class BarcodePlotReact extends Component {
     const tooltip = this.getTooltip();
 
     return (
-      <div
-        ref={this.barcodeContainerRef}
-        id={settings.id}
-        className="BarcodeChartContainer"
-      >
+      <div ref={this.barcodeContainerRef} id="BarcodeChartContainer">
         <div className="export-container">
           <ButtonActions
             exportButtonSize={'mini'}
@@ -489,13 +484,12 @@ class BarcodePlotReact extends Component {
             pdfVisible={false}
             svgVisible={true}
             txtVisible={false}
-            plot={'barcode'}
+            plot={'BarcodeChart'}
           />
         </div>
         <svg
           ref={this.barcodeSVGRef}
-          id={`svg-${settings.id}`}
-          className="barcode-chart-area bcChart barcode"
+          id="BarcodeChart"
           height={horizontalSplitPaneSize}
           width={barcodeContainerWidth}
           viewBox={`0 0 ${barcodeContainerWidth} ${horizontalSplitPaneSize}`}

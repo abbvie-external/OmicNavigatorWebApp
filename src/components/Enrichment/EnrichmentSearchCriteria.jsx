@@ -833,7 +833,7 @@ class EnrichmentSearchCriteria extends Component {
           let svgMarkup = svgMarkupObj.data;
           svgMarkup = svgMarkup.replace(
             /<svg/g,
-            '<svg preserveAspectRatio="xMinYMid meet" id="multisetAnalysisSVGEnrichment"',
+            '<svg preserveAspectRatio="xMinYMid meet" id="enrichmentMultisetAnalysisSVG"',
           );
           DOMPurify.addHook('afterSanitizeAttributes', function(node) {
             if (

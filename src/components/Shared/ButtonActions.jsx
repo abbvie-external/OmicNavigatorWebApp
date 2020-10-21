@@ -16,122 +16,68 @@ class ButtonActions extends Component {
   };
 
   PNGExport = () => {
-    if (this.props.plot === 'multisetDifferential') {
-      const MultisetPlotName = this.getMultisetPlotName('png');
-      const currentSVG =
-        document.getElementById('multisetAnalysisSVGDifferential') || null;
-      saveSvgAsPng.saveSvgAsPng(currentSVG, MultisetPlotName, {
-        encoderOptions: 1,
-        scale: 2,
-      });
-    } else if (this.props.plot === 'multisetEnrichment') {
-      const MultisetPlotName = this.getMultisetPlotName('png');
-      const currentSVG =
-        document.getElementById('multisetAnalysisSVGEnrichment') || null;
-      saveSvgAsPng.saveSvgAsPng(currentSVG, MultisetPlotName, {
-        encoderOptions: 1,
-        scale: 2,
-      });
-    } else if (this.props.plot === 'barcode') {
-      const currentSVG = document.getElementById('svg-chart-barcode') || null;
-      const PlotName = 'barcode.png';
-      saveSvgAsPng.saveSvgAsPng(currentSVG, PlotName, {
-        encoderOptions: 1,
-        scale: 2,
-      });
-    } else if (this.props.plot === 'violin') {
-      const ViolinPlotName = 'violin.png';
-      const currentSVG = document.getElementById('svg-violin-graph-1') || null;
-      saveSvgAsPng.saveSvgAsPng(currentSVG, ViolinPlotName, {
+    if (this.props.imageInfo == null) {
+      let PlotName = `${this.props.plot}.png`;
+      if (this.props.study != null) {
+        // for Multiset Analysis
+        PlotName = `${this.props.study}_${this.props.model}_MultisetPlot.png`;
+      }
+      const Plot = document.getElementById(this.props.plot) || null;
+      saveSvgAsPng.saveSvgAsPng(Plot, PlotName, {
         encoderOptions: 1,
         scale: 2,
       });
     } else {
-      let PlotName = this.props.imageInfo
-        ? `${this.props.imageInfo?.svg[this.props.tabIndex]?.plotType.plotID}_${
-            this.props.imageInfo?.key
-          }.png`
-        : 'svgPlot.png';
+      // for reusable SVG Plot
+      let PlotName =
+        `${this.props.imageInfo?.svg[this.props.tabIndex]?.plotType.plotID}_${
+          this.props.imageInfo?.key
+        }.png` || `${this.props.plot}.png`;
       if (this.props.tab === 'enrichment') {
         PlotName =
           `${this.props.imageInfo?.svg[this.props.tabIndex]?.plotType.plotID}_${
             this.props.svgExportName
-          }.png` || 'svgPlot.png';
+          }.png` || `${this.props.plot}.png`;
       }
       const currentContentContainer =
         document.getElementById('PlotSVG') ||
         document.getElementById('DifferentialPlotTabsPlotSVG');
-      const currentSVG =
+      const Plot =
         currentContentContainer.getElementsByTagName('svg')[0] || null;
-      saveSvgAsPng.saveSvgAsPng(currentSVG, PlotName, {
+      saveSvgAsPng.saveSvgAsPng(Plot, PlotName, {
         encoderOptions: 1,
         scale: 2,
       });
-    }
-  };
-
-  PDFExport = () => {
-    console.log(this.props);
-    const isMultisetPlot = this.props.visible;
-    if (isMultisetPlot) {
-      const currentSVG = document.getElementById('multisetAnalysisSVG') || null;
-      pdfService.createPDF(currentSVG);
-    } else if (this.props.plot === 'barcode') {
-      const currentContentContainer =
-        document.getElementById('chart-barcode') || null;
-      const currentSVG =
-        currentContentContainer.getElementsByTagName('svg')[0] || null;
-      // pdfService.createPDF(currentSVG);
-      pdfService.convertToPdf(currentSVG);
-    } else {
-      const currentContentContainer =
-        document.getElementById('PlotSVG') ||
-        document.getElementById('DifferentialPlotTabsPlotSVG');
-      const currentSVG =
-        currentContentContainer.getElementsByTagName('svg')[0] || null;
-      pdfService.createPDF(currentSVG);
     }
   };
 
   SVGExport = () => {
-    // const svgElements =
-    //   document.getElementsByClassName('ContentContainer') || null;
-    if (this.props.plot === 'multisetDifferential') {
-      const MultisetPlotName = this.getMultisetPlotName('svg');
-      const currentSVG =
-        document.getElementById('multisetAnalysisSVGDifferential') || null;
-      this.exportSVG(currentSVG, MultisetPlotName);
-    } else if (this.props.plot === 'multisetEnrichment') {
-      const MultisetPlotName = this.getMultisetPlotName('svg');
-      const currentSVG =
-        document.getElementById('multisetAnalysisSVGEnrichment') || null;
-      this.exportSVG(currentSVG, MultisetPlotName);
-    } else if (this.props.plot === 'barcode') {
-      const BarcodePlotName = 'barcode.svg';
-      const currentSVG = document.getElementById('svg-chart-barcode') || null;
-      this.exportSVG(currentSVG, BarcodePlotName);
-    } else if (this.props.plot === 'violin') {
-      const ViolinPlotName = 'violin.svg';
-      const currentSVG = document.getElementById('svg-violin-graph-1') || null;
-      this.exportSVG(currentSVG, ViolinPlotName);
+    if (this.props.imageInfo == null) {
+      let PlotName = `${this.props.plot}.svg`;
+      if (this.props.study != null) {
+        // for Multiset Analysis
+        PlotName = `${this.props.study}_${this.props.model}_MultisetPlot.svg`;
+      }
+      const Plot = document.getElementById(this.props.plot) || null;
+      this.exportSVG(Plot, PlotName);
     } else {
-      let PlotName = this.props.imageInfo
-        ? `${this.props.imageInfo?.svg[this.props.tabIndex]?.plotType.plotID}_${
-            this.props.imageInfo?.key
-          }.svg`
-        : 'svgPlot.svg';
+      // for reusable SVG Plot
+      let PlotName =
+        `${this.props.imageInfo?.svg[this.props.tabIndex]?.plotType.plotID}_${
+          this.props.imageInfo?.key
+        }.svg` || `${this.props.plot}.svg`;
       if (this.props.tab === 'enrichment') {
         PlotName =
           `${this.props.imageInfo?.svg[this.props.tabIndex]?.plotType.plotID}_${
             this.props.svgExportName
-          }.svg` || 'svgPlot.svg';
+          }.svg` || `${this.props.plot}.svg`;
       }
       const currentContentContainer =
         document.getElementById('PlotSVG') ||
         document.getElementById('DifferentialPlotTabsPlotSVG');
-      const currentSVG =
+      const Plot =
         currentContentContainer.getElementsByTagName('svg')[0] || null;
-      this.exportSVG(currentSVG, PlotName);
+      this.exportSVG(Plot, PlotName);
     }
   };
 
@@ -151,8 +97,27 @@ class ButtonActions extends Component {
     document.body.removeChild(downloadLink);
   };
 
-  getMultisetPlotName = exporttype => {
-    return `${this.props.study}_${this.props.model}_MultisetPlot.${exporttype}`;
+  PDFExport = () => {
+    console.log(this.props);
+    const isMultisetPlot = this.props.visible;
+    if (isMultisetPlot) {
+      const Plot = document.getElementById('multisetAnalysisSVG') || null;
+      pdfService.createPDF(Plot);
+    } else if (this.props.plot === 'barcode') {
+      const currentContentContainer =
+        document.getElementById('barcodeChart') || null;
+      const Plot =
+        currentContentContainer.getElementsByTagName('svg')[0] || null;
+      // pdfService.createPDF(Plot);
+      pdfService.convertToPdf(Plot);
+    } else {
+      const currentContentContainer =
+        document.getElementById('PlotSVG') ||
+        document.getElementById('DifferentialPlotTabsPlotSVG');
+      const Plot =
+        currentContentContainer.getElementsByTagName('svg')[0] || null;
+      pdfService.createPDF(Plot);
+    }
   };
 
   getExcelButton = () => {

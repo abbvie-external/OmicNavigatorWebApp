@@ -145,7 +145,7 @@ class Enrichment extends Component {
         yAxis: "log<tspan baseline-shift='sub' font-size='14px'>2</tspan>FC",
       },
       // axisLabels: { xAxis: this.term, yAxis: "log<tspan baseline-shift='sub' font-size='14px'>2</tspan>(FC)" },
-      id: 'violin-graph-1',
+      id: 'violinChart',
       pointUniqueId: 'sample',
       pointValue: 'cpm',
       title: '',
@@ -2066,7 +2066,7 @@ class Enrichment extends Component {
                 pdfVisible={false}
                 svgVisible={true}
                 txtVisible={false}
-                plot={'multisetEnrichment'}
+                plot={'enrichmentMultisetAnalysisSVG'}
                 tab={tab}
                 study={enrichmentStudy}
                 model={enrichmentModel}
