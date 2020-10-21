@@ -77,7 +77,7 @@ class SVGPlot extends Component {
 
   render() {
     if (this.state.isSVGReady) {
-      const { activeSVGTabIndex, imageInfo } = this.props;
+      const { activeSVGTabIndex, imageInfo, svgExportName, tab } = this.props;
       const ButtonActionsClass = this.getButtonActionsClass();
 
       const BreadcrumbPopupStyle = {
@@ -94,14 +94,16 @@ class SVGPlot extends Component {
         <div className="svgContainer">
           <div className={ButtonActionsClass}>
             <ButtonActions
+              exportButtonSize={'mini'}
               excelVisible={false}
               pdfVisible={false}
               pngVisible={true}
               svgVisible={true}
               txtVisible={false}
-              exportButtonSize="mini"
+              tab={tab}
               imageInfo={imageInfo}
               tabIndex={activeSVGTabIndex}
+              svgExportName={svgExportName}
             />
           </div>
           <Popup

@@ -488,7 +488,6 @@ class FilteredDifferentialTable extends Component {
             min-height="5vh"
             height="auto"
             additionalTemplateInfo={additionalTemplateInfo}
-            // headerAttributes={<ButtonActions />}
             onRowClick={this.handleRowClick}
             rowLevelPropsCalc={this.rowLevelPropsCalc}
             emptyMessage={CustomEmptyMessage}

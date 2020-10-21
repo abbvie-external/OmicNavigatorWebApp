@@ -391,7 +391,7 @@ class BarcodePlotReact extends Component {
             fontSize="14px"
             textAnchor={tooltipTextAnchor}
           >
-            &nbsp;&nbsp;{hoveredLineName}
+            {hoveredLineName}
           </text>
         );
       }
@@ -403,7 +403,7 @@ class BarcodePlotReact extends Component {
             fontSize="14px"
             textAnchor={tooltipTextAnchor}
           >
-            &nbsp;&nbsp;{highlightedLineName}
+            {highlightedLineName}
           </text>
         );
       }
@@ -483,9 +483,12 @@ class BarcodePlotReact extends Component {
       >
         <div className="export-container">
           <ButtonActions
+            exportButtonSize={'mini'}
             excelVisible={false}
-            txtVisible={false}
+            pngVisible={true}
             pdfVisible={false}
+            svgVisible={true}
+            txtVisible={false}
             plot={'barcode'}
           />
         </div>
@@ -518,7 +521,7 @@ class BarcodePlotReact extends Component {
             className="BarcodeLabel"
             transform="rotate(-90)"
             y={15}
-            x={0 - barcodeHeight / 1 + 10}
+            x={-barcodeHeight}
           >
             {barcodeSettings.lowLabel}
           </text>
@@ -527,7 +530,7 @@ class BarcodePlotReact extends Component {
             className="BarcodeLabel"
             transform="rotate(-90)"
             y={barcodeWidth + 27}
-            x={0 - barcodeHeight / 1 + 10}
+            x={-barcodeHeight}
           >
             {barcodeSettings.highLabel}
           </text>

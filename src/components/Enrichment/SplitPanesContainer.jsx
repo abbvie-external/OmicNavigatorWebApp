@@ -146,7 +146,6 @@ class SplitPanesContainer extends Component {
     ];
 
     const selectedPlot = violinAndTablePanes[activeViolinTableIndex].menuItem;
-    //const actionButtons = selectedPlot === "Statistic Table" ? <ButtonActions excelVisible={false} pngVisible={false} pdfVisible={false} txtVisible={true} exportButtonSize='mini' plot={'table'}/> : <ButtonActions excelVisible={false} pngVisibile={false} exportButtonSize='mini' plot={'violin'}/>;
     const ButtonActionsClass = this.getButtonActionsClass();
     const actionButtons =
       selectedPlot === 'Statistic Table' ? (
@@ -154,9 +153,12 @@ class SplitPanesContainer extends Component {
       ) : (
         <ButtonActions
           excelVisible={false}
+          pngVisible={true}
           pdfVisible={false}
-          exportButtonSize="mini"
+          svgVisible={true}
+          txtVisible={false}
           plot={'violin'}
+          exportButtonSize={'mini'}
         />
       );
     return (

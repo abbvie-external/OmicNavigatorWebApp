@@ -151,8 +151,6 @@ class MetafeaturesTable extends Component {
           disableColumnReorder
           // disableFilters={false}
           min-height="5vh"
-          // additionalTemplateInfo={this.state.additionalTemplateInfo}
-          // headerAttributes={<ButtonActions />}
           emptyMessage={'No Feature Data Available'}
         />
       </div>

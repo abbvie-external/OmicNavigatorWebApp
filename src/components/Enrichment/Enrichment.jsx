@@ -62,10 +62,6 @@ class Enrichment extends Component {
     visible: false,
     plotButtonActive: false,
     uData: [],
-    excelVisible: false,
-    pngVisible: true,
-    pdfVisible: false,
-    svgVisible: true,
     displayViolinPlot: true,
     // networkDataAvailable: false,
     networkData: {
@@ -178,6 +174,7 @@ class Enrichment extends Component {
     enrichmentModelsAndAnnotations: [],
     enrichmentAnnotationsMetadata: [],
     enrichmentFeatureIdKey: '',
+    // filteredDifferentialFeatureIdKey: '',
     multisetFiltersVisible: false,
     multisetQueriedE: false,
     reloadPlot: false,
@@ -950,6 +947,12 @@ class Enrichment extends Component {
     this.setState(emptyArr);
   };
 
+  // handleFilteredDifferentialFeatureIdKey = (name, id) => {
+  //   this.setState({
+  //     [name]: id,
+  //   });
+  // };
+
   handleProteinSelected = toHighlightArray => {
     const prevHighestValueObject = this.state.HighlightedProteins[0]?.featureID;
     const highestValueObject = toHighlightArray[0];
@@ -995,8 +998,7 @@ class Enrichment extends Component {
     let imageInfo = { key: '', title: '', svg: [] };
     imageInfo.title = this.state.imageInfo.title;
     imageInfo.key = this.state.imageInfo.key;
-    // imageInfo.title = `Protein Intensity - ${enrichmentFeatureIdKey} ${featureId}`;
-    // imageInfo.key = `${enrichmentFeatureIdKey} ${featureId}`;
+    this.setState({ svgExportName: id });
     let handleSVGCb = this.handleSVG;
     let handlePlotStudyError = this.handlePlotStudyError;
     let currentSVGs = [];
@@ -1761,6 +1763,9 @@ class Enrichment extends Component {
             onHandleProteinSelected={this.handleProteinSelected}
             onHandleHighlightedLineReset={this.handleHighlightedLineReset}
             onHandleBarcodeChanges={this.handleBarcodeChanges}
+            // onHandleFilteredDifferentialFeatureIdKey={
+            //   this.handleFilteredDifferentialFeatureIdKey
+            // }
           ></SplitPanesContainer>
         </div>
       );
@@ -2035,6 +2040,7 @@ class Enrichment extends Component {
   render() {
     const enrichmentView = this.getView();
     const { multisetPlotInfo, animation, direction, visible } = this.state;
+    const { tab, enrichmentStudy, enrichmentModel } = this.props;
     const VerticalSidebar = ({ animation, visible }) => (
       <Sidebar
         as={'div'}
@@ -2054,7 +2060,17 @@ class Enrichment extends Component {
               largeScreen={16}
               widescreen={16}
             >
-              <ButtonActions {...this.props} {...this.state} />
+              <ButtonActions
+                excelVisible={false}
+                pngVisible={true}
+                pdfVisible={false}
+                svgVisible={true}
+                txtVisible={false}
+                plot={'multisetEnrichment'}
+                tab={tab}
+                study={enrichmentStudy}
+                model={enrichmentModel}
+              />
             </Grid.Column>
           </Grid.Row>
         </Grid>

@@ -15,18 +15,7 @@ class ButtonActions extends Component {
     exportButtonSize: 'medium',
   };
 
-  componentDidMount() {
-    // const svgElements = document.getElementsByClassName("ContentContainer") || null;
-    // const currentContentContainer = svgElements[0] || null;
-    // const currentSVGVar = currentContentContainer.getElementsByTagName('svg')[0] || null;
-    // this.setState({
-    //   currentSVG: currentSVGVar
-    // })
-  }
-
   PNGExport = () => {
-    // const svgElements =
-    //   document.getElementsByClassName('ContentContainer') || null;
     if (this.props.plot === 'multisetDifferential') {
       const MultisetPlotName = this.getMultisetPlotName('png');
       const currentSVG =
@@ -44,37 +33,37 @@ class ButtonActions extends Component {
         scale: 2,
       });
     } else if (this.props.plot === 'barcode') {
-      const currentContentContainer =
-        document.getElementById('chart-barcode') || null;
-      const ProteinPlotName = 'Barcode.png';
-      const currentSVG =
-        currentContentContainer.getElementsByTagName('svg')[0] || null;
-      saveSvgAsPng.saveSvgAsPng(currentSVG, ProteinPlotName, {
+      const currentSVG = document.getElementById('svg-chart-barcode') || null;
+      const PlotName = 'barcode.png';
+      saveSvgAsPng.saveSvgAsPng(currentSVG, PlotName, {
         encoderOptions: 1,
         scale: 2,
       });
     } else if (this.props.plot === 'violin') {
-      const currentContentContainer =
-        document.getElementById('violin-graph-1') || null;
-      const ProteinPlotName = 'violin.png';
-      const currentSVG =
-        currentContentContainer.getElementsByTagName('svg')[0] || null;
-      saveSvgAsPng.saveSvgAsPng(currentSVG, ProteinPlotName, {
+      const ViolinPlotName = 'violin.png';
+      const currentSVG = document.getElementById('svg-violin-graph-1') || null;
+      saveSvgAsPng.saveSvgAsPng(currentSVG, ViolinPlotName, {
         encoderOptions: 1,
         scale: 2,
       });
     } else {
-      const currentContentContainer =
-        document.getElementById('PlotSVG') ||
-        document.getElementById('DifferentialPlotTabsPlotSVG');
-      const ProteinPlotName = this.props.imageInfo
+      let PlotName = this.props.imageInfo
         ? `${this.props.imageInfo?.svg[this.props.tabIndex]?.plotType.plotID}_${
             this.props.imageInfo?.key
           }.png`
         : 'svgPlot.png';
+      if (this.props.tab === 'enrichment') {
+        PlotName =
+          `${this.props.imageInfo?.svg[this.props.tabIndex]?.plotType.plotID}_${
+            this.props.svgExportName
+          }.png` || 'svgPlot.png';
+      }
+      const currentContentContainer =
+        document.getElementById('PlotSVG') ||
+        document.getElementById('DifferentialPlotTabsPlotSVG');
       const currentSVG =
         currentContentContainer.getElementsByTagName('svg')[0] || null;
-      saveSvgAsPng.saveSvgAsPng(currentSVG, ProteinPlotName, {
+      saveSvgAsPng.saveSvgAsPng(currentSVG, PlotName, {
         encoderOptions: 1,
         scale: 2,
       });
@@ -82,8 +71,6 @@ class ButtonActions extends Component {
   };
 
   PDFExport = () => {
-    // const svgElements =
-    //   document.getElementsByClassName('ContentContainer') || null;
     console.log(this.props);
     const isMultisetPlot = this.props.visible;
     if (isMultisetPlot) {
@@ -119,16 +106,32 @@ class ButtonActions extends Component {
       const currentSVG =
         document.getElementById('multisetAnalysisSVGEnrichment') || null;
       this.exportSVG(currentSVG, MultisetPlotName);
+    } else if (this.props.plot === 'barcode') {
+      const BarcodePlotName = 'barcode.svg';
+      const currentSVG = document.getElementById('svg-chart-barcode') || null;
+      this.exportSVG(currentSVG, BarcodePlotName);
+    } else if (this.props.plot === 'violin') {
+      const ViolinPlotName = 'violin.svg';
+      const currentSVG = document.getElementById('svg-violin-graph-1') || null;
+      this.exportSVG(currentSVG, ViolinPlotName);
     } else {
-      const ProteinPlotName = `${
-        this.props.imageInfo.svg[this.props.tabIndex].plotType.plotID
-      }_${this.props.imageInfo.key}.svg`;
+      let PlotName = this.props.imageInfo
+        ? `${this.props.imageInfo?.svg[this.props.tabIndex]?.plotType.plotID}_${
+            this.props.imageInfo?.key
+          }.svg`
+        : 'svgPlot.svg';
+      if (this.props.tab === 'enrichment') {
+        PlotName =
+          `${this.props.imageInfo?.svg[this.props.tabIndex]?.plotType.plotID}_${
+            this.props.svgExportName
+          }.svg` || 'svgPlot.svg';
+      }
       const currentContentContainer =
         document.getElementById('PlotSVG') ||
         document.getElementById('DifferentialPlotTabsPlotSVG');
       const currentSVG =
         currentContentContainer.getElementsByTagName('svg')[0] || null;
-      this.exportSVG(currentSVG, ProteinPlotName);
+      this.exportSVG(currentSVG, PlotName);
     }
   };
 

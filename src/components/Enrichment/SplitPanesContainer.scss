@@ -62,8 +62,11 @@
     padding-right: 10px !important;
   }
 
-  .SVGSplitContainer {
-    margin: 0px 15px 0px 15px !important;
+  #SVGSplitContainer {
+    // margin: 0px 15px 0px 15px !important;
+    .ShowBlock {
+      margin-right: 30px;
+    }
   }
 
   .PlotInstructions {
@@ -139,6 +142,9 @@
 
   .BarcodeChartContainer {
     width: 100% !important;
+    .ExportButtonGroup {
+      padding-bottom: 10px;
+    }
   }
 
   .barcode-chart-area {

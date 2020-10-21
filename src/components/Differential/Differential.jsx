@@ -1097,10 +1097,12 @@ class Differential extends Component {
               widescreen={16}
             >
               <ButtonActions
+                exportButtonSize={'medium'}
                 excelVisible={false}
                 pngVisible={true}
                 pdfVisible={false}
                 svgVisible={true}
+                txtVisible={false}
                 plot={'multisetDifferential'}
                 tab={tab}
                 study={differentialStudy}
