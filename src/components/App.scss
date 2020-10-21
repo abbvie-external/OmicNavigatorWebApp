@@ -195,6 +195,10 @@
   .ShowBlock {
     display: block !important;
   }
+
+  .ui.search.dropdown > .text {
+    display: block !important;
+  }
 }
 
 .SortableHelper {
