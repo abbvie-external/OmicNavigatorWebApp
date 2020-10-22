@@ -60,7 +60,7 @@
 }
 .violin-chart-wrapper .box-plot circle {
   fill: white;
-  stroke: black;
+  stroke: #000;
 }
 
 .violin-chart-wrapper .box-plot .median {
@@ -125,7 +125,7 @@
   // -moz-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
   // box-shadow: 4px 4px 10px rgba(0, 100, 100, 0.4);
   background-color: #2e2e2e !important;
-  border-bottom: 2px solid var(--color-primary) !important;
+  border-bottom: 2px solid #ff4400 !important;
   color: #fff !important;
   padding: 1em !important;
   max-width: 300px !important;
