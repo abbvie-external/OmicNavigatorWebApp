@@ -284,7 +284,7 @@ class Differential extends Component {
 
   handlePlotTypesDifferential = differentialModel => {
     if (differentialModel !== '') {
-      if (this.state.differentialStudyMetadata.plots != null) {
+      if (this.state.differentialStudyMetadata?.plots != null) {
         const differentialModelData = this.state.differentialStudyMetadata.plots.find(
           model => model.modelID === differentialModel,
         );
@@ -487,12 +487,32 @@ class Differential extends Component {
               // currentSVGs.unshift(sanitizedSVG);
               // }
               handleSVGCb(imageInfo);
+            } else {
+              handleItemSelectedCb(false);
             }
           })
           .catch(error => {
             self.handleItemSelected(false);
           });
       });
+    } else {
+      this.handleItemSelected(false);
+      this.setState({
+        imageInfo: {
+          key: null,
+          title: '',
+          svg: [],
+        },
+        isProteinSVGLoaded: true,
+        isVolcanoPlotSVGLoaded: true,
+      });
+      let stateObj = {
+        differentialStudy: this.props.differentialStudy || '',
+        differentialModel: this.props.differentialModel || '',
+        differentialTest: this.props.differentialTest || '',
+        differentialFeature: '',
+      };
+      this.props.onSearchCriteriaToTop(stateObj, 'differential');
     }
   };
 

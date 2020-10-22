@@ -38,21 +38,27 @@ class DifferentialVolcanoPlot extends Component {
       circles.classed('highlightedMax', false);
       if (volcanoDifferentialTableRowOther.length > 0) {
         volcanoDifferentialTableRowOther.forEach(element => {
-          const highlightedCircle = d3
-            .select(`circle[id=volcanoDataPoint-${element}]`)
-            .attr('r', 3);
-          highlightedCircle.classed('highlighted', true);
-          highlightedCircle.raise();
+          const highlightedCircleId = document.getElementById(
+            `volcanoDataPoint-${element}`,
+          );
+          const highlightedCircle = d3.select(highlightedCircleId);
+          if (highlightedCircle != null) {
+            highlightedCircle.attr('r', 3);
+            highlightedCircle.classed('highlighted', true);
+            highlightedCircle.raise();
+          }
         });
       }
       if (volcanoDifferentialTableRowMax.length > 0) {
-        const maxCircle = d3
-          .select(
-            `circle[id=volcanoDataPoint-${volcanoDifferentialTableRowMax}]`,
-          )
-          .attr('r', 5);
-        maxCircle.classed('highlightedMax', true);
-        maxCircle.raise();
+        const maxCircleId = document.getElementById(
+          `volcanoDataPoint-${volcanoDifferentialTableRowMax}`,
+        );
+        const maxCircle = d3.select(maxCircleId);
+        if (maxCircle != null) {
+          maxCircle.attr('r', 5);
+          maxCircle.classed('highlightedMax', true);
+          maxCircle.raise();
+        }
       }
     }
   }
@@ -82,14 +88,17 @@ class DifferentialVolcanoPlot extends Component {
         e.target.attributes['cy'].value,
       ],
     };
-    const circle = d3.select(
-      `#volcanoDataPoint-${e.target.attributes['circleid'].value}`,
+    const hovered = document.getElementById(
+      `volcanoDataPoint-${e.target.attributes['circleid'].value}`,
     );
-    circle.classed('hovered', true).raise();
-    this.setState({
-      hoveredCircleData: hoveredData,
-      hovering: true,
-    });
+    const circle = d3.select(hovered) ?? null;
+    if (circle != null) {
+      circle.classed('hovered', true).raise();
+      this.setState({
+        hoveredCircleData: hoveredData,
+        hovering: true,
+      });
+    }
   };
   handleCircleLeave() {
     d3.selectAll('circle.volcanoPlot-dataPoint').classed('hovered', false);
