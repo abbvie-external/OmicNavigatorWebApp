@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './DifferentialVolcanoPlot.scss';
 import * as d3 from 'd3';
+import ButtonActions from '../Shared/ButtonActions';
 
 class DifferentialVolcanoPlot extends Component {
   state = {
@@ -465,7 +466,15 @@ class DifferentialVolcanoPlot extends Component {
 
     if (identifier !== null && xAxisLabel !== null && yAxisLabel !== null) {
       return (
-        <div className="volcanoPlotContainer">
+        <>
+          <div id="VolcanoPlotDiv">
+            <ButtonActions
+              plot={this.state.plotName}
+              excelVisible={false}
+              pdfVisible={false}
+              exportButtonSize="mini"
+            />
+          </div>
           <svg
             id="differentialVolcanoPlot"
             className="volcanoPlotSVG"
@@ -479,14 +488,14 @@ class DifferentialVolcanoPlot extends Component {
             {xAxis}
             {/*X Axis Label*/}
             <text
-              className="axisLabel"
+              className="volcanoAxisLabel"
               transform={`translate(${volcanoWidth / 2}, ${volcanoHeight})`}
             >
               {xAxisText}
             </text>
             {/*Y Axis Label*/}
             <text
-              className="axisLabel"
+              className="volcanoAxisLabel"
               transform={`rotate(-90,0,${volcanoHeight * 0.5})`}
               x="0"
               y={`${volcanoHeight * 0.5}`}
@@ -504,7 +513,7 @@ class DifferentialVolcanoPlot extends Component {
             {plotCircles}
             {hoveredCircleTooltip}
           </svg>
-        </div>
+        </>
       );
     } else {
       return null;

@@ -1,7 +1,10 @@
-.volcanoPlotContainer {
+//.volcanoPlotContainer {
   .volcanoPlotSVG {
     margin: 0 auto;
     display: block;
+    //opacity: 0.6;
+    shape-rendering: 'crispEdges';
+    stroke: white;
   }
 
   .volcanoPlotYAxis {
@@ -44,4 +47,4 @@
     margin-left: 20px !important;
     margin-top: 5px !important;
   }
-}
+//}
