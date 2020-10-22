@@ -7,113 +7,77 @@ import './ButtonActions.scss';
 
 class ButtonActions extends Component {
   static defaultProps = {
-    excelVisible: true,
-    pngVisible: true,
-    pdfVisible: true,
+    excelVisible: false,
+    pngVisible: false,
+    pdfVisible: false,
+    svgVisible: false,
+    txtVisible: false,
     exportButtonSize: 'medium',
   };
 
-  componentDidMount() {
-    // const svgElements = document.getElementsByClassName("ContentContainer") || null;
-    // const currentContentContainer = svgElements[0] || null;
-    // const currentSVGVar = currentContentContainer.getElementsByTagName('svg')[0] || null;
-    // this.setState({
-    //   currentSVG: currentSVGVar
-    // })
-  }
-
   PNGExport = () => {
-    // const svgElements =
-    //   document.getElementsByClassName('ContentContainer') || null;
-    const isMultisetPlot = this.props.visible;
-    if (isMultisetPlot) {
-      const MultisetPlotName = this.getMultisetPlotName('png');
-      const currentSVG = document.getElementById('multisetAnalysisSVG') || null;
-      saveSvgAsPng.saveSvgAsPng(currentSVG, MultisetPlotName, {
-        encoderOptions: 1,
-        scale: 2,
-      });
-    } else if (this.props.plot === 'barcode') {
-      const currentContentContainer =
-        document.getElementById('chart-barcode') || null;
-      const ProteinPlotName = 'Barcode.png';
-      const currentSVG =
-        currentContentContainer.getElementsByTagName('svg')[0] || null;
-      saveSvgAsPng.saveSvgAsPng(currentSVG, ProteinPlotName, {
-        encoderOptions: 1,
-        scale: 2,
-      });
-    } else if (this.props.plot === 'violin') {
-      const currentContentContainer =
-        document.getElementById('violin-graph-1') || null;
-      const ProteinPlotName = 'violin.png';
-      const currentSVG =
-        currentContentContainer.getElementsByTagName('svg')[0] || null;
-      saveSvgAsPng.saveSvgAsPng(currentSVG, ProteinPlotName, {
+    if (this.props.imageInfo == null) {
+      let PlotName = `${this.props.plot}.png`;
+      if (this.props.study != null) {
+        // for Multiset Analysis
+        PlotName = `${this.props.study}_${this.props.model}_MultisetPlot.png`;
+      }
+      const Plot = document.getElementById(this.props.plot) || null;
+      saveSvgAsPng.saveSvgAsPng(Plot, PlotName, {
         encoderOptions: 1,
         scale: 2,
       });
     } else {
+      // for reusable SVG Plot
+      let PlotName =
+        `${this.props.imageInfo?.svg[this.props.tabIndex]?.plotType.plotID}_${
+          this.props.imageInfo?.key
+        }.png` || `${this.props.plot}.png`;
+      if (this.props.tab === 'enrichment') {
+        PlotName =
+          `${this.props.imageInfo?.svg[this.props.tabIndex]?.plotType.plotID}_${
+            this.props.svgExportName
+          }.png` || `${this.props.plot}.png`;
+      }
       const currentContentContainer =
         document.getElementById('PlotSVG') ||
         document.getElementById('DifferentialPlotTabsPlotSVG');
-      const ProteinPlotName = this.props.imageInfo
-        ? `${this.props.imageInfo?.title} - ${
-            this.props.imageInfo?.svg[this.props.activeSVGTabIndex]?.plotType
-          }.png`
-        : 'svgPlot.png';
-      const currentSVG =
+      const Plot =
         currentContentContainer.getElementsByTagName('svg')[0] || null;
-      saveSvgAsPng.saveSvgAsPng(currentSVG, ProteinPlotName, {
+      saveSvgAsPng.saveSvgAsPng(Plot, PlotName, {
         encoderOptions: 1,
         scale: 2,
       });
-    }
-  };
-
-  PDFExport = () => {
-    // const svgElements =
-    //   document.getElementsByClassName('ContentContainer') || null;
-    console.log(this.props);
-    const isMultisetPlot = this.props.visible;
-    if (isMultisetPlot) {
-      const currentSVG = document.getElementById('multisetAnalysisSVG') || null;
-      pdfService.createPDF(currentSVG);
-    } else if (this.props.plot === 'barcode') {
-      const currentContentContainer =
-        document.getElementById('chart-barcode') || null;
-      const currentSVG =
-        currentContentContainer.getElementsByTagName('svg')[0] || null;
-      // pdfService.createPDF(currentSVG);
-      pdfService.convertToPdf(currentSVG);
-    } else {
-      const currentContentContainer =
-        document.getElementById('PlotSVG') ||
-        document.getElementById('DifferentialPlotTabsPlotSVG');
-      const currentSVG =
-        currentContentContainer.getElementsByTagName('svg')[0] || null;
-      pdfService.createPDF(currentSVG);
     }
   };
 
   SVGExport = () => {
-    // const svgElements =
-    //   document.getElementsByClassName('ContentContainer') || null;
-    const isMultisetPlot = this.props.visible;
-    if (isMultisetPlot) {
-      const MultisetPlotName = this.getMultisetPlotName('svg');
-      const currentSVG = document.getElementById('multisetAnalysisSVG') || null;
-      this.exportSVG(currentSVG, MultisetPlotName);
+    if (this.props.imageInfo == null) {
+      let PlotName = `${this.props.plot}.svg`;
+      if (this.props.study != null) {
+        // for Multiset Analysis
+        PlotName = `${this.props.study}_${this.props.model}_MultisetPlot.svg`;
+      }
+      const Plot = document.getElementById(this.props.plot) || null;
+      this.exportSVG(Plot, PlotName);
     } else {
-      const ProteinPlotName = `${this.props.imageInfo.title}-${
-        this.props.imageInfo.svg[this.props.activeSVGTabIndex].plotType
-      }.svg`;
+      // for reusable SVG Plot
+      let PlotName =
+        `${this.props.imageInfo?.svg[this.props.tabIndex]?.plotType.plotID}_${
+          this.props.imageInfo?.key
+        }.svg` || `${this.props.plot}.svg`;
+      if (this.props.tab === 'enrichment') {
+        PlotName =
+          `${this.props.imageInfo?.svg[this.props.tabIndex]?.plotType.plotID}_${
+            this.props.svgExportName
+          }.svg` || `${this.props.plot}.svg`;
+      }
       const currentContentContainer =
         document.getElementById('PlotSVG') ||
         document.getElementById('DifferentialPlotTabsPlotSVG');
-      const currentSVG =
+      const Plot =
         currentContentContainer.getElementsByTagName('svg')[0] || null;
-      this.exportSVG(currentSVG, ProteinPlotName);
+      this.exportSVG(Plot, PlotName);
     }
   };
 
@@ -133,12 +97,27 @@ class ButtonActions extends Component {
     document.body.removeChild(downloadLink);
   };
 
-  getMultisetPlotName = exporttype => {
-    if (this.props.tab === 'differential') {
-      return `${this.props.differentialStudy}-${this.props.differentialModel}-MultisetPlot.${exporttype}`;
-    } else if (this.props.tab === 'enrichment') {
-      return `${this.props.enrichmentStudy}-${this.props.enrichmentModel}-MultisetPlot.${exporttype}`;
-    } else return '';
+  PDFExport = () => {
+    console.log(this.props);
+    const isMultisetPlot = this.props.visible;
+    if (isMultisetPlot) {
+      const Plot = document.getElementById('multisetAnalysisSVG') || null;
+      pdfService.createPDF(Plot);
+    } else if (this.props.plot === 'barcode') {
+      const currentContentContainer =
+        document.getElementById('barcodeChart') || null;
+      const Plot =
+        currentContentContainer.getElementsByTagName('svg')[0] || null;
+      // pdfService.createPDF(Plot);
+      pdfService.convertToPdf(Plot);
+    } else {
+      const currentContentContainer =
+        document.getElementById('PlotSVG') ||
+        document.getElementById('DifferentialPlotTabsPlotSVG');
+      const Plot =
+        currentContentContainer.getElementsByTagName('svg')[0] || null;
+      pdfService.createPDF(Plot);
+    }
   };
 
   getExcelButton = () => {

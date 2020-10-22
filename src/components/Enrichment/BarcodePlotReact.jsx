@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import ButtonActions from '../Shared/ButtonActions';
+import styled from 'styled-components';
 // import Axis from "./Axis";
 import './BarcodePlotReact.scss';
 // import Tooltip from "./useTooltip";
@@ -21,7 +22,6 @@ class BarcodePlotReact extends Component {
       // brushing: false,
       bottomLabel: '',
       barcodeHeight: 0,
-      id: 'chart-barcode',
       margin: {
         top: 40,
         right: 40,
@@ -81,10 +81,10 @@ class BarcodePlotReact extends Component {
           const MaxFeatureId = MaxFeatureData.featureID;
           const MaxFeatureElement = d3.select(`#barcode-line-${MaxFeatureId}`);
           if (MaxFeatureElement != null) {
-            MaxFeatureElement.classed('MaxLine', true).attr(
-              'y1',
-              this.state.settings.margin.max,
-            );
+            MaxFeatureElement.classed('MaxLine', true)
+              .attr('y1', this.state.settings.margin.max)
+              .attr('style', 'stroke:#FF4400;stroke-width:3.5');
+            // .attr('style', 'stroke:"#000", strokeWidth: 1.5, opacity: 1');
             const MaxFeatureLineData = {
               x2: MaxFeatureElement.attr('x2') || null,
               featureID: MaxFeatureElement.attr('featureid') || null,
@@ -391,7 +391,7 @@ class BarcodePlotReact extends Component {
             fontSize="14px"
             textAnchor={tooltipTextAnchor}
           >
-            &nbsp;&nbsp;{hoveredLineName}
+            {hoveredLineName}
           </text>
         );
       }
@@ -403,7 +403,7 @@ class BarcodePlotReact extends Component {
             fontSize="14px"
             textAnchor={tooltipTextAnchor}
           >
-            &nbsp;&nbsp;{highlightedLineName}
+            {highlightedLineName}
           </text>
         );
       }
@@ -428,7 +428,6 @@ class BarcodePlotReact extends Component {
       value,
       xOffset: xScale(value),
     }));
-
     const barcodeTicks = xAxisTicks.map(({ value, xOffset }) => (
       <g
         key={value}
@@ -458,6 +457,7 @@ class BarcodePlotReact extends Component {
       <line
         id={`barcode-line-${d.featureID}`}
         className="barcode-line"
+        style={{ stroke: '#838383', strokeWidth: 1.5, opacity: 0.5 }}
         key={`${d.featureID}`}
         x1={xScale(d.statistic) + settings.margin.left}
         x2={xScale(d.statistic) + settings.margin.left}
@@ -476,23 +476,21 @@ class BarcodePlotReact extends Component {
     const tooltip = this.getTooltip();
 
     return (
-      <div
-        ref={this.barcodeContainerRef}
-        id={settings.id}
-        className="BarcodeChartContainer"
-      >
+      <div ref={this.barcodeContainerRef} id="BarcodeChartContainer">
         <div className="export-container">
           <ButtonActions
+            exportButtonSize={'mini'}
             excelVisible={false}
-            txtVisible={false}
+            pngVisible={true}
             pdfVisible={false}
-            plot={'barcode'}
+            svgVisible={false}
+            txtVisible={false}
+            plot={'BarcodeChart'}
           />
         </div>
         <svg
           ref={this.barcodeSVGRef}
-          id={`svg-${settings.id}`}
-          className="barcode-chart-area bcChart barcode"
+          id="BarcodeChart"
           height={horizontalSplitPaneSize}
           width={barcodeContainerWidth}
           viewBox={`0 0 ${barcodeContainerWidth} ${horizontalSplitPaneSize}`}
@@ -508,6 +506,8 @@ class BarcodePlotReact extends Component {
           {/* X Axis Label */}
           <text
             className="BarcodeLabel"
+            fontWeight={600}
+            fontSize={15}
             transform={`translate(${barcodeWidth / 2}, ${barcodeHeight + 35})`}
             textAnchor="middle"
           >
@@ -516,18 +516,22 @@ class BarcodePlotReact extends Component {
           {/* Y Axis Left Label */}
           <text
             className="BarcodeLabel"
+            fontWeight={600}
+            fontSize={15}
             transform="rotate(-90)"
             y={15}
-            x={0 - barcodeHeight / 1 + 10}
+            x={-barcodeHeight}
           >
             {barcodeSettings.lowLabel}
           </text>
           {/* Y Axis Right Label */}
           <text
             className="BarcodeLabel"
+            fontWeight={600}
+            fontSize={15}
             transform="rotate(-90)"
             y={barcodeWidth + 27}
-            x={0 - barcodeHeight / 1 + 10}
+            x={-barcodeHeight}
           >
             {barcodeSettings.highLabel}
           </text>
