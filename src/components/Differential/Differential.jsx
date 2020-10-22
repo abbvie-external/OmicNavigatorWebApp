@@ -444,45 +444,50 @@ class Differential extends Component {
           )
           .then(svgMarkupObj => {
             let svgMarkup = svgMarkupObj.data;
-            svgMarkup = svgMarkup.replace(/id="/g, 'id="' + id + '-' + i + '-');
-            svgMarkup = svgMarkup.replace(
-              /#glyph/g,
-              '#' + id + '-' + i + '-glyph',
-            );
-            svgMarkup = svgMarkup.replace(
-              /#clip/g,
-              '#' + id + '-' + i + '-clip',
-            );
-            svgMarkup = svgMarkup.replace(
-              /<svg/g,
-              `<svg preserveAspectRatio="xMinYMin meet" id="currentSVG-${id}-${i}"`,
-            );
-            DOMPurify.addHook('afterSanitizeAttributes', function(node) {
-              if (
-                node.hasAttribute('xlink:href') &&
-                !node.getAttribute('xlink:href').match(/^#/)
-              ) {
-                node.remove();
-              }
-            });
-            // Clean HTML string and write into our DIV
-            let sanitizedSVG = DOMPurify.sanitize(svgMarkup, {
-              ADD_TAGS: ['use'],
-            });
-            let svgInfo = {
-              plotType: differentialPlotTypes[i],
-              svg: sanitizedSVG,
-            };
+            if (svgMarkup != null || svgMarkup !== []) {
+              svgMarkup = svgMarkup.replace(
+                /id="/g,
+                'id="' + id + '-' + i + '-',
+              );
+              svgMarkup = svgMarkup.replace(
+                /#glyph/g,
+                '#' + id + '-' + i + '-glyph',
+              );
+              svgMarkup = svgMarkup.replace(
+                /#clip/g,
+                '#' + id + '-' + i + '-clip',
+              );
+              svgMarkup = svgMarkup.replace(
+                /<svg/g,
+                `<svg preserveAspectRatio="xMinYMin meet" id="currentSVG-${id}-${i}"`,
+              );
+              DOMPurify.addHook('afterSanitizeAttributes', function(node) {
+                if (
+                  node.hasAttribute('xlink:href') &&
+                  !node.getAttribute('xlink:href').match(/^#/)
+                ) {
+                  node.remove();
+                }
+              });
+              // Clean HTML string and write into our DIV
+              let sanitizedSVG = DOMPurify.sanitize(svgMarkup, {
+                ADD_TAGS: ['use'],
+              });
+              let svgInfo = {
+                plotType: differentialPlotTypes[i],
+                svg: sanitizedSVG,
+              };
 
-            // we want spline plot in zero index, rather than lineplot
-            // if (i === 0) {
-            imageInfo.svg.push(svgInfo);
-            currentSVGs.push(sanitizedSVG);
-            // } else {
-            // imageInfo.svg.unshift(svgInfo);
-            // currentSVGs.unshift(sanitizedSVG);
-            // }
-            handleSVGCb(imageInfo);
+              // we want spline plot in zero index, rather than lineplot
+              // if (i === 0) {
+              imageInfo.svg.push(svgInfo);
+              currentSVGs.push(sanitizedSVG);
+              // } else {
+              // imageInfo.svg.unshift(svgInfo);
+              // currentSVGs.unshift(sanitizedSVG);
+              // }
+              handleSVGCb(imageInfo);
+            }
           })
           .catch(error => {
             self.handleItemSelected(false);
