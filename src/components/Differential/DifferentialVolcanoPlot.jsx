@@ -38,9 +38,8 @@ class DifferentialVolcanoPlot extends Component {
       circles.classed('highlightedMax', false);
       if (volcanoDifferentialTableRowOther.length > 0) {
         volcanoDifferentialTableRowOther.forEach(element => {
-          const circleid = `${element}`;
           const highlightedCircle = d3
-            .select(`#volcanoDataPoint-${circleid}`)
+            .select(`circle[id=volcanoDataPoint-${element}]`)
             .attr('r', 3);
           highlightedCircle.classed('highlighted', true);
           highlightedCircle.raise();
@@ -48,7 +47,9 @@ class DifferentialVolcanoPlot extends Component {
       }
       if (volcanoDifferentialTableRowMax.length > 0) {
         const maxCircle = d3
-          .select(`#volcanoDataPoint-${volcanoDifferentialTableRowMax}`)
+          .select(
+            `circle[id=volcanoDataPoint-${volcanoDifferentialTableRowMax}]`,
+          )
           .attr('r', 5);
         maxCircle.classed('highlightedMax', true);
         maxCircle.raise();
