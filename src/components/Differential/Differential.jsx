@@ -79,10 +79,6 @@ class Differential extends Component {
     direction: 'left',
     visible: false,
     plotButtonActive: false,
-    excelVisible: false,
-    pngVisible: true,
-    pdfVisible: false,
-    svgVisible: true,
     multisetQueriedP: false,
     activeIndexDifferentialView: this.defaultActiveIndexDifferentialView || 0,
     thresholdColsP: [],
@@ -154,7 +150,6 @@ class Differential extends Component {
   }
 
   pageToFeature = featureToHighlight => {
-    debugger;
     if (featureToHighlight !== '') {
       const {
         differentialFeatureIdKey,
@@ -289,7 +284,7 @@ class Differential extends Component {
 
   handlePlotTypesDifferential = differentialModel => {
     if (differentialModel !== '') {
-      if (this.state.differentialStudyMetadata.plots != null) {
+      if (this.state.differentialStudyMetadata?.plots != null) {
         const differentialModelData = this.state.differentialStudyMetadata.plots.find(
           model => model.modelID === differentialModel,
         );
@@ -402,8 +397,8 @@ class Differential extends Component {
       return function() {
         let value = dataItem[alphanumericTrigger];
         let imageInfo = { key: '', title: '', svg: [] };
-        imageInfo.title = `Protein Intensity - ${alphanumericTrigger} ${value}`;
-        imageInfo.key = `${alphanumericTrigger} ${value}`;
+        imageInfo.title = `${alphanumericTrigger} ${value}`;
+        imageInfo.key = `${value}`;
         getProteinDataCb(
           dataItem[alphanumericTrigger],
           dataItem,
@@ -426,8 +421,8 @@ class Differential extends Component {
     } = this.props;
     let id = featureId != null ? featureId : differentialFeature;
     let imageInfo = { key: '', title: '', svg: [] };
-    imageInfo.title = `Protein Intensity - ${differentialFeatureIdKey} ${featureId}`;
-    imageInfo.key = `${differentialFeatureIdKey} ${featureId}`;
+    imageInfo.title = `${differentialFeatureIdKey} ${featureId}`;
+    imageInfo.key = `${featureId}`;
     let handleSVGCb = this.handleSVG;
     let currentSVGs = [];
     let handleItemSelectedCb = this.handleItemSelected;
@@ -449,50 +444,75 @@ class Differential extends Component {
           )
           .then(svgMarkupObj => {
             let svgMarkup = svgMarkupObj.data;
-            svgMarkup = svgMarkup.replace(/id="/g, 'id="' + id + '-' + i + '-');
-            svgMarkup = svgMarkup.replace(
-              /#glyph/g,
-              '#' + id + '-' + i + '-glyph',
-            );
-            svgMarkup = svgMarkup.replace(
-              /#clip/g,
-              '#' + id + '-' + i + '-clip',
-            );
-            svgMarkup = svgMarkup.replace(
-              /<svg/g,
-              `<svg preserveAspectRatio="xMinYMin meet" id="currentSVG-${id}-${i}"`,
-            );
-            DOMPurify.addHook('afterSanitizeAttributes', function(node) {
-              if (
-                node.hasAttribute('xlink:href') &&
-                !node.getAttribute('xlink:href').match(/^#/)
-              ) {
-                node.remove();
-              }
-            });
-            // Clean HTML string and write into our DIV
-            let sanitizedSVG = DOMPurify.sanitize(svgMarkup, {
-              ADD_TAGS: ['use'],
-            });
-            let svgInfo = {
-              plotType: differentialPlotTypes[i],
-              svg: sanitizedSVG,
-            };
+            if (svgMarkup != null || svgMarkup !== []) {
+              svgMarkup = svgMarkup.replace(
+                /id="/g,
+                'id="' + id + '-' + i + '-',
+              );
+              svgMarkup = svgMarkup.replace(
+                /#glyph/g,
+                '#' + id + '-' + i + '-glyph',
+              );
+              svgMarkup = svgMarkup.replace(
+                /#clip/g,
+                '#' + id + '-' + i + '-clip',
+              );
+              svgMarkup = svgMarkup.replace(
+                /<svg/g,
+                `<svg preserveAspectRatio="xMinYMin meet" id="currentSVG-${id}-${i}"`,
+              );
+              DOMPurify.addHook('afterSanitizeAttributes', function(node) {
+                if (
+                  node.hasAttribute('xlink:href') &&
+                  !node.getAttribute('xlink:href').match(/^#/)
+                ) {
+                  node.remove();
+                }
+              });
+              // Clean HTML string and write into our DIV
+              let sanitizedSVG = DOMPurify.sanitize(svgMarkup, {
+                ADD_TAGS: ['use'],
+              });
+              let svgInfo = {
+                plotType: differentialPlotTypes[i],
+                svg: sanitizedSVG,
+              };
 
-            // we want spline plot in zero index, rather than lineplot
-            // if (i === 0) {
-            imageInfo.svg.push(svgInfo);
-            currentSVGs.push(sanitizedSVG);
-            // } else {
-            // imageInfo.svg.unshift(svgInfo);
-            // currentSVGs.unshift(sanitizedSVG);
-            // }
-            handleSVGCb(imageInfo);
+              // we want spline plot in zero index, rather than lineplot
+              // if (i === 0) {
+              imageInfo.svg.push(svgInfo);
+              currentSVGs.push(sanitizedSVG);
+              // } else {
+              // imageInfo.svg.unshift(svgInfo);
+              // currentSVGs.unshift(sanitizedSVG);
+              // }
+              handleSVGCb(imageInfo);
+            } else {
+              handleItemSelectedCb(false);
+            }
           })
           .catch(error => {
             self.handleItemSelected(false);
           });
       });
+    } else {
+      this.handleItemSelected(false);
+      this.setState({
+        imageInfo: {
+          key: null,
+          title: '',
+          svg: [],
+        },
+        isProteinSVGLoaded: true,
+        isVolcanoPlotSVGLoaded: true,
+      });
+      let stateObj = {
+        differentialStudy: this.props.differentialStudy || '',
+        differentialModel: this.props.differentialModel || '',
+        differentialTest: this.props.differentialTest || '',
+        differentialFeature: '',
+      };
+      this.props.onSearchCriteriaToTop(stateObj, 'differential');
     }
   };
 
@@ -617,8 +637,8 @@ class Differential extends Component {
     const alphanumericTrigger = differentialAlphanumericFields[0];
     if (differentialFeature !== '') {
       let imageInfo = { key: '', title: '', svg: [] };
-      imageInfo.title = `Protein Intensity - ${alphanumericTrigger} ${differentialFeature}`;
-      imageInfo.key = `${alphanumericTrigger} ${differentialFeature}`;
+      imageInfo.title = `${alphanumericTrigger} ${differentialFeature}`;
+      imageInfo.key = `${differentialFeature}`;
       this.setState({
         imageInfo: imageInfo,
         // differentialResultsMounted: false,
@@ -1022,7 +1042,6 @@ class Differential extends Component {
                     }
                     onRowClick={this.handleRowClickDifferential}
                     rowLevelPropsCalc={this.rowLevelPropsCalcDifferential}
-                    // headerAttributes={<ButtonActions />}
                   />
                   {/* </div> */}
                 </Grid.Column>
@@ -1082,6 +1101,7 @@ class Differential extends Component {
   render() {
     const differentialView = this.getView();
     const { multisetPlotInfo, animation, direction, visible } = this.state;
+    const { tab, differentialStudy, differentialModel } = this.props;
     const VerticalSidebar = ({ animation, visible }) => (
       <Sidebar
         as={'div'}
@@ -1101,7 +1121,18 @@ class Differential extends Component {
               largeScreen={16}
               widescreen={16}
             >
-              <ButtonActions {...this.props} {...this.state} />
+              <ButtonActions
+                exportButtonSize={'medium'}
+                excelVisible={false}
+                pngVisible={true}
+                pdfVisible={false}
+                svgVisible={true}
+                txtVisible={false}
+                plot={'differentialMultisetAnalysisSVG'}
+                tab={tab}
+                study={differentialStudy}
+                model={differentialModel}
+              />
             </Grid.Column>
           </Grid.Row>
         </Grid>

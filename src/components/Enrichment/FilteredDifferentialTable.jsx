@@ -32,29 +32,18 @@ class FilteredDifferentialTable extends Component {
     identifier: null,
     filteredDifferentialTableRowMax: [],
     filteredDifferentialTableRowOther: [],
+    rowClicked: false,
   };
   filteredDifferentialGridRef = React.createRef();
 
   componentDidMount() {
     this.getFilteredTableConfigCols(this.props.barcodeSettings.barcodeData);
-    // if (
-    //   this.props.tab === 'enrichment' &&
-    //   this.props.HighlightedProteins !== '' &&
-    //   this.props.HighlightedProteins != null
-    // ) {
-    //   this.pageToProtein(
-    //     this.props.barcodeSettings.brushedData,
-    //     this.props.HighlightedProteins,
-    //     this.state.itemsPerPageFilteredDifferentialTable,
-    //   );
-    // }
   }
 
   componentDidUpdate(prevProps, prevState) {
     if (
       this.props.barcodeSettings.brushedData !==
         prevProps.barcodeSettings.brushedData ||
-      // this.props.filteredDifferentialFeatureIdKey !== prevState.filteredDifferentialFeatureIdKey
       this.state.filteredBarcodeData !== prevState.filteredBarcodeData
     ) {
       this.getTableData();
@@ -76,7 +65,7 @@ class FilteredDifferentialTable extends Component {
     }
 
     if (this.props.HighlightedProteins !== prevProps.HighlightedProteins) {
-      this.highlightRows(this.props.HighlightedProteins);
+      this.highlightRows(this.props.HighlightedProteins, this.state.rowClicked);
     }
   }
 
@@ -319,7 +308,7 @@ class FilteredDifferentialTable extends Component {
     };
   };
 
-  highlightRows = HighlightedProteins => {
+  highlightRows = (HighlightedProteins, rowClicked) => {
     const MaxLine = HighlightedProteins[0] || null;
     let filteredDifferentialTableRowMaxVar = [];
     if (MaxLine !== {} && MaxLine != null) {
@@ -337,7 +326,10 @@ class FilteredDifferentialTable extends Component {
       filteredDifferentialTableRowMax: filteredDifferentialTableRowMaxVar,
       filteredDifferentialTableRowOther: filteredDifferentialTableRowOtherVar,
     });
-    this.pageToFeature(filteredDifferentialTableRowMaxVar);
+    if (!rowClicked) {
+      this.pageToFeature(filteredDifferentialTableRowMaxVar);
+    }
+    this.setState({ rowClicked: false });
   };
 
   getTableHelpers = () => {
@@ -373,6 +365,7 @@ class FilteredDifferentialTable extends Component {
   // };
 
   handleRowClick = (event, item, index) => {
+    this.setState({ rowClicked: true });
     if (item !== null && event?.target?.className !== 'ExternalSiteIcon') {
       const { filteredDifferentialFeatureIdKey } = this.props;
       event.stopPropagation();
@@ -495,7 +488,6 @@ class FilteredDifferentialTable extends Component {
             min-height="5vh"
             height="auto"
             additionalTemplateInfo={additionalTemplateInfo}
-            // headerAttributes={<ButtonActions />}
             onRowClick={this.handleRowClick}
             rowLevelPropsCalc={this.rowLevelPropsCalc}
             emptyMessage={CustomEmptyMessage}
