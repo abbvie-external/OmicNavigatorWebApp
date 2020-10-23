@@ -320,19 +320,27 @@ class DifferentialVolcano extends Component {
   }
   handleDropdownChange(evt, { name, value }) {
     const { differentialResultsUnfiltered } = this.props;
+    const allowXTransCheck =
+      this.getMaxAndMin(differentialResultsUnfiltered, value)[0] > 0;
+    const doXaxisTransCheck = allowXTransCheck
+      ? this.state.doXAxisTransformation
+      : false;
     if (name === 'xAxisSelector') {
       this.setState({
         xAxisLabel: value,
-        doXAxisTransformation: false,
-        allowXTransformation:
-          this.getMaxAndMin(differentialResultsUnfiltered, value)[0] > 0,
+        doXAxisTransformation: doXaxisTransCheck,
+        allowXTransformation: allowXTransCheck,
       });
     } else {
+      const allowYTransCheck =
+        this.getMaxAndMin(differentialResultsUnfiltered, value)[0] > 0;
+      const doYaxisTransCheck = allowYTransCheck
+        ? this.state.doYAxisTransformation
+        : false;
       this.setState({
         yAxisLabel: value,
-        doYAxisTransformation: false,
-        allowYTransformation:
-          this.getMaxAndMin(differentialResultsUnfiltered, value)[0] > 0,
+        doYAxisTransformation: doYaxisTransCheck,
+        allowYTransformation: allowYTransCheck,
       });
     }
   }
@@ -432,7 +440,18 @@ class DifferentialVolcano extends Component {
           onClick={this.handleTransformationChange.bind(this)}
         ></Form.Field>
       </span>
-    ) : null;
+    ) : (
+      <span title="-log10 Transform">
+        <Form.Field
+          control={Checkbox}
+          name="xTransformationCheckbox"
+          checked={false}
+          disabled={true}
+          //checked={doXAxisTransformation}
+          //onClick={this.handleTransformationChange.bind(this)}
+        ></Form.Field>
+      </span>
+    );
     const yAxisTransformBox = allowYTransformation ? (
       <span title="-log10 Transform">
         <Form.Field
@@ -442,7 +461,18 @@ class DifferentialVolcano extends Component {
           onClick={this.handleTransformationChange.bind(this)}
         ></Form.Field>
       </span>
-    ) : null;
+    ) : (
+      <span title="-log10 Transform">
+        <Form.Field
+          control={Checkbox}
+          name="yTransformationCheckbox"
+          checked={false}
+          disabled={true}
+          //checked={doYAxisTransformation}
+          //onClick={this.handleTransformationChange.bind(this)}
+        ></Form.Field>
+      </span>
+    );
     const svgPlot = this.getSVGPlot();
     let differentialVolcanoCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-Volcano`;
     if (multisetQueriedP) {
