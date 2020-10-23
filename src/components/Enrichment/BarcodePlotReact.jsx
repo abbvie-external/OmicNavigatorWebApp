@@ -81,9 +81,11 @@ class BarcodePlotReact extends Component {
           const MaxFeatureId = MaxFeatureData.featureID;
           const MaxFeatureElement = d3.select(`#barcode-line-${MaxFeatureId}`);
           if (MaxFeatureElement != null) {
-            MaxFeatureElement.classed('MaxLine', true)
-              .attr('y1', this.state.settings.margin.max)
-              .attr('style', 'stroke:#FF4400;stroke-width:3.5');
+            MaxFeatureElement.classed('MaxLine', true).attr(
+              'y1',
+              this.state.settings.margin.max,
+            );
+            // .attr('style', 'stroke:#FF4400;stroke-width:3.5');
             // .attr('style', 'stroke:"#000", strokeWidth: 1.5, opacity: 1');
             const MaxFeatureLineData = {
               x2: MaxFeatureElement.attr('x2') || null,
@@ -457,7 +459,7 @@ class BarcodePlotReact extends Component {
       <line
         id={`barcode-line-${d.featureID}`}
         className="barcode-line"
-        style={{ stroke: '#838383', strokeWidth: 1.5, opacity: 0.5 }}
+        // style={{ stroke: '#838383', strokeWidth: 1.5, opacity: 0.5 }}
         key={`${d.featureID}`}
         x1={xScale(d.statistic) + settings.margin.left}
         x2={xScale(d.statistic) + settings.margin.left}
