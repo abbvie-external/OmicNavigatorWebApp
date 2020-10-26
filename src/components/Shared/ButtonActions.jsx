@@ -89,20 +89,17 @@ class ButtonActions extends Component {
     }
   };
 
-  exportSVG = (svgEl, name) => {
-    svgEl.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-    const svgData = svgEl.outerHTML;
-    const preface = '<?xml version="1.0" standalone="no"?>\r\n';
-    const svgBlob = new Blob([preface, svgData], {
-      type: 'image/svg+xml;charset=utf-8',
-    });
-    const svgUrl = URL.createObjectURL(svgBlob);
-    const downloadLink = document.createElement('a');
-    downloadLink.href = svgUrl;
-    downloadLink.download = name;
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
+  ExcelExport = () => {
+    const excelExport = this.props.refFwd?.current?.qhGridRef.current ?? null;
+    if (excelExport != null) {
+      excelExport.exportExcel(
+        `${this.props.tab}_${this.props.study}_${this.props.model}_${this.props.test}`,
+      );
+    }
+  };
+
+  TextExport = () => {
+    debugger;
   };
 
   PDFExport = () => {
@@ -130,7 +127,11 @@ class ButtonActions extends Component {
 
   getExcelButton = () => {
     if (this.props.excelVisible) {
-      return <Button className="ExportButton">Data (.xls)</Button>;
+      return (
+        <Button className="ExportButton" onClick={this.ExcelExport}>
+          Data (.xls)
+        </Button>
+      );
     }
   };
 
@@ -167,7 +168,7 @@ class ButtonActions extends Component {
   getTxtButton = () => {
     if (this.props.txtVisible) {
       return (
-        <Button className="ExportButton" onClick={this.SVGExport}>
+        <Button className="ExportButton" onClick={this.TextExport}>
           TXT
         </Button>
       );

@@ -92,7 +92,7 @@ class Differential extends Component {
     itemsPerPageDifferentialTable:
       parseInt(localStorage.getItem('itemsPerPageDifferentialTable'), 10) || 45,
   };
-  DifferentialViewContainerRef = React.createRef();
+  differentialViewContainerRef = React.createRef();
   differentialGridRef = React.createRef();
 
   componentDidMount() {
@@ -1194,7 +1194,7 @@ class Differential extends Component {
               <Sidebar.Pusher>
                 <div
                   className="DifferentialViewContainer"
-                  ref={this.DifferentialViewContainerRef}
+                  ref={this.differentialViewContainerRef}
                 >
                   {differentialView}
                 </div>

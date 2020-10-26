@@ -184,6 +184,15 @@
     user-select: none !important; /* Non-prefixed version, currently supported by Chrome, Opera and Firefox */
   }
 
+  .FloatRight {
+    float: right !important;
+    cursor: pointer !important;
+  }
+
+  .FloatLeft {
+    float: left !important;
+  }
+
   .ShowInlineBlock {
     display: inline-block !important;
   }
@@ -198,6 +207,14 @@
 
   .ui.search.dropdown > .text {
     display: block !important;
+  }
+
+  .AbsoluteExport {
+    width: 97%;
+    position: absolute;
+    z-index: 1;
+    margin-top: 10px;
+    margin-right: 130px !important;
   }
 }
 

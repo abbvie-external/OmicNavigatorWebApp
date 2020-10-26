@@ -191,6 +191,7 @@ class Enrichment extends Component {
       parseInt(localStorage.getItem('itemsPerPageEnrichmentTable'), 10) || 45,
   };
   EnrichmentViewContainerRef = React.createRef();
+  enrichmentGridRef = React.createRef();
 
   componentDidMount() {
     this.getTableHelpers(this.testSelectedTransition, this.showBarcodePlot);
@@ -1824,6 +1825,7 @@ class Enrichment extends Component {
 
   getTableAndNetworkPanes = () => {
     const {
+      tab,
       enrichmentStudy,
       enrichmentModel,
       enrichmentAnnotation,
@@ -1873,6 +1875,21 @@ class Enrichment extends Component {
           >
             <Grid>
               <Grid.Row>
+                <div className="FloatRight AbsoluteExport">
+                  <ButtonActions
+                    excelVisible={true}
+                    pngVisible={false}
+                    pdfVisible={false}
+                    svgVisible={false}
+                    txtVisible={true}
+                    refFwd={this.enrichmentGridRef}
+                    // plot={'enrichmentData'}
+                    tab={tab}
+                    study={enrichmentStudy}
+                    model={enrichmentModel}
+                    test={enrichmentAnnotation}
+                  />
+                </div>
                 <Grid.Column
                   className="ResultsTableWrapper"
                   mobile={16}
@@ -1881,6 +1898,7 @@ class Enrichment extends Component {
                   widescreen={16}
                 >
                   <EZGrid
+                    ref={this.enrichmentGridRef}
                     uniqueCacheKey={enrichmentCacheKey}
                     data={enrichmentResults}
                     columnsConfig={enrichmentColumns}
@@ -1891,7 +1909,7 @@ class Enrichment extends Component {
                     //   this.informItemsPerPageEnrichmentTable
                     // }
                     loading={this.state.isEnrichmentTableLoading}
-                    exportBaseName="Enrichment_Analysis"
+                    // exportBaseName="Enrichment_Analysis"
                     // columnReorder={this.props.columnReorder}
                     disableColumnReorder
                     disableGrouping

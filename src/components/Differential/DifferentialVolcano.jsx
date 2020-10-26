@@ -360,7 +360,7 @@ class DifferentialVolcano extends Component {
       return (
         <div className="VolcanoPlotSVGPlot">
           <SVGPlot
-            // ref={this.DifferentialViewContainerRef}
+            // ref={this.differentialViewContainerRef}
             {...this.props}
             {...this.state}
             onSVGTabChange={this.props.onSVGTabChange}
