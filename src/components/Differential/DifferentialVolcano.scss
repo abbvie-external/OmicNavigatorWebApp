@@ -1,28 +1,3 @@
-.DifferentialVolcano {
-  direction: ltr !important;
-  .ui.mini.image {
-    width: 35px !important;
-  }
-
-  .TableValue {
-    cursor: auto !important;
-  }
-}
-
-.volcanoSplitPane {
-  // .QHGrid table th:first-child {
-  //   padding-top: 9px !important;
-  //   padding-bottom: 0px !important;
-  // }
-
-  .QHGrid--generalSearch input {
-    border: 1px solid lightgrey !important;
-  }
-}
-.VolcanoPlotAxisSelectorsRow {
-  padding-bottom: 0px !important;
-}
-
 .PlotInstructions {
   height: 100%;
 }
@@ -45,12 +20,55 @@
   }
 }
 
+#xAxisSelector,
+#yAxisSelector {
+  min-width: 100px !important;
+}
+
+.VolcanoAxisLabel {
+  margin-right: -1px !important;
+  border-radius: 0.28571429rem 0px 0px 0.28571429rem !important;
+  background-color: var(--color-dark) !important;
+  color: var(--color-light) !important;
+  padding: 11px 10px !important;
+}
+
+#VolcanoAxisLabelY {
+  margin-left: 35px !important;
+}
+
+@media (max-width: 1598px) {
+  .VolcanoAxisLabel {
+    line-height: 1.2 !important;
+  }
+}
+
+@media (min-width: 1599px) {
+  .VolcanoAxisLabel {
+    line-height: 1.4 !important;
+  }
+}
+
+.VolcanoPlotAxisSelectorsRow {
+  padding-top: 25px !important;
+  padding-bottom: 0px !important;
+}
+
 #volcanoViewRow {
   padding-bottom: 0px !important;
 
   .volcanoSplitPane {
     position: relative !important;
     padding-bottom: 50px !important;
+
+    // .QHGrid table th:first-child {
+    //   padding-top: 9px !important;
+    //   padding-bottom: 0px !important;
+    // }
+
+    .QHGrid--generalSearch input {
+      border: 1px solid lightgrey !important;
+    }
   }
 
   .Resizer {
