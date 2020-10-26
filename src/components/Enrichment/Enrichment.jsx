@@ -1875,6 +1875,21 @@ class Enrichment extends Component {
           >
             <Grid>
               <Grid.Row>
+                <div className="FloatRight AbsoluteExport">
+                  <ButtonActions
+                    excelVisible={true}
+                    pngVisible={false}
+                    pdfVisible={false}
+                    svgVisible={false}
+                    txtVisible={true}
+                    refFwd={this.enrichmentGridRef}
+                    // plot={'enrichmentData'}
+                    tab={tab}
+                    study={enrichmentStudy}
+                    model={enrichmentModel}
+                    test={enrichmentAnnotation}
+                  />
+                </div>
                 <Grid.Column
                   className="ResultsTableWrapper"
                   mobile={16}
