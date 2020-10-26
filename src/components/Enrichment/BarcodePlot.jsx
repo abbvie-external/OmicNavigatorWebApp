@@ -2,12 +2,12 @@ import React, { Component } from 'react';
 import ButtonActions from '../Shared/ButtonActions';
 import styled from 'styled-components';
 // import Axis from "./Axis";
-import './BarcodePlotReact.scss';
+import './BarcodePlot.scss';
 // import Tooltip from "./useTooltip";
 import * as d3 from 'd3';
 // import * as _ from "lodash";
 
-class BarcodePlotReact extends Component {
+class BarcodePlot extends Component {
   state = {
     barcodeWidth: 0,
     barcodeContainerWidth: 0,
@@ -485,7 +485,7 @@ class BarcodePlotReact extends Component {
             excelVisible={false}
             pngVisible={true}
             pdfVisible={false}
-            svgVisible={false}
+            svgVisible={true}
             txtVisible={false}
             plot={'BarcodeChart'}
           />
@@ -547,4 +547,4 @@ class BarcodePlotReact extends Component {
   }
 }
 
-export default BarcodePlotReact;
+export default BarcodePlot;

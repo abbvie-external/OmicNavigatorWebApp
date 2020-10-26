@@ -229,9 +229,6 @@ class ViolinPlot extends Component {
 
       const svg = document.getElementById(`${this.props.violinSettings.id}`);
       let parent = '';
-      // if (this.violinContainerRef.current !== null) {
-
-      // } else {
       parent = document
         .getElementById(this.props.violinSettings.id)
         .getBoundingClientRect();
@@ -267,13 +264,6 @@ class ViolinPlot extends Component {
     p.y = y;
     return p.matrixTransform(ctm);
   };
-
-  // getCircleId = (id, idMult) => {
-  //   if (id && idMult) {
-  //     return `${id.replace(/;/g, '_')}_${idMult}`;
-  //   }
-  //   return null;
-  // };
 
   addJitter = (doJitter, width) => {
     if (doJitter !== true || width === 0) {
@@ -353,29 +343,6 @@ class ViolinPlot extends Component {
   }
 
   unhighlightPoint = (unselectedArray, clearAll, self) => {
-    // if (clearAll) {
-    //   const allPoints = d3.selectAll(
-    //     '.' + self.props.violinSettings.id + '.vPoint',
-    //   );
-    //   allPoints
-    //     .attr(
-    //       'class',
-    //       'non_brushed point ' + self.props.violinSettings.id + ' vPoint',
-    //     )
-    //     .attr('r', 3)
-    //     .attr('stroke-width', 1)
-    //     .attr('stroke', 'black')
-    //     .attr('fill', '#1678C2');
-    // }
-    // _.forEach(unselectedArray, function(oldPoint) {
-    //   d3.select('#violin_' + oldPoint._row.replace(/\./g, ''))
-    //     .transition()
-    //     .duration(100)
-    //     .attr('r', 3)
-    //     .attr('stroke-width', 1)
-    //     .attr('stroke', 'black')
-    //     .attr('fill', '#1678C2');
-    // });
     d3.selectAll(`.violin-tooltip`).style('display', 'none');
     this.props.onHandleProteinSelected([]);
   };
