@@ -1836,6 +1836,9 @@ class Enrichment extends Component {
       additionalTemplateInfoEnrichmentTable,
       itemsPerPageEnrichmentTable,
       multisetQueriedE,
+      activeIndexEnrichmentView,
+      isEnrichmentTableLoading,
+      networkDataError,
     } = this.state;
     let enrichmentCacheKey = `${enrichmentStudy}-${enrichmentModel}-${enrichmentAnnotation}-${multisetQueriedE}`;
     return [
@@ -1847,7 +1850,7 @@ class Enrichment extends Component {
             name="table"
             color="orange"
             // active={this.state.activeIndexEnrichmentView === 0}
-            inverted={(this.state.activeIndexEnrichmentView === 0).toString()}
+            inverted={(activeIndexEnrichmentView === 0).toString()}
           >
             {/* <Icon
               name="table"
@@ -1857,9 +1860,7 @@ class Enrichment extends Component {
             /> */}
             <img
               src={
-                this.state.activeIndexEnrichmentView === 0
-                  ? tableIconSelected
-                  : tableIcon
+                activeIndexEnrichmentView === 0 ? tableIconSelected : tableIcon
               }
               alt="Table Icon"
               id="TableButton"
@@ -1875,6 +1876,22 @@ class Enrichment extends Component {
           >
             <Grid>
               <Grid.Row>
+                <div className="FloatRight AbsoluteExport">
+                  <ButtonActions
+                    excelVisible={true}
+                    pngVisible={false}
+                    pdfVisible={false}
+                    svgVisible={false}
+                    txtVisible={true}
+                    refFwd={this.enrichmentGridRef}
+                    data={enrichmentResults}
+                    // plot={'enrichmentData'}
+                    tab={tab}
+                    study={enrichmentStudy}
+                    model={enrichmentModel}
+                    test={enrichmentAnnotation}
+                  />
+                </div>
                 <Grid.Column
                   className="ResultsTableWrapper"
                   mobile={16}
@@ -1893,7 +1910,7 @@ class Enrichment extends Component {
                     // onInformItemsPerPage={
                     //   this.informItemsPerPageEnrichmentTable
                     // }
-                    loading={this.state.isEnrichmentTableLoading}
+                    loading={isEnrichmentTableLoading}
                     // exportBaseName="Enrichment_Analysis"
                     // columnReorder={this.props.columnReorder}
                     disableColumnReorder
@@ -1920,7 +1937,7 @@ class Enrichment extends Component {
           >
             <img
               src={
-                this.state.activeIndexEnrichmentView === 1
+                activeIndexEnrichmentView === 1
                   ? networkIconSelected
                   : networkIcon
               }
@@ -1936,7 +1953,7 @@ class Enrichment extends Component {
             id="EnrichmentContentPane"
             // ref="EnrichmentContentPaneGraph"
           >
-            {!this.state.networkDataError ? (
+            {!networkDataError ? (
               <EnrichmentResultsGraph
                 {...this.props}
                 {...this.state}

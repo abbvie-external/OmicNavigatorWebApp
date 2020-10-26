@@ -107,6 +107,7 @@ class ButtonActions extends Component {
 
   TextExport = () => {
     debugger;
+    const enrichmentResults = this.props.data;
   };
 
   ExcelExport = () => {
