@@ -114,7 +114,7 @@ class ButtonActions extends Component {
     const excelExport = this.props.refFwd?.current?.qhGridRef.current ?? null;
     if (excelExport != null) {
       excelExport.exportExcel(
-        `${this.props.tab}_${this.props.study}_${this.props.model}_${this.props.test}`,
+        `${this.props.tab}-${this.props.study}-${this.props.model}-${this.props.test}`,
       );
     }
   };
