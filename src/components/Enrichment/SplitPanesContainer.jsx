@@ -94,10 +94,10 @@ class SplitPanesContainer extends Component {
   getViolinAndTable = () => {
     const {
       displayViolinPlot,
-      tab,
-      enrichmentStudy,
-      enrichmentModel,
-      enrichmentAnnotation,
+      // tab,
+      // enrichmentStudy,
+      // enrichmentModel,
+      // enrichmentAnnotation,
     } = this.props;
     const { activeViolinTableIndex } = this.state;
     const violinPlot = this.getViolinPlot();

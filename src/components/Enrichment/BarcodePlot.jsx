@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import ButtonActions from '../Shared/ButtonActions';
-import styled from 'styled-components';
+// import styled from 'styled-components';
 // import Axis from "./Axis";
 import './BarcodePlot.scss';
 // import Tooltip from "./useTooltip";
@@ -62,14 +62,15 @@ class BarcodePlot extends Component {
         console.log(this.props.HighlightedProteins);
         d3.selectAll(`.MaxLine`)
           .attr('y1', this.state.settings.margin.selected)
+          .attr('style', 'stroke:#838383;strokeWidth: 1.5;opacity: 0.5')
           .classed('MaxLine', false);
         d3.selectAll(`.HighlightedLine`)
           .attr('y1', this.state.settings.margin.selected)
+          .attr('style', 'stroke:#838383;strokeWidth: 1.5;opacity: 0.5')
           .classed('HighlightedLine', false);
-        // d3.selectAll('.barcode-line').attr(
-        //   'style',
-        //   'stroke:#838383;strokeWidth: 1.5;opacity: 0.5',
-        // );
+        d3.selectAll(`.selected`)
+          .attr('y1', this.state.settings.margin.selected)
+          .attr('style', 'stroke:#2c3b78;strokeWidth: 2.5;opacity: 1');
         if (this.props.HighlightedProteins.length > 0) {
           const HighlightedProteinsCopy = [...this.props.HighlightedProteins];
           const MaxFeatureData = HighlightedProteinsCopy[0];
