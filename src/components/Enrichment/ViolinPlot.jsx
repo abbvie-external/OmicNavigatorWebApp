@@ -115,7 +115,7 @@ class ViolinPlot extends Component {
   // }
 
   createViolinPlot = () => {
-    d3.select(`#svg-${this.props.violinSettings.id}`).remove();
+    d3.select(`#${this.props.violinSettings.id}`).remove();
     d3.selectAll(`.violin-tooltip`).remove();
     this.makeChart();
     this.prepareData();
@@ -227,9 +227,7 @@ class ViolinPlot extends Component {
       const cx = Math.ceil(d3.select(`#violin_${id.featureID}`).attr('cx'));
       const cy = Math.ceil(d3.select(`#violin_${id.featureID}`).attr('cy'));
 
-      const svg = document.getElementById(
-        `svg-${this.props.violinSettings.id}`,
-      );
+      const svg = document.getElementById(`${this.props.violinSettings.id}`);
       let parent = '';
       // if (this.violinContainerRef.current !== null) {
 
@@ -565,7 +563,9 @@ class ViolinPlot extends Component {
 
   prepareChart = () => {
     const self = this;
-    self.chart.objs.chartDiv = d3.select(`#${self.props.violinSettings.id}`);
+    self.chart.objs.chartDiv = d3.select(
+      `#${self.props.violinSettings.parentId}`,
+    );
     self.chart.objs.tooltip = self.chart.objs.chartDiv.append('div');
     self.chart.objs.tooltip
       .attr('class', 'violin-tooltip')
@@ -575,7 +575,7 @@ class ViolinPlot extends Component {
     self.chart.objs.svg = self.chart.objs.chartDiv
       .append('svg')
       .attr('class', 'chart-area vChart')
-      .attr('id', `svg-${self.props.violinSettings.id}`)
+      .attr('id', `${self.props.violinSettings.id}`)
       .attr('width', '100%')
       .attr('height', '100%')
       .attr(
@@ -1653,7 +1653,7 @@ class ViolinPlot extends Component {
 
   initiateViolinPlot = resetDimensions => {
     const { violinSettings, verticalSplitPaneSize } = this.props;
-    d3.select(`#svg-${violinSettings.id}`).remove();
+    d3.select(`#${violinSettings.id}`).remove();
     if (resetDimensions) {
       // we calculate height based on the containerRef
       let containerHeight = this.getHeight();
@@ -1699,7 +1699,7 @@ class ViolinPlot extends Component {
     return (
       <div
         ref={this.violinContainerRef}
-        id={self.props.violinSettings.id}
+        id={self.props.violinSettings.parentId}
         className="violin-chart-wrapper"
       />
     );

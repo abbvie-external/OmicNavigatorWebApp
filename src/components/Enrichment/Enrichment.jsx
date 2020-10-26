@@ -145,6 +145,7 @@ class Enrichment extends Component {
         yAxis: "log<tspan baseline-shift='sub' font-size='14px'>2</tspan>FC",
       },
       // axisLabels: { xAxis: this.term, yAxis: "log<tspan baseline-shift='sub' font-size='14px'>2</tspan>(FC)" },
+      parentId: 'violinChartParent',
       id: 'violinChart',
       pointUniqueId: 'sample',
       pointValue: 'cpm',
