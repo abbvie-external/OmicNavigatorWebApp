@@ -356,14 +356,11 @@ class DifferentialVolcano extends Component {
     }
   };
   getSVGPlot = () => {
-    if (
-      this.props.imageInfo.key !== null &&
-      this.props.isVolcanoPlotSVGLoaded
-    ) {
+    if (this.props.imageInfo.key != null && this.props.isVolcanoPlotSVGLoaded) {
       return (
         <div className="VolcanoPlotSVGPlot">
           <SVGPlot
-            // ref={this.DifferentialViewContainerRef}
+            // ref={this.differentialViewContainerRef}
             {...this.props}
             {...this.state}
             onSVGTabChange={this.props.onSVGTabChange}

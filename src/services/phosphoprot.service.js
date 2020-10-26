@@ -5,7 +5,7 @@ window.jQuery = $;
 require('opencpu.js/opencpu-0.5.js');
 class PhosphoprotService {
   constructor() {
-    this.ocpuUrl = '***REMOVED***/ocpu/library/OmicAnalyzer/R';
+    this.ocpuUrl = '***REMOVED***/ocpu/library/OmicNavigator/R';
     //this.ocpuUrl = 'http://localhost:5656/ocpu/library/OmicAnalyzer/R';  //<-- comment out before building production
   }
 

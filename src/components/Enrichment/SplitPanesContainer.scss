@@ -62,8 +62,11 @@
     padding-right: 10px !important;
   }
 
-  .SVGSplitContainer {
-    margin: 0px 15px 0px 15px !important;
+  #SVGSplitContainer {
+    // margin: 0px 15px 0px 15px !important;
+    .ShowBlock {
+      margin-right: 30px;
+    }
   }
 
   .PlotInstructions {
@@ -122,6 +125,7 @@
     // min-height: 350px !important;
     height: 100% !important;
     // direction: rtl !important;
+    overflow-y: overlay !important;
   }
 
   #TableResultsTab .QHGrid {
@@ -136,11 +140,14 @@
     height: 100% !important;
   }
 
-  .BarcodeChartContainer {
+  #BarcodeChartContainer {
     width: 100% !important;
+    .ExportButtonGroup {
+      padding-bottom: 10px;
+    }
   }
 
-  .barcode-chart-area {
+  #BarcodeChart {
     width: 100% !important;
   }
 

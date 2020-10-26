@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { Tab } from 'semantic-ui-react';
 import { phosphoprotService } from '../../services/phosphoprot.service';
 // import { toast } from 'react-toastify';
-// import ButtonActions from '../Shared/ButtonActions';
 import MetafeaturesTable from './MetafeaturesTable';
 // import * as d3 from 'd3';
 import '../Shared/SVGPlot.scss';

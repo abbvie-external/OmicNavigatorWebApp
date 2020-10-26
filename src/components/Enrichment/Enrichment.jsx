@@ -62,10 +62,6 @@ class Enrichment extends Component {
     visible: false,
     plotButtonActive: false,
     uData: [],
-    excelVisible: false,
-    pngVisible: true,
-    pdfVisible: false,
-    svgVisible: true,
     displayViolinPlot: true,
     // networkDataAvailable: false,
     networkData: {
@@ -149,7 +145,7 @@ class Enrichment extends Component {
         yAxis: "log<tspan baseline-shift='sub' font-size='14px'>2</tspan>FC",
       },
       // axisLabels: { xAxis: this.term, yAxis: "log<tspan baseline-shift='sub' font-size='14px'>2</tspan>(FC)" },
-      id: 'violin-graph-1',
+      id: 'violinChart',
       pointUniqueId: 'sample',
       pointValue: 'cpm',
       title: '',
@@ -178,6 +174,7 @@ class Enrichment extends Component {
     enrichmentModelsAndAnnotations: [],
     enrichmentAnnotationsMetadata: [],
     enrichmentFeatureIdKey: '',
+    // filteredDifferentialFeatureIdKey: '',
     multisetFiltersVisible: false,
     multisetQueriedE: false,
     reloadPlot: false,
@@ -194,6 +191,7 @@ class Enrichment extends Component {
       parseInt(localStorage.getItem('itemsPerPageEnrichmentTable'), 10) || 45,
   };
   EnrichmentViewContainerRef = React.createRef();
+  enrichmentGridRef = React.createRef();
 
   componentDidMount() {
     this.getTableHelpers(this.testSelectedTransition, this.showBarcodePlot);
@@ -950,6 +948,12 @@ class Enrichment extends Component {
     this.setState(emptyArr);
   };
 
+  // handleFilteredDifferentialFeatureIdKey = (name, id) => {
+  //   this.setState({
+  //     [name]: id,
+  //   });
+  // };
+
   handleProteinSelected = toHighlightArray => {
     const prevHighestValueObject = this.state.HighlightedProteins[0]?.featureID;
     const highestValueObject = toHighlightArray[0];
@@ -995,8 +999,7 @@ class Enrichment extends Component {
     let imageInfo = { key: '', title: '', svg: [] };
     imageInfo.title = this.state.imageInfo.title;
     imageInfo.key = this.state.imageInfo.key;
-    // imageInfo.title = `Protein Intensity - ${enrichmentFeatureIdKey} ${featureId}`;
-    // imageInfo.key = `${enrichmentFeatureIdKey} ${featureId}`;
+    this.setState({ svgExportName: id });
     let handleSVGCb = this.handleSVG;
     let handlePlotStudyError = this.handlePlotStudyError;
     let currentSVGs = [];
@@ -1017,45 +1020,50 @@ class Enrichment extends Component {
           )
           .then(svgMarkupObj => {
             let svgMarkup = svgMarkupObj.data;
-            svgMarkup = svgMarkup.replace(/id="/g, 'id="' + id + '-' + i + '-');
-            svgMarkup = svgMarkup.replace(
-              /#glyph/g,
-              '#' + id + '-' + i + '-glyph',
-            );
-            svgMarkup = svgMarkup.replace(
-              /#clip/g,
-              '#' + id + '-' + i + '-clip',
-            );
-            svgMarkup = svgMarkup.replace(
-              /<svg/g,
-              `<svg preserveAspectRatio="xMinYMin meet" id="currentSVG-${id}-${i}"`,
-            );
-            DOMPurify.addHook('afterSanitizeAttributes', function(node) {
-              if (
-                node.hasAttribute('xlink:href') &&
-                !node.getAttribute('xlink:href').match(/^#/)
-              ) {
-                node.remove();
-              }
-            });
-            // Clean HTML string and write into our DIV
-            let sanitizedSVG = DOMPurify.sanitize(svgMarkup, {
-              ADD_TAGS: ['use'],
-            });
-            let svgInfo = {
-              plotType: enrichmentPlotTypes[i],
-              svg: sanitizedSVG,
-            };
+            if (svgMarkup != null || svgMarkup !== []) {
+              svgMarkup = svgMarkup.replace(
+                /id="/g,
+                'id="' + id + '-' + i + '-',
+              );
+              svgMarkup = svgMarkup.replace(
+                /#glyph/g,
+                '#' + id + '-' + i + '-glyph',
+              );
+              svgMarkup = svgMarkup.replace(
+                /#clip/g,
+                '#' + id + '-' + i + '-clip',
+              );
+              svgMarkup = svgMarkup.replace(
+                /<svg/g,
+                `<svg preserveAspectRatio="xMinYMin meet" id="currentSVG-${id}-${i}"`,
+              );
+              DOMPurify.addHook('afterSanitizeAttributes', function(node) {
+                if (
+                  node.hasAttribute('xlink:href') &&
+                  !node.getAttribute('xlink:href').match(/^#/)
+                ) {
+                  node.remove();
+                }
+              });
+              // Clean HTML string and write into our DIV
+              let sanitizedSVG = DOMPurify.sanitize(svgMarkup, {
+                ADD_TAGS: ['use'],
+              });
+              let svgInfo = {
+                plotType: enrichmentPlotTypes[i],
+                svg: sanitizedSVG,
+              };
 
-            // we want spline plot in zero index, rather than lineplot
-            // if (i === 0) {
-            imageInfo.svg.push(svgInfo);
-            currentSVGs.push(sanitizedSVG);
-            // } else {
-            //   imageInfo.svg.unshift(svgInfo);
-            //   currentSVGs.unshift(sanitizedSVG);
-            // }
-            handleSVGCb(imageInfo);
+              // we want spline plot in zero index, rather than lineplot
+              // if (i === 0) {
+              imageInfo.svg.push(svgInfo);
+              currentSVGs.push(sanitizedSVG);
+              // } else {
+              //   imageInfo.svg.unshift(svgInfo);
+              //   currentSVGs.unshift(sanitizedSVG);
+              // }
+              handleSVGCb(imageInfo);
+            }
           })
           .catch(error => {
             console.error('Error during getPlot', error);
@@ -1761,6 +1769,9 @@ class Enrichment extends Component {
             onHandleProteinSelected={this.handleProteinSelected}
             onHandleHighlightedLineReset={this.handleHighlightedLineReset}
             onHandleBarcodeChanges={this.handleBarcodeChanges}
+            // onHandleFilteredDifferentialFeatureIdKey={
+            //   this.handleFilteredDifferentialFeatureIdKey
+            // }
           ></SplitPanesContainer>
         </div>
       );
@@ -1814,6 +1825,7 @@ class Enrichment extends Component {
 
   getTableAndNetworkPanes = () => {
     const {
+      tab,
       enrichmentStudy,
       enrichmentModel,
       enrichmentAnnotation,
@@ -1871,6 +1883,7 @@ class Enrichment extends Component {
                   widescreen={16}
                 >
                   <EZGrid
+                    ref={this.enrichmentGridRef}
                     uniqueCacheKey={enrichmentCacheKey}
                     data={enrichmentResults}
                     columnsConfig={enrichmentColumns}
@@ -1881,7 +1894,7 @@ class Enrichment extends Component {
                     //   this.informItemsPerPageEnrichmentTable
                     // }
                     loading={this.state.isEnrichmentTableLoading}
-                    exportBaseName="Enrichment_Analysis"
+                    // exportBaseName="Enrichment_Analysis"
                     // columnReorder={this.props.columnReorder}
                     disableColumnReorder
                     disableGrouping
@@ -2035,6 +2048,7 @@ class Enrichment extends Component {
   render() {
     const enrichmentView = this.getView();
     const { multisetPlotInfo, animation, direction, visible } = this.state;
+    const { tab, enrichmentStudy, enrichmentModel } = this.props;
     const VerticalSidebar = ({ animation, visible }) => (
       <Sidebar
         as={'div'}
@@ -2054,7 +2068,17 @@ class Enrichment extends Component {
               largeScreen={16}
               widescreen={16}
             >
-              <ButtonActions {...this.props} {...this.state} />
+              <ButtonActions
+                excelVisible={false}
+                pngVisible={true}
+                pdfVisible={false}
+                svgVisible={true}
+                txtVisible={false}
+                plot={'enrichmentMultisetAnalysisSVG'}
+                tab={tab}
+                study={enrichmentStudy}
+                model={enrichmentModel}
+              />
             </Grid.Column>
           </Grid.Row>
         </Grid>

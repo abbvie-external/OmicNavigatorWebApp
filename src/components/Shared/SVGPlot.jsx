@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Loader, Dimmer, Tab, Popup, Icon, Message } from 'semantic-ui-react';
 import ButtonActions from '../Shared/ButtonActions';
-// import * as d3 from 'd3';
 import './SVGPlot.scss';
 
 class SVGPlot extends Component {
@@ -14,15 +13,6 @@ class SVGPlot extends Component {
       isSVGReady: true,
     });
   }
-
-  // componentDidUpdate = (prevProps, prevState) => {
-  //   if (this.props.SVGPlotLoaded !== prevProps.SVGPlotLoaded) {
-  //     this.setState({
-  //       isSVGReady: false,
-  //     });
-  //     this.getSVGPanes();
-  //   }
-  // };
 
   handleTabChange = (e, { activeIndex }) => {
     this.props.onSVGTabChange(activeIndex);
@@ -50,18 +40,6 @@ class SVGPlot extends Component {
                 dangerouslySetInnerHTML={{ __html: s.svg }}
               ></div>
             </Tab.Pane>
-            //   const viewbox = `0 0 ${this.props.enrichmentPlotSVGWidth} ${this.props.enrichmentPlotSVGHeight}`;
-            //   <svg
-            //   version="1.1"
-            //   viewBox={viewbox}
-            //   height={this.props.enrichmentPlotSVGHeight}
-            //   width={this.props.enrichmentPlotSVGHeight}
-            //   xmlns="http://www.w3.org/2000/svg"
-            //   id="currentSVG-20750-0"
-            //   preserveAspectRatio="xMinYMin meet"
-            // >
-            //   {s.svg}
-            //</svg>
           ),
         };
       });
@@ -80,7 +58,6 @@ class SVGPlot extends Component {
           className="NoPlotsMessage"
           icon="question mark"
           header="No Plots Available"
-          // content="add description/instructions"
         />
       );
     }
@@ -100,7 +77,7 @@ class SVGPlot extends Component {
 
   render() {
     if (this.state.isSVGReady) {
-      const { activeSVGTabIndex } = this.props;
+      const { activeSVGTabIndex, imageInfo, svgExportName, tab } = this.props;
       const ButtonActionsClass = this.getButtonActionsClass();
 
       const BreadcrumbPopupStyle = {
@@ -117,9 +94,16 @@ class SVGPlot extends Component {
         <div className="svgContainer">
           <div className={ButtonActionsClass}>
             <ButtonActions
+              exportButtonSize={'mini'}
               excelVisible={false}
               pdfVisible={false}
-              exportButtonSize="mini"
+              pngVisible={true}
+              svgVisible={true}
+              txtVisible={false}
+              tab={tab}
+              imageInfo={imageInfo}
+              tabIndex={activeSVGTabIndex}
+              svgExportName={svgExportName}
             />
           </div>
           <Popup

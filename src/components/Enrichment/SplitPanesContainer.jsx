@@ -92,7 +92,13 @@ class SplitPanesContainer extends Component {
   };
 
   getViolinAndTable = () => {
-    const { displayViolinPlot } = this.props;
+    const {
+      displayViolinPlot,
+      tab,
+      enrichmentStudy,
+      enrichmentModel,
+      enrichmentAnnotation,
+    } = this.props;
     const { activeViolinTableIndex } = this.state;
     const violinPlot = this.getViolinPlot();
     const violinAndTablePanes = [
@@ -146,17 +152,32 @@ class SplitPanesContainer extends Component {
     ];
 
     const selectedPlot = violinAndTablePanes[activeViolinTableIndex].menuItem;
-    //const actionButtons = selectedPlot === "Statistic Table" ? <ButtonActions excelVisible={false} pngVisible={false} pdfVisible={false} txtVisible={true} exportButtonSize='mini' plot={'table'}/> : <ButtonActions excelVisible={false} pngVisibile={false} exportButtonSize='mini' plot={'violin'}/>;
     const ButtonActionsClass = this.getButtonActionsClass();
     const actionButtons =
       selectedPlot === 'Statistic Table' ? (
         ''
       ) : (
+        // <ButtonActions
+        //   excelVisible={false}
+        //   pngVisible={false}
+        //   pdfVisible={false}
+        //   svgVisible={false}
+        //   txtVisible={false}
+        //   refFwd={this.filteredDifferentialGridRef}
+        //   exportButtonSize={'mini'}
+        //   tab={tab}
+        //   study={enrichmentStudy}
+        //   model={enrichmentModel}
+        //   test={enrichmentAnnotation}
+        // />
         <ButtonActions
           excelVisible={false}
+          pngVisible={true}
           pdfVisible={false}
-          exportButtonSize="mini"
-          plot={'violin'}
+          svgVisible={true}
+          txtVisible={false}
+          plot={`svg-${this.props.violinSettings.id}`}
+          exportButtonSize={'mini'}
         />
       );
     return (

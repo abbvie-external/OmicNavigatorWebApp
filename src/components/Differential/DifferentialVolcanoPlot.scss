@@ -1,50 +1,50 @@
 //.volcanoPlotContainer {
-  .volcanoPlotSVG {
-    margin: 0 auto;
-    display: block;
-    //opacity: 0.6;
-    //shape-rendering: 'crispEdges';
-    //stroke: white;
-  }
+.volcanoPlotSVG {
+  margin: 0 auto;
+  display: block;
+  //opacity: 0.6;
+  // shape-rendering: 'crispEdges';
+  // stroke: white;
+}
 
-  .volcanoPlotYAxis {
-    stroke: #838383;
-    stroke-width: 2px;
-  }
-  .volcanoPlotXAxis {
-    stroke: #838383;
-    stroke-width: 2px;
-  }
-  .axisLabel {
-    font-weight: bold;
-  }
-  .volcanoPlot-dataPoint {
-    stroke: black;
-    stroke-width: 0.4;
-    fill: var(--color-link);
-  }
-  .volcanoPlot-dataPoint.hovered {
-    stroke: var(--color-tertiary);
-    stroke-width: 5;
-  }
-  .volcanoPlot-dataPoint.selected {
-    // stroke: black;
-    // stroke-width: 1;
-    fill: var(--color-tertiary);
-  }
-  .volcanoPlot-dataPoint.highlighted {
-    stroke: black;
-    stroke-width: 1;
-    fill: var(--color-primary-gradient);
-  }
-  .volcanoPlot-dataPoint.highlightedMax {
-    //stroke: var(--color-primary);
-    // stroke-width: 5;
-    fill: var(--color-primary);
-  }
+.volcanoPlotYAxis {
+  stroke: #838383;
+  stroke-width: 2px;
+}
+.volcanoPlotXAxis {
+  stroke: #838383;
+  stroke-width: 2px;
+}
+.axisLabel {
+  font-weight: bold;
+}
+.volcanoPlot-dataPoint {
+  stroke: black;
+  stroke-width: 0.4;
+  fill: var(--color-link);
+}
+.volcanoPlot-dataPoint.hovered {
+  stroke: var(--color-tertiary);
+  stroke-width: 5;
+}
+.volcanoPlot-dataPoint.selected {
+  // stroke: black;
+  // stroke-width: 1;
+  fill: var(--color-tertiary);
+}
+.volcanoPlot-dataPoint.highlighted {
+  stroke: black;
+  stroke-width: 1;
+  fill: var(--color-primary-gradient);
+}
+.volcanoPlot-dataPoint.highlightedMax {
+  //stroke: var(--color-primary);
+  // stroke-width: 5;
+  fill: var(--color-primary);
+}
 
-  #differentialVolcanoPlot {
-    margin-left: 20px !important;
-    margin-top: 5px !important;
-  }
+#differentialVolcanoPlot {
+  margin-left: 20px !important;
+  margin-top: 5px !important;
+}
 //}
