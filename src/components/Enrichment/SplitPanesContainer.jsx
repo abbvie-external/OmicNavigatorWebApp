@@ -92,7 +92,13 @@ class SplitPanesContainer extends Component {
   };
 
   getViolinAndTable = () => {
-    const { displayViolinPlot } = this.props;
+    const {
+      displayViolinPlot,
+      tab,
+      enrichmentStudy,
+      enrichmentModel,
+      enrichmentAnnotation,
+    } = this.props;
     const { activeViolinTableIndex } = this.state;
     const violinPlot = this.getViolinPlot();
     const violinAndTablePanes = [
@@ -151,6 +157,19 @@ class SplitPanesContainer extends Component {
       selectedPlot === 'Statistic Table' ? (
         ''
       ) : (
+        // <ButtonActions
+        //   excelVisible={false}
+        //   pngVisible={false}
+        //   pdfVisible={false}
+        //   svgVisible={false}
+        //   txtVisible={false}
+        //   refFwd={this.filteredDifferentialGridRef}
+        //   exportButtonSize={'mini'}
+        //   tab={tab}
+        //   study={enrichmentStudy}
+        //   model={enrichmentModel}
+        //   test={enrichmentAnnotation}
+        // />
         <ButtonActions
           excelVisible={false}
           pngVisible={true}
