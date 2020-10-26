@@ -66,6 +66,10 @@ class BarcodePlot extends Component {
         d3.selectAll(`.HighlightedLine`)
           .attr('y1', this.state.settings.margin.selected)
           .classed('HighlightedLine', false);
+        // d3.selectAll('.barcode-line').attr(
+        //   'style',
+        //   'stroke:#838383;strokeWidth: 1.5;opacity: 0.5',
+        // );
         if (this.props.HighlightedProteins.length > 0) {
           const HighlightedProteinsCopy = [...this.props.HighlightedProteins];
           const MaxFeatureData = HighlightedProteinsCopy[0];
@@ -73,20 +77,16 @@ class BarcodePlot extends Component {
           OtherFeatures.forEach(element => {
             const lineId = `${element.featureID}`;
             const OtherHighlighted = d3.select(`#barcode-line-${lineId}`);
-            OtherHighlighted.classed('HighlightedLine', true).attr(
-              'y1',
-              this.state.settings.margin.highlighted,
-            );
+            OtherHighlighted.classed('HighlightedLine', true)
+              .attr('y1', this.state.settings.margin.highlighted)
+              .attr('style', 'stroke:#ff7e38;stroke-width:3');
           });
           const MaxFeatureId = MaxFeatureData.featureID;
           const MaxFeatureElement = d3.select(`#barcode-line-${MaxFeatureId}`);
           if (MaxFeatureElement != null) {
-            MaxFeatureElement.classed('MaxLine', true).attr(
-              'y1',
-              this.state.settings.margin.max,
-            );
-            // .attr('style', 'stroke:#FF4400;stroke-width:3.5');
-            // .attr('style', 'stroke:"#000", strokeWidth: 1.5, opacity: 1');
+            MaxFeatureElement.classed('MaxLine', true)
+              .attr('y1', this.state.settings.margin.max)
+              .attr('style', 'stroke:#FF4400;stroke-width:3.5');
             const MaxFeatureLineData = {
               x2: MaxFeatureElement.attr('x2') || null,
               featureID: MaxFeatureElement.attr('featureid') || null,
@@ -252,15 +252,16 @@ class BarcodePlot extends Component {
         const lines = d3
           .selectAll('line.barcode-line')
           .attr('y1', settings.margin.top)
+          .attr('style', 'stroke:#838383;stroke-width: 1.5;opacity: 0.5')
           .classed('selected', false)
           .classed('MaxLine', false);
-
         const brushed = lines
           .filter(function() {
             const x = d3.select(this).attr('x1');
             return isBrushed(brushedLines, x);
           })
           .attr('y1', settings.margin.selected)
+          .attr('style', 'stroke:#2c3b78;stroke-width: 2.5;opacity: 1')
           .classed('selected', true);
         const brushedArr = brushed._groups[0];
         const brushedDataVar = brushedArr.map(a => {
@@ -279,7 +280,10 @@ class BarcodePlot extends Component {
           const maxLineObject = self.getMaxObject(brushedDataVar);
           const maxLineId = `${maxLineObject.lineID}`;
           const maxLine = d3.select(`#barcode-line-${maxLineId}`);
-          maxLine.classed('MaxLine', true).attr('y1', settings.margin.max);
+          maxLine
+            .classed('MaxLine', true)
+            .attr('style', 'stroke:#FF4400;stroke-width:3.5')
+            .attr('y1', settings.margin.max);
           const statistic = maxLineObject.statistic;
           const textAnchor =
             statistic > self.props.barcodeSettings.highStat / 2
@@ -362,7 +366,10 @@ class BarcodePlot extends Component {
     } else {
       // reposition the brushed rect on window resize, or horizontal pane resize
       const selectedTicks = d3.selectAll('line').filter(function() {
-        return d3.select(this).classed('selected');
+        return d3
+          .select(this)
+          .attr('style', 'stroke:#2c3b78;stroke-width: 2.5;opacity: 1')
+          .classed('selected');
       });
       const highestTickIndex = selectedTicks.nodes().length - 1;
       if (highestTickIndex >= 0) {
@@ -392,6 +399,7 @@ class BarcodePlot extends Component {
             transform={`translate(${tooltipPosition}, 10)`}
             fontSize="14px"
             textAnchor={tooltipTextAnchor}
+            fontFamily="Lato, Helvetica Neue, Arial, Helvetica, sans-serif"
           >
             {hoveredLineName}
           </text>
@@ -404,6 +412,7 @@ class BarcodePlot extends Component {
             transform={`translate(${tooltipPosition}, 15)`}
             fontSize="14px"
             textAnchor={tooltipTextAnchor}
+            fontFamily="Lato, Helvetica Neue, Arial, Helvetica, sans-serif"
           >
             {highlightedLineName}
           </text>
@@ -443,6 +452,7 @@ class BarcodePlot extends Component {
             fontSize: '12px',
             textAnchor: 'middle',
             transform: 'translateY(20px)',
+            fontFamily: 'Lato, Helvetica Neue, Arial, Helvetica, sans-serif',
           }}
         >
           {value}
@@ -459,7 +469,7 @@ class BarcodePlot extends Component {
       <line
         id={`barcode-line-${d.featureID}`}
         className="barcode-line"
-        // style={{ stroke: '#838383', strokeWidth: 1.5, opacity: 0.5 }}
+        style={{ stroke: '#838383', strokeWidth: 1.5, opacity: 0.5 }}
         key={`${d.featureID}`}
         x1={xScale(d.statistic) + settings.margin.left}
         x2={xScale(d.statistic) + settings.margin.left}
@@ -512,6 +522,7 @@ class BarcodePlot extends Component {
             fontSize={15}
             transform={`translate(${barcodeWidth / 2}, ${barcodeHeight + 35})`}
             textAnchor="middle"
+            fontFamily="Lato, Helvetica Neue, Arial, Helvetica, sans-serif"
           >
             {barcodeSettings.statLabel}
           </text>
@@ -523,6 +534,7 @@ class BarcodePlot extends Component {
             transform="rotate(-90)"
             y={15}
             x={-barcodeHeight}
+            fontFamily="Lato, Helvetica Neue, Arial, Helvetica, sans-serif"
           >
             {barcodeSettings.lowLabel}
           </text>
@@ -534,6 +546,7 @@ class BarcodePlot extends Component {
             transform="rotate(-90)"
             y={barcodeWidth + 27}
             x={-barcodeHeight}
+            fontFamily="Lato, Helvetica Neue, Arial, Helvetica, sans-serif"
           >
             {barcodeSettings.highLabel}
           </text>
