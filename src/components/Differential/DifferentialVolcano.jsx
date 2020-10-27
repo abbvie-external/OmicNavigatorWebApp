@@ -11,8 +11,11 @@ import {
   Grid,
   Select,
   Checkbox,
+  Popup,
   Dimmer,
   Loader,
+  Label,
+  // Divider,
 } from 'semantic-ui-react';
 import './DifferentialVolcano.scss';
 import SplitPane from 'react-split-pane';
@@ -403,6 +406,20 @@ class DifferentialVolcano extends Component {
     }
   };
 
+  getDynamicSize() {
+    // let w = Math.max(
+    //   document.documentElement.clientWidth,
+    //   window.innerWidth || 0,
+    // );
+    // if (w < 1200) {
+    //   return 'small';
+    // } else if (w > 1199 && w < 1600) {
+    //   return 'small';
+    // } else if (w > 1599 && w < 2600) {
+    return undefined;
+    // } else if (w > 2599) return 'large';
+  }
+
   render() {
     const {
       filteredTableData,
@@ -429,57 +446,52 @@ class DifferentialVolcano extends Component {
     } = this.props;
     // if (differentialResultsMounted) {
     const xAxisTransformBox = allowXTransformation ? (
-      <span title="-log10 Transform">
-        <Form.Field
-          control={Checkbox}
-          name="xTransformationCheckbox"
-          checked={doXAxisTransformation}
-          onClick={this.handleTransformationChange.bind(this)}
-        ></Form.Field>
-      </span>
+      <Form.Field
+        control={Checkbox}
+        name="xTransformationCheckbox"
+        checked={doXAxisTransformation}
+        onClick={this.handleTransformationChange.bind(this)}
+      ></Form.Field>
     ) : (
-      <span title="-log10 Transform">
-        <Form.Field
-          control={Checkbox}
-          name="xTransformationCheckbox"
-          checked={false}
-          disabled={true}
-          //checked={doXAxisTransformation}
-          //onClick={this.handleTransformationChange.bind(this)}
-        ></Form.Field>
-      </span>
+      <Form.Field
+        control={Checkbox}
+        name="xTransformationCheckbox"
+        checked={false}
+        disabled={true}
+        //checked={doXAxisTransformation}
+        //onClick={this.handleTransformationChange.bind(this)}
+      ></Form.Field>
     );
     const yAxisTransformBox = allowYTransformation ? (
-      <span title="-log10 Transform">
-        <Form.Field
-          control={Checkbox}
-          name="yTransformationCheckbox"
-          checked={doYAxisTransformation}
-          onClick={this.handleTransformationChange.bind(this)}
-        ></Form.Field>
-      </span>
+      <Form.Field
+        control={Checkbox}
+        name="yTransformationCheckbox"
+        checked={doYAxisTransformation}
+        onClick={this.handleTransformationChange.bind(this)}
+      ></Form.Field>
     ) : (
-      <span title="-log10 Transform">
-        <Form.Field
-          control={Checkbox}
-          name="yTransformationCheckbox"
-          checked={false}
-          disabled={true}
-          //checked={doYAxisTransformation}
-          //onClick={this.handleTransformationChange.bind(this)}
-        ></Form.Field>
-      </span>
+      <Form.Field
+        control={Checkbox}
+        name="yTransformationCheckbox"
+        checked={false}
+        disabled={true}
+        //checked={doYAxisTransformation}
+        //onClick={this.handleTransformationChange.bind(this)}
+      ></Form.Field>
     );
     const svgPlot = this.getSVGPlot();
     let differentialVolcanoCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-Volcano`;
     if (multisetQueriedP) {
       differentialVolcanoCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-${multisetQueriedP}-Volcano`;
     }
+    const dynamicSize = this.getDynamicSize();
+
     return (
       <Grid className="VolcanoPlotGridContainer">
         <Grid.Row className="VolcanoPlotAxisSelectorsRow">
           <Grid.Column
             className="EmptyColumn"
+            mobile={2}
             tablet={4}
             computer={4}
             largeScreen={2}
@@ -487,41 +499,83 @@ class DifferentialVolcano extends Component {
           ></Grid.Column>
           <Grid.Column
             className="VolcanoPlotFilters"
-            tablet={8}
-            computer={16}
+            id="xAxisSelector"
+            mobile={14}
+            tablet={12}
+            computer={6}
             largeScreen={8}
             widescreen={8}
           >
             <Fragment>
-              <Form>
-                <Form.Group>
+              <Form size={dynamicSize}>
+                <Form.Group inline>
+                  <Label className="VolcanoAxisLabel" size={dynamicSize}>
+                    X AXIS
+                  </Label>
                   <Form.Field
                     control={Select}
-                    label="X Axis"
+                    // label="X Axis"
                     name="xAxisSelector"
                     className="axisSelector"
+                    id="xAxisSelector"
                     value={xAxisLabel}
                     options={axisLables}
-                    width={4}
                     onChange={this.handleDropdownChange.bind(this)}
                   ></Form.Field>
-                  {xAxisTransformBox}
+                  <Popup
+                    trigger={
+                      // <Form.Field
+                      //   control={Checkbox}
+                      //   name="xTransformationCheckbox"
+                      //   checked={doXAxisTransformation}
+                      //   onClick={this.handleTransformationChange.bind(this)}
+                      //   disabled={allowXTransformation}
+                      // ></Form.Field>
+                      xAxisTransformBox
+                    }
+                    // style={TableValuePopupStyle}
+                    // className="TablePopupValue"
+                    content="-log10 Transform, X Axis"
+                    inverted
+                    basic
+                  />
+
+                  {/* <Divider vertical></Divider> */}
+                  <Label
+                    className="VolcanoAxisLabel"
+                    id="VolcanoAxisLabelY"
+                    size={dynamicSize}
+                  >
+                    Y AXIS
+                  </Label>
                   <Form.Field
                     control={Select}
-                    label="Y Axis"
+                    // label="Y Axis"
                     name="yAxisSelector"
+                    id="yAxisSelector"
                     className="axisSelector"
                     value={yAxisLabel}
                     options={axisLables}
-                    width={4}
                     onChange={this.handleDropdownChange.bind(this)}
                   ></Form.Field>
-                  {yAxisTransformBox}
-                  {/* <Image
-                      src={excel_logo_custom}
-                      onClick={console.log("Exporting not working")}
-                      style={{ float: 'right', cursor: 'pointer' }}
-                    /> */}
+                  {/* <span title="-log10 Transform"> */}
+                  <Popup
+                    trigger={
+                      // <Form.Field
+                      //   control={Checkbox}
+                      //   name="yTransformationCheckbox"
+                      //   checked={doYAxisTransformation}
+                      //   onClick={this.handleTransformationChange.bind(this)}
+                      //   disabled={allowYTransformation}
+                      // ></Form.Field>
+                      yAxisTransformBox
+                    }
+                    // style={TableValuePopupStyle}
+                    // className="TablePopupValue"
+                    content="-log10 Transform, Y Axis"
+                    inverted
+                    basic
+                  />
                 </Form.Group>
               </Form>
             </Fragment>

@@ -4,6 +4,7 @@ import * as saveSvgAsPng from 'save-svg-as-png';
 // import { excelService } from '../../services/excel.service';
 import { pdfService } from '../../services/pdf.service';
 import './ButtonActions.scss';
+import { toast } from 'react-toastify';
 
 class ButtonActions extends Component {
   static defaultProps = {
@@ -90,19 +91,23 @@ class ButtonActions extends Component {
   };
 
   exportSVG = (svgEl, name) => {
-    svgEl.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-    const svgData = svgEl.outerHTML;
-    const preface = '<?xml version="1.0" standalone="no"?>\r\n';
-    const svgBlob = new Blob([preface, svgData], {
-      type: 'image/svg+xml;charset=utf-8',
-    });
-    const svgUrl = URL.createObjectURL(svgBlob);
-    const downloadLink = document.createElement('a');
-    downloadLink.href = svgUrl;
-    downloadLink.download = name;
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
+    if (svgEl != null) {
+      svgEl.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+      const svgData = svgEl.outerHTML;
+      const preface = '<?xml version="1.0" standalone="no"?>\r\n';
+      const svgBlob = new Blob([preface, svgData], {
+        type: 'image/svg+xml;charset=utf-8',
+      });
+      const svgUrl = URL.createObjectURL(svgBlob);
+      const downloadLink = document.createElement('a');
+      downloadLink.href = svgUrl;
+      downloadLink.download = name;
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+    } else {
+      toast.error("SVG couldn't be created; please try again");
+    }
   };
 
   TextExport = () => {
@@ -122,7 +127,7 @@ class ButtonActions extends Component {
     const excelExport = this.props.refFwd?.current?.qhGridRef.current ?? null;
     if (excelExport != null) {
       excelExport.exportExcel(
-        `${this.props.tab}_${this.props.study}_${this.props.model}_${this.props.test}`,
+        `${this.props.tab}-${this.props.study}-${this.props.model}-${this.props.test}`,
       );
     }
   };

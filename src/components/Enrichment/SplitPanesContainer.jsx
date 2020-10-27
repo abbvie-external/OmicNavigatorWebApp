@@ -7,7 +7,7 @@ import ButtonActions from '../Shared/ButtonActions';
 import SplitPane from 'react-split-pane';
 import './SplitPanesContainer.scss';
 import SVGPlot from '../Shared/SVGPlot';
-import BarcodePlotReact from './BarcodePlotReact';
+import BarcodePlot from './BarcodePlot';
 import ViolinPlot from './ViolinPlot';
 import FilteredDifferentialTable from './FilteredDifferentialTable';
 
@@ -45,7 +45,7 @@ class SplitPanesContainer extends Component {
       );
     } else {
       return (
-        <BarcodePlotReact
+        <BarcodePlot
           className="BarcodePlotContainer"
           {...this.state}
           {...this.props}
@@ -94,10 +94,10 @@ class SplitPanesContainer extends Component {
   getViolinAndTable = () => {
     const {
       displayViolinPlot,
-      tab,
-      enrichmentStudy,
-      enrichmentModel,
-      enrichmentAnnotation,
+      // tab,
+      // enrichmentStudy,
+      // enrichmentModel,
+      // enrichmentAnnotation,
     } = this.props;
     const { activeViolinTableIndex } = this.state;
     const violinPlot = this.getViolinPlot();
@@ -176,7 +176,7 @@ class SplitPanesContainer extends Component {
           pdfVisible={false}
           svgVisible={true}
           txtVisible={false}
-          plot={`svg-${this.props.violinSettings.id}`}
+          plot={this.props.violinSettings.id}
           exportButtonSize={'mini'}
         />
       );

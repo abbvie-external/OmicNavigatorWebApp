@@ -967,6 +967,7 @@ class Differential extends Component {
 
   getTableAndPlotPanes = () => {
     const {
+      tab,
       differentialStudy,
       differentialModel,
       differentialTest,
@@ -985,6 +986,9 @@ class Differential extends Component {
     if (multisetQueriedP) {
       differentialCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-${multisetQueriedP}`;
     }
+    const differentialSortedFilteredData =
+      this.differentialGridRef.current?.qhGridRef.current?.getSortedData() ||
+      [];
     return [
       {
         menuItem: (
@@ -1010,6 +1014,22 @@ class Differential extends Component {
             {/* <div id="DifferentialGrid"> */}
             <Grid>
               <Grid.Row>
+                <div className="FloatRight AbsoluteExport">
+                  <ButtonActions
+                    excelVisible={true}
+                    pngVisible={false}
+                    pdfVisible={false}
+                    svgVisible={false}
+                    txtVisible={true}
+                    refFwd={this.differentialGridRef}
+                    data={differentialSortedFilteredData}
+                    // plot={'enrichmentData'}
+                    tab={tab}
+                    study={differentialStudy}
+                    model={differentialModel}
+                    test={differentialTest}
+                  />
+                </div>
                 <Grid.Column
                   className="ResultsTableWrapper"
                   mobile={16}
@@ -1028,7 +1048,7 @@ class Differential extends Component {
                     // onInformItemsPerPage={
                     //   this.informItemsPerPageDifferentialTable
                     // }
-                    exportBaseName="Differential_Analysis"
+                    // exportBaseName="Differential_Analysis"
                     loading={isVolcanoTableLoading}
                     // quickViews={quickViews}
                     // disableGeneralSearch
