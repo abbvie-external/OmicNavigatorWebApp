@@ -108,6 +108,14 @@ class ButtonActions extends Component {
   TextExport = () => {
     debugger;
     const enrichmentResults = this.props.data;
+    //const copy = JSON.stringify(enrichmentResults);
+    const jsonToTxt = require('json-to-txt');
+    const dataInString = jsonToTxt({ data: enrichmentResults });
+    var a = document.createElement('a');
+    var file = new Blob([dataInString], { type: 'text/plain' });
+    a.href = URL.createObjectURL(file);
+    a.download = 'json.txt';
+    a.click();
   };
 
   ExcelExport = () => {
