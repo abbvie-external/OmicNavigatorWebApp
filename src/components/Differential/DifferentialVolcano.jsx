@@ -17,6 +17,7 @@ import {
   Label,
   // Divider,
 } from 'semantic-ui-react';
+import ButtonActions from '../Shared/ButtonActions';
 import './DifferentialVolcano.scss';
 import SplitPane from 'react-split-pane';
 
@@ -443,6 +444,7 @@ class DifferentialVolcano extends Component {
       differentialModel,
       differentialTest,
       multisetQueriedP,
+      tab,
     } = this.props;
     // if (differentialResultsMounted) {
     const xAxisTransformBox = allowXTransformation ? (
@@ -485,6 +487,10 @@ class DifferentialVolcano extends Component {
       differentialVolcanoCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-${multisetQueriedP}-Volcano`;
     }
     const dynamicSize = this.getDynamicSize();
+
+    const volcanoSortedFilteredData =
+      this.volcanoPlotFilteredGridRef.current?.qhGridRef.current?.getSortedData() ||
+      [];
 
     return (
       <Grid className="VolcanoPlotGridContainer">
@@ -614,42 +620,60 @@ class DifferentialVolcano extends Component {
                 ></DifferentialVolcanoPlot>
                 {svgPlot}
               </SplitPane>
-              <EZGrid
-                ref={this.volcanoPlotFilteredGridRef}
-                uniqueCacheKey={differentialVolcanoCacheKey}
-                className="volcanoPlotTable"
-                // note, default is 70vh; if you want a specific vh, specify like "40vh"; "auto" lets the height flow based on items per page
-                // height="auto"
-                height="40vh"
-                data={filteredTableData}
-                totalRows={volcanoPlotRows}
-                columnsConfig={differentialColumns}
-                itemsPerPage={itemsPerPageVolcanoTable}
-                // onInformItemsPerPage={this.informItemsPerPageVolcanoTable}
-                // disableGeneralSearch
-                disableGrouping
-                disableColumnVisibilityToggle
-                exportBaseName="VolcanoPlot_Filtered_Results"
-                loading={isDifferentialTableLoading}
-                additionalTemplateInfo={additionalTemplateInfoDifferentialTable}
-                onRowClick={this.handleRowClick}
-                rowLevelPropsCalc={this.rowLevelPropsCalc}
-                emptyMessage={CustomEmptyMessage}
-              />
+              <Grid.Row>
+                <div className="FloatRight AbsoluteExport">
+                  <ButtonActions
+                    excelVisible={true}
+                    pngVisible={false}
+                    pdfVisible={false}
+                    svgVisible={false}
+                    txtVisible={true}
+                    refFwd={this.volcanoPlotFilteredGridRef}
+                    data={volcanoSortedFilteredData}
+                    tab={tab}
+                    study={differentialStudy}
+                    model={differentialModel}
+                    test={differentialTest}
+                  />
+                </div>
+                <Grid.Column
+                  className=""
+                  mobile={16}
+                  tablet={16}
+                  largeScreen={16}
+                  widescreen={16}
+                >
+                  <EZGrid
+                    ref={this.volcanoPlotFilteredGridRef}
+                    uniqueCacheKey={differentialVolcanoCacheKey}
+                    className="volcanoPlotTable"
+                    // note, default is 70vh; if you want a specific vh, specify like "40vh"; "auto" lets the height flow based on items per page
+                    // height="auto"
+                    height="40vh"
+                    data={filteredTableData}
+                    totalRows={volcanoPlotRows}
+                    columnsConfig={differentialColumns}
+                    itemsPerPage={itemsPerPageVolcanoTable}
+                    // onInformItemsPerPage={this.informItemsPerPageVolcanoTable}
+                    // disableGeneralSearch
+                    disableGrouping
+                    disableColumnVisibilityToggle
+                    // exportBaseName="VolcanoPlot_Filtered_Results"
+                    loading={isDifferentialTableLoading}
+                    additionalTemplateInfo={
+                      additionalTemplateInfoDifferentialTable
+                    }
+                    onRowClick={this.handleRowClick}
+                    rowLevelPropsCalc={this.rowLevelPropsCalc}
+                    emptyMessage={CustomEmptyMessage}
+                  />
+                </Grid.Column>
+              </Grid.Row>
             </SplitPane>
           </Grid.Column>
         </Grid.Row>
       </Grid>
     );
-    // } else {
-    //   return (
-    //     <div>
-    //       <Dimmer active inverted>
-    //         <Loader size="large">Plots are Loading</Loader>
-    //       </Dimmer>
-    //     </div>
-    //   );
-    // }
   }
 }
 export default DifferentialVolcano;
