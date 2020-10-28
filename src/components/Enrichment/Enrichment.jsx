@@ -192,7 +192,7 @@ class Enrichment extends Component {
       parseInt(localStorage.getItem('itemsPerPageEnrichmentTable'), 10) || 45,
   };
   EnrichmentViewContainerRef = React.createRef();
-  enrichmentGridRef = React.createRef();
+  EnrichmentGridRef = React.createRef();
 
   componentDidMount() {
     this.getTableHelpers(this.testSelectedTransition, this.showBarcodePlot);
@@ -1884,7 +1884,7 @@ class Enrichment extends Component {
                     pdfVisible={false}
                     svgVisible={false}
                     txtVisible={true}
-                    refFwd={this.enrichmentGridRef}
+                    refFwd={this.EnrichmentGridRef}
                     exportButtonSize={'medium'}
                     tab={tab}
                     study={enrichmentStudy}
@@ -1900,7 +1900,7 @@ class Enrichment extends Component {
                   widescreen={16}
                 >
                   <EZGrid
-                    ref={this.enrichmentGridRef}
+                    ref={this.EnrichmentGridRef}
                     uniqueCacheKey={enrichmentCacheKey}
                     data={enrichmentResults}
                     columnsConfig={enrichmentColumns}
