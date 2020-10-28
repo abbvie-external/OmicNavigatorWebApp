@@ -1023,7 +1023,7 @@ class Differential extends Component {
                     txtVisible={true}
                     refFwd={this.differentialGridRef}
                     data={differentialSortedFilteredData}
-                    // plot={'enrichmentData'}
+                    exportButtonSize={'medium'}
                     tab={tab}
                     study={differentialStudy}
                     model={differentialModel}

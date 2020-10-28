@@ -31,6 +31,7 @@
   background-color: var(--color-dark) !important;
   color: var(--color-light) !important;
   padding: 11px 10px !important;
+  min-width: 75px;
 }
 
 #VolcanoAxisLabelY {
@@ -54,6 +55,20 @@
   padding-bottom: 0px !important;
 }
 
+// .VolcanoTransformationCheckbox,
+
+.VolcanoPlotAxisSelectorsRow {
+  .ui.checkbox label:before {
+    // border: 1px solid #d4d4d5 !important;
+    border: 1px solid black !important;
+    opacity: 1 !important;
+  }
+  .ui.disabled.checkbox label:before {
+    // border: 1px solid #d4d4d5 !important;
+    border: 1px solid var(--color-dark) !important;
+    opacity: 1 !important;
+  }
+}
 #volcanoViewRow {
   padding-bottom: 0px !important;
 

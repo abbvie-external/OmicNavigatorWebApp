@@ -408,17 +408,17 @@ class DifferentialVolcano extends Component {
   };
 
   getDynamicSize() {
-    // let w = Math.max(
-    //   document.documentElement.clientWidth,
-    //   window.innerWidth || 0,
-    // );
-    // if (w < 1200) {
-    //   return 'small';
-    // } else if (w > 1199 && w < 1600) {
-    //   return 'small';
-    // } else if (w > 1599 && w < 2600) {
-    return undefined;
-    // } else if (w > 2599) return 'large';
+    let w = Math.max(
+      document.documentElement.clientWidth,
+      window.innerWidth || 0,
+    );
+    if (w < 1200) {
+      return 'small';
+    } else if (w > 1199 && w < 1600) {
+      return 'small';
+    } else if (w > 1599 && w < 2600) {
+      return undefined;
+    } else if (w > 2599) return 'large';
   }
 
   render() {
@@ -451,6 +451,7 @@ class DifferentialVolcano extends Component {
       <Form.Field
         control={Checkbox}
         name="xTransformationCheckbox"
+        class="VolcanoTransformationCheckbox"
         checked={doXAxisTransformation}
         onClick={this.handleTransformationChange.bind(this)}
       ></Form.Field>
@@ -458,6 +459,7 @@ class DifferentialVolcano extends Component {
       <Form.Field
         control={Checkbox}
         name="xTransformationCheckbox"
+        class="VolcanoTransformationCheckbox"
         checked={false}
         disabled={true}
         //checked={doXAxisTransformation}
@@ -468,6 +470,7 @@ class DifferentialVolcano extends Component {
       <Form.Field
         control={Checkbox}
         name="yTransformationCheckbox"
+        class="VolcanoTransformationCheckbox"
         checked={doYAxisTransformation}
         onClick={this.handleTransformationChange.bind(this)}
       ></Form.Field>
@@ -475,6 +478,7 @@ class DifferentialVolcano extends Component {
       <Form.Field
         control={Checkbox}
         name="yTransformationCheckbox"
+        class="VolcanoTransformationCheckbox"
         checked={false}
         disabled={true}
         //checked={doYAxisTransformation}
@@ -487,6 +491,16 @@ class DifferentialVolcano extends Component {
       differentialVolcanoCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-${multisetQueriedP}-Volcano`;
     }
     const dynamicSize = this.getDynamicSize();
+
+    const TableValuePopupStyle = {
+      backgroundColor: '2E2E2E',
+      borderBottom: '2px solid var(--color-primary)',
+      color: '#FFF',
+      padding: '1em',
+      maxWidth: '50vw',
+      fontSize: '13px',
+      wordBreak: 'break-all',
+    };
 
     const volcanoSortedFilteredData =
       this.volcanoPlotFilteredGridRef.current?.qhGridRef.current?.getSortedData() ||
@@ -539,7 +553,7 @@ class DifferentialVolcano extends Component {
                       // ></Form.Field>
                       xAxisTransformBox
                     }
-                    // style={TableValuePopupStyle}
+                    style={TableValuePopupStyle}
                     // className="TablePopupValue"
                     content="-log10 Transform, X Axis"
                     inverted
@@ -576,7 +590,7 @@ class DifferentialVolcano extends Component {
                       // ></Form.Field>
                       yAxisTransformBox
                     }
-                    // style={TableValuePopupStyle}
+                    style={TableValuePopupStyle}
                     // className="TablePopupValue"
                     content="-log10 Transform, Y Axis"
                     inverted
@@ -629,6 +643,7 @@ class DifferentialVolcano extends Component {
                     svgVisible={false}
                     txtVisible={true}
                     refFwd={this.volcanoPlotFilteredGridRef}
+                    exportButtonSize={'small'}
                     data={volcanoSortedFilteredData}
                     tab={tab}
                     study={differentialStudy}
