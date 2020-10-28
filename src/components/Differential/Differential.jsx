@@ -982,13 +982,13 @@ class Differential extends Component {
       isVolcanoTableLoading,
     } = this.state;
     const differentialRows = differentialResults.length || 1000;
+    // const getExportDataDifferential =
+    //   this.differentialGridRef.current?.qhGridRef.current?.getSortedData() ||
+    //   null;
     let differentialCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}`;
     if (multisetQueriedP) {
       differentialCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-${multisetQueriedP}`;
     }
-    const differentialSortedFilteredData =
-      this.differentialGridRef.current?.qhGridRef.current?.getSortedData() ||
-      [];
     return [
       {
         menuItem: (
@@ -1022,7 +1022,6 @@ class Differential extends Component {
                     svgVisible={false}
                     txtVisible={true}
                     refFwd={this.differentialGridRef}
-                    data={differentialSortedFilteredData}
                     exportButtonSize={'medium'}
                     tab={tab}
                     study={differentialStudy}
@@ -1041,6 +1040,7 @@ class Differential extends Component {
                     ref={this.differentialGridRef}
                     uniqueCacheKey={differentialCacheKey}
                     data={differentialResults}
+                    // getExportData={getExportDataDifferential}
                     columnsConfig={differentialColumns}
                     totalRows={differentialRows}
                     // use "differentialRows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster

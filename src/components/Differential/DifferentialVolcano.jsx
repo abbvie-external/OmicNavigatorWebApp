@@ -451,7 +451,7 @@ class DifferentialVolcano extends Component {
       <Form.Field
         control={Checkbox}
         name="xTransformationCheckbox"
-        class="VolcanoTransformationCheckbox"
+        className="VolcanoTransformationCheckbox"
         checked={doXAxisTransformation}
         onClick={this.handleTransformationChange.bind(this)}
       ></Form.Field>
@@ -459,7 +459,7 @@ class DifferentialVolcano extends Component {
       <Form.Field
         control={Checkbox}
         name="xTransformationCheckbox"
-        class="VolcanoTransformationCheckbox"
+        className="VolcanoTransformationCheckbox"
         checked={false}
         disabled={true}
         //checked={doXAxisTransformation}
@@ -470,7 +470,7 @@ class DifferentialVolcano extends Component {
       <Form.Field
         control={Checkbox}
         name="yTransformationCheckbox"
-        class="VolcanoTransformationCheckbox"
+        className="VolcanoTransformationCheckbox"
         checked={doYAxisTransformation}
         onClick={this.handleTransformationChange.bind(this)}
       ></Form.Field>
@@ -478,7 +478,7 @@ class DifferentialVolcano extends Component {
       <Form.Field
         control={Checkbox}
         name="yTransformationCheckbox"
-        class="VolcanoTransformationCheckbox"
+        className="VolcanoTransformationCheckbox"
         checked={false}
         disabled={true}
         //checked={doYAxisTransformation}
@@ -501,11 +501,6 @@ class DifferentialVolcano extends Component {
       fontSize: '13px',
       wordBreak: 'break-all',
     };
-
-    const volcanoSortedFilteredData =
-      this.volcanoPlotFilteredGridRef.current?.qhGridRef.current?.getSortedData() ||
-      [];
-
     return (
       <Grid className="VolcanoPlotGridContainer">
         <Grid.Row className="VolcanoPlotAxisSelectorsRow">
@@ -644,7 +639,6 @@ class DifferentialVolcano extends Component {
                     txtVisible={true}
                     refFwd={this.volcanoPlotFilteredGridRef}
                     exportButtonSize={'small'}
-                    data={volcanoSortedFilteredData}
                     tab={tab}
                     study={differentialStudy}
                     model={differentialModel}

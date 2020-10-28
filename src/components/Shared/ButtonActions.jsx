@@ -111,11 +111,10 @@ class ButtonActions extends Component {
   };
 
   TextExport = () => {
-    debugger;
-    const enrichmentResults = this.props.data;
-    //const copy = JSON.stringify(enrichmentResults);
+    const sortedData =
+      this.props.refFwd.current?.qhGridRef.current?.getSortedData() || [];
     const jsonToTxt = require('json-to-txt');
-    const dataInString = jsonToTxt({ data: enrichmentResults });
+    const dataInString = jsonToTxt({ data: sortedData });
     var a = document.createElement('a');
     var file = new Blob([dataInString], { type: 'text/plain' });
     a.href = URL.createObjectURL(file);
@@ -125,6 +124,8 @@ class ButtonActions extends Component {
 
   ExcelExport = () => {
     const excelExport = this.props.refFwd?.current?.qhGridRef.current ?? null;
+    // const sortedData =
+    //   this.props.refFwd.current?.qhGridRef.current?.getSortedData() || [];
     if (excelExport != null) {
       excelExport.exportExcel(
         `${this.props.tab}-${this.props.study}-${this.props.model}-${this.props.test}`,

@@ -1885,7 +1885,7 @@ class Enrichment extends Component {
                     svgVisible={false}
                     txtVisible={true}
                     refFwd={this.enrichmentGridRef}
-                    data={enrichmentResults}
+                    exportButtonSize={'medium'}
                     tab={tab}
                     study={enrichmentStudy}
                     model={enrichmentModel}
@@ -2065,7 +2065,12 @@ class Enrichment extends Component {
   render() {
     const enrichmentView = this.getView();
     const { multisetPlotInfo, animation, direction, visible } = this.state;
-    const { tab, enrichmentStudy, enrichmentModel } = this.props;
+    const {
+      tab,
+      enrichmentStudy,
+      enrichmentModel,
+      enrichmentAnnotation,
+    } = this.props;
     const VerticalSidebar = ({ animation, visible }) => (
       <Sidebar
         as={'div'}
@@ -2095,6 +2100,7 @@ class Enrichment extends Component {
                 tab={tab}
                 study={enrichmentStudy}
                 model={enrichmentModel}
+                test={enrichmentAnnotation}
               />
             </Grid.Column>
           </Grid.Row>
