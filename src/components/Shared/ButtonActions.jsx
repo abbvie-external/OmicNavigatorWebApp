@@ -118,14 +118,12 @@ class ButtonActions extends Component {
     var a = document.createElement('a');
     var file = new Blob([dataInString], { type: 'text/plain' });
     a.href = URL.createObjectURL(file);
-    a.download = 'json.txt';
+    a.download = `${this.props.tab}-${this.props.study}-${this.props.model}-${this.props.test}`;
     a.click();
   };
 
   ExcelExport = () => {
     const excelExport = this.props.refFwd?.current?.qhGridRef.current ?? null;
-    // const sortedData =
-    //   this.props.refFwd.current?.qhGridRef.current?.getSortedData() || [];
     if (excelExport != null) {
       excelExport.exportExcel(
         `${this.props.tab}-${this.props.study}-${this.props.model}-${this.props.test}`,
