@@ -44,7 +44,12 @@ class FilteredDifferentialTable extends Component {
     if (
       this.props.barcodeSettings.brushedData !==
         prevProps.barcodeSettings.brushedData ||
-      this.state.filteredBarcodeData !== prevState.filteredBarcodeData
+      !_.isEqual(
+        _.sortBy(this.state.filteredBarcodeData),
+        _.sortBy(prevState.filteredBarcodeData),
+      )
+
+      // this.state.filteredBarcodeData !== prevState.filteredBarcodeData
     ) {
       this.getTableData();
     }
@@ -53,6 +58,7 @@ class FilteredDifferentialTable extends Component {
       this.props.filteredDifferentialFeatureIdKey !==
       prevProps.filteredDifferentialFeatureIdKey
     ) {
+      debugger;
       this.setState(
         {
           additionalTemplateInfo: {},
@@ -65,6 +71,7 @@ class FilteredDifferentialTable extends Component {
     }
 
     if (this.props.HighlightedProteins !== prevProps.HighlightedProteins) {
+      debugger;
       this.highlightRows(this.props.HighlightedProteins, this.state.rowClicked);
     }
   }
@@ -183,6 +190,7 @@ class FilteredDifferentialTable extends Component {
       }
     }
     const alphanumericTrigger = filteredDifferentialAlphanumericFields[0];
+    debugger;
     this.props.onHandleDifferentialFeatureIdKey(
       'filteredDifferentialFeatureIdKey',
       alphanumericTrigger,
