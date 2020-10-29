@@ -19,6 +19,10 @@ class ButtonActions extends Component {
   PNGExport = () => {
     if (this.props.imageInfo == null) {
       let PlotName = `${this.props.plot}.png`;
+      // for Barcode, Violin
+      if (this.props.description != null) {
+        PlotName = `${this.props.plot}_${this.props.description}`;
+      }
       if (this.props.study != null) {
         // for Multiset Analysis
         PlotName = `${this.props.study}_${this.props.model}_MultisetPlot.png`;
@@ -62,6 +66,10 @@ class ButtonActions extends Component {
   SVGExport = () => {
     if (this.props.imageInfo == null) {
       let PlotName = `${this.props.plot}.svg`;
+      // for Barcode, Violin
+      if (this.props.description != null) {
+        PlotName = `${this.props.plot}_${this.props.description}`;
+      }
       if (this.props.study != null) {
         // for Multiset Analysis
         PlotName = `${this.props.study}_${this.props.model}_MultisetPlot.svg`;
@@ -131,6 +139,7 @@ class ButtonActions extends Component {
   };
 
   PDFExport = () => {
+    debugger;
     console.log(this.props);
     const isMultisetPlot = this.props.visible;
     if (isMultisetPlot) {

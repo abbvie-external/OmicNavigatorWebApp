@@ -499,6 +499,7 @@ class BarcodePlot extends Component {
             svgVisible={true}
             txtVisible={false}
             plot={'BarcodeChart'}
+            description={this.props.imageInfo.key}
           />
         </div>
         <svg

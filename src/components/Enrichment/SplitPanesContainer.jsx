@@ -185,6 +185,7 @@ class SplitPanesContainer extends Component {
           txtVisible={false}
           plot={this.props.violinSettings.id}
           exportButtonSize={'mini'}
+          description={imageInfo.key}
         />
       );
     return (
