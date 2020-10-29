@@ -29,7 +29,6 @@ class ButtonActions extends Component {
         scale: 2,
       });
     } else if (this.props.plot === 'differentialVolcanoPlot') {
-      debugger;
       const currentSVG = document.getElementById(this.props.plot) || null;
       const ProteinPlotName = 'Volcano.png';
       saveSvgAsPng.saveSvgAsPng(currentSVG, ProteinPlotName, {
