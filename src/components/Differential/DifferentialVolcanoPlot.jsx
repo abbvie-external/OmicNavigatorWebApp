@@ -333,7 +333,7 @@ class DifferentialVolcanoPlot extends Component {
     const yScale = d3
       .scaleLinear()
       .domain([Math.min(...yMM), Math.max(...yMM) * 1.1])
-      .range([volcanoHeight * 0.9, 0]);
+      .range([volcanoHeight * 0.85, 0]);
 
     const yAxis = (
       <line
@@ -349,8 +349,8 @@ class DifferentialVolcanoPlot extends Component {
         className="volcanoPlotXAxis"
         x1={0}
         x2={volcanoWidth}
-        y1={volcanoHeight - volcanoHeight * 0.1}
-        y2={volcanoHeight - volcanoHeight * 0.1}
+        y1={volcanoHeight - volcanoHeight * 0.15}
+        y2={volcanoHeight - volcanoHeight * 0.15}
       />
     );
 
@@ -368,7 +368,7 @@ class DifferentialVolcanoPlot extends Component {
         }
         className="individualTick"
         transform={`translate(${xOffset}, ${volcanoHeight -
-          volcanoHeight * 0.1})`}
+          volcanoHeight * 0.15})`}
       >
         <line y2="8" stroke="currentColor" />
         <text
