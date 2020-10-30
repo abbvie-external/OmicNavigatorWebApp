@@ -21,7 +21,7 @@ class ButtonActions extends Component {
       let PlotName = `${this.props.plot}.png`;
       // for Barcode, Violin
       if (this.props.description != null) {
-        PlotName = `${this.props.plot}_${this.props.description}`;
+        PlotName = `${this.props.plot}_${this.props.description}.png`;
       }
       if (this.props.study != null) {
         // for Multiset Analysis
@@ -68,7 +68,7 @@ class ButtonActions extends Component {
       let PlotName = `${this.props.plot}.svg`;
       // for Barcode, Violin
       if (this.props.description != null) {
-        PlotName = `${this.props.plot}_${this.props.description}`;
+        PlotName = `${this.props.plot}_${this.props.description}.svg`;
       }
       if (this.props.study != null) {
         // for Multiset Analysis

@@ -5,6 +5,7 @@ import ButtonActions from '../Shared/ButtonActions';
 import './BarcodePlot.scss';
 // import Tooltip from "./useTooltip";
 import * as d3 from 'd3';
+import { startCase } from 'lodash';
 // import * as _ from "lodash";
 
 class BarcodePlot extends Component {
@@ -16,7 +17,9 @@ class BarcodePlot extends Component {
     hoveredLineName: null,
     highlightedLineName: null,
     tooltipPosition: null,
+    tooltipPositionMax: null,
     tooltipTextAnchor: 'start',
+    tooltipTextAnchorMax: 'start',
     // initialLoad: true,
     settings: {
       // brushing: false,
@@ -96,20 +99,20 @@ class BarcodePlot extends Component {
               statistic: MaxFeatureElement.attr('statistic') || null,
             };
             const statistic = MaxFeatureLineData.statistic;
-            const textAnchor =
+            const textAnchorMax =
               statistic > this.props.barcodeSettings.highStat / 2
                 ? 'end'
                 : 'start';
-            const ttPosition =
-              textAnchor === 'end'
+            const ttPositionMax =
+              textAnchorMax === 'end'
                 ? MaxFeatureLineData.x2 - 5
                 : MaxFeatureLineData.x2 + 5;
             this.setState({
               hoveredLineId: null,
               hoveredLineName: null,
               highlightedLineName: MaxFeatureLineData.lineID,
-              tooltipPosition: ttPosition,
-              tooltipTextAnchor: textAnchor,
+              tooltipPositionMax: ttPositionMax,
+              tooltipTextAnchorMax: textAnchorMax,
             });
           }
         }
@@ -166,6 +169,7 @@ class BarcodePlot extends Component {
     // const lineId = `#barcode-line-${lineName}`;
     const lineId = `#barcode-line-${lineIdMult}`;
     const hoveredLine = d3.select(lineId);
+    debugger;
     if (hoveredLine.attr('class').endsWith('selected')) {
       hoveredLine.attr('y1', this.state.settings.margin.hovered - 10);
     } else if (hoveredLine.attr('class').endsWith('MaxLine')) {
@@ -177,10 +181,13 @@ class BarcodePlot extends Component {
         .classed('HoveredLine', true)
         .attr('y1', this.state.settings.margin.hovered);
     }
-
+    if (lineIdMult !== this.state.highlightedLineName) {
+      this.setState({
+        hoveredLineId: lineId,
+        hoveredLineName: lineName,
+      });
+    }
     this.setState({
-      hoveredLineId: lineId,
-      hoveredLineName: lineName,
       tooltipPosition: textPosition,
       tooltipTextAnchor: textAnchor,
     });
@@ -286,18 +293,20 @@ class BarcodePlot extends Component {
             .attr('style', 'stroke:#FF4400;stroke-width:3.5')
             .attr('y1', settings.margin.max);
           const statistic = maxLineObject.statistic;
-          const textAnchor =
+          const textAnchorMax =
             statistic > self.props.barcodeSettings.highStat / 2
               ? 'end'
               : 'start';
-          const ttPosition =
-            textAnchor === 'end' ? maxLineObject.x2 - 5 : maxLineObject.x2 + 5;
+          const ttPositionMax =
+            textAnchorMax === 'end'
+              ? maxLineObject.x2 - 5
+              : maxLineObject.x2 + 5;
           self.setState({
             hoveredLineId: null,
             hoveredLineName: null,
             highlightedLineName: maxLineObject.lineID,
-            tooltipPosition: ttPosition,
-            tooltipTextAnchor: textAnchor,
+            tooltipPositionMax: ttPositionMax,
+            tooltipTextAnchorMax: textAnchorMax,
           });
         }
       }
@@ -384,12 +393,7 @@ class BarcodePlot extends Component {
   }
 
   getTooltip = () => {
-    const {
-      hoveredLineName,
-      highlightedLineName,
-      tooltipPosition,
-      tooltipTextAnchor,
-    } = this.state;
+    const { hoveredLineName, tooltipPosition, tooltipTextAnchor } = this.state;
 
     if (tooltipPosition) {
       if (hoveredLineName) {
@@ -406,13 +410,23 @@ class BarcodePlot extends Component {
           </text>
         );
       }
+    }
+  };
+
+  getMaxTooltip = () => {
+    const {
+      highlightedLineName,
+      tooltipPositionMax,
+      tooltipTextAnchorMax,
+    } = this.state;
+    if (tooltipPositionMax) {
       if (highlightedLineName) {
         return (
           <text
             className="BarcodeTooltipText"
-            transform={`translate(${tooltipPosition}, 15)`}
+            transform={`translate(${tooltipPositionMax}, 15)`}
             fontSize="14px"
-            textAnchor={tooltipTextAnchor}
+            textAnchor={tooltipTextAnchorMax}
             fontFamily="Lato, Helvetica Neue, Arial, Helvetica, sans-serif"
           >
             {highlightedLineName}
@@ -423,7 +437,6 @@ class BarcodePlot extends Component {
 
     return null;
   };
-
   render() {
     const { barcodeWidth, barcodeContainerWidth, settings } = this.state;
 
@@ -487,6 +500,7 @@ class BarcodePlot extends Component {
     ));
 
     const tooltip = this.getTooltip();
+    const maxTooltip = this.getMaxTooltip();
 
     return (
       <div ref={this.barcodeContainerRef} id="BarcodeChartContainer">
@@ -556,6 +570,7 @@ class BarcodePlot extends Component {
           {/* Barcode Lines & Tooltip */}
           {barcodeLines}
           {tooltip}
+          {maxTooltip}
         </svg>
       </div>
     );
