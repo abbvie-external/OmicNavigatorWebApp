@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import _ from 'lodash';
 import './DifferentialVolcanoPlot.scss';
 import * as d3 from 'd3';
 import ButtonActions from '../Shared/ButtonActions';
@@ -29,14 +30,22 @@ class DifferentialVolcanoPlot extends Component {
       volcanoDifferentialTableRowMax,
     } = this.props;
     if (
-      volcanoDifferentialTableRowOther !==
-        prevProps.volcanoDifferentialTableRowOther ||
+      !_.isEqual(
+        _.sortBy(volcanoDifferentialTableRowOther),
+        _.sortBy(prevProps.volcanoDifferentialTableRowOther),
+      ) ||
       volcanoDifferentialTableRowMax !==
         prevProps.volcanoDifferentialTableRowMax
     ) {
       const circles = d3.selectAll('circle.volcanoPlot-dataPoint').attr('r', 2);
-      circles.classed('highlighted', false);
-      circles.classed('highlightedMax', false);
+      circles
+        .attr('style', 'stroke:#000000;strokeWidth: 0.4;fill: #1678c2')
+        .classed('highlighted', false);
+
+      circles
+        //.attr('style', 'fill: #ff4400')
+        .classed('highlightedMax', false);
+
       if (volcanoDifferentialTableRowOther.length > 0) {
         volcanoDifferentialTableRowOther.forEach(element => {
           const highlightedCircleId = document.getElementById(
@@ -45,7 +54,9 @@ class DifferentialVolcanoPlot extends Component {
           const highlightedCircle = d3.select(highlightedCircleId);
           if (highlightedCircle != null) {
             highlightedCircle.attr('r', 3);
-            highlightedCircle.classed('highlighted', true);
+            highlightedCircle
+              .attr('style', 'stroke:#000000;strokeWidth: 1;fill: #ff7e05')
+              .classed('highlighted', true);
             highlightedCircle.raise();
           }
         });
@@ -57,7 +68,9 @@ class DifferentialVolcanoPlot extends Component {
         const maxCircle = d3.select(maxCircleId);
         if (maxCircle != null) {
           maxCircle.attr('r', 5);
-          maxCircle.classed('highlightedMax', true);
+          maxCircle
+            .attr('style', 'fill: #ff4400')
+            .classed('highlightedMax', true);
           maxCircle.raise();
         }
       }
@@ -76,8 +89,11 @@ class DifferentialVolcanoPlot extends Component {
 
   unhighlightBrushedCircles = () => {
     const circles = d3.selectAll('circle.volcanoPlot-dataPoint');
-    circles.classed('selected', false);
-    circles.classed('highlighted', false);
+    circles //.attr('style', 'fill: #00aeff')
+      .attr('style', 'stroke:#000000;strokeWidth: 0.4;fill: #1678c2')
+      .classed('selected', false);
+    circles //.attr('style', 'stroke:#000000;strokeWidth: 1;fill: #ff7e05')
+      .classed('highlighted', false);
   };
   handleCircleHover = e => {
     const hoveredData = {
@@ -94,7 +110,10 @@ class DifferentialVolcanoPlot extends Component {
     );
     const circle = d3.select(hovered) ?? null;
     if (circle != null) {
-      circle.classed('hovered', true).raise();
+      circle
+        .attr('style', 'stroke:#00aeff;strokeWidth: 5')
+        .classed('hovered', true);
+      circle.raise();
       this.setState({
         hoveredCircleData: hoveredData,
         hovering: true,
@@ -102,7 +121,10 @@ class DifferentialVolcanoPlot extends Component {
     }
   };
   handleCircleLeave() {
-    d3.selectAll('circle.volcanoPlot-dataPoint').classed('hovered', false);
+    d3.selectAll('circle.volcanoPlot-dataPoint')
+      //.attr('style', 'stroke:#00aef;strokeWidth: 5')
+      .attr('style', 'stroke:#000000;strokeWidth: 0.4;fill: #1678c2')
+      .classed('hovered', false);
     this.setState({
       hoveredCircleData: {
         position: [],
@@ -210,6 +232,8 @@ class DifferentialVolcanoPlot extends Component {
 
         const circles = d3
           .selectAll('circle.volcanoPlot-dataPoint')
+          //.attr('style', 'fill: #00aeff')
+          .attr('style', 'stroke:#000000;strokeWidth: 0.4;fill: #1678c2')
           .classed('selected', false);
 
         const brushed = circles
@@ -218,8 +242,9 @@ class DifferentialVolcanoPlot extends Component {
             const y = d3.select(this).attr('cy');
             return isBrushed(x, y);
           })
+          .attr('style', 'fill: #00aeff')
           .classed('selected', true);
-
+        debugger;
         const brushedDataArr = brushed._groups[0].map(a => {
           return JSON.parse(a.attributes.data.value);
         });
@@ -446,6 +471,7 @@ class DifferentialVolcanoPlot extends Component {
         circleid={`${val[identifier]}`}
         key={`${val[identifier] + '_' + index}`}
         data={`${JSON.stringify(val)}`}
+        style={{ stroke: '#000000', strokeWidth: 0.4, fill: '#1678c2' }}
         onMouseEnter={e => this.handleCircleHover(e)}
         onMouseLeave={() => this.handleCircleLeave()}
         onClick={e =>
@@ -482,6 +508,8 @@ class DifferentialVolcanoPlot extends Component {
               plot={this.state.plotName}
               excelVisible={false}
               pdfVisible={false}
+              pngVisible={true}
+              svgVisible={true}
               exportButtonSize="mini"
             />
           </div>
