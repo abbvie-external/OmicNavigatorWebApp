@@ -145,7 +145,8 @@ class Enrichment extends Component {
         yAxis: "log<tspan baseline-shift='sub' font-size='14px'>2</tspan>FC",
       },
       // axisLabels: { xAxis: this.term, yAxis: "log<tspan baseline-shift='sub' font-size='14px'>2</tspan>(FC)" },
-      id: 'violinChart',
+      parentId: 'ViolinChartParent',
+      id: 'ViolinChart',
       pointUniqueId: 'sample',
       pointValue: 'cpm',
       title: '',
@@ -191,6 +192,7 @@ class Enrichment extends Component {
       parseInt(localStorage.getItem('itemsPerPageEnrichmentTable'), 10) || 45,
   };
   EnrichmentViewContainerRef = React.createRef();
+  EnrichmentGridRef = React.createRef();
 
   componentDidMount() {
     this.getTableHelpers(this.testSelectedTransition, this.showBarcodePlot);
@@ -1824,6 +1826,7 @@ class Enrichment extends Component {
 
   getTableAndNetworkPanes = () => {
     const {
+      tab,
       enrichmentStudy,
       enrichmentModel,
       enrichmentAnnotation,
@@ -1834,6 +1837,9 @@ class Enrichment extends Component {
       additionalTemplateInfoEnrichmentTable,
       itemsPerPageEnrichmentTable,
       multisetQueriedE,
+      activeIndexEnrichmentView,
+      isEnrichmentTableLoading,
+      networkDataError,
     } = this.state;
     let enrichmentCacheKey = `${enrichmentStudy}-${enrichmentModel}-${enrichmentAnnotation}-${multisetQueriedE}`;
     return [
@@ -1845,7 +1851,7 @@ class Enrichment extends Component {
             name="table"
             color="orange"
             // active={this.state.activeIndexEnrichmentView === 0}
-            inverted={(this.state.activeIndexEnrichmentView === 0).toString()}
+            inverted={(activeIndexEnrichmentView === 0).toString()}
           >
             {/* <Icon
               name="table"
@@ -1855,9 +1861,7 @@ class Enrichment extends Component {
             /> */}
             <img
               src={
-                this.state.activeIndexEnrichmentView === 0
-                  ? tableIconSelected
-                  : tableIcon
+                activeIndexEnrichmentView === 0 ? tableIconSelected : tableIcon
               }
               alt="Table Icon"
               id="TableButton"
@@ -1873,6 +1877,21 @@ class Enrichment extends Component {
           >
             <Grid>
               <Grid.Row>
+                <div className="FloatRight AbsoluteExport">
+                  <ButtonActions
+                    excelVisible={true}
+                    pngVisible={false}
+                    pdfVisible={false}
+                    svgVisible={false}
+                    txtVisible={true}
+                    refFwd={this.EnrichmentGridRef}
+                    exportButtonSize={'medium'}
+                    tab={tab}
+                    study={enrichmentStudy}
+                    model={enrichmentModel}
+                    test={enrichmentAnnotation}
+                  />
+                </div>
                 <Grid.Column
                   className="ResultsTableWrapper"
                   mobile={16}
@@ -1881,6 +1900,7 @@ class Enrichment extends Component {
                   widescreen={16}
                 >
                   <EZGrid
+                    ref={this.EnrichmentGridRef}
                     uniqueCacheKey={enrichmentCacheKey}
                     data={enrichmentResults}
                     columnsConfig={enrichmentColumns}
@@ -1890,8 +1910,8 @@ class Enrichment extends Component {
                     // onInformItemsPerPage={
                     //   this.informItemsPerPageEnrichmentTable
                     // }
-                    loading={this.state.isEnrichmentTableLoading}
-                    exportBaseName="Enrichment_Analysis"
+                    loading={isEnrichmentTableLoading}
+                    // exportBaseName="Enrichment_Analysis"
                     // columnReorder={this.props.columnReorder}
                     disableColumnReorder
                     disableGrouping
@@ -1917,7 +1937,7 @@ class Enrichment extends Component {
           >
             <img
               src={
-                this.state.activeIndexEnrichmentView === 1
+                activeIndexEnrichmentView === 1
                   ? networkIconSelected
                   : networkIcon
               }
@@ -1933,7 +1953,7 @@ class Enrichment extends Component {
             id="EnrichmentContentPane"
             // ref="EnrichmentContentPaneGraph"
           >
-            {!this.state.networkDataError ? (
+            {!networkDataError ? (
               <EnrichmentResultsGraph
                 {...this.props}
                 {...this.state}
@@ -2045,7 +2065,12 @@ class Enrichment extends Component {
   render() {
     const enrichmentView = this.getView();
     const { multisetPlotInfo, animation, direction, visible } = this.state;
-    const { tab, enrichmentStudy, enrichmentModel } = this.props;
+    const {
+      tab,
+      enrichmentStudy,
+      enrichmentModel,
+      enrichmentAnnotation,
+    } = this.props;
     const VerticalSidebar = ({ animation, visible }) => (
       <Sidebar
         as={'div'}
@@ -2075,6 +2100,7 @@ class Enrichment extends Component {
                 tab={tab}
                 study={enrichmentStudy}
                 model={enrichmentModel}
+                test={enrichmentAnnotation}
               />
             </Grid.Column>
           </Grid.Row>

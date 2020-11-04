@@ -92,7 +92,7 @@ class Differential extends Component {
     itemsPerPageDifferentialTable:
       parseInt(localStorage.getItem('itemsPerPageDifferentialTable'), 10) || 45,
   };
-  DifferentialViewContainerRef = React.createRef();
+  differentialViewContainerRef = React.createRef();
   differentialGridRef = React.createRef();
 
   componentDidMount() {
@@ -967,6 +967,7 @@ class Differential extends Component {
 
   getTableAndPlotPanes = () => {
     const {
+      tab,
       differentialStudy,
       differentialModel,
       differentialTest,
@@ -981,6 +982,9 @@ class Differential extends Component {
       isVolcanoTableLoading,
     } = this.state;
     const differentialRows = differentialResults.length || 1000;
+    // const getExportDataDifferential =
+    //   this.differentialGridRef.current?.qhGridRef.current?.getSortedData() ||
+    //   null;
     let differentialCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}`;
     if (multisetQueriedP) {
       differentialCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-${multisetQueriedP}`;
@@ -1010,6 +1014,21 @@ class Differential extends Component {
             {/* <div id="DifferentialGrid"> */}
             <Grid>
               <Grid.Row>
+                <div className="FloatRight AbsoluteExport">
+                  <ButtonActions
+                    excelVisible={true}
+                    pngVisible={false}
+                    pdfVisible={false}
+                    svgVisible={false}
+                    txtVisible={true}
+                    refFwd={this.differentialGridRef}
+                    exportButtonSize={'medium'}
+                    tab={tab}
+                    study={differentialStudy}
+                    model={differentialModel}
+                    test={differentialTest}
+                  />
+                </div>
                 <Grid.Column
                   className="ResultsTableWrapper"
                   mobile={16}
@@ -1021,6 +1040,7 @@ class Differential extends Component {
                     ref={this.differentialGridRef}
                     uniqueCacheKey={differentialCacheKey}
                     data={differentialResults}
+                    // getExportData={getExportDataDifferential}
                     columnsConfig={differentialColumns}
                     totalRows={differentialRows}
                     // use "differentialRows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
@@ -1028,7 +1048,7 @@ class Differential extends Component {
                     // onInformItemsPerPage={
                     //   this.informItemsPerPageDifferentialTable
                     // }
-                    exportBaseName="Differential_Analysis"
+                    // exportBaseName="Differential_Analysis"
                     loading={isVolcanoTableLoading}
                     // quickViews={quickViews}
                     // disableGeneralSearch
@@ -1194,7 +1214,7 @@ class Differential extends Component {
               <Sidebar.Pusher>
                 <div
                   className="DifferentialViewContainer"
-                  ref={this.DifferentialViewContainerRef}
+                  ref={this.differentialViewContainerRef}
                 >
                   {differentialView}
                 </div>

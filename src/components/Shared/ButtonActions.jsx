@@ -4,6 +4,7 @@ import * as saveSvgAsPng from 'save-svg-as-png';
 // import { excelService } from '../../services/excel.service';
 import { pdfService } from '../../services/pdf.service';
 import './ButtonActions.scss';
+import { toast } from 'react-toastify';
 
 class ButtonActions extends Component {
   static defaultProps = {
@@ -18,12 +19,23 @@ class ButtonActions extends Component {
   PNGExport = () => {
     if (this.props.imageInfo == null) {
       let PlotName = `${this.props.plot}.png`;
+      // for Barcode, Violin
+      if (this.props.description != null) {
+        PlotName = `${this.props.plot}_${this.props.description}.png`;
+      }
       if (this.props.study != null) {
         // for Multiset Analysis
         PlotName = `${this.props.study}_${this.props.model}_MultisetPlot.png`;
       }
       const Plot = document.getElementById(this.props.plot) || null;
       saveSvgAsPng.saveSvgAsPng(Plot, PlotName, {
+        encoderOptions: 1,
+        scale: 2,
+      });
+    } else if (this.props.plot === 'differentialVolcanoPlot') {
+      const currentSVG = document.getElementById(this.props.plot) || null;
+      const ProteinPlotName = 'Volcano.png';
+      saveSvgAsPng.saveSvgAsPng(currentSVG, ProteinPlotName, {
         encoderOptions: 1,
         scale: 2,
       });
@@ -54,6 +66,10 @@ class ButtonActions extends Component {
   SVGExport = () => {
     if (this.props.imageInfo == null) {
       let PlotName = `${this.props.plot}.svg`;
+      // for Barcode, Violin
+      if (this.props.description != null) {
+        PlotName = `${this.props.plot}_${this.props.description}.svg`;
+      }
       if (this.props.study != null) {
         // for Multiset Analysis
         PlotName = `${this.props.study}_${this.props.model}_MultisetPlot.svg`;
@@ -82,22 +98,48 @@ class ButtonActions extends Component {
   };
 
   exportSVG = (svgEl, name) => {
-    svgEl.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-    const svgData = svgEl.outerHTML;
-    const preface = '<?xml version="1.0" standalone="no"?>\r\n';
-    const svgBlob = new Blob([preface, svgData], {
-      type: 'image/svg+xml;charset=utf-8',
-    });
-    const svgUrl = URL.createObjectURL(svgBlob);
-    const downloadLink = document.createElement('a');
-    downloadLink.href = svgUrl;
-    downloadLink.download = name;
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
+    if (svgEl != null) {
+      svgEl.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+      const svgData = svgEl.outerHTML;
+      const preface = '<?xml version="1.0" standalone="no"?>\r\n';
+      const svgBlob = new Blob([preface, svgData], {
+        type: 'image/svg+xml;charset=utf-8',
+      });
+      const svgUrl = URL.createObjectURL(svgBlob);
+      const downloadLink = document.createElement('a');
+      downloadLink.href = svgUrl;
+      downloadLink.download = name;
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+    } else {
+      toast.error("SVG couldn't be created; please try again");
+    }
+  };
+
+  TextExport = () => {
+    const sortedData =
+      this.props.refFwd.current?.qhGridRef.current?.getSortedData() || [];
+    const jsonToTxt = require('json-to-txt');
+    const dataInString = jsonToTxt({ data: sortedData });
+    var a = document.createElement('a');
+    var file = new Blob([dataInString], { type: 'text/plain' });
+    a.href = URL.createObjectURL(file);
+    a.download = `${this.props.tab}-${this.props.study}-${this.props.model}-${this.props.test}`;
+    a.click();
+  };
+
+  ExcelExport = () => {
+    const excelExport = this.props.refFwd?.current?.qhGridRef.current ?? null;
+    if (excelExport != null) {
+      excelExport.exportExcel(
+        `${this.props.tab}-${this.props.study}-${this.props.model}-${this.props.test}`,
+      );
+    }
   };
 
   PDFExport = () => {
+    debugger;
     console.log(this.props);
     const isMultisetPlot = this.props.visible;
     if (isMultisetPlot) {
@@ -122,7 +164,11 @@ class ButtonActions extends Component {
 
   getExcelButton = () => {
     if (this.props.excelVisible) {
-      return <Button className="ExportButton">Data (.xls)</Button>;
+      return (
+        <Button className="ExportButton" onClick={this.ExcelExport}>
+          Data (.xls)
+        </Button>
+      );
     }
   };
 
@@ -159,7 +205,7 @@ class ButtonActions extends Component {
   getTxtButton = () => {
     if (this.props.txtVisible) {
       return (
-        <Button className="ExportButton" onClick={this.SVGExport}>
+        <Button className="ExportButton" onClick={this.TextExport}>
           TXT
         </Button>
       );

@@ -48,6 +48,7 @@ class DifferentialPlot extends Component {
       excelFlag: false,
       // pdfFlag: index !== 2,
       pdfFlag: false,
+      // pdfFlag: index !== 2,
       svgFlag: index !== 2,
       pngFlag: index !== 2,
     });

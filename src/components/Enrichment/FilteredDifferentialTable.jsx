@@ -44,7 +44,12 @@ class FilteredDifferentialTable extends Component {
     if (
       this.props.barcodeSettings.brushedData !==
         prevProps.barcodeSettings.brushedData ||
-      this.state.filteredBarcodeData !== prevState.filteredBarcodeData
+      !_.isEqual(
+        _.sortBy(this.state.filteredBarcodeData),
+        _.sortBy(prevState.filteredBarcodeData),
+      )
+
+      // this.state.filteredBarcodeData !== prevState.filteredBarcodeData
     ) {
       this.getTableData();
     }
@@ -53,6 +58,7 @@ class FilteredDifferentialTable extends Component {
       this.props.filteredDifferentialFeatureIdKey !==
       prevProps.filteredDifferentialFeatureIdKey
     ) {
+      debugger;
       this.setState(
         {
           additionalTemplateInfo: {},
@@ -65,6 +71,7 @@ class FilteredDifferentialTable extends Component {
     }
 
     if (this.props.HighlightedProteins !== prevProps.HighlightedProteins) {
+      debugger;
       this.highlightRows(this.props.HighlightedProteins, this.state.rowClicked);
     }
   }
@@ -80,10 +87,10 @@ class FilteredDifferentialTable extends Component {
         // differentialResults
       } = this.props;
       // const { itemsPerPageFilteredDifferentialTable } = this.state;
-      const currentData = this.filteredDifferentialGridRef?.current?.qhGridRef
-        ?.current?.data;
+      const currentData = this.props.filteredDifferentialGridRef?.current
+        ?.qhGridRef?.current?.data;
       if (currentData != null) {
-        const itemsPerPage = this.filteredDifferentialGridRef?.current
+        const itemsPerPage = this.props.filteredDifferentialGridRef?.current
           ?.qhGridRef?.current?.props.itemsPerPage;
         const Index = _.findIndex(currentData, function(p) {
           // const Index = _.findIndex(differentialResults, function(p) {
@@ -91,12 +98,14 @@ class FilteredDifferentialTable extends Component {
         });
         const pageNumber = Math.ceil((Index + 1) / itemsPerPage);
         if (pageNumber > 0) {
-          this.filteredDifferentialGridRef.current.handlePageChange(pageNumber);
+          this.props.filteredDifferentialGridRef.current.handlePageChange(
+            pageNumber,
+          );
           // scrollElement(this, 'filteredDifferentialGridRef', 'rowHighlightMax');
         }
       }
     } else {
-      this.filteredDifferentialGridRef.current.handlePageChange(1);
+      this.props.filteredDifferentialGridRef.current.handlePageChange(1);
     }
   };
 
@@ -181,6 +190,7 @@ class FilteredDifferentialTable extends Component {
       }
     }
     const alphanumericTrigger = filteredDifferentialAlphanumericFields[0];
+    debugger;
     this.props.onHandleDifferentialFeatureIdKey(
       'filteredDifferentialFeatureIdKey',
       alphanumericTrigger,
@@ -372,7 +382,7 @@ class FilteredDifferentialTable extends Component {
       const PreviouslyHighlighted = [...this.props.HighlightedProteins];
       if (event.shiftKey) {
         const allTableData =
-          this.filteredDifferentialGridRef.current?.qhGridRef.current?.getSortedData() ||
+          this.props.filteredDifferentialGridRef.current?.qhGridRef.current?.getSortedData() ||
           [];
         const indexMaxProtein = _.findIndex(allTableData, function(d) {
           return (
@@ -397,7 +407,7 @@ class FilteredDifferentialTable extends Component {
         this.props.onHandleProteinSelected(shiftedTableDataArray);
       } else if (event.ctrlKey) {
         const allTableData =
-          this.filteredDifferentialGridRef.current?.qhGridRef.current?.getSortedData() ||
+          this.props.filteredDifferentialGridRef.current?.qhGridRef.current?.getSortedData() ||
           [];
         let selectedTableDataArray = [];
 
@@ -468,7 +478,7 @@ class FilteredDifferentialTable extends Component {
       return (
         <div className="FilteredDifferentialTableDiv">
           <EZGrid
-            ref={this.filteredDifferentialGridRef}
+            ref={this.props.filteredDifferentialGridRef}
             data={filteredTableData}
             columnsConfig={filteredTableConfigCols}
             totalRows={15}
@@ -477,7 +487,7 @@ class FilteredDifferentialTable extends Component {
             // onInformItemsPerPage={
             //   this.informItemsPerPageFilteredDifferentialTable
             // }
-            exportBaseName="Differential_Analysis_Filtered"
+            // exportBaseName="Differential_Analysis_Filtered"
             // quickViews={quickViews}
             // disableGeneralSearch
             disableGrouping
