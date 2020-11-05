@@ -1060,7 +1060,7 @@ class Differential extends Component {
                     additionalTemplateInfo={
                       additionalTemplateInfoDifferentialTable
                     }
-                    onRowClick={this.handleRowClickDifferential}
+                    // onRowClick={this.handleRowClickDifferential}
                     rowLevelPropsCalc={this.rowLevelPropsCalcDifferential}
                   />
                   {/* </div> */}

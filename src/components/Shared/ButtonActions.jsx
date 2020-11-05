@@ -166,7 +166,7 @@ class ButtonActions extends Component {
     if (this.props.excelVisible) {
       return (
         <Button className="ExportButton" onClick={this.ExcelExport}>
-          Data (.xls)
+          XLS
         </Button>
       );
     }
