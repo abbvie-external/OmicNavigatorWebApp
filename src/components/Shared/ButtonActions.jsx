@@ -241,12 +241,12 @@ class ButtonActions extends Component {
             <Label basic pointing="right" className="ExportButtonGroupLabel">
               EXPORT
             </Label>
-            {excelButton}
           </Button>
+          {txtButton}
           {svgButton}
           {pdfButton}
           {pngButton}
-          {txtButton}
+          {excelButton}
         </Button.Group>
       </div>
     );
