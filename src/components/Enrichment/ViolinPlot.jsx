@@ -1615,7 +1615,7 @@ class ViolinPlot extends Component {
   };
 
   windowResized = () => {
-    this.initiateViolinPlot(true);
+    // this.initiateViolinPlot(true);
   };
 
   initiateViolinPlot = resetDimensions => {

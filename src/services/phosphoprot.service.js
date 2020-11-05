@@ -219,6 +219,8 @@ class PhosphoprotService {
       window.ocpu
         .call(plottype, obj, function(session) {
           axios
+            // if we want to call plot with dimensions...in progress
+            // .get(session.getLoc() + `graphics/1/svg?width=${dynamicWidth}&height={dynamicHeight}`, {
             .get(session.getLoc() + 'graphics/1/svg', {
               responseType: 'text',
               cancelToken,
