@@ -3,7 +3,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 window.jQuery = $;
 require('opencpu.js/opencpu-0.5.js');
-class PhosphoprotService {
+class OmicNavigatorService {
   constructor() {
     this.ocpuUrl = '***REMOVED***/ocpu/library/OmicNavigator/R';
     //this.ocpuUrl = 'http://localhost:5656/ocpu/library/OmicAnalyzer/R';  //<-- comment out before building production
@@ -508,4 +508,4 @@ class PhosphoprotService {
   }
 }
 
-export const phosphoprotService = new PhosphoprotService();
+export const omicNavigatorService = new OmicNavigatorService();

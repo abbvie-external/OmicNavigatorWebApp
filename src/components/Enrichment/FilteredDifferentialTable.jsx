@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Popup, Dimmer, Loader } from 'semantic-ui-react';
-import { phosphoprotService } from '../../services/phosphoprot.service';
+import { omicNavigatorService } from '../../services/omicNavigator.service';
 import _ from 'lodash';
 import {
   formatNumberForDisplay,
@@ -147,7 +147,7 @@ class FilteredDifferentialTable extends Component {
       let cancelToken = new CancelToken(e => {
         cancelRequestFPTGetResultsTable = e;
       });
-      phosphoprotService
+      omicNavigatorService
         .getResultsTable(
           this.props.enrichmentStudy,
           this.props.enrichmentModel,
@@ -355,7 +355,7 @@ class FilteredDifferentialTable extends Component {
           queryId: -1,
           from: 0,
         };
-        phosphoprotService.postToPhosphositePlus(
+        omicNavigatorService.postToPhosphositePlus(
           param,
           'https://www.phosphosite.org/proteinSearchSubmitAction.action',
         );

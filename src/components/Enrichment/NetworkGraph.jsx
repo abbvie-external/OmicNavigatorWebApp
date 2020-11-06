@@ -7,7 +7,7 @@ import {
   networkByCluster,
   // limitValues
 } from '../Shared/helpers';
-// import { phosphoprotService } from '../../services/phosphoprot.service';
+// import { omicNavigatorService } from '../../services/omicNavigator.service';
 // import { CancelToken } from 'axios';
 
 // let cancelRequestGetNodeFeatures = () => {};
@@ -679,7 +679,7 @@ class NetworkGraph extends Component {
                   //   let cancelToken = new CancelToken(e => {
                   //     cancelRequestGetLinkFeatures = e;
                   //   });
-                  //   phosphoprotService
+                  //   omicNavigatorService
                   //     .getLinkFeatures(
                   //       self.props.enrichmentStudy,
                   //       self.props.enrichmentAnnotation,
@@ -933,7 +933,7 @@ class NetworkGraph extends Component {
                     // let cancelToken = new CancelToken(e => {
                     //   cancelRequestGetNodeFeatures = e;
                     // });
-                    // phosphoprotService
+                    // omicNavigatorService
                     //   .getNodeFeatures(
                     //     self.props.enrichmentStudy,
                     //     self.props.enrichmentAnnotation,

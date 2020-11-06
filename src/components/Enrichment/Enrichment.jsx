@@ -12,7 +12,7 @@ import phosphosite_icon from '../../resources/phosphosite.ico';
 import reactome_icon from '../../resources/reactome.jpg';
 import tableIcon from '../../resources/tableIcon.png';
 import tableIconSelected from '../../resources/tableIconSelected.png';
-import { phosphoprotService } from '../../services/phosphoprot.service';
+import { omicNavigatorService } from '../../services/omicNavigator.service';
 import ButtonActions from '../Shared/ButtonActions';
 import * as d3 from 'd3';
 import {
@@ -261,7 +261,7 @@ class Enrichment extends Component {
     // const TestSiteVar = `${test}:${dataItem.description}`;
     // let xLargest = 0;
     // let imageInfo = { key: '', title: '', svg: [] };
-    // phosphoprotService
+    // omicNavigatorService
     //   .getDatabaseInfo(
     //     enrichmentStudy + 'plots',
     //     enrichmentAnnotation,
@@ -287,7 +287,7 @@ class Enrichment extends Component {
       enrichmentTerm: term,
     });
 
-    phosphoprotService
+    omicNavigatorService
       .getBarcodeData(
         enrichmentStudy,
         enrichmentModel,
@@ -730,7 +730,7 @@ class Enrichment extends Component {
       let cancelToken = new CancelToken(e => {
         cancelRequestGetEnrichmentsNetwork = e;
       });
-      phosphoprotService
+      omicNavigatorService
         .getEnrichmentsNetwork(
           enrichmentStudy,
           enrichmentModel,
@@ -1010,7 +1010,7 @@ class Enrichment extends Component {
     });
     if (enrichmentPlotTypes.length > 0) {
       _.forEach(enrichmentPlotTypes, function(plot, i) {
-        phosphoprotService
+        omicNavigatorService
           .plotStudy(
             enrichmentStudy,
             enrichmentModel,
@@ -1159,7 +1159,7 @@ class Enrichment extends Component {
       enrichmentDataItem: dataItem,
       enrichmentTerm: term,
     });
-    phosphoprotService
+    omicNavigatorService
       .getBarcodeData(
         enrichmentStudy,
         enrichmentModel,
@@ -1227,7 +1227,7 @@ class Enrichment extends Component {
         //     enrichmentTerm: term
         //   });
 
-        //   phosphoprotService
+        //   omicNavigatorService
         //     .getBarcodeData(
         //       enrichmentStudy + 'plots',
         //       enrichmentModel,
@@ -1810,7 +1810,7 @@ class Enrichment extends Component {
         : dataItem.MajorityProteinIDsHGNC
       ).split(';')[0];
       let param = { queryId: -1, from: 0, searchStr: protein };
-      phosphoprotService.postToPhosphositePlus(
+      omicNavigatorService.postToPhosphositePlus(
         param,
         'https://www.phosphosite.org/proteinSearchSubmitAction.action',
       );

@@ -12,7 +12,7 @@ import {
 import { CancelToken } from 'axios';
 import DOMPurify from 'dompurify';
 import '../Shared/SearchCriteria.scss';
-import { phosphoprotService } from '../../services/phosphoprot.service';
+import { omicNavigatorService } from '../../services/omicNavigator.service';
 import DifferentialMultisetFilters from './DifferentialMultisetFilters';
 
 let cancelRequestGetReportLinkDifferential = () => {};
@@ -190,7 +190,7 @@ class DifferentialSearchCriteria extends Component {
         this.getReportLink(differentialStudy, differentialModel);
         if (differentialTest !== '') {
           onSearchTransitionDifferential(true);
-          phosphoprotService
+          omicNavigatorService
             .getResultsTable(
               differentialStudy,
               differentialModel,
@@ -270,7 +270,7 @@ class DifferentialSearchCriteria extends Component {
     let cancelToken = new CancelToken(e => {
       cancelRequestGetReportLinkDifferential = e;
     });
-    phosphoprotService
+    omicNavigatorService
       .getReportLink(study, model, this.setStudyTooltip, cancelToken)
       .then(getReportLink => {
         const link = getReportLink.includes('http')
@@ -365,7 +365,7 @@ class DifferentialSearchCriteria extends Component {
     let cancelToken = new CancelToken(e => {
       cancelRequestPSCGetResultsTable = e;
     });
-    phosphoprotService
+    omicNavigatorService
       .getResultsTable(
         differentialStudy,
         differentialModel,
@@ -488,7 +488,7 @@ class DifferentialSearchCriteria extends Component {
     let cancelToken = new CancelToken(e => {
       cancelRequestPSCGetResultsTable = e;
     });
-    phosphoprotService
+    omicNavigatorService
       .getResultsTable(
         differentialStudy,
         differentialModel,
@@ -641,7 +641,7 @@ class DifferentialSearchCriteria extends Component {
     let cancelToken = new CancelToken(e => {
       cancelRequestMultisetInferenceData = e;
     });
-    phosphoprotService
+    omicNavigatorService
       .getResultsIntersection(
         differentialStudy,
         differentialModel,
@@ -709,7 +709,7 @@ class DifferentialSearchCriteria extends Component {
     let cancelToken = new CancelToken(e => {
       cancelRequestInferenceMultisetPlot = e;
     });
-    phosphoprotService
+    omicNavigatorService
       .getResultsUpset(
         differentialStudy,
         differentialModel,

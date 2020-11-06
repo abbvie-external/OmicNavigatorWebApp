@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { Tab, Menu } from 'semantic-ui-react';
-import { phosphoprotService } from '../services/phosphoprot.service';
+import { omicNavigatorService } from '../services/omicNavigator.service';
 import Differential from './Differential/Differential';
 import omicNavigatorIcon from '../resources/icon.png';
 import Enrichment from './Enrichment/Enrichment';
@@ -163,7 +163,7 @@ class Tabs extends Component {
   };
 
   getStudies = () => {
-    phosphoprotService
+    omicNavigatorService
       .listStudies()
       .then(listStudiesResponseData => {
         this.setState({
