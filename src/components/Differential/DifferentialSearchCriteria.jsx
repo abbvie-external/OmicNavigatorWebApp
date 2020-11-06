@@ -272,15 +272,22 @@ class DifferentialSearchCriteria extends Component {
     });
     omicNavigatorService
       .getReportLink(study, model, this.setStudyTooltip, cancelToken)
-      .then(getReportLink => {
-        const link = getReportLink.includes('http')
-          ? getReportLink
-          : // : `***REMOVED***/ocpu/library/${getReportLink}`;
-            `${this.props.baseUrl}/ocpu/library/${getReportLink}`;
-        this.setState({
-          differentialStudyHrefVisible: true,
-          differentialStudyHref: link,
-        });
+      .then(getReportLinkResponse => {
+        if (getReportLinkResponse.length > 0) {
+          const link = getReportLinkResponse.includes('http')
+            ? getReportLinkResponse
+            : // : `***REMOVED***/ocpu/library/${getReportLinkResponse}`;
+              `${this.props.baseUrl}/ocpu/library/${getReportLinkResponse}`;
+          this.setState({
+            differentialStudyHrefVisible: true,
+            differentialStudyHref: link,
+          });
+        } else {
+          this.setState({
+            differentialStudyHrefVisible: false,
+            differentialStudyHref: '',
+          });
+        }
       })
       .catch(error => {
         console.error('Error during getReportLink', error);

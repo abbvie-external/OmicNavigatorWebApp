@@ -252,15 +252,22 @@ class EnrichmentSearchCriteria extends Component {
     });
     omicNavigatorService
       .getReportLink(study, model, this.setStudyTooltip, cancelToken)
-      .then(getReportLink => {
-        const link = getReportLink.includes('http')
-          ? getReportLink
-          : // : `***REMOVED***/ocpu/library/${getReportLink}`;
-            `${this.props.baseUrl}/ocpu/library/${getReportLink}`;
-        this.setState({
-          enrichmentStudyHrefVisible: true,
-          enrichmentStudyHref: link,
-        });
+      .then(getReportLinkResponse => {
+        if (getReportLinkResponse.length > 0) {
+          const link = getReportLinkResponse.includes('http')
+            ? getReportLinkResponse
+            : // : `***REMOVED***/ocpu/library/${getReportLinkResponse}`;
+              `${this.props.baseUrl}/ocpu/library/${getReportLinkResponse}`;
+          this.setState({
+            enrichmentStudyHrefVisible: true,
+            enrichmentStudyHref: link,
+          });
+        } else {
+          this.setState({
+            enrichmentStudyHrefVisible: false,
+            enrichmentStudyHref: '',
+          });
+        }
       })
       .catch(error => {
         console.error('Error during getReportLink', error);
