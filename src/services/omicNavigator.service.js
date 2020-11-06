@@ -7,6 +7,7 @@ class OmicNavigatorService {
   constructor() {
     this.ocpuUrl = '***REMOVED***/ocpu/library/OmicNavigator/R';
     //this.ocpuUrl = 'http://localhost:5656/ocpu/library/OmicAnalyzer/R';  //<-- comment out before building production
+    this.ocpuUrlUtils = '***REMOVED***/ocpu/library/utils/R';
   }
 
   setUrl() {
@@ -15,8 +16,30 @@ class OmicNavigatorService {
     }
   }
 
-  setUrlAlt() {
-    window.ocpu.seturl(this.ocpuUrlAlt);
+  setUrlUtils() {
+    window.ocpu.seturl(this.ocpuUrlUtils);
+  }
+
+  async getVersion(method, obj) {
+    return new Promise(function(resolve, reject) {
+      window.ocpu.call(method, obj, function(session) {
+        const url = session.getLoc() + 'R/.val';
+        axios
+          .get(url)
+          .then(response => resolve(response.data))
+          .catch(function(thrown) {
+            console.log(thrown);
+          });
+      });
+    });
+  }
+
+  async getPackageVersion() {
+    this.setUrlUtils();
+    const obj = { pkg: 'OmicNavigator' };
+    const promise = this.getVersion('packageVersion', obj, 15000);
+    const versionFromPromise = await promise;
+    return versionFromPromise;
   }
 
   async ocpuRPCUnbox(method, obj, timeoutLength, handleError, cancelToken) {

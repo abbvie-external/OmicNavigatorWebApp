@@ -139,7 +139,6 @@ class ButtonActions extends Component {
   };
 
   PDFExport = () => {
-    debugger;
     console.log(this.props);
     const isMultisetPlot = this.props.visible;
     if (isMultisetPlot) {
