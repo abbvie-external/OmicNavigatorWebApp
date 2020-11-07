@@ -213,16 +213,17 @@
     margin-top: 10px;
     right: 25px !important;
   }
+
+  #AppVersion {
+    top: 5px;
+    right: 5px;
+    position: absolute;
+    color: #525252;
+    font-size: 13px !important;
+  }
 }
 
 .SortableHelper {
   z-index: 3;
   list-style: none;
-}
-
-#AppVersion {
-  top: 5px;
-  right: 5px;
-  position: absolute;
-  color: #525252;
 }

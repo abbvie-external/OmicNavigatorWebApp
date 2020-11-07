@@ -37,7 +37,7 @@ let cancelRequestEnrichmentGetPlot = () => {};
 let cancelRequestGetEnrichmentsNetwork = () => {};
 
 class Enrichment extends Component {
-  defaultEnrichmentActiveIndex =
+  storedEnrichmentActiveIndex =
     parseInt(sessionStorage.getItem('enrichmentViewTab'), 10) || 0;
 
   state = {
@@ -51,7 +51,7 @@ class Enrichment extends Component {
     enrichmentFeatureID: '',
     enrichmentPlotSVGHeight: 0,
     enrichmentPlotSVGWidth: 0,
-    activeIndexEnrichmentView: this.defaultEnrichmentActiveIndex || 0,
+    activeIndexEnrichmentView: this.storedEnrichmentActiveIndex || 0,
     multisetPlotInfo: {
       title: '',
       svg: [],
@@ -739,15 +739,21 @@ class Enrichment extends Component {
           cancelToken,
         )
         .then(getEnrichmentNetworkResponseData => {
-          this.setState(
-            {
-              unfilteredNetworkData: getEnrichmentNetworkResponseData,
-            },
-            this.handleEnrichmentNetworkData(
-              getEnrichmentNetworkResponseData,
-              enrichmentResults,
-            ),
-          );
+          debugger;
+          getEnrichmentNetworkResponseData = [];
+          if (getEnrichmentNetworkResponseData.length > 0) {
+            this.setState(
+              {
+                unfilteredNetworkData: getEnrichmentNetworkResponseData,
+              },
+              this.handleEnrichmentNetworkData(
+                getEnrichmentNetworkResponseData,
+                enrichmentResults,
+              ),
+            );
+          } else {
+            this.handleGetEnrichmentNetworkError();
+          }
         })
         .catch(error => {
           console.error('Error during getEnrichmentNetwork', error);
@@ -834,6 +840,7 @@ class Enrichment extends Component {
         propData: [],
       },
       networkDataError: true,
+      activeIndexEnrichmentView: 0,
     });
   };
 
@@ -1932,8 +1939,13 @@ class Enrichment extends Component {
         menuItem: (
           <Menu.Item
             key="1"
-            className="TableAndNetworkButtons NetworkButton"
+            className={
+              !networkDataError
+                ? 'TableAndNetworkButtons NetworkButton'
+                : 'TableAndNetworkButtons NetworkButton DisabledCursor'
+            }
             name="network"
+            disabled={networkDataError}
           >
             <img
               src={
