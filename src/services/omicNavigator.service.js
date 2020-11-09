@@ -284,6 +284,23 @@ class OmicNavigatorService {
     return promise;
   }
 
+  async getBarcodes(study, model) {
+    this.setUrl();
+    const promise = this.ocpuDataCall(
+      'getBarcodes',
+      {
+        study: study,
+        modelID: model,
+      },
+      null,
+      null,
+      false,
+      15000,
+    );
+    const dataFromPromise = await promise;
+    return dataFromPromise;
+  }
+
   async getBarcodeData(
     study,
     model,

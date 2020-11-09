@@ -164,6 +164,7 @@ class EnrichmentSearchCriteria extends Component {
       });
       this.getReportLink(enrichmentStudy, 'default');
       if (enrichmentModel !== '') {
+        this.props.onHandleHasBarcodeData();
         this.props.onHandlePlotTypesEnrichment(enrichmentModel);
         const enrichmentModelWithAnnotations = enrichmentModelsAndAnnotationsVar.find(
           model => model.modelID === enrichmentModel,
@@ -305,6 +306,7 @@ class EnrichmentSearchCriteria extends Component {
       onSearchCriteriaReset,
       enrichmentModelsAndAnnotations,
     } = this.props;
+    this.props.onHandleHasBarcodeData();
     this.props.onHandlePlotTypesEnrichment(value);
     onSearchCriteriaChange(
       {

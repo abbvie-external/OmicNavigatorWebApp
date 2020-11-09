@@ -127,6 +127,7 @@ class Enrichment extends Component {
     SVGPlotLoading: false,
     SVGPlotLoaded: false,
     isViolinPlotLoaded: false,
+    // hasBarcodeData: true,
     barcodeSettings: {
       barcodeData: [],
       brushedData: [],
@@ -312,6 +313,9 @@ class Enrichment extends Component {
             });
           }
           showBarcodePlotCb(barcodeDataResponse, dataItem);
+        } else {
+          // empty barcode data array
+          this.handleGetBarcodeDataError();
         }
       })
       .catch(error => {
@@ -489,6 +493,26 @@ class Enrichment extends Component {
     }
   };
 
+  handleHasBarcodeData = () => {
+    const { enrichmentStudy, enrichmentModel } = this.props;
+    omicNavigatorService
+      .getBarcodes(enrichmentStudy, enrichmentModel, null, null)
+      .then(getBarcodesResponseData => {
+        if (getBarcodesResponseData.statistic !== '') {
+          this.setState({
+            hasBarcodeData: true,
+          });
+        } else {
+          this.setState({
+            hasBarcodeData: false,
+          });
+        }
+      })
+      .catch(error => {
+        console.error('Error during getBarcodes', error);
+      });
+  };
+
   disablePlot = () => {
     this.setState({
       multisetPlotAvailable: false,
@@ -535,6 +559,7 @@ class Enrichment extends Component {
       enrichmentModel,
       enrichmentAnnotation,
     } = this.props;
+    const { hasBarcodeData } = this.state;
     const TableValuePopupStyle = {
       backgroundColor: '2E2E2E',
       borderBottom: '2px solid var(--color-primary)',
@@ -661,14 +686,18 @@ class Enrichment extends Component {
               <Popup
                 trigger={
                   <span
-                    className="TableCellLink"
-                    onClick={addParams.barcodeData(
-                      enrichmentStudy,
-                      enrichmentModel,
-                      enrichmentAnnotation,
-                      item,
-                      c,
-                    )}
+                    className={hasBarcodeData ? 'TableCellLink' : ''}
+                    onClick={
+                      hasBarcodeData
+                        ? addParams.barcodeData(
+                            enrichmentStudy,
+                            enrichmentModel,
+                            enrichmentAnnotation,
+                            item,
+                            c,
+                          )
+                        : {}
+                    }
                   >
                     {formatNumberForDisplay(value)}
                   </span>
@@ -739,9 +768,11 @@ class Enrichment extends Component {
           cancelToken,
         )
         .then(getEnrichmentNetworkResponseData => {
-          debugger;
-          getEnrichmentNetworkResponseData = [];
-          if (getEnrichmentNetworkResponseData.length > 0) {
+          if (
+            getEnrichmentNetworkResponseData.nodes?.length > 0 ||
+            getEnrichmentNetworkResponseData.links?.length > 0 ||
+            getEnrichmentNetworkResponseData.tests?.length > 0
+          ) {
             this.setState(
               {
                 unfilteredNetworkData: getEnrichmentNetworkResponseData,
@@ -1191,6 +1222,8 @@ class Enrichment extends Component {
             });
           }
           this.showBarcodePlot(barcodeDataResponse, dataItem);
+        } else {
+          this.handleGetBarcodeDataError();
         }
       })
       .catch(error => {
@@ -2161,6 +2194,7 @@ class Enrichment extends Component {
               onAnnotationChange={this.handleAnnotationChange}
               onHandleNetworkGraphReady={this.handleNetworkGraphReady}
               onHandleEnrichmentTableLoading={this.handleEnrichmentTableLoading}
+              onHandleHasBarcodeData={this.handleHasBarcodeData}
             />
           </Grid.Column>
           <Grid.Column
