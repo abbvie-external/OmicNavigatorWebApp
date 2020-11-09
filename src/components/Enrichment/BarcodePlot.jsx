@@ -70,7 +70,8 @@ class BarcodePlot extends Component {
           .classed('HighlightedLine', false);
         d3.selectAll(`.selected`)
           .attr('y1', this.state.settings.margin.selected)
-          .attr('style', 'stroke:#2c3b78;strokeWidth: 2.5;opacity: 1');
+          .attr('style', 'stroke:#2c3b78;strokeWidth: 2.5;opacity: 1')
+          .raise();
         if (this.props.HighlightedProteins.length > 0) {
           const HighlightedProteinsCopy = [...this.props.HighlightedProteins];
           const MaxFeatureData = HighlightedProteinsCopy[0];
@@ -80,14 +81,16 @@ class BarcodePlot extends Component {
             const OtherHighlighted = d3.select(`#barcode-line-${lineId}`);
             OtherHighlighted.classed('HighlightedLine', true)
               .attr('y1', this.state.settings.margin.highlighted)
-              .attr('style', 'stroke:#ff7e38;stroke-width:3');
+              .attr('style', 'stroke:#ff7e38;stroke-width:3')
+              .raise();
           });
           const MaxFeatureId = MaxFeatureData.featureID;
           const MaxFeatureElement = d3.select(`#barcode-line-${MaxFeatureId}`);
           if (MaxFeatureElement != null) {
             MaxFeatureElement.classed('MaxLine', true)
               .attr('y1', this.state.settings.margin.max)
-              .attr('style', 'stroke:#FF4400;stroke-width:3.5');
+              .attr('style', 'stroke:#FF4400;stroke-width:3.5')
+              .raise();
             const MaxFeatureLineData = {
               x2: MaxFeatureElement.attr('x2') || null,
               featureID: MaxFeatureElement.attr('featureid') || null,
