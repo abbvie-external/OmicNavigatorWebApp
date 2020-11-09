@@ -25,14 +25,14 @@ class BarcodePlot extends Component {
       bottomLabel: '',
       barcodeHeight: 0,
       margin: {
-        top: 40,
+        top: 50,
         right: 40,
         bottom: 40,
         left: 20,
-        hovered: 20,
-        selected: 20,
-        highlighted: 10,
-        max: 5,
+        hovered: 30,
+        selected: 30,
+        highlighted: 20,
+        max: 10,
       },
     },
   };
@@ -167,12 +167,16 @@ class BarcodePlot extends Component {
     // const lineId = `#barcode-line-${lineName}`;
     const lineId = `#barcode-line-${lineIdMult}`;
     const hoveredLine = d3.select(lineId);
+    // hovered: 20,
+    // selected: 20,
+    // highlighted: 10,
+    // max: 5,
     if (hoveredLine.attr('class').endsWith('selected')) {
-      hoveredLine.attr('y1', this.state.settings.margin.hovered - 10);
+      hoveredLine.attr('y1', this.state.settings.margin.selected - 10);
     } else if (hoveredLine.attr('class').endsWith('MaxLine')) {
-      hoveredLine.attr('y1', this.state.settings.margin.hovered - 20);
-    } else if (hoveredLine.attr('class').endsWith('selected HighlightedLine')) {
-      hoveredLine.attr('y1', this.state.settings.margin.hovered - 15);
+      hoveredLine.attr('y1', this.state.settings.margin.max - 10);
+    } else if (hoveredLine.attr('class').endsWith('HighlightedLine')) {
+      hoveredLine.attr('y1', this.state.settings.margin.highlighted - 10);
     } else {
       hoveredLine
         .classed('HoveredLine', true)
@@ -194,13 +198,11 @@ class BarcodePlot extends Component {
     const hoveredLine = d3.select(this.state.hoveredLineId);
     if (!hoveredLine.empty()) {
       if (hoveredLine.attr('class').endsWith('selected')) {
-        hoveredLine.attr('y1', this.state.settings.margin.hovered);
+        hoveredLine.attr('y1', this.state.settings.margin.selected);
       } else if (hoveredLine.attr('class').endsWith('MaxLine')) {
-        hoveredLine.attr('y1', this.state.settings.margin.hovered - 10);
-      } else if (
-        hoveredLine.attr('class').endsWith('selected HighlightedLine')
-      ) {
-        hoveredLine.attr('y1', this.state.settings.margin.hovered - 10);
+        hoveredLine.attr('y1', this.state.settings.margin.max);
+      } else if (hoveredLine.attr('class').endsWith('HighlightedLine')) {
+        hoveredLine.attr('y1', this.state.settings.margin.highlighted);
       } else {
         hoveredLine
           .classed('HoveredLine', false)
@@ -273,8 +275,8 @@ class BarcodePlot extends Component {
               .selectAll('line.barcode-line')
               .attr('y1', settings.margin.top)
               .attr('style', 'stroke:#838383;stroke-width: 1.5;opacity: 0.5')
-              .classed('selected', false)
               .classed('selectedReference', false)
+              .classed('selected', false)
               .classed('MaxLine', false);
             const brushed = lines
               .filter(function() {
@@ -283,8 +285,8 @@ class BarcodePlot extends Component {
               })
               .attr('y1', settings.margin.selected)
               .attr('style', 'stroke:#2c3b78;stroke-width: 2.5;opacity: 1')
-              .classed('selected', true)
-              .classed('selectedReference', true);
+              .classed('selectedReference', true)
+              .classed('selected', true);
             const brushedArr = brushed._groups[0];
             const brushedDataVar = brushedArr.map(a => {
               return {
@@ -397,7 +399,7 @@ class BarcodePlot extends Component {
         return (
           <text
             className="BarcodeTooltipText"
-            // transform={`translate(${tooltipPosition}, 50)rotate(35)`}
+            // transform={`translate(${tooltipPosition}, 15)rotate(-45)`}
             transform={`translate(${tooltipPosition}, 10)`}
             fontSize="14px"
             textAnchor={tooltipTextAnchor}
