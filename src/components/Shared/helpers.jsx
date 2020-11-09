@@ -96,6 +96,15 @@ export function limitValues(values, size) {
   }
 }
 
+export function limitString(string, indexes, characters) {
+  if (indexes < 3) {
+    return string;
+  } else {
+    let stringSubstring = string?.substring(0, characters);
+    return `${stringSubstring}...`;
+  }
+}
+
 export function scrollElement(_this, grid, target) {
   const bodyRef =
     _this[grid].current?.qhGridRef?.current?.bodyRef?.current || null;

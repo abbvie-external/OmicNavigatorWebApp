@@ -1,5 +1,15 @@
 import React, { Component } from 'react';
-import { Loader, Dimmer, Tab, Popup, Icon, Message } from 'semantic-ui-react';
+import {
+  Loader,
+  Dimmer,
+  Tab,
+  Popup,
+  Icon,
+  Message,
+  // Menu,
+  // Label,
+} from 'semantic-ui-react';
+// import { limitString } from '../Shared/helpers';
 import ButtonActions from '../Shared/ButtonActions';
 import './SVGPlot.scss';
 
@@ -26,12 +36,37 @@ class SVGPlot extends Component {
   };
 
   getSVGPanes(activeSVGTabIndex) {
+    // const BreadcrumbPopupStyle = {
+    //   backgroundColor: '2E2E2E',
+    //   borderBottom: '2px solid var(--color-primary)',
+    //   color: '#FFF',
+    //   padding: '1em',
+    //   maxWidth: '50vw',
+    //   fontSize: '13px',
+    //   wordBreak: 'break-all',
+    // };
     if (this.props.imageInfo.length !== 0) {
       const svgArray = this.props.imageInfo.svg;
       // const svgArrayReversed = svgArray.reverse();
-      const panes = svgArray.map(s => {
+      // const numberOfPlots = svgArray.length;
+      const panes = svgArray.map((s, index) => {
         return {
           menuItem: `${s.plotType.plotDisplay}`,
+          // menuItem: limitString(`${s.plotType.plotDisplay}`, numberOfPlots, 5),
+          // menuItem: (
+          //   <Popup
+          //     trigger={
+          //       <Menu.Item key={`${s.plotType.plotDisplay}`} content="test">
+          //         <Label>{index}</Label>
+          //       </Menu.Item>
+          //     }
+          //     style={BreadcrumbPopupStyle}
+          //     inverted
+          //     basic
+          //     position="bottom left"
+          //     content={`${s.plotType.plotDisplay}`}
+          //   />
+          // ),
           render: () => (
             <Tab.Pane attached="true" as="div">
               <div
