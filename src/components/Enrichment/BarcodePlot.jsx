@@ -25,14 +25,14 @@ class BarcodePlot extends Component {
       bottomLabel: '',
       barcodeHeight: 0,
       margin: {
-        top: 50,
+        top: 45,
         right: 40,
         bottom: 40,
         left: 20,
-        hovered: 30,
-        selected: 30,
-        highlighted: 20,
-        max: 10,
+        hovered: 25,
+        selected: 25,
+        highlighted: 15,
+        max: 5,
       },
     },
   };
@@ -70,8 +70,7 @@ class BarcodePlot extends Component {
           .classed('HighlightedLine', false);
         d3.selectAll(`.selected`)
           .attr('y1', this.state.settings.margin.selected)
-          .attr('style', 'stroke:#2c3b78;strokeWidth: 2.5;opacity: 1')
-          .raise();
+          .attr('style', 'stroke:#2c3b78;strokeWidth: 2.5;opacity: 1');
         if (this.props.HighlightedProteins.length > 0) {
           const HighlightedProteinsCopy = [...this.props.HighlightedProteins];
           const MaxFeatureData = HighlightedProteinsCopy[0];
@@ -81,16 +80,14 @@ class BarcodePlot extends Component {
             const OtherHighlighted = d3.select(`#barcode-line-${lineId}`);
             OtherHighlighted.classed('HighlightedLine', true)
               .attr('y1', this.state.settings.margin.highlighted)
-              .attr('style', 'stroke:#ff7e38;stroke-width:3')
-              .raise();
+              .attr('style', 'stroke:#ff7e38;stroke-width:3');
           });
           const MaxFeatureId = MaxFeatureData.featureID;
           const MaxFeatureElement = d3.select(`#barcode-line-${MaxFeatureId}`);
           if (MaxFeatureElement != null) {
             MaxFeatureElement.classed('MaxLine', true)
               .attr('y1', this.state.settings.margin.max)
-              .attr('style', 'stroke:#FF4400;stroke-width:3.5')
-              .raise();
+              .attr('style', 'stroke:#FF4400;stroke-width:3.5');
             const MaxFeatureLineData = {
               x2: MaxFeatureElement.attr('x2') || null,
               featureID: MaxFeatureElement.attr('featureid') || null,
@@ -177,7 +174,7 @@ class BarcodePlot extends Component {
     if (hoveredLine.attr('class').endsWith('selected')) {
       hoveredLine.attr('y1', this.state.settings.margin.selected - 10);
     } else if (hoveredLine.attr('class').endsWith('MaxLine')) {
-      hoveredLine.attr('y1', this.state.settings.margin.max - 10);
+      hoveredLine.attr('y1', this.state.settings.margin.max);
     } else if (hoveredLine.attr('class').endsWith('HighlightedLine')) {
       hoveredLine.attr('y1', this.state.settings.margin.highlighted - 10);
     } else {
@@ -403,7 +400,7 @@ class BarcodePlot extends Component {
           <text
             className="BarcodeTooltipText"
             // transform={`translate(${tooltipPosition}, 15)rotate(-45)`}
-            transform={`translate(${tooltipPosition}, 10)`}
+            transform={`translate(${tooltipPosition}, 15)`}
             fontSize="14px"
             textAnchor={tooltipTextAnchor}
             fontFamily="Lato, Helvetica Neue, Arial, Helvetica, sans-serif"
@@ -417,6 +414,7 @@ class BarcodePlot extends Component {
 
   getMaxTooltip = () => {
     const {
+      // tooltipPosition,
       highlightedLineName,
       tooltipPositionMax,
       tooltipTextAnchorMax,
@@ -426,6 +424,7 @@ class BarcodePlot extends Component {
         return (
           <text
             className="BarcodeTooltipText"
+            // transform={`translate(${tooltipPosition}, 15)rotate(-45)`}
             transform={`translate(${tooltipPositionMax}, 15)`}
             fontSize="14px"
             textAnchor={tooltipTextAnchorMax}
