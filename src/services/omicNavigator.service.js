@@ -3,10 +3,11 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 window.jQuery = $;
 require('opencpu.js/opencpu-0.5.js');
-class PhosphoprotService {
+class OmicNavigatorService {
   constructor() {
     this.ocpuUrl = '***REMOVED***/ocpu/library/OmicNavigator/R';
     //this.ocpuUrl = 'http://localhost:5656/ocpu/library/OmicAnalyzer/R';  //<-- comment out before building production
+    this.ocpuUrlUtils = '***REMOVED***/ocpu/library/utils/R';
   }
 
   setUrl() {
@@ -15,8 +16,30 @@ class PhosphoprotService {
     }
   }
 
-  setUrlAlt() {
-    window.ocpu.seturl(this.ocpuUrlAlt);
+  setUrlUtils() {
+    window.ocpu.seturl(this.ocpuUrlUtils);
+  }
+
+  async getVersion(method, obj) {
+    return new Promise(function(resolve, reject) {
+      window.ocpu.call(method, obj, function(session) {
+        const url = session.getLoc() + 'R/.val';
+        axios
+          .get(url)
+          .then(response => resolve(response.data))
+          .catch(function(thrown) {
+            console.log(thrown);
+          });
+      });
+    });
+  }
+
+  async getPackageVersion() {
+    this.setUrlUtils();
+    const obj = { pkg: 'OmicNavigator' };
+    const promise = this.getVersion('packageVersion', obj, 15000);
+    const versionFromPromise = await promise;
+    return versionFromPromise;
   }
 
   async ocpuRPCUnbox(method, obj, timeoutLength, handleError, cancelToken) {
@@ -219,6 +242,8 @@ class PhosphoprotService {
       window.ocpu
         .call(plottype, obj, function(session) {
           axios
+            // if we want to call plot with dimensions...in progress
+            // .get(session.getLoc() + `graphics/1/svg?width=${dynamicWidth}&height={dynamicHeight}`, {
             .get(session.getLoc() + 'graphics/1/svg', {
               responseType: 'text',
               cancelToken,
@@ -257,6 +282,23 @@ class PhosphoprotService {
     );
     //const svgMarkupFromPromise = await promise;
     return promise;
+  }
+
+  async getBarcodes(study, model) {
+    this.setUrl();
+    const promise = this.ocpuDataCall(
+      'getBarcodes',
+      {
+        study: study,
+        modelID: model,
+      },
+      null,
+      null,
+      false,
+      15000,
+    );
+    const dataFromPromise = await promise;
+    return dataFromPromise;
   }
 
   async getBarcodeData(
@@ -506,4 +548,4 @@ class PhosphoprotService {
   }
 }
 
-export const phosphoprotService = new PhosphoprotService();
+export const omicNavigatorService = new OmicNavigatorService();

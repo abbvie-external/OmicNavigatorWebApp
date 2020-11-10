@@ -19,7 +19,7 @@ import {
 } from '../Shared/helpers';
 import phosphosite_icon from '../../resources/phosphosite.ico';
 import DOMPurify from 'dompurify';
-import { phosphoprotService } from '../../services/phosphoprot.service';
+import { omicNavigatorService } from '../../services/omicNavigator.service';
 import DifferentialVolcano from './DifferentialVolcano';
 import { CancelToken } from 'axios';
 import _ from 'lodash';
@@ -386,7 +386,7 @@ class Differential extends Component {
           queryId: -1,
           from: 0,
         };
-        phosphoprotService.postToPhosphositePlus(
+        omicNavigatorService.postToPhosphositePlus(
           param,
           'https://www.phosphosite.org/proteinSearchSubmitAction.action',
         );
@@ -433,7 +433,7 @@ class Differential extends Component {
     let self = this;
     if (differentialPlotTypes.length > 0) {
       _.forEach(differentialPlotTypes, function(plot, i) {
-        phosphoprotService
+        omicNavigatorService
           .plotStudy(
             differentialStudy,
             differentialModel,
@@ -1060,7 +1060,7 @@ class Differential extends Component {
                     additionalTemplateInfo={
                       additionalTemplateInfoDifferentialTable
                     }
-                    onRowClick={this.handleRowClickDifferential}
+                    // onRowClick={this.handleRowClickDifferential}
                     rowLevelPropsCalc={this.rowLevelPropsCalcDifferential}
                   />
                   {/* </div> */}

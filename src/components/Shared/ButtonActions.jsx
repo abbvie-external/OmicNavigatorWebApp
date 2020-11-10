@@ -139,7 +139,6 @@ class ButtonActions extends Component {
   };
 
   PDFExport = () => {
-    debugger;
     console.log(this.props);
     const isMultisetPlot = this.props.visible;
     if (isMultisetPlot) {
@@ -166,7 +165,7 @@ class ButtonActions extends Component {
     if (this.props.excelVisible) {
       return (
         <Button className="ExportButton" onClick={this.ExcelExport}>
-          Data (.xls)
+          XLS
         </Button>
       );
     }
@@ -241,12 +240,12 @@ class ButtonActions extends Component {
             <Label basic pointing="right" className="ExportButtonGroupLabel">
               EXPORT
             </Label>
-            {excelButton}
           </Button>
+          {txtButton}
           {svgButton}
           {pdfButton}
           {pngButton}
-          {txtButton}
+          {excelButton}
         </Button.Group>
       </div>
     );

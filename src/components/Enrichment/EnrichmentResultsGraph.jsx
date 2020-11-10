@@ -25,7 +25,7 @@ import LoaderActivePlots from '../Transitions/LoaderActivePlots';
 import './EnrichmentResultsGraph.scss';
 import NumericExponentialInput from '../Shared/NumericExponentialInput';
 import { limitValues } from '../Shared/helpers';
-import { phosphoprotService } from '../../services/phosphoprot.service';
+import { omicNavigatorService } from '../../services/omicNavigator.service';
 import { ResizableBox } from 'react-resizable';
 import '../Shared/ReactResizable.css';
 import { CancelToken } from 'axios';
@@ -383,7 +383,7 @@ class EnrichmentResultsGraph extends Component {
     let cancelToken = new CancelToken(e => {
       cancelRequestGetNodeFeaturesSearch = e;
     });
-    phosphoprotService
+    omicNavigatorService
       .getNodeFeatures(
         enrichmentStudy,
         enrichmentAnnotation,
