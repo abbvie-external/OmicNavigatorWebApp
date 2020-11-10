@@ -231,6 +231,7 @@ class DifferentialVolcano extends Component {
         key: item[differentialFeatureIdKey],
       },
     ]);
+    debugger;
     this.pageToFeature(item[differentialFeatureIdKey]);
   };
 

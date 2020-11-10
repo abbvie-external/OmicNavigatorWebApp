@@ -38,9 +38,14 @@ class DifferentialVolcanoPlot extends Component {
         prevProps.volcanoDifferentialTableRowMax
     ) {
       const circles = d3.selectAll('circle.volcanoPlot-dataPoint').attr('r', 2);
-      circles
-        .attr('style', 'stroke:#000000;strokeWidth: 0.4;fill: #1678c2')
-        .classed('highlighted', false);
+      circles.classed('highlighted', false);
+
+      // if (circles.attr('class').endsWith('highlighted')) {
+      //   circles.attr('style', 'stroke:#000000;strokeWidth: 0.4;fill: #1678c2');
+      // }
+      // if (circles.attr('class').endsWith('highlightedMax')) {
+      //   circles.attr('style', 'stroke:#000000;strokeWidth: 0.4;fill: #1678c2');
+      // }
 
       circles
         //.attr('style', 'fill: #ff4400')
@@ -244,7 +249,7 @@ class DifferentialVolcanoPlot extends Component {
           })
           .attr('style', 'fill: #00aeff')
           .classed('selected', true);
-        debugger;
+        //debugger;
         const brushedDataArr = brushed._groups[0].map(a => {
           return JSON.parse(a.attributes.data.value);
         });
