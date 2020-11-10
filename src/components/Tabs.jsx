@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import { Tab, Menu } from 'semantic-ui-react';
+import { Tab, Menu, Popup, Icon } from 'semantic-ui-react';
 import { omicNavigatorService } from '../services/omicNavigator.service';
 import Differential from './Differential/Differential';
 import omicNavigatorIcon from '../resources/icon.png';
@@ -291,7 +291,15 @@ class Tabs extends Component {
         ),
       },
     ];
-
+    const TableValuePopupStyle = {
+      backgroundColor: '2E2E2E',
+      borderBottom: '2px solid var(--color-primary)',
+      color: '#FFF',
+      padding: '1em',
+      maxWidth: '50vw',
+      fontSize: '13px',
+      wordBreak: 'break-all',
+    };
     return (
       <>
         <Tab
@@ -308,9 +316,20 @@ class Tabs extends Component {
           }}
         />
         <span id="AppVersion">
-          App: {`v${appVersion}`}
-          <br></br>
-          Package: {`v${packageVersion}`}
+          <Popup
+            trigger={<Icon name="info" color="grey" />}
+            style={TableValuePopupStyle}
+            className="TablePopupValue"
+            inverted
+            basic
+            // on='hover'
+            position="left center"
+          >
+            <Popup.Content>
+              App: {`v${appVersion}`}
+              <br></br>Package: {`v${packageVersion}`}
+            </Popup.Content>
+          </Popup>
         </span>
       </>
     );
