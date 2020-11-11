@@ -110,9 +110,9 @@ class DifferentialVolcanoPlot extends Component {
         e.target.attributes['cy'].value,
       ],
     };
-    const hovered = document.getElementById(
-      `volcanoDataPoint-${e.target.attributes['circleid'].value}`,
-    );
+    const hoveredElement = `volcanoDataPoint-${e.target.attributes['circleid'].value}`;
+    const hoveredId = `#volcanoDataPoint-${e.target.attributes['circleid'].value}`;
+    const hovered = document.getElementById(hoveredElement);
     const circle = d3.select(hovered) ?? null;
     if (circle != null) {
       circle
@@ -121,6 +121,7 @@ class DifferentialVolcanoPlot extends Component {
       circle.raise();
       this.setState({
         hoveredCircleData: hoveredData,
+        hoveredCircleId: hoveredId || null,
         hovering: true,
       });
     }
@@ -128,8 +129,26 @@ class DifferentialVolcanoPlot extends Component {
   handleCircleLeave() {
     d3.selectAll('circle.volcanoPlot-dataPoint')
       //.attr('style', 'stroke:#00aef;strokeWidth: 5')
-      .attr('style', 'stroke:#000000;strokeWidth: 0.4;fill: #1678c2')
+      //.attr('style', 'stroke:#000000;strokeWidth: 0.4;fill: #1678c2')
       .classed('hovered', false);
+    const hoveredCircle = d3.select(this.state.hoveredCircleId);
+    if (!hoveredCircle.empty()) {
+      if (hoveredCircle.attr('class').endsWith('selected')) {
+        hoveredCircle.attr('style', 'stroke:#00aef;strokeWidth: 5');
+      } else if (hoveredCircle.attr('class').endsWith('highlightedMax')) {
+        hoveredCircle.attr('style', 'fill: #ff4400');
+      } else if (hoveredCircle.attr('class').endsWith('highlighted')) {
+        hoveredCircle.attr(
+          'style',
+          'stroke:#000000;stroke-width:1;fill: #ff7e38',
+        );
+      } else {
+        hoveredCircle.attr(
+          'style',
+          'stroke:#000000;strokeWidth: 0.4;fill: #1678c2',
+        );
+      }
+    }
     this.setState({
       hoveredCircleData: {
         position: [],
@@ -238,7 +257,7 @@ class DifferentialVolcanoPlot extends Component {
         const circles = d3
           .selectAll('circle.volcanoPlot-dataPoint')
           //.attr('style', 'fill: #00aeff')
-          .attr('style', 'stroke:#000000;strokeWidth: 0.4;fill: #1678c2')
+          //.attr('style', 'stroke:#000000;strokeWidth: 0.4;fill: #1678c2')
           .classed('selected', false);
 
         const brushed = circles
