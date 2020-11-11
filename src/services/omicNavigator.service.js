@@ -106,24 +106,16 @@ class OmicNavigatorService {
     });
   }
 
-  async ocpuSimplest(method, obj) {
-    return new Promise(function(resolve, reject) {
-      window.ocpu.call(method, obj, function(session) {
-        const url = session.getLoc() + 'R/.val';
-        axios
-          .get(url)
-          .then(response => resolve(response.data))
-          .catch(function(thrown) {
-            console.log(thrown);
-          });
-      });
-    });
-  }
-
   async getPackageVersion() {
     this.setUrl();
-    const obj = { pkg: 'OmicNavigator' };
-    const promise = this.ocpuSimplest('getPackageVersion', obj);
+    const promise = this.ocpuDataCall(
+      'getPackageVersion',
+      {},
+      null,
+      null,
+      null,
+      15000,
+    );
     const versionFromPromise = await promise;
     return versionFromPromise;
   }

@@ -182,13 +182,8 @@ class Tabs extends Component {
     omicNavigatorService
       .getPackageVersion()
       .then(packageVersionResponseData => {
-        // grab version "[1] '0.20.1'"
-        var versionSubString = packageVersionResponseData.substring(
-          packageVersionResponseData.lastIndexOf(']') + 3,
-          packageVersionResponseData.lastIndexOf("'"),
-        );
         this.setState({
-          packageVersion: versionSubString,
+          packageVersion: packageVersionResponseData,
         });
       })
       .catch(error => {
