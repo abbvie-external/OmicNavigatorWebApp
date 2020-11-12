@@ -37,7 +37,13 @@ class DifferentialVolcanoPlot extends Component {
       volcanoDifferentialTableRowMax !==
         prevProps.volcanoDifferentialTableRowMax
     ) {
+      // excessive styling needed for proper display across all export types
+      // style all circles back to default
       const allCircles = d3.selectAll('circle.volcanoPlot-dataPoint');
+      allCircles.attr(
+        'style',
+        'stroke: #000, stroke-width: 0.4; fill: #1678c2',
+      );
       allCircles.attr('stroke', '#000');
       allCircles.attr('stroke-width', '0.4');
       allCircles.attr('fill', '#1678c2');
@@ -47,6 +53,10 @@ class DifferentialVolcanoPlot extends Component {
       const selectedCircles = d3.selectAll(
         'circle.volcanoPlot-dataPoint.selected',
       );
+      // style all brushed circles
+      selectedCircles
+        .attr('style', 'stroke: #000, stroke-width: 0.4; fill: #00aeff')
+        .classed('highlighted', true);
       selectedCircles.attr('stroke', '#000');
       selectedCircles.attr('stroke-width', '0.4');
       selectedCircles.attr('fill', '#00aeff');
@@ -54,6 +64,7 @@ class DifferentialVolcanoPlot extends Component {
       selectedCircles.raise();
       if (volcanoDifferentialTableRowOther.length > 0) {
         volcanoDifferentialTableRowOther.forEach(element => {
+          // style all highlighted circles
           const highlightedCircleId = document.getElementById(
             `volcanoDataPoint-${element}`,
           );
@@ -61,25 +72,32 @@ class DifferentialVolcanoPlot extends Component {
           if (highlightedCircle != null) {
             highlightedCircle.attr('r', 4);
             highlightedCircle
-              .attr(
-                'style',
-                'stroke: #000000, stroke-width: 0.4; fill: #ff7e05',
-              )
+              .attr('style', 'stroke: #000, stroke-width: 0.4; fill: #ff7e05')
               .classed('highlighted', true);
+            highlightedCircle.attr('stroke', '#000');
+            highlightedCircle.attr('stroke-width', '0.4');
+            highlightedCircle.attr('fill', '#ff7e05');
+            highlightedCircle.attr('r', 5);
+            highlightedCircle.classed('highlightedMax', true);
             highlightedCircle.raise();
           }
         });
       }
       if (volcanoDifferentialTableRowMax.length > 0) {
+        // style max highlighted circle
         const maxCircleId = document.getElementById(
           `volcanoDataPoint-${volcanoDifferentialTableRowMax}`,
         );
         const maxCircle = d3.select(maxCircleId);
         if (maxCircle != null) {
-          maxCircle.attr('r', 5);
           maxCircle
-            .attr('style', 'stroke: #000000, stroke-width: 0.4; fill: #ff4400')
-            .classed('highlightedMax', true);
+            .attr('style', 'stroke: #000, stroke-width: 0.4; fill: #ff4400')
+            .classed('highlighted', true);
+          maxCircle.attr('stroke', '#000');
+          maxCircle.attr('stroke-width', '0.4');
+          maxCircle.attr('fill', '#ff4400');
+          maxCircle.attr('r', 5);
+          maxCircle.classed('highlightedMax', true);
           maxCircle.raise();
         }
       }
@@ -249,39 +267,27 @@ class DifferentialVolcanoPlot extends Component {
           return brushTest;
         };
 
-        // const circles = d3
-        // .selectAll('circle.volcanoPlot-dataPoint')
-        // .attr('style', 'stroke: #000000, stroke-width: 0.4; fill: #1678c2')
-        // .attr('r', 2)
-        // .classed('selected', false);
+        // style all circles back to default
         const circles = d3.selectAll('circle.volcanoPlot-dataPoint');
+        circles.attr('style', 'stroke: #000, stroke-width: 0.4; fill: #1678c2');
         circles.attr('stroke', '#000');
         circles.attr('stroke-width', '0.4');
         circles.attr('fill', '#1678c2');
-        circles.attr('style', 'fill:#1678c2');
         circles.attr('r', 2);
         circles.classed('selected', false);
         circles.classed('highlighted', false);
         circles.classed('highlightedMax', false);
 
-        // const brushed = circles
-        //   .filter(function() {
-        //     const x = d3.select(this).attr('cx');
-        //     const y = d3.select(this).attr('cy');
-        //     return isBrushed(x, y);
-        //   })
-        //   .attr('style', 'stroke: #000000, stroke-width: 0.4; fill: #00aeff')
-        //   .attr('r', 2.5)
-        //   .classed('selected', true);
-        const brushed = circles
-          .filter(function() {
-            const x = d3.select(this).attr('cx');
-            const y = d3.select(this).attr('cy');
-            return isBrushed(x, y);
-          })
-          .attr('style', 'fill:#00aeff');
+        // style all brushed circles
+        const brushed = circles.filter(function() {
+          const x = d3.select(this).attr('cx');
+          const y = d3.select(this).attr('cy');
+          return isBrushed(x, y);
+        });
+        brushed.attr('style', 'stroke: #000, stroke-width: 0.4; fill: #00aeff');
         brushed.attr('stroke', '#000');
         brushed.attr('stroke-width', '0.4');
+        brushed.attr('fill', '#00aeff');
         brushed.attr('r', 2.5);
         brushed.classed('selected', true);
 
