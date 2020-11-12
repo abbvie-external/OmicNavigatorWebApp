@@ -132,3 +132,8 @@
 .checkboxMultiset input {
   cursor: pointer !important;
 }
+
+.DisabledCursor {
+  pointer-events: auto !important;
+  cursor: not-allowed !important;
+}

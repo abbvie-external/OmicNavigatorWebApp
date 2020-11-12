@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import { Tab, Menu } from 'semantic-ui-react';
-import { phosphoprotService } from '../services/phosphoprot.service';
+import { Tab, Menu, Popup, Icon } from 'semantic-ui-react';
+import { omicNavigatorService } from '../services/omicNavigator.service';
 import Differential from './Differential/Differential';
 import omicNavigatorIcon from '../resources/icon.png';
 import Enrichment from './Enrichment/Enrichment';
@@ -53,6 +53,8 @@ class Tabs extends Component {
       allStudiesMetadata: [],
       differentialFeatureIdKey: '',
       filteredDifferentialFeatureIdKey: '',
+      appVersion: '0.2.6.1',
+      packageVersion: '',
     };
   }
 
@@ -163,15 +165,29 @@ class Tabs extends Component {
   };
 
   getStudies = () => {
-    phosphoprotService
+    omicNavigatorService
       .listStudies()
       .then(listStudiesResponseData => {
         this.setState({
           allStudiesMetadata: listStudiesResponseData,
         });
+        this.getPackageVersion();
       })
       .catch(error => {
         console.error('Error during listStudies', error);
+      });
+  };
+
+  getPackageVersion = () => {
+    omicNavigatorService
+      .getPackageVersion()
+      .then(packageVersionResponseData => {
+        this.setState({
+          packageVersion: packageVersionResponseData,
+        });
+      })
+      .catch(error => {
+        console.error('Error during packageVersion', error);
       });
   };
 
@@ -214,7 +230,7 @@ class Tabs extends Component {
   };
 
   render() {
-    const { activeIndex } = this.state;
+    const { activeIndex, appVersion, packageVersion } = this.state;
     const panes = [
       {
         menuItem: (
@@ -270,21 +286,47 @@ class Tabs extends Component {
         ),
       },
     ];
-
+    const TableValuePopupStyle = {
+      backgroundColor: '2E2E2E',
+      borderBottom: '2px solid var(--color-primary)',
+      color: '#FFF',
+      padding: '1em',
+      maxWidth: '50vw',
+      fontSize: '13px',
+      wordBreak: 'break-all',
+    };
     return (
-      <Tab
-        onTabChange={this.handleTabChange}
-        panes={panes}
-        activeIndex={activeIndex}
-        renderActiveOnly={false}
-        menu={{
-          stackable: true,
-          secondary: true,
-          pointing: true,
-          inverted: true,
-          className: 'MenuContainer',
-        }}
-      />
+      <>
+        <Tab
+          onTabChange={this.handleTabChange}
+          panes={panes}
+          activeIndex={activeIndex}
+          renderActiveOnly={false}
+          menu={{
+            stackable: true,
+            secondary: true,
+            pointing: true,
+            inverted: true,
+            className: 'MenuContainer',
+          }}
+        />
+        <span id="AppVersion">
+          <Popup
+            trigger={<Icon name="info" color="grey" />}
+            style={TableValuePopupStyle}
+            className="TablePopupValue"
+            inverted
+            basic
+            // on='hover'
+            position="left center"
+          >
+            <Popup.Content>
+              App: {`v${appVersion}`}
+              <br></br>Package: {`v${packageVersion}`}
+            </Popup.Content>
+          </Popup>
+        </span>
+      </>
     );
   }
 }

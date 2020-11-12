@@ -12,7 +12,7 @@ import {
 import { CancelToken } from 'axios';
 import DOMPurify from 'dompurify';
 import '../Shared/SearchCriteria.scss';
-import { phosphoprotService } from '../../services/phosphoprot.service';
+import { omicNavigatorService } from '../../services/omicNavigator.service';
 import DifferentialMultisetFilters from './DifferentialMultisetFilters';
 
 let cancelRequestGetReportLinkDifferential = () => {};
@@ -190,7 +190,7 @@ class DifferentialSearchCriteria extends Component {
         this.getReportLink(differentialStudy, differentialModel);
         if (differentialTest !== '') {
           onSearchTransitionDifferential(true);
-          phosphoprotService
+          omicNavigatorService
             .getResultsTable(
               differentialStudy,
               differentialModel,
@@ -270,17 +270,24 @@ class DifferentialSearchCriteria extends Component {
     let cancelToken = new CancelToken(e => {
       cancelRequestGetReportLinkDifferential = e;
     });
-    phosphoprotService
+    omicNavigatorService
       .getReportLink(study, model, this.setStudyTooltip, cancelToken)
-      .then(getReportLink => {
-        const link = getReportLink.includes('http')
-          ? getReportLink
-          : // : `***REMOVED***/ocpu/library/${getReportLink}`;
-            `${this.props.baseUrl}/ocpu/library/${getReportLink}`;
-        this.setState({
-          differentialStudyHrefVisible: true,
-          differentialStudyHref: link,
-        });
+      .then(getReportLinkResponse => {
+        if (getReportLinkResponse.length > 0) {
+          const link = getReportLinkResponse.includes('http')
+            ? getReportLinkResponse
+            : // : `***REMOVED***/ocpu/library/${getReportLinkResponse}`;
+              `${this.props.baseUrl}/ocpu/library/${getReportLinkResponse}`;
+          this.setState({
+            differentialStudyHrefVisible: true,
+            differentialStudyHref: link,
+          });
+        } else {
+          this.setState({
+            differentialStudyHrefVisible: false,
+            differentialStudyHref: '',
+          });
+        }
       })
       .catch(error => {
         console.error('Error during getReportLink', error);
@@ -365,7 +372,7 @@ class DifferentialSearchCriteria extends Component {
     let cancelToken = new CancelToken(e => {
       cancelRequestPSCGetResultsTable = e;
     });
-    phosphoprotService
+    omicNavigatorService
       .getResultsTable(
         differentialStudy,
         differentialModel,
@@ -488,7 +495,7 @@ class DifferentialSearchCriteria extends Component {
     let cancelToken = new CancelToken(e => {
       cancelRequestPSCGetResultsTable = e;
     });
-    phosphoprotService
+    omicNavigatorService
       .getResultsTable(
         differentialStudy,
         differentialModel,
@@ -641,7 +648,7 @@ class DifferentialSearchCriteria extends Component {
     let cancelToken = new CancelToken(e => {
       cancelRequestMultisetInferenceData = e;
     });
-    phosphoprotService
+    omicNavigatorService
       .getResultsIntersection(
         differentialStudy,
         differentialModel,
@@ -709,7 +716,7 @@ class DifferentialSearchCriteria extends Component {
     let cancelToken = new CancelToken(e => {
       cancelRequestInferenceMultisetPlot = e;
     });
-    phosphoprotService
+    omicNavigatorService
       .getResultsUpset(
         differentialStudy,
         differentialModel,

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Tab } from 'semantic-ui-react';
-import { phosphoprotService } from '../../services/phosphoprot.service';
+import { omicNavigatorService } from '../../services/omicNavigator.service';
 // import { toast } from 'react-toastify';
 import MetafeaturesTable from './MetafeaturesTable';
 // import * as d3 from 'd3';
@@ -31,7 +31,7 @@ class SVGPlot extends Component {
       JSON.parse(modelSpecificMetaFeaturesExist) &&
       JSON.parse(featureidSpecificMetaFeaturesExist)
     ) {
-      phosphoprotService
+      omicNavigatorService
         .getMetaFeaturesTable(
           this.props.differentialStudy,
           differentialModel,

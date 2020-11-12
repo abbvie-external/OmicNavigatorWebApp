@@ -12,7 +12,7 @@ import {
 import { CancelToken } from 'axios';
 import DOMPurify from 'dompurify';
 import '../Shared/SearchCriteria.scss';
-import { phosphoprotService } from '../../services/phosphoprot.service';
+import { omicNavigatorService } from '../../services/omicNavigator.service';
 import EnrichmentMultisetFilters from './EnrichmentMultisetFilters';
 
 let cancelRequestGetReportLinkEnrichment = () => {};
@@ -164,6 +164,7 @@ class EnrichmentSearchCriteria extends Component {
       });
       this.getReportLink(enrichmentStudy, 'default');
       if (enrichmentModel !== '') {
+        this.props.onHandleHasBarcodeData();
         this.props.onHandlePlotTypesEnrichment(enrichmentModel);
         const enrichmentModelWithAnnotations = enrichmentModelsAndAnnotationsVar.find(
           model => model.modelID === enrichmentModel,
@@ -196,7 +197,7 @@ class EnrichmentSearchCriteria extends Component {
         this.getReportLink(enrichmentStudy, enrichmentModel);
         if (enrichmentAnnotation !== '') {
           onSearchTransitionEnrichment(true);
-          phosphoprotService
+          omicNavigatorService
             .getEnrichmentsTable(
               enrichmentStudy,
               enrichmentModel,
@@ -250,17 +251,24 @@ class EnrichmentSearchCriteria extends Component {
     let cancelToken = new CancelToken(e => {
       cancelRequestGetReportLinkEnrichment = e;
     });
-    phosphoprotService
+    omicNavigatorService
       .getReportLink(study, model, this.setStudyTooltip, cancelToken)
-      .then(getReportLink => {
-        const link = getReportLink.includes('http')
-          ? getReportLink
-          : // : `***REMOVED***/ocpu/library/${getReportLink}`;
-            `${this.props.baseUrl}/ocpu/library/${getReportLink}`;
-        this.setState({
-          enrichmentStudyHrefVisible: true,
-          enrichmentStudyHref: link,
-        });
+      .then(getReportLinkResponse => {
+        if (getReportLinkResponse.length > 0) {
+          const link = getReportLinkResponse.includes('http')
+            ? getReportLinkResponse
+            : // : `***REMOVED***/ocpu/library/${getReportLinkResponse}`;
+              `${this.props.baseUrl}/ocpu/library/${getReportLinkResponse}`;
+          this.setState({
+            enrichmentStudyHrefVisible: true,
+            enrichmentStudyHref: link,
+          });
+        } else {
+          this.setState({
+            enrichmentStudyHrefVisible: false,
+            enrichmentStudyHref: '',
+          });
+        }
       })
       .catch(error => {
         console.error('Error during getReportLink', error);
@@ -298,6 +306,7 @@ class EnrichmentSearchCriteria extends Component {
       onSearchCriteriaReset,
       enrichmentModelsAndAnnotations,
     } = this.props;
+    this.props.onHandleHasBarcodeData();
     this.props.onHandlePlotTypesEnrichment(value);
     onSearchCriteriaChange(
       {
@@ -374,7 +383,7 @@ class EnrichmentSearchCriteria extends Component {
     let cancelToken = new CancelToken(e => {
       cancelGetEnrichmentsTable = e;
     });
-    phosphoprotService
+    omicNavigatorService
       .getEnrichmentsTable(
         enrichmentStudy,
         enrichmentModel,
@@ -451,7 +460,7 @@ class EnrichmentSearchCriteria extends Component {
       let cancelToken = new CancelToken(e => {
         cancelGetEnrichmentsTable = e;
       });
-      phosphoprotService
+      omicNavigatorService
         .getEnrichmentsTable(
           enrichmentStudy,
           enrichmentModel,
@@ -487,7 +496,7 @@ class EnrichmentSearchCriteria extends Component {
       let cancelToken = new CancelToken(e => {
         cancelRequestMultisetEnrichmentData = e;
       });
-      phosphoprotService
+      omicNavigatorService
         .getEnrichmentsIntersection(
           enrichmentStudy,
           enrichmentModel,
@@ -604,7 +613,7 @@ class EnrichmentSearchCriteria extends Component {
     let cancelToken = new CancelToken(e => {
       cancelGetEnrichmentsTable = e;
     });
-    phosphoprotService
+    omicNavigatorService
       .getEnrichmentsTable(
         enrichmentStudy,
         enrichmentModel,
@@ -738,7 +747,7 @@ class EnrichmentSearchCriteria extends Component {
     let cancelToken = new CancelToken(e => {
       cancelRequestMultisetEnrichmentData = e;
     });
-    phosphoprotService
+    omicNavigatorService
       .getEnrichmentsIntersection(
         enrichmentStudy,
         enrichmentModel,
@@ -817,7 +826,7 @@ class EnrichmentSearchCriteria extends Component {
       let cancelToken = new CancelToken(e => {
         cancelRequestEnrichmentMultisetPlot = e;
       });
-      phosphoprotService
+      omicNavigatorService
         .getEnrichmentsUpset(
           enrichmentStudy,
           enrichmentModel,
