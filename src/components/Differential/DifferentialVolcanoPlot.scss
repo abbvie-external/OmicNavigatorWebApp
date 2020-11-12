@@ -13,33 +13,30 @@
 }
 .volcanoPlotXAxis {
   stroke: #838383;
-  stroke-width: 2px;
+  stroke-width: 1;
 }
 .axisLabel {
+  stroke: #000;
   font-weight: bold;
 }
 .volcanoPlot-dataPoint {
-  stroke: black;
+  stroke: #000;
   stroke-width: 0.4;
   fill: var(--color-link);
 }
-.volcanoPlot-dataPoint.hovered {
-  stroke: var(--color-tertiary);
-  stroke-width: 5;
-}
 .volcanoPlot-dataPoint.selected {
-  // stroke: black;
-  // stroke-width: 1;
+  stroke: #000;
+  stroke-width: 0.4;
   fill: var(--color-tertiary);
 }
 .volcanoPlot-dataPoint.highlighted {
-  stroke: black;
-  stroke-width: 1;
+  stroke: #000;
+  stroke-width: 0.4;
   fill: var(--color-primary-gradient);
 }
 .volcanoPlot-dataPoint.highlightedMax {
-  //stroke: var(--color-primary);
-  // stroke-width: 5;
+  stroke: #000;
+  stroke-width: 0.4;
   fill: var(--color-primary);
 }
 
