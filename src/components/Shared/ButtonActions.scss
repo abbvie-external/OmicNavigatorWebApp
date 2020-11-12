@@ -8,6 +8,7 @@
   .ExportButtonGroupLabel {
     background-color: var(--color-primary) !important;
     color: #fff !important;
+    cursor: auto;
     // border-radius: 10px !important;
     // border-radius: 28571429rem;
   }
@@ -22,5 +23,6 @@
     box-shadow: 0 1px 0px rgba(0, 0, 0, 0.12), 0 1px 0px rgba(0, 0, 0, 0.24) !important;
     border-radius: 0.28571429rem !important;
     // max-width: 72px !important;
+    z-index: 1;
   }
 }
