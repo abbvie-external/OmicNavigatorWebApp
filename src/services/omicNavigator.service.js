@@ -3,20 +3,15 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 window.jQuery = $;
 require('opencpu.js/opencpu-0.5.js');
-class PhosphoprotService {
+class OmicNavigatorService {
   constructor() {
     this.ocpuUrl = '***REMOVED***/ocpu/library/OmicNavigator/R';
-    //this.ocpuUrl = 'http://localhost:5656/ocpu/library/OmicAnalyzer/R';  //<-- comment out before building production
   }
 
   setUrl() {
     if (process.env.NODE_ENV === 'development') {
       window.ocpu.seturl(this.ocpuUrl);
     }
-  }
-
-  setUrlAlt() {
-    window.ocpu.seturl(this.ocpuUrlAlt);
   }
 
   async ocpuRPCUnbox(method, obj, timeoutLength, handleError, cancelToken) {
@@ -58,13 +53,6 @@ class PhosphoprotService {
           }
         });
     });
-  }
-
-  async listStudies() {
-    this.setUrl();
-    const promise = this.ocpuRPCUnbox('listStudies', {}, 15000);
-    const studiesFromPromise = await promise;
-    return studiesFromPromise;
   }
 
   async ocpuDataCall(
@@ -118,6 +106,20 @@ class PhosphoprotService {
     });
   }
 
+  async getPackageVersion() {
+    this.setUrl();
+    const promise = this.ocpuDataCall(
+      'getPackageVersion',
+      {},
+      null,
+      null,
+      null,
+      15000,
+    );
+    const versionFromPromise = await promise;
+    return versionFromPromise;
+  }
+
   async getReportLink(study, model, errorCb, cancelToken) {
     this.setUrl();
     const obj = { study: study, modelID: model };
@@ -131,6 +133,13 @@ class PhosphoprotService {
     );
     const dataFromPromise = await promise;
     return dataFromPromise;
+  }
+
+  async listStudies() {
+    this.setUrl();
+    const promise = this.ocpuRPCUnbox('listStudies', {}, 15000);
+    const studiesFromPromise = await promise;
+    return studiesFromPromise;
   }
 
   async getResultsTable(study, model, test, errorCb, cancelToken) {
@@ -219,6 +228,8 @@ class PhosphoprotService {
       window.ocpu
         .call(plottype, obj, function(session) {
           axios
+            // if we want to call plot with dimensions...in progress
+            // .get(session.getLoc() + `graphics/1/svg?width=${dynamicWidth}&height={dynamicHeight}`, {
             .get(session.getLoc() + 'graphics/1/svg', {
               responseType: 'text',
               cancelToken,
@@ -257,6 +268,23 @@ class PhosphoprotService {
     );
     //const svgMarkupFromPromise = await promise;
     return promise;
+  }
+
+  async getBarcodes(study, model) {
+    this.setUrl();
+    const promise = this.ocpuDataCall(
+      'getBarcodes',
+      {
+        study: study,
+        modelID: model,
+      },
+      null,
+      null,
+      false,
+      15000,
+    );
+    const dataFromPromise = await promise;
+    return dataFromPromise;
   }
 
   async getBarcodeData(
@@ -506,4 +534,4 @@ class PhosphoprotService {
   }
 }
 
-export const phosphoprotService = new PhosphoprotService();
+export const omicNavigatorService = new OmicNavigatorService();

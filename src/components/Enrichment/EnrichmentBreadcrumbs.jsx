@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import { Breadcrumb, Icon, Popup } from 'semantic-ui-react';
 import '../Shared/Breadcrumbs.scss';
-import { phosphoprotService } from '../../services/phosphoprot.service';
+import { omicNavigatorService } from '../../services/omicNavigator.service';
 
 // import msig_icon from '../../resources/msig.ico';
 // import phosphosite_icon from '../../resources/phosphosite.ico';
@@ -39,7 +39,7 @@ class EnrichmentBreadcrumbs extends Component {
         : dataItem.MajorityProteinIDsHGNC
       ).split(';')[0];
       let param = { queryId: -1, from: 0, searchStr: protein };
-      phosphoprotService.postToPhosphositePlus(
+      omicNavigatorService.postToPhosphositePlus(
         param,
         'https://www.phosphosite.org/proteinSearchSubmitAction.action',
       );

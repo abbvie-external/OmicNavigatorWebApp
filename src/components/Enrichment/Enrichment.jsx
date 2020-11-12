@@ -12,7 +12,7 @@ import phosphosite_icon from '../../resources/phosphosite.ico';
 import reactome_icon from '../../resources/reactome.jpg';
 import tableIcon from '../../resources/tableIcon.png';
 import tableIconSelected from '../../resources/tableIconSelected.png';
-import { phosphoprotService } from '../../services/phosphoprot.service';
+import { omicNavigatorService } from '../../services/omicNavigator.service';
 import ButtonActions from '../Shared/ButtonActions';
 import * as d3 from 'd3';
 import {
@@ -37,7 +37,7 @@ let cancelRequestEnrichmentGetPlot = () => {};
 let cancelRequestGetEnrichmentsNetwork = () => {};
 
 class Enrichment extends Component {
-  defaultEnrichmentActiveIndex =
+  storedEnrichmentActiveIndex =
     parseInt(sessionStorage.getItem('enrichmentViewTab'), 10) || 0;
 
   state = {
@@ -51,7 +51,7 @@ class Enrichment extends Component {
     enrichmentFeatureID: '',
     enrichmentPlotSVGHeight: 0,
     enrichmentPlotSVGWidth: 0,
-    activeIndexEnrichmentView: this.defaultEnrichmentActiveIndex || 0,
+    activeIndexEnrichmentView: this.storedEnrichmentActiveIndex || 0,
     multisetPlotInfo: {
       title: '',
       svg: [],
@@ -127,6 +127,7 @@ class Enrichment extends Component {
     SVGPlotLoading: false,
     SVGPlotLoaded: false,
     isViolinPlotLoaded: false,
+    // hasBarcodeData: true,
     barcodeSettings: {
       barcodeData: [],
       brushedData: [],
@@ -261,7 +262,7 @@ class Enrichment extends Component {
     // const TestSiteVar = `${test}:${dataItem.description}`;
     // let xLargest = 0;
     // let imageInfo = { key: '', title: '', svg: [] };
-    // phosphoprotService
+    // omicNavigatorService
     //   .getDatabaseInfo(
     //     enrichmentStudy + 'plots',
     //     enrichmentAnnotation,
@@ -287,7 +288,7 @@ class Enrichment extends Component {
       enrichmentTerm: term,
     });
 
-    phosphoprotService
+    omicNavigatorService
       .getBarcodeData(
         enrichmentStudy,
         enrichmentModel,
@@ -312,6 +313,9 @@ class Enrichment extends Component {
             });
           }
           showBarcodePlotCb(barcodeDataResponse, dataItem);
+        } else {
+          // empty barcode data array
+          this.handleGetBarcodeDataError();
         }
       })
       .catch(error => {
@@ -489,6 +493,26 @@ class Enrichment extends Component {
     }
   };
 
+  handleHasBarcodeData = () => {
+    const { enrichmentStudy, enrichmentModel } = this.props;
+    omicNavigatorService
+      .getBarcodes(enrichmentStudy, enrichmentModel, null, null)
+      .then(getBarcodesResponseData => {
+        if (getBarcodesResponseData.statistic !== '') {
+          this.setState({
+            hasBarcodeData: true,
+          });
+        } else {
+          this.setState({
+            hasBarcodeData: false,
+          });
+        }
+      })
+      .catch(error => {
+        console.error('Error during getBarcodes', error);
+      });
+  };
+
   disablePlot = () => {
     this.setState({
       multisetPlotAvailable: false,
@@ -535,6 +559,7 @@ class Enrichment extends Component {
       enrichmentModel,
       enrichmentAnnotation,
     } = this.props;
+    const { hasBarcodeData } = this.state;
     const TableValuePopupStyle = {
       backgroundColor: '2E2E2E',
       borderBottom: '2px solid var(--color-primary)',
@@ -661,14 +686,18 @@ class Enrichment extends Component {
               <Popup
                 trigger={
                   <span
-                    className="TableCellLink"
-                    onClick={addParams.barcodeData(
-                      enrichmentStudy,
-                      enrichmentModel,
-                      enrichmentAnnotation,
-                      item,
-                      c,
-                    )}
+                    className={hasBarcodeData ? 'TableCellLink' : ''}
+                    onClick={
+                      hasBarcodeData
+                        ? addParams.barcodeData(
+                            enrichmentStudy,
+                            enrichmentModel,
+                            enrichmentAnnotation,
+                            item,
+                            c,
+                          )
+                        : {}
+                    }
                   >
                     {formatNumberForDisplay(value)}
                   </span>
@@ -730,7 +759,7 @@ class Enrichment extends Component {
       let cancelToken = new CancelToken(e => {
         cancelRequestGetEnrichmentsNetwork = e;
       });
-      phosphoprotService
+      omicNavigatorService
         .getEnrichmentsNetwork(
           enrichmentStudy,
           enrichmentModel,
@@ -739,15 +768,23 @@ class Enrichment extends Component {
           cancelToken,
         )
         .then(getEnrichmentNetworkResponseData => {
-          this.setState(
-            {
-              unfilteredNetworkData: getEnrichmentNetworkResponseData,
-            },
-            this.handleEnrichmentNetworkData(
-              getEnrichmentNetworkResponseData,
-              enrichmentResults,
-            ),
-          );
+          if (
+            getEnrichmentNetworkResponseData.nodes?.length > 0 ||
+            getEnrichmentNetworkResponseData.links?.length > 0 ||
+            getEnrichmentNetworkResponseData.tests?.length > 0
+          ) {
+            this.setState(
+              {
+                unfilteredNetworkData: getEnrichmentNetworkResponseData,
+              },
+              this.handleEnrichmentNetworkData(
+                getEnrichmentNetworkResponseData,
+                enrichmentResults,
+              ),
+            );
+          } else {
+            this.handleGetEnrichmentNetworkError();
+          }
         })
         .catch(error => {
           console.error('Error during getEnrichmentNetwork', error);
@@ -834,6 +871,7 @@ class Enrichment extends Component {
         propData: [],
       },
       networkDataError: true,
+      activeIndexEnrichmentView: 0,
     });
   };
 
@@ -1010,7 +1048,7 @@ class Enrichment extends Component {
     });
     if (enrichmentPlotTypes.length > 0) {
       _.forEach(enrichmentPlotTypes, function(plot, i) {
-        phosphoprotService
+        omicNavigatorService
           .plotStudy(
             enrichmentStudy,
             enrichmentModel,
@@ -1159,7 +1197,7 @@ class Enrichment extends Component {
       enrichmentDataItem: dataItem,
       enrichmentTerm: term,
     });
-    phosphoprotService
+    omicNavigatorService
       .getBarcodeData(
         enrichmentStudy,
         enrichmentModel,
@@ -1184,6 +1222,8 @@ class Enrichment extends Component {
             });
           }
           this.showBarcodePlot(barcodeDataResponse, dataItem);
+        } else {
+          this.handleGetBarcodeDataError();
         }
       })
       .catch(error => {
@@ -1227,7 +1267,7 @@ class Enrichment extends Component {
         //     enrichmentTerm: term
         //   });
 
-        //   phosphoprotService
+        //   omicNavigatorService
         //     .getBarcodeData(
         //       enrichmentStudy + 'plots',
         //       enrichmentModel,
@@ -1810,7 +1850,7 @@ class Enrichment extends Component {
         : dataItem.MajorityProteinIDsHGNC
       ).split(';')[0];
       let param = { queryId: -1, from: 0, searchStr: protein };
-      phosphoprotService.postToPhosphositePlus(
+      omicNavigatorService.postToPhosphositePlus(
         param,
         'https://www.phosphosite.org/proteinSearchSubmitAction.action',
       );
@@ -1932,8 +1972,13 @@ class Enrichment extends Component {
         menuItem: (
           <Menu.Item
             key="1"
-            className="TableAndNetworkButtons NetworkButton"
+            className={
+              !networkDataError
+                ? 'TableAndNetworkButtons NetworkButton'
+                : 'TableAndNetworkButtons NetworkButton DisabledCursor'
+            }
             name="network"
+            disabled={networkDataError}
           >
             <img
               src={
@@ -2149,6 +2194,7 @@ class Enrichment extends Component {
               onAnnotationChange={this.handleAnnotationChange}
               onHandleNetworkGraphReady={this.handleNetworkGraphReady}
               onHandleEnrichmentTableLoading={this.handleEnrichmentTableLoading}
+              onHandleHasBarcodeData={this.handleHasBarcodeData}
             />
           </Grid.Column>
           <Grid.Column

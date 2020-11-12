@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Popup, Dimmer, Loader } from 'semantic-ui-react';
-import { phosphoprotService } from '../../services/phosphoprot.service';
+import { omicNavigatorService } from '../../services/omicNavigator.service';
 import _ from 'lodash';
 import {
   formatNumberForDisplay,
@@ -58,7 +58,6 @@ class FilteredDifferentialTable extends Component {
       this.props.filteredDifferentialFeatureIdKey !==
       prevProps.filteredDifferentialFeatureIdKey
     ) {
-      debugger;
       this.setState(
         {
           additionalTemplateInfo: {},
@@ -71,7 +70,6 @@ class FilteredDifferentialTable extends Component {
     }
 
     if (this.props.HighlightedProteins !== prevProps.HighlightedProteins) {
-      debugger;
       this.highlightRows(this.props.HighlightedProteins, this.state.rowClicked);
     }
   }
@@ -147,7 +145,7 @@ class FilteredDifferentialTable extends Component {
       let cancelToken = new CancelToken(e => {
         cancelRequestFPTGetResultsTable = e;
       });
-      phosphoprotService
+      omicNavigatorService
         .getResultsTable(
           this.props.enrichmentStudy,
           this.props.enrichmentModel,
@@ -190,7 +188,6 @@ class FilteredDifferentialTable extends Component {
       }
     }
     const alphanumericTrigger = filteredDifferentialAlphanumericFields[0];
-    debugger;
     this.props.onHandleDifferentialFeatureIdKey(
       'filteredDifferentialFeatureIdKey',
       alphanumericTrigger,
@@ -355,7 +352,7 @@ class FilteredDifferentialTable extends Component {
           queryId: -1,
           from: 0,
         };
-        phosphoprotService.postToPhosphositePlus(
+        omicNavigatorService.postToPhosphositePlus(
           param,
           'https://www.phosphosite.org/proteinSearchSubmitAction.action',
         );
