@@ -360,18 +360,24 @@ class DifferentialVolcano extends Component {
     }
   };
   getSVGPlot = () => {
-    if (this.props.imageInfo.key != null && this.props.isVolcanoPlotSVGLoaded) {
+    const {
+      imageInfo,
+      tabsMessage,
+      isVolcanoPlotSVGLoaded,
+      onSVGTabChange,
+    } = this.props;
+    if (imageInfo.key != null && isVolcanoPlotSVGLoaded) {
       return (
         <div className="VolcanoPlotSVGPlot">
           <SVGPlot
             // ref={this.differentialViewContainerRef}
             {...this.props}
             {...this.state}
-            onSVGTabChange={this.props.onSVGTabChange}
+            onSVGTabChange={onSVGTabChange}
           ></SVGPlot>
         </div>
       );
-    } else if (!this.props.isVolcanoPlotSVGLoaded) {
+    } else if (!isVolcanoPlotSVGLoaded) {
       return (
         <Dimmer active inverted>
           <Loader size="large">Loading Plots</Loader>
@@ -380,9 +386,7 @@ class DifferentialVolcano extends Component {
     } else {
       return (
         <div className="PlotInstructions">
-          <h4 className="PlotInstructionsText">
-            Select a feature to display SVG Plot
-          </h4>
+          <h4 className="PlotInstructionsText">{tabsMessage}</h4>
         </div>
       );
     }
