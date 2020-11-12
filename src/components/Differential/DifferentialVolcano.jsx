@@ -231,6 +231,7 @@ class DifferentialVolcano extends Component {
         key: item[differentialFeatureIdKey],
       },
     ]);
+    debugger;
     this.pageToFeature(item[differentialFeatureIdKey]);
   };
 
@@ -604,8 +605,8 @@ class DifferentialVolcano extends Component {
               id=""
               // defaultSize={this.state.volcanoHeight * 1.05263157895}
               size={this.state.volcanoHeight * 1.05263157895}
-              minSize={200}
-              maxSize={1200}
+              minSize={220}
+              maxSize={1000}
               onDragFinished={size => this.onSizeChange(size, 'horizontal')}
             >
               <SplitPane

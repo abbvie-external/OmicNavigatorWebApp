@@ -517,6 +517,7 @@ class Differential extends Component {
   };
 
   handleSelectedVolcano = toHighlightArr => {
+    //if(toHighlightArr !== this.state.HighlightedFeaturesArrVolcano){
     this.setState({
       HighlightedFeaturesArrVolcano: toHighlightArr,
     });
@@ -551,6 +552,7 @@ class Differential extends Component {
       });
       this.handlePlotVolcano('');
     }
+    //}
   };
 
   handlePlotVolcano = maxId => {
