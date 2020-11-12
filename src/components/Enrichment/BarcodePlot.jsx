@@ -25,16 +25,17 @@ class BarcodePlot extends Component {
       bottomLabel: '',
       barcodeHeight: 0,
       margin: {
-        top: 45,
+        top: 65,
         right: 40,
-        bottom: 40,
+        bottom: 20,
         left: 20,
-        hovered: 25,
-        selected: 25,
-        highlighted: 15,
-        max: 5,
+        hovered: 45,
+        selected: 45,
+        highlighted: 25,
+        max: 15,
       },
     },
+    showAllTooltips: false,
   };
 
   barcodeContainerRef = React.createRef();
@@ -288,6 +289,7 @@ class BarcodePlot extends Component {
               .classed('selectedReference', true)
               .classed('selected', true);
             const brushedArr = brushed._groups[0];
+            debugger;
             const brushedDataVar = brushedArr.map(a => {
               return {
                 x2: a.attributes[2].nodeValue,
@@ -295,7 +297,41 @@ class BarcodePlot extends Component {
                 lineID: a.attributes[7].nodeValue,
                 logFC: a.attributes[8].nodeValue,
                 statistic: a.attributes[9].nodeValue,
+                class: a.attributes[1].nodeValue,
               };
+            });
+            const brushedDataTooltips = brushedDataVar.map(line => {
+              debugger;
+              // const statistic = line.statistic;
+              // const textAnchor =
+              //   statistic > self.props.barcodeSettings.highStat / 2
+              //     ? 'end'
+              //     : 'start';
+              // const textAnchor = this.position === 'start' ? 'end' : 'start';
+              // this.position = textAnchor;
+              // const ttPosition =
+              //   this.switch === 'odd' ? line.x2 - 15 : line.x2 + 15;
+              const ttPosition = line.x2 - 3;
+              const switchEveryOther = this.switch === 'odd' ? 'even' : 'odd';
+              this.switch = switchEveryOther;
+              const textAnchor = 'start';
+              // const ttPosition =
+              //   this.switch === 'odd' ? line.x2 + 5 : line.x2 + 15;
+              const alternatePosition = this.switch === 'even' ? 0 : 35;
+
+              return (
+                <text
+                  key={`${line.featureID}-barcodeTooltip`}
+                  className="BarcodeTooltipText"
+                  transform={`translate(${ttPosition}, ${alternatePosition})rotate(-90)`}
+                  // transform={`translate(${ttPosition}, 15)`}
+                  fontSize="11px"
+                  textAnchor={textAnchor}
+                  fontFamily="Lato, Helvetica Neue, Arial, Helvetica, sans-serif"
+                >
+                  {line.featureID}
+                </text>
+              );
             });
             self.props.onHandleBarcodeChanges({
               brushedData: brushedDataVar,
@@ -323,6 +359,7 @@ class BarcodePlot extends Component {
                 highlightedLineName: maxLineObject.lineID,
                 tooltipPositionMax: ttPositionMax,
                 tooltipTextAnchorMax: textAnchorMax,
+                allTooltips: brushedDataTooltips,
               });
             }
           }
@@ -392,17 +429,16 @@ class BarcodePlot extends Component {
   }
 
   getTooltip = () => {
-    const { hoveredLineName, tooltipPosition, tooltipTextAnchor } = this.state;
-
+    const { hoveredLineName, tooltipPosition } = this.state;
     if (tooltipPosition) {
       if (hoveredLineName) {
         return (
           <text
             className="BarcodeTooltipText"
             // transform={`translate(${tooltipPosition}, 15)rotate(-45)`}
-            transform={`translate(${tooltipPosition}, 15)`}
+            transform={`translate(${tooltipPosition}, 13)`}
             fontSize="14px"
-            textAnchor={tooltipTextAnchor}
+            textAnchor="end"
             fontFamily="Lato, Helvetica Neue, Arial, Helvetica, sans-serif"
           >
             {hoveredLineName}
@@ -439,7 +475,13 @@ class BarcodePlot extends Component {
     return null;
   };
   render() {
-    const { barcodeWidth, barcodeContainerWidth, settings } = this.state;
+    const {
+      barcodeWidth,
+      barcodeContainerWidth,
+      settings,
+      allTooltips,
+      showAllTooltips,
+    } = this.state;
 
     const { horizontalSplitPaneSize, barcodeSettings } = this.props;
     const barcodeHeight =
@@ -502,7 +544,6 @@ class BarcodePlot extends Component {
 
     const tooltip = this.getTooltip();
     const maxTooltip = this.getMaxTooltip();
-
     return (
       <div ref={this.barcodeContainerRef} id="BarcodeChartContainer">
         <div className="export-container">
@@ -572,6 +613,7 @@ class BarcodePlot extends Component {
           {barcodeLines}
           {tooltip}
           {maxTooltip}
+          {showAllTooltips ? allTooltips : null}
         </svg>
       </div>
     );

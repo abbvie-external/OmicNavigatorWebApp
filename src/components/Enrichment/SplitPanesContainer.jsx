@@ -274,7 +274,7 @@ class SplitPanesContainer extends Component {
                 className="ThreePlotsDiv SplitPanesWrapper"
                 split="horizontal"
                 size={this.state.horizontalSplitPaneSize}
-                minSize={150}
+                minSize={185}
                 maxSize={400}
                 onDragFinished={size =>
                   this.splitPaneResized(size, 'horizontal')
