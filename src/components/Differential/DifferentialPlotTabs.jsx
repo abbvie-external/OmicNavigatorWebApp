@@ -35,7 +35,7 @@ class SVGPlot extends Component {
         .getMetaFeaturesTable(
           this.props.differentialStudy,
           differentialModel,
-          'test',
+          differentialFeature,
           this.handleGetMetaFeaturesTableError,
         )
         .then(getMetaFeaturesTableResponseData => {
