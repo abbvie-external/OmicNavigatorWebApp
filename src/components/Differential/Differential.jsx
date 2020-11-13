@@ -189,6 +189,13 @@ class Differential extends Component {
     });
   };
 
+  handleSearchTransitionDifferentialAlt = bool => {
+    this.setState({
+      isVolcanoTableLoading: bool,
+      isDifferentialTableLoading: bool,
+    });
+  };
+
   handleMultisetQueriedP = value => {
     this.setState({
       multisetQueriedP: value,
@@ -1179,6 +1186,9 @@ class Differential extends Component {
               {...this.props}
               onSearchTransitionDifferential={
                 this.handleSearchTransitionDifferential
+              }
+              onSearchTransitionDifferentialAlt={
+                this.handleSearchTransitionDifferentialAlt
               }
               onDifferentialSearch={this.handleDifferentialSearch}
               onDifferentialSearchUnfiltered={
