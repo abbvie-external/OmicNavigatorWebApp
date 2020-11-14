@@ -16,7 +16,7 @@ class DifferentialVolcanoPlot extends Component {
     hovering: false,
     hoveredTextScalar: 12,
     tooltipPosition: null,
-    brushedCirclesData: [],
+    // brushedCirclesData: [],
     brushing: false,
     resizeScalarX: 1,
     resizeScalarY: 1,
@@ -29,79 +29,77 @@ class DifferentialVolcanoPlot extends Component {
       volcanoDifferentialTableRowOther,
       volcanoDifferentialTableRowMax,
     } = this.props;
-    if (
-      !_.isEqual(
-        _.sortBy(volcanoDifferentialTableRowOther),
-        _.sortBy(prevProps.volcanoDifferentialTableRowOther),
-      ) ||
-      volcanoDifferentialTableRowMax !==
-        prevProps.volcanoDifferentialTableRowMax
-    ) {
-      // excessive styling needed for proper display across all export types
-      // style all circles back to default
-      const allCircles = d3.selectAll('circle.volcanoPlot-dataPoint');
-      allCircles.attr(
-        'style',
-        'stroke: #000, stroke-width: 0.4; fill: #1678c2',
-      );
-      allCircles.attr('stroke', '#000');
-      allCircles.attr('stroke-width', '0.4');
-      allCircles.attr('fill', '#1678c2');
-      allCircles.attr('r', 2);
-      allCircles.classed('highlighted', false);
-      allCircles.classed('highlightedMax', false);
-      const selectedCircles = d3.selectAll(
-        'circle.volcanoPlot-dataPoint.selected',
-      );
-      // style all brushed circles
-      selectedCircles
-        .attr('style', 'stroke: #000, stroke-width: 0.4; fill: #00aeff')
-        .classed('highlighted', true);
-      selectedCircles.attr('stroke', '#000');
-      selectedCircles.attr('stroke-width', '0.4');
-      selectedCircles.attr('fill', '#00aeff');
-      selectedCircles.attr('r', 2.5);
-      selectedCircles.raise();
-      if (volcanoDifferentialTableRowOther.length > 0) {
-        volcanoDifferentialTableRowOther.forEach(element => {
-          // style all highlighted circles
-          const highlightedCircleId = document.getElementById(
-            `volcanoDataPoint-${element}`,
-          );
-          const highlightedCircle = d3.select(highlightedCircleId);
-          if (highlightedCircle != null) {
-            highlightedCircle.attr('r', 4);
-            highlightedCircle
-              .attr('style', 'stroke: #000, stroke-width: 0.4; fill: #ff7e05')
-              .classed('highlighted', true);
-            highlightedCircle.attr('stroke', '#000');
-            highlightedCircle.attr('stroke-width', '0.4');
-            highlightedCircle.attr('fill', '#ff7e05');
-            highlightedCircle.attr('r', 5);
-            highlightedCircle.classed('highlightedMax', true);
-            highlightedCircle.raise();
-          }
-        });
-      }
-      if (volcanoDifferentialTableRowMax.length > 0) {
-        // style max highlighted circle
-        const maxCircleId = document.getElementById(
-          `volcanoDataPoint-${volcanoDifferentialTableRowMax}`,
+    debugger;
+    // if (
+    //   !_.isEqual(
+    //     _.sortBy(volcanoDifferentialTableRowOther),
+    //     _.sortBy(prevProps.volcanoDifferentialTableRowOther),
+    //   ) ||
+    //   volcanoDifferentialTableRowMax !==
+    //     prevProps.volcanoDifferentialTableRowMax
+    // ) {
+    // excessive styling needed for proper display across all export types
+    // style all circles back to default
+    const allCircles = d3.selectAll('circle.volcanoPlot-dataPoint');
+    allCircles.attr('style', 'stroke: #000, stroke-width: 0.4; fill: #1678c2');
+    allCircles.attr('stroke', '#000');
+    allCircles.attr('stroke-width', '0.4');
+    allCircles.attr('fill', '#1678c2');
+    allCircles.attr('r', 2);
+    allCircles.classed('highlighted', false);
+    allCircles.classed('highlightedMax', false);
+    const selectedCircles = d3.selectAll(
+      'circle.volcanoPlot-dataPoint.selected',
+    );
+    // style all brushed circles
+    selectedCircles
+      .attr('style', 'stroke: #000, stroke-width: 0.4; fill: #00aeff')
+      .classed('highlighted', true);
+    selectedCircles.attr('stroke', '#000');
+    selectedCircles.attr('stroke-width', '0.4');
+    selectedCircles.attr('fill', '#00aeff');
+    selectedCircles.attr('r', 2.5);
+    selectedCircles.raise();
+    if (volcanoDifferentialTableRowOther?.length > 0) {
+      volcanoDifferentialTableRowOther.forEach(element => {
+        // style all highlighted circles
+        const highlightedCircleId = document.getElementById(
+          `volcanoDataPoint-${element}`,
         );
-        const maxCircle = d3.select(maxCircleId);
-        if (maxCircle != null) {
-          maxCircle
-            .attr('style', 'stroke: #000, stroke-width: 0.4; fill: #ff4400')
+        const highlightedCircle = d3.select(highlightedCircleId);
+        if (highlightedCircle != null) {
+          highlightedCircle.attr('r', 4);
+          highlightedCircle
+            .attr('style', 'stroke: #000, stroke-width: 0.4; fill: #ff7e05')
             .classed('highlighted', true);
-          maxCircle.attr('stroke', '#000');
-          maxCircle.attr('stroke-width', '0.4');
-          maxCircle.attr('fill', '#ff4400');
-          maxCircle.attr('r', 5);
-          maxCircle.classed('highlightedMax', true);
-          maxCircle.raise();
+          highlightedCircle.attr('stroke', '#000');
+          highlightedCircle.attr('stroke-width', '0.4');
+          highlightedCircle.attr('fill', '#ff7e05');
+          highlightedCircle.attr('r', 5);
+          highlightedCircle.classed('highlightedMax', true);
+          highlightedCircle.raise();
         }
+      });
+    }
+    if (volcanoDifferentialTableRowMax?.length > 0) {
+      // style max highlighted circle
+      const maxCircleId = document.getElementById(
+        `volcanoDataPoint-${volcanoDifferentialTableRowMax}`,
+      );
+      const maxCircle = d3.select(maxCircleId);
+      if (maxCircle != null) {
+        maxCircle
+          .attr('style', 'stroke: #000, stroke-width: 0.4; fill: #ff4400')
+          .classed('highlighted', true);
+        maxCircle.attr('stroke', '#000');
+        maxCircle.attr('stroke-width', '0.4');
+        maxCircle.attr('fill', '#ff4400');
+        maxCircle.attr('r', 5);
+        maxCircle.classed('highlightedMax', true);
+        maxCircle.raise();
       }
     }
+    // }
   }
   doTransform(value, axis) {
     const { doXAxisTransformation, doYAxisTransformation } = this.props;

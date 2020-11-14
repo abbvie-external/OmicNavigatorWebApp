@@ -46,13 +46,13 @@ class Differential extends Component {
     isSearchingDifferential: false,
     isDifferentialTableLoading: false,
     isVolcanoTableLoading: false,
-    differentialResults: [],
+    // differentialResults: [],
     // differentialResultsMounted: false,
-    differentialResultsUnfiltered: [],
+    // differentialResultsUnfiltered: [],
     /**
      * @type {QHGrid.ColumnConfig[]}
      */
-    differentialColumns: [],
+    // differentialColumns: [],
     filterableColumnsP: [],
     multisetPlotInfo: {
       title: '',
@@ -61,13 +61,13 @@ class Differential extends Component {
     isItemSelected: false,
     isProteinSVGLoaded: false,
     // isProteinDataLoaded: false,
-    HighlightedFeaturesArrVolcano: [],
-    HighlightedFeaturesArrDifferential: [],
-    differentialTableRowMax: '',
-    differentialTableRowOther: [],
-    volcanoDifferentialTableRowMax: '',
-    volcanoDifferentialTableRowOther: [],
-    maxObjectIdentifier: null,
+    // HighlightedFeaturesArrVolcano: [],
+    // HighlightedFeaturesArrDifferential: [],
+    // differentialTableRowMax: '',
+    // differentialTableRowOther: [],
+    // volcanoDifferentialTableRowMax: '',
+    // volcanoDifferentialTableRowOther: [],
+    // maxObjectIdentifier: null,
     imageInfo: {
       key: null,
       title: '',
@@ -560,7 +560,6 @@ class Differential extends Component {
 
   getMetaFeaturesTable = featureId => {
     const { differentialStudy, differentialModel } = this.props;
-    debugger;
     const featureidSpecificMetaFeaturesExist =
       sessionStorage.getItem(
         `${differentialStudy}-${featureId}-MetaFeaturesExist`,
@@ -574,7 +573,6 @@ class Differential extends Component {
           this.handleGetMetaFeaturesTableError,
         )
         .then(getMetaFeaturesTableResponseData => {
-          debugger;
           const metafeaturesData =
             getMetaFeaturesTableResponseData.length > 0
               ? getMetaFeaturesTableResponseData
@@ -966,7 +964,7 @@ class Differential extends Component {
     if (item[differentialFeatureIdKey] === differentialTableRowMax) {
       className = 'rowHighlightMax';
     }
-    if (differentialTableRowOther.includes(item[differentialFeatureIdKey])) {
+    if (differentialTableRowOther?.includes(item[differentialFeatureIdKey])) {
       className = 'rowHighlightOther';
     }
     return {
@@ -1167,7 +1165,7 @@ class Differential extends Component {
                     uniqueCacheKey={differentialCacheKey}
                     data={differentialResults}
                     // getExportData={getExportDataDifferential}
-                    columnsConfig={differentialColumns}
+                    columnsConfig={differentialColumns || []}
                     totalRows={differentialRows}
                     // use "differentialRows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
                     itemsPerPage={itemsPerPageDifferentialTable}
