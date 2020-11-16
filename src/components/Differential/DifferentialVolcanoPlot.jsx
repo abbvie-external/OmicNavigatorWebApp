@@ -405,7 +405,7 @@ class DifferentialVolcanoPlot extends Component {
     const xScale = d3
       .scaleLinear()
       .domain([Math.min(...xMM), Math.max(...xMM)])
-      .range([44, volcanoWidth]);
+      .range([64, volcanoWidth]);
 
     const yScale = d3
       .scaleLinear()
@@ -416,8 +416,8 @@ class DifferentialVolcanoPlot extends Component {
     const yAxis = (
       <line
         className="volcanoPlotYAxis"
-        x1={40}
-        x2={40}
+        x1={60}
+        x2={60}
         y1={0}
         y2={volcanoHeight - 50}
         stroke="#000"
@@ -427,7 +427,7 @@ class DifferentialVolcanoPlot extends Component {
     const xAxis = (
       <line
         className="volcanoPlotXAxis"
-        x1={40}
+        x1={60}
         x2={volcanoWidth}
         y1={volcanoHeight - 50}
         y2={volcanoHeight - 50}
@@ -483,7 +483,7 @@ class DifferentialVolcanoPlot extends Component {
         className="individualTick"
         transform={`translate(0,${yOffset})`}
       >
-        <line x1={30} x2={40} stroke="#000" strokeWidth={1} />
+        <line x1={50} x2={60} stroke="#000" strokeWidth={1} />
         <text
           key={
             value !== undefined
@@ -493,7 +493,7 @@ class DifferentialVolcanoPlot extends Component {
           style={{
             fontSize: '12px',
             textAnchor: 'middle',
-            transform: `translate(20px, 3px)`,
+            transform: `translate(40px, 3px)`,
           }}
         >
           {value}
@@ -579,17 +579,19 @@ class DifferentialVolcanoPlot extends Component {
             {/*X Axis Label*/}
             <text
               className="volcanoAxisLabel"
-              x={volcanoWidth * 0.52}
+              x={volcanoWidth * 0.51}
               y={xAxisLabelY}
+              fontFamily="Lato, Helvetica Neue, Arial, Helvetica, sans-serif"
             >
               {xAxisText}
             </text>
             {/*Y Axis Label*/}
             <text
               className="volcanoAxisLabel"
-              transform={`rotate(-90,0,${volcanoHeight * 0.5})`}
+              transform={`rotate(-90,20,${volcanoHeight * 0.5})`}
               x="0"
               y={`${volcanoHeight * 0.5}`}
+              fontFamily="Lato, Helvetica Neue, Arial, Helvetica, sans-serif"
             >
               {yAxisText}
             </text>
