@@ -35,7 +35,7 @@ class BarcodePlot extends Component {
         max: 15,
       },
     },
-    showAllTooltips: false,
+    showAllTooltips: true,
   };
 
   barcodeContainerRef = React.createRef();
@@ -289,7 +289,6 @@ class BarcodePlot extends Component {
               .classed('selectedReference', true)
               .classed('selected', true);
             const brushedArr = brushed._groups[0];
-            debugger;
             const brushedDataVar = brushedArr.map(a => {
               return {
                 x2: a.attributes[2].nodeValue,
@@ -301,7 +300,6 @@ class BarcodePlot extends Component {
               };
             });
             const brushedDataTooltips = brushedDataVar.map(line => {
-              debugger;
               // const statistic = line.statistic;
               // const textAnchor =
               //   statistic > self.props.barcodeSettings.highStat / 2

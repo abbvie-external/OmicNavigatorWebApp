@@ -20,6 +20,7 @@ class DifferentialVolcanoPlot extends Component {
     brushing: false,
     resizeScalarX: 1,
     resizeScalarY: 1,
+    volcanoCircleText: [],
   };
 
   volcanoSVGRef = React.createRef();
@@ -28,7 +29,15 @@ class DifferentialVolcanoPlot extends Component {
     const {
       volcanoDifferentialTableRowOther,
       volcanoDifferentialTableRowMax,
+      volcanoCircleLabel,
     } = this.props;
+    if (
+      volcanoCircleLabel != null &&
+      prevProps.volcanoCircleLabel !== volcanoCircleLabel &&
+      this.state.brushedRawData != null
+    ) {
+      this.handleBrushedText(this.state.brushedRawData);
+    }
     if (
       !_.isEqual(
         _.sortBy(volcanoDifferentialTableRowOther),
@@ -290,6 +299,8 @@ class DifferentialVolcanoPlot extends Component {
         brushed.attr('fill', '#00aeff');
         brushed.attr('r', 2.5);
         brushed.classed('selected', true);
+        self.setState({ brushedRawData: brushed });
+        self.handleBrushedText(brushed);
 
         const brushedDataArr = brushed._groups[0].map(a => {
           return JSON.parse(a.attributes.data.value);
@@ -347,6 +358,47 @@ class DifferentialVolcanoPlot extends Component {
     }
   }
 
+  handleBrushedText = brushed => {
+    // MAP brushedDataArr to circle text state
+    const brushedCircleTextMapped = brushed._groups[0].map(a => {
+      const columnData = JSON.parse(a.attributes[4].nodeValue);
+      const key = this.props.volcanoCircleLabel || 0;
+      return {
+        class: a.attributes[1].nodeValue,
+        id: a.attributes[2].nodeValue,
+        // circleid: a.attributes[3].nodeValue,
+        data: columnData[key],
+        // xstatistic: a.attributes[5].nodeValue,
+        // ystatistic: a.attributes[6].nodeValue,
+        cx: a.attributes[7].nodeValue,
+        cy: a.attributes[8].nodeValue,
+        // cursor: a.attributes[9].nodeValue,
+        // style: a.attributes[10].nodeValue,
+        // stroke: a.attributes[11].nodeValue,
+        // stoke-width: a.attributes[12].nodeValue,
+        // fill: a.attributes[13].nodeValue
+      };
+    });
+    const brushedCircleText = brushedCircleTextMapped.map(circle => {
+      const textAnchor = 'start';
+      return (
+        <text
+          key={`volcanoCircleText-${circle.id}`}
+          className="volcanoCircleTooltipText"
+          transform={`translate(${circle.cx}, ${circle.cy})rotate(45)`}
+          fontSize="11px"
+          textAnchor={textAnchor}
+          fontFamily="Lato, Helvetica Neue, Arial, Helvetica, sans-serif"
+        >
+          {circle.data}
+        </text>
+      );
+    });
+    this.setState({
+      volcanoCircleText: brushedCircleText,
+    });
+  };
+
   handleSVGClick() {
     // this.props.onHandleVolcanoTableLoading(true);
     this.unhighlightBrushedCircles();
@@ -389,6 +441,8 @@ class DifferentialVolcanoPlot extends Component {
       doXAxisTransformation,
       doYAxisTransformation,
     } = this.props;
+
+    const { volcanoCircleText } = this.state;
 
     if (differentialResultsUnfiltered.length === 0) {
       return null;
@@ -605,6 +659,7 @@ class DifferentialVolcanoPlot extends Component {
             <g filter="url(#constantOpacity)">{filteredOutPlotCircles}</g>
             {plotCircles}
             {hoveredCircleTooltip}
+            {volcanoCircleText}
           </svg>
         </>
       );

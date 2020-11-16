@@ -33,10 +33,13 @@ class DifferentialVolcano extends Component {
     doYAxisTransformation: false,
     allowXTransformation: true,
     allowYTransformation: true,
-    axisLables: [],
+    axisLabels: [],
     xAxisLabel: null,
     yAxisLabel: null,
+    volcanoCircleLabel: null,
     identifier: null,
+    displayVolcanoCircleText: true,
+    volcanoCircleLabels: [],
   };
   volcanoPlotFilteredGridRef = React.createRef();
   differentialVolcanoPlotRef = React.createRef();
@@ -150,7 +153,18 @@ class DifferentialVolcano extends Component {
           relevantConfigColumns.push(key);
         }
       }
-      this.setState({ identifier: differentialAlphanumericFields[0] });
+      let volcanoCircleLabelsVar = differentialAlphanumericFields.map(e => {
+        return {
+          key: e,
+          text: e,
+          value: e,
+        };
+      });
+      this.setState({
+        identifier: differentialAlphanumericFields[0],
+        volcanoCircleLabels: volcanoCircleLabelsVar,
+        volcanoCircleLabel: differentialAlphanumericFields[0],
+      });
       var yLabel = relevantConfigColumns[0];
       var xLabel = relevantConfigColumns[1];
       var doY = false;
@@ -180,7 +194,7 @@ class DifferentialVolcano extends Component {
         };
       });
       this.setState({
-        axisLables: axes,
+        axisLabels: axes,
         yAxisLabel: yLabel,
         doYAxisTransformation: doY,
       });
@@ -231,7 +245,6 @@ class DifferentialVolcano extends Component {
         key: item[differentialFeatureIdKey],
       },
     ]);
-    debugger;
     this.pageToFeature(item[differentialFeatureIdKey]);
   };
 
@@ -336,7 +349,7 @@ class DifferentialVolcano extends Component {
         doXAxisTransformation: doXaxisTransCheck,
         allowXTransformation: allowXTransCheck,
       });
-    } else {
+    } else if (name === 'yAxisSelector') {
       const allowYTransCheck =
         this.getMaxAndMin(differentialResultsUnfiltered, value)[0] > 0;
       const doYaxisTransCheck = allowYTransCheck
@@ -347,8 +360,13 @@ class DifferentialVolcano extends Component {
         doYAxisTransformation: doYaxisTransCheck,
         allowYTransformation: allowYTransCheck,
       });
+    } else {
+      this.setState({
+        volcanoCircleLabel: value,
+      });
     }
   }
+
   handleTransformationChange = (evt, { name }) => {
     if (name === 'xTransformationCheckbox') {
       this.setState({
@@ -427,9 +445,12 @@ class DifferentialVolcano extends Component {
       filteredTableData,
       itemsPerPageVolcanoTable,
       volcanoPlotRows,
-      axisLables,
+      axisLabels,
       xAxisLabel,
       yAxisLabel,
+      displayVolcanoCircleText,
+      volcanoCircleLabels,
+      volcanoCircleLabel,
       doXAxisTransformation,
       doYAxisTransformation,
       allowXTransformation,
@@ -486,6 +507,16 @@ class DifferentialVolcano extends Component {
         //onClick={this.handleTransformationChange.bind(this)}
       ></Form.Field>
     );
+    // const labelBox = (
+    //   <Form.Field
+    //     control={Checkbox}
+    //     name="yTransformationCheckbox"
+    //     className="VolcanoTransformationCheckbox"
+    //     checked={displayVolcanoCircleText}
+    //     //checked={doYAxisTransformation}
+    //     //onClick={this.handleTransformationChange.bind(this)}
+    //   ></Form.Field>
+    // );
     const svgPlot = this.getSVGPlot();
     let differentialVolcanoCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-Volcano`;
     if (multisetQueriedP) {
@@ -535,7 +566,7 @@ class DifferentialVolcano extends Component {
                     className="axisSelector"
                     id="xAxisSelector"
                     value={xAxisLabel}
-                    options={axisLables}
+                    options={axisLabels}
                     onChange={this.handleDropdownChange.bind(this)}
                   ></Form.Field>
                   <Popup
@@ -571,7 +602,7 @@ class DifferentialVolcano extends Component {
                     id="yAxisSelector"
                     className="axisSelector"
                     value={yAxisLabel}
-                    options={axisLables}
+                    options={axisLabels}
                     onChange={this.handleDropdownChange.bind(this)}
                   ></Form.Field>
                   {/* <span title="-log10 Transform"> */}
@@ -592,6 +623,46 @@ class DifferentialVolcano extends Component {
                     inverted
                     basic
                   />
+                  <Popup
+                    trigger={
+                      <>
+                        <Label
+                          className="VolcanoAxisLabel"
+                          id="VolcanoCircleLabel"
+                          size={dynamicSize}
+                        >
+                          LABEL
+                        </Label>
+                        <Form.Field
+                          control={Select}
+                          name="volcanoCircleSelector"
+                          id="volcanoCircleSelector"
+                          // value={this.props.differentialFeatureIdKey}
+                          value={volcanoCircleLabel}
+                          options={volcanoCircleLabels}
+                          onChange={this.handleDropdownChange.bind(this)}
+                          // onChange={this.handleCircleLabelFieldChange.bind(
+                          //   this,
+                          // )}
+                        ></Form.Field>
+                      </>
+                    }
+                    style={TableValuePopupStyle}
+                    // className="TablePopupValue"
+                    content="Label for Selected Features"
+                    inverted
+                    basic
+                  />
+                  {/* <Popup
+                    trigger={
+                      labelBox
+                    }
+                    style={TableValuePopupStyle}
+                    // className="TablePopupValue"
+                    content="Toggle on/off circle text"
+                    inverted
+                    basic
+                  /> */}
                 </Form.Group>
               </Form>
             </Fragment>

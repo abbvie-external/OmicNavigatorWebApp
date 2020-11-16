@@ -21,7 +21,8 @@
 }
 
 #xAxisSelector,
-#yAxisSelector {
+#yAxisSelector,
+#volcanoCircleSelector {
   min-width: 100px !important;
 }
 
@@ -34,7 +35,8 @@
   min-width: 60px;
 }
 
-#VolcanoAxisLabelY {
+#VolcanoAxisLabelY,
+#VolcanoCircleLabel {
   margin-left: 35px !important;
 }
 
