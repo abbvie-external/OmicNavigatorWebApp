@@ -29,7 +29,6 @@ class DifferentialVolcanoPlot extends Component {
       volcanoDifferentialTableRowOther,
       volcanoDifferentialTableRowMax,
     } = this.props;
-    debugger;
     // if (
     //   !_.isEqual(
     //     _.sortBy(volcanoDifferentialTableRowOther),
