@@ -82,6 +82,7 @@ class Differential extends Component {
     multisetQueriedP: false,
     activeIndexDifferentialView: this.defaultActiveIndexDifferentialView || 0,
     thresholdColsP: [],
+    rehighlightCircles: false,
     tabsMessage: 'Select a feature to display plots and data',
     // differentialPlotTypes: [],
     differentialStudyMetadata: [],
@@ -211,6 +212,11 @@ class Differential extends Component {
   //   });
   // };
 
+  rehighlightCircles = bool => {
+    this.setState({
+      rehighlightCircles: bool,
+    });
+  };
   setStudyModelTestMetadata = (studyData, modelsAndTests) => {
     this.setState(
       {
@@ -723,6 +729,7 @@ class Differential extends Component {
       isItemSelected: false,
       // isProteinDataLoaded: false,
       isProteinSVGLoaded: false,
+      rehighlightCircles: true,
     });
     this.handleSearchCriteriaChange(
       {
@@ -737,8 +744,8 @@ class Differential extends Component {
   getConfigCols = testData => {
     const pepResults = testData.differentialResults;
     const {
-      differentialStudy,
-      differentialModel,
+      // differentialStudy,
+      // differentialModel,
       differentialFeature,
     } = this.props;
     const {
@@ -1266,6 +1273,7 @@ class Differential extends Component {
               onSVGTabChange={this.handleSVGTabChange}
               onHandleVolcanoTableLoading={this.handleVolcanoTableLoading}
               // onHandleVolcanoPlotSVGLoaded={this.handleVolcanoPlotSVGLoaded}
+              onRehighlightCircles={this.rehighlightCircles}
             />
           </Tab.Pane>
         ),
