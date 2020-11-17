@@ -17,6 +17,7 @@ class ButtonActions extends Component {
   };
 
   PNGExport = () => {
+    debugger;
     if (this.props.imageInfo == null) {
       let PlotName = `${this.props.plot}.png`;
       // for Barcode, Violin
@@ -28,15 +29,9 @@ class ButtonActions extends Component {
         PlotName = `${this.props.study}_${this.props.model}_MultisetPlot.png`;
       }
       const Plot = document.getElementById(this.props.plot) || null;
+      const encoderOptionsVar = this.props.plot !== 'ViolinChart' ? 1 : 0.1;
       saveSvgAsPng.saveSvgAsPng(Plot, PlotName, {
-        encoderOptions: 1,
-        scale: 2,
-      });
-    } else if (this.props.plot === 'differentialVolcanoPlot') {
-      const currentSVG = document.getElementById(this.props.plot) || null;
-      const ProteinPlotName = 'Volcano.png';
-      saveSvgAsPng.saveSvgAsPng(currentSVG, ProteinPlotName, {
-        encoderOptions: 1,
+        encoderOptions: encoderOptionsVar,
         scale: 2,
       });
     } else {
