@@ -264,6 +264,7 @@ class EnrichmentSearchCriteria extends Component {
             enrichmentStudyHref: link,
           });
         } else {
+          this.setStudyTooltip();
           this.setState({
             enrichmentStudyHrefVisible: false,
             enrichmentStudyHref: '',

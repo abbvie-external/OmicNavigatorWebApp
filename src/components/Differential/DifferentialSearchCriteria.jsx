@@ -273,6 +273,7 @@ class DifferentialSearchCriteria extends Component {
     omicNavigatorService
       .getReportLink(study, model, this.setStudyTooltip, cancelToken)
       .then(getReportLinkResponse => {
+        debugger;
         if (getReportLinkResponse.length > 0) {
           const link = getReportLinkResponse.includes('http')
             ? getReportLinkResponse
@@ -283,6 +284,7 @@ class DifferentialSearchCriteria extends Component {
             differentialStudyHref: link,
           });
         } else {
+          this.setStudyTooltip();
           this.setState({
             differentialStudyHrefVisible: false,
             differentialStudyHref: '',
