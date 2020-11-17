@@ -445,7 +445,7 @@ class Differential extends Component {
       ) || true;
     let featureidSpecificMetaFeaturesExist =
       sessionStorage.getItem(
-        `${differentialStudy}-${featureId}-MetaFeaturesExist`,
+        `${differentialStudy}-${differentialModel}-${featureId}-MetaFeaturesExist`,
       ) || true;
     // differentialPlotTypes.length = 0;
     // modelSpecificMetaFeaturesExist = false;
@@ -567,7 +567,7 @@ class Differential extends Component {
             : [];
         if (getMetaFeaturesTableResponseData.length === 0) {
           sessionStorage.setItem(
-            `${differentialStudy}-${featureId}-MetaFeaturesExist`,
+            `${differentialStudy}-${differentialModel}-${featureId}-MetaFeaturesExist`,
             false,
           );
           // this.handleGetMetaFeaturesTableError,
