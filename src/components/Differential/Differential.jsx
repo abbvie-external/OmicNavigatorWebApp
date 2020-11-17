@@ -88,7 +88,7 @@ class Differential extends Component {
     differentialStudyMetadata: [],
     differentialModelsAndTests: [],
     differentialTestsMetadata: [],
-    // modelSpecificMetaFeaturesExist: true,
+    modelSpecificMetaFeaturesExist: true,
     plotSVGWidth: null,
     plotSVGHeight: null,
     isVolcanoPlotSVGLoaded: true,
@@ -251,6 +251,7 @@ class Differential extends Component {
       });
     }
     if (searchResults.differentialResults?.length > 0) {
+      debugger;
       columns = this.getConfigCols(searchResults);
     }
     //   const statToSort =
@@ -744,8 +745,8 @@ class Differential extends Component {
   getConfigCols = testData => {
     const pepResults = testData.differentialResults;
     const {
-      // differentialStudy,
-      // differentialModel,
+      differentialStudy,
+      differentialModel,
       differentialFeature,
     } = this.props;
     const {
@@ -829,12 +830,23 @@ class Differential extends Component {
           field: f,
           filterable: { type: 'multiFilter' },
           template: (value, item, addParams) => {
-            const featureIdClass = noPlotsNorMetafeatures
-              ? 'TableCellBold NoSelect'
-              : 'TableCellLink NoSelect';
-            const featureIdClick = noPlotsNorMetafeatures
-              ? null
-              : addParams.showPlot(item, alphanumericTrigger);
+            debugger;
+            let featureSpecificMetafeatures = `${differentialStudy}-${differentialModel}-${value}-MetaFeaturesExist`;
+            let featureidSpecificMetaFeaturesExist =
+              sessionStorage.getItem(featureSpecificMetafeatures) || true;
+            let featureidSpecificMetaFeaturesExistParsed = JSON.parse(
+              featureidSpecificMetaFeaturesExist,
+            );
+            const featureIdClass =
+              noPlotsNorMetafeatures ||
+              !featureidSpecificMetaFeaturesExistParsed
+                ? 'TableCellBold NoSelect'
+                : 'TableCellLink NoSelect';
+            const featureIdClick =
+              noPlotsNorMetafeatures ||
+              !featureidSpecificMetaFeaturesExistParsed
+                ? null
+                : addParams.showPlot(item, alphanumericTrigger);
             let linkout = getLinkout(
               item,
               addParams,
