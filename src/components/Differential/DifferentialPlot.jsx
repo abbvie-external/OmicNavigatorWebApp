@@ -11,7 +11,7 @@ import './DifferentialPlot.scss';
 class DifferentialPlot extends Component {
   static defaultProps = {
     // isProteinDataLoaded: false,
-    isProteinSVGLoaded: true,
+    // isProteinSVGLoaded: true,
   };
 
   state = {
@@ -78,17 +78,19 @@ class DifferentialPlot extends Component {
       });
       panes = panes.concat(svgPanes);
     }
-    let metafeaturesTab = [
-      {
-        menuItem: 'Feature Data',
-        render: () => (
-          <Tab.Pane attached="true" as="div">
-            <MetafeaturesTable {...this.state} {...this.props} />
-          </Tab.Pane>
-        ),
-      },
-    ];
-    panes = panes.concat(metafeaturesTab);
+    if (this.props.modelSpecificMetaFeaturesExist !== false) {
+      let metafeaturesTab = [
+        {
+          menuItem: 'Feature Data',
+          render: () => (
+            <Tab.Pane attached="true" as="div">
+              <MetafeaturesTable {...this.state} {...this.props} />
+            </Tab.Pane>
+          ),
+        },
+      ];
+      panes = panes.concat(metafeaturesTab);
+    }
     return (
       <Tab
         menu={{ secondary: true, pointing: true, className: 'SVGDiv' }}
