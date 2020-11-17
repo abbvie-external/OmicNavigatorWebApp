@@ -33,6 +33,7 @@ class ButtonActions extends Component {
       saveSvgAsPng.saveSvgAsPng(Plot, PlotName, {
         encoderOptions: encoderOptionsVar,
         scale: 2,
+        backgroundColor: 'white',
       });
     } else {
       // for reusable SVG Plot
@@ -54,6 +55,7 @@ class ButtonActions extends Component {
       saveSvgAsPng.saveSvgAsPng(Plot, PlotName, {
         encoderOptions: 1,
         scale: 2,
+        backgroundColor: 'white',
       });
     }
   };
