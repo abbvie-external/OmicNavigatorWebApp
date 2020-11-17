@@ -87,6 +87,7 @@ class Differential extends Component {
     differentialStudyMetadata: [],
     differentialModelsAndTests: [],
     differentialTestsMetadata: [],
+    // modelSpecificMetaFeaturesExist: true,
     plotSVGWidth: null,
     plotSVGHeight: null,
     isVolcanoPlotSVGLoaded: true,
@@ -311,8 +312,44 @@ class Differential extends Component {
     if (scChange) {
       this.setState({
         multisetPlotAvailable: false,
+        imageInfo: { key: null, title: '', svg: [] },
+        tabsMessage: 'Select a feature to display plots and data',
+        // differentialResults: [],
+        // differentialResultsMounted: false,
+        // differentialResultsUnfiltered: [],
+        isProteinDataLoaded: false,
+        HighlightedFeaturesArrVolcano: [],
+        HighlightedFeaturesArrDifferential: [],
+        differentialTableRowMax: '',
+        differentialTableRowOther: [],
+        volcanoDifferentialTableRowMax: '',
+        volcanoDifferentialTableRowOther: [],
+        maxObjectIdentifier: null,
+        isVolcanoPlotSVGLoaded: true,
+        isItemSelected: false,
+        isProteinSVGLoaded: true,
       });
     }
+    if (
+      changes.differentialModel !== '' &&
+      changes.differentialModel !== this.props.differentialModel
+    ) {
+      this.doMetaFeaturesExist(
+        changes.differentialStudy,
+        changes.differentialModel,
+      );
+    }
+  };
+
+  doMetaFeaturesExist = (differentialStudy, differentialModel) => {
+    omicNavigatorService
+      .getMetaFeatures(differentialStudy, differentialModel)
+      .then(getMetaFeaturesResponseData => {
+        const exist = getMetaFeaturesResponseData.length > 0 ? true : false;
+        this.setState({
+          modelSpecificMetaFeaturesExist: exist,
+        });
+      });
   };
 
   disablePlot = () => {
@@ -404,7 +441,7 @@ class Differential extends Component {
     addParams.showPlot = (dataItem, alphanumericTrigger) => {
       return function() {
         let value = dataItem[alphanumericTrigger];
-        let imageInfo = { key: '', title: '', svg: [] };
+        let imageInfo = { key: null, title: '', svg: [] };
         imageInfo.title = `${alphanumericTrigger} ${value}`;
         imageInfo.key = `${value}`;
         getProteinDataCb(
@@ -420,7 +457,11 @@ class Differential extends Component {
   };
 
   getPlot = featureId => {
-    const { differentialPlotTypes } = this.state;
+    const {
+      differentialPlotTypes,
+      modelSpecificMetaFeaturesExist,
+    } = this.state;
+    // let differentialPlotTypes = [];
     const {
       differentialStudy,
       differentialModel,
@@ -428,7 +469,7 @@ class Differential extends Component {
       differentialFeatureIdKey,
     } = this.props;
     let id = featureId != null ? featureId : differentialFeature;
-    let imageInfo = { key: '', title: '', svg: [] };
+    let imageInfo = { key: null, title: '', svg: [] };
     imageInfo.title = `${differentialFeatureIdKey} ${featureId}`;
     imageInfo.key = `${featureId}`;
     let handleSVGCb = this.handleSVG;
@@ -439,21 +480,21 @@ class Differential extends Component {
       cancelRequestDifferentialResultsGetPlot = e;
     });
     let self = this;
-    let modelSpecificMetaFeaturesExist =
-      sessionStorage.getItem(
-        `${differentialStudy}-${differentialModel}-MetaFeaturesExist`,
-      ) || true;
     let featureidSpecificMetaFeaturesExist =
       sessionStorage.getItem(
         `${differentialStudy}-${differentialModel}-${featureId}-MetaFeaturesExist`,
       ) || true;
+    let featureidSpecificMetaFeaturesExistParsed = JSON.parse(
+      featureidSpecificMetaFeaturesExist,
+    );
+
     // differentialPlotTypes.length = 0;
     // modelSpecificMetaFeaturesExist = false;
     // featureidSpecificMetaFeaturesExist = false;
     if (
       differentialPlotTypes.length === 0 &&
-      (JSON.parse(!modelSpecificMetaFeaturesExist) ||
-        JSON.parse(!featureidSpecificMetaFeaturesExist))
+      (!modelSpecificMetaFeaturesExist ||
+        !featureidSpecificMetaFeaturesExistParsed)
     ) {
       this.handleItemSelected(false);
       this.setState({
@@ -475,8 +516,8 @@ class Differential extends Component {
       this.props.onSearchCriteriaToTop(stateObj, 'differential');
     } else {
       if (
-        JSON.parse(modelSpecificMetaFeaturesExist) &&
-        JSON.parse(featureidSpecificMetaFeaturesExist)
+        modelSpecificMetaFeaturesExist &&
+        featureidSpecificMetaFeaturesExistParsed
       ) {
         this.getMetaFeaturesTable(featureId);
       }
@@ -582,7 +623,7 @@ class Differential extends Component {
         });
       })
       .catch(error => {
-        console.error('Error during getEnrichmentNetwork', error);
+        console.error('Error during getMetaFeaturesTable', error);
       });
   };
 
@@ -700,7 +741,11 @@ class Differential extends Component {
       differentialModel,
       differentialFeature,
     } = this.props;
-    const { differentialPlotTypes } = this.state;
+    const {
+      differentialPlotTypes,
+      modelSpecificMetaFeaturesExist,
+    } = this.state;
+    // let differentialPlotTypes = [];
     const TableValuePopupStyle = {
       backgroundColor: '2E2E2E',
       borderBottom: '2px solid var(--color-primary)',
@@ -724,7 +769,7 @@ class Differential extends Component {
     }
     const alphanumericTrigger = differentialAlphanumericFields[0];
     if (differentialFeature !== '') {
-      let imageInfo = { key: '', title: '', svg: [] };
+      let imageInfo = { key: null, title: '', svg: [] };
       imageInfo.title = `${alphanumericTrigger} ${differentialFeature}`;
       imageInfo.key = `${differentialFeature}`;
       this.setState({
@@ -735,8 +780,7 @@ class Differential extends Component {
         // isProteinDataLoaded: false,
         currentSVGs: [],
       });
-      // why was this added?
-      // this.getPlot(differentialFeature);
+      this.getPlot(differentialFeature);
     }
     this.props.onHandleDifferentialFeatureIdKey(
       'differentialFeatureIdKey',
@@ -747,21 +791,26 @@ class Differential extends Component {
       this.getPlot,
       alphanumericTrigger,
     );
-    let modelSpecificMetaFeaturesExistStorage =
-      sessionStorage.getItem(
-        `${differentialStudy}-${differentialModel}-MetaFeaturesExist`,
-      ) || true;
-    const modelSpecificMetaFeaturesExistVar =
-      JSON.parse(!modelSpecificMetaFeaturesExistStorage) || true;
+
+    // let featureSpecificMetafeatures = `${differentialStudy}-${differentialModel}-${differentialFeature}-MetaFeaturesExist`;
+    // let featureidSpecificMetaFeaturesExist =
+    //   sessionStorage.getItem(featureSpecificMetafeatures) || true;
+    // let featureidSpecificMetaFeaturesExistParsed = JSON.parse(
+    //   featureidSpecificMetaFeaturesExist,
+    // );
+    const noPlotsNorMetafeatures =
+      differentialPlotTypes.length === 0 &&
+      // (
+      !modelSpecificMetaFeaturesExist;
+    //|| !featureidSpecificMetaFeaturesExistParsed;
+    // );
+
     if (differentialPlotTypes.length === 0) {
       this.setState({
         tabsMessage: 'No plots available',
       });
     }
-    if (
-      differentialPlotTypes.length === 0 &&
-      !modelSpecificMetaFeaturesExistVar
-    ) {
+    if (differentialPlotTypes.length === 0 && noPlotsNorMetafeatures) {
       this.setState({
         tabsMessage: 'No plots or feature data available',
       });
@@ -773,16 +822,12 @@ class Differential extends Component {
           field: f,
           filterable: { type: 'multiFilter' },
           template: (value, item, addParams) => {
-            const featureIdClass =
-              differentialPlotTypes.length === 0 &&
-              !modelSpecificMetaFeaturesExistVar
-                ? 'TableCellBold NoSelect'
-                : 'TableCellLink NoSelect';
-            const featureIdClick =
-              differentialPlotTypes.length === 0 &&
-              !modelSpecificMetaFeaturesExistVar
-                ? null
-                : addParams.showPlot(item, alphanumericTrigger);
+            const featureIdClass = noPlotsNorMetafeatures
+              ? 'TableCellBold NoSelect'
+              : 'TableCellLink NoSelect';
+            const featureIdClick = noPlotsNorMetafeatures
+              ? null
+              : addParams.showPlot(item, alphanumericTrigger);
             let linkout = getLinkout(
               item,
               addParams,

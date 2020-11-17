@@ -7,7 +7,6 @@ class DifferentialBreadcrumbs extends Component {
   componentDidMount() {}
 
   render() {
-    debugger;
     // let name = this.props.imageInfo.title;
     // if (name === '') {
     let name = `${this.props.differentialFeatureIdKey} ${this.props.differentialFeature}`;
