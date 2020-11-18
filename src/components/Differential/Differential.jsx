@@ -16,6 +16,8 @@ import {
   splitValue,
   getLinkout,
   scrollElement,
+  findDomain,
+  getLinkoutsAndFavicon,
 } from '../Shared/helpers';
 import phosphosite_icon from '../../resources/phosphosite.ico';
 import DOMPurify from 'dompurify';
@@ -89,6 +91,7 @@ class Differential extends Component {
     differentialModelsAndTests: [],
     differentialTestsMetadata: [],
     modelSpecificMetaFeaturesExist: true,
+    resultsLinkouts: [],
     plotSVGWidth: null,
     plotSVGHeight: null,
     isVolcanoPlotSVGLoaded: true,
@@ -251,7 +254,6 @@ class Differential extends Component {
       });
     }
     if (searchResults.differentialResults?.length > 0) {
-      debugger;
       columns = this.getConfigCols(searchResults);
     }
     //   const statToSort =
@@ -345,6 +347,10 @@ class Differential extends Component {
         changes.differentialStudy,
         changes.differentialModel,
       );
+      this.getResultsLinkouts(
+        changes.differentialStudy,
+        changes.differentialModel,
+      );
     }
   };
 
@@ -355,6 +361,16 @@ class Differential extends Component {
         const exist = getMetaFeaturesResponseData.length > 0 ? true : false;
         this.setState({
           modelSpecificMetaFeaturesExist: exist,
+        });
+      });
+  };
+
+  getResultsLinkouts = (differentialStudy, differentialModel) => {
+    omicNavigatorService
+      .getResultsLinkouts(differentialStudy, differentialModel)
+      .then(getResultsLinkoutsResponseData => {
+        this.setState({
+          resultsLinkouts: getResultsLinkoutsResponseData,
         });
       });
   };
@@ -749,6 +765,7 @@ class Differential extends Component {
       differentialModel,
       differentialFeature,
     } = this.props;
+    const { resultsLinkouts } = this.state;
     const {
       differentialPlotTypes,
       modelSpecificMetaFeaturesExist,
@@ -830,7 +847,6 @@ class Differential extends Component {
           field: f,
           filterable: { type: 'multiFilter' },
           template: (value, item, addParams) => {
-            debugger;
             let featureSpecificMetafeatures = `${differentialStudy}-${differentialModel}-${value}-MetaFeaturesExist`;
             let featureidSpecificMetaFeaturesExist =
               sessionStorage.getItem(featureSpecificMetafeatures) || true;
@@ -847,48 +863,71 @@ class Differential extends Component {
               !featureidSpecificMetaFeaturesExistParsed
                 ? null
                 : addParams.showPlot(item, alphanumericTrigger);
-            let linkout = getLinkout(
-              item,
-              addParams,
-              icon,
-              iconText,
-              TableValuePopupStyle,
-              alphanumericTrigger,
-            );
-            if (f === alphanumericTrigger) {
-              return (
-                <div className="NoSelect">
-                  <Popup
-                    trigger={
-                      <span className={featureIdClass} onClick={featureIdClick}>
-                        {splitValue(value)}
-                      </span>
-                    }
-                    style={TableValuePopupStyle}
-                    className="TablePopupValue"
-                    content={value}
-                    inverted
-                    basic
-                  />
-                  {linkout}
-                </div>
-              );
-            } else {
-              return (
-                <div className="NoSelect">
-                  <Popup
-                    trigger={
-                      <span className="NoSelect">{splitValue(value)}</span>
-                    }
-                    style={TableValuePopupStyle}
-                    className="TablePopupValue"
-                    content={value}
-                    inverted
-                    basic
-                  />
-                </div>
+            // let linkoutWithIcon = getLinkoutsAndFavicon(resultsLinkouts);
+            const resultsLinkoutsKeys = Object.keys(resultsLinkouts);
+            let linkoutWithIcon = null;
+            if (resultsLinkoutsKeys.includes(f)) {
+              const columnLinkoutsObj = resultsLinkouts[f];
+              const columnLinkoutsIsArray = Array.isArray(columnLinkoutsObj);
+              const linkouts = columnLinkoutsIsArray
+                ? columnLinkoutsObj
+                : [columnLinkoutsObj];
+              let linkoutsConcatenated = [];
+              const iconBaseUrl = 'https://icons.duckduckgo.com/ip3/';
+              let iconDomains = [];
+              let icons = [];
+              if (linkouts.length === 1) {
+                linkoutsConcatenated.push(`${linkouts}${item[f]}`);
+                const domain = findDomain(`${linkouts}`);
+                iconDomains.push(domain);
+                icons.push(`${iconBaseUrl}${domain}`);
+              }
+              if (linkouts.length > 1) {
+                for (const val of linkouts) {
+                  linkoutsConcatenated.push(`${val}${item[f]}`);
+                  const domain = findDomain(`${val}`);
+                  iconDomains.push(domain);
+                  icons.push(`${iconBaseUrl}${domain}`);
+                }
+              }
+              linkoutWithIcon = getLinkout(
+                icons,
+                iconDomains,
+                TableValuePopupStyle,
+                linkoutsConcatenated,
               );
             }
+            //   linkout = getLinkout(
+            //   item,
+            //   addParams,
+            //   icon,
+            //   iconText,
+            //   TableValuePopupStyle,
+            //   alphanumericTrigger,
+            // );
+            let TriggerVar = (
+              <span className={featureIdClass} onClick={featureIdClick}>
+                {splitValue(value)}
+              </span>
+            );
+            if (f === alphanumericTrigger) {
+              TriggerVar = (
+                <span className="NoSelect">{splitValue(value)}</span>
+              );
+            }
+            return (
+              <div className="NoSelect">
+                <Popup
+                  trigger={TriggerVar}
+                  style={TableValuePopupStyle}
+                  className="TablePopupValue"
+                  content={value}
+                  inverted
+                  basic
+                />
+                {linkoutWithIcon}
+              </div>
+            );
           },
         };
       },
@@ -1379,6 +1418,8 @@ class Differential extends Component {
                 this.handleDifferentialTableLoading
               }
               onHandleVolcanoTableLoading={this.handleVolcanoTableLoading}
+              onDoMetaFeaturesExist={this.doMetaFeaturesExist}
+              onGetResultsLinkouts={this.getResultsLinkouts}
             />
           </Grid.Column>
           <Grid.Column

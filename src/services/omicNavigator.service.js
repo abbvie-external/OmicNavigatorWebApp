@@ -547,6 +547,36 @@ class OmicNavigatorService {
     const nodesFromPromise = await promise;
     return nodesFromPromise;
   }
+
+  async getResultsLinkouts(differentialStudy, differentialModel) {
+    this.setUrl();
+    const promise = this.ocpuRPCUnbox(
+      'getResultsLinkouts',
+      {
+        study: differentialStudy,
+        modelID: differentialModel,
+      },
+      15000,
+      null,
+    );
+    const nodesFromPromise = await promise;
+    return nodesFromPromise;
+  }
+
+  async getEnrichmentsLinkouts(enrichmentStudy, enrichmentAnnotation) {
+    this.setUrl();
+    const promise = this.ocpuRPCUnbox(
+      'getResultsLinkouts',
+      {
+        study: enrichmentStudy,
+        annotationID: enrichmentAnnotation,
+      },
+      15000,
+      null,
+    );
+    const nodesFromPromise = await promise;
+    return nodesFromPromise;
+  }
 }
 
 export const omicNavigatorService = new OmicNavigatorService();

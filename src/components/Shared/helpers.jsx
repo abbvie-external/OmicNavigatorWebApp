@@ -4,53 +4,101 @@ import _ from 'lodash';
 import * as d3 from 'd3-array';
 
 export function getLinkout(
-  item,
-  addParams,
-  icon,
-  iconText,
+  icons,
+  iconDomains,
   TableValuePopupStyle,
-  featureIdKey,
-  study,
-  test,
+  linkoutsConcatenated,
 ) {
-  if (featureIdKey === 'idmult') {
+  if (linkoutsConcatenated.length > 1) {
+    const Popups = linkoutsConcatenated.map((link, index) => {
+      return (
+        <Popup
+          trigger={
+            <img
+              src={icons[index]}
+              alt={iconDomains[index]}
+              className="ExternalSiteIcon"
+              onClick={() => window.open(link)}
+            />
+          }
+          style={TableValuePopupStyle}
+          className="TablePopupValue"
+          content={iconDomains[index]}
+          inverted
+          basic
+        />
+      );
+    });
+    return Popups;
+  } else {
     return (
       <Popup
         trigger={
           <img
-            src={icon}
-            alt="Phosophosite"
+            src={icons}
+            alt={iconDomains}
             className="ExternalSiteIcon"
-            onClick={addParams.showPhosphositePlus(item)}
+            onClick={() => window.open(linkoutsConcatenated)}
           />
         }
         style={TableValuePopupStyle}
         className="TablePopupValue"
-        content={iconText}
+        content={iconDomains}
         inverted
         basic
       />
     );
-  } else if (item[featureIdKey].includes('GO:')) {
-    return (
-      <Popup
-        trigger={
-          <img
-            src={icon}
-            alt={iconText}
-            className="ExternalSiteIcon"
-            onClick={addParams.getLink(study, test, item)}
-          />
-        }
-        style={TableValuePopupStyle}
-        className="TablePopupValue"
-        content={iconText}
-        inverted
-        basic
-      />
-    );
-  } else return null;
+  }
 }
+
+// export function getLinkout(
+//   item,
+//   addParams,
+//   icon,
+//   iconText,
+//   TableValuePopupStyle,
+//   featureIdKey,
+//   study,
+//   test,
+// ) {
+//   if (featureIdKey === 'idmult') {
+//     return (
+//       <Popup
+//         trigger={
+//           <img
+//             src={icon}
+//             alt="Phosophosite"
+//             className="ExternalSiteIcon"
+//             onClick={addParams.showPhosphositePlus(item)}
+//           />
+//         }
+//         style={TableValuePopupStyle}
+//         className="TablePopupValue"
+//         content={iconText}
+//         inverted
+//         basic
+//       />
+//     );
+//   } else if (item[featureIdKey].includes('GO:')) {
+//     return (
+//       <Popup
+//         trigger={
+//           <img
+//             src={icon}
+//             alt={iconText}
+//             className="ExternalSiteIcon"
+//             onClick={addParams.getLink(study, test, item)}
+//           />
+//         }
+//         style={TableValuePopupStyle}
+//         className="TablePopupValue"
+//         content={iconText}
+//         inverted
+//         basic
+//       />
+//     );
+//   } else return null;
+// }
 
 export function formatNumberForDisplay(num) {
   if (num) {
@@ -79,6 +127,13 @@ export function splitValue(value) {
     return numberOfSemicolons > 0
       ? `${firstValue}...(${numberOfSemicolons})`
       : firstValue;
+  }
+}
+
+export function findDomain(link) {
+  if (link) {
+    const path = link.split('//')[1] || null;
+    return path != null ? path.split('/')[0] : null;
   }
 }
 

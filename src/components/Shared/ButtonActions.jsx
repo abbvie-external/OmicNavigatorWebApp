@@ -17,7 +17,6 @@ class ButtonActions extends Component {
   };
 
   PNGExport = () => {
-    debugger;
     if (this.props.imageInfo == null) {
       let PlotName = `${this.props.plot}.png`;
       // for Barcode, Violin
@@ -29,6 +28,7 @@ class ButtonActions extends Component {
         PlotName = `${this.props.study}_${this.props.model}_MultisetPlot.png`;
       }
       const Plot = document.getElementById(this.props.plot) || null;
+      // decrease quality if volcano chart
       const encoderOptionsVar = this.props.plot !== 'ViolinChart' ? 1 : 0.1;
       saveSvgAsPng.saveSvgAsPng(Plot, PlotName, {
         encoderOptions: encoderOptionsVar,
