@@ -553,7 +553,7 @@ class DifferentialVolcanoPlot extends Component {
           <svg
             id="ViolinChart"
             className="volcanoPlotSVG"
-            width={volcanoWidth}
+            width={volcanoWidth + 20}
             height={volcanoHeight}
             ref={this.volcanoSVGRef}
             onClick={() => this.handleSVGClick()}
