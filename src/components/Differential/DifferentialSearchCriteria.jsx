@@ -283,6 +283,7 @@ class DifferentialSearchCriteria extends Component {
             differentialStudyHref: link,
           });
         } else {
+          this.setStudyTooltip();
           this.setState({
             differentialStudyHrefVisible: false,
             differentialStudyHref: '',

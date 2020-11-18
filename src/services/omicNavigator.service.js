@@ -512,6 +512,21 @@ class OmicNavigatorService {
     return featuresFromPromise;
   }
 
+  async getMetaFeatures(differentialStudy, differentialModel) {
+    this.setUrl();
+    const promise = this.ocpuRPCUnbox(
+      'getMetaFeatures',
+      {
+        study: differentialStudy,
+        model: differentialModel,
+      },
+      15000,
+      null,
+    );
+    const nodesFromPromise = await promise;
+    return nodesFromPromise;
+  }
+
   async getMetaFeaturesTable(
     differentialStudy,
     differentialModel,

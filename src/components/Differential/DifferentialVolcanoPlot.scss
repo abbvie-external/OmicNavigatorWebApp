@@ -19,28 +19,28 @@
   stroke: #000;
   font-weight: bold;
 }
-.volcanoPlot-dataPoint {
-  stroke: #000;
-  stroke-width: 0.4;
-  fill: var(--color-link);
-}
-.volcanoPlot-dataPoint.selected {
-  stroke: #000;
-  stroke-width: 0.4;
-  fill: var(--color-tertiary);
-}
-.volcanoPlot-dataPoint.highlighted {
-  stroke: #000;
-  stroke-width: 0.4;
-  fill: var(--color-primary-gradient);
-}
-.volcanoPlot-dataPoint.highlightedMax {
-  stroke: #000;
-  stroke-width: 0.4;
-  fill: var(--color-primary);
-}
+// .volcanoPlot-dataPoint {
+//   stroke: #000;
+//   stroke-width: 0.4;
+//   fill: var(--color-link);
+// }
+// .volcanoPlot-dataPoint.selected {
+//   stroke: #000;
+//   stroke-width: 0.4;
+//   fill: var(--color-tertiary);
+// }
+// .volcanoPlot-dataPoint.highlighted {
+//   stroke: #000;
+//   stroke-width: 0.4;
+//   fill: var(--color-primary-gradient);
+// }
+// .volcanoPlot-dataPoint.highlightedMax {
+//   stroke: #000;
+//   stroke-width: 0.4;
+//   fill: var(--color-primary);
+// }
 
-#differentialVolcanoPlot {
+#ViolinChart {
   margin-left: 20px !important;
   margin-top: 5px !important;
 }

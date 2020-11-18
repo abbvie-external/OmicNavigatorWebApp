@@ -1,16 +1,17 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import { Grid, Dimmer, Loader } from 'semantic-ui-react';
+import { Grid, Dimmer, Loader, Tab } from 'semantic-ui-react';
 import DifferentialBreadcrumbs from './DifferentialBreadcrumbs';
 import ButtonActions from '../Shared/ButtonActions';
-import DifferentialPlotTabs from './DifferentialPlotTabs';
+import MetafeaturesTable from './MetafeaturesTable';
 import '../Enrichment/SplitPanesContainer.scss';
+import '../Shared/SVGPlot.scss';
 import './DifferentialPlot.scss';
 
 class DifferentialPlot extends Component {
   static defaultProps = {
     // isProteinDataLoaded: false,
-    isProteinSVGLoaded: true,
+    // isProteinSVGLoaded: true,
   };
 
   state = {
@@ -20,6 +21,8 @@ class DifferentialPlot extends Component {
     pdfFlag: false,
     svgFlag: true,
     txtFlag: false,
+    metafeaturesData: [],
+    areDifferentialPlotTabsReady: false,
   };
 
   componentDidMount() {
@@ -35,12 +38,6 @@ class DifferentialPlot extends Component {
     }
   }
 
-  handleDifferentialPlotTabChange = activeTabIndex => {
-    this.setState({
-      activeDifferentialPlotTabsIndex: activeTabIndex,
-    });
-  };
-
   setButtonVisibility = index => {
     this.setState({
       // excelFlag: index === 2,
@@ -54,11 +51,62 @@ class DifferentialPlot extends Component {
     });
   };
 
+  handleTabChange = (e, { activeIndex }) => {
+    this.setState({
+      activeDifferentialPlotTabsIndex: activeIndex,
+    });
+  };
+
+  getSVGPanes(activeDifferentialPlotTabsIndex) {
+    let panes = [];
+    if (this.props.imageInfo.length !== 0) {
+      const svgArray = this.props.imageInfo.svg;
+      // const svgArrayReversed = svgArray.reverse();
+      const svgPanes = svgArray.map(s => {
+        return {
+          menuItem: `${s.plotType.plotDisplay}`,
+          render: () => (
+            <Tab.Pane attached="true" as="div">
+              <div
+                id="DifferentialPlotTabsPlotSVG"
+                className="svgSpan"
+                dangerouslySetInnerHTML={{ __html: s.svg }}
+              ></div>
+            </Tab.Pane>
+          ),
+        };
+      });
+      panes = panes.concat(svgPanes);
+    }
+    if (this.props.modelSpecificMetaFeaturesExist !== false) {
+      let metafeaturesTab = [
+        {
+          menuItem: 'Feature Data',
+          render: () => (
+            <Tab.Pane attached="true" as="div">
+              <MetafeaturesTable {...this.state} {...this.props} />
+            </Tab.Pane>
+          ),
+        },
+      ];
+      panes = panes.concat(metafeaturesTab);
+    }
+    return (
+      <Tab
+        menu={{ secondary: true, pointing: true, className: 'SVGDiv' }}
+        panes={panes}
+        onTabChange={this.handleTabChange}
+        activeIndex={activeDifferentialPlotTabsIndex}
+      />
+    );
+  }
+
   render() {
     // const { activeDifferentialPlotTabsIndex } = this.state;
     const { excelFlag, pngFlag, pdfFlag, svgFlag } = this.state;
     const { isProteinSVGLoaded, imageInfo } = this.props;
     const { activeDifferentialPlotTabsIndex } = this.state;
+    const svgPanes = this.getSVGPanes(activeDifferentialPlotTabsIndex);
     if (!isProteinSVGLoaded) {
       return (
         <div>
@@ -98,13 +146,7 @@ class DifferentialPlot extends Component {
                 largeScreen={16}
                 widescreen={16}
               >
-                <DifferentialPlotTabs
-                  {...this.props}
-                  {...this.state}
-                  onDifferentialPlotTableChange={
-                    this.handleDifferentialPlotTabChange
-                  }
-                />
+                <div className="">{svgPanes}</div>;
               </Grid.Column>
             </Grid.Row>
           </Grid>
