@@ -16,8 +16,6 @@ import {
   splitValue,
   getLinkout,
   scrollElement,
-  // findDomain,
-  // separateItemValues,
 } from '../Shared/helpers';
 import phosphosite_icon from '../../resources/phosphosite.ico';
 import DOMPurify from 'dompurify';
@@ -863,7 +861,6 @@ class Differential extends Component {
               !featureidSpecificMetaFeaturesExistParsed
                 ? null
                 : addParams.showPlot(item, alphanumericTrigger);
-            // let linkoutWithIcon = getLinkoutsAndFavicon(resultsLinkouts);
             const resultsLinkoutsKeys = Object.keys(resultsLinkouts);
             let linkoutWithIcon = null;
             if (resultsLinkoutsKeys.includes(f)) {
@@ -873,63 +870,22 @@ class Differential extends Component {
                 ? columnLinkoutsObj
                 : [columnLinkoutsObj];
               const itemValue = item[f];
-              // let linkoutsConcatenated = [];
-              // const iconBaseUrl = 'https://icons.duckduckgo.com/ip3/';
-              // let iconDomains = [];
-              // let icons = [];
-              // const itemValuesSeparated = separateItemValues(item[f]);
-              // if (linkouts.length === 1) {
-              //   if (itemValuesSeparated.length === 1) {
-              //     linkoutsConcatenated.push(
-              //       `${linkouts}${itemValuesSeparated}`,
-              //     );
-              //   }
-              //   if (itemValuesSeparated.length > 1) {
-              //     for (const item of itemValuesSeparated) {
-              //       linkoutsConcatenated.push(`${linkouts}${item}`);
-              //     }
-              //   }
-              //   const domain = findDomain(`${linkouts}`);
-              //   iconDomains.push(domain);
-              //   icons.push(`${iconBaseUrl}${domain}`);
-              // }
-              // if (linkouts.length > 1) {
-              //   for (const val of linkouts) {
-              //     if (itemValuesSeparated.length === 1) {
-              //       linkoutsConcatenated.push(
-              //         `${linkouts}${itemValuesSeparated}`,
-              //       );
-              //     }
-              //     if (itemValuesSeparated.length > 1) {
-              //       for (const item of itemValuesSeparated) {
-              //         linkoutsConcatenated.push(`${linkouts}${item}`);
-              //       }
-              //     }
-              //     const domain = findDomain(`${val}`);
-              //     iconDomains.push(domain);
-              //     icons.push(`${iconBaseUrl}${domain}`);
-              //   }
-              // }
-              // linkoutWithIcon = getLinkout(
-              //   icons,
-              //   iconDomains,
-              //   TableValuePopupStyle,
-              //   linkoutsConcatenated,
-              // );
               linkoutWithIcon = getLinkout(
                 itemValue,
                 linkouts,
                 TableValuePopupStyle,
               );
+              // let linkoutWithIcon = getLinkout(
+              //   item,
+              //   addParams,
+              //   icon,
+              //   iconText,
+              //   TableValuePopupStyle,
+              //   alphanumericTrigger,
+              //   differentialStudy,
+              //   differentialAnnotation,
+              // );
             }
-            //   linkout = getLinkout(
-            //   item,
-            //   addParams,
-            //   icon,
-            //   iconText,
-            //   TableValuePopupStyle,
-            //   alphanumericTrigger,
-            // );
             if (f === alphanumericTrigger) {
               return (
                 <div className="NoSelect">
