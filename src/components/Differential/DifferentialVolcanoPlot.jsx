@@ -573,6 +573,7 @@ class DifferentialVolcanoPlot extends Component {
             {/*X Axis Label*/}
             <text
               className="volcanoAxisLabel"
+              textAnchor="middle"
               x={volcanoWidth * 0.51}
               y={xAxisLabelY}
               fontFamily="Lato, Helvetica Neue, Arial, Helvetica, sans-serif"
@@ -582,8 +583,9 @@ class DifferentialVolcanoPlot extends Component {
             {/*Y Axis Label*/}
             <text
               className="volcanoAxisLabel"
+              textAnchor="middle"
               transform={`rotate(-90,20,${volcanoHeight * 0.5})`}
-              x="0"
+              x="60"
               y={`${volcanoHeight * 0.5}`}
               fontFamily="Lato, Helvetica Neue, Arial, Helvetica, sans-serif"
             >
