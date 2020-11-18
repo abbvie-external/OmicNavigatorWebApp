@@ -1,24 +1,59 @@
 import React from 'react';
 import { Popup } from 'semantic-ui-react';
-import _ from 'lodash';
+import _, { forEach } from 'lodash';
 import * as d3 from 'd3-array';
 
 export function getLinkout(
-  icons,
-  iconDomains,
+  // icons,
+  // iconDomains,
+  // TableValuePopupStyle,
+  // linkoutsConcatenated,
+  itemValue,
+  linkouts,
   TableValuePopupStyle,
-  linkoutsConcatenated,
 ) {
-  if (linkoutsConcatenated.length > 1) {
-    const Popups = linkoutsConcatenated.map((link, index) => {
+  // itemValue = 'ENSP00000489236.1;ENSP00000484789.1;ENSP00000481486.1;ENSP00000480960.1;ENSP00000479794.1;ENSP00000479461.1';
+  function openWindows(link, itemValue) {
+    const windowFeatures =
+      'menubar=yes,location=yes,resizable=yes,scrollbars=yes,status=yes';
+    const itemValuesSeparated = separateItemValues(itemValue);
+    debugger;
+    let linkoutsConcatenated = [];
+    if (itemValuesSeparated.length === 1) {
+      linkoutsConcatenated = `${link}${itemValuesSeparated[0]}`;
+      window.open(linkoutsConcatenated, '_blank', windowFeatures);
+    }
+    if (itemValuesSeparated.length > 1) {
+      for (const item of itemValuesSeparated) {
+        linkoutsConcatenated.push(`${link}${item}`);
+      }
+      linkoutsConcatenated.forEach(link => {
+        window.open(link, '_blank', windowFeatures);
+      });
+    }
+  }
+
+  const iconBaseUrl = 'https://icons.duckduckgo.com/ip3/';
+  let iconDomains = [];
+  let icons = [];
+
+  if (linkouts.length > 1) {
+    for (const val of linkouts) {
+      const domain = findDomain(`${val}`);
+      iconDomains.push(domain);
+      icons.push(`${iconBaseUrl}${domain}`);
+    }
+
+    const Popups = linkouts.map((link, index) => {
       return (
         <Popup
+          key={itemValue - index}
           trigger={
             <img
               src={icons[index]}
               alt={iconDomains[index]}
               className="ExternalSiteIcon"
-              onClick={() => window.open(link)}
+              onClick={() => openWindows(link, itemValue)}
             />
           }
           style={TableValuePopupStyle}
@@ -31,14 +66,18 @@ export function getLinkout(
     });
     return Popups;
   } else {
+    const domain = findDomain(`${linkouts[0]}`);
+    iconDomains.push(domain);
+    icons.push(`${iconBaseUrl}${domain}`);
     return (
       <Popup
+        key={itemValue}
         trigger={
           <img
             src={icons}
             alt={iconDomains}
             className="ExternalSiteIcon"
-            onClick={() => window.open(linkoutsConcatenated)}
+            onClick={() => openWindows(linkouts, itemValue)}
           />
         }
         style={TableValuePopupStyle}
@@ -99,6 +138,14 @@ export function getLinkout(
 //     );
 //   } else return null;
 // }
+
+export function separateItemValues(value) {
+  if (value) {
+    const splitValuesArr = value.split(';');
+    // const arrayOfValues =
+    return splitValuesArr;
+  }
+}
 
 export function formatNumberForDisplay(num) {
   if (num) {

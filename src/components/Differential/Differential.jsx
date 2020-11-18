@@ -16,8 +16,8 @@ import {
   splitValue,
   getLinkout,
   scrollElement,
-  findDomain,
-  getLinkoutsAndFavicon,
+  // findDomain,
+  // separateItemValues,
 } from '../Shared/helpers';
 import phosphosite_icon from '../../resources/phosphosite.ico';
 import DOMPurify from 'dompurify';
@@ -872,29 +872,54 @@ class Differential extends Component {
               const linkouts = columnLinkoutsIsArray
                 ? columnLinkoutsObj
                 : [columnLinkoutsObj];
-              let linkoutsConcatenated = [];
-              const iconBaseUrl = 'https://icons.duckduckgo.com/ip3/';
-              let iconDomains = [];
-              let icons = [];
-              if (linkouts.length === 1) {
-                linkoutsConcatenated.push(`${linkouts}${item[f]}`);
-                const domain = findDomain(`${linkouts}`);
-                iconDomains.push(domain);
-                icons.push(`${iconBaseUrl}${domain}`);
-              }
-              if (linkouts.length > 1) {
-                for (const val of linkouts) {
-                  linkoutsConcatenated.push(`${val}${item[f]}`);
-                  const domain = findDomain(`${val}`);
-                  iconDomains.push(domain);
-                  icons.push(`${iconBaseUrl}${domain}`);
-                }
-              }
+              const itemValue = item[f];
+              // let linkoutsConcatenated = [];
+              // const iconBaseUrl = 'https://icons.duckduckgo.com/ip3/';
+              // let iconDomains = [];
+              // let icons = [];
+              // const itemValuesSeparated = separateItemValues(item[f]);
+              // if (linkouts.length === 1) {
+              //   if (itemValuesSeparated.length === 1) {
+              //     linkoutsConcatenated.push(
+              //       `${linkouts}${itemValuesSeparated}`,
+              //     );
+              //   }
+              //   if (itemValuesSeparated.length > 1) {
+              //     for (const item of itemValuesSeparated) {
+              //       linkoutsConcatenated.push(`${linkouts}${item}`);
+              //     }
+              //   }
+              //   const domain = findDomain(`${linkouts}`);
+              //   iconDomains.push(domain);
+              //   icons.push(`${iconBaseUrl}${domain}`);
+              // }
+              // if (linkouts.length > 1) {
+              //   for (const val of linkouts) {
+              //     if (itemValuesSeparated.length === 1) {
+              //       linkoutsConcatenated.push(
+              //         `${linkouts}${itemValuesSeparated}`,
+              //       );
+              //     }
+              //     if (itemValuesSeparated.length > 1) {
+              //       for (const item of itemValuesSeparated) {
+              //         linkoutsConcatenated.push(`${linkouts}${item}`);
+              //       }
+              //     }
+              //     const domain = findDomain(`${val}`);
+              //     iconDomains.push(domain);
+              //     icons.push(`${iconBaseUrl}${domain}`);
+              //   }
+              // }
+              // linkoutWithIcon = getLinkout(
+              //   icons,
+              //   iconDomains,
+              //   TableValuePopupStyle,
+              //   linkoutsConcatenated,
+              // );
               linkoutWithIcon = getLinkout(
-                icons,
-                iconDomains,
+                itemValue,
+                linkouts,
                 TableValuePopupStyle,
-                linkoutsConcatenated,
               );
             }
             //   linkout = getLinkout(
@@ -905,29 +930,41 @@ class Differential extends Component {
             //   TableValuePopupStyle,
             //   alphanumericTrigger,
             // );
-            let TriggerVar = (
-              <span className={featureIdClass} onClick={featureIdClick}>
-                {splitValue(value)}
-              </span>
-            );
             if (f === alphanumericTrigger) {
-              TriggerVar = (
-                <span className="NoSelect">{splitValue(value)}</span>
+              return (
+                <div className="NoSelect">
+                  <Popup
+                    trigger={
+                      <span className={featureIdClass} onClick={featureIdClick}>
+                        {splitValue(value)}
+                      </span>
+                    }
+                    style={TableValuePopupStyle}
+                    className="TablePopupValue"
+                    content={value}
+                    inverted
+                    basic
+                  />
+                  {linkoutWithIcon}
+                </div>
+              );
+            } else {
+              return (
+                <div className="NoSelect">
+                  <Popup
+                    trigger={
+                      <span className="NoSelect">{splitValue(value)}</span>
+                    }
+                    style={TableValuePopupStyle}
+                    className="TablePopupValue"
+                    content={value}
+                    inverted
+                    basic
+                  />
+                  {linkoutWithIcon}
+                </div>
               );
             }
-            return (
-              <div className="NoSelect">
-                <Popup
-                  trigger={TriggerVar}
-                  style={TableValuePopupStyle}
-                  className="TablePopupValue"
-                  content={value}
-                  inverted
-                  basic
-                />
-                {linkoutWithIcon}
-              </div>
-            );
           },
         };
       },

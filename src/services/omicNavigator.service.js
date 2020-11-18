@@ -31,7 +31,7 @@ class OmicNavigatorService {
               if (axios.isCancel(thrown)) {
                 // console.log('Request canceled', thrown.message);
               } else {
-                if (handleError !== undefined) {
+                if (handleError != null) {
                   handleError(false);
                 }
                 // console.log(`${thrown.message}`);
