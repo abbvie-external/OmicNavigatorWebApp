@@ -526,7 +526,6 @@ class Enrichment extends Component {
     omicNavigatorService
       .getResultsLinkouts(enrichmentStudy, enrichmentModel)
       .then(getEnrichmentsLinkoutsResponseData => {
-        debugger;
         this.setState({
           enrichmentsLinkouts: getEnrichmentsLinkoutsResponseData,
         });

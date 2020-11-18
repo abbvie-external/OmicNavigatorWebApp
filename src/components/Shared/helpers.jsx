@@ -17,7 +17,6 @@ export function getLinkout(
     const windowFeatures =
       'menubar=yes,location=yes,resizable=yes,scrollbars=yes,status=yes';
     const itemValuesSeparated = separateItemValues(itemValue);
-    debugger;
     let linkoutsConcatenated = [];
     if (itemValuesSeparated.length === 1) {
       linkoutsConcatenated = `${link}${itemValuesSeparated[0]}`;

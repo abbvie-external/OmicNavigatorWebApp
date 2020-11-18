@@ -81,7 +81,6 @@ class EnrichmentBreadcrumbs extends Component {
   ) => {
     const enrichmentsLinkoutsKeys = Object.keys(enrichmentsLinkouts);
     let linkoutWithIcon = null;
-    debugger;
     if (enrichmentsLinkoutsKeys.includes(enrichmentTerm)) {
       const columnLinkoutsObj = enrichmentsLinkouts[enrichmentTerm];
       const columnLinkoutsIsArray = Array.isArray(columnLinkoutsObj);
