@@ -1,6 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import { Breadcrumb, Icon, Popup } from 'semantic-ui-react';
 import '../Shared/Breadcrumbs.scss';
+import { getLinkout } from '../Shared/helpers';
 import { omicNavigatorService } from '../../services/omicNavigator.service';
 
 // import msig_icon from '../../resources/msig.ico';
@@ -76,7 +77,30 @@ class EnrichmentBreadcrumbs extends Component {
     enrichmentAnnotation,
     enrichmentDataItem,
     enrichmentTerm,
+    enrichmentsLinkouts,
   ) => {
+    const enrichmentsLinkoutsKeys = Object.keys(enrichmentsLinkouts);
+    let linkoutWithIcon = null;
+    debugger;
+    if (enrichmentsLinkoutsKeys.includes(enrichmentTerm)) {
+      const columnLinkoutsObj = enrichmentsLinkouts[enrichmentTerm];
+      const columnLinkoutsIsArray = Array.isArray(columnLinkoutsObj);
+      const linkouts = columnLinkoutsIsArray
+        ? columnLinkoutsObj
+        : [columnLinkoutsObj];
+      const itemValue = enrichmentDataItem[enrichmentTerm];
+      const TableValuePopupStyle = {
+        backgroundColor: '2E2E2E',
+        borderBottom: '2px solid var(--color-primary)',
+        color: '#FFF',
+        padding: '1em',
+        maxWidth: '50vw',
+        fontSize: '13px',
+        wordBreak: 'break-all',
+      };
+      linkoutWithIcon = getLinkout(itemValue, linkouts, TableValuePopupStyle);
+    }
+
     if (enrichmentNameLoaded === true) {
       const BreadcrumbPopupStyle = {
         backgroundColor: '2E2E2E',
@@ -122,6 +146,7 @@ class EnrichmentBreadcrumbs extends Component {
               />
             </span>
           ) : null}
+          {linkoutWithIcon}
         </Fragment>
       );
     }
@@ -136,6 +161,7 @@ class EnrichmentBreadcrumbs extends Component {
       enrichmentAnnotation,
       enrichmentDataItem,
       enrichmentTerm,
+      enrichmentsLinkouts,
     } = this.props;
 
     const name = this.props.imageInfo.key;
@@ -158,7 +184,9 @@ class EnrichmentBreadcrumbs extends Component {
       enrichmentAnnotation,
       enrichmentDataItem,
       enrichmentTerm,
+      enrichmentsLinkouts,
     );
+
     const EnrichmentViewTabDescription =
       parseInt(sessionStorage.getItem('enrichmentViewTab'), 10) === 0
         ? 'Back To Table'
