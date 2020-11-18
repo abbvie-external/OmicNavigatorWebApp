@@ -89,6 +89,7 @@ class Differential extends Component {
     differentialModelsAndTests: [],
     differentialTestsMetadata: [],
     modelSpecificMetaFeaturesExist: true,
+    resultsLinkouts: [],
     plotSVGWidth: null,
     plotSVGHeight: null,
     isVolcanoPlotSVGLoaded: true,
@@ -251,7 +252,6 @@ class Differential extends Component {
       });
     }
     if (searchResults.differentialResults?.length > 0) {
-      debugger;
       columns = this.getConfigCols(searchResults);
     }
     //   const statToSort =
@@ -345,6 +345,10 @@ class Differential extends Component {
         changes.differentialStudy,
         changes.differentialModel,
       );
+      this.getResultsLinkouts(
+        changes.differentialStudy,
+        changes.differentialModel,
+      );
     }
   };
 
@@ -355,6 +359,16 @@ class Differential extends Component {
         const exist = getMetaFeaturesResponseData.length > 0 ? true : false;
         this.setState({
           modelSpecificMetaFeaturesExist: exist,
+        });
+      });
+  };
+
+  getResultsLinkouts = (differentialStudy, differentialModel) => {
+    omicNavigatorService
+      .getResultsLinkouts(differentialStudy, differentialModel)
+      .then(getResultsLinkoutsResponseData => {
+        this.setState({
+          resultsLinkouts: getResultsLinkoutsResponseData,
         });
       });
   };
@@ -749,6 +763,7 @@ class Differential extends Component {
       differentialModel,
       differentialFeature,
     } = this.props;
+    const { resultsLinkouts } = this.state;
     const {
       differentialPlotTypes,
       modelSpecificMetaFeaturesExist,
@@ -830,7 +845,6 @@ class Differential extends Component {
           field: f,
           filterable: { type: 'multiFilter' },
           template: (value, item, addParams) => {
-            debugger;
             let featureSpecificMetafeatures = `${differentialStudy}-${differentialModel}-${value}-MetaFeaturesExist`;
             let featureidSpecificMetaFeaturesExist =
               sessionStorage.getItem(featureSpecificMetafeatures) || true;
@@ -847,14 +861,31 @@ class Differential extends Component {
               !featureidSpecificMetaFeaturesExistParsed
                 ? null
                 : addParams.showPlot(item, alphanumericTrigger);
-            let linkout = getLinkout(
-              item,
-              addParams,
-              icon,
-              iconText,
-              TableValuePopupStyle,
-              alphanumericTrigger,
-            );
+            const resultsLinkoutsKeys = Object.keys(resultsLinkouts);
+            let linkoutWithIcon = null;
+            if (resultsLinkoutsKeys.includes(f)) {
+              const columnLinkoutsObj = resultsLinkouts[f];
+              const columnLinkoutsIsArray = Array.isArray(columnLinkoutsObj);
+              const linkouts = columnLinkoutsIsArray
+                ? columnLinkoutsObj
+                : [columnLinkoutsObj];
+              const itemValue = item[f];
+              linkoutWithIcon = getLinkout(
+                itemValue,
+                linkouts,
+                TableValuePopupStyle,
+              );
+              // let linkoutWithIcon = getLinkout(
+              //   item,
+              //   addParams,
+              //   icon,
+              //   iconText,
+              //   TableValuePopupStyle,
+              //   alphanumericTrigger,
+              //   differentialStudy,
+              //   differentialAnnotation,
+              // );
+            }
             if (f === alphanumericTrigger) {
               return (
                 <div className="NoSelect">
@@ -870,7 +901,7 @@ class Differential extends Component {
                     inverted
                     basic
                   />
-                  {linkout}
+                  {linkoutWithIcon}
                 </div>
               );
             } else {
@@ -886,6 +917,7 @@ class Differential extends Component {
                     inverted
                     basic
                   />
+                  {linkoutWithIcon}
                 </div>
               );
             }
@@ -1379,6 +1411,8 @@ class Differential extends Component {
                 this.handleDifferentialTableLoading
               }
               onHandleVolcanoTableLoading={this.handleVolcanoTableLoading}
+              onDoMetaFeaturesExist={this.doMetaFeaturesExist}
+              onGetResultsLinkouts={this.getResultsLinkouts}
             />
           </Grid.Column>
           <Grid.Column

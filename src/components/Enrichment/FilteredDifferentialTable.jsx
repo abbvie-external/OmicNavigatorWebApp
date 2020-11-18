@@ -165,6 +165,7 @@ class FilteredDifferentialTable extends Component {
   };
 
   setConfigCols = (data, dataFromService, dataAlreadyFiltered) => {
+    const { enrichmentsLinkouts } = this.props;
     const TableValuePopupStyle = {
       backgroundColor: '2E2E2E',
       borderBottom: '2px solid var(--color-primary)',
@@ -206,14 +207,29 @@ class FilteredDifferentialTable extends Component {
           field: f,
           filterable: { type: 'multiFilter' },
           template: (value, item, addParams) => {
-            let linkout = getLinkout(
-              item,
-              addParams,
-              icon,
-              iconText,
-              TableValuePopupStyle,
-              alphanumericTrigger,
-            );
+            const enrichmentsLinkoutsKeys = Object.keys(enrichmentsLinkouts);
+            let linkoutWithIcon = null;
+            if (enrichmentsLinkoutsKeys.includes(f)) {
+              const columnLinkoutsObj = enrichmentsLinkouts[f];
+              const columnLinkoutsIsArray = Array.isArray(columnLinkoutsObj);
+              const linkouts = columnLinkoutsIsArray
+                ? columnLinkoutsObj
+                : [columnLinkoutsObj];
+              const itemValue = item[f];
+              linkoutWithIcon = getLinkout(
+                itemValue,
+                linkouts,
+                TableValuePopupStyle,
+              );
+              // let linkout = getLinkout(
+              //   item,
+              //   addParams,
+              //   icon,
+              //   iconText,
+              //   TableValuePopupStyle,
+              //   alphanumericTrigger,
+              // );
+            }
             if (f === alphanumericTrigger) {
               return (
                 <div className="NoSelect">
@@ -227,7 +243,7 @@ class FilteredDifferentialTable extends Component {
                     inverted
                     basic
                   />
-                  {linkout}
+                  {linkoutWithIcon}
                 </div>
               );
             } else {
@@ -243,6 +259,7 @@ class FilteredDifferentialTable extends Component {
                     inverted
                     basic
                   />
+                  {linkoutWithIcon}
                 </div>
               );
             }

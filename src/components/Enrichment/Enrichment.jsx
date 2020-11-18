@@ -19,7 +19,6 @@ import {
   formatNumberForDisplay,
   splitValue,
   getLinkout,
-  // getIconInfo
 } from '../Shared/helpers';
 import '../Shared/Table.scss';
 import SearchingAlt from '../Transitions/SearchingAlt';
@@ -175,6 +174,7 @@ class Enrichment extends Component {
     enrichmentStudyMetadata: [],
     enrichmentModelsAndAnnotations: [],
     enrichmentAnnotationsMetadata: [],
+    enrichmentsLinkouts: [],
     enrichmentFeatureIdKey: '',
     // filteredDifferentialFeatureIdKey: '',
     multisetFiltersVisible: false,
@@ -491,6 +491,15 @@ class Enrichment extends Component {
         multisetPlotAvailable: false,
       });
     }
+    if (
+      changes.enrichmentModel !== '' &&
+      changes.enrichmentModel !== this.props.enrichmentModel
+    ) {
+      this.getEnrichmentsLinkouts(
+        changes.enrichmentStudy,
+        changes.enrichmentModel,
+      );
+    }
   };
 
   handleHasBarcodeData = () => {
@@ -510,6 +519,16 @@ class Enrichment extends Component {
       })
       .catch(error => {
         console.error('Error during getBarcodes', error);
+      });
+  };
+
+  getEnrichmentsLinkouts = (enrichmentStudy, enrichmentModel) => {
+    omicNavigatorService
+      .getResultsLinkouts(enrichmentStudy, enrichmentModel)
+      .then(getEnrichmentsLinkoutsResponseData => {
+        this.setState({
+          enrichmentsLinkouts: getEnrichmentsLinkoutsResponseData,
+        });
       });
   };
 
@@ -559,7 +578,7 @@ class Enrichment extends Component {
       enrichmentModel,
       enrichmentAnnotation,
     } = this.props;
-    const { hasBarcodeData } = this.state;
+    const { hasBarcodeData, enrichmentsLinkouts } = this.state;
     const TableValuePopupStyle = {
       backgroundColor: '2E2E2E',
       borderBottom: '2px solid var(--color-primary)',
@@ -616,22 +635,37 @@ class Enrichment extends Component {
           field: f,
           filterable: { type: 'multiFilter' },
           template: (value, item, addParams) => {
-            let linkout = getLinkout(
-              item,
-              addParams,
-              icon,
-              iconText,
-              TableValuePopupStyle,
-              alphanumericTrigger,
-              enrichmentStudy,
-              enrichmentAnnotation,
-            );
+            const enrichmentsLinkoutsKeys = Object.keys(enrichmentsLinkouts);
+            let linkoutWithIcon = null;
+            if (enrichmentsLinkoutsKeys.includes(f)) {
+              const columnLinkoutsObj = enrichmentsLinkouts[f];
+              const columnLinkoutsIsArray = Array.isArray(columnLinkoutsObj);
+              const linkouts = columnLinkoutsIsArray
+                ? columnLinkoutsObj
+                : [columnLinkoutsObj];
+              const itemValue = item[f];
+              linkoutWithIcon = getLinkout(
+                itemValue,
+                linkouts,
+                TableValuePopupStyle,
+              );
+              // let linkoutWithIcon = getLinkout(
+              //   item,
+              //   addParams,
+              //   icon,
+              //   iconText,
+              //   TableValuePopupStyle,
+              //   alphanumericTrigger,
+              //   enrichmentStudy,
+              //   enrichmentAnnotation,
+              // );
+            }
             if (f === alphanumericTrigger) {
               return (
                 <div>
                   <Popup
                     trigger={
-                      <span className="TableValue  NoSelect">
+                      <span className="TableValue NoSelect">
                         {splitValue(value)}
                       </span>
                     }
@@ -641,7 +675,7 @@ class Enrichment extends Component {
                     inverted
                     basic
                   />
-                  {linkout}
+                  {linkoutWithIcon}
                 </div>
               );
             } else {
@@ -659,6 +693,7 @@ class Enrichment extends Component {
                     inverted
                     basic
                   />
+                  {linkoutWithIcon}
                 </div>
               );
             }
@@ -2195,6 +2230,7 @@ class Enrichment extends Component {
               onHandleNetworkGraphReady={this.handleNetworkGraphReady}
               onHandleEnrichmentTableLoading={this.handleEnrichmentTableLoading}
               onHandleHasBarcodeData={this.handleHasBarcodeData}
+              onGetEnrichmentsLinkouts={this.getEnrichmentsLinkouts}
             />
           </Grid.Column>
           <Grid.Column

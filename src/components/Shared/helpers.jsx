@@ -1,55 +1,149 @@
 import React from 'react';
 import { Popup } from 'semantic-ui-react';
-import _ from 'lodash';
+import _, { forEach } from 'lodash';
 import * as d3 from 'd3-array';
 
 export function getLinkout(
-  item,
-  addParams,
-  icon,
-  iconText,
+  // icons,
+  // iconDomains,
+  // TableValuePopupStyle,
+  // linkoutsConcatenated,
+  itemValue,
+  linkouts,
   TableValuePopupStyle,
-  featureIdKey,
-  study,
-  test,
 ) {
-  if (featureIdKey === 'idmult') {
+  // itemValue = 'ENSP00000489236.1;ENSP00000484789.1;ENSP00000481486.1;ENSP00000480960.1;ENSP00000479794.1;ENSP00000479461.1';
+  function openWindows(link, itemValue) {
+    const windowFeatures =
+      'menubar=yes,location=yes,resizable=yes,scrollbars=yes,status=yes';
+    const itemValuesSeparated = separateItemValues(itemValue);
+    let linkoutsConcatenated = [];
+    if (itemValuesSeparated.length === 1) {
+      linkoutsConcatenated = `${link}${itemValuesSeparated[0]}`;
+      window.open(linkoutsConcatenated, '_blank', windowFeatures);
+    }
+    if (itemValuesSeparated.length > 1) {
+      for (const item of itemValuesSeparated) {
+        linkoutsConcatenated.push(`${link}${item}`);
+      }
+      linkoutsConcatenated.forEach(link => {
+        window.open(link, '_blank', windowFeatures);
+      });
+    }
+  }
+
+  const iconBaseUrl = 'https://icons.duckduckgo.com/ip3/';
+  let iconDomains = [];
+  let icons = [];
+
+  if (linkouts.length > 1) {
+    for (const val of linkouts) {
+      const domain = findDomain(`${val}`);
+      iconDomains.push(domain);
+      icons.push(`${iconBaseUrl}${domain}`);
+    }
+
+    const Popups = linkouts.map((link, index) => {
+      return (
+        <Popup
+          key={itemValue - index}
+          trigger={
+            <img
+              src={icons[index]}
+              alt={iconDomains[index]}
+              className="ExternalSiteIcon"
+              onClick={() => openWindows(link, itemValue)}
+            />
+          }
+          style={TableValuePopupStyle}
+          className="TablePopupValue"
+          content={iconDomains[index]}
+          inverted
+          basic
+        />
+      );
+    });
+    return Popups;
+  } else {
+    const domain = findDomain(`${linkouts[0]}`);
+    iconDomains.push(domain);
+    icons.push(`${iconBaseUrl}${domain}`);
     return (
       <Popup
+        key={itemValue}
         trigger={
           <img
-            src={icon}
-            alt="Phosophosite"
+            src={icons}
+            alt={iconDomains}
             className="ExternalSiteIcon"
-            onClick={addParams.showPhosphositePlus(item)}
+            onClick={() => openWindows(linkouts, itemValue)}
           />
         }
         style={TableValuePopupStyle}
         className="TablePopupValue"
-        content={iconText}
+        content={iconDomains}
         inverted
         basic
       />
     );
-  } else if (item[featureIdKey].includes('GO:')) {
-    return (
-      <Popup
-        trigger={
-          <img
-            src={icon}
-            alt={iconText}
-            className="ExternalSiteIcon"
-            onClick={addParams.getLink(study, test, item)}
-          />
-        }
-        style={TableValuePopupStyle}
-        className="TablePopupValue"
-        content={iconText}
-        inverted
-        basic
-      />
-    );
-  } else return null;
+  }
+}
+
+// export function getLinkout(
+//   item,
+//   addParams,
+//   icon,
+//   iconText,
+//   TableValuePopupStyle,
+//   featureIdKey,
+//   study,
+//   test,
+// ) {
+//   if (featureIdKey === 'idmult') {
+//     return (
+//       <Popup
+//         trigger={
+//           <img
+//             src={icon}
+//             alt="Phosophosite"
+//             className="ExternalSiteIcon"
+//             onClick={addParams.showPhosphositePlus(item)}
+//           />
+//         }
+//         style={TableValuePopupStyle}
+//         className="TablePopupValue"
+//         content={iconText}
+//         inverted
+//         basic
+//       />
+//     );
+//   } else if (item[featureIdKey].includes('GO:')) {
+//     return (
+//       <Popup
+//         trigger={
+//           <img
+//             src={icon}
+//             alt={iconText}
+//             className="ExternalSiteIcon"
+//             onClick={addParams.getLink(study, test, item)}
+//           />
+//         }
+//         style={TableValuePopupStyle}
+//         className="TablePopupValue"
+//         content={iconText}
+//         inverted
+//         basic
+//       />
+//     );
+//   } else return null;
+// }
+
+export function separateItemValues(value) {
+  if (value) {
+    const splitValuesArr = value.split(';');
+    // const arrayOfValues =
+    return splitValuesArr;
+  }
 }
 
 export function formatNumberForDisplay(num) {
@@ -79,6 +173,13 @@ export function splitValue(value) {
     return numberOfSemicolons > 0
       ? `${firstValue}...(${numberOfSemicolons})`
       : firstValue;
+  }
+}
+
+export function findDomain(link) {
+  if (link) {
+    const path = link.split('//')[1] || null;
+    return path != null ? path.split('/')[0] : null;
   }
 }
 

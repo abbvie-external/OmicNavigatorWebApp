@@ -124,40 +124,48 @@ class DifferentialVolcanoPlot extends Component {
     const hoveredElement = `volcanoDataPoint-${e.target.attributes['circleid'].value}`;
     const hoveredId = `#volcanoDataPoint-${e.target.attributes['circleid'].value}`;
     const hovered = document.getElementById(hoveredElement);
-    const circle = d3.select(hovered) ?? null;
-    if (circle != null) {
-      circle.attr('r', 6);
-      circle.raise();
-      this.setState({
-        hoveredCircleData: hoveredData,
-        hoveredCircleId: hoveredId || null,
-        hovering: true,
-      });
+    if (hovered != null) {
+      const circle = d3.select(hovered) ?? null;
+      if (circle != null) {
+        circle.attr('r', 6);
+        circle.raise();
+        this.setState({
+          hoveredCircleData: hoveredData,
+          hoveredCircleId: hoveredId || null,
+          hoveredCircleElement: hoveredElement,
+          hovering: true,
+        });
+      }
     }
   };
   handleCircleLeave() {
     d3.selectAll('circle.volcanoPlot-dataPoint').classed('hovered', false);
-    const hoveredCircle = d3.select(this.state.hoveredCircleId);
-    if (!hoveredCircle.empty()) {
-      if (hoveredCircle.attr('class').endsWith('selected')) {
-        hoveredCircle.attr('r', 2.5);
-      } else if (hoveredCircle.attr('class').endsWith('highlightedMax')) {
-        hoveredCircle.attr('r', 5);
-      } else if (hoveredCircle.attr('class').endsWith('highlighted')) {
-        hoveredCircle.attr('r', 4);
-      } else {
-        hoveredCircle.attr('r', 2);
+    const hovered = document.getElementById(this.state.hoveredCircleElement);
+    if (hovered != null) {
+      const hoveredCircle = d3.select(hovered) ?? null;
+      if (hoveredCircle != null) {
+        if (!hoveredCircle.empty()) {
+          if (hoveredCircle.attr('class').endsWith('selected')) {
+            hoveredCircle.attr('r', 2.5);
+          } else if (hoveredCircle.attr('class').endsWith('highlightedMax')) {
+            hoveredCircle.attr('r', 5);
+          } else if (hoveredCircle.attr('class').endsWith('highlighted')) {
+            hoveredCircle.attr('r', 4);
+          } else {
+            hoveredCircle.attr('r', 2);
+          }
+        }
+        this.setState({
+          hoveredCircleData: {
+            position: [],
+            id: null,
+            xstat: null,
+            ystat: null,
+          },
+          hovering: false,
+        });
       }
     }
-    this.setState({
-      hoveredCircleData: {
-        position: [],
-        id: null,
-        xstat: null,
-        ystat: null,
-      },
-      hovering: false,
-    });
   }
   getToolTip() {
     const { hoveredCircleData, hovering } = this.state;
@@ -191,7 +199,7 @@ class DifferentialVolcanoPlot extends Component {
               : hoveredCircleData.position[0] * 1 + 15
           }
           y={hoveredCircleData.position[1] * 1 + 10}
-          width="150"
+          width="200"
           height="75"
         >
           <rect width="100%" height="100%" fill="#ff4400" rx="5" ry="5"></rect>
@@ -564,6 +572,7 @@ class DifferentialVolcanoPlot extends Component {
             {/*X Axis Label*/}
             <text
               className="volcanoAxisLabel"
+              textAnchor="middle"
               x={volcanoWidth * 0.51}
               y={xAxisLabelY}
               fontFamily="Lato, Helvetica Neue, Arial, Helvetica, sans-serif"
@@ -573,8 +582,9 @@ class DifferentialVolcanoPlot extends Component {
             {/*Y Axis Label*/}
             <text
               className="volcanoAxisLabel"
+              textAnchor="middle"
               transform={`rotate(-90,20,${volcanoHeight * 0.5})`}
-              x="0"
+              x="60"
               y={`${volcanoHeight * 0.5}`}
               fontFamily="Lato, Helvetica Neue, Arial, Helvetica, sans-serif"
             >
