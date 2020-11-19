@@ -2,9 +2,9 @@ import React from 'react';
 import { Popup } from 'semantic-ui-react';
 import _ from 'lodash';
 // import phosphosite_icon from '../../resources/phosphosite.ico';
-import reactome_icon from '../../resources/reactome.jpg';
-import go_icon from '../../resources/go.png';
-import msig_icon from '../../resources/msig.ico';
+// import reactome_icon from '../../resources/reactome.jpg';
+// import go_icon from '../../resources/go.png';
+// import msig_icon from '../../resources/msig.ico';
 import * as d3 from 'd3-array';
 // import { omicNavigatorService } from '../../services/omicNavigator.service';
 
@@ -43,9 +43,15 @@ export function getLinkout(
 
   if (linkouts.length > 1) {
     for (const val of linkouts) {
-      const domain = findDomain(`${val}`);
-      iconDomains.push(domain);
-      icons.push(`${iconBaseUrl}${domain}`);
+      const domainRaw = findDomain(`${val}`);
+      const domainRawWww = domainRaw.includes('www')
+        ? domainRaw
+        : `www.${domainRaw}`;
+      const domainRawWwwHttps = domainRawWww.includes('//')
+        ? domainRawWww.split('//').pop()
+        : domainRawWww;
+      iconDomains.push(domainRawWwwHttps);
+      icons.push(`${iconBaseUrl}${domainRawWwwHttps}.ico`);
     }
 
     const Popups = linkouts.map((link, index) => {
@@ -70,15 +76,22 @@ export function getLinkout(
     });
     return Popups;
   } else {
-    const domain = findDomain(`${linkouts[0]}`);
-    iconDomains.push(domain);
-    icons.push(`${iconBaseUrl}${domain}`);
+    const domainRaw = findDomain(`${linkouts[0]}`);
+    const domainRawWww = domainRaw.includes('www')
+      ? domainRaw
+      : `www.${domainRaw}`;
+    const domainRawWwwHttps = domainRawWww.includes('//')
+      ? domainRawWww.split('//').pop()
+      : domainRawWww;
+    icons.push(`${iconBaseUrl}${domainRawWwwHttps}.ico`);
+    iconDomains.push(domainRawWwwHttps);
+    icons.push(`${iconBaseUrl}${domainRawWwwHttps}`);
     return (
       <Popup
         key={itemValue}
         trigger={
           <img
-            src={icons}
+            src={icons[0]}
             alt={iconDomains}
             className="ExternalSiteIcon"
             onClick={() => openWindows(linkouts, itemValue)}
@@ -92,99 +105,6 @@ export function getLinkout(
       />
     );
   }
-}
-
-// export function showPhosphositePlus(item, featureIdKey) {
-//   const featureID = item[featureIdKey].split(';')[0];
-//   omicNavigatorService.postToPhosphositePlus(
-//     { searchStr: featureID, queryId: -1, from: 0 },
-//     'https://www.phosphosite.org/proteinSearchSubmitAction.action',
-//   );
-// }
-
-export function getLinkoutHardcoded(
-  item,
-  TableValuePopupStyle,
-  featureIdKey,
-  test,
-) {
-  let icon = '';
-  let iconText = '';
-  if (test === 'REACTOME') {
-    icon = reactome_icon;
-    iconText = 'Reactome';
-  }
-  if (test.substring(0, 2) === 'GO') {
-    icon = go_icon;
-    iconText = 'AmiGO 2';
-  }
-  if (test.substring(0, 4) === 'msig') {
-    icon = msig_icon;
-    iconText = 'GSEA MSigDB';
-  }
-
-  // if (featureIdKey === 'idmult' || test === 'PSP') {
-  //   return (
-  //     <Popup
-  //       trigger={
-  //         <img
-  //           src={phosphosite_icon}
-  //           alt="Phosophosite"
-  //           className="ExternalSiteIcon"
-  //           onClick={() => showPhosphositePlus(item, featureIdKey)}
-  //         />
-  //       }
-  //       style={TableValuePopupStyle}
-  //       className="TablePopupValue"
-  //       content={'PhosphoSitePlus'}
-  //       inverted
-  //       basic
-  //     />
-  //   );
-  // } else
-  if (
-    test === 'REACTOME' ||
-    test.substring(0, 4) === 'msig' ||
-    item[featureIdKey].includes('GO:')
-  ) {
-    return (
-      <Popup
-        trigger={
-          <img
-            src={icon}
-            alt={iconText}
-            className="ExternalSiteIcon"
-            onClick={() => getLink(test, item, featureIdKey)}
-          />
-        }
-        style={TableValuePopupStyle}
-        className="TablePopupValue"
-        content={iconText}
-        inverted
-        basic
-      />
-    );
-  } else return null;
-}
-
-export function getLink(test, item, featureIdKey) {
-  if (test === 'REACTOME') {
-    window.open(
-      'https://reactome.org/content/detail/' + item[featureIdKey],
-      '_blank',
-    );
-  } else if (test.substring(0, 2) === 'GO') {
-    window.open(
-      'http://amigo.geneontology.org/amigo/term/' + item[featureIdKey],
-      '_blank',
-    );
-  } else if (test.substring(0, 4) === 'msig') {
-    window.open(
-      'http://software.broadinstitute.org/gsea/msigdb/cards/' +
-        item[featureIdKey],
-      '_blank',
-    );
-  } else return null;
 }
 
 export function separateItemValues(value) {

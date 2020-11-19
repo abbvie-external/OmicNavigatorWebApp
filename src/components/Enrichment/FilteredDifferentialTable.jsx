@@ -5,9 +5,7 @@ import _ from 'lodash';
 import {
   formatNumberForDisplay,
   splitValue,
-  // scrollElement,
   getLinkout,
-  getLinkoutHardcoded,
 } from '../Shared/helpers';
 import './FilteredDifferentialTable.scss';
 import { CancelToken } from 'axios';
@@ -159,7 +157,7 @@ class FilteredDifferentialTable extends Component {
   };
 
   setConfigCols = (data, dataFromService, dataAlreadyFiltered) => {
-    const { enrichmentAnnotation, enrichmentsLinkouts } = this.props;
+    const { enrichmentsLinkouts } = this.props;
     const TableValuePopupStyle = {
       backgroundColor: '2E2E2E',
       borderBottom: '2px solid var(--color-primary)',
@@ -198,12 +196,6 @@ class FilteredDifferentialTable extends Component {
           field: f,
           filterable: { type: 'multiFilter' },
           template: (value, item) => {
-            let linkoutHardcoded = getLinkoutHardcoded(
-              item,
-              TableValuePopupStyle,
-              alphanumericTrigger,
-              enrichmentAnnotation,
-            );
             const enrichmentsLinkoutsKeys = Object.keys(enrichmentsLinkouts);
             let linkoutWithIcon = null;
             if (enrichmentsLinkoutsKeys.includes(f)) {
@@ -233,7 +225,6 @@ class FilteredDifferentialTable extends Component {
                     basic
                   />
                   {linkoutWithIcon}
-                  {linkoutHardcoded}
                 </div>
               );
             } else {
