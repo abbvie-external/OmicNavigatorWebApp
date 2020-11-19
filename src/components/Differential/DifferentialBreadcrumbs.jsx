@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { Breadcrumb, Icon, Popup } from 'semantic-ui-react';
+import { splitValue } from '../Shared/helpers';
 import '../Shared/Breadcrumbs.scss';
 
 class DifferentialBreadcrumbs extends Component {
@@ -71,13 +72,3 @@ class DifferentialBreadcrumbs extends Component {
 }
 
 export default withRouter(DifferentialBreadcrumbs);
-
-function splitValue(value) {
-  if (value) {
-    const firstValue = value.split(';')[0];
-    const numberOfSemicolons = (value.match(/;/g) || []).length;
-    return numberOfSemicolons > 0
-      ? `${firstValue}...(${numberOfSemicolons})`
-      : firstValue;
-  }
-}
