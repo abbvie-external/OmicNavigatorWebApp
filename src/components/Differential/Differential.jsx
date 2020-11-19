@@ -15,9 +15,9 @@ import {
   formatNumberForDisplay,
   splitValue,
   getLinkout,
+  getLinkoutHardcoded,
   scrollElement,
 } from '../Shared/helpers';
-import phosphosite_icon from '../../resources/phosphosite.ico';
 import DOMPurify from 'dompurify';
 import { omicNavigatorService } from '../../services/omicNavigator.service';
 import DifferentialVolcano from './DifferentialVolcano';
@@ -442,23 +442,6 @@ class Differential extends Component {
     differentialFeatureIdKeyVar,
   ) => {
     let addParams = {};
-    addParams.showPhosphositePlus = dataItem => {
-      let protein = dataItem.symbol
-        ? dataItem.symbol
-        : dataItem[differentialFeatureIdKeyVar];
-      return function() {
-        const param = {
-          proteinNames: protein,
-          queryId: -1,
-          from: 0,
-        };
-        omicNavigatorService.postToPhosphositePlus(
-          param,
-          'https://www.phosphosite.org/proteinSearchSubmitAction.action',
-        );
-      };
-    };
-
     addParams.showPlot = (dataItem, alphanumericTrigger) => {
       return function() {
         let value = dataItem[alphanumericTrigger];
@@ -761,6 +744,7 @@ class Differential extends Component {
     const {
       differentialStudy,
       differentialModel,
+      differentialTest,
       differentialFeature,
     } = this.props;
     const { resultsLinkouts } = this.state;
@@ -778,8 +762,6 @@ class Differential extends Component {
       fontSize: '13px',
       wordBreak: 'break-all',
     };
-    let icon = phosphosite_icon;
-    let iconText = 'PhosphoSitePlus';
     let differentialAlphanumericFields = [];
     let differentialNumericFields = [];
     const firstObject = pepResults[0];
@@ -791,6 +773,7 @@ class Differential extends Component {
       }
     }
     const alphanumericTrigger = differentialAlphanumericFields[0];
+    // on page refresh, handle if differential features is selected
     if (differentialFeature !== '') {
       let imageInfo = { key: null, title: '', svg: [] };
       imageInfo.title = `${alphanumericTrigger} ${differentialFeature}`;
@@ -863,6 +846,12 @@ class Differential extends Component {
                 : addParams.showPlot(item, alphanumericTrigger);
             const resultsLinkoutsKeys = Object.keys(resultsLinkouts);
             let linkoutWithIcon = null;
+            let linkoutHardcoded = getLinkoutHardcoded(
+              item,
+              TableValuePopupStyle,
+              alphanumericTrigger,
+              differentialTest,
+            );
             if (resultsLinkoutsKeys.includes(f)) {
               const columnLinkoutsObj = resultsLinkouts[f];
               const columnLinkoutsIsArray = Array.isArray(columnLinkoutsObj);
@@ -875,16 +864,6 @@ class Differential extends Component {
                 linkouts,
                 TableValuePopupStyle,
               );
-              // let linkoutWithIcon = getLinkout(
-              //   item,
-              //   addParams,
-              //   icon,
-              //   iconText,
-              //   TableValuePopupStyle,
-              //   alphanumericTrigger,
-              //   differentialStudy,
-              //   differentialAnnotation,
-              // );
             }
             if (f === alphanumericTrigger) {
               return (
@@ -902,6 +881,7 @@ class Differential extends Component {
                     basic
                   />
                   {linkoutWithIcon}
+                  {linkoutHardcoded}
                 </div>
               );
             } else {

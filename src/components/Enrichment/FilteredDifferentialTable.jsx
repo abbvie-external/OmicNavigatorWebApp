@@ -7,14 +7,13 @@ import {
   splitValue,
   // scrollElement,
   getLinkout,
+  getLinkoutHardcoded,
 } from '../Shared/helpers';
-import phosphosite_icon from '../../resources/phosphosite.ico';
 import './FilteredDifferentialTable.scss';
 import { CancelToken } from 'axios';
 import CustomEmptyMessage from '../Shared/Templates';
 // eslint-disable-next-line no-unused-vars
 import QHGrid, { EZGrid } from '***REMOVED***';
-// import { data } from 'pdfkit/js/reference';
 
 let cancelRequestFPTGetResultsTable = () => {};
 class FilteredDifferentialTable extends Component {
@@ -165,7 +164,7 @@ class FilteredDifferentialTable extends Component {
   };
 
   setConfigCols = (data, dataFromService, dataAlreadyFiltered) => {
-    const { enrichmentsLinkouts } = this.props;
+    const { enrichmentAnnotation, enrichmentsLinkouts } = this.props;
     const TableValuePopupStyle = {
       backgroundColor: '2E2E2E',
       borderBottom: '2px solid var(--color-primary)',
@@ -175,9 +174,6 @@ class FilteredDifferentialTable extends Component {
       fontSize: '13px',
       wordBreak: 'break-all',
     };
-
-    let icon = phosphosite_icon;
-    let iconText = 'PhosphoSitePlus';
     let filteredDifferentialAlphanumericFields = [];
     let filteredDifferentialNumericFields = [];
     const firstObject = dataFromService[0];
@@ -207,6 +203,12 @@ class FilteredDifferentialTable extends Component {
           field: f,
           filterable: { type: 'multiFilter' },
           template: (value, item, addParams) => {
+            let linkoutHardcoded = getLinkoutHardcoded(
+              item,
+              TableValuePopupStyle,
+              alphanumericTrigger,
+              enrichmentAnnotation,
+            );
             const enrichmentsLinkoutsKeys = Object.keys(enrichmentsLinkouts);
             let linkoutWithIcon = null;
             if (enrichmentsLinkoutsKeys.includes(f)) {
@@ -221,14 +223,6 @@ class FilteredDifferentialTable extends Component {
                 linkouts,
                 TableValuePopupStyle,
               );
-              // let linkout = getLinkout(
-              //   item,
-              //   addParams,
-              //   icon,
-              //   iconText,
-              //   TableValuePopupStyle,
-              //   alphanumericTrigger,
-              // );
             }
             if (f === alphanumericTrigger) {
               return (
@@ -244,6 +238,7 @@ class FilteredDifferentialTable extends Component {
                     basic
                   />
                   {linkoutWithIcon}
+                  {linkoutHardcoded}
                 </div>
               );
             } else {
