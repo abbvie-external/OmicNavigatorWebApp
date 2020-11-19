@@ -17,6 +17,7 @@ export function getLinkout(
   linkouts,
   TableValuePopupStyle,
 ) {
+  debugger;
   // itemValue = 'ENSP00000489236.1;ENSP00000484789.1;ENSP00000481486.1;ENSP00000480960.1;ENSP00000479794.1;ENSP00000479461.1';
   function openWindows(link, itemValue) {
     const windowFeatures =

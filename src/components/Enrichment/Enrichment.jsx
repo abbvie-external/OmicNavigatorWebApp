@@ -502,18 +502,10 @@ class Enrichment extends Component {
     omicNavigatorService
       .getBarcodes(enrichmentStudy, enrichmentModel, null, null)
       .then(getBarcodesResponseData => {
-        if (getBarcodesResponseData.statistic !== '') {
-          this.setState({
-            hasBarcodeData: true,
-          });
-        } else {
-          this.setState({
-            hasBarcodeData: false,
-          });
-        }
-      })
-      .catch(error => {
-        console.error('Error during getBarcodes', error);
+        debugger;
+        this.setState({
+          hasBarcodeData: getBarcodesResponseData.length === 0 ? false : true,
+        });
       });
   };
 
