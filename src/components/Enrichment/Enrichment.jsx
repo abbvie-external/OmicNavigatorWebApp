@@ -1830,6 +1830,15 @@ class Enrichment extends Component {
       networkDataError,
     } = this.state;
     let enrichmentCacheKey = `${enrichmentStudy}-${enrichmentModel}-${enrichmentAnnotation}-${multisetQueriedE}`;
+    const TableValuePopupStyle = {
+      backgroundColor: '2E2E2E',
+      borderBottom: '2px solid var(--color-primary)',
+      color: '#FFF',
+      padding: '1em',
+      maxWidth: '50vw',
+      fontSize: '13px',
+      wordBreak: 'break-all',
+    };
     return [
       {
         menuItem: (
@@ -1920,23 +1929,41 @@ class Enrichment extends Component {
         menuItem: (
           <Menu.Item
             key="1"
-            className={
-              !networkDataError
-                ? 'TableAndNetworkButtons NetworkButton'
-                : 'TableAndNetworkButtons NetworkButton DisabledCursor'
-            }
+            className="TableAndNetworkButtons NetworkButton"
             name="network"
             disabled={networkDataError}
           >
-            <img
-              src={
-                activeIndexEnrichmentView === 1
-                  ? networkIconSelected
-                  : networkIcon
-              }
-              alt="Network Icon"
-              id="NetworkButton"
-            />
+            {!networkDataError ? (
+              <img
+                src={
+                  activeIndexEnrichmentView === 1
+                    ? networkIconSelected
+                    : networkIcon
+                }
+                alt="Network Icon"
+                id="NetworkButton"
+              />
+            ) : (
+              <Popup
+                trigger={
+                  <img
+                    src={
+                      activeIndexEnrichmentView === 1
+                        ? networkIconSelected
+                        : networkIcon
+                    }
+                    alt="Network Icon"
+                    id="NetworkButton"
+                    className={!networkDataError ? '' : 'DisabledCursor'}
+                  />
+                }
+                style={TableValuePopupStyle}
+                className="TablePopupValue"
+                content="Network Chart Not Available"
+                inverted
+                basic
+              />
+            )}
           </Menu.Item>
         ),
         pane: (
