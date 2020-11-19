@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import { Breadcrumb, Icon, Popup } from 'semantic-ui-react';
 import '../Shared/Breadcrumbs.scss';
-import { getLinkout, getLinkoutHardcoded } from '../Shared/helpers';
+import { getLinkout } from '../Shared/helpers';
 
 class EnrichmentBreadcrumbs extends Component {
   componentDidMount() {}
@@ -15,22 +15,6 @@ class EnrichmentBreadcrumbs extends Component {
     enrichmentsLinkouts,
     enrichmentFeatureIdKey,
   ) => {
-    const TableValuePopupStyle = {
-      backgroundColor: '2E2E2E',
-      borderBottom: '2px solid var(--color-primary)',
-      color: '#FFF',
-      padding: '1em',
-      maxWidth: '50vw',
-      fontSize: '13px',
-      wordBreak: 'break-all',
-    };
-    let linkoutHardcoded = getLinkoutHardcoded(
-      enrichmentDataItem,
-      TableValuePopupStyle,
-      enrichmentFeatureIdKey,
-      enrichmentAnnotation,
-    );
-
     let linkoutWithIcon = null;
     const enrichmentsLinkoutsKeys = Object.keys(enrichmentsLinkouts);
     if (enrichmentsLinkoutsKeys.includes(enrichmentTerm)) {
@@ -74,7 +58,6 @@ class EnrichmentBreadcrumbs extends Component {
             content={name}
           />
           {linkoutWithIcon}
-          {linkoutHardcoded}
         </Fragment>
       );
     }

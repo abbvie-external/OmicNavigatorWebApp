@@ -15,7 +15,6 @@ import {
   formatNumberForDisplay,
   splitValue,
   getLinkout,
-  getLinkoutHardcoded,
 } from '../Shared/helpers';
 import '../Shared/Table.scss';
 import SearchingAlt from '../Transitions/SearchingAlt';
@@ -595,12 +594,6 @@ class Enrichment extends Component {
           template: (value, item, addParams) => {
             const enrichmentsLinkoutsKeys = Object.keys(enrichmentsLinkouts);
             let linkoutWithIcon = null;
-            let linkoutHardcoded = getLinkoutHardcoded(
-              item,
-              TableValuePopupStyle,
-              alphanumericTrigger,
-              enrichmentAnnotation,
-            );
             if (enrichmentsLinkoutsKeys.includes(f)) {
               const columnLinkoutsObj = enrichmentsLinkouts[f];
               const columnLinkoutsIsArray = Array.isArray(columnLinkoutsObj);
@@ -630,7 +623,6 @@ class Enrichment extends Component {
                     basic
                   />
                   {linkoutWithIcon}
-                  {linkoutHardcoded}
                 </div>
               );
             } else {

@@ -15,7 +15,6 @@ import {
   formatNumberForDisplay,
   splitValue,
   getLinkout,
-  getLinkoutHardcoded,
   scrollElement,
 } from '../Shared/helpers';
 import DOMPurify from 'dompurify';
@@ -744,7 +743,6 @@ class Differential extends Component {
     const {
       differentialStudy,
       differentialModel,
-      differentialTest,
       differentialFeature,
     } = this.props;
     const { resultsLinkouts } = this.state;
@@ -846,12 +844,6 @@ class Differential extends Component {
                 : addParams.showPlot(item, alphanumericTrigger);
             const resultsLinkoutsKeys = Object.keys(resultsLinkouts);
             let linkoutWithIcon = null;
-            let linkoutHardcoded = getLinkoutHardcoded(
-              item,
-              TableValuePopupStyle,
-              alphanumericTrigger,
-              differentialTest,
-            );
             if (resultsLinkoutsKeys.includes(f)) {
               const columnLinkoutsObj = resultsLinkouts[f];
               const columnLinkoutsIsArray = Array.isArray(columnLinkoutsObj);
@@ -881,7 +873,6 @@ class Differential extends Component {
                     basic
                   />
                   {linkoutWithIcon}
-                  {linkoutHardcoded}
                 </div>
               );
             } else {
