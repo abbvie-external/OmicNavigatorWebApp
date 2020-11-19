@@ -17,7 +17,6 @@ export function getLinkout(
   linkouts,
   TableValuePopupStyle,
 ) {
-  debugger;
   // itemValue = 'ENSP00000489236.1;ENSP00000484789.1;ENSP00000481486.1;ENSP00000480960.1;ENSP00000479794.1;ENSP00000479461.1';
   function openWindows(link, itemValue) {
     const windowFeatures =
@@ -145,7 +144,6 @@ export function getLinkoutHardcoded(
   // } else
   if (
     test === 'REACTOME' ||
-    test.substring(0, 2) === 'GO' ||
     test.substring(0, 4) === 'msig' ||
     item[featureIdKey].includes('GO:')
   ) {
@@ -156,7 +154,7 @@ export function getLinkoutHardcoded(
             src={icon}
             alt={iconText}
             className="ExternalSiteIcon"
-            onClick={() => getLink(test, item)}
+            onClick={() => getLink(test, item, featureIdKey)}
           />
         }
         style={TableValuePopupStyle}
@@ -169,17 +167,21 @@ export function getLinkoutHardcoded(
   } else return null;
 }
 
-export function getLink(test, item) {
+export function getLink(test, item, featureIdKey) {
   if (test === 'REACTOME') {
-    window.open('https://reactome.org/content/detail/' + item.termID, '_blank');
+    window.open(
+      'https://reactome.org/content/detail/' + item[featureIdKey],
+      '_blank',
+    );
   } else if (test.substring(0, 2) === 'GO') {
     window.open(
-      'http://amigo.geneontology.org/amigo/term/' + item.termID,
+      'http://amigo.geneontology.org/amigo/term/' + item[featureIdKey],
       '_blank',
     );
   } else if (test.substring(0, 4) === 'msig') {
     window.open(
-      'http://software.broadinstitute.org/gsea/msigdb/cards/' + item.termID,
+      'http://software.broadinstitute.org/gsea/msigdb/cards/' +
+        item[featureIdKey],
       '_blank',
     );
   } else return null;

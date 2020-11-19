@@ -57,15 +57,10 @@ class FilteredDifferentialTable extends Component {
       this.props.filteredDifferentialFeatureIdKey !==
       prevProps.filteredDifferentialFeatureIdKey
     ) {
-      this.setState(
-        {
-          additionalTemplateInfo: {},
-          filteredTableLoading: true,
-        },
-        function() {
-          this.getTableHelpers();
-        },
-      );
+      this.setState({
+        additionalTemplateInfo: {},
+        filteredTableLoading: false,
+      });
     }
 
     if (this.props.HighlightedProteins !== prevProps.HighlightedProteins) {
@@ -202,7 +197,7 @@ class FilteredDifferentialTable extends Component {
           title: f,
           field: f,
           filterable: { type: 'multiFilter' },
-          template: (value, item, addParams) => {
+          template: (value, item) => {
             let linkoutHardcoded = getLinkoutHardcoded(
               item,
               TableValuePopupStyle,
@@ -349,31 +344,6 @@ class FilteredDifferentialTable extends Component {
       this.pageToFeature(filteredDifferentialTableRowMaxVar);
     }
     this.setState({ rowClicked: false });
-  };
-
-  getTableHelpers = () => {
-    const { filteredDifferentialFeatureIdKey } = this.props;
-    let addParams = {};
-    addParams.showPhosphositePlus = dataItem => {
-      let protein = dataItem.symbol
-        ? dataItem.symbol
-        : dataItem[filteredDifferentialFeatureIdKey];
-      return function() {
-        const param = {
-          proteinNames: protein,
-          queryId: -1,
-          from: 0,
-        };
-        omicNavigatorService.postToPhosphositePlus(
-          param,
-          'https://www.phosphosite.org/proteinSearchSubmitAction.action',
-        );
-      };
-    };
-    this.setState({
-      additionalTemplateInfo: addParams,
-      filteredTableLoading: false,
-    });
   };
 
   // informItemsPerPageFilteredDifferentialTable = items => {

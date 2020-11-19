@@ -502,7 +502,6 @@ class Enrichment extends Component {
     omicNavigatorService
       .getBarcodes(enrichmentStudy, enrichmentModel, null, null)
       .then(getBarcodesResponseData => {
-        debugger;
         this.setState({
           hasBarcodeData: getBarcodesResponseData.length === 0 ? false : true,
         });
