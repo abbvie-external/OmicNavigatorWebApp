@@ -43,9 +43,15 @@ export function getLinkout(
 
   if (linkouts.length > 1) {
     for (const val of linkouts) {
-      const domain = findDomain(`${val}`);
-      iconDomains.push(domain);
-      icons.push(`${iconBaseUrl}${domain}`);
+      const domainRaw = findDomain(`${val}`);
+      const domainRawWww = domainRaw.includes('www')
+        ? domainRaw
+        : `www.${domainRaw}`;
+      const domainRawWwwHttps = domainRawWww.includes('//')
+        ? domainRawWww.split('//').pop()
+        : domainRawWww;
+      iconDomains.push(domainRawWwwHttps);
+      icons.push(`${iconBaseUrl}${domainRawWwwHttps}.ico`);
     }
 
     const Popups = linkouts.map((link, index) => {
@@ -70,15 +76,22 @@ export function getLinkout(
     });
     return Popups;
   } else {
-    const domain = findDomain(`${linkouts[0]}`);
-    iconDomains.push(domain);
-    icons.push(`${iconBaseUrl}${domain}`);
+    const domainRaw = findDomain(`${linkouts[0]}`);
+    const domainRawWww = domainRaw.includes('www')
+      ? domainRaw
+      : `www.${domainRaw}`;
+    const domainRawWwwHttps = domainRawWww.includes('//')
+      ? domainRawWww.split('//').pop()
+      : domainRawWww;
+    icons.push(`${iconBaseUrl}${domainRawWwwHttps}.ico`);
+    iconDomains.push(domainRawWwwHttps);
+    icons.push(`${iconBaseUrl}${domainRawWwwHttps}`);
     return (
       <Popup
         key={itemValue}
         trigger={
           <img
-            src={icons}
+            src={icons[0]}
             alt={iconDomains}
             className="ExternalSiteIcon"
             onClick={() => openWindows(linkouts, itemValue)}
