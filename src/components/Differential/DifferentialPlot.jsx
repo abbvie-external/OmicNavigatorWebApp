@@ -21,7 +21,6 @@ class DifferentialPlot extends Component {
     pdfFlag: false,
     svgFlag: true,
     txtFlag: false,
-    metafeaturesData: [],
     areDifferentialPlotTabsReady: false,
   };
 
