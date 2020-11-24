@@ -566,7 +566,7 @@ class OmicNavigatorService {
   async getEnrichmentsLinkouts(enrichmentStudy, enrichmentAnnotation) {
     this.setUrl();
     const promise = this.ocpuRPCUnbox(
-      'getResultsLinkouts',
+      'getEnrichmentsLinkouts',
       {
         study: enrichmentStudy,
         annotationID: enrichmentAnnotation,

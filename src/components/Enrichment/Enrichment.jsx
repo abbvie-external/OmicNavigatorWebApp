@@ -486,12 +486,12 @@ class Enrichment extends Component {
       });
     }
     if (
-      changes.enrichmentModel !== '' &&
-      changes.enrichmentModel !== this.props.enrichmentModel
+      changes.enrichmentAnnotation !== '' &&
+      changes.enrichmentAnnotation !== this.props.enrichmentAnnotation
     ) {
       this.getEnrichmentsLinkouts(
         changes.enrichmentStudy,
-        changes.enrichmentModel,
+        changes.enrichmentAnnotation,
       );
     }
   };
@@ -507,9 +507,10 @@ class Enrichment extends Component {
       });
   };
 
-  getEnrichmentsLinkouts = (enrichmentStudy, enrichmentModel) => {
+  getEnrichmentsLinkouts = (enrichmentStudy, enrichmentAnnotation) => {
+    debugger;
     omicNavigatorService
-      .getResultsLinkouts(enrichmentStudy, enrichmentModel)
+      .getEnrichmentsLinkouts(enrichmentStudy, enrichmentAnnotation)
       .then(getEnrichmentsLinkoutsResponseData => {
         this.setState({
           enrichmentsLinkouts: getEnrichmentsLinkoutsResponseData,
@@ -592,22 +593,17 @@ class Enrichment extends Component {
           field: f,
           filterable: { type: 'multiFilter' },
           template: (value, item, addParams) => {
-            const enrichmentsLinkoutsKeys = Object.keys(enrichmentsLinkouts);
-            let linkoutWithIcon = null;
-            if (enrichmentsLinkoutsKeys.includes(f)) {
-              const columnLinkoutsObj = enrichmentsLinkouts[f];
-              const columnLinkoutsIsArray = Array.isArray(columnLinkoutsObj);
-              const linkouts = columnLinkoutsIsArray
-                ? columnLinkoutsObj
-                : [columnLinkoutsObj];
+            if (f === alphanumericTrigger) {
+              const linkoutsIsArray = Array.isArray(enrichmentsLinkouts);
+              const linkouts = linkoutsIsArray
+                ? enrichmentsLinkouts
+                : [enrichmentsLinkouts];
               const itemValue = item[f];
               linkoutWithIcon = getLinkout(
                 itemValue,
                 linkouts,
                 TableValuePopupStyle,
               );
-            }
-            if (f === alphanumericTrigger) {
               return (
                 <div>
                   <Popup
@@ -640,7 +636,6 @@ class Enrichment extends Component {
                     inverted
                     basic
                   />
-                  {linkoutWithIcon}
                 </div>
               );
             }
