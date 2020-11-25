@@ -124,6 +124,7 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentTestAndDescription,
       onSearchCriteriaChange,
       onSearchTransitionEnrichment,
+      onGetEnrichmentsLinkouts,
     } = this.props;
 
     const studies = allStudiesMetadata.map(study => {
@@ -164,7 +165,6 @@ class EnrichmentSearchCriteria extends Component {
       });
       this.getReportLink(enrichmentStudy, 'default');
       if (enrichmentModel !== '') {
-        this.props.onGetEnrichmentsLinkouts(enrichmentStudy, enrichmentModel);
         this.props.onHandleHasBarcodeData();
         this.props.onHandlePlotTypesEnrichment(enrichmentModel);
         const enrichmentModelWithAnnotations = enrichmentModelsAndAnnotationsVar.find(
@@ -197,6 +197,7 @@ class EnrichmentSearchCriteria extends Component {
         this.props.onSetAnnotationsMetadata(enrichmentAnnotationsMetadataVar);
         this.getReportLink(enrichmentStudy, enrichmentModel);
         if (enrichmentAnnotation !== '') {
+          onGetEnrichmentsLinkouts(enrichmentStudy, enrichmentAnnotation);
           onSearchTransitionEnrichment(true);
           omicNavigatorService
             .getEnrichmentsTable(
