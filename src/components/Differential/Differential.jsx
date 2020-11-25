@@ -1,11 +1,16 @@
 import React, { Component } from 'react';
-import { Grid, Menu, Popup, Sidebar, Tab } from 'semantic-ui-react';
+import {
+  Grid,
+  // Menu, Tab
+  Popup,
+  Sidebar,
+} from 'semantic-ui-react';
 import { withRouter } from 'react-router-dom';
 import DifferentialSearchCriteria from './DifferentialSearchCriteria';
-import VolcanoPlotIcon from '../../resources/VolcanoPlotIcon.png';
-import VolcanoPlotIconSelected from '../../resources/VolcanoPlotIconSelected.png';
-import tableIcon from '../../resources/tableIcon.png';
-import tableIconSelected from '../../resources/tableIconSelected.png';
+// import VolcanoPlotIcon from '../../resources/VolcanoPlotIcon.png';
+// import VolcanoPlotIconSelected from '../../resources/VolcanoPlotIconSelected.png';
+// import tableIcon from '../../resources/tableIcon.png';
+// import tableIconSelected from '../../resources/tableIconSelected.png';
 import DifferentialPlot from './DifferentialPlot';
 import LoaderActivePlots from '../Transitions/LoaderActivePlots';
 import TransitionActive from '../Transitions/TransitionActive';
@@ -928,18 +933,34 @@ class Differential extends Component {
       !this.state.isSearchingDifferential &&
       !this.state.isItemSelected
     ) {
-      const TableAndPlotPanes = this.getTableAndPlotPanes();
+      // const TableAndPlotPanes = this.getTableAndPlotPanes();
       return (
-        <Tab
-          className="TableAndPlotContainer"
-          panes={TableAndPlotPanes}
-          onTabChange={this.handleTablePlotTabChange}
-          activeIndex={this.state.activeIndexDifferentialView}
-          renderActiveOnly={false}
-          menu={{
-            attached: true,
-            className: 'TableAndPlotMenuContainer',
-          }}
+        // <Tab
+        //   className="TableAndPlotContainer"
+        //   panes={TableAndPlotPanes}
+        //   onTabChange={this.handleTablePlotTabChange}
+        //   activeIndex={this.state.activeIndexDifferentialView}
+        //   renderActiveOnly={false}
+        //   menu={{
+        //     attached: true,
+        //     className: 'TableAndPlotMenuContainer',
+        //   }}
+        // />
+        // <div className="TableAndPlotContainer">
+
+        // </div>
+        <DifferentialVolcano
+          {...this.state}
+          {...this.props}
+          handleVolcanoPlotSelectionChange={
+            this.handleVolcanoPlotSelectionChange
+          }
+          onHandleSelectedVolcano={this.handleSelectedVolcano}
+          onVolcanoSVGSizeChange={this.handleVolcanoSVGSizeChange}
+          onSVGTabChange={this.handleSVGTabChange}
+          onHandleVolcanoTableLoading={this.handleVolcanoTableLoading}
+          // onHandleVolcanoPlotSVGLoaded={this.handleVolcanoPlotSVGLoaded}
+          onRehighlightCircles={this.rehighlightCircles}
         />
       );
     } else return <TransitionStill stillMessage={message} />;
@@ -1091,159 +1112,159 @@ class Differential extends Component {
     }
   };
 
-  getTableAndPlotPanes = () => {
-    const {
-      tab,
-      differentialStudy,
-      differentialModel,
-      differentialTest,
-    } = this.props;
-    const { multisetQueriedP } = this.state;
+  // getTableAndPlotPanes = () => {
+  //   const {
+  //     tab,
+  //     differentialStudy,
+  //     differentialModel,
+  //     differentialTest,
+  //   } = this.props;
+  //   const { multisetQueriedP } = this.state;
 
-    const {
-      additionalTemplateInfoDifferentialTable,
-      differentialResults,
-      itemsPerPageDifferentialTable,
-      differentialColumns,
-      isVolcanoTableLoading,
-    } = this.state;
-    const differentialRows = differentialResults.length || 1000;
-    // const getExportDataDifferential =
-    //   this.differentialGridRef.current?.qhGridRef.current?.getSortedData() ||
-    //   null;
-    let differentialCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}`;
-    if (multisetQueriedP) {
-      differentialCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-${multisetQueriedP}`;
-    }
-    return [
-      {
-        menuItem: (
-          <Menu.Item
-            key="0"
-            className="TableAndPlotButtons TableButton"
-            name="Table"
-            color="orange"
-          >
-            <img
-              src={
-                this.state.activeIndexDifferentialView === 0
-                  ? tableIconSelected
-                  : tableIcon
-              }
-              alt="Table Icon"
-              id="TableButton"
-            />
-          </Menu.Item>
-        ),
-        pane: (
-          <Tab.Pane key="0" className="DifferentialContentPane">
-            {/* <div id="DifferentialGrid"> */}
-            <Grid>
-              <Grid.Row>
-                <div className="FloatRight AbsoluteExport">
-                  <ButtonActions
-                    excelVisible={true}
-                    pngVisible={false}
-                    pdfVisible={false}
-                    svgVisible={false}
-                    txtVisible={true}
-                    refFwd={this.differentialGridRef}
-                    exportButtonSize={'medium'}
-                    tab={tab}
-                    study={differentialStudy}
-                    model={differentialModel}
-                    test={differentialTest}
-                  />
-                </div>
-                <Grid.Column
-                  className="ResultsTableWrapper"
-                  mobile={16}
-                  tablet={16}
-                  largeScreen={16}
-                  widescreen={16}
-                >
-                  <EZGrid
-                    ref={this.differentialGridRef}
-                    uniqueCacheKey={differentialCacheKey}
-                    data={differentialResults}
-                    // getExportData={getExportDataDifferential}
-                    columnsConfig={differentialColumns || []}
-                    totalRows={differentialRows}
-                    // use "differentialRows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
-                    itemsPerPage={itemsPerPageDifferentialTable}
-                    // onInformItemsPerPage={
-                    //   this.informItemsPerPageDifferentialTable
-                    // }
-                    // exportBaseName="Differential_Analysis"
-                    loading={isVolcanoTableLoading}
-                    // quickViews={quickViews}
-                    // disableGeneralSearch
-                    disableGrouping
-                    disableColumnVisibilityToggle
-                    disableColumnReorder
-                    // disableFilters
-                    min-height="75vh"
-                    additionalTemplateInfo={
-                      additionalTemplateInfoDifferentialTable
-                    }
-                    // onRowClick={this.handleRowClickDifferential}
-                    rowLevelPropsCalc={this.rowLevelPropsCalcDifferential}
-                  />
-                  {/* </div> */}
-                </Grid.Column>
-              </Grid.Row>
-            </Grid>
-          </Tab.Pane>
-        ),
-      },
-      {
-        menuItem: (
-          <Menu.Item
-            key="1"
-            className="TableAndPlotButtons PlotButton"
-            name="plot"
-            // color="orange"
-          >
-            <img
-              src={
-                this.state.activeIndexDifferentialView === 1
-                  ? VolcanoPlotIconSelected
-                  : VolcanoPlotIcon
-              }
-              alt="Plot Icon"
-              id="PlotButton"
-            />
-          </Menu.Item>
-        ),
-        pane: (
-          <Tab.Pane
-            key="1"
-            className="DifferentialContentPane"
-            id="DifferentialContentPane"
-          >
-            <DifferentialVolcano
-              {...this.state}
-              {...this.props}
-              handleVolcanoPlotSelectionChange={
-                this.handleVolcanoPlotSelectionChange
-              }
-              onHandleSelectedVolcano={this.handleSelectedVolcano}
-              onVolcanoSVGSizeChange={this.handleVolcanoSVGSizeChange}
-              onSVGTabChange={this.handleSVGTabChange}
-              onHandleVolcanoTableLoading={this.handleVolcanoTableLoading}
-              // onHandleVolcanoPlotSVGLoaded={this.handleVolcanoPlotSVGLoaded}
-              onRehighlightCircles={this.rehighlightCircles}
-            />
-          </Tab.Pane>
-        ),
-      },
-    ];
-  };
+  //   const {
+  //     additionalTemplateInfoDifferentialTable,
+  //     differentialResults,
+  //     itemsPerPageDifferentialTable,
+  //     differentialColumns,
+  //     isVolcanoTableLoading,
+  //   } = this.state;
+  //   const differentialRows = differentialResults.length || 1000;
+  //   // const getExportDataDifferential =
+  //   //   this.differentialGridRef.current?.qhGridRef.current?.getSortedData() ||
+  //   //   null;
+  //   let differentialCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}`;
+  //   if (multisetQueriedP) {
+  //     differentialCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-${multisetQueriedP}`;
+  //   }
+  //   return [
+  //     {
+  //       menuItem: (
+  //         <Menu.Item
+  //           key="0"
+  //           className="TableAndPlotButtons TableButton"
+  //           name="Table"
+  //           color="orange"
+  //         >
+  //           <img
+  //             src={
+  //               this.state.activeIndexDifferentialView === 0
+  //                 ? tableIconSelected
+  //                 : tableIcon
+  //             }
+  //             alt="Table Icon"
+  //             id="TableButton"
+  //           />
+  //         </Menu.Item>
+  //       ),
+  //       pane: (
+  //         <Tab.Pane key="0" className="DifferentialContentPane">
+  //           {/* <div id="DifferentialGrid"> */}
+  //           <Grid>
+  //             <Grid.Row>
+  //               <div className="FloatRight AbsoluteExport">
+  //                 <ButtonActions
+  //                   excelVisible={true}
+  //                   pngVisible={false}
+  //                   pdfVisible={false}
+  //                   svgVisible={false}
+  //                   txtVisible={true}
+  //                   refFwd={this.differentialGridRef}
+  //                   exportButtonSize={'medium'}
+  //                   tab={tab}
+  //                   study={differentialStudy}
+  //                   model={differentialModel}
+  //                   test={differentialTest}
+  //                 />
+  //               </div>
+  //               <Grid.Column
+  //                 className="ResultsTableWrapper"
+  //                 mobile={16}
+  //                 tablet={16}
+  //                 largeScreen={16}
+  //                 widescreen={16}
+  //               >
+  //                 <EZGrid
+  //                   ref={this.differentialGridRef}
+  //                   uniqueCacheKey={differentialCacheKey}
+  //                   data={differentialResults}
+  //                   // getExportData={getExportDataDifferential}
+  //                   columnsConfig={differentialColumns || []}
+  //                   totalRows={differentialRows}
+  //                   // use "differentialRows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
+  //                   itemsPerPage={itemsPerPageDifferentialTable}
+  //                   // onInformItemsPerPage={
+  //                   //   this.informItemsPerPageDifferentialTable
+  //                   // }
+  //                   // exportBaseName="Differential_Analysis"
+  //                   loading={isVolcanoTableLoading}
+  //                   // quickViews={quickViews}
+  //                   // disableGeneralSearch
+  //                   disableGrouping
+  //                   disableColumnVisibilityToggle
+  //                   disableColumnReorder
+  //                   // disableFilters
+  //                   min-height="75vh"
+  //                   additionalTemplateInfo={
+  //                     additionalTemplateInfoDifferentialTable
+  //                   }
+  //                   // onRowClick={this.handleRowClickDifferential}
+  //                   rowLevelPropsCalc={this.rowLevelPropsCalcDifferential}
+  //                 />
+  //                 {/* </div> */}
+  //               </Grid.Column>
+  //             </Grid.Row>
+  //           </Grid>
+  //         </Tab.Pane>
+  //       ),
+  //     },
+  //     {
+  //       menuItem: (
+  //         <Menu.Item
+  //           key="1"
+  //           className="TableAndPlotButtons PlotButton"
+  //           name="plot"
+  //           // color="orange"
+  //         >
+  //           <img
+  //             src={
+  //               this.state.activeIndexDifferentialView === 1
+  //                 ? VolcanoPlotIconSelected
+  //                 : VolcanoPlotIcon
+  //             }
+  //             alt="Plot Icon"
+  //             id="PlotButton"
+  //           />
+  //         </Menu.Item>
+  //       ),
+  //       pane: (
+  //         <Tab.Pane
+  //           key="1"
+  //           className="DifferentialContentPane"
+  //           id="DifferentialContentPane"
+  //         >
+  //           <DifferentialVolcano
+  //             {...this.state}
+  //             {...this.props}
+  //             handleVolcanoPlotSelectionChange={
+  //               this.handleVolcanoPlotSelectionChange
+  //             }
+  //             onHandleSelectedVolcano={this.handleSelectedVolcano}
+  //             onVolcanoSVGSizeChange={this.handleVolcanoSVGSizeChange}
+  //             onSVGTabChange={this.handleSVGTabChange}
+  //             onHandleVolcanoTableLoading={this.handleVolcanoTableLoading}
+  //             // onHandleVolcanoPlotSVGLoaded={this.handleVolcanoPlotSVGLoaded}
+  //             onRehighlightCircles={this.rehighlightCircles}
+  //           />
+  //         </Tab.Pane>
+  //       ),
+  //     },
+  //   ];
+  // };
 
-  handleTablePlotTabChange = (e, { activeIndex }) => {
-    sessionStorage.setItem(`differentialViewTab`, activeIndex);
-    this.setState({ activeIndexDifferentialView: activeIndex });
-  };
+  // handleTablePlotTabChange = (e, { activeIndex }) => {
+  //   sessionStorage.setItem(`differentialViewTab`, activeIndex);
+  //   this.setState({ activeIndexDifferentialView: activeIndex });
+  // };
 
   render() {
     const differentialView = this.getView();
