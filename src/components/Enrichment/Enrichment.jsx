@@ -157,7 +157,7 @@ class Enrichment extends Component {
       xName: 'tissue',
       constrainExtremes: false,
       color: d3.scaleOrdinal(d3.schemeCategory10),
-      margin: { top: 10, right: 10, bottom: 50, left: 60 },
+      margin: { top: 10, right: 30, bottom: 50, left: 60 },
       scale: 'linear',
       yName: null,
       yTicks: 1,
