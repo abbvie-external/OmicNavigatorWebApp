@@ -22,6 +22,7 @@ import VolcanoPlotIconSelected from '../../resources/VolcanoPlotIconSelected.png
 import ButtonActions from '../Shared/ButtonActions';
 import './DifferentialVolcano.scss';
 import SplitPane from 'react-split-pane';
+import { nonNegativeInteger } from 'airbnb-prop-types';
 
 class DifferentialVolcano extends Component {
   state = {
@@ -536,6 +537,20 @@ class DifferentialVolcano extends Component {
       ></Form.Field>
     );
     const svgPlot = this.getSVGPlot();
+    const resizerStyle = {
+      // padding: '1px 0px !important',
+      // height: '16px',
+      // margin: '-8px 0',
+      // borderTop: '8px solid rgba(255, 255, 255, 0)',
+      // borderBottom: '8px solid rgba(255, 255, 255, 0)',
+      // cursor: 'row-resize',
+      // width: '100%',
+      // zIndex: '4',
+      display: 'block',
+    };
+    const hiddenResizerStyle = {
+      display: 'none',
+    };
     return (
       <>
         <span className="VolcanoPlotButton">
@@ -669,6 +684,9 @@ class DifferentialVolcano extends Component {
                 split="horizontal"
                 className="volcanoSplitPane"
                 id=""
+                resizerStyle={
+                  !volcanoPlotsVisible ? hiddenResizerStyle : resizerStyle
+                }
                 // defaultSize={this.state.volcanoHeight * 1.05263157895}
                 size={volcanoPlotsVisible ? volcanoHeight * 1.05263157895 : 0}
                 minSize={220}
