@@ -6,7 +6,7 @@ import ButtonActions from '../Shared/ButtonActions';
 
 class DifferentialVolcanoPlot extends Component {
   state = {
-    plotName: 'ViolinChart',
+    plotName: 'VolcanoChart',
     hoveredCircleData: {
       position: [],
       id: null,
@@ -559,7 +559,7 @@ class DifferentialVolcanoPlot extends Component {
             />
           </div>
           <svg
-            id="ViolinChart"
+            id="VolcanoChart"
             className="volcanoPlotSVG"
             width={volcanoWidth + 20}
             height={volcanoHeight}
