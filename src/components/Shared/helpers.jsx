@@ -76,7 +76,10 @@ export function getLinkout(
     });
     return Popups;
   } else {
-    const domainRaw = findDomain(`${linkouts[0]}`);
+    const linkoutsIsArray = Array.isArray(linkouts);
+    const domainRaw = linkoutsIsArray
+      ? findDomain(`${linkouts[0]}`)
+      : findDomain(linkouts);
     const domainRawWww = domainRaw.includes('www')
       ? domainRaw
       : `www.${domainRaw}`;

@@ -594,16 +594,19 @@ class Enrichment extends Component {
           filterable: { type: 'multiFilter' },
           template: (value, item, addParams) => {
             if (f === alphanumericTrigger) {
-              const linkoutsIsArray = Array.isArray(enrichmentsLinkouts);
-              const linkouts = linkoutsIsArray
-                ? enrichmentsLinkouts
-                : [enrichmentsLinkouts];
-              const itemValue = item[f];
-              linkoutWithIcon = getLinkout(
-                itemValue,
-                linkouts,
-                TableValuePopupStyle,
-              );
+              let linkoutWithIcon = null;
+              if (enrichmentsLinkouts.length > 0) {
+                const linkoutsIsArray = Array.isArray(enrichmentsLinkouts);
+                const linkouts = linkoutsIsArray
+                  ? enrichmentsLinkouts
+                  : [enrichmentsLinkouts];
+                const itemValue = item[f];
+                linkoutWithIcon = getLinkout(
+                  itemValue,
+                  linkouts,
+                  TableValuePopupStyle,
+                );
+              }
               return (
                 <div>
                   <Popup
