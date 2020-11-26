@@ -569,11 +569,7 @@ class DifferentialVolcano extends Component {
             }
             style={TableValuePopupStyle}
             // className="TablePopupValue"
-            content={
-              volcanoPlotsVisible
-                ? 'Hide Volcano Charts'
-                : 'Show Volcano Charts'
-            }
+            content={volcanoPlotsVisible ? 'Hide Charts' : 'Show Charts'}
             inverted
             basic
           />

@@ -287,8 +287,6 @@ class DifferentialVolcanoPlot extends Component {
           self.setState({ brushedCirclesData: brushedDataArr });
         }
         self.props.handleVolcanoPlotSelectionChange(brushedDataArr);
-      } else {
-        self.handleSVGClick(null);
       }
     };
 
