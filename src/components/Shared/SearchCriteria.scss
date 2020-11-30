@@ -2,6 +2,7 @@
   // background-color: #F6F6F6;
   background-color: #e0e1e2;
   overflow: auto !important;
+  min-height: calc(100vh - 57px) !important;
   height: auto !important;
 
   @media (max-width: 677px) {

@@ -9,92 +9,19 @@
   height: 20px !important;
 }
 
-.DifferentialContentPane {
-  border: none !important;
-}
-
 .DifferentialContainer ::-webkit-scrollbar-thumb:vertical {
-  // border-radius: 0 !important;
-  /* background: var(--color-primary) !important; */
-  // background: #0f0000 !important;
-  /* box-shadow: 0px 2px 0px rgba(0, 0, 0, 0.6) !important; */
   box-shadow: 0px 2px 0px var(--color-primary) !important;
 }
 
 .DifferentialContainer ::-webkit-scrollbar-thumb:horizontal {
-  // border-radius: 0 !important;
-  /* background: var(--color-primary) !important; */
-  // background: #0f0000 !important;
-  /* box-shadow: 0px 2px 0px rgba(0, 0, 0, 0.6) !important; */
   box-shadow: 2px 0px 0px var(--color-primary) !important;
 }
-
-// #DifferentialGrid .highlightedRow {
-//   background: var(--color-primary) !important;
-//   color: white !important;
-// }
-
-// #DifferentialGrid .highlightedRow .TableCellLink {
-//   color: white !important;
-//   cursor: pointer !important;
-// }
 
 .ui.red.button,
 .ui.red.buttons .button {
   background-color: var(--color-primary) !important;
 }
 
-// @media (max-width: 1199px) {
-//   .TableAndPlotMenuContainer {
-//     position: block !important;
-//     display: relative !important;
-//     margin-top: 25px !important;
-//     padding-left: 15px !important;
-//     cursor: pointer !important;
-//     height: 47px !important;
-//     width: 100px !important;
-//     border: none !important;
-//   }
-//   .VolcanoPlotFilters {
-//     margin-top: 20px !important;
-//     margin-bottom: 20px !important;
-//   }
-// }
-
-// .TableAndPlotMenuContainer {
-//   position: absolute !important;
-//   margin-top: 25px !important;
-//   padding-left: 15px !important;
-//   cursor: pointer !important;
-//   z-index: 1 !important;
-//   height: 47px !important;
-//   width: 100px !important;
-//   border: none !important;
-
-//   .TableAndPlotButtons {
-//     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.54) !important;
-//     border-radius: 0px !important;
-//     height: 45px !important;
-//     width: 45px !important;
-//   }
-
-//   .TableButton {
-//     margin: 0px 15px 0px 0px !important;
-//     padding: 0px !important;
-//   }
-//   .PlotButton {
-//     margin: 0px !important;
-//     padding: 0px !important;
-//   }
-//   #TableButton {
-//     height: 45px !important;
-//     width: 45px !important;
-//   }
-//   #PlotButton {
-//     height: 45px !important;
-//     width: 45px !important;
-//   }
-// }
 .NoDataMessage {
   margin-top: 40px !important;
 }

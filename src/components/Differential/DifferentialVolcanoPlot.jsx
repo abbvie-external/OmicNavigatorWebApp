@@ -201,6 +201,7 @@ class DifferentialVolcanoPlot extends Component {
           y={hoveredCircleData.position[1] * 1 + 10}
           width="200"
           height="75"
+          cursor="crosshair"
         >
           <rect width="100%" height="100%" fill="#ff4400" rx="5" ry="5"></rect>
           <rect

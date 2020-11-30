@@ -22,7 +22,6 @@ import VolcanoPlotIconSelected from '../../resources/VolcanoPlotIconSelected.png
 import ButtonActions from '../Shared/ButtonActions';
 import './DifferentialVolcano.scss';
 import SplitPane from 'react-split-pane';
-import { nonNegativeInteger } from 'airbnb-prop-types';
 
 class DifferentialVolcano extends Component {
   state = {
@@ -674,11 +673,11 @@ class DifferentialVolcano extends Component {
               </Fragment>
             </Grid.Column>
           </Grid.Row>
-          <Grid.Row id="volcanoViewRow">
+          <Grid.Row id="VolcanoViewRow">
             <Grid.Column>
               <SplitPane
                 split="horizontal"
-                className="volcanoSplitPane"
+                className="VolcanoSplitPane"
                 id=""
                 resizerStyle={
                   !volcanoPlotsVisible ? hiddenResizerStyle : resizerStyle
@@ -695,8 +694,8 @@ class DifferentialVolcano extends Component {
                   split="vertical"
                   className={
                     volcanoPlotsVisible
-                      ? 'Show volcanoSplitPane'
-                      : 'Hide volcanoSplitPane'
+                      ? 'Show VolcanoSplitPane'
+                      : 'Hide VolcanoSplitPane'
                   }
                   // defaultSize={this.state.volcanoWidth * 1.05263157895}
                   size={volcanoWidth * 1.05263157895}
@@ -719,7 +718,7 @@ class DifferentialVolcano extends Component {
                   {svgPlot}
                 </SplitPane>
                 <Grid.Row>
-                  <div className="FloatRight AbsoluteExport">
+                  <div className="FloatRight AbsoluteExportDifferential">
                     <ButtonActions
                       excelVisible={true}
                       pngVisible={false}
@@ -744,10 +743,10 @@ class DifferentialVolcano extends Component {
                     <EZGrid
                       ref={this.volcanoPlotFilteredGridRef}
                       uniqueCacheKey={differentialVolcanoCacheKey}
-                      className="volcanoPlotTable"
+                      className="VolcanoPlotTable"
                       // note, default is 70vh; if you want a specific vh, specify like "40vh"; "auto" lets the height flow based on items per page
                       // height="auto"
-                      height="40vh"
+                      height={volcanoPlotsVisible ? '40vh' : '70vh'}
                       data={filteredTableData || []}
                       totalRows={volcanoPlotRows || 0}
                       columnsConfig={differentialColumns}
