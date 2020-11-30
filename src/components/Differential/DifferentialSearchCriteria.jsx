@@ -466,7 +466,6 @@ class DifferentialSearchCriteria extends Component {
 
   handleMultisetPCloseError = () => {
     this.props.onSearchTransitionDifferentialAlt(false);
-    this.props.onHandleDifferentialTableLoading(false);
     this.props.onHandleVolcanoTableLoading(false);
     this.setState(
       {
@@ -520,7 +519,6 @@ class DifferentialSearchCriteria extends Component {
   };
 
   addFilterDifferential = () => {
-    this.props.onHandleDifferentialTableLoading(true);
     this.props.onHandleVolcanoTableLoading(true);
     // this.setState({ loadingDifferentialMultisetFilters: true });
     // const uSetVP = _.cloneDeep(this.state.uSettingsP);
@@ -543,7 +541,6 @@ class DifferentialSearchCriteria extends Component {
   };
 
   removeFilterDifferential = index => {
-    this.props.onHandleDifferentialTableLoading(true);
     this.props.onHandleVolcanoTableLoading(true);
     // this.setState({ loadingDifferentialMultisetFilters: true });
     const uSetVP = { ...this.state.uSettingsP };
@@ -577,7 +574,6 @@ class DifferentialSearchCriteria extends Component {
     this.setState({ uSettingsP: uSetVP });
   };
   handleDropdownChange = (evt, { name, value, index }) => {
-    this.props.onHandleDifferentialTableLoading(true);
     this.props.onHandleVolcanoTableLoading(true);
     const uSelVP = [...this.state[name]];
     uSelVP[index] = {
@@ -597,7 +593,6 @@ class DifferentialSearchCriteria extends Component {
   };
   handleSigValuePInputChange = (name, value, index) => {
     if (!this.state.initialRenderP) {
-      this.props.onHandleDifferentialTableLoading(true);
       this.props.onHandleVolcanoTableLoading(true);
     }
     const uSelVP = [...this.state[name]];
@@ -614,7 +609,6 @@ class DifferentialSearchCriteria extends Component {
     );
   };
   handleSetChange = ({ mustP, notP }) => {
-    this.props.onHandleDifferentialTableLoading(true);
     this.props.onHandleVolcanoTableLoading(true);
     const uSettingsVP = this.state.uSettingsP;
     uSettingsVP.mustP = mustP;

@@ -35,7 +35,6 @@ class Differential extends Component {
   state = {
     isValidSearchDifferential: false,
     isSearchingDifferential: false,
-    isDifferentialTableLoading: false,
     isVolcanoTableLoading: false,
     // differentialResults: [],
     // differentialResultsMounted: false,
@@ -53,9 +52,6 @@ class Differential extends Component {
     isProteinSVGLoaded: false,
     // isProteinDataLoaded: false,
     // HighlightedFeaturesArrVolcano: [],
-    // HighlightedFeaturesArrDifferential: [],
-    // differentialTableRowMax: '',
-    // differentialTableRowOther: [],
     // volcanoDifferentialTableRowMax: '',
     // volcanoDifferentialTableRowOther: [],
     // maxObjectIdentifier: null,
@@ -85,8 +81,6 @@ class Differential extends Component {
     isVolcanoPlotSVGLoaded: true,
     metaFeaturesDataDifferential: [],
     allMetaFeaturesDataDifferential: [],
-    itemsPerPageDifferentialTable:
-      parseInt(localStorage.getItem('itemsPerPageDifferentialTable'), 10) || 45,
   };
   differentialViewContainerRef = React.createRef();
   differentialGridRef = React.createRef();
@@ -100,7 +94,6 @@ class Differential extends Component {
   handleSearchTransitionDifferentialAlt = bool => {
     this.setState({
       isVolcanoTableLoading: bool,
-      isDifferentialTableLoading: bool,
     });
   };
 
@@ -169,14 +162,12 @@ class Differential extends Component {
       differentialColumns: columns,
       isSearchingDifferential: false,
       isValidSearchDifferential: true,
-      isDifferentialTableLoading: false,
       isVolcanoTableLoading: false,
       // differentialResultsMounted: false,
       plotButtonActive: false,
       visible: false,
       // isProteinSVGLoaded: false,
       HighlightedFeaturesArrVolcano: [],
-      HighlightedFeaturesArrDifferential: [],
     });
   };
 
@@ -187,13 +178,6 @@ class Differential extends Component {
       // isProteinDataLoaded: false,
       isItemSelected: false,
       HighlightedFeaturesArrVolcano: [],
-      HighlightedFeaturesArrDifferential: [],
-    });
-  };
-
-  handleDifferentialTableLoading = bool => {
-    this.setState({
-      isDifferentialTableLoading: bool,
     });
   };
 
@@ -231,9 +215,6 @@ class Differential extends Component {
         // differentialResultsUnfiltered: [],
         isProteinDataLoaded: false,
         HighlightedFeaturesArrVolcano: [],
-        HighlightedFeaturesArrDifferential: [],
-        differentialTableRowMax: '',
-        differentialTableRowOther: [],
         volcanoDifferentialTableRowMax: '',
         volcanoDifferentialTableRowOther: [],
         maxObjectIdentifier: null,
@@ -926,9 +907,6 @@ class Differential extends Component {
               onSetTestsMetadata={this.setTestsMetadata}
               onHandlePlotTypesDifferential={this.handlePlotTypesDifferential}
               onGetPlot={this.getPlot}
-              onHandleDifferentialTableLoading={
-                this.handleDifferentialTableLoading
-              }
               onHandleVolcanoTableLoading={this.handleVolcanoTableLoading}
               onDoMetaFeaturesExist={this.doMetaFeaturesExist}
               onGetResultsLinkouts={this.getResultsLinkouts}

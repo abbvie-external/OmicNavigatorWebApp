@@ -402,7 +402,7 @@ class DifferentialVolcano extends Component {
     }
   };
 
-  onSizeChange = (size, paneType, show) => {
+  onSizeChange = (size, paneType) => {
     const adjustedSize = Math.round(size * 0.95);
     if (paneType === 'horizontal') {
       // if (show) {
@@ -444,8 +444,14 @@ class DifferentialVolcano extends Component {
 
   handleVolcanoVisability = () => {
     const { volcanoPlotsVisible } = this.state;
+    if (volcanoPlotsVisible) {
+      localStorage.setItem('volcanoHeightBackup', this.state.volcanoHeight);
+      this.setState({
+        volcanoHeightBackup: this.state.volcanoHeight,
+      });
+    }
     const size = !volcanoPlotsVisible ? this.state.volcanoHeightBackup : 0;
-    this.onSizeChange(size, 'horizontal', !volcanoPlotsVisible);
+    this.onSizeChange(size, 'horizontal');
     this.setState({
       volcanoPlotsVisible: !volcanoPlotsVisible,
     });
@@ -472,7 +478,7 @@ class DifferentialVolcano extends Component {
     const {
       additionalTemplateInfoDifferentialTable,
       differentialColumns,
-      isDifferentialTableLoading,
+      isVolcanoTableLoading,
       // differentialResultsMounted,
       differentialStudy,
       differentialModel,
@@ -686,9 +692,7 @@ class DifferentialVolcano extends Component {
                 size={volcanoPlotsVisible ? volcanoHeight * 1.05263157895 : 0}
                 minSize={220}
                 maxSize={1000}
-                onDragFinished={size =>
-                  this.onSizeChange(size, 'horizontal', true)
-                }
+                onDragFinished={size => this.onSizeChange(size, 'horizontal')}
               >
                 <SplitPane
                   split="vertical"
@@ -701,9 +705,7 @@ class DifferentialVolcano extends Component {
                   size={volcanoWidth * 1.05263157895}
                   minSize={300}
                   maxSize={1500}
-                  onDragFinished={size =>
-                    this.onSizeChange(size, 'vertical', true)
-                  }
+                  onDragFinished={size => this.onSizeChange(size, 'vertical')}
                 >
                   <DifferentialVolcanoPlot
                     ref={this.differentialVolcanoPlotRef}
@@ -756,7 +758,7 @@ class DifferentialVolcano extends Component {
                       disableGrouping
                       disableColumnVisibilityToggle
                       // exportBaseName="VolcanoPlot_Filtered_Results"
-                      loading={isDifferentialTableLoading}
+                      loading={isVolcanoTableLoading}
                       additionalTemplateInfo={
                         additionalTemplateInfoDifferentialTable
                       }

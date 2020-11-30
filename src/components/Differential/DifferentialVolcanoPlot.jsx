@@ -571,8 +571,7 @@ class DifferentialVolcanoPlot extends Component {
             {/*X Axis Label*/}
             <text
               className="volcanoAxisLabel"
-              textAnchor="middle"
-              x={volcanoWidth * 0.51}
+              x={volcanoWidth * 0.5 + 25}
               y={xAxisLabelY}
               fontFamily="Lato, Helvetica Neue, Arial, Helvetica, sans-serif"
             >
