@@ -385,7 +385,7 @@ class DifferentialVolcanoPlot extends Component {
         <text
           key={`volcanoCircleText-${circle.id}`}
           className="volcanoCircleTooltipText"
-          transform={`translate(${circle.cx}, ${circle.cy})rotate(45)`}
+          transform={`translate(${circle.cx}, ${circle.cy})rotate(0)`}
           fontSize="11px"
           textAnchor={textAnchor}
           fontFamily="Lato, Helvetica Neue, Arial, Helvetica, sans-serif"
@@ -407,6 +407,7 @@ class DifferentialVolcanoPlot extends Component {
       brushing: false,
       resizeScalarX: 1,
       resizeScalarY: 1,
+      volcanoCircleText: [],
     });
   }
 

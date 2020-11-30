@@ -153,6 +153,8 @@ class DifferentialVolcano extends Component {
           relevantConfigColumns.push(key);
         }
       }
+      //Pushes "none" option into Volcano circle text dropdown
+      differentialAlphanumericFields.push('none');
       let volcanoCircleLabelsVar = differentialAlphanumericFields.map(e => {
         return {
           key: e,

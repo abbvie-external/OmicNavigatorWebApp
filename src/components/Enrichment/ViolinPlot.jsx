@@ -4,9 +4,13 @@ import * as d3 from 'd3';
 import * as _ from 'lodash';
 // import { select } from "d3-selection";
 import './ViolinPlot.scss';
+import { Dropdown } from 'semantic-ui-react';
 
 class ViolinPlot extends Component {
   state = {
+    dropdownChange: null,
+    // dropdownChangeAfter: null,
+    // didDropdownChange: false,
     violinContainerHeight:
       this.violinContainerRef?.current?.parentElement?.offsetHeight ||
       window.screen.height - this.props.horizontalSplitPaneSize - 51,
@@ -54,7 +58,7 @@ class ViolinPlot extends Component {
             Object.keys(o).every(k => o[k] === currentValues[i][k]),
         );
       if (!isSame) {
-        this.initiateViolinPlot(false);
+        this.initiateViolinPlot(true);
       }
     }
     if (this.props.HighlightedProteins !== prevProps.HighlightedProteins) {
@@ -223,7 +227,7 @@ class ViolinPlot extends Component {
     if (id != null) {
       const self = this;
       let maxObj = d3.select(`#violin_${id.featureID}`);
-      console.log(maxObj);
+      //console.log(maxObj);
       const cx = Math.ceil(d3.select(`#violin_${id.featureID}`).attr('cx'));
       const cy = Math.ceil(d3.select(`#violin_${id.featureID}`).attr('cy'));
 
@@ -278,7 +282,14 @@ class ViolinPlot extends Component {
       const circles = d3.selectAll(
         '.' + self.props.violinSettings.id + '.vPoint',
       );
+      //debugger;
+      //console.log("kjsdhfkjsdhfjksdfhskdjfhsdjkfhskdjfhskdf");
+      //console.log(d3.event.selection);
+      //console.log("hellohellohellohellohellohellohello");
+
       if (d3.event.selection != null) {
+        //   self.state.didDropdownChange = false;
+
         // revert circles to initial style
         // self.unhighlightPoint([], true, self);
         const brush_coords = d3.brushSelection(this);
@@ -307,6 +318,37 @@ class ViolinPlot extends Component {
           .attr('stroke', '#8e1b54')
           .attr('opacity', 1.0);
 
+        // d3.selectAll('.brushed')
+        // .each(function(d) {
+        //   const test = d3.select(this);
+        //   debugger;
+        // const circleText = self.chart.objs.g.append('g').attr('class', 'circleText');
+        // circleText
+        //   .append('text')
+        //   .attr('x', 50)
+        //   .attr('y', 50)
+        //   .style('fill', 'black')
+        //   .attr('font-size', 36)
+        //   .attr('font-family', 'Arial')
+        //   .text('HELLOHELLOHELLO');
+        // });
+        //debugger;
+        d3.selectAll('.brushed').each(function(d) {
+          const test = d3.select(this);
+          //debugger;
+          const circleText = self.chart.objs.g
+            .append('g')
+            .attr('class', 'circleText');
+          circleText
+            .append('text')
+            .attr('x', test.attr('cx'))
+            .attr('y', test.attr('cy'))
+            .style('fill', 'black')
+            .attr('font-size', 36)
+            .attr('font-family', 'Arial')
+            .text(test.attr(self.state.dropdownChange));
+        });
+
         // notBrushed
         circles.filter(function() {
           const cx = d3.select(this).attr('cx'),
@@ -323,6 +365,10 @@ class ViolinPlot extends Component {
       }
     };
 
+    // if(self.state.dropdownChange != self.state.dropdownChangeAfter){
+    //   highlightBrushedCircles();
+    // }
+
     self.chart.objs.brush = d3
       .brush()
       .extent([
@@ -336,6 +382,7 @@ class ViolinPlot extends Component {
       .append('g')
       .attr('class', 'violinBrush')
       .call(self.chart.objs.brush);
+    self.state.dropdownChangeAfter = self.state.dropdownChange;
   }
 
   clearBrush(self) {
@@ -1661,14 +1708,53 @@ class ViolinPlot extends Component {
     return window.screen.height - this.props.horizontalSplitPaneSize - 51;
   };
 
+  onDropdownChange = (e, data) => {
+    var self = this;
+    //console.log(data.value);
+    debugger;
+    //this.setState({ dropdownChange: data.value });
+    if (data.value == 'featureID') {
+      this.setState({ dropdownChange: 'id' });
+    } else {
+      this.setState({ dropdownChange: '' });
+    }
+    // self.state.didDropdownChange = true;
+    // debugger;
+    // console.log(self.state.dropdownChange);
+    // self.makeBrush();
+  };
+
   render() {
+    const dataOptions = [
+      {
+        key: 'featureID',
+        text: 'featureID',
+        value: 'featureID',
+      },
+      {
+        key: 'entrez',
+        text: 'entrez',
+        value: 'entrez',
+      },
+    ];
     const self = this;
     return (
-      <div
-        ref={this.violinContainerRef}
-        id={self.props.violinSettings.parentId}
-        className="violin-chart-wrapper"
-      />
+      <>
+        <div>
+          <Dropdown
+            placeholder="Choose"
+            compact
+            selection
+            onChange={this.onDropdownChange}
+            options={dataOptions}
+          />
+        </div>
+        <div
+          ref={this.violinContainerRef}
+          id={self.props.violinSettings.parentId}
+          className="violin-chart-wrapper"
+        />
+      </>
     );
   }
 }
