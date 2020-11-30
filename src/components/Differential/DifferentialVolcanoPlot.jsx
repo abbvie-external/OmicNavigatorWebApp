@@ -18,16 +18,32 @@ class DifferentialVolcanoPlot extends Component {
     tooltipPosition: null,
     // brushedCirclesData: [],
     brushing: false,
-    resizeScalarX: 1,
-    resizeScalarY: 1,
+    // resizeScalarX: 1,
+    // resizeScalarY: 1,
   };
 
   volcanoSVGRef = React.createRef();
+
+  componentDidMount() {
+    let resizedFn;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizedFn);
+      resizedFn = setTimeout(() => {
+        this.windowResized();
+      }, 200);
+    });
+  }
 
   componentDidUpdate(prevProps) {
     const {
       volcanoDifferentialTableRowOther,
       volcanoDifferentialTableRowMax,
+      rehighlightCircles,
+      onRehighlightCircles,
+      volcanoHeight,
+      volcanoWidth,
+      xAxisLabel,
+      yAxisLabel,
     } = this.props;
     if (
       !_.isEqual(
@@ -86,10 +102,29 @@ class DifferentialVolcanoPlot extends Component {
         }
       }
     }
-    if (this.props.rehighlightCircles === true) {
-      this.props.onRehighlightCircles(false);
+    if (rehighlightCircles === true) {
+      onRehighlightCircles(false);
+    }
+    if (
+      prevProps.volcanoHeight !== volcanoHeight ||
+      prevProps.volcanoWidth !== volcanoWidth
+    ) {
+      this.resizeBrushSelection();
+    }
+    if (
+      prevProps.horizontal !== xAxisLabel ||
+      prevProps.yAxisLabel !== yAxisLabel
+    ) {
+      this.removeViolinBrush();
     }
   }
+
+  removeViolinBrush = () => {};
+
+  resizeBrushSelection = () => {};
+
+  windowResized = () => {};
+
   doTransform(value, axis) {
     const { doXAxisTransformation, doYAxisTransformation } = this.props;
     if (axis === 'x' && doXAxisTransformation) {
@@ -201,7 +236,6 @@ class DifferentialVolcanoPlot extends Component {
           y={hoveredCircleData.position[1] * 1 + 10}
           width="200"
           height="75"
-          cursor="crosshair"
         >
           <rect width="100%" height="100%" fill="#ff4400" rx="5" ry="5"></rect>
           <rect
@@ -236,6 +270,7 @@ class DifferentialVolcanoPlot extends Component {
   }
 
   setupBrush(width, height) {
+    debugger;
     const self = this;
     let objsBrush = {};
 
@@ -405,7 +440,7 @@ class DifferentialVolcanoPlot extends Component {
 
     const yAxis = (
       <line
-        className="volcanoPlotYAxis"
+        className="volcanoPlotYAxis NoSelect"
         x1={60}
         x2={60}
         y1={0}
@@ -416,7 +451,7 @@ class DifferentialVolcanoPlot extends Component {
     );
     const xAxis = (
       <line
-        className="volcanoPlotXAxis"
+        className="volcanoPlotXAxis NoSelect"
         x1={60}
         x2={volcanoWidth}
         y1={volcanoHeight - 50}
@@ -438,7 +473,7 @@ class DifferentialVolcanoPlot extends Component {
             ? `xplotick-${value}-g`
             : `xplottick-${identifier}-g`
         }
-        className="individualTick"
+        className="individualTick NoSelect"
         transform={`translate(${xOffset}, ${volcanoHeight - 50})`}
       >
         <line y2="8" stroke="#000" strokeWidth={1} />
@@ -470,7 +505,7 @@ class DifferentialVolcanoPlot extends Component {
             ? `yplottick-${value}-g`
             : `yplottick-${identifier}-g`
         }
-        className="individualTick"
+        className="individualTick NoSelect"
         transform={`translate(0,${yOffset})`}
       >
         <line x1={50} x2={60} stroke="#000" strokeWidth={1} />
@@ -559,7 +594,7 @@ class DifferentialVolcanoPlot extends Component {
           </div>
           <svg
             id="VolcanoChart"
-            className="volcanoPlotSVG"
+            className="VolcanoPlotSVG"
             width={volcanoWidth + 20}
             height={volcanoHeight}
             ref={this.volcanoSVGRef}
@@ -570,8 +605,8 @@ class DifferentialVolcanoPlot extends Component {
             {xAxis}
             {/*X Axis Label*/}
             <text
-              className="volcanoAxisLabel"
-              x={volcanoWidth * 0.5 + 25}
+              className="volcanoAxisLabel NoSelect"
+              x={volcanoWidth * 0.5 + 10}
               y={xAxisLabelY}
               fontFamily="Lato, Helvetica Neue, Arial, Helvetica, sans-serif"
             >
@@ -579,11 +614,11 @@ class DifferentialVolcanoPlot extends Component {
             </text>
             {/*Y Axis Label*/}
             <text
-              className="volcanoAxisLabel"
+              className="volcanoAxisLabel NoSelect"
               textAnchor="middle"
-              transform={`rotate(-90,20,${volcanoHeight * 0.5})`}
+              transform={`rotate(-90,20,${volcanoHeight * 0.5 + 20})`}
               x="60"
-              y={`${volcanoHeight * 0.5}`}
+              y={`${volcanoHeight * 0.5 + 20}`}
               fontFamily="Lato, Helvetica Neue, Arial, Helvetica, sans-serif"
             >
               {yAxisText}

@@ -76,8 +76,6 @@ class Differential extends Component {
     differentialTestsMetadata: [],
     modelSpecificMetaFeaturesExist: true,
     resultsLinkouts: [],
-    plotSVGWidth: null,
-    plotSVGHeight: null,
     isVolcanoPlotSVGLoaded: true,
     metaFeaturesDataDifferential: [],
     allMetaFeaturesDataDifferential: [],
