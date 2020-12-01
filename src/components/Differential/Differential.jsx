@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import { Grid, Popup, Sidebar } from 'semantic-ui-react';
 import { withRouter } from 'react-router-dom';
 import DifferentialSearchCriteria from './DifferentialSearchCriteria';
-import DifferentialPlot from './DifferentialPlot';
-import LoaderActivePlots from '../Transitions/LoaderActivePlots';
+// import DifferentialPlot from './DifferentialPlot';
+// import LoaderActivePlots from '../Transitions/LoaderActivePlots';
 import TransitionActive from '../Transitions/TransitionActive';
 import TransitionStill from '../Transitions/TransitionStill';
 import ButtonActions from '../Shared/ButtonActions';
@@ -68,7 +68,6 @@ class Differential extends Component {
     plotButtonActive: false,
     multisetQueriedP: false,
     thresholdColsP: [],
-    rehighlightCircles: false,
     tabsMessage: 'Select a feature to display plots and data',
     // differentialPlotTypes: [],
     differentialStudyMetadata: [],
@@ -107,12 +106,6 @@ class Differential extends Component {
   //     isVolcanoPlotSVGLoaded: bool,
   //   });
   // };
-
-  rehighlightCircles = bool => {
-    this.setState({
-      rehighlightCircles: bool,
-    });
-  };
 
   setStudyModelTestMetadata = (studyData, modelsAndTests) => {
     this.setState(
@@ -565,7 +558,6 @@ class Differential extends Component {
       isItemSelected: false,
       // isProteinDataLoaded: false,
       isProteinSVGLoaded: false,
-      rehighlightCircles: true,
     });
     this.handleSearchCriteriaChange(
       {
@@ -794,22 +786,24 @@ class Differential extends Component {
 
   getView = () => {
     const message = this.getMessage();
-    if (this.state.isItemSelected && !this.state.isProteinSVGLoaded) {
-      return <LoaderActivePlots />;
-    } else if (this.state.isSearchingDifferential) {
+    // if (this.state.isItemSelected && !this.state.isProteinSVGLoaded) {
+    //   return <LoaderActivePlots />;
+    // } else
+    if (this.state.isSearchingDifferential) {
       return <TransitionActive />;
-    } else if (this.state.isItemSelected && this.state.isProteinSVGLoaded) {
-      return (
-        <DifferentialPlot
-          {...this.props}
-          {...this.state}
-          onBackToTable={this.backToTable}
-        ></DifferentialPlot>
-      );
+      // } else if (this.state.isItemSelected && this.state.isProteinSVGLoaded) {
+      //   return (
+      //     <DifferentialPlot
+      //       {...this.props}
+      //       {...this.state}
+      //       onBackToTable={this.backToTable}
+      //     ></DifferentialPlot>
+      //   );
     } else if (
       this.state.isValidSearchDifferential &&
-      !this.state.isSearchingDifferential &&
-      !this.state.isItemSelected
+      !this.state.isSearchingDifferential
+      // &&
+      // !this.state.isItemSelected
     ) {
       return (
         <DifferentialVolcano
@@ -822,7 +816,7 @@ class Differential extends Component {
           onVolcanoSVGSizeChange={this.handleVolcanoSVGSizeChange}
           onSVGTabChange={this.handleSVGTabChange}
           onHandleVolcanoTableLoading={this.handleVolcanoTableLoading}
-          onRehighlightCircles={this.rehighlightCircles}
+          onBackToTable={this.backToTable}
         />
       );
     } else return <TransitionStill stillMessage={message} />;

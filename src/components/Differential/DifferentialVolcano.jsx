@@ -3,7 +3,8 @@ import _ from 'lodash';
 import CustomEmptyMessage from '../Shared/Templates';
 // eslint-disable-next-line no-unused-vars
 import QHGrid, { EZGrid } from '***REMOVED***';
-import SVGPlot from '../Shared/SVGPlot';
+import DifferentialPlot from './DifferentialPlot';
+// import SVGPlot from '../Shared/SVGPlot';
 import { scrollElement } from '../Shared/helpers';
 import DifferentialVolcanoPlot from './DifferentialVolcanoPlot';
 import {
@@ -12,10 +13,11 @@ import {
   Select,
   Checkbox,
   Popup,
-  Dimmer,
-  Loader,
+  // Dimmer,
+  // Loader,
   Label,
   // Divider,
+  Sidebar,
 } from 'semantic-ui-react';
 import VolcanoPlotIcon from '../../resources/VolcanoPlotIcon.png';
 import VolcanoPlotIconSelected from '../../resources/VolcanoPlotIconSelected.png';
@@ -43,6 +45,9 @@ class DifferentialVolcano extends Component {
     xAxisLabel: null,
     yAxisLabel: null,
     identifier: null,
+    animation: 'overlay',
+    direction: 'right',
+    visible: false,
   };
   volcanoPlotFilteredGridRef = React.createRef();
   differentialVolcanoPlotRef = React.createRef();
@@ -79,7 +84,7 @@ class DifferentialVolcano extends Component {
         volcanoPlotRows: this.props.differentialResults.length,
       });
     }
-    const { featureToHighlightInDiffTable } = this.props;
+    const { featureToHighlightInDiffTable, isItemSelected } = this.props;
     if (
       featureToHighlightInDiffTable !== '' &&
       prevProps.featureToHighlightInDiffTable !== featureToHighlightInDiffTable
@@ -93,6 +98,9 @@ class DifferentialVolcano extends Component {
       ];
       this.props.onHandleSelectedVolcano(featureToHighlightInDiffTableArr);
       this.pageToFeature(featureToHighlightInDiffTable);
+    }
+    if (prevProps.isItemSelected !== isItemSelected) {
+      this.setState({ visible: isItemSelected });
     }
   }
 
@@ -371,35 +379,35 @@ class DifferentialVolcano extends Component {
   };
   getSVGPlot = () => {
     const {
-      imageInfo,
+      // imageInfo,
       tabsMessage,
-      isVolcanoPlotSVGLoaded,
-      onSVGTabChange,
+      // isVolcanoPlotSVGLoaded,
+      // onSVGTabChange,
     } = this.props;
-    if (imageInfo.key != null && isVolcanoPlotSVGLoaded) {
-      return (
-        <div className="VolcanoPlotSVGPlot">
-          <SVGPlot
-            // ref={this.differentialViewContainerRef}
-            {...this.props}
-            {...this.state}
-            onSVGTabChange={onSVGTabChange}
-          ></SVGPlot>
-        </div>
-      );
-    } else if (!isVolcanoPlotSVGLoaded) {
-      return (
-        <Dimmer active inverted>
-          <Loader size="large">Loading Plots</Loader>
-        </Dimmer>
-      );
-    } else {
-      return (
-        <div className="PlotInstructions">
-          <h4 className="PlotInstructionsText">{tabsMessage}</h4>
-        </div>
-      );
-    }
+    // if (imageInfo.key != null && isVolcanoPlotSVGLoaded) {
+    //   return (
+    //     <div className="VolcanoPlotSVGPlot">
+    //       <SVGPlot
+    //         // ref={this.differentialViewContainerRef}
+    //         {...this.props}
+    //         {...this.state}
+    //         onSVGTabChange={onSVGTabChange}
+    //       ></SVGPlot>
+    //     </div>
+    //   );
+    // } else if (!isVolcanoPlotSVGLoaded) {
+    //   return (
+    //     <Dimmer active inverted>
+    //       <Loader size="large">Loading Plots</Loader>
+    //     </Dimmer>
+    //   );
+    // } else {
+    return (
+      <div className="PlotInstructions">
+        <h4 className="PlotInstructionsText">{tabsMessage}</h4>
+      </div>
+    );
+    // }
   };
 
   onSizeChange = (size, paneType) => {
@@ -457,6 +465,17 @@ class DifferentialVolcano extends Component {
     });
     localStorage.setItem(`volcanoPlotsVisible`, !volcanoPlotsVisible);
   };
+
+  handlePlotAnimation = animation => () => {
+    this.setState(prevState => ({
+      animation,
+      visible: !prevState.visible,
+      plotButtonActive: !prevState.plotButtonActive,
+    }));
+  };
+
+  handleDirectionChange = direction => () =>
+    this.setState({ direction: direction, visible: false });
 
   render() {
     const {
@@ -556,7 +575,8 @@ class DifferentialVolcano extends Component {
     const hiddenResizerStyle = {
       display: 'none',
     };
-    return (
+
+    const differentialVolcanoView = (
       <>
         <span className="VolcanoPlotButton">
           <Popup
@@ -773,6 +793,50 @@ class DifferentialVolcano extends Component {
           </Grid.Row>
         </Grid>
       </>
+    );
+
+    const { animation, direction, visible } = this.state;
+    const VerticalSidebar = ({ animation, visible }) => (
+      <Sidebar
+        as={'span'}
+        animation={animation}
+        direction={direction}
+        icon="labeled"
+        vertical="true"
+        visible={visible}
+        width="very wide"
+        className="VerticalSidebarVolcanoView"
+      >
+        <div className="">
+          <DifferentialPlot {...this.props} {...this.state}></DifferentialPlot>
+        </div>
+      </Sidebar>
+    );
+
+    return (
+      <Grid.Column
+        className=""
+        mobile={16}
+        tablet={16}
+        largeScreen={12}
+        widescreen={12}
+      >
+        <Sidebar.Pushable as={'span'}>
+          <VerticalSidebar
+            animation={animation}
+            direction={direction}
+            visible={visible}
+          />
+          <Sidebar.Pusher>
+            <div
+            // className="DifferentialVolcanoViewContainer"
+            // ref={this.differentialVolcanoViewContainerRef}
+            >
+              {differentialVolcanoView}
+            </div>
+          </Sidebar.Pusher>
+        </Sidebar.Pushable>
+      </Grid.Column>
     );
   }
 }

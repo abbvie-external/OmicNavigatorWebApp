@@ -4,6 +4,7 @@ import { Grid, Dimmer, Loader, Tab } from 'semantic-ui-react';
 import DifferentialBreadcrumbs from './DifferentialBreadcrumbs';
 import ButtonActions from '../Shared/ButtonActions';
 import MetafeaturesTable from './MetafeaturesTable';
+// import LoaderActivePlots from '../Transitions/LoaderActivePlots';
 import '../Enrichment/SplitPanesContainer.scss';
 import '../Shared/SVGPlot.scss';
 import './DifferentialPlot.scss';
@@ -108,9 +109,10 @@ class DifferentialPlot extends Component {
     const svgPanes = this.getSVGPanes(activeDifferentialPlotTabsIndex);
     if (!isProteinSVGLoaded) {
       return (
+        // <LoaderActivePlots />
         <div>
           <Dimmer active inverted>
-            <Loader size="large">Loading Plots...</Loader>
+            <Loader size="large">Loading Plots and Feature Data...</Loader>
           </Dimmer>
         </div>
       );

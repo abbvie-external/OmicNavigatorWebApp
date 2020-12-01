@@ -39,8 +39,6 @@ class DifferentialVolcanoPlot extends Component {
     const {
       volcanoDifferentialTableRowOther,
       volcanoDifferentialTableRowMax,
-      rehighlightCircles,
-      onRehighlightCircles,
       volcanoHeight,
       volcanoWidth,
       xAxisLabel,
@@ -54,8 +52,7 @@ class DifferentialVolcanoPlot extends Component {
         _.sortBy(prevProps.volcanoDifferentialTableRowOther),
       ) ||
       volcanoDifferentialTableRowMax !==
-        prevProps.volcanoDifferentialTableRowMax ||
-      this.props.rehighlightCircles
+        prevProps.volcanoDifferentialTableRowMax
     ) {
       // excessive styling needed for proper display across all export types
       // style all circles back to default
@@ -104,10 +101,6 @@ class DifferentialVolcanoPlot extends Component {
           maxCircle.raise();
         }
       }
-    }
-    if (rehighlightCircles === true) {
-      d3.selectAll(this.state.brushedCircles).classed('selected', true);
-      onRehighlightCircles(false);
     }
     if (
       prevProps.volcanoHeight !== volcanoHeight ||
