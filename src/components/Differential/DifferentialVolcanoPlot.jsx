@@ -352,17 +352,22 @@ class DifferentialVolcanoPlot extends Component {
     const brushedCircleTextMapped = brushed._groups[0].map(a => {
       const columnData = JSON.parse(a.attributes[4].nodeValue);
       const key = this.props.volcanoCircleLabel || 0;
+      debugger;
       return {
+        data: columnData[key],
         class: a.attributes[1].nodeValue,
         id: a.attributes[2].nodeValue,
+        cx: a.attributes[10].nodeValue,
+        cy: a.attributes[11].nodeValue,
+        // r: a.attributes[0].nodeValue,
         // circleid: a.attributes[3].nodeValue,
-        data: columnData[key],
-        // xstatistic: a.attributes[5].nodeValue,
-        // ystatistic: a.attributes[6].nodeValue,
-        cx: a.attributes[7].nodeValue,
-        cy: a.attributes[8].nodeValue,
-        // cursor: a.attributes[9].nodeValue,
-        // style: a.attributes[10].nodeValue,
+        // stroke: a.attributes[5].nodeValue,
+        // stoke-width: a.attributes[6].nodeValue,
+        // fill: a.attributes[7].nodeValue
+        // xstatistic: a.attributes[5 8].nodeValue,
+        // ystatistic: a.attributes[6 9].nodeValue,
+        // cursor: a.attributes[9 12].nodeValue,
+        // style: a.attributes[10 13].nodeValue,
         // stroke: a.attributes[11].nodeValue,
         // stoke-width: a.attributes[12].nodeValue,
         // fill: a.attributes[13].nodeValue
@@ -370,6 +375,7 @@ class DifferentialVolcanoPlot extends Component {
     });
     const brushedCircleText = brushedCircleTextMapped.map(circle => {
       const textAnchor = 'start';
+      debugger;
       return (
         <text
           key={`volcanoCircleText-${circle.id}`}
