@@ -5,16 +5,13 @@ import _ from 'lodash';
 import {
   formatNumberForDisplay,
   splitValue,
-  // scrollElement,
   getLinkout,
 } from '../Shared/helpers';
-import phosphosite_icon from '../../resources/phosphosite.ico';
 import './FilteredDifferentialTable.scss';
 import { CancelToken } from 'axios';
 import CustomEmptyMessage from '../Shared/Templates';
 // eslint-disable-next-line no-unused-vars
 import QHGrid, { EZGrid } from '***REMOVED***';
-// import { data } from 'pdfkit/js/reference';
 
 let cancelRequestFPTGetResultsTable = () => {};
 class FilteredDifferentialTable extends Component {
@@ -58,15 +55,10 @@ class FilteredDifferentialTable extends Component {
       this.props.filteredDifferentialFeatureIdKey !==
       prevProps.filteredDifferentialFeatureIdKey
     ) {
-      this.setState(
-        {
-          additionalTemplateInfo: {},
-          filteredTableLoading: true,
-        },
-        function() {
-          this.getTableHelpers();
-        },
-      );
+      this.setState({
+        additionalTemplateInfo: {},
+        filteredTableLoading: false,
+      });
     }
 
     if (this.props.HighlightedProteins !== prevProps.HighlightedProteins) {
@@ -165,6 +157,7 @@ class FilteredDifferentialTable extends Component {
   };
 
   setConfigCols = (data, dataFromService, dataAlreadyFiltered) => {
+    const { enrichmentsLinkouts } = this.props;
     const TableValuePopupStyle = {
       backgroundColor: '2E2E2E',
       borderBottom: '2px solid var(--color-primary)',
@@ -174,9 +167,6 @@ class FilteredDifferentialTable extends Component {
       fontSize: '13px',
       wordBreak: 'break-all',
     };
-
-    let icon = phosphosite_icon;
-    let iconText = 'PhosphoSitePlus';
     let filteredDifferentialAlphanumericFields = [];
     let filteredDifferentialNumericFields = [];
     const firstObject = dataFromService[0];
@@ -205,15 +195,22 @@ class FilteredDifferentialTable extends Component {
           title: f,
           field: f,
           filterable: { type: 'multiFilter' },
-          template: (value, item, addParams) => {
-            let linkout = getLinkout(
-              item,
-              addParams,
-              icon,
-              iconText,
-              TableValuePopupStyle,
-              alphanumericTrigger,
-            );
+          template: (value, item) => {
+            const enrichmentsLinkoutsKeys = Object.keys(enrichmentsLinkouts);
+            let linkoutWithIcon = null;
+            if (enrichmentsLinkoutsKeys.includes(f)) {
+              const columnLinkoutsObj = enrichmentsLinkouts[f];
+              const columnLinkoutsIsArray = Array.isArray(columnLinkoutsObj);
+              const linkouts = columnLinkoutsIsArray
+                ? columnLinkoutsObj
+                : [columnLinkoutsObj];
+              const itemValue = item[f];
+              linkoutWithIcon = getLinkout(
+                itemValue,
+                linkouts,
+                TableValuePopupStyle,
+              );
+            }
             if (f === alphanumericTrigger) {
               return (
                 <div className="NoSelect">
@@ -227,7 +224,7 @@ class FilteredDifferentialTable extends Component {
                     inverted
                     basic
                   />
-                  {linkout}
+                  {linkoutWithIcon}
                 </div>
               );
             } else {
@@ -243,6 +240,7 @@ class FilteredDifferentialTable extends Component {
                     inverted
                     basic
                   />
+                  {linkoutWithIcon}
                 </div>
               );
             }
@@ -337,31 +335,6 @@ class FilteredDifferentialTable extends Component {
       this.pageToFeature(filteredDifferentialTableRowMaxVar);
     }
     this.setState({ rowClicked: false });
-  };
-
-  getTableHelpers = () => {
-    const { filteredDifferentialFeatureIdKey } = this.props;
-    let addParams = {};
-    addParams.showPhosphositePlus = dataItem => {
-      let protein = dataItem.symbol
-        ? dataItem.symbol
-        : dataItem[filteredDifferentialFeatureIdKey];
-      return function() {
-        const param = {
-          proteinNames: protein,
-          queryId: -1,
-          from: 0,
-        };
-        omicNavigatorService.postToPhosphositePlus(
-          param,
-          'https://www.phosphosite.org/proteinSearchSubmitAction.action',
-        );
-      };
-    };
-    this.setState({
-      additionalTemplateInfo: addParams,
-      filteredTableLoading: false,
-    });
   };
 
   // informItemsPerPageFilteredDifferentialTable = items => {

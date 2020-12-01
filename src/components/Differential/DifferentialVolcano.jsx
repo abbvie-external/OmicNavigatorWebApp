@@ -25,10 +25,10 @@ class DifferentialVolcano extends Component {
   state = {
     volcanoHeight: parseInt(localStorage.getItem('volcanoHeight'), 10) || 500,
     volcanoWidth: parseInt(localStorage.getItem('volcanoWidth'), 10) || 300,
-    filteredTableData: [],
+    // filteredTableData: [],
     itemsPerPageVolcanoTable:
       parseInt(localStorage.getItem('itemsPerPageVolcanoTable'), 10) || 30,
-    volcanoPlotRows: 0,
+    // volcanoPlotRows: 0,
     doXAxisTransformation: false,
     doYAxisTransformation: false,
     allowXTransformation: true,
@@ -132,7 +132,7 @@ class DifferentialVolcano extends Component {
       className = 'rowHighlightMax';
     }
     if (
-      volcanoDifferentialTableRowOther.includes(item[differentialFeatureIdKey])
+      volcanoDifferentialTableRowOther?.includes(item[differentialFeatureIdKey])
     ) {
       className = 'rowHighlightOther';
     }
@@ -251,7 +251,11 @@ class DifferentialVolcano extends Component {
   };
 
   handleRowClick = (event, item, index) => {
-    if (item !== null && event?.target?.className !== 'ExternalSiteIcon') {
+    if (
+      item !== null &&
+      event?.target?.className !== 'ExternalSiteIcon' &&
+      event?.target?.className !== 'TableCellLink NoSelect'
+    ) {
       const { differentialFeatureIdKey } = this.props;
       event.stopPropagation();
       const PreviouslyHighlighted = [
@@ -381,18 +385,24 @@ class DifferentialVolcano extends Component {
     }
   };
   getSVGPlot = () => {
-    if (this.props.imageInfo.key != null && this.props.isVolcanoPlotSVGLoaded) {
+    const {
+      imageInfo,
+      tabsMessage,
+      isVolcanoPlotSVGLoaded,
+      onSVGTabChange,
+    } = this.props;
+    if (imageInfo.key != null && isVolcanoPlotSVGLoaded) {
       return (
         <div className="VolcanoPlotSVGPlot">
           <SVGPlot
             // ref={this.differentialViewContainerRef}
             {...this.props}
             {...this.state}
-            onSVGTabChange={this.props.onSVGTabChange}
+            onSVGTabChange={onSVGTabChange}
           ></SVGPlot>
         </div>
       );
-    } else if (!this.props.isVolcanoPlotSVGLoaded) {
+    } else if (!isVolcanoPlotSVGLoaded) {
       return (
         <Dimmer active inverted>
           <Loader size="large">Loading Plots</Loader>
@@ -401,9 +411,7 @@ class DifferentialVolcano extends Component {
     } else {
       return (
         <div className="PlotInstructions">
-          <h4 className="PlotInstructionsText">
-            Select a feature to display SVG Plot
-          </h4>
+          <h4 className="PlotInstructionsText">{tabsMessage}</h4>
         </div>
       );
     }
@@ -733,8 +741,8 @@ class DifferentialVolcano extends Component {
                     // note, default is 70vh; if you want a specific vh, specify like "40vh"; "auto" lets the height flow based on items per page
                     // height="auto"
                     height="40vh"
-                    data={filteredTableData}
-                    totalRows={volcanoPlotRows}
+                    data={filteredTableData || []}
+                    totalRows={volcanoPlotRows || 0}
                     columnsConfig={differentialColumns}
                     itemsPerPage={itemsPerPageVolcanoTable}
                     // onInformItemsPerPage={this.informItemsPerPageVolcanoTable}

@@ -160,6 +160,8 @@ class DifferentialSearchCriteria extends Component {
       });
       this.getReportLink(differentialStudy, 'default');
       if (differentialModel !== '') {
+        this.props.onDoMetaFeaturesExist(differentialStudy, differentialModel);
+        this.props.onGetResultsLinkouts(differentialStudy, differentialModel);
         this.props.onHandlePlotTypesDifferential(differentialModel);
         const differentialModelWithTests = differentialModelsAndTestsVar.find(
           model => model.modelID === differentialModel,
@@ -283,6 +285,7 @@ class DifferentialSearchCriteria extends Component {
             differentialStudyHref: link,
           });
         } else {
+          this.setStudyTooltip();
           this.setState({
             differentialStudyHrefVisible: false,
             differentialStudyHref: '',
@@ -416,7 +419,7 @@ class DifferentialSearchCriteria extends Component {
       if (this.state.multisetFiltersVisibleP === false) {
         // on toggle open
         this.props.onMultisetQueriedP(true);
-        this.props.onSearchTransitionDifferential(true);
+        this.props.onSearchTransitionDifferentialAlt(true);
         if (this.state.selectedColP.length === 0) {
           const uSetVP = { ...this.state.uSettingsP };
           const defaultCol = this.props.thresholdColsP[0];
@@ -462,7 +465,7 @@ class DifferentialSearchCriteria extends Component {
   };
 
   handleMultisetPCloseError = () => {
-    this.props.onSearchTransitionDifferential(false);
+    this.props.onSearchTransitionDifferentialAlt(false);
     this.props.onHandleDifferentialTableLoading(false);
     this.props.onHandleVolcanoTableLoading(false);
     this.setState(
@@ -480,9 +483,9 @@ class DifferentialSearchCriteria extends Component {
       differentialStudy,
       differentialModel,
       onSearchCriteriaChange,
-      onSearchTransitionDifferential,
+      onSearchTransitionDifferentialAlt,
     } = this.props;
-    onSearchTransitionDifferential(true);
+    onSearchTransitionDifferentialAlt(true);
     onSearchCriteriaChange(
       {
         differentialStudy: differentialStudy,

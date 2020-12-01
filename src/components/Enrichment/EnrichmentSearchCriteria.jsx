@@ -124,6 +124,7 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentTestAndDescription,
       onSearchCriteriaChange,
       onSearchTransitionEnrichment,
+      onGetEnrichmentsLinkouts,
     } = this.props;
 
     const studies = allStudiesMetadata.map(study => {
@@ -196,6 +197,7 @@ class EnrichmentSearchCriteria extends Component {
         this.props.onSetAnnotationsMetadata(enrichmentAnnotationsMetadataVar);
         this.getReportLink(enrichmentStudy, enrichmentModel);
         if (enrichmentAnnotation !== '') {
+          onGetEnrichmentsLinkouts(enrichmentStudy, enrichmentAnnotation);
           onSearchTransitionEnrichment(true);
           omicNavigatorService
             .getEnrichmentsTable(
@@ -264,6 +266,7 @@ class EnrichmentSearchCriteria extends Component {
             enrichmentStudyHref: link,
           });
         } else {
+          this.setStudyTooltip();
           this.setState({
             enrichmentStudyHrefVisible: false,
             enrichmentStudyHref: '',

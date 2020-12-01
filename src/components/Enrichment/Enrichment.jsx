@@ -4,12 +4,8 @@ import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { Grid, Menu, Popup, Sidebar, Tab, Message } from 'semantic-ui-react';
 import { CancelToken } from 'axios';
-import go_icon from '../../resources/go.png';
-import msig_icon from '../../resources/msig.ico';
 import networkIcon from '../../resources/networkIcon.png';
 import networkIconSelected from '../../resources/networkIconSelected.png';
-import phosphosite_icon from '../../resources/phosphosite.ico';
-import reactome_icon from '../../resources/reactome.jpg';
 import tableIcon from '../../resources/tableIcon.png';
 import tableIconSelected from '../../resources/tableIconSelected.png';
 import { omicNavigatorService } from '../../services/omicNavigator.service';
@@ -19,7 +15,6 @@ import {
   formatNumberForDisplay,
   splitValue,
   getLinkout,
-  // getIconInfo
 } from '../Shared/helpers';
 import '../Shared/Table.scss';
 import SearchingAlt from '../Transitions/SearchingAlt';
@@ -44,8 +39,6 @@ class Enrichment extends Component {
     isValidSearchEnrichment: false,
     isSearchingEnrichment: false,
     isEnrichmentTableLoading: false,
-    enrichmentIcon: '',
-    enrichmentIconText: '',
     enrichmentResults: [],
     enrichmentColumns: [],
     enrichmentFeatureID: '',
@@ -164,7 +157,7 @@ class Enrichment extends Component {
       xName: 'tissue',
       constrainExtremes: false,
       color: d3.scaleOrdinal(d3.schemeCategory10),
-      margin: { top: 10, right: 10, bottom: 50, left: 60 },
+      margin: { top: 10, right: 30, bottom: 50, left: 60 },
       scale: 'linear',
       yName: null,
       yTicks: 1,
@@ -175,6 +168,7 @@ class Enrichment extends Component {
     enrichmentStudyMetadata: [],
     enrichmentModelsAndAnnotations: [],
     enrichmentAnnotationsMetadata: [],
+    enrichmentsLinkouts: [],
     enrichmentFeatureIdKey: '',
     // filteredDifferentialFeatureIdKey: '',
     multisetFiltersVisible: false,
@@ -491,6 +485,15 @@ class Enrichment extends Component {
         multisetPlotAvailable: false,
       });
     }
+    if (
+      changes.enrichmentAnnotation !== '' &&
+      changes.enrichmentAnnotation !== this.props.enrichmentAnnotation
+    ) {
+      this.getEnrichmentsLinkouts(
+        changes.enrichmentStudy,
+        changes.enrichmentAnnotation,
+      );
+    }
   };
 
   handleHasBarcodeData = () => {
@@ -498,18 +501,20 @@ class Enrichment extends Component {
     omicNavigatorService
       .getBarcodes(enrichmentStudy, enrichmentModel, null, null)
       .then(getBarcodesResponseData => {
-        if (getBarcodesResponseData.statistic !== '') {
-          this.setState({
-            hasBarcodeData: true,
-          });
-        } else {
-          this.setState({
-            hasBarcodeData: false,
-          });
-        }
-      })
-      .catch(error => {
-        console.error('Error during getBarcodes', error);
+        this.setState({
+          hasBarcodeData: getBarcodesResponseData.length === 0 ? false : true,
+        });
+      });
+  };
+
+  getEnrichmentsLinkouts = (enrichmentStudy, enrichmentAnnotation) => {
+    debugger;
+    omicNavigatorService
+      .getEnrichmentsLinkouts(enrichmentStudy, enrichmentAnnotation)
+      .then(getEnrichmentsLinkoutsResponseData => {
+        this.setState({
+          enrichmentsLinkouts: getEnrichmentsLinkoutsResponseData,
+        });
       });
   };
 
@@ -559,7 +564,7 @@ class Enrichment extends Component {
       enrichmentModel,
       enrichmentAnnotation,
     } = this.props;
-    const { hasBarcodeData } = this.state;
+    const { hasBarcodeData, enrichmentsLinkouts } = this.state;
     const TableValuePopupStyle = {
       backgroundColor: '2E2E2E',
       borderBottom: '2px solid var(--color-primary)',
@@ -569,34 +574,6 @@ class Enrichment extends Component {
       fontSize: '13px',
       wordBreak: 'break-all',
     };
-    let icon = '';
-    let iconText = '';
-    // let dbShort = '';
-    if (enrichmentAnnotation === 'REACTOME') {
-      icon = reactome_icon;
-      iconText = 'Reactome';
-      // dbShort = 'REACTOME';
-    } else if (enrichmentAnnotation.substring(0, 2) === 'GO') {
-      icon = go_icon;
-      iconText = 'AmiGO 2';
-      if (enrichmentAnnotation.substring(3, 4) === 'B') {
-        // dbShort = 'GOBP';
-      } else if (enrichmentAnnotation.substring(3, 4) === 'C') {
-        // dbShort = 'GOCC';
-      } else if (enrichmentAnnotation.substring(3, 4) === 'M') {
-        // dbShort = 'GOMF';
-      }
-    } else if (enrichmentAnnotation.substring(0, 4) === 'msig') {
-      icon = msig_icon;
-      iconText = 'GSEA MSigDB';
-    } else if (enrichmentAnnotation === 'PSP') {
-      icon = phosphosite_icon;
-      iconText = 'PhosphoSitePlus';
-    }
-    this.setState({
-      enrichmentIcon: icon,
-      enrichmentIconText: iconText,
-    });
     let enrichmentAlphanumericFields = [];
     let enrichmentNumericFields = [];
     const firstObject = enrResults[0];
@@ -616,22 +593,25 @@ class Enrichment extends Component {
           field: f,
           filterable: { type: 'multiFilter' },
           template: (value, item, addParams) => {
-            let linkout = getLinkout(
-              item,
-              addParams,
-              icon,
-              iconText,
-              TableValuePopupStyle,
-              alphanumericTrigger,
-              enrichmentStudy,
-              enrichmentAnnotation,
-            );
             if (f === alphanumericTrigger) {
+              let linkoutWithIcon = null;
+              if (enrichmentsLinkouts.length > 0) {
+                const linkoutsIsArray = Array.isArray(enrichmentsLinkouts);
+                const linkouts = linkoutsIsArray
+                  ? enrichmentsLinkouts
+                  : [enrichmentsLinkouts];
+                const itemValue = item[f];
+                linkoutWithIcon = getLinkout(
+                  itemValue,
+                  linkouts,
+                  TableValuePopupStyle,
+                );
+              }
               return (
                 <div>
                   <Popup
                     trigger={
-                      <span className="TableValue  NoSelect">
+                      <span className="TableValue NoSelect">
                         {splitValue(value)}
                       </span>
                     }
@@ -641,7 +621,7 @@ class Enrichment extends Component {
                     inverted
                     basic
                   />
-                  {linkout}
+                  {linkoutWithIcon}
                 </div>
               );
             } else {
@@ -1289,34 +1269,6 @@ class Enrichment extends Component {
         // }
       };
     };
-
-    addParams.getLink = (enrichmentStudy, enrichmentAnnotation, dataItem) => {
-      let self = this;
-      return function() {
-        const database = enrichmentAnnotation;
-        if (database === 'REACTOME') {
-          window.open(
-            'https://reactome.org/content/detail/' + dataItem.termID,
-            '_blank',
-          );
-        } else if (database.substring(0, 2) === 'GO') {
-          window.open(
-            'http://amigo.geneontology.org/amigo/term/' + dataItem.termID,
-            '_blank',
-          );
-        } else if (database.substring(0, 4) === 'msig') {
-          window.open(
-            'http://software.broadinstitute.org/gsea/msigdb/cards/' +
-              dataItem.termID,
-            '_blank',
-          );
-        } else if (database === 'PSP') {
-          self.showPhosphositePlus('', dataItem);
-        }
-        // }
-      };
-    };
-
     this.setState({
       additionalTemplateInfoEnrichmentTable: addParams,
     });
@@ -1843,20 +1795,6 @@ class Enrichment extends Component {
     } else return <TransitionStill stillMessage={message} />;
   };
 
-  showPhosphositePlus = dataItem => {
-    return function() {
-      var protein = (dataItem.Description
-        ? dataItem.Description
-        : dataItem.MajorityProteinIDsHGNC
-      ).split(';')[0];
-      let param = { queryId: -1, from: 0, searchStr: protein };
-      omicNavigatorService.postToPhosphositePlus(
-        param,
-        'https://www.phosphosite.org/proteinSearchSubmitAction.action',
-      );
-    };
-  };
-
   // informItemsPerPageEnrichmentTable = items => {
   //   this.setState({
   //     itemsPerPageEnrichmentTable: items,
@@ -1882,6 +1820,15 @@ class Enrichment extends Component {
       networkDataError,
     } = this.state;
     let enrichmentCacheKey = `${enrichmentStudy}-${enrichmentModel}-${enrichmentAnnotation}-${multisetQueriedE}`;
+    const TableValuePopupStyle = {
+      backgroundColor: '2E2E2E',
+      borderBottom: '2px solid var(--color-primary)',
+      color: '#FFF',
+      padding: '1em',
+      maxWidth: '50vw',
+      fontSize: '13px',
+      wordBreak: 'break-all',
+    };
     return [
       {
         menuItem: (
@@ -1972,23 +1919,41 @@ class Enrichment extends Component {
         menuItem: (
           <Menu.Item
             key="1"
-            className={
-              !networkDataError
-                ? 'TableAndNetworkButtons NetworkButton'
-                : 'TableAndNetworkButtons NetworkButton DisabledCursor'
-            }
+            className="TableAndNetworkButtons NetworkButton"
             name="network"
             disabled={networkDataError}
           >
-            <img
-              src={
-                activeIndexEnrichmentView === 1
-                  ? networkIconSelected
-                  : networkIcon
-              }
-              alt="Network Icon"
-              id="NetworkButton"
-            />
+            {!networkDataError ? (
+              <img
+                src={
+                  activeIndexEnrichmentView === 1
+                    ? networkIconSelected
+                    : networkIcon
+                }
+                alt="Network Icon"
+                id="NetworkButton"
+              />
+            ) : (
+              <Popup
+                trigger={
+                  <img
+                    src={
+                      activeIndexEnrichmentView === 1
+                        ? networkIconSelected
+                        : networkIcon
+                    }
+                    alt="Network Icon"
+                    id="NetworkButton"
+                    className={!networkDataError ? '' : 'DisabledCursor'}
+                  />
+                }
+                style={TableValuePopupStyle}
+                className="TablePopupValue"
+                content="Network Chart Not Available"
+                inverted
+                basic
+              />
+            )}
           </Menu.Item>
         ),
         pane: (
@@ -2195,6 +2160,7 @@ class Enrichment extends Component {
               onHandleNetworkGraphReady={this.handleNetworkGraphReady}
               onHandleEnrichmentTableLoading={this.handleEnrichmentTableLoading}
               onHandleHasBarcodeData={this.handleHasBarcodeData}
+              onGetEnrichmentsLinkouts={this.getEnrichmentsLinkouts}
             />
           </Grid.Column>
           <Grid.Column

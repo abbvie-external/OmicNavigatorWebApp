@@ -24,6 +24,12 @@ class SVGPlot extends Component {
     });
   }
 
+  // componentDidUpdate(prevProps, prevState) {
+  //   if (prevProps.imageInfo !== this.props.imageInfo) {
+  //     this.forceUpdate();
+  //   }
+  // }
+
   handleTabChange = (e, { activeIndex }) => {
     this.props.onSVGTabChange(activeIndex);
   };

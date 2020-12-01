@@ -31,7 +31,7 @@ class OmicNavigatorService {
               if (axios.isCancel(thrown)) {
                 // console.log('Request canceled', thrown.message);
               } else {
-                if (handleError !== undefined) {
+                if (handleError != null) {
                   handleError(false);
                 }
                 // console.log(`${thrown.message}`);
@@ -512,6 +512,21 @@ class OmicNavigatorService {
     return featuresFromPromise;
   }
 
+  async getMetaFeatures(differentialStudy, differentialModel) {
+    this.setUrl();
+    const promise = this.ocpuRPCUnbox(
+      'getMetaFeatures',
+      {
+        study: differentialStudy,
+        model: differentialModel,
+      },
+      15000,
+      null,
+    );
+    const nodesFromPromise = await promise;
+    return nodesFromPromise;
+  }
+
   async getMetaFeaturesTable(
     differentialStudy,
     differentialModel,
@@ -528,6 +543,36 @@ class OmicNavigatorService {
       },
       15000,
       errorCb,
+    );
+    const nodesFromPromise = await promise;
+    return nodesFromPromise;
+  }
+
+  async getResultsLinkouts(differentialStudy, differentialModel) {
+    this.setUrl();
+    const promise = this.ocpuRPCUnbox(
+      'getResultsLinkouts',
+      {
+        study: differentialStudy,
+        modelID: differentialModel,
+      },
+      15000,
+      null,
+    );
+    const nodesFromPromise = await promise;
+    return nodesFromPromise;
+  }
+
+  async getEnrichmentsLinkouts(enrichmentStudy, enrichmentAnnotation) {
+    this.setUrl();
+    const promise = this.ocpuRPCUnbox(
+      'getEnrichmentsLinkouts',
+      {
+        study: enrichmentStudy,
+        annotationID: enrichmentAnnotation,
+      },
+      15000,
+      null,
     );
     const nodesFromPromise = await promise;
     return nodesFromPromise;

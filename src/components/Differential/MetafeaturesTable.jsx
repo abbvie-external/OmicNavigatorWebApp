@@ -19,16 +19,36 @@ class MetafeaturesTable extends Component {
   metafeaturesGridRef = React.createRef();
 
   componentDidMount() {
-    this.getMetafeaturesTableConfigCols(this.props.metafeaturesData);
+    this.getMetafeaturesTableConfigCols(
+      this.props.metaFeaturesDataDifferential,
+    );
   }
 
-  componentDidUpdate = (prevProps, prevState) => {
-    // if (this.props.metafeaturesData !== prevProps.metafeaturesData) {
-    //   this.setState({
-    //     metafeaturesTableData: this.props.metafeaturesTableData
-    //   })
-    // }
-  };
+  componentDidUpdate(prevProps, prevState) {
+    if (
+      this.props.metaFeaturesDataDifferential.length !== 0 &&
+      this.props.metaFeaturesDataDifferential !==
+        prevProps.metaFeaturesDataDifferential
+    ) {
+      this.getMetafeaturesTableConfigCols(
+        this.props.metaFeaturesDataDifferential,
+      );
+    }
+  }
+
+  // shouldComponentUpdate(nextProps) {
+  //   if (
+  //     nextProps.metaFeaturesDataDifferential !==
+  //     this.props.metaFeaturesDataDifferential
+  //   ) {
+  //     return false;
+  //   }
+  // }
+  // componentWillUnmount() {
+  //   this.setState({
+  //     metafeaturesTableData: [],
+  //   });
+  // }
 
   getMetafeaturesTableConfigCols = data => {
     let configCols = [];
@@ -130,7 +150,7 @@ class MetafeaturesTable extends Component {
       metafeaturesTableData,
     } = this.state;
 
-    // const { metafeaturesData } = this.props;
+    // const { metafeaturesDataDifferential } = this.props;
 
     return (
       <div className="MetafeaturesTableDiv">
