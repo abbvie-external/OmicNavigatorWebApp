@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import { Grid, Dimmer, Loader, Tab } from 'semantic-ui-react';
+import { Grid, Dimmer, Loader, Tab, Radio } from 'semantic-ui-react';
 // import _ from 'lodash';
 import EnrichmentBreadcrumbs from './EnrichmentBreadcrumbs';
 import ButtonActions from '../Shared/ButtonActions';
@@ -19,6 +19,21 @@ class SplitPanesContainer extends Component {
     verticalSplitPaneSize:
       parseInt(localStorage.getItem('verticalSplitPaneSize'), 10) || 525,
     activeViolinTableIndex: 0,
+    // elementText: null,
+    // elementTextOptions: [
+    //   {
+    //     key: 'none',
+    //     text: 'none',
+    //     value: null,
+    //   },
+    //   {
+    //     key: 'featureID',
+    //     text: 'featureID',
+    //     value: 'featureID',
+    //   },
+    // ],
+    // displayElementText: false,
+    elementTextKey: 'featureID',
   };
   filteredDifferentialGridRef = React.createRef();
 
@@ -246,7 +261,13 @@ class SplitPanesContainer extends Component {
     localStorage.setItem(`${paneType}SplitPaneSize`, size);
   };
 
+  handleElementTextChange = () =>
+    this.setState(prevState => ({
+      displayElementText: !prevState.displayElementText,
+    }));
+
   render() {
+    const { displayElementText } = this.state;
     const BarcodePlot = this.getBarcodePlot();
     const ViolinAndTable = this.getViolinAndTable();
     const SVGPlot = this.getSVGPlot();
@@ -258,10 +279,32 @@ class SplitPanesContainer extends Component {
             <Grid.Column
               mobile={16}
               tablet={16}
-              largeScreen={12}
-              widescreen={12}
+              computer={8}
+              largeScreen={8}
+              widescreen={8}
             >
               <EnrichmentBreadcrumbs {...this.props} />
+            </Grid.Column>
+            <Grid.Column
+              mobile={16}
+              tablet={16}
+              computer={8}
+              largeScreen={8}
+              widescreen={8}
+              className="elementTextCol"
+            >
+              <Radio
+                id="elementTextCheckbox"
+                toggle
+                // size={dynamicSize}
+                size="small"
+                label={displayElementText ? 'Hide Labels' : 'Show Labels'}
+                // defaultValue={elementTextOptions[0].text}
+                // onChange={this.handleElementTextDropdownChange}
+                // options={elementTextOptions}
+                checked={displayElementText}
+                onClick={this.handleElementTextChange}
+              />
             </Grid.Column>
 
             <Grid.Column

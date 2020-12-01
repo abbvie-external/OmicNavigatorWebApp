@@ -35,7 +35,6 @@ class BarcodePlot extends Component {
         max: 15,
       },
     },
-    showAllTooltips: true,
   };
 
   barcodeContainerRef = React.createRef();
@@ -478,10 +477,13 @@ class BarcodePlot extends Component {
       barcodeContainerWidth,
       settings,
       allTooltips,
-      showAllTooltips,
     } = this.state;
 
-    const { horizontalSplitPaneSize, barcodeSettings } = this.props;
+    const {
+      horizontalSplitPaneSize,
+      barcodeSettings,
+      displayElementText,
+    } = this.props;
     const barcodeHeight =
       horizontalSplitPaneSize - settings.margin.top - settings.margin.bottom;
 
@@ -611,7 +613,7 @@ class BarcodePlot extends Component {
           {barcodeLines}
           {tooltip}
           {maxTooltip}
-          {showAllTooltips ? allTooltips : null}
+          {displayElementText ? allTooltips : null}
         </svg>
       </div>
     );

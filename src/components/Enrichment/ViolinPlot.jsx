@@ -4,12 +4,23 @@ import * as d3 from 'd3';
 import * as _ from 'lodash';
 // import { select } from "d3-selection";
 import './ViolinPlot.scss';
-import { Dropdown } from 'semantic-ui-react';
 
 class ViolinPlot extends Component {
   state = {
-    dropdownChange: null,
-    // dropdownChangeAfter: null,
+    // elementText: null,
+    // elementTextOptions: [
+    //   {
+    //     key: 'none',
+    //     text: 'none',
+    //     value: null,
+    //   },
+    //   {
+    //     key: 'featureID',
+    //     text: 'featureID',
+    //     value: 'featureID',
+    //   },
+    // ],
+    // elementTextAfter: null,
     // didDropdownChange: false,
     violinContainerHeight:
       this.violinContainerRef?.current?.parentElement?.offsetHeight ||
@@ -45,11 +56,12 @@ class ViolinPlot extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (this.props.violinData !== prevProps.violinData) {
+    const { violinData, HighlightedProteins, displayElementText } = this.props;
+    if (violinData !== prevProps.violinData) {
       // const label = this.props.violinSettings.axisLabels.xAxis;
       const label = this.props.barcodeSettings.statLabel;
       let prevValues = prevProps?.violinData?.[label]?.values ?? [];
-      let currentValues = this.props.violinData?.[label]?.values ?? [];
+      let currentValues = violinData?.[label]?.values ?? [];
       var isSame =
         prevValues.length === currentValues.length &&
         prevValues.every(
@@ -61,7 +73,7 @@ class ViolinPlot extends Component {
         this.initiateViolinPlot(true);
       }
     }
-    if (this.props.HighlightedProteins !== prevProps.HighlightedProteins) {
+    if (HighlightedProteins !== prevProps.HighlightedProteins) {
       this.isHovering = false;
       // set all dots back to small, blue
       const dOpts = this.chart.dataPlots.options;
@@ -70,13 +82,13 @@ class ViolinPlot extends Component {
         .duration(300)
         .attr('fill', '#1678C2')
         .attr('r', dOpts.pointSize * 1);
-      if (this.props.HighlightedProteins.length > 0) {
+      if (HighlightedProteins.length > 0) {
         // separate max protein from the rest
         // const HighlightedProteins =
         //   this.brushedData.length > 0
         //     ? this.brushedData.slice(1)
         //     : this.props.HighlightedProteins.slice(1);
-        this.props.HighlightedProteins.forEach(element => {
+        HighlightedProteins.forEach(element => {
           const highlightedDotId = element.featureID;
           d3.select(`#violin_${highlightedDotId}`)
             .transition()
@@ -88,10 +100,10 @@ class ViolinPlot extends Component {
         });
         // if max protein exists, get id
         if (
-          this.props.HighlightedProteins[0]?.featureID != null &&
-          this.props.HighlightedProteins[0]?.featureID !== ''
+          HighlightedProteins[0]?.featureID != null &&
+          HighlightedProteins[0]?.featureID !== ''
         ) {
-          const maxDotId = this.props.HighlightedProteins[0].featureID;
+          const maxDotId = HighlightedProteins[0].featureID;
           d3.select(`#violin_${maxDotId}`)
             .transition()
             .duration(100)
@@ -100,15 +112,18 @@ class ViolinPlot extends Component {
             .attr('r', dOpts.pointSize * 2);
           // const d = this.chart.groupObjs[cName].values[pt];
           this.maxCircle = maxDotId;
-          this.addToolTiptoMax(this.props.HighlightedProteins[0]);
+          this.addToolTiptoMax(HighlightedProteins[0]);
         }
-        // if (
-        //   this.state.violinContainerHeight !== prevState.violinContainerHeight
-        // ) {
-        //   this.createViolinPlot();
-        // }
       }
     }
+    if (prevProps.displayElementText !== displayElementText) {
+      this.handleElementText();
+    }
+    // if (
+    //   this.state.violinContainerHeight !== prevState.violinContainerHeight
+    // ) {
+    //   this.createViolinPlot();
+    // }
   }
 
   // shouldComponentUpdate(nextProps, nextState) {
@@ -282,16 +297,7 @@ class ViolinPlot extends Component {
       const circles = d3.selectAll(
         '.' + self.props.violinSettings.id + '.vPoint',
       );
-      //debugger;
-      //console.log("kjsdhfkjsdhfjksdfhskdjfhsdjkfhskdjfhskdf");
-      //console.log(d3.event.selection);
-      //console.log("hellohellohellohellohellohellohello");
-
       if (d3.event.selection != null) {
-        //   self.state.didDropdownChange = false;
-
-        // revert circles to initial style
-        // self.unhighlightPoint([], true, self);
         const brush_coords = d3.brushSelection(this);
         // style brushed circles
         // tslint:disable-next-line:no-shadowed-variable
@@ -304,6 +310,8 @@ class ViolinPlot extends Component {
           const brushTest = x0 <= cx && cx <= x1 && y0 <= cy && cy <= y1;
           return brushTest;
         };
+        const chartSVG = d3.select(`#${self.props.violinSettings.id}`);
+        chartSVG.selectAll('.brushed').classed('brushed', false);
         const brushed = circles
           .filter(function() {
             const cx = d3.select(this).attr('cx'),
@@ -314,41 +322,24 @@ class ViolinPlot extends Component {
             'class',
             'brushed point ' + self.props.violinSettings.id + ' vPoint',
           )
-          .attr('fill', '#ff3399')
-          .attr('stroke', '#8e1b54')
           .attr('opacity', 1.0);
-
-        // d3.selectAll('.brushed')
-        // .each(function(d) {
-        //   const test = d3.select(this);
-        //   debugger;
-        // const circleText = self.chart.objs.g.append('g').attr('class', 'circleText');
-        // circleText
-        //   .append('text')
-        //   .attr('x', 50)
-        //   .attr('y', 50)
-        //   .style('fill', 'black')
-        //   .attr('font-size', 36)
-        //   .attr('font-family', 'Arial')
-        //   .text('HELLOHELLOHELLO');
-        // });
-        //debugger;
-        d3.selectAll('.brushed').each(function(d) {
+        chartSVG.selectAll('g.circleText').remove();
+        brushed.each(function(d) {
           const test = d3.select(this);
-          //debugger;
-          const circleText = self.chart.objs.g
+          const circleText = self.chart.objs.svg
             .append('g')
             .attr('class', 'circleText');
-          circleText
-            .append('text')
-            .attr('x', test.attr('cx'))
-            .attr('y', test.attr('cy'))
-            .style('fill', 'black')
-            .attr('font-size', 36)
-            .attr('font-family', 'Arial')
-            .text(test.attr(self.state.dropdownChange));
+          if (self.props.displayElementText) {
+            circleText
+              .append('text')
+              .attr('x', test.attr('cx'))
+              .attr('y', test.attr('cy'))
+              .style('fill', 'black')
+              .attr('font-size', 36)
+              .attr('font-family', 'Arial')
+              .text(d[self.props.elementTextKey]);
+          }
         });
-
         // notBrushed
         circles.filter(function() {
           const cx = d3.select(this).attr('cx'),
@@ -365,7 +356,7 @@ class ViolinPlot extends Component {
       }
     };
 
-    // if(self.state.dropdownChange != self.state.dropdownChangeAfter){
+    // if(self.state.elementText != self.state.elementTextAfter){
     //   highlightBrushedCircles();
     // }
 
@@ -382,7 +373,7 @@ class ViolinPlot extends Component {
       .append('g')
       .attr('class', 'violinBrush')
       .call(self.chart.objs.brush);
-    self.state.dropdownChangeAfter = self.state.dropdownChange;
+    // self.state.elementTextAfter = self.state.elementText;
   }
 
   clearBrush(self) {
@@ -1708,50 +1699,52 @@ class ViolinPlot extends Component {
     return window.screen.height - this.props.horizontalSplitPaneSize - 51;
   };
 
-  onDropdownChange = (e, data) => {
-    var self = this;
-    //console.log(data.value);
-    debugger;
-    //this.setState({ dropdownChange: data.value });
-    if (data.value == 'featureID') {
-      this.setState({ dropdownChange: 'id' });
+  handleElementText = () => {
+    const self = this;
+    if (!self.props.displayElementText) {
+      const chartSVG = d3.select(`#${self.props.violinSettings.id}`);
+      chartSVG.selectAll('g.circleText').remove();
     } else {
-      this.setState({ dropdownChange: '' });
+      d3.selectAll('.brushed').each(function(d) {
+        const test = d3.select(this);
+        const circleText = self.chart.objs.svg
+          .append('g')
+          .attr('class', 'circleText');
+        circleText
+          .append('text')
+          .attr('x', test.attr('cx'))
+          .attr('y', test.attr('cy'))
+          .style('fill', 'black')
+          .attr('font-size', 36)
+          .attr('font-family', 'Arial')
+          .text(d[self.props.elementTextKey]);
+      });
     }
-    // self.state.didDropdownChange = true;
-    // debugger;
-    // console.log(self.state.dropdownChange);
-    // self.makeBrush();
   };
 
+  // handleElementTextDropdownChange = value => {
+  //   var self = this;
+  //   this.setState({ elementText: value }, this.handleElementText(self));
+  // };
+
   render() {
-    const dataOptions = [
-      {
-        key: 'featureID',
-        text: 'featureID',
-        value: 'featureID',
-      },
-      {
-        key: 'entrez',
-        text: 'entrez',
-        value: 'entrez',
-      },
-    ];
-    const self = this;
+    const { violinSettings } = this.props;
+    // const { elementTextOptions } = this.state;
     return (
       <>
-        <div>
+        {/* <div>
           <Dropdown
-            placeholder="Choose"
             compact
             selection
-            onChange={this.onDropdownChange}
-            options={dataOptions}
+            value=
+            defaultValue={elementTextOptions[0].text}
+            onChange={this.handleElementTextDropdownChange(value)}
+            options={elementTextOptions}
           />
-        </div>
+        </div> */}
         <div
           ref={this.violinContainerRef}
-          id={self.props.violinSettings.parentId}
+          id={violinSettings.parentId}
           className="violin-chart-wrapper"
         />
       </>
