@@ -298,8 +298,6 @@ class DifferentialVolcanoPlot extends Component {
           self.setState({ brushedCirclesData: brushedDataArr });
         }
         self.props.handleVolcanoPlotSelectionChange(brushedDataArr);
-      } else {
-        self.handleSVGClick(null);
       }
     };
 
@@ -352,7 +350,6 @@ class DifferentialVolcanoPlot extends Component {
     const brushedCircleTextMapped = brushed._groups[0].map(a => {
       const columnData = JSON.parse(a.attributes[4].nodeValue);
       const key = this.props.volcanoCircleLabel || 0;
-      debugger;
       return {
         data: columnData[key],
         class: a.attributes[1].nodeValue,
@@ -375,7 +372,6 @@ class DifferentialVolcanoPlot extends Component {
     });
     const brushedCircleText = brushedCircleTextMapped.map(circle => {
       const textAnchor = 'start';
-      debugger;
       return (
         <text
           key={`volcanoCircleText-${circle.id}`}

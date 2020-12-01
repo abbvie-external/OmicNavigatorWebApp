@@ -508,7 +508,6 @@ class Enrichment extends Component {
   };
 
   getEnrichmentsLinkouts = (enrichmentStudy, enrichmentAnnotation) => {
-    debugger;
     omicNavigatorService
       .getEnrichmentsLinkouts(enrichmentStudy, enrichmentAnnotation)
       .then(getEnrichmentsLinkoutsResponseData => {
