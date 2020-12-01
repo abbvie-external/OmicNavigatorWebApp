@@ -17,6 +17,7 @@ class DifferentialVolcanoPlot extends Component {
     hoveredTextScalar: 12,
     tooltipPosition: null,
     // brushedCirclesData: [],
+    // brushedCircles: [],
     brushing: false,
     // resizeScalarX: 1,
     // resizeScalarY: 1,
@@ -44,6 +45,8 @@ class DifferentialVolcanoPlot extends Component {
       volcanoWidth,
       xAxisLabel,
       yAxisLabel,
+      doXAxisTransformation,
+      doYAxisTransformation,
     } = this.props;
     if (
       !_.isEqual(
@@ -103,6 +106,7 @@ class DifferentialVolcanoPlot extends Component {
       }
     }
     if (rehighlightCircles === true) {
+      d3.selectAll(this.state.brushedCircles).classed('selected', true);
       onRehighlightCircles(false);
     }
     if (
@@ -112,18 +116,37 @@ class DifferentialVolcanoPlot extends Component {
       this.resizeBrushSelection();
     }
     if (
-      prevProps.horizontal !== xAxisLabel ||
-      prevProps.yAxisLabel !== yAxisLabel
+      prevProps.xAxisLabel !== xAxisLabel ||
+      prevProps.yAxisLabel !== yAxisLabel ||
+      prevProps.doXAxisTransformation !== doXAxisTransformation ||
+      prevProps.doYAxisTransformation !== doYAxisTransformation
     ) {
       this.removeViolinBrush();
     }
   }
 
-  removeViolinBrush = () => {};
+  removeViolinBrush = () => {
+    const brush = d3
+      .select('.volcanoPlotD3BrushSelection')
+      .selectAll('rect.selection');
+    const brushObjs = this.state.objsBrushState;
+    if (
+      brush.nodes().length !== 0 &&
+      brush.nodes()[0].getAttribute('x') !== null &&
+      brushObjs != null
+    ) {
+      d3.select('.volcanoPlotD3BrushSelection').call(brushObjs.move, null);
+    }
+  };
 
-  resizeBrushSelection = () => {};
+  resizeBrushSelection = () => {
+    this.removeViolinBrush();
+    // add resizing later after priorities
+  };
 
-  windowResized = () => {};
+  windowResized = () => {
+    this.removeViolinBrush();
+  };
 
   doTransform(value, axis) {
     const { doXAxisTransformation, doYAxisTransformation } = this.props;
@@ -270,7 +293,6 @@ class DifferentialVolcanoPlot extends Component {
   }
 
   setupBrush(width, height) {
-    debugger;
     const self = this;
     let objsBrush = {};
 
@@ -315,12 +337,14 @@ class DifferentialVolcanoPlot extends Component {
         brushed.attr('style', 'fill: #00aeff');
         brushed.attr('r', 2.5);
         brushed.classed('selected', true);
-
         const brushedDataArr = brushed._groups[0].map(a => {
           return JSON.parse(a.attributes.data.value);
         });
         if (brushedDataArr.length > 0) {
-          self.setState({ brushedCirclesData: brushedDataArr });
+          self.setState({
+            brushedCirclesData: brushedDataArr,
+            brushedCircles: brushed,
+          });
         }
         self.props.handleVolcanoPlotSelectionChange(brushedDataArr);
       }
@@ -337,7 +361,6 @@ class DifferentialVolcanoPlot extends Component {
       ])
       .on('start', brushingStart)
       .on('end', endBrush);
-
     d3.selectAll('.volcanoPlotD3BrushSelection').call(objsBrush);
     const brush = d3
       .select('.volcanoPlotD3BrushSelection')
@@ -366,6 +389,7 @@ class DifferentialVolcanoPlot extends Component {
       self.setState({
         resizeScalarX: 1,
         resizeScalarY: 1,
+        objsBrushState: objsBrush,
       });
     }
   }
