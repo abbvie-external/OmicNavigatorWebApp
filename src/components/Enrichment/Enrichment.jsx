@@ -508,7 +508,6 @@ class Enrichment extends Component {
   };
 
   getEnrichmentsLinkouts = (enrichmentStudy, enrichmentAnnotation) => {
-    debugger;
     omicNavigatorService
       .getEnrichmentsLinkouts(enrichmentStudy, enrichmentAnnotation)
       .then(getEnrichmentsLinkoutsResponseData => {
@@ -1872,7 +1871,7 @@ class Enrichment extends Component {
                     svgVisible={false}
                     txtVisible={true}
                     refFwd={this.EnrichmentGridRef}
-                    exportButtonSize={'medium'}
+                    exportButtonSize={'small'}
                     tab={tab}
                     study={enrichmentStudy}
                     model={enrichmentModel}

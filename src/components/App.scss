@@ -89,7 +89,7 @@
 
   .QHGrid--body thead tr th {
     border-top: 1px solid lightgrey !important;
-    border-bottom: 1px solid grey !important;
+    border-bottom: 1.5px solid grey !important;
   }
 
   // .QHGridHeaderDiv {
@@ -153,6 +153,10 @@
     color: white !important;
   }
 
+  .ui.bottom.attached.segment.active.tab {
+    border-bottom: none;
+  }
+
   .test {
     color: white !important;
   }
@@ -207,11 +211,18 @@
     display: block !important;
   }
 
+  .AbsoluteExportDifferential {
+    position: absolute;
+    z-index: 1;
+    margin-top: 13px;
+    right: 9px !important;
+  }
+
   .AbsoluteExport {
     position: absolute;
     z-index: 1;
     margin-top: 10px;
-    right: 25px !important;
+    right: 10px !important;
   }
 
   #AppVersion {
