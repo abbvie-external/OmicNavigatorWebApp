@@ -1,5 +1,6 @@
 /* eslint-disable react/state-in-constructor */
 import React, { Component } from 'react';
+import { Button, Icon, Popup } from 'semantic-ui-react';
 import * as d3 from 'd3';
 import * as _ from 'lodash';
 // import { select } from "d3-selection";
@@ -22,6 +23,7 @@ class ViolinPlot extends Component {
     // ],
     // elementTextAfter: null,
     // didDropdownChange: false,
+    displayElementText: false,
     violinContainerHeight:
       this.violinContainerRef?.current?.parentElement?.offsetHeight ||
       window.screen.height - this.props.horizontalSplitPaneSize - 51,
@@ -56,7 +58,8 @@ class ViolinPlot extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    const { violinData, HighlightedProteins, displayElementText } = this.props;
+    //const { violinData, HighlightedProteins, displayElementText } = this.props;
+    const { violinData, HighlightedProteins } = this.props;
     if (violinData !== prevProps.violinData) {
       // const label = this.props.violinSettings.axisLabels.xAxis;
       const label = this.props.barcodeSettings.statLabel;
@@ -116,9 +119,7 @@ class ViolinPlot extends Component {
         }
       }
     }
-    if (prevProps.displayElementText !== displayElementText) {
-      this.handleElementText();
-    }
+
     // if (
     //   this.state.violinContainerHeight !== prevState.violinContainerHeight
     // ) {
@@ -293,6 +294,12 @@ class ViolinPlot extends Component {
 
   makeBrush() {
     var self = this;
+    const brushStart = function() {
+      const chartSVG = d3.select(`#${self.props.violinSettings.id}`);
+      chartSVG.selectAll('.brushed').classed('brushed', false);
+      self.unhighlightPoint([], true, self);
+      self.handleElementText(true);
+    };
     const highlightBrushedCircles = function() {
       const circles = d3.selectAll(
         '.' + self.props.violinSettings.id + '.vPoint',
@@ -311,7 +318,7 @@ class ViolinPlot extends Component {
           return brushTest;
         };
         const chartSVG = d3.select(`#${self.props.violinSettings.id}`);
-        chartSVG.selectAll('.brushed').classed('brushed', false);
+        //chartSVG.selectAll('.brushed').classed('brushed', false);
         const brushed = circles
           .filter(function() {
             const cx = d3.select(this).attr('cx'),
@@ -329,7 +336,7 @@ class ViolinPlot extends Component {
           const circleText = self.chart.objs.svg
             .append('g')
             .attr('class', 'circleText');
-          if (self.props.displayElementText) {
+          if (self.state.displayElementText) {
             circleText
               .append('text')
               .attr('x', test.attr('cx'))
@@ -354,6 +361,14 @@ class ViolinPlot extends Component {
           self.props.onHandleProteinSelected(sortedData);
         }
       }
+      // else{
+      //   self.handleElementText(true);
+      // }
+    };
+    const brushEnd = function() {
+      if (self.state.displayElementText) {
+        self.handleElementText(false);
+      }
     };
 
     // if(self.state.elementText != self.state.elementTextAfter){
@@ -366,9 +381,9 @@ class ViolinPlot extends Component {
         [0, 0],
         [self.state.violinContainerWidth, self.state.violinContainerHeight],
       ])
-      .on('start', e => this.unhighlightPoint([], true, self))
+      .on('start', brushStart)
       .on('brush', highlightBrushedCircles)
-      .on('end', function() {});
+      .on('end', brushEnd);
     self.chart.objs.g
       .append('g')
       .attr('class', 'violinBrush')
@@ -1457,11 +1472,12 @@ class ViolinPlot extends Component {
         return;
       }
 
-      // Single Click Behavior
-      // self.chart.objs.svg.on("dblclick", function () {
-      //   self.unhighlightPoint(null, true, self);
-      //   self.violinBrush.emit([[], []])
-      // })
+      //Single Click Behavior
+      // self.chart.objs.svg.on("click", function () {
+      //   // self.unhighlightPoint(null, true, self);
+      //   // self.violinBrush.emit([[], []])
+      //   self.handleElementText(true);
+      // });
 
       Object.keys(self.chart.groupObjs).forEach(cName => {
         if (Object.prototype.hasOwnProperty.call(self.chart.groupObjs, cName)) {
@@ -1528,7 +1544,6 @@ class ViolinPlot extends Component {
             //   value[self.props.violinSettings.xName] = cName;
             // },
           );
-
           cPlot.objs.points.g
             .selectAll('circle')
             .data(circleData)
@@ -1699,9 +1714,10 @@ class ViolinPlot extends Component {
     return window.screen.height - this.props.horizontalSplitPaneSize - 51;
   };
 
-  handleElementText = () => {
+  handleElementText = removeText => {
+    debugger;
     const self = this;
-    if (!self.props.displayElementText) {
+    if (!self.state.displayElementText || removeText) {
       const chartSVG = d3.select(`#${self.props.violinSettings.id}`);
       chartSVG.selectAll('g.circleText').remove();
     } else {
@@ -1722,6 +1738,17 @@ class ViolinPlot extends Component {
     }
   };
 
+  handleElementTextChange = () => {
+    this.setState(
+      {
+        // prevState => ({
+        // displayElementText: !prevState.displayElementText,
+        displayElementText: !this.state.displayElementText,
+      },
+      this.handleElementText(),
+    );
+  };
+
   // handleElementTextDropdownChange = value => {
   //   var self = this;
   //   this.setState({ elementText: value }, this.handleElementText(self));
@@ -1729,6 +1756,7 @@ class ViolinPlot extends Component {
 
   render() {
     const { violinSettings } = this.props;
+    //const { displayElementText } = this.state;
     // const { elementTextOptions } = this.state;
     return (
       <>
@@ -1742,6 +1770,41 @@ class ViolinPlot extends Component {
             options={elementTextOptions}
           />
         </div> */}
+        {/* <div>
+        <Button
+          icon
+          onClick={this.handleElementTextChange}
+          > */}
+        <span className="TextToggleButton">
+          <Popup
+            trigger={
+              <Icon
+                name="font"
+                size="small"
+                inverted
+                circular
+                onClick={this.handleElementTextChange}
+                color="grey"
+              />
+            }
+            style={{
+              backgroundColor: '#2E2E2E',
+              borderBottom: '2px solid var(--color-primary)',
+              color: '#FFF',
+              padding: '1em',
+              fontSize: '13px',
+            }}
+            className=""
+            //inverted
+            basic
+            //position="bottom center"
+            content={
+              this.state.displayElementText ? 'Hide Labels' : 'Show Labels'
+            }
+          />
+        </span>
+        {/* </Button> */}
+        {/* </div> */}
         <div
           ref={this.violinContainerRef}
           id={violinSettings.parentId}

@@ -155,6 +155,13 @@
   text-anchor: middle;
 }
 
+.TextToggleButton {
+  position: absolute;
+  top: 10px;
+  left: 15px;
+  z-index: 3;
+}
+
 // .circleText {
 //   font-size: 25px;
 //   font-weight: bold;

@@ -584,6 +584,7 @@ class BarcodePlot extends Component {
           >
             {barcodeSettings.statLabel}
           </text>
+          {/* Semantic UI Button */}
           {/* Y Axis Left Label */}
           <text
             className="BarcodeLabel"

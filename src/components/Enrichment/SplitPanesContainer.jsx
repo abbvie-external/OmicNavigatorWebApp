@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Button, Icon } from 'semantic-ui-react';
 import { withRouter } from 'react-router-dom';
 import { Grid, Dimmer, Loader, Tab, Radio } from 'semantic-ui-react';
 // import _ from 'lodash';
@@ -293,7 +294,7 @@ class SplitPanesContainer extends Component {
               widescreen={8}
               className="elementTextCol"
             >
-              <Radio
+              {/* <Radio
                 id="elementTextCheckbox"
                 toggle
                 // size={dynamicSize}
@@ -304,7 +305,12 @@ class SplitPanesContainer extends Component {
                 // options={elementTextOptions}
                 checked={displayElementText}
                 onClick={this.handleElementTextChange}
-              />
+              /> */}
+              <div>
+                <Button icon onClick={this.handleElementTextChange}>
+                  <Icon name="font" size="small" />
+                </Button>
+              </div>
             </Grid.Column>
 
             <Grid.Column
