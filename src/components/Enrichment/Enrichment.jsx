@@ -1862,13 +1862,13 @@ class Enrichment extends Component {
               <Grid.Row>
                 <div className="FloatRight AbsoluteExport">
                   <ButtonActions
+                    exportButtonSize={'small'}
                     excelVisible={true}
                     pngVisible={false}
                     pdfVisible={false}
                     svgVisible={false}
                     txtVisible={true}
                     refFwd={this.EnrichmentGridRef}
-                    exportButtonSize={'small'}
                     tab={tab}
                     study={enrichmentStudy}
                     model={enrichmentModel}
@@ -2097,6 +2097,7 @@ class Enrichment extends Component {
               widescreen={16}
             >
               <ButtonActions
+                exportButtonSize={'small'}
                 excelVisible={false}
                 pngVisible={true}
                 pdfVisible={false}

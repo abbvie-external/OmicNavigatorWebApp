@@ -126,7 +126,7 @@ class DifferentialPlot extends Component {
               </Grid.Column>
               <Grid.Column mobile={8} tablet={8} largeScreen={8} widescreen={8}>
                 <ButtonActions
-                  exportButtonSize={'medium'}
+                  exportButtonSize={'small'}
                   excelVisible={excelFlag}
                   pngVisible={pngFlag}
                   pdfVisible={pdfFlag}

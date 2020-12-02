@@ -601,12 +601,12 @@ class DifferentialVolcanoPlot extends Component {
         <>
           <div id="VolcanoPlotDiv">
             <ButtonActions
+              exportButtonSize="mini"
               plot={this.state.plotName}
               excelVisible={false}
               pdfVisible={false}
               pngVisible={true}
               svgVisible={true}
-              exportButtonSize="mini"
             />
           </div>
           <svg

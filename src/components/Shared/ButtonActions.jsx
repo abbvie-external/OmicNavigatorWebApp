@@ -8,12 +8,12 @@ import { toast } from 'react-toastify';
 
 class ButtonActions extends Component {
   static defaultProps = {
+    exportButtonSize: 'small',
     excelVisible: false,
     pngVisible: false,
     pdfVisible: false,
     svgVisible: false,
     txtVisible: false,
-    exportButtonSize: 'medium',
   };
 
   PNGExport = () => {

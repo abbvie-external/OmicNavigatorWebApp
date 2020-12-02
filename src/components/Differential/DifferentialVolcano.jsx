@@ -767,13 +767,13 @@ class DifferentialVolcano extends Component {
                       <Grid.Row>
                         <div className="FloatRight AbsoluteExportDifferential">
                           <ButtonActions
+                            exportButtonSize={'small'}
                             excelVisible={true}
                             pngVisible={false}
                             pdfVisible={false}
                             svgVisible={false}
                             txtVisible={true}
                             refFwd={this.volcanoPlotFilteredGridRef}
-                            exportButtonSize={'small'}
                             tab={tab}
                             study={differentialStudy}
                             model={differentialModel}

@@ -819,7 +819,7 @@ class Differential extends Component {
               widescreen={16}
             >
               <ButtonActions
-                exportButtonSize={'medium'}
+                exportButtonSize={'small'}
                 excelVisible={false}
                 pngVisible={true}
                 pdfVisible={false}
