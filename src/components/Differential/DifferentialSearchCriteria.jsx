@@ -118,7 +118,7 @@ class DifferentialSearchCriteria extends Component {
       differentialModel,
       differentialTest,
       differentialFeature,
-      onSearchCriteriaChange,
+      onSearchCriteriaChangeDifferential,
       onSearchTransitionDifferential,
     } = this.props;
     const studies = allStudiesMetadata.map(study => {
@@ -210,7 +210,7 @@ class DifferentialSearchCriteria extends Component {
             .catch(error => {
               console.error('Error during getResultsTable', error);
             });
-          onSearchCriteriaChange(
+          onSearchCriteriaChangeDifferential(
             {
               differentialStudy: differentialStudy,
               differentialModel: differentialModel,
@@ -237,8 +237,11 @@ class DifferentialSearchCriteria extends Component {
   };
 
   handleStudyChange = (evt, { name, value }) => {
-    const { onSearchCriteriaChange, onSearchCriteriaReset } = this.props;
-    onSearchCriteriaChange(
+    const {
+      onSearchCriteriaChangeDifferential,
+      onSearchCriteriaResetDifferential,
+    } = this.props;
+    onSearchCriteriaChangeDifferential(
       {
         [name]: value,
         differentialModel: '',
@@ -246,7 +249,7 @@ class DifferentialSearchCriteria extends Component {
       },
       true,
     );
-    onSearchCriteriaReset({
+    onSearchCriteriaResetDifferential({
       isValidSearchDifferential: false,
     });
     this.setState({
@@ -300,12 +303,12 @@ class DifferentialSearchCriteria extends Component {
   handleModelChange = (evt, { name, value }) => {
     const {
       differentialStudy,
-      onSearchCriteriaChange,
-      onSearchCriteriaReset,
+      onSearchCriteriaChangeDifferential,
+      onSearchCriteriaResetDifferential,
       differentialModelsAndTests,
     } = this.props;
     this.props.onHandlePlotTypesDifferential(value);
-    onSearchCriteriaChange(
+    onSearchCriteriaChangeDifferential(
       {
         differentialStudy: differentialStudy,
         [name]: value,
@@ -313,7 +316,7 @@ class DifferentialSearchCriteria extends Component {
       },
       true,
     );
-    onSearchCriteriaReset({
+    onSearchCriteriaResetDifferential({
       isValidSearchDifferential: false,
     });
     const differentialModelsAndTestsCopy = [...differentialModelsAndTests];
@@ -347,12 +350,12 @@ class DifferentialSearchCriteria extends Component {
     const {
       differentialStudy,
       differentialModel,
-      onMultisetQueriedP,
-      onSearchCriteriaChange,
+      onMultisetQueriedDifferential,
+      onSearchCriteriaChangeDifferential,
       onSearchTransitionDifferential,
     } = this.props;
     onSearchTransitionDifferential(true);
-    onMultisetQueriedP(false);
+    onMultisetQueriedDifferential(false);
     const differentialTestMeta = this.props.differentialTestsMetadata.find(
       test => test.testID === value,
     );
@@ -363,7 +366,7 @@ class DifferentialSearchCriteria extends Component {
       multisetFiltersVisibleP: false,
       sigValP: this.state.uSettingsP.defaultSigValueP,
     });
-    onSearchCriteriaChange(
+    onSearchCriteriaChangeDifferential(
       {
         differentialStudy: differentialStudy,
         differentialModel: differentialModel,
@@ -418,7 +421,7 @@ class DifferentialSearchCriteria extends Component {
     return evt => {
       if (this.state.multisetFiltersVisibleP === false) {
         // on toggle open
-        this.props.onMultisetQueriedP(true);
+        this.props.onMultisetQueriedDifferential(true);
         this.props.onSearchTransitionDifferentialAlt(true);
         if (this.state.selectedColP.length === 0) {
           const uSetVP = { ...this.state.uSettingsP };
@@ -440,7 +443,7 @@ class DifferentialSearchCriteria extends Component {
         );
       } else {
         // on toggle close
-        this.props.onMultisetQueriedP(false);
+        this.props.onMultisetQueriedDifferential(false);
         this.setState({
           multisetFiltersVisibleP: false,
           reloadPlotP: false,
@@ -481,11 +484,11 @@ class DifferentialSearchCriteria extends Component {
     const {
       differentialStudy,
       differentialModel,
-      onSearchCriteriaChange,
+      onSearchCriteriaChangeDifferential,
       onSearchTransitionDifferentialAlt,
     } = this.props;
     onSearchTransitionDifferentialAlt(true);
-    onSearchCriteriaChange(
+    onSearchCriteriaChangeDifferential(
       {
         differentialStudy: differentialStudy,
         differentialModel: differentialModel,

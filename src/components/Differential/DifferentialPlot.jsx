@@ -11,8 +11,8 @@ import './DifferentialPlot.scss';
 
 class DifferentialPlot extends Component {
   static defaultProps = {
-    // isProteinDataLoaded: false,
-    // isProteinSVGLoaded: true,
+    // isItemDatatLoaded: false,
+    // isItemSVGLoaded: true,
   };
 
   state = {
@@ -104,10 +104,10 @@ class DifferentialPlot extends Component {
   render() {
     // const { activeDifferentialPlotTabsIndex } = this.state;
     const { excelFlag, pngFlag, pdfFlag, svgFlag } = this.state;
-    const { isProteinSVGLoaded, imageInfo } = this.props;
+    const { isItemSVGLoaded, imageInfo } = this.props;
     const { activeDifferentialPlotTabsIndex } = this.state;
     const svgPanes = this.getSVGPanes(activeDifferentialPlotTabsIndex);
-    if (!isProteinSVGLoaded) {
+    if (!isItemSVGLoaded) {
       return (
         // <LoaderActivePlots />
         <div className="PlotsMetafeaturesDimmer">

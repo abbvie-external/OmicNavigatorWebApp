@@ -49,8 +49,8 @@ class Differential extends Component {
       svg: [],
     },
     isItemSelected: false,
-    isProteinSVGLoaded: false,
-    // isProteinDataLoaded: false,
+    isItemSVGLoaded: false,
+    // isItemDatatLoaded: false,
     // HighlightedFeaturesArrVolcano: [],
     // volcanoDifferentialTableRowMax: '',
     // volcanoDifferentialTableRowOther: [],
@@ -94,7 +94,7 @@ class Differential extends Component {
     });
   };
 
-  handleMultisetQueriedP = value => {
+  handleMultisetQueriedDifferential = value => {
     this.setState({
       multisetQueriedP: value,
       // isVolcanoPlotSVGLoaded: !value,
@@ -125,6 +125,16 @@ class Differential extends Component {
     });
   };
 
+  handleDifferentialSearchUnfiltered = searchResults => {
+    this.setState({
+      differentialResultsUnfiltered: searchResults.differentialResults,
+      isItemSVGLoaded: false,
+      // isItemDatatLoaded: false,
+      isItemSelected: this.props.differentialFeature !== '',
+      HighlightedFeaturesArrVolcano: [],
+    });
+  };
+
   handleDifferentialSearch = searchResults => {
     /**
      * @type {QHGrid.ColumnConfig<{}>[]}
@@ -137,11 +147,6 @@ class Differential extends Component {
     if (searchResults.differentialResults?.length > 0) {
       columns = this.getConfigCols(searchResults);
     }
-    //   const statToSort =
-    //     'P.Value' in sortedDifferentialResults[0] ? 'P.Value' : 'P_Value';
-    //   sortedDifferentialResults = sortedDifferentialResults.sort(
-    //     (a, b) => a[statToSort] - b[statToSort],
-    //   );
     this.setState({
       differentialResults: searchResults.differentialResults,
       differentialColumns: columns,
@@ -151,18 +156,7 @@ class Differential extends Component {
       // differentialResultsMounted: false,
       plotButtonActive: false,
       visible: false,
-      // isProteinSVGLoaded: false,
-      HighlightedFeaturesArrVolcano: [],
-    });
-  };
-
-  handleDifferentialSearchUnfiltered = searchResults => {
-    this.setState({
-      differentialResultsUnfiltered: searchResults.differentialResults,
-      isProteinSVGLoaded: false,
-      // isProteinDataLoaded: false,
-      // PAUL - why is this set false?
-      // isItemSelected: false,
+      // isItemSVGLoaded: false,
       HighlightedFeaturesArrVolcano: [],
     });
   };
@@ -185,7 +179,7 @@ class Differential extends Component {
       }
     }
   };
-  handleSearchCriteriaChange = (changes, scChange) => {
+  handleSearchCriteriaChangeDifferential = (changes, scChange) => {
     this.props.onHandleUrlChange(changes, 'differential');
     this.setState({
       visible: false,
@@ -199,14 +193,14 @@ class Differential extends Component {
         // differentialResults: [],
         // differentialResultsMounted: false,
         // differentialResultsUnfiltered: [],
-        isProteinDataLoaded: false,
+        isItemDatatLoaded: false,
         HighlightedFeaturesArrVolcano: [],
         volcanoDifferentialTableRowMax: '',
         volcanoDifferentialTableRowOther: [],
         maxObjectIdentifier: null,
         isVolcanoPlotSVGLoaded: true,
         isItemSelected: false,
-        isProteinSVGLoaded: true,
+        isItemSVGLoaded: true,
       });
     }
     if (
@@ -252,7 +246,7 @@ class Differential extends Component {
     });
   };
 
-  hidePGrid = () => {
+  handleSearchCriteriaResetDifferential = () => {
     this.setState({
       isValidSearchDifferential: false,
       multisetPlotAvailable: false,
@@ -260,7 +254,7 @@ class Differential extends Component {
       visible: false,
       isItemSelected: false,
       // differentialResultsMounted: false,
-      isProteinSVGLoaded: false,
+      isItemSVGLoaded: false,
     });
   };
 
@@ -294,12 +288,12 @@ class Differential extends Component {
         imageInfo: imageInfo,
         isItemSelected: true,
         // differentialResultsMounted: false,
-        isProteinSVGLoaded: false,
-        // isProteinDataLoaded: false,
+        isItemSVGLoaded: false,
+        // isItemDatatLoaded: false,
         currentSVGs: [],
       },
       function() {
-        this.handleSearchCriteriaChange(
+        this.handleSearchCriteriaChangeDifferential(
           {
             differentialStudy: this.props.differentialStudy || '',
             differentialModel: this.props.differentialModel || '',
@@ -428,7 +422,7 @@ class Differential extends Component {
           title: '',
           svg: [],
         },
-        isProteinSVGLoaded: true,
+        isItemSVGLoaded: true,
         isVolcanoPlotSVGLoaded: true,
       });
     }
@@ -540,7 +534,7 @@ class Differential extends Component {
   handleSVG = imageInfo => {
     this.setState({
       imageInfo: imageInfo,
-      isProteinSVGLoaded: true,
+      isItemSVGLoaded: true,
       isVolcanoPlotSVGLoaded: true,
     });
   };
@@ -548,10 +542,10 @@ class Differential extends Component {
     this.setState({
       // differentialResultsMounted: false,
       isItemSelected: false,
-      // isProteinDataLoaded: false,
-      isProteinSVGLoaded: false,
+      // isItemDatatLoaded: false,
+      isItemSVGLoaded: false,
     });
-    this.handleSearchCriteriaChange(
+    this.handleSearchCriteriaChangeDifferential(
       {
         differentialStudy: this.props.differentialStudy || '',
         differentialModel: this.props.differentialModel || '',
@@ -600,8 +594,8 @@ class Differential extends Component {
         imageInfo: imageInfo,
         // differentialResultsMounted: false,
         isItemSelected: true,
-        isProteinSVGLoaded: false,
-        // isProteinDataLoaded: false,
+        isItemSVGLoaded: false,
+        // isItemDatatLoaded: false,
         currentSVGs: [],
       });
       this.getPlot(differentialFeature, true);
@@ -868,12 +862,18 @@ class Differential extends Component {
               onDifferentialSearchUnfiltered={
                 this.handleDifferentialSearchUnfiltered
               }
-              onSearchCriteriaChange={this.handleSearchCriteriaChange}
-              onSearchCriteriaReset={this.hidePGrid}
+              onSearchCriteriaChangeDifferential={
+                this.handleSearchCriteriaChangeDifferential
+              }
+              onSearchCriteriaResetDifferential={
+                this.handleSearchCriteriaResetDifferential
+              }
               onDisablePlot={this.disablePlot}
               onGetMultisetPlot={this.handleMultisetPlot}
               onHandlePlotAnimation={this.handlePlotAnimation}
-              onMultisetQueriedP={this.handleMultisetQueriedP}
+              onMultisetQueriedDifferential={
+                this.handleMultisetQueriedDifferential
+              }
               onSetStudyModelTestMetadata={this.setStudyModelTestMetadata}
               onSetTestsMetadata={this.setTestsMetadata}
               onHandlePlotTypesDifferential={this.handlePlotTypesDifferential}

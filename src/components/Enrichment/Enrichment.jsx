@@ -358,7 +358,7 @@ class Enrichment extends Component {
     });
   };
 
-  handleMultisetQueriedE = value => {
+  handleMultisetQueriedEnrichment = value => {
     this.setState({
       multisetQueriedE: value,
     });
@@ -474,7 +474,7 @@ class Enrichment extends Component {
     }
   };
 
-  handleSearchCriteriaChange = (changes, scChange) => {
+  handleSearchCriteriaChangeEnrichment = (changes, scChange) => {
     this.props.onHandleUrlChange(changes, 'enrichment');
     this.setState({
       plotButtonActive: false,
@@ -523,7 +523,7 @@ class Enrichment extends Component {
     });
   };
 
-  hideEGrid = () => {
+  handleSearchCriteriaResetEnrichment = () => {
     this.setState({
       isTestSelected: false,
       isTestDataLoaded: false,
@@ -1132,7 +1132,7 @@ class Enrichment extends Component {
 
   handleGetBarcodeDataError = () => {
     this.testSelectedTransition(false);
-    this.handleSearchCriteriaChange(
+    this.handleSearchCriteriaChangeEnrichment(
       {
         enrichmentStudy: this.props.enrichmentStudy || '',
         enrichmentModel: this.props.enrichmentModel || '',
@@ -1152,7 +1152,7 @@ class Enrichment extends Component {
   ) => {
     this.testSelectedTransition(true);
     const TestSiteVar = `${test}:${dataItem.description}`;
-    this.handleSearchCriteriaChange(
+    this.handleSearchCriteriaChangeEnrichment(
       {
         enrichmentStudy: this.props.enrichmentStudy || '',
         enrichmentModel: this.props.enrichmentModel || '',
@@ -1675,7 +1675,7 @@ class Enrichment extends Component {
         dataItem: [],
       },
     });
-    this.handleSearchCriteriaChange(
+    this.handleSearchCriteriaChangeEnrichment(
       {
         enrichmentStudy: this.props.enrichmentStudy || '',
         enrichmentModel: this.props.enrichmentModel || '',
@@ -2136,11 +2136,15 @@ class Enrichment extends Component {
               }
               onEnrichmentSearch={this.handleEnrichmentSearch}
               onColumnReorder={this.handleColumnReorder}
-              onSearchCriteriaChange={this.handleSearchCriteriaChange}
-              onSearchCriteriaReset={this.hideEGrid}
+              onSearchCriteriaChangeEnrichment={
+                this.handleSearchCriteriaChangeEnrichment
+              }
+              onSearchCriteriaResetEnrichment={
+                this.handleSearchCriteriaResetEnrichment
+              }
               onDisablePlot={this.disablePlot}
               onGetMultisetPlot={this.handleMultisetPlot}
-              onMultisetQueriedE={this.handleMultisetQueriedE}
+              onMultisetQueriedEnrichment={this.handleMultisetQueriedEnrichment}
               onHandlePlotAnimation={this.handlePlotAnimation}
               onHandlePlotTypesEnrichment={this.handlePlotTypesEnrichment}
               onSetStudyModelAnnotationMetadata={

@@ -294,7 +294,7 @@ class DifferentialVolcano extends Component {
           const indexMaxFeature = _.findIndex(allTableData, function(d) {
             return d[differentialFeatureIdKey] === PreviouslyHighlighted[0]?.id;
           });
-          // map protein to fix obj entries
+          // map feature to fix obj entries
           const mappedFeature = {
             id: item[differentialFeatureIdKey],
             value: item[differentialFeatureIdKey],
