@@ -186,7 +186,7 @@ class Differential extends Component {
     }
   };
   handleSearchCriteriaChange = (changes, scChange) => {
-    this.props.onSearchCriteriaToTop(changes, 'differential');
+    this.props.onHandleUrlChange(changes, 'differential');
     this.setState({
       visible: false,
       plotButtonActive: false,

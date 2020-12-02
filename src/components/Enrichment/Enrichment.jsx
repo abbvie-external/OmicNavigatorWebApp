@@ -475,7 +475,7 @@ class Enrichment extends Component {
   };
 
   handleSearchCriteriaChange = (changes, scChange) => {
-    this.props.onSearchCriteriaToTop(changes, 'enrichment');
+    this.props.onHandleUrlChange(changes, 'enrichment');
     this.setState({
       plotButtonActive: false,
       visible: false,
