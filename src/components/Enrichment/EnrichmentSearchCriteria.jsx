@@ -740,12 +740,12 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentAnnotation,
       pValueType,
       onEnrichmentSearch,
-      onDisablePlot,
+      onDisablePlotEnrichment,
       tests,
     } = this.props;
     const { selectedOperator, reloadPlot, sigValue } = this.state;
     if (reloadPlot) {
-      onDisablePlot();
+      onDisablePlotEnrichment();
     }
     const eMust = this.state.uSettings.must;
     const eNot = this.state.uSettings.not;
@@ -864,7 +864,7 @@ class EnrichmentSearchCriteria extends Component {
           });
           let svgInfo = { plotType: 'Multiset', svg: sanitizedSVG };
           // let svgInfo = { plotType: 'Multiset', svg: svgMarkup };
-          this.props.onGetMultisetPlot({
+          this.props.onGetMultisetPlotEnrichment({
             svgInfo,
           });
         })

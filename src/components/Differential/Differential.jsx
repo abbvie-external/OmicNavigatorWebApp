@@ -193,7 +193,7 @@ class Differential extends Component {
         // differentialResults: [],
         // differentialResultsMounted: false,
         // differentialResultsUnfiltered: [],
-        isItemDatatLoaded: false,
+        // isItemDatatLoaded: false,
         HighlightedFeaturesArrVolcano: [],
         volcanoDifferentialTableRowMax: '',
         volcanoDifferentialTableRowOther: [],
@@ -240,7 +240,7 @@ class Differential extends Component {
       });
   };
 
-  disablePlot = () => {
+  disablePlotDifferential = () => {
     this.setState({
       multisetPlotAvailableDifferential: false,
     });
@@ -873,8 +873,8 @@ class Differential extends Component {
               onSearchCriteriaResetDifferential={
                 this.handleSearchCriteriaResetDifferential
               }
-              onDisablePlot={this.disablePlot}
-              onGetMultisetPlot={this.handleMultisetPlot}
+              onDisablePlotDifferential={this.disablePlotDifferential}
+              onGetMultisetPlotDifferential={this.handleMultisetPlot}
               onHandlePlotAnimation={this.handlePlotAnimation}
               onMultisetQueriedDifferential={
                 this.handleMultisetQueriedDifferential

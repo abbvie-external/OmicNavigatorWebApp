@@ -517,7 +517,7 @@ class Enrichment extends Component {
       });
   };
 
-  disablePlot = () => {
+  disablePlotEnrichment = () => {
     this.setState({
       multisetPlotAvailableEnrichment: false,
     });
@@ -2148,8 +2148,8 @@ class Enrichment extends Component {
               onSearchCriteriaResetEnrichment={
                 this.handleSearchCriteriaResetEnrichment
               }
-              onDisablePlot={this.disablePlot}
-              onGetMultisetPlot={this.handleMultisetPlot}
+              onDisablePlotEnrichment={this.disablePlotEnrichment}
+              onGetMultisetPlotEnrichment={this.handleMultisetPlot}
               onmultisetQueriedEnrichmentnrichment={
                 this.handleMultisetQueriedEnrichmentnrichment
               }

@@ -793,8 +793,8 @@ class DifferentialVolcano extends Component {
                             className="VolcanoPlotTable"
                             // note, default is 70vh; if you want a specific vh, specify like "40vh"; "auto" lets the height flow based on items per page
                             // height="auto"
-                            // height={volcanoPlotsVisible ? '40vh' : '70vh'}
-                            height="70vh"
+                            height={volcanoPlotsVisible ? 'auto' : '70vh'}
+                            // height="70vh"
                             data={filteredTableData || []}
                             totalRows={volcanoPlotRows || 0}
                             columnsConfig={differentialColumns}

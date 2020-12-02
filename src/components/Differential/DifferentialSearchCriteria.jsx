@@ -633,7 +633,7 @@ class DifferentialSearchCriteria extends Component {
       differentialModel,
       differentialTest,
       onDifferentialSearch,
-      onDisablePlot,
+      onDisablePlotDifferential,
     } = this.props;
     const {
       selectedOperatorP,
@@ -686,7 +686,7 @@ class DifferentialSearchCriteria extends Component {
     //   typeof differentialTests === 'string' ? 1 : differentialTests.length;
     // if (reloadPlotP === true && testsLength > 1) {
     if (reloadPlotP === true && differentialTests.length > 1) {
-      onDisablePlot();
+      onDisablePlotDifferential();
       this.getMultisetPlot(
         sigValueP,
         differentialModel,
@@ -746,7 +746,7 @@ class DifferentialSearchCriteria extends Component {
         });
         let svgInfo = { plotType: 'Multiset', svg: sanitizedSVG };
         // let svgInfo = { plotType: 'Multiset', svg: svgMarkup };
-        this.props.onGetMultisetPlot({
+        this.props.onGetMultisetPlotDifferential({
           svgInfo,
         });
       })
