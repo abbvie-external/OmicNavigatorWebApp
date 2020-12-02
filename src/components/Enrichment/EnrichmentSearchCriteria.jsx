@@ -456,12 +456,12 @@ class EnrichmentSearchCriteria extends Component {
       onEnrichmentSearch,
       onPValueTypeChange,
       onHandleEnrichmentTableLoading,
-      multisetFiltersVisible,
+      multisetFiltersVisibleEnrichment,
     } = this.props;
     onSearchTransitionEnrichment(true);
     onHandleEnrichmentTableLoading(true);
     onPValueTypeChange(value);
-    if (!multisetFiltersVisible) {
+    if (!multisetFiltersVisibleEnrichment) {
       cancelGetEnrichmentsTable();
       let cancelToken = new CancelToken(e => {
         cancelGetEnrichmentsTable = e;
@@ -537,16 +537,16 @@ class EnrichmentSearchCriteria extends Component {
     }
   };
 
-  handleMultisetToggle = () => {
+  handleMultisetToggleEnrichment = () => {
     return evt => {
       this.props.onHandleNetworkGraphReady(false);
 
-      if (this.props.multisetFiltersVisible === false) {
+      if (this.props.multisetFiltersVisibleEnrichment === false) {
         // on toggle open
         this.props.onmultisetQueriedEnrichmentnrichment(true);
         this.props.onSearchTransitionEnrichment(true);
-        this.props.onHandleMultisetFiltersVisible();
-        // this.props.onHandleMultisetFiltersVisible(true);
+        this.props.onHandleMultisetFiltersVisibleEnrichment();
+        // this.props.onHandleMultisetFiltersVisibleEnrichment(true);
         this.setState(
           {
             reloadPlot: true,
@@ -559,8 +559,8 @@ class EnrichmentSearchCriteria extends Component {
         // on toggle close
         // this.props.onHandleNetworkTests([], []);
         this.props.onmultisetQueriedEnrichmentnrichment(false);
-        this.props.onHandleMultisetFiltersVisible();
-        // this.props.onHandleMultisetFiltersVisible(false);
+        this.props.onHandleMultisetFiltersVisibleEnrichment();
+        // this.props.onHandleMultisetFiltersVisibleEnrichment(false);
         this.setState({
           reloadPlot: false,
           initialRenderE: true,
@@ -575,18 +575,18 @@ class EnrichmentSearchCriteria extends Component {
     };
   };
 
-  handleMultisetEOpenError = () => {
+  handleMultisetOpenErrorEnrichment = () => {
     cancelRequestEnrichmentMultisetPlot();
-    this.props.onHandleMultisetFiltersVisible();
-    // this.props.onHandleMultisetFiltersVisible(false);
+    this.props.onHandleMultisetFiltersVisibleEnrichment();
+    // this.props.onHandleMultisetFiltersVisibleEnrichment(false);
     this.props.onmultisetQueriedEnrichmentnrichment(false);
     console.log('Error during getEnrichmentsIntersection');
   };
 
   handleMultisetECloseError = () => {
     this.props.onSearchTransitionEnrichment(false);
-    this.props.onHandleMultisetFiltersVisible();
-    // this.props.onHandleMultisetFiltersVisible(true);
+    this.props.onHandleMultisetFiltersVisibleEnrichment();
+    // this.props.onHandleMultisetFiltersVisibleEnrichment(true);
     this.props.onmultisetQueriedEnrichmentnrichment(true);
     this.setState(
       {
@@ -763,7 +763,7 @@ class EnrichmentSearchCriteria extends Component {
         sigValue,
         this.jsonToList(selectedOperator),
         pValueType,
-        this.handleMultisetEOpenError,
+        this.handleMultisetOpenErrorEnrichment,
         cancelToken,
       )
       .then(annotationData => {
@@ -898,7 +898,7 @@ class EnrichmentSearchCriteria extends Component {
       multisetPlotAvailableEnrichment,
       plotButtonActiveEnrichment,
       isTestDataLoaded,
-      multisetFiltersVisible,
+      multisetFiltersVisibleEnrichment,
     } = this.props;
 
     const StudyPopupStyle = {
@@ -958,7 +958,7 @@ class EnrichmentSearchCriteria extends Component {
     if (
       isValidSearchEnrichment //&&
       // activateMultisetFilters &&
-      //multisetFiltersVisible
+      //multisetFiltersVisibleEnrichment
     ) {
       EMultisetFilters = (
         <EnrichmentMultisetFilters
@@ -1001,8 +1001,8 @@ class EnrichmentSearchCriteria extends Component {
           <Radio
             toggle
             label="Set Analysis"
-            checked={multisetFiltersVisible}
-            onChange={this.handleMultisetToggle()}
+            checked={multisetFiltersVisibleEnrichment}
+            onChange={this.handleMultisetToggleEnrichment()}
           />
         </React.Fragment>
       );

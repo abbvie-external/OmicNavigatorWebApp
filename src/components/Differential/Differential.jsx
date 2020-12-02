@@ -44,7 +44,7 @@ class Differential extends Component {
      */
     // differentialColumns: [],
     filterableColumnsP: [],
-    multisetPlotInfo: {
+    multisetPlotInfoDifferential: {
       title: '',
       svg: [],
     },
@@ -268,7 +268,7 @@ class Differential extends Component {
 
   handleMultisetPlot = multisetPlotResults => {
     this.setState({
-      multisetPlotInfo: {
+      multisetPlotInfoDifferential: {
         title: multisetPlotResults.svgInfo.plotType,
         svg: multisetPlotResults.svgInfo.svg,
       },
@@ -797,7 +797,12 @@ class Differential extends Component {
 
   render() {
     const differentialView = this.getView();
-    const { multisetPlotInfo, animation, direction, visible } = this.state;
+    const {
+      multisetPlotInfoDifferential,
+      animation,
+      direction,
+      visible,
+    } = this.state;
     const { tab, differentialStudy, differentialModel } = this.props;
     const VerticalSidebar = ({ animation, visible }) => (
       <Sidebar
@@ -835,7 +840,7 @@ class Differential extends Component {
         </Grid>
         <div
           className="MultisetSvgOuter"
-          dangerouslySetInnerHTML={{ __html: multisetPlotInfo.svg }}
+          dangerouslySetInnerHTML={{ __html: multisetPlotInfoDifferential.svg }}
         ></div>
       </Sidebar>
     );

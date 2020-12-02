@@ -86,7 +86,7 @@ class DifferentialSearchCriteria extends Component {
         },
       ],
     },
-    multisetFiltersVisibleP: false,
+    multisetFiltersVisibleDifferential: false,
     activateMultisetFiltersP: false,
     uDataP: [],
     initialRenderP: true,
@@ -363,7 +363,7 @@ class DifferentialSearchCriteria extends Component {
     this.setState({
       differentialTestTooltip: differentialTestTooltip,
       reloadPlotP: true,
-      multisetFiltersVisibleP: false,
+      multisetFiltersVisibleDifferential: false,
       sigValP: this.state.uSettingsP.defaultSigValueP,
     });
     onSearchCriteriaChangeDifferential(
@@ -419,7 +419,7 @@ class DifferentialSearchCriteria extends Component {
 
   handleMultisetToggle = () => {
     return evt => {
-      if (this.state.multisetFiltersVisibleP === false) {
+      if (this.state.multisetFiltersVisibleDifferential === false) {
         // on toggle open
         this.props.onMultisetQueriedDifferential(true);
         this.props.onSearchTransitionDifferentialAlt(true);
@@ -435,7 +435,7 @@ class DifferentialSearchCriteria extends Component {
         this.setState(
           {
             reloadPlotP: true,
-            multisetFiltersVisibleP: true,
+            multisetFiltersVisibleDifferential: true,
           },
           function() {
             this.updateQueryDataP();
@@ -445,7 +445,7 @@ class DifferentialSearchCriteria extends Component {
         // on toggle close
         this.props.onMultisetQueriedDifferential(false);
         this.setState({
-          multisetFiltersVisibleP: false,
+          multisetFiltersVisibleDifferential: false,
           reloadPlotP: false,
           initialRenderP: true,
         });
@@ -459,10 +459,10 @@ class DifferentialSearchCriteria extends Component {
     };
   };
 
-  handleMultisetPOpenError = () => {
+  handleMultisetOpenErrorDifferential = () => {
     cancelRequestInferenceMultisetPlot();
     this.setState({
-      multisetFiltersVisibleP: false,
+      multisetFiltersVisibleDifferential: false,
     });
     console.log('Error during getResultsIntersection');
   };
@@ -472,7 +472,7 @@ class DifferentialSearchCriteria extends Component {
     this.props.onHandleVolcanoTableLoading(false);
     this.setState(
       {
-        multisetFiltersVisibleP: true,
+        multisetFiltersVisibleDifferential: true,
         reloadPlotP: true,
       },
       this.updateQueryDataP(),
@@ -658,7 +658,7 @@ class DifferentialSearchCriteria extends Component {
         sigValueP,
         this.jsonToList(selectedOperatorP),
         this.jsonToList(selectedColP),
-        this.handleMultisetPOpenError,
+        this.handleMultisetOpenErrorDifferential,
         cancelToken,
       )
       .then(inferenceData => {
@@ -767,7 +767,7 @@ class DifferentialSearchCriteria extends Component {
       differentialStudiesDisabled,
       differentialModelsDisabled,
       differentialTestsDisabled,
-      multisetFiltersVisibleP,
+      multisetFiltersVisibleDifferential,
       activateMultisetFiltersP,
     } = this.state;
 
@@ -843,7 +843,7 @@ class DifferentialSearchCriteria extends Component {
     if (
       isValidSearchDifferential &&
       activateMultisetFiltersP &&
-      multisetFiltersVisibleP
+      multisetFiltersVisibleDifferential
     ) {
       PMultisetFilters = (
         <DifferentialMultisetFilters
@@ -886,7 +886,7 @@ class DifferentialSearchCriteria extends Component {
           <Radio
             toggle
             label="Set Analysis"
-            checked={multisetFiltersVisibleP}
+            checked={multisetFiltersVisibleDifferential}
             onChange={this.handleMultisetToggle()}
           />
         </React.Fragment>

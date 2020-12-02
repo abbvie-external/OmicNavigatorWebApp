@@ -506,7 +506,7 @@ class EnrichmentResultsGraph extends Component {
       totalNodes,
       totalLinks,
       legendIsOpen,
-      // multisetFiltersVisible,
+      // multisetFiltersVisibleEnrichment,
       // networkSigValue,
     } = this.props;
 
@@ -612,7 +612,7 @@ class EnrichmentResultsGraph extends Component {
             >
               <div
                 // className={
-                //   multisetFiltersVisible
+                //   multisetFiltersVisibleEnrichment
                 //     ? 'InlineFlex NumericExponentialInputContainer Hide'
                 //     : 'InlineFlex NumericExponentialInputContainer Show'
                 // }

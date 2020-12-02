@@ -45,7 +45,7 @@ class Enrichment extends Component {
     enrichmentPlotSVGHeight: 0,
     enrichmentPlotSVGWidth: 0,
     activeIndexEnrichmentView: this.storedEnrichmentActiveIndex || 0,
-    multisetPlotInfo: {
+    multisetPlotInfoEnrichment: {
       title: '',
       svg: [],
     },
@@ -171,7 +171,7 @@ class Enrichment extends Component {
     enrichmentsLinkouts: [],
     enrichmentFeatureIdKey: '',
     // filteredDifferentialFeatureIdKey: '',
-    multisetFiltersVisible: false,
+    multisetFiltersVisibleEnrichment: false,
     multisetQueriedEnrichment: false,
     reloadPlot: false,
     networkSigValue: '0.05',
@@ -358,7 +358,7 @@ class Enrichment extends Component {
     });
   };
 
-  handlemultisetQueriedEnrichmentnrichment = value => {
+  handleMultisetQueriedEnrichmentnrichment = value => {
     this.setState({
       multisetQueriedEnrichment: value,
     });
@@ -382,9 +382,9 @@ class Enrichment extends Component {
     });
   };
 
-  handleMultisetFiltersVisible = () => {
+  handlemultisetFiltersVisibleEnrichment = () => {
     this.setState(prevState => ({
-      multisetFiltersVisible: !prevState.multisetFiltersVisible,
+      multisetFiltersVisibleEnrichment: !prevState.multisetFiltersVisibleEnrichment,
     }));
   };
 
@@ -451,7 +451,7 @@ class Enrichment extends Component {
     this.setState({
       multisetTestsFilteredOut: [],
       enrichmentColumnsUnfiltered: [],
-      multisetFiltersVisible: false,
+      multisetFiltersVisibleEnrichment: false,
       enrichmentColumns: [],
     });
   };
@@ -545,7 +545,7 @@ class Enrichment extends Component {
 
   handleMultisetPlot = multisetPlotResults => {
     this.setState({
-      multisetPlotInfo: {
+      multisetPlotInfoEnrichment: {
         title: multisetPlotResults.svgInfo.plotType,
         svg: multisetPlotResults.svgInfo.svg,
       },
@@ -2070,7 +2070,12 @@ class Enrichment extends Component {
 
   render() {
     const enrichmentView = this.getView();
-    const { multisetPlotInfo, animation, direction, visible } = this.state;
+    const {
+      multisetPlotInfoEnrichment,
+      animation,
+      direction,
+      visible,
+    } = this.state;
     const {
       tab,
       enrichmentStudy,
@@ -2114,7 +2119,7 @@ class Enrichment extends Component {
         </Grid>
         <div
           className="MultisetSvgOuter"
-          dangerouslySetInnerHTML={{ __html: multisetPlotInfo.svg }}
+          dangerouslySetInnerHTML={{ __html: multisetPlotInfoEnrichment.svg }}
         ></div>
       </Sidebar>
     );
@@ -2146,14 +2151,16 @@ class Enrichment extends Component {
               onDisablePlot={this.disablePlot}
               onGetMultisetPlot={this.handleMultisetPlot}
               onmultisetQueriedEnrichmentnrichment={
-                this.handlemultisetQueriedEnrichmentnrichment
+                this.handleMultisetQueriedEnrichmentnrichment
               }
               onHandlePlotAnimation={this.handlePlotAnimation}
               onHandlePlotTypesEnrichment={this.handlePlotTypesEnrichment}
               onSetStudyModelAnnotationMetadata={
                 this.setStudyModelAnnotationMetadata
               }
-              onHandleMultisetFiltersVisible={this.handleMultisetFiltersVisible}
+              onHandleMultisetFiltersVisibleEnrichment={
+                this.handleMultisetFiltersVisible
+              }
               onSetAnnotationsMetadata={this.setAnnotationsMetadata}
               onHandleNetworkSigValue={this.handleNetworkSigValue}
               onHandleNetworkOperator={this.handleNetworkOperator}
