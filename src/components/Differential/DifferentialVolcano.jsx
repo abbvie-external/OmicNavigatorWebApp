@@ -401,7 +401,7 @@ class DifferentialVolcano extends Component {
     // } else {
     return (
       <div className="PlotInstructions">
-        <h4 className="PlotInstructionsText">{tabsMessage}</h4>
+        <h4 className="PlotInstructionsText NoSelect">{tabsMessage}</h4>
       </div>
     );
     // }
@@ -416,7 +416,7 @@ class DifferentialVolcano extends Component {
       //     volcanoHeightBackup: adjustedSize + 1,
       //   });
       // }
-      const width = parseInt(localStorage.getItem('volcanoWidth'), 10) || 300;
+      const width = parseInt(localStorage.getItem('volcanoWidth'), 10) || 500;
       // on up/down drag, we are forcing a svg resize by change the volcano width by 1
       localStorage.setItem('volcanoWidth', width + 1);
       localStorage.setItem('volcanoHeight', adjustedSize + 1);
@@ -579,7 +579,7 @@ class DifferentialVolcano extends Component {
             icon="labeled"
             vertical="true"
             visible={isItemSelected}
-            width="very wide"
+            // width="very wide"
             className="VerticalSidebarVolcanoView"
           >
             <div className="">
@@ -644,7 +644,7 @@ class DifferentialVolcano extends Component {
                       <Form size={dynamicSize}>
                         <Form.Group inline>
                           <Label
-                            className="VolcanoAxisLabel"
+                            className="VolcanoAxisLabel NoSelect"
                             size={dynamicSize}
                           >
                             X AXIS
@@ -653,7 +653,7 @@ class DifferentialVolcano extends Component {
                             control={Select}
                             // label="X Axis"
                             name="xAxisSelector"
-                            className="axisSelector"
+                            className="axisSelector NoSelect"
                             id="xAxisSelector"
                             value={xAxisLabel}
                             options={axisLables}
@@ -679,7 +679,7 @@ class DifferentialVolcano extends Component {
 
                           {/* <Divider vertical></Divider> */}
                           <Label
-                            className="VolcanoAxisLabel"
+                            className="VolcanoAxisLabel NoSelect"
                             id="VolcanoAxisLabelY"
                             size={dynamicSize}
                           >
@@ -690,7 +690,7 @@ class DifferentialVolcano extends Component {
                             // label="Y Axis"
                             name="yAxisSelector"
                             id="yAxisSelector"
-                            className="axisSelector"
+                            className="axisSelector NoSelect"
                             value={yAxisLabel}
                             options={axisLables}
                             onChange={this.handleDropdownChange.bind(this)}
@@ -793,7 +793,8 @@ class DifferentialVolcano extends Component {
                             className="VolcanoPlotTable"
                             // note, default is 70vh; if you want a specific vh, specify like "40vh"; "auto" lets the height flow based on items per page
                             // height="auto"
-                            height={volcanoPlotsVisible ? '40vh' : '70vh'}
+                            // height={volcanoPlotsVisible ? '40vh' : '70vh'}
+                            height="70vh"
                             data={filteredTableData || []}
                             totalRows={volcanoPlotRows || 0}
                             columnsConfig={differentialColumns}

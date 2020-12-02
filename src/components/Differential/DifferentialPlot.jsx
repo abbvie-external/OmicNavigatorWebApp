@@ -110,7 +110,7 @@ class DifferentialPlot extends Component {
     if (!isProteinSVGLoaded) {
       return (
         // <LoaderActivePlots />
-        <div>
+        <div className="PlotsMetafeaturesDimmer">
           <Dimmer active inverted>
             <Loader size="large">Loading Plots and Feature Data...</Loader>
           </Dimmer>
@@ -147,7 +147,7 @@ class DifferentialPlot extends Component {
                 largeScreen={16}
                 widescreen={16}
               >
-                <div className="">{svgPanes}</div>;
+                <div className="">{svgPanes}</div>
               </Grid.Column>
             </Grid.Row>
           </Grid>

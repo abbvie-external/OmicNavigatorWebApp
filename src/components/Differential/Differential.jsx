@@ -131,16 +131,9 @@ class Differential extends Component {
      */
     let columns = [{}];
     // need this check for page refresh
-    debugger;
-    if (this.props.differentialFeature !== '') {
-      this.setState({
-        isItemSelected: true,
-      });
-    } else {
-      this.setState({
-        isItemSelected: false,
-      });
-    }
+    this.setState({
+      isItemSelected: this.props.differentialFeature !== '',
+    });
     if (searchResults.differentialResults?.length > 0) {
       columns = this.getConfigCols(searchResults);
     }
@@ -785,24 +778,11 @@ class Differential extends Component {
 
   getView = () => {
     const message = this.getMessage();
-    // if (this.state.isItemSelected && !this.state.isProteinSVGLoaded) {
-    //   return <LoaderActivePlots />;
-    // } else
     if (this.state.isSearchingDifferential) {
       return <TransitionActive />;
-      // } else if (this.state.isItemSelected && this.state.isProteinSVGLoaded) {
-      //   return (
-      //     <DifferentialPlot
-      //       {...this.props}
-      //       {...this.state}
-      //       onBackToTable={this.backToTable}
-      //     ></DifferentialPlot>
-      //   );
     } else if (
       this.state.isValidSearchDifferential &&
       !this.state.isSearchingDifferential
-      // &&
-      // !this.state.isItemSelected
     ) {
       return (
         <DifferentialVolcano
