@@ -49,11 +49,11 @@ class Enrichment extends Component {
       title: '',
       svg: [],
     },
-    multisetPlotAvailable: false,
+    multisetPlotAvailableEnrichment: false,
     animation: 'uncover',
     direction: 'left',
     visible: false,
-    plotButtonActive: false,
+    plotButtonActiveEnrichment: false,
     uData: [],
     displayViolinPlot: true,
     // networkDataAvailable: false,
@@ -172,7 +172,7 @@ class Enrichment extends Component {
     enrichmentFeatureIdKey: '',
     // filteredDifferentialFeatureIdKey: '',
     multisetFiltersVisible: false,
-    multisetQueriedE: false,
+    multisetQueriedEnrichment: false,
     reloadPlot: false,
     networkSigValue: '0.05',
     networkOperator: '<',
@@ -358,9 +358,9 @@ class Enrichment extends Component {
     });
   };
 
-  handleMultisetQueriedEnrichment = value => {
+  handlemultisetQueriedEnrichmentnrichment = value => {
     this.setState({
-      multisetQueriedE: value,
+      multisetQueriedEnrichment: value,
     });
   };
 
@@ -433,7 +433,7 @@ class Enrichment extends Component {
       isSearchingEnrichment: false,
       isEnrichmentTableLoading: false,
       isValidSearchEnrichment: true,
-      plotButtonActive: false,
+      plotButtonActiveEnrichment: false,
       visible: false,
       isTestSelected: false,
       isTestDataLoaded: false,
@@ -477,12 +477,12 @@ class Enrichment extends Component {
   handleSearchCriteriaChangeEnrichment = (changes, scChange) => {
     this.props.onHandleUrlChange(changes, 'enrichment');
     this.setState({
-      plotButtonActive: false,
+      plotButtonActiveEnrichment: false,
       visible: false,
     });
     if (scChange) {
       this.setState({
-        multisetPlotAvailable: false,
+        multisetPlotAvailableEnrichment: false,
       });
     }
     if (
@@ -519,7 +519,7 @@ class Enrichment extends Component {
 
   disablePlot = () => {
     this.setState({
-      multisetPlotAvailable: false,
+      multisetPlotAvailableEnrichment: false,
     });
   };
 
@@ -528,8 +528,8 @@ class Enrichment extends Component {
       isTestSelected: false,
       isTestDataLoaded: false,
       isValidSearchEnrichment: false,
-      multisetPlotAvailable: false,
-      plotButtonActive: false,
+      multisetPlotAvailableEnrichment: false,
+      plotButtonActiveEnrichment: false,
       visible: false,
       // displayViolinPlot: false,
     });
@@ -539,7 +539,7 @@ class Enrichment extends Component {
     this.setState(prevState => ({
       animation,
       visible: !prevState.visible,
-      plotButtonActive: !this.state.plotButtonActive,
+      plotButtonActiveEnrichment: !this.state.plotButtonActiveEnrichment,
     }));
   };
 
@@ -549,7 +549,7 @@ class Enrichment extends Component {
         title: multisetPlotResults.svgInfo.plotType,
         svg: multisetPlotResults.svgInfo.svg,
       },
-      multisetPlotAvailable: true,
+      multisetPlotAvailableEnrichment: true,
     });
   };
 
@@ -1810,12 +1810,12 @@ class Enrichment extends Component {
       enrichmentColumns,
       additionalTemplateInfoEnrichmentTable,
       itemsPerPageEnrichmentTable,
-      multisetQueriedE,
+      multisetQueriedEnrichment,
       activeIndexEnrichmentView,
       isEnrichmentTableLoading,
       networkDataError,
     } = this.state;
-    let enrichmentCacheKey = `${enrichmentStudy}-${enrichmentModel}-${enrichmentAnnotation}-${multisetQueriedE}`;
+    let enrichmentCacheKey = `${enrichmentStudy}-${enrichmentModel}-${enrichmentAnnotation}-${multisetQueriedEnrichment}`;
     const TableValuePopupStyle = {
       backgroundColor: '2E2E2E',
       borderBottom: '2px solid var(--color-primary)',
@@ -2144,7 +2144,9 @@ class Enrichment extends Component {
               }
               onDisablePlot={this.disablePlot}
               onGetMultisetPlot={this.handleMultisetPlot}
-              onMultisetQueriedEnrichment={this.handleMultisetQueriedEnrichment}
+              onmultisetQueriedEnrichmentnrichment={
+                this.handlemultisetQueriedEnrichmentnrichment
+              }
               onHandlePlotAnimation={this.handlePlotAnimation}
               onHandlePlotTypesEnrichment={this.handlePlotTypesEnrichment}
               onSetStudyModelAnnotationMetadata={

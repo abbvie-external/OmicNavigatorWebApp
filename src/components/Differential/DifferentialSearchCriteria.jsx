@@ -106,7 +106,7 @@ class DifferentialSearchCriteria extends Component {
     ) {
       this.populateDropdowns();
     }
-    // if (this.props.multisetPlotAvailable !== prevProps.multisetPlotAvailable) {
+    // if (this.props.multisetPlotAvailableDifferential !== prevProps.multisetPlotAvailableDifferential) {
     //   this.forceUpdate();
     // }
   }
@@ -776,8 +776,8 @@ class DifferentialSearchCriteria extends Component {
       differentialModel,
       differentialTest,
       isValidSearchDifferential,
-      multisetPlotAvailable,
-      plotButtonActive,
+      multisetPlotAvailableDifferential,
+      plotButtonActiveDifferential,
     } = this.props;
 
     const StudyPopupStyle = {
@@ -865,17 +865,17 @@ class DifferentialSearchCriteria extends Component {
     if (isValidSearchDifferential) {
       PlotRadio = (
         <Transition
-          visible={!multisetPlotAvailable}
+          visible={!multisetPlotAvailableDifferential}
           animation="flash"
           duration={1500}
         >
           <Radio
             toggle
             label="View Plot"
-            className={multisetPlotAvailable ? 'ViewPlotRadio' : ''}
-            checked={plotButtonActive}
+            className={multisetPlotAvailableDifferential ? 'ViewPlotRadio' : ''}
+            checked={plotButtonActiveDifferential}
             onChange={this.props.onHandlePlotAnimation('uncover')}
-            disabled={!multisetPlotAvailable}
+            disabled={!multisetPlotAvailableDifferential}
           />
         </Transition>
       );

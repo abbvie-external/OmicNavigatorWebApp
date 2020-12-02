@@ -360,12 +360,12 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentStudy,
       enrichmentModel,
       pValueType,
-      onMultisetQueriedEnrichment,
+      onmultisetQueriedEnrichmentnrichment,
       onSearchTransitionEnrichment,
       onSearchCriteriaChangeEnrichment,
     } = this.props;
     onSearchTransitionEnrichment(true);
-    onMultisetQueriedEnrichment(false);
+    onmultisetQueriedEnrichmentnrichment(false);
     const enrichmentAnnotationMeta = this.props.enrichmentAnnotationsMetadata.find(
       annotation => annotation.annotationID === value,
     );
@@ -543,7 +543,7 @@ class EnrichmentSearchCriteria extends Component {
 
       if (this.props.multisetFiltersVisible === false) {
         // on toggle open
-        this.props.onMultisetQueriedEnrichment(true);
+        this.props.onmultisetQueriedEnrichmentnrichment(true);
         this.props.onSearchTransitionEnrichment(true);
         this.props.onHandleMultisetFiltersVisible();
         // this.props.onHandleMultisetFiltersVisible(true);
@@ -558,7 +558,7 @@ class EnrichmentSearchCriteria extends Component {
       } else {
         // on toggle close
         // this.props.onHandleNetworkTests([], []);
-        this.props.onMultisetQueriedEnrichment(false);
+        this.props.onmultisetQueriedEnrichmentnrichment(false);
         this.props.onHandleMultisetFiltersVisible();
         // this.props.onHandleMultisetFiltersVisible(false);
         this.setState({
@@ -579,7 +579,7 @@ class EnrichmentSearchCriteria extends Component {
     cancelRequestEnrichmentMultisetPlot();
     this.props.onHandleMultisetFiltersVisible();
     // this.props.onHandleMultisetFiltersVisible(false);
-    this.props.onMultisetQueriedEnrichment(false);
+    this.props.onmultisetQueriedEnrichmentnrichment(false);
     console.log('Error during getEnrichmentsIntersection');
   };
 
@@ -587,7 +587,7 @@ class EnrichmentSearchCriteria extends Component {
     this.props.onSearchTransitionEnrichment(false);
     this.props.onHandleMultisetFiltersVisible();
     // this.props.onHandleMultisetFiltersVisible(true);
-    this.props.onMultisetQueriedEnrichment(true);
+    this.props.onmultisetQueriedEnrichmentnrichment(true);
     this.setState(
       {
         reloadPlot: true,
@@ -895,8 +895,8 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentAnnotation,
       pValueType,
       isValidSearchEnrichment,
-      multisetPlotAvailable,
-      plotButtonActive,
+      multisetPlotAvailableEnrichment,
+      plotButtonActiveEnrichment,
       isTestDataLoaded,
       multisetFiltersVisible,
     } = this.props;
@@ -981,17 +981,17 @@ class EnrichmentSearchCriteria extends Component {
     if (isValidSearchEnrichment) {
       PlotRadio = (
         <Transition
-          visible={!multisetPlotAvailable}
+          visible={!multisetPlotAvailableEnrichment}
           animation="flash"
           duration={1500}
         >
           <Radio
             toggle
             label="View Plot"
-            className={multisetPlotAvailable ? 'ViewPlotRadio' : ''}
-            checked={plotButtonActive}
+            className={multisetPlotAvailableEnrichment ? 'ViewPlotRadio' : ''}
+            checked={plotButtonActiveEnrichment}
             onChange={this.props.onHandlePlotAnimation('uncover')}
-            disabled={!multisetPlotAvailable}
+            disabled={!multisetPlotAvailableEnrichment}
           />
         </Transition>
       );

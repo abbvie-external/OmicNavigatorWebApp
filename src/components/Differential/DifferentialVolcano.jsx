@@ -488,14 +488,14 @@ class DifferentialVolcano extends Component {
       differentialStudy,
       differentialModel,
       differentialTest,
-      multisetQueriedP,
+      multisetQueriedDifferential,
       tab,
       isItemSelected,
     } = this.props;
     // if (differentialResultsMounted) {
     let differentialVolcanoCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-Volcano`;
-    if (multisetQueriedP) {
-      differentialVolcanoCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-${multisetQueriedP}-Volcano`;
+    if (multisetQueriedDifferential) {
+      differentialVolcanoCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-${multisetQueriedDifferential}-Volcano`;
     }
     const dynamicSize = this.getDynamicSize();
 

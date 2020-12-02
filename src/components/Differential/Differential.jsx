@@ -61,12 +61,12 @@ class Differential extends Component {
       svg: [],
     },
     activeSVGTabIndex: 0,
-    multisetPlotAvailable: false,
+    multisetPlotAvailableDifferential: false,
     animation: 'uncover',
     direction: 'left',
     visible: false,
-    plotButtonActive: false,
-    multisetQueriedP: false,
+    plotButtonActiveDifferential: false,
+    multisetQueriedDifferential: false,
     thresholdColsP: [],
     tabsMessage: 'Select a feature to display plots and data',
     // differentialPlotTypes: [],
@@ -96,7 +96,7 @@ class Differential extends Component {
 
   handleMultisetQueriedDifferential = value => {
     this.setState({
-      multisetQueriedP: value,
+      multisetQueriedDifferential: value,
       // isVolcanoPlotSVGLoaded: !value,
     });
   };
@@ -154,7 +154,7 @@ class Differential extends Component {
       isValidSearchDifferential: true,
       isVolcanoTableLoading: false,
       // differentialResultsMounted: false,
-      plotButtonActive: false,
+      plotButtonActiveDifferential: false,
       visible: false,
       // isItemSVGLoaded: false,
       HighlightedFeaturesArrVolcano: [],
@@ -183,11 +183,11 @@ class Differential extends Component {
     this.props.onHandleUrlChange(changes, 'differential');
     this.setState({
       visible: false,
-      plotButtonActive: false,
+      plotButtonActiveDifferential: false,
     });
     if (scChange) {
       this.setState({
-        multisetPlotAvailable: false,
+        multisetPlotAvailableDifferential: false,
         imageInfo: { key: null, title: '', svg: [] },
         tabsMessage: 'Select a feature to display plots and data',
         // differentialResults: [],
@@ -242,15 +242,15 @@ class Differential extends Component {
 
   disablePlot = () => {
     this.setState({
-      multisetPlotAvailable: false,
+      multisetPlotAvailableDifferential: false,
     });
   };
 
   handleSearchCriteriaResetDifferential = () => {
     this.setState({
       isValidSearchDifferential: false,
-      multisetPlotAvailable: false,
-      plotButtonActive: false,
+      multisetPlotAvailableDifferential: false,
+      plotButtonActiveDifferential: false,
       visible: false,
       isItemSelected: false,
       // differentialResultsMounted: false,
@@ -262,7 +262,7 @@ class Differential extends Component {
     this.setState(prevState => ({
       animation,
       visible: !prevState.visible,
-      plotButtonActive: !prevState.plotButtonActive,
+      plotButtonActiveDifferential: !prevState.plotButtonActiveDifferential,
     }));
   };
 
@@ -272,7 +272,7 @@ class Differential extends Component {
         title: multisetPlotResults.svgInfo.plotType,
         svg: multisetPlotResults.svgInfo.svg,
       },
-      multisetPlotAvailable: true,
+      multisetPlotAvailableDifferential: true,
     });
   };
   getProteinData = (
@@ -556,7 +556,7 @@ class Differential extends Component {
     );
   };
   getConfigCols = testData => {
-    const pepResults = testData.differentialResults;
+    const differentialResultsVar = testData.differentialResults;
     const { differentialFeature } = this.props;
     const {
       resultsLinkouts,
@@ -576,7 +576,7 @@ class Differential extends Component {
     };
     let differentialAlphanumericFields = [];
     let differentialNumericFields = [];
-    const firstObject = pepResults[0];
+    const firstObject = differentialResultsVar[0];
     for (let [key, value] of Object.entries(firstObject)) {
       if (typeof value === 'string' || value instanceof String) {
         differentialAlphanumericFields.push(key);
