@@ -131,6 +131,7 @@ class Differential extends Component {
      */
     let columns = [{}];
     // need this check for page refresh
+    debugger;
     if (this.props.differentialFeature !== '') {
       this.setState({
         isItemSelected: true,
@@ -167,7 +168,8 @@ class Differential extends Component {
       differentialResultsUnfiltered: searchResults.differentialResults,
       isProteinSVGLoaded: false,
       // isProteinDataLoaded: false,
-      isItemSelected: false,
+      // PAUL - why is this set false?
+      // isItemSelected: false,
       HighlightedFeaturesArrVolcano: [],
     });
   };
@@ -276,9 +278,6 @@ class Differential extends Component {
       plotButtonActive: !prevState.plotButtonActive,
     }));
   };
-
-  handleDirectionChange = direction => () =>
-    this.setState({ direction: direction, visible: false });
 
   handleMultisetPlot = multisetPlotResults => {
     this.setState({

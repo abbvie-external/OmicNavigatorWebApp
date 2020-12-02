@@ -30,7 +30,7 @@ class DifferentialVolcano extends Component {
     volcanoHeight: parseInt(localStorage.getItem('volcanoHeight'), 10) || 1,
     volcanoHeightBackup:
       parseInt(localStorage.getItem('volcanoHeightBackup'), 10) || 300,
-    volcanoWidth: parseInt(localStorage.getItem('volcanoWidth'), 10) || 300,
+    volcanoWidth: parseInt(localStorage.getItem('volcanoWidth'), 10) || 500,
     volcanoPlotsVisible:
       JSON.parse(localStorage.getItem('volcanoPlotsVisible')) || false,
     // filteredTableData: [],
@@ -78,13 +78,13 @@ class DifferentialVolcano extends Component {
   // }
 
   componentDidUpdate(prevProps, prevState) {
-    if (prevProps.differentialResults !== this.props.differentialResults) {
+    const { featureToHighlightInDiffTable, differentialResults } = this.props;
+    if (prevProps.differentialResults !== differentialResults) {
       this.setState({
-        filteredTableData: this.props.differentialResults,
-        volcanoPlotRows: this.props.differentialResults.length,
+        filteredTableData: differentialResults,
+        volcanoPlotRows: differentialResults.length,
       });
     }
-    const { featureToHighlightInDiffTable, isItemSelected } = this.props;
     if (
       featureToHighlightInDiffTable !== '' &&
       prevProps.featureToHighlightInDiffTable !== featureToHighlightInDiffTable
@@ -98,9 +98,6 @@ class DifferentialVolcano extends Component {
       ];
       this.props.onHandleSelectedVolcano(featureToHighlightInDiffTableArr);
       this.pageToFeature(featureToHighlightInDiffTable);
-    }
-    if (prevProps.isItemSelected !== isItemSelected) {
-      this.setState({ visible: isItemSelected });
     }
   }
 
@@ -466,17 +463,6 @@ class DifferentialVolcano extends Component {
     localStorage.setItem(`volcanoPlotsVisible`, !volcanoPlotsVisible);
   };
 
-  handlePlotAnimation = animation => () => {
-    this.setState(prevState => ({
-      animation,
-      visible: !prevState.visible,
-      plotButtonActive: !prevState.plotButtonActive,
-    }));
-  };
-
-  handleDirectionChange = direction => () =>
-    this.setState({ direction: direction, visible: false });
-
   render() {
     const {
       filteredTableData,
@@ -504,6 +490,7 @@ class DifferentialVolcano extends Component {
       differentialTest,
       multisetQueriedP,
       tab,
+      isItemSelected,
     } = this.props;
     // if (differentialResultsMounted) {
     let differentialVolcanoCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-Volcano`;
@@ -576,243 +563,6 @@ class DifferentialVolcano extends Component {
       display: 'none',
     };
 
-    const differentialVolcanoView = (
-      <>
-        <span className="VolcanoPlotButton">
-          <Popup
-            trigger={
-              <img
-                src={
-                  volcanoPlotsVisible
-                    ? VolcanoPlotIconSelected
-                    : VolcanoPlotIcon
-                }
-                alt="Volcano Plot"
-                id="VolcanoPlotButton"
-                onClick={this.handleVolcanoVisability}
-              />
-            }
-            style={TableValuePopupStyle}
-            // className="TablePopupValue"
-            content={volcanoPlotsVisible ? 'Hide Charts' : 'Show Charts'}
-            inverted
-            basic
-          />
-        </span>
-        <Grid className="VolcanoPlotGridContainer">
-          <Grid.Row
-            className={
-              volcanoPlotsVisible
-                ? 'Show VolcanoPlotAxisSelectorsRow'
-                : 'Hide VolcanoPlotAxisSelectorsRow'
-            }
-          >
-            <Grid.Column
-              className="EmptyColumn"
-              mobile={2}
-              tablet={4}
-              computer={4}
-              largeScreen={2}
-              widescreen={2}
-            ></Grid.Column>
-            <Grid.Column
-              className="VolcanoPlotFilters"
-              id="xAxisSelector"
-              mobile={14}
-              tablet={12}
-              computer={6}
-              largeScreen={8}
-              widescreen={8}
-            >
-              <Fragment>
-                <Form size={dynamicSize}>
-                  <Form.Group inline>
-                    <Label className="VolcanoAxisLabel" size={dynamicSize}>
-                      X AXIS
-                    </Label>
-                    <Form.Field
-                      control={Select}
-                      // label="X Axis"
-                      name="xAxisSelector"
-                      className="axisSelector"
-                      id="xAxisSelector"
-                      value={xAxisLabel}
-                      options={axisLables}
-                      onChange={this.handleDropdownChange.bind(this)}
-                    ></Form.Field>
-                    <Popup
-                      trigger={
-                        // <Form.Field
-                        //   control={Checkbox}
-                        //   name="xTransformationCheckbox"
-                        //   checked={doXAxisTransformation}
-                        //   onClick={this.handleTransformationChange.bind(this)}
-                        //   disabled={allowXTransformation}
-                        // ></Form.Field>
-                        xAxisTransformBox
-                      }
-                      style={TableValuePopupStyle}
-                      // className="TablePopupValue"
-                      content="-log10 Transform, X Axis"
-                      inverted
-                      basic
-                    />
-
-                    {/* <Divider vertical></Divider> */}
-                    <Label
-                      className="VolcanoAxisLabel"
-                      id="VolcanoAxisLabelY"
-                      size={dynamicSize}
-                    >
-                      Y AXIS
-                    </Label>
-                    <Form.Field
-                      control={Select}
-                      // label="Y Axis"
-                      name="yAxisSelector"
-                      id="yAxisSelector"
-                      className="axisSelector"
-                      value={yAxisLabel}
-                      options={axisLables}
-                      onChange={this.handleDropdownChange.bind(this)}
-                    ></Form.Field>
-                    {/* <span title="-log10 Transform"> */}
-                    <Popup
-                      trigger={
-                        // <Form.Field
-                        //   control={Checkbox}
-                        //   name="yTransformationCheckbox"
-                        //   checked={doYAxisTransformation}
-                        //   onClick={this.handleTransformationChange.bind(this)}
-                        //   disabled={allowYTransformation}
-                        // ></Form.Field>
-                        yAxisTransformBox
-                      }
-                      style={TableValuePopupStyle}
-                      // className="TablePopupValue"
-                      content="-log10 Transform, Y Axis"
-                      inverted
-                      basic
-                    />
-                  </Form.Group>
-                </Form>
-              </Fragment>
-            </Grid.Column>
-          </Grid.Row>
-          <Grid.Row id="VolcanoViewRow">
-            <Grid.Column>
-              <SplitPane
-                split="horizontal"
-                className="VolcanoSplitPane"
-                id=""
-                resizerStyle={
-                  !volcanoPlotsVisible ? hiddenResizerStyle : resizerStyle
-                }
-                // defaultSize={this.state.volcanoHeight * 1.05263157895}
-                size={volcanoPlotsVisible ? volcanoHeight * 1.05263157895 : 0}
-                minSize={220}
-                maxSize={1000}
-                onDragFinished={size => this.onSizeChange(size, 'horizontal')}
-              >
-                <SplitPane
-                  split="vertical"
-                  className={
-                    volcanoPlotsVisible
-                      ? 'Show VolcanoSplitPane'
-                      : 'Hide VolcanoSplitPane'
-                  }
-                  // defaultSize={this.state.volcanoWidth * 1.05263157895}
-                  size={volcanoWidth * 1.05263157895}
-                  minSize={300}
-                  maxSize={1500}
-                  onDragFinished={size => this.onSizeChange(size, 'vertical')}
-                >
-                  <DifferentialVolcanoPlot
-                    ref={this.differentialVolcanoPlotRef}
-                    {...this.state}
-                    {...this.props}
-                    handleVolcanoPlotSelectionChange={
-                      this.handleVolcanoPlotSelectionChange
-                    }
-                    getMaxAndMin={this.getMaxAndMin}
-                    onHandleDotClick={this.handleDotClick}
-                  ></DifferentialVolcanoPlot>
-                  {svgPlot}
-                </SplitPane>
-                <Grid.Row>
-                  <div className="FloatRight AbsoluteExportDifferential">
-                    <ButtonActions
-                      excelVisible={true}
-                      pngVisible={false}
-                      pdfVisible={false}
-                      svgVisible={false}
-                      txtVisible={true}
-                      refFwd={this.volcanoPlotFilteredGridRef}
-                      exportButtonSize={'small'}
-                      tab={tab}
-                      study={differentialStudy}
-                      model={differentialModel}
-                      test={differentialTest}
-                    />
-                  </div>
-                  <Grid.Column
-                    className="ResultsTableWrapper"
-                    mobile={16}
-                    tablet={16}
-                    largeScreen={16}
-                    widescreen={16}
-                  >
-                    <EZGrid
-                      ref={this.volcanoPlotFilteredGridRef}
-                      uniqueCacheKey={differentialVolcanoCacheKey}
-                      className="VolcanoPlotTable"
-                      // note, default is 70vh; if you want a specific vh, specify like "40vh"; "auto" lets the height flow based on items per page
-                      // height="auto"
-                      height={volcanoPlotsVisible ? '40vh' : '70vh'}
-                      data={filteredTableData || []}
-                      totalRows={volcanoPlotRows || 0}
-                      columnsConfig={differentialColumns}
-                      itemsPerPage={itemsPerPageVolcanoTable}
-                      // onInformItemsPerPage={this.informItemsPerPageVolcanoTable}
-                      // disableGeneralSearch
-                      disableGrouping
-                      disableColumnVisibilityToggle
-                      // exportBaseName="VolcanoPlot_Filtered_Results"
-                      loading={isVolcanoTableLoading}
-                      additionalTemplateInfo={
-                        additionalTemplateInfoDifferentialTable
-                      }
-                      onRowClick={this.handleRowClick}
-                      rowLevelPropsCalc={this.rowLevelPropsCalc}
-                      emptyMessage={CustomEmptyMessage}
-                    />
-                  </Grid.Column>
-                </Grid.Row>
-              </SplitPane>
-            </Grid.Column>
-          </Grid.Row>
-        </Grid>
-      </>
-    );
-
-    const { animation, direction, visible } = this.state;
-    const VerticalSidebar = ({ animation, visible }) => (
-      <Sidebar
-        as={'span'}
-        animation={animation}
-        direction={direction}
-        icon="labeled"
-        vertical="true"
-        visible={visible}
-        width="very wide"
-        className="VerticalSidebarVolcanoView"
-      >
-        <div className="">
-          <DifferentialPlot {...this.props} {...this.state}></DifferentialPlot>
-        </div>
-      </Sidebar>
-    );
-
     return (
       <Grid.Column
         className=""
@@ -821,18 +571,252 @@ class DifferentialVolcano extends Component {
         largeScreen={12}
         widescreen={12}
       >
-        <Sidebar.Pushable as={'span'}>
-          <VerticalSidebar
-            animation={animation}
-            direction={direction}
-            visible={visible}
-          />
+        <Sidebar.Pushable as={'div'}>
+          <Sidebar
+            as={'div'}
+            animation="overlay"
+            direction="right"
+            icon="labeled"
+            vertical="true"
+            visible={isItemSelected}
+            width="very wide"
+            className="VerticalSidebarVolcanoView"
+          >
+            <div className="">
+              <DifferentialPlot
+                {...this.props}
+                {...this.state}
+              ></DifferentialPlot>
+            </div>
+          </Sidebar>
           <Sidebar.Pusher>
             <div
             // className="DifferentialVolcanoViewContainer"
             // ref={this.differentialVolcanoViewContainerRef}
             >
-              {differentialVolcanoView}
+              <span className="VolcanoPlotButton">
+                <Popup
+                  trigger={
+                    <img
+                      src={
+                        volcanoPlotsVisible
+                          ? VolcanoPlotIconSelected
+                          : VolcanoPlotIcon
+                      }
+                      alt="Volcano Plot"
+                      id="VolcanoPlotButton"
+                      onClick={this.handleVolcanoVisability}
+                    />
+                  }
+                  style={TableValuePopupStyle}
+                  // className="TablePopupValue"
+                  content={volcanoPlotsVisible ? 'Hide Charts' : 'Show Charts'}
+                  inverted
+                  basic
+                />
+              </span>
+              <Grid className="VolcanoPlotGridContainer">
+                <Grid.Row
+                  className={
+                    volcanoPlotsVisible
+                      ? 'Show VolcanoPlotAxisSelectorsRow'
+                      : 'Hide VolcanoPlotAxisSelectorsRow'
+                  }
+                >
+                  <Grid.Column
+                    className="EmptyColumn"
+                    mobile={2}
+                    tablet={4}
+                    computer={4}
+                    largeScreen={2}
+                    widescreen={2}
+                  ></Grid.Column>
+                  <Grid.Column
+                    className="VolcanoPlotFilters"
+                    id="xAxisSelector"
+                    mobile={14}
+                    tablet={12}
+                    computer={6}
+                    largeScreen={8}
+                    widescreen={8}
+                  >
+                    <Fragment>
+                      <Form size={dynamicSize}>
+                        <Form.Group inline>
+                          <Label
+                            className="VolcanoAxisLabel"
+                            size={dynamicSize}
+                          >
+                            X AXIS
+                          </Label>
+                          <Form.Field
+                            control={Select}
+                            // label="X Axis"
+                            name="xAxisSelector"
+                            className="axisSelector"
+                            id="xAxisSelector"
+                            value={xAxisLabel}
+                            options={axisLables}
+                            onChange={this.handleDropdownChange.bind(this)}
+                          ></Form.Field>
+                          <Popup
+                            trigger={
+                              // <Form.Field
+                              //   control={Checkbox}
+                              //   name="xTransformationCheckbox"
+                              //   checked={doXAxisTransformation}
+                              //   onClick={this.handleTransformationChange.bind(this)}
+                              //   disabled={allowXTransformation}
+                              // ></Form.Field>
+                              xAxisTransformBox
+                            }
+                            style={TableValuePopupStyle}
+                            // className="TablePopupValue"
+                            content="-log10 Transform, X Axis"
+                            inverted
+                            basic
+                          />
+
+                          {/* <Divider vertical></Divider> */}
+                          <Label
+                            className="VolcanoAxisLabel"
+                            id="VolcanoAxisLabelY"
+                            size={dynamicSize}
+                          >
+                            Y AXIS
+                          </Label>
+                          <Form.Field
+                            control={Select}
+                            // label="Y Axis"
+                            name="yAxisSelector"
+                            id="yAxisSelector"
+                            className="axisSelector"
+                            value={yAxisLabel}
+                            options={axisLables}
+                            onChange={this.handleDropdownChange.bind(this)}
+                          ></Form.Field>
+                          {/* <span title="-log10 Transform"> */}
+                          <Popup
+                            trigger={
+                              // <Form.Field
+                              //   control={Checkbox}
+                              //   name="yTransformationCheckbox"
+                              //   checked={doYAxisTransformation}
+                              //   onClick={this.handleTransformationChange.bind(this)}
+                              //   disabled={allowYTransformation}
+                              // ></Form.Field>
+                              yAxisTransformBox
+                            }
+                            style={TableValuePopupStyle}
+                            // className="TablePopupValue"
+                            content="-log10 Transform, Y Axis"
+                            inverted
+                            basic
+                          />
+                        </Form.Group>
+                      </Form>
+                    </Fragment>
+                  </Grid.Column>
+                </Grid.Row>
+                <Grid.Row id="VolcanoViewRow">
+                  <Grid.Column>
+                    <SplitPane
+                      split="horizontal"
+                      className="VolcanoSplitPane"
+                      id=""
+                      resizerStyle={
+                        !volcanoPlotsVisible ? hiddenResizerStyle : resizerStyle
+                      }
+                      // defaultSize={this.state.volcanoHeight * 1.05263157895}
+                      size={
+                        volcanoPlotsVisible ? volcanoHeight * 1.05263157895 : 0
+                      }
+                      minSize={220}
+                      maxSize={1000}
+                      onDragFinished={size =>
+                        this.onSizeChange(size, 'horizontal')
+                      }
+                    >
+                      <SplitPane
+                        split="vertical"
+                        className={
+                          volcanoPlotsVisible
+                            ? 'Show VolcanoSplitPane'
+                            : 'Hide VolcanoSplitPane'
+                        }
+                        // defaultSize={this.state.volcanoWidth * 1.05263157895}
+                        size={volcanoWidth * 1.05263157895}
+                        minSize={300}
+                        maxSize={1500}
+                        onDragFinished={size =>
+                          this.onSizeChange(size, 'vertical')
+                        }
+                      >
+                        <DifferentialVolcanoPlot
+                          ref={this.differentialVolcanoPlotRef}
+                          {...this.state}
+                          {...this.props}
+                          handleVolcanoPlotSelectionChange={
+                            this.handleVolcanoPlotSelectionChange
+                          }
+                          getMaxAndMin={this.getMaxAndMin}
+                          onHandleDotClick={this.handleDotClick}
+                        ></DifferentialVolcanoPlot>
+                        {svgPlot}
+                      </SplitPane>
+                      <Grid.Row>
+                        <div className="FloatRight AbsoluteExportDifferential">
+                          <ButtonActions
+                            excelVisible={true}
+                            pngVisible={false}
+                            pdfVisible={false}
+                            svgVisible={false}
+                            txtVisible={true}
+                            refFwd={this.volcanoPlotFilteredGridRef}
+                            exportButtonSize={'small'}
+                            tab={tab}
+                            study={differentialStudy}
+                            model={differentialModel}
+                            test={differentialTest}
+                          />
+                        </div>
+                        <Grid.Column
+                          className="ResultsTableWrapper"
+                          mobile={16}
+                          tablet={16}
+                          largeScreen={16}
+                          widescreen={16}
+                        >
+                          <EZGrid
+                            ref={this.volcanoPlotFilteredGridRef}
+                            uniqueCacheKey={differentialVolcanoCacheKey}
+                            className="VolcanoPlotTable"
+                            // note, default is 70vh; if you want a specific vh, specify like "40vh"; "auto" lets the height flow based on items per page
+                            // height="auto"
+                            height={volcanoPlotsVisible ? '40vh' : '70vh'}
+                            data={filteredTableData || []}
+                            totalRows={volcanoPlotRows || 0}
+                            columnsConfig={differentialColumns}
+                            itemsPerPage={itemsPerPageVolcanoTable}
+                            // onInformItemsPerPage={this.informItemsPerPageVolcanoTable}
+                            // disableGeneralSearch
+                            disableGrouping
+                            disableColumnVisibilityToggle
+                            // exportBaseName="VolcanoPlot_Filtered_Results"
+                            loading={isVolcanoTableLoading}
+                            additionalTemplateInfo={
+                              additionalTemplateInfoDifferentialTable
+                            }
+                            onRowClick={this.handleRowClick}
+                            rowLevelPropsCalc={this.rowLevelPropsCalc}
+                            emptyMessage={CustomEmptyMessage}
+                          />
+                        </Grid.Column>
+                      </Grid.Row>
+                    </SplitPane>
+                  </Grid.Column>
+                </Grid.Row>
+              </Grid>
             </div>
           </Sidebar.Pusher>
         </Sidebar.Pushable>

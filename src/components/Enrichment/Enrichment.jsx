@@ -543,9 +543,6 @@ class Enrichment extends Component {
     }));
   };
 
-  handleDirectionChange = direction => () =>
-    this.setState({ direction: direction, visible: false });
-
   handleMultisetPlot = multisetPlotResults => {
     this.setState({
       multisetPlotInfo: {

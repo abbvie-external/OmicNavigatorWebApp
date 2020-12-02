@@ -114,7 +114,7 @@ class OmicNavigatorService {
       null,
       null,
       null,
-      15000,
+      25000,
     );
     const versionFromPromise = await promise;
     return versionFromPromise;
@@ -129,7 +129,7 @@ class OmicNavigatorService {
       errorCb,
       null,
       false,
-      15000,
+      25000,
     );
     const dataFromPromise = await promise;
     return dataFromPromise;
@@ -137,7 +137,7 @@ class OmicNavigatorService {
 
   async listStudies() {
     this.setUrl();
-    const promise = this.ocpuRPCUnbox('listStudies', {}, 15000);
+    const promise = this.ocpuRPCUnbox('listStudies', {}, 25000);
     const studiesFromPromise = await promise;
     return studiesFromPromise;
   }
@@ -151,7 +151,7 @@ class OmicNavigatorService {
       errorCb,
       cancelToken,
       true,
-      15000,
+      25000,
     );
     const dataFromPromise = await promise;
     return dataFromPromise;
@@ -179,7 +179,7 @@ class OmicNavigatorService {
       errorCb,
       cancelToken,
       true,
-      15000,
+      25000,
     );
     const dataFromPromise = await promise;
     return dataFromPromise;
@@ -205,7 +205,7 @@ class OmicNavigatorService {
     const promise = this.ocpuRPCUnbox(
       'sitedata',
       { idmult: id, study: study },
-      15000,
+      25000,
       errorCb,
     );
     const siteDataFromPromise = await promise;
@@ -216,7 +216,7 @@ class OmicNavigatorService {
     const promise = this.ocpuRPCUnbox(
       'proteindata',
       { id: id, study: study },
-      15000,
+      25000,
       errorCb,
     );
     const proteinDataFromPromise = await promise;
@@ -233,7 +233,7 @@ class OmicNavigatorService {
             .get(session.getLoc() + 'graphics/1/svg', {
               responseType: 'text',
               cancelToken,
-              timeout: 15000,
+              timeout: 25000,
             })
             .then(response => resolve(response))
             .catch(function(thrown) {
@@ -281,7 +281,7 @@ class OmicNavigatorService {
       null,
       null,
       false,
-      15000,
+      25000,
     );
     const dataFromPromise = await promise;
     return dataFromPromise;
@@ -309,7 +309,7 @@ class OmicNavigatorService {
       errorCb,
       cancelToken,
       false,
-      15000,
+      25000,
     );
     const dataFromPromise = await promise;
     return dataFromPromise;
@@ -343,7 +343,7 @@ class OmicNavigatorService {
       errorCb,
       cancelToken,
       true,
-      15000,
+      25000,
     );
     const dataFromPromise = await promise;
     return dataFromPromise;
@@ -407,7 +407,7 @@ class OmicNavigatorService {
       errorCb,
       cancelToken,
       true,
-      15000,
+      25000,
     );
     const dataFromPromise = await promise;
     return dataFromPromise;
@@ -480,7 +480,7 @@ class OmicNavigatorService {
       errorCb,
       cancelToken,
       false,
-      15000,
+      25000,
     );
     const featuresFromPromise = await promise;
     return featuresFromPromise;
@@ -506,7 +506,7 @@ class OmicNavigatorService {
       errorCb,
       cancelToken,
       false,
-      15000,
+      25000,
     );
     const featuresFromPromise = await promise;
     return featuresFromPromise;
@@ -520,7 +520,7 @@ class OmicNavigatorService {
         study: differentialStudy,
         model: differentialModel,
       },
-      15000,
+      25000,
       null,
     );
     const nodesFromPromise = await promise;
@@ -541,7 +541,7 @@ class OmicNavigatorService {
         model: differentialModel,
         featureID: feature,
       },
-      15000,
+      25000,
       errorCb,
     );
     const nodesFromPromise = await promise;
@@ -556,7 +556,7 @@ class OmicNavigatorService {
         study: differentialStudy,
         modelID: differentialModel,
       },
-      15000,
+      25000,
       null,
     );
     const nodesFromPromise = await promise;
@@ -571,7 +571,7 @@ class OmicNavigatorService {
         study: enrichmentStudy,
         annotationID: enrichmentAnnotation,
       },
-      15000,
+      25000,
       null,
     );
     const nodesFromPromise = await promise;
