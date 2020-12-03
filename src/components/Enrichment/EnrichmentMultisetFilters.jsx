@@ -42,10 +42,11 @@ class EnrichmentMultisetFilters extends Component {
       sigValue,
       selectedCol,
       selectedOperator,
-      multisetFiltersVisible,
+      multisetFiltersVisibleEnrichment,
     } = this.props;
     if (
-      multisetFiltersVisible !== prevProps.multisetFiltersVisible ||
+      multisetFiltersVisibleEnrichment !==
+        prevProps.multisetFiltersVisibleEnrichment ||
       uData !== prevProps.uData ||
       uAnchor !== prevProps.uAnchor ||
       uSettings !== prevProps.uSettings ||
@@ -76,7 +77,7 @@ class EnrichmentMultisetFilters extends Component {
     selectedCol,
     selectedOperator,
   ) {
-    if (this.props.multisetFiltersVisible) {
+    if (this.props.multisetFiltersVisibleEnrichment) {
       d3.selectAll('#multiset-query')
         .selectAll('*')
         .remove();
@@ -978,7 +979,7 @@ class EnrichmentMultisetFilters extends Component {
       this.props.pValueType === 'nominal'
         ? 'Nominal P Value'
         : 'Adjusted P Value';
-    if (this.props.multisetFiltersVisible) {
+    if (this.props.multisetFiltersVisibleEnrichment) {
       return (
         <Fragment>
           <Form className="MultisetDropdownContainer">

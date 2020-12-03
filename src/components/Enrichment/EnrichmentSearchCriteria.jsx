@@ -122,7 +122,7 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentAnnotation,
       pValueType,
       enrichmentTestAndDescription,
-      onSearchCriteriaChange,
+      onSearchCriteriaChangeEnrichment,
       onSearchTransitionEnrichment,
       onGetEnrichmentsLinkouts,
     } = this.props;
@@ -218,7 +218,7 @@ class EnrichmentSearchCriteria extends Component {
             .catch(error => {
               console.error('Error during getEnrichmentsTable', error);
             });
-          onSearchCriteriaChange(
+          onSearchCriteriaChangeEnrichment(
             {
               enrichmentStudy: enrichmentStudy,
               enrichmentModel: enrichmentModel,
@@ -279,8 +279,11 @@ class EnrichmentSearchCriteria extends Component {
   };
 
   handleStudyChange = (evt, { name, value }) => {
-    const { onSearchCriteriaChange, onSearchCriteriaReset } = this.props;
-    onSearchCriteriaChange(
+    const {
+      onSearchCriteriaChangeEnrichment,
+      onSearchCriteriaResetEnrichment,
+    } = this.props;
+    onSearchCriteriaChangeEnrichment(
       {
         [name]: value,
         enrichmentModel: '',
@@ -289,7 +292,7 @@ class EnrichmentSearchCriteria extends Component {
       },
       true,
     );
-    onSearchCriteriaReset({
+    onSearchCriteriaResetEnrichment({
       isValidSearchEnrichment: false,
     });
     this.setState({
@@ -305,13 +308,13 @@ class EnrichmentSearchCriteria extends Component {
   handleModelChange = (evt, { name, value }) => {
     const {
       enrichmentStudy,
-      onSearchCriteriaChange,
-      onSearchCriteriaReset,
+      onSearchCriteriaChangeEnrichment,
+      onSearchCriteriaResetEnrichment,
       enrichmentModelsAndAnnotations,
     } = this.props;
     this.props.onHandleHasBarcodeData();
     this.props.onHandlePlotTypesEnrichment(value);
-    onSearchCriteriaChange(
+    onSearchCriteriaChangeEnrichment(
       {
         enrichmentStudy: enrichmentStudy,
         [name]: value,
@@ -320,7 +323,7 @@ class EnrichmentSearchCriteria extends Component {
       },
       true,
     );
-    onSearchCriteriaReset({
+    onSearchCriteriaResetEnrichment({
       isValidSearchEnrichment: false,
     });
     const enrichmentModelsAndAnnotationsCopy = [
@@ -357,12 +360,12 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentStudy,
       enrichmentModel,
       pValueType,
-      onMultisetQueriedE,
+      onmultisetQueriedEnrichmentnrichment,
       onSearchTransitionEnrichment,
-      onSearchCriteriaChange,
+      onSearchCriteriaChangeEnrichment,
     } = this.props;
     onSearchTransitionEnrichment(true);
-    onMultisetQueriedE(false);
+    onmultisetQueriedEnrichmentnrichment(false);
     const enrichmentAnnotationMeta = this.props.enrichmentAnnotationsMetadata.find(
       annotation => annotation.annotationID === value,
     );
@@ -373,7 +376,7 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentAnnotationTooltip,
       reloadPlot: true,
     });
-    onSearchCriteriaChange(
+    onSearchCriteriaChangeEnrichment(
       {
         enrichmentStudy: enrichmentStudy,
         enrichmentModel: enrichmentModel,
@@ -453,12 +456,12 @@ class EnrichmentSearchCriteria extends Component {
       onEnrichmentSearch,
       onPValueTypeChange,
       onHandleEnrichmentTableLoading,
-      multisetFiltersVisible,
+      multisetFiltersVisibleEnrichment,
     } = this.props;
     onSearchTransitionEnrichment(true);
     onHandleEnrichmentTableLoading(true);
     onPValueTypeChange(value);
-    if (!multisetFiltersVisible) {
+    if (!multisetFiltersVisibleEnrichment) {
       cancelGetEnrichmentsTable();
       let cancelToken = new CancelToken(e => {
         cancelGetEnrichmentsTable = e;
@@ -534,16 +537,16 @@ class EnrichmentSearchCriteria extends Component {
     }
   };
 
-  handleMultisetToggle = () => {
+  handleMultisetToggleEnrichment = () => {
     return evt => {
       this.props.onHandleNetworkGraphReady(false);
 
-      if (this.props.multisetFiltersVisible === false) {
+      if (this.props.multisetFiltersVisibleEnrichment === false) {
         // on toggle open
-        this.props.onMultisetQueriedE(true);
+        this.props.onmultisetQueriedEnrichmentnrichment(true);
         this.props.onSearchTransitionEnrichment(true);
-        this.props.onHandleMultisetFiltersVisible();
-        // this.props.onHandleMultisetFiltersVisible(true);
+        this.props.onHandleMultisetFiltersVisibleEnrichment();
+        // this.props.onHandleMultisetFiltersVisibleEnrichment(true);
         this.setState(
           {
             reloadPlot: true,
@@ -555,9 +558,9 @@ class EnrichmentSearchCriteria extends Component {
       } else {
         // on toggle close
         // this.props.onHandleNetworkTests([], []);
-        this.props.onMultisetQueriedE(false);
-        this.props.onHandleMultisetFiltersVisible();
-        // this.props.onHandleMultisetFiltersVisible(false);
+        this.props.onmultisetQueriedEnrichmentnrichment(false);
+        this.props.onHandleMultisetFiltersVisibleEnrichment();
+        // this.props.onHandleMultisetFiltersVisibleEnrichment(false);
         this.setState({
           reloadPlot: false,
           initialRenderE: true,
@@ -572,19 +575,19 @@ class EnrichmentSearchCriteria extends Component {
     };
   };
 
-  handleMultisetEOpenError = () => {
+  handleMultisetOpenErrorEnrichment = () => {
     cancelRequestEnrichmentMultisetPlot();
-    this.props.onHandleMultisetFiltersVisible();
-    // this.props.onHandleMultisetFiltersVisible(false);
-    this.props.onMultisetQueriedE(false);
+    this.props.onHandleMultisetFiltersVisibleEnrichment();
+    // this.props.onHandleMultisetFiltersVisibleEnrichment(false);
+    this.props.onmultisetQueriedEnrichmentnrichment(false);
     console.log('Error during getEnrichmentsIntersection');
   };
 
   handleMultisetECloseError = () => {
     this.props.onSearchTransitionEnrichment(false);
-    this.props.onHandleMultisetFiltersVisible();
-    // this.props.onHandleMultisetFiltersVisible(true);
-    this.props.onMultisetQueriedE(true);
+    this.props.onHandleMultisetFiltersVisibleEnrichment();
+    // this.props.onHandleMultisetFiltersVisibleEnrichment(true);
+    this.props.onmultisetQueriedEnrichmentnrichment(true);
     this.setState(
       {
         reloadPlot: true,
@@ -600,9 +603,9 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentModel,
       pValueType,
       onSearchTransitionEnrichment,
-      onSearchCriteriaChange,
+      onSearchCriteriaChangeEnrichment,
     } = this.props;
-    onSearchCriteriaChange(
+    onSearchCriteriaChangeEnrichment(
       {
         enrichmentStudy: enrichmentStudy,
         enrichmentModel: enrichmentModel,
@@ -737,12 +740,12 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentAnnotation,
       pValueType,
       onEnrichmentSearch,
-      onDisablePlot,
+      onDisablePlotEnrichment,
       tests,
     } = this.props;
     const { selectedOperator, reloadPlot, sigValue } = this.state;
     if (reloadPlot) {
-      onDisablePlot();
+      onDisablePlotEnrichment();
     }
     const eMust = this.state.uSettings.must;
     const eNot = this.state.uSettings.not;
@@ -760,7 +763,7 @@ class EnrichmentSearchCriteria extends Component {
         sigValue,
         this.jsonToList(selectedOperator),
         pValueType,
-        this.handleMultisetEOpenError,
+        this.handleMultisetOpenErrorEnrichment,
         cancelToken,
       )
       .then(annotationData => {
@@ -861,7 +864,7 @@ class EnrichmentSearchCriteria extends Component {
           });
           let svgInfo = { plotType: 'Multiset', svg: sanitizedSVG };
           // let svgInfo = { plotType: 'Multiset', svg: svgMarkup };
-          this.props.onGetMultisetPlot({
+          this.props.onGetMultisetPlotEnrichment({
             svgInfo,
           });
         })
@@ -892,10 +895,10 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentAnnotation,
       pValueType,
       isValidSearchEnrichment,
-      multisetPlotAvailable,
-      plotButtonActive,
+      multisetPlotAvailableEnrichment,
+      plotButtonActiveEnrichment,
       isTestDataLoaded,
-      multisetFiltersVisible,
+      multisetFiltersVisibleEnrichment,
     } = this.props;
 
     const StudyPopupStyle = {
@@ -955,7 +958,7 @@ class EnrichmentSearchCriteria extends Component {
     if (
       isValidSearchEnrichment //&&
       // activateMultisetFilters &&
-      //multisetFiltersVisible
+      //multisetFiltersVisibleEnrichment
     ) {
       EMultisetFilters = (
         <EnrichmentMultisetFilters
@@ -978,17 +981,17 @@ class EnrichmentSearchCriteria extends Component {
     if (isValidSearchEnrichment) {
       PlotRadio = (
         <Transition
-          visible={!multisetPlotAvailable}
+          visible={!multisetPlotAvailableEnrichment}
           animation="flash"
           duration={1500}
         >
           <Radio
             toggle
             label="View Plot"
-            className={multisetPlotAvailable ? 'ViewPlotRadio' : ''}
-            checked={plotButtonActive}
+            className={multisetPlotAvailableEnrichment ? 'ViewPlotRadio' : ''}
+            checked={plotButtonActiveEnrichment}
             onChange={this.props.onHandlePlotAnimation('uncover')}
-            disabled={!multisetPlotAvailable}
+            disabled={!multisetPlotAvailableEnrichment}
           />
         </Transition>
       );
@@ -998,8 +1001,8 @@ class EnrichmentSearchCriteria extends Component {
           <Radio
             toggle
             label="Set Analysis"
-            checked={multisetFiltersVisible}
-            onChange={this.handleMultisetToggle()}
+            checked={multisetFiltersVisibleEnrichment}
+            onChange={this.handleMultisetToggleEnrichment()}
           />
         </React.Fragment>
       );
@@ -1085,38 +1088,40 @@ class EnrichmentSearchCriteria extends Component {
             mouseEnterDelay={1000}
             mouseLeaveDelay={0}
           />
-          <label
-            className={
-              enrichmentAnnotationsDisabled ? 'greyText' : 'normalText'
-            }
-          >
-            P Values
-          </label>
-          <Button.Group className="PValueTypeContainer" size="small">
-            <Button
-              type="button"
-              className="pValueButton"
-              value="nominal"
-              name="nominal"
-              positive={pValueType === 'nominal'}
-              onClick={this.handlePValueTypeChange}
-              disabled={enrichmentAnnotationsDisabled}
+          <span className={!isTestDataLoaded ? 'ShowBlock' : 'Hide'}>
+            <label
+              className={
+                enrichmentAnnotationsDisabled ? 'greyText' : 'normalText'
+              }
             >
-              Nominal
-            </Button>
-            <Button.Or className="OrCircle" />
-            <Button
-              type="button"
-              className="pValueButton"
-              value="adjusted"
-              name="adjusted"
-              positive={pValueType === 'adjusted'}
-              onClick={this.handlePValueTypeChange}
-              disabled={enrichmentAnnotationsDisabled}
-            >
-              Adjusted
-            </Button>
-          </Button.Group>
+              P Values
+            </label>
+            <Button.Group className="PValueTypeContainer" size="small">
+              <Button
+                type="button"
+                className="pValueButton"
+                value="nominal"
+                name="nominal"
+                positive={pValueType === 'nominal'}
+                onClick={this.handlePValueTypeChange}
+                disabled={enrichmentAnnotationsDisabled}
+              >
+                Nominal
+              </Button>
+              <Button.Or className="OrCircle" />
+              <Button
+                type="button"
+                className="pValueButton"
+                value="adjusted"
+                name="adjusted"
+                positive={pValueType === 'adjusted'}
+                onClick={this.handlePValueTypeChange}
+                disabled={enrichmentAnnotationsDisabled}
+              >
+                Adjusted
+              </Button>
+            </Button.Group>
+          </span>
         </Form>
         <div
           className={

@@ -4,14 +4,15 @@ import { Grid, Dimmer, Loader, Tab } from 'semantic-ui-react';
 import DifferentialBreadcrumbs from './DifferentialBreadcrumbs';
 import ButtonActions from '../Shared/ButtonActions';
 import MetafeaturesTable from './MetafeaturesTable';
+// import LoaderActivePlots from '../Transitions/LoaderActivePlots';
 import '../Enrichment/SplitPanesContainer.scss';
 import '../Shared/SVGPlot.scss';
 import './DifferentialPlot.scss';
 
 class DifferentialPlot extends Component {
   static defaultProps = {
-    // isProteinDataLoaded: false,
-    // isProteinSVGLoaded: true,
+    // isItemDatatLoaded: false,
+    // isItemSVGLoaded: true,
   };
 
   state = {
@@ -58,8 +59,8 @@ class DifferentialPlot extends Component {
 
   getSVGPanes(activeDifferentialPlotTabsIndex) {
     let panes = [];
-    if (this.props.imageInfo.length !== 0) {
-      const svgArray = this.props.imageInfo.svg;
+    if (this.props.imageInfoDifferential.length !== 0) {
+      const svgArray = this.props.imageInfoDifferential.svg;
       // const svgArrayReversed = svgArray.reverse();
       const svgPanes = svgArray.map(s => {
         return {
@@ -83,7 +84,9 @@ class DifferentialPlot extends Component {
           menuItem: 'Feature Data',
           render: () => (
             <Tab.Pane attached="true" as="div">
-              <MetafeaturesTable {...this.state} {...this.props} />
+              <MetafeaturesTable
+                metaFeaturesData={this.props.metaFeaturesDataDifferential}
+              />
             </Tab.Pane>
           ),
         },
@@ -103,14 +106,15 @@ class DifferentialPlot extends Component {
   render() {
     // const { activeDifferentialPlotTabsIndex } = this.state;
     const { excelFlag, pngFlag, pdfFlag, svgFlag } = this.state;
-    const { isProteinSVGLoaded, imageInfo } = this.props;
+    const { isItemSVGLoaded, imageInfoDifferential } = this.props;
     const { activeDifferentialPlotTabsIndex } = this.state;
     const svgPanes = this.getSVGPanes(activeDifferentialPlotTabsIndex);
-    if (!isProteinSVGLoaded) {
+    if (!isItemSVGLoaded) {
       return (
-        <div>
+        // <LoaderActivePlots />
+        <div className="PlotsMetafeaturesDimmer">
           <Dimmer active inverted>
-            <Loader size="large">Loading Plots...</Loader>
+            <Loader size="large">Loading Plots and Feature Data...</Loader>
           </Dimmer>
         </div>
       );
@@ -124,13 +128,13 @@ class DifferentialPlot extends Component {
               </Grid.Column>
               <Grid.Column mobile={8} tablet={8} largeScreen={8} widescreen={8}>
                 <ButtonActions
-                  exportButtonSize={'medium'}
+                  exportButtonSize={'small'}
                   excelVisible={excelFlag}
                   pngVisible={pngFlag}
                   pdfVisible={pdfFlag}
                   svgVisible={svgFlag}
                   txtVisible={false}
-                  imageInfo={imageInfo}
+                  imageInfo={imageInfoDifferential}
                   tabIndex={activeDifferentialPlotTabsIndex}
                 />
               </Grid.Column>
@@ -145,7 +149,7 @@ class DifferentialPlot extends Component {
                 largeScreen={16}
                 widescreen={16}
               >
-                <div className="">{svgPanes}</div>;
+                <div className="">{svgPanes}</div>
               </Grid.Column>
             </Grid.Row>
           </Grid>

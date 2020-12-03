@@ -164,13 +164,13 @@ class SplitPanesContainer extends Component {
     const actionButtons =
       selectedPlot === 'Statistic Table' ? (
         <ButtonActions
+          exportButtonSize={'mini'}
           excelVisible={true}
           pngVisible={false}
           pdfVisible={false}
           svgVisible={false}
           txtVisible={true}
           refFwd={this.filteredDifferentialGridRef}
-          exportButtonSize={'mini'}
           tab={'differential'}
           study={enrichmentStudy}
           model={enrichmentModel}
@@ -178,13 +178,13 @@ class SplitPanesContainer extends Component {
         />
       ) : (
         <ButtonActions
+          exportButtonSize={'mini'}
           excelVisible={false}
           pngVisible={true}
           pdfVisible={false}
           svgVisible={true}
           txtVisible={false}
           plot={this.props.violinSettings.id}
-          exportButtonSize={'mini'}
           description={imageInfo.key}
         />
       );

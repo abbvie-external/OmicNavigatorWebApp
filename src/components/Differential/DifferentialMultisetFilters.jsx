@@ -42,10 +42,10 @@ class DifferentialMultisetFilters extends Component {
       sigValueP,
       selectedColP,
       selectedOperatorP,
-      multisetFiltersVisibleP,
+      multisetFiltersVisibleDifferential,
     } = this.props;
     if (
-      multisetFiltersVisibleP &&
+      multisetFiltersVisibleDifferential &&
       (uDataP !== prevProps.uDataP ||
         uAnchorP !== prevProps.uAnchorP ||
         uSettingsP !== prevProps.uSettingsP ||
