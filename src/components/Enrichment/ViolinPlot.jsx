@@ -313,7 +313,8 @@ class ViolinPlot extends Component {
           return brushTest;
         };
         const chartSVG = d3.select(`#${self.props.violinSettings.id}`);
-        //chartSVG.selectAll('.brushed').classed('brushed', false);
+        self.handleElementText(true);
+        chartSVG.selectAll('.brushed').classed('brushed', false);
         const brushed = circles
           .filter(function() {
             const cx = d3.select(this).attr('cx'),
