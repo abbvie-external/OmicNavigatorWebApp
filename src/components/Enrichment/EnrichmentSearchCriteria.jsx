@@ -1088,38 +1088,40 @@ class EnrichmentSearchCriteria extends Component {
             mouseEnterDelay={1000}
             mouseLeaveDelay={0}
           />
-          <label
-            className={
-              enrichmentAnnotationsDisabled ? 'greyText' : 'normalText'
-            }
-          >
-            P Values
-          </label>
-          <Button.Group className="PValueTypeContainer" size="small">
-            <Button
-              type="button"
-              className="pValueButton"
-              value="nominal"
-              name="nominal"
-              positive={pValueType === 'nominal'}
-              onClick={this.handlePValueTypeChange}
-              disabled={enrichmentAnnotationsDisabled}
+          <span className={!isTestDataLoaded ? 'ShowBlock' : 'Hide'}>
+            <label
+              className={
+                enrichmentAnnotationsDisabled ? 'greyText' : 'normalText'
+              }
             >
-              Nominal
-            </Button>
-            <Button.Or className="OrCircle" />
-            <Button
-              type="button"
-              className="pValueButton"
-              value="adjusted"
-              name="adjusted"
-              positive={pValueType === 'adjusted'}
-              onClick={this.handlePValueTypeChange}
-              disabled={enrichmentAnnotationsDisabled}
-            >
-              Adjusted
-            </Button>
-          </Button.Group>
+              P Values
+            </label>
+            <Button.Group className="PValueTypeContainer" size="small">
+              <Button
+                type="button"
+                className="pValueButton"
+                value="nominal"
+                name="nominal"
+                positive={pValueType === 'nominal'}
+                onClick={this.handlePValueTypeChange}
+                disabled={enrichmentAnnotationsDisabled}
+              >
+                Nominal
+              </Button>
+              <Button.Or className="OrCircle" />
+              <Button
+                type="button"
+                className="pValueButton"
+                value="adjusted"
+                name="adjusted"
+                positive={pValueType === 'adjusted'}
+                onClick={this.handlePValueTypeChange}
+                disabled={enrichmentAnnotationsDisabled}
+              >
+                Adjusted
+              </Button>
+            </Button.Group>
+          </span>
         </Form>
         <div
           className={
