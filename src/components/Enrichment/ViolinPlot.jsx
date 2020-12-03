@@ -23,7 +23,8 @@ class ViolinPlot extends Component {
     // ],
     // elementTextAfter: null,
     // didDropdownChange: false,
-    displayElementText: false,
+    displayElementTextViolin:
+      sessionStorage.getItem('displayElementTextViolin') || false,
     violinContainerHeight:
       this.violinContainerRef?.current?.parentElement?.offsetHeight ||
       window.screen.height - this.props.horizontalSplitPaneSize - 51,
@@ -58,7 +59,7 @@ class ViolinPlot extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    //const { violinData, HighlightedProteins, displayElementText } = this.props;
+    //const { violinData, HighlightedProteins, displayElementTextViolin } = this.props;
     const { violinData, HighlightedProteins } = this.props;
     if (violinData !== prevProps.violinData) {
       // const label = this.props.violinSettings.axisLabels.xAxis;
@@ -332,13 +333,13 @@ class ViolinPlot extends Component {
           const circleText = self.chart.objs.svg
             .append('g')
             .attr('class', 'circleText');
-          if (self.state.displayElementText) {
+          if (self.state.displayElementTextViolin) {
             circleText
               .append('text')
               .attr('x', test.attr('cx'))
               .attr('y', test.attr('cy'))
               .style('fill', 'black')
-              .attr('font-size', 36)
+              .attr('font-size', '10px')
               .attr('font-family', 'Arial')
               .text(d[self.props.elementTextKey]);
           }
@@ -360,7 +361,7 @@ class ViolinPlot extends Component {
     };
     const brushingEnd = function() {
       if (d3.event.selection != null) {
-        if (self.state.displayElementText) {
+        if (self.state.displayElementTextViolin) {
           self.handleElementText(false);
         }
       }
@@ -613,7 +614,7 @@ class ViolinPlot extends Component {
         'font-family',
         '"Lato", "Helvetica Neue", "Arial", Helvetica, sans-serif',
       )
-      .attr('font-size', 15)
+      .attr('font-size', '15px')
       .attr('font-weight', 'bold')
       .attr('text-anchor', 'middle')
       .attr('class', 'vXLabel vLabelStyles')
@@ -642,7 +643,7 @@ class ViolinPlot extends Component {
         'font-family',
         '"Lato", "Helvetica Neue", "Arial", Helvetica, sans-serif',
       )
-      .attr('font-size', 15)
+      .attr('font-size', '15px')
       .attr('font-weight', 'bold')
       .attr('dy', '.62em')
       .attr('transform', 'rotate(-90)')
@@ -1698,9 +1699,8 @@ class ViolinPlot extends Component {
   };
 
   handleElementText = removeText => {
-    debugger;
     const self = this;
-    if (!self.state.displayElementText || removeText) {
+    if (!self.state.displayElementTextViolin || removeText) {
       const chartSVG = d3.select(`#${self.props.violinSettings.id}`);
       chartSVG.selectAll('g.circleText').remove();
     } else {
@@ -1714,7 +1714,7 @@ class ViolinPlot extends Component {
           .attr('x', test.attr('cx'))
           .attr('y', test.attr('cy'))
           .style('fill', 'black')
-          .attr('font-size', 36)
+          .attr('font-size', '10px')
           .attr('font-family', 'Arial')
           .text(d[self.props.elementTextKey]);
       });
@@ -1722,8 +1722,12 @@ class ViolinPlot extends Component {
   };
 
   handleElementTextChange = () => {
+    sessionStorage.setItem(
+      'displayElementTextViolin',
+      !this.state.displayElementTextViolin,
+    );
     this.setState(
-      { displayElementText: !this.state.displayElementText },
+      { displayElementTextViolin: !this.state.displayElementTextViolin },
       function() {
         this.handleElementText();
       },
@@ -1756,7 +1760,9 @@ class ViolinPlot extends Component {
             className=""
             basic
             content={
-              this.state.displayElementText ? 'Hide Labels' : 'Show Labels'
+              this.state.displayElementTextViolin
+                ? 'Hide Labels'
+                : 'Show Labels'
             }
           />
         </span>
