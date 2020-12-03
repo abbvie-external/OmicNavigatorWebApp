@@ -1,6 +1,6 @@
 /* eslint-disable react/state-in-constructor */
 import React, { Component } from 'react';
-import { Button, Icon, Popup } from 'semantic-ui-react';
+import { Icon, Popup } from 'semantic-ui-react';
 import * as d3 from 'd3';
 import * as _ from 'lodash';
 // import { select } from "d3-selection";
@@ -242,8 +242,7 @@ class ViolinPlot extends Component {
   addToolTiptoMax = id => {
     if (id != null) {
       const self = this;
-      let maxObj = d3.select(`#violin_${id.featureID}`);
-      //console.log(maxObj);
+      d3.select(`#violin_${id.featureID}`);
       const cx = Math.ceil(d3.select(`#violin_${id.featureID}`).attr('cx'));
       const cy = Math.ceil(d3.select(`#violin_${id.featureID}`).attr('cy'));
 
@@ -294,12 +293,8 @@ class ViolinPlot extends Component {
 
   makeBrush() {
     var self = this;
-    const brushStart = function() {
-      const chartSVG = d3.select(`#${self.props.violinSettings.id}`);
-      chartSVG.selectAll('.brushed').classed('brushed', false);
-      self.unhighlightPoint([], true, self);
-      self.handleElementText(true);
-    };
+    // const brushingStart = function() {
+    // };
     const highlightBrushedCircles = function() {
       const circles = d3.selectAll(
         '.' + self.props.violinSettings.id + '.vPoint',
@@ -361,34 +356,27 @@ class ViolinPlot extends Component {
           self.props.onHandleProteinSelected(sortedData);
         }
       }
-      // else{
-      //   self.handleElementText(true);
-      // }
     };
-    const brushEnd = function() {
-      if (self.state.displayElementText) {
-        self.handleElementText(false);
+    const brushingEnd = function() {
+      if (d3.event.selection != null) {
+        if (self.state.displayElementText) {
+          self.handleElementText(false);
+        }
       }
     };
-
-    // if(self.state.elementText != self.state.elementTextAfter){
-    //   highlightBrushedCircles();
-    // }
-
     self.chart.objs.brush = d3
       .brush()
       .extent([
         [0, 0],
         [self.state.violinContainerWidth, self.state.violinContainerHeight],
       ])
-      .on('start', brushStart)
+      // .on('start', brushingStart)
       .on('brush', highlightBrushedCircles)
-      .on('end', brushEnd);
+      .on('end', brushingEnd);
     self.chart.objs.g
       .append('g')
       .attr('class', 'violinBrush')
       .call(self.chart.objs.brush);
-    // self.state.elementTextAfter = self.state.elementText;
   }
 
   clearBrush(self) {
@@ -1473,11 +1461,12 @@ class ViolinPlot extends Component {
       }
 
       //Single Click Behavior
-      // self.chart.objs.svg.on("click", function () {
-      //   // self.unhighlightPoint(null, true, self);
-      //   // self.violinBrush.emit([[], []])
-      //   self.handleElementText(true);
-      // });
+      self.chart.objs.svg.on('click', function() {
+        const chartSVG = d3.select(`#${self.props.violinSettings.id}`);
+        chartSVG.selectAll('.brushed').classed('brushed', false);
+        self.unhighlightPoint([], true, self);
+        self.handleElementText(true);
+      });
 
       Object.keys(self.chart.groupObjs).forEach(cName => {
         if (Object.prototype.hasOwnProperty.call(self.chart.groupObjs, cName)) {
@@ -1565,12 +1554,6 @@ class ViolinPlot extends Component {
                   .transition()
                   .delay(500)
                   .duration(500)
-
-                  // console.log('self.chart.objs.tooltip is ');
-                  // console.log(self.chart.objs.tooltip);
-                  // console.log(self.chart.objs.tooltip.style('opacity'));
-                  // self.chart.objs.tooltip
-
                   .style('opacity', () => {
                     return 1;
                   })
@@ -1634,7 +1617,6 @@ class ViolinPlot extends Component {
                   },
                 ]);
               }
-
               // self.props.onHandleMaxLinePlot(d)
               d3.select(`#violin_${maxId}`)
                 .transition()
@@ -1740,41 +1722,17 @@ class ViolinPlot extends Component {
 
   handleElementTextChange = () => {
     this.setState(
-      {
-        // prevState => ({
-        // displayElementText: !prevState.displayElementText,
-        displayElementText: !this.state.displayElementText,
+      { displayElementText: !this.state.displayElementText },
+      function() {
+        this.handleElementText();
       },
-      this.handleElementText(),
     );
   };
 
-  // handleElementTextDropdownChange = value => {
-  //   var self = this;
-  //   this.setState({ elementText: value }, this.handleElementText(self));
-  // };
-
   render() {
     const { violinSettings } = this.props;
-    //const { displayElementText } = this.state;
-    // const { elementTextOptions } = this.state;
     return (
       <>
-        {/* <div>
-          <Dropdown
-            compact
-            selection
-            value=
-            defaultValue={elementTextOptions[0].text}
-            onChange={this.handleElementTextDropdownChange(value)}
-            options={elementTextOptions}
-          />
-        </div> */}
-        {/* <div>
-        <Button
-          icon
-          onClick={this.handleElementTextChange}
-          > */}
         <span className="TextToggleButton">
           <Popup
             trigger={
@@ -1795,16 +1753,12 @@ class ViolinPlot extends Component {
               fontSize: '13px',
             }}
             className=""
-            //inverted
             basic
-            //position="bottom center"
             content={
               this.state.displayElementText ? 'Hide Labels' : 'Show Labels'
             }
           />
         </span>
-        {/* </Button> */}
-        {/* </div> */}
         <div
           ref={this.violinContainerRef}
           id={violinSettings.parentId}
