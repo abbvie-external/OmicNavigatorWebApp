@@ -676,6 +676,7 @@ class Differential extends Component {
                     content={value}
                     inverted
                     basic
+                    closeOnTriggerClick
                   />
                   {linkoutWithIcon}
                 </div>

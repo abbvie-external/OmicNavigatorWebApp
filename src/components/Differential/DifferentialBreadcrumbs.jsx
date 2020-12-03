@@ -47,6 +47,7 @@ class DifferentialBreadcrumbs extends Component {
                     ? 'Back To Table'
                     : 'Back To Plot'
                 }
+                closeOnTriggerClick
               />
             </Breadcrumb.Section>
             <Breadcrumb.Divider icon="right chevron" />

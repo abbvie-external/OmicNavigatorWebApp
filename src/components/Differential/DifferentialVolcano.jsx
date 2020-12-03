@@ -571,7 +571,7 @@ class DifferentialVolcano extends Component {
         largeScreen={12}
         widescreen={12}
       >
-        <Sidebar.Pushable as={'div'}>
+        <Sidebar.Pushable as={'span'}>
           <Sidebar
             as={'div'}
             animation="overlay"
