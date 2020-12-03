@@ -59,8 +59,8 @@ class DifferentialPlot extends Component {
 
   getSVGPanes(activeDifferentialPlotTabsIndex) {
     let panes = [];
-    if (this.props.imageInfo.length !== 0) {
-      const svgArray = this.props.imageInfo.svg;
+    if (this.props.imageInfoDifferential.length !== 0) {
+      const svgArray = this.props.imageInfoDifferential.svg;
       // const svgArrayReversed = svgArray.reverse();
       const svgPanes = svgArray.map(s => {
         return {
@@ -84,7 +84,9 @@ class DifferentialPlot extends Component {
           menuItem: 'Feature Data',
           render: () => (
             <Tab.Pane attached="true" as="div">
-              <MetafeaturesTable {...this.state} {...this.props} />
+              <MetafeaturesTable
+                metaFeaturesData={this.props.metaFeaturesDataDifferential}
+              />
             </Tab.Pane>
           ),
         },
@@ -104,7 +106,7 @@ class DifferentialPlot extends Component {
   render() {
     // const { activeDifferentialPlotTabsIndex } = this.state;
     const { excelFlag, pngFlag, pdfFlag, svgFlag } = this.state;
-    const { isItemSVGLoaded, imageInfo } = this.props;
+    const { isItemSVGLoaded, imageInfoDifferential } = this.props;
     const { activeDifferentialPlotTabsIndex } = this.state;
     const svgPanes = this.getSVGPanes(activeDifferentialPlotTabsIndex);
     if (!isItemSVGLoaded) {
@@ -132,7 +134,7 @@ class DifferentialPlot extends Component {
                   pdfVisible={pdfFlag}
                   svgVisible={svgFlag}
                   txtVisible={false}
-                  imageInfo={imageInfo}
+                  imageInfo={imageInfoDifferential}
                   tabIndex={activeDifferentialPlotTabsIndex}
                 />
               </Grid.Column>

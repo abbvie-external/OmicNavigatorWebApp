@@ -4,7 +4,7 @@ import CustomEmptyMessage from '../Shared/Templates';
 // eslint-disable-next-line no-unused-vars
 import QHGrid, { EZGrid } from '***REMOVED***';
 import DifferentialPlot from './DifferentialPlot';
-// import SVGPlot from '../Shared/SVGPlot';
+import SVGPlot from '../Shared/SVGPlot';
 import { scrollElement } from '../Shared/helpers';
 import DifferentialVolcanoPlot from './DifferentialVolcanoPlot';
 import {
@@ -13,8 +13,8 @@ import {
   Select,
   Checkbox,
   Popup,
-  // Dimmer,
-  // Loader,
+  Dimmer,
+  Loader,
   Label,
   // Divider,
   Sidebar,
@@ -376,35 +376,35 @@ class DifferentialVolcano extends Component {
   };
   getSVGPlot = () => {
     const {
-      // imageInfo,
+      imageInfo,
       tabsMessage,
-      // isVolcanoPlotSVGLoaded,
-      // onSVGTabChange,
+      isVolcanoPlotSVGLoaded,
+      onSVGTabChange,
     } = this.props;
-    // if (imageInfo.key != null && isVolcanoPlotSVGLoaded) {
-    //   return (
-    //     <div className="VolcanoPlotSVGPlot">
-    //       <SVGPlot
-    //         // ref={this.differentialViewContainerRef}
-    //         {...this.props}
-    //         {...this.state}
-    //         onSVGTabChange={onSVGTabChange}
-    //       ></SVGPlot>
-    //     </div>
-    //   );
-    // } else if (!isVolcanoPlotSVGLoaded) {
-    //   return (
-    //     <Dimmer active inverted>
-    //       <Loader size="large">Loading Plots</Loader>
-    //     </Dimmer>
-    //   );
-    // } else {
-    return (
-      <div className="PlotInstructions">
-        <h4 className="PlotInstructionsText NoSelect">{tabsMessage}</h4>
-      </div>
-    );
-    // }
+    if (imageInfo.key != null && isVolcanoPlotSVGLoaded) {
+      return (
+        <div className="VolcanoPlotSVGPlot">
+          <SVGPlot
+            // ref={this.differentialViewContainerRef}
+            {...this.props}
+            {...this.state}
+            onSVGTabChange={onSVGTabChange}
+          ></SVGPlot>
+        </div>
+      );
+    } else if (!isVolcanoPlotSVGLoaded) {
+      return (
+        <Dimmer active inverted>
+          <Loader size="large">Loading Plots</Loader>
+        </Dimmer>
+      );
+    } else {
+      return (
+        <div className="PlotInstructions">
+          <h4 className="PlotInstructionsText NoSelect">{tabsMessage}</h4>
+        </div>
+      );
+    }
   };
 
   onSizeChange = (size, paneType) => {

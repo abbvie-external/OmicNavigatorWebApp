@@ -228,9 +228,6 @@ class DifferentialSearchCriteria extends Component {
             differentialTestTooltip,
             uAnchorP: differentialTest,
           });
-          // if (differentialFeature !== '') {
-          //   this.props.onGetPlot(differentialFeature, true);
-          // }
         }
       }
     }
