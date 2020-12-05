@@ -25,6 +25,7 @@ import LoaderActivePlots from '../Transitions/LoaderActivePlots';
 import './EnrichmentResultsGraph.scss';
 import NumericExponentialInput from '../Shared/NumericExponentialInput';
 import { limitValues } from '../Shared/helpers';
+import ButtonActions from '../Shared/ButtonActions';
 import { omicNavigatorService } from '../../services/omicNavigator.service';
 import { ResizableBox } from 'react-resizable';
 import '../Shared/ReactResizable.css';
@@ -905,10 +906,10 @@ class EnrichmentResultsGraph extends Component {
             <Grid.Column
               id="LegendColumn"
               mobile={16}
-              tablet={9}
-              computer={9}
-              largeScreen={9}
-              widescreen={9}
+              tablet={6}
+              computer={6}
+              largeScreen={5}
+              widescreen={5}
             >
               <Popup
                 trigger={
@@ -970,48 +971,69 @@ class EnrichmentResultsGraph extends Component {
               />
             </Grid.Column>
             <Grid.Column
-              id="TotalsColumn"
-              mobile={16}
-              tablet={7}
-              computer={7}
-              largeScreen={7}
-              widescreen={7}
+              id="NodeTotalsCol"
+              mobile={3}
+              tablet={3}
+              computer={3}
+              largeScreen={3}
+              widescreen={3}
             >
-              <div
-                // className={
-                //   networkGraphReady ? 'ShowInlineBlock NodeLinkTotals' : 'Hide'
-                // }
-                className="ShowInlineBlock NodeLinkTotals"
-              >
-                <Popup
-                  trigger={
-                    <Label size={dynamicSize}>
-                      {filteredNodesTotal} of {totalNodes} Nodes
-                    </Label>
-                  }
-                  style={CustomPopupStyle}
-                  content="Number of nodes meeting current filter requirements, of total nodes without filters"
-                  inverted
-                  on={['hover', 'click']}
-                  position="left center"
-                  mouseEnterDelay={1000}
-                  mouseLeaveDelay={0}
-                />
-                <Popup
-                  trigger={
-                    <Label size={dynamicSize}>
-                      {filteredLinksTotal} of {totalLinks} Links
-                    </Label>
-                  }
-                  style={CustomPopupStyle}
-                  content="Number of links meeting current filter requirements, of total links without filters"
-                  inverted
-                  on={['hover', 'click']}
-                  position="left center"
-                  mouseEnterDelay={1000}
-                  mouseLeaveDelay={0}
-                />
-              </div>
+              {/* className="ShowInlineBlock NodeLinkTotals" */}
+              <Popup
+                trigger={
+                  <Label id="NodeTotals" size={dynamicSize}>
+                    {filteredNodesTotal} of {totalNodes} Nodes
+                  </Label>
+                }
+                style={CustomPopupStyle}
+                content="Number of nodes meeting current filter requirements, of total nodes without filters"
+                inverted
+                on={['hover', 'click']}
+                position="left center"
+                mouseEnterDelay={1000}
+                mouseLeaveDelay={0}
+              />
+            </Grid.Column>
+            <Grid.Column
+              id="LinkTotalsCol"
+              mobile={3}
+              tablet={3}
+              computer={3}
+              largeScreen={3}
+              widescreen={3}
+            >
+              <Popup
+                trigger={
+                  <Label id="LinkTotals" size={dynamicSize}>
+                    {filteredLinksTotal} of {totalLinks} Links
+                  </Label>
+                }
+                style={CustomPopupStyle}
+                content="Number of links meeting current filter requirements, of total links without filters"
+                inverted
+                on={['hover', 'click']}
+                position="left center"
+                mouseEnterDelay={1000}
+                mouseLeaveDelay={0}
+              />
+            </Grid.Column>
+            <Grid.Column
+              id="NetworkButtonActions"
+              mobile={16}
+              tablet={4}
+              computer={4}
+              largeScreen={5}
+              widescreen={5}
+            >
+              <ButtonActions
+                exportButtonSize={'mini'}
+                excelVisible={false}
+                pngVisible={true}
+                pdfVisible={false}
+                svgVisible={true}
+                txtVisible={false}
+                plot={'svg-chart-network'}
+              />
             </Grid.Column>
             <Grid.Column
               className=""
