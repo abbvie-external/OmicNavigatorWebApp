@@ -86,9 +86,8 @@ export function getLinkout(
     const domainRawWwwHttps = domainRawWww.includes('//')
       ? domainRawWww.split('//').pop()
       : domainRawWww;
-    icons.push(`${iconBaseUrl}${domainRawWwwHttps}.ico`);
     iconDomains.push(domainRawWwwHttps);
-    icons.push(`${iconBaseUrl}${domainRawWwwHttps}`);
+    icons.push(`${iconBaseUrl}${domainRawWwwHttps}.ico`);
     return (
       <Popup
         key={itemValue}
