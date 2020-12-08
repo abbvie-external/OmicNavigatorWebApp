@@ -441,7 +441,6 @@ class Differential extends Component {
         this.handleGetMetaFeaturesTableError,
       )
       .then(getMetaFeaturesTableResponseData => {
-        debugger;
         this.setState({
           metaFeaturesDataDifferential: getMetaFeaturesTableResponseData,
           // areDifferentialPlotTabsReady: true,
@@ -537,7 +536,6 @@ class Differential extends Component {
   };
   handleSVG = (view, imageInfo) => {
     const key = view === 'Differential' ? `imageInfo${view}` : 'imageInfo';
-    debugger;
     this.setState({
       [key]: imageInfo,
       isItemSVGLoaded: true,

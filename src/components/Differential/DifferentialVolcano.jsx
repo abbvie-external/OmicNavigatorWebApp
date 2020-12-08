@@ -374,6 +374,25 @@ class DifferentialVolcano extends Component {
       });
     }
   };
+  getVolcanoPlot = () => {
+    const { volcanoPlotsVisible } = this.state;
+    if (volcanoPlotsVisible) {
+      return (
+        <DifferentialVolcanoPlot
+          ref={this.differentialVolcanoPlotRef}
+          {...this.state}
+          {...this.props}
+          handleVolcanoPlotSelectionChange={
+            this.handleVolcanoPlotSelectionChange
+          }
+          getMaxAndMin={this.getMaxAndMin}
+          onHandleDotClick={this.handleDotClick}
+        ></DifferentialVolcanoPlot>
+      );
+    } else {
+      return <p>Loading</p>;
+    }
+  };
   getSVGPlot = () => {
     const {
       imageInfo,
@@ -548,6 +567,7 @@ class DifferentialVolcano extends Component {
       ></Form.Field>
     );
     const svgPlot = this.getSVGPlot();
+    const volcanoPlot = this.getVolcanoPlot();
     const resizerStyle = {
       // padding: '1px 0px !important',
       // height: '16px',
@@ -752,16 +772,7 @@ class DifferentialVolcano extends Component {
                           this.onSizeChange(size, 'vertical')
                         }
                       >
-                        <DifferentialVolcanoPlot
-                          ref={this.differentialVolcanoPlotRef}
-                          {...this.state}
-                          {...this.props}
-                          handleVolcanoPlotSelectionChange={
-                            this.handleVolcanoPlotSelectionChange
-                          }
-                          getMaxAndMin={this.getMaxAndMin}
-                          onHandleDotClick={this.handleDotClick}
-                        ></DifferentialVolcanoPlot>
+                        {volcanoPlot}
                         {svgPlot}
                       </SplitPane>
                       <Grid.Row>
