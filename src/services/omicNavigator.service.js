@@ -181,35 +181,20 @@ class OmicNavigatorService {
       true,
       25000,
     );
+    // const promise = this.ocpuRPCOutput(
+    //   'getEnrichmentsTable',
+    //   obj,
+    // );
     const dataFromPromise = await promise;
     return dataFromPromise;
   }
 
-  postToPhosphositePlus(obj, url) {
-    var mapForm = document.createElement('form');
-    mapForm.target = '_blank';
-    mapForm.method = 'POST'; // or "post" if appropriate
-    mapForm.action = url;
-    Object.keys(obj).forEach(function(param) {
-      var mapInput = document.createElement('input');
-      mapInput.type = 'hidden';
-      mapInput.name = param;
-      mapInput.setAttribute('value', obj[param]);
-      mapForm.appendChild(mapInput);
+  async ocpuRPCOutput(method, obj) {
+    return new Promise(function(resolve, reject) {
+      window.ocpu.rpc(method, obj, function(output) {
+        resolve(output);
+      });
     });
-    document.body.appendChild(mapForm);
-    mapForm.submit();
-  }
-
-  async getSiteData(id, study, errorCb) {
-    const promise = this.ocpuRPCUnbox(
-      'sitedata',
-      { idmult: id, study: study },
-      25000,
-      errorCb,
-    );
-    const siteDataFromPromise = await promise;
-    return siteDataFromPromise;
   }
 
   async getProteinData(id, study, errorCb) {
@@ -458,6 +443,14 @@ class OmicNavigatorService {
       errorCb,
       cancelToken,
     );
+    // const promise = this.ocpuRPCOutput(
+    //   'getEnrichmentsNetwork',
+    //   {
+    //     study: enrichmentStudy,
+    //     model: enrichmentModel,
+    //     annotation: enrichmentAnnotation,
+    //   },
+    // );
     const nodesFromPromise = await promise;
     return nodesFromPromise;
   }

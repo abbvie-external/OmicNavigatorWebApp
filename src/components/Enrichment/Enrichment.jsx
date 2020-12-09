@@ -358,7 +358,7 @@ class Enrichment extends Component {
     });
   };
 
-  handleMultisetQueriedEnrichmentnrichment = value => {
+  handleMultisetQueriedEnrichment = value => {
     this.setState({
       multisetQueriedEnrichment: value,
     });
@@ -463,7 +463,7 @@ class Enrichment extends Component {
 
   handlePlotTypesEnrichment = enrichmentModel => {
     if (enrichmentModel !== '') {
-      if (this.state.enrichmentStudyMetadata.plots != null) {
+      if (this.state.enrichmentStudyMetadata?.plots != null) {
         const enrichmentModelData = this.state.enrichmentStudyMetadata.plots.find(
           model => model.modelID === enrichmentModel,
         );
@@ -2150,9 +2150,7 @@ class Enrichment extends Component {
               }
               onDisablePlotEnrichment={this.disablePlotEnrichment}
               onGetMultisetPlotEnrichment={this.handleMultisetPlot}
-              onmultisetQueriedEnrichmentnrichment={
-                this.handleMultisetQueriedEnrichmentnrichment
-              }
+              onMultisetQueriedEnrichment={this.handleMultisetQueriedEnrichment}
               onHandlePlotAnimation={this.handlePlotAnimation}
               onHandlePlotTypesEnrichment={this.handlePlotTypesEnrichment}
               onSetStudyModelAnnotationMetadata={
