@@ -257,79 +257,86 @@ class DifferentialVolcano extends Component {
   };
 
   handleRowClick = (event, item, index) => {
-    if (
-      item !== null &&
-      event?.target?.className !== 'ExternalSiteIcon' &&
-      event?.target?.className !== 'TableCellLink NoSelect'
-    ) {
-      const { differentialFeatureIdKey } = this.props;
-      event.stopPropagation();
-      const PreviouslyHighlighted = [
-        ...this.props.HighlightedFeaturesArrVolcano,
-      ];
-      if (event.shiftKey) {
-        const allTableData =
-          this.volcanoPlotFilteredGridRef.current?.qhGridRef.current?.getSortedData() ||
-          [];
-        const indexMaxFeature = _.findIndex(allTableData, function(d) {
-          return d[differentialFeatureIdKey] === PreviouslyHighlighted[0]?.id;
-        });
-        const sliceFirst = index < indexMaxFeature ? index : indexMaxFeature;
-        const sliceLast = index > indexMaxFeature ? index : indexMaxFeature;
-        const shiftedTableData = allTableData.slice(sliceFirst, sliceLast + 1);
-        const shiftedTableDataArray = shiftedTableData.map(function(d) {
-          return {
-            id: d[differentialFeatureIdKey],
-            value: d[differentialFeatureIdKey],
-            key: d[differentialFeatureIdKey],
-          };
-        });
-        this.props.onHandleSelectedVolcano(shiftedTableDataArray);
-      } else if (event.ctrlKey) {
-        const allTableData =
-          this.volcanoPlotFilteredGridRef.current?.qhGridRef.current?.getSortedData() ||
-          [];
-        let selectedTableDataArray = [];
-
-        const alreadyHighlighted = PreviouslyHighlighted.some(
-          d => d.id === item[differentialFeatureIdKey],
-        );
-        // already highlighted, remove it from array
-        if (alreadyHighlighted) {
-          selectedTableDataArray = PreviouslyHighlighted.filter(
-            i => i.id !== item[differentialFeatureIdKey],
-          );
-          this.props.onHandleSelectedVolcano(selectedTableDataArray);
-        } else {
-          // not yet highlighted, add it to array
+    if (this.state.volcanoPlotsVisible) {
+      if (
+        item !== null &&
+        event?.target?.className !== 'ExternalSiteIcon' &&
+        event?.target?.className !== 'TableCellLink NoSelect'
+      ) {
+        const { differentialFeatureIdKey } = this.props;
+        event.stopPropagation();
+        const PreviouslyHighlighted = [
+          ...this.props.HighlightedFeaturesArrVolcano,
+        ];
+        if (event.shiftKey) {
+          const allTableData =
+            this.volcanoPlotFilteredGridRef.current?.qhGridRef.current?.getSortedData() ||
+            [];
           const indexMaxFeature = _.findIndex(allTableData, function(d) {
             return d[differentialFeatureIdKey] === PreviouslyHighlighted[0]?.id;
           });
-          // map feature to fix obj entries
-          const mappedFeature = {
-            id: item[differentialFeatureIdKey],
-            value: item[differentialFeatureIdKey],
-            key: item[differentialFeatureIdKey],
-          };
-          const lowerIndexThanMax = index < indexMaxFeature ? true : false;
-          if (lowerIndexThanMax) {
-            // add to beginning of array if max
-            PreviouslyHighlighted.unshift(mappedFeature);
+          const sliceFirst = index < indexMaxFeature ? index : indexMaxFeature;
+          const sliceLast = index > indexMaxFeature ? index : indexMaxFeature;
+          const shiftedTableData = allTableData.slice(
+            sliceFirst,
+            sliceLast + 1,
+          );
+          const shiftedTableDataArray = shiftedTableData.map(function(d) {
+            return {
+              id: d[differentialFeatureIdKey],
+              value: d[differentialFeatureIdKey],
+              key: d[differentialFeatureIdKey],
+            };
+          });
+          this.props.onHandleSelectedVolcano(shiftedTableDataArray);
+        } else if (event.ctrlKey) {
+          const allTableData =
+            this.volcanoPlotFilteredGridRef.current?.qhGridRef.current?.getSortedData() ||
+            [];
+          let selectedTableDataArray = [];
+
+          const alreadyHighlighted = PreviouslyHighlighted.some(
+            d => d.id === item[differentialFeatureIdKey],
+          );
+          // already highlighted, remove it from array
+          if (alreadyHighlighted) {
+            selectedTableDataArray = PreviouslyHighlighted.filter(
+              i => i.id !== item[differentialFeatureIdKey],
+            );
+            this.props.onHandleSelectedVolcano(selectedTableDataArray);
           } else {
-            // just add to array if not max
-            PreviouslyHighlighted.push(mappedFeature);
+            // not yet highlighted, add it to array
+            const indexMaxFeature = _.findIndex(allTableData, function(d) {
+              return (
+                d[differentialFeatureIdKey] === PreviouslyHighlighted[0]?.id
+              );
+            });
+            // map feature to fix obj entries
+            const mappedFeature = {
+              id: item[differentialFeatureIdKey],
+              value: item[differentialFeatureIdKey],
+              key: item[differentialFeatureIdKey],
+            };
+            const lowerIndexThanMax = index < indexMaxFeature ? true : false;
+            if (lowerIndexThanMax) {
+              // add to beginning of array if max
+              PreviouslyHighlighted.unshift(mappedFeature);
+            } else {
+              // just add to array if not max
+              PreviouslyHighlighted.push(mappedFeature);
+            }
+            selectedTableDataArray = [...PreviouslyHighlighted];
+            this.props.onHandleSelectedVolcano(selectedTableDataArray);
           }
-          selectedTableDataArray = [...PreviouslyHighlighted];
-          this.props.onHandleSelectedVolcano(selectedTableDataArray);
+        } else {
+          this.props.onHandleSelectedVolcano([
+            {
+              id: item[differentialFeatureIdKey],
+              value: item[differentialFeatureIdKey],
+              key: item[differentialFeatureIdKey],
+            },
+          ]);
         }
-      } else {
-        this.props.onHandleSelectedVolcano([
-          {
-            id: item[differentialFeatureIdKey],
-            value: item[differentialFeatureIdKey],
-            key: item[differentialFeatureIdKey],
-          },
-        ]);
       }
     }
     // else {
@@ -484,6 +491,7 @@ class DifferentialVolcano extends Component {
       this.setState({
         volcanoHeightBackup: this.state.volcanoHeight,
       });
+      this.props.onHandleSelectedVolcano([]);
     }
     const size = !volcanoPlotsVisible ? this.state.volcanoHeightBackup : 0;
     this.onSizeChange(size, 'horizontal');
