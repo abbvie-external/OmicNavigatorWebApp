@@ -189,6 +189,10 @@ class Enrichment extends Component {
   EnrichmentViewContainerRef = React.createRef();
   EnrichmentGridRef = React.createRef();
 
+  shouldComponentUpdate(nextProps) {
+    return nextProps.tab === 'enrichment';
+  }
+
   componentDidMount() {
     this.getTableHelpers(this.testSelectedTransition, this.showBarcodePlot);
     // let resizedFn;
@@ -382,7 +386,7 @@ class Enrichment extends Component {
     });
   };
 
-  handlemultisetFiltersVisibleEnrichment = () => {
+  handleMultisetFiltersVisibleEnrichment = () => {
     this.setState(prevState => ({
       multisetFiltersVisibleEnrichment: !prevState.multisetFiltersVisibleEnrichment,
     }));
@@ -2157,7 +2161,7 @@ class Enrichment extends Component {
                 this.setStudyModelAnnotationMetadata
               }
               onHandleMultisetFiltersVisibleEnrichment={
-                this.handleMultisetFiltersVisible
+                this.handleMultisetFiltersVisibleEnrichment
               }
               onSetAnnotationsMetadata={this.setAnnotationsMetadata}
               onHandleNetworkSigValue={this.handleNetworkSigValue}
