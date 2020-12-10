@@ -990,7 +990,7 @@ class EnrichmentSearchCriteria extends Component {
             label="View Plot"
             className={multisetPlotAvailableEnrichment ? 'ViewPlotRadio' : ''}
             checked={plotButtonActiveEnrichment}
-            onChange={this.props.onHandlePlotAnimation('uncover')}
+            onChange={this.props.onHandlePlotAnimationEnrichment('uncover')}
             disabled={!multisetPlotAvailableEnrichment}
           />
         </Transition>

@@ -50,9 +50,9 @@ class Enrichment extends Component {
       svg: [],
     },
     multisetPlotAvailableEnrichment: false,
-    animation: 'uncover',
-    direction: 'left',
-    visible: false,
+    animationEnrichment: 'uncover',
+    directionEnrichment: 'left',
+    visibleEnrichment: false,
     plotButtonActiveEnrichment: false,
     uData: [],
     displayViolinPlot: true,
@@ -539,10 +539,10 @@ class Enrichment extends Component {
     });
   };
 
-  handlePlotAnimation = animation => () => {
+  handlePlotAnimationEnrichment = animationEnrichment => () => {
     this.setState(prevState => ({
-      animation,
-      visible: !prevState.visible,
+      animationEnrichment,
+      visibleEnrichment: !prevState.visibleEnrichment,
       plotButtonActiveEnrichment: !this.state.plotButtonActiveEnrichment,
     }));
   };
@@ -1967,7 +1967,6 @@ class Enrichment extends Component {
               <EnrichmentResultsGraph
                 {...this.props}
                 {...this.state}
-                onHandlePlotAnimation={this.handlePlotAnimation}
                 onDisplayViolinPlot={this.displayViolinPlot}
                 onHandlePieClick={this.testSelected}
                 onHandleNodeCutoffInputChange={this.handleNodeCutoffInputChange}
@@ -2076,9 +2075,9 @@ class Enrichment extends Component {
     const enrichmentView = this.getView();
     const {
       multisetPlotInfoEnrichment,
-      animation,
-      direction,
-      visible,
+      animationEnrichment,
+      directionEnrichment,
+      visibleEnrichment,
     } = this.state;
     const {
       tab,
@@ -2086,7 +2085,7 @@ class Enrichment extends Component {
       enrichmentModel,
       enrichmentAnnotation,
     } = this.props;
-    const VerticalSidebar = ({ animation, visible }) => (
+    const VerticalSidebar = ({ animation, visible, direction }) => (
       <Sidebar
         as={'div'}
         animation={animation}
@@ -2155,7 +2154,9 @@ class Enrichment extends Component {
               onDisablePlotEnrichment={this.disablePlotEnrichment}
               onGetMultisetPlotEnrichment={this.handleMultisetPlot}
               onMultisetQueriedEnrichment={this.handleMultisetQueriedEnrichment}
-              onHandlePlotAnimation={this.handlePlotAnimation}
+              onHandlePlotAnimationEnrichment={
+                this.handlePlotAnimationEnrichment
+              }
               onHandlePlotTypesEnrichment={this.handlePlotTypesEnrichment}
               onSetStudyModelAnnotationMetadata={
                 this.setStudyModelAnnotationMetadata
@@ -2184,9 +2185,9 @@ class Enrichment extends Component {
           >
             <Sidebar.Pushable as={'span'}>
               <VerticalSidebar
-                animation={animation}
-                direction={direction}
-                visible={visible}
+                animation={animationEnrichment}
+                direction={directionEnrichment}
+                visible={visibleEnrichment}
               />
               <Sidebar.Pusher>
                 <div

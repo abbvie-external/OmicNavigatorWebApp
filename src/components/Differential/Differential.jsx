@@ -87,6 +87,10 @@ class Differential extends Component {
   differentialViewContainerRef = React.createRef();
   differentialGridRef = React.createRef();
 
+  shouldComponentUpdate(nextProps) {
+    return nextProps.tab === 'differential';
+  }
+
   handleSearchTransitionDifferential = bool => {
     this.setState({
       isSearchingDifferential: bool,
@@ -261,7 +265,7 @@ class Differential extends Component {
     });
   };
 
-  handlePlotAnimation = animation => () => {
+  handlePlotAnimationDifferential = animation => () => {
     this.setState(prevState => ({
       animation,
       visible: !prevState.visible,
@@ -880,7 +884,9 @@ class Differential extends Component {
               }
               onDisablePlotDifferential={this.disablePlotDifferential}
               onGetMultisetPlotDifferential={this.handleMultisetPlot}
-              onHandlePlotAnimation={this.handlePlotAnimation}
+              onHandlePlotAnimationDifferential={
+                this.handlePlotAnimationDifferential
+              }
               onMultisetQueriedDifferential={
                 this.handleMultisetQueriedDifferential
               }

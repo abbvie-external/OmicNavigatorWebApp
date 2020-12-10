@@ -145,6 +145,7 @@ class OmicNavigatorService {
   async getResultsTable(study, model, test, errorCb, cancelToken) {
     this.setUrl();
     const obj = { study: study, modelID: model, testID: test };
+    // const promise = this.ocpuRPCOutput('getResultsTable', obj);
     const promise = this.ocpuDataCall(
       'getResultsTable',
       obj,

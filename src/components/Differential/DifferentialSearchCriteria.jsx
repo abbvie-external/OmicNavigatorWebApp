@@ -871,7 +871,7 @@ class DifferentialSearchCriteria extends Component {
             label="View Plot"
             className={multisetPlotAvailableDifferential ? 'ViewPlotRadio' : ''}
             checked={plotButtonActiveDifferential}
-            onChange={this.props.onHandlePlotAnimation('uncover')}
+            onChange={this.props.onHandlePlotAnimationDifferential('uncover')}
             disabled={!multisetPlotAvailableDifferential}
           />
         </Transition>

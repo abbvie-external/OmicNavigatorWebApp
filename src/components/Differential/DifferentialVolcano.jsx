@@ -41,7 +41,7 @@ class DifferentialVolcano extends Component {
     doYAxisTransformation: false,
     allowXTransformation: true,
     allowYTransformation: true,
-    axisLables: [],
+    axisLabels: [],
     xAxisLabel: null,
     yAxisLabel: null,
     identifier: null,
@@ -51,6 +51,10 @@ class DifferentialVolcano extends Component {
   };
   volcanoPlotFilteredGridRef = React.createRef();
   differentialVolcanoPlotRef = React.createRef();
+
+  shouldComponentUpdate(nextProps) {
+    return nextProps.tab === 'differential';
+  }
 
   componentDidMount() {
     this.getAxisLabels();
@@ -78,7 +82,11 @@ class DifferentialVolcano extends Component {
   // }
 
   componentDidUpdate(prevProps, prevState) {
-    const { featureToHighlightInDiffTable, differentialResults } = this.props;
+    const {
+      featureToHighlightInDiffTable,
+      differentialResults,
+      // isItemSelected,
+    } = this.props;
     if (prevProps.differentialResults !== differentialResults) {
       this.setState({
         filteredTableData: differentialResults,
@@ -99,6 +107,9 @@ class DifferentialVolcano extends Component {
       this.props.onHandleSelectedVolcano(featureToHighlightInDiffTableArr);
       this.pageToFeature(featureToHighlightInDiffTable);
     }
+    // if (prevProps.isItemSelected !== isItemSelected) {
+    //   this.handlePlotAnimationVolcano('overlay');
+    // }
   }
 
   pageToFeature = featureToHighlight => {
@@ -191,7 +202,7 @@ class DifferentialVolcano extends Component {
         };
       });
       this.setState({
-        axisLables: axes,
+        axisLabels: axes,
         yAxisLabel: yLabel,
         doYAxisTransformation: doY,
       });
@@ -482,12 +493,19 @@ class DifferentialVolcano extends Component {
     localStorage.setItem(`volcanoPlotsVisible`, !volcanoPlotsVisible);
   };
 
+  // handlePlotAnimationVolcano = animation => () => {
+  //   this.setState(prevState => ({
+  //     animation,
+  //     visible: !prevState.visible,
+  //   }));
+  // };
+
   render() {
     const {
       filteredTableData,
       itemsPerPageVolcanoTable,
       volcanoPlotRows,
-      axisLables,
+      axisLabels,
       xAxisLabel,
       yAxisLabel,
       doXAxisTransformation,
@@ -497,13 +515,14 @@ class DifferentialVolcano extends Component {
       volcanoPlotsVisible,
       volcanoHeight,
       volcanoWidth,
+      animation,
+      direction,
     } = this.state;
 
     const {
       additionalTemplateInfoDifferentialTable,
       differentialColumns,
       isVolcanoTableLoading,
-      // differentialResultsMounted,
       differentialStudy,
       differentialModel,
       differentialTest,
@@ -511,7 +530,6 @@ class DifferentialVolcano extends Component {
       tab,
       isItemSelected,
     } = this.props;
-    // if (differentialResultsMounted) {
     let differentialVolcanoCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-Volcano`;
     if (multisetQueriedDifferential) {
       differentialVolcanoCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-${multisetQueriedDifferential}-Volcano`;
@@ -527,7 +545,6 @@ class DifferentialVolcano extends Component {
       fontSize: '13px',
       wordBreak: 'break-all',
     };
-    // if (volcanoPlotsVisible) {
     const xAxisTransformBox = allowXTransformation ? (
       <Form.Field
         control={Checkbox}
@@ -582,6 +599,20 @@ class DifferentialVolcano extends Component {
     const hiddenResizerStyle = {
       display: 'none',
     };
+    const VerticalSidebar = ({ animation, direction, isItemSelected }) => (
+      <Sidebar
+        as={'div'}
+        animation={animation}
+        direction={direction}
+        icon="labeled"
+        vertical="true"
+        visible={isItemSelected}
+        width="very wide"
+        className="VerticalSidebarPlot"
+      >
+        <DifferentialPlot {...this.props} {...this.state}></DifferentialPlot>
+      </Sidebar>
+    );
 
     return (
       <Grid.Column
@@ -592,23 +623,11 @@ class DifferentialVolcano extends Component {
         widescreen={12}
       >
         <Sidebar.Pushable as={'span'}>
-          <Sidebar
-            as={'div'}
-            animation="overlay"
-            direction="right"
-            icon="labeled"
-            vertical="true"
-            visible={isItemSelected}
-            // width="very wide"
-            className="VerticalSidebarVolcanoView"
-          >
-            <div className="">
-              <DifferentialPlot
-                {...this.props}
-                {...this.state}
-              ></DifferentialPlot>
-            </div>
-          </Sidebar>
+          <VerticalSidebar
+            animation={animation}
+            direction={direction}
+            isItemSelected={isItemSelected}
+          />
           <Sidebar.Pusher>
             <div
             // className="DifferentialVolcanoViewContainer"
@@ -671,33 +690,21 @@ class DifferentialVolcano extends Component {
                           </Label>
                           <Form.Field
                             control={Select}
-                            // label="X Axis"
                             name="xAxisSelector"
                             className="axisSelector NoSelect"
                             id="xAxisSelector"
                             value={xAxisLabel}
-                            options={axisLables}
+                            options={axisLabels}
                             onChange={this.handleDropdownChange.bind(this)}
                           ></Form.Field>
                           <Popup
-                            trigger={
-                              // <Form.Field
-                              //   control={Checkbox}
-                              //   name="xTransformationCheckbox"
-                              //   checked={doXAxisTransformation}
-                              //   onClick={this.handleTransformationChange.bind(this)}
-                              //   disabled={allowXTransformation}
-                              // ></Form.Field>
-                              xAxisTransformBox
-                            }
+                            trigger={xAxisTransformBox}
                             style={TableValuePopupStyle}
                             // className="TablePopupValue"
                             content="-log10 Transform, X Axis"
                             inverted
                             basic
                           />
-
-                          {/* <Divider vertical></Divider> */}
                           <Label
                             className="VolcanoAxisLabel NoSelect"
                             id="VolcanoAxisLabelY"
@@ -712,21 +719,11 @@ class DifferentialVolcano extends Component {
                             id="yAxisSelector"
                             className="axisSelector NoSelect"
                             value={yAxisLabel}
-                            options={axisLables}
+                            options={axisLabels}
                             onChange={this.handleDropdownChange.bind(this)}
                           ></Form.Field>
-                          {/* <span title="-log10 Transform"> */}
                           <Popup
-                            trigger={
-                              // <Form.Field
-                              //   control={Checkbox}
-                              //   name="yTransformationCheckbox"
-                              //   checked={doYAxisTransformation}
-                              //   onClick={this.handleTransformationChange.bind(this)}
-                              //   disabled={allowYTransformation}
-                              // ></Form.Field>
-                              yAxisTransformBox
-                            }
+                            trigger={yAxisTransformBox}
                             style={TableValuePopupStyle}
                             // className="TablePopupValue"
                             content="-log10 Transform, Y Axis"
