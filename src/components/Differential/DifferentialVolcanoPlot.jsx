@@ -6,7 +6,6 @@ import ButtonActions from '../Shared/ButtonActions';
 
 class DifferentialVolcanoPlot extends Component {
   state = {
-    plotName: 'VolcanoChart',
     hoveredCircleData: {
       position: [],
       id: null,
@@ -419,6 +418,9 @@ class DifferentialVolcanoPlot extends Component {
 
   render() {
     const {
+      differentialStudy,
+      differentialModel,
+      differentialTest,
       differentialResults,
       volcanoWidth,
       volcanoHeight,
@@ -596,13 +598,15 @@ class DifferentialVolcanoPlot extends Component {
       ? '-log(' + yAxisLabel + ')'
       : yAxisLabel;
     const xAxisLabelY = this.getXAxisLabelY(volcanoHeight);
+    const PlotName = `${differentialStudy}_${differentialModel}_${differentialTest}_scatter`;
     if (identifier !== null && xAxisLabel !== null && yAxisLabel !== null) {
       return (
         <>
           <div id="VolcanoPlotDiv">
             <ButtonActions
               exportButtonSize="mini"
-              plot={this.state.plotName}
+              plotName={PlotName}
+              plot="VolcanoChart"
               excelVisible={false}
               pdfVisible={false}
               pngVisible={true}
