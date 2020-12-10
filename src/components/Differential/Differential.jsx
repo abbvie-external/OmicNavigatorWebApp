@@ -87,6 +87,10 @@ class Differential extends Component {
   differentialViewContainerRef = React.createRef();
   differentialGridRef = React.createRef();
 
+  shouldComponentUpdate(nextProps) {
+    return nextProps.tab === 'differential';
+  }
+
   handleSearchTransitionDifferential = bool => {
     this.setState({
       isSearchingDifferential: bool,
@@ -261,7 +265,7 @@ class Differential extends Component {
     });
   };
 
-  handlePlotAnimation = animation => () => {
+  handlePlotAnimationDifferential = animation => () => {
     this.setState(prevState => ({
       animation,
       visible: !prevState.visible,
@@ -441,7 +445,6 @@ class Differential extends Component {
         this.handleGetMetaFeaturesTableError,
       )
       .then(getMetaFeaturesTableResponseData => {
-        debugger;
         this.setState({
           metaFeaturesDataDifferential: getMetaFeaturesTableResponseData,
           // areDifferentialPlotTabsReady: true,
@@ -537,7 +540,6 @@ class Differential extends Component {
   };
   handleSVG = (view, imageInfo) => {
     const key = view === 'Differential' ? `imageInfo${view}` : 'imageInfo';
-    debugger;
     this.setState({
       [key]: imageInfo,
       isItemSVGLoaded: true,
@@ -654,17 +656,19 @@ class Differential extends Component {
             const resultsLinkoutsKeys = Object.keys(resultsLinkouts);
             let linkoutWithIcon = null;
             if (resultsLinkoutsKeys.includes(f)) {
-              const columnLinkoutsObj = resultsLinkouts[f];
-              const columnLinkoutsIsArray = Array.isArray(columnLinkoutsObj);
-              const linkouts = columnLinkoutsIsArray
-                ? columnLinkoutsObj
-                : [columnLinkoutsObj];
-              const itemValue = item[f];
-              linkoutWithIcon = getLinkout(
-                itemValue,
-                linkouts,
-                TableValuePopupStyle,
-              );
+              if (item[f] != null && item[f] !== '') {
+                const columnLinkoutsObj = resultsLinkouts[f];
+                const columnLinkoutsIsArray = Array.isArray(columnLinkoutsObj);
+                const linkouts = columnLinkoutsIsArray
+                  ? columnLinkoutsObj
+                  : [columnLinkoutsObj];
+                const itemValue = item[f];
+                linkoutWithIcon = getLinkout(
+                  itemValue,
+                  linkouts,
+                  TableValuePopupStyle,
+                );
+              }
             }
             if (f === alphanumericTrigger) {
               return (
@@ -880,7 +884,9 @@ class Differential extends Component {
               }
               onDisablePlotDifferential={this.disablePlotDifferential}
               onGetMultisetPlotDifferential={this.handleMultisetPlot}
-              onHandlePlotAnimation={this.handlePlotAnimation}
+              onHandlePlotAnimationDifferential={
+                this.handlePlotAnimationDifferential
+              }
               onMultisetQueriedDifferential={
                 this.handleMultisetQueriedDifferential
               }

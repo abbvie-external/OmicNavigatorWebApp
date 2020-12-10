@@ -50,9 +50,9 @@ class Enrichment extends Component {
       svg: [],
     },
     multisetPlotAvailableEnrichment: false,
-    animation: 'uncover',
-    direction: 'left',
-    visible: false,
+    animationEnrichment: 'uncover',
+    directionEnrichment: 'left',
+    visibleEnrichment: false,
     plotButtonActiveEnrichment: false,
     uData: [],
     displayViolinPlot: true,
@@ -188,6 +188,10 @@ class Enrichment extends Component {
   };
   EnrichmentViewContainerRef = React.createRef();
   EnrichmentGridRef = React.createRef();
+
+  shouldComponentUpdate(nextProps) {
+    return nextProps.tab === 'enrichment';
+  }
 
   componentDidMount() {
     this.getTableHelpers(this.testSelectedTransition, this.showBarcodePlot);
@@ -358,7 +362,7 @@ class Enrichment extends Component {
     });
   };
 
-  handleMultisetQueriedEnrichmentnrichment = value => {
+  handleMultisetQueriedEnrichment = value => {
     this.setState({
       multisetQueriedEnrichment: value,
     });
@@ -382,7 +386,7 @@ class Enrichment extends Component {
     });
   };
 
-  handlemultisetFiltersVisibleEnrichment = () => {
+  handleMultisetFiltersVisibleEnrichment = () => {
     this.setState(prevState => ({
       multisetFiltersVisibleEnrichment: !prevState.multisetFiltersVisibleEnrichment,
     }));
@@ -463,7 +467,7 @@ class Enrichment extends Component {
 
   handlePlotTypesEnrichment = enrichmentModel => {
     if (enrichmentModel !== '') {
-      if (this.state.enrichmentStudyMetadata.plots != null) {
+      if (this.state.enrichmentStudyMetadata?.plots != null) {
         const enrichmentModelData = this.state.enrichmentStudyMetadata.plots.find(
           model => model.modelID === enrichmentModel,
         );
@@ -535,10 +539,10 @@ class Enrichment extends Component {
     });
   };
 
-  handlePlotAnimation = animation => () => {
+  handlePlotAnimationEnrichment = animationEnrichment => () => {
     this.setState(prevState => ({
-      animation,
-      visible: !prevState.visible,
+      animationEnrichment,
+      visibleEnrichment: !prevState.visibleEnrichment,
       plotButtonActiveEnrichment: !this.state.plotButtonActiveEnrichment,
     }));
   };
@@ -1963,7 +1967,6 @@ class Enrichment extends Component {
               <EnrichmentResultsGraph
                 {...this.props}
                 {...this.state}
-                onHandlePlotAnimation={this.handlePlotAnimation}
                 onDisplayViolinPlot={this.displayViolinPlot}
                 onHandlePieClick={this.testSelected}
                 onHandleNodeCutoffInputChange={this.handleNodeCutoffInputChange}
@@ -2072,9 +2075,9 @@ class Enrichment extends Component {
     const enrichmentView = this.getView();
     const {
       multisetPlotInfoEnrichment,
-      animation,
-      direction,
-      visible,
+      animationEnrichment,
+      directionEnrichment,
+      visibleEnrichment,
     } = this.state;
     const {
       tab,
@@ -2082,7 +2085,7 @@ class Enrichment extends Component {
       enrichmentModel,
       enrichmentAnnotation,
     } = this.props;
-    const VerticalSidebar = ({ animation, visible }) => (
+    const VerticalSidebar = ({ animation, visible, direction }) => (
       <Sidebar
         as={'div'}
         animation={animation}
@@ -2150,16 +2153,16 @@ class Enrichment extends Component {
               }
               onDisablePlotEnrichment={this.disablePlotEnrichment}
               onGetMultisetPlotEnrichment={this.handleMultisetPlot}
-              onmultisetQueriedEnrichmentnrichment={
-                this.handleMultisetQueriedEnrichmentnrichment
+              onMultisetQueriedEnrichment={this.handleMultisetQueriedEnrichment}
+              onHandlePlotAnimationEnrichment={
+                this.handlePlotAnimationEnrichment
               }
-              onHandlePlotAnimation={this.handlePlotAnimation}
               onHandlePlotTypesEnrichment={this.handlePlotTypesEnrichment}
               onSetStudyModelAnnotationMetadata={
                 this.setStudyModelAnnotationMetadata
               }
               onHandleMultisetFiltersVisibleEnrichment={
-                this.handleMultisetFiltersVisible
+                this.handleMultisetFiltersVisibleEnrichment
               }
               onSetAnnotationsMetadata={this.setAnnotationsMetadata}
               onHandleNetworkSigValue={this.handleNetworkSigValue}
@@ -2182,9 +2185,9 @@ class Enrichment extends Component {
           >
             <Sidebar.Pushable as={'span'}>
               <VerticalSidebar
-                animation={animation}
-                direction={direction}
-                visible={visible}
+                animation={animationEnrichment}
+                direction={directionEnrichment}
+                visible={visibleEnrichment}
               />
               <Sidebar.Pusher>
                 <div

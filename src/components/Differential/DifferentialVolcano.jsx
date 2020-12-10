@@ -41,7 +41,7 @@ class DifferentialVolcano extends Component {
     doYAxisTransformation: false,
     allowXTransformation: true,
     allowYTransformation: true,
-    axisLables: [],
+    axisLabels: [],
     xAxisLabel: null,
     yAxisLabel: null,
     identifier: null,
@@ -51,6 +51,10 @@ class DifferentialVolcano extends Component {
   };
   volcanoPlotFilteredGridRef = React.createRef();
   differentialVolcanoPlotRef = React.createRef();
+
+  shouldComponentUpdate(nextProps) {
+    return nextProps.tab === 'differential';
+  }
 
   componentDidMount() {
     this.getAxisLabels();
@@ -78,7 +82,11 @@ class DifferentialVolcano extends Component {
   // }
 
   componentDidUpdate(prevProps, prevState) {
-    const { featureToHighlightInDiffTable, differentialResults } = this.props;
+    const {
+      featureToHighlightInDiffTable,
+      differentialResults,
+      // isItemSelected,
+    } = this.props;
     if (prevProps.differentialResults !== differentialResults) {
       this.setState({
         filteredTableData: differentialResults,
@@ -99,6 +107,9 @@ class DifferentialVolcano extends Component {
       this.props.onHandleSelectedVolcano(featureToHighlightInDiffTableArr);
       this.pageToFeature(featureToHighlightInDiffTable);
     }
+    // if (prevProps.isItemSelected !== isItemSelected) {
+    //   this.handlePlotAnimationVolcano('overlay');
+    // }
   }
 
   pageToFeature = featureToHighlight => {
@@ -191,7 +202,7 @@ class DifferentialVolcano extends Component {
         };
       });
       this.setState({
-        axisLables: axes,
+        axisLabels: axes,
         yAxisLabel: yLabel,
         doYAxisTransformation: doY,
       });
@@ -246,79 +257,86 @@ class DifferentialVolcano extends Component {
   };
 
   handleRowClick = (event, item, index) => {
-    if (
-      item !== null &&
-      event?.target?.className !== 'ExternalSiteIcon' &&
-      event?.target?.className !== 'TableCellLink NoSelect'
-    ) {
-      const { differentialFeatureIdKey } = this.props;
-      event.stopPropagation();
-      const PreviouslyHighlighted = [
-        ...this.props.HighlightedFeaturesArrVolcano,
-      ];
-      if (event.shiftKey) {
-        const allTableData =
-          this.volcanoPlotFilteredGridRef.current?.qhGridRef.current?.getSortedData() ||
-          [];
-        const indexMaxFeature = _.findIndex(allTableData, function(d) {
-          return d[differentialFeatureIdKey] === PreviouslyHighlighted[0]?.id;
-        });
-        const sliceFirst = index < indexMaxFeature ? index : indexMaxFeature;
-        const sliceLast = index > indexMaxFeature ? index : indexMaxFeature;
-        const shiftedTableData = allTableData.slice(sliceFirst, sliceLast + 1);
-        const shiftedTableDataArray = shiftedTableData.map(function(d) {
-          return {
-            id: d[differentialFeatureIdKey],
-            value: d[differentialFeatureIdKey],
-            key: d[differentialFeatureIdKey],
-          };
-        });
-        this.props.onHandleSelectedVolcano(shiftedTableDataArray);
-      } else if (event.ctrlKey) {
-        const allTableData =
-          this.volcanoPlotFilteredGridRef.current?.qhGridRef.current?.getSortedData() ||
-          [];
-        let selectedTableDataArray = [];
-
-        const alreadyHighlighted = PreviouslyHighlighted.some(
-          d => d.id === item[differentialFeatureIdKey],
-        );
-        // already highlighted, remove it from array
-        if (alreadyHighlighted) {
-          selectedTableDataArray = PreviouslyHighlighted.filter(
-            i => i.id !== item[differentialFeatureIdKey],
-          );
-          this.props.onHandleSelectedVolcano(selectedTableDataArray);
-        } else {
-          // not yet highlighted, add it to array
+    if (this.state.volcanoPlotsVisible) {
+      if (
+        item !== null &&
+        event?.target?.className !== 'ExternalSiteIcon' &&
+        event?.target?.className !== 'TableCellLink NoSelect'
+      ) {
+        const { differentialFeatureIdKey } = this.props;
+        event.stopPropagation();
+        const PreviouslyHighlighted = [
+          ...this.props.HighlightedFeaturesArrVolcano,
+        ];
+        if (event.shiftKey) {
+          const allTableData =
+            this.volcanoPlotFilteredGridRef.current?.qhGridRef.current?.getSortedData() ||
+            [];
           const indexMaxFeature = _.findIndex(allTableData, function(d) {
             return d[differentialFeatureIdKey] === PreviouslyHighlighted[0]?.id;
           });
-          // map feature to fix obj entries
-          const mappedFeature = {
-            id: item[differentialFeatureIdKey],
-            value: item[differentialFeatureIdKey],
-            key: item[differentialFeatureIdKey],
-          };
-          const lowerIndexThanMax = index < indexMaxFeature ? true : false;
-          if (lowerIndexThanMax) {
-            // add to beginning of array if max
-            PreviouslyHighlighted.unshift(mappedFeature);
+          const sliceFirst = index < indexMaxFeature ? index : indexMaxFeature;
+          const sliceLast = index > indexMaxFeature ? index : indexMaxFeature;
+          const shiftedTableData = allTableData.slice(
+            sliceFirst,
+            sliceLast + 1,
+          );
+          const shiftedTableDataArray = shiftedTableData.map(function(d) {
+            return {
+              id: d[differentialFeatureIdKey],
+              value: d[differentialFeatureIdKey],
+              key: d[differentialFeatureIdKey],
+            };
+          });
+          this.props.onHandleSelectedVolcano(shiftedTableDataArray);
+        } else if (event.ctrlKey) {
+          const allTableData =
+            this.volcanoPlotFilteredGridRef.current?.qhGridRef.current?.getSortedData() ||
+            [];
+          let selectedTableDataArray = [];
+
+          const alreadyHighlighted = PreviouslyHighlighted.some(
+            d => d.id === item[differentialFeatureIdKey],
+          );
+          // already highlighted, remove it from array
+          if (alreadyHighlighted) {
+            selectedTableDataArray = PreviouslyHighlighted.filter(
+              i => i.id !== item[differentialFeatureIdKey],
+            );
+            this.props.onHandleSelectedVolcano(selectedTableDataArray);
           } else {
-            // just add to array if not max
-            PreviouslyHighlighted.push(mappedFeature);
+            // not yet highlighted, add it to array
+            const indexMaxFeature = _.findIndex(allTableData, function(d) {
+              return (
+                d[differentialFeatureIdKey] === PreviouslyHighlighted[0]?.id
+              );
+            });
+            // map feature to fix obj entries
+            const mappedFeature = {
+              id: item[differentialFeatureIdKey],
+              value: item[differentialFeatureIdKey],
+              key: item[differentialFeatureIdKey],
+            };
+            const lowerIndexThanMax = index < indexMaxFeature ? true : false;
+            if (lowerIndexThanMax) {
+              // add to beginning of array if max
+              PreviouslyHighlighted.unshift(mappedFeature);
+            } else {
+              // just add to array if not max
+              PreviouslyHighlighted.push(mappedFeature);
+            }
+            selectedTableDataArray = [...PreviouslyHighlighted];
+            this.props.onHandleSelectedVolcano(selectedTableDataArray);
           }
-          selectedTableDataArray = [...PreviouslyHighlighted];
-          this.props.onHandleSelectedVolcano(selectedTableDataArray);
+        } else {
+          this.props.onHandleSelectedVolcano([
+            {
+              id: item[differentialFeatureIdKey],
+              value: item[differentialFeatureIdKey],
+              key: item[differentialFeatureIdKey],
+            },
+          ]);
         }
-      } else {
-        this.props.onHandleSelectedVolcano([
-          {
-            id: item[differentialFeatureIdKey],
-            value: item[differentialFeatureIdKey],
-            key: item[differentialFeatureIdKey],
-          },
-        ]);
       }
     }
     // else {
@@ -372,6 +390,25 @@ class DifferentialVolcano extends Component {
       this.setState({
         doYAxisTransformation: !this.state.doYAxisTransformation,
       });
+    }
+  };
+  getVolcanoPlot = () => {
+    const { volcanoPlotsVisible } = this.state;
+    if (volcanoPlotsVisible) {
+      return (
+        <DifferentialVolcanoPlot
+          ref={this.differentialVolcanoPlotRef}
+          {...this.state}
+          {...this.props}
+          handleVolcanoPlotSelectionChange={
+            this.handleVolcanoPlotSelectionChange
+          }
+          getMaxAndMin={this.getMaxAndMin}
+          onHandleDotClick={this.handleDotClick}
+        ></DifferentialVolcanoPlot>
+      );
+    } else {
+      return <p>Loading</p>;
     }
   };
   getSVGPlot = () => {
@@ -454,6 +491,7 @@ class DifferentialVolcano extends Component {
       this.setState({
         volcanoHeightBackup: this.state.volcanoHeight,
       });
+      this.props.onHandleSelectedVolcano([]);
     }
     const size = !volcanoPlotsVisible ? this.state.volcanoHeightBackup : 0;
     this.onSizeChange(size, 'horizontal');
@@ -463,12 +501,19 @@ class DifferentialVolcano extends Component {
     localStorage.setItem(`volcanoPlotsVisible`, !volcanoPlotsVisible);
   };
 
+  // handlePlotAnimationVolcano = animation => () => {
+  //   this.setState(prevState => ({
+  //     animation,
+  //     visible: !prevState.visible,
+  //   }));
+  // };
+
   render() {
     const {
       filteredTableData,
       itemsPerPageVolcanoTable,
       volcanoPlotRows,
-      axisLables,
+      axisLabels,
       xAxisLabel,
       yAxisLabel,
       doXAxisTransformation,
@@ -478,13 +523,14 @@ class DifferentialVolcano extends Component {
       volcanoPlotsVisible,
       volcanoHeight,
       volcanoWidth,
+      animation,
+      direction,
     } = this.state;
 
     const {
       additionalTemplateInfoDifferentialTable,
       differentialColumns,
       isVolcanoTableLoading,
-      // differentialResultsMounted,
       differentialStudy,
       differentialModel,
       differentialTest,
@@ -492,7 +538,6 @@ class DifferentialVolcano extends Component {
       tab,
       isItemSelected,
     } = this.props;
-    // if (differentialResultsMounted) {
     let differentialVolcanoCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-Volcano`;
     if (multisetQueriedDifferential) {
       differentialVolcanoCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-${multisetQueriedDifferential}-Volcano`;
@@ -508,7 +553,6 @@ class DifferentialVolcano extends Component {
       fontSize: '13px',
       wordBreak: 'break-all',
     };
-    // if (volcanoPlotsVisible) {
     const xAxisTransformBox = allowXTransformation ? (
       <Form.Field
         control={Checkbox}
@@ -548,6 +592,7 @@ class DifferentialVolcano extends Component {
       ></Form.Field>
     );
     const svgPlot = this.getSVGPlot();
+    const volcanoPlot = this.getVolcanoPlot();
     const resizerStyle = {
       // padding: '1px 0px !important',
       // height: '16px',
@@ -562,6 +607,20 @@ class DifferentialVolcano extends Component {
     const hiddenResizerStyle = {
       display: 'none',
     };
+    const VerticalSidebar = ({ animation, direction, isItemSelected }) => (
+      <Sidebar
+        as={'div'}
+        animation={animation}
+        direction={direction}
+        icon="labeled"
+        vertical="true"
+        visible={isItemSelected}
+        width="very wide"
+        className="VerticalSidebarPlot"
+      >
+        <DifferentialPlot {...this.props} {...this.state}></DifferentialPlot>
+      </Sidebar>
+    );
 
     return (
       <Grid.Column
@@ -572,23 +631,11 @@ class DifferentialVolcano extends Component {
         widescreen={12}
       >
         <Sidebar.Pushable as={'span'}>
-          <Sidebar
-            as={'div'}
-            animation="overlay"
-            direction="right"
-            icon="labeled"
-            vertical="true"
-            visible={isItemSelected}
-            // width="very wide"
-            className="VerticalSidebarVolcanoView"
-          >
-            <div className="">
-              <DifferentialPlot
-                {...this.props}
-                {...this.state}
-              ></DifferentialPlot>
-            </div>
-          </Sidebar>
+          <VerticalSidebar
+            animation={animation}
+            direction={direction}
+            isItemSelected={isItemSelected}
+          />
           <Sidebar.Pusher>
             <div
             // className="DifferentialVolcanoViewContainer"
@@ -651,33 +698,21 @@ class DifferentialVolcano extends Component {
                           </Label>
                           <Form.Field
                             control={Select}
-                            // label="X Axis"
                             name="xAxisSelector"
                             className="axisSelector NoSelect"
                             id="xAxisSelector"
                             value={xAxisLabel}
-                            options={axisLables}
+                            options={axisLabels}
                             onChange={this.handleDropdownChange.bind(this)}
                           ></Form.Field>
                           <Popup
-                            trigger={
-                              // <Form.Field
-                              //   control={Checkbox}
-                              //   name="xTransformationCheckbox"
-                              //   checked={doXAxisTransformation}
-                              //   onClick={this.handleTransformationChange.bind(this)}
-                              //   disabled={allowXTransformation}
-                              // ></Form.Field>
-                              xAxisTransformBox
-                            }
+                            trigger={xAxisTransformBox}
                             style={TableValuePopupStyle}
                             // className="TablePopupValue"
                             content="-log10 Transform, X Axis"
                             inverted
                             basic
                           />
-
-                          {/* <Divider vertical></Divider> */}
                           <Label
                             className="VolcanoAxisLabel NoSelect"
                             id="VolcanoAxisLabelY"
@@ -692,21 +727,11 @@ class DifferentialVolcano extends Component {
                             id="yAxisSelector"
                             className="axisSelector NoSelect"
                             value={yAxisLabel}
-                            options={axisLables}
+                            options={axisLabels}
                             onChange={this.handleDropdownChange.bind(this)}
                           ></Form.Field>
-                          {/* <span title="-log10 Transform"> */}
                           <Popup
-                            trigger={
-                              // <Form.Field
-                              //   control={Checkbox}
-                              //   name="yTransformationCheckbox"
-                              //   checked={doYAxisTransformation}
-                              //   onClick={this.handleTransformationChange.bind(this)}
-                              //   disabled={allowYTransformation}
-                              // ></Form.Field>
-                              yAxisTransformBox
-                            }
+                            trigger={yAxisTransformBox}
                             style={TableValuePopupStyle}
                             // className="TablePopupValue"
                             content="-log10 Transform, Y Axis"
@@ -752,16 +777,7 @@ class DifferentialVolcano extends Component {
                           this.onSizeChange(size, 'vertical')
                         }
                       >
-                        <DifferentialVolcanoPlot
-                          ref={this.differentialVolcanoPlotRef}
-                          {...this.state}
-                          {...this.props}
-                          handleVolcanoPlotSelectionChange={
-                            this.handleVolcanoPlotSelectionChange
-                          }
-                          getMaxAndMin={this.getMaxAndMin}
-                          onHandleDotClick={this.handleDotClick}
-                        ></DifferentialVolcanoPlot>
+                        {volcanoPlot}
                         {svgPlot}
                       </SplitPane>
                       <Grid.Row>
