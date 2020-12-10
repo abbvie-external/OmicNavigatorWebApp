@@ -27,6 +27,9 @@ class ButtonActions extends Component {
         // for Multiset Analysis
         PlotName = `${this.props.study}_${this.props.model}_MultisetPlot.png`;
       }
+      if (this.props.plotName != null) {
+        PlotName = this.props.plotName;
+      }
       const Plot = document.getElementById(this.props.plot) || null;
       // decrease quality if volcano chart
       const encoderOptionsVar = this.props.plot !== 'ViolinChart' ? 1 : 0.1;
@@ -61,6 +64,7 @@ class ButtonActions extends Component {
   };
 
   SVGExport = () => {
+    debugger;
     if (this.props.imageInfo == null) {
       let PlotName = `${this.props.plot}.svg`;
       // for Barcode, Violin
@@ -70,6 +74,9 @@ class ButtonActions extends Component {
       if (this.props.study != null) {
         // for Multiset Analysis
         PlotName = `${this.props.study}_${this.props.model}_MultisetPlot.svg`;
+      }
+      if (this.props.plotName != null) {
+        PlotName = this.props.plotName;
       }
       const Plot = document.getElementById(this.props.plot) || null;
       this.exportSVG(Plot, PlotName);

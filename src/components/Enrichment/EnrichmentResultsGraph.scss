@@ -372,15 +372,15 @@
   margin-bottom: 5px;
 }
 
-.NodeLinkTotals {
-  margin-bottom: 5px;
-  // margin-left: 40px;
-  // float: right !important;
+.TotalsSpan {
+  float: right;
+  margin-right: 5px;
 }
 
-// #NodeTotals {
-//   margin-right: 100px;
-// }
+#LinkTotalsSpan {
+  margin-right: 30px;
+}
+
 .node-label {
   pointer-events: none;
 }

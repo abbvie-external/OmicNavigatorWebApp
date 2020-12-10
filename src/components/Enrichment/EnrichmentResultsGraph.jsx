@@ -509,6 +509,9 @@ class EnrichmentResultsGraph extends Component {
       legendIsOpen,
       // multisetFiltersVisibleEnrichment,
       // networkSigValue,
+      enrichmentStudy,
+      enrichmentModel,
+      enrichmentAnnotation,
     } = this.props;
 
     if (!networkDataLoaded) {
@@ -566,7 +569,7 @@ class EnrichmentResultsGraph extends Component {
       const LinkTypeTrack = (props, state) => (
         <LinkTypeStyledTrack {...props} index={state.index} />
       );
-
+      const PlotName = `${enrichmentStudy}_${enrichmentModel}_${enrichmentAnnotation}_network`;
       return (
         <Grid className="NetworkGraphFiltersContainer">
           <Grid.Row className="NetworkGraphFiltersRow">
@@ -908,8 +911,8 @@ class EnrichmentResultsGraph extends Component {
               mobile={16}
               tablet={6}
               computer={6}
-              largeScreen={5}
-              widescreen={5}
+              largeScreen={6}
+              widescreen={6}
             >
               <Popup
                 trigger={
@@ -971,59 +974,12 @@ class EnrichmentResultsGraph extends Component {
               />
             </Grid.Column>
             <Grid.Column
-              id="NodeTotalsCol"
-              mobile={3}
-              tablet={3}
-              computer={3}
-              largeScreen={3}
-              widescreen={3}
-            >
-              {/* className="ShowInlineBlock NodeLinkTotals" */}
-              <Popup
-                trigger={
-                  <Label id="NodeTotals" size={dynamicSize}>
-                    {filteredNodesTotal} of {totalNodes} Nodes
-                  </Label>
-                }
-                style={CustomPopupStyle}
-                content="Number of nodes meeting current filter requirements, of total nodes without filters"
-                inverted
-                on={['hover', 'click']}
-                position="left center"
-                mouseEnterDelay={1000}
-                mouseLeaveDelay={0}
-              />
-            </Grid.Column>
-            <Grid.Column
-              id="LinkTotalsCol"
-              mobile={3}
-              tablet={3}
-              computer={3}
-              largeScreen={3}
-              widescreen={3}
-            >
-              <Popup
-                trigger={
-                  <Label id="LinkTotals" size={dynamicSize}>
-                    {filteredLinksTotal} of {totalLinks} Links
-                  </Label>
-                }
-                style={CustomPopupStyle}
-                content="Number of links meeting current filter requirements, of total links without filters"
-                inverted
-                on={['hover', 'click']}
-                position="left center"
-                mouseEnterDelay={1000}
-                mouseLeaveDelay={0}
-              />
-            </Grid.Column>
-            <Grid.Column
-              id="NetworkButtonActions"
               mobile={16}
-              tablet={4}
-              computer={4}
-              largeScreen={5}
-              widescreen={5}
+              tablet={10}
+              computer={10}
+              largeScreen={10}
+              widescreen={10}
+              id="NetworkExportNodeLinkTotals"
             >
               <ButtonActions
                 exportButtonSize={'mini'}
@@ -1032,8 +988,42 @@ class EnrichmentResultsGraph extends Component {
                 pdfVisible={false}
                 svgVisible={true}
                 txtVisible={false}
-                plot={'svg-chart-network'}
+                plotName={PlotName}
+                plot="svg-chart-network"
               />
+              <span class="TotalsSpan" id="LinkTotalsSpan">
+                <Popup
+                  trigger={
+                    <Label id="LinkTotals" size={dynamicSize}>
+                      {filteredLinksTotal} of {totalLinks} Links
+                    </Label>
+                  }
+                  style={CustomPopupStyle}
+                  content="Number of links meeting current filter requirements, of total links without filters"
+                  inverted
+                  on={['hover', 'click']}
+                  position="left center"
+                  mouseEnterDelay={1000}
+                  mouseLeaveDelay={0}
+                />
+              </span>
+              <span class="TotalsSpan" id="NodeTotalsSpan">
+                {/* className="ShowInlineBlock NodeLinkTotals" */}
+                <Popup
+                  trigger={
+                    <Label id="NodeTotals" size={dynamicSize}>
+                      {filteredNodesTotal} of {totalNodes} Nodes
+                    </Label>
+                  }
+                  style={CustomPopupStyle}
+                  content="Number of nodes meeting current filter requirements, of total nodes without filters"
+                  inverted
+                  on={['hover', 'click']}
+                  position="left center"
+                  mouseEnterDelay={1000}
+                  mouseLeaveDelay={0}
+                />
+              </span>
             </Grid.Column>
             <Grid.Column
               className=""
