@@ -35,7 +35,7 @@ class Tabs extends Component {
     this.state = {
       baseUrl: baseUrl,
       activeIndex: isEnrichment ? 2 : 1,
-      tab: tabFromUrl,
+      tab: tabFromUrl || 'differential',
       enrichmentStudy: isEnrichment ? decodedStudy : '',
       enrichmentModel: isEnrichment ? decodedModel : '',
       enrichmentAnnotation: isEnrichment ? decodedTest : '',
@@ -53,7 +53,7 @@ class Tabs extends Component {
       allStudiesMetadata: [],
       differentialFeatureIdKey: '',
       filteredDifferentialFeatureIdKey: '',
-      appVersion: '0.3.2',
+      appVersion: '0.3.2.1',
       packageVersion: '',
     };
   }
