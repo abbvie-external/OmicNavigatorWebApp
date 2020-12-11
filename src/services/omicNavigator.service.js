@@ -5,73 +5,62 @@ window.jQuery = $;
 require('opencpu.js/opencpu-0.5.js');
 class OmicNavigatorService {
   constructor() {
-    this.ocpuUrl = '***REMOVED***/ocpu/library/OmicNavigator/R';
+    this.ocpuUrlDev = '***REMOVED***/ocpu/library/OmicNavigator/R';
+    this.ocpuUrlProd = '***REMOVED***/ocpu/library/OmicNavigator/R';
+    this.baseUrl =
+      process.env.NODE_ENV === 'development'
+        ? '***REMOVED***'
+        : window.location.origin;
+    this.url = `${this.baseUrl}/ocpu/library/OmicNavigator/R`;
   }
 
   setUrl() {
     if (process.env.NODE_ENV === 'development') {
-      window.ocpu.seturl(this.ocpuUrl);
+      window.ocpu.seturl(this.ocpuUrlProd);
     }
   }
 
-  async ocpuRPCUnbox(method, obj, timeoutLength, handleError, cancelToken) {
+  async axiosPost(method, obj, params, handleError, cancelToken, timeout) {
+    const paramsObj = params ? { digits: 10 } : {};
+    const self = this;
     return new Promise(function(resolve, reject) {
-      window.ocpu
-        .call(method, obj, function(session) {
-          const url = session.getLoc() + 'R/.val/json?auto_unbox=true';
-          axios
-            .get(url, {
-              params: { digits: 10 },
-              responseType: 'text',
-              cancelToken,
-              timeout: timeoutLength,
-            })
-            .then(response => resolve(response.data))
-            .catch(function(thrown) {
-              if (axios.isCancel(thrown)) {
-                // console.log('Request canceled', thrown.message);
-              } else {
-                if (handleError != null) {
-                  handleError(false);
-                }
-                // console.log(`${thrown.message}`);
-              }
-            });
+      const axiosPostUrl = `${self.url}/${method}/json?auto_unbox=true`;
+      console.log(axiosPostUrl);
+      axios
+        .post(axiosPostUrl, obj, {
+          params: paramsObj,
+          responseType: 'text',
+          cancelToken,
+          timeout,
         })
-        // instead of line 26-35, you can use this function instead, if don't need the cancelToken
-        // .call(method, obj, function(session) {
-        //   session
-        //     .getObject('.val', 'digits=10')
-        //     .then(response => resolve(response));
-        // })
-        .catch(error => {
-          if (method !== 'getMetaFeaturesTable') {
-            toast.error(`${error.statusText}: ${error.responseText}`);
-          }
-          if (handleError !== undefined) {
-            handleError(false);
+        .then(response => resolve(response.data))
+        .catch(function(error) {
+          if (!axios.isCancel(error)) {
+            if (
+              method !== 'getReportLink' &&
+              method !== 'getMetaFeaturesTable'
+            ) {
+              toast.error(`${error.message}`);
+            }
+            if (handleError != null) {
+              handleError(false);
+            }
           }
         });
     });
   }
 
-  async ocpuDataCall(
+  async ocpuCallAxiosGet(
     method,
     obj,
+    params,
     handleError,
     cancelToken,
-    params,
-    timeoutLength,
+    timeout,
   ) {
     const paramsObj = params ? { digits: 10 } : {};
     return new Promise(function(resolve, reject) {
       window.ocpu
-        // you can use this function instead, if don't need Axios cancelToken
-        // .call(method, obj, function(session) {
-        //   session
-        //     .getObject('.val', 'digits=10')
-        //     .then(response => resolve(response));
-        // })
         .call(method, obj, function(session) {
           const url = session.getLoc() + 'R/.val/json?auto_unbox=true';
           axios
@@ -79,7 +68,7 @@ class OmicNavigatorService {
               params: paramsObj,
               responseType: 'text',
               cancelToken,
-              timeout: timeoutLength,
+              timeout,
             })
             .then(response => resolve(response.data))
             .catch(function(thrown) {
@@ -87,28 +76,35 @@ class OmicNavigatorService {
                 // console.log('Request canceled', thrown.message);
               } else {
                 toast.error(`${thrown.message}`);
-                if (handleError !== undefined) {
+                // console.log(`${thrown.message}`);
+                if (handleError != null) {
                   handleError(false);
                 }
-                // console.log(`${thrown.message}`);
               }
             });
         })
         .catch(error => {
-          if (method !== 'getReportLink') {
+          if (method !== 'getReportLink' && method !== 'getMetaFeaturesTable') {
             toast.error(`${error.statusText}: ${error.responseText}`);
+            // console.log(`${error.statusText}: ${error.responseText}`);
           }
-          if (handleError !== undefined) {
+          if (handleError != null) {
             handleError(false);
           }
-          // console.log(`${error.statusText}: ${error.responseText}`);
         });
     });
   }
 
+  async ocpuRPCOutput(method, obj) {
+    return new Promise(function(resolve, reject) {
+      window.ocpu.rpc(method, obj, function(output) {
+        resolve(output);
+      });
+    });
+  }
+
   async getPackageVersion() {
-    this.setUrl();
-    const promise = this.ocpuDataCall(
+    const promise = this.axiosPost(
       'getPackageVersion',
       {},
       null,
@@ -121,14 +117,15 @@ class OmicNavigatorService {
   }
 
   async getReportLink(study, model, errorCb, cancelToken) {
-    this.setUrl();
+    // this.setUrl();
     const obj = { study: study, modelID: model };
-    const promise = this.ocpuDataCall(
+    // const promise = this.ocpuCallAxiosGet(
+    const promise = this.axiosPost(
       'getReportLink',
       obj,
+      false,
       errorCb,
       null,
-      false,
       25000,
     );
     const dataFromPromise = await promise;
@@ -136,22 +133,22 @@ class OmicNavigatorService {
   }
 
   async listStudies() {
-    this.setUrl();
-    const promise = this.ocpuRPCUnbox('listStudies', {}, 25000);
+    // this.setUrl();
+    const promise = this.axiosPost('listStudies', {}, true, null, null, 25000);
     const studiesFromPromise = await promise;
     return studiesFromPromise;
   }
 
   async getResultsTable(study, model, test, errorCb, cancelToken) {
-    this.setUrl();
+    // this.setUrl();
     const obj = { study: study, modelID: model, testID: test };
     // const promise = this.ocpuRPCOutput('getResultsTable', obj);
-    const promise = this.ocpuDataCall(
+    const promise = this.axiosPost(
       'getResultsTable',
       obj,
+      true,
       errorCb,
       cancelToken,
-      true,
       25000,
     );
     const dataFromPromise = await promise;
@@ -166,7 +163,7 @@ class OmicNavigatorService {
     errorCb,
     cancelToken,
   ) {
-    this.setUrl();
+    // this.setUrl();
     const obj = {
       study: study,
       modelID: model,
@@ -174,12 +171,12 @@ class OmicNavigatorService {
       type: valueType,
     };
 
-    const promise = this.ocpuDataCall(
+    const promise = this.axiosPost(
       'getEnrichmentsTable',
       obj,
+      true,
       errorCb,
       cancelToken,
-      true,
       25000,
     );
     // const promise = this.ocpuRPCOutput(
@@ -190,20 +187,17 @@ class OmicNavigatorService {
     return dataFromPromise;
   }
 
-  async ocpuRPCOutput(method, obj) {
-    return new Promise(function(resolve, reject) {
-      window.ocpu.rpc(method, obj, function(output) {
-        resolve(output);
-      });
-    });
-  }
-
   async getProteinData(id, study, errorCb) {
-    const promise = this.ocpuRPCUnbox(
+    const promise = this.axiosPost(
       'proteindata',
-      { id: id, study: study },
-      25000,
+      {
+        id: id,
+        study: study,
+      },
+      true,
       errorCb,
+      null,
+      25000,
     );
     const proteinDataFromPromise = await promise;
     return proteinDataFromPromise;
@@ -245,10 +239,15 @@ class OmicNavigatorService {
   }
 
   async plotStudy(study, model, id, plottype, errorCb, cancelToken) {
-    this.setUrl();
+    // this.setUrl();
     const promise = this.ocpuPlotCall(
       'plotStudy',
-      { study: study, modelID: model, featureID: id, plotID: plottype },
+      {
+        study: study,
+        modelID: model,
+        featureID: id,
+        plotID: plottype,
+      },
       errorCb,
       cancelToken,
     );
@@ -257,16 +256,16 @@ class OmicNavigatorService {
   }
 
   async getBarcodes(study, model) {
-    this.setUrl();
-    const promise = this.ocpuDataCall(
+    // this.setUrl();
+    const promise = this.axiosPost(
       'getBarcodes',
       {
         study: study,
         modelID: model,
       },
-      null,
-      null,
       false,
+      null,
+      null,
       25000,
     );
     const dataFromPromise = await promise;
@@ -282,8 +281,8 @@ class OmicNavigatorService {
     errorCb,
     cancelToken,
   ) {
-    this.setUrl();
-    const promise = this.ocpuDataCall(
+    // this.setUrl();
+    const promise = this.axiosPost(
       'getBarcodeData',
       {
         study: study,
@@ -292,9 +291,9 @@ class OmicNavigatorService {
         annotationID: annotation,
         termID: term,
       },
+      false,
       errorCb,
       cancelToken,
-      false,
       25000,
     );
     const dataFromPromise = await promise;
@@ -313,8 +312,8 @@ class OmicNavigatorService {
     errorCb,
     cancelToken,
   ) {
-    this.setUrl();
-    const promise = this.ocpuDataCall(
+    // this.setUrl();
+    const promise = this.axiosPost(
       'getEnrichmentsIntersection',
       {
         study: study,
@@ -326,9 +325,9 @@ class OmicNavigatorService {
         operator: operator,
         type: type,
       },
+      true,
       errorCb,
       cancelToken,
-      true,
       25000,
     );
     const dataFromPromise = await promise;
@@ -346,7 +345,7 @@ class OmicNavigatorService {
     errorCb,
     cancelToken,
   ) {
-    this.setUrl();
+    // this.setUrl();
     const promise = this.ocpuPlotCall(
       'getEnrichmentsUpset',
       {
@@ -377,8 +376,8 @@ class OmicNavigatorService {
     errorCb,
     cancelToken,
   ) {
-    this.setUrl();
-    const promise = this.ocpuDataCall(
+    // this.setUrl();
+    const promise = this.axiosPost(
       'getResultsIntersection',
       {
         study: study,
@@ -390,9 +389,9 @@ class OmicNavigatorService {
         operator: operator,
         column: column,
       },
+      true,
       errorCb,
       cancelToken,
-      true,
       25000,
     );
     const dataFromPromise = await promise;
@@ -408,7 +407,7 @@ class OmicNavigatorService {
     errorCb,
     cancelToken,
   ) {
-    this.setUrl();
+    // this.setUrl();
     const promise = this.ocpuPlotCall(
       'getResultsUpset',
       {
@@ -432,17 +431,18 @@ class OmicNavigatorService {
     errorCb,
     cancelToken,
   ) {
-    this.setUrl();
-    const promise = this.ocpuRPCUnbox(
+    // this.setUrl();
+    const promise = this.axiosPost(
       'getEnrichmentsNetwork',
       {
         study: enrichmentStudy,
         model: enrichmentModel,
         annotation: enrichmentAnnotation,
       },
-      45000,
+      true,
       errorCb,
       cancelToken,
+      45000,
     );
     // const promise = this.ocpuRPCOutput(
     //   'getEnrichmentsNetwork',
@@ -463,17 +463,17 @@ class OmicNavigatorService {
     errorCb,
     cancelToken,
   ) {
-    this.setUrl();
-    const promise = this.ocpuDataCall(
+    // this.setUrl();
+    const promise = this.axiosPost(
       'getNodeFeatures',
       {
         study: enrichmentStudy,
         annotationID: enrichmentAnnotation,
         termID: term,
       },
+      false,
       errorCb,
       cancelToken,
-      false,
       25000,
     );
     const featuresFromPromise = await promise;
@@ -488,8 +488,8 @@ class OmicNavigatorService {
     errorCb,
     cancelToken,
   ) {
-    this.setUrl();
-    const promise = this.ocpuDataCall(
+    // this.setUrl();
+    const promise = this.axiosPost(
       'getLinkFeatures',
       {
         study: enrichmentStudy,
@@ -497,9 +497,9 @@ class OmicNavigatorService {
         termID1: term1,
         termID2: term2,
       },
+      false,
       errorCb,
       cancelToken,
-      false,
       25000,
     );
     const featuresFromPromise = await promise;
@@ -508,14 +508,16 @@ class OmicNavigatorService {
 
   async getMetaFeatures(differentialStudy, differentialModel) {
     this.setUrl();
-    const promise = this.ocpuRPCUnbox(
+    const promise = this.ocpuCallAxiosGet(
       'getMetaFeatures',
       {
         study: differentialStudy,
         model: differentialModel,
       },
-      25000,
+      false,
       null,
+      null,
+      25000,
     );
     const nodesFromPromise = await promise;
     return nodesFromPromise;
@@ -527,16 +529,18 @@ class OmicNavigatorService {
     feature,
     errorCb,
   ) {
-    this.setUrl();
-    const promise = this.ocpuRPCUnbox(
+    // this.setUrl();
+    const promise = this.axiosPost(
       'getMetaFeaturesTable',
       {
         study: differentialStudy,
         model: differentialModel,
         featureID: feature,
       },
-      25000,
+      true,
       errorCb,
+      null,
+      25000,
     );
     const nodesFromPromise = await promise;
     return nodesFromPromise;
@@ -544,14 +548,16 @@ class OmicNavigatorService {
 
   async getResultsLinkouts(differentialStudy, differentialModel) {
     this.setUrl();
-    const promise = this.ocpuRPCUnbox(
+    const promise = this.ocpuCallAxiosGet(
       'getResultsLinkouts',
       {
         study: differentialStudy,
         modelID: differentialModel,
       },
-      25000,
+      false,
       null,
+      null,
+      25000,
     );
     const nodesFromPromise = await promise;
     return nodesFromPromise;
@@ -559,14 +565,16 @@ class OmicNavigatorService {
 
   async getEnrichmentsLinkouts(enrichmentStudy, enrichmentAnnotation) {
     this.setUrl();
-    const promise = this.ocpuRPCUnbox(
+    const promise = this.ocpuCallAxiosGet(
       'getEnrichmentsLinkouts',
       {
         study: enrichmentStudy,
         annotationID: enrichmentAnnotation,
       },
-      25000,
+      false,
       null,
+      null,
+      25000,
     );
     const nodesFromPromise = await promise;
     return nodesFromPromise;

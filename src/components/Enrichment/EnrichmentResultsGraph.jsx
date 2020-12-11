@@ -991,7 +991,7 @@ class EnrichmentResultsGraph extends Component {
                 plotName={PlotName}
                 plot="svg-chart-network"
               />
-              <span class="TotalsSpan" id="LinkTotalsSpan">
+              <span className="TotalsSpan" id="LinkTotalsSpan">
                 <Popup
                   trigger={
                     <Label id="LinkTotals" size={dynamicSize}>
@@ -1007,7 +1007,7 @@ class EnrichmentResultsGraph extends Component {
                   mouseLeaveDelay={0}
                 />
               </span>
-              <span class="TotalsSpan" id="NodeTotalsSpan">
+              <span className="TotalsSpan" id="NodeTotalsSpan">
                 {/* className="ShowInlineBlock NodeLinkTotals" */}
                 <Popup
                   trigger={

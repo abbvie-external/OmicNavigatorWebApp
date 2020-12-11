@@ -19,9 +19,6 @@ import { CancelToken } from 'axios';
 import _ from 'lodash';
 import './Differential.scss';
 import '../Shared/Table.scss';
-// eslint-disable-next-line no-unused-vars
-import QHGrid, { EZGrid } from '***REMOVED***';
-import '***REMOVED***/dist/index.css';
 
 let cancelRequestDifferentialResultsGetPlot = () => {};
 class Differential extends Component {
