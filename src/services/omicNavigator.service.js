@@ -429,23 +429,17 @@ class OmicNavigatorService {
     return svgMarkupFromPromise;
   }
 
-  async getEnrichmentsNetwork(
-    enrichmentStudy,
-    enrichmentModel,
-    enrichmentAnnotation,
-    errorCb,
-    cancelToken,
-  ) {
-    const cacheKey = `getEnrichmentsNetwork_${enrichmentStudy}_${enrichmentModel}_${enrichmentAnnotation}`;
+  async getEnrichmentsNetwork(study, model, annotation, errorCb, cancelToken) {
+    const cacheKey = `getEnrichmentsNetwork_${study}_${model}_${annotation}`;
     if (this[cacheKey] != null) {
       return this[cacheKey];
     } else {
       const promise = this.axiosPost(
         'getEnrichmentsNetwork',
         {
-          study: enrichmentStudy,
-          model: enrichmentModel,
-          annotation: enrichmentAnnotation,
+          study,
+          model,
+          annotation,
         },
         true,
         errorCb,
