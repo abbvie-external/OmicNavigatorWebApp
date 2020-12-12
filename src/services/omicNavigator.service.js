@@ -436,29 +436,26 @@ class OmicNavigatorService {
     errorCb,
     cancelToken,
   ) {
-    // this.setUrl();
-    const promise = this.axiosPost(
-      'getEnrichmentsNetwork',
-      {
-        study: enrichmentStudy,
-        model: enrichmentModel,
-        annotation: enrichmentAnnotation,
-      },
-      true,
-      errorCb,
-      cancelToken,
-      45000,
-    );
-    // const promise = this.ocpuRPCOutput(
-    //   'getEnrichmentsNetwork',
-    //   {
-    //     study: enrichmentStudy,
-    //     model: enrichmentModel,
-    //     annotation: enrichmentAnnotation,
-    //   },
-    // );
-    const nodesFromPromise = await promise;
-    return nodesFromPromise;
+    const cacheKey = `getEnrichmentsNetwork_${enrichmentStudy}_${enrichmentModel}_${enrichmentAnnotation}`;
+    if (this[cacheKey] != null) {
+      return this[cacheKey];
+    } else {
+      const promise = this.axiosPost(
+        'getEnrichmentsNetwork',
+        {
+          study: enrichmentStudy,
+          model: enrichmentModel,
+          annotation: enrichmentAnnotation,
+        },
+        true,
+        errorCb,
+        cancelToken,
+        45000,
+      );
+      const nodesFromPromise = await promise;
+      this[cacheKey] = nodesFromPromise;
+      return nodesFromPromise;
+    }
   }
 
   async getNodeFeatures(
