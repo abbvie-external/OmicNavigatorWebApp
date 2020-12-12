@@ -140,19 +140,23 @@ class OmicNavigatorService {
   }
 
   async getResultsTable(study, model, test, errorCb, cancelToken) {
-    // this.setUrl();
-    const obj = { study: study, modelID: model, testID: test };
-    // const promise = this.ocpuRPCOutput('getResultsTable', obj);
-    const promise = this.axiosPost(
-      'getResultsTable',
-      obj,
-      true,
-      errorCb,
-      cancelToken,
-      25000,
-    );
-    const dataFromPromise = await promise;
-    return dataFromPromise;
+    const cacheKey = `getResultsTable_${study}_${model}_${test}`;
+    if (this[cacheKey] != null) {
+      return this[cacheKey];
+    } else {
+      const obj = { study: study, modelID: model, testID: test };
+      const promise = this.axiosPost(
+        'getResultsTable',
+        obj,
+        true,
+        errorCb,
+        cancelToken,
+        25000,
+      );
+      const dataFromPromise = await promise;
+      this[cacheKey] = dataFromPromise;
+      return dataFromPromise;
+    }
   }
 
   async getEnrichmentsTable(
@@ -163,28 +167,29 @@ class OmicNavigatorService {
     errorCb,
     cancelToken,
   ) {
-    // this.setUrl();
-    const obj = {
-      study: study,
-      modelID: model,
-      annotationID: annotation,
-      type: valueType,
-    };
+    const cacheKey = `getEnrichmentsTable_${study}_${model}_${annotation}`;
+    if (this[cacheKey] != null) {
+      return this[cacheKey];
+    } else {
+      const obj = {
+        study: study,
+        modelID: model,
+        annotationID: annotation,
+        type: valueType,
+      };
 
-    const promise = this.axiosPost(
-      'getEnrichmentsTable',
-      obj,
-      true,
-      errorCb,
-      cancelToken,
-      25000,
-    );
-    // const promise = this.ocpuRPCOutput(
-    //   'getEnrichmentsTable',
-    //   obj,
-    // );
-    const dataFromPromise = await promise;
-    return dataFromPromise;
+      const promise = this.axiosPost(
+        'getEnrichmentsTable',
+        obj,
+        true,
+        errorCb,
+        cancelToken,
+        25000,
+      );
+      const dataFromPromise = await promise;
+      this[cacheKey] = dataFromPromise;
+      return dataFromPromise;
+    }
   }
 
   async getProteinData(id, study, errorCb) {
