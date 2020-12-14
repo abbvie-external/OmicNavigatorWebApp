@@ -24,7 +24,7 @@ class ViolinPlot extends Component {
     // elementTextAfter: null,
     // didDropdownChange: false,
     displayElementTextViolin:
-      sessionStorage.getItem('displayElementTextViolin') || false,
+      JSON.parse(sessionStorage.getItem('displayElementTextViolin')) || false,
     violinContainerHeight:
       this.violinContainerRef?.current?.parentElement?.offsetHeight ||
       window.screen.height - this.props.horizontalSplitPaneSize - 51,
@@ -336,8 +336,8 @@ class ViolinPlot extends Component {
           if (self.state.displayElementTextViolin) {
             circleText
               .append('text')
-              .attr('x', test.attr('cx'))
-              .attr('y', test.attr('cy'))
+              .attr('x', parseInt(test.attr('cx')) + parseInt(70))
+              .attr('y', parseInt(test.attr('cy')) + parseInt(20))
               .style('fill', 'black')
               .attr('font-size', '10px')
               .attr('font-family', 'Arial')
@@ -359,13 +359,13 @@ class ViolinPlot extends Component {
         }
       }
     };
-    const brushingEnd = function() {
-      if (d3.event.selection != null) {
-        if (self.state.displayElementTextViolin) {
-          self.handleElementText(false);
-        }
-      }
-    };
+    // const brushingEnd = function() {
+    //   if (d3.event.selection != null) {
+    //     if (self.state.displayElementTextViolin) {
+    //       self.handleElementText(false);
+    //     }
+    //   }
+    // };
     self.chart.objs.brush = d3
       .brush()
       .extent([
@@ -373,8 +373,8 @@ class ViolinPlot extends Component {
         [self.state.violinContainerWidth, self.state.violinContainerHeight],
       ])
       // .on('start', brushingStart)
-      .on('brush', highlightBrushedCircles)
-      .on('end', brushingEnd);
+      .on('brush', highlightBrushedCircles);
+    //.on('end', brushingEnd);
     self.chart.objs.g
       .append('g')
       .attr('class', 'violinBrush')
@@ -1709,10 +1709,15 @@ class ViolinPlot extends Component {
         const circleText = self.chart.objs.svg
           .append('g')
           .attr('class', 'circleText');
+        //console.log("HELLOHELLOHELLO")
+        // console.log(parseInt(test.attr('cx')) + parseInt(300));
+        // console.log(parseInt(test.attr('cy')) + parseInt(300));
+        // let x = test.attr('cx') + 300;
+        // let y = test.attr('cy') + 300;
         circleText
           .append('text')
-          .attr('x', test.attr('cx'))
-          .attr('y', test.attr('cy'))
+          .attr('x', parseInt(test.attr('cx')) + parseInt(70))
+          .attr('y', parseInt(test.attr('cy')) + parseInt(20))
           .style('fill', 'black')
           .attr('font-size', '10px')
           .attr('font-family', 'Arial')
@@ -1747,7 +1752,7 @@ class ViolinPlot extends Component {
                 inverted
                 circular
                 onClick={this.handleElementTextChange}
-                color="grey"
+                color="black"
               />
             }
             style={{

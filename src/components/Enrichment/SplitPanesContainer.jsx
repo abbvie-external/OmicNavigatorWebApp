@@ -262,13 +262,7 @@ class SplitPanesContainer extends Component {
     localStorage.setItem(`${paneType}SplitPaneSize`, size);
   };
 
-  handleElementTextChange = () =>
-    this.setState(prevState => ({
-      displayElementText: !prevState.displayElementText,
-    }));
-
   render() {
-    const { displayElementText } = this.state;
     const BarcodePlot = this.getBarcodePlot();
     const ViolinAndTable = this.getViolinAndTable();
     const SVGPlot = this.getSVGPlot();
@@ -306,11 +300,6 @@ class SplitPanesContainer extends Component {
                 checked={displayElementText}
                 onClick={this.handleElementTextChange}
               /> */}
-              <div>
-                <Button icon onClick={this.handleElementTextChange}>
-                  <Icon name="font" size="small" />
-                </Button>
-              </div>
             </Grid.Column>
 
             <Grid.Column
