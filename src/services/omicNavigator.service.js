@@ -14,18 +14,11 @@ class OmicNavigatorService {
     this.url = `${this.baseUrl}/ocpu/library/OmicNavigator/R`;
   }
 
-  setUrl() {
-    if (process.env.NODE_ENV === 'development') {
-      window.ocpu.seturl(this.ocpuUrlProd);
-    }
-  }
-
   async axiosPost(method, obj, params, handleError, cancelToken, timeout) {
     const paramsObj = params ? { digits: 10 } : {};
     const self = this;
     return new Promise(function(resolve, reject) {
       const axiosPostUrl = `${self.url}/${method}/json?auto_unbox=true`;
-      console.log(axiosPostUrl);
       axios
         .post(axiosPostUrl, obj, {
           params: paramsObj,
@@ -50,8 +43,14 @@ class OmicNavigatorService {
     });
   }
 
-  async ocpuCallAxiosGet(
-    method,
+  setUrl() {
+    if (process.env.NODE_ENV === 'development') {
+      window.ocpu.seturl(this.ocpuUrlProd);
+    }
+  }
+
+  async axiosPostPlot(
+    plottype,
     obj,
     params,
     handleError,
@@ -59,24 +58,50 @@ class OmicNavigatorService {
     timeout,
   ) {
     const paramsObj = params ? { digits: 10 } : {};
+    const self = this;
+    return new Promise(function(resolve, reject) {
+      const axiosPostUrl = `${self.url}/${plottype}/graphics/1/svg`;
+      // const axiosPostUrl = `${self.url}/${plottype}/graphics/R/plotStudy`;
+      axios
+        .post(axiosPostUrl, obj, {
+          params: paramsObj,
+          responseType: 'text',
+          cancelToken,
+          timeout,
+        })
+        // .then(response => resolve(response))
+        .then(response => {
+          console.log(response);
+          resolve(response.data);
+        })
+        .catch(function(error) {
+          if (!axios.isCancel(error)) {
+            toast.error(`${error.message}`);
+          }
+          if (handleError != null) {
+            handleError(false);
+          }
+        });
+    });
+  }
+
+  async ocpuPlotCall(plottype, obj, handleError, cancelToken, timeout) {
     return new Promise(function(resolve, reject) {
       window.ocpu
-        .call(method, obj, function(session) {
-          const url = session.getLoc() + 'R/.val/json?auto_unbox=true';
+        .call(plottype, obj, function(session) {
           axios
-            .get(url, {
-              params: paramsObj,
+            // if we want to call plot with dimensions...in progress
+            // .get(session.getLoc() + `graphics/1/svg?width=${dynamicWidth}&height={dynamicHeight}`, {
+            .get(session.getLoc() + 'graphics/1/svg', {
               responseType: 'text',
               cancelToken,
               timeout,
             })
-            .then(response => resolve(response.data))
+            .then(response => resolve(response))
             .catch(function(thrown) {
               if (axios.isCancel(thrown)) {
-                // console.log('Request canceled', thrown.message);
               } else {
                 toast.error(`${thrown.message}`);
-                // console.log(`${thrown.message}`);
                 if (handleError != null) {
                   handleError(false);
                 }
@@ -84,10 +109,7 @@ class OmicNavigatorService {
             });
         })
         .catch(error => {
-          if (method !== 'getReportLink' && method !== 'getMetaFeaturesTable') {
-            toast.error(`${error.statusText}: ${error.responseText}`);
-            // console.log(`${error.statusText}: ${error.responseText}`);
-          }
+          toast.error(`${error.statusText}: ${error.responseText}`);
           if (handleError != null) {
             handleError(false);
           }
@@ -116,35 +138,38 @@ class OmicNavigatorService {
     return versionFromPromise;
   }
 
-  async getReportLink(study, model, errorCb, cancelToken) {
-    // this.setUrl();
-    const obj = { study: study, modelID: model };
-    // const promise = this.ocpuCallAxiosGet(
-    const promise = this.axiosPost(
-      'getReportLink',
-      obj,
-      false,
-      errorCb,
-      null,
-      25000,
-    );
-    const dataFromPromise = await promise;
-    return dataFromPromise;
-  }
-
   async listStudies() {
-    // this.setUrl();
     const promise = this.axiosPost('listStudies', {}, true, null, null, 25000);
     const studiesFromPromise = await promise;
     return studiesFromPromise;
   }
 
-  async getResultsTable(study, model, test, errorCb, cancelToken) {
-    const cacheKey = `getResultsTable_${study}_${model}_${test}`;
+  async getReportLink(study, modelID, errorCb, cancelToken) {
+    const cacheKey = `getReportLink_${study}_${modelID}`;
     if (this[cacheKey] != null) {
       return this[cacheKey];
     } else {
-      const obj = { study: study, modelID: model, testID: test };
+      const obj = { study, modelID };
+      const promise = this.axiosPost(
+        'getReportLink',
+        obj,
+        false,
+        errorCb,
+        null,
+        25000,
+      );
+      const dataFromPromise = await promise;
+      this[cacheKey] = dataFromPromise;
+      return dataFromPromise;
+    }
+  }
+
+  async getResultsTable(study, modelID, testID, errorCb, cancelToken) {
+    const cacheKey = `getResultsTable_${study}_${modelID}_${testID}`;
+    if (this[cacheKey] != null) {
+      return this[cacheKey];
+    } else {
+      const obj = { study, modelID, testID };
       const promise = this.axiosPost(
         'getResultsTable',
         obj,
@@ -161,23 +186,22 @@ class OmicNavigatorService {
 
   async getEnrichmentsTable(
     study,
-    model,
-    annotation,
-    valueType,
+    modelID,
+    annotationID,
+    type,
     errorCb,
     cancelToken,
   ) {
-    const cacheKey = `getEnrichmentsTable_${study}_${model}_${annotation}`;
+    const cacheKey = `getEnrichmentsTable_${study}_${modelID}_${annotationID}_${type}`;
     if (this[cacheKey] != null) {
       return this[cacheKey];
     } else {
       const obj = {
-        study: study,
-        modelID: model,
-        annotationID: annotation,
-        type: valueType,
+        study,
+        modelID,
+        annotationID,
+        type,
       };
-
       const promise = this.axiosPost(
         'getEnrichmentsTable',
         obj,
@@ -192,181 +216,117 @@ class OmicNavigatorService {
     }
   }
 
-  async getProteinData(id, study, errorCb) {
-    const promise = this.axiosPost(
-      'proteindata',
-      {
-        id: id,
-        study: study,
-      },
-      true,
-      errorCb,
-      null,
-      25000,
-    );
-    const proteinDataFromPromise = await promise;
-    return proteinDataFromPromise;
+  async getMetaFeatures(study, model) {
+    const cacheKey = `getMetaFeatures_${study}_${model}`;
+    if (this[cacheKey] != null) {
+      return this[cacheKey];
+    } else {
+      const promise = this.axiosPost(
+        'getMetaFeatures',
+        {
+          study,
+          model,
+        },
+        false,
+        null,
+        null,
+        25000,
+      );
+      const dataFromPromise = await promise;
+      this[cacheKey] = dataFromPromise;
+      return dataFromPromise;
+    }
   }
 
-  async ocpuPlotCall(plottype, obj, handleError, cancelToken) {
-    return new Promise(function(resolve, reject) {
-      window.ocpu
-        .call(plottype, obj, function(session) {
-          axios
-            // if we want to call plot with dimensions...in progress
-            // .get(session.getLoc() + `graphics/1/svg?width=${dynamicWidth}&height={dynamicHeight}`, {
-            .get(session.getLoc() + 'graphics/1/svg', {
-              responseType: 'text',
-              cancelToken,
-              timeout: 25000,
-            })
-            .then(response => resolve(response))
-            .catch(function(thrown) {
-              if (axios.isCancel(thrown)) {
-                // console.log('Request canceled', thrown.message);
-              } else {
-                toast.error(`${thrown.message}`);
-                if (handleError !== undefined) {
-                  handleError(false);
-                }
-                // console.log(`${thrown.message}`);
-              }
-            });
-        })
-        .catch(error => {
-          toast.error(`${error.statusText}: ${error.responseText}`);
-          if (handleError !== undefined) {
-            handleError(false);
-          }
-          // console.log(`${error.statusText}: ${error.responseText}`);
-        });
-    });
+  async getMetaFeaturesTable(study, model, featureID, errorCb) {
+    const cacheKey = `getMetaFeaturesTable_${study}_${model}_${featureID}`;
+    if (this[cacheKey] != null) {
+      return this[cacheKey];
+    } else {
+      const promise = this.axiosPost(
+        'getMetaFeaturesTable',
+        {
+          study,
+          model,
+          featureID,
+        },
+        true,
+        errorCb,
+        null,
+        25000,
+      );
+      const dataFromPromise = await promise;
+      this[cacheKey] = dataFromPromise;
+      return dataFromPromise;
+    }
   }
 
-  async plotStudy(study, model, id, plottype, errorCb, cancelToken) {
-    // this.setUrl();
-    const promise = this.ocpuPlotCall(
-      'plotStudy',
-      {
-        study: study,
-        modelID: model,
-        featureID: id,
-        plotID: plottype,
-      },
-      errorCb,
-      cancelToken,
-    );
-    //const svgMarkupFromPromise = await promise;
-    return promise;
+  async getResultsLinkouts(study, modelID) {
+    const cacheKey = `getResultsLinkouts${study}_${modelID}`;
+    if (this[cacheKey] != null) {
+      return this[cacheKey];
+    } else {
+      const promise = this.axiosPost(
+        'getResultsLinkouts',
+        {
+          study,
+          modelID,
+        },
+        false,
+        null,
+        null,
+        25000,
+      );
+      const dataFromPromise = await promise;
+      this[cacheKey] = dataFromPromise;
+      return dataFromPromise;
+    }
   }
 
-  async getBarcodes(study, model) {
-    // this.setUrl();
-    const promise = this.axiosPost(
-      'getBarcodes',
-      {
-        study: study,
-        modelID: model,
-      },
-      false,
-      null,
-      null,
-      25000,
-    );
-    const dataFromPromise = await promise;
-    return dataFromPromise;
+  async getEnrichmentsLinkouts(study, annotationID) {
+    const cacheKey = `getEnrichmentsLinkouts${study}_${annotationID}`;
+    if (this[cacheKey] != null) {
+      return this[cacheKey];
+    } else {
+      const promise = this.axiosPost(
+        'getEnrichmentsLinkouts',
+        {
+          study,
+          annotationID,
+        },
+        false,
+        null,
+        null,
+        25000,
+      );
+      const dataFromPromise = await promise;
+      this[cacheKey] = dataFromPromise;
+      return dataFromPromise;
+    }
   }
 
-  async getBarcodeData(
-    study,
-    model,
-    test,
-    annotation,
-    term,
-    errorCb,
-    cancelToken,
-  ) {
-    // this.setUrl();
-    const promise = this.axiosPost(
-      'getBarcodeData',
-      {
-        study: study,
-        modelID: model,
-        testID: test,
-        annotationID: annotation,
-        termID: term,
-      },
-      false,
-      errorCb,
-      cancelToken,
-      25000,
-    );
-    const dataFromPromise = await promise;
-    return dataFromPromise;
-  }
-
-  async getEnrichmentsIntersection(
-    study,
-    modelID,
-    annotationID,
-    mustTests,
-    notTests,
-    sigValue,
-    operator,
-    type,
-    errorCb,
-    cancelToken,
-  ) {
-    // this.setUrl();
-    const promise = this.axiosPost(
-      'getEnrichmentsIntersection',
-      {
-        study: study,
-        modelID: modelID,
-        annotationID: annotationID,
-        mustTests: mustTests,
-        notTests: notTests,
-        sigValue: sigValue,
-        operator: operator,
-        type: type,
-      },
-      true,
-      errorCb,
-      cancelToken,
-      25000,
-    );
-    const dataFromPromise = await promise;
-    return dataFromPromise;
-  }
-
-  async getEnrichmentsUpset(
-    study,
-    modelID,
-    annotationID,
-    sigValue,
-    operator,
-    type,
-    tests,
-    errorCb,
-    cancelToken,
-  ) {
-    // this.setUrl();
-    const promise = this.ocpuPlotCall(
-      'getEnrichmentsUpset',
-      {
-        study: study,
-        modelID: modelID,
-        annotationID: annotationID,
-        sigValue: sigValue,
-        operator: operator,
-        type: type,
-        tests: tests,
-      },
-      errorCb,
-      cancelToken,
-    );
-    const svgMarkupFromPromise = await promise;
-    return svgMarkupFromPromise;
+  async plotStudy(study, modelID, featureID, plotID, errorCb, cancelToken) {
+    this.setUrl();
+    const cacheKey = `plotStudy_${study}_${modelID}_${featureID}_${plotID}`;
+    if (this[cacheKey] != null) {
+      return this[cacheKey];
+    } else {
+      const promise = this.ocpuPlotCall(
+        'plotStudy',
+        {
+          study,
+          modelID,
+          featureID,
+          plotID,
+        },
+        errorCb,
+        cancelToken,
+        25000,
+      );
+      const dataFromPromise = await promise;
+      this[cacheKey] = dataFromPromise;
+      return dataFromPromise;
+    }
   }
 
   async getResultsIntersection(
@@ -381,26 +341,70 @@ class OmicNavigatorService {
     errorCb,
     cancelToken,
   ) {
-    // this.setUrl();
-    const promise = this.axiosPost(
-      'getResultsIntersection',
-      {
-        study: study,
-        modelID: modelID,
-        anchor: anchor,
-        mustTests: mustTests,
-        notTests: notTests,
-        sigValue: sigValue,
-        operator: operator,
-        column: column,
-      },
-      true,
-      errorCb,
-      cancelToken,
-      25000,
-    );
-    const dataFromPromise = await promise;
-    return dataFromPromise;
+    const cacheKey = `getResultsIntersection_${study}_${modelID}_${anchor}_${mustTests}_${notTests}_${sigValue}_${operator}`;
+    if (this[cacheKey] != null) {
+      return this[cacheKey];
+    } else {
+      const promise = this.axiosPost(
+        'getResultsIntersection',
+        {
+          study,
+          modelID,
+          anchor,
+          mustTests,
+          notTests,
+          sigValue,
+          operator,
+          column,
+        },
+        true,
+        errorCb,
+        cancelToken,
+        25000,
+      );
+      const dataFromPromise = await promise;
+      this[cacheKey] = dataFromPromise;
+      return dataFromPromise;
+    }
+  }
+
+  async getEnrichmentsIntersection(
+    study,
+    modelID,
+    annotationID,
+    mustTests,
+    notTests,
+    sigValue,
+    operator,
+    type,
+    errorCb,
+    cancelToken,
+  ) {
+    const cacheKey = `getEnrichmentsIntersection_${study}_${modelID}_${annotationID}_${mustTests}_${notTests}_${sigValue}_${operator}_${type}`;
+    if (this[cacheKey] != null) {
+      return this[cacheKey];
+    } else {
+      const promise = this.axiosPost(
+        'getEnrichmentsIntersection',
+        {
+          study,
+          modelID,
+          annotationID,
+          mustTests,
+          notTests,
+          sigValue,
+          operator,
+          type,
+        },
+        true,
+        errorCb,
+        cancelToken,
+        25000,
+      );
+      const dataFromPromise = await promise;
+      this[cacheKey] = dataFromPromise;
+      return dataFromPromise;
+    }
   }
 
   async getResultsUpset(
@@ -412,21 +416,65 @@ class OmicNavigatorService {
     errorCb,
     cancelToken,
   ) {
-    // this.setUrl();
-    const promise = this.ocpuPlotCall(
-      'getResultsUpset',
-      {
-        study: study,
-        modelID: modelID,
-        sigValue: sigValue,
-        operator: operator,
-        column: column,
-      },
-      errorCb,
-      cancelToken,
-    );
-    const svgMarkupFromPromise = await promise;
-    return svgMarkupFromPromise;
+    const cacheKey = `getResultsUpset_${study}_${modelID}_${sigValue}_${operator}_${column}`;
+    if (this[cacheKey] != null) {
+      return this[cacheKey];
+    } else {
+      this.setUrl();
+      const promise = this.ocpuPlotCall(
+        'getResultsUpset',
+        {
+          study,
+          modelID,
+          sigValue,
+          operator,
+          column,
+        },
+        errorCb,
+        cancelToken,
+        25000,
+      );
+      const dataFromPromise = await promise;
+      this[cacheKey] = dataFromPromise;
+      return dataFromPromise;
+    }
+  }
+
+  async getEnrichmentsUpset(
+    study,
+    modelID,
+    annotationID,
+    sigValue,
+    operator,
+    type,
+    tests,
+    errorCb,
+    cancelToken,
+  ) {
+    const cacheKey = `getEnrichmentsUpset_${study}_${modelID}_${annotationID}_${sigValue}_${operator}_${type}_${tests}`;
+    if (this[cacheKey] != null) {
+      return this[cacheKey];
+    } else {
+      this.setUrl();
+      const promise = this.ocpuPlotCall(
+        'getEnrichmentsUpset',
+        {
+          study,
+          modelID,
+          annotationID,
+          sigValue,
+          operator,
+          type,
+          tests,
+        },
+        errorCb,
+        cancelToken,
+        25000,
+      );
+      const dataFromPromise = await promise;
+      this[cacheKey] = dataFromPromise;
+      return dataFromPromise;
+    }
   }
 
   async getEnrichmentsNetwork(study, model, annotation, errorCb, cancelToken) {
@@ -446,134 +494,120 @@ class OmicNavigatorService {
         cancelToken,
         45000,
       );
-      const nodesFromPromise = await promise;
-      this[cacheKey] = nodesFromPromise;
-      return nodesFromPromise;
+      const dataFromPromise = await promise;
+      this[cacheKey] = dataFromPromise;
+      return dataFromPromise;
     }
   }
 
-  async getNodeFeatures(
-    enrichmentStudy,
-    enrichmentAnnotation,
-    term,
-    errorCb,
-    cancelToken,
-  ) {
-    // this.setUrl();
+  async getNodeFeatures(study, annotationID, termID, errorCb, cancelToken) {
+    // uncomment cache when fix display issue
+    // const cacheKey = `getNodeFeatures_${study}_${annotationID}_${termID}`;
+    // if (this[cacheKey] != null) {
+    //   return this[cacheKey];
+    // } else {
     const promise = this.axiosPost(
       'getNodeFeatures',
       {
-        study: enrichmentStudy,
-        annotationID: enrichmentAnnotation,
-        termID: term,
+        study,
+        annotationID,
+        termID,
       },
       false,
       errorCb,
       cancelToken,
       25000,
     );
-    const featuresFromPromise = await promise;
-    return featuresFromPromise;
+    const dataFromPromise = await promise;
+    // this[cacheKey] = dataFromPromise;
+    return dataFromPromise;
+    // }
   }
 
   async getLinkFeatures(
-    enrichmentStudy,
-    enrichmentAnnotation,
-    term1,
-    term2,
+    study,
+    annotationID,
+    termID1,
+    termID2,
     errorCb,
     cancelToken,
   ) {
-    // this.setUrl();
-    const promise = this.axiosPost(
-      'getLinkFeatures',
-      {
-        study: enrichmentStudy,
-        annotationID: enrichmentAnnotation,
-        termID1: term1,
-        termID2: term2,
-      },
-      false,
-      errorCb,
-      cancelToken,
-      25000,
-    );
-    const featuresFromPromise = await promise;
-    return featuresFromPromise;
+    const cacheKey = `getLinkFeatures_${study}_${annotationID}_${termID1}_${termID2}`;
+    if (this[cacheKey] != null) {
+      return this[cacheKey];
+    } else {
+      const promise = this.axiosPost(
+        'getLinkFeatures',
+        {
+          study,
+          annotationID,
+          termID1,
+          termID2,
+        },
+        false,
+        errorCb,
+        cancelToken,
+        25000,
+      );
+      const dataFromPromise = await promise;
+      this[cacheKey] = dataFromPromise;
+      return dataFromPromise;
+    }
   }
 
-  async getMetaFeatures(differentialStudy, differentialModel) {
-    this.setUrl();
-    const promise = this.ocpuCallAxiosGet(
-      'getMetaFeatures',
-      {
-        study: differentialStudy,
-        model: differentialModel,
-      },
-      false,
-      null,
-      null,
-      25000,
-    );
-    const nodesFromPromise = await promise;
-    return nodesFromPromise;
+  async getBarcodes(study, modelID) {
+    const cacheKey = `getBarcodes_${study}_${modelID}`;
+    if (this[cacheKey] != null) {
+      return this[cacheKey];
+    } else {
+      const promise = this.axiosPost(
+        'getBarcodes',
+        {
+          study,
+          modelID,
+        },
+        false,
+        null,
+        null,
+        25000,
+      );
+      const dataFromPromise = await promise;
+      this[cacheKey] = dataFromPromise;
+      return dataFromPromise;
+    }
   }
 
-  async getMetaFeaturesTable(
-    differentialStudy,
-    differentialModel,
-    feature,
+  async getBarcodeData(
+    study,
+    modelID,
+    testID,
+    annotationID,
+    termID,
     errorCb,
+    cancelToken,
   ) {
-    // this.setUrl();
-    const promise = this.axiosPost(
-      'getMetaFeaturesTable',
-      {
-        study: differentialStudy,
-        model: differentialModel,
-        featureID: feature,
-      },
-      true,
-      errorCb,
-      null,
-      25000,
-    );
-    const nodesFromPromise = await promise;
-    return nodesFromPromise;
-  }
-
-  async getResultsLinkouts(differentialStudy, differentialModel) {
-    this.setUrl();
-    const promise = this.ocpuCallAxiosGet(
-      'getResultsLinkouts',
-      {
-        study: differentialStudy,
-        modelID: differentialModel,
-      },
-      false,
-      null,
-      null,
-      25000,
-    );
-    const nodesFromPromise = await promise;
-    return nodesFromPromise;
-  }
-
-  async getEnrichmentsLinkouts(enrichmentStudy, enrichmentAnnotation) {
-    this.setUrl();
-    const promise = this.ocpuCallAxiosGet(
-      'getEnrichmentsLinkouts',
-      {
-        study: enrichmentStudy,
-        annotationID: enrichmentAnnotation,
-      },
-      false,
-      null,
-      null,
-      25000,
-    );
-    const nodesFromPromise = await promise;
-    return nodesFromPromise;
+    const cacheKey = `getBarcodeData_${study}_${modelID}_${testID}_${annotationID}_${termID}`;
+    if (this[cacheKey] != null) {
+      return this[cacheKey];
+    } else {
+      const promise = this.axiosPost(
+        'getBarcodeData',
+        {
+          study,
+          modelID,
+          testID,
+          annotationID,
+          termID,
+        },
+        false,
+        errorCb,
+        cancelToken,
+        25000,
+      );
+      const dataFromPromise = await promise;
+      this[cacheKey] = dataFromPromise;
+      return dataFromPromise;
+    }
   }
 }
 

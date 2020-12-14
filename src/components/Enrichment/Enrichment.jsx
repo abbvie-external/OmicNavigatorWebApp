@@ -294,6 +294,7 @@ class Enrichment extends Component {
         enrichmentAnnotation,
         term,
         this.handleGetBarcodeDataError,
+        null,
       )
       .then(barcodeDataResponse => {
         if (barcodeDataResponse?.data?.length > 0) {
