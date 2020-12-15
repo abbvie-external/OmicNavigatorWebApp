@@ -1543,11 +1543,19 @@ class ViolinPlot extends Component {
               // var id = d.sample.replace(/\;/g, "_");
               // self.dotHover.emit({ object: d, action: 'mouseover' });
               self.isHovering = true;
-              d3.select(`#violin_${d.featureID}`)
-                .transition()
-                .duration(100)
-                .attr('cursor', 'pointer')
-                .attr('r', dOpts.pointSize * 2);
+              if (self.maxCircle === d.sample) {
+                d3.select(`#violin_${d.featureID}`)
+                  .transition()
+                  .duration(100)
+                  .attr('cursor', 'pointer')
+                  .attr('r', dOpts.pointSize * 2.5);
+              } else {
+                d3.select(`#violin_${d.featureID}`)
+                  .transition()
+                  .duration(100)
+                  .attr('cursor', 'pointer')
+                  .attr('r', dOpts.pointSize * 2);
+              }
               if (self.props.violinSettings.tooltip.show) {
                 const m = d3.mouse(self.chart.objs.chartDiv.node());
                 self.chart.objs.tooltip
@@ -1575,7 +1583,7 @@ class ViolinPlot extends Component {
                   const inBrush = this.brushedData.findIndex(
                     d => d.featureID === x.featureID,
                   );
-                  if (self.maxCircle.sample !== x.sample) {
+                  if (self.maxCircle !== x.sample) {
                     if (inBrush > 0) {
                       return dOpts.pointSize * 1.5;
                     } else {
