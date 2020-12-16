@@ -12,6 +12,22 @@ class OmicNavigatorService {
         ? '***REMOVED***'
         : window.location.origin;
     this.url = `${this.baseUrl}/ocpu/library/OmicNavigator/R`;
+    // this.addEventListener('fetch' => {
+    //   var stream = new ReadableStream({
+    //     start(controller) {
+    //       if (/* there's more data */) {
+    //         controller.enqueue(/* your data here */);
+    //       } else {
+    //         controller.close();
+    //       }
+    //     });
+    //   });
+
+    //   var response = new Response(stream, {
+    //     headers: {'content-type': /* your content-type here */}
+    //   });
+    //   respondWith(response);
+    // });
   }
 
   async axiosPost(method, obj, params, handleError, cancelToken, timeout) {
@@ -165,23 +181,380 @@ class OmicNavigatorService {
   }
 
   async getResultsTable(study, modelID, testID, errorCb, cancelToken) {
-    const cacheKey = `getResultsTable_${study}_${modelID}_${testID}`;
-    if (this[cacheKey] != null) {
-      return this[cacheKey];
-    } else {
-      const obj = { study, modelID, testID };
-      const promise = this.axiosPost(
-        'getResultsTable',
-        obj,
-        true,
-        errorCb,
-        cancelToken,
-        25000,
-      );
-      const dataFromPromise = await promise;
-      this[cacheKey] = dataFromPromise;
-      return dataFromPromise;
+    // current implementation
+    // const cacheKey = `getResultsTable_${study}_${modelID}_${testID}`;
+    // if (this[cacheKey] != null) {
+    //   return this[cacheKey];
+    // } else {
+    // const obj = { study, modelID, testID };
+    // const promise = this.axiosPost(
+    //   'getResultsTable',
+    //   obj,
+    //   true,
+    //   errorCb,
+    //   cancelToken,
+    //   25000,
+    // );
+    // const dataFromPromise = await promise;
+    // this[cacheKey] = dataFromPromise;
+    // return dataFromPromise;
+    //}
+
+    // readable stream
+    const obj = { study, modelID, testID };
+    const fetchUrl = `${this.url}/getResultsTable/json?auto_unbox=true`;
+
+    // fetch(fetchUrl, {
+    //   method: 'POST', // *GET, POST, PUT, DELETE, etc.
+    //   mode: 'cors', // no-cors, *cors, same-origin
+    //   cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+    //   credentials: 'same-origin', // include, *same-origin, omit
+    //   headers: {
+    //     'Content-Type': 'application/json'
+    //     // 'Content-Type': 'application/x-www-form-urlencoded',
+    //   },
+    //   redirect: 'follow', // manual, *follow, error
+    //   referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+    //   body: JSON.stringify(obj) // body data type must match "Content-Type" header
+    // })
+    // .then(response => {
+    //   const reader = response.body.getReader();
+    //   return new ReadableStream({
+    //     start(controller) {
+    //       return pump();
+    //       function pump() {
+    //         return reader.read().then(({ done, value }) => {
+    //           // When no more data needs to be consumed, close the stream
+    //           if (done) {
+    //               controller.close();
+    //               return;
+    //           }
+    //           // Enqueue the next data chunk into our target stream
+    //           controller.enqueue(value);
+    //           return pump();
+    //         });
+    //       }
+    //     }
+    //   })
+    // })
+    // // .then(stream => new Response(stream))
+    // .then(stream => {
+    //   debugger;
+    //   return new Response(stream)
+    //   // return new Response(stream, { headers: { "Content-Type": "text/html" } });
+    // })
+    // // .then(response => {
+    // //   debugger;
+    // //   const json = response.json();
+    // //   if (json != null) {
+    // //     if (json.length > 0) {
+    // //       return json;
+    // //     }
+    // //   }
+    // // })
+    // .then(response => response)
+    // // .then(response => response.blob())
+    // // .then(blob => URL.createObjectURL(blob))
+    // // .then(url => console.log(image.src = url))
+    // .catch(err => console.error(err));
+
+    // const fetchResponse = await fetch(fetchUrl, {
+    //   method: 'POST', // *GET, POST, PUT, DELETE, etc.
+    //   mode: 'cors', // no-cors, *cors, same-origin
+    //   cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+    //   credentials: 'same-origin', // include, *same-origin, omit
+    //   headers: {
+    //     'Content-Type': 'application/json'
+    //     // 'Content-Type': 'application/x-www-form-urlencoded',
+    //   },
+    //   redirect: 'follow', // manual, *follow, error
+    //   referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+    //   body: JSON.stringify(obj) // body data type must match "Content-Type" header
+    // });
+    // const response = await fetchResponse;
+    // // const responseJSON = await fetchResponse.json();
+    // const reader = response.body.getReader();
+    // const stream = new ReadableStream({
+    //   start(controller) {
+    //     const chunkys = [];
+    //     // The following function handles each data chunk
+    //     function push() {
+    //       // "done" is a Boolean and value a "Uint8Array"
+    //       reader.read().then(({ done, value }) => {
+    //         // Is there no more data to read?
+    //         if (done) {
+    //           // Tell the browser that we have finished sending data
+    //           controller.close();
+    //           return chunkys;
+    //         }
+    //         // Get the data and send it to the browser via the controller
+    //         controller.enqueue(value);
+    //         push();
+    //           chunkys.push(value);
+    //         // getResultsTable(null, null, null, null, null, chunk)
+    //       });
+    //     };
+    //     push();
+    //     if (chunkys.length > 1) {
+    //       debugger;
+    //       return chunkys;
+    //     }
+    //   }
+    // });
+    // debugger;
+    // // return chunkys;
+    // return new Response(stream, { headers: { "Content-Type": "text/html" } });
+
+    const response = this.fetchReadableStream(fetchUrl, obj);
+    const tableData = await response;
+    // const tableData = await response;
+    // debugger;
+    if (tableData != null) {
+      const dataFromPromise = tableData.json();
+      if (dataFromPromise !== undefined) {
+        return dataFromPromise;
+      }
     }
+
+    // simple fetch
+    // this.postData(fetchUrl, obj)
+    // .then(data => {
+    //   debugger;
+    //   console.log(data); // JSON data parsed by `data.json()` call
+    // });
+  }
+
+  // async readAllChunks(readableStream) {
+  //   const reader = readableStream.getReader();
+  //   const chunkys = [];
+  //   let done, value;
+  //   while (!done) {
+  //     ({ value, done } = await reader.read());
+  //     if (done) {
+  //       return chunkys;
+  //     }
+  //     debugger;
+  //     chunkys.push(value);
+  //     return chunkys;
+  //   }
+  // }
+
+  async fetchReadableStream(url = '', data = {}) {
+    const fetchResponse = fetch(url, {
+      method: 'POST', // *GET, POST, PUT, DELETE, etc.
+      mode: 'cors', // no-cors, *cors, same-origin
+      cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+      credentials: 'same-origin', // include, *same-origin, omit
+      headers: {
+        'Content-Type': 'application/json',
+        // 'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      redirect: 'follow', // manual, *follow, error
+      referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+      body: JSON.stringify(data), // body data type must match "Content-Type" header
+    });
+    const response = await fetchResponse;
+    // const responseJSON = response.json();
+    // return responseJSON;
+    const reader = response.body.getReader();
+    const stream = new ReadableStream({
+      start(controller) {
+        // let chunkys = [];
+        // The following function handles each data chunk
+        function push() {
+          // "done" is a Boolean and value a "Uint8Array"
+          reader.read().then(({ done, value }) => {
+            // Is there no more data to read?
+            if (done) {
+              // Tell the browser that we have finished sending data
+              controller.close();
+              // return chunkys;
+            }
+            // Get the data and send it to the browser via the controller
+            controller.enqueue(value);
+            push();
+            // chunkys.push(value);
+            // getResultsTable(null, null, null, null, null, chunk)
+          });
+        }
+        push();
+        // debugger;
+        // return chunks;
+      },
+    });
+    // debugger;
+    // return chunks;
+    return new Response(stream, {
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+  // fetch(url, {
+  //   method: 'POST', // *GET, POST, PUT, DELETE, etc.
+  //   mode: 'cors', // no-cors, *cors, same-origin
+  //   cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+  //   credentials: 'same-origin', // include, *same-origin, omit
+  //   headers: {
+  //     'Content-Type': 'application/json'
+  //     // 'Content-Type': 'application/x-www-form-urlencoded',
+  //   },
+  //   redirect: 'follow', // manual, *follow, error
+  //   referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+  //   body: JSON.stringify(data) // body data type must match "Content-Type" header
+  // })
+  // .then(response => {
+  // const reader = response.body.getReader();
+  // return new ReadableStream({
+  //   start(controller) {
+  //     return pump();
+  //     function pump() {
+  //       return reader.read().then(({ done, value }) => {
+  //         // When no more data needs to be consumed, close the stream
+  //         if (done) {
+  //             controller.close();
+  //             return;
+  //         }
+  //         // Enqueue the next data chunk into our target stream
+  //         controller.enqueue(value);
+  //         return pump();
+  //       });
+  //     }
+  //   }
+  // })
+  // })
+  // .then(stream => new Response(stream))
+  // .then(response => {
+  //   debugger;
+  //   return response;
+  // })
+  // .then(response => response)
+  // .then(response => response.blob())
+  // .then(blob => URL.createObjectURL(blob))
+  // .then(url => console.log(image.src = url))
+  // .catch(err => console.error(err));
+
+  // const stream = new ReadableStream({
+  //   start(controller) {
+  //     const chunkys = [];
+  //     // The following function handles each data chunk
+  //     function push() {
+  //       // "done" is a Boolean and value a "Uint8Array"
+  //       reader.read().then(({ done, value }) => {
+  //         // Is there no more data to read?
+  //         if (done) {
+  //           // Tell the browser that we have finished sending data
+  //           controller.close();
+  //           return chunkys;
+  //         }
+  //         // Get the data and send it to the browser via the controller
+  //         controller.enqueue(value);
+  //         push();
+  //         // chunkys.push(value);
+  //         // if (chunkys.length > 0) {
+  //         //   debugger;
+  //         //   return chunkys;
+  //         // }
+  //         // getResultsTable(null, null, null, null, null, chunk)
+  //       });
+  //     };
+  //     console.log(chunkys);
+  //     push();
+  //     // if (chunkys.length > 0) {
+  //     //   debugger;
+  //     //   return chunkys;
+  //     // }
+  //     // return chunkys;
+  //   }
+  // })
+  // // return new Response(stream, { headers: { "Content-Type": "text/html" } });
+  // .then(stream => new Response(stream))
+  // // .then(response => response)
+  // .then(response => {
+  //   debugger;
+  //   return response;
+  // })
+  // // return chunkys;
+  //};
+
+  //const chunkys = this.readAllChunks(response.body);
+  // const paul = await chunkys;
+  //return chunkys;
+  // async function readAllChunks(readableStream) {
+  //   const reader = readableStream.getReader();
+  //   const chunkys = [];
+
+  //   let done, value;
+  //   while (!done) {
+  //     ({ value, done } = await reader.read());
+  //     if (done) {
+  //       return chunkys;
+  //     }
+  //     chunkys.push(value);
+  //   }
+  // }
+
+  //await readAllChunks(response.body));
+  // const reader = rb.getReader();
+  // const chunkys = [];
+  // debugger;
+  // const { value, done } = reader.read();
+
+  // if (done) {
+  //   console.log("The stream was already closed!");
+  // } else {
+  //   console.log(value);
+  //   chunkys.push(value);
+  // }
+  // return chunkys;
+
+  //   const reader = rs.getReader();
+
+  //   return new ReadableStream({
+  //     async start(controller) {
+  //       while (true) {
+  //         const { done, value } = await reader.read();
+
+  //         // When no more data needs to be consumed, break the reading
+  //         if (done) {
+  //           break;
+  //         }
+
+  //         // Enqueue the next data chunk into our target stream
+  //         controller.enqueue(value);
+  //       }
+
+  //       // Close the stream
+  //       controller.close();
+  //       reader.releaseLock();
+  //     }
+  //   })
+  // })
+  // Create a new response out of the stream
+  // .then(rs => new Response(rs))
+  // Create an object URL for the response
+  // .then(response => {
+  //   debugger;
+  //   return response;
+  // })
+  // .catch(console.error);
+  // })
+  //}
+
+  async postData(url = '', data = {}) {
+    // Default options are marked with *
+    const response = await fetch(url, {
+      method: 'POST', // *GET, POST, PUT, DELETE, etc.
+      mode: 'cors', // no-cors, *cors, same-origin
+      cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+      credentials: 'same-origin', // include, *same-origin, omit
+      headers: {
+        'Content-Type': 'application/json',
+        // 'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      redirect: 'follow', // manual, *follow, error
+      referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+      body: JSON.stringify(data), // body data type must match "Content-Type" header
+    });
+    return response.json(); // parses JSON response into native JavaScript objects
   }
 
   async getEnrichmentsTable(

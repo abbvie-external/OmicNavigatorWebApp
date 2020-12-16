@@ -192,24 +192,163 @@ class DifferentialSearchCriteria extends Component {
         this.getReportLink(differentialStudy, differentialModel);
         if (differentialTest !== '') {
           onSearchTransitionDifferential(true);
-          omicNavigatorService
-            .getResultsTable(
-              differentialStudy,
-              differentialModel,
-              differentialTest,
-              onSearchTransitionDifferential,
-            )
-            .then(getResultsTableData => {
-              this.handleGetResultsTableData(
-                getResultsTableData,
-                true,
-                true,
-                differentialTest,
-              );
+          // omicNavigatorService
+          //   .getResultsTable(
+          //     differentialStudy,
+          //     differentialModel,
+          //     differentialTest,
+          //     onSearchTransitionDifferential,
+          //   )
+          //   .then(getResultsTableData => {
+          //     // debugger;
+          //     // getResultsTableData = getResultsTableData.json();
+          //     if (getResultsTableData != null) {
+          //       if (getResultsTableData.length > 0) {
+          //         this.handleGetResultsTableData(
+          //           getResultsTableData,
+          //           true,
+          //           true,
+          //           differentialTest,
+          //         );
+          //       }
+          //     }
+          //   })
+          //   .catch(error => {
+          //     console.error('Error during getResultsTable', error);
+          //   });
+
+          const self = this;
+          const obj = {
+            study: differentialStudy,
+            modelID: differentialModel,
+            testID: differentialTest,
+          };
+          const fetchUrl = `***REMOVED***/ocpu/library/OmicNavigator/R/getResultsTable/json?auto_unbox=true`;
+          const fetchResponse = fetch(fetchUrl, {
+            method: 'POST', // *GET, POST, PUT, DELETE, etc.
+            // mode: 'cors', // no-cors, *cors, same-origin
+            // cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+            // credentials: 'same-origin', // include, *same-origin, omit
+            headers: {
+              'Content-Type': 'application/json',
+              // 'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            // redirect: 'follow', // manual, *follow, error
+            // referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+            body: JSON.stringify(obj), // body data type must match "Content-Type" header
+          })
+            // .then(response => response.json())
+            //   .then(response => response.text())
+            //   .then(transform);
+
+            // function transform(str) {
+            //   debugger;
+            //   let data = str.split('\n').map(i => i.split(','));
+            //   let headers = data.shift();
+            //   let output = data.map(d => {
+            //     let obj = {};
+            //     headers.map((h, i) => (obj[headers[i]] = d[i]));
+            //     return obj;
+            //   });
+            //   console.log(output);
+            //   JSON.stringify(output)
+            // }
+            // .then(response => response.json())
+            // .then(responseJSON => {
+            //   if (responseJSON != null) {
+            //     if (responseJSON.length > 0) {
+            //       self.handleGetResultsTableData(
+            //         responseJSON,
+            //         true,
+            //         true,
+            //         differentialTest,
+            //       );
+            //     }
+            //   }
+            // });
+            .then(response => {
+              const reader = response.body.getReader();
+              let streamedResults = [];
+              return new ReadableStream({
+                start(controller) {
+                  return pump();
+                  function pump() {
+                    return reader.read().then(({ done, value }) => {
+                      // When no more data needs to be consumed, close the stream
+                      if (done) {
+                        controller.close();
+                        return;
+                      }
+                      // Enqueue the next data chunk into our target stream
+                      controller.enqueue(value);
+                      streamedResults.push(value);
+                      // console.log(value);
+                      console.log(streamedResults);
+                      // console.log(
+                      //   JSON.parse(
+                      //     String.fromCharCode.apply(
+                      //       null,
+                      //       new Uint8Array(value),
+                      //     ),
+                      //   ),
+                      // );
+                      // JSON.stringify(Array.from(new Uint8Array(value)));
+                      // function Decodeuint8arr(uint8array) {
+                      //   return new TextDecoder('utf-8').decode(uint8array);
+                      // }
+                      // const streamedResultsDecoded = Decodeuint8arr(
+                      //   streamedResults,
+                      // );
+                      // self.handleGetResultsTableData(
+                      //   streamedResultsDecoded,
+                      //   true,
+                      //   true,
+                      //   differentialTest,
+                      // );
+                      // ReadableStream.pipeTo(
+                      //   new WritableStream({
+                      //     write(streamedResults) {
+                      //       self.handleGetResultsTableData(
+                      //         streamedResults,
+                      //         true,
+                      //         true,
+                      //         differentialTest,
+                      //       );
+                      //       console.log('Chunk received', streamedResults);
+                      //     },
+                      //     close() {
+                      //       console.log('All data successfully read!');
+                      //     },
+                      //     abort(e) {
+                      //       console.error('Something went wrong!', e);
+                      //     },
+                      //   }),
+                      // );
+                      return pump();
+                    });
+                  }
+                },
+              });
             })
-            .catch(error => {
-              console.error('Error during getResultsTable', error);
-            });
+            // .then(stream => new Response(stream))
+            .then(stream => {
+              return new Response(stream);
+              // return new Response(stream, { headers: { "Content-Type": "text/html" } });
+            })
+            .then(streamResponse => streamResponse.json())
+            .then(streamJson => {
+              if (streamJson != null) {
+                if (streamJson.length > 0) {
+                  self.handleGetResultsTableData(
+                    streamJson,
+                    true,
+                    true,
+                    differentialTest,
+                  );
+                }
+              }
+            })
+            .catch(err => console.error(err));
           onSearchCriteriaChangeDifferential(
             {
               differentialStudy: differentialStudy,
@@ -375,6 +514,7 @@ class DifferentialSearchCriteria extends Component {
     let cancelToken = new CancelToken(e => {
       cancelRequestPSCGetResultsTable = e;
     });
+    // let promises =
     omicNavigatorService
       .getResultsTable(
         differentialStudy,
@@ -384,11 +524,25 @@ class DifferentialSearchCriteria extends Component {
         cancelToken,
       )
       .then(getResultsTableData => {
-        this.handleGetResultsTableData(getResultsTableData, true, true, value);
+        // debugger;
+        // getResultsTableData = getResultsTableData.json();
+        if (getResultsTableData != null) {
+          if (getResultsTableData.length > 0) {
+            this.handleGetResultsTableData(
+              getResultsTableData,
+              true,
+              true,
+              value,
+            );
+          }
+        }
       })
       .catch(error => {
         console.error('Error during getResultsTable', error);
       });
+    // Promise.all(promises).finally(() => {
+    //   debugger;
+    // });
   };
 
   handleGetResultsTableData = (
@@ -506,12 +660,18 @@ class DifferentialSearchCriteria extends Component {
         cancelToken,
       )
       .then(getResultsTableData => {
-        this.handleGetResultsTableData(
-          getResultsTableData,
-          false,
-          false,
-          value,
-        );
+        // debugger;
+        // getResultsTableData = getResultsTableData.json();
+        if (getResultsTableData != null) {
+          if (getResultsTableData.length > 0) {
+            this.handleGetResultsTableData(
+              getResultsTableData,
+              false,
+              false,
+              value,
+            );
+          }
+        }
       })
       .catch(error => {
         console.error('Error during getResultsTable', error);
