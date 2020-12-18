@@ -621,9 +621,6 @@ class DifferentialSearchCriteria extends Component {
     //   .catch(error => {
     //     console.error('Error during getResultsTable', error);
     //   });
-    // Promise.all(promises).finally(() => {
-    //   debugger;
-    // });
   };
 
   handleGetResultsTableData = (
@@ -728,31 +725,82 @@ class DifferentialSearchCriteria extends Component {
       },
       true,
     );
-    cancelRequestPSCGetResultsTable();
-    let cancelToken = new CancelToken(e => {
-      cancelRequestPSCGetResultsTable = e;
-    });
-    omicNavigatorService
-      .getResultsTable(
-        differentialStudy,
-        differentialModel,
-        value,
-        this.handleMultisetPCloseError,
-        cancelToken,
-      )
-      .then(getResultsTableData => {
-        // debugger;
-        // getResultsTableData = getResultsTableData.json();
-        if (getResultsTableData != null) {
-          if (getResultsTableData.length > 0) {
-            this.handleGetResultsTableData(
-              getResultsTableData,
-              false,
-              false,
-              value,
-            );
-          }
-        }
+    // cancelRequestPSCGetResultsTable();
+    // let cancelToken = new CancelToken(e => {
+    //   cancelRequestPSCGetResultsTable = e;
+    // });
+    // omicNavigatorService
+    //   .getResultsTable(
+    //     differentialStudy,
+    //     differentialModel,
+    //     value,
+    //     this.handleMultisetPCloseError,
+    //     cancelToken,
+    //   )
+    //   .then(getResultsTableData => {
+    //     // debugger;
+    //     // getResultsTableData = getResultsTableData.json();
+    //     if (getResultsTableData != null) {
+    //       if (getResultsTableData.length > 0) {
+    //         this.handleGetResultsTableData(
+    //           getResultsTableData,
+    //           false,
+    //           false,
+    //           value,
+    //         );
+    //       }
+    //     }
+    //   })
+    //   .catch(error => {
+    //     console.error('Error during getResultsTable', error);
+    //   });
+    const self = this;
+    const obj = {
+      study: differentialStudy,
+      modelID: differentialModel,
+      testID: value,
+    };
+    const fetchUrl = `***REMOVED***/ocpu/library/OmicNavigator/R/getResultsTable/ndjson`;
+    fetch(fetchUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(obj), // body data type must match "Content-Type" header
+    })
+      // can nd-json-stream - assumes json is NDJSON, a data format that is separated into individual JSON objects with a newline character (\n). The 'nd' stands for newline delimited JSON
+      .then(response => {
+        return ndjsonStream(response.body); //ndjsonStream parses the response.body
+      })
+      .then(canNdJsonStream => {
+        const reader = canNdJsonStream.getReader();
+        let read;
+        let streamedResults = [];
+        reader.read().then(
+          (read = result => {
+            if (result.done) {
+              streamedResults.push(result.value);
+              self.handleGetResultsTableData(
+                streamedResults,
+                true,
+                true,
+                value,
+              );
+              return;
+            }
+            // console.log(result.value);
+            streamedResults.push(result.value);
+            if (streamedResults.length / 100 === 1) {
+              self.handleGetResultsTableData(
+                streamedResults,
+                true,
+                true,
+                value,
+              );
+            }
+            reader.read().then(read);
+          }),
+        );
       })
       .catch(error => {
         console.error('Error during getResultsTable', error);

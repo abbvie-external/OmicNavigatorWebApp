@@ -176,19 +176,19 @@ class DifferentialVolcano extends Component {
       var yLabel = relevantConfigColumns[0];
       var xLabel = relevantConfigColumns[1];
       var doY = false;
-      if (relevantConfigColumns.includes('logFC')) {
+      if (relevantConfigColumns.indexOf('logFC') >= 0) {
         xLabel = 'logFC';
       }
-      if (relevantConfigColumns.includes('adj_P_Val')) {
+      if (relevantConfigColumns.indexOf('adj_P_Val') >= 0) {
         yLabel = 'adj_P_Val';
         doY = true;
-      } else if (relevantConfigColumns.includes('adj.P.Val')) {
+      } else if (relevantConfigColumns.indexOf('adj.P.Val') >= 0) {
         yLabel = 'adj.P.Val';
         doY = true;
-      } else if (relevantConfigColumns.includes('P_Value')) {
+      } else if (relevantConfigColumns.indexOf('P_Value') >= 0) {
         yLabel = 'P_Value';
         doY = true;
-      } else if (relevantConfigColumns.includes('P.Value')) {
+      } else if (relevantConfigColumns.indexOf('P.Value') >= 0) {
         yLabel = 'P.Value';
         doY = true;
       } else {
