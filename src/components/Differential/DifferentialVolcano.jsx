@@ -254,7 +254,7 @@ class DifferentialVolcano extends Component {
     if (
       item !== null &&
       event?.target?.className !== 'ExternalSiteIcon' &&
-      event?.target?.className !== 'TableCellLink NoSelect'
+      event?.target?.className !== 'TableCellLink'
     ) {
       const { differentialFeatureIdKey } = this.props;
       event.stopPropagation();

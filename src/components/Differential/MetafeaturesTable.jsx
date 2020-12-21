@@ -80,11 +80,9 @@ class MetafeaturesTable extends Component {
             filterable: { type: 'multiFilter' },
             template: (value, item, addParams) => {
               return (
-                <div className="NoSelect">
+                <div className="">
                   <Popup
-                    trigger={
-                      <span className="NoSelect">{splitValue(value)}</span>
-                    }
+                    trigger={<span className="">{splitValue(value)}</span>}
                     style={TableValuePopupStyle}
                     className="TablePopupValue"
                     content={value}
@@ -110,7 +108,7 @@ class MetafeaturesTable extends Component {
                 <p>
                   <Popup
                     trigger={
-                      <span className="TableValue NoSelect">
+                      <span className="TableValue">
                         {formatNumberForDisplay(value)}
                       </span>
                     }
