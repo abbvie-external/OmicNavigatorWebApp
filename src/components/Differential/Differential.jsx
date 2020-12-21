@@ -640,8 +640,8 @@ class Differential extends Component {
             );
             const featureIdClass =
               noPlots && !featureidSpecificMetaFeaturesExist
-                ? 'TableCellBold NoSelect'
-                : 'TableCellLink NoSelect';
+                ? 'TableCellBold'
+                : 'TableCellLink';
             const featureIdClick =
               noPlots && !featureidSpecificMetaFeaturesExist
                 ? null
@@ -669,7 +669,7 @@ class Differential extends Component {
             }
             if (f === alphanumericTrigger) {
               return (
-                <div className="NoSelect">
+                <div className="">
                   <Popup
                     trigger={
                       <span className={featureIdClass} onClick={featureIdClick}>
@@ -688,11 +688,9 @@ class Differential extends Component {
               );
             } else {
               return (
-                <div className="NoSelect">
+                <div className="">
                   <Popup
-                    trigger={
-                      <span className="NoSelect">{splitValue(value)}</span>
-                    }
+                    trigger={<span className="">{splitValue(value)}</span>}
                     style={TableValuePopupStyle}
                     className="TablePopupValue"
                     content={value}
@@ -724,10 +722,10 @@ class Differential extends Component {
           exportTemplate: value => (value ? `${value}` : 'N/A'),
           template: (value, item, addParams) => {
             return (
-              <div className="NoSelect">
+              <div className="">
                 <Popup
                   trigger={
-                    <span className="TableValue NoSelect">
+                    <span className="TableValue">
                       {formatNumberForDisplay(value)}
                     </span>
                   }

@@ -154,3 +154,17 @@
   font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif;
   text-anchor: middle;
 }
+
+.TextToggleButton {
+  position: absolute;
+  top: 10px;
+  left: 15px;
+  z-index: 3;
+}
+
+// .circleText {
+//   font-size: 25px;
+//   font-weight: bold;
+//   font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif;
+//   text-anchor: left;
+// }

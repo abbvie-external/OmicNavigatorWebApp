@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { Grid, Dimmer, Loader, Tab } from 'semantic-ui-react';
-// import _ from 'lodash';
 import EnrichmentBreadcrumbs from './EnrichmentBreadcrumbs';
 import ButtonActions from '../Shared/ButtonActions';
 import SplitPane from 'react-split-pane';
@@ -19,12 +18,9 @@ class SplitPanesContainer extends Component {
     verticalSplitPaneSize:
       parseInt(localStorage.getItem('verticalSplitPaneSize'), 10) || 525,
     activeViolinTableIndex: 0,
+    elementTextKey: 'featureID',
   };
   filteredDifferentialGridRef = React.createRef();
-
-  // shouldComponentUpdate(nextProps, nextState) {
-  //   return this.props.isTestSelected;
-  // }
 
   handleSVGTabChange = activeTabIndex => {
     this.setState({
@@ -34,8 +30,6 @@ class SplitPanesContainer extends Component {
 
   getBarcodePlot = () => {
     const { isTestDataLoaded } = this.props;
-    // const d = barcodeSettings.barcodeData;
-    // const absTAccessor = d => d.statistic;
     if (!isTestDataLoaded) {
       return (
         <div>
@@ -258,11 +252,20 @@ class SplitPanesContainer extends Component {
             <Grid.Column
               mobile={16}
               tablet={16}
-              largeScreen={12}
-              widescreen={12}
+              computer={8}
+              largeScreen={8}
+              widescreen={8}
             >
               <EnrichmentBreadcrumbs {...this.props} />
             </Grid.Column>
+            <Grid.Column
+              mobile={16}
+              tablet={16}
+              computer={8}
+              largeScreen={8}
+              widescreen={8}
+              className="elementTextCol"
+            ></Grid.Column>
 
             <Grid.Column
               mobile={16}
@@ -274,16 +277,13 @@ class SplitPanesContainer extends Component {
                 className="ThreePlotsDiv SplitPanesWrapper"
                 split="horizontal"
                 size={this.state.horizontalSplitPaneSize}
-                minSize={150}
+                minSize={185}
                 maxSize={400}
                 onDragFinished={size =>
                   this.splitPaneResized(size, 'horizontal')
                 }
               >
                 {BarcodePlot}
-                {/* <BarcodePlotReusable
-                  data={this.props.barcodeSettings.barcodeData}
-                /> */}
                 <SplitPane
                   className="BottomSplitPaneContainer"
                   split="vertical"

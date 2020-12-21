@@ -612,9 +612,7 @@ class Enrichment extends Component {
                 <div>
                   <Popup
                     trigger={
-                      <span className="TableValue NoSelect">
-                        {splitValue(value)}
-                      </span>
+                      <span className="TableValue">{splitValue(value)}</span>
                     }
                     style={TableValuePopupStyle}
                     className="TablePopupValue"
@@ -630,9 +628,7 @@ class Enrichment extends Component {
                 <div>
                   <Popup
                     trigger={
-                      <span className="TableValue  NoSelect">
-                        {splitValue(value)}
-                      </span>
+                      <span className="TableValue">{splitValue(value)}</span>
                     }
                     style={TableValuePopupStyle}
                     className="TablePopupValue"
