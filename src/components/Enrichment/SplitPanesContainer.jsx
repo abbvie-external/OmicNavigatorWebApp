@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
-import { Button, Icon } from 'semantic-ui-react';
 import { withRouter } from 'react-router-dom';
-import { Grid, Dimmer, Loader, Tab, Radio } from 'semantic-ui-react';
-// import _ from 'lodash';
+import { Grid, Dimmer, Loader, Tab } from 'semantic-ui-react';
 import EnrichmentBreadcrumbs from './EnrichmentBreadcrumbs';
 import ButtonActions from '../Shared/ButtonActions';
 import SplitPane from 'react-split-pane';
@@ -20,27 +18,9 @@ class SplitPanesContainer extends Component {
     verticalSplitPaneSize:
       parseInt(localStorage.getItem('verticalSplitPaneSize'), 10) || 525,
     activeViolinTableIndex: 0,
-    // elementText: null,
-    // elementTextOptions: [
-    //   {
-    //     key: 'none',
-    //     text: 'none',
-    //     value: null,
-    //   },
-    //   {
-    //     key: 'featureID',
-    //     text: 'featureID',
-    //     value: 'featureID',
-    //   },
-    // ],
-    // displayElementText: false,
     elementTextKey: 'featureID',
   };
   filteredDifferentialGridRef = React.createRef();
-
-  // shouldComponentUpdate(nextProps, nextState) {
-  //   return this.props.isTestSelected;
-  // }
 
   handleSVGTabChange = activeTabIndex => {
     this.setState({
@@ -50,8 +30,6 @@ class SplitPanesContainer extends Component {
 
   getBarcodePlot = () => {
     const { isTestDataLoaded } = this.props;
-    // const d = barcodeSettings.barcodeData;
-    // const absTAccessor = d => d.statistic;
     if (!isTestDataLoaded) {
       return (
         <div>
@@ -287,20 +265,7 @@ class SplitPanesContainer extends Component {
               largeScreen={8}
               widescreen={8}
               className="elementTextCol"
-            >
-              {/* <Radio
-                id="elementTextCheckbox"
-                toggle
-                // size={dynamicSize}
-                size="small"
-                label={displayElementText ? 'Hide Labels' : 'Show Labels'}
-                // defaultValue={elementTextOptions[0].text}
-                // onChange={this.handleElementTextDropdownChange}
-                // options={elementTextOptions}
-                checked={displayElementText}
-                onClick={this.handleElementTextChange}
-              /> */}
-            </Grid.Column>
+            ></Grid.Column>
 
             <Grid.Column
               mobile={16}
@@ -319,9 +284,6 @@ class SplitPanesContainer extends Component {
                 }
               >
                 {BarcodePlot}
-                {/* <BarcodePlotReusable
-                  data={this.props.barcodeSettings.barcodeData}
-                /> */}
                 <SplitPane
                   className="BottomSplitPaneContainer"
                   split="vertical"

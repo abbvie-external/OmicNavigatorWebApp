@@ -46,7 +46,6 @@ class DifferentialVolcano extends Component {
     yAxisLabel: null,
     volcanoCircleLabel: null,
     identifier: null,
-    displayVolcanoCircleText: true,
     volcanoCircleLabels: [],
     animation: 'overlay',
     direction: 'right',
@@ -546,7 +545,6 @@ class DifferentialVolcano extends Component {
       axisLabels,
       xAxisLabel,
       yAxisLabel,
-      // displayVolcanoCircleText,
       volcanoCircleLabels,
       volcanoCircleLabel,
       doXAxisTransformation,
@@ -620,31 +618,11 @@ class DifferentialVolcano extends Component {
         className="VolcanoTransformationCheckbox"
         checked={false}
         disabled={true}
-        //checked={doYAxisTransformation}
-        //onClick={this.handleTransformationChange.bind(this)}
       ></Form.Field>
     );
-    // const labelBox = (
-    //   <Form.Field
-    //     control={Checkbox}
-    //     name="yTransformationCheckbox"
-    //     className="VolcanoTransformationCheckbox"
-    //     checked={displayVolcanoCircleText}
-    //     //checked={doYAxisTransformation}
-    //     //onClick={this.handleTransformationChange.bind(this)}
-    //   ></Form.Field>
-    // );
     const svgPlot = this.getSVGPlot();
     const volcanoPlot = this.getVolcanoPlot();
     const resizerStyle = {
-      // padding: '1px 0px !important',
-      // height: '16px',
-      // margin: '-8px 0',
-      // borderTop: '8px solid rgba(255, 255, 255, 0)',
-      // borderBottom: '8px solid rgba(255, 255, 255, 0)',
-      // cursor: 'row-resize',
-      // width: '100%',
-      // zIndex: '4',
       display: 'block',
     };
 

@@ -1,12 +1,8 @@
 import React, { Component } from 'react';
 import ButtonActions from '../Shared/ButtonActions';
 import { Icon, Popup } from 'semantic-ui-react';
-// import styled from 'styled-components';
-// import Axis from "./Axis";
 import './BarcodePlot.scss';
-// import Tooltip from "./useTooltip";
 import * as d3 from 'd3';
-// import * as _ from "lodash";
 
 class BarcodePlot extends Component {
   state = {
@@ -23,7 +19,6 @@ class BarcodePlot extends Component {
     tooltipTextAnchorMax: 'start',
     displayElementTextBarcode:
       JSON.parse(sessionStorage.getItem('displayElementTextBarcode')) || false,
-    // initialLoad: true,
     settings: {
       // brushing: false,
       bottomLabel: '',
@@ -167,20 +162,8 @@ class BarcodePlot extends Component {
       textAnchor === 'end'
         ? event.target.attributes[2].nodeValue - 5
         : event.target.attributes[2].nodeValue + 5;
-    // const lineId = `#barcode-line-${lineName.replace(/;/g, '')}_${lineIdMult}`;
-    // const lineId = `#barcode-line-${lineName}`;
-
     const lineId = `#barcode-line-${lineIdMult}`;
     const hoveredLine = d3.select(lineId);
-
-    //debugger;
-
-    //const hoveredLineText = d3.select(`${lineIdMult}-barcodeTooltip`);
-    //hoveredLineText.attr('style', 'font-weight: bold');
-    // hovered: 20,
-    // selected: 20,
-    // highlighted: 10,
-    // max: 5,
     if (hoveredLine.attr('class').endsWith('selected')) {
       hoveredLine.attr('y1', this.state.settings.margin.selected - 10);
     } else if (hoveredLine.attr('class').endsWith('MaxLine')) {
@@ -256,7 +239,6 @@ class BarcodePlot extends Component {
       .brushX()
       .extent([
         [settings.margin.left + 4, 0],
-        // [barcodeWidth + 15, barcodeHeight],
         [barcodeWidth + 15, Math.round(barcodeHeight * 0.5)],
       ])
       .on('start', function() {
@@ -308,41 +290,26 @@ class BarcodePlot extends Component {
               };
             });
             const brushedDataTooltips = brushedDataVar.map(line => {
-              // // const statistic = line.statistic;
               const textAnchor =
                 line.statistic > self.props.barcodeSettings.highStat / 2
                   ? 'end'
                   : 'start';
-              // // const textAnchor = this.position === 'start' ? 'end' : 'start';
-              // // this.position = textAnchor;
-              // // const ttPosition =
-              // //   this.switch === 'odd' ? line.x2 - 15 : line.x2 + 15;
-              // const ttPosition = line.x2 - 3;
-              // const switchEveryOther = this.switch === 'odd' ? 'even' : 'odd';
-              // this.switch = switchEveryOther;
-              // const textAnchor = 'start';
-              // // const ttPosition =
-              // //   this.switch === 'odd' ? line.x2 + 5 : line.x2 + 15;
-              // const alternatePosition = this.switch === 'even' ? 0 : 35;
               var ttPosition = null;
               if (textAnchor === 'end') {
                 ttPosition = line.x2 - 5;
               } else {
                 ttPosition = line.x2 + 5;
               }
-
-              // const ttPosition = line.x2 - 3;
-              const switchEveryOther = (self.state.switch + 1) % 5;
-              self.setState({ switch: switchEveryOther });
-              //const textAnchor = 'start';
+              const fiveLevelSwitch = (self.state.switch + 1) % 5;
+              self.setState({ switch: fiveLevelSwitch });
               let alternatePosition = 0;
-              if (self.state.switch == 0) {
+              if (self.state.switch === 0) {
                 alternatePosition = 0;
-              } else if (self.state.switch == 1) {
+              } else if (self.state.switch === 1) {
                 alternatePosition = 10;
-              } else if (self.state.switch == 2) {
+              } else if (self.state.switch === 2) {
                 alternatePosition = 20;
-              } else if (self.state.switch == 3) {
+              } else if (self.state.switch === 3) {
                 alternatePosition = 30;
               } else {
                 alternatePosition = 40;
@@ -354,7 +321,6 @@ class BarcodePlot extends Component {
                   key={`${line.featureID}-barcodeTooltip`}
                   className="BarcodeTooltipText"
                   transform={`translate(${ttPosition}, ${alternatePosition})rotate(0)`}
-                  // transform={`translate(${ttPosition}, 15)`}
                   fontSize="11px"
                   textAnchor={textAnchor}
                   fontFamily="Lato, Helvetica Neue, Arial, Helvetica, sans-serif"
@@ -603,16 +569,12 @@ class BarcodePlot extends Component {
           <Popup
             trigger={
               <Icon
-                // style={{
-                //   backgroundColor: displayElementTextBarcode ? "#FF4400" : ""
-                // }}
                 name="font"
                 size="small"
                 inverted
                 circular
                 onClick={this.handleElementTextChange}
                 id={displayElementTextBarcode ? 'PrimaryColor' : 'black'}
-                //className="TextToggleIconBarcode"
               />
             }
             style={{

@@ -424,13 +424,20 @@ class DifferentialVolcanoPlot extends Component {
         // fill: a.attributes[13].nodeValue
       };
     });
+    const self = this;
     const brushedCircleText = brushedCircleTextMapped.map(circle => {
-      const textAnchor = 'start';
+      const circleOnLeftSide = circle.cx <= self.props.volcanoWidth / 2;
+      const textAnchor = circleOnLeftSide ? 'start' : 'end';
+      const cx = circleOnLeftSide
+        ? parseInt(circle.cx) + 5
+        : parseInt(circle.cx) - 5;
+      const cy = parseInt(circle.cy) + 4;
+      debugger;
       return (
         <text
           key={`volcanoCircleText-${circle.id}`}
           className="volcanoCircleTooltipText"
-          transform={`translate(${circle.cx}, ${circle.cy})rotate(0)`}
+          transform={`translate(${cx}, ${cy})rotate(0)`}
           fontSize="11px"
           textAnchor={textAnchor}
           fontFamily="Lato, Helvetica Neue, Arial, Helvetica, sans-serif"

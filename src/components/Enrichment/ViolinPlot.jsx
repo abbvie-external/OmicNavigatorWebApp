@@ -5,7 +5,6 @@ import * as d3 from 'd3';
 import * as _ from 'lodash';
 // import { select } from "d3-selection";
 import './ViolinPlot.scss';
-import { over } from 'lodash';
 
 class ViolinPlot extends Component {
   state = {
@@ -114,8 +113,22 @@ class ViolinPlot extends Component {
             .duration(100)
             .attr('fill', '#FF4400')
             .attr('stroke', '#000')
-            .attr('r', dOpts.pointSize * 2);
-          // const d = this.chart.groupObjs[cName].values[pt];
+            .attr('r', dOpts.pointSize * 2)
+            .attr('class', 'maxCirc');
+          // const maxCircle = d3.select(`#violin_${maxDotId}`);
+          // const circleText = this.chart.objs.svg
+          //   .append('g')
+          //   .attr('class', 'circleText');
+          // if (this.state.displayElementTextViolin) {
+          //   circleText
+          //     .append('text')
+          //     .attr('x', parseInt(maxCircle.attr('cx')) + parseInt(70))
+          //     .attr('y', parseInt(maxCircle.attr('cy')) + parseInt(20))
+          //     .style('fill', 'black')
+          //     .attr('font-size', '10px')
+          //     .attr('font-family', 'Arial')
+          //     .text(maxDotId);
+          // }
           this.maxCircle = maxDotId;
           this.addToolTiptoMax(HighlightedProteins[0]);
         }
@@ -329,15 +342,15 @@ class ViolinPlot extends Component {
           .attr('opacity', 1.0);
         chartSVG.selectAll('g.circleText').remove();
         brushed.each(function(d) {
-          const test = d3.select(this);
+          const brushedCircle = d3.select(this);
           const circleText = self.chart.objs.svg
             .append('g')
             .attr('class', 'circleText');
           if (self.state.displayElementTextViolin) {
             circleText
               .append('text')
-              .attr('x', parseInt(test.attr('cx')) + parseInt(70))
-              .attr('y', parseInt(test.attr('cy')) + parseInt(20))
+              .attr('x', parseInt(brushedCircle.attr('cx')) + parseInt(70))
+              .attr('y', parseInt(brushedCircle.attr('cy')) + parseInt(20))
               .style('fill', 'black')
               .attr('font-size', '10px')
               .attr('font-family', 'Arial')
@@ -1719,11 +1732,6 @@ class ViolinPlot extends Component {
         const circleText = self.chart.objs.svg
           .append('g')
           .attr('class', 'circleText');
-        //console.log("HELLOHELLOHELLO")
-        // console.log(parseInt(test.attr('cx')) + parseInt(300));
-        // console.log(parseInt(test.attr('cy')) + parseInt(300));
-        // let x = test.attr('cx') + 300;
-        // let y = test.attr('cy') + 300;
         circleText
           .append('text')
           .attr('x', parseInt(test.attr('cx')) + parseInt(70))
@@ -1733,6 +1741,20 @@ class ViolinPlot extends Component {
           .attr('font-family', 'Arial')
           .text(d[self.props.elementTextKey]);
       });
+      // used for initial render, toggling max text on, off
+      // const maxCirc = d3.select('#maxCirc');
+      // debugger;
+      // const circleText = self.chart.objs.svg
+      //   .append('g')
+      //   .attr('class', 'maxText');
+      // circleText
+      //   .append('text')
+      //   .attr('x', parseInt(maxCirc.attr('cx')) + parseInt(70))
+      //   .attr('y', parseInt(maxCirc.attr('cy')) + parseInt(20))
+      //   .style('fill', 'black')
+      //   .attr('font-size', '10px')
+      //   .attr('font-family', 'Arial')
+      //   .text(maxCirc[self.props.elementTextKey]);
     }
   };
 
