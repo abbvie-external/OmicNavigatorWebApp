@@ -114,6 +114,7 @@ class EnrichmentBreadcrumbs extends Component {
                 basic
                 position="bottom left"
                 content={EnrichmentViewTabDescription}
+                closeOnTriggerClick
               />
             </Breadcrumb.Section>
             <Breadcrumb.Divider icon="right chevron" />

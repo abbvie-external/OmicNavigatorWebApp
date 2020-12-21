@@ -8,12 +8,12 @@ import { toast } from 'react-toastify';
 
 class ButtonActions extends Component {
   static defaultProps = {
+    exportButtonSize: 'small',
     excelVisible: false,
     pngVisible: false,
     pdfVisible: false,
     svgVisible: false,
     txtVisible: false,
-    exportButtonSize: 'medium',
   };
 
   PNGExport = () => {
@@ -26,6 +26,9 @@ class ButtonActions extends Component {
       if (this.props.study != null) {
         // for Multiset Analysis
         PlotName = `${this.props.study}_${this.props.model}_MultisetPlot.png`;
+      }
+      if (this.props.plotName != null) {
+        PlotName = this.props.plotName;
       }
       const Plot = document.getElementById(this.props.plot) || null;
       // decrease quality if volcano chart
@@ -70,6 +73,9 @@ class ButtonActions extends Component {
       if (this.props.study != null) {
         // for Multiset Analysis
         PlotName = `${this.props.study}_${this.props.model}_MultisetPlot.svg`;
+      }
+      if (this.props.plotName != null) {
+        PlotName = this.props.plotName;
       }
       const Plot = document.getElementById(this.props.plot) || null;
       this.exportSVG(Plot, PlotName);

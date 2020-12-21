@@ -142,7 +142,7 @@ class FilteredDifferentialTable extends Component {
           this.props.enrichmentStudy,
           this.props.enrichmentModel,
           name,
-          undefined,
+          null,
           cancelToken,
         )
         .then(dataFromService => {

@@ -1,7 +1,8 @@
 //.volcanoPlotContainer {
-.volcanoPlotSVG {
+.VolcanoPlotSVG {
   margin: 0 auto;
   display: block;
+  cursor: crosshair !important;
   //opacity: 0.6;
   // shape-rendering: 'crispEdges';
   // stroke: white;
@@ -40,7 +41,7 @@
 //   fill: var(--color-primary);
 // }
 
-#ViolinChart {
+#VolcanoChart {
   margin-left: 20px !important;
   margin-top: 5px !important;
 }

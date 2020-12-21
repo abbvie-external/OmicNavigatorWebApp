@@ -45,15 +45,15 @@ class Enrichment extends Component {
     enrichmentPlotSVGHeight: 0,
     enrichmentPlotSVGWidth: 0,
     activeIndexEnrichmentView: this.storedEnrichmentActiveIndex || 0,
-    multisetPlotInfo: {
+    multisetPlotInfoEnrichment: {
       title: '',
       svg: [],
     },
-    multisetPlotAvailable: false,
-    animation: 'uncover',
-    direction: 'left',
-    visible: false,
-    plotButtonActive: false,
+    multisetPlotAvailableEnrichment: false,
+    animationEnrichment: 'uncover',
+    directionEnrichment: 'left',
+    visibleEnrichment: false,
+    plotButtonActiveEnrichment: false,
     uData: [],
     displayViolinPlot: true,
     // networkDataAvailable: false,
@@ -171,8 +171,8 @@ class Enrichment extends Component {
     enrichmentsLinkouts: [],
     enrichmentFeatureIdKey: '',
     // filteredDifferentialFeatureIdKey: '',
-    multisetFiltersVisible: false,
-    multisetQueriedE: false,
+    multisetFiltersVisibleEnrichment: false,
+    multisetQueriedEnrichment: false,
     reloadPlot: false,
     networkSigValue: '0.05',
     networkOperator: '<',
@@ -188,6 +188,10 @@ class Enrichment extends Component {
   };
   EnrichmentViewContainerRef = React.createRef();
   EnrichmentGridRef = React.createRef();
+
+  shouldComponentUpdate(nextProps) {
+    return nextProps.tab === 'enrichment';
+  }
 
   componentDidMount() {
     this.getTableHelpers(this.testSelectedTransition, this.showBarcodePlot);
@@ -290,6 +294,7 @@ class Enrichment extends Component {
         enrichmentAnnotation,
         term,
         this.handleGetBarcodeDataError,
+        null,
       )
       .then(barcodeDataResponse => {
         if (barcodeDataResponse?.data?.length > 0) {
@@ -358,9 +363,9 @@ class Enrichment extends Component {
     });
   };
 
-  handleMultisetQueriedE = value => {
+  handleMultisetQueriedEnrichment = value => {
     this.setState({
-      multisetQueriedE: value,
+      multisetQueriedEnrichment: value,
     });
   };
 
@@ -382,9 +387,9 @@ class Enrichment extends Component {
     });
   };
 
-  handleMultisetFiltersVisible = () => {
+  handleMultisetFiltersVisibleEnrichment = () => {
     this.setState(prevState => ({
-      multisetFiltersVisible: !prevState.multisetFiltersVisible,
+      multisetFiltersVisibleEnrichment: !prevState.multisetFiltersVisibleEnrichment,
     }));
   };
 
@@ -433,7 +438,7 @@ class Enrichment extends Component {
       isSearchingEnrichment: false,
       isEnrichmentTableLoading: false,
       isValidSearchEnrichment: true,
-      plotButtonActive: false,
+      plotButtonActiveEnrichment: false,
       visible: false,
       isTestSelected: false,
       isTestDataLoaded: false,
@@ -451,7 +456,7 @@ class Enrichment extends Component {
     this.setState({
       multisetTestsFilteredOut: [],
       enrichmentColumnsUnfiltered: [],
-      multisetFiltersVisible: false,
+      multisetFiltersVisibleEnrichment: false,
       enrichmentColumns: [],
     });
   };
@@ -463,7 +468,7 @@ class Enrichment extends Component {
 
   handlePlotTypesEnrichment = enrichmentModel => {
     if (enrichmentModel !== '') {
-      if (this.state.enrichmentStudyMetadata.plots != null) {
+      if (this.state.enrichmentStudyMetadata?.plots != null) {
         const enrichmentModelData = this.state.enrichmentStudyMetadata.plots.find(
           model => model.modelID === enrichmentModel,
         );
@@ -474,15 +479,15 @@ class Enrichment extends Component {
     }
   };
 
-  handleSearchCriteriaChange = (changes, scChange) => {
-    this.props.onSearchCriteriaToTop(changes, 'enrichment');
+  handleSearchCriteriaChangeEnrichment = (changes, scChange) => {
+    this.props.onHandleUrlChange(changes, 'enrichment');
     this.setState({
-      plotButtonActive: false,
+      plotButtonActiveEnrichment: false,
       visible: false,
     });
     if (scChange) {
       this.setState({
-        multisetPlotAvailable: false,
+        multisetPlotAvailableEnrichment: false,
       });
     }
     if (
@@ -517,42 +522,39 @@ class Enrichment extends Component {
       });
   };
 
-  disablePlot = () => {
+  disablePlotEnrichment = () => {
     this.setState({
-      multisetPlotAvailable: false,
+      multisetPlotAvailableEnrichment: false,
     });
   };
 
-  hideEGrid = () => {
+  handleSearchCriteriaResetEnrichment = () => {
     this.setState({
       isTestSelected: false,
       isTestDataLoaded: false,
       isValidSearchEnrichment: false,
-      multisetPlotAvailable: false,
-      plotButtonActive: false,
+      multisetPlotAvailableEnrichment: false,
+      plotButtonActiveEnrichment: false,
       visible: false,
       // displayViolinPlot: false,
     });
   };
 
-  handlePlotAnimation = animation => () => {
+  handlePlotAnimationEnrichment = animationEnrichment => () => {
     this.setState(prevState => ({
-      animation,
-      visible: !prevState.visible,
-      plotButtonActive: !this.state.plotButtonActive,
+      animationEnrichment,
+      visibleEnrichment: !prevState.visibleEnrichment,
+      plotButtonActiveEnrichment: !this.state.plotButtonActiveEnrichment,
     }));
   };
 
-  handleDirectionChange = direction => () =>
-    this.setState({ direction: direction, visible: false });
-
   handleMultisetPlot = multisetPlotResults => {
     this.setState({
-      multisetPlotInfo: {
+      multisetPlotInfoEnrichment: {
         title: multisetPlotResults.svgInfo.plotType,
         svg: multisetPlotResults.svgInfo.svg,
       },
-      multisetPlotAvailable: true,
+      multisetPlotAvailableEnrichment: true,
     });
   };
 
@@ -1131,7 +1133,7 @@ class Enrichment extends Component {
 
   handleGetBarcodeDataError = () => {
     this.testSelectedTransition(false);
-    this.handleSearchCriteriaChange(
+    this.handleSearchCriteriaChangeEnrichment(
       {
         enrichmentStudy: this.props.enrichmentStudy || '',
         enrichmentModel: this.props.enrichmentModel || '',
@@ -1151,7 +1153,7 @@ class Enrichment extends Component {
   ) => {
     this.testSelectedTransition(true);
     const TestSiteVar = `${test}:${dataItem.description}`;
-    this.handleSearchCriteriaChange(
+    this.handleSearchCriteriaChangeEnrichment(
       {
         enrichmentStudy: this.props.enrichmentStudy || '',
         enrichmentModel: this.props.enrichmentModel || '',
@@ -1674,7 +1676,7 @@ class Enrichment extends Component {
         dataItem: [],
       },
     });
-    this.handleSearchCriteriaChange(
+    this.handleSearchCriteriaChangeEnrichment(
       {
         enrichmentStudy: this.props.enrichmentStudy || '',
         enrichmentModel: this.props.enrichmentModel || '',
@@ -1809,12 +1811,12 @@ class Enrichment extends Component {
       enrichmentColumns,
       additionalTemplateInfoEnrichmentTable,
       itemsPerPageEnrichmentTable,
-      multisetQueriedE,
+      multisetQueriedEnrichment,
       activeIndexEnrichmentView,
       isEnrichmentTableLoading,
       networkDataError,
     } = this.state;
-    let enrichmentCacheKey = `${enrichmentStudy}-${enrichmentModel}-${enrichmentAnnotation}-${multisetQueriedE}`;
+    let enrichmentCacheKey = `${enrichmentStudy}-${enrichmentModel}-${enrichmentAnnotation}-${multisetQueriedEnrichment}`;
     const TableValuePopupStyle = {
       backgroundColor: '2E2E2E',
       borderBottom: '2px solid var(--color-primary)',
@@ -1861,13 +1863,13 @@ class Enrichment extends Component {
               <Grid.Row>
                 <div className="FloatRight AbsoluteExport">
                   <ButtonActions
+                    exportButtonSize={'small'}
                     excelVisible={true}
                     pngVisible={false}
                     pdfVisible={false}
                     svgVisible={false}
                     txtVisible={true}
                     refFwd={this.EnrichmentGridRef}
-                    exportButtonSize={'medium'}
                     tab={tab}
                     study={enrichmentStudy}
                     model={enrichmentModel}
@@ -1962,7 +1964,6 @@ class Enrichment extends Component {
               <EnrichmentResultsGraph
                 {...this.props}
                 {...this.state}
-                onHandlePlotAnimation={this.handlePlotAnimation}
                 onDisplayViolinPlot={this.displayViolinPlot}
                 onHandlePieClick={this.testSelected}
                 onHandleNodeCutoffInputChange={this.handleNodeCutoffInputChange}
@@ -2069,14 +2070,19 @@ class Enrichment extends Component {
 
   render() {
     const enrichmentView = this.getView();
-    const { multisetPlotInfo, animation, direction, visible } = this.state;
+    const {
+      multisetPlotInfoEnrichment,
+      animationEnrichment,
+      directionEnrichment,
+      visibleEnrichment,
+    } = this.state;
     const {
       tab,
       enrichmentStudy,
       enrichmentModel,
       enrichmentAnnotation,
     } = this.props;
-    const VerticalSidebar = ({ animation, visible }) => (
+    const VerticalSidebar = ({ animation, visible, direction }) => (
       <Sidebar
         as={'div'}
         animation={animation}
@@ -2096,6 +2102,7 @@ class Enrichment extends Component {
               widescreen={16}
             >
               <ButtonActions
+                exportButtonSize={'small'}
                 excelVisible={false}
                 pngVisible={true}
                 pdfVisible={false}
@@ -2112,7 +2119,7 @@ class Enrichment extends Component {
         </Grid>
         <div
           className="MultisetSvgOuter"
-          dangerouslySetInnerHTML={{ __html: multisetPlotInfo.svg }}
+          dangerouslySetInnerHTML={{ __html: multisetPlotInfoEnrichment.svg }}
         ></div>
       </Sidebar>
     );
@@ -2135,17 +2142,25 @@ class Enrichment extends Component {
               }
               onEnrichmentSearch={this.handleEnrichmentSearch}
               onColumnReorder={this.handleColumnReorder}
-              onSearchCriteriaChange={this.handleSearchCriteriaChange}
-              onSearchCriteriaReset={this.hideEGrid}
-              onDisablePlot={this.disablePlot}
-              onGetMultisetPlot={this.handleMultisetPlot}
-              onMultisetQueriedE={this.handleMultisetQueriedE}
-              onHandlePlotAnimation={this.handlePlotAnimation}
+              onSearchCriteriaChangeEnrichment={
+                this.handleSearchCriteriaChangeEnrichment
+              }
+              onSearchCriteriaResetEnrichment={
+                this.handleSearchCriteriaResetEnrichment
+              }
+              onDisablePlotEnrichment={this.disablePlotEnrichment}
+              onGetMultisetPlotEnrichment={this.handleMultisetPlot}
+              onMultisetQueriedEnrichment={this.handleMultisetQueriedEnrichment}
+              onHandlePlotAnimationEnrichment={
+                this.handlePlotAnimationEnrichment
+              }
               onHandlePlotTypesEnrichment={this.handlePlotTypesEnrichment}
               onSetStudyModelAnnotationMetadata={
                 this.setStudyModelAnnotationMetadata
               }
-              onHandleMultisetFiltersVisible={this.handleMultisetFiltersVisible}
+              onHandleMultisetFiltersVisibleEnrichment={
+                this.handleMultisetFiltersVisibleEnrichment
+              }
               onSetAnnotationsMetadata={this.setAnnotationsMetadata}
               onHandleNetworkSigValue={this.handleNetworkSigValue}
               onHandleNetworkOperator={this.handleNetworkOperator}
@@ -2167,9 +2182,9 @@ class Enrichment extends Component {
           >
             <Sidebar.Pushable as={'span'}>
               <VerticalSidebar
-                animation={animation}
-                direction={direction}
-                visible={visible}
+                animation={animationEnrichment}
+                direction={directionEnrichment}
+                visible={visibleEnrichment}
               />
               <Sidebar.Pusher>
                 <div

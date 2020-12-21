@@ -8,7 +8,7 @@ class DifferentialBreadcrumbs extends Component {
   componentDidMount() {}
 
   render() {
-    // let name = this.props.imageInfo.title;
+    // let name = this.props.imageInfoDifferential.title;
     // if (name === '') {
     let name = `${this.props.differentialFeatureIdKey} ${this.props.differentialFeature}`;
     // }
@@ -47,6 +47,7 @@ class DifferentialBreadcrumbs extends Component {
                     ? 'Back To Table'
                     : 'Back To Plot'
                 }
+                closeOnTriggerClick
               />
             </Breadcrumb.Section>
             <Breadcrumb.Divider icon="right chevron" />

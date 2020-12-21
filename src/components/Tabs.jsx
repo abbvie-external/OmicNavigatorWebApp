@@ -35,7 +35,7 @@ class Tabs extends Component {
     this.state = {
       baseUrl: baseUrl,
       activeIndex: isEnrichment ? 2 : 1,
-      tab: tabFromUrl,
+      tab: tabFromUrl || 'differential',
       enrichmentStudy: isEnrichment ? decodedStudy : '',
       enrichmentModel: isEnrichment ? decodedModel : '',
       enrichmentAnnotation: isEnrichment ? decodedTest : '',
@@ -53,7 +53,7 @@ class Tabs extends Component {
       allStudiesMetadata: [],
       differentialFeatureIdKey: '',
       filteredDifferentialFeatureIdKey: '',
-      appVersion: '0.2.8',
+      appVersion: '0.3.3',
       packageVersion: '',
     };
   }
@@ -103,7 +103,7 @@ class Tabs extends Component {
     }
   };
 
-  handleSearchCriteriaToTop = (changes, tab) => {
+  handleUrlChange = (changes, tab) => {
     if (tab === 'differential') {
       this.setState({
         tab: 'differential',
@@ -256,7 +256,7 @@ class Tabs extends Component {
             <Differential
               {...this.props}
               {...this.state}
-              onSearchCriteriaToTop={this.handleSearchCriteriaToTop}
+              onHandleUrlChange={this.handleUrlChange}
               onHandleDifferentialFeatureIdKey={
                 this.handleDifferentialFeatureIdKey
               }
@@ -275,7 +275,7 @@ class Tabs extends Component {
             <Enrichment
               {...this.props}
               {...this.state}
-              onSearchCriteriaToTop={this.handleSearchCriteriaToTop}
+              onHandleUrlChange={this.handleUrlChange}
               onPValueTypeChange={this.handlePValueTypeChange}
               onFindDifferentialFeature={this.findDifferentialFeature}
               onHandleDifferentialFeatureIdKey={

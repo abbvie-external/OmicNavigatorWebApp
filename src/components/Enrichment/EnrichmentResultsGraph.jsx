@@ -25,6 +25,7 @@ import LoaderActivePlots from '../Transitions/LoaderActivePlots';
 import './EnrichmentResultsGraph.scss';
 import NumericExponentialInput from '../Shared/NumericExponentialInput';
 import { limitValues } from '../Shared/helpers';
+import ButtonActions from '../Shared/ButtonActions';
 import { omicNavigatorService } from '../../services/omicNavigator.service';
 import { ResizableBox } from 'react-resizable';
 import '../Shared/ReactResizable.css';
@@ -506,8 +507,11 @@ class EnrichmentResultsGraph extends Component {
       totalNodes,
       totalLinks,
       legendIsOpen,
-      // multisetFiltersVisible,
+      // multisetFiltersVisibleEnrichment,
       // networkSigValue,
+      enrichmentStudy,
+      enrichmentModel,
+      enrichmentAnnotation,
     } = this.props;
 
     if (!networkDataLoaded) {
@@ -565,7 +569,7 @@ class EnrichmentResultsGraph extends Component {
       const LinkTypeTrack = (props, state) => (
         <LinkTypeStyledTrack {...props} index={state.index} />
       );
-
+      const PlotName = `${enrichmentStudy}_${enrichmentModel}_${enrichmentAnnotation}_network`;
       return (
         <Grid className="NetworkGraphFiltersContainer">
           <Grid.Row className="NetworkGraphFiltersRow">
@@ -612,7 +616,7 @@ class EnrichmentResultsGraph extends Component {
             >
               <div
                 // className={
-                //   multisetFiltersVisible
+                //   multisetFiltersVisibleEnrichment
                 //     ? 'InlineFlex NumericExponentialInputContainer Hide'
                 //     : 'InlineFlex NumericExponentialInputContainer Show'
                 // }
@@ -905,10 +909,10 @@ class EnrichmentResultsGraph extends Component {
             <Grid.Column
               id="LegendColumn"
               mobile={16}
-              tablet={9}
-              computer={9}
-              largeScreen={9}
-              widescreen={9}
+              tablet={6}
+              computer={6}
+              largeScreen={6}
+              widescreen={6}
             >
               <Popup
                 trigger={
@@ -970,36 +974,27 @@ class EnrichmentResultsGraph extends Component {
               />
             </Grid.Column>
             <Grid.Column
-              id="TotalsColumn"
               mobile={16}
-              tablet={7}
-              computer={7}
-              largeScreen={7}
-              widescreen={7}
+              tablet={10}
+              computer={10}
+              largeScreen={10}
+              widescreen={10}
+              id="NetworkExportNodeLinkTotals"
             >
-              <div
-                // className={
-                //   networkGraphReady ? 'ShowInlineBlock NodeLinkTotals' : 'Hide'
-                // }
-                className="ShowInlineBlock NodeLinkTotals"
-              >
+              <ButtonActions
+                exportButtonSize={'mini'}
+                excelVisible={false}
+                pngVisible={true}
+                pdfVisible={false}
+                svgVisible={true}
+                txtVisible={false}
+                plotName={PlotName}
+                plot="svg-chart-network"
+              />
+              <span className="TotalsSpan" id="LinkTotalsSpan">
                 <Popup
                   trigger={
-                    <Label size={dynamicSize}>
-                      {filteredNodesTotal} of {totalNodes} Nodes
-                    </Label>
-                  }
-                  style={CustomPopupStyle}
-                  content="Number of nodes meeting current filter requirements, of total nodes without filters"
-                  inverted
-                  on={['hover', 'click']}
-                  position="left center"
-                  mouseEnterDelay={1000}
-                  mouseLeaveDelay={0}
-                />
-                <Popup
-                  trigger={
-                    <Label size={dynamicSize}>
+                    <Label id="LinkTotals" size={dynamicSize}>
                       {filteredLinksTotal} of {totalLinks} Links
                     </Label>
                   }
@@ -1011,7 +1006,24 @@ class EnrichmentResultsGraph extends Component {
                   mouseEnterDelay={1000}
                   mouseLeaveDelay={0}
                 />
-              </div>
+              </span>
+              <span className="TotalsSpan" id="NodeTotalsSpan">
+                {/* className="ShowInlineBlock NodeLinkTotals" */}
+                <Popup
+                  trigger={
+                    <Label id="NodeTotals" size={dynamicSize}>
+                      {filteredNodesTotal} of {totalNodes} Nodes
+                    </Label>
+                  }
+                  style={CustomPopupStyle}
+                  content="Number of nodes meeting current filter requirements, of total nodes without filters"
+                  inverted
+                  on={['hover', 'click']}
+                  position="left center"
+                  mouseEnterDelay={1000}
+                  mouseLeaveDelay={0}
+                />
+              </span>
             </Grid.Column>
             <Grid.Column
               className=""

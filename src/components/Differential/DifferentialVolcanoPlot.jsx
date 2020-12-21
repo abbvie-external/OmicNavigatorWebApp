@@ -6,7 +6,6 @@ import ButtonActions from '../Shared/ButtonActions';
 
 class DifferentialVolcanoPlot extends Component {
   state = {
-    plotName: 'ViolinChart',
     hoveredCircleData: {
       position: [],
       id: null,
@@ -17,6 +16,7 @@ class DifferentialVolcanoPlot extends Component {
     hoveredTextScalar: 12,
     tooltipPosition: null,
     // brushedCirclesData: [],
+    // brushedCircles: [],
     brushing: false,
     resizeScalarX: 1,
     resizeScalarY: 1,
@@ -25,12 +25,29 @@ class DifferentialVolcanoPlot extends Component {
 
   volcanoSVGRef = React.createRef();
 
+  componentDidMount() {
+    let resizedFn;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizedFn);
+      resizedFn = setTimeout(() => {
+        this.windowResized();
+      }, 200);
+    });
+  }
+
   componentDidUpdate(prevProps) {
     const {
       volcanoDifferentialTableRowOther,
       volcanoDifferentialTableRowMax,
       volcanoCircleLabel,
+      volcanoHeight,
+      volcanoWidth,
+      xAxisLabel,
+      yAxisLabel,
+      doXAxisTransformation,
+      doYAxisTransformation,
     } = this.props;
+
     if (
       volcanoCircleLabel != null &&
       prevProps.volcanoCircleLabel !== volcanoCircleLabel &&
@@ -44,8 +61,7 @@ class DifferentialVolcanoPlot extends Component {
         _.sortBy(prevProps.volcanoDifferentialTableRowOther),
       ) ||
       volcanoDifferentialTableRowMax !==
-        prevProps.volcanoDifferentialTableRowMax ||
-      this.props.rehighlightCircles
+        prevProps.volcanoDifferentialTableRowMax
     ) {
       // excessive styling needed for proper display across all export types
       // style all circles back to default
@@ -95,10 +111,45 @@ class DifferentialVolcanoPlot extends Component {
         }
       }
     }
-    if (this.props.rehighlightCircles === true) {
-      this.props.onRehighlightCircles(false);
+    if (
+      prevProps.volcanoHeight !== volcanoHeight ||
+      prevProps.volcanoWidth !== volcanoWidth
+    ) {
+      this.resizeBrushSelection();
+    }
+    if (
+      prevProps.xAxisLabel !== xAxisLabel ||
+      prevProps.yAxisLabel !== yAxisLabel ||
+      prevProps.doXAxisTransformation !== doXAxisTransformation ||
+      prevProps.doYAxisTransformation !== doYAxisTransformation
+    ) {
+      this.removeViolinBrush();
     }
   }
+
+  removeViolinBrush = () => {
+    const brush = d3
+      .select('.volcanoPlotD3BrushSelection')
+      .selectAll('rect.selection');
+    const brushObjs = this.state.objsBrushState;
+    if (
+      brush.nodes().length !== 0 &&
+      brush.nodes()[0].getAttribute('x') !== null &&
+      brushObjs != null
+    ) {
+      d3.select('.volcanoPlotD3BrushSelection').call(brushObjs.move, null);
+    }
+  };
+
+  resizeBrushSelection = () => {
+    this.removeViolinBrush();
+    // add resizing later after priorities
+  };
+
+  windowResized = () => {
+    this.removeViolinBrush();
+  };
+
   doTransform(value, axis) {
     const { doXAxisTransformation, doYAxisTransformation } = this.props;
     if (axis === 'x' && doXAxisTransformation) {
@@ -295,7 +346,10 @@ class DifferentialVolcanoPlot extends Component {
           return JSON.parse(a.attributes.data.value);
         });
         if (brushedDataArr.length > 0) {
-          self.setState({ brushedCirclesData: brushedDataArr });
+          self.setState({
+            brushedCirclesData: brushedDataArr,
+            brushedCircles: brushed,
+          });
         }
         self.props.handleVolcanoPlotSelectionChange(brushedDataArr);
       }
@@ -312,7 +366,6 @@ class DifferentialVolcanoPlot extends Component {
       ])
       .on('start', brushingStart)
       .on('end', endBrush);
-
     d3.selectAll('.volcanoPlotD3BrushSelection').call(objsBrush);
     const brush = d3
       .select('.volcanoPlotD3BrushSelection')
@@ -341,6 +394,7 @@ class DifferentialVolcanoPlot extends Component {
       self.setState({
         resizeScalarX: 1,
         resizeScalarY: 1,
+        objsBrushState: objsBrush,
       });
     }
   }
@@ -423,6 +477,9 @@ class DifferentialVolcanoPlot extends Component {
 
   render() {
     const {
+      differentialStudy,
+      differentialModel,
+      differentialTest,
       differentialResults,
       volcanoWidth,
       volcanoHeight,
@@ -463,7 +520,7 @@ class DifferentialVolcanoPlot extends Component {
 
     const yAxis = (
       <line
-        className="volcanoPlotYAxis"
+        className="volcanoPlotYAxis NoSelect"
         x1={60}
         x2={60}
         y1={0}
@@ -474,7 +531,7 @@ class DifferentialVolcanoPlot extends Component {
     );
     const xAxis = (
       <line
-        className="volcanoPlotXAxis"
+        className="volcanoPlotXAxis NoSelect"
         x1={60}
         x2={volcanoWidth}
         y1={volcanoHeight - 50}
@@ -496,7 +553,7 @@ class DifferentialVolcanoPlot extends Component {
             ? `xplotick-${value}-g`
             : `xplottick-${identifier}-g`
         }
-        className="individualTick"
+        className="individualTick NoSelect"
         transform={`translate(${xOffset}, ${volcanoHeight - 50})`}
       >
         <line y2="8" stroke="#000" strokeWidth={1} />
@@ -528,7 +585,7 @@ class DifferentialVolcanoPlot extends Component {
             ? `yplottick-${value}-g`
             : `yplottick-${identifier}-g`
         }
-        className="individualTick"
+        className="individualTick NoSelect"
         transform={`translate(0,${yOffset})`}
       >
         <line x1={50} x2={60} stroke="#000" strokeWidth={1} />
@@ -602,22 +659,24 @@ class DifferentialVolcanoPlot extends Component {
       ? '-log(' + yAxisLabel + ')'
       : yAxisLabel;
     const xAxisLabelY = this.getXAxisLabelY(volcanoHeight);
+    const PlotName = `${differentialStudy}_${differentialModel}_${differentialTest}_scatter`;
     if (identifier !== null && xAxisLabel !== null && yAxisLabel !== null) {
       return (
         <>
           <div id="VolcanoPlotDiv">
             <ButtonActions
-              plot={this.state.plotName}
+              exportButtonSize="mini"
+              plotName={PlotName}
+              plot="VolcanoChart"
               excelVisible={false}
               pdfVisible={false}
               pngVisible={true}
               svgVisible={true}
-              exportButtonSize="mini"
             />
           </div>
           <svg
-            id="ViolinChart"
-            className="volcanoPlotSVG"
+            id="VolcanoChart"
+            className="VolcanoPlotSVG"
             width={volcanoWidth + 20}
             height={volcanoHeight}
             ref={this.volcanoSVGRef}
@@ -628,9 +687,8 @@ class DifferentialVolcanoPlot extends Component {
             {xAxis}
             {/*X Axis Label*/}
             <text
-              className="volcanoAxisLabel"
-              textAnchor="middle"
-              x={volcanoWidth * 0.51}
+              className="volcanoAxisLabel NoSelect"
+              x={volcanoWidth * 0.5 + 10}
               y={xAxisLabelY}
               fontFamily="Lato, Helvetica Neue, Arial, Helvetica, sans-serif"
             >
@@ -638,11 +696,11 @@ class DifferentialVolcanoPlot extends Component {
             </text>
             {/*Y Axis Label*/}
             <text
-              className="volcanoAxisLabel"
+              className="volcanoAxisLabel NoSelect"
               textAnchor="middle"
-              transform={`rotate(-90,20,${volcanoHeight * 0.5})`}
+              transform={`rotate(-90,20,${volcanoHeight * 0.5 + 20})`}
               x="60"
-              y={`${volcanoHeight * 0.5}`}
+              y={`${volcanoHeight * 0.5 + 20}`}
               fontFamily="Lato, Helvetica Neue, Arial, Helvetica, sans-serif"
             >
               {yAxisText}
