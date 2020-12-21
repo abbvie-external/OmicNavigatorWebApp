@@ -272,7 +272,9 @@ class ViolinPlot extends Component {
       id.cpm = _.find(this.props.barcodeSettings.barcodeData, function(o) {
         return o.featureID === id.featureID;
       }).logFoldChange;
+      // if (!this.state.displayElementTextViolin) {
       this.tooltipHover(id);
+      // }
       // }
     }
   };
@@ -1556,7 +1558,10 @@ class ViolinPlot extends Component {
                   .attr('cursor', 'pointer')
                   .attr('r', dOpts.pointSize * 2);
               }
-              if (self.props.violinSettings.tooltip.show) {
+              if (
+                self.props.violinSettings.tooltip.show &&
+                !this.state.displayElementTextViolin
+              ) {
                 const m = d3.mouse(self.chart.objs.chartDiv.node());
                 self.chart.objs.tooltip
                   .style('left', `${m[0] + 10}px`)
@@ -1655,7 +1660,6 @@ class ViolinPlot extends Component {
 
     self.chart.dataPlots.preparePlots();
     self.chart.dataPlots.update();
-    // self.addToolTiptoMax(id);
     return self.chart;
   };
 
@@ -1735,6 +1739,23 @@ class ViolinPlot extends Component {
   };
 
   handleElementTextChange = () => {
+    if (!this.state.displayElementTextViolin) {
+      this.chart.objs.tooltip
+        .transition()
+        .duration(300)
+        .style('opacity', () => {
+          return 0;
+        })
+        .style('display', 'none');
+    } else {
+      this.chart.objs.tooltip
+        .transition()
+        .duration(300)
+        .style('opacity', () => {
+          return 1;
+        })
+        .style('display', 'block');
+    }
     sessionStorage.setItem(
       'displayElementTextViolin',
       !this.state.displayElementTextViolin,
@@ -1749,6 +1770,7 @@ class ViolinPlot extends Component {
 
   render() {
     const { violinSettings } = this.props;
+    const { displayElementTextViolin } = this.state;
     return (
       <>
         <span className="TextToggleButton">
@@ -1760,7 +1782,7 @@ class ViolinPlot extends Component {
                 inverted
                 circular
                 onClick={this.handleElementTextChange}
-                color="black"
+                id={displayElementTextViolin ? 'PrimaryColor' : 'black'}
               />
             }
             style={{
@@ -1772,11 +1794,7 @@ class ViolinPlot extends Component {
             }}
             className=""
             basic
-            content={
-              this.state.displayElementTextViolin
-                ? 'Hide Labels'
-                : 'Show Labels'
-            }
+            content={displayElementTextViolin ? 'Hide Labels' : 'Show Labels'}
           />
         </span>
         <div
