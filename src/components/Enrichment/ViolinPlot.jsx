@@ -5,6 +5,7 @@ import * as d3 from 'd3';
 import * as _ from 'lodash';
 // import { select } from "d3-selection";
 import './ViolinPlot.scss';
+import { over } from 'lodash';
 
 class ViolinPlot extends Component {
   state = {
@@ -59,7 +60,7 @@ class ViolinPlot extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    //const { violinData, HighlightedProteins, displayElementTextViolin } = this.props;
+    //const { violinData, HighlightedProteins } = this.props;
     const { violinData, HighlightedProteins } = this.props;
     if (violinData !== prevProps.violinData) {
       // const label = this.props.violinSettings.axisLabels.xAxis;
@@ -259,23 +260,20 @@ class ViolinPlot extends Component {
       const relative = shape.left - parent.left;
 
       const res = self.getPos(cx, cy, svg, svg);
-
+      const opacity = this.state.displayElementTextViolin ? 0 : 1;
       self.chart.objs.tooltip
         .transition()
         .duration(300)
         .style('left', `${relative + 20}px`)
         .style('top', `${res.y + 20}px`)
         .style('opacity', () => {
-          return 1;
+          return opacity;
         })
         .style('display', null);
       id.cpm = _.find(this.props.barcodeSettings.barcodeData, function(o) {
         return o.featureID === id.featureID;
       }).logFoldChange;
-      // if (!this.state.displayElementTextViolin) {
       this.tooltipHover(id);
-      // }
-      // }
     }
   };
 
@@ -392,17 +390,19 @@ class ViolinPlot extends Component {
     this.props.onHandleProteinSelected([]);
   };
 
-  tooltipHover = d => {
-    const self = this;
-    const tooltipFields = self.props.violinSettings.tooltip.fields;
+  tooltipHover = (d, override) => {
+    const tooltipFields = this.props.violinSettings.tooltip.fields;
     let tooltipString = '';
     _.forEach(tooltipFields, field => {
       if (d[field.value] != null && d[field.value] !== '') {
         tooltipString += `<span>${field.label} = ${d[field.value]}</span><br/>`;
       }
     });
-    self.chart.objs.tooltip.html(tooltipString);
-    self.chart.objs.tooltip.style('z-index', 100);
+    this.chart.objs.tooltip.html(tooltipString);
+    this.chart.objs.tooltip.style('z-index', 100);
+    if (override) {
+      this.chart.objs.tooltip.style('opacity', 1);
+    }
   };
 
   makeChart = () => {
@@ -1558,11 +1558,9 @@ class ViolinPlot extends Component {
                   .attr('cursor', 'pointer')
                   .attr('r', dOpts.pointSize * 2);
               }
-              if (
-                self.props.violinSettings.tooltip.show &&
-                !this.state.displayElementTextViolin
-              ) {
+              if (self.props.violinSettings.tooltip.show) {
                 const m = d3.mouse(self.chart.objs.chartDiv.node());
+                const opacity = this.state.displayElementTextViolin ? 0 : 1;
                 self.chart.objs.tooltip
                   .style('left', `${m[0] + 10}px`)
                   .style('top', `${m[1] - 10}px`)
@@ -1570,12 +1568,12 @@ class ViolinPlot extends Component {
                   .delay(500)
                   .duration(500)
                   .style('opacity', () => {
-                    return 1;
+                    return opacity;
                   })
                   .style('fill', '#f46d43')
                   .style('display', null);
 
-                return self.tooltipHover(d);
+                return self.tooltipHover(d, true);
               }
               return null;
             })
@@ -1739,23 +1737,15 @@ class ViolinPlot extends Component {
   };
 
   handleElementTextChange = () => {
-    if (!this.state.displayElementTextViolin) {
-      this.chart.objs.tooltip
-        .transition()
-        .duration(300)
-        .style('opacity', () => {
-          return 0;
-        })
-        .style('display', 'none');
-    } else {
-      this.chart.objs.tooltip
-        .transition()
-        .duration(300)
-        .style('opacity', () => {
-          return 1;
-        })
-        .style('display', 'block');
-    }
+    const opacity = this.state.displayElementTextViolin ? 1 : 0;
+    const display = this.state.displayElementTextViolin ? null : 'none';
+    this.chart.objs.tooltip
+      .transition()
+      .duration(300)
+      .style('opacity', () => {
+        return opacity;
+      })
+      .style('display', display);
     sessionStorage.setItem(
       'displayElementTextViolin',
       !this.state.displayElementTextViolin,
