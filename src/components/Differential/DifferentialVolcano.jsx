@@ -195,17 +195,26 @@ class DifferentialVolcano extends Component {
       if (relevantConfigColumns.includes('logFC')) {
         xLabel = 'logFC';
       }
-      if (relevantConfigColumns.includes('adj_P_Val')) {
-        yLabel = 'adj_P_Val';
-        doY = true;
-      } else if (relevantConfigColumns.includes('adj.P.Val')) {
-        yLabel = 'adj.P.Val';
-        doY = true;
-      } else if (relevantConfigColumns.includes('P_Value')) {
+      if (relevantConfigColumns.includes('P_Value')) {
         yLabel = 'P_Value';
         doY = true;
       } else if (relevantConfigColumns.includes('P.Value')) {
         yLabel = 'P.Value';
+        doY = true;
+      } else if (relevantConfigColumns.includes('PValue')) {
+        yLabel = 'PValue';
+        doY = true;
+      } else if (relevantConfigColumns.includes('PVal')) {
+        yLabel = 'PVal';
+        doY = true;
+      } else if (relevantConfigColumns.includes('P value')) {
+        yLabel = 'P value';
+        doY = true;
+      } else if (relevantConfigColumns.includes('adj_P_Value')) {
+        yLabel = 'adj_P_Val';
+        doY = true;
+      } else if (relevantConfigColumns.includes('adj.P.Value')) {
+        yLabel = 'adj.P.Val';
         doY = true;
       } else {
         this.handleDropdownChange({}, { name: 'yAxisSelector', value: yLabel });
