@@ -409,7 +409,7 @@ class DifferentialMultisetFilters extends Component {
 
     // Sizing
     let heightScalarP = 1;
-    if (uSettingsP.heightScalarP !== undefined) {
+    if (uSettingsP.heightScalarP != null) {
       heightScalarP = uSettingsP.heightScalarP;
     }
 
@@ -451,14 +451,14 @@ class DifferentialMultisetFilters extends Component {
     let baseColorCodeP = '#585858';
     let backgroundColorCodeP = '#E6E6E6';
     //Adding settings colors
-    if (uSettingsP.colors !== undefined) {
-      if (uSettingsP.colors.chosen !== undefined) {
+    if (uSettingsP.colors != null) {
+      if (uSettingsP.colors.chosen != null) {
         chosenColorCodeP = uSettingsP.colors.chosen;
       }
-      if (uSettingsP.colors.baseP !== undefined) {
+      if (uSettingsP.colors.baseP != null) {
         baseColorCodeP = uSettingsP.colors.baseP;
       }
-      if (uSettingsP.colors.background !== undefined) {
+      if (uSettingsP.colors.background != null) {
         backgroundColorCodeP = uSettingsP.colors.background;
       }
     }
@@ -753,44 +753,37 @@ class DifferentialMultisetFilters extends Component {
         return heightScalarP * 14 + 'px';
       })
       .attr('fill', 'black');
-    if (
-      uSettingsP.numElementsP !== undefined &&
-      uSettingsP.maxElementsP !== undefined
-    ) {
+    if (uSettingsP.numElementsP != null && uSettingsP.maxElementsP != null) {
+      let calculation =
+        4 * circlePadding +
+          6 * circleRadius +
+          (textElementWidth - 85 * heightScalarP) *
+            (uSettingsP.numElementsP / uSettingsP.maxElementsP) +
+          3 || 0;
       // const numElementsPLine =
       svg
         .append('line')
         .attr('class', 'numElements')
         .attr('x1', 4 * circlePadding + 6 * circleRadius)
-        .attr('x2', function() {
-          return (
-            4 * circlePadding +
-            6 * circleRadius +
-            (textElementWidth - 85 * heightScalarP) *
-              (uSettingsP.numElementsP / uSettingsP.maxElementsP) +
-            3
-          );
-        })
+        .attr('x2', calculation)
         .attr('y1', topBoxHeightP - 10 * heightScalarP)
         .attr('y2', topBoxHeightP - 10 * heightScalarP)
         .attr('stroke', chosenColorCodeP)
         .attr('stroke-width', 10 * heightScalarP);
 
+      calculation =
+        4 * circlePadding +
+          6 * circleRadius +
+          (textElementWidth - 85 * heightScalarP) *
+            (uSettingsP.numElementsP / uSettingsP.maxElementsP) +
+          6 || 0;
       const numElementsP = svg
         .selectAll('svg.dataObject')
         .data([uSettingsP.numElementsP])
         .enter()
         .append('text')
         .attr('class', 'numElements')
-        .attr('x', function() {
-          return (
-            4 * circlePadding +
-            6 * circleRadius +
-            (textElementWidth - 85 * heightScalarP) *
-              (uSettingsP.numElementsP / uSettingsP.maxElementsP) +
-            6
-          );
-        })
+        .attr('x', calculation)
         .attr('y', topBoxHeightP - 6 * heightScalarP);
 
       // const numElementsPText =
@@ -889,6 +882,7 @@ class DifferentialMultisetFilters extends Component {
     const callbackFactory = index => value => {
       this.props.onHandleSigValuePInputChange('sigValueP', value, index);
     };
+    console.log(selectedColP[0].value);
     return (
       <Fragment>
         <Form className="MultisetDropdownContainer">
