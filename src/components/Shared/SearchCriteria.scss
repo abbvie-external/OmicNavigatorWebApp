@@ -83,8 +83,17 @@
     }
   }
 
-  .PlotRadio {
+  .MultisetFilterButton {
+    background-color: var(--color-primary) !important;
+    color: white !important;
+  }
+
+  .MultisetFilterButtonSpan {
     float: right;
+  }
+
+  .PlotRadio {
+    margin-top: 10px !important;
   }
 
   .ViewPlotRadio label {

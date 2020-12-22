@@ -6,12 +6,6 @@ import NumericExponentialInput from '../Shared/NumericExponentialInput';
 import '../Shared/MultisetFilters.scss';
 
 class DifferentialMultisetFilters extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      sigValuePLocal: props.sigValueP,
-    };
-  }
   componentDidMount() {
     const {
       uDataP,
@@ -21,6 +15,8 @@ class DifferentialMultisetFilters extends Component {
       sigValueP,
       selectedColP,
       selectedOperatorP,
+      mustDifferential,
+      notDifferential,
     } = this.props;
     this.makeMultiset(
       uDataP,
@@ -30,6 +26,8 @@ class DifferentialMultisetFilters extends Component {
       sigValueP,
       selectedColP,
       selectedOperatorP,
+      mustDifferential,
+      notDifferential,
     );
   }
 
@@ -43,10 +41,14 @@ class DifferentialMultisetFilters extends Component {
       selectedColP,
       selectedOperatorP,
       multisetFiltersVisibleDifferential,
+      mustDifferential,
+      notDifferential,
     } = this.props;
     if (
       multisetFiltersVisibleDifferential &&
-      (uDataP !== prevProps.uDataP ||
+      (mustDifferential !== prevProps.mustDifferential ||
+        notDifferential !== prevProps.notDifferential ||
+        uDataP !== prevProps.uDataP ||
         uAnchorP !== prevProps.uAnchorP ||
         uSettingsP !== prevProps.uSettingsP ||
         metaSvgP !== prevProps.metaSvgP ||
@@ -63,6 +65,8 @@ class DifferentialMultisetFilters extends Component {
         sigValueP,
         selectedColP,
         selectedOperatorP,
+        mustDifferential,
+        notDifferential,
       );
     }
   }
@@ -75,6 +79,8 @@ class DifferentialMultisetFilters extends Component {
     sigValueP,
     selectedColP,
     selectedOperatorP,
+    mustDifferential,
+    notDifferential,
   ) {
     d3.selectAll('#multiset-query-p')
       .selectAll('*')
@@ -85,7 +91,14 @@ class DifferentialMultisetFilters extends Component {
       .style('padding-bottom', '5px');
 
     if (uSettingsP.displayMetaDataP) {
-      this.prepareMultiset(uDataP, uAnchorP, uSettingsP, baseP);
+      this.prepareMultiset(
+        uDataP,
+        uAnchorP,
+        uSettingsP,
+        baseP,
+        mustDifferential,
+        notDifferential,
+      );
       const baseMetaSvgP = baseP.append('svg');
       this.metaScript(
         baseMetaSvgP,
@@ -95,6 +108,8 @@ class DifferentialMultisetFilters extends Component {
         selectedColP,
         selectedOperatorP,
         sigValueP,
+        mustDifferential,
+        notDifferential,
       );
     }
   }
@@ -107,23 +122,20 @@ class DifferentialMultisetFilters extends Component {
     selectedColP,
     selectedOperatorP,
     sigValueP,
+    mustDifferential,
+    notDifferential,
   ) {
     const svgWidthP = 315;
     const heightScalarP = 15;
-    const mustDataP = uSettingsP.mustP;
-    const notDataP = uSettingsP.notP;
     const svgHeightP =
-      notDataP.length * heightScalarP +
-      mustDataP.length * heightScalarP +
+      notDifferential.length * heightScalarP +
+      mustDifferential.length * heightScalarP +
       60 +
       10 +
       24;
     const useAnchorP = uSettingsP.useAnchorP;
     const setDescP = [];
     const notSetDescP = [];
-    //var mustTextScalar = (15 * Number(mustDataP.length !== 0))
-    //var notTextScalar = (15 * Number(notDataP.length !== 0))
-
     for (var i = 0; i < selectedOperatorP.length; i++) {
       switch (selectedOperatorP[i].value) {
         case '<':
@@ -166,7 +178,11 @@ class DifferentialMultisetFilters extends Component {
     metaSvgP.selectAll('text').remove();
     metaSvgP.selectAll('circle').remove();
     metaSvgP.selectAll('rect').remove();
-    if (mustDataP.length !== 0 || notDataP.length !== 0 || useAnchorP) {
+    if (
+      mustDifferential.length !== 0 ||
+      notDifferential.length !== 0 ||
+      useAnchorP
+    ) {
       metaSvgP.attr('width', svgWidthP).attr('height', svgHeightP);
 
       metaSvgP
@@ -217,7 +233,7 @@ class DifferentialMultisetFilters extends Component {
       // const mustTestCirclesP =
       metaSvgP
         .selectAll('dataObject')
-        .data(mustDataP)
+        .data(mustDifferential)
         .enter()
         .append('circle')
         .style('fill', 'green')
@@ -227,13 +243,13 @@ class DifferentialMultisetFilters extends Component {
             return (
               30 +
               heightScalarP * setDescP.length +
-              mustDataP.indexOf(d) * heightScalarP
+              mustDifferential.indexOf(d) * heightScalarP
             );
           } else {
             return (
               30 +
               heightScalarP * setDescP.length +
-              (mustDataP.indexOf(d) + 1) * heightScalarP
+              (mustDifferential.indexOf(d) + 1) * heightScalarP
             );
           }
         })
@@ -242,7 +258,7 @@ class DifferentialMultisetFilters extends Component {
       // const mustTextP =
       metaSvgP
         .selectAll('svg.dataObject')
-        .data(mustDataP)
+        .data(mustDifferential)
         .enter()
         .append('text')
         .attr('x', 25)
@@ -251,14 +267,14 @@ class DifferentialMultisetFilters extends Component {
             return (
               30 +
               heightScalarP * setDescP.length +
-              mustDataP.indexOf(d) * heightScalarP +
+              mustDifferential.indexOf(d) * heightScalarP +
               4
             );
           } else {
             return (
               30 +
               heightScalarP * setDescP.length +
-              (mustDataP.indexOf(d) + 1) * heightScalarP +
+              (mustDifferential.indexOf(d) + 1) * heightScalarP +
               4
             );
           }
@@ -270,7 +286,7 @@ class DifferentialMultisetFilters extends Component {
         .attr('font-size', '13px')
         .attr('fill', 'black');
 
-      if (notDataP.length !== 0) {
+      if (notDifferential.length !== 0) {
         metaSvgP
           .selectAll('dataObject')
           .data(notSetDescP)
@@ -283,13 +299,13 @@ class DifferentialMultisetFilters extends Component {
               return (
                 30 +
                 heightScalarP * setDescP.length +
-                (i + mustDataP.length - 1) * heightScalarP
+                (i + mustDifferential.length - 1) * heightScalarP
               );
             } else {
               return (
                 30 +
                 heightScalarP * setDescP.length +
-                (i + mustDataP.length) * heightScalarP
+                (i + mustDifferential.length) * heightScalarP
               );
             }
           })
@@ -303,7 +319,7 @@ class DifferentialMultisetFilters extends Component {
         // const notTestCirclesP =
         metaSvgP
           .selectAll('dataObject')
-          .data(notDataP)
+          .data(notDifferential)
           .enter()
           .append('circle')
           .style('fill', 'red')
@@ -314,7 +330,10 @@ class DifferentialMultisetFilters extends Component {
                 30 +
                 4 +
                 heightScalarP *
-                  (i + setDescP.length + notSetDescP.length + mustDataP.length)
+                  (i +
+                    setDescP.length +
+                    notSetDescP.length +
+                    mustDifferential.length)
               );
             } else {
               return (
@@ -324,7 +343,7 @@ class DifferentialMultisetFilters extends Component {
                   (i +
                     setDescP.length +
                     notSetDescP.length +
-                    mustDataP.length +
+                    mustDifferential.length +
                     1)
               );
             }
@@ -334,7 +353,7 @@ class DifferentialMultisetFilters extends Component {
         // const notTextP =
         metaSvgP
           .selectAll('svg.dataObject')
-          .data(notDataP)
+          .data(notDifferential)
           .enter()
           .append('text')
           .attr('x', 25)
@@ -344,7 +363,10 @@ class DifferentialMultisetFilters extends Component {
                 30 +
                 8 +
                 heightScalarP *
-                  (i + setDescP.length + notSetDescP.length + mustDataP.length)
+                  (i +
+                    setDescP.length +
+                    notSetDescP.length +
+                    mustDifferential.length)
               );
             } else {
               return (
@@ -354,7 +376,7 @@ class DifferentialMultisetFilters extends Component {
                   (i +
                     setDescP.length +
                     notSetDescP.length +
-                    mustDataP.length +
+                    mustDifferential.length +
                     1)
               );
             }
@@ -369,7 +391,14 @@ class DifferentialMultisetFilters extends Component {
     }
   }
 
-  prepareMultiset(uDataP, uAnchorP, uSettingsP, baseP) {
+  prepareMultiset(
+    uDataP,
+    uAnchorP,
+    uSettingsP,
+    baseP,
+    mustDifferential,
+    notDifferential,
+  ) {
     const self = this;
     let datasetP = uDataP;
     if (uSettingsP.useAnchorP && datasetP.indexOf(uAnchorP) !== 0) {
@@ -377,8 +406,6 @@ class DifferentialMultisetFilters extends Component {
       datasetP.splice(anchorPIndex, 1);
       datasetP.unshift(uAnchorP);
     }
-    let mustDataP = uSettingsP.mustP;
-    let notDataP = uSettingsP.notP;
 
     // Sizing
     let heightScalarP = 1;
@@ -508,19 +535,24 @@ class DifferentialMultisetFilters extends Component {
       })
       .attr('r', circleRadius)
       .style('stroke', d =>
-        mustDataP.includes(d) || d === uAnchorP
+        mustDifferential.includes(d) || d === uAnchorP
           ? chosenColorCodeP
           : 'transparent',
       )
       .attr('stroke-width', circleRadius / 5)
       .on('click', function(d) {
-        if (!mustDataP.includes(d) && d !== uAnchorP) {
-          mustDataP.push(d);
-          if (notDataP.includes(d)) {
-            notDataP.splice(notDataP.indexOf(d), 1);
+        let mustDifferentialCopy = [...mustDifferential];
+        let notDifferentialCopy = [...notDifferential];
+        if (!mustDifferential.includes(d) && d !== uAnchorP) {
+          mustDifferentialCopy.push(d);
+          if (notDifferential.includes(d)) {
+            notDifferentialCopy.splice(notDifferential.indexOf(d), 1);
           }
           updateCircles();
-          self.props.onHandleSetChange({ mustP: mustDataP, notP: notDataP });
+          self.props.onHandleSetChange(
+            mustDifferentialCopy,
+            notDifferentialCopy,
+          );
         }
       });
 
@@ -540,20 +572,24 @@ class DifferentialMultisetFilters extends Component {
       })
       .attr('r', circleRadius)
       .style('stroke', d =>
-        !notDataP.includes(d) && !mustDataP.includes(d) && d !== uAnchorP
+        !notDifferential.includes(d) &&
+        !mustDifferential.includes(d) &&
+        d !== uAnchorP
           ? chosenColorCodeP
           : baseColorCodeP,
       )
       .attr('stroke-width', circleRadius / 5)
       .on('click', function(d) {
-        if (mustDataP.includes(d) && d !== uAnchorP) {
-          mustDataP.splice(mustDataP.indexOf(d), 1);
+        let mustDifferentialCopy = [...mustDifferential];
+        let notDifferentialCopy = [...notDifferential];
+        if (mustDifferential.includes(d) && d !== uAnchorP) {
+          mustDifferentialCopy.splice(mustDifferential.indexOf(d), 1);
         }
-        if (notDataP.includes(d) && d !== uAnchorP) {
-          notDataP.splice(notDataP.indexOf(d), 1);
+        if (notDifferential.includes(d) && d !== uAnchorP) {
+          notDifferentialCopy.splice(notDifferential.indexOf(d), 1);
         }
         updateCircles();
-        self.props.onHandleSetChange({ mustP: mustDataP, notP: notDataP });
+        self.props.onHandleSetChange(mustDifferentialCopy, notDifferentialCopy);
       });
 
     // const miniMaybeCircles =
@@ -573,14 +609,16 @@ class DifferentialMultisetFilters extends Component {
       })
       .attr('r', circleRadius / 3)
       .on('click', function(d) {
-        if (mustDataP.includes(d) && d !== uAnchorP) {
-          mustDataP.splice(mustDataP.indexOf(d), 1);
+        let mustDifferentialCopy = [...mustDifferential];
+        let notDifferentialCopy = [...notDifferential];
+        if (mustDifferential.includes(d) && d !== uAnchorP) {
+          mustDifferentialCopy.splice(mustDifferential.indexOf(d), 1);
         }
-        if (notDataP.includes(d) && d !== uAnchorP) {
-          notDataP.splice(notDataP.indexOf(d), 1);
+        if (notDifferential.includes(d) && d !== uAnchorP) {
+          notDifferentialCopy.splice(notDifferential.indexOf(d), 1);
         }
         updateCircles();
-        self.props.onHandleSetChange({ mustP: mustDataP, notP: notDataP });
+        self.props.onHandleSetChange(mustDifferentialCopy, notDifferentialCopy);
       });
 
     const notCircles = svg
@@ -599,19 +637,24 @@ class DifferentialMultisetFilters extends Component {
       })
       .attr('r', circleRadius)
       .style('stroke', d =>
-        notDataP.includes(d) && d !== uAnchorP
+        notDifferential.includes(d) && d !== uAnchorP
           ? chosenColorCodeP
           : 'transparent',
       )
       .attr('stroke-width', circleRadius / 5)
       .on('click', function(d) {
-        if (!notDataP.includes(d) && d !== uAnchorP) {
-          notDataP.push(d);
-          if (mustDataP.includes(d)) {
-            mustDataP.splice(mustDataP.indexOf(d), 1);
+        let mustDifferentialCopy = [...mustDifferential];
+        let notDifferentialCopy = [...notDifferential];
+        if (!notDifferential.includes(d) && d !== uAnchorP) {
+          notDifferentialCopy.push(d);
+          if (mustDifferential.includes(d)) {
+            mustDifferentialCopy.splice(mustDifferential.indexOf(d), 1);
           }
           updateCircles();
-          self.props.onHandleSetChange({ mustP: mustDataP, notP: notDataP }); // updateGlobalVariables();
+          self.props.onHandleSetChange(
+            mustDifferentialCopy,
+            notDifferentialCopy,
+          );
         }
       });
 
@@ -794,21 +837,23 @@ class DifferentialMultisetFilters extends Component {
     function updateCircles() {
       mustCircles
         .style('stroke', d =>
-          mustDataP.includes(d) || d === uAnchorP
+          mustDifferential.includes(d) || d === uAnchorP
             ? chosenColorCodeP
             : 'transparent',
         )
         .attr('stroke-width', circleRadius / 5);
       maybeCircles
         .style('stroke', d =>
-          !notDataP.includes(d) && !mustDataP.includes(d) && d !== uAnchorP
+          !notDifferential.includes(d) &&
+          !mustDifferential.includes(d) &&
+          d !== uAnchorP
             ? chosenColorCodeP
             : baseColorCodeP,
         )
         .attr('stroke-width', circleRadius / 5);
       notCircles
         .style('stroke', d =>
-          notDataP.includes(d) ? chosenColorCodeP : 'transparent',
+          notDifferential.includes(d) ? chosenColorCodeP : 'transparent',
         )
         .attr('stroke-width', circleRadius / 5);
     }
@@ -817,22 +862,6 @@ class DifferentialMultisetFilters extends Component {
   handleDropdownChange = (evt, { name, value, index }) => {
     this.props.onHandleDropdownChange(evt, { name, value, index });
   };
-
-  // handleInputChange = (evt, { name, value, index }) => {
-  //   this.props.onHandleSigValuePInputChange(evt, { name, value, index });
-  // };
-
-  handleSigValuePInputChange = (value, index) => {
-    const uSelVPLocal = [...this.state['sigValuePLocal']];
-    uSelVPLocal[index] = parseFloat(value);
-    this.setState({
-      sigValuePLocal: uSelVPLocal,
-    });
-  };
-
-  actuallyHandleSigValuePInputChange = _.debounce((value, index) => {
-    this.props.onHandleSigValuePInputChange('sigValueP', value, index);
-  }, 1250);
 
   addFilter = () => {
     this.props.onAddFilterDifferential();
@@ -847,22 +876,18 @@ class DifferentialMultisetFilters extends Component {
   };
 
   render() {
-    const { sigValuePLocal } = this.state;
     const {
       sigValueP,
       selectedOperatorP,
       selectedColP,
       uSettingsP,
       thresholdColsP,
-      // loadingDifferentialMultisetFilters,
     } = this.props;
     const OperatorsP = uSettingsP.thresholdOperatorP;
     const indexFiltersP = uSettingsP.indexFiltersP;
     const hoveredFilter = uSettingsP.hoveredFilter;
-    // const defaultSigValue = uSettingsP.defaultsigValueP;
-    const callbackFactory = index => number => {
-      this.handleSigValuePInputChange(number, index);
-      this.actuallyHandleSigValuePInputChange(number, index);
+    const callbackFactory = index => value => {
+      this.props.onHandleSigValuePInputChange('sigValueP', value, index);
     };
     return (
       <Fragment>
@@ -889,7 +914,6 @@ class DifferentialMultisetFilters extends Component {
                 ></Form.Field>
                 {hoveredFilter === index && indexFiltersP.length !== 1 && (
                   <Button
-                    // disabled={loadingDifferentialMultisetFilters}
                     circular
                     icon
                     style={{
@@ -916,19 +940,6 @@ class DifferentialMultisetFilters extends Component {
                   width={5}
                   onChange={this.handleDropdownChange}
                 ></Form.Field>
-                {/* <Form.Field
-                  control={Input}
-                  type="number"
-                  step="0.01"
-                  label={index === 0 ? 'Significance' : ''}
-                  name="sigValueP"
-                  className="SignificantValueInput"
-                  id="SignificantValueInputMultisetP"
-                  index={index}
-                  value={sigValueP[index]}
-                  width={5}
-                  onChange={this.handleInputChange}
-                ></Form.Field> */}
                 <Form.Field
                   width={4}
                   id="SignificantValueInputMultisetP"
@@ -942,21 +953,13 @@ class DifferentialMultisetFilters extends Component {
                     preventNegatives={false}
                     name="sigValueP"
                     defaultValue={sigValueP[index]}
-                    value={sigValuePLocal[index]}
+                    value={sigValueP[index]}
                   />
                 </Form.Field>
               </Form.Group>
             ))}
           </ul>
-          <Button
-            circular
-            compact
-            size="mini"
-            icon
-            onClick={this.addFilter}
-            // onClick={this.props.onAddFilterDifferential}
-            // disabled={loadingDifferentialMultisetFilters}
-          >
+          <Button circular compact size="mini" icon onClick={this.addFilter}>
             <Icon name="plus circle" color={'green'} />
           </Button>
         </Form>

@@ -432,7 +432,6 @@ class DifferentialVolcanoPlot extends Component {
         ? parseInt(circle.cx) + 5
         : parseInt(circle.cx) - 5;
       const cy = parseInt(circle.cy) + 4;
-      debugger;
       return (
         <text
           key={`volcanoCircleText-${circle.id}`}
