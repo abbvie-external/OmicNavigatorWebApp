@@ -754,36 +754,39 @@ class DifferentialMultisetFilters extends Component {
       })
       .attr('fill', 'black');
     if (uSettingsP.numElementsP != null && uSettingsP.maxElementsP != null) {
-      let calculation =
-        4 * circlePadding +
-          6 * circleRadius +
-          (textElementWidth - 85 * heightScalarP) *
-            (uSettingsP.numElementsP / uSettingsP.maxElementsP) +
-          3 || 0;
       // const numElementsPLine =
       svg
         .append('line')
         .attr('class', 'numElements')
         .attr('x1', 4 * circlePadding + 6 * circleRadius)
-        .attr('x2', calculation)
+        .attr('x2', function() {
+          return (
+            4 * circlePadding +
+            6 * circleRadius +
+            (textElementWidth - 85 * heightScalarP) *
+              (uSettingsP.numElementsP / uSettingsP.maxElementsP) +
+            3
+          );
+        })
         .attr('y1', topBoxHeightP - 10 * heightScalarP)
         .attr('y2', topBoxHeightP - 10 * heightScalarP)
         .attr('stroke', chosenColorCodeP)
         .attr('stroke-width', 10 * heightScalarP);
-
-      calculation =
-        4 * circlePadding +
-          6 * circleRadius +
-          (textElementWidth - 85 * heightScalarP) *
-            (uSettingsP.numElementsP / uSettingsP.maxElementsP) +
-          6 || 0;
       const numElementsP = svg
         .selectAll('svg.dataObject')
         .data([uSettingsP.numElementsP])
         .enter()
         .append('text')
         .attr('class', 'numElements')
-        .attr('x', calculation)
+        .attr('x', function() {
+          return (
+            4 * circlePadding +
+            6 * circleRadius +
+            (textElementWidth - 85 * heightScalarP) *
+              (uSettingsP.numElementsP / uSettingsP.maxElementsP) +
+            6
+          );
+        })
         .attr('y', topBoxHeightP - 6 * heightScalarP);
 
       // const numElementsPText =

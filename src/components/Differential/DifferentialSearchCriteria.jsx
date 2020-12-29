@@ -20,6 +20,7 @@ let cancelRequestGetReportLinkDifferential = () => {};
 let cancelRequestPSCGetResultsTable = () => {};
 let cancelRequestMultisetInferenceData = () => {};
 let cancelRequestInferenceMultisetPlot = () => {};
+
 class DifferentialSearchCriteria extends Component {
   state = {
     differentialStudies: [],
@@ -47,7 +48,6 @@ class DifferentialSearchCriteria extends Component {
     reloadPlotP: true,
     mustDifferential: [],
     notDifferential: [],
-    filteredTriggeredDifferential: false,
     uSettingsP: {
       defaultselectedColP: [],
       defaultselectedOperatorP: {
@@ -91,6 +91,7 @@ class DifferentialSearchCriteria extends Component {
     multisetFiltersVisibleDifferential: false,
     activateMultisetFiltersP: false,
     uDataP: [],
+    filteredTriggeredDifferential: false,
     // initialRenderP: true,
     // loadingDifferentialMultisetFilters: false,
   };
@@ -349,12 +350,12 @@ class DifferentialSearchCriteria extends Component {
     const {
       differentialStudy,
       differentialModel,
-      // onMultisetQueriedDifferential,
+      onMultisetQueriedDifferential,
       onSearchCriteriaChangeDifferential,
       onSearchTransitionDifferential,
     } = this.props;
     // onSearchTransitionDifferential(true);
-    // onMultisetQueriedDifferential(false);
+    onMultisetQueriedDifferential(false);
     const differentialTestMeta = this.props.differentialTestsMetadata.find(
       test => test.testID === value,
     );
@@ -897,11 +898,7 @@ class DifferentialSearchCriteria extends Component {
 
     let MultisetFiltersDifferential;
     let MultisetFilterButtonDifferential;
-    if (
-      isValidSearchDifferential &&
-      // activateMultisetFiltersP &&
-      multisetFiltersVisibleDifferential
-    ) {
+    if (isValidSearchDifferential && multisetFiltersVisibleDifferential) {
       MultisetFiltersDifferential = (
         <DifferentialMultisetFilters
           {...this.props}
@@ -919,15 +916,14 @@ class DifferentialSearchCriteria extends Component {
         // <Popup
         //   trigger={
         <Button
-          // disabled={}
           icon
           labelPosition="left"
-          // className={this.props.isVolcanoTableLoading ? '' : ''}
           id={
             this.state.filteredTriggeredDifferential
               ? 'MultisetFilterButtonLight'
               : 'MultisetFilterButtonDark'
           }
+          className={this.state.filteredTriggeredDifferential ? 'disabled' : ''}
           size={dynamicSize}
           fluid
           onClick={this.updateQueryDataP}

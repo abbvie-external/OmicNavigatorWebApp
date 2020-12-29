@@ -50,6 +50,8 @@ class EnrichmentSearchCriteria extends Component {
       },
     ],
     sigValue: [0.05],
+    mustEnrichment: [],
+    notEnrichment: [],
     uSettings: {
       defaultSelectedCol: {
         key: 'adj_P_Val',
@@ -65,8 +67,6 @@ class EnrichmentSearchCriteria extends Component {
       useAnchor: false,
       hoveredFilter: -1,
       indexFilters: [0],
-      must: [],
-      not: [],
       displayMetaData: true,
       templateName: 'enrichment-multiset',
       numElements: 0,
@@ -94,9 +94,9 @@ class EnrichmentSearchCriteria extends Component {
       ],
       useTestCheckBoxes: true,
     },
-    // activateMultisetFilters: false,
     reloadPlot: true,
-    initialRenderE: true,
+    filteredTriggeredEnrichment: false,
+    multisetFiltersVisibleEnrichment: false,
   };
 
   componentDidMount() {
@@ -240,44 +240,6 @@ class EnrichmentSearchCriteria extends Component {
     }
   };
 
-  setStudyTooltip = () => {
-    if (this.props.enrichmentModel !== '') {
-      this.setState({
-        enrichmentStudyReportTooltip: `The model "main" from the study ${this.props.enrichmentStudy} does not have additional analysis details available.`,
-      });
-    }
-  };
-
-  getReportLink = (study, model) => {
-    cancelRequestGetReportLinkEnrichment();
-    let cancelToken = new CancelToken(e => {
-      cancelRequestGetReportLinkEnrichment = e;
-    });
-    omicNavigatorService
-      .getReportLink(study, model, this.setStudyTooltip, cancelToken)
-      .then(getReportLinkResponse => {
-        if (getReportLinkResponse.length > 0) {
-          const link = getReportLinkResponse.includes('http')
-            ? getReportLinkResponse
-            : // : `***REMOVED***/ocpu/library/${getReportLinkResponse}`;
-              `${this.props.baseUrl}/ocpu/library/${getReportLinkResponse}`;
-          this.setState({
-            enrichmentStudyHrefVisible: true,
-            enrichmentStudyHref: link,
-          });
-        } else {
-          this.setStudyTooltip();
-          this.setState({
-            enrichmentStudyHrefVisible: false,
-            enrichmentStudyHref: '',
-          });
-        }
-      })
-      .catch(error => {
-        console.error('Error during getReportLink', error);
-      });
-  };
-
   handleStudyChange = (evt, { name, value }) => {
     const {
       onSearchCriteriaChangeEnrichment,
@@ -303,6 +265,43 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentAnnotationTooltip: '',
     });
     this.getReportLink(value, 'default');
+  };
+
+  setStudyTooltip = () => {
+    if (this.props.enrichmentModel !== '') {
+      this.setState({
+        enrichmentStudyReportTooltip: `The model "main" from the study ${this.props.enrichmentStudy} does not have additional analysis details available.`,
+      });
+    }
+  };
+
+  getReportLink = (study, model) => {
+    cancelRequestGetReportLinkEnrichment();
+    let cancelToken = new CancelToken(e => {
+      cancelRequestGetReportLinkEnrichment = e;
+    });
+    omicNavigatorService
+      .getReportLink(study, model, this.setStudyTooltip, cancelToken)
+      .then(getReportLinkResponse => {
+        if (getReportLinkResponse.length > 0) {
+          const link = getReportLinkResponse.includes('http')
+            ? getReportLinkResponse
+            : `${this.props.baseUrl}/ocpu/library/${getReportLinkResponse}`;
+          this.setState({
+            enrichmentStudyHrefVisible: true,
+            enrichmentStudyHref: link,
+          });
+        } else {
+          this.setStudyTooltip();
+          this.setState({
+            enrichmentStudyHrefVisible: false,
+            enrichmentStudyHref: '',
+          });
+        }
+      })
+      .catch(error => {
+        console.error('Error during getReportLink', error);
+      });
   };
 
   handleModelChange = (evt, { name, value }) => {
@@ -375,6 +374,7 @@ class EnrichmentSearchCriteria extends Component {
     this.setState({
       enrichmentAnnotationTooltip,
       reloadPlot: true,
+      multisetFiltersVisibleEnrichment: false,
     });
     onSearchCriteriaChangeEnrichment(
       {
@@ -421,11 +421,8 @@ class EnrichmentSearchCriteria extends Component {
     if (handleUSettings) {
       this.props.onHandleNetworkSigValue(0.05);
       this.setState({
-        uSettings: {
-          ...this.state.uSettings,
-          must: [],
-          not: [],
-        },
+        mustEnrichment: [],
+        notEnrichment: [],
         sigValue: [0.05],
       });
     }
@@ -458,7 +455,6 @@ class EnrichmentSearchCriteria extends Component {
       onHandleEnrichmentTableLoading,
       multisetFiltersVisibleEnrichment,
     } = this.props;
-    onSearchTransitionEnrichment(true);
     onHandleEnrichmentTableLoading(true);
     onPValueTypeChange(value);
     if (!multisetFiltersVisibleEnrichment) {
@@ -487,9 +483,12 @@ class EnrichmentSearchCriteria extends Component {
           console.error('Error during getEnrichmentsTable', error);
         });
     } else {
-      const { sigValue, selectedOperator } = this.state;
-      const eMust = this.state.uSettings.must;
-      const eNot = this.state.uSettings.not;
+      const {
+        sigValue,
+        selectedOperator,
+        mustEnrichment,
+        notEnrichment,
+      } = this.state;
       this.getMultisetPlot(
         sigValue,
         enrichmentModel,
@@ -507,8 +506,8 @@ class EnrichmentSearchCriteria extends Component {
           enrichmentStudy,
           enrichmentModel,
           enrichmentAnnotation,
-          eMust,
-          eNot,
+          mustEnrichment,
+          notEnrichment,
           sigValue,
           this.jsonToList(selectedOperator),
           value,
@@ -518,14 +517,13 @@ class EnrichmentSearchCriteria extends Component {
         .then(annotationData => {
           const multisetResults = annotationData;
           this.setState({
+            mustEnrichment,
+            notEnrichment,
             uSettings: {
               ...this.state.uSettings,
               numElements: multisetResults.length,
               maxElements: this.state.uSettings.maxElements,
-              must: eMust,
-              not: eNot,
             },
-            // activateMultisetFilters: true,
           });
           onEnrichmentSearch({
             enrichmentResults: multisetResults,
@@ -538,62 +536,42 @@ class EnrichmentSearchCriteria extends Component {
   };
 
   handleMultisetToggleEnrichment = () => {
-    return evt => {
-      this.props.onHandleNetworkGraphReady(false);
-
-      if (this.props.multisetFiltersVisibleEnrichment === false) {
-        // on toggle open
-        this.props.onMultisetQueriedEnrichment(true);
-        this.props.onSearchTransitionEnrichment(true);
-        this.props.onHandleMultisetFiltersVisibleEnrichment();
-        // this.props.onHandleMultisetFiltersVisibleEnrichment(true);
-        this.setState(
-          {
-            reloadPlot: true,
-          },
-          function() {
-            this.updateQueryData();
-          },
-        );
-      } else {
-        // on toggle close
-        // this.props.onHandleNetworkTests([], []);
-        this.props.onMultisetQueriedEnrichment(false);
-        this.props.onHandleMultisetFiltersVisibleEnrichment();
-        // this.props.onHandleMultisetFiltersVisibleEnrichment(false);
-        this.setState({
-          reloadPlot: false,
-          initialRenderE: true,
-        });
-        const enrichmentAnnotationName = 'enrichmentAnnotation';
-        const enrichmentAnnotationVar = this.props.enrichmentAnnotation;
-        this.multisetTriggeredAnnotationChange(
-          enrichmentAnnotationName,
-          enrichmentAnnotationVar,
-        );
-      }
-    };
+    if (this.state.multisetFiltersVisibleEnrichment === false) {
+      // on toggle open
+      this.setState({
+        reloadPlot: true,
+        multisetFiltersVisibleEnrichment: true,
+      });
+    } else {
+      // on toggle close
+      // this.props.onHandleNetworkTests([], []);
+      this.props.onMultisetQueriedEnrichment(false);
+      this.setState({
+        reloadPlot: false,
+        multisetFiltersVisibleEnrichment: false,
+        filteredTriggeredEnrichment: false,
+      });
+      const enrichmentAnnotationName = 'enrichmentAnnotation';
+      const enrichmentAnnotationVar = this.props.enrichmentAnnotation;
+      this.multisetTriggeredAnnotationChange(
+        enrichmentAnnotationName,
+        enrichmentAnnotationVar,
+      );
+    }
   };
 
   handleMultisetOpenErrorEnrichment = () => {
     cancelRequestEnrichmentMultisetPlot();
-    this.props.onHandleMultisetFiltersVisibleEnrichment();
-    // this.props.onHandleMultisetFiltersVisibleEnrichment(false);
     this.props.onMultisetQueriedEnrichment(false);
     console.log('Error during getEnrichmentsIntersection');
   };
 
   handleMultisetECloseError = () => {
     this.props.onSearchTransitionEnrichment(false);
-    this.props.onHandleMultisetFiltersVisibleEnrichment();
-    // this.props.onHandleMultisetFiltersVisibleEnrichment(true);
     this.props.onMultisetQueriedEnrichment(true);
-    this.setState(
-      {
-        reloadPlot: true,
-      },
-      this.updateQueryData(),
-    );
+    this.setState({
+      reloadPlot: true,
+    });
     console.log('Error during getEnrichmentsTable');
   };
 
@@ -602,9 +580,12 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentStudy,
       enrichmentModel,
       pValueType,
-      onSearchTransitionEnrichment,
+      // onSearchTransitionEnrichment,
       onSearchCriteriaChangeEnrichment,
     } = this.props;
+    this.setState({
+      multisetFiltersVisibleEnrichment: false,
+    });
     onSearchCriteriaChangeEnrichment(
       {
         enrichmentStudy: enrichmentStudy,
@@ -614,7 +595,7 @@ class EnrichmentSearchCriteria extends Component {
       },
       true,
     );
-    onSearchTransitionEnrichment(true);
+    // onSearchTransitionEnrichment(true);
     cancelGetEnrichmentsTable();
     let cancelToken = new CancelToken(e => {
       cancelGetEnrichmentsTable = e;
@@ -640,91 +621,65 @@ class EnrichmentSearchCriteria extends Component {
         console.error('Error during getEnrichmentsTable', error);
       });
   };
+
   changeHoveredFilter = index => {
     const uSetVP = { ...this.state.uSettings };
     uSetVP.hoveredFilter = index;
     this.setState({ uSettings: uSetVP });
   };
+
   handleOperatorChange = (evt, { name, value, index }) => {
-    if (
-      this.state.uSettings.must.length > 0 ||
-      this.state.uSettings.not.length > 0
-    ) {
-      this.props.onHandleNetworkGraphReady(false);
-      // this.props.onSearchTransitionEnrichment(true);
-      this.props.onHandleEnrichmentTableLoading(true);
-      this.props.onHandleNetworkOperator(value);
-    }
+    this.setState({
+      filteredTriggeredEnrichment: false,
+    });
+    this.props.onHandleNetworkOperator(value);
     const uSelVP = [...this.state[name]];
     uSelVP[index] = {
       key: value,
       text: value,
       value: value,
     };
-    this.setState(
-      {
-        [name]: uSelVP,
-        reloadPlot: false,
-      },
-      function() {
-        this.updateQueryData();
-      },
-    );
+    this.setState({
+      [name]: uSelVP,
+      reloadPlot: false,
+    });
   };
+
   handleSigValueEInputChange = value => {
-    if (
-      !this.state.initialRenderE &&
-      (this.state.uSettings.must.length > 0 ||
-        this.state.uSettings.not.length > 0)
-    ) {
-      this.props.onHandleNetworkGraphReady(false);
-      // this.props.onSearchTransitionEnrichment(true);
-      this.props.onHandleEnrichmentTableLoading(true);
-      this.props.onHandleNetworkSigValue(parseFloat(value));
-    }
-    this.setState(
-      {
-        sigValue: [parseFloat(value)],
-        reloadPlot: true,
-        initialRenderE: false,
-      },
-      function() {
-        this.updateQueryData();
-      },
-    );
+    this.setState({
+      sigValue: [parseFloat(value)],
+      reloadPlot: true,
+      filteredTriggeredEnrichment: false,
+    });
+    this.props.onHandleNetworkSigValue(parseFloat(value));
   };
-  handleSetChange = ({ must, not }) => {
-    this.props.onHandleNetworkGraphReady(false);
-    // this.props.onSearchTransitionEnrichment(true);
-    this.props.onHandleEnrichmentTableLoading(true);
-    this.props.onHandleNetworkTests(must, not);
-    const uSettingsVP = this.state.uSettings;
-    uSettingsVP.must = must;
-    uSettingsVP.not = not;
-    this.setState(
-      {
-        uSettings: uSettingsVP,
-        reloadPlot: false,
-      },
-      function() {
-        this.updateQueryData();
-      },
-    );
+
+  handleSetChange = (mustEnrichment, notEnrichment) => {
+    this.setState({
+      mustEnrichment,
+      notEnrichment,
+      filteredTriggeredEnrichment: false,
+      // reloadPlot: false,
+    });
+    this.props.onHandleNetworkTests(mustEnrichment, notEnrichment);
   };
+
   handleFilterOutChange = test => {
+    const { mustEnrichment, notEnrichment } = this.state;
     this.props.onHandleNetworkGraphReady(false);
-    // this.props.onSearchTransitionEnrichment(true);
     this.props.onHandleEnrichmentTableLoading(true);
     this.props.onMultisetTestsFiltered(test);
-    const uSetVP = this.state.uSettings;
-    if (uSetVP.must.includes(test)) {
-      uSetVP.must.splice(uSetVP.must.indexOf(test), 1);
-    } else if (uSetVP.not.includes(test)) {
-      uSetVP.not.splice(uSetVP.not.indexOf(test), 1);
+    let mustEnrichmentCopy = [...mustEnrichment];
+    let notEnrichmentCopy = [...notEnrichment];
+    if (mustEnrichmentCopy.includes(test)) {
+      mustEnrichmentCopy.splice(mustEnrichmentCopy.indexOf(test), 1);
+    } else if (notEnrichmentCopy.includes(test)) {
+      notEnrichmentCopy.splice(notEnrichmentCopy.indexOf(test), 1);
     }
     this.setState(
       {
-        uSettings: uSetVP,
+        mustEnrichment: mustEnrichmentCopy,
+        notEnrichment: notEnrichmentCopy,
         reloadPlot: true,
       },
       function() {
@@ -743,12 +698,20 @@ class EnrichmentSearchCriteria extends Component {
       onDisablePlotEnrichment,
       tests,
     } = this.props;
-    const { selectedOperator, reloadPlot, sigValue } = this.state;
+    const {
+      selectedOperator,
+      reloadPlot,
+      sigValue,
+      mustEnrichment,
+      notEnrichment,
+    } = this.state;
+    this.setState({
+      filteredTriggeredEnrichment: true,
+    });
+    this.props.onHandleEnrichmentTableLoading(true);
     if (reloadPlot) {
       onDisablePlotEnrichment();
     }
-    const eMust = this.state.uSettings.must;
-    const eNot = this.state.uSettings.not;
     cancelRequestMultisetEnrichmentData();
     let cancelToken = new CancelToken(e => {
       cancelRequestMultisetEnrichmentData = e;
@@ -758,8 +721,8 @@ class EnrichmentSearchCriteria extends Component {
         enrichmentStudy,
         enrichmentModel,
         enrichmentAnnotation,
-        eMust,
-        eNot,
+        mustEnrichment,
+        notEnrichment,
         sigValue,
         this.jsonToList(selectedOperator),
         pValueType,
@@ -780,12 +743,12 @@ class EnrichmentSearchCriteria extends Component {
         // if (reloadPlot === true && annotationTestsLength > 1) {
         const multisetResults = annotationData;
         this.setState({
+          mustEnrichment,
+          notEnrichment,
           uSettings: {
             ...this.state.uSettings,
-            numElements: multisetResults.length,
-            maxElements: this.state.uSettings.maxElements,
-            must: eMust,
-            not: eNot,
+            numElements: multisetResults.length || 0,
+            maxElements: this.state.uSettings.maxElements || 0,
           },
           // activateMultisetFilters: true,
         });
@@ -808,6 +771,7 @@ class EnrichmentSearchCriteria extends Component {
       );
     }
   };
+
   jsonToList(json) {
     var valueList = [];
     for (var i = 0; i < json.length; i++) {
@@ -874,6 +838,26 @@ class EnrichmentSearchCriteria extends Component {
     }
   }
 
+  handleMultisetFiltersVisibleEnrichment = () => {
+    this.setState(prevState => ({
+      multisetFiltersVisibleEnrichment: !prevState.multisetFiltersVisibleEnrichment,
+    }));
+  };
+
+  getDynamicSize() {
+    let w = Math.max(
+      document.documentElement.clientWidth,
+      window.innerWidth || 0,
+    );
+    if (w < 1200) {
+      return 'small';
+    } else if (w > 1199 && w < 1600) {
+      return 'small';
+    } else if (w > 1599 && w < 2600) {
+      return undefined;
+    } else if (w > 2599) return 'large';
+  }
+
   render() {
     const {
       enrichmentStudies,
@@ -887,6 +871,7 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentModelsDisabled,
       enrichmentAnnotationsDisabled,
       // activateMultisetFilters,
+      multisetFiltersVisibleEnrichment,
     } = this.state;
 
     const {
@@ -898,7 +883,6 @@ class EnrichmentSearchCriteria extends Component {
       multisetPlotAvailableEnrichment,
       plotButtonActiveEnrichment,
       isTestDataLoaded,
-      multisetFiltersVisibleEnrichment,
     } = this.props;
 
     const StudyPopupStyle = {
@@ -911,6 +895,7 @@ class EnrichmentSearchCriteria extends Component {
 
     let studyIcon;
     let studyName = `${enrichmentStudy} Analysis Details`;
+    const dynamicSize = this.getDynamicSize();
 
     if (enrichmentStudyHrefVisible) {
       studyIcon = (
@@ -954,13 +939,10 @@ class EnrichmentSearchCriteria extends Component {
       );
     }
 
-    let EMultisetFilters;
-    if (
-      isValidSearchEnrichment //&&
-      // activateMultisetFilters &&
-      //multisetFiltersVisibleEnrichment
-    ) {
-      EMultisetFilters = (
+    let MultisetFiltersEnrichment;
+    let MultisetFilterButtonEnrichment;
+    if (isValidSearchEnrichment) {
+      MultisetFiltersEnrichment = (
         <EnrichmentMultisetFilters
           {...this.props}
           {...this.state}
@@ -968,10 +950,43 @@ class EnrichmentSearchCriteria extends Component {
           onHandleSigValueEInputChange={this.handleSigValueEInputChange}
           onHandleSetChange={this.handleSetChange}
           onFilterOutChange={this.handleFilterOutChange}
-          onAddFilter={this.addFilter}
-          onRemoveFilter={this.removeFilter}
+          // onAddFilter={this.addFilter}
+          // onRemoveFilter={this.removeFilter}
           onChangeHoveredFilter={this.changeHoveredFilter}
         />
+      );
+    }
+
+    if (isValidSearchEnrichment && multisetFiltersVisibleEnrichment) {
+      MultisetFilterButtonEnrichment = (
+        // <Popup
+        //   trigger={
+        <Button
+          // disabled={}
+          icon
+          labelPosition="left"
+          id={
+            this.state.filteredTriggeredEnrichment
+              ? 'MultisetFilterButtonLight'
+              : 'MultisetFilterButtonDark'
+          }
+          className={this.state.filteredTriggeredEnrichment ? 'disabled' : ''}
+          size={dynamicSize}
+          fluid
+          onClick={this.updateQueryData}
+        >
+          {this.state.filteredTriggeredEnrichment ? 'Filtered' : 'Filter'}
+          <Icon
+            name={this.state.filteredTriggeredEnrichment ? 'check' : 'filter'}
+          />
+        </Button>
+        // }
+        //   content="Use multiset criteria below to filter results"
+        //   style={StudyPopupStyle}
+        //   // on="click"
+        //   basic
+        //   inverted
+        // />
       );
     }
 
@@ -995,6 +1010,7 @@ class EnrichmentSearchCriteria extends Component {
           />
         </Transition>
       );
+
       MultisetRadio = (
         <React.Fragment>
           <Divider />
@@ -1002,7 +1018,7 @@ class EnrichmentSearchCriteria extends Component {
             toggle
             label="Set Analysis"
             checked={multisetFiltersVisibleEnrichment}
-            onChange={this.handleMultisetToggleEnrichment()}
+            onChange={this.handleMultisetToggleEnrichment}
           />
         </React.Fragment>
       );
@@ -1134,7 +1150,10 @@ class EnrichmentSearchCriteria extends Component {
             <span className="MultisetRadio">{MultisetRadio}</span>
             <span className="PlotRadio">{PlotRadio}</span>
           </div>
-          <div className="MultisetFiltersDiv">{EMultisetFilters}</div>
+          <div className="MultisetFilterButtonDiv">
+            {MultisetFilterButtonEnrichment}
+          </div>
+          <div className="MultisetFiltersDiv">{MultisetFiltersEnrichment}</div>
         </div>
       </React.Fragment>
     );

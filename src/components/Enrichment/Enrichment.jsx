@@ -171,7 +171,6 @@ class Enrichment extends Component {
     enrichmentsLinkouts: [],
     enrichmentFeatureIdKey: '',
     // filteredDifferentialFeatureIdKey: '',
-    multisetFiltersVisibleEnrichment: false,
     multisetQueriedEnrichment: false,
     reloadPlot: false,
     networkSigValue: '0.05',
@@ -385,12 +384,6 @@ class Enrichment extends Component {
     this.setState({
       enrichmentAnnotationsMetadata: annotationsData,
     });
-  };
-
-  handleMultisetFiltersVisibleEnrichment = () => {
-    this.setState(prevState => ({
-      multisetFiltersVisibleEnrichment: !prevState.multisetFiltersVisibleEnrichment,
-    }));
   };
 
   handleNetworkSigValue = val => {
@@ -2157,9 +2150,6 @@ class Enrichment extends Component {
               onHandlePlotTypesEnrichment={this.handlePlotTypesEnrichment}
               onSetStudyModelAnnotationMetadata={
                 this.setStudyModelAnnotationMetadata
-              }
-              onHandleMultisetFiltersVisibleEnrichment={
-                this.handleMultisetFiltersVisibleEnrichment
               }
               onSetAnnotationsMetadata={this.setAnnotationsMetadata}
               onHandleNetworkSigValue={this.handleNetworkSigValue}
