@@ -325,7 +325,7 @@ class Enrichment extends Component {
     // });
   };
 
-  handleMultisetTestsFiltered = test => {
+  handleMultisetTestsFiltered = (test, execute) => {
     // this.handleSearchTransitionEnrichment(true);
     // this.handleNetworkGraphReady(false);
     // this.handleEnrichmentTableLoading(true);
@@ -335,11 +335,18 @@ class Enrichment extends Component {
       enrichmentResults,
     } = this.state;
     var arr = [...this.state.multisetTestsFilteredOut];
-    const index = arr.indexOf(test);
-    if (index > -1) {
-      arr.splice(index, 1);
-    } else {
-      arr.push(test);
+    if (test != null) {
+      const index = arr.indexOf(test);
+      if (index > -1) {
+        arr.splice(index, 1);
+      } else {
+        arr.push(test);
+      }
+      this.setState({
+        multisetTestsFilteredOut: arr,
+        // isEnrichmentTableLoading: false,
+        // isSearchingEnrichment: false,
+      });
     }
     var col = [...enrichmentColumnsUnfiltered];
     if (arr.length > 0) {
@@ -347,13 +354,16 @@ class Enrichment extends Component {
         return !arr.includes(col.title);
       });
     }
-    this.setState({
-      multisetTestsFilteredOut: arr,
-      enrichmentColumns: col,
-      // isEnrichmentTableLoading: false,
-      // isSearchingEnrichment: false,
-    });
-    this.handleEnrichmentNetworkData(unfilteredNetworkData, enrichmentResults);
+    if (execute) {
+      this.setState({
+        enrichmentColumns: col,
+        // isSearchingEnrichment: false,
+      });
+      this.handleEnrichmentNetworkData(
+        unfilteredNetworkData,
+        enrichmentResults,
+      );
+    }
   };
 
   handleSearchTransitionEnrichment = bool => {

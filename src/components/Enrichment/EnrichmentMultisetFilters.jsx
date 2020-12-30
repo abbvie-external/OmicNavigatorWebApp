@@ -43,18 +43,24 @@ class EnrichmentMultisetFilters extends Component {
       multisetFiltersVisibleEnrichment,
       mustEnrichment,
       notEnrichment,
+      multisetTestsFilteredOut,
     } = this.props;
+    debugger;
     if (
-      multisetFiltersVisibleEnrichment &&
-      (mustEnrichment !== prevProps.mustEnrichment ||
-        notEnrichment !== prevProps.notEnrichment ||
-        uAnchor !== prevProps.uAnchor ||
-        uSettings !== prevProps.uSettings ||
-        metaSvg !== prevProps.metaSvg ||
-        sigValue !== prevProps.sigValue ||
-        sigValue.length !== prevProps.sigValue.length ||
-        selectedCol !== prevProps.selectedCol ||
-        selectedOperator !== prevProps.selectedOperator)
+      // multisetFiltersVisibleEnrichment &&
+      multisetFiltersVisibleEnrichment !==
+        prevProps.multisetFiltersVisibleEnrichment ||
+      mustEnrichment !== prevProps.mustEnrichment ||
+      notEnrichment !== prevProps.notEnrichment ||
+      uAnchor !== prevProps.uAnchor ||
+      uSettings !== prevProps.uSettings ||
+      metaSvg !== prevProps.metaSvg ||
+      sigValue !== prevProps.sigValue ||
+      sigValue.length !== prevProps.sigValue.length ||
+      selectedCol !== prevProps.selectedCol ||
+      selectedOperator !== prevProps.selectedOperator ||
+      multisetTestsFilteredOut.length !==
+        prevProps.multisetTestsFilteredOut.length
     ) {
       this.makeMultiset(
         uData,
@@ -973,7 +979,7 @@ class EnrichmentMultisetFilters extends Component {
         return !multisetTestsFilteredOut.includes(d);
       })
       .on('change', function(d) {
-        self.props.onMultisetTestsFiltered(d);
+        self.props.onFilterOutChange(d);
       });
   }
 

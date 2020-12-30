@@ -95,7 +95,8 @@ class EnrichmentSearchCriteria extends Component {
       useTestCheckBoxes: true,
     },
     reloadPlot: true,
-    filteredTriggeredEnrichment: false,
+    reloadTests: false,
+    isFilteredEnrichment: false,
     multisetFiltersVisibleEnrichment: false,
   };
 
@@ -549,7 +550,7 @@ class EnrichmentSearchCriteria extends Component {
       this.setState({
         reloadPlot: false,
         multisetFiltersVisibleEnrichment: false,
-        filteredTriggeredEnrichment: false,
+        isFilteredEnrichment: false,
       });
       const enrichmentAnnotationName = 'enrichmentAnnotation';
       const enrichmentAnnotationVar = this.props.enrichmentAnnotation;
@@ -630,7 +631,7 @@ class EnrichmentSearchCriteria extends Component {
 
   handleOperatorChange = (evt, { name, value, index }) => {
     this.setState({
-      filteredTriggeredEnrichment: false,
+      isFilteredEnrichment: false,
     });
     this.props.onHandleNetworkOperator(value);
     const uSelVP = [...this.state[name]];
@@ -649,7 +650,7 @@ class EnrichmentSearchCriteria extends Component {
     this.setState({
       sigValue: [parseFloat(value)],
       reloadPlot: true,
-      filteredTriggeredEnrichment: false,
+      isFilteredEnrichment: false,
     });
     this.props.onHandleNetworkSigValue(parseFloat(value));
   };
@@ -658,17 +659,21 @@ class EnrichmentSearchCriteria extends Component {
     this.setState({
       mustEnrichment,
       notEnrichment,
-      filteredTriggeredEnrichment: false,
+      isFilteredEnrichment: false,
       // reloadPlot: false,
     });
     this.props.onHandleNetworkTests(mustEnrichment, notEnrichment);
   };
 
-  handleFilterOutChange = test => {
-    const { mustEnrichment, notEnrichment } = this.state;
-    this.props.onHandleNetworkGraphReady(false);
-    this.props.onHandleEnrichmentTableLoading(true);
-    this.props.onMultisetTestsFiltered(test);
+  handleFilterOutChange = (test, isMultiset) => {
+    debugger;
+    const {
+      mustEnrichment,
+      notEnrichment,
+      multisetFiltersVisibleEnrichment,
+    } = this.state;
+    // this.props.onHandleNetworkGraphReady(false);
+    // this.props.onHandleEnrichmentTableLoading(true);
     let mustEnrichmentCopy = [...mustEnrichment];
     let notEnrichmentCopy = [...notEnrichment];
     if (mustEnrichmentCopy.includes(test)) {
@@ -681,11 +686,14 @@ class EnrichmentSearchCriteria extends Component {
         mustEnrichment: mustEnrichmentCopy,
         notEnrichment: notEnrichmentCopy,
         reloadPlot: true,
+        reloadTests: true,
+        isFilteredEnrichment: false,
       },
-      function() {
-        this.updateQueryData();
-      },
+      // function() {
+      //   this.updateQueryData();
+      // },
     );
+    this.props.onMultisetTestsFiltered(test, !multisetFiltersVisibleEnrichment);
   };
 
   updateQueryData = () => {
@@ -704,10 +712,14 @@ class EnrichmentSearchCriteria extends Component {
       sigValue,
       mustEnrichment,
       notEnrichment,
+      reloadTests,
     } = this.state;
     this.setState({
-      filteredTriggeredEnrichment: true,
+      isFilteredEnrichment: true,
     });
+    if (reloadTests) {
+      this.props.onMultisetTestsFiltered(null, true);
+    }
     this.props.onHandleEnrichmentTableLoading(true);
     if (reloadPlot) {
       onDisablePlotEnrichment();
@@ -966,19 +978,17 @@ class EnrichmentSearchCriteria extends Component {
           icon
           labelPosition="left"
           id={
-            this.state.filteredTriggeredEnrichment
+            this.state.isFilteredEnrichment
               ? 'MultisetFilterButtonLight'
               : 'MultisetFilterButtonDark'
           }
-          className={this.state.filteredTriggeredEnrichment ? 'disabled' : ''}
+          className={this.state.isFilteredEnrichment ? 'disabled' : ''}
           size={dynamicSize}
           fluid
           onClick={this.updateQueryData}
         >
-          {this.state.filteredTriggeredEnrichment ? 'Filtered' : 'Filter'}
-          <Icon
-            name={this.state.filteredTriggeredEnrichment ? 'check' : 'filter'}
-          />
+          {this.state.isFilteredEnrichment ? 'Filtered' : 'Filter'}
+          <Icon name={this.state.isFilteredEnrichment ? 'check' : 'filter'} />
         </Button>
         // }
         //   content="Use multiset criteria below to filter results"

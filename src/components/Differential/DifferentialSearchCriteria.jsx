@@ -91,7 +91,7 @@ class DifferentialSearchCriteria extends Component {
     multisetFiltersVisibleDifferential: false,
     activateMultisetFiltersP: false,
     uDataP: [],
-    filteredTriggeredDifferential: false,
+    isFilteredDifferential: false,
     // initialRenderP: true,
     // loadingDifferentialMultisetFilters: false,
   };
@@ -481,7 +481,7 @@ class DifferentialSearchCriteria extends Component {
         {
           multisetFiltersVisibleDifferential: false,
           // reloadPlotP: false,
-          filteredTriggeredDifferential: false,
+          isFilteredDifferential: false,
           // initialRenderP: true,
         },
         function() {
@@ -526,7 +526,7 @@ class DifferentialSearchCriteria extends Component {
     } = this.props;
     // onSearchTransitionDifferentialAlt(true);
     this.setState({
-      filteredTriggeredDifferential: false,
+      isFilteredDifferential: false,
     });
     onSearchCriteriaChangeDifferential(
       {
@@ -580,7 +580,7 @@ class DifferentialSearchCriteria extends Component {
         this.state.uSettingsP.defaultSigValueP,
       ),
       uSettingsP: uSetVP,
-      filteredTriggeredDifferential: false,
+      isFilteredDifferential: false,
     });
   };
 
@@ -605,7 +605,7 @@ class DifferentialSearchCriteria extends Component {
           .slice(0, index)
           .concat([...this.state.sigValueP].slice(index + 1)),
         uSettingsP: uSetVP,
-        filteredTriggeredDifferential: false,
+        isFilteredDifferential: false,
       },
       // function() {
       //   this.updateQueryDataP();
@@ -629,7 +629,7 @@ class DifferentialSearchCriteria extends Component {
       {
         [name]: uSelVP,
         // reloadPlotP: false,
-        filteredTriggeredDifferential: false,
+        isFilteredDifferential: false,
       },
       // function() {
       //   this.updateQueryDataP();
@@ -646,7 +646,7 @@ class DifferentialSearchCriteria extends Component {
       {
         [name]: uSelVP,
         reloadPlotP: true,
-        filteredTriggeredDifferential: false,
+        isFilteredDifferential: false,
         // initialRenderP: false,
       },
       // function() {
@@ -660,7 +660,7 @@ class DifferentialSearchCriteria extends Component {
       mustDifferential,
       notDifferential,
       // reloadPlotP: false,
-      filteredTriggeredDifferential: false,
+      isFilteredDifferential: false,
     });
   };
 
@@ -683,7 +683,7 @@ class DifferentialSearchCriteria extends Component {
     } = this.state;
     this.props.onSearchTransitionDifferentialAlt(true);
     this.setState({
-      filteredTriggeredDifferential: true,
+      isFilteredDifferential: true,
     });
     cancelRequestMultisetInferenceData();
     let cancelToken = new CancelToken(e => {
@@ -709,8 +709,8 @@ class DifferentialSearchCriteria extends Component {
           notDifferential,
           uSettingsP: {
             ...this.state.uSettingsP,
-            numElementsP: multisetResultsP.length || 0,
-            maxElementsP: this.state.uSettingsP.maxElementsP || 0,
+            numElementsP: multisetResultsP.length,
+            maxElementsP: this.state.uSettingsP.maxElementsP,
           },
           // activateMultisetFiltersP: true,
           reloadPlotP: false,
@@ -823,6 +823,8 @@ class DifferentialSearchCriteria extends Component {
       differentialModelsDisabled,
       differentialTestsDisabled,
       multisetFiltersVisibleDifferential,
+      differentialStudyReportTooltip,
+      isFilteredDifferential,
       // activateMultisetFiltersP,
     } = this.state;
 
@@ -833,6 +835,7 @@ class DifferentialSearchCriteria extends Component {
       isValidSearchDifferential,
       multisetPlotAvailableDifferential,
       plotButtonActiveDifferential,
+      onHandlePlotAnimationDifferential,
     } = this.props;
 
     const dynamicSize = this.getDynamicSize();
@@ -889,7 +892,7 @@ class DifferentialSearchCriteria extends Component {
           inverted
           className="CustomTooltip"
           position="bottom center"
-          content={this.state.differentialStudyReportTooltip}
+          content={differentialStudyReportTooltip}
           mouseEnterDelay={0}
           mouseLeaveDelay={0}
         />
@@ -919,19 +922,17 @@ class DifferentialSearchCriteria extends Component {
           icon
           labelPosition="left"
           id={
-            this.state.filteredTriggeredDifferential
+            isFilteredDifferential
               ? 'MultisetFilterButtonLight'
               : 'MultisetFilterButtonDark'
           }
-          className={this.state.filteredTriggeredDifferential ? 'disabled' : ''}
+          className={isFilteredDifferential ? 'disabled' : ''}
           size={dynamicSize}
           fluid
           onClick={this.updateQueryDataP}
         >
-          {this.state.filteredTriggeredDifferential ? 'Filtered' : 'Filter'}
-          <Icon
-            name={this.state.filteredTriggeredDifferential ? 'check' : 'filter'}
-          />
+          {isFilteredDifferential ? 'Filtered' : 'Filter'}
+          <Icon name={isFilteredDifferential ? 'check' : 'filter'} />
         </Button>
         // }
         //   content="Use multiset criteria below to filter results"
@@ -958,7 +959,7 @@ class DifferentialSearchCriteria extends Component {
             label="View Plot"
             className={multisetPlotAvailableDifferential ? 'ViewPlotRadio' : ''}
             checked={plotButtonActiveDifferential}
-            onChange={this.props.onHandlePlotAnimationDifferential('uncover')}
+            onChange={onHandlePlotAnimationDifferential('uncover')}
             disabled={!multisetPlotAvailableDifferential}
           />
         </Transition>
