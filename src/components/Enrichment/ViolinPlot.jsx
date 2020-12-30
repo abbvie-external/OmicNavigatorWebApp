@@ -113,8 +113,8 @@ class ViolinPlot extends Component {
             .duration(100)
             .attr('fill', '#FF4400')
             .attr('stroke', '#000')
-            .attr('r', dOpts.pointSize * 2)
-            .attr('class', 'maxCirc');
+            .attr('r', dOpts.pointSize * 2);
+          // .attr('class', `maxCirc`);
           // const maxCircle = d3.select(`#violin_${maxDotId}`);
           // const circleText = this.chart.objs.svg
           //   .append('g')
@@ -1743,7 +1743,6 @@ class ViolinPlot extends Component {
       });
       // used for initial render, toggling max text on, off
       // const maxCirc = d3.select('#maxCirc');
-      // debugger;
       // const circleText = self.chart.objs.svg
       //   .append('g')
       //   .attr('class', 'maxText');
