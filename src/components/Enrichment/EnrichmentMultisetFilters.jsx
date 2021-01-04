@@ -6,12 +6,6 @@ import '../Shared/MultisetFilters.scss';
 import NumericExponentialInput from '../Shared/NumericExponentialInput';
 
 class EnrichmentMultisetFilters extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      sigValueELocal: props.sigValue,
-    };
-  }
   componentDidMount() {
     const {
       uData,
@@ -21,6 +15,8 @@ class EnrichmentMultisetFilters extends Component {
       sigValue,
       selectedCol,
       selectedOperator,
+      mustEnrichment,
+      notEnrichment,
     } = this.props;
     this.makeMultiset(
       uData,
@@ -30,6 +26,8 @@ class EnrichmentMultisetFilters extends Component {
       sigValue,
       selectedCol,
       selectedOperator,
+      mustEnrichment,
+      notEnrichment,
     );
   }
 
@@ -43,18 +41,26 @@ class EnrichmentMultisetFilters extends Component {
       selectedCol,
       selectedOperator,
       multisetFiltersVisibleEnrichment,
+      mustEnrichment,
+      notEnrichment,
+      multisetTestsFilteredOut,
     } = this.props;
+    debugger;
     if (
+      // multisetFiltersVisibleEnrichment &&
       multisetFiltersVisibleEnrichment !==
         prevProps.multisetFiltersVisibleEnrichment ||
-      uData !== prevProps.uData ||
+      mustEnrichment !== prevProps.mustEnrichment ||
+      notEnrichment !== prevProps.notEnrichment ||
       uAnchor !== prevProps.uAnchor ||
       uSettings !== prevProps.uSettings ||
       metaSvg !== prevProps.metaSvg ||
       sigValue !== prevProps.sigValue ||
       sigValue.length !== prevProps.sigValue.length ||
       selectedCol !== prevProps.selectedCol ||
-      selectedOperator !== prevProps.selectedOperator
+      selectedOperator !== prevProps.selectedOperator ||
+      multisetTestsFilteredOut.length !==
+        prevProps.multisetTestsFilteredOut.length
     ) {
       this.makeMultiset(
         uData,
@@ -64,6 +70,8 @@ class EnrichmentMultisetFilters extends Component {
         sigValue,
         selectedCol,
         selectedOperator,
+        mustEnrichment,
+        notEnrichment,
       );
     }
   }
@@ -76,6 +84,8 @@ class EnrichmentMultisetFilters extends Component {
     sigValue,
     selectedCol,
     selectedOperator,
+    mustEnrichment,
+    notEnrichment,
   ) {
     if (this.props.multisetFiltersVisibleEnrichment) {
       d3.selectAll('#multiset-query')
@@ -87,7 +97,14 @@ class EnrichmentMultisetFilters extends Component {
         .style('padding-bottom', '5px');
 
       if (uSettings.displayMetaData) {
-        this.prepareMultiset(uData, uAnchor, uSettings, base);
+        this.prepareMultiset(
+          uData,
+          uAnchor,
+          uSettings,
+          base,
+          mustEnrichment,
+          notEnrichment,
+        );
         const baseMetaSvg = base.append('svg');
         this.metaScript(
           baseMetaSvg,
@@ -97,6 +114,8 @@ class EnrichmentMultisetFilters extends Component {
           selectedCol,
           selectedOperator,
           sigValue,
+          mustEnrichment,
+          notEnrichment,
         );
       }
     } else {
@@ -119,17 +138,15 @@ class EnrichmentMultisetFilters extends Component {
     selectedCol,
     selectedOperator,
     sigValue,
+    mustEnrichment,
+    notEnrichment,
   ) {
     const svgWidth = 315;
     const heightScalar = 15;
-    const mustData = uSettings.must;
-    const notData = uSettings.not;
     const svgHeight =
-      notData.length * heightScalar +
-      mustData.length * heightScalar +
-      60 +
-      10 +
-      24;
+      notEnrichment.length * heightScalar +
+      mustEnrichment.length * heightScalar +
+      94;
     const useAnchor = uSettings.useAnchor;
     const setDescP = [];
     const notSetDescP = [];
@@ -162,7 +179,11 @@ class EnrichmentMultisetFilters extends Component {
     metaSvg.selectAll('text').remove();
     metaSvg.selectAll('circle').remove();
     metaSvg.selectAll('rect').remove();
-    if (mustData.length !== 0 || notData.length !== 0 || useAnchor) {
+    if (
+      mustEnrichment.length !== 0 ||
+      notEnrichment.length !== 0 ||
+      useAnchor
+    ) {
       metaSvg.attr('width', svgWidth).attr('height', svgHeight);
 
       metaSvg
@@ -173,7 +194,7 @@ class EnrichmentMultisetFilters extends Component {
         .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
         .attr('font-size', '15px')
         .attr('fill', 'black');
-      if (mustData.length !== 0 || useAnchor) {
+      if (mustEnrichment.length !== 0 || useAnchor) {
         metaSvg
           .selectAll('dataObject')
           .data(setDescP)
@@ -214,7 +235,7 @@ class EnrichmentMultisetFilters extends Component {
 
       metaSvg
         .selectAll('dataObject')
-        .data(mustData)
+        .data(mustEnrichment)
         .enter()
         .append('circle')
         .style('fill', 'green')
@@ -224,13 +245,13 @@ class EnrichmentMultisetFilters extends Component {
             return (
               30 +
               heightScalar * setDescP.length +
-              mustData.indexOf(d) * heightScalar
+              mustEnrichment.indexOf(d) * heightScalar
             );
           } else {
             return (
               30 +
               heightScalar * setDescP.length +
-              (mustData.indexOf(d) + 1) * heightScalar
+              (mustEnrichment.indexOf(d) + 1) * heightScalar
             );
           }
         })
@@ -239,7 +260,7 @@ class EnrichmentMultisetFilters extends Component {
       // const mustText =
       metaSvg
         .selectAll('svg.dataObject')
-        .data(mustData)
+        .data(mustEnrichment)
         .enter()
         .append('text')
         .attr('x', 25)
@@ -248,14 +269,14 @@ class EnrichmentMultisetFilters extends Component {
             return (
               30 +
               heightScalar * setDescP.length +
-              mustData.indexOf(d) * heightScalar +
+              mustEnrichment.indexOf(d) * heightScalar +
               4
             );
           } else {
             return (
               30 +
               heightScalar * setDescP.length +
-              (mustData.indexOf(d) + 1) * heightScalar +
+              (mustEnrichment.indexOf(d) + 1) * heightScalar +
               4
             );
           }
@@ -267,7 +288,7 @@ class EnrichmentMultisetFilters extends Component {
         .attr('font-size', '13px')
         .attr('fill', 'black');
 
-      if (notData.length !== 0) {
+      if (notEnrichment.length !== 0) {
         metaSvg
           .selectAll('dataObject')
           .data(notSetDescP)
@@ -275,14 +296,14 @@ class EnrichmentMultisetFilters extends Component {
           .append('text')
           .attr('x', 7)
           .attr('y', function(d, i) {
-            if (!useAnchor && mustData.length === 0) {
+            if (!useAnchor && mustEnrichment.length === 0) {
               return 30 + heightScalar * i;
             } else {
               return (
                 30 +
                 4 +
                 heightScalar * setDescP.length +
-                (i + mustData.length) * heightScalar
+                (i + mustEnrichment.length) * heightScalar
               );
             }
           })
@@ -296,20 +317,23 @@ class EnrichmentMultisetFilters extends Component {
         // const notTestCircles =
         metaSvg
           .selectAll('dataObject')
-          .data(notData)
+          .data(notEnrichment)
           .enter()
           .append('circle')
           .style('fill', 'red')
           .attr('cx', 17)
           .attr('cy', function(d, i) {
-            if (!useAnchor && mustData.length === 0) {
+            if (!useAnchor && mustEnrichment.length === 0) {
               return 30 + heightScalar * (i + notSetDescP.length);
             } else {
               return (
                 30 +
                 4 +
                 heightScalar *
-                  (i + setDescP.length + notSetDescP.length + mustData.length)
+                  (i +
+                    setDescP.length +
+                    notSetDescP.length +
+                    mustEnrichment.length)
               );
             }
           })
@@ -318,19 +342,22 @@ class EnrichmentMultisetFilters extends Component {
         // const notText =
         metaSvg
           .selectAll('svg.dataObject')
-          .data(notData)
+          .data(notEnrichment)
           .enter()
           .append('text')
           .attr('x', 25)
           .attr('y', function(d, i) {
-            if (!useAnchor && mustData.length === 0) {
+            if (!useAnchor && mustEnrichment.length === 0) {
               return 30 + 4 + heightScalar * (i + notSetDescP.length);
             } else {
               return (
                 30 +
                 8 +
                 heightScalar *
-                  (i + setDescP.length + notSetDescP.length + mustData.length)
+                  (i +
+                    setDescP.length +
+                    notSetDescP.length +
+                    mustEnrichment.length)
               );
             }
           })
@@ -344,19 +371,17 @@ class EnrichmentMultisetFilters extends Component {
     }
   }
 
-  prepareMultiset(data, anchor, settings, base) {
+  prepareMultiset(data, anchor, settings, base, mustEnrichment, notEnrichment) {
     const { multisetTestsFilteredOut } = this.props;
     const self = this;
     let dataset = data;
     if (settings.useAnchor && dataset.indexOf(anchor) < 0) {
       dataset.unshift(anchor);
     }
-    let mustData = settings.must;
-    let notData = settings.not;
 
     // Sizing
     let heightScalar = 1;
-    if (settings.heightScalar !== undefined) {
+    if (settings.heightScalar != null) {
       heightScalar = settings.heightScalar;
     }
 
@@ -398,14 +423,14 @@ class EnrichmentMultisetFilters extends Component {
     let baseColorCode = '#585858';
     let backgroundColorCode = '#E6E6E6';
     //Adding settings colors
-    if (settings.colors !== undefined) {
-      if (settings.colors.chosen !== undefined) {
+    if (settings.colors != null) {
+      if (settings.colors.chosen != null) {
         chosenColorCode = settings.colors.chosen;
       }
-      if (settings.colors.base !== undefined) {
+      if (settings.colors.base != null) {
         baseColorCode = settings.colors.base;
       }
-      if (settings.colors.background !== undefined) {
+      if (settings.colors.background != null) {
         backgroundColorCode = settings.colors.background;
       }
     }
@@ -485,18 +510,22 @@ class EnrichmentMultisetFilters extends Component {
       })
       .attr('r', circleRadius)
       .style('stroke', d =>
-        mustData.includes(d) || d === anchor ? chosenColorCode : 'transparent',
+        mustEnrichment.includes(d) || d === anchor
+          ? chosenColorCode
+          : 'transparent',
       )
       .attr('stroke-width', circleRadius / 5)
       .on('click', function(d) {
         if (!multisetTestsFilteredOut.includes(d)) {
-          if (!mustData.includes(d) && d !== anchor) {
-            mustData.push(d);
-            if (notData.includes(d)) {
-              notData.splice(notData.indexOf(d), 1);
+          if (!mustEnrichment.includes(d) && d !== anchor) {
+            let mustEnrichmentCopy = [...mustEnrichment];
+            let notEnrichmentCopy = [...notEnrichment];
+            mustEnrichmentCopy.push(d);
+            if (notEnrichmentCopy.includes(d)) {
+              notEnrichmentCopy.splice(notEnrichmentCopy.indexOf(d), 1);
             }
             updateCircles();
-            self.props.onHandleSetChange({ must: mustData, not: notData });
+            self.props.onHandleSetChange(mustEnrichmentCopy, notEnrichmentCopy);
           }
         }
       });
@@ -520,21 +549,25 @@ class EnrichmentMultisetFilters extends Component {
       })
       .attr('r', circleRadius)
       .style('stroke', d =>
-        !notData.includes(d) && !mustData.includes(d) && d !== anchor
+        !notEnrichment.includes(d) &&
+        !mustEnrichment.includes(d) &&
+        d !== anchor
           ? chosenColorCode
           : baseColorCode,
       )
       .attr('stroke-width', circleRadius / 5)
       .on('click', function(d) {
         if (!multisetTestsFilteredOut.includes(d)) {
-          if (mustData.includes(d) && d !== anchor) {
-            mustData.splice(mustData.indexOf(d), 1);
+          let mustEnrichmentCopy = [...mustEnrichment];
+          let notEnrichmentCopy = [...notEnrichment];
+          if (mustEnrichmentCopy.includes(d) && d !== anchor) {
+            mustEnrichmentCopy.splice(mustEnrichmentCopy.indexOf(d), 1);
           }
-          if (notData.includes(d) && d !== anchor) {
-            notData.splice(notData.indexOf(d), 1);
+          if (notEnrichmentCopy.includes(d) && d !== anchor) {
+            notEnrichmentCopy.splice(notEnrichmentCopy.indexOf(d), 1);
           }
           updateCircles();
-          self.props.onHandleSetChange({ must: mustData, not: notData });
+          self.props.onHandleSetChange(mustEnrichmentCopy, notEnrichmentCopy);
         }
       });
 
@@ -559,14 +592,16 @@ class EnrichmentMultisetFilters extends Component {
       .attr('r', circleRadius / 3)
       .on('click', function(d) {
         if (!multisetTestsFilteredOut.includes(d)) {
-          if (mustData.includes(d) && d !== anchor) {
-            mustData.splice(mustData.indexOf(d), 1);
+          let mustEnrichmentCopy = [...mustEnrichment];
+          let notEnrichmentCopy = [...notEnrichment];
+          if (mustEnrichmentCopy.includes(d) && d !== anchor) {
+            mustEnrichmentCopy.splice(mustEnrichmentCopy.indexOf(d), 1);
           }
-          if (notData.includes(d) && d !== anchor) {
-            notData.splice(notData.indexOf(d), 1);
+          if (notEnrichmentCopy.includes(d) && d !== anchor) {
+            notEnrichmentCopy.splice(notEnrichmentCopy.indexOf(d), 1);
           }
           updateCircles();
-          self.props.onHandleSetChange({ must: mustData, not: notData });
+          self.props.onHandleSetChange(mustEnrichmentCopy, notEnrichmentCopy);
         }
       });
 
@@ -589,18 +624,22 @@ class EnrichmentMultisetFilters extends Component {
       })
       .attr('r', circleRadius)
       .style('stroke', d =>
-        notData.includes(d) && d !== anchor ? chosenColorCode : 'transparent',
+        notEnrichment.includes(d) && d !== anchor
+          ? chosenColorCode
+          : 'transparent',
       )
       .attr('stroke-width', circleRadius / 5)
       .on('click', function(d) {
         if (!multisetTestsFilteredOut.includes(d)) {
-          if (!notData.includes(d) && d !== anchor) {
-            notData.push(d);
-            if (mustData.includes(d)) {
-              mustData.splice(mustData.indexOf(d), 1);
+          let mustEnrichmentCopy = [...mustEnrichment];
+          let notEnrichmentCopy = [...notEnrichment];
+          if (!notEnrichmentCopy.includes(d) && d !== anchor) {
+            notEnrichmentCopy.push(d);
+            if (mustEnrichmentCopy.includes(d)) {
+              mustEnrichmentCopy.splice(mustEnrichmentCopy.indexOf(d), 1);
             }
             updateCircles();
-            self.props.onHandleSetChange({ must: mustData, not: notData }); // updateGlobalVariables();
+            self.props.onHandleSetChange(mustEnrichmentCopy, notEnrichmentCopy);
           }
         }
       });
@@ -735,10 +774,7 @@ class EnrichmentMultisetFilters extends Component {
         return heightScalar * 14 + 'px';
       })
       .attr('fill', 'black');
-    if (
-      settings.numElements !== undefined &&
-      settings.maxElements !== undefined
-    ) {
+    if (settings.numElements != null && settings.maxElements != null) {
       // const numElementsLine =
       svg
         .append('line')
@@ -819,21 +855,23 @@ class EnrichmentMultisetFilters extends Component {
     function updateCircles() {
       mustCircles
         .style('stroke', d =>
-          mustData.includes(d) || d === anchor
+          mustEnrichment.includes(d) || d === anchor
             ? chosenColorCode
             : 'transparent',
         )
         .attr('stroke-width', circleRadius / 5);
       maybeCircles
         .style('stroke', d =>
-          !notData.includes(d) && !mustData.includes(d) && d !== anchor
+          !notEnrichment.includes(d) &&
+          !mustEnrichment.includes(d) &&
+          d !== anchor
             ? chosenColorCode
             : baseColorCode,
         )
         .attr('stroke-width', circleRadius / 5);
       notCircles
         .style('stroke', d =>
-          notData.includes(d) ? chosenColorCode : 'transparent',
+          notEnrichment.includes(d) ? chosenColorCode : 'transparent',
         )
         .attr('stroke-width', circleRadius / 5);
     }
@@ -941,33 +979,24 @@ class EnrichmentMultisetFilters extends Component {
         return !multisetTestsFilteredOut.includes(d);
       })
       .on('change', function(d) {
-        self.props.onMultisetTestsFiltered(d);
+        self.props.onFilterOutChange(d);
       });
   }
-
-  handleSigValueEInputChange = value => {
-    this.setState({
-      sigValueELocal: [parseFloat(value)],
-    });
-  };
-
-  actuallyHandleSigValueEInputChange = _.debounce(value => {
-    this.props.onHandleSigValueEInputChange(value);
-  }, 1250);
 
   addFilter = () => {
     this.props.onAddFilter();
   };
+
   removeFilter = index => {
     this.props.onRemoveFilter(index);
   };
+
   changeHoveredFilter = index => {
     this.props.onChangeHoveredFilter(index);
   };
 
   render() {
-    const { sigValueELocal } = this.state;
-    const { selectedOperator, uSettings } = this.props;
+    const { sigValue, selectedOperator, uSettings } = this.props;
     const Columns = uSettings.thresholdCols;
     const Operators = uSettings.thresholdOperator;
     const SelOp = selectedOperator;
@@ -1017,16 +1046,13 @@ class EnrichmentMultisetFilters extends Component {
                     <label>{index === 0 ? 'Value' : ''}</label>
                     <NumericExponentialInput
                       className="SignificantValueInput"
-                      onChange={number => {
-                        this.handleSigValueEInputChange(number);
-                        this.actuallyHandleSigValueEInputChange(number);
-                      }}
+                      onChange={this.props.onHandleSigValueEInputChange}
                       min={1e-100}
                       max={1}
                       preventNegatives={true}
                       name="sigValue"
-                      // defaultValue={parseFloat(defaultSigValue)}
-                      value={sigValueELocal[index]}
+                      // defaultValue={sigValue[index]}
+                      value={sigValue[index]}
                     />
                   </Form.Field>
                 </Form.Group>

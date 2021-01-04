@@ -1,14 +1,12 @@
 import React, { Component } from 'react';
 import ButtonActions from '../Shared/ButtonActions';
-// import styled from 'styled-components';
-// import Axis from "./Axis";
+import { Icon, Popup } from 'semantic-ui-react';
 import './BarcodePlot.scss';
-// import Tooltip from "./useTooltip";
 import * as d3 from 'd3';
-// import * as _ from "lodash";
 
 class BarcodePlot extends Component {
   state = {
+    switch: 0,
     barcodeWidth: 0,
     barcodeContainerWidth: 0,
     xScale: null,
@@ -19,20 +17,21 @@ class BarcodePlot extends Component {
     tooltipPositionMax: null,
     tooltipTextAnchor: 'start',
     tooltipTextAnchorMax: 'start',
-    // initialLoad: true,
+    displayElementTextBarcode:
+      JSON.parse(sessionStorage.getItem('displayElementTextBarcode')) || false,
     settings: {
       // brushing: false,
       bottomLabel: '',
       barcodeHeight: 0,
       margin: {
-        top: 45,
+        top: 65,
         right: 40,
-        bottom: 40,
+        bottom: 20,
         left: 20,
-        hovered: 25,
-        selected: 25,
-        highlighted: 15,
-        max: 5,
+        hovered: 45,
+        selected: 45,
+        highlighted: 25,
+        max: 15,
       },
     },
   };
@@ -163,14 +162,8 @@ class BarcodePlot extends Component {
       textAnchor === 'end'
         ? event.target.attributes[2].nodeValue - 5
         : event.target.attributes[2].nodeValue + 5;
-    // const lineId = `#barcode-line-${lineName.replace(/;/g, '')}_${lineIdMult}`;
-    // const lineId = `#barcode-line-${lineName}`;
     const lineId = `#barcode-line-${lineIdMult}`;
     const hoveredLine = d3.select(lineId);
-    // hovered: 20,
-    // selected: 20,
-    // highlighted: 10,
-    // max: 5,
     if (hoveredLine.attr('class').endsWith('selected')) {
       hoveredLine.attr('y1', this.state.settings.margin.selected - 10);
     } else if (hoveredLine.attr('class').endsWith('MaxLine')) {
@@ -232,7 +225,6 @@ class BarcodePlot extends Component {
       return obj;
     }
   }
-
   setupBrush(barcodeWidth, barcodeHeight, settings, initialBrush, resized) {
     const self = this;
     self.resized = resized;
@@ -247,7 +239,6 @@ class BarcodePlot extends Component {
       .brushX()
       .extent([
         [settings.margin.left + 4, 0],
-        // [barcodeWidth + 15, barcodeHeight],
         [barcodeWidth + 15, Math.round(barcodeHeight * 0.5)],
       ])
       .on('start', function() {
@@ -295,7 +286,48 @@ class BarcodePlot extends Component {
                 lineID: a.attributes[7].nodeValue,
                 logFC: a.attributes[8].nodeValue,
                 statistic: a.attributes[9].nodeValue,
+                class: a.attributes[1].nodeValue,
               };
+            });
+            const brushedDataTooltips = brushedDataVar.map(line => {
+              const textAnchor =
+                line.statistic > self.props.barcodeSettings.highStat / 2
+                  ? 'end'
+                  : 'start';
+              var ttPosition = null;
+              if (textAnchor === 'end') {
+                ttPosition = line.x2 - 5;
+              } else {
+                ttPosition = line.x2 + 5;
+              }
+              const fiveLevelSwitch = (self.state.switch + 1) % 5;
+              self.setState({ switch: fiveLevelSwitch });
+              let alternatePosition = 0;
+              if (self.state.switch === 0) {
+                alternatePosition = 0;
+              } else if (self.state.switch === 1) {
+                alternatePosition = 10;
+              } else if (self.state.switch === 2) {
+                alternatePosition = 20;
+              } else if (self.state.switch === 3) {
+                alternatePosition = 30;
+              } else {
+                alternatePosition = 40;
+              }
+
+              return (
+                <text
+                  id={`${line.featureID}-barcodeTooltip`}
+                  key={`${line.featureID}-barcodeTooltip`}
+                  className="BarcodeTooltipText"
+                  transform={`translate(${ttPosition}, ${alternatePosition})rotate(0)`}
+                  fontSize="11px"
+                  textAnchor={textAnchor}
+                  fontFamily="Lato, Helvetica Neue, Arial, Helvetica, sans-serif"
+                >
+                  {line.featureID}
+                </text>
+              );
             });
             self.props.onHandleBarcodeChanges({
               brushedData: brushedDataVar,
@@ -323,6 +355,7 @@ class BarcodePlot extends Component {
                 highlightedLineName: maxLineObject.lineID,
                 tooltipPositionMax: ttPositionMax,
                 tooltipTextAnchorMax: textAnchorMax,
+                allTooltips: brushedDataTooltips,
               });
             }
           }
@@ -392,17 +425,16 @@ class BarcodePlot extends Component {
   }
 
   getTooltip = () => {
-    const { hoveredLineName, tooltipPosition, tooltipTextAnchor } = this.state;
-
+    const { hoveredLineName, tooltipPosition } = this.state;
     if (tooltipPosition) {
       if (hoveredLineName) {
         return (
           <text
             className="BarcodeTooltipText"
             // transform={`translate(${tooltipPosition}, 15)rotate(-45)`}
-            transform={`translate(${tooltipPosition}, 15)`}
+            transform={`translate(${tooltipPosition}, 13)`}
             fontSize="14px"
-            textAnchor={tooltipTextAnchor}
+            textAnchor="end"
             fontFamily="Lato, Helvetica Neue, Arial, Helvetica, sans-serif"
           >
             {hoveredLineName}
@@ -438,8 +470,25 @@ class BarcodePlot extends Component {
 
     return null;
   };
+
+  handleElementTextChange = () => {
+    sessionStorage.setItem(
+      'displayElementTextBarcode',
+      !this.state.displayElementTextBarcode,
+    );
+    this.setState(prevState => ({
+      displayElementTextBarcode: !prevState.displayElementTextBarcode,
+    }));
+  };
+
   render() {
-    const { barcodeWidth, barcodeContainerWidth, settings } = this.state;
+    const {
+      barcodeWidth,
+      barcodeContainerWidth,
+      settings,
+      allTooltips,
+      displayElementTextBarcode,
+    } = this.state;
 
     const { horizontalSplitPaneSize, barcodeSettings } = this.props;
     const barcodeHeight =
@@ -502,7 +551,6 @@ class BarcodePlot extends Component {
 
     const tooltip = this.getTooltip();
     const maxTooltip = this.getMaxTooltip();
-
     return (
       <div ref={this.barcodeContainerRef} id="BarcodeChartContainer">
         <div className="export-container">
@@ -517,6 +565,30 @@ class BarcodePlot extends Component {
             description={this.props.imageInfo.key}
           />
         </div>
+        <span className="TextToggleButton">
+          <Popup
+            trigger={
+              <Icon
+                name="font"
+                size="small"
+                inverted
+                circular
+                onClick={this.handleElementTextChange}
+                id={displayElementTextBarcode ? 'PrimaryColor' : 'black'}
+              />
+            }
+            style={{
+              backgroundColor: '#2E2E2E',
+              borderBottom: '2px solid var(--color-primary)',
+              color: '#FFF',
+              padding: '1em',
+              fontSize: '13px',
+            }}
+            className=""
+            basic
+            content={displayElementTextBarcode ? 'Hide Labels' : 'Show Labels'}
+          />
+        </span>
         <svg
           ref={this.barcodeSVGRef}
           id="BarcodeChart"
@@ -543,6 +615,12 @@ class BarcodePlot extends Component {
           >
             {barcodeSettings.statLabel}
           </text>
+          {/* Semantic UI Button */}
+          {/* <div
+        x="-100"
+        y="15"> */}
+
+          {/* </div> */}
           {/* Y Axis Left Label */}
           <text
             className="BarcodeLabel"
@@ -571,7 +649,7 @@ class BarcodePlot extends Component {
           {/* Barcode Lines & Tooltip */}
           {barcodeLines}
           {tooltip}
-          {maxTooltip}
+          {displayElementTextBarcode ? allTooltips : maxTooltip}
         </svg>
       </div>
     );

@@ -18,8 +18,9 @@ class DifferentialVolcanoPlot extends Component {
     // brushedCirclesData: [],
     // brushedCircles: [],
     brushing: false,
-    // resizeScalarX: 1,
-    // resizeScalarY: 1,
+    resizeScalarX: 1,
+    resizeScalarY: 1,
+    volcanoCircleText: [],
   };
 
   volcanoSVGRef = React.createRef();
@@ -38,6 +39,7 @@ class DifferentialVolcanoPlot extends Component {
     const {
       volcanoDifferentialTableRowOther,
       volcanoDifferentialTableRowMax,
+      volcanoCircleLabel,
       volcanoHeight,
       volcanoWidth,
       xAxisLabel,
@@ -45,6 +47,14 @@ class DifferentialVolcanoPlot extends Component {
       doXAxisTransformation,
       doYAxisTransformation,
     } = this.props;
+
+    if (
+      volcanoCircleLabel != null &&
+      prevProps.volcanoCircleLabel !== volcanoCircleLabel &&
+      this.state.brushedRawData != null
+    ) {
+      this.handleBrushedText(this.state.brushedRawData);
+    }
     if (
       !_.isEqual(
         _.sortBy(volcanoDifferentialTableRowOther),
@@ -329,6 +339,9 @@ class DifferentialVolcanoPlot extends Component {
         brushed.attr('style', 'fill: #00aeff');
         brushed.attr('r', 2.5);
         brushed.classed('selected', true);
+        self.setState({ brushedRawData: brushed });
+        self.handleBrushedText(brushed);
+
         const brushedDataArr = brushed._groups[0].map(a => {
           return JSON.parse(a.attributes.data.value);
         });
@@ -386,6 +399,57 @@ class DifferentialVolcanoPlot extends Component {
     }
   }
 
+  handleBrushedText = brushed => {
+    // MAP brushedDataArr to circle text state
+    const brushedCircleTextMapped = brushed._groups[0].map(a => {
+      const columnData = JSON.parse(a.attributes[4].nodeValue);
+      const key = this.props.volcanoCircleLabel || 0;
+      return {
+        data: columnData[key],
+        class: a.attributes[1].nodeValue,
+        id: a.attributes[2].nodeValue,
+        cx: a.attributes[10].nodeValue,
+        cy: a.attributes[11].nodeValue,
+        // r: a.attributes[0].nodeValue,
+        // circleid: a.attributes[3].nodeValue,
+        // stroke: a.attributes[5].nodeValue,
+        // stoke-width: a.attributes[6].nodeValue,
+        // fill: a.attributes[7].nodeValue
+        // xstatistic: a.attributes[5 8].nodeValue,
+        // ystatistic: a.attributes[6 9].nodeValue,
+        // cursor: a.attributes[9 12].nodeValue,
+        // style: a.attributes[10 13].nodeValue,
+        // stroke: a.attributes[11].nodeValue,
+        // stoke-width: a.attributes[12].nodeValue,
+        // fill: a.attributes[13].nodeValue
+      };
+    });
+    const self = this;
+    const brushedCircleText = brushedCircleTextMapped.map(circle => {
+      const circleOnLeftSide = circle.cx <= self.props.volcanoWidth / 2;
+      const textAnchor = circleOnLeftSide ? 'start' : 'end';
+      const cx = circleOnLeftSide
+        ? parseInt(circle.cx) + 5
+        : parseInt(circle.cx) - 5;
+      const cy = parseInt(circle.cy) + 4;
+      return (
+        <text
+          key={`volcanoCircleText-${circle.id}`}
+          className="volcanoCircleTooltipText"
+          transform={`translate(${cx}, ${cy})rotate(0)`}
+          fontSize="11px"
+          textAnchor={textAnchor}
+          fontFamily="Lato, Helvetica Neue, Arial, Helvetica, sans-serif"
+        >
+          {circle.data}
+        </text>
+      );
+    });
+    this.setState({
+      volcanoCircleText: brushedCircleText,
+    });
+  };
+
   handleSVGClick() {
     // this.props.onHandleVolcanoTableLoading(true);
     this.unhighlightBrushedCircles();
@@ -394,6 +458,7 @@ class DifferentialVolcanoPlot extends Component {
       brushing: false,
       resizeScalarX: 1,
       resizeScalarY: 1,
+      volcanoCircleText: [],
     });
   }
 
@@ -431,6 +496,8 @@ class DifferentialVolcanoPlot extends Component {
       doXAxisTransformation,
       doYAxisTransformation,
     } = this.props;
+
+    const { volcanoCircleText } = this.state;
 
     if (differentialResultsUnfiltered.length === 0) {
       return null;
@@ -654,6 +721,7 @@ class DifferentialVolcanoPlot extends Component {
             <g filter="url(#constantOpacity)">{filteredOutPlotCircles}</g>
             {plotCircles}
             {hoveredCircleTooltip}
+            {volcanoCircleText}
           </svg>
         </>
       );
