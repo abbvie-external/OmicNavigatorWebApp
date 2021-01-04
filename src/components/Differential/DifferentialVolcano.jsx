@@ -191,37 +191,30 @@ class DifferentialVolcano extends Component {
       var yLabel = relevantConfigColumns[0];
       var xLabel = relevantConfigColumns[1];
       var doY = false;
-      debugger;
       if (relevantConfigColumns.indexOf('logFC') >= 0) {
         xLabel = 'logFC';
       }
-      if (relevantConfigColumns.indexOf('adj_P_Val') >= 0) {
-        yLabel = 'adj_P_Val';
-        doY = true;
-      } else if (relevantConfigColumns.indexOf('adj.P.Val') >= 0) {
-        yLabel = 'adj.P.Val';
-        doY = true;
-      } else if (relevantConfigColumns.indexOf('P_Value') >= 0) {
+      if (relevantConfigColumns.indexOf('P_Value') >= 0) {
         yLabel = 'P_Value';
         doY = true;
       } else if (relevantConfigColumns.indexOf('P.Value') >= 0) {
         yLabel = 'P.Value';
         doY = true;
-        // } else if (relevantConfigColumns.includes('PValue')) {
-        //   yLabel = 'PValue';
-        //   doY = true;
-        // } else if (relevantConfigColumns.includes('PVal')) {
-        //   yLabel = 'PVal';
-        //   doY = true;
-        // } else if (relevantConfigColumns.includes('P value')) {
-        //   yLabel = 'P value';
-        //   doY = true;
-        // } else if (relevantConfigColumns.includes('adj_P_Value')) {
-        //   yLabel = 'adj_P_Val';
-        //   doY = true;
-        // } else if (relevantConfigColumns.includes('adj.P.Value')) {
-        //   yLabel = 'adj.P.Val';
-        //   doY = true;
+      } else if (relevantConfigColumns.indexOf('PValue') >= 0) {
+        yLabel = 'PValue';
+        doY = true;
+      } else if (relevantConfigColumns.indexOf('PVal') >= 0) {
+        yLabel = 'PVal';
+        doY = true;
+      } else if (relevantConfigColumns.indexOf('P value') >= 0) {
+        yLabel = 'P value';
+        doY = true;
+      } else if (relevantConfigColumns.indexOf('adj_P_Val') >= 0) {
+        yLabel = 'adj_P_Val';
+        doY = true;
+      } else if (relevantConfigColumns.indexOf('adj.P.Val') >= 0) {
+        yLabel = 'adj.P.Val';
+        doY = true;
       } else {
         this.handleDropdownChange({}, { name: 'yAxisSelector', value: yLabel });
       }

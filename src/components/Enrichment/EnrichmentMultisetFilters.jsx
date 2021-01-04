@@ -1,7 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import { Form, Select, Input } from 'semantic-ui-react';
 import * as d3 from 'd3';
-import _ from 'lodash';
 import '../Shared/MultisetFilters.scss';
 import NumericExponentialInput from '../Shared/NumericExponentialInput';
 
