@@ -18,7 +18,6 @@ import { omicNavigatorService } from '../../services/omicNavigator.service';
 import DifferentialMultisetFilters from './DifferentialMultisetFilters';
 
 let cancelRequestGetReportLinkDifferential = () => {};
-let cancelRequestPSCGetResultsTable = () => {};
 let cancelRequestMultisetInferenceData = () => {};
 let cancelRequestInferenceMultisetPlot = () => {};
 
@@ -196,31 +195,6 @@ class DifferentialSearchCriteria extends Component {
         this.getReportLink(differentialStudy, differentialModel);
         if (differentialTest !== '') {
           onSearchTransitionDifferential(true);
-          // omicNavigatorService
-          //   .getResultsTable(
-          //     differentialStudy,
-          //     differentialModel,
-          //     differentialTest,
-          //     onSearchTransitionDifferential,
-          //   )
-          //   .then(getResultsTableData => {
-          //     // debugger;
-          //     // getResultsTableData = getResultsTableData.json();
-          //     if (getResultsTableData != null) {
-          //       if (getResultsTableData.length > 0) {
-          //         this.handleGetResultsTableData(
-          //           getResultsTableData,
-          //           true,
-          //           true,
-          //           differentialTest,
-          //         );
-          //       }
-          //     }
-          //   })
-          //   .catch(error => {
-          //     console.error('Error during getResultsTable', error);
-          //   });
-
           const self = this;
           const obj = {
             study: differentialStudy,
@@ -240,32 +214,9 @@ class DifferentialSearchCriteria extends Component {
               return ndjsonStream(response.body); //ndjsonStream parses the response.body
             })
             .then(canNdJsonStream => {
-              const reader = canNdJsonStream.getReader();
-              let read;
-              let streamedResults = [];
-              reader.read().then(
-                (read = result => {
-                  if (result.done) {
-                    self.handleGetResultsTableData(
-                      streamedResults,
-                      true,
-                      true,
-                      differentialTest,
-                    );
-                    return;
-                  }
-                  // console.log(result.value);
-                  streamedResults.push(result.value);
-                  if (streamedResults.length / 100 === 1) {
-                    self.handleGetResultsTableData(
-                      streamedResults,
-                      true,
-                      true,
-                      differentialTest,
-                    );
-                  }
-                  reader.read().then(read);
-                }),
+              self.handleGetResultsTableStream(
+                canNdJsonStream,
+                differentialTest,
               );
             })
             .catch(error => {
@@ -497,7 +448,8 @@ class DifferentialSearchCriteria extends Component {
       onSearchCriteriaChangeDifferential,
       onSearchTransitionDifferential,
     } = this.props;
-    // onSearchTransitionDifferential(true);
+    // this.handleGetResultsTableData([], false, false, null);
+    onSearchTransitionDifferential(true);
     onMultisetQueriedDifferential(false);
     const differentialTestMeta = this.props.differentialTestsMetadata.find(
       test => test.testID === value,
@@ -519,32 +471,6 @@ class DifferentialSearchCriteria extends Component {
       },
       true,
     );
-    // cancelRequestPSCGetResultsTable();
-    // let cancelToken = new CancelToken(e => {
-    //   cancelRequestPSCGetResultsTable = e;
-    // });
-    // let promises =
-    // omicNavigatorService
-    //   .getResultsTable(
-    //     differentialStudy,
-    //     differentialModel,
-    //     value,
-    //     onSearchTransitionDifferential,
-    //     cancelToken,
-    //   )
-    //   .then(getResultsTableData => {
-    // debugger;
-    // getResultsTableData = getResultsTableData.json();
-    //       this.handleGetResultsTableData(
-    //         getResultsTableData,
-    //         true,
-    //         true,
-    //         value,
-    //       );
-    // })
-    // .catch(error => {
-    //   console.error('Error during getResultsTable', error);
-    // });
     const self = this;
     const obj = {
       study: differentialStudy,
@@ -564,68 +490,40 @@ class DifferentialSearchCriteria extends Component {
         return ndjsonStream(response.body); //ndjsonStream parses the response.body
       })
       .then(canNdJsonStream => {
-        const reader = canNdJsonStream.getReader();
-        let read;
-        let streamedResults = [];
-        reader.read().then(
-          (read = result => {
-            if (result.done) {
-              streamedResults.push(result.value);
-              self.handleGetResultsTableData(
-                streamedResults,
-                true,
-                true,
-                value,
-              );
-              return;
-            }
-            // console.log(result.value);
-            streamedResults.push(result.value);
-            if (streamedResults.length / 100 === 1) {
-              self.handleGetResultsTableData(
-                streamedResults,
-                true,
-                true,
-                value,
-              );
-            }
-            reader.read().then(read);
-          }),
-        );
+        self.handleGetResultsTableStream(canNdJsonStream, value);
       })
       .catch(error => {
         console.error('Error during getResultsTable', error);
       });
-    // cancelRequestPSCGetResultsTable();
-    // let cancelToken = new CancelToken(e => {
-    //   cancelRequestPSCGetResultsTable = e;
-    // });
-    // let promises =
-    // omicNavigatorService
-    //   .getResultsTable(
-    //     differentialStudy,
-    //     differentialModel,
-    //     value,
-    //     onSearchTransitionDifferential,
-    //     cancelToken,
-    //   )
-    //   .then(getResultsTableData => {
-    //     // debugger;
-    //     // getResultsTableData = getResultsTableData.json();
-    //     if (getResultsTableData != null) {
-    //       if (getResultsTableData.length > 0) {
-    //         this.handleGetResultsTableData(
-    //           getResultsTableData,
-    //           true,
-    //           true,
-    //           value,
-    //         );
-    //       }
-    //     }
-    //   })
-    //   .catch(error => {
-    //     console.error('Error during getResultsTable', error);
-    //   });
+  };
+
+  handleGetResultsTableStream = (stream, value) => {
+    const self = this;
+    if (self.reader != null) {
+      self.reader.cancel();
+    }
+    self.reader = stream.getReader();
+    let read;
+    let streamedResults = [];
+    self.reader.read().then(
+      (read = result => {
+        if (result.done) {
+          streamedResults.push(result.value);
+          if (streamedResults.length > 0) {
+            self.handleGetResultsTableData(streamedResults, true, true, value);
+            return;
+          }
+        }
+        // console.log(result.value);
+        streamedResults.push(result.value);
+        if (streamedResults.length / 100 === 1) {
+          if (streamedResults.length > 0) {
+            self.handleGetResultsTableData(streamedResults, true, true, value);
+          }
+        }
+        self.reader.read().then(read);
+      }),
+    );
   };
 
   handleGetResultsTableData = (
@@ -768,35 +666,6 @@ class DifferentialSearchCriteria extends Component {
       },
       true,
     );
-    // cancelRequestPSCGetResultsTable();
-    // let cancelToken = new CancelToken(e => {
-    //   cancelRequestPSCGetResultsTable = e;
-    // });
-    // omicNavigatorService
-    //   .getResultsTable(
-    //     differentialStudy,
-    //     differentialModel,
-    //     value,
-    //     this.handleMultisetPCloseError,
-    //     cancelToken,
-    //   )
-    //   .then(getResultsTableData => {
-    //     // debugger;
-    //     // getResultsTableData = getResultsTableData.json();
-    //     if (getResultsTableData != null) {
-    //       if (getResultsTableData.length > 0) {
-    //         this.handleGetResultsTableData(
-    //           getResultsTableData,
-    //           false,
-    //           false,
-    //           value,
-    //         );
-    //       }
-    //     }
-    //   })
-    //   .catch(error => {
-    //     console.error('Error during getResultsTable', error);
-    //   });
     const self = this;
     const obj = {
       study: differentialStudy,
@@ -816,34 +685,7 @@ class DifferentialSearchCriteria extends Component {
         return ndjsonStream(response.body); //ndjsonStream parses the response.body
       })
       .then(canNdJsonStream => {
-        const reader = canNdJsonStream.getReader();
-        let read;
-        let streamedResults = [];
-        reader.read().then(
-          (read = result => {
-            if (result.done) {
-              streamedResults.push(result.value);
-              self.handleGetResultsTableData(
-                streamedResults,
-                true,
-                true,
-                value,
-              );
-              return;
-            }
-            // console.log(result.value);
-            streamedResults.push(result.value);
-            if (streamedResults.length / 100 === 1) {
-              self.handleGetResultsTableData(
-                streamedResults,
-                true,
-                true,
-                value,
-              );
-            }
-            reader.read().then(read);
-          }),
-        );
+        self.handleGetResultsTableStream(canNdJsonStream, value);
       })
       .catch(error => {
         console.error('Error during getResultsTable', error);

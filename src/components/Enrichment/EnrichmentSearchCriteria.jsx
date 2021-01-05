@@ -666,7 +666,6 @@ class EnrichmentSearchCriteria extends Component {
   };
 
   handleFilterOutChange = (test, isMultiset) => {
-    debugger;
     const {
       mustEnrichment,
       notEnrichment,

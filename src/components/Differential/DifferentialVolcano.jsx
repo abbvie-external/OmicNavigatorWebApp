@@ -369,16 +369,21 @@ class DifferentialVolcano extends Component {
   };
 
   getMaxAndMin(data, element) {
-    var values = [data[0][element], data[0][element]];
-    for (var i = 1; i < data.length; i++) {
-      if (data[i][element] > values[1]) {
-        values[1] = data[i][element];
-      } else if (data[i][element] < values[0]) {
-        values[0] = data[i][element];
+    if (data.length > 0 && data[0][element] != null) {
+      var values = [data[0][element], data[0][element]];
+      for (var i = 1; i < data.length; i++) {
+        if (data[i] != null && data[i][element] != null) {
+          if (data[i][element] > values[1]) {
+            values[1] = data[i][element];
+          } else if (data[i][element] < values[0]) {
+            values[0] = data[i][element];
+          }
+        }
       }
-    }
-    return values;
+      return values;
+    } else return [0, 0];
   }
+
   handleDropdownChange(evt, { name, value }) {
     const { differentialResultsUnfiltered } = this.props;
     const allowXTransCheck =
@@ -565,14 +570,14 @@ class DifferentialVolcano extends Component {
       differentialStudy,
       differentialModel,
       differentialTest,
-      multisetQueriedDifferential,
+      // multisetQueriedDifferential,
       tab,
       isItemSelected,
     } = this.props;
-    let differentialVolcanoCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-Volcano`;
-    if (multisetQueriedDifferential) {
-      differentialVolcanoCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-${multisetQueriedDifferential}-Volcano`;
-    }
+    // let differentialVolcanoCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-Volcano`;
+    // if (multisetQueriedDifferential) {
+    //   differentialVolcanoCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-${multisetQueriedDifferential}-Volcano`;
+    // }
     const dynamicSize = this.getDynamicSize();
 
     const TableValuePopupStyle = {
@@ -890,7 +895,7 @@ class DifferentialVolcano extends Component {
                         >
                           <EZGrid
                             ref={this.volcanoPlotFilteredGridRef}
-                            uniqueCacheKey={differentialVolcanoCacheKey}
+                            // uniqueCacheKey={differentialVolcanoCacheKey}
                             className="VolcanoPlotTable"
                             // note, default is 70vh; if you want a specific vh, specify like "40vh"; "auto" lets the height flow based on items per page
                             // height="auto"

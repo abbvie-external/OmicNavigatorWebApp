@@ -44,7 +44,6 @@ class EnrichmentMultisetFilters extends Component {
       notEnrichment,
       multisetTestsFilteredOut,
     } = this.props;
-    debugger;
     if (
       // multisetFiltersVisibleEnrichment &&
       multisetFiltersVisibleEnrichment !==
