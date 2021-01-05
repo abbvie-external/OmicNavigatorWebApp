@@ -180,28 +180,6 @@ class OmicNavigatorService {
     }
   }
 
-  async getResultsTable(study, modelID, testID, errorCb, cancelToken) {
-    const cacheKey = `getResultsTable_${study}_${modelID}_${testID}`;
-    if (this[cacheKey] != null) {
-      return this[cacheKey];
-    } else {
-      const obj = { study, modelID, testID };
-      const promise = this.axiosPost(
-        'getResultsTable',
-        obj,
-        true,
-        errorCb,
-        cancelToken,
-        25000,
-      );
-      const dataFromPromise = await promise;
-      this[cacheKey] = dataFromPromise;
-      return dataFromPromise;
-    }
-  }
-
-  async fetchReadableStream(url = '', data = {}) {}
-
   async getEnrichmentsTable(
     study,
     modelID,

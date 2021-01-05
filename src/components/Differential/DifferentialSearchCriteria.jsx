@@ -20,7 +20,16 @@ import DifferentialMultisetFilters from './DifferentialMultisetFilters';
 let cancelRequestGetReportLinkDifferential = () => {};
 let cancelRequestMultisetInferenceData = () => {};
 let cancelRequestInferenceMultisetPlot = () => {};
-
+const cache = {};
+async function* streamAsyncIterable(reader) {
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) {
+      return;
+    }
+    yield value;
+  }
+}
 class DifferentialSearchCriteria extends Component {
   state = {
     differentialStudies: [],
@@ -92,6 +101,7 @@ class DifferentialSearchCriteria extends Component {
     activateMultisetFiltersP: false,
     uDataP: [],
     isFilteredDifferential: false,
+    isDataStreaming: false,
     // initialRenderP: true,
     // loadingDifferentialMultisetFilters: false,
   };
@@ -222,90 +232,6 @@ class DifferentialSearchCriteria extends Component {
             .catch(error => {
               console.error('Error during getResultsTable', error);
             });
-          // );
-
-          //   const reader = response.body.getReader();
-          //   let streamedResults = [];
-          //   return new ReadableStream({
-          //     start(controller) {
-          //       return pump();
-          //       function pump() {
-          //         return reader.read().then(({ done, value }) => {
-          //           // When no more data needs to be consumed, close the stream
-          //           if (done) {
-          //             controller.close();
-          //             return;
-          //           }
-          //           // Enqueue the next data chunk into our target stream
-          //           controller.enqueue(value);
-          //           streamedResults.push(value);
-          //           // console.log(value);
-          //           console.log(streamedResults);
-          //           // console.log(
-          //           //   JSON.parse(
-          //           //     String.fromCharCode.apply(
-          //           //       null,
-          //           //       new Uint8Array(value),
-          //           //     ),
-          //           //   ),
-          //           // );
-          //           // JSON.stringify(Array.from(new Uint8Array(value)));
-          //           // function Decodeuint8arr(uint8array) {
-          //           //   return new TextDecoder('utf-8').decode(uint8array);
-          //           // }
-          //           // const streamedResultsDecoded = Decodeuint8arr(
-          //           //   streamedResults,
-          //           // );
-          //           // self.handleGetResultsTableData(
-          //           //   streamedResultsDecoded,
-          //           //   true,
-          //           //   true,
-          //           //   differentialTest,
-          //           // );
-          //           // ReadableStream.pipeTo(
-          //           //   new WritableStream({
-          //           //     write(streamedResults) {
-          //           //       self.handleGetResultsTableData(
-          //           //         streamedResults,
-          //           //         true,
-          //           //         true,
-          //           //         differentialTest,
-          //           //       );
-          //           //       console.log('Chunk received', streamedResults);
-          //           //     },
-          //           //     close() {
-          //           //       console.log('All data successfully read!');
-          //           //     },
-          //           //     abort(e) {
-          //           //       console.error('Something went wrong!', e);
-          //           //     },
-          //           //   }),
-          //           // );
-          //           return pump();
-          //         });
-          //       }
-          //     },
-          //   });
-          // })
-          // // .then(stream => new Response(stream))
-          // .then(stream => {
-          //   return new Response(stream);
-          //   // return new Response(stream, { headers: { "Content-Type": "text/html" } });
-          // })
-          // .then(streamResponse => streamResponse.json())
-          // .then(streamJson => {
-          //   if (streamJson != null) {
-          //     if (streamJson.length > 0) {
-          //       self.handleGetResultsTableData(
-          //         streamJson,
-          //         true,
-          //         true,
-          //         differentialTest,
-          //       );
-          //     }
-          //   }
-          // })
-          // .catch(err => console.error(err));
 
           onSearchCriteriaChangeDifferential(
             {
@@ -444,6 +370,7 @@ class DifferentialSearchCriteria extends Component {
     const {
       differentialStudy,
       differentialModel,
+      differentialTest,
       onMultisetQueriedDifferential,
       onSearchCriteriaChangeDifferential,
       onSearchTransitionDifferential,
@@ -471,12 +398,16 @@ class DifferentialSearchCriteria extends Component {
       },
       true,
     );
-    const self = this;
     const obj = {
       study: differentialStudy,
       modelID: differentialModel,
       testID: value,
     };
+    const cacheKey = `getResultsTable_${differentialStudy}_${differentialModel}_${differentialTest}`;
+    if (cache[cacheKey]) {
+      this.handleGetResultsTableData(cache[cacheKey], true, true, value);
+      return;
+    }
     const fetchUrl = `***REMOVED***/ocpu/library/OmicNavigator/R/getResultsTable/ndjson`;
     fetch(fetchUrl, {
       method: 'POST',
@@ -490,40 +421,75 @@ class DifferentialSearchCriteria extends Component {
         return ndjsonStream(response.body); //ndjsonStream parses the response.body
       })
       .then(canNdJsonStream => {
-        self.handleGetResultsTableStream(canNdJsonStream, value);
+        this.handleGetResultsTableStream(canNdJsonStream, value);
       })
       .catch(error => {
         console.error('Error during getResultsTable', error);
       });
   };
 
-  handleGetResultsTableStream = (stream, value) => {
-    const self = this;
-    if (self.reader != null) {
-      self.reader.cancel();
-    }
-    self.reader = stream.getReader();
-    let read;
+  /**
+   * @param stream {ReadableStream<any>}
+   */
+  handleGetResultsTableStream = async (stream, value) => {
+    this.reader?.cancel();
+    this.setState({
+      isDataStreaming: true,
+    });
+    const {
+      differentialStudy,
+      differentialModel,
+      differentialTest,
+    } = this.state;
+    const cacheKey = `getResultsTable_${differentialStudy}_${differentialModel}_${differentialTest}`;
     let streamedResults = [];
-    self.reader.read().then(
-      (read = result => {
-        if (result.done) {
-          streamedResults.push(result.value);
-          if (streamedResults.length > 0) {
-            self.handleGetResultsTableData(streamedResults, true, true, value);
-            return;
-          }
+    try {
+      this.reader = stream.getReader();
+      for await (let value of streamAsyncIterable(this.reader)) {
+        streamedResults.push(value);
+        if (
+          streamedResults.length === 100 ||
+          streamedResults.length % 5000 === 0
+        ) {
+          this.handleGetResultsTableData(
+            streamedResults.slice(),
+            true,
+            true,
+            value,
+          );
         }
-        // console.log(result.value);
-        streamedResults.push(result.value);
-        if (streamedResults.length / 100 === 1) {
-          if (streamedResults.length > 0) {
-            self.handleGetResultsTableData(streamedResults, true, true, value);
-          }
-        }
-        self.reader.read().then(read);
-      }),
-    );
+      }
+      // Stream finished at this point
+      const streamedResultsCopy = streamedResults.slice();
+      cache[cacheKey] = streamedResultsCopy;
+      this.handleGetResultsTableData(streamedResultsCopy, true, true, value);
+      this.setState({
+        isDataStreaming: false,
+      });
+    } catch (error) {
+      console.error(error);
+      // Ignore?
+    }
+    // while(!reader.){
+    // }
+    // this.reader.read().then(
+    //   (read = result => {
+    //     if (result.done) {
+    //       streamedResults.push(result.value);
+    //       if (streamedResults.length > 0) {
+    //         this.handleGetResultsTableData(streamedResults, true, true, value);
+    //         return;
+    //       }
+    //     }
+    //     console.log(result.value);
+    //     streamedResults.push(result.value);
+    //     if (streamedResults.length === 100) {
+    //       debugger;
+    //       this.handleGetResultsTableData(streamedResults, true, true, value);
+    //     }
+    //     this.reader.read().then(read);
+    //   }),
+    // );
   };
 
   handleGetResultsTableData = (
