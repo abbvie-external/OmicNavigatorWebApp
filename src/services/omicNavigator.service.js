@@ -12,22 +12,6 @@ class OmicNavigatorService {
         ? '***REMOVED***'
         : window.location.origin;
     this.url = `${this.baseUrl}/ocpu/library/OmicNavigator/R`;
-    // this.addEventListener('fetch' => {
-    //   var stream = new ReadableStream({
-    //     start(controller) {
-    //       if (/* there's more data */) {
-    //         controller.enqueue(/* your data here */);
-    //       } else {
-    //         controller.close();
-    //       }
-    //     });
-    //   });
-
-    //   var response = new Response(stream, {
-    //     headers: {'content-type': /* your content-type here */}
-    //   });
-    //   respondWith(response);
-    // });
   }
 
   async axiosPost(method, obj, params, handleError, cancelToken, timeout) {
