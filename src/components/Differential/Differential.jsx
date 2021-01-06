@@ -80,6 +80,7 @@ class Differential extends Component {
     isVolcanoPlotSVGLoaded: true,
     metaFeaturesDataDifferential: [],
     allMetaFeaturesDataDifferential: [],
+    isDataStreaming: false,
   };
   differentialViewContainerRef = React.createRef();
   differentialGridRef = React.createRef();
@@ -242,6 +243,12 @@ class Differential extends Component {
           resultsLinkouts: getResultsLinkoutsResponseData,
         });
       });
+  };
+
+  handleIsDataStreaming = bool => {
+    this.setState({
+      isDataStreaming: bool,
+    });
   };
 
   disablePlotDifferential = () => {
@@ -891,6 +898,7 @@ class Differential extends Component {
               onHandleVolcanoTableLoading={this.handleVolcanoTableLoading}
               onDoMetaFeaturesExist={this.doMetaFeaturesExist}
               onGetResultsLinkouts={this.getResultsLinkouts}
+              onHandleIsDataStreaming={this.handleIsDataStreaming}
             />
           </Grid.Column>
           <Grid.Column

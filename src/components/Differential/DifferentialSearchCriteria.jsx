@@ -106,7 +106,6 @@ class DifferentialSearchCriteria extends Component {
     activateMultisetFiltersP: false,
     uDataP: [],
     isFilteredDifferential: false,
-    isDataStreaming: false,
     // initialRenderP: true,
     // loadingDifferentialMultisetFilters: false,
   };
@@ -444,9 +443,7 @@ class DifferentialSearchCriteria extends Component {
    */
   handleGetResultsTableStream = async (stream, value) => {
     this.reader?.cancel();
-    this.setState({
-      isDataStreaming: true,
-    });
+    this.props.onHandleIsDataStreaming(true);
     const {
       differentialStudy,
       differentialModel,
@@ -473,10 +470,8 @@ class DifferentialSearchCriteria extends Component {
       // Stream finished at this point
       const streamedResultsCopy = streamedResults.slice();
       cache[cacheKey] = streamedResultsCopy;
+      this.props.onHandleIsDataStreaming(false);
       this.handleGetResultsTableData(streamedResultsCopy, true, true, value);
-      this.setState({
-        isDataStreaming: false,
-      });
     } catch (error) {
       console.error(error);
       // Ignore?
@@ -937,7 +932,6 @@ class DifferentialSearchCriteria extends Component {
       multisetFiltersVisibleDifferential,
       differentialStudyReportTooltip,
       isFilteredDifferential,
-      isDataStreaming,
       // activateMultisetFiltersP,
     } = this.state;
 
@@ -949,6 +943,7 @@ class DifferentialSearchCriteria extends Component {
       multisetPlotAvailableDifferential,
       plotButtonActiveDifferential,
       onHandlePlotAnimationDifferential,
+      isDataStreaming,
     } = this.props;
 
     const dynamicSize = this.getDynamicSize();
@@ -1087,6 +1082,7 @@ class DifferentialSearchCriteria extends Component {
             checked={multisetFiltersVisibleDifferential}
             onChange={this.handleMultisetToggleDifferential}
             disabled={isDataStreaming}
+            className={isDataStreaming ? 'CursorNotAllowed' : ''}
           />
         </React.Fragment>
       );

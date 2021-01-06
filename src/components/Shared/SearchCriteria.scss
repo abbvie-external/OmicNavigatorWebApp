@@ -81,6 +81,10 @@
     .ui.toggle.checkbox input:checked ~ label:before {
       background-color: var(--color-primary) !important;
     }
+
+    .CursorNotAllowed {
+      cursor: not-allowed !important;
+    }
   }
 
   .MultisetFilterButtonDiv {

@@ -31,8 +31,8 @@ class DifferentialVolcano extends Component {
     volcanoHeightBackup:
       parseInt(localStorage.getItem('volcanoHeightBackup'), 10) || 300,
     volcanoWidth: parseInt(localStorage.getItem('volcanoWidth'), 10) || 500,
-    volcanoPlotsVisible:
-      JSON.parse(localStorage.getItem('volcanoPlotsVisible')) || false,
+    volcanoPlotsVisible: false,
+    // JSON.parse(localStorage.getItem('volcanoPlotsVisible')) || false,
     // filteredTableData: [],
     itemsPerPageVolcanoTable:
       parseInt(localStorage.getItem('itemsPerPageVolcanoTable'), 10) || 30,
@@ -533,7 +533,7 @@ class DifferentialVolcano extends Component {
     this.setState({
       volcanoPlotsVisible: !volcanoPlotsVisible,
     });
-    localStorage.setItem(`volcanoPlotsVisible`, !volcanoPlotsVisible);
+    // localStorage.setItem(`volcanoPlotsVisible`, !volcanoPlotsVisible);
   };
 
   // handlePlotAnimationVolcano = animation => () => {
@@ -542,6 +542,15 @@ class DifferentialVolcano extends Component {
   //     visible: !prevState.visible,
   //   }));
   // };
+
+  getVolcanoPlotButtonContent = () => {
+    const { volcanoPlotsVisible, isDataStreaming } = this.props;
+    if (isDataStreaming) {
+      return 'Plots are not avaialble until data finishes streaming';
+    } else {
+      return volcanoPlotsVisible ? 'Hide Charts' : 'Show Charts';
+    }
+  };
 
   render() {
     const {
@@ -574,6 +583,7 @@ class DifferentialVolcano extends Component {
       // multisetQueriedDifferential,
       tab,
       isItemSelected,
+      isDataStreaming,
     } = this.props;
     // let differentialVolcanoCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-Volcano`;
     // if (multisetQueriedDifferential) {
@@ -679,13 +689,16 @@ class DifferentialVolcano extends Component {
                           : VolcanoPlotIcon
                       }
                       alt="Volcano Plot"
+                      className={isDataStreaming ? 'CursorNotAllowed' : ''}
                       id="VolcanoPlotButton"
-                      onClick={this.handleVolcanoVisability}
+                      onClick={
+                        !isDataStreaming ? this.handleVolcanoVisability : null
+                      }
                     />
                   }
                   style={TableValuePopupStyle}
                   // className="TablePopupValue"
-                  content={volcanoPlotsVisible ? 'Hide Charts' : 'Show Charts'}
+                  content={this.getVolcanoPlotButtonContent()}
                   inverted
                   basic
                 />
