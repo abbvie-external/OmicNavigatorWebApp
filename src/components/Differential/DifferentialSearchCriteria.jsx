@@ -20,12 +20,12 @@ import DifferentialMultisetFilters from './DifferentialMultisetFilters';
 let cancelRequestGetReportLinkDifferential = () => {};
 let cancelRequestMultisetInferenceData = () => {};
 let cancelRequestInferenceMultisetPlot = () => {};
-const cache = {};
+const cacheResultsTable = {};
 const baseUrl =
   process.env.NODE_ENV === 'development'
     ? '***REMOVED***'
     : window.location.origin;
-const fetchUrl = `${baseUrl}/ocpu/library/OmicNavigator/R/getResultsTable/ndjson`;
+const fetchUrlResultsTable = `${baseUrl}/ocpu/library/OmicNavigator/R/getResultsTable/ndjson`;
 async function* streamAsyncIterable(reader) {
   while (true) {
     const { done, value } = await reader.read();
@@ -214,7 +214,7 @@ class DifferentialSearchCriteria extends Component {
             modelID: differentialModel,
             testID: differentialTest,
           };
-          fetch(fetchUrl, {
+          fetch(fetchUrlResultsTable, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -403,11 +403,16 @@ class DifferentialSearchCriteria extends Component {
       testID: value,
     };
     const cacheKey = `getResultsTable_${differentialStudy}_${differentialModel}_${value}`;
-    if (cache[cacheKey]) {
-      this.handleGetResultsTableData(cache[cacheKey], true, true, value);
+    if (cacheResultsTable[cacheKey]) {
+      this.handleGetResultsTableData(
+        cacheResultsTable[cacheKey],
+        true,
+        true,
+        value,
+      );
       return;
     }
-    fetch(fetchUrl, {
+    fetch(fetchUrlResultsTable, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -431,7 +436,7 @@ class DifferentialSearchCriteria extends Component {
    */
   handleGetResultsTableStream = async (stream, test) => {
     this.reader?.cancel();
-    this.props.onHandleIsDataStreaming(true);
+    this.props.onHandleIsDataStreamingResultsTable(true);
     const { differentialStudy, differentialModel } = this.props;
     const cacheKey = `getResultsTable_${differentialStudy}_${differentialModel}_${test}`;
     let streamedResults = [];
@@ -453,8 +458,8 @@ class DifferentialSearchCriteria extends Component {
       }
       // Stream finished at this point
       const streamedResultsCopy = streamedResults.slice();
-      cache[cacheKey] = streamedResultsCopy;
-      this.props.onHandleIsDataStreaming(false);
+      cacheResultsTable[cacheKey] = streamedResultsCopy;
+      this.props.onHandleIsDataStreamingResultsTable(false);
       this.handleGetResultsTableData(streamedResultsCopy, true, true, test);
     } catch (error) {
       console.error(error);
@@ -627,11 +632,16 @@ class DifferentialSearchCriteria extends Component {
       testID: value,
     };
     const cacheKey = `getResultsTable_${differentialStudy}_${differentialModel}_${value}`;
-    if (cache[cacheKey]) {
-      this.handleGetResultsTableData(cache[cacheKey], true, true, value);
+    if (cacheResultsTable[cacheKey]) {
+      this.handleGetResultsTableData(
+        cacheResultsTable[cacheKey],
+        true,
+        true,
+        value,
+      );
       return;
     }
-    fetch(fetchUrl, {
+    fetch(fetchUrlResultsTable, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

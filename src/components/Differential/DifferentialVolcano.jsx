@@ -90,7 +90,6 @@ class DifferentialVolcano extends Component {
       // isItemSelected,
     } = this.props;
     if (prevProps.differentialResults !== differentialResults) {
-      debugger;
       this.setState({
         filteredTableData: differentialResults,
         volcanoPlotRows: differentialResults.length,

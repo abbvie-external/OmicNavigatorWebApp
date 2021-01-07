@@ -245,7 +245,7 @@ class Differential extends Component {
       });
   };
 
-  handleIsDataStreaming = bool => {
+  handleIsDataStreamingResultsTable = bool => {
     this.setState({
       isDataStreamingResultsTable: bool,
     });
@@ -898,7 +898,9 @@ class Differential extends Component {
               onHandleVolcanoTableLoading={this.handleVolcanoTableLoading}
               onDoMetaFeaturesExist={this.doMetaFeaturesExist}
               onGetResultsLinkouts={this.getResultsLinkouts}
-              onHandleIsDataStreaming={this.handleIsDataStreaming}
+              onHandleIsDataStreamingResultsTable={
+                this.handleIsDataStreamingResultsTable
+              }
             />
           </Grid.Column>
           <Grid.Column

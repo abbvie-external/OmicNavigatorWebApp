@@ -164,37 +164,37 @@ class OmicNavigatorService {
     }
   }
 
-  async getEnrichmentsTable(
-    study,
-    modelID,
-    annotationID,
-    type,
-    errorCb,
-    cancelToken,
-  ) {
-    const cacheKey = `getEnrichmentsTable_${study}_${modelID}_${annotationID}_${type}`;
-    if (this[cacheKey] != null) {
-      return this[cacheKey];
-    } else {
-      const obj = {
-        study,
-        modelID,
-        annotationID,
-        type,
-      };
-      const promise = this.axiosPost(
-        'getEnrichmentsTable',
-        obj,
-        true,
-        errorCb,
-        cancelToken,
-        25000,
-      );
-      const dataFromPromise = await promise;
-      this[cacheKey] = dataFromPromise;
-      return dataFromPromise;
-    }
-  }
+  // async getEnrichmentsTable(
+  //   study,
+  //   modelID,
+  //   annotationID,
+  //   type,
+  //   errorCb,
+  //   cancelToken,
+  // ) {
+  //   const cacheKey = `getEnrichmentsTable_${study}_${modelID}_${annotationID}_${type}`;
+  //   if (this[cacheKey] != null) {
+  //     return this[cacheKey];
+  //   } else {
+  //     const obj = {
+  //       study,
+  //       modelID,
+  //       annotationID,
+  //       type,
+  //     };
+  //     const promise = this.axiosPost(
+  //       'getEnrichmentsTable',
+  //       obj,
+  //       true,
+  //       errorCb,
+  //       cancelToken,
+  //       25000,
+  //     );
+  //     const dataFromPromise = await promise;
+  //     this[cacheKey] = dataFromPromise;
+  //     return dataFromPromise;
+  //   }
+  // }
 
   async getMetaFeatures(study, model) {
     const cacheKey = `getMetaFeatures_${study}_${model}`;

@@ -184,6 +184,7 @@ class Enrichment extends Component {
     enrichmentColumnsUnfiltered: [],
     itemsPerPageEnrichmentTable:
       parseInt(localStorage.getItem('itemsPerPageEnrichmentTable'), 10) || 45,
+    isDataStreamingEnrichmentsTable: false,
   };
   EnrichmentViewContainerRef = React.createRef();
   EnrichmentGridRef = React.createRef();
@@ -523,6 +524,12 @@ class Enrichment extends Component {
           enrichmentsLinkouts: getEnrichmentsLinkoutsResponseData,
         });
       });
+  };
+
+  handleIsDataStreamingEnrichmentsTable = bool => {
+    this.setState({
+      isDataStreamingEnrichmentsTable: bool,
+    });
   };
 
   disablePlotEnrichment = () => {
@@ -2171,6 +2178,9 @@ class Enrichment extends Component {
               onHandleEnrichmentTableLoading={this.handleEnrichmentTableLoading}
               onHandleHasBarcodeData={this.handleHasBarcodeData}
               onGetEnrichmentsLinkouts={this.getEnrichmentsLinkouts}
+              onHandleIsDataStreamingEnrichmentsTable={
+                this.handleIsDataStreamingEnrichmentsTable
+              }
             />
           </Grid.Column>
           <Grid.Column
