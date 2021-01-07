@@ -214,36 +214,26 @@ class DifferentialSearchCriteria extends Component {
             modelID: differentialModel,
             testID: differentialTest,
           };
-          const cacheKey = `getResultsTable_${differentialStudy}_${differentialModel}_${differentialTest}`;
-          if (cache[cacheKey]) {
-            this.handleGetResultsTableData(
-              cache[cacheKey],
-              true,
-              true,
-              differentialTest,
-            );
-          } else {
-            fetch(fetchUrl, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify(obj), // body data type must match "Content-Type" header
+          fetch(fetchUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(obj), // body data type must match "Content-Type" header
+          })
+            // can nd-json-stream - assumes json is NDJSON, a data format that is separated into individual JSON objects with a newline character (\n). The 'nd' stands for newline delimited JSON
+            .then(response => {
+              return ndjsonStream(response.body); //ndjsonStream parses the response.body
             })
-              // can nd-json-stream - assumes json is NDJSON, a data format that is separated into individual JSON objects with a newline character (\n). The 'nd' stands for newline delimited JSON
-              .then(response => {
-                return ndjsonStream(response.body); //ndjsonStream parses the response.body
-              })
-              .then(canNdJsonStream => {
-                this.handleGetResultsTableStream(
-                  canNdJsonStream,
-                  differentialTest,
-                );
-              })
-              .catch(error => {
-                console.error('Error during getResultsTable', error);
-              });
-          }
+            .then(canNdJsonStream => {
+              this.handleGetResultsTableStream(
+                canNdJsonStream,
+                differentialTest,
+              );
+            })
+            .catch(error => {
+              console.error('Error during getResultsTable', error);
+            });
           onSearchCriteriaChangeDifferential(
             {
               differentialStudy: differentialStudy,
@@ -935,7 +925,7 @@ class DifferentialSearchCriteria extends Component {
       multisetPlotAvailableDifferential,
       plotButtonActiveDifferential,
       onHandlePlotAnimationDifferential,
-      isDataStreaming,
+      isDataStreamingResultsTable,
     } = this.props;
 
     const dynamicSize = this.getDynamicSize();
@@ -1073,8 +1063,8 @@ class DifferentialSearchCriteria extends Component {
             label="Set Analysis"
             checked={multisetFiltersVisibleDifferential}
             onChange={this.handleMultisetToggleDifferential}
-            disabled={isDataStreaming}
-            className={isDataStreaming ? 'CursorNotAllowed' : ''}
+            disabled={isDataStreamingResultsTable}
+            className={isDataStreamingResultsTable ? 'CursorNotAllowed' : ''}
           />
         </React.Fragment>
       );

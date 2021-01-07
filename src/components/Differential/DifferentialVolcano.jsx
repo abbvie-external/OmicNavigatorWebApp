@@ -544,8 +544,8 @@ class DifferentialVolcano extends Component {
   // };
 
   getVolcanoPlotButtonContent = () => {
-    const { volcanoPlotsVisible, isDataStreaming } = this.props;
-    if (isDataStreaming) {
+    const { volcanoPlotsVisible, isDataStreamingResultsTable } = this.props;
+    if (isDataStreamingResultsTable) {
       return 'Plots are not avaialble until data finishes streaming';
     } else {
       return volcanoPlotsVisible ? 'Hide Charts' : 'Show Charts';
@@ -583,7 +583,7 @@ class DifferentialVolcano extends Component {
       // multisetQueriedDifferential,
       tab,
       isItemSelected,
-      isDataStreaming,
+      isDataStreamingResultsTable,
     } = this.props;
     // let differentialVolcanoCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-Volcano`;
     // if (multisetQueriedDifferential) {
@@ -689,10 +689,14 @@ class DifferentialVolcano extends Component {
                           : VolcanoPlotIcon
                       }
                       alt="Volcano Plot"
-                      className={isDataStreaming ? 'CursorNotAllowed' : ''}
+                      className={
+                        isDataStreamingResultsTable ? 'CursorNotAllowed' : ''
+                      }
                       id="VolcanoPlotButton"
                       onClick={
-                        !isDataStreaming ? this.handleVolcanoVisability : null
+                        !isDataStreamingResultsTable
+                          ? this.handleVolcanoVisability
+                          : null
                       }
                     />
                   }
