@@ -381,12 +381,10 @@ class DifferentialSearchCriteria extends Component {
     const {
       differentialStudy,
       differentialModel,
-      differentialTest,
       onMultisetQueriedDifferential,
       onSearchCriteriaChangeDifferential,
       onSearchTransitionDifferential,
     } = this.props;
-    // this.handleGetResultsTableData([], false, false, null);
     onSearchTransitionDifferential(true);
     onMultisetQueriedDifferential(false);
     const differentialTestMeta = this.props.differentialTestsMetadata.find(
@@ -414,7 +412,7 @@ class DifferentialSearchCriteria extends Component {
       modelID: differentialModel,
       testID: value,
     };
-    const cacheKey = `getResultsTable_${differentialStudy}_${differentialModel}_${differentialTest}`;
+    const cacheKey = `getResultsTable_${differentialStudy}_${differentialModel}_${value}`;
     if (cache[cacheKey]) {
       this.handleGetResultsTableData(cache[cacheKey], true, true, value);
       return;
@@ -441,15 +439,11 @@ class DifferentialSearchCriteria extends Component {
   /**
    * @param stream {ReadableStream<any>}
    */
-  handleGetResultsTableStream = async (stream, value) => {
+  handleGetResultsTableStream = async (stream, test) => {
     this.reader?.cancel();
     this.props.onHandleIsDataStreaming(true);
-    const {
-      differentialStudy,
-      differentialModel,
-      differentialTest,
-    } = this.state;
-    const cacheKey = `getResultsTable_${differentialStudy}_${differentialModel}_${differentialTest}`;
+    const { differentialStudy, differentialModel } = this.props;
+    const cacheKey = `getResultsTable_${differentialStudy}_${differentialModel}_${test}`;
     let streamedResults = [];
     try {
       this.reader = stream.getReader();
@@ -457,13 +451,13 @@ class DifferentialSearchCriteria extends Component {
         streamedResults.push(value);
         if (
           streamedResults.length === 100 ||
-          streamedResults.length % 5000 === 0
+          streamedResults.length % 25000 === 0
         ) {
           this.handleGetResultsTableData(
             streamedResults.slice(),
             true,
             true,
-            value,
+            test,
           );
         }
       }
@@ -471,7 +465,7 @@ class DifferentialSearchCriteria extends Component {
       const streamedResultsCopy = streamedResults.slice();
       cache[cacheKey] = streamedResultsCopy;
       this.props.onHandleIsDataStreaming(false);
-      this.handleGetResultsTableData(streamedResultsCopy, true, true, value);
+      this.handleGetResultsTableData(streamedResultsCopy, true, true, test);
     } catch (error) {
       console.error(error);
       // Ignore?
@@ -487,10 +481,8 @@ class DifferentialSearchCriteria extends Component {
     //         return;
     //       }
     //     }
-    //     console.log(result.value);
     //     streamedResults.push(result.value);
     //     if (streamedResults.length === 100) {
-    //       debugger;
     //       this.handleGetResultsTableData(streamedResults, true, true, value);
     //     }
     //     this.reader.read().then(read);
