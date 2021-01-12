@@ -451,23 +451,24 @@ class BarcodePlot extends Component {
       tooltipPositionMax,
       tooltipTextAnchorMax,
     } = this.state;
-    if (tooltipPositionMax) {
-      if (highlightedLineName) {
-        return (
-          <text
-            className="BarcodeTooltipText"
-            // transform={`translate(${tooltipPosition}, 15)rotate(-45)`}
-            transform={`translate(${tooltipPositionMax}, 15)`}
-            fontSize="14px"
-            textAnchor={tooltipTextAnchorMax}
-            fontFamily="Lato, Helvetica Neue, Arial, Helvetica, sans-serif"
-          >
-            {highlightedLineName}
-          </text>
-        );
-      }
+    if (
+      tooltipPositionMax &&
+      highlightedLineName &&
+      this.props.HighlightedProteins.length > 0
+    ) {
+      return (
+        <text
+          className="BarcodeTooltipText"
+          // transform={`translate(${tooltipPosition}, 15)rotate(-45)`}
+          transform={`translate(${tooltipPositionMax}, 15)`}
+          fontSize="14px"
+          textAnchor={tooltipTextAnchorMax}
+          fontFamily="Lato, Helvetica Neue, Arial, Helvetica, sans-serif"
+        >
+          {highlightedLineName}
+        </text>
+      );
     }
-
     return null;
   };
 

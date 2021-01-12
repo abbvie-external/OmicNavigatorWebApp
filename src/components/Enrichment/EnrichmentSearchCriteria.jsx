@@ -1238,15 +1238,27 @@ class EnrichmentSearchCriteria extends Component {
       MultisetRadio = (
         <React.Fragment>
           <Divider />
-          <Radio
-            toggle
-            label="Set Analysis"
-            checked={multisetFiltersVisibleEnrichment}
-            onChange={this.handleMultisetToggleEnrichment}
-            disabled={isDataStreamingEnrichmentsTable}
-            className={
-              isDataStreamingEnrichmentsTable ? 'CursorNotAllowed' : ''
+          <Popup
+            trigger={
+              <Radio
+                toggle
+                label="Set Analysis"
+                checked={multisetFiltersVisibleEnrichment}
+                onChange={this.handleMultisetToggleEnrichment}
+                disabled={isDataStreamingEnrichmentsTable}
+                className={
+                  isDataStreamingEnrichmentsTable ? 'CursorNotAllowed' : ''
+                }
+              />
             }
+            style={StudyPopupStyle}
+            className="CustomTooltip"
+            position="bottom"
+            inverted
+            basic
+            content="Apply column filter(s) across multiple test results"
+            mouseEnterDelay={1000}
+            mouseLeaveDelay={0}
           />
         </React.Fragment>
       );

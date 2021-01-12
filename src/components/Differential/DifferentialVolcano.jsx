@@ -175,7 +175,7 @@ class DifferentialVolcano extends Component {
         }
       }
       //Pushes "none" option into Volcano circle text dropdown
-      differentialAlphanumericFields.push('none');
+      differentialAlphanumericFields.unshift('none');
       let volcanoCircleLabelsVar = differentialAlphanumericFields.map(e => {
         return {
           key: e,
@@ -752,23 +752,12 @@ class DifferentialVolcano extends Component {
                             onChange={this.handleDropdownChange.bind(this)}
                           ></Form.Field>
                           <Popup
-                            trigger={
-                              // <Form.Field
-                              //   control={Checkbox}
-                              //   name="xTransformationCheckbox"
-                              //   checked={doXAxisTransformation}
-                              //   onClick={this.handleTransformationChange.bind(this)}
-                              //   disabled={allowXTransformation}
-                              // ></Form.Field>
-                              xAxisTransformBox
-                            }
+                            trigger={xAxisTransformBox}
                             style={TableValuePopupStyle}
-                            // className="TablePopupValue"
                             content="-log10 Transform, X Axis"
                             inverted
                             basic
                           />
-                          {/* <Divider vertical></Divider> */}
                           <Label
                             className="VolcanoAxisLabel"
                             id="VolcanoAxisLabelY"
@@ -786,66 +775,42 @@ class DifferentialVolcano extends Component {
                             options={axisLabels}
                             onChange={this.handleDropdownChange.bind(this)}
                           ></Form.Field>
-                          {/* <span title="-log10 Transform"> */}
                           <Popup
-                            trigger={
-                              // <Form.Field
-                              //   control={Checkbox}
-                              //   name="yTransformationCheckbox"
-                              //   checked={doYAxisTransformation}
-                              //   onClick={this.handleTransformationChange.bind(this)}
-                              //   disabled={allowYTransformation}
-                              // ></Form.Field>
-                              yAxisTransformBox
-                            }
+                            trigger={yAxisTransformBox}
                             style={TableValuePopupStyle}
-                            // className="TablePopupValue"
                             content="-log10 Transform, Y Axis"
                             inverted
                             basic
                           />
                           <Popup
                             trigger={
-                              <>
-                                <Label
-                                  className="VolcanoAxisLabel"
-                                  id="VolcanoCircleLabel"
-                                  size={dynamicSize}
-                                >
-                                  LABEL
-                                </Label>
-                                <Form.Field
-                                  control={Select}
-                                  name="volcanoCircleSelector"
-                                  id="volcanoCircleSelector"
-                                  // value={this.props.differentialFeatureIdKey}
-                                  value={volcanoCircleLabel}
-                                  options={volcanoCircleLabels}
-                                  onChange={this.handleDropdownChange.bind(
-                                    this,
-                                  )}
-                                  // onChange={this.handleCircleLabelFieldChange.bind(
-                                  //   this,
-                                  // )}
-                                ></Form.Field>
-                              </>
+                              <Label
+                                className="VolcanoAxisLabel"
+                                id="VolcanoCircleLabel"
+                                size={dynamicSize}
+                              >
+                                LABEL
+                              </Label>
                             }
                             style={TableValuePopupStyle}
-                            // className="TablePopupValue"
                             content="Label for Selected Features"
                             inverted
                             basic
+                            on={['hover', 'click']}
+                            position="left center"
+                            mouseEnterDelay={1000}
+                            mouseLeaveDelay={0}
                           />
-                          {/* <Popup
-                    trigger={
-                      labelBox
-                    }
-                    style={TableValuePopupStyle}
-                    // className="TablePopupValue"
-                    content="Toggle on/off circle text"
-                    inverted
-                    basic
-                  /> */}
+
+                          <Form.Field
+                            control={Select}
+                            name="volcanoCircleSelector"
+                            id="volcanoCircleSelector"
+                            // value={this.props.differentialFeatureIdKey}
+                            value={volcanoCircleLabel}
+                            options={volcanoCircleLabels}
+                            onChange={this.handleDropdownChange.bind(this)}
+                          ></Form.Field>
                         </Form.Group>
                       </Form>
                     </Fragment>
