@@ -433,7 +433,6 @@ class Enrichment extends Component {
 
   handleEnrichmentSearch = (searchResults, enrichmentAnnotation) => {
     const { multisetTestsFilteredOut } = this.state;
-    debugger;
     this.removeNetworkSVG();
     this.setState({ networkGraphReady: false });
 
@@ -798,7 +797,6 @@ class Enrichment extends Component {
     // })
     //   // can nd-json-stream - assumes json is NDJSON, a data format that is separated into individual JSON objects with a newline character (\n). The 'nd' stands for newline delimited JSON
     //   .then(response => {
-    //     debugger;
     //     return ndjsonStream(response.body); //ndjsonStream parses the response.body
     //   })
     //   .then(canNdJsonStream => {
@@ -835,7 +833,6 @@ class Enrichment extends Component {
   //         streamedResults.length === 100 ||
   //         streamedResults.length % 2500 === 0
   //       ) {
-  //         debugger;
   //         const streamedResultsCopy = streamedResults.slice();
   //         // this.setState(
   //         //   {
