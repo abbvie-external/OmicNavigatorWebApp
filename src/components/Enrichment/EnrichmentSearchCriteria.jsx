@@ -450,12 +450,6 @@ class EnrichmentSearchCriteria extends Component {
     //       false,
     //     );
     //   })
-    const obj = {
-      study: enrichmentStudy,
-      modelID: enrichmentModel,
-      annotationID: value,
-      type: pValueType,
-    };
     const cacheKey = `getEnrichmentsTable_${enrichmentStudy}_${enrichmentModel}_${value}`;
     if (cacheEnrichmentsTable[cacheKey]) {
       this.handleGetEnrichmentsTableData(
@@ -467,6 +461,12 @@ class EnrichmentSearchCriteria extends Component {
       );
       return;
     }
+    const obj = {
+      study: enrichmentStudy,
+      modelID: enrichmentModel,
+      annotationID: value,
+      type: pValueType,
+    };
     fetch(fetchUrlEnrichmentsTable, {
       method: 'POST',
       headers: {
@@ -625,12 +625,6 @@ class EnrichmentSearchCriteria extends Component {
       //       false,
       //     );
       //   })
-      const obj = {
-        study: enrichmentStudy,
-        modelID: enrichmentModel,
-        annotationID: value,
-        type: value,
-      };
       const cacheKey = `getEnrichmentsTable_${enrichmentStudy}_${enrichmentModel}_${value}`;
       if (cacheEnrichmentsTable[cacheKey]) {
         this.handleGetEnrichmentsTableData(
@@ -641,6 +635,12 @@ class EnrichmentSearchCriteria extends Component {
         );
         return;
       }
+      const obj = {
+        study: enrichmentStudy,
+        modelID: enrichmentModel,
+        annotationID: value,
+        type: value,
+      };
       fetch(fetchUrlEnrichmentsTable, {
         method: 'POST',
         headers: {
@@ -798,12 +798,6 @@ class EnrichmentSearchCriteria extends Component {
     //       false,
     //     );
     //   })
-    const obj = {
-      study: enrichmentStudy,
-      modelID: enrichmentModel,
-      annotationID: value,
-      type: pValueType,
-    };
     const cacheKey = `getEnrichmentsTable_${enrichmentStudy}_${enrichmentModel}_${value}`;
     if (cacheEnrichmentsTable[cacheKey]) {
       this.handleGetEnrichmentsTableData(
@@ -814,6 +808,12 @@ class EnrichmentSearchCriteria extends Component {
       );
       return;
     }
+    const obj = {
+      study: enrichmentStudy,
+      modelID: enrichmentModel,
+      annotationID: value,
+      type: pValueType,
+    };
     fetch(fetchUrlEnrichmentsTable, {
       method: 'POST',
       headers: {
