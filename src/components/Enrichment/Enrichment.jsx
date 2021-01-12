@@ -30,6 +30,7 @@ import QHGrid, { EZGrid } from '***REMOVED***';
 
 let cancelRequestEnrichmentGetPlot = () => {};
 let cancelRequestGetEnrichmentsNetwork = () => {};
+const getEnrichmentsNetwork = {};
 
 class Enrichment extends Component {
   storedEnrichmentActiveIndex =
@@ -415,7 +416,7 @@ class Enrichment extends Component {
     });
   };
 
-  handleEnrichmentSearch = searchResults => {
+  handleEnrichmentSearch = (searchResults, enrichmentAnnotation) => {
     const { multisetTestsFilteredOut } = this.state;
     this.removeNetworkSVG();
     this.setState({ networkGraphReady: false });
@@ -425,7 +426,7 @@ class Enrichment extends Component {
     //   this.handleColumnReorder(searchResults);
     // }
     let columns = [];
-    if (searchResults.enrichmentResults?.length > 0) {
+    if (searchResults?.length > 0) {
       columns = this.getConfigCols(searchResults);
     }
     this.setState({ enrichmentColumnsUnfiltered: columns });
@@ -434,10 +435,10 @@ class Enrichment extends Component {
         return !multisetTestsFilteredOut.includes(col.title);
       });
     }
-    this.getNetworkData(searchResults.enrichmentResults);
+    this.getNetworkData(searchResults, enrichmentAnnotation);
     this.setState({
       networkDataError: false,
-      enrichmentResults: searchResults.enrichmentResults,
+      enrichmentResults: searchResults,
       isSearching: false,
       isSearchingEnrichment: false,
       isEnrichmentTableLoading: false,
@@ -569,7 +570,7 @@ class Enrichment extends Component {
   };
 
   getConfigCols = annotationData => {
-    const enrResults = annotationData.enrichmentResults;
+    const enrResults = annotationData;
     const {
       enrichmentStudy,
       enrichmentModel,
@@ -717,31 +718,20 @@ class Enrichment extends Component {
     cancelRequestGetEnrichmentsNetwork();
   };
 
-  getNetworkData = enrichmentResults => {
+  getNetworkData = (enrichmentResults, annotation) => {
     const {
-      enrichmentModel,
-      enrichmentAnnotation,
-      // pValueType,
       enrichmentStudy,
+      enrichmentModel,
+      // enrichmentAnnotation,
+      // pValueType,
     } = this.props;
-    const {
-      networkData,
-      previousEnrichmentStudy,
-      previousEnrichmentModel,
-      previousEnrichmentAnnotation,
-      unfilteredNetworkData,
-    } = this.state;
-    if (
-      enrichmentStudy !== previousEnrichmentStudy ||
-      enrichmentModel !== previousEnrichmentModel ||
-      enrichmentAnnotation !== previousEnrichmentAnnotation ||
-      networkData.nodes.length === 0
-    ) {
-      this.setState({
-        previousEnrichmentStudy: enrichmentStudy,
-        previousEnrichmentModel: enrichmentModel,
-        previousEnrichmentAnnotation: enrichmentAnnotation,
-      });
+    const cacheKey = `getEnrichmentsNetwork_${enrichmentStudy}_${enrichmentModel}_${annotation}`;
+    if (getEnrichmentsNetwork[cacheKey] != null) {
+      this.handleEnrichmentNetworkData(
+        getEnrichmentsNetwork[cacheKey],
+        enrichmentResults,
+      );
+    } else {
       cancelRequestGetEnrichmentsNetwork();
       let cancelToken = new CancelToken(e => {
         cancelRequestGetEnrichmentsNetwork = e;
@@ -750,11 +740,12 @@ class Enrichment extends Component {
         .getEnrichmentsNetwork(
           enrichmentStudy,
           enrichmentModel,
-          enrichmentAnnotation,
+          annotation,
           this.handleGetEnrichmentNetworkError,
           cancelToken,
         )
         .then(getEnrichmentNetworkResponseData => {
+          getEnrichmentsNetwork[cacheKey] = getEnrichmentNetworkResponseData;
           if (
             getEnrichmentNetworkResponseData.nodes?.length > 0 ||
             getEnrichmentNetworkResponseData.links?.length > 0 ||
@@ -776,11 +767,6 @@ class Enrichment extends Component {
         .catch(error => {
           console.error('Error during getEnrichmentNetwork', error);
         });
-    } else {
-      this.handleEnrichmentNetworkData(
-        unfilteredNetworkData,
-        enrichmentResults,
-      );
     }
   };
 

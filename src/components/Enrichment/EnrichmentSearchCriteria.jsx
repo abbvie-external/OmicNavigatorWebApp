@@ -460,6 +460,7 @@ class EnrichmentSearchCriteria extends Component {
     if (cacheEnrichmentsTable[cacheKey]) {
       this.handleGetEnrichmentsTableData(
         cacheEnrichmentsTable[cacheKey],
+        value,
         true,
         true,
         false,
@@ -516,6 +517,7 @@ class EnrichmentSearchCriteria extends Component {
         ) {
           this.handleGetEnrichmentsTableData(
             streamedResults.slice(),
+            annotation,
             handleUSettings,
             handleMaxElements,
             handleColumns,
@@ -528,6 +530,7 @@ class EnrichmentSearchCriteria extends Component {
       this.props.onHandleIsDataStreamingEnrichmentsTable(false);
       this.handleGetEnrichmentsTableData(
         streamedResultsCopy,
+        annotation,
         handleUSettings,
         handleMaxElements,
         handleColumns,
@@ -558,6 +561,7 @@ class EnrichmentSearchCriteria extends Component {
 
   handleGetEnrichmentsTableData = (
     data,
+    annotation,
     handleUSettings,
     handleMaxElements,
     handleColumns,
@@ -583,9 +587,7 @@ class EnrichmentSearchCriteria extends Component {
         enrichmentResults: this.annotationdata,
       });
     }
-    this.props.onEnrichmentSearch({
-      enrichmentResults: data,
-    });
+    this.props.onEnrichmentSearch(data, annotation);
   };
 
   handlePValueTypeChange = (evt, { value }) => {
@@ -706,9 +708,7 @@ class EnrichmentSearchCriteria extends Component {
               maxElements: this.state.uSettings.maxElements,
             },
           });
-          onEnrichmentSearch({
-            enrichmentResults: multisetResults,
-          });
+          onEnrichmentSearch(multisetResults, enrichmentAnnotation);
         })
         .catch(error => {
           console.error('Error during getEnrichmentsIntersection', error);
@@ -979,9 +979,7 @@ class EnrichmentSearchCriteria extends Component {
           },
           // activateMultisetFilters: true,
         });
-        onEnrichmentSearch({
-          enrichmentResults: multisetResults,
-        });
+        onEnrichmentSearch(multisetResults, enrichmentAnnotation);
       })
       .catch(error => {
         console.error('Error during getEnrichmentsIntersection', error);
