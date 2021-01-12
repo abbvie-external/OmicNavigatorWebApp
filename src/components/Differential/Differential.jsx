@@ -621,7 +621,7 @@ class Differential extends Component {
     this.getTableHelpers(alphanumericTrigger);
     const self = this;
     const differentialAlphanumericColumnsMapped = differentialAlphanumericFields.map(
-      f => {
+      (f, { index }) => {
         const noPlots = differentialPlotTypes.length === 0;
 
         if (noPlots) {
@@ -647,8 +647,8 @@ class Differential extends Component {
             );
             const featureIdClass =
               noPlots && !featureidSpecificMetaFeaturesExist
-                ? 'TableCellBold'
-                : 'TableCellLink';
+                ? 'TableCellBold NoSelect'
+                : 'TableCellLink NoSelect';
             const featureIdClick =
               noPlots && !featureidSpecificMetaFeaturesExist
                 ? null
@@ -676,7 +676,7 @@ class Differential extends Component {
             }
             if (f === alphanumericTrigger) {
               return (
-                <div className="">
+                <div className="NoSelect" key={value}>
                   <Popup
                     trigger={
                       <span className={featureIdClass} onClick={featureIdClick}>
@@ -695,7 +695,7 @@ class Differential extends Component {
               );
             } else {
               return (
-                <div className="">
+                <div className="NoSelect" key={value}>
                   <Popup
                     trigger={<span className="">{splitValue(value)}</span>}
                     style={TableValuePopupStyle}
@@ -729,10 +729,10 @@ class Differential extends Component {
           exportTemplate: value => (value ? `${value}` : 'N/A'),
           template: (value, item, addParams) => {
             return (
-              <div className="">
+              <div className="NoSelect">
                 <Popup
                   trigger={
-                    <span className="TableValue">
+                    <span className="TableValue NoSelect">
                       {formatNumberForDisplay(value)}
                     </span>
                   }

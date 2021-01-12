@@ -213,7 +213,7 @@ class FilteredDifferentialTable extends Component {
             }
             if (f === alphanumericTrigger) {
               return (
-                <div className="">
+                <div className="NoSelect">
                   <Popup
                     trigger={<span className="">{splitValue(value)}</span>}
                     style={TableValuePopupStyle}
@@ -227,9 +227,11 @@ class FilteredDifferentialTable extends Component {
               );
             } else {
               return (
-                <div className="">
+                <div className="NoSelect">
                   <Popup
-                    trigger={<span className="">{splitValue(value)}</span>}
+                    trigger={
+                      <span className="NoSelect">{splitValue(value)}</span>
+                    }
                     style={TableValuePopupStyle}
                     className="TablePopupValue"
                     content={value}
@@ -257,7 +259,7 @@ class FilteredDifferentialTable extends Component {
               <p>
                 <Popup
                   trigger={
-                    <span className="TableValue">
+                    <span className="TableValue NoSelect">
                       {formatNumberForDisplay(value)}
                     </span>
                   }
