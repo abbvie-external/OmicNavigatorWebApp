@@ -10,6 +10,7 @@ import {
   Transition,
   Button,
 } from 'semantic-ui-react';
+import ndjsonStream from 'can-ndjson-stream';
 import { CancelToken } from 'axios';
 import DOMPurify from 'dompurify';
 import '../Shared/SearchCriteria.scss';
@@ -17,10 +18,23 @@ import { omicNavigatorService } from '../../services/omicNavigator.service';
 import DifferentialMultisetFilters from './DifferentialMultisetFilters';
 
 let cancelRequestGetReportLinkDifferential = () => {};
-let cancelRequestPSCGetResultsTable = () => {};
 let cancelRequestMultisetInferenceData = () => {};
 let cancelRequestInferenceMultisetPlot = () => {};
-
+const cacheResultsTable = {};
+const baseUrl =
+  process.env.NODE_ENV === 'development'
+    ? '***REMOVED***'
+    : window.location.origin;
+const fetchUrlResultsTable = `${baseUrl}/ocpu/library/OmicNavigator/R/getResultsTable/ndjson`;
+async function* streamAsyncIterable(reader) {
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) {
+      return;
+    }
+    yield value;
+  }
+}
 class DifferentialSearchCriteria extends Component {
   state = {
     differentialStudies: [],
@@ -195,18 +209,25 @@ class DifferentialSearchCriteria extends Component {
         this.getReportLink(differentialStudy, differentialModel);
         if (differentialTest !== '') {
           onSearchTransitionDifferential(true);
-          omicNavigatorService
-            .getResultsTable(
-              differentialStudy,
-              differentialModel,
-              differentialTest,
-              onSearchTransitionDifferential,
-            )
-            .then(getResultsTableData => {
-              this.handleGetResultsTableData(
-                getResultsTableData,
-                true,
-                true,
+          const obj = {
+            study: differentialStudy,
+            modelID: differentialModel,
+            testID: differentialTest,
+          };
+          fetch(fetchUrlResultsTable, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(obj), // body data type must match "Content-Type" header
+          })
+            // can nd-json-stream - assumes json is NDJSON, a data format that is separated into individual JSON objects with a newline character (\n). The 'nd' stands for newline delimited JSON
+            .then(response => {
+              return ndjsonStream(response.body); //ndjsonStream parses the response.body
+            })
+            .then(canNdJsonStream => {
+              this.handleGetResultsTableStream(
+                canNdJsonStream,
                 differentialTest,
               );
             })
@@ -354,7 +375,7 @@ class DifferentialSearchCriteria extends Component {
       onSearchCriteriaChangeDifferential,
       onSearchTransitionDifferential,
     } = this.props;
-    // onSearchTransitionDifferential(true);
+    onSearchTransitionDifferential(true);
     onMultisetQueriedDifferential(false);
     const differentialTestMeta = this.props.differentialTestsMetadata.find(
       test => test.testID === value,
@@ -376,24 +397,92 @@ class DifferentialSearchCriteria extends Component {
       },
       true,
     );
-    cancelRequestPSCGetResultsTable();
-    let cancelToken = new CancelToken(e => {
-      cancelRequestPSCGetResultsTable = e;
-    });
-    omicNavigatorService
-      .getResultsTable(
-        differentialStudy,
-        differentialModel,
+    const obj = {
+      study: differentialStudy,
+      modelID: differentialModel,
+      testID: value,
+    };
+    const cacheKey = `getResultsTable_${differentialStudy}_${differentialModel}_${value}`;
+    if (cacheResultsTable[cacheKey]) {
+      this.handleGetResultsTableData(
+        cacheResultsTable[cacheKey],
+        true,
+        true,
         value,
-        onSearchTransitionDifferential,
-        cancelToken,
-      )
-      .then(getResultsTableData => {
-        this.handleGetResultsTableData(getResultsTableData, true, true, value);
+      );
+      return;
+    }
+    fetch(fetchUrlResultsTable, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(obj), // body data type must match "Content-Type" header
+    })
+      // can nd-json-stream - assumes json is NDJSON, a data format that is separated into individual JSON objects with a newline character (\n). The 'nd' stands for newline delimited JSON
+      .then(response => {
+        return ndjsonStream(response.body); //ndjsonStream parses the response.body
+      })
+      .then(canNdJsonStream => {
+        this.handleGetResultsTableStream(canNdJsonStream, value);
       })
       .catch(error => {
         console.error('Error during getResultsTable', error);
       });
+  };
+
+  /**
+   * @param stream {ReadableStream<any>}
+   */
+  handleGetResultsTableStream = async (stream, test) => {
+    this.reader?.cancel();
+    this.props.onHandleIsDataStreamingResultsTable(true);
+    const { differentialStudy, differentialModel } = this.props;
+    const cacheKey = `getResultsTable_${differentialStudy}_${differentialModel}_${test}`;
+    let streamedResults = [];
+    try {
+      this.reader = stream.getReader();
+      for await (let value of streamAsyncIterable(this.reader)) {
+        streamedResults.push(value);
+        if (
+          streamedResults.length === 100 ||
+          streamedResults.length % 25000 === 0
+        ) {
+          this.handleGetResultsTableData(
+            streamedResults.slice(),
+            true,
+            true,
+            test,
+          );
+        }
+      }
+      // Stream finished at this point
+      const streamedResultsCopy = streamedResults.slice();
+      cacheResultsTable[cacheKey] = streamedResultsCopy;
+      this.props.onHandleIsDataStreamingResultsTable(false);
+      this.handleGetResultsTableData(streamedResultsCopy, true, true, test);
+    } catch (error) {
+      console.error(error);
+      // Ignore?
+    }
+    // while(!reader.){
+    // }
+    // this.reader.read().then(
+    //   (read = result => {
+    //     if (result.done) {
+    //       streamedResults.push(result.value);
+    //       if (streamedResults.length > 0) {
+    //         this.handleGetResultsTableData(streamedResults, true, true, value);
+    //         return;
+    //       }
+    //     }
+    //     streamedResults.push(result.value);
+    //     if (streamedResults.length === 100) {
+    //       this.handleGetResultsTableData(streamedResults, true, true, value);
+    //     }
+    //     this.reader.read().then(read);
+    //   }),
+    // );
   };
 
   handleGetResultsTableData = (
@@ -476,6 +565,7 @@ class DifferentialSearchCriteria extends Component {
       );
     } else {
       // on toggle close
+      this.props.onSearchTransitionDifferentialAlt(true);
       // this.props.onMultisetQueriedDifferential(false);
       this.setState(
         {
@@ -536,25 +626,34 @@ class DifferentialSearchCriteria extends Component {
       },
       true,
     );
-    cancelRequestPSCGetResultsTable();
-    let cancelToken = new CancelToken(e => {
-      cancelRequestPSCGetResultsTable = e;
-    });
-    omicNavigatorService
-      .getResultsTable(
-        differentialStudy,
-        differentialModel,
+    const obj = {
+      study: differentialStudy,
+      modelID: differentialModel,
+      testID: value,
+    };
+    const cacheKey = `getResultsTable_${differentialStudy}_${differentialModel}_${value}`;
+    if (cacheResultsTable[cacheKey]) {
+      this.handleGetResultsTableData(
+        cacheResultsTable[cacheKey],
+        true,
+        true,
         value,
-        this.handleMultisetPCloseError,
-        cancelToken,
-      )
-      .then(getResultsTableData => {
-        this.handleGetResultsTableData(
-          getResultsTableData,
-          false,
-          false,
-          value,
-        );
+      );
+      return;
+    }
+    fetch(fetchUrlResultsTable, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(obj), // body data type must match "Content-Type" header
+    })
+      // can nd-json-stream - assumes json is NDJSON, a data format that is separated into individual JSON objects with a newline character (\n). The 'nd' stands for newline delimited JSON
+      .then(response => {
+        return ndjsonStream(response.body); //ndjsonStream parses the response.body
+      })
+      .then(canNdJsonStream => {
+        this.handleGetResultsTableStream(canNdJsonStream, value);
       })
       .catch(error => {
         console.error('Error during getResultsTable', error);
@@ -836,6 +935,7 @@ class DifferentialSearchCriteria extends Component {
       multisetPlotAvailableDifferential,
       plotButtonActiveDifferential,
       onHandlePlotAnimationDifferential,
+      isDataStreamingResultsTable,
     } = this.props;
 
     const dynamicSize = this.getDynamicSize();
@@ -973,6 +1073,8 @@ class DifferentialSearchCriteria extends Component {
             label="Set Analysis"
             checked={multisetFiltersVisibleDifferential}
             onChange={this.handleMultisetToggleDifferential}
+            disabled={isDataStreamingResultsTable}
+            className={isDataStreamingResultsTable ? 'CursorNotAllowed' : ''}
           />
         </React.Fragment>
       );

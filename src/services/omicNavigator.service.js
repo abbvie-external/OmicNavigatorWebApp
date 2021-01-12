@@ -184,38 +184,6 @@ class OmicNavigatorService {
     }
   }
 
-  async getEnrichmentsTable(
-    study,
-    modelID,
-    annotationID,
-    type,
-    errorCb,
-    cancelToken,
-  ) {
-    const cacheKey = `getEnrichmentsTable_${study}_${modelID}_${annotationID}_${type}`;
-    if (this[cacheKey] != null) {
-      return this[cacheKey];
-    } else {
-      const obj = {
-        study,
-        modelID,
-        annotationID,
-        type,
-      };
-      const promise = this.axiosPost(
-        'getEnrichmentsTable',
-        obj,
-        true,
-        errorCb,
-        cancelToken,
-        25000,
-      );
-      const dataFromPromise = await promise;
-      this[cacheKey] = dataFromPromise;
-      return dataFromPromise;
-    }
-  }
-
   async getMetaFeatures(study, model) {
     const cacheKey = `getMetaFeatures_${study}_${model}`;
     if (this[cacheKey] != null) {
@@ -478,26 +446,20 @@ class OmicNavigatorService {
   }
 
   async getEnrichmentsNetwork(study, model, annotation, errorCb, cancelToken) {
-    const cacheKey = `getEnrichmentsNetwork_${study}_${model}_${annotation}`;
-    if (this[cacheKey] != null) {
-      return this[cacheKey];
-    } else {
-      const promise = this.axiosPost(
-        'getEnrichmentsNetwork',
-        {
-          study,
-          model,
-          annotation,
-        },
-        true,
-        errorCb,
-        cancelToken,
-        45000,
-      );
-      const dataFromPromise = await promise;
-      this[cacheKey] = dataFromPromise;
-      return dataFromPromise;
-    }
+    const promise = this.axiosPost(
+      'getEnrichmentsNetwork',
+      {
+        study,
+        model,
+        annotation,
+      },
+      true,
+      errorCb,
+      cancelToken,
+      45000,
+    );
+    const dataFromPromise = await promise;
+    return dataFromPromise;
   }
 
   async getNodeFeatures(study, annotationID, termID, errorCb, cancelToken) {
