@@ -9,6 +9,7 @@ import {
   Transition,
   Button,
 } from 'semantic-ui-react';
+import ndjsonStream from 'can-ndjson-stream';
 import { CancelToken } from 'axios';
 import DOMPurify from 'dompurify';
 import '../Shared/SearchCriteria.scss';
@@ -16,9 +17,24 @@ import { omicNavigatorService } from '../../services/omicNavigator.service';
 import EnrichmentMultisetFilters from './EnrichmentMultisetFilters';
 
 let cancelRequestGetReportLinkEnrichment = () => {};
-let cancelGetEnrichmentsTable = () => {};
+// let cancelGetEnrichmentsTable = () => {};
 let cancelRequestMultisetEnrichmentData = () => {};
 let cancelRequestEnrichmentMultisetPlot = () => {};
+const cacheEnrichmentsTable = {};
+const baseUrl =
+  process.env.NODE_ENV === 'development'
+    ? '***REMOVED***'
+    : window.location.origin;
+const fetchUrlEnrichmentsTable = `${baseUrl}/ocpu/library/OmicNavigator/R/getEnrichmentsTable/ndjson`;
+async function* streamAsyncIterable(reader) {
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) {
+      return;
+    }
+    yield value;
+  }
+}
 
 class EnrichmentSearchCriteria extends Component {
   state = {
@@ -200,22 +216,48 @@ class EnrichmentSearchCriteria extends Component {
         if (enrichmentAnnotation !== '') {
           onGetEnrichmentsLinkouts(enrichmentStudy, enrichmentAnnotation);
           onSearchTransitionEnrichment(true);
-          omicNavigatorService
-            .getEnrichmentsTable(
-              enrichmentStudy,
-              enrichmentModel,
-              enrichmentAnnotation,
-              pValueType,
-              onSearchTransitionEnrichment,
-            )
-            .then(getEnrichmentsTableData => {
-              this.handleGetEnrichmentsTableData(
-                getEnrichmentsTableData,
+          const obj = {
+            study: enrichmentStudy,
+            modelID: enrichmentModel,
+            annotationID: enrichmentAnnotation,
+            type: pValueType,
+          };
+          fetch(fetchUrlEnrichmentsTable, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(obj), // body data type must match "Content-Type" header
+          })
+            // can nd-json-stream - assumes json is NDJSON, a data format that is separated into individual JSON objects with a newline character (\n). The 'nd' stands for newline delimited JSON
+            .then(response => {
+              return ndjsonStream(response.body); //ndjsonStream parses the response.body
+            })
+            .then(canNdJsonStream => {
+              this.handleGetEnrichmentsTableStream(
+                canNdJsonStream,
+                enrichmentAnnotation,
                 false,
                 true,
                 false,
               );
             })
+            // omicNavigatorService
+            //   .getEnrichmentsTable(
+            //     enrichmentStudy,
+            //     enrichmentModel,
+            //     enrichmentAnnotation,
+            //     pValueType,
+            //     onSearchTransitionEnrichment,
+            //   )
+            //   .then(getEnrichmentsTableData => {
+            //     this.handleGetEnrichmentsTableData(
+            //       getEnrichmentsTableData,
+            //       false,
+            //       true,
+            //       false,
+            //     );
+            //   })
             .catch(error => {
               console.error('Error during getEnrichmentsTable', error);
             });
@@ -386,25 +428,62 @@ class EnrichmentSearchCriteria extends Component {
       },
       true,
     );
-    cancelGetEnrichmentsTable();
-    let cancelToken = new CancelToken(e => {
-      cancelGetEnrichmentsTable = e;
-    });
-    omicNavigatorService
-      .getEnrichmentsTable(
-        enrichmentStudy,
-        enrichmentModel,
+    // cancelGetEnrichmentsTable();
+    // let cancelToken = new CancelToken(e => {
+    //   cancelGetEnrichmentsTable = e;
+    // });
+    // omicNavigatorService
+    //   .getEnrichmentsTable(
+    //     enrichmentStudy,
+    //     enrichmentModel,
+    //     value,
+    //     pValueType,
+    //     onSearchTransitionEnrichment,
+    //     cancelToken,
+    //   )
+    //   .then(getEnrichmentsTableData => {
+    //     this.handleGetEnrichmentsTableData(
+    //       getEnrichmentsTableData,
+    //       true,
+    //       true,
+    //       // PAUL - this needs to be handled true for column reordering, once we can freeze the first column (featureID) from being reordered
+    //       false,
+    //     );
+    //   })
+    const cacheKey = `getEnrichmentsTable_${enrichmentStudy}_${enrichmentModel}_${value}`;
+    if (cacheEnrichmentsTable[cacheKey]) {
+      this.handleGetEnrichmentsTableData(
+        cacheEnrichmentsTable[cacheKey],
         value,
-        pValueType,
-        onSearchTransitionEnrichment,
-        cancelToken,
-      )
-      .then(getEnrichmentsTableData => {
-        this.handleGetEnrichmentsTableData(
-          getEnrichmentsTableData,
+        true,
+        true,
+        false,
+      );
+      return;
+    }
+    const obj = {
+      study: enrichmentStudy,
+      modelID: enrichmentModel,
+      annotationID: value,
+      type: pValueType,
+    };
+    fetch(fetchUrlEnrichmentsTable, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(obj), // body data type must match "Content-Type" header
+    })
+      // can nd-json-stream - assumes json is NDJSON, a data format that is separated into individual JSON objects with a newline character (\n). The 'nd' stands for newline delimited JSON
+      .then(response => {
+        return ndjsonStream(response.body); //ndjsonStream parses the response.body
+      })
+      .then(canNdJsonStream => {
+        this.handleGetEnrichmentsTableStream(
+          canNdJsonStream,
+          value,
           true,
           true,
-          // PAUL - this needs to be handled true for column reordering, once we can freeze the first column (featureID) from being reordered
           false,
         );
       })
@@ -413,8 +492,76 @@ class EnrichmentSearchCriteria extends Component {
       });
   };
 
+  /**
+   * @param stream {ReadableStream<any>}
+   */
+  handleGetEnrichmentsTableStream = async (
+    stream,
+    annotation,
+    handleUSettings,
+    handleMaxElements,
+    handleColumns,
+  ) => {
+    this.reader?.cancel();
+    this.props.onHandleIsDataStreamingEnrichmentsTable(true);
+    const { enrichmentStudy, enrichmentModel } = this.props;
+    const cacheKey = `getEnrichmentsTable_${enrichmentStudy}_${enrichmentModel}_${annotation}`;
+    let streamedResults = [];
+    try {
+      this.reader = stream.getReader();
+      for await (let value of streamAsyncIterable(this.reader)) {
+        streamedResults.push(value);
+        if (
+          streamedResults.length === 100 ||
+          streamedResults.length % 25000 === 0
+        ) {
+          this.handleGetEnrichmentsTableData(
+            streamedResults.slice(),
+            annotation,
+            handleUSettings,
+            handleMaxElements,
+            handleColumns,
+          );
+        }
+      }
+      // Stream finished at this point
+      const streamedResultsCopy = streamedResults.slice();
+      cacheEnrichmentsTable[cacheKey] = streamedResultsCopy;
+      this.props.onHandleIsDataStreamingEnrichmentsTable(false);
+      this.handleGetEnrichmentsTableData(
+        streamedResultsCopy,
+        annotation,
+        handleUSettings,
+        handleMaxElements,
+        handleColumns,
+      );
+    } catch (error) {
+      console.error(error);
+      // Ignore?
+    }
+    // while(!reader.){
+    // }
+    // this.reader.read().then(
+    //   (read = result => {
+    //     if (result.done) {
+    //       streamedResults.push(result.value);
+    //       if (streamedResults.length > 0) {
+    //         this.handleGetEnrichmentsTableData(streamedResults, true, true, value);
+    //         return;
+    //       }
+    //     }
+    //     streamedResults.push(result.value);
+    //     if (streamedResults.length === 100) {
+    //       this.handleGetEnrichmentsTableData(streamedResults, true, true, value);
+    //     }
+    //     this.reader.read().then(read);
+    //   }),
+    // );
+  };
+
   handleGetEnrichmentsTableData = (
     data,
+    annotation,
     handleUSettings,
     handleMaxElements,
     handleColumns,
@@ -440,9 +587,7 @@ class EnrichmentSearchCriteria extends Component {
         enrichmentResults: this.annotationdata,
       });
     }
-    this.props.onEnrichmentSearch({
-      enrichmentResults: data,
-    });
+    this.props.onEnrichmentSearch(data, annotation);
   };
 
   handlePValueTypeChange = (evt, { value }) => {
@@ -459,28 +604,65 @@ class EnrichmentSearchCriteria extends Component {
     onHandleEnrichmentTableLoading(true);
     onPValueTypeChange(value);
     if (!multisetFiltersVisibleEnrichment) {
-      cancelGetEnrichmentsTable();
-      let cancelToken = new CancelToken(e => {
-        cancelGetEnrichmentsTable = e;
-      });
-      omicNavigatorService
-        .getEnrichmentsTable(
-          enrichmentStudy,
-          enrichmentModel,
-          enrichmentAnnotation,
+      // cancelGetEnrichmentsTable();
+      // let cancelToken = new CancelToken(e => {
+      //   cancelGetEnrichmentsTable = e;
+      // });
+      // omicNavigatorService
+      //   .getEnrichmentsTable(
+      //     enrichmentStudy,
+      //     enrichmentModel,
+      //     enrichmentAnnotation,
+      //     value,
+      //     onSearchTransitionEnrichment,
+      //     cancelToken,
+      //   )
+      //   .then(getEnrichmentsTableData => {
+      //     this.handleGetEnrichmentsTableData(
+      //       getEnrichmentsTableData,
+      //       false,
+      //       true,
+      //       false,
+      //     );
+      //   })
+      const cacheKey = `getEnrichmentsTable_${enrichmentStudy}_${enrichmentModel}_${value}`;
+      if (cacheEnrichmentsTable[cacheKey]) {
+        this.handleGetEnrichmentsTableData(
+          cacheEnrichmentsTable[cacheKey],
+          true,
+          true,
           value,
-          onSearchTransitionEnrichment,
-          cancelToken,
-        )
-        .then(getEnrichmentsTableData => {
-          this.handleGetEnrichmentsTableData(
-            getEnrichmentsTableData,
+        );
+        return;
+      }
+      const obj = {
+        study: enrichmentStudy,
+        modelID: enrichmentModel,
+        annotationID: value,
+        type: value,
+      };
+      fetch(fetchUrlEnrichmentsTable, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(obj), // body data type must match "Content-Type" header
+      })
+        // can nd-json-stream - assumes json is NDJSON, a data format that is separated into individual JSON objects with a newline character (\n). The 'nd' stands for newline delimited JSON
+        .then(response => {
+          return ndjsonStream(response.body); //ndjsonStream parses the response.body
+        })
+        .then(canNdJsonStream => {
+          this.handleGetEnrichmentsTableStream(
+            canNdJsonStream,
+            value,
             false,
             true,
             false,
           );
         })
         .catch(error => {
+          onSearchTransitionEnrichment(false);
           console.error('Error during getEnrichmentsTable', error);
         });
     } else {
@@ -526,9 +708,7 @@ class EnrichmentSearchCriteria extends Component {
               maxElements: this.state.uSettings.maxElements,
             },
           });
-          onEnrichmentSearch({
-            enrichmentResults: multisetResults,
-          });
+          onEnrichmentSearch(multisetResults, enrichmentAnnotation);
         })
         .catch(error => {
           console.error('Error during getEnrichmentsIntersection', error);
@@ -597,22 +777,58 @@ class EnrichmentSearchCriteria extends Component {
       true,
     );
     // onSearchTransitionEnrichment(true);
-    cancelGetEnrichmentsTable();
-    let cancelToken = new CancelToken(e => {
-      cancelGetEnrichmentsTable = e;
-    });
-    omicNavigatorService
-      .getEnrichmentsTable(
-        enrichmentStudy,
-        enrichmentModel,
+    // cancelGetEnrichmentsTable();
+    // let cancelToken = new CancelToken(e => {
+    //   cancelGetEnrichmentsTable = e;
+    // });
+    // omicNavigatorService
+    //   .getEnrichmentsTable(
+    //     enrichmentStudy,
+    //     enrichmentModel,
+    //     value,
+    //     pValueType,
+    //     this.handleMultisetECloseError,
+    //     cancelToken,
+    //   )
+    //   .then(getEnrichmentsTableData => {
+    //     this.handleGetEnrichmentsTableData(
+    //       getEnrichmentsTableData,
+    //       false,
+    //       false,
+    //       false,
+    //     );
+    //   })
+    const cacheKey = `getEnrichmentsTable_${enrichmentStudy}_${enrichmentModel}_${value}`;
+    if (cacheEnrichmentsTable[cacheKey]) {
+      this.handleGetEnrichmentsTableData(
+        cacheEnrichmentsTable[cacheKey],
+        true,
+        true,
         value,
-        pValueType,
-        this.handleMultisetECloseError,
-        cancelToken,
-      )
-      .then(getEnrichmentsTableData => {
-        this.handleGetEnrichmentsTableData(
-          getEnrichmentsTableData,
+      );
+      return;
+    }
+    const obj = {
+      study: enrichmentStudy,
+      modelID: enrichmentModel,
+      annotationID: value,
+      type: pValueType,
+    };
+    fetch(fetchUrlEnrichmentsTable, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(obj), // body data type must match "Content-Type" header
+    })
+      // can nd-json-stream - assumes json is NDJSON, a data format that is separated into individual JSON objects with a newline character (\n). The 'nd' stands for newline delimited JSON
+      .then(response => {
+        return ndjsonStream(response.body); //ndjsonStream parses the response.body
+      })
+      .then(canNdJsonStream => {
+        this.handleGetEnrichmentsTableStream(
+          canNdJsonStream,
+          value,
           false,
           false,
           false,
@@ -666,7 +882,6 @@ class EnrichmentSearchCriteria extends Component {
   };
 
   handleFilterOutChange = (test, isMultiset) => {
-    debugger;
     const {
       mustEnrichment,
       notEnrichment,
@@ -764,9 +979,7 @@ class EnrichmentSearchCriteria extends Component {
           },
           // activateMultisetFilters: true,
         });
-        onEnrichmentSearch({
-          enrichmentResults: multisetResults,
-        });
+        onEnrichmentSearch(multisetResults, enrichmentAnnotation);
       })
       .catch(error => {
         console.error('Error during getEnrichmentsIntersection', error);
@@ -895,6 +1108,7 @@ class EnrichmentSearchCriteria extends Component {
       multisetPlotAvailableEnrichment,
       plotButtonActiveEnrichment,
       isTestDataLoaded,
+      isDataStreamingEnrichmentsTable,
     } = this.props;
 
     const StudyPopupStyle = {
@@ -1029,6 +1243,10 @@ class EnrichmentSearchCriteria extends Component {
             label="Set Analysis"
             checked={multisetFiltersVisibleEnrichment}
             onChange={this.handleMultisetToggleEnrichment}
+            disabled={isDataStreamingEnrichmentsTable}
+            className={
+              isDataStreamingEnrichmentsTable ? 'CursorNotAllowed' : ''
+            }
           />
         </React.Fragment>
       );

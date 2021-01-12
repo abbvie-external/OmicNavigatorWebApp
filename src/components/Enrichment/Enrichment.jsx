@@ -3,6 +3,7 @@ import _ from 'lodash';
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { Grid, Menu, Popup, Sidebar, Tab, Message } from 'semantic-ui-react';
+// import ndjsonStream from 'can-ndjson-stream';
 import { CancelToken } from 'axios';
 import networkIcon from '../../resources/networkIcon.png';
 import networkIconSelected from '../../resources/networkIconSelected.png';
@@ -30,6 +31,21 @@ import QHGrid, { EZGrid } from '***REMOVED***';
 
 let cancelRequestEnrichmentGetPlot = () => {};
 let cancelRequestGetEnrichmentsNetwork = () => {};
+const cacheGetEnrichmentsNetwork = {};
+const baseUrl =
+  process.env.NODE_ENV === 'development'
+    ? '***REMOVED***'
+    : window.location.origin;
+const fetchUrlEnrichmentsNetwork = `${baseUrl}/ocpu/library/OmicNavigator/R/getEnrichmentsNetwork/ndjson`;
+async function* streamAsyncIterable(reader) {
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) {
+      return;
+    }
+    yield value;
+  }
+}
 
 class Enrichment extends Component {
   storedEnrichmentActiveIndex =
@@ -184,6 +200,7 @@ class Enrichment extends Component {
     enrichmentColumnsUnfiltered: [],
     itemsPerPageEnrichmentTable:
       parseInt(localStorage.getItem('itemsPerPageEnrichmentTable'), 10) || 45,
+    isDataStreamingEnrichmentsTable: false,
   };
   EnrichmentViewContainerRef = React.createRef();
   EnrichmentGridRef = React.createRef();
@@ -414,7 +431,7 @@ class Enrichment extends Component {
     });
   };
 
-  handleEnrichmentSearch = searchResults => {
+  handleEnrichmentSearch = (searchResults, enrichmentAnnotation) => {
     const { multisetTestsFilteredOut } = this.state;
     this.removeNetworkSVG();
     this.setState({ networkGraphReady: false });
@@ -424,7 +441,7 @@ class Enrichment extends Component {
     //   this.handleColumnReorder(searchResults);
     // }
     let columns = [];
-    if (searchResults.enrichmentResults?.length > 0) {
+    if (searchResults?.length > 0) {
       columns = this.getConfigCols(searchResults);
     }
     this.setState({ enrichmentColumnsUnfiltered: columns });
@@ -433,11 +450,10 @@ class Enrichment extends Component {
         return !multisetTestsFilteredOut.includes(col.title);
       });
     }
-    this.getNetworkData(searchResults.enrichmentResults);
+    this.getNetworkData(searchResults, enrichmentAnnotation);
     this.setState({
       networkDataError: false,
-      enrichmentResults: searchResults.enrichmentResults,
-      isSearching: false,
+      enrichmentResults: searchResults,
       isSearchingEnrichment: false,
       isEnrichmentTableLoading: false,
       isValidSearchEnrichment: true,
@@ -525,6 +541,12 @@ class Enrichment extends Component {
       });
   };
 
+  handleIsDataStreamingEnrichmentsTable = bool => {
+    this.setState({
+      isDataStreamingEnrichmentsTable: bool,
+    });
+  };
+
   disablePlotEnrichment = () => {
     this.setState({
       multisetPlotAvailableEnrichment: false,
@@ -562,7 +584,7 @@ class Enrichment extends Component {
   };
 
   getConfigCols = annotationData => {
-    const enrResults = annotationData.enrichmentResults;
+    const enrResults = annotationData;
     const {
       enrichmentStudy,
       enrichmentModel,
@@ -710,31 +732,20 @@ class Enrichment extends Component {
     cancelRequestGetEnrichmentsNetwork();
   };
 
-  getNetworkData = enrichmentResults => {
+  getNetworkData = (enrichmentResults, annotation) => {
     const {
-      enrichmentModel,
-      enrichmentAnnotation,
-      // pValueType,
       enrichmentStudy,
+      enrichmentModel,
+      // enrichmentAnnotation,
+      // pValueType,
     } = this.props;
-    const {
-      networkData,
-      previousEnrichmentStudy,
-      previousEnrichmentModel,
-      previousEnrichmentAnnotation,
-      unfilteredNetworkData,
-    } = this.state;
-    if (
-      enrichmentStudy !== previousEnrichmentStudy ||
-      enrichmentModel !== previousEnrichmentModel ||
-      enrichmentAnnotation !== previousEnrichmentAnnotation ||
-      networkData.nodes.length === 0
-    ) {
-      this.setState({
-        previousEnrichmentStudy: enrichmentStudy,
-        previousEnrichmentModel: enrichmentModel,
-        previousEnrichmentAnnotation: enrichmentAnnotation,
-      });
+    const cacheKey = `getEnrichmentsNetwork_${enrichmentStudy}_${enrichmentModel}_${annotation}`;
+    if (cacheGetEnrichmentsNetwork[cacheKey] != null) {
+      this.handleEnrichmentNetworkData(
+        cacheGetEnrichmentsNetwork[cacheKey],
+        enrichmentResults,
+      );
+    } else {
       cancelRequestGetEnrichmentsNetwork();
       let cancelToken = new CancelToken(e => {
         cancelRequestGetEnrichmentsNetwork = e;
@@ -743,11 +754,14 @@ class Enrichment extends Component {
         .getEnrichmentsNetwork(
           enrichmentStudy,
           enrichmentModel,
-          enrichmentAnnotation,
+          annotation,
           this.handleGetEnrichmentNetworkError,
           cancelToken,
         )
         .then(getEnrichmentNetworkResponseData => {
+          cacheGetEnrichmentsNetwork[
+            cacheKey
+          ] = getEnrichmentNetworkResponseData;
           if (
             getEnrichmentNetworkResponseData.nodes?.length > 0 ||
             getEnrichmentNetworkResponseData.links?.length > 0 ||
@@ -762,20 +776,96 @@ class Enrichment extends Component {
                 enrichmentResults,
               ),
             );
-          } else {
-            this.handleGetEnrichmentNetworkError();
           }
         })
         .catch(error => {
           console.error('Error during getEnrichmentNetwork', error);
+          //   this.handleGetEnrichmentNetworkError();
         });
-    } else {
-      this.handleEnrichmentNetworkData(
-        unfilteredNetworkData,
-        enrichmentResults,
-      );
     }
+    // const fetchParams = {
+    //   study: enrichmentStudy,
+    //   modelID: enrichmentModel,
+    //   annotationID: enrichmentAnnotation,
+    // };
+    // fetch(fetchUrlEnrichmentsNetwork, {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: JSON.stringify(fetchParams), // body data type must match "Content-Type" header
+    // })
+    //   // can nd-json-stream - assumes json is NDJSON, a data format that is separated into individual JSON objects with a newline character (\n). The 'nd' stands for newline delimited JSON
+    //   .then(response => {
+    //     return ndjsonStream(response.body); //ndjsonStream parses the response.body
+    //   })
+    //   .then(canNdJsonStream => {
+    //     this.handleGetEnrichmentsNetworkStream(
+    //       canNdJsonStream,
+    //       enrichmentResults,
+    //     );
+    //   })
+    //   .catch(error => {
+    //     console.error('Error during getEnrichmentsNetwork', error);
+    //   this.handleGetEnrichmentNetworkError();
+    //   });
   };
+
+  // /**
+  //  * @param stream {ReadableStream<any>}
+  //  */
+  // handleGetEnrichmentsNetworkStream = async (stream, enrichmentResults) => {
+  //   // console.log({ stream });
+  //   // console.log({ enrichmentResults });
+  //   this.reader?.cancel();
+  //   const {
+  //     enrichmentStudy,
+  //     enrichmentModel,
+  //     enrichmentAnnotation,
+  //   } = this.props;
+  //   const cacheKey = `getEnrichmentsNetwork_${enrichmentStudy}_${enrichmentModel}_${enrichmentAnnotation}`;
+  //   let streamedResults = [];
+  //   try {
+  //     this.reader = stream.getReader();
+  //     for await (let value of streamAsyncIterable(this.reader)) {
+  //       streamedResults.push(value);
+  //       if (
+  //         streamedResults.length === 100 ||
+  //         streamedResults.length % 2500 === 0
+  //       ) {
+  //         const streamedResultsCopy = streamedResults.slice();
+  //         // this.setState(
+  //         //   {
+  //         //     unfilteredNetworkData: streamedResultsCopy,
+  //         //   },
+  //         //   function() {
+  //         this.handleEnrichmentNetworkData(
+  //           streamedResultsCopy,
+  //           enrichmentResults,
+  //         );
+  //         // },
+  //         // );
+  //       }
+  //     }
+  //     // Stream finished at this point
+  //     const streamedResultsFinishedCopy = streamedResults.slice();
+  //     cacheEnrichmentsNetwork[cacheKey] = streamedResultsFinishedCopy;
+  //     // this.setState(
+  //     //   {
+  //     //     unfilteredNetworkData: streamedResultsFinishedCopy,
+  //     //   },
+  //     //   function() {
+  //     this.handleEnrichmentNetworkData(
+  //       streamedResultsFinishedCopy,
+  //       enrichmentResults,
+  //     );
+  //     //   },
+  //     // );
+  //   } catch (error) {
+  //     console.error(error);
+  //     // Ignore?
+  //   }
+  // };
 
   handleEnrichmentNetworkData = (unfilteredNetworkData, enrichmentResults) => {
     const { multisetTestsFilteredOut } = this.state;
@@ -785,55 +875,62 @@ class Enrichment extends Component {
     const enrichmentResultsDescriptions = [...enrichmentResults].map(
       r => r.description,
     );
-    const filteredNodes = unfilteredNetworkData.nodes.filter(n =>
-      enrichmentResultsDescriptions.includes(n.description),
-    );
-    networkDataVar.nodes = filteredNodes;
-    this.setState({
-      networkData: networkDataVar,
-      tests: tests,
-      totalNodes: unfilteredNetworkData.nodes.length,
-      totalLinks: unfilteredNetworkData.links.length,
-    });
-    let testsAfterFilter = unfilteredNetworkData.tests;
-    if (multisetTestsFilteredOut.length > 0) {
-      let isArrayBeforeFilter = Array.isArray(testsAfterFilter);
-      if (isArrayBeforeFilter) {
-        testsAfterFilter = testsAfterFilter.filter(function(col) {
-          return !multisetTestsFilteredOut.includes(col);
-        });
+    if (
+      unfilteredNetworkData.nodes?.length > 0 ||
+      unfilteredNetworkData.links?.length > 0 ||
+      unfilteredNetworkData.tests?.length > 0
+    ) {
+      const filteredNodes = unfilteredNetworkData.nodes.filter(n =>
+        enrichmentResultsDescriptions.includes(n.description),
+      );
+      networkDataVar.nodes = filteredNodes;
+      this.setState({
+        // unfilteredNetworkData: unfilteredNetworkData,
+        networkData: networkDataVar,
+        tests: tests,
+        totalNodes: unfilteredNetworkData.nodes.length,
+        totalLinks: unfilteredNetworkData.links.length,
+      });
+      let testsAfterFilter = unfilteredNetworkData.tests;
+      if (multisetTestsFilteredOut.length > 0) {
+        let isArrayBeforeFilter = Array.isArray(testsAfterFilter);
+        if (isArrayBeforeFilter) {
+          testsAfterFilter = testsAfterFilter.filter(function(col) {
+            return !multisetTestsFilteredOut.includes(col);
+          });
+        } else {
+          testsAfterFilter = [];
+        }
+      }
+      let facets = [];
+      let pieData = [];
+      const isArrayAfterFilter = Array.isArray(testsAfterFilter);
+      const testsLengthAfterFilter =
+        typeof testsAfterFilter === 'string' ? 1 : testsAfterFilter.length;
+      if (isArrayAfterFilter && testsLengthAfterFilter > 0) {
+        for (var i = 0; i < testsLengthAfterFilter; i++) {
+          // let rplcSpaces = testsAfterFilter[i].replace(/ /g, '_');
+          // facets.push('EnrichmentMap_pvalue_' + rplcSpaces + '_');
+          facets.push(testsAfterFilter[i]);
+          pieData.push(100 / testsLengthAfterFilter);
+        }
       } else {
-        testsAfterFilter = [];
+        if (testsAfterFilter.length > 0) {
+          facets.push(testsAfterFilter);
+          pieData.push(testsAfterFilter);
+        }
       }
+      this.setState({
+        networkSettings: {
+          ...this.state.networkSettings,
+          facets: facets,
+          propLabel: testsAfterFilter,
+          propData: pieData,
+        },
+        networkDataLoaded: true,
+        networkGraphReady: true,
+      });
     }
-    let facets = [];
-    let pieData = [];
-    const isArrayAfterFilter = Array.isArray(testsAfterFilter);
-    const testsLengthAfterFilter =
-      typeof testsAfterFilter === 'string' ? 1 : testsAfterFilter.length;
-    if (isArrayAfterFilter && testsLengthAfterFilter > 0) {
-      for (var i = 0; i < testsLengthAfterFilter; i++) {
-        // let rplcSpaces = testsAfterFilter[i].replace(/ /g, '_');
-        // facets.push('EnrichmentMap_pvalue_' + rplcSpaces + '_');
-        facets.push(testsAfterFilter[i]);
-        pieData.push(100 / testsLengthAfterFilter);
-      }
-    } else {
-      if (testsAfterFilter.length > 0) {
-        facets.push(testsAfterFilter);
-        pieData.push(testsAfterFilter);
-      }
-    }
-    this.setState({
-      networkSettings: {
-        ...this.state.networkSettings,
-        facets: facets,
-        propLabel: testsAfterFilter,
-        propData: pieData,
-      },
-      networkDataLoaded: true,
-      networkGraphReady: true,
-    });
   };
 
   handleNetworkGraphReady = bool => {
@@ -873,7 +970,7 @@ class Enrichment extends Component {
         : 1200;
     let violinWidth =
       parseInt(localStorage.getItem('verticalSplitPaneSize'), 10) || 525;
-    // subtracting 80 due to plot margin
+    // subtracting 60 due to plot margin
     return containerWidth - violinWidth - 60;
   };
 
@@ -2171,6 +2268,9 @@ class Enrichment extends Component {
               onHandleEnrichmentTableLoading={this.handleEnrichmentTableLoading}
               onHandleHasBarcodeData={this.handleHasBarcodeData}
               onGetEnrichmentsLinkouts={this.getEnrichmentsLinkouts}
+              onHandleIsDataStreamingEnrichmentsTable={
+                this.handleIsDataStreamingEnrichmentsTable
+              }
             />
           </Grid.Column>
           <Grid.Column
