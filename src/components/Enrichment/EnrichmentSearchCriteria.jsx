@@ -1253,7 +1253,7 @@ class EnrichmentSearchCriteria extends Component {
             }
             style={StudyPopupStyle}
             className="CustomTooltip"
-            position="bottom"
+            position="bottom center"
             inverted
             basic
             content="Apply column filter(s) across multiple test results"

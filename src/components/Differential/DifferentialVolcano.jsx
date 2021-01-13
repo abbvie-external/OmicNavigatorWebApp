@@ -175,7 +175,7 @@ class DifferentialVolcano extends Component {
         }
       }
       //Pushes "none" option into Volcano circle text dropdown
-      differentialAlphanumericFields.unshift('none');
+      differentialAlphanumericFields.unshift('None');
       let volcanoCircleLabelsVar = differentialAlphanumericFields.map(e => {
         return {
           key: e,
@@ -183,8 +183,12 @@ class DifferentialVolcano extends Component {
           value: e,
         };
       });
+      let identifierVar =
+        differentialAlphanumericFields[0] !== 'None'
+          ? differentialAlphanumericFields[0]
+          : differentialAlphanumericFields[1];
       this.setState({
-        identifier: differentialAlphanumericFields[0],
+        identifier: identifierVar,
         volcanoCircleLabels: volcanoCircleLabelsVar,
         volcanoCircleLabel: differentialAlphanumericFields[0],
       });

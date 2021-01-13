@@ -758,7 +758,8 @@ class DifferentialSearchCriteria extends Component {
     this.setState({
       mustDifferential,
       notDifferential,
-      // reloadPlotP: false,
+      // if BE changes to have multi-set plot consider set changes, this is needed
+      // reloadPlotP: true,
       isFilteredDifferential: false,
     });
   };
@@ -1083,7 +1084,7 @@ class DifferentialSearchCriteria extends Component {
             }
             style={StudyPopupStyle}
             className="CustomTooltip"
-            position="bottom"
+            position="bottom center"
             inverted
             basic
             content="Apply column filter(s) across multiple test results"
