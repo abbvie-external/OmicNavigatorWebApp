@@ -10,7 +10,11 @@ import { updateUrl } from './Shared/UrlControl';
 class Tabs extends Component {
   constructor(props) {
     super(props);
-    const baseUrl = window.location.origin || 'http://localhost:3000';
+    // const baseUrl = window.location.origin || 'http://localhost:3000';
+    const baseUrl =
+      process.env.NODE_ENV === 'development'
+        ? '***REMOVED***'
+        : window.location.origin;
     const pathnameInit = this.props.location.pathname.substring(1) || null;
     const pathname =
       pathnameInit !== null ? pathnameInit.replace(/–/gi, ' ') : pathnameInit;

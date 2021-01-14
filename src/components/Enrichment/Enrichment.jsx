@@ -32,20 +32,6 @@ import QHGrid, { EZGrid } from '***REMOVED***';
 let cancelRequestEnrichmentGetPlot = () => {};
 let cancelRequestGetEnrichmentsNetwork = () => {};
 const cacheGetEnrichmentsNetwork = {};
-const baseUrl =
-  process.env.NODE_ENV === 'development'
-    ? '***REMOVED***'
-    : window.location.origin;
-const fetchUrlEnrichmentsNetwork = `${baseUrl}/ocpu/library/OmicNavigator/R/getEnrichmentsNetwork/ndjson`;
-async function* streamAsyncIterable(reader) {
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) {
-      return;
-    }
-    yield value;
-  }
-}
 
 class Enrichment extends Component {
   storedEnrichmentActiveIndex =
@@ -783,89 +769,7 @@ class Enrichment extends Component {
           //   this.handleGetEnrichmentNetworkError();
         });
     }
-    // const fetchParams = {
-    //   study: enrichmentStudy,
-    //   modelID: enrichmentModel,
-    //   annotationID: enrichmentAnnotation,
-    // };
-    // fetch(fetchUrlEnrichmentsNetwork, {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify(fetchParams), // body data type must match "Content-Type" header
-    // })
-    //   // can nd-json-stream - assumes json is NDJSON, a data format that is separated into individual JSON objects with a newline character (\n). The 'nd' stands for newline delimited JSON
-    //   .then(response => {
-    //     return ndjsonStream(response.body); //ndjsonStream parses the response.body
-    //   })
-    //   .then(canNdJsonStream => {
-    //     this.handleGetEnrichmentsNetworkStream(
-    //       canNdJsonStream,
-    //       enrichmentResults,
-    //     );
-    //   })
-    //   .catch(error => {
-    //     console.error('Error during getEnrichmentsNetwork', error);
-    //   this.handleGetEnrichmentNetworkError();
-    //   });
   };
-
-  // /**
-  //  * @param stream {ReadableStream<any>}
-  //  */
-  // handleGetEnrichmentsNetworkStream = async (stream, enrichmentResults) => {
-  //   // console.log({ stream });
-  //   // console.log({ enrichmentResults });
-  //   this.reader?.cancel();
-  //   const {
-  //     enrichmentStudy,
-  //     enrichmentModel,
-  //     enrichmentAnnotation,
-  //   } = this.props;
-  //   const cacheKey = `getEnrichmentsNetwork_${enrichmentStudy}_${enrichmentModel}_${enrichmentAnnotation}`;
-  //   let streamedResults = [];
-  //   try {
-  //     this.reader = stream.getReader();
-  //     for await (let value of streamAsyncIterable(this.reader)) {
-  //       streamedResults.push(value);
-  //       if (
-  //         streamedResults.length === 100 ||
-  //         streamedResults.length % 2500 === 0
-  //       ) {
-  //         const streamedResultsCopy = streamedResults.slice();
-  //         // this.setState(
-  //         //   {
-  //         //     unfilteredNetworkData: streamedResultsCopy,
-  //         //   },
-  //         //   function() {
-  //         this.handleEnrichmentNetworkData(
-  //           streamedResultsCopy,
-  //           enrichmentResults,
-  //         );
-  //         // },
-  //         // );
-  //       }
-  //     }
-  //     // Stream finished at this point
-  //     const streamedResultsFinishedCopy = streamedResults.slice();
-  //     cacheEnrichmentsNetwork[cacheKey] = streamedResultsFinishedCopy;
-  //     // this.setState(
-  //     //   {
-  //     //     unfilteredNetworkData: streamedResultsFinishedCopy,
-  //     //   },
-  //     //   function() {
-  //     this.handleEnrichmentNetworkData(
-  //       streamedResultsFinishedCopy,
-  //       enrichmentResults,
-  //     );
-  //     //   },
-  //     // );
-  //   } catch (error) {
-  //     console.error(error);
-  //     // Ignore?
-  //   }
-  // };
 
   handleEnrichmentNetworkData = (unfilteredNetworkData, enrichmentResults) => {
     const { multisetTestsFilteredOut } = this.state;
@@ -885,7 +789,6 @@ class Enrichment extends Component {
       );
       networkDataVar.nodes = filteredNodes;
       this.setState({
-        // unfilteredNetworkData: unfilteredNetworkData,
         networkData: networkDataVar,
         tests: tests,
         totalNodes: unfilteredNetworkData.nodes.length,

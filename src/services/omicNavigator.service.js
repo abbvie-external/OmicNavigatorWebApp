@@ -5,8 +5,6 @@ window.jQuery = $;
 require('opencpu.js/opencpu-0.5.js');
 class OmicNavigatorService {
   constructor() {
-    this.ocpuUrlDev = '***REMOVED***/ocpu/library/OmicNavigator/R';
-    this.ocpuUrlProd = '***REMOVED***/ocpu/library/OmicNavigator/R';
     this.baseUrl =
       process.env.NODE_ENV === 'development'
         ? '***REMOVED***'
@@ -45,7 +43,7 @@ class OmicNavigatorService {
 
   setUrl() {
     if (process.env.NODE_ENV === 'development') {
-      window.ocpu.seturl(this.ocpuUrlProd);
+      window.ocpu.seturl(this.url);
     }
   }
 
