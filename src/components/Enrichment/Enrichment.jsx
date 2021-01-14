@@ -3,7 +3,6 @@ import _ from 'lodash';
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { Grid, Menu, Popup, Sidebar, Tab, Message } from 'semantic-ui-react';
-// import ndjsonStream from 'can-ndjson-stream';
 import { CancelToken } from 'axios';
 import networkIcon from '../../resources/networkIcon.png';
 import networkIconSelected from '../../resources/networkIconSelected.png';
