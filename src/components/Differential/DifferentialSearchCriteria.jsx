@@ -21,11 +21,6 @@ let cancelRequestGetReportLinkDifferential = () => {};
 let cancelRequestMultisetInferenceData = () => {};
 let cancelRequestInferenceMultisetPlot = () => {};
 const cacheResultsTable = {};
-const baseUrl =
-  process.env.NODE_ENV === 'development'
-    ? '***REMOVED***'
-    : window.location.origin;
-const fetchUrlResultsTable = `${baseUrl}/ocpu/library/OmicNavigator/R/getResultsTable/ndjson`;
 async function* streamAsyncIterable(reader) {
   while (true) {
     const { done, value } = await reader.read();
@@ -214,6 +209,7 @@ class DifferentialSearchCriteria extends Component {
             modelID: differentialModel,
             testID: differentialTest,
           };
+          const fetchUrlResultsTable = `${this.props.baseUrl}/ocpu/library/OmicNavigator/R/getResultsTable/ndjson`;
           fetch(fetchUrlResultsTable, {
             method: 'POST',
             headers: {
@@ -302,8 +298,7 @@ class DifferentialSearchCriteria extends Component {
         if (getReportLinkResponse.length > 0) {
           const link = getReportLinkResponse.includes('http')
             ? getReportLinkResponse
-            : // : `***REMOVED***/ocpu/library/${getReportLinkResponse}`;
-              `${this.props.baseUrl}/ocpu/library/${getReportLinkResponse}`;
+            : `${this.props.baseUrl}/ocpu/library/${getReportLinkResponse}`;
           this.setState({
             differentialStudyHrefVisible: true,
             differentialStudyHref: link,
@@ -412,6 +407,7 @@ class DifferentialSearchCriteria extends Component {
       );
       return;
     }
+    const fetchUrlResultsTable = `${this.props.baseUrl}/ocpu/library/OmicNavigator/R/getResultsTable/ndjson`;
     fetch(fetchUrlResultsTable, {
       method: 'POST',
       headers: {
@@ -641,6 +637,7 @@ class DifferentialSearchCriteria extends Component {
       );
       return;
     }
+    const fetchUrlResultsTable = `${this.props.baseUrl}/ocpu/library/OmicNavigator/R/getResultsTable/ndjson`;
     fetch(fetchUrlResultsTable, {
       method: 'POST',
       headers: {

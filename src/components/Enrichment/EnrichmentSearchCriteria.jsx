@@ -21,11 +21,6 @@ let cancelRequestGetReportLinkEnrichment = () => {};
 let cancelRequestMultisetEnrichmentData = () => {};
 let cancelRequestEnrichmentMultisetPlot = () => {};
 const cacheEnrichmentsTable = {};
-const baseUrl =
-  process.env.NODE_ENV === 'development'
-    ? '***REMOVED***'
-    : window.location.origin;
-const fetchUrlEnrichmentsTable = `${baseUrl}/ocpu/library/OmicNavigator/R/getEnrichmentsTable/ndjson`;
 async function* streamAsyncIterable(reader) {
   while (true) {
     const { done, value } = await reader.read();
@@ -222,6 +217,7 @@ class EnrichmentSearchCriteria extends Component {
             annotationID: enrichmentAnnotation,
             type: pValueType,
           };
+          const fetchUrlEnrichmentsTable = `${this.props.baseUrl}/ocpu/library/OmicNavigator/R/getEnrichmentsTable/ndjson`;
           fetch(fetchUrlEnrichmentsTable, {
             method: 'POST',
             headers: {
@@ -467,6 +463,7 @@ class EnrichmentSearchCriteria extends Component {
       annotationID: value,
       type: pValueType,
     };
+    const fetchUrlEnrichmentsTable = `${this.props.baseUrl}/ocpu/library/OmicNavigator/R/getEnrichmentsTable/ndjson`;
     fetch(fetchUrlEnrichmentsTable, {
       method: 'POST',
       headers: {
@@ -641,6 +638,7 @@ class EnrichmentSearchCriteria extends Component {
         annotationID: value,
         type: value,
       };
+      const fetchUrlEnrichmentsTable = `${this.props.baseUrl}/ocpu/library/OmicNavigator/R/getEnrichmentsTable/ndjson`;
       fetch(fetchUrlEnrichmentsTable, {
         method: 'POST',
         headers: {
@@ -814,6 +812,7 @@ class EnrichmentSearchCriteria extends Component {
       annotationID: value,
       type: pValueType,
     };
+    const fetchUrlEnrichmentsTable = `${this.props.baseUrl}/ocpu/library/OmicNavigator/R/getEnrichmentsTable/ndjson`;
     fetch(fetchUrlEnrichmentsTable, {
       method: 'POST',
       headers: {
