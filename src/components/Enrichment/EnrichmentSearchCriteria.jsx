@@ -217,7 +217,7 @@ class EnrichmentSearchCriteria extends Component {
             annotationID: enrichmentAnnotation,
             type: pValueType,
           };
-          const fetchUrlEnrichmentsTable = `${this.props.baseUrl}/ocpu/library/OmicNavigator/R/getEnrichmentsTable/ndjson`;
+          const fetchUrlEnrichmentsTable = `${this.props.baseUrl}/ocpu/library/OmicNavigator/R/getEnrichmentsTable/ndjson?auto_unbox=true&digits=10`;
           fetch(fetchUrlEnrichmentsTable, {
             method: 'POST',
             headers: {
@@ -463,7 +463,7 @@ class EnrichmentSearchCriteria extends Component {
       annotationID: value,
       type: pValueType,
     };
-    const fetchUrlEnrichmentsTable = `${this.props.baseUrl}/ocpu/library/OmicNavigator/R/getEnrichmentsTable/ndjson`;
+    const fetchUrlEnrichmentsTable = `${this.props.baseUrl}/ocpu/library/OmicNavigator/R/getEnrichmentsTable/ndjson?auto_unbox=true&digits=10`;
     fetch(fetchUrlEnrichmentsTable, {
       method: 'POST',
       headers: {
@@ -638,7 +638,7 @@ class EnrichmentSearchCriteria extends Component {
         annotationID: value,
         type: value,
       };
-      const fetchUrlEnrichmentsTable = `${this.props.baseUrl}/ocpu/library/OmicNavigator/R/getEnrichmentsTable/ndjson`;
+      const fetchUrlEnrichmentsTable = `${this.props.baseUrl}/ocpu/library/OmicNavigator/R/getEnrichmentsTable/ndjson?auto_unbox=true&digits=10`;
       fetch(fetchUrlEnrichmentsTable, {
         method: 'POST',
         headers: {
@@ -812,7 +812,7 @@ class EnrichmentSearchCriteria extends Component {
       annotationID: value,
       type: pValueType,
     };
-    const fetchUrlEnrichmentsTable = `${this.props.baseUrl}/ocpu/library/OmicNavigator/R/getEnrichmentsTable/ndjson`;
+    const fetchUrlEnrichmentsTable = `${this.props.baseUrl}/ocpu/library/OmicNavigator/R/getEnrichmentsTable/?auto_unbox=true&digits=10`;
     fetch(fetchUrlEnrichmentsTable, {
       method: 'POST',
       headers: {
