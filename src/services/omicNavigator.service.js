@@ -5,11 +5,7 @@ window.jQuery = $;
 require('opencpu.js/opencpu-0.5.js');
 class OmicNavigatorService {
   constructor() {
-    this.baseUrl =
-      process.env.NODE_ENV === 'development'
-        ? '***REMOVED***'
-        : window.location.origin;
-    this.url = `${this.baseUrl}/ocpu/library/OmicNavigator/R`;
+    this.baseUrl = window.location.origin || 'http://localhost:3000';
   }
 
   async axiosPost(method, obj, params, handleError, cancelToken, timeout) {
@@ -41,11 +37,11 @@ class OmicNavigatorService {
     });
   }
 
-  setUrl() {
-    if (process.env.NODE_ENV === 'development') {
-      window.ocpu.seturl(this.url);
-    }
-  }
+  // setUrl() {
+  //   if (process.env.NODE_ENV === 'development') {
+  //     window.ocpu.seturl(this.url);
+  //   }
+  // }
 
   async axiosPostPlot(
     plottype,
@@ -272,7 +268,7 @@ class OmicNavigatorService {
   }
 
   async plotStudy(study, modelID, featureID, plotID, errorCb, cancelToken) {
-    this.setUrl();
+    // this.setUrl();
     const cacheKey = `plotStudy_${study}_${modelID}_${featureID}_${plotID}`;
     if (this[cacheKey] != null) {
       return this[cacheKey];
@@ -386,7 +382,7 @@ class OmicNavigatorService {
     if (this[cacheKey] != null) {
       return this[cacheKey];
     } else {
-      this.setUrl();
+      // this.setUrl();
       const promise = this.ocpuPlotCall(
         'getResultsUpset',
         {
@@ -421,7 +417,7 @@ class OmicNavigatorService {
     if (this[cacheKey] != null) {
       return this[cacheKey];
     } else {
-      this.setUrl();
+      // this.setUrl();
       const promise = this.ocpuPlotCall(
         'getEnrichmentsUpset',
         {
