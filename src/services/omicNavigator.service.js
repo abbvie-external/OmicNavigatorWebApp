@@ -6,6 +6,7 @@ require('opencpu.js/opencpu-0.5.js');
 class OmicNavigatorService {
   constructor() {
     this.baseUrl = window.location.origin || 'http://localhost:3000';
+    this.url = `${this.baseUrl}/ocpu/library/OmicNavigator/R`;
   }
 
   async axiosPost(method, obj, params, handleError, cancelToken, timeout) {
