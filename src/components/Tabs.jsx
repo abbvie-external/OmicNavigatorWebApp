@@ -48,7 +48,6 @@ class Tabs extends Component {
       differentialFeature: !isEnrichment
         ? decodedFeatureOrTestAndDescription
         : '',
-      pValueType: 'nominal',
       featureToHighlightInDiffTable: '',
       allStudiesMetadata: [],
       differentialFeatureIdKey: '',
@@ -74,12 +73,6 @@ class Tabs extends Component {
   setTabIndex = tabIndex => {
     this.setState({
       activeIndex: tabIndex,
-    });
-  };
-
-  handlePValueTypeChange = type => {
-    this.setState({
-      pValueType: type,
     });
   };
 
@@ -208,7 +201,6 @@ class Tabs extends Component {
         differentialModel: '',
         differentialTest: '',
         differentialFeature: '',
-        pValueType: 'nominal',
         featureToHighlightInDiffTable: '',
         allStudiesMetadata: [],
         differentialFeatureIdKey: '',
@@ -276,7 +268,6 @@ class Tabs extends Component {
               {...this.props}
               {...this.state}
               onHandleUrlChange={this.handleUrlChange}
-              onPValueTypeChange={this.handlePValueTypeChange}
               onFindDifferentialFeature={this.findDifferentialFeature}
               onHandleDifferentialFeatureIdKey={
                 this.handleDifferentialFeatureIdKey

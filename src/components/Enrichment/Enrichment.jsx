@@ -37,6 +37,7 @@ class Enrichment extends Component {
     parseInt(sessionStorage.getItem('enrichmentViewTab'), 10) || 0;
 
   state = {
+    pValueType: sessionStorage.getItem('pValueType') || 'nominal',
     isValidSearchEnrichment: false,
     isSearchingEnrichment: false,
     isEnrichmentTableLoading: false,
@@ -246,6 +247,13 @@ class Enrichment extends Component {
   //     linkCutoff: this.state.linkCutoff,
   //   });
   // };
+
+  handlePValueTypeChange = type => {
+    this.setState({
+      pValueType: type,
+    });
+    sessionStorage.setItem('pValueType', type);
+  };
 
   getThreePlotsFromUrl = (
     enrichmentStudy,
@@ -2173,6 +2181,7 @@ class Enrichment extends Component {
               onHandleIsDataStreamingEnrichmentsTable={
                 this.handleIsDataStreamingEnrichmentsTable
               }
+              onHandlePValueTypeChange={this.handlePValueTypeChange}
             />
           </Grid.Column>
           <Grid.Column
