@@ -649,20 +649,27 @@ class DifferentialVolcano extends Component {
     const hiddenResizerStyle = {
       display: 'none',
     };
-    const VerticalSidebar = ({ animation, direction, isItemSelected }) => (
-      <Sidebar
-        as={'div'}
-        animation={animation}
-        direction={direction}
-        icon="labeled"
-        vertical="true"
-        visible={isItemSelected}
-        width="very wide"
-        className="VerticalSidebarPlot"
-      >
-        <DifferentialPlot {...this.props} {...this.state}></DifferentialPlot>
-      </Sidebar>
-    );
+    const VerticalSidebar = ({ animation, direction, isItemSelected }) => {
+      if (isItemSelected) {
+        return (
+          <Sidebar
+            as={'div'}
+            animation={animation}
+            direction={direction}
+            icon="labeled"
+            vertical="true"
+            visible={isItemSelected}
+            width="very wide"
+            className="VerticalSidebarPlot"
+          >
+            <DifferentialPlot
+              {...this.props}
+              {...this.state}
+            ></DifferentialPlot>
+          </Sidebar>
+        );
+      } else return null;
+    };
 
     return (
       <Grid.Column
