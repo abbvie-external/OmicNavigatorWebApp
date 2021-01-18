@@ -211,7 +211,11 @@ class EnrichmentResultsGraph extends Component {
     networkSearchResultSelected: false,
     descriptions: [],
     hoveredFeatures: '',
-    networkSortBy: ['significance', 'nodecount', 'linkcount'],
+    networkSortBy: JSON.parse(sessionStorage.getItem('networkSortBy')) || [
+      'significance',
+      'nodecount',
+      'linkcount',
+    ],
     nodeCutoffLocal: sessionStorage.getItem('nodeCutoff') || 0.1,
     linkCutoffLocal: sessionStorage.getItem('linkCutoff') || 0.4,
     linkTypeLocal: sessionStorage.getItem('linkType') || 0.5,
@@ -306,9 +310,12 @@ class EnrichmentResultsGraph extends Component {
   };
 
   onSortEnd = ({ oldIndex, newIndex }) => {
-    this.setState(({ networkSortBy }) => ({
-      networkSortBy: arrayMove(networkSortBy, oldIndex, newIndex),
-    }));
+    const { networkSortBy } = this.state;
+    const newSort = arrayMove(networkSortBy, oldIndex, newIndex);
+    this.setState({
+      networkSortBy: newSort,
+    });
+    sessionStorage.setItem('networkSortBy', JSON.stringify(newSort));
   };
 
   // NODE CUTOFF
