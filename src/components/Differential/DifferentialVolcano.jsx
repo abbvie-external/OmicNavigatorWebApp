@@ -86,7 +86,7 @@ class DifferentialVolcano extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     const {
-      featureToHighlightInDiffTable,
+      // featureToHighlightInDiffTable,
       differentialResults,
       // isItemSelected,
     } = this.props;
