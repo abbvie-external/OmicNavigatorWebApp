@@ -52,7 +52,7 @@ class Tabs extends Component {
       allStudiesMetadata: [],
       differentialFeatureIdKey: '',
       filteredDifferentialFeatureIdKey: '',
-      appVersion: '0.3.5.3',
+      appVersion: '0.3.6',
       packageVersion: '',
     };
   }
@@ -230,12 +230,12 @@ class Tabs extends Component {
             <span id="ResetApp" onClick={this.resetApp}>
               <span className="LogoElement">
                 <img
-                  alt="Omic Navigator"
+                  alt="OmicNavigator"
                   src={omicNavigatorIcon}
                   className="LogoImage"
                 />
               </span>
-              <span className="Header HeaderFirst">Omic&nbsp;</span>
+              <span className="Header HeaderFirst">Omic</span>
               <span className="Header HeaderSecond">Navigator</span>
             </span>
           </Menu.Item>
