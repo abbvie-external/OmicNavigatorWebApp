@@ -769,11 +769,13 @@ class Enrichment extends Component {
                 enrichmentResults,
               ),
             );
+          } else {
+            this.handleGetEnrichmentNetworkError();
           }
         })
         .catch(error => {
           console.error('Error during getEnrichmentNetwork', error);
-          //   this.handleGetEnrichmentNetworkError();
+          this.handleGetEnrichmentNetworkError();
         });
     }
   };
