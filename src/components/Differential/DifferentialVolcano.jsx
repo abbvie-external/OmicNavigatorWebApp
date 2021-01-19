@@ -64,19 +64,20 @@ class DifferentialVolcano extends Component {
       filteredTableData: this.props.differentialResults,
       volcanoPlotRows: this.props.differentialResults.length,
     });
-    const { featureToHighlightInDiffTable } = this.props;
-    if (featureToHighlightInDiffTable !== '') {
-      const featureToHighlightInDiffTableArr = [
-        {
-          id: featureToHighlightInDiffTable,
-          value: featureToHighlightInDiffTable,
-          key: featureToHighlightInDiffTable,
-        },
-      ];
-      this.props.onHandleSelectedVolcano(featureToHighlightInDiffTableArr);
-      // this.pageToFeature(featureToHighlightInDiffTable);
-      // this.props.onResetFeatureToHighlightInDiffTable();
-    }
+    // integrate with streaming
+    // const { featureToHighlightInDiffTable } = this.props;
+    // if (featureToHighlightInDiffTable !== '') {
+    //   const featureToHighlightInDiffTableArr = [
+    //     {
+    //       id: featureToHighlightInDiffTable,
+    //       value: featureToHighlightInDiffTable,
+    //       key: featureToHighlightInDiffTable,
+    //     },
+    //   ];
+    // this.props.onHandleSelectedVolcano(featureToHighlightInDiffTableArr);
+    // this.pageToFeature(featureToHighlightInDiffTable);
+    // this.props.onResetFeatureToHighlightInDiffTable();
+    // }
   }
 
   // shouldComponentUpdate() {
@@ -95,20 +96,21 @@ class DifferentialVolcano extends Component {
         volcanoPlotRows: differentialResults.length,
       });
     }
-    if (
-      featureToHighlightInDiffTable !== '' &&
-      prevProps.featureToHighlightInDiffTable !== featureToHighlightInDiffTable
-    ) {
-      const featureToHighlightInDiffTableArr = [
-        {
-          id: featureToHighlightInDiffTable,
-          value: featureToHighlightInDiffTable,
-          key: featureToHighlightInDiffTable,
-        },
-      ];
-      this.props.onHandleSelectedVolcano(featureToHighlightInDiffTableArr);
-      this.pageToFeature(featureToHighlightInDiffTable);
-    }
+    // integrate with streaming
+    // if (
+    //   featureToHighlightInDiffTable !== '' &&
+    //   prevProps.featureToHighlightInDiffTable !== featureToHighlightInDiffTable
+    // ) {
+    //   const featureToHighlightInDiffTableArr = [
+    //     {
+    //       id: featureToHighlightInDiffTable,
+    //       value: featureToHighlightInDiffTable,
+    //       key: featureToHighlightInDiffTable,
+    //     },
+    //   ];
+    //   this.props.onHandleSelectedVolcano(featureToHighlightInDiffTableArr);
+    //   this.pageToFeature(featureToHighlightInDiffTable);
+    // }
     // if (prevProps.isItemSelected !== isItemSelected) {
     //   this.handlePlotAnimationVolcano('overlay');
     // }
@@ -548,7 +550,8 @@ class DifferentialVolcano extends Component {
   // };
 
   getVolcanoPlotButtonContent = () => {
-    const { volcanoPlotsVisible, isDataStreamingResultsTable } = this.props;
+    const { isDataStreamingResultsTable } = this.props;
+    const { volcanoPlotsVisible } = this.state;
     if (isDataStreamingResultsTable) {
       return 'Plots are not avaialble until data finishes streaming';
     } else {
