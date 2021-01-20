@@ -21,7 +21,7 @@ import SearchingAlt from '../Transitions/SearchingAlt';
 import TransitionActive from '../Transitions/TransitionActive';
 import TransitionStill from '../Transitions/TransitionStill';
 import './Enrichment.scss';
-import EnrichmentResultsGraph from './EnrichmentResultsGraph';
+import NetworkGraphControls from './NetworkGraphControls';
 import EnrichmentSearchCriteria from './EnrichmentSearchCriteria';
 import SplitPanesContainer from './SplitPanesContainer';
 import CustomEmptyMessage from '../Shared/Templates';
@@ -1963,7 +1963,7 @@ class Enrichment extends Component {
             // ref="EnrichmentContentPaneGraph"
           >
             {!networkDataError ? (
-              <EnrichmentResultsGraph
+              <NetworkGraphControls
                 {...this.props}
                 {...this.state}
                 onDisplayViolinPlot={this.displayViolinPlot}

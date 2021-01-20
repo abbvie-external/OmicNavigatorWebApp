@@ -22,7 +22,7 @@ import arrayMove from 'array-move';
 import NetworkGraph from './NetworkGraph';
 import ReactSlider from 'react-slider';
 import LoaderActivePlots from '../Transitions/LoaderActivePlots';
-import './EnrichmentResultsGraph.scss';
+import './NetworkGraphControls.scss';
 import NumericExponentialInput from '../Shared/NumericExponentialInput';
 import { limitValues } from '../Shared/helpers';
 import ButtonActions from '../Shared/ButtonActions';
@@ -202,7 +202,7 @@ const SortableContainer = sortableContainer(({ children }) => {
   return <ul className="NetworkGraphSortableList">{children}</ul>;
 });
 
-class EnrichmentResultsGraph extends Component {
+class NetworkGraphControls extends Component {
   state = {
     showNetworkLabels: true,
     networkSearchResults: [],
@@ -1047,4 +1047,4 @@ class EnrichmentResultsGraph extends Component {
   }
 }
 
-export default EnrichmentResultsGraph;
+export default NetworkGraphControls;
