@@ -23,8 +23,6 @@ class DifferentialVolcanoPlot extends Component {
     volcanoCircleText: [],
   };
 
-  volcanoSVGRef = React.createRef();
-
   componentDidMount() {
     let resizedFn;
     window.addEventListener('resize', () => {
@@ -46,6 +44,7 @@ class DifferentialVolcanoPlot extends Component {
       yAxisLabel,
       doXAxisTransformation,
       doYAxisTransformation,
+      updateVolcanoLabels,
     } = this.props;
 
     if (
@@ -55,6 +54,22 @@ class DifferentialVolcanoPlot extends Component {
     ) {
       this.handleBrushedText(this.state.brushedRawData);
     }
+
+    if (
+      updateVolcanoLabels ||
+      (volcanoCircleLabel != null &&
+        prevProps.volcanoCircleLabel !== volcanoCircleLabel &&
+        this.props.volcanoDifferentialTableAll?.length > 0 &&
+        this.state.brushedRawData == null)
+    ) {
+      const elems = this.props.volcanoDifferentialTableAll.map(elem => {
+        const el = document.getElementById(`volcanoDataPoint-${elem.key}`);
+        return d3.select(el)._groups[0][0];
+      });
+
+      this.handleBrushedText({ _groups: [elems] });
+    }
+
     if (
       !_.isEqual(
         _.sortBy(volcanoDifferentialTableRowOther),
@@ -169,6 +184,10 @@ class DifferentialVolcanoPlot extends Component {
       .classed('selected', false)
       .classed('highlighted', false)
       .classed('highlightedMax', false);
+
+    this.setState({
+      brushedRawData: null,
+    });
   };
 
   handleCircleHover = e => {
@@ -448,6 +467,7 @@ class DifferentialVolcanoPlot extends Component {
     this.setState({
       volcanoCircleText: brushedCircleText,
     });
+    this.props.onUpdateVolcanoLabels(false);
   };
 
   handleSVGClick() {
