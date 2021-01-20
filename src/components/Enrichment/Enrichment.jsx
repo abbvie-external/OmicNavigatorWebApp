@@ -184,7 +184,7 @@ class Enrichment extends Component {
     multisetTestsFilteredOut: [],
     enrichmentColumnsUnfiltered: [],
     itemsPerPageEnrichmentTable:
-      parseInt(localStorage.getItem('itemsPerPageEnrichmentTable'), 10) || 45,
+      parseInt(localStorage.getItem('itemsPerPageEnrichmentTable'), 10) || 30,
     isDataStreamingEnrichmentsTable: false,
   };
   EnrichmentViewContainerRef = React.createRef();

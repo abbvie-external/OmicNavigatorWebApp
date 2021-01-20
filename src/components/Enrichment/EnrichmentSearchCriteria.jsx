@@ -509,7 +509,7 @@ class EnrichmentSearchCriteria extends Component {
       for await (let value of streamAsyncIterable(this.reader)) {
         streamedResults.push(value);
         if (
-          streamedResults.length === 100 ||
+          streamedResults.length === 30 ||
           streamedResults.length % 25000 === 0
         ) {
           this.handleGetEnrichmentsTableData(
@@ -534,26 +534,7 @@ class EnrichmentSearchCriteria extends Component {
       );
     } catch (error) {
       console.error(error);
-      // Ignore?
     }
-    // while(!reader.){
-    // }
-    // this.reader.read().then(
-    //   (read = result => {
-    //     if (result.done) {
-    //       streamedResults.push(result.value);
-    //       if (streamedResults.length > 0) {
-    //         this.handleGetEnrichmentsTableData(streamedResults, true, true, value);
-    //         return;
-    //       }
-    //     }
-    //     streamedResults.push(result.value);
-    //     if (streamedResults.length === 100) {
-    //       this.handleGetEnrichmentsTableData(streamedResults, true, true, value);
-    //     }
-    //     this.reader.read().then(read);
-    //   }),
-    // );
   };
 
   handleGetEnrichmentsTableData = (
