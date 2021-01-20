@@ -487,7 +487,7 @@ class Enrichment extends Component {
     this.props.onHandleUrlChange(changes, 'enrichment');
     this.setState({
       plotButtonActiveEnrichment: false,
-      visible: false,
+      visibleEnrichment: false,
     });
     if (scChange) {
       this.setState({
@@ -545,7 +545,7 @@ class Enrichment extends Component {
       isValidSearchEnrichment: false,
       multisetPlotAvailableEnrichment: false,
       plotButtonActiveEnrichment: false,
-      visible: false,
+      visibleEnrichment: false,
       // displayViolinPlot: false,
     });
   };
