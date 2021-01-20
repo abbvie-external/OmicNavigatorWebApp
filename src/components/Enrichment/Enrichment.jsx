@@ -451,7 +451,7 @@ class Enrichment extends Component {
       isEnrichmentTableLoading: false,
       isValidSearchEnrichment: true,
       plotButtonActiveEnrichment: false,
-      visible: false,
+      visibleEnrichment: false,
       isTestSelected: false,
       isTestDataLoaded: false,
       enrichmentColumns: columns,
@@ -495,7 +495,7 @@ class Enrichment extends Component {
     this.props.onHandleUrlChange(changes, 'enrichment');
     this.setState({
       plotButtonActiveEnrichment: false,
-      visible: false,
+      visibleEnrichment: false,
     });
     if (scChange) {
       this.setState({
@@ -553,7 +553,7 @@ class Enrichment extends Component {
       isValidSearchEnrichment: false,
       multisetPlotAvailableEnrichment: false,
       plotButtonActiveEnrichment: false,
-      visible: false,
+      visibleEnrichment: false,
       // displayViolinPlot: false,
     });
   };
@@ -562,7 +562,7 @@ class Enrichment extends Component {
     this.setState(prevState => ({
       animationEnrichment,
       visibleEnrichment: !prevState.visibleEnrichment,
-      plotButtonActiveEnrichment: !this.state.plotButtonActiveEnrichment,
+      plotButtonActiveEnrichment: !prevState.plotButtonActiveEnrichment,
     }));
   };
 
@@ -2094,11 +2094,11 @@ class Enrichment extends Component {
       enrichmentModel,
       enrichmentAnnotation,
     } = this.props;
-    const VerticalSidebar = ({ animation, visible, direction }) => (
+    const VerticalSidebar = ({ animation, visible }) => (
       <Sidebar
         as={'div'}
         animation={animation}
-        direction={direction}
+        direction={directionEnrichment}
         icon="labeled"
         vertical="true"
         visible={visible}
