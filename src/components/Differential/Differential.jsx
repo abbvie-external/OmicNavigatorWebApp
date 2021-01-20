@@ -497,6 +497,8 @@ class Differential extends Component {
       this.setState({
         volcanoDifferentialTableRowMax: volcanoDifferentialTableRowMaxVar,
         volcanoDifferentialTableRowOther: volcanoDifferentialTableRowOtherVar,
+        volcanoDifferentialTableAll: toHighlightArr,
+        updateVolcanoLabels: true,
       });
       this.handlePlotVolcano(maxId);
     } else {
@@ -507,6 +509,12 @@ class Differential extends Component {
       this.handlePlotVolcano('');
     }
     //}
+  };
+
+  updateVolcanoLabels = bool => {
+    this.setState({
+      updateVolcanoLabels: bool,
+    });
   };
 
   handlePlotVolcano = maxId => {
@@ -801,6 +809,7 @@ class Differential extends Component {
           onSVGTabChange={this.handleSVGTabChange}
           onHandleVolcanoTableLoading={this.handleVolcanoTableLoading}
           onBackToTable={this.backToTable}
+          onUpdateVolcanoLabels={this.updateVolcanoLabels}
         />
       );
     } else return <TransitionStill stillMessage={message} />;
