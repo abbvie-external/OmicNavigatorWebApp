@@ -15,6 +15,7 @@ export function getLinkout(
   // linkoutsConcatenated,
   itemValue,
   linkouts,
+  favicons,
   TableValuePopupStyle,
 ) {
   // itemValue = 'ENSP00000489236.1;ENSP00000484789.1;ENSP00000481486.1;ENSP00000480960.1;ENSP00000479794.1;ENSP00000479461.1';
@@ -39,7 +40,7 @@ export function getLinkout(
 
   const iconBaseUrl = 'https://icons.duckduckgo.com/ip3/';
   let iconDomains = [];
-  let icons = [];
+  let icons = [...favicons];
 
   if (linkouts.length > 1) {
     for (const val of linkouts) {
@@ -51,7 +52,9 @@ export function getLinkout(
         ? domainRawWww.split('//').pop()
         : domainRawWww;
       iconDomains.push(domainRawWwwHttps);
-      icons.push(`${iconBaseUrl}${domainRawWwwHttps}.ico`);
+      if (favicons.length == 0) {
+        icons.push(`${iconBaseUrl}${domainRawWwwHttps}.ico`);
+      }
     }
 
     const Popups = linkouts.map((link, index) => {
@@ -87,7 +90,9 @@ export function getLinkout(
       ? domainRawWww.split('//').pop()
       : domainRawWww;
     iconDomains.push(domainRawWwwHttps);
-    icons.push(`${iconBaseUrl}${domainRawWwwHttps}.ico`);
+    if (favicons.length == 0) {
+      icons.push(`${iconBaseUrl}${domainRawWwwHttps}.ico`);
+    }
     return (
       <Popup
         key={itemValue}

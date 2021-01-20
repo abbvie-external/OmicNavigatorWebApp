@@ -77,6 +77,7 @@ class Differential extends Component {
     differentialTestsMetadata: [],
     modelSpecificMetaFeaturesExist: true,
     resultsLinkouts: [],
+    resultsFavicons: [],
     isVolcanoPlotSVGLoaded: true,
     metaFeaturesDataDifferential: [],
     allMetaFeaturesDataDifferential: [],
@@ -579,6 +580,7 @@ class Differential extends Component {
     const { differentialFeature } = this.props;
     const {
       resultsLinkouts,
+      resultsFavicons,
       allMetaFeaturesDataDifferential,
       differentialPlotTypes,
       modelSpecificMetaFeaturesExist,
@@ -665,18 +667,32 @@ class Differential extends Component {
                     featureidSpecificMetaFeaturesExist,
                   );
             const resultsLinkoutsKeys = Object.keys(resultsLinkouts);
+            const resultsFaviconsKeys = Object.keys(resultsFavicons);
             let linkoutWithIcon = null;
             if (resultsLinkoutsKeys.includes(f)) {
+              debugger;
               if (item[f] != null && item[f] !== '') {
                 const columnLinkoutsObj = resultsLinkouts[f];
+                const columnFaviconsObj = resultsFavicons[f];
                 const columnLinkoutsIsArray = Array.isArray(columnLinkoutsObj);
+                let favicons = [];
+                if (columnFaviconsObj != null) {
+                  const columnFaviconsIsArray = Array.isArray(
+                    columnFaviconsObj,
+                  );
+                  favicons = columnFaviconsIsArray
+                    ? columnFaviconsObj
+                    : [columnFaviconsObj];
+                }
                 const linkouts = columnLinkoutsIsArray
                   ? columnLinkoutsObj
                   : [columnLinkoutsObj];
+
                 const itemValue = item[f];
                 linkoutWithIcon = getLinkout(
                   itemValue,
                   linkouts,
+                  favicons,
                   TableValuePopupStyle,
                 );
               }
