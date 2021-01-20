@@ -566,6 +566,26 @@ class OmicNavigatorService {
       return dataFromPromise;
     }
   }
+
+  async getFavicons(resultsLinkouts, errorCb, cancelToken) {
+    // const cacheKey = `getFavicons_${resultsLinkouts}`;
+    // if (this[cacheKey] != null) {
+    //   return this[cacheKey];
+    // } else {
+    const promise = this.axiosPost(
+      'getFavicons',
+      {
+        linkouts: resultsLinkouts,
+      },
+      false,
+      errorCb,
+      cancelToken,
+      25000,
+    );
+    const dataFromPromise = await promise;
+    // this[cacheKey] = dataFromPromise;
+    return dataFromPromise;
+  }
 }
 
 export const omicNavigatorService = new OmicNavigatorService();

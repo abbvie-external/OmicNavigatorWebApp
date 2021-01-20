@@ -242,6 +242,13 @@ class Differential extends Component {
         this.setState({
           resultsLinkouts: getResultsLinkoutsResponseData,
         });
+        omicNavigatorService
+          .getFavicons(getResultsLinkoutsResponseData)
+          .then(getFaviconsResponseData => {
+            this.setState({
+              resultsFavicons: getFaviconsResponseData,
+            });
+          });
       });
   };
 
