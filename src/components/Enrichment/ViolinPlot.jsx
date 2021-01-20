@@ -1,6 +1,6 @@
 /* eslint-disable react/state-in-constructor */
 import React, { Component } from 'react';
-import { Icon, Popup } from 'semantic-ui-react';
+// import { Icon, Popup } from 'semantic-ui-react';
 import * as d3 from 'd3';
 import * as _ from 'lodash';
 // import { select } from "d3-selection";

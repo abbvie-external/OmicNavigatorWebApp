@@ -48,12 +48,11 @@ class Tabs extends Component {
       differentialFeature: !isEnrichment
         ? decodedFeatureOrTestAndDescription
         : '',
-      pValueType: 'nominal',
       featureToHighlightInDiffTable: '',
       allStudiesMetadata: [],
       differentialFeatureIdKey: '',
       filteredDifferentialFeatureIdKey: '',
-      appVersion: '0.3.5.3',
+      appVersion: '0.3.6',
       packageVersion: '',
     };
   }
@@ -74,12 +73,6 @@ class Tabs extends Component {
   setTabIndex = tabIndex => {
     this.setState({
       activeIndex: tabIndex,
-    });
-  };
-
-  handlePValueTypeChange = type => {
-    this.setState({
-      pValueType: type,
     });
   };
 
@@ -208,7 +201,6 @@ class Tabs extends Component {
         differentialModel: '',
         differentialTest: '',
         differentialFeature: '',
-        pValueType: 'nominal',
         featureToHighlightInDiffTable: '',
         allStudiesMetadata: [],
         differentialFeatureIdKey: '',
@@ -238,12 +230,12 @@ class Tabs extends Component {
             <span id="ResetApp" onClick={this.resetApp}>
               <span className="LogoElement">
                 <img
-                  alt="Omic Navigator"
+                  alt="OmicNavigator"
                   src={omicNavigatorIcon}
                   className="LogoImage"
                 />
               </span>
-              <span className="Header HeaderFirst">Omic&nbsp;</span>
+              <span className="Header HeaderFirst">Omic</span>
               <span className="Header HeaderSecond">Navigator</span>
             </span>
           </Menu.Item>
@@ -276,7 +268,6 @@ class Tabs extends Component {
               {...this.props}
               {...this.state}
               onHandleUrlChange={this.handleUrlChange}
-              onPValueTypeChange={this.handlePValueTypeChange}
               onFindDifferentialFeature={this.findDifferentialFeature}
               onHandleDifferentialFeatureIdKey={
                 this.handleDifferentialFeatureIdKey

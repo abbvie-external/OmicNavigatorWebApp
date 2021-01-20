@@ -238,22 +238,6 @@ class EnrichmentSearchCriteria extends Component {
                 false,
               );
             })
-            // omicNavigatorService
-            //   .getEnrichmentsTable(
-            //     enrichmentStudy,
-            //     enrichmentModel,
-            //     enrichmentAnnotation,
-            //     pValueType,
-            //     onSearchTransitionEnrichment,
-            //   )
-            //   .then(getEnrichmentsTableData => {
-            //     this.handleGetEnrichmentsTableData(
-            //       getEnrichmentsTableData,
-            //       false,
-            //       true,
-            //       false,
-            //     );
-            //   })
             .catch(error => {
               console.error('Error during getEnrichmentsTable', error);
             });
@@ -424,29 +408,7 @@ class EnrichmentSearchCriteria extends Component {
       },
       true,
     );
-    // cancelGetEnrichmentsTable();
-    // let cancelToken = new CancelToken(e => {
-    //   cancelGetEnrichmentsTable = e;
-    // });
-    // omicNavigatorService
-    //   .getEnrichmentsTable(
-    //     enrichmentStudy,
-    //     enrichmentModel,
-    //     value,
-    //     pValueType,
-    //     onSearchTransitionEnrichment,
-    //     cancelToken,
-    //   )
-    //   .then(getEnrichmentsTableData => {
-    //     this.handleGetEnrichmentsTableData(
-    //       getEnrichmentsTableData,
-    //       true,
-    //       true,
-    //       // PAUL - this needs to be handled true for column reordering, once we can freeze the first column (featureID) from being reordered
-    //       false,
-    //     );
-    //   })
-    const cacheKey = `getEnrichmentsTable_${enrichmentStudy}_${enrichmentModel}_${value}`;
+    const cacheKey = `getEnrichmentsTable_${enrichmentStudy}_${enrichmentModel}_${value}_${pValueType}`;
     if (cacheEnrichmentsTable[cacheKey]) {
       this.handleGetEnrichmentsTableData(
         cacheEnrichmentsTable[cacheKey],
@@ -501,8 +463,8 @@ class EnrichmentSearchCriteria extends Component {
   ) => {
     this.reader?.cancel();
     this.props.onHandleIsDataStreamingEnrichmentsTable(true);
-    const { enrichmentStudy, enrichmentModel } = this.props;
-    const cacheKey = `getEnrichmentsTable_${enrichmentStudy}_${enrichmentModel}_${annotation}`;
+    const { enrichmentStudy, enrichmentModel, pValueType } = this.props;
+    const cacheKey = `getEnrichmentsTable_${enrichmentStudy}_${enrichmentModel}_${annotation}_${pValueType}`;
     let streamedResults = [];
     try {
       this.reader = stream.getReader();
@@ -534,26 +496,7 @@ class EnrichmentSearchCriteria extends Component {
       );
     } catch (error) {
       console.error(error);
-      // Ignore?
     }
-    // while(!reader.){
-    // }
-    // this.reader.read().then(
-    //   (read = result => {
-    //     if (result.done) {
-    //       streamedResults.push(result.value);
-    //       if (streamedResults.length > 0) {
-    //         this.handleGetEnrichmentsTableData(streamedResults, true, true, value);
-    //         return;
-    //       }
-    //     }
-    //     streamedResults.push(result.value);
-    //     if (streamedResults.length === 100) {
-    //       this.handleGetEnrichmentsTableData(streamedResults, true, true, value);
-    //     }
-    //     this.reader.read().then(read);
-    //   }),
-    // );
   };
 
   handleGetEnrichmentsTableData = (
@@ -561,7 +504,7 @@ class EnrichmentSearchCriteria extends Component {
     annotation,
     handleUSettings,
     handleMaxElements,
-    handleColumns,
+    // handleColumns,
   ) => {
     if (handleUSettings) {
       this.props.onHandleNetworkSigValue(0.05);
@@ -579,11 +522,11 @@ class EnrichmentSearchCriteria extends Component {
         },
       });
     }
-    if (handleColumns) {
-      this.props.onColumnReorder({
-        enrichmentResults: this.annotationdata,
-      });
-    }
+    // if (handleColumns) {
+    //   this.props.onColumnReorder({
+    //     enrichmentResults: this.annotationdata,
+    //   });
+    // }
     this.props.onEnrichmentSearch(data, annotation);
   };
 
@@ -594,48 +537,28 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentAnnotation,
       onSearchTransitionEnrichment,
       onEnrichmentSearch,
-      onPValueTypeChange,
+      onHandlePValueTypeChange,
       onHandleEnrichmentTableLoading,
       multisetFiltersVisibleEnrichment,
     } = this.props;
-    onHandleEnrichmentTableLoading(true);
-    onPValueTypeChange(value);
+    onHandlePValueTypeChange(value);
     if (!multisetFiltersVisibleEnrichment) {
-      // cancelGetEnrichmentsTable();
-      // let cancelToken = new CancelToken(e => {
-      //   cancelGetEnrichmentsTable = e;
-      // });
-      // omicNavigatorService
-      //   .getEnrichmentsTable(
-      //     enrichmentStudy,
-      //     enrichmentModel,
-      //     enrichmentAnnotation,
-      //     value,
-      //     onSearchTransitionEnrichment,
-      //     cancelToken,
-      //   )
-      //   .then(getEnrichmentsTableData => {
-      //     this.handleGetEnrichmentsTableData(
-      //       getEnrichmentsTableData,
-      //       false,
-      //       true,
-      //       false,
-      //     );
-      //   })
-      const cacheKey = `getEnrichmentsTable_${enrichmentStudy}_${enrichmentModel}_${value}`;
+      const cacheKey = `getEnrichmentsTable_${enrichmentStudy}_${enrichmentModel}_${enrichmentAnnotation}_${value}`;
       if (cacheEnrichmentsTable[cacheKey]) {
         this.handleGetEnrichmentsTableData(
           cacheEnrichmentsTable[cacheKey],
+          enrichmentAnnotation,
+          false,
           true,
-          true,
-          value,
+          false,
         );
         return;
       }
+      onHandleEnrichmentTableLoading(true);
       const obj = {
         study: enrichmentStudy,
         modelID: enrichmentModel,
-        annotationID: value,
+        annotationID: enrichmentAnnotation,
         type: value,
       };
       const fetchUrlEnrichmentsTable = `${this.props.baseUrl}/ocpu/library/OmicNavigator/R/getEnrichmentsTable/ndjson?auto_unbox=true&digits=10`;
@@ -653,7 +576,7 @@ class EnrichmentSearchCriteria extends Component {
         .then(canNdJsonStream => {
           this.handleGetEnrichmentsTableStream(
             canNdJsonStream,
-            value,
+            enrichmentAnnotation,
             false,
             true,
             false,
@@ -670,6 +593,7 @@ class EnrichmentSearchCriteria extends Component {
         mustEnrichment,
         notEnrichment,
       } = this.state;
+      onHandleEnrichmentTableLoading(true);
       this.getMultisetPlot(
         sigValue,
         enrichmentModel,
@@ -796,13 +720,14 @@ class EnrichmentSearchCriteria extends Component {
     //       false,
     //     );
     //   })
-    const cacheKey = `getEnrichmentsTable_${enrichmentStudy}_${enrichmentModel}_${value}`;
+    const cacheKey = `getEnrichmentsTable_${enrichmentStudy}_${enrichmentModel}_${value}_${pValueType}`;
     if (cacheEnrichmentsTable[cacheKey]) {
       this.handleGetEnrichmentsTableData(
         cacheEnrichmentsTable[cacheKey],
-        true,
-        true,
         value,
+        false,
+        false,
+        false,
       );
       return;
     }
