@@ -7,11 +7,7 @@ import DifferentialSearchCriteria from './DifferentialSearchCriteria';
 import TransitionActive from '../Transitions/TransitionActive';
 import TransitionStill from '../Transitions/TransitionStill';
 import ButtonActions from '../Shared/ButtonActions';
-import {
-  formatNumberForDisplay,
-  splitValue,
-  getLinkout,
-} from '../Shared/helpers';
+import { formatNumberForDisplay, splitValue, Linkout } from '../Shared/helpers';
 import DOMPurify from 'dompurify';
 import { omicNavigatorService } from '../../services/omicNavigator.service';
 import DifferentialVolcano from './DifferentialVolcano';
@@ -237,6 +233,10 @@ class Differential extends Component {
   };
 
   getResultsLinkouts = (differentialStudy, differentialModel) => {
+    this.setState({
+      resultsLinkouts: [],
+      resultsFavicons: [],
+    });
     omicNavigatorService
       .getResultsLinkouts(differentialStudy, differentialModel)
       .then(getResultsLinkoutsResponseData => {
@@ -667,10 +667,8 @@ class Differential extends Component {
                     featureidSpecificMetaFeaturesExist,
                   );
             const resultsLinkoutsKeys = Object.keys(resultsLinkouts);
-            const resultsFaviconsKeys = Object.keys(resultsFavicons);
             let linkoutWithIcon = null;
             if (resultsLinkoutsKeys.includes(f)) {
-              debugger;
               if (item[f] != null && item[f] !== '') {
                 const columnLinkoutsObj = resultsLinkouts[f];
                 const columnFaviconsObj = resultsFavicons[f];
@@ -689,11 +687,8 @@ class Differential extends Component {
                   : [columnLinkoutsObj];
 
                 const itemValue = item[f];
-                linkoutWithIcon = getLinkout(
-                  itemValue,
-                  linkouts,
-                  favicons,
-                  TableValuePopupStyle,
+                linkoutWithIcon = (
+                  <Linkout {...{ itemValue, linkouts, favicons }} />
                 );
               }
             }

@@ -8,43 +8,82 @@ import _ from 'lodash';
 import * as d3 from 'd3-array';
 // import { omicNavigatorService } from '../../services/omicNavigator.service';
 
-export function getLinkout(
-  // icons,
-  // iconDomains,
-  // TableValuePopupStyle,
-  // linkoutsConcatenated,
-  itemValue,
-  linkouts,
-  favicons,
-  TableValuePopupStyle,
-) {
-  // itemValue = 'ENSP00000489236.1;ENSP00000484789.1;ENSP00000481486.1;ENSP00000480960.1;ENSP00000479794.1;ENSP00000479461.1';
-  function openWindows(link, itemValue) {
-    const windowFeatures =
-      'menubar=yes,location=yes,resizable=yes,scrollbars=yes,status=yes';
-    const itemValuesSeparated = separateItemValues(itemValue);
-    let linkoutsConcatenated = [];
-    if (itemValuesSeparated.length === 1) {
-      linkoutsConcatenated = `${link}${itemValuesSeparated[0]}`;
-      window.open(linkoutsConcatenated, '_blank', windowFeatures);
-    }
-    if (itemValuesSeparated.length > 1) {
-      for (const item of itemValuesSeparated) {
-        linkoutsConcatenated.push(`${link}${item}`);
+export const Linkout = React.memo(
+  function Linkout({ itemValue, linkouts, favicons }) {
+    const TableValuePopupStyle = {
+      backgroundColor: '2E2E2E',
+      borderBottom: '2px solid var(--color-primary)',
+      color: '#FFF',
+      padding: '1em',
+      maxWidth: '50vw',
+      fontSize: '13px',
+      wordBreak: 'break-all',
+    };
+
+    function openWindows(link, itemValue) {
+      const windowFeatures =
+        'menubar=yes,location=yes,resizable=yes,scrollbars=yes,status=yes';
+      const itemValuesSeparated = separateItemValues(itemValue);
+      let linkoutsConcatenated = [];
+      if (itemValuesSeparated.length === 1) {
+        linkoutsConcatenated = `${link}${itemValuesSeparated[0]}`;
+        window.open(linkoutsConcatenated, '_blank', windowFeatures);
       }
-      linkoutsConcatenated.forEach(link => {
-        window.open(link, '_blank', windowFeatures);
-      });
+      if (itemValuesSeparated.length > 1) {
+        for (const item of itemValuesSeparated) {
+          linkoutsConcatenated.push(`${link}${item}`);
+        }
+        linkoutsConcatenated.forEach(link => {
+          window.open(link, '_blank', windowFeatures);
+        });
+      }
     }
-  }
 
-  const iconBaseUrl = 'https://icons.duckduckgo.com/ip3/';
-  let iconDomains = [];
-  let icons = [...favicons];
+    const iconBaseUrl = 'https://icons.duckduckgo.com/ip3/';
+    let iconDomains = [];
+    let icons = [...favicons];
 
-  if (linkouts.length > 1) {
-    for (const val of linkouts) {
-      const domainRaw = findDomain(`${val}`);
+    if (linkouts.length > 1) {
+      for (const val of linkouts) {
+        const domainRaw = findDomain(`${val}`);
+        const domainRawWww = domainRaw.includes('www')
+          ? domainRaw
+          : `www.${domainRaw}`;
+        const domainRawWwwHttps = domainRawWww.includes('//')
+          ? domainRawWww.split('//').pop()
+          : domainRawWww;
+        iconDomains.push(domainRawWwwHttps);
+        if (favicons.length === 0) {
+          icons.push(`${iconBaseUrl}${domainRawWwwHttps}.ico`);
+        }
+      }
+
+      const Popups = linkouts.map((link, index) => {
+        return (
+          <Popup
+            key={itemValue - index}
+            trigger={
+              <img
+                src={icons[index]}
+                alt={iconDomains[index]}
+                className="ExternalSiteIcon"
+                onClick={() => openWindows(link, itemValue)}
+              />
+            }
+            style={TableValuePopupStyle}
+            className="TablePopupValue"
+            content={iconDomains[index]}
+            inverted
+            basic
+          />
+        );
+      });
+      return Popups;
+    } else {
+      const linkoutsIsArray = Array.isArray(linkouts);
+      const domainRaw = linkoutsIsArray
+        ? findDomain(`${linkouts[0]}`)
+        : findDomain(linkouts);
       const domainRawWww = domainRaw.includes('www')
         ? domainRaw
         : `www.${domainRaw}`;
@@ -52,67 +91,35 @@ export function getLinkout(
         ? domainRawWww.split('//').pop()
         : domainRawWww;
       iconDomains.push(domainRawWwwHttps);
-      if (favicons.length == 0) {
+      if (favicons.length === 0) {
         icons.push(`${iconBaseUrl}${domainRawWwwHttps}.ico`);
       }
-    }
-
-    const Popups = linkouts.map((link, index) => {
       return (
         <Popup
-          key={itemValue - index}
+          key={itemValue}
           trigger={
             <img
-              src={icons[index]}
-              alt={iconDomains[index]}
+              src={icons[0]}
+              alt={iconDomains}
               className="ExternalSiteIcon"
-              onClick={() => openWindows(link, itemValue)}
+              onClick={() => openWindows(linkouts, itemValue)}
             />
           }
           style={TableValuePopupStyle}
           className="TablePopupValue"
-          content={iconDomains[index]}
+          content={iconDomains}
           inverted
           basic
         />
       );
-    });
-    return Popups;
-  } else {
-    const linkoutsIsArray = Array.isArray(linkouts);
-    const domainRaw = linkoutsIsArray
-      ? findDomain(`${linkouts[0]}`)
-      : findDomain(linkouts);
-    const domainRawWww = domainRaw.includes('www')
-      ? domainRaw
-      : `www.${domainRaw}`;
-    const domainRawWwwHttps = domainRawWww.includes('//')
-      ? domainRawWww.split('//').pop()
-      : domainRawWww;
-    iconDomains.push(domainRawWwwHttps);
-    if (favicons.length == 0) {
-      icons.push(`${iconBaseUrl}${domainRawWwwHttps}.ico`);
     }
-    return (
-      <Popup
-        key={itemValue}
-        trigger={
-          <img
-            src={icons[0]}
-            alt={iconDomains}
-            className="ExternalSiteIcon"
-            onClick={() => openWindows(linkouts, itemValue)}
-          />
-        }
-        style={TableValuePopupStyle}
-        className="TablePopupValue"
-        content={iconDomains}
-        inverted
-        basic
-      />
-    );
-  }
-}
+  },
+  //,
+  // for deeper array comparison
+  // ,(prev,next)=>{
+  //   return ;
+  // }
+);
 
 export function separateItemValues(value) {
   if (value) {

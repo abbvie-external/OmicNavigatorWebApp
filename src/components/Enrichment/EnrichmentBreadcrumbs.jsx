@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import { Breadcrumb, Icon, Popup } from 'semantic-ui-react';
 import '../Shared/Breadcrumbs.scss';
-import { getLinkout } from '../Shared/helpers';
+import { Linkout } from '../Shared/helpers';
 
 class EnrichmentBreadcrumbs extends Component {
   componentDidMount() {}
@@ -13,27 +13,24 @@ class EnrichmentBreadcrumbs extends Component {
     enrichmentDataItem,
     enrichmentTerm,
     enrichmentsLinkouts,
+    enrichmentsFavicons,
     enrichmentFeatureIdKey,
   ) => {
     let linkoutWithIcon = null;
-    const enrichmentsLinkoutsKeys = Object.keys(enrichmentsLinkouts);
-    if (enrichmentsLinkoutsKeys.includes(enrichmentTerm)) {
-      const columnLinkoutsObj = enrichmentsLinkouts[enrichmentTerm];
-      const columnLinkoutsIsArray = Array.isArray(columnLinkoutsObj);
-      const linkouts = columnLinkoutsIsArray
-        ? columnLinkoutsObj
-        : [columnLinkoutsObj];
-      const itemValue = enrichmentDataItem[enrichmentTerm];
-      const TableValuePopupStyle = {
-        backgroundColor: '2E2E2E',
-        borderBottom: '2px solid var(--color-primary)',
-        color: '#FFF',
-        padding: '1em',
-        maxWidth: '50vw',
-        fontSize: '13px',
-        wordBreak: 'break-all',
-      };
-      linkoutWithIcon = getLinkout(itemValue, linkouts, TableValuePopupStyle);
+    const linkoutsIsArray = Array.isArray(enrichmentsLinkouts);
+    const linkouts = linkoutsIsArray
+      ? enrichmentsLinkouts
+      : [enrichmentsLinkouts];
+    if (linkouts.length > 0) {
+      let favicons = [];
+      if (enrichmentsFavicons.length !== 0) {
+        const columnFaviconsIsArray = Array.isArray(enrichmentsFavicons);
+        favicons = columnFaviconsIsArray
+          ? enrichmentsFavicons
+          : [enrichmentsFavicons];
+      }
+      const itemValue = enrichmentTerm;
+      linkoutWithIcon = <Linkout {...{ itemValue, linkouts, favicons }} />;
     }
 
     if (enrichmentNameLoaded === true) {
@@ -70,6 +67,7 @@ class EnrichmentBreadcrumbs extends Component {
       enrichmentDataItem,
       enrichmentTerm,
       enrichmentsLinkouts,
+      enrichmentsFavicons,
       enrichmentFeatureIdKey,
     } = this.props;
 
@@ -90,6 +88,7 @@ class EnrichmentBreadcrumbs extends Component {
       enrichmentDataItem,
       enrichmentTerm,
       enrichmentsLinkouts,
+      enrichmentsFavicons,
       enrichmentFeatureIdKey,
     );
 
