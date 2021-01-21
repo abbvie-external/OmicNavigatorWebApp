@@ -532,7 +532,6 @@ class Enrichment extends Component {
         this.setState({
           enrichmentsLinkouts: getEnrichmentsLinkoutsResponseData,
         });
-        debugger;
         omicNavigatorService
           .getFavicons(getEnrichmentsLinkoutsResponseData)
           .then(getFaviconsResponseData => {

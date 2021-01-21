@@ -9,7 +9,7 @@ import * as d3 from 'd3-array';
 // import { omicNavigatorService } from '../../services/omicNavigator.service';
 
 export const Linkout = React.memo(
-  function Linkout({ itemValue, linkouts, favicons }) {
+  function Linkout({ keyVar, itemValue, linkouts, favicons }) {
     const TableValuePopupStyle = {
       backgroundColor: '2E2E2E',
       borderBottom: '2px solid var(--color-primary)',
@@ -61,7 +61,7 @@ export const Linkout = React.memo(
       const Popups = linkouts.map((link, index) => {
         return (
           <Popup
-            key={itemValue - index}
+            key={`${keyVar}-PopupArr-${index}`}
             trigger={
               <img
                 src={icons[index]}
@@ -96,7 +96,7 @@ export const Linkout = React.memo(
       }
       return (
         <Popup
-          key={itemValue}
+          key={`${keyVar}-PopupObj`}
           trigger={
             <img
               src={icons[0]}

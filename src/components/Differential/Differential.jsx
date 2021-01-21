@@ -648,6 +648,7 @@ class Differential extends Component {
           field: f,
           filterable: { type: 'multiFilter' },
           template: (value, item, addParams) => {
+            const keyVar = `${item[f]}-${item[alphanumericTrigger]}`;
             const mappedMetafeaturesFeatureIds = allMetaFeaturesDataDifferential.map(
               meta => meta[alphanumericTrigger],
             );
@@ -688,13 +689,13 @@ class Differential extends Component {
 
                 const itemValue = item[f];
                 linkoutWithIcon = (
-                  <Linkout {...{ itemValue, linkouts, favicons }} />
+                  <Linkout {...{ keyVar, itemValue, linkouts, favicons }} />
                 );
               }
             }
             if (f === alphanumericTrigger) {
               return (
-                <div className="NoSelect" key={value}>
+                <div className="NoSelect" key={keyVar}>
                   <Popup
                     trigger={
                       <span className={featureIdClass} onClick={featureIdClick}>
@@ -713,7 +714,7 @@ class Differential extends Component {
               );
             } else {
               return (
-                <div className="NoSelect" key={value}>
+                <div className="NoSelect" key={keyVar}>
                   <Popup
                     trigger={<span className="">{splitValue(value)}</span>}
                     style={TableValuePopupStyle}
