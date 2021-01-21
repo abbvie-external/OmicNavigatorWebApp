@@ -304,31 +304,25 @@ class OmicNavigatorService {
     errorCb,
     cancelToken,
   ) {
-    const cacheKey = `getResultsIntersection_${study}_${modelID}_${anchor}_${mustTests}_${notTests}_${sigValue}_${operator}`;
-    if (this[cacheKey] != null) {
-      return this[cacheKey];
-    } else {
-      const promise = this.axiosPost(
-        'getResultsIntersection',
-        {
-          study,
-          modelID,
-          anchor,
-          mustTests,
-          notTests,
-          sigValue,
-          operator,
-          column,
-        },
-        true,
-        errorCb,
-        cancelToken,
-        25000,
-      );
-      const dataFromPromise = await promise;
-      this[cacheKey] = dataFromPromise;
-      return dataFromPromise;
-    }
+    const promise = this.axiosPost(
+      'getResultsIntersection',
+      {
+        study,
+        modelID,
+        anchor,
+        mustTests,
+        notTests,
+        sigValue,
+        operator,
+        column,
+      },
+      true,
+      errorCb,
+      cancelToken,
+      25000,
+    );
+    const dataFromPromise = await promise;
+    return dataFromPromise;
   }
 
   async getEnrichmentsIntersection(
@@ -343,31 +337,25 @@ class OmicNavigatorService {
     errorCb,
     cancelToken,
   ) {
-    const cacheKey = `getEnrichmentsIntersection_${study}_${modelID}_${annotationID}_${mustTests}_${notTests}_${sigValue}_${operator}_${type}`;
-    if (this[cacheKey] != null) {
-      return this[cacheKey];
-    } else {
-      const promise = this.axiosPost(
-        'getEnrichmentsIntersection',
-        {
-          study,
-          modelID,
-          annotationID,
-          mustTests,
-          notTests,
-          sigValue,
-          operator,
-          type,
-        },
-        true,
-        errorCb,
-        cancelToken,
-        25000,
-      );
-      const dataFromPromise = await promise;
-      this[cacheKey] = dataFromPromise;
-      return dataFromPromise;
-    }
+    const promise = this.axiosPost(
+      'getEnrichmentsIntersection',
+      {
+        study,
+        modelID,
+        annotationID,
+        mustTests,
+        notTests,
+        sigValue,
+        operator,
+        type,
+      },
+      true,
+      errorCb,
+      cancelToken,
+      25000,
+    );
+    const dataFromPromise = await promise;
+    return dataFromPromise;
   }
 
   async getResultsUpset(
@@ -568,10 +556,6 @@ class OmicNavigatorService {
   }
 
   async getFavicons(resultsLinkouts, errorCb, cancelToken) {
-    // const cacheKey = `getFavicons_${resultsLinkouts}`;
-    // if (this[cacheKey] != null) {
-    //   return this[cacheKey];
-    // } else {
     const promise = this.axiosPost(
       'getFavicons',
       {
@@ -583,7 +567,6 @@ class OmicNavigatorService {
       25000,
     );
     const dataFromPromise = await promise;
-    // this[cacheKey] = dataFromPromise;
     return dataFromPromise;
   }
 }
