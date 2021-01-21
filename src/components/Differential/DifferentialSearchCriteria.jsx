@@ -441,7 +441,7 @@ class DifferentialSearchCriteria extends Component {
       for await (let value of streamAsyncIterable(this.reader)) {
         streamedResults.push(value);
         if (
-          streamedResults.length === 100 ||
+          streamedResults.length === 30 ||
           streamedResults.length % 25000 === 0
         ) {
           this.handleGetResultsTableData(
@@ -459,26 +459,7 @@ class DifferentialSearchCriteria extends Component {
       this.handleGetResultsTableData(streamedResultsCopy, true, true, test);
     } catch (error) {
       console.error(error);
-      // Ignore?
     }
-    // while(!reader.){
-    // }
-    // this.reader.read().then(
-    //   (read = result => {
-    //     if (result.done) {
-    //       streamedResults.push(result.value);
-    //       if (streamedResults.length > 0) {
-    //         this.handleGetResultsTableData(streamedResults, true, true, value);
-    //         return;
-    //       }
-    //     }
-    //     streamedResults.push(result.value);
-    //     if (streamedResults.length === 100) {
-    //       this.handleGetResultsTableData(streamedResults, true, true, value);
-    //     }
-    //     this.reader.read().then(read);
-    //   }),
-    // );
   };
 
   handleGetResultsTableData = (

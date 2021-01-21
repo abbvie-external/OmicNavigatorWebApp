@@ -7,11 +7,7 @@ import DifferentialSearchCriteria from './DifferentialSearchCriteria';
 import TransitionActive from '../Transitions/TransitionActive';
 import TransitionStill from '../Transitions/TransitionStill';
 import ButtonActions from '../Shared/ButtonActions';
-import {
-  formatNumberForDisplay,
-  splitValue,
-  getLinkout,
-} from '../Shared/helpers';
+import { formatNumberForDisplay, splitValue, Linkout } from '../Shared/helpers';
 import DOMPurify from 'dompurify';
 import { omicNavigatorService } from '../../services/omicNavigator.service';
 import DifferentialVolcano from './DifferentialVolcano';
@@ -77,6 +73,7 @@ class Differential extends Component {
     differentialTestsMetadata: [],
     modelSpecificMetaFeaturesExist: true,
     resultsLinkouts: [],
+    resultsFavicons: [],
     isVolcanoPlotSVGLoaded: true,
     metaFeaturesDataDifferential: [],
     allMetaFeaturesDataDifferential: [],
@@ -236,12 +233,23 @@ class Differential extends Component {
   };
 
   getResultsLinkouts = (differentialStudy, differentialModel) => {
+    this.setState({
+      resultsLinkouts: [],
+      resultsFavicons: [],
+    });
     omicNavigatorService
       .getResultsLinkouts(differentialStudy, differentialModel)
       .then(getResultsLinkoutsResponseData => {
         this.setState({
           resultsLinkouts: getResultsLinkoutsResponseData,
         });
+        omicNavigatorService
+          .getFavicons(getResultsLinkoutsResponseData)
+          .then(getFaviconsResponseData => {
+            this.setState({
+              resultsFavicons: getFaviconsResponseData,
+            });
+          });
       });
   };
 
@@ -580,6 +588,7 @@ class Differential extends Component {
     const { differentialFeature } = this.props;
     const {
       resultsLinkouts,
+      resultsFavicons,
       allMetaFeaturesDataDifferential,
       differentialPlotTypes,
       modelSpecificMetaFeaturesExist,
@@ -647,6 +656,7 @@ class Differential extends Component {
           field: f,
           filterable: { type: 'multiFilter' },
           template: (value, item, addParams) => {
+            const keyVar = `${item[f]}-${item[alphanumericTrigger]}`;
             const mappedMetafeaturesFeatureIds = allMetaFeaturesDataDifferential.map(
               meta => meta[alphanumericTrigger],
             );
@@ -670,21 +680,30 @@ class Differential extends Component {
             if (resultsLinkoutsKeys.includes(f)) {
               if (item[f] != null && item[f] !== '') {
                 const columnLinkoutsObj = resultsLinkouts[f];
+                const columnFaviconsObj = resultsFavicons[f];
                 const columnLinkoutsIsArray = Array.isArray(columnLinkoutsObj);
+                let favicons = [];
+                if (columnFaviconsObj != null) {
+                  const columnFaviconsIsArray = Array.isArray(
+                    columnFaviconsObj,
+                  );
+                  favicons = columnFaviconsIsArray
+                    ? columnFaviconsObj
+                    : [columnFaviconsObj];
+                }
                 const linkouts = columnLinkoutsIsArray
                   ? columnLinkoutsObj
                   : [columnLinkoutsObj];
+
                 const itemValue = item[f];
-                linkoutWithIcon = getLinkout(
-                  itemValue,
-                  linkouts,
-                  TableValuePopupStyle,
+                linkoutWithIcon = (
+                  <Linkout {...{ keyVar, itemValue, linkouts, favicons }} />
                 );
               }
             }
             if (f === alphanumericTrigger) {
               return (
-                <div className="NoSelect" key={value}>
+                <div className="NoSelect" key={keyVar}>
                   <Popup
                     trigger={
                       <span className={featureIdClass} onClick={featureIdClick}>
@@ -703,7 +722,7 @@ class Differential extends Component {
               );
             } else {
               return (
-                <div className="NoSelect" key={value}>
+                <div className="NoSelect" key={keyVar}>
                   <Popup
                     trigger={<span className="">{splitValue(value)}</span>}
                     style={TableValuePopupStyle}

@@ -471,7 +471,7 @@ class EnrichmentSearchCriteria extends Component {
       for await (let value of streamAsyncIterable(this.reader)) {
         streamedResults.push(value);
         if (
-          streamedResults.length === 100 ||
+          streamedResults.length === 30 ||
           streamedResults.length % 25000 === 0
         ) {
           this.handleGetEnrichmentsTableData(

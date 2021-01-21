@@ -11,17 +11,13 @@ import tableIconSelected from '../../resources/tableIconSelected.png';
 import { omicNavigatorService } from '../../services/omicNavigator.service';
 import ButtonActions from '../Shared/ButtonActions';
 import * as d3 from 'd3';
-import {
-  formatNumberForDisplay,
-  splitValue,
-  getLinkout,
-} from '../Shared/helpers';
+import { formatNumberForDisplay, splitValue, Linkout } from '../Shared/helpers';
 import '../Shared/Table.scss';
 import SearchingAlt from '../Transitions/SearchingAlt';
 import TransitionActive from '../Transitions/TransitionActive';
 import TransitionStill from '../Transitions/TransitionStill';
 import './Enrichment.scss';
-import EnrichmentResultsGraph from './EnrichmentResultsGraph';
+import NetworkGraphControls from './NetworkGraphControls';
 import EnrichmentSearchCriteria from './EnrichmentSearchCriteria';
 import SplitPanesContainer from './SplitPanesContainer';
 import CustomEmptyMessage from '../Shared/Templates';
@@ -171,6 +167,7 @@ class Enrichment extends Component {
     enrichmentModelsAndAnnotations: [],
     enrichmentAnnotationsMetadata: [],
     enrichmentsLinkouts: [],
+    enrichmentsFavicons: [],
     enrichmentFeatureIdKey: '',
     // filteredDifferentialFeatureIdKey: '',
     multisetQueriedEnrichment: false,
@@ -185,7 +182,7 @@ class Enrichment extends Component {
     multisetTestsFilteredOut: [],
     enrichmentColumnsUnfiltered: [],
     itemsPerPageEnrichmentTable:
-      parseInt(localStorage.getItem('itemsPerPageEnrichmentTable'), 10) || 45,
+      parseInt(localStorage.getItem('itemsPerPageEnrichmentTable'), 10) || 30,
     isDataStreamingEnrichmentsTable: false,
   };
   EnrichmentViewContainerRef = React.createRef();
@@ -525,12 +522,23 @@ class Enrichment extends Component {
   };
 
   getEnrichmentsLinkouts = (enrichmentStudy, enrichmentAnnotation) => {
+    this.setState({
+      enrichmentsLinkouts: [],
+      enrichmentsFavicons: [],
+    });
     omicNavigatorService
       .getEnrichmentsLinkouts(enrichmentStudy, enrichmentAnnotation)
       .then(getEnrichmentsLinkoutsResponseData => {
         this.setState({
           enrichmentsLinkouts: getEnrichmentsLinkoutsResponseData,
         });
+        omicNavigatorService
+          .getFavicons(getEnrichmentsLinkoutsResponseData)
+          .then(getFaviconsResponseData => {
+            this.setState({
+              enrichmentsFavicons: getFaviconsResponseData,
+            });
+          });
       });
   };
 
@@ -583,7 +591,11 @@ class Enrichment extends Component {
       enrichmentModel,
       enrichmentAnnotation,
     } = this.props;
-    const { hasBarcodeData, enrichmentsLinkouts } = this.state;
+    const {
+      hasBarcodeData,
+      enrichmentsLinkouts,
+      enrichmentsFavicons,
+    } = this.state;
     const TableValuePopupStyle = {
       backgroundColor: '2E2E2E',
       borderBottom: '2px solid var(--color-primary)',
@@ -611,19 +623,24 @@ class Enrichment extends Component {
           title: f,
           field: f,
           filterable: { type: 'multiFilter' },
-          template: (value, item, addParams) => {
+          template: (value, item) => {
             if (f === alphanumericTrigger) {
               let linkoutWithIcon = null;
-              if (enrichmentsLinkouts.length > 0) {
-                const linkoutsIsArray = Array.isArray(enrichmentsLinkouts);
-                const linkouts = linkoutsIsArray
-                  ? enrichmentsLinkouts
-                  : [enrichmentsLinkouts];
+              const linkoutsIsArray = Array.isArray(enrichmentsLinkouts);
+              const linkouts = linkoutsIsArray
+                ? enrichmentsLinkouts
+                : [enrichmentsLinkouts];
+              let favicons = [];
+              if (linkouts.length > 0) {
+                const columnFaviconsIsArray = Array.isArray(
+                  enrichmentsFavicons,
+                );
+                favicons = columnFaviconsIsArray
+                  ? enrichmentsFavicons
+                  : [enrichmentsFavicons];
                 const itemValue = item[f];
-                linkoutWithIcon = getLinkout(
-                  itemValue,
-                  linkouts,
-                  TableValuePopupStyle,
+                linkoutWithIcon = (
+                  <Linkout {...{ itemValue, linkouts, favicons }} />
                 );
               }
               return (
@@ -1973,7 +1990,7 @@ class Enrichment extends Component {
             // ref="EnrichmentContentPaneGraph"
           >
             {!networkDataError ? (
-              <EnrichmentResultsGraph
+              <NetworkGraphControls
                 {...this.props}
                 {...this.state}
                 onDisplayViolinPlot={this.displayViolinPlot}
