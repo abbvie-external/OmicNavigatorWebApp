@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { withRouter } from 'react-router-dom';
 import {
   Form,
@@ -1009,20 +1009,57 @@ class DifferentialSearchCriteria extends Component {
 
     if (isValidSearchDifferential) {
       PlotRadio = (
-        <Transition
-          visible={!multisetPlotAvailableDifferential}
-          animation="flash"
-          duration={1500}
-        >
-          <Radio
-            toggle
-            label="View Plot"
-            className={multisetPlotAvailableDifferential ? 'ViewPlotRadio' : ''}
-            checked={plotButtonActiveDifferential}
-            onChange={onHandlePlotAnimationDifferential('uncover')}
-            disabled={!multisetPlotAvailableDifferential}
-          />
-        </Transition>
+        <Fragment>
+          <Transition
+            visible={!multisetPlotAvailableDifferential}
+            animation="flash"
+            duration={1500}
+          >
+            <Radio
+              toggle
+              label="View Plot"
+              className={
+                multisetPlotAvailableDifferential ? 'ViewPlotRadio' : ''
+              }
+              checked={plotButtonActiveDifferential}
+              onChange={onHandlePlotAnimationDifferential('uncover')}
+              disabled={!multisetPlotAvailableDifferential}
+            />
+          </Transition>
+          <Popup
+            trigger={
+              <Icon
+                size="small"
+                name="info circle"
+                className="ViewPlotInfo"
+                color="grey"
+              />
+            }
+            style={StudyPopupStyle}
+            className="CustomTooltip"
+            position="bottom center"
+            inverted
+            basic
+            on="click"
+            mouseEnterDelay={1000}
+            mouseLeaveDelay={0}
+          >
+            <Popup.Content>
+              View as intersecting sets, or{' '}
+              <a
+                href="https://github.com/hms-dbmi/UpSetR"
+                target="_blank"
+                rel="noreferrer"
+              >
+                UpSet
+              </a>{' '}
+              plot, derived from features that pass the selected filters in at
+              least one of the possible sets. Note that this plot considers the
+              column/operator/value selection and ignores the must/maybe/not
+              selection.
+            </Popup.Content>
+          </Popup>
+        </Fragment>
       );
 
       MultisetRadio = (
