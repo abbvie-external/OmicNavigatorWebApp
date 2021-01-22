@@ -694,6 +694,7 @@ class DifferentialSearchCriteria extends Component {
     uSetVP.hoveredFilter = index;
     this.setState({ uSettingsP: uSetVP });
   };
+
   handleDropdownChange = (evt, { name, value, index }) => {
     // this.props.onHandleVolcanoTableLoading(true);
     const uSelVP = [...this.state[name]];
@@ -702,42 +703,25 @@ class DifferentialSearchCriteria extends Component {
       text: value,
       value: value,
     };
-    this.setState(
-      {
-        [name]: uSelVP,
-        // reloadPlotP: false,
-        isFilteredDifferential: false,
-      },
-      // function() {
-      //   this.updateQueryDataP();
-      // },
-    );
+    this.setState({
+      [name]: uSelVP,
+      reloadPlotP: true,
+      isFilteredDifferential: false,
+    });
   };
   handleSigValuePInputChange = (name, value, index) => {
-    // if (!this.state.initialRenderP) {
-    //   this.props.onHandleVolcanoTableLoading(true);
-    // }
     const uSelVP = [...this.state[name]];
     uSelVP[index] = parseFloat(value);
-    this.setState(
-      {
-        [name]: uSelVP,
-        reloadPlotP: true,
-        isFilteredDifferential: false,
-        // initialRenderP: false,
-      },
-      // function() {
-      //   this.updateQueryDataP();
-      // },
-    );
+    this.setState({
+      [name]: uSelVP,
+      reloadPlotP: true,
+      isFilteredDifferential: false,
+    });
   };
   handleSetChange = (mustDifferential, notDifferential) => {
-    // this.props.onHandleVolcanoTableLoading(true);
     this.setState({
       mustDifferential,
       notDifferential,
-      // if BE changes to have multi-set plot consider set changes, this is needed
-      // reloadPlotP: true,
       isFilteredDifferential: false,
     });
   };
@@ -801,9 +785,6 @@ class DifferentialSearchCriteria extends Component {
       .catch(error => {
         console.error('Error during getResultsIntersection', error);
       });
-    //   const testsLength =
-    //   typeof differentialTests === 'string' ? 1 : differentialTests.length;
-    // if (reloadPlotP === true && testsLength > 1) {
     if (reloadPlotP === true && differentialTests.length > 1) {
       onDisablePlotDifferential();
       this.getMultisetPlot(
