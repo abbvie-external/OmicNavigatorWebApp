@@ -117,7 +117,7 @@ class DifferentialVolcano extends Component {
   }
 
   pageToFeature = featureToHighlight => {
-    if (featureToHighlight !== '') {
+    if (featureToHighlight) {
       const {
         differentialFeatureIdKey,
         // differentialResults
@@ -240,6 +240,7 @@ class DifferentialVolcano extends Component {
     }
   };
   handleVolcanoPlotSelectionChange = volcanoPlotSelectedDataArr => {
+    this.pageToFeature();
     if (volcanoPlotSelectedDataArr.length > 0) {
       this.setState({
         filteredTableData: volcanoPlotSelectedDataArr,
