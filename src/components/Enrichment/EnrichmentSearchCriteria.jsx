@@ -539,8 +539,8 @@ class EnrichmentSearchCriteria extends Component {
       onEnrichmentSearch,
       onHandlePValueTypeChange,
       onHandleEnrichmentTableLoading,
-      multisetFiltersVisibleEnrichment,
     } = this.props;
+    const { multisetFiltersVisibleEnrichment } = this.state;
     onHandlePValueTypeChange(value);
     if (!multisetFiltersVisibleEnrichment) {
       const cacheKey = `getEnrichmentsTable_${enrichmentStudy}_${enrichmentModel}_${enrichmentAnnotation}_${value}`;
@@ -593,15 +593,11 @@ class EnrichmentSearchCriteria extends Component {
         mustEnrichment,
         notEnrichment,
       } = this.state;
-      onHandleEnrichmentTableLoading(true);
-      this.getMultisetPlot(
-        sigValue,
-        enrichmentModel,
-        enrichmentStudy,
-        enrichmentAnnotation,
-        this.jsonToList(selectedOperator),
-        value,
-      );
+      this.setState({
+        reloadPlot: true,
+        isFilteredEnrichment: false,
+      });
+      this.props.onHandleEnrichmentTableLoading(true);
       cancelRequestMultisetEnrichmentData();
       let cancelToken = new CancelToken(e => {
         cancelRequestMultisetEnrichmentData = e;
@@ -782,7 +778,7 @@ class EnrichmentSearchCriteria extends Component {
     };
     this.setState({
       [name]: uSelVP,
-      reloadPlot: false,
+      reloadPlot: true,
     });
   };
 
@@ -935,6 +931,7 @@ class EnrichmentSearchCriteria extends Component {
     enrichmentStudy,
     enrichmentAnnotation,
     selectedOperator,
+    pValueType,
   ) {
     const { uData, multisetTestsFilteredOut } = this.props;
     const tests = uData.filter(function(col) {
@@ -952,7 +949,7 @@ class EnrichmentSearchCriteria extends Component {
           enrichmentAnnotation,
           sigVal,
           selectedOperator,
-          this.props.pValueType,
+          pValueType,
           tests,
           undefined,
           cancelToken,
