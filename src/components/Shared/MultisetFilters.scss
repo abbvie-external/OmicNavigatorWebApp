@@ -39,3 +39,11 @@ svg:not(:root) {
   width: 75px !important;
   max-width: 75px !important;
 }
+
+.SetCircle {
+  cursor: pointer;
+}
+
+.CursorNotAllowed {
+  cursor: not-allowed !important;
+}
