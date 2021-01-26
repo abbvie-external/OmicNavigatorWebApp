@@ -256,12 +256,13 @@ class Differential extends Component {
         omicNavigatorService
           .getFavicons(parsedResultsLinkouts)
           .then(getFaviconsResponseData => {
+            const favicons = getFaviconsResponseData || [];
             this.setState({
-              resultsFavicons: getFaviconsResponseData,
+              resultsFavicons: favicons,
             });
             sessionStorage.setItem(
               `ResultsFavicons-${differentialStudy}_${differentialModel}`,
-              JSON.stringify(getFaviconsResponseData),
+              JSON.stringify(favicons),
             );
           });
       }
@@ -273,22 +274,24 @@ class Differential extends Component {
       omicNavigatorService
         .getResultsLinkouts(differentialStudy, differentialModel)
         .then(getResultsLinkoutsResponseData => {
+          const linkouts = getResultsLinkoutsResponseData || [];
           this.setState({
-            resultsLinkouts: getResultsLinkoutsResponseData,
+            resultsLinkouts: linkouts,
           });
           sessionStorage.setItem(
             `ResultsLinkouts-${differentialStudy}_${differentialModel}`,
-            JSON.stringify(getResultsLinkoutsResponseData),
+            JSON.stringify(linkouts),
           );
           omicNavigatorService
-            .getFavicons(getResultsLinkoutsResponseData)
+            .getFavicons(linkouts)
             .then(getFaviconsResponseData => {
+              const favicons = getFaviconsResponseData || [];
               this.setState({
-                resultsFavicons: getFaviconsResponseData,
+                resultsFavicons: favicons,
               });
               sessionStorage.setItem(
                 `ResultsFavicons-${differentialStudy}_${differentialModel}`,
-                JSON.stringify(getFaviconsResponseData),
+                JSON.stringify(favicons),
               );
             });
         });

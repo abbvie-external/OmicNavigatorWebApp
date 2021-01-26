@@ -545,12 +545,13 @@ class Enrichment extends Component {
         omicNavigatorService
           .getFavicons(parsedEnrichmentsLinkouts)
           .then(getFaviconsResponseData => {
+            const favicons = getFaviconsResponseData || [];
             this.setState({
-              enrichmentsFavicons: getFaviconsResponseData,
+              enrichmentsFavicons: favicons,
             });
             sessionStorage.setItem(
               `EnrichmentsFavicons-${enrichmentStudy}_${enrichmentAnnotation}`,
-              JSON.stringify(getFaviconsResponseData),
+              JSON.stringify(favicons),
             );
           });
       }
@@ -562,22 +563,24 @@ class Enrichment extends Component {
       omicNavigatorService
         .getEnrichmentsLinkouts(enrichmentStudy, enrichmentAnnotation)
         .then(getEnrichmentsLinkoutsResponseData => {
+          const linkouts = getEnrichmentsLinkoutsResponseData;
           this.setState({
-            enrichmentsLinkouts: getEnrichmentsLinkoutsResponseData,
+            enrichmentsLinkouts: linkouts,
           });
           sessionStorage.setItem(
             `EnrichmentsLinkouts-${enrichmentStudy}_${enrichmentAnnotation}`,
-            JSON.stringify(getEnrichmentsLinkoutsResponseData),
+            JSON.stringify(linkouts),
           );
           omicNavigatorService
             .getFavicons(getEnrichmentsLinkoutsResponseData)
             .then(getFaviconsResponseData => {
+              const favicons = getFaviconsResponseData || [];
               this.setState({
-                enrichmentsFavicons: getFaviconsResponseData,
+                enrichmentsFavicons: favicons,
               });
               sessionStorage.setItem(
                 `EnrichmentsFavicons-${enrichmentStudy}_${enrichmentAnnotation}`,
-                JSON.stringify(getFaviconsResponseData),
+                JSON.stringify(favicons),
               );
             });
         });
