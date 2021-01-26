@@ -553,6 +553,13 @@ class DifferentialMultisetFilters extends Component {
             notDifferentialCopy,
           );
         }
+      })
+      .on('mouseover', function(d) {
+        const cursorStyle = d !== uAnchorP ? 'pointer' : 'not-allowed';
+        d3.select(this)
+          .transition()
+          .duration(100)
+          .attr('cursor', cursorStyle);
       });
 
     const maybeCircles = svg
@@ -587,8 +594,20 @@ class DifferentialMultisetFilters extends Component {
         if (notDifferential.includes(d) && d !== uAnchorP) {
           notDifferentialCopy.splice(notDifferential.indexOf(d), 1);
         }
-        updateCircles();
-        self.props.onHandleSetChange(mustDifferentialCopy, notDifferentialCopy);
+        if (d !== uAnchorP) {
+          updateCircles();
+          self.props.onHandleSetChange(
+            mustDifferentialCopy,
+            notDifferentialCopy,
+          );
+        }
+      })
+      .on('mouseover', function(d) {
+        const cursorStyle = d !== uAnchorP ? 'pointer' : 'not-allowed';
+        d3.select(this)
+          .transition()
+          .duration(100)
+          .attr('cursor', cursorStyle);
       });
 
     // const miniMaybeCircles =
@@ -616,8 +635,20 @@ class DifferentialMultisetFilters extends Component {
         if (notDifferential.includes(d) && d !== uAnchorP) {
           notDifferentialCopy.splice(notDifferential.indexOf(d), 1);
         }
-        updateCircles();
-        self.props.onHandleSetChange(mustDifferentialCopy, notDifferentialCopy);
+        if (d !== uAnchorP) {
+          updateCircles();
+          self.props.onHandleSetChange(
+            mustDifferentialCopy,
+            notDifferentialCopy,
+          );
+        }
+      })
+      .on('mouseover', function(d) {
+        const cursorStyle = d !== uAnchorP ? 'pointer' : 'not-allowed';
+        d3.select(this)
+          .transition()
+          .duration(100)
+          .attr('cursor', cursorStyle);
       });
 
     const notCircles = svg
@@ -649,12 +680,21 @@ class DifferentialMultisetFilters extends Component {
           if (mustDifferential.includes(d)) {
             mustDifferentialCopy.splice(mustDifferential.indexOf(d), 1);
           }
-          updateCircles();
-          self.props.onHandleSetChange(
-            mustDifferentialCopy,
-            notDifferentialCopy,
-          );
+          if (d !== uAnchorP) {
+            updateCircles();
+            self.props.onHandleSetChange(
+              mustDifferentialCopy,
+              notDifferentialCopy,
+            );
+          }
         }
+      })
+      .on('mouseover', function(d) {
+        const cursorStyle = d !== uAnchorP ? 'pointer' : 'not-allowed';
+        d3.select(this)
+          .transition()
+          .duration(100)
+          .attr('cursor', cursorStyle);
       });
 
     // const lineVert =
@@ -820,6 +860,7 @@ class DifferentialMultisetFilters extends Component {
       svg
         .append('rect')
         .style('fill', 'white')
+        .attr('class', 'CursorNotAllowed')
         .attr('x', circlePadding + circleRadius - circleRadius / 3)
         .attr(
           'y',
@@ -884,7 +925,6 @@ class DifferentialMultisetFilters extends Component {
     const callbackFactory = index => value => {
       this.props.onHandleSigValuePInputChange('sigValueP', value, index);
     };
-    console.log(selectedColP[0].value);
     return (
       <Fragment>
         <Form className="MultisetDropdownContainer">

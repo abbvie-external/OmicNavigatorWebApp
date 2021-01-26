@@ -73,13 +73,13 @@ class FilteredDifferentialTable extends Component {
         // differentialResults
       } = this.props;
       // const { itemsPerPageFilteredDifferentialTable } = this.state;
-      const currentData = this.props.filteredDifferentialGridRef?.current
-        ?.qhGridRef?.current?.data;
-      if (currentData != null) {
+      const sortedData =
+        this.props.filteredDifferentialGridRef.current?.qhGridRef.current?.getSortedData() ||
+        [];
+      if (sortedData != null) {
         const itemsPerPage = this.props.filteredDifferentialGridRef?.current
           ?.qhGridRef?.current?.props.itemsPerPage;
-        const Index = _.findIndex(currentData, function(p) {
-          // const Index = _.findIndex(differentialResults, function(p) {
+        const Index = _.findIndex(sortedData, function(p) {
           return p[filteredDifferentialFeatureIdKey] === featureToHighlight;
         });
         const pageNumber = Math.ceil((Index + 1) / itemsPerPage);

@@ -280,12 +280,13 @@ class Enrichment extends Component {
     //     dataItem.Annotation = _.find(annotationDataParsed, {
     //       Description: dataItem.description,
     //     }).Key;
-    let term = dataItem.termID;
+    let term = dataItem?.termID || '';
+    let description = dataItem?.description || '';
     self.setState({
       imageInfo: {
         ...self.state.imageInfo,
-        key: `${test}:${dataItem.description}`,
-        title: `${test}:${dataItem.description}`,
+        key: `${test}:${description}`,
+        title: `${test}:${description}`,
       },
       enrichmentNameLoaded: true,
       enrichmentDataItem: dataItem,
@@ -465,7 +466,6 @@ class Enrichment extends Component {
     this.setState({
       multisetTestsFilteredOut: [],
       enrichmentColumnsUnfiltered: [],
-      multisetFiltersVisibleEnrichment: false,
       enrichmentColumns: [],
     });
   };
@@ -1233,12 +1233,13 @@ class Enrichment extends Component {
       },
       true,
     );
-    let term = dataItem.termID;
+    let term = dataItem?.termID || '';
+    let description = dataItem?.description || '';
     this.setState({
       imageInfo: {
         ...this.state.imageInfo,
-        key: `${test}:${dataItem.description}`,
-        title: `${test}:${dataItem.description}`,
+        key: `${test}:${description}`,
+        title: `${test}:${description}`,
         dataItem: dataItem,
       },
       enrichmentNameLoaded: true,

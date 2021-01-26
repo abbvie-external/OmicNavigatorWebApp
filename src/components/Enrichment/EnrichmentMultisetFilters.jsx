@@ -498,6 +498,7 @@ class EnrichmentMultisetFilters extends Component {
         return multisetTestsFilteredOut.includes(d) ? 0.5 : 1;
       })
       .style('fill', baseColorCode)
+      .attr('class', 'SetCircle')
       .attr('cx', circlePadding + circleRadius)
       .attr('cy', function(d) {
         return (
@@ -537,6 +538,7 @@ class EnrichmentMultisetFilters extends Component {
         return multisetTestsFilteredOut.includes(d) ? 0.5 : 1;
       })
       .style('fill', backgroundColorCode)
+      .attr('class', 'SetCircle')
       .attr('cx', 2 * circlePadding + 3 * circleRadius)
       .attr('cy', function(d) {
         return (
@@ -579,6 +581,7 @@ class EnrichmentMultisetFilters extends Component {
         return multisetTestsFilteredOut.includes(d) ? 0.5 : 1;
       })
       .style('fill', baseColorCode)
+      .attr('class', 'SetCircle')
       .attr('cx', 2 * circlePadding + 3 * circleRadius)
       .attr('cy', function(d) {
         return (
@@ -612,6 +615,7 @@ class EnrichmentMultisetFilters extends Component {
       .style('opacity', function(d) {
         return multisetTestsFilteredOut.includes(d) ? 0.5 : 1;
       })
+      .attr('class', 'SetCircle')
       .attr('cx', 3 * circlePadding + 5 * circleRadius)
       .attr('cy', function(d) {
         return (
