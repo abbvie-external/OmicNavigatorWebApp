@@ -522,24 +522,69 @@ class Enrichment extends Component {
   };
 
   getEnrichmentsLinkouts = (enrichmentStudy, enrichmentAnnotation) => {
-    this.setState({
-      enrichmentsLinkouts: [],
-      enrichmentsFavicons: [],
-    });
-    omicNavigatorService
-      .getEnrichmentsLinkouts(enrichmentStudy, enrichmentAnnotation)
-      .then(getEnrichmentsLinkoutsResponseData => {
+    const cachedEnrichmentsLinkouts = sessionStorage.getItem(
+      `EnrichmentsLinkouts-${enrichmentStudy}_${enrichmentAnnotation}`,
+    );
+    if (cachedEnrichmentsLinkouts) {
+      const parsedEnrichmentsLinkouts = JSON.parse(cachedEnrichmentsLinkouts);
+      this.setState({
+        enrichmentsLinkouts: parsedEnrichmentsLinkouts,
+      });
+      const cachedEnrichmentsFavicons = sessionStorage.getItem(
+        `EnrichmentsFavicons-${enrichmentStudy}_${enrichmentAnnotation}`,
+      );
+      if (cachedEnrichmentsFavicons) {
+        const parsedEnrichmentsFavicons = JSON.parse(cachedEnrichmentsFavicons);
         this.setState({
-          enrichmentsLinkouts: getEnrichmentsLinkoutsResponseData,
+          enrichmentsFavicons: parsedEnrichmentsFavicons,
+        });
+      } else {
+        this.setState({
+          enrichmentsFavicons: [],
         });
         omicNavigatorService
-          .getFavicons(getEnrichmentsLinkoutsResponseData)
+          .getFavicons(parsedEnrichmentsLinkouts)
           .then(getFaviconsResponseData => {
+            const favicons = getFaviconsResponseData || [];
             this.setState({
-              enrichmentsFavicons: getFaviconsResponseData,
+              enrichmentsFavicons: favicons,
             });
+            sessionStorage.setItem(
+              `EnrichmentsFavicons-${enrichmentStudy}_${enrichmentAnnotation}`,
+              JSON.stringify(favicons),
+            );
           });
+      }
+    } else {
+      this.setState({
+        enrichmentsLinkouts: [],
+        enrichmentsFavicons: [],
       });
+      omicNavigatorService
+        .getEnrichmentsLinkouts(enrichmentStudy, enrichmentAnnotation)
+        .then(getEnrichmentsLinkoutsResponseData => {
+          const linkouts = getEnrichmentsLinkoutsResponseData;
+          this.setState({
+            enrichmentsLinkouts: linkouts,
+          });
+          sessionStorage.setItem(
+            `EnrichmentsLinkouts-${enrichmentStudy}_${enrichmentAnnotation}`,
+            JSON.stringify(linkouts),
+          );
+          omicNavigatorService
+            .getFavicons(getEnrichmentsLinkoutsResponseData)
+            .then(getFaviconsResponseData => {
+              const favicons = getFaviconsResponseData || [];
+              this.setState({
+                enrichmentsFavicons: favicons,
+              });
+              sessionStorage.setItem(
+                `EnrichmentsFavicons-${enrichmentStudy}_${enrichmentAnnotation}`,
+                JSON.stringify(favicons),
+              );
+            });
+        });
+    }
   };
 
   handleIsDataStreamingEnrichmentsTable = bool => {

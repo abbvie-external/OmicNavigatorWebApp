@@ -233,24 +233,69 @@ class Differential extends Component {
   };
 
   getResultsLinkouts = (differentialStudy, differentialModel) => {
-    this.setState({
-      resultsLinkouts: [],
-      resultsFavicons: [],
-    });
-    omicNavigatorService
-      .getResultsLinkouts(differentialStudy, differentialModel)
-      .then(getResultsLinkoutsResponseData => {
+    const cachedResultsLinkouts = sessionStorage.getItem(
+      `ResultsLinkouts-${differentialStudy}_${differentialModel}`,
+    );
+    if (cachedResultsLinkouts) {
+      const parsedResultsLinkouts = JSON.parse(cachedResultsLinkouts);
+      this.setState({
+        resultsLinkouts: parsedResultsLinkouts,
+      });
+      const cachedResultsFavicons = sessionStorage.getItem(
+        `ResultsFavicons-${differentialStudy}_${differentialModel}`,
+      );
+      if (cachedResultsFavicons) {
+        const parsedResultsFavicons = JSON.parse(cachedResultsFavicons);
         this.setState({
-          resultsLinkouts: getResultsLinkoutsResponseData,
+          resultsFavicons: parsedResultsFavicons,
+        });
+      } else {
+        this.setState({
+          resultsFavicons: [],
         });
         omicNavigatorService
-          .getFavicons(getResultsLinkoutsResponseData)
+          .getFavicons(parsedResultsLinkouts)
           .then(getFaviconsResponseData => {
+            const favicons = getFaviconsResponseData || [];
             this.setState({
-              resultsFavicons: getFaviconsResponseData,
+              resultsFavicons: favicons,
             });
+            sessionStorage.setItem(
+              `ResultsFavicons-${differentialStudy}_${differentialModel}`,
+              JSON.stringify(favicons),
+            );
           });
+      }
+    } else {
+      this.setState({
+        resultsLinkouts: [],
+        resultsFavicons: [],
       });
+      omicNavigatorService
+        .getResultsLinkouts(differentialStudy, differentialModel)
+        .then(getResultsLinkoutsResponseData => {
+          const linkouts = getResultsLinkoutsResponseData || [];
+          this.setState({
+            resultsLinkouts: linkouts,
+          });
+          sessionStorage.setItem(
+            `ResultsLinkouts-${differentialStudy}_${differentialModel}`,
+            JSON.stringify(linkouts),
+          );
+          omicNavigatorService
+            .getFavicons(linkouts)
+            .then(getFaviconsResponseData => {
+              const favicons = getFaviconsResponseData || [];
+              this.setState({
+                resultsFavicons: favicons,
+              });
+              sessionStorage.setItem(
+                `ResultsFavicons-${differentialStudy}_${differentialModel}`,
+                JSON.stringify(favicons),
+              );
+            });
+        });
+    }
   };
 
   handleIsDataStreamingResultsTable = bool => {
