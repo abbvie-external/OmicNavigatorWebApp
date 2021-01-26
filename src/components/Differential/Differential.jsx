@@ -148,6 +148,7 @@ class Differential extends Component {
     if (searchResults.differentialResults?.length > 0) {
       columns = this.getConfigCols(searchResults);
     }
+    debugger;
     this.setState({
       differentialResults: searchResults.differentialResults,
       differentialColumns: columns,
@@ -233,28 +234,26 @@ class Differential extends Component {
   };
 
   getResultsLinkouts = (differentialStudy, differentialModel) => {
-    this.setState({
-      resultsLinkouts: [],
-      resultsFavicons: [],
-    });
-    debugger;
-    const storedResultsLinkouts = sessionStorage.getItem(
+    const cachedResultsLinkouts = sessionStorage.getItem(
       `ResultsLinkouts-${differentialStudy}_${differentialModel}`,
     );
-    if (storedResultsLinkouts) {
-      const parsedResultsLinkouts = JSON.parse(storedResultsLinkouts);
+    if (cachedResultsLinkouts) {
+      const parsedResultsLinkouts = JSON.parse(cachedResultsLinkouts);
       this.setState({
         resultsLinkouts: parsedResultsLinkouts,
       });
-      const storedResultsFavicons = sessionStorage.getItem(
+      const cachedResultsFavicons = sessionStorage.getItem(
         `ResultsFavicons-${differentialStudy}_${differentialModel}`,
       );
-      if (storedResultsFavicons) {
-        const parsedResultsFavicons = JSON.parse(storedResultsFavicons);
+      if (cachedResultsFavicons) {
+        const parsedResultsFavicons = JSON.parse(cachedResultsFavicons);
         this.setState({
           resultsFavicons: parsedResultsFavicons,
         });
       } else {
+        this.setState({
+          resultsFavicons: [],
+        });
         omicNavigatorService
           .getFavicons(parsedResultsLinkouts)
           .then(getFaviconsResponseData => {
@@ -268,6 +267,10 @@ class Differential extends Component {
           });
       }
     } else {
+      this.setState({
+        resultsLinkouts: [],
+        resultsFavicons: [],
+      });
       omicNavigatorService
         .getResultsLinkouts(differentialStudy, differentialModel)
         .then(getResultsLinkoutsResponseData => {
@@ -624,6 +627,7 @@ class Differential extends Component {
     );
   };
   getConfigCols = testData => {
+    debugger;
     const differentialResultsVar = testData.differentialResults;
     const { differentialFeature } = this.props;
     const {
