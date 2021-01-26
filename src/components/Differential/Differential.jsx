@@ -148,7 +148,6 @@ class Differential extends Component {
     if (searchResults.differentialResults?.length > 0) {
       columns = this.getConfigCols(searchResults);
     }
-    debugger;
     this.setState({
       differentialResults: searchResults.differentialResults,
       differentialColumns: columns,
@@ -627,7 +626,6 @@ class Differential extends Component {
     );
   };
   getConfigCols = testData => {
-    debugger;
     const differentialResultsVar = testData.differentialResults;
     const { differentialFeature } = this.props;
     const {
