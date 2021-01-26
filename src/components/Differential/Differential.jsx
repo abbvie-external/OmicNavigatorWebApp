@@ -237,20 +237,60 @@ class Differential extends Component {
       resultsLinkouts: [],
       resultsFavicons: [],
     });
-    omicNavigatorService
-      .getResultsLinkouts(differentialStudy, differentialModel)
-      .then(getResultsLinkoutsResponseData => {
+    debugger;
+    const storedResultsLinkouts = sessionStorage.getItem(
+      `ResultsLinkouts-${differentialStudy}_${differentialModel}`,
+    );
+    if (storedResultsLinkouts) {
+      const parsedResultsLinkouts = JSON.parse(storedResultsLinkouts);
+      this.setState({
+        resultsLinkouts: parsedResultsLinkouts,
+      });
+      const storedResultsFavicons = sessionStorage.getItem(
+        `ResultsFavicons-${differentialStudy}_${differentialModel}`,
+      );
+      if (storedResultsFavicons) {
+        const parsedResultsFavicons = JSON.parse(storedResultsFavicons);
         this.setState({
-          resultsLinkouts: getResultsLinkoutsResponseData,
+          resultsFavicons: parsedResultsFavicons,
         });
+      } else {
         omicNavigatorService
-          .getFavicons(getResultsLinkoutsResponseData)
+          .getFavicons(parsedResultsLinkouts)
           .then(getFaviconsResponseData => {
             this.setState({
               resultsFavicons: getFaviconsResponseData,
             });
+            sessionStorage.setItem(
+              `ResultsFavicons-${differentialStudy}_${differentialModel}`,
+              JSON.stringify(getFaviconsResponseData),
+            );
           });
-      });
+      }
+    } else {
+      omicNavigatorService
+        .getResultsLinkouts(differentialStudy, differentialModel)
+        .then(getResultsLinkoutsResponseData => {
+          this.setState({
+            resultsLinkouts: getResultsLinkoutsResponseData,
+          });
+          sessionStorage.setItem(
+            `ResultsLinkouts-${differentialStudy}_${differentialModel}`,
+            JSON.stringify(getResultsLinkoutsResponseData),
+          );
+          omicNavigatorService
+            .getFavicons(getResultsLinkoutsResponseData)
+            .then(getFaviconsResponseData => {
+              this.setState({
+                resultsFavicons: getFaviconsResponseData,
+              });
+              sessionStorage.setItem(
+                `ResultsFavicons-${differentialStudy}_${differentialModel}`,
+                JSON.stringify(getFaviconsResponseData),
+              );
+            });
+        });
+    }
   };
 
   handleIsDataStreamingResultsTable = bool => {
