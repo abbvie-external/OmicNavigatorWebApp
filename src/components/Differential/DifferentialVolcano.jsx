@@ -117,19 +117,19 @@ class DifferentialVolcano extends Component {
   }
 
   pageToFeature = featureToHighlight => {
-    if (featureToHighlight !== '') {
+    if (featureToHighlight) {
       const {
         differentialFeatureIdKey,
         // differentialResults
       } = this.props;
       // const { itemsPerPageVolcanoTable } = this.state;
-      const currentData = this.volcanoPlotFilteredGridRef?.current?.qhGridRef
-        ?.current?.data;
-      if (currentData != null) {
+      const sortedData =
+        this.volcanoPlotFilteredGridRef.current?.qhGridRef?.current?.getSortedData() ||
+        [];
+      if (sortedData != null) {
         const itemsPerPage = this.volcanoPlotFilteredGridRef?.current?.qhGridRef
           ?.current?.props.itemsPerPage;
-        const Index = _.findIndex(currentData, function(p) {
-          // const Index = _.findIndex(differentialResults, function(p) {
+        const Index = _.findIndex(sortedData, function(p) {
           return p[differentialFeatureIdKey] === featureToHighlight;
         });
         const pageNumber = Math.ceil((Index + 1) / itemsPerPage);
@@ -240,6 +240,7 @@ class DifferentialVolcano extends Component {
     }
   };
   handleVolcanoPlotSelectionChange = volcanoPlotSelectedDataArr => {
+    this.pageToFeature();
     if (volcanoPlotSelectedDataArr.length > 0) {
       this.setState({
         filteredTableData: volcanoPlotSelectedDataArr,

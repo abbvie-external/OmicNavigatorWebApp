@@ -25,6 +25,7 @@ class OmicNavigatorService {
         .catch(function(error) {
           if (!axios.isCancel(error)) {
             if (
+              method !== 'getFavicons' &&
               method !== 'getReportLink' &&
               method !== 'getMetaFeaturesTable'
             ) {
@@ -56,7 +57,6 @@ class OmicNavigatorService {
     const self = this;
     return new Promise(function(resolve, reject) {
       const axiosPostUrl = `${self.url}/${plottype}/graphics/1/svg`;
-      // const axiosPostUrl = `${self.url}/${plottype}/graphics/R/plotStudy`;
       axios
         .post(axiosPostUrl, obj, {
           params: paramsObj,

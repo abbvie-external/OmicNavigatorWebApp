@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { withRouter } from 'react-router-dom';
 import {
   Form,
@@ -694,6 +694,7 @@ class DifferentialSearchCriteria extends Component {
     uSetVP.hoveredFilter = index;
     this.setState({ uSettingsP: uSetVP });
   };
+
   handleDropdownChange = (evt, { name, value, index }) => {
     // this.props.onHandleVolcanoTableLoading(true);
     const uSelVP = [...this.state[name]];
@@ -702,42 +703,25 @@ class DifferentialSearchCriteria extends Component {
       text: value,
       value: value,
     };
-    this.setState(
-      {
-        [name]: uSelVP,
-        // reloadPlotP: false,
-        isFilteredDifferential: false,
-      },
-      // function() {
-      //   this.updateQueryDataP();
-      // },
-    );
+    this.setState({
+      [name]: uSelVP,
+      reloadPlotP: true,
+      isFilteredDifferential: false,
+    });
   };
   handleSigValuePInputChange = (name, value, index) => {
-    // if (!this.state.initialRenderP) {
-    //   this.props.onHandleVolcanoTableLoading(true);
-    // }
     const uSelVP = [...this.state[name]];
     uSelVP[index] = parseFloat(value);
-    this.setState(
-      {
-        [name]: uSelVP,
-        reloadPlotP: true,
-        isFilteredDifferential: false,
-        // initialRenderP: false,
-      },
-      // function() {
-      //   this.updateQueryDataP();
-      // },
-    );
+    this.setState({
+      [name]: uSelVP,
+      reloadPlotP: true,
+      isFilteredDifferential: false,
+    });
   };
   handleSetChange = (mustDifferential, notDifferential) => {
-    // this.props.onHandleVolcanoTableLoading(true);
     this.setState({
       mustDifferential,
       notDifferential,
-      // if BE changes to have multi-set plot consider set changes, this is needed
-      // reloadPlotP: true,
       isFilteredDifferential: false,
     });
   };
@@ -801,9 +785,6 @@ class DifferentialSearchCriteria extends Component {
       .catch(error => {
         console.error('Error during getResultsIntersection', error);
       });
-    //   const testsLength =
-    //   typeof differentialTests === 'string' ? 1 : differentialTests.length;
-    // if (reloadPlotP === true && testsLength > 1) {
     if (reloadPlotP === true && differentialTests.length > 1) {
       onDisablePlotDifferential();
       this.getMultisetPlot(
@@ -1028,20 +1009,57 @@ class DifferentialSearchCriteria extends Component {
 
     if (isValidSearchDifferential) {
       PlotRadio = (
-        <Transition
-          visible={!multisetPlotAvailableDifferential}
-          animation="flash"
-          duration={1500}
-        >
-          <Radio
-            toggle
-            label="View Plot"
-            className={multisetPlotAvailableDifferential ? 'ViewPlotRadio' : ''}
-            checked={plotButtonActiveDifferential}
-            onChange={onHandlePlotAnimationDifferential('uncover')}
-            disabled={!multisetPlotAvailableDifferential}
-          />
-        </Transition>
+        <Fragment>
+          <Transition
+            visible={!multisetPlotAvailableDifferential}
+            animation="flash"
+            duration={1500}
+          >
+            <Radio
+              toggle
+              label="View Plot"
+              className={
+                multisetPlotAvailableDifferential ? 'ViewPlotRadio' : ''
+              }
+              checked={plotButtonActiveDifferential}
+              onChange={onHandlePlotAnimationDifferential('uncover')}
+              disabled={!multisetPlotAvailableDifferential}
+            />
+          </Transition>
+          <Popup
+            trigger={
+              <Icon
+                size="small"
+                name="info circle"
+                className="ViewPlotInfo"
+                color="grey"
+              />
+            }
+            style={StudyPopupStyle}
+            className="CustomTooltip"
+            position="bottom center"
+            inverted
+            basic
+            on="click"
+            mouseEnterDelay={1000}
+            mouseLeaveDelay={0}
+          >
+            <Popup.Content>
+              View as intersecting sets, or{' '}
+              <a
+                href="https://github.com/hms-dbmi/UpSetR"
+                target="_blank"
+                rel="noreferrer"
+              >
+                UpSet
+              </a>{' '}
+              plot, derived from features that pass the selected filters in at
+              least one of the possible sets. Note that this plot considers the
+              column/operator/value selection and ignores the must/maybe/not
+              selection.
+            </Popup.Content>
+          </Popup>
+        </Fragment>
       );
 
       MultisetRadio = (

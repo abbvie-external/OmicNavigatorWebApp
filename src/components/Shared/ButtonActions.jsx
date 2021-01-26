@@ -142,7 +142,6 @@ class ButtonActions extends Component {
   };
 
   PDFExport = () => {
-    console.log(this.props);
     const isMultisetPlot = this.props.visible;
     if (isMultisetPlot) {
       const Plot = document.getElementById('multisetAnalysisSVG') || null;

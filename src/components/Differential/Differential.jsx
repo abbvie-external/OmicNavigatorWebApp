@@ -820,9 +820,6 @@ class Differential extends Component {
         <DifferentialVolcano
           {...this.state}
           {...this.props}
-          handleVolcanoPlotSelectionChange={
-            this.handleVolcanoPlotSelectionChange
-          }
           onHandleSelectedVolcano={this.handleSelectedVolcano}
           onVolcanoSVGSizeChange={this.handleVolcanoSVGSizeChange}
           onSVGTabChange={this.handleSVGTabChange}

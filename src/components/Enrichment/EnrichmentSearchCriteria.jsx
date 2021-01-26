@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import {
   Form,
   Select,
@@ -539,8 +539,8 @@ class EnrichmentSearchCriteria extends Component {
       onEnrichmentSearch,
       onHandlePValueTypeChange,
       onHandleEnrichmentTableLoading,
-      multisetFiltersVisibleEnrichment,
     } = this.props;
+    const { multisetFiltersVisibleEnrichment } = this.state;
     onHandlePValueTypeChange(value);
     if (!multisetFiltersVisibleEnrichment) {
       const cacheKey = `getEnrichmentsTable_${enrichmentStudy}_${enrichmentModel}_${enrichmentAnnotation}_${value}`;
@@ -593,15 +593,11 @@ class EnrichmentSearchCriteria extends Component {
         mustEnrichment,
         notEnrichment,
       } = this.state;
-      onHandleEnrichmentTableLoading(true);
-      this.getMultisetPlot(
-        sigValue,
-        enrichmentModel,
-        enrichmentStudy,
-        enrichmentAnnotation,
-        this.jsonToList(selectedOperator),
-        value,
-      );
+      this.setState({
+        reloadPlot: true,
+        isFilteredEnrichment: false,
+      });
+      this.props.onHandleEnrichmentTableLoading(true);
       cancelRequestMultisetEnrichmentData();
       let cancelToken = new CancelToken(e => {
         cancelRequestMultisetEnrichmentData = e;
@@ -782,7 +778,7 @@ class EnrichmentSearchCriteria extends Component {
     };
     this.setState({
       [name]: uSelVP,
-      reloadPlot: false,
+      reloadPlot: true,
     });
   };
 
@@ -935,6 +931,7 @@ class EnrichmentSearchCriteria extends Component {
     enrichmentStudy,
     enrichmentAnnotation,
     selectedOperator,
+    pValueType,
   ) {
     const { uData, multisetTestsFilteredOut } = this.props;
     const tests = uData.filter(function(col) {
@@ -952,7 +949,7 @@ class EnrichmentSearchCriteria extends Component {
           enrichmentAnnotation,
           sigVal,
           selectedOperator,
-          this.props.pValueType,
+          pValueType,
           tests,
           undefined,
           cancelToken,
@@ -1143,20 +1140,55 @@ class EnrichmentSearchCriteria extends Component {
 
     if (isValidSearchEnrichment) {
       PlotRadio = (
-        <Transition
-          visible={!multisetPlotAvailableEnrichment}
-          animation="flash"
-          duration={1500}
-        >
-          <Radio
-            toggle
-            label="View Plot"
-            className={multisetPlotAvailableEnrichment ? 'ViewPlotRadio' : ''}
-            checked={plotButtonActiveEnrichment}
-            onChange={this.props.onHandlePlotAnimationEnrichment('uncover')}
-            disabled={!multisetPlotAvailableEnrichment}
-          />
-        </Transition>
+        <Fragment>
+          <Transition
+            visible={!multisetPlotAvailableEnrichment}
+            animation="flash"
+            duration={1500}
+          >
+            <Radio
+              toggle
+              label="View Plot"
+              className={multisetPlotAvailableEnrichment ? 'ViewPlotRadio' : ''}
+              checked={plotButtonActiveEnrichment}
+              onChange={this.props.onHandlePlotAnimationEnrichment('uncover')}
+              disabled={!multisetPlotAvailableEnrichment}
+            />
+          </Transition>
+          <Popup
+            trigger={
+              <Icon
+                size="small"
+                name="info circle"
+                className="ViewPlotInfo"
+                color="grey"
+              />
+            }
+            style={StudyPopupStyle}
+            className="CustomTooltip"
+            position="bottom center"
+            inverted
+            basic
+            on="click"
+            mouseEnterDelay={1000}
+            mouseLeaveDelay={0}
+          >
+            <Popup.Content>
+              View as intersecting sets, or{' '}
+              <a
+                href="https://github.com/hms-dbmi/UpSetR"
+                target="_blank"
+                rel="noreferrer"
+              >
+                UpSet
+              </a>{' '}
+              plot, derived from features that pass the selected filters in at
+              least one of the possible sets. Note that this plot considers the
+              column/operator/value selection and ignores the must/maybe/not
+              selection.
+            </Popup.Content>
+          </Popup>
+        </Fragment>
       );
 
       MultisetRadio = (
