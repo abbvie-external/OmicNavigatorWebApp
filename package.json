@@ -1,6 +1,6 @@
 {
-  "name": "phospho-prot-react",
-  "version": "0.1.0",
+  "name": "OmicNavigatorApp",
+  "version": "0.3.8",
   "private": true,
   "dependencies": {
     "***REMOVED***": "^0.1.7",
