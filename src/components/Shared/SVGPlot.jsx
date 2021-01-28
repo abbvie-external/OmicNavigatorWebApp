@@ -3,8 +3,8 @@ import {
   Loader,
   Dimmer,
   Tab,
-  Popup,
-  Icon,
+  // Popup,
+  // Icon,
   Message,
   // Menu,
   // Label,
@@ -121,15 +121,15 @@ class SVGPlot extends Component {
       const { activeSVGTabIndex, imageInfo, svgExportName, tab } = this.props;
       const ButtonActionsClass = this.getButtonActionsClass();
 
-      const BreadcrumbPopupStyle = {
-        backgroundColor: '2E2E2E',
-        borderBottom: '2px solid var(--color-primary)',
-        color: '#FFF',
-        padding: '1em',
-        maxWidth: '50vw',
-        fontSize: '13px',
-        wordBreak: 'break-all',
-      };
+      // const BreadcrumbPopupStyle = {
+      //   backgroundColor: '2E2E2E',
+      //   borderBottom: '2px solid var(--color-primary)',
+      //   color: '#FFF',
+      //   padding: '1em',
+      //   maxWidth: '50vw',
+      //   fontSize: '13px',
+      //   wordBreak: 'break-all',
+      // };
       const svgPanes = this.getSVGPanes(activeSVGTabIndex);
       return (
         <div className="svgContainer">
