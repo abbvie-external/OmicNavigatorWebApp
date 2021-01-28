@@ -3,7 +3,6 @@
   "version": "0.3.8",
   "private": true,
   "dependencies": {
-    "***REMOVED***": "^0.1.7",
     "gh-pages": "^3.1.0"
   },
   "homepage": ".",
@@ -57,14 +56,16 @@
     "file-saver": "^2.0.2",
     "html2canvas": "^1.0.0-rc.5",
     "husky": "^3.0.3",
-    "immutability-helper": "^3.0.1",
+    "immutability-helper": "^3.1.1",
     "jquery": "^3.5.1",
     "json-to-txt": "^2.1.1",
     "jspdf": "^1.5.3",
     "lint-staged": "^9.2.1",
     "lodash": "^4.17.19",
-    "moment": "^2.24.0",
+    "lodash-es": "^4.17.15",
+    "moment": "^2.27.0",
     "node-sass": "^4.14.1",
+    "npm-run-all": "^4.1.5",
     "opencpu.js": "^0.5.0",
     "pdfkit": "^0.11.0",
     "prettier": "^1.19.1",
@@ -80,16 +81,17 @@
     "react-sortable-hoc": "^1.11.0",
     "react-split-pane": "^0.1.87",
     "react-toastify": "^5.4.1",
-    "react-virtualized": "^9.21.0",
+    "react-virtualized": "^9.22.2",
     "reselect": "^4.0.0",
     "resize-observer-polyfill": "^1.5.1",
     "save-svg-as-png": "^1.4.14",
     "semantic-ui-css": "^2.4.1",
-    "semantic-ui-react": "^0.87.3",
+    "semantic-ui-react": "^1.2.0",
+    "standard-version": "^9.0.0",
     "styled-components": "^5.0.1",
     "svg-to-pdfkit": "^0.1.7",
     "transform-loader": "^0.2.4",
     "webpack-bundle-analyzer": "^3.8.0",
-    "xlsx": "^0.14.5"
+    "xlsx": "^0.16.6"
   }
 }

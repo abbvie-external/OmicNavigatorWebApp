@@ -5,7 +5,7 @@ import { formatNumberForDisplay, splitValue } from '../Shared/helpers';
 import './MetafeaturesTable.scss';
 // import { CancelToken } from 'axios';
 // eslint-disable-next-line no-unused-vars
-import QHGrid, { EZGrid } from '***REMOVED***';
+import QHGrid, { EZGrid } from '../utility/dist';
 
 class MetafeaturesTable extends Component {
   state = {
