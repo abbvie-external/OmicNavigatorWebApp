@@ -10,7 +10,10 @@ import { updateUrl } from './Shared/UrlControl';
 class Tabs extends Component {
   constructor(props) {
     super(props);
-    const baseUrl = window.location.origin || 'http://localhost:3000';
+    const baseUrlVar =
+      process.env.NODE_ENV === 'development'
+        ? process.env.REACT_APP_DEVSERVER
+        : process.env.REACT_APP_PRODSERVER;
     const pathnameInit = this.props.location.pathname.substring(1) || null;
     const pathname =
       pathnameInit !== null ? pathnameInit.replace(/–/gi, ' ') : pathnameInit;
@@ -33,7 +36,7 @@ class Tabs extends Component {
     );
     const isEnrichment = tabFromUrl === 'enrichment';
     this.state = {
-      baseUrl: baseUrl,
+      baseUrl: baseUrlVar,
       activeIndex: isEnrichment ? 2 : 1,
       tab: tabFromUrl || 'differential',
       enrichmentStudy: isEnrichment ? decodedStudy : '',
