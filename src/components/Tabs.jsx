@@ -13,7 +13,7 @@ class Tabs extends Component {
     const baseUrlVar =
       process.env.NODE_ENV === 'development'
         ? process.env.REACT_APP_DEVSERVER
-        : process.env.REACT_APP_PRODSERVER;
+        : window.location.origin;
     const pathnameInit = this.props.location.pathname.substring(1) || null;
     const pathname =
       pathnameInit !== null ? pathnameInit.replace(/–/gi, ' ') : pathnameInit;
@@ -55,7 +55,7 @@ class Tabs extends Component {
       allStudiesMetadata: [],
       differentialFeatureIdKey: '',
       filteredDifferentialFeatureIdKey: '',
-      appVersion: process.env.REACT_APP_VERSION,
+      appVersion: '0.3.8',
       packageVersion: '',
     };
   }

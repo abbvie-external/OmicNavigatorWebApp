@@ -8,7 +8,7 @@ class OmicNavigatorService {
     this.baseUrl =
       process.env.NODE_ENV === 'development'
         ? process.env.REACT_APP_DEVSERVER
-        : process.env.REACT_APP_PRODSERVER;
+        : window.location.origin;
     this.url = `${this.baseUrl}/ocpu/library/OmicNavigator/R`;
   }
 
