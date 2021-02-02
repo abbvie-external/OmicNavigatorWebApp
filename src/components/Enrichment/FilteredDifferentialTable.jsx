@@ -72,17 +72,17 @@ class FilteredDifferentialTable extends Component {
         filteredDifferentialFeatureIdKey,
         // differentialResults
       } = this.props;
-      // const { itemsPerPageFilteredDifferentialTable } = this.state;
+      const { itemsPerPageFilteredDifferentialTable } = this.state;
       const sortedData =
         this.props.filteredDifferentialGridRef.current?.qhGridRef.current?.getSortedData() ||
         [];
       if (sortedData != null) {
-        const itemsPerPage = this.props.filteredDifferentialGridRef?.current
-          ?.qhGridRef?.current?.props.itemsPerPage;
         const Index = _.findIndex(sortedData, function(p) {
           return p[filteredDifferentialFeatureIdKey] === featureToHighlight;
         });
-        const pageNumber = Math.ceil((Index + 1) / itemsPerPage);
+        const pageNumber = Math.ceil(
+          (Index + 1) / itemsPerPageFilteredDifferentialTable,
+        );
         if (pageNumber > 0) {
           this.props.filteredDifferentialGridRef.current.handlePageChange(
             pageNumber,
@@ -313,12 +313,12 @@ class FilteredDifferentialTable extends Component {
     this.setState({ rowClicked: false });
   };
 
-  // informItemsPerPageFilteredDifferentialTable = items => {
-  //   this.setState({
-  //     itemsPerPageFilteredDifferentialTable: items,
-  //   });
-  //   localStorage.setItem('itemsPerPageFilteredDifferentialTable', items);
-  // };
+  handleItemsPerPageChange = items => {
+    this.setState({
+      itemsPerPageFilteredDifferentialTable: items,
+    });
+    localStorage.setItem('itemsPerPageFilteredDifferentialTable', items);
+  };
 
   handleRowClick = (event, item, index) => {
     this.setState({ rowClicked: true });
@@ -430,9 +430,7 @@ class FilteredDifferentialTable extends Component {
             totalRows={15}
             // use "differentialRows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
             itemsPerPage={itemsPerPageFilteredDifferentialTable}
-            // onInformItemsPerPage={
-            //   this.informItemsPerPageFilteredDifferentialTable
-            // }
+            onItemsPerPageChange={this.handleItemsPerPageChange}
             // exportBaseName="Differential_Analysis_Filtered"
             // quickViews={quickViews}
             // disableGeneralSearch
