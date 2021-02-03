@@ -1105,12 +1105,13 @@ class Enrichment extends Component {
             enrichmentModel,
             id,
             enrichmentPlotTypes[i].plotID,
+            enrichmentPlotTypes[i].plotType,
             handlePlotStudyError,
             cancelToken,
           )
           .then(svgMarkupObj => {
-            let svgMarkup = svgMarkupObj.data;
-            if (svgMarkup != null || svgMarkup !== []) {
+            let svgMarkup = svgMarkupObj?.data || null;
+            if (svgMarkup != null && svgMarkup !== []) {
               svgMarkup = svgMarkup.replace(
                 /id="/g,
                 'id="' + id + '-' + i + '-',

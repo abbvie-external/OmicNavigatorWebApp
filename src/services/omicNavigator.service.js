@@ -97,8 +97,7 @@ class OmicNavigatorService {
             })
             .then(response => resolve(response))
             .catch(function(thrown) {
-              if (axios.isCancel(thrown)) {
-              } else {
+              if (!axios.isCancel(thrown)) {
                 toast.error(`${thrown.message}`);
                 if (handleError != null) {
                   handleError(false);
@@ -271,8 +270,19 @@ class OmicNavigatorService {
     }
   }
 
-  async plotStudy(study, modelID, featureID, plotID, errorCb, cancelToken) {
+  async plotStudy(
+    study,
+    modelID,
+    featureID,
+    plotID,
+    plotType,
+    errorCb,
+    cancelToken,
+  ) {
     this.setUrl();
+    if (plotType === 'multiFeature') {
+      return null;
+    }
     const cacheKey = `plotStudy_${study}_${modelID}_${featureID}_${plotID}`;
     if (this[cacheKey] != null) {
       return this[cacheKey];
