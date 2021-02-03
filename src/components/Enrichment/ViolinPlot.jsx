@@ -336,11 +336,6 @@ class ViolinPlot extends Component {
     d3.selectAll('.violinBrush').call(self.chart.objs.brush.move, null);
   }
 
-  unhighlightPoint = (unselectedArray, clearAll, self) => {
-    d3.selectAll(`.violin-tooltip`).style('display', 'none');
-    this.props.onHandleProteinSelected([]);
-  };
-
   tooltipHover = (d, override) => {
     const tooltipFields = this.props.violinSettings.tooltip.fields;
     let tooltipString = '';
@@ -1417,9 +1412,12 @@ class ViolinPlot extends Component {
 
       //Double Click Behavior
       self.chart.objs.svg.on('dblclick', function() {
+        d3.selectAll(`.violin-tooltip`).style('display', 'none');
+        self.brushedData = [];
+        self.clearBrush(self);
         const chartSVG = d3.select(`#${self.props.violinSettings.id}`);
         chartSVG.selectAll('.brushed').classed('brushed', false);
-        self.unhighlightPoint([], true, self);
+        self.props.onHandleProteinSelected([]);
       });
 
       Object.keys(self.chart.groupObjs).forEach(cName => {
@@ -1582,25 +1580,6 @@ class ViolinPlot extends Component {
                   },
                 ]);
               }
-              // self.props.onHandleMaxLinePlot(d)
-              d3.select(`#violin_${maxId}`)
-                .transition()
-                .duration(300)
-                .attr(
-                  'fill',
-                  this.brushedData.length > 0 ? '#FF7E38' : '#1678C2',
-                )
-                .attr(
-                  'r',
-                  inBrush > 0 ? dOpts.pointSize * 1.5 : dOpts.pointSize * 1,
-                );
-
-              d3.select(`#violin_${id}`)
-                .transition()
-                .duration(100)
-                .attr('fill', '#FF4400')
-                .attr('r', dOpts.pointSize * 2);
-
               self.maxCircle = d.featureID;
               self.addToolTiptoMax(d);
             });
