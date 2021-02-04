@@ -31,6 +31,7 @@ async function* streamAsyncIterable(reader) {
   }
 }
 class DifferentialSearchCriteria extends Component {
+  debugger;
   state = {
     differentialStudies: [],
     differentialStudyHrefVisible: false,
@@ -69,8 +70,8 @@ class DifferentialSearchCriteria extends Component {
       hoveredFilter: -1,
       displayMetaDataP: true,
       templateName: 'differential-multiset',
-      numElementsP: 0,
-      maxElementsP: 0,
+      // numElementsP: this.props.differentialResults?.length || null,
+      // maxElementsP: this.props.differentialResults?.length || null,
       indexFiltersP: [0],
       metaSvgP: '',
       heightScalarP: 1,
@@ -1083,7 +1084,11 @@ class DifferentialSearchCriteria extends Component {
             position="bottom center"
             inverted
             basic
-            content="Apply column filter(s) across multiple test results"
+            content={
+              isDataStreamingResultsTable
+                ? 'Set Analysis is disabled until data finishes streaming'
+                : 'Apply column filter(s) across multiple test results'
+            }
             mouseEnterDelay={1000}
             mouseLeaveDelay={0}
           />

@@ -1212,7 +1212,11 @@ class EnrichmentSearchCriteria extends Component {
             position="bottom center"
             inverted
             basic
-            content="Apply column filter(s) across multiple test results"
+            content={
+              isDataStreamingEnrichmentsTable
+                ? 'Set Analysis is disabled until data finishes streaming'
+                : 'Apply column filter(s) across multiple test results'
+            }
             mouseEnterDelay={1000}
             mouseLeaveDelay={0}
           />
