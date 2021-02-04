@@ -1,5 +1,5 @@
 {
-  "name": "OmicNavigatorApp",
+  "name": "OmicNavigatorWebApp",
   "version": "0.3.8",
   "private": true,
   "dependencies": {

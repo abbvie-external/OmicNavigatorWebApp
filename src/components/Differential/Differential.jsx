@@ -429,13 +429,14 @@ class Differential extends Component {
             differentialModel,
             id,
             differentialPlotTypes[i].plotID,
+            differentialPlotTypes[i].plotType,
             // self.handleItemSelected,
             null,
             cancelToken,
           )
           .then(svgMarkupObj => {
-            let svgMarkup = svgMarkupObj.data;
-            if (svgMarkup != null || svgMarkup !== []) {
+            let svgMarkup = svgMarkupObj?.data || null;
+            if (svgMarkup != null && svgMarkup !== []) {
               svgMarkup = svgMarkup.replace(
                 /id="/g,
                 'id="' + id + '-' + i + '-',
