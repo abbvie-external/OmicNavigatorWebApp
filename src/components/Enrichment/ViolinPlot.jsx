@@ -1,6 +1,6 @@
 /* eslint-disable react/state-in-constructor */
 import React, { Component } from 'react';
-// import { Icon, Popup } from 'semantic-ui-react';
+import { Icon, Popup } from 'semantic-ui-react';
 import * as d3 from 'd3';
 import * as _ from 'lodash';
 // import { select } from "d3-selection";
@@ -8,24 +8,8 @@ import './ViolinPlot.scss';
 
 class ViolinPlot extends Component {
   state = {
-    // elementText: null,
-    // elementTextOptions: [
-    //   {
-    //     key: 'none',
-    //     text: 'none',
-    //     value: null,
-    //   },
-    //   {
-    //     key: 'featureID',
-    //     text: 'featureID',
-    //     value: 'featureID',
-    //   },
-    // ],
-    // elementTextAfter: null,
-    // didDropdownChange: false,
-    // displayElementTextViolin:
-    //   JSON.parse(sessionStorage.getItem('displayElementTextViolin')) || false,
-    displayElementText: false,
+    displayElementTextViolin:
+      JSON.parse(sessionStorage.getItem('displayElementTextViolin')) || false,
     violinContainerHeight:
       this.violinContainerRef?.current?.parentElement?.offsetHeight ||
       window.screen.height - this.props.horizontalSplitPaneSize - 51,
@@ -60,10 +44,8 @@ class ViolinPlot extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    //const { violinData, HighlightedProteins } = this.props;
     const { violinData, HighlightedProteins } = this.props;
     if (violinData !== prevProps.violinData) {
-      // const label = this.props.violinSettings.axisLabels.xAxis;
       const label = this.props.barcodeSettings.statLabel;
       let prevValues = prevProps?.violinData?.[label]?.values ?? [];
       let currentValues = violinData?.[label]?.values ?? [];
@@ -79,6 +61,7 @@ class ViolinPlot extends Component {
       }
     }
     if (HighlightedProteins !== prevProps.HighlightedProteins) {
+      const self = this;
       this.isHovering = false;
       // set all dots back to small, blue
       const dOpts = this.chart.dataPlots.options;
@@ -87,68 +70,48 @@ class ViolinPlot extends Component {
         .duration(300)
         .attr('fill', '#1678C2')
         .attr('r', dOpts.pointSize * 1);
+      const chartSVG = d3.select(`#${this.props.violinSettings.id}`);
+      chartSVG.selectAll('g.circleText').remove();
       if (HighlightedProteins.length > 0) {
-        // separate max protein from the rest
-        // const HighlightedProteins =
-        //   this.brushedData.length > 0
-        //     ? this.brushedData.slice(1)
-        //     : this.props.HighlightedProteins.slice(1);
         HighlightedProteins.forEach(element => {
           const highlightedDotId = element.featureID;
-          d3.select(`#violin_${highlightedDotId}`)
+          const dot = d3.select(`#violin_${highlightedDotId}`);
+          dot
             .transition()
             .duration(100)
             .attr('fill', '#FF7E38')
             .attr('stroke', '#000')
             .attr('r', dOpts.pointSize * 1.5);
-          d3.select(`#violin_${highlightedDotId}`).raise();
+          const circleText = self.chart.objs.svg
+            .append('g')
+            .attr('class', 'circleText');
+          circleText
+            .append('text')
+            .attr('x', parseInt(dot.attr('cx')) + parseInt(70))
+            .attr('y', parseInt(dot.attr('cy')) + parseInt(20))
+            .style('fill', 'black')
+            .attr('font-size', '10px')
+            .attr('font-family', 'Arial')
+            .text(highlightedDotId);
         });
-        // if max protein exists, get id
-        if (
-          HighlightedProteins[0]?.featureID != null &&
-          HighlightedProteins[0]?.featureID !== ''
-        ) {
-          const maxDotId = HighlightedProteins[0].featureID;
-          d3.select(`#violin_${maxDotId}`)
-            .transition()
-            .duration(100)
-            .attr('fill', '#FF4400')
-            .attr('stroke', '#000')
-            .attr('r', dOpts.pointSize * 2);
-          // .attr('class', `maxCirc`);
-          // const maxCircle = d3.select(`#violin_${maxDotId}`);
-          // const circleText = this.chart.objs.svg
-          //   .append('g')
-          //   .attr('class', 'circleText');
-          // if (this.state.displayElementTextViolin) {
-          //   circleText
-          //     .append('text')
-          //     .attr('x', parseInt(maxCircle.attr('cx')) + parseInt(70))
-          //     .attr('y', parseInt(maxCircle.attr('cy')) + parseInt(20))
-          //     .style('fill', 'black')
-          //     .attr('font-size', '10px')
-          //     .attr('font-family', 'Arial')
-          //     .text(maxDotId);
-          // }
-          this.maxCircle = maxDotId;
-          this.addToolTiptoMax(HighlightedProteins[0]);
-        }
       }
+      // if max protein exists, get id
+      if (HighlightedProteins[0]?.featureID) {
+        const maxDotId = HighlightedProteins[0].featureID;
+        d3.select(`#violin_${maxDotId}`)
+          .transition()
+          .duration(100)
+          .attr('fill', '#FF4400')
+          .attr('stroke', '#000')
+          .attr('r', dOpts.pointSize * 2);
+        this.maxCircle = maxDotId;
+        this.addToolTiptoMax(HighlightedProteins[0]);
+        d3.select(`#violin_${maxDotId}`).raise();
+      }
+      const opacityVar = this.state.displayElementTextViolin ? 1 : 0;
+      chartSVG.selectAll('g.circleText').attr('opacity', opacityVar);
     }
-
-    // if (
-    //   this.state.violinContainerHeight !== prevState.violinContainerHeight
-    // ) {
-    //   this.createViolinPlot();
-    // }
   }
-
-  // shouldComponentUpdate(nextProps, nextState) {
-  //   return (
-  //     nextProps.violinData !== this.props.violinData ||
-  //     nextProps.HighlightedProteins !== this.props.HighlightedProteins
-  //   );
-  // }
 
   createViolinPlot = () => {
     d3.select(`#${this.props.violinSettings.id}`).remove();
@@ -308,6 +271,8 @@ class ViolinPlot extends Component {
 
   makeBrush() {
     var self = this;
+    // const brushingStart = function() {
+    // };
     const highlightBrushedCircles = function() {
       const circles = d3.selectAll(
         '.' + self.props.violinSettings.id + '.vPoint',
@@ -326,7 +291,6 @@ class ViolinPlot extends Component {
           return brushTest;
         };
         const chartSVG = d3.select(`#${self.props.violinSettings.id}`);
-        // self.handleElementText(true);
         chartSVG.selectAll('.brushed').classed('brushed', false);
         const brushed = circles
           .filter(function() {
@@ -339,23 +303,6 @@ class ViolinPlot extends Component {
             'brushed point ' + self.props.violinSettings.id + ' vPoint',
           )
           .attr('opacity', 1.0);
-        chartSVG.selectAll('g.circleText').remove();
-        brushed.each(function(d) {
-          // const brushedCircle = d3.select(this);
-          // const circleText =
-          self.chart.objs.svg.append('g').attr('class', 'circleText');
-          // if (self.state.displayElementTextViolin) {
-          //   circleText
-          //     .append('text')
-          //     .attr('x', parseInt(brushedCircle.attr('cx')) + parseInt(70))
-          //     .attr('y', parseInt(brushedCircle.attr('cy')) + parseInt(20))
-          //     .style('fill', 'black')
-          //     .attr('font-size', '10px')
-          //     .attr('font-family', 'Arial')
-          //     .text(d[self.props.elementTextKey]);
-          // }
-        });
-        // notBrushed
         circles.filter(function() {
           const cx = d3.select(this).attr('cx'),
             cy = d3.select(this).attr('cy');
@@ -370,22 +317,15 @@ class ViolinPlot extends Component {
         }
       }
     };
-    // const brushingEnd = function() {
-    //   if (d3.event.selection != null) {
-    //     if (self.state.displayElementTextViolin) {
-    //       self.handleElementText(false);
-    //     }
-    //   }
-    // };
     self.chart.objs.brush = d3
       .brush()
       .extent([
         [0, 0],
         [self.state.violinContainerWidth, self.state.violinContainerHeight],
       ])
-      // .on('start', e => this.unhighlightPoint([], true, self))
-      .on('brush', highlightBrushedCircles);
-    //.on('end', brushingEnd);
+      // .on('start', brushingStart)
+      // .on('brush', highlightBrushedCircles);
+      .on('end', highlightBrushedCircles);
     self.chart.objs.g
       .append('g')
       .attr('class', 'violinBrush')
@@ -395,12 +335,6 @@ class ViolinPlot extends Component {
   clearBrush(self) {
     d3.selectAll('.violinBrush').call(self.chart.objs.brush.move, null);
   }
-
-  unhighlightPoint = (unselectedArray, clearAll, self) => {
-    d3.selectAll(`.violin-tooltip`).style('display', 'none');
-    this.props.onHandleProteinSelected([]);
-    // self.handleElementText(true);
-  };
 
   tooltipHover = (d, override) => {
     const tooltipFields = this.props.violinSettings.tooltip.fields;
@@ -1476,12 +1410,14 @@ class ViolinPlot extends Component {
         return;
       }
 
-      //Single Click Behavior
+      //Double Click Behavior
       self.chart.objs.svg.on('dblclick', function() {
+        d3.selectAll(`.violin-tooltip`).style('display', 'none');
+        self.brushedData = [];
+        self.clearBrush(self);
         const chartSVG = d3.select(`#${self.props.violinSettings.id}`);
         chartSVG.selectAll('.brushed').classed('brushed', false);
-        self.unhighlightPoint([], true, self);
-        // self.handleElementText(true);
+        self.props.onHandleProteinSelected([]);
       });
 
       Object.keys(self.chart.groupObjs).forEach(cName => {
@@ -1644,25 +1580,6 @@ class ViolinPlot extends Component {
                   },
                 ]);
               }
-              // self.props.onHandleMaxLinePlot(d)
-              d3.select(`#violin_${maxId}`)
-                .transition()
-                .duration(300)
-                .attr(
-                  'fill',
-                  this.brushedData.length > 0 ? '#FF7E38' : '#1678C2',
-                )
-                .attr(
-                  'r',
-                  inBrush > 0 ? dOpts.pointSize * 1.5 : dOpts.pointSize * 1,
-                );
-
-              d3.select(`#violin_${id}`)
-                .transition()
-                .duration(100)
-                .attr('fill', '#FF4400')
-                .attr('r', dOpts.pointSize * 2);
-
               self.maxCircle = d.featureID;
               self.addToolTiptoMax(d);
             });
@@ -1722,99 +1639,78 @@ class ViolinPlot extends Component {
     return window.screen.height - this.props.horizontalSplitPaneSize - 51;
   };
 
-  // handleElementText = removeText => {
-  //   const self = this;
-  //   if (!self.state.displayElementTextViolin || removeText) {
-  //     const chartSVG = d3.select(`#${self.props.violinSettings.id}`);
-  //     chartSVG.selectAll('g.circleText').remove();
-  //   } else {
-  //     d3.selectAll('.brushed').each(function(d) {
-  //       const test = d3.select(this);
-  //       const circleText = self.chart.objs.svg
-  //         .append('g')
-  //         .attr('class', 'circleText');
-  //       circleText
-  //         .append('text')
-  //         .attr('x', parseInt(test.attr('cx')) + parseInt(70))
-  //         .attr('y', parseInt(test.attr('cy')) + parseInt(20))
-  //         .style('fill', 'black')
-  //         .attr('font-size', '10px')
-  //         .attr('font-family', 'Arial')
-  //         .text(d[self.props.elementTextKey]);
-  //     });
-  //     // used for initial render, toggling max text on, off
-  //     // const maxCirc = d3.select('#maxCirc');
-  //     // const circleText = self.chart.objs.svg
-  //     //   .append('g')
-  //     //   .attr('class', 'maxText');
-  //     // circleText
-  //     //   .append('text')
-  //     //   .attr('x', parseInt(maxCirc.attr('cx')) + parseInt(70))
-  //     //   .attr('y', parseInt(maxCirc.attr('cy')) + parseInt(20))
-  //     //   .style('fill', 'black')
-  //     //   .attr('font-size', '10px')
-  //     //   .attr('font-family', 'Arial')
-  //     //   .text(maxCirc[self.props.elementTextKey]);
-  //   }
-  // };
+  handleElementText = (removeText, highlighted) => {
+    const self = this;
+    const chartSVG = d3.select(`#${self.props.violinSettings.id}`);
+    if (removeText) {
+      chartSVG.selectAll('g.circleText').remove();
+      chartSVG.selectAll('.brushed').classed('brushed', false);
+      return;
+    }
+    if (!self.state.displayElementTextViolin) {
+      chartSVG.selectAll('g.circleText').attr('opacity', 0);
+    } else {
+      chartSVG.selectAll('g.circleText').attr('opacity', 1);
+    }
+  };
 
-  // handleElementTextChange = () => {
-  //   const opacity = this.state.displayElementTextViolin ? 1 : 0;
-  //   const display = this.state.displayElementTextViolin ? null : 'none';
-  //   this.chart.objs.tooltip
-  //     .transition()
-  //     .duration(300)
-  //     .style('opacity', () => {
-  //       return opacity;
-  //     })
-  //     .style('display', display);
-  //   sessionStorage.setItem(
-  //     'displayElementTextViolin',
-  //     !this.state.displayElementTextViolin,
-  //   );
-  //   this.setState(
-  //     { displayElementTextViolin: !this.state.displayElementTextViolin },
-  //     function() {
-  //       this.handleElementText();
-  //     },
-  //   );
-  // };
+  handleElementTextChange = () => {
+    const opacity = this.state.displayElementTextViolin ? 1 : 0;
+    const display = this.state.displayElementTextViolin ? null : 'none';
+    this.chart.objs.tooltip
+      .transition()
+      .duration(300)
+      .style('opacity', () => {
+        return opacity;
+      })
+      .style('display', display);
+    sessionStorage.setItem(
+      'displayElementTextViolin',
+      !this.state.displayElementTextViolin,
+    );
+    this.setState(
+      { displayElementTextViolin: !this.state.displayElementTextViolin },
+      function() {
+        this.handleElementText(false, this.props.HighlightedProteins);
+      },
+    );
+  };
 
   render() {
     const { violinSettings } = this.props;
-    // const { displayElementTextViolin } = this.state;
+    const { displayElementTextViolin } = this.state;
     return (
-      // <>
-      //   <span className="TextToggleButton">
-      //     <Popup
-      //       trigger={
-      //         <Icon
-      //           name="font"
-      //           size="small"
-      //           inverted
-      //           circular
-      //           onClick={this.handleElementTextChange}
-      //           id={displayElementTextViolin ? 'PrimaryColor' : 'black'}
-      //         />
-      //       }
-      //       style={{
-      //         backgroundColor: '#2E2E2E',
-      //         borderBottom: '2px solid var(--color-primary)',
-      //         color: '#FFF',
-      //         padding: '1em',
-      //         fontSize: '13px',
-      //       }}
-      //       className=""
-      //       basic
-      //       content={displayElementTextViolin ? 'Hide Labels' : 'Show Labels'}
-      //     />
-      //   </span>
-      <div
-        ref={this.violinContainerRef}
-        id={violinSettings.parentId}
-        className="violin-chart-wrapper"
-      />
-      // </>
+      <>
+        <span className="TextToggleButton">
+          <Popup
+            trigger={
+              <Icon
+                name="font"
+                size="small"
+                inverted
+                circular
+                onClick={this.handleElementTextChange}
+                id={displayElementTextViolin ? 'PrimaryColor' : 'black'}
+              />
+            }
+            style={{
+              backgroundColor: '#2E2E2E',
+              borderBottom: '2px solid var(--color-primary)',
+              color: '#FFF',
+              padding: '1em',
+              fontSize: '13px',
+            }}
+            className=""
+            basic
+            content={displayElementTextViolin ? 'Hide Labels' : 'Show Labels'}
+          />
+        </span>
+        <div
+          ref={this.violinContainerRef}
+          id={violinSettings.parentId}
+          className="violin-chart-wrapper"
+        />
+      </>
     );
   }
 }
