@@ -115,12 +115,12 @@ class MetafeaturesTable extends Component {
     });
   };
 
-  // informItemsPerPageMetafeaturesTable = items => {
-  //   this.setState({
-  //     itemsPerPageMetafeaturesTable: items,
-  //   });
-  //   localStorage.setItem('itemsPerPageMetafeaturesTable', items);
-  // };
+  handleItemsPerPageChange = items => {
+    this.setState({
+      itemsPerPageMetafeaturesTable: items,
+    });
+    localStorage.setItem('itemsPerPageMetafeaturesTable', items);
+  };
 
   render() {
     const {
@@ -140,7 +140,7 @@ class MetafeaturesTable extends Component {
           totalRows={15}
           // use "differentialRows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
           itemsPerPage={itemsPerPageMetafeaturesTable}
-          // onInformItemsPerPage={this.informItemsPerPageMetafeaturesTable}
+          onItemsPerPageChange={this.handleItemsPerPageChange}
           exportBaseName="Feature Data"
           // quickViews={quickViews}
           disableGeneralSearch

@@ -118,21 +118,16 @@ class DifferentialVolcano extends Component {
 
   pageToFeature = featureToHighlight => {
     if (featureToHighlight) {
-      const {
-        differentialFeatureIdKey,
-        // differentialResults
-      } = this.props;
-      // const { itemsPerPageVolcanoTable } = this.state;
+      const { differentialFeatureIdKey } = this.props;
+      const { itemsPerPageVolcanoTable } = this.state;
       const sortedData =
         this.volcanoPlotFilteredGridRef.current?.qhGridRef?.current?.getSortedData() ||
         [];
       if (sortedData != null) {
-        const itemsPerPage = this.volcanoPlotFilteredGridRef?.current?.qhGridRef
-          ?.current?.props.itemsPerPage;
         const Index = _.findIndex(sortedData, function(p) {
           return p[differentialFeatureIdKey] === featureToHighlight;
         });
-        const pageNumber = Math.ceil((Index + 1) / itemsPerPage);
+        const pageNumber = Math.ceil((Index + 1) / itemsPerPageVolcanoTable);
         if (pageNumber > 0) {
           this.volcanoPlotFilteredGridRef.current.handlePageChange(pageNumber);
           scrollElement(this, 'volcanoPlotFilteredGridRef', 'rowHighlightMax');
@@ -256,12 +251,12 @@ class DifferentialVolcano extends Component {
     }
   };
 
-  // informItemsPerPageVolcanoTable = items => {
-  //   this.setState({
-  //     itemsPerPageVolcanoTable: items,
-  //   });
-  //   localStorage.setItem('itemsPerPageVolcanoTable', items);
-  // };
+  handleItemsPerPageChange = items => {
+    this.setState({
+      itemsPerPageVolcanoTable: items,
+    });
+    localStorage.setItem('itemsPerPageVolcanoTable', items);
+  };
 
   handleDotClick = (event, item, index) => {
     event.stopPropagation();
@@ -903,7 +898,7 @@ class DifferentialVolcano extends Component {
                             totalRows={volcanoPlotRows || 0}
                             columnsConfig={differentialColumns}
                             itemsPerPage={itemsPerPageVolcanoTable}
-                            // onInformItemsPerPage={this.informItemsPerPageVolcanoTable}
+                            onItemsPerPageChange={this.handleItemsPerPageChange}
                             // disableGeneralSearch
                             disableGrouping
                             disableColumnVisibilityToggle
