@@ -18,8 +18,8 @@ import EnrichmentMultisetFilters from './EnrichmentMultisetFilters';
 
 let cancelRequestGetReportLinkEnrichment = () => {};
 // let cancelGetEnrichmentsTable = () => {};
-let cancelRequestMultisetEnrichmentData = () => {};
-let cancelRequestEnrichmentMultisetPlot = () => {};
+let cancelRequestGetEnrichmentsIntersection = () => {};
+let cancelRequestGetEnrichmentsUpset = () => {};
 const cacheEnrichmentsTable = {};
 async function* streamAsyncIterable(reader) {
   while (true) {
@@ -63,6 +63,8 @@ class EnrichmentSearchCriteria extends Component {
     sigValue: [0.05],
     mustEnrichment: [],
     notEnrichment: [],
+    numElements: null,
+    maxElements: null,
     uSettings: {
       defaultSelectedCol: {
         key: 'adj_P_Val',
@@ -80,8 +82,6 @@ class EnrichmentSearchCriteria extends Component {
       indexFilters: [0],
       displayMetaData: true,
       templateName: 'enrichment-multiset',
-      numElements: 0,
-      maxElements: 0,
       metaSvg: '',
       heightScalar: 1,
       thresholdCols: [
@@ -118,11 +118,22 @@ class EnrichmentSearchCriteria extends Component {
   }
 
   componentDidUpdate(prevProps) {
+    const {
+      allStudiesMetadata,
+      enrichmentStudy,
+      enrichmentResults,
+    } = this.props;
     if (
-      this.props.allStudiesMetadata !== prevProps.allStudiesMetadata ||
-      this.props.enrichmentStudy !== prevProps.enrichmentStudy
+      allStudiesMetadata !== prevProps.allStudiesMetadata ||
+      enrichmentStudy !== prevProps.enrichmentStudy
     ) {
       this.populateDropdowns();
+    }
+
+    if (prevProps.enrichmentResults !== enrichmentResults) {
+      this.setState({
+        numElements: enrichmentResults?.length || null,
+      });
     }
   }
 
@@ -516,10 +527,7 @@ class EnrichmentSearchCriteria extends Component {
     }
     if (handleMaxElements) {
       this.setState({
-        uSettings: {
-          ...this.state.uSettings,
-          maxElements: data.length,
-        },
+        maxElements: data.length,
       });
     }
     // if (handleColumns) {
@@ -598,9 +606,9 @@ class EnrichmentSearchCriteria extends Component {
         isFilteredEnrichment: this.hasMustOrNotAnnotations(),
       });
       this.props.onHandleEnrichmentTableLoading(true);
-      cancelRequestMultisetEnrichmentData();
+      cancelRequestGetEnrichmentsIntersection();
       let cancelToken = new CancelToken(e => {
-        cancelRequestMultisetEnrichmentData = e;
+        cancelRequestGetEnrichmentsIntersection = e;
       });
       omicNavigatorService
         .getEnrichmentsIntersection(
@@ -620,11 +628,8 @@ class EnrichmentSearchCriteria extends Component {
           this.setState({
             mustEnrichment,
             notEnrichment,
-            uSettings: {
-              ...this.state.uSettings,
-              numElements: multisetResults.length,
-              maxElements: this.state.uSettings.maxElements,
-            },
+            numElements: multisetResults.length,
+            maxElements: this.state.maxElements,
           });
           onEnrichmentSearch(multisetResults, enrichmentAnnotation);
         })
@@ -667,19 +672,9 @@ class EnrichmentSearchCriteria extends Component {
     }
   };
 
-  handleMultisetOpenErrorEnrichment = () => {
-    cancelRequestEnrichmentMultisetPlot();
-    this.props.onMultisetQueriedEnrichment(false);
-    console.log('Error during getEnrichmentsIntersection');
-  };
-
-  handleMultisetECloseError = () => {
-    this.props.onSearchTransitionEnrichment(false);
-    this.props.onMultisetQueriedEnrichment(true);
-    this.setState({
-      reloadPlot: true,
-    });
-    console.log('Error during getEnrichmentsTable');
+  handleErrorGetEnrichmentsIntersection = () => {
+    this.props.onHandleNetworkGraphReady(true);
+    this.props.onHandleEnrichmentTableLoading(false);
   };
 
   multisetTriggeredAnnotationChange = (name, value) => {
@@ -702,28 +697,6 @@ class EnrichmentSearchCriteria extends Component {
       },
       true,
     );
-    // onSearchTransitionEnrichment(true);
-    // cancelGetEnrichmentsTable();
-    // let cancelToken = new CancelToken(e => {
-    //   cancelGetEnrichmentsTable = e;
-    // });
-    // omicNavigatorService
-    //   .getEnrichmentsTable(
-    //     enrichmentStudy,
-    //     enrichmentModel,
-    //     value,
-    //     pValueType,
-    //     this.handleMultisetECloseError,
-    //     cancelToken,
-    //   )
-    //   .then(getEnrichmentsTableData => {
-    //     this.handleGetEnrichmentsTableData(
-    //       getEnrichmentsTableData,
-    //       false,
-    //       false,
-    //       false,
-    //     );
-    //   })
     const cacheKey = `getEnrichmentsTable_${enrichmentStudy}_${enrichmentModel}_${value}_${pValueType}`;
     if (cacheEnrichmentsTable[cacheKey]) {
       this.handleGetEnrichmentsTableData(
@@ -817,8 +790,6 @@ class EnrichmentSearchCriteria extends Component {
       notEnrichment,
       multisetFiltersVisibleEnrichment,
     } = this.state;
-    // this.props.onHandleNetworkGraphReady(false);
-    // this.props.onHandleEnrichmentTableLoading(true);
     let mustEnrichmentCopy = [...mustEnrichment];
     let notEnrichmentCopy = [...notEnrichment];
     if (mustEnrichmentCopy.includes(test)) {
@@ -869,9 +840,9 @@ class EnrichmentSearchCriteria extends Component {
     if (reloadPlot) {
       onDisablePlotEnrichment();
     }
-    cancelRequestMultisetEnrichmentData();
+    cancelRequestGetEnrichmentsIntersection();
     let cancelToken = new CancelToken(e => {
-      cancelRequestMultisetEnrichmentData = e;
+      cancelRequestGetEnrichmentsIntersection = e;
     });
     omicNavigatorService
       .getEnrichmentsIntersection(
@@ -883,7 +854,7 @@ class EnrichmentSearchCriteria extends Component {
         sigValue,
         this.jsonToList(selectedOperator),
         pValueType,
-        this.handleMultisetOpenErrorEnrichment,
+        this.handleErrorGetEnrichmentsIntersection,
         cancelToken,
       )
       .then(annotationData => {
@@ -902,11 +873,8 @@ class EnrichmentSearchCriteria extends Component {
         this.setState({
           mustEnrichment,
           notEnrichment,
-          uSettings: {
-            ...this.state.uSettings,
-            numElements: multisetResults.length || 0,
-            maxElements: this.state.uSettings.maxElements || 0,
-          },
+          numElements: multisetResults.length || 0,
+          maxElements: this.state.maxElements || 0,
           // activateMultisetFilters: true,
         });
         onEnrichmentSearch(multisetResults, enrichmentAnnotation);
@@ -948,9 +916,9 @@ class EnrichmentSearchCriteria extends Component {
       return !multisetTestsFilteredOut.includes(col);
     });
     if (tests?.length > 1) {
-      cancelRequestEnrichmentMultisetPlot();
+      cancelRequestGetEnrichmentsUpset();
       let cancelToken = new CancelToken(e => {
-        cancelRequestEnrichmentMultisetPlot = e;
+        cancelRequestGetEnrichmentsUpset = e;
       });
       omicNavigatorService
         .getEnrichmentsUpset(

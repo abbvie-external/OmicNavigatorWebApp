@@ -332,7 +332,6 @@ class DifferentialMultisetFilters extends Component {
       maxElementsP,
     } = this.props;
     const self = this;
-    debugger;
     let datasetP = uDataP;
     if (uSettingsP.useAnchorP && datasetP.indexOf(uAnchorP) !== 0) {
       let anchorPIndex = datasetP.indexOf(uAnchorP);
