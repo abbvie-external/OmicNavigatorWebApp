@@ -1555,12 +1555,7 @@ class ViolinPlot extends Component {
               }
             })
             .on('click', d => {
-              // var maxId = self.maxCircle.sample.replace(/\;/g, "_");
               self.isHovering = false;
-              const maxId = self.maxCircle.featureID;
-              // var id = d.sample.replace(/\;/g, "_");
-              const id = d.featureID;
-              // self.dotClick.emit(d);
               const inBrush = this.brushedData.findIndex(function(x) {
                 return x.featureID === d.featureID;
               });

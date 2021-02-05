@@ -47,7 +47,6 @@ class DifferentialMultisetFilters extends Component {
 
   metaScript = metaSvgP => {
     const {
-      uDataP,
       uAnchorP,
       uSettingsP,
       sigValueP,
@@ -55,8 +54,6 @@ class DifferentialMultisetFilters extends Component {
       selectedOperatorP,
       mustDifferential,
       notDifferential,
-      numElementsP,
-      maxElementsP,
     } = this.props;
     const svgWidthP = 315;
     const heightScalarP = 15;
@@ -335,6 +332,7 @@ class DifferentialMultisetFilters extends Component {
       maxElementsP,
     } = this.props;
     const self = this;
+    debugger;
     let datasetP = uDataP;
     if (uSettingsP.useAnchorP && datasetP.indexOf(uAnchorP) !== 0) {
       let anchorPIndex = datasetP.indexOf(uAnchorP);
