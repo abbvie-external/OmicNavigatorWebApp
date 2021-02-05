@@ -2,8 +2,6 @@ import React, { Component } from 'react';
 import { Grid, Popup, Sidebar } from 'semantic-ui-react';
 import { withRouter } from 'react-router-dom';
 import DifferentialSearchCriteria from './DifferentialSearchCriteria';
-// import DifferentialPlot from './DifferentialPlot';
-// import LoaderActivePlots from '../Transitions/LoaderActivePlots';
 import TransitionActive from '../Transitions/TransitionActive';
 import TransitionStill from '../Transitions/TransitionStill';
 import ButtonActions from '../Shared/ButtonActions';
@@ -30,7 +28,6 @@ class Differential extends Component {
     isSearchingDifferential: false,
     isVolcanoTableLoading: false,
     // differentialResults: [],
-    // differentialResultsMounted: false,
     // differentialResultsUnfiltered: [],
     /**
      * @type {QHGrid.ColumnConfig[]}
@@ -92,12 +89,6 @@ class Differential extends Component {
     });
   };
 
-  handleSearchTransitionDifferentialAlt = bool => {
-    this.setState({
-      isVolcanoTableLoading: bool,
-    });
-  };
-
   handleMultisetQueriedDifferential = value => {
     this.setState({
       multisetQueriedDifferential: value,
@@ -154,7 +145,6 @@ class Differential extends Component {
       isSearchingDifferential: false,
       isValidSearchDifferential: true,
       isVolcanoTableLoading: false,
-      // differentialResultsMounted: false,
       plotButtonActiveDifferential: false,
       visible: false,
       // isItemSVGLoaded: false,
@@ -193,7 +183,6 @@ class Differential extends Component {
         imageInfoDifferential: { key: null, title: '', svg: [] },
         tabsMessage: 'Select a feature to display plots and data',
         // differentialResults: [],
-        // differentialResultsMounted: false,
         // differentialResultsUnfiltered: [],
         // isItemDatatLoaded: false,
         HighlightedFeaturesArrVolcano: [],
@@ -317,7 +306,6 @@ class Differential extends Component {
       plotButtonActiveDifferential: false,
       visible: false,
       isItemSelected: false,
-      // differentialResultsMounted: false,
       isItemSVGLoaded: false,
     });
   };
@@ -352,7 +340,6 @@ class Differential extends Component {
       {
         imageInfoDifferential: imageInfoDifferential,
         isItemSelected: true,
-        // differentialResultsMounted: false,
         isItemSVGLoaded: false,
         // isItemDatatLoaded: false,
         currentSVGs: [],
@@ -599,11 +586,13 @@ class Differential extends Component {
       activeSVGTabIndex: activeTabIndex,
     });
   };
+
   handleItemSelected = bool => {
     this.setState({
       isItemSelected: bool,
     });
   };
+
   handleSVG = (view, imageInfo) => {
     const key = view === 'Differential' ? `imageInfo${view}` : 'imageInfo';
     this.setState({
@@ -612,9 +601,9 @@ class Differential extends Component {
       isVolcanoPlotSVGLoaded: true,
     });
   };
+
   backToTable = () => {
     this.setState({
-      // differentialResultsMounted: false,
       isItemSelected: false,
       // isItemDatatLoaded: false,
       isItemSVGLoaded: false,
@@ -629,6 +618,7 @@ class Differential extends Component {
       false,
     );
   };
+
   getConfigCols = testData => {
     const differentialResultsVar = testData.differentialResults;
     const { differentialFeature } = this.props;
@@ -669,7 +659,6 @@ class Differential extends Component {
       };
       this.setState({
         imageInfoDifferential: imageInfoDifferential,
-        // differentialResultsMounted: false,
         isItemSelected: true,
         isItemSVGLoaded: false,
         // isItemDatatLoaded: false,
@@ -790,8 +779,8 @@ class Differential extends Component {
     );
     this.setState({
       thresholdColsP: thresholdColsDifferential,
+      filterableColumnsP: [...differentialNumericFields],
     });
-    this.setState({ filterableColumnsP: [...differentialNumericFields] });
     const differentialNumericColumnsMapped = differentialNumericFields.map(
       c => {
         return {
@@ -941,9 +930,6 @@ class Differential extends Component {
               {...this.props}
               onSearchTransitionDifferential={
                 this.handleSearchTransitionDifferential
-              }
-              onSearchTransitionDifferentialAlt={
-                this.handleSearchTransitionDifferentialAlt
               }
               onDifferentialSearch={this.handleDifferentialSearch}
               onDifferentialSearchUnfiltered={
