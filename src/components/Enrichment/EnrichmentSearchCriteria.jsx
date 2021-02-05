@@ -595,7 +595,7 @@ class EnrichmentSearchCriteria extends Component {
       } = this.state;
       this.setState({
         reloadPlot: true,
-        isFilteredEnrichment: false,
+        isFilteredEnrichment: this.hasMustOrNotAnnotations(),
       });
       this.props.onHandleEnrichmentTableLoading(true);
       cancelRequestMultisetEnrichmentData();
@@ -634,12 +634,21 @@ class EnrichmentSearchCriteria extends Component {
     }
   };
 
+  hasMustOrNotAnnotations = () => {
+    // if no annotations are "must" or "not", then set isFilteredEnrichment to true
+    return this.state.mustEnrichment.length > 0 ||
+      this.state.notEnrichment.length > 0
+      ? false
+      : true;
+  };
+
   handleMultisetToggleEnrichment = () => {
     if (this.state.multisetFiltersVisibleEnrichment === false) {
       // on toggle open
       this.setState({
         reloadPlot: true,
         multisetFiltersVisibleEnrichment: true,
+        isFilteredEnrichment: this.hasMustOrNotAnnotations(),
       });
     } else {
       // on toggle close
@@ -648,7 +657,6 @@ class EnrichmentSearchCriteria extends Component {
       this.setState({
         reloadPlot: false,
         multisetFiltersVisibleEnrichment: false,
-        isFilteredEnrichment: false,
       });
       const enrichmentAnnotationName = 'enrichmentAnnotation';
       const enrichmentAnnotationVar = this.props.enrichmentAnnotation;
@@ -767,7 +775,7 @@ class EnrichmentSearchCriteria extends Component {
 
   handleOperatorChange = (evt, { name, value, index }) => {
     this.setState({
-      isFilteredEnrichment: false,
+      isFilteredEnrichment: this.hasMustOrNotAnnotations(),
     });
     this.props.onHandleNetworkOperator(value);
     const uSelVP = [...this.state[name]];
@@ -786,16 +794,18 @@ class EnrichmentSearchCriteria extends Component {
     this.setState({
       sigValue: [parseFloat(value)],
       reloadPlot: true,
-      isFilteredEnrichment: false,
+      isFilteredEnrichment: this.hasMustOrNotAnnotations(),
     });
     this.props.onHandleNetworkSigValue(parseFloat(value));
   };
 
   handleSetChange = (mustEnrichment, notEnrichment) => {
+    const hasMustOrNotAnnotations =
+      mustEnrichment.length > 0 || notEnrichment.length > 0 ? false : true;
     this.setState({
       mustEnrichment,
       notEnrichment,
-      isFilteredEnrichment: false,
+      isFilteredEnrichment: hasMustOrNotAnnotations,
       // reloadPlot: false,
     });
     this.props.onHandleNetworkTests(mustEnrichment, notEnrichment);
@@ -822,7 +832,7 @@ class EnrichmentSearchCriteria extends Component {
         notEnrichment: notEnrichmentCopy,
         reloadPlot: true,
         reloadTests: true,
-        isFilteredEnrichment: false,
+        isFilteredEnrichment: this.hasMustOrNotAnnotations(),
       },
       // function() {
       //   this.updateQueryData();
@@ -1174,7 +1184,7 @@ class EnrichmentSearchCriteria extends Component {
             mouseLeaveDelay={0}
           >
             <Popup.Content>
-              View as intersecting sets, or{' '}
+              View an intersecting sets, or{' '}
               <a
                 href="https://github.com/hms-dbmi/UpSetR"
                 target="_blank"
