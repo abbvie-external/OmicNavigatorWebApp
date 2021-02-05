@@ -1770,11 +1770,6 @@ class Enrichment extends Component {
     });
   };
 
-  informItemsPerPage = items => {
-    this.setState({
-      itemsPerPageInformedEnrichmentMain: items,
-    });
-  };
   // cannot use this unless we can prevent first column (featureID) from being reordered
   // columnReorder = columns => {
   //   this.setState({ enrichmentColumns: columns });
@@ -1868,12 +1863,12 @@ class Enrichment extends Component {
     } else return <TransitionStill stillMessage={message} />;
   };
 
-  // informItemsPerPageEnrichmentTable = items => {
-  //   this.setState({
-  //     itemsPerPageEnrichmentTable: items,
-  //   });
-  //   localStorage.setItem('itemsPerPageEnrichmentTable', items);
-  // };
+  handleItemsPerPageChange = items => {
+    this.setState({
+      itemsPerPageEnrichmentTable: items,
+    });
+    localStorage.setItem('itemsPerPageEnrichmentTable', items);
+  };
 
   getTableAndNetworkPanes = () => {
     const {
@@ -1967,9 +1962,7 @@ class Enrichment extends Component {
                     // totalRows={rows}
                     // use "rows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
                     itemsPerPage={itemsPerPageEnrichmentTable}
-                    // onInformItemsPerPage={
-                    //   this.informItemsPerPageEnrichmentTable
-                    // }
+                    onItemsPerPageChange={this.handleItemsPerPageChange}
                     loading={isEnrichmentTableLoading}
                     // exportBaseName="Enrichment_Analysis"
                     // columnReorder={this.props.columnReorder}
