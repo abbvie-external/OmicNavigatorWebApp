@@ -55,7 +55,7 @@ class Tabs extends Component {
       allStudiesMetadata: [],
       differentialFeatureIdKey: '',
       filteredDifferentialFeatureIdKey: '',
-      appVersion: '0.3.8',
+      appVersion: '1.0.0',
       packageVersion: '',
     };
   }
