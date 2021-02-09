@@ -75,6 +75,7 @@ class Differential extends Component {
     metaFeaturesDataDifferential: [],
     allMetaFeaturesDataDifferential: [],
     isDataStreamingResultsTable: false,
+    enableMultifeaturePlotting: false,
   };
   differentialViewContainerRef = React.createRef();
   differentialGridRef = React.createRef();
@@ -480,6 +481,10 @@ class Differential extends Component {
     }
   };
 
+  getMultifeaturePlot = () => {
+    debugger;
+  };
+
   getMetaFeaturesTable = featureId => {
     const { differentialStudy, differentialModel } = this.props;
     omicNavigatorService
@@ -512,9 +517,10 @@ class Differential extends Component {
   };
 
   handleSelectedVolcano = toHighlightArr => {
-    //if(toHighlightArr !== this.state.HighlightedFeaturesArrVolcano){
+    const enableMultifeature = toHighlightArr.length > 1 ? true : false;
     this.setState({
       HighlightedFeaturesArrVolcano: toHighlightArr,
+      enableMultifeaturePlotting: enableMultifeature,
     });
     if (toHighlightArr.length > 0) {
       const MaxLine = toHighlightArr[0] || null;
@@ -861,6 +867,7 @@ class Differential extends Component {
           onHandleVolcanoTableLoading={this.handleVolcanoTableLoading}
           onBackToTable={this.backToTable}
           onUpdateVolcanoLabels={this.updateVolcanoLabels}
+          onGetMultifeaturePlot={this.getMultifeaturePlot}
         />
       );
     } else return <TransitionStill stillMessage={message} />;

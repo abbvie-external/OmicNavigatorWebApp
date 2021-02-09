@@ -194,6 +194,11 @@
     user-select: none !important; /* Non-prefixed version, currently supported by Chrome, Opera and Firefox */
   }
 
+  .PrimaryColor {
+    background-color: var(--color-dark) !important;
+    color: var(--color-white) !important;
+  }
+
   .FloatRight {
     float: right !important;
     cursor: pointer !important;
