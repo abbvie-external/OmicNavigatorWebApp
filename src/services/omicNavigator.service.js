@@ -270,39 +270,22 @@ class OmicNavigatorService {
     }
   }
 
-  async plotStudy(
-    study,
-    modelID,
-    featureID,
-    plotID,
-    plotType,
-    errorCb,
-    cancelToken,
-  ) {
+  async plotStudy(study, modelID, featureID, plotID, errorCb, cancelToken) {
     this.setUrl();
-    if (plotType === 'multiFeature') {
-      return null;
-    }
-    const cacheKey = `plotStudy_${study}_${modelID}_${featureID}_${plotID}`;
-    if (this[cacheKey] != null) {
-      return this[cacheKey];
-    } else {
-      const promise = this.ocpuPlotCall(
-        'plotStudy',
-        {
-          study,
-          modelID,
-          featureID,
-          plotID,
-        },
-        errorCb,
-        cancelToken,
-        25000,
-      );
-      const dataFromPromise = await promise;
-      this[cacheKey] = dataFromPromise;
-      return dataFromPromise;
-    }
+    const promise = this.ocpuPlotCall(
+      'plotStudy',
+      {
+        study,
+        modelID,
+        featureID,
+        plotID,
+      },
+      errorCb,
+      cancelToken,
+      25000,
+    );
+    const dataFromPromise = await promise;
+    return dataFromPromise;
   }
 
   async getResultsIntersection(

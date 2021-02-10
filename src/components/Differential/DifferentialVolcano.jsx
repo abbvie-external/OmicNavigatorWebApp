@@ -859,54 +859,12 @@ class DifferentialVolcano extends Component {
                         <div className="MultifeaturePlotButtonDiv AbsoluteExportDifferential">
                           <Popup
                             trigger={
-                              <Icon
-                                name="bar chart"
-                                size="large"
-                                color="black"
-                                className={
-                                  !this.props.enableMultifeaturePlotting
-                                    ? 'MultiFeaturePlottingBtn'
-                                    : 'MultiFeaturePlottingBtn'
-                                }
-                                // id={
-                                //   this.props.enableMultifeaturePlotting
-                                //     ? 'PrimaryColor'
-                                //     : ''
-                                // }
-                                inverted
-                                circular
-                                disabled={
-                                  !this.props.enableMultifeaturePlotting
-                                }
-                                onClick={this.props.onGetMultifeaturePlot}
-                              />
-                            }
-                            basic
-                            inverted
-                            position="bottom center"
-                            content={
-                              this.props.enableMultifeaturePlotting
-                                ? 'View Multifeature Plot'
-                                : 'Multifeature Plot requires two features selected'
-                            }
-                            mouseEnterDelay={0}
-                            mouseLeaveDelay={0}
-                            style={TableValuePopupStyle}
-                          />
-                        </div>
-                        <div className="FloatRight AbsoluteExportDifferential">
-                          <Popup
-                            trigger={
                               <Button
                                 name="bar chart"
                                 size="mini"
                                 color="black"
                                 icon
-                                className={
-                                  this.props.enableMultifeaturePlotting
-                                    ? 'MultiFeaturePlottingBtn PrimaryColor'
-                                    : 'MultiFeaturePlottingBtn'
-                                }
+                                className="MultiFeaturePlottingBtn"
                                 labelPosition="left"
                                 // id={
                                 //   this.props.enableMultifeaturePlotting
@@ -916,8 +874,13 @@ class DifferentialVolcano extends Component {
                                 disabled={
                                   !this.props.enableMultifeaturePlotting
                                 }
+                                onClick={() =>
+                                  this.props.onGetMultifeaturePlot(
+                                    'Differential',
+                                  )
+                                }
                               >
-                                Multi-feature Plot
+                                MULTI-FEATURE PLOT
                                 <Icon name="bar chart" />
                               </Button>
                             }
@@ -933,6 +896,83 @@ class DifferentialVolcano extends Component {
                             mouseLeaveDelay={0}
                             style={TableValuePopupStyle}
                           />
+                        </div>
+                        {/* <div className="MultifeaturePlotButtonDiv AbsoluteExportDifferential">
+                          <Popup
+                            trigger={
+                              <Icon
+                                name="bar chart"
+                                size="large"
+                                color="black"
+                                className="MultiFeaturePlottingBtn"
+                                // id={
+                                //   this.props.enableMultifeaturePlotting
+                                //     ? 'PrimaryColor'
+                                //     : ''
+                                // }
+                                inverted
+                                circular
+                                disabled={
+                                  !this.props.enableMultifeaturePlotting
+                                }
+                                onClick={() =>
+                                  this.props.onGetMultifeaturePlot('volcano')
+                                }
+                              />
+                            }
+                            basic
+                            inverted
+                            position="bottom center"
+                            content={
+                              this.props.enableMultifeaturePlotting
+                                ? 'View Multifeature Plot'
+                                : 'Multifeature Plot requires two features selected'
+                            }
+                            mouseEnterDelay={0}
+                            mouseLeaveDelay={0}
+                            style={TableValuePopupStyle}
+                          />
+                        </div> */}
+                        <div className="FloatRight AbsoluteExportDifferential">
+                          {/* <Popup
+                            trigger={
+                              <Button
+                                name="bar chart"
+                                size="mini"
+                                color="black"
+                                icon
+                                className="MultiFeaturePlottingBtn"
+                                labelPosition="left"
+                                // id={
+                                //   this.props.enableMultifeaturePlotting
+                                //     ? 'PrimaryColor'
+                                //     : ''
+                                // }
+                                disabled={
+                                  !this.props.enableMultifeaturePlotting
+                                }
+                                onClick={() =>
+                                  this.props.onGetMultifeaturePlot(
+                                    'Differential',
+                                  )
+                                }
+                              >
+                                MULTI-FEATURE PLOT
+                                <Icon name="bar chart" />
+                              </Button>
+                            }
+                            basic
+                            inverted
+                            position="bottom center"
+                            content={
+                              this.props.enableMultifeaturePlotting
+                                ? 'View Multifeature Plot'
+                                : 'Multifeature Plot requires two features selected'
+                            }
+                            mouseEnterDelay={0}
+                            mouseLeaveDelay={0}
+                            style={TableValuePopupStyle}
+                          /> */}
                           <ButtonActions
                             exportButtonSize={'small'}
                             excelVisible={true}
