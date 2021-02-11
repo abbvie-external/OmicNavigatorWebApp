@@ -304,7 +304,7 @@ class EnrichmentSearchCriteria extends Component {
   setStudyTooltip = () => {
     if (this.props.enrichmentModel !== '') {
       this.setState({
-        enrichmentStudyReportTooltip: `The model "main" from the study ${this.props.enrichmentStudy} does not have additional analysis details available.`,
+        enrichmentStudyReportTooltip: `The model ${this.props.enrichmentModel} from the study ${this.props.enrichmentStudy} does not have additional analysis details available.`,
       });
     }
   };
