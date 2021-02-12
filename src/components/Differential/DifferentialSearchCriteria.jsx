@@ -180,7 +180,9 @@ class DifferentialSearchCriteria extends Component {
         differentialModelsDisabled: false,
         differentialModels: differentialModelsMapped,
       });
-      this.getReportLink(differentialStudy, 'default');
+      if (differentialModel === '') {
+        this.getReportLink(differentialStudy, 'default');
+      }
       if (differentialModel !== '') {
         this.props.onDoMetaFeaturesExist(differentialStudy, differentialModel);
         this.props.onGetResultsLinkouts(differentialStudy, differentialModel);

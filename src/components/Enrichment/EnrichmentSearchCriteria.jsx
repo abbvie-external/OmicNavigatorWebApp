@@ -186,7 +186,9 @@ class EnrichmentSearchCriteria extends Component {
         enrichmentModelsDisabled: false,
         enrichmentModels: enrichmentModelsMapped,
       });
-      this.getReportLink(enrichmentStudy, 'default');
+      if (enrichmentModel === '') {
+        this.getReportLink(enrichmentStudy, 'default');
+      }
       if (enrichmentModel !== '') {
         this.props.onHandleHasBarcodeData();
         this.props.onHandlePlotTypesEnrichment(enrichmentModel);
