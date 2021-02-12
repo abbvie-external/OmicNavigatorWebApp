@@ -932,29 +932,13 @@ class EnrichmentSearchCriteria extends Component {
           undefined,
           cancelToken,
         )
-        .then(svgMarkupObj => {
-          let svgMarkup = svgMarkupObj.data;
-          svgMarkup = svgMarkup.replace(
-            /<svg/g,
-            '<svg preserveAspectRatio="xMinYMid meet" id="enrichmentMultisetAnalysisSVG"',
-          );
-          DOMPurify.addHook('afterSanitizeAttributes', function(node) {
-            if (
-              node.hasAttribute('xlink:href') &&
-              !node.getAttribute('xlink:href').match(/^#/)
-            ) {
-              node.remove();
-            }
-          });
-          // Clean HTML string and write into our DIV
-          let sanitizedSVG = DOMPurify.sanitize(svgMarkup, {
-            ADD_TAGS: ['use'],
-          });
-          let svgInfo = { plotType: 'Multiset', svg: sanitizedSVG };
-          // let svgInfo = { plotType: 'Multiset', svg: svgMarkup };
-          this.props.onGetMultisetPlotEnrichment({
-            svgInfo,
-          });
+        .then(svgUrl => {
+          if (svgUrl) {
+            let svgInfo = { plotType: 'Multiset', svg: svgUrl };
+            this.props.onGetMultisetPlotEnrichment({
+              svgInfo,
+            });
+          }
         })
         .catch(error => {
           console.error('Error during getEnrichmentsUpset', error);

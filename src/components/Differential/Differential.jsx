@@ -1,15 +1,15 @@
 import React, { Component } from 'react';
 import { Grid, Popup, Sidebar } from 'semantic-ui-react';
 import { withRouter } from 'react-router-dom';
+import { ReactSVG } from 'react-svg';
+import { CancelToken } from 'axios';
 import DifferentialSearchCriteria from './DifferentialSearchCriteria';
 import TransitionActive from '../Transitions/TransitionActive';
 import TransitionStill from '../Transitions/TransitionStill';
 import ButtonActions from '../Shared/ButtonActions';
 import { formatNumberForDisplay, splitValue, Linkout } from '../Shared/helpers';
-import DOMPurify from 'dompurify';
 import { omicNavigatorService } from '../../services/omicNavigator.service';
 import DifferentialVolcano from './DifferentialVolcano';
-import { CancelToken } from 'axios';
 import _ from 'lodash';
 import './Differential.scss';
 import '../Shared/Table.scss';
@@ -36,7 +36,7 @@ class Differential extends Component {
     filterableColumnsP: [],
     multisetPlotInfoDifferential: {
       title: '',
-      svg: [],
+      svg: '',
     },
     isItemSelected: false,
     isItemSVGLoaded: false,
@@ -421,43 +421,14 @@ class Differential extends Component {
             null,
             cancelToken,
           )
-          .then(svgMarkupObj => {
-            let svgMarkup = svgMarkupObj?.data || null;
-            if (svgMarkup != null && svgMarkup !== []) {
-              svgMarkup = svgMarkup.replace(
-                /id="/g,
-                'id="' + id + '-' + i + '-',
-              );
-              svgMarkup = svgMarkup.replace(
-                /#glyph/g,
-                '#' + id + '-' + i + '-glyph',
-              );
-              svgMarkup = svgMarkup.replace(
-                /#clip/g,
-                '#' + id + '-' + i + '-clip',
-              );
-              svgMarkup = svgMarkup.replace(
-                /<svg/g,
-                `<svg preserveAspectRatio="xMinYMin meet" id="currentSVG-${id}-${i}"`,
-              );
-              DOMPurify.addHook('afterSanitizeAttributes', function(node) {
-                if (
-                  node.hasAttribute('xlink:href') &&
-                  !node.getAttribute('xlink:href').match(/^#/)
-                ) {
-                  node.remove();
-                }
-              });
-              // Clean HTML string and write into our DIV
-              let sanitizedSVG = DOMPurify.sanitize(svgMarkup, {
-                ADD_TAGS: ['use'],
-              });
+          .then(svgUrl => {
+            if (svgUrl) {
               let svgInfo = {
                 plotType: differentialPlotTypes[i],
-                svg: sanitizedSVG,
+                svg: svgUrl,
               };
               imageInfo.svg.push(svgInfo);
-              currentSVGs.push(sanitizedSVG);
+              currentSVGs.push(svgUrl);
               self.handleSVG(view, imageInfo);
             } else {
               // self.handleItemSelected(false);
@@ -909,10 +880,9 @@ class Differential extends Component {
             </Grid.Column>
           </Grid.Row>
         </Grid>
-        <div
-          className="MultisetSvgOuter"
-          dangerouslySetInnerHTML={{ __html: multisetPlotInfoDifferential.svg }}
-        ></div>
+        <div className="MultisetSvgOuter">
+          <ReactSVG src={multisetPlotInfoDifferential.svg} />
+        </div>
       </Sidebar>
     );
     return (

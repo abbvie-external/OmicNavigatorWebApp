@@ -9,6 +9,7 @@ import {
   // Menu,
   // Label,
 } from 'semantic-ui-react';
+import { ReactSVG } from 'react-svg';
 // import { limitString } from '../Shared/helpers';
 import ButtonActions from '../Shared/ButtonActions';
 import './SVGPlot.scss';
@@ -56,6 +57,7 @@ class SVGPlot extends Component {
       // const svgArrayReversed = svgArray.reverse();
       // const numberOfPlots = svgArray.length;
       const panes = svgArray.map((s, index) => {
+        // let srcUrl = `http://10.253.152.184/ocpu/tmp/x0d9e682d08431f/graphics/1/svg?${this.props.volcanoSvgWidth}&${this.props.volcanoSvgHeight}`;
         return {
           menuItem: `${s.plotType.plotDisplay}`,
           // menuItem: limitString(`${s.plotType.plotDisplay}`, numberOfPlots, 5),
@@ -75,11 +77,9 @@ class SVGPlot extends Component {
           // ),
           render: () => (
             <Tab.Pane attached="true" as="div">
-              <div
-                id="PlotSVG"
-                className="svgSpan"
-                dangerouslySetInnerHTML={{ __html: s.svg }}
-              ></div>
+              <div id="PlotSVG" className="svgSpan">
+                <ReactSVG src={s.svg} />
+              </div>
             </Tab.Pane>
           ),
         };

@@ -2,8 +2,9 @@ import DOMPurify from 'dompurify';
 import _ from 'lodash';
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import { Grid, Menu, Popup, Sidebar, Tab, Message } from 'semantic-ui-react';
 import { CancelToken } from 'axios';
+import { Grid, Menu, Popup, Sidebar, Tab, Message } from 'semantic-ui-react';
+import { ReactSVG } from 'react-svg';
 import networkIcon from '../../resources/networkIcon.png';
 import networkIconSelected from '../../resources/networkIconSelected.png';
 import tableIcon from '../../resources/tableIcon.png';
@@ -45,7 +46,7 @@ class Enrichment extends Component {
     activeIndexEnrichmentView: this.storedEnrichmentActiveIndex || 0,
     multisetPlotInfoEnrichment: {
       title: '',
-      svg: [],
+      svg: '',
     },
     multisetPlotAvailableEnrichment: false,
     animationEnrichment: 'uncover',
@@ -1109,50 +1110,14 @@ class Enrichment extends Component {
             handlePlotStudyError,
             cancelToken,
           )
-          .then(svgMarkupObj => {
-            let svgMarkup = svgMarkupObj?.data || null;
-            if (svgMarkup != null && svgMarkup !== []) {
-              svgMarkup = svgMarkup.replace(
-                /id="/g,
-                'id="' + id + '-' + i + '-',
-              );
-              svgMarkup = svgMarkup.replace(
-                /#glyph/g,
-                '#' + id + '-' + i + '-glyph',
-              );
-              svgMarkup = svgMarkup.replace(
-                /#clip/g,
-                '#' + id + '-' + i + '-clip',
-              );
-              svgMarkup = svgMarkup.replace(
-                /<svg/g,
-                `<svg preserveAspectRatio="xMinYMin meet" id="currentSVG-${id}-${i}"`,
-              );
-              DOMPurify.addHook('afterSanitizeAttributes', function(node) {
-                if (
-                  node.hasAttribute('xlink:href') &&
-                  !node.getAttribute('xlink:href').match(/^#/)
-                ) {
-                  node.remove();
-                }
-              });
-              // Clean HTML string and write into our DIV
-              let sanitizedSVG = DOMPurify.sanitize(svgMarkup, {
-                ADD_TAGS: ['use'],
-              });
+          .then(svgUrl => {
+            if (svgUrl) {
               let svgInfo = {
                 plotType: enrichmentPlotTypes[i],
-                svg: sanitizedSVG,
+                svg: svgUrl,
               };
-
-              // we want spline plot in zero index, rather than lineplot
-              // if (i === 0) {
               imageInfo.svg.push(svgInfo);
-              currentSVGs.push(sanitizedSVG);
-              // } else {
-              //   imageInfo.svg.unshift(svgInfo);
-              //   currentSVGs.unshift(sanitizedSVG);
-              // }
+              currentSVGs.push(svgUrl);
               handleSVGCb(imageInfo);
             }
           })
@@ -1197,7 +1162,7 @@ class Enrichment extends Component {
 
   handlePlotStudyError = () => {
     this.setState({
-      SVGPlotLoaded: false,
+      // SVGPlotLoaded: false,
       SVGPlotLoading: false,
       // imageInfo: {
       //   ...this.state.imageInfo,
@@ -2186,10 +2151,9 @@ class Enrichment extends Component {
             </Grid.Column>
           </Grid.Row>
         </Grid>
-        <div
-          className="MultisetSvgOuter"
-          dangerouslySetInnerHTML={{ __html: multisetPlotInfoEnrichment.svg }}
-        ></div>
+        <div className="MultisetSvgOuter">
+          <ReactSVG src={multisetPlotInfoEnrichment.svg} />
+        </div>
       </Sidebar>
     );
 

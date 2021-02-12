@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { Grid, Dimmer, Loader, Tab } from 'semantic-ui-react';
+import { ReactSVG } from 'react-svg';
 import DifferentialBreadcrumbs from './DifferentialBreadcrumbs';
 import ButtonActions from '../Shared/ButtonActions';
 import MetafeaturesTable from './MetafeaturesTable';
@@ -67,11 +68,9 @@ class DifferentialPlot extends Component {
           menuItem: `${s.plotType.plotDisplay}`,
           render: () => (
             <Tab.Pane attached="true" as="div">
-              <div
-                id="DifferentialPlotTabsPlotSVG"
-                className="svgSpan"
-                dangerouslySetInnerHTML={{ __html: s.svg }}
-              ></div>
+              <div id="DifferentialPlotTabsPlotSVG" className="svgSpan">
+                <ReactSVG src={s.svg} />
+              </div>
             </Tab.Pane>
           ),
         };
