@@ -182,8 +182,7 @@ class DifferentialSearchCriteria extends Component {
       });
       if (differentialModel === '') {
         this.getReportLink(differentialStudy, 'default');
-      }
-      if (differentialModel !== '') {
+      } else {
         this.props.onDoMetaFeaturesExist(differentialStudy, differentialModel);
         this.props.onGetResultsLinkouts(differentialStudy, differentialModel);
         this.props.onHandlePlotTypesDifferential(differentialModel);

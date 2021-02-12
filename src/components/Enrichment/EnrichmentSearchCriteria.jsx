@@ -188,8 +188,7 @@ class EnrichmentSearchCriteria extends Component {
       });
       if (enrichmentModel === '') {
         this.getReportLink(enrichmentStudy, 'default');
-      }
-      if (enrichmentModel !== '') {
+      } else {
         this.props.onHandleHasBarcodeData();
         this.props.onHandlePlotTypesEnrichment(enrichmentModel);
         const enrichmentModelWithAnnotations = enrichmentModelsAndAnnotationsVar.find(
