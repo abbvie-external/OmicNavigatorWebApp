@@ -180,16 +180,27 @@
 //   color: #fff !important;
 // }
 
-.MultiFeaturePlottingBtn {
+.MultiFeaturePlotBtn {
   margin-top: 5px !important;
   margin-left: 355px !important;
+  cursor: pointer !important;
 }
 
-.MultifeaturePlotButtonDiv {
+.MultifeaturePlotBtnDiv {
   position: absolute;
   z-index: 1;
-  margin-top: 13px;
   left: 83px !important;
+  margin-top: 13px;
+
+  // .MultiFeaturePlottingBtn {
+  //   font-size: 13px !important;
+  //   height: 28px !important;
+  // }
+
+  // .MultiFeaturePlotDetail {
+  //   background-color: #1678c2 !important;
+  //   color: white !important;
+  // }
 }
 
 // .ui.visible.overlay.sidebar {
