@@ -206,6 +206,11 @@ export function scrollElement(_this, grid, target) {
   });
 }
 
+export function roundToPrecision(value, precision) {
+  var multiplier = Math.pow(10, precision || 0);
+  return Math.round(value * multiplier) / multiplier;
+}
+
 export function networkByCluster(network) {
   network = _.cloneDeep(network);
   let buckets = [];

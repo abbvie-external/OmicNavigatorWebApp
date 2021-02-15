@@ -48,10 +48,10 @@
 #PlotSVG {
   padding-right: 25px !important;
 
-  svg {
-    width: inherit !important;
-    height: -webkit-fill-available !important;
-  }
+  // svg {
+  //   width: inherit !important;
+  //   height: -webkit-fill-available !important;
+  // }
 }
 
 #xAxisSelector,
@@ -109,6 +109,7 @@
   padding-bottom: 0px !important;
 
   .VolcanoSplitPane {
+    max-width: 100% !important;
     position: relative !important;
     padding-bottom: 50px !important;
 

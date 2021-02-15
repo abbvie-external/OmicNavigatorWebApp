@@ -9,6 +9,8 @@ import {
   // Menu,
   // Label,
 } from 'semantic-ui-react';
+import { ReactSVG } from 'react-svg';
+
 // import { limitString } from '../Shared/helpers';
 import ButtonActions from '../Shared/ButtonActions';
 import './EnrichmentSVGPlot.scss';
@@ -52,10 +54,19 @@ class EnrichmentSVGPlot extends Component {
     //   wordBreak: 'break-all',
     // };
     if (this.props.imageInfo.length !== 0) {
+      const heightVar = this.props.divHeight || null;
+      const widthVar = this.props.divWidth || null;
+      const pointSizeVar = this.props.pointSize || null;
+      let dimensions = '';
+      if (heightVar && widthVar) {
+        dimensions = `?${widthVar}${heightVar}${pointSizeVar}`;
+      }
+      console.log(dimensions);
       const svgArray = this.props.imageInfo.svg;
       // const svgArrayReversed = svgArray.reverse();
       // const numberOfPlots = svgArray.length;
       const panes = svgArray.map((s, index) => {
+        let srcUrl = `${s.svg}${dimensions}`;
         return {
           menuItem: `${s.plotType.plotDisplay}`,
           // menuItem: limitString(`${s.plotType.plotDisplay}`, numberOfPlots, 5),
@@ -75,11 +86,9 @@ class EnrichmentSVGPlot extends Component {
           // ),
           render: () => (
             <Tab.Pane attached="true" as="div">
-              <div
-                id="PlotSVG"
-                className="svgSpan"
-                dangerouslySetInnerHTML={{ __html: s.svg }}
-              ></div>
+              <div id="PlotSVG" className="svgSpan">
+                <ReactSVG src={srcUrl} />
+              </div>
             </Tab.Pane>
           ),
         };

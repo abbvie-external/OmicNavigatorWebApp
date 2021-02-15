@@ -5,7 +5,7 @@ import CustomEmptyMessage from '../Shared/Templates';
 import QHGrid, { EZGrid } from '../Shared/QHGrid';
 import DifferentialPlot from './DifferentialPlot';
 import SVGPlot from '../Shared/SVGPlot';
-import { scrollElement } from '../Shared/helpers';
+import { scrollElement, roundToPrecision } from '../Shared/helpers';
 import DifferentialVolcanoPlot from './DifferentialVolcanoPlot';
 import {
   Form,
@@ -16,7 +16,6 @@ import {
   Dimmer,
   Loader,
   Label,
-  // Divider,
   Sidebar,
 } from 'semantic-ui-react';
 import VolcanoPlotIcon from '../../resources/VolcanoPlotIcon.png';
@@ -459,9 +458,11 @@ class DifferentialVolcano extends Component {
       return (
         <div className="VolcanoPlotSVGPlot">
           <SVGPlot
-            // ref={this.differentialViewContainerRef}
             {...this.props}
             {...this.state}
+            divHeight={`&height=${this.state.volcanoSvgHeight}`}
+            divWidth={`&width=${this.state.volcanoSvgWidth}`}
+            pointSize={`&pointsize=11`}
             onSVGTabChange={onSVGTabChange}
           ></SVGPlot>
         </div>
@@ -482,6 +483,11 @@ class DifferentialVolcano extends Component {
   };
 
   onSizeChange = (size, paneType) => {
+    const volcanoSvgWidthPx =
+      this.props.fwdRefDVC.current?.offsetWidth - size || 500;
+    const volcanoSvgHeightPx = this.state.volcanoHeight || 300;
+    const volcanoSvgWidthPt = roundToPrecision(volcanoSvgWidthPx / 100, 1);
+    const volcanoSvgHeightPt = roundToPrecision(volcanoSvgHeightPx / 100, 1);
     const adjustedSize = Math.round(size * 0.95);
     if (paneType === 'horizontal') {
       // if (show) {
@@ -497,11 +503,15 @@ class DifferentialVolcano extends Component {
       this.setState({
         volcanoHeight: adjustedSize + 1,
         volcanoWidth: width + 1,
+        volcanoSvgWidth: volcanoSvgWidthPt,
+        volcanoSvgHeight: volcanoSvgHeightPt,
       });
     } else {
       localStorage.setItem('volcanoWidth', adjustedSize);
       this.setState({
         volcanoWidth: adjustedSize,
+        volcanoSvgWidth: volcanoSvgWidthPt,
+        volcanoSvgHeight: volcanoSvgHeightPt,
       });
     }
     // }
@@ -685,10 +695,7 @@ class DifferentialVolcano extends Component {
             isItemSelected={isItemSelected}
           />
           <Sidebar.Pusher>
-            <div
-            // className="DifferentialVolcanoViewContainer"
-            // ref={this.differentialVolcanoViewContainerRef}
-            >
+            <div>
               <span className="VolcanoPlotButton">
                 <Popup
                   trigger={
@@ -861,7 +868,13 @@ class DifferentialVolcano extends Component {
                         }
                       >
                         {volcanoPlot}
+                        {/* <div
+                          ref={volcanoSVGDivRef => {
+                            this.volcanoSVGDivRef = volcanoSVGDivRef;
+                          }}
+                        > */}
                         {svgPlot}
+                        {/* </div> */}
                       </SplitPane>
                       <Grid.Row>
                         <div className="FloatRight AbsoluteExportDifferential">

@@ -832,6 +832,7 @@ class Differential extends Component {
           onHandleVolcanoTableLoading={this.handleVolcanoTableLoading}
           onBackToTable={this.backToTable}
           onUpdateVolcanoLabels={this.updateVolcanoLabels}
+          fwdRefDVC={this.differentialViewContainerRef}
         />
       );
     } else return <TransitionStill stillMessage={message} />;

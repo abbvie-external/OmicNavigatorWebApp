@@ -20,29 +20,38 @@ class SVGPlot extends Component {
   };
 
   componentDidMount() {
+    const svgPanesVar = this.getSVGPanes(this.props.activeSVGTabIndex);
     this.setState({
       isSVGReady: true,
+      svgPanes: svgPanesVar,
     });
   }
 
-  // componentDidUpdate(prevProps, prevState) {
-  //   if (prevProps.imageInfo !== this.props.imageInfo) {
-  //     this.forceUpdate();
-  //   }
-  // }
+  componentDidUpdate(prevProps) {
+    if (
+      prevProps.volcanoWidth !== this.props.volcanoWidth ||
+      prevProps.volcanoHeight !== this.props.volcanoHeight ||
+      prevProps.activeSVGTabIndex !== this.props.activeSVGTabIndex
+    ) {
+      const svgPanesVar = this.getSVGPanes(this.props.activeSVGTabIndex);
+      this.setState({
+        svgPanes: svgPanesVar,
+      });
+    }
+  }
 
   handleTabChange = (e, { activeIndex }) => {
     this.props.onSVGTabChange(activeIndex);
   };
 
-  navigateToDifferentialFeature = evt => {
-    const testAndDescription = this.props.imageInfo.key.split(':');
-    const test = testAndDescription[0] || '';
-    const featureID = this.props.HighlightedProteins[0]?.featureID;
-    this.props.onFindDifferentialFeature(test, featureID);
-  };
+  // navigateToDifferentialFeature = evt => {
+  //   const testAndDescription = this.props.imageInfo.key.split(':');
+  //   const test = testAndDescription[0] || '';
+  //   const featureID = this.props.HighlightedProteins[0]?.featureID;
+  //   this.props.onFindDifferentialFeature(test, featureID);
+  // };
 
-  getSVGPanes(activeSVGTabIndex) {
+  getSVGPanes = activeSVGTabIndex => {
     // const BreadcrumbPopupStyle = {
     //   backgroundColor: '2E2E2E',
     //   borderBottom: '2px solid var(--color-primary)',
@@ -53,11 +62,20 @@ class SVGPlot extends Component {
     //   wordBreak: 'break-all',
     // };
     if (this.props.imageInfo.length !== 0) {
+      const heightVar = this.props.divHeight || null;
+      const widthVar = this.props.divWidth || null;
+      const pointSizeVar = this.props.pointSize || null;
+      let dimensions = '';
+      if (heightVar && widthVar) {
+        dimensions = `?${widthVar}${heightVar}${pointSizeVar}`;
+      }
+      console.log(dimensions);
       const svgArray = this.props.imageInfo.svg;
       // const svgArrayReversed = svgArray.reverse();
       // const numberOfPlots = svgArray.length;
       const panes = svgArray.map((s, index) => {
-        // let srcUrl = `http://10.253.152.184/ocpu/tmp/x0d9e682d08431f/graphics/1/svg?${this.props.volcanoSvgWidth}&${this.props.volcanoSvgHeight}`;
+        let srcUrl = `${s.svg}${dimensions}`;
+        console.log(srcUrl);
         return {
           menuItem: `${s.plotType.plotDisplay}`,
           // menuItem: limitString(`${s.plotType.plotDisplay}`, numberOfPlots, 5),
@@ -78,7 +96,29 @@ class SVGPlot extends Component {
           render: () => (
             <Tab.Pane attached="true" as="div">
               <div id="PlotSVG" className="svgSpan">
-                <ReactSVG src={s.svg} />
+                <ReactSVG src={srcUrl} />
+                {/* <ReactSVG
+                  src={srcUrl}
+                  afterInjection={(error, svg) => {
+                    if (error) {
+                      console.error(error);
+                      return;
+                    }
+                    console.log(svg);
+                  }}
+                  beforeInjection={svg => {
+                    svg.classList.add('svg-class-name');
+                    svg.setAttribute('style', `width: ${widthVar}px`);
+                    svg.setAttribute('style', `height: ${heightVar}px`);
+                  }}
+                  className="wrapper-class-name"
+                  evalScripts="always"
+                  fallback={() => <span>Error!</span>}
+                  loading={() => <span>Loading</span>}
+                  renumerateIRIElements={false}
+                  useRequestCache={true}
+                  wrapper="span"
+                /> */}
               </div>
             </Tab.Pane>
           ),
@@ -91,6 +131,7 @@ class SVGPlot extends Component {
           panes={panes}
           onTabChange={this.handleTabChange}
           activeIndex={activeSVGTabIndex}
+          vertical
         />
       );
     } else {
@@ -102,7 +143,7 @@ class SVGPlot extends Component {
         />
       );
     }
-  }
+  };
 
   getButtonActionsClass = () => {
     // if (
@@ -130,7 +171,6 @@ class SVGPlot extends Component {
       //   fontSize: '13px',
       //   wordBreak: 'break-all',
       // };
-      const svgPanes = this.getSVGPanes(activeSVGTabIndex);
       return (
         <div className="svgContainer">
           <div className={ButtonActionsClass}>
@@ -162,7 +202,7 @@ class SVGPlot extends Component {
             position="bottom left"
             content="view in differential analysis section"
           /> */}
-          {svgPanes}
+          {this.state.svgPanes}
         </div>
       );
     } else {

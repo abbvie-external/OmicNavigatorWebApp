@@ -225,6 +225,9 @@ class SplitPanesContainer extends Component {
         <EnrichmentSVGPlot
           {...this.props}
           {...this.state}
+          // divHeight={`&height=${this.state.enrichmentSvgHeight}`}
+          // divWidth={`&width=${this.state.enrichmentSvgWidth}`}
+          // pointSize={`&pointsize=11`}
           onSVGTabChange={tabChangeCb}
         />
       );
@@ -232,13 +235,21 @@ class SplitPanesContainer extends Component {
   };
 
   splitPaneResized = (size, paneType) => {
+    //   const volcanoSvgWidthPx =
+    //   this.props.fwdRefDVC.current?.offsetWidth - size || 500;
+    // const volcanoSvgHeightPx = this.state.volcanoHeight || 300;
+    // const volcanoSvgWidthPt = roundToPrecision(volcanoSvgWidthPx / 100, 1);
+    // const volcanoSvgHeightPt = roundToPrecision(volcanoSvgHeightPx / 100, 1);
     if (paneType === 'horizontal') {
       this.setState({
         horizontalSplitPaneSize: size,
       });
     } else {
+      debugger;
       this.setState({
         verticalSplitPaneSize: size,
+        // enrichmentSvgHeight: 300,
+        // enrichmentSvgWidth: 400,
       });
     }
     localStorage.setItem(`${paneType}SplitPaneSize`, size);
