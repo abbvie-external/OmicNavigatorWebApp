@@ -74,7 +74,7 @@ class SVGPlot extends Component {
       // const svgArrayReversed = svgArray.reverse();
       // const numberOfPlots = svgArray.length;
       const panes = svgArray.map((s, index) => {
-        let srcUrl = `${s.svg}${dimensions}`;
+        const srcUrl = `${s.svg}${dimensions}`;
         console.log(srcUrl);
         return {
           menuItem: `${s.plotType.plotDisplay}`,
@@ -96,6 +96,9 @@ class SVGPlot extends Component {
           render: () => (
             <Tab.Pane attached="true" as="div">
               <div id="PlotSVG" className="svgSpan">
+                {/* <p>heightVar: {heightVar}</p>
+                <p>widthVar: {widthVar}</p>
+                <p>srcUrl: {srcUrl}</p> */}
                 <ReactSVG src={srcUrl} />
                 {/* <ReactSVG
                   src={srcUrl}

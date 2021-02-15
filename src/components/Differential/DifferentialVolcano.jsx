@@ -483,20 +483,15 @@ class DifferentialVolcano extends Component {
   };
 
   onSizeChange = (size, paneType) => {
-    const volcanoSvgWidthPx =
-      this.props.fwdRefDVC.current?.offsetWidth - size || 500;
-    const volcanoSvgHeightPx = this.state.volcanoHeight || 300;
-    const volcanoSvgWidthPt = roundToPrecision(volcanoSvgWidthPx / 100, 1);
-    const volcanoSvgHeightPt = roundToPrecision(volcanoSvgHeightPx / 100, 1);
     const adjustedSize = Math.round(size * 0.95);
     if (paneType === 'horizontal') {
-      // if (show) {
-      //   localStorage.setItem('volcanoHeightBackup', adjustedSize);
-      //   this.setState({
-      //     volcanoHeightBackup: adjustedSize + 1,
-      //   });
-      // }
       const width = parseInt(localStorage.getItem('volcanoWidth'), 10) || 500;
+      const volcanoSvgWidthPx =
+        this.props.fwdRefDVC.current?.offsetWidth - this.state.volcanoWidth ||
+        500;
+      const volcanoSvgWidthPt = roundToPrecision(volcanoSvgWidthPx / 105, 1);
+      const volcanoSvgHeightPx = size || 300;
+      const volcanoSvgHeightPt = roundToPrecision(volcanoSvgHeightPx / 105, 1);
       // on up/down drag, we are forcing a svg resize by change the volcano width by 1
       localStorage.setItem('volcanoWidth', width + 1);
       localStorage.setItem('volcanoHeight', adjustedSize + 1);
@@ -507,14 +502,15 @@ class DifferentialVolcano extends Component {
         volcanoSvgHeight: volcanoSvgHeightPt,
       });
     } else {
+      const volcanoSvgWidthPx =
+        this.props.fwdRefDVC.current?.offsetWidth - size || 500;
+      const volcanoSvgWidthPt = roundToPrecision(volcanoSvgWidthPx / 100, 1);
       localStorage.setItem('volcanoWidth', adjustedSize);
       this.setState({
         volcanoWidth: adjustedSize,
         volcanoSvgWidth: volcanoSvgWidthPt,
-        volcanoSvgHeight: volcanoSvgHeightPt,
       });
     }
-    // }
   };
 
   getDynamicSize() {
