@@ -5,7 +5,7 @@ import EnrichmentBreadcrumbs from './EnrichmentBreadcrumbs';
 import ButtonActions from '../Shared/ButtonActions';
 import SplitPane from 'react-split-pane';
 import './SplitPanesContainer.scss';
-import SVGPlot from '../Shared/SVGPlot';
+import EnrichmentSVGPlot from './EnrichmentSVGPlot';
 import BarcodePlot from './BarcodePlot';
 import ViolinPlot from './ViolinPlot';
 import FilteredDifferentialTable from './FilteredDifferentialTable';
@@ -222,7 +222,11 @@ class SplitPanesContainer extends Component {
       );
     } else {
       return (
-        <SVGPlot {...this.props} {...this.state} onSVGTabChange={tabChangeCb} />
+        <EnrichmentSVGPlot
+          {...this.props}
+          {...this.state}
+          onSVGTabChange={tabChangeCb}
+        />
       );
     }
   };

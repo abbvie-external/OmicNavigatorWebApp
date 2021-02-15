@@ -1,0 +1,69 @@
+.svgContainer {
+  height: 100% !important;
+  width: 100% !important;
+  margin: 0px 15px 0px 15px !important;
+
+  .svgDiv {
+    margin-left: 35px !important;
+    height: 100% !important;
+    width: 100% !important;
+  }
+
+  .ui.secondary.pointing.menu {
+    margin-left: 35px !important;
+  }
+
+  .svgSpan {
+    height: 100% !important;
+    width: 100% !important;
+  }
+
+  .SVGPlot {
+    min-height: 75vh !important;
+  }
+
+  .DiffTableIcon {
+    display: none !important;
+    position: absolute !important;
+    top: 10px !important;
+    // left: -2px !important;
+    cursor: pointer !important;
+    color: #1678c2 !important;
+  }
+
+  .NoPlotsMessage {
+    margin: 40px auto !important;
+    width: 300px !important;
+  }
+}
+
+.svgContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.export-svg {
+  margin: 5px 20px 5px 0px;
+  position: absolute;
+  right: 0;
+}
+
+// .TwoPlotsDiv {
+//   .DiffTableIcon {
+//     display: inline-block !important;
+//     left: -2px !important;
+//     // right: 75% !important;
+//     cursor: pointer !important;
+//   }
+
+//   .svgContainer {
+//     margin-left: 0px !important;
+//   }
+// }
+
+.ThreePlotsDiv .DiffTableIcon {
+  display: inline-block !important;
+  left: 10px !important;
+  // right: 50% !important;
+  cursor: pointer !important;
+}
