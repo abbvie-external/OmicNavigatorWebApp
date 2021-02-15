@@ -180,8 +180,9 @@ class DifferentialSearchCriteria extends Component {
         differentialModelsDisabled: false,
         differentialModels: differentialModelsMapped,
       });
-      this.getReportLink(differentialStudy, 'default');
-      if (differentialModel !== '') {
+      if (differentialModel === '') {
+        this.getReportLink(differentialStudy, 'default');
+      } else {
         this.props.onDoMetaFeaturesExist(differentialStudy, differentialModel);
         this.props.onGetResultsLinkouts(differentialStudy, differentialModel);
         this.props.onHandlePlotTypesDifferential(differentialModel);
@@ -292,7 +293,7 @@ class DifferentialSearchCriteria extends Component {
   setStudyTooltip = () => {
     if (this.props.differentialModel !== '') {
       this.setState({
-        differentialStudyReportTooltip: `The model "main" from the study ${this.props.differentialStudy} does not have additional analysis details available.`,
+        differentialStudyReportTooltip: `The model ${this.props.differentialModel} from the study ${this.props.differentialStudy} does not have additional analysis details available.`,
       });
     }
   };

@@ -186,8 +186,9 @@ class EnrichmentSearchCriteria extends Component {
         enrichmentModelsDisabled: false,
         enrichmentModels: enrichmentModelsMapped,
       });
-      this.getReportLink(enrichmentStudy, 'default');
-      if (enrichmentModel !== '') {
+      if (enrichmentModel === '') {
+        this.getReportLink(enrichmentStudy, 'default');
+      } else {
         this.props.onHandleHasBarcodeData();
         this.props.onHandlePlotTypesEnrichment(enrichmentModel);
         const enrichmentModelWithAnnotations = enrichmentModelsAndAnnotationsVar.find(
@@ -304,7 +305,7 @@ class EnrichmentSearchCriteria extends Component {
   setStudyTooltip = () => {
     if (this.props.enrichmentModel !== '') {
       this.setState({
-        enrichmentStudyReportTooltip: `The model "main" from the study ${this.props.enrichmentStudy} does not have additional analysis details available.`,
+        enrichmentStudyReportTooltip: `The model ${this.props.enrichmentModel} from the study ${this.props.enrichmentStudy} does not have additional analysis details available.`,
       });
     }
   };
