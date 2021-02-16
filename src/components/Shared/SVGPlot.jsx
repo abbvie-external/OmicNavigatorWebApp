@@ -10,6 +10,7 @@ import {
   // Label,
 } from 'semantic-ui-react';
 import { ReactSVG } from 'react-svg';
+import { roundToPrecision } from '../Shared/helpers';
 // import { limitString } from '../Shared/helpers';
 import ButtonActions from '../Shared/ButtonActions';
 import './SVGPlot.scss';
@@ -53,21 +54,26 @@ class SVGPlot extends Component {
   // };
 
   getSVGPanes = activeSVGTabIndex => {
-    if (this.props.imageInfo.length !== 0) {
-      const heightVar = this.props.divHeight || null;
-      const widthVar = this.props.divWidth || null;
-      const pointSizeVar = this.props.pointSize || null;
+    const {
+      imageInfo,
+      divWidth,
+      divHeight,
+      pxToPtRatio,
+      pointSize,
+    } = this.props;
+    if (imageInfo.length !== 0) {
       let dimensions = '';
-      if (heightVar && widthVar) {
-        dimensions = `?${widthVar}${heightVar}${pointSizeVar}`;
+      if (divWidth && divHeight && pxToPtRatio) {
+        const divWidthPt = roundToPrecision(divWidth / pxToPtRatio, 1);
+        const divHeightPt = roundToPrecision(divHeight / pxToPtRatio, 1);
+        const divWidthPtString = `&width=${divWidthPt}`;
+        const divHeightPtString = `&height=${divHeightPt}`;
+        const pointSizeString = `&pointsize=${pointSize}`;
+        dimensions = `?${divWidthPtString}${divHeightPtString}${pointSizeString}`;
       }
-      console.log(dimensions);
-      const svgArray = this.props.imageInfo.svg;
-      // const svgArrayReversed = svgArray.reverse();
-      // const numberOfPlots = svgArray.length;
+      const svgArray = [...imageInfo.svg];
       const panes = svgArray.map((s, index) => {
         const srcUrl = `${s.svg}${dimensions}`;
-        console.log(srcUrl);
         return {
           menuItem: `${s.plotType.plotDisplay}`,
           render: () => (

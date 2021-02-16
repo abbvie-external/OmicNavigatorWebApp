@@ -82,7 +82,6 @@ class DifferentialPlot extends Component {
   };
 
   getSVGPanes(activeDifferentialPlotTabsIndex) {
-    console.log('psul');
     let panes = [];
     let plotOptions = [];
     if (this.props.imageInfoDifferential.length !== 0) {

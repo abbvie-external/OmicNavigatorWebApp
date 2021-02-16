@@ -5,7 +5,7 @@ import CustomEmptyMessage from '../Shared/Templates';
 import QHGrid, { EZGrid } from '../Shared/QHGrid';
 import DifferentialPlot from './DifferentialPlot';
 import SVGPlot from '../Shared/SVGPlot';
-import { scrollElement, roundToPrecision } from '../Shared/helpers';
+import { scrollElement } from '../Shared/helpers';
 import DifferentialVolcanoPlot from './DifferentialVolcanoPlot';
 import {
   Form,
@@ -460,9 +460,10 @@ class DifferentialVolcano extends Component {
           <SVGPlot
             {...this.props}
             {...this.state}
-            divHeight={`&height=${this.state.volcanoSvgHeight}`}
-            divWidth={`&width=${this.state.volcanoSvgWidth}`}
-            pointSize={`&pointsize=11`}
+            divWidth={this.state.volcanoSvgWidth}
+            divHeight={this.state.volcanoSvgHeight}
+            pxToPtRatio={115}
+            pointSize={11}
             onSVGTabChange={onSVGTabChange}
           ></SVGPlot>
         </div>
@@ -482,33 +483,30 @@ class DifferentialVolcano extends Component {
     }
   };
 
-  onSizeChange = (size, paneType) => {
-    const adjustedSize = Math.round(size * 0.95);
+  onSizeChange = (newSize, paneType) => {
+    const { volcanoWidth } = this.state;
+    const { fwdRefDVC } = this.props;
+    const adjustedSize = Math.round(newSize * 0.95);
     if (paneType === 'horizontal') {
       const width = parseInt(localStorage.getItem('volcanoWidth'), 10) || 500;
       const volcanoSvgWidthPx =
-        this.props.fwdRefDVC.current?.offsetWidth - this.state.volcanoWidth ||
-        500;
-      const volcanoSvgWidthPt = roundToPrecision(volcanoSvgWidthPx / 105, 1);
-      const volcanoSvgHeightPx = size || 300;
-      const volcanoSvgHeightPt = roundToPrecision(volcanoSvgHeightPx / 105, 1);
+        fwdRefDVC.current?.offsetWidth - volcanoWidth || 500;
+      const volcanoSvgHeightPx = newSize || 300;
       // on up/down drag, we are forcing a svg resize by change the volcano width by 1
       localStorage.setItem('volcanoWidth', width + 1);
       localStorage.setItem('volcanoHeight', adjustedSize + 1);
       this.setState({
         volcanoHeight: adjustedSize + 1,
         volcanoWidth: width + 1,
-        volcanoSvgWidth: volcanoSvgWidthPt,
-        volcanoSvgHeight: volcanoSvgHeightPt,
+        volcanoSvgWidth: volcanoSvgWidthPx,
+        volcanoSvgHeight: volcanoSvgHeightPx,
       });
     } else {
-      const volcanoSvgWidthPx =
-        this.props.fwdRefDVC.current?.offsetWidth - size || 500;
-      const volcanoSvgWidthPt = roundToPrecision(volcanoSvgWidthPx / 100, 1);
+      const volcanoSvgWidthPx = fwdRefDVC.current?.offsetWidth - newSize || 500;
       localStorage.setItem('volcanoWidth', adjustedSize);
       this.setState({
         volcanoWidth: adjustedSize,
-        volcanoSvgWidth: volcanoSvgWidthPt,
+        volcanoSvgWidth: volcanoSvgWidthPx,
       });
     }
   };
@@ -842,7 +840,7 @@ class DifferentialVolcano extends Component {
                       size={
                         volcanoPlotsVisible ? volcanoHeight * 1.05263157895 : 0
                       }
-                      minSize={220}
+                      minSize={260}
                       maxSize={1000}
                       onDragFinished={size =>
                         this.onSizeChange(size, 'horizontal')
