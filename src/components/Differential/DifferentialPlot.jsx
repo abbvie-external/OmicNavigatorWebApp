@@ -1,6 +1,6 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { withRouter } from 'react-router-dom';
-import { Grid, Dimmer, Loader, Tab } from 'semantic-ui-react';
+import { Grid, Dimmer, Loader, Tab, Dropdown, Menu } from 'semantic-ui-react';
 import { ReactSVG } from 'react-svg';
 import DifferentialBreadcrumbs from './DifferentialBreadcrumbs';
 import ButtonActions from '../Shared/ButtonActions';
@@ -24,6 +24,7 @@ class DifferentialPlot extends Component {
     svgFlag: true,
     txtFlag: false,
     areDifferentialPlotTabsReady: false,
+    // selectedPlot: null,
   };
 
   componentDidMount() {
@@ -58,10 +59,25 @@ class DifferentialPlot extends Component {
     });
   };
 
+  handlePlotDropdownChange = (e, { value }) => {
+    debugger;
+    this.setState({
+      activeDifferentialPlotTabsIndex: value,
+    });
+  };
+
   getSVGPanes(activeDifferentialPlotTabsIndex) {
     let panes = [];
+    let plotOptions = [];
     if (this.props.imageInfoDifferential.length !== 0) {
-      const svgArray = this.props.imageInfoDifferential.svg;
+      const svgArray = [...this.props.imageInfoDifferential.svg];
+      plotOptions = svgArray.map(function(s, index) {
+        return {
+          key: `${index}=DifferentialPlotDropdownOption`,
+          text: s.plotType.plotDisplay,
+          value: index,
+        };
+      });
       // const svgArrayReversed = svgArray.reverse();
       const svgPanes = svgArray.map(s => {
         return {
@@ -91,15 +107,72 @@ class DifferentialPlot extends Component {
         },
       ];
       panes = panes.concat(metafeaturesTab);
+      let metafeaturesDropdown = [
+        {
+          key: this.props.imageInfoDifferential.svg.length,
+          text: 'Feature Data',
+          value: this.props.imageInfoDifferential.svg.length,
+        },
+      ];
+      plotOptions = plotOptions.concat(metafeaturesDropdown);
     }
+    const TabMenuClass =
+      this.props.differentialPlotTypes.length > 4 ? 'Hide' : 'Show';
     return (
-      <Tab
-        menu={{ secondary: true, pointing: true, className: 'SVGDiv' }}
-        panes={panes}
-        onTabChange={this.handleTabChange}
-        activeIndex={activeDifferentialPlotTabsIndex}
-      />
+      <Fragment>
+        <Dropdown
+          onChange={this.handlePlotDropdownChange}
+          search
+          // inline
+          options={plotOptions}
+          selection
+          defaultValue={plotOptions[0].text}
+          value={plotOptions[activeDifferentialPlotTabsIndex].value}
+          className={
+            this.props.differentialPlotTypes.length > 5 ? 'Show' : 'Hide'
+          }
+        />
+        <Tab
+          menu={{ secondary: true, pointing: true, className: TabMenuClass }}
+          panes={panes}
+          onTabChange={this.handleTabChange}
+          activeIndex={activeDifferentialPlotTabsIndex}
+        />
+      </Fragment>
     );
+
+    // if (this.props.imageInfoDifferential.length !== 0) {
+    //   const svgArray = [...this.props.imageInfoDifferential.svg];
+    //   const plotOptions = svgArray.map(function(s, index) {
+    //     return {
+    //       key: index,
+    //       text: s.plotType.plotDisplay,
+    //       value: s.plotType.plotDisplay,
+    //     };
+    //   });
+    //   return (
+    //     <Grid>
+    //       <Grid.Column
+    //         className=""
+    //         mobile={16}
+    //         tablet={16}
+    //         computer={16}
+    //         largeScreen={16}
+    //         widescreen={16}
+    //       >
+    //         <Dropdown
+    //           // onChange={this.handlePlotChange}
+    //           // search
+    //           options={plotOptions}
+    //           // selection
+    //           defaultValue={plotOptions[0]}
+    //           // value={this.state.selectedPlot}
+    //         />
+    //         <p>SVG Goes Here</p>
+    //       </Grid.Column>
+    //     </Grid>
+    //   );
+    // }
   }
 
   render() {
