@@ -307,6 +307,11 @@ class EnrichmentSearchCriteria extends Component {
       this.setState({
         enrichmentStudyReportTooltip: `The model ${this.props.enrichmentModel} from the study ${this.props.enrichmentStudy} does not have additional analysis details available.`,
       });
+    } else {
+      this.setState({
+        enrichmentStudyReportTooltip:
+          'Select a study and model to view Analysis Details',
+      });
     }
   };
 

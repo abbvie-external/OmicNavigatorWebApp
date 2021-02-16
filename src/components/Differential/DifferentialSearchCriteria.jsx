@@ -295,6 +295,11 @@ class DifferentialSearchCriteria extends Component {
       this.setState({
         differentialStudyReportTooltip: `The model ${this.props.differentialModel} from the study ${this.props.differentialStudy} does not have additional analysis details available.`,
       });
+    } else {
+      this.setState({
+        differentialStudyReportTooltip:
+          'Select a study and model to view Analysis Details',
+      });
     }
   };
 
