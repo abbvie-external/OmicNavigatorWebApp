@@ -17,39 +17,54 @@ class DifferentialPlot extends Component {
   };
 
   state = {
-    activeDifferentialPlotTabsIndex: 0,
+    // activeDifferentialPlotTabsIndex: 0,
     excelFlag: true,
     pngFlag: true,
     pdfFlag: false,
     svgFlag: true,
     txtFlag: false,
-    areDifferentialPlotTabsReady: false,
+    // areDifferentialPlotTabsReady: false,
     // selectedPlot: null,
   };
 
   componentDidMount() {
-    this.setButtonVisibility(this.state.activeDifferentialPlotTabsIndex);
+    const { activeDifferentialPlotTabsIndex } = this.state;
+    this.setButtonVisibility(activeDifferentialPlotTabsIndex);
+    const svgPanesVar = this.getSVGPanes(activeDifferentialPlotTabsIndex);
+    this.setState({
+      isSVGReady: true,
+      svgPanes: svgPanesVar,
+    });
   }
 
   componentDidUpdate(prevProps, prevState) {
+    const { imageInfoDifferential, isItemSVGLoaded } = this.props;
+    const { activeDifferentialPlotTabsIndex } = this.state;
     if (
-      this.state.activeDifferentialPlotTabsIndex !==
-      prevState.activeDifferentialPlotTabsIndex
+      isItemSVGLoaded &&
+      (prevState.activeDifferentialPlotTabsIndex !==
+        activeDifferentialPlotTabsIndex ||
+        prevProps.imageInfoDifferential !== imageInfoDifferential)
     ) {
-      this.setButtonVisibility(this.state.activeDifferentialPlotTabsIndex);
+      const svgPanesVar = this.getSVGPanes(activeDifferentialPlotTabsIndex);
+      this.setState({
+        svgPanes: svgPanesVar,
+      });
+    }
+    if (
+      prevState.activeDifferentialPlotTabsIndex !==
+      activeDifferentialPlotTabsIndex
+    ) {
+      this.setButtonVisibility(activeDifferentialPlotTabsIndex);
     }
   }
 
   setButtonVisibility = index => {
     this.setState({
-      // excelFlag: index === 2,
-      // excel not ready yet
       excelFlag: false,
-      // pdfFlag: index !== 2,
       pdfFlag: false,
-      // pdfFlag: index !== 2,
-      svgFlag: index !== 2,
-      pngFlag: index !== 2,
+      svgFlag: index !== this.props.imageInfoDifferential.svg.length,
+      pngFlag: index !== this.props.imageInfoDifferential.svg.length,
     });
   };
 
@@ -67,6 +82,7 @@ class DifferentialPlot extends Component {
   };
 
   getSVGPanes(activeDifferentialPlotTabsIndex) {
+    console.log('psul');
     let panes = [];
     let plotOptions = [];
     if (this.props.imageInfoDifferential.length !== 0) {
@@ -118,25 +134,24 @@ class DifferentialPlot extends Component {
     }
     const TabMenuClass =
       this.props.differentialPlotTypes.length > 4 ? 'Hide' : 'Show';
+    const indexVar = activeDifferentialPlotTabsIndex || 0;
     return (
       <Fragment>
         <Dropdown
           onChange={this.handlePlotDropdownChange}
           search
-          // inline
           options={plotOptions}
           selection
-          defaultValue={plotOptions[0].text}
-          value={plotOptions[activeDifferentialPlotTabsIndex].value}
+          value={plotOptions[indexVar].value}
           className={
-            this.props.differentialPlotTypes.length > 5 ? 'Show' : 'Hide'
+            this.props.differentialPlotTypes.length > 4 ? 'Show' : 'Hide'
           }
         />
         <Tab
           menu={{ secondary: true, pointing: true, className: TabMenuClass }}
           panes={panes}
           onTabChange={this.handleTabChange}
-          activeIndex={activeDifferentialPlotTabsIndex}
+          activeIndex={indexVar}
         />
       </Fragment>
     );
@@ -177,10 +192,12 @@ class DifferentialPlot extends Component {
 
   render() {
     // const { activeDifferentialPlotTabsIndex } = this.state;
-    const { excelFlag, pngFlag, pdfFlag, svgFlag } = this.state;
-    const { isItemSVGLoaded, imageInfoDifferential } = this.props;
-    const { activeDifferentialPlotTabsIndex } = this.state;
-    const svgPanes = this.getSVGPanes(activeDifferentialPlotTabsIndex);
+    const { excelFlag, pngFlag, pdfFlag, svgFlag, svgPanes } = this.state;
+    const {
+      isItemSVGLoaded,
+      imageInfoDifferential,
+      activeDifferentialPlotTabsIndex,
+    } = this.props;
     if (!isItemSVGLoaded) {
       return (
         // <LoaderActivePlots />
