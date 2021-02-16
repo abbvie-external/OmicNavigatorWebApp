@@ -245,7 +245,6 @@ class SplitPanesContainer extends Component {
         horizontalSplitPaneSize: size,
       });
     } else {
-      debugger;
       this.setState({
         verticalSplitPaneSize: size,
         // enrichmentSvgHeight: 300,

@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import {
   Loader,
   Dimmer,
@@ -8,6 +8,7 @@ import {
   Message,
   // Menu,
   // Label,
+  Dropdown,
 } from 'semantic-ui-react';
 import { ReactSVG } from 'react-svg';
 import { roundToPrecision } from '../Shared/helpers';
@@ -46,6 +47,10 @@ class SVGPlot extends Component {
     this.props.onSVGTabChange(activeIndex);
   };
 
+  handlePlotDropdownChange = (e, { value }) => {
+    this.props.onSVGTabChange(value);
+  };
+
   // navigateToDifferentialFeature = evt => {
   //   const testAndDescription = this.props.imageInfo.key.split(':');
   //   const test = testAndDescription[0] || '';
@@ -62,6 +67,8 @@ class SVGPlot extends Component {
       pointSize,
     } = this.props;
     if (imageInfo.length !== 0) {
+      let panes = [];
+      let plotOptions = [];
       let dimensions = '';
       if (divWidth && divHeight && pxToPtRatio) {
         const divWidthPt = roundToPrecision(divWidth / pxToPtRatio, 1);
@@ -72,7 +79,14 @@ class SVGPlot extends Component {
         dimensions = `?${divWidthPtString}${divHeightPtString}${pointSizeString}`;
       }
       const svgArray = [...imageInfo.svg];
-      const panes = svgArray.map((s, index) => {
+      plotOptions = svgArray.map(function(s, index) {
+        return {
+          key: `${index}=VolcanoPlotDropdownOption`,
+          text: s.plotType.plotDisplay,
+          value: index,
+        };
+      });
+      panes = svgArray.map((s, index) => {
         const srcUrl = `${s.svg}${dimensions}`;
         return {
           menuItem: `${s.plotType.plotDisplay}`,
@@ -110,14 +124,32 @@ class SVGPlot extends Component {
           ),
         };
       });
+      const TabMenuClass =
+        this.props.differentialPlotTypes.length > 1 ? 'Hide' : 'Show';
+      const indexVar = activeSVGTabIndex || 0;
 
       return (
-        <Tab
-          menu={{ secondary: true, pointing: true, className: 'SVGDiv' }}
-          panes={panes}
-          onTabChange={this.handleTabChange}
-          activeIndex={activeSVGTabIndex}
-        />
+        <Fragment>
+          <Dropdown
+            search
+            selection
+            compact
+            options={plotOptions}
+            value={plotOptions[indexVar].value}
+            onChange={this.handlePlotDropdownChange}
+            className={
+              this.props.differentialPlotTypes.length > 1
+                ? 'Show svgPlotDropdown'
+                : 'Hide svgPlotDropdown'
+            }
+          />
+          <Tab
+            menu={{ secondary: true, pointing: true, className: TabMenuClass }}
+            panes={panes}
+            onTabChange={this.handleTabChange}
+            activeIndex={activeSVGTabIndex}
+          />
+        </Fragment>
       );
     } else {
       return (

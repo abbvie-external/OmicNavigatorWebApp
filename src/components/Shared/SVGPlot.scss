@@ -9,6 +9,11 @@
     width: 100% !important;
   }
 
+  .svgPlotDropdown {
+    max-width: fit-content !important;
+    z-index: 5 !important;
+  }
+
   .ui.secondary.pointing.menu {
     margin-left: 35px !important;
   }

@@ -75,7 +75,6 @@ class DifferentialPlot extends Component {
   };
 
   handlePlotDropdownChange = (e, { value }) => {
-    debugger;
     this.setState({
       activeDifferentialPlotTabsIndex: value,
     });
@@ -93,7 +92,6 @@ class DifferentialPlot extends Component {
           value: index,
         };
       });
-      // const svgArrayReversed = svgArray.reverse();
       const svgPanes = svgArray.map(s => {
         return {
           menuItem: `${s.plotType.plotDisplay}`,
@@ -137,11 +135,12 @@ class DifferentialPlot extends Component {
     return (
       <Fragment>
         <Dropdown
-          onChange={this.handlePlotDropdownChange}
           search
-          options={plotOptions}
           selection
+          compact
+          options={plotOptions}
           value={plotOptions[indexVar].value}
+          onChange={this.handlePlotDropdownChange}
           className={
             this.props.differentialPlotTypes.length > 4 ? 'Show' : 'Hide'
           }
