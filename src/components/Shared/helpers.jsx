@@ -1,12 +1,7 @@
 import React from 'react';
 import { Popup } from 'semantic-ui-react';
 import _ from 'lodash';
-// import phosphosite_icon from '../../resources/phosphosite.ico';
-// import reactome_icon from '../../resources/reactome.jpg';
-// import go_icon from '../../resources/go.png';
-// import msig_icon from '../../resources/msig.ico';
 import * as d3 from 'd3-array';
-// import { omicNavigatorService } from '../../services/omicNavigator.service';
 
 export const Linkout = React.memo(
   function Linkout({ keyVar, itemValue, linkouts, favicons }) {
