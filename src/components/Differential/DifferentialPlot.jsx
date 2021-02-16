@@ -38,13 +38,13 @@ class DifferentialPlot extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    const { imageInfoDifferential, isItemSVGLoaded } = this.props;
+    const { imageInfoDifferentialLength, isItemSVGLoaded } = this.props;
     const { activeDifferentialPlotTabsIndex } = this.state;
     if (
       isItemSVGLoaded &&
       (prevState.activeDifferentialPlotTabsIndex !==
         activeDifferentialPlotTabsIndex ||
-        prevProps.imageInfoDifferential !== imageInfoDifferential)
+        prevProps.imageInfoDifferentialLength !== imageInfoDifferentialLength)
     ) {
       const svgPanesVar = this.getSVGPanes(activeDifferentialPlotTabsIndex);
       this.setState({
@@ -155,39 +155,6 @@ class DifferentialPlot extends Component {
         />
       </Fragment>
     );
-
-    // if (this.props.imageInfoDifferential.length !== 0) {
-    //   const svgArray = [...this.props.imageInfoDifferential.svg];
-    //   const plotOptions = svgArray.map(function(s, index) {
-    //     return {
-    //       key: index,
-    //       text: s.plotType.plotDisplay,
-    //       value: s.plotType.plotDisplay,
-    //     };
-    //   });
-    //   return (
-    //     <Grid>
-    //       <Grid.Column
-    //         className=""
-    //         mobile={16}
-    //         tablet={16}
-    //         computer={16}
-    //         largeScreen={16}
-    //         widescreen={16}
-    //       >
-    //         <Dropdown
-    //           // onChange={this.handlePlotChange}
-    //           // search
-    //           options={plotOptions}
-    //           // selection
-    //           defaultValue={plotOptions[0]}
-    //           // value={this.state.selectedPlot}
-    //         />
-    //         <p>SVG Goes Here</p>
-    //       </Grid.Column>
-    //     </Grid>
-    //   );
-    // }
   }
 
   render() {

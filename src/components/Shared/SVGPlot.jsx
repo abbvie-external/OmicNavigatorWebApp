@@ -29,6 +29,7 @@ class SVGPlot extends Component {
 
   componentDidUpdate(prevProps) {
     if (
+      prevProps.imageInfoLength !== this.props.imageInfoLength ||
       prevProps.volcanoWidth !== this.props.volcanoWidth ||
       prevProps.volcanoHeight !== this.props.volcanoHeight ||
       prevProps.activeSVGTabIndex !== this.props.activeSVGTabIndex
@@ -52,15 +53,6 @@ class SVGPlot extends Component {
   // };
 
   getSVGPanes = activeSVGTabIndex => {
-    // const BreadcrumbPopupStyle = {
-    //   backgroundColor: '2E2E2E',
-    //   borderBottom: '2px solid var(--color-primary)',
-    //   color: '#FFF',
-    //   padding: '1em',
-    //   maxWidth: '50vw',
-    //   fontSize: '13px',
-    //   wordBreak: 'break-all',
-    // };
     if (this.props.imageInfo.length !== 0) {
       const heightVar = this.props.divHeight || null;
       const widthVar = this.props.divWidth || null;
@@ -78,21 +70,6 @@ class SVGPlot extends Component {
         console.log(srcUrl);
         return {
           menuItem: `${s.plotType.plotDisplay}`,
-          // menuItem: limitString(`${s.plotType.plotDisplay}`, numberOfPlots, 5),
-          // menuItem: (
-          //   <Popup
-          //     trigger={
-          //       <Menu.Item key={`${s.plotType.plotDisplay}`} content="test">
-          //         <Label>{index}</Label>
-          //       </Menu.Item>
-          //     }
-          //     style={BreadcrumbPopupStyle}
-          //     inverted
-          //     basic
-          //     position="bottom left"
-          //     content={`${s.plotType.plotDisplay}`}
-          //   />
-          // ),
           render: () => (
             <Tab.Pane attached="true" as="div">
               <div id="PlotSVG" className="svgSpan">
@@ -134,7 +111,6 @@ class SVGPlot extends Component {
           panes={panes}
           onTabChange={this.handleTabChange}
           activeIndex={activeSVGTabIndex}
-          vertical
         />
       );
     } else {

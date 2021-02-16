@@ -339,6 +339,7 @@ class Differential extends Component {
     this.setState(
       {
         imageInfoDifferential: imageInfoDifferential,
+        imageInfoDifferentialLength: imageInfoDifferential.svg?.length || 0,
         isItemSelected: true,
         isItemSVGLoaded: false,
         // isItemDatatLoaded: false,
@@ -570,6 +571,7 @@ class Differential extends Component {
       [key]: imageInfo,
       isItemSVGLoaded: true,
       isVolcanoPlotSVGLoaded: true,
+      imageInfoLength: imageInfo.svg?.length || 0,
     });
   };
 
@@ -630,6 +632,7 @@ class Differential extends Component {
       };
       this.setState({
         imageInfoDifferential: imageInfoDifferential,
+        imageInfoDifferentialLength: imageInfoDifferential.svg?.length || 0,
         isItemSelected: true,
         isItemSVGLoaded: false,
         // isItemDatatLoaded: false,
