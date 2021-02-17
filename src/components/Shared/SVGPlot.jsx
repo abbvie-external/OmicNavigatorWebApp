@@ -43,18 +43,16 @@ class SVGPlot extends Component {
     }
   }
 
-  handleSVGTabChange = activeTabIndex => {
+  handleTabChange = (e, { activeIndex }) => {
     this.setState({
-      activeSVGTabIndex: activeTabIndex,
+      activeSVGTabIndexVolcano: activeIndex,
     });
   };
 
-  handleTabChange = (e, { activeIndex }) => {
-    this.handleSVGTabChange(activeIndex);
-  };
-
   handlePlotDropdownChange = (e, { value }) => {
-    this.handleSVGTabChange(value);
+    this.setState({
+      activeSVGTabIndexVolcano: value,
+    });
   };
 
   // navigateToDifferentialFeature = evt => {
@@ -140,7 +138,7 @@ class SVGPlot extends Component {
   render() {
     if (this.state.isSVGReady) {
       const { imageInfoVolcano, svgExportName, tab } = this.props;
-      const { activeSVGTabIndex, svgPanes } = this.state;
+      const { activeSVGTabIndexVolcano, svgPanes } = this.state;
       const ButtonActionsClass = this.getButtonActionsClass();
       const TabMenuClass =
         this.props.differentialPlotTypes.length > this.props.svgTabMax
@@ -156,6 +154,9 @@ class SVGPlot extends Component {
       //   wordBreak: 'break-all',
       // };
       let plotOptions = [];
+      const activeSVGTabIndexVolcanoVar = activeSVGTabIndexVolcano
+        ? activeSVGTabIndexVolcano
+        : 0;
       const svgArray = [...imageInfoVolcano.svg];
       plotOptions = svgArray.map(function(s, index) {
         return {
@@ -176,7 +177,7 @@ class SVGPlot extends Component {
               txtVisible={false}
               tab={tab}
               imageInfo={imageInfoVolcano}
-              tabIndex={activeSVGTabIndex}
+              tabIndex={activeSVGTabIndexVolcanoVar}
               svgExportName={svgExportName}
             />
           </div>
@@ -200,7 +201,7 @@ class SVGPlot extends Component {
             selection
             compact
             options={plotOptions}
-            // value={plotOptions[indexVar].value}
+            value={plotOptions[activeSVGTabIndexVolcanoVar].value}
             onChange={this.handlePlotDropdownChange}
             className={
               this.props.differentialPlotTypes.length > this.props.svgTabMax
@@ -212,7 +213,7 @@ class SVGPlot extends Component {
             menu={{ secondary: true, pointing: true, className: TabMenuClass }}
             panes={svgPanes}
             onTabChange={this.handleTabChange}
-            activeIndex={activeSVGTabIndex}
+            activeIndex={activeSVGTabIndexVolcano}
           />
         </div>
       );

@@ -12,7 +12,7 @@ import FilteredDifferentialTable from './FilteredDifferentialTable';
 
 class SplitPanesContainer extends Component {
   state = {
-    activeSVGTabIndex: 0,
+    activeSvgTabIndexEnrichment: 0,
     horizontalSplitPaneSize:
       parseInt(localStorage.getItem('horizontalSplitPaneSize'), 10) || 250,
     verticalSplitPaneSize:
@@ -24,7 +24,7 @@ class SplitPanesContainer extends Component {
 
   handleSVGTabChange = activeTabIndex => {
     this.setState({
-      activeSVGTabIndex: activeTabIndex,
+      activeSvgTabIndexEnrichment: activeTabIndex,
     });
   };
 

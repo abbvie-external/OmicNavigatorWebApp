@@ -43,7 +43,7 @@ class EnrichmentSVGPlot extends Component {
     this.props.onFindDifferentialFeature(test, featureID);
   };
 
-  getSVGPanes(activeSVGTabIndex) {
+  getSVGPanes(activeSvgTabIndexEnrichment) {
     // const BreadcrumbPopupStyle = {
     //   backgroundColor: '2E2E2E',
     //   borderBottom: '2px solid var(--color-primary)',
@@ -99,7 +99,7 @@ class EnrichmentSVGPlot extends Component {
           menu={{ secondary: true, pointing: true, className: 'SVGDiv' }}
           panes={panes}
           onTabChange={this.handleTabChange}
-          activeIndex={activeSVGTabIndex}
+          activeIndex={activeSvgTabIndexEnrichment}
         />
       );
     } else {
@@ -128,7 +128,7 @@ class EnrichmentSVGPlot extends Component {
   render() {
     if (this.state.isSVGReady) {
       const {
-        activeSVGTabIndex,
+        activeSvgTabIndexEnrichment,
         imageInfoEnrichment,
         svgExportName,
         tab,
@@ -144,7 +144,7 @@ class EnrichmentSVGPlot extends Component {
       //   fontSize: '13px',
       //   wordBreak: 'break-all',
       // };
-      const svgPanes = this.getSVGPanes(activeSVGTabIndex);
+      const svgPanes = this.getSVGPanes(activeSvgTabIndexEnrichment);
       return (
         <div className="svgContainer">
           <div className={ButtonActionsClass}>
@@ -157,7 +157,7 @@ class EnrichmentSVGPlot extends Component {
               txtVisible={false}
               tab={tab}
               imageInfo={imageInfoEnrichment}
-              tabIndex={activeSVGTabIndex}
+              tabIndex={activeSvgTabIndexEnrichment}
               svgExportName={svgExportName}
             />
           </div>

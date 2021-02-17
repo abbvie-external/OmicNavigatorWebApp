@@ -17,7 +17,7 @@ class DifferentialPlot extends Component {
   };
 
   state = {
-    // activeDifferentialPlotTabsIndex: 0,
+    // activeSVGTabIndexDifferential: 0,
     excelFlag: true,
     pngFlag: true,
     pdfFlag: false,
@@ -28,9 +28,9 @@ class DifferentialPlot extends Component {
   };
 
   componentDidMount() {
-    const { activeDifferentialPlotTabsIndex } = this.state;
-    this.setButtonVisibility(activeDifferentialPlotTabsIndex);
-    const svgPanesVar = this.getSVGPanes(activeDifferentialPlotTabsIndex);
+    const { activeSVGTabIndexDifferential } = this.state;
+    this.setButtonVisibility(activeSVGTabIndexDifferential);
+    const svgPanesVar = this.getSVGPanes(activeSVGTabIndexDifferential);
     this.setState({
       isSVGReady: true,
       svgPanes: svgPanesVar,
@@ -39,23 +39,21 @@ class DifferentialPlot extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     const { imageInfoDifferentialLength, isItemSVGLoaded } = this.props;
-    const { activeDifferentialPlotTabsIndex } = this.state;
+    const { activeSVGTabIndexDifferential } = this.state;
     if (
       isItemSVGLoaded &&
-      (prevState.activeDifferentialPlotTabsIndex !==
-        activeDifferentialPlotTabsIndex ||
-        prevProps.imageInfoDifferentialLength !== imageInfoDifferentialLength)
+      prevProps.imageInfoDifferentialLength !== imageInfoDifferentialLength
     ) {
-      const svgPanesVar = this.getSVGPanes(activeDifferentialPlotTabsIndex);
+      const svgPanesVar = this.getSVGPanes(activeSVGTabIndexDifferential);
       this.setState({
         svgPanes: svgPanesVar,
+        isSVGReady: true,
       });
     }
     if (
-      prevState.activeDifferentialPlotTabsIndex !==
-      activeDifferentialPlotTabsIndex
+      prevState.activeSVGTabIndexDifferential !== activeSVGTabIndexDifferential
     ) {
-      this.setButtonVisibility(activeDifferentialPlotTabsIndex);
+      this.setButtonVisibility(activeSVGTabIndexDifferential);
     }
   }
 
@@ -70,17 +68,17 @@ class DifferentialPlot extends Component {
 
   handleTabChange = (e, { activeIndex }) => {
     this.setState({
-      activeDifferentialPlotTabsIndex: activeIndex,
+      activeSVGTabIndexDifferential: activeIndex,
     });
   };
 
   handlePlotDropdownChange = (e, { value }) => {
     this.setState({
-      activeDifferentialPlotTabsIndex: value,
+      activeSVGTabIndexDifferential: value,
     });
   };
 
-  getSVGPanes(activeDifferentialPlotTabsIndex) {
+  getSVGPanes(activeSVGTabIndexDifferential) {
     let panes = [];
     let plotOptions = [];
     if (this.props.imageInfoDifferential.length !== 0) {
@@ -131,7 +129,7 @@ class DifferentialPlot extends Component {
     }
     const TabMenuClass =
       this.props.differentialPlotTypes.length > 4 ? 'Hide' : 'Show';
-    const indexVar = activeDifferentialPlotTabsIndex || 0;
+    const indexVar = activeSVGTabIndexDifferential || 0;
     return (
       <Fragment>
         <Dropdown
@@ -156,12 +154,12 @@ class DifferentialPlot extends Component {
   }
 
   render() {
-    // const { activeDifferentialPlotTabsIndex } = this.state;
+    // const { activeSVGTabIndexDifferential } = this.state;
     const { excelFlag, pngFlag, pdfFlag, svgFlag, svgPanes } = this.state;
     const {
       isItemSVGLoaded,
       imageInfoDifferential,
-      activeDifferentialPlotTabsIndex,
+      activeSVGTabIndexDifferential,
     } = this.props;
     if (!isItemSVGLoaded) {
       return (
@@ -189,7 +187,7 @@ class DifferentialPlot extends Component {
                   svgVisible={svgFlag}
                   txtVisible={false}
                   imageInfo={imageInfoDifferential}
-                  tabIndex={activeDifferentialPlotTabsIndex}
+                  tabIndex={activeSVGTabIndexDifferential}
                 />
               </Grid.Column>
             </Grid.Row>
