@@ -70,7 +70,6 @@ class SVGPlot extends Component {
       pxToPtRatio,
       pointSize,
     } = this.props;
-
     if (imageInfoVolcano.length !== 0) {
       let dimensions = '';
       if (divWidth && divHeight && pxToPtRatio) {
@@ -140,6 +139,10 @@ class SVGPlot extends Component {
       const { imageInfoVolcano, svgExportName, tab } = this.props;
       const { activeSVGTabIndexVolcano, svgPanes } = this.state;
       const ButtonActionsClass = this.getButtonActionsClass();
+      const DropdownClass =
+        this.props.differentialPlotTypes.length > this.props.svgTabMax
+          ? 'Show svgPlotDropdown'
+          : 'Hide svgPlotDropdown';
       const TabMenuClass =
         this.props.differentialPlotTypes.length > this.props.svgTabMax
           ? 'Hide'
@@ -153,12 +156,9 @@ class SVGPlot extends Component {
       //   fontSize: '13px',
       //   wordBreak: 'break-all',
       // };
-      let plotOptions = [];
-      const activeSVGTabIndexVolcanoVar = activeSVGTabIndexVolcano
-        ? activeSVGTabIndexVolcano
-        : 0;
+      const activeSVGTabIndexVolcanoVar = activeSVGTabIndexVolcano || 0;
       const svgArray = [...imageInfoVolcano.svg];
-      plotOptions = svgArray.map(function(s, index) {
+      const plotOptions = svgArray.map(function(s, index) {
         return {
           key: `${index}=VolcanoPlotDropdownOption`,
           text: s.plotType.plotDisplay,
@@ -203,11 +203,7 @@ class SVGPlot extends Component {
             options={plotOptions}
             value={plotOptions[activeSVGTabIndexVolcanoVar].value}
             onChange={this.handlePlotDropdownChange}
-            className={
-              this.props.differentialPlotTypes.length > this.props.svgTabMax
-                ? 'Show svgPlotDropdown'
-                : 'Hide svgPlotDropdown'
-            }
+            className={DropdownClass}
           />
           <Tab
             menu={{ secondary: true, pointing: true, className: TabMenuClass }}

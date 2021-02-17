@@ -669,6 +669,11 @@ class DifferentialVolcano extends Component {
             <DifferentialPlot
               {...this.props}
               {...this.state}
+              // divWidth={this.state.}
+              // divHeight={this.state.}
+              // pxToPtRatio={115}
+              // pointSize={11}
+              svgTabMax={4}
             ></DifferentialPlot>
           </Sidebar>
         );

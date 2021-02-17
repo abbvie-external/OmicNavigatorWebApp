@@ -80,16 +80,8 @@ class DifferentialPlot extends Component {
 
   getSVGPanes(activeSVGTabIndexDifferential) {
     let panes = [];
-    let plotOptions = [];
     if (this.props.imageInfoDifferential.length !== 0) {
       const svgArray = [...this.props.imageInfoDifferential.svg];
-      plotOptions = svgArray.map(function(s, index) {
-        return {
-          key: `${index}=DifferentialPlotDropdownOption`,
-          text: s.plotType.plotDisplay,
-          value: index,
-        };
-      });
       const svgPanes = svgArray.map(s => {
         return {
           menuItem: `${s.plotType.plotDisplay}`,
@@ -118,49 +110,20 @@ class DifferentialPlot extends Component {
         },
       ];
       panes = panes.concat(metafeaturesTab);
-      let metafeaturesDropdown = [
-        {
-          key: this.props.imageInfoDifferential.svg.length,
-          text: 'Feature Data',
-          value: this.props.imageInfoDifferential.svg.length,
-        },
-      ];
-      plotOptions = plotOptions.concat(metafeaturesDropdown);
     }
-    const TabMenuClass =
-      this.props.differentialPlotTypes.length > 4 ? 'Hide' : 'Show';
-    const indexVar = activeSVGTabIndexDifferential || 0;
-    return (
-      <Fragment>
-        <Dropdown
-          search
-          selection
-          compact
-          options={plotOptions}
-          value={plotOptions[indexVar].value}
-          onChange={this.handlePlotDropdownChange}
-          className={
-            this.props.differentialPlotTypes.length > 4 ? 'Show' : 'Hide'
-          }
-        />
-        <Tab
-          menu={{ secondary: true, pointing: true, className: TabMenuClass }}
-          panes={panes}
-          onTabChange={this.handleTabChange}
-          activeIndex={indexVar}
-        />
-      </Fragment>
-    );
+    return panes;
   }
 
   render() {
-    // const { activeSVGTabIndexDifferential } = this.state;
-    const { excelFlag, pngFlag, pdfFlag, svgFlag, svgPanes } = this.state;
     const {
-      isItemSVGLoaded,
-      imageInfoDifferential,
+      excelFlag,
+      pngFlag,
+      pdfFlag,
+      svgFlag,
+      svgPanes,
       activeSVGTabIndexDifferential,
-    } = this.props;
+    } = this.state;
+    const { isItemSVGLoaded, imageInfoDifferential } = this.props;
     if (!isItemSVGLoaded) {
       return (
         // <LoaderActivePlots />
@@ -171,6 +134,37 @@ class DifferentialPlot extends Component {
         </div>
       );
     } else {
+      const DropdownClass =
+        this.props.differentialPlotTypes.length > this.props.svgTabMax
+          ? 'Show svgPlotDropdown'
+          : 'Hide svgPlotDropdown';
+      const TabMenuClass =
+        this.props.differentialPlotTypes.length > this.props.svgTabMax
+          ? 'Hide'
+          : 'Show';
+      const activeSVGTabIndexDifferentialVar =
+        activeSVGTabIndexDifferential || 0;
+      let plotOptions = [];
+      if (this.props.imageInfoDifferential.length !== 0) {
+        const svgArray = [...imageInfoDifferential.svg];
+        plotOptions = svgArray.map(function(s, index) {
+          return {
+            key: `${index}=DifferentialPlotDropdownOption`,
+            text: s.plotType.plotDisplay,
+            value: index,
+          };
+        });
+        if (this.props.modelSpecificMetaFeaturesExist !== false) {
+          let metafeaturesDropdown = [
+            {
+              key: this.props.imageInfoDifferential.svg.length,
+              text: 'Feature Data',
+              value: this.props.imageInfoDifferential.svg.length,
+            },
+          ];
+          plotOptions = plotOptions.concat(metafeaturesDropdown);
+        }
+      }
       return (
         <div className="PlotWrapper">
           <Grid columns={2} className="">
@@ -187,7 +181,7 @@ class DifferentialPlot extends Component {
                   svgVisible={svgFlag}
                   txtVisible={false}
                   imageInfo={imageInfoDifferential}
-                  tabIndex={activeSVGTabIndexDifferential}
+                  tabIndex={activeSVGTabIndexDifferentialVar}
                 />
               </Grid.Column>
             </Grid.Row>
@@ -201,7 +195,27 @@ class DifferentialPlot extends Component {
                 largeScreen={16}
                 widescreen={16}
               >
-                <div className="">{svgPanes}</div>
+                <div className="">
+                  <Dropdown
+                    search
+                    selection
+                    compact
+                    options={plotOptions}
+                    value={plotOptions[activeSVGTabIndexDifferentialVar].value}
+                    onChange={this.handlePlotDropdownChange}
+                    className={DropdownClass}
+                  />
+                  <Tab
+                    menu={{
+                      secondary: true,
+                      pointing: true,
+                      className: TabMenuClass,
+                    }}
+                    panes={svgPanes}
+                    onTabChange={this.handleTabChange}
+                    activeIndex={activeSVGTabIndexDifferentialVar}
+                  />
+                </div>
               </Grid.Column>
             </Grid.Row>
           </Grid>
