@@ -464,6 +464,7 @@ class DifferentialVolcano extends Component {
             divHeight={this.state.volcanoSvgHeight}
             pxToPtRatio={115}
             pointSize={11}
+            svgTabMax={1}
             onSVGTabChange={onSVGTabChange}
           ></SVGPlot>
         </div>

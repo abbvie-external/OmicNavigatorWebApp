@@ -22,33 +22,39 @@ class SVGPlot extends Component {
   };
 
   componentDidMount() {
-    const svgPanesVar = this.getSVGPanes(this.props.activeSVGTabIndex);
+    const svgPanesVar = this.getSVGPanes();
     this.setState({
       isSVGReady: true,
       svgPanes: svgPanesVar,
     });
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps, prevState) {
     if (
       prevProps.imageInfoVolcanoLength !== this.props.imageInfoVolcanoLength ||
       prevProps.volcanoWidth !== this.props.volcanoWidth ||
-      prevProps.volcanoHeight !== this.props.volcanoHeight ||
-      prevProps.activeSVGTabIndex !== this.props.activeSVGTabIndex
+      prevProps.volcanoHeight !== this.props.volcanoHeight
     ) {
-      const svgPanesVar = this.getSVGPanes(this.props.activeSVGTabIndex);
+      const svgPanesVar = this.getSVGPanes();
       this.setState({
         svgPanes: svgPanesVar,
+        isSVGReady: true,
       });
     }
   }
 
+  handleSVGTabChange = activeTabIndex => {
+    this.setState({
+      activeSVGTabIndex: activeTabIndex,
+    });
+  };
+
   handleTabChange = (e, { activeIndex }) => {
-    this.props.onSVGTabChange(activeIndex);
+    this.handleSVGTabChange(activeIndex);
   };
 
   handlePlotDropdownChange = (e, { value }) => {
-    this.props.onSVGTabChange(value);
+    this.handleSVGTabChange(value);
   };
 
   // navigateToDifferentialFeature = evt => {
@@ -58,7 +64,7 @@ class SVGPlot extends Component {
   //   this.props.onFindDifferentialFeature(test, featureID);
   // };
 
-  getSVGPanes = activeSVGTabIndex => {
+  getSVGPanes = () => {
     const {
       imageInfoVolcano,
       divWidth,
@@ -66,9 +72,8 @@ class SVGPlot extends Component {
       pxToPtRatio,
       pointSize,
     } = this.props;
+
     if (imageInfoVolcano.length !== 0) {
-      let panes = [];
-      let plotOptions = [];
       let dimensions = '';
       if (divWidth && divHeight && pxToPtRatio) {
         const divWidthPt = roundToPrecision(divWidth / pxToPtRatio, 1);
@@ -79,14 +84,7 @@ class SVGPlot extends Component {
         dimensions = `?${divWidthPtString}${divHeightPtString}${pointSizeString}`;
       }
       const svgArray = [...imageInfoVolcano.svg];
-      plotOptions = svgArray.map(function(s, index) {
-        return {
-          key: `${index}=VolcanoPlotDropdownOption`,
-          text: s.plotType.plotDisplay,
-          value: index,
-        };
-      });
-      panes = svgArray.map((s, index) => {
+      return svgArray.map((s, index) => {
         const srcUrl = `${s.svg}${dimensions}`;
         return {
           menuItem: `${s.plotType.plotDisplay}`,
@@ -124,41 +122,6 @@ class SVGPlot extends Component {
           ),
         };
       });
-      const TabMenuClass =
-        this.props.differentialPlotTypes.length > 1 ? 'Hide' : 'Show';
-      const indexVar = activeSVGTabIndex || 0;
-
-      return (
-        <Fragment>
-          <Dropdown
-            search
-            selection
-            compact
-            options={plotOptions}
-            value={plotOptions[indexVar].value}
-            onChange={this.handlePlotDropdownChange}
-            className={
-              this.props.differentialPlotTypes.length > 1
-                ? 'Show svgPlotDropdown'
-                : 'Hide svgPlotDropdown'
-            }
-          />
-          <Tab
-            menu={{ secondary: true, pointing: true, className: TabMenuClass }}
-            panes={panes}
-            onTabChange={this.handleTabChange}
-            activeIndex={activeSVGTabIndex}
-          />
-        </Fragment>
-      );
-    } else {
-      return (
-        <Message
-          className="NoPlotsMessage"
-          icon="question mark"
-          header="No Plots Available"
-        />
-      );
     }
   };
 
@@ -176,14 +139,13 @@ class SVGPlot extends Component {
 
   render() {
     if (this.state.isSVGReady) {
-      const {
-        activeSVGTabIndex,
-        imageInfoVolcano,
-        svgExportName,
-        tab,
-      } = this.props;
+      const { imageInfoVolcano, svgExportName, tab } = this.props;
+      const { activeSVGTabIndex, svgPanes } = this.state;
       const ButtonActionsClass = this.getButtonActionsClass();
-
+      const TabMenuClass =
+        this.props.differentialPlotTypes.length > this.props.svgTabMax
+          ? 'Hide'
+          : 'Show';
       // const BreadcrumbPopupStyle = {
       //   backgroundColor: '2E2E2E',
       //   borderBottom: '2px solid var(--color-primary)',
@@ -193,6 +155,15 @@ class SVGPlot extends Component {
       //   fontSize: '13px',
       //   wordBreak: 'break-all',
       // };
+      let plotOptions = [];
+      const svgArray = [...imageInfoVolcano.svg];
+      plotOptions = svgArray.map(function(s, index) {
+        return {
+          key: `${index}=VolcanoPlotDropdownOption`,
+          text: s.plotType.plotDisplay,
+          value: index,
+        };
+      });
       return (
         <div className="svgContainer">
           <div className={ButtonActionsClass}>
@@ -224,7 +195,25 @@ class SVGPlot extends Component {
             position="bottom left"
             content="view in differential analysis section"
           /> */}
-          {this.state.svgPanes}
+          <Dropdown
+            search
+            selection
+            compact
+            options={plotOptions}
+            // value={plotOptions[indexVar].value}
+            onChange={this.handlePlotDropdownChange}
+            className={
+              this.props.differentialPlotTypes.length > this.props.svgTabMax
+                ? 'Show svgPlotDropdown'
+                : 'Hide svgPlotDropdown'
+            }
+          />
+          <Tab
+            menu={{ secondary: true, pointing: true, className: TabMenuClass }}
+            panes={svgPanes}
+            onTabChange={this.handleTabChange}
+            activeIndex={activeSVGTabIndex}
+          />
         </div>
       );
     } else {

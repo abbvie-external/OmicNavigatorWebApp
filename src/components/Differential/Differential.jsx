@@ -55,7 +55,6 @@ class Differential extends Component {
       title: '',
       svg: [],
     },
-    activeSVGTabIndex: 0,
     multisetPlotAvailableDifferential: false,
     animation: 'uncover',
     direction: 'left',
@@ -551,12 +550,6 @@ class Differential extends Component {
         },
       });
     }
-  };
-
-  handleSVGTabChange = activeTabIndex => {
-    this.setState({
-      activeSVGTabIndex: activeTabIndex,
-    });
   };
 
   handleItemSelected = bool => {
