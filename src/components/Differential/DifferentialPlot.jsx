@@ -39,16 +39,24 @@ class DifferentialPlot extends Component {
   }
 
   setButtonVisibility = index => {
-    this.setState({
-      // excelFlag: index === 2,
-      // excel not ready yet
-      excelFlag: false,
-      // pdfFlag: index !== 2,
-      pdfFlag: false,
-      // pdfFlag: index !== 2,
-      svgFlag: index !== 2,
-      pngFlag: index !== 2,
-    });
+    if (this.props.differentialPlotTypes.length > 0) {
+      const singleFeaturePlotTypes = this.props.differentialPlotTypes.filter(
+        p => p.plotType !== 'multiFeature',
+      );
+      this.setState({
+        excelFlag: false,
+        pdfFlag: false,
+        svgFlag: index !== singleFeaturePlotTypes.length,
+        pngFlag: index !== singleFeaturePlotTypes.length,
+      });
+    } else {
+      this.setState({
+        excelFlag: false,
+        pdfFlag: false,
+        svgFlag: false,
+        pngFlag: false,
+      });
+    }
   };
 
   handleTabChange = (e, { activeIndex }) => {
