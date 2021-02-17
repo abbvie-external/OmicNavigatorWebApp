@@ -91,7 +91,7 @@ class SplitPanesContainer extends Component {
       displayViolinPlot,
       enrichmentStudy,
       enrichmentModel,
-      imageInfo,
+      imageInfoEnrichment,
     } = this.props;
     const { activeViolinTableIndex } = this.state;
     const violinPlot = this.getViolinPlot();
@@ -150,8 +150,8 @@ class SplitPanesContainer extends Component {
     ];
 
     const testVar =
-      imageInfo.key !== '' && imageInfo.key != null
-        ? imageInfo.key.split(':')[0]
+      imageInfoEnrichment.key !== '' && imageInfoEnrichment.key != null
+        ? imageInfoEnrichment.key.split(':')[0]
         : '';
     const selectedPlot = violinAndTablePanes[activeViolinTableIndex].menuItem;
     const ButtonActionsClass = this.getButtonActionsClass();
@@ -179,7 +179,7 @@ class SplitPanesContainer extends Component {
           svgVisible={true}
           txtVisible={false}
           plot={this.props.violinSettings.id}
-          description={imageInfo.key}
+          description={imageInfoEnrichment.key}
         />
       );
     return (

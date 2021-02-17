@@ -563,7 +563,7 @@ class BarcodePlot extends Component {
             svgVisible={true}
             txtVisible={false}
             plot={'BarcodeChart'}
-            description={this.props.imageInfo.key}
+            description={this.props.imageInfoEnrichment.key}
           />
         </div>
         <span className="TextToggleButton">

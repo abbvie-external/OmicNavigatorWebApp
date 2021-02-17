@@ -31,7 +31,7 @@ class SVGPlot extends Component {
 
   componentDidUpdate(prevProps) {
     if (
-      prevProps.imageInfoLength !== this.props.imageInfoLength ||
+      prevProps.imageInfoVolcanoLength !== this.props.imageInfoVolcanoLength ||
       prevProps.volcanoWidth !== this.props.volcanoWidth ||
       prevProps.volcanoHeight !== this.props.volcanoHeight ||
       prevProps.activeSVGTabIndex !== this.props.activeSVGTabIndex
@@ -52,7 +52,7 @@ class SVGPlot extends Component {
   };
 
   // navigateToDifferentialFeature = evt => {
-  //   const testAndDescription = this.props.imageInfo.key.split(':');
+  //   const testAndDescription = this.props.imageInfoVolcano.key.split(':');
   //   const test = testAndDescription[0] || '';
   //   const featureID = this.props.HighlightedProteins[0]?.featureID;
   //   this.props.onFindDifferentialFeature(test, featureID);
@@ -60,13 +60,13 @@ class SVGPlot extends Component {
 
   getSVGPanes = activeSVGTabIndex => {
     const {
-      imageInfo,
+      imageInfoVolcano,
       divWidth,
       divHeight,
       pxToPtRatio,
       pointSize,
     } = this.props;
-    if (imageInfo.length !== 0) {
+    if (imageInfoVolcano.length !== 0) {
       let panes = [];
       let plotOptions = [];
       let dimensions = '';
@@ -78,7 +78,7 @@ class SVGPlot extends Component {
         const pointSizeString = `&pointsize=${pointSize}`;
         dimensions = `?${divWidthPtString}${divHeightPtString}${pointSizeString}`;
       }
-      const svgArray = [...imageInfo.svg];
+      const svgArray = [...imageInfoVolcano.svg];
       plotOptions = svgArray.map(function(s, index) {
         return {
           key: `${index}=VolcanoPlotDropdownOption`,
@@ -176,7 +176,12 @@ class SVGPlot extends Component {
 
   render() {
     if (this.state.isSVGReady) {
-      const { activeSVGTabIndex, imageInfo, svgExportName, tab } = this.props;
+      const {
+        activeSVGTabIndex,
+        imageInfoVolcano,
+        svgExportName,
+        tab,
+      } = this.props;
       const ButtonActionsClass = this.getButtonActionsClass();
 
       // const BreadcrumbPopupStyle = {
@@ -199,7 +204,7 @@ class SVGPlot extends Component {
               svgVisible={true}
               txtVisible={false}
               tab={tab}
-              imageInfo={imageInfo}
+              imageInfo={imageInfoVolcano}
               tabIndex={activeSVGTabIndex}
               svgExportName={svgExportName}
             />

@@ -27,7 +27,7 @@ class EnrichmentSVGPlot extends Component {
   }
 
   // componentDidUpdate(prevProps, prevState) {
-  //   if (prevProps.imageInfo !== this.props.imageInfo) {
+  //   if (prevProps.imageInfoEnrichment !== this.props.imageInfoEnrichment) {
   //     this.forceUpdate();
   //   }
   // }
@@ -37,7 +37,7 @@ class EnrichmentSVGPlot extends Component {
   };
 
   navigateToDifferentialFeature = evt => {
-    const testAndDescription = this.props.imageInfo.key.split(':');
+    const testAndDescription = this.props.imageInfoEnrichment.key.split(':');
     const test = testAndDescription[0] || '';
     const featureID = this.props.HighlightedProteins[0]?.featureID;
     this.props.onFindDifferentialFeature(test, featureID);
@@ -53,7 +53,7 @@ class EnrichmentSVGPlot extends Component {
     //   fontSize: '13px',
     //   wordBreak: 'break-all',
     // };
-    if (this.props.imageInfo.length !== 0) {
+    if (this.props.imageInfoEnrichment.length !== 0) {
       const heightVar = this.props.divHeight || null;
       const widthVar = this.props.divWidth || null;
       const pointSizeVar = this.props.pointSize || null;
@@ -62,7 +62,7 @@ class EnrichmentSVGPlot extends Component {
         dimensions = `?${widthVar}${heightVar}${pointSizeVar}`;
       }
       console.log(dimensions);
-      const svgArray = this.props.imageInfo.svg;
+      const svgArray = this.props.imageInfoEnrichment.svg;
       // const svgArrayReversed = svgArray.reverse();
       // const numberOfPlots = svgArray.length;
       const panes = svgArray.map((s, index) => {
@@ -127,7 +127,12 @@ class EnrichmentSVGPlot extends Component {
 
   render() {
     if (this.state.isSVGReady) {
-      const { activeSVGTabIndex, imageInfo, svgExportName, tab } = this.props;
+      const {
+        activeSVGTabIndex,
+        imageInfoEnrichment,
+        svgExportName,
+        tab,
+      } = this.props;
       const ButtonActionsClass = this.getButtonActionsClass();
 
       // const BreadcrumbPopupStyle = {
@@ -151,7 +156,7 @@ class EnrichmentSVGPlot extends Component {
               svgVisible={true}
               txtVisible={false}
               tab={tab}
-              imageInfo={imageInfo}
+              imageInfo={imageInfoEnrichment}
               tabIndex={activeSVGTabIndex}
               svgExportName={svgExportName}
             />

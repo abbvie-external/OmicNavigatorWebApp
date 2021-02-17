@@ -127,7 +127,7 @@ class FilteredDifferentialTable extends Component {
     if (this.state.filteredBarcodeData.length > 0) {
       this.setConfigCols(this.state.filteredBarcodeData, null, true);
     } else {
-      const key = this.props.imageInfo.key.split(':');
+      const key = this.props.imageInfoEnrichment.key.split(':');
       const name = key[0].trim() || '';
       cancelRequestFPTGetResultsTable();
       let cancelToken = new CancelToken(e => {

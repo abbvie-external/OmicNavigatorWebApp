@@ -45,7 +45,7 @@ class Differential extends Component {
     // volcanoDifferentialTableRowMax: '',
     // volcanoDifferentialTableRowOther: [],
     // maxObjectIdentifier: null,
-    imageInfo: {
+    imageInfoVolcano: {
       key: null,
       title: '',
       svg: [],
@@ -179,7 +179,7 @@ class Differential extends Component {
     if (scChange) {
       this.setState({
         multisetPlotAvailableDifferential: false,
-        imageInfo: { key: null, title: '', svg: [] },
+        imageInfoVolcano: { key: null, title: '', svg: [] },
         imageInfoDifferential: { key: null, title: '', svg: [] },
         tabsMessage: 'Select a feature to display plots and data',
         // differentialResults: [],
@@ -396,7 +396,7 @@ class Differential extends Component {
     } = this.props;
     let self = this;
     let id = featureId != null ? featureId : differentialFeature;
-    let imageInfo = {
+    let imageInfoVar = {
       key: `${featureId}`,
       title: `${differentialFeatureIdKey} ${featureId}`,
       svg: [],
@@ -428,9 +428,9 @@ class Differential extends Component {
                 plotType: differentialPlotTypes[i],
                 svg: svgUrl,
               };
-              imageInfo.svg.push(svgInfo);
+              imageInfoVar.svg.push(svgInfo);
               currentSVGs.push(svgUrl);
-              self.handleSVG(view, imageInfo);
+              self.handleSVG(view, imageInfoVar);
             } else {
               // self.handleItemSelected(false);
             }
@@ -441,7 +441,7 @@ class Differential extends Component {
       });
     } else {
       this.setState({
-        imageInfo: {
+        imageInfoVolcano: {
           key: null,
           title: '',
           svg: [],
@@ -544,7 +544,7 @@ class Differential extends Component {
         isVolcanoPlotSVGLoaded: true,
         maxObjectIdentifier: '',
 
-        imageInfo: {
+        imageInfoVolcano: {
           key: null,
           title: '',
           svg: [],
@@ -565,13 +565,14 @@ class Differential extends Component {
     });
   };
 
-  handleSVG = (view, imageInfo) => {
-    const key = view === 'Differential' ? `imageInfo${view}` : 'imageInfo';
+  handleSVG = (view, imageInfoArg) => {
+    const imageInfoKey = `imageInfo${view}`;
+    const imageInfoLengthKey = `imageInfo${view}Length`;
     this.setState({
-      [key]: imageInfo,
+      [imageInfoKey]: imageInfoArg,
+      [imageInfoLengthKey]: imageInfoArg.svg?.length || 0,
       isItemSVGLoaded: true,
       isVolcanoPlotSVGLoaded: true,
-      imageInfoLength: imageInfo.svg?.length || 0,
     });
   };
 

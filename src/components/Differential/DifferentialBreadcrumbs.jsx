@@ -8,10 +8,7 @@ class DifferentialBreadcrumbs extends Component {
   componentDidMount() {}
 
   render() {
-    // let name = this.props.imageInfoDifferential.title;
-    // if (name === '') {
     let name = `${this.props.differentialFeatureIdKey} ${this.props.differentialFeature}`;
-    // }
     const BreadcrumbPopupStyle = {
       backgroundColor: '2E2E2E',
       borderBottom: '2px solid var(--color-primary)',
