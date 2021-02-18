@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, PureComponent } from 'react';
 import { withRouter } from 'react-router-dom';
 import { Grid, Dimmer, Loader, Tab } from 'semantic-ui-react';
 import DifferentialBreadcrumbs from './DifferentialBreadcrumbs';
@@ -9,7 +9,7 @@ import '../Enrichment/SplitPanesContainer.scss';
 import '../Shared/SVGPlot.scss';
 import './DifferentialPlot.scss';
 
-class DifferentialPlot extends Component {
+class DifferentialPlot extends PureComponent {
   static defaultProps = {
     // isItemDatatLoaded: false,
     // isItemSVGLoaded: true,

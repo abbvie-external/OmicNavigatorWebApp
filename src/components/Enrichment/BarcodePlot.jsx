@@ -1,10 +1,10 @@
-import React, { Component } from 'react';
+import React, { Component, PureComponent } from 'react';
 import ButtonActions from '../Shared/ButtonActions';
 import { Icon, Popup } from 'semantic-ui-react';
 import './BarcodePlot.scss';
 import * as d3 from 'd3';
 
-class BarcodePlot extends Component {
+class BarcodePlot extends PureComponent {
   state = {
     switch: 0,
     barcodeWidth: 0,
@@ -289,46 +289,127 @@ class BarcodePlot extends Component {
                 class: a.attributes[1].nodeValue,
               };
             });
-            const brushedDataTooltips = brushedDataVar.map(line => {
-              const textAnchor =
-                line.statistic > self.props.barcodeSettings.highStat / 2
-                  ? 'end'
-                  : 'start';
-              var ttPosition = null;
-              if (textAnchor === 'end') {
-                ttPosition = line.x2 - 5;
-              } else {
-                ttPosition = line.x2 + 5;
-              }
-              const fiveLevelSwitch = (self.state.switch + 1) % 5;
-              self.setState({ switch: fiveLevelSwitch });
-              let alternatePosition = 0;
-              if (self.state.switch === 0) {
-                alternatePosition = 0;
-              } else if (self.state.switch === 1) {
-                alternatePosition = 10;
-              } else if (self.state.switch === 2) {
-                alternatePosition = 20;
-              } else if (self.state.switch === 3) {
-                alternatePosition = 30;
-              } else {
-                alternatePosition = 40;
-              }
+            let labelLadder = -1;
+            let labelSwitchFlag = false;
+            const brushedDataTooltips = brushedDataVar.map(
+              (line, index, brushedDataVar) => {
+                console.log('Statistic: ' + line.statistic);
+                const textAnchor =
+                  line.statistic >
+                  self.props.barcodeSettings.highStat * (0.2 / 6)
+                    ? 'end'
+                    : 'start';
+                var ttPosition = null;
+                if (textAnchor === 'end') {
+                  ttPosition = line.x2 - 5;
+                } else {
+                  ttPosition = line.x2 + 5;
+                }
+                const fiveLevelSwitch = (labelLadder + 1) % 5;
+                const barspace =
+                  (0.16 / 3) * self.props.barcodeSettings.highStat;
+                labelLadder = fiveLevelSwitch;
+                let curSwitch = labelLadder;
+                if (
+                  index > 0 &&
+                  line.statistic >
+                    (0.2 / 6) * self.props.barcodeSettings.highStat
+                ) {
+                  if (
+                    index <= brushedDataVar.length - 2 &&
+                    line.statistic >
+                      (0.2 / 6) * self.props.barcodeSettings.highStat
+                  ) {
+                    console.log(
+                      'Difference: ' +
+                        (line.statistic - brushedDataVar[index + 1].statistic),
+                    );
+                    if (
+                      Math.abs(
+                        line.statistic - brushedDataVar[index + 1].statistic,
+                      ) >= barspace &&
+                      Math.abs(
+                        line.statistic - brushedDataVar[index - 1].statistic,
+                      ) >= barspace
+                    ) {
+                      console.log('Switch -1');
+                      labelLadder = -1;
+                      curSwitch = 0;
+                    }
+                  } else if (
+                    index == brushedDataVar.length - 1 &&
+                    Math.abs(
+                      line.statistic - brushedDataVar[index - 1].statistic,
+                    ) >= barspace &&
+                    line.statistic >
+                      (0.2 / 6) * self.props.barcodeSettings.highStat
+                  ) {
+                    labelLadder = -1;
+                    curSwitch = 0;
+                  }
+                } else if (
+                  line.statistic <=
+                    (0.2 / 6) * self.props.barcodeSettings.highStat &&
+                  labelSwitchFlag == false
+                ) {
+                  labelSwitchFlag = true;
+                  if (index == 0) {
+                    labelLadder = -1;
+                    curSwitch = 3;
+                  } else if (
+                    Math.abs(
+                      line.statistic - brushedDataVar[index - 1].statistic,
+                    ) >=
+                    barspace * 2
+                  ) {
+                    labelLadder = -1;
+                    curSwitch = 0;
+                  }
+                } else if (
+                  line.statistic <=
+                    (0.2 / 6) * self.props.barcodeSettings.highStat &&
+                  Math.abs(
+                    line.statistic - brushedDataVar[index - 1].statistic,
+                  ) >= barspace
+                ) {
+                  labelLadder = -1;
+                  curSwitch = 0;
+                } else if (
+                  index == 0 &&
+                  line.statistic >
+                    (0.2 / 6) * self.props.barcodeSettings.highStat
+                ) {
+                  labelLadder = -1;
+                  curSwitch = 3;
+                }
+                let alternatePosition = 0;
+                if (curSwitch === 0) {
+                  alternatePosition = 40;
+                } else if (curSwitch === 1) {
+                  alternatePosition = 30;
+                } else if (curSwitch === 2) {
+                  alternatePosition = 20;
+                } else if (curSwitch === 3) {
+                  alternatePosition = 10;
+                } else {
+                  alternatePosition = 0;
+                }
 
-              return (
-                <text
-                  id={`${line.featureID}-barcodeTooltip`}
-                  key={`${line.featureID}-barcodeTooltip`}
-                  className="BarcodeTooltipText"
-                  transform={`translate(${ttPosition}, ${alternatePosition})rotate(0)`}
-                  fontSize="11px"
-                  textAnchor={textAnchor}
-                  fontFamily="Lato, Helvetica Neue, Arial, Helvetica, sans-serif"
-                >
-                  {line.featureID}
-                </text>
-              );
-            });
+                return (
+                  <text
+                    id={`${line.featureID}-barcodeTooltip`}
+                    key={`${line.featureID}-barcodeTooltip`}
+                    className="BarcodeTooltipText"
+                    transform={`translate(${ttPosition}, ${alternatePosition})rotate(0)`}
+                    fontSize="11px"
+                    textAnchor={textAnchor}
+                    fontFamily="Lato, Helvetica Neue, Arial, Helvetica, sans-serif"
+                  >
+                    {line.featureID}
+                  </text>
+                );
+              },
+            );
             self.props.onHandleBarcodeChanges({
               brushedData: brushedDataVar,
             });

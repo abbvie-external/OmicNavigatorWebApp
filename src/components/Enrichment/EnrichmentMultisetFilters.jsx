@@ -1,10 +1,10 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component, Fragment, PureComponent } from 'react';
 import { Form, Select, Input } from 'semantic-ui-react';
 import * as d3 from 'd3';
 import '../Shared/MultisetFilters.scss';
 import NumericExponentialInput from '../Shared/NumericExponentialInput';
 
-class EnrichmentMultisetFilters extends Component {
+class EnrichmentMultisetFilters extends PureComponent {
   componentDidMount() {
     this.makeMultiset();
   }

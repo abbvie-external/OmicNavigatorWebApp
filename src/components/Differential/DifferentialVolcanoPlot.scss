@@ -20,11 +20,12 @@
   stroke: #000;
   font-weight: bold;
 }
-// .volcanoPlot-dataPoint {
+.volcanoPlot-dataPoint {
+  cursor: pointer;
 //   stroke: #000;
 //   stroke-width: 0.4;
 //   fill: var(--color-link);
-// }
+}
 // .volcanoPlot-dataPoint.selected {
 //   stroke: #000;
 //   stroke-width: 0.4;
@@ -44,5 +45,15 @@
 #VolcanoChart {
   margin-left: 20px !important;
   margin-top: 5px !important;
+}
+
+.CursorWaitRect {
+  rect {
+    cursor: wait !important;
+  } 
+}
+
+.CursorWait{
+  cursor: wait !important;
 }
 //}

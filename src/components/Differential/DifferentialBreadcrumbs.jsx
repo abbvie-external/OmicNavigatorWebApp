@@ -1,10 +1,10 @@
-import React, { Component } from 'react';
+import React, { Component, PureComponent } from 'react';
 import { withRouter } from 'react-router-dom';
 import { Breadcrumb, Icon, Popup } from 'semantic-ui-react';
 import { splitValue } from '../Shared/helpers';
 import '../Shared/Breadcrumbs.scss';
 
-class DifferentialBreadcrumbs extends Component {
+class DifferentialBreadcrumbs extends PureComponent {
   componentDidMount() {}
 
   render() {

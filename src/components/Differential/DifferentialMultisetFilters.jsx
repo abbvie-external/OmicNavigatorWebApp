@@ -1,10 +1,10 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component, Fragment, PureComponent } from 'react';
 import { Form, Select, Icon, Button } from 'semantic-ui-react';
 import * as d3 from 'd3';
 import NumericExponentialInput from '../Shared/NumericExponentialInput';
 import '../Shared/MultisetFilters.scss';
 
-class DifferentialMultisetFilters extends Component {
+class DifferentialMultisetFilters extends PureComponent {
   componentDidMount() {
     this.makeMultiset();
   }

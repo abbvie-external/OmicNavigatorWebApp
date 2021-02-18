@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, PureComponent } from 'react';
 import {
   Loader,
   Dimmer,
@@ -13,7 +13,7 @@ import {
 import ButtonActions from '../Shared/ButtonActions';
 import './SVGPlot.scss';
 
-class SVGPlot extends Component {
+class SVGPlot extends PureComponent {
   state = {
     isSVGReady: false,
   };

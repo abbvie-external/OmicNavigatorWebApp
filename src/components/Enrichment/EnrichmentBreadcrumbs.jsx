@@ -1,9 +1,9 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component, Fragment, PureComponent } from 'react';
 import { Breadcrumb, Icon, Popup } from 'semantic-ui-react';
 import '../Shared/Breadcrumbs.scss';
 import { Linkout } from '../Shared/helpers';
 
-class EnrichmentBreadcrumbs extends Component {
+class EnrichmentBreadcrumbs extends PureComponent {
   componentDidMount() {}
 
   getNameAndLink = (

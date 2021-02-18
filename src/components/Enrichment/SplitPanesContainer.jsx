@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, PureComponent } from 'react';
 import { withRouter } from 'react-router-dom';
 import { Grid, Dimmer, Loader, Tab } from 'semantic-ui-react';
 import EnrichmentBreadcrumbs from './EnrichmentBreadcrumbs';
@@ -10,7 +10,7 @@ import BarcodePlot from './BarcodePlot';
 import ViolinPlot from './ViolinPlot';
 import FilteredDifferentialTable from './FilteredDifferentialTable';
 
-class SplitPanesContainer extends Component {
+class SplitPanesContainer extends PureComponent {
   state = {
     activeSVGTabIndex: 0,
     horizontalSplitPaneSize:

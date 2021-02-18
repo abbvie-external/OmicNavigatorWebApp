@@ -140,6 +140,13 @@ class DifferentialVolcanoPlot extends Component {
     ) {
       this.removeViolinBrush();
     }
+    if (
+      this.props.isVolcanoPlotSVGLoaded &&
+      this.props.isVolcanoPlotSVGLoaded !== prevProps.isVolcanoPlotSVGLoaded
+    ) {
+      // || (this.props.maxObjectIdentifier === "" && this.props.maxObjectIdentifier !== prevProps.maxObjectIdentifier)){
+      this.setState({ volcanoCursorLoading: false });
+    }
   }
 
   removeViolinBrush = () => {
@@ -517,7 +524,7 @@ class DifferentialVolcanoPlot extends Component {
       doYAxisTransformation,
     } = this.props;
 
-    const { volcanoCircleText } = this.state;
+    const { volcanoCircleText, volcanoCursorLoading } = this.state;
 
     if (differentialResultsUnfiltered.length === 0) {
       return null;
@@ -631,6 +638,7 @@ class DifferentialVolcanoPlot extends Component {
         </text>
       </g>
     ));
+    let self = this;
     var filteredOutPlotCircles = null;
     if (differentialResultsUnfiltered.length !== differentialResults.length) {
       filteredOutPlotCircles = differentialResultsUnfiltered.map(
@@ -649,7 +657,11 @@ class DifferentialVolcanoPlot extends Component {
       <circle
         // r={this.getRadius(val[this.props.differentialFeatureIdKey])}
         r={2}
-        className="volcanoPlot-dataPoint"
+        className={
+          volcanoCursorLoading
+            ? 'volcanoPlot-dataPoint CursorWait'
+            : 'volcanoPlot-dataPoint'
+        }
         id={`volcanoDataPoint-${val[identifier]}`}
         circleid={`${val[identifier]}`}
         key={`${val[identifier] + '_' + index}`}
@@ -659,18 +671,20 @@ class DifferentialVolcanoPlot extends Component {
         fill={'#1678c2'}
         onMouseEnter={e => this.handleCircleHover(e)}
         onMouseLeave={() => this.handleCircleLeave()}
-        onClick={e =>
-          this.props.onHandleDotClick(
+        onClick={function(e) {
+          debugger;
+          self.setState({ volcanoCursorLoading: true });
+          self.props.onHandleDotClick(
             e,
             JSON.parse(e.target.attributes.data.value),
             0,
-          )
-        }
+          );
+        }}
         xstatistic={`${this.doTransform(val[xAxisLabel], 'x')}`}
         ystatistic={`${this.doTransform(val[yAxisLabel], 'y')}`}
         cx={`${xScale(this.doTransform(val[xAxisLabel], 'x'))}`}
         cy={`${yScale(this.doTransform(val[yAxisLabel], 'y'))}`}
-        cursor="pointer"
+        // cursor="pointer"
       ></circle>
     ));
 
@@ -702,10 +716,17 @@ class DifferentialVolcanoPlot extends Component {
           </div>
           <svg
             id="VolcanoChart"
-            className="VolcanoPlotSVG"
+            className={
+              volcanoCursorLoading
+                ? 'VolcanoPlotSVG CursorWaitRect'
+                : 'VolcanoPlotSVG'
+            }
             width={volcanoWidth + 20}
             height={volcanoHeight}
             ref={this.volcanoSVGRef}
+            onClick={function() {
+              self.handleSVGClick();
+            }}
             onClick={() => this.handleSVGClick()}
           >
             <g className="volcanoPlotD3BrushSelection" />

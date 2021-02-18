@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, PureComponent } from 'react';
 import { Grid, Popup, Sidebar } from 'semantic-ui-react';
 import { withRouter } from 'react-router-dom';
 import DifferentialSearchCriteria from './DifferentialSearchCriteria';
@@ -15,7 +15,7 @@ import './Differential.scss';
 import '../Shared/Table.scss';
 
 let cancelRequestDifferentialResultsGetPlot = () => {};
-class Differential extends Component {
+class Differential extends PureComponent {
   static defaultProps = {
     differentialStudy: '',
     differentialModel: '',

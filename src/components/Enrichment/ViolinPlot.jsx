@@ -1,12 +1,12 @@
 /* eslint-disable react/state-in-constructor */
-import React, { Component } from 'react';
+import React, { Component, PureComponent } from 'react';
 import { Icon, Popup } from 'semantic-ui-react';
 import * as d3 from 'd3';
 import * as _ from 'lodash';
 // import { select } from "d3-selection";
 import './ViolinPlot.scss';
 
-class ViolinPlot extends Component {
+class ViolinPlot extends PureComponent {
   state = {
     displayElementTextViolin:
       JSON.parse(sessionStorage.getItem('displayElementTextViolin')) || false,
