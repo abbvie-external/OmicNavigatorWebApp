@@ -32,7 +32,7 @@ class DifferentialPlot extends Component {
     this.setButtonVisibility(activeSVGTabIndexDifferential);
     const svgPanesVar = this.getSVGPanes(activeSVGTabIndexDifferential);
     this.setState({
-      isSVGReady: true,
+      // isSVGReadyDifferential: true,
       svgPanes: svgPanesVar,
     });
   }
@@ -47,7 +47,6 @@ class DifferentialPlot extends Component {
       const svgPanesVar = this.getSVGPanes(activeSVGTabIndexDifferential);
       this.setState({
         svgPanes: svgPanesVar,
-        isSVGReady: true,
       });
     }
     if (
@@ -58,12 +57,24 @@ class DifferentialPlot extends Component {
   }
 
   setButtonVisibility = index => {
-    this.setState({
-      excelFlag: false,
-      pdfFlag: false,
-      svgFlag: index !== this.props.imageInfoDifferential.svg.length,
-      pngFlag: index !== this.props.imageInfoDifferential.svg.length,
-    });
+    if (this.props.differentialPlotTypes.length > 0) {
+      const singleFeaturePlotTypes = this.props.differentialPlotTypes.filter(
+        p => p.plotType !== 'multiFeature',
+      );
+      this.setState({
+        excelFlag: false,
+        pdfFlag: false,
+        svgFlag: index !== singleFeaturePlotTypes.length,
+        pngFlag: index !== singleFeaturePlotTypes.length,
+      });
+    } else {
+      this.setState({
+        excelFlag: false,
+        pdfFlag: false,
+        svgFlag: false,
+        pngFlag: false,
+      });
+    }
   };
 
   handleTabChange = (e, { activeIndex }) => {

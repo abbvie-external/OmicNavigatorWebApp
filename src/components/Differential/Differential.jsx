@@ -62,7 +62,7 @@ class Differential extends Component {
     plotButtonActiveDifferential: false,
     multisetQueriedDifferential: false,
     thresholdColsP: [],
-    tabsMessage: 'Select a feature to display plots and data',
+    tabsMessage: 'Select a feature to display plots',
     // differentialPlotTypes: [],
     differentialStudyMetadata: [],
     differentialModelsAndTests: [],
@@ -180,7 +180,7 @@ class Differential extends Component {
         multisetPlotAvailableDifferential: false,
         imageInfoVolcano: { key: null, title: '', svg: [] },
         imageInfoDifferential: { key: null, title: '', svg: [] },
-        tabsMessage: 'Select a feature to display plots and data',
+        tabsMessage: 'Select a feature to display plots',
         // differentialResults: [],
         // differentialResultsUnfiltered: [],
         // isItemDatatLoaded: false,
@@ -825,7 +825,6 @@ class Differential extends Component {
           {...this.props}
           onHandleSelectedVolcano={this.handleSelectedVolcano}
           onVolcanoSVGSizeChange={this.handleVolcanoSVGSizeChange}
-          onSVGTabChange={this.handleSVGTabChange}
           onHandleVolcanoTableLoading={this.handleVolcanoTableLoading}
           onBackToTable={this.backToTable}
           onUpdateVolcanoLabels={this.updateVolcanoLabels}
@@ -879,7 +878,28 @@ class Differential extends Component {
           </Grid.Row>
         </Grid>
         <div className="MultisetSvgOuter">
-          <ReactSVG src={multisetPlotInfoDifferential.svg} />
+          {/* <ReactSVG src={multisetPlotInfoDifferential.svg} /> */}
+          <ReactSVG
+            key="multisetPlotInfoDifferential"
+            src={multisetPlotInfoDifferential.svg}
+            afterInjection={(error, svg) => {
+              if (error) {
+                console.error(error);
+                return;
+              }
+              console.log(svg);
+            }}
+            beforeInjection={svg => {
+              svg.setAttribute('id', `glyph-test`);
+            }}
+            className="wrapper-class"
+            evalScripts="always"
+            fallback={() => <span>Error!</span>}
+            loading={() => <span>Loading</span>}
+            renumerateIRIElements={false}
+            useRequestCache={true}
+            wrapper="span"
+          />
         </div>
       </Sidebar>
     );
