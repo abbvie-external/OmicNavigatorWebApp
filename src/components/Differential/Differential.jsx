@@ -43,6 +43,8 @@ class Differential extends Component {
     },
     isItemSelected: false,
     isItemSVGLoaded: false,
+    isUpsetVisible: false,
+    isFilteredDifferential: false,
     // isItemDatatLoaded: false,
     // HighlightedFeaturesArrVolcano: [],
     // volcanoDifferentialTableRowMax: '',
@@ -78,6 +80,8 @@ class Differential extends Component {
     metaFeaturesDataDifferential: [],
     allMetaFeaturesDataDifferential: [],
     isDataStreamingResultsTable: false,
+    zoom: false,
+    filterState: {},
   };
   differentialViewContainerRef = React.createRef();
   differentialGridRef = React.createRef();
@@ -92,6 +96,22 @@ class Differential extends Component {
     });
   };
 
+  handleFilterState = filterState => {
+    this.setState({ filterState });
+  };
+
+  handleUpsetVisible = bool => {
+    this.setState({
+      isUpsetVisible: bool,
+    });
+  };
+
+  handleIsFilteredDifferential = bool => {
+    this.setState({
+      isFilteredDifferential: bool,
+    });
+  };
+
   handleSearchTransitionDifferentialAlt = bool => {
     this.setState({
       isVolcanoTableLoading: bool,
@@ -102,6 +122,12 @@ class Differential extends Component {
     this.setState({
       multisetQueriedDifferential: value,
       // isVolcanoPlotSVGLoaded: !value,
+    });
+  };
+
+  endZoom = () => {
+    this.setState({
+      zoom: false,
     });
   };
 
@@ -523,6 +549,42 @@ class Differential extends Component {
     });
   };
 
+  updateBreadcrumbIndex = index => {
+    console.log('index', index);
+    this.setState({
+      activeBreadcrumb: index,
+    });
+  };
+
+  handleBreadCrumbClick = (results, index) => {
+    this.setState({
+      differentialResults: results,
+      differentialResultsUnfiltered: results,
+      activeBreadcrumb: index,
+    });
+  };
+
+  handleZoom = (results, index) => {
+    this.setState({
+      differentialResults: results,
+      differentialResultsUnfiltered: results,
+      zoom: true,
+      activeBreadcrumb: index,
+    });
+  };
+
+  // updateDifferentialResultsUnfiltered = results => {
+  //   this.setState({
+  //     differentialResultsUnfiltered: results,
+  //   });
+  // };
+
+  updateDifferentialResults = results => {
+    this.setState({
+      differentialResults: results,
+    });
+  };
+
   handleSelectedVolcano = toHighlightArr => {
     //if(toHighlightArr !== this.state.HighlightedFeaturesArrVolcano){
     this.setState({
@@ -550,13 +612,14 @@ class Differential extends Component {
       this.setState({
         volcanoDifferentialTableRowMax: volcanoDifferentialTableRowMaxVar,
         volcanoDifferentialTableRowOther: volcanoDifferentialTableRowOtherVar,
-        volcanoDifferentialTableAll: toHighlightArr,
+        // volcanoDifferentialTableAll: toHighlightArr,
+        HighlightedFeaturesArrVolcano: toHighlightArr,
         updateVolcanoLabels: true,
       });
       this.handlePlotVolcano(maxId);
     } else {
       this.setState({
-        volcanoDifferentialTableRowMax: '',
+        volcanoDifferentialTableRowMax: null,
         volcanoDifferentialTableRowOther: [],
       });
       this.handlePlotVolcano('');
@@ -871,6 +934,10 @@ class Differential extends Component {
           onHandleVolcanoTableLoading={this.handleVolcanoTableLoading}
           onBackToTable={this.backToTable}
           onUpdateVolcanoLabels={this.updateVolcanoLabels}
+          onHandleZoom={this.handleZoom}
+          onHandleBreadCrumbClick={this.handleBreadCrumbClick}
+          onHandleUpdateDifferentialResults={this.updateDifferentialResults}
+          onUpdateBreadcrumbIndex={this.updateBreadcrumbIndex}
         />
       );
     } else return <TransitionStill stillMessage={message} />;
@@ -971,6 +1038,10 @@ class Differential extends Component {
               onHandleIsDataStreamingResultsTable={
                 this.handleIsDataStreamingResultsTable
               }
+              onHandleUpsetVisible={this.handleUpsetVisible}
+              onHandleIsFilteredDifferential={this.handleIsFilteredDifferential}
+              onEndZoom={this.endZoom}
+              onHandleFilterState={this.handleFilterState}
             />
           </Grid.Column>
           <Grid.Column

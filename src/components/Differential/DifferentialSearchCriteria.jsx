@@ -112,6 +112,10 @@ class DifferentialSearchCriteria extends Component {
   }
 
   componentDidUpdate(prevProps) {
+    if (!prevProps.zoom && this.props.zoom) {
+      this.props.onEndZoom();
+    }
+
     if (
       this.props.allStudiesMetadata !== prevProps.allStudiesMetadata ||
       this.props.differentialStudy !== prevProps.differentialStudy
@@ -120,6 +124,31 @@ class DifferentialSearchCriteria extends Component {
     }
     // if (this.props.multisetPlotAvailableDifferential !== prevProps.multisetPlotAvailableDifferential) {
     //   this.forceUpdate();
+    // }
+
+    if (
+      prevProps.differentialResultsUnfiltered !==
+      this.props.differentialResultsUnfiltered
+    ) {
+      // console.log('props', [
+      //   ...new Set(
+      //     this.props.differentialResultsUnfiltered.map(data =>
+      //       console.log(data),
+      //     ),
+      //   ),
+      // ]);
+      this.setState({
+        uSettingsP: {
+          ...this.state.uSettingsP,
+          maxElementsP: this.props.differentialResultsUnfiltered.length,
+          numElementsP: 0,
+        },
+      });
+    }
+
+    // uSettingsP: {
+    //   ...this.state.uSettingsP,
+    //   maxElementsP: handleMaxElements ? tableData.length : 0,
     // }
   }
 
@@ -487,6 +516,7 @@ class DifferentialSearchCriteria extends Component {
 
   handleMultisetToggleDifferential = () => {
     if (this.state.multisetFiltersVisibleDifferential === false) {
+      this.props.onHandleUpsetVisible(true);
       const { thresholdColsP } = this.props;
       // on toggle open
       // this.props.onMultisetQueriedDifferential(true);
@@ -544,6 +574,8 @@ class DifferentialSearchCriteria extends Component {
       // on toggle close
       this.props.onSearchTransitionDifferentialAlt(true);
       // this.props.onMultisetQueriedDifferential(false);
+      this.props.onHandleUpsetVisible(false);
+      this.props.onHandleIsFilteredDifferential(false);
       this.setState(
         {
           multisetFiltersVisibleDifferential: false,
@@ -592,6 +624,7 @@ class DifferentialSearchCriteria extends Component {
       // onSearchTransitionDifferentialAlt,
     } = this.props;
     // onSearchTransitionDifferentialAlt(true);
+    this.props.onHandleIsFilteredDifferential(false);
     this.setState({
       isFilteredDifferential: false,
     });
@@ -642,6 +675,7 @@ class DifferentialSearchCriteria extends Component {
     // this.props.onHandleVolcanoTableLoading(true);
     // this.setState({ loadingDifferentialMultisetFilters: true });
     // const uSetVP = _.cloneDeep(this.state.uSettingsP);
+    this.props.onHandleIsFilteredDifferential(false);
     const uSetVP = { ...this.state.uSettingsP };
     uSetVP.indexFiltersP = [...this.state.uSettingsP.indexFiltersP].concat(
       this.state.uSettingsP.indexFiltersP.length,
@@ -670,6 +704,7 @@ class DifferentialSearchCriteria extends Component {
     for (var i = index; i < uSetVP.indexFiltersP.length; i++) {
       uSetVP.indexFiltersP[i]--;
     }
+    this.props.onHandleIsFilteredDifferential(false);
     this.setState(
       {
         selectedColP: [...this.state.selectedColP]
@@ -697,6 +732,7 @@ class DifferentialSearchCriteria extends Component {
 
   handleDropdownChange = (evt, { name, value, index }) => {
     // this.props.onHandleVolcanoTableLoading(true);
+    this.props.onHandleIsFilteredDifferential(false);
     const uSelVP = [...this.state[name]];
     uSelVP[index] = {
       key: value,
@@ -710,6 +746,7 @@ class DifferentialSearchCriteria extends Component {
     });
   };
   handleSigValuePInputChange = (name, value, index) => {
+    this.props.onHandleIsFilteredDifferential(false);
     const uSelVP = [...this.state[name]];
     uSelVP[index] = parseFloat(value);
     this.setState({
@@ -744,6 +781,7 @@ class DifferentialSearchCriteria extends Component {
       notDifferential,
     } = this.state;
     this.props.onSearchTransitionDifferentialAlt(true);
+    this.props.onHandleIsFilteredDifferential(true);
     this.setState({
       isFilteredDifferential: true,
     });
@@ -781,10 +819,48 @@ class DifferentialSearchCriteria extends Component {
         onDifferentialSearch({
           differentialResults: multisetResultsP,
         });
+        this.props.onHandleIsFilteredDifferential(false);
       })
       .catch(error => {
         console.error('Error during getResultsIntersection', error);
+        this.props.onHandleIsFilteredDifferential(false);
       });
+
+    // let a =
+    //   this.state.filterPersistance.length === 0
+    //     ? [
+    //         {
+    //           activeBreadcrumb: 0,
+    //           sigValueP,
+    //           differentialModel,
+    //           differentialStudy,
+    //           selectedOperatorP: this.jsonToList(selectedOperatorP),
+    //           selectedColP: this.jsonToList(selectedColP),
+    //         },
+    //       ]
+    //     : this.state.filterPersistance.map((item, index) => {
+    //         if (index === this.props.activeBreadcrumb) {
+    //           return {
+    //             activeBreadcrumb: index,
+    //             sigValueP,
+    //             differentialModel,
+    //             differentialStudy,
+    //             selectedOperatorP: this.jsonToList(selectedOperatorP),
+    //             selectedColP: this.jsonToList(selectedColP),
+    //           };
+    //         } else {
+    //           return item;
+    //         }
+    //       });
+
+    this.props.onHandleFilterState({
+      sigValueP,
+      differentialModel,
+      differentialStudy,
+      selectedOperatorP: this.jsonToList(selectedOperatorP),
+      selectedColP: this.jsonToList(selectedColP),
+    });
+
     if (reloadPlotP === true && differentialTests.length > 1) {
       onDisablePlotDifferential();
       this.getMultisetPlot(

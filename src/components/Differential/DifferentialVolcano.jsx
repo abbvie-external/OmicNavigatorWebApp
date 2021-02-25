@@ -96,6 +96,7 @@ class DifferentialVolcano extends Component {
         volcanoPlotRows: differentialResults.length,
       });
     }
+
     // integrate with streaming
     // if (
     //   featureToHighlightInDiffTable !== '' &&
@@ -256,12 +257,46 @@ class DifferentialVolcano extends Component {
     }
   };
 
+  handleZoom = (results, index) => {
+    this.props.onHandleZoom(results, index);
+  };
+
+  handleBreadCrumbClick = (results, index) => {
+    this.props.onHandleBreadCrumbClick(results, index);
+  };
+
+  handleUpdateDifferentialResults = results => {
+    this.props.onHandleUpdateDifferentialResults(results);
+  };
+
+  UpdateBreadcrumbIndex = index => {
+    this.props.onUpdateBreadcrumbIndex(index);
+  };
+
   // informItemsPerPageVolcanoTable = items => {
   //   this.setState({
   //     itemsPerPageVolcanoTable: items,
   //   });
   //   localStorage.setItem('itemsPerPageVolcanoTable', items);
   // };
+
+  handleBinClick = item => {
+    const { differentialFeatureIdKey } = this.props;
+    const bins = item.map(elem => {
+      const data = JSON.parse(elem.props.data);
+      return {
+        id: data[differentialFeatureIdKey],
+        value: data[differentialFeatureIdKey],
+        key: data[differentialFeatureIdKey],
+      };
+    });
+
+    this.props.onHandleSelectedVolcano(bins);
+    // console.log('bin', bins[0]);
+    this.pageToFeature(
+      JSON.parse(item[0].props.data)[differentialFeatureIdKey],
+    );
+  };
 
   handleDotClick = (event, item, index) => {
     event.stopPropagation();
@@ -438,15 +473,55 @@ class DifferentialVolcano extends Component {
     const { volcanoPlotsVisible } = this.state;
     if (volcanoPlotsVisible) {
       return (
+        // <DifferentialVolcanoPlot
+        //   ref={this.differentialVolcanoPlotRef}
+        //   {...this.state}
+        //   {...this.props}
+        //   handleVolcanoPlotSelectionChange={
+        //     this.handleVolcanoPlotSelectionChange
+        //   }
+        //   getMaxAndMin={this.getMaxAndMin}
+        //   onHandleDotClick={this.handleDotClick}
+        //   onHandleBinClick={this.handleBinClick}
+        // ></DifferentialVolcanoPlot>
         <DifferentialVolcanoPlot
           ref={this.differentialVolcanoPlotRef}
-          {...this.state}
-          {...this.props}
           handleVolcanoPlotSelectionChange={
             this.handleVolcanoPlotSelectionChange
           }
+          onHandleZoom={this.handleZoom}
+          onUpdateBreadcrumbIndex={this.UpdateBreadcrumbIndex}
+          onHandleBreadCrumbClick={this.handleBreadCrumbClick}
+          onHandleUpdateDifferentialResults={
+            this.handleUpdateDifferentialResults
+          }
           getMaxAndMin={this.getMaxAndMin}
           onHandleDotClick={this.handleDotClick}
+          volcanoDifferentialTableRowOther={
+            this.props.volcanoDifferentialTableRowOther
+          }
+          volcanoDifferentialTableRowMax={
+            this.props.volcanoDifferentialTableRowMax
+          }
+          volcanoCircleLabel={this.state.volcanoCircleLabel}
+          volcanoHeight={this.state.volcanoHeight}
+          volcanoWidth={this.state.volcanoWidth}
+          xAxisLabel={this.state.xAxisLabel}
+          yAxisLabel={this.state.yAxisLabel}
+          doXAxisTransformation={this.state.doXAxisTransformation}
+          doYAxisTransformation={this.state.doYAxisTransformation}
+          differentialResultsUnfiltered={
+            this.props.differentialResultsUnfiltered
+          }
+          differentialResults={this.props.differentialResults}
+          multisetFiltersVisibleDifferential={
+            this.props.multisetFiltersVisibleDifferential
+          }
+          isUpsetVisible={this.props.isUpsetVisible}
+          isFilteredDifferential={this.props.isFilteredDifferential}
+          identifier={this.state.identifier}
+          onUpdateVolcanoLabels={this.props.onUpdateVolcanoLabels}
+          filterState={this.props.filterState}
         ></DifferentialVolcanoPlot>
       );
     } else {
@@ -842,7 +917,7 @@ class DifferentialVolcano extends Component {
                       }
                       // defaultSize={this.state.volcanoHeight * 1.05263157895}
                       size={
-                        volcanoPlotsVisible ? volcanoHeight * 1.05263157895 : 0
+                        volcanoPlotsVisible ? volcanoHeight * 1.20263157895 : 0
                       }
                       minSize={220}
                       maxSize={1000}
@@ -860,7 +935,7 @@ class DifferentialVolcano extends Component {
                         // defaultSize={this.state.volcanoWidth * 1.05263157895}
                         size={volcanoWidth * 1.05263157895}
                         minSize={300}
-                        maxSize={1500}
+                        maxSize={1600}
                         onDragFinished={size =>
                           this.onSizeChange(size, 'vertical')
                         }
