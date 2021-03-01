@@ -115,6 +115,54 @@ class DifferentialSearchCriteria extends Component {
     if (!prevProps.zoom && this.props.zoom) {
       this.props.onEndZoom();
     }
+    // console.log(!prevProps.breadcrumbClick && this.props.breadcrumbClick);
+    if (!prevProps.breadcrumbClick && this.props.breadcrumbClick) {
+      if (
+        this.props.filterState &&
+        Object.keys(this.props.filterState)?.length > 0 &&
+        this.props.filterState.constructor === Object
+      ) {
+        // console.log('Search', this.props.filterState.sigValueP);
+        const {
+          sigValueP,
+          differentialModel,
+          differentialStudy,
+          selectedOperatorP,
+          selectedColP,
+        } = this.props.filterState;
+        // debugger;
+        // console.log('uSettings', this.state.uSettingsP);
+        this.setState({
+          sigValueP: sigValueP,
+          differentialModel: differentialModel,
+          differentialStudy: differentialStudy,
+          selectedOperatorP: selectedOperatorP,
+          selectedColP: selectedColP,
+        });
+      }
+      this.props.onUpdateBreadcrumbClick(false);
+      // if (this.props.filterState) {
+      //   const {
+      //     sigValueP,
+      //     differentialModel,
+      //     differentialStudy,
+      //     selectedOperatorP,
+      //     selectedColP,
+      //   } = this.props.filterState;
+      //   console.log('selectedColP', this.props.filterState);
+      //   this.setState(
+      //     {
+      //       sigValueP,
+      //       differentialModel,
+      //       differentialStudy,
+      //       selectedOperatorP,
+      //       selectedColP,
+      //     },
+      //     this.updateQueryDataP(),
+      //   );
+      // }
+      // this.props.onUpdateBreadcrumbClick(false);
+    }
 
     if (
       this.props.allStudiesMetadata !== prevProps.allStudiesMetadata ||
@@ -392,6 +440,7 @@ class DifferentialSearchCriteria extends Component {
   };
 
   handleTestChange = (evt, { name, value }) => {
+    console.log('441');
     const {
       differentialStudy,
       differentialModel,
@@ -672,6 +721,7 @@ class DifferentialSearchCriteria extends Component {
   };
 
   addFilterDifferential = () => {
+    console.log('722');
     // this.props.onHandleVolcanoTableLoading(true);
     // this.setState({ loadingDifferentialMultisetFilters: true });
     // const uSetVP = _.cloneDeep(this.state.uSettingsP);
@@ -696,6 +746,7 @@ class DifferentialSearchCriteria extends Component {
   };
 
   removeFilterDifferential = index => {
+    console.log('747');
     // this.props.onHandleVolcanoTableLoading(true);
     const uSetVP = { ...this.state.uSettingsP };
     uSetVP.indexFiltersP = [...uSetVP.indexFiltersP]
@@ -746,6 +797,7 @@ class DifferentialSearchCriteria extends Component {
     });
   };
   handleSigValuePInputChange = (name, value, index) => {
+    console.log('input change', value, name);
     this.props.onHandleIsFilteredDifferential(false);
     const uSelVP = [...this.state[name]];
     uSelVP[index] = parseFloat(value);
@@ -764,6 +816,7 @@ class DifferentialSearchCriteria extends Component {
   };
 
   updateQueryDataP = () => {
+    console.log('816');
     const {
       differentialStudy,
       differentialModel,
@@ -857,8 +910,8 @@ class DifferentialSearchCriteria extends Component {
       sigValueP,
       differentialModel,
       differentialStudy,
-      selectedOperatorP: this.jsonToList(selectedOperatorP),
-      selectedColP: this.jsonToList(selectedColP),
+      selectedOperatorP: selectedOperatorP,
+      selectedColP: selectedColP,
     });
 
     if (reloadPlotP === true && differentialTests.length > 1) {

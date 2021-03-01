@@ -82,6 +82,7 @@ class Differential extends Component {
     isDataStreamingResultsTable: false,
     zoom: false,
     filterState: {},
+    breadcrumbClick: false,
   };
   differentialViewContainerRef = React.createRef();
   differentialGridRef = React.createRef();
@@ -550,17 +551,24 @@ class Differential extends Component {
   };
 
   updateBreadcrumbIndex = index => {
-    console.log('index', index);
     this.setState({
       activeBreadcrumb: index,
     });
   };
 
-  handleBreadCrumbClick = (results, index) => {
+  updateBreadcrumbClick = bool => {
+    this.setState({
+      breadcrumbClick: false,
+    });
+  };
+
+  handleBreadcrumbClick = (results, index, filterState, breadcrumbClick) => {
     this.setState({
       differentialResults: results,
       differentialResultsUnfiltered: results,
       activeBreadcrumb: index,
+      breadcrumbClick: breadcrumbClick,
+      filterState,
     });
   };
 
@@ -935,7 +943,7 @@ class Differential extends Component {
           onBackToTable={this.backToTable}
           onUpdateVolcanoLabels={this.updateVolcanoLabels}
           onHandleZoom={this.handleZoom}
-          onHandleBreadCrumbClick={this.handleBreadCrumbClick}
+          onHandleBreadcrumbClick={this.handleBreadcrumbClick}
           onHandleUpdateDifferentialResults={this.updateDifferentialResults}
           onUpdateBreadcrumbIndex={this.updateBreadcrumbIndex}
         />
@@ -1042,6 +1050,7 @@ class Differential extends Component {
               onHandleIsFilteredDifferential={this.handleIsFilteredDifferential}
               onEndZoom={this.endZoom}
               onHandleFilterState={this.handleFilterState}
+              onUpdateBreadcrumbClick={this.updateBreadcrumbClick}
             />
           </Grid.Column>
           <Grid.Column

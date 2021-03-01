@@ -3,6 +3,9 @@ import { Form, Select, Icon, Button } from 'semantic-ui-react';
 import * as d3 from 'd3';
 import NumericExponentialInput from '../Shared/NumericExponentialInput';
 import '../Shared/MultisetFilters.scss';
+import { object } from 'airbnb-prop-types';
+import { filter } from 'lodash';
+import { index } from 'd3';
 
 class DifferentialMultisetFilters extends Component {
   componentDidMount() {
@@ -56,6 +59,7 @@ class DifferentialMultisetFilters extends Component {
         selectedColP !== prevProps.selectedColP ||
         selectedOperatorP !== prevProps.selectedOperatorP)
     ) {
+      console.log('filters', this.props.sigValueP);
       this.makeMultiset(
         uDataP,
         uAnchorP,
@@ -67,6 +71,32 @@ class DifferentialMultisetFilters extends Component {
         mustDifferential,
         notDifferential,
       );
+
+      // filterState &&
+      // Object.keys(filterState)?.length > 0 &&
+      // filterState.constructor === Object
+      //   ? this.makeMultiset(
+      //       uDataP,
+      //       uAnchorP,
+      //       uSettingsP,
+      //       metaSvgP,
+      //       filterState.sigValueP,
+      //       filterState.selectedColP,
+      //       filterState.selectedOperatorP,
+      //       mustDifferential,
+      //       notDifferential,
+      //     )
+      //   : this.makeMultiset(
+      //       uDataP,
+      //       uAnchorP,
+      //       uSettingsP,
+      //       metaSvgP,
+      //       sigValueP,
+      //       selectedColP,
+      //       selectedOperatorP,
+      //       mustDifferential,
+      //       notDifferential,
+      //     );
     }
   }
 
@@ -911,6 +941,12 @@ class DifferentialMultisetFilters extends Component {
     this.props.onChangeHoveredFilter(index);
   };
 
+  // handleInputChange = (value, index) => {
+  //   console.log('index', index);
+  //   console.log('value', value);
+  //   this.props.onHandleSigValuePInputChange('sigValueP', value, index);
+  // };
+
   render() {
     const {
       sigValueP,
@@ -922,78 +958,83 @@ class DifferentialMultisetFilters extends Component {
     const OperatorsP = uSettingsP.thresholdOperatorP;
     const indexFiltersP = uSettingsP.indexFiltersP;
     const hoveredFilter = uSettingsP.hoveredFilter;
+    // console.log('render', sigValueP, selectedOperatorP);
     const callbackFactory = index => value => {
+      console.log('factory', value);
       this.props.onHandleSigValuePInputChange('sigValueP', value, index);
     };
     return (
       <Fragment>
         <Form className="MultisetDropdownContainer">
           <ul style={{ padding: '0px' }}>
-            {indexFiltersP.map(index => (
-              <Form.Group
-                key={`differentialMultiSetFiltersRow${index}`}
-                onMouseEnter={() => this.changeHoveredFilter(index)}
-                onMouseLeave={() => this.changeHoveredFilter(-1)}
-              >
-                <Form.Field
-                  key={`differentialMultiSetFiltersColumn${index}`}
-                  control={Select}
-                  label={index === 0 ? 'Column' : ''}
-                  name="selectedColP"
-                  className="ThresholdColumnReadOnly"
-                  index={index}
-                  // selection
-                  value={selectedColP[index].value}
-                  options={thresholdColsP}
-                  width={7}
-                  onChange={this.handleDropdownChange}
-                ></Form.Field>
-                {hoveredFilter === index && indexFiltersP.length !== 1 && (
-                  <Button
-                    circular
-                    icon
-                    style={{
-                      position: 'absolute',
-                      marginTop: index === 0 ? '15px' : '0px',
-                    }}
-                    size="mini"
-                    compact
-                    onClick={() => this.removeFilter(index)}
-                  >
-                    <Icon name="minus circle" color={'red'} />
-                  </Button>
-                )}
-                <Form.Field
-                  key={`differentialMultiSetFiltersOperator${index}`}
-                  control={Select}
-                  label={index === 0 ? 'Operator' : ''}
-                  name="selectedOperatorP"
-                  className="ThresholdOperatorSelect"
-                  index={index}
-                  // selection
-                  value={selectedOperatorP[index].value}
-                  options={OperatorsP}
-                  width={5}
-                  onChange={this.handleDropdownChange}
-                ></Form.Field>
-                <Form.Field
-                  width={4}
-                  id="SignificantValueInputMultisetP"
-                  key={`differentialMultiSetFiltersSignificance${index}`}
+            {indexFiltersP.map(index => {
+              // console.log('sig', sigValueP[index]);
+              return (
+                <Form.Group
+                  key={`differentialMultiSetFiltersRow${index}`}
+                  onMouseEnter={() => this.changeHoveredFilter(index)}
+                  onMouseLeave={() => this.changeHoveredFilter(-1)}
                 >
-                  <label>{index === 0 ? 'Value' : ''}</label>
-                  <NumericExponentialInput
-                    key={`differentialMultiSetFiltersInput${index}`}
-                    onChange={callbackFactory(index)}
-                    min={1e-100}
-                    preventNegatives={false}
-                    name="sigValueP"
-                    defaultValue={sigValueP[index]}
-                    value={sigValueP[index]}
-                  />
-                </Form.Field>
-              </Form.Group>
-            ))}
+                  <Form.Field
+                    key={`differentialMultiSetFiltersColumn${index}`}
+                    control={Select}
+                    label={index === 0 ? 'Column' : ''}
+                    name="selectedColP"
+                    className="ThresholdColumnReadOnly"
+                    index={index}
+                    // selection
+                    value={selectedColP[index].value}
+                    options={thresholdColsP}
+                    width={7}
+                    onChange={this.handleDropdownChange}
+                  ></Form.Field>
+                  {hoveredFilter === index && indexFiltersP.length !== 1 && (
+                    <Button
+                      circular
+                      icon
+                      style={{
+                        position: 'absolute',
+                        marginTop: index === 0 ? '15px' : '0px',
+                      }}
+                      size="mini"
+                      compact
+                      onClick={() => this.removeFilter(index)}
+                    >
+                      <Icon name="minus circle" color={'red'} />
+                    </Button>
+                  )}
+                  <Form.Field
+                    key={`differentialMultiSetFiltersOperator${index}`}
+                    control={Select}
+                    label={index === 0 ? 'Operator' : ''}
+                    name="selectedOperatorP"
+                    className="ThresholdOperatorSelect"
+                    index={index}
+                    // selection
+                    value={selectedOperatorP[index].value}
+                    options={OperatorsP}
+                    width={5}
+                    onChange={this.handleDropdownChange}
+                  ></Form.Field>
+                  <Form.Field
+                    width={4}
+                    id="SignificantValueInputMultisetP"
+                    key={`differentialMultiSetFiltersSignificance${index}`}
+                  >
+                    <label>{index === 0 ? 'Value' : ''}</label>
+                    <NumericExponentialInput
+                      key={`differentialMultiSetFiltersInput${index}`}
+                      onChange={callbackFactory(index)}
+                      min={1e-100}
+                      preventNegatives={false}
+                      name="sigValueP"
+                      defaultValue={sigValueP[index]}
+                      value={sigValueP[index]}
+                    />
+                  </Form.Field>
+                </Form.Group>
+              );
+            })}
           </ul>
           <Button circular compact size="mini" icon onClick={this.addFilter}>
             <Icon name="plus circle" color={'green'} />
