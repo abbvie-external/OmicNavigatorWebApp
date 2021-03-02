@@ -31,6 +31,8 @@ async function* streamAsyncIterable(reader) {
   }
 }
 class DifferentialSearchCriteria extends Component {
+  dom = '';
+
   state = {
     differentialStudies: [],
     differentialStudyHrefVisible: false,
@@ -122,7 +124,7 @@ class DifferentialSearchCriteria extends Component {
         Object.keys(this.props.filterState)?.length > 0 &&
         this.props.filterState.constructor === Object
       ) {
-        // console.log('Search', this.props.filterState.sigValueP);
+        console.log('filter state', this.props.filterState);
         const {
           sigValueP,
           differentialModel,
@@ -440,7 +442,6 @@ class DifferentialSearchCriteria extends Component {
   };
 
   handleTestChange = (evt, { name, value }) => {
-    console.log('441');
     const {
       differentialStudy,
       differentialModel,
@@ -721,7 +722,6 @@ class DifferentialSearchCriteria extends Component {
   };
 
   addFilterDifferential = () => {
-    console.log('722');
     // this.props.onHandleVolcanoTableLoading(true);
     // this.setState({ loadingDifferentialMultisetFilters: true });
     // const uSetVP = _.cloneDeep(this.state.uSettingsP);
@@ -746,7 +746,6 @@ class DifferentialSearchCriteria extends Component {
   };
 
   removeFilterDifferential = index => {
-    console.log('747');
     // this.props.onHandleVolcanoTableLoading(true);
     const uSetVP = { ...this.state.uSettingsP };
     uSetVP.indexFiltersP = [...uSetVP.indexFiltersP]
@@ -776,9 +775,14 @@ class DifferentialSearchCriteria extends Component {
     );
   };
   changeHoveredFilter = index => {
-    const uSetVP = { ...this.state.uSettingsP };
-    uSetVP.hoveredFilter = index;
-    this.setState({ uSettingsP: uSetVP });
+    // const uSetVP = { ...this.state.uSettingsP };
+    // uSetVP.hoveredFilter = index;
+    this.setState({
+      uSettingsP: {
+        ...this.state.uSettingsP,
+        hoveredFilter: index,
+      },
+    });
   };
 
   handleDropdownChange = (evt, { name, value, index }) => {
@@ -798,6 +802,7 @@ class DifferentialSearchCriteria extends Component {
   };
   handleSigValuePInputChange = (name, value, index) => {
     console.log('input change', value, name);
+    console.log('state', this.props.breadcrumbClick);
     this.props.onHandleIsFilteredDifferential(false);
     const uSelVP = [...this.state[name]];
     uSelVP[index] = parseFloat(value);
@@ -816,7 +821,6 @@ class DifferentialSearchCriteria extends Component {
   };
 
   updateQueryDataP = () => {
-    console.log('816');
     const {
       differentialStudy,
       differentialModel,
@@ -998,6 +1002,25 @@ class DifferentialSearchCriteria extends Component {
     } else if (w > 2599) return 'large';
   }
 
+  thisfunc = () => {
+    this.setState({
+      sigValueP: [0.25],
+    });
+    // document.getElementsByClassName('NumericExponentialInput')[0].value = [
+    //   0.25,
+    // ];
+    // this.dom = document.getElementsByClassName(
+    //   'MultisetFiltersDiv',
+    // )[0].innerHTML;
+    // console.log(this.dom);
+  };
+
+  thisfuncTwo = () => {
+    // document.getElementsByClassName(
+    //   'MultisetFiltersDiv',
+    // )[0].innerHTML = this.dom;
+  };
+
   render() {
     const {
       differentialStudies,
@@ -1101,6 +1124,7 @@ class DifferentialSearchCriteria extends Component {
           onAddFilterDifferential={this.addFilterDifferential}
           onRemoveFilterDifferential={this.removeFilterDifferential}
           onChangeHoveredFilter={this.changeHoveredFilter}
+          onBreadcrumbClick={this.props.onUpdateBreadcrumbClick}
         />
       );
 
@@ -1242,6 +1266,8 @@ class DifferentialSearchCriteria extends Component {
             selectOnNavigation={false}
           />
           <span className="StudyHtmlIconDivP">{studyIcon}</span>
+          <button onClick={this.thisfunc}>read me</button>
+          <button onClick={this.thisfuncTwo}>write me</button>
           <Popup
             trigger={
               <Form.Field

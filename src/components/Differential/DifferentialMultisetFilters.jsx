@@ -59,7 +59,6 @@ class DifferentialMultisetFilters extends Component {
         selectedColP !== prevProps.selectedColP ||
         selectedOperatorP !== prevProps.selectedOperatorP)
     ) {
-      console.log('filters', this.props.sigValueP);
       this.makeMultiset(
         uDataP,
         uAnchorP,
@@ -941,11 +940,11 @@ class DifferentialMultisetFilters extends Component {
     this.props.onChangeHoveredFilter(index);
   };
 
-  // handleInputChange = (value, index) => {
-  //   console.log('index', index);
-  //   console.log('value', value);
-  //   this.props.onHandleSigValuePInputChange('sigValueP', value, index);
-  // };
+  handleInputChange = (value, index) => {
+    // console.log('index', index);
+    // console.log('value', value);
+    this.props.onHandleSigValuePInputChange('sigValueP', value, index);
+  };
 
   render() {
     const {
@@ -960,7 +959,7 @@ class DifferentialMultisetFilters extends Component {
     const hoveredFilter = uSettingsP.hoveredFilter;
     // console.log('render', sigValueP, selectedOperatorP);
     const callbackFactory = index => value => {
-      console.log('factory', value);
+      // console.log('factory', value);
       this.props.onHandleSigValuePInputChange('sigValueP', value, index);
     };
     return (
@@ -1024,7 +1023,17 @@ class DifferentialMultisetFilters extends Component {
                     <label>{index === 0 ? 'Value' : ''}</label>
                     <NumericExponentialInput
                       key={`differentialMultiSetFiltersInput${index}`}
-                      onChange={callbackFactory(index)}
+                      onChange={value => {
+                        this.handleInputChange(value, index);
+                        // if (this.props.breadcrumbClick) {
+                        //   console.log('here');
+                        //   this.handleInputChange(this.props.sigValueP, index);
+                        // } else {
+                        //   this.handleInputChange(value, index);
+                        // }
+
+                        // this.props.onBreadcrumbClick(false);
+                      }}
                       min={1e-100}
                       preventNegatives={false}
                       name="sigValueP"
