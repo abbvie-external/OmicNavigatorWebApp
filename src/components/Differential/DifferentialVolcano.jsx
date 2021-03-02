@@ -547,6 +547,15 @@ class DifferentialVolcano extends Component {
     }
   };
 
+  getFeaturesLength = () => {
+    const { differentialResults, HighlightedFeaturesArrVolcano } = this.props;
+    if (HighlightedFeaturesArrVolcano.length === 1) {
+      return 1;
+    } else if (HighlightedFeaturesArrVolcano.length > 1) {
+      return HighlightedFeaturesArrVolcano.length;
+    } else return differentialResults.length;
+  };
+
   render() {
     const {
       filteredTableData,
@@ -663,6 +672,8 @@ class DifferentialVolcano extends Component {
         );
       } else return null;
     };
+
+    const FeaturesLength = this.getFeaturesLength();
 
     return (
       <Grid.Column
@@ -869,11 +880,11 @@ class DifferentialVolcano extends Component {
                               this.props.onGetMultifeaturePlot('Differential')
                             }
                           >
-                            MULTI-FEATURE PLOT
+                            {HighlightedFeaturesArrVolcano.length !== 1
+                              ? 'MULTI-FEATURE PLOT'
+                              : 'SINGLE-FEATURE PLOT'}
                             <Label.Detail className="MultiFeaturePlotDetail">
-                              {HighlightedFeaturesArrVolcano.length > 1
-                                ? HighlightedFeaturesArrVolcano.length
-                                : differentialResults.length}
+                              {FeaturesLength}
                             </Label.Detail>
                           </Label>
                         </div>

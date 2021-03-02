@@ -64,7 +64,6 @@ class ButtonActions extends Component {
   };
 
   SVGExport = () => {
-    debugger;
     if (this.props.imageInfo == null) {
       let PlotName = `${this.props.plot}.svg`;
       // for Barcode, Violin

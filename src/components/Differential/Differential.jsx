@@ -438,7 +438,6 @@ class Differential extends Component {
         ) {
           return;
         }
-        debugger;
         omicNavigatorService
           .plotStudy(
             differentialStudy,
@@ -511,22 +510,33 @@ class Differential extends Component {
   };
 
   getMultifeaturePlot = view => {
-    const featureIds = this.state.HighlightedFeaturesArrVolcano.map(
-      featureId => featureId.id,
-    );
-    if (view === 'volcano') {
-      this.getPlot('volcano', featureIds);
-    } else {
+    if (this.state.HighlightedFeaturesArrVolcano.length > 1) {
+      const featureIds = this.state.HighlightedFeaturesArrVolcano.map(
+        featureId => featureId.id,
+      );
+      // if (view === 'volcano') {
+      //   this.getPlot('volcano', featureIds, false);
+      // } else {
       this.getProteinDataAlt(featureIds);
+      // }
+    } else {
+      if (this.state.HighlightedFeaturesArrVolcano.length === 1) {
+        this.getPlot(
+          'differential',
+          this.state.HighlightedFeaturesArrVolcano[0].id,
+          true,
+        );
+      } else return;
     }
   };
 
   getProteinDataAlt = featureids => {
     const { differentialFeatureIdKey } = this.props;
+    const featuresLength = featureids.length;
     const features = JSON.stringify(featureids);
     const imageInfoDifferential = {
       key: `${features}`,
-      title: `${differentialFeatureIdKey} ${features}`,
+      title: `${differentialFeatureIdKey} ${featuresLength}`,
       svg: [],
     };
     this.setState(
@@ -590,6 +600,20 @@ class Differential extends Component {
       enableMultifeaturePlotting: enableMultifeature,
     });
     if (toHighlightArr.length > 0) {
+      // unhighlight single row if already highlighted
+      if (toHighlightArr.length === 1) {
+        if (
+          toHighlightArr[0].id === this.state.volcanoDifferentialTableRowMax
+        ) {
+          this.setState({
+            HighlightedFeaturesArrVolcano: [],
+            volcanoDifferentialTableRowMax: '',
+            volcanoDifferentialTableRowOther: [],
+          });
+          this.handlePlotVolcano('');
+          return;
+        }
+      }
       const MaxLine = toHighlightArr[0] || null;
       let volcanoDifferentialTableRowMaxVar = '';
       if (MaxLine !== {} && MaxLine != null) {
