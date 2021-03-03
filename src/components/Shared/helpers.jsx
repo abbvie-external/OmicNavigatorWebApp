@@ -1,5 +1,5 @@
 import React from 'react';
-import { Popup } from 'semantic-ui-react';
+import { Popup, Loader, Dimmer } from 'semantic-ui-react';
 import _ from 'lodash';
 // import phosphosite_icon from '../../resources/phosphosite.ico';
 // import reactome_icon from '../../resources/reactome.jpg';
@@ -325,3 +325,9 @@ export function networkByCluster(network) {
   nodeArray.sort((x, y) => d3.descending(x.size, y.size));
   return { name: 'Network', children: nodeArray };
 }
+
+export const loadingDimmer = (
+  <Dimmer active inverted>
+    <Loader size="large">SVG Loading</Loader>
+  </Dimmer>
+);

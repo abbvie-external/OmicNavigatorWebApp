@@ -1,7 +1,8 @@
 import React, { Component, Fragment } from 'react';
 import { withRouter } from 'react-router-dom';
 import { Grid, Dimmer, Loader, Tab, Dropdown, Menu } from 'semantic-ui-react';
-import { ReactSVG } from 'react-svg';
+import SVG from 'react-inlinesvg';
+import { loadingDimmer } from '../Shared/helpers';
 import DifferentialBreadcrumbs from './DifferentialBreadcrumbs';
 import ButtonActions from '../Shared/ButtonActions';
 import MetafeaturesTable from './MetafeaturesTable';
@@ -99,7 +100,18 @@ class DifferentialPlot extends Component {
           render: () => (
             <Tab.Pane attached="true" as="div">
               <div id="DifferentialPlotTabsPlotSVG" className="svgSpan">
-                <ReactSVG src={s.svg} />
+                <SVG
+                  cacheRequests={true}
+                  // description=""
+                  loader={<span>{loadingDimmer}</span>}
+                  // onError={error => console.log(error.message)}
+                  // onLoad={(src, hasCache) => console.log(src, hasCache)}
+                  // preProcessor={code => code.replace(/fill=".*?"/g, 'fill="currentColor"')}
+                  src={s.svg}
+                  // title={`${s.plotType.plotDisplay}`}
+                  uniqueHash="c3h0f3"
+                  uniquifyIDs={true}
+                />
               </div>
             </Tab.Pane>
           ),
@@ -212,7 +224,9 @@ class DifferentialPlot extends Component {
                     selection
                     compact
                     options={plotOptions}
-                    value={plotOptions[activeSVGTabIndexDifferentialVar].value}
+                    value={
+                      plotOptions[activeSVGTabIndexDifferentialVar]?.value || 0
+                    }
                     onChange={this.handlePlotDropdownChange}
                     className={DropdownClass}
                   />

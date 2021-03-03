@@ -1,13 +1,18 @@
 import React, { Component } from 'react';
 import { Grid, Popup, Sidebar } from 'semantic-ui-react';
 import { withRouter } from 'react-router-dom';
-import { ReactSVG } from 'react-svg';
+import SVG from 'react-inlinesvg';
 import { CancelToken } from 'axios';
 import DifferentialSearchCriteria from './DifferentialSearchCriteria';
 import TransitionActive from '../Transitions/TransitionActive';
 import TransitionStill from '../Transitions/TransitionStill';
 import ButtonActions from '../Shared/ButtonActions';
-import { formatNumberForDisplay, splitValue, Linkout } from '../Shared/helpers';
+import {
+  formatNumberForDisplay,
+  splitValue,
+  Linkout,
+  loadingDimmer,
+} from '../Shared/helpers';
 import { omicNavigatorService } from '../../services/omicNavigator.service';
 import DifferentialVolcano from './DifferentialVolcano';
 import _ from 'lodash';
@@ -878,27 +883,17 @@ class Differential extends Component {
           </Grid.Row>
         </Grid>
         <div className="MultisetSvgOuter">
-          {/* <ReactSVG src={multisetPlotInfoDifferential.svg} /> */}
-          <ReactSVG
-            key="multisetPlotInfoDifferential"
+          <SVG
+            cacheRequests={true}
+            // description=""
+            loader={<span>{loadingDimmer}</span>}
+            // onError={error => console.log(error.message)}
+            // onLoad={(src, hasCache) => console.log(src, hasCache)}
+            // preProcessor={code => code.replace(/fill=".*?"/g, 'fill="currentColor"')}
             src={multisetPlotInfoDifferential.svg}
-            afterInjection={(error, svg) => {
-              if (error) {
-                console.error(error);
-                return;
-              }
-              console.log(svg);
-            }}
-            beforeInjection={svg => {
-              svg.setAttribute('id', `glyph-test`);
-            }}
-            className="wrapper-class"
-            evalScripts="always"
-            fallback={() => <span>Error!</span>}
-            loading={() => <span>Loading</span>}
-            renumerateIRIElements={false}
-            useRequestCache={true}
-            wrapper="span"
+            // title={`${s.plotType.plotDisplay}`}
+            uniqueHash="b2g9e2"
+            uniquifyIDs={true}
           />
         </div>
       </Sidebar>

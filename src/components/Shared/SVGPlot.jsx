@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component, Fragment, useRef } from 'react';
 import {
   Loader,
   Dimmer,
@@ -10,8 +10,8 @@ import {
   // Label,
   Dropdown,
 } from 'semantic-ui-react';
-import { ReactSVG } from 'react-svg';
-import { roundToPrecision } from '../Shared/helpers';
+import SVG from 'react-inlinesvg';
+import { roundToPrecision, loadingDimmer } from '../Shared/helpers';
 // import { limitString } from '../Shared/helpers';
 import ButtonActions from '../Shared/ButtonActions';
 import './SVGPlot.scss';
@@ -19,6 +19,7 @@ import './SVGPlot.scss';
 class SVGPlot extends Component {
   state = {
     isSVGReady: false,
+    activeSVGTabIndexVolcano: 0,
   };
 
   componentDidMount() {
@@ -33,6 +34,7 @@ class SVGPlot extends Component {
         prevProps.volcanoWidth !== this.props.volcanoWidth ||
         prevProps.volcanoHeight !== this.props.volcanoHeight)
     ) {
+      debugger;
       this.getSVGPanes();
     }
   }
@@ -90,32 +92,17 @@ class SVGPlot extends Component {
               key={`${index}-${s.plotType.plotDisplay}-pane`}
             >
               <div id="PlotSVG" className="svgSpan">
-                {/* <p>heightVar: {heightVar}</p>
-                <p>widthVar: {widthVar}</p>
-                <p>srcUrl: {srcUrl}</p> */}
-                {/* <ReactSVG
+                <SVG
+                  cacheRequests={true}
+                  // description=""
+                  loader={<span>{loadingDimmer}</span>}
+                  // onError={error => console.log(error.message)}
+                  // onLoad={(src, hasCache) => console.log(src, hasCache)}
+                  // preProcessor={code => code.replace(/fill=".*?"/g, 'fill="currentColor"')}
                   src={srcUrl}
-                  key={`${index}-${s.plotType.plotDisplay}`}
-                /> */}
-                <ReactSVG
-                  key={`${index}-${s.plotType.plotDisplay}-Volcano`}
-                  src={srcUrl}
-                  // afterInjection={(error, svg) => {
-                  //   if (error) {
-                  //     console.error(error);
-                  //     return;
-                  //   }
-                  //   console.log(svg);
-                  // }}
-                  // beforeInjection={svg => {
-                  // }}
-                  // className="wrapper-class-name"
-                  // evalScripts="always"
-                  fallback={() => <span>Error!</span>}
-                  // loading={() => <span>Loading</span>}
-                  // renumerateIRIElements={false}
-                  // useRequestCache={true}
-                  // wrapper="span"
+                  title={`${s.plotType.plotDisplay}`}
+                  uniqueHash="a1f8d1"
+                  uniquifyIDs={true}
                 />
               </div>
             </Tab.Pane>
@@ -216,7 +203,7 @@ class SVGPlot extends Component {
                 selection
                 compact
                 options={plotOptions}
-                value={plotOptions[activeSVGTabIndexVolcanoVar].value}
+                value={plotOptions[activeSVGTabIndexVolcanoVar]?.value}
                 onChange={this.handlePlotDropdownChange}
                 className={DropdownClass}
               />
@@ -246,13 +233,7 @@ class SVGPlot extends Component {
           );
         }
       } else {
-        return (
-          <div>
-            <Dimmer active inverted>
-              <Loader size="large">SVG Loading</Loader>
-            </Dimmer>
-          </div>
-        );
+        return <div>{loadingDimmer}</div>;
       }
     } else return null;
   }
