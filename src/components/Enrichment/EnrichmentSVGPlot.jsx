@@ -9,9 +9,8 @@ import {
   // Menu,
   // Label,
 } from 'semantic-ui-react';
-import { ReactSVG } from 'react-svg';
-
-// import { limitString } from '../Shared/helpers';
+import SVG from 'react-inlinesvg';
+import { loadingDimmer } from '../Shared/helpers';
 import ButtonActions from '../Shared/ButtonActions';
 import './EnrichmentSVGPlot.scss';
 
@@ -87,7 +86,18 @@ class EnrichmentSVGPlot extends Component {
           render: () => (
             <Tab.Pane attached="true" as="div">
               <div id="PlotSVG" className="svgSpan">
-                <ReactSVG src={srcUrl} />
+                <SVG
+                  cacheRequests={true}
+                  // description=""
+                  loader={<span>{loadingDimmer}</span>}
+                  // onError={error => console.log(error.message)}
+                  // onLoad={(src, hasCache) => console.log(src, hasCache)}
+                  // preProcessor={code => code.replace(/fill=".*?"/g, 'fill="currentColor"')}
+                  src={srcUrl}
+                  // title={`${s.plotType.plotDisplay}`}
+                  uniqueHash="e5j2h5"
+                  uniquifyIDs={true}
+                />
               </div>
             </Tab.Pane>
           ),

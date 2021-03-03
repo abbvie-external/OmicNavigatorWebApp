@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { CancelToken } from 'axios';
 import { Grid, Menu, Popup, Sidebar, Tab, Message } from 'semantic-ui-react';
-import { ReactSVG } from 'react-svg';
+import SVG from 'react-inlinesvg';
 import networkIcon from '../../resources/networkIcon.png';
 import networkIconSelected from '../../resources/networkIconSelected.png';
 import tableIcon from '../../resources/tableIcon.png';
@@ -12,7 +12,12 @@ import tableIconSelected from '../../resources/tableIconSelected.png';
 import { omicNavigatorService } from '../../services/omicNavigator.service';
 import ButtonActions from '../Shared/ButtonActions';
 import * as d3 from 'd3';
-import { formatNumberForDisplay, splitValue, Linkout } from '../Shared/helpers';
+import {
+  formatNumberForDisplay,
+  splitValue,
+  Linkout,
+  loadingDimmer,
+} from '../Shared/helpers';
 import '../Shared/Table.scss';
 import SearchingAlt from '../Transitions/SearchingAlt';
 import TransitionActive from '../Transitions/TransitionActive';
@@ -2152,7 +2157,18 @@ class Enrichment extends Component {
           </Grid.Row>
         </Grid>
         <div className="MultisetSvgOuter">
-          <ReactSVG src={multisetPlotInfoEnrichment.svg} />
+          <SVG
+            cacheRequests={true}
+            // description=""
+            loader={<span>{loadingDimmer}</span>}
+            // onError={error => console.log(error.message)}
+            // onLoad={(src, hasCache) => console.log(src, hasCache)}
+            // preProcessor={code => code.replace(/fill=".*?"/g, 'fill="currentColor"')}
+            src={multisetPlotInfoEnrichment.svg}
+            // title={`${s.plotType.plotDisplay}`}
+            uniqueHash="d4i1g4"
+            uniquifyIDs={true}
+          />
         </div>
       </Sidebar>
     );

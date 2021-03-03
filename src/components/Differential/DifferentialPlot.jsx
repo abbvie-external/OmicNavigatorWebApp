@@ -2,7 +2,7 @@ import React, { Component, Fragment } from 'react';
 import { withRouter } from 'react-router-dom';
 import { Grid, Dimmer, Loader, Tab, Dropdown, Menu } from 'semantic-ui-react';
 import SVG from 'react-inlinesvg';
-import { loadingDimmer } from '../Shared/helpers';
+// import { loadingDimmer } from '../Shared/helpers';
 import DifferentialBreadcrumbs from './DifferentialBreadcrumbs';
 import ButtonActions from '../Shared/ButtonActions';
 import MetafeaturesTable from './MetafeaturesTable';
@@ -103,7 +103,7 @@ class DifferentialPlot extends Component {
                 <SVG
                   cacheRequests={true}
                   // description=""
-                  loader={<span>{loadingDimmer}</span>}
+                  // loader={<span>{loadingDimmer}</span>}
                   // onError={error => console.log(error.message)}
                   // onLoad={(src, hasCache) => console.log(src, hasCache)}
                   // preProcessor={code => code.replace(/fill=".*?"/g, 'fill="currentColor"')}
