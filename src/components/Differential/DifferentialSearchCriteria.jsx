@@ -39,6 +39,7 @@ class DifferentialSearchCriteria extends Component {
       'Select a study and model to view Analysis Details',
     differentialModels: [],
     differentialTests: [],
+    differentialStudyTooltip: 'Select a study',
     differentialModelTooltip: '',
     differentialTestTooltip: '',
     differentialStudiesDisabled: true,
@@ -175,13 +176,16 @@ class DifferentialSearchCriteria extends Component {
           };
         },
       );
-
+      const differentialStudyTooltip =
+        differentialStudyData?.package?.description || '';
       this.setState({
+        differentialStudyTooltip: differentialStudyTooltip,
         differentialModelsDisabled: false,
         differentialModels: differentialModelsMapped,
       });
-      this.getReportLink(differentialStudy, 'default');
-      if (differentialModel !== '') {
+      if (differentialModel === '') {
+        this.getReportLink(differentialStudy, 'default');
+      } else {
         this.props.onDoMetaFeaturesExist(differentialStudy, differentialModel);
         this.props.onGetResultsLinkouts(differentialStudy, differentialModel);
         this.props.onHandlePlotTypesDifferential(differentialModel);
@@ -292,7 +296,12 @@ class DifferentialSearchCriteria extends Component {
   setStudyTooltip = () => {
     if (this.props.differentialModel !== '') {
       this.setState({
-        differentialStudyReportTooltip: `The model "main" from the study ${this.props.differentialStudy} does not have additional analysis details available.`,
+        differentialStudyReportTooltip: `The model ${this.props.differentialModel} from the study ${this.props.differentialStudy} does not have additional analysis details available.`,
+      });
+    } else {
+      this.setState({
+        differentialStudyReportTooltip:
+          'Select a study and model to view Analysis Details',
       });
     }
   };
@@ -837,6 +846,7 @@ class DifferentialSearchCriteria extends Component {
   render() {
     const {
       differentialStudies,
+      differentialStudyTooltip,
       differentialStudyHref,
       differentialStudyHrefVisible,
       differentialModels,
@@ -1045,23 +1055,34 @@ class DifferentialSearchCriteria extends Component {
     return (
       <React.Fragment>
         <Form className="SearchCriteriaContainer">
-          <Form.Field
-            control={Select}
-            name="differentialStudy"
-            value={differentialStudy}
-            options={differentialStudies}
-            placeholder="Select A Study"
-            onChange={this.handleStudyChange}
-            disabled={differentialStudiesDisabled}
-            label={{
-              children: 'Study',
-              htmlFor: 'form-select-control-pstudy',
-            }}
-            search
-            searchInput={{ id: 'form-select-control-pstudy' }}
-            width={13}
-            selectOnBlur={false}
-            selectOnNavigation={false}
+          <Popup
+            trigger={
+              <Form.Field
+                control={Select}
+                name="differentialStudy"
+                value={differentialStudy}
+                options={differentialStudies}
+                placeholder="Select A Study"
+                onChange={this.handleStudyChange}
+                disabled={differentialStudiesDisabled}
+                label={{
+                  children: 'Study',
+                  htmlFor: 'form-select-control-pstudy',
+                }}
+                search
+                searchInput={{ id: 'form-select-control-pstudy' }}
+                width={13}
+                selectOnBlur={false}
+                selectOnNavigation={false}
+              />
+            }
+            style={StudyPopupStyle}
+            className="CustomTooltip"
+            inverted
+            position="bottom right"
+            content={differentialStudyTooltip}
+            mouseEnterDelay={1000}
+            mouseLeaveDelay={0}
           />
           <span className="StudyHtmlIconDivP">{studyIcon}</span>
           <Popup
