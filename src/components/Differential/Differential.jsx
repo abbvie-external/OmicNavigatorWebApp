@@ -5,7 +5,12 @@ import DifferentialSearchCriteria from './DifferentialSearchCriteria';
 import TransitionActive from '../Transitions/TransitionActive';
 import TransitionStill from '../Transitions/TransitionStill';
 import ButtonActions from '../Shared/ButtonActions';
-import { formatNumberForDisplay, splitValue, Linkout } from '../Shared/helpers';
+import {
+  formatNumberForDisplay,
+  splitValue,
+  Linkout,
+  limitValues,
+} from '../Shared/helpers';
 import DOMPurify from 'dompurify';
 import { omicNavigatorService } from '../../services/omicNavigator.service';
 import DifferentialVolcano from './DifferentialVolcano';
@@ -417,7 +422,6 @@ class Differential extends Component {
     };
     if (multiFeatureCall) {
       const featuresLength = featureId?.length || 0;
-      // const features = JSON.stringify(featureId);
       imageInfo = {
         key: `(${featuresLength}-features)`,
         title: `${differentialFeatureIdKey} (${featuresLength} Features)`,
@@ -545,12 +549,14 @@ class Differential extends Component {
   };
 
   getProteinDataAlt = featureids => {
+    const featuresString = limitValues(featureids, 100);
     this.setState(
       {
         isItemSelected: true,
         isItemSVGLoaded: false,
         // isItemDatatLoaded: false,
         currentSVGs: [],
+        featuresString,
       },
       function() {
         this.handleSearchCriteriaChangeDifferential(

@@ -14,10 +14,13 @@ class DifferentialBreadcrumbs extends Component {
       onBackToTable,
       differentialFeatureIdKey,
       activeIndexDifferentialView,
+      featuresString,
     } = this.props;
-    let name = `${differentialFeatureIdKey} ${differentialFeature}`;
+    let name = splitValue(`${differentialFeatureIdKey} ${differentialFeature}`);
+    let longName = `${differentialFeatureIdKey} ${differentialFeature}`;
     if (differentialFeature === '') {
       name = imageInfoDifferential?.title || '';
+      longName = featuresString;
     }
     const BreadcrumbPopupStyle = {
       backgroundColor: '2E2E2E',
@@ -58,14 +61,12 @@ class DifferentialBreadcrumbs extends Component {
             <Breadcrumb.Divider icon="right chevron" />
             <Breadcrumb.Section active={true}>
               <Popup
-                trigger={
-                  <span className="BreadcrumbName">{splitValue(name)}</span>
-                }
+                trigger={<span className="BreadcrumbName">{name}</span>}
                 style={BreadcrumbPopupStyle}
                 inverted
                 basic
                 position="bottom left"
-                content={name}
+                content={longName}
               />
             </Breadcrumb.Section>
           </Breadcrumb>
