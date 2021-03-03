@@ -869,7 +869,13 @@ class DifferentialVolcano extends Component {
                         {svgPlot}
                       </SplitPane>
                       <Grid.Row>
-                        <div className="MultifeaturePlotBtnDiv">
+                        <div
+                          className={
+                            isDataStreamingResultsTable
+                              ? 'MultifeaturePlotBtnDiv Hide'
+                              : 'MultifeaturePlotBtnDiv Show'
+                          }
+                        >
                           <Label
                             className="MultiFeaturePlotBtn"
                             size="medium"

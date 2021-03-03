@@ -8,14 +8,17 @@ class DifferentialBreadcrumbs extends Component {
   componentDidMount() {}
 
   render() {
-    let differentialFeature = this.props.differentialFeature;
-    // if (this.props.differentialFeature.length !== 1) {
-    // differentialFeature = this.props.differentialFeature.length;
-    // }
-    // let name = this.props.imageInfoDifferential.title;
-    // if (name === '') {
-    let name = `${this.props.differentialFeatureIdKey} ${differentialFeature}`;
-    // }
+    const {
+      differentialFeature,
+      imageInfoDifferential,
+      onBackToTable,
+      differentialFeatureIdKey,
+      activeIndexDifferentialView,
+    } = this.props;
+    let name = `${differentialFeatureIdKey} ${differentialFeature}`;
+    if (differentialFeature === '') {
+      name = imageInfoDifferential?.title || '';
+    }
     const BreadcrumbPopupStyle = {
       backgroundColor: '2E2E2E',
       borderBottom: '2px solid var(--color-primary)',
@@ -35,11 +38,9 @@ class DifferentialBreadcrumbs extends Component {
                 trigger={
                   <Icon
                     name={
-                      this.props.activeIndexDifferentialView === 0
-                        ? 'table'
-                        : 'chart area'
+                      activeIndexDifferentialView === 0 ? 'table' : 'chart area'
                     }
-                    onClick={this.props.onBackToTable}
+                    onClick={onBackToTable}
                   />
                 }
                 style={BreadcrumbPopupStyle}
@@ -47,7 +48,7 @@ class DifferentialBreadcrumbs extends Component {
                 basic
                 position="bottom left"
                 content={
-                  this.props.activeIndexDifferentialView === 0
+                  activeIndexDifferentialView === 0
                     ? 'Back To Table'
                     : 'Back To Plot'
                 }

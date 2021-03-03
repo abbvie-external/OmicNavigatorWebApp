@@ -78,7 +78,12 @@ class DifferentialPlot extends Component {
       });
       panes = panes.concat(svgPanes);
     }
-    if (this.props.modelSpecificMetaFeaturesExist !== false) {
+    const isMultifeaturePlot =
+      this.props.imageInfoDifferential.key?.includes('multifeature') || false;
+    if (
+      this.props.modelSpecificMetaFeaturesExist !== false &&
+      !isMultifeaturePlot
+    ) {
       let metafeaturesTab = [
         {
           menuItem: 'Feature Data',

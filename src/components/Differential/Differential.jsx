@@ -337,8 +337,12 @@ class Differential extends Component {
     dataItem,
     imageInfoDifferential,
     featureidSpecificMetaFeaturesExist,
+    useId,
   ) => {
     const { differentialFeatureIdKey } = this.props;
+    const differentialFeatureVar = useId
+      ? id
+      : dataItem[differentialFeatureIdKey];
     const self = this;
     this.setState(
       {
@@ -354,7 +358,7 @@ class Differential extends Component {
             differentialStudy: this.props.differentialStudy || '',
             differentialModel: this.props.differentialModel || '',
             differentialTest: this.props.differentialTest || '',
-            differentialFeature: dataItem[differentialFeatureIdKey] || '',
+            differentialFeature: differentialFeatureVar || '',
           },
           false,
         );
@@ -390,7 +394,12 @@ class Differential extends Component {
     this.setState({ additionalTemplateInfoDifferentialTable: addParams });
   };
 
-  getPlot = (view, featureId, featureidSpecificMetaFeaturesExist) => {
+  getPlot = (
+    view,
+    featureId,
+    featureidSpecificMetaFeaturesExist,
+    multiFeatureCall,
+  ) => {
     const { differentialPlotTypes } = this.state;
     const {
       differentialStudy,
@@ -399,7 +408,7 @@ class Differential extends Component {
       differentialFeatureIdKey,
     } = this.props;
     let self = this;
-    const multiFeatureCall = Array.isArray(featureId);
+    // const multiFeatureCall = Array.isArray(featureId);
     let id = featureId != null ? featureId : differentialFeature;
     let imageInfo = {
       key: '',
@@ -407,10 +416,11 @@ class Differential extends Component {
       svg: [],
     };
     if (multiFeatureCall) {
-      const features = JSON.stringify(featureId);
+      const featuresLength = featureId?.length || 0;
+      // const features = JSON.stringify(featureId);
       imageInfo = {
-        key: `${features}`,
-        title: `${differentialFeatureIdKey} ${features}`,
+        key: `(${featuresLength}-features)`,
+        title: `${differentialFeatureIdKey} (${featuresLength} Features)`,
         svg: [],
       };
     } else {
@@ -510,38 +520,33 @@ class Differential extends Component {
   };
 
   getMultifeaturePlot = view => {
-    if (this.state.HighlightedFeaturesArrVolcano.length > 1) {
-      const featureIds = this.state.HighlightedFeaturesArrVolcano.map(
+    const { HighlightedFeaturesArrVolcano } = this.state;
+    const { differentialFeatureIdKey } = this.props;
+    if (HighlightedFeaturesArrVolcano.length > 1) {
+      const featureIds = HighlightedFeaturesArrVolcano.map(
         featureId => featureId.id,
       );
-      // if (view === 'volcano') {
-      //   this.getPlot('volcano', featureIds, false);
-      // } else {
       this.getProteinDataAlt(featureIds);
       // }
-    } else {
-      if (this.state.HighlightedFeaturesArrVolcano.length === 1) {
-        this.getPlot(
-          'differential',
-          this.state.HighlightedFeaturesArrVolcano[0].id,
-          true,
-        );
-      } else return;
-    }
+    } else if (HighlightedFeaturesArrVolcano.length === 1) {
+      const value = HighlightedFeaturesArrVolcano[0].id;
+      let imageInfoDifferential = {
+        key: `${value}`,
+        title: `${differentialFeatureIdKey} ${value}`,
+        svg: [],
+      };
+      this.getProteinData(value, null, imageInfoDifferential, true, true);
+    } else if (HighlightedFeaturesArrVolcano.length === 0) {
+      const featureIds = this.state.differentialResults.map(
+        featureId => featureId[differentialFeatureIdKey],
+      );
+      this.getProteinDataAlt(featureIds);
+    } else return;
   };
 
   getProteinDataAlt = featureids => {
-    const { differentialFeatureIdKey } = this.props;
-    const featuresLength = featureids.length;
-    const features = JSON.stringify(featureids);
-    const imageInfoDifferential = {
-      key: `${features}`,
-      title: `${differentialFeatureIdKey} ${featuresLength}`,
-      svg: [],
-    };
     this.setState(
       {
-        imageInfoDifferential: imageInfoDifferential,
         isItemSelected: true,
         isItemSVGLoaded: false,
         // isItemDatatLoaded: false,
@@ -553,11 +558,13 @@ class Differential extends Component {
             differentialStudy: this.props.differentialStudy || '',
             differentialModel: this.props.differentialModel || '',
             differentialTest: this.props.differentialTest || '',
-            differentialFeature: features || '',
+            differentialFeature: '' || '',
+            // differentialFeature: `(${featuresLength} Features)` || '',
+            // differentialFeatureLength: featuresLength,
           },
           false,
         );
-        this.getPlot('Differential', featureids, false);
+        this.getPlot('Differential', featureids, false, true);
       },
     );
   };
