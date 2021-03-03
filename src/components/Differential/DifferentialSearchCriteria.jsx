@@ -124,13 +124,17 @@ class DifferentialSearchCriteria extends Component {
         Object.keys(this.props.filterState)?.length > 0 &&
         this.props.filterState.constructor === Object
       ) {
-        console.log('filter state', this.props.filterState);
+        // console.log('filter state', this.props.filterState);
         const {
           sigValueP,
           differentialModel,
           differentialStudy,
           selectedOperatorP,
           selectedColP,
+          differentialTests,
+          mustDifferential,
+          notDifferential,
+          numElementsP,
         } = this.props.filterState;
         // debugger;
         // console.log('uSettings', this.state.uSettingsP);
@@ -140,6 +144,13 @@ class DifferentialSearchCriteria extends Component {
           differentialStudy: differentialStudy,
           selectedOperatorP: selectedOperatorP,
           selectedColP: selectedColP,
+          differentialTests,
+          mustDifferential,
+          notDifferential,
+          uSettingsP: {
+            ...this.state.uSettingsP,
+            numElementsP: numElementsP,
+          },
         });
       }
       this.props.onUpdateBreadcrumbClick(false);
@@ -916,6 +927,9 @@ class DifferentialSearchCriteria extends Component {
       differentialStudy,
       selectedOperatorP: selectedOperatorP,
       selectedColP: selectedColP,
+      differentialTests: this.state.differentialTests,
+      mustDifferential: this.state.mustDifferential,
+      notDifferential: this.state.notDifferential,
     });
 
     if (reloadPlotP === true && differentialTests.length > 1) {

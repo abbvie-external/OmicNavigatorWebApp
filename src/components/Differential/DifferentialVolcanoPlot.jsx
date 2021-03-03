@@ -49,7 +49,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         this.windowResized();
       }, 200);
     });
-
+    console.log('52');
     this.hexBinning(this.createCircleElements(this.differentialResults));
   }
 
@@ -422,6 +422,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       identifier,
       differentialResultsUnfiltered,
       isFilteredDifferential,
+      differentialResults,
       isUpsetVisible,
     } = this.props;
 
@@ -459,6 +460,16 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     //         JSON.parse(elem.props.data),
     //       )
     //     : differentialResultsUnfiltered;
+
+    console.log(
+      !breadcrumb
+        ? differentialResultsUnfiltered
+        : this.state.zoom.history[index].map(elem =>
+            JSON.parse(elem.props.data),
+          ),
+      breadcrumb,
+      index,
+    );
 
     var xMM = this.props.getMaxAndMin(
       !breadcrumb
@@ -593,6 +604,19 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       differentialResultsUnfiltered,
     } = this.props;
 
+    if (prevProps.doYAxisTransformation !== this.props.doYAxisTransformation) {
+      console.log('608');
+      this.hexBinning(
+        this.createCircleElements(
+          this.state.historyLastViewed[this.state.zoom.activeIndex].map(elem =>
+            JSON.parse(elem.props.data),
+          ),
+        ),
+        true,
+        this.state.zoom.activeIndex,
+      );
+    }
+
     if (!prevProps.isFilteredDifferential && isFilteredDifferential) {
       console.log(
         this.setLastViewed(
@@ -636,12 +660,14 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       isFilteredDifferential &&
       this.differentialResults.length !== differentialResults.length
     ) {
+      console.log('662');
       this.hexBinning(
         this.createCircleElements(differentialResults),
         true,
         this.state.zoom.activeIndex,
       );
     } else if (!isUpsetVisible && prevProps.isUpsetVisible) {
+      console.log('670');
       this.hexBinning(
         this.createCircleElements(
           this.state.zoom.history[0].map(elem => JSON.parse(elem.props.data)),
@@ -654,6 +680,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       isUpsetVisible &&
       prevState.zoom.activeIndex !== this.state.zoom.activeIndex
     ) {
+      console.log('682');
       this.hexBinning(
         this.createCircleElements(
           this.state.historyLastViewed[this.state.zoom.activeIndex].map(elem =>
@@ -834,11 +861,12 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     ) {
       d3.select('.volcanoPlotD3BrushSelection').call(brushObjs.move, null);
     }
-    this.hexBinning(
-      this.plotCirclesSorted,
-      true,
-      this.state.zoom.history.length - 1,
-    );
+    // console.log('865', this.state.zoom.history.length - 1);
+    // this.hexBinning(
+    //   this.plotCirclesSorted,
+    //   true,
+    //   this.state.zoom.history.length - 1,
+    // );
   };
 
   resizeBrushSelection = () => {
@@ -848,6 +876,11 @@ class DifferentialVolcanoPlot extends React.PureComponent {
 
   windowResized = () => {
     this.removeViolinBrush();
+    this.hexBinning(
+      this.plotCirclesSorted,
+      true,
+      this.state.zoom.history.length - 1,
+    );
   };
 
   doTransform(value, axis) {
@@ -1590,6 +1623,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
                   <Step
                     key={`${zoom.length}-${index}`}
                     onClick={() => {
+                      console.log('1622', index);
                       this.hexBinning(
                         this.createCircleElements(
                           this.state.historyLastViewed[index].map(elem =>
