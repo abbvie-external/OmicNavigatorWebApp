@@ -87,7 +87,7 @@ class DifferentialPlot extends Component {
       panes = panes.concat(svgPanes);
     }
     const isMultifeaturePlot =
-      this.props.imageInfoDifferential.key?.includes('multifeature') || false;
+      this.props.imageInfoDifferential.key?.includes('features') || false;
     if (
       this.props.modelSpecificMetaFeaturesExist !== false &&
       !isMultifeaturePlot
