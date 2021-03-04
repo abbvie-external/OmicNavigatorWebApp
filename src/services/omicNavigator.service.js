@@ -161,26 +161,6 @@ class OmicNavigatorService {
     }
   }
 
-  async getResultsTable(study, modelID, testID, errorCb, cancelToken) {
-    const cacheKey = `getResultsTable_${study}_${modelID}_${testID}`;
-    if (this[cacheKey] != null) {
-      return this[cacheKey];
-    } else {
-      const obj = { study, modelID, testID };
-      const promise = this.axiosPost(
-        'getResultsTable',
-        obj,
-        true,
-        errorCb,
-        cancelToken,
-        25000,
-      );
-      const dataFromPromise = await promise;
-      this[cacheKey] = dataFromPromise;
-      return dataFromPromise;
-    }
-  }
-
   async getMetaFeatures(study, model) {
     const cacheKey = `getMetaFeatures_${study}_${model}`;
     if (this[cacheKey] != null) {
@@ -270,8 +250,17 @@ class OmicNavigatorService {
     }
   }
 
-  async plotStudy(study, modelID, featureID, plotID, errorCb, cancelToken) {
+  async plotStudy(
+    study,
+    modelID,
+    featureID,
+    plotID,
+    plotType,
+    errorCb,
+    cancelToken,
+  ) {
     this.setUrl();
+    const timeoutLength = plotType === 'multiFeature' ? 250000 : 25000;
     const promise = this.ocpuPlotCall(
       'plotStudy',
       {
@@ -282,7 +271,7 @@ class OmicNavigatorService {
       },
       errorCb,
       cancelToken,
-      25000,
+      timeoutLength,
     );
     const dataFromPromise = await promise;
     return dataFromPromise;

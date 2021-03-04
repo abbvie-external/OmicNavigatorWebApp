@@ -871,7 +871,8 @@ class DifferentialVolcano extends Component {
                       <Grid.Row>
                         <div
                           className={
-                            isDataStreamingResultsTable
+                            isDataStreamingResultsTable ||
+                            HighlightedFeaturesArrVolcano.length === 1
                               ? 'MultifeaturePlotBtnDiv Hide'
                               : 'MultifeaturePlotBtnDiv Show'
                           }

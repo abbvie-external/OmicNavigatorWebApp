@@ -413,7 +413,6 @@ class Differential extends Component {
       differentialFeatureIdKey,
     } = this.props;
     let self = this;
-    // const multiFeatureCall = Array.isArray(featureId);
     let id = featureId != null ? featureId : differentialFeature;
     let imageInfo = {
       key: '',
@@ -458,8 +457,7 @@ class Differential extends Component {
             differentialModel,
             id,
             differentialPlotTypes[i].plotID,
-            // differentialPlotTypes[i].plotType,
-            // multiFeaturePlot,
+            differentialPlotTypes[i].plotType,
             // self.handleItemSelected,
             null,
             cancelToken,

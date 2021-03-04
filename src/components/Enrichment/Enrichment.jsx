@@ -1099,6 +1099,9 @@ class Enrichment extends Component {
     });
     if (enrichmentPlotTypes.length > 0) {
       _.forEach(enrichmentPlotTypes, function(plot, i) {
+        if (enrichmentPlotTypes[i].plotType === 'multiFeature') {
+          return;
+        }
         omicNavigatorService
           .plotStudy(
             enrichmentStudy,
