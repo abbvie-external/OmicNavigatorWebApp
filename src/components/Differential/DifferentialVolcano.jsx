@@ -556,6 +556,15 @@ class DifferentialVolcano extends Component {
     } else return differentialResults.length;
   };
 
+  hasMultifeaturePlots = () => {
+    if (this.props.differentialPlotTypes) {
+      const plotTypesMapped = this.props.differentialPlotTypes.map(
+        p => p.plotType,
+      );
+      return plotTypesMapped.includes('multiFeature') || false;
+    } else return false;
+  };
+
   render() {
     const {
       filteredTableData,
@@ -588,7 +597,7 @@ class DifferentialVolcano extends Component {
       tab,
       isItemSelected,
       isDataStreamingResultsTable,
-      differentialResults,
+      // differentialResults,
       HighlightedFeaturesArrVolcano,
     } = this.props;
     // let differentialVolcanoCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-Volcano`;
@@ -674,7 +683,7 @@ class DifferentialVolcano extends Component {
     };
 
     const FeaturesLength = this.getFeaturesLength();
-
+    const HasMultifeaturePlots = this.hasMultifeaturePlots();
     return (
       <Grid.Column
         className=""
@@ -871,6 +880,7 @@ class DifferentialVolcano extends Component {
                       <Grid.Row>
                         <div
                           className={
+                            !HasMultifeaturePlots ||
                             isDataStreamingResultsTable ||
                             HighlightedFeaturesArrVolcano.length === 1
                               ? 'MultifeaturePlotBtnDiv Hide'
