@@ -205,6 +205,7 @@ class DifferentialPlot extends Component {
                   txtVisible={false}
                   imageInfo={imageInfoDifferential}
                   tabIndex={activeSVGTabIndexDifferentialVar}
+                  plot={'DifferentialPlotTabsPlotSVG'}
                 />
               </Grid.Column>
             </Grid.Row>

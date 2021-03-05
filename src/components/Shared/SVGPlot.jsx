@@ -90,7 +90,7 @@ class SVGPlot extends Component {
               as="div"
               key={`${index}-${s.plotType.plotDisplay}-pane-volcano`}
             >
-              <div id="PlotSVG" className="svgSpan">
+              <div id="VolcanoPlotSVG" className="svgSpan">
                 <SVG
                   cacheRequests={true}
                   // description=""
@@ -174,6 +174,7 @@ class SVGPlot extends Component {
                   imageInfo={imageInfoVolcano}
                   tabIndex={activeSVGTabIndexVolcanoVar}
                   svgExportName={svgExportName}
+                  plot="VolcanoPlotSVG"
                 />
               </div>
               {/* <Popup
