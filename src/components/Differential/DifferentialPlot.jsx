@@ -2,6 +2,7 @@ import React, { Component, Fragment } from 'react';
 import { withRouter } from 'react-router-dom';
 import { Grid, Dimmer, Loader, Tab, Dropdown, Menu } from 'semantic-ui-react';
 import SVG from 'react-inlinesvg';
+import _ from 'lodash';
 import { roundToPrecision, loadingDimmer } from '../Shared/helpers';
 import DifferentialBreadcrumbs from './DifferentialBreadcrumbs';
 import ButtonActions from '../Shared/ButtonActions';
@@ -17,16 +18,21 @@ class DifferentialPlot extends Component {
     // isItemSVGLoaded: true,
   };
 
-  state = {
-    // activeSVGTabIndexDifferential: 0,
-    excelFlag: true,
-    pngFlag: true,
-    pdfFlag: false,
-    svgFlag: true,
-    txtFlag: false,
-    // areDifferentialPlotTabsReady: false,
-    // selectedPlot: null,
-  };
+  constructor(props) {
+    super(props);
+    this.resizeListener = this.resizeListener.bind(this);
+    this.debouncedResizeListener = _.debounce(this.resizeListener, 100);
+    this.state = {
+      // activeSVGTabIndexDifferential: 0,
+      excelFlag: true,
+      pngFlag: true,
+      pdfFlag: false,
+      svgFlag: true,
+      txtFlag: false,
+      // areDifferentialPlotTabsReady: false,
+      // selectedPlot: null,
+    };
+  }
 
   componentDidMount() {
     const { activeSVGTabIndexDifferential } = this.state;
@@ -36,13 +42,7 @@ class DifferentialPlot extends Component {
       // isSVGReadyDifferential: true,
       svgPanes: svgPanesVar,
     });
-    let resizedFn;
-    window.addEventListener('resize', () => {
-      clearTimeout(resizedFn);
-      resizedFn = setTimeout(() => {
-        this.getSVGPanes();
-      }, 200);
-    });
+    window.addEventListener('resize', this.debouncedResizeListener);
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -62,6 +62,14 @@ class DifferentialPlot extends Component {
     ) {
       this.setButtonVisibility(activeSVGTabIndexDifferential);
     }
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.debouncedResizeListener);
+  }
+
+  resizeListener() {
+    this.getSVGPanes();
   }
 
   setButtonVisibility = index => {
@@ -100,7 +108,7 @@ class DifferentialPlot extends Component {
   getSVGPanes(activeSVGTabIndexDifferential) {
     let panes = [];
     if (this.props.imageInfoDifferential.length !== 0) {
-      const pxToPtRatio = 72;
+      const pxToPtRatio = 105;
       const pointSize = 12;
       const width =
         window.innerWidth ||

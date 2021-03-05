@@ -291,7 +291,7 @@ class SplitPanesContainer extends Component {
                       divWidth={width - verticalSplitPaneSize - 300}
                       divHeight={height - horizontalSplitPaneSize - 51}
                       px
-                      pxToPtRatio={72}
+                      pxToPtRatio={105}
                       pointSize={12}
                       svgTabMax={1}
                       tab={this.props.tab}
