@@ -2,7 +2,7 @@ import React, { Component, Fragment } from 'react';
 import { withRouter } from 'react-router-dom';
 import { Grid, Dimmer, Loader, Tab, Dropdown, Menu } from 'semantic-ui-react';
 import SVG from 'react-inlinesvg';
-// import { loadingDimmer } from '../Shared/helpers';
+import { roundToPrecision, loadingDimmer } from '../Shared/helpers';
 import DifferentialBreadcrumbs from './DifferentialBreadcrumbs';
 import ButtonActions from '../Shared/ButtonActions';
 import MetafeaturesTable from './MetafeaturesTable';
@@ -35,6 +35,13 @@ class DifferentialPlot extends Component {
     this.setState({
       // isSVGReadyDifferential: true,
       svgPanes: svgPanesVar,
+    });
+    let resizedFn;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizedFn);
+      resizedFn = setTimeout(() => {
+        this.getSVGPanes();
+      }, 200);
     });
   }
 
@@ -93,8 +100,27 @@ class DifferentialPlot extends Component {
   getSVGPanes(activeSVGTabIndexDifferential) {
     let panes = [];
     if (this.props.imageInfoDifferential.length !== 0) {
+      const pxToPtRatio = 72;
+      const pointSize = 12;
+      const width =
+        window.innerWidth ||
+        document.documentElement.clientWidth ||
+        document.body.clientWidth;
+      const height =
+        window.innerHeight ||
+        document.documentElement.clientHeight ||
+        document.body.clientHeight;
+      const divWidth = width - 300;
+      const divHeight = height - 51;
+      const divWidthPt = roundToPrecision(divWidth / pxToPtRatio, 1);
+      const divHeightPt = roundToPrecision(divHeight / pxToPtRatio, 1);
+      const divWidthPtString = `&width=${divWidthPt}`;
+      const divHeightPtString = `&height=${divHeightPt}`;
+      const pointSizeString = `&pointsize=${pointSize}`;
+      const dimensions = `?${divWidthPtString}${divHeightPtString}${pointSizeString}`;
       const svgArray = [...this.props.imageInfoDifferential.svg];
       const svgPanes = svgArray.map(s => {
+        const srcUrl = `${s.svg}${dimensions}`;
         return {
           menuItem: `${s.plotType.plotDisplay}`,
           render: () => (
@@ -107,7 +133,7 @@ class DifferentialPlot extends Component {
                   // onError={error => console.log(error.message)}
                   // onLoad={(src, hasCache) => console.log(src, hasCache)}
                   // preProcessor={code => code.replace(/fill=".*?"/g, 'fill="currentColor"')}
-                  src={s.svg}
+                  src={srcUrl}
                   // title={`${s.plotType.plotDisplay}`}
                   uniqueHash="c3h0f3"
                   uniquifyIDs={true}
@@ -211,7 +237,7 @@ class DifferentialPlot extends Component {
             </Grid.Row>
           </Grid>
 
-          <Grid columns={2} className="PlotContainer">
+          <Grid className="PlotContainer">
             <Grid.Row className="PlotContainerRow">
               <Grid.Column
                 mobile={16}
