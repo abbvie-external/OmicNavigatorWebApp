@@ -460,6 +460,7 @@ class DifferentialVolcano extends Component {
       // on up/down drag, we are forcing a svg resize by change the volcano width by 1
       localStorage.setItem('volcanoWidth', width + 1);
       localStorage.setItem('volcanoHeight', adjustedSize + 1);
+      localStorage.setItem('volcanoHeightBackup', adjustedSize + 1);
       this.setState({
         volcanoHeight: adjustedSize + 1,
         volcanoWidth: width + 1,
@@ -492,6 +493,7 @@ class DifferentialVolcano extends Component {
 
   handleVolcanoVisability = () => {
     const { volcanoPlotsVisible } = this.state;
+    debugger;
     if (volcanoPlotsVisible) {
       localStorage.setItem('volcanoHeightBackup', this.state.volcanoHeight);
       this.setState({
