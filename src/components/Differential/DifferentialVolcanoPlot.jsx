@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import _ from 'lodash';
+// import { Popup, Icon } from 'semantic-ui-react';
 import './DifferentialVolcanoPlot.scss';
 import * as d3 from 'd3';
 import ButtonActions from '../Shared/ButtonActions';
@@ -59,10 +60,10 @@ class DifferentialVolcanoPlot extends Component {
       updateVolcanoLabels ||
       (volcanoCircleLabel != null &&
         prevProps.volcanoCircleLabel !== volcanoCircleLabel &&
-        this.props.volcanoDifferentialTableAll?.length > 0 &&
+        this.props.HighlightedFeaturesArrVolcano?.length > 0 &&
         this.state.brushedRawData == null)
     ) {
-      const elems = this.props.volcanoDifferentialTableAll.map(elem => {
+      const elems = this.props.HighlightedFeaturesArrVolcano.map(elem => {
         const el = document.getElementById(`volcanoDataPoint-${elem.key}`);
         return d3.select(el)._groups[0][0];
       });
@@ -687,9 +688,50 @@ class DifferentialVolcanoPlot extends Component {
     const xAxisLabelY = this.getXAxisLabelY(volcanoHeight);
     const PlotName = `${differentialStudy}_${differentialModel}_${differentialTest}_scatter`;
     if (identifier !== null && xAxisLabel !== null && yAxisLabel !== null) {
+      // const TableValuePopupStyle = {
+      //   backgroundColor: '2E2E2E',
+      //   borderBottom: '2px solid var(--color-primary)',
+      //   color: '#FFF',
+      //   padding: '1em',
+      //   maxWidth: '50vw',
+      //   fontSize: '13px',
+      //   wordBreak: 'break-all',
+      // };
       return (
         <>
           <div id="VolcanoPlotDiv">
+            {/* <div className="MultifeaturePlotButtonDiv AbsoluteExportDifferential">
+              <Popup
+                trigger={
+                  <Icon
+                    name="bar chart"
+                    size="large"
+                    color="black"
+                    className="MultiFeaturePlottingBtn"
+                    // id={
+                    //   this.props.enableMultifeaturePlotting
+                    //     ? 'PrimaryColor'
+                    //     : ''
+                    // }
+                    inverted
+                    circular
+                    disabled={!this.props.enableMultifeaturePlotting}
+                    onClick={() => this.props.onGetMultifeaturePlot('volcano')}
+                  />
+                }
+                basic
+                inverted
+                position="bottom center"
+                content={
+                  this.props.enableMultifeaturePlotting
+                    ? 'View Multifeature Plot'
+                    : 'Multifeature Plot requires two features selected'
+                }
+                mouseEnterDelay={0}
+                mouseLeaveDelay={0}
+                style={TableValuePopupStyle}
+              />
+            </div> */}
             <ButtonActions
               exportButtonSize="mini"
               plotName={PlotName}

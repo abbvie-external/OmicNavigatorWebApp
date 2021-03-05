@@ -882,56 +882,39 @@ class DifferentialSearchCriteria extends Component {
       fontSize: '13px',
     };
 
-    let studyIcon;
     let studyName = `${differentialStudy} Analysis Details`;
-
-    if (differentialStudyHrefVisible) {
-      studyIcon = (
-        <Popup
-          trigger={
-            <a
-              target="_blank"
-              rel="noopener noreferrer"
-              href={differentialStudyHref}
-            >
-              <Icon
-                name="line graph"
-                size="large"
-                className="StudyHtmlIcon"
-                inverted
-                circular
-              />
-            </a>
-          }
-          style={StudyPopupStyle}
-          className="CustomTooltip"
-          inverted
-          basic
-          position="bottom center"
-          content={studyName}
-          mouseEnterDelay={0}
-          mouseLeaveDelay={0}
-        />
-      );
-    } else {
-      studyIcon = (
-        <Popup
-          trigger={
-            <a target="_blank" rel="noopener noreferrer" href={'/'}>
-              <Icon name="line graph" size="large" circular inverted disabled />
-            </a>
-          }
-          style={StudyPopupStyle}
-          basic
-          inverted
-          className="CustomTooltip"
-          position="bottom center"
-          content={differentialStudyReportTooltip}
-          mouseEnterDelay={0}
-          mouseLeaveDelay={0}
-        />
-      );
-    }
+    let studyIcon = (
+      <Popup
+        trigger={
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href={differentialStudyHrefVisible ? differentialStudyHref : '/'}
+          >
+            <Icon
+              name="line graph"
+              size="large"
+              className="StudyHtmlIcon"
+              inverted
+              circular
+              disabled={!differentialStudyHrefVisible}
+            />
+          </a>
+        }
+        style={StudyPopupStyle}
+        className="CustomTooltip"
+        inverted
+        basic
+        position="bottom center"
+        content={
+          differentialStudyHrefVisible
+            ? studyName
+            : differentialStudyReportTooltip
+        }
+        mouseEnterDelay={0}
+        mouseLeaveDelay={0}
+      />
+    );
 
     let MultisetFiltersDifferential;
     let MultisetFilterButtonDifferential;

@@ -8,10 +8,20 @@ class DifferentialBreadcrumbs extends Component {
   componentDidMount() {}
 
   render() {
-    // let name = this.props.imageInfoDifferential.title;
-    // if (name === '') {
-    let name = `${this.props.differentialFeatureIdKey} ${this.props.differentialFeature}`;
-    // }
+    const {
+      differentialFeature,
+      imageInfoDifferential,
+      onBackToTable,
+      differentialFeatureIdKey,
+      activeIndexDifferentialView,
+      featuresString,
+    } = this.props;
+    let name = splitValue(`${differentialFeatureIdKey} ${differentialFeature}`);
+    let longName = `${differentialFeatureIdKey} ${differentialFeature}`;
+    if (differentialFeature === '') {
+      name = imageInfoDifferential?.title || '';
+      longName = featuresString;
+    }
     const BreadcrumbPopupStyle = {
       backgroundColor: '2E2E2E',
       borderBottom: '2px solid var(--color-primary)',
@@ -31,11 +41,9 @@ class DifferentialBreadcrumbs extends Component {
                 trigger={
                   <Icon
                     name={
-                      this.props.activeIndexDifferentialView === 0
-                        ? 'table'
-                        : 'chart area'
+                      activeIndexDifferentialView === 0 ? 'table' : 'chart area'
                     }
-                    onClick={this.props.onBackToTable}
+                    onClick={onBackToTable}
                   />
                 }
                 style={BreadcrumbPopupStyle}
@@ -43,7 +51,7 @@ class DifferentialBreadcrumbs extends Component {
                 basic
                 position="bottom left"
                 content={
-                  this.props.activeIndexDifferentialView === 0
+                  activeIndexDifferentialView === 0
                     ? 'Back To Table'
                     : 'Back To Plot'
                 }
@@ -53,14 +61,12 @@ class DifferentialBreadcrumbs extends Component {
             <Breadcrumb.Divider icon="right chevron" />
             <Breadcrumb.Section active={true}>
               <Popup
-                trigger={
-                  <span className="BreadcrumbName">{splitValue(name)}</span>
-                }
+                trigger={<span className="BreadcrumbName">{name}</span>}
                 style={BreadcrumbPopupStyle}
                 inverted
                 basic
                 position="bottom left"
-                content={name}
+                content={longName}
               />
             </Breadcrumb.Section>
           </Breadcrumb>
