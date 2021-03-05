@@ -40,6 +40,7 @@ class EnrichmentSearchCriteria extends Component {
       'Select a study and model to view Analysis Details',
     enrichmentModels: [],
     enrichmentAnnotations: [],
+    enrichmentStudyTooltip: 'Select a study',
     enrichmentModelTooltip: '',
     enrichmentAnnotationTooltip: '',
     enrichmentStudiesDisabled: true,
@@ -182,12 +183,16 @@ class EnrichmentSearchCriteria extends Component {
           };
         },
       );
+      const enrichmentStudyTooltip =
+        enrichmentStudyData?.package?.description || '';
       this.setState({
+        enrichmentStudyTooltip: enrichmentStudyTooltip,
         enrichmentModelsDisabled: false,
         enrichmentModels: enrichmentModelsMapped,
       });
-      this.getReportLink(enrichmentStudy, 'default');
-      if (enrichmentModel !== '') {
+      if (enrichmentModel === '') {
+        this.getReportLink(enrichmentStudy, 'default');
+      } else {
         this.props.onHandleHasBarcodeData();
         this.props.onHandlePlotTypesEnrichment(enrichmentModel);
         const enrichmentModelWithAnnotations = enrichmentModelsAndAnnotationsVar.find(
@@ -304,7 +309,12 @@ class EnrichmentSearchCriteria extends Component {
   setStudyTooltip = () => {
     if (this.props.enrichmentModel !== '') {
       this.setState({
-        enrichmentStudyReportTooltip: `The model "main" from the study ${this.props.enrichmentStudy} does not have additional analysis details available.`,
+        enrichmentStudyReportTooltip: `The model ${this.props.enrichmentModel} from the study ${this.props.enrichmentStudy} does not have additional analysis details available.`,
+      });
+    } else {
+      this.setState({
+        enrichmentStudyReportTooltip:
+          'Select a study and model to view Analysis Details',
       });
     }
   };
@@ -973,6 +983,7 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentStudyHrefVisible,
       enrichmentModels,
       enrichmentAnnotations,
+      enrichmentStudyTooltip,
       enrichmentModelTooltip,
       enrichmentAnnotationTooltip,
       enrichmentStudiesDisabled,
@@ -1189,23 +1200,34 @@ class EnrichmentSearchCriteria extends Component {
     return (
       <React.Fragment>
         <Form className="SearchCriteriaContainer">
-          <Form.Field
-            control={Select}
-            name="enrichmentStudy"
-            value={enrichmentStudy}
-            options={enrichmentStudies}
-            placeholder="Select A Study"
-            onChange={this.handleStudyChange}
-            disabled={enrichmentStudiesDisabled}
-            width={13}
-            label={{
-              children: 'Study',
-              htmlFor: 'form-select-control-estudy',
-            }}
-            search
-            searchInput={{ id: 'form-select-control-estudy' }}
-            selectOnBlur={false}
-            selectOnNavigation={false}
+          <Popup
+            trigger={
+              <Form.Field
+                control={Select}
+                name="enrichmentStudy"
+                value={enrichmentStudy}
+                options={enrichmentStudies}
+                placeholder="Select A Study"
+                onChange={this.handleStudyChange}
+                disabled={enrichmentStudiesDisabled}
+                width={13}
+                label={{
+                  children: 'Study',
+                  htmlFor: 'form-select-control-estudy',
+                }}
+                search
+                searchInput={{ id: 'form-select-control-estudy' }}
+                selectOnBlur={false}
+                selectOnNavigation={false}
+              />
+            }
+            style={StudyPopupStyle}
+            className="CustomTooltip"
+            inverted
+            position="bottom right"
+            content={enrichmentStudyTooltip}
+            mouseEnterDelay={1000}
+            mouseLeaveDelay={0}
           />
           <span className="StudyHtmlIconDivE">{studyIcon}</span>
           <Popup
