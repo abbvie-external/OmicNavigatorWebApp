@@ -18,7 +18,6 @@ import './SVGPlot.scss';
 
 class SVGPlot extends Component {
   state = {
-    isSVGReady: false,
     activeSVGTabIndexVolcano: 0,
   };
 
@@ -26,15 +25,14 @@ class SVGPlot extends Component {
     this.getSVGPanes();
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps) {
     if (
-      this.state.isSVGReady &&
-      this.props.imageInfoVolcanoLength > 0 &&
+      this.state.isSVGReadyVolcano &&
       (prevProps.imageInfoVolcanoLength !== this.props.imageInfoVolcanoLength ||
+        prevProps.imageInfoVolcano.key !== this.props.imageInfoVolcano.key ||
         prevProps.volcanoWidth !== this.props.volcanoWidth ||
         prevProps.volcanoHeight !== this.props.volcanoHeight)
     ) {
-      debugger;
       this.getSVGPanes();
     }
   }
@@ -69,8 +67,9 @@ class SVGPlot extends Component {
       divHeight,
       pxToPtRatio,
       pointSize,
+      imageInfoVolcanoLength,
     } = this.props;
-    if (imageInfoVolcano.length !== 0) {
+    if (imageInfoVolcanoLength !== 0) {
       let dimensions = '';
       if (divWidth && divHeight && pxToPtRatio) {
         const divWidthPt = roundToPrecision(divWidth / pxToPtRatio, 1);
@@ -89,7 +88,7 @@ class SVGPlot extends Component {
             <Tab.Pane
               attached="true"
               as="div"
-              key={`${index}-${s.plotType.plotDisplay}-pane`}
+              key={`${index}-${s.plotType.plotDisplay}-pane-volcano`}
             >
               <div id="PlotSVG" className="svgSpan">
                 <SVG
@@ -110,22 +109,10 @@ class SVGPlot extends Component {
         };
       });
       this.setState({
-        isSVGReady: true,
+        isSVGReadyVolcano: true,
         svgPanes: panes,
       });
-    }
-  };
-
-  getButtonActionsClass = () => {
-    // if (
-    // this.props.activeIndex === 1 &&
-    // this.props.activeIndexDifferentialView === 0
-    // this.props.tab === 'differential'
-    // ) {
-    // return 'export-svg Hide';
-    // } else {
-    return 'export-svg ShowBlock';
-    // }
+    } else return null;
   };
 
   render() {
@@ -134,13 +121,15 @@ class SVGPlot extends Component {
       isVolcanoPlotSVGLoaded,
       tabsMessage,
       volcanoPlotsVisible,
+      svgExportName,
+      tab,
     } = this.props;
+
+    const { activeSVGTabIndexVolcano, svgPanes } = this.state;
+
     if (volcanoPlotsVisible) {
-      if (this.state.isSVGReady) {
+      if (this.state.isSVGReadyVolcano) {
         if (imageInfoVolcano.key != null && isVolcanoPlotSVGLoaded) {
-          const { svgExportName, tab } = this.props;
-          const { activeSVGTabIndexVolcano, svgPanes } = this.state;
-          const ButtonActionsClass = this.getButtonActionsClass();
           const DropdownClass =
             this.props.differentialPlotTypes.length > this.props.svgTabMax
               ? 'Show svgPlotDropdown'
@@ -169,7 +158,7 @@ class SVGPlot extends Component {
           });
           return (
             <div className="svgContainer">
-              <div className={ButtonActionsClass}>
+              <div className="export-svg ShowBlock">
                 <ButtonActions
                   exportButtonSize={'mini'}
                   excelVisible={false}
