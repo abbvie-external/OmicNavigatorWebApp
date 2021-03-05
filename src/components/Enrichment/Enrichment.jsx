@@ -1092,9 +1092,9 @@ class Enrichment extends Component {
     const { enrichmentPlotTypes } = this.state;
     const { enrichmentStudy, enrichmentModel } = this.props;
     let id = featureId != null ? featureId : '';
-    let imageInfoEnrichment = { key: '', title: '', svg: [] };
-    imageInfoEnrichment.title = this.state.imageInfoEnrichment.title;
-    imageInfoEnrichment.key = this.state.imageInfoEnrichment.key;
+    let imageInfoEnrichmentVar = { key: '', title: '', svg: [] };
+    imageInfoEnrichmentVar.title = this.state.imageInfoEnrichment.title;
+    imageInfoEnrichmentVar.key = this.state.imageInfoEnrichment.key;
     this.setState({ svgExportName: id });
     let handleSVGCb = this.handleSVG;
     let handlePlotStudyError = this.handlePlotStudyError;
@@ -1121,9 +1121,9 @@ class Enrichment extends Component {
                 plotType: enrichmentPlotTypes[i],
                 svg: svgUrl,
               };
-              imageInfoEnrichment.svg.push(svgInfo);
-              currentSVGs.push(svgUrl);
-              handleSVGCb(imageInfoEnrichment);
+              imageInfoEnrichmentVar.svg.push(svgInfo);
+              // currentSVGs.push(svgUrl);
+              handleSVGCb(imageInfoEnrichmentVar);
             }
           })
           .catch(error => {
@@ -1157,9 +1157,10 @@ class Enrichment extends Component {
     );
   };
 
-  handleSVG = imageInfoEnrichment => {
+  handleSVG = imageInfoEnrichmentVar => {
     this.setState({
-      imageInfoEnrichment: imageInfoEnrichment,
+      imageInfoEnrichment: imageInfoEnrichmentVar,
+      imageInfoEnrichmentLength: imageInfoEnrichmentVar.svg?.length || 0,
       SVGPlotLoaded: true,
       SVGPlotLoading: false,
     });

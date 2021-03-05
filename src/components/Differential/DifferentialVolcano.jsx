@@ -493,7 +493,6 @@ class DifferentialVolcano extends Component {
 
   handleVolcanoVisability = () => {
     const { volcanoPlotsVisible } = this.state;
-    debugger;
     if (volcanoPlotsVisible) {
       localStorage.setItem('volcanoHeightBackup', this.state.volcanoHeight);
       this.setState({

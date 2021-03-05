@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import {
   Loader,
   Dimmer,
@@ -8,83 +8,86 @@ import {
   Message,
   // Menu,
   // Label,
+  Dropdown,
 } from 'semantic-ui-react';
 import SVG from 'react-inlinesvg';
-import { loadingDimmer } from '../Shared/helpers';
+import { roundToPrecision, loadingDimmer } from '../Shared/helpers';
 import ButtonActions from '../Shared/ButtonActions';
 import './EnrichmentSVGPlot.scss';
 
-class EnrichmentSVGPlot extends Component {
+class EnrichmentSVGPlot extends PureComponent {
   state = {
-    isSVGReady: false,
+    activeSVGTabIndexEnrichment: 0,
   };
 
   componentDidMount() {
-    this.setState({
-      isSVGReady: true,
-    });
+    this.getSVGPanes();
   }
 
-  // componentDidUpdate(prevProps, prevState) {
-  //   if (prevProps.imageInfoEnrichment !== this.props.imageInfoEnrichment) {
-  //     this.forceUpdate();
-  //   }
-  // }
+  componentDidUpdate(prevProps) {
+    if (
+      // this.state.isSVGReadyEnrichment &&
+      // prevProps.HighlightedProteins !== this.props.HighlightedProteins ||
+      prevProps.imageInfoEnrichmentLength !==
+        this.props.imageInfoEnrichmentLength ||
+      prevProps.imageInfoEnrichment.key !==
+        this.props.imageInfoEnrichment.key ||
+      prevProps.divWidth !== this.props.divWidth ||
+      prevProps.divHeight !== this.props.divHeight
+    ) {
+      this.getSVGPanes();
+    }
+  }
 
   handleTabChange = (e, { activeIndex }) => {
-    this.props.onSVGTabChange(activeIndex);
+    this.setState({
+      activeSVGTabIndexEnrichment: activeIndex,
+    });
   };
 
-  navigateToDifferentialFeature = evt => {
-    const testAndDescription = this.props.imageInfoEnrichment.key.split(':');
-    const test = testAndDescription[0] || '';
-    const featureID = this.props.HighlightedProteins[0]?.featureID;
-    this.props.onFindDifferentialFeature(test, featureID);
+  handlePlotDropdownChange = (e, { value }) => {
+    this.setState({
+      activeSVGTabIndexEnrichment: value,
+    });
   };
 
-  getSVGPanes(activeSvgTabIndexEnrichment) {
-    // const BreadcrumbPopupStyle = {
-    //   backgroundColor: '2E2E2E',
-    //   borderBottom: '2px solid var(--color-primary)',
-    //   color: '#FFF',
-    //   padding: '1em',
-    //   maxWidth: '50vw',
-    //   fontSize: '13px',
-    //   wordBreak: 'break-all',
-    // };
-    if (this.props.imageInfoEnrichment.length !== 0) {
-      const heightVar = this.props.divHeight || null;
-      const widthVar = this.props.divWidth || null;
-      const pointSizeVar = this.props.pointSize || null;
+  // navigateToDifferentialFeature = evt => {
+  //   const testAndDescription = this.props.imageInfoEnrichment.key.split(':');
+  //   const test = testAndDescription[0] || '';
+  //   const featureID = this.props.HighlightedProteins[0]?.featureID;
+  //   this.props.onFindDifferentialFeature(test, featureID);
+  // };
+
+  getSVGPanes = () => {
+    const {
+      imageInfoEnrichment,
+      divWidth,
+      divHeight,
+      pxToPtRatio,
+      pointSize,
+      imageInfoEnrichmentLength,
+    } = this.props;
+    if (imageInfoEnrichmentLength > 0) {
       let dimensions = '';
-      if (heightVar && widthVar) {
-        dimensions = `?${widthVar}${heightVar}${pointSizeVar}`;
+      if (divWidth && divHeight && pxToPtRatio) {
+        const divWidthPt = roundToPrecision(divWidth / pxToPtRatio, 1);
+        const divHeightPt = roundToPrecision(divHeight / pxToPtRatio, 1);
+        const divWidthPtString = `&width=${divWidthPt}`;
+        const divHeightPtString = `&height=${divHeightPt}`;
+        const pointSizeString = `&pointsize=${pointSize}`;
+        dimensions = `?${divWidthPtString}${divHeightPtString}${pointSizeString}`;
       }
-      console.log(dimensions);
-      const svgArray = this.props.imageInfoEnrichment.svg;
-      // const svgArrayReversed = svgArray.reverse();
-      // const numberOfPlots = svgArray.length;
+      const svgArray = imageInfoEnrichment.svg;
       const panes = svgArray.map((s, index) => {
         let srcUrl = `${s.svg}${dimensions}`;
         return {
           menuItem: `${s.plotType.plotDisplay}`,
-          // menuItem: limitString(`${s.plotType.plotDisplay}`, numberOfPlots, 5),
-          // menuItem: (
-          //   <Popup
-          //     trigger={
-          //       <Menu.Item key={`${s.plotType.plotDisplay}`} content="test">
-          //         <Label>{index}</Label>
-          //       </Menu.Item>
-          //     }
-          //     style={BreadcrumbPopupStyle}
-          //     inverted
-          //     basic
-          //     position="bottom left"
-          //     content={`${s.plotType.plotDisplay}`}
-          //   />
-          // ),
           render: () => (
-            <Tab.Pane attached="true" as="div">
+            <Tab.Pane
+              attached="true"
+              as="div"
+              key={`${index}-${s.plotType.plotDisplay}-pane-enrichment`}
+            >
               <div id="PlotSVG" className="svgSpan">
                 <SVG
                   cacheRequests={true}
@@ -103,75 +106,74 @@ class EnrichmentSVGPlot extends Component {
           ),
         };
       });
-
-      return (
-        <Tab
-          menu={{ secondary: true, pointing: true, className: 'SVGDiv' }}
-          panes={panes}
-          onTabChange={this.handleTabChange}
-          activeIndex={activeSvgTabIndexEnrichment}
-        />
-      );
-    } else {
-      return (
-        <Message
-          className="NoPlotsMessage"
-          icon="question mark"
-          header="No Plots Available"
-        />
-      );
+      this.setState({
+        isSVGReadyEnrichment: true,
+        svgPanes: panes,
+      });
     }
-  }
-
-  getButtonActionsClass = () => {
-    // if (
-    // this.props.activeIndex === 1 &&
-    // this.props.activeIndexDifferentialView === 0
-    // this.props.tab === 'differential'
-    // ) {
-    // return 'export-svg Hide';
-    // } else {
-    return 'export-svg ShowBlock';
-    // }
   };
 
   render() {
-    if (this.state.isSVGReady) {
-      const {
-        activeSvgTabIndexEnrichment,
-        imageInfoEnrichment,
-        svgExportName,
-        tab,
-      } = this.props;
-      const ButtonActionsClass = this.getButtonActionsClass();
+    const {
+      imageInfoEnrichment,
+      imageInfoEnrichmentLength,
+      svgExportName,
+      tab,
+      SVGPlotLoaded,
+      SVGPlotLoading,
+    } = this.props;
 
-      // const BreadcrumbPopupStyle = {
-      //   backgroundColor: '2E2E2E',
-      //   borderBottom: '2px solid var(--color-primary)',
-      //   color: '#FFF',
-      //   padding: '1em',
-      //   maxWidth: '50vw',
-      //   fontSize: '13px',
-      //   wordBreak: 'break-all',
-      // };
-      const svgPanes = this.getSVGPanes(activeSvgTabIndexEnrichment);
-      return (
-        <div className="svgContainer">
-          <div className={ButtonActionsClass}>
-            <ButtonActions
-              exportButtonSize={'mini'}
-              excelVisible={false}
-              pdfVisible={false}
-              pngVisible={true}
-              svgVisible={true}
-              txtVisible={false}
-              tab={tab}
-              imageInfo={imageInfoEnrichment}
-              tabIndex={activeSvgTabIndexEnrichment}
-              svgExportName={svgExportName}
-            />
-          </div>
-          {/* <Popup
+    const {
+      activeSVGTabIndexEnrichment,
+      svgPanes,
+      isSVGReadyEnrichment,
+    } = this.state;
+
+    if (isSVGReadyEnrichment) {
+      if (imageInfoEnrichment.key != null && SVGPlotLoaded) {
+        const DropdownClass =
+          this.props.enrichmentPlotTypes.length > this.props.svgTabMax
+            ? 'Show svgPlotDropdown'
+            : 'Hide svgPlotDropdown';
+        const TabMenuClassEnrichment =
+          this.props.enrichmentPlotTypes.length > this.props.svgTabMax
+            ? 'Hide'
+            : 'Show';
+        // const BreadcrumbPopupStyle = {
+        //   backgroundColor: '2E2E2E',
+        //   borderBottom: '2px solid var(--color-primary)',
+        //   color: '#FFF',
+        //   padding: '1em',
+        //   maxWidth: '50vw',
+        //   fontSize: '13px',
+        //   wordBreak: 'break-all',
+        // };
+        const activeSVGTabIndexEnrichmentVar = activeSVGTabIndexEnrichment || 0;
+        const svgArray = imageInfoEnrichment.svg;
+        const plotOptions = svgArray.map(function(s, index) {
+          return {
+            key: `${index}=EnrichmentPlotDropdownOption`,
+            text: s.plotType.plotDisplay,
+            value: index,
+          };
+        });
+        return (
+          <div className="svgContainer">
+            <div className="export-svg ShowBlock">
+              <ButtonActions
+                exportButtonSize={'mini'}
+                excelVisible={false}
+                pdfVisible={false}
+                pngVisible={true}
+                svgVisible={true}
+                txtVisible={false}
+                tab={tab}
+                imageInfo={imageInfoEnrichment}
+                tabIndex={activeSVGTabIndexEnrichmentVar}
+                svgExportName={svgExportName}
+              />
+            </div>
+            {/* <Popup
             trigger={
               <Icon
                 name="bullseye"
@@ -186,18 +188,45 @@ class EnrichmentSVGPlot extends Component {
             position="bottom left"
             content="view in differential analysis section"
           /> */}
-          {svgPanes}
-        </div>
-      );
-    } else {
-      return (
-        <div>
+            <Dropdown
+              search
+              selection
+              compact
+              options={plotOptions}
+              value={plotOptions[activeSVGTabIndexEnrichmentVar]?.value}
+              onChange={this.handlePlotDropdownChange}
+              className={DropdownClass}
+            />
+            <Tab
+              menu={{
+                secondary: true,
+                pointing: true,
+                className: TabMenuClassEnrichment,
+              }}
+              panes={svgPanes}
+              onTabChange={this.handleTabChange}
+              activeIndex={activeSVGTabIndexEnrichmentVar}
+            />
+          </div>
+        );
+      } else if (!SVGPlotLoaded & !SVGPlotLoading) {
+        return (
+          <div className="PlotInstructions">
+            <h4 className="PlotInstructionsText">
+              Select barcode line/s to display SVG Plot
+            </h4>
+          </div>
+        );
+      } else if (!SVGPlotLoaded & SVGPlotLoading) {
+        return (
           <Dimmer active inverted>
-            <Loader size="large">SVG Loading</Loader>
+            <Loader size="large">Loading Plots</Loader>
           </Dimmer>
-        </div>
-      );
-    }
+        );
+      } else {
+        return <div>{loadingDimmer}</div>;
+      }
+    } else return null;
   }
 }
 

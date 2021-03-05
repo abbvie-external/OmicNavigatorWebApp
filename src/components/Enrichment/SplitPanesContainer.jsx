@@ -203,37 +203,6 @@ class SplitPanesContainer extends Component {
     );
   };
 
-  getSVGPlot = () => {
-    const tabChangeCb = this.handleSVGTabChange;
-    const { SVGPlotLoaded, SVGPlotLoading } = this.props;
-    if (!SVGPlotLoaded & !SVGPlotLoading) {
-      return (
-        <div className="PlotInstructions">
-          <h4 className="PlotInstructionsText">
-            Select barcode line/s to display SVG Plot
-          </h4>
-        </div>
-      );
-    } else if (!SVGPlotLoaded & SVGPlotLoading) {
-      return (
-        <Dimmer active inverted>
-          <Loader size="large">Loading Plots</Loader>
-        </Dimmer>
-      );
-    } else {
-      return (
-        <EnrichmentSVGPlot
-          {...this.props}
-          {...this.state}
-          // divHeight={`&height=${this.state.enrichmentSvgHeight}`}
-          // divWidth={`&width=${this.state.enrichmentSvgWidth}`}
-          // pointSize={`&pointsize=11`}
-          onSVGTabChange={tabChangeCb}
-        />
-      );
-    }
-  };
-
   splitPaneResized = (size, paneType) => {
     //   const volcanoSvgWidthPx =
     //   this.props.fwdRefDVC.current?.offsetWidth - size || 500;
@@ -255,9 +224,17 @@ class SplitPanesContainer extends Component {
   };
 
   render() {
+    const { verticalSplitPaneSize, horizontalSplitPaneSize } = this.state;
     const BarcodePlot = this.getBarcodePlot();
     const ViolinAndTable = this.getViolinAndTable();
-    const SVGPlot = this.getSVGPlot();
+    const width =
+      window.innerWidth ||
+      document.documentElement.clientWidth ||
+      document.body.clientWidth;
+    const height =
+      window.innerHeight ||
+      document.documentElement.clientHeight ||
+      document.body.clientHeight;
 
     return (
       <div className="PlotsWrapper">
@@ -309,7 +286,27 @@ class SplitPanesContainer extends Component {
                   }
                 >
                   <div id="ViolinAndTableSplitContainer">{ViolinAndTable}</div>
-                  <div id="SVGSplitContainer">{SVGPlot}</div>
+                  <div id="SVGSplitContainer">
+                    <EnrichmentSVGPlot
+                      divWidth={width - verticalSplitPaneSize - 300}
+                      divHeight={height - horizontalSplitPaneSize - 51}
+                      px
+                      pxToPtRatio={72}
+                      pointSize={12}
+                      svgTabMax={1}
+                      tab={this.props.tab}
+                      imageInfoEnrichment={this.props.imageInfoEnrichment}
+                      imageInfoEnrichmentLength={
+                        this.props.imageInfoEnrichmentLength
+                      }
+                      svgExportName={this.props.svgExportName}
+                      enrichmentPlotTypes={this.props.enrichmentPlotTypes}
+                      // isEnrichmentPlotSVGLoaded={this.props.isEnrichmentPlotSVGLoaded}
+                      SVGPlotLoaded={this.props.SVGPlotLoaded}
+                      SVGPlotLoading={this.props.SVGPlotLoading}
+                      HighlightedProteins={this.props.HighlightedProteins}
+                    />
+                  </div>
                 </SplitPane>
               </SplitPane>
             </Grid.Column>

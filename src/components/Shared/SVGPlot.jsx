@@ -125,10 +125,14 @@ class SVGPlot extends Component {
       tab,
     } = this.props;
 
-    const { activeSVGTabIndexVolcano, svgPanes } = this.state;
+    const {
+      activeSVGTabIndexVolcano,
+      svgPanes,
+      isSVGReadyVolcano,
+    } = this.state;
 
     if (volcanoPlotsVisible) {
-      if (this.state.isSVGReadyVolcano) {
+      if (isSVGReadyVolcano) {
         if (imageInfoVolcano.key != null && isVolcanoPlotSVGLoaded) {
           const DropdownClass =
             this.props.differentialPlotTypes.length > this.props.svgTabMax
