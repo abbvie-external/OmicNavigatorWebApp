@@ -3,7 +3,7 @@ import { withRouter } from 'react-router-dom';
 import { Grid, Dimmer, Loader, Tab, Dropdown, Menu } from 'semantic-ui-react';
 import SVG from 'react-inlinesvg';
 import _ from 'lodash';
-import { roundToPrecision, loadingDimmer } from '../Shared/helpers';
+import { roundToPrecision } from '../Shared/helpers';
 import DifferentialBreadcrumbs from './DifferentialBreadcrumbs';
 import ButtonActions from '../Shared/ButtonActions';
 import MetafeaturesTable from './MetafeaturesTable';
@@ -118,8 +118,11 @@ class DifferentialPlot extends Component {
         window.innerHeight ||
         document.documentElement.clientHeight ||
         document.body.clientHeight;
-      const divWidth = width - 300;
-      const divHeight = height - 51;
+      debugger;
+      const divWidth =
+        this.props.fwdRefDVC?.current?.offsetWidth - 25 || width - 310;
+      const divHeight =
+        this.props.fwdRefDVC?.current?.offsetHeight - 115 || height - 50;
       const divWidthPt = roundToPrecision(divWidth / pxToPtRatio, 1);
       const divHeightPt = roundToPrecision(divHeight / pxToPtRatio, 1);
       const divWidthPtString = `&width=${divWidthPt}`;

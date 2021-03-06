@@ -12,6 +12,7 @@ import {
   splitValue,
   Linkout,
   loadingDimmer,
+  roundToPrecision,
 } from '../Shared/helpers';
 import { omicNavigatorService } from '../../services/omicNavigator.service';
 import DifferentialVolcano from './DifferentialVolcano';
@@ -28,63 +29,77 @@ class Differential extends Component {
     differentialFeature: '',
   };
 
-  state = {
-    isValidSearchDifferential: false,
-    isSearchingDifferential: false,
-    isVolcanoTableLoading: false,
-    // differentialResults: [],
-    // differentialResultsUnfiltered: [],
-    /**
-     * @type {QHGrid.ColumnConfig[]}
-     */
-    // differentialColumns: [],
-    filterableColumnsP: [],
-    multisetPlotInfoDifferential: {
-      title: '',
-      svg: '',
-    },
-    isItemSelected: false,
-    isItemSVGLoaded: false,
-    // isItemDatatLoaded: false,
-    // HighlightedFeaturesArrVolcano: [],
-    // volcanoDifferentialTableRowMax: '',
-    // volcanoDifferentialTableRowOther: [],
-    // maxObjectIdentifier: null,
-    imageInfoVolcano: {
-      key: null,
-      title: '',
-      svg: [],
-    },
-    imageInfoDifferential: {
-      key: null,
-      title: '',
-      svg: [],
-    },
-    multisetPlotAvailableDifferential: false,
-    animation: 'uncover',
-    direction: 'left',
-    visible: false,
-    plotButtonActiveDifferential: false,
-    multisetQueriedDifferential: false,
-    thresholdColsP: [],
-    tabsMessage: 'Select a feature to display plots',
-    // differentialPlotTypes: [],
-    differentialStudyMetadata: [],
-    differentialModelsAndTests: [],
-    differentialTestsMetadata: [],
-    modelSpecificMetaFeaturesExist: true,
-    resultsLinkouts: [],
-    resultsFavicons: [],
-    isVolcanoPlotSVGLoaded: true,
-    metaFeaturesDataDifferential: [],
-    allMetaFeaturesDataDifferential: [],
-    isDataStreamingResultsTable: false,
-  };
+  constructor(props) {
+    super(props);
+    this.resizeListener = this.resizeListener.bind(this);
+    this.debouncedResizeListener = _.debounce(this.resizeListener, 100);
+    this.state = {
+      isValidSearchDifferential: false,
+      isSearchingDifferential: false,
+      isVolcanoTableLoading: false,
+      // differentialResults: [],
+      // differentialResultsUnfiltered: [],
+      /**
+       * @type {QHGrid.ColumnConfig[]}
+       */
+      // differentialColumns: [],
+      filterableColumnsP: [],
+      multisetPlotInfoDifferential: {
+        title: '',
+        svg: '',
+      },
+      isItemSelected: false,
+      isItemSVGLoaded: false,
+      // isItemDatatLoaded: false,
+      // HighlightedFeaturesArrVolcano: [],
+      // volcanoDifferentialTableRowMax: '',
+      // volcanoDifferentialTableRowOther: [],
+      // maxObjectIdentifier: null,
+      imageInfoVolcano: {
+        key: null,
+        title: '',
+        svg: [],
+      },
+      imageInfoDifferential: {
+        key: null,
+        title: '',
+        svg: [],
+      },
+      multisetPlotAvailableDifferential: false,
+      animation: 'uncover',
+      direction: 'left',
+      visible: false,
+      plotButtonActiveDifferential: false,
+      multisetQueriedDifferential: false,
+      thresholdColsP: [],
+      tabsMessage: 'Select a feature to display plots',
+      // differentialPlotTypes: [],
+      differentialStudyMetadata: [],
+      differentialModelsAndTests: [],
+      differentialTestsMetadata: [],
+      modelSpecificMetaFeaturesExist: true,
+      resultsLinkouts: [],
+      resultsFavicons: [],
+      isVolcanoPlotSVGLoaded: true,
+      metaFeaturesDataDifferential: [],
+      allMetaFeaturesDataDifferential: [],
+      isDataStreamingResultsTable: false,
+    };
+  }
+
   differentialViewContainerRef = React.createRef();
   differentialGridRef = React.createRef();
 
   shouldComponentUpdate(nextProps) {
     return nextProps.tab === 'differential';
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.debouncedResizeListener);
+  }
+
+  resizeListener() {
+    this.forceUpdate();
   }
 
   handleSearchTransitionDifferential = bool => {
@@ -848,6 +863,27 @@ class Differential extends Component {
       visible,
     } = this.state;
     const { tab, differentialStudy, differentialModel } = this.props;
+    const pxToPtRatio = 105;
+    const pointSize = 12;
+    const width =
+      window.innerWidth ||
+      document.documentElement.clientWidth ||
+      document.body.clientWidth;
+    const height =
+      window.innerHeight ||
+      document.documentElement.clientHeight ||
+      document.body.clientHeight;
+    const divWidth =
+      this.differentialViewContainerRef?.current?.parentElement?.offsetWidth ||
+      width - 310;
+    const divHeight = height - 100;
+    const divWidthPt = roundToPrecision(divWidth / pxToPtRatio, 1);
+    const divHeightPt = roundToPrecision(divHeight / pxToPtRatio, 1);
+    const divWidthPtString = `&width=${divWidthPt}`;
+    const divHeightPtString = `&height=${divHeightPt}`;
+    const pointSizeString = `&pointsize=${pointSize}`;
+    const dimensions = `?${divWidthPtString}${divHeightPtString}${pointSizeString}`;
+    const srcUrl = `${multisetPlotInfoDifferential.svg}${dimensions}`;
     const VerticalSidebar = ({ animation, visible }) => (
       <Sidebar
         as={'div'}
@@ -890,7 +926,7 @@ class Differential extends Component {
             // onError={error => console.log(error.message)}
             // onLoad={(src, hasCache) => console.log(src, hasCache)}
             // preProcessor={code => code.replace(/fill=".*?"/g, 'fill="currentColor"')}
-            src={multisetPlotInfoDifferential.svg}
+            src={srcUrl}
             // title={`${s.plotType.plotDisplay}`}
             uniqueHash="b2g9e2"
             uniquifyIDs={true}
