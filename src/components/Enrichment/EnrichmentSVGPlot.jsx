@@ -158,7 +158,7 @@ class EnrichmentSVGPlot extends PureComponent {
           };
         });
         return (
-          <div className="svgContainer">
+          <div className="svgContainerEnrichment">
             <div className="export-svg ShowBlock">
               <ButtonActions
                 exportButtonSize={'mini'}

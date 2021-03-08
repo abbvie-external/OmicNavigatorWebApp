@@ -1,7 +1,15 @@
-.svgContainer {
+.svgContainerEnrichment {
   height: 100% !important;
   width: 100% !important;
   margin: 0px 15px 0px 15px !important;
+  display: flex;
+  flex-direction: column;
+
+  .svgPlotDropdown {
+    max-width: fit-content !important;
+    z-index: 5 !important;
+    margin-top: 5px;
+  }
 
   .ui.secondary.pointing.menu {
     margin-left: 35px !important;
@@ -31,13 +39,8 @@
   }
 }
 
-.svgContainer {
-  display: flex;
-  flex-direction: column;
-}
-
 .export-svg {
-  margin: 5px 20px 5px 0px;
+  margin: 5px 20px 5px 0px !important;
   position: absolute;
   right: 0;
 }

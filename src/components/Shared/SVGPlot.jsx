@@ -161,7 +161,7 @@ class SVGPlot extends Component {
             };
           });
           return (
-            <div className="svgContainer">
+            <div className="svgContainerVolcano">
               <div className="export-svg ShowBlock">
                 <ButtonActions
                   exportButtonSize={'mini'}
@@ -227,7 +227,7 @@ class SVGPlot extends Component {
           );
         }
       } else {
-        return <div>{loadingDimmer}</div>;
+        return null;
       }
     } else return null;
   }

@@ -671,7 +671,7 @@ class Differential extends Component {
         }
         if (noPlots && !modelSpecificMetaFeaturesExist) {
           self.setState({
-            tabsMessage: 'No plots or feature data available',
+            tabsMessage: 'No plots available',
           });
         }
         return {
@@ -922,7 +922,7 @@ class Differential extends Component {
           <SVG
             cacheRequests={true}
             // description=""
-            loader={<span>{loadingDimmer}</span>}
+            // loader={<span>{loadingDimmer}</span>}
             // onError={error => console.log(error.message)}
             // onLoad={(src, hasCache) => console.log(src, hasCache)}
             // preProcessor={code => code.replace(/fill=".*?"/g, 'fill="currentColor"')}
