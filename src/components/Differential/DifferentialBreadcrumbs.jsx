@@ -26,24 +26,13 @@ class DifferentialBreadcrumbs extends Component {
             <Breadcrumb.Section className="BreadcrumbLink">
               <Popup
                 trigger={
-                  <Icon
-                    name={
-                      this.props.activeIndexDifferentialView === 0
-                        ? 'table'
-                        : 'chart area'
-                    }
-                    onClick={this.props.onBackToTable}
-                  />
+                  <Icon name="table" onClick={this.props.onBackToTable} />
                 }
                 style={BreadcrumbPopupStyle}
                 inverted
                 basic
                 position="bottom left"
-                content={
-                  this.props.activeIndexDifferentialView === 0
-                    ? 'Back To Table'
-                    : 'Back To Plot'
-                }
+                content="Back To Table"
                 closeOnTriggerClick
               />
             </Breadcrumb.Section>
