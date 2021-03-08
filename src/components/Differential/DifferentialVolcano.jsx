@@ -30,7 +30,7 @@ class DifferentialVolcano extends Component {
   state = {
     volcanoHeight: parseInt(localStorage.getItem('volcanoHeight'), 10) || 1,
     volcanoHeightBackup:
-      parseInt(localStorage.getItem('volcanoHeightBackup'), 10) || 300,
+      parseInt(localStorage.getItem('volcanoHeightBackup'), 10) || 350,
     volcanoWidth: parseInt(localStorage.getItem('volcanoWidth'), 10) || 500,
     volcanoPlotsVisible: false,
     // JSON.parse(localStorage.getItem('volcanoPlotsVisible')) || false,
@@ -420,25 +420,6 @@ class DifferentialVolcano extends Component {
       });
     }
   };
-  getVolcanoPlot = () => {
-    const { volcanoPlotsVisible } = this.state;
-    if (volcanoPlotsVisible) {
-      return (
-        <DifferentialVolcanoPlot
-          ref={this.differentialVolcanoPlotRef}
-          {...this.state}
-          {...this.props}
-          handleVolcanoPlotSelectionChange={
-            this.handleVolcanoPlotSelectionChange
-          }
-          getMaxAndMin={this.getMaxAndMin}
-          onHandleDotClick={this.handleDotClick}
-        ></DifferentialVolcanoPlot>
-      );
-    } else {
-      return <p>Loading</p>;
-    }
-  };
 
   onSizeChange = (newSize, paneType) => {
     const { volcanoWidth } = this.state;
@@ -452,7 +433,6 @@ class DifferentialVolcano extends Component {
       // on up/down drag, we are forcing a svg resize by change the volcano width by 1
       localStorage.setItem('volcanoWidth', width + 1);
       localStorage.setItem('volcanoHeight', adjustedSize + 1);
-      localStorage.setItem('volcanoHeightBackup', adjustedSize + 1);
       this.setState({
         volcanoHeight: adjustedSize + 1,
         volcanoWidth: width + 1,
@@ -490,22 +470,13 @@ class DifferentialVolcano extends Component {
       this.setState({
         volcanoHeightBackup: this.state.volcanoHeight,
       });
-      this.props.onHandleSelectedVolcano([]);
     }
     const size = !volcanoPlotsVisible ? this.state.volcanoHeightBackup : 0;
     this.onSizeChange(size, 'horizontal');
     this.setState({
       volcanoPlotsVisible: !volcanoPlotsVisible,
     });
-    // localStorage.setItem(`volcanoPlotsVisible`, !volcanoPlotsVisible);
   };
-
-  // handlePlotAnimationVolcano = animation => () => {
-  //   this.setState(prevState => ({
-  //     animation,
-  //     visible: !prevState.visible,
-  //   }));
-  // };
 
   getVolcanoPlotButtonContent = () => {
     const { isDataStreamingResultsTable } = this.props;
@@ -621,7 +592,6 @@ class DifferentialVolcano extends Component {
         disabled={true}
       ></Form.Field>
     );
-    const volcanoPlot = this.getVolcanoPlot();
     const resizerStyle = {
       display: 'block',
     };
@@ -857,7 +827,17 @@ class DifferentialVolcano extends Component {
                           this.onSizeChange(size, 'vertical')
                         }
                       >
-                        {volcanoPlot}
+                        {/* {volcanoPlot} */}
+                        <DifferentialVolcanoPlot
+                          ref={this.differentialVolcanoPlotRef}
+                          {...this.state}
+                          {...this.props}
+                          handleVolcanoPlotSelectionChange={
+                            this.handleVolcanoPlotSelectionChange
+                          }
+                          getMaxAndMin={this.getMaxAndMin}
+                          onHandleDotClick={this.handleDotClick}
+                        ></DifferentialVolcanoPlot>
                         <SVGPlot
                           divWidth={this.state.volcanoSvgWidth}
                           divHeight={this.state.volcanoSvgHeight}
