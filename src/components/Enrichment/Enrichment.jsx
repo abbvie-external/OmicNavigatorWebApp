@@ -16,7 +16,7 @@ import {
   formatNumberForDisplay,
   splitValue,
   Linkout,
-  loadingDimmer,
+  roundToPrecision,
 } from '../Shared/helpers';
 import '../Shared/Table.scss';
 import SearchingAlt from '../Transitions/SearchingAlt';
@@ -2122,6 +2122,29 @@ class Enrichment extends Component {
       enrichmentModel,
       enrichmentAnnotation,
     } = this.props;
+
+    const pxToPtRatio = 105;
+    const pointSize = 12;
+    const width =
+      window.innerWidth ||
+      document.documentElement.clientWidth ||
+      document.body.clientWidth;
+    const height =
+      window.innerHeight ||
+      document.documentElement.clientHeight ||
+      document.body.clientHeight;
+    // const divWidth =
+    //   this.differentialViewContainerRef?.current?.parentElement?.offsetWidth ||
+    //   width - 310;
+    const divWidth = width * 0.75;
+    const divHeight = height - 100;
+    const divWidthPt = roundToPrecision(divWidth / pxToPtRatio, 1);
+    const divHeightPt = roundToPrecision(divHeight / pxToPtRatio, 1);
+    const divWidthPtString = `&width=${divWidthPt}`;
+    const divHeightPtString = `&height=${divHeightPt}`;
+    const pointSizeString = `&pointsize=${pointSize}`;
+    const dimensions = `?${divWidthPtString}${divHeightPtString}${pointSizeString}`;
+    const srcUrl = `${multisetPlotInfoEnrichment.svg}${dimensions}`;
     const VerticalSidebar = ({ animation, visible }) => (
       <Sidebar
         as={'div'}
@@ -2161,11 +2184,11 @@ class Enrichment extends Component {
           <SVG
             cacheRequests={true}
             // description=""
-            loader={<span>{loadingDimmer}</span>}
+            // loader={<span>{loadingDimmer}</span>}
             // onError={error => console.log(error.message)}
             // onLoad={(src, hasCache) => console.log(src, hasCache)}
             // preProcessor={code => code.replace(/fill=".*?"/g, 'fill="currentColor"')}
-            src={multisetPlotInfoEnrichment.svg}
+            src={srcUrl}
             // title={`${s.plotType.plotDisplay}`}
             uniqueHash="d4i1g4"
             uniquifyIDs={true}

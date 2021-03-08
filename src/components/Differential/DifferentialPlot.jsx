@@ -107,10 +107,12 @@ class DifferentialPlot extends PureComponent {
           window.innerHeight ||
           document.documentElement.clientHeight ||
           document.body.clientHeight;
-        const divWidth =
-          this.props.fwdRefDVC?.current?.offsetWidth - 25 || width - 310;
-        const divHeight =
-          this.props.fwdRefDVC?.current?.offsetHeight - 115 || height - 50;
+        const divWidth = width * 0.75;
+        const divHeight = height - 100;
+        // const divWidth =
+        //   this.props.fwdRefDVC?.current?.offsetWidth - 15 || width - 310;
+        // const divHeight =
+        //   this.props.fwdRefDVC?.current?.offsetHeight - 115 || height - 50;
         const divWidthPt = roundToPrecision(divWidth / pxToPtRatio, 1);
         const divHeightPt = roundToPrecision(divHeight / pxToPtRatio, 1);
         const divWidthPtString = `&width=${divWidthPt}`;

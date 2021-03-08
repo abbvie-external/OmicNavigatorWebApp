@@ -11,7 +11,6 @@ import {
   formatNumberForDisplay,
   splitValue,
   Linkout,
-  loadingDimmer,
   roundToPrecision,
 } from '../Shared/helpers';
 import { omicNavigatorService } from '../../services/omicNavigator.service';
@@ -873,9 +872,10 @@ class Differential extends Component {
       window.innerHeight ||
       document.documentElement.clientHeight ||
       document.body.clientHeight;
-    const divWidth =
-      this.differentialViewContainerRef?.current?.parentElement?.offsetWidth ||
-      width - 310;
+    // const divWidth =
+    //   this.differentialViewContainerRef?.current?.parentElement?.offsetWidth ||
+    //   width - 310;
+    const divWidth = width * 0.75;
     const divHeight = height - 100;
     const divWidthPt = roundToPrecision(divWidth / pxToPtRatio, 1);
     const divHeightPt = roundToPrecision(divHeight / pxToPtRatio, 1);
