@@ -631,12 +631,24 @@ class DifferentialVolcano extends Component {
             className="VerticalSidebarPlot"
           >
             <DifferentialPlot
-              {...this.props}
-              {...this.state}
-              // divWidth={this.state.}
-              // divHeight={this.state.}
-              // pxToPtRatio={115}
-              // pointSize={11}
+              // {...this.props}
+              // {...this.state}
+              onBackToTable={this.props.onBackToTable}
+              differentialFeatureIdKey={this.props.differentialFeatureIdKey}
+              differentialFeature={this.props.differentialFeature}
+              isItemSVGLoaded={this.props.isItemSVGLoaded}
+              metaFeaturesDataDifferential={
+                this.props.metaFeaturesDataDifferential
+              }
+              modelSpecificMetaFeaturesExist={
+                this.props.modelSpecificMetaFeaturesExist || false
+              }
+              fwdRefDVC={this.props.fwdRefDVC}
+              imageInfoDifferentialLength={
+                this.props.imageInfoDifferentialLength || 0
+              }
+              imageInfoDifferential={this.props.imageInfoDifferential}
+              differentialPlotTypes={this.props.differentialPlotTypes}
               svgTabMax={4}
             ></DifferentialPlot>
           </Sidebar>

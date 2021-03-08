@@ -31,8 +31,8 @@ class Differential extends Component {
 
   constructor(props) {
     super(props);
-    this.resizeListener = this.resizeListener.bind(this);
-    this.debouncedResizeListener = _.debounce(this.resizeListener, 100);
+    // this.resizeListener = this.resizeListener.bind(this);
+    // this.debouncedResizeListener = _.debounce(this.resizeListener, 100);
     this.state = {
       isValidSearchDifferential: false,
       isSearchingDifferential: false,
@@ -94,13 +94,13 @@ class Differential extends Component {
     return nextProps.tab === 'differential';
   }
 
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.debouncedResizeListener);
-  }
+  // componentWillUnmount() {
+  //   window.removeEventListener('resize', this.debouncedResizeListener);
+  // }
 
-  resizeListener() {
-    this.forceUpdate();
-  }
+  // resizeListener() {
+  //   this.forceUpdate();
+  // }
 
   handleSearchTransitionDifferential = bool => {
     this.setState({
@@ -436,7 +436,7 @@ class Differential extends Component {
             differentialModel,
             id,
             differentialPlotTypes[i].plotID,
-            differentialPlotTypes[i].plotType,
+            differentialPlotTypes[i].plotType || 'singleFeature',
             // self.handleItemSelected,
             null,
             cancelToken,

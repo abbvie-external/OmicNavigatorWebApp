@@ -110,7 +110,7 @@ class EnrichmentSVGPlot extends PureComponent {
         isSVGReadyEnrichment: true,
         svgPanes: panes,
       });
-    }
+    } else return null;
   };
 
   render() {
