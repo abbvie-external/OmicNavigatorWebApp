@@ -17,6 +17,8 @@ import {
   Loader,
   Label,
   Sidebar,
+  Button,
+  Icon,
 } from 'semantic-ui-react';
 import VolcanoPlotIcon from '../../resources/VolcanoPlotIcon.png';
 import VolcanoPlotIconSelected from '../../resources/VolcanoPlotIconSelected.png';
@@ -282,91 +284,81 @@ class DifferentialVolcano extends Component {
   };
 
   handleRowClick = (event, item, index) => {
-    if (this.state.volcanoPlotsVisible) {
-      if (
-        item !== null &&
-        event?.target?.className !== 'ExternalSiteIcon' &&
-        event?.target?.className !== 'TableCellLink NoSelect' &&
-        event?.target?.className !== 'TableCellLink'
-      ) {
-        const { differentialFeatureIdKey } = this.props;
-        event.stopPropagation();
-        const PreviouslyHighlighted = [
-          ...this.props.HighlightedFeaturesArrVolcano,
-        ];
-        if (event.shiftKey) {
-          const allTableData =
-            this.volcanoPlotFilteredGridRef.current?.qhGridRef.current?.getSortedData() ||
-            [];
+    if (
+      item !== null &&
+      event?.target?.className !== 'ExternalSiteIcon' &&
+      event?.target?.className !== 'TableCellLink NoSelect' &&
+      event?.target?.className !== 'TableCellLink'
+    ) {
+      const { differentialFeatureIdKey } = this.props;
+      event.stopPropagation();
+      const PreviouslyHighlighted = [
+        ...this.props.HighlightedFeaturesArrVolcano,
+      ];
+      if (event.shiftKey) {
+        const allTableData =
+          this.volcanoPlotFilteredGridRef.current?.qhGridRef.current?.getSortedData() ||
+          [];
+        const indexMaxFeature = _.findIndex(allTableData, function(d) {
+          return d[differentialFeatureIdKey] === PreviouslyHighlighted[0]?.id;
+        });
+        const sliceFirst = index < indexMaxFeature ? index : indexMaxFeature;
+        const sliceLast = index > indexMaxFeature ? index : indexMaxFeature;
+        const shiftedTableData = allTableData.slice(sliceFirst, sliceLast + 1);
+        const shiftedTableDataArray = shiftedTableData.map(function(d) {
+          return {
+            id: d[differentialFeatureIdKey],
+            value: d[differentialFeatureIdKey],
+            key: d[differentialFeatureIdKey],
+          };
+        });
+        this.props.onHandleSelectedVolcano(shiftedTableDataArray);
+      } else if (event.ctrlKey) {
+        const allTableData =
+          this.volcanoPlotFilteredGridRef.current?.qhGridRef.current?.getSortedData() ||
+          [];
+        let selectedTableDataArray = [];
+
+        const alreadyHighlighted = PreviouslyHighlighted.some(
+          d => d.id === item[differentialFeatureIdKey],
+        );
+        // already highlighted, remove it from array
+        if (alreadyHighlighted) {
+          selectedTableDataArray = PreviouslyHighlighted.filter(
+            i => i.id !== item[differentialFeatureIdKey],
+          );
+          this.props.onHandleSelectedVolcano(selectedTableDataArray);
+        } else {
+          // not yet highlighted, add it to array
           const indexMaxFeature = _.findIndex(allTableData, function(d) {
             return d[differentialFeatureIdKey] === PreviouslyHighlighted[0]?.id;
           });
-          const sliceFirst = index < indexMaxFeature ? index : indexMaxFeature;
-          const sliceLast = index > indexMaxFeature ? index : indexMaxFeature;
-          const shiftedTableData = allTableData.slice(
-            sliceFirst,
-            sliceLast + 1,
-          );
-          const shiftedTableDataArray = shiftedTableData.map(function(d) {
-            return {
-              id: d[differentialFeatureIdKey],
-              value: d[differentialFeatureIdKey],
-              key: d[differentialFeatureIdKey],
-            };
-          });
-          this.props.onHandleSelectedVolcano(shiftedTableDataArray);
-        } else if (event.ctrlKey) {
-          const allTableData =
-            this.volcanoPlotFilteredGridRef.current?.qhGridRef.current?.getSortedData() ||
-            [];
-          let selectedTableDataArray = [];
-
-          const alreadyHighlighted = PreviouslyHighlighted.some(
-            d => d.id === item[differentialFeatureIdKey],
-          );
-          // already highlighted, remove it from array
-          if (alreadyHighlighted) {
-            selectedTableDataArray = PreviouslyHighlighted.filter(
-              i => i.id !== item[differentialFeatureIdKey],
-            );
-            this.props.onHandleSelectedVolcano(selectedTableDataArray);
+          // map feature to fix obj entries
+          const mappedFeature = {
+            id: item[differentialFeatureIdKey],
+            value: item[differentialFeatureIdKey],
+            key: item[differentialFeatureIdKey],
+          };
+          const lowerIndexThanMax = index < indexMaxFeature ? true : false;
+          if (lowerIndexThanMax) {
+            // add to beginning of array if max
+            PreviouslyHighlighted.unshift(mappedFeature);
           } else {
-            // not yet highlighted, add it to array
-            const indexMaxFeature = _.findIndex(allTableData, function(d) {
-              return (
-                d[differentialFeatureIdKey] === PreviouslyHighlighted[0]?.id
-              );
-            });
-            // map feature to fix obj entries
-            const mappedFeature = {
-              id: item[differentialFeatureIdKey],
-              value: item[differentialFeatureIdKey],
-              key: item[differentialFeatureIdKey],
-            };
-            const lowerIndexThanMax = index < indexMaxFeature ? true : false;
-            if (lowerIndexThanMax) {
-              // add to beginning of array if max
-              PreviouslyHighlighted.unshift(mappedFeature);
-            } else {
-              // just add to array if not max
-              PreviouslyHighlighted.push(mappedFeature);
-            }
-            selectedTableDataArray = [...PreviouslyHighlighted];
-            this.props.onHandleSelectedVolcano(selectedTableDataArray);
+            // just add to array if not max
+            PreviouslyHighlighted.push(mappedFeature);
           }
-        } else {
-          this.props.onHandleSelectedVolcano([
-            {
-              id: item[differentialFeatureIdKey],
-              value: item[differentialFeatureIdKey],
-              key: item[differentialFeatureIdKey],
-            },
-          ]);
+          selectedTableDataArray = [...PreviouslyHighlighted];
+          this.props.onHandleSelectedVolcano(selectedTableDataArray);
         }
+      } else {
+        this.props.onHandleSelectedVolcano([
+          {
+            id: item[differentialFeatureIdKey],
+            value: item[differentialFeatureIdKey],
+            key: item[differentialFeatureIdKey],
+          },
+        ]);
       }
-      // else {
-      //   this.props.onPagedToFeature();
-      // }
     }
   };
 
@@ -525,6 +517,24 @@ class DifferentialVolcano extends Component {
     }
   };
 
+  getFeaturesLength = () => {
+    const { differentialResults, HighlightedFeaturesArrVolcano } = this.props;
+    if (HighlightedFeaturesArrVolcano.length === 1) {
+      return 1;
+    } else if (HighlightedFeaturesArrVolcano.length > 1) {
+      return HighlightedFeaturesArrVolcano.length;
+    } else return differentialResults.length;
+  };
+
+  hasMultifeaturePlots = () => {
+    if (this.props.differentialPlotTypes) {
+      const plotTypesMapped = this.props.differentialPlotTypes.map(
+        p => p.plotType,
+      );
+      return plotTypesMapped.includes('multiFeature') || false;
+    } else return false;
+  };
+
   render() {
     const {
       filteredTableData,
@@ -557,6 +567,8 @@ class DifferentialVolcano extends Component {
       tab,
       isItemSelected,
       isDataStreamingResultsTable,
+      // differentialResults,
+      HighlightedFeaturesArrVolcano,
     } = this.props;
     // let differentialVolcanoCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-Volcano`;
     // if (multisetQueriedDifferential) {
@@ -656,6 +668,8 @@ class DifferentialVolcano extends Component {
       } else return null;
     };
 
+    const FeaturesLength = this.getFeaturesLength();
+    const HasMultifeaturePlots = this.hasMultifeaturePlots();
     return (
       <Grid.Column
         className=""
@@ -869,6 +883,33 @@ class DifferentialVolcano extends Component {
                         ></SVGPlot>
                       </SplitPane>
                       <Grid.Row>
+                        <div
+                          className={
+                            !HasMultifeaturePlots ||
+                            isDataStreamingResultsTable ||
+                            HighlightedFeaturesArrVolcano.length === 1
+                              ? 'MultifeaturePlotBtnDiv Hide'
+                              : 'MultifeaturePlotBtnDiv Show'
+                          }
+                        >
+                          <Label
+                            className="MultiFeaturePlotBtn"
+                            size="medium"
+                            color="blue"
+                            // image
+                            // basic
+                            onClick={() =>
+                              this.props.onGetMultifeaturePlot('Differential')
+                            }
+                          >
+                            {HighlightedFeaturesArrVolcano.length !== 1
+                              ? 'MULTI-FEATURE PLOT'
+                              : 'SINGLE-FEATURE PLOT'}
+                            <Label.Detail className="MultiFeaturePlotDetail">
+                              {FeaturesLength}
+                            </Label.Detail>
+                          </Label>
+                        </div>
                         <div className="FloatRight AbsoluteExportDifferential">
                           <ButtonActions
                             exportButtonSize={'small'}

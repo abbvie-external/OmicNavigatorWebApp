@@ -153,26 +153,6 @@ class OmicNavigatorService {
     }
   }
 
-  async getResultsTable(study, modelID, testID, errorCb, cancelToken) {
-    const cacheKey = `getResultsTable_${study}_${modelID}_${testID}`;
-    if (this[cacheKey] != null) {
-      return this[cacheKey];
-    } else {
-      const obj = { study, modelID, testID };
-      const promise = this.axiosPost(
-        'getResultsTable',
-        obj,
-        true,
-        errorCb,
-        cancelToken,
-        25000,
-      );
-      const dataFromPromise = await promise;
-      this[cacheKey] = dataFromPromise;
-      return dataFromPromise;
-    }
-  }
-
   async getMetaFeatures(study, model) {
     const cacheKey = `getMetaFeatures_${study}_${model}`;
     if (this[cacheKey] != null) {
@@ -272,29 +252,21 @@ class OmicNavigatorService {
     cancelToken,
   ) {
     this.setUrl();
-    if (plotType === 'multiFeature') {
-      return null;
-    }
-    const cacheKey = `plotStudy_${study}_${modelID}_${featureID}_${plotID}`;
-    if (this[cacheKey] != null) {
-      return this[cacheKey];
-    } else {
-      const promise = this.axiosPostPlot(
-        'plotStudy',
-        {
-          study,
-          modelID,
-          featureID,
-          plotID,
-        },
-        errorCb,
-        cancelToken,
-        25000,
-      );
-      const dataFromPromise = await promise;
-      this[cacheKey] = dataFromPromise;
-      return dataFromPromise;
-    }
+    const timeoutLength = plotType === 'multiFeature' ? 250000 : 25000;
+    const promise = this.ocpuPlotCall(
+      'plotStudy',
+      {
+        study,
+        modelID,
+        featureID,
+        plotID,
+      },
+      errorCb,
+      cancelToken,
+      timeoutLength,
+    );
+    const dataFromPromise = await promise;
+    return dataFromPromise;
   }
 
   async getResultsIntersection(

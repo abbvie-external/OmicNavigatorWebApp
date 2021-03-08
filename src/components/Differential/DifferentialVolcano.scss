@@ -176,6 +176,34 @@
   }
 }
 
+// #PrimaryColor {
+//   background-color: #ff4400 !important;
+//   color: #fff !important;
+// }
+
+.MultiFeaturePlotBtn {
+  margin-top: 5px !important;
+  margin-left: 355px !important;
+  cursor: pointer !important;
+}
+
+.MultifeaturePlotBtnDiv {
+  position: absolute;
+  z-index: 1;
+  left: 83px !important;
+  margin-top: 13px;
+
+  // .MultiFeaturePlottingBtn {
+  //   font-size: 13px !important;
+  //   height: 28px !important;
+  // }
+
+  // .MultiFeaturePlotDetail {
+  //   background-color: #1678c2 !important;
+  //   color: white !important;
+  // }
+}
+
 // .ui.visible.overlay.sidebar {
 //   transition: transform 0.5s step-end 0.1s !important;
 // }
