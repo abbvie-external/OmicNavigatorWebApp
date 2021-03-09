@@ -1,4 +1,4 @@
-.svgContainerVolcano {
+.svgContainerEnrichment {
   height: 100% !important;
   width: 100% !important;
   margin: 0px 15px 0px 15px !important;
@@ -8,17 +8,17 @@
   .svgPlotDropdown {
     max-width: fit-content !important;
     z-index: 5 !important;
-    margin-top: 0px;
+    margin-top: 5px;
   }
 
   .ui.secondary.pointing.menu {
     margin-left: 35px !important;
   }
 
-  // .svgSpan {
-  //   height: 100% !important;
-  //   width: 100% !important;
-  // }
+  .svgSpan {
+    height: 100% !important;
+    width: 100% !important;
+  }
 
   .SVGPlot {
     min-height: 75vh !important;
@@ -40,9 +40,9 @@
 }
 
 .export-svg {
-  margin: 0px 30px 5px 0px !important;
-  position: absolute !important;
-  right: 30px !important;
+  margin: 5px 20px 5px 0px !important;
+  position: absolute;
+  right: 0;
 }
 
 // .TwoPlotsDiv {

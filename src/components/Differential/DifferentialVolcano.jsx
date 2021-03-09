@@ -16,7 +16,6 @@ import {
   Dimmer,
   Loader,
   Label,
-  // Divider,
   Sidebar,
   Button,
   Icon,
@@ -31,7 +30,7 @@ class DifferentialVolcano extends Component {
   state = {
     volcanoHeight: parseInt(localStorage.getItem('volcanoHeight'), 10) || 1,
     volcanoHeightBackup:
-      parseInt(localStorage.getItem('volcanoHeightBackup'), 10) || 300,
+      parseInt(localStorage.getItem('volcanoHeightBackup'), 10) || 350,
     volcanoWidth: parseInt(localStorage.getItem('volcanoWidth'), 10) || 500,
     volcanoPlotsVisible: false,
     // JSON.parse(localStorage.getItem('volcanoPlotsVisible')) || false,
@@ -421,82 +420,33 @@ class DifferentialVolcano extends Component {
       });
     }
   };
-  getVolcanoPlot = () => {
-    const { volcanoPlotsVisible } = this.state;
-    if (volcanoPlotsVisible) {
-      return (
-        <DifferentialVolcanoPlot
-          ref={this.differentialVolcanoPlotRef}
-          {...this.state}
-          {...this.props}
-          handleVolcanoPlotSelectionChange={
-            this.handleVolcanoPlotSelectionChange
-          }
-          getMaxAndMin={this.getMaxAndMin}
-          onHandleDotClick={this.handleDotClick}
-        ></DifferentialVolcanoPlot>
-      );
-    } else {
-      return <p>Loading</p>;
-    }
-  };
-  getSVGPlot = () => {
-    const {
-      imageInfo,
-      tabsMessage,
-      isVolcanoPlotSVGLoaded,
-      onSVGTabChange,
-    } = this.props;
-    if (imageInfo.key != null && isVolcanoPlotSVGLoaded) {
-      return (
-        <div className="VolcanoPlotSVGPlot">
-          <SVGPlot
-            // ref={this.differentialViewContainerRef}
-            {...this.props}
-            {...this.state}
-            onSVGTabChange={onSVGTabChange}
-          ></SVGPlot>
-        </div>
-      );
-    } else if (!isVolcanoPlotSVGLoaded) {
-      return (
-        <Dimmer active inverted>
-          <Loader size="large">Loading Plots</Loader>
-        </Dimmer>
-      );
-    } else {
-      return (
-        <div className="PlotInstructions">
-          <h4 className="PlotInstructionsText NoSelect">{tabsMessage}</h4>
-        </div>
-      );
-    }
-  };
 
-  onSizeChange = (size, paneType) => {
-    const adjustedSize = Math.round(size * 0.95);
+  onSizeChange = (newSize, paneType) => {
+    const { volcanoWidth } = this.state;
+    const { fwdRefDVC } = this.props;
+    const adjustedSize = Math.round(newSize * 0.95);
     if (paneType === 'horizontal') {
-      // if (show) {
-      //   localStorage.setItem('volcanoHeightBackup', adjustedSize);
-      //   this.setState({
-      //     volcanoHeightBackup: adjustedSize + 1,
-      //   });
-      // }
       const width = parseInt(localStorage.getItem('volcanoWidth'), 10) || 500;
+      const volcanoSvgWidthPx =
+        fwdRefDVC.current?.offsetWidth - volcanoWidth || 500;
+      const volcanoSvgHeightPx = newSize || 300;
       // on up/down drag, we are forcing a svg resize by change the volcano width by 1
       localStorage.setItem('volcanoWidth', width + 1);
       localStorage.setItem('volcanoHeight', adjustedSize + 1);
       this.setState({
         volcanoHeight: adjustedSize + 1,
         volcanoWidth: width + 1,
+        volcanoSvgWidth: volcanoSvgWidthPx,
+        volcanoSvgHeight: volcanoSvgHeightPx,
       });
     } else {
+      const volcanoSvgWidthPx = fwdRefDVC.current?.offsetWidth - newSize || 500;
       localStorage.setItem('volcanoWidth', adjustedSize);
       this.setState({
         volcanoWidth: adjustedSize,
+        volcanoSvgWidth: volcanoSvgWidthPx,
       });
     }
-    // }
   };
 
   getDynamicSize() {
@@ -520,22 +470,13 @@ class DifferentialVolcano extends Component {
       this.setState({
         volcanoHeightBackup: this.state.volcanoHeight,
       });
-      this.props.onHandleSelectedVolcano([]);
     }
     const size = !volcanoPlotsVisible ? this.state.volcanoHeightBackup : 0;
     this.onSizeChange(size, 'horizontal');
     this.setState({
       volcanoPlotsVisible: !volcanoPlotsVisible,
     });
-    // localStorage.setItem(`volcanoPlotsVisible`, !volcanoPlotsVisible);
   };
-
-  // handlePlotAnimationVolcano = animation => () => {
-  //   this.setState(prevState => ({
-  //     animation,
-  //     visible: !prevState.visible,
-  //   }));
-  // };
 
   getVolcanoPlotButtonContent = () => {
     const { isDataStreamingResultsTable } = this.props;
@@ -651,8 +592,6 @@ class DifferentialVolcano extends Component {
         disabled={true}
       ></Form.Field>
     );
-    const svgPlot = this.getSVGPlot();
-    const volcanoPlot = this.getVolcanoPlot();
     const resizerStyle = {
       display: 'block',
     };
@@ -674,8 +613,25 @@ class DifferentialVolcano extends Component {
             className="VerticalSidebarPlot"
           >
             <DifferentialPlot
-              {...this.props}
-              {...this.state}
+              // {...this.props}
+              // {...this.state}
+              onBackToTable={this.props.onBackToTable}
+              differentialFeatureIdKey={this.props.differentialFeatureIdKey}
+              differentialFeature={this.props.differentialFeature}
+              isItemSVGLoaded={this.props.isItemSVGLoaded}
+              metaFeaturesDataDifferential={
+                this.props.metaFeaturesDataDifferential
+              }
+              modelSpecificMetaFeaturesExist={
+                this.props.modelSpecificMetaFeaturesExist || false
+              }
+              fwdRefDVC={this.props.fwdRefDVC}
+              imageInfoDifferentialLength={
+                this.props.imageInfoDifferentialLength || 0
+              }
+              imageInfoDifferential={this.props.imageInfoDifferential}
+              differentialPlotTypes={this.props.differentialPlotTypes}
+              svgTabMax={4}
             ></DifferentialPlot>
           </Sidebar>
         );
@@ -699,10 +655,7 @@ class DifferentialVolcano extends Component {
             isItemSelected={isItemSelected}
           />
           <Sidebar.Pusher>
-            <div
-            // className="DifferentialVolcanoViewContainer"
-            // ref={this.differentialVolcanoViewContainerRef}
-            >
+            <div>
               <span className="VolcanoPlotButton">
                 <Popup
                   trigger={
@@ -853,7 +806,7 @@ class DifferentialVolcano extends Component {
                       size={
                         volcanoPlotsVisible ? volcanoHeight * 1.05263157895 : 0
                       }
-                      minSize={220}
+                      minSize={350}
                       maxSize={1000}
                       onDragFinished={size =>
                         this.onSizeChange(size, 'horizontal')
@@ -874,8 +827,40 @@ class DifferentialVolcano extends Component {
                           this.onSizeChange(size, 'vertical')
                         }
                       >
-                        {volcanoPlot}
-                        {svgPlot}
+                        {/* {volcanoPlot} */}
+                        <DifferentialVolcanoPlot
+                          ref={this.differentialVolcanoPlotRef}
+                          {...this.state}
+                          {...this.props}
+                          handleVolcanoPlotSelectionChange={
+                            this.handleVolcanoPlotSelectionChange
+                          }
+                          getMaxAndMin={this.getMaxAndMin}
+                          onHandleDotClick={this.handleDotClick}
+                        ></DifferentialVolcanoPlot>
+                        <SVGPlot
+                          divWidth={this.state.volcanoSvgWidth}
+                          divHeight={this.state.volcanoSvgHeight}
+                          pxToPtRatio={105}
+                          pointSize={12}
+                          svgTabMax={1}
+                          tab={this.props.tab}
+                          volcanoWidth={this.state.volcanoWidth}
+                          volcanoHeight={this.state.volcanoHeight}
+                          volcanoPlotsVisible={this.state.volcanoPlotsVisible}
+                          imageInfoVolcano={this.props.imageInfoVolcano}
+                          imageInfoVolcanoLength={
+                            this.props.imageInfoVolcanoLength
+                          }
+                          svgExportName={this.props.svgExportName}
+                          differentialPlotTypes={
+                            this.props.differentialPlotTypes
+                          }
+                          tabsMessage={this.props.tabsMessage}
+                          isVolcanoPlotSVGLoaded={
+                            this.props.isVolcanoPlotSVGLoaded
+                          }
+                        ></SVGPlot>
                       </SplitPane>
                       <Grid.Row>
                         <div

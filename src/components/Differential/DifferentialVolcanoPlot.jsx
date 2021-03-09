@@ -47,7 +47,6 @@ class DifferentialVolcanoPlot extends Component {
       doYAxisTransformation,
       updateVolcanoLabels,
     } = this.props;
-
     if (
       volcanoCircleLabel != null &&
       prevProps.volcanoCircleLabel !== volcanoCircleLabel &&
@@ -70,7 +69,6 @@ class DifferentialVolcanoPlot extends Component {
 
       this.handleBrushedText({ _groups: [elems] });
     }
-
     if (
       !_.isEqual(
         _.sortBy(volcanoDifferentialTableRowOther),

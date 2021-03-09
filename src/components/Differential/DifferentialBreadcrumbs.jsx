@@ -13,7 +13,6 @@ class DifferentialBreadcrumbs extends Component {
       imageInfoDifferential,
       onBackToTable,
       differentialFeatureIdKey,
-      activeIndexDifferentialView,
       featuresString,
     } = this.props;
     let name = splitValue(`${differentialFeatureIdKey} ${differentialFeature}`);
@@ -38,23 +37,12 @@ class DifferentialBreadcrumbs extends Component {
           <Breadcrumb size="large">
             <Breadcrumb.Section className="BreadcrumbLink">
               <Popup
-                trigger={
-                  <Icon
-                    name={
-                      activeIndexDifferentialView === 0 ? 'table' : 'chart area'
-                    }
-                    onClick={onBackToTable}
-                  />
-                }
+                trigger={<Icon name="table" onClick={onBackToTable} />}
                 style={BreadcrumbPopupStyle}
                 inverted
                 basic
                 position="bottom left"
-                content={
-                  activeIndexDifferentialView === 0
-                    ? 'Back To Table'
-                    : 'Back To Plot'
-                }
+                content="Back To Table"
                 closeOnTriggerClick
               />
             </Breadcrumb.Section>

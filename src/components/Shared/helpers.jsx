@@ -1,5 +1,5 @@
 import React from 'react';
-import { Popup } from 'semantic-ui-react';
+import { Popup, Loader, Dimmer } from 'semantic-ui-react';
 import _ from 'lodash';
 import * as d3 from 'd3-array';
 
@@ -201,6 +201,11 @@ export function scrollElement(_this, grid, target) {
   });
 }
 
+export function roundToPrecision(value, precision) {
+  var multiplier = Math.pow(10, precision || 0);
+  return Math.round(value * multiplier) / multiplier;
+}
+
 export function networkByCluster(network) {
   network = _.cloneDeep(network);
   let buckets = [];
@@ -315,3 +320,9 @@ export function networkByCluster(network) {
   nodeArray.sort((x, y) => d3.descending(x.size, y.size));
   return { name: 'Network', children: nodeArray };
 }
+
+export const loadingDimmer = (
+  <Dimmer active inverted>
+    <Loader size="large">SVG Loading</Loader>
+  </Dimmer>
+);

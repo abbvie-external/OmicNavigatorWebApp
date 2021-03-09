@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment, useRef } from 'react';
 import {
   Loader,
   Dimmer,
@@ -8,146 +8,176 @@ import {
   Message,
   // Menu,
   // Label,
+  Dropdown,
 } from 'semantic-ui-react';
+import SVG from 'react-inlinesvg';
+import { roundToPrecision, loadingDimmer } from '../Shared/helpers';
 // import { limitString } from '../Shared/helpers';
 import ButtonActions from '../Shared/ButtonActions';
 import './SVGPlot.scss';
 
 class SVGPlot extends Component {
   state = {
-    isSVGReady: false,
+    activeSVGTabIndexVolcano: 0,
   };
 
   componentDidMount() {
-    this.setState({
-      isSVGReady: true,
-    });
+    this.getSVGPanes();
   }
 
-  // componentDidUpdate(prevProps, prevState) {
-  //   if (prevProps.imageInfo !== this.props.imageInfo) {
-  //     this.forceUpdate();
-  //   }
-  // }
+  componentDidUpdate(prevProps) {
+    if (
+      this.state.isSVGReadyVolcano &&
+      (prevProps.imageInfoVolcanoLength !== this.props.imageInfoVolcanoLength ||
+        prevProps.imageInfoVolcano.key !== this.props.imageInfoVolcano.key ||
+        prevProps.volcanoWidth !== this.props.volcanoWidth ||
+        prevProps.volcanoHeight !== this.props.volcanoHeight)
+    ) {
+      this.getSVGPanes();
+    }
+  }
+
+  shouldComponentUpdate(nextProps) {
+    return nextProps.volcanoPlotsVisible;
+  }
 
   handleTabChange = (e, { activeIndex }) => {
-    this.props.onSVGTabChange(activeIndex);
+    this.setState({
+      activeSVGTabIndexVolcano: activeIndex,
+    });
   };
 
-  navigateToDifferentialFeature = evt => {
-    const testAndDescription = this.props.imageInfo.key.split(':');
-    const test = testAndDescription[0] || '';
-    const featureID = this.props.HighlightedProteins[0]?.featureID;
-    this.props.onFindDifferentialFeature(test, featureID);
+  handlePlotDropdownChange = (e, { value }) => {
+    this.setState({
+      activeSVGTabIndexVolcano: value,
+    });
   };
 
-  getSVGPanes(activeSVGTabIndex) {
-    // const BreadcrumbPopupStyle = {
-    //   backgroundColor: '2E2E2E',
-    //   borderBottom: '2px solid var(--color-primary)',
-    //   color: '#FFF',
-    //   padding: '1em',
-    //   maxWidth: '50vw',
-    //   fontSize: '13px',
-    //   wordBreak: 'break-all',
-    // };
-    if (this.props.imageInfo.length !== 0) {
-      const svgArray = this.props.imageInfo.svg;
-      // const svgArrayReversed = svgArray.reverse();
-      // const numberOfPlots = svgArray.length;
+  // navigateToDifferentialFeature = evt => {
+  //   const testAndDescription = this.props.imageInfoVolcano.key.split(':');
+  //   const test = testAndDescription[0] || '';
+  //   const featureID = this.props.HighlightedProteins[0]?.featureID;
+  //   this.props.onFindDifferentialFeature(test, featureID);
+  // };
+
+  getSVGPanes = () => {
+    const {
+      imageInfoVolcano,
+      divWidth,
+      divHeight,
+      pxToPtRatio,
+      pointSize,
+      imageInfoVolcanoLength,
+    } = this.props;
+    if (imageInfoVolcanoLength !== 0) {
+      let dimensions = '';
+      if (divWidth && divHeight && pxToPtRatio) {
+        const divWidthPt = roundToPrecision(divWidth / pxToPtRatio, 1);
+        const divHeightPt = roundToPrecision(divHeight / pxToPtRatio, 1);
+        const divWidthPtString = `&width=${divWidthPt}`;
+        const divHeightPtString = `&height=${divHeightPt}`;
+        const pointSizeString = `&pointsize=${pointSize}`;
+        dimensions = `?${divWidthPtString}${divHeightPtString}${pointSizeString}`;
+      }
+      const svgArray = imageInfoVolcano.svg;
       const panes = svgArray.map((s, index) => {
+        const srcUrl = `${s.svg}${dimensions}`;
         return {
           menuItem: `${s.plotType.plotDisplay}`,
-          // menuItem: limitString(`${s.plotType.plotDisplay}`, numberOfPlots, 5),
-          // menuItem: (
-          //   <Popup
-          //     trigger={
-          //       <Menu.Item key={`${s.plotType.plotDisplay}`} content="test">
-          //         <Label>{index}</Label>
-          //       </Menu.Item>
-          //     }
-          //     style={BreadcrumbPopupStyle}
-          //     inverted
-          //     basic
-          //     position="bottom left"
-          //     content={`${s.plotType.plotDisplay}`}
-          //   />
-          // ),
           render: () => (
-            <Tab.Pane attached="true" as="div">
-              <div
-                id="PlotSVG"
-                className="svgSpan"
-                dangerouslySetInnerHTML={{ __html: s.svg }}
-              ></div>
+            <Tab.Pane
+              attached="true"
+              as="div"
+              key={`${index}-${s.plotType.plotDisplay}-pane-volcano`}
+            >
+              <div id="VolcanoPlotSVG" className="svgSpan">
+                <SVG
+                  cacheRequests={true}
+                  // description=""
+                  loader={<span>{loadingDimmer}</span>}
+                  // onError={error => console.log(error.message)}
+                  // onLoad={(src, hasCache) => console.log(src, hasCache)}
+                  // preProcessor={code => code.replace(/fill=".*?"/g, 'fill="currentColor"')}
+                  src={srcUrl}
+                  title={`${s.plotType.plotDisplay}`}
+                  uniqueHash="a1f8d1"
+                  uniquifyIDs={true}
+                />
+              </div>
             </Tab.Pane>
           ),
         };
       });
-
-      return (
-        <Tab
-          menu={{ secondary: true, pointing: true, className: 'SVGDiv' }}
-          panes={panes}
-          onTabChange={this.handleTabChange}
-          activeIndex={activeSVGTabIndex}
-        />
-      );
-    } else {
-      return (
-        <Message
-          className="NoPlotsMessage"
-          icon="question mark"
-          header="No Plots Available"
-        />
-      );
-    }
-  }
-
-  getButtonActionsClass = () => {
-    // if (
-    // this.props.activeIndex === 1 &&
-    // this.props.activeIndexDifferentialView === 0
-    // this.props.tab === 'differential'
-    // ) {
-    // return 'export-svg Hide';
-    // } else {
-    return 'export-svg ShowBlock';
-    // }
+      this.setState({
+        isSVGReadyVolcano: true,
+        svgPanes: panes,
+      });
+    } else return null;
   };
 
   render() {
-    if (this.state.isSVGReady) {
-      const { activeSVGTabIndex, imageInfo, svgExportName, tab } = this.props;
-      const ButtonActionsClass = this.getButtonActionsClass();
+    const {
+      imageInfoVolcano,
+      isVolcanoPlotSVGLoaded,
+      tabsMessage,
+      volcanoPlotsVisible,
+      svgExportName,
+      tab,
+    } = this.props;
 
-      // const BreadcrumbPopupStyle = {
-      //   backgroundColor: '2E2E2E',
-      //   borderBottom: '2px solid var(--color-primary)',
-      //   color: '#FFF',
-      //   padding: '1em',
-      //   maxWidth: '50vw',
-      //   fontSize: '13px',
-      //   wordBreak: 'break-all',
-      // };
-      const svgPanes = this.getSVGPanes(activeSVGTabIndex);
-      return (
-        <div className="svgContainer">
-          <div className={ButtonActionsClass}>
-            <ButtonActions
-              exportButtonSize={'mini'}
-              excelVisible={false}
-              pdfVisible={false}
-              pngVisible={true}
-              svgVisible={true}
-              txtVisible={false}
-              tab={tab}
-              imageInfo={imageInfo}
-              tabIndex={activeSVGTabIndex}
-              svgExportName={svgExportName}
-            />
-          </div>
-          {/* <Popup
+    const {
+      activeSVGTabIndexVolcano,
+      svgPanes,
+      isSVGReadyVolcano,
+    } = this.state;
+
+    if (volcanoPlotsVisible) {
+      if (isSVGReadyVolcano) {
+        if (imageInfoVolcano.key != null && isVolcanoPlotSVGLoaded) {
+          const DropdownClass =
+            this.props.differentialPlotTypes.length > this.props.svgTabMax
+              ? 'Show svgPlotDropdown'
+              : 'Hide svgPlotDropdown';
+          const TabMenuClass =
+            this.props.differentialPlotTypes.length > this.props.svgTabMax
+              ? 'Hide'
+              : 'Show';
+          // const BreadcrumbPopupStyle = {
+          //   backgroundColor: '2E2E2E',
+          //   borderBottom: '2px solid var(--color-primary)',
+          //   color: '#FFF',
+          //   padding: '1em',
+          //   maxWidth: '50vw',
+          //   fontSize: '13px',
+          //   wordBreak: 'break-all',
+          // };
+          const activeSVGTabIndexVolcanoVar = activeSVGTabIndexVolcano || 0;
+          const svgArray = imageInfoVolcano.svg;
+          const plotOptions = svgArray.map(function(s, index) {
+            return {
+              key: `${index}=VolcanoPlotDropdownOption`,
+              text: s.plotType.plotDisplay,
+              value: index,
+            };
+          });
+          return (
+            <div className="svgContainerVolcano">
+              <div className="export-svg ShowBlock">
+                <ButtonActions
+                  exportButtonSize={'mini'}
+                  excelVisible={false}
+                  pdfVisible={false}
+                  pngVisible={true}
+                  svgVisible={true}
+                  txtVisible={false}
+                  tab={tab}
+                  imageInfo={imageInfoVolcano}
+                  tabIndex={activeSVGTabIndexVolcanoVar}
+                  svgExportName={svgExportName}
+                  plot="VolcanoPlotSVG"
+                />
+              </div>
+              {/* <Popup
             trigger={
               <Icon
                 name="bullseye"
@@ -162,18 +192,44 @@ class SVGPlot extends Component {
             position="bottom left"
             content="view in differential analysis section"
           /> */}
-          {svgPanes}
-        </div>
-      );
-    } else {
-      return (
-        <div>
-          <Dimmer active inverted>
-            <Loader size="large">SVG Loading</Loader>
-          </Dimmer>
-        </div>
-      );
-    }
+              <Dropdown
+                search
+                selection
+                compact
+                options={plotOptions}
+                value={plotOptions[activeSVGTabIndexVolcanoVar]?.value}
+                onChange={this.handlePlotDropdownChange}
+                className={DropdownClass}
+              />
+              <Tab
+                menu={{
+                  secondary: true,
+                  pointing: true,
+                  className: TabMenuClass,
+                }}
+                panes={svgPanes}
+                onTabChange={this.handleTabChange}
+                activeIndex={activeSVGTabIndexVolcano}
+              />
+            </div>
+          );
+        } else if (!isVolcanoPlotSVGLoaded) {
+          return (
+            <Dimmer active inverted>
+              <Loader size="large">Loading Plots</Loader>
+            </Dimmer>
+          );
+        } else {
+          return (
+            <div className="PlotInstructions">
+              <h4 className="PlotInstructionsText NoSelect">{tabsMessage}</h4>
+            </div>
+          );
+        }
+      } else {
+        return null;
+      }
+    } else return null;
   }
 }
 

@@ -32,14 +32,14 @@ class ButtonActions extends Component {
       }
       const Plot = document.getElementById(this.props.plot) || null;
       // decrease quality if volcano chart
-      const encoderOptionsVar = this.props.plot !== 'ViolinChart' ? 1 : 0.1;
+      const encoderOptionsVar = this.props.plot !== 'VolcanoChart' ? 1 : 0.1;
       saveSvgAsPng.saveSvgAsPng(Plot, PlotName, {
         encoderOptions: encoderOptionsVar,
         scale: 2,
         backgroundColor: 'white',
       });
     } else {
-      // for reusable SVG Plot
+      // for SVG Plot Tabs
       let PlotName =
         `${this.props.imageInfo?.svg[this.props.tabIndex]?.plotType.plotID}_${
           this.props.imageInfo?.key
@@ -50,16 +50,18 @@ class ButtonActions extends Component {
             this.props.svgExportName
           }.png` || `${this.props.plot}.png`;
       }
-      const currentContentContainer =
-        document.getElementById('PlotSVG') ||
-        document.getElementById('DifferentialPlotTabsPlotSVG');
+      const currentContentContainer = document.getElementById(
+        `${this.props.plot}`,
+      );
       const Plot =
         currentContentContainer.getElementsByTagName('svg')[0] || null;
-      saveSvgAsPng.saveSvgAsPng(Plot, PlotName, {
-        encoderOptions: 1,
-        scale: 2,
-        backgroundColor: 'white',
-      });
+      if (Plot) {
+        saveSvgAsPng.saveSvgAsPng(Plot, PlotName, {
+          encoderOptions: 1,
+          scale: 2,
+          backgroundColor: 'white',
+        });
+      }
     }
   };
 
@@ -80,7 +82,7 @@ class ButtonActions extends Component {
       const Plot = document.getElementById(this.props.plot) || null;
       this.exportSVG(Plot, PlotName);
     } else {
-      // for reusable SVG Plot
+      // for SVG Plot Tabs
       let PlotName =
         `${this.props.imageInfo?.svg[this.props.tabIndex]?.plotType.plotID}_${
           this.props.imageInfo?.key
@@ -91,12 +93,14 @@ class ButtonActions extends Component {
             this.props.svgExportName
           }.svg` || `${this.props.plot}.svg`;
       }
-      const currentContentContainer =
-        document.getElementById('PlotSVG') ||
-        document.getElementById('DifferentialPlotTabsPlotSVG');
+      const currentContentContainer = document.getElementById(
+        `${this.props.plot}`,
+      );
       const Plot =
         currentContentContainer.getElementsByTagName('svg')[0] || null;
-      this.exportSVG(Plot, PlotName);
+      if (Plot) {
+        this.exportSVG(Plot, PlotName);
+      }
     }
   };
 

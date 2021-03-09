@@ -1,6 +1,6 @@
 {
   "name": "OmicNavigatorWebApp",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "dependencies": {
     "gh-pages": "^3.1.0"
@@ -74,6 +74,7 @@
     "react": "^16.8.6",
     "react-class-hooks": "^0.5.0",
     "react-dom": "^16.8.6",
+    "react-inlinesvg": "^2.2.2",
     "react-resizable": "^1.10.1",
     "react-router-dom": "^5.0.1",
     "react-scripts": "^4.0.1",
