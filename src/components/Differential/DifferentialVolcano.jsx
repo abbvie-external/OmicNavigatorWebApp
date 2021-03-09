@@ -615,6 +615,7 @@ class DifferentialVolcano extends Component {
             <DifferentialPlot
               // {...this.props}
               // {...this.state}
+              featuresString={this.props.featuresString}
               onBackToTable={this.props.onBackToTable}
               differentialFeatureIdKey={this.props.differentialFeatureIdKey}
               differentialFeature={this.props.differentialFeature}

@@ -549,7 +549,7 @@ class Differential extends Component {
             differentialStudy: this.props.differentialStudy || '',
             differentialModel: this.props.differentialModel || '',
             differentialTest: this.props.differentialTest || '',
-            differentialFeature: '' || '',
+            differentialFeature: '',
             // differentialFeature: `(${featuresLength} Features)` || '',
             // differentialFeatureLength: featuresLength,
           },
