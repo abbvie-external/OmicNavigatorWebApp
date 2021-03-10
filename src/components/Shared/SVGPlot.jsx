@@ -74,7 +74,7 @@ class SVGPlot extends Component {
       if (divWidth && divHeight && pxToPtRatio) {
         const divWidthPt = roundToPrecision(divWidth / pxToPtRatio, 1);
         const divHeightPt = roundToPrecision(divHeight / pxToPtRatio, 1);
-        const divWidthPtString = `&width=${divWidthPt}`;
+        const divWidthPtString = `width=${divWidthPt}`;
         const divHeightPtString = `&height=${divHeightPt}`;
         const pointSizeString = `&pointsize=${pointSize}`;
         dimensions = `?${divWidthPtString}${divHeightPtString}${pointSizeString}`;

@@ -549,7 +549,7 @@ class Differential extends Component {
             differentialStudy: this.props.differentialStudy || '',
             differentialModel: this.props.differentialModel || '',
             differentialTest: this.props.differentialTest || '',
-            differentialFeature: '' || '',
+            differentialFeature: '',
             // differentialFeature: `(${featuresLength} Features)` || '',
             // differentialFeatureLength: featuresLength,
           },
@@ -981,10 +981,10 @@ class Differential extends Component {
     //   this.differentialViewContainerRef?.current?.parentElement?.offsetWidth ||
     //   width - 310;
     const divWidth = width * 0.75;
-    const divHeight = height - 100;
+    const divHeight = height * 0.85;
     const divWidthPt = roundToPrecision(divWidth / pxToPtRatio, 1);
     const divHeightPt = roundToPrecision(divHeight / pxToPtRatio, 1);
-    const divWidthPtString = `&width=${divWidthPt}`;
+    const divWidthPtString = `width=${divWidthPt}`;
     const divHeightPtString = `&height=${divHeightPt}`;
     const pointSizeString = `&pointsize=${pointSize}`;
     const dimensions = `?${divWidthPtString}${divHeightPtString}${pointSizeString}`;

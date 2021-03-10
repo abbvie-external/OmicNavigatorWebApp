@@ -615,6 +615,7 @@ class DifferentialVolcano extends Component {
             <DifferentialPlot
               // {...this.props}
               // {...this.state}
+              featuresString={this.props.featuresString}
               onBackToTable={this.props.onBackToTable}
               differentialFeatureIdKey={this.props.differentialFeatureIdKey}
               differentialFeature={this.props.differentialFeature}
@@ -822,7 +823,7 @@ class DifferentialVolcano extends Component {
                         // defaultSize={this.state.volcanoWidth * 1.05263157895}
                         size={volcanoWidth * 1.05263157895}
                         minSize={300}
-                        maxSize={1500}
+                        maxSize={1800}
                         onDragFinished={size =>
                           this.onSizeChange(size, 'vertical')
                         }
@@ -874,8 +875,8 @@ class DifferentialVolcano extends Component {
                         >
                           <Label
                             className="MultiFeaturePlotBtn"
-                            size="medium"
-                            color="blue"
+                            size={dynamicSize}
+                            // color="blue"
                             // image
                             // basic
                             onClick={() =>
