@@ -108,7 +108,7 @@ class DifferentialPlot extends PureComponent {
           document.documentElement.clientHeight ||
           document.body.clientHeight;
         const divWidth = width * 0.75;
-        const divHeight = height - 100;
+        const divHeight = height * 0.8;
         // const divWidth =
         //   this.props.fwdRefDVC?.current?.offsetWidth - 15 || width - 310;
         // const divHeight =

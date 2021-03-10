@@ -981,7 +981,7 @@ class Differential extends Component {
     //   this.differentialViewContainerRef?.current?.parentElement?.offsetWidth ||
     //   width - 310;
     const divWidth = width * 0.75;
-    const divHeight = height - 100;
+    const divHeight = height * 0.85;
     const divWidthPt = roundToPrecision(divWidth / pxToPtRatio, 1);
     const divHeightPt = roundToPrecision(divHeight / pxToPtRatio, 1);
     const divWidthPtString = `width=${divWidthPt}`;
