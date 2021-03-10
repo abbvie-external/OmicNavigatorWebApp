@@ -115,7 +115,7 @@ class DifferentialPlot extends PureComponent {
         //   this.props.fwdRefDVC?.current?.offsetHeight - 115 || height - 50;
         const divWidthPt = roundToPrecision(divWidth / pxToPtRatio, 1);
         const divHeightPt = roundToPrecision(divHeight / pxToPtRatio, 1);
-        const divWidthPtString = `&width=${divWidthPt}`;
+        const divWidthPtString = `width=${divWidthPt}`;
         const divHeightPtString = `&height=${divHeightPt}`;
         const pointSizeString = `&pointsize=${pointSize}`;
         const dimensions = `?${divWidthPtString}${divHeightPtString}${pointSizeString}`;

@@ -984,7 +984,7 @@ class Differential extends Component {
     const divHeight = height - 100;
     const divWidthPt = roundToPrecision(divWidth / pxToPtRatio, 1);
     const divHeightPt = roundToPrecision(divHeight / pxToPtRatio, 1);
-    const divWidthPtString = `&width=${divWidthPt}`;
+    const divWidthPtString = `width=${divWidthPt}`;
     const divHeightPtString = `&height=${divHeightPt}`;
     const pointSizeString = `&pointsize=${pointSize}`;
     const dimensions = `?${divWidthPtString}${divHeightPtString}${pointSizeString}`;
