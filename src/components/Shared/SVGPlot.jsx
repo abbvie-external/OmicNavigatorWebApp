@@ -82,7 +82,6 @@ class SVGPlot extends Component {
       const svgArray = imageInfoVolcano.svg;
       const panes = svgArray.map((s, index) => {
         const srcUrl = `${s.svg}${dimensions}`;
-        debugger;
         return {
           menuItem: `${s.plotType.plotDisplay}`,
           render: () => (
