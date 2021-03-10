@@ -1,6 +1,6 @@
 {
-  "name": "OmicNavigatorWebApp",
-  "version": "1.1.0",
+  "name": "omicnavigatorwebapp",
+  "version": "1.1.1",
   "private": true,
   "dependencies": {
     "gh-pages": "^3.1.0"
