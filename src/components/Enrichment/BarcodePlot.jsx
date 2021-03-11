@@ -319,6 +319,10 @@ class BarcodePlot extends PureComponent {
                     line.statistic >
                       (0.2 / 6) * self.props.barcodeSettings.highStat
                   ) {
+                    console.log(
+                      'Difference: ' +
+                        (line.statistic - brushedDataVar[index + 1].statistic),
+                    );
                     if (
                       Math.abs(
                         line.statistic - brushedDataVar[index + 1].statistic,
@@ -327,6 +331,7 @@ class BarcodePlot extends PureComponent {
                         line.statistic - brushedDataVar[index - 1].statistic,
                       ) >= barspace
                     ) {
+                      console.log('Switch -1');
                       labelLadder = -1;
                       curSwitch = 0;
                     }
