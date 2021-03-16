@@ -139,6 +139,10 @@ class DifferentialVolcano extends Component {
     }
   };
 
+  handleTableFiltered = () => {
+    this.getFeaturesLength();
+  };
+
   rowLevelPropsCalc = item => {
     let className;
     const {
@@ -449,7 +453,7 @@ class DifferentialVolcano extends Component {
     }
   };
 
-  getDynamicSize() {
+  getDynamicSizeBtn() {
     let w = Math.max(
       document.documentElement.clientWidth,
       window.innerWidth || 0,
@@ -460,6 +464,20 @@ class DifferentialVolcano extends Component {
       return 'small';
     } else if (w > 1599 && w < 2600) {
       return undefined;
+    } else if (w > 2599) return 'large';
+  }
+
+  getDynamicSizeLabel() {
+    let w = Math.max(
+      document.documentElement.clientWidth,
+      window.innerWidth || 0,
+    );
+    if (w < 1200) {
+      return undefined;
+    } else if (w > 1199 && w < 1600) {
+      return undefined;
+    } else if (w > 1599 && w < 2600) {
+      return 'large';
     } else if (w > 2599) return 'large';
   }
 
@@ -490,11 +508,17 @@ class DifferentialVolcano extends Component {
 
   getFeaturesLength = () => {
     const { differentialResults, HighlightedFeaturesArrVolcano } = this.props;
+    debugger;
     if (HighlightedFeaturesArrVolcano.length === 1) {
       return 1;
     } else if (HighlightedFeaturesArrVolcano.length > 1) {
       return HighlightedFeaturesArrVolcano.length;
-    } else return differentialResults.length;
+    } else {
+      const sortedData =
+        this.volcanoPlotFilteredGridRef.current?.qhGridRef?.current?.getSortedData() ||
+        differentialResults.length;
+      return sortedData.length;
+    }
   };
 
   hasMultifeaturePlots = () => {
@@ -545,7 +569,8 @@ class DifferentialVolcano extends Component {
     // if (multisetQueriedDifferential) {
     //   differentialVolcanoCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-${multisetQueriedDifferential}-Volcano`;
     // }
-    const dynamicSize = this.getDynamicSize();
+    const dynamicSize = this.getDynamicSizeBtn();
+    const dynamicSizeLarger = this.getDynamicSizeLabel();
 
     const TableValuePopupStyle = {
       backgroundColor: '2E2E2E',
@@ -875,7 +900,7 @@ class DifferentialVolcano extends Component {
                         >
                           <Label
                             className="MultiFeaturePlotBtn"
-                            size={dynamicSize}
+                            size={dynamicSizeLarger}
                             // color="blue"
                             // image
                             // basic
@@ -937,6 +962,7 @@ class DifferentialVolcano extends Component {
                             onRowClick={this.handleRowClick}
                             rowLevelPropsCalc={this.rowLevelPropsCalc}
                             emptyMessage={CustomEmptyMessage}
+                            onFiltered={this.handleTableFiltered}
                           />
                         </Grid.Column>
                       </Grid.Row>
