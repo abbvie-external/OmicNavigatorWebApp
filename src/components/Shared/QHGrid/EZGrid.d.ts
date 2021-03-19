@@ -22,6 +22,14 @@ export interface EZGridProps<T = unknown, ATI = unknown> {
      */
     onItemsPerPageChange?: (itemsPerPage: number) => void;
     /**
+     * Called after the data is filtered with the new filteredData
+     */
+    onFiltered?: QHGridProps<T, ATI>['onFiltered'];
+    /**
+     * Called after the filtered data is sorted with the new sortedData
+     */
+    onSorted?: QHGridProps<T, ATI>['onSorted'];
+    /**
      * The beginning of the name to use when exporting. Will be baseName+date.
      * Setting this enables exporting to excel.
      */
