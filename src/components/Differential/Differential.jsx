@@ -508,7 +508,7 @@ class Differential extends Component {
     }
   };
 
-  getMultifeaturePlot = view => {
+  getMultifeaturePlot = (view, tableData) => {
     const { HighlightedFeaturesArrVolcano, differentialResults } = this.state;
     const { differentialFeatureIdKey } = this.props;
     if (HighlightedFeaturesArrVolcano.length > 1) {
@@ -526,10 +526,8 @@ class Differential extends Component {
       };
       this.getProteinData(value, null, imageInfoDifferential, true, true);
     } else if (HighlightedFeaturesArrVolcano.length === 0) {
-      const sortedData =
-        this.volcanoPlotFilteredGridRef.current?.qhGridRef?.current?.getSortedData() ||
-        differentialResults.length;
-      const featureIds = sortedData.map(
+      const data = tableData || [];
+      const featureIds = data.map(
         featureId => featureId[differentialFeatureIdKey],
       );
       this.getProteinDataAlt(featureIds);
