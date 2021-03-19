@@ -5,13 +5,13 @@ import {
   Tab,
   // Popup,
   // Icon,
-  Message,
+  // Message,
   // Menu,
   // Label,
   Dropdown,
 } from 'semantic-ui-react';
 import SVG from 'react-inlinesvg';
-import { roundToPrecision, loadingDimmer } from '../Shared/helpers';
+import { roundToPrecision } from '../Shared/helpers';
 // import { limitString } from '../Shared/helpers';
 import ButtonActions from '../Shared/ButtonActions';
 import './SVGPlot.scss';
@@ -94,7 +94,7 @@ class SVGPlot extends Component {
                 <SVG
                   cacheRequests={true}
                   // description=""
-                  loader={<span>{loadingDimmer}</span>}
+                  // loader={<span>{loadingDimmer}</span>}
                   // onError={error => console.log(error.message)}
                   // onLoad={(src, hasCache) => console.log(src, hasCache)}
                   // preProcessor={code => code.replace(/fill=".*?"/g, 'fill="currentColor"')}

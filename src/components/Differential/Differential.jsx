@@ -508,8 +508,8 @@ class Differential extends Component {
     }
   };
 
-  getMultifeaturePlot = view => {
-    const { HighlightedFeaturesArrVolcano } = this.state;
+  getMultifeaturePlot = (view, tableData) => {
+    const { HighlightedFeaturesArrVolcano, differentialResults } = this.state;
     const { differentialFeatureIdKey } = this.props;
     if (HighlightedFeaturesArrVolcano.length > 1) {
       const featureIds = HighlightedFeaturesArrVolcano.map(
@@ -526,7 +526,8 @@ class Differential extends Component {
       };
       this.getProteinData(value, null, imageInfoDifferential, true, true);
     } else if (HighlightedFeaturesArrVolcano.length === 0) {
-      const featureIds = this.state.differentialResults.map(
+      const data = tableData || [];
+      const featureIds = data.map(
         featureId => featureId[differentialFeatureIdKey],
       );
       this.getProteinDataAlt(featureIds);
