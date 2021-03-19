@@ -43,7 +43,8 @@ class ButtonActions extends Component {
         PlotName = `${studyNoPeriods}_${modelNoPeriods}_MultisetPlot.png`;
       }
       if (plotName != null) {
-        PlotName = plotName;
+        let plotNameNoPeriods = plotName.replace(/\./g, '_');
+        PlotName = plotNameNoPeriods;
       }
       const Plot = document.getElementById(plot) || null;
       // decrease quality if volcano chart
@@ -103,7 +104,8 @@ class ButtonActions extends Component {
         PlotName = `${studyNoPeriods}_${modelNoPeriods}_MultisetPlot.svg`;
       }
       if (plotName != null) {
-        PlotName = plotName;
+        let plotNameNoPeriods = plotName.replace(/\./g, '_');
+        PlotName = plotNameNoPeriods;
       }
       const Plot = document.getElementById(plot) || null;
       this.exportSVG(Plot, PlotName);
