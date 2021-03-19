@@ -139,10 +139,6 @@ class DifferentialVolcano extends Component {
     }
   };
 
-  handleTableFiltered = () => {
-    this.getFeaturesLength();
-  };
-
   rowLevelPropsCalc = item => {
     let className;
     const {
@@ -508,7 +504,6 @@ class DifferentialVolcano extends Component {
 
   getFeaturesLength = () => {
     const { differentialResults, HighlightedFeaturesArrVolcano } = this.props;
-    debugger;
     if (HighlightedFeaturesArrVolcano.length === 1) {
       return 1;
     } else if (HighlightedFeaturesArrVolcano.length > 1) {
@@ -516,7 +511,7 @@ class DifferentialVolcano extends Component {
     } else {
       const sortedData =
         this.volcanoPlotFilteredGridRef.current?.qhGridRef?.current?.getSortedData() ||
-        differentialResults.length;
+        differentialResults;
       return sortedData.length;
     }
   };
@@ -962,7 +957,7 @@ class DifferentialVolcano extends Component {
                             onRowClick={this.handleRowClick}
                             rowLevelPropsCalc={this.rowLevelPropsCalc}
                             emptyMessage={CustomEmptyMessage}
-                            onFiltered={this.handleTableFiltered}
+                            onFiltered={this.getFeaturesLength}
                           />
                         </Grid.Column>
                       </Grid.Row>
