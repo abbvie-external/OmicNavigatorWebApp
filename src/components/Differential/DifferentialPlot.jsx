@@ -30,6 +30,7 @@ class DifferentialPlot extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
+    console.log(this.props.metaFeaturesDataDifferential);
     if (
       this.state.activeDifferentialPlotTabsIndex !==
       prevState.activeDifferentialPlotTabsIndex

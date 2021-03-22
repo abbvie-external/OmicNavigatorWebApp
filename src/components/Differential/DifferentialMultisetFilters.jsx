@@ -966,8 +966,7 @@ class DifferentialMultisetFilters extends Component {
       <Fragment>
         <Form className="MultisetDropdownContainer">
           <ul style={{ padding: '0px' }}>
-            {indexFiltersP.map(index => {
-              // console.log('sig', sigValueP[index]);
+            {selectedColP.map((val, index) => {
               return (
                 <Form.Group
                   key={`differentialMultiSetFiltersRow${index}`}
@@ -982,7 +981,7 @@ class DifferentialMultisetFilters extends Component {
                     className="ThresholdColumnReadOnly"
                     index={index}
                     // selection
-                    value={selectedColP[index].value}
+                    value={val.value}
                     options={thresholdColsP}
                     width={7}
                     onChange={this.handleDropdownChange}

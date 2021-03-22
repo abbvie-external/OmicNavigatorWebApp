@@ -83,6 +83,8 @@ class Differential extends Component {
     zoom: false,
     filterState: {},
     breadcrumbClick: false,
+    zoomHistory: {},
+    updateVolcanoLabels: false,
   };
   differentialViewContainerRef = React.createRef();
   differentialGridRef = React.createRef();
@@ -556,6 +558,20 @@ class Differential extends Component {
     });
   };
 
+  updateVolcanoState = (volcanoState, maxElements) => {
+    this.setState({
+      zoomHistory: volcanoState,
+      maxElements: maxElements,
+    });
+  };
+
+  // handleTableDataChange = data => {
+  //   console.log(data);
+  //   this.setState({
+  //     metaFeaturesDataDifferential: data,
+  //   });
+  // };
+
   updateBreadcrumbClick = bool => {
     this.setState({
       breadcrumbClick: false,
@@ -572,12 +588,13 @@ class Differential extends Component {
     });
   };
 
-  handleZoom = (results, index) => {
+  handleZoom = (results, index, history) => {
     this.setState({
       differentialResults: results,
       differentialResultsUnfiltered: results,
       zoom: true,
       activeBreadcrumb: index,
+      zoomHistory: history,
     });
   };
 
@@ -946,6 +963,8 @@ class Differential extends Component {
           onHandleBreadcrumbClick={this.handleBreadcrumbClick}
           onHandleUpdateDifferentialResults={this.updateDifferentialResults}
           onUpdateBreadcrumbIndex={this.updateBreadcrumbIndex}
+          onHandleVolcanoState={this.updateVolcanoState}
+          onHandleTableDataChange={this.handleTableDataChange}
         />
       );
     } else return <TransitionStill stillMessage={message} />;

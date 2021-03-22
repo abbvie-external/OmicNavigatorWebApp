@@ -257,8 +257,8 @@ class DifferentialVolcano extends Component {
     }
   };
 
-  handleZoom = (results, index) => {
-    this.props.onHandleZoom(results, index);
+  handleZoom = (results, index, history) => {
+    this.props.onHandleZoom(results, index, history);
   };
 
   handleBreadcrumbClick = (results, index, filterState, breadcrumbClick) => {
@@ -269,6 +269,14 @@ class DifferentialVolcano extends Component {
       breadcrumbClick,
     );
   };
+
+  handleVolcanoState = (volcanoState, maxElements) => {
+    this.props.onHandleVolcanoState(volcanoState, maxElements);
+  };
+
+  // handleTableDataChange = data => {
+  //   this.props.onHandleTableDataChange(data);
+  // };
 
   handleUpdateDifferentialResults = results => {
     this.props.onHandleUpdateDifferentialResults(results);
@@ -502,6 +510,8 @@ class DifferentialVolcano extends Component {
           }
           getMaxAndMin={this.getMaxAndMin}
           onHandleDotClick={this.handleDotClick}
+          onHandleVolcanoState={this.handleVolcanoState}
+          // onHandleTableDataChange={this.handleTableDataChange}
           volcanoDifferentialTableRowOther={
             this.props.volcanoDifferentialTableRowOther
           }
@@ -527,6 +537,7 @@ class DifferentialVolcano extends Component {
           identifier={this.state.identifier}
           onUpdateVolcanoLabels={this.props.onUpdateVolcanoLabels}
           filterState={this.props.filterState}
+          updateVolcanoLabels={this.props.updateVolcanoLabels}
         ></DifferentialVolcanoPlot>
       );
     } else {

@@ -114,6 +114,19 @@ class DifferentialSearchCriteria extends Component {
   }
 
   componentDidUpdate(prevProps) {
+    if (
+      this.props.maxElements !== this.state.uSettingsP.numElementsP &&
+      this.state.isFilteredDifferential &&
+      prevProps.breadcrumbClick === this.props.breadcrumbClick
+    ) {
+      this.setState({
+        uSettingsP: {
+          ...this.state.uSettingsP,
+          numElementsP: this.props.maxElements,
+        },
+      });
+    }
+
     if (!prevProps.zoom && this.props.zoom) {
       this.props.onEndZoom();
     }
@@ -124,7 +137,6 @@ class DifferentialSearchCriteria extends Component {
         Object.keys(this.props.filterState)?.length > 0 &&
         this.props.filterState.constructor === Object
       ) {
-        // console.log('filter state', this.props.filterState);
         const {
           sigValueP,
           differentialModel,
@@ -134,7 +146,6 @@ class DifferentialSearchCriteria extends Component {
           differentialTests,
           mustDifferential,
           notDifferential,
-          numElementsP,
         } = this.props.filterState;
         // debugger;
         // console.log('uSettings', this.state.uSettingsP);
@@ -149,7 +160,37 @@ class DifferentialSearchCriteria extends Component {
           notDifferential,
           uSettingsP: {
             ...this.state.uSettingsP,
-            numElementsP: numElementsP,
+            numElementsP:
+              this.props.zoomHistory.historyLastViewed[
+                this.props.activeBreadcrumb
+              ].length <
+              this.props.zoomHistory.history[this.props.activeBreadcrumb].length
+                ? this.props.zoomHistory.historyLastViewed[
+                    this.props.activeBreadcrumb
+                  ].length
+                : 0,
+            indexFilters: selectedColP.length,
+            maxElementsP: this.props.zoomHistory.history[
+              this.props.activeBreadcrumb
+            ].length,
+          },
+        });
+      } else {
+        this.setState({
+          uSettingsP: {
+            ...this.state.uSettingsP,
+            numElementsP:
+              this.props.zoomHistory.historyLastViewed[
+                this.props.activeBreadcrumb
+              ].length <
+              this.props.zoomHistory.history[this.props.activeBreadcrumb].length
+                ? this.props.zoomHistory.historyLastViewed[
+                    this.props.activeBreadcrumb
+                  ].length
+                : 0,
+            maxElementsP: this.props.zoomHistory.history[
+              this.props.activeBreadcrumb
+            ].length,
           },
         });
       }
@@ -189,7 +230,9 @@ class DifferentialSearchCriteria extends Component {
 
     if (
       prevProps.differentialResultsUnfiltered !==
-      this.props.differentialResultsUnfiltered
+        this.props.differentialResultsUnfiltered &&
+      !prevProps?.breadcrumbClick &&
+      !this.props?.breadcrumbClick
     ) {
       // console.log('props', [
       //   ...new Set(
@@ -812,8 +855,8 @@ class DifferentialSearchCriteria extends Component {
     });
   };
   handleSigValuePInputChange = (name, value, index) => {
-    console.log('input change', value, name);
-    console.log('state', this.props.breadcrumbClick);
+    // console.log('input change', value, name);
+    // console.log('state', this.props.breadcrumbClick);
     this.props.onHandleIsFilteredDifferential(false);
     const uSelVP = [...this.state[name]];
     uSelVP[index] = parseFloat(value);
