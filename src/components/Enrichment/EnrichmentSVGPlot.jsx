@@ -88,7 +88,7 @@ class EnrichmentSVGPlot extends PureComponent {
               as="div"
               key={`${index}-${s.plotType.plotDisplay}-pane-enrichment`}
             >
-              <div id="EnrichmentPlotSVG" className="svgSpan">
+              <div id="EnrichmentPlotSVGDiv" className="svgSpan">
                 <SVG
                   cacheRequests={true}
                   // description=""
@@ -100,6 +100,7 @@ class EnrichmentSVGPlot extends PureComponent {
                   // title={`${s.plotType.plotDisplay}`}
                   uniqueHash="e5j2h5"
                   uniquifyIDs={true}
+                  id="EnrichmentPlotSVG"
                 />
               </div>
             </Tab.Pane>
@@ -116,7 +117,6 @@ class EnrichmentSVGPlot extends PureComponent {
   render() {
     const {
       imageInfoEnrichment,
-      imageInfoEnrichmentLength,
       svgExportName,
       tab,
       SVGPlotLoaded,
@@ -171,7 +171,7 @@ class EnrichmentSVGPlot extends PureComponent {
                 imageInfo={imageInfoEnrichment}
                 tabIndex={activeSVGTabIndexEnrichmentVar}
                 svgExportName={svgExportName}
-                plot="EnrichmentPlotSVG"
+                plot="EnrichmentPlotSVGDiv"
               />
             </div>
             {/* <Popup

@@ -126,7 +126,7 @@ class DifferentialPlot extends PureComponent {
             menuItem: `${s.plotType.plotDisplay}`,
             render: () => (
               <Tab.Pane attached="true" as="div">
-                <div id="DifferentialPlotTabsPlotSVG" className="svgSpan">
+                <div id="DifferentialPlotTabsPlotSVGDiv" className="svgSpan">
                   <SVG
                     cacheRequests={true}
                     // description=""
@@ -138,6 +138,7 @@ class DifferentialPlot extends PureComponent {
                     // title={`${s.plotType.plotDisplay}`}
                     uniqueHash="c3h0f3"
                     uniquifyIDs={true}
+                    id="DifferentialPlotTabsPlotSVG"
                   />
                 </div>
               </Tab.Pane>
@@ -255,7 +256,7 @@ class DifferentialPlot extends PureComponent {
                     txtVisible={false}
                     imageInfo={imageInfoDifferential}
                     tabIndex={activeSVGTabIndexDifferentialVar}
-                    plot={'DifferentialPlotTabsPlotSVG'}
+                    plot={'DifferentialPlotTabsPlotSVGDiv'}
                   />
                 </Grid.Column>
               </Grid.Row>

@@ -562,7 +562,7 @@ class BarcodePlot extends Component {
             pdfVisible={false}
             svgVisible={true}
             txtVisible={false}
-            plot={'BarcodeChart'}
+            plot="BarcodeChart"
             description={this.props.imageInfoEnrichment.key}
           />
         </div>
