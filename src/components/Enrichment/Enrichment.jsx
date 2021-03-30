@@ -2183,7 +2183,7 @@ class Enrichment extends Component {
             </Grid.Column>
           </Grid.Row>
         </Grid>
-        <div className="MultisetSvgOuter">
+        <div className="MultisetSvgOuter" id="enrichmentMultisetAnalysisSVGDiv">
           <SVG
             cacheRequests={true}
             // description=""
@@ -2195,6 +2195,7 @@ class Enrichment extends Component {
             // title={`${s.plotType.plotDisplay}`}
             uniqueHash="d4i1g4"
             uniquifyIDs={true}
+            id="enrichmentMultisetAnalysisSVG"
           />
         </div>
       </Sidebar>

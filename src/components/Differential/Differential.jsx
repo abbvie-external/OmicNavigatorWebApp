@@ -1024,7 +1024,10 @@ class Differential extends Component {
             </Grid.Column>
           </Grid.Row>
         </Grid>
-        <div className="MultisetSvgOuter">
+        <div
+          id="differentialMultisetAnalysisSVGDiv"
+          className="MultisetSvgOuter"
+        >
           <SVG
             cacheRequests={true}
             // description=""
@@ -1036,6 +1039,7 @@ class Differential extends Component {
             // title={`${s.plotType.plotDisplay}`}
             uniqueHash="b2g9e2"
             uniquifyIDs={true}
+            id="differentialMultisetAnalysisSVG"
           />
         </div>
       </Sidebar>
