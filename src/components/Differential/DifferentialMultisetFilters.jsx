@@ -3,9 +3,6 @@ import { Form, Select, Icon, Button } from 'semantic-ui-react';
 import * as d3 from 'd3';
 import NumericExponentialInput from '../Shared/NumericExponentialInput';
 import '../Shared/MultisetFilters.scss';
-import { object } from 'airbnb-prop-types';
-import { filter } from 'lodash';
-import { index } from 'd3';
 
 class DifferentialMultisetFilters extends Component {
   componentDidMount() {
@@ -46,6 +43,9 @@ class DifferentialMultisetFilters extends Component {
       mustDifferential,
       notDifferential,
     } = this.props;
+    console.log('sigval', sigValueP);
+
+    // if (this.props.breadcrumbClick) {
     if (
       multisetFiltersVisibleDifferential &&
       (mustDifferential !== prevProps.mustDifferential ||
@@ -59,6 +59,12 @@ class DifferentialMultisetFilters extends Component {
         selectedColP !== prevProps.selectedColP ||
         selectedOperatorP !== prevProps.selectedOperatorP)
     ) {
+      console.log(
+        'prev',
+        prevProps.breadcrumbClick,
+        this.props.breadcrumbClick,
+      );
+
       this.makeMultiset(
         uDataP,
         uAnchorP,
@@ -70,6 +76,7 @@ class DifferentialMultisetFilters extends Component {
         mustDifferential,
         notDifferential,
       );
+      // }
 
       // filterState &&
       // Object.keys(filterState)?.length > 0 &&
@@ -943,7 +950,11 @@ class DifferentialMultisetFilters extends Component {
   handleInputChange = (value, index) => {
     // console.log('index', index);
     // console.log('value', value);
-    this.props.onHandleSigValuePInputChange('sigValueP', value, index);
+    this.props.onHandleSigValuePInputChange(
+      'sigValueP',
+      this.props.breadcrumbClick ? this.props.sigValueP[index] : value,
+      index,
+    );
   };
 
   render() {
@@ -959,14 +970,14 @@ class DifferentialMultisetFilters extends Component {
     const hoveredFilter = uSettingsP.hoveredFilter;
     // console.log('render', sigValueP, selectedOperatorP);
     const callbackFactory = index => value => {
-      // console.log('factory', value);
+      console.log('factory', value);
       this.props.onHandleSigValuePInputChange('sigValueP', value, index);
     };
     return (
       <Fragment>
         <Form className="MultisetDropdownContainer">
           <ul style={{ padding: '0px' }}>
-            {selectedColP.map((val, index) => {
+            {indexFiltersP.map(index => {
               return (
                 <Form.Group
                   key={`differentialMultiSetFiltersRow${index}`}
@@ -981,7 +992,7 @@ class DifferentialMultisetFilters extends Component {
                     className="ThresholdColumnReadOnly"
                     index={index}
                     // selection
-                    value={val.value}
+                    value={selectedColP[index].value}
                     options={thresholdColsP}
                     width={7}
                     onChange={this.handleDropdownChange}
@@ -1020,24 +1031,31 @@ class DifferentialMultisetFilters extends Component {
                     key={`differentialMultiSetFiltersSignificance${index}`}
                   >
                     <label>{index === 0 ? 'Value' : ''}</label>
+                    {console.log('render', sigValueP[index])}
                     <NumericExponentialInput
                       key={`differentialMultiSetFiltersInput${index}`}
-                      onChange={value => {
-                        this.handleInputChange(value, index);
-                        // if (this.props.breadcrumbClick) {
-                        //   console.log('here');
-                        //   this.handleInputChange(this.props.sigValueP, index);
-                        // } else {
-                        //   this.handleInputChange(value, index);
-                        // }
+                      // onChange={value => {
+                      //   console.log(
+                      //     'change input handler',
+                      //     sigValueP[index],
+                      //     value,
+                      //     index,
+                      //   );
 
-                        // this.props.onBreadcrumbClick(false);
-                      }}
+                      //   if (this.props.breadcrumbClick) {
+                      //     callbackFactory(index);
+                      //     this.props.onBreadcrumbClick(false);
+                      //   } else {
+                      //     callbackFactory(index);
+                      //   }
+                      // }}
+                      onChange={callbackFactory(index)}
                       min={1e-100}
                       preventNegatives={false}
                       name="sigValueP"
                       defaultValue={sigValueP[index]}
                       value={sigValueP[index]}
+                      breadcrumb={this.props.breadcrumbClick}
                     />
                   </Form.Field>
                 </Form.Group>

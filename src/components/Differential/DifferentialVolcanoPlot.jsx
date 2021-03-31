@@ -637,44 +637,41 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       );
     }
 
-    // if (!prevProps.isFilteredDifferential && isFilteredDifferential) {
-
-    //   console.log(
-    //     this.setLastViewed(
-    //       this.state.filterState,
-    //       this.props.filterState,
-    //       this.state.zoom.activeIndex,
-    //     ),
-    //   );
-    //   // if (this.state.filterState.length > 0) {
-    //   //   let index = this.state.filterState.findIndex(
-    //   //     item => item.index === this.state.zoom.activeIndex,
-    //   //   );
-    //   //   if (index >= 0) {
-    //   //     let array = [...this.state.filterState];
-    //   //     array.splice(index, 1, {
-    //   //       ...this.props.filterState,
-    //   //       index: this.state.zoom.activeIndex,
-    //   //     });
-    //   //     this.setState({
-    //   //       filterState: [...array],
-    //   //     });
-    //   //   } else {
-    //   //     this.setState({
-    //   //       filterState: [
-    //   //         ...this.state.filterState,
-    //   //         { ...this.props.filterState, index: this.state.zoom.activeIndex },
-    //   //       ],
-    //   //     });
-    //   //   }
-    //   // } else {
-    //   //   this.setState({
-    //   //     filterState: [
-    //   //       { ...this.props.filterState, index: this.state.zoom.activeIndex },
-    //   //     ],
-    //   //   });
-    //   // }
-    // }
+    if (!prevProps.isFilteredDifferential && isFilteredDifferential) {
+      this.setLastViewed(
+        this.state.filterState,
+        this.props.filterState,
+        this.state.zoom.activeIndex,
+      );
+      //   // if (this.state.filterState.length > 0) {
+      //   //   let index = this.state.filterState.findIndex(
+      //   //     item => item.index === this.state.zoom.activeIndex,
+      //   //   );
+      //   //   if (index >= 0) {
+      //   //     let array = [...this.state.filterState];
+      //   //     array.splice(index, 1, {
+      //   //       ...this.props.filterState,
+      //   //       index: this.state.zoom.activeIndex,
+      //   //     });
+      //   //     this.setState({
+      //   //       filterState: [...array],
+      //   //     });
+      //   //   } else {
+      //   //     this.setState({
+      //   //       filterState: [
+      //   //         ...this.state.filterState,
+      //   //         { ...this.props.filterState, index: this.state.zoom.activeIndex },
+      //   //       ],
+      //   //     });
+      //   //   }
+      //   // } else {
+      //   //   this.setState({
+      //   //     filterState: [
+      //   //       { ...this.props.filterState, index: this.state.zoom.activeIndex },
+      //   //     ],
+      //   //   });
+      //   // }
+    }
 
     if (
       isUpsetVisible &&
@@ -1244,29 +1241,32 @@ class DifferentialVolcanoPlot extends React.PureComponent {
           ...self.createCircleElements(brushedDataArr),
         ];
 
-        self.props.onHandleZoom(
-          total.map(elem => JSON.parse(elem.props.data)),
-          self.state.zoom.activeIndex + 1,
-          self.state.zoom,
-        );
+        if (!!total.length) {
+          self.props.onHandleZoom(
+            total.map(elem => JSON.parse(elem.props.data)),
+            self.state.zoom.activeIndex + 1,
+            self.state.zoom,
+          );
 
-        // if (brushedBins.length > 0) {
-        self.hexBinning(total);
-        // }
+          // if (brushedBins.length > 0) {
+          self.hexBinning(total);
+          // }
 
-        self.setState({ brushedRawData: brushedCircles, brushing: false });
+          self.setState({ brushedRawData: brushedCircles, brushing: false });
 
-        if (brushedDataArr.length > 0) {
-          self.setState({
-            brushedCirclesData: brushedDataArr,
-            brushedCircles: brushedCircles,
-          });
+          if (brushedDataArr.length > 0) {
+            self.setState({
+              brushedCirclesData: brushedDataArr,
+              brushedCircles: brushedCircles,
+            });
+          }
+          // self.hexBinning(brushed);
+          self.props.handleVolcanoPlotSelectionChange([
+            ...brushedDataArr,
+            ...brushedBins.map(elem => JSON.parse(elem.props.data)),
+          ]);
         }
-        // self.hexBinning(brushed);
-        self.props.handleVolcanoPlotSelectionChange([
-          ...brushedDataArr,
-          ...brushedBins.map(elem => JSON.parse(elem.props.data)),
-        ]);
+
         // }
         // }
 

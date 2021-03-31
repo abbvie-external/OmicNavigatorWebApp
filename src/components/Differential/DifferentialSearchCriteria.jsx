@@ -114,11 +114,13 @@ class DifferentialSearchCriteria extends Component {
   }
 
   componentDidUpdate(prevProps) {
+    // console.log(this.state.sigValueP);
     if (
       this.props.maxElements !== this.state.uSettingsP.numElementsP &&
       this.state.isFilteredDifferential &&
       prevProps.breadcrumbClick === this.props.breadcrumbClick
     ) {
+      console.log('123');
       this.setState({
         uSettingsP: {
           ...this.state.uSettingsP,
@@ -137,6 +139,7 @@ class DifferentialSearchCriteria extends Component {
         Object.keys(this.props.filterState)?.length > 0 &&
         this.props.filterState.constructor === Object
       ) {
+        console.log('142', this.props);
         const {
           sigValueP,
           differentialModel,
@@ -176,6 +179,7 @@ class DifferentialSearchCriteria extends Component {
           },
         });
       } else {
+        console.log('182');
         this.setState({
           uSettingsP: {
             ...this.state.uSettingsP,
@@ -194,7 +198,8 @@ class DifferentialSearchCriteria extends Component {
           },
         });
       }
-      this.props.onUpdateBreadcrumbClick(false);
+      // this.props.onUpdateBreadcrumbClick(false);
+
       // if (this.props.filterState) {
       //   const {
       //     sigValueP,
@@ -856,15 +861,28 @@ class DifferentialSearchCriteria extends Component {
   };
   handleSigValuePInputChange = (name, value, index) => {
     // console.log('input change', value, name);
-    // console.log('state', this.props.breadcrumbClick);
-    this.props.onHandleIsFilteredDifferential(false);
+    console.log('state', this.props.breadcrumbClick);
+    if (this.props.isFilteredDifferential)
+      this.props.onHandleIsFilteredDifferential(false);
     const uSelVP = [...this.state[name]];
     uSelVP[index] = parseFloat(value);
+    if (this.props.breadcrumbClick) this.props.onUpdateBreadcrumbClick(false);
+    // if (!this.props.breadcrumbClick) {
     this.setState({
       [name]: uSelVP,
       reloadPlotP: true,
       isFilteredDifferential: false,
     });
+
+    if (this.props.breadcrumbClick) this.props.onUpdateBreadcrumbClick(false);
+    // } else {
+    //   this.setState({
+    //     [name]: uSelVP,
+    //     reloadPlotP: false,
+    //     isFilteredDifferential: false,
+    //   });
+    // }
+    // this.props.onUpdateBreadcrumbClick(false);
   };
   handleSetChange = (mustDifferential, notDifferential) => {
     this.setState({
@@ -975,7 +993,7 @@ class DifferentialSearchCriteria extends Component {
       notDifferential: this.state.notDifferential,
     });
 
-    if (reloadPlotP === true && differentialTests.length > 1) {
+    if (reloadPlotP === true && differentialTests?.length > 1) {
       onDisablePlotDifferential();
       this.getMultisetPlot(
         sigValueP,
@@ -1173,8 +1191,8 @@ class DifferentialSearchCriteria extends Component {
     if (isValidSearchDifferential && multisetFiltersVisibleDifferential) {
       MultisetFiltersDifferential = (
         <DifferentialMultisetFilters
-          {...this.props}
-          {...this.state}
+          // {...this.props}
+          // {...this.state}
           onHandleDropdownChange={this.handleDropdownChange}
           onHandleSigValuePInputChange={this.handleSigValuePInputChange}
           onHandleSetChange={this.handleSetChange}
@@ -1182,6 +1200,20 @@ class DifferentialSearchCriteria extends Component {
           onRemoveFilterDifferential={this.removeFilterDifferential}
           onChangeHoveredFilter={this.changeHoveredFilter}
           onBreadcrumbClick={this.props.onUpdateBreadcrumbClick}
+          uDataP={this.state.uDataP}
+          uAnchorP={this.state.uAnchorP}
+          uSettingsP={this.state.uSettingsP}
+          metaSvgP={this.state.metaSvgP}
+          sigValueP={this.state.sigValueP}
+          selectedColP={this.state.selectedColP}
+          selectedOperatorP={this.state.selectedOperatorP}
+          mustDifferential={this.state.mustDifferential}
+          notDifferential={this.state.notDifferential}
+          multisetFiltersVisibleDifferential={
+            this.state.multisetFiltersVisibleDifferential
+          }
+          thresholdColsP={this.props.thresholdColsP}
+          breadcrumbClick={this.props.breadcrumbClick}
         />
       );
 

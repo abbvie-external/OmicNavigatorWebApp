@@ -16,6 +16,7 @@ export default function Component({
   value,
   preventNegatives,
   disabled,
+  breadcrumb,
 }) {
   const [numberProps] = useExponentialInput({
     defaultValue,
@@ -24,6 +25,7 @@ export default function Component({
     onChange,
     value,
     preventNegatives,
+    breadcrumb,
   });
 
   return (
@@ -43,6 +45,7 @@ const useExponentialInput = ({
   value: propValue,
   defaultValue,
   preventNegatives,
+  breadcrumb,
 }) => {
   const [power, setPower] = useState(() => {
     return +(propValue || defaultValue || 0).toExponential(0).split('e')[1];
@@ -62,10 +65,11 @@ const useExponentialInput = ({
     setBase(+base);
     setPower(+power);
   }, [propValue]);
-
+  console.log('propvalue', propValue, numberValue);
   const [fakeValue, setFakeValue] = useState(null);
   const isStepRef = useRef(true);
   const handleChange = evt => {
+    console.log('evt', evt);
     isStepRef.current = evt.nativeEvent.data === undefined;
     let val = evt.currentTarget.value;
     if (isStepRef.current) {
@@ -111,30 +115,51 @@ const useExponentialInput = ({
   };
   const onChangeRef = useRef(onChange);
   useEffect(() => {
+    console.log('input 115');
     onChangeRef.current = onChange;
   }, [onChange]);
   useEffect(() => {
+    console.log('input 119', numberValue, fakeValue);
     if (onChangeRef.current && !Number.isNaN(+fakeValue)) {
+      console.log('input 121');
       if (isStepRef.current) {
+        console.log('input 123');
         onChangeRef.current(numberValue);
       } else {
+        console.log('input 126', fakeValue);
         const newValue = absClamp(+fakeValue, min, max);
         if (preventNegatives) {
+          console.log('input 129');
           onChangeRef.current(Math.abs(newValue));
         } else {
-          onChangeRef.current(newValue);
+          console.log('input 132', newValue, value);
+          // onChangeRef.current(newValue);
+          breadcrumb
+            ? onChangeRef.current(propValue)
+            : onChangeRef.current(newValue);
         }
       }
     }
   }, [numberValue, fakeValue, min, max, preventNegatives]);
+  console.log(
+    'here',
+    !breadcrumb
+      ? fakeValue ??
+          (Math.abs(numberValue) < 1e-3
+            ? numberValue.toExponential(0)
+            : numberValue.toPrecision(1))
+      : propValue,
+    breadcrumb,
+  );
   return [
     {
       onChange: handleChange,
-      value:
-        fakeValue ??
-        (Math.abs(numberValue) < 1e-3
-          ? numberValue.toExponential(0)
-          : numberValue.toPrecision(1)),
+      value: !breadcrumb
+        ? fakeValue ??
+          (Math.abs(numberValue) < 1e-3
+            ? numberValue.toExponential(0)
+            : numberValue.toPrecision(1))
+        : propValue,
       step: Number.MAX_VALUE,
       type: 'number',
     },
