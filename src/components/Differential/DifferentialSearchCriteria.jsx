@@ -119,7 +119,7 @@ class DifferentialSearchCriteria extends Component {
       this.state.isFilteredDifferential &&
       prevProps.breadcrumbClick === this.props.breadcrumbClick
     ) {
-      console.log('123');
+      // console.log('123');
       this.setState({
         uSettingsP: {
           ...this.state.uSettingsP,
@@ -131,14 +131,14 @@ class DifferentialSearchCriteria extends Component {
     if (!prevProps.zoom && this.props.zoom) {
       this.props.onEndZoom();
     }
-    // console.log(!prevProps.breadcrumbClick && this.props.breadcrumbClick);
+
     if (!prevProps.breadcrumbClick && this.props.breadcrumbClick) {
       if (
         this.props.filterState &&
         Object.keys(this.props.filterState)?.length > 0 &&
         this.props.filterState.constructor === Object
       ) {
-        console.log('142', this.props);
+        // console.log('142', this.props);
         const {
           sigValueP,
           differentialModel,
@@ -149,8 +149,7 @@ class DifferentialSearchCriteria extends Component {
           mustDifferential,
           notDifferential,
         } = this.props.filterState;
-        // debugger;
-        // console.log('uSettings', this.state.uSettingsP);
+        // debugger;x
         this.setState({
           sigValueP: sigValueP,
           differentialModel: differentialModel,
@@ -178,7 +177,6 @@ class DifferentialSearchCriteria extends Component {
           },
         });
       } else {
-        console.log('182');
         this.setState({
           uSettingsP: {
             ...this.state.uSettingsP,
@@ -244,13 +242,6 @@ class DifferentialSearchCriteria extends Component {
       !prevProps?.breadcrumbClick &&
       !this.props?.breadcrumbClick
     ) {
-      // console.log('props', [
-      //   ...new Set(
-      //     this.props.differentialResultsUnfiltered.map(data =>
-      //       console.log(data),
-      //     ),
-      //   ),
-      // ]);
       this.setState({
         uSettingsP: {
           ...this.state.uSettingsP,
@@ -611,14 +602,20 @@ class DifferentialSearchCriteria extends Component {
             true,
             true,
             test,
+            false,
           );
         }
       }
       // Stream finished at this point
       const streamedResultsCopy = streamedResults.slice();
       cacheResultsTable[cacheKey] = streamedResultsCopy;
-      this.props.onHandleIsDataStreamingResultsTable(false);
-      this.handleGetResultsTableData(streamedResultsCopy, true, true, test);
+      this.handleGetResultsTableData(
+        streamedResultsCopy,
+        true,
+        true,
+        test,
+        true,
+      );
     } catch (error) {
       console.error(error);
     }
@@ -629,6 +626,7 @@ class DifferentialSearchCriteria extends Component {
     resetMultiset,
     handleMaxElements,
     differentialTest,
+    streamingFinished,
   ) => {
     const { onDifferentialSearchUnfiltered, onDifferentialSearch } = this.props;
     if (resetMultiset) {
@@ -640,8 +638,9 @@ class DifferentialSearchCriteria extends Component {
         uAnchorP: differentialTest,
       });
     }
+    const finished = streamingFinished ? true : false;
     onDifferentialSearchUnfiltered({ differentialResults: tableData });
-    onDifferentialSearch({ differentialResults: tableData });
+    onDifferentialSearch({ differentialResults: tableData }, finished);
   };
 
   handleMultisetToggleDifferential = () => {
@@ -855,13 +854,10 @@ class DifferentialSearchCriteria extends Component {
   };
 
   handleSigValuePInputChange = (name, value, index) => {
-    // console.log('input change', value, name);
-    console.log('state', this.props.breadcrumbClick);
     if (this.props.isFilteredDifferential)
       this.props.onHandleIsFilteredDifferential(false);
     const uSelVP = [...this.state[name]];
     uSelVP[index] = parseFloat(value);
-    if (this.props.breadcrumbClick) this.props.onUpdateBreadcrumbClick(false);
     // if (!this.props.breadcrumbClick) {
     this.setState({
       [name]: uSelVP,
@@ -869,7 +865,6 @@ class DifferentialSearchCriteria extends Component {
       isFilteredDifferential: false,
     });
 
-    if (this.props.breadcrumbClick) this.props.onUpdateBreadcrumbClick(false);
     // } else {
     //   this.setState({
     //     [name]: uSelVP,
@@ -877,7 +872,7 @@ class DifferentialSearchCriteria extends Component {
     //     isFilteredDifferential: false,
     //   });
     // }
-    // this.props.onUpdateBreadcrumbClick(false);
+    if (this.props.breadcrumbClick) this.props.onUpdateBreadcrumbClick(false);
   };
 
   handleSetChange = (mustDifferential, notDifferential) => {
@@ -906,7 +901,7 @@ class DifferentialSearchCriteria extends Component {
       notDifferential,
       maxElementsP,
     } = this.state;
-    this.props.onSearchTransitionDifferentialAlt(true);
+    // this.props.onSearchTransitionDifferentialAlt(true); Commented on 3/31 Paul
     this.props.onHandleIsFilteredDifferential(true);
     this.setState({
       isFilteredDifferential: true,
@@ -973,7 +968,6 @@ class DifferentialSearchCriteria extends Component {
     //           return item;
     //         }
     //       });
-
     this.props.onHandleFilterState({
       sigValueP,
       differentialModel,

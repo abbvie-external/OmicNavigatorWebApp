@@ -56,7 +56,7 @@ class Differential extends Component {
       // isItemDatatLoaded: false,
       // HighlightedFeaturesArrVolcano: [],
       // volcanoDifferentialTableRowMax: '',
-      // volcanoDifferentialTableRowOther: [],
+      // volcanoDifferentialTableRowOther: [], commented on 3/31 Paul
       // maxObjectIdentifier: null,
       imageInfoVolcano: {
         key: null,
@@ -188,7 +188,7 @@ class Differential extends Component {
     });
   };
 
-  handleDifferentialSearch = searchResults => {
+  handleDifferentialSearch = (searchResults, streamingFinished) => {
     /**
      * @type {QHGrid.ColumnConfig<{}>[]}
      */
@@ -209,6 +209,9 @@ class Differential extends Component {
       HighlightedFeaturesArrVolcano: [],
       enableMultifeaturePlotting: false,
     });
+
+    if (streamingFinished)
+      this.setState({ isDataStreamingResultsTable: false });
   };
 
   handleVolcanoTableLoading = bool => {
@@ -661,6 +664,7 @@ class Differential extends Component {
       activeBreadcrumb: index,
       breadcrumbClick: breadcrumbClick,
       filterState,
+      HighlightedFeaturesArrVolcano: [],
     });
   };
 
@@ -671,6 +675,7 @@ class Differential extends Component {
       zoom: true,
       activeBreadcrumb: index,
       zoomHistory: history,
+      HighlightedFeaturesArrVolcano: [],
     });
   };
 

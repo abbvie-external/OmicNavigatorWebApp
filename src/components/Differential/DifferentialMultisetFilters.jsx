@@ -10,7 +10,7 @@ class DifferentialMultisetFilters extends Component {
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
-    console.log('sigval', this.props.sigValueP);
+    // console.log('sigval', this.props.sigValueP);
 
     // if (this.props.breadcrumbClick) {
     if (
@@ -28,12 +28,11 @@ class DifferentialMultisetFilters extends Component {
         this.props.numElementsP !== prevProps.numElementsP ||
         this.props.maxElementsP !== prevProps.maxElementsP)
     ) {
-      console.log(
-        'prev',
-        prevProps.breadcrumbClick,
-        this.props.breadcrumbClick,
-      );
-
+      // console.log(
+      //   'prev',
+      //   prevProps.breadcrumbClick,
+      //   this.props.breadcrumbClick,
+      // );
       // this.makeMultiset(
       //   uDataP,
       //   uAnchorP,
@@ -46,7 +45,6 @@ class DifferentialMultisetFilters extends Component {
       //   notDifferential,
       // );
       // }
-
       // filterState &&
       // Object.keys(filterState)?.length > 0 &&
       // filterState.constructor === Object
@@ -912,14 +910,14 @@ class DifferentialMultisetFilters extends Component {
     const hoveredFilter = uSettingsP.hoveredFilter;
     // console.log('render', sigValueP, selectedOperatorP);
     const callbackFactory = index => value => {
-      console.log('factory', value);
+      // console.log('factory', value);
       this.props.onHandleSigValuePInputChange('sigValueP', value, index);
     };
     return (
       <Fragment>
         <Form className="MultisetDropdownContainer">
           <ul style={{ padding: '0px' }}>
-            {indexFiltersP.map(index => {
+            {selectedColP.map((val, index) => {
               return (
                 <Form.Group
                   key={`differentialMultiSetFiltersRow${index}`}
@@ -934,7 +932,7 @@ class DifferentialMultisetFilters extends Component {
                     className="ThresholdColumnReadOnly"
                     index={index}
                     // selection
-                    value={selectedColP[index].value}
+                    value={val.value}
                     options={thresholdColsP}
                     width={7}
                     onChange={this.handleDropdownChange}
@@ -973,7 +971,7 @@ class DifferentialMultisetFilters extends Component {
                     key={`differentialMultiSetFiltersSignificance${index}`}
                   >
                     <label>{index === 0 ? 'Value' : ''}</label>
-                    {console.log('render', sigValueP[index])}
+                    {/* {console.log('render', sigValueP[index])} */}
                     <NumericExponentialInput
                       key={`differentialMultiSetFiltersInput${index}`}
                       // onChange={value => {
