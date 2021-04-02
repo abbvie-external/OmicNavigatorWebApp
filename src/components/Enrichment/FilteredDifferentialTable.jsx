@@ -74,8 +74,8 @@ class FilteredDifferentialTable extends Component {
       } = this.props;
       const { itemsPerPageFilteredDifferentialTable } = this.state;
       const sortedData =
-        this.props.filteredDifferentialGridRef.current?.qhGridRef.current?.getSortedData() ||
-        [];
+        this.props.filteredDifferentialGridRef?.current?.qhGridRef.current?.getSortedData() ||
+        null;
       if (sortedData != null) {
         const Index = _.findIndex(sortedData, function(p) {
           return p[filteredDifferentialFeatureIdKey] === featureToHighlight;
