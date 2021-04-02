@@ -12,7 +12,7 @@
       padding-top: 0px !important;
     }
 
-    .svgContainer {
+    .svgContainerVolcano {
       margin: 15px !important;
     }
 
@@ -27,11 +27,10 @@
     }
   }
 }
-#DifferentialPlotTabsPlotSVG {
+#DifferentialPlotTabsPlotSVGDiv {
   width: 100% !important;
   svg {
     height: 100% !important;
-    max-height: 70vh !important;
     width: inherit !important;
   }
 }

@@ -2,8 +2,9 @@ import DOMPurify from 'dompurify';
 import _ from 'lodash';
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import { Grid, Menu, Popup, Sidebar, Tab, Message } from 'semantic-ui-react';
 import { CancelToken } from 'axios';
+import { Grid, Menu, Popup, Sidebar, Tab, Message } from 'semantic-ui-react';
+import SVG from 'react-inlinesvg';
 import networkIcon from '../../resources/networkIcon.png';
 import networkIconSelected from '../../resources/networkIconSelected.png';
 import tableIcon from '../../resources/tableIcon.png';
@@ -11,7 +12,12 @@ import tableIconSelected from '../../resources/tableIconSelected.png';
 import { omicNavigatorService } from '../../services/omicNavigator.service';
 import ButtonActions from '../Shared/ButtonActions';
 import * as d3 from 'd3';
-import { formatNumberForDisplay, splitValue, Linkout } from '../Shared/helpers';
+import {
+  formatNumberForDisplay,
+  splitValue,
+  Linkout,
+  roundToPrecision,
+} from '../Shared/helpers';
 import '../Shared/Table.scss';
 import SearchingAlt from '../Transitions/SearchingAlt';
 import TransitionActive from '../Transitions/TransitionActive';
@@ -45,7 +51,7 @@ class Enrichment extends Component {
     activeIndexEnrichmentView: this.storedEnrichmentActiveIndex || 0,
     multisetPlotInfoEnrichment: {
       title: '',
-      svg: [],
+      svg: '',
     },
     multisetPlotAvailableEnrichment: false,
     animationEnrichment: 'uncover',
@@ -106,7 +112,7 @@ class Enrichment extends Component {
     enrichmentTerm: '',
     itemsPerPageInformedEnrichmentMain: null,
     plotType: [],
-    imageInfo: {
+    imageInfoEnrichment: {
       key: null,
       title: '',
       svg: [],
@@ -265,7 +271,7 @@ class Enrichment extends Component {
     testSelectedTransitionCb(true);
     // const TestSiteVar = `${test}:${dataItem.description}`;
     // let xLargest = 0;
-    // let imageInfo = { key: '', title: '', svg: [] };
+    // let imageInfoEnrichment = { key: '', title: '', svg: [] };
     // omicNavigatorService
     //   .getDatabaseInfo(
     //     enrichmentStudy + 'plots',
@@ -283,8 +289,8 @@ class Enrichment extends Component {
     let term = dataItem?.termID || '';
     let description = dataItem?.description || '';
     self.setState({
-      imageInfo: {
-        ...self.state.imageInfo,
+      imageInfoEnrichment: {
+        ...self.state.imageInfoEnrichment,
         key: `${test}:${description}`,
         title: `${test}:${description}`,
       },
@@ -1025,7 +1031,7 @@ class Enrichment extends Component {
         },
         SVGPlotLoaded: false,
         SVGPlotLoading: false,
-        // imageInfo: {
+        // imageInfoEnrichment: {
         //   key: null,
         //   title: '',
         //   svg: []
@@ -1074,8 +1080,8 @@ class Enrichment extends Component {
         SVGPlotLoaded: false,
         SVGPlotLoading: false,
         HighlightedProteins: [],
-        // imageInfo: {
-        //   ...this.state.imageInfo,
+        // imageInfoEnrichment: {
+        //   ...this.state.imageInfoEnrichment,
         //   svg: []
         // },
       });
@@ -1086,9 +1092,9 @@ class Enrichment extends Component {
     const { enrichmentPlotTypes } = this.state;
     const { enrichmentStudy, enrichmentModel } = this.props;
     let id = featureId != null ? featureId : '';
-    let imageInfo = { key: '', title: '', svg: [] };
-    imageInfo.title = this.state.imageInfo.title;
-    imageInfo.key = this.state.imageInfo.key;
+    let imageInfoEnrichmentVar = { key: '', title: '', svg: [] };
+    imageInfoEnrichmentVar.title = this.state.imageInfoEnrichment.title;
+    imageInfoEnrichmentVar.key = this.state.imageInfoEnrichment.key;
     this.setState({ svgExportName: id });
     let handleSVGCb = this.handleSVG;
     let handlePlotStudyError = this.handlePlotStudyError;
@@ -1099,60 +1105,28 @@ class Enrichment extends Component {
     });
     if (enrichmentPlotTypes.length > 0) {
       _.forEach(enrichmentPlotTypes, function(plot, i) {
+        if (enrichmentPlotTypes[i].plotType === 'multiFeature') {
+          return;
+        }
         omicNavigatorService
           .plotStudy(
             enrichmentStudy,
             enrichmentModel,
             id,
             enrichmentPlotTypes[i].plotID,
+            enrichmentPlotTypes[i].plotType,
             handlePlotStudyError,
             cancelToken,
           )
-          .then(svgMarkupObj => {
-            let svgMarkup = svgMarkupObj.data;
-            if (svgMarkup != null || svgMarkup !== []) {
-              svgMarkup = svgMarkup.replace(
-                /id="/g,
-                'id="' + id + '-' + i + '-',
-              );
-              svgMarkup = svgMarkup.replace(
-                /#glyph/g,
-                '#' + id + '-' + i + '-glyph',
-              );
-              svgMarkup = svgMarkup.replace(
-                /#clip/g,
-                '#' + id + '-' + i + '-clip',
-              );
-              svgMarkup = svgMarkup.replace(
-                /<svg/g,
-                `<svg preserveAspectRatio="xMinYMin meet" id="currentSVG-${id}-${i}"`,
-              );
-              DOMPurify.addHook('afterSanitizeAttributes', function(node) {
-                if (
-                  node.hasAttribute('xlink:href') &&
-                  !node.getAttribute('xlink:href').match(/^#/)
-                ) {
-                  node.remove();
-                }
-              });
-              // Clean HTML string and write into our DIV
-              let sanitizedSVG = DOMPurify.sanitize(svgMarkup, {
-                ADD_TAGS: ['use'],
-              });
+          .then(svgUrl => {
+            if (svgUrl) {
               let svgInfo = {
                 plotType: enrichmentPlotTypes[i],
-                svg: sanitizedSVG,
+                svg: svgUrl,
               };
-
-              // we want spline plot in zero index, rather than lineplot
-              // if (i === 0) {
-              imageInfo.svg.push(svgInfo);
-              currentSVGs.push(sanitizedSVG);
-              // } else {
-              //   imageInfo.svg.unshift(svgInfo);
-              //   currentSVGs.unshift(sanitizedSVG);
-              // }
-              handleSVGCb(imageInfo);
+              imageInfoEnrichmentVar.svg.push(svgInfo);
+              // currentSVGs.push(svgUrl);
+              handleSVGCb(imageInfoEnrichmentVar);
             }
           })
           .catch(error => {
@@ -1186,9 +1160,10 @@ class Enrichment extends Component {
     );
   };
 
-  handleSVG = imageInfo => {
+  handleSVG = imageInfoEnrichmentVar => {
     this.setState({
-      imageInfo: imageInfo,
+      imageInfoEnrichment: imageInfoEnrichmentVar,
+      imageInfoEnrichmentLength: imageInfoEnrichmentVar.svg?.length || 0,
       SVGPlotLoaded: true,
       SVGPlotLoading: false,
     });
@@ -1196,10 +1171,10 @@ class Enrichment extends Component {
 
   handlePlotStudyError = () => {
     this.setState({
-      SVGPlotLoaded: false,
+      // SVGPlotLoaded: false,
       SVGPlotLoading: false,
-      // imageInfo: {
-      //   ...this.state.imageInfo,
+      // imageInfoEnrichment: {
+      //   ...this.state.imageInfoEnrichment,
       //   svg: []
       // },
     });
@@ -1239,8 +1214,8 @@ class Enrichment extends Component {
     let term = dataItem?.termID || '';
     let description = dataItem?.description || '';
     this.setState({
-      imageInfo: {
-        ...this.state.imageInfo,
+      imageInfoEnrichment: {
+        ...this.state.imageInfoEnrichment,
         key: `${test}:${description}`,
         title: `${test}:${description}`,
         dataItem: dataItem,
@@ -1309,8 +1284,8 @@ class Enrichment extends Component {
         //   let term = dataItem.Annotation;
 
         //   self.setState({
-        //     imageInfo: {
-        //       ...self.state.imageInfo,
+        //     imageInfoEnrichment: {
+        //       ...self.state.imageInfoEnrichment,
         //       key: `${test} : ${dataItem.description}`,
         //       title: `${test} : ${dataItem.description}`
         //     },
@@ -1744,7 +1719,7 @@ class Enrichment extends Component {
       enrichmentNameLoaded: false,
       SVGPlotLoaded: false,
       SVGPlotLoading: false,
-      imageInfo: {
+      imageInfoEnrichment: {
         key: null,
         title: '',
         svg: [],
@@ -1769,11 +1744,6 @@ class Enrichment extends Component {
     });
   };
 
-  informItemsPerPage = items => {
-    this.setState({
-      itemsPerPageInformedEnrichmentMain: items,
-    });
-  };
   // cannot use this unless we can prevent first column (featureID) from being reordered
   // columnReorder = columns => {
   //   this.setState({ enrichmentColumns: columns });
@@ -1867,12 +1837,12 @@ class Enrichment extends Component {
     } else return <TransitionStill stillMessage={message} />;
   };
 
-  // informItemsPerPageEnrichmentTable = items => {
-  //   this.setState({
-  //     itemsPerPageEnrichmentTable: items,
-  //   });
-  //   localStorage.setItem('itemsPerPageEnrichmentTable', items);
-  // };
+  handleItemsPerPageChange = items => {
+    this.setState({
+      itemsPerPageEnrichmentTable: items,
+    });
+    localStorage.setItem('itemsPerPageEnrichmentTable', items);
+  };
 
   getTableAndNetworkPanes = () => {
     const {
@@ -1966,9 +1936,7 @@ class Enrichment extends Component {
                     // totalRows={rows}
                     // use "rows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
                     itemsPerPage={itemsPerPageEnrichmentTable}
-                    // onInformItemsPerPage={
-                    //   this.informItemsPerPageEnrichmentTable
-                    // }
+                    onItemsPerPageChange={this.handleItemsPerPageChange}
                     loading={isEnrichmentTableLoading}
                     // exportBaseName="Enrichment_Analysis"
                     // columnReorder={this.props.columnReorder}
@@ -2157,6 +2125,29 @@ class Enrichment extends Component {
       enrichmentModel,
       enrichmentAnnotation,
     } = this.props;
+
+    const pxToPtRatio = 105;
+    const pointSize = 12;
+    const width =
+      window.innerWidth ||
+      document.documentElement.clientWidth ||
+      document.body.clientWidth;
+    const height =
+      window.innerHeight ||
+      document.documentElement.clientHeight ||
+      document.body.clientHeight;
+    // const divWidth =
+    //   this.differentialViewContainerRef?.current?.parentElement?.offsetWidth ||
+    //   width - 310;
+    const divWidth = width * 0.75;
+    const divHeight = height * 0.85;
+    const divWidthPt = roundToPrecision(divWidth / pxToPtRatio, 1);
+    const divHeightPt = roundToPrecision(divHeight / pxToPtRatio, 1);
+    const divWidthPtString = `width=${divWidthPt}`;
+    const divHeightPtString = `&height=${divHeightPt}`;
+    const pointSizeString = `&pointsize=${pointSize}`;
+    const dimensions = `?${divWidthPtString}${divHeightPtString}${pointSizeString}`;
+    const srcUrl = `${multisetPlotInfoEnrichment.svg}${dimensions}`;
     const VerticalSidebar = ({ animation, visible }) => (
       <Sidebar
         as={'div'}
@@ -2192,10 +2183,21 @@ class Enrichment extends Component {
             </Grid.Column>
           </Grid.Row>
         </Grid>
-        <div
-          className="MultisetSvgOuter"
-          dangerouslySetInnerHTML={{ __html: multisetPlotInfoEnrichment.svg }}
-        ></div>
+        <div className="MultisetSvgOuter" id="enrichmentMultisetAnalysisSVGDiv">
+          <SVG
+            cacheRequests={true}
+            // description=""
+            // loader={<span>{loadingDimmer}</span>}
+            // onError={error => console.log(error.message)}
+            // onLoad={(src, hasCache) => console.log(src, hasCache)}
+            // preProcessor={code => code.replace(/fill=".*?"/g, 'fill="currentColor"')}
+            src={srcUrl}
+            // title={`${s.plotType.plotDisplay}`}
+            uniqueHash="d4i1g4"
+            uniquifyIDs={true}
+            id="enrichmentMultisetAnalysisSVG"
+          />
+        </div>
       </Sidebar>
     );
 

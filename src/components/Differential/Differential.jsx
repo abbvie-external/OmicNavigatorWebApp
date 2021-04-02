@@ -1,17 +1,22 @@
 import React, { Component } from 'react';
 import { Grid, Popup, Sidebar } from 'semantic-ui-react';
 import { withRouter } from 'react-router-dom';
+import SVG from 'react-inlinesvg';
+import { CancelToken } from 'axios';
 import DifferentialSearchCriteria from './DifferentialSearchCriteria';
-// import DifferentialPlot from './DifferentialPlot';
-// import LoaderActivePlots from '../Transitions/LoaderActivePlots';
 import TransitionActive from '../Transitions/TransitionActive';
 import TransitionStill from '../Transitions/TransitionStill';
 import ButtonActions from '../Shared/ButtonActions';
-import { formatNumberForDisplay, splitValue, Linkout } from '../Shared/helpers';
+import {
+  formatNumberForDisplay,
+  splitValue,
+  Linkout,
+  roundToPrecision,
+  limitValues,
+} from '../Shared/helpers';
 import DOMPurify from 'dompurify';
 import { omicNavigatorService } from '../../services/omicNavigator.service';
 import DifferentialVolcano from './DifferentialVolcano';
-import { CancelToken } from 'axios';
 import _ from 'lodash';
 import './Differential.scss';
 import '../Shared/Table.scss';
@@ -25,73 +30,87 @@ class Differential extends Component {
     differentialFeature: '',
   };
 
-  state = {
-    isValidSearchDifferential: false,
-    isSearchingDifferential: false,
-    isVolcanoTableLoading: false,
-    // differentialResults: [],
-    // differentialResultsMounted: false,
-    // differentialResultsUnfiltered: [],
-    /**
-     * @type {QHGrid.ColumnConfig[]}
-     */
-    // differentialColumns: [],
-    filterableColumnsP: [],
-    multisetPlotInfoDifferential: {
-      title: '',
-      svg: [],
-    },
-    isItemSelected: false,
-    isItemSVGLoaded: false,
-    isUpsetVisible: false,
-    isFilteredDifferential: false,
-    // isItemDatatLoaded: false,
-    // HighlightedFeaturesArrVolcano: [],
-    // volcanoDifferentialTableRowMax: '',
-    // volcanoDifferentialTableRowOther: [],
-    // maxObjectIdentifier: null,
-    imageInfo: {
-      key: null,
-      title: '',
-      svg: [],
-    },
-    imageInfoDifferential: {
-      key: null,
-      title: '',
-      svg: [],
-    },
-    activeSVGTabIndex: 0,
-    multisetPlotAvailableDifferential: false,
-    animation: 'uncover',
-    direction: 'left',
-    visible: false,
-    plotButtonActiveDifferential: false,
-    multisetQueriedDifferential: false,
-    thresholdColsP: [],
-    tabsMessage: 'Select a feature to display plots and data',
-    // differentialPlotTypes: [],
-    differentialStudyMetadata: [],
-    differentialModelsAndTests: [],
-    differentialTestsMetadata: [],
-    modelSpecificMetaFeaturesExist: true,
-    resultsLinkouts: [],
-    resultsFavicons: [],
-    isVolcanoPlotSVGLoaded: true,
-    metaFeaturesDataDifferential: [],
-    allMetaFeaturesDataDifferential: [],
-    isDataStreamingResultsTable: false,
-    zoom: false,
-    filterState: {},
-    breadcrumbClick: false,
-    zoomHistory: {},
-    updateVolcanoLabels: false,
-  };
+  constructor(props) {
+    super(props);
+    // this.resizeListener = this.resizeListener.bind(this);
+    // this.debouncedResizeListener = _.debounce(this.resizeListener, 100);
+    this.state = {
+      isValidSearchDifferential: false,
+      isSearchingDifferential: false,
+      isVolcanoTableLoading: false,
+      // differentialResults: [],
+      // differentialResultsUnfiltered: [],
+      /**
+       * @type {QHGrid.ColumnConfig[]}
+       */
+      // differentialColumns: [],
+      filterableColumnsP: [],
+      multisetPlotInfoDifferential: {
+        title: '',
+        svg: [],
+      },
+      isItemSelected: false,
+      isItemSVGLoaded: false,
+      isUpsetVisible: false,
+      isFilteredDifferential: false,
+      // isItemDatatLoaded: false,
+      // HighlightedFeaturesArrVolcano: [],
+      // volcanoDifferentialTableRowMax: '',
+      // volcanoDifferentialTableRowOther: [],
+      // maxObjectIdentifier: null,
+      imageInfoVolcano: {
+        key: null,
+        title: '',
+        svg: [],
+      },
+      imageInfoDifferential: {
+        key: null,
+        title: '',
+        svg: [],
+      },
+      activeSVGTabIndex: 0,
+      multisetPlotAvailableDifferential: false,
+      animation: 'uncover',
+      direction: 'left',
+      visible: false,
+      plotButtonActiveDifferential: false,
+      multisetQueriedDifferential: false,
+      thresholdColsP: [],
+      tabsMessage: 'Select a feature to display plots',
+      // differentialPlotTypes: [],
+      differentialStudyMetadata: [],
+      differentialModelsAndTests: [],
+      differentialTestsMetadata: [],
+      modelSpecificMetaFeaturesExist: true,
+      resultsLinkouts: [],
+      resultsFavicons: [],
+      isVolcanoPlotSVGLoaded: true,
+      metaFeaturesDataDifferential: [],
+      allMetaFeaturesDataDifferential: [],
+      isDataStreamingResultsTable: false,
+      enableMultifeaturePlotting: false,
+      zoom: false,
+      filterState: {},
+      breadcrumbClick: false,
+      zoomHistory: {},
+      updateVolcanoLabels: false,
+    };
+  }
+
   differentialViewContainerRef = React.createRef();
   differentialGridRef = React.createRef();
 
   shouldComponentUpdate(nextProps) {
     return nextProps.tab === 'differential';
   }
+
+  // componentWillUnmount() {
+  //   window.removeEventListener('resize', this.debouncedResizeListener);
+  // }
+
+  // resizeListener() {
+  //   this.forceUpdate();
+  // }
 
   handleSearchTransitionDifferential = bool => {
     this.setState({
@@ -165,6 +184,7 @@ class Differential extends Component {
       // isItemDatatLoaded: false,
       // isItemSelected: this.props.differentialFeature !== '',
       HighlightedFeaturesArrVolcano: [],
+      enableMultifeaturePlotting: false,
     });
   };
 
@@ -183,11 +203,11 @@ class Differential extends Component {
       isSearchingDifferential: false,
       isValidSearchDifferential: true,
       isVolcanoTableLoading: false,
-      // differentialResultsMounted: false,
       plotButtonActiveDifferential: false,
       visible: false,
       // isItemSVGLoaded: false,
       HighlightedFeaturesArrVolcano: [],
+      enableMultifeaturePlotting: false,
     });
   };
 
@@ -218,14 +238,14 @@ class Differential extends Component {
     if (scChange) {
       this.setState({
         multisetPlotAvailableDifferential: false,
-        imageInfo: { key: null, title: '', svg: [] },
+        imageInfoVolcano: { key: null, title: '', svg: [] },
         imageInfoDifferential: { key: null, title: '', svg: [] },
-        tabsMessage: 'Select a feature to display plots and data',
+        tabsMessage: 'Select a feature to display plots',
         // differentialResults: [],
-        // differentialResultsMounted: false,
         // differentialResultsUnfiltered: [],
         // isItemDatatLoaded: false,
         HighlightedFeaturesArrVolcano: [],
+        enableMultifeaturePlotting: false,
         volcanoDifferentialTableRowMax: '',
         volcanoDifferentialTableRowOther: [],
         maxObjectIdentifier: null,
@@ -346,7 +366,6 @@ class Differential extends Component {
       plotButtonActiveDifferential: false,
       visible: false,
       isItemSelected: false,
-      // differentialResultsMounted: false,
       isItemSVGLoaded: false,
     });
   };
@@ -374,14 +393,18 @@ class Differential extends Component {
     dataItem,
     imageInfoDifferential,
     featureidSpecificMetaFeaturesExist,
+    useId,
   ) => {
     const { differentialFeatureIdKey } = this.props;
+    const differentialFeatureVar = useId
+      ? id
+      : dataItem[differentialFeatureIdKey];
     const self = this;
     this.setState(
       {
         imageInfoDifferential: imageInfoDifferential,
+        imageInfoDifferentialLength: imageInfoDifferential.svg?.length || 0,
         isItemSelected: true,
-        // differentialResultsMounted: false,
         isItemSVGLoaded: false,
         // isItemDatatLoaded: false,
         currentSVGs: [],
@@ -392,7 +415,7 @@ class Differential extends Component {
             differentialStudy: this.props.differentialStudy || '',
             differentialModel: this.props.differentialModel || '',
             differentialTest: this.props.differentialTest || '',
-            differentialFeature: dataItem[differentialFeatureIdKey] || '',
+            differentialFeature: differentialFeatureVar || '',
           },
           false,
         );
@@ -400,6 +423,7 @@ class Differential extends Component {
       },
     );
   };
+
   getTableHelpers = differentialFeatureIdKeyVar => {
     const self = this;
     let addParams = {};
@@ -427,7 +451,12 @@ class Differential extends Component {
     this.setState({ additionalTemplateInfoDifferentialTable: addParams });
   };
 
-  getPlot = (view, featureId, featureidSpecificMetaFeaturesExist) => {
+  getPlot = (
+    view,
+    featureId,
+    featureidSpecificMetaFeaturesExist,
+    multiFeatureCall,
+  ) => {
     const { differentialPlotTypes } = this.state;
     const {
       differentialStudy,
@@ -437,11 +466,25 @@ class Differential extends Component {
     } = this.props;
     let self = this;
     let id = featureId != null ? featureId : differentialFeature;
-    let imageInfo = {
-      key: `${featureId}`,
-      title: `${differentialFeatureIdKey} ${featureId}`,
+    let imageInfoVar = {
+      key: ``,
+      title: ``,
       svg: [],
     };
+    if (multiFeatureCall) {
+      const featuresLength = featureId?.length || 0;
+      imageInfoVar = {
+        key: `(${featuresLength}-features)`,
+        title: `${differentialFeatureIdKey} (${featuresLength} Features)`,
+        svg: [],
+      };
+    } else {
+      imageInfoVar = {
+        key: `${featureId}`,
+        title: `${differentialFeatureIdKey} ${featureId}`,
+        svg: [],
+      };
+    }
     let currentSVGs = [];
     cancelRequestDifferentialResultsGetPlot();
     let cancelToken = new CancelToken(e => {
@@ -452,54 +495,34 @@ class Differential extends Component {
     }
     if (differentialPlotTypes.length !== 0) {
       _.forEach(differentialPlotTypes, function(plot, i) {
+        if (
+          (differentialPlotTypes[i].plotType === 'singleFeature' &&
+            multiFeatureCall) ||
+          (differentialPlotTypes[i].plotType === 'multiFeature' &&
+            !multiFeatureCall)
+        ) {
+          return;
+        }
         omicNavigatorService
           .plotStudy(
             differentialStudy,
             differentialModel,
             id,
             differentialPlotTypes[i].plotID,
+            differentialPlotTypes[i].plotType || 'singleFeature',
             // self.handleItemSelected,
             null,
             cancelToken,
           )
-          .then(svgMarkupObj => {
-            let svgMarkup = svgMarkupObj.data;
-            if (svgMarkup != null || svgMarkup !== []) {
-              svgMarkup = svgMarkup.replace(
-                /id="/g,
-                'id="' + id + '-' + i + '-',
-              );
-              svgMarkup = svgMarkup.replace(
-                /#glyph/g,
-                '#' + id + '-' + i + '-glyph',
-              );
-              svgMarkup = svgMarkup.replace(
-                /#clip/g,
-                '#' + id + '-' + i + '-clip',
-              );
-              svgMarkup = svgMarkup.replace(
-                /<svg/g,
-                `<svg preserveAspectRatio="xMinYMin meet" id="currentSVG-${id}-${i}"`,
-              );
-              DOMPurify.addHook('afterSanitizeAttributes', function(node) {
-                if (
-                  node.hasAttribute('xlink:href') &&
-                  !node.getAttribute('xlink:href').match(/^#/)
-                ) {
-                  node.remove();
-                }
-              });
-              // Clean HTML string and write into our DIV
-              let sanitizedSVG = DOMPurify.sanitize(svgMarkup, {
-                ADD_TAGS: ['use'],
-              });
+          .then(svgUrl => {
+            if (svgUrl) {
               let svgInfo = {
                 plotType: differentialPlotTypes[i],
-                svg: sanitizedSVG,
+                svg: svgUrl,
               };
-              imageInfo.svg.push(svgInfo);
-              currentSVGs.push(sanitizedSVG);
-              self.handleSVG(view, imageInfo);
+              imageInfoVar.svg.push(svgInfo);
+              currentSVGs.push(svgUrl);
+              self.handleSVG(view, imageInfoVar);
             } else {
               // self.handleItemSelected(false);
             }
@@ -510,7 +533,7 @@ class Differential extends Component {
       });
     } else {
       this.setState({
-        imageInfo: {
+        imageInfoVolcano: {
           key: null,
           title: '',
           svg: [],
@@ -519,6 +542,59 @@ class Differential extends Component {
         isVolcanoPlotSVGLoaded: true,
       });
     }
+  };
+
+  getMultifeaturePlot = (view, tableData) => {
+    const { HighlightedFeaturesArrVolcano, differentialResults } = this.state;
+    const { differentialFeatureIdKey } = this.props;
+    if (HighlightedFeaturesArrVolcano.length > 1) {
+      const featureIds = HighlightedFeaturesArrVolcano.map(
+        featureId => featureId.id,
+      );
+      this.getProteinDataAlt(featureIds);
+      // }
+    } else if (HighlightedFeaturesArrVolcano.length === 1) {
+      const value = HighlightedFeaturesArrVolcano[0].id;
+      let imageInfoDifferential = {
+        key: `${value}`,
+        title: `${differentialFeatureIdKey} ${value}`,
+        svg: [],
+      };
+      this.getProteinData(value, null, imageInfoDifferential, true, true);
+    } else if (HighlightedFeaturesArrVolcano.length === 0) {
+      const data = tableData || [];
+      const featureIds = data.map(
+        featureId => featureId[differentialFeatureIdKey],
+      );
+      this.getProteinDataAlt(featureIds);
+    } else return;
+  };
+
+  getProteinDataAlt = featureids => {
+    const featuresString = limitValues(featureids, 100);
+    this.setState(
+      {
+        isItemSelected: true,
+        isItemSVGLoaded: false,
+        // isItemDatatLoaded: false,
+        currentSVGs: [],
+        featuresString,
+      },
+      function() {
+        this.handleSearchCriteriaChangeDifferential(
+          {
+            differentialStudy: this.props.differentialStudy || '',
+            differentialModel: this.props.differentialModel || '',
+            differentialTest: this.props.differentialTest || '',
+            differentialFeature: '',
+            // differentialFeature: `(${featuresLength} Features)` || '',
+            // differentialFeatureLength: featuresLength,
+          },
+          false,
+        );
+        this.getPlot('Differential', featureids, false, true);
+      },
+    );
   };
 
   getMetaFeaturesTable = featureId => {
@@ -611,11 +687,26 @@ class Differential extends Component {
   };
 
   handleSelectedVolcano = toHighlightArr => {
-    //if(toHighlightArr !== this.state.HighlightedFeaturesArrVolcano){
+    const enableMultifeature = toHighlightArr.length > 1 ? true : false;
     this.setState({
       HighlightedFeaturesArrVolcano: toHighlightArr,
+      enableMultifeaturePlotting: enableMultifeature,
     });
     if (toHighlightArr.length > 0) {
+      // unhighlight single row if already highlighted
+      if (toHighlightArr.length === 1) {
+        if (
+          toHighlightArr[0].id === this.state.volcanoDifferentialTableRowMax
+        ) {
+          this.setState({
+            HighlightedFeaturesArrVolcano: [],
+            volcanoDifferentialTableRowMax: '',
+            volcanoDifferentialTableRowOther: [],
+          });
+          this.handlePlotVolcano('');
+          return;
+        }
+      }
       const MaxLine = toHighlightArr[0] || null;
       let volcanoDifferentialTableRowMaxVar = '';
       if (MaxLine !== {} && MaxLine != null) {
@@ -672,7 +763,7 @@ class Differential extends Component {
         isVolcanoPlotSVGLoaded: true,
         maxObjectIdentifier: '',
 
-        imageInfo: {
+        imageInfoVolcano: {
           key: null,
           title: '',
           svg: [],
@@ -681,27 +772,25 @@ class Differential extends Component {
     }
   };
 
-  handleSVGTabChange = activeTabIndex => {
-    this.setState({
-      activeSVGTabIndex: activeTabIndex,
-    });
-  };
   handleItemSelected = bool => {
     this.setState({
       isItemSelected: bool,
     });
   };
-  handleSVG = (view, imageInfo) => {
-    const key = view === 'Differential' ? `imageInfo${view}` : 'imageInfo';
+
+  handleSVG = (view, imageInfoArg) => {
+    const imageInfoKey = `imageInfo${view}`;
+    const imageInfoLengthKey = `imageInfo${view}Length`;
     this.setState({
-      [key]: imageInfo,
+      [imageInfoKey]: imageInfoArg,
+      [imageInfoLengthKey]: imageInfoArg.svg?.length || 0,
       isItemSVGLoaded: true,
       isVolcanoPlotSVGLoaded: true,
     });
   };
+
   backToTable = () => {
     this.setState({
-      // differentialResultsMounted: false,
       isItemSelected: false,
       // isItemDatatLoaded: false,
       isItemSVGLoaded: false,
@@ -716,6 +805,7 @@ class Differential extends Component {
       false,
     );
   };
+
   getConfigCols = testData => {
     const differentialResultsVar = testData.differentialResults;
     const { differentialFeature } = this.props;
@@ -756,7 +846,7 @@ class Differential extends Component {
       };
       this.setState({
         imageInfoDifferential: imageInfoDifferential,
-        // differentialResultsMounted: false,
+        imageInfoDifferentialLength: imageInfoDifferential.svg?.length || 0,
         isItemSelected: true,
         isItemSVGLoaded: false,
         // isItemDatatLoaded: false,
@@ -781,7 +871,7 @@ class Differential extends Component {
         }
         if (noPlots && !modelSpecificMetaFeaturesExist) {
           self.setState({
-            tabsMessage: 'No plots or feature data available',
+            tabsMessage: 'No plots available',
           });
         }
         return {
@@ -877,8 +967,8 @@ class Differential extends Component {
     );
     this.setState({
       thresholdColsP: thresholdColsDifferential,
+      filterableColumnsP: [...differentialNumericFields],
     });
-    this.setState({ filterableColumnsP: [...differentialNumericFields] });
     const differentialNumericColumnsMapped = differentialNumericFields.map(
       c => {
         return {
@@ -955,7 +1045,6 @@ class Differential extends Component {
           {...this.props}
           onHandleSelectedVolcano={this.handleSelectedVolcano}
           onVolcanoSVGSizeChange={this.handleVolcanoSVGSizeChange}
-          onSVGTabChange={this.handleSVGTabChange}
           onHandleVolcanoTableLoading={this.handleVolcanoTableLoading}
           onBackToTable={this.backToTable}
           onUpdateVolcanoLabels={this.updateVolcanoLabels}
@@ -965,6 +1054,8 @@ class Differential extends Component {
           onUpdateBreadcrumbIndex={this.updateBreadcrumbIndex}
           onHandleVolcanoState={this.updateVolcanoState}
           onHandleTableDataChange={this.handleTableDataChange}
+          fwdRefDVC={this.differentialViewContainerRef}
+          onGetMultifeaturePlot={this.getMultifeaturePlot}
         />
       );
     } else return <TransitionStill stillMessage={message} />;
@@ -979,6 +1070,28 @@ class Differential extends Component {
       visible,
     } = this.state;
     const { tab, differentialStudy, differentialModel } = this.props;
+    const pxToPtRatio = 105;
+    const pointSize = 12;
+    const width =
+      window.innerWidth ||
+      document.documentElement.clientWidth ||
+      document.body.clientWidth;
+    const height =
+      window.innerHeight ||
+      document.documentElement.clientHeight ||
+      document.body.clientHeight;
+    // const divWidth =
+    //   this.differentialViewContainerRef?.current?.parentElement?.offsetWidth ||
+    //   width - 310;
+    const divWidth = width * 0.75;
+    const divHeight = height * 0.85;
+    const divWidthPt = roundToPrecision(divWidth / pxToPtRatio, 1);
+    const divHeightPt = roundToPrecision(divHeight / pxToPtRatio, 1);
+    const divWidthPtString = `width=${divWidthPt}`;
+    const divHeightPtString = `&height=${divHeightPt}`;
+    const pointSizeString = `&pointsize=${pointSize}`;
+    const dimensions = `?${divWidthPtString}${divHeightPtString}${pointSizeString}`;
+    const srcUrl = `${multisetPlotInfoDifferential.svg}${dimensions}`;
     const VerticalSidebar = ({ animation, visible }) => (
       <Sidebar
         as={'div'}
@@ -1014,9 +1127,23 @@ class Differential extends Component {
           </Grid.Row>
         </Grid>
         <div
+          id="differentialMultisetAnalysisSVGDiv"
           className="MultisetSvgOuter"
-          dangerouslySetInnerHTML={{ __html: multisetPlotInfoDifferential.svg }}
-        ></div>
+        >
+          <SVG
+            cacheRequests={true}
+            // description=""
+            // loader={<span>{loadingDimmer}</span>}
+            // onError={error => console.log(error.message)}
+            // onLoad={(src, hasCache) => console.log(src, hasCache)}
+            // preProcessor={code => code.replace(/fill=".*?"/g, 'fill="currentColor"')}
+            src={srcUrl}
+            // title={`${s.plotType.plotDisplay}`}
+            uniqueHash="b2g9e2"
+            uniquifyIDs={true}
+            id="differentialMultisetAnalysisSVG"
+          />
+        </div>
       </Sidebar>
     );
     return (
@@ -1034,9 +1161,6 @@ class Differential extends Component {
               {...this.props}
               onSearchTransitionDifferential={
                 this.handleSearchTransitionDifferential
-              }
-              onSearchTransitionDifferentialAlt={
-                this.handleSearchTransitionDifferentialAlt
               }
               onDifferentialSearch={this.handleDifferentialSearch}
               onDifferentialSearchUnfiltered={

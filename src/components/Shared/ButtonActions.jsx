@@ -17,86 +17,114 @@ class ButtonActions extends Component {
   };
 
   PNGExport = () => {
-    if (this.props.imageInfo == null) {
-      let PlotName = `${this.props.plot}.png`;
+    const {
+      imageInfo,
+      plot,
+      description,
+      study,
+      model,
+      plotName,
+      tab,
+      tabIndex,
+      svgExportName,
+    } = this.props;
+    if (imageInfo == null) {
+      let plotNoPeriods = plot.replace(/\./g, '_');
+      let PlotName = `${plotNoPeriods}.png`;
       // for Barcode, Violin
-      if (this.props.description != null) {
-        PlotName = `${this.props.plot}_${this.props.description}.png`;
+      if (description != null) {
+        let descriptionNoPeriods = description.replace(/\./g, '_');
+        PlotName = `${plotNoPeriods}_${descriptionNoPeriods}.png`;
       }
-      if (this.props.study != null) {
+      if (study != null) {
+        let studyNoPeriods = study.replace(/\./g, '_');
+        let modelNoPeriods = model.replace(/\./g, '_');
         // for Multiset Analysis
-        PlotName = `${this.props.study}_${this.props.model}_MultisetPlot.png`;
+        PlotName = `${studyNoPeriods}_${modelNoPeriods}_MultisetPlot.png`;
       }
-      if (this.props.plotName != null) {
-        PlotName = this.props.plotName;
+      if (plotName != null) {
+        let plotNameNoPeriods = plotName.replace(/\./g, '_');
+        PlotName = plotNameNoPeriods;
       }
-      const Plot = document.getElementById(this.props.plot) || null;
+      const Plot = document.getElementById(plot) || null;
       // decrease quality if volcano chart
-      const encoderOptionsVar = this.props.plot !== 'ViolinChart' ? 1 : 0.1;
+      const encoderOptionsVar = plotNoPeriods !== 'VolcanoChart' ? 1 : 0.1;
       saveSvgAsPng.saveSvgAsPng(Plot, PlotName, {
         encoderOptions: encoderOptionsVar,
         scale: 2,
         backgroundColor: 'white',
       });
     } else {
-      // for reusable SVG Plot
+      // for SVG Plot Tabs
       let PlotName =
-        `${this.props.imageInfo?.svg[this.props.tabIndex]?.plotType.plotID}_${
-          this.props.imageInfo?.key
-        }.png` || `${this.props.plot}.png`;
-      if (this.props.tab === 'enrichment') {
+        `${imageInfo?.svg[tabIndex]?.plotType.plotID}_${imageInfo?.key}.png` ||
+        `${plot}.png`;
+      if (tab === 'enrichment') {
         PlotName =
-          `${this.props.imageInfo?.svg[this.props.tabIndex]?.plotType.plotID}_${
-            this.props.svgExportName
-          }.png` || `${this.props.plot}.png`;
+          `${imageInfo?.svg[tabIndex]?.plotType.plotID}_${svgExportName}.png` ||
+          `${plot}.png`;
       }
-      const currentContentContainer =
-        document.getElementById('PlotSVG') ||
-        document.getElementById('DifferentialPlotTabsPlotSVG');
+      const currentContentContainer = document.getElementById(`${plot}`);
       const Plot =
         currentContentContainer.getElementsByTagName('svg')[0] || null;
-      saveSvgAsPng.saveSvgAsPng(Plot, PlotName, {
-        encoderOptions: 1,
-        scale: 2,
-        backgroundColor: 'white',
-      });
+      if (Plot) {
+        saveSvgAsPng.saveSvgAsPng(Plot, PlotName, {
+          encoderOptions: 1,
+          scale: 2,
+          backgroundColor: 'white',
+        });
+      }
     }
   };
 
   SVGExport = () => {
-    if (this.props.imageInfo == null) {
-      let PlotName = `${this.props.plot}.svg`;
+    const {
+      imageInfo,
+      plot,
+      description,
+      study,
+      model,
+      plotName,
+      tab,
+      tabIndex,
+      svgExportName,
+    } = this.props;
+    if (imageInfo == null) {
+      let plotNoPeriods = plot.replace(/\./g, '_');
+      let PlotName = `${plotNoPeriods}.svg`;
       // for Barcode, Violin
-      if (this.props.description != null) {
-        PlotName = `${this.props.plot}_${this.props.description}.svg`;
+      if (description != null) {
+        let descriptionNoPeriods = description.replace(/\./g, '_');
+        PlotName = `${plotNoPeriods}_${descriptionNoPeriods}.svg`;
       }
-      if (this.props.study != null) {
+      if (study != null) {
+        let studyNoPeriods = study.replace(/\./g, '_');
+        let modelNoPeriods = model.replace(/\./g, '_');
         // for Multiset Analysis
-        PlotName = `${this.props.study}_${this.props.model}_MultisetPlot.svg`;
+        PlotName = `${studyNoPeriods}_${modelNoPeriods}_MultisetPlot.svg`;
       }
-      if (this.props.plotName != null) {
-        PlotName = this.props.plotName;
+      if (plotName != null) {
+        let plotNameNoPeriods = plotName.replace(/\./g, '_');
+        PlotName = plotNameNoPeriods;
       }
-      const Plot = document.getElementById(this.props.plot) || null;
+      const Plot = document.getElementById(plot) || null;
       this.exportSVG(Plot, PlotName);
     } else {
-      // for reusable SVG Plot
+      // for SVG Plot Tabs
       let PlotName =
-        `${this.props.imageInfo?.svg[this.props.tabIndex]?.plotType.plotID}_${
-          this.props.imageInfo?.key
-        }.svg` || `${this.props.plot}.svg`;
-      if (this.props.tab === 'enrichment') {
+        `${imageInfo?.svg[tabIndex]?.plotType.plotID}_${imageInfo?.key}.svg` ||
+        `${plot}.svg`;
+      if (tab === 'enrichment') {
         PlotName =
-          `${this.props.imageInfo?.svg[this.props.tabIndex]?.plotType.plotID}_${
-            this.props.svgExportName
-          }.svg` || `${this.props.plot}.svg`;
+          `${imageInfo?.svg[tabIndex]?.plotType.plotID}_${svgExportName}.svg` ||
+          `${plot}.svg`;
       }
-      const currentContentContainer =
-        document.getElementById('PlotSVG') ||
-        document.getElementById('DifferentialPlotTabsPlotSVG');
+      const currentContentContainer = document.getElementById(`${plot}`);
       const Plot =
         currentContentContainer.getElementsByTagName('svg')[0] || null;
-      this.exportSVG(Plot, PlotName);
+      if (Plot) {
+        this.exportSVG(Plot, PlotName);
+      }
     }
   };
 
@@ -121,32 +149,40 @@ class ButtonActions extends Component {
   };
 
   TextExport = () => {
-    const sortedData =
-      this.props.refFwd.current?.qhGridRef.current?.getSortedData() || [];
+    const { study, model, test, tab, refFwd } = this.props;
+    let studyNoPeriods = study.replace(/\./g, '_');
+    let modelNoPeriods = model.replace(/\./g, '_');
+    let testNoPeriods = test.replace(/\./g, '_');
+    const sortedData = refFwd.current?.qhGridRef.current?.getSortedData() || [];
     const jsonToTxt = require('json-to-txt');
     const dataInString = jsonToTxt({ data: sortedData });
-    var a = document.createElement('a');
-    var file = new Blob([dataInString], { type: 'text/plain' });
+    let a = document.createElement('a');
+    let file = new Blob([dataInString], { type: 'text/plain' });
     a.href = URL.createObjectURL(file);
-    a.download = `${this.props.tab}-${this.props.study}-${this.props.model}-${this.props.test}`;
+    a.download = `${tab}-${studyNoPeriods}-${modelNoPeriods}-${testNoPeriods}`;
     a.click();
   };
 
   ExcelExport = () => {
-    const excelExport = this.props.refFwd?.current?.qhGridRef.current ?? null;
+    const { study, model, test, tab, refFwd } = this.props;
+    let studyNoPeriods = study.replace(/\./g, '_');
+    let modelNoPeriods = model.replace(/\./g, '_');
+    let testNoPeriods = test.replace(/\./g, '_');
+    const excelExport = refFwd?.current?.qhGridRef.current ?? null;
     if (excelExport != null) {
       excelExport.exportExcel(
-        `${this.props.tab}-${this.props.study}-${this.props.model}-${this.props.test}`,
+        `${tab}-${studyNoPeriods}-${modelNoPeriods}-${testNoPeriods}`,
       );
     }
   };
 
   PDFExport = () => {
-    const isMultisetPlot = this.props.visible;
+    const { visible, plot } = this.props;
+    const isMultisetPlot = visible;
     if (isMultisetPlot) {
       const Plot = document.getElementById('multisetAnalysisSVG') || null;
       pdfService.createPDF(Plot);
-    } else if (this.props.plot === 'barcode') {
+    } else if (plot === 'barcode') {
       const currentContentContainer =
         document.getElementById('barcodeChart') || null;
       const Plot =

@@ -1,6 +1,9 @@
-import React, { Component } from 'react';
+import React, { PureComponent, Fragment } from 'react';
 import { withRouter } from 'react-router-dom';
-import { Grid, Dimmer, Loader, Tab } from 'semantic-ui-react';
+import { Grid, Dimmer, Loader, Tab, Dropdown } from 'semantic-ui-react';
+import SVG from 'react-inlinesvg';
+import _ from 'lodash';
+import { roundToPrecision } from '../Shared/helpers';
 import DifferentialBreadcrumbs from './DifferentialBreadcrumbs';
 import ButtonActions from '../Shared/ButtonActions';
 import MetafeaturesTable from './MetafeaturesTable';
@@ -9,77 +12,149 @@ import '../Enrichment/SplitPanesContainer.scss';
 import '../Shared/SVGPlot.scss';
 import './DifferentialPlot.scss';
 
-class DifferentialPlot extends Component {
-  static defaultProps = {
-    // isItemDatatLoaded: false,
-    // isItemSVGLoaded: true,
-  };
-
-  state = {
-    activeDifferentialPlotTabsIndex: 0,
-    excelFlag: true,
-    pngFlag: true,
-    pdfFlag: false,
-    svgFlag: true,
-    txtFlag: false,
-    areDifferentialPlotTabsReady: false,
-  };
+class DifferentialPlot extends PureComponent {
+  constructor(props) {
+    super(props);
+    // this.resizeListener = this.resizeListener.bind(this);
+    // this.debouncedResizeListener = _.debounce(this.resizeListener, 100);
+    this.state = {
+      // activeSVGTabIndexDifferential: 0,
+      excelFlag: true,
+      pngFlag: true,
+      pdfFlag: false,
+      svgFlag: true,
+      txtFlag: false,
+      // areDifferentialPlotTabsReady: false,
+      // selectedPlot: null,
+    };
+  }
 
   componentDidMount() {
-    this.setButtonVisibility(this.state.activeDifferentialPlotTabsIndex);
+    const { activeSVGTabIndexDifferential } = this.state;
+    this.setButtonVisibility(activeSVGTabIndexDifferential);
+    this.getSVGPanes();
+    // window.addEventListener('resize', this.debouncedResizeListener);
   }
 
   componentDidUpdate(prevProps, prevState) {
     console.log(this.props.metaFeaturesDataDifferential);
+    const { imageInfoDifferentialLength, isItemSVGLoaded } = this.props;
+    const { activeSVGTabIndexDifferential } = this.state;
     if (
-      this.state.activeDifferentialPlotTabsIndex !==
-      prevState.activeDifferentialPlotTabsIndex
+      isItemSVGLoaded &&
+      prevProps.imageInfoDifferentialLength !== imageInfoDifferentialLength
     ) {
-      this.setButtonVisibility(this.state.activeDifferentialPlotTabsIndex);
+      this.getSVGPanes();
+    }
+    if (
+      prevState.activeSVGTabIndexDifferential !== activeSVGTabIndexDifferential
+    ) {
+      this.setButtonVisibility(activeSVGTabIndexDifferential);
     }
   }
 
+  componentWillUnmount() {
+    // window.removeEventListener('resize', this.debouncedResizeListener);
+  }
+
+  // resizeListener() {
+  //   this.getSVGPanes();
+  // }
+
   setButtonVisibility = index => {
-    this.setState({
-      // excelFlag: index === 2,
-      // excel not ready yet
-      excelFlag: false,
-      // pdfFlag: index !== 2,
-      pdfFlag: false,
-      // pdfFlag: index !== 2,
-      svgFlag: index !== 2,
-      pngFlag: index !== 2,
-    });
+    if (this.props.differentialPlotTypes.length > 0) {
+      const singleFeaturePlotTypes = this.props.differentialPlotTypes.filter(
+        p => p.plotType !== 'multiFeature',
+      );
+      this.setState({
+        excelFlag: false,
+        pdfFlag: false,
+        svgFlag: index !== singleFeaturePlotTypes.length,
+        pngFlag: index !== singleFeaturePlotTypes.length,
+      });
+    } else {
+      this.setState({
+        excelFlag: false,
+        pdfFlag: false,
+        svgFlag: false,
+        pngFlag: false,
+      });
+    }
   };
 
   handleTabChange = (e, { activeIndex }) => {
     this.setState({
-      activeDifferentialPlotTabsIndex: activeIndex,
+      activeSVGTabIndexDifferential: activeIndex,
     });
   };
 
-  getSVGPanes(activeDifferentialPlotTabsIndex) {
+  handlePlotDropdownChange = (e, { value }) => {
+    this.setState({
+      activeSVGTabIndexDifferential: value,
+    });
+  };
+
+  getSVGPanes() {
     let panes = [];
-    if (this.props.imageInfoDifferential.length !== 0) {
-      const svgArray = this.props.imageInfoDifferential.svg;
-      // const svgArrayReversed = svgArray.reverse();
-      const svgPanes = svgArray.map(s => {
-        return {
-          menuItem: `${s.plotType.plotDisplay}`,
-          render: () => (
-            <Tab.Pane attached="true" as="div">
-              <div
-                id="DifferentialPlotTabsPlotSVG"
-                className="svgSpan"
-                dangerouslySetInnerHTML={{ __html: s.svg }}
-              ></div>
-            </Tab.Pane>
-          ),
-        };
-      });
-      panes = panes.concat(svgPanes);
+    if (this.props.imageInfoDifferential) {
+      if (this.props.imageInfoDifferential.svg.length !== 0) {
+        const pxToPtRatio = 105;
+        const pointSize = 12;
+        const width =
+          window.innerWidth ||
+          document.documentElement.clientWidth ||
+          document.body.clientWidth;
+        const height =
+          window.innerHeight ||
+          document.documentElement.clientHeight ||
+          document.body.clientHeight;
+        const divWidth = width * 0.75;
+        const divHeight = height * 0.8;
+        // const divWidth =
+        //   this.props.fwdRefDVC?.current?.offsetWidth - 15 || width - 310;
+        // const divHeight =
+        //   this.props.fwdRefDVC?.current?.offsetHeight - 115 || height - 50;
+        const divWidthPt = roundToPrecision(divWidth / pxToPtRatio, 1);
+        const divHeightPt = roundToPrecision(divHeight / pxToPtRatio, 1);
+        const divWidthPtString = `width=${divWidthPt}`;
+        const divHeightPtString = `&height=${divHeightPt}`;
+        const pointSizeString = `&pointsize=${pointSize}`;
+        const dimensions = `?${divWidthPtString}${divHeightPtString}${pointSizeString}`;
+        const svgArray = [...this.props.imageInfoDifferential.svg];
+        const svgPanes = svgArray.map(s => {
+          const srcUrl = `${s.svg}${dimensions}`;
+          return {
+            menuItem: `${s.plotType.plotDisplay}`,
+            render: () => (
+              <Tab.Pane attached="true" as="div">
+                <div id="DifferentialPlotTabsPlotSVGDiv" className="svgSpan">
+                  <SVG
+                    cacheRequests={true}
+                    // description=""
+                    // loader={<span>{loadingDimmer}</span>}
+                    // onError={error => console.log(error.message)}
+                    // onLoad={(src, hasCache) => console.log(src, hasCache)}
+                    // preProcessor={code => code.replace(/fill=".*?"/g, 'fill="currentColor"')}
+                    src={srcUrl}
+                    // title={`${s.plotType.plotDisplay}`}
+                    uniqueHash="c3h0f3"
+                    uniquifyIDs={true}
+                    id="DifferentialPlotTabsPlotSVG"
+                  />
+                </div>
+              </Tab.Pane>
+            ),
+          };
+        });
+        panes = panes.concat(svgPanes);
+      }
     }
-    if (this.props.modelSpecificMetaFeaturesExist !== false) {
+    const isMultifeaturePlot =
+      this.props.imageInfoDifferential.key?.includes('features') || false;
+    if (
+      this.props.modelSpecificMetaFeaturesExist !== false &&
+      !isMultifeaturePlot
+    ) {
       let metafeaturesTab = [
         {
           menuItem: 'Feature Data',
@@ -94,22 +169,22 @@ class DifferentialPlot extends Component {
       ];
       panes = panes.concat(metafeaturesTab);
     }
-    return (
-      <Tab
-        menu={{ secondary: true, pointing: true, className: 'SVGDiv' }}
-        panes={panes}
-        onTabChange={this.handleTabChange}
-        activeIndex={activeDifferentialPlotTabsIndex}
-      />
-    );
+    // return panes;
+    this.setState({
+      svgPanes: panes,
+    });
   }
 
   render() {
-    // const { activeDifferentialPlotTabsIndex } = this.state;
-    const { excelFlag, pngFlag, pdfFlag, svgFlag } = this.state;
+    const {
+      excelFlag,
+      pngFlag,
+      pdfFlag,
+      svgFlag,
+      svgPanes,
+      activeSVGTabIndexDifferential,
+    } = this.state;
     const { isItemSVGLoaded, imageInfoDifferential } = this.props;
-    const { activeDifferentialPlotTabsIndex } = this.state;
-    const svgPanes = this.getSVGPanes(activeDifferentialPlotTabsIndex);
     if (!isItemSVGLoaded) {
       return (
         // <LoaderActivePlots />
@@ -120,42 +195,112 @@ class DifferentialPlot extends Component {
         </div>
       );
     } else {
-      return (
-        <div className="PlotWrapper">
-          <Grid columns={2} className="">
-            <Grid.Row className="ActionsRow">
-              <Grid.Column mobile={8} tablet={8} largeScreen={8} widescreen={8}>
-                <DifferentialBreadcrumbs {...this.props} />
-              </Grid.Column>
-              <Grid.Column mobile={8} tablet={8} largeScreen={8} widescreen={8}>
-                <ButtonActions
-                  exportButtonSize={'small'}
-                  excelVisible={excelFlag}
-                  pngVisible={pngFlag}
-                  pdfVisible={pdfFlag}
-                  svgVisible={svgFlag}
-                  txtVisible={false}
-                  imageInfo={imageInfoDifferential}
-                  tabIndex={activeDifferentialPlotTabsIndex}
-                />
-              </Grid.Column>
-            </Grid.Row>
-          </Grid>
+      if (
+        this.props.differentialPlotTypes &&
+        this.props.imageInfoDifferential
+      ) {
+        const DropdownClass =
+          this.props.differentialPlotTypes.length > this.props.svgTabMax
+            ? 'Show svgPlotDropdown'
+            : 'Hide svgPlotDropdown';
+        const TabMenuClass =
+          this.props.differentialPlotTypes.length > this.props.svgTabMax
+            ? 'Hide'
+            : 'Show';
+        const activeSVGTabIndexDifferentialVar =
+          activeSVGTabIndexDifferential || 0;
+        let plotOptions = [];
+        if (this.props.imageInfoDifferential.length !== 0) {
+          const svgArray = [...imageInfoDifferential.svg];
+          plotOptions = svgArray.map(function(s, index) {
+            return {
+              key: `${index}=DifferentialPlotDropdownOption`,
+              text: s.plotType.plotDisplay,
+              value: index,
+            };
+          });
+          if (this.props.modelSpecificMetaFeaturesExist !== false) {
+            let metafeaturesDropdown = [
+              {
+                key: 'Feature-Data-Differential-Plot',
+                text: 'Feature Data',
+                value: 'Feature Data',
+              },
+            ];
+            plotOptions = plotOptions.concat(metafeaturesDropdown);
+          }
+        }
+        return (
+          <div className="PlotWrapper">
+            <Grid columns={2} className="">
+              <Grid.Row className="ActionsRow">
+                <Grid.Column
+                  mobile={8}
+                  tablet={8}
+                  largeScreen={8}
+                  widescreen={8}
+                >
+                  <DifferentialBreadcrumbs {...this.props} />
+                </Grid.Column>
+                <Grid.Column
+                  mobile={8}
+                  tablet={8}
+                  largeScreen={8}
+                  widescreen={8}
+                >
+                  <ButtonActions
+                    exportButtonSize={'small'}
+                    excelVisible={excelFlag}
+                    pngVisible={pngFlag}
+                    pdfVisible={pdfFlag}
+                    svgVisible={svgFlag}
+                    txtVisible={false}
+                    imageInfo={imageInfoDifferential}
+                    tabIndex={activeSVGTabIndexDifferentialVar}
+                    plot={'DifferentialPlotTabsPlotSVGDiv'}
+                  />
+                </Grid.Column>
+              </Grid.Row>
+            </Grid>
 
-          <Grid columns={2} className="PlotContainer">
-            <Grid.Row className="PlotContainerRow">
-              <Grid.Column
-                mobile={16}
-                tablet={16}
-                largeScreen={16}
-                widescreen={16}
-              >
-                <div className="">{svgPanes}</div>
-              </Grid.Column>
-            </Grid.Row>
-          </Grid>
-        </div>
-      );
+            <Grid className="PlotContainer">
+              <Grid.Row className="PlotContainerRow">
+                <Grid.Column
+                  mobile={16}
+                  tablet={16}
+                  largeScreen={16}
+                  widescreen={16}
+                >
+                  <div className="">
+                    <Dropdown
+                      search
+                      selection
+                      compact
+                      options={plotOptions}
+                      value={
+                        plotOptions[activeSVGTabIndexDifferentialVar]?.value ||
+                        0
+                      }
+                      onChange={this.handlePlotDropdownChange}
+                      className={DropdownClass}
+                    />
+                    <Tab
+                      menu={{
+                        secondary: true,
+                        pointing: true,
+                        className: TabMenuClass,
+                      }}
+                      panes={svgPanes}
+                      onTabChange={this.handleTabChange}
+                      activeIndex={activeSVGTabIndexDifferentialVar}
+                    />
+                  </div>
+                </Grid.Column>
+              </Grid.Row>
+            </Grid>
+          </div>
+        );
+      } else return null;
     }
   }
 }

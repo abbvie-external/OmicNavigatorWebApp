@@ -10,6 +10,7 @@
   --color-white: #fff;
   --color-light: #e0e1e2;
   --color-dark: #2e2e2e;
+  --color-gray: #e8e8e8;
 }
 
 .AppContainer {
@@ -194,6 +195,11 @@
     user-select: none !important; /* Non-prefixed version, currently supported by Chrome, Opera and Firefox */
   }
 
+  .PrimaryColor {
+    background-color: var(--color-dark) !important;
+    color: var(--color-white) !important;
+  }
+
   .FloatRight {
     float: right !important;
     cursor: pointer !important;
@@ -243,4 +249,55 @@
 .SortableHelper {
   z-index: 3;
   list-style: none;
+}
+
+.TopBar {
+  margin: 0px;
+  background-color: var(--color-dark) !important;
+
+  .MenuContainer {
+    margin-bottom: 0px !important;
+
+    a {
+      cursor: pointer !important;
+    }
+
+    .ui.segment[class*='bottom attached'] {
+      margin-bottom: 0rem !important;
+    }
+
+    .active {
+      border-color: var(--color-primary) !important;
+    }
+  }
+
+  .LogoAndTitle {
+    width: 25% !important;
+    padding-left: 35px;
+
+    .LogoElement {
+      padding: 0px !important;
+      margin-right: 10px;
+    }
+
+    .LogoImage {
+      height: 23px;
+    }
+
+    .Header {
+      font-size: 18px !important;
+      margin: 0px !important;
+      padding-top: 0px !important;
+    }
+
+    .HeaderSecond {
+      font-weight: 100 !important;
+      font-style: italic;
+      color: #e0e1e2 !important;
+    }
+
+    #ResetApp {
+      cursor: pointer !important;
+    }
+  }
 }

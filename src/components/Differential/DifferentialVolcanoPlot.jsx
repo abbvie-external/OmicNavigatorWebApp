@@ -738,7 +738,6 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       });
       this.handleBrushedText({ _groups: [elems.map(elem => elem)] });
     }
-
     if (
       !_.isEqual(
         _.sortBy(volcanoDifferentialTableRowOther),
@@ -1065,7 +1064,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
             ></rect>
             <rect
               width="100%"
-              height="95%"
+              height="96%"
               fill="#2e2e2e"
               stroke="#000"
               rx="3"

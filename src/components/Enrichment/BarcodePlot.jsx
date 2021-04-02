@@ -562,8 +562,8 @@ class BarcodePlot extends Component {
             pdfVisible={false}
             svgVisible={true}
             txtVisible={false}
-            plot={'BarcodeChart'}
-            description={this.props.imageInfo.key}
+            plot="BarcodeChart"
+            description={this.props.imageInfoEnrichment.key}
           />
         </div>
         <span className="TextToggleButton">
