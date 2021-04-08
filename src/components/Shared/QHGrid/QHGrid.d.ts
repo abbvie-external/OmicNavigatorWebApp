@@ -6,18 +6,31 @@ declare type fetchData = () => void;
 export interface QHGridRef<T> {
     bodyRef: Ref<HTMLDivElement>;
     data: T[];
+    sortedData: T[];
     slicedData: T[];
     exportExcel: (name?: string) => Promise<void>;
     props: QHGridProps<T, unknown>;
+    /**
+     * Returns sortedData
+     * @deprecated
+     */
     getSortedData: () => T[];
 }
 export interface QHGridProps<T, ATI> {
     columns: InnerColumnConfig<T, ATI>[];
     data: T[];
     filters: FilterValues;
+    /**
+     * Called after the data is filtered with the new filteredData
+     */
+    onFiltered?: (data: T[]) => void;
     sortBy: string | null;
     sortOrder: 'asc' | 'desc' | null;
     onSort?: (colId: string) => void;
+    /**
+     * Called after the filtered data is sorted with the new sortedData
+     */
+    onSorted?: (data: T[]) => void;
     grouping: BaseGrouping[];
     onGroupChange?: (grouping: BaseGrouping[]) => void;
     generalSearch: string;

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import _ from 'lodash';
+// import { Popup, Icon } from 'semantic-ui-react';
 import './DifferentialVolcanoPlot.scss';
 import * as d3 from 'd3';
 import ButtonActions from '../Shared/ButtonActions';
@@ -47,7 +48,6 @@ class DifferentialVolcanoPlot extends Component {
       doYAxisTransformation,
       updateVolcanoLabels,
     } = this.props;
-
     if (
       volcanoCircleLabel != null &&
       prevProps.volcanoCircleLabel !== volcanoCircleLabel &&
@@ -60,17 +60,16 @@ class DifferentialVolcanoPlot extends Component {
       updateVolcanoLabels ||
       (volcanoCircleLabel != null &&
         prevProps.volcanoCircleLabel !== volcanoCircleLabel &&
-        this.props.volcanoDifferentialTableAll?.length > 0 &&
+        this.props.HighlightedFeaturesArrVolcano?.length > 0 &&
         this.state.brushedRawData == null)
     ) {
-      const elems = this.props.volcanoDifferentialTableAll.map(elem => {
+      const elems = this.props.HighlightedFeaturesArrVolcano.map(elem => {
         const el = document.getElementById(`volcanoDataPoint-${elem.key}`);
         return d3.select(el)._groups[0][0];
       });
 
       this.handleBrushedText({ _groups: [elems] });
     }
-
     if (
       !_.isEqual(
         _.sortBy(volcanoDifferentialTableRowOther),
@@ -295,7 +294,7 @@ class DifferentialVolcanoPlot extends Component {
           <rect width="100%" height="100%" fill="#ff4400" rx="5" ry="5"></rect>
           <rect
             width="100%"
-            height="95%"
+            height="96%"
             fill="#2e2e2e"
             stroke="#000"
             rx="3"
@@ -306,6 +305,9 @@ class DifferentialVolcanoPlot extends Component {
             fill="#FFF"
             fontFamily="Lato, Helvetica Neue, Arial, Helvetica, sans-serif"
             textAnchor="left"
+            wordBreak="break-all"
+            overflowWrap="break-word"
+            wordWrap="break-word"
           >
             <tspan x={15} y={23}>
               {idText}

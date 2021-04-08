@@ -5,14 +5,14 @@ import EnrichmentBreadcrumbs from './EnrichmentBreadcrumbs';
 import ButtonActions from '../Shared/ButtonActions';
 import SplitPane from 'react-split-pane';
 import './SplitPanesContainer.scss';
-import SVGPlot from '../Shared/SVGPlot';
+import EnrichmentSVGPlot from './EnrichmentSVGPlot';
 import BarcodePlot from './BarcodePlot';
 import ViolinPlot from './ViolinPlot';
 import FilteredDifferentialTable from './FilteredDifferentialTable';
 
 class SplitPanesContainer extends PureComponent {
   state = {
-    activeSVGTabIndex: 0,
+    activeSvgTabIndexEnrichment: 0,
     horizontalSplitPaneSize:
       parseInt(localStorage.getItem('horizontalSplitPaneSize'), 10) || 250,
     verticalSplitPaneSize:
@@ -24,7 +24,7 @@ class SplitPanesContainer extends PureComponent {
 
   handleSVGTabChange = activeTabIndex => {
     this.setState({
-      activeSVGTabIndex: activeTabIndex,
+      activeSvgTabIndexEnrichment: activeTabIndex,
     });
   };
 
@@ -91,7 +91,7 @@ class SplitPanesContainer extends PureComponent {
       displayViolinPlot,
       enrichmentStudy,
       enrichmentModel,
-      imageInfo,
+      imageInfoEnrichment,
     } = this.props;
     const { activeViolinTableIndex } = this.state;
     const violinPlot = this.getViolinPlot();
@@ -150,8 +150,8 @@ class SplitPanesContainer extends PureComponent {
     ];
 
     const testVar =
-      imageInfo.key !== '' && imageInfo.key != null
-        ? imageInfo.key.split(':')[0]
+      imageInfoEnrichment.key !== '' && imageInfoEnrichment.key != null
+        ? imageInfoEnrichment.key.split(':')[0]
         : '';
     const selectedPlot = violinAndTablePanes[activeViolinTableIndex].menuItem;
     const ButtonActionsClass = this.getButtonActionsClass();
@@ -179,7 +179,7 @@ class SplitPanesContainer extends PureComponent {
           svgVisible={true}
           txtVisible={false}
           plot={this.props.violinSettings.id}
-          description={imageInfo.key}
+          description={imageInfoEnrichment.key}
         />
       );
     return (
@@ -203,31 +203,12 @@ class SplitPanesContainer extends PureComponent {
     );
   };
 
-  getSVGPlot = () => {
-    const tabChangeCb = this.handleSVGTabChange;
-    const { SVGPlotLoaded, SVGPlotLoading } = this.props;
-    if (!SVGPlotLoaded & !SVGPlotLoading) {
-      return (
-        <div className="PlotInstructions">
-          <h4 className="PlotInstructionsText">
-            Select barcode line/s to display SVG Plot
-          </h4>
-        </div>
-      );
-    } else if (!SVGPlotLoaded & SVGPlotLoading) {
-      return (
-        <Dimmer active inverted>
-          <Loader size="large">Loading Plots</Loader>
-        </Dimmer>
-      );
-    } else {
-      return (
-        <SVGPlot {...this.props} {...this.state} onSVGTabChange={tabChangeCb} />
-      );
-    }
-  };
-
   splitPaneResized = (size, paneType) => {
+    //   const volcanoSvgWidthPx =
+    //   this.props.fwdRefDVC.current?.offsetWidth - size || 500;
+    // const volcanoSvgHeightPx = this.state.volcanoHeight || 300;
+    // const volcanoSvgWidthPt = roundToPrecision(volcanoSvgWidthPx / 100, 1);
+    // const volcanoSvgHeightPt = roundToPrecision(volcanoSvgHeightPx / 100, 1);
     if (paneType === 'horizontal') {
       this.setState({
         horizontalSplitPaneSize: size,
@@ -235,15 +216,25 @@ class SplitPanesContainer extends PureComponent {
     } else {
       this.setState({
         verticalSplitPaneSize: size,
+        // enrichmentSvgHeight: 300,
+        // enrichmentSvgWidth: 400,
       });
     }
     localStorage.setItem(`${paneType}SplitPaneSize`, size);
   };
 
   render() {
+    const { verticalSplitPaneSize, horizontalSplitPaneSize } = this.state;
     const BarcodePlot = this.getBarcodePlot();
     const ViolinAndTable = this.getViolinAndTable();
-    const SVGPlot = this.getSVGPlot();
+    const width =
+      window.innerWidth ||
+      document.documentElement.clientWidth ||
+      document.body.clientWidth;
+    const height =
+      window.innerHeight ||
+      document.documentElement.clientHeight ||
+      document.body.clientHeight;
 
     return (
       <div className="PlotsWrapper">
@@ -295,7 +286,27 @@ class SplitPanesContainer extends PureComponent {
                   }
                 >
                   <div id="ViolinAndTableSplitContainer">{ViolinAndTable}</div>
-                  <div id="SVGSplitContainer">{SVGPlot}</div>
+                  <div id="SVGSplitContainer">
+                    <EnrichmentSVGPlot
+                      divWidth={width - verticalSplitPaneSize - 300}
+                      divHeight={height - horizontalSplitPaneSize - 51}
+                      px
+                      pxToPtRatio={105}
+                      pointSize={12}
+                      svgTabMax={1}
+                      tab={this.props.tab}
+                      imageInfoEnrichment={this.props.imageInfoEnrichment}
+                      imageInfoEnrichmentLength={
+                        this.props.imageInfoEnrichmentLength
+                      }
+                      svgExportName={this.props.svgExportName}
+                      enrichmentPlotTypes={this.props.enrichmentPlotTypes}
+                      // isEnrichmentPlotSVGLoaded={this.props.isEnrichmentPlotSVGLoaded}
+                      SVGPlotLoaded={this.props.SVGPlotLoaded}
+                      SVGPlotLoading={this.props.SVGPlotLoading}
+                      HighlightedProteins={this.props.HighlightedProteins}
+                    />
+                  </div>
                 </SplitPane>
               </SplitPane>
             </Grid.Column>

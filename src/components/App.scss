@@ -10,6 +10,7 @@
   --color-white: #fff;
   --color-light: #e0e1e2;
   --color-dark: #2e2e2e;
+  --color-gray: #e8e8e8;
 }
 
 .AppContainer {
@@ -192,6 +193,11 @@
     -moz-user-select: none !important; /* Old versions of Firefox */
     -ms-user-select: none !important; /* Internet Explorer/Edge */
     user-select: none !important; /* Non-prefixed version, currently supported by Chrome, Opera and Firefox */
+  }
+
+  .PrimaryColor {
+    background-color: var(--color-dark) !important;
+    color: var(--color-white) !important;
   }
 
   .FloatRight {

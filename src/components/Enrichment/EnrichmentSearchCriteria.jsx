@@ -40,6 +40,7 @@ class EnrichmentSearchCriteria extends Component {
       'Select a study and model to view Analysis Details',
     enrichmentModels: [],
     enrichmentAnnotations: [],
+    enrichmentStudyTooltip: 'Select a study',
     enrichmentModelTooltip: '',
     enrichmentAnnotationTooltip: '',
     enrichmentStudiesDisabled: true,
@@ -182,7 +183,10 @@ class EnrichmentSearchCriteria extends Component {
           };
         },
       );
+      const enrichmentStudyTooltip =
+        enrichmentStudyData?.package?.description || '';
       this.setState({
+        enrichmentStudyTooltip: enrichmentStudyTooltip,
         enrichmentModelsDisabled: false,
         enrichmentModels: enrichmentModelsMapped,
       });
@@ -938,29 +942,13 @@ class EnrichmentSearchCriteria extends Component {
           undefined,
           cancelToken,
         )
-        .then(svgMarkupObj => {
-          let svgMarkup = svgMarkupObj.data;
-          svgMarkup = svgMarkup.replace(
-            /<svg/g,
-            '<svg preserveAspectRatio="xMinYMid meet" id="enrichmentMultisetAnalysisSVG"',
-          );
-          DOMPurify.addHook('afterSanitizeAttributes', function(node) {
-            if (
-              node.hasAttribute('xlink:href') &&
-              !node.getAttribute('xlink:href').match(/^#/)
-            ) {
-              node.remove();
-            }
-          });
-          // Clean HTML string and write into our DIV
-          let sanitizedSVG = DOMPurify.sanitize(svgMarkup, {
-            ADD_TAGS: ['use'],
-          });
-          let svgInfo = { plotType: 'Multiset', svg: sanitizedSVG };
-          // let svgInfo = { plotType: 'Multiset', svg: svgMarkup };
-          this.props.onGetMultisetPlotEnrichment({
-            svgInfo,
-          });
+        .then(svgUrl => {
+          if (svgUrl) {
+            let svgInfo = { plotType: 'Multiset', svg: svgUrl };
+            this.props.onGetMultisetPlotEnrichment({
+              svgInfo,
+            });
+          }
         })
         .catch(error => {
           console.error('Error during getEnrichmentsUpset', error);
@@ -995,6 +983,7 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentStudyHrefVisible,
       enrichmentModels,
       enrichmentAnnotations,
+      enrichmentStudyTooltip,
       enrichmentModelTooltip,
       enrichmentAnnotationTooltip,
       enrichmentStudiesDisabled,
@@ -1211,23 +1200,34 @@ class EnrichmentSearchCriteria extends Component {
     return (
       <React.Fragment>
         <Form className="SearchCriteriaContainer">
-          <Form.Field
-            control={Select}
-            name="enrichmentStudy"
-            value={enrichmentStudy}
-            options={enrichmentStudies}
-            placeholder="Select A Study"
-            onChange={this.handleStudyChange}
-            disabled={enrichmentStudiesDisabled}
-            width={13}
-            label={{
-              children: 'Study',
-              htmlFor: 'form-select-control-estudy',
-            }}
-            search
-            searchInput={{ id: 'form-select-control-estudy' }}
-            selectOnBlur={false}
-            selectOnNavigation={false}
+          <Popup
+            trigger={
+              <Form.Field
+                control={Select}
+                name="enrichmentStudy"
+                value={enrichmentStudy}
+                options={enrichmentStudies}
+                placeholder="Select A Study"
+                onChange={this.handleStudyChange}
+                disabled={enrichmentStudiesDisabled}
+                width={13}
+                label={{
+                  children: 'Study',
+                  htmlFor: 'form-select-control-estudy',
+                }}
+                search
+                searchInput={{ id: 'form-select-control-estudy' }}
+                selectOnBlur={false}
+                selectOnNavigation={false}
+              />
+            }
+            style={StudyPopupStyle}
+            className="CustomTooltip"
+            inverted
+            position="bottom right"
+            content={enrichmentStudyTooltip}
+            mouseEnterDelay={1000}
+            mouseLeaveDelay={0}
           />
           <span className="StudyHtmlIconDivE">{studyIcon}</span>
           <Popup

@@ -1,48 +1,49 @@
-/* eslint-disable */
-'use strict';
-const regeneratorRuntime = require('regenerator-runtime');
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-function _interopDefault(ex) {
-  return ex && typeof ex === 'object' && 'default' in ex ? ex['default'] : ex;
-}
-
-function _interopNamespace(e) {
-  if (e && e.__esModule) {
-    return e;
-  } else {
-    var n = {};
-    if (e) {
-      Object.keys(e).forEach(function(k) {
-        var d = Object.getOwnPropertyDescriptor(e, k);
-        Object.defineProperty(
-          n,
-          k,
-          d.get
-            ? d
-            : {
-                enumerable: true,
-                get: function() {
-                  return e[k];
-                },
-              },
-        );
-      });
-    }
-    n['default'] = e;
-    return n;
-  }
-}
-
-var update = _interopDefault(require('immutability-helper'));
-var lodashEs = require('lodash-es');
-var React = require('react');
-var React__default = _interopDefault(React);
-var semanticUiReact = require('semantic-ui-react');
-var moment = _interopDefault(require('moment'));
-var reactVirtualized = require('react-virtualized');
-var Axios = _interopDefault(require('axios'));
+import update from 'immutability-helper';
+import {
+  some,
+  isEmpty,
+  orderBy,
+  map,
+  debounce,
+  sortBy,
+  range,
+  filter,
+  find,
+  groupBy,
+  keyBy,
+} from 'lodash-es';
+import React__default, {
+  useMemo,
+  useReducer,
+  useEffect,
+  useState,
+  useRef,
+  useCallback,
+  Component,
+  PureComponent,
+} from 'react';
+import {
+  Popup,
+  Tab,
+  Input,
+  Dropdown,
+  Icon,
+  Button,
+  Loader,
+  Divider,
+  Dimmer,
+  Table,
+  Message,
+  Pagination,
+  Image,
+  Modal,
+  Form,
+  Header,
+  Menu,
+} from 'semantic-ui-react';
+import moment from 'moment';
+import { List } from 'react-virtualized';
+import Axios from 'axios';
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
   try {
@@ -962,18 +963,18 @@ function useAxiosGet(url, params, hookConfig) {
     hookConfig = {};
   }
 
-  var reducer = React.useMemo(function() {
+  var reducer = useMemo(function() {
     return axiosReducer();
   }, []);
 
-  var _useReducer3 = React.useReducer(reducer, {
+  var _useReducer3 = useReducer(reducer, {
       loading: true,
       error: {},
     }),
     state = _useReducer3[0],
     dispatch = _useReducer3[1];
 
-  var _useReducer4 = React.useReducer(function(x) {
+  var _useReducer4 = useReducer(function(x) {
       return x + 1;
     }, 0),
     forceTrigger = _useReducer4[0],
@@ -987,7 +988,7 @@ function useAxiosGet(url, params, hookConfig) {
     deps = _hookConfig2$deps === void 0 ? [] : _hookConfig2$deps,
     runIf = _hookConfig2.runIf,
     cacheKey = _hookConfig2.cacheKey;
-  React.useEffect(function() {
+  useEffect(function() {
     if (runIf && !runIf()) {
       dispatch({
         type: 'noRun',
@@ -1097,12 +1098,9 @@ function getAccessorValue(opt, accessor) {
 }
 var ListSwitchLength = 300;
 var listHeight = 215;
-var baseTrigger = /*#__PURE__*/ React__default.createElement(
-  semanticUiReact.Icon,
-  {
-    name: 'filter',
-  },
-);
+var baseTrigger = /*#__PURE__*/ React__default.createElement(Icon, {
+  name: 'filter',
+});
 
 var stopPropFunc = function stopPropFunc(evt) {
   return evt.stopPropagation();
@@ -1131,15 +1129,15 @@ function MultiFilterDropdown(_ref) {
       'trigger',
     ]);
 
-  var _useState = React.useState(''),
+  var _useState = useState(''),
     search = _useState[0],
     setSearch = _useState[1];
 
-  var _useState2 = React.useState(0),
+  var _useState2 = useState(0),
     showSelected = _useState2[0],
     setShowSelected = _useState2[1];
 
-  var options = React.useMemo(
+  var options = useMemo(
     function() {
       return Array.from(
         new Set(
@@ -1155,8 +1153,8 @@ function MultiFilterDropdown(_ref) {
     },
     [data, field],
   );
-  var listRef = React.useRef(null);
-  var filteredOptions = React.useMemo(
+  var listRef = useRef(null);
+  var filteredOptions = useMemo(
     function() {
       if (showSelected) {
         return [];
@@ -1178,7 +1176,7 @@ function MultiFilterDropdown(_ref) {
     },
     [options, search, showSelected],
   );
-  var filteredSelectedOpts = React.useMemo(
+  var filteredSelectedOpts = useMemo(
     function() {
       if (!showSelected) {
         return [];
@@ -1201,7 +1199,7 @@ function MultiFilterDropdown(_ref) {
     [search, selectedOpts, showSelected],
   );
   var filteredOpts = showSelected ? filteredSelectedOpts : filteredOptions;
-  var selectedOptsMap = React.useMemo(
+  var selectedOptsMap = useMemo(
     function() {
       return Object.fromEntries(
         selectedOpts.map(function(opt) {
@@ -1211,7 +1209,7 @@ function MultiFilterDropdown(_ref) {
     },
     [selectedOpts],
   );
-  React.useEffect(
+  useEffect(
     function() {
       if (filteredOpts.length > ListSwitchLength) {
         var _listRef$current;
@@ -1267,7 +1265,7 @@ function MultiFilterDropdown(_ref) {
       style = _ref2.style;
     var opt = filteredOpts[index];
     return React__default.createElement(
-      semanticUiReact.Dropdown.Item,
+      Dropdown.Item,
       {
         className: 'dropdownItem',
         key: key,
@@ -1276,7 +1274,7 @@ function MultiFilterDropdown(_ref) {
         style: style,
       },
       selectedOptsMap[opt] &&
-        React__default.createElement(semanticUiReact.Icon, {
+        React__default.createElement(Icon, {
           color: 'green',
           name: 'checkmark',
         }),
@@ -1285,7 +1283,7 @@ function MultiFilterDropdown(_ref) {
   };
 
   return React__default.createElement(
-    semanticUiReact.Popup,
+    Popup,
     {
       position: 'bottom center',
       trigger: React__default.createElement(
@@ -1301,11 +1299,11 @@ function MultiFilterDropdown(_ref) {
       popperDependencies: [filteredOpts.length],
     },
     React__default.createElement(
-      semanticUiReact.Popup.Content,
+      Popup.Content,
       {
         className: 'Filter MultiFilter',
       },
-      React__default.createElement(semanticUiReact.Tab, {
+      React__default.createElement(Tab, {
         panes: [
           {
             menuItem: 'All',
@@ -1336,7 +1334,7 @@ function MultiFilterDropdown(_ref) {
               position: 'unset',
             },
           },
-          React__default.createElement(semanticUiReact.Input, {
+          React__default.createElement(Input, {
             icon: 'search',
             iconPosition: 'left',
             className: 'search',
@@ -1360,7 +1358,7 @@ function MultiFilterDropdown(_ref) {
             },
           }),
           filteredOpts.length > ListSwitchLength &&
-            React__default.createElement(reactVirtualized.List, {
+            React__default.createElement(List, {
               ref: listRef,
               height: listHeight,
               rowCount: filteredOpts.length,
@@ -1372,7 +1370,7 @@ function MultiFilterDropdown(_ref) {
             }),
           filteredOpts.length <= ListSwitchLength &&
             React__default.createElement(
-              semanticUiReact.Dropdown.Menu,
+              Dropdown.Menu,
               {
                 scrolling: true,
                 style: {
@@ -1382,14 +1380,14 @@ function MultiFilterDropdown(_ref) {
               },
               filteredOpts.map(function(opt, idx) {
                 return React__default.createElement(
-                  semanticUiReact.Dropdown.Item,
+                  Dropdown.Item,
                   {
                     key: idx,
                     value: opt,
                     onClick: handleSelectionChange,
                   },
                   selectedOptsMap[opt] &&
-                    React__default.createElement(semanticUiReact.Icon, {
+                    React__default.createElement(Icon, {
                       color: 'green',
                       name: 'checkmark',
                     }),
@@ -1398,13 +1396,13 @@ function MultiFilterDropdown(_ref) {
               }),
             ),
           React__default.createElement(
-            semanticUiReact.Button.Group,
+            Button.Group,
             {
               fluid: true,
               widths: 2,
             },
             React__default.createElement(
-              semanticUiReact.Button,
+              Button,
               {
                 disabled: filteredOpts.length > 500 || !!showSelected,
                 title:
@@ -1417,7 +1415,7 @@ function MultiFilterDropdown(_ref) {
               'Select All',
             ),
             React__default.createElement(
-              semanticUiReact.Button,
+              Button,
               {
                 negative: true,
                 onClick: handleClearAll,
@@ -1451,15 +1449,15 @@ function RemoteMultiFilterDropdown(_ref3) {
       'useLocal',
     ]);
 
-  var _useState3 = React.useState(''),
+  var _useState3 = useState(''),
     search = _useState3[0],
     setSearch = _useState3[1];
 
-  var _useState4 = React.useState(0),
+  var _useState4 = useState(0),
     showSelected = _useState4[0],
     setShowSelected = _useState4[1];
 
-  var _useState5 = React.useState(false),
+  var _useState5 = useState(false),
     opened = _useState5[0],
     setOpened = _useState5[1];
 
@@ -1481,7 +1479,7 @@ function RemoteMultiFilterDropdown(_ref3) {
     loading = _useAxiosGet.loading,
     loadOptions = _useAxiosGet.trigger;
 
-  React.useEffect(
+  useEffect(
     function() {
       if (!props.prefetch) {
         loadOptions();
@@ -1489,7 +1487,7 @@ function RemoteMultiFilterDropdown(_ref3) {
     },
     [opened, loadOptions, props.prefetch],
   );
-  var localOptions = React.useMemo(
+  var localOptions = useMemo(
     function() {
       if (!useLocal) {
         return stubArray;
@@ -1509,7 +1507,7 @@ function RemoteMultiFilterDropdown(_ref3) {
     },
     [data, useLocal, field],
   );
-  var options = React.useMemo(
+  var options = useMemo(
     function() {
       if (!localOptions.length) {
         return remoteOptions;
@@ -1519,8 +1517,8 @@ function RemoteMultiFilterDropdown(_ref3) {
     },
     [remoteOptions, localOptions],
   );
-  var listRef = React.useRef(null);
-  var filteredOptions = React.useMemo(
+  var listRef = useRef(null);
+  var filteredOptions = useMemo(
     function() {
       if (showSelected) {
         return [];
@@ -1542,7 +1540,7 @@ function RemoteMultiFilterDropdown(_ref3) {
     },
     [options, search, showSelected],
   );
-  var filteredSelectedOpts = React.useMemo(
+  var filteredSelectedOpts = useMemo(
     function() {
       if (!showSelected) {
         return [];
@@ -1565,7 +1563,7 @@ function RemoteMultiFilterDropdown(_ref3) {
     [search, selectedOpts, showSelected],
   );
   var filteredOpts = showSelected ? filteredSelectedOpts : filteredOptions;
-  var selectedOptsMap = React.useMemo(
+  var selectedOptsMap = useMemo(
     function() {
       return Object.fromEntries(
         selectedOpts.map(function(opt) {
@@ -1575,7 +1573,7 @@ function RemoteMultiFilterDropdown(_ref3) {
     },
     [selectedOpts],
   );
-  React.useEffect(
+  useEffect(
     function() {
       if (filteredOpts.length > ListSwitchLength) {
         var _listRef$current2;
@@ -1631,7 +1629,7 @@ function RemoteMultiFilterDropdown(_ref3) {
       style = _ref4.style;
     var opt = filteredOpts[index];
     return React__default.createElement(
-      semanticUiReact.Dropdown.Item,
+      Dropdown.Item,
       {
         className: 'dropdownItem',
         key: key,
@@ -1640,7 +1638,7 @@ function RemoteMultiFilterDropdown(_ref3) {
         style: style,
       },
       selectedOptsMap[opt] &&
-        React__default.createElement(semanticUiReact.Icon, {
+        React__default.createElement(Icon, {
           color: 'green',
           name: 'checkmark',
         }),
@@ -1649,7 +1647,7 @@ function RemoteMultiFilterDropdown(_ref3) {
   };
 
   return React__default.createElement(
-    semanticUiReact.Popup,
+    Popup,
     {
       position: 'bottom center',
       trigger: React__default.createElement(
@@ -1668,14 +1666,14 @@ function RemoteMultiFilterDropdown(_ref3) {
       popperDependencies: [filteredOpts.length],
     },
     React__default.createElement(
-      semanticUiReact.Popup.Content,
+      Popup.Content,
       {
         className: 'Filter MultiFilter',
       },
-      React__default.createElement(semanticUiReact.Loader, {
+      React__default.createElement(Loader, {
         active: loading,
       }),
-      React__default.createElement(semanticUiReact.Tab, {
+      React__default.createElement(Tab, {
         panes: [
           {
             menuItem: 'All',
@@ -1706,7 +1704,7 @@ function RemoteMultiFilterDropdown(_ref3) {
               position: 'unset',
             },
           },
-          React__default.createElement(semanticUiReact.Input, {
+          React__default.createElement(Input, {
             icon: 'search',
             iconPosition: 'left',
             className: 'search',
@@ -1730,7 +1728,7 @@ function RemoteMultiFilterDropdown(_ref3) {
             },
           }),
           filteredOpts.length > ListSwitchLength &&
-            React__default.createElement(reactVirtualized.List, {
+            React__default.createElement(List, {
               ref: listRef,
               height: listHeight,
               rowCount: filteredOpts.length,
@@ -1742,7 +1740,7 @@ function RemoteMultiFilterDropdown(_ref3) {
             }),
           filteredOpts.length <= ListSwitchLength &&
             React__default.createElement(
-              semanticUiReact.Dropdown.Menu,
+              Dropdown.Menu,
               {
                 scrolling: true,
                 style: {
@@ -1752,14 +1750,14 @@ function RemoteMultiFilterDropdown(_ref3) {
               },
               filteredOpts.map(function(opt, idx) {
                 return React__default.createElement(
-                  semanticUiReact.Dropdown.Item,
+                  Dropdown.Item,
                   {
                     key: idx,
                     value: opt,
                     onClick: handleSelectionChange,
                   },
                   selectedOptsMap[opt] &&
-                    React__default.createElement(semanticUiReact.Icon, {
+                    React__default.createElement(Icon, {
                       color: 'green',
                       name: 'checkmark',
                     }),
@@ -1768,13 +1766,13 @@ function RemoteMultiFilterDropdown(_ref3) {
               }),
             ),
           React__default.createElement(
-            semanticUiReact.Button.Group,
+            Button.Group,
             {
               fluid: true,
               widths: 2,
             },
             React__default.createElement(
-              semanticUiReact.Button,
+              Button,
               {
                 disabled: filteredOpts.length > 500 || !!showSelected,
                 title:
@@ -1787,7 +1785,7 @@ function RemoteMultiFilterDropdown(_ref3) {
               'Select All',
             ),
             React__default.createElement(
-              semanticUiReact.Button,
+              Button,
               {
                 negative: true,
                 onClick: handleClearAll,
@@ -1826,7 +1824,7 @@ var DateFilterDropdown = function DateFilterDropdown(props) {
       ((_extends2 = {}), (_extends2[name] = value), _extends2),
     );
 
-    if (!lodashEs.some(newOpts, Boolean)) {
+    if (!some(newOpts, Boolean)) {
       props.onChange == null ? void 0 : props.onChange();
     } else {
       props.onChange == null ? void 0 : props.onChange(newOpts);
@@ -1836,7 +1834,7 @@ var DateFilterDropdown = function DateFilterDropdown(props) {
   var startDate = selectedOpts.startDate,
     endDate = selectedOpts.endDate;
   return React__default.createElement(
-    semanticUiReact.Popup,
+    Popup,
     {
       position: 'bottom center',
       trigger: React__default.createElement(
@@ -1851,11 +1849,11 @@ var DateFilterDropdown = function DateFilterDropdown(props) {
       onClick: stopPropFunc,
     },
     React__default.createElement(
-      semanticUiReact.Popup.Content,
+      Popup.Content,
       {
         className: 'Filter DateFilter',
       },
-      React__default.createElement(semanticUiReact.Input, {
+      React__default.createElement(Input, {
         onClick: stopPropFunc,
         icon: {
           name: 'x',
@@ -1885,7 +1883,7 @@ var DateFilterDropdown = function DateFilterDropdown(props) {
         name: 'startDate',
         onChange: handleChange,
       }),
-      React__default.createElement(semanticUiReact.Input, {
+      React__default.createElement(Input, {
         onClick: stopPropFunc,
         icon: {
           name: 'x',
@@ -2005,18 +2003,18 @@ var isComparisonActive = function isComparisonActive(opts) {
 };
 
 function useComparisonFilter(selectedOptsProp, onChange, initialState) {
-  var _useState6 = React.useState(selectedOptsProp),
+  var _useState6 = useState(selectedOptsProp),
     selectedOpts = _useState6[0],
     setSelectedOpts = _useState6[1];
 
-  var selectedOptsRef = React.useRef(selectedOpts);
-  React.useEffect(
+  var selectedOptsRef = useRef(selectedOpts);
+  useEffect(
     function() {
       selectedOptsRef.current = selectedOpts;
     },
     [selectedOpts],
   );
-  var handleAdd = React.useCallback(
+  var handleAdd = useCallback(
     function(_evt) {
       setSelectedOpts(function(selectedOpts) {
         return update(selectedOpts, {
@@ -2026,7 +2024,7 @@ function useComparisonFilter(selectedOptsProp, onChange, initialState) {
     },
     [initialState],
   );
-  var handleChange = React.useCallback(function(evt, _ref6) {
+  var handleChange = useCallback(function(evt, _ref6) {
     var value = _ref6.value,
       name = _ref6.name,
       idx = _ref6['data-idx'];
@@ -2047,14 +2045,14 @@ function useComparisonFilter(selectedOptsProp, onChange, initialState) {
       );
     });
   }, []);
-  var handleClear = React.useCallback(
+  var handleClear = useCallback(
     function() {
       setSelectedOpts([initialState]);
       onChange();
     },
     [onChange, initialState],
   );
-  var handleFilter = React.useCallback(
+  var handleFilter = useCallback(
     function() {
       if (!selectedOptsRef.current.some(isComparisonActive)) {
         onChange();
@@ -2064,7 +2062,7 @@ function useComparisonFilter(selectedOptsProp, onChange, initialState) {
     },
     [onChange],
   );
-  var handleOpen = React.useCallback(
+  var handleOpen = useCallback(
     function() {
       if (selectedOptsProp.some(isComparisonActive)) {
         setSelectedOpts(selectedOptsProp);
@@ -2072,7 +2070,7 @@ function useComparisonFilter(selectedOptsProp, onChange, initialState) {
     },
     [selectedOptsProp],
   );
-  var handleRemove = React.useCallback(function(_evt, _ref7) {
+  var handleRemove = useCallback(function(_evt, _ref7) {
     var idx = _ref7['data-idx'];
     setSelectedOpts(function(selectedOpts) {
       return update(selectedOpts, {
@@ -2108,7 +2106,7 @@ var NumericFilterPopup = /*#__PURE__*/ React__default.memo(
     var filterInputs = filter.selectedOpts.map(function(opts, idx) {
       var combination =
         idx > 0
-          ? React__default.createElement(semanticUiReact.Dropdown, {
+          ? React__default.createElement(Dropdown, {
               'data-idx': idx,
               name: 'combination',
               options: combinations,
@@ -2129,7 +2127,7 @@ var NumericFilterPopup = /*#__PURE__*/ React__default.memo(
           (opts.combination === '&&'
             ? combination
             : React__default.createElement(
-                semanticUiReact.Divider,
+                Divider,
                 {
                   horizontal: true,
                 },
@@ -2143,7 +2141,7 @@ var NumericFilterPopup = /*#__PURE__*/ React__default.memo(
           React__default.createElement(
             'div',
             null,
-            React__default.createElement(semanticUiReact.Dropdown, {
+            React__default.createElement(Dropdown, {
               'data-idx': idx,
               name: 'comparison',
               options: numericComparisons,
@@ -2152,7 +2150,7 @@ var NumericFilterPopup = /*#__PURE__*/ React__default.memo(
               onChange: filter.handleChange,
             }),
             !singleComparisons[opts.comparison] &&
-              React__default.createElement(semanticUiReact.Input, {
+              React__default.createElement(Input, {
                 'data-idx': idx,
                 name: 'value',
                 type: 'number',
@@ -2161,7 +2159,7 @@ var NumericFilterPopup = /*#__PURE__*/ React__default.memo(
                 onChange: filter.handleChange,
               }),
           ),
-          React__default.createElement(semanticUiReact.Button, {
+          React__default.createElement(Button, {
             icon: {
               name: 'minus',
               color: 'red',
@@ -2175,7 +2173,7 @@ var NumericFilterPopup = /*#__PURE__*/ React__default.memo(
       );
     });
     return React__default.createElement(
-      semanticUiReact.Popup,
+      Popup,
       {
         position: 'bottom center',
         trigger: React__default.createElement(
@@ -2191,17 +2189,17 @@ var NumericFilterPopup = /*#__PURE__*/ React__default.memo(
         onClick: stopPropFunc,
       },
       React__default.createElement(
-        semanticUiReact.Popup.Content,
+        Popup.Content,
         {
           className: 'ComparisonFilter',
         },
         filterInputs,
         React__default.createElement(
-          semanticUiReact.Divider,
+          Divider,
           {
             horizontal: true,
           },
-          React__default.createElement(semanticUiReact.Button, {
+          React__default.createElement(Button, {
             className: 'add',
             icon: {
               name: 'plus circle',
@@ -2213,7 +2211,7 @@ var NumericFilterPopup = /*#__PURE__*/ React__default.memo(
           }),
         ),
         React__default.createElement(
-          semanticUiReact.Button.Group,
+          Button.Group,
           {
             fluid: true,
             widths: 2,
@@ -2223,7 +2221,7 @@ var NumericFilterPopup = /*#__PURE__*/ React__default.memo(
             },
           },
           React__default.createElement(
-            semanticUiReact.Button,
+            Button,
             {
               positive: true,
               onClick: filter.handleFilter,
@@ -2231,7 +2229,7 @@ var NumericFilterPopup = /*#__PURE__*/ React__default.memo(
             'Filter',
           ),
           React__default.createElement(
-            semanticUiReact.Button,
+            Button,
             {
               negative: true,
               onClick: filter.handleClear,
@@ -2306,7 +2304,7 @@ var AlphanumericFilterPopup = function AlphanumericFilterPopup(_ref9) {
   var filterInputs = filter.selectedOpts.map(function(opts, idx) {
     var combination =
       idx > 0
-        ? React__default.createElement(semanticUiReact.Dropdown, {
+        ? React__default.createElement(Dropdown, {
             'data-idx': idx,
             name: 'combination',
             options: combinations,
@@ -2327,7 +2325,7 @@ var AlphanumericFilterPopup = function AlphanumericFilterPopup(_ref9) {
         (opts.combination === '&&'
           ? combination
           : React__default.createElement(
-              semanticUiReact.Divider,
+              Divider,
               {
                 horizontal: true,
               },
@@ -2341,7 +2339,7 @@ var AlphanumericFilterPopup = function AlphanumericFilterPopup(_ref9) {
         React__default.createElement(
           'div',
           null,
-          React__default.createElement(semanticUiReact.Dropdown, {
+          React__default.createElement(Dropdown, {
             'data-idx': idx,
             name: 'comparison',
             options: alphanumericComparisons,
@@ -2350,7 +2348,7 @@ var AlphanumericFilterPopup = function AlphanumericFilterPopup(_ref9) {
             onChange: filter.handleChange,
           }),
           !singleComparisons[opts.comparison] &&
-            React__default.createElement(semanticUiReact.Input, {
+            React__default.createElement(Input, {
               'data-idx': idx,
               name: 'value',
               // type="number"
@@ -2359,7 +2357,7 @@ var AlphanumericFilterPopup = function AlphanumericFilterPopup(_ref9) {
               onChange: filter.handleChange,
             }),
         ),
-        React__default.createElement(semanticUiReact.Button, {
+        React__default.createElement(Button, {
           icon: {
             name: 'minus',
             color: 'red',
@@ -2373,7 +2371,7 @@ var AlphanumericFilterPopup = function AlphanumericFilterPopup(_ref9) {
     );
   });
   return React__default.createElement(
-    semanticUiReact.Popup,
+    Popup,
     {
       position: 'bottom center',
       trigger: React__default.createElement(
@@ -2389,17 +2387,17 @@ var AlphanumericFilterPopup = function AlphanumericFilterPopup(_ref9) {
       onClick: stopPropFunc,
     },
     React__default.createElement(
-      semanticUiReact.Popup.Content,
+      Popup.Content,
       {
         className: 'ComparisonFilter',
       },
       filterInputs,
       React__default.createElement(
-        semanticUiReact.Divider,
+        Divider,
         {
           horizontal: true,
         },
-        React__default.createElement(semanticUiReact.Button, {
+        React__default.createElement(Button, {
           className: 'add',
           icon: {
             name: 'plus circle',
@@ -2411,7 +2409,7 @@ var AlphanumericFilterPopup = function AlphanumericFilterPopup(_ref9) {
         }),
       ),
       React__default.createElement(
-        semanticUiReact.Button.Group,
+        Button.Group,
         {
           fluid: true,
           widths: 2,
@@ -2421,7 +2419,7 @@ var AlphanumericFilterPopup = function AlphanumericFilterPopup(_ref9) {
           },
         },
         React__default.createElement(
-          semanticUiReact.Button,
+          Button,
           {
             positive: true,
             onClick: filter.handleFilter,
@@ -2429,7 +2427,7 @@ var AlphanumericFilterPopup = function AlphanumericFilterPopup(_ref9) {
           'Filter',
         ),
         React__default.createElement(
-          semanticUiReact.Button,
+          Button,
           {
             negative: true,
             onClick: filter.handleClear,
@@ -2636,8 +2634,8 @@ function alphanumericComparisons$1(comparison, a, b) {
  */
 
 function useLiveRef(value) {
-  var ref = React.useRef(value);
-  React.useEffect(function() {
+  var ref = useRef(value);
+  useEffect(function() {
     ref.current = value;
   });
   return ref;
@@ -2882,7 +2880,7 @@ var paginationOpts = [
     text: '1000',
     value: 1000,
   },
-];
+]; // eslint-disable-next-line @typescript-eslint/no-empty-function
 
 var stubFunction = function stubFunction() {
   return {};
@@ -2890,52 +2888,49 @@ var stubFunction = function stubFunction() {
 
 var stubArray$1 = [];
 var filteredIcon = /*#__PURE__*/ React__default.createElement(
-  semanticUiReact.Icon.Group,
+  Icon.Group,
   null,
-  /*#__PURE__*/ React__default.createElement(semanticUiReact.Icon, {
+  /*#__PURE__*/ React__default.createElement(Icon, {
     name: 'filter',
     color: 'blue',
   }),
-  /*#__PURE__*/ React__default.createElement(semanticUiReact.Icon, {
+  /*#__PURE__*/ React__default.createElement(Icon, {
     corner: true,
     name: 'asterisk',
     color: 'blue',
   }),
 );
-var unfilteredIcon = /*#__PURE__*/ React__default.createElement(
-  semanticUiReact.Icon,
-  {
-    name: 'filter',
-  },
-);
+var unfilteredIcon = /*#__PURE__*/ React__default.createElement(Icon, {
+  name: 'filter',
+});
 
 function QHGridHeader(props) {
-  var _useState = React.useState(false),
+  var _useState = useState(false),
     columnOpen = _useState[0],
     setColumnOpen = _useState[1];
 
-  var _useState2 = React.useState(props.generalSearch),
+  var _useState2 = useState(props.generalSearch),
     generalSearch = _useState2[0],
     setGeneralSearch = _useState2[1];
 
-  React.useEffect(
+  useEffect(
     function() {
       setGeneralSearch(props.generalSearch);
     },
     [props.generalSearch],
   );
   var onGeneralSearch = props.onGeneralSearch;
-  var handlePropsGeneralSearch = React.useMemo(
+  var handlePropsGeneralSearch = useMemo(
     function() {
-      return lodashEs.debounce(function(value) {
+      return debounce(function(value) {
         onGeneralSearch == null ? void 0 : onGeneralSearch(value);
       }, props.generalSearchDebounceTime);
     },
     [onGeneralSearch, props.generalSearchDebounceTime],
   );
-  var generalSearchRef = React.useRef(props.generalSearch);
+  var generalSearchRef = useRef(props.generalSearch);
   generalSearchRef.current = props.generalSearch;
-  React.useEffect(
+  useEffect(
     function() {
       if (generalSearchRef.current === generalSearch) {
         return;
@@ -2986,16 +2981,16 @@ function QHGridHeader(props) {
 
   var columns = props.columns,
     grouping = props.grouping;
-  var sortedColumns = React.useMemo(
+  var sortedColumns = useMemo(
     function() {
-      return lodashEs.sortBy(columns, 'title');
+      return sortBy(columns, 'title');
     },
     [columns],
   );
   var columnMenuItems = columnOpen
     ? sortedColumns.map(function(col) {
         return React__default.createElement(
-          semanticUiReact.Dropdown.Item,
+          Dropdown.Item,
           {
             key: col.id,
             onClick: function onClick(evt) {
@@ -3006,7 +3001,7 @@ function QHGridHeader(props) {
             },
           },
           !col.hidden &&
-            React__default.createElement(semanticUiReact.Icon, {
+            React__default.createElement(Icon, {
               color: 'green',
               name: 'checkmark',
             }),
@@ -3051,14 +3046,14 @@ function QHGridHeader(props) {
     });
     var sortIcon =
       group.sortOrder === 'asc'
-        ? React__default.createElement(semanticUiReact.Icon, {
+        ? React__default.createElement(Icon, {
             name: 'long arrow alternate up',
           })
-        : React__default.createElement(semanticUiReact.Icon, {
+        : React__default.createElement(Icon, {
             name: 'long arrow alternate down',
           });
     return React__default.createElement(
-      semanticUiReact.Button.Group,
+      Button.Group,
       {
         key: colId,
         inverted: true,
@@ -3069,7 +3064,7 @@ function QHGridHeader(props) {
         },
       },
       React__default.createElement(
-        semanticUiReact.Button,
+        Button,
         {
           inverted: true,
           size: 'mini',
@@ -3082,7 +3077,7 @@ function QHGridHeader(props) {
         (col == null ? void 0 : col.title) || colId,
       ),
       React__default.createElement(
-        semanticUiReact.Button,
+        Button,
         {
           inverted: true,
           size: 'mini',
@@ -3098,7 +3093,7 @@ function QHGridHeader(props) {
     );
   });
   return React__default.createElement(
-    semanticUiReact.Table,
+    Table,
     {
       compact: 'very',
       size: 'small',
@@ -3108,17 +3103,17 @@ function QHGridHeader(props) {
       },
     },
     React__default.createElement(
-      semanticUiReact.Table.Header,
+      Table.Header,
       null,
       (props.onGeneralSearch ||
         props.onColumnVisibilityToggle ||
         props.extraHeaderItem ||
         props.exportBaseName) &&
         React__default.createElement(
-          semanticUiReact.Table.Row,
+          Table.Row,
           null,
           React__default.createElement(
-            semanticUiReact.Table.HeaderCell,
+            Table.HeaderCell,
             {
               style: {
                 backgroundColor: '#1678C2',
@@ -3127,7 +3122,7 @@ function QHGridHeader(props) {
               className: 'QHGrid--header',
             },
             props.onGeneralSearch &&
-              React__default.createElement(semanticUiReact.Input, {
+              React__default.createElement(Input, {
                 className: 'QHGrid--generalSearch',
                 icon: 'search',
                 iconPosition: 'left',
@@ -3147,15 +3142,15 @@ function QHGridHeader(props) {
               }),
             props.onColumnVisibilityToggle &&
               React__default.createElement(
-                semanticUiReact.Dropdown,
+                Dropdown,
                 {
                   scrolling: true,
                   trigger: React__default.createElement(
-                    semanticUiReact.Button,
+                    Button,
                     {
                       inverted: true,
                     },
-                    React__default.createElement(semanticUiReact.Icon, {
+                    React__default.createElement(Icon, {
                       name: 'columns',
                     }),
                     'Columns',
@@ -3171,7 +3166,7 @@ function QHGridHeader(props) {
                   name: 'column',
                 },
                 React__default.createElement(
-                  semanticUiReact.Dropdown.Menu,
+                  Dropdown.Menu,
                   null,
                   columnMenuItems,
                 ),
@@ -3179,7 +3174,7 @@ function QHGridHeader(props) {
             props.extraHeaderItem,
             !props.loading &&
               !!props.exportBaseName &&
-              React__default.createElement(semanticUiReact.Image, {
+              React__default.createElement(Image, {
                 src: excelLogo,
                 avatar: true,
                 size: 'mini',
@@ -3195,10 +3190,10 @@ function QHGridHeader(props) {
         ),
       props.onGroupChange &&
         React__default.createElement(
-          semanticUiReact.Table.Row,
+          Table.Row,
           null,
           React__default.createElement(
-            semanticUiReact.Table.HeaderCell,
+            Table.HeaderCell,
             {
               style: {
                 backgroundColor: '#1678C2',
@@ -3222,11 +3217,11 @@ function QHGridHeader(props) {
 function QHGridBodyHeaders(props) {
   var enableDrag = props.enableDrag || !!props.onColumnReorder;
 
-  var _useState3 = React.useState(-1),
+  var _useState3 = useState(-1),
     dragIndex = _useState3[0],
     setDragIndex = _useState3[1];
 
-  var _useState4 = React.useState(-1),
+  var _useState4 = useState(-1),
     hoverIndex = _useState4[0],
     setHoverIndex = _useState4[1];
 
@@ -3367,7 +3362,7 @@ function QHGridBodyHeaders(props) {
         ? void 0
         : _props$filters$.value;
     return React__default.createElement(
-      semanticUiReact.Table.HeaderCell,
+      Table.HeaderCell,
       Object.assign(
         {},
         col.headerAttributes,
@@ -3415,11 +3410,11 @@ function QHGridBodyHeaders(props) {
 function QHGridBody(props) {
   var joinChar = '\u200C';
 
-  var _useState5 = React.useState({}),
+  var _useState5 = useState({}),
     hidden = _useState5[0],
     setHidden = _useState5[1];
 
-  React.useEffect(
+  useEffect(
     function() {
       setHidden({});
     },
@@ -3474,7 +3469,7 @@ function QHGridBody(props) {
     var row = isHidden
       ? null
       : React__default.createElement(
-          semanticUiReact.Table.Row,
+          Table.Row,
           Object.assign(
             {
               style: rowLevelStyle,
@@ -3490,7 +3485,7 @@ function QHGridBody(props) {
             },
           ),
           props.grouping.map(function(_group, groupIdx) {
-            return React__default.createElement(semanticUiReact.Table.Cell, {
+            return React__default.createElement(Table.Cell, {
               style: {
                 backgroundColor: '#F2F2F2',
               },
@@ -3501,7 +3496,7 @@ function QHGridBody(props) {
           props.visibleColumns.map(function(col) {
             var template = getTemplate(col);
             return React__default.createElement(
-              semanticUiReact.Table.Cell,
+              Table.Cell,
               {
                 key: col.id || col.title,
               },
@@ -3555,12 +3550,12 @@ function QHGridBody(props) {
 
       groupDisplays.push(
         React__default.createElement(
-          semanticUiReact.Table.Row,
+          Table.Row,
           {
             key: '' + group.title + _groupName,
           },
-          lodashEs.range(_index2).map(function(rangeIdx) {
-            return React__default.createElement(semanticUiReact.Table.Cell, {
+          range(_index2).map(function(rangeIdx) {
+            return React__default.createElement(Table.Cell, {
               style: {
                 backgroundColor: '#F2F2F2',
               },
@@ -3569,7 +3564,7 @@ function QHGridBody(props) {
             });
           }),
           React__default.createElement(
-            semanticUiReact.Table.Cell,
+            Table.Cell,
             {
               onClick: handleToggle(_groupName),
               colSpan:
@@ -3580,7 +3575,7 @@ function QHGridBody(props) {
               },
               collapsing: true,
             },
-            React__default.createElement(semanticUiReact.Icon, {
+            React__default.createElement(Icon, {
               name: 'caret ' + (hidden[_groupName] ? 'right' : 'down'),
             }),
             React__default.createElement(
@@ -3626,16 +3621,16 @@ function QHGrid(_ref) {
       'grouping',
     ]);
 
-  var _useState6 = React.useState(1),
+  var _useState6 = useState(1),
     activePageState = _useState6[0],
     setActivePage = _useState6[1];
 
-  var _useState7 = React.useState(15),
+  var _useState7 = useState(15),
     itemsPerPageState = _useState7[0],
     setItemsPerPage = _useState7[1];
 
-  var bodyRef = React.useRef(null);
-  var filteredData = React.useMemo(
+  var bodyRef = useRef(null);
+  var filteredData = useMemo(
     function() {
       var data = props.data;
 
@@ -3643,7 +3638,7 @@ function QHGrid(_ref) {
         return data;
       }
 
-      if (!lodashEs.isEmpty(props.filters)) {
+      if (!isEmpty(props.filters)) {
         var filters = Object.entries(props.filters);
         data = data.filter(function(item) {
           var include = true;
@@ -3694,7 +3689,7 @@ function QHGrid(_ref) {
     [props.data, props.generalSearch, props.filters, props.isPaginated],
   );
   var onFilteredRef = useLiveRef(props.onFiltered);
-  React.useEffect(
+  useEffect(
     function() {
       // Let parent know that new filtered data is available if they are interested
       onFilteredRef.current == null
@@ -3743,14 +3738,14 @@ function QHGrid(_ref) {
     }
   };
 
-  React.useEffect(
+  useEffect(
     function() {
       setActivePage(1);
     },
     [props.data, props.activePage],
   ); // const { data = stubArray } = props;
 
-  var visibleColumns = React.useMemo(
+  var visibleColumns = useMemo(
     function() {
       return props.columns
         .map(function(col, idx) {
@@ -3764,7 +3759,7 @@ function QHGrid(_ref) {
     },
     [props.columns],
   );
-  var itemKeyMap = React.useMemo(
+  var itemKeyMap = useMemo(
     function() {
       var uniqueColumns = props.columns.filter(function(col) {
         return col.unique;
@@ -3809,7 +3804,7 @@ function QHGrid(_ref) {
     endIndex = itemsPerPage;
   }
 
-  var groupingWithExtraStuff = React.useMemo(
+  var groupingWithExtraStuff = useMemo(
     function() {
       return grouping.map(function(group) {
         var col = columnsConfig.find(function(col) {
@@ -3828,7 +3823,7 @@ function QHGrid(_ref) {
     },
     [grouping, columnsConfig],
   );
-  var columnsById = React.useMemo(
+  var columnsById = useMemo(
     function() {
       return Object.fromEntries(
         columnsConfig.map(function(col) {
@@ -3838,7 +3833,7 @@ function QHGrid(_ref) {
     },
     [columnsConfig],
   );
-  var sortedData = React.useMemo(
+  var sortedData = useMemo(
     function() {
       if ((!grouping.length && !props.sortBy) || props.isPaginated) {
         return filteredData;
@@ -3866,7 +3861,7 @@ function QHGrid(_ref) {
         sortOrders.push(props.sortOrder);
       }
 
-      return lodashEs.orderBy(filteredData, sortBys, sortOrders);
+      return orderBy(filteredData, sortBys, sortOrders);
     },
     [
       props.sortBy,
@@ -3878,14 +3873,14 @@ function QHGrid(_ref) {
     ],
   );
   var onSortedRef = useLiveRef(props.onSorted);
-  React.useEffect(
+  useEffect(
     function() {
       // Let parent know that new sorted data is available if they are interested
       onSortedRef.current == null ? void 0 : onSortedRef.current(sortedData);
     },
     [sortedData, onSortedRef],
   );
-  var slicedData = React.useMemo(
+  var slicedData = useMemo(
     function() {
       return sortedData.slice(startIndex, endIndex);
     },
@@ -3940,9 +3935,7 @@ function QHGrid(_ref) {
                     ? _props$getExportData
                     : sortedData;
                 _context.next = 5;
-                return new Promise(function(resolve) {
-                  resolve(_interopNamespace(require('xlsx')));
-                })['catch'](function() {
+                return import('xlsx')['catch'](function() {
                   alert('XSLX needs to be imported!');
                 });
 
@@ -3963,13 +3956,13 @@ function QHGrid(_ref) {
               case 10:
                 data = _context.sent;
                 wb = XLSX.utils.book_new();
-                visibleColumns = lodashEs.filter(cols, function(col) {
+                visibleColumns = filter(cols, function(col) {
                   var notHidden = !col.hidden;
                   var hideOnExport = col.hideOnExport;
                   var visibleDueToOtherCol = false;
 
                   if (col.exportIfVisible) {
-                    var dependentCol = lodashEs.find(cols, function(depCol) {
+                    var dependentCol = find(cols, function(depCol) {
                       return depCol.id === col.exportIfVisible;
                     });
                     visibleDueToOtherCol = !(dependentCol == null
@@ -4074,16 +4067,12 @@ function QHGrid(_ref) {
       },
     },
     React__default.createElement(
-      semanticUiReact.Dimmer,
+      Dimmer,
       {
         active: props.loading,
         className: 'QHGrid--loading',
       },
-      React__default.createElement(
-        semanticUiReact.Loader,
-        null,
-        loadingMessage,
-      ),
+      React__default.createElement(Loader, null, loadingMessage),
     ),
     React__default.createElement(QHGridHeader, {
       columns: props.columns,
@@ -4113,7 +4102,7 @@ function QHGrid(_ref) {
         ref: bodyRef,
       },
       React__default.createElement(
-        semanticUiReact.Table,
+        Table,
         {
           className: 'QHGrid--body',
           fixed: props.loading && !props.isPaginated,
@@ -4147,22 +4136,19 @@ function QHGrid(_ref) {
           }),
         ),
         React__default.createElement(
-          semanticUiReact.Table.Header,
+          Table.Header,
           null,
           React__default.createElement(
-            semanticUiReact.Table.Row,
+            Table.Row,
             null,
-            lodashEs.map(grouping, function(_group, groupIdx) {
-              return React__default.createElement(
-                semanticUiReact.Table.HeaderCell,
-                {
-                  key: groupIdx,
-                  collapsing: true,
-                  style: {
-                    cursor: 'default',
-                  },
+            map(grouping, function(_group, groupIdx) {
+              return React__default.createElement(Table.HeaderCell, {
+                key: groupIdx,
+                collapsing: true,
+                style: {
+                  cursor: 'default',
                 },
-              );
+              });
             }),
             React__default.createElement(QHGridBodyHeaders, {
               filters: props.filters,
@@ -4178,7 +4164,7 @@ function QHGrid(_ref) {
           ),
         ),
         React__default.createElement(
-          semanticUiReact.Table.Body,
+          Table.Body,
           null,
           React__default.createElement(QHGridBody, {
             startIndex: realStartIndex,
@@ -4200,10 +4186,10 @@ function QHGrid(_ref) {
           {
             className: 'QHGrid--empty',
           },
-          lodashEs.isEmpty(emptyMessage)
+          isEmpty(emptyMessage)
             ? null
             : typeof emptyMessage === 'string'
-            ? React__default.createElement(semanticUiReact.Message, {
+            ? React__default.createElement(Message, {
                 icon: 'search',
                 content: emptyMessage,
               })
@@ -4211,7 +4197,7 @@ function QHGrid(_ref) {
         ),
     ),
     React__default.createElement(
-      semanticUiReact.Table,
+      Table,
       {
         striped: true,
         sortable: true,
@@ -4227,13 +4213,13 @@ function QHGrid(_ref) {
         },
       },
       React__default.createElement(
-        semanticUiReact.Table.Footer,
+        Table.Footer,
         null,
         React__default.createElement(
-          semanticUiReact.Table.Row,
+          Table.Row,
           null,
           React__default.createElement(
-            semanticUiReact.Table.HeaderCell,
+            Table.HeaderCell,
             {
               colSpan: numColumns + grouping.length,
               style: {
@@ -4242,7 +4228,7 @@ function QHGrid(_ref) {
                 borderTop: 0,
               },
             },
-            React__default.createElement(semanticUiReact.Pagination, {
+            React__default.createElement(Pagination, {
               size: 'mini',
               activePage: activePage,
               totalPages: numPages,
@@ -4263,7 +4249,7 @@ function QHGrid(_ref) {
             React__default.createElement(
               'span',
               null,
-              React__default.createElement(semanticUiReact.Dropdown, {
+              React__default.createElement(Dropdown, {
                 inline: true,
                 options: paginationOpts,
                 value: itemsPerPage,
@@ -4292,7 +4278,7 @@ function QHGrid(_ref) {
               ' Items',
               ' ',
               props.onReloadData &&
-                React__default.createElement(semanticUiReact.Button, {
+                React__default.createElement(Button, {
                   style: {
                     marginLeft: 10,
                   },
@@ -4323,7 +4309,7 @@ var useAutoControlled = function useAutoControlled(options) {
       _options$initialValue === void 0 ? undefined : _options$initialValue,
     value = options.value;
 
-  var _useState = React.useState(
+  var _useState = useState(
       defaultValue === undefined ? initialValue : defaultValue,
     ),
     state = _useState[0],
@@ -4457,7 +4443,7 @@ var iconOptions = /*#__PURE__*/ icons.map(function(icon) {
     // icon,
     value: icon,
     text: icon,
-    content: React__default.createElement(semanticUiReact.Header, {
+    content: React__default.createElement(Header, {
       icon: icon,
       content: icon,
     }),
@@ -4721,15 +4707,15 @@ var QuickViewModal = /*#__PURE__*/ (function(_Component) {
     }
 
     return React__default.createElement(
-      semanticUiReact.Modal,
+      Modal,
       {
         open: this.props.open,
         onClose: this.props.onClose,
-        as: semanticUiReact.Form,
+        as: Form,
         onSubmit: this.handleSubmit,
       },
       React__default.createElement(
-        semanticUiReact.Modal.Header,
+        Modal.Header,
         null,
         this.props.header ||
           (this.props.values
@@ -4737,21 +4723,21 @@ var QuickViewModal = /*#__PURE__*/ (function(_Component) {
             : 'Create QuickView'),
       ),
       React__default.createElement(
-        semanticUiReact.Modal.Content,
+        Modal.Content,
         null,
         React__default.createElement(
-          semanticUiReact.Form.Group,
+          Form.Group,
           {
             widths: 'equal',
           },
-          React__default.createElement(semanticUiReact.Form.Input, {
+          React__default.createElement(Form.Input, {
             label: React__default.createElement(
               'label',
               null,
               'Name',
               this.state.nameError &&
-                React__default.createElement(semanticUiReact.Popup, {
-                  trigger: React__default.createElement(semanticUiReact.Icon, {
+                React__default.createElement(Popup, {
+                  trigger: React__default.createElement(Icon, {
                     name: 'info circle',
                     style: {
                       cursor: 'pointer',
@@ -4771,7 +4757,7 @@ var QuickViewModal = /*#__PURE__*/ (function(_Component) {
             error: this.state.nameError,
             required: true,
           }),
-          React__default.createElement(semanticUiReact.Form.Dropdown, {
+          React__default.createElement(Form.Dropdown, {
             allowAdditions: true,
             onChange: this.handleGroupChange,
             onAddItem: this.handleGroupAddition,
@@ -4783,8 +4769,8 @@ var QuickViewModal = /*#__PURE__*/ (function(_Component) {
               'label',
               null,
               'Group',
-              React__default.createElement(semanticUiReact.Popup, {
-                trigger: React__default.createElement(semanticUiReact.Icon, {
+              React__default.createElement(Popup, {
+                trigger: React__default.createElement(Icon, {
                   name: 'question circle',
                   style: {
                     cursor: 'pointer',
@@ -4799,17 +4785,17 @@ var QuickViewModal = /*#__PURE__*/ (function(_Component) {
           }),
         ),
         React__default.createElement(
-          semanticUiReact.Form.Group,
+          Form.Group,
           {
             widths: 'equal',
           },
-          React__default.createElement(semanticUiReact.Form.Select, {
+          React__default.createElement(Form.Select, {
             label: React__default.createElement(
               'label',
               null,
               'Color',
-              React__default.createElement(semanticUiReact.Popup, {
-                trigger: React__default.createElement(semanticUiReact.Icon, {
+              React__default.createElement(Popup, {
+                trigger: React__default.createElement(Icon, {
                   name: 'question circle',
                   style: {
                     cursor: 'pointer',
@@ -4824,13 +4810,13 @@ var QuickViewModal = /*#__PURE__*/ (function(_Component) {
             value: this.state.color,
             onChange: this.handleColorChange,
           }),
-          React__default.createElement(semanticUiReact.Form.Dropdown, {
+          React__default.createElement(Form.Dropdown, {
             label: React__default.createElement(
               'label',
               null,
               'Icon',
-              React__default.createElement(semanticUiReact.Popup, {
-                trigger: React__default.createElement(semanticUiReact.Icon, {
+              React__default.createElement(Popup, {
+                trigger: React__default.createElement(Icon, {
                   name: 'question circle',
                   style: {
                     cursor: 'pointer',
@@ -4848,14 +4834,14 @@ var QuickViewModal = /*#__PURE__*/ (function(_Component) {
           }),
         ),
         this.props.values &&
-          React__default.createElement(semanticUiReact.Form.Checkbox, {
+          React__default.createElement(Form.Checkbox, {
             label: 'Update View Settings to the Current Settings',
             inline: true,
             checked: this.state.update,
             onChange: this.handleUpdateChange,
           }),
       ),
-      React__default.createElement(semanticUiReact.Modal.Actions, {
+      React__default.createElement(Modal.Actions, {
         actions: [
           {
             content: 'Cancel',
@@ -4876,7 +4862,7 @@ var QuickViewModal = /*#__PURE__*/ (function(_Component) {
   };
 
   return QuickViewModal;
-})(React.Component);
+})(Component);
 
 var stubObj = {};
 var sortOrderToRightType = {
@@ -4886,28 +4872,28 @@ var sortOrderToRightType = {
   desc: 'desc',
 };
 function QuickViews(props) {
-  var _useState = React.useState(false),
+  var _useState = useState(false),
     open = _useState[0],
     setOpen = _useState[1];
 
-  var _useState2 = React.useState(false),
+  var _useState2 = useState(false),
     modalOpen = _useState2[0],
     setModalOpen = _useState2[1];
 
-  var _useState3 = React.useState(undefined),
+  var _useState3 = useState(undefined),
     editView = _useState3[0],
     setEditView = _useState3[1];
 
-  var getViewRef = React.useRef(props.getView);
+  var getViewRef = useRef(props.getView);
   getViewRef.current = props.getView;
 
-  var _useState4 = React.useState(stubObj),
+  var _useState4 = useState(stubObj),
     customConfig = _useState4[0],
     setCustomConfig = _useState4[1];
 
-  var customConfigRef = React.useRef(stubObj);
+  var customConfigRef = useRef(stubObj);
   var disableChanges = props.disableChanges || !props.id;
-  React.useEffect(
+  useEffect(
     function() {
       if (disableChanges || customConfig === customConfigRef.current) {
         return;
@@ -4975,11 +4961,11 @@ function QuickViews(props) {
     },
     [customConfig, props.ownerId, props.id, props.url, disableChanges],
   );
-  var config = React.useMemo(
+  var config = useMemo(
     function() {
       if (!props.config) {
         return customConfig;
-      } else if (lodashEs.isEmpty(customConfig)) {
+      } else if (isEmpty(customConfig)) {
         return props.config || customConfig;
       } else {
         return _extends({}, props.config, customConfig);
@@ -4987,7 +4973,7 @@ function QuickViews(props) {
     },
     [customConfig, props.config],
   );
-  var quickViews = React.useMemo(
+  var quickViews = useMemo(
     function() {
       return Object.entries(config).map(function(_ref2) {
         var name = _ref2[0],
@@ -5011,7 +4997,7 @@ function QuickViews(props) {
     value = _useAutoControlled[0],
     setValue = _useAutoControlled[1];
 
-  var view = React.useMemo(
+  var view = useMemo(
     function() {
       return quickViews.find(function(qv) {
         return qv.name === value;
@@ -5019,7 +5005,7 @@ function QuickViews(props) {
     },
     [value, quickViews],
   );
-  React.useEffect(
+  useEffect(
     function() {
       var onViewChange = props.onViewChange;
 
@@ -5029,7 +5015,7 @@ function QuickViews(props) {
     },
     [view, props.onViewChange],
   );
-  React.useEffect(
+  useEffect(
     function() {
       var cancelToken;
 
@@ -5263,9 +5249,9 @@ function QuickViews(props) {
     });
   };
 
-  var quickViewGroups = React.useMemo(
+  var quickViewGroups = useMemo(
     function() {
-      return lodashEs.groupBy(quickViews, 'group');
+      return groupBy(quickViews, 'group');
     },
     [quickViews],
   );
@@ -5274,7 +5260,7 @@ function QuickViews(props) {
       qvGroup = _ref4[1];
     var items = qvGroup.map(function(qv) {
       return React__default.createElement(
-        semanticUiReact.Menu.Item,
+        Menu.Item,
         {
           key: qv.name,
           view: qv.view,
@@ -5289,7 +5275,7 @@ function QuickViews(props) {
           },
         },
         qv.icon &&
-          React__default.createElement(semanticUiReact.Icon, {
+          React__default.createElement(Icon, {
             className: 'quickViewIcon ' + qv.color,
             name: qv.icon,
           }),
@@ -5299,9 +5285,9 @@ function QuickViews(props) {
           null,
           qv.custom &&
             props.onShare &&
-            React__default.createElement(semanticUiReact.Button, {
+            React__default.createElement(Button, {
               title: 'Share View',
-              icon: React__default.createElement(semanticUiReact.Icon, {
+              icon: React__default.createElement(Icon, {
                 name: 'share square',
                 color: 'black',
               }),
@@ -5314,9 +5300,9 @@ function QuickViews(props) {
             }),
           qv.custom &&
             !props.disableChanges &&
-            React__default.createElement(semanticUiReact.Button, {
+            React__default.createElement(Button, {
               title: 'Edit View',
-              icon: React__default.createElement(semanticUiReact.Icon, {
+              icon: React__default.createElement(Icon, {
                 name: 'pencil',
                 color: 'black',
               }),
@@ -5329,9 +5315,9 @@ function QuickViews(props) {
             }),
           qv.custom &&
             !props.disableChanges &&
-            React__default.createElement(semanticUiReact.Button, {
+            React__default.createElement(Button, {
               title: 'Delete View',
-              icon: React__default.createElement(semanticUiReact.Icon, {
+              icon: React__default.createElement(Icon, {
                 name: 'remove',
                 color: 'red',
               }),
@@ -5348,17 +5334,13 @@ function QuickViews(props) {
 
     if (groupName !== 'undefined') {
       return React__default.createElement(
-        semanticUiReact.Dropdown,
+        Dropdown,
         {
           key: groupName,
           item: true,
           text: groupName,
         },
-        React__default.createElement(
-          semanticUiReact.Dropdown.Menu,
-          null,
-          items,
-        ),
+        React__default.createElement(Dropdown.Menu, null, items),
       );
     } else {
       return items;
@@ -5385,14 +5367,14 @@ function QuickViews(props) {
       values: editView,
     }),
     React__default.createElement(
-      semanticUiReact.Popup,
+      Popup,
       {
         trigger: React__default.createElement(
-          semanticUiReact.Button,
+          Button,
           {
             inverted: true,
           },
-          React__default.createElement(semanticUiReact.Icon, {
+          React__default.createElement(Icon, {
             name: 'lightning',
           }),
           'Quick Views',
@@ -5411,18 +5393,18 @@ function QuickViews(props) {
         basic: true,
       },
       React__default.createElement(
-        semanticUiReact.Menu,
+        Menu,
         {
           vertical: true,
           fluid: true,
         },
         !disableChanges &&
           React__default.createElement(
-            semanticUiReact.Menu.Item,
+            Menu.Item,
             {
               onClick: handleCreate,
             },
-            React__default.createElement(semanticUiReact.Icon, {
+            React__default.createElement(Icon, {
               name: 'add',
               color: 'green',
             }),
@@ -5661,8 +5643,8 @@ var EZGrid = /*#__PURE__*/ (function(_Component) {
         );
       }
 
-      var colMap = lodashEs.keyBy(columnsConfig, 'id');
-      var viewColumnMap = lodashEs.groupBy(viewColumns, 'id');
+      var colMap = keyBy(columnsConfig, 'id');
+      var viewColumnMap = groupBy(viewColumns, 'id');
       var newColumns = columnsConfig.filter(function(col) {
         return !viewColumnMap[col.id];
       });
@@ -5738,9 +5720,9 @@ var EZGrid = /*#__PURE__*/ (function(_Component) {
         disableMenu: this.props.disableQuickViewMenu,
       }),
       this.props.legend &&
-        React__default.createElement(semanticUiReact.Popup, {
+        React__default.createElement(Popup, {
           flowing: true,
-          trigger: React__default.createElement(semanticUiReact.Button, {
+          trigger: React__default.createElement(Button, {
             icon: 'info circle',
             content: 'Legend',
             inverted: true,
@@ -5809,7 +5791,7 @@ var EZGrid = /*#__PURE__*/ (function(_Component) {
   };
 
   return EZGrid;
-})(React.Component);
+})(Component);
 EZGrid.defaultProps = {
   showError: function showError() {},
   itemsPerPage: 15,
@@ -6056,8 +6038,8 @@ var EZNetworkGrid = /*#__PURE__*/ (function(_PureComponent) {
         );
       }
 
-      var colMap = lodashEs.keyBy(columnsConfig, 'id');
-      var viewColumnMap = lodashEs.groupBy(viewColumns, 'id');
+      var colMap = keyBy(columnsConfig, 'id');
+      var viewColumnMap = groupBy(viewColumns, 'id');
       var newColumns = columnsConfig.filter(function(col) {
         return !viewColumnMap[col.id];
       });
@@ -6210,9 +6192,9 @@ var EZNetworkGrid = /*#__PURE__*/ (function(_PureComponent) {
         disableMenu: this.props.disableQuickViewMenu,
       }),
       this.props.legend &&
-        React__default.createElement(semanticUiReact.Popup, {
+        React__default.createElement(Popup, {
           flowing: true,
-          trigger: React__default.createElement(semanticUiReact.Button, {
+          trigger: React__default.createElement(Button, {
             icon: 'info circle',
             content: 'Legend',
             inverted: true,
@@ -6281,7 +6263,7 @@ var EZNetworkGrid = /*#__PURE__*/ (function(_PureComponent) {
   };
 
   return EZNetworkGrid;
-})(React.PureComponent);
+})(PureComponent);
 EZNetworkGrid.defaultProps = {
   showError: function showError() {},
   itemsPerPage: 15,
@@ -6301,13 +6283,15 @@ function mapColumnsConfig$1(columns) {
   });
 }
 
-exports.EZGrid = EZGrid;
-exports.EZNetworkGrid = EZNetworkGrid;
-exports.QHGrid = QHGrid;
-exports.QuickViewModal = QuickViewModal;
-exports.QuickViews = QuickViews;
-exports.filterTypes = filterTypes;
-exports.getField = getField;
-exports.getFieldValue = getFieldValue;
-exports.typeMap = typeMap;
-//# sourceMappingURL=qhgrid.cjs.development.js.map
+export {
+  EZGrid,
+  EZNetworkGrid,
+  QHGrid,
+  QuickViewModal,
+  QuickViews,
+  filterTypes,
+  getField,
+  getFieldValue,
+  typeMap,
+};
+//# sourceMappingURL=qhgrid.esm.js.map

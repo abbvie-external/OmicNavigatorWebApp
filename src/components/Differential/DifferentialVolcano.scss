@@ -45,7 +45,7 @@
   transform: translate(-50%, -50%);
 }
 
-#PlotSVG {
+#VolcanoPlotSVG {
   padding-right: 25px !important;
 
   svg {
@@ -109,6 +109,7 @@
   padding-bottom: 0px !important;
 
   .VolcanoSplitPane {
+    max-width: 100% !important;
     position: relative !important;
     padding-bottom: 50px !important;
 
@@ -173,6 +174,34 @@
   .Resizer.disabled:hover {
     border-color: transparent;
   }
+}
+
+// #PrimaryColor {
+//   background-color: #ff4400 !important;
+//   color: #fff !important;
+// }
+
+.MultiFeaturePlotBtn {
+  margin-top: 5px !important;
+  margin-left: 355px !important;
+  cursor: pointer !important;
+  box-shadow: 0 1px 0px rgba(0, 0, 0, 0.12), 0 1px 0px rgba(0, 0, 0, 0.24) !important;
+}
+
+.MultifeaturePlotBtnDiv {
+  position: absolute;
+  left: 83px !important;
+  margin-top: 13px;
+
+  // .MultiFeaturePlottingBtn {
+  //   font-size: 13px !important;
+  //   height: 28px !important;
+  // }
+
+  // .MultiFeaturePlotDetail {
+  //   background-color: #1678c2 !important;
+  //   color: white !important;
+  // }
 }
 
 // .ui.visible.overlay.sidebar {

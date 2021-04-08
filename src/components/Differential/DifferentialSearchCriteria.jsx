@@ -39,6 +39,7 @@ class DifferentialSearchCriteria extends Component {
       'Select a study and model to view Analysis Details',
     differentialModels: [],
     differentialTests: [],
+    differentialStudyTooltip: 'Select a study',
     differentialModelTooltip: '',
     differentialTestTooltip: '',
     differentialStudiesDisabled: true,
@@ -175,8 +176,10 @@ class DifferentialSearchCriteria extends Component {
           };
         },
       );
-
+      const differentialStudyTooltip =
+        differentialStudyData?.package?.description || '';
       this.setState({
+        differentialStudyTooltip: differentialStudyTooltip,
         differentialModelsDisabled: false,
         differentialModels: differentialModelsMapped,
       });
@@ -797,29 +800,13 @@ class DifferentialSearchCriteria extends Component {
         undefined,
         cancelToken,
       )
-      .then(svgMarkupRaw => {
-        let svgMarkup = svgMarkupRaw.data;
-        svgMarkup = svgMarkup.replace(
-          /<svg/g,
-          '<svg preserveAspectRatio="xMinYMid meet" id="differentialMultisetAnalysisSVG"',
-        );
-        DOMPurify.addHook('afterSanitizeAttributes', function(node) {
-          if (
-            node.hasAttribute('xlink:href') &&
-            !node.getAttribute('xlink:href').match(/^#/)
-          ) {
-            node.remove();
-          }
-        });
-        // Clean HTML string and write into our DIV
-        let sanitizedSVG = DOMPurify.sanitize(svgMarkup, {
-          ADD_TAGS: ['use'],
-        });
-        let svgInfo = { plotType: 'Multiset', svg: sanitizedSVG };
-        // let svgInfo = { plotType: 'Multiset', svg: svgMarkup };
-        this.props.onGetMultisetPlotDifferential({
-          svgInfo,
-        });
+      .then(svgUrl => {
+        if (svgUrl) {
+          let svgInfo = { plotType: 'Multiset', svg: svgUrl };
+          this.props.onGetMultisetPlotDifferential({
+            svgInfo,
+          });
+        }
       })
       .catch(error => {
         console.error('Error during getResultsUpset', error);
@@ -843,6 +830,7 @@ class DifferentialSearchCriteria extends Component {
   render() {
     const {
       differentialStudies,
+      differentialStudyTooltip,
       differentialStudyHref,
       differentialStudyHrefVisible,
       differentialModels,
@@ -878,56 +866,39 @@ class DifferentialSearchCriteria extends Component {
       fontSize: '13px',
     };
 
-    let studyIcon;
     let studyName = `${differentialStudy} Analysis Details`;
-
-    if (differentialStudyHrefVisible) {
-      studyIcon = (
-        <Popup
-          trigger={
-            <a
-              target="_blank"
-              rel="noopener noreferrer"
-              href={differentialStudyHref}
-            >
-              <Icon
-                name="line graph"
-                size="large"
-                className="StudyHtmlIcon"
-                inverted
-                circular
-              />
-            </a>
-          }
-          style={StudyPopupStyle}
-          className="CustomTooltip"
-          inverted
-          basic
-          position="bottom center"
-          content={studyName}
-          mouseEnterDelay={0}
-          mouseLeaveDelay={0}
-        />
-      );
-    } else {
-      studyIcon = (
-        <Popup
-          trigger={
-            <a target="_blank" rel="noopener noreferrer" href={'/'}>
-              <Icon name="line graph" size="large" circular inverted disabled />
-            </a>
-          }
-          style={StudyPopupStyle}
-          basic
-          inverted
-          className="CustomTooltip"
-          position="bottom center"
-          content={differentialStudyReportTooltip}
-          mouseEnterDelay={0}
-          mouseLeaveDelay={0}
-        />
-      );
-    }
+    let studyIcon = (
+      <Popup
+        trigger={
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href={differentialStudyHrefVisible ? differentialStudyHref : '/'}
+          >
+            <Icon
+              name="line graph"
+              size="large"
+              className="StudyHtmlIcon"
+              inverted
+              circular
+              disabled={!differentialStudyHrefVisible}
+            />
+          </a>
+        }
+        style={StudyPopupStyle}
+        className="CustomTooltip"
+        inverted
+        basic
+        position="bottom center"
+        content={
+          differentialStudyHrefVisible
+            ? studyName
+            : differentialStudyReportTooltip
+        }
+        mouseEnterDelay={0}
+        mouseLeaveDelay={0}
+      />
+    );
 
     let MultisetFiltersDifferential;
     let MultisetFilterButtonDifferential;
@@ -1068,23 +1039,34 @@ class DifferentialSearchCriteria extends Component {
     return (
       <React.Fragment>
         <Form className="SearchCriteriaContainer">
-          <Form.Field
-            control={Select}
-            name="differentialStudy"
-            value={differentialStudy}
-            options={differentialStudies}
-            placeholder="Select A Study"
-            onChange={this.handleStudyChange}
-            disabled={differentialStudiesDisabled}
-            label={{
-              children: 'Study',
-              htmlFor: 'form-select-control-pstudy',
-            }}
-            search
-            searchInput={{ id: 'form-select-control-pstudy' }}
-            width={13}
-            selectOnBlur={false}
-            selectOnNavigation={false}
+          <Popup
+            trigger={
+              <Form.Field
+                control={Select}
+                name="differentialStudy"
+                value={differentialStudy}
+                options={differentialStudies}
+                placeholder="Select A Study"
+                onChange={this.handleStudyChange}
+                disabled={differentialStudiesDisabled}
+                label={{
+                  children: 'Study',
+                  htmlFor: 'form-select-control-pstudy',
+                }}
+                search
+                searchInput={{ id: 'form-select-control-pstudy' }}
+                width={13}
+                selectOnBlur={false}
+                selectOnNavigation={false}
+              />
+            }
+            style={StudyPopupStyle}
+            className="CustomTooltip"
+            inverted
+            position="bottom right"
+            content={differentialStudyTooltip}
+            mouseEnterDelay={1000}
+            mouseLeaveDelay={0}
           />
           <span className="StudyHtmlIconDivP">{studyIcon}</span>
           <Popup

@@ -71,7 +71,7 @@ class EnrichmentBreadcrumbs extends PureComponent {
       enrichmentFeatureIdKey,
     } = this.props;
 
-    const name = this.props.imageInfo.key;
+    const name = this.props.imageInfoEnrichment.key;
     const BreadcrumbPopupStyle = {
       backgroundColor: '2E2E2E',
       borderBottom: '2px solid var(--color-primary)',

@@ -74,8 +74,8 @@ class FilteredDifferentialTable extends Component {
       } = this.props;
       const { itemsPerPageFilteredDifferentialTable } = this.state;
       const sortedData =
-        this.props.filteredDifferentialGridRef.current?.qhGridRef.current?.getSortedData() ||
-        [];
+        this.props.filteredDifferentialGridRef?.current?.qhGridRef.current?.getSortedData() ||
+        null;
       if (sortedData != null) {
         const Index = _.findIndex(sortedData, function(p) {
           return p[filteredDifferentialFeatureIdKey] === featureToHighlight;
@@ -127,7 +127,7 @@ class FilteredDifferentialTable extends Component {
     if (this.state.filteredBarcodeData.length > 0) {
       this.setConfigCols(this.state.filteredBarcodeData, null, true);
     } else {
-      const key = this.props.imageInfo.key.split(':');
+      const key = this.props.imageInfoEnrichment.key.split(':');
       const name = key[0].trim() || '';
       cancelRequestFPTGetResultsTable();
       let cancelToken = new CancelToken(e => {
