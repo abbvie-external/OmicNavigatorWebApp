@@ -79,9 +79,9 @@ class Differential extends PureComponent {
   differentialViewContainerRef = React.createRef();
   differentialGridRef = React.createRef();
 
-  shouldComponentUpdate(nextProps) {
-    return nextProps.tab === 'differential';
-  }
+  // shouldComponentUpdate(nextProps) {
+  //   return nextProps.tab === 'differential';
+  // }
 
   handleSearchTransitionDifferential = bool => {
     this.setState({
@@ -558,6 +558,10 @@ class Differential extends PureComponent {
     });
   };
 
+  // turnOffCursorDifferential = () => {
+  //   this.setState({isVolcanoPlotSVGLoaded: true});
+  // };
+
   handlePlotVolcano = maxId => {
     if (maxId !== '') {
       if (this.state.maxObjectIdentifier !== maxId) {
@@ -861,6 +865,7 @@ class Differential extends PureComponent {
           onHandleVolcanoTableLoading={this.handleVolcanoTableLoading}
           onBackToTable={this.backToTable}
           onUpdateVolcanoLabels={this.updateVolcanoLabels}
+          //turnOffCursorDifferential={this.turnOffCursorDifferential}
         />
       );
     } else return <TransitionStill stillMessage={message} />;

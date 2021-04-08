@@ -6,6 +6,7 @@ import ButtonActions from '../Shared/ButtonActions';
 
 class DifferentialVolcanoPlot extends Component {
   state = {
+    differentialIsSVGLoaded: true,
     hoveredCircleData: {
       position: [],
       id: null,
@@ -33,7 +34,7 @@ class DifferentialVolcanoPlot extends Component {
     });
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps, prevState) {
     const {
       volcanoDifferentialTableRowOther,
       volcanoDifferentialTableRowMax,
@@ -140,9 +141,12 @@ class DifferentialVolcanoPlot extends Component {
     ) {
       this.removeViolinBrush();
     }
+    console.log(this.props.isVolcanoPlotSVGLoaded);
     if (
       this.props.isVolcanoPlotSVGLoaded &&
-      this.props.isVolcanoPlotSVGLoaded !== prevProps.isVolcanoPlotSVGLoaded
+      this.props.isVolcanoPlotSVGLoaded !== prevProps.isVolcanoPlotSVGLoaded // ||
+      // (this.state.differentialIsSVGLoaded &&
+      //   this.state.differentialIsSVGLoaded !== prevState.differentialIsSVGLoaded)
     ) {
       // || (this.props.maxObjectIdentifier === "" && this.props.maxObjectIdentifier !== prevProps.maxObjectIdentifier)){
       this.setState({ volcanoCursorLoading: false });
@@ -477,17 +481,25 @@ class DifferentialVolcanoPlot extends Component {
     this.props.onUpdateVolcanoLabels(false);
   };
 
-  handleSVGClick() {
+  handleSVGClick = () => {
     // this.props.onHandleVolcanoTableLoading(true);
     this.unhighlightBrushedCircles();
     this.props.handleVolcanoPlotSelectionChange([]);
-    this.setState({
-      brushing: false,
-      resizeScalarX: 1,
-      resizeScalarY: 1,
-      volcanoCircleText: [],
-    });
-  }
+    this.setState(
+      {
+        brushing: false,
+        resizeScalarX: 1,
+        resizeScalarY: 1,
+        volcanoCircleText: [],
+      }, //,
+      //this.props.turnOffCursor()
+    );
+
+    // setTimeout(
+    //   () => this.setState({differentialIsSVGLoaded: true }),
+    //   1000
+    // );
+  };
 
   // getRadius(val) {
   //   const otherFeatures = this.props.volcanoDifferentialTableRowOther.includes(
@@ -507,6 +519,48 @@ class DifferentialVolcanoPlot extends Component {
       return volcanoHeight - 10;
     } else return volcanoHeight - 15;
   }
+
+  getLabelSizes = () => {
+    const { volcanoHeight, volcanoWidth } = this.props;
+    if (volcanoHeight > 600 && volcanoWidth > 400) {
+      var min_dim = Math.min(volcanoHeight / 600, volcanoWidth / 400);
+      var scale_factor = 12 + min_dim * 8;
+      return scale_factor + 'px';
+    } else {
+      return '12px';
+    }
+  };
+
+  getXLabelPosY = xAxisLabelY => {
+    const { volcanoHeight, volcanoWidth } = this.props;
+    if (volcanoHeight > 600 && volcanoWidth > 400) {
+      var scale_factor = (volcanoHeight / 600) * 10;
+      return xAxisLabelY + scale_factor;
+    } else {
+      return xAxisLabelY;
+    }
+  };
+
+  getYTicks = () => {
+    const { volcanoHeight, volcanoWidth } = this.props;
+    if (volcanoHeight > 600 && volcanoWidth > 400) {
+      var min_dim = Math.min(volcanoHeight / 600, volcanoWidth / 400);
+      var scale_factor = 12 + min_dim * 6;
+      return scale_factor + 'px';
+    } else {
+      return '12px';
+    }
+  };
+
+  getXYtransform = () => {
+    const { volcanoHeight, volcanoWidth } = this.props;
+    if (volcanoHeight > 600 && volcanoWidth > 400) {
+      var scale_factor = 20 + 5 * (volcanoHeight / 600);
+      return 'translateY(' + scale_factor + 'px)';
+    } else {
+      return 'translateY(20px)';
+    }
+  };
 
   render() {
     const {
@@ -597,9 +651,9 @@ class DifferentialVolcanoPlot extends Component {
               : `xplottick-${identifier}-text`
           }
           style={{
-            fontSize: '12px',
+            fontSize: this.getYTicks(),
             textAnchor: 'middle',
-            transform: 'translateY(20px)',
+            transform: this.getXYtransform(),
           }}
         >
           {value}
@@ -629,7 +683,7 @@ class DifferentialVolcanoPlot extends Component {
               : `yplottick-${identifier}-text`
           }
           style={{
-            fontSize: '12px',
+            fontSize: this.getYTicks(),
             textAnchor: 'middle',
             transform: `translate(40px, 3px)`,
           }}
@@ -672,13 +726,49 @@ class DifferentialVolcanoPlot extends Component {
         onMouseEnter={e => this.handleCircleHover(e)}
         onMouseLeave={() => this.handleCircleLeave()}
         onClick={function(e) {
-          debugger;
-          self.setState({ volcanoCursorLoading: true });
-          self.props.onHandleDotClick(
-            e,
-            JSON.parse(e.target.attributes.data.value),
-            0,
+          e.persist();
+          self.setState(
+            { volcanoCursorLoading: true },
+            () =>
+              setTimeout(function() {
+                self.props.onHandleDotClick(
+                  e,
+                  JSON.parse(e.target.attributes.data.value),
+                  0,
+                );
+              }, 4),
+            //setTimeout(self.turnOffCursor(), 1000);
+            //self.setState({differentialIsSVGLoaded: true});
           );
+
+          // function temp1(){
+          //   self.props.onHandleDotClick(
+          //     e,
+          //     JSON.parse(e.target.attributes.data.value),
+          //     0,
+          //   );
+          // }
+
+          // self.setState({ volcanoCursorLoading: true, differentialIsSVGLoaded: false },
+          //   [temp1(),
+          //   setTimeout(self.setState({differentialIsSVGLoaded: true}), 500)]);
+
+          // setTimeout(self.setState({differentialIsSVGLoaded: true}), 500);
+
+          // self.setState({ volcanoCursorLoading: true, differentialIsSVGLoaded: false });
+          // setTimeout(self.props.onHandleDotClick(
+          //   e,
+          //   JSON.parse(e.target.attributes.data.value),
+          //   0,
+          // ), 500);
+          // setTimeout(self.setState({differentialIsSVGLoaded: true}), 500);
+
+          // self.setState({ volcanoCursorLoading: true });
+          // self.props.onHandleDotClick(
+          //   e,
+          //   JSON.parse(e.target.attributes.data.value),
+          //   0,
+          // );
         }}
         xstatistic={`${this.doTransform(val[xAxisLabel], 'x')}`}
         ystatistic={`${this.doTransform(val[yAxisLabel], 'y')}`}
@@ -725,9 +815,28 @@ class DifferentialVolcanoPlot extends Component {
             height={volcanoHeight}
             ref={this.volcanoSVGRef}
             onClick={function() {
+              //console.log("dif1: " + self.state.differentialIsSVGLoaded + " " + self.state.volcanoCursorLoading);
+              //debugger;
+              //      self.setState({ volcanoCursorLoading: true }, () => setTimeout(function() {
+              // function(){
+              //   self.handleSVGClick();
+              //   self.setState({differentialIsSVGLoaded: false });
+              // }
+              //console.log("dif2: " + self.state.differentialIsSVGLoaded + " " + self.state.volcanoCursorLoading);
+              //        self.handleSVGClick();
+              //        self.props.turnOffCursor();
+              //      }), 4);
               self.handleSVGClick();
+              //console.log("dif2: " + self.state.differentialIsSVGLoaded + " " + self.state.volcanoCursorLoading);
+              //self.props.isVolcanoPlotSVGLoaded = false;
+              //self.handleSVGClick();
+              // self.setState({ differentialIsSVGLoaded: false });
+              // self.setState({ differentialIsSVGLoaded: true });
+              //debugger;
+              //const overlay = d3.selectAll("overlay");
+              //overlay.style("cursor", "pointer");
             }}
-            onClick={() => this.handleSVGClick()}
+            //onClick={() => this.handleSVGClick()}
           >
             <g className="volcanoPlotD3BrushSelection" />
             {yAxis}
@@ -736,8 +845,9 @@ class DifferentialVolcanoPlot extends Component {
             <text
               className="volcanoAxisLabel NoSelect"
               x={volcanoWidth * 0.5 + 10}
-              y={xAxisLabelY}
+              y={this.getXLabelPosY(xAxisLabelY)}
               fontFamily="Lato, Helvetica Neue, Arial, Helvetica, sans-serif"
+              fontSize={this.getLabelSizes()}
             >
               {xAxisText}
             </text>
@@ -749,6 +859,7 @@ class DifferentialVolcanoPlot extends Component {
               x="60"
               y={`${volcanoHeight * 0.5 + 20}`}
               fontFamily="Lato, Helvetica Neue, Arial, Helvetica, sans-serif"
+              fontSize={this.getLabelSizes()}
             >
               {yAxisText}
             </text>

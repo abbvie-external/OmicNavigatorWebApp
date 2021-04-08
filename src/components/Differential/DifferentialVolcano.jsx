@@ -24,6 +24,7 @@ import VolcanoPlotIconSelected from '../../resources/VolcanoPlotIconSelected.png
 import ButtonActions from '../Shared/ButtonActions';
 import './DifferentialVolcano.scss';
 import SplitPane from 'react-split-pane';
+import { tickStep } from 'd3-array';
 
 class DifferentialVolcano extends Component {
   state = {
@@ -258,6 +259,10 @@ class DifferentialVolcano extends Component {
     localStorage.setItem('itemsPerPageVolcanoTable', items);
   };
 
+  // turnOffCursor = () => {
+  //   this.props.turnOffCursorDifferential();
+  // };
+
   handleDotClick = (event, item, index) => {
     event.stopPropagation();
     const { differentialFeatureIdKey } = this.props;
@@ -440,6 +445,7 @@ class DifferentialVolcano extends Component {
           handleVolcanoPlotSelectionChange={
             this.handleVolcanoPlotSelectionChange
           }
+          //turnOffCursor={this.turnOffCursor}
           getMaxAndMin={this.getMaxAndMin}
           onHandleDotClick={this.handleDotClick}
         ></DifferentialVolcanoPlot>
