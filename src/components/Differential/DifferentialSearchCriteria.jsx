@@ -150,32 +150,40 @@ class DifferentialSearchCriteria extends Component {
           notDifferential,
         } = this.props.filterState;
         // debugger;x
-        this.setState({
-          sigValueP: sigValueP,
-          differentialModel: differentialModel,
-          differentialStudy: differentialStudy,
-          selectedOperatorP: selectedOperatorP,
-          selectedColP: selectedColP,
-          differentialTests,
-          mustDifferential,
-          notDifferential,
-          uSettingsP: {
-            ...this.state.uSettingsP,
-            numElementsP:
-              this.props.zoomHistory.historyLastViewed[
+        this.setState(
+          {
+            sigValueP: sigValueP,
+            differentialModel: differentialModel,
+            differentialStudy: differentialStudy,
+            selectedOperatorP: selectedOperatorP,
+            selectedColP: selectedColP,
+            differentialTests,
+            mustDifferential,
+            notDifferential,
+            uSettingsP: {
+              ...this.state.uSettingsP,
+              numElementsP:
+                this.props.zoomHistory.historyLastViewed[
+                  this.props.activeBreadcrumb
+                ].length <
+                this.props.zoomHistory.history[this.props.activeBreadcrumb]
+                  .length
+                  ? this.props.zoomHistory.historyLastViewed[
+                      this.props.activeBreadcrumb
+                    ].length
+                  : 0,
+              indexFilters: selectedColP.length,
+              maxElementsP: this.props.zoomHistory.history[
                 this.props.activeBreadcrumb
-              ].length <
-              this.props.zoomHistory.history[this.props.activeBreadcrumb].length
-                ? this.props.zoomHistory.historyLastViewed[
-                    this.props.activeBreadcrumb
-                  ].length
-                : 0,
-            indexFilters: selectedColP.length,
-            maxElementsP: this.props.zoomHistory.history[
-              this.props.activeBreadcrumb
-            ].length,
+              ].length,
+            },
           },
-        });
+          function() {
+            if (this.props.breadcrumbClick) {
+              this.props.onUpdateBreadcrumbClick(false);
+            }
+          },
+        );
       } else {
         this.setState({
           uSettingsP: {
@@ -872,7 +880,7 @@ class DifferentialSearchCriteria extends Component {
     //     isFilteredDifferential: false,
     //   });
     // }
-    if (this.props.breadcrumbClick) this.props.onUpdateBreadcrumbClick(false);
+    // if (this.props.breadcrumbClick) this.props.onUpdateBreadcrumbClick(false);
   };
 
   handleSetChange = (mustDifferential, notDifferential) => {
@@ -1323,8 +1331,8 @@ class DifferentialSearchCriteria extends Component {
             mouseLeaveDelay={0}
           />
           <span className="StudyHtmlIconDivP">{studyIcon}</span>
-          <button onClick={this.thisfunc}>read me</button>
-          <button onClick={this.thisfuncTwo}>write me</button>
+          {/* <button onClick={this.thisfunc}>read me</button>
+          <button onClick={this.thisfuncTwo}>write me</button> */}
           <Popup
             trigger={
               <Form.Field

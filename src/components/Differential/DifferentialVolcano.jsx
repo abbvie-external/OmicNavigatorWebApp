@@ -255,15 +255,6 @@ class DifferentialVolcano extends Component {
     this.props.onHandleZoom(results, index, history);
   };
 
-  handleBreadcrumbClick = (results, index, filterState, breadcrumbClick) => {
-    this.props.onHandleBreadcrumbClick(
-      results,
-      index,
-      filterState,
-      breadcrumbClick,
-    );
-  };
-
   handleVolcanoState = (volcanoState, maxElements) => {
     this.props.onHandleVolcanoState(volcanoState, maxElements);
   };
@@ -504,7 +495,7 @@ class DifferentialVolcano extends Component {
             this.handleVolcanoPlotSelectionChange
           }
           onHandleZoom={this.handleZoom}
-          onUpdateBreadcrumbIndex={this.UpdateBreadcrumbIndex}
+          onUpdateBreadcrumbIndex={this.props.onUpdateBreadcrumbIndex}
           onHandleBreadcrumbClick={this.handleBreadcrumbClick}
           onHandleUpdateDifferentialResults={
             this.handleUpdateDifferentialResults

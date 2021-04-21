@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import { Form, Select, Icon, Button } from 'semantic-ui-react';
 import * as d3 from 'd3';
-import NumericExponentialInput from '../Shared/NumericExponentialInput';
+import { ExponentialNumberInput } from '../Shared/ExponentialNumberInput';
 import '../Shared/MultisetFilters.scss';
 
 class DifferentialMultisetFilters extends Component {
@@ -910,7 +910,6 @@ class DifferentialMultisetFilters extends Component {
     const hoveredFilter = uSettingsP.hoveredFilter;
     // console.log('render', sigValueP, selectedOperatorP);
     const callbackFactory = index => value => {
-      // console.log('factory', value);
       this.props.onHandleSigValuePInputChange('sigValueP', value, index);
     };
     return (
@@ -920,12 +919,11 @@ class DifferentialMultisetFilters extends Component {
             {selectedColP.map((val, index) => {
               return (
                 <Form.Group
-                  key={`differentialMultiSetFiltersRow${index}`}
+                  key={`${index}`}
                   onMouseEnter={() => this.changeHoveredFilter(index)}
                   onMouseLeave={() => this.changeHoveredFilter(-1)}
                 >
                   <Form.Field
-                    key={`differentialMultiSetFiltersColumn${index}`}
                     control={Select}
                     label={index === 0 ? 'Column' : ''}
                     name="selectedColP"
@@ -953,7 +951,6 @@ class DifferentialMultisetFilters extends Component {
                     </Button>
                   )}
                   <Form.Field
-                    key={`differentialMultiSetFiltersOperator${index}`}
                     control={Select}
                     label={index === 0 ? 'Operator' : ''}
                     name="selectedOperatorP"
@@ -965,15 +962,10 @@ class DifferentialMultisetFilters extends Component {
                     width={5}
                     onChange={this.handleDropdownChange}
                   ></Form.Field>
-                  <Form.Field
-                    width={4}
-                    id="SignificantValueInputMultisetP"
-                    key={`differentialMultiSetFiltersSignificance${index}`}
-                  >
+                  <Form.Field width={4} id="SignificantValueInputMultisetP">
                     <label>{index === 0 ? 'Value' : ''}</label>
                     {/* {console.log('render', sigValueP[index])} */}
-                    <NumericExponentialInput
-                      key={`differentialMultiSetFiltersInput${index}`}
+                    <ExponentialNumberInput
                       // onChange={value => {
                       //   console.log(
                       //     'change input handler',
@@ -995,7 +987,6 @@ class DifferentialMultisetFilters extends Component {
                       name="sigValueP"
                       defaultValue={sigValueP[index]}
                       value={sigValueP[index]}
-                      breadcrumb={this.props.breadcrumbClick}
                     />
                   </Form.Field>
                 </Form.Group>

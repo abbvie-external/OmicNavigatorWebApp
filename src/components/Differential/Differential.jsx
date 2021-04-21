@@ -94,6 +94,7 @@ class Differential extends Component {
       breadcrumbClick: false,
       zoomHistory: {},
       updateVolcanoLabels: false,
+      activeBreadcrumb: 0,
     };
   }
 
