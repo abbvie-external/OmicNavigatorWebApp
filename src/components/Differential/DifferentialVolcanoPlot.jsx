@@ -259,6 +259,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         currentResults: results,
         circles: circles,
         bins: bins,
+        filterState: reset ? {} : this.state.filterState,
         zoom: {
           history: !breadCrumb
             ? [
@@ -301,6 +302,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       this.circles = this.plotCirclesSorted;
 
       let volcanoState = {
+        filterState: reset ? {} : this.state.filterState,
         volcanoCircleText: breadCrumb ? [] : this.props.volcanoCircleText,
         currentResults: results,
         circles: [this.plotCirclesSorted],

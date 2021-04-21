@@ -132,6 +132,8 @@ class DifferentialSearchCriteria extends Component {
       this.props.onEndZoom();
     }
 
+    console.log(this.props.filterState);
+
     if (!prevProps.breadcrumbClick && this.props.breadcrumbClick) {
       if (
         this.props.filterState &&
@@ -185,23 +187,31 @@ class DifferentialSearchCriteria extends Component {
           },
         );
       } else {
-        this.setState({
-          uSettingsP: {
-            ...this.state.uSettingsP,
-            numElementsP:
-              this.props.zoomHistory.historyLastViewed[
+        this.setState(
+          {
+            uSettingsP: {
+              ...this.state.uSettingsP,
+              numElementsP:
+                this.props.zoomHistory.historyLastViewed[
+                  this.props.activeBreadcrumb
+                ].length <
+                this.props.zoomHistory.history[this.props.activeBreadcrumb]
+                  .length
+                  ? this.props.zoomHistory.historyLastViewed[
+                      this.props.activeBreadcrumb
+                    ].length
+                  : 0,
+              maxElementsP: this.props.zoomHistory.history[
                 this.props.activeBreadcrumb
-              ].length <
-              this.props.zoomHistory.history[this.props.activeBreadcrumb].length
-                ? this.props.zoomHistory.historyLastViewed[
-                    this.props.activeBreadcrumb
-                  ].length
-                : 0,
-            maxElementsP: this.props.zoomHistory.history[
-              this.props.activeBreadcrumb
-            ].length,
+              ].length,
+            },
           },
-        });
+          function() {
+            if (this.props.breadcrumbClick) {
+              this.props.onUpdateBreadcrumbClick(false);
+            }
+          },
+        );
       }
       // this.props.onUpdateBreadcrumbClick(false);
 
