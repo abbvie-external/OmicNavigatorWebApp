@@ -128,15 +128,12 @@ class DifferentialSearchCriteria extends Component {
       this.props.onEndZoom();
     }
 
-    console.log(this.props.filterState);
-
     if (!prevProps.breadcrumbClick && this.props.breadcrumbClick) {
       if (
         this.props.filterState &&
         Object.keys(this.props.filterState)?.length > 0 &&
         this.props.filterState.constructor === Object
       ) {
-        // console.log('142', this.props);
         const {
           sigValueP,
           differentialModel,
@@ -181,51 +178,60 @@ class DifferentialSearchCriteria extends Component {
           },
         );
       } else {
-        this.setState(
-          {
-            numElementsP:
-              this.props.zoomHistory.historyLastViewed[
-                this.props.activeBreadcrumb
-              ].length <
-              this.props.zoomHistory.history[this.props.activeBreadcrumb].length
-                ? this.props.zoomHistory.historyLastViewed[
+        if (this.props.filterState) {
+          this.setState(
+            {
+              uSettingsP: {
+                ...this.state.uSettingsP,
+                numElementsP:
+                  this.props.zoomHistory.historyLastViewed[
                     this.props.activeBreadcrumb
-                  ].length
-                : 0,
-            maxElementsP: this.props.zoomHistory.history[
-              this.props.activeBreadcrumb
-            ].length,
-          },
-          function() {
-            if (this.props.breadcrumbClick) {
-              this.props.onUpdateBreadcrumbClick(false);
-            }
-          },
-        );
+                  ].length <
+                  this.props.zoomHistory.history[this.props.activeBreadcrumb]
+                    .length
+                    ? this.props.zoomHistory.historyLastViewed[
+                        this.props.activeBreadcrumb
+                      ].length
+                    : 0,
+                maxElementsP: this.props.zoomHistory.history[
+                  this.props.activeBreadcrumb
+                ].length,
+              },
+            },
+            function() {
+              if (this.props.breadcrumbClick) {
+                this.props.onUpdateBreadcrumbClick(false);
+              }
+            },
+          );
+        } else {
+          this.setState(
+            {
+              sigValueP: [0.05],
+              differentialModel: this.props.differentialModel,
+              differentialStudy: this.props.differentialStudy,
+              selectedOperatorP: [
+                {
+                  key: '<',
+                  text: '<',
+                  value: '<',
+                },
+              ],
+              selectedColP: [
+                { key: 'P.Value', text: 'P.Value', value: 'P.Value' },
+              ],
+              differentialTests: [],
+              mustDifferential: [],
+              notDifferential: [],
+            },
+            function() {
+              if (this.props.breadcrumbClick) {
+                this.props.onUpdateBreadcrumbClick(false);
+              }
+            },
+          );
+        }
       }
-      // this.props.onUpdateBreadcrumbClick(false);
-
-      // if (this.props.filterState) {
-      //   const {
-      //     sigValueP,
-      //     differentialModel,
-      //     differentialStudy,
-      //     selectedOperatorP,
-      //     selectedColP,
-      //   } = this.props.filterState;
-      //   console.log('selectedColP', this.props.filterState);
-      //   this.setState(
-      //     {
-      //       sigValueP,
-      //       differentialModel,
-      //       differentialStudy,
-      //       selectedOperatorP,
-      //       selectedColP,
-      //     },
-      //     this.updateQueryDataP(),
-      //   );
-      // }
-      // this.props.onUpdateBreadcrumbClick(false);
     }
 
     const {
@@ -244,15 +250,24 @@ class DifferentialSearchCriteria extends Component {
     //   this.forceUpdate();
     // }
 
-    if (
-      prevProps.differentialResultsUnfiltered !==
-        this.props.differentialResultsUnfiltered &&
-      !prevProps?.breadcrumbClick &&
-      !this.props?.breadcrumbClick
-    ) {
+    if (!prevProps?.zoom && this.props?.zoom) {
       this.setState({
         maxElementsP: this.props.differentialResultsUnfiltered.length,
         numElementsP: 0,
+        sigValueP: [0.05],
+        differentialModel: this.props.differentialModel,
+        differentialStudy: this.props.differentialStudy,
+        selectedOperatorP: [
+          {
+            key: '<',
+            text: '<',
+            value: '<',
+          },
+        ],
+        selectedColP: [{ key: 'P.Value', text: 'P.Value', value: 'P.Value' }],
+        differentialTests: [],
+        mustDifferential: [],
+        notDifferential: [],
       });
     }
 
