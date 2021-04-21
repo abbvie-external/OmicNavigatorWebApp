@@ -1185,6 +1185,8 @@ class DifferentialSearchCriteria extends Component {
           }
           thresholdColsP={this.props.thresholdColsP}
           breadcrumbClick={this.props.breadcrumbClick}
+          numElementsP={this.state.numElementsP}
+          maxElementsP={this.state.maxElementsP}
         />
       );
 
