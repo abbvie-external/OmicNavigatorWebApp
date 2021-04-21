@@ -113,18 +113,14 @@ class DifferentialSearchCriteria extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    // console.log(this.state.sigValueP);
     if (
-      this.props.maxElements !== this.state.uSettingsP.numElementsP &&
+      this.props.maxElements !== this.state.numElementsP &&
       this.state.isFilteredDifferential &&
       prevProps.breadcrumbClick === this.props.breadcrumbClick
     ) {
       // console.log('123');
       this.setState({
-        uSettingsP: {
-          ...this.state.uSettingsP,
-          numElementsP: this.props.maxElements,
-        },
+        numElementsP: this.props.maxElements,
       });
     }
 
@@ -151,7 +147,6 @@ class DifferentialSearchCriteria extends Component {
           mustDifferential,
           notDifferential,
         } = this.props.filterState;
-        // debugger;x
         this.setState(
           {
             sigValueP: sigValueP,
@@ -162,22 +157,21 @@ class DifferentialSearchCriteria extends Component {
             differentialTests,
             mustDifferential,
             notDifferential,
+            numElementsP:
+              this.props.zoomHistory.historyLastViewed[
+                this.props.activeBreadcrumb
+              ].length <
+              this.props.zoomHistory.history[this.props.activeBreadcrumb].length
+                ? this.props.zoomHistory.historyLastViewed[
+                    this.props.activeBreadcrumb
+                  ].length
+                : 0,
+            maxElementsP: this.props.zoomHistory.history[
+              this.props.activeBreadcrumb
+            ].length,
             uSettingsP: {
               ...this.state.uSettingsP,
-              numElementsP:
-                this.props.zoomHistory.historyLastViewed[
-                  this.props.activeBreadcrumb
-                ].length <
-                this.props.zoomHistory.history[this.props.activeBreadcrumb]
-                  .length
-                  ? this.props.zoomHistory.historyLastViewed[
-                      this.props.activeBreadcrumb
-                    ].length
-                  : 0,
               indexFilters: selectedColP.length,
-              maxElementsP: this.props.zoomHistory.history[
-                this.props.activeBreadcrumb
-              ].length,
             },
           },
           function() {
@@ -189,22 +183,18 @@ class DifferentialSearchCriteria extends Component {
       } else {
         this.setState(
           {
-            uSettingsP: {
-              ...this.state.uSettingsP,
-              numElementsP:
-                this.props.zoomHistory.historyLastViewed[
-                  this.props.activeBreadcrumb
-                ].length <
-                this.props.zoomHistory.history[this.props.activeBreadcrumb]
-                  .length
-                  ? this.props.zoomHistory.historyLastViewed[
-                      this.props.activeBreadcrumb
-                    ].length
-                  : 0,
-              maxElementsP: this.props.zoomHistory.history[
+            numElementsP:
+              this.props.zoomHistory.historyLastViewed[
                 this.props.activeBreadcrumb
-              ].length,
-            },
+              ].length <
+              this.props.zoomHistory.history[this.props.activeBreadcrumb].length
+                ? this.props.zoomHistory.historyLastViewed[
+                    this.props.activeBreadcrumb
+                  ].length
+                : 0,
+            maxElementsP: this.props.zoomHistory.history[
+              this.props.activeBreadcrumb
+            ].length,
           },
           function() {
             if (this.props.breadcrumbClick) {
@@ -261,11 +251,8 @@ class DifferentialSearchCriteria extends Component {
       !this.props?.breadcrumbClick
     ) {
       this.setState({
-        uSettingsP: {
-          ...this.state.uSettingsP,
-          maxElementsP: this.props.differentialResultsUnfiltered.length,
-          numElementsP: 0,
-        },
+        maxElementsP: this.props.differentialResultsUnfiltered.length,
+        numElementsP: 0,
       });
     }
 

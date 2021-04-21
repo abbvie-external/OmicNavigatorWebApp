@@ -770,7 +770,6 @@ class DifferentialMultisetFilters extends Component {
         return heightScalarP * 14 + 'px';
       })
       .attr('fill', 'black');
-    debugger;
     if (numElementsP != null && maxElementsP != null) {
       // const numElementsPLine =
       svg
@@ -806,7 +805,6 @@ class DifferentialMultisetFilters extends Component {
           );
         })
         .attr('y', topBoxHeightP - 6 * heightScalarP);
-      debugger;
       // const numElementsPText =
       numElementsPVar
         .text(function(d) {

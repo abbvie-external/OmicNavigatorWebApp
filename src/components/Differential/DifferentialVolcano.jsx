@@ -255,10 +255,6 @@ class DifferentialVolcano extends Component {
     this.props.onHandleZoom(results, index, history);
   };
 
-  handleVolcanoState = (volcanoState, maxElements) => {
-    this.props.onHandleVolcanoState(volcanoState, maxElements);
-  };
-
   // handleTableDataChange = data => {
   //   this.props.onHandleTableDataChange(data);
   // };
@@ -502,7 +498,7 @@ class DifferentialVolcano extends Component {
           }
           getMaxAndMin={this.getMaxAndMin}
           onHandleDotClick={this.handleDotClick}
-          onHandleVolcanoState={this.handleVolcanoState}
+          onHandleVolcanoState={this.props.handleVolcanoState}
           // onHandleTableDataChange={this.handleTableDataChange}
           volcanoDifferentialTableRowOther={
             this.props.volcanoDifferentialTableRowOther
