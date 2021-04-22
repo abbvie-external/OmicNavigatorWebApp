@@ -591,6 +591,81 @@ class Enrichment extends Component {
             });
         });
     }
+    this.getFilteredDifferentialLinkouts(
+      enrichmentStudy,
+      this.props.enrichmentModel,
+    );
+  };
+
+  getFilteredDifferentialLinkouts = (enrichmentStudy, enrichmentModel) => {
+    debugger;
+    const cachedFilteredDifferentialLinkouts = sessionStorage.getItem(
+      `FilteredDifferentialLinkouts-${enrichmentStudy}_${enrichmentModel}`,
+    );
+    if (cachedFilteredDifferentialLinkouts) {
+      const parsedFilteredDifferentialLinkouts = JSON.parse(
+        cachedFilteredDifferentialLinkouts,
+      );
+      this.setState({
+        filteredDifferentialLinkouts: parsedFilteredDifferentialLinkouts,
+      });
+      const cachedFilteredDifferentialFavicons = sessionStorage.getItem(
+        `FilteredDifferentialFavicons-${enrichmentStudy}_${enrichmentModel}`,
+      );
+      if (cachedFilteredDifferentialFavicons) {
+        const parsedFilteredDifferentialFavicons = JSON.parse(
+          cachedFilteredDifferentialFavicons,
+        );
+        this.setState({
+          filteredDifferentialFavicons: parsedFilteredDifferentialFavicons,
+        });
+      } else {
+        this.setState({
+          filteredDifferentialFavicons: [],
+        });
+        omicNavigatorService
+          .getFavicons(parsedFilteredDifferentialLinkouts)
+          .then(getFaviconsResponseData => {
+            const favicons = getFaviconsResponseData || [];
+            this.setState({
+              filteredDifferentialFavicons: favicons,
+            });
+            sessionStorage.setItem(
+              `FilteredDifferentialFavicons-${enrichmentStudy}_${enrichmentModel}`,
+              JSON.stringify(favicons),
+            );
+          });
+      }
+    } else {
+      this.setState({
+        filteredDifferentialLinkouts: [],
+        filteredDifferentialFavicons: [],
+      });
+      omicNavigatorService
+        .getResultsLinkouts(enrichmentStudy, enrichmentModel)
+        .then(getFilteredDifferentialLinkoutsResponseData => {
+          const linkouts = getFilteredDifferentialLinkoutsResponseData || [];
+          this.setState({
+            filteredDifferentialLinkouts: linkouts,
+          });
+          sessionStorage.setItem(
+            `FilteredDifferentialLinkouts-${enrichmentStudy}_${enrichmentModel}`,
+            JSON.stringify(linkouts),
+          );
+          omicNavigatorService
+            .getFavicons(linkouts)
+            .then(getFaviconsResponseData => {
+              const favicons = getFaviconsResponseData || [];
+              this.setState({
+                filteredDifferentialFavicons: favicons,
+              });
+              sessionStorage.setItem(
+                `FilteredDifferentialFavicons-${enrichmentStudy}_${enrichmentModel}`,
+                JSON.stringify(favicons),
+              );
+            });
+        });
+    }
   };
 
   handleIsDataStreamingEnrichmentsTable = bool => {
