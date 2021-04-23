@@ -449,7 +449,6 @@ class Differential extends Component {
         svg: [],
       };
     }
-    let currentSVGs = [];
     cancelRequestDifferentialResultsGetPlot();
     let cancelToken = new CancelToken(e => {
       cancelRequestDifferentialResultsGetPlot = e;
@@ -458,43 +457,75 @@ class Differential extends Component {
       this.getMetaFeaturesTable(featureId);
     }
     if (differentialPlotTypes.length !== 0) {
-      _.forEach(differentialPlotTypes, function(plot, i) {
-        if (
-          (differentialPlotTypes[i].plotType === 'singleFeature' &&
-            multiFeatureCall) ||
-          (differentialPlotTypes[i].plotType === 'multiFeature' &&
-            !multiFeatureCall)
-        ) {
-          return;
-        }
-        omicNavigatorService
-          .plotStudy(
-            differentialStudy,
-            differentialModel,
-            id,
-            differentialPlotTypes[i].plotID,
-            differentialPlotTypes[i].plotType || 'singleFeature',
-            // self.handleItemSelected,
-            null,
-            cancelToken,
-          )
-          .then(svgUrl => {
-            if (svgUrl) {
-              let svgInfo = {
-                plotType: differentialPlotTypes[i],
-                svg: svgUrl,
-              };
-              imageInfoVar.svg.push(svgInfo);
-              currentSVGs.push(svgUrl);
-              self.handleSVG(view, imageInfoVar);
-            } else {
-              // self.handleItemSelected(false);
+      Promise.all(
+        differentialPlotTypes
+          .map(plot => {
+            if (
+              (plot.plotType === 'singleFeature' && multiFeatureCall) ||
+              (plot.plotType === 'multiFeature' && !multiFeatureCall)
+            ) {
+              return undefined;
             }
-          });
-        // .catch(error => {
-        //   self.handleItemSelected(false);
-        // });
-      });
+            return omicNavigatorService
+              .plotStudy(
+                differentialStudy,
+                differentialModel,
+                id,
+                plot.plotID,
+                plot.plotType || 'singleFeature',
+                // self.handleItemSelected,
+                null,
+                cancelToken,
+              )
+              .then(svg => ({ svg, plotType: plot }));
+          })
+          .filter(Boolean),
+      )
+        .then(svgInfo => {
+          imageInfoVar.svg = svgInfo;
+          self.handleSVG(view, imageInfoVar);
+        })
+        .catch(error => {
+          self.handleItemSelected(false);
+        });
+
+      // _.forEach(differentialPlotTypes, function(plot, i) {
+      //   if (
+      //     (differentialPlotTypes[i].plotType === 'singleFeature' &&
+      //       multiFeatureCall) ||
+      //     (differentialPlotTypes[i].plotType === 'multiFeature' &&
+      //       !multiFeatureCall)
+      //   ) {
+      //     return;
+      //   }
+      //   omicNavigatorService
+      //     .plotStudy(
+      //       differentialStudy,
+      //       differentialModel,
+      //       id,
+      //       differentialPlotTypes[i].plotID,
+      //       differentialPlotTypes[i].plotType || 'singleFeature',
+      //       // self.handleItemSelected,
+      //       null,
+      //       cancelToken,
+      //     )
+      //     .then(svgUrl => {
+      //       if (svgUrl) {
+      //         let svgInfo = {
+      //           plotType: differentialPlotTypes[i],
+      //           svg: svgUrl,
+      //         };
+      //         imageInfoVar.svg.push(svgInfo);
+      //         currentSVGs.push(svgUrl);
+      //         self.handleSVG(view, imageInfoVar);
+      //       } else {
+      //         // self.handleItemSelected(false);
+      //       }
+      //     });
+      //   // .catch(error => {
+      //   //   self.handleItemSelected(false);
+      //   // });
+      // });
     } else {
       this.setState({
         imageInfoVolcano: {
@@ -685,6 +716,13 @@ class Differential extends Component {
   handleSVG = (view, imageInfoArg) => {
     const imageInfoKey = `imageInfo${view}`;
     const imageInfoLengthKey = `imageInfo${view}Length`;
+    console.log({
+      [imageInfoKey]: imageInfoArg,
+      [imageInfoLengthKey]: imageInfoArg.svg?.length || 0,
+      isItemSVGLoaded: true,
+      isVolcanoPlotSVGLoaded: true,
+    });
+
     this.setState({
       [imageInfoKey]: imageInfoArg,
       [imageInfoLengthKey]: imageInfoArg.svg?.length || 0,
