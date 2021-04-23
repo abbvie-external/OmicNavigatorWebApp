@@ -479,7 +479,6 @@ class Differential extends Component {
             .then(svg => ({ svg, plotType: plot }));
         })
         .filter(Boolean);
-      console.log(promises.length, promises);
       Promise.race(promises)
         .then(svg => {
           imageInfoVar.svg = [svg];
@@ -488,16 +487,12 @@ class Differential extends Component {
         // Ignore error in first race - Handled later
         .catch(error => undefined)
         .then(() => {
-          console.log('In First Then');
           if (promises.length > 1) {
-            console.log('running allSettled');
             const all = Promise.allSettled(promises);
-            console.log(all);
             return all;
           }
         })
         .then(promiseResults => {
-          console.log(promiseResults);
           if (!promiseResults) {
             // If promise.length===1, then this is undefined
             return;
@@ -524,7 +519,6 @@ class Differential extends Component {
         })
         .catch(error => {
           self.handleItemSelected(false);
-          console.log(error);
         });
 
       // _.forEach(differentialPlotTypes, function(plot, i) {
@@ -754,13 +748,6 @@ class Differential extends Component {
   handleSVG = (view, imageInfoArg) => {
     const imageInfoKey = `imageInfo${view}`;
     const imageInfoLengthKey = `imageInfo${view}Length`;
-    console.log({
-      [imageInfoKey]: imageInfoArg,
-      [imageInfoLengthKey]: imageInfoArg.svg?.length || 0,
-      isItemSVGLoaded: true,
-      isVolcanoPlotSVGLoaded: true,
-    });
-
     this.setState({
       [imageInfoKey]: imageInfoArg,
       [imageInfoLengthKey]: imageInfoArg.svg?.length || 0,
