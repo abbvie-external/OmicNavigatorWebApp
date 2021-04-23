@@ -479,24 +479,51 @@ class Differential extends Component {
             .then(svg => ({ svg, plotType: plot }));
         })
         .filter(Boolean);
+      console.log(promises.length, promises);
       Promise.race(promises)
         .then(svg => {
           imageInfoVar.svg = [svg];
           self.handleSVG(view, imageInfoVar);
         })
+        // Ignore error in first race - Handled later
+        .catch(error => undefined)
         .then(() => {
+          console.log('In First Then');
           if (promises.length > 1) {
-            return Promise.all(promises);
+            console.log('running allSettled');
+            const all = Promise.allSettled(promises);
+            console.log(all);
+            return all;
           }
         })
-        .then(svgArray => {
-          if (svgArray) {
-            imageInfoVar.svg = svgArray;
-            self.handleSVG(view, imageInfoVar);
+        .then(promiseResults => {
+          console.log(promiseResults);
+          if (!promiseResults) {
+            // If promise.length===1, then this is undefined
+            return;
+          }
+          const svgArray = promiseResults
+            .filter(result => result.status === 'fulfilled')
+            .map(({ value }) => value);
+          /**
+           * @type {Error[]}
+           */
+          const errors = promiseResults
+            .filter(result => result.status === 'rejected')
+            .map(({ reason }) => reason);
+          if (svgArray.length) {
+            // imageInfoVar.svg = svgArray;
+            self.handleSVG(view, { ...imageInfoVar, svg: svgArray });
+          }
+          if (errors.length === promises.length) {
+            throw new Error('NOT FOUND');
+          }
+          if (errors.length) {
+            // Handle errors coming in - warn users
           }
         })
         .catch(error => {
-          // self.handleItemSelected(false);
+          self.handleItemSelected(false);
           console.log(error);
         });
 

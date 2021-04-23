@@ -50,31 +50,28 @@ class OmicNavigatorService {
 
   async axiosPostPlot(method, obj, handleError, cancelToken, timeout) {
     const self = this;
-    return new Promise(function(resolve, reject) {
-      const axiosPostUrl = `${self.url}/${method}`;
-      axios
-        .post(axiosPostUrl, obj, {
-          responseType: 'text',
-          cancelToken,
-          timeout,
-        })
-        .then(response => {
-          const data = response.data;
-          const splitUrls = data.split('/ocpu/');
-          const graphics = splitUrls.filter(u => u.includes('graphics'));
-          const graphicsUrl = `/ocpu/${graphics}`;
-          const url = `${self.baseUrl}${graphicsUrl}/svg`;
-          resolve(url);
-        })
-        .catch(function(error) {
-          if (!axios.isCancel(error)) {
-            toast.error(`${error.message}`);
-          }
-          if (handleError != null) {
-            handleError(false);
-          }
-        });
-    });
+    const axiosPostUrl = `${self.url}/${method}`;
+    try {
+      const { data } = await axios.post(axiosPostUrl, obj, {
+        responseType: 'text',
+        cancelToken,
+        timeout,
+      });
+      const splitUrls = data.split('/ocpu/');
+      const graphics = splitUrls.filter(u => u.includes('graphics'));
+      const graphicsUrl = `/ocpu/${graphics}`;
+      const url = `${self.baseUrl}${graphicsUrl}/svg`;
+      return url;
+    } catch (error) {
+      if (!axios.isCancel(error)) {
+        toast.error(`${error.message}`);
+        if (handleError != null) {
+          handleError(false);
+        } else {
+          throw error;
+        }
+      }
+    }
   }
 
   // async ocpuPlotCall(method, obj, handleError, cancelToken, timeout) {
