@@ -457,36 +457,47 @@ class Differential extends Component {
       this.getMetaFeaturesTable(featureId);
     }
     if (differentialPlotTypes.length !== 0) {
-      Promise.all(
-        differentialPlotTypes
-          .map(plot => {
-            if (
-              (plot.plotType === 'singleFeature' && multiFeatureCall) ||
-              (plot.plotType === 'multiFeature' && !multiFeatureCall)
-            ) {
-              return undefined;
-            }
-            return omicNavigatorService
-              .plotStudy(
-                differentialStudy,
-                differentialModel,
-                id,
-                plot.plotID,
-                plot.plotType || 'singleFeature',
-                // self.handleItemSelected,
-                null,
-                cancelToken,
-              )
-              .then(svg => ({ svg, plotType: plot }));
-          })
-          .filter(Boolean),
-      )
-        .then(svgInfo => {
-          imageInfoVar.svg = svgInfo;
+      const promises = differentialPlotTypes
+        .map(plot => {
+          if (
+            (plot.plotType === 'singleFeature' && multiFeatureCall) ||
+            (plot.plotType === 'multiFeature' && !multiFeatureCall)
+          ) {
+            return undefined;
+          }
+          return omicNavigatorService
+            .plotStudy(
+              differentialStudy,
+              differentialModel,
+              id,
+              plot.plotID,
+              plot.plotType || 'singleFeature',
+              // self.handleItemSelected,
+              null,
+              cancelToken,
+            )
+            .then(svg => ({ svg, plotType: plot }));
+        })
+        .filter(Boolean);
+      Promise.race(promises)
+        .then(svg => {
+          imageInfoVar.svg = [svg];
           self.handleSVG(view, imageInfoVar);
         })
+        .then(() => {
+          if (promises.length > 1) {
+            return Promise.all(promises);
+          }
+        })
+        .then(svgArray => {
+          if (svgArray) {
+            imageInfoVar.svg = svgArray;
+            self.handleSVG(view, imageInfoVar);
+          }
+        })
         .catch(error => {
-          self.handleItemSelected(false);
+          // self.handleItemSelected(false);
+          console.log(error);
         });
 
       // _.forEach(differentialPlotTypes, function(plot, i) {
