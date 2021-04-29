@@ -124,7 +124,7 @@ class Enrichment extends Component {
     SVGPlotLoading: false,
     SVGPlotLoaded: false,
     isViolinPlotLoaded: false,
-    // hasBarcodeData: true,
+    hasBarcodeData: true,
     barcodeSettings: {
       barcodeData: [],
       brushedData: [],
