@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - main
+jobs:
   deploy-main:
     if: ${{ github.repository == 'abbvie-external/OmicNavigatorWebApp' && github.event_name != 'pull_request' }}
     runs-on: ubuntu-latest
