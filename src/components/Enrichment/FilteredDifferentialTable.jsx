@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Popup, Dimmer, Loader } from 'semantic-ui-react';
 import { omicNavigatorService } from '../../services/omicNavigator.service';
 import _ from 'lodash';
-import { formatNumberForDisplay, splitValue } from '../Shared/helpers';
+import { formatNumberForDisplay, splitValue, Linkout } from '../Shared/helpers';
 import './FilteredDifferentialTable.scss';
 import { CancelToken } from 'axios';
 import CustomEmptyMessage from '../Shared/Templates';
@@ -153,6 +153,10 @@ class FilteredDifferentialTable extends Component {
   };
 
   setConfigCols = (data, dataFromService, dataAlreadyFiltered) => {
+    const {
+      filteredDifferentialLinkouts,
+      filteredDifferentialFavicons,
+    } = this.props;
     const TableValuePopupStyle = {
       backgroundColor: '2E2E2E',
       borderBottom: '2px solid var(--color-primary)',
@@ -190,7 +194,37 @@ class FilteredDifferentialTable extends Component {
           title: f,
           field: f,
           filterable: { type: 'multiFilter' },
-          template: value => {
+          template: (value, item) => {
+            const keyVar = `${item[f]}-${item[alphanumericTrigger]}`;
+            const filteredDifferentialLinkoutsKeys = Object.keys(
+              filteredDifferentialLinkouts,
+            );
+            let linkoutWithIcon = null;
+            if (filteredDifferentialLinkoutsKeys.includes(f)) {
+              if (item[f] != null && item[f] !== '') {
+                const columnLinkoutsObj = filteredDifferentialLinkouts[f];
+                const columnFaviconsObj = filteredDifferentialFavicons[f];
+                const columnLinkoutsIsArray = Array.isArray(columnLinkoutsObj);
+                let favicons = [];
+                if (columnFaviconsObj != null) {
+                  const columnFaviconsIsArray = Array.isArray(
+                    columnFaviconsObj,
+                  );
+                  favicons = columnFaviconsIsArray
+                    ? columnFaviconsObj
+                    : [columnFaviconsObj];
+                }
+                const linkouts = columnLinkoutsIsArray
+                  ? columnLinkoutsObj
+                  : [columnLinkoutsObj];
+
+                const itemValue = item[f];
+                linkoutWithIcon = (
+                  <Linkout {...{ keyVar, itemValue, linkouts, favicons }} />
+                );
+              }
+            }
+
             if (f === alphanumericTrigger) {
               return (
                 <div className="NoSelect">
@@ -202,6 +236,7 @@ class FilteredDifferentialTable extends Component {
                     inverted
                     basic
                   />
+                  {linkoutWithIcon}
                 </div>
               );
             } else {
@@ -217,6 +252,7 @@ class FilteredDifferentialTable extends Component {
                     inverted
                     basic
                   />
+                  {linkoutWithIcon}
                 </div>
               );
             }
