@@ -598,7 +598,6 @@ class Enrichment extends Component {
   };
 
   getFilteredDifferentialLinkouts = (enrichmentStudy, enrichmentModel) => {
-    debugger;
     const cachedFilteredDifferentialLinkouts = sessionStorage.getItem(
       `FilteredDifferentialLinkouts-${enrichmentStudy}_${enrichmentModel}`,
     );
