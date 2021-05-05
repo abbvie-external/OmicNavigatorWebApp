@@ -17,4 +17,11 @@ jobs:
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
           repository: abbvie-external/OmicNavigator
           event-type: app-release
-          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
+          client-payload: '{
+            "repository": "${{ github.repository }}",
+            "ref": "${{ github.ref }}",
+            "sha": "${{ github.sha }}",
+            "workflow": "${{ github.workflow }}",
+            "run_id": "${{ github.run_id }}",
+            "run_number": "${{ github.run_number }}"
+          }'
