@@ -222,16 +222,42 @@ class Tabs extends Component {
   };
 
   getInfoButton = () => {
+    const { appVersion, packageVersion } = this.state;
     const self = this;
+    const TableValuePopupStyle = {
+      backgroundColor: '2E2E2E',
+      borderBottom: '2px solid var(--color-primary)',
+      color: '#FFF',
+      padding: '1em',
+      maxWidth: '50vw',
+      fontSize: '13px',
+      wordBreak: 'break-all',
+    };
+    const MailToString = `mailto:OmicNavigator@abbvie.com?subject=Email From OmicNavigator&body=App: v${appVersion}, Package: v${packageVersion}`;
     return (
       <span>
-        <Icon
-          className="CursorPointer"
-          id="HelpButton"
-          color="grey"
-          name="question"
-          onClick={() => self.toggleInfoFirst(true)}
-        />
+        <Popup
+          trigger={
+            <Icon
+              className="CursorPointer"
+              id="HelpButton"
+              color="grey"
+              name="info"
+              onClick={() => self.toggleInfoFirst(true)}
+            />
+          }
+          style={TableValuePopupStyle}
+          className="TablePopupValue"
+          inverted
+          basic
+          position="left center"
+        >
+          <Popup.Content>
+            App: {`v${appVersion}`}
+            <br></br>Package: {`v${packageVersion}`}
+            {/* <br></br>Click for Help */}
+          </Popup.Content>
+        </Popup>
         <Modal
           size="small"
           closeOnDimmerClick="true"
@@ -245,17 +271,29 @@ class Tabs extends Component {
           <Modal.Header>Issues or questions?</Modal.Header>
           <Modal.Content image>
             <Modal.Description>
+              <Header size="small">
+                <span className="MarginRight">App: {`v${appVersion}`}</span>
+                <span className="MarginRight">
+                  Package: {`v${packageVersion}`}
+                </span>
+              </Header>
               <p>
                 To report a bug, please open a GitHub Issue within our{' '}
-                <a onClick={() => self.toggleInfoSecond(true)}>
+                <a
+                  className="CursorPointer"
+                  onClick={() => self.toggleInfoSecond(true)}
+                >
                   public repository
                 </a>{' '}
-                ** (note that anything you write is open to the public and not
-                private to AbbVie). If you are an AbbVie employee and need to
-                include specific details about your study data, please email the
-                developers at{' '}
+                (note that anything you write is open to the public and not
+                private to AbbVie). In your report, please include the app and
+                package versions listed above.
+              </p>
+              <p>
+                If you are an AbbVie employee and need to include specific
+                details about your study data, please email the developers at{' '}
                 <a
-                  href="mailto:OmicNavigator@abbvie.com"
+                  href={MailToString}
                   rel="noreferrer"
                   alt="Email OmicNavigator Team"
                   target="_blank"
@@ -283,7 +321,7 @@ class Tabs extends Component {
               <p>
                 Thank you for contributing to this open-source project. You are
                 being redirected to our public repository to make a public
-                comment. Please click below to proceed
+                comment. Please click below to proceed.
               </p>
             </Modal.Content>
             <Modal.Actions>
@@ -402,15 +440,6 @@ class Tabs extends Component {
       },
     ];
     const InfoButton = this.getInfoButton();
-    const TableValuePopupStyle = {
-      backgroundColor: '2E2E2E',
-      borderBottom: '2px solid var(--color-primary)',
-      color: '#FFF',
-      padding: '1em',
-      maxWidth: '50vw',
-      fontSize: '13px',
-      wordBreak: 'break-all',
-    };
     return (
       <>
         <Tab
@@ -426,22 +455,7 @@ class Tabs extends Component {
             className: 'MenuContainer',
           }}
         />
-        <span id="AppVersion">
-          <Popup
-            trigger={<Icon name="info" color="grey" />}
-            style={TableValuePopupStyle}
-            className="TablePopupValue"
-            inverted
-            basic
-            position="left center"
-          >
-            <Popup.Content>
-              App: {`v${appVersion}`}
-              <br></br>Package: {`v${packageVersion}`}
-            </Popup.Content>
-          </Popup>
-          {InfoButton}
-        </span>
+        <span id="AppVersion">{InfoButton}</span>
       </>
     );
   }
