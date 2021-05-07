@@ -297,8 +297,11 @@
   }
 }
 
-#InfoButton {
-  background: transparent !important;
+#HelpButton {
+  margin-left: 10px;
+}
+.CursorPointer {
+  cursor: pointer !important;
 }
 
 .ui.modal > .header {

@@ -226,7 +226,8 @@ class Tabs extends Component {
     return (
       <span>
         <Icon
-          id="InfoButton"
+          className="CursorPointer"
+          id="HelpButton"
           color="grey"
           name="question"
           onClick={() => self.toggleInfoFirst(true)}
