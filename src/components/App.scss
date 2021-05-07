@@ -195,11 +195,6 @@
     user-select: none !important; /* Non-prefixed version, currently supported by Chrome, Opera and Firefox */
   }
 
-  .PrimaryColor {
-    background-color: var(--color-dark) !important;
-    color: var(--color-white) !important;
-  }
-
   .FloatRight {
     float: right !important;
     cursor: pointer !important;
@@ -300,4 +295,22 @@
       cursor: pointer !important;
     }
   }
+}
+
+#InfoButton {
+  background: transparent !important;
+}
+
+.ui.modal > .header {
+  background: var(--color-link) !important;
+  color: #fff !important;
+}
+
+.ui.modal > .content > .description {
+  width: 100%;
+}
+
+.PrimaryColor {
+  background-color: var(--color-primary) !important;
+  color: var(--color-white) !important;
 }
