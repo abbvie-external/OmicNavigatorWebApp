@@ -233,7 +233,8 @@ class Tabs extends Component {
       fontSize: '13px',
       wordBreak: 'break-all',
     };
-    const MailToString = `mailto:OmicNavigator@abbvie.com?subject=Email From OmicNavigator&body=App: v${appVersion}, Package: v${packageVersion}`;
+    const MailToString = 'mailto:OmicNavigator@abbvie.com';
+    // `mailto:OmicNavigator@abbvie.com?subject=Email From OmicNavigator&body=App: v${appVersion}, Package: v${packageVersion}`;
     return (
       <span>
         <Popup
