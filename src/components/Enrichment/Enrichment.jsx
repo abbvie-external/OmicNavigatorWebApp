@@ -1168,7 +1168,7 @@ class Enrichment extends Component {
     let id = featureId != null ? featureId : '';
     let imageInfoEnrichmentVar = { key: '', title: '', svg: [] };
     imageInfoEnrichmentVar.title = this.state.imageInfoEnrichment.title;
-    imageInfoEnrichmentVar.key = this.state.imageInfoEnrichment.key;
+    imageInfoEnrichmentVar.key = id;
     this.setState({ svgExportName: id });
     let handleSVGCb = this.handleSVG;
     let handlePlotStudyError = this.handlePlotStudyError;
