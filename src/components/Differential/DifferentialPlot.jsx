@@ -28,6 +28,7 @@ class DifferentialPlot extends PureComponent {
       // selectedPlot: null,
     };
   }
+  metaFeaturesTableRef = React.createRef();
 
   componentDidMount() {
     const { activeSVGTabIndexDifferential } = this.state;
@@ -66,7 +67,8 @@ class DifferentialPlot extends PureComponent {
         p => p.plotType !== 'multiFeature',
       );
       this.setState({
-        excelFlag: false,
+        excelFlag: index === singleFeaturePlotTypes.length,
+        txtFlag: index === singleFeaturePlotTypes.length,
         pdfFlag: false,
         svgFlag: index !== singleFeaturePlotTypes.length,
         pngFlag: index !== singleFeaturePlotTypes.length,
@@ -160,6 +162,7 @@ class DifferentialPlot extends PureComponent {
           render: () => (
             <Tab.Pane attached="true" as="div">
               <MetafeaturesTable
+                ref={this.metaFeaturesTableRef}
                 metaFeaturesData={this.props.metaFeaturesDataDifferential}
               />
             </Tab.Pane>
@@ -179,11 +182,19 @@ class DifferentialPlot extends PureComponent {
       excelFlag,
       pngFlag,
       pdfFlag,
+      txtFlag,
       svgFlag,
       svgPanes,
       activeSVGTabIndexDifferential,
     } = this.state;
-    const { isItemSVGLoaded, imageInfoDifferential } = this.props;
+    const {
+      isItemSVGLoaded,
+      imageInfoDifferential,
+      tab,
+      differentialStudy,
+      differentialModel,
+      differentialTest,
+    } = this.props;
     if (!isItemSVGLoaded) {
       return (
         // <LoaderActivePlots />
@@ -253,7 +264,15 @@ class DifferentialPlot extends PureComponent {
                     pngVisible={pngFlag}
                     pdfVisible={pdfFlag}
                     svgVisible={svgFlag}
-                    txtVisible={false}
+                    txtVisible={txtFlag}
+                    refFwd={
+                      this.metaFeaturesTableRef.current?.metafeaturesGridRef ||
+                      null
+                    }
+                    tab={tab}
+                    study={differentialStudy}
+                    model={differentialModel}
+                    test={differentialTest}
                     imageInfo={imageInfoDifferential}
                     tabIndex={activeSVGTabIndexDifferentialVar}
                     plot={'DifferentialPlotTabsPlotSVGDiv'}
