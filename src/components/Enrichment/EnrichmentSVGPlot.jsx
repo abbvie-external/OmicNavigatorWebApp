@@ -128,18 +128,12 @@ class EnrichmentSVGPlot extends PureComponent {
 
     if (isSVGReadyEnrichment) {
       if (imageInfoEnrichment.key != null && SVGPlotLoaded) {
-        let singleFeaturePlotTypes = [];
-        if (this.props.enrichmentPlotTypes.length > 0) {
-          singleFeaturePlotTypes = this.props.enrichmentPlotTypes.filter(
-            p => p.plotType !== 'multiFeature',
-          );
-        }
         const DropdownClass =
-          singleFeaturePlotTypes.length > this.props.svgTabMax
+          this.props.enrichmentPlotTypes.length > this.props.svgTabMax
             ? 'Show svgPlotDropdown'
             : 'Hide svgPlotDropdown';
         const TabMenuClassEnrichment =
-          singleFeaturePlotTypes.length > this.props.svgTabMax
+          this.props.enrichmentPlotTypes.length > this.props.svgTabMax
             ? 'Hide'
             : 'Show';
         // const BreadcrumbPopupStyle = {

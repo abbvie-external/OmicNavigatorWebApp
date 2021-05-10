@@ -198,18 +198,14 @@ class DifferentialPlot extends PureComponent {
         this.props.differentialPlotTypes &&
         this.props.imageInfoDifferential
       ) {
-        let singleFeaturePlotTypes = [];
-        if (this.props.differentialPlotTypes.length > 0) {
-          singleFeaturePlotTypes = this.props.differentialPlotTypes.filter(
-            p => p.plotType !== 'multiFeature',
-          );
-        }
         const DropdownClass =
-          singleFeaturePlotTypes.length > this.props.svgTabMax
+          this.props.differentialPlotTypes.length > this.props.svgTabMax
             ? 'Show svgPlotDropdown'
             : 'Hide svgPlotDropdown';
         const TabMenuClass =
-          singleFeaturePlotTypes > this.props.svgTabMax ? 'Hide' : 'Show';
+          this.props.differentialPlotTypes.length > this.props.svgTabMax
+            ? 'Hide'
+            : 'Show';
         const activeSVGTabIndexDifferentialVar =
           activeSVGTabIndexDifferential || 0;
         let plotOptions = [];

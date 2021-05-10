@@ -136,18 +136,14 @@ class SVGPlot extends Component {
     if (volcanoPlotsVisible) {
       if (isSVGReadyVolcano) {
         if (imageInfoVolcano.key != null && isVolcanoPlotSVGLoaded) {
-          let singleFeaturePlotTypes = [];
-          if (this.props.differentialPlotTypes.length > 0) {
-            singleFeaturePlotTypes = this.props.differentialPlotTypes.filter(
-              p => p.plotType !== 'multiFeature',
-            );
-          }
           const DropdownClass =
-            singleFeaturePlotTypes.length > this.props.svgTabMax
+            this.props.differentialPlotTypes.length > this.props.svgTabMax
               ? 'Show svgPlotDropdown'
               : 'Hide svgPlotDropdown';
           const TabMenuClass =
-            singleFeaturePlotTypes > this.props.svgTabMax ? 'Hide' : 'Show';
+            this.props.differentialPlotTypes.length > this.props.svgTabMax
+              ? 'Hide'
+              : 'Show';
           // const BreadcrumbPopupStyle = {
           //   backgroundColor: '2E2E2E',
           //   borderBottom: '2px solid var(--color-primary)',
