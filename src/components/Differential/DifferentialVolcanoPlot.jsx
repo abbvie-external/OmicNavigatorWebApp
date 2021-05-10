@@ -294,9 +294,9 @@ class DifferentialVolcanoPlot extends Component {
             fill="#FFF"
             fontFamily="Lato, Helvetica Neue, Arial, Helvetica, sans-serif"
             textAnchor="left"
-            wordBreak="break-all"
-            overflowWrap="break-word"
-            wordWrap="break-word"
+            //   wordBreak="break-all"
+            //   overflowWrap="break-word"
+            //   wordWrap="break-word"
           >
             <tspan x={15} y={23}>
               {idText}
