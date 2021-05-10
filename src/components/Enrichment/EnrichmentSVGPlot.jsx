@@ -20,10 +20,6 @@ class EnrichmentSVGPlot extends PureComponent {
     activeSVGTabIndexEnrichment: 0,
   };
 
-  componentDidMount() {
-    this.getSVGPanes();
-  }
-
   componentDidUpdate(prevProps) {
     if (
       // this.state.isSVGReadyEnrichment &&
@@ -78,6 +74,7 @@ class EnrichmentSVGPlot extends PureComponent {
         dimensions = `?${divWidthPtString}${divHeightPtString}${pointSizeString}`;
       }
       const svgArray = imageInfoEnrichment.svg;
+      const uniqueKey = imageInfoEnrichment.key || '';
       const panes = svgArray.map((s, index) => {
         let srcUrl = `${s.svg}${dimensions}`;
         return {
@@ -86,7 +83,7 @@ class EnrichmentSVGPlot extends PureComponent {
             <Tab.Pane
               attached="true"
               as="div"
-              key={`${index}-${s.plotType.plotDisplay}-pane-enrichment`}
+              key={`${uniqueKey}-${index}-${s.plotType.plotDisplay}-pane-enrichment`}
             >
               <div id="EnrichmentPlotSVGDiv" className="svgSpan">
                 <SVG
@@ -131,12 +128,18 @@ class EnrichmentSVGPlot extends PureComponent {
 
     if (isSVGReadyEnrichment) {
       if (imageInfoEnrichment.key != null && SVGPlotLoaded) {
+        let singleFeaturePlotTypes = [];
+        if (this.props.enrichmentPlotTypes.length > 0) {
+          singleFeaturePlotTypes = this.props.enrichmentPlotTypes.filter(
+            p => p.plotType !== 'multiFeature',
+          );
+        }
         const DropdownClass =
-          this.props.enrichmentPlotTypes.length > this.props.svgTabMax
+          singleFeaturePlotTypes.length > this.props.svgTabMax
             ? 'Show svgPlotDropdown'
             : 'Hide svgPlotDropdown';
         const TabMenuClassEnrichment =
-          this.props.enrichmentPlotTypes.length > this.props.svgTabMax
+          singleFeaturePlotTypes.length > this.props.svgTabMax
             ? 'Hide'
             : 'Show';
         // const BreadcrumbPopupStyle = {
