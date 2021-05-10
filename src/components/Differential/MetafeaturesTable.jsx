@@ -143,7 +143,7 @@ class MetafeaturesTable extends Component {
           onItemsPerPageChange={this.handleItemsPerPageChange}
           // exportBaseName="Feature Data"
           // quickViews={quickViews}
-          disableGeneralSearch
+          // disableGeneralSearch
           // disableGrouping
           // disableSort
           disableColumnVisibilityToggle
