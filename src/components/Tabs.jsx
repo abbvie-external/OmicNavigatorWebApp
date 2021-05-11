@@ -233,8 +233,7 @@ class Tabs extends Component {
       fontSize: '13px',
       wordBreak: 'break-all',
     };
-    const MailToString = 'mailto:OmicNavigator@abbvie.com';
-    // `mailto:OmicNavigator@abbvie.com?subject=Email From OmicNavigator&body=App: v${appVersion}, Package: v${packageVersion}`;
+    const MailToString = `mailto:OmicNavigator@abbvie.com?body=App: v${appVersion}, Package: v${packageVersion}`;
     return (
       <span>
         <Popup
@@ -256,7 +255,11 @@ class Tabs extends Component {
           <Popup.Content>
             App: {`v${appVersion}`}
             <br></br>Package: {`v${packageVersion}`}
-            {/* <br></br>Click for Help */}
+            <br></br>
+            <span className="MarginRight">
+              Click <Icon name="info" size="small" />
+              to open an issue
+            </span>{' '}
           </Popup.Content>
         </Popup>
         <Modal
@@ -332,7 +335,7 @@ class Tabs extends Component {
                 onClick={() => self.toggleInfoSecond(false)}
               />
               <a
-                href="https://github.com/abbvie-external/OmicNavigatorWebApp/issues"
+                href="https://github.com/abbvie-external/OmicNavigatorWebApp/issues/new"
                 rel="noreferrer"
                 alt="OmicNavigator Issues Github"
                 target="_blank"
