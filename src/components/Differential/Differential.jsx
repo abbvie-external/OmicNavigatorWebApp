@@ -732,8 +732,20 @@ class Differential extends Component {
     };
     let differentialAlphanumericFields = [];
     let differentialNumericFields = [];
-    const firstObject = differentialResultsVar[0];
-    for (let [key, value] of Object.entries(firstObject)) {
+    function isNotNANorNullNorUndefined(o) {
+      return typeof o !== 'undefined' && o !== null && o !== 'NA';
+    }
+    function everyIsNotNANorNullNorUndefined(arr) {
+      return arr.every(isNotNANorNullNorUndefined);
+    }
+    const objectValuesArr = [...differentialResultsVar].map(f =>
+      Object.values(f),
+    );
+    const firstFullObjectIndex = objectValuesArr.findIndex(
+      everyIsNotNANorNullNorUndefined,
+    );
+    const firstFullObject = differentialResultsVar[firstFullObjectIndex];
+    for (let [key, value] of Object.entries(firstFullObject)) {
       if (typeof value === 'string' || value instanceof String) {
         differentialAlphanumericFields.push(key);
       } else {

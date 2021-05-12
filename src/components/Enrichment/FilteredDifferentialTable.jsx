@@ -168,8 +168,18 @@ class FilteredDifferentialTable extends Component {
     };
     let filteredDifferentialAlphanumericFields = [];
     let filteredDifferentialNumericFields = [];
-    const firstObject = dataFromService[0];
-    for (let [key, value] of Object.entries(firstObject)) {
+    function isNotNANorNullNorUndefined(o) {
+      return typeof o !== 'undefined' && o !== null && o !== 'NA';
+    }
+    function everyIsNotNANorNullNorUndefined(arr) {
+      return arr.every(isNotNANorNullNorUndefined);
+    }
+    const objectValuesArr = [...dataFromService].map(f => Object.values(f));
+    const firstFullObjectIndex = objectValuesArr.findIndex(
+      everyIsNotNANorNullNorUndefined,
+    );
+    const firstFullObject = dataFromService[firstFullObjectIndex];
+    for (let [key, value] of Object.entries(firstFullObject)) {
       if (typeof value === 'string' || value instanceof String) {
         filteredDifferentialAlphanumericFields.push(key);
       } else {

@@ -16,7 +16,7 @@ class OmicNavigatorService {
     const paramsObj = params ? { digits: 10 } : {};
     const self = this;
     return new Promise(function(resolve, reject) {
-      const axiosPostUrl = `${self.url}/${method}/json?auto_unbox=true`;
+      const axiosPostUrl = `${self.url}/${method}/json?auto_unbox=true&na="string"`;
       axios
         .post(axiosPostUrl, obj, {
           params: paramsObj,

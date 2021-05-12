@@ -162,12 +162,24 @@ class DifferentialVolcano extends Component {
     if (this.props.differentialResults.length > 0) {
       let differentialAlphanumericFields = [];
       let relevantConfigColumns = [];
-      const firstObject = this.props.differentialResults[0];
-      for (let [key, value] of Object.entries(firstObject)) {
+      function isNotNANorNullNorUndefined(o) {
+        return typeof o !== 'undefined' && o !== null && o !== 'NA';
+      }
+      function everyIsNotNANorNullNorUndefined(arr) {
+        return arr.every(isNotNANorNullNorUndefined);
+      }
+      const objectValuesArr = [...this.props.differentialResults].map(f =>
+        Object.values(f),
+      );
+      const firstFullObjectIndex = objectValuesArr.findIndex(
+        everyIsNotNANorNullNorUndefined,
+      );
+      const firstFullObject = this.props.differentialResults[
+        firstFullObjectIndex
+      ];
+      for (let [key, value] of Object.entries(firstFullObject)) {
         if (typeof value === 'string' || value instanceof String) {
           differentialAlphanumericFields.push(key);
-        } else {
-          relevantConfigColumns.push(key);
         }
       }
       //Pushes "none" option into Volcano circle text dropdown
@@ -725,7 +737,9 @@ class DifferentialVolcano extends Component {
                       }
                       alt="Volcano Plot"
                       className={
-                        isDataStreamingResultsTable ? 'CursorNotAllowed' : ''
+                        isDataStreamingResultsTable
+                          ? 'CursorNotAllowed'
+                          : 'NoSelect'
                       }
                       id="VolcanoPlotButton"
                       onClick={
@@ -932,7 +946,7 @@ class DifferentialVolcano extends Component {
                           }
                         >
                           <Label
-                            className="MultiFeaturePlotBtn"
+                            className="MultiFeaturePlotBtn NoSelect"
                             size={dynamicSizeLarger}
                             // color="blue"
                             // image
