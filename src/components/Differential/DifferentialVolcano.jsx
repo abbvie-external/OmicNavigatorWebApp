@@ -671,6 +671,10 @@ class DifferentialVolcano extends Component {
               imageInfoDifferential={this.props.imageInfoDifferential}
               differentialPlotTypes={this.props.differentialPlotTypes}
               svgTabMax={4}
+              tab={this.props.tab}
+              differentialStudy={this.props.differentialStudy}
+              differentialModel={this.props.differentialModel}
+              differentialTest={this.props.differentialTest}
             ></DifferentialPlot>
           </Sidebar>
         );

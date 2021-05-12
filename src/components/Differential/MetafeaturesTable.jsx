@@ -141,9 +141,9 @@ class MetafeaturesTable extends Component {
           // use "differentialRows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
           itemsPerPage={itemsPerPageMetafeaturesTable}
           onItemsPerPageChange={this.handleItemsPerPageChange}
-          exportBaseName="Feature Data"
+          // exportBaseName="Feature Data"
           // quickViews={quickViews}
-          disableGeneralSearch
+          // disableGeneralSearch
           // disableGrouping
           // disableSort
           disableColumnVisibilityToggle
