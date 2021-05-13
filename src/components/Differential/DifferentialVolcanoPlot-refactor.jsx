@@ -5,6 +5,7 @@ import { Step, Loader, Button, Breadcrumb } from 'semantic-ui-react';
 import * as d3 from 'd3';
 import * as hexbin from 'd3-hexbin';
 import ButtonActions from '../Shared/ButtonActions';
+import { pointer } from 'd3';
 
 class DifferentialVolcanoPlot extends React.PureComponent {
   plotCirclesSorted = [];
@@ -14,7 +15,6 @@ class DifferentialVolcanoPlot extends React.PureComponent {
   circles = [];
   bins = [];
   hexbin = hexbin.hexbin();
-  objsBrush = {};
 
   state = {
     hoveredElement: 'bin' || 'circle',
@@ -43,9 +43,6 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     showBins: true,
     isBinClicked: false,
     clickedBin: null,
-    xxAxis: '',
-    yyAxis: '',
-    currentResults: [],
   };
 
   componentDidMount() {
@@ -58,7 +55,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     });
 
     // this.hexBinning(this.createCircleElements(this.differentialResults));
-    // this.hexBinning(this.differentialResults);
+    this.hexBinning(this.differentialResults);
   }
 
   setLastViewed = (obj, data, breadCrumbIndex) => {
@@ -67,176 +64,6 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     });
     return newObj;
   };
-
-  setupVolcano() {
-    const {
-      volcanoHeight,
-      volcanoWidth,
-      xAxisLabelY,
-      doXAxisTransformation,
-      xAxisLabel,
-      doYAxisTransformation,
-      yAxisLabel,
-      differentialResults,
-      differentialResultsUnfiltered,
-    } = this.props;
-    const { xScale, yScale } = this.scaleFactory(differentialResultsUnfiltered);
-
-    this.xxAxis = d3.axisTop(xScale).ticks();
-    this.yyAxis = d3.axisRight(yScale).ticks();
-
-    const svg = d3
-      .select('#volcano')
-      .append('svg')
-      .attr('width', volcanoWidth)
-      .attr('height', volcanoHeight)
-      .attr('id', 'VolcanoChart')
-      .attr('class', 'VolcanoPlotSVG')
-      .on('onClick', () => this.handleSVGClick());
-
-    var clip = svg
-      .append('defs')
-      .append('svg:clipPath')
-      .attr('id', 'clip')
-      .append('svg:rect')
-      .attr('width', volcanoWidth - 47)
-      .attr('height', volcanoHeight - 50)
-      .attr('x', 50)
-      .attr('y', 0);
-
-    var area = svg
-      .append('g')
-      .attr('clip-path', 'url(#clip)')
-      .attr('id', 'clip-path');
-
-    area.append('g').attr('id', 'filtered-elements');
-    area.append('g').attr('id', 'nonfiltered-elements');
-
-    const g = d3
-      .select('svg')
-      .append('g')
-      .attr('class', 'volcanoPlotD3BrushSelection')
-      .attr('fill', 'none');
-
-    const yAxis = d3
-      .select('svg')
-      .append('g')
-      .attr('class', 'volcanoPlotXAxis NoSelect')
-      .attr('id', 'yaxis-line')
-      .attr('transform', 'translate(30, 0)')
-      // .attr('x1', 60)
-      // .attr('x2', 60)
-      // .attr('y1', 0)
-      // .attr('y2', volcanoHeight - 50)
-      // .style('stroke', '#000')
-      // .attr('strokeWidth', 1)
-      .call(this.yyAxis);
-
-    const yAxisLbl = d3
-      .select('svg')
-      .append('text')
-      .attr('class', 'volcanoAxisLabel NoSelect')
-      .attr('textAnchor', 'middle')
-      .attr('transform', `rotate(-90,20,${volcanoHeight * 0.5 + 20})`)
-      .attr('x', 60)
-      .attr('y', `${volcanoHeight * 0.5 + 20}`)
-      .text(function() {
-        return doYAxisTransformation ? '-log(' + yAxisLabel + ')' : yAxisLabel;
-      });
-
-    const xAxis = d3
-      .select('svg')
-      .append('g')
-      .attr('class', 'volcanoPlotXAxis NoSelect')
-      .attr('id', 'xaxis-line')
-      .attr('transform', 'translate(0,' + (volcanoHeight - 30) + ')')
-      // .attr('x1', 60)
-      // .attr('x2', volcanoWidth)
-      // .attr('y1', volcanoHeight - 50)
-      // .attr('y2', volcanoHeight - 50)
-      // .attr('stroke', '#000')
-      // .attr('strokeWidth', 1)
-      .call(this.xxAxis);
-
-    const xAxisLbl = d3
-      .select('svg')
-      .append('text')
-      .attr('class', 'volcanoAxisLabel NoSelect')
-      .attr('x', volcanoWidth * 0.5 + 10)
-      .attr('y', volcanoHeight - 10)
-      .text(function() {
-        return doXAxisTransformation ? '-log(' + xAxisLabel + ')' : xAxisLabel;
-      });
-
-    svg.on('dblclick', () => {
-      this.transitionZoom(differentialResultsUnfiltered);
-
-      // this.hexBinning(differentialResultsUnfiltered);
-    });
-
-    // const { xScale, yScale } = this.scaleFactory(differentialResultsUnfiltered);
-
-    // const xAxisTicks = xScale.ticks().map(value => ({
-    //   value,
-    //   xOffset: xScale(value),
-    // }));
-
-    // const yAxisTicks = yScale.ticks().map(value => ({
-    //   value,
-    //   yOffset: yScale(value),
-    // }));
-
-    // const xTickLines = d3
-    //   .select('svg')
-    //   .selectAll('.g-x')
-    //   .data(xAxisTicks)
-    //   .enter()
-    //   .append('g')
-    //   .attr('id', 'g-x')
-    //   .attr('class', 'individualTick NoSelect')
-    //   .attr('transform', d => `translate(${d.xOffset}, ${volcanoHeight - 50})`);
-
-    // xTickLines
-    //   .append('line')
-    //   .attr('y2', 8)
-    //   .attr('stroke', '#000')
-    //   .attr('strokeWidth', 1);
-
-    // xTickLines
-    //   .append('text')
-    //   .attr('fontSize', '12px')
-    //   .attr('text-anchor', 'middle')
-    //   .style('transform', 'translateY(20px)')
-    //   .text(function(d) {
-    //     return d.value;
-    //   });
-
-    // const yTickLines = d3
-    //   .select('svg')
-    //   .selectAll('.g-y')
-    //   .data(yAxisTicks)
-    //   .enter()
-    //   .append('g')
-    //   .attr('id', 'g-y')
-    //   .attr('class', 'individualTick NoSelect')
-    //   .attr('transform', d => `translate(0,${d.yOffset})`);
-
-    // yTickLines
-    //   .append('line')
-    //   .attr('x1', 50)
-    //   .attr('x2', 60)
-    //   .attr('stroke', '#000')
-    //   .attr('strokeWidth', 1);
-
-    // yTickLines
-    //   .append('text')
-    //   .attr('fontSize', '12px')
-    //   .attr('text-anchor', 'middle')
-    //   .style('transform', `translate(40px, 3px)`)
-    //   .text(function(d) {
-    //     return d.value;
-    //   });
-  }
 
   hexBinning(data, breadCrumb = false, breadCrumbIndex = 0, reset = false) {
     // const results = data.map(elem => JSON.parse(elem.props.data));
@@ -247,7 +74,6 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       // xAxisLabel,
       // yAxisLabel,
       // identifier,
-      isFilteredDifferential,
     } = this.props;
 
     // const width = volcanoWidth;
@@ -319,7 +145,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       // );
 
       // this.plotCirclesSorted = this.createCircleElements(
-      //   results,
+      //   data,
       //   breadCrumb,
       //   !breadCrumb ? this.state.zoom.history.length : breadCrumbIndex,
       // );
@@ -333,12 +159,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       // // .radius((2 * width) / (height - 1));
 
       // let bins = [];
-      const { xScale, yScale } = this.scaleFactory(data);
-      const { bins, circles } = this.parseDataToBinsAndCircles(
-        data,
-        xScale,
-        yScale,
-      );
+      const { bins, circles } = this.parseDataToBinsAndCircles(data);
 
       this.bins = bins;
       this.circles = circles;
@@ -438,12 +259,9 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       // );
 
       let volcanoState = {
-        volcanoCircleText: breadCrumb ? [] : this.props.volcanoCircleText,
-        previousResult: data,
         currentResults: data,
         circles: circles,
         bins: bins,
-        filterState: reset ? {} : this.state.filterState,
         zoom: {
           history: !breadCrumb
             ? [
@@ -481,52 +299,46 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       // const results = data.map(elem => JSON.parse(elem.props.data));
       // console.log('results', data);
 
-      const { xScale, yScale } = this.scaleFactory(data);
+      this.plotCirclesSorted = this.createCircleElements(data);
 
-      this.renderCircles(data);
+      this.circles = this.plotCirclesSorted;
 
-      // this.plotCirclesSorted = this.createCircleElements(data);
-
-      // this.circles = this.plotCirclesSorted;
-
-      // let volcanoState = {
-      //   filterState: reset ? {} : this.state.filterState,
-      //   volcanoCircleText: breadCrumb ? [] : this.props.volcanoCircleText,
-      //   currentResults: data,
-      //   circles: [this.plotCirclesSorted],
-      //   bins: [],
-      //   zoom: {
-      //     history: !breadCrumb
-      //       ? [
-      //           ...this.state.zoom.history,
-      //           this.createCircleElements(
-      //             this.props.differentialResultsUnfiltered,
-      //           ),
-      //         ]
-      //       : reset
-      //       ? [data]
-      //       : // : isFilteredDifferential
-      //         // ? [...this.state.zoom.history.splice(breadCrumbIndex, 1, data)]
-      //         [...this.state.zoom.history],
-      //     activeIndex: !breadCrumb
-      //       ? this.state.zoom.history.length
-      //       : breadCrumbIndex,
-      //     historyLastViewed: !reset
-      //       ? this.setLastViewed(
-      //           this.state.zoom.historyLastViewed,
-      //           data,
-      //           !breadCrumb ? this.state.zoom.history.length : breadCrumbIndex,
-      //         )
-      //       : {
-      //           0: this.state.zoom.history[0],
-      //         },
-      //   },
-      // };
-      // this.setState({ ...volcanoState });
-      // this.props.onHandleVolcanoState(
-      //   volcanoState.zoom,
-      //   this.plotCirclesSorted.length,
-      // );
+      let volcanoState = {
+        currentResults: data,
+        circles: [this.plotCirclesSorted],
+        bins: [],
+        zoom: {
+          history: !breadCrumb
+            ? [
+                ...this.state.zoom.history,
+                this.createCircleElements(
+                  this.props.differentialResultsUnfiltered,
+                ),
+              ]
+            : reset
+            ? [data]
+            : // : isFilteredDifferential
+              // ? [...this.state.zoom.history.splice(breadCrumbIndex, 1, data)]
+              [...this.state.zoom.history],
+          activeIndex: !breadCrumb
+            ? this.state.zoom.history.length
+            : breadCrumbIndex,
+          historyLastViewed: !reset
+            ? this.setLastViewed(
+                this.state.zoom.historyLastViewed,
+                data,
+                !breadCrumb ? this.state.zoom.history.length : breadCrumbIndex,
+              )
+            : {
+                0: this.state.zoom.history[0],
+              },
+        },
+      };
+      this.setState({ ...volcanoState });
+      this.props.onHandleVolcanoState(
+        volcanoState.zoom,
+        this.plotCirclesSorted.length,
+      );
     }
 
     // this.props.onUpdateBreadcrumbIndex(
@@ -608,7 +420,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     return color(length);
   }
 
-  scaleBinsCustom(bins, data) {
+  parseDataToBinsAndCircles(data) {
     const { volcanoWidth, volcanoHeight, xAxisLabel, yAxisLabel } = this.props;
     const { xScale, yScale } = this.scaleFactory(data);
 
@@ -616,21 +428,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       .hexbin()
       .x(d => xScale(this.doTransform(d[xAxisLabel], 'x')))
       .y(d => yScale(this.doTransform(d[yAxisLabel], 'y')))
-      // .size({ volcanoWidth, volcanoHeight })
-      .radius(5);
-
-    return hexb(bins);
-  }
-
-  parseDataToBinsAndCircles(data, xScale, yScale) {
-    const { volcanoWidth, volcanoHeight, xAxisLabel, yAxisLabel } = this.props;
-    // const { xScale, yScale, radius } = this.scaleFactory(data);
-
-    const hexb = hexbin
-      .hexbin()
-      .x(d => xScale(this.doTransform(d[xAxisLabel], 'x')))
-      .y(d => yScale(this.doTransform(d[yAxisLabel], 'y')))
-      // .size({ volcanoWidth, volcanoHeight })
+      .size({ volcanoWidth, volcanoHeight })
       .radius(5);
 
     let bins = [];
@@ -650,55 +448,8 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     return { bins: b, circles: circ };
   }
 
-  renderBinsFilter(bins) {
-    const svg = d3.select('#filtered-elements');
-
-    svg
-      .selectAll('path')
-      .data(bins)
-      .enter()
-      .append('path')
-      .attr('stroke', '#aab1c0')
-      .attr('stroke-opacity', 1)
-      .attr('stroke-width', 1)
-      .attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(5)}`)
-      .attr('fill', d => '#aab1c0')
-      .attr('id', d => `path-${Math.ceil(d.x)}-${Math.ceil(d.y)}-${d.length}`);
-    // .on('mouseenter', d => {
-    //   if (!this.state.brushing) {
-    //     d3.select(`#path-${Math.ceil(d.x)}-${Math.ceil(d.y)}-${d.length}`)
-    //       .attr('stroke', '#F5F5F5')
-    //       .attr('fill', '#F5F5F5')
-    //       .attr('cursor', 'pointer')
-    //       .attr('stroke-width', 5)
-    //       .raise();
-
-    //     this.setState({
-    //       hoveredBin: d,
-    //       hoveredElement: 'bin',
-    //       hovering: true,
-    //     });
-    //   }
-    // })
-    // .on('mouseleave', d => {
-    //   const bin = d3.select(
-    //     `#path-${Math.ceil(d.x)}-${Math.ceil(d.y)}-${d.length}`,
-    //   );
-
-    //   if (bin.attr('class') !== 'highlighted') {
-    //     bin
-    //       .attr('fill', d => this.determineBinColor(bins, d.length))
-    //       .attr('stroke', '#000')
-    //       .attr('stroke-width', 1);
-    //   }
-    //   this.setState({
-    //     hovering: false,
-    //   });
-    // });
-  }
-
   renderBins(bins) {
-    const svg = d3.select('#nonfiltered-elements');
+    const svg = d3.select('svg');
 
     // svg
     //   .selectAll('path')
@@ -707,8 +458,6 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     //   .append('path')
     //   .attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon()}`);
     svg
-      // .append('g')
-      // .attr('id', 'hex-container')
       .selectAll('path')
       .data(bins)
       .enter()
@@ -716,24 +465,26 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       .attr('stroke', '#000')
       .attr('stroke-opacity', 1)
       .attr('stroke-width', 1)
+      .attr('id', 'hexagon-container')
+
+      // .join('path')
+      // .append('path')
       .attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(5)}`)
       .attr('fill', d => this.determineBinColor(bins, d.length))
       .attr('id', d => `path-${Math.ceil(d.x)}-${Math.ceil(d.y)}-${d.length}`)
       .on('mouseenter', d => {
-        if (!this.state.brushing) {
-          d3.select(`#path-${Math.ceil(d.x)}-${Math.ceil(d.y)}-${d.length}`)
-            .attr('stroke', '#00aeff')
-            .attr('fill', '#00aeff')
-            .attr('cursor', 'pointer')
-            .attr('stroke-width', 5)
-            .raise();
+        d3.select(`#path-${Math.ceil(d.x)}-${Math.ceil(d.y)}-${d.length}`)
+          .attr('stroke', '#00aeff')
+          .attr('fill', '#00aeff')
+          .attr('cursor', 'pointer')
+          .attr('stroke-width', 5)
+          .raise();
 
-          this.setState({
-            hoveredBin: d,
-            hoveredElement: 'bin',
-            hovering: true,
-          });
-        }
+        this.setState({
+          hoveredBin: d,
+          hoveredElement: 'bin',
+          hovering: true,
+        });
       })
       .on('mouseleave', d => {
         const bin = d3.select(
@@ -764,59 +515,6 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     //   d3.event.stopPropagation();
     // });
   }
-  renderCirclesFilter(circles) {
-    const {
-      differentialResultsUnfiltered,
-      identifier,
-      xAxisLabel,
-      yAxisLabel,
-    } = this.props;
-    const { xScale, yScale } = this.scaleFactory(
-      this.state.currentResults.length > 0
-        ? this.state.currentResults
-        : differentialResultsUnfiltered,
-    );
-
-    const svg = d3.select('#filtered-elements');
-    svg
-      .selectAll('circle')
-      .data(circles)
-      .enter()
-      .append('circle')
-      .attr('cx', d => `${xScale(this.doTransform(d[xAxisLabel], 'x'))}`)
-      .attr('cy', d => `${yScale(this.doTransform(d[yAxisLabel], 'y'))}`)
-      .attr('fill', '#aab1c0')
-      .attr('r', 2)
-      .attr('stroke', '#aab1c0')
-      .attr('strokeWidth', 0.4)
-      .attr('class', 'volcanoPlot-dataPoint')
-      .attr('id', d => `volcanoDataPoint-${d[identifier]}`)
-      .attr('circleid', d => `${d[identifier]}`)
-      .attr('key', (d, index) => `${d[identifier]}_${index}`)
-      .attr('data', d => JSON.stringify(d))
-      .attr('ystatistic', d => `${this.doTransform(d[yAxisLabel], 'y')}`)
-      .attr('xstatistic', d => `${this.doTransform(d[xAxisLabel], 'x')}`);
-    // .on('mouseenter', e => {
-    //   if (!this.state.brushing) {
-    //     d3.select(`#volcanoDataPoint-${e[identifier]}`).attr(
-    //       'cursor',
-    //       'pointer',
-    //     );
-    //     this.handleCircleHover(e);
-    //   }
-    // })
-    // .on('mouseleave', () => this.handleCircleLeave())
-    // .on('click', e => {
-    //   d3.event.stopPropagation();
-    //   const elem = d3.select(`#volcanoDataPoint-${e[identifier]}`)
-    //     ._groups[0][0];
-    //   this.props.onHandleDotClick(
-    //     e,
-    //     JSON.parse(elem.attributes.data.value),
-    //     0,
-    //   );
-    // });
-  }
 
   renderCircles(circles) {
     const {
@@ -825,19 +523,15 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       xAxisLabel,
       yAxisLabel,
     } = this.props;
-    const { xScale, yScale } = this.scaleFactory(
-      this.state.currentResults.length > 0
-        ? this.state.currentResults
-        : differentialResultsUnfiltered,
-    );
+    const { xScale, yScale } = this.scaleFactory(differentialResultsUnfiltered);
 
-    const svg = d3.select('#nonfiltered-elements');
+    const svg = d3.select('svg');
     svg
       .selectAll('circle')
       .data(circles)
       .enter()
       .append('circle')
-      // .attr('id', 'circle-container')
+      .attr('id', 'circle-container')
       // .join('circle')
       .attr('cx', d => `${xScale(this.doTransform(d[xAxisLabel], 'x'))}`)
       .attr('cy', d => `${yScale(this.doTransform(d[yAxisLabel], 'y'))}`)
@@ -852,15 +546,8 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       .attr('data', d => JSON.stringify(d))
       .attr('ystatistic', d => `${this.doTransform(d[yAxisLabel], 'y')}`)
       .attr('xstatistic', d => `${this.doTransform(d[xAxisLabel], 'x')}`)
-      .on('mouseenter', e => {
-        if (!this.state.brushing) {
-          d3.select(`#volcanoDataPoint-${e[identifier]}`).attr(
-            'cursor',
-            'pointer',
-          );
-          this.handleCircleHover(e);
-        }
-      })
+      .attr('cursor', 'pointer')
+      .on('mouseenter', e => this.handleCircleHover(e))
       .on('mouseleave', () => this.handleCircleLeave())
       .on('click', e => {
         d3.event.stopPropagation();
@@ -893,6 +580,9 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       // .range([volcanoHeight * 0.79, 10]);
       .range([volcanoHeight - 54, 10]);
 
+    // let [xMin, xMax] = [Math.min(...xMM), Math.max(...xMM)];
+    // let [yMin, yMax] = [Math.min(...yMM), Math.max(...yMM)];
+
     return {
       xScale: xScale,
       yScale: yScale,
@@ -902,34 +592,6 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       yMin: Math.min(...yMM),
     };
   }
-
-  // createBins(data) {
-  //   const { volcanoWidth, volcanoHeight } = this.props;
-
-  //   const hexb = hexbin
-  //     .hexbin()
-  //     .x(d => d.props.cx)
-  //     .y(d => d.props.cy)
-  //     .size({ volcanoWidth, volcanoHeight })
-  //     .radius(5);
-  //   // .radius((2 * width) / (height - 1));
-
-  //   let bins = [];
-  //   bins = hexb(data);
-
-  //   var circ = [];
-  //   var b = [];
-
-  //   bins.forEach((bin, index) => {
-  //     if (bin.length <= 5) {
-  //       circ.push(...bin.flatMap(b => b));
-  //     } else {
-  //       b.push(bin);
-  //     }
-  //   });
-
-  //   return { bins: b, circles: circ };
-  // }
 
   createCircleElements(data, breadcrumb = false, index) {
     const {
@@ -1109,143 +771,99 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       isUpsetVisible,
       isFilteredDifferential,
       differentialResults,
-      isDataStreamingResultsTable,
       differentialResultsUnfiltered,
-      HighlightedFeaturesArrVolcano,
     } = this.props;
 
-    // if (
-    //   prevProps.doYAxisTransformation !== this.props.doYAxisTransformation &&
-    //   !isDataStreamingResultsTable
-    // ) {
-    //   this.hexBinning(differentialResultsUnfiltered)
-    //   // this.hexBinning(
-    //   //   this.createCircleElements(
-    //   //     this.state.zoom.historyLastViewed[
-    //   //       this.state.zoom.activeIndex
-    //   //     ].map(elem => JSON.parse(elem.props.data)),
-    //   //   ),
-    //   //   true,
-    //   //   this.state.zoom.activeIndex,
-    //   // );
-    // }
-
-    if (!isDataStreamingResultsTable && prevProps.isDataStreamingResultsTable) {
-      this.setupVolcano();
-      this.hexBinning(differentialResultsUnfiltered);
+    if (prevProps.doYAxisTransformation !== this.props.doYAxisTransformation) {
+      this.hexBinning(
+        this.createCircleElements(
+          this.state.zoom.historyLastViewed[
+            this.state.zoom.activeIndex
+          ].map(elem => JSON.parse(elem.props.data)),
+        ),
+        true,
+        this.state.zoom.activeIndex,
+      );
     }
 
-    if (prevProps.isFilteredDifferential && !isFilteredDifferential) {
-      this.transitionZoom(this.state.currentResults);
-      // console.log('here');
+    // if (!prevProps.isFilteredDifferential && isFilteredDifferential) {
 
-      // d3.select('#clip-path')
-      //   .selectAll('path')
-      //   .remove();
-
-      // d3.select('#clip-path')
-      //   .selectAll('circle')
-      //   .remove();
-
-      // const { xScale, yScale } = this.scaleFactory(this.state.currentResults);
-
-      // if (this.props.isUpsetVisible) {
-      //   this.renderBinsFilter(this.state.bins);
-      //   this.renderCirclesFilter(this.state.circles);
-      // }
-
-      // if (differentialResults.length >= 5000) {
-      //   const { bins, circles } = this.parseDataToBinsAndCircles(
-      //     differentialResults,
-      //     xScale,
-      //     yScale,
-      //   );
-
-      //   this.renderBins(bins);
-      //   this.renderCircles(circles);
-      // } else {
-      //   this.renderCircles(differentialResults);
-      // }
-
-      // this.setLastViewed(
-      //   this.state.filterState,
-      //   this.props.filterState,
-      //   this.state.zoom.activeIndex,
-      // );
-      //   // if (this.state.filterState.length > 0) {
-      //   //   let index = this.state.filterState.findIndex(
-      //   //     item => item.index === this.state.zoom.activeIndex,
-      //   //   );
-      //   //   if (index >= 0) {
-      //   //     let array = [...this.state.filterState];
-      //   //     array.splice(index, 1, {
-      //   //       ...this.props.filterState,
-      //   //       index: this.state.zoom.activeIndex,
-      //   //     });
-      //   //     this.setState({
-      //   //       filterState: [...array],
-      //   //     });
-      //   //   } else {
-      //   //     this.setState({
-      //   //       filterState: [
-      //   //         ...this.state.filterState,
-      //   //         { ...this.props.filterState, index: this.state.zoom.activeIndex },
-      //   //       ],
-      //   //     });
-      //   //   }
-      //   // } else {
-      //   //   this.setState({
-      //   //     filterState: [
-      //   //       { ...this.props.filterState, index: this.state.zoom.activeIndex },
-      //   //     ],
-      //   //   });
-      //   // }
-    }
-
-    // if (
-    //   isUpsetVisible &&
-    //   isFilteredDifferential &&
-    //   this.differentialResults.length !== differentialResults.length
-    // ) {
-    //   this.hexBinning(
-    //     this.createCircleElements(differentialResults),
-    //     true,
-    //     this.state.zoom.activeIndex,
-    //   );
-    // } else if (!isUpsetVisible && prevProps.isUpsetVisible) {
-    //   this.hexBinning(
-    //     this.createCircleElements(
-    //       this.state.zoom.history[this.state.zoom.activeIndex].map(elem =>
-    //         JSON.parse(elem.props.data),
-    //       ),
+    //   console.log(
+    //     this.setLastViewed(
+    //       this.state.filterState,
+    //       this.props.filterState,
+    //       this.state.zoom.activeIndex,
     //     ),
-    //     true,
-    //     this.state.zoom.activeIndex,
     //   );
-    // } else if (prevState.zoom.activeIndex !== this.state.zoom.activeIndex) {
-    //   this.hexBinning(
-    //     this.createCircleElements(
-    //       isUpsetVisible
-    //         ? this.state.zoom.historyLastViewed[
-    //             this.state.zoom.activeIndex
-    //           ].map(elem => JSON.parse(elem.props.data))
-    //         : this.state.zoom.history[this.state.zoom.activeIndex].map(elem =>
-    //             JSON.parse(elem.props.data),
-    //           ),
-    //     ),
-    //     true,
-    //     this.state.zoom.activeIndex,
-    //   );
-    // } else if (!prevState.isBinClicked && this.state.isBinClicked) {
-    //   this.hexBinning(this.state.clickedBin);
-    //   this.setState({ isBinClicked: false });
-    // } else if (
-    //   prevProps.isDataStreamingResultsTable &&
-    //   !isDataStreamingResultsTable
-    // ) {
-    //   // this.hexBinning(this.createCircleElements(differentialResultsUnfiltered));
-    //   this.hexBinning(differentialResultsUnfiltered);
+    //   // if (this.state.filterState.length > 0) {
+    //   //   let index = this.state.filterState.findIndex(
+    //   //     item => item.index === this.state.zoom.activeIndex,
+    //   //   );
+    //   //   if (index >= 0) {
+    //   //     let array = [...this.state.filterState];
+    //   //     array.splice(index, 1, {
+    //   //       ...this.props.filterState,
+    //   //       index: this.state.zoom.activeIndex,
+    //   //     });
+    //   //     this.setState({
+    //   //       filterState: [...array],
+    //   //     });
+    //   //   } else {
+    //   //     this.setState({
+    //   //       filterState: [
+    //   //         ...this.state.filterState,
+    //   //         { ...this.props.filterState, index: this.state.zoom.activeIndex },
+    //   //       ],
+    //   //     });
+    //   //   }
+    //   // } else {
+    //   //   this.setState({
+    //   //     filterState: [
+    //   //       { ...this.props.filterState, index: this.state.zoom.activeIndex },
+    //   //     ],
+    //   //   });
+    //   // }
     // }
+
+    if (
+      isUpsetVisible &&
+      isFilteredDifferential &&
+      this.differentialResults.length !== differentialResults.length
+    ) {
+      this.hexBinning(
+        this.createCircleElements(differentialResults),
+        true,
+        this.state.zoom.activeIndex,
+      );
+    } else if (!isUpsetVisible && prevProps.isUpsetVisible) {
+      console.log('690', this.state.zoom.activeIndex);
+      this.hexBinning(
+        this.createCircleElements(
+          this.state.zoom.history[this.state.zoom.activeIndex].map(elem =>
+            JSON.parse(elem.props.data),
+          ),
+        ),
+        true,
+        this.state.zoom.activeIndex,
+      );
+    } else if (prevState.zoom.activeIndex !== this.state.zoom.activeIndex) {
+      this.hexBinning(
+        this.createCircleElements(
+          isUpsetVisible
+            ? this.state.zoom.historyLastViewed[
+                this.state.zoom.activeIndex
+              ].map(elem => JSON.parse(elem.props.data))
+            : this.state.zoom.history[this.state.zoom.activeIndex].map(elem =>
+                JSON.parse(elem.props.data),
+              ),
+        ),
+        true,
+        this.state.zoom.activeIndex,
+      );
+    } else if (!prevState.isBinClicked && this.state.isBinClicked) {
+      this.hexBinning(this.state.clickedBin);
+      this.setState({ isBinClicked: false });
+    }
 
     if (
       volcanoCircleLabel != null &&
@@ -1255,36 +873,22 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       this.handleBrushedText(this.state.brushedRawData);
     }
 
-    // if (
-    //   updateVolcanoLabels ||
-    //   (volcanoCircleLabel != null &&
-    //     prevProps.volcanoCircleLabel !== volcanoCircleLabel &&
-    //     [volcanoDifferentialTableRowMax, ...volcanoDifferentialTableRowOther]
-    //       .length > 0 &&
-    //     this.state.brushedRawData == null)
-    // ) {
-    //   const elems = [
-    //     volcanoDifferentialTableRowMax,
-    //     ...volcanoDifferentialTableRowOther,
-    //   ].map(elem => {
-    //     const el = document.getElementById(`volcanoDataPoint-${elem}`);
-    //     return el ? d3.select(el)._groups[0][0] : null;
-    //   });
-    //   this.handleBrushedText({ _groups: [elems.map(elem => elem)] });
-    // }
-
     if (
       updateVolcanoLabels ||
       (volcanoCircleLabel != null &&
         prevProps.volcanoCircleLabel !== volcanoCircleLabel &&
-        HighlightedFeaturesArrVolcano?.length > 0 &&
+        [volcanoDifferentialTableRowMax, ...volcanoDifferentialTableRowOther]
+          .length > 0 &&
         this.state.brushedRawData == null)
     ) {
-      const elems = HighlightedFeaturesArrVolcano.map(elem => {
-        const el = document.getElementById(`volcanoDataPoint-${elem.key}`);
+      const elems = [
+        volcanoDifferentialTableRowMax,
+        ...volcanoDifferentialTableRowOther,
+      ].map(elem => {
+        const el = document.getElementById(`volcanoDataPoint-${elem}`);
         return el ? d3.select(el)._groups[0][0] : null;
       });
-      this.handleBrushedText({ _groups: [elems] });
+      this.handleBrushedText({ _groups: [elems.map(elem => elem)] });
     }
 
     if (
@@ -1381,33 +985,32 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       prevProps.volcanoWidth !== volcanoWidth
     ) {
       this.resizeBrushSelection();
-      // this.hexBinning(
-      //   this.createCircleElements(
-      //     this.state.zoom.historyLastViewed[
-      //       this.state.zoom.activeIndex
-      //     ].map(elem => JSON.parse(elem.props.data)),
-      //   ),
-      //   true,
-      //   this.state.zoom.activeIndex,
-      // );
+      this.hexBinning(
+        this.createCircleElements(
+          this.state.zoom.historyLastViewed[
+            this.state.zoom.activeIndex
+          ].map(elem => JSON.parse(elem.props.data)),
+        ),
+        true,
+        this.state.zoom.activeIndex,
+      );
     }
     if (
-      !isDataStreamingResultsTable &&
-      (prevProps.xAxisLabel !== xAxisLabel ||
-        prevProps.yAxisLabel !== yAxisLabel ||
-        prevProps.doXAxisTransformation !== doXAxisTransformation ||
-        prevProps.doYAxisTransformation !== doYAxisTransformation)
+      prevProps.xAxisLabel !== xAxisLabel ||
+      prevProps.yAxisLabel !== yAxisLabel ||
+      prevProps.doXAxisTransformation !== doXAxisTransformation ||
+      prevProps.doYAxisTransformation !== doYAxisTransformation
     ) {
       this.removeViolinBrush();
-      // this.hexBinning(
-      //   this.createCircleElements(
-      //     this.state.zoom.historyLastViewed[
-      //       this.state.zoom.activeIndex
-      //     ].map(elem => JSON.parse(elem.props.data)),
-      //   ),
-      //   true,
-      //   this.state.zoom.activeIndex,
-      // );
+      this.hexBinning(
+        this.createCircleElements(
+          this.state.zoom.historyLastViewed[
+            this.state.zoom.activeIndex
+          ].map(elem => JSON.parse(elem.props.data)),
+        ),
+        true,
+        this.state.zoom.activeIndex,
+      );
     }
   }
 
@@ -1617,7 +1220,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
             ></rect>
             <rect
               width="100%"
-              height="96%"
+              height="95%"
               fill="#2e2e2e"
               stroke="#000"
               rx="3"
@@ -1705,129 +1308,9 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     }
   }
 
-  updateVoclanoAfterUpsetFilter(data, xScale, yScale) {
-    const self = this;
-    const { differentialResults, isUpsetVisible } = self.props;
-
-    const unfilteredObject = self.parseDataToBinsAndCircles(
-      data,
-      xScale,
-      yScale,
-    );
-
-    d3.select('#clip-path')
-      .selectAll('path')
-      .remove();
-
-    d3.select('#clip-path')
-      .selectAll('circle')
-      .remove();
-
-    if (isUpsetVisible) {
-      const filteredElements = _.differenceBy(
-        data,
-        differentialResults,
-        'Ensembl_Gene_ID',
-      );
-
-      const elementsToDisplay = _.differenceBy(
-        data,
-        filteredElements,
-        'Ensembl_Gene_ID',
-      );
-
-      const filteredObject = self.parseDataToBinsAndCircles(
-        elementsToDisplay,
-        xScale,
-        yScale,
-      );
-
-      if (data.length >= 5000 && elementsToDisplay.length >= 5000) {
-        self.renderCirclesFilter(unfilteredObject.circles);
-        self.renderBinsFilter(unfilteredObject.bins);
-        self.renderCircles(filteredObject.circles);
-        self.renderBins(filteredObject.bins);
-      } else if (data.length >= 5000 && elementsToDisplay.length < 5000) {
-        self.renderCirclesFilter(unfilteredObject.circles);
-        self.renderBinsFilter(unfilteredObject.bins);
-        self.renderCircles(elementsToDisplay);
-      } else {
-        self.renderCirclesFilter(data);
-        self.renderCircles(elementsToDisplay);
-      }
-    } else {
-      if (data.length >= 5000) {
-        self.renderCircles(unfilteredObject.circles);
-        self.renderBins(unfilteredObject.bins);
-      } else {
-        self.renderCircles(data);
-      }
-    }
-  }
-
-  transitionZoom(data) {
-    const self = this;
-    const { xScale, yScale } = self.scaleFactory(data);
-
-    const unfilteredObject = self.parseDataToBinsAndCircles(
-      data,
-      xScale,
-      yScale,
-    );
-
-    this.updateVoclanoAfterUpsetFilter(data, xScale, yScale);
-
-    d3.select('#clip-path')
-      .selectAll('path')
-      .attr('opacity', 0);
-
-    d3.select('.volcanoPlotD3BrushSelection').call(self.objsBrush.move, null);
-
-    self.xxAxis = d3.axisTop(xScale).ticks();
-    self.yyAxis = d3.axisRight(yScale).ticks();
-
-    let t = d3
-      .select('svg')
-      .transition()
-      .duration(200);
-    d3.select('#xaxis-line')
-      .transition(t)
-      .call(self.xxAxis);
-    d3.select('#yaxis-line')
-      .transition(t)
-      .call(self.yyAxis);
-
-    const container = d3.select('#clip-path').transition(t);
-
-    const circle = container.selectAll('circle');
-
-    circle
-      .transition(t)
-      .attr('cx', function(d) {
-        return xScale(self.doTransform(d[self.props.xAxisLabel], 'x'));
-      })
-      .attr('cy', function(d) {
-        return yScale(self.doTransform(d[self.props.yAxisLabel], 'y'));
-      });
-
-    const bin = container.selectAll('path');
-
-    bin
-      .transition(t)
-      .delay(100)
-      .duration(100)
-      .attr('opacity', 1);
-
-    self.setState({
-      currentResults: data,
-      bins: unfilteredObject.bins,
-      circles: unfilteredObject.circles,
-    });
-  }
-
   setupBrush(width, height) {
     const self = this;
-    this.objsBrush = {};
+    let objsBrush = {};
 
     const brushingStart = function() {
       self.setState({
@@ -1894,7 +1377,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         brushedCircles.attr('r', 2.5);
         brushedCircles.classed('selected', true);
 
-        // self.handleBrushedText(brushedCircles);
+        self.handleBrushedText(brushedCircles);
 
         // if (!!brushedBins.length && !!brushedCircles._groups[0].length) {
         const brushedDataArr = brushedCircles._groups[0].map(a => {
@@ -1913,41 +1396,29 @@ class DifferentialVolcanoPlot extends React.PureComponent {
           ...self.createCircleElements(brushedDataArr),
         ];
 
-        if (!!total.length) {
-          self.transitionZoom([...brushedBins, ...brushedDataArr]);
+        self.props.onHandleZoom(
+          total,
+          self.state.zoom.activeIndex + 1,
+          self.state.zoom,
+        );
 
-          // self.props.onHandleZoom(
-          //   total.map(elem => JSON.parse(elem.props.data)),
-          //   self.state.zoom.activeIndex + 1,
-          //   self.state.zoom,
-          // );
+        // if (brushedBins.length > 0) {
+        self.hexBinning(total);
+        // }
 
-          // if (brushedBins.length > 0) {
-          // self.hexBinning(total);
-          // }
+        self.setState({ brushedRawData: brushedCircles, brushing: false });
 
-          // if (brushedDataArr.length > 0) {
-          //   self.setState({
-          //     // brushedRawData: brushedCircles,
-          //     // brushedCirclesData: brushedDataArr,
-          //     brushedCircles: brushedCircles,
-          //     brushing: false,
-          //   });
-          // } else {
-          //   self.setState({
-          //     // brushedRawData: brushedCircles,
-          //     brushing: false,
-          //   });
-          // }
-          // self.hexBinning(brushed);
-          // self.props.handleVolcanoPlotSelectionChange([
-          //   ...brushedDataArr,
-          //   ...brushedBins.map(elem => JSON.parse(elem.props.data)),
-          // ]);
+        if (brushedDataArr.length > 0) {
+          self.setState({
+            brushedCirclesData: brushedDataArr,
+            brushedCircles: brushedCircles,
+          });
         }
-
-        self.setState({ brushing: false });
-
+        // self.hexBinning(brushed);
+        self.props.handleVolcanoPlotSelectionChange([
+          ...brushedDataArr,
+          ...brushedBins,
+        ]);
         // }
         // }
 
@@ -1988,19 +1459,15 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     if (d3.selectAll('.brush').nodes().length > 0) {
       d3.selectAll('.brush').remove();
     }
-    self.objsBrush = d3
+    objsBrush = d3
       .brush()
-      // .extent([
-      //   [-100, -20],
-      //   [width + 100, height + 20],
-      // ])
       .extent([
-        [55, 0],
-        [width + 5, height - 45],
+        [-100, -20],
+        [width + 100, height + 20],
       ])
       .on('start', brushingStart)
       .on('end', endBrush);
-    d3.selectAll('.volcanoPlotD3BrushSelection').call(self.objsBrush);
+    d3.selectAll('.volcanoPlotD3BrushSelection').call(objsBrush);
     const brush = d3
       .select('.volcanoPlotD3BrushSelection')
       .selectAll('rect.selection');
@@ -2009,7 +1476,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       brush.nodes()[0].getAttribute('x') !== null &&
       (self.state.resizeScalarX !== 1 || self.state.resizeScalarY !== 1)
     ) {
-      d3.select('.volcanoPlotD3BrushSelection').call(self.objsBrush.move, [
+      d3.select('.volcanoPlotD3BrushSelection').call(objsBrush.move, [
         [
           parseFloat(brush.nodes()[0].getAttribute('x')) *
             self.state.resizeScalarX,
@@ -2028,24 +1495,24 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       self.setState({
         resizeScalarX: 1,
         resizeScalarY: 1,
-        objsBrushState: self.objsBrush,
+        objsBrushState: objsBrush,
       });
     } else {
-      d3.select('.volcanoPlotD3BrushSelection').call(self.objsBrush.move, null);
+      d3.select('.volcanoPlotD3BrushSelection').call(objsBrush.move, null);
     }
   }
 
   handleBrushedText = brushed => {
     // MAP brushedDataArr to circle text state
     const brushedCircleTextMapped = brushed._groups[0].map(a => {
-      const columnData = JSON.parse(a.attributes[4].nodeValue);
+      const columnData = JSON.parse(a.attributes['data'].value);
       const key = this.props.volcanoCircleLabel || 0;
       return {
         data: columnData[key],
-        class: a.attributes[1].nodeValue,
-        id: a.attributes[2].nodeValue,
-        cx: a.attributes[10].nodeValue,
-        cy: a.attributes[11].nodeValue,
+        class: a.attributes['class'].value,
+        id: a.attributes['id'].value,
+        cx: a.attributes['cx'].value,
+        cy: a.attributes['cy'].value,
         // r: a.attributes[0].nodeValue,
         // circleid: a.attributes[3].nodeValue,
         // stroke: a.attributes[5].nodeValue,
@@ -2132,6 +1599,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       identifier,
       doXAxisTransformation,
       doYAxisTransformation,
+      isFilteredDifferential,
       isUpsetVisible,
     } = this.props;
 
@@ -2147,126 +1615,126 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     //     ? differentialResultsUnfiltered
     //     : this.differentialResultsUnfiltered;
 
-    // this.differentialResults =
-    //   this.differentialResults.length <= 0
-    //     ? differentialResults
-    //     : this.differentialResults;
+    this.differentialResults =
+      this.differentialResults.length <= 0
+        ? differentialResults
+        : this.differentialResults;
 
     // console.log('results', this.differentialResults);
     // console.log('results from props', differentialResults);
 
-    // if (differentialResultsUnfiltered.length === 0) {
-    //   return null;
-    // }
-    // var xMM = this.props.getMaxAndMin(
-    //   differentialResultsUnfiltered,
-    //   xAxisLabel,
-    // );
-    // var yMM = this.props.getMaxAndMin(
-    //   differentialResultsUnfiltered,
-    //   yAxisLabel,
-    // );
-    // xMM = [this.doTransform(xMM[0], 'x'), this.doTransform(xMM[1], 'x')];
-    // yMM = [this.doTransform(yMM[0], 'y'), this.doTransform(yMM[1], 'y')];
+    if (differentialResultsUnfiltered.length === 0) {
+      return null;
+    }
+    var xMM = this.props.getMaxAndMin(
+      differentialResultsUnfiltered,
+      xAxisLabel,
+    );
+    var yMM = this.props.getMaxAndMin(
+      differentialResultsUnfiltered,
+      yAxisLabel,
+    );
+    xMM = [this.doTransform(xMM[0], 'x'), this.doTransform(xMM[1], 'x')];
+    yMM = [this.doTransform(yMM[0], 'y'), this.doTransform(yMM[1], 'y')];
 
-    // const xScale = d3
-    //   .scaleLinear()
-    //   .domain([Math.min(...xMM), Math.max(...xMM)])
-    //   .range([64, volcanoWidth]);
+    const xScale = d3
+      .scaleLinear()
+      .domain([Math.min(...xMM), Math.max(...xMM)])
+      .range([64, volcanoWidth]);
 
-    // const yScale = d3
-    //   .scaleLinear()
-    //   .domain([Math.min(...yMM), Math.max(...yMM)])
-    //   // .range([volcanoHeight * 0.79, 10]);
-    //   .range([volcanoHeight - 54, 10]);
+    const yScale = d3
+      .scaleLinear()
+      .domain([Math.min(...yMM), Math.max(...yMM)])
+      // .range([volcanoHeight * 0.79, 10]);
+      .range([volcanoHeight - 54, 10]);
 
-    // const yAxis = (
-    //   <line
-    //     className="volcanoPlotYAxis NoSelect"
-    //     x1={60}
-    //     x2={60}
-    //     y1={0}
-    //     y2={volcanoHeight - 50}
-    //     stroke="#000"
-    //     strokeWidth={1}
-    //   />
-    // );
-    // const xAxis = (
-    //   <line
-    //     className="volcanoPlotXAxis NoSelect"
-    //     x1={60}
-    //     x2={volcanoWidth}
-    //     y1={volcanoHeight - 50}
-    //     y2={volcanoHeight - 50}
-    //     stroke="#000"
-    //     strokeWidth={1}
-    //   />
-    // );
+    const yAxis = (
+      <line
+        className="volcanoPlotYAxis NoSelect"
+        x1={60}
+        x2={60}
+        y1={0}
+        y2={volcanoHeight - 50}
+        stroke="#000"
+        strokeWidth={1}
+      />
+    );
+    const xAxis = (
+      <line
+        className="volcanoPlotXAxis NoSelect"
+        x1={60}
+        x2={volcanoWidth}
+        y1={volcanoHeight - 50}
+        y2={volcanoHeight - 50}
+        stroke="#000"
+        strokeWidth={1}
+      />
+    );
 
-    // const xAxisTicks = xScale.ticks().map(value => ({
-    //   value,
-    //   xOffset: xScale(value),
-    // }));
+    const xAxisTicks = xScale.ticks().map(value => ({
+      value,
+      xOffset: xScale(value),
+    }));
 
-    // const xPlotTicks = xAxisTicks.map(({ value, xOffset }) => (
-    //   <g
-    //     key={
-    //       value !== undefined
-    //         ? `xplotick-${value}-g`
-    //         : `xplottick-${identifier}-g`
-    //     }
-    //     className="individualTick NoSelect"
-    //     transform={`translate(${xOffset}, ${volcanoHeight - 50})`}
-    //   >
-    //     <line y2="8" stroke="#000" strokeWidth={1} />
-    //     <text
-    //       key={
-    //         value !== undefined
-    //           ? `xplottick-${value}-text`
-    //           : `xplottick-${identifier}-text`
-    //       }
-    //       style={{
-    //         fontSize: '12px',
-    //         textAnchor: 'middle',
-    //         transform: 'translateY(20px)',
-    //       }}
-    //     >
-    //       {value}
-    //     </text>
-    //   </g>
-    // ));
-    // const yAxisTicks = yScale.ticks().map(value => ({
-    //   value,
-    //   yOffset: yScale(value),
-    // }));
+    const xPlotTicks = xAxisTicks.map(({ value, xOffset }) => (
+      <g
+        key={
+          value !== undefined
+            ? `xplotick-${value}-g`
+            : `xplottick-${identifier}-g`
+        }
+        className="individualTick NoSelect"
+        transform={`translate(${xOffset}, ${volcanoHeight - 50})`}
+      >
+        <line y2="8" stroke="#000" strokeWidth={1} />
+        <text
+          key={
+            value !== undefined
+              ? `xplottick-${value}-text`
+              : `xplottick-${identifier}-text`
+          }
+          style={{
+            fontSize: '12px',
+            textAnchor: 'middle',
+            transform: 'translateY(20px)',
+          }}
+        >
+          {value}
+        </text>
+      </g>
+    ));
+    const yAxisTicks = yScale.ticks().map(value => ({
+      value,
+      yOffset: yScale(value),
+    }));
 
-    // const yPlotTicks = yAxisTicks.map(({ value, yOffset }) => (
-    //   <g
-    //     key={
-    //       value !== undefined
-    //         ? `yplottick-${value}-g`
-    //         : `yplottick-${identifier}-g`
-    //     }
-    //     className="individualTick NoSelect"
-    //     transform={`translate(0,${yOffset})`}
-    //   >
-    //     <line x1={50} x2={60} stroke="#000" strokeWidth={1} />
-    //     <text
-    //       key={
-    //         value !== undefined
-    //           ? `yplottick-${value}-text`
-    //           : `yplottick-${identifier}-text`
-    //       }
-    //       style={{
-    //         fontSize: '12px',
-    //         textAnchor: 'middle',
-    //         transform: `translate(40px, 3px)`,
-    //       }}
-    //     >
-    //       {value}
-    //     </text>
-    //   </g>
-    // ));
+    const yPlotTicks = yAxisTicks.map(({ value, yOffset }) => (
+      <g
+        key={
+          value !== undefined
+            ? `yplottick-${value}-g`
+            : `yplottick-${identifier}-g`
+        }
+        className="individualTick NoSelect"
+        transform={`translate(0,${yOffset})`}
+      >
+        <line x1={50} x2={60} stroke="#000" strokeWidth={1} />
+        <text
+          key={
+            value !== undefined
+              ? `yplottick-${value}-text`
+              : `yplottick-${identifier}-text`
+          }
+          style={{
+            fontSize: '12px',
+            textAnchor: 'middle',
+            transform: `translate(40px, 3px)`,
+          }}
+        >
+          {value}
+        </text>
+      </g>
+    ));
     // var filteredOutPlotCircles = null;
     // if (
     //   this.differentialResultsUnfiltered.length !==
@@ -2288,75 +1756,19 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     //   );
     // }
 
-    // const { bins, circles } =
-    //   (differentialResultsUnfiltered.length !== differentialResults.length ||
-    //     differentialResultsUnfiltered.length === differentialResults.length) &&
-    //   isUpsetVisible
-    //     ? differentialResultsUnfiltered.length > 5000
-    //       ? this.createBins(
-    //           this.createCircleElements(differentialResultsUnfiltered),
-    //         )
-    //       : {
-    //           bins: null,
-    //           circles: this.createCircleElements(differentialResultsUnfiltered),
-    //         }
-    //     : { bins: null, circles: null };
-
-    // if (
-    //   (differentialResultsUnfiltered.length !== differentialResults.length ||
-    //     differentialResultsUnfiltered.length === differentialResults.length) &&
-    //   isUpsetVisible
-    // ) {
-    //   let unfiltered = [
-    //     ...differentialResultsUnfiltered.map(result => result.Ensembl_Gene_ID),
-    //   ];
-    //   let results = [
-    //     ...differentialResults.map(result => result.Ensembl_Gene_ID),
-    //   ];
-    //   let diff = _.difference(unfiltered, results);
-    //   let filteredElements = differentialResultsUnfiltered.filter(result =>
-    //     diff.includes(result.Ensembl_Gene_ID),
-    //   );
-
-    //   d3.select('#clip-path')
-    //     .selectAll('path')
-    //     .remove();
-
-    //   d3.select('#clip-path')
-    //     .selectAll('circle')
-    //     .remove();
-
-    //   const { xScale, yScale } = this.scaleFactory(
-    //     differentialResultsUnfiltered,
-    //   );
-    //   const filteredObject = this.parseDataToBinsAndCircles(
-    //     filteredElements,
-    //     xScale,
-    //     yScale,
-    //   );
-    //   // console.log('results', differentialResults.length);
-    //   // console.log('filteredObject', filteredObject);
-    //   this.renderBinsFilter(this.bins);
-    //   this.renderCirclesFilter(this.circles);
-
-    //   if (results.length >= 5000) {
-    //     const { bins, circles } = this.parseDataToBinsAndCircles(
-    //       differentialResults,
-    //       xScale,
-    //       yScale,
-    //     );
-
-    //     // console.log(bins.length, circles.length);
-    //     this.renderBins(bins);
-    //     this.renderCircles(circles);
-    //     // console.log(
-    //     //   d3.select('#clip-path').selectAll('path'),
-    //     //   d3.select('#filtered-elements').selectAll('path'),
-    //     // );
-    //   } else {
-    //     this.renderCircles(differentialResults);
-    //   }
-    // }
+    const { bins, circles } =
+      (differentialResultsUnfiltered.length !== differentialResults.length ||
+        differentialResultsUnfiltered.length === differentialResults.length) &&
+      isUpsetVisible
+        ? differentialResultsUnfiltered.length > 5000
+          ? this.createBins(
+              this.createCircleElements(differentialResultsUnfiltered),
+            )
+          : {
+              bins: null,
+              circles: this.createCircleElements(differentialResultsUnfiltered),
+            }
+        : { bins: null, circles: null };
 
     // if (isUpsetVisible) {
     //   this.hexBinning(this.createCircleElements(differentialResults));
@@ -2449,6 +1861,9 @@ class DifferentialVolcanoPlot extends React.PureComponent {
             </Button.Group> */}
           </div>
           <div className="breadcrumb-container">
+            <Button onClick={() => this.hexBinning(differentialResults)}>
+              Click me
+            </Button>
             {this.state.zoom?.history?.length > 0 ? (
               <Step.Group size="mini">
                 {this.state.zoom.history.map((zoom, index) => (
@@ -2536,11 +1951,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
               </span>
             ) : null}
           </div>
-          <div id="volcano">
-            {hoveredCircleTooltip}
-            {volcanoCircleText}
-          </div>
-          {/* <svg
+          <svg
             id="VolcanoChart"
             className="VolcanoPlotSVG"
             width={volcanoWidth + 20}
@@ -2550,18 +1961,18 @@ class DifferentialVolcanoPlot extends React.PureComponent {
           >
             <g className="volcanoPlotD3BrushSelection" />
             {yAxis}
-            {xAxis} */}
-          {/*X Axis Label*/}
-          {/* <text
+            {xAxis}
+            {/*X Axis Label*/}
+            <text
               className="volcanoAxisLabel NoSelect"
               x={volcanoWidth * 0.5 + 10}
               y={xAxisLabelY}
               fontFamily="Lato, Helvetica Neue, Arial, Helvetica, sans-serif"
             >
               {xAxisText}
-            </text> */}
-          {/*Y Axis Label*/}
-          {/* <text
+            </text>
+            {/*Y Axis Label*/}
+            <text
               className="volcanoAxisLabel NoSelect"
               textAnchor="middle"
               transform={`rotate(-90,20,${volcanoHeight * 0.5 + 20})`}
@@ -2572,14 +1983,14 @@ class DifferentialVolcanoPlot extends React.PureComponent {
               {yAxisText}
             </text>
             {xPlotTicks}
-            {yPlotTicks} */}
-          {/* <filter id="constantOpacity">
+            {yPlotTicks}
+            <filter id="constantOpacity">
               <feComponentTransfer>
                 <feFuncA type="table" tableValues="0 .3 .3" />
               </feComponentTransfer>
             </filter>
             {/* <g filter="url(#constantOpacity)">{filteredOutPlotCircles}</g> */}
-          {/* <g filter="url(#constantOpacity)">
+            <g filter="url(#constantOpacity)">
               {bins
                 ? bins.map((elem, index) => {
                     return (
@@ -2608,13 +2019,13 @@ class DifferentialVolcanoPlot extends React.PureComponent {
                     );
                   })
                 : null}
-            </g> */}
-          {/* {plotCircles} */}
-          {/* {this.plotCirclesSorted} */}
-          {/* {this.plotCirclesSorted.length <= 5000
+            </g>
+            {/* {plotCircles} */}
+            {/* {this.plotCirclesSorted} */}
+            {/* {this.plotCirclesSorted.length <= 5000
               ? this.plotCirclesSorted
               : null} */}
-          {/* {this.state.bins.map(elem => {
+            {/* {this.state.bins.map(elem => {
               return (
                 <path
                   stroke="black"
@@ -2626,7 +2037,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
                 />
               );
             })} */}
-          {/* {this.state.showBins
+            {/* {this.state.showBins
               ? this.state.bins.map((elem, index) => {
                   return (
                     <path
@@ -2670,11 +2081,11 @@ class DifferentialVolcanoPlot extends React.PureComponent {
                     />
                   );
                 })
-              : null}
-            {this.state.showCircles ? this.state.circles : null} */}
-          {/* {hoveredCircleTooltip}
+              : null} */}
+            {/* {this.state.showCircles ? this.state.circles : null} */}
+            {hoveredCircleTooltip}
             {volcanoCircleText}
-          </svg> */}
+          </svg>
         </>
       );
     } else {
