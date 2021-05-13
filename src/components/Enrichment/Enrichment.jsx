@@ -710,7 +710,6 @@ class Enrichment extends Component {
   };
 
   getConfigCols = annotationData => {
-    const enrResults = annotationData;
     const {
       enrichmentStudy,
       enrichmentModel,
@@ -732,8 +731,19 @@ class Enrichment extends Component {
     };
     let enrichmentAlphanumericFields = [];
     let enrichmentNumericFields = [];
-    const firstObject = enrResults[0];
-    for (let [key, value] of Object.entries(firstObject)) {
+    function isNotNANorNullNorUndefined(o) {
+      return typeof o !== 'undefined' && o !== null && o !== 'NA';
+    }
+
+    function everyIsNotNANorNullNorUndefined(arr) {
+      return arr.every(isNotNANorNullNorUndefined);
+    }
+    const objectValuesArr = [...annotationData].map(f => Object.values(f));
+    const firstFullObjectIndex = objectValuesArr.findIndex(
+      everyIsNotNANorNullNorUndefined,
+    );
+    const firstFullObject = annotationData[firstFullObjectIndex];
+    for (let [key, value] of Object.entries(firstFullObject)) {
       if (typeof value === 'string' || value instanceof String) {
         enrichmentAlphanumericFields.push(key);
       } else {

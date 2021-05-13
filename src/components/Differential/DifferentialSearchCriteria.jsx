@@ -223,7 +223,7 @@ class DifferentialSearchCriteria extends Component {
             modelID: differentialModel,
             testID: differentialTest,
           };
-          const fetchUrlResultsTable = `${this.props.baseUrl}/ocpu/library/OmicNavigator/R/getResultsTable/ndjson?auto_unbox=true&digits=10`;
+          const fetchUrlResultsTable = `${this.props.baseUrl}/ocpu/library/OmicNavigator/R/getResultsTable/ndjson?auto_unbox=true&digits=10&na="string"`;
           fetch(fetchUrlResultsTable, {
             method: 'POST',
             headers: {
@@ -426,7 +426,7 @@ class DifferentialSearchCriteria extends Component {
       );
       return;
     }
-    const fetchUrlResultsTable = `${this.props.baseUrl}/ocpu/library/OmicNavigator/R/getResultsTable/ndjson?auto_unbox=true&digits=10`;
+    const fetchUrlResultsTable = `${this.props.baseUrl}/ocpu/library/OmicNavigator/R/getResultsTable/ndjson?auto_unbox=true&digits=10&na="string"`;
     fetch(fetchUrlResultsTable, {
       method: 'POST',
       headers: {
@@ -604,7 +604,7 @@ class DifferentialSearchCriteria extends Component {
       );
       return;
     }
-    const fetchUrlResultsTable = `${this.props.baseUrl}/ocpu/library/OmicNavigator/R/getResultsTable/ndjson?auto_unbox=true&digits=10`;
+    const fetchUrlResultsTable = `${this.props.baseUrl}/ocpu/library/OmicNavigator/R/getResultsTable/ndjson?auto_unbox=true&digits=10&na="string"`;
     fetch(fetchUrlResultsTable, {
       method: 'POST',
       headers: {

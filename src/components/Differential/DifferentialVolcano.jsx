@@ -162,12 +162,24 @@ class DifferentialVolcano extends Component {
     if (this.props.differentialResults.length > 0) {
       let differentialAlphanumericFields = [];
       let relevantConfigColumns = [];
-      const firstObject = this.props.differentialResults[0];
-      for (let [key, value] of Object.entries(firstObject)) {
+      function isNotNANorNullNorUndefined(o) {
+        return typeof o !== 'undefined' && o !== null && o !== 'NA';
+      }
+      function everyIsNotNANorNullNorUndefined(arr) {
+        return arr.every(isNotNANorNullNorUndefined);
+      }
+      const objectValuesArr = [...this.props.differentialResults].map(f =>
+        Object.values(f),
+      );
+      const firstFullObjectIndex = objectValuesArr.findIndex(
+        everyIsNotNANorNullNorUndefined,
+      );
+      const firstFullObject = this.props.differentialResults[
+        firstFullObjectIndex
+      ];
+      for (let [key, value] of Object.entries(firstFullObject)) {
         if (typeof value === 'string' || value instanceof String) {
           differentialAlphanumericFields.push(key);
-        } else {
-          relevantConfigColumns.push(key);
         }
       }
       //Pushes "none" option into Volcano circle text dropdown
@@ -290,6 +302,9 @@ class DifferentialVolcano extends Component {
     ) {
       const { differentialFeatureIdKey } = this.props;
       event.stopPropagation();
+      let sortedData =
+        this.volcanoPlotFilteredGridRef.current?.qhGridRef?.current?.data ||
+        this.props.differentialResults;
       const PreviouslyHighlighted = [
         ...this.props.HighlightedFeaturesArrVolcano,
       ];
@@ -314,7 +329,9 @@ class DifferentialVolcano extends Component {
           };
         });
         this.props.onHandleSelectedVolcano(shiftedTableDataArray);
-        this.setState({ featuresLength: shiftedTableDataArray.length || 0 });
+        this.setState({
+          featuresLength: shiftedTableDataArray.length || sortedData.length,
+        });
       } else if (event.ctrlKey) {
         const allTableData =
           this.volcanoPlotFilteredGridRef.current?.qhGridRef.current?.getSortedData() ||
@@ -326,7 +343,9 @@ class DifferentialVolcano extends Component {
             i => i.id !== item[differentialFeatureIdKey],
           );
           this.props.onHandleSelectedVolcano(selectedTableDataArray);
-          this.setState({ featuresLength: selectedTableDataArray.length || 0 });
+          this.setState({
+            featuresLength: selectedTableDataArray.length || sortedData.length,
+          });
         } else {
           // not yet highlighted, add it to array
           const indexMaxFeature = _.findIndex(allTableData, function(d) {
@@ -348,7 +367,9 @@ class DifferentialVolcano extends Component {
           }
           selectedTableDataArray = [...PreviouslyHighlighted];
           this.props.onHandleSelectedVolcano(selectedTableDataArray);
-          this.setState({ featuresLength: selectedTableDataArray.length || 0 });
+          this.setState({
+            featuresLength: selectedTableDataArray.length || sortedData.length,
+          });
         }
       } else {
         // already highlighted, remove it from array
@@ -366,7 +387,7 @@ class DifferentialVolcano extends Component {
             key: item[differentialFeatureIdKey],
           },
         ]);
-        // this.setState({ featuresLength: 1 });
+        this.setState({ featuresLength: sortedData.length || 0 });
       }
     }
   };
@@ -517,13 +538,17 @@ class DifferentialVolcano extends Component {
 
   setFeaturesLength = filteredData => {
     const { differentialResults, HighlightedFeaturesArrVolcano } = this.props;
+    let sortedData =
+      this.volcanoPlotFilteredGridRef.current?.qhGridRef?.current?.data ||
+      this.props.differentialResults;
     if (HighlightedFeaturesArrVolcano.length === 1) {
       this.setState({
         featuresLength: 1,
       });
     } else if (HighlightedFeaturesArrVolcano.length > 1) {
       this.setState({
-        featuresLength: HighlightedFeaturesArrVolcano.length || 0,
+        featuresLength:
+          HighlightedFeaturesArrVolcano.length || sortedData.length,
       });
     } else {
       let sortedData =
@@ -712,7 +737,9 @@ class DifferentialVolcano extends Component {
                       }
                       alt="Volcano Plot"
                       className={
-                        isDataStreamingResultsTable ? 'CursorNotAllowed' : ''
+                        isDataStreamingResultsTable
+                          ? 'CursorNotAllowed'
+                          : 'NoSelect'
                       }
                       id="VolcanoPlotButton"
                       onClick={
@@ -919,7 +946,7 @@ class DifferentialVolcano extends Component {
                           }
                         >
                           <Label
-                            className="MultiFeaturePlotBtn"
+                            className="MultiFeaturePlotBtn NoSelect"
                             size={dynamicSizeLarger}
                             // color="blue"
                             // image
