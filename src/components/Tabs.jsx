@@ -264,8 +264,8 @@ class Tabs extends Component {
         </Popup>
         <Modal
           size="small"
-          closeOnDimmerClick="true"
-          closeOnEscape="true"
+          closeOnDimmerClick={true}
+          closeOnEscape={true}
           closeIcon
           centered={false}
           open={self.state.infoOpenFirst}
