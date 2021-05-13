@@ -14,7 +14,6 @@ import {
   roundToPrecision,
   limitValues,
 } from '../Shared/helpers';
-import DOMPurify from 'dompurify';
 import { omicNavigatorService } from '../../services/omicNavigator.service';
 import DifferentialVolcano from './DifferentialVolcano';
 import _ from 'lodash';
@@ -509,7 +508,7 @@ class Differential extends Component {
   };
 
   getMultifeaturePlot = (view, tableData) => {
-    const { HighlightedFeaturesArrVolcano, differentialResults } = this.state;
+    const { HighlightedFeaturesArrVolcano } = this.state;
     const { differentialFeatureIdKey } = this.props;
     if (HighlightedFeaturesArrVolcano.length > 1) {
       const featureIds = HighlightedFeaturesArrVolcano.map(
@@ -1040,19 +1039,15 @@ class Differential extends Component {
           id="differentialMultisetAnalysisSVGDiv"
           className="MultisetSvgOuter"
         >
-          <SVG
-            cacheRequests={true}
-            // description=""
-            // loader={<span>{loadingDimmer}</span>}
-            // onError={error => console.log(error.message)}
-            // onLoad={(src, hasCache) => console.log(src, hasCache)}
-            // preProcessor={code => code.replace(/fill=".*?"/g, 'fill="currentColor"')}
-            src={srcUrl}
-            // title={`${s.plotType.plotDisplay}`}
-            uniqueHash="b2g9e2"
-            uniquifyIDs={true}
-            id="differentialMultisetAnalysisSVG"
-          />
+          {multisetPlotInfoDifferential.svg?.length ? (
+            <SVG
+              cacheRequests={true}
+              src={srcUrl}
+              uniqueHash="b2g9e2"
+              uniquifyIDs={true}
+              id="differentialMultisetAnalysisSVG"
+            />
+          ) : null}
         </div>
       </Sidebar>
     );

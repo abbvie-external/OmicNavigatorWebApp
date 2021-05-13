@@ -1,3 +1,4 @@
+/* eslint-disable */
 'use strict';
 
 if (process.env.NODE_ENV === 'production') {

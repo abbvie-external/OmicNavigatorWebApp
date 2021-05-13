@@ -12,7 +12,6 @@ import {
 } from 'semantic-ui-react';
 import ndjsonStream from 'can-ndjson-stream';
 import { CancelToken } from 'axios';
-import DOMPurify from 'dompurify';
 import '../Shared/SearchCriteria.scss';
 import { omicNavigatorService } from '../../services/omicNavigator.service';
 import DifferentialMultisetFilters from './DifferentialMultisetFilters';

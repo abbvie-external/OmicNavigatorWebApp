@@ -63,7 +63,7 @@ class Tabs extends Component {
       allStudiesMetadata: [],
       differentialFeatureIdKey: '',
       filteredDifferentialFeatureIdKey: '',
-      appVersion: '1.1.5',
+      appVersion: '1.1.6',
       packageVersion: '',
       infoOpenFirst: false,
       infoOpenSecond: false,
@@ -264,8 +264,8 @@ class Tabs extends Component {
         </Popup>
         <Modal
           size="small"
-          closeOnDimmerClick="true"
-          closeOnEscape="true"
+          closeOnDimmerClick={true}
+          closeOnEscape={true}
           closeIcon
           centered={false}
           open={self.state.infoOpenFirst}
@@ -382,7 +382,7 @@ class Tabs extends Component {
   };
 
   render() {
-    const { activeIndex, appVersion, packageVersion } = this.state;
+    const { activeIndex } = this.state;
     const panes = [
       {
         menuItem: (

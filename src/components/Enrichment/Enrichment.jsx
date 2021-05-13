@@ -1,4 +1,3 @@
-import DOMPurify from 'dompurify';
 import _ from 'lodash';
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
@@ -1182,7 +1181,6 @@ class Enrichment extends Component {
     this.setState({ svgExportName: id });
     let handleSVGCb = this.handleSVG;
     let handlePlotStudyError = this.handlePlotStudyError;
-    let currentSVGs = [];
     cancelRequestEnrichmentGetPlot();
     let cancelToken = new CancelToken(e => {
       cancelRequestEnrichmentGetPlot = e;
@@ -2268,19 +2266,15 @@ class Enrichment extends Component {
           </Grid.Row>
         </Grid>
         <div className="MultisetSvgOuter" id="enrichmentMultisetAnalysisSVGDiv">
-          <SVG
-            cacheRequests={true}
-            // description=""
-            // loader={<span>{loadingDimmer}</span>}
-            // onError={error => console.log(error.message)}
-            // onLoad={(src, hasCache) => console.log(src, hasCache)}
-            // preProcessor={code => code.replace(/fill=".*?"/g, 'fill="currentColor"')}
-            src={srcUrl}
-            // title={`${s.plotType.plotDisplay}`}
-            uniqueHash="d4i1g4"
-            uniquifyIDs={true}
-            id="enrichmentMultisetAnalysisSVG"
-          />
+          {multisetPlotInfoEnrichment.svg?.length ? (
+            <SVG
+              cacheRequests={true}
+              src={srcUrl}
+              uniqueHash="d4i1g4"
+              uniquifyIDs={true}
+              id="enrichmentMultisetAnalysisSVG"
+            />
+          ) : null}
         </div>
       </Sidebar>
     );

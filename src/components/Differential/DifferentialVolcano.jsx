@@ -180,6 +180,8 @@ class DifferentialVolcano extends Component {
       for (let [key, value] of Object.entries(firstFullObject)) {
         if (typeof value === 'string' || value instanceof String) {
           differentialAlphanumericFields.push(key);
+        } else {
+          relevantConfigColumns.push(key);
         }
       }
       //Pushes "none" option into Volcano circle text dropdown
