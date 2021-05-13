@@ -283,15 +283,9 @@ class Tabs extends Component {
               </Header>
               <p>
                 To report a bug, please open a GitHub Issue within our{' '}
-                <a
-                  className="CursorPointer"
-                  onClick={() => self.toggleInfoSecond(true)}
-                >
-                  public repository
-                </a>{' '}
-                (note that anything you write is open to the public and not
-                private to AbbVie). In your report, please include the app and
-                package versions listed above.
+                <b>public repository</b> (note that anything you write is open
+                to the public and not private to AbbVie). In your report, please
+                include the app and package versions listed above.
               </p>
               <p>
                 If you are an AbbVie employee and need to include specific
