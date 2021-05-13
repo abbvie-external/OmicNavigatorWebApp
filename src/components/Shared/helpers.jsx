@@ -145,13 +145,13 @@ export function formatNumberForDisplay(num) {
 }
 
 export function splitValue(value) {
-  if (value) {
+  if (value && value.isNaN) {
     const firstValue = value.split(';')[0];
     const numberOfSemicolons = (value.match(/;/g) || []).length;
     return numberOfSemicolons > 0
       ? `${firstValue}...(${numberOfSemicolons})`
       : firstValue;
-  }
+  } else return value;
 }
 
 export function findDomain(link) {

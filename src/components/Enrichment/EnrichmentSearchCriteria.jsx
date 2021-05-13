@@ -233,7 +233,7 @@ class EnrichmentSearchCriteria extends Component {
             annotationID: enrichmentAnnotation,
             type: pValueType,
           };
-          const fetchUrlEnrichmentsTable = `${this.props.baseUrl}/ocpu/library/OmicNavigator/R/getEnrichmentsTable/ndjson?auto_unbox=true&digits=10`;
+          const fetchUrlEnrichmentsTable = `${this.props.baseUrl}/ocpu/library/OmicNavigator/R/getEnrichmentsTable/ndjson?auto_unbox=true&digits=10&na="string"`;
           fetch(fetchUrlEnrichmentsTable, {
             method: 'POST',
             headers: {
@@ -446,7 +446,7 @@ class EnrichmentSearchCriteria extends Component {
       annotationID: value,
       type: pValueType,
     };
-    const fetchUrlEnrichmentsTable = `${this.props.baseUrl}/ocpu/library/OmicNavigator/R/getEnrichmentsTable/ndjson?auto_unbox=true&digits=10`;
+    const fetchUrlEnrichmentsTable = `${this.props.baseUrl}/ocpu/library/OmicNavigator/R/getEnrichmentsTable/ndjson?auto_unbox=true&digits=10&na="string"`;
     fetch(fetchUrlEnrichmentsTable, {
       method: 'POST',
       headers: {
@@ -579,7 +579,7 @@ class EnrichmentSearchCriteria extends Component {
         annotationID: enrichmentAnnotation,
         type: value,
       };
-      const fetchUrlEnrichmentsTable = `${this.props.baseUrl}/ocpu/library/OmicNavigator/R/getEnrichmentsTable/ndjson?auto_unbox=true&digits=10`;
+      const fetchUrlEnrichmentsTable = `${this.props.baseUrl}/ocpu/library/OmicNavigator/R/getEnrichmentsTable/ndjson?auto_unbox=true&digits=10&na="string"`;
       fetch(fetchUrlEnrichmentsTable, {
         method: 'POST',
         headers: {
@@ -724,7 +724,7 @@ class EnrichmentSearchCriteria extends Component {
       annotationID: value,
       type: pValueType,
     };
-    const fetchUrlEnrichmentsTable = `${this.props.baseUrl}/ocpu/library/OmicNavigator/R/getEnrichmentsTable/?auto_unbox=true&digits=10`;
+    const fetchUrlEnrichmentsTable = `${this.props.baseUrl}/ocpu/library/OmicNavigator/R/getEnrichmentsTable/?auto_unbox=true&digits=10&na="string"`;
     fetch(fetchUrlEnrichmentsTable, {
       method: 'POST',
       headers: {
@@ -868,17 +868,6 @@ class EnrichmentSearchCriteria extends Component {
         cancelToken,
       )
       .then(annotationData => {
-        // let countAlphanumericFields = [];
-        // const firstObject = annotationData[0];
-        // const totalLength = Object.keys(firstObject).length;
-        // for (let [key, value] of Object.entries(firstObject)) {
-        //   if (typeof value === 'string' || value instanceof String) {
-        //     countAlphanumericFields.push(key);
-        //   }
-        // }
-        // const alphanumericLength = countAlphanumericFields.length;
-        // const annotationTestsLength = totalLength - alphanumericLength;
-        // if (reloadPlot === true && annotationTestsLength > 1) {
         const multisetResults = annotationData;
         this.setState({
           mustEnrichment,
