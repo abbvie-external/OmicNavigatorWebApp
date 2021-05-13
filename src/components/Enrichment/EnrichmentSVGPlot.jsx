@@ -88,13 +88,7 @@ class EnrichmentSVGPlot extends PureComponent {
               <div id="EnrichmentPlotSVGDiv" className="svgSpan">
                 <SVG
                   cacheRequests={true}
-                  // description=""
-                  // loader={<span>{loadingDimmer}</span>}
-                  // onError={error => console.log(error.message)}
-                  // onLoad={(src, hasCache) => console.log(src, hasCache)}
-                  // preProcessor={code => code.replace(/fill=".*?"/g, 'fill="currentColor"')}
                   src={srcUrl}
-                  // title={`${s.plotType.plotDisplay}`}
                   uniqueHash="e5j2h5"
                   uniquifyIDs={true}
                   id="EnrichmentPlotSVG"

@@ -130,13 +130,7 @@ class DifferentialPlot extends PureComponent {
                 <div id="DifferentialPlotTabsPlotSVGDiv" className="svgSpan">
                   <SVG
                     cacheRequests={true}
-                    // description=""
-                    // loader={<span>{loadingDimmer}</span>}
-                    // onError={error => console.log(error.message)}
-                    // onLoad={(src, hasCache) => console.log(src, hasCache)}
-                    // preProcessor={code => code.replace(/fill=".*?"/g, 'fill="currentColor"')}
                     src={srcUrl}
-                    // title={`${s.plotType.plotDisplay}`}
                     uniqueHash="c3h0f3"
                     uniquifyIDs={true}
                     id="DifferentialPlotTabsPlotSVG"

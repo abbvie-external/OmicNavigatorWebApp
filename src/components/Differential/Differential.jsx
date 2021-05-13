@@ -1042,13 +1042,7 @@ class Differential extends Component {
           {multisetPlotInfoDifferential.svg?.length ? (
             <SVG
               cacheRequests={true}
-              // description=""
-              // loader={<span>{loadingDimmer}</span>}
-              // onError={error => console.log(error.message)}
-              // onLoad={(src, hasCache) => console.log(src, hasCache)}
-              // preProcessor={code => code.replace(/fill=".*?"/g, 'fill="currentColor"')}
               src={srcUrl}
-              // title={`${s.plotType.plotDisplay}`}
               uniqueHash="b2g9e2"
               uniquifyIDs={true}
               id="differentialMultisetAnalysisSVG"
