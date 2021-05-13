@@ -14,7 +14,6 @@ import {
   roundToPrecision,
   limitValues,
 } from '../Shared/helpers';
-import DOMPurify from 'dompurify';
 import { omicNavigatorService } from '../../services/omicNavigator.service';
 import DifferentialVolcano from './DifferentialVolcano';
 import _ from 'lodash';
@@ -509,7 +508,7 @@ class Differential extends Component {
   };
 
   getMultifeaturePlot = (view, tableData) => {
-    const { HighlightedFeaturesArrVolcano, differentialResults } = this.state;
+    const { HighlightedFeaturesArrVolcano } = this.state;
     const { differentialFeatureIdKey } = this.props;
     if (HighlightedFeaturesArrVolcano.length > 1) {
       const featureIds = HighlightedFeaturesArrVolcano.map(

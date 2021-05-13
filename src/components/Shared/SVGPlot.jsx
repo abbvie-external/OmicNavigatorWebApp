@@ -1,4 +1,4 @@
-import React, { Component, Fragment, useRef } from 'react';
+import React, { Component } from 'react';
 import {
   Loader,
   Dimmer,

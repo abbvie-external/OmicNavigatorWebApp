@@ -382,7 +382,7 @@ class Tabs extends Component {
   };
 
   render() {
-    const { activeIndex, appVersion, packageVersion } = this.state;
+    const { activeIndex } = this.state;
     const panes = [
       {
         menuItem: (
