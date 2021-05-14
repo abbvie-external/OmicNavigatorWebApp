@@ -5,6 +5,7 @@ import { Step, Loader, Button, Breadcrumb } from 'semantic-ui-react';
 import * as d3 from 'd3';
 import * as hexbin from 'd3-hexbin';
 import ButtonActions from '../Shared/ButtonActions';
+import { schemeSet3 } from 'd3';
 
 class DifferentialVolcanoPlot extends React.PureComponent {
   plotCirclesSorted = [];
@@ -56,7 +57,10 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         this.windowResized();
       }, 200);
     });
-
+    if (!this.props.isDataStreamingResultsTable) {
+      this.setupVolcano();
+      this.hexBinning(this.props.differentialResultsUnfiltered);
+    }
     // this.hexBinning(this.createCircleElements(this.differentialResults));
     // this.hexBinning(this.differentialResults);
   }
@@ -109,14 +113,14 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       .attr('clip-path', 'url(#clip)')
       .attr('id', 'clip-path');
 
-    area.append('g').attr('id', 'filtered-elements');
-    area.append('g').attr('id', 'nonfiltered-elements');
-
     const g = d3
-      .select('svg')
+      .select('#clip-path')
       .append('g')
       .attr('class', 'volcanoPlotD3BrushSelection')
       .attr('fill', 'none');
+
+    area.append('g').attr('id', 'filtered-elements');
+    area.append('g').attr('id', 'nonfiltered-elements');
 
     const yAxis = d3
       .select('svg')
@@ -247,6 +251,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       // xAxisLabel,
       // yAxisLabel,
       // identifier,
+      differentialResults,
       isFilteredDifferential,
     } = this.props;
 
@@ -443,33 +448,33 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         currentResults: data,
         circles: circles,
         bins: bins,
-        filterState: reset ? {} : this.state.filterState,
-        zoom: {
-          history: !breadCrumb
-            ? [
-                ...this.state.zoom.history,
-                this.createCircleElements(
-                  this.props.differentialResultsUnfiltered,
-                ),
-              ]
-            : reset
-            ? [data]
-            : // : isFilteredDifferential
-              // ? this.state.zoom.history.splice(breadCrumbIndex, 1, data)
-              [...this.state.zoom.history],
-          activeIndex: !breadCrumb
-            ? this.state.zoom.history.length
-            : breadCrumbIndex,
-          historyLastViewed: !reset
-            ? this.setLastViewed(
-                this.state.zoom.historyLastViewed,
-                data,
-                !breadCrumb ? this.state.zoom.history.length : breadCrumbIndex,
-              )
-            : {
-                0: this.state.zoom.history[0],
-              },
-        },
+        // filterState: reset ? {} : this.state.filterState,
+        // zoom: {
+        //   history: !breadCrumb
+        //     ? [
+        //         ...this.state.zoom.history,
+        //         this.createCircleElements(
+        //           this.props.differentialResultsUnfiltered,
+        //         ),
+        //       ]
+        //     : reset
+        //     ? [data]
+        //     : // : isFilteredDifferential
+        //       // ? this.state.zoom.history.splice(breadCrumbIndex, 1, data)
+        //       [...this.state.zoom.history],
+        //   activeIndex: !breadCrumb
+        //     ? this.state.zoom.history.length
+        //     : breadCrumbIndex,
+        //   historyLastViewed: !reset
+        //     ? this.setLastViewed(
+        //         this.state.zoom.historyLastViewed,
+        //         data,
+        //         !breadCrumb ? this.state.zoom.history.length : breadCrumbIndex,
+        //       )
+        //     : {
+        //         0: this.state.zoom.history[0],
+        //       },
+        // },
       };
 
       this.setState({ ...volcanoState });
@@ -489,40 +494,40 @@ class DifferentialVolcanoPlot extends React.PureComponent {
 
       // this.circles = this.plotCirclesSorted;
 
-      // let volcanoState = {
-      //   filterState: reset ? {} : this.state.filterState,
-      //   volcanoCircleText: breadCrumb ? [] : this.props.volcanoCircleText,
-      //   currentResults: data,
-      //   circles: [this.plotCirclesSorted],
-      //   bins: [],
-      //   zoom: {
-      //     history: !breadCrumb
-      //       ? [
-      //           ...this.state.zoom.history,
-      //           this.createCircleElements(
-      //             this.props.differentialResultsUnfiltered,
-      //           ),
-      //         ]
-      //       : reset
-      //       ? [data]
-      //       : // : isFilteredDifferential
-      //         // ? [...this.state.zoom.history.splice(breadCrumbIndex, 1, data)]
-      //         [...this.state.zoom.history],
-      //     activeIndex: !breadCrumb
-      //       ? this.state.zoom.history.length
-      //       : breadCrumbIndex,
-      //     historyLastViewed: !reset
-      //       ? this.setLastViewed(
-      //           this.state.zoom.historyLastViewed,
-      //           data,
-      //           !breadCrumb ? this.state.zoom.history.length : breadCrumbIndex,
-      //         )
-      //       : {
-      //           0: this.state.zoom.history[0],
-      //         },
-      //   },
-      // };
-      // this.setState({ ...volcanoState });
+      let volcanoState = {
+        // filterState: reset ? {} : this.state.filterState,
+        volcanoCircleText: breadCrumb ? [] : this.props.volcanoCircleText,
+        currentResults: data,
+        circles: data,
+        bins: [],
+        // zoom: {
+        //   history: !breadCrumb
+        //     ? [
+        //         ...this.state.zoom.history,
+        //         this.createCircleElements(
+        //           this.props.differentialResultsUnfiltered,
+        //         ),
+        //       ]
+        //     : reset
+        //     ? [data]
+        //     : // : isFilteredDifferential
+        //       // ? [...this.state.zoom.history.splice(breadCrumbIndex, 1, data)]
+        //       [...this.state.zoom.history],
+        //   activeIndex: !breadCrumb
+        //     ? this.state.zoom.history.length
+        //     : breadCrumbIndex,
+        //   historyLastViewed: !reset
+        //     ? this.setLastViewed(
+        //         this.state.zoom.historyLastViewed,
+        //         data,
+        //         !breadCrumb ? this.state.zoom.history.length : breadCrumbIndex,
+        //       )
+        //     : {
+        //         0: this.state.zoom.history[0],
+        //       },
+        // },
+      };
+      this.setState({ ...volcanoState });
       // this.props.onHandleVolcanoState(
       //   volcanoState.zoom,
       //   this.plotCirclesSorted.length,
@@ -543,7 +548,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
 
     this.differentialResults = data;
 
-    this.props.onHandleUpdateDifferentialResults(this.differentialResults);
+    this.props.onHandleUpdateDifferentialResults(differentialResults);
 
     if (reset || breadCrumb) {
       this.props.handleVolcanoPlotSelectionChange(data);
@@ -608,19 +613,19 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     return color(length);
   }
 
-  scaleBinsCustom(bins, data) {
-    const { volcanoWidth, volcanoHeight, xAxisLabel, yAxisLabel } = this.props;
-    const { xScale, yScale } = this.scaleFactory(data);
+  // scaleBinsCustom(bins, data) {
+  //   const { volcanoWidth, volcanoHeight, xAxisLabel, yAxisLabel } = this.props;
+  //   const { xScale, yScale } = this.scaleFactory(data);
 
-    const hexb = hexbin
-      .hexbin()
-      .x(d => xScale(this.doTransform(d[xAxisLabel], 'x')))
-      .y(d => yScale(this.doTransform(d[yAxisLabel], 'y')))
-      // .size({ volcanoWidth, volcanoHeight })
-      .radius(5);
+  //   const hexb = hexbin
+  //     .hexbin()
+  //     .x(d => xScale(this.doTransform(d[xAxisLabel], 'x')))
+  //     .y(d => yScale(this.doTransform(d[yAxisLabel], 'y')))
+  //     // .size({ volcanoWidth, volcanoHeight })
+  //     .radius(5);
 
-    return hexb(bins);
-  }
+  //   return hexb(bins);
+  // }
 
   parseDataToBinsAndCircles(data, xScale, yScale) {
     const { volcanoWidth, volcanoHeight, xAxisLabel, yAxisLabel } = this.props;
@@ -652,6 +657,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
 
   renderBinsFilter(bins) {
     const svg = d3.select('#filtered-elements');
+    // const svg = d3.select('#clip-path');
 
     svg
       .selectAll('path')
@@ -662,8 +668,8 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       .attr('stroke-opacity', 1)
       .attr('stroke-width', 1)
       .attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(5)}`)
-      .attr('fill', d => '#aab1c0')
-      .attr('id', d => `path-${Math.ceil(d.x)}-${Math.ceil(d.y)}-${d.length}`);
+      .attr('fill', d => '#aab1c0');
+    // .attr('id', d => `path-${Math.ceil(d.x)}-${Math.ceil(d.y)}-${d.length}`);
     // .on('mouseenter', d => {
     //   if (!this.state.brushing) {
     //     d3.select(`#path-${Math.ceil(d.x)}-${Math.ceil(d.y)}-${d.length}`)
@@ -699,6 +705,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
 
   renderBins(bins) {
     const svg = d3.select('#nonfiltered-elements');
+    // const svg = d3.select('#clip-path');
 
     // svg
     //   .selectAll('path')
@@ -719,26 +726,25 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       .attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(5)}`)
       .attr('fill', d => this.determineBinColor(bins, d.length))
       .attr('id', d => `path-${Math.ceil(d.x)}-${Math.ceil(d.y)}-${d.length}`)
+      .attr('cursor', 'pointer')
       .on('mouseenter', d => {
-        if (!this.state.brushing) {
-          d3.select(`#path-${Math.ceil(d.x)}-${Math.ceil(d.y)}-${d.length}`)
-            .attr('stroke', '#00aeff')
-            .attr('fill', '#00aeff')
-            .attr('cursor', 'pointer')
-            .attr('stroke-width', 5)
-            .raise();
+        d3.select(`#path-${Math.ceil(d.x)}-${Math.ceil(d.y)}-${d.length}`)
+          .attr('stroke', '#000')
+          .attr('fill', '#00aeff')
+          .attr('stroke-width', 1)
+          .attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(8)}`)
+          .raise();
 
-          this.setState({
-            hoveredBin: d,
-            hoveredElement: 'bin',
-            hovering: true,
-          });
-        }
+        this.setState({
+          hoveredBin: d,
+          hoveredElement: 'bin',
+          hovering: true,
+        });
       })
       .on('mouseleave', d => {
-        const bin = d3.select(
-          `#path-${Math.ceil(d.x)}-${Math.ceil(d.y)}-${d.length}`,
-        );
+        const bin = d3
+          .select(`#path-${Math.ceil(d.x)}-${Math.ceil(d.y)}-${d.length}`)
+          .attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(5)}`);
 
         if (bin.attr('class') !== 'highlighted') {
           bin
@@ -749,6 +755,8 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         this.setState({
           hovering: false,
         });
+
+        d3.select('#tooltip').remove();
       });
     // .on('click', (item, index) => {
     //   // this.hexBinning(item);
@@ -778,6 +786,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     );
 
     const svg = d3.select('#filtered-elements');
+    // const svg = d3.select('#clip-path');
     svg
       .selectAll('circle')
       .data(circles)
@@ -790,7 +799,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       .attr('stroke', '#aab1c0')
       .attr('strokeWidth', 0.4)
       .attr('class', 'volcanoPlot-dataPoint')
-      .attr('id', d => `volcanoDataPoint-${d[identifier]}`)
+      // .attr('id', d => `volcanoDataPoint-${d[identifier]}`)
       .attr('circleid', d => `${d[identifier]}`)
       .attr('key', (d, index) => `${d[identifier]}_${index}`)
       .attr('data', d => JSON.stringify(d))
@@ -832,6 +841,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     );
 
     const svg = d3.select('#nonfiltered-elements');
+    // const svg = d3.select('#clip-path');
     svg
       .selectAll('circle')
       .data(circles)
@@ -852,16 +862,14 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       .attr('data', d => JSON.stringify(d))
       .attr('ystatistic', d => `${this.doTransform(d[yAxisLabel], 'y')}`)
       .attr('xstatistic', d => `${this.doTransform(d[xAxisLabel], 'x')}`)
+      .attr('cursor', 'pointer')
       .on('mouseenter', e => {
-        if (!this.state.brushing) {
-          d3.select(`#volcanoDataPoint-${e[identifier]}`).attr(
-            'cursor',
-            'pointer',
-          );
-          this.handleCircleHover(e);
-        }
+        this.handleCircleHover(e);
       })
-      .on('mouseleave', () => this.handleCircleLeave())
+      .on('mouseleave', e => {
+        this.handleCircleLeave(e);
+        d3.select('#tooltip').remove();
+      })
       .on('click', e => {
         d3.event.stopPropagation();
         const elem = d3.select(`#volcanoDataPoint-${e[identifier]}`)
@@ -1133,11 +1141,12 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     if (!isDataStreamingResultsTable && prevProps.isDataStreamingResultsTable) {
       this.setupVolcano();
       this.hexBinning(differentialResultsUnfiltered);
-    }
-
-    if (prevProps.isFilteredDifferential && !isFilteredDifferential) {
+    } else if (
+      (prevProps.isFilteredDifferential && !isFilteredDifferential) ||
+      (prevProps.isUpsetVisible && !this.props.isUpsetVisible)
+    ) {
       this.transitionZoom(this.state.currentResults);
-      // console.log('here');
+      //console.log('here');
 
       // d3.select('#clip-path')
       //   .selectAll('path')
@@ -1295,7 +1304,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       volcanoDifferentialTableRowMax !==
         prevProps.volcanoDifferentialTableRowMax
     ) {
-      // var self = this;
+      //var self = this;
       // excessive styling needed for proper display across all export types
       // style all circles back to default
       const allCircles = d3.selectAll('circle.volcanoPlot-dataPoint');
@@ -1399,6 +1408,8 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         prevProps.doYAxisTransformation !== doYAxisTransformation)
     ) {
       this.removeViolinBrush();
+      this.setupVolcano();
+      this.hexBinning(differentialResultsUnfiltered);
       // this.hexBinning(
       //   this.createCircleElements(
       //     this.state.zoom.historyLastViewed[
@@ -1522,13 +1533,18 @@ class DifferentialVolcanoPlot extends React.PureComponent {
           });
         }
       }
+
+      this.getToolTip();
     }
   };
-  handleCircleLeave() {
+  handleCircleLeave(e) {
     d3.selectAll('circle.volcanoPlot-dataPoint').classed('hovered', false);
     const hovered = document.getElementById(this.state.hoveredCircleElement);
     if (hovered != null) {
-      const hoveredCircle = d3.select(hovered)._groups[0][0] ?? null;
+      // const hoveredCircle = d3.select(hovered)._groups[0][0] ?? null;
+      const hoveredCircle =
+        d3.select(`#volcanoDataPoint-${e[this.props.identifier]}`)
+          ._groups[0][0] ?? null;
       if (hoveredCircle != null) {
         // if (!hoveredCircle.empty()) {
         if (hoveredCircle.attributes['class'].value.endsWith('selected')) {
@@ -1542,7 +1558,9 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         ) {
           hoveredCircle.attributes['r'].value = 4;
         } else {
+          console.log('here');
           hoveredCircle.attributes['r'].value = 2;
+          console.log(hoveredCircle.attributes['r']);
         }
         // }
         this.setState({
@@ -1575,6 +1593,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     if (hovering) {
       if (hoveredElement === 'bin') {
         const bin = hoveredBin;
+        console.log('hoveredElement', bin);
         const xstat = bin
           .map(circle => this.doTransform(circle[xAxisLabel], 'x'))
           .reduce((reducer, stat) => reducer + stat);
@@ -1601,46 +1620,90 @@ class DifferentialVolcanoPlot extends React.PureComponent {
             yAxisLabel +
             ': ' +
             parseFloat(ystat / bin.length).toFixed(4);
-        return (
-          <svg
-            x={bin.x >= 240 ? bin.x * 1 - 170 : bin.x * 1 + 15}
-            y={bin.y * 1 + 10}
-            width="200"
-            height="75"
-          >
-            <rect
-              width="100%"
-              height="100%"
-              fill="#ff4400"
-              rx="5"
-              ry="5"
-            ></rect>
-            <rect
-              width="100%"
-              height="96%"
-              fill="#2e2e2e"
-              stroke="#000"
-              rx="3"
-              ry="3"
-            ></rect>
-            <text
-              fontSize="13px"
-              fill="#FFF"
-              fontFamily="Lato, Helvetica Neue, Arial, Helvetica, sans-serif"
-              textAnchor="left"
-            >
-              <tspan x={15} y={23}>
-                {`Total features: ${bin.length}`}
-              </tspan>
-              <tspan x={15} y={23 + 16}>
-                {xText}
-              </tspan>
-              <tspan x={15} y={23 + 16 * 2}>
-                {yText}
-              </tspan>
-            </text>
-          </svg>
-        );
+        d3.select('svg')
+          .append('svg')
+          .attr('width', 200)
+          .attr('height', 75)
+          .attr('x', bin.x >= 240 ? bin.x * 1 - 170 : bin.x * 1 + 15)
+          .attr('y', bin.y * 1 + 10)
+          .attr('id', 'tooltip')
+          .append('rect')
+          .attr('width', '100%')
+          .attr('height', '100%')
+          .attr('fill', '#ff4400')
+          .attr('rx', '5')
+          .attr('ry', '5');
+
+        d3.select('#tooltip')
+          .append('rect')
+          .attr('width', '100%')
+          .attr('height', '96%')
+          .attr('fill', '#2e2e2e')
+          .attr('stroke', '#000')
+          .attr('rx', '3')
+          .attr('ry', '3');
+
+        d3.select('#tooltip')
+          .append('text')
+          .attr('fontSize', '13px')
+          .attr('fill', '#FFF')
+          .attr(
+            'fontFamily',
+            'Lato, Helvetica Neue, Arial, Helvetica, sans-serif',
+          )
+          .attr('textAnchor', 'left')
+          .insert('tspan')
+          .attr('x', 15)
+          .attr('y', 23)
+          .text(`Total features: ${bin.length}`)
+          .insert('tspan')
+          .attr('x', 15)
+          .attr('y', 23 + 16)
+          .text(xText)
+          .insert('tspan')
+          .attr('x', 15)
+          .attr('y', 23 + 16 * 2)
+          .text(yText);
+        // return (
+        //   <svg
+        //     x={bin.x >= 240 ? bin.x * 1 - 170 : bin.x * 1 + 15}
+        //     y={bin.y * 1 + 10}
+        //     width="200"
+        //     height="75"
+        //   >
+        //     <rect
+        //       width="100%"
+        //       height="100%"
+        //       fill="#ff4400"
+        //       rx="5"
+        //       ry="5"
+        //     ></rect>
+        //     <rect
+        //       width="100%"
+        //       height="96%"
+        //       fill="#2e2e2e"
+        //       stroke="#000"
+        //       rx="3"
+        //       ry="3"
+        //     ></rect>
+        //     <text
+        //       fontSize="13px"
+        //       fill="#FFF"
+        //       fontFamily="Lato, Helvetica Neue, Arial, Helvetica, sans-serif"
+        //       textAnchor="left"
+        //     >
+        //       <tspan x={15} y={23}>
+        //         {`Total features: ${bin.length}`}
+        //       </tspan>
+        //       <tspan x={15} y={23 + 16}>
+        //         {xText}
+        //       </tspan>
+        //       <tspan x={15} y={23 + 16 * 2}>
+        //         {yText}
+        //       </tspan>
+        //     </text>
+        //   </svg>
+        // );
       } else if (hoveredElement === 'circle') {
         const idText = identifier + ': ' + hoveredCircleData.id;
         const xText = doXAxisTransformation
@@ -1655,50 +1718,99 @@ class DifferentialVolcanoPlot extends React.PureComponent {
             '): ' +
             parseFloat(hoveredCircleData.ystat).toFixed(4)
           : yAxisLabel + ': ' + parseFloat(hoveredCircleData.ystat).toFixed(4);
-        return (
-          <svg
-            x={
-              hoveredCircleData.position[0] >= 240
-                ? hoveredCircleData.position[0] * 1 - 170
-                : hoveredCircleData.position[0] * 1 + 15
-            }
-            y={hoveredCircleData.position[1] * 1 + 10}
-            width="200"
-            height="75"
-          >
-            <rect
-              width="100%"
-              height="100%"
-              fill="#ff4400"
-              rx="5"
-              ry="5"
-            ></rect>
-            <rect
-              width="100%"
-              height="95%"
-              fill="#2e2e2e"
-              stroke="#000"
-              rx="3"
-              ry="3"
-            ></rect>
-            <text
-              fontSize="13px"
-              fill="#FFF"
-              fontFamily="Lato, Helvetica Neue, Arial, Helvetica, sans-serif"
-              textAnchor="left"
-            >
-              <tspan x={15} y={23}>
-                {idText}
-              </tspan>
-              <tspan x={15} y={23 + 16}>
-                {xText}
-              </tspan>
-              <tspan x={15} y={23 + 16 * 2}>
-                {yText}
-              </tspan>
-            </text>
-          </svg>
-        );
+        d3.select('svg')
+          .append('svg')
+          .attr('width', 200)
+          .attr('height', 75)
+          .attr(
+            'x',
+            hoveredCircleData.position[0] >= 240
+              ? hoveredCircleData.position[0] * 1 - 170
+              : hoveredCircleData.position[0] * 1 + 15,
+          )
+          .attr('y', hoveredCircleData.position[1] * 1 + 10)
+          .attr('id', 'tooltip')
+          .append('rect')
+          .attr('width', '100%')
+          .attr('height', '100%')
+          .attr('fill', '#ff4400')
+          .attr('rx', '5')
+          .attr('ry', '5');
+
+        d3.select('#tooltip')
+          .append('rect')
+          .attr('width', '100%')
+          .attr('height', '96%')
+          .attr('fill', '#2e2e2e')
+          .attr('stroke', '#000')
+          .attr('rx', '3')
+          .attr('ry', '3');
+
+        d3.select('#tooltip')
+          .append('text')
+          .attr('fontSize', '13px')
+          .attr('fill', '#FFF')
+          .attr(
+            'fontFamily',
+            'Lato, Helvetica Neue, Arial, Helvetica, sans-serif',
+          )
+          .attr('textAnchor', 'left')
+          .insert('tspan')
+          .attr('x', 15)
+          .attr('y', 23)
+          .text(idText)
+          .insert('tspan')
+          .attr('x', 15)
+          .attr('y', 23 + 16)
+          .text(xText)
+          .insert('tspan')
+          .attr('x', 15)
+          .attr('y', 23 + 16 * 2)
+          .text(yText);
+        // return (
+        //   <svg
+        // x={
+        // hoveredCircleData.position[0] >= 240
+        //   ? hoveredCircleData.position[0] * 1 - 170
+        //   : hoveredCircleData.position[0] * 1 + 15
+        //     }
+        //     y={hoveredCircleData.position[1] * 1 + 10}
+        //     width="200"
+        //     height="75"
+        //   >
+        //     <rect
+        //       width="100%"
+        //       height="100%"
+        //       fill="#ff4400"
+        //       rx="5"
+        //       ry="5"
+        //     ></rect>
+        //     <rect
+        //       width="100%"
+        //       height="95%"
+        //       fill="#2e2e2e"
+        //       stroke="#000"
+        //       rx="3"
+        //       ry="3"
+        //     ></rect>
+        //     <text
+        //       fontSize="13px"
+        //       fill="#FFF"
+        //       fontFamily="Lato, Helvetica Neue, Arial, Helvetica, sans-serif"
+        //       textAnchor="left"
+        //     >
+        //       <tspan x={15} y={23}>
+        //         {idText}
+        //       </tspan>
+        //       <tspan x={15} y={23 + 16}>
+        //         {xText}
+        //       </tspan>
+        //       <tspan x={15} y={23 + 16 * 2}>
+        //         {yText}
+        //       </tspan>
+        //     </text>
+        //   </svg>
+        // );
       }
     } else {
       return null;
@@ -1707,13 +1819,11 @@ class DifferentialVolcanoPlot extends React.PureComponent {
 
   updateVoclanoAfterUpsetFilter(data, xScale, yScale) {
     const self = this;
-    const { differentialResults, isUpsetVisible } = self.props;
-
-    const unfilteredObject = self.parseDataToBinsAndCircles(
-      data,
-      xScale,
-      yScale,
-    );
+    const {
+      differentialResults,
+      isUpsetVisible,
+      differentialFeatureIdKey,
+    } = self.props;
 
     d3.select('#clip-path')
       .selectAll('path')
@@ -1727,13 +1837,18 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       const filteredElements = _.differenceBy(
         data,
         differentialResults,
-        'Ensembl_Gene_ID',
+        differentialFeatureIdKey,
       );
 
-      const elementsToDisplay = _.differenceBy(
-        data,
+      const unfilteredObject = self.parseDataToBinsAndCircles(
         filteredElements,
-        'Ensembl_Gene_ID',
+        xScale,
+        yScale,
+      );
+
+      const elementsToDisplay = _.uniqBy(
+        _.differenceBy(data, filteredElements, differentialFeatureIdKey),
+        differentialFeatureIdKey,
       );
 
       const filteredObject = self.parseDataToBinsAndCircles(
@@ -1756,6 +1871,11 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         self.renderCircles(elementsToDisplay);
       }
     } else {
+      const unfilteredObject = self.parseDataToBinsAndCircles(
+        data,
+        xScale,
+        yScale,
+      );
       if (data.length >= 5000) {
         self.renderCircles(unfilteredObject.circles);
         self.renderBins(unfilteredObject.bins);
@@ -2397,7 +2517,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     //   (a, b) => a.props.cx - b.props.cx,
     // );
 
-    const hoveredCircleTooltip = this.getToolTip();
+    // const hoveredCircleTooltip = this.getToolTip();
 
     // this.setupBrush(volcanoWidth, volcanoHeight);
 
@@ -2448,7 +2568,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
               </Button>
             </Button.Group> */}
           </div>
-          <div className="breadcrumb-container">
+          {/* <div className="breadcrumb-container">
             {this.state.zoom?.history?.length > 0 ? (
               <Step.Group size="mini">
                 {this.state.zoom.history.map((zoom, index) => (
@@ -2535,9 +2655,9 @@ class DifferentialVolcanoPlot extends React.PureComponent {
                 clear all
               </span>
             ) : null}
-          </div>
+          </div> */}
           <div id="volcano">
-            {hoveredCircleTooltip}
+            {/* {hoveredCircleTooltip} */}
             {volcanoCircleText}
           </div>
           {/* <svg

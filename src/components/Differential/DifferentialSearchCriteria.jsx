@@ -714,7 +714,7 @@ class DifferentialSearchCriteria extends Component {
       });
     } else {
       // on toggle close
-      this.props.onSearchTransitionDifferentialAlt(true);
+      // this.props.onSearchTransitionDifferentialAlt(true);
       // this.props.onMultisetQueriedDifferential(false);
       this.props.onHandleUpsetVisible(false);
       this.props.onHandleIsFilteredDifferential(false);
