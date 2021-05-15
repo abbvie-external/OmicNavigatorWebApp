@@ -258,7 +258,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     // const width = volcanoWidth;
     // const height = volcanoHeight;
 
-    if (data.length > 5000) {
+    if (data.length > 2500) {
       // const {
       //   volcanoWidth,
       //   volcanoHeight,
@@ -668,7 +668,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       .attr('stroke-opacity', 1)
       .attr('stroke-width', 1)
       .attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(5)}`)
-      .attr('fill', d => '#aab1c0');
+      .attr('fill', d => '#E0E1E2');
     // .attr('id', d => `path-${Math.ceil(d.x)}-${Math.ceil(d.y)}-${d.length}`);
     // .on('mouseenter', d => {
     //   if (!this.state.brushing) {
@@ -728,33 +728,35 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       .attr('id', d => `path-${Math.ceil(d.x)}-${Math.ceil(d.y)}-${d.length}`)
       .attr('cursor', 'pointer')
       .on('mouseenter', d => {
-        d3.select(`#path-${Math.ceil(d.x)}-${Math.ceil(d.y)}-${d.length}`)
-          .attr('stroke', '#000')
-          .attr('fill', '#00aeff')
-          .attr('stroke-width', 1)
-          .attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(8)}`)
-          .raise();
+        this.handleBinHover(d);
+        // d3.select(`#path-${Math.ceil(d.x)}-${Math.ceil(d.y)}-${d.length}`)
+        //   .attr('stroke', '#000')
+        //   .attr('fill', '#00aeff')
+        //   .attr('stroke-width', 1)
+        //   .attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(8)}`)
+        //   .raise();
 
-        this.setState({
-          hoveredBin: d,
-          hoveredElement: 'bin',
-          hovering: true,
-        });
+        // this.setState({
+        //   hoveredBin: d,
+        //   hoveredElement: 'bin',
+        //   hovering: true,
+        // });
       })
       .on('mouseleave', d => {
-        const bin = d3
-          .select(`#path-${Math.ceil(d.x)}-${Math.ceil(d.y)}-${d.length}`)
-          .attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(5)}`);
+        this.handleBinLeave(d, bins);
+        // const bin = d3
+        //   .select(`#path-${Math.ceil(d.x)}-${Math.ceil(d.y)}-${d.length}`)
+        //   .attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(5)}`);
 
-        if (bin.attr('class') !== 'highlighted') {
-          bin
-            .attr('fill', d => this.determineBinColor(bins, d.length))
-            .attr('stroke', '#000')
-            .attr('stroke-width', 1);
-        }
-        this.setState({
-          hovering: false,
-        });
+        // if (bin.attr('class') !== 'highlighted') {
+        //   bin
+        //     .attr('fill', d => this.determineBinColor(bins, d.length))
+        //     .attr('stroke', '#000')
+        //     .attr('stroke-width', 1);
+        // }
+        // this.setState({
+        //   hovering: false,
+        // });
 
         d3.select('#tooltip').remove();
       });
@@ -794,7 +796,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       .append('circle')
       .attr('cx', d => `${xScale(this.doTransform(d[xAxisLabel], 'x'))}`)
       .attr('cy', d => `${yScale(this.doTransform(d[yAxisLabel], 'y'))}`)
-      .attr('fill', '#aab1c0')
+      .attr('fill', '#E0E1E2')
       .attr('r', 2)
       .attr('stroke', '#aab1c0')
       .attr('strokeWidth', 0.4)
@@ -1506,6 +1508,25 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     });
   };
 
+  handleBinHover = d => {
+    if (!this.state.brushing) {
+      d3.select(`#path-${Math.ceil(d.x)}-${Math.ceil(d.y)}-${d.length}`)
+        .attr('stroke', '#000')
+        .attr('fill', '#00aeff')
+        .attr('stroke-width', 1)
+        .attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(8)}`)
+        .raise();
+
+      this.setState({
+        hoveredBin: d,
+        hoveredElement: 'bin',
+        hovering: true,
+      });
+
+      this.getToolTip();
+    }
+  };
+
   handleCircleHover = e => {
     const elem = d3.select(`#volcanoDataPoint-${e[this.props.identifier]}`)
       ._groups[0][0];
@@ -1558,9 +1579,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         ) {
           hoveredCircle.attributes['r'].value = 4;
         } else {
-          console.log('here');
           hoveredCircle.attributes['r'].value = 2;
-          console.log(hoveredCircle.attributes['r']);
         }
         // }
         this.setState({
@@ -1575,6 +1594,21 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       }
     }
   }
+  handleBinLeave = (d, bins) => {
+    const bin = d3
+      .select(`#path-${Math.ceil(d.x)}-${Math.ceil(d.y)}-${d.length}`)
+      .attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(5)}`);
+
+    if (bin.attr('class') !== 'highlighted') {
+      bin
+        .attr('fill', d => this.determineBinColor(bins, d.length))
+        .attr('stroke', '#000')
+        .attr('stroke-width', 1);
+    }
+    this.setState({
+      hovering: false,
+    });
+  };
   getToolTip() {
     const {
       hoveredCircleData,
@@ -1590,10 +1624,15 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       doYAxisTransformation,
     } = this.props;
 
+    const clipPathHeight = d3
+      .select('#clip-path')
+      .node()
+      .getBBox().height;
+
     if (hovering) {
       if (hoveredElement === 'bin') {
         const bin = hoveredBin;
-        console.log('hoveredElement', bin);
+        const tooltipHeight = clipPathHeight - (bin.y * 1 + 10);
         const xstat = bin
           .map(circle => this.doTransform(circle[xAxisLabel], 'x'))
           .reduce((reducer, stat) => reducer + stat);
@@ -1620,12 +1659,12 @@ class DifferentialVolcanoPlot extends React.PureComponent {
             yAxisLabel +
             ': ' +
             parseFloat(ystat / bin.length).toFixed(4);
-        d3.select('svg')
+        d3.select('#nonfiltered-elements')
           .append('svg')
           .attr('width', 200)
           .attr('height', 75)
           .attr('x', bin.x >= 240 ? bin.x * 1 - 170 : bin.x * 1 + 15)
-          .attr('y', bin.y * 1 + 10)
+          .attr('y', tooltipHeight <= 75 ? bin.y * 1 - 85 : bin.y * 1 + 10)
           .attr('id', 'tooltip')
           .append('rect')
           .attr('width', '100%')
@@ -1706,6 +1745,8 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         // );
       } else if (hoveredElement === 'circle') {
         const idText = identifier + ': ' + hoveredCircleData.id;
+        const tooltipHeight =
+          clipPathHeight - (hoveredCircleData.position[1] * 1 + 10);
         const xText = doXAxisTransformation
           ? '-log(' +
             xAxisLabel +
@@ -1718,7 +1759,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
             '): ' +
             parseFloat(hoveredCircleData.ystat).toFixed(4)
           : yAxisLabel + ': ' + parseFloat(hoveredCircleData.ystat).toFixed(4);
-        d3.select('svg')
+        d3.select('#nonfiltered-elements')
           .append('svg')
           .attr('width', 200)
           .attr('height', 75)
@@ -1728,7 +1769,12 @@ class DifferentialVolcanoPlot extends React.PureComponent {
               ? hoveredCircleData.position[0] * 1 - 170
               : hoveredCircleData.position[0] * 1 + 15,
           )
-          .attr('y', hoveredCircleData.position[1] * 1 + 10)
+          .attr(
+            'y',
+            tooltipHeight <= 75
+              ? hoveredCircleData.position[1] * 1 - 85
+              : hoveredCircleData.position[1] * 1 + 10,
+          )
           .attr('id', 'tooltip')
           .append('rect')
           .attr('width', '100%')
@@ -1857,12 +1903,12 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         yScale,
       );
 
-      if (data.length >= 5000 && elementsToDisplay.length >= 5000) {
+      if (data.length >= 2500 && elementsToDisplay.length >= 2500) {
         self.renderCirclesFilter(unfilteredObject.circles);
         self.renderBinsFilter(unfilteredObject.bins);
         self.renderCircles(filteredObject.circles);
         self.renderBins(filteredObject.bins);
-      } else if (data.length >= 5000 && elementsToDisplay.length < 5000) {
+      } else if (data.length >= 2500 && elementsToDisplay.length < 2500) {
         self.renderCirclesFilter(unfilteredObject.circles);
         self.renderBinsFilter(unfilteredObject.bins);
         self.renderCircles(elementsToDisplay);
@@ -1876,7 +1922,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         xScale,
         yScale,
       );
-      if (data.length >= 5000) {
+      if (data.length >= 2500) {
         self.renderCircles(unfilteredObject.circles);
         self.renderBins(unfilteredObject.bins);
       } else {
@@ -1951,7 +1997,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
 
     const brushingStart = function() {
       self.setState({
-        brushing: d3.brushSelection(this)?.length ? true : false,
+        brushing: d3.brushSelection(this)?.length > 0 ? true : false,
         hoveredCircleData: {
           position: [],
           id: null,
@@ -2065,7 +2111,10 @@ class DifferentialVolcanoPlot extends React.PureComponent {
           //   ...brushedBins.map(elem => JSON.parse(elem.props.data)),
           // ]);
         }
-
+        d3.select('.volcanoPlotD3BrushSelection').call(
+          self.objsBrush.move,
+          null,
+        );
         self.setState({ brushing: false });
 
         // }
