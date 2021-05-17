@@ -140,18 +140,12 @@ class Differential extends Component {
     });
   };
 
-  handleDifferentialSearchUnfiltered = searchResults => {
-    this.setState({
-      differentialResultsUnfiltered: searchResults.differentialResults,
-      isItemSVGLoaded: false,
-      // isItemDatatLoaded: false,
-      // isItemSelected: this.props.differentialFeature !== '',
-      HighlightedFeaturesArrVolcano: [],
-      enableMultifeaturePlotting: false,
-    });
-  };
-
-  handleDifferentialSearch = searchResults => {
+  handleDifferentialSearch = (searchResults, setUnfiltered) => {
+    if (setUnfiltered) {
+      this.setState({
+        differentialResultsUnfiltered: searchResults.differentialResults,
+      });
+    }
     /**
      * @type {QHGrid.ColumnConfig<{}>[]}
      */
@@ -168,7 +162,7 @@ class Differential extends Component {
       isVolcanoTableLoading: false,
       plotButtonActiveDifferential: false,
       visible: false,
-      // isItemSVGLoaded: false,
+      isItemSVGLoaded: false,
       HighlightedFeaturesArrVolcano: [],
       enableMultifeaturePlotting: false,
     });
@@ -1068,9 +1062,6 @@ class Differential extends Component {
                 this.handleSearchTransitionDifferential
               }
               onDifferentialSearch={this.handleDifferentialSearch}
-              onDifferentialSearchUnfiltered={
-                this.handleDifferentialSearchUnfiltered
-              }
               onSearchCriteriaChangeDifferential={
                 this.handleSearchCriteriaChangeDifferential
               }

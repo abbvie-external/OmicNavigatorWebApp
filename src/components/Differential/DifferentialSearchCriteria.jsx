@@ -486,7 +486,7 @@ class DifferentialSearchCriteria extends Component {
     handleMaxElements,
     differentialTest,
   ) => {
-    const { onDifferentialSearchUnfiltered, onDifferentialSearch } = this.props;
+    const { onDifferentialSearch } = this.props;
     if (resetMultiset) {
       this.setState({
         mustDifferential: [],
@@ -496,8 +496,7 @@ class DifferentialSearchCriteria extends Component {
         uAnchorP: differentialTest,
       });
     }
-    onDifferentialSearchUnfiltered({ differentialResults: tableData });
-    onDifferentialSearch({ differentialResults: tableData });
+    onDifferentialSearch({ differentialResults: tableData }, true);
   };
 
   handleMultisetToggleDifferential = () => {
@@ -744,9 +743,12 @@ class DifferentialSearchCriteria extends Component {
         cancelToken,
       )
       .then(inferenceData => {
-        onDifferentialSearch({
-          differentialResults: inferenceData,
-        });
+        onDifferentialSearch(
+          {
+            differentialResults: inferenceData,
+          },
+          false,
+        );
         this.setState({
           mustDifferential,
           notDifferential,
