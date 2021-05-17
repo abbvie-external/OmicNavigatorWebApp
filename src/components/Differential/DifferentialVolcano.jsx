@@ -47,7 +47,7 @@ class DifferentialVolcano extends Component {
     animation: 'overlay',
     direction: 'right',
     visible: false,
-    featuresLength: 0,
+    // featuresLength: 0,
   };
   volcanoPlotFilteredGridRef = React.createRef();
   differentialVolcanoPlotRef = React.createRef();
@@ -92,7 +92,7 @@ class DifferentialVolcano extends Component {
       this.setState({
         filteredTableData: differentialResults,
         volcanoPlotRows: differentialResults.length,
-        featuresLength: differentialResults.length || 0,
+        // featuresLength: differentialResults.length || 0,
       });
     }
     // integrate with streaming
@@ -940,7 +940,7 @@ class DifferentialVolcano extends Component {
                         <div
                           className={
                             !HasMultifeaturePlots ||
-                            isDataStreamingResultsTable ||
+                            // isDataStreamingResultsTable ||
                             HighlightedFeaturesArrVolcano.length === 1 ||
                             featuresLength === 1
                               ? 'MultifeaturePlotBtnDiv Hide'

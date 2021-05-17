@@ -144,6 +144,7 @@ class Differential extends Component {
     if (setUnfiltered) {
       this.setState({
         differentialResultsUnfiltered: searchResults.differentialResults,
+        HighlightedFeaturesArrVolcano: [],
       });
     }
     /**
@@ -163,7 +164,6 @@ class Differential extends Component {
       plotButtonActiveDifferential: false,
       visible: false,
       isItemSVGLoaded: false,
-      HighlightedFeaturesArrVolcano: [],
       enableMultifeaturePlotting: false,
     });
   };
