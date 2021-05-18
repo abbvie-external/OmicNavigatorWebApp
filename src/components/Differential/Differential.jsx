@@ -51,7 +51,7 @@ class Differential extends Component {
       isItemSelected: false,
       isItemSVGLoaded: false,
       // isItemDatatLoaded: false,
-      // HighlightedFeaturesArrVolcano: [],
+      HighlightedFeaturesArrVolcano: [],
       // volcanoDifferentialTableRowMax: '',
       // volcanoDifferentialTableRowOther: [],
       // maxObjectIdentifier: null,
@@ -84,7 +84,6 @@ class Differential extends Component {
       metaFeaturesDataDifferential: [],
       allMetaFeaturesDataDifferential: [],
       isDataStreamingResultsTable: false,
-      enableMultifeaturePlotting: false,
     };
   }
 
@@ -144,7 +143,6 @@ class Differential extends Component {
     if (setUnfiltered) {
       this.setState({
         differentialResultsUnfiltered: searchResults.differentialResults,
-        HighlightedFeaturesArrVolcano: [],
       });
     }
     /**
@@ -164,7 +162,6 @@ class Differential extends Component {
       plotButtonActiveDifferential: false,
       visible: false,
       isItemSVGLoaded: false,
-      enableMultifeaturePlotting: false,
     });
   };
 
@@ -202,7 +199,6 @@ class Differential extends Component {
         // differentialResultsUnfiltered: [],
         // isItemDatatLoaded: false,
         HighlightedFeaturesArrVolcano: [],
-        enableMultifeaturePlotting: false,
         volcanoDifferentialTableRowMax: '',
         volcanoDifferentialTableRowOther: [],
         maxObjectIdentifier: null,
@@ -586,10 +582,8 @@ class Differential extends Component {
   };
 
   handleSelectedVolcano = toHighlightArr => {
-    const enableMultifeature = toHighlightArr.length > 1 ? true : false;
     this.setState({
       HighlightedFeaturesArrVolcano: toHighlightArr,
-      enableMultifeaturePlotting: enableMultifeature,
     });
     if (toHighlightArr.length > 0) {
       // unhighlight single row if already highlighted

@@ -10,6 +10,7 @@ import {
   Transition,
   Button,
 } from 'semantic-ui-react';
+import _ from 'lodash';
 import ndjsonStream from 'can-ndjson-stream';
 import { CancelToken } from 'axios';
 import '../Shared/SearchCriteria.scss';
@@ -468,13 +469,16 @@ class DifferentialSearchCriteria extends Component {
             true,
             test,
           );
+          this.props.onHandleIsDataStreamingResultsTable(false);
         }
       }
       // Stream finished at this point
       const streamedResultsCopy = streamedResults.slice();
       cacheResultsTable[cacheKey] = streamedResultsCopy;
-      this.props.onHandleIsDataStreamingResultsTable(false);
-      this.handleGetResultsTableData(streamedResultsCopy, true, true, test);
+      this.props.onDifferentialSearch(
+        { differentialResults: streamedResultsCopy },
+        true,
+      );
     } catch (error) {
       console.error(error);
     }
