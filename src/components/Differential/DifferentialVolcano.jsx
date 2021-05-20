@@ -980,9 +980,9 @@ class DifferentialVolcano extends Component {
                       resizerStyle={
                         !volcanoPlotsVisible ? hiddenResizerStyle : resizerStyle
                       }
-                      // defaultSize={this.state.volcanoHeight * 1.05263157895}
+                      // defaultSize={this.state.volcanoHeight * 1.05263157895} 1.20263157895
                       size={
-                        volcanoPlotsVisible ? volcanoHeight * 1.20263157895 : 0
+                        volcanoPlotsVisible ? volcanoHeight * 1.08263157895 : 0
                       }
                       minSize={350}
                       maxSize={1000}
