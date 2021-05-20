@@ -112,17 +112,6 @@ class DifferentialSearchCriteria extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (
-      this.props.maxElements !== this.state.numElementsP &&
-      this.state.isFilteredDifferential &&
-      prevProps.breadcrumbClick === this.props.breadcrumbClick
-    ) {
-      // console.log('123');
-      this.setState({
-        numElementsP: this.props.maxElements,
-      });
-    }
-
     if (!prevProps.zoom && this.props.zoom) {
       this.props.onEndZoom();
     }
