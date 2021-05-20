@@ -103,7 +103,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       .attr('id', 'clip')
       .append('svg:rect')
       .attr('width', volcanoWidth - 47)
-      .attr('height', volcanoHeight - 45)
+      .attr('height', volcanoHeight - 40)
       .attr('x', 50)
       .attr('y', 0);
 
@@ -1330,6 +1330,10 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       //var self = this;
       // excessive styling needed for proper display across all export types
       // style all circles back to default
+      d3.select('#nonfiltered-elements')
+        .selectAll('path')
+        .attr('fill', d => this.determineBinColor(this.state.bins, d.length))
+        .attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(5)}`);
       const allCircles = d3.selectAll('circle.volcanoPlot-dataPoint');
       allCircles.attr('style', 'fill: #1678c2');
       allCircles.attr('stroke', '#000');
@@ -1361,7 +1365,6 @@ class DifferentialVolcanoPlot extends React.PureComponent {
           //   `volcanoDataPoint-${element}`,
           // );
           const highlightedCircleId = this.getCircleOrBin(element);
-          console.log('highlighted', highlightedCircleId);
           const highlightedCircle = d3.select(highlightedCircleId.element);
           if (highlightedCircle != null) {
             if (highlightedCircleId.type === 'circle') {
@@ -1401,9 +1404,9 @@ class DifferentialVolcanoPlot extends React.PureComponent {
             maxCircle.raise();
           } else {
             maxCircle.attr('fill', '#ff4400').classed('highlighted', true);
-            maxCircle.attr('stroke', '#ff4400');
-            maxCircle.attr('stroke-width', '#ff4400');
-            maxCircle.attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(6)}`);
+            maxCircle.attr('stroke', '#000');
+            maxCircle.attr('stroke-width', 1);
+            maxCircle.attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(7)}`);
             maxCircle.classed('highlightedMax', true);
             maxCircle.raise();
           }
@@ -1544,12 +1547,31 @@ class DifferentialVolcanoPlot extends React.PureComponent {
 
   handleBinHover = d => {
     if (!this.state.brushing) {
-      d3.select(`#path-${Math.ceil(d.x)}-${Math.ceil(d.y)}-${d.length}`)
-        .attr('stroke', '#000')
-        .attr('fill', '#00aeff')
-        .attr('stroke-width', 1)
-        .attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(8)}`)
-        .raise();
+      const bin = d3.select(
+        `#path-${Math.ceil(d.x)}-${Math.ceil(d.y)}-${d.length}`,
+      );
+      const binClass = bin.attr('class');
+
+      if (binClass.endsWith('highlightedMax')) {
+        bin.attr('stroke', '#000');
+        bin.attr('stroke-width', 1);
+        bin.attr('fill', '#ff4400');
+        bin.attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(8)}`);
+        bin.raise();
+      } else if (binClass.endsWith('highlighted')) {
+        bin.attr('stroke', '#000');
+        bin.attr('stroke-width', 1);
+        bin.attr('fill', '#ff7e05');
+        bin.attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(8)}`);
+        bin.raise();
+      } else {
+        bin
+          .attr('fill', '#1678c2')
+          .attr('stroke', '#000')
+          .attr('stroke-width', 1)
+          .attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(7)}`)
+          .raise();
+      }
 
       this.setState({
         hoveredBin: d,
@@ -1634,12 +1656,16 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     );
     const binClass = bin.attr('class');
 
-    if (
-      binClass.endsWith('highlighted') ||
-      binClass.endsWith('highlightedMax')
-    ) {
+    if (binClass.endsWith('highlightedMax')) {
+      bin.attr('stroke', '#000');
+      bin.attr('stroke-width', 1);
+      bin.attr('fill', '#ff4400');
+      bin.attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(7)}`);
+    } else if (binClass.endsWith('highlighted')) {
+      bin.attr('stroke', '#000');
+      bin.attr('stroke-width', 1);
       bin.attr('fill', '#ff7e05');
-      bin.attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(5)}`);
+      bin.attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(7)}`);
     } else {
       bin
         .attr('fill', d => this.determineBinColor(bins, d.length))
