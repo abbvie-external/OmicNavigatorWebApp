@@ -46,8 +46,18 @@ class MetafeaturesTable extends Component {
       };
       let metafeaturesAlphanumericFields = [];
       let metafeaturesNumericFields = [];
-      const firstObject = data[0];
-      for (let [key, value] of Object.entries(firstObject)) {
+      function isNotNANorNullNorUndefined(o) {
+        return typeof o !== 'undefined' && o !== null && o !== 'NA';
+      }
+      function everyIsNotNANorNullNorUndefined(arr) {
+        return arr.every(isNotNANorNullNorUndefined);
+      }
+      const objectValuesArr = [...data].map(f => Object.values(f));
+      const firstFullObjectIndex = objectValuesArr.findIndex(
+        everyIsNotNANorNullNorUndefined,
+      );
+      const firstFullObject = data[firstFullObjectIndex];
+      for (let [key, value] of Object.entries(firstFullObject)) {
         if (typeof value === 'string' || value instanceof String) {
           metafeaturesAlphanumericFields.push(key);
         } else {
@@ -142,9 +152,9 @@ class MetafeaturesTable extends Component {
           // use "differentialRows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
           itemsPerPage={itemsPerPageMetafeaturesTable}
           onItemsPerPageChange={this.handleItemsPerPageChange}
-          exportBaseName="Feature Data"
+          // exportBaseName="Feature Data"
           // quickViews={quickViews}
-          disableGeneralSearch
+          // disableGeneralSearch
           // disableGrouping
           // disableSort
           disableColumnVisibilityToggle

@@ -20,10 +20,6 @@ class EnrichmentSVGPlot extends PureComponent {
     activeSVGTabIndexEnrichment: 0,
   };
 
-  componentDidMount() {
-    this.getSVGPanes();
-  }
-
   componentDidUpdate(prevProps) {
     if (
       // this.state.isSVGReadyEnrichment &&
@@ -78,6 +74,7 @@ class EnrichmentSVGPlot extends PureComponent {
         dimensions = `?${divWidthPtString}${divHeightPtString}${pointSizeString}`;
       }
       const svgArray = imageInfoEnrichment.svg;
+      const uniqueKey = imageInfoEnrichment.key || '';
       const panes = svgArray.map((s, index) => {
         let srcUrl = `${s.svg}${dimensions}`;
         return {
@@ -86,18 +83,12 @@ class EnrichmentSVGPlot extends PureComponent {
             <Tab.Pane
               attached="true"
               as="div"
-              key={`${index}-${s.plotType.plotDisplay}-pane-enrichment`}
+              key={`${uniqueKey}-${index}-${s.plotType.plotDisplay}-pane-enrichment`}
             >
               <div id="EnrichmentPlotSVGDiv" className="svgSpan">
                 <SVG
                   cacheRequests={true}
-                  // description=""
-                  // loader={<span>{loadingDimmer}</span>}
-                  // onError={error => console.log(error.message)}
-                  // onLoad={(src, hasCache) => console.log(src, hasCache)}
-                  // preProcessor={code => code.replace(/fill=".*?"/g, 'fill="currentColor"')}
                   src={srcUrl}
-                  // title={`${s.plotType.plotDisplay}`}
                   uniqueHash="e5j2h5"
                   uniquifyIDs={true}
                   id="EnrichmentPlotSVG"

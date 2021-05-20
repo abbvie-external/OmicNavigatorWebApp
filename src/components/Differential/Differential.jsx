@@ -14,7 +14,6 @@ import {
   roundToPrecision,
   limitValues,
 } from '../Shared/helpers';
-import DOMPurify from 'dompurify';
 import { omicNavigatorService } from '../../services/omicNavigator.service';
 import DifferentialVolcano from './DifferentialVolcano';
 import _ from 'lodash';
@@ -549,7 +548,7 @@ class Differential extends Component {
   };
 
   getMultifeaturePlot = (view, tableData) => {
-    const { HighlightedFeaturesArrVolcano, differentialResults } = this.state;
+    const { HighlightedFeaturesArrVolcano } = this.state;
     const { differentialFeatureIdKey } = this.props;
     if (HighlightedFeaturesArrVolcano.length > 1) {
       const featureIds = HighlightedFeaturesArrVolcano.map(
@@ -834,8 +833,20 @@ class Differential extends Component {
     };
     let differentialAlphanumericFields = [];
     let differentialNumericFields = [];
-    const firstObject = differentialResultsVar[0];
-    for (let [key, value] of Object.entries(firstObject)) {
+    function isNotNANorNullNorUndefined(o) {
+      return typeof o !== 'undefined' && o !== null && o !== 'NA';
+    }
+    function everyIsNotNANorNullNorUndefined(arr) {
+      return arr.every(isNotNANorNullNorUndefined);
+    }
+    const objectValuesArr = [...differentialResultsVar].map(f =>
+      Object.values(f),
+    );
+    const firstFullObjectIndex = objectValuesArr.findIndex(
+      everyIsNotNANorNullNorUndefined,
+    );
+    const firstFullObject = differentialResultsVar[firstFullObjectIndex];
+    for (let [key, value] of Object.entries(firstFullObject)) {
       if (typeof value === 'string' || value instanceof String) {
         differentialAlphanumericFields.push(key);
       } else {
@@ -1136,19 +1147,15 @@ class Differential extends Component {
           id="differentialMultisetAnalysisSVGDiv"
           className="MultisetSvgOuter"
         >
-          <SVG
-            cacheRequests={true}
-            // description=""
-            // loader={<span>{loadingDimmer}</span>}
-            // onError={error => console.log(error.message)}
-            // onLoad={(src, hasCache) => console.log(src, hasCache)}
-            // preProcessor={code => code.replace(/fill=".*?"/g, 'fill="currentColor"')}
-            src={srcUrl}
-            // title={`${s.plotType.plotDisplay}`}
-            uniqueHash="b2g9e2"
-            uniquifyIDs={true}
-            id="differentialMultisetAnalysisSVG"
-          />
+          {multisetPlotInfoDifferential.svg?.length ? (
+            <SVG
+              cacheRequests={true}
+              src={srcUrl}
+              uniqueHash="b2g9e2"
+              uniquifyIDs={true}
+              id="differentialMultisetAnalysisSVG"
+            />
+          ) : null}
         </div>
       </Sidebar>
     );
