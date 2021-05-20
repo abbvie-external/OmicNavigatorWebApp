@@ -2327,6 +2327,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
   handleBrushedText = brushed => {
     // MAP brushedDataArr to circle text state
     const brushedCircleTextMapped = brushed._groups[0].map(a => {
+      if (!a && !a.attributes) return null;
       const columnData = JSON.parse(a.attributes['data'].nodeValue);
       const key = this.props.volcanoCircleLabel || 0;
       return {
@@ -2353,6 +2354,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         // fill: a.attributes[13].nodeValue
       };
     });
+    if (!brushedCircleTextMapped) return;
     const self = this;
     // const brushedCircleText = brushedCircleTextMapped.map(circle => {
     //   const circleOnLeftSide = circle.cx <= self.props.volcanoWidth / 2;
