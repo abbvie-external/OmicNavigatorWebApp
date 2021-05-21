@@ -1593,8 +1593,9 @@ class DifferentialVolcanoPlot extends React.PureComponent {
   };
 
   handleCircleHover = e => {
-    const elem = d3.select(`#volcanoDataPoint-${e[this.props.identifier]}`)
-      ._groups[0][0];
+    const elem = d3.select(
+      `circle[id='volcanoDataPoint-${e[this.props.identifier]}`,
+    )._groups[0][0];
     if (!this.state.brushing) {
       const hoveredData = {
         id: elem.attributes['circleid'].value,
@@ -1628,8 +1629,9 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     const hovered = document.getElementById(this.state.hoveredCircleElement);
     if (hovered != null) {
       // const hoveredCircle = d3.select(hovered)._groups[0][0] ?? null;
+
       const hoveredCircle =
-        d3.select(`#volcanoDataPoint-${e[this.props.identifier]}`)
+        d3.select(`circle[id='volcanoDataPoint-${e[this.props.identifier]}`)
           ._groups[0][0] ?? null;
       if (hoveredCircle != null) {
         // if (!hoveredCircle.empty()) {
