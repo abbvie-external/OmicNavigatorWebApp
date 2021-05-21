@@ -102,7 +102,7 @@ class DifferentialSearchCriteria extends Component {
     multisetFiltersVisibleDifferential: false,
     activateMultisetFiltersP: false,
     uDataP: [],
-    isFilteredDifferential: false,
+    isFilteredSearchCriteria: false,
   };
 
   componentDidMount() {
@@ -574,11 +574,10 @@ class DifferentialSearchCriteria extends Component {
       // this.props.onSearchTransitionDifferentialAlt(true);
       // this.props.onMultisetQueriedDifferential(false);
       this.props.onHandleUpsetVisible(false);
-      this.props.onHandleIsFilteredDifferential(false);
       this.setState(
         {
           multisetFiltersVisibleDifferential: false,
-          isFilteredDifferential: false,
+          isFilteredSearchCriteria: false,
         },
         function() {
           const differentialTestName = 'differentialTest';
@@ -603,9 +602,8 @@ class DifferentialSearchCriteria extends Component {
       onSearchCriteriaChangeDifferential,
     } = this.props;
     // onSearchTransitionDifferentialAlt(true);
-    this.props.onHandleIsFilteredDifferential(false);
     this.setState({
-      isFilteredDifferential: false,
+      isFilteredSearchCriteria: false,
     });
     onSearchCriteriaChangeDifferential(
       {
@@ -654,7 +652,6 @@ class DifferentialSearchCriteria extends Component {
     // this.props.onHandleVolcanoTableLoading(true);
     // this.setState({ loadingDifferentialMultisetFilters: true });
     // const uSetVP = _.cloneDeep(this.state.uSettingsP);
-    this.props.onHandleIsFilteredDifferential(false);
     const uSetVP = { ...this.state.uSettingsP };
     uSetVP.indexFiltersP = [...this.state.uSettingsP.indexFiltersP].concat(
       this.state.uSettingsP.indexFiltersP.length,
@@ -670,7 +667,7 @@ class DifferentialSearchCriteria extends Component {
         this.state.uSettingsP.defaultSigValueP,
       ),
       uSettingsP: uSetVP,
-      isFilteredDifferential: false,
+      isFilteredSearchCriteria: false,
     });
   };
 
@@ -682,7 +679,6 @@ class DifferentialSearchCriteria extends Component {
     for (var i = index; i < uSetVP.indexFiltersP.length; i++) {
       uSetVP.indexFiltersP[i]--;
     }
-    this.props.onHandleIsFilteredDifferential(false);
     this.setState(
       {
         selectedColP: [...this.state.selectedColP]
@@ -695,7 +691,7 @@ class DifferentialSearchCriteria extends Component {
           .slice(0, index)
           .concat([...this.state.sigValueP].slice(index + 1)),
         uSettingsP: uSetVP,
-        isFilteredDifferential: false,
+        isFilteredSearchCriteria: false,
       },
       // function() {
       //   this.updateQueryDataP();
@@ -716,7 +712,6 @@ class DifferentialSearchCriteria extends Component {
 
   handleDropdownChange = (evt, { name, value, index }) => {
     // this.props.onHandleVolcanoTableLoading(true);
-    this.props.onHandleIsFilteredDifferential(false);
     const uSelVP = [...this.state[name]];
     uSelVP[index] = {
       key: value,
@@ -726,19 +721,17 @@ class DifferentialSearchCriteria extends Component {
     this.setState({
       [name]: uSelVP,
       reloadPlotP: true,
-      isFilteredDifferential: false,
+      isFilteredSearchCriteria: false,
     });
   };
 
   handleSigValuePInputChange = (name, value, index) => {
-    if (this.props.isFilteredDifferential)
-      this.props.onHandleIsFilteredDifferential(false);
     const uSelVP = [...this.state[name]];
     uSelVP[index] = parseFloat(value);
     this.setState({
       [name]: uSelVP,
       reloadPlotP: true,
-      isFilteredDifferential: false,
+      isFilteredSearchCriteria: false,
     });
   };
 
@@ -746,7 +739,7 @@ class DifferentialSearchCriteria extends Component {
     this.setState({
       mustDifferential,
       notDifferential,
-      isFilteredDifferential: false,
+      isFilteredSearchCriteria: false,
     });
   };
 
@@ -771,7 +764,7 @@ class DifferentialSearchCriteria extends Component {
     // this.props.onSearchTransitionDifferentialAlt(true); Commented on 3/31 Paul
     this.props.onHandleIsFilteredDifferential(true);
     this.setState({
-      isFilteredDifferential: true,
+      isFilteredSearchCriteria: true,
     });
     this.props.onHandleVolcanoTableLoading(true);
     cancelRequestGetResultsIntersection();
@@ -911,7 +904,7 @@ class DifferentialSearchCriteria extends Component {
       differentialTestsDisabled,
       multisetFiltersVisibleDifferential,
       differentialStudyReportTooltip,
-      isFilteredDifferential,
+      isFilteredSearchCriteria,
     } = this.state;
 
     const {
@@ -1007,17 +1000,17 @@ class DifferentialSearchCriteria extends Component {
           icon
           labelPosition="left"
           id={
-            isFilteredDifferential
+            isFilteredSearchCriteria
               ? 'MultisetFilterButtonLight'
               : 'MultisetFilterButtonDark'
           }
-          className={isFilteredDifferential ? 'disabled' : ''}
+          className={isFilteredSearchCriteria ? 'disabled' : ''}
           size={dynamicSize}
           fluid
           onClick={this.updateQueryDataP}
         >
-          {isFilteredDifferential ? 'Filtered' : 'Filter'}
-          <Icon name={isFilteredDifferential ? 'check' : 'filter'} />
+          {isFilteredSearchCriteria ? 'Filtered' : 'Filter'}
+          <Icon name={isFilteredSearchCriteria ? 'check' : 'filter'} />
         </Button>
         // }
         //   content="Use multiset criteria below to filter results"
