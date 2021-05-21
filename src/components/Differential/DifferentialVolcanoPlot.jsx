@@ -876,7 +876,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       })
       .on('click', e => {
         d3.select('#tooltip').remove();
-        const elem = d3.select(`#volcanoDataPoint-${e[identifier]}`)
+        const elem = d3.select(`circle[id='volcanoDataPoint-${e[identifier]}`)
           ._groups[0][0];
         this.props.onHandleDotClick(
           e,
