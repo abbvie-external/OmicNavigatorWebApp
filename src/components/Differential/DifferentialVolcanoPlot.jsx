@@ -576,7 +576,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       volcanoDifferentialTableRowOther.forEach(element => {
         // style all highlighted circles
         const highlightedCircleId = this.getCircleOrBin(element);
-        const highlightedCircle = d3.select(highlightedCircleId.element);
+        const highlightedCircle = d3.select(highlightedCircleId?.element);
         if (highlightedCircle != null) {
           if (highlightedCircleId.type === 'circle') {
             highlightedCircle.attr('r', 4);
