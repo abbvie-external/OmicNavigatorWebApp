@@ -538,7 +538,6 @@ class DifferentialVolcano extends Component {
             this.props.multisetFiltersVisibleDifferential
           }
           isUpsetVisible={this.props.isUpsetVisible}
-          isFilteredDifferential={this.props.isFilteredDifferential}
           identifier={this.state.identifier}
           onUpdateVolcanoLabels={this.props.onUpdateVolcanoLabels}
           updateVolcanoLabels={this.props.updateVolcanoLabels}

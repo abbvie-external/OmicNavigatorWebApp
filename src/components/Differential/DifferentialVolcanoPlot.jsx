@@ -420,6 +420,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       (prevProps.isFilteredDifferential && !isFilteredDifferential) ||
       (prevProps.isUpsetVisible && !this.props.isUpsetVisible)
     ) {
+      console.log('here');
       this.transitionZoom(this.state.currentResults, true);
     }
 
