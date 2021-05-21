@@ -10,9 +10,6 @@ class DifferentialMultisetFilters extends Component {
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
-    // console.log('sigval', this.props.sigValueP);
-
-    // if (this.props.breadcrumbClick) {
     if (
       this.props.multisetFiltersVisibleDifferential &&
       (this.props.mustDifferential !== prevProps.mustDifferential ||
@@ -28,48 +25,6 @@ class DifferentialMultisetFilters extends Component {
         this.props.numElementsP !== prevProps.numElementsP ||
         this.props.maxElementsP !== prevProps.maxElementsP)
     ) {
-      // console.log(
-      //   'prev',
-      //   prevProps.breadcrumbClick,
-      //   this.props.breadcrumbClick,
-      // );
-      // this.makeMultiset(
-      //   uDataP,
-      //   uAnchorP,
-      //   uSettingsP,
-      //   metaSvgP,
-      //   sigValueP,
-      //   selectedColP,
-      //   selectedOperatorP,
-      //   mustDifferential,
-      //   notDifferential,
-      // );
-      // }
-      // filterState &&
-      // Object.keys(filterState)?.length > 0 &&
-      // filterState.constructor === Object
-      //   ? this.makeMultiset(
-      //       uDataP,
-      //       uAnchorP,
-      //       uSettingsP,
-      //       metaSvgP,
-      //       filterState.sigValueP,
-      //       filterState.selectedColP,
-      //       filterState.selectedOperatorP,
-      //       mustDifferential,
-      //       notDifferential,
-      //     )
-      //   : this.makeMultiset(
-      //       uDataP,
-      //       uAnchorP,
-      //       uSettingsP,
-      //       metaSvgP,
-      //       sigValueP,
-      //       selectedColP,
-      //       selectedOperatorP,
-      //       mustDifferential,
-      //       notDifferential,
-      //     );
       this.makeMultiset();
     }
   }
@@ -887,13 +842,7 @@ class DifferentialMultisetFilters extends Component {
   };
 
   handleInputChange = (value, index) => {
-    // console.log('index', index);
-    // console.log('value', value);
-    this.props.onHandleSigValuePInputChange(
-      'sigValueP',
-      this.props.breadcrumbClick ? this.props.sigValueP[index] : value,
-      index,
-    );
+    this.props.onHandleSigValuePInputChange('sigValueP', value, index);
   };
 
   render() {
@@ -965,21 +914,6 @@ class DifferentialMultisetFilters extends Component {
                     <label>{index === 0 ? 'Value' : ''}</label>
                     {/* {console.log('render', sigValueP[index])} */}
                     <ExponentialNumberInput
-                      // onChange={value => {
-                      //   console.log(
-                      //     'change input handler',
-                      //     sigValueP[index],
-                      //     value,
-                      //     index,
-                      //   );
-
-                      //   if (this.props.breadcrumbClick) {
-                      //     callbackFactory(index);
-                      //     this.props.onBreadcrumbClick(false);
-                      //   } else {
-                      //     callbackFactory(index);
-                      //   }
-                      // }}
                       onChange={callbackFactory(index)}
                       min={1e-100}
                       preventNegatives={false}

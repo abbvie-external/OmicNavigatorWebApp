@@ -88,12 +88,7 @@ class Differential extends Component {
       allMetaFeaturesDataDifferential: [],
       isDataStreamingResultsTable: false,
       enableMultifeaturePlotting: false,
-      zoom: false,
-      filterState: {},
-      breadcrumbClick: false,
-      zoomHistory: {},
       updateVolcanoLabels: false,
-      activeBreadcrumb: 0,
     };
   }
 
@@ -118,10 +113,6 @@ class Differential extends Component {
     });
   };
 
-  handleFilterState = filterState => {
-    this.setState({ filterState });
-  };
-
   handleUpsetVisible = bool => {
     this.setState({
       isUpsetVisible: bool,
@@ -144,12 +135,6 @@ class Differential extends Component {
     this.setState({
       multisetQueriedDifferential: value,
       // isVolcanoPlotSVGLoaded: !value,
-    });
-  };
-
-  endZoom = () => {
-    this.setState({
-      zoom: false,
     });
   };
 
@@ -631,53 +616,12 @@ class Differential extends Component {
     });
   };
 
-  updateBreadcrumbIndex = index => {
-    this.setState({
-      activeBreadcrumb: index,
-    });
-  };
-
-  updateVolcanoState = (volcanoState, maxElements) => {
-    this.setState({
-      zoomHistory: volcanoState,
-      maxElements: maxElements,
-    });
-  };
-
   // handleTableDataChange = data => {
   //   console.log(data);
   //   this.setState({
   //     metaFeaturesDataDifferential: data,
   //   });
   // };
-
-  updateBreadcrumbClick = bool => {
-    this.setState({
-      breadcrumbClick: false,
-    });
-  };
-
-  handleBreadcrumbClick = (results, index, filterState, breadcrumbClick) => {
-    this.setState({
-      differentialResults: results,
-      differentialResultsUnfiltered: results,
-      activeBreadcrumb: index,
-      breadcrumbClick: breadcrumbClick,
-      filterState,
-      HighlightedFeaturesArrVolcano: [],
-    });
-  };
-
-  handleZoom = (results, index, history) => {
-    this.setState({
-      differentialResults: results,
-      differentialResultsUnfiltered: results,
-      zoom: true,
-      activeBreadcrumb: index,
-      zoomHistory: history,
-      HighlightedFeaturesArrVolcano: [],
-    });
-  };
 
   // updateDifferentialResultsUnfiltered = results => {
   //   this.setState({
@@ -1065,10 +1009,7 @@ class Differential extends Component {
           onHandleVolcanoTableLoading={this.handleVolcanoTableLoading}
           onBackToTable={this.backToTable}
           onUpdateVolcanoLabels={this.updateVolcanoLabels}
-          onHandleZoom={this.handleZoom}
-          onHandleBreadcrumbClick={this.handleBreadcrumbClick}
           onHandleUpdateDifferentialResults={this.updateDifferentialResults}
-          onUpdateBreadcrumbIndex={this.updateBreadcrumbIndex}
           onHandleVolcanoState={this.updateVolcanoState}
           onHandleTableDataChange={this.handleTableDataChange}
           fwdRefDVC={this.differentialViewContainerRef}
@@ -1204,9 +1145,6 @@ class Differential extends Component {
               }
               onHandleUpsetVisible={this.handleUpsetVisible}
               onHandleIsFilteredDifferential={this.handleIsFilteredDifferential}
-              onEndZoom={this.endZoom}
-              onHandleFilterState={this.handleFilterState}
-              onUpdateBreadcrumbClick={this.updateBreadcrumbClick}
             />
           </Grid.Column>
           <Grid.Column
