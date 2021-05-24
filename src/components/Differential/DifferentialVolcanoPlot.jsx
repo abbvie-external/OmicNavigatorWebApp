@@ -520,12 +520,10 @@ class DifferentialVolcanoPlot extends React.PureComponent {
   };
 
   windowResized = () => {
-    // debounce(() => {
     d3.select('#VolcanoChart').remove();
     this.setupVolcano();
     this.hexBinning(this.state.currentResults);
     this.transitionZoom(this.state.currentResults, false);
-    // }, 200);
   };
 
   doTransform(value, axis) {
