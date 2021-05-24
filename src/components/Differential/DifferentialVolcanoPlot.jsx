@@ -145,7 +145,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       });
 
     svg.on('dblclick', () => {
-      this.transitionZoom(differentialResultsUnfiltered, true);
+      this.transitionZoom(differentialResultsUnfiltered, false);
     });
   }
 
@@ -1144,7 +1144,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         const total = [...brushedBins, ...brushedDataArr];
 
         if (!!total.length) {
-          self.transitionZoom(total, true);
+          self.transitionZoom(total, false);
         }
         d3.select('.volcanoPlotD3BrushSelection').call(
           self.objsBrush.move,
