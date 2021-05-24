@@ -490,63 +490,6 @@ class DifferentialVolcano extends Component {
       });
     }
   };
-  getVolcanoPlot = () => {
-    const { volcanoPlotsVisible } = this.state;
-    if (volcanoPlotsVisible) {
-      return (
-        // <DifferentialVolcanoPlot
-        //   ref={this.differentialVolcanoPlotRef}
-        //   {...this.state}
-        //   {...this.props}
-        //   handleVolcanoPlotSelectionChange={
-        //     this.handleVolcanoPlotSelectionChange
-        //   }
-        //   getMaxAndMin={this.getMaxAndMin}
-        //   onHandleDotClick={this.handleDotClick}
-        //   onHandleBinClick={this.handleBinClick}
-        // ></DifferentialVolcanoPlot>
-        <DifferentialVolcanoPlot
-          ref={this.differentialVolcanoPlotRef}
-          handleVolcanoPlotSelectionChange={
-            this.handleVolcanoPlotSelectionChange
-          }
-          onHandleUpdateDifferentialResults={
-            this.handleUpdateDifferentialResults
-          }
-          getMaxAndMin={this.getMaxAndMin}
-          onHandleDotClick={this.handleDotClick}
-          onHandleVolcanoState={this.props.handleVolcanoState}
-          // onHandleTableDataChange={this.handleTableDataChange}
-          volcanoDifferentialTableRowOther={
-            this.props.volcanoDifferentialTableRowOther
-          }
-          volcanoDifferentialTableRowMax={
-            this.props.volcanoDifferentialTableRowMax
-          }
-          volcanoCircleLabel={this.state.volcanoCircleLabel}
-          volcanoHeight={this.state.volcanoHeight}
-          volcanoWidth={this.state.volcanoWidth}
-          xAxisLabel={this.state.xAxisLabel}
-          yAxisLabel={this.state.yAxisLabel}
-          doXAxisTransformation={this.state.doXAxisTransformation}
-          doYAxisTransformation={this.state.doYAxisTransformation}
-          differentialResultsUnfiltered={
-            this.props.differentialResultsUnfiltered
-          }
-          differentialResults={this.props.differentialResults}
-          multisetFiltersVisibleDifferential={
-            this.props.multisetFiltersVisibleDifferential
-          }
-          isUpsetVisible={this.props.isUpsetVisible}
-          identifier={this.state.identifier}
-          onUpdateVolcanoLabels={this.props.onUpdateVolcanoLabels}
-          updateVolcanoLabels={this.props.updateVolcanoLabels}
-        ></DifferentialVolcanoPlot>
-      );
-    } else {
-      return <p>Loading</p>;
-    }
-  };
 
   onSizeChange = (newSize, paneType) => {
     const { volcanoWidth } = this.state;
