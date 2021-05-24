@@ -1,5 +1,5 @@
 import React from 'react';
-import _ from 'lodash';
+import _, { debounce } from 'lodash';
 import './DifferentialVolcanoPlot.scss';
 import * as d3 from 'd3';
 import * as hexbin from 'd3-hexbin';
@@ -427,7 +427,6 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       (prevProps.isFilteredDifferential && !isFilteredDifferential) ||
       (prevProps.isUpsetVisible && !this.props.isUpsetVisible)
     ) {
-      console.log('here');
       this.transitionZoom(this.state.currentResults, true);
     }
 
@@ -521,12 +520,12 @@ class DifferentialVolcanoPlot extends React.PureComponent {
   };
 
   windowResized = () => {
+    // debounce(() => {
     d3.select('#VolcanoChart').remove();
-    this.removeViolinBrush();
     this.setupVolcano();
-    this.setupBrush();
     this.hexBinning(this.state.currentResults);
     this.transitionZoom(this.state.currentResults, false);
+    // }, 200);
   };
 
   doTransform(value, axis) {
@@ -571,7 +570,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       volcanoDifferentialTableRowOther.forEach(element => {
         // style all highlighted circles
         const highlightedCircleId = this.getCircleOrBin(element);
-        const highlightedCircle = d3.select(highlightedCircleId?.element);
+        const highlightedCircle = d3.select(highlightedCircleId.element);
         if (highlightedCircle != null) {
           if (highlightedCircleId?.type === 'circle') {
             highlightedCircle.attr('r', 4);
