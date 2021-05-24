@@ -44,18 +44,24 @@ class DifferentialVolcanoPlot extends React.PureComponent {
   };
 
   componentDidMount() {
-    let resizedFn;
-    window.addEventListener('resize', () => {
-      clearTimeout(resizedFn);
-      resizedFn = setTimeout(() => {
-        this.windowResized();
-      }, 200);
-    });
+    window.addEventListener('resize', this.debouncedResizeListener);
     if (!this.props.isDataStreamingResultsTable) {
       this.setupVolcano();
       this.hexBinning(this.props.differentialResultsUnfiltered);
     }
   }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.debouncedResizeListener);
+  }
+
+  debouncedResizeListener = () => {
+    let resizedFn;
+    clearTimeout(resizedFn);
+    resizedFn = _.debounce(() => {
+      this.windowResized();
+    }, 200);
+  };
 
   setupVolcano() {
     const {
