@@ -24,10 +24,16 @@ import SplitPane from 'react-split-pane';
 
 class DifferentialVolcano extends Component {
   state = {
+    volcanoDivHeight:
+      parseInt(localStorage.getItem('volcanoDivHeight'), 10) || 1,
     volcanoHeight: parseInt(localStorage.getItem('volcanoHeight'), 10) || 1,
+    volcanoDivHeightBackup:
+      parseInt(localStorage.getItem('volcanoDivHeightBackup'), 10) || 370,
     volcanoHeightBackup:
-      parseInt(localStorage.getItem('volcanoHeightBackup'), 10) || 350,
-    volcanoWidth: parseInt(localStorage.getItem('volcanoWidth'), 10) || 500,
+      parseInt(localStorage.getItem('volcanoHeightBackup'), 10) || 340,
+    volcanoDivWidth:
+      parseInt(localStorage.getItem('volcanoDivWidth'), 10) || 500,
+    volcanoWidth: parseInt(localStorage.getItem('volcanoWidth'), 10) || 460,
     volcanoPlotsVisible: false,
     // JSON.parse(localStorage.getItem('volcanoPlotsVisible')) || false,
     // filteredTableData: [],
@@ -269,20 +275,10 @@ class DifferentialVolcano extends Component {
     }
   };
 
-  // handleTableDataChange = data => {
-  //   this.props.onHandleTableDataChange(data);
-  // };
-
   handleUpdateDifferentialResults = results => {
     this.props.onHandleUpdateDifferentialResults(results);
   };
 
-  // informItemsPerPageVolcanoTable = items => {
-  //   this.setState({
-  //     itemsPerPageVolcanoTable: items,
-  //   });
-  //   localStorage.setItem('itemsPerPageVolcanoTable', items);
-  // };
   handleItemsPerPageChange = items => {
     this.setState({
       itemsPerPageVolcanoTable: items,
@@ -492,18 +488,23 @@ class DifferentialVolcano extends Component {
   };
 
   onSizeChange = (newSize, paneType) => {
-    const { volcanoWidth } = this.state;
+    const { volcanoDivWidth } = this.state;
     const { fwdRefDVC } = this.props;
-    const adjustedSize = Math.round(newSize * 0.95);
+    const adjustedSize = Math.round(newSize * 0.92);
     if (paneType === 'horizontal') {
-      const width = parseInt(localStorage.getItem('volcanoWidth'), 10) || 500;
+      const divWidth =
+        parseInt(localStorage.getItem('volcanoDivWidth'), 10) || 500;
+      const width = parseInt(localStorage.getItem('volcanoWidth'), 10) || 460;
       const volcanoSvgWidthPx =
-        fwdRefDVC.current?.offsetWidth - volcanoWidth || 500;
+        fwdRefDVC.current?.offsetWidth - volcanoDivWidth || 500;
       const volcanoSvgHeightPx = newSize || 300;
       // on up/down drag, we are forcing a svg resize by change the volcano width by 1
+
       localStorage.setItem('volcanoWidth', width + 1);
       localStorage.setItem('volcanoHeight', adjustedSize + 1);
       this.setState({
+        volcanoDivHeight: newSize + 1,
+        volcanoDivWidth: divWidth + 1,
         volcanoHeight: adjustedSize + 1,
         volcanoWidth: width + 1,
         volcanoSvgWidth: volcanoSvgWidthPx,
@@ -511,8 +512,10 @@ class DifferentialVolcano extends Component {
       });
     } else {
       const volcanoSvgWidthPx = fwdRefDVC.current?.offsetWidth - newSize || 500;
+      localStorage.setItem('volcanoDivWidth', newSize);
       localStorage.setItem('volcanoWidth', adjustedSize);
       this.setState({
+        volcanoDivWidth: newSize,
         volcanoWidth: adjustedSize,
         volcanoSvgWidth: volcanoSvgWidthPx,
       });
@@ -550,8 +553,13 @@ class DifferentialVolcano extends Component {
   handleVolcanoVisability = () => {
     const { volcanoPlotsVisible } = this.state;
     if (volcanoPlotsVisible) {
+      localStorage.setItem(
+        'volcanoDivHeightBackup',
+        this.state.volcanoDivHeight,
+      );
       localStorage.setItem('volcanoHeightBackup', this.state.volcanoHeight);
       this.setState({
+        volcanoDivHeightBackup: this.state.volcanoDivHeight,
         volcanoHeightBackup: this.state.volcanoHeight,
       });
     }
@@ -560,6 +568,7 @@ class DifferentialVolcano extends Component {
     this.setState({
       volcanoPlotsVisible: !volcanoPlotsVisible,
     });
+    // localStorage.setItem('volcanoPlotsVisible', !volcanoPlotsVisible);
   };
 
   getVolcanoPlotButtonContent = () => {
@@ -622,8 +631,8 @@ class DifferentialVolcano extends Component {
       allowXTransformation,
       allowYTransformation,
       volcanoPlotsVisible,
-      volcanoHeight,
-      volcanoWidth,
+      volcanoDivHeight,
+      volcanoDivWidth,
       animation,
       direction,
       featuresLength,
@@ -915,9 +924,7 @@ class DifferentialVolcano extends Component {
                         !volcanoPlotsVisible ? hiddenResizerStyle : resizerStyle
                       }
                       // defaultSize={this.state.volcanoHeight * 1.05263157895} 1.20263157895
-                      size={
-                        volcanoPlotsVisible ? volcanoHeight * 1.08263157895 : 0
-                      }
+                      size={volcanoPlotsVisible ? volcanoDivHeight : 1}
                       minSize={350}
                       maxSize={1000}
                       onDragFinished={size =>
@@ -932,7 +939,7 @@ class DifferentialVolcano extends Component {
                             : 'Hide VolcanoSplitPane'
                         }
                         // defaultSize={this.state.volcanoWidth * 1.05263157895}
-                        size={volcanoWidth * 1.05263157895}
+                        size={volcanoDivWidth}
                         minSize={300}
                         maxSize={1800}
                         onDragFinished={size =>
@@ -957,8 +964,8 @@ class DifferentialVolcano extends Component {
                           pointSize={12}
                           svgTabMax={1}
                           tab={this.props.tab}
-                          volcanoWidth={this.state.volcanoWidth}
-                          volcanoHeight={this.state.volcanoHeight}
+                          volcanoWidth={this.state.volcanoDivWidth}
+                          volcanoHeight={this.state.volcanoDivHeight}
                           volcanoPlotsVisible={this.state.volcanoPlotsVisible}
                           imageInfoVolcano={this.props.imageInfoVolcano}
                           imageInfoVolcanoLength={
