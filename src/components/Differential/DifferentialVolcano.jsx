@@ -263,12 +263,25 @@ class DifferentialVolcano extends Component {
         filteredTableData: volcanoPlotSelectedDataArr,
         volcanoPlotRows: volcanoPlotSelectedDataArr.length,
       });
+      // if there the max in the table, scroll to it
+      if (this.props.volcanoDifferentialTableRowMax) {
+        let features = volcanoPlotSelectedDataArr.map(
+          i => i[this.props.differentialFeatureIdKey],
+        );
+        let hasMax = features.includes(
+          this.props.volcanoDifferentialTableRowMax,
+        );
+        if (hasMax) {
+          this.pageToFeature(this.props.volcanoDifferentialTableRowMax);
+        } else this.pageToFeature();
+      }
     } else {
       this.setState({
         filteredTableData: this.props.differentialResults,
         volcanoPlotRows: this.props.differentialResults.length,
       });
     }
+    // clear the highlighted rows/dots/svg
     if (clearHighlightedData) {
       this.pageToFeature();
       this.props.onHandleSelectedVolcano([]);
