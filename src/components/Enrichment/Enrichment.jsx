@@ -2030,6 +2030,8 @@ class Enrichment extends Component {
                       additionalTemplateInfoEnrichmentTable
                     }
                     emptyMessage={CustomEmptyMessage}
+                    disableQuickViewEditing
+                    disableQuickViewMenu
                   />
                 </Grid.Column>
               </Grid.Row>

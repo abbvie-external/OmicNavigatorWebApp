@@ -1053,6 +1053,8 @@ class DifferentialVolcano extends Component {
                             rowLevelPropsCalc={this.rowLevelPropsCalc}
                             emptyMessage={CustomEmptyMessage}
                             onFiltered={this.handleTableFiltered}
+                            disableQuickViewEditing
+                            disableQuickViewMenu
                           />
                         </Grid.Column>
                       </Grid.Row>

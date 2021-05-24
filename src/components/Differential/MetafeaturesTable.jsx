@@ -162,6 +162,8 @@ class MetafeaturesTable extends Component {
           // disableFilters={false}
           min-height="5vh"
           emptyMessage={'No Feature Data Available'}
+          disableQuickViewEditing
+          disableQuickViewMenu
         />
       </div>
     );

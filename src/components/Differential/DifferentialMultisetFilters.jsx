@@ -69,6 +69,7 @@ class DifferentialMultisetFilters extends Component {
     const setDescP = [];
     const notSetDescP = [];
     for (var i = 0; i < selectedOperatorP.length; i++) {
+      if (!selectedColP.length || !sigValueP.length) return '';
       switch (selectedOperatorP[i].value) {
         case '<':
           setDescP.push(
