@@ -1,7 +1,9 @@
 import React, { Component, Fragment } from 'react';
 import { Form, Select, Icon, Button } from 'semantic-ui-react';
 import * as d3 from 'd3';
-import { ExponentialNumberInput } from '../Shared/ExponentialNumberInput';
+
+import NumericExponentialInput from '../Shared/NumericExponentialInput';
+// import { ExponentialNumberInput } from '../Shared/ExponentialNumberInput';
 import '../Shared/MultisetFilters.scss';
 
 class DifferentialMultisetFilters extends Component {
@@ -841,10 +843,6 @@ class DifferentialMultisetFilters extends Component {
     this.props.onChangeHoveredFilter(index);
   };
 
-  handleInputChange = (value, index) => {
-    this.props.onHandleSigValuePInputChange('sigValueP', value, index);
-  };
-
   render() {
     const {
       sigValueP,
@@ -856,7 +854,6 @@ class DifferentialMultisetFilters extends Component {
     const OperatorsP = uSettingsP.thresholdOperatorP;
     const indexFiltersP = uSettingsP.indexFiltersP;
     const hoveredFilter = uSettingsP.hoveredFilter;
-    // console.log('render', sigValueP, selectedOperatorP);
     const callbackFactory = index => value => {
       this.props.onHandleSigValuePInputChange('sigValueP', value, index);
     };
@@ -912,8 +909,7 @@ class DifferentialMultisetFilters extends Component {
                   ></Form.Field>
                   <Form.Field width={4} id="SignificantValueInputMultisetP">
                     <label>{index === 0 ? 'Value' : ''}</label>
-                    {/* {console.log('render', sigValueP[index])} */}
-                    <ExponentialNumberInput
+                    <NumericExponentialInput
                       onChange={callbackFactory(index)}
                       min={1e-100}
                       preventNegatives={false}
