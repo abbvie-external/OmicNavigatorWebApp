@@ -354,6 +354,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         );
         d3.event.stopPropagation();
       });
+    this.highlightBrushedCircles();
   }
 
   scaleFactory(scaleData) {
@@ -552,33 +553,21 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       volcanoDifferentialTableRowMax,
       volcanoDifferentialTableRowOther,
     } = this.props;
-    // excessive styling needed for proper display across all export types
-    // style all circles back to default
     d3.select('#nonfiltered-elements')
-      .selectAll('path')
-      .attr('fill', d => this.determineBinColor(this.state.bins, d.length))
-      .attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(5)}`);
-    const allCircles = d3.selectAll('circle.volcanoPlot-dataPoint');
-    allCircles.attr('style', 'fill: #1678c2');
-    allCircles.attr('stroke', '#000');
-    allCircles.attr('r', 2);
-    allCircles.classed('highlighted', false);
-    allCircles.classed('highlightedMax', false);
-    const selectedCircles = d3.selectAll(
-      'circle.volcanoPlot-dataPoint.selected',
-    );
+      .selectAll('circle')
+      .attr('style', 'fill: #1678c2')
+      .attr('stroke', '#000')
+      .attr('r', 2)
+      .classed('highlighted', false)
+      .classed('highlightedMax', false);
 
-    // style all brushed circles
-    selectedCircles.attr('style', 'fill: #00aeff').classed('highlighted', true);
-    selectedCircles.attr('r', 2.5);
-    selectedCircles.raise();
     if (volcanoDifferentialTableRowOther?.length > 0) {
       volcanoDifferentialTableRowOther.forEach(element => {
         // style all highlighted circles
         const highlightedCircleId = this.getCircleOrBin(element);
         const highlightedCircle = d3.select(highlightedCircleId?.element);
         if (highlightedCircle != null) {
-          if (highlightedCircleId.type === 'circle') {
+          if (highlightedCircleId?.type === 'circle') {
             highlightedCircle.attr('r', 4);
             highlightedCircle
               .attr('style', 'fill: #ff7e05')
@@ -998,13 +987,9 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         self.renderCirclesFilter(data);
         self.renderCircles(elementsToDisplay);
       }
-      setTimeout(
-        () =>
-          self.props.onHandleVolcanoPlotSelectionChange(
-            elementsToDisplay,
-            clearHighlightedData,
-          ),
-        500,
+      self.props.onHandleVolcanoPlotSelectionChange(
+        elementsToDisplay,
+        clearHighlightedData,
       );
     } else {
       if (data.length >= 2500) {
@@ -1028,14 +1013,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         const elementsToDisplay = _.uniqBy(data, differentialFeatureIdKey);
         self.renderCircles(elementsToDisplay);
       }
-      setTimeout(
-        () =>
-          self.props.onHandleVolcanoPlotSelectionChange(
-            data,
-            clearHighlightedData,
-          ),
-        500,
-      );
+      self.props.onHandleVolcanoPlotSelectionChange(data, clearHighlightedData);
     }
   }
 
@@ -1222,7 +1200,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
   handleBrushedText = brushed => {
     // MAP brushedDataArr to circle text state
     const brushedCircleTextMapped = brushed._groups[0].map(a => {
-      if (!a && !a.attributes) return null;
+      if (!a || !a.attributes) return null;
       const columnData = JSON.parse(a.attributes['data'].nodeValue);
       const key = this.props.volcanoCircleLabel || 0;
       return {
