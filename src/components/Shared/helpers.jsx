@@ -145,7 +145,7 @@ export function formatNumberForDisplay(num) {
 }
 
 export function splitValue(value) {
-  if (value && value.isNaN) {
+  if (value && isNaN(value)) {
     const firstValue = value.split(';')[0];
     const numberOfSemicolons = (value.match(/;/g) || []).length;
     return numberOfSemicolons > 0
