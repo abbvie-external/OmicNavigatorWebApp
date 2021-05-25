@@ -28,6 +28,7 @@ import SplitPanesContainer from './SplitPanesContainer';
 import CustomEmptyMessage from '../Shared/Templates';
 // eslint-disable-next-line no-unused-vars
 import QHGrid, { EZGrid } from '../Shared/QHGrid';
+import ErrorBoundary from '../Shared/ErrorBoundary';
 
 let cancelRequestEnrichmentGetPlot = () => {};
 let cancelRequestGetEnrichmentsNetwork = () => {};
@@ -2345,12 +2346,14 @@ class Enrichment extends Component {
                 visible={visibleEnrichment}
               />
               <Sidebar.Pusher>
-                <div
-                  className="EnrichmentViewContainer"
-                  ref={this.EnrichmentViewContainerRef}
-                >
-                  {enrichmentView}
-                </div>
+                <ErrorBoundary>
+                  <div
+                    className="EnrichmentViewContainer"
+                    ref={this.EnrichmentViewContainerRef}
+                  >
+                    {enrichmentView}
+                  </div>
+                </ErrorBoundary>
               </Sidebar.Pusher>
             </Sidebar.Pushable>
           </Grid.Column>
