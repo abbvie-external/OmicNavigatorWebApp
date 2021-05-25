@@ -491,6 +491,8 @@ class FilteredDifferentialTable extends Component {
             onRowClick={this.handleRowClick}
             rowLevelPropsCalc={this.rowLevelPropsCalc}
             emptyMessage={CustomEmptyMessage}
+            disableQuickViewEditing
+            disableQuickViewMenu
           />
         </div>
       );

@@ -45,4 +45,37 @@
   margin-left: 20px !important;
   margin-top: 5px !important;
 }
+
+// #volcano {
+//   overflow: hidden;
+// }
 //}
+
+#VolcanoPlotDiv {
+  margin-bottom: 5px;
+}
+
+.breadcrumb-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  .clear-button {
+    margin: 0px 0px 15px 7px;
+    cursor: pointer;
+    &:hover {
+      color: #ff4400;
+    }
+  }
+
+  .ui.steps {
+    .step.active {
+      background-color: #ff4400;
+    }
+  }
+
+  .ui.loader:after,
+  .ui.loader:before {
+    margin: 5px 0px 0px -5px;
+  }
+}

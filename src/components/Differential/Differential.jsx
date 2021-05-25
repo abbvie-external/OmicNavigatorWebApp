@@ -50,10 +50,12 @@ class Differential extends Component {
       },
       isItemSelected: false,
       isItemSVGLoaded: false,
+      isUpsetVisible: false,
+      isFilteredDifferential: false,
       // isItemDatatLoaded: false,
       // HighlightedFeaturesArrVolcano: [],
       // volcanoDifferentialTableRowMax: '',
-      // volcanoDifferentialTableRowOther: [],
+      // volcanoDifferentialTableRowOther: [], commented on 3/31 Paul
       // maxObjectIdentifier: null,
       imageInfoVolcano: {
         key: null,
@@ -65,6 +67,7 @@ class Differential extends Component {
         title: '',
         svg: [],
       },
+      activeSVGTabIndex: 0,
       multisetPlotAvailableDifferential: false,
       animation: 'uncover',
       direction: 'left',
@@ -85,6 +88,7 @@ class Differential extends Component {
       allMetaFeaturesDataDifferential: [],
       isDataStreamingResultsTable: false,
       enableMultifeaturePlotting: false,
+      updateVolcanoLabels: false,
     };
   }
 
@@ -106,6 +110,24 @@ class Differential extends Component {
   handleSearchTransitionDifferential = bool => {
     this.setState({
       isSearchingDifferential: bool,
+    });
+  };
+
+  handleUpsetVisible = bool => {
+    this.setState({
+      isUpsetVisible: bool,
+    });
+  };
+
+  handleIsFilteredDifferential = bool => {
+    this.setState({
+      isFilteredDifferential: bool,
+    });
+  };
+
+  handleSearchTransitionDifferentialAlt = bool => {
+    this.setState({
+      isVolcanoTableLoading: bool,
     });
   };
 
@@ -151,7 +173,7 @@ class Differential extends Component {
     });
   };
 
-  handleDifferentialSearch = searchResults => {
+  handleDifferentialSearch = (searchResults, streamingFinished) => {
     /**
      * @type {QHGrid.ColumnConfig<{}>[]}
      */
@@ -172,6 +194,9 @@ class Differential extends Component {
       HighlightedFeaturesArrVolcano: [],
       enableMultifeaturePlotting: false,
     });
+
+    if (streamingFinished)
+      this.setState({ isDataStreamingResultsTable: false });
   };
 
   handleVolcanoTableLoading = bool => {
@@ -591,6 +616,25 @@ class Differential extends Component {
     });
   };
 
+  // handleTableDataChange = data => {
+  //   console.log(data);
+  //   this.setState({
+  //     metaFeaturesDataDifferential: data,
+  //   });
+  // };
+
+  // updateDifferentialResultsUnfiltered = results => {
+  //   this.setState({
+  //     differentialResultsUnfiltered: results,
+  //   });
+  // };
+
+  updateDifferentialResults = results => {
+    this.setState({
+      differentialResults: results,
+    });
+  };
+
   handleSelectedVolcano = toHighlightArr => {
     const enableMultifeature = toHighlightArr.length > 1 ? true : false;
     this.setState({
@@ -633,12 +677,14 @@ class Differential extends Component {
       this.setState({
         volcanoDifferentialTableRowMax: volcanoDifferentialTableRowMaxVar,
         volcanoDifferentialTableRowOther: volcanoDifferentialTableRowOtherVar,
+        // volcanoDifferentialTableAll: toHighlightArr,
+        HighlightedFeaturesArrVolcano: toHighlightArr,
         updateVolcanoLabels: true,
       });
       this.handlePlotVolcano(maxId);
     } else {
       this.setState({
-        volcanoDifferentialTableRowMax: '',
+        volcanoDifferentialTableRowMax: null,
         volcanoDifferentialTableRowOther: [],
       });
       this.handlePlotVolcano('');
@@ -963,6 +1009,9 @@ class Differential extends Component {
           onHandleVolcanoTableLoading={this.handleVolcanoTableLoading}
           onBackToTable={this.backToTable}
           onUpdateVolcanoLabels={this.updateVolcanoLabels}
+          onHandleUpdateDifferentialResults={this.updateDifferentialResults}
+          onHandleVolcanoState={this.updateVolcanoState}
+          onHandleTableDataChange={this.handleTableDataChange}
           fwdRefDVC={this.differentialViewContainerRef}
           onGetMultifeaturePlot={this.getMultifeaturePlot}
         />
@@ -1094,6 +1143,8 @@ class Differential extends Component {
               onHandleIsDataStreamingResultsTable={
                 this.handleIsDataStreamingResultsTable
               }
+              onHandleUpsetVisible={this.handleUpsetVisible}
+              onHandleIsFilteredDifferential={this.handleIsFilteredDifferential}
             />
           </Grid.Column>
           <Grid.Column

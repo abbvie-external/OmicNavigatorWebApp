@@ -37,6 +37,7 @@ class DifferentialPlot extends PureComponent {
   }
 
   componentDidUpdate(prevProps, prevState) {
+    console.log(this.props.metaFeaturesDataDifferential);
     const { imageInfoDifferentialLength, isItemSVGLoaded } = this.props;
     const { activeSVGTabIndexDifferential } = this.state;
     if (
