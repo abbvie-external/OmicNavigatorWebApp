@@ -19,6 +19,7 @@ import DifferentialVolcano from './DifferentialVolcano';
 import _ from 'lodash';
 import './Differential.scss';
 import '../Shared/Table.scss';
+import ErrorBoundary from '../Shared/ErrorBoundary';
 
 let cancelRequestDifferentialResultsGetPlot = () => {};
 class Differential extends Component {
@@ -1161,12 +1162,14 @@ class Differential extends Component {
                 visible={visible}
               />
               <Sidebar.Pusher>
-                <div
-                  className="DifferentialViewContainer"
-                  ref={this.differentialViewContainerRef}
-                >
-                  {differentialView}
-                </div>
+                <ErrorBoundary>
+                  <div
+                    className="DifferentialViewContainer"
+                    ref={this.differentialViewContainerRef}
+                  >
+                    {differentialView}
+                  </div>
+                </ErrorBoundary>
               </Sidebar.Pusher>
             </Sidebar.Pushable>
           </Grid.Column>
