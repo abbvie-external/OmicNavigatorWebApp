@@ -1012,7 +1012,7 @@ class DifferentialVolcano extends Component {
                             // image
                             // basic
                             onClick={() =>
-                              this.props.onGetMultifeaturePlot(
+                              this.props.onHandleMultifeaturePlot(
                                 'Differential',
                                 tableData,
                               )

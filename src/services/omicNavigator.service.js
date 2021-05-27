@@ -111,12 +111,11 @@ class OmicNavigatorService {
     modelID,
     featureID,
     plotID,
-    plotType,
     errorCb,
     cancelToken,
   ) {
     this.setUrl();
-    const timeoutLength = plotType === 'multiFeature' ? 250000 : 25000;
+    const timeoutLength = 60000;
     const promise = this.ocpuPlotCall(
       'plotStudy',
       {
@@ -131,6 +130,48 @@ class OmicNavigatorService {
     );
     const dataFromPromise = await promise;
     return dataFromPromise;
+  }
+
+  async plotStudyReturnSVGWithTimeoutResolver(
+    study,
+    modelID,
+    featureID,
+    plotID,
+    errorCb,
+    cancelToken,
+  ) {
+    this.setUrl();
+    const timeoutLength = 240000;
+    // const cacheKey = `plotStudyMultifeature_${study}_${modelID}_${featureID}_${plotID}`;
+    // if (this[cacheKey] != null) {
+    //   return this[cacheKey];
+    // }
+    const promise = this.ocpuPlotCall(
+      'plotStudy',
+      {
+        study,
+        modelID,
+        featureID,
+        plotID,
+      },
+      errorCb,
+      cancelToken,
+      timeoutLength,
+    );
+    function timeoutResolver(ms) {
+      return new Promise((resolve, reject) => {
+        setTimeout(function() {
+          reject(true);
+        }, ms);
+      });
+    }
+    try {
+      await Promise.race([promise, timeoutResolver(10000)]);
+      // this[cacheKey] = promise;
+      return promise;
+    } catch (err) {
+      return err;
+    }
   }
 
   async ocpuRPCOutput(method, obj) {
@@ -289,17 +330,9 @@ class OmicNavigatorService {
     }
   }
 
-  async plotStudy(
-    study,
-    modelID,
-    featureID,
-    plotID,
-    plotType,
-    errorCb,
-    cancelToken,
-  ) {
+  async plotStudy(study, modelID, featureID, plotID, errorCb, cancelToken) {
     this.setUrl();
-    const timeoutLength = plotType === 'multiFeature' ? 250000 : 25000;
+    const timeoutLength = 60000;
     const cacheKey = `plotStudy_${study}_${modelID}_${featureID}_${plotID}`;
     if (this[cacheKey] != null) {
       return this[cacheKey];
