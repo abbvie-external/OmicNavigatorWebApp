@@ -77,34 +77,61 @@ class OmicNavigatorService {
     });
   }
 
-  // async ocpuPlotCall(method, obj, handleError, cancelToken, timeout) {
-  //   return new Promise(function(resolve, reject) {
-  //     window.ocpu
-  //       .call(method, obj, function(session) {
-  //         axios
-  //           .get(session.getLoc() + 'graphics/1/svg', {
-  //             responseType: 'text',
-  //             cancelToken,
-  //             timeout,
-  //           })
-  //           .then(response => resolve(response))
-  //           .catch(function(thrown) {
-  //             if (!axios.isCancel(thrown)) {
-  //               toast.error(`${thrown.message}`);
-  //               if (handleError != null) {
-  //                 handleError(false);
-  //               }
-  //             }
-  //           });
-  //       })
-  //       .catch(error => {
-  //         toast.error(`${error.statusText}: ${error.responseText}`);
-  //         if (handleError != null) {
-  //           handleError(false);
-  //         }
-  //       });
-  //   });
-  // }
+  async ocpuPlotCall(method, obj, handleError, cancelToken, timeout) {
+    return new Promise(function(resolve, reject) {
+      window.ocpu
+        .call(method, obj, function(session) {
+          axios
+            .get(session.getLoc() + 'graphics/1/svg', {
+              responseType: 'text',
+              cancelToken,
+              timeout,
+            })
+            .then(response => resolve(response))
+            .catch(function(thrown) {
+              if (!axios.isCancel(thrown)) {
+                toast.error(`${thrown.message}`);
+                if (handleError != null) {
+                  handleError(false);
+                }
+              }
+            });
+        })
+        .catch(error => {
+          toast.error(`${error.statusText}: ${error.responseText}`);
+          if (handleError != null) {
+            handleError(false);
+          }
+        });
+    });
+  }
+
+  async plotStudyReturnSVG(
+    study,
+    modelID,
+    featureID,
+    plotID,
+    plotType,
+    errorCb,
+    cancelToken,
+  ) {
+    this.setUrl();
+    const timeoutLength = plotType === 'multiFeature' ? 250000 : 25000;
+    const promise = this.ocpuPlotCall(
+      'plotStudy',
+      {
+        study,
+        modelID,
+        featureID,
+        plotID,
+      },
+      errorCb,
+      cancelToken,
+      timeoutLength,
+    );
+    const dataFromPromise = await promise;
+    return dataFromPromise;
+  }
 
   async ocpuRPCOutput(method, obj) {
     return new Promise(function(resolve, reject) {

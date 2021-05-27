@@ -37,12 +37,17 @@ class DifferentialPlot extends PureComponent {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    console.log(this.props.metaFeaturesDataDifferential);
-    const { imageInfoDifferentialLength, isItemSVGLoaded } = this.props;
+    const {
+      imageInfoDifferentialLength,
+      isItemSVGLoaded,
+      metaFeaturesDataDifferential,
+    } = this.props;
     const { activeSVGTabIndexDifferential } = this.state;
     if (
-      isItemSVGLoaded &&
-      prevProps.imageInfoDifferentialLength !== imageInfoDifferentialLength
+      (isItemSVGLoaded &&
+        prevProps.imageInfoDifferentialLength !==
+          imageInfoDifferentialLength) ||
+      prevProps.metaFeaturesDataDifferential !== metaFeaturesDataDifferential
     ) {
       this.getSVGPanes();
     }
@@ -99,44 +104,17 @@ class DifferentialPlot extends PureComponent {
     let panes = [];
     if (this.props.imageInfoDifferential) {
       if (this.props.imageInfoDifferential.svg.length !== 0) {
-        const pxToPtRatio = 105;
-        const pointSize = 12;
-        const width =
-          window.innerWidth ||
-          document.documentElement.clientWidth ||
-          document.body.clientWidth;
-        const height =
-          window.innerHeight ||
-          document.documentElement.clientHeight ||
-          document.body.clientHeight;
-        const divWidth = width * 0.75;
-        const divHeight = height * 0.8;
-        // const divWidth =
-        //   this.props.fwdRefDVC?.current?.offsetWidth - 15 || width - 310;
-        // const divHeight =
-        //   this.props.fwdRefDVC?.current?.offsetHeight - 115 || height - 50;
-        const divWidthPt = roundToPrecision(divWidth / pxToPtRatio, 1);
-        const divHeightPt = roundToPrecision(divHeight / pxToPtRatio, 1);
-        const divWidthPtString = `width=${divWidthPt}`;
-        const divHeightPtString = `&height=${divHeightPt}`;
-        const pointSizeString = `&pointsize=${pointSize}`;
-        const dimensions = `?${divWidthPtString}${divHeightPtString}${pointSizeString}`;
         const svgArray = [...this.props.imageInfoDifferential.svg];
         const svgPanes = svgArray.map(s => {
-          const srcUrl = `${s.svg}${dimensions}`;
           return {
             menuItem: `${s.plotType.plotDisplay}`,
             render: () => (
               <Tab.Pane attached="true" as="div">
-                <div id="DifferentialPlotTabsPlotSVGDiv" className="svgSpan">
-                  <SVG
-                    cacheRequests={true}
-                    src={srcUrl}
-                    uniqueHash="c3h0f3"
-                    uniquifyIDs={true}
-                    id="DifferentialPlotTabsPlotSVG"
-                  />
-                </div>
+                <div
+                  id="DifferentialPlotTabsPlotSVGDiv"
+                  className="svgSpan"
+                  dangerouslySetInnerHTML={{ __html: s.svg }}
+                ></div>
               </Tab.Pane>
             ),
           };
@@ -144,6 +122,7 @@ class DifferentialPlot extends PureComponent {
         panes = panes.concat(svgPanes);
       }
     }
+    debugger;
     const isMultifeaturePlot =
       this.props.imageInfoDifferential.key?.includes('features') || false;
     if (
