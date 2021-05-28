@@ -664,7 +664,6 @@ class Differential extends Component {
         data = [...data.slice(0, this.state.multifeaturePlotMax)];
       }
       const featureIds = data.map(featureId => featureId[key]);
-      debugger;
       this.getMultifeaturePlotTransition(featureIds, false);
     } else return;
   };
