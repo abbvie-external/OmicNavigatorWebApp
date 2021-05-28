@@ -560,6 +560,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       volcanoDifferentialTableRowOther,
     } = this.props;
     if (d3.select('#nonfiltered-elements').size() !== 0) {
+      // set circles back to default
       d3.select('#nonfiltered-elements')
         .selectAll('circle')
         .attr('style', 'fill: #1678c2')
@@ -568,6 +569,18 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         .classed('highlighted', false)
         .classed('highlightedMax', false);
     }
+
+    // set bins back to white
+    d3.select('#nonfiltered-elements')
+      .selectAll('path')
+      .attr('fill', 'white')
+      .attr('stroke', '#000')
+      .attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(5)}`);
+
+    // determine new bin color
+    d3.select('#nonfiltered-elements')
+      .selectAll('path')
+      .attr('fill', d => this.determineBinColor(this.state.bins, d.length));
 
     if (volcanoDifferentialTableRowOther?.length > 0) {
       volcanoDifferentialTableRowOther.forEach(element => {
@@ -581,7 +594,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
               .attr('style', 'fill: #ff7e05')
               .classed('highlighted', true);
             highlightedCircle.attr('r', 5);
-            highlightedCircle.classed('highlightedMax', true);
+            highlightedCircle.classed('highlighted', true);
             highlightedCircle.raise();
           } else {
             highlightedCircle
@@ -589,7 +602,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
               .classed('highlighted', true);
             highlightedCircle.attr('stroke', '#ff7e05');
             highlightedCircle.attr('stroke-width', '#ff7e05');
-            highlightedCircle.classed('highlightedMax', true);
+            highlightedCircle.classed('highlighted', true);
             highlightedCircle.raise();
           }
         }
@@ -604,12 +617,12 @@ class DifferentialVolcanoPlot extends React.PureComponent {
           if (maxCircleId.type === 'circle') {
             maxCircle
               .attr('style', 'fill: #ff4400')
-              .classed('highlighted', true);
+              .classed('highlightedMax', true);
             maxCircle.attr('r', 5);
             maxCircle.classed('highlightedMax', true);
             maxCircle.raise();
           } else {
-            maxCircle.attr('fill', '#ff4400').classed('highlighted', true);
+            maxCircle.attr('fill', '#ff4400').classed('highlightedMax', true);
             maxCircle.attr('stroke', '#000');
             maxCircle.attr('stroke-width', 1);
             maxCircle.attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(7)}`);
