@@ -667,7 +667,9 @@ class DifferentialVolcano extends Component {
 
   getMultiFeaturePlotBtnPopupContent = () => {
     if (this.state.featuresLength === 1000) {
-      return 'Plot the first 1000 features in the table';
+      if (this.props.HighlightedFeaturesArrVolcano?.length < 1000) {
+        return 'Plot the first 1000 features in the table';
+      } else return 'Plot the first 1000 highlighted features in the table';
     } else if (this.props.HighlightedFeaturesArrVolcano?.length) {
       return `Plot the ${this.state.featuresLength} highlighted features`;
     } else return 'Plot all of the features in the table';
