@@ -660,10 +660,11 @@ class Differential extends Component {
         ? 'id'
         : differentialFeatureIdKey;
     if (data.length) {
-      if (data.length > this.state.mulitfeaturePlotMax) {
-        data = [...data.slice(0, this.state.mulitfeaturePlotMax)];
+      if (data.length > this.state.multifeaturePlotMax) {
+        data = [...data.slice(0, this.state.multifeaturePlotMax)];
       }
       const featureIds = data.map(featureId => featureId[key]);
+      debugger;
       this.getMultifeaturePlotTransition(featureIds, false);
     } else return;
   };
