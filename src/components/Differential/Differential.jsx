@@ -93,6 +93,7 @@ class Differential extends Component {
       isDataStreamingResultsTable: false,
       enableMultifeaturePlotting: false,
       updateVolcanoLabels: false,
+      multifeaturePlotMax: 1000,
     };
   }
 
@@ -660,8 +661,8 @@ class Differential extends Component {
         : differentialFeatureIdKey;
     debugger;
     if (data.length) {
-      if (data.length > 1000) {
-        data = [...data.slice(0, 999)];
+      if (data.length > this.state.mulitfeaturePlotMax) {
+        data = [...data.slice(0, this.state.mulitfeaturePlotMax)];
       }
       const featureIds = data.map(featureId => featureId[key]);
       this.getMultifeaturePlotTransition(featureIds, false);
