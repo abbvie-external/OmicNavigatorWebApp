@@ -546,7 +546,6 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     circles
       .attr('style', 'fill: #1678c2')
       .attr('r', 2)
-      .classed('selected', false)
       .classed('highlighted', false)
       .classed('highlightedMax', false);
 
@@ -700,9 +699,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         d3.select(`circle[id='volcanoDataPoint-${e[this.props.identifier]}`)
           ._groups[0][0] ?? null;
       if (hoveredCircle != null) {
-        if (hoveredCircle.attributes['class'].value.endsWith('selected')) {
-          hoveredCircle.attributes['r'].value = 2.5;
-        } else if (
+        if (
           hoveredCircle.attributes['class'].value.endsWith('highlightedMax')
         ) {
           hoveredCircle.attributes['r'].value = 5;
@@ -1135,7 +1132,6 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         const circles = d3.selectAll('circle.volcanoPlot-dataPoint');
         circles.attr('style', 'fill: #1678c2');
         circles.attr('r', 2);
-        circles.classed('selected', false);
         circles.classed('highlighted', false);
         circles.classed('highlightedMax', false);
 
@@ -1144,10 +1140,6 @@ class DifferentialVolcanoPlot extends React.PureComponent {
           const y = d3.select(this).attr('cy');
           return isBrushed(x, y);
         });
-
-        brushedCircles.attr('style', 'fill: #00aeff');
-        brushedCircles.attr('r', 2.5);
-        brushedCircles.classed('selected', true);
 
         const brushedDataArr = brushedCircles._groups[0].map(a => {
           return JSON.parse(a.attributes.data.value);
