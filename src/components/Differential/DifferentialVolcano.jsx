@@ -5,7 +5,11 @@ import CustomEmptyMessage from '../Shared/Templates';
 import QHGrid, { EZGrid } from '../Shared/QHGrid';
 import DifferentialPlot from './DifferentialPlot';
 import SVGPlot from '../Shared/SVGPlot';
-import { scrollElement } from '../Shared/helpers';
+import {
+  scrollElement,
+  limitLength,
+  limitLengthOrNull,
+} from '../Shared/helpers';
 import DifferentialVolcanoPlot from './DifferentialVolcanoPlot';
 import {
   Form,
@@ -97,8 +101,8 @@ class DifferentialVolcano extends Component {
     if (prevProps.differentialResults !== differentialResults) {
       this.setState({
         filteredTableData: differentialResults,
-        volcanoPlotRows: differentialResults.length,
-        featuresLength: differentialResults.length || 0,
+        volcanoPlotRows: differentialResults?.length || 0,
+        featuresLength: limitLength(differentialResults?.length, 1000) || 0,
       });
     }
 
@@ -379,7 +383,9 @@ class DifferentialVolcano extends Component {
         });
         this.props.onHandleSelectedVolcano(shiftedTableDataArray);
         this.setState({
-          featuresLength: shiftedTableDataArray.length || sortedData.length,
+          featuresLength:
+            limitLengthOrNull(shiftedTableDataArray?.length, 1000) ||
+            limitLength(sortedData?.length, 1000),
         });
       } else if (event.ctrlKey) {
         const allTableData =
@@ -393,7 +399,9 @@ class DifferentialVolcano extends Component {
           );
           this.props.onHandleSelectedVolcano(selectedTableDataArray);
           this.setState({
-            featuresLength: selectedTableDataArray.length || sortedData.length,
+            featuresLength:
+              limitLengthOrNull(selectedTableDataArray?.length, 1000) ||
+              limitLength(sortedData?.length, 1000),
           });
         } else {
           // not yet highlighted, add it to array
@@ -417,7 +425,9 @@ class DifferentialVolcano extends Component {
           selectedTableDataArray = [...PreviouslyHighlighted];
           this.props.onHandleSelectedVolcano(selectedTableDataArray);
           this.setState({
-            featuresLength: selectedTableDataArray.length || sortedData.length,
+            featuresLength:
+              limitLengthOrNull(selectedTableDataArray?.length, 1000) ||
+              limitLength(sortedData?.length, 1000),
           });
         }
       } else {
@@ -436,7 +446,9 @@ class DifferentialVolcano extends Component {
             key: item[differentialFeatureIdKey],
           },
         ]);
-        this.setState({ featuresLength: sortedData.length || 0 });
+        this.setState({
+          featuresLength: limitLength(sortedData?.length, 1000),
+        });
       }
     }
   };
@@ -610,13 +622,14 @@ class DifferentialVolcano extends Component {
     } else if (HighlightedFeaturesArrVolcano.length > 1) {
       this.setState({
         featuresLength:
-          HighlightedFeaturesArrVolcano.length || sortedData.length,
+          limitLengthOrNull(HighlightedFeaturesArrVolcano?.length, 1000) ||
+          limitLength(sortedData?.length, 1000),
       });
     } else {
       let sortedData =
         this.volcanoPlotFilteredGridRef?.current?.qhGridRef?.current?.data ||
         differentialResults;
-      this.setState({ featuresLength: sortedData.length || 0 });
+      this.setState({ featuresLength: limitLength(sortedData?.length, 1000) });
     }
   };
 

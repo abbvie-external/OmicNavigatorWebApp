@@ -206,6 +206,18 @@ export function roundToPrecision(value, precision) {
   return Math.round(value * multiplier) / multiplier;
 }
 
+export function limitLength(arrLength, length) {
+  if (arrLength) {
+    return arrLength < length ? arrLength : length;
+  } else return 0;
+}
+
+export function limitLengthOrNull(arrLength, length) {
+  if (arrLength) {
+    return arrLength < length ? arrLength : length;
+  } else return null;
+}
+
 export function networkByCluster(network) {
   network = _.cloneDeep(network);
   let buckets = [];

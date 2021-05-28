@@ -610,10 +610,10 @@ class Differential extends Component {
                 plotType: multifeaturePlot[0],
                 svg: svg.data,
               };
-              const featuresLength = featureids.length;
+              const featuresLengthVar = featureids.length;
               const imageInfoVar = {
-                key: `(${featuresLength}-features)`,
-                title: `${differentialFeatureIdKey} (${featuresLength} Features)`,
+                key: `(${featuresLengthVar}-features)`,
+                title: `${differentialFeatureIdKey} (${featuresLengthVar} Features)`,
                 svg: [],
               };
               imageInfoVar.svg.push(svgInfo);
@@ -650,7 +650,7 @@ class Differential extends Component {
   handleMultifeaturePlot = (view, tableData) => {
     const { HighlightedFeaturesArrVolcano } = this.state;
     const { differentialFeatureIdKey } = this.props;
-    const data =
+    let data =
       HighlightedFeaturesArrVolcano.length > 1
         ? HighlightedFeaturesArrVolcano
         : tableData;
@@ -658,7 +658,11 @@ class Differential extends Component {
       HighlightedFeaturesArrVolcano.length > 1
         ? 'id'
         : differentialFeatureIdKey;
+    debugger;
     if (data.length) {
+      if (data.length > 1000) {
+        data = [...data.slice(0, 999)];
+      }
       const featureIds = data.map(featureId => featureId[key]);
       this.getMultifeaturePlotTransition(featureIds, false);
     } else return;
