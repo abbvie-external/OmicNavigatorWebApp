@@ -1249,6 +1249,9 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         .selectAll('text')
         .remove();
 
+      // if (d3.select('#nonfiltered-elements').size() !== 0) {
+      console.log(d3.select('#nonfiltered-elements').size());
+      debugger;
       d3.select('#nonfiltered-elements')
         .selectAll('text')
         .data(brushedCircleTextMapped)

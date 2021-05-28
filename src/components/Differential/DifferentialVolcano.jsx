@@ -665,6 +665,14 @@ class DifferentialVolcano extends Component {
     } else return false;
   };
 
+  getMultiFeaturePlotBtnPopupContent = () => {
+    if (this.state.featuresLength === 1000) {
+      return 'Plot the first 1000 features in the table';
+    } else if (this.props.HighlightedFeaturesArrVolcano?.length) {
+      return `Plot the ${this.state.featuresLength} highlighted features`;
+    } else return 'Plot all of the features in the table';
+  };
+
   render() {
     const {
       filteredTableData,
@@ -1034,33 +1042,41 @@ class DifferentialVolcano extends Component {
                         <div
                           className={
                             !HasMultifeaturePlots ||
-                            isDataStreamingResultsTable ||
+                            // isDataStreamingResultsTable ||
                             HighlightedFeaturesArrVolcano.length === 1 ||
                             featuresLength === 1
                               ? 'MultifeaturePlotBtnDiv Hide'
                               : 'MultifeaturePlotBtnDiv Show'
                           }
                         >
-                          <Label
-                            className="MultiFeaturePlotBtn NoSelect"
-                            size={dynamicSizeLarger}
-                            // color="blue"
-                            // image
-                            // basic
-                            onClick={() =>
-                              this.props.onHandleMultifeaturePlot(
-                                'Differential',
-                                tableData,
-                              )
+                          <Popup
+                            trigger={
+                              <Label
+                                className="MultiFeaturePlotBtn NoSelect"
+                                size={dynamicSizeLarger}
+                                // color="blue"
+                                // image
+                                // basic
+                                onClick={() =>
+                                  this.props.onHandleMultifeaturePlot(
+                                    'Differential',
+                                    tableData,
+                                  )
+                                }
+                              >
+                                {HighlightedFeaturesArrVolcano.length !== 1
+                                  ? 'MULTI-FEATURE PLOT'
+                                  : 'SINGLE-FEATURE PLOT'}
+                                <Label.Detail className="MultiFeaturePlotDetail">
+                                  {featuresLength}
+                                </Label.Detail>
+                              </Label>
                             }
-                          >
-                            {HighlightedFeaturesArrVolcano.length !== 1
-                              ? 'MULTI-FEATURE PLOT'
-                              : 'SINGLE-FEATURE PLOT'}
-                            <Label.Detail className="MultiFeaturePlotDetail">
-                              {featuresLength}
-                            </Label.Detail>
-                          </Label>
+                            style={TableValuePopupStyle}
+                            content={this.getMultiFeaturePlotBtnPopupContent}
+                            inverted
+                            basic
+                          ></Popup>
                         </div>
                         <div className="FloatRight AbsoluteExportDifferential">
                           <ButtonActions
