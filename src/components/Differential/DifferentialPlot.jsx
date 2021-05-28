@@ -1,8 +1,6 @@
 import React, { PureComponent } from 'react';
 import { withRouter } from 'react-router-dom';
 import { Grid, Dimmer, Loader, Tab, Dropdown } from 'semantic-ui-react';
-import SVG from 'react-inlinesvg';
-import { roundToPrecision } from '../Shared/helpers';
 import DifferentialBreadcrumbs from './DifferentialBreadcrumbs';
 import ButtonActions from '../Shared/ButtonActions';
 import MetafeaturesTable from './MetafeaturesTable';
@@ -47,7 +45,8 @@ class DifferentialPlot extends PureComponent {
       (isItemSVGLoaded &&
         prevProps.imageInfoDifferentialLength !==
           imageInfoDifferentialLength) ||
-      prevProps.metaFeaturesDataDifferential !== metaFeaturesDataDifferential
+      prevProps.metaFeaturesDataDifferential.length !==
+        metaFeaturesDataDifferential.length
     ) {
       this.getSVGPanes();
     }
@@ -122,7 +121,6 @@ class DifferentialPlot extends PureComponent {
         panes = panes.concat(svgPanes);
       }
     }
-    debugger;
     const isMultifeaturePlot =
       this.props.imageInfoDifferential.key?.includes('features') || false;
     if (

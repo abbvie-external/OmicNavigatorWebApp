@@ -23,10 +23,8 @@ class MetafeaturesTable extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    console.log('table', this.props.metaFeaturesData);
     if (
-      this.props.metaFeaturesData.length !== 0 &&
-      this.props.metaFeaturesData !== prevProps.metaFeaturesData
+      this.props.metaFeaturesData.length !== prevProps.metaFeaturesData.length
     ) {
       this.getMetafeaturesTableConfigCols(this.props.metaFeaturesData);
     }

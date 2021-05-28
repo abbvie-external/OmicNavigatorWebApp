@@ -106,7 +106,39 @@ class OmicNavigatorService {
     });
   }
 
-  async plotStudyReturnSVG(
+  async plotStudyReturnSvgUrl(
+    study,
+    modelID,
+    featureID,
+    plotID,
+    errorCb,
+    cancelToken,
+  ) {
+    this.setUrl();
+    const timeoutLength = 60000;
+    const cacheKey = `plotStudy_${study}_${modelID}_${featureID}_${plotID}`;
+    if (this[cacheKey] != null) {
+      return this[cacheKey];
+    } else {
+      const promise = this.axiosPostPlot(
+        'plotStudy',
+        {
+          study,
+          modelID,
+          featureID,
+          plotID,
+        },
+        errorCb,
+        cancelToken,
+        timeoutLength,
+      );
+      const dataFromPromise = await promise;
+      this[cacheKey] = dataFromPromise;
+      return dataFromPromise;
+    }
+  }
+
+  async plotStudyReturnSvg(
     study,
     modelID,
     featureID,
@@ -132,7 +164,7 @@ class OmicNavigatorService {
     return dataFromPromise;
   }
 
-  async plotStudyReturnSVGWithTimeoutResolver(
+  async plotStudyReturnSvgWithTimeoutResolver(
     study,
     modelID,
     featureID,
@@ -323,31 +355,6 @@ class OmicNavigatorService {
         null,
         null,
         25000,
-      );
-      const dataFromPromise = await promise;
-      this[cacheKey] = dataFromPromise;
-      return dataFromPromise;
-    }
-  }
-
-  async plotStudy(study, modelID, featureID, plotID, errorCb, cancelToken) {
-    this.setUrl();
-    const timeoutLength = 60000;
-    const cacheKey = `plotStudy_${study}_${modelID}_${featureID}_${plotID}`;
-    if (this[cacheKey] != null) {
-      return this[cacheKey];
-    } else {
-      const promise = this.axiosPostPlot(
-        'plotStudy',
-        {
-          study,
-          modelID,
-          featureID,
-          plotID,
-        },
-        errorCb,
-        cancelToken,
-        timeoutLength,
       );
       const dataFromPromise = await promise;
       this[cacheKey] = dataFromPromise;

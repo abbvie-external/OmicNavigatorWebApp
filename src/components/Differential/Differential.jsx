@@ -488,7 +488,7 @@ class Differential extends Component {
         }
         if (returnSVG) {
           omicNavigatorService
-            .plotStudyReturnSVG(
+            .plotStudyReturnSvg(
               differentialStudy,
               differentialModel,
               id,
@@ -531,7 +531,7 @@ class Differential extends Component {
             });
         } else {
           omicNavigatorService
-            .plotStudy(
+            .plotStudyReturnSvgUrl(
               differentialStudy,
               differentialModel,
               id,
@@ -591,7 +591,7 @@ class Differential extends Component {
       );
       if (multifeaturePlot.length !== 0) {
         try {
-          const promise = omicNavigatorService.plotStudyReturnSVGWithTimeoutResolver(
+          const promise = omicNavigatorService.plotStudyReturnSvgWithTimeoutResolver(
             differentialStudy,
             differentialModel,
             featureids,
@@ -723,7 +723,7 @@ class Differential extends Component {
     );
     if (multifeaturePlot.length !== 0) {
       try {
-        const promise = omicNavigatorService.plotStudyReturnSVG(
+        const promise = omicNavigatorService.plotStudyReturnSvg(
           differentialStudy,
           differentialModel,
           featureids,
