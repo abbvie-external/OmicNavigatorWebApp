@@ -6,7 +6,7 @@ import './App.scss';
 
 const App = () => (
   <div className="AppContainer">
-    <ToastContainer autoClose={5000} />
+    <ToastContainer autoClose={10000} />
     <div className="TopBar">
       <Tabs></Tabs>
     </div>

@@ -1192,12 +1192,11 @@ class Enrichment extends Component {
           return;
         }
         omicNavigatorService
-          .plotStudy(
+          .plotStudyReturnSvgUrl(
             enrichmentStudy,
             enrichmentModel,
             id,
             enrichmentPlotTypes[i].plotID,
-            enrichmentPlotTypes[i].plotType,
             handlePlotStudyError,
             cancelToken,
           )

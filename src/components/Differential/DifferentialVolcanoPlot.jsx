@@ -1,5 +1,5 @@
 import React from 'react';
-import _, { debounce } from 'lodash';
+import _ from 'lodash';
 import './DifferentialVolcanoPlot.scss';
 import * as d3 from 'd3';
 import * as hexbin from 'd3-hexbin';
@@ -546,7 +546,6 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     circles
       .attr('style', 'fill: #1678c2')
       .attr('r', 2)
-      .classed('selected', false)
       .classed('highlighted', false)
       .classed('highlightedMax', false);
 
@@ -561,6 +560,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       volcanoDifferentialTableRowOther,
     } = this.props;
     if (d3.select('#nonfiltered-elements').size() !== 0) {
+      // set circles back to default
       d3.select('#nonfiltered-elements')
         .selectAll('circle')
         .attr('style', 'fill: #1678c2')
@@ -569,6 +569,18 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         .classed('highlighted', false)
         .classed('highlightedMax', false);
     }
+
+    // set bins back to white
+    d3.select('#nonfiltered-elements')
+      .selectAll('path')
+      .attr('fill', 'white')
+      .attr('stroke', '#000')
+      .attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(5)}`);
+
+    // determine new bin color
+    d3.select('#nonfiltered-elements')
+      .selectAll('path')
+      .attr('fill', d => this.determineBinColor(this.state.bins, d.length));
 
     if (volcanoDifferentialTableRowOther?.length > 0) {
       volcanoDifferentialTableRowOther.forEach(element => {
@@ -582,7 +594,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
               .attr('style', 'fill: #ff7e05')
               .classed('highlighted', true);
             highlightedCircle.attr('r', 5);
-            highlightedCircle.classed('highlightedMax', true);
+            highlightedCircle.classed('highlighted', true);
             highlightedCircle.raise();
           } else {
             highlightedCircle
@@ -590,7 +602,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
               .classed('highlighted', true);
             highlightedCircle.attr('stroke', '#ff7e05');
             highlightedCircle.attr('stroke-width', '#ff7e05');
-            highlightedCircle.classed('highlightedMax', true);
+            highlightedCircle.classed('highlighted', true);
             highlightedCircle.raise();
           }
         }
@@ -605,12 +617,12 @@ class DifferentialVolcanoPlot extends React.PureComponent {
           if (maxCircleId.type === 'circle') {
             maxCircle
               .attr('style', 'fill: #ff4400')
-              .classed('highlighted', true);
+              .classed('highlightedMax', true);
             maxCircle.attr('r', 5);
             maxCircle.classed('highlightedMax', true);
             maxCircle.raise();
           } else {
-            maxCircle.attr('fill', '#ff4400').classed('highlighted', true);
+            maxCircle.attr('fill', '#ff4400').classed('highlightedMax', true);
             maxCircle.attr('stroke', '#000');
             maxCircle.attr('stroke-width', 1);
             maxCircle.attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(7)}`);
@@ -700,9 +712,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         d3.select(`circle[id='volcanoDataPoint-${e[this.props.identifier]}`)
           ._groups[0][0] ?? null;
       if (hoveredCircle != null) {
-        if (hoveredCircle.attributes['class'].value.endsWith('selected')) {
-          hoveredCircle.attributes['r'].value = 2.5;
-        } else if (
+        if (
           hoveredCircle.attributes['class'].value.endsWith('highlightedMax')
         ) {
           hoveredCircle.attributes['r'].value = 5;
@@ -1135,7 +1145,6 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         const circles = d3.selectAll('circle.volcanoPlot-dataPoint');
         circles.attr('style', 'fill: #1678c2');
         circles.attr('r', 2);
-        circles.classed('selected', false);
         circles.classed('highlighted', false);
         circles.classed('highlightedMax', false);
 
@@ -1144,10 +1153,6 @@ class DifferentialVolcanoPlot extends React.PureComponent {
           const y = d3.select(this).attr('cy');
           return isBrushed(x, y);
         });
-
-        brushedCircles.attr('style', 'fill: #00aeff');
-        brushedCircles.attr('r', 2.5);
-        brushedCircles.classed('selected', true);
 
         const brushedDataArr = brushedCircles._groups[0].map(a => {
           return JSON.parse(a.attributes.data.value);
@@ -1249,30 +1254,46 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         .selectAll('text')
         .remove();
 
+      // if (d3.select('#nonfiltered-elements').size() !== 0) {
+      console.log(d3.select('#nonfiltered-elements').size());
       d3.select('#nonfiltered-elements')
         .selectAll('text')
         .data(brushedCircleTextMapped)
         .enter()
         .append('text')
-        .attr('key', d => `volcanoCircleText-${d.id}`)
+        .attr('key', d => {
+          if (d) {
+            return `volcanoCircleText-${d.id}`;
+          }
+        })
         .attr('class', 'volcanoCircleTooltipText')
         .attr('transform', d => {
-          const circleOnLeftSide = d.cx <= self.props.volcanoWidth / 2;
-          const cx = circleOnLeftSide ? parseInt(d.cx) + 8 : parseInt(d.cx) + 8;
-          const cy = parseInt(d.cy) + 4;
-          return `translate(${cx}, ${cy})rotate(0)`;
+          if (d) {
+            const circleOnLeftSide = d.cx <= self.props.volcanoWidth / 2;
+            const cx = circleOnLeftSide
+              ? parseInt(d.cx) + 8
+              : parseInt(d.cx) + 8;
+            const cy = parseInt(d.cy) + 4;
+            return `translate(${cx}, ${cy})rotate(0)`;
+          }
         })
         .style('font-size', '11px')
         .style('color', '#d3d3')
         .attr('textAnchor', d => {
-          const circleOnLeftSide = d.cx <= self.props.volcanoWidth / 2;
-          return circleOnLeftSide ? 'start' : 'end';
+          if (d) {
+            const circleOnLeftSide = d.cx <= self.props.volcanoWidth / 2;
+            return circleOnLeftSide ? 'start' : 'end';
+          }
         })
         .style(
           'font-family',
           'Lato, Helvetica Neue, Arial, Helvetica, sans-serif',
         )
-        .text(d => d.data);
+        .text(d => {
+          if (d) {
+            return d.data;
+          }
+        });
     }
     this.props.onUpdateVolcanoLabels(false);
   };
