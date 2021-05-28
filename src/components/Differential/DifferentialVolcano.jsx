@@ -360,7 +360,7 @@ class DifferentialVolcano extends Component {
       const { differentialFeatureIdKey } = this.props;
       event.stopPropagation();
       let sortedData =
-        this.volcanoPlotFilteredGridRef?.current?.qhGridRef?.current?.data ||
+        this.volcanoPlotFilteredGridRef?.current?.qhGridRef?.current?.getSortedData() ||
         this.props.differentialResults;
       const PreviouslyHighlighted = [
         ...this.props.HighlightedFeaturesArrVolcano,
@@ -629,7 +629,7 @@ class DifferentialVolcano extends Component {
   setFeaturesLength = filteredData => {
     const { differentialResults, HighlightedFeaturesArrVolcano } = this.props;
     let sortedData =
-      this.volcanoPlotFilteredGridRef?.current?.qhGridRef?.current?.data ||
+      this.volcanoPlotFilteredGridRef?.current?.qhGridRef?.current?.getSortedData() ||
       this.props.differentialResults;
     if (HighlightedFeaturesArrVolcano.length === 1) {
       this.setState({
@@ -645,7 +645,7 @@ class DifferentialVolcano extends Component {
       });
     } else {
       let sortedData =
-        this.volcanoPlotFilteredGridRef?.current?.qhGridRef?.current?.data ||
+        this.volcanoPlotFilteredGridRef?.current?.qhGridRef?.current?.getSortedData() ||
         differentialResults;
       this.setState({
         featuresLength: limitLength(
@@ -816,7 +816,7 @@ class DifferentialVolcano extends Component {
 
     const HasMultifeaturePlots = this.hasMultifeaturePlots();
     const tableData =
-      this.volcanoPlotFilteredGridRef?.current?.qhGridRef?.current?.data ||
+      this.volcanoPlotFilteredGridRef?.current?.qhGridRef?.current?.getSortedData() ||
       this.props.differentialResults;
     return (
       <Grid.Column
