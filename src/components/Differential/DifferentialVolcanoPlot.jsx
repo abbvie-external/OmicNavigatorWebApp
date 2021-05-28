@@ -1251,31 +1251,44 @@ class DifferentialVolcanoPlot extends React.PureComponent {
 
       // if (d3.select('#nonfiltered-elements').size() !== 0) {
       console.log(d3.select('#nonfiltered-elements').size());
-      debugger;
       d3.select('#nonfiltered-elements')
         .selectAll('text')
         .data(brushedCircleTextMapped)
         .enter()
         .append('text')
-        .attr('key', d => `volcanoCircleText-${d.id}`)
+        .attr('key', d => {
+          if (d) {
+            return `volcanoCircleText-${d.id}`;
+          }
+        })
         .attr('class', 'volcanoCircleTooltipText')
         .attr('transform', d => {
-          const circleOnLeftSide = d.cx <= self.props.volcanoWidth / 2;
-          const cx = circleOnLeftSide ? parseInt(d.cx) + 8 : parseInt(d.cx) + 8;
-          const cy = parseInt(d.cy) + 4;
-          return `translate(${cx}, ${cy})rotate(0)`;
+          if (d) {
+            const circleOnLeftSide = d.cx <= self.props.volcanoWidth / 2;
+            const cx = circleOnLeftSide
+              ? parseInt(d.cx) + 8
+              : parseInt(d.cx) + 8;
+            const cy = parseInt(d.cy) + 4;
+            return `translate(${cx}, ${cy})rotate(0)`;
+          }
         })
         .style('font-size', '11px')
         .style('color', '#d3d3')
         .attr('textAnchor', d => {
-          const circleOnLeftSide = d.cx <= self.props.volcanoWidth / 2;
-          return circleOnLeftSide ? 'start' : 'end';
+          if (d) {
+            const circleOnLeftSide = d.cx <= self.props.volcanoWidth / 2;
+            return circleOnLeftSide ? 'start' : 'end';
+          }
         })
         .style(
           'font-family',
           'Lato, Helvetica Neue, Arial, Helvetica, sans-serif',
         )
-        .text(d => d.data);
+        .text(d => {
+          if (d) {
+            return d.data;
+          }
+        });
     }
     this.props.onUpdateVolcanoLabels(false);
   };

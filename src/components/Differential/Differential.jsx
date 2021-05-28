@@ -659,7 +659,6 @@ class Differential extends Component {
       HighlightedFeaturesArrVolcano.length > 1
         ? 'id'
         : differentialFeatureIdKey;
-    debugger;
     if (data.length) {
       if (data.length > this.state.mulitfeaturePlotMax) {
         data = [...data.slice(0, this.state.mulitfeaturePlotMax)];
