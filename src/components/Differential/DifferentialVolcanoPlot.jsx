@@ -1300,7 +1300,6 @@ class DifferentialVolcanoPlot extends React.PureComponent {
 
   handleSVGClick() {
     // this.props.onHandleVolcanoTableLoading(true);
-    console.log('here');
     this.unhighlightBrushedCircles();
     this.props.onHandleVolcanoPlotSelectionChange(
       this.state.currentResults,
