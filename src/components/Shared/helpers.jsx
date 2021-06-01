@@ -145,7 +145,7 @@ export function formatNumberForDisplay(num) {
 }
 
 export function splitValue(value) {
-  if (value && value.isNaN) {
+  if (value && isNaN(value)) {
     const firstValue = value.split(';')[0];
     const numberOfSemicolons = (value.match(/;/g) || []).length;
     return numberOfSemicolons > 0
@@ -204,6 +204,18 @@ export function scrollElement(_this, grid, target) {
 export function roundToPrecision(value, precision) {
   var multiplier = Math.pow(10, precision || 0);
   return Math.round(value * multiplier) / multiplier;
+}
+
+export function limitLength(arrLength, length) {
+  if (arrLength) {
+    return arrLength < length ? arrLength : length;
+  } else return 0;
+}
+
+export function limitLengthOrNull(arrLength, length) {
+  if (arrLength) {
+    return arrLength < length ? arrLength : length;
+  } else return null;
 }
 
 export function networkByCluster(network) {

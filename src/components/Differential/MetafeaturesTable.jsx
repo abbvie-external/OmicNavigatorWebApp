@@ -24,8 +24,7 @@ class MetafeaturesTable extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     if (
-      this.props.metaFeaturesData.length !== 0 &&
-      this.props.metaFeaturesData !== prevProps.metaFeaturesData
+      this.props.metaFeaturesData.length !== prevProps.metaFeaturesData.length
     ) {
       this.getMetafeaturesTableConfigCols(this.props.metaFeaturesData);
     }
@@ -161,6 +160,8 @@ class MetafeaturesTable extends Component {
           // disableFilters={false}
           min-height="5vh"
           emptyMessage={'No Feature Data Available'}
+          disableQuickViewEditing
+          disableQuickViewMenu
         />
       </div>
     );
