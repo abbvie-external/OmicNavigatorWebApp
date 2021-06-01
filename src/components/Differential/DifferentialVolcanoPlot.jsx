@@ -85,7 +85,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       .attr('height', volcanoHeight)
       .attr('id', 'VolcanoChart')
       .attr('class', 'VolcanoPlotSVG')
-      .on('onClick', () => this.handleSVGClick());
+      .on('click', () => this.handleSVGClick());
 
     svg
       .append('defs')
