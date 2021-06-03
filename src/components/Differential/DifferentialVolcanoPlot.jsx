@@ -274,8 +274,6 @@ class DifferentialVolcanoPlot extends React.PureComponent {
             .remove();
           let circles = item.map(bin => bin);
           this.renderCircles([...this.state.circles, ...circles]);
-          // this.transitionZoom(item, true);
-
           this.setState({
             circles: [...this.state.circles, ...circles],
           });
