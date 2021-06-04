@@ -272,10 +272,10 @@ class DifferentialVolcanoPlot extends React.PureComponent {
           d3.select('#nonfiltered-elements')
             .selectAll('circle')
             .remove();
-          let circles = item.map(bin => bin);
-          this.renderCircles([...this.state.circles, ...circles]);
+          let circles = [...this.state.circles, ...item];
+          this.renderCircles(circles);
           this.setState({
-            circles: [...this.state.circles, ...circles],
+            circles: circles,
           });
 
           d3.select(
