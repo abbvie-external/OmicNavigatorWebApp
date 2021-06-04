@@ -269,10 +269,18 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         .on('click', (item, index) => {
           d3.event.stopPropagation();
           d3.select('#tooltip').remove();
-          this.transitionZoom(item, true);
+          d3.select('#nonfiltered-elements')
+            .selectAll('circle')
+            .remove();
+          let circles = [...this.state.circles, ...item];
+          this.renderCircles(circles);
+          this.setState({
+            circles: circles,
+          });
+
           d3.select(
             `#path-${Math.ceil(item.x)}-${Math.ceil(item.y)}-${item.length}`,
-          );
+          ).remove();
         });
     }
   }
