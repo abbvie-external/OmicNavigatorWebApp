@@ -843,6 +843,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
             )
             .attr('y', tooltipHeight <= 110 ? bin.y * 1 - 85 : bin.y * 1 + 10)
             .attr('id', 'tooltip')
+            .attr('class', 'NoSelect')
             .append('rect')
             .attr('width', '100%')
             .attr('height', '100%')
@@ -919,6 +920,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
                 : hoveredCircleData.position[1] * 1 + 10,
             )
             .attr('id', 'tooltip')
+            .attr('class', 'NoSelect')
             .append('rect')
             .attr('width', '100%')
             .attr('height', '100%')
