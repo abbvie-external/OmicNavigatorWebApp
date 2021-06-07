@@ -10,7 +10,7 @@ import {
   Transition,
   Button,
 } from 'semantic-ui-react';
-import _ from 'lodash';
+// import _ from 'lodash';
 import ndjsonStream from 'can-ndjson-stream';
 import { CancelToken } from 'axios';
 import '../Shared/SearchCriteria.scss';
@@ -482,7 +482,6 @@ class DifferentialSearchCriteria extends Component {
             test,
             false,
           );
-          this.props.onHandleIsDataStreamingResultsTable(false);
         }
       }
       // Stream finished at this point

@@ -90,7 +90,7 @@ class Differential extends Component {
       isVolcanoPlotSVGLoaded: true,
       metaFeaturesDataDifferential: [],
       allMetaFeaturesDataDifferential: [],
-      isDataStreamingResultsTable: false,
+      isDataStreamingResultsTable: true,
       enableMultifeaturePlotting: false,
       updateVolcanoLabels: false,
       multifeaturePlotMax: 1000,
@@ -196,8 +196,9 @@ class Differential extends Component {
       isItemSVGLoaded: false,
     });
 
-    if (streamingFinished)
+    if (streamingFinished) {
       this.setState({ isDataStreamingResultsTable: false });
+    }
   };
 
   handleVolcanoTableLoading = bool => {

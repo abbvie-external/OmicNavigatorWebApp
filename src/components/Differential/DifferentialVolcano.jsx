@@ -62,10 +62,6 @@ class DifferentialVolcano extends Component {
   volcanoPlotFilteredGridRef = React.createRef();
   differentialVolcanoPlotRef = React.createRef();
 
-  shouldComponentUpdate(nextProps) {
-    return nextProps.tab === 'differential';
-  }
-
   componentDidMount() {
     this.getAxisLabels();
     this.setState({
@@ -538,7 +534,7 @@ class DifferentialVolcano extends Component {
       const width = parseInt(localStorage.getItem('volcanoWidth'), 10) || 460;
       const volcanoSvgWidthPx =
         fwdRefDVC.current?.offsetWidth - volcanoDivWidth || 500;
-      const volcanoSvgHeightPx = newSize || 300;
+      const volcanoSvgHeightPx = newSize || 340;
       // on up/down drag, we are forcing a svg resize by change the volcano width by 1
 
       localStorage.setItem('volcanoWidth', width + 1);
