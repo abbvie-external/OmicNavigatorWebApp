@@ -60,7 +60,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
   };
 
   setupVolcano() {
-    console.log('setup');
+    // console.log('setup');
 
     const {
       volcanoHeight,
@@ -148,7 +148,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
   }
 
   hexBinning(data) {
-    console.log('hex binning');
+    // console.log('hex binning');
     const { volcanoWidth, volcanoHeight, differentialResults } = this.props;
 
     if (data.length > 2500) {
@@ -1069,7 +1069,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
   }
 
   transitionZoom(data, clearHighlightedData) {
-    console.log('zoom');
+    // console.log(' transition zoom');
     const self = this;
     const { xScale, yScale } = self.scaleFactory(data);
 
@@ -1281,7 +1281,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         .remove();
 
       // if (d3.select('#nonfiltered-elements').size() !== 0) {
-      console.log(d3.select('#nonfiltered-elements').size());
+      // console.log(d3.select('#nonfiltered-elements').size());
       d3.select('#nonfiltered-elements')
         .selectAll('text')
         .data(brushedCircleTextMapped)

@@ -323,7 +323,7 @@ class DifferentialVolcano extends Component {
 
   handleDotClick = (event, item, index) => {
     // event.stopPropagation();
-    console.log(item);
+    // console.log(item);
     const { differentialFeatureIdKey } = this.props;
     // const dotClickArr = [
     //   {
