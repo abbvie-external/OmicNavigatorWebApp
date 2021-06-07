@@ -124,6 +124,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       .attr('transform', `rotate(-90,20,${volcanoHeight * 0.5 + 20})`)
       .attr('x', 60)
       .attr('y', `${volcanoHeight * 0.5 + 20}`)
+      .attr('font-size', '18px')
       .text(function() {
         return doYAxisTransformation ? '-log(' + yAxisLabel + ')' : yAxisLabel;
       });
@@ -140,6 +141,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       .attr('class', 'volcanoAxisLabel NoSelect')
       .attr('x', volcanoWidth * 0.5 + 10)
       .attr('y', volcanoHeight - 5)
+      .attr('font-size', '18px')
       .text(function() {
         return doXAxisTransformation ? '-log(' + xAxisLabel + ')' : xAxisLabel;
       });
