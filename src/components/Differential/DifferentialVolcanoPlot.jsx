@@ -85,17 +85,17 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       .attr('height', volcanoHeight)
       .attr('id', 'VolcanoChart')
       .attr('class', 'VolcanoPlotSVG')
-      .on('onClick', () => this.handleSVGClick());
+      .on('click', () => this.handleSVGClick());
 
     svg
       .append('defs')
       .append('svg:clipPath')
       .attr('id', 'clip')
       .append('svg:rect')
-      .attr('width', volcanoWidth - 47)
-      .attr('height', volcanoHeight - 40)
-      .attr('x', 50)
-      .attr('y', 0);
+      .attr('width', volcanoWidth + 50)
+      .attr('height', volcanoHeight + 20)
+      .attr('x', 0)
+      .attr('y', -15);
 
     var area = svg
       .append('g')
@@ -269,10 +269,18 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         .on('click', (item, index) => {
           d3.event.stopPropagation();
           d3.select('#tooltip').remove();
-          this.transitionZoom(item, true);
+          d3.select('#nonfiltered-elements')
+            .selectAll('circle')
+            .remove();
+          let circles = [...this.state.circles, ...item];
+          this.renderCircles(circles);
+          this.setState({
+            circles: circles,
+          });
+
           d3.select(
             `#path-${Math.ceil(item.x)}-${Math.ceil(item.y)}-${item.length}`,
-          );
+          ).remove();
         });
     }
   }
@@ -777,15 +785,17 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       doYAxisTransformation,
     } = this.props;
 
-    const clipPathHeight = d3
-      .select('#clip-path')
-      .node()
-      .getBBox().height;
+    const clipPathHeight =
+      d3
+        .select('#clip-path')
+        .node()
+        .getBBox().height - 40;
 
-    const clipPathWidth = d3
-      .select('#clip-path')
-      .node()
-      .getBBox().width;
+    const clipPathWidth =
+      d3
+        .select('#clip-path')
+        .node()
+        .getBBox().width - 47;
 
     if (hovering) {
       if (hoveredElement === 'bin') {
@@ -831,7 +841,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
                   : bin.x * 1 - 170
                 : bin.x * 1 + 15,
             )
-            .attr('y', tooltipHeight <= 75 ? bin.y * 1 - 85 : bin.y * 1 + 10)
+            .attr('y', tooltipHeight <= 110 ? bin.y * 1 - 85 : bin.y * 1 + 10)
             .attr('id', 'tooltip')
             .append('rect')
             .attr('width', '100%')
@@ -904,7 +914,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
             )
             .attr(
               'y',
-              tooltipHeight <= 75
+              tooltipHeight <= 110
                 ? hoveredCircleData.position[1] * 1 - 85
                 : hoveredCircleData.position[1] * 1 + 10,
             )
@@ -1123,7 +1133,6 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       });
     };
     const endBrush = function() {
-      // self.props.onHandleVolcanoTableLoading(true);
       if (d3.event.selection != null) {
         const brush = d3.brushSelection(this);
 
@@ -1177,8 +1186,8 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     self.objsBrush = d3
       .brush()
       .extent([
-        [55, 0],
-        [width + 5, height - 45],
+        [0, -15],
+        [width + 50, height + 20],
       ])
       .on('start', brushingStart)
       .on('end', endBrush);
