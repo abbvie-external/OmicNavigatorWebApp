@@ -110,6 +110,13 @@ class DifferentialVolcano extends Component {
       });
     }
 
+    if (
+      prevProps.HighlightedFeaturesArrVolcano !==
+      this.props.HighlightedFeaturesArrVolcano
+    ) {
+      this.setFeaturesLength();
+    }
+
     // integrate with streaming
     // if (
     //   featureToHighlightInDiffTable !== '' &&
