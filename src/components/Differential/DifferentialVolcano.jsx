@@ -107,8 +107,8 @@ class DifferentialVolcano extends Component {
     }
 
     if (
-      prevProps.HighlightedFeaturesArrVolcano !==
-      this.props.HighlightedFeaturesArrVolcano
+      prevProps.HighlightedFeaturesArrVolcano?.length !==
+      this.props.HighlightedFeaturesArrVolcano?.length
     ) {
       this.setFeaturesLength();
     }
