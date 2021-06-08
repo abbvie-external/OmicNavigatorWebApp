@@ -57,7 +57,7 @@ class Differential extends Component {
       isUpsetVisible: false,
       isFilteredDifferential: false,
       // isItemDatatLoaded: false,
-      // HighlightedFeaturesArrVolcano: [],
+      HighlightedFeaturesArrVolcano: [],
       // volcanoDifferentialTableRowMax: '',
       // volcanoDifferentialTableRowOther: [], commented on 3/31 Paul
       // maxObjectIdentifier: null,
@@ -90,7 +90,7 @@ class Differential extends Component {
       isVolcanoPlotSVGLoaded: true,
       metaFeaturesDataDifferential: [],
       allMetaFeaturesDataDifferential: [],
-      isDataStreamingResultsTable: false,
+      isDataStreamingResultsTable: true,
       enableMultifeaturePlotting: false,
       updateVolcanoLabels: false,
       multifeaturePlotMax: 1000,
@@ -167,18 +167,16 @@ class Differential extends Component {
     });
   };
 
-  handleDifferentialSearchUnfiltered = searchResults => {
-    this.setState({
-      differentialResultsUnfiltered: searchResults.differentialResults,
-      isItemSVGLoaded: false,
-      // isItemDatatLoaded: false,
-      // isItemSelected: this.props.differentialFeature !== '',
-      HighlightedFeaturesArrVolcano: [],
-      enableMultifeaturePlotting: false,
-    });
-  };
-
-  handleDifferentialSearch = (searchResults, streamingFinished) => {
+  handleDifferentialSearch = (
+    searchResults,
+    setUnfiltered,
+    streamingFinished,
+  ) => {
+    if (setUnfiltered) {
+      this.setState({
+        differentialResultsUnfiltered: searchResults.differentialResults,
+      });
+    }
     /**
      * @type {QHGrid.ColumnConfig<{}>[]}
      */
@@ -195,13 +193,12 @@ class Differential extends Component {
       isVolcanoTableLoading: false,
       plotButtonActiveDifferential: false,
       visible: false,
-      // isItemSVGLoaded: false,
-      HighlightedFeaturesArrVolcano: [],
-      enableMultifeaturePlotting: false,
+      isItemSVGLoaded: false,
     });
 
-    if (streamingFinished)
+    if (streamingFinished) {
       this.setState({ isDataStreamingResultsTable: false });
+    }
   };
 
   handleVolcanoTableLoading = bool => {
@@ -238,7 +235,6 @@ class Differential extends Component {
         // differentialResultsUnfiltered: [],
         // isItemDatatLoaded: false,
         HighlightedFeaturesArrVolcano: [],
-        enableMultifeaturePlotting: false,
         volcanoDifferentialTableRowMax: '',
         volcanoDifferentialTableRowOther: [],
         maxObjectIdentifier: null,
@@ -797,10 +793,8 @@ class Differential extends Component {
   };
 
   handleSelectedVolcano = toHighlightArr => {
-    const enableMultifeature = toHighlightArr.length > 1 ? true : false;
     this.setState({
       HighlightedFeaturesArrVolcano: toHighlightArr,
-      enableMultifeaturePlotting: enableMultifeature,
     });
     if (toHighlightArr.length > 0) {
       // unhighlight single row if already highlighted
@@ -1280,9 +1274,6 @@ class Differential extends Component {
                 this.handleSearchTransitionDifferential
               }
               onDifferentialSearch={this.handleDifferentialSearch}
-              onDifferentialSearchUnfiltered={
-                this.handleDifferentialSearchUnfiltered
-              }
               onSearchCriteriaChangeDifferential={
                 this.handleSearchCriteriaChangeDifferential
               }

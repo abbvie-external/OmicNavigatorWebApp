@@ -45,10 +45,6 @@ class DifferentialVolcanoPlot extends React.PureComponent {
 
   componentDidMount() {
     window.addEventListener('resize', this.debouncedResizeListener);
-    if (!this.props.isDataStreamingResultsTable) {
-      this.setupVolcano();
-      this.hexBinning(this.props.differentialResultsUnfiltered);
-    }
   }
 
   componentWillUnmount() {
@@ -64,6 +60,8 @@ class DifferentialVolcanoPlot extends React.PureComponent {
   };
 
   setupVolcano() {
+    // console.log('setup');
+
     const {
       volcanoHeight,
       volcanoWidth,
@@ -152,6 +150,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
   }
 
   hexBinning(data) {
+    // console.log('hex binning');
     const { volcanoWidth, volcanoHeight, differentialResults } = this.props;
 
     if (data.length > 2500) {
@@ -419,27 +418,51 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       isDataStreamingResultsTable,
       differentialResultsUnfiltered,
       HighlightedFeaturesArrVolcano,
+      volcanoPlotsVisible,
     } = this.props;
 
-    if (!isDataStreamingResultsTable && prevProps.isDataStreamingResultsTable) {
+    // this if/else if/else if statement in place to minimize re-renders - should cover all situations
+    if (
+      !isDataStreamingResultsTable &&
+      volcanoPlotsVisible &&
+      volcanoPlotsVisible !== prevProps.volcanoPlotsVisible
+    ) {
+      // user opens volcano plot any time after data finishes streaming
+      let currentData =
+        this.state.currentResults.length > 0
+          ? this.state.currentResults
+          : differentialResultsUnfiltered;
+      d3.select('#VolcanoChart').remove();
       this.setupVolcano();
       this.hexBinning(differentialResultsUnfiltered);
+      this.transitionZoom(currentData, false);
     } else if (
       !isDataStreamingResultsTable &&
+      volcanoPlotsVisible &&
       (prevProps.xAxisLabel !== xAxisLabel ||
         prevProps.yAxisLabel !== yAxisLabel ||
         prevProps.doXAxisTransformation !== doXAxisTransformation ||
-        prevProps.doYAxisTransformation !== doYAxisTransformation)
+        prevProps.doYAxisTransformation !== doYAxisTransformation ||
+        prevProps.volcanoHeight !== volcanoHeight ||
+        prevProps.volcanoWidth !== volcanoWidth)
     ) {
+      // volcano plot is open, user changes axis or height/widht (visible only whe volcano plot is open)
       d3.select('#VolcanoChart').remove();
       this.setupVolcano();
       this.hexBinning(this.state.currentResults);
       this.transitionZoom(this.state.currentResults, false);
     } else if (
-      (prevProps.isFilteredDifferential && !isFilteredDifferential) ||
+      (volcanoPlotsVisible &&
+        prevProps.isFilteredDifferential &&
+        !isFilteredDifferential) ||
       (prevProps.isUpsetVisible && !this.props.isUpsetVisible)
     ) {
-      this.transitionZoom(this.state.currentResults, true);
+      // volcano plot is open, and set analysis "filter" is clicked OR set analysis is toggled off
+      let currentData =
+        this.state.currentResults.length > 0
+          ? this.state.currentResults
+          : differentialResultsUnfiltered;
+      this.transitionZoom(currentData, true);
     }
 
     if (
@@ -482,15 +505,6 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         prevProps.volcanoDifferentialTableRowMax
     ) {
       this.highlightBrushedCircles();
-    }
-    if (
-      prevProps.volcanoHeight !== volcanoHeight ||
-      prevProps.volcanoWidth !== volcanoWidth
-    ) {
-      d3.select('#VolcanoChart').remove();
-      this.setupVolcano();
-      this.hexBinning(this.state.currentResults);
-      this.transitionZoom(this.state.currentResults, false);
     }
   }
 
@@ -1057,6 +1071,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
   }
 
   transitionZoom(data, clearHighlightedData) {
+    // console.log(' transition zoom');
     const self = this;
     const { xScale, yScale } = self.scaleFactory(data);
 
@@ -1268,7 +1283,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         .remove();
 
       // if (d3.select('#nonfiltered-elements').size() !== 0) {
-      console.log(d3.select('#nonfiltered-elements').size());
+      // console.log(d3.select('#nonfiltered-elements').size());
       d3.select('#nonfiltered-elements')
         .selectAll('text')
         .data(brushedCircleTextMapped)
