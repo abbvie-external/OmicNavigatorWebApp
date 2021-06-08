@@ -325,9 +325,8 @@ class DifferentialVolcano extends Component {
     );
   };
 
-  handleDotClick = (event, item, index) => {
+  handleDotClick = (event, items, index) => {
     // event.stopPropagation();
-    console.log(item);
     const { differentialFeatureIdKey } = this.props;
     // const dotClickArr = [
     //   {
@@ -340,14 +339,20 @@ class DifferentialVolcano extends Component {
     //   filteredTableData: dotClickArr,
     //   volcanoPlotRows: dotClickArr.length,
     // });
-    this.props.onHandleSelectedVolcano([
-      {
-        id: item[differentialFeatureIdKey],
-        value: item[differentialFeatureIdKey],
-        key: item[differentialFeatureIdKey],
-      },
-    ]);
-    this.pageToFeature(item[differentialFeatureIdKey]);
+    let elementArray = items.map(item => ({
+      id: item[differentialFeatureIdKey],
+      value: item[differentialFeatureIdKey],
+      key: item[differentialFeatureIdKey],
+    }));
+    this.props.onHandleSelectedVolcano(elementArray);
+    // this.props.onHandleSelectedVolcano([
+    //   {
+    //     id: item[differentialFeatureIdKey],
+    //     value: item[differentialFeatureIdKey],
+    //     key: item[differentialFeatureIdKey],
+    //   },
+    // ]);
+    // this.pageToFeature(item[differentialFeatureIdKey]);
   };
 
   handleRowClick = (event, item, index) => {
