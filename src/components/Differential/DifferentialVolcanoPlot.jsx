@@ -568,8 +568,8 @@ class DifferentialVolcanoPlot extends React.PureComponent {
   unhighlightBrushedCircles = () => {
     const circles = d3.selectAll('circle.volcanoPlot-dataPoint');
     circles
-      .attr('style', 'fill: #1678c2')
-      .attr('r', 2)
+      // .attr('style', 'fill: #1678c2')
+      // .attr('r', 2)
       .classed('highlighted', false)
       .classed('highlightedMax', false);
 
@@ -1328,17 +1328,18 @@ class DifferentialVolcanoPlot extends React.PureComponent {
 
   handleSVGClick() {
     // this.props.onHandleVolcanoTableLoading(true);
-    this.unhighlightBrushedCircles();
-    this.props.onHandleVolcanoPlotSelectionChange(
-      this.state.currentResults,
-      true,
-    );
-    this.setState({
-      brushing: false,
-      resizeScalarX: 1,
-      resizeScalarY: 1,
-      volcanoCircleText: [],
-    });
+    // this.unhighlightBrushedCircles();
+    // this.props.onHandleVolcanoPlotSelectionChange(
+    //   this.state.currentResults,
+    //   true,
+    // );
+    // this.setState({
+    //   brushing: false,
+    //   resizeScalarX: 1,
+    //   resizeScalarY: 1,
+    //   volcanoCircleText: [],
+    // });
+    this.props.onHandleSelectedVolcano([]);
   }
 
   getXAxisLabelY(volcanoHeight) {

@@ -839,8 +839,10 @@ class Differential extends Component {
       this.handlePlotVolcano(maxId);
     } else {
       this.setState({
+        HighlightedFeaturesArrVolcano: [],
         volcanoDifferentialTableRowMax: null,
         volcanoDifferentialTableRowOther: [],
+        updateVolcanoLabels: true,
       });
       this.handlePlotVolcano('');
     }
