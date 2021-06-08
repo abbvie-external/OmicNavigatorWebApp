@@ -10,6 +10,7 @@ import {
   Transition,
   Button,
 } from 'semantic-ui-react';
+// import _ from 'lodash';
 import ndjsonStream from 'can-ndjson-stream';
 import { CancelToken } from 'axios';
 import '../Shared/SearchCriteria.scss';
@@ -505,7 +506,7 @@ class DifferentialSearchCriteria extends Component {
     differentialTest,
     streamingFinished,
   ) => {
-    const { onDifferentialSearchUnfiltered, onDifferentialSearch } = this.props;
+    const { onDifferentialSearch } = this.props;
     if (resetMultiset) {
       this.setState({
         mustDifferential: [],
@@ -516,8 +517,7 @@ class DifferentialSearchCriteria extends Component {
       });
     }
     const finished = streamingFinished ? true : false;
-    onDifferentialSearchUnfiltered({ differentialResults: tableData });
-    onDifferentialSearch({ differentialResults: tableData }, finished);
+    onDifferentialSearch({ differentialResults: tableData }, true, finished);
   };
 
   handleMultisetToggleDifferential = () => {
@@ -785,9 +785,13 @@ class DifferentialSearchCriteria extends Component {
         cancelToken,
       )
       .then(inferenceData => {
-        onDifferentialSearch({
-          differentialResults: inferenceData,
-        });
+        onDifferentialSearch(
+          {
+            differentialResults: inferenceData,
+          },
+          false,
+          true,
+        );
         this.setState({
           mustDifferential,
           notDifferential,
