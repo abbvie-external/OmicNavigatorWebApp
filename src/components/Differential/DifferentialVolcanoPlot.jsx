@@ -79,7 +79,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     const svg = d3
       .select('#volcano')
       .append('svg')
-      .attr('width', volcanoWidth)
+      .attr('width', volcanoWidth + 50)
       .attr('height', volcanoHeight)
       .attr('id', 'VolcanoChart')
       .attr('class', 'VolcanoPlotSVG')
