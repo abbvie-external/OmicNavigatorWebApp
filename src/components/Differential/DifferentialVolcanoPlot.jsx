@@ -496,9 +496,6 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       this.transitionZoom(currentData, true);
     }
 
-    if (prevProps.clickedElements !== this.state.clickedElements) {
-    }
-
     if (
       volcanoCircleLabel != null &&
       prevProps.volcanoCircleLabel !== volcanoCircleLabel &&
