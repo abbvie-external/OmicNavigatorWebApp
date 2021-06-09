@@ -273,35 +273,21 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         })
         .on('click', (item, index) => {
           d3.event.stopPropagation();
-          // if (d3.event.metaKey || d3.event.ctrlKey) {
-          //   let clickedElems = [...this.state.clickedElements, ...item];
-          //   this.props.onHandleDotClick(d3.event, clickedElems, 0);
+          if (!d3.event.metaKey && !d3.event.ctrlKey) {
+            d3.select('#tooltip').remove();
+            d3.select('#nonfiltered-elements')
+              .selectAll('circle')
+              .remove();
+            let circles = [...this.state.circles, ...item];
+            this.renderCircles(circles);
+            this.setState({
+              circles: circles,
+            });
 
-          //   this.setState({
-          //     clickedElements: clickedElems,
-          //   });
-          // } else {
-          d3.select('#tooltip').remove();
-          d3.select('#nonfiltered-elements')
-            .selectAll('circle')
-            .remove();
-          let circles = [...this.state.circles, ...item];
-          this.renderCircles(circles);
-          this.setState({
-            circles: circles,
-          });
-
-          d3.select(
-            `#path-${Math.ceil(item.x)}-${Math.ceil(item.y)}-${item.length}`,
-          ).remove();
-
-          // if (!!this.state.clickedElements.length) {
-          //   this.props.onHandleDotClick(d3.event, [], 0);
-          //   this.setState({
-          //     clickedElements: [],
-          //   });
-          // }
-          // }
+            d3.select(
+              `#path-${Math.ceil(item.x)}-${Math.ceil(item.y)}-${item.length}`,
+            ).remove();
+          }
         });
     }
   }
@@ -381,18 +367,22 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         })
         .on('click', e => {
           d3.select('#tooltip').remove();
+          d3.event.stopPropagation();
           if (d3.event.metaKey || d3.event.ctrlKey) {
+            const { yAxisLabel } = this.props;
             const elem = d3.select(
               `circle[id='volcanoDataPoint-${e[identifier]}`,
             )._groups[0][0];
-            let clickedElems = [
-              ...this.state.clickedElements,
-              ...[elem],
-            ].map(elem =>
-              elem.attributes ? JSON.parse(elem.attributes.data.value) : elem,
-            );
+            let clickedElems = [...this.state.clickedElements, ...[elem]]
+              .map(elem =>
+                elem.attributes ? JSON.parse(elem.attributes.data.value) : elem,
+              )
+              .sort(
+                (a, b) =>
+                  this.doTransform(b[yAxisLabel], 'y') -
+                  this.doTransform(a[yAxisLabel], 'y'),
+              );
             this.props.onHandleDotClick(e, clickedElems, 0);
-            d3.event.stopPropagation();
 
             this.setState({
               clickedElements: clickedElems,
@@ -406,7 +396,6 @@ class DifferentialVolcanoPlot extends React.PureComponent {
               [JSON.parse(elem.attributes.data.value)],
               0,
             );
-            d3.event.stopPropagation();
             this.setState({
               clickedElements: [],
             });
@@ -1384,6 +1373,9 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     //   resizeScalarY: 1,
     //   volcanoCircleText: [],
     // });
+    this.setState({
+      clickedElements: [],
+    });
     this.props.onHandleSelectedVolcano([]);
   }
 
