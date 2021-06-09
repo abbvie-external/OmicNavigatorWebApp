@@ -1024,6 +1024,7 @@ class DifferentialVolcano extends Component {
                           }
                           getMaxAndMin={this.getMaxAndMin}
                           onHandleDotClick={this.handleDotClick}
+                          onPageToFeature={this.pageToFeature}
                         ></DifferentialVolcanoPlot>
                         <SVGPlot
                           divWidth={this.state.volcanoSvgWidth}

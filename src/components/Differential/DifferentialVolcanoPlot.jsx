@@ -397,7 +397,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
               0,
             );
             this.setState({
-              clickedElements: [],
+              clickedElements: [elem],
             });
           }
         });
@@ -536,6 +536,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         prevProps.volcanoDifferentialTableRowMax
     ) {
       this.highlightBrushedCircles();
+      this.props.onPageToFeature(volcanoDifferentialTableRowMax);
     }
   }
 
