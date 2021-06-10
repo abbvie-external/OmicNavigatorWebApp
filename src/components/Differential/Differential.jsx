@@ -798,7 +798,10 @@ class Differential extends Component {
     });
     if (toHighlightArr.length > 0) {
       // unhighlight single row if already highlighted
-      if (toHighlightArr.length === 1) {
+      if (
+        toHighlightArr.length === 1 &&
+        this.state.volcanoDifferentialTableRowOther?.length === 0
+      ) {
         if (
           toHighlightArr[0].id === this.state.volcanoDifferentialTableRowMax
         ) {
