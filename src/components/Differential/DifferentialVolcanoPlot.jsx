@@ -1298,6 +1298,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         .attr('transform', d => {
           if (d) {
             if (d.data) {
+              //create temporary element to get text width in pixels
               let tempElem = document.createElement('span');
               document.body.appendChild(tempElem);
               tempElem.style.fontSize = `11px`;
@@ -1307,6 +1308,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
               tempElem.innerHTML = d.data;
               let width = tempElem.clientWidth;
 
+              //remove temp element
               document.body.removeChild(tempElem);
 
               const cx =
