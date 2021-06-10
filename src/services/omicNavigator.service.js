@@ -340,6 +340,28 @@ class OmicNavigatorService {
     }
   }
 
+  async getUpsetCols(study, modelID) {
+    const cacheKey = `getUpsetCols${study}_${modelID}`;
+    if (this[cacheKey] != null) {
+      return this[cacheKey];
+    } else {
+      const promise = this.axiosPost(
+        'getUpsetCols',
+        {
+          study,
+          modelID,
+        },
+        false,
+        null,
+        null,
+        25000,
+      );
+      const dataFromPromise = await promise;
+      this[cacheKey] = dataFromPromise;
+      return dataFromPromise;
+    }
+  }
+
   async getEnrichmentsLinkouts(study, annotationID) {
     const cacheKey = `getEnrichmentsLinkouts${study}_${annotationID}`;
     if (this[cacheKey] != null) {

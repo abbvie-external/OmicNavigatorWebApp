@@ -850,7 +850,7 @@ class DifferentialMultisetFilters extends Component {
       selectedOperatorP,
       selectedColP,
       uSettingsP,
-      thresholdColsP,
+      upsetColsDifferential,
     } = this.props;
     const OperatorsP = uSettingsP.thresholdOperatorP;
     const indexFiltersP = uSettingsP.indexFiltersP;
@@ -877,7 +877,7 @@ class DifferentialMultisetFilters extends Component {
                     index={index}
                     // selection
                     value={val.value}
-                    options={thresholdColsP}
+                    options={upsetColsDifferential}
                     width={7}
                     onChange={this.handleDropdownChange}
                   ></Form.Field>
