@@ -330,6 +330,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       identifier,
       xAxisLabel,
       yAxisLabel,
+      differentialFeatureIdKey,
     } = this.props;
     const { xScale, yScale } = this.scaleFactory(
       this.state.currentResults.length > 0
@@ -385,10 +386,11 @@ class DifferentialVolcanoPlot extends React.PureComponent {
 
               let clickedElems = [
                 ...this.state.clickedElements.filter(
-                  elem => elem.Ensembl_Gene_ID !== elemData.Ensembl_Gene_ID,
+                  elem =>
+                    elem[differentialFeatureIdKey] !==
+                    elemData[differentialFeatureIdKey],
                 ),
               ];
-
               this.props.onHandleDotClick(e, clickedElems, 0);
 
               this.setState({
