@@ -328,9 +328,7 @@ class DifferentialVolcano extends Component {
     );
   };
 
-  handleDotClick = (event, item, index) => {
-    // event.stopPropagation();
-    // console.log(item);
+  handleDotClick = (event, items, index) => {
     const { differentialFeatureIdKey } = this.props;
     // const dotClickArr = [
     //   {
@@ -343,14 +341,20 @@ class DifferentialVolcano extends Component {
     //   filteredTableData: dotClickArr,
     //   volcanoPlotRows: dotClickArr.length,
     // });
-    this.props.onHandleSelectedVolcano([
-      {
-        id: item[differentialFeatureIdKey],
-        value: item[differentialFeatureIdKey],
-        key: item[differentialFeatureIdKey],
-      },
-    ]);
-    this.pageToFeature(item[differentialFeatureIdKey]);
+    let elementArray = items.map(item => ({
+      id: item[differentialFeatureIdKey],
+      value: item[differentialFeatureIdKey],
+      key: item[differentialFeatureIdKey],
+    }));
+    this.props.onHandleSelectedVolcano(elementArray);
+    // this.props.onHandleSelectedVolcano([
+    //   {
+    //     id: item[differentialFeatureIdKey],
+    //     value: item[differentialFeatureIdKey],
+    //     key: item[differentialFeatureIdKey],
+    //   },
+    // ]);
+    // this.pageToFeature(item[differentialFeatureIdKey]);
   };
 
   handleRowClick = (event, item, index) => {
@@ -397,7 +401,7 @@ class DifferentialVolcano extends Component {
             ) ||
             limitLength(sortedData?.length, this.props.multifeaturePlotMax),
         });
-      } else if (event.ctrlKey) {
+      } else if (event.ctrlKey || event.metaKey) {
         const allTableData =
           this.volcanoPlotFilteredGridRef?.current?.qhGridRef.current?.getSortedData() ||
           [];
@@ -1018,6 +1022,7 @@ class DifferentialVolcano extends Component {
                           }
                           getMaxAndMin={this.getMaxAndMin}
                           onHandleDotClick={this.handleDotClick}
+                          onPageToFeature={this.pageToFeature}
                         ></DifferentialVolcanoPlot>
                         <SVGPlot
                           divWidth={this.state.volcanoSvgWidth}

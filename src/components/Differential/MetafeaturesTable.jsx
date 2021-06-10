@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Popup } from 'semantic-ui-react';
-// import _ from 'lodash';
+import _ from 'lodash';
 import { formatNumberForDisplay, splitValue } from '../Shared/helpers';
 import './MetafeaturesTable.scss';
 // import { CancelToken } from 'axios';
@@ -24,7 +24,12 @@ class MetafeaturesTable extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     if (
-      this.props.metaFeaturesData.length !== prevProps.metaFeaturesData.length
+      this.props.metaFeaturesData.length !==
+        prevProps.metaFeaturesData.length ||
+      !_.isEqual(
+        _.sortBy(this.props.metaFeaturesData),
+        _.sortBy(prevProps.metaFeaturesData),
+      )
     ) {
       this.getMetafeaturesTableConfigCols(this.props.metaFeaturesData);
     }
@@ -32,7 +37,7 @@ class MetafeaturesTable extends Component {
 
   getMetafeaturesTableConfigCols = data => {
     let configCols = [];
-    if (data.length > 0) {
+    if (data?.length > 0) {
       const TableValuePopupStyle = {
         backgroundColor: '2E2E2E',
         borderBottom: '2px solid var(--color-primary)',
