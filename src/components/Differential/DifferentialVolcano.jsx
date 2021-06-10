@@ -329,8 +329,6 @@ class DifferentialVolcano extends Component {
   };
 
   handleDotClick = (event, items, index) => {
-    // event.stopPropagation();
-    // console.log(item);
     const { differentialFeatureIdKey } = this.props;
     // const dotClickArr = [
     //   {
@@ -403,7 +401,7 @@ class DifferentialVolcano extends Component {
             ) ||
             limitLength(sortedData?.length, this.props.multifeaturePlotMax),
         });
-      } else if (event.ctrlKey) {
+      } else if (event.ctrlKey || event.metaKey) {
         const allTableData =
           this.volcanoPlotFilteredGridRef?.current?.qhGridRef.current?.getSortedData() ||
           [];

@@ -368,36 +368,61 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         .on('click', e => {
           d3.select('#tooltip').remove();
           d3.event.stopPropagation();
+          const elem = d3.select(
+            `circle[id='volcanoDataPoint-${e[identifier]}`,
+          );
+
           if (d3.event.metaKey || d3.event.ctrlKey) {
             const { yAxisLabel } = this.props;
-            const elem = d3.select(
-              `circle[id='volcanoDataPoint-${e[identifier]}`,
-            )._groups[0][0];
-            let clickedElems = [...this.state.clickedElements, ...[elem]]
-              .map(elem =>
-                elem.attributes ? JSON.parse(elem.attributes.data.value) : elem,
-              )
-              .sort(
-                (a, b) =>
-                  this.doTransform(b[yAxisLabel], 'y') -
-                  this.doTransform(a[yAxisLabel], 'y'),
-              );
-            this.props.onHandleDotClick(e, clickedElems, 0);
 
-            this.setState({
-              clickedElements: clickedElems,
-            });
+            if (
+              elem.attr('class').endsWith('highlighted') ||
+              elem.attr('class').endsWith('highlightedMax')
+            ) {
+              let elemData = JSON.parse(
+                elem._groups[0][0].attributes.data.value,
+              );
+
+              let clickedElems = [
+                ...this.state.clickedElements.filter(
+                  elem => elem.Ensembl_Gene_ID !== elemData.Ensembl_Gene_ID,
+                ),
+              ];
+
+              this.props.onHandleDotClick(e, clickedElems, 0);
+
+              this.setState({
+                clickedElements: clickedElems,
+              });
+            } else {
+              let clickedElems = [
+                ...this.state.clickedElements,
+                ...[elem._groups[0][0]],
+              ]
+                .map(elem =>
+                  elem.attributes
+                    ? JSON.parse(elem.attributes.data.value)
+                    : elem,
+                )
+                .sort(
+                  (a, b) =>
+                    this.doTransform(b[yAxisLabel], 'y') -
+                    this.doTransform(a[yAxisLabel], 'y'),
+                );
+              this.props.onHandleDotClick(e, clickedElems, 0);
+
+              this.setState({
+                clickedElements: clickedElems,
+              });
+            }
           } else {
-            const elem = d3.select(
-              `circle[id='volcanoDataPoint-${e[identifier]}`,
-            )._groups[0][0];
             this.props.onHandleDotClick(
               e,
-              [JSON.parse(elem.attributes.data.value)],
+              [JSON.parse(elem._groups[0][0].attributes.data.value)],
               0,
             );
             this.setState({
-              clickedElements: [elem],
+              clickedElements: [elem._groups[0][0]],
             });
           }
         });
