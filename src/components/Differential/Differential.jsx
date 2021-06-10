@@ -47,7 +47,6 @@ class Differential extends Component {
        * @type {QHGrid.ColumnConfig[]}
        */
       // differentialColumns: [],
-      filterableColumnsP: [],
       multisetPlotInfoDifferential: {
         title: '',
         svg: [],
@@ -1120,7 +1119,6 @@ class Differential extends Component {
     const upsetColsDifferentialVar = this.listToJson(differentialNumericFields);
     this.setState({
       upsetColsDifferential: upsetColsDifferentialVar,
-      filterableColumnsP: [...differentialNumericFields],
     });
     const differentialNumericColumnsMapped = differentialNumericFields.map(
       c => {
