@@ -88,7 +88,6 @@ class Differential extends Component {
       resultsLinkouts: [],
       resultsFavicons: [],
       isVolcanoPlotSVGLoaded: true,
-      metaFeaturesDataDifferential: [],
       allMetaFeaturesDataDifferential: [],
       isDataStreamingResultsTable: true,
       enableMultifeaturePlotting: false,
@@ -263,6 +262,7 @@ class Differential extends Component {
       .getMetaFeatures(differentialStudy, differentialModel)
       .then(getMetaFeaturesResponseData => {
         const exist = getMetaFeaturesResponseData.length > 0 ? true : false;
+        // Paul - save this data to local storage (e.g. indexDB)
         this.setState({
           modelSpecificMetaFeaturesExist: exist,
           allMetaFeaturesDataDifferential: getMetaFeaturesResponseData,
@@ -377,13 +377,7 @@ class Differential extends Component {
     });
   };
 
-  getPlotTransition = (
-    id,
-    dataItem,
-    imageInfoDifferential,
-    featureidSpecificMetaFeaturesExist,
-    useId,
-  ) => {
+  getPlotTransition = (id, dataItem, imageInfoDifferential, useId) => {
     const { differentialFeatureIdKey } = this.props;
     const differentialFeatureVar = useId
       ? id
@@ -408,13 +402,7 @@ class Differential extends Component {
           },
           false,
         );
-        self.getPlot(
-          'Differential',
-          id,
-          featureidSpecificMetaFeaturesExist,
-          false,
-          true,
-        );
+        self.getPlot('Differential', id, true);
       },
     );
   };
@@ -422,11 +410,7 @@ class Differential extends Component {
   getTableHelpers = differentialFeatureIdKeyVar => {
     const self = this;
     let addParams = {};
-    addParams.showPlotDifferential = (
-      dataItem,
-      alphanumericTrigger,
-      featureidSpecificMetaFeaturesExist,
-    ) => {
+    addParams.showPlotDifferential = (dataItem, alphanumericTrigger) => {
       return function() {
         let value = dataItem[alphanumericTrigger];
         let imageInfoDifferential = {
@@ -438,7 +422,7 @@ class Differential extends Component {
           dataItem[alphanumericTrigger],
           dataItem,
           imageInfoDifferential,
-          featureidSpecificMetaFeaturesExist,
+          false,
         );
       };
     };
@@ -446,13 +430,7 @@ class Differential extends Component {
     this.setState({ additionalTemplateInfoDifferentialTable: addParams });
   };
 
-  getPlot = (
-    view,
-    featureId,
-    featureidSpecificMetaFeaturesExist,
-    multiFeatureCall,
-    returnSVG,
-  ) => {
+  getPlot = (view, featureId, returnSVG) => {
     const { differentialPlotTypes } = this.state;
     const {
       differentialStudy,
@@ -472,15 +450,9 @@ class Differential extends Component {
     let cancelToken = new CancelToken(e => {
       cancelRequestDifferentialResultsGetPlot = e;
     });
-    if (featureidSpecificMetaFeaturesExist) {
-      this.getMetaFeaturesTable(featureId);
-    }
     if (differentialPlotTypes.length !== 0) {
       _.forEach(differentialPlotTypes, function(plot, i) {
-        if (
-          differentialPlotTypes[i].plotType === 'multiFeature' &&
-          !multiFeatureCall
-        ) {
+        if (differentialPlotTypes[i].plotType === 'multiFeature') {
           return;
         }
         if (returnSVG) {
@@ -579,9 +551,6 @@ class Differential extends Component {
       cancelRequestDifferentialResultsGetMultifeaturePlot();
       let cancelToken = new CancelToken(e => {
         cancelRequestDifferentialResultsGetMultifeaturePlot = e;
-      });
-      this.setState({
-        metaFeaturesDataDifferential: [],
       });
       let multifeaturePlot = differentialPlotTypes.filter(
         p => p.plotType === 'multiFeature',
@@ -755,37 +724,6 @@ class Differential extends Component {
     }
   }
 
-  getMetaFeaturesTable = featureId => {
-    const { differentialStudy, differentialModel } = this.props;
-    omicNavigatorService
-      .getMetaFeaturesTable(
-        differentialStudy,
-        differentialModel,
-        featureId,
-        this.handleGetMetaFeaturesTableError,
-      )
-      .then(getMetaFeaturesTableResponseData => {
-        this.setState({
-          metaFeaturesDataDifferential: getMetaFeaturesTableResponseData,
-          // areDifferentialPlotTabsReady: true,
-        });
-      })
-      .catch(error => {
-        console.error('Error during getMetaFeaturesTable', error);
-      });
-  };
-
-  handleGetMetaFeaturesTableError = () => {
-    const { differentialStudy, differentialModel } = this.props;
-    sessionStorage.setItem(
-      `${differentialStudy}-${differentialModel}-MetaFeaturesExist`,
-      false,
-    );
-    this.setState({
-      areDifferentialPlotTabsReady: true,
-    });
-  };
-
   updateDifferentialResults = results => {
     this.setState({
       differentialResults: results,
@@ -865,7 +803,7 @@ class Differential extends Component {
           isVolcanoPlotSVGLoaded: false,
           maxObjectIdentifier: maxId,
         });
-        this.getPlot('Volcano', maxId, false, false, false);
+        this.getPlot('Volcano', maxId, false);
       }
     } else {
       this.setState({
@@ -921,7 +859,6 @@ class Differential extends Component {
     const {
       resultsLinkouts,
       resultsFavicons,
-      allMetaFeaturesDataDifferential,
       differentialPlotTypes,
       modelSpecificMetaFeaturesExist,
     } = this.state;
@@ -973,7 +910,7 @@ class Differential extends Component {
         // isItemDatatLoaded: false,
         currentSVGs: [],
       });
-      this.getPlot('Differential', differentialFeature, true, false, true);
+      this.getPlot('Differential', differentialFeature, true);
     }
     this.props.onHandleDifferentialFeatureIdKey(
       'differentialFeatureIdKey',
@@ -1001,24 +938,15 @@ class Differential extends Component {
           filterable: { type: 'multiFilter' },
           template: (value, item, addParams) => {
             const keyVar = `${item[f]}-${item[alphanumericTrigger]}`;
-            const mappedMetafeaturesFeatureIds = allMetaFeaturesDataDifferential.map(
-              meta => meta[alphanumericTrigger],
-            );
-            const featureidSpecificMetaFeaturesExist = mappedMetafeaturesFeatureIds.includes(
-              item[alphanumericTrigger],
-            );
+
             const featureIdClass =
-              noPlots && !featureidSpecificMetaFeaturesExist
+              noPlots && !modelSpecificMetaFeaturesExist
                 ? 'TableCellBold NoSelect'
                 : 'TableCellLink NoSelect';
             const featureIdClick =
-              noPlots && !featureidSpecificMetaFeaturesExist
+              noPlots && !modelSpecificMetaFeaturesExist
                 ? null
-                : addParams.showPlotDifferential(
-                    item,
-                    alphanumericTrigger,
-                    featureidSpecificMetaFeaturesExist,
-                  );
+                : addParams.showPlotDifferential(item, alphanumericTrigger);
             const resultsLinkoutsKeys = Object.keys(resultsLinkouts);
             let linkoutWithIcon = null;
             if (resultsLinkoutsKeys.includes(f)) {
