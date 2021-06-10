@@ -4,6 +4,7 @@ import { Grid, Dimmer, Loader, Tab, Dropdown } from 'semantic-ui-react';
 import DifferentialBreadcrumbs from './DifferentialBreadcrumbs';
 import ButtonActions from '../Shared/ButtonActions';
 import MetafeaturesTable from './MetafeaturesTable';
+import { omicNavigatorService } from '../../services/omicNavigator.service';
 // import LoaderActivePlots from '../Transitions/LoaderActivePlots';
 import '../Enrichment/SplitPanesContainer.scss';
 import '../Shared/SVGPlot.scss';
@@ -35,18 +36,11 @@ class DifferentialPlot extends PureComponent {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    const {
-      imageInfoDifferentialLength,
-      isItemSVGLoaded,
-      metaFeaturesDataDifferential,
-    } = this.props;
+    const { imageInfoDifferentialLength, isItemSVGLoaded } = this.props;
     const { activeSVGTabIndexDifferential } = this.state;
     if (
-      (isItemSVGLoaded &&
-        prevProps.imageInfoDifferentialLength !==
-          imageInfoDifferentialLength) ||
-      prevProps.metaFeaturesDataDifferential.length !==
-        metaFeaturesDataDifferential.length
+      isItemSVGLoaded &&
+      prevProps.imageInfoDifferentialLength !== imageInfoDifferentialLength
     ) {
       this.getSVGPanes();
     }
@@ -99,7 +93,7 @@ class DifferentialPlot extends PureComponent {
     });
   };
 
-  getSVGPanes() {
+  async getSVGPanes() {
     let panes = [];
     if (this.props.imageInfoDifferential) {
       if (this.props.imageInfoDifferential.svg.length !== 0) {
@@ -127,6 +121,14 @@ class DifferentialPlot extends PureComponent {
       this.props.modelSpecificMetaFeaturesExist !== false &&
       !isMultifeaturePlot
     ) {
+      let metaFeaturesData = await omicNavigatorService.getMetaFeaturesTable(
+        this.props.differentialStudy,
+        this.props.differentialModel,
+        this.props.differentialFeature,
+        this.handleGetMetaFeaturesTableError,
+      );
+      let metaFeaturesDataDifferential =
+        metaFeaturesData != null ? metaFeaturesData : [];
       let metafeaturesTab = [
         {
           menuItem: 'Feature Data',
@@ -134,7 +136,9 @@ class DifferentialPlot extends PureComponent {
             <Tab.Pane attached="true" as="div">
               <MetafeaturesTable
                 ref={this.metaFeaturesTableRef}
-                metaFeaturesData={this.props.metaFeaturesDataDifferential}
+                metaFeaturesData={metaFeaturesDataDifferential}
+                // differentialFeature={this.props.differentialFeature}
+                // isItemSVGLoaded={this.props.isItemSVGLoaded}
               />
             </Tab.Pane>
           ),
@@ -171,7 +175,7 @@ class DifferentialPlot extends PureComponent {
         // <LoaderActivePlots />
         <div className="PlotsMetafeaturesDimmer">
           <Dimmer active inverted>
-            <Loader size="large">Loading Plots and Feature Data...</Loader>
+            <Loader size="large">Loading...</Loader>
           </Dimmer>
         </div>
       );
