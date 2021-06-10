@@ -270,6 +270,7 @@ class DifferentialVolcano extends Component {
     clearHighlightedData,
   ) => {
     if (volcanoPlotSelectedDataArr.length > 0) {
+      console.log('volcano', volcanoPlotSelectedDataArr);
       this.setState({
         filteredTableData: volcanoPlotSelectedDataArr,
         volcanoPlotRows: volcanoPlotSelectedDataArr.length,
@@ -287,9 +288,13 @@ class DifferentialVolcano extends Component {
         } else this.pageToFeature();
       }
     } else {
+      // this.setState({
+      //   filteredTableData: this.props.differentialResults,
+      //   volcanoPlotRows: this.props.differentialResults.length,
+      // });
       this.setState({
-        filteredTableData: this.props.differentialResults,
-        volcanoPlotRows: this.props.differentialResults.length,
+        filteredTableData: [],
+        volcanoPlotRows: 0,
       });
     }
     // clear the highlighted rows/dots/svg

@@ -1063,6 +1063,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     }
 
     if (isUpsetVisible) {
+      console.log('upset');
       const filteredElements = _.differenceBy(
         data,
         differentialResults,
@@ -1099,11 +1100,13 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         self.renderCirclesFilter(data);
         self.renderCircles(elementsToDisplay);
       }
+
       self.props.onHandleVolcanoPlotSelectionChange(
         elementsToDisplay,
         clearHighlightedData,
       );
     } else {
+      console.log('not upset');
       if (data.length >= 2500) {
         const unfilteredObject = self.parseDataToBinsAndCircles(
           data,
@@ -1230,10 +1233,6 @@ class DifferentialVolcanoPlot extends React.PureComponent {
           .flatMap(elem => elem);
 
         const circles = d3.selectAll('circle.volcanoPlot-dataPoint');
-        circles.attr('style', 'fill: #1678c2');
-        circles.attr('r', 2);
-        circles.classed('highlighted', false);
-        circles.classed('highlightedMax', false);
 
         const brushedCircles = circles.filter(function() {
           const x = d3.select(this).attr('cx');
