@@ -140,11 +140,14 @@ class DifferentialPlot extends PureComponent {
           ),
         },
       ];
+      const singleFeaturePlotTypes = this.props.differentialPlotTypes.filter(
+        p => p.plotType !== 'multiFeature',
+      );
       let metafeaturesDropdown = [
         {
           key: 'Feature-Data-Differential-Plot',
           text: 'Feature Data',
-          value: 'Feature Data',
+          value: singleFeaturePlotTypes.length,
         },
       ];
       panes = panes.concat(metafeaturesTab);
@@ -192,7 +195,7 @@ class DifferentialPlot extends PureComponent {
       ) {
         const DropdownClass =
           this.props.differentialPlotTypes.length > this.props.svgTabMax
-            ? 'Show svgPlotDropdown'
+            ? 'Show svgPlotDropdownInOverlay'
             : 'Hide svgPlotDropdown';
         const TabMenuClass =
           this.props.differentialPlotTypes.length > this.props.svgTabMax
