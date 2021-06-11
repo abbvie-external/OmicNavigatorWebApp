@@ -150,7 +150,6 @@ class SVGPlot extends Component {
           // };
           const activeSVGTabIndexVolcanoVar = activeSVGTabIndexVolcano || 0;
           const svgArray = imageInfoVolcano.svg;
-
           const plotOptions = svgArray.map(function(s, index) {
             return {
               key: `${index}=VolcanoPlotDropdownOption`,

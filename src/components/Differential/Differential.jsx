@@ -451,11 +451,11 @@ class Differential extends Component {
       cancelRequestDifferentialResultsGetPlot = e;
     });
     if (differentialPlotTypes.length !== 0) {
-      _.forEach(differentialPlotTypes, function(plot, i) {
-        if (differentialPlotTypes[i].plotType === 'multiFeature') {
-          return;
-        }
-        if (returnSVG) {
+      if (returnSVG) {
+        _.forEach(differentialPlotTypes, function(plot, i) {
+          if (differentialPlotTypes[i].plotType === 'multiFeature') {
+            return;
+          }
           omicNavigatorService
             .plotStudyReturnSvg(
               differentialStudy,
@@ -497,99 +497,78 @@ class Differential extends Component {
               } else {
                 // self.handleItemSelected(false);
               }
+            })
+            .catch(error => {
+              console.error(
+                `Error during plotStudyReturnSvg for plot ${differentialPlotTypes[i].plotID}`,
+                error,
+              );
+              // if one of many plots fails we don't want to return to the table; eventually we should use this when single feature differentialPlotTypes length is 1
+              // self.handleItemSelected(false);
             });
-        } else {
-          // PAUL - refactor here
-          //   const promises = differentialPlotTypes
-          //   .map(plot => {
-          //     if (
-          //       (plot.plotType === 'singleFeature' && multiFeatureCall) ||
-          //       (plot.plotType === 'multiFeature' && !multiFeatureCall)
-          //     ) {
-          //       return undefined;
-          //     }
-          //     return omicNavigatorService
-          //       .plotStudy(
-          //         differentialStudy,
-          //         differentialModel,
-          //         id,
-          //         plot.plotID,
-          //         plot.plotType || 'singleFeature',
-          //         // self.handleItemSelected,
-          //         null,
-          //         cancelToken,
-          //       )
-          //       .then(svg => ({ svg, plotType: plot }));
-          //   })
-          //   .filter(Boolean);
-          // Promise.race(promises)
-          //   .then(svg => {
-          //     imageInfoVar.svg = [svg];
-          //     self.handleSVG(view, imageInfoVar);
-          //   })
-          //   // Ignore error in first race - Handled later
-          //   .catch(error => undefined)
-          //   .then(() => {
-          //     if (promises.length > 1) {
-          //       const all = Promise.allSettled(promises);
-          //       return all;
-          //     }
-          //   })
-          //   .then(promiseResults => {
-          //     if (!promiseResults) {
-          //       // If promise.length===1, then this is undefined
-          //       return;
-          //     }
-          //     const svgArray = promiseResults
-          //       .filter(result => result.status === 'fulfilled')
-          //       .map(({ value }) => value);
-          //     /**
-          //      * @type {Error[]}
-          //      */
-          //     const errors = promiseResults
-          //       .filter(result => result.status === 'rejected')
-          //       .map(({ reason }) => reason);
-          //     if (svgArray.length) {
-          //       // imageInfoVar.svg = svgArray;
-          //       self.handleSVG(view, { ...imageInfoVar, svg: svgArray });
-          //     }
-          //     if (errors.length === promises.length) {
-          //       throw new Error('NOT FOUND');
-          //     }
-          //     if (errors.length) {
-          //       // Handle errors coming in - warn users
-          //     }
-          //   })
-          //   .catch(error => {
-          //     self.handleItemSelected(false);
-          //   });
-          omicNavigatorService
-            .plotStudyReturnSvgUrl(
-              differentialStudy,
-              differentialModel,
-              id,
-              differentialPlotTypes[i].plotID,
-              null,
-              cancelToken,
-            )
-            .then(svgUrl => {
-              if (svgUrl) {
-                let svgInfo = {
-                  plotType: differentialPlotTypes[i],
-                  svg: svgUrl,
-                };
-                imageInfoVar.svg.push(svgInfo);
-                currentSVGs.push(svgUrl);
-                self.handleSVG(view, imageInfoVar);
-              } else {
-                // self.handleItemSelected(false);
-              }
-            });
-        }
-      });
-      // .catch(error => {
-      //   self.handleItemSelected(false);
-      // });
+        });
+      } else {
+        // refined for dynamically sized plots on single-threaded servers (running R locally), we're using a race condition to take the first url and handle/display it asap; after that, we're using allSettled to wait for remaining urls, and then sending them all to the component as props
+        const promises = differentialPlotTypes
+          .map(plot => {
+            if (plot.plotType === 'multiFeature') {
+              return undefined;
+            }
+            return omicNavigatorService
+              .plotStudyReturnSvgUrl(
+                differentialStudy,
+                differentialModel,
+                id,
+                plot.plotID,
+                null,
+                cancelToken,
+              )
+              .then(svg => ({ svg, plotType: plot }));
+          })
+          .filter(Boolean);
+        Promise.race(promises)
+          .then(svg => {
+            imageInfoVar.svg = [svg];
+            self.handleSVG(view, imageInfoVar);
+          })
+          // Ignore error in first race - Handled later
+          .catch(error => undefined)
+          .then(() => {
+            if (promises.length > 1) {
+              const all = Promise.allSettled(promises);
+              return all;
+            }
+          })
+          .then(promiseResults => {
+            if (!promiseResults) {
+              // If promise.length===1, then this is undefined
+              return;
+            }
+            const svgArray = promiseResults
+              .filter(result => result.status === 'fulfilled')
+              .map(({ value }) => value);
+            /**
+             * @type {Error[]}
+             */
+            const errors = promiseResults
+              .filter(result => result.status === 'rejected')
+              .map(({ reason }) => reason);
+            if (svgArray.length) {
+              self.handleSVG(view, { ...imageInfoVar, svg: svgArray });
+            }
+            if (errors.length === promises.length) {
+              throw new Error('Error during plotStudyReturnSvgUrl');
+            }
+            if (errors.length) {
+              console.error(`Error during plotStudyReturnSvgUrl`, errors);
+              // Handle errors coming in - warn users
+            }
+          })
+          .catch(error => {
+            console.error(`Error during plotStudyReturnSvgUrl`, error);
+            // if one of many plots fails we don't want to alter the UI, however eventually consdider how best to handle failure when single feature differentialPlotTypes length is 1
+          });
+      }
     } else {
       this.setState({
         imageInfoVolcano: {
