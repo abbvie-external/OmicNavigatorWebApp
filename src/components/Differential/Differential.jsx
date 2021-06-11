@@ -47,7 +47,6 @@ class Differential extends Component {
        * @type {QHGrid.ColumnConfig[]}
        */
       // differentialColumns: [],
-      filterableColumnsP: [],
       multisetPlotInfoDifferential: {
         title: '',
         svg: [],
@@ -78,7 +77,7 @@ class Differential extends Component {
       visible: false,
       plotButtonActiveDifferential: false,
       multisetQueriedDifferential: false,
-      thresholdColsP: [],
+      upsetColsDifferential: [],
       tabsMessage: 'Select a feature to display plots',
       // differentialPlotTypes: [],
       differentialStudyMetadata: [],
@@ -254,6 +253,10 @@ class Differential extends Component {
         changes.differentialStudy,
         changes.differentialModel,
       );
+      this.getUpsetColsDifferential(
+        changes.differentialStudy,
+        changes.differentialModel,
+      );
     }
   };
 
@@ -332,6 +335,36 @@ class Differential extends Component {
                 JSON.stringify(favicons),
               );
             });
+        });
+    }
+  };
+
+  getUpsetColsDifferential = (differentialStudy, differentialModel) => {
+    const cachedUpsetColsDifferential = sessionStorage.getItem(
+      `UpsetCols-${differentialStudy}_${differentialModel}`,
+    );
+    if (cachedUpsetColsDifferential) {
+      const parsedUpsetColsDifferential = JSON.parse(
+        cachedUpsetColsDifferential,
+      );
+      this.setState({
+        upsetColsDifferential: parsedUpsetColsDifferential,
+      });
+    } else {
+      this.setState({
+        upsetColsDifferential: [],
+      });
+      omicNavigatorService
+        .getUpsetCols(differentialStudy, differentialModel)
+        .then(getUpsetColsDifferentialResponseData => {
+          const cols = getUpsetColsDifferentialResponseData || [];
+          this.setState({
+            upsetColsDifferential: cols,
+          });
+          sessionStorage.setItem(
+            `UpsetCols-${differentialStudy}_${differentialModel}`,
+            JSON.stringify(cols),
+          );
         });
     }
   };
@@ -1011,12 +1044,9 @@ class Differential extends Component {
         };
       },
     );
-    const thresholdColsDifferential = this.listToJson(
-      differentialNumericFields,
-    );
+    const upsetColsDifferentialVar = this.listToJson(differentialNumericFields);
     this.setState({
-      thresholdColsP: thresholdColsDifferential,
-      filterableColumnsP: [...differentialNumericFields],
+      upsetColsDifferential: upsetColsDifferentialVar,
     });
     const differentialNumericColumnsMapped = differentialNumericFields.map(
       c => {
@@ -1225,6 +1255,7 @@ class Differential extends Component {
               onHandleVolcanoTableLoading={this.handleVolcanoTableLoading}
               onDoMetaFeaturesExist={this.doMetaFeaturesExist}
               onGetResultsLinkouts={this.getResultsLinkouts}
+              onGetUpsetColsDifferential={this.getUpsetColsDifferential}
               onHandleIsDataStreamingResultsTable={
                 this.handleIsDataStreamingResultsTable
               }

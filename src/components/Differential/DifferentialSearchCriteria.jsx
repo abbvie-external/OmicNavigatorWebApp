@@ -200,6 +200,10 @@ class DifferentialSearchCriteria extends Component {
       } else {
         this.props.onDoMetaFeaturesExist(differentialStudy, differentialModel);
         this.props.onGetResultsLinkouts(differentialStudy, differentialModel);
+        this.props.onGetUpsetColsDifferential(
+          differentialStudy,
+          differentialModel,
+        );
         this.props.onHandlePlotTypesDifferential(differentialModel);
         const differentialModelWithTests = differentialModelsAndTestsVar.find(
           model => model.modelID === differentialModel,
@@ -523,24 +527,24 @@ class DifferentialSearchCriteria extends Component {
   handleMultisetToggleDifferential = () => {
     if (this.state.multisetFiltersVisibleDifferential === false) {
       this.props.onHandleUpsetVisible(true);
-      const { thresholdColsP } = this.props;
+      const { upsetColsDifferential } = this.props;
       // on toggle open
       if (this.state.selectedColP.length === 0) {
         var defaultColKey = null;
-        const thresholdColsPKeys = thresholdColsP.map(t => t.key);
-        if (thresholdColsPKeys.includes('P_Value')) {
+        const upsetColsDifferentialKeys = upsetColsDifferential.map(t => t.key);
+        if (upsetColsDifferentialKeys.includes('P_Value')) {
           defaultColKey = 'P_Value';
-        } else if (thresholdColsPKeys.includes('P.Value')) {
+        } else if (upsetColsDifferentialKeys.includes('P.Value')) {
           defaultColKey = 'P.Value';
-        } else if (thresholdColsPKeys.includes('PValue')) {
+        } else if (upsetColsDifferentialKeys.includes('PValue')) {
           defaultColKey = 'PValue';
-        } else if (thresholdColsPKeys.includes('PVal')) {
+        } else if (upsetColsDifferentialKeys.includes('PVal')) {
           defaultColKey = 'PVal';
-        } else if (thresholdColsPKeys.includes('P value')) {
+        } else if (upsetColsDifferentialKeys.includes('P value')) {
           defaultColKey = 'P value';
-        } else if (thresholdColsPKeys.includes('adj_P_Value')) {
+        } else if (upsetColsDifferentialKeys.includes('adj_P_Value')) {
           defaultColKey = 'adj_P_Val';
-        } else if (thresholdColsPKeys.includes('adj.P.Value')) {
+        } else if (upsetColsDifferentialKeys.includes('adj.P.Value')) {
           defaultColKey = 'adj.P.Val';
         } else {
           defaultColKey = null;
@@ -555,7 +559,7 @@ class DifferentialSearchCriteria extends Component {
             },
           ];
         } else {
-          defaultCol = [thresholdColsP[0]];
+          defaultCol = [upsetColsDifferential[0]];
         }
         this.setState({
           uSettingsP: {
@@ -991,7 +995,7 @@ class DifferentialSearchCriteria extends Component {
           multisetFiltersVisibleDifferential={
             this.state.multisetFiltersVisibleDifferential
           }
-          thresholdColsP={this.props.thresholdColsP}
+          upsetColsDifferential={this.props.upsetColsDifferential}
           numElementsP={this.state.numElementsP}
           maxElementsP={this.state.maxElementsP}
         />
