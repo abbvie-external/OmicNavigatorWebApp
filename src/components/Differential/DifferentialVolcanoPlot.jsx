@@ -655,6 +655,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       .selectAll('path')
       .attr('fill', 'white')
       .attr('stroke', '#000')
+      .attr('class', 'bin')
       .attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(5)}`);
     // determine new bin color
     d3.select('#nonfiltered-elements')
