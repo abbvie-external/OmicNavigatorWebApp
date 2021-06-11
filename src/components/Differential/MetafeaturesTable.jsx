@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Popup } from 'semantic-ui-react';
-// import _ from 'lodash';
+import _ from 'lodash';
 import { formatNumberForDisplay, splitValue } from '../Shared/helpers';
 import './MetafeaturesTable.scss';
 // import { CancelToken } from 'axios';
@@ -24,8 +24,12 @@ class MetafeaturesTable extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     if (
-      this.props.metaFeaturesData.length !== 0 &&
-      this.props.metaFeaturesData !== prevProps.metaFeaturesData
+      this.props.metaFeaturesData.length !==
+        prevProps.metaFeaturesData.length ||
+      !_.isEqual(
+        _.sortBy(this.props.metaFeaturesData),
+        _.sortBy(prevProps.metaFeaturesData),
+      )
     ) {
       this.getMetafeaturesTableConfigCols(this.props.metaFeaturesData);
     }
@@ -33,7 +37,7 @@ class MetafeaturesTable extends Component {
 
   getMetafeaturesTableConfigCols = data => {
     let configCols = [];
-    if (data.length > 0) {
+    if (data?.length > 0) {
       const TableValuePopupStyle = {
         backgroundColor: '2E2E2E',
         borderBottom: '2px solid var(--color-primary)',
@@ -45,8 +49,18 @@ class MetafeaturesTable extends Component {
       };
       let metafeaturesAlphanumericFields = [];
       let metafeaturesNumericFields = [];
-      const firstObject = data[0];
-      for (let [key, value] of Object.entries(firstObject)) {
+      function isNotNANorNullNorUndefined(o) {
+        return typeof o !== 'undefined' && o !== null && o !== 'NA';
+      }
+      function everyIsNotNANorNullNorUndefined(arr) {
+        return arr.every(isNotNANorNullNorUndefined);
+      }
+      const objectValuesArr = [...data].map(f => Object.values(f));
+      const firstFullObjectIndex = objectValuesArr.findIndex(
+        everyIsNotNANorNullNorUndefined,
+      );
+      const firstFullObject = data[firstFullObjectIndex];
+      for (let [key, value] of Object.entries(firstFullObject)) {
         if (typeof value === 'string' || value instanceof String) {
           metafeaturesAlphanumericFields.push(key);
         } else {
@@ -141,9 +155,9 @@ class MetafeaturesTable extends Component {
           // use "differentialRows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
           itemsPerPage={itemsPerPageMetafeaturesTable}
           onItemsPerPageChange={this.handleItemsPerPageChange}
-          exportBaseName="Feature Data"
+          // exportBaseName="Feature Data"
           // quickViews={quickViews}
-          disableGeneralSearch
+          // disableGeneralSearch
           // disableGrouping
           // disableSort
           disableColumnVisibilityToggle
@@ -151,6 +165,8 @@ class MetafeaturesTable extends Component {
           // disableFilters={false}
           min-height="5vh"
           emptyMessage={'No Feature Data Available'}
+          disableQuickViewEditing
+          disableQuickViewMenu
         />
       </div>
     );

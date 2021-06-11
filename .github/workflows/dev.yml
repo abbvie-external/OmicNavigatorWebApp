@@ -1,22 +1,19 @@
-name: Dispatch to trigger new release of the R package
-# After a new release, this Action triggers the R package repository to update
-# the pinned version of the app and create a new release.
-#
-# https://github.com/abbvie-external/OmicNavigator/releases
-# https://github.com/peter-evans/repository-dispatch
+name: Deploy dev branch
 on:
-  release:
-    types: [published]
+  push:
+    branches:
+      - dev
 jobs:
-  dispatch:
+  deploy-dev:
+    if: ${{ github.repository == 'abbvie-external/OmicNavigatorWebApp' && github.event_name != 'pull_request' }}
     runs-on: ubuntu-latest
     steps:
-      - name: Repository Dispatch
+      - name: Deploy dev dispatch
         uses: peter-evans/repository-dispatch@v1
         with:
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
-          repository: abbvie-external/OmicNavigator
-          event-type: app-release
+          repository: abbvie-internal/OmicNavigatorCD
+          event-type: deploy-dev
           client-payload: '{
             "repository": "${{ github.repository }}",
             "ref": "${{ github.ref }}",

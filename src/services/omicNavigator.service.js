@@ -16,7 +16,7 @@ class OmicNavigatorService {
     const paramsObj = params ? { digits: 10 } : {};
     const self = this;
     return new Promise(function(resolve, reject) {
-      const axiosPostUrl = `${self.url}/${method}/json?auto_unbox=true`;
+      const axiosPostUrl = `${self.url}/${method}/json?auto_unbox=true&na="string"`;
       axios
         .post(axiosPostUrl, obj, {
           params: paramsObj,
@@ -74,34 +74,134 @@ class OmicNavigatorService {
     }
   }
 
-  // async ocpuPlotCall(method, obj, handleError, cancelToken, timeout) {
-  //   return new Promise(function(resolve, reject) {
-  //     window.ocpu
-  //       .call(method, obj, function(session) {
-  //         axios
-  //           .get(session.getLoc() + 'graphics/1/svg', {
-  //             responseType: 'text',
-  //             cancelToken,
-  //             timeout,
-  //           })
-  //           .then(response => resolve(response))
-  //           .catch(function(thrown) {
-  //             if (!axios.isCancel(thrown)) {
-  //               toast.error(`${thrown.message}`);
-  //               if (handleError != null) {
-  //                 handleError(false);
-  //               }
-  //             }
-  //           });
-  //       })
-  //       .catch(error => {
-  //         toast.error(`${error.statusText}: ${error.responseText}`);
-  //         if (handleError != null) {
-  //           handleError(false);
-  //         }
-  //       });
-  //   });
-  // }
+  async ocpuPlotCall(method, obj, handleError, cancelToken, timeout) {
+    return new Promise(function(resolve, reject) {
+      window.ocpu
+        .call(method, obj, function(session) {
+          axios
+            .get(session.getLoc() + 'graphics/1/svg', {
+              responseType: 'text',
+              cancelToken,
+              timeout,
+            })
+            .then(response => resolve(response))
+            .catch(function(thrown) {
+              if (!axios.isCancel(thrown)) {
+                toast.error(`${thrown.message}`);
+                if (handleError != null) {
+                  handleError(false);
+                }
+              }
+            });
+        })
+        .catch(error => {
+          toast.error(`${error.statusText}: ${error.responseText}`);
+          if (handleError != null) {
+            handleError(false);
+          }
+        });
+    });
+  }
+
+  async plotStudyReturnSvgUrl(
+    study,
+    modelID,
+    featureID,
+    plotID,
+    errorCb,
+    cancelToken,
+  ) {
+    this.setUrl();
+    const timeoutLength = 60000;
+    const cacheKey = `plotStudy_${study}_${modelID}_${featureID}_${plotID}`;
+    if (this[cacheKey] != null) {
+      return this[cacheKey];
+    } else {
+      const promise = this.axiosPostPlot(
+        'plotStudy',
+        {
+          study,
+          modelID,
+          featureID,
+          plotID,
+        },
+        errorCb,
+        cancelToken,
+        timeoutLength,
+      );
+      const dataFromPromise = await promise;
+      this[cacheKey] = dataFromPromise;
+      return dataFromPromise;
+    }
+  }
+
+  async plotStudyReturnSvg(
+    study,
+    modelID,
+    featureID,
+    plotID,
+    errorCb,
+    cancelToken,
+  ) {
+    this.setUrl();
+    const timeoutLength = 60000;
+    const promise = this.ocpuPlotCall(
+      'plotStudy',
+      {
+        study,
+        modelID,
+        featureID,
+        plotID,
+      },
+      errorCb,
+      cancelToken,
+      timeoutLength,
+    );
+    const dataFromPromise = await promise;
+    return dataFromPromise;
+  }
+
+  async plotStudyReturnSvgWithTimeoutResolver(
+    study,
+    modelID,
+    featureID,
+    plotID,
+    errorCb,
+    cancelToken,
+  ) {
+    this.setUrl();
+    const timeoutLength = 240000;
+    // const cacheKey = `plotStudyMultifeature_${study}_${modelID}_${featureID}_${plotID}`;
+    // if (this[cacheKey] != null) {
+    //   return this[cacheKey];
+    // }
+    const promise = this.ocpuPlotCall(
+      'plotStudy',
+      {
+        study,
+        modelID,
+        featureID,
+        plotID,
+      },
+      errorCb,
+      cancelToken,
+      timeoutLength,
+    );
+    function timeoutResolver(ms) {
+      return new Promise((resolve, reject) => {
+        setTimeout(function() {
+          reject(true);
+        }, ms);
+      });
+    }
+    try {
+      await Promise.race([promise, timeoutResolver(10000)]);
+      // this[cacheKey] = promise;
+      return promise;
+    } catch (err) {
+      return err;
+    }
+  }
 
   async ocpuRPCOutput(method, obj) {
     return new Promise(function(resolve, reject) {
@@ -252,39 +352,6 @@ class OmicNavigatorService {
         null,
         null,
         25000,
-      );
-      const dataFromPromise = await promise;
-      this[cacheKey] = dataFromPromise;
-      return dataFromPromise;
-    }
-  }
-
-  async plotStudy(
-    study,
-    modelID,
-    featureID,
-    plotID,
-    plotType,
-    errorCb,
-    cancelToken,
-  ) {
-    this.setUrl();
-    const timeoutLength = plotType === 'multiFeature' ? 250000 : 25000;
-    const cacheKey = `plotStudy_${study}_${modelID}_${featureID}_${plotID}`;
-    if (this[cacheKey] != null) {
-      return this[cacheKey];
-    } else {
-      const promise = this.axiosPostPlot(
-        'plotStudy',
-        {
-          study,
-          modelID,
-          featureID,
-          plotID,
-        },
-        errorCb,
-        cancelToken,
-        timeoutLength,
       );
       const dataFromPromise = await promise;
       this[cacheKey] = dataFromPromise;

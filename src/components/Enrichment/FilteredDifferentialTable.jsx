@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Popup, Dimmer, Loader } from 'semantic-ui-react';
 import { omicNavigatorService } from '../../services/omicNavigator.service';
 import _ from 'lodash';
-import { formatNumberForDisplay, splitValue } from '../Shared/helpers';
+import { formatNumberForDisplay, splitValue, Linkout } from '../Shared/helpers';
 import './FilteredDifferentialTable.scss';
 import { CancelToken } from 'axios';
 import CustomEmptyMessage from '../Shared/Templates';
@@ -153,6 +153,10 @@ class FilteredDifferentialTable extends Component {
   };
 
   setConfigCols = (data, dataFromService, dataAlreadyFiltered) => {
+    const {
+      filteredDifferentialLinkouts,
+      filteredDifferentialFavicons,
+    } = this.props;
     const TableValuePopupStyle = {
       backgroundColor: '2E2E2E',
       borderBottom: '2px solid var(--color-primary)',
@@ -164,8 +168,18 @@ class FilteredDifferentialTable extends Component {
     };
     let filteredDifferentialAlphanumericFields = [];
     let filteredDifferentialNumericFields = [];
-    const firstObject = dataFromService[0];
-    for (let [key, value] of Object.entries(firstObject)) {
+    function isNotNANorNullNorUndefined(o) {
+      return typeof o !== 'undefined' && o !== null && o !== 'NA';
+    }
+    function everyIsNotNANorNullNorUndefined(arr) {
+      return arr.every(isNotNANorNullNorUndefined);
+    }
+    const objectValuesArr = [...dataFromService].map(f => Object.values(f));
+    const firstFullObjectIndex = objectValuesArr.findIndex(
+      everyIsNotNANorNullNorUndefined,
+    );
+    const firstFullObject = dataFromService[firstFullObjectIndex];
+    for (let [key, value] of Object.entries(firstFullObject)) {
       if (typeof value === 'string' || value instanceof String) {
         filteredDifferentialAlphanumericFields.push(key);
       } else {
@@ -190,7 +204,37 @@ class FilteredDifferentialTable extends Component {
           title: f,
           field: f,
           filterable: { type: 'multiFilter' },
-          template: value => {
+          template: (value, item) => {
+            const keyVar = `${item[f]}-${item[alphanumericTrigger]}`;
+            const filteredDifferentialLinkoutsKeys = Object.keys(
+              filteredDifferentialLinkouts,
+            );
+            let linkoutWithIcon = null;
+            if (filteredDifferentialLinkoutsKeys.includes(f)) {
+              if (item[f] != null && item[f] !== '') {
+                const columnLinkoutsObj = filteredDifferentialLinkouts[f];
+                const columnFaviconsObj = filteredDifferentialFavicons[f];
+                const columnLinkoutsIsArray = Array.isArray(columnLinkoutsObj);
+                let favicons = [];
+                if (columnFaviconsObj != null) {
+                  const columnFaviconsIsArray = Array.isArray(
+                    columnFaviconsObj,
+                  );
+                  favicons = columnFaviconsIsArray
+                    ? columnFaviconsObj
+                    : [columnFaviconsObj];
+                }
+                const linkouts = columnLinkoutsIsArray
+                  ? columnLinkoutsObj
+                  : [columnLinkoutsObj];
+
+                const itemValue = item[f];
+                linkoutWithIcon = (
+                  <Linkout {...{ keyVar, itemValue, linkouts, favicons }} />
+                );
+              }
+            }
+
             if (f === alphanumericTrigger) {
               return (
                 <div className="NoSelect">
@@ -202,6 +246,7 @@ class FilteredDifferentialTable extends Component {
                     inverted
                     basic
                   />
+                  {linkoutWithIcon}
                 </div>
               );
             } else {
@@ -217,6 +262,7 @@ class FilteredDifferentialTable extends Component {
                     inverted
                     basic
                   />
+                  {linkoutWithIcon}
                 </div>
               );
             }
@@ -445,6 +491,8 @@ class FilteredDifferentialTable extends Component {
             onRowClick={this.handleRowClick}
             rowLevelPropsCalc={this.rowLevelPropsCalc}
             emptyMessage={CustomEmptyMessage}
+            disableQuickViewEditing
+            disableQuickViewMenu
           />
         </div>
       );

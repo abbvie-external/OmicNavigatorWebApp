@@ -1,6 +1,14 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import { Tab, Menu, Popup, Icon } from 'semantic-ui-react';
+import {
+  Tab,
+  Menu,
+  Popup,
+  Icon,
+  Modal,
+  Button,
+  Header,
+} from 'semantic-ui-react';
 import { omicNavigatorService } from '../services/omicNavigator.service';
 import Differential from './Differential/Differential';
 import omicNavigatorIcon from '../resources/icon.png';
@@ -55,8 +63,10 @@ class Tabs extends Component {
       allStudiesMetadata: [],
       differentialFeatureIdKey: '',
       filteredDifferentialFeatureIdKey: '',
-      appVersion: '1.1.5',
+      appVersion: '1.1.7',
       packageVersion: '',
+      infoOpenFirst: false,
+      infoOpenSecond: false,
     };
   }
 
@@ -199,6 +209,145 @@ class Tabs extends Component {
     this.setState({ featureToHighlightInDiffTable: '' });
   };
 
+  toggleInfoFirst = bool => {
+    this.setState({
+      infoOpenFirst: bool,
+    });
+  };
+
+  toggleInfoSecond = bool => {
+    this.setState({
+      infoOpenSecond: bool,
+    });
+  };
+
+  getInfoButton = () => {
+    const { appVersion, packageVersion } = this.state;
+    const self = this;
+    const TableValuePopupStyle = {
+      backgroundColor: '2E2E2E',
+      borderBottom: '2px solid var(--color-primary)',
+      color: '#FFF',
+      padding: '1em',
+      maxWidth: '50vw',
+      fontSize: '13px',
+      wordBreak: 'break-all',
+    };
+    const MailToString = `mailto:OmicNavigator@abbvie.com?body=App: v${appVersion}, Package: v${packageVersion}`;
+    return (
+      <span>
+        <Popup
+          trigger={
+            <Icon
+              className="CursorPointer"
+              id="HelpButton"
+              color="grey"
+              name="info"
+              onClick={() => self.toggleInfoFirst(true)}
+            />
+          }
+          style={TableValuePopupStyle}
+          className="TablePopupValue"
+          inverted
+          basic
+          position="left center"
+        >
+          <Popup.Content>
+            App: {`v${appVersion}`}
+            <br></br>Package: {`v${packageVersion}`}
+            <br></br>
+            <span className="MarginRight">
+              Click <Icon name="info" size="small" />
+              to open an issue
+            </span>{' '}
+          </Popup.Content>
+        </Popup>
+        <Modal
+          size="small"
+          closeOnDimmerClick={true}
+          closeOnEscape={true}
+          closeIcon
+          centered={false}
+          open={self.state.infoOpenFirst}
+          onOpen={() => self.toggleInfoFirst(true)}
+          onClose={() => self.toggleInfoFirst(false)}
+        >
+          <Modal.Header>Issues or questions?</Modal.Header>
+          <Modal.Content image>
+            <Modal.Description>
+              <Header size="small">
+                <span className="MarginRight">App: {`v${appVersion}`}</span>
+                <span className="MarginRight">
+                  Package: {`v${packageVersion}`}
+                </span>
+              </Header>
+              <p>
+                To report a bug, please open a GitHub Issue within our{' '}
+                <b>public repository</b> (note that anything you write is open
+                to the public and not private to AbbVie). In your report, please
+                include the app and package versions listed above.
+              </p>
+              <p>
+                If you are an AbbVie employee and need to include specific
+                details about your study data, please email the developers at{' '}
+                <a
+                  href={MailToString}
+                  rel="noreferrer"
+                  alt="Email OmicNavigator Team"
+                  target="_blank"
+                >
+                  OmicNavigator@abbvie.com
+                </a>
+                .
+              </p>
+            </Modal.Description>
+          </Modal.Content>
+          <Modal.Actions>
+            <Button onClick={() => self.toggleInfoSecond(true)} primary>
+              Open Issue
+            </Button>
+          </Modal.Actions>
+          <Modal
+            onClose={() => self.toggleInfoSecond(false)}
+            open={self.state.infoOpenSecond}
+            size="small"
+          >
+            <Modal.Header className="PrimaryColor">
+              Proceed to public repository?
+            </Modal.Header>
+            <Modal.Content>
+              <p>
+                Thank you for contributing to this open-source project. You are
+                being redirected to our public repository to make a public
+                comment. Please click below to proceed.
+              </p>
+            </Modal.Content>
+            <Modal.Actions>
+              <Button
+                icon="cancel"
+                content="Cancel"
+                onClick={() => self.toggleInfoSecond(false)}
+              />
+              <a
+                href="https://github.com/abbvie-external/OmicNavigatorWebApp/issues/new"
+                rel="noreferrer"
+                alt="OmicNavigator Issues Github"
+                target="_blank"
+              >
+                <Button
+                  onClick={() => self.toggleInfoSecond(false)}
+                  className="PrimaryColor"
+                >
+                  Proceed <Icon name="right chevron" />
+                </Button>
+              </a>
+            </Modal.Actions>
+          </Modal>
+        </Modal>
+      </span>
+    );
+  };
+
   resetApp = () => {
     this.setState(
       {
@@ -233,7 +382,7 @@ class Tabs extends Component {
   };
 
   render() {
-    const { activeIndex, appVersion, packageVersion } = this.state;
+    const { activeIndex } = this.state;
     const panes = [
       {
         menuItem: (
@@ -288,15 +437,7 @@ class Tabs extends Component {
         ),
       },
     ];
-    const TableValuePopupStyle = {
-      backgroundColor: '2E2E2E',
-      borderBottom: '2px solid var(--color-primary)',
-      color: '#FFF',
-      padding: '1em',
-      maxWidth: '50vw',
-      fontSize: '13px',
-      wordBreak: 'break-all',
-    };
+    const InfoButton = this.getInfoButton();
     return (
       <>
         <Tab
@@ -312,22 +453,7 @@ class Tabs extends Component {
             className: 'MenuContainer',
           }}
         />
-        <span id="AppVersion">
-          <Popup
-            trigger={<Icon name="info" color="grey" />}
-            style={TableValuePopupStyle}
-            className="TablePopupValue"
-            inverted
-            basic
-            // on='hover'
-            position="left center"
-          >
-            <Popup.Content>
-              App: {`v${appVersion}`}
-              <br></br>Package: {`v${packageVersion}`}
-            </Popup.Content>
-          </Popup>
-        </span>
+        <span id="AppVersion">{InfoButton}</span>
       </>
     );
   }

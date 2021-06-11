@@ -1,4 +1,3 @@
-import DOMPurify from 'dompurify';
 import _ from 'lodash';
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
@@ -29,6 +28,7 @@ import SplitPanesContainer from './SplitPanesContainer';
 import CustomEmptyMessage from '../Shared/Templates';
 // eslint-disable-next-line no-unused-vars
 import QHGrid, { EZGrid } from '../Shared/QHGrid';
+import ErrorBoundary from '../Shared/ErrorBoundary';
 
 let cancelRequestEnrichmentGetPlot = () => {};
 let cancelRequestGetEnrichmentsNetwork = () => {};
@@ -124,7 +124,7 @@ class Enrichment extends Component {
     SVGPlotLoading: false,
     SVGPlotLoaded: false,
     isViolinPlotLoaded: false,
-    // hasBarcodeData: true,
+    hasBarcodeData: true,
     barcodeSettings: {
       barcodeData: [],
       brushedData: [],
@@ -591,6 +591,80 @@ class Enrichment extends Component {
             });
         });
     }
+    this.getFilteredDifferentialLinkouts(
+      enrichmentStudy,
+      this.props.enrichmentModel,
+    );
+  };
+
+  getFilteredDifferentialLinkouts = (enrichmentStudy, enrichmentModel) => {
+    const cachedFilteredDifferentialLinkouts = sessionStorage.getItem(
+      `FilteredDifferentialLinkouts-${enrichmentStudy}_${enrichmentModel}`,
+    );
+    if (cachedFilteredDifferentialLinkouts) {
+      const parsedFilteredDifferentialLinkouts = JSON.parse(
+        cachedFilteredDifferentialLinkouts,
+      );
+      this.setState({
+        filteredDifferentialLinkouts: parsedFilteredDifferentialLinkouts,
+      });
+      const cachedFilteredDifferentialFavicons = sessionStorage.getItem(
+        `FilteredDifferentialFavicons-${enrichmentStudy}_${enrichmentModel}`,
+      );
+      if (cachedFilteredDifferentialFavicons) {
+        const parsedFilteredDifferentialFavicons = JSON.parse(
+          cachedFilteredDifferentialFavicons,
+        );
+        this.setState({
+          filteredDifferentialFavicons: parsedFilteredDifferentialFavicons,
+        });
+      } else {
+        this.setState({
+          filteredDifferentialFavicons: [],
+        });
+        omicNavigatorService
+          .getFavicons(parsedFilteredDifferentialLinkouts)
+          .then(getFaviconsResponseData => {
+            const favicons = getFaviconsResponseData || [];
+            this.setState({
+              filteredDifferentialFavicons: favicons,
+            });
+            sessionStorage.setItem(
+              `FilteredDifferentialFavicons-${enrichmentStudy}_${enrichmentModel}`,
+              JSON.stringify(favicons),
+            );
+          });
+      }
+    } else {
+      this.setState({
+        filteredDifferentialLinkouts: [],
+        filteredDifferentialFavicons: [],
+      });
+      omicNavigatorService
+        .getResultsLinkouts(enrichmentStudy, enrichmentModel)
+        .then(getFilteredDifferentialLinkoutsResponseData => {
+          const linkouts = getFilteredDifferentialLinkoutsResponseData || [];
+          this.setState({
+            filteredDifferentialLinkouts: linkouts,
+          });
+          sessionStorage.setItem(
+            `FilteredDifferentialLinkouts-${enrichmentStudy}_${enrichmentModel}`,
+            JSON.stringify(linkouts),
+          );
+          omicNavigatorService
+            .getFavicons(linkouts)
+            .then(getFaviconsResponseData => {
+              const favicons = getFaviconsResponseData || [];
+              this.setState({
+                filteredDifferentialFavicons: favicons,
+              });
+              sessionStorage.setItem(
+                `FilteredDifferentialFavicons-${enrichmentStudy}_${enrichmentModel}`,
+                JSON.stringify(favicons),
+              );
+            });
+        });
+    }
   };
 
   handleIsDataStreamingEnrichmentsTable = bool => {
@@ -636,7 +710,6 @@ class Enrichment extends Component {
   };
 
   getConfigCols = annotationData => {
-    const enrResults = annotationData;
     const {
       enrichmentStudy,
       enrichmentModel,
@@ -658,8 +731,19 @@ class Enrichment extends Component {
     };
     let enrichmentAlphanumericFields = [];
     let enrichmentNumericFields = [];
-    const firstObject = enrResults[0];
-    for (let [key, value] of Object.entries(firstObject)) {
+    function isNotNANorNullNorUndefined(o) {
+      return typeof o !== 'undefined' && o !== null && o !== 'NA';
+    }
+
+    function everyIsNotNANorNullNorUndefined(arr) {
+      return arr.every(isNotNANorNullNorUndefined);
+    }
+    const objectValuesArr = [...annotationData].map(f => Object.values(f));
+    const firstFullObjectIndex = objectValuesArr.findIndex(
+      everyIsNotNANorNullNorUndefined,
+    );
+    const firstFullObject = annotationData[firstFullObjectIndex];
+    for (let [key, value] of Object.entries(firstFullObject)) {
       if (typeof value === 'string' || value instanceof String) {
         enrichmentAlphanumericFields.push(key);
       } else {
@@ -1094,11 +1178,10 @@ class Enrichment extends Component {
     let id = featureId != null ? featureId : '';
     let imageInfoEnrichmentVar = { key: '', title: '', svg: [] };
     imageInfoEnrichmentVar.title = this.state.imageInfoEnrichment.title;
-    imageInfoEnrichmentVar.key = this.state.imageInfoEnrichment.key;
+    imageInfoEnrichmentVar.key = id;
     this.setState({ svgExportName: id });
     let handleSVGCb = this.handleSVG;
     let handlePlotStudyError = this.handlePlotStudyError;
-    let currentSVGs = [];
     cancelRequestEnrichmentGetPlot();
     let cancelToken = new CancelToken(e => {
       cancelRequestEnrichmentGetPlot = e;
@@ -1109,12 +1192,11 @@ class Enrichment extends Component {
           return;
         }
         omicNavigatorService
-          .plotStudy(
+          .plotStudyReturnSvgUrl(
             enrichmentStudy,
             enrichmentModel,
             id,
             enrichmentPlotTypes[i].plotID,
-            enrichmentPlotTypes[i].plotType,
             handlePlotStudyError,
             cancelToken,
           )
@@ -1948,6 +2030,8 @@ class Enrichment extends Component {
                       additionalTemplateInfoEnrichmentTable
                     }
                     emptyMessage={CustomEmptyMessage}
+                    disableQuickViewEditing
+                    disableQuickViewMenu
                   />
                 </Grid.Column>
               </Grid.Row>
@@ -2184,19 +2268,15 @@ class Enrichment extends Component {
           </Grid.Row>
         </Grid>
         <div className="MultisetSvgOuter" id="enrichmentMultisetAnalysisSVGDiv">
-          <SVG
-            cacheRequests={true}
-            // description=""
-            // loader={<span>{loadingDimmer}</span>}
-            // onError={error => console.log(error.message)}
-            // onLoad={(src, hasCache) => console.log(src, hasCache)}
-            // preProcessor={code => code.replace(/fill=".*?"/g, 'fill="currentColor"')}
-            src={srcUrl}
-            // title={`${s.plotType.plotDisplay}`}
-            uniqueHash="d4i1g4"
-            uniquifyIDs={true}
-            id="enrichmentMultisetAnalysisSVG"
-          />
+          {multisetPlotInfoEnrichment.svg?.length ? (
+            <SVG
+              cacheRequests={true}
+              src={srcUrl}
+              uniqueHash="d4i1g4"
+              uniquifyIDs={true}
+              id="enrichmentMultisetAnalysisSVG"
+            />
+          ) : null}
         </div>
       </Sidebar>
     );
@@ -2265,12 +2345,14 @@ class Enrichment extends Component {
                 visible={visibleEnrichment}
               />
               <Sidebar.Pusher>
-                <div
-                  className="EnrichmentViewContainer"
-                  ref={this.EnrichmentViewContainerRef}
-                >
-                  {enrichmentView}
-                </div>
+                <ErrorBoundary>
+                  <div
+                    className="EnrichmentViewContainer"
+                    ref={this.EnrichmentViewContainerRef}
+                  >
+                    {enrichmentView}
+                  </div>
+                </ErrorBoundary>
               </Sidebar.Pusher>
             </Sidebar.Pushable>
           </Grid.Column>

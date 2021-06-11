@@ -1,12 +1,10 @@
-import React, { PureComponent, Fragment } from 'react';
+import React, { PureComponent } from 'react';
 import { withRouter } from 'react-router-dom';
 import { Grid, Dimmer, Loader, Tab, Dropdown } from 'semantic-ui-react';
-import SVG from 'react-inlinesvg';
-import _ from 'lodash';
-import { roundToPrecision } from '../Shared/helpers';
 import DifferentialBreadcrumbs from './DifferentialBreadcrumbs';
 import ButtonActions from '../Shared/ButtonActions';
 import MetafeaturesTable from './MetafeaturesTable';
+import { omicNavigatorService } from '../../services/omicNavigator.service';
 // import LoaderActivePlots from '../Transitions/LoaderActivePlots';
 import '../Enrichment/SplitPanesContainer.scss';
 import '../Shared/SVGPlot.scss';
@@ -28,6 +26,7 @@ class DifferentialPlot extends PureComponent {
       // selectedPlot: null,
     };
   }
+  metaFeaturesTableRef = React.createRef();
 
   componentDidMount() {
     const { activeSVGTabIndexDifferential } = this.state;
@@ -66,7 +65,8 @@ class DifferentialPlot extends PureComponent {
         p => p.plotType !== 'multiFeature',
       );
       this.setState({
-        excelFlag: false,
+        excelFlag: index === singleFeaturePlotTypes.length,
+        txtFlag: index === singleFeaturePlotTypes.length,
         pdfFlag: false,
         svgFlag: index !== singleFeaturePlotTypes.length,
         pngFlag: index !== singleFeaturePlotTypes.length,
@@ -93,54 +93,21 @@ class DifferentialPlot extends PureComponent {
     });
   };
 
-  getSVGPanes() {
+  async getSVGPanes() {
     let panes = [];
     if (this.props.imageInfoDifferential) {
       if (this.props.imageInfoDifferential.svg.length !== 0) {
-        const pxToPtRatio = 105;
-        const pointSize = 12;
-        const width =
-          window.innerWidth ||
-          document.documentElement.clientWidth ||
-          document.body.clientWidth;
-        const height =
-          window.innerHeight ||
-          document.documentElement.clientHeight ||
-          document.body.clientHeight;
-        const divWidth = width * 0.75;
-        const divHeight = height * 0.8;
-        // const divWidth =
-        //   this.props.fwdRefDVC?.current?.offsetWidth - 15 || width - 310;
-        // const divHeight =
-        //   this.props.fwdRefDVC?.current?.offsetHeight - 115 || height - 50;
-        const divWidthPt = roundToPrecision(divWidth / pxToPtRatio, 1);
-        const divHeightPt = roundToPrecision(divHeight / pxToPtRatio, 1);
-        const divWidthPtString = `width=${divWidthPt}`;
-        const divHeightPtString = `&height=${divHeightPt}`;
-        const pointSizeString = `&pointsize=${pointSize}`;
-        const dimensions = `?${divWidthPtString}${divHeightPtString}${pointSizeString}`;
         const svgArray = [...this.props.imageInfoDifferential.svg];
         const svgPanes = svgArray.map(s => {
-          const srcUrl = `${s.svg}${dimensions}`;
           return {
             menuItem: `${s.plotType.plotDisplay}`,
             render: () => (
               <Tab.Pane attached="true" as="div">
-                <div id="DifferentialPlotTabsPlotSVGDiv" className="svgSpan">
-                  <SVG
-                    cacheRequests={true}
-                    // description=""
-                    // loader={<span>{loadingDimmer}</span>}
-                    // onError={error => console.log(error.message)}
-                    // onLoad={(src, hasCache) => console.log(src, hasCache)}
-                    // preProcessor={code => code.replace(/fill=".*?"/g, 'fill="currentColor"')}
-                    src={srcUrl}
-                    // title={`${s.plotType.plotDisplay}`}
-                    uniqueHash="c3h0f3"
-                    uniquifyIDs={true}
-                    id="DifferentialPlotTabsPlotSVG"
-                  />
-                </div>
+                <div
+                  id="DifferentialPlotTabsPlotSVGDiv"
+                  className="svgSpan"
+                  dangerouslySetInnerHTML={{ __html: s.svg }}
+                ></div>
               </Tab.Pane>
             ),
           };
@@ -154,13 +121,24 @@ class DifferentialPlot extends PureComponent {
       this.props.modelSpecificMetaFeaturesExist !== false &&
       !isMultifeaturePlot
     ) {
+      let metaFeaturesData = await omicNavigatorService.getMetaFeaturesTable(
+        this.props.differentialStudy,
+        this.props.differentialModel,
+        this.props.differentialFeature,
+        this.handleGetMetaFeaturesTableError,
+      );
+      let metaFeaturesDataDifferential =
+        metaFeaturesData != null ? metaFeaturesData : [];
       let metafeaturesTab = [
         {
           menuItem: 'Feature Data',
           render: () => (
             <Tab.Pane attached="true" as="div">
               <MetafeaturesTable
-                metaFeaturesData={this.props.metaFeaturesDataDifferential}
+                ref={this.metaFeaturesTableRef}
+                metaFeaturesData={metaFeaturesDataDifferential}
+                // differentialFeature={this.props.differentialFeature}
+                // isItemSVGLoaded={this.props.isItemSVGLoaded}
               />
             </Tab.Pane>
           ),
@@ -179,17 +157,25 @@ class DifferentialPlot extends PureComponent {
       excelFlag,
       pngFlag,
       pdfFlag,
+      txtFlag,
       svgFlag,
       svgPanes,
       activeSVGTabIndexDifferential,
     } = this.state;
-    const { isItemSVGLoaded, imageInfoDifferential } = this.props;
+    const {
+      isItemSVGLoaded,
+      imageInfoDifferential,
+      tab,
+      differentialStudy,
+      differentialModel,
+      differentialTest,
+    } = this.props;
     if (!isItemSVGLoaded) {
       return (
         // <LoaderActivePlots />
         <div className="PlotsMetafeaturesDimmer">
           <Dimmer active inverted>
-            <Loader size="large">Loading Plots and Feature Data...</Loader>
+            <Loader size="large">Loading...</Loader>
           </Dimmer>
         </div>
       );
@@ -253,7 +239,15 @@ class DifferentialPlot extends PureComponent {
                     pngVisible={pngFlag}
                     pdfVisible={pdfFlag}
                     svgVisible={svgFlag}
-                    txtVisible={false}
+                    txtVisible={txtFlag}
+                    refFwd={
+                      this.metaFeaturesTableRef.current?.metafeaturesGridRef ||
+                      null
+                    }
+                    tab={tab}
+                    study={differentialStudy}
+                    model={differentialModel}
+                    test={differentialTest}
                     imageInfo={imageInfoDifferential}
                     tabIndex={activeSVGTabIndexDifferentialVar}
                     plot={'DifferentialPlotTabsPlotSVGDiv'}
