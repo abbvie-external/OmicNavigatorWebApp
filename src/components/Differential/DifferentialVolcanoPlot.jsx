@@ -80,7 +80,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     const svg = d3
       .select('#volcano')
       .append('svg')
-      .attr('width', volcanoWidth)
+      .attr('width', volcanoWidth + 50)
       .attr('height', volcanoHeight)
       .attr('id', 'VolcanoChart')
       .attr('class', 'VolcanoPlotSVG')
@@ -1356,12 +1356,27 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         .attr('class', 'volcanoCircleTooltipText')
         .attr('transform', d => {
           if (d) {
-            const circleOnLeftSide = d.cx <= self.props.volcanoWidth / 2;
-            const cx = circleOnLeftSide
-              ? parseInt(d.cx) + 8
-              : parseInt(d.cx) + 8;
-            const cy = parseInt(d.cy) + 4;
-            return `translate(${cx}, ${cy})rotate(0)`;
+            if (d.data) {
+              //create temporary element to get text width in pixels
+              let tempElem = document.createElement('span');
+              document.body.appendChild(tempElem);
+              tempElem.style.fontSize = `11px`;
+              tempElem.style.position = 'absolute';
+              tempElem.style.left = -1000;
+              tempElem.style.top = -1000;
+              tempElem.innerHTML = d.data;
+              let width = tempElem.clientWidth;
+
+              //remove temp element
+              document.body.removeChild(tempElem);
+
+              const cx =
+                width + parseInt(d.cx) > self.props.volcanoWidth
+                  ? parseInt(d.cx) - (8 + width)
+                  : parseInt(d.cx) + 8;
+              const cy = parseInt(d.cy) + 4;
+              return `translate(${cx}, ${cy})rotate(0)`;
+            }
           }
         })
         .style('font-size', '11px')
