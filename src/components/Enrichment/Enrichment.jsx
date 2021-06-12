@@ -1180,41 +1180,73 @@ class Enrichment extends Component {
     imageInfoEnrichmentVar.title = this.state.imageInfoEnrichment.title;
     imageInfoEnrichmentVar.key = id;
     this.setState({ svgExportName: id });
-    let handleSVGCb = this.handleSVG;
-    let handlePlotStudyError = this.handlePlotStudyError;
     cancelRequestEnrichmentGetPlot();
     let cancelToken = new CancelToken(e => {
       cancelRequestEnrichmentGetPlot = e;
     });
+    let self = this;
     if (enrichmentPlotTypes.length > 0) {
-      _.forEach(enrichmentPlotTypes, function(plot, i) {
-        if (enrichmentPlotTypes[i].plotType === 'multiFeature') {
-          return;
-        }
-        omicNavigatorService
-          .plotStudyReturnSvgUrl(
-            enrichmentStudy,
-            enrichmentModel,
-            id,
-            enrichmentPlotTypes[i].plotID,
-            handlePlotStudyError,
-            cancelToken,
-          )
-          .then(svgUrl => {
-            if (svgUrl) {
-              let svgInfo = {
-                plotType: enrichmentPlotTypes[i],
-                svg: svgUrl,
-              };
-              imageInfoEnrichmentVar.svg.push(svgInfo);
-              // currentSVGs.push(svgUrl);
-              handleSVGCb(imageInfoEnrichmentVar);
-            }
-          })
-          .catch(error => {
-            console.error('Error during getPlot', error);
-          });
-      });
+      // refined for dynamically sized plots on single-threaded servers (running R locally), we're using a race condition to take the first url and handle/display it asap; after that, we're using allSettled to wait for remaining urls, and then sending them all to the component as props
+      const promises = enrichmentPlotTypes
+        .map(plot => {
+          if (plot.plotType === 'multiFeature') {
+            return undefined;
+          }
+          return omicNavigatorService
+            .plotStudyReturnSvgUrl(
+              enrichmentStudy,
+              enrichmentModel,
+              id,
+              plot.plotID,
+              null,
+              cancelToken,
+            )
+            .then(svg => ({ svg, plotType: plot }));
+        })
+        .filter(Boolean);
+      Promise.race(promises)
+        .then(svg => {
+          imageInfoEnrichmentVar.svg = [svg];
+          self.handleSVG(imageInfoEnrichmentVar);
+        })
+        // Ignore error in first race - Handled later
+        .catch(error => undefined)
+        .then(() => {
+          if (promises.length > 1) {
+            const all = Promise.allSettled(promises);
+            return all;
+          }
+        })
+        .then(promiseResults => {
+          if (!promiseResults) {
+            // If promise.length===1, then this is undefined
+            return;
+          }
+          const svgArray = promiseResults
+            .filter(result => result.status === 'fulfilled')
+            .map(({ value }) => value);
+          /**
+           * @type {Error[]}
+           */
+          const errors = promiseResults
+            .filter(result => result.status === 'rejected')
+            .map(({ reason }) => reason);
+          if (svgArray.length) {
+            self.handleSVG({ ...imageInfoEnrichmentVar, svg: svgArray });
+          }
+          if (errors.length === promises.length) {
+            throw new Error('Error during plotStudyReturnSvgUrl');
+          }
+          if (errors.length) {
+            console.error(`Error during plotStudyReturnSvgUrl`, errors);
+            // Handle errors coming in - warn users
+          }
+        })
+        .catch(error => {
+          console.error(`Error during plotStudyReturnSvgUrl`, error);
+          // if one of many plots fails we don't want to alter the UI, however eventually consider how best to handle failure when single feature enrichmentPlotTypes length is 1
+          // self.handlePlotStudyError();
+        });
     }
   };
 
