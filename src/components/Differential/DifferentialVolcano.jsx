@@ -28,11 +28,11 @@ import SplitPane from 'react-split-pane';
 
 class DifferentialVolcano extends Component {
   state = {
-    volcanoHeight: parseInt(localStorage.getItem('volcanoHeight'), 10) || 1,
+    volcanoHeight: parseInt(localStorage.getItem('volcanoHeight'), 10) || 340,
     volcanoHeightBackup:
       parseInt(localStorage.getItem('volcanoHeightBackup'), 10) || 340,
     volcanoDivHeight:
-      parseInt(localStorage.getItem('volcanoDivHeight'), 10) || 1,
+      parseInt(localStorage.getItem('volcanoDivHeight'), 10) || 370,
     volcanoDivHeightBackup:
       parseInt(localStorage.getItem('volcanoDivHeightBackup'), 10) || 370,
     volcanoWidth: parseInt(localStorage.getItem('volcanoWidth'), 10) || 460,
@@ -1027,7 +1027,7 @@ class DifferentialVolcano extends Component {
                       }
                       // defaultSize={this.state.volcanoHeight * 1.05263157895} 1.20263157895
                       size={volcanoPlotsVisible ? volcanoDivHeight : 1}
-                      minSize={350}
+                      minSize={370}
                       maxSize={1000}
                       onDragFinished={size =>
                         this.onSizeChange(size, 'horizontal')
