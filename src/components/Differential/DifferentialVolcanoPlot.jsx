@@ -61,8 +61,6 @@ class DifferentialVolcanoPlot extends React.PureComponent {
   };
 
   setupVolcano() {
-    // console.log('setup');
-
     const {
       volcanoHeight,
       volcanoWidth,
@@ -154,7 +152,6 @@ class DifferentialVolcanoPlot extends React.PureComponent {
   }
 
   hexBinning(data) {
-    // console.log('hex binning');
     const { volcanoWidth, volcanoHeight, differentialResults } = this.props;
 
     if (data.length > 2500) {
@@ -193,7 +190,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       };
       this.setState({ ...volcanoState });
     }
-
+    this.props.onHandleVolcanoCurrentState(data);
     this.setupBrush(volcanoWidth, volcanoHeight);
 
     this.props.onHandleUpdateDifferentialResults(differentialResults);
@@ -520,7 +517,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         this.state.currentResults.length > 0
           ? this.state.currentResults
           : differentialResultsUnfiltered;
-      this.transitionZoom(currentData, true);
+      this.transitionZoom(currentData, false);
     }
 
     if (
@@ -658,8 +655,8 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       .selectAll('path')
       .attr('fill', 'white')
       .attr('stroke', '#000')
+      .attr('class', 'bin')
       .attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(5)}`);
-
     // determine new bin color
     d3.select('#nonfiltered-elements')
       .selectAll('path')
@@ -1099,6 +1096,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         self.renderCirclesFilter(data);
         self.renderCircles(elementsToDisplay);
       }
+
       self.props.onHandleVolcanoPlotSelectionChange(
         elementsToDisplay,
         clearHighlightedData,
@@ -1130,7 +1128,6 @@ class DifferentialVolcanoPlot extends React.PureComponent {
   }
 
   transitionZoom(data, clearHighlightedData) {
-    // console.log(' transition zoom');
     const self = this;
     const { xScale, yScale } = self.scaleFactory(data);
 
@@ -1188,6 +1185,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       .duration(100)
       .attr('opacity', 1);
 
+    this.props.onHandleVolcanoCurrentState(data);
     self.setState({
       currentResults: data,
       bins: unfilteredObject.bins,
@@ -1230,10 +1228,6 @@ class DifferentialVolcanoPlot extends React.PureComponent {
           .flatMap(elem => elem);
 
         const circles = d3.selectAll('circle.volcanoPlot-dataPoint');
-        circles.attr('style', 'fill: #1678c2');
-        circles.attr('r', 2);
-        circles.classed('highlighted', false);
-        circles.classed('highlightedMax', false);
 
         const brushedCircles = circles.filter(function() {
           const x = d3.select(this).attr('cx');
