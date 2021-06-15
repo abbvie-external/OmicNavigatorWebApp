@@ -9,6 +9,7 @@
     max-width: fit-content !important;
     z-index: 5 !important;
     margin-top: 0px;
+    margin-bottom: 10px !important;
   }
 
   .ui.secondary.pointing.menu {
@@ -63,4 +64,10 @@
   left: 10px !important;
   // right: 50% !important;
   cursor: pointer !important;
+}
+
+.svgPlotDropdownInOverlay {
+  max-width: fit-content !important;
+  z-index: 5 !important;
+  margin: 10px 10px 20px 10px !important;
 }
