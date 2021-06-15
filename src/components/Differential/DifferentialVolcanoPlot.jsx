@@ -643,6 +643,26 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       volcanoDifferentialTableRowOther,
     } = this.props;
     if (d3.select('#nonfiltered-elements').size() !== 0) {
+      if (
+        !volcanoDifferentialTableRowMax?.length &&
+        !volcanoDifferentialTableRowOther?.length
+      ) {
+        console.log(
+          'nothing',
+          volcanoDifferentialTableRowMax?.length,
+          volcanoDifferentialTableRowOther?.length,
+        );
+        d3.select('#nonfiltered-elements')
+          .selectAll('text')
+          .remove();
+      } else {
+        console.log(
+          'something',
+          volcanoDifferentialTableRowMax?.length,
+          volcanoDifferentialTableRowOther?.length,
+        );
+      }
+
       // set circles back to default
       d3.select('#nonfiltered-elements')
         .selectAll('circle')
@@ -658,6 +678,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       .selectAll('path')
       .attr('fill', 'white')
       .attr('stroke', '#000')
+      .attr('class', 'bin')
       .attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(5)}`);
 
     // determine new bin color
@@ -1188,6 +1209,28 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       .duration(100)
       .attr('opacity', 1);
 
+    // this.handleBrushedText();
+    const highlighted = d3
+      .select('#nonfiltered-elements')
+      .selectAll('[class$=highlighted');
+    const highlightedMax = d3
+      .select('#nonfiltered-elements')
+      .selectAll('[class$=highlightedMax');
+
+    const together = [
+      ...highlighted?._groups[0],
+      ...highlightedMax?._groups[0],
+    ];
+
+    console.log('here', [
+      ...highlighted?._groups[0],
+      ...highlightedMax?._groups[0],
+    ]);
+
+    if (!!together.length) {
+      this.handleBrushedText({ _groups: [together] });
+    }
+
     self.setState({
       currentResults: data,
       bins: unfilteredObject.bins,
@@ -1306,7 +1349,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
 
   handleBrushedText = brushed => {
     // MAP brushedDataArr to circle text state
-    const brushedCircleTextMapped = brushed._groups[0].map(a => {
+    const brushedCircleTextMapped = brushed?._groups[0].map(a => {
       if (!a || !a.attributes) return null;
       const columnData = JSON.parse(a.attributes['data'].nodeValue);
       const key = this.props.volcanoCircleLabel || 0;
