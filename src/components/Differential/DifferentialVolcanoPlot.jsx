@@ -538,7 +538,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       const elems = HighlightedFeaturesArrVolcano.map(elem => {
         const el = document.getElementById(`volcanoDataPoint-${elem.key}`);
         return el ? d3.select(el)._groups[0][0] : null;
-      });
+      }).filter(elem => elem);
 
       if (elems[0]) {
         this.handleBrushedText({ _groups: [elems] });
@@ -644,20 +644,9 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         !volcanoDifferentialTableRowMax?.length &&
         !volcanoDifferentialTableRowOther?.length
       ) {
-        console.log(
-          'nothing',
-          volcanoDifferentialTableRowMax?.length,
-          volcanoDifferentialTableRowOther?.length,
-        );
         d3.select('#nonfiltered-elements')
           .selectAll('text')
           .remove();
-      } else {
-        console.log(
-          'something',
-          volcanoDifferentialTableRowMax?.length,
-          volcanoDifferentialTableRowOther?.length,
-        );
       }
 
       // set circles back to default
@@ -1164,6 +1153,47 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       clearHighlightedData,
     );
 
+    const highlighted = d3
+      .select('#nonfiltered-elements')
+      .selectAll('[class$=highlighted')
+      .attr('cx', function(d) {
+        return xScale(self.doTransform(d[self.props.xAxisLabel], 'x'));
+      })
+      .attr('cy', function(d) {
+        return yScale(self.doTransform(d[self.props.yAxisLabel], 'y'));
+      });
+
+    const highlightedMax = d3
+      .select('#nonfiltered-elements')
+      .selectAll('[class$=highlightedMax')
+      .attr('cx', function(d) {
+        return xScale(self.doTransform(d[self.props.xAxisLabel], 'x'));
+      })
+      .attr('cy', function(d) {
+        return yScale(self.doTransform(d[self.props.yAxisLabel], 'y'));
+      });
+
+    const circleLabels = [
+      ...highlighted?._groups[0],
+      ...highlightedMax?._groups[0],
+    ];
+
+    if (!!circleLabels.length) {
+      this.handleBrushedText({ _groups: [circleLabels] });
+
+      this.props.onHandleDotClick(
+        _,
+        circleLabels
+          .map(circle => JSON.parse(circle.attributes.data.value))
+          .sort(
+            (a, b) =>
+              this.doTransform(b[this.props.yAxisLabel], 'y') -
+              this.doTransform(a[this.props.yAxisLabel], 'y'),
+          ),
+        0,
+      );
+    }
+
     d3.select('#clip-path')
       .selectAll('path')
       .attr('opacity', 0);
@@ -1204,28 +1234,6 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       .delay(100)
       .duration(100)
       .attr('opacity', 1);
-
-    // this.handleBrushedText();
-    const highlighted = d3
-      .select('#nonfiltered-elements')
-      .selectAll('[class$=highlighted');
-    const highlightedMax = d3
-      .select('#nonfiltered-elements')
-      .selectAll('[class$=highlightedMax');
-
-    const together = [
-      ...highlighted?._groups[0],
-      ...highlightedMax?._groups[0],
-    ];
-
-    console.log('here', [
-      ...highlighted?._groups[0],
-      ...highlightedMax?._groups[0],
-    ]);
-
-    if (!!together.length) {
-      this.handleBrushedText({ _groups: [together] });
-    }
 
     this.props.onHandleVolcanoCurrentState(data);
     self.setState({
