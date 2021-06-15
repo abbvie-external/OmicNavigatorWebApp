@@ -28,16 +28,16 @@ import SplitPane from 'react-split-pane';
 
 class DifferentialVolcano extends Component {
   state = {
-    volcanoDivHeight:
-      parseInt(localStorage.getItem('volcanoDivHeight'), 10) || 1,
-    volcanoHeight: parseInt(localStorage.getItem('volcanoHeight'), 10) || 1,
-    volcanoDivHeightBackup:
-      parseInt(localStorage.getItem('volcanoDivHeightBackup'), 10) || 370,
+    volcanoHeight: parseInt(localStorage.getItem('volcanoHeight'), 10) || 340,
     volcanoHeightBackup:
       parseInt(localStorage.getItem('volcanoHeightBackup'), 10) || 340,
+    volcanoDivHeight:
+      parseInt(localStorage.getItem('volcanoDivHeight'), 10) || 370,
+    volcanoDivHeightBackup:
+      parseInt(localStorage.getItem('volcanoDivHeightBackup'), 10) || 370,
+    volcanoWidth: parseInt(localStorage.getItem('volcanoWidth'), 10) || 460,
     volcanoDivWidth:
       parseInt(localStorage.getItem('volcanoDivWidth'), 10) || 500,
-    volcanoWidth: parseInt(localStorage.getItem('volcanoWidth'), 10) || 460,
     volcanoPlotsVisible: false,
     // JSON.parse(localStorage.getItem('volcanoPlotsVisible')) || false,
     // filteredTableData: [],
@@ -90,11 +90,10 @@ class DifferentialVolcano extends Component {
   // }
 
   componentDidUpdate(prevProps, prevState) {
-    const {
-      // featureToHighlightInDiffTable,
-      differentialResults,
-      // isItemSelected,
-    } = this.props;
+    const { differentialResults, differentialTest } = this.props;
+    if (prevProps.differentialTest !== differentialTest) {
+      this.handleVolcanoVisability(null, true);
+    }
     if (prevProps.differentialResults !== differentialResults) {
       let data =
         differentialResults !== this.state.volcanoCurrentState &&
@@ -545,37 +544,53 @@ class DifferentialVolcano extends Component {
     }
   };
 
-  onSizeChange = (newSize, paneType) => {
+  onSizeChange = (newSize, axisDragged) => {
     const { volcanoDivWidth } = this.state;
     const { fwdRefDVC } = this.props;
     const adjustedSize = Math.round(newSize * 0.92);
-    if (paneType === 'horizontal') {
-      const divWidth =
-        parseInt(localStorage.getItem('volcanoDivWidth'), 10) || 500;
-      const width = parseInt(localStorage.getItem('volcanoWidth'), 10) || 460;
-      const volcanoSvgWidthPx =
-        fwdRefDVC.current?.offsetWidth - volcanoDivWidth || 500;
-      const volcanoSvgHeightPx = newSize || 340;
-      // on up/down drag, we are forcing a svg resize by change the volcano width by 1
-
-      localStorage.setItem('volcanoWidth', width + 1);
-      localStorage.setItem('volcanoHeight', adjustedSize + 1);
+    if (newSize === 1) {
+      // closing the plot, set backup heights
+      localStorage.setItem(
+        'volcanoDivHeightBackup',
+        this.state.volcanoDivHeight,
+      );
+      localStorage.setItem('volcanoHeightBackup', this.state.volcanoHeight);
       this.setState({
-        volcanoDivHeight: newSize + 1,
-        volcanoDivWidth: divWidth + 1,
+        volcanoHeightBackup: this.state.volcanoHeight,
+        volcanoDivHeightBackup: this.state.volcanoDivHeight,
+      });
+    }
+    if (axisDragged === 'horizontal') {
+      // on up/down drag, we are forcing a dynamic plot resize by change the volcano width by 1
+      const vDivWidth =
+        parseInt(localStorage.getItem('volcanoDivWidth'), 10) || 500;
+      const vWidth = parseInt(localStorage.getItem('volcanoWidth'), 10) || 460;
+      const differentialDynamicPlotWidthPx =
+        fwdRefDVC.current?.offsetWidth - volcanoDivWidth - 1 || 500;
+      const differentialDynamicPlotHeightPx = newSize + 1 || 370;
+      // up/down drag expected logic
+      localStorage.setItem('volcanoDivWidth', vDivWidth + 1);
+      localStorage.setItem('volcanoWidth', vWidth + 1);
+      localStorage.setItem('volcanoHeight', adjustedSize + 1);
+      localStorage.setItem('volcanoDivHeight', newSize + 1);
+      this.setState({
+        differentialDynamicPlotWidth: differentialDynamicPlotWidthPx,
+        differentialDynamicPlotHeight: differentialDynamicPlotHeightPx,
+        volcanoWidth: vWidth + 1,
         volcanoHeight: adjustedSize + 1,
-        volcanoWidth: width + 1,
-        volcanoSvgWidth: volcanoSvgWidthPx,
-        volcanoSvgHeight: volcanoSvgHeightPx,
+        volcanoDivHeight: newSize + 1,
+        volcanoDivWidth: vDivWidth + 1,
       });
     } else {
-      const volcanoSvgWidthPx = fwdRefDVC.current?.offsetWidth - newSize || 500;
+      // on left/right
+      const differentialDynamicPlotWidthPx =
+        fwdRefDVC.current?.offsetWidth - newSize || 500;
       localStorage.setItem('volcanoDivWidth', newSize);
       localStorage.setItem('volcanoWidth', adjustedSize);
       this.setState({
         volcanoDivWidth: newSize,
         volcanoWidth: adjustedSize,
-        volcanoSvgWidth: volcanoSvgWidthPx,
+        differentialDynamicPlotWidth: differentialDynamicPlotWidthPx,
       });
     }
   };
@@ -608,25 +623,46 @@ class DifferentialVolcano extends Component {
     } else if (w > 2599) return 'large';
   }
 
-  handleVolcanoVisability = () => {
-    const { volcanoPlotsVisible } = this.state;
-    if (volcanoPlotsVisible) {
-      localStorage.setItem(
-        'volcanoDivHeightBackup',
-        this.state.volcanoDivHeight,
-      );
-      localStorage.setItem('volcanoHeightBackup', this.state.volcanoHeight);
+  handleVolcanoVisability = (e, closeOnTestChange) => {
+    if (closeOnTestChange) {
+      // volcanoHeigth/volcanoDivHeight never opened if === 1, then set to default 370/340, otherwise use current height
+      const backupDivHeight =
+        this.state.volcanoDivHeight < 10
+          ? this.state.volcanoDivHeightBackup
+          : this.state.volcanoDivHeight;
+      const backupHeight =
+        this.state.volcanoHeight < 10
+          ? this.state.volcanoHeightBackup
+          : this.state.volcanoHeight;
+      localStorage.setItem('volcanoDivHeightBackup', backupDivHeight);
+      localStorage.setItem('volcanoHeightBackup', backupHeight);
       this.setState({
-        volcanoDivHeightBackup: this.state.volcanoDivHeight,
-        volcanoHeightBackup: this.state.volcanoHeight,
+        volcanoDivHeightBackup: backupDivHeight,
+        volcanoHeightBackup: backupHeight,
+        volcanoPlotsVisible: false,
+      });
+    } else {
+      // toggle visability
+      const { volcanoPlotsVisible } = this.state;
+      if (volcanoPlotsVisible) {
+        // closing the plot, set backup heights
+        localStorage.setItem(
+          'volcanoDivHeightBackup',
+          this.state.volcanoDivHeight,
+        );
+        localStorage.setItem('volcanoHeightBackup', this.state.volcanoHeight);
+        this.setState({
+          volcanoHeightBackup: this.state.volcanoHeight,
+          volcanoDivHeightBackup: this.state.volcanoDivHeight,
+        });
+      }
+      // opening the plot (use div height backup as new size) or closing the plot (use 1)
+      const size = !volcanoPlotsVisible ? this.state.volcanoDivHeightBackup : 1;
+      this.onSizeChange(size, 'horizontal');
+      this.setState({
+        volcanoPlotsVisible: !volcanoPlotsVisible,
       });
     }
-    const size = !volcanoPlotsVisible ? this.state.volcanoHeightBackup : 0;
-    this.onSizeChange(size, 'horizontal');
-    this.setState({
-      volcanoPlotsVisible: !volcanoPlotsVisible,
-    });
-    // localStorage.setItem('volcanoPlotsVisible', !volcanoPlotsVisible);
   };
 
   getVolcanoPlotButtonContent = () => {
@@ -1001,7 +1037,7 @@ class DifferentialVolcano extends Component {
                       }
                       // defaultSize={this.state.volcanoHeight * 1.05263157895} 1.20263157895
                       size={volcanoPlotsVisible ? volcanoDivHeight : 1}
-                      minSize={350}
+                      minSize={370}
                       maxSize={1000}
                       onDragFinished={size =>
                         this.onSizeChange(size, 'horizontal')
@@ -1038,8 +1074,8 @@ class DifferentialVolcano extends Component {
                           }
                         ></DifferentialVolcanoPlot>
                         <SVGPlot
-                          divWidth={this.state.volcanoSvgWidth}
-                          divHeight={this.state.volcanoSvgHeight}
+                          divWidth={this.state.differentialDynamicPlotWidth}
+                          divHeight={this.state.differentialDynamicPlotHeight}
                           pxToPtRatio={105}
                           pointSize={12}
                           svgTabMax={1}

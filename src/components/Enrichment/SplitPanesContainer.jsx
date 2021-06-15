@@ -204,11 +204,6 @@ class SplitPanesContainer extends Component {
   };
 
   splitPaneResized = (size, paneType) => {
-    //   const volcanoSvgWidthPx =
-    //   this.props.fwdRefDVC.current?.offsetWidth - size || 500;
-    // const volcanoSvgHeightPx = this.state.volcanoHeight || 300;
-    // const volcanoSvgWidthPt = roundToPrecision(volcanoSvgWidthPx / 100, 1);
-    // const volcanoSvgHeightPt = roundToPrecision(volcanoSvgHeightPx / 100, 1);
     if (paneType === 'horizontal') {
       this.setState({
         horizontalSplitPaneSize: size,
@@ -216,8 +211,6 @@ class SplitPanesContainer extends Component {
     } else {
       this.setState({
         verticalSplitPaneSize: size,
-        // enrichmentSvgHeight: 300,
-        // enrichmentSvgWidth: 400,
       });
     }
     localStorage.setItem(`${paneType}SplitPaneSize`, size);
