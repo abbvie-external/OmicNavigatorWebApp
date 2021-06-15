@@ -3,6 +3,7 @@ import { Popup } from 'semantic-ui-react';
 import _ from 'lodash';
 import { formatNumberForDisplay, splitValue } from '../Shared/helpers';
 import './MetafeaturesTable.scss';
+import { omicNavigatorService } from '../../services/omicNavigator.service';
 // import { CancelToken } from 'axios';
 // eslint-disable-next-line no-unused-vars
 import QHGrid, { EZGrid } from '../Shared/QHGrid';
@@ -19,19 +20,39 @@ class MetafeaturesTable extends Component {
   metafeaturesGridRef = React.createRef();
 
   componentDidMount() {
-    this.getMetafeaturesTableConfigCols(this.props.metaFeaturesData);
+    console.log('mounted');
+    const isMultifeaturePlot =
+      this.props.imageInfoDifferential.key?.includes('features') || false;
+    if (
+      this.props.modelSpecificMetaFeaturesExist !== false &&
+      !isMultifeaturePlot
+    ) {
+      this.getMetafeaturesData();
+    }
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    if (
-      this.props.metaFeaturesData.length !==
-        prevProps.metaFeaturesData.length ||
-      !_.isEqual(
-        _.sortBy(this.props.metaFeaturesData),
-        _.sortBy(prevProps.metaFeaturesData),
-      )
-    ) {
-      this.getMetafeaturesTableConfigCols(this.props.metaFeaturesData);
+  async getMetafeaturesData() {
+    const cachedMetafeaturesData = JSON.parse(
+      sessionStorage.getItem(
+        `MetafeaturesData-${this.props.imageInfoDifferential.key}`,
+      ),
+    );
+    let metaFeaturesDataDifferential = [];
+    if (!cachedMetafeaturesData) {
+      let data = await omicNavigatorService.getMetaFeaturesTable(
+        this.props.differentialStudy,
+        this.props.differentialModel,
+        this.props.differentialFeature,
+        null,
+      );
+      metaFeaturesDataDifferential = data != null ? data : [];
+      sessionStorage.setItem(
+        `MetafeaturesData-${this.props.imageInfoDifferential.key}`,
+        JSON.stringify(metaFeaturesDataDifferential),
+      );
+      this.getMetafeaturesTableConfigCols(metaFeaturesDataDifferential);
+    } else {
+      this.getMetafeaturesTableConfigCols(cachedMetafeaturesData);
     }
   }
 
@@ -126,6 +147,7 @@ class MetafeaturesTable extends Component {
     this.setState({
       metafeaturesTableConfigCols: configCols,
       metafeaturesTableData: data,
+      metafeaturesLoaded: true,
     });
   };
 
@@ -141,10 +163,10 @@ class MetafeaturesTable extends Component {
       metafeaturesTableConfigCols,
       itemsPerPageMetafeaturesTable,
       metafeaturesTableData,
+      metafeaturesLoaded,
     } = this.state;
 
     // const { metaFeaturesData } = this.props;
-
     return (
       <div className="MetafeaturesTableDiv">
         <EZGrid
@@ -152,6 +174,7 @@ class MetafeaturesTable extends Component {
           data={metafeaturesTableData}
           columnsConfig={metafeaturesTableConfigCols}
           totalRows={15}
+          loading={!metafeaturesLoaded}
           // use "differentialRows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
           itemsPerPage={itemsPerPageMetafeaturesTable}
           onItemsPerPageChange={this.handleItemsPerPageChange}

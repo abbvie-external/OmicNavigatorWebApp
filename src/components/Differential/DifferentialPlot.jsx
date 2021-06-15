@@ -4,8 +4,6 @@ import { Grid, Dimmer, Loader, Tab, Dropdown } from 'semantic-ui-react';
 import DifferentialBreadcrumbs from './DifferentialBreadcrumbs';
 import ButtonActions from '../Shared/ButtonActions';
 import MetafeaturesTable from './MetafeaturesTable';
-import { omicNavigatorService } from '../../services/omicNavigator.service';
-// import LoaderActivePlots from '../Transitions/LoaderActivePlots';
 import '../Enrichment/SplitPanesContainer.scss';
 import '../Shared/SVGPlot.scss';
 import './DifferentialPlot.scss';
@@ -22,8 +20,7 @@ class DifferentialPlot extends PureComponent {
       pdfFlag: false,
       svgFlag: true,
       txtFlag: false,
-      // areDifferentialPlotTabsReady: false,
-      // selectedPlot: null,
+      plotOptions: [],
     };
   }
   metaFeaturesTableRef = React.createRef();
@@ -32,7 +29,6 @@ class DifferentialPlot extends PureComponent {
     const { activeSVGTabIndexDifferential } = this.state;
     this.setButtonVisibility(activeSVGTabIndexDifferential);
     this.getSVGPanes();
-    // window.addEventListener('resize', this.debouncedResizeListener);
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -51,13 +47,7 @@ class DifferentialPlot extends PureComponent {
     }
   }
 
-  componentWillUnmount() {
-    // window.removeEventListener('resize', this.debouncedResizeListener);
-  }
-
-  // resizeListener() {
-  //   this.getSVGPanes();
-  // }
+  componentWillUnmount() {}
 
   setButtonVisibility = index => {
     if (this.props.differentialPlotTypes.length > 0) {
@@ -95,6 +85,7 @@ class DifferentialPlot extends PureComponent {
 
   async getSVGPanes() {
     let panes = [];
+    let options = [];
     if (this.props.imageInfoDifferential) {
       if (this.props.imageInfoDifferential.svg.length !== 0) {
         const svgArray = [...this.props.imageInfoDifferential.svg];
@@ -112,7 +103,15 @@ class DifferentialPlot extends PureComponent {
             ),
           };
         });
+        const plotOptions = svgArray.map(function(s, index) {
+          return {
+            key: `${index}=DifferentialPlotDropdownOption`,
+            text: s.plotType.plotDisplay,
+            value: index,
+          };
+        });
         panes = panes.concat(svgPanes);
+        options = options.concat(plotOptions);
       }
     }
     const isMultifeaturePlot =
@@ -121,14 +120,6 @@ class DifferentialPlot extends PureComponent {
       this.props.modelSpecificMetaFeaturesExist !== false &&
       !isMultifeaturePlot
     ) {
-      let metaFeaturesData = await omicNavigatorService.getMetaFeaturesTable(
-        this.props.differentialStudy,
-        this.props.differentialModel,
-        this.props.differentialFeature,
-        this.handleGetMetaFeaturesTableError,
-      );
-      let metaFeaturesDataDifferential =
-        metaFeaturesData != null ? metaFeaturesData : [];
       let metafeaturesTab = [
         {
           menuItem: 'Feature Data',
@@ -136,19 +127,36 @@ class DifferentialPlot extends PureComponent {
             <Tab.Pane attached="true" as="div">
               <MetafeaturesTable
                 ref={this.metaFeaturesTableRef}
-                metaFeaturesData={metaFeaturesDataDifferential}
-                // differentialFeature={this.props.differentialFeature}
-                // isItemSVGLoaded={this.props.isItemSVGLoaded}
+                differentialStudy={this.props.differentialStudy}
+                differentialModel={this.props.differentialModel}
+                differentialFeature={this.props.differentialFeature}
+                isItemSVGLoaded={this.props.isItemSVGLoaded}
+                imageInfoDifferential={this.props.imageInfoDifferential}
+                modelSpecificMetaFeaturesExist={
+                  this.props.modelSpecificMetaFeaturesExist
+                }
               />
             </Tab.Pane>
           ),
         },
       ];
+      const singleFeaturePlotTypes = this.props.differentialPlotTypes.filter(
+        p => p.plotType !== 'multiFeature',
+      );
+      let metafeaturesDropdown = [
+        {
+          key: 'Feature-Data-Differential-Plot',
+          text: 'Feature Data',
+          value: singleFeaturePlotTypes.length,
+        },
+      ];
       panes = panes.concat(metafeaturesTab);
+      options = options.concat(metafeaturesDropdown);
+      // }
     }
-    // return panes;
     this.setState({
       svgPanes: panes,
+      plotOptions: options,
     });
   }
 
@@ -160,6 +168,7 @@ class DifferentialPlot extends PureComponent {
       txtFlag,
       svgFlag,
       svgPanes,
+      plotOptions,
       activeSVGTabIndexDifferential,
     } = this.state;
     const {
@@ -186,7 +195,7 @@ class DifferentialPlot extends PureComponent {
       ) {
         const DropdownClass =
           this.props.differentialPlotTypes.length > this.props.svgTabMax
-            ? 'Show svgPlotDropdown'
+            ? 'Show svgPlotDropdownInOverlay'
             : 'Hide svgPlotDropdown';
         const TabMenuClass =
           this.props.differentialPlotTypes.length > this.props.svgTabMax
@@ -194,27 +203,6 @@ class DifferentialPlot extends PureComponent {
             : 'Show';
         const activeSVGTabIndexDifferentialVar =
           activeSVGTabIndexDifferential || 0;
-        let plotOptions = [];
-        if (this.props.imageInfoDifferential.length !== 0) {
-          const svgArray = [...imageInfoDifferential.svg];
-          plotOptions = svgArray.map(function(s, index) {
-            return {
-              key: `${index}=DifferentialPlotDropdownOption`,
-              text: s.plotType.plotDisplay,
-              value: index,
-            };
-          });
-          if (this.props.modelSpecificMetaFeaturesExist !== false) {
-            let metafeaturesDropdown = [
-              {
-                key: 'Feature-Data-Differential-Plot',
-                text: 'Feature Data',
-                value: 'Feature Data',
-              },
-            ];
-            plotOptions = plotOptions.concat(metafeaturesDropdown);
-          }
-        }
         return (
           <div className="PlotWrapper">
             <Grid columns={2} className="">
