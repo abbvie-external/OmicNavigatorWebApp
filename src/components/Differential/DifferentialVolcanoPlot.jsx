@@ -79,7 +79,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       .select('#volcano')
       .append('svg')
       .attr('width', volcanoWidth + 50)
-      .attr('height', volcanoHeight)
+      .attr('height', volcanoHeight + 20)
       .attr('id', 'VolcanoChart')
       .attr('class', 'VolcanoPlotSVG')
       .on('click', () => this.handleSVGClick());
@@ -122,6 +122,10 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       .attr('x', 60)
       .attr('y', `${volcanoHeight * 0.5 + 20}`)
       .attr('font-size', '18px')
+      .style(
+        'font-family',
+        'Lato, Helvetica Neue, Arial, Helvetica, sans-serif',
+      )
       .text(function() {
         return doYAxisTransformation ? '-log(' + yAxisLabel + ')' : yAxisLabel;
       });
@@ -139,6 +143,10 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       .attr('x', volcanoWidth * 0.5 + 10)
       .attr('y', volcanoHeight - 5)
       .attr('font-size', '18px')
+      .style(
+        'font-family',
+        'Lato, Helvetica Neue, Arial, Helvetica, sans-serif',
+      )
       .text(function() {
         return doXAxisTransformation ? '-log(' + xAxisLabel + ')' : xAxisLabel;
       });
