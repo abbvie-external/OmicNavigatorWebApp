@@ -546,7 +546,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       const elems = HighlightedFeaturesArrVolcano.map(elem => {
         const el = document.getElementById(`volcanoDataPoint-${elem.key}`);
         return el ? d3.select(el)._groups[0][0] : null;
-      });
+      }).filter(elem => elem);
 
       if (elems[0]) {
         this.handleBrushedText({ _groups: [elems] });
@@ -648,6 +648,15 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       volcanoDifferentialTableRowOther,
     } = this.props;
     if (d3.select('#nonfiltered-elements').size() !== 0) {
+      if (
+        !volcanoDifferentialTableRowMax?.length &&
+        !volcanoDifferentialTableRowOther?.length
+      ) {
+        d3.select('#nonfiltered-elements')
+          .selectAll('text')
+          .remove();
+      }
+
       // set circles back to default
       d3.select('#nonfiltered-elements')
         .selectAll('circle')
@@ -1152,6 +1161,47 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       clearHighlightedData,
     );
 
+    const highlighted = d3
+      .select('#nonfiltered-elements')
+      .selectAll('[class$=highlighted')
+      .attr('cx', function(d) {
+        return xScale(self.doTransform(d[self.props.xAxisLabel], 'x'));
+      })
+      .attr('cy', function(d) {
+        return yScale(self.doTransform(d[self.props.yAxisLabel], 'y'));
+      });
+
+    const highlightedMax = d3
+      .select('#nonfiltered-elements')
+      .selectAll('[class$=highlightedMax')
+      .attr('cx', function(d) {
+        return xScale(self.doTransform(d[self.props.xAxisLabel], 'x'));
+      })
+      .attr('cy', function(d) {
+        return yScale(self.doTransform(d[self.props.yAxisLabel], 'y'));
+      });
+
+    const circleLabels = [
+      ...highlighted?._groups[0],
+      ...highlightedMax?._groups[0],
+    ];
+
+    if (!!circleLabels.length) {
+      this.handleBrushedText({ _groups: [circleLabels] });
+
+      this.props.onHandleDotClick(
+        _,
+        circleLabels
+          .map(circle => JSON.parse(circle.attributes.data.value))
+          .sort(
+            (a, b) =>
+              this.doTransform(b[this.props.yAxisLabel], 'y') -
+              this.doTransform(a[this.props.yAxisLabel], 'y'),
+          ),
+        0,
+      );
+    }
+
     d3.select('#clip-path')
       .selectAll('path')
       .attr('opacity', 0);
@@ -1308,7 +1358,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
 
   handleBrushedText = brushed => {
     // MAP brushedDataArr to circle text state
-    const brushedCircleTextMapped = brushed._groups[0].map(a => {
+    const brushedCircleTextMapped = brushed?._groups[0].map(a => {
       if (!a || !a.attributes) return null;
       const columnData = JSON.parse(a.attributes['data'].nodeValue);
       const key = this.props.volcanoCircleLabel || 0;
