@@ -525,7 +525,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         this.state.currentResults.length > 0
           ? this.state.currentResults
           : differentialResultsUnfiltered;
-      this.transitionZoom(currentData, false);
+      if (volcanoPlotsVisible) this.transitionZoom(currentData, false);
     }
 
     if (
