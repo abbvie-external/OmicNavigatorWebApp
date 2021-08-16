@@ -557,7 +557,21 @@ class Enrichment extends Component {
                 enrichmentsFavicons: favicons,
               },
               function() {
-                this.getConfigCols(this.state.enrichmentResults);
+                let columns = [];
+                if (this.state.enrichmentResults?.length > 0) {
+                  columns = this.getConfigCols(this.state.enrichmentResults);
+                }
+                this.setState({ enrichmentColumnsUnfiltered: columns });
+                if (this.state.multisetTestsFilteredOut.length > 0) {
+                  columns = columns.filter(function(col) {
+                    return !this.setState.MultisetTestsFilteredOut.includes(
+                      col.title,
+                    );
+                  });
+                }
+                this.setState({
+                  enrichmentColumns: columns,
+                });
                 sessionStorage.setItem(
                   `EnrichmentsFavicons-${enrichmentStudy}_${enrichmentAnnotation}`,
                   JSON.stringify(favicons),
@@ -591,7 +605,21 @@ class Enrichment extends Component {
                   enrichmentsFavicons: favicons,
                 },
                 function() {
-                  this.getConfigCols(this.state.enrichmentResults);
+                  let columns = [];
+                  if (this.state.enrichmentResults?.length > 0) {
+                    columns = this.getConfigCols(this.state.enrichmentResults);
+                  }
+                  this.setState({ enrichmentColumnsUnfiltered: columns });
+                  if (this.state.multisetTestsFilteredOut.length > 0) {
+                    columns = columns.filter(function(col) {
+                      return !this.setState.MultisetTestsFilteredOut.includes(
+                        col.title,
+                      );
+                    });
+                  }
+                  this.setState({
+                    enrichmentColumns: columns,
+                  });
                   sessionStorage.setItem(
                     `EnrichmentsFavicons-${enrichmentStudy}_${enrichmentAnnotation}`,
                     JSON.stringify(favicons),
