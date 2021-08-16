@@ -552,12 +552,17 @@ class Enrichment extends Component {
           .getFavicons(parsedEnrichmentsLinkouts)
           .then(getFaviconsResponseData => {
             const favicons = getFaviconsResponseData || [];
-            this.setState({
-              enrichmentsFavicons: favicons,
-            });
-            sessionStorage.setItem(
-              `EnrichmentsFavicons-${enrichmentStudy}_${enrichmentAnnotation}`,
-              JSON.stringify(favicons),
+            this.setState(
+              {
+                enrichmentsFavicons: favicons,
+              },
+              function() {
+                this.getConfigCols(this.state.enrichmentResults);
+                sessionStorage.setItem(
+                  `EnrichmentsFavicons-${enrichmentStudy}_${enrichmentAnnotation}`,
+                  JSON.stringify(favicons),
+                );
+              },
             );
           });
       }
@@ -581,12 +586,17 @@ class Enrichment extends Component {
             .getFavicons(getEnrichmentsLinkoutsResponseData)
             .then(getFaviconsResponseData => {
               const favicons = getFaviconsResponseData || [];
-              this.setState({
-                enrichmentsFavicons: favicons,
-              });
-              sessionStorage.setItem(
-                `EnrichmentsFavicons-${enrichmentStudy}_${enrichmentAnnotation}`,
-                JSON.stringify(favicons),
+              this.setState(
+                {
+                  enrichmentsFavicons: favicons,
+                },
+                function() {
+                  this.getConfigCols(this.state.enrichmentResults);
+                  sessionStorage.setItem(
+                    `EnrichmentsFavicons-${enrichmentStudy}_${enrichmentAnnotation}`,
+                    JSON.stringify(favicons),
+                  );
+                },
               );
             });
         });
