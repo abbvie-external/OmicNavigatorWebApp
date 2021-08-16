@@ -362,15 +362,14 @@ class Enrichment extends Component {
         // isSearchingEnrichment: false,
       });
     }
-    var col = [...enrichmentColumnsUnfiltered];
-    if (arr.length > 0) {
-      col = col.filter(function(col) {
-        return !arr.includes(col.title);
-      });
-    }
     if (execute) {
       this.setState({
-        enrichmentColumns: col,
+        enrichmentColumns: enrichmentColumnsUnfiltered.map(col => {
+          if (!arr.includes(col.title)) {
+            return col;
+          }
+          return { ...col, hidden: true };
+        }),
         // isSearchingEnrichment: false,
       });
       this.handleEnrichmentNetworkData(
@@ -443,8 +442,11 @@ class Enrichment extends Component {
     }
     this.setState({ enrichmentColumnsUnfiltered: columns });
     if (multisetTestsFilteredOut.length > 0) {
-      columns = columns.filter(function(col) {
-        return !multisetTestsFilteredOut.includes(col.title);
+      columns = columns.map(col => {
+        if (!multisetTestsFilteredOut.includes(col.title)) {
+          return col;
+        }
+        return { ...col, hidden: true };
       });
     }
     this.getNetworkData(searchResults, enrichmentAnnotation);
