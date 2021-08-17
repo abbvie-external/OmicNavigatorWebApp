@@ -108,6 +108,7 @@ class OmicNavigatorService {
     modelID,
     featureID,
     plotID,
+    testID,
     errorCb,
     cancelToken,
   ) {
@@ -124,6 +125,7 @@ class OmicNavigatorService {
           modelID,
           featureID,
           plotID,
+          testID,
         },
         errorCb,
         cancelToken,
@@ -140,6 +142,7 @@ class OmicNavigatorService {
     modelID,
     featureID,
     plotID,
+    testID,
     errorCb,
     cancelToken,
   ) {
@@ -152,6 +155,7 @@ class OmicNavigatorService {
         modelID,
         featureID,
         plotID,
+        testID,
       },
       errorCb,
       cancelToken,
@@ -166,6 +170,7 @@ class OmicNavigatorService {
     modelID,
     featureID,
     plotID,
+    testID,
     errorCb,
     cancelToken,
   ) {
@@ -182,6 +187,7 @@ class OmicNavigatorService {
         modelID,
         featureID,
         plotID,
+        testID,
       },
       errorCb,
       cancelToken,

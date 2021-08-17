@@ -468,6 +468,7 @@ class Differential extends Component {
     const {
       differentialStudy,
       differentialModel,
+      differentialTest,
       differentialFeature,
       differentialFeatureIdKey,
     } = this.props;
@@ -495,6 +496,7 @@ class Differential extends Component {
               differentialModel,
               id,
               differentialPlotTypes[i].plotID,
+              differentialTest,
               null,
               cancelToken,
             )
@@ -553,6 +555,7 @@ class Differential extends Component {
                 differentialModel,
                 id,
                 plot.plotID,
+                differentialTest,
                 null,
                 cancelToken,
               )
@@ -622,6 +625,7 @@ class Differential extends Component {
         differentialStudy,
         differentialModel,
         differentialFeatureIdKey,
+        differentialTest,
       } = this.props;
       const self = this;
       cancelRequestDifferentialResultsGetMultifeaturePlot();
@@ -638,6 +642,7 @@ class Differential extends Component {
             differentialModel,
             featureids,
             multifeaturePlot[0].plotID,
+            differentialTest,
             null,
             cancelToken,
           );
@@ -758,7 +763,11 @@ class Differential extends Component {
 
   async getMultifeaturePlotForNewTab(featureids) {
     const { differentialPlotTypes } = this.state;
-    const { differentialStudy, differentialModel } = this.props;
+    const {
+      differentialStudy,
+      differentialModel,
+      differentialTest,
+    } = this.props;
     cancelRequestDifferentialResultsGetMultifeaturePlot();
     let cancelToken = new CancelToken(e => {
       cancelRequestDifferentialResultsGetMultifeaturePlot = e;
@@ -773,6 +782,7 @@ class Differential extends Component {
           differentialModel,
           featureids,
           multifeaturePlot[0].plotID,
+          differentialTest,
           null,
           cancelToken,
         );

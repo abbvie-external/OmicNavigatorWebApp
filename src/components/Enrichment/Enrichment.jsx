@@ -190,6 +190,7 @@ class Enrichment extends Component {
     itemsPerPageEnrichmentTable:
       parseInt(localStorage.getItem('itemsPerPageEnrichmentTable'), 10) || 30,
     isDataStreamingEnrichmentsTable: false,
+    enrichmentTest: '',
   };
   EnrichmentViewContainerRef = React.createRef();
   EnrichmentGridRef = React.createRef();
@@ -297,6 +298,7 @@ class Enrichment extends Component {
       enrichmentNameLoaded: true,
       enrichmentDataItem: dataItem,
       enrichmentTerm: term,
+      enrichmentTest: test,
     });
 
     omicNavigatorService
@@ -1213,7 +1215,7 @@ class Enrichment extends Component {
   };
 
   getPlot = featureId => {
-    const { enrichmentPlotTypes } = this.state;
+    const { enrichmentPlotTypes, enrichmentTest } = this.state;
     const { enrichmentStudy, enrichmentModel } = this.props;
     let id = featureId != null ? featureId : '';
     let imageInfoEnrichmentVar = { key: '', title: '', svg: [] };
@@ -1238,6 +1240,7 @@ class Enrichment extends Component {
               enrichmentModel,
               id,
               plot.plotID,
+              enrichmentTest,
               null,
               cancelToken,
             )
@@ -1341,6 +1344,7 @@ class Enrichment extends Component {
         enrichmentStudy: this.props.enrichmentStudy || '',
         enrichmentModel: this.props.enrichmentModel || '',
         enrichmentAnnotation: this.props.enrichmentAnnotation || '',
+        enrichmentTest: '',
         enrichmentTestAndDescription: '',
       },
       false,
@@ -1377,6 +1381,7 @@ class Enrichment extends Component {
       enrichmentNameLoaded: true,
       enrichmentDataItem: dataItem,
       enrichmentTerm: term,
+      enrichmentTest: test,
     });
     omicNavigatorService
       .getBarcodeData(
@@ -1870,6 +1875,7 @@ class Enrichment extends Component {
     this.setState({
       isTestDataLoaded: false,
       isTestSelected: false,
+      enrichmentTest: '',
       enrichmentNameLoaded: false,
       SVGPlotLoaded: false,
       SVGPlotLoading: false,
