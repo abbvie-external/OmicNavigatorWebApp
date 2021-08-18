@@ -190,6 +190,7 @@ class Enrichment extends Component {
     itemsPerPageEnrichmentTable:
       parseInt(localStorage.getItem('itemsPerPageEnrichmentTable'), 10) || 30,
     isDataStreamingEnrichmentsTable: false,
+    enrichmentTest: '',
   };
   EnrichmentViewContainerRef = React.createRef();
   EnrichmentGridRef = React.createRef();
@@ -297,6 +298,7 @@ class Enrichment extends Component {
       enrichmentNameLoaded: true,
       enrichmentDataItem: dataItem,
       enrichmentTerm: term,
+      enrichmentTest: test,
     });
 
     omicNavigatorService
@@ -362,15 +364,14 @@ class Enrichment extends Component {
         // isSearchingEnrichment: false,
       });
     }
-    var col = [...enrichmentColumnsUnfiltered];
-    if (arr.length > 0) {
-      col = col.filter(function(col) {
-        return !arr.includes(col.title);
-      });
-    }
     if (execute) {
       this.setState({
-        enrichmentColumns: col,
+        enrichmentColumns: enrichmentColumnsUnfiltered.map(col => {
+          if (!arr.includes(col.title)) {
+            return col;
+          }
+          return { ...col, hidden: true };
+        }),
         // isSearchingEnrichment: false,
       });
       this.handleEnrichmentNetworkData(
@@ -443,8 +444,11 @@ class Enrichment extends Component {
     }
     this.setState({ enrichmentColumnsUnfiltered: columns });
     if (multisetTestsFilteredOut.length > 0) {
-      columns = columns.filter(function(col) {
-        return !multisetTestsFilteredOut.includes(col.title);
+      columns = columns.map(col => {
+        if (!multisetTestsFilteredOut.includes(col.title)) {
+          return col;
+        }
+        return { ...col, hidden: true };
       });
     }
     this.getNetworkData(searchResults, enrichmentAnnotation);
@@ -552,12 +556,31 @@ class Enrichment extends Component {
           .getFavicons(parsedEnrichmentsLinkouts)
           .then(getFaviconsResponseData => {
             const favicons = getFaviconsResponseData || [];
-            this.setState({
-              enrichmentsFavicons: favicons,
-            });
-            sessionStorage.setItem(
-              `EnrichmentsFavicons-${enrichmentStudy}_${enrichmentAnnotation}`,
-              JSON.stringify(favicons),
+            this.setState(
+              {
+                enrichmentsFavicons: favicons,
+              },
+              function() {
+                let columns = [];
+                if (this.state.enrichmentResults?.length > 0) {
+                  columns = this.getConfigCols(this.state.enrichmentResults);
+                }
+                this.setState({ enrichmentColumnsUnfiltered: columns });
+                if (this.state.multisetTestsFilteredOut.length > 0) {
+                  columns = columns.filter(function(col) {
+                    return !this.setState.MultisetTestsFilteredOut.includes(
+                      col.title,
+                    );
+                  });
+                }
+                this.setState({
+                  enrichmentColumns: columns,
+                });
+                sessionStorage.setItem(
+                  `EnrichmentsFavicons-${enrichmentStudy}_${enrichmentAnnotation}`,
+                  JSON.stringify(favicons),
+                );
+              },
             );
           });
       }
@@ -581,12 +604,31 @@ class Enrichment extends Component {
             .getFavicons(getEnrichmentsLinkoutsResponseData)
             .then(getFaviconsResponseData => {
               const favicons = getFaviconsResponseData || [];
-              this.setState({
-                enrichmentsFavicons: favicons,
-              });
-              sessionStorage.setItem(
-                `EnrichmentsFavicons-${enrichmentStudy}_${enrichmentAnnotation}`,
-                JSON.stringify(favicons),
+              this.setState(
+                {
+                  enrichmentsFavicons: favicons,
+                },
+                function() {
+                  let columns = [];
+                  if (this.state.enrichmentResults?.length > 0) {
+                    columns = this.getConfigCols(this.state.enrichmentResults);
+                  }
+                  this.setState({ enrichmentColumnsUnfiltered: columns });
+                  if (this.state.multisetTestsFilteredOut.length > 0) {
+                    columns = columns.filter(function(col) {
+                      return !this.setState.MultisetTestsFilteredOut.includes(
+                        col.title,
+                      );
+                    });
+                  }
+                  this.setState({
+                    enrichmentColumns: columns,
+                  });
+                  sessionStorage.setItem(
+                    `EnrichmentsFavicons-${enrichmentStudy}_${enrichmentAnnotation}`,
+                    JSON.stringify(favicons),
+                  );
+                },
               );
             });
         });
@@ -1173,7 +1215,7 @@ class Enrichment extends Component {
   };
 
   getPlot = featureId => {
-    const { enrichmentPlotTypes } = this.state;
+    const { enrichmentPlotTypes, enrichmentTest } = this.state;
     const { enrichmentStudy, enrichmentModel } = this.props;
     let id = featureId != null ? featureId : '';
     let imageInfoEnrichmentVar = { key: '', title: '', svg: [] };
@@ -1198,6 +1240,7 @@ class Enrichment extends Component {
               enrichmentModel,
               id,
               plot.plotID,
+              enrichmentTest,
               null,
               cancelToken,
             )
@@ -1301,6 +1344,7 @@ class Enrichment extends Component {
         enrichmentStudy: this.props.enrichmentStudy || '',
         enrichmentModel: this.props.enrichmentModel || '',
         enrichmentAnnotation: this.props.enrichmentAnnotation || '',
+        enrichmentTest: '',
         enrichmentTestAndDescription: '',
       },
       false,
@@ -1337,6 +1381,7 @@ class Enrichment extends Component {
       enrichmentNameLoaded: true,
       enrichmentDataItem: dataItem,
       enrichmentTerm: term,
+      enrichmentTest: test,
     });
     omicNavigatorService
       .getBarcodeData(
@@ -1830,6 +1875,7 @@ class Enrichment extends Component {
     this.setState({
       isTestDataLoaded: false,
       isTestSelected: false,
+      enrichmentTest: '',
       enrichmentNameLoaded: false,
       SVGPlotLoaded: false,
       SVGPlotLoading: false,
