@@ -51,19 +51,19 @@ class DifferentialPlot extends PureComponent {
 
   setButtonVisibility = index => {
     if (this.props.differentialPlotTypes.length > 0) {
-      const singleFeaturePlotTypes = this.props.differentialPlotTypes.filter(
-        p => p.plotType !== 'multiFeature',
-      );
+      const isMetaFeatureTab =
+        this.metaFeaturesTableRef.current !== null ? true : false;
       this.setState({
-        excelFlag: index === singleFeaturePlotTypes.length,
-        txtFlag: index === singleFeaturePlotTypes.length,
+        excelFlag: isMetaFeatureTab,
+        txtFlag: isMetaFeatureTab,
         pdfFlag: false,
-        svgFlag: index !== singleFeaturePlotTypes.length,
-        pngFlag: index !== singleFeaturePlotTypes.length,
+        svgFlag: !isMetaFeatureTab,
+        pngFlag: !isMetaFeatureTab,
       });
     } else {
       this.setState({
-        excelFlag: false,
+        excelFlag: true,
+        txtFlag: true,
         pdfFlag: false,
         svgFlag: false,
         pngFlag: false,

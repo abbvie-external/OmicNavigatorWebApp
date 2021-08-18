@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Popup } from 'semantic-ui-react';
-import _ from 'lodash';
+// import _ from 'lodash';
 import { formatNumberForDisplay, splitValue } from '../Shared/helpers';
 import './MetafeaturesTable.scss';
 import { omicNavigatorService } from '../../services/omicNavigator.service';

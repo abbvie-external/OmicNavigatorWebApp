@@ -529,8 +529,6 @@ class Differential extends Component {
                 imageInfoVar.svg.push(svgInfo);
                 currentSVGs.push(sanitizedSVG);
                 self.handleSVG(view, imageInfoVar);
-              } else {
-                // self.handleItemSelected(false);
               }
             })
             .catch(error => {
@@ -635,40 +633,113 @@ class Differential extends Component {
       let multifeaturePlot = differentialPlotTypes.filter(
         p => p.plotType === 'multiFeature',
       );
+      const featuresLengthVar = featureids.length;
+      let imageInfoVar = {
+        key: `(${featuresLengthVar}-features)`,
+        title: `${differentialFeatureIdKey} (${featuresLengthVar} Features)`,
+        svg: [],
+      };
+      let currentSVGs = [];
       if (multifeaturePlot.length !== 0) {
-        try {
-          const promise = omicNavigatorService.plotStudyReturnSvgWithTimeoutResolver(
-            differentialStudy,
-            differentialModel,
-            featureids,
-            multifeaturePlot[0].plotID,
-            differentialTest,
-            null,
-            cancelToken,
-          );
-          const svg = await promise;
-          if (svg) {
-            if (svg === true) {
-              // duration timeout
-              cancelRequestDifferentialResultsGetPlot();
-              this.getMultifeaturePlotTransition(featureids, true);
-            } else {
-              let svgInfo = {
-                plotType: multifeaturePlot[0],
-                svg: svg.data,
-              };
-              const featuresLengthVar = featureids.length;
-              const imageInfoVar = {
-                key: `(${featuresLengthVar}-features)`,
-                title: `${differentialFeatureIdKey} (${featuresLengthVar} Features)`,
-                svg: [],
-              };
-              imageInfoVar.svg.push(svgInfo);
-              self.handleSVG('Differential', imageInfoVar);
+        if (multifeaturePlot.length === 1) {
+          try {
+            const promise = omicNavigatorService.plotStudyReturnSvgWithTimeoutResolver(
+              differentialStudy,
+              differentialModel,
+              featureids,
+              multifeaturePlot[0].plotID,
+              differentialTest,
+              null,
+              cancelToken,
+            );
+            const svg = await promise;
+            if (svg) {
+              if (svg === true) {
+                // duration timeout
+                cancelRequestDifferentialResultsGetPlot();
+                this.getMultifeaturePlotTransition(featureids, true, 0);
+              } else {
+                let svgInfo = {
+                  plotType: multifeaturePlot[0],
+                  svg: svg.data,
+                };
+                const featuresLengthVar = featureids.length;
+                const imageInfoVar = {
+                  key: `(${featuresLengthVar}-features)`,
+                  title: `${differentialFeatureIdKey} (${featuresLengthVar} Features)`,
+                  svg: [],
+                };
+                imageInfoVar.svg.push(svgInfo);
+                self.handleSVG('Differential', imageInfoVar);
+              }
             }
+          } catch (err) {
+            self.handleItemSelected(false);
+            return err;
           }
-        } catch (err) {
-          return err;
+        } else {
+          _.forEach(multifeaturePlot, function(plot, i) {
+            omicNavigatorService
+              .plotStudyReturnSvg(
+                differentialStudy,
+                differentialModel,
+                featureids,
+                multifeaturePlot[i].plotID,
+                null,
+                cancelToken,
+              )
+              .then(svg => {
+                if (svg) {
+                  // if (svg === true) {
+                  //   duration timeout - for multiple plots, won't open a new tab for each, but rather await the longer responses
+                  //   cancelRequestDifferentialResultsGetPlot();
+                  //   self.getMultifeaturePlotTransition(featureids, true, i);
+                  // } else {
+                  let xml = svg?.data || null;
+                  if (xml != null && xml !== []) {
+                    xml = xml.replace(/id="/g, 'id="' + i + '-');
+                    xml = xml.replace(/#glyph/g, '#' + i + '-glyph');
+                    xml = xml.replace(/#clip/g, '#' + i + '-clip');
+                    xml = xml.replace(
+                      /<svg/g,
+                      `<svg preserveAspectRatio="xMinYMin meet" id="currentSVG-multifeatures-${i}"`,
+                    );
+                    DOMPurify.addHook('afterSanitizeAttributes', function(
+                      node,
+                    ) {
+                      if (
+                        node.hasAttribute('xlink:href') &&
+                        !node.getAttribute('xlink:href').match(/^#/)
+                      ) {
+                        node.remove();
+                      }
+                    });
+                    // Clean HTML string and write into our DIV
+                    let sanitizedSVG = DOMPurify.sanitize(xml, {
+                      ADD_TAGS: ['use'],
+                    });
+                    let svgInfo = {
+                      plotType: multifeaturePlot[i],
+                      svg: sanitizedSVG,
+                    };
+
+                    imageInfoVar.svg.push(svgInfo);
+                    currentSVGs.push(sanitizedSVG);
+                    self.handleSVG('Differential', imageInfoVar);
+                  }
+                }
+                // }
+              })
+              .catch(error => {
+                console.error(
+                  `Error during plotStudyReturnSvgWithTimeoutResolver for plot ${differentialPlotTypes[i].plotID}`,
+                  error,
+                );
+                // if one of many plots fails we don't want to return to the table; eventually we should use this when single feature differentialPlotTypes length is 1
+                // self.handleItemSelected(false);
+                return error;
+              });
+          });
         }
       } else {
         this.setState({
@@ -710,13 +781,14 @@ class Differential extends Component {
         data = [...data.slice(0, this.state.multifeaturePlotMax)];
       }
       const featureIds = data.map(featureId => featureId[key]);
-      this.getMultifeaturePlotTransition(featureIds, false);
+      this.getMultifeaturePlotTransition(featureIds, false, 0);
     } else return;
   };
 
-  async getMultifeaturePlotTransition(featureids, openNewTab) {
+  async getMultifeaturePlotTransition(featureids, openNewTab, plotindex) {
     const featuresString = limitValues(featureids, 100);
     if (openNewTab) {
+      // if (plotindex === 0) {
       this.setState({
         isItemSelected: false,
         isItemSVGLoaded: true,
@@ -727,7 +799,10 @@ class Differential extends Component {
       toast.success(
         'Your plot has more taken more than 10 seconds to load, so will appear in a new tab when it is ready',
       );
-      const plot = await this.getMultifeaturePlotForNewTab(featureids);
+      const plot = await this.getMultifeaturePlotForNewTab(
+        featureids,
+        plotindex,
+      );
       if (plot?.config?.url) {
         const newWindow = window.open(
           plot.config.url,
@@ -735,7 +810,8 @@ class Differential extends Component {
           'noopener,noreferrer',
         );
         if (newWindow) newWindow.opener = null;
-      } else return;
+      }
+      // }
     } else {
       this.setState(
         {
@@ -761,7 +837,7 @@ class Differential extends Component {
     }
   }
 
-  async getMultifeaturePlotForNewTab(featureids) {
+  async getMultifeaturePlotForNewTab(featureids, plotindex) {
     const { differentialPlotTypes } = this.state;
     const {
       differentialStudy,
@@ -781,7 +857,7 @@ class Differential extends Component {
           differentialStudy,
           differentialModel,
           featureids,
-          multifeaturePlot[0].plotID,
+          multifeaturePlot[plotindex].plotID,
           differentialTest,
           null,
           cancelToken,
