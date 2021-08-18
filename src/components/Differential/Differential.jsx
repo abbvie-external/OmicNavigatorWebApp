@@ -685,6 +685,7 @@ class Differential extends Component {
                 differentialModel,
                 featureids,
                 multifeaturePlot[i].plotID,
+                differentialTest,
                 null,
                 cancelToken,
               )
