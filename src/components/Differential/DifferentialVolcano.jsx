@@ -40,7 +40,8 @@ class DifferentialVolcano extends Component {
       parseInt(localStorage.getItem('volcanoDivWidth'), 10) || 500,
     volcanoPlotsVisible: false,
     // JSON.parse(localStorage.getItem('volcanoPlotsVisible')) || false,
-    // filteredTableData: [],
+    // differentialTableData: [],
+    filteredDifferentialTableData: [],
     itemsPerPageVolcanoTable:
       parseInt(localStorage.getItem('itemsPerPageVolcanoTable'), 10) || 30,
     // volcanoPlotRows: 0,
@@ -57,7 +58,7 @@ class DifferentialVolcano extends Component {
     animation: 'overlay',
     direction: 'right',
     visible: false,
-    volcanoCurrentState: [],
+    volcanoCurrentSelection: [],
     // featuresLength: 0,
   };
   volcanoPlotFilteredGridRef = React.createRef();
@@ -66,8 +67,8 @@ class DifferentialVolcano extends Component {
   componentDidMount() {
     this.getAxisLabels();
     this.setState({
-      filteredTableData: this.props.differentialResults,
-      volcanoPlotRows: this.props.differentialResults.length,
+      differentialTableData: this.props.differentialResults,
+      // volcanoPlotRows: this.props.differentialResults.length,
     });
     // integrate with streaming
     // const { featureToHighlightInDiffTable } = this.props;
@@ -96,13 +97,14 @@ class DifferentialVolcano extends Component {
     }
     if (prevProps.differentialResults !== differentialResults) {
       let data =
-        differentialResults !== this.state.volcanoCurrentState &&
-        !!this.state.volcanoCurrentState.length
-          ? this.state.volcanoCurrentState
+        differentialResults.length !==
+          this.state.volcanoCurrentSelection.length &&
+        !!this.state.volcanoCurrentSelection.length
+          ? this.state.volcanoCurrentSelection
           : differentialResults;
 
       this.setState({
-        filteredTableData: data,
+        differentialTableData: data,
         volcanoPlotRows: data?.length || 0,
         featuresLength:
           limitLength(data?.length, this.props.multifeaturePlotMax) || 0,
@@ -113,7 +115,7 @@ class DifferentialVolcano extends Component {
       prevProps.HighlightedFeaturesArrVolcano?.length !==
       this.props.HighlightedFeaturesArrVolcano?.length
     ) {
-      this.setFeaturesLength();
+      this.handleTableChange();
     }
 
     // integrate with streaming
@@ -136,9 +138,9 @@ class DifferentialVolcano extends Component {
     // }
   }
 
-  handleCurrentVolcanoCurrentState = currentState => {
+  handleVolcanoCurrentSelection = currentSelection => {
     this.setState({
-      volcanoCurrentState: currentState,
+      volcanoCurrentSelection: currentSelection,
     });
   };
 
@@ -280,7 +282,7 @@ class DifferentialVolcano extends Component {
   ) => {
     if (volcanoPlotSelectedDataArr.length > 0) {
       this.setState({
-        filteredTableData: volcanoPlotSelectedDataArr,
+        differentialTableData: volcanoPlotSelectedDataArr,
         volcanoPlotRows: volcanoPlotSelectedDataArr.length,
       });
       // if there the max in the table, scroll to it
@@ -297,7 +299,7 @@ class DifferentialVolcano extends Component {
       }
     } else {
       this.setState({
-        filteredTableData: [],
+        differentialTableData: [],
         volcanoPlotRows: 0,
       });
     }
@@ -347,7 +349,7 @@ class DifferentialVolcano extends Component {
     //   },
     // ];
     // this.setState({
-    //   filteredTableData: dotClickArr,
+    //   differentialTableData: dotClickArr,
     //   volcanoPlotRows: dotClickArr.length,
     // });
     let elementArray = items.map(item => ({
@@ -675,15 +677,16 @@ class DifferentialVolcano extends Component {
     }
   };
 
-  handleTableFiltered = () => {
-    this.setFeaturesLength(true);
-  };
-
-  setFeaturesLength = filteredData => {
+  handleTableChange = () => {
     const { differentialResults, HighlightedFeaturesArrVolcano } = this.props;
-    let sortedData =
+    let sortedFilteredData =
       this.volcanoPlotFilteredGridRef?.current?.qhGridRef?.current?.getSortedData() ||
       this.props.differentialResults;
+
+    this.setState({
+      filteredDifferentialTableData: sortedFilteredData,
+    });
+    // handle features length
     if (HighlightedFeaturesArrVolcano.length === 1) {
       this.setState({
         featuresLength: 1,
@@ -694,7 +697,11 @@ class DifferentialVolcano extends Component {
           limitLengthOrNull(
             HighlightedFeaturesArrVolcano?.length,
             this.props.multifeaturePlotMax,
-          ) || limitLength(sortedData?.length, this.props.multifeaturePlotMax),
+          ) ||
+          limitLength(
+            sortedFilteredData?.length,
+            this.props.multifeaturePlotMax,
+          ),
       });
     } else {
       let sortedData =
@@ -730,7 +737,7 @@ class DifferentialVolcano extends Component {
 
   render() {
     const {
-      filteredTableData,
+      differentialTableData,
       itemsPerPageVolcanoTable,
       volcanoPlotRows,
       axisLabels,
@@ -1069,8 +1076,8 @@ class DifferentialVolcano extends Component {
                           getMaxAndMin={this.getMaxAndMin}
                           onHandleDotClick={this.handleDotClick}
                           onPageToFeature={this.pageToFeature}
-                          onHandleVolcanoCurrentState={
-                            this.handleCurrentVolcanoCurrentState
+                          onHandleVolcanoCurrentSelection={
+                            this.handleVolcanoCurrentSelection
                           }
                         ></DifferentialVolcanoPlot>
                         <SVGPlot
@@ -1167,7 +1174,7 @@ class DifferentialVolcano extends Component {
                             // height="auto"
                             height={volcanoPlotsVisible ? 'auto' : '70vh'}
                             // height="70vh"
-                            data={filteredTableData || []}
+                            data={differentialTableData || []}
                             totalRows={volcanoPlotRows || 0}
                             columnsConfig={differentialColumns}
                             itemsPerPage={itemsPerPageVolcanoTable}
@@ -1183,7 +1190,7 @@ class DifferentialVolcano extends Component {
                             onRowClick={this.handleRowClick}
                             rowLevelPropsCalc={this.rowLevelPropsCalc}
                             emptyMessage={CustomEmptyMessage}
-                            onFiltered={this.handleTableFiltered}
+                            onFiltered={this.handleTableChange}
                             disableQuickViewEditing
                             disableQuickViewMenu
                           />
