@@ -185,20 +185,12 @@ class Tabs extends Component {
   };
 
   getPackageVersion = () => {
-    const version = sessionStorage.getItem('packageVersion');
-    if (version) {
-      this.setState({
-        packageVersion: version,
-      });
-      return;
-    }
     omicNavigatorService
       .getPackageVersion()
       .then(packageVersionResponseData => {
         this.setState({
           packageVersion: packageVersionResponseData,
         });
-        sessionStorage.setItem('packageVersion', packageVersionResponseData);
       })
       .catch(error => {
         console.error('Error during packageVersion', error);

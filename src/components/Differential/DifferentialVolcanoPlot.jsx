@@ -152,7 +152,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       });
 
     svg.on('dblclick', () => {
-      this.transitionZoom(differentialResultsUnfiltered, false);
+      this.transitionZoom(differentialResultsUnfiltered, false, false, true);
       this.setState({
         clickedElements: [],
       });
@@ -198,7 +198,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       };
       this.setState({ ...volcanoState });
     }
-    this.props.onHandleVolcanoCurrentState(data);
+    this.props.onHandleVolcanoCurrentSelection(data);
     this.setupBrush(volcanoWidth, volcanoHeight);
 
     this.props.onHandleUpdateDifferentialResults(differentialResults);
@@ -482,6 +482,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       differentialResultsUnfiltered,
       HighlightedFeaturesArrVolcano,
       volcanoPlotsVisible,
+      filteredDifferentialTableData,
     } = this.props;
 
     // this if/else if/else if statement in place to minimize re-renders - should cover all situations
@@ -491,14 +492,14 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       volcanoPlotsVisible !== prevProps.volcanoPlotsVisible
     ) {
       // user opens volcano plot any time after data finishes streaming
-      let currentData =
+      const dataInCurrentView =
         this.state.currentResults.length > 0
           ? this.state.currentResults
           : differentialResultsUnfiltered;
       d3.select('#VolcanoChart').remove();
       this.setupVolcano();
       this.hexBinning(differentialResultsUnfiltered);
-      this.transitionZoom(currentData, false);
+      this.transitionZoom(dataInCurrentView, false, false, false);
     } else if (
       !isDataStreamingResultsTable &&
       volcanoPlotsVisible &&
@@ -513,7 +514,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       d3.select('#VolcanoChart').remove();
       this.setupVolcano();
       this.hexBinning(this.state.currentResults);
-      this.transitionZoom(this.state.currentResults, false);
+      this.transitionZoom(this.state.currentResults, false, false, false);
     } else if (
       (volcanoPlotsVisible &&
         prevProps.isFilteredDifferential &&
@@ -521,11 +522,26 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       (prevProps.isUpsetVisible && !this.props.isUpsetVisible)
     ) {
       // volcano plot is open, and set analysis "filter" is clicked OR set analysis is toggled off
-      let currentData =
+      const dataInCurrentView =
         this.state.currentResults.length > 0
           ? this.state.currentResults
           : differentialResultsUnfiltered;
-      if (volcanoPlotsVisible) this.transitionZoom(currentData, false);
+      if (volcanoPlotsVisible)
+        this.transitionZoom(dataInCurrentView, false, false, false);
+    } else if (
+      !isDataStreamingResultsTable &&
+      volcanoPlotsVisible &&
+      prevProps.filteredDifferentialTableData.length !== 30 &&
+      filteredDifferentialTableData.length !==
+        prevProps.filteredDifferentialTableData.length
+    ) {
+      // table filtered is applied
+      let allDataInSelectedArea =
+        this.state.currentResults.length > 0
+          ? this.state.currentResults
+          : differentialResultsUnfiltered;
+      if (volcanoPlotsVisible)
+        this.transitionZoom(allDataInSelectedArea, false, true, false);
     }
 
     if (
@@ -615,7 +631,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     d3.select('#VolcanoChart').remove();
     this.setupVolcano();
     this.hexBinning(this.state.currentResults);
-    this.transitionZoom(this.state.currentResults, false);
+    this.transitionZoom(this.state.currentResults, false, false, false);
   };
 
   doTransform(value, axis) {
@@ -1054,12 +1070,20 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     }
   }
 
-  updateVolcanoAfterUpsetFilter(data, xScale, yScale, clearHighlightedData) {
+  updateVolcanoAfterUpsetOrTableFilter(
+    dataInSelection,
+    initiatedByTable,
+    xScale,
+    yScale,
+    clearHighlightedData,
+    doubleClick,
+  ) {
     const self = this;
     const {
       differentialResults,
-      isUpsetVisible,
       differentialFeatureIdKey,
+      differentialResultsUnfiltered,
+      filteredDifferentialTableData,
     } = self.props;
 
     d3.select('#clip-path')
@@ -1076,181 +1100,210 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         .remove();
     }
 
-    if (isUpsetVisible) {
-      const filteredElements = _.differenceBy(
-        data,
-        differentialResults,
+    const filteredDifferentialTableDataFeatureIds = filteredDifferentialTableData.map(
+      tableDataElement => tableDataElement[differentialFeatureIdKey],
+    );
+    const differentialResultsFeatureIds = differentialResults.map(
+      differentialResultElement =>
+        differentialResultElement[differentialFeatureIdKey],
+    );
+    const dataInViewCopy = [...dataInSelection];
+
+    const dataInView = doubleClick
+      ? differentialResultsUnfiltered
+      : dataInViewCopy;
+
+    let dataInViewPassingTableFilters =
+      dataInView.length > 0
+        ? dataInView.filter(d =>
+            filteredDifferentialTableDataFeatureIds.includes(
+              d[differentialFeatureIdKey],
+            ),
+          )
+        : [];
+
+    const dataInViewPassingTableFiltersAndUpset =
+      dataInViewPassingTableFilters.length > 0
+        ? dataInViewPassingTableFilters.filter(divptf =>
+            differentialResultsFeatureIds.includes(
+              divptf[differentialFeatureIdKey],
+            ),
+          )
+        : [];
+
+    let irrelevantDataRaw = [];
+    let relevantDataRaw = dataInViewPassingTableFiltersAndUpset || [];
+    if (dataInViewPassingTableFiltersAndUpset.length !== dataInView.length) {
+      irrelevantDataRaw = _.differenceBy(
+        dataInView,
+        dataInViewPassingTableFiltersAndUpset,
         differentialFeatureIdKey,
       );
+    }
 
-      const unfilteredObject = self.parseDataToBinsAndCircles(
-        filteredElements,
-        xScale,
-        yScale,
-      );
+    const irrelevantData = _.uniqBy(
+      irrelevantDataRaw,
+      differentialFeatureIdKey,
+    );
 
-      const elementsToDisplay = _.uniqBy(
-        _.differenceBy(data, filteredElements, differentialFeatureIdKey),
-        differentialFeatureIdKey,
-      );
+    const irrelevantCirclesAndBins = self.parseDataToBinsAndCircles(
+      irrelevantData,
+      xScale,
+      yScale,
+    );
 
-      const filteredObject = self.parseDataToBinsAndCircles(
-        elementsToDisplay,
-        xScale,
-        yScale,
-      );
+    const relevantData = _.uniqBy(relevantDataRaw, differentialFeatureIdKey);
+    const relevantCirclesAndBins = self.parseDataToBinsAndCircles(
+      relevantData,
+      xScale,
+      yScale,
+    );
 
-      if (data.length >= 2500 && elementsToDisplay.length >= 2500) {
-        self.renderCirclesFilter(unfilteredObject.circles);
-        self.renderBinsFilter(unfilteredObject.bins);
-        self.renderCircles(filteredObject.circles);
-        self.renderBins(filteredObject.bins);
-      } else if (data.length >= 2500 && elementsToDisplay.length < 2500) {
-        self.renderCirclesFilter(unfilteredObject.circles);
-        self.renderBinsFilter(unfilteredObject.bins);
-        self.renderCircles(elementsToDisplay);
-      } else {
-        self.renderCirclesFilter(data);
-        self.renderCircles(elementsToDisplay);
-      }
-
+    if (dataInView.length >= 2500 && relevantData.length >= 2500) {
+      self.renderCirclesFilter(irrelevantCirclesAndBins.circles);
+      self.renderBinsFilter(irrelevantCirclesAndBins.bins);
+      self.renderCircles(relevantCirclesAndBins.circles);
+      self.renderBins(relevantCirclesAndBins.bins);
+    } else if (dataInView.length >= 2500 && relevantData.length < 2500) {
+      self.renderCirclesFilter(irrelevantCirclesAndBins.circles);
+      self.renderBinsFilter(irrelevantCirclesAndBins.bins);
+      self.renderCircles(relevantData);
+    } else {
+      self.renderCirclesFilter(dataInView);
+      self.renderCircles(relevantData);
+    }
+    const relevantDataOverride =
+      doubleClick || dataInView.length >= differentialResults.length
+        ? differentialResults
+        : relevantData;
+    if (initiatedByTable !== true) {
       self.props.onHandleVolcanoPlotSelectionChange(
-        elementsToDisplay,
+        relevantDataOverride,
         clearHighlightedData,
       );
-    } else {
-      if (data.length >= 2500) {
-        const unfilteredObject = self.parseDataToBinsAndCircles(
-          data,
-          xScale,
-          yScale,
-        );
-        const removeDups = _.uniqBy(
-          _.differenceBy(data, unfilteredObject, differentialFeatureIdKey),
-          differentialFeatureIdKey,
-        );
-        const elementsToDisplay = self.parseDataToBinsAndCircles(
-          removeDups,
-          xScale,
-          yScale,
-        );
-        self.renderCircles(elementsToDisplay.circles);
-        self.renderBins(elementsToDisplay.bins);
-      } else {
-        const elementsToDisplay = _.uniqBy(data, differentialFeatureIdKey);
-        self.renderCircles(elementsToDisplay);
-      }
-      self.props.onHandleVolcanoPlotSelectionChange(data, clearHighlightedData);
     }
   }
 
-  transitionZoom(data, clearHighlightedData) {
+  transitionZoom(
+    allDataInView,
+    clearHighlightedData,
+    initiatedByTable,
+    doubleClick,
+  ) {
     const self = this;
-    const { xScale, yScale } = self.scaleFactory(data);
-
+    const { xScale, yScale } = self.scaleFactory(allDataInView);
     const unfilteredObject = self.parseDataToBinsAndCircles(
-      data,
+      allDataInView,
       xScale,
       yScale,
     );
 
-    this.updateVolcanoAfterUpsetFilter(
-      data,
-      xScale,
-      yScale,
-      clearHighlightedData,
+    self.setState(
+      {
+        currentResults: allDataInView,
+        bins: unfilteredObject.bins,
+        circles: unfilteredObject.circles,
+      },
+      function() {
+        this.updateVolcanoAfterUpsetOrTableFilter(
+          allDataInView,
+          initiatedByTable,
+          xScale,
+          yScale,
+          clearHighlightedData,
+          doubleClick,
+        );
+
+        const highlighted = d3
+          .select('#nonfiltered-elements')
+          .selectAll('[class$=highlighted')
+          .attr('cx', function(d) {
+            return xScale(self.doTransform(d[self.props.xAxisLabel], 'x'));
+          })
+          .attr('cy', function(d) {
+            return yScale(self.doTransform(d[self.props.yAxisLabel], 'y'));
+          });
+
+        const highlightedMax = d3
+          .select('#nonfiltered-elements')
+          .selectAll('[class$=highlightedMax')
+          .attr('cx', function(d) {
+            return xScale(self.doTransform(d[self.props.xAxisLabel], 'x'));
+          })
+          .attr('cy', function(d) {
+            return yScale(self.doTransform(d[self.props.yAxisLabel], 'y'));
+          });
+        const circleLabels = [
+          ...highlighted?._groups[0],
+          ...highlightedMax?._groups[0],
+        ];
+
+        if (!!circleLabels.length) {
+          this.handleBrushedText({ _groups: [circleLabels] });
+
+          this.props.onHandleDotClick(
+            _,
+            circleLabels
+              .map(circle => JSON.parse(circle.attributes.data.value))
+              .sort(
+                (a, b) =>
+                  this.doTransform(b[this.props.yAxisLabel], 'y') -
+                  this.doTransform(a[this.props.yAxisLabel], 'y'),
+              ),
+            0,
+          );
+        }
+
+        d3.select('#clip-path')
+          .selectAll('path')
+          .attr('opacity', 0);
+
+        d3.select('.volcanoPlotD3BrushSelection').call(
+          self.objsBrush.move,
+          null,
+        );
+
+        self.xxAxis = d3.axisTop(xScale).ticks();
+        self.yyAxis = d3.axisRight(yScale).ticks();
+
+        let t = d3
+          .select('svg')
+          .transition()
+          .duration(200);
+        d3.select('#xaxis-line')
+          .transition(t)
+          .call(self.xxAxis);
+        d3.select('#yaxis-line')
+          .transition(t)
+          .call(self.yyAxis);
+
+        const container = d3.select('#clip-path').transition(t);
+
+        const circle = container.selectAll('circle');
+
+        circle
+          .transition(t)
+          .attr('cx', function(d) {
+            return xScale(self.doTransform(d[self.props.xAxisLabel], 'x'));
+          })
+          .attr('cy', function(d) {
+            return yScale(self.doTransform(d[self.props.yAxisLabel], 'y'));
+          });
+
+        const bin = container.selectAll('path');
+
+        bin
+          .transition(t)
+          .delay(100)
+          .duration(100)
+          .attr('opacity', 1);
+        // ignore selection change if initiated by table filter, it shouldn't change]
+        if (initiatedByTable !== true) {
+          this.props.onHandleVolcanoCurrentSelection(allDataInView);
+        }
+      },
     );
-
-    const highlighted = d3
-      .select('#nonfiltered-elements')
-      .selectAll('[class$=highlighted')
-      .attr('cx', function(d) {
-        return xScale(self.doTransform(d[self.props.xAxisLabel], 'x'));
-      })
-      .attr('cy', function(d) {
-        return yScale(self.doTransform(d[self.props.yAxisLabel], 'y'));
-      });
-
-    const highlightedMax = d3
-      .select('#nonfiltered-elements')
-      .selectAll('[class$=highlightedMax')
-      .attr('cx', function(d) {
-        return xScale(self.doTransform(d[self.props.xAxisLabel], 'x'));
-      })
-      .attr('cy', function(d) {
-        return yScale(self.doTransform(d[self.props.yAxisLabel], 'y'));
-      });
-
-    const circleLabels = [
-      ...highlighted?._groups[0],
-      ...highlightedMax?._groups[0],
-    ];
-
-    if (!!circleLabels.length) {
-      this.handleBrushedText({ _groups: [circleLabels] });
-
-      this.props.onHandleDotClick(
-        _,
-        circleLabels
-          .map(circle => JSON.parse(circle.attributes.data.value))
-          .sort(
-            (a, b) =>
-              this.doTransform(b[this.props.yAxisLabel], 'y') -
-              this.doTransform(a[this.props.yAxisLabel], 'y'),
-          ),
-        0,
-      );
-    }
-
-    d3.select('#clip-path')
-      .selectAll('path')
-      .attr('opacity', 0);
-
-    d3.select('.volcanoPlotD3BrushSelection').call(self.objsBrush.move, null);
-
-    self.xxAxis = d3.axisTop(xScale).ticks();
-    self.yyAxis = d3.axisRight(yScale).ticks();
-
-    let t = d3
-      .select('svg')
-      .transition()
-      .duration(200);
-    d3.select('#xaxis-line')
-      .transition(t)
-      .call(self.xxAxis);
-    d3.select('#yaxis-line')
-      .transition(t)
-      .call(self.yyAxis);
-
-    const container = d3.select('#clip-path').transition(t);
-
-    const circle = container.selectAll('circle');
-
-    circle
-      .transition(t)
-      .attr('cx', function(d) {
-        return xScale(self.doTransform(d[self.props.xAxisLabel], 'x'));
-      })
-      .attr('cy', function(d) {
-        return yScale(self.doTransform(d[self.props.yAxisLabel], 'y'));
-      });
-
-    const bin = container.selectAll('path');
-
-    bin
-      .transition(t)
-      .delay(100)
-      .duration(100)
-      .attr('opacity', 1);
-
-    this.props.onHandleVolcanoCurrentState(data);
-    self.setState({
-      currentResults: data,
-      bins: unfilteredObject.bins,
-      circles: unfilteredObject.circles,
-    });
   }
-
   setupBrush(width, height) {
     const self = this;
     this.objsBrush = {};
@@ -1300,7 +1353,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         const total = [...brushedBins, ...brushedDataArr];
 
         if (!!total.length) {
-          self.transitionZoom(total, false);
+          self.transitionZoom(total, false, false, false);
         }
         d3.select('.volcanoPlotD3BrushSelection').call(
           self.objsBrush.move,
