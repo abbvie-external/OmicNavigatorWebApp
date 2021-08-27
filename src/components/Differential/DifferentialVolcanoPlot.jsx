@@ -1172,9 +1172,8 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       self.renderCirclesFilter(dataInView);
       self.renderCircles(relevantData);
     }
-    debugger;
     const relevantDataOverride =
-      doubleClick || dataInView.length > differentialResults.length
+      doubleClick || dataInView.length >= differentialResults.length
         ? differentialResults
         : relevantData;
     if (initiatedByTable !== true) {
@@ -1298,7 +1297,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
           .delay(100)
           .duration(100)
           .attr('opacity', 1);
-        // ignore selection change if initiated by table filter, it shouldn't change
+        // ignore selection change if initiated by table filter, it shouldn't change]
         if (initiatedByTable !== true) {
           this.props.onHandleVolcanoCurrentSelection(allDataInView);
         }
