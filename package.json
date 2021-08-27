@@ -1,6 +1,6 @@
 {
   "name": "omicnavigatorwebapp",
-  "version": "1.2.1",
+  "version": "1.3.1",
   "private": true,
   "dependencies": {
     "d3-hexbin": "^0.2.2",
@@ -66,7 +66,7 @@
     "lodash": "^4.17.19",
     "lodash-es": "^4.17.15",
     "moment": "^2.27.0",
-    "node-sass": "^4.14.1",
+    "node-sass": "^6.0.1",
     "npm-run-all": "^4.1.5",
     "opencpu.js": "^0.5.0",
     "pdfkit": "^0.11.0",
