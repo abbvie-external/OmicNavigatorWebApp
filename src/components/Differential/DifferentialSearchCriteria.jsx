@@ -215,6 +215,9 @@ class DifferentialSearchCriteria extends Component {
         });
         const differentialTestsMetadataVar =
           differentialModelWithTests?.tests || [];
+        const differentialTestIdsMapped = differentialTestsMetadataVar.map(
+          test => test.testID,
+        );
         const differentialTestsMapped = differentialTestsMetadataVar.map(
           test => {
             return {
@@ -230,6 +233,7 @@ class DifferentialSearchCriteria extends Component {
           differentialTests: differentialTestsMapped,
           uDataP: uDataPMapped,
         });
+        this.props.onSetDifferentialTestIds(differentialTestIdsMapped);
         this.props.onSetTestsMetadata(differentialTestsMetadataVar);
         this.getReportLink(differentialStudy, differentialModel);
         if (differentialTest !== '') {
@@ -393,6 +397,7 @@ class DifferentialSearchCriteria extends Component {
       differentialModelTooltip: differentialModelTooltip,
       differentialTestTooltip: '',
     });
+    this.props.onSetDifferentialTestIds(differentialTestsMapped);
     this.props.onSetTestsMetadata(differentialTestsMetadataVar);
     this.getReportLink(differentialStudy, value);
   };

@@ -868,6 +868,7 @@ class DifferentialVolcano extends Component {
               differentialStudy={this.props.differentialStudy}
               differentialModel={this.props.differentialModel}
               differentialTest={this.props.differentialTest}
+              differentialTests={this.props.differentialTests}
             ></DifferentialPlot>
           </Sidebar>
         );
