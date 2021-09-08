@@ -350,6 +350,7 @@ class Enrichment extends Component {
       unfilteredNetworkData,
       enrichmentResults,
     } = this.state;
+    debugger;
     var arr = [...this.state.multisetTestsFilteredOut];
     if (test != null) {
       const index = arr.indexOf(test);
@@ -1215,7 +1216,7 @@ class Enrichment extends Component {
   };
 
   getPlot = featureId => {
-    const { enrichmentPlotTypes, enrichmentTest } = this.state;
+    const { enrichmentPlotTypes, enrichmentTest, uData } = this.state;
     const { enrichmentStudy, enrichmentModel } = this.props;
     let id = featureId != null ? featureId : '';
     let imageInfoEnrichmentVar = { key: '', title: '', svg: [] };
@@ -1234,13 +1235,15 @@ class Enrichment extends Component {
           if (plot.plotType === 'multiFeature') {
             return undefined;
           }
+          const testsArg =
+            plot.plotType === 'multiTest' ? uData : enrichmentTest;
           return omicNavigatorService
             .plotStudyReturnSvgUrl(
               enrichmentStudy,
               enrichmentModel,
               id,
               plot.plotID,
-              enrichmentTest,
+              testsArg,
               null,
               cancelToken,
             )
