@@ -920,7 +920,7 @@ class Differential extends Component {
     });
   };
 
-  handleSelectedVolcano = toHighlightArr => {
+  handleSelectedVolcano = (toHighlightArr, doNotUnhighlight) => {
     this.setState({
       HighlightedFeaturesArrVolcano: toHighlightArr,
     });
@@ -928,7 +928,8 @@ class Differential extends Component {
       // unhighlight single row if already highlighted
       if (
         toHighlightArr.length === 1 &&
-        this.state.volcanoDifferentialTableRowOther?.length === 0
+        this.state.volcanoDifferentialTableRowOther?.length === 0 &&
+        !doNotUnhighlight
       ) {
         if (
           toHighlightArr[0].id === this.state.volcanoDifferentialTableRowMax

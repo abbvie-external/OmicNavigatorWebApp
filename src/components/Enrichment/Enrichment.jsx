@@ -350,7 +350,6 @@ class Enrichment extends Component {
       unfilteredNetworkData,
       enrichmentResults,
     } = this.state;
-    debugger;
     var arr = [...this.state.multisetTestsFilteredOut];
     if (test != null) {
       const index = arr.indexOf(test);
