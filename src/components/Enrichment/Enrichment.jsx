@@ -1235,8 +1235,9 @@ class Enrichment extends Component {
           if (plot.plotType === 'multiFeature') {
             return undefined;
           }
-          const testsArg =
-            plot.plotType === 'multiTest' ? uData : enrichmentTest;
+          const testsArg = plot.plotType.includes('multiTest')
+            ? uData
+            : enrichmentTest;
           return omicNavigatorService
             .plotStudyReturnSvgUrl(
               enrichmentStudy,

@@ -497,10 +497,11 @@ class Differential extends Component {
           if (differentialPlotTypes[i].plotType === 'multiFeature') {
             return;
           }
-          const testsArg =
-            differentialPlotTypes[i].plotType === 'multiTest'
-              ? differentialTestIds
-              : differentialTest;
+          const testsArg = differentialPlotTypes[i].plotType.includes(
+            'multiTest',
+          )
+            ? differentialTestIds
+            : differentialTest;
           omicNavigatorService
             .plotStudyReturnSvg(
               differentialStudy,
@@ -558,10 +559,9 @@ class Differential extends Component {
             if (plot.plotType === 'multiFeature') {
               return undefined;
             }
-            const testsArg =
-              plot.plotType === 'multiTest'
-                ? differentialTestIds
-                : differentialTest;
+            const testsArg = plot.plotType.includes('multiTest')
+              ? differentialTestIds
+              : differentialTest;
             return omicNavigatorService
               .plotStudyReturnSvgUrl(
                 differentialStudy,
@@ -658,12 +658,15 @@ class Differential extends Component {
       if (multifeaturePlot.length !== 0) {
         if (multifeaturePlot.length === 1) {
           try {
+            const testsArg = multifeaturePlot[0].plotType.includes('multiTest')
+              ? differentialTestIds
+              : differentialTest;
             const promise = omicNavigatorService.plotStudyReturnSvgWithTimeoutResolver(
               differentialStudy,
               differentialModel,
               featureids,
               multifeaturePlot[0].plotID,
-              differentialTest,
+              testsArg,
               null,
               cancelToken,
             );
@@ -694,10 +697,9 @@ class Differential extends Component {
           }
         } else {
           _.forEach(multifeaturePlot, function(plot, i) {
-            const testsArg =
-              plot.plotID === 'multiTest'
-                ? differentialTestIds
-                : differentialTest;
+            const testsArg = plot.plotType.includes('multiTest')
+              ? differentialTestIds
+              : differentialTest;
 
             omicNavigatorService
               .plotStudyReturnSvg(
@@ -859,7 +861,7 @@ class Differential extends Component {
   }
 
   async getMultifeaturePlotForNewTab(featureids, plotindex) {
-    const { differentialPlotTypes } = this.state;
+    const { differentialPlotTypes, differentialTestIds } = this.state;
     const {
       differentialStudy,
       differentialModel,
@@ -873,13 +875,18 @@ class Differential extends Component {
       p => p.plotType === 'multiFeature',
     );
     if (multifeaturePlot.length !== 0) {
+      const testsArg = multifeaturePlot[plotindex].plotType.includes(
+        'multiTest',
+      )
+        ? differentialTestIds
+        : differentialTest;
       try {
         const promise = omicNavigatorService.plotStudyReturnSvg(
           differentialStudy,
           differentialModel,
           featureids,
           multifeaturePlot[plotindex].plotID,
-          differentialTest,
+          testsArg,
           null,
           cancelToken,
         );
