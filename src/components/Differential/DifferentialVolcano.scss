@@ -7,7 +7,7 @@
   border: none !important;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.54) !important;
   border-radius: 0px !important;
-  margin: 27px 10px 10px 15px !important;
+  margin: 10px 10px 10px 15px !important;
 }
 #VolcanoPlotButton {
   height: 45px !important;
@@ -63,15 +63,11 @@
 .VolcanoAxisLabel {
   margin-right: -1px !important;
   border-radius: 0.28571429rem 0px 0px 0.28571429rem !important;
-  background-color: var(--color-dark) !important;
-  color: var(--color-light) !important;
+  // background-color: var(--color-dark) !important;
+  background-color: var(--color-light) !important;
+  color: var(--color-dark) !important;
   padding: 11px 10px !important;
   min-width: 60px;
-}
-
-#VolcanoAxisLabelY,
-#VolcanoCircleLabel {
-  margin-left: 35px !important;
 }
 
 @media (max-width: 1598px) {
@@ -89,6 +85,7 @@
 .VolcanoPlotAxisSelectorsRow {
   padding-top: 27px !important;
   padding-bottom: 0px !important;
+  width: 100% !important;
 }
 
 // .VolcanoTransformationCheckbox,
@@ -190,7 +187,7 @@
 
 .MultifeaturePlotBtnDiv {
   position: absolute;
-  left: 83px !important;
+  right: 50% !important;
   margin-top: 13px;
 
   // .MultiFeaturePlottingBtn {
@@ -207,3 +204,47 @@
 // .ui.visible.overlay.sidebar {
 //   transition: transform 0.5s step-end 0.1s !important;
 // }
+
+.AbsoluteLegendDifferential {
+  position: absolute;
+  z-index: 1;
+  margin-top: 13px;
+  right: 20% !important;
+}
+
+#VolcanoOptionsPopup {
+  position: absolute !important;
+  margin-top: 8px;
+  // margin-left: 50px;
+  cursor: pointer;
+  z-index: 1111111111 !important;
+  // top: 0 !important;
+  // right: 0 !important;
+}
+
+#CustomTooltip {
+  top: -38px !important;
+  left: -265px !important;
+  border-bottom: 2px solid var(--color-primary);
+  background-color: var(--color-dark) !important;
+  padding: 10px 10px 20px 20px;
+}
+
+#MaxCircle {
+  background-color: var(--color-primary);
+}
+
+#OtherCircle {
+  background-color: var(--color-primary-gradient);
+}
+
+#HyperlinkCircle {
+  background-color: var(--color-link);
+}
+
+#MaxCircle {
+  margin-top: 5px !important;
+  margin-left: 755px !important;
+  cursor: pointer !important;
+  box-shadow: 0 1px 0px rgba(0, 0, 0, 0.12), 0 1px 0px rgba(0, 0, 0, 0.24) !important;
+}

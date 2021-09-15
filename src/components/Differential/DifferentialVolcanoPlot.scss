@@ -47,8 +47,8 @@
 // }
 
 #VolcanoChart {
-  margin-left: 20px !important;
-  margin-top: 5px !important;
+  margin-left: 0px !important;
+  margin-top: 0px !important;
 }
 
 // #volcano {
@@ -58,6 +58,9 @@
 
 #VolcanoPlotDiv {
   margin-bottom: 5px;
+  .ExportButtonGroup {
+    margin-top: 8px !important;
+  }
 }
 
 .breadcrumb-container {

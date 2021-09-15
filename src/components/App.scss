@@ -3,10 +3,10 @@
   --color-primary: rgba(255, 68, 0, 1);
   // --color-primary-gradient: #ff7e38;
   --color-primary-gradient: rgba(255, 126, 5, 1);
-  --color-secondary: #2c3b78;
-  --color-secondary-gradient: #465fc5;
+  --color-secondary: rgba(44, 59, 120, 1);
+  --color-secondary-gradient: #94959c;
   --color-tertiary: #00aeff;
-  --color-link: #1678c2 !important;
+  --color-link: rgba(22, 120, 194, 1) !important;
   --color-white: #fff;
   --color-light: #e0e1e2;
   --color-dark: #2e2e2e;
@@ -128,29 +128,40 @@
     background-color: var(--color-primary) !important;
   }
 
-  .rowHighlightMax {
-    background: var(--color-primary) !important;
-    color: white !important;
-  }
-
   .rowHighlightOther {
     background: var(--color-primary-gradient) !important;
     color: white !important;
   }
 
+  .rowHighlightHyperlink {
+    background: var(--color-link) !important;
+    color: white !important;
+  }
+
+  .rowHighlightMax {
+    background: var(--color-primary) !important;
+    color: white !important;
+  }
+
   .rowHighlightMax .TableCellLink,
-  .rowHighlightOther .TableCellLink {
+  .rowHighlightOther .TableCellLink,
+  .rowHighlightHyperlink .TableCellLink {
     color: white !important;
     cursor: pointer !important;
   }
 
-  .ui.selectable.table tbody .rowHighlightMax:hover {
-    background: rgba(255, 68, 0, 0.9) !important;
+  .ui.selectable.table tbody .rowHighlightOther:hover {
+    background: rgba(255, 126, 5, 0.9) !important;
     color: white !important;
   }
 
-  .ui.selectable.table tbody .rowHighlightOther:hover {
-    background: rgba(255, 126, 5, 0.9) !important;
+  .ui.selectable.table tbody .rowHighlightHyperlink:hover {
+    background: rgba(22, 120, 194, 0.9) !important;
+    color: white !important;
+  }
+
+  .ui.selectable.table tbody .rowHighlightMax:hover {
+    background: rgba(255, 68, 0, 0.9) !important;
     color: white !important;
   }
 
@@ -159,11 +170,6 @@
   }
 
   .test {
-    color: white !important;
-  }
-
-  .ui.selectable.table tbody .highlightedRow:hover {
-    background: #f14000 !important;
     color: white !important;
   }
 
