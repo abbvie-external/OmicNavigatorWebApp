@@ -339,7 +339,7 @@ class DifferentialVolcano extends Component {
     );
   };
 
-  handleDotClick = (event, items, index) => {
+  handleDotClick = (event, items, index, doNotUnhighlight) => {
     const { differentialFeatureIdKey } = this.props;
     // const dotClickArr = [
     //   {
@@ -357,7 +357,7 @@ class DifferentialVolcano extends Component {
       value: item[differentialFeatureIdKey],
       key: item[differentialFeatureIdKey],
     }));
-    this.props.onHandleSelectedVolcano(elementArray);
+    this.props.onHandleSelectedVolcano(elementArray, doNotUnhighlight);
     // this.props.onHandleSelectedVolcano([
     //   {
     //     id: item[differentialFeatureIdKey],
@@ -868,6 +868,7 @@ class DifferentialVolcano extends Component {
               differentialStudy={this.props.differentialStudy}
               differentialModel={this.props.differentialModel}
               differentialTest={this.props.differentialTest}
+              differentialTests={this.props.differentialTests}
             ></DifferentialPlot>
           </Sidebar>
         );

@@ -1251,6 +1251,8 @@ class DifferentialVolcanoPlot extends React.PureComponent {
                   this.doTransform(a[this.props.yAxisLabel], 'y'),
               ),
             0,
+            // pass true so single selected feature is not unhighlighted
+            true,
           );
         }
 

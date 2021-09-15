@@ -83,6 +83,7 @@ class Differential extends Component {
       differentialStudyMetadata: [],
       differentialModelsAndTests: [],
       differentialTestsMetadata: [],
+      differentialTestIds: [],
       modelSpecificMetaFeaturesExist: true,
       resultsLinkouts: [],
       resultsFavicons: [],
@@ -162,6 +163,12 @@ class Differential extends Component {
   setTestsMetadata = testsData => {
     this.setState({
       differentialTestsMetadata: testsData,
+    });
+  };
+
+  setDifferentialTestIds = differentialTestIds => {
+    this.setState({
+      differentialTestIds,
     });
   };
 
@@ -464,7 +471,7 @@ class Differential extends Component {
   };
 
   getPlot = (view, featureId, returnSVG) => {
-    const { differentialPlotTypes } = this.state;
+    const { differentialPlotTypes, differentialTestIds } = this.state;
     const {
       differentialStudy,
       differentialModel,
@@ -490,13 +497,18 @@ class Differential extends Component {
           if (differentialPlotTypes[i].plotType === 'multiFeature') {
             return;
           }
+          const testsArg = differentialPlotTypes[i].plotType.includes(
+            'multiTest',
+          )
+            ? differentialTestIds
+            : differentialTest;
           omicNavigatorService
             .plotStudyReturnSvg(
               differentialStudy,
               differentialModel,
               id,
               differentialPlotTypes[i].plotID,
-              differentialTest,
+              testsArg,
               null,
               cancelToken,
             )
@@ -547,13 +559,16 @@ class Differential extends Component {
             if (plot.plotType === 'multiFeature') {
               return undefined;
             }
+            const testsArg = plot.plotType.includes('multiTest')
+              ? differentialTestIds
+              : differentialTest;
             return omicNavigatorService
               .plotStudyReturnSvgUrl(
                 differentialStudy,
                 differentialModel,
                 id,
                 plot.plotID,
-                differentialTest,
+                testsArg,
                 null,
                 cancelToken,
               )
@@ -618,7 +633,7 @@ class Differential extends Component {
 
   async getMultifeaturePlot(featureids) {
     if (featureids?.length) {
-      const { differentialPlotTypes } = this.state;
+      const { differentialPlotTypes, differentialTestIds } = this.state;
       const {
         differentialStudy,
         differentialModel,
@@ -643,12 +658,15 @@ class Differential extends Component {
       if (multifeaturePlot.length !== 0) {
         if (multifeaturePlot.length === 1) {
           try {
+            const testsArg = multifeaturePlot[0].plotType.includes('multiTest')
+              ? differentialTestIds
+              : differentialTest;
             const promise = omicNavigatorService.plotStudyReturnSvgWithTimeoutResolver(
               differentialStudy,
               differentialModel,
               featureids,
               multifeaturePlot[0].plotID,
-              differentialTest,
+              testsArg,
               null,
               cancelToken,
             );
@@ -679,13 +697,17 @@ class Differential extends Component {
           }
         } else {
           _.forEach(multifeaturePlot, function(plot, i) {
+            const testsArg = plot.plotType.includes('multiTest')
+              ? differentialTestIds
+              : differentialTest;
+
             omicNavigatorService
               .plotStudyReturnSvg(
                 differentialStudy,
                 differentialModel,
                 featureids,
                 multifeaturePlot[i].plotID,
-                differentialTest,
+                testsArg,
                 null,
                 cancelToken,
               )
@@ -839,7 +861,7 @@ class Differential extends Component {
   }
 
   async getMultifeaturePlotForNewTab(featureids, plotindex) {
-    const { differentialPlotTypes } = this.state;
+    const { differentialPlotTypes, differentialTestIds } = this.state;
     const {
       differentialStudy,
       differentialModel,
@@ -853,13 +875,18 @@ class Differential extends Component {
       p => p.plotType === 'multiFeature',
     );
     if (multifeaturePlot.length !== 0) {
+      const testsArg = multifeaturePlot[plotindex].plotType.includes(
+        'multiTest',
+      )
+        ? differentialTestIds
+        : differentialTest;
       try {
         const promise = omicNavigatorService.plotStudyReturnSvg(
           differentialStudy,
           differentialModel,
           featureids,
           multifeaturePlot[plotindex].plotID,
-          differentialTest,
+          testsArg,
           null,
           cancelToken,
         );
@@ -893,7 +920,7 @@ class Differential extends Component {
     });
   };
 
-  handleSelectedVolcano = toHighlightArr => {
+  handleSelectedVolcano = (toHighlightArr, doNotUnhighlight) => {
     this.setState({
       HighlightedFeaturesArrVolcano: toHighlightArr,
     });
@@ -901,7 +928,8 @@ class Differential extends Component {
       // unhighlight single row if already highlighted
       if (
         toHighlightArr.length === 1 &&
-        this.state.volcanoDifferentialTableRowOther?.length === 0
+        this.state.volcanoDifferentialTableRowOther?.length === 0 &&
+        !doNotUnhighlight
       ) {
         if (
           toHighlightArr[0].id === this.state.volcanoDifferentialTableRowMax
@@ -1381,6 +1409,7 @@ class Differential extends Component {
               }
               onSetStudyModelTestMetadata={this.setStudyModelTestMetadata}
               onSetTestsMetadata={this.setTestsMetadata}
+              onSetDifferentialTestIds={this.setDifferentialTestIds}
               onHandlePlotTypesDifferential={this.handlePlotTypesDifferential}
               onHandleVolcanoTableLoading={this.handleVolcanoTableLoading}
               onDoMetaFeaturesExist={this.doMetaFeaturesExist}
