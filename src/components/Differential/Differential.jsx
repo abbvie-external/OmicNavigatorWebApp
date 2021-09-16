@@ -494,7 +494,7 @@ class Differential extends Component {
     if (differentialPlotTypes.length !== 0) {
       if (returnSVG) {
         _.forEach(differentialPlotTypes, function(plot, i) {
-          if (differentialPlotTypes[i].plotType === 'multiFeature') {
+          if (differentialPlotTypes[i].plotType.includes('multiFeature')) {
             return;
           }
           const testsArg = differentialPlotTypes[i].plotType.includes(
@@ -556,7 +556,7 @@ class Differential extends Component {
         // refined for dynamically sized plots on single-threaded servers (running R locally), we're using a race condition to take the first url and handle/display it asap; after that, we're using allSettled to wait for remaining urls, and then sending them all to the component as props
         const promises = differentialPlotTypes
           .map(plot => {
-            if (plot.plotType === 'multiFeature') {
+            if (plot.plotType.includes('multiFeature')) {
               return undefined;
             }
             const testsArg = plot.plotType.includes('multiTest')
@@ -645,8 +645,8 @@ class Differential extends Component {
       let cancelToken = new CancelToken(e => {
         cancelRequestDifferentialResultsGetMultifeaturePlot = e;
       });
-      let multifeaturePlot = differentialPlotTypes.filter(
-        p => p.plotType === 'multiFeature',
+      let multifeaturePlot = differentialPlotTypes.filter(p =>
+        p.plotType.includes('multiFeature'),
       );
       const featuresLengthVar = featureids.length;
       let imageInfoVar = {
@@ -871,8 +871,8 @@ class Differential extends Component {
     let cancelToken = new CancelToken(e => {
       cancelRequestDifferentialResultsGetMultifeaturePlot = e;
     });
-    let multifeaturePlot = differentialPlotTypes.filter(
-      p => p.plotType === 'multiFeature',
+    let multifeaturePlot = differentialPlotTypes.filter(p =>
+      p.plotType.includes('multiFeature'),
     );
     if (multifeaturePlot.length !== 0) {
       const testsArg = multifeaturePlot[plotindex].plotType.includes(
