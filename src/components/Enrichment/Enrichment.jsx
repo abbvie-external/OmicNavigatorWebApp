@@ -1231,7 +1231,7 @@ class Enrichment extends Component {
       // refined for dynamically sized plots on single-threaded servers (running R locally), we're using a race condition to take the first url and handle/display it asap; after that, we're using allSettled to wait for remaining urls, and then sending them all to the component as props
       const promises = enrichmentPlotTypes
         .map(plot => {
-          if (plot.plotType === 'multiFeature') {
+          if (plot.plotType.includes('multiFeature')) {
             return undefined;
           }
           const testsArg = plot.plotType.includes('multiTest')
