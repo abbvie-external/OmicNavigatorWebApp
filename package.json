@@ -1,6 +1,6 @@
 {
   "name": "omicnavigatorwebapp",
-  "version": "1.3.1",
+  "version": "1.3.3",
   "private": true,
   "dependencies": {
     "d3-hexbin": "^0.2.2",
