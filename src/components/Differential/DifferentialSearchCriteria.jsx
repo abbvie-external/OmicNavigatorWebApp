@@ -215,9 +215,6 @@ class DifferentialSearchCriteria extends Component {
         });
         const differentialTestsMetadataVar =
           differentialModelWithTests?.tests || [];
-        const differentialTestIdsMapped = differentialTestsMetadataVar.map(
-          test => test.testID,
-        );
         const differentialTestsMapped = differentialTestsMetadataVar.map(
           test => {
             return {
@@ -227,13 +224,15 @@ class DifferentialSearchCriteria extends Component {
             };
           },
         );
-        const uDataPMapped = differentialTestsMetadataVar.map(t => t.testID);
+        const differentialTestIds = differentialTestsMetadataVar.map(
+          t => t.testID,
+        );
         this.setState({
           differentialTestsDisabled: false,
           differentialTests: differentialTestsMapped,
-          uDataP: uDataPMapped,
+          uDataP: differentialTestIds,
         });
-        this.props.onSetDifferentialTestIds(differentialTestIdsMapped);
+        this.props.onSetDifferentialTestIds(differentialTestIds);
         this.props.onSetTestsMetadata(differentialTestsMetadataVar);
         this.getReportLink(differentialStudy, differentialModel);
         if (differentialTest !== '') {
@@ -389,15 +388,15 @@ class DifferentialSearchCriteria extends Component {
         value: test.testID,
       };
     });
-    const uDataP = differentialTestsMetadataVar.map(t => t.testID);
+    const differentialTestIds = differentialTestsMetadataVar.map(t => t.testID);
     this.setState({
       differentialTestsDisabled: false,
       differentialTests: differentialTestsMapped,
-      uDataP: uDataP,
+      uDataP: differentialTestIds,
       differentialModelTooltip: differentialModelTooltip,
       differentialTestTooltip: '',
     });
-    this.props.onSetDifferentialTestIds(differentialTestsMapped);
+    this.props.onSetDifferentialTestIds(differentialTestIds);
     this.props.onSetTestsMetadata(differentialTestsMetadataVar);
     this.getReportLink(differentialStudy, value);
   };
