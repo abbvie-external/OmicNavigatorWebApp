@@ -1744,8 +1744,13 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     } else if (w > 2599) return 'large';
   }
 
-  toggleOptionsPopup = () => {
-    this.setState({ optionsOpen: !this.state.optionsOpen });
+  toggleOptionsPopup = (e, obj, close) => {
+    debugger;
+    if (close) {
+      this.setState({ optionsOpen: false });
+    } else {
+      this.setState({ optionsOpen: true });
+    }
   };
 
   render() {
@@ -1837,6 +1842,10 @@ class DifferentialVolcanoPlot extends React.PureComponent {
               on="click"
               inverted
               open={optionsOpen}
+              onClose={e => this.toggleOptionsPopup(e, null, true)}
+              closeOnDocumentClick
+              closeOnEscape
+              hideOnScroll
             >
               <Popup.Content id="VolcanoOptionsPopupContent">
                 <Grid>
