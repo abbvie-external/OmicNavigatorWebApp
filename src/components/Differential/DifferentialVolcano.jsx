@@ -294,7 +294,10 @@ class DifferentialVolcano extends Component {
           this.props.volcanoDifferentialTableRowMax,
         );
         if (hasMax) {
-          this.pageToFeature(this.props.volcanoDifferentialTableRowMax);
+          const self = this;
+          setTimeout(function() {
+            self.pageToFeature(self.props.volcanoDifferentialTableRowMax);
+          }, 50);
         } else this.pageToFeature();
       }
     } else {
