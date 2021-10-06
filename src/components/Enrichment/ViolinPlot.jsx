@@ -1685,7 +1685,7 @@ class ViolinPlot extends Component {
                 inverted
                 circular
                 onClick={this.handleElementTextChange}
-                id={displayElementTextViolin ? 'PrimaryColor' : 'black'}
+                id={displayElementTextViolin ? 'PrimaryBackground' : 'black'}
               />
             }
             style={{

@@ -10,6 +10,8 @@ import {
   Label,
   Icon,
   Button,
+  Loader,
+  Dimmer,
 } from 'semantic-ui-react';
 import * as d3 from 'd3';
 import * as hexbin from 'd3-hexbin';
@@ -66,14 +68,17 @@ class DifferentialVolcanoPlot extends React.PureComponent {
   };
 
   componentDidMount() {
-    this.getAxisLabels();
-
-    window.addEventListener('resize', this.debouncedResizeListener);
+    // this.getAxisLabels();
+    // window.addEventListener('resize', this.debouncedResizeListener);
   }
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.debouncedResizeListener);
   }
+
+  // shouldComponentUpdate() {
+  //   return this.props.volcanoPlotVisible && this.props.upperPlotsVisible;
+  // }
 
   debouncedResizeListener = () => {
     let resizedFn;
@@ -85,7 +90,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
 
   setupVolcano() {
     const {
-      volcanoHeight,
+      upperPlotsHeight,
       volcanoWidth,
       differentialResultsUnfiltered,
     } = this.props;
@@ -104,7 +109,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       .select('#volcano')
       .append('svg')
       .attr('width', volcanoWidth + 50)
-      .attr('height', volcanoHeight + 20)
+      .attr('height', upperPlotsHeight + 20)
       .attr('id', 'VolcanoChart')
       .attr('class', 'VolcanoPlotSVG')
       .on('click', () => this.handleSVGClick());
@@ -115,7 +120,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       .attr('id', 'clip')
       .append('svg:rect')
       .attr('width', volcanoWidth + 50)
-      .attr('height', volcanoHeight + 20)
+      .attr('height', upperPlotsHeight + 20)
       .attr('x', 0)
       .attr('y', -15);
 
@@ -143,9 +148,9 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       .append('text')
       .attr('class', 'volcanoAxisLabel NoSelect')
       .attr('textAnchor', 'middle')
-      .attr('transform', `rotate(-90,20,${volcanoHeight * 0.5 + 20})`)
+      .attr('transform', `rotate(-90,20,${upperPlotsHeight * 0.5 + 20})`)
       .attr('x', 60)
-      .attr('y', `${volcanoHeight * 0.5 + 20}`)
+      .attr('y', `${upperPlotsHeight * 0.5 + 20}`)
       .attr('font-size', '18px')
       .style(
         'font-family',
@@ -159,14 +164,14 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       .append('g')
       .attr('class', 'volcanoPlotXAxis NoSelect')
       .attr('id', 'xaxis-line')
-      .attr('transform', 'translate(0,' + (volcanoHeight - 25) + ')')
+      .attr('transform', 'translate(0,' + (upperPlotsHeight - 25) + ')')
       .call(this.xxAxis);
 
     d3.select('#VolcanoChart')
       .append('text')
       .attr('class', 'volcanoAxisLabel NoSelect')
       .attr('x', volcanoWidth * 0.5 + 10)
-      .attr('y', volcanoHeight - 5)
+      .attr('y', upperPlotsHeight - 5)
       .attr('font-size', '18px')
       .style(
         'font-family',
@@ -185,7 +190,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
   }
 
   hexBinning(data) {
-    const { volcanoWidth, volcanoHeight, differentialResults } = this.props;
+    const { volcanoWidth, upperPlotsHeight, differentialResults } = this.props;
 
     if (data.length > 2500) {
       const { xScale, yScale } = this.scaleFactory(data);
@@ -224,7 +229,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       this.setState({ ...volcanoState });
     }
     this.props.onHandleVolcanoCurrentSelection(data);
-    this.setupBrush(volcanoWidth, volcanoHeight);
+    this.setupBrush(volcanoWidth, upperPlotsHeight);
 
     this.props.onHandleUpdateDifferentialResults(differentialResults);
   }
@@ -462,7 +467,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
   };
 
   scaleFactory(scaleData) {
-    const { volcanoWidth, volcanoHeight } = this.props;
+    const { volcanoWidth, upperPlotsHeight } = this.props;
     const { xAxisLabel, yAxisLabel } = this.state;
 
     var xMM = this.getMaxAndMin(scaleData, xAxisLabel);
@@ -478,7 +483,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     const yScale = d3
       .scaleLinear()
       .domain([Math.min(...yMM), Math.max(...yMM)])
-      .range([volcanoHeight - 54, 10]);
+      .range([upperPlotsHeight - 54, 10]);
 
     return {
       xScale: xScale,
@@ -493,16 +498,18 @@ class DifferentialVolcanoPlot extends React.PureComponent {
   componentDidUpdate(prevProps, prevState) {
     const {
       volcanoDifferentialTableRowOther,
-      volcanoDifferentialTableRowMax,
-      volcanoHeight,
+      // volcanoDifferentialTableRowMax,
+      upperPlotsHeight,
       volcanoWidth,
       updateVolcanoLabels,
       isFilteredDifferential,
       isDataStreamingResultsTable,
       differentialResultsUnfiltered,
       HighlightedFeaturesArrVolcano,
-      volcanoPlotsVisible,
+      volcanoPlotVisible,
+      upperPlotsVisible,
       filteredDifferentialTableData,
+      volcanoDifferentialTableRowOutline,
     } = this.props;
 
     const {
@@ -516,9 +523,15 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     // this if/else if/else if statement in place to minimize re-renders - should cover all situations
     if (
       !isDataStreamingResultsTable &&
-      volcanoPlotsVisible &&
-      volcanoPlotsVisible !== prevProps.volcanoPlotsVisible
+      isDataStreamingResultsTable !== prevProps.isDataStreamingResultsTable
+      //     ||
+      // (volcanoPlotVisible &&
+      //   volcanoPlotVisible !== prevProps.volcanoPlotVisible &&
+      //   upperPlotsVisible)
     ) {
+      this.getAxisLabels();
+
+      window.addEventListener('resize', this.debouncedResizeListener);
       // user opens volcano plot any time after data finishes streaming
       const dataInCurrentView =
         this.state.currentResults.length > 0
@@ -528,15 +541,18 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       this.setupVolcano();
       this.hexBinning(differentialResultsUnfiltered);
       this.transitionZoom(dataInCurrentView, false, false, false);
-      this.setState({ optionsOpen: true });
+      if (volcanoPlotVisible && upperPlotsVisible) {
+        this.setState({ optionsOpen: true });
+      }
     } else if (
       !isDataStreamingResultsTable &&
-      volcanoPlotsVisible &&
+      // volcanoPlotVisible &&
+      // upperPlotsVisible &&
       (prevState.xAxisLabel !== xAxisLabel ||
         prevState.yAxisLabel !== yAxisLabel ||
         prevState.doXAxisTransformation !== doXAxisTransformation ||
         prevState.doYAxisTransformation !== doYAxisTransformation ||
-        prevProps.volcanoHeight !== volcanoHeight ||
+        prevProps.upperPlotsHeight !== upperPlotsHeight ||
         prevProps.volcanoWidth !== volcanoWidth)
     ) {
       // volcano plot is open, user changes axis or height/widht (visible only whe volcano plot is open)
@@ -545,9 +561,9 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       this.hexBinning(this.state.currentResults);
       this.transitionZoom(this.state.currentResults, false, false, false);
     } else if (
-      (volcanoPlotsVisible &&
-        prevProps.isFilteredDifferential &&
-        !isFilteredDifferential) ||
+      // volcanoPlotVisible &&
+      // upperPlotsVisible &&
+      (prevProps.isFilteredDifferential && !isFilteredDifferential) ||
       (prevProps.isUpsetVisible && !this.props.isUpsetVisible)
     ) {
       // volcano plot is open, and set analysis "filter" is clicked OR set analysis is toggled off
@@ -555,11 +571,11 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         this.state.currentResults.length > 0
           ? this.state.currentResults
           : differentialResultsUnfiltered;
-      if (volcanoPlotsVisible)
-        this.transitionZoom(dataInCurrentView, false, false, false);
+      // if (upperPlotsVisible && volcanoPlotVisible)
+      this.transitionZoom(dataInCurrentView, false, false, false);
     } else if (
       !isDataStreamingResultsTable &&
-      volcanoPlotsVisible &&
+      // volcanoPlotVisible &&
       prevProps.filteredDifferentialTableData.length !== 30 &&
       filteredDifferentialTableData.length !==
         prevProps.filteredDifferentialTableData.length
@@ -569,8 +585,8 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         this.state.currentResults.length > 0
           ? this.state.currentResults
           : differentialResultsUnfiltered;
-      if (volcanoPlotsVisible)
-        this.transitionZoom(allDataInSelectedArea, false, true, false);
+      // if (upperPlotsVisible && volcanoPlotVisible)
+      this.transitionZoom(allDataInSelectedArea, false, true, false);
     }
 
     if (
@@ -605,19 +621,28 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     }
 
     if (
+      // upperPlotsVisible &&
+      // volcanoPlotVisible &&
       !_.isEqual(
         _.sortBy(volcanoDifferentialTableRowOther),
         _.sortBy(prevProps.volcanoDifferentialTableRowOther),
       ) ||
-      volcanoDifferentialTableRowMax !==
-        prevProps.volcanoDifferentialTableRowMax
+      volcanoDifferentialTableRowOutline !==
+        prevProps.volcanoDifferentialTableRowOutline
     ) {
       this.highlightBrushedCircles();
-      this.props.onPageToFeature(volcanoDifferentialTableRowMax);
+      // if (
+      //   volcanoDifferentialTableRowMax !==
+      //   prevProps.volcanoDifferentialTableRowMax
+      // ) {
+      //   this.props.onPageToFeature(volcanoDifferentialTableRowMax);
+      // }
     }
     if (
-      !volcanoPlotsVisible &&
-      volcanoPlotsVisible !== prevProps.volcanoPlotsVisible
+      (!upperPlotsVisible &&
+        upperPlotsVisible !== prevProps.upperPlotsVisible) ||
+      (!volcanoPlotVisible &&
+        volcanoPlotVisible !== prevProps.volcanoPlotVisible)
     ) {
       // user closes volcano plot, close options
       this.setState({ optionsOpen: false });
@@ -688,7 +713,6 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       // .attr('r', 2)
       .classed('highlighted', false)
       .classed('highlightedMax', false);
-
     this.setState({
       brushedRawData: null,
     });
@@ -696,12 +720,13 @@ class DifferentialVolcanoPlot extends React.PureComponent {
 
   highlightBrushedCircles = () => {
     const {
-      volcanoDifferentialTableRowMax,
+      // volcanoDifferentialTableRowMax,
       volcanoDifferentialTableRowOther,
+      // volcanoDifferentialTableRowOutline,
     } = this.props;
     if (d3.select('#nonfiltered-elements').size() !== 0) {
       if (
-        !volcanoDifferentialTableRowMax?.length &&
+        // !volcanoDifferentialTableRowMax?.length &&
         !volcanoDifferentialTableRowOther?.length
       ) {
         d3.select('#nonfiltered-elements')
@@ -730,54 +755,98 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     d3.select('#nonfiltered-elements')
       .selectAll('path')
       .attr('fill', d => this.determineBinColor(this.state.bins, d.length));
+    this.hightlightPlotCircle();
+    this.highlightSelectedCircles();
+    // if (volcanoDifferentialTableRowMax?.length > 0) {
+    //   // style max highlighted circle
+    //   const maxCircleId = this.getCircleOrBin(volcanoDifferentialTableRowMax);
+    //   if (maxCircleId) {
+    //     const maxCircle = d3.select(maxCircleId.element);
+    //     if (maxCircle != null) {
+    //       if (maxCircleId.type === 'circle') {
+    //         maxCircle
+    //           .attr('style', 'fill: #ff4400')
+    //           .classed('highlightedMax', true);
+    //         maxCircle.attr('r', 5);
+    //         maxCircle.classed('highlightedMax', true);
+    //         maxCircle.raise();
+    //       } else {
+    //         maxCircle.attr('fill', '#ff4400').classed('highlightedMax', true);
+    //         maxCircle.attr('stroke', '#000');
+    //         maxCircle.attr('stroke-width', 1);
+    //         maxCircle.attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(7)}`);
+    //         maxCircle.classed('highlightedMax', true);
+    //         maxCircle.raise();
+    //       }
+    //     }
+    //   }
+    // }
+  };
 
+  highlightSelectedCircles = () => {
+    const {
+      volcanoDifferentialTableRowOther,
+      volcanoDifferentialTableRowOutline,
+    } = this.props;
     if (volcanoDifferentialTableRowOther?.length > 0) {
       volcanoDifferentialTableRowOther.forEach(element => {
         // style all highlighted circles
         const highlightedCircleId = this.getCircleOrBin(element);
         const highlightedCircle = d3.select(highlightedCircleId?.element);
+        let radius = element === volcanoDifferentialTableRowOutline ? 6 : 6;
+        let stroke =
+          element === volcanoDifferentialTableRowOutline
+            ? '#1678c2'
+            : '#ff4400';
+        let strokeWidth =
+          element === volcanoDifferentialTableRowOutline ? 2 : 1;
         if (highlightedCircle != null) {
           if (highlightedCircleId?.type === 'circle') {
-            highlightedCircle.attr('r', 4);
+            highlightedCircle.attr('stroke', stroke);
+            highlightedCircle.attr('stroke-width', strokeWidth);
             highlightedCircle
-              .attr('style', 'fill: #ff7e05')
+              .attr('style', 'fill: #ff4400')
               .classed('highlighted', true);
-            highlightedCircle.attr('r', 5);
+            highlightedCircle.attr('r', radius);
             highlightedCircle.classed('highlighted', true);
             highlightedCircle.raise();
           } else {
             highlightedCircle
-              .attr('fill', '#ff7e05')
+              .attr('fill', '#ff4400')
               .classed('highlighted', true);
-            highlightedCircle.attr('stroke', '#ff7e05');
-            highlightedCircle.attr('stroke-width', '#ff7e05');
+            highlightedCircle.attr('stroke', stroke);
+            highlightedCircle.attr('stroke-width', strokeWidth);
             highlightedCircle.classed('highlighted', true);
             highlightedCircle.raise();
           }
         }
       });
     }
-    if (volcanoDifferentialTableRowMax?.length > 0) {
-      // style max highlighted circle
-      const maxCircleId = this.getCircleOrBin(volcanoDifferentialTableRowMax);
-      if (maxCircleId) {
-        const maxCircle = d3.select(maxCircleId.element);
-        if (maxCircle != null) {
-          if (maxCircleId.type === 'circle') {
-            maxCircle
-              .attr('style', 'fill: #ff4400')
-              .classed('highlightedMax', true);
-            maxCircle.attr('r', 5);
-            maxCircle.classed('highlightedMax', true);
-            maxCircle.raise();
-          } else {
-            maxCircle.attr('fill', '#ff4400').classed('highlightedMax', true);
-            maxCircle.attr('stroke', '#000');
-            maxCircle.attr('stroke-width', 1);
-            maxCircle.attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(7)}`);
-            maxCircle.classed('highlightedMax', true);
-            maxCircle.raise();
+  };
+
+  hightlightPlotCircle = () => {
+    const { volcanoDifferentialTableRowOutline } = this.props;
+    if (volcanoDifferentialTableRowOutline) {
+      // style outline highlighted circle
+      const outlineCircleId = this.getCircleOrBin(
+        volcanoDifferentialTableRowOutline,
+      );
+      if (outlineCircleId) {
+        const outlineCircle = d3.select(outlineCircleId.element);
+        if (outlineCircle != null) {
+          outlineCircle.attr('r', 8);
+          outlineCircle.attr('style', 'fill: #ffffff');
+          outlineCircle.classed('plotted', true);
+          outlineCircle.attr('stroke', '#1678c2');
+          outlineCircle.attr('stroke-width', 2);
+          outlineCircle.raise();
+          if (outlineCircleId.type !== 'circle') {
+            outlineCircle.attr(
+              'd',
+              d => `M${d.x},${d.y}${this.hexbin.hexagon(7)}`,
+            );
           }
+          outlineCircle.raise();
         }
       }
     }
@@ -799,7 +868,13 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       } else if (binClass.endsWith('highlighted')) {
         bin.attr('stroke', '#000');
         bin.attr('stroke-width', 1);
-        bin.attr('fill', '#ff7e05');
+        bin.attr('fill', '#ff4400');
+        bin.attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(8)}`);
+        bin.raise();
+      } else if (binClass.endsWith('plotted')) {
+        bin.attr('stroke', '#1678c2');
+        bin.attr('stroke-width', 1);
+        bin.attr('fill', '#fff');
         bin.attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(8)}`);
         bin.raise();
       } else {
@@ -898,7 +973,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     } else if (binClass.endsWith('highlighted')) {
       bin.attr('stroke', '#000');
       bin.attr('stroke-width', 1);
-      bin.attr('fill', '#ff7e05');
+      bin.attr('fill', '#ff4400');
       bin.attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(7)}`);
     } else {
       bin
@@ -1267,37 +1342,41 @@ class DifferentialVolcanoPlot extends React.PureComponent {
           .attr('cy', function(d) {
             return yScale(self.doTransform(d[self.state.yAxisLabel], 'y'));
           });
-        const circleLabels = [
-          ...highlighted?._groups[0],
-          ...highlightedMax?._groups[0],
-        ];
+        if (!!highlighted.length && !!highlightedMax) {
+          const circleLabels = [
+            ...highlighted?._groups[0],
+            ...highlightedMax?._groups[0],
+          ];
 
-        if (!!circleLabels.length) {
-          this.handleBrushedText({ _groups: [circleLabels] });
+          if (!!circleLabels.length) {
+            this.handleBrushedText({ _groups: [circleLabels] });
 
-          this.props.onHandleDotClick(
-            _,
-            circleLabels
-              .map(circle => JSON.parse(circle.attributes.data.value))
-              .sort(
-                (a, b) =>
-                  this.doTransform(b[this.state.yAxisLabel], 'y') -
-                  this.doTransform(a[this.state.yAxisLabel], 'y'),
-              ),
-            0,
-            // pass true so single selected feature is not unhighlighted
-            true,
-          );
+            this.props.onHandleDotClick(
+              _,
+              circleLabels
+                .map(circle => JSON.parse(circle.attributes.data.value))
+                .sort(
+                  (a, b) =>
+                    this.doTransform(b[this.state.yAxisLabel], 'y') -
+                    this.doTransform(a[this.state.yAxisLabel], 'y'),
+                ),
+              0,
+              // pass true so single selected feature is not unhighlighted
+              true,
+            );
+          }
         }
 
         d3.select('#clip-path')
           .selectAll('path')
           .attr('opacity', 0);
 
-        d3.select('.volcanoPlotD3BrushSelection').call(
-          self.objsBrush.move,
-          null,
-        );
+        if (d3.select('.volcanoPlotD3BrushSelection').size() !== 0) {
+          d3.select('.volcanoPlotD3BrushSelection').call(
+            self.objsBrush.move,
+            null,
+          );
+        }
 
         self.xxAxis = d3.axisTop(xScale).ticks();
         self.yyAxis = d3.axisRight(yScale).ticks();
@@ -1560,12 +1639,12 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     this.props.onHandleSelectedVolcano([]);
   }
 
-  getXAxisLabelY(volcanoHeight) {
-    if (volcanoHeight < 300) {
-      return volcanoHeight - 19;
-    } else if (volcanoHeight > 500) {
-      return volcanoHeight - 10;
-    } else return volcanoHeight - 15;
+  getXAxisLabelY(upperPlotsHeight) {
+    if (upperPlotsHeight < 300) {
+      return upperPlotsHeight - 19;
+    } else if (upperPlotsHeight > 500) {
+      return upperPlotsHeight - 10;
+    } else return upperPlotsHeight - 15;
   }
 
   getMaxAndMin(data, element) {
@@ -1745,7 +1824,6 @@ class DifferentialVolcanoPlot extends React.PureComponent {
   }
 
   toggleOptionsPopup = (e, obj, close) => {
-    debugger;
     if (close) {
       this.setState({ optionsOpen: false });
     } else {
@@ -1758,6 +1836,8 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       differentialStudy,
       differentialModel,
       differentialTest,
+      isDataStreamingResultsTable,
+      volcanoPlotVisible,
     } = this.props;
 
     const {
@@ -1776,8 +1856,13 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     } = this.state;
 
     const PlotName = `${differentialStudy}_${differentialModel}_${differentialTest}_scatter`;
-
-    if (identifier !== null && xAxisLabel !== null && yAxisLabel !== null) {
+    // if (volcanoPlotVisible && upperPlotsVisible) {
+    if (
+      !isDataStreamingResultsTable &&
+      identifier !== null &&
+      xAxisLabel !== null &&
+      yAxisLabel !== null
+    ) {
       const dynamicSize = this.getDynamicSizeBtn();
 
       const xAxisTransformBox = allowXTransformation ? (
@@ -1827,7 +1912,10 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       };
       return (
         <>
-          <span id="VolcanoOptionsPopup">
+          <span
+            id="VolcanoOptionsPopup"
+            className={volcanoPlotVisible ? 'Show' : 'Hide'}
+          >
             <Popup
               trigger={
                 <Button size="mini" onClick={this.toggleOptionsPopup}>
@@ -1837,7 +1925,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
               }
               // style={StudyPopupStyle}
               id="CustomTooltip"
-              position="left"
+              position="left center"
               basic
               on="click"
               inverted
@@ -1847,14 +1935,16 @@ class DifferentialVolcanoPlot extends React.PureComponent {
               closeOnEscape
               hideOnScroll
             >
-              <Popup.Content id="VolcanoOptionsPopupContent">
+              <Popup.Content
+                id="VolcanoOptionsPopupContent"
+                className={volcanoPlotVisible ? 'Show' : 'Hide'}
+              >
                 <Grid>
                   <Grid.Row
                     className={
-                      // volcanoPlotsVisible
-                      // ?
-                      'Show VolcanoPlotAxisSelectorsRow'
-                      // : 'Hide VolcanoPlotAxisSelectorsRow'
+                      volcanoPlotVisible
+                        ? 'Show VolcanoPlotAxisSelectorsRow'
+                        : 'Hide VolcanoPlotAxisSelectorsRow'
                     }
                   >
                     <Grid.Column
@@ -1953,7 +2043,10 @@ class DifferentialVolcanoPlot extends React.PureComponent {
               </Popup.Content>
             </Popup>
           </span>
-          <div id="VolcanoPlotDiv">
+          <div
+            id="VolcanoPlotDiv"
+            className={volcanoPlotVisible ? 'Show' : 'Hide'}
+          >
             <ButtonActions
               exportButtonSize="mini"
               plotName={PlotName}
@@ -1964,12 +2057,27 @@ class DifferentialVolcanoPlot extends React.PureComponent {
               svgVisible={true}
             />
           </div>
-          <div id="volcano">{volcanoCircleText}</div>
+          <div id="volcano" className={volcanoPlotVisible ? 'Show' : 'Hide'}>
+            {volcanoCircleText}
+          </div>
         </>
       );
     } else {
-      return null;
+      return (
+        <div
+          className={
+            volcanoPlotVisible
+              ? 'Show PlotInstructions'
+              : 'Hide PlotInstructions'
+          }
+        >
+          <Dimmer active inverted>
+            <Loader size="large">Volcano Plot is Loading</Loader>
+          </Dimmer>
+        </div>
+      );
     }
+    // } else return null;
   }
 }
 export default DifferentialVolcanoPlot;

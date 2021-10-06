@@ -45,6 +45,11 @@
 //   stroke-width: 0.4;
 //   fill: var(--color-primary);
 // }
+.volcanoPlot-dataPoint.plotted {
+  // stroke: #000;
+  // stroke-width: 0.4;
+  fill: var(--color-primary-white);
+}
 
 #VolcanoChart {
   margin-left: 0px !important;
@@ -86,4 +91,17 @@
   .ui.loader:before {
     margin: 5px 0px 0px -5px;
   }
+}
+
+.PlotInstructions {
+  height: 100%;
+}
+
+.PlotInstructionsText {
+  text-align: center !important;
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }

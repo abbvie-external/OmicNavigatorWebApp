@@ -1,18 +1,21 @@
 .VolcanoPlotButton {
   position: absolute !important;
   cursor: pointer !important;
-  z-index: 1 !important;
-  width: 45px;
-  height: 45px !important;
+  z-index: 4 !important;
   border: none !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.54) !important;
   border-radius: 0px !important;
-  margin: 10px 10px 10px 15px !important;
+  margin: -15px 10px 10px 45% !important;
 }
-#VolcanoPlotButton {
-  height: 45px !important;
-  width: 45px !important;
+
+.UpperPlotsToggle {
+  position: absolute !important;
+  cursor: pointer !important;
+  z-index: 4 !important;
+  border: none !important;
+  border-radius: 0px !important;
+  margin: 20px 0px 0px 45% !important;
 }
+
 .CursorNotAllowed {
   cursor: not-allowed !important;
 }
@@ -109,6 +112,7 @@
     max-width: 100% !important;
     position: relative !important;
     padding-bottom: 50px !important;
+    // transition: all 2s ease-out;
 
     .QHGrid--header {
       padding-top: 15px !important;
@@ -177,14 +181,9 @@
   }
 }
 
-// #PrimaryColor {
-//   background-color: #ff4400 !important;
-//   color: #fff !important;
-// }
-
 .MultiFeaturePlotBtn {
   margin-top: 5px !important;
-  margin-left: 355px !important;
+  margin-left: 255px !important;
   cursor: pointer !important;
   box-shadow: 0 1px 0px rgba(0, 0, 0, 0.12), 0 1px 0px rgba(0, 0, 0, 0.24) !important;
   z-index: 2 !important;
@@ -192,7 +191,7 @@
 
 .MultifeaturePlotBtnDiv {
   position: absolute;
-  right: 50% !important;
+  // right: 50% !important;
   margin-top: 13px;
   z-index: 2 !important;
 
@@ -214,8 +213,9 @@
 .AbsoluteLegendDifferential {
   position: absolute;
   z-index: 1;
-  margin-top: 13px;
-  right: 20% !important;
+  margin-top: 19px;
+  margin-left: 220px !important;
+  display: none;
 }
 
 #VolcanoOptionsPopup {
@@ -236,21 +236,33 @@
   padding: 10px 10px 20px 20px;
 }
 
-#MaxCircle {
-  background-color: var(--color-primary);
+// #MaxCircle {
+//   background-color: var(--color-primary);
+// }
+
+// #OtherCircle {
+//   background-color: var(--color-primary-gradient);
+// }
+
+#SelectedRowLegend {
+  color: var(--color-primary);
 }
 
-#OtherCircle {
-  background-color: var(--color-primary-gradient);
+#SelectedPlotLegend {
+  color: var(--color-link);
 }
 
-#HyperlinkCircle {
-  background-color: var(--color-link);
-}
+// #MaxCircle {
+//   margin-top: 5px !important;
+//   margin-left: 755px !important;
+//   cursor: pointer !important;
+//   box-shadow: 0 1px 0px rgba(0, 0, 0, 0.12), 0 1px 0px rgba(0, 0, 0, 0.24) !important;
+// }
 
-#MaxCircle {
-  margin-top: 5px !important;
-  margin-left: 755px !important;
-  cursor: pointer !important;
-  box-shadow: 0 1px 0px rgba(0, 0, 0, 0.12), 0 1px 0px rgba(0, 0, 0, 0.24) !important;
+#ToggleAllCheckbox {
+  position: absolute !important;
+  margin-top: 80px;
+  margin-left: 17px;
+  color: var(--color-dark);
+  cursor: pointer;
 }
