@@ -857,7 +857,7 @@ class DifferentialVolcano extends Component {
                           divHeight={upperPlotsDivHeight}
                           pxToPtRatio={105}
                           pointSize={12}
-                          svgTabMax={1}
+                          svgTabMax={0}
                           tab={tab}
                           volcanoWidth={volcanoDivWidth}
                           upperPlotsHeight={upperPlotsDivHeight}
