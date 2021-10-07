@@ -408,11 +408,12 @@ class DifferentialVolcanoPlot extends React.PureComponent {
           );
 
           if (d3.event.metaKey || d3.event.ctrlKey) {
+            // control-click dot
             const { yAxisLabel } = this.state;
 
             if (
               elem.attr('class').endsWith('highlighted') ||
-              elem.attr('class').endsWith('highlightedMax')
+              elem.attr('class').endsWith('outlined')
             ) {
               let elemData = JSON.parse(
                 elem._groups[0][0].attributes.data.value,
@@ -425,7 +426,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
                     elemData[differentialFeatureIdKey],
                 ),
               ];
-              this.props.onHandleDotClick(e, clickedElems, 0);
+              this.props.onHandleDotClick(e, clickedElems, 0, false, false);
 
               this.setState({
                 clickedElements: clickedElems,
@@ -445,21 +446,25 @@ class DifferentialVolcanoPlot extends React.PureComponent {
                     this.doTransform(b[yAxisLabel], 'y') -
                     this.doTransform(a[yAxisLabel], 'y'),
                 );
-              this.props.onHandleDotClick(e, clickedElems, 0);
+              this.props.onHandleDotClick(e, clickedElems, 0, false, false);
 
               this.setState({
                 clickedElements: clickedElems,
               });
             }
           } else {
+            // simple dot click
             this.props.onHandleDotClick(
               e,
               [JSON.parse(elem._groups[0][0].attributes.data.value)],
               0,
+              false,
+              true,
+              elem,
             );
-            this.setState({
-              clickedElements: [elem._groups[0][0]],
-            });
+            // this.setState({
+            //   clickedElements: [elem._groups[0][0]],
+            // });
           }
         });
       this.highlightBrushedCircles();
@@ -712,7 +717,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       // .attr('style', 'fill: #1678c2')
       // .attr('r', 2)
       .classed('highlighted', false)
-      .classed('highlightedMax', false);
+      .classed('outlined', false);
     this.setState({
       brushedRawData: null,
     });
@@ -741,7 +746,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         .attr('stroke', '#000')
         .attr('r', 2)
         .classed('highlighted', false)
-        .classed('highlightedMax', false);
+        .classed('outlined', false);
     }
 
     // set bins back to white
@@ -755,8 +760,8 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     d3.select('#nonfiltered-elements')
       .selectAll('path')
       .attr('fill', d => this.determineBinColor(this.state.bins, d.length));
-    this.hightlightPlotCircle();
-    this.highlightSelectedCircles();
+    this.outlineCircle();
+    this.highlightCircles();
     // if (volcanoDifferentialTableRowMax?.length > 0) {
     //   // style max highlighted circle
     //   const maxCircleId = this.getCircleOrBin(volcanoDifferentialTableRowMax);
@@ -766,16 +771,16 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     //       if (maxCircleId.type === 'circle') {
     //         maxCircle
     //           .attr('style', 'fill: #ff4400')
-    //           .classed('highlightedMax', true);
+    //           .classed('outlined', true);
     //         maxCircle.attr('r', 5);
-    //         maxCircle.classed('highlightedMax', true);
+    //         maxCircle.classed('outlined', true);
     //         maxCircle.raise();
     //       } else {
-    //         maxCircle.attr('fill', '#ff4400').classed('highlightedMax', true);
+    //         maxCircle.attr('fill', '#ff4400').classed('outlined', true);
     //         maxCircle.attr('stroke', '#000');
     //         maxCircle.attr('stroke-width', 1);
     //         maxCircle.attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(7)}`);
-    //         maxCircle.classed('highlightedMax', true);
+    //         maxCircle.classed('outlined', true);
     //         maxCircle.raise();
     //       }
     //     }
@@ -783,7 +788,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     // }
   };
 
-  highlightSelectedCircles = () => {
+  highlightCircles = () => {
     const {
       volcanoDifferentialTableRowOther,
       volcanoDifferentialTableRowOutline,
@@ -793,11 +798,14 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         // style all highlighted circles
         const highlightedCircleId = this.getCircleOrBin(element);
         const highlightedCircle = d3.select(highlightedCircleId?.element);
-        let radius = element === volcanoDifferentialTableRowOutline ? 6 : 6;
+        let radius = element === volcanoDifferentialTableRowOutline ? 7 : 6;
         let stroke =
           element === volcanoDifferentialTableRowOutline
             ? '#1678c2'
             : '#ff4400';
+        // let class = element !== volcanoDifferentialTableRowOutline
+        // ? 'highlighted'
+        // : 'outlined';
         let strokeWidth =
           element === volcanoDifferentialTableRowOutline ? 2 : 1;
         if (highlightedCircle != null) {
@@ -811,6 +819,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
             highlightedCircle.classed('highlighted', true);
             highlightedCircle.raise();
           } else {
+            // bin highlight
             highlightedCircle
               .attr('fill', '#ff4400')
               .classed('highlighted', true);
@@ -824,7 +833,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     }
   };
 
-  hightlightPlotCircle = () => {
+  outlineCircle = () => {
     const { volcanoDifferentialTableRowOutline } = this.props;
     if (volcanoDifferentialTableRowOutline) {
       // style outline highlighted circle
@@ -834,9 +843,9 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       if (outlineCircleId) {
         const outlineCircle = d3.select(outlineCircleId.element);
         if (outlineCircle != null) {
-          outlineCircle.attr('r', 8);
+          outlineCircle.attr('r', 7);
           outlineCircle.attr('style', 'fill: #ffffff');
-          outlineCircle.classed('plotted', true);
+          outlineCircle.classed('outlined', true);
           outlineCircle.attr('stroke', '#1678c2');
           outlineCircle.attr('stroke-width', 2);
           outlineCircle.raise();
@@ -859,19 +868,13 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       );
       const binClass = bin.attr('class');
 
-      if (binClass.endsWith('highlightedMax')) {
+      if (binClass.endsWith('highlighted')) {
         bin.attr('stroke', '#000');
         bin.attr('stroke-width', 1);
         bin.attr('fill', '#ff4400');
         bin.attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(8)}`);
         bin.raise();
-      } else if (binClass.endsWith('highlighted')) {
-        bin.attr('stroke', '#000');
-        bin.attr('stroke-width', 1);
-        bin.attr('fill', '#ff4400');
-        bin.attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(8)}`);
-        bin.raise();
-      } else if (binClass.endsWith('plotted')) {
+      } else if (binClass.endsWith('outlined')) {
         bin.attr('stroke', '#1678c2');
         bin.attr('stroke-width', 1);
         bin.attr('fill', '#fff');
@@ -913,7 +916,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       if (hovered != null) {
         const circle = d3.select(hovered) ?? null;
         if (circle != null) {
-          circle.attr('r', 6);
+          circle.attr('r', 8);
           circle.raise();
           this.setState({
             hoveredElement: 'circle',
@@ -936,14 +939,12 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         d3.select(`circle[id='volcanoDataPoint-${e[this.state.identifier]}`)
           ._groups[0][0] ?? null;
       if (hoveredCircle != null) {
-        if (
-          hoveredCircle.attributes['class'].value.endsWith('highlightedMax')
-        ) {
-          hoveredCircle.attributes['r'].value = 5;
+        if (hoveredCircle.attributes['class'].value.endsWith('outlined')) {
+          hoveredCircle.attributes['r'].value = 7;
         } else if (
           hoveredCircle.attributes['class'].value.endsWith('highlighted')
         ) {
-          hoveredCircle.attributes['r'].value = 4;
+          hoveredCircle.attributes['r'].value = 6;
         } else {
           hoveredCircle.attributes['r'].value = 2;
         }
@@ -965,7 +966,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     );
     const binClass = bin.attr('class');
 
-    if (binClass.endsWith('highlightedMax')) {
+    if (binClass.endsWith('outlined')) {
       bin.attr('stroke', '#000');
       bin.attr('stroke-width', 1);
       bin.attr('fill', '#ff4400');
@@ -1333,19 +1334,19 @@ class DifferentialVolcanoPlot extends React.PureComponent {
             return yScale(self.doTransform(d[self.state.yAxisLabel], 'y'));
           });
 
-        const highlightedMax = d3
+        const outlined = d3
           .select('#nonfiltered-elements')
-          .selectAll('[class$=highlightedMax')
+          .selectAll('[class$=outlined')
           .attr('cx', function(d) {
             return xScale(self.doTransform(d[self.state.xAxisLabel], 'x'));
           })
           .attr('cy', function(d) {
             return yScale(self.doTransform(d[self.state.yAxisLabel], 'y'));
           });
-        if (!!highlighted.length && !!highlightedMax) {
+        if (!!highlighted.length && !!outlined) {
           const circleLabels = [
             ...highlighted?._groups[0],
-            ...highlightedMax?._groups[0],
+            ...outlined?._groups[0],
           ];
 
           if (!!circleLabels.length) {
@@ -1363,6 +1364,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
               0,
               // pass true so single selected feature is not unhighlighted
               true,
+              false,
             );
           }
         }
@@ -1925,7 +1927,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
               }
               // style={StudyPopupStyle}
               id="CustomTooltip"
-              position="left center"
+              position="left bottom"
               basic
               on="click"
               inverted

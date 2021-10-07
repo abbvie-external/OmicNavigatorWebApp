@@ -264,33 +264,50 @@ class DifferentialVolcano extends Component {
     );
   };
 
-  handleDotClick = (event, items, index, doNotUnhighlight) => {
+  handleDotClick = (
+    event,
+    items,
+    index,
+    doNotUnhighlight,
+    simpleClick,
+    elem,
+  ) => {
     const { differentialFeatureIdKey } = this.props;
-    // const dotClickArr = [
-    //   {
-    //     id: item[differentialFeatureIdKey],
-    //     value: item[differentialFeatureIdKey],
-    //     key: item[differentialFeatureIdKey],
-    //   },
-    // ];
-    // this.setState({
-    //   differentialTableData: dotClickArr,
-    //   volcanoPlotRows: dotClickArr.length,
-    // });
-    let elementArray = items.map(item => ({
-      id: item[differentialFeatureIdKey],
-      value: item[differentialFeatureIdKey],
-      key: item[differentialFeatureIdKey],
-    }));
-    this.props.onHandleSelectedVolcano(elementArray, doNotUnhighlight);
-    // this.props.onHandleSelectedVolcano([
-    //   {
-    //     id: item[differentialFeatureIdKey],
-    //     value: item[differentialFeatureIdKey],
-    //     key: item[differentialFeatureIdKey],
-    //   },
-    // ]);
-    this.pageToFeature(items[0][differentialFeatureIdKey]);
+    if (simpleClick) {
+      const obj = JSON.parse(elem._groups[0][0].attributes.data.value) || '';
+      const feature = obj ? obj[differentialFeatureIdKey] : '';
+      this.props.onSetPlotSelected(feature);
+      this.pageToFeature(event[differentialFeatureIdKey]);
+      this.props.onGetPlot('Volcano', feature, false, false);
+    } else {
+      // const dotClickArr = [
+      //   {
+      //     id: item[differentialFeatureIdKey],
+      //     value: item[differentialFeatureIdKey],
+      //     key: item[differentialFeatureIdKey],
+      //   },
+      // ];
+      // this.setState({
+      //   differentialTableData: dotClickArr,
+      //   volcanoPlotRows: dotClickArr.length,
+      // });
+      let elementArray = items.map(item => ({
+        id: item[differentialFeatureIdKey],
+        value: item[differentialFeatureIdKey],
+        key: item[differentialFeatureIdKey],
+      }));
+      this.props.onHandleSelectedVolcano(elementArray, doNotUnhighlight);
+      if (items.length) {
+        this.pageToFeature(event[differentialFeatureIdKey]);
+      }
+      // this.props.onHandleSelectedVolcano([
+      //   {
+      //     id: item[differentialFeatureIdKey],
+      //     value: item[differentialFeatureIdKey],
+      //     key: item[differentialFeatureIdKey],
+      //   },
+      // ]);
+    }
   };
 
   getTableHelpers = differentialFeatureIdKeyVar => {
