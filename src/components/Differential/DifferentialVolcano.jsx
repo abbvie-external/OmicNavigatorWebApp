@@ -9,7 +9,7 @@ import {
   scrollElement,
   limitLength,
   limitLengthOrNull,
-  dynamicSizeLarger,
+  // dynamicSizeLarger,
 } from '../Shared/helpers';
 import DifferentialVolcanoPlot from './DifferentialVolcanoPlot';
 import {
@@ -176,11 +176,13 @@ class DifferentialVolcano extends Component {
     const {
       differentialFeatureIdKey,
       // volcanoDifferentialTableRowMax,
-      volcanoDifferentialTableRowOther,
+      volcanoDifferentialTableRowHighlight,
       volcanoDifferentialTableRowOutline,
     } = this.props;
     if (
-      volcanoDifferentialTableRowOther?.includes(item[differentialFeatureIdKey])
+      volcanoDifferentialTableRowHighlight?.includes(
+        item[differentialFeatureIdKey],
+      )
     ) {
       className = 'rowHighlightOther';
     }
@@ -292,9 +294,9 @@ class DifferentialVolcano extends Component {
       //   volcanoPlotRows: dotClickArr.length,
       // });
       let elementArray = items.map(item => ({
-        id: item[differentialFeatureIdKey],
-        value: item[differentialFeatureIdKey],
-        key: item[differentialFeatureIdKey],
+        id: item,
+        value: item,
+        key: item,
       }));
       this.props.onHandleSelectedVolcano(elementArray, doNotUnhighlight);
       if (items.length) {
@@ -683,7 +685,7 @@ class DifferentialVolcano extends Component {
       // isDataStreamingResultsTable,
       HighlightedFeaturesArrVolcano,
       // volcanoDifferentialTableRowMax,
-      volcanoDifferentialTableRowOther,
+      volcanoDifferentialTableRowHighlight,
       volcanoDifferentialTableRowOutline,
       differentialResults,
       onHandleMultifeaturePlot,
@@ -692,8 +694,6 @@ class DifferentialVolcano extends Component {
     // if (multisetQueriedDifferential) {
     //   differentialVolcanoCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-${multisetQueriedDifferential}-Volcano`;
     // }
-    // const dynamicSize = this.getDynamicSizeBtn();
-
     const maxWidthPopupStyle = {
       backgroundColor: '2E2E2E',
       borderBottom: '2px solid var(--color-primary)',
@@ -925,7 +925,7 @@ class DifferentialVolcano extends Component {
                             trigger={
                               <Label
                                 className="MultiFeaturePlotBtn NoSelect"
-                                size={dynamicSizeLarger}
+                                // size={dynamicSizeLarger}
                                 // color="blue"
                                 // image
                                 // basic
@@ -946,7 +946,7 @@ class DifferentialVolcano extends Component {
                           ></Popup>
                         </div>
                         <div className="AbsoluteLegendDifferential NoSelect">
-                          {/* {volcanoDifferentialTableRowOther?.length > 0 &&
+                          {/* {volcanoDifferentialTableRowHighlight?.length > 0 &&
                           volcanoDifferentialTableRowOutline ? (
                             <Popup
                               trigger={<Label circular id="MaxCircle" />}
@@ -973,7 +973,7 @@ class DifferentialVolcano extends Component {
                               basic
                             />
                           ) : null}
-                          {volcanoDifferentialTableRowOther?.length > 0 ? (
+                          {volcanoDifferentialTableRowHighlight?.length > 0 ? (
                             <Popup
                               trigger={
                                 <Icon
