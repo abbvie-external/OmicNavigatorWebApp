@@ -339,6 +339,49 @@ export const loadingDimmer = (
   </Dimmer>
 );
 
+export function getDynamicSize() {
+  let w = Math.max(
+    document.documentElement.clientWidth,
+    window.innerWidth || 0,
+  );
+  if (w < 1200) {
+    return 'small';
+  } else if (w > 1199 && w < 1600) {
+    return 'small';
+  } else if (w > 1599 && w < 2600) {
+    return 'medium';
+  } else if (w > 2599) return 'large';
+}
+
+export function getDynamicSearch() {
+  let w = Math.max(
+    document.documentElement.clientWidth,
+    window.innerWidth || 0,
+  );
+  if (w < 1200) {
+    return 'small';
+  } else if (w > 1199 && w < 1600) {
+    return 'small';
+  } else if (w > 1599 && w < 2000) {
+    return undefined;
+  } else if (w > 1999 && w < 2600) {
+    return 'large';
+  } else if (w > 2599) return 'big';
+}
+
+export function getDynamicLegend() {
+  let w = Math.max(
+    document.documentElement.clientWidth,
+    window.innerWidth || 0,
+  );
+  if (w < 768) {
+    return 250;
+  } else if (w > 767 && w < 1600) {
+    return 300;
+    // else if (w > 1599 && w < 2600) { return 450
+  } else return 350;
+}
+
 export function dynamicSizeLarger() {
   let w = Math.max(
     document.documentElement.clientWidth,
@@ -350,5 +393,19 @@ export function dynamicSizeLarger() {
     return 'medium';
   } else if (w > 1599 && w < 2600) {
     return 'large';
+  } else if (w > 2599) return 'large';
+}
+
+export function getDynamicSizeBtn() {
+  let w = Math.max(
+    document.documentElement.clientWidth,
+    window.innerWidth || 0,
+  );
+  if (w < 1200) {
+    return 'small';
+  } else if (w > 1199 && w < 1600) {
+    return 'small';
+  } else if (w > 1599 && w < 2600) {
+    return 'medium';
   } else if (w > 2599) return 'large';
 }

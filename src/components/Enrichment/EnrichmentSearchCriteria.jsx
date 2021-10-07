@@ -14,6 +14,7 @@ import { CancelToken } from 'axios';
 import '../Shared/SearchCriteria.scss';
 import { omicNavigatorService } from '../../services/omicNavigator.service';
 import EnrichmentMultisetFilters from './EnrichmentMultisetFilters';
+import { getDynamicSize } from '../Shared/helpers';
 
 let cancelRequestGetReportLinkEnrichment = () => {};
 // let cancelGetEnrichmentsTable = () => {};
@@ -950,20 +951,6 @@ class EnrichmentSearchCriteria extends Component {
     }));
   };
 
-  getDynamicSize() {
-    let w = Math.max(
-      document.documentElement.clientWidth,
-      window.innerWidth || 0,
-    );
-    if (w < 1200) {
-      return 'small';
-    } else if (w > 1199 && w < 1600) {
-      return 'small';
-    } else if (w > 1599 && w < 2600) {
-      return undefined;
-    } else if (w > 2599) return 'large';
-  }
-
   render() {
     const {
       enrichmentStudies,
@@ -1003,7 +990,7 @@ class EnrichmentSearchCriteria extends Component {
 
     let studyIcon;
     let studyName = `${enrichmentStudy} Analysis Details`;
-    const dynamicSize = this.getDynamicSize();
+    const dynamicSize = getDynamicSize();
 
     if (enrichmentStudyHrefVisible) {
       studyIcon = (

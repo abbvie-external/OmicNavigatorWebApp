@@ -66,10 +66,8 @@ class Differential extends Component {
       isFilteredDifferential: false,
       // isItemDatatLoaded: false,
       HighlightedFeaturesArrVolcano: [],
-      // volcanoDifferentialTableRowMax: '',
-      // volcanoDifferentialTableRowOther: [],
+      volcanoDifferentialTableRowHighlight: [],
       volcanoDifferentialTableRowOutline: '',
-      // maxObjectIdentifier: null,
       imageInfoVolcano: {
         key: null,
         title: '',
@@ -112,17 +110,6 @@ class Differential extends Component {
   shouldComponentUpdate(nextProps) {
     return nextProps.tab === 'differential';
   }
-
-  // componentDidUpdate(prevProps, prevState) {
-  //   const { volcanoDifferentialTableRowOutline } = this.state;
-  //   if (
-  //     volcanoDifferentialTableRowOutline === '' &&
-  //     volcanoDifferentialTableRowOutline !==
-  //       prevState.volcanoDifferentialTableRowOutline
-  //   ) {
-  //     this.handlePlotVolcano(this.state.maxObjectIdentifier, true);
-  //   }
-  // }
 
   // componentWillUnmount() {
   //   window.removeEventListener('resize', this.debouncedResizeListener);
@@ -261,10 +248,8 @@ class Differential extends Component {
         // differentialResultsUnfiltered: [],
         // isItemDatatLoaded: false,
         HighlightedFeaturesArrVolcano: [],
-        // volcanoDifferentialTableRowMax: '',
-        volcanoDifferentialTableRowOther: [],
+        volcanoDifferentialTableRowHighlight: [],
         volcanoDifferentialTableRowOutline: '',
-        maxObjectIdentifier: null,
         isVolcanoPlotSVGLoaded: true,
         isItemSelected: false,
         isItemSVGLoaded: true,
@@ -979,65 +964,51 @@ class Differential extends Component {
       if (toHighlightArr.length === 1) {
         // 1 feature
         if (
-          this.state.volcanoDifferentialTableRowOther?.length === 1 &&
-          this.state.volcanoDifferentialTableRowOther[0] ===
+          this.state.volcanoDifferentialTableRowHighlight?.length === 1 &&
+          this.state.volcanoDifferentialTableRowHighlight[0] ===
             toHighlightArr[0].id
         ) {
           if (!doNotUnhighlight) {
             // if not override, unhighlight row selected
             this.setState({
               HighlightedFeaturesArrVolcano: [],
-              volcanoDifferentialTableRowOther: [],
+              volcanoDifferentialTableRowHighlight: [],
             });
-            // if (
-            //   this.state.volcanoDifferentialTableRowOutline ===
-            //   toHighlightArr[0].id
-            // ) {
-            //   // remove row plotted
-            //   this.setState({
-            //     volcanoDifferentialTableRowOutline: '',
-            //   });
-            //   this.handlePlotVolcano('');
-            // }
           }
         } else {
           // new row has been selected
           const HighlightedFeaturesCopy = [...toHighlightArr];
-          let volcanoDifferentialTableRowOtherVar = [];
+          let volcanoDifferentialTableRowHighlightVar = [];
           if (
             HighlightedFeaturesCopy.length > 0 &&
             HighlightedFeaturesCopy != null &&
             HighlightedFeaturesCopy !== {}
           ) {
             HighlightedFeaturesCopy.forEach(element => {
-              volcanoDifferentialTableRowOtherVar.push(element.key);
+              volcanoDifferentialTableRowHighlightVar.push(element.key);
             });
           }
           this.setState({
             HighlightedFeaturesArrVolcano: toHighlightArr,
-            volcanoDifferentialTableRowOther:
-              volcanoDifferentialTableRowOtherVar || [],
-            // uncomment if want a single feature highlight to select a plot
-            // volcanoDifferentialTableRowOutline: toHighlightArr[0].key || '',
+            volcanoDifferentialTableRowHighlight:
+              volcanoDifferentialTableRowHighlightVar || [],
           });
-          // uncomment if want a single feature highlight to change the plot
-          // this.handlePlotVolcano(toHighlightArr[0].key);
         }
       } else {
         // highlight selected rows
         const HighlightedFeaturesCopy = [...toHighlightArr];
-        let volcanoDifferentialTableRowOtherVar = [];
+        let volcanoDifferentialTableRowHighlightVar = [];
         if (
           HighlightedFeaturesCopy.length > 0 &&
           HighlightedFeaturesCopy != null &&
           HighlightedFeaturesCopy !== {}
         ) {
           HighlightedFeaturesCopy.forEach(element => {
-            volcanoDifferentialTableRowOtherVar.push(element.key);
+            volcanoDifferentialTableRowHighlightVar.push(element.key);
           });
         }
         this.setState({
-          volcanoDifferentialTableRowOther: volcanoDifferentialTableRowOtherVar,
+          volcanoDifferentialTableRowHighlight: volcanoDifferentialTableRowHighlightVar,
           HighlightedFeaturesArrVolcano: toHighlightArr,
           updateVolcanoLabels: true,
         });
@@ -1045,14 +1016,10 @@ class Differential extends Component {
     } else {
       this.setState({
         HighlightedFeaturesArrVolcano: [],
-        // volcanoDifferentialTableRowMax: '',
-        volcanoDifferentialTableRowOther: [],
-        // volcanoDifferentialTableRowOutline: '',
+        volcanoDifferentialTableRowHighlight: [],
         updateVolcanoLabels: true,
       });
-      // this.handlePlotVolcano('');
     }
-    //}
   };
 
   updateVolcanoLabels = bool => {
@@ -1119,7 +1086,7 @@ class Differential extends Component {
 
   isChecked = item => {
     return function() {
-      return this.state.volcanoDifferentialTableRowOther.contains(
+      return this.state.volcanoDifferentialTableRowHighlight.contains(
         item[this.state.differentialFeatureIdKey],
       );
     };

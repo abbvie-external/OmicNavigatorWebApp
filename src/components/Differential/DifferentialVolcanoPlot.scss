@@ -1,11 +1,7 @@
-//.volcanoPlotContainer {
 .VolcanoPlotSVG {
   margin: 0 auto;
   display: block;
   cursor: crosshair !important;
-  //opacity: 0.6;
-  // shape-rendering: 'crispEdges';
-  // stroke: white;
 }
 
 .volcanoPlotYAxis {
@@ -25,41 +21,10 @@
   font-size: 13px;
 }
 
-// .volcanoPlot-dataPoint {
-//   stroke: #000;
-//   stroke-width: 0.4;
-//   fill: var(--color-link);
-// }
-// .volcanoPlot-dataPoint.selected {
-//   stroke: #000;
-//   stroke-width: 0.4;
-//   fill: var(--color-tertiary);
-// }
-// .volcanoPlot-dataPoint.highlighted {
-//   stroke: #000;
-//   stroke-width: 0.4;
-//   fill: var(--color-primary-gradient);
-// }
-// .volcanoPlot-dataPoint.highlightedMax {
-//   stroke: #000;
-//   stroke-width: 0.4;
-//   fill: var(--color-primary);
-// }
-.volcanoPlot-dataPoint.plotted {
-  // stroke: #000;
-  // stroke-width: 0.4;
-  fill: var(--color-primary-white);
-}
-
 #VolcanoChart {
   margin-left: 0px !important;
   margin-top: 0px !important;
 }
-
-// #volcano {
-//   overflow: hidden;
-// }
-//}
 
 #VolcanoPlotDiv {
   margin-bottom: 5px;
