@@ -575,7 +575,7 @@ class BarcodePlot extends Component {
                 inverted
                 circular
                 onClick={this.handleElementTextChange}
-                id={displayElementTextBarcode ? 'PrimaryColor' : 'black'}
+                id={displayElementTextBarcode ? 'PrimaryBackground' : 'black'}
               />
             }
             style={{

@@ -3,13 +3,14 @@
   --color-primary: rgba(255, 68, 0, 1);
   // --color-primary-gradient: #ff7e38;
   --color-primary-gradient: rgba(255, 126, 5, 1);
-  --color-secondary: #2c3b78;
-  --color-secondary-gradient: #465fc5;
+  --color-secondary: rgba(44, 59, 120, 1);
+  --color-secondary-gradient: #94959c;
   --color-tertiary: #00aeff;
-  --color-link: #1678c2 !important;
+  --color-link: rgba(22, 120, 194, 1) !important;
   --color-white: #fff;
   --color-light: #e0e1e2;
   --color-dark: #2e2e2e;
+  --color-grey: grey;
   --color-gray: #e8e8e8;
 }
 
@@ -84,6 +85,32 @@
     }
   }
 
+  #DifferentialResultsTableWrapper {
+    .QHGrid table {
+      border-collapse: collapse;
+      tr {
+        cursor: pointer !important;
+      }
+    }
+
+    .ui.celled.table tr td:first-child,
+    .ui.celled.table tr th:first-child {
+      min-width: 25px !important;
+      max-width: 25px !important;
+    }
+
+    .ui.celled.table tr td:last-child,
+    .ui.celled.table tr th:last-child {
+      min-width: 40px !important;
+      max-width: 40px !important;
+    }
+
+    .QHGrid--generalSearch:nth-child(1) {
+      margin-left: 0px !important;
+      // margin-top: -3px !important;
+    }
+  }
+
   tfoot tr th {
     border-top: 1px solid grey !important;
   }
@@ -128,29 +155,25 @@
     background-color: var(--color-primary) !important;
   }
 
-  .rowHighlightMax {
-    background: var(--color-primary) !important;
-    color: white !important;
+  #rowOutline {
+    // border: 3px 7px 3px 6px solid var(--color-link) !important;
+    border-top: 3px solid var(--color-link) !important;
+    border-right: 7px solid var(--color-link) !important;
+    border-bottom: 3px solid var(--color-link) !important;
+    border-left: 6px solid var(--color-link) !important;
   }
 
-  .rowHighlightOther {
-    background: var(--color-primary-gradient) !important;
-    color: white !important;
+  .rowHighlightOther i.icon.square.outline:before {
+    content: '\f14a';
+    color: var(--color-primary) !important;
   }
 
-  .rowHighlightMax .TableCellLink,
-  .rowHighlightOther .TableCellLink {
-    color: white !important;
-    cursor: pointer !important;
+  .rowHighlightOther i.icon.square.outline:after {
+    background-color: var(--color-primary);
   }
 
   .ui.selectable.table tbody .rowHighlightMax:hover {
     background: rgba(255, 68, 0, 0.9) !important;
-    color: white !important;
-  }
-
-  .ui.selectable.table tbody .rowHighlightOther:hover {
-    background: rgba(255, 126, 5, 0.9) !important;
     color: white !important;
   }
 
@@ -159,11 +182,6 @@
   }
 
   .test {
-    color: white !important;
-  }
-
-  .ui.selectable.table tbody .highlightedRow:hover {
-    background: #f14000 !important;
     color: white !important;
   }
 
@@ -317,7 +335,11 @@
   width: 100%;
 }
 
-.PrimaryColor {
+.PrimaryBackground {
   background-color: var(--color-primary) !important;
   color: var(--color-white) !important;
+}
+
+.PrimaryColor {
+  color: var(--color-primary) !important;
 }

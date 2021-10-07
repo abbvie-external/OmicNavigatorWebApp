@@ -3,19 +3,31 @@ import {
   Loader,
   Dimmer,
   Tab,
-  // Popup,
-  // Icon,
+  Popup,
+  Icon,
   // Message,
   // Menu,
-  // Label,
+  Label,
+  Button,
   Dropdown,
 } from 'semantic-ui-react';
 import SVG from 'react-inlinesvg';
-import { roundToPrecision } from '../Shared/helpers';
+import {
+  // dynamicSizeLarger,
+  roundToPrecision,
+} from '../Shared/helpers';
 // import { limitString } from '../Shared/helpers';
 import ButtonActions from '../Shared/ButtonActions';
 import './SVGPlot.scss';
 
+const maxWidthPopupStyle = {
+  backgroundColor: '2E2E2E',
+  borderBottom: '2px solid var(--color-primary)',
+  color: '#FFF',
+  padding: '1em',
+  maxWidth: '15vw',
+  fontSize: '13px',
+};
 class SVGPlot extends Component {
   state = {
     activeSVGTabIndexVolcano: 0,
@@ -31,15 +43,15 @@ class SVGPlot extends Component {
       (prevProps.imageInfoVolcanoLength !== this.props.imageInfoVolcanoLength ||
         prevProps.imageInfoVolcano.key !== this.props.imageInfoVolcano.key ||
         prevProps.volcanoWidth !== this.props.volcanoWidth ||
-        prevProps.volcanoHeight !== this.props.volcanoHeight)
+        prevProps.upperPlotsHeight !== this.props.upperPlotsHeight)
     ) {
       this.getSVGPanes();
     }
   }
 
-  shouldComponentUpdate(nextProps) {
-    return nextProps.volcanoPlotsVisible;
-  }
+  // shouldComponentUpdate(nextProps) {
+  //   return nextProps.upperPlotsVisible;
+  // }
 
   handleTabChange = (e, { activeIndex }) => {
     this.setState({
@@ -112,12 +124,45 @@ class SVGPlot extends Component {
     } else return null;
   };
 
-  render() {
+  handlePlotOverlay = () => {
+    const {
+      // HighlightedFeaturesArrVolcano,
+      // differentialFeatureIdKey,
+      imageInfoVolcano,
+      onGetMultifeaturePlotTransitionRef,
+    } = this.props;
+    if (imageInfoVolcano.key.includes('features')) {
+      // multifeature plot
+      // const featureIds = HighlightedFeaturesArrVolcano.map(
+      //   features => features.id,
+      // );
+      // let value = dataItem[alphanumericTrigger];
+      //     let imageInfoDifferential = {
+      //       key: `${value}`,
+      //       title: `${alphanumericTrigger} ${value}`,
+      //       svg: [],
+      //     };
+      //     this.props.onGetPlotTransition(
+      //       dataItem[alphanumericTrigger],
+      //       dataItem,
+      //       imageInfoDifferential,
+      //       true,
+      //     );
+      // this.props.onGetPlotTransitionRef(key, null, imageInfoVolcano, true);
+      onGetMultifeaturePlotTransitionRef();
+    } else {
+      // single feature plot
+      const key = imageInfoVolcano.key;
+      this.props.onGetPlotTransitionRef(key, null, imageInfoVolcano, true);
+    }
+  };
+
+  getPlotContent = () => {
     const {
       imageInfoVolcano,
       isVolcanoPlotSVGLoaded,
       tabsMessage,
-      volcanoPlotsVisible,
+      upperPlotsVisible,
       svgExportName,
       tab,
     } = this.props;
@@ -127,8 +172,7 @@ class SVGPlot extends Component {
       svgPanes,
       isSVGReadyVolcano,
     } = this.state;
-
-    if (volcanoPlotsVisible) {
+    if (upperPlotsVisible) {
       if (isSVGReadyVolcano) {
         if (imageInfoVolcano.key != null && isVolcanoPlotSVGLoaded) {
           const DropdownClass =
@@ -175,20 +219,20 @@ class SVGPlot extends Component {
                 />
               </div>
               {/* <Popup
-            trigger={
-              <Icon
-                name="bullseye"
-                size="large"
-                onClick={this.navigateToDifferentialFeature}
-                className="DiffTableIcon"
-              />
-            }
-            style={BreadcrumbPopupStyle}
-            inverted
-            basic
-            position="bottom left"
-            content="view in differential analysis section"
-          /> */}
+          trigger={
+            <Icon
+              name="bullseye"
+              size="large"
+              onClick={this.navigateToDifferentialFeature}
+              className="DiffTableIcon"
+            />
+          }
+          style={BreadcrumbPopupStyle}
+          inverted
+          basic
+          position="bottom left"
+          content="view in differential analysis section"
+        /> */}
               <Dropdown
                 search
                 selection
@@ -197,6 +241,7 @@ class SVGPlot extends Component {
                 value={plotOptions[activeSVGTabIndexVolcanoVar]?.value}
                 onChange={this.handlePlotDropdownChange}
                 className={DropdownClass}
+                id="svgPlotDropdownDifferential"
               />
               <Tab
                 menu={{
@@ -208,6 +253,31 @@ class SVGPlot extends Component {
                 onTabChange={this.handleTabChange}
                 activeIndex={activeSVGTabIndexVolcano}
               />
+              {this.props.tab === 'differential' ? (
+                <span id="VolcanoOptionsPopup">
+                  {/* <Popup
+                  trigger={ */}
+                  <Button size="mini" onClick={this.handlePlotOverlay}>
+                    <Icon
+                      // name="expand"
+                      name="expand arrows alternate"
+                      className=""
+                    />
+                    FULL SCREEN
+                  </Button>
+                  {/* }
+                  style={PopupStyle}
+                  content="View Larger"
+                  basic
+                /> */}
+                </span>
+              ) : null}
+              {/* <Icon
+              name="bullseye"
+              size="large"
+              onClick={this.navigateToDifferentialFeature}
+              className="DiffTableIcon"
+            /> */}
             </div>
           );
         } else if (!isVolcanoPlotSVGLoaded) {
@@ -227,6 +297,50 @@ class SVGPlot extends Component {
         return null;
       }
     } else return null;
+  };
+
+  render() {
+    const { volcanoPlotVisible } = this.props;
+
+    const Toggle = (
+      <span
+        className="VolcanoPlotToggle"
+        id={volcanoPlotVisible ? '' : 'VolcanoPlotToggle'}
+      >
+        <Popup
+          trigger={
+            <Label
+              circular
+              id="VolcanoPlotToggleLabel"
+              onClick={this.props.onHandleVolcanoVisability}
+              // size={volcanoPlotVisible ? '' : 'large'}
+            >
+              <Icon
+                // size={dynamicSizeLarger}
+                // size={volcanoPlotVisible ? '' : 'large'}
+                name={volcanoPlotVisible ? 'angle left' : 'angle right'}
+              />
+              {/* {volcanoPlotVisible ? '<' : '>'} */}
+            </Label>
+          }
+          style={maxWidthPopupStyle}
+          // className="TablePopupValue"
+          content={
+            volcanoPlotVisible ? 'Hide Volcano Plot' : 'Show Volcano Plot'
+          }
+          inverted
+          basic
+        />
+      </span>
+    );
+    const PlotContent = this.getPlotContent();
+
+    return (
+      <>
+        {Toggle}
+        {PlotContent}
+      </>
+    );
   }
 }
 

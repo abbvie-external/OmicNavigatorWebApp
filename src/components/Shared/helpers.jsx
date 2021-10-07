@@ -338,3 +338,17 @@ export const loadingDimmer = (
     <Loader size="large">SVG Loading</Loader>
   </Dimmer>
 );
+
+export function dynamicSizeLarger() {
+  let w = Math.max(
+    document.documentElement.clientWidth,
+    window.innerWidth || 0,
+  );
+  if (w < 1200) {
+    return 'medium';
+  } else if (w > 1199 && w < 1600) {
+    return 'medium';
+  } else if (w > 1599 && w < 2600) {
+    return 'large';
+  } else if (w > 2599) return 'large';
+}

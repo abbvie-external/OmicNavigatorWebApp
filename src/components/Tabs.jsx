@@ -304,7 +304,7 @@ class Tabs extends Component {
             open={self.state.infoOpenSecond}
             size="small"
           >
-            <Modal.Header className="PrimaryColor">
+            <Modal.Header className="PrimaryBackground">
               Proceed to public repository?
             </Modal.Header>
             <Modal.Content>
@@ -328,7 +328,7 @@ class Tabs extends Component {
               >
                 <Button
                   onClick={() => self.toggleInfoSecond(false)}
-                  className="PrimaryColor"
+                  className="PrimaryBackground"
                 >
                   Proceed <Icon name="right chevron" />
                 </Button>
