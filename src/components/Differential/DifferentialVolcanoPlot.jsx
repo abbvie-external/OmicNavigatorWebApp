@@ -1965,7 +1965,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
           }
         >
           <Dimmer active inverted>
-            <Loader size="large">Volcano Plot is Loading</Loader>
+            <Loader size="large">Scatter Plot is Loading</Loader>
           </Dimmer>
         </div>
       );
