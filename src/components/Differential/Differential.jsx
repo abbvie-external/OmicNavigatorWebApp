@@ -523,128 +523,154 @@ class Differential extends Component {
           p => !p.plotType.includes('multiFeature'),
         );
       }
-      if (returnSVG) {
-        _.forEach(plots, function(plot, i) {
-          // if (plots[i].plotType.includes('multiFeature')) {
-          //   return;
-          // }
-          const testsArg = plots[i].plotType.includes('multiTest')
-            ? differentialTestIds
-            : differentialTest;
-          omicNavigatorService
-            .plotStudyReturnSvg(
-              differentialStudy,
-              differentialModel,
-              // ['12759', '53624'],
-              id,
-              plots[i].plotID,
-              testsArg,
-              null,
-              cancelToken,
-            )
-            .then(svg => {
-              let xml = svg?.data || null;
-              if (xml != null && xml !== []) {
-                xml = xml.replace(/id="/g, 'id="' + id + '-' + i + '-');
-                xml = xml.replace(/#glyph/g, '#' + id + '-' + i + '-glyph');
-                xml = xml.replace(/#clip/g, '#' + id + '-' + i + '-clip');
-                xml = xml.replace(
-                  /<svg/g,
-                  `<svg preserveAspectRatio="xMinYMin meet" id="currentSVG-${id}-${i}"`,
-                );
-                DOMPurify.addHook('afterSanitizeAttributes', function(node) {
-                  if (
-                    node.hasAttribute('xlink:href') &&
-                    !node.getAttribute('xlink:href').match(/^#/)
-                  ) {
-                    node.remove();
-                  }
-                });
-                // Clean HTML string and write into our DIV
-                let sanitizedSVG = DOMPurify.sanitize(xml, {
-                  ADD_TAGS: ['use'],
-                });
-                let svgInfo = {
-                  plotType: plots[i],
-                  svg: sanitizedSVG,
-                };
-                imageInfoVar.svg.push(svgInfo);
-                currentSVGs.push(sanitizedSVG);
-                self.handleSVG(view, imageInfoVar);
-              }
-            })
-            .catch(error => {
-              console.error(
-                `Error during plotStudyReturnSvg for plot ${plots[i].plotID}`,
-                error,
-              );
-              // if one of many plots fails we don't want to return to the table; eventually we should use this when single feature differentialPlotTypes length is 1
-              // self.handleItemSelected(false);
-            });
-        });
-      } else {
-        // refined for dynamically sized plots on single-threaded servers (running R locally), we're using a race condition to take the first url and handle/display it asap; after that, we're using allSettled to wait for remaining urls, and then sending them all to the component as props
-        const promises = plots
-          .map(plot => {
-            const testsArg = plot.plotType.includes('multiTest')
+      if (plots?.length) {
+        if (returnSVG) {
+          _.forEach(plots, function(plot, i) {
+            // if (plots[i].plotType.includes('multiFeature')) {
+            //   return;
+            // }
+            const testsArg = plots[i].plotType.includes('multiTest')
               ? differentialTestIds
               : differentialTest;
-            return omicNavigatorService
-              .plotStudyReturnSvgUrl(
+            omicNavigatorService
+              .plotStudyReturnSvg(
                 differentialStudy,
                 differentialModel,
                 // ['12759', '53624'],
                 id,
-                plot.plotID,
+                plots[i].plotID,
                 testsArg,
                 null,
                 cancelToken,
               )
-              .then(svg => ({ svg, plotType: plot }));
-          })
-          .filter(Boolean);
-        Promise.race(promises)
-          .then(svg => {
-            imageInfoVar.svg = [svg];
-            self.handleSVG(view, imageInfoVar);
-          })
-          // Ignore error in first race - Handled later
-          .catch(error => undefined)
-          .then(() => {
-            if (promises.length > 1) {
-              const all = Promise.allSettled(promises);
-              return all;
-            }
-          })
-          .then(promiseResults => {
-            if (!promiseResults) {
-              // If promise.length===1, then this is undefined
-              return;
-            }
-            const svgArray = promiseResults
-              .filter(result => result.status === 'fulfilled')
-              .map(({ value }) => value);
-            /**
-             * @type {Error[]}
-             */
-            const errors = promiseResults
-              .filter(result => result.status === 'rejected')
-              .map(({ reason }) => reason);
-            if (svgArray.length) {
-              self.handleSVG(view, { ...imageInfoVar, svg: svgArray });
-            }
-            if (errors.length === promises.length) {
-              throw new Error('Error during plotStudyReturnSvgUrl');
-            }
-            if (errors.length) {
-              console.error(`Error during plotStudyReturnSvgUrl`, errors);
-              // Handle errors coming in - warn users
-            }
-          })
-          .catch(error => {
-            console.error(`Error during plotStudyReturnSvgUrl`, error);
-            // if one of many plots fails we don't want to alter the UI, however eventually consdider how best to handle failure when single feature differentialPlotTypes length is 1
+              .then(svg => {
+                let xml = svg?.data || null;
+                if (xml != null && xml !== []) {
+                  xml = xml.replace(/id="/g, 'id="' + id + '-' + i + '-');
+                  xml = xml.replace(/#glyph/g, '#' + id + '-' + i + '-glyph');
+                  xml = xml.replace(/#clip/g, '#' + id + '-' + i + '-clip');
+                  xml = xml.replace(
+                    /<svg/g,
+                    `<svg preserveAspectRatio="xMinYMin meet" id="currentSVG-${id}-${i}"`,
+                  );
+                  DOMPurify.addHook('afterSanitizeAttributes', function(node) {
+                    if (
+                      node.hasAttribute('xlink:href') &&
+                      !node.getAttribute('xlink:href').match(/^#/)
+                    ) {
+                      node.remove();
+                    }
+                  });
+                  // Clean HTML string and write into our DIV
+                  let sanitizedSVG = DOMPurify.sanitize(xml, {
+                    ADD_TAGS: ['use'],
+                  });
+                  let svgInfo = {
+                    plotType: plots[i],
+                    svg: sanitizedSVG,
+                  };
+                  imageInfoVar.svg.push(svgInfo);
+                  currentSVGs.push(sanitizedSVG);
+                  self.handleSVG(view, imageInfoVar);
+                }
+              })
+              .catch(error => {
+                console.error(
+                  `Error during plotStudyReturnSvg for plot ${plots[i].plotID}`,
+                  error,
+                );
+                // if one of many plots fails we don't want to return to the table; eventually we should use this when single feature differentialPlotTypes length is 1
+                // self.handleItemSelected(false);
+              });
           });
+        } else {
+          // refined for dynamically sized plots on single-threaded servers (running R locally), we're using a race condition to take the first url and handle/display it asap; after that, we're using allSettled to wait for remaining urls, and then sending them all to the component as props
+          const promises = plots
+            .map(plot => {
+              const testsArg = plot.plotType.includes('multiTest')
+                ? differentialTestIds
+                : differentialTest;
+              return omicNavigatorService
+                .plotStudyReturnSvgUrl(
+                  differentialStudy,
+                  differentialModel,
+                  // ['12759', '53624'],
+                  id,
+                  plot.plotID,
+                  testsArg,
+                  null,
+                  cancelToken,
+                )
+                .then(svg => ({ svg, plotType: plot }));
+            })
+            .filter(Boolean);
+          Promise.race(promises)
+            .then(svg => {
+              imageInfoVar.svg = [svg];
+              self.handleSVG(view, imageInfoVar);
+            })
+            // Ignore error in first race - Handled later
+            .catch(error => undefined)
+            .then(() => {
+              if (promises.length > 1) {
+                const all = Promise.allSettled(promises);
+                return all;
+              }
+            })
+            .then(promiseResults => {
+              if (!promiseResults) {
+                // If promise.length===1, then this is undefined
+                return;
+              }
+              const svgArray = promiseResults
+                .filter(result => result.status === 'fulfilled')
+                .map(({ value }) => value);
+              /**
+               * @type {Error[]}
+               */
+              const errors = promiseResults
+                .filter(result => result.status === 'rejected')
+                .map(({ reason }) => reason);
+              if (svgArray.length) {
+                self.handleSVG(view, { ...imageInfoVar, svg: svgArray });
+              }
+              if (errors.length === promises.length) {
+                throw new Error('Error during plotStudyReturnSvgUrl');
+              }
+              if (errors.length) {
+                console.error(`Error during plotStudyReturnSvgUrl`, errors);
+                // Handle errors coming in - warn users
+              }
+            })
+            .catch(error => {
+              console.error(`Error during plotStudyReturnSvgUrl`, error);
+              // if one of many plots fails we don't want to alter the UI, however eventually consdider how best to handle failure when single feature differentialPlotTypes length is 1
+            });
+        }
+      } else {
+        if (view === 'Differential') {
+          this.setState({
+            // isItemSelected: false,
+            // isItemSVGLoaded: true,
+            // currentSVGs: [],
+            // featuresString: '',
+            tabsMessage: `No plots available for feature ${featureId}`,
+          });
+          this.backToTable();
+          toast.error(`No plots available for feature ${featureId}`);
+        } else {
+          this.setState({
+            imageInfoVolcano: {
+              key: null,
+              title: '',
+              svg: [],
+            },
+            isItemSVGLoaded: true,
+            isVolcanoPlotSVGLoaded: true,
+            tabsMessage: `No plots available for feature ${featureId}`,
+          });
+          // toast.error(`No plots available for feature ${featureId}`);
+        }
       }
     } else {
       this.setState({
