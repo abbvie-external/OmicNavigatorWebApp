@@ -326,7 +326,7 @@ class SVGPlot extends Component {
           style={maxWidthPopupStyle}
           // className="TablePopupValue"
           content={
-            volcanoPlotVisible ? 'Hide Volcano Plot' : 'Show Volcano Plot'
+            volcanoPlotVisible ? 'Hide Scatter Plot' : 'Show Scatter Plot'
           }
           inverted
           basic

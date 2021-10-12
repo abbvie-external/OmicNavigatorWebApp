@@ -452,14 +452,21 @@ class DifferentialVolcano extends Component {
           });
         }
       } else {
-        // simple row click without control nor shift
-        this.props.onSetPlotSelected(item[differentialFeatureIdKey]);
-        this.props.onGetPlot(
-          'Volcano',
-          item[differentialFeatureIdKey],
-          false,
-          false,
-        );
+        // if item is already outlined, remove outline and clear plot
+        if (
+          item[differentialFeatureIdKey] === volcanoDifferentialTableRowOutline
+        ) {
+          this.props.onClearPlotSelected();
+        } else {
+          // simple row click without control nor shift
+          this.props.onSetPlotSelected(item[differentialFeatureIdKey]);
+          this.props.onGetPlot(
+            'Volcano',
+            item[differentialFeatureIdKey],
+            false,
+            false,
+          );
+        }
       }
     }
   };
