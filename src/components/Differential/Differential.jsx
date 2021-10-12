@@ -1124,6 +1124,21 @@ class Differential extends Component {
     });
   };
 
+  clearPlotSelected = () => {
+    cancelRequestDifferentialResultsGetPlot();
+    this.setState({
+      volcanoDifferentialTableRowOutline: '',
+      imageInfoVolcano: {
+        key: null,
+        title: '',
+        svg: [],
+      },
+      isItemSVGLoaded: true,
+      isVolcanoPlotSVGLoaded: true,
+      tabsMessage: 'Select a feature to display plots',
+    });
+  };
+
   getConfigCols = testData => {
     const differentialResultsVar = testData.differentialResults;
     const { differentialFeature } = this.props;
@@ -1400,6 +1415,7 @@ class Differential extends Component {
           onGetPlotTransition={this.getPlotTransition}
           onGetPlot={this.getPlot}
           onSetPlotSelected={this.setPlotSelected}
+          onClearPlotSelected={this.clearPlotSelected}
         />
       );
     } else return <TransitionStill stillMessage={message} />;
