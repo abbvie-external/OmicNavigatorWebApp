@@ -16,6 +16,7 @@ class MetafeaturesTableDynamic extends Component {
     itemsPerPageMetafeaturesTable:
       parseInt(localStorage.getItem('itemsPerPageMetafeaturesTable'), 10) || 60,
     additionalTemplateInfo: [],
+    metafeaturesLoaded: false,
   };
   metafeaturesGridRef = React.createRef();
 
@@ -36,26 +37,29 @@ class MetafeaturesTableDynamic extends Component {
         `MetafeaturesData-${this.props.imageInfoVolcano.key}`,
       ),
     );
-    let metaFeaturesDataVolcano = [];
     if (!cachedMetafeaturesData) {
-      let data = await omicNavigatorService.getMetaFeaturesTable(
-        this.props.differentialStudy,
-        this.props.differentialModel,
-        this.props.differentialFeature,
-        null,
-      );
-      metaFeaturesDataVolcano = data != null ? data : [];
-      sessionStorage.setItem(
-        `MetafeaturesData-${this.props.imageInfoVolcano.key}`,
-        JSON.stringify(metaFeaturesDataVolcano),
-      );
-      this.getMetafeaturesTableConfigCols(metaFeaturesDataVolcano);
+      try {
+        const data = await omicNavigatorService.getMetaFeaturesTable(
+          this.props.differentialStudy,
+          this.props.differentialModel,
+          this.props.imageInfoVolcano.key,
+          null,
+        );
+        let metaFeaturesDataVolcano = data != null ? data : [];
+        sessionStorage.setItem(
+          `MetafeaturesData-${this.props.imageInfoVolcano.key}`,
+          JSON.stringify(metaFeaturesDataVolcano),
+        );
+        this.getMetafeaturesTableConfigCols(metaFeaturesDataVolcano);
+      } catch (error) {
+        throw error;
+      }
     } else {
       this.getMetafeaturesTableConfigCols(cachedMetafeaturesData);
     }
   }
 
-  getMetafeaturesTableConfigCols = data => {
+  async getMetafeaturesTableConfigCols(data) {
     let configCols = [];
     if (data?.length > 0) {
       const TableValuePopupStyle = {
@@ -148,7 +152,7 @@ class MetafeaturesTableDynamic extends Component {
       metafeaturesTableData: data,
       metafeaturesLoaded: true,
     });
-  };
+  }
 
   handleItemsPerPageChange = items => {
     this.setState({

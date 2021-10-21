@@ -177,7 +177,6 @@ class SVGPlot extends Component {
                 ref={this.metaFeaturesTableDynamicRef}
                 differentialStudy={this.props.differentialStudy}
                 differentialModel={this.props.differentialModel}
-                differentialFeature={this.props.differentialFeature}
                 isItemSVGLoaded={this.props.isItemSVGLoaded}
                 imageInfoVolcano={this.props.imageInfoVolcano}
                 modelSpecificMetaFeaturesExist={
