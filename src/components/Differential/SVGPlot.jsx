@@ -243,6 +243,11 @@ class SVGPlot extends Component {
       activeSVGTabIndexVolcano,
       svgPanes,
       isSVGReadyVolcano,
+      pdfFlagVolcano,
+      pngFlagVolcano,
+      svgFlagVolcano,
+      txtFlagVolcano,
+      excelFlagVolcano,
     } = this.state;
     let options = [];
     if (upperPlotsVisible) {
@@ -267,35 +272,42 @@ class SVGPlot extends Component {
           // };
           const activeSVGTabIndexVolcanoVar = activeSVGTabIndexVolcano || 0;
           const svgArray = [...imageInfoVolcano.svg];
-          let plotOptions = svgArray.map(function(s, index) {
+          options = svgArray.map(function(s, index) {
             return {
               key: `${index}=VolcanoPlotDropdownOption`,
               text: s.plotType.plotDisplay,
               value: index,
             };
           });
-          // options = options.concat(plotOptions);
-          const singleFeaturePlotTypes = this.props.differentialPlotTypes.filter(
-            p => !p.plotType.includes('multiFeature'),
-          );
-          let metafeaturesDropdown = [
-            {
-              key: 'Feature-Data-SVG-Plot',
-              text: 'Feature Data',
-              value: singleFeaturePlotTypes.length,
-            },
-          ];
-          options = [...plotOptions, ...metafeaturesDropdown];
+          const isMultifeaturePlot =
+            this.props.imageInfoVolcano.key?.includes('features') || false;
+          if (
+            this.props.modelSpecificMetaFeaturesExist !== false &&
+            !isMultifeaturePlot
+          ) {
+            // options = options.concat(plotOptions);
+            const singleFeaturePlotTypes = this.props.differentialPlotTypes.filter(
+              p => !p.plotType.includes('multiFeature'),
+            );
+            let metafeaturesDropdown = [
+              {
+                key: 'Feature-Data-SVG-Plot',
+                text: 'Feature Data',
+                value: singleFeaturePlotTypes.length,
+              },
+            ];
+            options = [...options, ...metafeaturesDropdown];
+          }
           return (
             <div className="svgContainerVolcano">
               <div className="export-svg ShowBlock">
                 <ButtonActions
                   exportButtonSize={'mini'}
-                  excelVisible={false}
-                  pdfVisible={false}
-                  pngVisible={true}
-                  svgVisible={true}
-                  txtVisible={false}
+                  excelVisible={excelFlagVolcano}
+                  pdfVisible={pdfFlagVolcano}
+                  pngVisible={pngFlagVolcano}
+                  svgVisible={svgFlagVolcano}
+                  txtVisible={txtFlagVolcano}
                   tab={tab}
                   imageInfo={imageInfoVolcano}
                   tabIndex={activeSVGTabIndexVolcanoVar}
@@ -323,7 +335,10 @@ class SVGPlot extends Component {
                 selection
                 compact
                 options={options}
-                value={options[activeSVGTabIndexVolcanoVar]?.value}
+                value={
+                  options[activeSVGTabIndexVolcanoVar]?.value ||
+                  options[0]?.value
+                }
                 onChange={this.handlePlotDropdownChange}
                 className={DropdownClass}
                 id="svgPlotDropdownDifferential"
