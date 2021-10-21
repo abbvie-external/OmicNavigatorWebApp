@@ -5,7 +5,7 @@ import DifferentialBreadcrumbs from './DifferentialBreadcrumbs';
 import ButtonActions from '../Shared/ButtonActions';
 import MetafeaturesTable from './MetafeaturesTable';
 import '../Enrichment/SplitPanesContainer.scss';
-import '../Shared/SVGPlot.scss';
+import './SVGPlot.scss';
 import './DifferentialPlot.scss';
 
 class DifferentialPlot extends PureComponent {

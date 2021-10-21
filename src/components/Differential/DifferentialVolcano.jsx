@@ -4,7 +4,7 @@ import CustomEmptyMessage from '../Shared/Templates';
 // eslint-disable-next-line no-unused-vars
 import QHGrid, { EZGrid } from '../Shared/QHGrid';
 import DifferentialPlot from './DifferentialPlot';
-import SVGPlot from '../Shared/SVGPlot';
+import SVGPlot from './SVGPlot';
 import {
   scrollElement,
   limitLength,
@@ -687,6 +687,7 @@ class DifferentialVolcano extends Component {
       differentialPlotTypes,
       tabsMessage,
       isVolcanoPlotSVGLoaded,
+      differentialFeature,
       differentialFeatureIdKey,
       onGetPlotTransition,
       // isDataStreamingResultsTable,
@@ -860,6 +861,9 @@ class DifferentialVolcano extends Component {
                           }
                         ></DifferentialVolcanoPlot>
                         <SVGPlot
+                          differentialStudy={differentialStudy}
+                          differentialModel={differentialModel}
+                          differentialFeature={differentialFeature}
                           divWidth={differentialDynamicPlotWidth}
                           divHeight={upperPlotsDivHeight}
                           pxToPtRatio={105}
@@ -1021,27 +1025,29 @@ class DifferentialVolcano extends Component {
                           largeScreen={16}
                           widescreen={16}
                         >
-                          <Popup
-                            trigger={
-                              <Icon
-                                name={
-                                  allChecked
-                                    ? 'check square outline'
-                                    : 'square outline'
-                                }
-                                size="large"
-                                id="ToggleAllCheckbox"
-                                className={allChecked ? 'PrimaryColor' : ''}
-                                onClick={this.toggleAllCheckboxes}
-                              />
-                              // <Label circular id="OtherCircle" />
-                            }
-                            style={selectAllPopupStyle}
-                            // content="Row is light orange when the feature is selected"
-                            content={SelectAllPopupContent}
-                            inverted
-                            basic
-                          />
+                          {this.props.modelSpecificMetaFeaturesExist ? (
+                            <Popup
+                              trigger={
+                                <Icon
+                                  name={
+                                    allChecked
+                                      ? 'check square outline'
+                                      : 'square outline'
+                                  }
+                                  size="large"
+                                  id="ToggleAllCheckbox"
+                                  className={allChecked ? 'PrimaryColor' : ''}
+                                  onClick={this.toggleAllCheckboxes}
+                                />
+                                // <Label circular id="OtherCircle" />
+                              }
+                              style={selectAllPopupStyle}
+                              // content="Row is light orange when the feature is selected"
+                              content={SelectAllPopupContent}
+                              inverted
+                              basic
+                            />
+                          ) : null}
                           <EZGrid
                             ref={this.volcanoPlotFilteredGridRef}
                             // uniqueCacheKey={differentialVolcanoCacheKey}
