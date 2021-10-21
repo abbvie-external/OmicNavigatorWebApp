@@ -493,6 +493,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       upperPlotsVisible,
       filteredDifferentialTableData,
       volcanoDifferentialTableRowOutline,
+      isItemSelected,
     } = this.props;
 
     const {
@@ -524,7 +525,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       this.setupVolcano();
       this.hexBinning(differentialResultsUnfiltered);
       this.transitionZoom(dataInCurrentView, false, false, false);
-      if (volcanoPlotVisible && upperPlotsVisible) {
+      if (volcanoPlotVisible && upperPlotsVisible && !isItemSelected) {
         this.setState({ optionsOpen: true });
       }
     } else if (

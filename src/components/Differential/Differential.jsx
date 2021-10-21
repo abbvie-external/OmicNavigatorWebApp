@@ -1335,23 +1335,29 @@ class Differential extends Component {
     //   noPlots && !modelSpecificMetaFeaturesExist
     //     ? 'ViewPlotIconDisabled NoSelect'
     //     : 'ViewPlotIcon NoSelect';
-    const checkboxCol = [
-      {
-        title: '',
-        field: 'select',
-        template: (value, item, addParams) => {
-          return (
-            <div id="ViewPlotCol">
-              <Icon
-                name="square outline"
-                size="large"
-                className="DifferentialResultsRowCheckbox"
-              />
-            </div>
-          );
+
+    let checkboxCol = [];
+    if (modelSpecificMetaFeaturesExist) {
+      checkboxCol = [
+        {
+          title: '',
+          field: 'select',
+          sortAccessor: (item, field) => console.log(item, field),
+          // self.state.volcanoDifferentialTableRowHighlight.contains(item),
+          template: (value, item, addParams) => {
+            return (
+              <div id="ViewPlotCol">
+                <Icon
+                  name="square outline"
+                  size="large"
+                  className="DifferentialResultsRowCheckbox"
+                />
+              </div>
+            );
+          },
         },
-      },
-    ];
+      ];
+    }
 
     const checkboxAndAlphanumericCols = checkboxCol.concat(
       differentialAlphanumericColumnsMapped,
