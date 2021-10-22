@@ -12,6 +12,10 @@ import {
   Button,
   Loader,
   Dimmer,
+  List,
+  Header,
+  Segment,
+  Divider,
 } from 'semantic-ui-react';
 import * as d3 from 'd3';
 import * as hexbin from 'd3-hexbin';
@@ -64,6 +68,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     identifier: null,
     volcanoCircleLabels: [],
     optionsOpen: false,
+    usageOpen: false,
   };
 
   componentDidMount() {
@@ -526,7 +531,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       this.hexBinning(differentialResultsUnfiltered);
       this.transitionZoom(dataInCurrentView, false, false, false);
       if (volcanoPlotVisible && upperPlotsVisible && !isItemSelected) {
-        this.setState({ optionsOpen: true });
+        this.setState({ optionsOpen: true, usageOpen: true });
       }
     } else if (
       !isDataStreamingResultsTable &&
@@ -621,7 +626,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         volcanoPlotVisible !== prevProps.volcanoPlotVisible)
     ) {
       // user closes volcano plot, close options
-      this.setState({ optionsOpen: false });
+      this.setState({ optionsOpen: false, usageOpen: false });
     }
   }
 
@@ -1736,6 +1741,14 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     }
   };
 
+  toggleUsagePopup = (e, obj, close) => {
+    if (close) {
+      this.setState({ usageOpen: false });
+    } else {
+      this.setState({ usageOpen: true });
+    }
+  };
+
   render() {
     const {
       differentialStudy,
@@ -1758,6 +1771,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       allowXTransformation,
       allowYTransformation,
       optionsOpen,
+      usageOpen,
     } = this.state;
 
     const PlotName = `${differentialStudy}_${differentialModel}_${differentialTest}_scatter`;
@@ -1822,12 +1836,12 @@ class DifferentialVolcanoPlot extends React.PureComponent {
             <Popup
               trigger={
                 <Button size="mini" onClick={this.toggleOptionsPopup}>
-                  <Icon name="options" className="ViewPlotInfo" />
+                  <Icon name="options" className="ViewPlotOptions" />
                   OPTIONS
                 </Button>
               }
               // style={StudyPopupStyle}
-              id="CustomTooltip"
+              id="OptionsTooltip"
               position="bottom left"
               basic
               on="click"
@@ -1937,6 +1951,77 @@ class DifferentialVolcanoPlot extends React.PureComponent {
               </Popup.Content>
             </Popup>
           </span>
+          <span
+            id="VolcanoUsagePopup"
+            className={volcanoPlotVisible ? 'Show' : 'Hide'}
+          >
+            <Popup
+              trigger={
+                <Button size="mini" onClick={this.toggleUsagePopup}>
+                  <Icon name="info" className="ViewPlotUsage" />
+                  USAGE GUIDE
+                </Button>
+              }
+              // style={StudyPopupStyle}
+              id="UsageTooltip"
+              position="right center"
+              basic
+              on="click"
+              inverted
+              open={usageOpen}
+              onClose={e => this.toggleUsagePopup(e, null, true)}
+              closeOnDocumentClick
+              closeOnEscape
+              hideOnScroll
+            >
+              <Popup.Content
+                id="VolcanoUsagePopupContent"
+                className={volcanoPlotVisible ? 'Show' : 'Hide'}
+              >
+                <Header as="h4">Scatter Plot Graph Controls</Header>
+                <Divider />
+                <List inverted>
+                  <List.Item>
+                    <Icon name="zoom in" />
+                    <List.Content>
+                      <List.Header>Zoom In</List.Header>
+                      <List.Description>
+                        Click and drag to box select an area
+                      </List.Description>
+                    </List.Content>
+                  </List.Item>
+                  <List.Item>
+                    <Icon name="zoom out" />
+                    <List.Content>
+                      <List.Header>Zoom Out</List.Header>
+                      <List.Description>
+                        Double click on an area without circles
+                      </List.Description>
+                    </List.Content>
+                  </List.Item>
+                  <List.Item>
+                    <Icon name="circle outline" id="OutlinedCircleIcon" />
+                    <List.Content>
+                      <List.Header>Outline a feature</List.Header>
+                      <List.Description>
+                        Click a circle to outline a feature and view plots
+                      </List.Description>
+                    </List.Content>
+                  </List.Item>
+                  <List.Item>
+                    <Icon name="circle" id="SelectedCircleIcon" />
+                    <List.Content>
+                      <List.Header>Select Feature/s</List.Header>
+                      <List.Description>
+                        Control-Click circle/s to add to selection
+                      </List.Description>
+                    </List.Content>
+                  </List.Item>
+                </List>
+              </Popup.Content>
+            </Popup>
+          </span>
+
           <div
             id="VolcanoPlotDiv"
             className={volcanoPlotVisible ? 'Show' : 'Hide'}
