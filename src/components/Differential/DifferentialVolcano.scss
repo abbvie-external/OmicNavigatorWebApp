@@ -228,13 +228,54 @@
   // right: 0 !important;
 }
 
-#CustomTooltip {
+#VolcanoUsagePopup {
+  position: absolute !important;
+  margin-top: 8px;
+  cursor: pointer;
+  z-index: 1111111111 !important;
+  // top: 0 !important;
+  left: 110px !important;
+  // bottom: 0;
+  // left: 0;
+  // margin-bottom: -40px;
+}
+#VolcanoUsagePopupContent {
+  padding-top: 8px !important;
+}
+#OptionsTooltip {
   top: -38px !important;
   left: -265px !important;
   border-bottom: 2px solid var(--color-primary);
   background-color: var(--color-dark) !important;
   padding: 10px 10px 20px 20px;
 }
+
+#UsageTooltip {
+  // top: -38px !important;
+  // left: -265px !important;
+  border-bottom: 2px solid var(--color-primary);
+  background-color: var(--color-dark) !important;
+  padding: 10px 10px 20px 20px;
+  // min-width: 300px;
+  max-width: 350px;
+}
+
+// #OutlinedCircleIcon {
+// color: var(--color-link);
+// background-color: var(--color-white);
+// display: flex;
+// border-radius: 7px;
+// font-size: 14px;
+// border: 2px solid var(--color-link);
+// }
+
+// #SelectedCircleIcon {
+// color: var(--color-primary);
+// display: flex;
+// border-radius: 7px;
+// font-size: 14px;
+// border: 2px solid var(--color-link);
+// }
 
 // #MaxCircle {
 //   background-color: var(--color-primary);
