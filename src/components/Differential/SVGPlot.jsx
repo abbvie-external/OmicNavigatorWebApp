@@ -35,7 +35,7 @@ class SVGPlot extends Component {
     // this.resizeListener = this.resizeListener.bind(this);
     // this.debouncedResizeListener = _.debounce(this.resizeListener, 100);
     this.state = {
-      // activeSVGTabIndexVolcano: 0,
+      activeSVGTabIndexVolcano: 0,
       excelFlagVolcano: true,
       pngFlagVolcano: true,
       pdfFlagVolcano: false,
@@ -62,6 +62,7 @@ class SVGPlot extends Component {
         prevProps.volcanoWidth !== this.props.volcanoWidth ||
         prevProps.upperPlotsHeight !== this.props.upperPlotsHeight)
     ) {
+      debugger;
       this.getSVGPanes();
     }
     if (prevState.activeSVGTabIndexVolcano !== activeSVGTabIndexVolcano) {
@@ -190,9 +191,19 @@ class SVGPlot extends Component {
       panes = panes.concat(metafeaturesTab);
       // }
     }
+    const singleFeaturePlotTypes = this.props.differentialPlotTypes.filter(
+      p => !p.plotType.includes('multiFeature'),
+    );
+    // check for when user is on feature data option, then moves to multi-feature, the index doesn't stay on feature data, but rather moves to 0
+    const index =
+      isMultifeaturePlot &&
+      this.state.activeSVGTabIndexVolcano >= singleFeaturePlotTypes.length
+        ? 0
+        : this.state.activeSVGTabIndexVolcano;
     this.setState({
       isSVGReadyVolcano: true,
       svgPanes: panes,
+      activeSVGTabIndexVolcano: index,
     });
   };
 
