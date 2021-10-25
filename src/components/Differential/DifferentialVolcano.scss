@@ -236,6 +236,33 @@
   // right: 0 !important;
 }
 
+#FullScreenButton,
+#FeaturesListButton {
+  position: absolute !important;
+  margin-top: 8px;
+  // margin-left: 50px;
+  cursor: pointer;
+  // z-index: 1111111111 !important;
+  // top: 0 !important;
+  // right: 0 !important;
+}
+
+#FeaturesListButton {
+  left: 220px;
+}
+
+#FullScreenButton {
+  left: 340px;
+}
+
+#FeaturesListTooltip {
+  top: 5px !important;
+  left: -210px !important;
+  border-bottom: 2px solid var(--color-primary);
+  background-color: var(--color-dark) !important;
+  padding: 10px 10px 20px 20px;
+}
+
 #VolcanoUsagePopup {
   position: absolute !important;
   margin-top: 8px;

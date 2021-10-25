@@ -10,6 +10,9 @@ import {
   Label,
   Button,
   Dropdown,
+  List,
+  Segment,
+  Grid,
 } from 'semantic-ui-react';
 import SVG from 'react-inlinesvg';
 import {
@@ -29,23 +32,18 @@ const maxWidthPopupStyle = {
   maxWidth: '15vw',
   fontSize: '13px',
 };
+
 class SVGPlot extends Component {
-  constructor(props) {
-    super(props);
-    // this.resizeListener = this.resizeListener.bind(this);
-    // this.debouncedResizeListener = _.debounce(this.resizeListener, 100);
-    this.state = {
-      activeSVGTabIndexVolcano: 0,
-      excelFlagVolcano: true,
-      pngFlagVolcano: true,
-      pdfFlagVolcano: false,
-      svgFlagVolcano: true,
-      txtFlagVolcano: false,
-    };
-  }
-
+  state = {
+    activeSVGTabIndexVolcano: 0,
+    excelFlagVolcano: true,
+    pngFlagVolcano: true,
+    pdfFlagVolcano: false,
+    svgFlagVolcano: true,
+    txtFlagVolcano: false,
+    featuresListOpen: false,
+  };
   metaFeaturesTableDynamicRef = React.createRef();
-
   componentDidMount() {
     const { activeSVGTabIndexVolcano } = this.state;
     this.setButtonVisibility(activeSVGTabIndexVolcano);
@@ -114,6 +112,101 @@ class SVGPlot extends Component {
   //   this.props.onFindDifferentialFeature(test, featureID);
   // };
 
+  toggleFeaturesListPopup = (e, obj, close) => {
+    debugger;
+    if (close) {
+      this.setState({ featuresListOpen: false });
+    } else {
+      this.setState({ featuresListOpen: true });
+    }
+  };
+
+  getFeaturesList = () => {
+    let features = [...this.props.HighlightedFeaturesArrVolcano].map(
+      m => m.key,
+    );
+    const featuresListPopupStyle = {
+      // minWidth: this.props.divWidth * 0.9,
+      minWidth: 'max-content',
+      maxWidth: this.props.divWidth * 0.9,
+    };
+    let list = (
+      <List
+        id={
+          !this.props.volcanoPlotVisible
+            ? 'FeaturesListHorizontal'
+            : 'FeaturesListVertical'
+        }
+        className="NoSelect"
+        style={featuresListPopupStyle}
+        divided
+        // divided={!this.props.volcanoPlotVisible}
+        horizontal
+        size="mini"
+      >
+        <List.Item className="NoSelect">
+          <Label>
+            CLEAR ALL <Icon name="trash" />
+          </Label>
+        </List.Item>
+        {features.map(f => {
+          return (
+            <List.Item key={`featureList-${f}`} className="NoSelect">
+              <Label>
+                {f}
+                <Icon name="delete" />
+              </Label>
+            </List.Item>
+          );
+        })}
+      </List>
+    );
+
+    let div = this.props.volcanoPlotVisible ? (
+      <span id="FeaturesListButton">
+        <Popup
+          trigger={
+            <Button size="mini" onClick={this.toggleFeaturesListPopup}>
+              <Icon name="setting" />
+              {this.props.featuresLength} FEATURES
+            </Button>
+          }
+          // style={StudyPopupStyle}
+          id="FeaturesListTooltip"
+          basic
+          on="click"
+          inverted
+          open={this.state.featuresListOpen}
+          onClose={e => this.toggleFeaturesListPopup(e, null, true)}
+          closeOnDocumentClick
+          closeOnEscape
+          hideOnScroll
+        >
+          <Popup.Content id="FeaturesListPopupContent">
+            {/* <Grid>
+              <Grid.Row>
+                <Grid.Column
+                  className="VolcanoPlotFilters"
+                  id="xAxisSelector"
+                  mobile={14}
+                  tablet={14}
+                  computer={14}
+                  largeScreen={14}
+                  widescreen={14}
+                > */}
+            {list}
+            {/* </Grid.Column>
+              </Grid.Row>
+            </Grid> */}
+          </Popup.Content>
+        </Popup>
+      </span>
+    ) : (
+      list
+    );
+    return div;
+  };
+
   getSVGPanes = () => {
     const {
       imageInfoVolcano,
@@ -124,6 +217,8 @@ class SVGPlot extends Component {
       imageInfoVolcanoLength,
     } = this.props;
     let panes = [];
+    debugger;
+
     if (imageInfoVolcanoLength !== 0) {
       let dimensions = '';
       if (divWidth && divHeight && pxToPtRatio) {
@@ -308,6 +403,10 @@ class SVGPlot extends Component {
             ];
             options = [...options, ...metafeaturesDropdown];
           }
+          let featuresList = null;
+          if (imageInfoVolcano?.key?.includes('features')) {
+            featuresList = this.getFeaturesList();
+          }
           return (
             <div className="svgContainerVolcano">
               <div className="export-svg ShowBlock">
@@ -363,25 +462,24 @@ class SVGPlot extends Component {
                 onTabChange={this.handleTabChange}
                 activeIndex={activeSVGTabIndexVolcano}
               />
-              {this.props.tab === 'differential' ? (
-                <span id="VolcanoOptionsPopup">
-                  {/* <Popup
+              {featuresList}
+              <span id="FullScreenButton">
+                {/* <Popup
                   trigger={ */}
-                  <Button size="mini" onClick={this.handlePlotOverlay}>
-                    <Icon
-                      // name="expand"
-                      name="expand arrows alternate"
-                      className=""
-                    />
-                    FULL SCREEN
-                  </Button>
-                  {/* }
+                <Button size="mini" onClick={this.handlePlotOverlay}>
+                  <Icon
+                    // name="expand"
+                    name="expand arrows alternate"
+                    className=""
+                  />
+                  FULL SCREEN
+                </Button>
+                {/* }
                   style={PopupStyle}
                   content="View Larger"
                   basic
                 /> */}
-                </span>
-              ) : null}
+              </span>
               {/* <Icon
               name="bullseye"
               size="large"

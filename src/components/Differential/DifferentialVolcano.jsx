@@ -789,7 +789,7 @@ class DifferentialVolcano extends Component {
     const SelectAllPopupContent = (
       <List inverted>
         <List.Item>
-          <Icon name="check square" />
+          <Icon name="square outline" />
           <List.Content>
             <List.Header>Select All</List.Header>
             <List.Description>
@@ -915,6 +915,7 @@ class DifferentialVolcano extends Component {
                           HighlightedFeaturesArrVolcano={
                             HighlightedFeaturesArrVolcano
                           }
+                          featuresLength={featuresLength}
                           differentialFeatureIdKey={differentialFeatureIdKey}
                           onGetPlotTransitionRef={onGetPlotTransition}
                           onGetMultifeaturePlotTransitionRef={
@@ -1081,7 +1082,11 @@ class DifferentialVolcano extends Component {
                             <Popup
                               trigger={
                                 <Icon
-                                  name={allChecked ? 'check square' : 'square'}
+                                  name={
+                                    allChecked
+                                      ? 'check square'
+                                      : 'square outline'
+                                  }
                                   size="large"
                                   id="ToggleAllCheckbox"
                                   className={allChecked ? 'PrimaryColor' : ''}
