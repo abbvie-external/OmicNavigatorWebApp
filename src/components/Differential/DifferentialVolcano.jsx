@@ -24,6 +24,7 @@ import {
   // Transition,
   Icon,
   Button,
+  List,
 } from 'semantic-ui-react';
 // import VolcanoPlotIcon from '../../resources/VolcanoPlotIcon.png';
 // import VolcanoPlotIconSelected from '../../resources/VolcanoPlotIconSelected.png';
@@ -786,13 +787,35 @@ class DifferentialVolcano extends Component {
       this.volcanoPlotFilteredGridRef?.current?.qhGridRef?.current?.getSortedData() ||
       differentialResults;
     const SelectAllPopupContent = (
-      <span>
-        Click here to select/deselect all checkboxes
-        <br />
-        Click a checkbox to select/deselect it
-        <br />
-        Control-Click or Shift-Click a ROW to multi-select/mulit-deselect
-      </span>
+      <List inverted>
+        <List.Item>
+          <Icon name="check square" />
+          <List.Content>
+            <List.Header>Select All</List.Header>
+            <List.Description>
+              Click here to select/deselect all checkboxes
+            </List.Description>
+          </List.Content>
+        </List.Item>
+        <List.Item>
+          <Icon name="check square outline" />
+          <List.Content>
+            <List.Header>Select One</List.Header>
+            <List.Description>
+              Click a checkbox to select/deselect it
+            </List.Description>
+          </List.Content>
+        </List.Item>
+        <List.Item>
+          <Icon name="keyboard" id="SelectedCircleIcon" />
+          <List.Content>
+            <List.Header>Select Multiple</List.Header>
+            <List.Description>
+              Control-Click or Shift-Click a ROW to multi-select/mulit-deselect
+            </List.Description>
+          </List.Content>
+        </List.Item>
+      </List>
     );
     const multiFeaturePlotDisabled =
       !HasMultifeaturePlots ||
@@ -1058,11 +1081,7 @@ class DifferentialVolcano extends Component {
                             <Popup
                               trigger={
                                 <Icon
-                                  name={
-                                    allChecked
-                                      ? 'check square outline'
-                                      : 'square outline'
-                                  }
+                                  name={allChecked ? 'check square' : 'square'}
                                   size="large"
                                   id="ToggleAllCheckbox"
                                   className={allChecked ? 'PrimaryColor' : ''}
