@@ -19,6 +19,9 @@
 .CursorNotAllowed {
   cursor: not-allowed !important;
 }
+#CursorNotAllowed {
+  cursor: not-allowed !important;
+}
 .PlotInstructions {
   height: 100%;
 }
@@ -189,7 +192,7 @@
   z-index: 2 !important;
 }
 
-.MultifeaturePlotBtnDiv {
+.MultiFeaturePlotBtnDiv {
   position: absolute;
   // right: 50% !important;
   margin-top: 13px;
@@ -199,13 +202,11 @@
   //   font-size: 13px !important;
   //   height: 28px !important;
   // }
-
-  // .MultiFeaturePlotDetail {
-  //   background-color: #1678c2 !important;
-  //   color: white !important;
-  // }
 }
-
+.MultiFeaturePlotBtnActive {
+  background-color: var(--color-primary) !important;
+  color: white !important;
+}
 // .ui.visible.overlay.sidebar {
 //   transition: transform 0.5s step-end 0.1s !important;
 // }

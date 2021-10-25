@@ -843,7 +843,10 @@ class Differential extends Component {
   }
 
   handleMultifeaturePlot = (view, tableData) => {
-    const { HighlightedFeaturesArrVolcano } = this.state;
+    const {
+      HighlightedFeaturesArrVolcano,
+      volcanoDifferentialTableRowOutline,
+    } = this.state;
     const { differentialFeatureIdKey } = this.props;
     let data =
       HighlightedFeaturesArrVolcano.length > 0
@@ -858,9 +861,11 @@ class Differential extends Component {
         data = [...data.slice(0, this.state.multifeaturePlotMax)];
       }
       const featureIds = data.map(featureId => featureId[key]);
+      // if (!featureIds.includes(volcanoDifferentialTableRowOutline)) {
       this.setState({
         volcanoDifferentialTableRowOutline: '',
       });
+      // }
       const returnSVG = view === 'Differential' ? true : false;
       if (returnSVG) {
         this.getMultifeaturePlotTransition(featureIds, false, 0);

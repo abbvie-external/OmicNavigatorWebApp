@@ -1978,8 +1978,8 @@ class DifferentialVolcanoPlot extends React.PureComponent {
                 id="VolcanoUsagePopupContent"
                 className={volcanoPlotVisible ? 'Show' : 'Hide'}
               >
-                <Header as="h4">Scatter Plot Graph Controls</Header>
-                <Divider />
+                {/* <Header as="h4">Scatter Plot Controls</Header>
+                <Divider /> */}
                 <List inverted>
                   <List.Item>
                     <Icon name="zoom in" />

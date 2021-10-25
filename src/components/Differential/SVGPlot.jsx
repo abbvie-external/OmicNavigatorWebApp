@@ -62,7 +62,6 @@ class SVGPlot extends Component {
         prevProps.volcanoWidth !== this.props.volcanoWidth ||
         prevProps.upperPlotsHeight !== this.props.upperPlotsHeight)
     ) {
-      debugger;
       this.getSVGPanes();
     }
     if (prevState.activeSVGTabIndexVolcano !== activeSVGTabIndexVolcano) {

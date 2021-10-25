@@ -23,6 +23,7 @@ import {
   // Button,
   // Transition,
   Icon,
+  Button,
 } from 'semantic-ui-react';
 // import VolcanoPlotIcon from '../../resources/VolcanoPlotIcon.png';
 // import VolcanoPlotIconSelected from '../../resources/VolcanoPlotIconSelected.png';
@@ -792,6 +793,13 @@ class DifferentialVolcano extends Component {
         Control-Click or Shift-Click a ROW to multi-select/mulit-deselect
       </span>
     );
+    const multiFeaturePlotDisabled =
+      !HasMultifeaturePlots ||
+      // isDataStreamingResultsTable ||
+      HighlightedFeaturesArrVolcano.length === 1 ||
+      featuresLength === 1;
+    const isMultifeaturePlot =
+      this.props.imageInfoVolcano?.key?.includes('features') || false;
     return (
       <Grid.Column
         className=""
@@ -928,14 +936,27 @@ class DifferentialVolcano extends Component {
                             // isDataStreamingResultsTable ||
                             HighlightedFeaturesArrVolcano.length === 1 ||
                             featuresLength === 1
-                              ? 'MultifeaturePlotBtnDiv Hide'
-                              : 'MultifeaturePlotBtnDiv Show'
+                              ? 'MultiFeaturePlotBtnDiv '
+                              : 'MultiFeaturePlotBtnDiv'
                           }
                         >
                           <Popup
                             trigger={
                               <Label
-                                className="MultiFeaturePlotBtn NoSelect"
+                                as={Button}
+                                disabled={multiFeaturePlotDisabled}
+                                id={
+                                  multiFeaturePlotDisabled
+                                    ? 'CursorNotAllowed'
+                                    : ''
+                                }
+                                // className="MultiFeaturePlotBtn NoSelect"
+                                className={
+                                  isMultifeaturePlot &&
+                                  !multiFeaturePlotDisabled
+                                    ? 'MultiFeaturePlotBtn NoSelect MultiFeaturePlotBtnActive'
+                                    : 'MultiFeaturePlotBtn NoSelect'
+                                }
                                 // size={dynamicSizeLarger}
                                 // color="blue"
                                 // image
@@ -945,7 +966,14 @@ class DifferentialVolcano extends Component {
                                 }
                               >
                                 MULTI-FEATURE PLOT
-                                <Label.Detail className="MultiFeaturePlotDetail">
+                                <Label.Detail
+                                // className={
+                                //   isMultifeaturePlot &&
+                                //   !multiFeaturePlotDisabled
+                                //     ? 'MultifeaturePlotDetailActive'
+                                //     : 'MultiFeaturePlotDetail'
+                                // }
+                                >
                                   {featuresLength}
                                 </Label.Detail>
                               </Label>
