@@ -798,8 +798,8 @@ class DifferentialVolcano extends Component {
       // isDataStreamingResultsTable ||
       HighlightedFeaturesArrVolcano.length === 1 ||
       featuresLength === 1;
-    const isMultifeaturePlot =
-      this.props.imageInfoVolcano?.key?.includes('features') || false;
+    // const isMultifeaturePlot =
+    //   this.props.imageInfoVolcano?.key?.includes('features') || false;
     return (
       <Grid.Column
         className=""
@@ -932,12 +932,9 @@ class DifferentialVolcano extends Component {
                         </span>
                         <div
                           className={
-                            !HasMultifeaturePlots ||
-                            // isDataStreamingResultsTable ||
-                            HighlightedFeaturesArrVolcano.length === 1 ||
-                            featuresLength === 1
-                              ? 'MultiFeaturePlotBtnDiv '
-                              : 'MultiFeaturePlotBtnDiv'
+                            HasMultifeaturePlots
+                              ? 'MultiFeaturePlotBtnDiv Show'
+                              : 'MultiFeaturePlotBtnDiv Hide'
                           }
                         >
                           <Popup
@@ -950,13 +947,12 @@ class DifferentialVolcano extends Component {
                                     ? 'CursorNotAllowed'
                                     : ''
                                 }
-                                // className="MultiFeaturePlotBtn NoSelect"
-                                className={
-                                  isMultifeaturePlot &&
-                                  !multiFeaturePlotDisabled
-                                    ? 'MultiFeaturePlotBtn NoSelect MultiFeaturePlotBtnActive'
-                                    : 'MultiFeaturePlotBtn NoSelect'
-                                }
+                                className="MultiFeaturePlotBtn NoSelect"
+                                // className={
+                                //   isMultifeaturePlot
+                                //     ? 'MultiFeaturePlotBtn NoSelect MultiFeaturePlotBtnActive'
+                                //     : 'MultiFeaturePlotBtn NoSelect MultiFeaturePlotBtnOutline'
+                                // }
                                 // size={dynamicSizeLarger}
                                 // color="blue"
                                 // image
@@ -1047,13 +1043,17 @@ class DifferentialVolcano extends Component {
                         </div>
                         <Grid.Column
                           className="ResultsTableWrapper"
-                          id="DifferentialResultsTableWrapper"
+                          id={
+                            HasMultifeaturePlots
+                              ? 'DifferentialResultsTableWrapperCheckboxes'
+                              : 'DifferentialResultsTableWrapper'
+                          }
                           mobile={16}
                           tablet={16}
                           largeScreen={16}
                           widescreen={16}
                         >
-                          {this.props.modelSpecificMetaFeaturesExist ? (
+                          {HasMultifeaturePlots ? (
                             <Popup
                               trigger={
                                 <Icon

@@ -203,9 +203,16 @@
   //   height: 28px !important;
   // }
 }
+
+.MultiFeaturePlotBtnOutline {
+  border: 2px solid var(--color-link) !important;
+  color: var(--color-link) !important;
+  background-color: var(--color-white) !important;
+}
 .MultiFeaturePlotBtnActive {
-  background-color: var(--color-primary) !important;
-  color: white !important;
+  border: 2px solid var(--color-primary) !important;
+  color: var(--color-primary) !important;
+  background-color: var(--color-white) !important;
 }
 // .ui.visible.overlay.sidebar {
 //   transition: transform 0.5s step-end 0.1s !important;

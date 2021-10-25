@@ -85,14 +85,7 @@
     }
   }
 
-  #DifferentialResultsTableWrapper {
-    .QHGrid table {
-      border-collapse: collapse;
-      tr {
-        cursor: pointer !important;
-      }
-    }
-
+  #DifferentialResultsTableWrapperCheckboxes {
     .ui.celled.table tr td:first-child,
     .ui.celled.table tr th:first-child {
       min-width: 25px !important;
@@ -104,10 +97,19 @@
       min-width: 40px !important;
       max-width: 40px !important;
     }
+  }
 
-    .QHGrid--generalSearch:nth-child(1) {
-      margin-left: 0px !important;
-      // margin-top: -3px !important;
+  #DifferentialResultsTableWrapperCheckboxes,
+  #DifferentialResultsTableWrapper {
+    .QHGrid table {
+      border-collapse: collapse;
+      tr {
+        cursor: pointer !important;
+      }
+      .QHGrid--generalSearch:nth-child(1) {
+        margin-left: 0px !important;
+        // margin-top: -3px !important;
+      }
     }
   }
 
