@@ -595,14 +595,15 @@ class DifferentialVolcano extends Component {
           ),
       });
     } else {
-      let sortedData =
-        this.volcanoPlotFilteredGridRef?.current?.qhGridRef?.current?.getSortedData() ||
-        differentialResults;
+      // let sortedData =
+      //   this.volcanoPlotFilteredGridRef?.current?.qhGridRef?.current?.getSortedData() ||
+      //   differentialResults;
       this.setState({
-        featuresLength: limitLength(
-          sortedData?.length,
-          this.props.multifeaturePlotMax,
-        ),
+        featuresLength: 0,
+        // featuresLength: limitLength(
+        //   sortedData?.length,
+        //   this.props.multifeaturePlotMax,
+        // ),
       });
     }
   };
@@ -796,8 +797,8 @@ class DifferentialVolcano extends Component {
     const multiFeaturePlotDisabled =
       !HasMultifeaturePlots ||
       // isDataStreamingResultsTable ||
-      HighlightedFeaturesArrVolcano.length === 1 ||
-      featuresLength === 1;
+      HighlightedFeaturesArrVolcano.length <= 1 ||
+      featuresLength <= 1;
     // const isMultifeaturePlot =
     //   this.props.imageInfoVolcano?.key?.includes('features') || false;
     return (
