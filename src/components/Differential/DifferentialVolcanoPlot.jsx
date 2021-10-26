@@ -438,17 +438,22 @@ class DifferentialVolcanoPlot extends React.PureComponent {
             }
           } else {
             // simple dot click
-            this.props.onHandleDotClick(
-              e,
-              [JSON.parse(elem._groups[0][0].attributes.data.value)],
-              0,
-              false,
-              true,
-              elem,
-            );
-            // this.setState({
-            //   clickedElements: [elem._groups[0][0]],
-            // });
+            if (elem.attr('class').endsWith('outlined')) {
+              // already outlined
+              this.props.onClearPlotSelected();
+            } else {
+              this.props.onHandleDotClick(
+                e,
+                [JSON.parse(elem._groups[0][0].attributes.data.value)],
+                0,
+                false,
+                true,
+                elem,
+              );
+              // this.setState({
+              //   clickedElements: [elem._groups[0][0]],
+              // });
+            }
           }
         });
       this.highlightBrushedCircles();

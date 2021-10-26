@@ -113,7 +113,6 @@ class SVGPlot extends Component {
   // };
 
   toggleFeaturesListPopup = (e, obj, close) => {
-    debugger;
     if (close) {
       this.setState({ featuresListOpen: false });
     } else {
@@ -217,8 +216,6 @@ class SVGPlot extends Component {
       imageInfoVolcanoLength,
     } = this.props;
     let panes = [];
-    debugger;
-
     if (imageInfoVolcanoLength !== 0) {
       let dimensions = '';
       if (divWidth && divHeight && pxToPtRatio) {

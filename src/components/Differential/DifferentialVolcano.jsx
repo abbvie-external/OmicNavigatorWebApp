@@ -275,6 +275,7 @@ class DifferentialVolcano extends Component {
     doNotUnhighlight,
     simpleClick,
     elem,
+    removedOutlined,
   ) => {
     const { differentialFeatureIdKey } = this.props;
     if (simpleClick) {
@@ -891,6 +892,7 @@ class DifferentialVolcano extends Component {
                           onHandleVolcanoCurrentSelection={
                             this.handleVolcanoCurrentSelection
                           }
+                          onClearPlotSelected={this.props.onClearPlotSelected}
                         ></DifferentialVolcanoPlot>
                         <SVGPlot
                           differentialStudy={differentialStudy}
