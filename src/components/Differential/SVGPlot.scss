@@ -42,9 +42,10 @@
 }
 
 .export-svg {
-  margin: 0px 30px 5px 0px !important;
+  // margin: 0px 30px 5px 0px !important;
   position: absolute !important;
-  right: 30px !important;
+  right: 0px !important;
+  top: 3px;
 }
 
 // .TwoPlotsDiv {
@@ -74,8 +75,8 @@
 }
 
 #svgPlotDropdownDifferential {
-  left: 90px !important;
-  top: 0px;
+  left: -35px !important;
+  top: 8px;
 }
 
 .VolcanoPlotToggle {
@@ -97,3 +98,17 @@
 // border: 2px solid var(--color-primary);
 // border-radius: 15px;
 // }
+
+.ClearAllFeatures {
+  background-color: var(--color-primary) !important;
+  color: var(--color-light) !important;
+}
+
+#MoreThanTenText {
+  margin-left: 20px;
+  font-size: 14px;
+}
+
+.FullScreenPadding {
+  padding-right: 9px !important;
+}

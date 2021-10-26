@@ -10,6 +10,9 @@ import {
   Label,
   Button,
   Dropdown,
+  List,
+  Segment,
+  Grid,
 } from 'semantic-ui-react';
 import SVG from 'react-inlinesvg';
 import {
@@ -29,23 +32,18 @@ const maxWidthPopupStyle = {
   maxWidth: '15vw',
   fontSize: '13px',
 };
+
 class SVGPlot extends Component {
-  constructor(props) {
-    super(props);
-    // this.resizeListener = this.resizeListener.bind(this);
-    // this.debouncedResizeListener = _.debounce(this.resizeListener, 100);
-    this.state = {
-      // activeSVGTabIndexVolcano: 0,
-      excelFlagVolcano: true,
-      pngFlagVolcano: true,
-      pdfFlagVolcano: false,
-      svgFlagVolcano: true,
-      txtFlagVolcano: false,
-    };
-  }
-
+  state = {
+    activeSVGTabIndexVolcano: 0,
+    excelFlagVolcano: true,
+    pngFlagVolcano: true,
+    pdfFlagVolcano: false,
+    svgFlagVolcano: true,
+    txtFlagVolcano: false,
+    featuresListOpen: false,
+  };
   metaFeaturesTableDynamicRef = React.createRef();
-
   componentDidMount() {
     const { activeSVGTabIndexVolcano } = this.state;
     this.setButtonVisibility(activeSVGTabIndexVolcano);
@@ -114,6 +112,124 @@ class SVGPlot extends Component {
   //   this.props.onFindDifferentialFeature(test, featureID);
   // };
 
+  toggleFeaturesListPopup = (e, obj, close) => {
+    if (close) {
+      this.setState({ featuresListOpen: false });
+    } else {
+      this.setState({ featuresListOpen: true });
+    }
+  };
+
+  clearAll = () => {
+    this.setState({
+      featuresListOpen: false,
+    });
+    this.props.onHandleSelectedVolcano([], false);
+    this.props.onClearPlotSelected();
+  };
+
+  getFeaturesList = () => {
+    const {
+      featuresLength,
+      divWidth,
+      HighlightedFeaturesArrVolcano,
+    } = this.props;
+    let features = [];
+    if (featuresLength > 10) {
+      let shortenedArr = [...HighlightedFeaturesArrVolcano].slice(0, 10);
+      features = shortenedArr.map(m => m.key);
+    } else {
+      features = [...HighlightedFeaturesArrVolcano].map(m => m.key);
+    }
+    const featuresListHorizontalStyle = {
+      minWidth: divWidth * 0.9,
+      maxWidth: divWidth * 0.9,
+    };
+
+    let list = (
+      <List
+        animated
+        inverted
+        verticalAlign="middle"
+        id="FeaturesListHorizontal"
+        className="NoSelect"
+        style={featuresListHorizontalStyle}
+        divided
+        horizontal
+        size="mini"
+      >
+        <List.Item className="NoSelect">
+          <Label
+            className="PrimaryBackground CursorPointer"
+            onClick={this.clearAll}
+          >
+            CLEAR ALL <Icon name="trash" />
+          </Label>
+          {featuresLength > 10 ? (
+            <span id="MoreThanTenText">{featuresLength} features selected</span>
+          ) : null}
+        </List.Item>
+        {featuresLength > 10
+          ? null
+          : features.map(f => {
+              return (
+                <List.Item key={`featureList-${f}`} className="NoSelect">
+                  <Label
+                    className="CursorPointer"
+                    onClick={() => this.props.onRemoveSelectedFeature(f)}
+                  >
+                    {f}
+                    <Icon name="delete" />
+                  </Label>
+                </List.Item>
+              );
+            })}
+      </List>
+    );
+
+    let div = (
+      <span id={divWidth >= 675 ? 'FeaturesListButton' : 'FeaturesListIcon'}>
+        <Popup
+          trigger={
+            <Button size="mini" onClick={this.toggleFeaturesListPopup}>
+              <Icon name="setting" />
+              {featuresLength} {divWidth >= 675 ? 'FEATURES' : ''}
+            </Button>
+          }
+          // style={StudyPopupStyle}
+          id="FeaturesListTooltip"
+          basic
+          on="click"
+          inverted
+          open={this.state.featuresListOpen}
+          onClose={e => this.toggleFeaturesListPopup(e, null, true)}
+          closeOnDocumentClick
+          closeOnEscape
+          hideOnScroll
+        >
+          <Popup.Content id="FeaturesListPopupContent">
+            {/* <Grid>
+              <Grid.Row>
+                <Grid.Column
+                  className="VolcanoPlotFilters"
+                  id="xAxisSelector"
+                  mobile={14}
+                  tablet={14}
+                  computer={14}
+                  largeScreen={14}
+                  widescreen={14}
+                > */}
+            {list}
+            {/* </Grid.Column>
+              </Grid.Row>
+            </Grid> */}
+          </Popup.Content>
+        </Popup>
+      </span>
+    );
+    return div;
+  };
+
   getSVGPanes = () => {
     const {
       imageInfoVolcano,
@@ -122,6 +238,10 @@ class SVGPlot extends Component {
       pxToPtRatio,
       pointSize,
       imageInfoVolcanoLength,
+      modelSpecificMetaFeaturesExist,
+      differentialStudy,
+      differentialModel,
+      isItemSVGLoaded,
     } = this.props;
     let panes = [];
     if (imageInfoVolcanoLength !== 0) {
@@ -163,11 +283,8 @@ class SVGPlot extends Component {
       panes = panes.concat(svgPanes);
     }
     const isMultifeaturePlot =
-      this.props.imageInfoVolcano.key?.includes('features') || false;
-    if (
-      this.props.modelSpecificMetaFeaturesExist !== false &&
-      !isMultifeaturePlot
-    ) {
+      imageInfoVolcano.key?.includes('features') || false;
+    if (modelSpecificMetaFeaturesExist !== false && !isMultifeaturePlot) {
       let metafeaturesTab = [
         {
           menuItem: 'Feature Data',
@@ -175,13 +292,11 @@ class SVGPlot extends Component {
             <Tab.Pane attached="true" as="div">
               <MetafeaturesTableDynamic
                 ref={this.metaFeaturesTableDynamicRef}
-                differentialStudy={this.props.differentialStudy}
-                differentialModel={this.props.differentialModel}
-                isItemSVGLoaded={this.props.isItemSVGLoaded}
-                imageInfoVolcano={this.props.imageInfoVolcano}
-                modelSpecificMetaFeaturesExist={
-                  this.props.modelSpecificMetaFeaturesExist
-                }
+                differentialStudy={differentialStudy}
+                differentialModel={differentialModel}
+                isItemSVGLoaded={isItemSVGLoaded}
+                imageInfoVolcano={imageInfoVolcano}
+                modelSpecificMetaFeaturesExist={modelSpecificMetaFeaturesExist}
               />
             </Tab.Pane>
           ),
@@ -190,9 +305,19 @@ class SVGPlot extends Component {
       panes = panes.concat(metafeaturesTab);
       // }
     }
+    const singleFeaturePlotTypes = this.props.differentialPlotTypes.filter(
+      p => !p.plotType.includes('multiFeature'),
+    );
+    // check for when user is on feature data option, then moves to multi-feature, the index doesn't stay on feature data, but rather moves to 0
+    const index =
+      isMultifeaturePlot &&
+      this.state.activeSVGTabIndexVolcano >= singleFeaturePlotTypes.length
+        ? 0
+        : this.state.activeSVGTabIndexVolcano;
     this.setState({
       isSVGReadyVolcano: true,
       svgPanes: panes,
+      activeSVGTabIndexVolcano: index,
     });
   };
 
@@ -237,6 +362,7 @@ class SVGPlot extends Component {
       upperPlotsVisible,
       svgExportName,
       tab,
+      divWidth,
     } = this.props;
 
     const {
@@ -298,6 +424,10 @@ class SVGPlot extends Component {
             ];
             options = [...options, ...metafeaturesDropdown];
           }
+          let featuresList = null;
+          if (imageInfoVolcano?.key?.includes('features')) {
+            featuresList = this.getFeaturesList();
+          }
           return (
             <div className="svgContainerVolcano">
               <div className="export-svg ShowBlock">
@@ -353,25 +483,30 @@ class SVGPlot extends Component {
                 onTabChange={this.handleTabChange}
                 activeIndex={activeSVGTabIndexVolcano}
               />
-              {this.props.tab === 'differential' ? (
-                <span id="VolcanoOptionsPopup">
-                  {/* <Popup
+              {featuresList}
+              <span
+                id={divWidth >= 675 ? 'FullScreenButton' : 'FullScreenIcon'}
+              >
+                {/* <Popup
                   trigger={ */}
-                  <Button size="mini" onClick={this.handlePlotOverlay}>
-                    <Icon
-                      // name="expand"
-                      name="expand arrows alternate"
-                      className=""
-                    />
-                    FULL SCREEN
-                  </Button>
-                  {/* }
+                <Button
+                  size="mini"
+                  onClick={this.handlePlotOverlay}
+                  className={divWidth >= 675 ? '' : 'FullScreenPadding'}
+                >
+                  <Icon
+                    // name="expand"
+                    name="expand arrows alternate"
+                    className=""
+                  />
+                  {divWidth >= 675 ? 'FULL SCREEN' : ''}
+                </Button>
+                {/* }
                   style={PopupStyle}
                   content="View Larger"
                   basic
                 /> */}
-                </span>
-              ) : null}
+              </span>
               {/* <Icon
               name="bullseye"
               size="large"

@@ -843,7 +843,10 @@ class Differential extends Component {
   }
 
   handleMultifeaturePlot = (view, tableData) => {
-    const { HighlightedFeaturesArrVolcano } = this.state;
+    const {
+      HighlightedFeaturesArrVolcano,
+      // volcanoDifferentialTableRowOutline,
+    } = this.state;
     const { differentialFeatureIdKey } = this.props;
     let data =
       HighlightedFeaturesArrVolcano.length > 0
@@ -858,9 +861,11 @@ class Differential extends Component {
         data = [...data.slice(0, this.state.multifeaturePlotMax)];
       }
       const featureIds = data.map(featureId => featureId[key]);
+      // if (!featureIds.includes(volcanoDifferentialTableRowOutline)) {
       this.setState({
         volcanoDifferentialTableRowOutline: '',
       });
+      // }
       const returnSVG = view === 'Differential' ? true : false;
       if (returnSVG) {
         this.getMultifeaturePlotTransition(featureIds, false, 0);
@@ -1139,6 +1144,15 @@ class Differential extends Component {
     });
   };
 
+  hasMultifeaturePlots = () => {
+    if (this.state.differentialPlotTypes) {
+      const plotTypesMapped = this.state.differentialPlotTypes.map(
+        p => p.plotType,
+      );
+      return plotTypesMapped.includes('multiFeature') || false;
+    } else return false;
+  };
+
   getConfigCols = testData => {
     const differentialResultsVar = testData.differentialResults;
     const { differentialFeature } = this.props;
@@ -1251,6 +1265,7 @@ class Differential extends Component {
               }
             }
             if (f === alphanumericTrigger) {
+              const popupContent = `View plots for feature ${value}`;
               const featureIdClass =
                 noPlots && !modelSpecificMetaFeaturesExist
                   ? 'TableCellBold NoSelect'
@@ -1269,7 +1284,7 @@ class Differential extends Component {
                     }
                     style={TableValuePopupStyle}
                     className="TablePopupValue"
-                    content={`View plots for feature ${value}`}
+                    content={popupContent}
                     inverted
                     basic
                     closeOnTriggerClick
@@ -1329,15 +1344,9 @@ class Differential extends Component {
         };
       },
     );
-    // const imageInfoKey = self.state.imageInfoVolcano?.key || '';
-    // const noPlots = differentialPlotTypes.length === 0;
-    // const featureIdClass =
-    //   noPlots && !modelSpecificMetaFeaturesExist
-    //     ? 'ViewPlotIconDisabled NoSelect'
-    //     : 'ViewPlotIcon NoSelect';
-
     let checkboxCol = [];
-    if (modelSpecificMetaFeaturesExist) {
+    let hasMultifeaturePlots = this.hasMultifeaturePlots();
+    if (hasMultifeaturePlots) {
       checkboxCol = [
         {
           title: '',

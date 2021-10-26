@@ -13,9 +13,6 @@ import {
   Loader,
   Dimmer,
   List,
-  Header,
-  Segment,
-  Divider,
 } from 'semantic-ui-react';
 import * as d3 from 'd3';
 import * as hexbin from 'd3-hexbin';
@@ -438,17 +435,22 @@ class DifferentialVolcanoPlot extends React.PureComponent {
             }
           } else {
             // simple dot click
-            this.props.onHandleDotClick(
-              e,
-              [JSON.parse(elem._groups[0][0].attributes.data.value)],
-              0,
-              false,
-              true,
-              elem,
-            );
-            // this.setState({
-            //   clickedElements: [elem._groups[0][0]],
-            // });
+            if (elem.attr('class').endsWith('outlined')) {
+              // already outlined
+              this.props.onClearPlotSelected();
+            } else {
+              this.props.onHandleDotClick(
+                e,
+                [JSON.parse(elem._groups[0][0].attributes.data.value)],
+                0,
+                false,
+                true,
+                elem,
+              );
+              // this.setState({
+              //   clickedElements: [elem._groups[0][0]],
+              // });
+            }
           }
         });
       this.highlightBrushedCircles();
@@ -531,7 +533,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       this.hexBinning(differentialResultsUnfiltered);
       this.transitionZoom(dataInCurrentView, false, false, false);
       if (volcanoPlotVisible && upperPlotsVisible && !isItemSelected) {
-        this.setState({ optionsOpen: true, usageOpen: true });
+        this.setState({ optionsOpen: true });
       }
     } else if (
       !isDataStreamingResultsTable &&
@@ -1756,6 +1758,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       differentialTest,
       isDataStreamingResultsTable,
       volcanoPlotVisible,
+      volcanoWidth,
     } = this.props;
 
     const {
@@ -1835,9 +1838,13 @@ class DifferentialVolcanoPlot extends React.PureComponent {
           >
             <Popup
               trigger={
-                <Button size="mini" onClick={this.toggleOptionsPopup}>
+                <Button
+                  size="mini"
+                  onClick={this.toggleOptionsPopup}
+                  className={volcanoWidth > 375 ? '' : 'OptionsPadding'}
+                >
                   <Icon name="options" className="ViewPlotOptions" />
-                  OPTIONS
+                  {volcanoWidth > 375 ? 'OPTIONS' : ''}
                 </Button>
               }
               // style={StudyPopupStyle}
@@ -1957,9 +1964,13 @@ class DifferentialVolcanoPlot extends React.PureComponent {
           >
             <Popup
               trigger={
-                <Button size="mini" onClick={this.toggleUsagePopup}>
+                <Button
+                  size="mini"
+                  onClick={this.toggleUsagePopup}
+                  className={volcanoWidth > 375 ? '' : 'UsagePadding'}
+                >
                   <Icon name="info" className="ViewPlotUsage" />
-                  USAGE GUIDE
+                  {volcanoWidth > 375 ? 'USAGE GUIDE' : ''}
                 </Button>
               }
               // style={StudyPopupStyle}
@@ -1978,8 +1989,8 @@ class DifferentialVolcanoPlot extends React.PureComponent {
                 id="VolcanoUsagePopupContent"
                 className={volcanoPlotVisible ? 'Show' : 'Hide'}
               >
-                <Header as="h4">Scatter Plot Graph Controls</Header>
-                <Divider />
+                {/* <Header as="h4">Scatter Plot Controls</Header>
+                <Divider /> */}
                 <List inverted>
                   <List.Item>
                     <Icon name="zoom in" />
