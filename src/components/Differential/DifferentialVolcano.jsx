@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import _ from 'lodash';
+import _, { debounce } from 'lodash';
 import CustomEmptyMessage from '../Shared/Templates';
 // eslint-disable-next-line no-unused-vars
 import QHGrid, { EZGrid } from '../Shared/QHGrid';
@@ -31,6 +31,7 @@ import {
 import ButtonActions from '../Shared/ButtonActions';
 import './DifferentialVolcano.scss';
 import SplitPane from 'react-split-pane';
+import { element } from 'prop-types';
 
 class DifferentialVolcano extends Component {
   state = {
@@ -43,10 +44,10 @@ class DifferentialVolcano extends Component {
     upperPlotsDivHeightBackup:
       parseInt(localStorage.getItem('upperPlotsDivHeightBackup'), 10) || 400,
     differentialDynamicPlotWidth:
-      parseInt(localStorage.getItem('differentialDynamicPlotWidth'), 10) || 600,
-    volcanoWidth: parseInt(localStorage.getItem('volcanoWidth'), 10) || 460,
+      parseInt(localStorage.getItem('differentialDynamicPlotWidth'), 10) || 680,
+    volcanoWidth: parseInt(localStorage.getItem('volcanoWidth'), 10) || 380,
     volcanoDivWidth:
-      parseInt(localStorage.getItem('volcanoDivWidth'), 10) || 500,
+      parseInt(localStorage.getItem('volcanoDivWidth'), 10) || 420,
     volcanoPlotVisible:
       JSON.parse(localStorage.getItem('volcanoPlotVisible')) === true ||
       localStorage.getItem('volcanoPlotVisible') == null
@@ -301,6 +302,7 @@ class DifferentialVolcano extends Component {
       if (items.length) {
         this.pageToFeature(event[differentialFeatureIdKey]);
       }
+      this.reloadMultifeaturePlot(elementArray);
       // this.props.onHandleSelectedVolcano([
       //   {
       //     id: item[differentialFeatureIdKey],
@@ -343,11 +345,32 @@ class DifferentialVolcano extends Component {
           this.props.multifeaturePlotMax,
         ) || limitLength(sortedData?.length, this.props.multifeaturePlotMax),
     });
-    if (selectedTableDataArray.length === 1) {
-      // less then 2 left
-      this.props.onClearPlotSelected();
-    }
+    // if (selectedTableDataArray.length === 1) {
+    // less then 2 left
+    // this.props.onClearPlotSelected();
+    this.reloadMultifeaturePlot(selectedTableDataArray);
+    // }
   };
+
+  reloadMultifeaturePlot = _.debounce(selected => {
+    const tableData =
+      this.volcanoPlotFilteredGridRef?.current?.qhGridRef?.current?.getSortedData() ||
+      this.props.differentialResults;
+    if (selected.length > 1) {
+      this.props.onHandleMultifeaturePlot('Volcano', tableData);
+    } else if (selected.length === 1) {
+      if (this.props.volcanoDifferentialTableRowOutline) {
+        this.props.onGetPlot(
+          'Volcano',
+          this.props.volcanoDifferentialTableRowOutline,
+          false,
+          false,
+        );
+      } else {
+        this.props.onClearPlotSelected();
+      }
+    } else return;
+  }, 1250);
 
   handleRowClick = (event, item, index) => {
     const {
@@ -419,6 +442,7 @@ class DifferentialVolcano extends Component {
             ) ||
             limitLength(sortedData?.length, this.props.multifeaturePlotMax),
         });
+        this.reloadMultifeaturePlot(uniqueTableDataArray);
       } else if (
         event.ctrlKey ||
         event.metaKey ||
@@ -443,6 +467,7 @@ class DifferentialVolcano extends Component {
               ) ||
               limitLength(sortedData?.length, this.props.multifeaturePlotMax),
           });
+          this.reloadMultifeaturePlot(selectedTableDataArray);
         } else {
           // not yet highlighted, add it to array
           const indexBaseFeature = _.findIndex(currentTableData, function(d) {
@@ -472,6 +497,7 @@ class DifferentialVolcano extends Component {
               ) ||
               limitLength(sortedData?.length, this.props.multifeaturePlotMax),
           });
+          this.reloadMultifeaturePlot(selectedTableDataArray);
         }
       } else {
         // if item is already outlined, remove outline and clear plot
@@ -885,7 +911,7 @@ class DifferentialVolcano extends Component {
                         }
                         // defaultSize={volcanoWidth * 1.05263157895}
                         size={volcanoDivWidth}
-                        minSize={300}
+                        minSize={350}
                         maxSize={1800}
                         onDragFinished={size =>
                           this.onSizeChange(size, 'vertical')
@@ -974,13 +1000,7 @@ class DifferentialVolcano extends Component {
                             {upperPlotsVisible ? 'Hide Plots' : 'Show Plots'}
                           </Label>
                         </span>
-                        <div
-                          className={
-                            HasMultifeaturePlots
-                              ? 'MultiFeaturePlotBtnDiv Show'
-                              : 'MultiFeaturePlotBtnDiv Hide'
-                          }
-                        >
+                        <div className="MultiFeaturePlotBtnDiv Hide">
                           <Popup
                             trigger={
                               <Label

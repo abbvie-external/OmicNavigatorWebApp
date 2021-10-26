@@ -237,7 +237,9 @@
 }
 
 #FullScreenButton,
-#FeaturesListButton {
+#FullScreenIcon,
+#FeaturesListButton,
+#FeaturesListIcon {
   position: absolute !important;
   margin-top: 8px;
   // margin-left: 50px;
@@ -250,17 +252,22 @@
 #FeaturesListButton {
   left: 220px;
 }
-
+#FeaturesListIcon {
+  left: 215px;
+}
 #FullScreenButton {
   left: 340px;
+}
+#FullScreenIcon {
+  left: 280px;
 }
 
 #FeaturesListTooltip {
   top: 5px !important;
-  left: -210px !important;
+  left: -205px !important;
   border-bottom: 2px solid var(--color-primary);
   background-color: var(--color-dark) !important;
-  padding: 10px 10px 20px 20px;
+  padding: 10px;
 }
 
 #VolcanoUsagePopup {

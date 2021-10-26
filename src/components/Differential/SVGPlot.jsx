@@ -129,20 +129,21 @@ class SVGPlot extends Component {
   };
 
   getFeaturesList = () => {
-    const { featuresLength } = this.props;
+    const {
+      featuresLength,
+      divWidth,
+      HighlightedFeaturesArrVolcano,
+    } = this.props;
     let features = [];
     if (featuresLength > 10) {
-      let shortenedArr = [...this.props.HighlightedFeaturesArrVolcano].slice(
-        0,
-        10,
-      );
+      let shortenedArr = [...HighlightedFeaturesArrVolcano].slice(0, 10);
       features = shortenedArr.map(m => m.key);
     } else {
-      features = [...this.props.HighlightedFeaturesArrVolcano].map(m => m.key);
+      features = [...HighlightedFeaturesArrVolcano].map(m => m.key);
     }
     const featuresListHorizontalStyle = {
-      minWidth: this.props.divWidth * 0.9,
-      maxWidth: this.props.divWidth * 0.9,
+      minWidth: divWidth * 0.9,
+      maxWidth: divWidth * 0.9,
     };
 
     let list = (
@@ -164,37 +165,35 @@ class SVGPlot extends Component {
           >
             CLEAR ALL <Icon name="trash" />
           </Label>
+          {featuresLength > 10 ? (
+            <span id="MoreThanTenText">{featuresLength} features selected</span>
+          ) : null}
         </List.Item>
-        {features.map(f => {
-          return (
-            <List.Item key={`featureList-${f}`} className="NoSelect">
-              <Label
-                className="CursorPointer"
-                onClick={() => this.props.onRemoveSelectedFeature(f)}
-              >
-                {f}
-                <Icon name="delete" />
-              </Label>
-            </List.Item>
-          );
-        })}
-        {featuresLength > 10 ? (
-          <List.Item>
-            <Label className="PrimaryBackground">
-              {featuresLength - 10} more...
-            </Label>
-          </List.Item>
-        ) : null}
+        {featuresLength > 10
+          ? null
+          : features.map(f => {
+              return (
+                <List.Item key={`featureList-${f}`} className="NoSelect">
+                  <Label
+                    className="CursorPointer"
+                    onClick={() => this.props.onRemoveSelectedFeature(f)}
+                  >
+                    {f}
+                    <Icon name="delete" />
+                  </Label>
+                </List.Item>
+              );
+            })}
       </List>
     );
 
     let div = (
-      <span id="FeaturesListButton">
+      <span id={divWidth >= 675 ? 'FeaturesListButton' : 'FeaturesListIcon'}>
         <Popup
           trigger={
             <Button size="mini" onClick={this.toggleFeaturesListPopup}>
               <Icon name="setting" />
-              {this.props.featuresLength} FEATURES
+              {featuresLength} {divWidth >= 675 ? 'FEATURES' : ''}
             </Button>
           }
           // style={StudyPopupStyle}
@@ -239,6 +238,10 @@ class SVGPlot extends Component {
       pxToPtRatio,
       pointSize,
       imageInfoVolcanoLength,
+      modelSpecificMetaFeaturesExist,
+      differentialStudy,
+      differentialModel,
+      isItemSVGLoaded,
     } = this.props;
     let panes = [];
     if (imageInfoVolcanoLength !== 0) {
@@ -280,11 +283,8 @@ class SVGPlot extends Component {
       panes = panes.concat(svgPanes);
     }
     const isMultifeaturePlot =
-      this.props.imageInfoVolcano.key?.includes('features') || false;
-    if (
-      this.props.modelSpecificMetaFeaturesExist !== false &&
-      !isMultifeaturePlot
-    ) {
+      imageInfoVolcano.key?.includes('features') || false;
+    if (modelSpecificMetaFeaturesExist !== false && !isMultifeaturePlot) {
       let metafeaturesTab = [
         {
           menuItem: 'Feature Data',
@@ -292,13 +292,11 @@ class SVGPlot extends Component {
             <Tab.Pane attached="true" as="div">
               <MetafeaturesTableDynamic
                 ref={this.metaFeaturesTableDynamicRef}
-                differentialStudy={this.props.differentialStudy}
-                differentialModel={this.props.differentialModel}
-                isItemSVGLoaded={this.props.isItemSVGLoaded}
-                imageInfoVolcano={this.props.imageInfoVolcano}
-                modelSpecificMetaFeaturesExist={
-                  this.props.modelSpecificMetaFeaturesExist
-                }
+                differentialStudy={differentialStudy}
+                differentialModel={differentialModel}
+                isItemSVGLoaded={isItemSVGLoaded}
+                imageInfoVolcano={imageInfoVolcano}
+                modelSpecificMetaFeaturesExist={modelSpecificMetaFeaturesExist}
               />
             </Tab.Pane>
           ),
@@ -364,6 +362,7 @@ class SVGPlot extends Component {
       upperPlotsVisible,
       svgExportName,
       tab,
+      divWidth,
     } = this.props;
 
     const {
@@ -485,16 +484,22 @@ class SVGPlot extends Component {
                 activeIndex={activeSVGTabIndexVolcano}
               />
               {featuresList}
-              <span id="FullScreenButton">
+              <span
+                id={divWidth >= 675 ? 'FullScreenButton' : 'FullScreenIcon'}
+              >
                 {/* <Popup
                   trigger={ */}
-                <Button size="mini" onClick={this.handlePlotOverlay}>
+                <Button
+                  size="mini"
+                  onClick={this.handlePlotOverlay}
+                  className={divWidth >= 675 ? '' : 'FullScreenPadding'}
+                >
                   <Icon
                     // name="expand"
                     name="expand arrows alternate"
                     className=""
                   />
-                  FULL SCREEN
+                  {divWidth >= 675 ? 'FULL SCREEN' : ''}
                 </Button>
                 {/* }
                   style={PopupStyle}
