@@ -92,10 +92,6 @@ class DifferentialVolcano extends Component {
     // }
   }
 
-  // shouldComponentUpdate() {
-  //   return this.props.isValidSearchDifferential;
-  // }
-
   componentDidUpdate(prevProps, prevState) {
     const { differentialResults } = this.props;
     // if (prevProps.differentialTest !== differentialTest) {
@@ -328,6 +324,29 @@ class DifferentialVolcano extends Component {
     };
     addParams.elementId = differentialFeatureIdKeyVar;
     this.setState({ additionalTemplateInfoDifferentialTable: addParams });
+  };
+
+  removeSelectedFeature = featureToRemove => {
+    const { differentialResults, HighlightedFeaturesArrVolcano } = this.props;
+    let sortedData =
+      this.volcanoPlotFilteredGridRef?.current?.qhGridRef?.current?.getSortedData() ||
+      differentialResults;
+    const PreviouslyHighlighted = [...HighlightedFeaturesArrVolcano];
+    const selectedTableDataArray = PreviouslyHighlighted.filter(
+      i => i.id !== featureToRemove,
+    );
+    this.props.onHandleSelectedVolcano(selectedTableDataArray);
+    this.setState({
+      featuresLength:
+        limitLengthOrNull(
+          selectedTableDataArray?.length,
+          this.props.multifeaturePlotMax,
+        ) || limitLength(sortedData?.length, this.props.multifeaturePlotMax),
+    });
+    if (selectedTableDataArray.length === 1) {
+      // less then 2 left
+      this.props.onClearPlotSelected();
+    }
   };
 
   handleRowClick = (event, item, index) => {
@@ -571,7 +590,7 @@ class DifferentialVolcano extends Component {
   };
 
   handleTableChange = () => {
-    const { differentialResults, HighlightedFeaturesArrVolcano } = this.props;
+    const { HighlightedFeaturesArrVolcano } = this.props;
     let sortedFilteredData =
       this.volcanoPlotFilteredGridRef?.current?.qhGridRef?.current?.getSortedData() ||
       this.props.differentialResults;
@@ -826,13 +845,7 @@ class DifferentialVolcano extends Component {
     // const isMultifeaturePlot =
     //   this.props.imageInfoVolcano?.key?.includes('features') || false;
     return (
-      <Grid.Column
-        className=""
-        mobile={16}
-        tablet={16}
-        largeScreen={12}
-        widescreen={12}
-      >
+      <Grid.Column mobile={16} tablet={16} largeScreen={12} widescreen={12}>
         <Sidebar.Pushable as={'span'}>
           <VerticalSidebar
             animation={animation}
@@ -847,7 +860,6 @@ class DifferentialVolcano extends Component {
                     <SplitPane
                       split="horizontal"
                       className="VolcanoSplitPane"
-                      id=""
                       resizerStyle={
                         upperPlotsVisible ? resizerStyle : hiddenResizerStyle
                       }
@@ -929,6 +941,11 @@ class DifferentialVolcano extends Component {
                           onHandleVolcanoVisability={
                             this.handleVolcanoVisability
                           }
+                          onHandleSelectedVolcano={
+                            this.props.onHandleSelectedVolcano
+                          }
+                          onClearPlotSelected={this.props.onClearPlotSelected}
+                          onRemoveSelectedFeature={this.removeSelectedFeature}
                         ></SVGPlot>
                       </SplitPane>
                       <Grid.Row>

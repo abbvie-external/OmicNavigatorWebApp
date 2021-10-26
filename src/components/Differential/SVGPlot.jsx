@@ -120,48 +120,75 @@ class SVGPlot extends Component {
     }
   };
 
+  clearAll = () => {
+    this.setState({
+      featuresListOpen: false,
+    });
+    this.props.onHandleSelectedVolcano([], false);
+    this.props.onClearPlotSelected();
+  };
+
   getFeaturesList = () => {
-    let features = [...this.props.HighlightedFeaturesArrVolcano].map(
-      m => m.key,
-    );
-    const featuresListPopupStyle = {
-      // minWidth: this.props.divWidth * 0.9,
-      minWidth: 'max-content',
+    const { featuresLength } = this.props;
+    let features = [];
+    if (featuresLength > 10) {
+      let shortenedArr = [...this.props.HighlightedFeaturesArrVolcano].slice(
+        0,
+        10,
+      );
+      features = shortenedArr.map(m => m.key);
+    } else {
+      features = [...this.props.HighlightedFeaturesArrVolcano].map(m => m.key);
+    }
+    const featuresListHorizontalStyle = {
+      minWidth: this.props.divWidth * 0.9,
       maxWidth: this.props.divWidth * 0.9,
     };
+
     let list = (
       <List
-        id={
-          !this.props.volcanoPlotVisible
-            ? 'FeaturesListHorizontal'
-            : 'FeaturesListVertical'
-        }
+        animated
+        inverted
+        verticalAlign="middle"
+        id="FeaturesListHorizontal"
         className="NoSelect"
-        style={featuresListPopupStyle}
+        style={featuresListHorizontalStyle}
         divided
-        // divided={!this.props.volcanoPlotVisible}
         horizontal
         size="mini"
       >
         <List.Item className="NoSelect">
-          <Label>
+          <Label
+            className="PrimaryBackground CursorPointer"
+            onClick={this.clearAll}
+          >
             CLEAR ALL <Icon name="trash" />
           </Label>
         </List.Item>
         {features.map(f => {
           return (
             <List.Item key={`featureList-${f}`} className="NoSelect">
-              <Label>
+              <Label
+                className="CursorPointer"
+                onClick={() => this.props.onRemoveSelectedFeature(f)}
+              >
                 {f}
                 <Icon name="delete" />
               </Label>
             </List.Item>
           );
         })}
+        {featuresLength > 10 ? (
+          <List.Item>
+            <Label className="PrimaryBackground">
+              {featuresLength - 10} more...
+            </Label>
+          </List.Item>
+        ) : null}
       </List>
     );
 
-    let div = this.props.volcanoPlotVisible ? (
+    let div = (
       <span id="FeaturesListButton">
         <Popup
           trigger={
@@ -200,8 +227,6 @@ class SVGPlot extends Component {
           </Popup.Content>
         </Popup>
       </span>
-    ) : (
-      list
     );
     return div;
   };
