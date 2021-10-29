@@ -188,12 +188,12 @@ class SVGPlot extends Component {
     );
 
     let div = (
-      <span id={divWidth >= 675 ? 'FeaturesListButton' : 'FeaturesListIcon'}>
+      <span id={divWidth >= 625 ? 'FeaturesListButton' : 'FeaturesListIcon'}>
         <Popup
           trigger={
             <Button size="mini" onClick={this.toggleFeaturesListPopup}>
               <Icon name="setting" />
-              {featuresLength} {divWidth >= 675 ? 'FEATURES' : ''}
+              {featuresLength} {divWidth >= 625 ? 'FEATURES' : ''}
             </Button>
           }
           // style={StudyPopupStyle}
@@ -485,21 +485,21 @@ class SVGPlot extends Component {
               />
               {featuresList}
               <span
-                id={divWidth >= 675 ? 'FullScreenButton' : 'FullScreenIcon'}
+                id={divWidth >= 625 ? 'FullScreenButton' : 'FullScreenIcon'}
               >
                 {/* <Popup
                   trigger={ */}
                 <Button
                   size="mini"
                   onClick={this.handlePlotOverlay}
-                  className={divWidth >= 675 ? '' : 'FullScreenPadding'}
+                  className={divWidth >= 625 ? '' : 'FullScreenPadding'}
                 >
                   <Icon
                     // name="expand"
                     name="expand arrows alternate"
                     className=""
                   />
-                  {divWidth >= 675 ? 'FULL SCREEN' : ''}
+                  {divWidth >= 625 ? 'FULL SCREEN' : ''}
                 </Button>
                 {/* }
                   style={PopupStyle}

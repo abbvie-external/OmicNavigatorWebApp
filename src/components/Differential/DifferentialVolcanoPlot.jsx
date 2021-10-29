@@ -1841,10 +1841,11 @@ class DifferentialVolcanoPlot extends React.PureComponent {
                 <Button
                   size="mini"
                   onClick={this.toggleOptionsPopup}
-                  className={volcanoWidth > 375 ? '' : 'OptionsPadding'}
+                  // className={volcanoWidth > 325 ? '' : 'OptionsPadding'}
                 >
                   <Icon name="options" className="ViewPlotOptions" />
-                  {volcanoWidth > 375 ? 'OPTIONS' : ''}
+                  {/* {volcanoWidth > 325 ? 'OPTIONS' : ''} */}
+                  OPTIONS
                 </Button>
               }
               // style={StudyPopupStyle}
@@ -1967,10 +1968,11 @@ class DifferentialVolcanoPlot extends React.PureComponent {
                 <Button
                   size="mini"
                   onClick={this.toggleUsagePopup}
-                  className={volcanoWidth > 375 ? '' : 'UsagePadding'}
+                  // className={volcanoWidth > 325 ? '' : 'UsagePadding'}
                 >
                   <Icon name="info" className="ViewPlotUsage" />
-                  {volcanoWidth > 375 ? 'USAGE GUIDE' : ''}
+                  {/* {volcanoWidth > 325 ? 'USAGE GUIDE' : ''} */}
+                  USAGE GUIDE
                 </Button>
               }
               // style={StudyPopupStyle}

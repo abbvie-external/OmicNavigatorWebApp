@@ -19,7 +19,9 @@
 
 .ui.red.button,
 .ui.red.buttons .button {
-  background-color: var(--color-dark) !important;
+  background-color: var(--color-semantic-grey) !important;
+  color: var(--color-grey) !important;
+  // color: rgba(0, 0, 0, 0.05) !important;
 }
 
 .NoDataMessage {
