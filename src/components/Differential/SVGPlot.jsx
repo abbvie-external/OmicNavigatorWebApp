@@ -363,6 +363,9 @@ class SVGPlot extends Component {
       svgExportName,
       tab,
       divWidth,
+      differentialStudy,
+      differentialModel,
+      differentialTest,
     } = this.props;
 
     const {
@@ -443,6 +446,14 @@ class SVGPlot extends Component {
                   tabIndex={activeSVGTabIndexVolcanoVar}
                   svgExportName={svgExportName}
                   plot="VolcanoPlotSVG"
+                  refFwd={
+                    this.metaFeaturesTableDynamicRef.current
+                      ?.metafeaturesGridRefDynamic || null
+                  }
+                  study={differentialStudy}
+                  model={differentialModel}
+                  test={differentialTest}
+                  feature={imageInfoVolcano?.key}
                 />
               </div>
               {/* <Popup

@@ -149,7 +149,7 @@ class ButtonActions extends Component {
   };
 
   TextExport = () => {
-    const { study, model, test, tab, refFwd } = this.props;
+    const { study, model, test, feature, tab, refFwd } = this.props;
     let studyNoPeriods = study.replace(/\./g, '_');
     let modelNoPeriods = model.replace(/\./g, '_');
     let testNoPeriods = test.replace(/\./g, '_');
@@ -160,19 +160,26 @@ class ButtonActions extends Component {
     let file = new Blob([dataInString], { type: 'text/plain' });
     a.href = URL.createObjectURL(file);
     a.download = `${tab}-${studyNoPeriods}-${modelNoPeriods}-${testNoPeriods}`;
+    if (feature) {
+      let featureNoPeriods = feature.replace(/\./g, '_');
+      a.download = `${tab}-${studyNoPeriods}-${modelNoPeriods}-${testNoPeriods}-${featureNoPeriods}`;
+    }
     a.click();
   };
 
   ExcelExport = () => {
-    const { study, model, test, tab, refFwd } = this.props;
+    const { study, model, test, feature, tab, refFwd } = this.props;
     let studyNoPeriods = study.replace(/\./g, '_');
     let modelNoPeriods = model.replace(/\./g, '_');
     let testNoPeriods = test.replace(/\./g, '_');
     const excelExport = refFwd?.current?.qhGridRef.current ?? null;
     if (excelExport != null) {
-      excelExport.exportExcel(
-        `${tab}-${studyNoPeriods}-${modelNoPeriods}-${testNoPeriods}`,
-      );
+      let name = `${tab}-${studyNoPeriods}-${modelNoPeriods}-${testNoPeriods}`;
+      if (feature) {
+        let featureNoPeriods = feature.replace(/\./g, '_');
+        name = `${tab}-${studyNoPeriods}-${modelNoPeriods}-${testNoPeriods}-${featureNoPeriods}`;
+      }
+      excelExport.exportExcel(name);
     }
   };
 
