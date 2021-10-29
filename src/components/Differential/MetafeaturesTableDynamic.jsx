@@ -18,7 +18,7 @@ class MetafeaturesTableDynamic extends Component {
     additionalTemplateInfo: [],
     metafeaturesLoaded: false,
   };
-  metafeaturesGridRef = React.createRef();
+  metafeaturesGridRefDynamic = React.createRef();
 
   componentDidMount() {
     const isMultifeaturePlot =
@@ -173,7 +173,7 @@ class MetafeaturesTableDynamic extends Component {
     return (
       <div className="MetafeaturesTableDiv">
         <EZGrid
-          ref={this.metafeaturesGridRef}
+          ref={this.metafeaturesGridRefDynamic}
           data={metafeaturesTableData}
           columnsConfig={metafeaturesTableConfigCols}
           totalRows={15}

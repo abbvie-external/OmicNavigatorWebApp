@@ -935,6 +935,7 @@ class DifferentialVolcano extends Component {
                         <SVGPlot
                           differentialStudy={differentialStudy}
                           differentialModel={differentialModel}
+                          differentialTest={differentialTest}
                           differentialFeature={differentialFeature}
                           divWidth={differentialDynamicPlotWidth}
                           divHeight={upperPlotsDivHeight}

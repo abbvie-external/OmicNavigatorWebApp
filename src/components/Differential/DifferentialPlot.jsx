@@ -178,6 +178,7 @@ class DifferentialPlot extends PureComponent {
       differentialStudy,
       differentialModel,
       differentialTest,
+      differentialFeature,
     } = this.props;
     if (!isItemSVGLoaded) {
       return (
@@ -236,6 +237,7 @@ class DifferentialPlot extends PureComponent {
                     study={differentialStudy}
                     model={differentialModel}
                     test={differentialTest}
+                    feature={differentialFeature}
                     imageInfo={imageInfoDifferential}
                     tabIndex={activeSVGTabIndexDifferentialVar}
                     plot={'DifferentialPlotTabsPlotSVGDiv'}
