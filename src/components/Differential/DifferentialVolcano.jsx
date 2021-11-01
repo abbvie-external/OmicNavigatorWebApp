@@ -44,7 +44,8 @@ class DifferentialVolcano extends Component {
     upperPlotsDivHeightBackup:
       parseInt(localStorage.getItem('upperPlotsDivHeightBackup'), 10) || 400,
     differentialDynamicPlotWidth:
-      parseInt(localStorage.getItem('differentialDynamicPlotWidth'), 10) || 680,
+      parseInt(localStorage.getItem('differentialDynamicPlotWidth'), 10) ||
+      document.body.clientWidth * 0.75 - 420,
     volcanoWidth: parseInt(localStorage.getItem('volcanoWidth'), 10) || 380,
     volcanoDivWidth:
       parseInt(localStorage.getItem('volcanoDivWidth'), 10) || 420,
