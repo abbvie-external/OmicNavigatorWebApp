@@ -504,6 +504,11 @@ class DifferentialVolcano extends Component {
         if (
           item[differentialFeatureIdKey] === volcanoDifferentialTableRowOutline
         ) {
+          if (this.props.volcanoDifferentialTableRowHighlight.length) {
+            this.reloadMultifeaturePlot(
+              this.props.volcanoDifferentialTableRowHighlight,
+            );
+          }
           this.props.onClearPlotSelected();
         } else {
           // simple row click without control nor shift

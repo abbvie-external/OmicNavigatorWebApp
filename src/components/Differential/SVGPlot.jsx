@@ -480,7 +480,11 @@ class SVGPlot extends Component {
                 }
                 onChange={this.handlePlotDropdownChange}
                 className={DropdownClass}
-                id="svgPlotDropdownDifferential"
+                id={
+                  isMultifeaturePlot
+                    ? 'svgPlotDropdownMulti'
+                    : 'svgPlotDropdownSingle'
+                }
               />
               <Tab
                 menu={{
