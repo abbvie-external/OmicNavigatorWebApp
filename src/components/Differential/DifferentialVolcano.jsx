@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import _, { debounce } from 'lodash';
+import _ from 'lodash';
 import CustomEmptyMessage from '../Shared/Templates';
 // eslint-disable-next-line no-unused-vars
 import QHGrid, { EZGrid } from '../Shared/QHGrid';
