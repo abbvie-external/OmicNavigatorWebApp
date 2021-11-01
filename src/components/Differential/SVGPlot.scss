@@ -74,9 +74,16 @@
   margin: 10px 10px 20px 10px !important;
 }
 
-#svgPlotDropdownDifferential {
+#svgPlotDropdownSingle {
   left: -35px !important;
   top: 8px;
+  border-bottom: 2px solid var(--color-link);
+}
+
+#svgPlotDropdownMulti {
+  left: -35px !important;
+  top: 8px;
+  border-bottom: 2px solid var(--color-primary);
 }
 
 .VolcanoPlotToggle {

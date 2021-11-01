@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Label, Dropdown } from 'semantic-ui-react';
+import { Button, Dropdown } from 'semantic-ui-react';
 import * as saveSvgAsPng from 'save-svg-as-png';
 // import { excelService } from '../../services/excel.service';
 import { pdfService } from '../../services/pdf.service';

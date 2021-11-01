@@ -11,8 +11,6 @@ import {
   Button,
   Dropdown,
   List,
-  Segment,
-  Grid,
 } from 'semantic-ui-react';
 import SVG from 'react-inlinesvg';
 import {
@@ -482,7 +480,11 @@ class SVGPlot extends Component {
                 }
                 onChange={this.handlePlotDropdownChange}
                 className={DropdownClass}
-                id="svgPlotDropdownDifferential"
+                id={
+                  isMultifeaturePlot
+                    ? 'svgPlotDropdownMulti'
+                    : 'svgPlotDropdownSingle'
+                }
               />
               <Tab
                 menu={{

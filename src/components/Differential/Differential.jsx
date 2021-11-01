@@ -86,7 +86,7 @@ class Differential extends Component {
       plotButtonActiveDifferential: false,
       multisetQueriedDifferential: false,
       upsetColsDifferential: [],
-      tabsMessage: 'Select a feature to display plots',
+      tabsMessage: 'Select feature/s to display plots',
       // differentialPlotTypes: [],
       differentialStudyMetadata: [],
       differentialModelsAndTests: [],
@@ -243,7 +243,7 @@ class Differential extends Component {
         multisetPlotAvailableDifferential: false,
         imageInfoVolcano: { key: null, title: '', svg: [] },
         imageInfoDifferential: { key: null, title: '', svg: [] },
-        tabsMessage: 'Select a feature to display plots',
+        tabsMessage: 'Select feature/s to display plots',
         // differentialResults: [],
         // differentialResultsUnfiltered: [],
         // isItemDatatLoaded: false,
@@ -862,9 +862,9 @@ class Differential extends Component {
       }
       const featureIds = data.map(featureId => featureId[key]);
       // if (!featureIds.includes(volcanoDifferentialTableRowOutline)) {
-      this.setState({
-        volcanoDifferentialTableRowOutline: '',
-      });
+      // this.setState({
+      //   volcanoDifferentialTableRowOutline: '',
+      // });
       // }
       const returnSVG = view === 'Differential' ? true : false;
       if (returnSVG) {
@@ -988,9 +988,17 @@ class Differential extends Component {
   };
 
   handleSelectedVolcano = (toHighlightArr, doNotUnhighlight) => {
-    this.setState({
-      HighlightedFeaturesArrVolcano: toHighlightArr,
-    });
+    // when multi-selecting, show loader
+    if (toHighlightArr.length > 1) {
+      this.setState({
+        isVolcanoPlotSVGLoaded: false,
+        HighlightedFeaturesArrVolcano: toHighlightArr,
+      });
+    } else {
+      this.setState({
+        HighlightedFeaturesArrVolcano: toHighlightArr,
+      });
+    }
     if (toHighlightArr.length > 0) {
       if (toHighlightArr.length === 1) {
         // 1 feature
@@ -1131,17 +1139,30 @@ class Differential extends Component {
 
   clearPlotSelected = () => {
     cancelRequestDifferentialResultsGetPlot();
-    this.setState({
-      volcanoDifferentialTableRowOutline: '',
-      imageInfoVolcano: {
-        key: null,
-        title: '',
-        svg: [],
-      },
-      isItemSVGLoaded: true,
-      isVolcanoPlotSVGLoaded: true,
-      tabsMessage: 'Select a feature to display plots',
-    });
+    if (this.state.HighlightedFeaturesArrVolcano.length > 1) {
+      this.setState({
+        volcanoDifferentialTableRowOutline: '',
+        imageInfoVolcano: {
+          key: null,
+          title: '',
+          svg: [],
+        },
+        isItemSVGLoaded: true,
+        isVolcanoPlotSVGLoaded: false,
+      });
+    } else {
+      this.setState({
+        volcanoDifferentialTableRowOutline: '',
+        imageInfoVolcano: {
+          key: null,
+          title: '',
+          svg: [],
+        },
+        isItemSVGLoaded: true,
+        isVolcanoPlotSVGLoaded: true,
+        tabsMessage: 'Select feature/s to display plots',
+      });
+    }
   };
 
   hasMultifeaturePlots = () => {
