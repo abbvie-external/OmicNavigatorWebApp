@@ -69,7 +69,6 @@ class DifferentialVolcanoPlot extends React.PureComponent {
   };
 
   componentDidMount() {
-    // this.getAxisLabels();
     // window.addEventListener('resize', this.debouncedResizeListener);
   }
 
@@ -326,13 +325,9 @@ class DifferentialVolcanoPlot extends React.PureComponent {
   }
   renderCirclesFilter(circles) {
     const { differentialResultsUnfiltered } = this.props;
-    const {
-      xScale,
-      yScale,
-      identifier,
-      xAxisLabel,
-      yAxisLabel,
-    } = this.scaleFactory(
+    const { identifier, xAxisLabel, yAxisLabel } = this.state;
+
+    const { xScale, yScale } = this.scaleFactory(
       this.state.currentResults.length > 0
         ? this.state.currentResults
         : differentialResultsUnfiltered,
@@ -716,8 +711,9 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       // set circles back to default
       d3.select('#nonfiltered-elements')
         .selectAll('circle')
-        .attr('style', 'fill: #1678c2')
+        .attr('fill', '#1678c2')
         .attr('stroke', '#000')
+        .attr('stroke-width', 1)
         .attr('r', 2)
         .classed('highlighted', false)
         .classed('outlined', false);
@@ -734,8 +730,8 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     d3.select('#nonfiltered-elements')
       .selectAll('path')
       .attr('fill', d => this.determineBinColor(this.state.bins, d.length));
-    this.outlineCircle();
     this.highlightCircles();
+    this.outlineCircle();
   };
 
   highlightCircles = () => {
@@ -750,9 +746,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         const highlightedCircle = d3.select(highlightedCircleId?.element);
         let radius = element === volcanoDifferentialTableRowOutline ? 7 : 6;
         let stroke =
-          element === volcanoDifferentialTableRowOutline
-            ? '#1678c2'
-            : '#ff4400';
+          element === volcanoDifferentialTableRowOutline ? '#1678c2' : '#000';
         // let class = element !== volcanoDifferentialTableRowOutline
         // ? 'highlighted'
         // : 'outlined';
@@ -761,20 +755,18 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         if (highlightedCircle != null) {
           if (highlightedCircleId?.type === 'circle') {
             highlightedCircle.attr('stroke', stroke);
-            highlightedCircle.attr('stroke-width', strokeWidth);
-            highlightedCircle
-              .attr('style', 'fill: #ff4400')
-              .classed('highlighted', true);
+            highlightedCircle.attr('stroke-width', 1);
+            highlightedCircle.attr('fill', '#ff4400');
+            highlightedCircle.classed('highlighted', true);
             highlightedCircle.attr('r', radius);
             highlightedCircle.classed('highlighted', true);
             highlightedCircle.raise();
           } else {
             // bin highlight
-            highlightedCircle
-              .attr('fill', '#ff4400')
-              .classed('highlighted', true);
+            highlightedCircle.attr('fill', '#ff4400');
+            highlightedCircle.classed('highlighted', true);
             highlightedCircle.attr('stroke', stroke);
-            highlightedCircle.attr('stroke-width', strokeWidth);
+            highlightedCircle.attr('stroke-width', 1);
             highlightedCircle.classed('highlighted', true);
             highlightedCircle.raise();
           }
@@ -792,18 +784,26 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       );
       if (outlineCircleId) {
         const outlineCircle = d3.select(outlineCircleId.element);
-        if (outlineCircle != null) {
+        if (outlineCircle) {
+          const outlineCircleClass = outlineCircle.attr('class');
+          if (outlineCircleClass) {
+            if (outlineCircle.attr('class').endsWith('highlighted')) {
+              outlineCircle.attr('fill', '#ff4400');
+            } else {
+              outlineCircle.attr('fill', '#ffffff');
+            }
+          }
           outlineCircle.attr('r', 7);
-          outlineCircle.attr('style', 'fill: #ffffff');
           outlineCircle.classed('outlined', true);
           outlineCircle.attr('stroke', '#1678c2');
-          outlineCircle.attr('stroke-width', 2);
-          outlineCircle.raise();
           if (outlineCircleId.type !== 'circle') {
+            outlineCircle.attr('stroke-width', 1);
             outlineCircle.attr(
               'd',
-              d => `M${d.x},${d.y}${this.hexbin.hexagon(7)}`,
+              d => `M${d.x},${d.y}${this.hexbin.hexagon(8)}`,
             );
+          } else {
+            outlineCircle.attr('stroke-width', 2);
           }
           outlineCircle.raise();
         }
@@ -822,20 +822,20 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         bin.attr('stroke', '#000');
         bin.attr('stroke-width', 1);
         bin.attr('fill', '#ff4400');
-        bin.attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(8)}`);
+        bin.attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(7)}`);
         bin.raise();
       } else if (binClass.endsWith('outlined')) {
         bin.attr('stroke', '#1678c2');
-        bin.attr('stroke-width', 2);
+        bin.attr('stroke-width', 1);
         bin.attr('fill', '#fff');
-        bin.attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(8)}`);
+        bin.attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(9)}`);
         bin.raise();
       } else {
         bin
           .attr('fill', '#1678c2')
           .attr('stroke', '#000')
           .attr('stroke-width', 1)
-          .attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(7)}`)
+          .attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(6)}`)
           .raise();
       }
 
@@ -918,14 +918,14 @@ class DifferentialVolcanoPlot extends React.PureComponent {
 
     if (binClass.endsWith('outlined')) {
       bin.attr('stroke', '#1678c2');
-      bin.attr('stroke-width', 2);
+      bin.attr('stroke-width', 1);
       bin.attr('fill', '#fff');
-      bin.attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(7)}`);
+      bin.attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(8)}`);
     } else if (binClass.endsWith('highlighted')) {
       bin.attr('stroke', '#000');
       bin.attr('stroke-width', 1);
       bin.attr('fill', '#ff4400');
-      bin.attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(7)}`);
+      bin.attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(6)}`);
     } else {
       bin
         .attr('fill', d => this.determineBinColor(bins, d.length))
