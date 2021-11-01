@@ -11,8 +11,6 @@ import {
   Button,
   Dropdown,
   List,
-  Segment,
-  Grid,
 } from 'semantic-ui-react';
 import SVG from 'react-inlinesvg';
 import {

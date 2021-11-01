@@ -31,7 +31,6 @@ import {
 import ButtonActions from '../Shared/ButtonActions';
 import './DifferentialVolcano.scss';
 import SplitPane from 'react-split-pane';
-import { element } from 'prop-types';
 
 class DifferentialVolcano extends Component {
   state = {

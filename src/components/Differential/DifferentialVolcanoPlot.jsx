@@ -747,11 +747,8 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         let radius = element === volcanoDifferentialTableRowOutline ? 7 : 6;
         let stroke =
           element === volcanoDifferentialTableRowOutline ? '#1678c2' : '#000';
-        // let class = element !== volcanoDifferentialTableRowOutline
-        // ? 'highlighted'
-        // : 'outlined';
-        let strokeWidth =
-          element === volcanoDifferentialTableRowOutline ? 2 : 1;
+        // let strokeWidth =
+        //   element === volcanoDifferentialTableRowOutline ? 2 : 1;
         if (highlightedCircle != null) {
           if (highlightedCircleId?.type === 'circle') {
             highlightedCircle.attr('stroke', stroke);
@@ -1284,8 +1281,8 @@ class DifferentialVolcanoPlot extends React.PureComponent {
             return yScale(self.doTransform(d[self.state.yAxisLabel], 'y'));
           });
 
-        const outlined = d3
-          .select('#nonfiltered-elements')
+        //const outlined =
+        d3.select('#nonfiltered-elements')
           .selectAll('[class$=outlined')
           .attr('cx', function(d) {
             return xScale(self.doTransform(d[self.state.xAxisLabel], 'x'));
@@ -1758,7 +1755,6 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       differentialTest,
       isDataStreamingResultsTable,
       volcanoPlotVisible,
-      volcanoWidth,
     } = this.props;
 
     const {
