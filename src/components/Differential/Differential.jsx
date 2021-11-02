@@ -988,8 +988,9 @@ class Differential extends Component {
   };
 
   handleSelectedVolcano = (toHighlightArr, doNotUnhighlight) => {
-    // when multi-selecting, show loader
+    const { volcanoDifferentialTableRowOutline } = this.state;
     if (toHighlightArr.length > 1) {
+      // when multi-selecting, show svg loading
       this.setState({
         isVolcanoPlotSVGLoaded: false,
         HighlightedFeaturesArrVolcano: toHighlightArr,
@@ -1058,6 +1059,30 @@ class Differential extends Component {
         volcanoDifferentialTableRowHighlight: [],
         updateVolcanoLabels: true,
       });
+      // when clearing multi-selection, if there is an outlined row, init single plot
+      if (volcanoDifferentialTableRowOutline.length > 0) {
+        // this.setState({
+        //   isVolcanoPlotSVGLoaded: false,
+        // });
+        this.getPlot(
+          'Volcano',
+          volcanoDifferentialTableRowOutline,
+          false,
+          false,
+        );
+      } else {
+        this.setState({
+          volcanoDifferentialTableRowOutline: '',
+          imageInfoVolcano: {
+            key: null,
+            title: '',
+            svg: [],
+          },
+          isItemSVGLoaded: true,
+          isVolcanoPlotSVGLoaded: true,
+          tabsMessage: 'Select feature/s to display plots',
+        });
+      }
     }
   };
 

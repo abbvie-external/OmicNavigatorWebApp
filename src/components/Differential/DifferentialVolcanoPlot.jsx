@@ -1993,36 +1993,39 @@ class DifferentialVolcanoPlot extends React.PureComponent {
                   <List.Item>
                     <Icon name="zoom in" />
                     <List.Content>
-                      <List.Header>Zoom In</List.Header>
+                      <List.Header>Zoom In / Filter Data</List.Header>
                       <List.Description>
-                        Click and drag to box select an area
+                        Click and drag (box select) to zoom in and filter data
                       </List.Description>
                     </List.Content>
                   </List.Item>
                   <List.Item>
                     <Icon name="zoom out" />
                     <List.Content>
-                      <List.Header>Zoom Out</List.Header>
+                      <List.Header>Zoom Out / Clear Filters</List.Header>
                       <List.Description>
-                        Double click on an area without circles
+                        Double click on an area without circles to zoom out, and
+                        clear filters
                       </List.Description>
                     </List.Content>
                   </List.Item>
                   <List.Item>
                     <Icon name="circle outline" id="OutlinedCircleIcon" />
                     <List.Content>
-                      <List.Header>Outline a feature</List.Header>
+                      <List.Header>Plot A Single Feature</List.Header>
                       <List.Description>
-                        Click a circle to outline a feature and view plots
+                        Click a circle to view plots for a single feature (blue
+                        outline)
                       </List.Description>
                     </List.Content>
                   </List.Item>
                   <List.Item>
                     <Icon name="circle" id="SelectedCircleIcon" />
                     <List.Content>
-                      <List.Header>Select Feature/s</List.Header>
+                      <List.Header>Plot Multiple Features</List.Header>
                       <List.Description>
-                        Control-Click circle/s to add to selection
+                        Control-Click circle/s to view plots for multiple
+                        feature (orange fill)
                       </List.Description>
                     </List.Content>
                   </List.Item>
