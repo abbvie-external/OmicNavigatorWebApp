@@ -107,6 +107,7 @@ class DifferentialVolcano extends Component {
           : differentialResults;
 
       this.setState({
+        allChecked: false,
         differentialTableData: data,
         volcanoPlotRows: data?.length || 0,
         featuresLength:
@@ -203,6 +204,9 @@ class DifferentialVolcano extends Component {
     volcanoPlotSelectedDataArr,
     clearHighlightedData,
   ) => {
+    this.setState({
+      allChecked: false,
+    });
     // clear the highlighted rows/dots/svg on svg double-click
     if (clearHighlightedData) {
       this.pageToFeature();
@@ -223,7 +227,6 @@ class DifferentialVolcano extends Component {
         differentialTableData: volcanoPlotSelectedDataArr,
         volcanoPlotRows: volcanoPlotSelectedDataArr.length,
       });
-      debugger;
       let multiselectedFeaturesArrRemaining = [
         ...volcanoPlotSelectedDataArr,
       ].filter(item =>
@@ -412,8 +415,9 @@ class DifferentialVolcano extends Component {
       : this.volcanoPlotFilteredGridRef?.current?.qhGridRef?.current?.getSortedData() ||
         this.props.differentialResults;
     if (selected.length > 1) {
-      this.props.onHandleMultifeaturePlot('Volcano', data);
+      if (selected.length) this.props.onHandleMultifeaturePlot('Volcano', data);
     } else if (selected.length === 1) {
+      this.setState({ allChecked: false });
       if (this.props.volcanoDifferentialTableRowOutline) {
         this.props.onGetPlot(
           'Volcano',
@@ -741,16 +745,21 @@ class DifferentialVolcano extends Component {
     if (allChecked) {
       this.props.onHandleSelectedVolcano([], false);
     } else {
-      const tableData =
+      let tableData =
         this.volcanoPlotFilteredGridRef?.current?.qhGridRef?.current?.getSortedData() ||
         this.props.differentialResults;
       // const featureIds = tableData.map(featureId => featureId[this.props.differentialFeatureIdKey]);
+      if (tableData.length > 1000) {
+        tableData = [...tableData].slice(0, 1000);
+      }
       let elementArray = tableData.map(item => ({
         id: item[differentialFeatureIdKey],
         value: item[differentialFeatureIdKey],
         key: item[differentialFeatureIdKey],
       }));
+
       this.props.onHandleSelectedVolcano(elementArray, false);
+      this.reloadMultifeaturePlot(elementArray);
     }
     this.setState({
       allChecked: !allChecked,
@@ -894,13 +903,13 @@ class DifferentialVolcano extends Component {
       this.volcanoPlotFilteredGridRef?.current?.qhGridRef?.current?.getSortedData() ||
       differentialResults;
     const SelectAllPopupContent = (
-      <List inverted>
+      <List size="large" inverted>
         <List.Item>
           <Icon name="square outline" />
           <List.Content>
             <List.Header>Select All</List.Header>
             <List.Description>
-              Click box to left, to select/deselect all checkboxes
+              Click box to left, to select/deselect first 1000 checkboxes
             </List.Description>
           </List.Content>
         </List.Item>
@@ -1034,6 +1043,9 @@ class DifferentialVolcano extends Component {
                           }
                           onClearPlotSelected={this.props.onClearPlotSelected}
                           onRemoveSelectedFeature={this.removeSelectedFeature}
+                          onHandleAllChecked={bool =>
+                            this.setState({ allChecked: bool })
+                          }
                         ></SVGPlot>
                       </SplitPane>
                       <Grid.Row>
