@@ -857,9 +857,9 @@ class Differential extends Component {
         ? 'id'
         : differentialFeatureIdKey;
     if (data.length) {
-      if (data.length > this.state.multifeaturePlotMax) {
-        data = [...data.slice(0, this.state.multifeaturePlotMax)];
-      }
+      // if (data.length > this.state.multifeaturePlotMax) {
+      //   data = [...data.slice(0, this.state.multifeaturePlotMax)];
+      // }
       const featureIds = data.map(featureId => featureId[key]);
       // if (!featureIds.includes(volcanoDifferentialTableRowOutline)) {
       // this.setState({

@@ -122,6 +122,7 @@ class SVGPlot extends Component {
     this.setState({
       featuresListOpen: false,
     });
+    this.props.onHandleAllChecked(false);
     this.props.onHandleSelectedVolcano([], false);
   };
 
@@ -142,6 +143,14 @@ class SVGPlot extends Component {
       minWidth: divWidth * 0.9,
       maxWidth: divWidth * 0.9,
     };
+    const manyFeaturesText =
+      featuresLength >= 1000 ? (
+        <span id="MoreThanText">
+          Plotting is limited to the first 1000 features
+        </span>
+      ) : (
+        <span id="MoreThanText">{featuresLength} features selected</span>
+      );
 
     let list = (
       <List
@@ -162,9 +171,7 @@ class SVGPlot extends Component {
           >
             CLEAR ALL <Icon name="trash" />
           </Label>
-          {featuresLength > 10 ? (
-            <span id="MoreThanTenText">{featuresLength} features selected</span>
-          ) : null}
+          {featuresLength > 10 ? manyFeaturesText : null}
         </List.Item>
         {featuresLength > 10
           ? null
@@ -185,7 +192,10 @@ class SVGPlot extends Component {
     );
 
     let div = (
-      <span id={divWidth >= 625 ? 'FeaturesListButton' : 'FeaturesListIcon'}>
+      <span
+        className={divWidth < 450 ? 'Hide' : 'Show'}
+        id={divWidth >= 625 ? 'FeaturesListButton' : 'FeaturesListIcon'}
+      >
         <Popup
           trigger={
             <Button size="mini" onClick={this.toggleFeaturesListPopup}>
@@ -497,6 +507,7 @@ class SVGPlot extends Component {
               />
               {featuresList}
               <span
+                className={divWidth < 450 ? 'Hide' : 'Show'}
                 id={divWidth >= 625 ? 'FullScreenButton' : 'FullScreenIcon'}
               >
                 {/* <Popup
