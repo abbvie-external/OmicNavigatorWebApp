@@ -776,33 +776,35 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     const { volcanoDifferentialTableRowOutline } = this.props;
     if (volcanoDifferentialTableRowOutline) {
       // style outline highlighted circle
-      const outlineCircleId = this.getCircleOrBin(
+      const outlinedId = this.getCircleOrBin(
         volcanoDifferentialTableRowOutline,
       );
-      if (outlineCircleId) {
-        const outlineCircle = d3.select(outlineCircleId.element);
-        if (outlineCircle) {
-          const outlineCircleClass = outlineCircle.attr('class');
-          if (outlineCircleClass) {
-            if (outlineCircle.attr('class').endsWith('highlighted')) {
-              outlineCircle.attr('fill', '#ff4400');
+      if (outlinedId) {
+        const outlined = d3.select(outlinedId?.element);
+        if (outlined != null) {
+          if (outlinedId?.type === 'circle') {
+            if (outlined.attr('class').endsWith('highlighted')) {
+              outlined.attr('fill', '#ff4400');
             } else {
-              outlineCircle.attr('fill', '#ffffff');
+              outlined.attr('fill', '#ffffff');
             }
-          }
-          outlineCircle.attr('r', 7);
-          outlineCircle.classed('outlined', true);
-          outlineCircle.attr('stroke', '#1678c2');
-          if (outlineCircleId.type !== 'circle') {
-            outlineCircle.attr('stroke-width', 1);
-            outlineCircle.attr(
-              'd',
-              d => `M${d.x},${d.y}${this.hexbin.hexagon(8)}`,
-            );
+            outlined.attr('stroke-width', 2);
           } else {
-            outlineCircle.attr('stroke-width', 2);
+            let bin = outlined?._groups[0] || null;
+            let classVar = bin[0].attributes['class'].nodeValue || null;
+            let isHighlighted = classVar.indexOf('highlighted');
+            if (isHighlighted != -1) {
+              outlined.attr('fill', '#ff4400');
+            } else {
+              outlined.attr('fill', '#ffffff');
+            }
+            outlined.attr('stroke-width', 1);
           }
-          outlineCircle.raise();
+          outlined.attr('r', 7);
+          outlined.classed('outlined', true);
+          outlined.attr('stroke', '#1678c2');
+          outlined.attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(8)}`);
+          outlined.raise();
         }
       }
     }
@@ -814,8 +816,13 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         `#path-${Math.ceil(d.x)}-${Math.ceil(d.y)}-${d.length}`,
       );
       const binClass = bin.attr('class');
-
-      if (binClass.endsWith('highlighted')) {
+      if (binClass.includes('outlined') && binClass.includes('highlighted')) {
+        bin.attr('stroke', '#1678c2');
+        bin.attr('stroke-width', 1);
+        bin.attr('fill', '#ff4400');
+        bin.attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(9)}`);
+        bin.raise();
+      } else if (binClass.endsWith('highlighted')) {
         bin.attr('stroke', '#000');
         bin.attr('stroke-width', 1);
         bin.attr('fill', '#ff4400');
@@ -912,8 +919,12 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       `#path-${Math.ceil(d.x)}-${Math.ceil(d.y)}-${d.length}`,
     );
     const binClass = bin.attr('class');
-
-    if (binClass.endsWith('outlined')) {
+    if (binClass.includes('outlined') && binClass.includes('highlighted')) {
+      bin.attr('stroke', '#1678c2');
+      bin.attr('stroke-width', 1);
+      bin.attr('fill', '#ff4400');
+      bin.attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(8)}`);
+    } else if (binClass.endsWith('outlined')) {
       bin.attr('stroke', '#1678c2');
       bin.attr('stroke-width', 1);
       bin.attr('fill', '#fff');
@@ -1423,8 +1434,8 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     self.objsBrush = d3
       .brush()
       .extent([
-        [0, 5],
-        [width + 55, height - 20],
+        [10, 5],
+        [width + 25, height - 10],
       ])
       .on('start', brushingStart)
       .on('end', endBrush);
