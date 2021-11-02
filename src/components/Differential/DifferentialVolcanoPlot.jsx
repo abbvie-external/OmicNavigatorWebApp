@@ -791,14 +791,15 @@ class DifferentialVolcanoPlot extends React.PureComponent {
             outlined.attr('stroke-width', 2);
           } else {
             let bin = outlined?._groups[0] || null;
-            let classVar = bin[0].attributes['class'].nodeValue || null;
-            let isHighlighted = classVar.indexOf('highlighted');
-            if (isHighlighted != -1) {
-              outlined.attr('fill', '#ff4400');
-            } else {
-              outlined.attr('fill', '#ffffff');
+            if (bin?.length > 0) {
+              let classVar = bin[0]?.attributes['class']?.nodeValue || null;
+              if (classVar?.includes('highlighted')) {
+                outlined.attr('fill', '#ff4400');
+              } else {
+                outlined.attr('fill', '#ffffff');
+              }
+              outlined.attr('stroke-width', 1);
             }
-            outlined.attr('stroke-width', 1);
           }
           outlined.attr('r', 7);
           outlined.classed('outlined', true);
