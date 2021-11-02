@@ -203,36 +203,90 @@ class DifferentialVolcano extends Component {
     volcanoPlotSelectedDataArr,
     clearHighlightedData,
   ) => {
+    // clear the highlighted rows/dots/svg on svg double-click
+    if (clearHighlightedData) {
+      this.pageToFeature();
+      this.props.onHandleSelectedVolcano([]);
+      // this.props.onSetPlotSelected();
+      // this.props.onClearPlotSelected();
+      return;
+    }
+    let allFeatureIdsRemaining = [...volcanoPlotSelectedDataArr].map(
+      i => i[this.props.differentialFeatureIdKey],
+    );
+    let isOutlinedFeatureInView = allFeatureIdsRemaining.includes(
+      this.props.volcanoDifferentialTableRowOutline,
+    );
     if (volcanoPlotSelectedDataArr.length > 0) {
+      const self = this;
       this.setState({
         differentialTableData: volcanoPlotSelectedDataArr,
         volcanoPlotRows: volcanoPlotSelectedDataArr.length,
       });
-      // if there the max in the table, scroll to it
-      if (this.props.volcanoDifferentialTableRowOutline) {
-        let features = volcanoPlotSelectedDataArr.map(
-          i => i[this.props.differentialFeatureIdKey],
+      debugger;
+      let multiselectedFeaturesArrRemaining = [
+        ...volcanoPlotSelectedDataArr,
+      ].filter(item =>
+        self.props.volcanoDifferentialTableRowHighlight.includes(
+          item[self.props.differentialFeatureIdKey],
+        ),
+      );
+      if (multiselectedFeaturesArrRemaining.length) {
+        // if there are multi-selected features in the box selection, reload the svg, single or multi
+        let multiselectedFeaturesArrMappedRemaining = [
+          ...multiselectedFeaturesArrRemaining,
+        ].map(item => ({
+          id: item[self.props.differentialFeatureIdKey],
+          value: item[self.props.differentialFeatureIdKey],
+          key: item[self.props.differentialFeatureIdKey],
+        }));
+        this.props.onHandleSelectedVolcano(
+          multiselectedFeaturesArrMappedRemaining,
+          false,
         );
-        let hasOutline = features.includes(
-          this.props.volcanoDifferentialTableRowOutline,
+        let multiselectedFeatureIdsMappedRemaining = [
+          ...multiselectedFeaturesArrRemaining,
+        ].map(item => item[self.props.differentialFeatureIdKey]);
+        this.reloadMultifeaturePlot(
+          multiselectedFeatureIdsMappedRemaining,
+          true,
         );
-        const self = this;
-        if (hasOutline) {
+        // if the outlined dot is still in the chart, page to it, otherwise clear it's state and page to 0
+        if (isOutlinedFeatureInView) {
           setTimeout(function() {
             self.pageToFeature(self.props.volcanoDifferentialTableRowOutline);
           }, 500);
-        } else this.pageToFeature();
+        } else {
+          this.props.onClearPlotSelected();
+          this.pageToFeature();
+        }
+      } else {
+        this.props.onHandleSelectedVolcano([]);
+        // there are no multi-selected features in the box selection; check for outligned row and load, or clear svg pane
+        if (isOutlinedFeatureInView) {
+          setTimeout(function() {
+            self.props.onGetPlot(
+              'Volcano',
+              self.props.volcanoDifferentialTableRowOutline,
+              false,
+              false,
+            );
+            self.pageToFeature(self.props.volcanoDifferentialTableRowOutline);
+          }, 500);
+        } else {
+          this.props.onClearPlotSelected();
+          this.pageToFeature();
+        }
       }
     } else {
+      // nothing is in box selection
+      this.props.onHandleSelectedVolcano([]);
+      this.props.onClearPlotSelected();
       this.setState({
         differentialTableData: [],
         volcanoPlotRows: 0,
       });
-    }
-    // clear the highlighted rows/dots/svg
-    if (clearHighlightedData) {
       this.pageToFeature();
-      this.props.onHandleSelectedVolcano([]);
     }
   };
 
@@ -352,12 +406,13 @@ class DifferentialVolcano extends Component {
     // }
   };
 
-  reloadMultifeaturePlot = _.debounce(selected => {
-    const tableData =
-      this.volcanoPlotFilteredGridRef?.current?.qhGridRef?.current?.getSortedData() ||
-      this.props.differentialResults;
+  reloadMultifeaturePlot = _.debounce((selected, boxSelection) => {
+    const data = boxSelection
+      ? selected
+      : this.volcanoPlotFilteredGridRef?.current?.qhGridRef?.current?.getSortedData() ||
+        this.props.differentialResults;
     if (selected.length > 1) {
-      this.props.onHandleMultifeaturePlot('Volcano', tableData);
+      this.props.onHandleMultifeaturePlot('Volcano', data);
     } else if (selected.length === 1) {
       if (this.props.volcanoDifferentialTableRowOutline) {
         this.props.onGetPlot(
@@ -368,6 +423,7 @@ class DifferentialVolcano extends Component {
         );
       } else {
         this.props.onClearPlotSelected();
+        this.pageToFeature();
       }
     } else return;
   }, 1250);
@@ -844,7 +900,7 @@ class DifferentialVolcano extends Component {
           <List.Content>
             <List.Header>Select All</List.Header>
             <List.Description>
-              Click here to select/deselect all checkboxes
+              Click box to left, to select/deselect all checkboxes
             </List.Description>
           </List.Content>
         </List.Item>
@@ -1124,27 +1180,41 @@ class DifferentialVolcano extends Component {
                           widescreen={16}
                         >
                           {HasMultifeaturePlots ? (
-                            <Popup
-                              trigger={
-                                <Icon
-                                  name={
-                                    allChecked
-                                      ? 'check square'
-                                      : 'square outline'
-                                  }
-                                  size="large"
-                                  id="ToggleAllCheckbox"
-                                  className={allChecked ? 'PrimaryColor' : ''}
-                                  onClick={this.toggleAllCheckboxes}
-                                />
-                                // <Label circular id="OtherCircle" />
+                            <>
+                              <Popup
+                                trigger={
+                                  <Icon
+                                    name="info"
+                                    // size="large"
+                                    id="ToggleAllCheckboxInfo"
+                                  />
+                                }
+                                style={selectAllPopupStyle}
+                                // content="Row is light orange when the feature is selected"
+                                content={SelectAllPopupContent}
+                                inverted
+                                basic
+                              />
+                              {/* <Popup
+                              trigger={ */}
+                              <Icon
+                                name={
+                                  allChecked ? 'check square' : 'square outline'
+                                }
+                                size="large"
+                                id="ToggleAllCheckbox"
+                                className={allChecked ? 'PrimaryColor' : ''}
+                                onClick={this.toggleAllCheckboxes}
+                              />
+                              {/* // <Label circular id="OtherCircle" />
                               }
                               style={selectAllPopupStyle}
                               // content="Row is light orange when the feature is selected"
                               content={SelectAllPopupContent}
                               inverted
                               basic
-                            />
+                            /> */}
+                            </>
                           ) : null}
                           <EZGrid
                             ref={this.volcanoPlotFilteredGridRef}

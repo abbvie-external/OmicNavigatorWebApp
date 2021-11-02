@@ -123,7 +123,6 @@ class SVGPlot extends Component {
       featuresListOpen: false,
     });
     this.props.onHandleSelectedVolcano([], false);
-    this.props.onClearPlotSelected();
   };
 
   getFeaturesList = () => {
