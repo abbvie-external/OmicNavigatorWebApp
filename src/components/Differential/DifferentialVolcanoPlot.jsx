@@ -164,14 +164,14 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       .append('g')
       .attr('class', 'volcanoPlotXAxis NoSelect')
       .attr('id', 'xaxis-line')
-      .attr('transform', 'translate(0,' + (upperPlotsHeight - 25) + ')')
+      .attr('transform', 'translate(0,' + (upperPlotsHeight - 35) + ')')
       .call(this.xxAxis);
 
     d3.select('#VolcanoChart')
       .append('text')
       .attr('class', 'volcanoAxisLabel NoSelect')
       .attr('x', volcanoWidth * 0.5 + 10)
-      .attr('y', upperPlotsHeight - 5)
+      .attr('y', upperPlotsHeight - 15)
       .attr('font-size', '18px')
       .style(
         'font-family',
@@ -469,7 +469,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     const yScale = d3
       .scaleLinear()
       .domain([Math.min(...yMM), Math.max(...yMM)])
-      .range([upperPlotsHeight - 54, 10]);
+      .range([upperPlotsHeight - 64, 10]);
 
     return {
       xScale: xScale,
@@ -1423,8 +1423,8 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     self.objsBrush = d3
       .brush()
       .extent([
-        [0, -15],
-        [width + 50, height + 20],
+        [0, 5],
+        [width + 55, height - 20],
       ])
       .on('start', brushingStart)
       .on('end', endBrush);
