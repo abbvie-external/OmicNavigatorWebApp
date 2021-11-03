@@ -1767,6 +1767,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       differentialTest,
       isDataStreamingResultsTable,
       volcanoPlotVisible,
+      hasMultifeaturePlots,
     } = this.props;
 
     const {
@@ -2031,16 +2032,18 @@ class DifferentialVolcanoPlot extends React.PureComponent {
                       </List.Description>
                     </List.Content>
                   </List.Item>
-                  <List.Item>
-                    <Icon name="circle" id="SelectedCircleIcon" />
-                    <List.Content>
-                      <List.Header>Plot Multiple Features</List.Header>
-                      <List.Description>
-                        Control-Click circle/s to view plots for multiple
-                        feature (orange fill)
-                      </List.Description>
-                    </List.Content>
-                  </List.Item>
+                  {hasMultifeaturePlots ? (
+                    <List.Item>
+                      <Icon name="circle" id="SelectedCircleIcon" />
+                      <List.Content>
+                        <List.Header>Plot Multiple Features</List.Header>
+                        <List.Description>
+                          Control-Click circle/s to view plots for multiple
+                          feature (orange fill)
+                        </List.Description>
+                      </List.Content>
+                    </List.Item>
+                  ) : null}
                 </List>
               </Popup.Content>
             </Popup>
