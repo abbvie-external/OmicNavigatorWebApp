@@ -61,7 +61,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     axisLabels: [],
     xAxisLabel: null,
     yAxisLabel: null,
-    volcanoCircleLabel: null,
+    volcanoCircleLabel: sessionStorage.getItem('volcanoCircleLabel') || null,
     identifier: null,
     volcanoCircleLabels: [],
     optionsOpen: false,
@@ -1639,6 +1639,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       this.setState({
         volcanoCircleLabel: value,
       });
+      sessionStorage.setItem('volcanoCircleLabel', value);
     }
   }
 
@@ -1693,11 +1694,20 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         differentialAlphanumericFields[0] !== 'None'
           ? differentialAlphanumericFields[0]
           : differentialAlphanumericFields[1];
+      let storedVolcanoCircleLabel = sessionStorage.getItem(
+        'volcanoCircleLabel',
+      );
+      let nextVolcanoCircleLabel = differentialAlphanumericFields?.includes(
+        storedVolcanoCircleLabel,
+      )
+        ? storedVolcanoCircleLabel
+        : differentialAlphanumericFields[0];
       this.setState({
         identifier: identifierVar,
         volcanoCircleLabels: volcanoCircleLabelsVar,
-        volcanoCircleLabel: differentialAlphanumericFields[0],
+        volcanoCircleLabel: nextVolcanoCircleLabel,
       });
+      sessionStorage.setItem('volcanoCircleLabel', nextVolcanoCircleLabel);
       var yLabel = relevantConfigColumns[0];
       var xLabel = relevantConfigColumns[1];
       var doY = false;
@@ -1767,6 +1777,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       differentialTest,
       isDataStreamingResultsTable,
       volcanoPlotVisible,
+      hasMultifeaturePlots,
     } = this.props;
 
     const {
@@ -2031,16 +2042,18 @@ class DifferentialVolcanoPlot extends React.PureComponent {
                       </List.Description>
                     </List.Content>
                   </List.Item>
-                  <List.Item>
-                    <Icon name="circle" id="SelectedCircleIcon" />
-                    <List.Content>
-                      <List.Header>Plot Multiple Features</List.Header>
-                      <List.Description>
-                        Control-Click circle/s to view plots for multiple
-                        feature (orange fill)
-                      </List.Description>
-                    </List.Content>
-                  </List.Item>
+                  {hasMultifeaturePlots ? (
+                    <List.Item>
+                      <Icon name="circle" id="SelectedCircleIcon" />
+                      <List.Content>
+                        <List.Header>Plot Multiple Features</List.Header>
+                        <List.Description>
+                          Control-Click circle/s to view plots for multiple
+                          feature (orange fill)
+                        </List.Description>
+                      </List.Content>
+                    </List.Item>
+                  ) : null}
                 </List>
               </Popup.Content>
             </Popup>

@@ -70,12 +70,15 @@ class DifferentialVolcano extends Component {
     visible: false,
     volcanoCurrentSelection: [],
     allChecked: false,
+    hasMultifeaturePlots: false,
   };
   volcanoPlotFilteredGridRef = React.createRef();
   differentialVolcanoPlotRef = React.createRef();
 
   componentDidMount() {
+    const hasMultifeaturePlots = this.hasMultifeaturePlots();
     this.setState({
+      hasMultifeaturePlots,
       differentialTableData: this.props.differentialResults,
       // volcanoPlotRows: this.props.differentialResults.length,
     });
@@ -341,6 +344,7 @@ class DifferentialVolcano extends Component {
       this.pageToFeature(event[differentialFeatureIdKey]);
       this.props.onGetPlot('Volcano', feature, false, false);
     } else {
+      if (!this.state.hasMultifeaturePlots) return;
       // const dotClickArr = [
       //   {
       //     id: item[differentialFeatureIdKey],
@@ -441,6 +445,7 @@ class DifferentialVolcano extends Component {
       HighlightedFeaturesArrVolcano,
       differentialResults,
     } = this.props;
+    const { hasMultifeaturePlots } = this.state;
     event.stopPropagation();
     if (
       item == null ||
@@ -466,6 +471,7 @@ class DifferentialVolcano extends Component {
       }
 
       if (event.shiftKey) {
+        if (!hasMultifeaturePlots) return;
         const currentTableData =
           this.volcanoPlotFilteredGridRef?.current?.qhGridRef.current?.getSortedData() ||
           [];
@@ -508,8 +514,10 @@ class DifferentialVolcano extends Component {
       } else if (
         event.ctrlKey ||
         event.metaKey ||
-        event?.target?.classList?.contains('DifferentialResultsRowCheckbox')
+        event?.target?.classList?.contains('DifferentialResultsRowCheckbox') ||
+        event?.target?.classList?.contains('DifferentialResultsRowCheckboxDiv')
       ) {
+        if (!hasMultifeaturePlots) return;
         // control-click or click specifically on checkbox
         const currentTableData =
           this.volcanoPlotFilteredGridRef?.current?.qhGridRef.current?.getSortedData() ||
@@ -789,6 +797,7 @@ class DifferentialVolcano extends Component {
       featuresLength,
       differentialDynamicPlotWidth,
       allChecked,
+      hasMultifeaturePlots,
     } = this.state;
 
     const {
@@ -900,12 +909,11 @@ class DifferentialVolcano extends Component {
       } else return null;
     };
 
-    const HasMultifeaturePlots = this.hasMultifeaturePlots();
     const tableData =
       this.volcanoPlotFilteredGridRef?.current?.qhGridRef?.current?.getSortedData() ||
       differentialResults;
     const SelectAllPopupContent = (
-      <List size="large" inverted>
+      <List inverted>
         <List.Item>
           <Icon name="square outline" />
           <List.Content>
@@ -920,7 +928,7 @@ class DifferentialVolcano extends Component {
           <List.Content>
             <List.Header>Select One</List.Header>
             <List.Description>
-              Click a checkbox to select/deselect it
+              Click a checkbox (or checkbox table cell) to select/deselect it
             </List.Description>
           </List.Content>
         </List.Item>
@@ -936,7 +944,7 @@ class DifferentialVolcano extends Component {
       </List>
     );
     const multiFeaturePlotDisabled =
-      !HasMultifeaturePlots ||
+      !hasMultifeaturePlots ||
       // isDataStreamingResultsTable ||
       HighlightedFeaturesArrVolcano.length <= 1 ||
       featuresLength <= 1;
@@ -1070,7 +1078,7 @@ class DifferentialVolcano extends Component {
                               // size={dynamicSizeLarger}
                               // size={upperPlotsVisible ? '' : 'large'}
                               name={
-                                upperPlotsVisible ? 'angle down' : 'angle up'
+                                upperPlotsVisible ? 'angle up' : 'angle down'
                               }
                             />
                             {upperPlotsVisible ? 'Hide Plots' : 'Show Plots'}
@@ -1184,7 +1192,7 @@ class DifferentialVolcano extends Component {
                         <Grid.Column
                           className="ResultsTableWrapper"
                           id={
-                            HasMultifeaturePlots
+                            hasMultifeaturePlots
                               ? 'DifferentialResultsTableWrapperCheckboxes'
                               : 'DifferentialResultsTableWrapper'
                           }
@@ -1193,13 +1201,12 @@ class DifferentialVolcano extends Component {
                           largeScreen={16}
                           widescreen={16}
                         >
-                          {HasMultifeaturePlots ? (
+                          {hasMultifeaturePlots ? (
                             <>
                               <Popup
                                 trigger={
                                   <Icon
                                     name="info"
-                                    // size="large"
                                     id="ToggleAllCheckboxInfo"
                                   />
                                 }
