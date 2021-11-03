@@ -1078,7 +1078,7 @@ class DifferentialVolcano extends Component {
                               // size={dynamicSizeLarger}
                               // size={upperPlotsVisible ? '' : 'large'}
                               name={
-                                upperPlotsVisible ? 'angle down' : 'angle up'
+                                upperPlotsVisible ? 'angle up' : 'angle down'
                               }
                             />
                             {upperPlotsVisible ? 'Hide Plots' : 'Show Plots'}

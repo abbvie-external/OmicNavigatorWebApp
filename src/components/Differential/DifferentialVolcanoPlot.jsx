@@ -61,7 +61,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     axisLabels: [],
     xAxisLabel: null,
     yAxisLabel: null,
-    volcanoCircleLabel: null,
+    volcanoCircleLabel: sessionStorage.getItem('volcanoCircleLabel') || null,
     identifier: null,
     volcanoCircleLabels: [],
     optionsOpen: false,
@@ -1639,6 +1639,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       this.setState({
         volcanoCircleLabel: value,
       });
+      sessionStorage.setItem('volcanoCircleLabel', value);
     }
   }
 
@@ -1693,11 +1694,20 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         differentialAlphanumericFields[0] !== 'None'
           ? differentialAlphanumericFields[0]
           : differentialAlphanumericFields[1];
+      let storedVolcanoCircleLabel = sessionStorage.getItem(
+        'volcanoCircleLabel',
+      );
+      let nextVolcanoCircleLabel = differentialAlphanumericFields?.includes(
+        storedVolcanoCircleLabel,
+      )
+        ? storedVolcanoCircleLabel
+        : differentialAlphanumericFields[0];
       this.setState({
         identifier: identifierVar,
         volcanoCircleLabels: volcanoCircleLabelsVar,
-        volcanoCircleLabel: differentialAlphanumericFields[0],
+        volcanoCircleLabel: nextVolcanoCircleLabel,
       });
+      sessionStorage.setItem('volcanoCircleLabel', nextVolcanoCircleLabel);
       var yLabel = relevantConfigColumns[0];
       var xLabel = relevantConfigColumns[1];
       var doY = false;
