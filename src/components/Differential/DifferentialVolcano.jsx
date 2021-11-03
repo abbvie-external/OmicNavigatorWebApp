@@ -619,7 +619,6 @@ class DifferentialVolcano extends Component {
       volcanoDivWidth,
       volcanoDivWidthBackup,
     } = this.state;
-    debugger;
     if (volcanoPlotVisible) {
       // closing the volcano plot, set backup widths
       localStorage.setItem('volcanoDivWidthBackup', volcanoDivWidth);
@@ -638,7 +637,6 @@ class DifferentialVolcano extends Component {
   };
 
   onSizeChange = (newSize, axisDragged) => {
-    debugger;
     const { volcanoDivWidth } = this.state;
     const { fwdRefDVC } = this.props;
     const plotSizeAdjustment = Math.round(newSize * 0.92);
