@@ -574,7 +574,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       // if (upperPlotsVisible && volcanoPlotVisible)
       this.transitionZoom(allDataInSelectedArea, false, true, false);
     }
-
+    // Paul & Joe - what is brushed raw data?
     if (
       volcanoCircleLabel != null &&
       prevState.volcanoCircleLabel !== volcanoCircleLabel &&
