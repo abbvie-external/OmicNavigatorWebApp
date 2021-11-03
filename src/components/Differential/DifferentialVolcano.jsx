@@ -48,6 +48,8 @@ class DifferentialVolcano extends Component {
     volcanoWidth: parseInt(localStorage.getItem('volcanoWidth'), 10) || 380,
     volcanoDivWidth:
       parseInt(localStorage.getItem('volcanoDivWidth'), 10) || 420,
+    volcanoDivWidthBackup:
+      parseInt(localStorage.getItem('volcanoDivWidthBackup'), 10) || 420,
     volcanoPlotVisible:
       JSON.parse(localStorage.getItem('volcanoPlotVisible')) === true ||
       localStorage.getItem('volcanoPlotVisible') == null
@@ -584,52 +586,6 @@ class DifferentialVolcano extends Component {
     }
   };
 
-  onSizeChange = (newSize, axisDragged) => {
-    const { volcanoDivWidth } = this.state;
-    const { fwdRefDVC } = this.props;
-    const plotSizeAdjustment = Math.round(newSize * 0.92);
-    if (axisDragged === 'horizontal') {
-      // if (newSize)
-      // on up/down drag, we are forcing a dynamic plot resize by change the volcano width by 1
-      const vDivWidth =
-        parseInt(localStorage.getItem('volcanoDivWidth'), 10) || 500;
-      const vWidth = parseInt(localStorage.getItem('volcanoWidth'), 10) || 460;
-      const differentialDynamicPlotWidthPx =
-        fwdRefDVC.current?.offsetWidth - volcanoDivWidth - 1 || 500;
-      // up/down drag expected logic
-      localStorage.setItem('volcanoDivWidth', vDivWidth + 1);
-      localStorage.setItem('volcanoWidth', vWidth + 1);
-      localStorage.setItem('upperPlotsHeight', plotSizeAdjustment + 1);
-      localStorage.setItem('upperPlotsDivHeight', newSize + 1);
-      localStorage.setItem(
-        'differentialDynamicPlotWidth',
-        differentialDynamicPlotWidthPx,
-      );
-      this.setState({
-        differentialDynamicPlotWidth: differentialDynamicPlotWidthPx,
-        volcanoWidth: vWidth + 1,
-        upperPlotsHeight: plotSizeAdjustment + 1,
-        upperPlotsDivHeight: newSize + 1,
-        volcanoDivWidth: vDivWidth + 1,
-      });
-    } else {
-      // on left/right "vertical"
-      const differentialDynamicPlotWidthPx =
-        fwdRefDVC.current?.offsetWidth - newSize || 500;
-      localStorage.setItem(
-        'differentialDynamicPlotWidth',
-        differentialDynamicPlotWidthPx,
-      );
-      localStorage.setItem('volcanoDivWidth', newSize);
-      localStorage.setItem('volcanoWidth', plotSizeAdjustment);
-      this.setState({
-        volcanoDivWidth: newSize,
-        volcanoWidth: plotSizeAdjustment,
-        differentialDynamicPlotWidth: differentialDynamicPlotWidthPx,
-      });
-    }
-  };
-
   handleUpperPlotsVisability = e => {
     // toggle visability
     const {
@@ -678,6 +634,52 @@ class DifferentialVolcano extends Component {
     });
     const size = !volcanoPlotVisible ? volcanoDivWidthBackup : 1;
     this.onSizeChange(size, 'vertical');
+  };
+
+  onSizeChange = (newSize, axisDragged) => {
+    const { volcanoDivWidth } = this.state;
+    const { fwdRefDVC } = this.props;
+    const plotSizeAdjustment = Math.round(newSize * 0.92);
+    if (axisDragged === 'horizontal') {
+      // if (newSize)
+      // on up/down drag, we are forcing a dynamic plot resize by change the volcano width by 1
+      const vDivWidth =
+        parseInt(localStorage.getItem('volcanoDivWidth'), 10) || 500;
+      const vWidth = parseInt(localStorage.getItem('volcanoWidth'), 10) || 460;
+      const differentialDynamicPlotWidthPx =
+        fwdRefDVC.current?.offsetWidth - volcanoDivWidth - 1 || 500;
+      // up/down drag expected logic
+      localStorage.setItem('volcanoDivWidth', vDivWidth + 1);
+      localStorage.setItem('volcanoWidth', vWidth + 1);
+      localStorage.setItem('upperPlotsHeight', plotSizeAdjustment + 1);
+      localStorage.setItem('upperPlotsDivHeight', newSize + 1);
+      localStorage.setItem(
+        'differentialDynamicPlotWidth',
+        differentialDynamicPlotWidthPx,
+      );
+      this.setState({
+        differentialDynamicPlotWidth: differentialDynamicPlotWidthPx,
+        volcanoWidth: vWidth + 1,
+        upperPlotsHeight: plotSizeAdjustment + 1,
+        upperPlotsDivHeight: newSize + 1,
+        volcanoDivWidth: vDivWidth + 1,
+      });
+    } else {
+      // on left/right "vertical"
+      const differentialDynamicPlotWidthPx =
+        fwdRefDVC.current?.offsetWidth - newSize || 500;
+      localStorage.setItem(
+        'differentialDynamicPlotWidth',
+        differentialDynamicPlotWidthPx,
+      );
+      localStorage.setItem('volcanoDivWidth', newSize);
+      localStorage.setItem('volcanoWidth', plotSizeAdjustment);
+      this.setState({
+        volcanoDivWidth: newSize,
+        volcanoWidth: plotSizeAdjustment,
+        differentialDynamicPlotWidth: differentialDynamicPlotWidthPx,
+      });
+    }
   };
 
   handleTableChange = () => {
