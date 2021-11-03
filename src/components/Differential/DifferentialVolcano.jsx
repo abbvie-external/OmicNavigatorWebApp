@@ -48,6 +48,8 @@ class DifferentialVolcano extends Component {
     volcanoWidth: parseInt(localStorage.getItem('volcanoWidth'), 10) || 380,
     volcanoDivWidth:
       parseInt(localStorage.getItem('volcanoDivWidth'), 10) || 420,
+    volcanoDivWidthBackup:
+      parseInt(localStorage.getItem('volcanoDivWidthBackup'), 10) || 420,
     volcanoPlotVisible:
       JSON.parse(localStorage.getItem('volcanoPlotVisible')) === true ||
       localStorage.getItem('volcanoPlotVisible') == null
@@ -584,7 +586,59 @@ class DifferentialVolcano extends Component {
     }
   };
 
+  handleUpperPlotsVisability = e => {
+    // toggle visability
+    const {
+      upperPlotsVisible,
+      upperPlotsHeight,
+      upperPlotsDivHeight,
+      upperPlotsDivHeightBackup,
+    } = this.state;
+    if (upperPlotsVisible) {
+      // closing the upper plots, set backup heights
+      localStorage.setItem('upperPlotsDivHeightBackup', upperPlotsDivHeight);
+      localStorage.setItem('upperPlotsHeightBackup', upperPlotsHeight);
+      this.setState({
+        upperPlotsHeightBackup: upperPlotsHeight,
+        upperPlotsDivHeightBackup: upperPlotsDivHeight,
+      });
+    }
+    localStorage.setItem('upperPlotsVisible', !upperPlotsVisible);
+    this.setState({
+      upperPlotsVisible: !upperPlotsVisible,
+    });
+    // opening the upper plots (use div height backup as new size) or closing the plot (use 1)
+    const size = !upperPlotsVisible ? upperPlotsDivHeightBackup : 1;
+    this.onSizeChange(size, 'horizontal');
+  };
+
+  handleVolcanoVisability = e => {
+    const {
+      volcanoPlotVisible,
+      volcanoWidth,
+      volcanoDivWidth,
+      volcanoDivWidthBackup,
+    } = this.state;
+    debugger;
+    if (volcanoPlotVisible) {
+      // closing the volcano plot, set backup widths
+      localStorage.setItem('volcanoDivWidthBackup', volcanoDivWidth);
+      localStorage.setItem('volcanoWidthBackup', volcanoWidth);
+      this.setState({
+        volcanoDivWidthBackup: volcanoDivWidth,
+        volcanoWidthBackup: volcanoWidth,
+      });
+    }
+    localStorage.setItem('volcanoPlotVisible', !volcanoPlotVisible);
+    this.setState({
+      volcanoPlotVisible: !volcanoPlotVisible,
+    });
+    const size = !volcanoPlotVisible ? volcanoDivWidthBackup : 1;
+    this.onSizeChange(size, 'vertical');
+  };
+
   onSizeChange = (newSize, axisDragged) => {
+    debugger;
     const { volcanoDivWidth } = this.state;
     const { fwdRefDVC } = this.props;
     const plotSizeAdjustment = Math.round(newSize * 0.92);
@@ -628,56 +682,6 @@ class DifferentialVolcano extends Component {
         differentialDynamicPlotWidth: differentialDynamicPlotWidthPx,
       });
     }
-  };
-
-  handleUpperPlotsVisability = e => {
-    // toggle visability
-    const {
-      upperPlotsVisible,
-      upperPlotsHeight,
-      upperPlotsDivHeight,
-      upperPlotsDivHeightBackup,
-    } = this.state;
-    if (upperPlotsVisible) {
-      // closing the upper plots, set backup heights
-      localStorage.setItem('upperPlotsDivHeightBackup', upperPlotsDivHeight);
-      localStorage.setItem('upperPlotsHeightBackup', upperPlotsHeight);
-      this.setState({
-        upperPlotsHeightBackup: upperPlotsHeight,
-        upperPlotsDivHeightBackup: upperPlotsDivHeight,
-      });
-    }
-    localStorage.setItem('upperPlotsVisible', !upperPlotsVisible);
-    this.setState({
-      upperPlotsVisible: !upperPlotsVisible,
-    });
-    // opening the upper plots (use div height backup as new size) or closing the plot (use 1)
-    const size = !upperPlotsVisible ? upperPlotsDivHeightBackup : 1;
-    this.onSizeChange(size, 'horizontal');
-  };
-
-  handleVolcanoVisability = e => {
-    const {
-      volcanoPlotVisible,
-      volcanoWidth,
-      volcanoDivWidth,
-      volcanoDivWidthBackup,
-    } = this.state;
-    if (volcanoPlotVisible) {
-      // closing the volcano plot, set backup widths
-      localStorage.setItem('volcanoDivWidthBackup', volcanoDivWidth);
-      localStorage.setItem('volcanoWidthBackup', volcanoWidth);
-      this.setState({
-        volcanoDivWidthBackup: volcanoDivWidth,
-        volcanoWidthBackup: volcanoWidth,
-      });
-    }
-    localStorage.setItem('volcanoPlotVisible', !volcanoPlotVisible);
-    this.setState({
-      volcanoPlotVisible: !volcanoPlotVisible,
-    });
-    const size = !volcanoPlotVisible ? volcanoDivWidthBackup : 1;
-    this.onSizeChange(size, 'vertical');
   };
 
   handleTableChange = () => {
