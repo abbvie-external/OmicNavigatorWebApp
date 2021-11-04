@@ -250,7 +250,7 @@ class DifferentialVolcano extends Component {
         }));
         this.props.onHandleSelectedVolcano(
           multiselectedFeaturesArrMappedRemaining,
-          false,
+          true,
         );
         let multiselectedFeatureIdsMappedRemaining = [
           ...multiselectedFeaturesArrRemaining,
