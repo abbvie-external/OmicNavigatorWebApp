@@ -37,7 +37,7 @@ class MetafeaturesTableDynamic extends Component {
         `MetafeaturesData-${this.props.imageInfoVolcano.key}`,
       ),
     );
-    if (!cachedMetafeaturesData) {
+    if (!cachedMetafeaturesData && this.props.imageInfoVolcano?.key) {
       try {
         const data = await omicNavigatorService.getMetaFeaturesTable(
           this.props.differentialStudy,
