@@ -54,13 +54,36 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     xxAxis: '',
     yyAxis: '',
     currentResults: [],
-    doXAxisTransformation: false,
-    doYAxisTransformation: false,
-    allowXTransformation: true,
-    allowYTransformation: true,
+    // doXAxisTransformation: sessionStorage.getItem('doXAxisTransformation') || false,
+    // doYAxisTransformation: sessionStorage.getItem('doYAxisTransformation') || false,
+    // allowXTransformation: sessionStorage.getItem('allowXTransformation') || true,
+    // allowYTransformation: sessionStorage.getItem('allowYTransformation') || true,
+
+    doXAxisTransformation:
+      JSON.parse(sessionStorage.getItem('doXAxisTransformation')) === true
+        ? // || sessionStorage.getItem('doXAxisTransformation') == null
+          true
+        : false,
+
+    doYAxisTransformation:
+      JSON.parse(sessionStorage.getItem('doYAxisTransformation')) === true
+        ? // || sessionStorage.getItem('doYAxisTransformation') == null
+          true
+        : false,
+
+    allowXTransformation:
+      JSON.parse(sessionStorage.getItem('allowXTransformation')) === true ||
+      sessionStorage.getItem('allowXTransformation') == null
+        ? true
+        : false,
+    allowYTransformation:
+      JSON.parse(sessionStorage.getItem('allowYTransformation')) === true ||
+      sessionStorage.getItem('allowYTransformation') == null
+        ? true
+        : false,
     axisLabels: [],
-    xAxisLabel: null,
-    yAxisLabel: null,
+    xAxisLabel: sessionStorage.getItem('yAxisLabel') || null,
+    yAxisLabel: sessionStorage.getItem('yAxisLabel') || null,
     volcanoCircleLabel: sessionStorage.getItem('volcanoCircleLabel') || null,
     identifier: null,
     volcanoCircleLabels: [],
@@ -1624,6 +1647,9 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         doXAxisTransformation: doXaxisTransCheck,
         allowXTransformation: allowXTransCheck,
       });
+      sessionStorage.setItem('xAxisLabel', value);
+      sessionStorage.setItem('doXAxisTransformation', doXaxisTransCheck);
+      sessionStorage.setItem('allowXTransformation', allowXTransCheck);
     } else if (name === 'yAxisSelector') {
       const allowYTransCheck =
         this.getMaxAndMin(differentialResultsUnfiltered, value)[0] > 0;
@@ -1635,6 +1661,9 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         doYAxisTransformation: doYaxisTransCheck,
         allowYTransformation: allowYTransCheck,
       });
+      sessionStorage.setItem('yAxisLabel', value);
+      sessionStorage.setItem('doYAxisTransformation', doYaxisTransCheck);
+      sessionStorage.setItem('allowYTransformation', allowYTransCheck);
     } else {
       this.setState({
         volcanoCircleLabel: value,
@@ -1648,10 +1677,18 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       this.setState({
         doXAxisTransformation: !this.state.doXAxisTransformation,
       });
+      sessionStorage.setItem(
+        'doXAxisTransformation',
+        !this.state.doXAxisTransformation,
+      );
     } else {
       this.setState({
         doYAxisTransformation: !this.state.doYAxisTransformation,
       });
+      sessionStorage.setItem(
+        'doYAxisTransformation',
+        !this.state.doYAxisTransformation,
+      );
     }
   };
 
@@ -1708,35 +1745,82 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         volcanoCircleLabel: nextVolcanoCircleLabel,
       });
       sessionStorage.setItem('volcanoCircleLabel', nextVolcanoCircleLabel);
-      var yLabel = relevantConfigColumns[0];
-      var xLabel = relevantConfigColumns[1];
-      var doY = false;
-      if (relevantConfigColumns.indexOf('logFC') >= 0) {
-        xLabel = 'logFC';
+      // XAXIS
+      let storedXAxisLabel = sessionStorage.getItem('xAxisLabel');
+      // if session storage cached xlabel is an option, use it
+      let xLabel = relevantConfigColumns?.includes(storedXAxisLabel)
+        ? storedXAxisLabel
+        : null;
+
+      // otherwise, if not cached in session, default to logFC. If no logFC, set to first index
+      if (!xLabel) {
+        if (relevantConfigColumns.indexOf('logFC') >= 0) {
+          xLabel = 'logFC';
+        } else {
+          xLabel = relevantConfigColumns[0];
+        }
       }
-      if (relevantConfigColumns.indexOf('P_Value') >= 0) {
-        yLabel = 'P_Value';
-        doY = true;
-      } else if (relevantConfigColumns.indexOf('P.Value') >= 0) {
-        yLabel = 'P.Value';
-        doY = true;
-      } else if (relevantConfigColumns.indexOf('PValue') >= 0) {
-        yLabel = 'PValue';
-        doY = true;
-      } else if (relevantConfigColumns.indexOf('PVal') >= 0) {
-        yLabel = 'PVal';
-        doY = true;
-      } else if (relevantConfigColumns.indexOf('P value') >= 0) {
-        yLabel = 'P value';
-        doY = true;
-      } else if (relevantConfigColumns.indexOf('adj_P_Val') >= 0) {
-        yLabel = 'adj_P_Val';
-        doY = true;
-      } else if (relevantConfigColumns.indexOf('adj.P.Val') >= 0) {
-        yLabel = 'adj.P.Val';
-        doY = true;
-      } else {
-        this.handleDropdownChange({}, { name: 'yAxisSelector', value: yLabel });
+      // YAXIS
+      let storedYAxisLabel = sessionStorage.getItem('yAxisLabel');
+      // if session storage cached ylabel is an option, use it, otherwise, if not cached in session, look for a p value label
+      let yLabel = relevantConfigColumns?.includes(storedYAxisLabel)
+        ? storedYAxisLabel
+        : null;
+
+      // DOY
+      let doY = this.state.doYAxisTransformation;
+      if (!yLabel) {
+        // stored in session and available, need to set doy
+        // if (yLabel.indexOf('P_Value') >= 0) {
+        //   doY = true;
+        // } else if (yLabel.indexOf('P.Value') >= 0) {
+        //   doY = true;
+        // } else if (yLabel.indexOf('PValue') >= 0) {
+        //   doY = true;
+        // } else if (yLabel.indexOf('PVal') >= 0) {
+        //   doY = true;
+        // } else if (yLabel.indexOf('P value') >= 0) {
+        //   doY = true;
+        // } else if (yLabel.indexOf('adj_P_Val') >= 0) {
+        //   doY = true;
+        // } else if (yLabel.indexOf('adj.P.Val') >= 0) {
+        //   doY = true;
+        // } else {
+        //     // this.handleDropdownChange(
+        //     //   {},
+        //     //   { name: 'yAxisSelector', value: yLabel },
+        //     // );
+        //     doY = this.state.doYAxisTransformation;
+        //   }
+        // } else {
+        // not stored in session or available, need to set ylabel and doy
+        if (relevantConfigColumns.indexOf('P_Value') >= 0) {
+          yLabel = 'P_Value';
+          doY = true;
+        } else if (relevantConfigColumns.indexOf('P.Value') >= 0) {
+          yLabel = 'P.Value';
+          doY = true;
+        } else if (relevantConfigColumns.indexOf('PValue') >= 0) {
+          yLabel = 'PValue';
+          doY = true;
+        } else if (relevantConfigColumns.indexOf('PVal') >= 0) {
+          yLabel = 'PVal';
+          doY = true;
+        } else if (relevantConfigColumns.indexOf('P value') >= 0) {
+          yLabel = 'P value';
+          doY = true;
+        } else if (relevantConfigColumns.indexOf('adj_P_Val') >= 0) {
+          yLabel = 'adj_P_Val';
+          doY = true;
+        } else if (relevantConfigColumns.indexOf('adj.P.Val') >= 0) {
+          yLabel = 'adj.P.Val';
+          doY = true;
+        } else {
+          this.handleDropdownChange(
+            {},
+            { name: 'yAxisSelector', value: relevantConfigColumns[0] },
+          );
+        }
       }
       const axes = relevantConfigColumns.map(e => {
         return {
