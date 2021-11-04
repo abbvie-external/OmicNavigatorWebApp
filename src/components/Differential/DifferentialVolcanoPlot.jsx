@@ -2036,6 +2036,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
                               trigger={xAxisTransformBox}
                               style={TableValuePopupStyle}
                               content="-log10 Transform, X Axis"
+                              inverted
                               basic
                             />
                           </Form.Group>
