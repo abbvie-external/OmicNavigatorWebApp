@@ -1727,10 +1727,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
           value: e,
         };
       });
-      let identifierVar =
-        differentialAlphanumericFields[0] !== 'None'
-          ? differentialAlphanumericFields[0]
-          : differentialAlphanumericFields[1];
+
       let storedVolcanoCircleLabel = sessionStorage.getItem(
         'volcanoCircleLabel',
       );
@@ -1739,6 +1736,16 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       )
         ? storedVolcanoCircleLabel
         : differentialAlphanumericFields[0];
+
+      // let identifierVar =
+      //   differentialAlphanumericFields[0] !== 'None'
+      //     ? differentialAlphanumericFields[0]
+      //     : differentialAlphanumericFields[1];
+      let identifierVar =
+        nextVolcanoCircleLabel !== 'None'
+          ? nextVolcanoCircleLabel
+          : differentialAlphanumericFields[1];
+
       this.setState({
         identifier: identifierVar,
         volcanoCircleLabels: volcanoCircleLabelsVar,
@@ -1753,7 +1760,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         : null;
 
       // otherwise, if not cached in session, default to logFC. If no logFC, set to first index
-      if (!xLabel) {
+      if (xLabel == null) {
         if (relevantConfigColumns.indexOf('logFC') >= 0) {
           xLabel = 'logFC';
         } else {
@@ -1766,10 +1773,9 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       let yLabel = relevantConfigColumns?.includes(storedYAxisLabel)
         ? storedYAxisLabel
         : null;
-
       // DOY
       let doY = this.state.doYAxisTransformation;
-      if (!yLabel) {
+      if (yLabel == null) {
         // stored in session and available, need to set doy
         // if (yLabel.indexOf('P_Value') >= 0) {
         //   doY = true;
