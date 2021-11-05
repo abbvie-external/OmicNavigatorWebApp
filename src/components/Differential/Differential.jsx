@@ -99,7 +99,6 @@ class Differential extends Component {
       allMetaFeaturesDataDifferential: [],
       isDataStreamingResultsTable: true,
       enableMultifeaturePlotting: false,
-      updateVolcanoLabels: false,
       multifeaturePlotMax: 1000,
     };
   }
@@ -1050,14 +1049,12 @@ class Differential extends Component {
         this.setState({
           volcanoDifferentialTableRowHighlight: volcanoDifferentialTableRowHighlightVar,
           HighlightedFeaturesArrVolcano: toHighlightArr,
-          updateVolcanoLabels: true,
         });
       }
     } else {
       this.setState({
         HighlightedFeaturesArrVolcano: [],
         volcanoDifferentialTableRowHighlight: [],
-        updateVolcanoLabels: true,
       });
       // when clearing multi-selection, if there is an outlined row, init single plot
       if (volcanoDifferentialTableRowOutline.length > 0) {
@@ -1084,12 +1081,6 @@ class Differential extends Component {
         });
       }
     }
-  };
-
-  updateVolcanoLabels = bool => {
-    this.setState({
-      updateVolcanoLabels: bool,
-    });
   };
 
   handlePlotVolcano = (maxId, rerenderMaxPlot) => {
@@ -1470,7 +1461,6 @@ class Differential extends Component {
           onVolcanoSVGSizeChange={this.handleVolcanoSVGSizeChange}
           onHandleVolcanoTableLoading={this.handleVolcanoTableLoading}
           onBackToTable={this.backToTable}
-          onUpdateVolcanoLabels={this.updateVolcanoLabels}
           onHandleUpdateDifferentialResults={this.updateDifferentialResults}
           onHandleVolcanoState={this.updateVolcanoState}
           onHandleTableDataChange={this.handleTableDataChange}
@@ -1495,28 +1485,43 @@ class Differential extends Component {
       visible,
     } = this.state;
     const { tab, differentialStudy, differentialModel } = this.props;
-    const pxToPtRatio = 105;
-    const pointSize = 12;
-    const width =
-      window.innerWidth ||
-      document.documentElement.clientWidth ||
-      document.body.clientWidth;
-    const height =
-      window.innerHeight ||
-      document.documentElement.clientHeight ||
-      document.body.clientHeight;
-    // const divWidth =
-    //   this.differentialViewContainerRef?.current?.parentElement?.offsetWidth ||
-    //   width - 310;
-    const divWidth = width * 0.75;
-    const divHeight = height * 0.85;
-    const divWidthPt = roundToPrecision(divWidth / pxToPtRatio, 1);
-    const divHeightPt = roundToPrecision(divHeight / pxToPtRatio, 1);
-    const divWidthPtString = `width=${divWidthPt}`;
-    const divHeightPtString = `&height=${divHeightPt}`;
-    const pointSizeString = `&pointsize=${pointSize}`;
-    const dimensions = `?${divWidthPtString}${divHeightPtString}${pointSizeString}`;
-    const srcUrl = `${multisetPlotInfoDifferential.svg}${dimensions}`;
+    let pxToPtRatio,
+      pointSize,
+      width,
+      height,
+      divWidth,
+      divHeight,
+      divWidthPt,
+      divHeightPt,
+      divWidthPtString,
+      divHeightPtString,
+      pointSizeString,
+      dimensions,
+      srcUrl;
+    if (multisetPlotInfoDifferential?.svg?.length > 0) {
+      pxToPtRatio = 105;
+      pointSize = 12;
+      width =
+        window.innerWidth ||
+        document.documentElement.clientWidth ||
+        document.body.clientWidth;
+      height =
+        window.innerHeight ||
+        document.documentElement.clientHeight ||
+        document.body.clientHeight;
+      // divWidth =
+      //   this.differentialViewContainerRef?.current?.parentElement?.offsetWidth ||
+      //   width - 310;
+      divWidth = width * 0.75;
+      divHeight = height * 0.85;
+      divWidthPt = roundToPrecision(divWidth / pxToPtRatio, 1);
+      divHeightPt = roundToPrecision(divHeight / pxToPtRatio, 1);
+      divWidthPtString = `width=${divWidthPt}`;
+      divHeightPtString = `&height=${divHeightPt}`;
+      pointSizeString = `&pointsize=${pointSize}`;
+      dimensions = `?${divWidthPtString}${divHeightPtString}${pointSizeString}`;
+      srcUrl = `${multisetPlotInfoDifferential.svg}${dimensions}`;
+    }
     const VerticalSidebar = ({ animation, visible }) => (
       <Sidebar
         as={'div'}
@@ -1555,7 +1560,7 @@ class Differential extends Component {
           id="differentialMultisetAnalysisSVGDiv"
           className="MultisetSvgOuter"
         >
-          {multisetPlotInfoDifferential.svg?.length ? (
+          {multisetPlotInfoDifferential.svg?.length > 0 ? (
             <SVG
               cacheRequests={true}
               src={srcUrl}

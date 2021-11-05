@@ -92,7 +92,30 @@ class DifferentialVolcanoPlot extends React.PureComponent {
   };
 
   componentDidMount() {
-    // window.addEventListener('resize', this.debouncedResizeListener);
+    const {
+      isDataStreamingResultsTable,
+      differentialResultsUnfiltered,
+      volcanoPlotVisible,
+      upperPlotsVisible,
+      isItemSelected,
+    } = this.props;
+    // if data streaming is false when mounts, it's cached, so we just need to load everything on mount, because it won't get caught in update
+    if (!isDataStreamingResultsTable) {
+      this.getAxisLabels();
+      window.addEventListener('resize', this.debouncedResizeListener);
+      // user opens volcano plot any time after data finishes streaming
+      const dataInCurrentView =
+        this.state.currentResults.length > 0
+          ? this.state.currentResults
+          : differentialResultsUnfiltered;
+      d3.select('#VolcanoChart').remove();
+      this.setupVolcano();
+      this.hexBinning(differentialResultsUnfiltered);
+      this.transitionZoom(dataInCurrentView, false, false, false);
+      if (volcanoPlotVisible && upperPlotsVisible && !isItemSelected) {
+        this.setState({ optionsOpen: true });
+      }
+    }
   }
 
   componentWillUnmount() {
@@ -509,7 +532,6 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       volcanoDifferentialTableRowHighlight,
       upperPlotsHeight,
       volcanoWidth,
-      // updateVolcanoLabels,
       isFilteredDifferential,
       isDataStreamingResultsTable,
       differentialResultsUnfiltered,
@@ -528,20 +550,13 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       doXAxisTransformation,
       doYAxisTransformation,
     } = this.state;
-
     // this if/else if/else if statement in place to minimize re-renders - should cover all situations
     if (
       !isDataStreamingResultsTable &&
       isDataStreamingResultsTable !== prevProps.isDataStreamingResultsTable
-      //     ||
-      // (volcanoPlotVisible &&
-      //   volcanoPlotVisible !== prevProps.volcanoPlotVisible &&
-      //   upperPlotsVisible)
     ) {
       this.getAxisLabels();
-
       window.addEventListener('resize', this.debouncedResizeListener);
-      // user opens volcano plot any time after data finishes streaming
       const dataInCurrentView =
         this.state.currentResults.length > 0
           ? this.state.currentResults
@@ -555,8 +570,6 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       }
     } else if (
       !isDataStreamingResultsTable &&
-      // volcanoPlotVisible &&
-      // upperPlotsVisible &&
       (prevState.xAxisLabel !== xAxisLabel ||
         prevState.yAxisLabel !== yAxisLabel ||
         prevState.doXAxisTransformation !== doXAxisTransformation ||
@@ -564,32 +577,28 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         prevProps.upperPlotsHeight !== upperPlotsHeight ||
         prevProps.volcanoWidth !== volcanoWidth)
     ) {
-      // volcano plot is open, user changes axis or height/widht (visible only whe volcano plot is open)
+      // volcano plot is open, user changes axis or height/width (visible only whe volcano plot is open)
       d3.select('#VolcanoChart').remove();
       this.setupVolcano();
       this.hexBinning(this.state.currentResults);
       this.transitionZoom(this.state.currentResults, false, false, false);
     } else if (
-      // volcanoPlotVisible &&
-      // upperPlotsVisible &&
       (prevProps.isFilteredDifferential && !isFilteredDifferential) ||
       (prevProps.isUpsetVisible && !this.props.isUpsetVisible)
     ) {
-      // volcano plot is open, and set analysis "filter" is clicked OR set analysis is toggled off
+      // set analysis "filter" is clicked OR set analysis is toggled off
       const dataInCurrentView =
         this.state.currentResults.length > 0
           ? this.state.currentResults
           : differentialResultsUnfiltered;
-      // if (upperPlotsVisible && volcanoPlotVisible)
       this.transitionZoom(dataInCurrentView, false, false, false);
     } else if (
       !isDataStreamingResultsTable &&
-      // volcanoPlotVisible &&
       prevProps.filteredDifferentialTableData.length !== 30 &&
       filteredDifferentialTableData.length !==
         prevProps.filteredDifferentialTableData.length
     ) {
-      // table filtered is applied
+      // table filtere is applied
       let allDataInSelectedArea =
         this.state.currentResults.length > 0
           ? this.state.currentResults
@@ -597,42 +606,9 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       // if (upperPlotsVisible && volcanoPlotVisible)
       this.transitionZoom(allDataInSelectedArea, false, true, false);
     }
-
-    // Paul & Joe - what is brushed raw data?
-    // if (
-    //   volcanoCircleLabel != null &&
-    //   prevState.volcanoCircleLabel !== volcanoCircleLabel &&
-    //   this.state.brushedRawData != null
-    // ) {
-    //   this.handleBrushedText(this.state.brushedRawData);
-    // }
-
-    // if (
-    //   updateVolcanoLabels ||
-    //   (volcanoCircleLabel != null &&
-    //     prevState.volcanoCircleLabel !== volcanoCircleLabel &&
-    //     HighlightedFeaturesArrVolcano?.length > 0 &&
-    //     this.state.brushedRawData == null)
-    // ) {
-    //   const elems = HighlightedFeaturesArrVolcano.map(elem => {
-    //     const el = document.getElementById(`volcanoDataPoint-${elem.key}`);
-    //     return el ? d3.select(el)._groups[0][0] : null;
-    //   }).filter(elem => elem);
-
-    //   if (elems[0]) {
-    //     this.handleBrushedText({ _groups: [elems] });
-    //   } else {
-    //     if (d3.select('#nonfiltered-elements').size() !== 0) {
-    //       d3.select('#nonfiltered-elements')
-    //         .selectAll('text')
-    //         .remove();
-    //     }
-    //   }
-    // }
     if (volcanoCircleLabel !== prevState.volcanoCircleLabel) {
       this.handleCircleLabels();
     }
-
     if (
       !_.isEqual(
         _.sortBy(volcanoDifferentialTableRowHighlight),
@@ -655,11 +631,20 @@ class DifferentialVolcanoPlot extends React.PureComponent {
   }
 
   getCircleOrBin = key => {
-    const el = document.getElementById(`volcanoDataPoint-${key}`);
+    const { identifier, circles } = this.state;
+    let el = null;
+    const circleWithKey = [...circles].find(
+      c => c[this.props.differentialFeatureIdKey] === key,
+    );
+    if (circleWithKey) {
+      const circleIdentifier = circleWithKey[identifier] || null;
+      if (circleIdentifier) {
+        el = document.getElementById(`volcanoDataPoint-${circleIdentifier}`);
+      } else return null;
+    }
     if (el) {
       return { element: d3.select(el)._groups[0][0], type: 'circle' };
     } else {
-      const { identifier } = this.state;
       const bin = this.state.bins.find(bin => {
         return bin.some(b => b[identifier] === key);
       });
@@ -718,15 +703,18 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       // .attr('r', 2)
       .classed('highlighted', false)
       .classed('outlined', false);
-    this.setState({
-      brushedRawData: null,
-    });
   };
 
   highlightBrushedCircles = () => {
-    const { volcanoDifferentialTableRowHighlight } = this.props;
+    const {
+      volcanoDifferentialTableRowHighlight,
+      volcanoDifferentialTableRowOutline,
+    } = this.props;
     if (d3.select('#nonfiltered-elements').size() !== 0) {
-      if (!volcanoDifferentialTableRowHighlight?.length) {
+      if (
+        !volcanoDifferentialTableRowHighlight?.length &&
+        volcanoDifferentialTableRowOutline === ''
+      ) {
         d3.select('#nonfiltered-elements')
           .selectAll('text')
           .remove();
@@ -761,38 +749,47 @@ class DifferentialVolcanoPlot extends React.PureComponent {
 
   handleCircleLabels = () => {
     const {
+      volcanoDifferentialTableRowHighlight,
       volcanoDifferentialTableRowOutline,
-      HighlightedFeaturesArrVolcano,
     } = this.props;
-    let volcanoDifferentialTableRowOutlineMapped = [];
+    const { identifier, circles } = this.state;
+    let combinedCircleFeatureIdsArr = [...volcanoDifferentialTableRowHighlight];
     if (volcanoDifferentialTableRowOutline !== '') {
-      volcanoDifferentialTableRowOutlineMapped = [
-        {
-          key: volcanoDifferentialTableRowOutline,
-          text: volcanoDifferentialTableRowOutline,
-          value: volcanoDifferentialTableRowOutline,
-        },
+      const volcanoDifferentialTableRowOutlineArr = [
+        volcanoDifferentialTableRowOutline,
       ];
+      combinedCircleFeatureIdsArr = _.union(
+        [...volcanoDifferentialTableRowHighlight],
+        [...volcanoDifferentialTableRowOutlineArr],
+      );
     }
-    let FeaturesToLabel = [
-      ...HighlightedFeaturesArrVolcano,
-      ...volcanoDifferentialTableRowOutlineMapped,
-    ];
 
-    if (!!FeaturesToLabel.length) {
-      const elems = FeaturesToLabel.map(elem => {
-        const el = document.getElementById(`volcanoDataPoint-${elem.key}`);
-        return el ? d3.select(el)._groups[0][0] : null;
-      }).filter(elem => elem);
-
-      if (elems[0]) {
-        this.handleBrushedText({ _groups: [elems] });
-      } else {
-        if (d3.select('#nonfiltered-elements').size() !== 0) {
-          d3.select('#nonfiltered-elements')
-            .selectAll('text')
-            .remove();
+    let combinedCircleElementsArr = [];
+    if (combinedCircleFeatureIdsArr?.length > 0) {
+      combinedCircleElementsArr = [...combinedCircleFeatureIdsArr].map(elem => {
+        let el = null;
+        const circleWithKey = [...circles].find(
+          c => c[this.props.differentialFeatureIdKey] === elem,
+        );
+        if (circleWithKey) {
+          const circleIdentifier = circleWithKey[identifier] || null;
+          if (circleIdentifier) {
+            el = document.getElementById(
+              `volcanoDataPoint-${circleIdentifier}`,
+            );
+          }
         }
+        return el ? d3.select(el)._groups[0][0] : null;
+      });
+    }
+
+    if (combinedCircleElementsArr.length) {
+      this.handleBrushedText({ _groups: [combinedCircleElementsArr] });
+    } else {
+      if (d3.select('#nonfiltered-elements').size() !== 0) {
+        d3.select('#nonfiltered-elements')
+          .selectAll('text')
+          .remove();
       }
     }
   };
@@ -806,29 +803,31 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       volcanoDifferentialTableRowHighlight.forEach(element => {
         // style all highlighted circles
         const highlightedCircleId = this.getCircleOrBin(element);
-        const highlightedCircle = d3.select(highlightedCircleId?.element);
-        let radius = element === volcanoDifferentialTableRowOutline ? 7 : 6;
-        let stroke =
-          element === volcanoDifferentialTableRowOutline ? '#1678c2' : '#000';
-        // let strokeWidth =
-        //   element === volcanoDifferentialTableRowOutline ? 2 : 1;
-        if (highlightedCircle != null) {
-          if (highlightedCircleId?.type === 'circle') {
-            highlightedCircle.attr('stroke', stroke);
-            highlightedCircle.attr('stroke-width', 1);
-            highlightedCircle.attr('fill', '#ff4400');
-            highlightedCircle.classed('highlighted', true);
-            highlightedCircle.attr('r', radius);
-            highlightedCircle.classed('highlighted', true);
-            highlightedCircle.raise();
-          } else {
-            // bin highlight
-            highlightedCircle.attr('fill', '#ff4400');
-            highlightedCircle.classed('highlighted', true);
-            highlightedCircle.attr('stroke', stroke);
-            highlightedCircle.attr('stroke-width', 1);
-            highlightedCircle.classed('highlighted', true);
-            highlightedCircle.raise();
+        if (highlightedCircleId) {
+          const highlightedCircle = d3.select(highlightedCircleId?.element);
+          let radius = element === volcanoDifferentialTableRowOutline ? 7 : 6;
+          let stroke =
+            element === volcanoDifferentialTableRowOutline ? '#1678c2' : '#000';
+          // let strokeWidth =
+          //   element === volcanoDifferentialTableRowOutline ? 2 : 1;
+          if (highlightedCircle != null) {
+            if (highlightedCircleId?.type === 'circle') {
+              highlightedCircle.attr('stroke', stroke);
+              highlightedCircle.attr('stroke-width', 1);
+              highlightedCircle.attr('fill', '#ff4400');
+              highlightedCircle.classed('highlighted', true);
+              highlightedCircle.attr('r', radius);
+              highlightedCircle.classed('highlighted', true);
+              highlightedCircle.raise();
+            } else {
+              // bin highlight
+              highlightedCircle.attr('fill', '#ff4400');
+              highlightedCircle.classed('highlighted', true);
+              highlightedCircle.attr('stroke', stroke);
+              highlightedCircle.attr('stroke-width', 1);
+              highlightedCircle.classed('highlighted', true);
+              highlightedCircle.raise();
+            }
           }
         }
       });
@@ -1642,7 +1641,6 @@ class DifferentialVolcanoPlot extends React.PureComponent {
           }
         });
     }
-    this.props.onUpdateVolcanoLabels(false);
   };
 
   handleSVGClick() {
