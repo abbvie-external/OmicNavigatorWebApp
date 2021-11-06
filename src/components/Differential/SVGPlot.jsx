@@ -131,6 +131,7 @@ class SVGPlot extends Component {
       featuresLength,
       divWidth,
       HighlightedFeaturesArrVolcano,
+      multifeaturePlotMax,
     } = this.props;
     let features = [];
     if (featuresLength > 10) {
@@ -144,12 +145,15 @@ class SVGPlot extends Component {
       maxWidth: divWidth * 0.9,
     };
     const manyFeaturesText =
-      featuresLength >= 1000 ? (
+      featuresLength >= multifeaturePlotMax ? (
         <span id="MoreThanText">
-          Plotting is limited to the first 1000 features
+          Plotting is limited to the first {multifeaturePlotMax} features
         </span>
       ) : (
-        <span id="MoreThanText">{featuresLength} features selected</span>
+        <span id="MoreThanText">
+          {featuresLength} features selected. Individual de-select disabled when
+          11+ features.
+        </span>
       );
 
     let list = (
@@ -328,31 +332,11 @@ class SVGPlot extends Component {
     });
   };
 
+  // full-screen plots action
   handlePlotOverlay = () => {
-    const {
-      // HighlightedFeaturesArrVolcano,
-      // differentialFeatureIdKey,
-      imageInfoVolcano,
-      onGetMultifeaturePlotTransitionRef,
-    } = this.props;
+    const { imageInfoVolcano, onGetMultifeaturePlotTransitionRef } = this.props;
     if (imageInfoVolcano.key.includes('features')) {
       // multifeature plot
-      // const featureIds = HighlightedFeaturesArrVolcano.map(
-      //   features => features.id,
-      // );
-      // let value = dataItem[alphanumericTrigger];
-      //     let imageInfoDifferential = {
-      //       key: `${value}`,
-      //       title: `${alphanumericTrigger} ${value}`,
-      //       svg: [],
-      //     };
-      //     this.props.onGetPlotTransition(
-      //       dataItem[alphanumericTrigger],
-      //       dataItem,
-      //       imageInfoDifferential,
-      //       true,
-      //     );
-      // this.props.onGetPlotTransitionRef(key, null, imageInfoVolcano, true);
       onGetMultifeaturePlotTransitionRef();
     } else {
       // single feature plot

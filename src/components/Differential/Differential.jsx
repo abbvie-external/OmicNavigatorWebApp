@@ -78,6 +78,8 @@ class Differential extends Component {
         title: '',
         svg: [],
       },
+      // imageInfoDifferentialLength: 0,
+      // imageInfoVolcanoLength: 0,
       activeSVGTabIndex: 0,
       multisetPlotAvailableDifferential: false,
       animation: 'uncover',
@@ -664,6 +666,7 @@ class Differential extends Component {
               title: '',
               svg: [],
             },
+            imageInfoVolcanoLength: 0,
             isItemSVGLoaded: true,
             isVolcanoPlotSVGLoaded: true,
             tabsMessage: `No plots available for feature ${featureId}`,
@@ -678,6 +681,7 @@ class Differential extends Component {
           title: '',
           svg: [],
         },
+        imageInfoVolcanoLength: 0,
         isItemSVGLoaded: true,
         isVolcanoPlotSVGLoaded: true,
       });
@@ -824,6 +828,7 @@ class Differential extends Component {
             title: '',
             svg: [],
           },
+          imageInfoDifferentialLength: 0,
           isItemSVGLoaded: true,
           isVolcanoPlotSVGLoaded: true,
         });
@@ -835,6 +840,7 @@ class Differential extends Component {
           title: '',
           svg: [],
         },
+        imageInfoDifferentialLength: 0,
         isItemSVGLoaded: true,
         isVolcanoPlotSVGLoaded: true,
       });
@@ -856,9 +862,9 @@ class Differential extends Component {
         ? 'id'
         : differentialFeatureIdKey;
     if (data.length) {
-      // if (data.length > this.state.multifeaturePlotMax) {
-      //   data = [...data.slice(0, this.state.multifeaturePlotMax)];
-      // }
+      if (data.length > this.state.multifeaturePlotMax) {
+        data = [...data.slice(0, this.state.multifeaturePlotMax)];
+      }
       const featureIds = data.map(featureId => featureId[key]);
       // if (!featureIds.includes(volcanoDifferentialTableRowOutline)) {
       // this.setState({
@@ -974,6 +980,7 @@ class Differential extends Component {
           title: '',
           svg: [],
         },
+        imageInfoDifferentialLength: 0,
         isItemSVGLoaded: true,
         isVolcanoPlotSVGLoaded: true,
       });
@@ -1075,6 +1082,7 @@ class Differential extends Component {
             title: '',
             svg: [],
           },
+          imageInfoVolcanoLength: 0,
           isItemSVGLoaded: true,
           isVolcanoPlotSVGLoaded: true,
           tabsMessage: 'Select feature/s to display plots',
@@ -1101,6 +1109,7 @@ class Differential extends Component {
           title: '',
           svg: [],
         },
+        imageInfoVolcanoLength: 0,
       });
     }
   };
@@ -1163,6 +1172,7 @@ class Differential extends Component {
           title: '',
           svg: [],
         },
+        imageInfoVolcanoLength: 0,
         isItemSVGLoaded: true,
         isVolcanoPlotSVGLoaded: false,
       });
@@ -1174,6 +1184,7 @@ class Differential extends Component {
           title: '',
           svg: [],
         },
+        imageInfoVolcanoLength: 0,
         isItemSVGLoaded: true,
         isVolcanoPlotSVGLoaded: true,
         tabsMessage: 'Select feature/s to display plots',

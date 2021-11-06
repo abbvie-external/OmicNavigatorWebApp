@@ -1597,7 +1597,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
             return `volcanoCircleText-${d.id}`;
           }
         })
-        .attr('class', 'volcanoCircleTooltipText')
+        .attr('class', 'NoSelect volcanoCircleTooltipText')
         .attr('transform', d => {
           if (d) {
             if (d.data) {
