@@ -1,19 +1,25 @@
 .VolcanoPlotButton {
   position: absolute !important;
   cursor: pointer !important;
-  z-index: 1 !important;
-  width: 45px;
-  height: 45px !important;
+  z-index: 4 !important;
   border: none !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.54) !important;
   border-radius: 0px !important;
-  margin: 27px 10px 10px 15px !important;
+  margin: -15px 10px 10px 45% !important;
 }
-#VolcanoPlotButton {
-  height: 45px !important;
-  width: 45px !important;
+
+.UpperPlotsToggle {
+  position: absolute !important;
+  cursor: pointer !important;
+  z-index: 4 !important;
+  border: none !important;
+  border-radius: 0px !important;
+  margin: 20px 0px 0px 45% !important;
 }
+
 .CursorNotAllowed {
+  cursor: not-allowed !important;
+}
+#CursorNotAllowed {
   cursor: not-allowed !important;
 }
 .PlotInstructions {
@@ -63,15 +69,11 @@
 .VolcanoAxisLabel {
   margin-right: -1px !important;
   border-radius: 0.28571429rem 0px 0px 0.28571429rem !important;
-  background-color: var(--color-dark) !important;
-  color: var(--color-light) !important;
+  // background-color: var(--color-dark) !important;
+  background-color: var(--color-light) !important;
+  color: var(--color-dark) !important;
   padding: 11px 10px !important;
   min-width: 60px;
-}
-
-#VolcanoAxisLabelY,
-#VolcanoCircleLabel {
-  margin-left: 35px !important;
 }
 
 @media (max-width: 1598px) {
@@ -89,6 +91,7 @@
 .VolcanoPlotAxisSelectorsRow {
   padding-top: 27px !important;
   padding-bottom: 0px !important;
+  width: 100% !important;
 }
 
 // .VolcanoTransformationCheckbox,
@@ -112,10 +115,15 @@
     max-width: 100% !important;
     position: relative !important;
     padding-bottom: 50px !important;
+    // transition: all 2s ease-out;
 
     .QHGrid--header {
       padding-top: 15px !important;
       padding-bottom: 10px !important;
+    }
+
+    .QHGrid--generalSearch {
+      z-index: 3 !important;
     }
     .QHGrid--generalSearch input {
       border: 1px solid lightgrey !important;
@@ -176,34 +184,176 @@
   }
 }
 
-// #PrimaryColor {
-//   background-color: #ff4400 !important;
-//   color: #fff !important;
-// }
-
 .MultiFeaturePlotBtn {
   margin-top: 5px !important;
-  margin-left: 355px !important;
+  margin-left: 255px !important;
   cursor: pointer !important;
   box-shadow: 0 1px 0px rgba(0, 0, 0, 0.12), 0 1px 0px rgba(0, 0, 0, 0.24) !important;
+  z-index: 2 !important;
 }
 
-.MultifeaturePlotBtnDiv {
+.MultiFeaturePlotBtnDiv {
   position: absolute;
-  left: 83px !important;
+  // right: 50% !important;
   margin-top: 13px;
+  z-index: 2 !important;
 
   // .MultiFeaturePlottingBtn {
   //   font-size: 13px !important;
   //   height: 28px !important;
   // }
-
-  // .MultiFeaturePlotDetail {
-  //   background-color: #1678c2 !important;
-  //   color: white !important;
-  // }
 }
 
+.MultiFeaturePlotBtnOutline {
+  border: 2px solid var(--color-link) !important;
+  color: var(--color-link) !important;
+  background-color: var(--color-white) !important;
+}
+.MultiFeaturePlotBtnActive {
+  border: 2px solid var(--color-primary) !important;
+  color: var(--color-primary) !important;
+  background-color: var(--color-white) !important;
+}
 // .ui.visible.overlay.sidebar {
 //   transition: transform 0.5s step-end 0.1s !important;
 // }
+
+.AbsoluteLegendDifferential {
+  position: absolute;
+  z-index: 1;
+  margin-top: 19px;
+  margin-left: 220px !important;
+  display: none;
+}
+
+#VolcanoOptionsPopup {
+  position: absolute !important;
+  margin-top: 8px;
+  // margin-left: 50px;
+  cursor: pointer;
+  z-index: 1111111111 !important;
+  // top: 0 !important;
+  // right: 0 !important;
+}
+
+#FullScreenButton,
+#FullScreenIcon,
+#FeaturesListButton,
+#FeaturesListIcon {
+  position: absolute !important;
+  margin-top: 8px;
+  // margin-left: 50px;
+  cursor: pointer;
+  // z-index: 1111111111 !important;
+  // top: 0 !important;
+  // right: 0 !important;
+}
+
+#FeaturesListButton {
+  left: 235px;
+}
+#FeaturesListIcon {
+  left: 215px;
+}
+#FullScreenButton {
+  left: 370px;
+}
+#FullScreenIcon {
+  left: 290px;
+}
+
+#FeaturesListTooltip {
+  top: 5px !important;
+  left: -205px !important;
+  border-bottom: 2px solid var(--color-primary);
+  background-color: var(--color-dark) !important;
+  padding: 10px;
+}
+
+#VolcanoUsagePopup {
+  position: absolute !important;
+  margin-top: 8px;
+  cursor: pointer;
+  z-index: 1111111111 !important;
+  // top: 0 !important;
+  left: 110px !important;
+  // bottom: 0;
+  // left: 0;
+  // margin-bottom: -40px;
+}
+#VolcanoUsagePopupContent {
+  padding-top: 8px !important;
+}
+#OptionsTooltip {
+  top: -38px !important;
+  left: -265px !important;
+  border-bottom: 2px solid var(--color-primary);
+  background-color: var(--color-dark) !important;
+  padding: 10px 10px 20px 20px;
+}
+
+#UsageTooltip {
+  // top: -38px !important;
+  // left: -265px !important;
+  border-bottom: 2px solid var(--color-primary);
+  background-color: var(--color-dark) !important;
+  padding: 10px 10px 20px 20px;
+  // min-width: 300px;
+  max-width: 350px;
+}
+
+// #OutlinedCircleIcon {
+// color: var(--color-link);
+// background-color: var(--color-white);
+// display: flex;
+// border-radius: 7px;
+// font-size: 14px;
+// border: 2px solid var(--color-link);
+// }
+
+// #SelectedCircleIcon {
+// color: var(--color-primary);
+// display: flex;
+// border-radius: 7px;
+// font-size: 14px;
+// border: 2px solid var(--color-link);
+// }
+
+// #MaxCircle {
+//   background-color: var(--color-primary);
+// }
+
+// #OtherCircle {
+//   background-color: var(--color-primary-gradient);
+// }
+
+#SelectedRowLegend {
+  color: var(--color-primary);
+}
+
+#SelectedPlotLegend {
+  color: var(--color-link);
+}
+
+// #MaxCircle {
+//   margin-top: 5px !important;
+//   margin-left: 755px !important;
+//   cursor: pointer !important;
+//   box-shadow: 0 1px 0px rgba(0, 0, 0, 0.12), 0 1px 0px rgba(0, 0, 0, 0.24) !important;
+// }
+
+#ToggleAllCheckbox {
+  position: absolute !important;
+  margin-top: 80px;
+  margin-left: 17px;
+  color: var(--color-dark);
+  cursor: pointer;
+}
+
+#ToggleAllCheckboxInfo {
+  position: absolute !important;
+  margin-top: 80px;
+  margin-left: 42px;
+  color: var(--color-dark);
+  cursor: pointer;
+}

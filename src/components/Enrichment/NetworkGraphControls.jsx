@@ -24,7 +24,12 @@ import ReactSlider from 'react-slider';
 import LoaderActivePlots from '../Transitions/LoaderActivePlots';
 import './NetworkGraphControls.scss';
 import NumericExponentialInput from '../Shared/NumericExponentialInput';
-import { limitValues } from '../Shared/helpers';
+import {
+  limitValues,
+  getDynamicSize,
+  getDynamicLegend,
+  getDynamicSearch,
+} from '../Shared/helpers';
 import ButtonActions from '../Shared/ButtonActions';
 import { omicNavigatorService } from '../../services/omicNavigator.service';
 import { ResizableBox } from 'react-resizable';
@@ -95,49 +100,6 @@ const LinkTypeStyledTrack = styled.div`
   /* : 'linear-gradient(90deg, var(--color-primary) -2.66%, var(--color-primary-gradient) 99.83%)'}; */
   border-radius: 999px;
 `;
-
-function getDynamicSize() {
-  let w = Math.max(
-    document.documentElement.clientWidth,
-    window.innerWidth || 0,
-  );
-  if (w < 1200) {
-    return 'small';
-  } else if (w > 1199 && w < 1600) {
-    return 'small';
-  } else if (w > 1599 && w < 2600) {
-    return undefined;
-  } else if (w > 2599) return 'large';
-}
-
-function getDynamicSearch() {
-  let w = Math.max(
-    document.documentElement.clientWidth,
-    window.innerWidth || 0,
-  );
-  if (w < 1200) {
-    return 'small';
-  } else if (w > 1199 && w < 1600) {
-    return 'small';
-  } else if (w > 1599 && w < 2000) {
-    return undefined;
-  } else if (w > 1999 && w < 2600) {
-    return 'large';
-  } else if (w > 2599) return 'big';
-}
-
-function getDynamicLegend() {
-  let w = Math.max(
-    document.documentElement.clientWidth,
-    window.innerWidth || 0,
-  );
-  if (w < 768) {
-    return 250;
-  } else if (w > 767 && w < 1600) {
-    return 300;
-    // else if (w > 1599 && w < 2600) { return 450
-  } else return 350;
-}
 
 const CustomPopupStyle = {
   backgroundColor: '2E2E2E',
@@ -421,7 +383,6 @@ class NetworkGraphControls extends Component {
       fontSize: '13px',
       wordBreak: 'break-all',
     };
-    // let dynamicSize = getDynamicSize();
     return (
       <Grid className="NetworkSearchResultsContainer">
         <Grid.Column width={12}>
@@ -867,7 +828,7 @@ class NetworkGraphControls extends Component {
               widescreen={3}
               textAlign="center"
             >
-              <Menu id="NetworkGraphSortByMenu" size={dynamicSize}>
+              <Menu id="NetworkGraphSortByMenu">
                 <Popup
                   trigger={
                     <Label className="NetworkInputLabel" size={dynamicSize}>

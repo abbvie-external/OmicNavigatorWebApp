@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Label } from 'semantic-ui-react';
+import { Button, Dropdown } from 'semantic-ui-react';
 import * as saveSvgAsPng from 'save-svg-as-png';
 // import { excelService } from '../../services/excel.service';
 import { pdfService } from '../../services/pdf.service';
@@ -149,7 +149,7 @@ class ButtonActions extends Component {
   };
 
   TextExport = () => {
-    const { study, model, test, tab, refFwd } = this.props;
+    const { study, model, test, feature, tab, refFwd } = this.props;
     let studyNoPeriods = study.replace(/\./g, '_');
     let modelNoPeriods = model.replace(/\./g, '_');
     let testNoPeriods = test.replace(/\./g, '_');
@@ -160,19 +160,26 @@ class ButtonActions extends Component {
     let file = new Blob([dataInString], { type: 'text/plain' });
     a.href = URL.createObjectURL(file);
     a.download = `${tab}-${studyNoPeriods}-${modelNoPeriods}-${testNoPeriods}`;
+    if (feature) {
+      let featureNoPeriods = feature.replace(/\./g, '_');
+      a.download = `${tab}-${studyNoPeriods}-${modelNoPeriods}-${testNoPeriods}-${featureNoPeriods}`;
+    }
     a.click();
   };
 
   ExcelExport = () => {
-    const { study, model, test, tab, refFwd } = this.props;
+    const { study, model, test, feature, tab, refFwd } = this.props;
     let studyNoPeriods = study.replace(/\./g, '_');
     let modelNoPeriods = model.replace(/\./g, '_');
     let testNoPeriods = test.replace(/\./g, '_');
     const excelExport = refFwd?.current?.qhGridRef.current ?? null;
     if (excelExport != null) {
-      excelExport.exportExcel(
-        `${tab}-${studyNoPeriods}-${modelNoPeriods}-${testNoPeriods}`,
-      );
+      let name = `${tab}-${studyNoPeriods}-${modelNoPeriods}-${testNoPeriods}`;
+      if (feature) {
+        let featureNoPeriods = feature.replace(/\./g, '_');
+        name = `${tab}-${studyNoPeriods}-${modelNoPeriods}-${testNoPeriods}-${featureNoPeriods}`;
+      }
+      excelExport.exportExcel(name);
     }
   };
 
@@ -199,52 +206,68 @@ class ButtonActions extends Component {
     }
   };
 
-  getExcelButton = () => {
+  // DROPDOWNS
+  getExcelDropdownItem = () => {
     if (this.props.excelVisible) {
       return (
-        <Button className="ExportButton" onClick={this.ExcelExport}>
-          XLS
-        </Button>
+        <Dropdown.Item
+          key="xlsDropdown"
+          text="XLS"
+          className="ExportDropdownItem"
+          onClick={this.ExcelExport}
+        />
       );
     }
   };
 
-  getPNGButton = () => {
+  getPNGDropdownItem = () => {
     if (this.props.pngVisible) {
       return (
-        <Button className="ExportButton" onClick={this.PNGExport}>
-          PNG
-        </Button>
+        <Dropdown.Item
+          key="pngDropdown"
+          text="PNG"
+          className="ExportDropdownItem"
+          onClick={this.PNGExport}
+        />
       );
     }
   };
 
-  getPDFButton = () => {
+  getPDFDropdownItem = () => {
     if (this.props.pdfVisible) {
       return (
-        <Button className="ExportButton" onClick={this.PDFExport}>
-          PDF
-        </Button>
+        <Dropdown.Item
+          key="pdfDropdown"
+          text="PDF"
+          className="ExportDropdownItem"
+          onClick={this.PDFExport}
+        />
       );
     }
   };
 
-  getSVGButton = () => {
+  getSVGDropdownItem = () => {
     if (this.props.svgVisible) {
       return (
-        <Button className="ExportButton" onClick={this.SVGExport}>
-          SVG
-        </Button>
+        <Dropdown.Item
+          key="svgDropdown"
+          text="SVG"
+          className="ExportDropdownItem"
+          onClick={this.SVGExport}
+        />
       );
     }
   };
 
-  getTxtButton = () => {
+  getTxtDropdownItem = () => {
     if (this.props.txtVisible) {
       return (
-        <Button className="ExportButton" onClick={this.TextExport}>
-          TXT
-        </Button>
+        <Dropdown.Item
+          key="txtDropdown"
+          text="TXT"
+          className="ExportDropdownItem"
+          onClick={this.TextExport}
+        />
       );
     }
   };
@@ -257,11 +280,11 @@ class ButtonActions extends Component {
       svgVisible,
       txtVisible,
     } = this.props;
-    const excelButton = this.getExcelButton();
-    const pdfButton = this.getPDFButton();
-    const pngButton = this.getPNGButton();
-    const svgButton = this.getSVGButton();
-    const txtButton = this.getTxtButton();
+    const excelDropdownItem = this.getExcelDropdownItem();
+    const pdfDropdownItem = this.getPDFDropdownItem();
+    const pngDropdownItem = this.getPNGDropdownItem();
+    const svgDropdownItem = this.getSVGDropdownItem();
+    const txtDropdownItem = this.getTxtDropdownItem();
     const buttonSize = this.props.exportButtonSize;
     const noneVisible =
       !excelVisible && !pdfVisible && !pngVisible && !svgVisible && !txtVisible;
@@ -274,16 +297,25 @@ class ButtonActions extends Component {
           floated="right"
           size={buttonSize}
         >
-          <Button as="div" labelPosition="left">
-            <Label basic pointing="right" className="ExportButtonGroupLabel">
-              EXPORT
-            </Label>
-          </Button>
-          {txtButton}
-          {svgButton}
-          {pdfButton}
-          {pngButton}
-          {excelButton}
+          <Dropdown
+            text="EXPORT"
+            className={
+              noneVisible
+                ? 'Hide ExportButtonGroup icon'
+                : 'ExportButtonGroup icon'
+            }
+            floated="right"
+            labeled
+            button
+          >
+            <Dropdown.Menu className="right">
+              {txtDropdownItem}
+              {svgDropdownItem}
+              {pdfDropdownItem}
+              {pngDropdownItem}
+              {excelDropdownItem}
+            </Dropdown.Menu>
+          </Dropdown>
         </Button.Group>
       </div>
     );

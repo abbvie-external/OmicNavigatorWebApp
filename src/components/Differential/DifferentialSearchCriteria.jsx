@@ -13,6 +13,7 @@ import {
 // import _ from 'lodash';
 import ndjsonStream from 'can-ndjson-stream';
 import { CancelToken } from 'axios';
+import { getDynamicSize } from '../Shared/helpers';
 import '../Shared/SearchCriteria.scss';
 import { omicNavigatorService } from '../../services/omicNavigator.service';
 import DifferentialMultisetFilters from './DifferentialMultisetFilters';
@@ -868,20 +869,6 @@ class DifferentialSearchCriteria extends Component {
       });
   }
 
-  getDynamicSize() {
-    let w = Math.max(
-      document.documentElement.clientWidth,
-      window.innerWidth || 0,
-    );
-    if (w < 1200) {
-      return 'small';
-    } else if (w > 1199 && w < 1600) {
-      return 'small';
-    } else if (w > 1599 && w < 2600) {
-      return undefined;
-    } else if (w > 2599) return 'large';
-  }
-
   thisfunc = () => {
     this.setState({
       sigValueP: [0.25],
@@ -930,7 +917,7 @@ class DifferentialSearchCriteria extends Component {
       isDataStreamingResultsTable,
     } = this.props;
 
-    const dynamicSize = this.getDynamicSize();
+    const dynamicSize = getDynamicSize();
 
     const StudyPopupStyle = {
       backgroundColor: '2E2E2E',

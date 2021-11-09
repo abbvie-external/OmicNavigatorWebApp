@@ -42,7 +42,15 @@
     border: 1px solid lightgrey;
   }
   .QHGrid--generalSearch:nth-child(1) {
-    margin-left: 127px !important;
+    margin-left: 70px !important;
     margin-bottom: 10px;
   }
+}
+.EnrichmentViewContainer .QHGrid--generalSearch:nth-child(1) {
+  margin-left: 127px !important;
+  margin-bottom: 10px;
+}
+
+.FilteredDifferentialTableDiv .QHGrid--generalSearch:nth-child(1) {
+  margin-left: -10px !important;
 }

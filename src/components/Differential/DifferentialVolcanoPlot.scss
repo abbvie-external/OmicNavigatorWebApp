@@ -1,11 +1,7 @@
-//.volcanoPlotContainer {
 .VolcanoPlotSVG {
   margin: 0 auto;
   display: block;
   cursor: crosshair !important;
-  //opacity: 0.6;
-  // shape-rendering: 'crispEdges';
-  // stroke: white;
 }
 
 .volcanoPlotYAxis {
@@ -25,39 +21,17 @@
   font-size: 13px;
 }
 
-// .volcanoPlot-dataPoint {
-//   stroke: #000;
-//   stroke-width: 0.4;
-//   fill: var(--color-link);
-// }
-// .volcanoPlot-dataPoint.selected {
-//   stroke: #000;
-//   stroke-width: 0.4;
-//   fill: var(--color-tertiary);
-// }
-// .volcanoPlot-dataPoint.highlighted {
-//   stroke: #000;
-//   stroke-width: 0.4;
-//   fill: var(--color-primary-gradient);
-// }
-// .volcanoPlot-dataPoint.highlightedMax {
-//   stroke: #000;
-//   stroke-width: 0.4;
-//   fill: var(--color-primary);
-// }
-
 #VolcanoChart {
-  margin-left: 20px !important;
-  margin-top: 5px !important;
+  margin-left: 0px !important;
+  margin-top: 0px !important;
 }
 
-// #volcano {
-//   overflow: hidden;
-// }
-//}
-
 #VolcanoPlotDiv {
-  margin-bottom: 5px;
+  // margin-bottom: 5px;
+  .ExportButtonGroup {
+    margin-top: 4px !important;
+    float: right !important;
+  }
 }
 
 .breadcrumb-container {
@@ -83,4 +57,22 @@
   .ui.loader:before {
     margin: 5px 0px 0px -5px;
   }
+}
+
+.PlotInstructions {
+  height: 100%;
+}
+
+.PlotInstructionsText {
+  text-align: center !important;
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.UsagePadding,
+.OptionsPadding {
+  padding-right: 9px !important;
 }

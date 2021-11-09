@@ -5,6 +5,10 @@
   display: flex;
   flex-direction: column;
 
+  .ExportButtonGroup {
+    margin-right: 8px !important;
+  }
+
   .svgPlotDropdown {
     max-width: fit-content !important;
     z-index: 5 !important;
@@ -24,14 +28,14 @@
     min-height: 75vh !important;
   }
 
-  .DiffTableIcon {
-    display: none !important;
-    position: absolute !important;
-    top: 10px !important;
-    // left: -2px !important;
-    cursor: pointer !important;
-    color: #1678c2 !important;
-  }
+  // .DiffTableIcon {
+  //   display: none !important;
+  //   position: absolute !important;
+  //   top: 10px !important;
+  //   // left: -2px !important;
+  //   cursor: pointer !important;
+  //   color: #1678c2 !important;
+  // }
 
   .NoPlotsMessage {
     margin: 40px auto !important;

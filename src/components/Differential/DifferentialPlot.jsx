@@ -5,7 +5,7 @@ import DifferentialBreadcrumbs from './DifferentialBreadcrumbs';
 import ButtonActions from '../Shared/ButtonActions';
 import MetafeaturesTable from './MetafeaturesTable';
 import '../Enrichment/SplitPanesContainer.scss';
-import '../Shared/SVGPlot.scss';
+import './SVGPlot.scss';
 import './DifferentialPlot.scss';
 
 class DifferentialPlot extends PureComponent {
@@ -178,6 +178,7 @@ class DifferentialPlot extends PureComponent {
       differentialStudy,
       differentialModel,
       differentialTest,
+      differentialFeature,
     } = this.props;
     if (!isItemSVGLoaded) {
       return (
@@ -236,6 +237,7 @@ class DifferentialPlot extends PureComponent {
                     study={differentialStudy}
                     model={differentialModel}
                     test={differentialTest}
+                    feature={differentialFeature}
                     imageInfo={imageInfoDifferential}
                     tabIndex={activeSVGTabIndexDifferentialVar}
                     plot={'DifferentialPlotTabsPlotSVGDiv'}
