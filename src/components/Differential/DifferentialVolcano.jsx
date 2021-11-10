@@ -103,6 +103,20 @@ class DifferentialVolcano extends Component {
     // if (prevProps.differentialTest !== differentialTest) {
     //   this.handleUpperPlotVisability(null, true);
     // }
+
+    if (this.state.hasMultifeaturePlots) {
+      const columnHeader = document.querySelector('[data-id="select"]');
+      if (!columnHeader.classList.value.split(' ').includes('th-select')) {
+        columnHeader.classList.add('th-select');
+        const toggleDiv = document.createElement('div');
+        toggleDiv.classList.add('toggleDiv');
+        // toggleDiv.onclick = () => {
+        //   this.toggleAllCheckboxes();
+        // };
+        columnHeader.appendChild(toggleDiv);
+      }
+    }
+
     if (prevProps.differentialResults !== differentialResults) {
       let data =
         differentialResults.length !==
@@ -958,7 +972,7 @@ class DifferentialVolcano extends Component {
     };
     const SelectAllPopupContent = (
       <List inverted>
-        <List.Item>
+        {/* <List.Item>
           <Icon name="square outline" />
           <List.Content>
             <List.Header>Select All</List.Header>
@@ -967,7 +981,7 @@ class DifferentialVolcano extends Component {
               {this.props.multifeaturePlotMax} checkboxes
             </List.Description>
           </List.Content>
-        </List.Item>
+        </List.Item> */}
         <List.Item>
           <Icon name="check square outline" />
           <List.Content>
@@ -1211,7 +1225,7 @@ class DifferentialVolcano extends Component {
                                 inverted
                                 basic
                               />
-                              <Icon
+                              {/* <Icon
                                 name={
                                   allChecked ? 'check square' : 'square outline'
                                 }
@@ -1219,7 +1233,7 @@ class DifferentialVolcano extends Component {
                                 id="ToggleAllCheckbox"
                                 className={allChecked ? 'PrimaryColor' : ''}
                                 onClick={this.toggleAllCheckboxes}
-                              />
+                              /> */}
                             </>
                           ) : null}
                           <EZGrid

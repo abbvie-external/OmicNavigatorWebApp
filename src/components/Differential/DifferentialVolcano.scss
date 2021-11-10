@@ -348,12 +348,27 @@
   margin-left: 17px;
   color: var(--color-dark);
   cursor: pointer;
+  z-index: 1;
 }
 
 #ToggleAllCheckboxInfo {
   position: absolute !important;
   margin-top: 80px;
-  margin-left: 42px;
+  margin-left: 20px;
   color: var(--color-dark);
   cursor: pointer;
+  z-index: 1;
+}
+
+.toggleDiv {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  left: 0px;
+  top: 0px;
+  z-index: 0;
+}
+
+.th-select {
+  position: relative;
 }
