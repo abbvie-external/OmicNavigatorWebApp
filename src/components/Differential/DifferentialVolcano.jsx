@@ -103,6 +103,20 @@ class DifferentialVolcano extends Component {
     // if (prevProps.differentialTest !== differentialTest) {
     //   this.handleUpperPlotVisability(null, true);
     // }
+
+    if (this.state.hasMultifeaturePlots) {
+      const columnHeader = document.querySelector('[data-id="select"]');
+      if (!columnHeader.classList.value.split(' ').includes('th-select')) {
+        columnHeader.classList.add('th-select');
+        const toggleDiv = document.createElement('div');
+        toggleDiv.classList.add('toggleDiv');
+        toggleDiv.onclick = () => {
+          this.toggleAllCheckboxes();
+        };
+        columnHeader.appendChild(toggleDiv);
+      }
+    }
+
     if (prevProps.differentialResults !== differentialResults) {
       let data =
         differentialResults.length !==

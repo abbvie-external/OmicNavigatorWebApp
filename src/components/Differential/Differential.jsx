@@ -1400,6 +1400,7 @@ class Differential extends Component {
           title: '',
           field: 'select',
           hideOnExport: true,
+          sortDisabled: true,
           sortAccessor: (item, field) => console.log(item, field),
           // self.state.volcanoDifferentialTableRowHighlight.contains(item),
           template: (value, item, addParams) => {
