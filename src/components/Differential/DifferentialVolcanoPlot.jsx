@@ -632,9 +632,10 @@ class DifferentialVolcanoPlot extends React.PureComponent {
   }
 
   getCircleOrBin = key => {
-    const { identifier, circles } = this.state;
+    const { identifier } = this.state;
+    const { differentialTableData } = this.props;
     let el = null;
-    const circleWithKey = [...circles].find(
+    const circleWithKey = [...differentialTableData].find(
       c => c[this.props.differentialFeatureIdKey] === key,
     );
     if (circleWithKey) {
@@ -1329,7 +1330,6 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       xScale,
       yScale,
     );
-
     self.setState(
       {
         currentResults: allDataInView,
