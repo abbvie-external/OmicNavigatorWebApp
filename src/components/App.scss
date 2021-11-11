@@ -90,14 +90,14 @@
     .ui.celled.table tr td:first-child,
     .ui.celled.table tr th:first-child {
       min-width: 25px !important;
-      max-width: 25px !important;
+      max-width: 35px !important;
     }
 
-    .ui.celled.table tr td:last-child,
-    .ui.celled.table tr th:last-child {
-      min-width: 40px !important;
-      max-width: 40px !important;
-    }
+    // .ui.celled.table tr td:last-child,
+    // .ui.celled.table tr th:last-child {
+    //   min-width: 40px !important;
+    //   max-width: 40px !important;
+    // }
   }
 
   #DifferentialResultsTableWrapperCheckboxes,

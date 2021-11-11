@@ -88,13 +88,13 @@ class Differential extends Component {
       plotButtonActiveDifferential: false,
       multisetQueriedDifferential: false,
       upsetColsDifferential: [],
-      tabsMessage: 'Select feature/s to display plots',
+      // tabsMessage: 'Select feature/s to display plots',
       // differentialPlotTypes: [],
       differentialStudyMetadata: [],
       differentialModelsAndTests: [],
       differentialTestsMetadata: [],
       differentialTestIds: [],
-      modelSpecificMetaFeaturesExist: true,
+      modelSpecificMetaFeaturesExist: false,
       resultsLinkouts: [],
       resultsFavicons: [],
       isVolcanoPlotSVGLoaded: true,
@@ -244,7 +244,7 @@ class Differential extends Component {
         multisetPlotAvailableDifferential: false,
         imageInfoVolcano: { key: null, title: '', svg: [] },
         imageInfoDifferential: { key: null, title: '', svg: [] },
-        tabsMessage: 'Select feature/s to display plots',
+        // tabsMessage: 'Select feature/s to display plots',
         // differentialResults: [],
         // differentialResultsUnfiltered: [],
         // isItemDatatLoaded: false,
@@ -650,13 +650,13 @@ class Differential extends Component {
         }
       } else {
         if (view === 'Differential') {
-          this.setState({
-            // isItemSelected: false,
-            // isItemSVGLoaded: true,
-            // currentSVGs: [],
-            // featuresString: '',
-            tabsMessage: `No plots available for feature ${featureId}`,
-          });
+          // this.setState({
+          // isItemSelected: false,
+          // isItemSVGLoaded: true,
+          // currentSVGs: [],
+          // featuresString: '',
+          // tabsMessage: `No plots available for feature ${featureId}`,
+          // });
           this.backToTable();
           toast.error(`No plots available for feature ${featureId}`);
         } else {
@@ -669,7 +669,7 @@ class Differential extends Component {
             imageInfoVolcanoLength: 0,
             isItemSVGLoaded: true,
             isVolcanoPlotSVGLoaded: true,
-            tabsMessage: `No plots available for feature ${featureId}`,
+            // tabsMessage: `No plots available for feature ${featureId}`,
           });
           // toast.error(`No plots available for feature ${featureId}`);
         }
@@ -1085,7 +1085,7 @@ class Differential extends Component {
           imageInfoVolcanoLength: 0,
           isItemSVGLoaded: true,
           isVolcanoPlotSVGLoaded: true,
-          tabsMessage: 'Select feature/s to display plots',
+          // tabsMessage: 'Select feature/s to display plots',
         });
       }
     }
@@ -1187,7 +1187,7 @@ class Differential extends Component {
         imageInfoVolcanoLength: 0,
         isItemSVGLoaded: true,
         isVolcanoPlotSVGLoaded: true,
-        tabsMessage: 'Select feature/s to display plots',
+        // tabsMessage: 'Select feature/s to display plots',
       });
     }
   };
@@ -1210,7 +1210,6 @@ class Differential extends Component {
       differentialPlotTypes,
       modelSpecificMetaFeaturesExist,
     } = this.state;
-    // let differentialPlotTypes = [];
     const TableValuePopupStyle = {
       backgroundColor: '2E2E2E',
       borderBottom: '2px solid var(--color-primary)',
@@ -1265,21 +1264,26 @@ class Differential extends Component {
       alphanumericTrigger,
     );
     this.getTableHelpers(alphanumericTrigger);
-    const self = this;
+    const noPlots = !differentialPlotTypes.length > 0;
+    if (!noPlots && modelSpecificMetaFeaturesExist) {
+      this.setState({
+        tabsMessage: 'Select feature/s to display plots and data',
+      });
+    } else if (!noPlots) {
+      this.setState({
+        tabsMessage: 'Select feature/s to display plots',
+      });
+    } else if (modelSpecificMetaFeaturesExist) {
+      this.setState({
+        tabsMessage: 'Select feature to display data',
+      });
+    } else {
+      this.setState({
+        tabsMessage: 'No plots nor feature data available',
+      });
+    }
     const differentialAlphanumericColumnsMapped = differentialAlphanumericFields.map(
       (f, { index }) => {
-        const noPlots = differentialPlotTypes.length === 0;
-
-        if (noPlots) {
-          self.setState({
-            tabsMessage: 'No plots available',
-          });
-        }
-        if (noPlots && !modelSpecificMetaFeaturesExist) {
-          self.setState({
-            tabsMessage: 'No plots available',
-          });
-        }
         return {
           title: f,
           field: f,
