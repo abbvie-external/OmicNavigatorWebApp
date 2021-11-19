@@ -332,7 +332,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       });
 
     svg.on('dblclick', () => {
-      this.transitionZoom(differentialResultsUnfiltered, false, false, true);
+      this.transitionZoom(differentialResultsUnfiltered, true, false, true);
     });
   }
 
