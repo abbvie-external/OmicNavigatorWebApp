@@ -454,7 +454,14 @@ class DifferentialVolcano extends Component {
       differentialResults,
     } = this.props;
     const { hasMultifeaturePlots } = this.state;
+    event.persist();
     event.stopPropagation();
+    // console.log('className', event.target.className);
+    // console.log('classList', event.target.classList);
+    // console.log('Event', { event });
+    // console.log(event?.target?.classList?.contains('DifferentialResultsRowCheckbox'));
+    // console.log(event?.target?.classList?.contains('DifferentialResultsRowCheckboxDiv'));
+    // console.log(event?.target?.innerHTML.includes('DifferentialResultsRowCheckboxDiv'));
     if (
       item == null ||
       event?.target?.className === 'ExternalSiteIcon' ||
@@ -477,7 +484,6 @@ class DifferentialVolcano extends Component {
       if (volcanoDifferentialTableRowOutline !== '') {
         baseFeature = volcanoDifferentialTableRowOutline;
       }
-
       if (event.shiftKey) {
         if (!hasMultifeaturePlots) return;
         const currentTableData =
@@ -523,7 +529,10 @@ class DifferentialVolcano extends Component {
         event.ctrlKey ||
         event.metaKey ||
         event?.target?.classList?.contains('DifferentialResultsRowCheckbox') ||
-        event?.target?.classList?.contains('DifferentialResultsRowCheckboxDiv')
+        event?.target?.classList?.contains(
+          'DifferentialResultsRowCheckboxDiv',
+        ) ||
+        event?.target?.innerHTML.includes('DifferentialResultsRowCheckboxDiv')
       ) {
         if (!hasMultifeaturePlots) return;
         // control-click or click specifically on checkbox

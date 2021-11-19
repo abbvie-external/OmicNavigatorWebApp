@@ -1409,10 +1409,7 @@ class Differential extends Component {
           // self.state.volcanoDifferentialTableRowHighlight.contains(item),
           template: (value, item, addParams) => {
             return (
-              <div
-                id="ViewPlotCol"
-                className="DifferentialResultsRowCheckboxDiv"
-              >
+              <div className="DifferentialResultsRowCheckboxDiv">
                 <Icon
                   name="square outline"
                   size="large"

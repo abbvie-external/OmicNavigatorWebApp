@@ -114,14 +114,6 @@
       // border-bottom: none !important;
       color: var(--color-primary-half) !important;
     }
-    .ui.celled.table tr th:first-child:hover i.icon.square.outline:before {
-      content: '\f14a';
-      color: var(--color-primary) !important;
-    }
-
-    .ui.celled.table tr th:first-child:hover i.icon.square.outline:after {
-      background-color: var(--color-primary) !important;
-    }
     // .ui.celled.table tr td:last-child,
     // .ui.celled.table tr th:last-child {
     //   min-width: 40px !important;
