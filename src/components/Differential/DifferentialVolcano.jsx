@@ -972,16 +972,9 @@ class DifferentialVolcano extends Component {
     };
     const SelectAllPopupContent = (
       <List inverted>
-        {/* <List.Item>
-          <Icon name="square outline" />
-          <List.Content>
-            <List.Header>Select All</List.Header>
-            <List.Description>
-              Click box to left, to select/deselect first{' '}
-              {this.props.multifeaturePlotMax} checkboxes
-            </List.Description>
-          </List.Content>
-        </List.Item> */}
+        <List.Header id="MultiSelectColumnHeader">
+          Multi-Select Column
+        </List.Header>
         <List.Item>
           <Icon name="check square outline" />
           <List.Content>
