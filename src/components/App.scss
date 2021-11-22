@@ -1,12 +1,14 @@
 :root {
   // --color-primary: #ff4400;
   --color-primary: rgba(255, 68, 0, 1);
+  --color-primary-half: rgba(255, 68, 0, 0.5);
   // --color-primary-gradient: #ff7e38;
   --color-primary-gradient: rgba(255, 126, 5, 1);
   --color-secondary: rgba(44, 59, 120, 1);
   --color-secondary-gradient: #94959c;
   --color-tertiary: #00aeff;
   --color-link: rgba(22, 120, 194, 1) !important;
+  --color-link-half: rgba(22, 120, 194, 0.5) !important;
   --color-white: #fff;
   --color-light: #e0e1e2;
   --color-dark: #2e2e2e;
@@ -68,6 +70,16 @@
     padding-right: 10px !important;
   }
 
+  .QHGrid table td:not(:first-child):hover {
+    border-top: 3px solid var(--color-link-half) !important;
+    border-bottom: 3px solid var(--color-link-half) !important;
+  }
+
+  .QHGrid table thead:hover {
+    border-top: none !important;
+    border-bottom: none !important;
+  }
+
   .QHGrid table tr th:first-child {
     background-color: #fff !important;
     //   padding-right: 0px !important;
@@ -93,6 +105,15 @@
       max-width: 35px !important;
     }
 
+    .ui.celled.table tr td:first-child:hover,
+    .ui.celled.table tr th:first-child:hover {
+      cursor: cell;
+      // border-top: 3px solid var(--color-primary-half) !important;
+      // border-top: none !important;
+      // border-bottom: 3px solid var(--color-primary-half) !important;
+      // border-bottom: none !important;
+      color: var(--color-primary-half) !important;
+    }
     // .ui.celled.table tr td:last-child,
     // .ui.celled.table tr th:last-child {
     //   min-width: 40px !important;
