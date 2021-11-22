@@ -103,6 +103,20 @@ class DifferentialVolcano extends Component {
     // if (prevProps.differentialTest !== differentialTest) {
     //   this.handleUpperPlotVisability(null, true);
     // }
+
+    if (this.state.hasMultifeaturePlots) {
+      const columnHeader = document.querySelector('[data-id="select"]');
+      if (!columnHeader.classList.value.split(' ').includes('th-select')) {
+        columnHeader.classList.add('th-select');
+        const toggleDiv = document.createElement('div');
+        toggleDiv.classList.add('toggleDiv');
+        // toggleDiv.onclick = () => {
+        //   this.toggleAllCheckboxes();
+        // };
+        columnHeader.appendChild(toggleDiv);
+      }
+    }
+
     if (prevProps.differentialResults !== differentialResults) {
       let data =
         differentialResults.length !==
@@ -216,6 +230,9 @@ class DifferentialVolcano extends Component {
     if (clearHighlightedData) {
       this.pageToFeature();
       this.props.onHandleSelectedVolcano([]);
+      this.setState({
+        differentialTableData: volcanoPlotSelectedDataArr,
+      });
       return;
     }
     let allFeatureIdsRemaining = [...volcanoPlotSelectedDataArr].map(
@@ -225,9 +242,19 @@ class DifferentialVolcano extends Component {
       this.props.volcanoDifferentialTableRowOutline,
     );
     if (volcanoPlotSelectedDataArr.length > 0) {
+      let sortedData =
+        this.volcanoPlotFilteredGridRef?.current?.qhGridRef?.current?.getSortedData() ||
+        this.props.differentialResults;
+      // const sortDataIds = [...sortedData].map(d => d[this.props.differentialFeatureIdKey]);
+      const volcanoPlotDataArrIds = [...volcanoPlotSelectedDataArr].map(
+        d => d[this.props.differentialFeatureIdKey],
+      );
+      const matchCurrentTableOrder = [...sortedData].filter(d =>
+        volcanoPlotDataArrIds.includes(d[this.props.differentialFeatureIdKey]),
+      );
       const self = this;
       this.setState({
-        differentialTableData: volcanoPlotSelectedDataArr,
+        differentialTableData: matchCurrentTableOrder,
         volcanoPlotRows: volcanoPlotSelectedDataArr.length,
       });
       let multiselectedFeaturesArrRemaining = [
@@ -427,7 +454,14 @@ class DifferentialVolcano extends Component {
       differentialResults,
     } = this.props;
     const { hasMultifeaturePlots } = this.state;
+    event.persist();
     event.stopPropagation();
+    // console.log('className', event.target.className);
+    // console.log('classList', event.target.classList);
+    // console.log('Event', { event });
+    // console.log(event?.target?.classList?.contains('DifferentialResultsRowCheckbox'));
+    // console.log(event?.target?.classList?.contains('DifferentialResultsRowCheckboxDiv'));
+    // console.log(event?.target?.innerHTML.includes('DifferentialResultsRowCheckboxDiv'));
     if (
       item == null ||
       event?.target?.className === 'ExternalSiteIcon' ||
@@ -450,7 +484,6 @@ class DifferentialVolcano extends Component {
       if (volcanoDifferentialTableRowOutline !== '') {
         baseFeature = volcanoDifferentialTableRowOutline;
       }
-
       if (event.shiftKey) {
         if (!hasMultifeaturePlots) return;
         const currentTableData =
@@ -496,7 +529,10 @@ class DifferentialVolcano extends Component {
         event.ctrlKey ||
         event.metaKey ||
         event?.target?.classList?.contains('DifferentialResultsRowCheckbox') ||
-        event?.target?.classList?.contains('DifferentialResultsRowCheckboxDiv')
+        event?.target?.classList?.contains(
+          'DifferentialResultsRowCheckboxDiv',
+        ) ||
+        event?.target?.innerHTML.includes('DifferentialResultsRowCheckboxDiv')
       ) {
         if (!hasMultifeaturePlots) return;
         // control-click or click specifically on checkbox
@@ -958,16 +994,9 @@ class DifferentialVolcano extends Component {
     };
     const SelectAllPopupContent = (
       <List inverted>
-        <List.Item>
-          <Icon name="square outline" />
-          <List.Content>
-            <List.Header>Select All</List.Header>
-            <List.Description>
-              Click box to left, to select/deselect first{' '}
-              {this.props.multifeaturePlotMax} checkboxes
-            </List.Description>
-          </List.Content>
-        </List.Item>
+        <List.Header id="MultiSelectColumnHeader">
+          Multi-Select Column
+        </List.Header>
         <List.Item>
           <Icon name="check square outline" />
           <List.Content>
@@ -1211,7 +1240,7 @@ class DifferentialVolcano extends Component {
                                 inverted
                                 basic
                               />
-                              <Icon
+                              {/* <Icon
                                 name={
                                   allChecked ? 'check square' : 'square outline'
                                 }
@@ -1219,7 +1248,7 @@ class DifferentialVolcano extends Component {
                                 id="ToggleAllCheckbox"
                                 className={allChecked ? 'PrimaryColor' : ''}
                                 onClick={this.toggleAllCheckboxes}
-                              />
+                              /> */}
                             </>
                           ) : null}
                           <EZGrid

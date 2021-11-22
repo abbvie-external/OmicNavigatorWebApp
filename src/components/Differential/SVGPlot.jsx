@@ -56,6 +56,7 @@ class SVGPlot extends Component {
       (prevProps.imageInfoVolcanoLength !== this.props.imageInfoVolcanoLength ||
         prevProps.imageInfoVolcano.key !== this.props.imageInfoVolcano.key ||
         prevProps.volcanoWidth !== this.props.volcanoWidth ||
+        prevProps.tabsMessage !== this.props.tabsMessage ||
         prevProps.upperPlotsHeight !== this.props.upperPlotsHeight)
     ) {
       this.getSVGPanes();

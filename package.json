@@ -1,6 +1,6 @@
 {
   "name": "omicnavigatorwebapp",
-  "version": "1.3.4",
+  "version": "1.4.0",
   "private": true,
   "dependencies": {
     "d3-hexbin": "^0.2.2",
@@ -47,7 +47,7 @@
     "@observablehq/stdlib": "^3.3.0",
     "airbnb-prop-types": "^2.13.2",
     "array-move": "^2.2.1",
-    "axios": "^0.21.1",
+    "axios": "^0.21.4",
     "blob-stream": "^0.1.3",
     "can-ndjson-stream": "^1.0.2",
     "canvg": "^3.0.7",

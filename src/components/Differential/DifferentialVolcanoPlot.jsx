@@ -89,6 +89,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     volcanoCircleLabels: [],
     optionsOpen: false,
     usageOpen: false,
+    renderedOnce: false,
   };
 
   componentDidMount() {
@@ -115,6 +116,109 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       if (volcanoPlotVisible && upperPlotsVisible && !isItemSelected) {
         this.setState({ optionsOpen: true });
       }
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const {
+      volcanoDifferentialTableRowHighlight,
+      upperPlotsHeight,
+      volcanoWidth,
+      isFilteredDifferential,
+      isDataStreamingResultsTable,
+      differentialResultsUnfiltered,
+      // HighlightedFeaturesArrVolcano,
+      volcanoPlotVisible,
+      upperPlotsVisible,
+      filteredDifferentialTableData,
+      volcanoDifferentialTableRowOutline,
+      isItemSelected,
+    } = this.props;
+
+    const {
+      volcanoCircleLabel,
+      xAxisLabel,
+      yAxisLabel,
+      doXAxisTransformation,
+      doYAxisTransformation,
+    } = this.state;
+    // this if/else if/else if statement in place to minimize re-renders - should cover all situations
+    if (
+      !isDataStreamingResultsTable &&
+      isDataStreamingResultsTable !== prevProps.isDataStreamingResultsTable
+    ) {
+      this.getAxisLabels();
+      window.addEventListener('resize', this.debouncedResizeListener);
+      const dataInCurrentView =
+        this.state.currentResults.length > 0
+          ? this.state.currentResults
+          : differentialResultsUnfiltered;
+      d3.select('#VolcanoChart').remove();
+      this.setupVolcano();
+      this.hexBinning(differentialResultsUnfiltered);
+      this.transitionZoom(dataInCurrentView, false, false, false);
+      if (volcanoPlotVisible && upperPlotsVisible && !isItemSelected) {
+        this.setState({ optionsOpen: true });
+      }
+    } else if (
+      !isDataStreamingResultsTable &&
+      (prevState.xAxisLabel !== xAxisLabel ||
+        prevState.yAxisLabel !== yAxisLabel ||
+        prevState.doXAxisTransformation !== doXAxisTransformation ||
+        prevState.doYAxisTransformation !== doYAxisTransformation ||
+        prevProps.upperPlotsHeight !== upperPlotsHeight ||
+        prevProps.volcanoWidth !== volcanoWidth)
+    ) {
+      // volcano plot is open, user changes axis or height/width (visible only whe volcano plot is open)
+      d3.select('#VolcanoChart').remove();
+      this.setupVolcano();
+      this.hexBinning(this.state.currentResults);
+      this.transitionZoom(this.state.currentResults, false, false, false);
+    } else if (
+      (prevProps.isFilteredDifferential && !isFilteredDifferential) ||
+      (prevProps.isUpsetVisible && !this.props.isUpsetVisible)
+    ) {
+      // set analysis "filter" is clicked OR set analysis is toggled off
+      const dataInCurrentView =
+        this.state.currentResults.length > 0
+          ? this.state.currentResults
+          : differentialResultsUnfiltered;
+      this.transitionZoom(dataInCurrentView, false, false, false);
+    } else if (
+      !isDataStreamingResultsTable &&
+      prevProps.filteredDifferentialTableData.length !== 30 &&
+      filteredDifferentialTableData.length !==
+        prevProps.filteredDifferentialTableData.length
+    ) {
+      // table filter is applied
+      let allDataInSelectedArea =
+        this.state.currentResults.length > 0
+          ? this.state.currentResults
+          : differentialResultsUnfiltered;
+      // if (upperPlotsVisible && volcanoPlotVisible)
+      this.transitionZoom(allDataInSelectedArea, false, true, false);
+    }
+    if (volcanoCircleLabel !== prevState.volcanoCircleLabel) {
+      this.handleCircleLabels();
+    }
+    if (
+      !_.isEqual(
+        _.sortBy(volcanoDifferentialTableRowHighlight),
+        _.sortBy(prevProps.volcanoDifferentialTableRowHighlight),
+      ) ||
+      volcanoDifferentialTableRowOutline !==
+        prevProps.volcanoDifferentialTableRowOutline
+    ) {
+      this.highlightBrushedCircles();
+    }
+    if (
+      (!upperPlotsVisible &&
+        upperPlotsVisible !== prevProps.upperPlotsVisible) ||
+      (!volcanoPlotVisible &&
+        volcanoPlotVisible !== prevProps.volcanoPlotVisible)
+    ) {
+      // user closes volcano plot, close options
+      this.setState({ optionsOpen: false, usageOpen: false });
     }
   }
 
@@ -228,7 +332,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       });
 
     svg.on('dblclick', () => {
-      this.transitionZoom(differentialResultsUnfiltered, false, false, true);
+      this.transitionZoom(differentialResultsUnfiltered, true, false, true);
     });
   }
 
@@ -527,113 +631,11 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     };
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    const {
-      volcanoDifferentialTableRowHighlight,
-      upperPlotsHeight,
-      volcanoWidth,
-      isFilteredDifferential,
-      isDataStreamingResultsTable,
-      differentialResultsUnfiltered,
-      // HighlightedFeaturesArrVolcano,
-      volcanoPlotVisible,
-      upperPlotsVisible,
-      filteredDifferentialTableData,
-      volcanoDifferentialTableRowOutline,
-      isItemSelected,
-    } = this.props;
-
-    const {
-      volcanoCircleLabel,
-      xAxisLabel,
-      yAxisLabel,
-      doXAxisTransformation,
-      doYAxisTransformation,
-    } = this.state;
-    // this if/else if/else if statement in place to minimize re-renders - should cover all situations
-    if (
-      !isDataStreamingResultsTable &&
-      isDataStreamingResultsTable !== prevProps.isDataStreamingResultsTable
-    ) {
-      this.getAxisLabels();
-      window.addEventListener('resize', this.debouncedResizeListener);
-      const dataInCurrentView =
-        this.state.currentResults.length > 0
-          ? this.state.currentResults
-          : differentialResultsUnfiltered;
-      d3.select('#VolcanoChart').remove();
-      this.setupVolcano();
-      this.hexBinning(differentialResultsUnfiltered);
-      this.transitionZoom(dataInCurrentView, false, false, false);
-      if (volcanoPlotVisible && upperPlotsVisible && !isItemSelected) {
-        this.setState({ optionsOpen: true });
-      }
-    } else if (
-      !isDataStreamingResultsTable &&
-      (prevState.xAxisLabel !== xAxisLabel ||
-        prevState.yAxisLabel !== yAxisLabel ||
-        prevState.doXAxisTransformation !== doXAxisTransformation ||
-        prevState.doYAxisTransformation !== doYAxisTransformation ||
-        prevProps.upperPlotsHeight !== upperPlotsHeight ||
-        prevProps.volcanoWidth !== volcanoWidth)
-    ) {
-      // volcano plot is open, user changes axis or height/width (visible only whe volcano plot is open)
-      d3.select('#VolcanoChart').remove();
-      this.setupVolcano();
-      this.hexBinning(this.state.currentResults);
-      this.transitionZoom(this.state.currentResults, false, false, false);
-    } else if (
-      (prevProps.isFilteredDifferential && !isFilteredDifferential) ||
-      (prevProps.isUpsetVisible && !this.props.isUpsetVisible)
-    ) {
-      // set analysis "filter" is clicked OR set analysis is toggled off
-      const dataInCurrentView =
-        this.state.currentResults.length > 0
-          ? this.state.currentResults
-          : differentialResultsUnfiltered;
-      this.transitionZoom(dataInCurrentView, false, false, false);
-    } else if (
-      !isDataStreamingResultsTable &&
-      prevProps.filteredDifferentialTableData.length !== 30 &&
-      filteredDifferentialTableData.length !==
-        prevProps.filteredDifferentialTableData.length
-    ) {
-      // table filtere is applied
-      let allDataInSelectedArea =
-        this.state.currentResults.length > 0
-          ? this.state.currentResults
-          : differentialResultsUnfiltered;
-      // if (upperPlotsVisible && volcanoPlotVisible)
-      this.transitionZoom(allDataInSelectedArea, false, true, false);
-    }
-    if (volcanoCircleLabel !== prevState.volcanoCircleLabel) {
-      this.handleCircleLabels();
-    }
-    if (
-      !_.isEqual(
-        _.sortBy(volcanoDifferentialTableRowHighlight),
-        _.sortBy(prevProps.volcanoDifferentialTableRowHighlight),
-      ) ||
-      volcanoDifferentialTableRowOutline !==
-        prevProps.volcanoDifferentialTableRowOutline
-    ) {
-      this.highlightBrushedCircles();
-    }
-    if (
-      (!upperPlotsVisible &&
-        upperPlotsVisible !== prevProps.upperPlotsVisible) ||
-      (!volcanoPlotVisible &&
-        volcanoPlotVisible !== prevProps.volcanoPlotVisible)
-    ) {
-      // user closes volcano plot, close options
-      this.setState({ optionsOpen: false, usageOpen: false });
-    }
-  }
-
   getCircleOrBin = key => {
-    const { identifier, circles } = this.state;
+    const { identifier } = this.state;
+    const { differentialTableData } = this.props;
     let el = null;
-    const circleWithKey = [...circles].find(
+    const circleWithKey = [...differentialTableData].find(
       c => c[this.props.differentialFeatureIdKey] === key,
     );
     if (circleWithKey) {
@@ -1328,7 +1330,6 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       xScale,
       yScale,
     );
-
     self.setState(
       {
         currentResults: allDataInView,
@@ -1825,30 +1826,6 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       // DOY
       let doY = this.state.doYAxisTransformation;
       if (yLabel == null) {
-        // stored in session and available, need to set doy
-        // if (yLabel.indexOf('P_Value') >= 0) {
-        //   doY = true;
-        // } else if (yLabel.indexOf('P.Value') >= 0) {
-        //   doY = true;
-        // } else if (yLabel.indexOf('PValue') >= 0) {
-        //   doY = true;
-        // } else if (yLabel.indexOf('PVal') >= 0) {
-        //   doY = true;
-        // } else if (yLabel.indexOf('P value') >= 0) {
-        //   doY = true;
-        // } else if (yLabel.indexOf('adj_P_Val') >= 0) {
-        //   doY = true;
-        // } else if (yLabel.indexOf('adj.P.Val') >= 0) {
-        //   doY = true;
-        // } else {
-        //     // this.handleDropdownChange(
-        //     //   {},
-        //     //   { name: 'yAxisSelector', value: yLabel },
-        //     // );
-        //     doY = this.state.doYAxisTransformation;
-        //   }
-        // } else {
-        // not stored in session or available, need to set ylabel and doy
         if (relevantConfigColumns.indexOf('P_Value') >= 0) {
           yLabel = 'P_Value';
           doY = true;
@@ -1871,10 +1848,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
           yLabel = 'adj.P.Val';
           doY = true;
         } else {
-          this.handleDropdownChange(
-            {},
-            { name: 'yAxisSelector', value: relevantConfigColumns[0] },
-          );
+          yLabel = relevantConfigColumns[0];
         }
       }
       const axes = relevantConfigColumns.map(e => {
@@ -1888,8 +1862,8 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         axisLabels: axes,
         yAxisLabel: yLabel,
         doYAxisTransformation: doY,
+        xAxisLabel: xLabel,
       });
-      this.handleDropdownChange({}, { name: 'xAxisSelector', value: xLabel });
     }
   };
 
@@ -1936,7 +1910,6 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     } = this.state;
 
     const PlotName = `${differentialStudy}_${differentialModel}_${differentialTest}_scatter`;
-    // if (volcanoPlotVisible && upperPlotsVisible) {
     if (
       !isDataStreamingResultsTable &&
       identifier !== null &&
