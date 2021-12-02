@@ -1148,13 +1148,10 @@ class Differential extends Component {
     );
   };
 
-  isChecked = item => {
-    return function() {
-      return this.state.volcanoDifferentialTableRowHighlight.contains(
-        item[this.state.differentialFeatureIdKey],
-      );
-    };
-  };
+  isChecked = item =>
+    this.state.volcanoDifferentialTableRowHighlight.contains(
+      item[this.state.differentialFeatureIdKey],
+    );
 
   setPlotSelected = featureId => {
     this.setState({
@@ -1402,14 +1399,15 @@ class Differential extends Component {
       checkboxCol = [
         {
           title: '',
-          field: 'select',
+          field: 'checked',
           hideOnExport: true,
-          sortDisabled: true,
-          sortAccessor: (item, field) => console.log(item, field),
-          // self.state.volcanoDifferentialTableRowHighlight.contains(item),
-          template: (value, item, addParams) => {
+          // sortAccessor: (item, field) => console.log(item, field),
+          sortAccessor: (item, field) => item[field],
+          // self.state.volcanoDifferentialTableRowHighlight.includes(item),
+          template: value => {
+            const classVar = `ViewPlotCol ${value ? 'rowHighlightOther' : ''}`;
             return (
-              <div className="DifferentialResultsRowCheckboxDiv">
+              <div className={classVar}>
                 <Icon
                   name="square outline"
                   size="large"

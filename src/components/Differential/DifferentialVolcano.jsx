@@ -97,6 +97,45 @@ class DifferentialVolcano extends Component {
     // this.props.onResetFeatureToHighlightInDiffTable();
     // }
   }
+  static getDerivedStateFromProps(props, state) {
+    debugger;
+    const nextState = {};
+    const {
+      differentialResults,
+      volcanoDifferentialTableRowHighlight,
+      differentialFeatureIdKey,
+    } = props;
+    const {
+      volcanoCurrentSelection,
+      prevVolcanoCurrentSelection,
+      prevDifferentialResults,
+      prevVolcanoDifferentialTableRowHighlight,
+    } = state;
+    if (
+      differentialResults !== prevDifferentialResults ||
+      volcanoDifferentialTableRowHighlight !==
+        prevVolcanoDifferentialTableRowHighlight ||
+      volcanoCurrentSelection !== prevVolcanoCurrentSelection
+    ) {
+      const data = volcanoCurrentSelection.length
+        ? volcanoCurrentSelection
+        : differentialResults;
+      nextState.derivedData = data.map(row => ({
+        ...row,
+        checked: volcanoDifferentialTableRowHighlight?.includes(
+          row[differentialFeatureIdKey],
+        ),
+      }));
+      nextState.prevDifferentialResults = differentialResults;
+      nextState.prevVolcanoDifferentialTableRowHighlight = volcanoDifferentialTableRowHighlight;
+      nextState.prevVolcanoCurrentSelection = volcanoCurrentSelection;
+    }
+
+    return nextState;
+  }
+  // shouldComponentUpdate() {
+  //   return this.props.isValidSearchDifferential;
+  // }
 
   componentDidUpdate(prevProps, prevState) {
     const { differentialResults } = this.props;
@@ -119,6 +158,7 @@ class DifferentialVolcano extends Component {
     // }
 
     if (prevProps.differentialResults !== differentialResults) {
+      debugger;
       let data =
         differentialResults.length !==
           this.state.volcanoCurrentSelection.length &&
@@ -127,8 +167,9 @@ class DifferentialVolcano extends Component {
           : differentialResults;
 
       this.setState({
-        allChecked: false,
-        differentialTableData: data,
+        // allChecked: false,
+        // differentialTableData: data,
+        volcanoCurrentSelection: [],
         volcanoPlotRows: data?.length || 0,
         featuresLength:
           limitLength(data?.length, this.props.multifeaturePlotMax) || 0,
@@ -875,7 +916,7 @@ class DifferentialVolcano extends Component {
 
   render() {
     const {
-      differentialTableData,
+      derivedData,
       itemsPerPageVolcanoTable,
       volcanoPlotRows,
       volcanoPlotVisible,
@@ -1241,7 +1282,7 @@ class DifferentialVolcano extends Component {
                                 inverted
                                 basic
                               />
-                              {/* <Icon
+                              <Icon
                                 name={
                                   allChecked ? 'check square' : 'square outline'
                                 }
@@ -1249,7 +1290,7 @@ class DifferentialVolcano extends Component {
                                 id="ToggleAllCheckbox"
                                 className={allChecked ? 'PrimaryColor' : ''}
                                 onClick={this.toggleAllCheckboxes}
-                              /> */}
+                              />
                             </>
                           ) : null}
                           <EZGrid
@@ -1260,7 +1301,7 @@ class DifferentialVolcano extends Component {
                             // height="auto"
                             height={volcanoPlotVisible ? 'auto' : '70vh'}
                             // height="70vh"
-                            data={differentialTableData || []}
+                            data={derivedData || []}
                             totalRows={volcanoPlotRows || 0}
                             columnsConfig={differentialColumns}
                             itemsPerPage={itemsPerPageVolcanoTable}
