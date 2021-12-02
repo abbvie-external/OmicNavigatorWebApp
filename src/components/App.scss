@@ -70,11 +70,6 @@
     padding-right: 10px !important;
   }
 
-  .QHGrid table td:not(:first-child):hover {
-    border-top: 3px solid var(--color-link-half) !important;
-    border-bottom: 3px solid var(--color-link-half) !important;
-  }
-
   .QHGrid table thead:hover {
     border-top: none !important;
     border-bottom: none !important;
@@ -119,6 +114,16 @@
     //   min-width: 40px !important;
     //   max-width: 40px !important;
     // }
+
+    .QHGrid table td:not(:first-child):hover {
+      border-top: 3px solid var(--color-link-half) !important;
+      border-bottom: 3px solid var(--color-link-half) !important;
+    }
+
+    .QHGrid table td:not(:first-child):hover ~ td {
+      border-top: 3px solid var(--color-link-half) !important;
+      border-bottom: 3px solid var(--color-link-half) !important;
+    }
   }
 
   #DifferentialResultsTableWrapperCheckboxes,
@@ -132,6 +137,22 @@
         margin-left: 0px !important;
         // margin-top: -3px !important;
       }
+    }
+  }
+  #DifferentialResultsTableWrapper {
+    .QHGrid table {
+      border-collapse: collapse;
+      tr {
+        cursor: pointer !important;
+      }
+      .QHGrid--generalSearch:nth-child(1) {
+        margin-left: 0px !important;
+        // margin-top: -3px !important;
+      }
+    }
+    .QHGrid table tbody tr:hover {
+      border-top: 3px solid var(--color-link-half) !important;
+      border-bottom: 3px solid var(--color-link-half) !important;
     }
   }
 

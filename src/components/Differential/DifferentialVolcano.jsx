@@ -104,18 +104,19 @@ class DifferentialVolcano extends Component {
     //   this.handleUpperPlotVisability(null, true);
     // }
 
-    if (this.state.hasMultifeaturePlots) {
-      const columnHeader = document.querySelector('[data-id="select"]');
-      if (!columnHeader.classList.value.split(' ').includes('th-select')) {
-        columnHeader.classList.add('th-select');
-        const toggleDiv = document.createElement('div');
-        toggleDiv.classList.add('toggleDiv');
-        // toggleDiv.onclick = () => {
-        //   this.toggleAllCheckboxes();
-        // };
-        columnHeader.appendChild(toggleDiv);
-      }
-    }
+    // THIS CODE ISN'T BEING USED NOW, BUT IS BREAKING THE APP IN SOME SITUATIONS, E.G. MULTIPLE COLUMN UPSET FILTERING WITH NO RESULTS
+    // if (this.state.hasMultifeaturePlots) {
+    //   const columnHeader = document.querySelector('[data-id="select"]');
+    //   if (!columnHeader.classList.value.split(' ').includes('th-select')) {
+    //     columnHeader.classList.add('th-select');
+    //     const toggleDiv = document.createElement('div');
+    //     toggleDiv.classList.add('toggleDiv');
+    //     // toggleDiv.onclick = () => {
+    //     //   this.toggleAllCheckboxes();
+    //     // };
+    //     columnHeader.appendChild(toggleDiv);
+    //   }
+    // }
 
     if (prevProps.differentialResults !== differentialResults) {
       let data =
