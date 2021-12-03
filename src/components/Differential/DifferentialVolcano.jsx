@@ -35,13 +35,13 @@ import SplitPane from 'react-split-pane';
 class DifferentialVolcano extends Component {
   state = {
     upperPlotsHeight:
-      parseInt(localStorage.getItem('upperPlotsHeight'), 10) || 370,
+      parseInt(localStorage.getItem('upperPlotsHeight'), 10) || 400,
     upperPlotsHeightBackup:
-      parseInt(localStorage.getItem('upperPlotsHeightBackup'), 10) || 370,
+      parseInt(localStorage.getItem('upperPlotsHeightBackup'), 10) || 400,
     upperPlotsDivHeight:
-      parseInt(localStorage.getItem('upperPlotsDivHeight'), 10) || 400,
+      parseInt(localStorage.getItem('upperPlotsDivHeight'), 10) || 440,
     upperPlotsDivHeightBackup:
-      parseInt(localStorage.getItem('upperPlotsDivHeightBackup'), 10) || 400,
+      parseInt(localStorage.getItem('upperPlotsDivHeightBackup'), 10) || 440,
     differentialDynamicPlotWidth:
       parseInt(localStorage.getItem('differentialDynamicPlotWidth'), 10) ||
       document.body.clientWidth * 0.75 - 420,
@@ -285,6 +285,9 @@ class DifferentialVolcano extends Component {
           multiselectedFeatureIdsMappedRemaining,
           true,
         );
+        // let hasOutline = features?.includes(
+        //   this.props.volcanoDifferentialTableRowOutline,
+        // );
         // if the outlined dot is still in the chart, page to it, otherwise clear it's state and page to 0
         if (isOutlinedFeatureInView) {
           setTimeout(function() {
@@ -836,7 +839,7 @@ class DifferentialVolcano extends Component {
       const plotTypesMapped = this.props.differentialPlotTypes.map(
         p => p.plotType,
       );
-      return plotTypesMapped.includes('multiFeature') || false;
+      return plotTypesMapped?.includes('multiFeature') || false;
     } else return false;
   };
   toggleAllCheckboxes = () => {
@@ -1125,6 +1128,7 @@ class DifferentialVolcano extends Component {
                           onHandleAllChecked={bool =>
                             this.setState({ allChecked: bool })
                           }
+                          hasMultifeaturePlots={this.props.hasMultifeaturePlots}
                         ></SVGPlot>
                       </SplitPane>
                       <Grid.Row>

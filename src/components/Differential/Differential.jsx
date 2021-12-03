@@ -101,7 +101,9 @@ class Differential extends Component {
       allMetaFeaturesDataDifferential: [],
       isDataStreamingResultsTable: true,
       enableMultifeaturePlotting: false,
+      updateVolcanoLabels: false,
       multifeaturePlotMax: 1000,
+      hasMultifeaturePlots: false,
     };
   }
 
@@ -227,8 +229,12 @@ class Differential extends Component {
         const differentialModelData = this.state.differentialStudyMetadata.plots.find(
           model => model.modelID === differentialModel,
         );
+        let hasMultifeaturePlots = this.hasMultifeaturePlots(
+          differentialModelData?.plots,
+        );
         this.setState({
           differentialPlotTypes: differentialModelData?.plots,
+          hasMultifeaturePlots,
         });
       }
     }
@@ -1192,12 +1198,10 @@ class Differential extends Component {
     }
   };
 
-  hasMultifeaturePlots = () => {
-    if (this.state.differentialPlotTypes) {
-      const plotTypesMapped = this.state.differentialPlotTypes.map(
-        p => p.plotType,
-      );
-      return plotTypesMapped.includes('multiFeature') || false;
+  hasMultifeaturePlots = differentialPlotTypes => {
+    if (differentialPlotTypes) {
+      const plotTypesMapped = differentialPlotTypes.map(p => p.plotType);
+      return plotTypesMapped?.includes('multiFeature') || false;
     } else return false;
   };
 
@@ -1397,8 +1401,8 @@ class Differential extends Component {
       },
     );
     let checkboxCol = [];
-    let hasMultifeaturePlots = this.hasMultifeaturePlots();
-    if (hasMultifeaturePlots) {
+    // let hasMultifeaturePlots = this.hasMultifeaturePlots();
+    if (this.state.hasMultifeaturePlots) {
       checkboxCol = [
         {
           title: '',

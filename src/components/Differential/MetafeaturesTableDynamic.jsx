@@ -59,7 +59,7 @@ class MetafeaturesTableDynamic extends Component {
     }
   }
 
-  async getMetafeaturesTableConfigCols(data) {
+  getMetafeaturesTableConfigCols = data => {
     let configCols = [];
     if (data?.length > 0) {
       const TableValuePopupStyle = {
@@ -146,13 +146,13 @@ class MetafeaturesTableDynamic extends Component {
       configCols = metafeaturesAlphanumericColumnsMapped.concat(
         metafeaturesNumericColumnsMapped,
       );
+      this.setState({
+        metafeaturesTableConfigCols: configCols,
+        metafeaturesTableData: data,
+        metafeaturesLoaded: true,
+      });
     }
-    this.setState({
-      metafeaturesTableConfigCols: configCols,
-      metafeaturesTableData: data,
-      metafeaturesLoaded: true,
-    });
-  }
+  };
 
   handleItemsPerPageChange = items => {
     this.setState({
