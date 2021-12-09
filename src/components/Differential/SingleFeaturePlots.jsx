@@ -38,14 +38,6 @@ class SingleFeaturePlots extends Component {
       activeSVGTabIndexVolcanoSingleFeature,
       isSVGReadyVolcanoSingleFeature,
     } = this.state;
-    // if (
-    //   prevProps.plotDataSingleFeatureLength !== plotDataSingleFeatureLength ||
-    //   prevProps.plotDataSingleFeature.key !== plotDataSingleFeature.key
-    // ) {
-    //   if (!plotDataSingleFeature?.key?.includes('features')) {
-    //     this.getSVGPanesSingleFeature();
-    //   }
-    // }
 
     if (
       isSVGReadyVolcanoSingleFeature &&
@@ -55,20 +47,15 @@ class SingleFeaturePlots extends Component {
         prevState.activeSVGTabIndexVolcanoSingleFeature !==
           activeSVGTabIndexVolcanoSingleFeature)
     ) {
+      // if SVG plot data changes, fetch new plot/s and set panes
       this.getSVGPanesSingleFeature();
       this.setButtonVisibility(activeSVGTabIndexVolcanoSingleFeature);
     }
     if (
-      this.props.activeIndexPlotTabs !== 1 &&
-      prevProps.activeIndexPlotTabs !== activeIndexPlotTabs
-    ) {
-      this.setButtonVisibility(activeIndexPlotTabs);
-    }
-
-    if (
       prevProps.volcanoWidth !== volcanoWidth ||
       prevProps.upperPlotsHeight !== upperPlotsHeight
     ) {
+      // if div dimensions change, fetch new plot/s and set panes
       this.getSVGPanesSingleFeature();
     }
   }

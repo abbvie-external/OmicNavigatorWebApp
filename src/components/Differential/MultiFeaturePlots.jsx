@@ -39,23 +39,13 @@ class MultiFeaturePlots extends Component {
       volcanoWidth,
       upperPlotsHeight,
       tabsMessage,
-      activeIndexPlotTabs,
     } = this.props;
     const {
       activeSVGTabIndexVolcanoMultiFeature,
       isSVGReadyVolcanoMultiFeature,
     } = this.state;
-    // if (
-    //   prevProps.plotDataMultiFeatureLength !== plotDataMultiFeatureLength ||
-    //   prevProps.plotDataMultiFeature.key !== plotDataMultiFeature.key
-    // ) {
-    //   if (plotDataMultiFeature?.key?.includes('features')) {
-    //     this.getSVGPanesMultiFeature();
-    //   }
-    // }
     if (
       isSVGReadyVolcanoMultiFeature &&
-      activeIndexPlotTabs === 1 &&
       (prevProps.plotDataMultiFeatureLength !== plotDataMultiFeatureLength ||
         prevProps.plotDataMultiFeature.key !== plotDataMultiFeature.key ||
         prevProps.volcanoWidth !== volcanoWidth ||
@@ -64,7 +54,7 @@ class MultiFeaturePlots extends Component {
         prevState.activeSVGTabIndexVolcanoMultiFeature !==
           activeSVGTabIndexVolcanoMultiFeature)
     ) {
-      debugger;
+      // if SVG plot data or dimensions change, fetch new plot/s and set panes
       this.getSVGPanesMultiFeature();
     }
   }
