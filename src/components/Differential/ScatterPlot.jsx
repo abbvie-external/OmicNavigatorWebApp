@@ -1,6 +1,6 @@
 import React from 'react';
 import _ from 'lodash';
-import './DifferentialVolcanoPlot.scss';
+import './ScatterPlot.scss';
 import {
   Form,
   Grid,
@@ -18,7 +18,7 @@ import * as d3 from 'd3';
 import * as hexbin from 'd3-hexbin';
 import ButtonActions from '../Shared/ButtonActions';
 
-class DifferentialVolcanoPlot extends React.PureComponent {
+class ScatterPlot extends React.PureComponent {
   plotCirclesSorted = [];
   differentialResults = [];
   circles = [];
@@ -2209,4 +2209,4 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     // } else return null;
   }
 }
-export default DifferentialVolcanoPlot;
+export default ScatterPlot;

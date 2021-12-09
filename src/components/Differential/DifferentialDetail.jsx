@@ -3,15 +3,15 @@ import _ from 'lodash';
 import CustomEmptyMessage from '../Shared/Templates';
 // eslint-disable-next-line no-unused-vars
 import QHGrid, { EZGrid } from '../Shared/QHGrid';
-import DifferentialPlot from './DifferentialPlot';
-import SVGPlot from './SVGPlot';
+import PlotsOverlay from './PlotsOverlay';
+import DynamicPlots from './DynamicPlots';
 import {
   scrollElement,
   limitLength,
   limitLengthOrNull,
   // dynamicSizeLarger,
 } from '../Shared/helpers';
-import DifferentialVolcanoPlot from './DifferentialVolcanoPlot';
+import ScatterPlot from './ScatterPlot';
 import {
   // Form,
   Grid,
@@ -29,10 +29,10 @@ import {
 // import VolcanoPlotIcon from '../../resources/VolcanoPlotIcon.png';
 // import VolcanoPlotIconSelected from '../../resources/VolcanoPlotIconSelected.png';
 import ButtonActions from '../Shared/ButtonActions';
-import './DifferentialVolcano.scss';
+import './DifferentialDetail.scss';
 import SplitPane from 'react-split-pane';
 
-class DifferentialVolcano extends Component {
+class DifferentialDetail extends Component {
   state = {
     upperPlotsHeight:
       parseInt(localStorage.getItem('upperPlotsHeight'), 10) || 400,
@@ -73,7 +73,7 @@ class DifferentialVolcano extends Component {
     hasMultifeaturePlots: false,
   };
   volcanoPlotFilteredGridRef = React.createRef();
-  differentialVolcanoPlotRef = React.createRef();
+  ScatterPlotRef = React.createRef();
 
   componentDidMount() {
     const hasMultifeaturePlots = this.hasMultifeaturePlots();
@@ -304,7 +304,7 @@ class DifferentialVolcano extends Component {
           // this timeout give the table time to load, before paging to the outlined feature
           setTimeout(function() {
             self.props.onGetPlot(
-              'Volcano',
+              'SingleFeature',
               self.props.volcanoDifferentialTableRowOutline,
               false,
               false,
@@ -372,7 +372,7 @@ class DifferentialVolcano extends Component {
       const feature = obj ? obj[differentialFeatureIdKey] : '';
       this.props.onSetPlotSelected(feature);
       this.pageToFeature(event[differentialFeatureIdKey]);
-      this.props.onGetPlot('Volcano', feature, false, false);
+      this.props.onGetPlot('SingleFeature', feature, false, false);
     } else {
       if (!this.state.hasMultifeaturePlots) return;
       let elementArray = items.map(item => ({
@@ -433,12 +433,13 @@ class DifferentialVolcano extends Component {
       : this.volcanoPlotFilteredGridRef?.current?.qhGridRef?.current?.getSortedData() ||
         this.props.differentialResults;
     if (selected.length > 1) {
-      if (selected.length) this.props.onHandleMultifeaturePlot('Volcano', data);
+      if (selected.length)
+        this.props.onHandleMultifeaturePlot('MultiFeature', data);
     } else if (selected.length === 1) {
       this.setState({ allChecked: false });
       if (this.props.volcanoDifferentialTableRowOutline) {
         this.props.onGetPlot(
-          'Volcano',
+          'SingleFeature',
           this.props.volcanoDifferentialTableRowOutline,
           false,
           false,
@@ -605,7 +606,7 @@ class DifferentialVolcano extends Component {
           // simple row click without control nor shift
           this.props.onSetPlotSelected(item[differentialFeatureIdKey]);
           this.props.onGetPlot(
-            'Volcano',
+            'SingleFeature',
             item[differentialFeatureIdKey],
             false,
             false,
@@ -731,7 +732,7 @@ class DifferentialVolcano extends Component {
       if (isOutlinedFeatureInView) {
         setTimeout(function() {
           self.props.onGetPlot(
-            'Volcano',
+            'SingleFeature',
             self.props.volcanoDifferentialTableRowOutline,
             false,
             false,
@@ -807,7 +808,7 @@ class DifferentialVolcano extends Component {
           if (isOutlinedFeatureInView) {
             setTimeout(function() {
               self.props.onGetPlot(
-                'Volcano',
+                'SingleFeature',
                 self.props.volcanoDifferentialTableRowOutline,
                 false,
                 false,
@@ -903,8 +904,10 @@ class DifferentialVolcano extends Component {
       differentialTest,
       tab,
       isItemSelected,
-      imageInfoVolcano,
-      imageInfoVolcanoLength,
+      plotDataSingleFeature,
+      plotDataSingleFeatureLength,
+      plotDataMultiFeature,
+      plotDataMultiFeatureLength,
       svgExportName,
       differentialPlotTypes,
       tabsMessage,
@@ -918,9 +921,9 @@ class DifferentialVolcano extends Component {
       multifeaturePlotMax,
       modelSpecificMetaFeaturesExist,
     } = this.props;
-    // let differentialVolcanoCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-Volcano`;
+    // let DifferentialDetailCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-Volcano`;
     // if (multisetQueriedDifferential) {
-    //   differentialVolcanoCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-${multisetQueriedDifferential}-Volcano`;
+    //   DifferentialDetailCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-${multisetQueriedDifferential}-Volcano`;
     // }
     const maxWidthPopupStyle = {
       backgroundColor: '2E2E2E',
@@ -956,8 +959,8 @@ class DifferentialVolcano extends Component {
         metaFeaturesDataDifferential,
         modelSpecificMetaFeaturesExist,
         fwdRefDVC,
-        imageInfoDifferentialLength,
-        imageInfoDifferential,
+        plotDataOverlay,
+        plotDataOverlayLength,
         differentialPlotTypes,
         differentialTests,
       } = this.props;
@@ -973,7 +976,7 @@ class DifferentialVolcano extends Component {
             width="very wide"
             className="VerticalSidebarPlot"
           >
-            <DifferentialPlot
+            <PlotsOverlay
               featuresString={featuresString}
               onBackToTable={onBackToTable}
               differentialFeatureIdKey={differentialFeatureIdKey}
@@ -984,8 +987,8 @@ class DifferentialVolcano extends Component {
                 modelSpecificMetaFeaturesExist || false
               }
               fwdRefDVC={fwdRefDVC}
-              imageInfoDifferentialLength={imageInfoDifferentialLength || 0}
-              imageInfoDifferential={imageInfoDifferential}
+              plotDataOverlayLength={plotDataOverlayLength || 0}
+              plotDataOverlay={plotDataOverlay}
               differentialPlotTypes={differentialPlotTypes}
               svgTabMax={4}
               tab={tab}
@@ -993,7 +996,7 @@ class DifferentialVolcano extends Component {
               differentialModel={differentialModel}
               differentialTest={differentialTest}
               differentialTests={differentialTests}
-            ></DifferentialPlot>
+            ></PlotsOverlay>
           </Sidebar>
         );
       } else return null;
@@ -1070,8 +1073,8 @@ class DifferentialVolcano extends Component {
                           this.onSizeChange(size, 'vertical')
                         }
                       >
-                        <DifferentialVolcanoPlot
-                          ref={this.differentialVolcanoPlotRef}
+                        <ScatterPlot
+                          ref={this.ScatterPlotRef}
                           {...this.state}
                           {...this.props}
                           onHandleVolcanoPlotSelectionChange={
@@ -1084,8 +1087,8 @@ class DifferentialVolcano extends Component {
                             this.handleVolcanoCurrentSelection
                           }
                           onClearPlotSelected={this.props.onClearPlotSelected}
-                        ></DifferentialVolcanoPlot>
-                        <SVGPlot
+                        ></ScatterPlot>
+                        <DynamicPlots
                           modelSpecificMetaFeaturesExist={
                             modelSpecificMetaFeaturesExist || false
                           }
@@ -1106,8 +1109,14 @@ class DifferentialVolcano extends Component {
                           volcanoWidth={volcanoWidth}
                           volcanoPlotVisible={volcanoPlotVisible}
                           upperPlotsVisible={upperPlotsVisible}
-                          imageInfoVolcano={imageInfoVolcano}
-                          imageInfoVolcanoLength={imageInfoVolcanoLength}
+                          plotDataSingleFeature={plotDataSingleFeature}
+                          plotDataSingleFeatureLength={
+                            plotDataSingleFeatureLength
+                          }
+                          plotDataMultiFeature={plotDataMultiFeature}
+                          plotDataMultiFeatureLength={
+                            plotDataMultiFeatureLength
+                          }
                           svgExportName={svgExportName}
                           differentialPlotTypes={differentialPlotTypes}
                           tabsMessage={tabsMessage}
@@ -1137,7 +1146,7 @@ class DifferentialVolcano extends Component {
                             this.setState({ allChecked: bool })
                           }
                           hasMultifeaturePlots={this.props.hasMultifeaturePlots}
-                        ></SVGPlot>
+                        ></DynamicPlots>
                       </SplitPane>
                       <Grid.Row>
                         <span
@@ -1266,7 +1275,7 @@ class DifferentialVolcano extends Component {
                           ) : null}
                           <EZGrid
                             ref={this.volcanoPlotFilteredGridRef}
-                            // uniqueCacheKey={differentialVolcanoCacheKey}
+                            // uniqueCacheKey={DifferentialDetailCacheKey}
                             className="VolcanoPlotTable"
                             // note, default is 70vh; if you want a specific vh, specify like "40vh"; "auto" lets the height flow based on items per page
                             // height="auto"
@@ -1305,4 +1314,4 @@ class DifferentialVolcano extends Component {
     );
   }
 }
-export default DifferentialVolcano;
+export default DifferentialDetail;

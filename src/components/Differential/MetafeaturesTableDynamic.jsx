@@ -22,7 +22,7 @@ class MetafeaturesTableDynamic extends Component {
 
   componentDidMount() {
     const isMultifeaturePlot =
-      this.props.imageInfoVolcano.key?.includes('features') || false;
+      this.props.plotDataSingleFeature.key?.includes('features') || false;
     if (
       this.props.modelSpecificMetaFeaturesExist !== false &&
       !isMultifeaturePlot
@@ -34,20 +34,20 @@ class MetafeaturesTableDynamic extends Component {
   async getMetafeaturesDataDynamic() {
     const cachedMetafeaturesData = JSON.parse(
       sessionStorage.getItem(
-        `MetafeaturesData-${this.props.imageInfoVolcano.key}`,
+        `MetafeaturesData-${this.props.plotDataSingleFeature.key}`,
       ),
     );
-    if (!cachedMetafeaturesData && this.props.imageInfoVolcano?.key) {
+    if (!cachedMetafeaturesData && this.props.plotDataSingleFeature?.key) {
       try {
         const data = await omicNavigatorService.getMetaFeaturesTable(
           this.props.differentialStudy,
           this.props.differentialModel,
-          this.props.imageInfoVolcano.key,
+          this.props.plotDataSingleFeature.key,
           null,
         );
         let metaFeaturesDataVolcano = data != null ? data : [];
         sessionStorage.setItem(
-          `MetafeaturesData-${this.props.imageInfoVolcano.key}`,
+          `MetafeaturesData-${this.props.plotDataSingleFeature.key}`,
           JSON.stringify(metaFeaturesDataVolcano),
         );
         this.getMetafeaturesTableConfigCols(metaFeaturesDataVolcano);

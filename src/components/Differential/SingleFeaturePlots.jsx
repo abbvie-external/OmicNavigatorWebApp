@@ -4,7 +4,7 @@ import SVG from 'react-inlinesvg';
 import { roundToPrecision } from '../Shared/helpers';
 import ButtonActions from '../Shared/ButtonActions';
 import MetafeaturesTableDynamic from './MetafeaturesTableDynamic';
-import './SVGPlot.scss';
+import './DynamicPlots.scss';
 
 class SingleFeaturePlots extends Component {
   state = {
@@ -27,8 +27,8 @@ class SingleFeaturePlots extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     const {
-      imageInfoVolcanoLength,
-      imageInfoVolcano,
+      plotDataSingleFeatureLength,
+      plotDataSingleFeature,
       volcanoWidth,
       upperPlotsHeight,
       tabsMessage,
@@ -39,18 +39,18 @@ class SingleFeaturePlots extends Component {
       isSVGReadyVolcanoSingleFeature,
     } = this.state;
     // if (
-    //   prevProps.imageInfoVolcanoLength !== imageInfoVolcanoLength ||
-    //   prevProps.imageInfoVolcano.key !== imageInfoVolcano.key
+    //   prevProps.plotDataSingleFeatureLength !== plotDataSingleFeatureLength ||
+    //   prevProps.plotDataSingleFeature.key !== plotDataSingleFeature.key
     // ) {
-    //   if (!imageInfoVolcano?.key?.includes('features')) {
+    //   if (!plotDataSingleFeature?.key?.includes('features')) {
     //     this.getSVGPanesSingleFeature();
     //   }
     // }
 
     if (
       isSVGReadyVolcanoSingleFeature &&
-      (prevProps.imageInfoVolcanoLength !== imageInfoVolcanoLength ||
-        prevProps.imageInfoVolcano.key !== imageInfoVolcano.key ||
+      (prevProps.plotDataSingleFeatureLength !== plotDataSingleFeatureLength ||
+        prevProps.plotDataSingleFeature.key !== plotDataSingleFeature.key ||
         prevProps.tabsMessage !== tabsMessage ||
         prevState.activeSVGTabIndexVolcanoSingleFeature !==
           activeSVGTabIndexVolcanoSingleFeature)
@@ -111,19 +111,19 @@ class SingleFeaturePlots extends Component {
 
   getSVGPanesSingleFeature = () => {
     const {
-      imageInfoVolcano,
+      plotDataSingleFeature,
       divWidth,
       divHeight,
       pxToPtRatio,
       pointSize,
-      imageInfoVolcanoLength,
+      plotDataSingleFeatureLength,
       modelSpecificMetaFeaturesExist,
       differentialStudy,
       differentialModel,
       isItemSVGLoaded,
     } = this.props;
     let panes = [];
-    if (imageInfoVolcanoLength !== 0) {
+    if (plotDataSingleFeatureLength !== 0) {
       let dimensions = '';
       if (divWidth && divHeight && pxToPtRatio) {
         const divWidthPadding = divWidth * 0.95;
@@ -135,7 +135,7 @@ class SingleFeaturePlots extends Component {
         const pointSizeString = `&pointsize=${pointSize}`;
         dimensions = `?${divWidthPtString}${divHeightPtString}${pointSizeString}`;
       }
-      const svgArray = imageInfoVolcano.svg;
+      const svgArray = plotDataSingleFeature.svg;
       const svgPanes = svgArray.map((s, index) => {
         const srcUrl = `${s.svg}${dimensions}`;
         return {
@@ -162,7 +162,7 @@ class SingleFeaturePlots extends Component {
       panes = panes.concat(svgPanes);
     }
     const isMultifeaturePlot =
-      imageInfoVolcano?.key?.includes('features') || false;
+      plotDataSingleFeature?.key?.includes('features') || false;
     if (modelSpecificMetaFeaturesExist !== false && !isMultifeaturePlot) {
       let metafeaturesTab = [
         {
@@ -174,7 +174,7 @@ class SingleFeaturePlots extends Component {
                 differentialStudy={differentialStudy}
                 differentialModel={differentialModel}
                 isItemSVGLoaded={isItemSVGLoaded}
-                imageInfoVolcano={imageInfoVolcano}
+                plotDataSingleFeature={plotDataSingleFeature}
                 modelSpecificMetaFeaturesExist={modelSpecificMetaFeaturesExist}
               />
             </Tab.Pane>
@@ -193,14 +193,14 @@ class SingleFeaturePlots extends Component {
   };
 
   handlePlotOverlaySingleFeature = () => {
-    const { imageInfoVolcano } = this.props;
-    const key = imageInfoVolcano.key;
-    this.props.onGetPlotTransitionRef(key, null, imageInfoVolcano, true);
+    const { plotDataSingleFeature } = this.props;
+    const key = plotDataSingleFeature.key;
+    this.props.onGetPlotTransitionRef(key, null, plotDataSingleFeature, true);
   };
 
   getSingleFeaturePlotContent = () => {
     const {
-      imageInfoVolcano,
+      plotDataSingleFeature,
       isVolcanoPlotSVGLoaded,
       tabsMessage,
       upperPlotsVisible,
@@ -225,7 +225,7 @@ class SingleFeaturePlots extends Component {
     let options = [];
     if (upperPlotsVisible) {
       if (isSVGReadyVolcanoSingleFeature) {
-        if (imageInfoVolcano.key != null && isVolcanoPlotSVGLoaded) {
+        if (plotDataSingleFeature.key != null && isVolcanoPlotSVGLoaded) {
           const DropdownClass =
             this.props.differentialPlotTypes.length > this.props.svgTabMax
               ? 'Show svgPlotDropdown'
@@ -245,7 +245,7 @@ class SingleFeaturePlots extends Component {
           // };
           const activeSVGTabIndexVolcanoSingleFeatureVar =
             activeSVGTabIndexVolcanoSingleFeature || 0;
-          const svgArray = [...imageInfoVolcano.svg];
+          const svgArray = [...plotDataSingleFeature.svg];
           options = svgArray.map(function(s, index) {
             return {
               key: `${index}=VolcanoPlotDropdownOption`,
@@ -254,7 +254,7 @@ class SingleFeaturePlots extends Component {
             };
           });
           const isMultifeaturePlot =
-            this.props.imageInfoVolcano.key?.includes('features') || false;
+            this.props.plotDataSingleFeature.key?.includes('features') || false;
           if (
             this.props.modelSpecificMetaFeaturesExist !== false &&
             !isMultifeaturePlot
@@ -283,7 +283,7 @@ class SingleFeaturePlots extends Component {
                   svgVisible={svgFlagSFPlots}
                   txtVisible={txtFlagSFPlots}
                   tab={tab}
-                  imageInfo={imageInfoVolcano}
+                  imageInfo={plotDataSingleFeature}
                   tabIndex={activeSVGTabIndexVolcanoSingleFeatureVar}
                   svgExportName={svgExportName}
                   plot="VolcanoPlotSVG"
@@ -294,7 +294,7 @@ class SingleFeaturePlots extends Component {
                   study={differentialStudy}
                   model={differentialModel}
                   test={differentialTest}
-                  feature={imageInfoVolcano?.key}
+                  feature={plotDataSingleFeature?.key}
                 />
               </div>
               <Dropdown

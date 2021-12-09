@@ -24,10 +24,9 @@ class EnrichmentSVGPlot extends PureComponent {
     if (
       // this.state.isSVGReadyEnrichment &&
       // prevProps.HighlightedProteins !== this.props.HighlightedProteins ||
-      prevProps.imageInfoEnrichmentLength !==
-        this.props.imageInfoEnrichmentLength ||
-      prevProps.imageInfoEnrichment.key !==
-        this.props.imageInfoEnrichment.key ||
+      prevProps.plotDataEnrichmentLength !==
+        this.props.plotDataEnrichmentLength ||
+      prevProps.plotDataEnrichment.key !== this.props.plotDataEnrichment.key ||
       prevProps.divWidth !== this.props.divWidth ||
       prevProps.divHeight !== this.props.divHeight
     ) {
@@ -48,7 +47,7 @@ class EnrichmentSVGPlot extends PureComponent {
   };
 
   // navigateToDifferentialFeature = evt => {
-  //   const testAndDescription = this.props.imageInfoEnrichment.key.split(':');
+  //   const testAndDescription = this.props.plotDataEnrichment.key.split(':');
   //   const test = testAndDescription[0] || '';
   //   const featureID = this.props.HighlightedProteins[0]?.featureID;
   //   this.props.onFindDifferentialFeature(test, featureID);
@@ -56,14 +55,14 @@ class EnrichmentSVGPlot extends PureComponent {
 
   getSVGPanes = () => {
     const {
-      imageInfoEnrichment,
+      plotDataEnrichment,
       divWidth,
       divHeight,
       pxToPtRatio,
       pointSize,
-      imageInfoEnrichmentLength,
+      plotDataEnrichmentLength,
     } = this.props;
-    if (imageInfoEnrichmentLength > 0) {
+    if (plotDataEnrichmentLength > 0) {
       let dimensions = '';
       if (divWidth && divHeight && pxToPtRatio) {
         const divWidthPt = roundToPrecision(divWidth / pxToPtRatio, 1);
@@ -73,8 +72,8 @@ class EnrichmentSVGPlot extends PureComponent {
         const pointSizeString = `&pointsize=${pointSize}`;
         dimensions = `?${divWidthPtString}${divHeightPtString}${pointSizeString}`;
       }
-      const svgArray = imageInfoEnrichment.svg;
-      const uniqueKey = imageInfoEnrichment.key || '';
+      const svgArray = plotDataEnrichment.svg;
+      const uniqueKey = plotDataEnrichment.key || '';
       const panes = svgArray.map((s, index) => {
         let srcUrl = `${s.svg}${dimensions}`;
         return {
@@ -107,7 +106,7 @@ class EnrichmentSVGPlot extends PureComponent {
 
   render() {
     const {
-      imageInfoEnrichment,
+      plotDataEnrichment,
       svgExportName,
       tab,
       SVGPlotLoaded,
@@ -121,7 +120,7 @@ class EnrichmentSVGPlot extends PureComponent {
     } = this.state;
 
     if (isSVGReadyEnrichment) {
-      if (imageInfoEnrichment.key != null && SVGPlotLoaded) {
+      if (plotDataEnrichment.key != null && SVGPlotLoaded) {
         const DropdownClass =
           this.props.enrichmentPlotTypes.length > this.props.svgTabMax
             ? 'Show svgPlotDropdown'
@@ -140,7 +139,7 @@ class EnrichmentSVGPlot extends PureComponent {
         //   wordBreak: 'break-all',
         // };
         const activeSVGTabIndexEnrichmentVar = activeSVGTabIndexEnrichment || 0;
-        const svgArray = imageInfoEnrichment.svg;
+        const svgArray = plotDataEnrichment.svg;
         const plotOptions = svgArray.map(function(s, index) {
           return {
             key: `${index}=EnrichmentPlotDropdownOption`,
@@ -159,7 +158,7 @@ class EnrichmentSVGPlot extends PureComponent {
                 svgVisible={true}
                 txtVisible={false}
                 tab={tab}
-                imageInfo={imageInfoEnrichment}
+                imageInfo={plotDataEnrichment}
                 tabIndex={activeSVGTabIndexEnrichmentVar}
                 svgExportName={svgExportName}
                 plot="EnrichmentPlotSVGDiv"

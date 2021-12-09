@@ -22,7 +22,7 @@ class MetafeaturesTable extends Component {
   componentDidMount() {
     console.log('mounted');
     const isMultifeaturePlot =
-      this.props.imageInfoDifferential.key?.includes('features') || false;
+      this.props.plotDataOverlay.key?.includes('features') || false;
     if (
       this.props.modelSpecificMetaFeaturesExist !== false &&
       !isMultifeaturePlot
@@ -34,7 +34,7 @@ class MetafeaturesTable extends Component {
   async getMetafeaturesData() {
     const cachedMetafeaturesData = JSON.parse(
       sessionStorage.getItem(
-        `MetafeaturesData-${this.props.imageInfoDifferential.key}`,
+        `MetafeaturesData-${this.props.plotDataOverlay.key}`,
       ),
     );
     let metaFeaturesDataDifferential = [];
@@ -47,7 +47,7 @@ class MetafeaturesTable extends Component {
       );
       metaFeaturesDataDifferential = data != null ? data : [];
       sessionStorage.setItem(
-        `MetafeaturesData-${this.props.imageInfoDifferential.key}`,
+        `MetafeaturesData-${this.props.plotDataOverlay.key}`,
         JSON.stringify(metaFeaturesDataDifferential),
       );
       this.getMetafeaturesTableConfigCols(metaFeaturesDataDifferential);

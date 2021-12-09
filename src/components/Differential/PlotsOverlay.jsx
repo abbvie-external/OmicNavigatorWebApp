@@ -5,10 +5,10 @@ import DifferentialBreadcrumbs from './DifferentialBreadcrumbs';
 import ButtonActions from '../Shared/ButtonActions';
 import MetafeaturesTable from './MetafeaturesTable';
 import '../Enrichment/SplitPanesContainer.scss';
-import './SVGPlot.scss';
-import './DifferentialPlot.scss';
+import './DynamicPlots.scss';
+import './PlotsOverlay.scss';
 
-class DifferentialPlot extends PureComponent {
+class PlotsOverlay extends PureComponent {
   constructor(props) {
     super(props);
     // this.resizeListener = this.resizeListener.bind(this);
@@ -32,11 +32,11 @@ class DifferentialPlot extends PureComponent {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    const { imageInfoDifferentialLength, isItemSVGLoaded } = this.props;
+    const { plotDataOverlayLength, isItemSVGLoaded } = this.props;
     const { activeSVGTabIndexDifferential } = this.state;
     if (
       isItemSVGLoaded &&
-      prevProps.imageInfoDifferentialLength !== imageInfoDifferentialLength
+      prevProps.plotDataOverlayLength !== plotDataOverlayLength
     ) {
       this.getSVGPanes();
     }
@@ -86,9 +86,9 @@ class DifferentialPlot extends PureComponent {
   async getSVGPanes() {
     let panes = [];
     let options = [];
-    if (this.props.imageInfoDifferential) {
-      if (this.props.imageInfoDifferential.svg.length !== 0) {
-        const svgArray = [...this.props.imageInfoDifferential.svg];
+    if (this.props.plotDataOverlay) {
+      if (this.props.plotDataOverlay.svg.length !== 0) {
+        const svgArray = [...this.props.plotDataOverlay.svg];
         const svgPanes = svgArray.map(s => {
           return {
             menuItem: `${s.plotType.plotDisplay}`,
@@ -115,7 +115,7 @@ class DifferentialPlot extends PureComponent {
       }
     }
     const isMultifeaturePlot =
-      this.props.imageInfoDifferential.key?.includes('features') || false;
+      this.props.plotDataOverlay.key?.includes('features') || false;
     if (
       this.props.modelSpecificMetaFeaturesExist !== false &&
       !isMultifeaturePlot
@@ -131,7 +131,7 @@ class DifferentialPlot extends PureComponent {
                 differentialModel={this.props.differentialModel}
                 differentialFeature={this.props.differentialFeature}
                 isItemSVGLoaded={this.props.isItemSVGLoaded}
-                imageInfoDifferential={this.props.imageInfoDifferential}
+                plotDataOverlay={this.props.plotDataOverlay}
                 modelSpecificMetaFeaturesExist={
                   this.props.modelSpecificMetaFeaturesExist
                 }
@@ -173,7 +173,7 @@ class DifferentialPlot extends PureComponent {
     } = this.state;
     const {
       isItemSVGLoaded,
-      imageInfoDifferential,
+      plotDataOverlay,
       tab,
       differentialStudy,
       differentialModel,
@@ -190,10 +190,7 @@ class DifferentialPlot extends PureComponent {
         </div>
       );
     } else {
-      if (
-        this.props.differentialPlotTypes &&
-        this.props.imageInfoDifferential
-      ) {
+      if (this.props.differentialPlotTypes && this.props.plotDataOverlay) {
         const DropdownClass =
           this.props.differentialPlotTypes.length > this.props.svgTabMax
             ? 'Show svgPlotDropdownInOverlay'
@@ -238,7 +235,7 @@ class DifferentialPlot extends PureComponent {
                     model={differentialModel}
                     test={differentialTest}
                     feature={differentialFeature}
-                    imageInfo={imageInfoDifferential}
+                    imageInfo={plotDataOverlay}
                     tabIndex={activeSVGTabIndexDifferentialVar}
                     plot={'DifferentialPlotTabsPlotSVGDiv'}
                   />
@@ -288,4 +285,4 @@ class DifferentialPlot extends PureComponent {
   }
 }
 
-export default withRouter(DifferentialPlot);
+export default withRouter(PlotsOverlay);

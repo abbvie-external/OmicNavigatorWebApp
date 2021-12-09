@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Tab, Popup, Icon, Label } from 'semantic-ui-react';
 import SingleFeaturePlots from './SingleFeaturePlots';
 import MultiFeaturePlots from './MultiFeaturePlots';
-import './SVGPlot.scss';
+import './DynamicPlots.scss';
 
 const maxWidthPopupStyle = {
   backgroundColor: '2E2E2E',
@@ -13,16 +13,16 @@ const maxWidthPopupStyle = {
   fontSize: '13px',
 };
 
-class SVGPlot extends Component {
+class DynamicPlots extends Component {
   state = {
     activeIndexPlotTabs: 0,
     featuresListOpen: false,
   };
 
   handlePlotOverlaySingleFeature = () => {
-    const { imageInfoVolcano } = this.props;
-    const key = imageInfoVolcano.key;
-    this.props.onGetPlotTransitionRef(key, null, imageInfoVolcano, true);
+    const { plotDataSingleFeature } = this.props;
+    const key = plotDataSingleFeature.key;
+    this.props.onGetPlotTransitionRef(key, null, plotDataSingleFeature, true);
   };
 
   handleTabChange = (e, { activeIndex }) => {
@@ -35,7 +35,6 @@ class SVGPlot extends Component {
 
   render() {
     const { volcanoPlotVisible, hasMultifeaturePlots } = this.props;
-    const { multiFeaturePlotContent } = this.state;
     const Toggle = (
       <span
         className="VolcanoPlotToggle"
@@ -93,8 +92,10 @@ class SVGPlot extends Component {
               pxToPtRatio={this.props.pxToPtRatio}
               pointSize={this.props.pointSize}
               // plot info
-              imageInfoVolcanoLength={this.props.imageInfoVolcanoLength}
-              imageInfoVolcano={this.props.imageInfoVolcano}
+              plotDataSingleFeatureLength={
+                this.props.plotDataSingleFeatureLength
+              }
+              plotDataSingleFeature={this.props.plotDataSingleFeature}
               // to determine tabs or dropdowns
               svgTabMax={this.props.svgTabMax}
               // to be used by resuable export
@@ -142,8 +143,10 @@ class SVGPlot extends Component {
                 pxToPtRatio={this.props.pxToPtRatio}
                 pointSize={this.props.pointSize}
                 // plot info
-                imageInfoVolcanoLength={this.props.imageInfoVolcanoLength}
-                imageInfoVolcano={this.props.imageInfoVolcano}
+                plotDataSingleFeatureLength={
+                  this.props.plotDataSingleFeatureLength
+                }
+                plotDataSingleFeature={this.props.plotDataSingleFeature}
                 // to determine tabs or dropdowns
                 svgTabMax={this.props.svgTabMax}
                 // to be used by resuable export
@@ -182,8 +185,10 @@ class SVGPlot extends Component {
                 pxToPtRatio={this.props.pxToPtRatio}
                 pointSize={this.props.pointSize}
                 // plot info
-                imageInfoVolcanoLength={this.props.imageInfoVolcanoLength}
-                imageInfoVolcano={this.props.imageInfoVolcano}
+                plotDataMultiFeatureLength={
+                  this.props.plotDataMultiFeatureLength
+                }
+                plotDataMultiFeature={this.props.plotDataMultiFeature}
                 // to determine tabs or dropdowns
                 svgTabMax={this.props.svgTabMax}
                 // to be used by resuable export
@@ -199,7 +204,7 @@ class SVGPlot extends Component {
                 // functional props to call
                 onHandleAllChecked={this.props.onHandleAllChecked}
                 onHandleSelectedVolcano={this.props.onHandleSelectedVolcano}
-                // multi-feature props need, but not single-feature
+                // multi-feature specific
                 onGetMultifeaturePlotTransitionAlt={
                   this.props.onGetMultifeaturePlotTransitionAlt
                 }
@@ -235,4 +240,4 @@ class SVGPlot extends Component {
   }
 }
 
-export default SVGPlot;
+export default DynamicPlots;

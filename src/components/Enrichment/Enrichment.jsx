@@ -112,7 +112,7 @@ class Enrichment extends Component {
     enrichmentTerm: '',
     itemsPerPageInformedEnrichmentMain: null,
     plotType: [],
-    imageInfoEnrichment: {
+    plotDataEnrichment: {
       key: null,
       title: '',
       svg: [],
@@ -272,7 +272,7 @@ class Enrichment extends Component {
     testSelectedTransitionCb(true);
     // const TestSiteVar = `${test}:${dataItem.description}`;
     // let xLargest = 0;
-    // let imageInfoEnrichment = { key: '', title: '', svg: [] };
+    // let plotDataEnrichment = { key: '', title: '', svg: [] };
     // omicNavigatorService
     //   .getDatabaseInfo(
     //     enrichmentStudy + 'plots',
@@ -290,8 +290,8 @@ class Enrichment extends Component {
     let term = dataItem?.termID || '';
     let description = dataItem?.description || '';
     self.setState({
-      imageInfoEnrichment: {
-        ...self.state.imageInfoEnrichment,
+      plotDataEnrichment: {
+        ...self.state.plotDataEnrichment,
         key: `${test}:${description}`,
         title: `${test}:${description}`,
       },
@@ -1157,7 +1157,7 @@ class Enrichment extends Component {
         },
         SVGPlotLoaded: false,
         SVGPlotLoading: false,
-        // imageInfoEnrichment: {
+        // plotDataEnrichment: {
         //   key: null,
         //   title: '',
         //   svg: []
@@ -1206,8 +1206,8 @@ class Enrichment extends Component {
         SVGPlotLoaded: false,
         SVGPlotLoading: false,
         HighlightedProteins: [],
-        // imageInfoEnrichment: {
-        //   ...this.state.imageInfoEnrichment,
+        // plotDataEnrichment: {
+        //   ...this.state.plotDataEnrichment,
         //   svg: []
         // },
       });
@@ -1218,9 +1218,9 @@ class Enrichment extends Component {
     const { enrichmentPlotTypes, enrichmentTest, uData } = this.state;
     const { enrichmentStudy, enrichmentModel } = this.props;
     let id = featureId != null ? featureId : '';
-    let imageInfoEnrichmentVar = { key: '', title: '', svg: [] };
-    imageInfoEnrichmentVar.title = this.state.imageInfoEnrichment.title;
-    imageInfoEnrichmentVar.key = id;
+    let plotDataEnrichmentVar = { key: '', title: '', svg: [] };
+    plotDataEnrichmentVar.title = this.state.plotDataEnrichment.title;
+    plotDataEnrichmentVar.key = id;
     this.setState({ svgExportName: id });
     cancelRequestEnrichmentGetPlot();
     let cancelToken = new CancelToken(e => {
@@ -1257,8 +1257,8 @@ class Enrichment extends Component {
           .filter(Boolean);
         Promise.race(promises)
           .then(svg => {
-            imageInfoEnrichmentVar.svg = [svg];
-            self.handleSVG(imageInfoEnrichmentVar);
+            plotDataEnrichmentVar.svg = [svg];
+            self.handleSVG(plotDataEnrichmentVar);
           })
           // Ignore error in first race - Handled later
           .catch(error => undefined)
@@ -1283,7 +1283,7 @@ class Enrichment extends Component {
               .filter(result => result.status === 'rejected')
               .map(({ reason }) => reason);
             if (svgArray.length) {
-              self.handleSVG({ ...imageInfoEnrichmentVar, svg: svgArray });
+              self.handleSVG({ ...plotDataEnrichmentVar, svg: svgArray });
             }
             if (errors.length === promises.length) {
               throw new Error('Error during plotStudyReturnSvgUrl');
@@ -1326,10 +1326,10 @@ class Enrichment extends Component {
     );
   };
 
-  handleSVG = imageInfoEnrichmentVar => {
+  handleSVG = plotDataEnrichmentVar => {
     this.setState({
-      imageInfoEnrichment: imageInfoEnrichmentVar,
-      imageInfoEnrichmentLength: imageInfoEnrichmentVar.svg?.length || 0,
+      plotDataEnrichment: plotDataEnrichmentVar,
+      plotDataEnrichmentLength: plotDataEnrichmentVar.svg?.length || 0,
       SVGPlotLoaded: true,
       SVGPlotLoading: false,
     });
@@ -1339,8 +1339,8 @@ class Enrichment extends Component {
     this.setState({
       // SVGPlotLoaded: false,
       SVGPlotLoading: false,
-      // imageInfoEnrichment: {
-      //   ...this.state.imageInfoEnrichment,
+      // plotDataEnrichment: {
+      //   ...this.state.plotDataEnrichment,
       //   svg: []
       // },
     });
@@ -1381,8 +1381,8 @@ class Enrichment extends Component {
     let term = dataItem?.termID || '';
     let description = dataItem?.description || '';
     this.setState({
-      imageInfoEnrichment: {
-        ...this.state.imageInfoEnrichment,
+      plotDataEnrichment: {
+        ...this.state.plotDataEnrichment,
         key: `${test}:${description}`,
         title: `${test}:${description}`,
         dataItem: dataItem,
@@ -1452,8 +1452,8 @@ class Enrichment extends Component {
         //   let term = dataItem.Annotation;
 
         //   self.setState({
-        //     imageInfoEnrichment: {
-        //       ...self.state.imageInfoEnrichment,
+        //     plotDataEnrichment: {
+        //       ...self.state.plotDataEnrichment,
         //       key: `${test} : ${dataItem.description}`,
         //       title: `${test} : ${dataItem.description}`
         //     },
@@ -1888,7 +1888,7 @@ class Enrichment extends Component {
       enrichmentNameLoaded: false,
       SVGPlotLoaded: false,
       SVGPlotLoading: false,
-      imageInfoEnrichment: {
+      plotDataEnrichment: {
         key: null,
         title: '',
         svg: [],
