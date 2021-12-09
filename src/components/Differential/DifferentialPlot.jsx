@@ -197,7 +197,7 @@ class DifferentialPlot extends PureComponent {
         const DropdownClass =
           this.props.differentialPlotTypes.length > this.props.svgTabMax
             ? 'Show svgPlotDropdownInOverlay'
-            : 'Hide svgPlotDropdown';
+            : 'Hide svgPlotDropdownInOverlay';
         const TabMenuClass =
           this.props.differentialPlotTypes.length > this.props.svgTabMax
             ? 'Hide'

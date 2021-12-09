@@ -869,7 +869,7 @@ class DifferentialVolcano extends Component {
     });
   };
 
-  getMultifeaturePlotTransitionRef = () => {
+  getMultifeaturePlotTransitionAlt = () => {
     const tableData =
       this.volcanoPlotFilteredGridRef?.current?.qhGridRef?.current?.getSortedData() ||
       this.props.differentialResults;
@@ -885,6 +885,7 @@ class DifferentialVolcano extends Component {
       upperPlotsVisible,
       upperPlotsDivHeight,
       volcanoDivWidth,
+      volcanoWidth,
       animation,
       direction,
       featuresLength,
@@ -915,6 +916,7 @@ class DifferentialVolcano extends Component {
       volcanoDifferentialTableRowHighlight,
       volcanoDifferentialTableRowOutline,
       multifeaturePlotMax,
+      modelSpecificMetaFeaturesExist,
     } = this.props;
     // let differentialVolcanoCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-Volcano`;
     // if (multisetQueriedDifferential) {
@@ -1084,18 +1086,24 @@ class DifferentialVolcano extends Component {
                           onClearPlotSelected={this.props.onClearPlotSelected}
                         ></DifferentialVolcanoPlot>
                         <SVGPlot
+                          modelSpecificMetaFeaturesExist={
+                            modelSpecificMetaFeaturesExist || false
+                          }
                           differentialStudy={differentialStudy}
                           differentialModel={differentialModel}
                           differentialTest={differentialTest}
                           differentialFeature={differentialFeature}
-                          divWidth={differentialDynamicPlotWidth}
-                          divHeight={upperPlotsDivHeight}
                           pxToPtRatio={105}
                           pointSize={12}
                           svgTabMax={0}
                           tab={tab}
-                          volcanoWidth={volcanoDivWidth}
+                          upperPlotsDivHeight={upperPlotsDivHeight}
                           upperPlotsHeight={upperPlotsDivHeight}
+                          differentialDynamicPlotWidth={
+                            differentialDynamicPlotWidth
+                          }
+                          volcanoDivWidth={volcanoDivWidth}
+                          volcanoWidth={volcanoWidth}
                           volcanoPlotVisible={volcanoPlotVisible}
                           upperPlotsVisible={upperPlotsVisible}
                           imageInfoVolcano={imageInfoVolcano}
@@ -1111,8 +1119,8 @@ class DifferentialVolcano extends Component {
                           differentialFeatureIdKey={differentialFeatureIdKey}
                           multifeaturePlotMax={multifeaturePlotMax}
                           onGetPlotTransitionRef={onGetPlotTransition}
-                          onGetMultifeaturePlotTransitionRef={
-                            this.getMultifeaturePlotTransitionRef
+                          onGetMultifeaturePlotTransitionAlt={
+                            this.getMultifeaturePlotTransitionAlt
                           }
                           // onHandleMultifeaturePlotRef={
                           //   onHandleMultifeaturePlot
