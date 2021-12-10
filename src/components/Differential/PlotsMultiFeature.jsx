@@ -250,6 +250,7 @@ class PlotsMultiFeature extends Component {
   render() {
     const {
       plotDataMultiFeature,
+      plotDataMultiFeatureLoaded,
       upperPlotsVisible,
       svgExportName,
       tab,
@@ -307,6 +308,11 @@ class PlotsMultiFeature extends Component {
         }
         let featuresList = null;
         featuresList = this.getFeaturesList();
+        const loader = plotDataMultiFeatureLoaded ? null : (
+          <Dimmer active inverted>
+            <Loader size="large">Loading Multi-Feature Plots</Loader>
+          </Dimmer>
+        );
         return (
           <div className="svgContainerVolcano">
             <div className="export-svg ShowBlock">
@@ -364,14 +370,9 @@ class PlotsMultiFeature extends Component {
                 {divWidth >= 625 ? 'FULL SCREEN' : ''}
               </Button>
             </span>
+            <span id="PlotDataMultiFeatureLoader">{loader}</span>
           </div>
         );
-        // } else if (!dynamicPlotsLoaded) {
-        //   return (
-        //     <Dimmer active inverted>
-        //       <Loader size="large">Loading Plots</Loader>
-        //     </Dimmer>
-        //   );
       } else {
         let instructions = this.getInstructions();
         return (

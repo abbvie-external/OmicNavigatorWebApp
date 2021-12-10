@@ -889,11 +889,12 @@ class DifferentialDetail extends Component {
       isItemSelected,
       plotDataSingleFeature,
       plotDataSingleFeatureLength,
+      plotDataSingleFeatureLoaded,
       plotDataMultiFeature,
       plotDataMultiFeatureLength,
+      plotDataMultiFeatureLoaded,
       svgExportName,
       differentialPlotTypes,
-      dynamicPlotsLoaded,
       differentialFeature,
       differentialFeatureIdKey,
       onGetPlotTransition,
@@ -937,12 +938,12 @@ class DifferentialDetail extends Component {
         onBackToTable,
         differentialFeatureIdKey,
         differentialFeature,
-        plotOverlayLoaded,
         metaFeaturesDataDifferential,
         modelSpecificMetaFeaturesExist,
         fwdRefDVC,
         plotDataOverlay,
         plotDataOverlayLength,
+        plotOverlayLoaded,
         differentialPlotTypes,
         differentialTests,
       } = this.props;
@@ -963,7 +964,6 @@ class DifferentialDetail extends Component {
               onBackToTable={onBackToTable}
               differentialFeatureIdKey={differentialFeatureIdKey}
               differentialFeature={differentialFeature}
-              plotOverlayLoaded={plotOverlayLoaded}
               metaFeaturesDataDifferential={metaFeaturesDataDifferential}
               modelSpecificMetaFeaturesExist={
                 modelSpecificMetaFeaturesExist || false
@@ -971,6 +971,7 @@ class DifferentialDetail extends Component {
               fwdRefDVC={fwdRefDVC}
               plotDataOverlayLength={plotDataOverlayLength || 0}
               plotDataOverlay={plotDataOverlay}
+              plotOverlayLoaded={plotOverlayLoaded}
               differentialPlotTypes={differentialPlotTypes}
               svgTabMax={4}
               tab={tab}
@@ -1095,13 +1096,18 @@ class DifferentialDetail extends Component {
                           plotDataSingleFeatureLength={
                             plotDataSingleFeatureLength
                           }
+                          plotDataSingleFeatureLoaded={
+                            plotDataSingleFeatureLoaded
+                          }
                           plotDataMultiFeature={plotDataMultiFeature}
                           plotDataMultiFeatureLength={
                             plotDataMultiFeatureLength
                           }
+                          plotDataMultiFeatureLoaded={
+                            plotDataMultiFeatureLoaded
+                          }
                           svgExportName={svgExportName}
                           differentialPlotTypes={differentialPlotTypes}
-                          dynamicPlotsLoaded={dynamicPlotsLoaded}
                           HighlightedFeaturesArrVolcano={
                             HighlightedFeaturesArrVolcano
                           }

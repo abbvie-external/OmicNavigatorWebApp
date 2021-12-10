@@ -68,24 +68,27 @@ class Differential extends Component {
       HighlightedFeaturesArrVolcano: [],
       volcanoDifferentialTableRowHighlight: [],
       volcanoDifferentialTableRowOutline: '',
+      // plotDataMultiFeatureLength: 0,
+      plotDataSingleFeatureLoaded: true,
       plotDataSingleFeature: {
         key: null,
         title: '',
         svg: [],
       },
+      // plotDataMultiFeatureLength: 0,
+      plotDataMultiFeatureLoaded: true,
       plotDataMultiFeature: {
         key: null,
         title: '',
         svg: [],
       },
+      // plotDataOverlayLength: 0,
+      // plotDataOverlayLoaded: true,
       plotDataOverlay: {
         key: null,
         title: '',
         svg: [],
       },
-      // plotDataOverlayLength: 0,
-      // plotDataSingleFeatureLength: 0,
-      // plotDataMultiFeatureLength: 0
       activeSVGTabIndex: 0,
       multisetPlotAvailableDifferential: false,
       animation: 'uncover',
@@ -102,7 +105,6 @@ class Differential extends Component {
       modelSpecificMetaFeaturesExist: false,
       resultsLinkouts: [],
       resultsFavicons: [],
-      dynamicPlotsLoaded: true,
       allMetaFeaturesDataDifferential: [],
       isDataStreamingResultsTable: true,
       enableMultifeaturePlotting: false,
@@ -262,7 +264,8 @@ class Differential extends Component {
         HighlightedFeaturesArrVolcano: [],
         volcanoDifferentialTableRowHighlight: [],
         volcanoDifferentialTableRowOutline: '',
-        dynamicPlotsLoaded: true,
+        plotDataSingleFeatureLoaded: true,
+        plotDataMultiFeatureLoaded: true,
         isItemSelected: false,
         plotOverlayLoaded: true,
       });
@@ -678,7 +681,7 @@ class Differential extends Component {
             },
             plotDataSingleFeatureLength: 0,
             plotOverlayLoaded: true,
-            dynamicPlotsLoaded: true,
+            plotDataSingleFeatureLoaded: true,
           });
           // toast.error(`No plots available for feature ${featureId}`);
         } else if (view === 'MultiFeature') {
@@ -690,7 +693,7 @@ class Differential extends Component {
             },
             plotDataMultiFeatureLength: 0,
             plotOverlayLoaded: true,
-            dynamicPlotsLoaded: true,
+            plotDataMultiFeatureLoaded: true,
           });
           // toast.error(`No plots available for feature ${featureId}`);
         }
@@ -710,7 +713,8 @@ class Differential extends Component {
         },
         plotDataMultiFeatureLength: 0,
         plotOverlayLoaded: true,
-        dynamicPlotsLoaded: true,
+        plotDataSingleFeatureLoaded: true,
+        plotDataMultiFeatureLoaded: true,
       });
     }
   };
@@ -857,7 +861,8 @@ class Differential extends Component {
           },
           plotDataOverlayLength: 0,
           plotOverlayLoaded: true,
-          dynamicPlotsLoaded: true,
+          plotDataSingleFeatureLoaded: true,
+          plotDataMultiFeatureLoaded: true,
         });
       }
     } else {
@@ -869,7 +874,8 @@ class Differential extends Component {
         },
         plotDataOverlayLength: 0,
         plotOverlayLoaded: true,
-        dynamicPlotsLoaded: true,
+        plotDataSingleFeatureLoaded: true,
+        plotDataMultiFeatureLoaded: true,
       });
     }
   }
@@ -1009,7 +1015,8 @@ class Differential extends Component {
         },
         plotDataOverlayLength: 0,
         plotOverlayLoaded: true,
-        dynamicPlotsLoaded: true,
+        plotDataSingleFeatureLoaded: true,
+        plotDataMultiFeatureLoaded: true,
       });
     }
   }
@@ -1025,7 +1032,7 @@ class Differential extends Component {
     if (toHighlightArr.length > 1) {
       // when multi-selecting, show svg loading
       this.setState({
-        dynamicPlotsLoaded: false,
+        plotDataMultiFeatureLoaded: false,
         HighlightedFeaturesArrVolcano: toHighlightArr,
       });
     } else {
@@ -1111,32 +1118,10 @@ class Differential extends Component {
           },
           plotDataSingleFeatureLength: 0,
           plotOverlayLoaded: true,
-          dynamicPlotsLoaded: true,
+          plotDataSingleFeatureLoaded: true,
+          plotDataMultiFeatureLoaded: true,
         });
       }
-    }
-  };
-
-  handlePlotVolcano = (maxId, rerenderMaxPlot) => {
-    if (maxId !== '') {
-      if (this.state.maxObjectIdentifier !== maxId || rerenderMaxPlot) {
-        this.setState({
-          dynamicPlotsLoaded: false,
-          maxObjectIdentifier: maxId,
-        });
-        this.getPlot('SingleFeature', maxId, false);
-      }
-    } else {
-      this.setState({
-        dynamicPlotsLoaded: true,
-        maxObjectIdentifier: '',
-        plotDataSingleFeature: {
-          key: null,
-          title: '',
-          svg: [],
-        },
-        plotDataSingleFeatureLength: 0,
-      });
     }
   };
 
@@ -1149,11 +1134,12 @@ class Differential extends Component {
   handleSVG = (view, plotDataObj) => {
     const plotDataKey = `plotData${view}`;
     const plotDataLengthKey = `plotData${view}Length`;
+    const plotDataLoadedKey = `plotData${view}Loaded`;
     this.setState({
       [plotDataKey]: plotDataObj,
       [plotDataLengthKey]: plotDataObj.svg?.length || 0,
       plotOverlayLoaded: true,
-      dynamicPlotsLoaded: true,
+      [plotDataLoadedKey]: true,
     });
   };
 
@@ -1200,7 +1186,9 @@ class Differential extends Component {
         },
         plotDataSingleFeatureLength: 0,
         plotOverlayLoaded: true,
-        dynamicPlotsLoaded: false,
+        // PAUL inspect
+        // plotDataSingleFeatureLoaded: false,
+        // plotDataMultiFeatureLoaded: true,
       });
     } else {
       this.setState({
@@ -1212,7 +1200,9 @@ class Differential extends Component {
         },
         plotDataSingleFeatureLength: 0,
         plotOverlayLoaded: true,
-        dynamicPlotsLoaded: true,
+        // PAUL inspect
+        plotDataSingleFeatureLoaded: true,
+        // plotDataMultiFeatureLoaded: true,
       });
     }
   };

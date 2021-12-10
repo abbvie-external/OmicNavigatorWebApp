@@ -160,8 +160,8 @@ class PlotsSingleFeature extends Component {
     const {
       plotDataSingleFeature,
       plotDataSingleFeatureLength,
+      plotDataSingleFeatureLoaded,
       divWidth,
-      tabsMessage,
       upperPlotsVisible,
       svgExportName,
       tab,
@@ -192,15 +192,6 @@ class PlotsSingleFeature extends Component {
           this.props.differentialPlotTypes?.length > this.props.svgTabMax
             ? 'Hide'
             : 'Show';
-        // const BreadcrumbPopupStyle = {
-        //   backgroundColor: '2E2E2E',
-        //   borderBottom: '2px solid var(--color-primary)',
-        //   color: '#FFF',
-        //   padding: '1em',
-        //   maxWidth: '50vw',
-        //   fontSize: '13px',
-        //   wordBreak: 'break-all',
-        // };
         const activeSVGTabIndexVolcanoSingleFeatureVar =
           activeSVGTabIndexVolcanoSingleFeature || 0;
         const svgArray = [...plotDataSingleFeature.svg];
@@ -218,7 +209,6 @@ class PlotsSingleFeature extends Component {
           this.props.modelSpecificMetaFeaturesExist !== false &&
           !isMultifeaturePlot
         ) {
-          // options = options.concat(plotOptions);
           const singleFeaturePlotTypes = this.props.differentialPlotTypes.filter(
             p => !p.plotType.includes('multiFeature'),
           );
@@ -231,6 +221,11 @@ class PlotsSingleFeature extends Component {
           ];
           options = [...options, ...metafeaturesDropdown];
         }
+        const loader = plotDataSingleFeatureLoaded ? null : (
+          <Dimmer active inverted>
+            <Loader size="large">Loading Single Feature Plots</Loader>
+          </Dimmer>
+        );
         return (
           <div className="svgContainerVolcano">
             <div className="export-svg ShowBlock">
@@ -302,15 +297,11 @@ class PlotsSingleFeature extends Component {
                 {divWidth >= 625 ? 'FULL SCREEN' : ''}
               </Button>
             </span>
+            <span id="PlotDataSingleFeatureLoader">{loader}</span>
           </div>
         );
-        // } else if (!dynamicPlotsLoaded) {
-        //   return (
-        //     <Dimmer active inverted>
-        //       <Loader size="large">Loading Plots</Loader>
-        //     </Dimmer>
-        //   );
       } else {
+        // no plot data; display instructions or no plots message
         let instructions = this.getInstructions();
         return (
           <div className="PlotInstructions">

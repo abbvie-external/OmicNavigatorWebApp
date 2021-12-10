@@ -98,13 +98,15 @@ class PlotsDynamic extends Component {
                   this.props.plotDataSingleFeatureLength
                 }
                 plotDataSingleFeature={this.props.plotDataSingleFeature}
+                plotDataSingleFeatureLoaded={
+                  this.props.plotDataSingleFeatureLoaded
+                }
                 // to determine tabs or dropdowns
                 svgTabMax={this.props.svgTabMax}
                 // to be used by resuable export
                 svgExportName={this.props.svgExportName}
                 // to determine updates, dynamic rendered ui and loaders
                 activeIndexPlotTabs={this.state.activeIndexPlotTabs}
-                dynamicPlotsLoaded={this.props.dynamicPlotsLoaded}
                 upperPlotsVisible={this.props.upperPlotsVisible}
                 modelSpecificMetaFeaturesExist={
                   this.props.modelSpecificMetaFeaturesExist
@@ -139,13 +141,15 @@ class PlotsDynamic extends Component {
                   this.props.plotDataMultiFeatureLength
                 }
                 plotDataMultiFeature={this.props.plotDataMultiFeature}
+                plotDataMultiFeatureLoaded={
+                  this.props.plotDataMultiFeatureLoaded
+                }
                 // to determine tabs or dropdowns
                 svgTabMax={this.props.svgTabMax}
                 // to be used by resuable export
                 svgExportName={this.props.svgExportName}
                 // to determine updates, dynamic rendered ui and loaders
                 activeIndexPlotTabs={this.state.activeIndexPlotTabs}
-                dynamicPlotsLoaded={this.props.dynamicPlotsLoaded}
                 upperPlotsVisible={this.props.upperPlotsVisible}
                 modelSpecificMetaFeaturesExist={
                   this.props.modelSpecificMetaFeaturesExist
@@ -197,13 +201,15 @@ class PlotsDynamic extends Component {
                   this.props.plotDataSingleFeatureLength
                 }
                 plotDataSingleFeature={this.props.plotDataSingleFeature}
+                plotDataSingleFeatureLoaded={
+                  this.props.plotDataSingleFeatureLoaded
+                }
                 // to determine tabs or dropdowns
                 svgTabMax={this.props.svgTabMax}
                 // to be used by resuable export
                 svgExportName={this.props.svgExportName}
                 // to be used by dynamic rendered ui and loaders
                 activeIndexPlotTabs={this.state.activeIndexPlotTabs}
-                dynamicPlotsLoaded={this.props.dynamicPlotsLoaded}
                 upperPlotsVisible={this.props.upperPlotsVisible}
                 modelSpecificMetaFeaturesExist={
                   this.props.modelSpecificMetaFeaturesExist
