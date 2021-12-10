@@ -237,10 +237,19 @@ class PlotsMultiFeature extends Component {
     }
   };
 
+  getInstructions = () => {
+    const { differentialPlotTypes } = this.props;
+    const hasPlots = differentialPlotTypes?.length > 0 || false;
+    if (hasPlots) {
+      return 'Check 2 or more features to display plots';
+    } else {
+      return 'Multi-feature plots are unavailable';
+    }
+  };
+
   render() {
     const {
       plotDataMultiFeature,
-      tabsMessage,
       upperPlotsVisible,
       svgExportName,
       tab,
@@ -364,9 +373,10 @@ class PlotsMultiFeature extends Component {
         //     </Dimmer>
         //   );
       } else {
+        let instructions = this.getInstructions();
         return (
           <div className="PlotInstructions">
-            <h4 className="PlotInstructionsText NoSelect">{tabsMessage}</h4>
+            <h4 className="PlotInstructionsText NoSelect">{instructions}</h4>
           </div>
         );
       }

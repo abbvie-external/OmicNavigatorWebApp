@@ -893,7 +893,6 @@ class DifferentialDetail extends Component {
       plotDataMultiFeatureLength,
       svgExportName,
       differentialPlotTypes,
-      tabsMessage,
       dynamicPlotsLoaded,
       differentialFeature,
       differentialFeatureIdKey,
@@ -1102,7 +1101,6 @@ class DifferentialDetail extends Component {
                           }
                           svgExportName={svgExportName}
                           differentialPlotTypes={differentialPlotTypes}
-                          tabsMessage={tabsMessage}
                           dynamicPlotsLoaded={dynamicPlotsLoaded}
                           HighlightedFeaturesArrVolcano={
                             HighlightedFeaturesArrVolcano

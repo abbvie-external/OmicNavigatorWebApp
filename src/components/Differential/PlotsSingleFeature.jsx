@@ -139,6 +139,23 @@ class PlotsSingleFeature extends Component {
     return panes;
   };
 
+  getInstructions = () => {
+    const {
+      modelSpecificMetaFeaturesExist,
+      differentialPlotTypes,
+    } = this.props;
+    const hasPlots = differentialPlotTypes?.length > 0 || false;
+    if (hasPlots && modelSpecificMetaFeaturesExist) {
+      return 'Select a feature to display plots and data';
+    } else if (hasPlots) {
+      return 'Select a feature to display plots';
+    } else if (modelSpecificMetaFeaturesExist) {
+      return 'Select a feature to display data';
+    } else {
+      return 'No plots nor feature data available';
+    }
+  };
+
   render() {
     const {
       plotDataSingleFeature,
@@ -294,9 +311,10 @@ class PlotsSingleFeature extends Component {
         //     </Dimmer>
         //   );
       } else {
+        let instructions = this.getInstructions();
         return (
           <div className="PlotInstructions">
-            <h4 className="PlotInstructionsText NoSelect">{tabsMessage}</h4>
+            <h4 className="PlotInstructionsText NoSelect">{instructions}</h4>
           </div>
         );
       }

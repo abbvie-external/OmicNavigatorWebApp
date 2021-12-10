@@ -94,7 +94,6 @@ class Differential extends Component {
       plotButtonActiveDifferential: false,
       multisetQueriedDifferential: false,
       upsetColsDifferential: [],
-      // tabsMessage: 'Select feature/s to display plots',
       // differentialPlotTypes: [],
       differentialStudyMetadata: [],
       differentialModelsAndTests: [],
@@ -257,7 +256,6 @@ class Differential extends Component {
         plotDataSingleFeature: { key: null, title: '', svg: [] },
         plotDataMultiFeature: { key: null, title: '', svg: [] },
         plotDataOverlay: { key: null, title: '', svg: [] },
-        // tabsMessage: 'Select feature/s to display plots',
         // differentialResults: [],
         // differentialResultsUnfiltered: [],
         // isItemDatatLoaded: false,
@@ -668,7 +666,6 @@ class Differential extends Component {
           // plotOverlayLoaded: true,
           // currentSVGs: [],
           // featuresString: '',
-          // tabsMessage: `No plots available for feature ${featureId}`,
           // });
           this.backToTable();
           toast.error(`No plots available for feature ${featureId}`);
@@ -682,7 +679,6 @@ class Differential extends Component {
             plotDataSingleFeatureLength: 0,
             plotOverlayLoaded: true,
             dynamicPlotsLoaded: true,
-            // tabsMessage: `No plots available for feature ${featureId}`,
           });
           // toast.error(`No plots available for feature ${featureId}`);
         } else if (view === 'MultiFeature') {
@@ -695,7 +691,6 @@ class Differential extends Component {
             plotDataMultiFeatureLength: 0,
             plotOverlayLoaded: true,
             dynamicPlotsLoaded: true,
-            // tabsMessage: `No plots available for feature ${featureId}`,
           });
           // toast.error(`No plots available for feature ${featureId}`);
         }
@@ -1117,7 +1112,6 @@ class Differential extends Component {
           plotDataSingleFeatureLength: 0,
           plotOverlayLoaded: true,
           dynamicPlotsLoaded: true,
-          // tabsMessage: 'Select feature/s to display plots',
         });
       }
     }
@@ -1219,7 +1213,6 @@ class Differential extends Component {
         plotDataSingleFeatureLength: 0,
         plotOverlayLoaded: true,
         dynamicPlotsLoaded: true,
-        // tabsMessage: 'Select feature/s to display plots',
       });
     }
   };
@@ -1294,24 +1287,7 @@ class Differential extends Component {
       alphanumericTrigger,
     );
     this.getTableHelpers(alphanumericTrigger);
-    const noPlots = !differentialPlotTypes.length > 0;
-    if (!noPlots && modelSpecificMetaFeaturesExist) {
-      this.setState({
-        tabsMessage: 'Select feature/s to display plots and data',
-      });
-    } else if (!noPlots) {
-      this.setState({
-        tabsMessage: 'Select feature/s to display plots',
-      });
-    } else if (modelSpecificMetaFeaturesExist) {
-      this.setState({
-        tabsMessage: 'Select feature to display data',
-      });
-    } else {
-      this.setState({
-        tabsMessage: 'No plots nor feature data available',
-      });
-    }
+    const noPlots = !differentialPlotTypes?.length > 0;
     const differentialAlphanumericColumnsMapped = differentialAlphanumericFields.map(
       (f, { index }) => {
         return {

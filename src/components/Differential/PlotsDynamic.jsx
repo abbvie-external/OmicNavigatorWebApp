@@ -67,56 +67,7 @@ class PlotsDynamic extends Component {
       </span>
     );
 
-    let panes = [
-      {
-        menuItem: 'Single Feature Plots',
-        pane: (
-          <Tab.Pane
-            key="single-feature-plots-pane"
-            className="SingleFeaturePlotPane"
-          >
-            {/* SINGLE-FEATURE PLOT COMPONENT WO/ MULTI-FEATURE */}
-            <PlotsSingleFeature
-              // higher level props
-              tab={this.props.tab}
-              differentialStudy={this.props.differentialStudy}
-              differentialModel={this.props.differentialModel}
-              differentialTest={this.props.differentialTest}
-              differentialFeature={this.props.differentialFeature}
-              differentialPlotTypes={this.props.differentialPlotTypes}
-              // for plot dimension calculations
-              divWidth={this.props.differentialDynamicPlotWidth}
-              volcanoWidth={this.props.volcanoWidth}
-              divHeight={this.props.upperPlotsDivHeight}
-              upperPlotsHeight={this.props.upperPlotsHeight}
-              pxToPtRatio={this.props.pxToPtRatio}
-              pointSize={this.props.pointSize}
-              // plot info
-              plotDataSingleFeatureLength={
-                this.props.plotDataSingleFeatureLength
-              }
-              plotDataSingleFeature={this.props.plotDataSingleFeature}
-              // to determine tabs or dropdowns
-              svgTabMax={this.props.svgTabMax}
-              // to be used by resuable export
-              svgExportName={this.props.svgExportName}
-              // to be used by dynamic rendered ui and loaders
-              activeIndexPlotTabs={this.state.activeIndexPlotTabs}
-              dynamicPlotsLoaded={this.props.dynamicPlotsLoaded}
-              upperPlotsVisible={this.props.upperPlotsVisible}
-              tabsMessage={this.props.tabsMessage}
-              modelSpecificMetaFeaturesExist={
-                this.props.modelSpecificMetaFeaturesExist
-              }
-              // functional props to call
-              onHandleAllChecked={this.props.onHandleAllChecked}
-              onHandleSelectedVolcano={this.props.onHandleSelectedVolcano}
-              onGetPlotTransitionRef={this.props.onGetPlotTransitionRef}
-            />
-          </Tab.Pane>
-        ),
-      },
-    ];
+    let panes = [];
     if (hasMultifeaturePlots) {
       panes = [
         {
@@ -155,7 +106,6 @@ class PlotsDynamic extends Component {
                 activeIndexPlotTabs={this.state.activeIndexPlotTabs}
                 dynamicPlotsLoaded={this.props.dynamicPlotsLoaded}
                 upperPlotsVisible={this.props.upperPlotsVisible}
-                tabsMessage={this.props.tabsMessage}
                 modelSpecificMetaFeaturesExist={
                   this.props.modelSpecificMetaFeaturesExist
                 }
@@ -197,7 +147,6 @@ class PlotsDynamic extends Component {
                 activeIndexPlotTabs={this.state.activeIndexPlotTabs}
                 dynamicPlotsLoaded={this.props.dynamicPlotsLoaded}
                 upperPlotsVisible={this.props.upperPlotsVisible}
-                tabsMessage={this.props.tabsMessage}
                 modelSpecificMetaFeaturesExist={
                   this.props.modelSpecificMetaFeaturesExist
                 }
@@ -213,6 +162,56 @@ class PlotsDynamic extends Component {
                 }
                 multifeaturePlotMax={this.props.multifeaturePlotMax}
                 onRemoveSelectedFeature={this.props.onRemoveSelectedFeature}
+              />
+            </Tab.Pane>
+          ),
+        },
+      ];
+    } else {
+      panes = [
+        {
+          menuItem: 'Single Feature Plots',
+          pane: (
+            <Tab.Pane
+              key="single-feature-plots-pane"
+              className="SingleFeaturePlotPane"
+            >
+              {/* SINGLE-FEATURE PLOT COMPONENT WO/ MULTI-FEATURE */}
+              <PlotsSingleFeature
+                // higher level props
+                tab={this.props.tab}
+                differentialStudy={this.props.differentialStudy}
+                differentialModel={this.props.differentialModel}
+                differentialTest={this.props.differentialTest}
+                differentialFeature={this.props.differentialFeature}
+                differentialPlotTypes={this.props.differentialPlotTypes}
+                // for plot dimension calculations
+                divWidth={this.props.differentialDynamicPlotWidth}
+                volcanoWidth={this.props.volcanoWidth}
+                divHeight={this.props.upperPlotsDivHeight}
+                upperPlotsHeight={this.props.upperPlotsHeight}
+                pxToPtRatio={this.props.pxToPtRatio}
+                pointSize={this.props.pointSize}
+                // plot info
+                plotDataSingleFeatureLength={
+                  this.props.plotDataSingleFeatureLength
+                }
+                plotDataSingleFeature={this.props.plotDataSingleFeature}
+                // to determine tabs or dropdowns
+                svgTabMax={this.props.svgTabMax}
+                // to be used by resuable export
+                svgExportName={this.props.svgExportName}
+                // to be used by dynamic rendered ui and loaders
+                activeIndexPlotTabs={this.state.activeIndexPlotTabs}
+                dynamicPlotsLoaded={this.props.dynamicPlotsLoaded}
+                upperPlotsVisible={this.props.upperPlotsVisible}
+                modelSpecificMetaFeaturesExist={
+                  this.props.modelSpecificMetaFeaturesExist
+                }
+                // functional props to call
+                onHandleAllChecked={this.props.onHandleAllChecked}
+                onHandleSelectedVolcano={this.props.onHandleSelectedVolcano}
+                onGetPlotTransitionRef={this.props.onGetPlotTransitionRef}
               />
             </Tab.Pane>
           ),
