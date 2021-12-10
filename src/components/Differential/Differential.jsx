@@ -22,7 +22,7 @@ import {
   // limitLength,
   // limitLengthOrNull,
 } from '../Shared/helpers';
-import DifferentialSearchCriteria from './DifferentialSearchCriteria';
+import DifferentialSearch from './DifferentialSearch';
 import TransitionActive from '../Transitions/TransitionActive';
 import TransitionStill from '../Transitions/TransitionStill';
 import ButtonActions from '../Shared/ButtonActions';
@@ -61,7 +61,7 @@ class Differential extends Component {
         svg: [],
       },
       isItemSelected: false,
-      isItemSVGLoaded: false,
+      plotOverlayLoaded: false,
       isUpsetVisible: false,
       isFilteredDifferential: false,
       // isItemDatatLoaded: false,
@@ -103,7 +103,7 @@ class Differential extends Component {
       modelSpecificMetaFeaturesExist: false,
       resultsLinkouts: [],
       resultsFavicons: [],
-      isVolcanoPlotSVGLoaded: true,
+      dynamicPlotsLoaded: true,
       allMetaFeaturesDataDifferential: [],
       isDataStreamingResultsTable: true,
       enableMultifeaturePlotting: false,
@@ -155,13 +155,13 @@ class Differential extends Component {
   handleMultisetQueriedDifferential = value => {
     this.setState({
       multisetQueriedDifferential: value,
-      // isVolcanoPlotSVGLoaded: !value,
+      // dynamicPlotsLoaded: !value,
     });
   };
 
   // handleVolcanoPlotSVGLoaded = bool => {
   //   this.setState({
-  //     isVolcanoPlotSVGLoaded: bool,
+  //     dynamicPlotsLoaded: bool,
   //   });
   // };
 
@@ -215,7 +215,7 @@ class Differential extends Component {
       isVolcanoTableLoading: false,
       plotButtonActiveDifferential: false,
       visible: false,
-      isItemSVGLoaded: false,
+      plotOverlayLoaded: false,
     });
 
     if (streamingFinished) {
@@ -245,7 +245,7 @@ class Differential extends Component {
       }
     }
   };
-  handleSearchCriteriaChangeDifferential = (changes, scChange) => {
+  handleSearchChangeDifferential = (changes, scChange) => {
     this.props.onHandleUrlChange(changes, 'differential');
     this.setState({
       visible: false,
@@ -264,9 +264,9 @@ class Differential extends Component {
         HighlightedFeaturesArrVolcano: [],
         volcanoDifferentialTableRowHighlight: [],
         volcanoDifferentialTableRowOutline: '',
-        isVolcanoPlotSVGLoaded: true,
+        dynamicPlotsLoaded: true,
         isItemSelected: false,
-        isItemSVGLoaded: true,
+        plotOverlayLoaded: true,
       });
     }
     if (
@@ -409,14 +409,14 @@ class Differential extends Component {
     });
   };
 
-  handleSearchCriteriaResetDifferential = () => {
+  handleSearchResetDifferential = () => {
     this.setState({
       isValidSearchDifferential: false,
       multisetPlotAvailableDifferential: false,
       plotButtonActiveDifferential: false,
       visible: false,
       isItemSelected: false,
-      isItemSVGLoaded: false,
+      plotOverlayLoaded: false,
     });
   };
 
@@ -449,12 +449,12 @@ class Differential extends Component {
         plotDataOverlay: plotDataOverlay,
         plotDataOverlayLength: plotDataOverlay.svg?.length || 0,
         isItemSelected: true,
-        isItemSVGLoaded: false,
+        plotOverlayLoaded: false,
         // isItemDatatLoaded: false,
         currentSVGs: [],
       },
       function() {
-        this.handleSearchCriteriaChangeDifferential(
+        this.handleSearchChangeDifferential(
           {
             differentialStudy: this.props.differentialStudy || '',
             differentialModel: this.props.differentialModel || '',
@@ -665,7 +665,7 @@ class Differential extends Component {
         if (view === 'Overlay') {
           // this.setState({
           // isItemSelected: false,
-          // isItemSVGLoaded: true,
+          // plotOverlayLoaded: true,
           // currentSVGs: [],
           // featuresString: '',
           // tabsMessage: `No plots available for feature ${featureId}`,
@@ -680,8 +680,8 @@ class Differential extends Component {
               svg: [],
             },
             plotDataSingleFeatureLength: 0,
-            isItemSVGLoaded: true,
-            isVolcanoPlotSVGLoaded: true,
+            plotOverlayLoaded: true,
+            dynamicPlotsLoaded: true,
             // tabsMessage: `No plots available for feature ${featureId}`,
           });
           // toast.error(`No plots available for feature ${featureId}`);
@@ -693,8 +693,8 @@ class Differential extends Component {
               svg: [],
             },
             plotDataMultiFeatureLength: 0,
-            isItemSVGLoaded: true,
-            isVolcanoPlotSVGLoaded: true,
+            plotOverlayLoaded: true,
+            dynamicPlotsLoaded: true,
             // tabsMessage: `No plots available for feature ${featureId}`,
           });
           // toast.error(`No plots available for feature ${featureId}`);
@@ -714,8 +714,8 @@ class Differential extends Component {
           svg: [],
         },
         plotDataMultiFeatureLength: 0,
-        isItemSVGLoaded: true,
-        isVolcanoPlotSVGLoaded: true,
+        plotOverlayLoaded: true,
+        dynamicPlotsLoaded: true,
       });
     }
   };
@@ -861,8 +861,8 @@ class Differential extends Component {
             svg: [],
           },
           plotDataOverlayLength: 0,
-          isItemSVGLoaded: true,
-          isVolcanoPlotSVGLoaded: true,
+          plotOverlayLoaded: true,
+          dynamicPlotsLoaded: true,
         });
       }
     } else {
@@ -873,8 +873,8 @@ class Differential extends Component {
           svg: [],
         },
         plotDataOverlayLength: 0,
-        isItemSVGLoaded: true,
-        isVolcanoPlotSVGLoaded: true,
+        plotOverlayLoaded: true,
+        dynamicPlotsLoaded: true,
       });
     }
   }
@@ -918,7 +918,7 @@ class Differential extends Component {
       // if (plotindex === 0) {
       this.setState({
         isItemSelected: false,
-        isItemSVGLoaded: true,
+        plotOverlayLoaded: true,
         // isItemDatatLoaded: false,
         currentSVGs: [],
         featuresString: '',
@@ -943,13 +943,13 @@ class Differential extends Component {
       this.setState(
         {
           isItemSelected: true,
-          isItemSVGLoaded: false,
+          plotOverlayLoaded: false,
           isItemDatatLoaded: false,
           currentSVGs: [],
           featuresString,
         },
         function() {
-          this.handleSearchCriteriaChangeDifferential(
+          this.handleSearchChangeDifferential(
             {
               differentialStudy: this.props.differentialStudy || '',
               differentialModel: this.props.differentialModel || '',
@@ -1013,8 +1013,8 @@ class Differential extends Component {
           svg: [],
         },
         plotDataOverlayLength: 0,
-        isItemSVGLoaded: true,
-        isVolcanoPlotSVGLoaded: true,
+        plotOverlayLoaded: true,
+        dynamicPlotsLoaded: true,
       });
     }
   }
@@ -1030,7 +1030,7 @@ class Differential extends Component {
     if (toHighlightArr.length > 1) {
       // when multi-selecting, show svg loading
       this.setState({
-        isVolcanoPlotSVGLoaded: false,
+        dynamicPlotsLoaded: false,
         HighlightedFeaturesArrVolcano: toHighlightArr,
       });
     } else {
@@ -1098,7 +1098,7 @@ class Differential extends Component {
       // when clearing multi-selection, if there is an outlined row, init single plot
       if (volcanoDifferentialTableRowOutline.length > 0) {
         // this.setState({
-        //   isVolcanoPlotSVGLoaded: false,
+        //   dynamicPlotsLoaded: false,
         // });
         this.getPlot(
           'SingleFeature',
@@ -1115,8 +1115,8 @@ class Differential extends Component {
             svg: [],
           },
           plotDataSingleFeatureLength: 0,
-          isItemSVGLoaded: true,
-          isVolcanoPlotSVGLoaded: true,
+          plotOverlayLoaded: true,
+          dynamicPlotsLoaded: true,
           // tabsMessage: 'Select feature/s to display plots',
         });
       }
@@ -1127,14 +1127,14 @@ class Differential extends Component {
     if (maxId !== '') {
       if (this.state.maxObjectIdentifier !== maxId || rerenderMaxPlot) {
         this.setState({
-          isVolcanoPlotSVGLoaded: false,
+          dynamicPlotsLoaded: false,
           maxObjectIdentifier: maxId,
         });
         this.getPlot('SingleFeature', maxId, false);
       }
     } else {
       this.setState({
-        isVolcanoPlotSVGLoaded: true,
+        dynamicPlotsLoaded: true,
         maxObjectIdentifier: '',
         plotDataSingleFeature: {
           key: null,
@@ -1158,8 +1158,8 @@ class Differential extends Component {
     this.setState({
       [plotDataKey]: plotDataObj,
       [plotDataLengthKey]: plotDataObj.svg?.length || 0,
-      isItemSVGLoaded: true,
-      isVolcanoPlotSVGLoaded: true,
+      plotOverlayLoaded: true,
+      dynamicPlotsLoaded: true,
     });
   };
 
@@ -1167,9 +1167,9 @@ class Differential extends Component {
     this.setState({
       isItemSelected: false,
       // isItemDatatLoaded: false,
-      isItemSVGLoaded: false,
+      plotOverlayLoaded: false,
     });
-    this.handleSearchCriteriaChangeDifferential(
+    this.handleSearchChangeDifferential(
       {
         differentialStudy: this.props.differentialStudy || '',
         differentialModel: this.props.differentialModel || '',
@@ -1205,8 +1205,8 @@ class Differential extends Component {
           svg: [],
         },
         plotDataSingleFeatureLength: 0,
-        isItemSVGLoaded: true,
-        isVolcanoPlotSVGLoaded: false,
+        plotOverlayLoaded: true,
+        dynamicPlotsLoaded: false,
       });
     } else {
       this.setState({
@@ -1217,8 +1217,8 @@ class Differential extends Component {
           svg: [],
         },
         plotDataSingleFeatureLength: 0,
-        isItemSVGLoaded: true,
-        isVolcanoPlotSVGLoaded: true,
+        plotOverlayLoaded: true,
+        dynamicPlotsLoaded: true,
         // tabsMessage: 'Select feature/s to display plots',
       });
     }
@@ -1283,7 +1283,7 @@ class Differential extends Component {
         plotDataOverlay: plotDataOverlay,
         plotDataOverlayLength: plotDataOverlay.svg?.length || 0,
         isItemSelected: true,
-        isItemSVGLoaded: false,
+        plotOverlayLoaded: false,
         // isItemDatatLoaded: false,
         currentSVGs: [],
       });
@@ -1625,19 +1625,15 @@ class Differential extends Component {
             largeScreen={4}
             widescreen={4}
           >
-            <DifferentialSearchCriteria
+            <DifferentialSearch
               {...this.state}
               {...this.props}
               onSearchTransitionDifferential={
                 this.handleSearchTransitionDifferential
               }
               onDifferentialSearch={this.handleDifferentialSearch}
-              onSearchCriteriaChangeDifferential={
-                this.handleSearchCriteriaChangeDifferential
-              }
-              onSearchCriteriaResetDifferential={
-                this.handleSearchCriteriaResetDifferential
-              }
+              onSearchChangeDifferential={this.handleSearchChangeDifferential}
+              onSearchResetDifferential={this.handleSearchResetDifferential}
               onDisablePlotDifferential={this.disablePlotDifferential}
               onGetMultisetPlotDifferential={this.handleMultisetPlot}
               onHandlePlotAnimationDifferential={

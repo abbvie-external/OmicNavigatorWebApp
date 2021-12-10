@@ -23,11 +23,11 @@ import TransitionActive from '../Transitions/TransitionActive';
 import TransitionStill from '../Transitions/TransitionStill';
 import './Enrichment.scss';
 import NetworkGraphControls from './NetworkGraphControls';
-import EnrichmentSearchCriteria from './EnrichmentSearchCriteria';
+import EnrichmentSearch from './EnrichmentSearch';
 import SplitPanesContainer from './SplitPanesContainer';
 import CustomEmptyMessage from '../Shared/Templates';
 // eslint-disable-next-line no-unused-vars
-import QHGrid, { EZGrid } from '../Shared/QHGrid';
+import { EZGrid } from '../Shared/QHGrid';
 import ErrorBoundary from '../Shared/ErrorBoundary';
 
 let cancelRequestEnrichmentGetPlot = () => {};
@@ -498,7 +498,7 @@ class Enrichment extends Component {
     }
   };
 
-  handleSearchCriteriaChangeEnrichment = (changes, scChange) => {
+  handleSearchChangeEnrichment = (changes, scChange) => {
     this.props.onHandleUrlChange(changes, 'enrichment');
     this.setState({
       plotButtonActiveEnrichment: false,
@@ -721,7 +721,7 @@ class Enrichment extends Component {
     });
   };
 
-  handleSearchCriteriaResetEnrichment = () => {
+  handleSearchResetEnrichment = () => {
     this.setState({
       isTestSelected: false,
       isTestDataLoaded: false,
@@ -1348,7 +1348,7 @@ class Enrichment extends Component {
 
   handleGetBarcodeDataError = () => {
     this.testSelectedTransition(false);
-    this.handleSearchCriteriaChangeEnrichment(
+    this.handleSearchChangeEnrichment(
       {
         enrichmentStudy: this.props.enrichmentStudy || '',
         enrichmentModel: this.props.enrichmentModel || '',
@@ -1369,7 +1369,7 @@ class Enrichment extends Component {
   ) => {
     this.testSelectedTransition(true);
     const TestSiteVar = `${test}:${dataItem.description}`;
-    this.handleSearchCriteriaChangeEnrichment(
+    this.handleSearchChangeEnrichment(
       {
         enrichmentStudy: this.props.enrichmentStudy || '',
         enrichmentModel: this.props.enrichmentModel || '',
@@ -1895,7 +1895,7 @@ class Enrichment extends Component {
         dataItem: [],
       },
     });
-    this.handleSearchCriteriaChangeEnrichment(
+    this.handleSearchChangeEnrichment(
       {
         enrichmentStudy: this.props.enrichmentStudy || '',
         enrichmentModel: this.props.enrichmentModel || '',
@@ -2378,7 +2378,7 @@ class Enrichment extends Component {
             largeScreen={4}
             widescreen={4}
           >
-            <EnrichmentSearchCriteria
+            <EnrichmentSearch
               {...this.state}
               {...this.props}
               onSearchTransitionEnrichment={
@@ -2386,12 +2386,8 @@ class Enrichment extends Component {
               }
               onEnrichmentSearch={this.handleEnrichmentSearch}
               onColumnReorder={this.handleColumnReorder}
-              onSearchCriteriaChangeEnrichment={
-                this.handleSearchCriteriaChangeEnrichment
-              }
-              onSearchCriteriaResetEnrichment={
-                this.handleSearchCriteriaResetEnrichment
-              }
+              onSearchChangeEnrichment={this.handleSearchChangeEnrichment}
+              onSearchResetEnrichment={this.handleSearchResetEnrichment}
               onDisablePlotEnrichment={this.disablePlotEnrichment}
               onGetMultisetPlotEnrichment={this.handleMultisetPlot}
               onMultisetQueriedEnrichment={this.handleMultisetQueriedEnrichment}

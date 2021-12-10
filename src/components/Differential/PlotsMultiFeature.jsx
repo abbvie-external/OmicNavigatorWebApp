@@ -13,9 +13,9 @@ import {
 import SVG from 'react-inlinesvg';
 import { roundToPrecision } from '../Shared/helpers';
 import ButtonActions from '../Shared/ButtonActions';
-import './DynamicPlots.scss';
+import './PlotsDynamic.scss';
 
-class MultiFeaturePlots extends Component {
+class PlotsMultiFeature extends Component {
   state = {
     activeSVGTabIndexVolcanoMultiFeature: 0,
     excelFlagMFPlots: false,
@@ -24,40 +24,7 @@ class MultiFeaturePlots extends Component {
     svgFlagMFPlots: true,
     pngFlagMFPlots: true,
     featuresListOpen: false,
-    isSVGReadyVolcanoMultiFeature: false,
-    multiFeaturePlotContent: '',
   };
-
-  componentDidMount() {
-    this.getSVGPanesMultiFeature();
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    const {
-      plotDataMultiFeatureLength,
-      plotDataMultiFeature,
-      volcanoWidth,
-      upperPlotsHeight,
-      tabsMessage,
-    } = this.props;
-    const {
-      activeSVGTabIndexVolcanoMultiFeature,
-      isSVGReadyVolcanoMultiFeature,
-    } = this.state;
-    if (
-      isSVGReadyVolcanoMultiFeature &&
-      (prevProps.plotDataMultiFeatureLength !== plotDataMultiFeatureLength ||
-        prevProps.plotDataMultiFeature.key !== plotDataMultiFeature.key ||
-        prevProps.volcanoWidth !== volcanoWidth ||
-        prevProps.tabsMessage !== tabsMessage ||
-        prevProps.upperPlotsHeight !== upperPlotsHeight ||
-        prevState.activeSVGTabIndexVolcanoMultiFeature !==
-          activeSVGTabIndexVolcanoMultiFeature)
-    ) {
-      // if SVG plot data or dimensions change, fetch new plot/s and set panes
-      this.getSVGPanesMultiFeature();
-    }
-  }
 
   handleTabChangeMultiFeature = (e, { activeIndex }) => {
     this.setState({
@@ -89,17 +56,18 @@ class MultiFeaturePlots extends Component {
 
   getFeaturesList = () => {
     const {
-      featuresLength,
+      plotDataMultiFeatureLength,
       divWidth,
       HighlightedFeaturesArrVolcano,
       multifeaturePlotMax,
     } = this.props;
     let features = [];
-    if (featuresLength > 10) {
+    const featuresHighlighted = HighlightedFeaturesArrVolcano?.length || null;
+    if (featuresHighlighted > 10) {
       let shortenedArr = [...HighlightedFeaturesArrVolcano].slice(0, 10);
       features = shortenedArr.map(m => m.key);
     } else {
-      if (featuresLength > 0) {
+      if (featuresHighlighted > 0) {
         features = [...HighlightedFeaturesArrVolcano].map(m => m.key);
       }
     }
@@ -108,14 +76,14 @@ class MultiFeaturePlots extends Component {
       maxWidth: divWidth * 0.9,
     };
     const manyFeaturesText =
-      featuresLength >= multifeaturePlotMax ? (
+      featuresHighlighted >= multifeaturePlotMax ? (
         <span id="MoreThanText">
           Plotting is limited to the first {multifeaturePlotMax} features
         </span>
       ) : (
         <span id="MoreThanText">
-          {featuresLength} features selected. Individual de-select disabled when
-          11+ features.
+          {featuresHighlighted} features selected. Individual de-select disabled
+          when 11+ features.
         </span>
       );
 
@@ -138,9 +106,9 @@ class MultiFeaturePlots extends Component {
           >
             CLEAR ALL <Icon name="trash" />
           </Label>
-          {featuresLength > 10 ? manyFeaturesText : null}
+          {featuresHighlighted > 10 ? manyFeaturesText : null}
         </List.Item>
-        {featuresLength > 10
+        {featuresHighlighted > 10
           ? null
           : features.map(f => {
               return (
@@ -167,7 +135,7 @@ class MultiFeaturePlots extends Component {
           trigger={
             <Button size="mini" onClick={this.toggleFeaturesListPopup}>
               <Icon name="setting" />
-              {featuresLength} {divWidth >= 625 ? 'FEATURES' : ''}
+              {featuresHighlighted} {divWidth >= 625 ? 'FEATURES' : ''}
             </Button>
           }
           // style={StudyPopupStyle}
@@ -214,7 +182,6 @@ class MultiFeaturePlots extends Component {
       plotDataMultiFeatureLength,
     } = this.props;
     let panes = [];
-    debugger;
     if (plotDataMultiFeatureLength !== 0) {
       let dimensions = '';
       if (divWidth && divHeight && pxToPtRatio) {
@@ -253,18 +220,26 @@ class MultiFeaturePlots extends Component {
       });
       panes = panes.concat(svgPanes);
     }
-    const multiFeaturePlotContent = this.getMultiFeaturePlotContent();
-    this.setState({
-      isSVGReadyVolcanoMultiFeature: true,
-      svgPanes: panes,
-      multiFeaturePlotContent,
-    });
+    return panes;
   };
 
-  getMultiFeaturePlotContent = () => {
+  handleTabChangeMultiFeature = (
+    e,
+    { activeSVGTabIndexVolcanoMultiFeature },
+  ) => {
+    if (
+      activeSVGTabIndexVolcanoMultiFeature !==
+      this.state.activeSVGTabIndexVolcanoMultiFeature
+    ) {
+      this.setState({
+        activeSVGTabIndexVolcanoMultiFeature: activeSVGTabIndexVolcanoMultiFeature,
+      });
+    }
+  };
+
+  render() {
     const {
       plotDataMultiFeature,
-      isVolcanoPlotSVGLoaded,
       tabsMessage,
       upperPlotsVisible,
       svgExportName,
@@ -273,20 +248,23 @@ class MultiFeaturePlots extends Component {
       differentialPlotTypes,
       svgTabMax,
       modelSpecificMetaFeaturesExist,
+      plotDataMultiFeatureLength,
     } = this.props;
-
     const {
       activeSVGTabIndexVolcanoMultiFeature,
-      svgPanes,
       pdfFlagMFPlots,
       pngFlagMFPlots,
       svgFlagMFPlots,
       txtFlagMFPlots,
       excelFlagMFPlots,
     } = this.state;
-    let options = [];
     if (upperPlotsVisible) {
-      if (plotDataMultiFeature.key != null && isVolcanoPlotSVGLoaded) {
+      if (
+        plotDataMultiFeatureLength !== 0 &&
+        plotDataMultiFeature.key != null
+      ) {
+        let options = [];
+        const svgPanesMultiFeature = this.getSVGPanesMultiFeature();
         const DropdownClass =
           differentialPlotTypes.length > svgTabMax
             ? 'Show svgPlotDropdown'
@@ -356,7 +334,7 @@ class MultiFeaturePlots extends Component {
                 pointing: true,
                 className: TabMenuClass,
               }}
-              panes={svgPanes}
+              panes={svgPanesMultiFeature}
               onTabChange={this.handleTabChangeMultiFeature}
               activeIndex={activeSVGTabIndexVolcanoMultiFeature}
             />
@@ -379,12 +357,12 @@ class MultiFeaturePlots extends Component {
             </span>
           </div>
         );
-      } else if (!isVolcanoPlotSVGLoaded) {
-        return (
-          <Dimmer active inverted>
-            <Loader size="large">Loading Plots</Loader>
-          </Dimmer>
-        );
+        // } else if (!dynamicPlotsLoaded) {
+        //   return (
+        //     <Dimmer active inverted>
+        //       <Loader size="large">Loading Plots</Loader>
+        //     </Dimmer>
+        //   );
       } else {
         return (
           <div className="PlotInstructions">
@@ -393,25 +371,7 @@ class MultiFeaturePlots extends Component {
         );
       }
     } else return null;
-  };
-
-  handleTabChangeMultiFeature = (
-    e,
-    { activeSVGTabIndexVolcanoMultiFeature },
-  ) => {
-    if (
-      activeSVGTabIndexVolcanoMultiFeature !==
-      this.state.activeSVGTabIndexVolcanoMultiFeature
-    ) {
-      this.setState({
-        activeSVGTabIndexVolcanoMultiFeature: activeSVGTabIndexVolcanoMultiFeature,
-      });
-    }
-  };
-
-  render() {
-    return this.state.multiFeaturePlotContent;
   }
 }
 
-export default MultiFeaturePlots;
+export default PlotsMultiFeature;

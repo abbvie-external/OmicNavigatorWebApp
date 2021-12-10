@@ -7,7 +7,7 @@ import './FilteredDifferentialTable.scss';
 import { CancelToken } from 'axios';
 import CustomEmptyMessage from '../Shared/Templates';
 // eslint-disable-next-line no-unused-vars
-import QHGrid, { EZGrid } from '../Shared/QHGrid';
+import { EZGrid } from '../Shared/QHGrid';
 
 let cancelRequestFPTGetResultsTable = () => {};
 class FilteredDifferentialTable extends Component {

@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { Tab, Popup, Icon, Label } from 'semantic-ui-react';
-import SingleFeaturePlots from './SingleFeaturePlots';
-import MultiFeaturePlots from './MultiFeaturePlots';
-import './DynamicPlots.scss';
+import PlotsSingleFeature from './PlotsSingleFeature';
+import MultiFeaturePlots from './PlotsMultiFeature';
+import './PlotsDynamic.scss';
 
 const maxWidthPopupStyle = {
   backgroundColor: '2E2E2E',
@@ -13,7 +13,7 @@ const maxWidthPopupStyle = {
   fontSize: '13px',
 };
 
-class DynamicPlots extends Component {
+class PlotsDynamic extends Component {
   state = {
     activeIndexPlotTabs: 0,
     featuresListOpen: false,
@@ -76,7 +76,7 @@ class DynamicPlots extends Component {
             className="SingleFeaturePlotPane"
           >
             {/* SINGLE-FEATURE PLOT COMPONENT WO/ MULTI-FEATURE */}
-            <SingleFeaturePlots
+            <PlotsSingleFeature
               // higher level props
               tab={this.props.tab}
               differentialStudy={this.props.differentialStudy}
@@ -102,7 +102,7 @@ class DynamicPlots extends Component {
               svgExportName={this.props.svgExportName}
               // to be used by dynamic rendered ui and loaders
               activeIndexPlotTabs={this.state.activeIndexPlotTabs}
-              isVolcanoPlotSVGLoaded={this.props.isVolcanoPlotSVGLoaded}
+              dynamicPlotsLoaded={this.props.dynamicPlotsLoaded}
               upperPlotsVisible={this.props.upperPlotsVisible}
               tabsMessage={this.props.tabsMessage}
               modelSpecificMetaFeaturesExist={
@@ -127,7 +127,7 @@ class DynamicPlots extends Component {
               className="SingleFeaturePlotPane"
             >
               {/* SINGLE-FEATURE PLOT COMPONENT */}
-              <SingleFeaturePlots
+              <PlotsSingleFeature
                 // higher level props
                 tab={this.props.tab}
                 differentialStudy={this.props.differentialStudy}
@@ -153,7 +153,7 @@ class DynamicPlots extends Component {
                 svgExportName={this.props.svgExportName}
                 // to determine updates, dynamic rendered ui and loaders
                 activeIndexPlotTabs={this.state.activeIndexPlotTabs}
-                isVolcanoPlotSVGLoaded={this.props.isVolcanoPlotSVGLoaded}
+                dynamicPlotsLoaded={this.props.dynamicPlotsLoaded}
                 upperPlotsVisible={this.props.upperPlotsVisible}
                 tabsMessage={this.props.tabsMessage}
                 modelSpecificMetaFeaturesExist={
@@ -195,7 +195,7 @@ class DynamicPlots extends Component {
                 svgExportName={this.props.svgExportName}
                 // to determine updates, dynamic rendered ui and loaders
                 activeIndexPlotTabs={this.state.activeIndexPlotTabs}
-                isVolcanoPlotSVGLoaded={this.props.isVolcanoPlotSVGLoaded}
+                dynamicPlotsLoaded={this.props.dynamicPlotsLoaded}
                 upperPlotsVisible={this.props.upperPlotsVisible}
                 tabsMessage={this.props.tabsMessage}
                 modelSpecificMetaFeaturesExist={
@@ -212,6 +212,7 @@ class DynamicPlots extends Component {
                   this.props.HighlightedFeaturesArrVolcano
                 }
                 multifeaturePlotMax={this.props.multifeaturePlotMax}
+                onRemoveSelectedFeature={this.props.onRemoveSelectedFeature}
               />
             </Tab.Pane>
           ),
@@ -240,4 +241,4 @@ class DynamicPlots extends Component {
   }
 }
 
-export default DynamicPlots;
+export default PlotsDynamic;

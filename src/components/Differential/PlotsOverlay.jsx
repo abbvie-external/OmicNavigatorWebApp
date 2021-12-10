@@ -5,7 +5,7 @@ import DifferentialBreadcrumbs from './DifferentialBreadcrumbs';
 import ButtonActions from '../Shared/ButtonActions';
 import MetafeaturesTable from './MetafeaturesTable';
 import '../Enrichment/SplitPanesContainer.scss';
-import './DynamicPlots.scss';
+import './PlotsDynamic.scss';
 import './PlotsOverlay.scss';
 
 class PlotsOverlay extends PureComponent {
@@ -32,10 +32,10 @@ class PlotsOverlay extends PureComponent {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    const { plotDataOverlayLength, isItemSVGLoaded } = this.props;
+    const { plotDataOverlayLength, plotOverlayLoaded } = this.props;
     const { activeSVGTabIndexDifferential } = this.state;
     if (
-      isItemSVGLoaded &&
+      plotOverlayLoaded &&
       prevProps.plotDataOverlayLength !== plotDataOverlayLength
     ) {
       this.getSVGPanes();
@@ -130,7 +130,7 @@ class PlotsOverlay extends PureComponent {
                 differentialStudy={this.props.differentialStudy}
                 differentialModel={this.props.differentialModel}
                 differentialFeature={this.props.differentialFeature}
-                isItemSVGLoaded={this.props.isItemSVGLoaded}
+                plotOverlayLoaded={this.props.plotOverlayLoaded}
                 plotDataOverlay={this.props.plotDataOverlay}
                 modelSpecificMetaFeaturesExist={
                   this.props.modelSpecificMetaFeaturesExist
@@ -172,7 +172,7 @@ class PlotsOverlay extends PureComponent {
       activeSVGTabIndexDifferential,
     } = this.state;
     const {
-      isItemSVGLoaded,
+      plotOverlayLoaded,
       plotDataOverlay,
       tab,
       differentialStudy,
@@ -180,7 +180,7 @@ class PlotsOverlay extends PureComponent {
       differentialTest,
       differentialFeature,
     } = this.props;
-    if (!isItemSVGLoaded) {
+    if (!plotOverlayLoaded) {
       return (
         // <LoaderActivePlots />
         <div className="PlotsMetafeaturesDimmer">

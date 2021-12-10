@@ -2,32 +2,16 @@ import React, { Component } from 'react';
 import _ from 'lodash';
 import CustomEmptyMessage from '../Shared/Templates';
 // eslint-disable-next-line no-unused-vars
-import QHGrid, { EZGrid } from '../Shared/QHGrid';
+import { EZGrid } from '../Shared/QHGrid';
 import PlotsOverlay from './PlotsOverlay';
-import DynamicPlots from './DynamicPlots';
+import PlotsDynamic from './PlotsDynamic';
 import {
   scrollElement,
   limitLength,
   limitLengthOrNull,
-  // dynamicSizeLarger,
 } from '../Shared/helpers';
 import ScatterPlot from './ScatterPlot';
-import {
-  // Form,
-  Grid,
-  // Select,
-  // Checkbox,
-  Popup,
-  Label,
-  Sidebar,
-  // Button,
-  // Transition,
-  Icon,
-  // Button,
-  List,
-} from 'semantic-ui-react';
-// import VolcanoPlotIcon from '../../resources/VolcanoPlotIcon.png';
-// import VolcanoPlotIconSelected from '../../resources/VolcanoPlotIconSelected.png';
+import { Grid, Popup, Label, Sidebar, Icon, List } from 'semantic-ui-react';
 import ButtonActions from '../Shared/ButtonActions';
 import './DifferentialDetail.scss';
 import SplitPane from 'react-split-pane';
@@ -874,7 +858,7 @@ class DifferentialDetail extends Component {
     const tableData =
       this.volcanoPlotFilteredGridRef?.current?.qhGridRef?.current?.getSortedData() ||
       this.props.differentialResults;
-    this.props.onHandleMultifeaturePlot('Differential', tableData, true);
+    this.props.onHandleMultifeaturePlot('Overlay', tableData, true);
   };
 
   render() {
@@ -891,7 +875,6 @@ class DifferentialDetail extends Component {
       direction,
       featuresLength,
       differentialDynamicPlotWidth,
-      allChecked,
       hasMultifeaturePlots,
     } = this.state;
 
@@ -911,7 +894,7 @@ class DifferentialDetail extends Component {
       svgExportName,
       differentialPlotTypes,
       tabsMessage,
-      isVolcanoPlotSVGLoaded,
+      dynamicPlotsLoaded,
       differentialFeature,
       differentialFeatureIdKey,
       onGetPlotTransition,
@@ -955,7 +938,7 @@ class DifferentialDetail extends Component {
         onBackToTable,
         differentialFeatureIdKey,
         differentialFeature,
-        isItemSVGLoaded,
+        plotOverlayLoaded,
         metaFeaturesDataDifferential,
         modelSpecificMetaFeaturesExist,
         fwdRefDVC,
@@ -981,7 +964,7 @@ class DifferentialDetail extends Component {
               onBackToTable={onBackToTable}
               differentialFeatureIdKey={differentialFeatureIdKey}
               differentialFeature={differentialFeature}
-              isItemSVGLoaded={isItemSVGLoaded}
+              plotOverlayLoaded={plotOverlayLoaded}
               metaFeaturesDataDifferential={metaFeaturesDataDifferential}
               modelSpecificMetaFeaturesExist={
                 modelSpecificMetaFeaturesExist || false
@@ -1088,7 +1071,7 @@ class DifferentialDetail extends Component {
                           }
                           onClearPlotSelected={this.props.onClearPlotSelected}
                         ></ScatterPlot>
-                        <DynamicPlots
+                        <PlotsDynamic
                           modelSpecificMetaFeaturesExist={
                             modelSpecificMetaFeaturesExist || false
                           }
@@ -1120,7 +1103,7 @@ class DifferentialDetail extends Component {
                           svgExportName={svgExportName}
                           differentialPlotTypes={differentialPlotTypes}
                           tabsMessage={tabsMessage}
-                          isVolcanoPlotSVGLoaded={isVolcanoPlotSVGLoaded}
+                          dynamicPlotsLoaded={dynamicPlotsLoaded}
                           HighlightedFeaturesArrVolcano={
                             HighlightedFeaturesArrVolcano
                           }
@@ -1146,7 +1129,7 @@ class DifferentialDetail extends Component {
                             this.setState({ allChecked: bool })
                           }
                           hasMultifeaturePlots={this.props.hasMultifeaturePlots}
-                        ></DynamicPlots>
+                        ></PlotsDynamic>
                       </SplitPane>
                       <Grid.Row>
                         <span

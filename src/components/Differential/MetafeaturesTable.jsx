@@ -6,7 +6,7 @@ import './MetafeaturesTable.scss';
 import { omicNavigatorService } from '../../services/omicNavigator.service';
 // import { CancelToken } from 'axios';
 // eslint-disable-next-line no-unused-vars
-import QHGrid, { EZGrid } from '../Shared/QHGrid';
+import { EZGrid } from '../Shared/QHGrid';
 
 class MetafeaturesTable extends Component {
   state = {
