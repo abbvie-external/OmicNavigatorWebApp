@@ -582,7 +582,7 @@ class ScatterPlot extends React.PureComponent {
             // simple dot click
             if (elem.attr('class').endsWith('outlined')) {
               // already outlined
-              this.props.onClearPlotSelected();
+              this.props.onResetDifferentialOutlinedFeature();
             } else {
               this.props.onHandleDotClick(
                 e,

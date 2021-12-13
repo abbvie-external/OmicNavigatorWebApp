@@ -5,11 +5,7 @@ import CustomEmptyMessage from '../Shared/Templates';
 import { EZGrid } from '../Shared/QHGrid';
 import PlotsOverlay from './PlotsOverlay';
 import PlotsDynamic from './PlotsDynamic';
-import {
-  scrollElement,
-  limitLength,
-  limitLengthOrNull,
-} from '../Shared/helpers';
+import { scrollElement } from '../Shared/helpers';
 import ScatterPlot from './ScatterPlot';
 import { Grid, Popup, Label, Sidebar, Icon, List } from 'semantic-ui-react';
 import ButtonActions from '../Shared/ButtonActions';
@@ -67,24 +63,6 @@ class DifferentialDetail extends Component {
 
   componentDidUpdate(prevProps) {
     const { differentialResults } = this.props;
-    // if (prevProps.differentialTest !== differentialTest) {
-    //   this.handleUpperPlotVisability(null, true);
-    // }
-
-    // THIS CODE ISN'T BEING USED NOW, BUT IS BREAKING THE APP IN SOME SITUATIONS, E.G. MULTIPLE COLUMN MULTISET FILTERING WITH NO RESULTS
-    // if (this.props.plotMultiFeatureAvailable) {
-    //   const columnHeader = document.querySelector('[data-id="select"]');
-    //   if (!columnHeader.classList.value.split(' ').includes('th-select')) {
-    //     columnHeader.classList.add('th-select');
-    //     const toggleDiv = document.createElement('div');
-    //     toggleDiv.classList.add('toggleDiv');
-    //     // toggleDiv.onclick = () => {
-    //     //   this.toggleAllCheckboxes();
-    //     // };
-    //     columnHeader.appendChild(toggleDiv);
-    //   }
-    // }
-
     if (prevProps.differentialResults !== differentialResults) {
       let data =
         differentialResults.length !==
@@ -97,17 +75,8 @@ class DifferentialDetail extends Component {
         allChecked: false,
         differentialTableData: data,
         volcanoPlotRows: data?.length || 0,
-        featuresLength:
-          limitLength(data?.length, this.props.plotMultiFeatureMax) || 0,
       });
     }
-
-    // if (
-    //   prevProps.differentialHighlightedFeaturesData?.length !==
-    //   this.props.differentialHighlightedFeaturesData?.length
-    // ) {
-    //   this.handleTableChange();
-    // }
   }
 
   handleScatterPlotBoxSelection = currentSelection => {
@@ -177,6 +146,7 @@ class DifferentialDetail extends Component {
     if (clearHighlightedData) {
       this.pageToFeature();
       this.props.onHandleHighlightedFeaturesDifferential([]);
+      this.props.onResetDifferentialOutlinedFeature();
       this.setState({
         differentialTableData: volcanoPlotSelectedDataArr,
       });
@@ -231,41 +201,32 @@ class DifferentialDetail extends Component {
           multiselectedFeatureIdsMappedRemaining,
           true,
         );
-        // let hasOutline = features?.includes(
-        //   this.props.differentialOutlinedFeature,
-        // );
         // if the outlined dot is still in the chart, page to it, otherwise clear it's state and page to 0
         if (isOutlinedFeatureInView) {
           setTimeout(function() {
             self.pageToFeature(self.props.differentialOutlinedFeature);
           }, 500);
         } else {
-          this.props.onClearPlotSelected();
+          this.props.onResetDifferentialOutlinedFeature();
           this.pageToFeature();
         }
       } else {
         this.props.onHandleHighlightedFeaturesDifferential([]);
-        // there are no multi-selected features in the box selection; check for outligned row and load, or clear svg pane
+        // there are no multi-selected features in the box selection; check for outlined row and load, or clear svg pane
         if (isOutlinedFeatureInView) {
           // this timeout give the table time to load, before paging to the outlined feature
           setTimeout(function() {
-            self.props.onGetPlot(
-              'SingleFeature',
-              self.props.differentialOutlinedFeature,
-              false,
-              false,
-            );
             self.pageToFeature(self.props.differentialOutlinedFeature);
           }, 500);
         } else {
-          this.props.onClearPlotSelected();
+          this.props.onResetDifferentialOutlinedFeature();
           this.pageToFeature();
         }
       }
     } else {
       // nothing is in box selection
       this.props.onHandleHighlightedFeaturesDifferential([]);
-      this.props.onClearPlotSelected();
+      this.props.onResetDifferentialOutlinedFeature();
       this.setState({
         differentialTableData: [],
         volcanoPlotRows: 0,
@@ -310,7 +271,6 @@ class DifferentialDetail extends Component {
     doNotUnhighlight,
     simpleClick,
     elem,
-    removedOutlined,
   ) => {
     const { differentialFeatureIdKey } = this.props;
     if (simpleClick) {
@@ -337,46 +297,17 @@ class DifferentialDetail extends Component {
     }
   };
 
-  getTableHelpers = differentialFeatureIdKeyVar => {
-    const self = this;
-    let addParams = {};
-    addParams.showPlotOverlay = (dataItem, alphanumericTrigger) => {
-      return function() {
-        self.setState({
-          differentialOutlinedFeature: dataItem[alphanumericTrigger],
-        });
-        self.getPlot('Volcano', dataItem[alphanumericTrigger], false, false);
-      };
-    };
-    addParams.elementId = differentialFeatureIdKeyVar;
-    this.setState({ additionalTemplateInfoDifferentialTable: addParams });
-  };
-
   removeSelectedFeature = featureToRemove => {
     const {
       differentialResults,
       differentialHighlightedFeaturesData,
     } = this.props;
-    let sortedData =
-      this.volcanoPlotFilteredGridRef?.current?.qhGridRef?.current?.getSortedData() ||
-      differentialResults;
     const PreviouslyHighlighted = [...differentialHighlightedFeaturesData];
     const selectedTableDataArray = PreviouslyHighlighted.filter(
       i => i.id !== featureToRemove,
     );
     this.props.onHandleHighlightedFeaturesDifferential(selectedTableDataArray);
-    this.setState({
-      featuresLength:
-        limitLengthOrNull(
-          selectedTableDataArray?.length,
-          this.props.plotMultiFeatureMax,
-        ) || limitLength(sortedData?.length, this.props.plotMultiFeatureMax),
-    });
-    // if (selectedTableDataArray.length === 1) {
-    // less then 2 left
-    // this.props.onClearPlotSelected();
     this.reloadMultifeaturePlot(selectedTableDataArray);
-    // }
   };
 
   reloadMultifeaturePlot = _.debounce((selected, boxSelection) => {
@@ -384,23 +315,9 @@ class DifferentialDetail extends Component {
       ? selected
       : this.volcanoPlotFilteredGridRef?.current?.qhGridRef?.current?.getSortedData() ||
         this.props.differentialResults;
-    if (selected.length > 1) {
-      if (selected.length)
-        this.props.onHandleMultifeaturePlot('MultiFeature', data);
-    } else if (selected.length === 1) {
-      this.setState({ allChecked: false });
-      if (this.props.differentialOutlinedFeature) {
-        this.props.onGetPlot(
-          'SingleFeature',
-          this.props.differentialOutlinedFeature,
-          false,
-          false,
-        );
-      } else {
-        this.props.onClearPlotSelected();
-        this.pageToFeature();
-      }
-    } else return;
+    if (selected?.length > 1) {
+      this.props.onHandleMultifeaturePlot('MultiFeature', data);
+    }
   }, 1250);
 
   handleRowClick = (event, item, index) => {
@@ -413,18 +330,13 @@ class DifferentialDetail extends Component {
     const { plotMultiFeatureAvailable } = this.props;
     event.persist();
     event.stopPropagation();
-    // console.log('className', event.target.className);
-    // console.log('classList', event.target.classList);
-    // console.log('Event', { event });
-    // console.log(event?.target?.classList?.contains('DifferentialResultsRowCheckbox'));
-    // console.log(event?.target?.classList?.contains('DifferentialResultsRowCheckboxDiv'));
-    // console.log(event?.target?.innerHTML.includes('DifferentialResultsRowCheckboxDiv'));
     if (
       item == null ||
       event?.target?.className === 'ExternalSiteIcon' ||
       event?.target?.className === 'TableCellLink NoSelect' ||
       event?.target?.className === 'TableCellLink'
     ) {
+      // CLICK ON EXTERNAL LINK, OR FEATURE ID PROMPTING PLOT OVERLAY
       return;
     } else {
       let sortedData =
@@ -442,6 +354,7 @@ class DifferentialDetail extends Component {
         baseFeature = differentialOutlinedFeature;
       }
       if (event.shiftKey) {
+        // SHIFT CLICK - ADD MULTIPLE FEATURES
         if (!plotMultiFeatureAvailable) return;
         const currentTableData =
           this.volcanoPlotFilteredGridRef?.current?.qhGridRef.current?.getSortedData() ||
@@ -475,14 +388,6 @@ class DifferentialDetail extends Component {
         this.props.onHandleHighlightedFeaturesDifferential(
           uniqueTableDataArray,
         );
-        this.setState({
-          featuresLength:
-            limitLengthOrNull(
-              uniqueTableDataArray?.length,
-              this.props.plotMultiFeatureMax,
-            ) ||
-            limitLength(sortedData?.length, this.props.plotMultiFeatureMax),
-        });
         this.reloadMultifeaturePlot(uniqueTableDataArray);
       } else if (
         event.ctrlKey ||
@@ -493,6 +398,7 @@ class DifferentialDetail extends Component {
         ) ||
         event?.target?.innerHTML.includes('DifferentialResultsRowCheckboxDiv')
       ) {
+        // CONTROL CLICK OR CLICK IN CHECKBOX CELL CLICK - ADD/REMOVE ONE FEATURE
         if (!plotMultiFeatureAvailable) return;
         // control-click or click specifically on checkbox
         const currentTableData =
@@ -507,14 +413,6 @@ class DifferentialDetail extends Component {
           this.props.onHandleHighlightedFeaturesDifferential(
             selectedTableDataArray,
           );
-          this.setState({
-            featuresLength:
-              limitLengthOrNull(
-                selectedTableDataArray?.length,
-                this.props.plotMultiFeatureMax,
-              ) ||
-              limitLength(sortedData?.length, this.props.plotMultiFeatureMax),
-          });
           this.reloadMultifeaturePlot(selectedTableDataArray);
         } else {
           // not yet highlighted, add it to array
@@ -539,25 +437,13 @@ class DifferentialDetail extends Component {
           this.props.onHandleHighlightedFeaturesDifferential(
             selectedTableDataArray,
           );
-          this.setState({
-            featuresLength:
-              limitLengthOrNull(
-                selectedTableDataArray?.length,
-                this.props.plotMultiFeatureMax,
-              ) ||
-              limitLength(sortedData?.length, this.props.plotMultiFeatureMax),
-          });
           this.reloadMultifeaturePlot(selectedTableDataArray);
         }
       } else {
+        // CLICK WITHOUT SHIFT OR CONTROL, NOT IN CHECKBOX CELL
         // if item is already outlined, remove outline and clear plot
         if (item[differentialFeatureIdKey] === differentialOutlinedFeature) {
-          if (this.props.differentialHighlightedFeatures.length) {
-            this.reloadMultifeaturePlot(
-              this.props.differentialHighlightedFeatures,
-            );
-          }
-          this.props.onClearPlotSelected();
+          this.props.onResetDifferentialOutlinedFeature();
         } else {
           // simple row click without control nor shift
           this.props.onSetPlotSelected(item[differentialFeatureIdKey]);
@@ -682,28 +568,21 @@ class DifferentialDetail extends Component {
     let isOutlinedFeatureInView = allFeatureIdsRemaining.includes(
       this.props.differentialOutlinedFeature,
     );
-
-    if (!this.props.plotMultiFeatureAvailable) {
-      const self = this;
+    const self = this;
+    if (sortedFilteredData.length > 0) {
+      // IF DATA
       if (isOutlinedFeatureInView) {
+        // PAGE TO OUTLINED FEATURE IF IT REMAINS
         setTimeout(function() {
-          self.props.onGetPlot(
-            'SingleFeature',
-            self.props.differentialOutlinedFeature,
-            false,
-            false,
-          );
           self.pageToFeature(self.props.differentialOutlinedFeature);
         }, 500);
       } else {
-        this.props.onClearPlotSelected();
+        // CLEAR OUTLINED FEATURE IF IT DOES NOT REMAIN, AND PAGE TO 0
+        this.props.onResetDifferentialOutlinedFeature();
         this.pageToFeature();
       }
-      this.setState({
-        featuresLength: 0,
-      });
-    } else {
-      if (sortedFilteredData.length > 0) {
+      if (this.props.plotMultiFeatureAvailable) {
+        // IF MULTI-FEATURE PLOTTING AVAILABLE AND THERE IS DATA
         const self = this;
         let multiselectedFeaturesArrRemaining = [
           ...sortedFilteredData,
@@ -712,82 +591,41 @@ class DifferentialDetail extends Component {
             item[self.props.differentialFeatureIdKey],
           ),
         );
-        if (multiselectedFeaturesArrRemaining.length) {
-          if (multiselectedFeaturesArrRemaining.length === 1) {
-            this.setState({
-              featuresLength: 1,
-            });
-          } else if (multiselectedFeaturesArrRemaining.length > 1) {
-            this.setState({
-              featuresLength:
-                limitLengthOrNull(
-                  multiselectedFeaturesArrRemaining?.length,
-                  this.props.plotMultiFeatureMax,
-                ) ||
-                limitLength(
-                  sortedFilteredData?.length,
-                  this.props.plotMultiFeatureMax,
-                ),
-            });
-          }
-          // if there are multi-selected features in the table, reload the svg, single or multi
-          let multiselectedFeaturesArrMappedRemaining = [
-            ...multiselectedFeaturesArrRemaining,
-          ].map(item => ({
-            id: item[self.props.differentialFeatureIdKey],
-            value: item[self.props.differentialFeatureIdKey],
-            key: item[self.props.differentialFeatureIdKey],
-          }));
-          this.props.onHandleHighlightedFeaturesDifferential(
-            multiselectedFeaturesArrMappedRemaining,
-            true,
-          );
-          let multiselectedFeatureIdsMappedRemaining = [
-            ...multiselectedFeaturesArrRemaining,
-          ].map(item => item[self.props.differentialFeatureIdKey]);
-          this.reloadMultifeaturePlot(
-            multiselectedFeatureIdsMappedRemaining,
-            true,
-          );
-          // if the outlined row is still in the table, page to it, otherwise clear it's state and page to 0
-          if (isOutlinedFeatureInView) {
-            setTimeout(function() {
-              self.pageToFeature(self.props.differentialOutlinedFeature);
-            }, 500);
+        if (
+          self.props.differentialHighlightedFeatures.length !==
+          multiselectedFeaturesArrRemaining.length
+        ) {
+          // IF CHECKED FEATURES LENGTH IS DIFFERENT THAN EXISTING
+          if (multiselectedFeaturesArrRemaining.length) {
+            // IF CHECKED FEATURES REMAIN, GET NEW SVG
+            let multiselectedFeaturesArrMappedRemaining = [
+              ...multiselectedFeaturesArrRemaining,
+            ].map(item => ({
+              id: item[self.props.differentialFeatureIdKey],
+              value: item[self.props.differentialFeatureIdKey],
+              key: item[self.props.differentialFeatureIdKey],
+            }));
+            this.props.onHandleHighlightedFeaturesDifferential(
+              multiselectedFeaturesArrMappedRemaining,
+              true,
+            );
+            let multiselectedFeatureIdsMappedRemaining = [
+              ...multiselectedFeaturesArrRemaining,
+            ].map(item => item[self.props.differentialFeatureIdKey]);
+            this.reloadMultifeaturePlot(
+              multiselectedFeatureIdsMappedRemaining,
+              true,
+            );
           } else {
-            this.props.onClearPlotSelected();
-            this.pageToFeature();
+            // no highlighted after table filter
+            this.props.onHandleHighlightedFeaturesDifferential([]);
           }
-        } else {
-          this.props.onHandleHighlightedFeaturesDifferential([]);
-          // there are no multi-selected features in the tablen; check for outligned row and load, or clear svg pane
-          if (isOutlinedFeatureInView) {
-            setTimeout(function() {
-              self.props.onGetPlot(
-                'SingleFeature',
-                self.props.differentialOutlinedFeature,
-                false,
-                false,
-              );
-              self.pageToFeature(self.props.differentialOutlinedFeature);
-            }, 500);
-          } else {
-            this.props.onClearPlotSelected();
-            this.pageToFeature();
-          }
-          this.setState({
-            featuresLength: 0,
-          });
         }
-      } else {
-        // no highlighted nor outlined features after table filter
-        this.props.onHandleHighlightedFeaturesDifferential([]);
-        this.props.onClearPlotSelected();
-        this.setState({
-          featuresLength: 0,
-        });
-        this.pageToFeature();
       }
+    } else {
+      this.props.onHandleHighlightedFeaturesDifferential([]);
+      this.props.onResetDifferentialOutlinedFeature();
+      this.pageToFeature();
     }
   };
 
@@ -837,7 +675,6 @@ class DifferentialDetail extends Component {
       volcanoWidth,
       animation,
       direction,
-      featuresLength,
       differentialDynamicPlotWidth,
     } = this.state;
 
@@ -1033,7 +870,9 @@ class DifferentialDetail extends Component {
                           onHandleScatterPlotBoxSelection={
                             this.handleScatterPlotBoxSelection
                           }
-                          onClearPlotSelected={this.props.onClearPlotSelected}
+                          onResetDifferentialOutlinedFeature={
+                            this.props.onResetDifferentialOutlinedFeature
+                          }
                         ></ScatterPlot>
                         <PlotsDynamic
                           modelSpecificMetaFeaturesExist={
@@ -1075,7 +914,6 @@ class DifferentialDetail extends Component {
                           differentialHighlightedFeaturesData={
                             differentialHighlightedFeaturesData
                           }
-                          featuresLength={featuresLength}
                           differentialFeatureIdKey={differentialFeatureIdKey}
                           plotMultiFeatureMax={plotMultiFeatureMax}
                           onGetPlotTransitionRef={onGetPlotTransition}
@@ -1091,7 +929,9 @@ class DifferentialDetail extends Component {
                           onHandleHighlightedFeaturesDifferential={
                             this.props.onHandleHighlightedFeaturesDifferential
                           }
-                          onClearPlotSelected={this.props.onClearPlotSelected}
+                          onResetDifferentialOutlinedFeature={
+                            this.props.onResetDifferentialOutlinedFeature
+                          }
                           onRemoveSelectedFeature={this.removeSelectedFeature}
                           onHandleAllChecked={bool =>
                             this.setState({ allChecked: bool })

@@ -175,6 +175,7 @@ class OmicNavigatorService {
     cancelToken,
   ) {
     this.setUrl();
+    debugger;
     const timeoutLength = 240000;
     // const cacheKey = `plotStudyMultifeature_${study}_${modelID}_${featureID}_${plotID}`;
     // if (this[cacheKey] != null) {

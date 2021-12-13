@@ -72,6 +72,7 @@ class Differential extends Component {
         title: '',
         svg: [],
       },
+      // plotSingleFeatureDataLength: 0,
       // MULTI-FEATURE PLOTS
       plotMultiFeatureAvailable: false,
       plotMultiFeatureDataLoaded: true,
@@ -504,7 +505,7 @@ class Differential extends Component {
         plots = differentialPlotTypes.filter(p =>
           p.plotType.includes('multiFeature'),
         );
-        const featuresLengthParentVar = featureId.length;
+        const featuresLengthParentVar = featureId?.length || 0;
         plotDataVar = {
           key: `(${featuresLengthParentVar}-features)`,
           title: `${differentialFeatureIdKey} (${featuresLengthParentVar} Features)`,
@@ -711,7 +712,7 @@ class Differential extends Component {
       let multifeaturePlot = differentialPlotTypes.filter(p =>
         p.plotType.includes('multiFeature'),
       );
-      const featuresLengthParentVar = featureids.length;
+      const featuresLengthParentVar = featureids?.length || 0;
       let plotDataVar = {
         key: `(${featuresLengthParentVar}-features)`,
         title: `${differentialFeatureIdKey} (${featuresLengthParentVar} Features)`,
@@ -743,7 +744,7 @@ class Differential extends Component {
                   plotType: multifeaturePlot[0],
                   svg: svg.data,
                 };
-                const featuresLengthParentVar = featureids.length;
+                const featuresLengthParentVar = featureids?.length || 0;
                 const plotDataVar = {
                   key: `(${featuresLengthParentVar}-features)`,
                   title: `${differentialFeatureIdKey} (${featuresLengthParentVar} Features)`,
@@ -1067,32 +1068,10 @@ class Differential extends Component {
       this.setState({
         differentialHighlightedFeaturesData: [],
         differentialHighlightedFeatures: [],
+        plotOverlayLoaded: true,
+        plotSingleFeatureDataLoaded: true,
+        plotMultiFeatureDataLoaded: true,
       });
-      // when clearing multi-selection, if there is an outlined row, init single plot
-      if (differentialOutlinedFeature.length > 0) {
-        // this.setState({
-        //   dynamicPlotsLoaded: false,
-        // });
-        this.getPlot(
-          'SingleFeature',
-          differentialOutlinedFeature,
-          false,
-          false,
-        );
-      } else {
-        this.setState({
-          differentialOutlinedFeature: '',
-          plotSingleFeatureData: {
-            key: null,
-            title: '',
-            svg: [],
-          },
-          plotSingleFeatureDataLength: 0,
-          plotOverlayLoaded: true,
-          plotSingleFeatureDataLoaded: true,
-          plotMultiFeatureDataLoaded: true,
-        });
-      }
     }
   };
 
@@ -1144,37 +1123,21 @@ class Differential extends Component {
     });
   };
 
-  clearPlotSelected = () => {
-    cancelRequestDifferentialResultsGetPlot();
-    if (this.state.differentialHighlightedFeaturesData.length > 1) {
-      this.setState({
-        differentialOutlinedFeature: '',
-        plotSingleFeatureData: {
-          key: null,
-          title: '',
-          svg: [],
-        },
-        plotSingleFeatureDataLength: 0,
-        plotOverlayLoaded: true,
-        // PAUL inspect
-        // plotSingleFeatureDataLoaded: false,
-        // plotMultiFeatureDataLoaded: true,
-      });
-    } else {
-      this.setState({
-        differentialOutlinedFeature: '',
-        plotSingleFeatureData: {
-          key: null,
-          title: '',
-          svg: [],
-        },
-        plotSingleFeatureDataLength: 0,
-        plotOverlayLoaded: true,
-        // PAUL inspect
-        plotSingleFeatureDataLoaded: true,
-        // plotMultiFeatureDataLoaded: true,
-      });
-    }
+  resetDifferentialOutlinedFeature = () => {
+    // cancelRequestDifferentialResultsGetPlot();
+    this.setState({
+      differentialOutlinedFeature: '',
+      plotSingleFeatureData: {
+        key: null,
+        title: '',
+        svg: [],
+      },
+      plotSingleFeatureDataLength: 0,
+      plotOverlayLoaded: true,
+      // PAUL inspect
+      // plotSingleFeatureDataLoaded: false,
+      // plotMultiFeatureDataLoaded: true,
+    });
   };
 
   handlePlotMultiFeatureAvailable = differentialPlotTypes => {
@@ -1451,7 +1414,9 @@ class Differential extends Component {
           onGetPlotTransition={this.getPlotTransition}
           onGetPlot={this.getPlot}
           onSetPlotSelected={this.setPlotSelected}
-          onClearPlotSelected={this.clearPlotSelected}
+          onResetDifferentialOutlinedFeature={
+            this.resetDifferentialOutlinedFeature
+          }
         />
       );
     } else return <TransitionStill stillMessage={message} />;
