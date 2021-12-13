@@ -489,6 +489,10 @@ class Differential extends Component {
       differentialFeatureIdKey,
     } = this.props;
     let self = this;
+    const plotDataLoadedKey = `plot${view}DataLoaded`;
+    this.setState({
+      [plotDataLoadedKey]: false,
+    });
     let id = featureId != null ? featureId : differentialFeature;
     let plotDataVar = {
       key: `${featureId}`,
@@ -599,6 +603,7 @@ class Differential extends Component {
           Promise.race(promises)
             .then(svg => {
               plotDataVar.svg = [svg];
+
               self.handleSVG(view, plotDataVar);
             })
             // Ignore error in first race - Handled later
@@ -1081,7 +1086,7 @@ class Differential extends Component {
     });
   };
 
-  handleSVG = (view, plotDataObj) => {
+  handleSVG = _.debounce((view, plotDataObj) => {
     const plotDataKey = `plot${view}Data`;
     const plotDataLengthKey = `plot${view}DataLength`;
     const plotDataLoadedKey = `plot${view}DataLoaded`;
@@ -1091,7 +1096,7 @@ class Differential extends Component {
       [plotDataLoadedKey]: true,
       plotOverlayLoaded: true,
     });
-  };
+  }, 750);
 
   backToTable = () => {
     this.setState({
@@ -1134,9 +1139,8 @@ class Differential extends Component {
       },
       plotSingleFeatureDataLength: 0,
       plotOverlayLoaded: true,
-      // PAUL inspect
-      // plotSingleFeatureDataLoaded: false,
-      // plotMultiFeatureDataLoaded: true,
+      plotSingleFeatureDataLoaded: false,
+      plotMultiFeatureDataLoaded: true,
     });
   };
 
