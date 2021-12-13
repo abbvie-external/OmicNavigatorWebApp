@@ -15,9 +15,24 @@ const maxWidthPopupStyle = {
 
 class PlotsDynamic extends Component {
   state = {
-    activeIndexPlotTabs: 0,
+    activeTabIndexPlotsDynamic: 0,
     featuresListOpen: false,
   };
+
+  componentDidUpdate(prevProps) {
+    if (
+      prevProps.plotSingleFeatureData?.title !==
+      this.props.plotSingleFeatureData?.title
+    ) {
+      this.setState({ activeTabIndexPlotsDynamic: 0 });
+    }
+    if (
+      prevProps.plotMultiFeatureData?.title !==
+      this.props.plotMultiFeatureData?.title
+    ) {
+      this.setState({ activeTabIndexPlotsDynamic: 1 });
+    }
+  }
 
   handlePlotOverlaySingleFeature = () => {
     const { plotSingleFeatureData } = this.props;
@@ -26,9 +41,9 @@ class PlotsDynamic extends Component {
   };
 
   handleTabChange = (e, { activeIndex }) => {
-    if (activeIndex !== this.state.activeIndexPlotTabs) {
+    if (activeIndex !== this.state.activeTabIndexPlotsDynamic) {
       this.setState({
-        activeIndexPlotTabs: activeIndex,
+        activeTabIndexPlotsDynamic: activeIndex,
       });
     }
   };
@@ -68,7 +83,6 @@ class PlotsDynamic extends Component {
     );
 
     let panes = [];
-    debugger;
     if (plotMultiFeatureAvailable) {
       panes = [
         {
@@ -107,7 +121,9 @@ class PlotsDynamic extends Component {
                 // to be used by resuable export
                 svgExportName={this.props.svgExportName}
                 // to determine updates, dynamic rendered ui and loaders
-                activeIndexPlotTabs={this.state.activeIndexPlotTabs}
+                activeTabIndexPlotsDynamic={
+                  this.state.activeTabIndexPlotsDynamic
+                }
                 upperPlotsVisible={this.props.upperPlotsVisible}
                 modelSpecificMetaFeaturesExist={
                   this.props.modelSpecificMetaFeaturesExist
@@ -152,7 +168,9 @@ class PlotsDynamic extends Component {
                 // to be used by resuable export
                 svgExportName={this.props.svgExportName}
                 // to determine updates, dynamic rendered ui and loaders
-                activeIndexPlotTabs={this.state.activeIndexPlotTabs}
+                activeTabIndexPlotsDynamic={
+                  this.state.activeTabIndexPlotsDynamic
+                }
                 upperPlotsVisible={this.props.upperPlotsVisible}
                 modelSpecificMetaFeaturesExist={
                   this.props.modelSpecificMetaFeaturesExist
@@ -214,7 +232,9 @@ class PlotsDynamic extends Component {
                 // to be used by resuable export
                 svgExportName={this.props.svgExportName}
                 // to be used by dynamic rendered ui and loaders
-                activeIndexPlotTabs={this.state.activeIndexPlotTabs}
+                activeTabIndexPlotsDynamic={
+                  this.state.activeTabIndexPlotsDynamic
+                }
                 upperPlotsVisible={this.props.upperPlotsVisible}
                 modelSpecificMetaFeaturesExist={
                   this.props.modelSpecificMetaFeaturesExist
@@ -238,7 +258,7 @@ class PlotsDynamic extends Component {
         <Tab
           onTabChange={this.handleTabChange}
           panes={panes}
-          activeIndex={this.state.activeIndexPlotTabs}
+          activeIndex={this.state.activeTabIndexPlotsDynamic}
           renderActiveOnly={false}
           menu={{
             stackable: true,

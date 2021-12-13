@@ -56,7 +56,6 @@ class PlotsMultiFeature extends Component {
 
   getFeaturesList = () => {
     const {
-      plotMultiFeatureDataLength,
       divWidth,
       differentialHighlightedFeaturesData,
       plotMultiFeatureMax,

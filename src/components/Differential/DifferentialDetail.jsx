@@ -63,23 +63,9 @@ class DifferentialDetail extends Component {
       differentialTableData: this.props.differentialResults,
       // volcanoPlotRows: this.props.differentialResults.length,
     });
-    // integrate with streaming
-    // const { featureToHighlightInDiffTable } = this.props;
-    // if (featureToHighlightInDiffTable !== '') {
-    //   const featureToHighlightInDiffTableArr = [
-    //     {
-    //       id: featureToHighlightInDiffTable,
-    //       value: featureToHighlightInDiffTable,
-    //       key: featureToHighlightInDiffTable,
-    //     },
-    //   ];
-    // this.props.onHandleHighlightedFeaturesDifferential(featureToHighlightInDiffTableArr);
-    // this.pageToFeature(featureToHighlightInDiffTable);
-    // this.props.onResetFeatureToHighlightInDiffTable();
-    // }
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps) {
     const { differentialResults } = this.props;
     // if (prevProps.differentialTest !== differentialTest) {
     //   this.handleUpperPlotVisability(null, true);
@@ -121,25 +107,6 @@ class DifferentialDetail extends Component {
     //   this.props.differentialHighlightedFeaturesData?.length
     // ) {
     //   this.handleTableChange();
-    // }
-
-    // integrate with streaming
-    // if (
-    //   featureToHighlightInDiffTable !== '' &&
-    //   prevProps.featureToHighlightInDiffTable !== featureToHighlightInDiffTable
-    // ) {
-    //   const featureToHighlightInDiffTableArr = [
-    //     {
-    //       id: featureToHighlightInDiffTable,
-    //       value: featureToHighlightInDiffTable,
-    //       key: featureToHighlightInDiffTable,
-    //     },
-    //   ];
-    //   this.props.onHandleHighlightedFeaturesDifferential(featureToHighlightInDiffTableArr);
-    //   this.pageToFeature(featureToHighlightInDiffTable);
-    // }
-    // if (prevProps.plotOverlayVisible !== plotOverlayVisible) {
-    //   this.handlePlotAnimationVolcano('overlay');
     // }
   }
 
