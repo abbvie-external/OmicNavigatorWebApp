@@ -14,42 +14,28 @@ class PlotsOverlay extends PureComponent {
     // this.resizeListener = this.resizeListener.bind(this);
     // this.debouncedResizeListener = _.debounce(this.resizeListener, 100);
     this.state = {
-      // activeSVGTabIndexDifferential: 0,
+      // activeTabIndexPlotsOverlay: 0,
       excelFlag: true,
       pngFlag: true,
       pdfFlag: false,
       svgFlag: true,
       txtFlag: false,
-      plotOptions: [],
     };
   }
   metaFeaturesTableRef = React.createRef();
 
   componentDidMount() {
-    const { activeSVGTabIndexDifferential } = this.state;
-    this.setButtonVisibility(activeSVGTabIndexDifferential);
-    this.getSVGPanes();
+    this.setButtonVisibility();
   }
 
   componentDidUpdate(prevProps, prevState) {
-    const { plotOverlayDataLength, plotOverlayLoaded } = this.props;
-    const { activeSVGTabIndexDifferential } = this.state;
-    if (
-      plotOverlayLoaded &&
-      prevProps.plotOverlayDataLength !== plotOverlayDataLength
-    ) {
-      this.getSVGPanes();
-    }
-    if (
-      prevState.activeSVGTabIndexDifferential !== activeSVGTabIndexDifferential
-    ) {
-      this.setButtonVisibility(activeSVGTabIndexDifferential);
+    const { activeTabIndexPlotsOverlay } = this.state;
+    if (prevState.activeTabIndexPlotsOverlay !== activeTabIndexPlotsOverlay) {
+      this.setButtonVisibility(activeTabIndexPlotsOverlay);
     }
   }
 
-  componentWillUnmount() {}
-
-  setButtonVisibility = index => {
+  setButtonVisibility = () => {
     if (this.props.differentialPlotTypes.length > 0) {
       const isMetaFeatureTab =
         this.metaFeaturesTableRef.current !== null ? true : false;
@@ -73,92 +59,15 @@ class PlotsOverlay extends PureComponent {
 
   handleTabChange = (e, { activeIndex }) => {
     this.setState({
-      activeSVGTabIndexDifferential: activeIndex,
+      activeTabIndexPlotsOverlay: activeIndex,
     });
   };
 
   handlePlotDropdownChange = (e, { value }) => {
     this.setState({
-      activeSVGTabIndexDifferential: value,
+      activeTabIndexPlotsOverlay: value,
     });
   };
-
-  async getSVGPanes() {
-    let panes = [];
-    let options = [];
-    if (this.props.plotOverlayData) {
-      if (this.props.plotOverlayData.svg.length !== 0) {
-        const svgArray = [...this.props.plotOverlayData.svg];
-        const svgPanes = svgArray.map(s => {
-          return {
-            menuItem: `${s.plotType.plotDisplay}`,
-            render: () => (
-              <Tab.Pane attached="true" as="div">
-                <div
-                  id="DifferentialPlotTabsPlotSVGDiv"
-                  className="svgSpan"
-                  dangerouslySetInnerHTML={{ __html: s.svg }}
-                ></div>
-              </Tab.Pane>
-            ),
-          };
-        });
-        const plotOptions = svgArray.map(function(s, index) {
-          return {
-            key: `${index}=DifferentialPlotDropdownOption`,
-            text: s.plotType.plotDisplay,
-            value: index,
-          };
-        });
-        panes = panes.concat(svgPanes);
-        options = options.concat(plotOptions);
-      }
-    }
-    const isMultifeaturePlot =
-      this.props.plotOverlayData.key?.includes('features') || false;
-    if (
-      this.props.modelSpecificMetaFeaturesExist !== false &&
-      !isMultifeaturePlot
-    ) {
-      let metafeaturesTab = [
-        {
-          menuItem: 'Feature Data',
-          render: () => (
-            <Tab.Pane attached="true" as="div">
-              <MetafeaturesTable
-                ref={this.metaFeaturesTableRef}
-                differentialStudy={this.props.differentialStudy}
-                differentialModel={this.props.differentialModel}
-                differentialFeature={this.props.differentialFeature}
-                plotOverlayLoaded={this.props.plotOverlayLoaded}
-                plotOverlayData={this.props.plotOverlayData}
-                modelSpecificMetaFeaturesExist={
-                  this.props.modelSpecificMetaFeaturesExist
-                }
-              />
-            </Tab.Pane>
-          ),
-        },
-      ];
-      const singleFeaturePlotTypes = this.props.differentialPlotTypes.filter(
-        p => p.plotType !== 'multiFeature',
-      );
-      let metafeaturesDropdown = [
-        {
-          key: 'Feature-Data-Differential-Plot',
-          text: 'Feature Data',
-          value: singleFeaturePlotTypes.length,
-        },
-      ];
-      panes = panes.concat(metafeaturesTab);
-      options = options.concat(metafeaturesDropdown);
-      // }
-    }
-    this.setState({
-      svgPanes: panes,
-      plotOptions: options,
-    });
-  }
 
   render() {
     const {
@@ -167,9 +76,7 @@ class PlotsOverlay extends PureComponent {
       pdfFlag,
       txtFlag,
       svgFlag,
-      svgPanes,
-      plotOptions,
-      activeSVGTabIndexDifferential,
+      activeTabIndexPlotsOverlay,
     } = this.state;
     const {
       plotOverlayLoaded,
@@ -190,6 +97,76 @@ class PlotsOverlay extends PureComponent {
         </div>
       );
     } else {
+      let panes = [];
+      let options = [];
+      if (this.props.plotOverlayData) {
+        if (this.props.plotOverlayData.svg.length !== 0) {
+          const svgArray = [...this.props.plotOverlayData.svg];
+          const svgPanes = svgArray.map(s => {
+            return {
+              menuItem: `${s.plotType.plotDisplay}`,
+              render: () => (
+                <Tab.Pane attached="true" as="div">
+                  <div
+                    id="DifferentialPlotTabsPlotSVGDiv"
+                    className="svgSpan"
+                    dangerouslySetInnerHTML={{ __html: s.svg }}
+                  ></div>
+                </Tab.Pane>
+              ),
+            };
+          });
+          const plotOptions = svgArray.map(function(s, index) {
+            return {
+              key: `${index}=DifferentialPlotDropdownOption`,
+              text: s.plotType.plotDisplay,
+              value: index,
+            };
+          });
+          panes = panes.concat(svgPanes);
+          options = options.concat(plotOptions);
+        }
+      }
+      const isMultifeaturePlot =
+        this.props.plotOverlayData.key?.includes('features') || false;
+      if (
+        this.props.modelSpecificMetaFeaturesExist !== false &&
+        !isMultifeaturePlot
+      ) {
+        let metafeaturesTab = [
+          {
+            menuItem: 'Feature Data',
+            render: () => (
+              <Tab.Pane attached="true" as="div">
+                <MetafeaturesTable
+                  ref={this.metaFeaturesTableRef}
+                  differentialStudy={this.props.differentialStudy}
+                  differentialModel={this.props.differentialModel}
+                  differentialFeature={this.props.differentialFeature}
+                  plotOverlayLoaded={this.props.plotOverlayLoaded}
+                  plotOverlayData={this.props.plotOverlayData}
+                  modelSpecificMetaFeaturesExist={
+                    this.props.modelSpecificMetaFeaturesExist
+                  }
+                />
+              </Tab.Pane>
+            ),
+          },
+        ];
+        const singleFeaturePlotTypes = this.props.differentialPlotTypes.filter(
+          p => p.plotType !== 'multiFeature',
+        );
+        let metafeaturesDropdown = [
+          {
+            key: 'Feature-Data-Differential-Plot',
+            text: 'Feature Data',
+            value: singleFeaturePlotTypes.length,
+          },
+        ];
+        panes = panes.concat(metafeaturesTab);
+        options = options.concat(metafeaturesDropdown);
+        // }
+      }
       if (this.props.differentialPlotTypes && this.props.plotOverlayData) {
         const DropdownClass =
           this.props.differentialPlotTypes.length > this.props.svgTabMax
@@ -199,8 +176,7 @@ class PlotsOverlay extends PureComponent {
           this.props.differentialPlotTypes.length > this.props.svgTabMax
             ? 'Hide'
             : 'Show';
-        const activeSVGTabIndexDifferentialVar =
-          activeSVGTabIndexDifferential || 0;
+        const activeTabIndexPlotsOverlayVar = activeTabIndexPlotsOverlay || 0;
         return (
           <div className="PlotWrapper">
             <Grid columns={2} className="">
@@ -236,7 +212,7 @@ class PlotsOverlay extends PureComponent {
                     test={differentialTest}
                     feature={differentialFeature}
                     imageInfo={plotOverlayData}
-                    tabIndex={activeSVGTabIndexDifferentialVar}
+                    tabIndex={activeTabIndexPlotsOverlayVar}
                     plot={'DifferentialPlotTabsPlotSVGDiv'}
                   />
                 </Grid.Column>
@@ -256,11 +232,8 @@ class PlotsOverlay extends PureComponent {
                       search
                       selection
                       compact
-                      options={plotOptions}
-                      value={
-                        plotOptions[activeSVGTabIndexDifferentialVar]?.value ||
-                        0
-                      }
+                      options={options}
+                      value={options[activeTabIndexPlotsOverlayVar]?.value || 0}
                       onChange={this.handlePlotDropdownChange}
                       className={DropdownClass}
                     />
@@ -270,9 +243,9 @@ class PlotsOverlay extends PureComponent {
                         pointing: true,
                         className: TabMenuClass,
                       }}
-                      panes={svgPanes}
+                      panes={panes}
                       onTabChange={this.handleTabChange}
-                      activeIndex={activeSVGTabIndexDifferentialVar}
+                      activeIndex={activeTabIndexPlotsOverlayVar}
                     />
                   </div>
                 </Grid.Column>

@@ -8,7 +8,6 @@ import './PlotsDynamic.scss';
 
 class PlotsSingleFeature extends Component {
   state = {
-    activeIndexPlotTabs: 0,
     activeTabIndexPlotsSingleFeature: 0,
     excelFlagSFPlots: true,
     pngFlagSFPlots: true,
