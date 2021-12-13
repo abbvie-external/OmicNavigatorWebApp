@@ -1653,6 +1653,7 @@ class ScatterPlot extends React.PureComponent {
     //   resizeScalarY: 1,
     //   volcanoCircleText: [],
     // });
+    this.props.onResetDifferentialOutlinedFeature();
     this.props.onHandleHighlightedFeaturesDifferential([], false);
   }
 
