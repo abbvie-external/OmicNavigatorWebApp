@@ -71,7 +71,6 @@ class Enrichment extends Component {
       links: [],
       tests: [],
     },
-    filterNetworkFromUpset: [],
     networkDataLoaded: false,
     networkGraphReady: false,
     networkDataError: false,

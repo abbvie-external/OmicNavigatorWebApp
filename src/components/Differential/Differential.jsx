@@ -38,16 +38,18 @@ class Differential extends Component {
     // this.resizeListener = this.resizeListener.bind(this);
     // this.debouncedResizeListener = _.debounce(this.resizeListener, 100);
     this.state = {
+      // GENERAL
       // differentialPlotTypes: [],
       differentialStudyMetadata: [],
       differentialModelsAndTests: [],
       differentialTestsMetadata: [],
       differentialTestIds: [],
-      differentialHighlightedFeaturesData: [],
-      differentialHighlightedFeatures: [],
-      differentialOutlinedFeature: '',
+      // RESULTS
       differentialResultsTableLoading: false,
       // differentialResults: [],
+      differentialResultsTableStreaming: true,
+      differentialResultsLinkouts: [],
+      differentialResultsFavicons: [],
       // differentialResultsUnfiltered: [],
       /**
        * @type {QHGrid.ColumnConfig[]}
@@ -55,14 +57,23 @@ class Differential extends Component {
       // differentialColumns: [],
       isSearchingDifferential: false,
       isValidSearchDifferential: false,
-      multisetFiltersVisible: false,
       isFilteredDifferential: false,
+      // HIGHLIGHTED FEATURES
+      differentialHighlightedFeaturesData: [],
+      differentialHighlightedFeatures: [],
+      differentialOutlinedFeature: '',
+      // FEATURE DATA
+      allMetaFeaturesDataDifferential: [],
+      modelSpecificMetaFeaturesExist: false,
+      // SINGLE FEATURE PLOTS
       plotSingleFeatureDataLoaded: true,
       plotSingleFeatureData: {
         key: null,
         title: '',
         svg: [],
       },
+      // MULTI-FEATURE PLOTS
+      plotMultiFeatureAvailable: false,
       plotMultiFeatureDataLoaded: true,
       plotMultiFeatureData: {
         key: null,
@@ -70,6 +81,8 @@ class Differential extends Component {
         svg: [],
       },
       // plotMultiFeatureDataLength: 0,
+      plotMultiFeatureMax: 1000,
+      // OVERLAY PLOTS
       plotOverlayVisible: false,
       plotOverlayLoaded: false,
       plotOverlayData: {
@@ -78,26 +91,21 @@ class Differential extends Component {
         svg: [],
       },
       // plotOverlayDataLength: 0,
-      plotMultisetAvailableDifferential: false,
-      plotMultisetBtnActiveDifferential: false,
-      plotMultisetQueriedDifferential: false,
-      plotDataMultisetDifferential: {
+      // MULTI-SET PLOT
+      plotMultisetLoadedDifferential: false,
+      plotMultisetDataDifferential: {
         title: '',
         svg: [],
       },
-      // Multi-Set Plot Animation State
+      // MULTISET PLOT ANIMANTION
       animation: 'uncover',
       direction: 'left',
       visible: false,
-      upsetColsDifferential: [],
-      modelSpecificMetaFeaturesExist: false,
-      // Differential Results linkouts and favicons
-      resultsLinkouts: [],
-      resultsFavicons: [],
-      allMetaFeaturesDataDifferential: [],
-      isDataStreamingResultsTable: true,
-      multifeaturePlotMax: 1000,
-      hasMultifeaturePlots: false,
+      // MULTISET FILTERS
+      multisetColsDifferential: [],
+      multisetFiltersVisible: false,
+      multisetButttonActiveDifferential: false,
+      multisetQueriedDifferential: false,
     };
   }
 
@@ -140,9 +148,9 @@ class Differential extends Component {
     });
   };
 
-  handlePlotMultisetQueriedDifferential = value => {
+  handleMultisetQueriedDifferential = value => {
     this.setState({
-      plotMultisetQueriedDifferential: value,
+      multisetQueriedDifferential: value,
       // dynamicPlotsLoaded: !value,
     });
   };
@@ -183,13 +191,13 @@ class Differential extends Component {
       isSearchingDifferential: false,
       isValidSearchDifferential: true,
       differentialResultsTableLoading: false,
-      plotMultisetBtnActiveDifferential: false,
+      multisetButttonActiveDifferential: false,
       visible: false,
       plotOverlayLoaded: false,
     });
 
     if (streamingFinished) {
-      this.setState({ isDataStreamingResultsTable: false });
+      this.setState({ differentialResultsTableStreaming: false });
     }
   };
 
@@ -217,12 +225,12 @@ class Differential extends Component {
         const differentialModelData = this.state.differentialStudyMetadata.plots.find(
           model => model.modelID === differentialModel,
         );
-        let hasMultifeaturePlotsVar = this.hasMultifeaturePlots(
+        let plotMultiFeatureAvailableVar = this.handlePlotMultiFeatureAvailable(
           differentialModelData?.plots,
         );
         this.setState({
           differentialPlotTypes: differentialModelData?.plots,
-          hasMultifeaturePlots: hasMultifeaturePlotsVar,
+          plotMultiFeatureAvailable: plotMultiFeatureAvailableVar,
         });
       }
     }
@@ -231,11 +239,11 @@ class Differential extends Component {
     this.props.onHandleUrlChange(changes, 'differential');
     this.setState({
       visible: false,
-      plotMultisetBtnActiveDifferential: false,
+      multisetButttonActiveDifferential: false,
     });
     if (scChange) {
       this.setState({
-        plotMultisetAvailableDifferential: false,
+        plotMultisetLoadedDifferential: false,
         plotSingleFeatureData: { key: null, title: '', svg: [] },
         plotMultiFeatureData: { key: null, title: '', svg: [] },
         plotOverlayData: { key: null, title: '', svg: [] },
@@ -262,7 +270,7 @@ class Differential extends Component {
         changes.differentialStudy,
         changes.differentialModel,
       );
-      this.getUpsetColsDifferential(
+      this.getMultisetColsDifferential(
         changes.differentialStudy,
         changes.differentialModel,
       );
@@ -289,7 +297,7 @@ class Differential extends Component {
     if (cachedResultsLinkouts) {
       const parsedResultsLinkouts = JSON.parse(cachedResultsLinkouts);
       this.setState({
-        resultsLinkouts: parsedResultsLinkouts,
+        differentialResultsLinkouts: parsedResultsLinkouts,
       });
       const cachedResultsFavicons = sessionStorage.getItem(
         `ResultsFavicons-${differentialStudy}_${differentialModel}`,
@@ -297,18 +305,18 @@ class Differential extends Component {
       if (cachedResultsFavicons) {
         const parsedResultsFavicons = JSON.parse(cachedResultsFavicons);
         this.setState({
-          resultsFavicons: parsedResultsFavicons,
+          differentialResultsFavicons: parsedResultsFavicons,
         });
       } else {
         this.setState({
-          resultsFavicons: [],
+          differentialResultsFavicons: [],
         });
         omicNavigatorService
           .getFavicons(parsedResultsLinkouts)
           .then(getFaviconsResponseData => {
             const favicons = getFaviconsResponseData || [];
             this.setState({
-              resultsFavicons: favicons,
+              differentialResultsFavicons: favicons,
             });
             sessionStorage.setItem(
               `ResultsFavicons-${differentialStudy}_${differentialModel}`,
@@ -318,15 +326,15 @@ class Differential extends Component {
       }
     } else {
       this.setState({
-        resultsLinkouts: [],
-        resultsFavicons: [],
+        differentialResultsLinkouts: [],
+        differentialResultsFavicons: [],
       });
       omicNavigatorService
         .getResultsLinkouts(differentialStudy, differentialModel)
         .then(getResultsLinkoutsResponseData => {
           const linkouts = getResultsLinkoutsResponseData || [];
           this.setState({
-            resultsLinkouts: linkouts,
+            differentialResultsLinkouts: linkouts,
           });
           sessionStorage.setItem(
             `ResultsLinkouts-${differentialStudy}_${differentialModel}`,
@@ -337,7 +345,7 @@ class Differential extends Component {
             .then(getFaviconsResponseData => {
               const favicons = getFaviconsResponseData || [];
               this.setState({
-                resultsFavicons: favicons,
+                differentialResultsFavicons: favicons,
               });
               sessionStorage.setItem(
                 `ResultsFavicons-${differentialStudy}_${differentialModel}`,
@@ -348,53 +356,53 @@ class Differential extends Component {
     }
   };
 
-  getUpsetColsDifferential = (differentialStudy, differentialModel) => {
-    const cachedUpsetColsDifferential = sessionStorage.getItem(
-      `UpsetCols-${differentialStudy}_${differentialModel}`,
+  getMultisetColsDifferential = (differentialStudy, differentialModel) => {
+    const cachedMultisetColsDifferential = sessionStorage.getItem(
+      `MultisetCols-${differentialStudy}_${differentialModel}`,
     );
-    if (cachedUpsetColsDifferential) {
-      const parsedUpsetColsDifferential = JSON.parse(
-        cachedUpsetColsDifferential,
+    if (cachedMultisetColsDifferential) {
+      const parsedMultisetColsDifferential = JSON.parse(
+        cachedMultisetColsDifferential,
       );
       this.setState({
-        upsetColsDifferential: parsedUpsetColsDifferential,
+        multisetColsDifferential: parsedMultisetColsDifferential,
       });
     } else {
       this.setState({
-        upsetColsDifferential: [],
+        multisetColsDifferential: [],
       });
       omicNavigatorService
-        .getUpsetCols(differentialStudy, differentialModel)
-        .then(getUpsetColsDifferentialResponseData => {
-          const cols = getUpsetColsDifferentialResponseData || [];
+        .getMultisetCols(differentialStudy, differentialModel)
+        .then(getMultisetColsDifferentialResponseData => {
+          const cols = getMultisetColsDifferentialResponseData || [];
           this.setState({
-            upsetColsDifferential: cols,
+            multisetColsDifferential: cols,
           });
           sessionStorage.setItem(
-            `UpsetCols-${differentialStudy}_${differentialModel}`,
+            `MultisetCols-${differentialStudy}_${differentialModel}`,
             JSON.stringify(cols),
           );
         });
     }
   };
 
-  handleIsDataStreamingResultsTable = bool => {
+  handleDifferentialResultsTableStreaming = bool => {
     this.setState({
-      isDataStreamingResultsTable: bool,
+      differentialResultsTableStreaming: bool,
     });
   };
 
   disablePlotDifferential = () => {
     this.setState({
-      plotMultisetAvailableDifferential: false,
+      plotMultisetLoadedDifferential: false,
     });
   };
 
   handleSearchResetDifferential = () => {
     this.setState({
       isValidSearchDifferential: false,
-      plotMultisetAvailableDifferential: false,
-      plotMultisetBtnActiveDifferential: false,
+      plotMultisetLoadedDifferential: false,
+      multisetButttonActiveDifferential: false,
       visible: false,
       plotOverlayVisible: false,
       plotOverlayLoaded: false,
@@ -405,17 +413,17 @@ class Differential extends Component {
     this.setState(prevState => ({
       animation,
       visible: !prevState.visible,
-      plotMultisetBtnActiveDifferential: !prevState.plotMultisetBtnActiveDifferential,
+      multisetButttonActiveDifferential: !prevState.multisetButttonActiveDifferential,
     }));
   };
 
   handleMultisetPlot = multisetPlotResults => {
     this.setState({
-      plotDataMultisetDifferential: {
+      plotMultisetDataDifferential: {
         title: multisetPlotResults.svgInfo.plotType,
         svg: multisetPlotResults.svgInfo.svg,
       },
-      plotMultisetAvailableDifferential: true,
+      plotMultisetLoadedDifferential: true,
     });
   };
 
@@ -860,8 +868,8 @@ class Differential extends Component {
         ? 'id'
         : differentialFeatureIdKey;
     if (data.length) {
-      if (data.length > this.state.multifeaturePlotMax) {
-        data = [...data.slice(0, this.state.multifeaturePlotMax)];
+      if (data.length > this.state.plotMultiFeatureMax) {
+        data = [...data.slice(0, this.state.plotMultiFeatureMax)];
       }
       const featureIds = data.map(featureId => featureId[key]);
       // if (!featureIds.includes(differentialOutlinedFeature)) {
@@ -1169,7 +1177,7 @@ class Differential extends Component {
     }
   };
 
-  hasMultifeaturePlots = differentialPlotTypes => {
+  handlePlotMultiFeatureAvailable = differentialPlotTypes => {
     if (differentialPlotTypes) {
       const plotTypesMapped = differentialPlotTypes.map(p => p.plotType);
       return plotTypesMapped?.includes('multiFeature') || false;
@@ -1180,8 +1188,8 @@ class Differential extends Component {
     const differentialResultsVar = testData.differentialResults;
     const { differentialFeature } = this.props;
     const {
-      resultsLinkouts,
-      resultsFavicons,
+      differentialResultsLinkouts,
+      differentialResultsFavicons,
       differentialPlotTypes,
       modelSpecificMetaFeaturesExist,
     } = this.state;
@@ -1246,12 +1254,14 @@ class Differential extends Component {
           filterable: { type: 'multiFilter' },
           template: (value, item, addParams) => {
             const keyVar = `${item[f]}-${item[alphanumericTrigger]}`;
-            const resultsLinkoutsKeys = Object.keys(resultsLinkouts);
+            const differentialResultsLinkoutsKeys = Object.keys(
+              differentialResultsLinkouts,
+            );
             let linkoutWithIcon = null;
-            if (resultsLinkoutsKeys.includes(f)) {
+            if (differentialResultsLinkoutsKeys.includes(f)) {
               if (item[f] != null && item[f] !== '') {
-                const columnLinkoutsObj = resultsLinkouts[f];
-                const columnFaviconsObj = resultsFavicons[f];
+                const columnLinkoutsObj = differentialResultsLinkouts[f];
+                const columnFaviconsObj = differentialResultsFavicons[f];
                 const columnLinkoutsIsArray = Array.isArray(columnLinkoutsObj);
                 let favicons = [];
                 if (columnFaviconsObj != null) {
@@ -1319,9 +1329,11 @@ class Differential extends Component {
         };
       },
     );
-    const upsetColsDifferentialVar = this.listToJson(differentialNumericFields);
+    const multisetColsDifferentialVar = this.listToJson(
+      differentialNumericFields,
+    );
     this.setState({
-      upsetColsDifferential: upsetColsDifferentialVar,
+      multisetColsDifferential: multisetColsDifferentialVar,
     });
     const differentialNumericColumnsMapped = differentialNumericFields.map(
       c => {
@@ -1353,7 +1365,7 @@ class Differential extends Component {
       },
     );
     let checkboxCol = [];
-    if (this.state.hasMultifeaturePlots) {
+    if (this.state.plotMultiFeatureAvailable) {
       checkboxCol = [
         {
           title: '',
@@ -1448,7 +1460,7 @@ class Differential extends Component {
   render() {
     const differentialView = this.getView();
     const {
-      plotDataMultisetDifferential,
+      plotMultisetDataDifferential,
       animation,
       direction,
       visible,
@@ -1467,7 +1479,7 @@ class Differential extends Component {
       pointSizeString,
       dimensions,
       srcUrl;
-    if (plotDataMultisetDifferential?.svg?.length > 0) {
+    if (plotMultisetDataDifferential?.svg?.length > 0) {
       pxToPtRatio = 105;
       pointSize = 12;
       width =
@@ -1489,7 +1501,7 @@ class Differential extends Component {
       divHeightPtString = `&height=${divHeightPt}`;
       pointSizeString = `&pointsize=${pointSize}`;
       dimensions = `?${divWidthPtString}${divHeightPtString}${pointSizeString}`;
-      srcUrl = `${plotDataMultisetDifferential.svg}${dimensions}`;
+      srcUrl = `${plotMultisetDataDifferential.svg}${dimensions}`;
     }
     const VerticalSidebar = ({ animation, visible }) => (
       <Sidebar
@@ -1529,7 +1541,7 @@ class Differential extends Component {
           id="differentialMultisetAnalysisSVGDiv"
           className="MultisetSvgOuter"
         >
-          {plotDataMultisetDifferential.svg?.length > 0 ? (
+          {plotMultisetDataDifferential.svg?.length > 0 ? (
             <SVG
               cacheRequests={true}
               src={srcUrl}
@@ -1565,8 +1577,8 @@ class Differential extends Component {
               onHandlePlotAnimationDifferential={
                 this.handlePlotAnimationDifferential
               }
-              onPlotMultisetQueriedDifferential={
-                this.handlePlotMultisetQueriedDifferential
+              onMultisetQueriedDifferential={
+                this.handleMultisetQueriedDifferential
               }
               onSetStudyModelTestMetadata={this.setStudyModelTestMetadata}
               onSetTestsMetadata={this.setTestsMetadata}
@@ -1575,9 +1587,9 @@ class Differential extends Component {
               onHandleResultsTableLoading={this.handleResultsTableLoading}
               onDoMetaFeaturesExist={this.doMetaFeaturesExist}
               onGetResultsLinkouts={this.getResultsLinkouts}
-              onGetUpsetColsDifferential={this.getUpsetColsDifferential}
-              onHandleIsDataStreamingResultsTable={
-                this.handleIsDataStreamingResultsTable
+              onGetMultisetColsDifferential={this.getMultisetColsDifferential}
+              onHandleDifferentialResultsTableStreaming={
+                this.handleDifferentialResultsTableStreaming
               }
               onHandleMultisetFiltersVisible={this.handleMultisetFiltersVisible}
               onHandleIsFilteredDifferential={this.handleIsFilteredDifferential}

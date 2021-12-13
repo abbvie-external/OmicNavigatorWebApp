@@ -19,7 +19,7 @@ import { getDynamicSize } from '../Shared/helpers';
 let cancelRequestGetReportLinkEnrichment = () => {};
 // let cancelGetEnrichmentsTable = () => {};
 let cancelRequestGetEnrichmentsIntersection = () => {};
-let cancelRequestGetEnrichmentsUpset = () => {};
+let cancelRequestGetEnrichmentsMultiset = () => {};
 const cacheEnrichmentsTable = {};
 async function* streamAsyncIterable(reader) {
   while (true) {
@@ -912,12 +912,12 @@ class EnrichmentSearch extends Component {
       return !multisetTestsFilteredOut.includes(col);
     });
     if (tests?.length > 1) {
-      cancelRequestGetEnrichmentsUpset();
+      cancelRequestGetEnrichmentsMultiset();
       let cancelToken = new CancelToken(e => {
-        cancelRequestGetEnrichmentsUpset = e;
+        cancelRequestGetEnrichmentsMultiset = e;
       });
       omicNavigatorService
-        .getEnrichmentsUpset(
+        .getEnrichmentsMultiset(
           enrichmentStudy,
           enrichmentModel,
           enrichmentAnnotation,
@@ -937,7 +937,7 @@ class EnrichmentSearch extends Component {
           }
         })
         .catch(error => {
-          console.error('Error during getEnrichmentsUpset', error);
+          console.error('Error during getEnrichmentsMultiset', error);
         });
     }
   }

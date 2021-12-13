@@ -59,7 +59,7 @@ class PlotsMultiFeature extends Component {
       plotMultiFeatureDataLength,
       divWidth,
       differentialHighlightedFeaturesData,
-      multifeaturePlotMax,
+      plotMultiFeatureMax,
     } = this.props;
     let features = [];
     const featuresHighlighted =
@@ -77,9 +77,9 @@ class PlotsMultiFeature extends Component {
       maxWidth: divWidth * 0.9,
     };
     const manyFeaturesText =
-      featuresHighlighted >= multifeaturePlotMax ? (
+      featuresHighlighted >= plotMultiFeatureMax ? (
         <span id="MoreThanText">
-          Plotting is limited to the first {multifeaturePlotMax} features
+          Plotting is limited to the first {plotMultiFeatureMax} features
         </span>
       ) : (
         <span id="MoreThanText">

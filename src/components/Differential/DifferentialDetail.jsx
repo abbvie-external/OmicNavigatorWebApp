@@ -54,15 +54,12 @@ class DifferentialDetail extends Component {
     visible: false,
     scatterPlotBoxSelection: [],
     allChecked: false,
-    hasMultifeaturePlots: false,
   };
   volcanoPlotFilteredGridRef = React.createRef();
   ScatterPlotRef = React.createRef();
 
   componentDidMount() {
-    const hasMultifeaturePlotsVar = this.hasMultifeaturePlots();
     this.setState({
-      hasMultifeaturePlots: hasMultifeaturePlotsVar,
       differentialTableData: this.props.differentialResults,
       // volcanoPlotRows: this.props.differentialResults.length,
     });
@@ -88,8 +85,8 @@ class DifferentialDetail extends Component {
     //   this.handleUpperPlotVisability(null, true);
     // }
 
-    // THIS CODE ISN'T BEING USED NOW, BUT IS BREAKING THE APP IN SOME SITUATIONS, E.G. MULTIPLE COLUMN UPSET FILTERING WITH NO RESULTS
-    // if (this.state.hasMultifeaturePlots) {
+    // THIS CODE ISN'T BEING USED NOW, BUT IS BREAKING THE APP IN SOME SITUATIONS, E.G. MULTIPLE COLUMN MULTISET FILTERING WITH NO RESULTS
+    // if (this.props.plotMultiFeatureAvailable) {
     //   const columnHeader = document.querySelector('[data-id="select"]');
     //   if (!columnHeader.classList.value.split(' ').includes('th-select')) {
     //     columnHeader.classList.add('th-select');
@@ -115,7 +112,7 @@ class DifferentialDetail extends Component {
         differentialTableData: data,
         volcanoPlotRows: data?.length || 0,
         featuresLength:
-          limitLength(data?.length, this.props.multifeaturePlotMax) || 0,
+          limitLength(data?.length, this.props.plotMultiFeatureMax) || 0,
       });
     }
 
@@ -356,7 +353,7 @@ class DifferentialDetail extends Component {
       this.pageToFeature(event[differentialFeatureIdKey]);
       this.props.onGetPlot('SingleFeature', feature, false, false);
     } else {
-      if (!this.state.hasMultifeaturePlots) return;
+      if (!this.props.plotMultiFeatureAvailable) return;
       let elementArray = items.map(item => ({
         id: item,
         value: item,
@@ -405,8 +402,8 @@ class DifferentialDetail extends Component {
       featuresLength:
         limitLengthOrNull(
           selectedTableDataArray?.length,
-          this.props.multifeaturePlotMax,
-        ) || limitLength(sortedData?.length, this.props.multifeaturePlotMax),
+          this.props.plotMultiFeatureMax,
+        ) || limitLength(sortedData?.length, this.props.plotMultiFeatureMax),
     });
     // if (selectedTableDataArray.length === 1) {
     // less then 2 left
@@ -446,7 +443,7 @@ class DifferentialDetail extends Component {
       differentialHighlightedFeaturesData,
       differentialResults,
     } = this.props;
-    const { hasMultifeaturePlots } = this.state;
+    const { plotMultiFeatureAvailable } = this.props;
     event.persist();
     event.stopPropagation();
     // console.log('className', event.target.className);
@@ -478,7 +475,7 @@ class DifferentialDetail extends Component {
         baseFeature = differentialOutlinedFeature;
       }
       if (event.shiftKey) {
-        if (!hasMultifeaturePlots) return;
+        if (!plotMultiFeatureAvailable) return;
         const currentTableData =
           this.volcanoPlotFilteredGridRef?.current?.qhGridRef.current?.getSortedData() ||
           [];
@@ -515,9 +512,9 @@ class DifferentialDetail extends Component {
           featuresLength:
             limitLengthOrNull(
               uniqueTableDataArray?.length,
-              this.props.multifeaturePlotMax,
+              this.props.plotMultiFeatureMax,
             ) ||
-            limitLength(sortedData?.length, this.props.multifeaturePlotMax),
+            limitLength(sortedData?.length, this.props.plotMultiFeatureMax),
         });
         this.reloadMultifeaturePlot(uniqueTableDataArray);
       } else if (
@@ -529,7 +526,7 @@ class DifferentialDetail extends Component {
         ) ||
         event?.target?.innerHTML.includes('DifferentialResultsRowCheckboxDiv')
       ) {
-        if (!hasMultifeaturePlots) return;
+        if (!plotMultiFeatureAvailable) return;
         // control-click or click specifically on checkbox
         const currentTableData =
           this.volcanoPlotFilteredGridRef?.current?.qhGridRef.current?.getSortedData() ||
@@ -547,9 +544,9 @@ class DifferentialDetail extends Component {
             featuresLength:
               limitLengthOrNull(
                 selectedTableDataArray?.length,
-                this.props.multifeaturePlotMax,
+                this.props.plotMultiFeatureMax,
               ) ||
-              limitLength(sortedData?.length, this.props.multifeaturePlotMax),
+              limitLength(sortedData?.length, this.props.plotMultiFeatureMax),
           });
           this.reloadMultifeaturePlot(selectedTableDataArray);
         } else {
@@ -579,9 +576,9 @@ class DifferentialDetail extends Component {
             featuresLength:
               limitLengthOrNull(
                 selectedTableDataArray?.length,
-                this.props.multifeaturePlotMax,
+                this.props.plotMultiFeatureMax,
               ) ||
-              limitLength(sortedData?.length, this.props.multifeaturePlotMax),
+              limitLength(sortedData?.length, this.props.plotMultiFeatureMax),
           });
           this.reloadMultifeaturePlot(selectedTableDataArray);
         }
@@ -719,7 +716,7 @@ class DifferentialDetail extends Component {
       this.props.differentialOutlinedFeature,
     );
 
-    if (!this.hasMultifeaturePlots) {
+    if (!this.props.plotMultiFeatureAvailable) {
       const self = this;
       if (isOutlinedFeatureInView) {
         setTimeout(function() {
@@ -758,11 +755,11 @@ class DifferentialDetail extends Component {
               featuresLength:
                 limitLengthOrNull(
                   multiselectedFeaturesArrRemaining?.length,
-                  this.props.multifeaturePlotMax,
+                  this.props.plotMultiFeatureMax,
                 ) ||
                 limitLength(
                   sortedFilteredData?.length,
-                  this.props.multifeaturePlotMax,
+                  this.props.plotMultiFeatureMax,
                 ),
             });
           }
@@ -827,14 +824,6 @@ class DifferentialDetail extends Component {
     }
   };
 
-  hasMultifeaturePlots = () => {
-    if (this.props.differentialPlotTypes) {
-      const plotTypesMapped = this.props.differentialPlotTypes.map(
-        p => p.plotType,
-      );
-      return plotTypesMapped?.includes('multiFeature') || false;
-    } else return false;
-  };
   toggleAllCheckboxes = () => {
     const { differentialFeatureIdKey } = this.props;
     const { allChecked } = this.state;
@@ -845,8 +834,8 @@ class DifferentialDetail extends Component {
         this.volcanoPlotFilteredGridRef?.current?.qhGridRef?.current?.getSortedData() ||
         this.props.differentialResults;
       // const featureIds = tableData.map(featureId => featureId[this.props.differentialFeatureIdKey]);
-      if (tableData.length > this.props.multifeaturePlotMax) {
-        tableData = [...tableData].slice(0, this.props.multifeaturePlotMax);
+      if (tableData.length > this.props.plotMultiFeatureMax) {
+        tableData = [...tableData].slice(0, this.props.plotMultiFeatureMax);
       }
       let elementArray = tableData.map(item => ({
         id: item[differentialFeatureIdKey],
@@ -883,7 +872,6 @@ class DifferentialDetail extends Component {
       direction,
       featuresLength,
       differentialDynamicPlotWidth,
-      hasMultifeaturePlots,
     } = this.state;
 
     const {
@@ -893,28 +881,29 @@ class DifferentialDetail extends Component {
       differentialStudy,
       differentialModel,
       differentialTest,
-      tab,
+      differentialPlotTypes,
+      differentialFeature,
+      differentialFeatureIdKey,
+      differentialHighlightedFeaturesData,
+      differentialHighlightedFeatures,
+      differentialOutlinedFeature,
+      plotMultiFeatureMax,
+      modelSpecificMetaFeaturesExist,
+      onGetPlotTransition,
       plotOverlayVisible,
       plotSingleFeatureData,
       plotSingleFeatureDataLength,
       plotSingleFeatureDataLoaded,
+      plotMultiFeatureAvailable,
       plotMultiFeatureData,
       plotMultiFeatureDataLength,
       plotMultiFeatureDataLoaded,
       svgExportName,
-      differentialPlotTypes,
-      differentialFeature,
-      differentialFeatureIdKey,
-      onGetPlotTransition,
-      differentialHighlightedFeaturesData,
-      differentialHighlightedFeatures,
-      differentialOutlinedFeature,
-      multifeaturePlotMax,
-      modelSpecificMetaFeaturesExist,
+      tab,
     } = this.props;
     // let DifferentialDetailCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-Volcano`;
-    // if (plotMultisetQueriedDifferential) {
-    //   DifferentialDetailCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-${plotMultisetQueriedDifferential}-Volcano`;
+    // if (multisetQueriedDifferential) {
+    //   DifferentialDetailCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-${multisetQueriedDifferential}-Volcano`;
     // }
     const maxWidthPopupStyle = {
       backgroundColor: '2E2E2E',
@@ -1121,7 +1110,7 @@ class DifferentialDetail extends Component {
                           }
                           featuresLength={featuresLength}
                           differentialFeatureIdKey={differentialFeatureIdKey}
-                          multifeaturePlotMax={multifeaturePlotMax}
+                          plotMultiFeatureMax={plotMultiFeatureMax}
                           onGetPlotTransitionRef={onGetPlotTransition}
                           onGetMultifeaturePlotTransitionAlt={
                             this.getMultifeaturePlotTransitionAlt
@@ -1140,7 +1129,9 @@ class DifferentialDetail extends Component {
                           onHandleAllChecked={bool =>
                             this.setState({ allChecked: bool })
                           }
-                          hasMultifeaturePlots={this.props.hasMultifeaturePlots}
+                          plotMultiFeatureAvailable={
+                            this.props.plotMultiFeatureAvailable
+                          }
                         ></PlotsDynamic>
                       </SplitPane>
                       <Grid.Row>
@@ -1222,7 +1213,7 @@ class DifferentialDetail extends Component {
                         <Grid.Column
                           className="ResultsTableWrapper"
                           id={
-                            hasMultifeaturePlots
+                            plotMultiFeatureAvailable
                               ? 'DifferentialResultsTableWrapperCheckboxes'
                               : 'DifferentialResultsTableWrapper'
                           }
@@ -1231,7 +1222,7 @@ class DifferentialDetail extends Component {
                           largeScreen={16}
                           widescreen={16}
                         >
-                          {hasMultifeaturePlots ? (
+                          {plotMultiFeatureAvailable ? (
                             <>
                               <Popup
                                 trigger={

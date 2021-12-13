@@ -34,7 +34,7 @@ class PlotsDynamic extends Component {
   };
 
   render() {
-    const { volcanoPlotVisible, hasMultifeaturePlots } = this.props;
+    const { volcanoPlotVisible, plotMultiFeatureAvailable } = this.props;
     const Toggle = (
       <span
         className="VolcanoPlotToggle"
@@ -69,7 +69,7 @@ class PlotsDynamic extends Component {
 
     let panes = [];
     debugger;
-    if (hasMultifeaturePlots) {
+    if (plotMultiFeatureAvailable) {
       panes = [
         {
           menuItem: 'Single Feature Plots',
@@ -169,7 +169,7 @@ class PlotsDynamic extends Component {
                 differentialHighlightedFeaturesData={
                   this.props.differentialHighlightedFeaturesData
                 }
-                multifeaturePlotMax={this.props.multifeaturePlotMax}
+                plotMultiFeatureMax={this.props.plotMultiFeatureMax}
                 onRemoveSelectedFeature={this.props.onRemoveSelectedFeature}
               />
             </Tab.Pane>

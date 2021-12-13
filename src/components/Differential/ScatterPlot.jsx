@@ -94,14 +94,14 @@ class ScatterPlot extends React.PureComponent {
 
   componentDidMount() {
     const {
-      isDataStreamingResultsTable,
+      differentialResultsTableStreaming,
       differentialResultsUnfiltered,
       volcanoPlotVisible,
       upperPlotsVisible,
       plotOverlayVisible,
     } = this.props;
     // if data streaming is false when mounts, it's cached, so we just need to load everything on mount, because it won't get caught in update
-    if (!isDataStreamingResultsTable) {
+    if (!differentialResultsTableStreaming) {
       this.getAxisLabels();
       window.addEventListener('resize', this.debouncedResizeListener);
       // user opens volcano plot any time after data finishes streaming
@@ -125,7 +125,7 @@ class ScatterPlot extends React.PureComponent {
       upperPlotsHeight,
       volcanoWidth,
       isFilteredDifferential,
-      isDataStreamingResultsTable,
+      differentialResultsTableStreaming,
       differentialResultsUnfiltered,
       // differentialHighlightedFeaturesData,
       volcanoPlotVisible,
@@ -144,8 +144,9 @@ class ScatterPlot extends React.PureComponent {
     } = this.state;
     // this if/else if/else if statement in place to minimize re-renders - should cover all situations
     if (
-      !isDataStreamingResultsTable &&
-      isDataStreamingResultsTable !== prevProps.isDataStreamingResultsTable
+      !differentialResultsTableStreaming &&
+      differentialResultsTableStreaming !==
+        prevProps.differentialResultsTableStreaming
     ) {
       this.getAxisLabels();
       window.addEventListener('resize', this.debouncedResizeListener);
@@ -161,7 +162,7 @@ class ScatterPlot extends React.PureComponent {
         this.setState({ optionsOpen: true });
       }
     } else if (
-      !isDataStreamingResultsTable &&
+      !differentialResultsTableStreaming &&
       (prevState.xAxisLabel !== xAxisLabel ||
         prevState.yAxisLabel !== yAxisLabel ||
         prevState.doXAxisTransformation !== doXAxisTransformation ||
@@ -185,7 +186,7 @@ class ScatterPlot extends React.PureComponent {
           : differentialResultsUnfiltered;
       this.transitionZoom(dataInCurrentView, false, false, false);
     } else if (
-      !isDataStreamingResultsTable &&
+      !differentialResultsTableStreaming &&
       prevProps.filteredDifferentialTableData.length !== 30 &&
       filteredDifferentialTableData.length !==
         prevProps.filteredDifferentialTableData.length
@@ -1198,7 +1199,7 @@ class ScatterPlot extends React.PureComponent {
     }
   }
 
-  updateVolcanoAfterUpsetOrTableFilter(
+  updateVolcanoAfterMultisetOrTableFilter(
     dataInSelection,
     initiatedByTable,
     xScale,
@@ -1250,7 +1251,7 @@ class ScatterPlot extends React.PureComponent {
           )
         : [];
 
-    const dataInViewPassingTableFiltersAndUpset =
+    const dataInViewPassingTableFiltersAndMultiset =
       dataInViewPassingTableFilters.length > 0
         ? dataInViewPassingTableFilters.filter(divptf =>
             differentialResultsFeatureIds.includes(
@@ -1260,11 +1261,11 @@ class ScatterPlot extends React.PureComponent {
         : [];
 
     let irrelevantDataRaw = [];
-    let relevantDataRaw = dataInViewPassingTableFiltersAndUpset || [];
-    if (dataInViewPassingTableFiltersAndUpset.length !== dataInView.length) {
+    let relevantDataRaw = dataInViewPassingTableFiltersAndMultiset || [];
+    if (dataInViewPassingTableFiltersAndMultiset.length !== dataInView.length) {
       irrelevantDataRaw = _.differenceBy(
         dataInView,
-        dataInViewPassingTableFiltersAndUpset,
+        dataInViewPassingTableFiltersAndMultiset,
         differentialFeatureIdKey,
       );
     }
@@ -1332,7 +1333,7 @@ class ScatterPlot extends React.PureComponent {
         circles: unfilteredObject.circles,
       },
       function() {
-        this.updateVolcanoAfterUpsetOrTableFilter(
+        this.updateVolcanoAfterMultisetOrTableFilter(
           allDataInView,
           initiatedByTable,
           xScale,
@@ -1883,9 +1884,9 @@ class ScatterPlot extends React.PureComponent {
       differentialStudy,
       differentialModel,
       differentialTest,
-      isDataStreamingResultsTable,
+      differentialResultsTableStreaming,
       volcanoPlotVisible,
-      hasMultifeaturePlots,
+      plotMultiFeatureAvailable,
     } = this.props;
 
     const {
@@ -1906,7 +1907,7 @@ class ScatterPlot extends React.PureComponent {
 
     const PlotName = `${differentialStudy}_${differentialModel}_${differentialTest}_scatter`;
     if (
-      !isDataStreamingResultsTable &&
+      !differentialResultsTableStreaming &&
       identifier !== null &&
       xAxisLabel !== null &&
       yAxisLabel !== null
@@ -2150,7 +2151,7 @@ class ScatterPlot extends React.PureComponent {
                       </List.Description>
                     </List.Content>
                   </List.Item>
-                  {hasMultifeaturePlots ? (
+                  {plotMultiFeatureAvailable ? (
                     <List.Item>
                       <Icon name="circle" id="SelectedCircleIcon" />
                       <List.Content>
