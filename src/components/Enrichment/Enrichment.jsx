@@ -2091,7 +2091,7 @@ class Enrichment extends Component {
                   />
                 </div>
                 <Grid.Column
-                  className="ResultsTableWrapper"
+                  className="EnrichmentTableWrapper"
                   mobile={16}
                   tablet={16}
                   largeScreen={16}

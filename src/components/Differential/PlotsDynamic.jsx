@@ -20,9 +20,9 @@ class PlotsDynamic extends Component {
   };
 
   handlePlotOverlaySingleFeature = () => {
-    const { plotDataSingleFeature } = this.props;
-    const key = plotDataSingleFeature.key;
-    this.props.onGetPlotTransitionRef(key, null, plotDataSingleFeature, true);
+    const { plotSingleFeatureData } = this.props;
+    const key = plotSingleFeatureData.key;
+    this.props.onGetPlotTransitionRef(key, null, plotSingleFeatureData, true);
   };
 
   handleTabChange = (e, { activeIndex }) => {
@@ -68,6 +68,7 @@ class PlotsDynamic extends Component {
     );
 
     let panes = [];
+    debugger;
     if (hasMultifeaturePlots) {
       panes = [
         {
@@ -94,12 +95,12 @@ class PlotsDynamic extends Component {
                 pxToPtRatio={this.props.pxToPtRatio}
                 pointSize={this.props.pointSize}
                 // plot info
-                plotDataSingleFeatureLength={
-                  this.props.plotDataSingleFeatureLength
+                plotSingleFeatureDataLength={
+                  this.props.plotSingleFeatureDataLength
                 }
-                plotDataSingleFeature={this.props.plotDataSingleFeature}
-                plotDataSingleFeatureLoaded={
-                  this.props.plotDataSingleFeatureLoaded
+                plotSingleFeatureData={this.props.plotSingleFeatureData}
+                plotSingleFeatureDataLoaded={
+                  this.props.plotSingleFeatureDataLoaded
                 }
                 // to determine tabs or dropdowns
                 svgTabMax={this.props.svgTabMax}
@@ -113,7 +114,9 @@ class PlotsDynamic extends Component {
                 }
                 // functional props to call
                 onHandleAllChecked={this.props.onHandleAllChecked}
-                onHandleSelectedVolcano={this.props.onHandleSelectedVolcano}
+                onHandleHighlightedFeaturesDifferential={
+                  this.props.onHandleHighlightedFeaturesDifferential
+                }
                 onGetPlotTransitionRef={this.props.onGetPlotTransitionRef}
               />
             </Tab.Pane>
@@ -137,12 +140,12 @@ class PlotsDynamic extends Component {
                 pxToPtRatio={this.props.pxToPtRatio}
                 pointSize={this.props.pointSize}
                 // plot info
-                plotDataMultiFeatureLength={
-                  this.props.plotDataMultiFeatureLength
+                plotMultiFeatureDataLength={
+                  this.props.plotMultiFeatureDataLength
                 }
-                plotDataMultiFeature={this.props.plotDataMultiFeature}
-                plotDataMultiFeatureLoaded={
-                  this.props.plotDataMultiFeatureLoaded
+                plotMultiFeatureData={this.props.plotMultiFeatureData}
+                plotMultiFeatureDataLoaded={
+                  this.props.plotMultiFeatureDataLoaded
                 }
                 // to determine tabs or dropdowns
                 svgTabMax={this.props.svgTabMax}
@@ -156,13 +159,15 @@ class PlotsDynamic extends Component {
                 }
                 // functional props to call
                 onHandleAllChecked={this.props.onHandleAllChecked}
-                onHandleSelectedVolcano={this.props.onHandleSelectedVolcano}
+                onHandleHighlightedFeaturesDifferential={
+                  this.props.onHandleHighlightedFeaturesDifferential
+                }
                 // multi-feature specific
                 onGetMultifeaturePlotTransitionAlt={
                   this.props.onGetMultifeaturePlotTransitionAlt
                 }
-                HighlightedFeaturesArrVolcano={
-                  this.props.HighlightedFeaturesArrVolcano
+                differentialHighlightedFeaturesData={
+                  this.props.differentialHighlightedFeaturesData
                 }
                 multifeaturePlotMax={this.props.multifeaturePlotMax}
                 onRemoveSelectedFeature={this.props.onRemoveSelectedFeature}
@@ -197,12 +202,12 @@ class PlotsDynamic extends Component {
                 pxToPtRatio={this.props.pxToPtRatio}
                 pointSize={this.props.pointSize}
                 // plot info
-                plotDataSingleFeatureLength={
-                  this.props.plotDataSingleFeatureLength
+                plotSingleFeatureDataLength={
+                  this.props.plotSingleFeatureDataLength
                 }
-                plotDataSingleFeature={this.props.plotDataSingleFeature}
-                plotDataSingleFeatureLoaded={
-                  this.props.plotDataSingleFeatureLoaded
+                plotSingleFeatureData={this.props.plotSingleFeatureData}
+                plotSingleFeatureDataLoaded={
+                  this.props.plotSingleFeatureDataLoaded
                 }
                 // to determine tabs or dropdowns
                 svgTabMax={this.props.svgTabMax}
@@ -216,7 +221,9 @@ class PlotsDynamic extends Component {
                 }
                 // functional props to call
                 onHandleAllChecked={this.props.onHandleAllChecked}
-                onHandleSelectedVolcano={this.props.onHandleSelectedVolcano}
+                onHandleHighlightedFeaturesDifferential={
+                  this.props.onHandleHighlightedFeaturesDifferential
+                }
                 onGetPlotTransitionRef={this.props.onGetPlotTransitionRef}
               />
             </Tab.Pane>

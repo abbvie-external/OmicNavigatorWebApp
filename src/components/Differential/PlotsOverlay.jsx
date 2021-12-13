@@ -32,11 +32,11 @@ class PlotsOverlay extends PureComponent {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    const { plotDataOverlayLength, plotOverlayLoaded } = this.props;
+    const { plotOverlayDataLength, plotOverlayLoaded } = this.props;
     const { activeSVGTabIndexDifferential } = this.state;
     if (
       plotOverlayLoaded &&
-      prevProps.plotDataOverlayLength !== plotDataOverlayLength
+      prevProps.plotOverlayDataLength !== plotOverlayDataLength
     ) {
       this.getSVGPanes();
     }
@@ -86,9 +86,9 @@ class PlotsOverlay extends PureComponent {
   async getSVGPanes() {
     let panes = [];
     let options = [];
-    if (this.props.plotDataOverlay) {
-      if (this.props.plotDataOverlay.svg.length !== 0) {
-        const svgArray = [...this.props.plotDataOverlay.svg];
+    if (this.props.plotOverlayData) {
+      if (this.props.plotOverlayData.svg.length !== 0) {
+        const svgArray = [...this.props.plotOverlayData.svg];
         const svgPanes = svgArray.map(s => {
           return {
             menuItem: `${s.plotType.plotDisplay}`,
@@ -115,7 +115,7 @@ class PlotsOverlay extends PureComponent {
       }
     }
     const isMultifeaturePlot =
-      this.props.plotDataOverlay.key?.includes('features') || false;
+      this.props.plotOverlayData.key?.includes('features') || false;
     if (
       this.props.modelSpecificMetaFeaturesExist !== false &&
       !isMultifeaturePlot
@@ -131,7 +131,7 @@ class PlotsOverlay extends PureComponent {
                 differentialModel={this.props.differentialModel}
                 differentialFeature={this.props.differentialFeature}
                 plotOverlayLoaded={this.props.plotOverlayLoaded}
-                plotDataOverlay={this.props.plotDataOverlay}
+                plotOverlayData={this.props.plotOverlayData}
                 modelSpecificMetaFeaturesExist={
                   this.props.modelSpecificMetaFeaturesExist
                 }
@@ -173,7 +173,7 @@ class PlotsOverlay extends PureComponent {
     } = this.state;
     const {
       plotOverlayLoaded,
-      plotDataOverlay,
+      plotOverlayData,
       tab,
       differentialStudy,
       differentialModel,
@@ -190,7 +190,7 @@ class PlotsOverlay extends PureComponent {
         </div>
       );
     } else {
-      if (this.props.differentialPlotTypes && this.props.plotDataOverlay) {
+      if (this.props.differentialPlotTypes && this.props.plotOverlayData) {
         const DropdownClass =
           this.props.differentialPlotTypes.length > this.props.svgTabMax
             ? 'Show svgPlotDropdownInOverlay'
@@ -235,7 +235,7 @@ class PlotsOverlay extends PureComponent {
                     model={differentialModel}
                     test={differentialTest}
                     feature={differentialFeature}
-                    imageInfo={plotDataOverlay}
+                    imageInfo={plotOverlayData}
                     tabIndex={activeSVGTabIndexDifferentialVar}
                     plot={'DifferentialPlotTabsPlotSVGDiv'}
                   />

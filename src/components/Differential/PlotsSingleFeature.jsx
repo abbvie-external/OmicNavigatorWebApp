@@ -9,7 +9,7 @@ import './PlotsDynamic.scss';
 class PlotsSingleFeature extends Component {
   state = {
     activeIndexPlotTabs: 0,
-    activeSVGTabIndexVolcanoSingleFeature: 0,
+    activeTabIndexPlotsSingleFeature: 0,
     excelFlagSFPlots: true,
     pngFlagSFPlots: true,
     pdfFlagSFPlots: false,
@@ -23,10 +23,10 @@ class PlotsSingleFeature extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    const { activeSVGTabIndexVolcanoSingleFeature } = this.state;
+    const { activeTabIndexPlotsSingleFeature } = this.state;
     if (
-      prevState.activeSVGTabIndexVolcanoSingleFeature !==
-      activeSVGTabIndexVolcanoSingleFeature
+      prevState.activeTabIndexPlotsSingleFeature !==
+      activeTabIndexPlotsSingleFeature
     ) {
       this.setButtonVisibility();
     }
@@ -49,20 +49,20 @@ class PlotsSingleFeature extends Component {
 
   handleTabChangeSingleFeature = (e, { activeIndex }) => {
     this.setState({
-      activeSVGTabIndexVolcanoSingleFeature: activeIndex,
+      activeTabIndexPlotsSingleFeature: activeIndex,
     });
   };
 
   handlePlotDropdownChangeSingleFeature = (e, { value }) => {
     this.setState({
-      activeSVGTabIndexVolcanoSingleFeature: value,
+      activeTabIndexPlotsSingleFeature: value,
     });
   };
 
   handlePlotOverlaySingleFeature = () => {
-    const { plotDataSingleFeature } = this.props;
-    const key = plotDataSingleFeature.key;
-    this.props.onGetPlotTransitionRef(key, null, plotDataSingleFeature, true);
+    const { plotSingleFeatureData } = this.props;
+    const key = plotSingleFeatureData.key;
+    this.props.onGetPlotTransitionRef(key, null, plotSingleFeatureData, true);
   };
 
   getSVGPanesSingleFeature = () => {
@@ -71,7 +71,7 @@ class PlotsSingleFeature extends Component {
       divHeight,
       pxToPtRatio,
       pointSize,
-      plotDataSingleFeature,
+      plotSingleFeatureData,
       modelSpecificMetaFeaturesExist,
       differentialStudy,
       differentialModel,
@@ -89,7 +89,7 @@ class PlotsSingleFeature extends Component {
       const pointSizeString = `&pointsize=${pointSize}`;
       dimensions = `?${divWidthPtString}${divHeightPtString}${pointSizeString}`;
     }
-    const svgArray = plotDataSingleFeature.svg;
+    const svgArray = plotSingleFeatureData.svg;
     const svgPanes = svgArray.map((s, index) => {
       const srcUrl = `${s.svg}${dimensions}`;
       return {
@@ -105,7 +105,7 @@ class PlotsSingleFeature extends Component {
                 cacheRequests={true}
                 src={srcUrl}
                 title={`${s.plotType.plotDisplay}`}
-                uniqueHash="a1f8d1"
+                uniqueHash={`a1f8d1-${index}`}
                 uniquifyIDs={true}
               />
             </div>
@@ -115,7 +115,7 @@ class PlotsSingleFeature extends Component {
     });
     panes = panes.concat(svgPanes);
     const isMultifeaturePlot =
-      plotDataSingleFeature?.key?.includes('features') || false;
+      plotSingleFeatureData?.key?.includes('features') || false;
     if (modelSpecificMetaFeaturesExist !== false && !isMultifeaturePlot) {
       let metafeaturesTab = [
         {
@@ -127,7 +127,7 @@ class PlotsSingleFeature extends Component {
                 differentialStudy={differentialStudy}
                 differentialModel={differentialModel}
                 plotOverlayLoaded={plotOverlayLoaded}
-                plotDataSingleFeature={plotDataSingleFeature}
+                plotSingleFeatureData={plotSingleFeatureData}
                 modelSpecificMetaFeaturesExist={modelSpecificMetaFeaturesExist}
               />
             </Tab.Pane>
@@ -158,9 +158,9 @@ class PlotsSingleFeature extends Component {
 
   render() {
     const {
-      plotDataSingleFeature,
-      plotDataSingleFeatureLength,
-      plotDataSingleFeatureLoaded,
+      plotSingleFeatureData,
+      plotSingleFeatureDataLength,
+      plotSingleFeatureDataLoaded,
       divWidth,
       upperPlotsVisible,
       svgExportName,
@@ -171,7 +171,7 @@ class PlotsSingleFeature extends Component {
     } = this.props;
 
     const {
-      activeSVGTabIndexVolcanoSingleFeature,
+      activeTabIndexPlotsSingleFeature,
       pdfFlagSFPlots,
       pngFlagSFPlots,
       svgFlagSFPlots,
@@ -180,8 +180,8 @@ class PlotsSingleFeature extends Component {
     } = this.state;
     if (upperPlotsVisible) {
       if (
-        plotDataSingleFeatureLength !== 0 &&
-        plotDataSingleFeature.key != null
+        plotSingleFeatureDataLength !== 0 &&
+        plotSingleFeatureData.key != null
       ) {
         const svgPanesSingleFeature = this.getSVGPanesSingleFeature();
         const DropdownClass =
@@ -192,9 +192,9 @@ class PlotsSingleFeature extends Component {
           this.props.differentialPlotTypes?.length > this.props.svgTabMax
             ? 'Hide'
             : 'Show';
-        const activeSVGTabIndexVolcanoSingleFeatureVar =
-          activeSVGTabIndexVolcanoSingleFeature || 0;
-        const svgArray = [...plotDataSingleFeature.svg];
+        const activeTabIndexPlotsSingleFeatureVar =
+          activeTabIndexPlotsSingleFeature || 0;
+        const svgArray = [...plotSingleFeatureData.svg];
         let options = [];
         options = svgArray.map(function(s, index) {
           return {
@@ -204,7 +204,7 @@ class PlotsSingleFeature extends Component {
           };
         });
         const isMultifeaturePlot =
-          this.props.plotDataSingleFeature.key?.includes('features') || false;
+          this.props.plotSingleFeatureData.key?.includes('features') || false;
         if (
           this.props.modelSpecificMetaFeaturesExist !== false &&
           !isMultifeaturePlot
@@ -221,7 +221,7 @@ class PlotsSingleFeature extends Component {
           ];
           options = [...options, ...metafeaturesDropdown];
         }
-        const loader = plotDataSingleFeatureLoaded ? null : (
+        const loader = plotSingleFeatureDataLoaded ? null : (
           <Dimmer active inverted>
             <Loader size="large">Loading Single Feature Plots</Loader>
           </Dimmer>
@@ -237,8 +237,8 @@ class PlotsSingleFeature extends Component {
                 svgVisible={svgFlagSFPlots}
                 txtVisible={txtFlagSFPlots}
                 tab={tab}
-                imageInfo={plotDataSingleFeature}
-                tabIndex={activeSVGTabIndexVolcanoSingleFeatureVar}
+                imageInfo={plotSingleFeatureData}
+                tabIndex={activeTabIndexPlotsSingleFeatureVar}
                 svgExportName={svgExportName}
                 plot="VolcanoPlotSVG"
                 refFwd={
@@ -248,7 +248,7 @@ class PlotsSingleFeature extends Component {
                 study={differentialStudy}
                 model={differentialModel}
                 test={differentialTest}
-                feature={plotDataSingleFeature?.key}
+                feature={plotSingleFeatureData?.key}
               />
             </div>
             <Dropdown
@@ -257,7 +257,7 @@ class PlotsSingleFeature extends Component {
               compact
               options={options}
               value={
-                options[activeSVGTabIndexVolcanoSingleFeatureVar]?.value ||
+                options[activeTabIndexPlotsSingleFeatureVar]?.value ||
                 options[0]?.value
               }
               onChange={this.handlePlotDropdownChangeSingleFeature}
@@ -276,7 +276,7 @@ class PlotsSingleFeature extends Component {
               }}
               panes={svgPanesSingleFeature}
               onTabChange={this.handleTabChange}
-              activeIndex={activeSVGTabIndexVolcanoSingleFeature}
+              activeIndex={activeTabIndexPlotsSingleFeature}
             />
             <span
               className={divWidth < 450 ? 'Hide' : 'Show'}
@@ -297,7 +297,7 @@ class PlotsSingleFeature extends Component {
                 {divWidth >= 625 ? 'FULL SCREEN' : ''}
               </Button>
             </span>
-            <span id="PlotDataSingleFeatureLoader">{loader}</span>
+            <span id="PlotSingleFeatureDataLoader">{loader}</span>
           </div>
         );
       } else {

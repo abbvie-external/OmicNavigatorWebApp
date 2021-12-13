@@ -17,7 +17,7 @@ import './PlotsDynamic.scss';
 
 class PlotsMultiFeature extends Component {
   state = {
-    activeSVGTabIndexVolcanoMultiFeature: 0,
+    activeTabIndexPlotsMultiFeature: 0,
     excelFlagMFPlots: false,
     txtFlagMFPlots: false,
     pdfFlagMFPlots: false,
@@ -28,13 +28,13 @@ class PlotsMultiFeature extends Component {
 
   handleTabChangeMultiFeature = (e, { activeIndex }) => {
     this.setState({
-      activeSVGTabIndexVolcanoMultiFeature: activeIndex,
+      activeTabIndexPlotsMultiFeature: activeIndex,
     });
   };
 
   handlePlotDropdownChangeMultiFeature = (e, { value }) => {
     this.setState({
-      activeSVGTabIndexVolcanoMultiFeature: value,
+      activeTabIndexPlotsMultiFeature: value,
     });
   };
 
@@ -51,24 +51,25 @@ class PlotsMultiFeature extends Component {
       featuresListOpen: false,
     });
     this.props.onHandleAllChecked(false);
-    this.props.onHandleSelectedVolcano([], false);
+    this.props.onHandleHighlightedFeaturesDifferential([], false);
   };
 
   getFeaturesList = () => {
     const {
-      plotDataMultiFeatureLength,
+      plotMultiFeatureDataLength,
       divWidth,
-      HighlightedFeaturesArrVolcano,
+      differentialHighlightedFeaturesData,
       multifeaturePlotMax,
     } = this.props;
     let features = [];
-    const featuresHighlighted = HighlightedFeaturesArrVolcano?.length || null;
+    const featuresHighlighted =
+      differentialHighlightedFeaturesData?.length || null;
     if (featuresHighlighted > 10) {
-      let shortenedArr = [...HighlightedFeaturesArrVolcano].slice(0, 10);
+      let shortenedArr = [...differentialHighlightedFeaturesData].slice(0, 10);
       features = shortenedArr.map(m => m.key);
     } else {
       if (featuresHighlighted > 0) {
-        features = [...HighlightedFeaturesArrVolcano].map(m => m.key);
+        features = [...differentialHighlightedFeaturesData].map(m => m.key);
       }
     }
     const featuresListHorizontalStyle = {
@@ -174,15 +175,15 @@ class PlotsMultiFeature extends Component {
 
   getSVGPanesMultiFeature = () => {
     const {
-      plotDataMultiFeature,
+      plotMultiFeatureData,
       divWidth,
       divHeight,
       pxToPtRatio,
       pointSize,
-      plotDataMultiFeatureLength,
+      plotMultiFeatureDataLength,
     } = this.props;
     let panes = [];
-    if (plotDataMultiFeatureLength !== 0) {
+    if (plotMultiFeatureDataLength !== 0) {
       let dimensions = '';
       if (divWidth && divHeight && pxToPtRatio) {
         const divWidthPadding = divWidth * 0.95;
@@ -194,7 +195,7 @@ class PlotsMultiFeature extends Component {
         const pointSizeString = `&pointsize=${pointSize}`;
         dimensions = `?${divWidthPtString}${divHeightPtString}${pointSizeString}`;
       }
-      const svgArray = plotDataMultiFeature.svg;
+      const svgArray = plotMultiFeatureData.svg;
       const svgPanes = svgArray.map((s, index) => {
         const srcUrl = `${s.svg}${dimensions}`;
         return {
@@ -210,7 +211,7 @@ class PlotsMultiFeature extends Component {
                   cacheRequests={true}
                   src={srcUrl}
                   title={`${s.plotType.plotDisplay}`}
-                  uniqueHash="b2g9e2"
+                  uniqueHash={`b2g9e2-${index}`}
                   uniquifyIDs={true}
                 />
               </div>
@@ -223,16 +224,13 @@ class PlotsMultiFeature extends Component {
     return panes;
   };
 
-  handleTabChangeMultiFeature = (
-    e,
-    { activeSVGTabIndexVolcanoMultiFeature },
-  ) => {
+  handleTabChangeMultiFeature = (e, { activeTabIndexPlotsMultiFeature }) => {
     if (
-      activeSVGTabIndexVolcanoMultiFeature !==
-      this.state.activeSVGTabIndexVolcanoMultiFeature
+      activeTabIndexPlotsMultiFeature !==
+      this.state.activeTabIndexPlotsMultiFeature
     ) {
       this.setState({
-        activeSVGTabIndexVolcanoMultiFeature: activeSVGTabIndexVolcanoMultiFeature,
+        activeTabIndexPlotsMultiFeature: activeTabIndexPlotsMultiFeature,
       });
     }
   };
@@ -249,8 +247,8 @@ class PlotsMultiFeature extends Component {
 
   render() {
     const {
-      plotDataMultiFeature,
-      plotDataMultiFeatureLoaded,
+      plotMultiFeatureData,
+      plotMultiFeatureDataLoaded,
       upperPlotsVisible,
       svgExportName,
       tab,
@@ -258,10 +256,10 @@ class PlotsMultiFeature extends Component {
       differentialPlotTypes,
       svgTabMax,
       modelSpecificMetaFeaturesExist,
-      plotDataMultiFeatureLength,
+      plotMultiFeatureDataLength,
     } = this.props;
     const {
-      activeSVGTabIndexVolcanoMultiFeature,
+      activeTabIndexPlotsMultiFeature,
       pdfFlagMFPlots,
       pngFlagMFPlots,
       svgFlagMFPlots,
@@ -270,8 +268,8 @@ class PlotsMultiFeature extends Component {
     } = this.state;
     if (upperPlotsVisible) {
       if (
-        plotDataMultiFeatureLength !== 0 &&
-        plotDataMultiFeature.key != null
+        plotMultiFeatureDataLength !== 0 &&
+        plotMultiFeatureData.key != null
       ) {
         let options = [];
         const svgPanesMultiFeature = this.getSVGPanesMultiFeature();
@@ -281,9 +279,9 @@ class PlotsMultiFeature extends Component {
             : 'Hide svgPlotDropdown';
         const TabMenuClass =
           differentialPlotTypes.length > svgTabMax ? 'Hide' : 'Show';
-        const activeSVGTabIndexVolcanoMultiFeatureVar =
-          activeSVGTabIndexVolcanoMultiFeature || 0;
-        const svgArray = [...plotDataMultiFeature.svg];
+        const activeTabIndexPlotsMultiFeatureVar =
+          activeTabIndexPlotsMultiFeature || 0;
+        const svgArray = [...plotMultiFeatureData.svg];
         options = svgArray.map(function(s, index) {
           return {
             key: `${index}=VolcanoPlotDropdownOption`,
@@ -292,7 +290,7 @@ class PlotsMultiFeature extends Component {
           };
         });
         const isMultifeaturePlot =
-          plotDataMultiFeature?.key?.includes('features') || false;
+          plotMultiFeatureData?.key?.includes('features') || false;
         if (modelSpecificMetaFeaturesExist !== false && !isMultifeaturePlot) {
           const multiFeaturePlotTypes = differentialPlotTypes.filter(
             p => !p.plotType.includes('multiFeature'),
@@ -308,7 +306,7 @@ class PlotsMultiFeature extends Component {
         }
         let featuresList = null;
         featuresList = this.getFeaturesList();
-        const loader = plotDataMultiFeatureLoaded ? null : (
+        const loader = plotMultiFeatureDataLoaded ? null : (
           <Dimmer active inverted>
             <Loader size="large">Loading Multi-Feature Plots</Loader>
           </Dimmer>
@@ -324,8 +322,8 @@ class PlotsMultiFeature extends Component {
                 svgVisible={svgFlagMFPlots}
                 txtVisible={txtFlagMFPlots}
                 tab={tab}
-                imageInfo={plotDataMultiFeature}
-                tabIndex={activeSVGTabIndexVolcanoMultiFeatureVar}
+                imageInfo={plotMultiFeatureData}
+                tabIndex={activeTabIndexPlotsMultiFeatureVar}
                 svgExportName={svgExportName}
                 plot="VolcanoPlotSVG"
               />
@@ -336,7 +334,7 @@ class PlotsMultiFeature extends Component {
               compact
               options={options}
               value={
-                options[activeSVGTabIndexVolcanoMultiFeatureVar]?.value ||
+                options[activeTabIndexPlotsMultiFeatureVar]?.value ||
                 options[0]?.value
               }
               onChange={this.handlePlotDropdownChangeMultiFeature}
@@ -351,7 +349,7 @@ class PlotsMultiFeature extends Component {
               }}
               panes={svgPanesMultiFeature}
               onTabChange={this.handleTabChangeMultiFeature}
-              activeIndex={activeSVGTabIndexVolcanoMultiFeature}
+              activeIndex={activeTabIndexPlotsMultiFeature}
             />
             {featuresList}
             <span id={divWidth >= 625 ? 'FullScreenButton' : 'FullScreenIcon'}>
@@ -370,7 +368,7 @@ class PlotsMultiFeature extends Component {
                 {divWidth >= 625 ? 'FULL SCREEN' : ''}
               </Button>
             </span>
-            <span id="PlotDataMultiFeatureLoader">{loader}</span>
+            <span id="PlotMultiFeatureDataLoader">{loader}</span>
           </div>
         );
       } else {

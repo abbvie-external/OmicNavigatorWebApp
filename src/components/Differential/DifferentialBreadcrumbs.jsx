@@ -10,7 +10,7 @@ class DifferentialBreadcrumbs extends Component {
   render() {
     const {
       differentialFeature,
-      plotDataOverlay,
+      plotOverlayData,
       onBackToTable,
       differentialFeatureIdKey,
       featuresString,
@@ -18,7 +18,7 @@ class DifferentialBreadcrumbs extends Component {
     let name = splitValue(`${differentialFeatureIdKey} ${differentialFeature}`);
     let longName = `${differentialFeatureIdKey} ${differentialFeature}`;
     if (differentialFeature === '') {
-      name = plotDataOverlay?.title || '';
+      name = plotOverlayData?.title || '';
       longName = featuresString;
     }
     const BreadcrumbPopupStyle = {

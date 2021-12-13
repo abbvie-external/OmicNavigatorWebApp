@@ -126,7 +126,7 @@ class DifferentialSearch extends Component {
     ) {
       this.populateDropdowns();
     }
-    // if (this.props.multisetPlotAvailableDifferential !== prevProps.multisetPlotAvailableDifferential) {
+    // if (this.props.plotMultisetAvailableDifferential !== prevProps.plotMultisetAvailableDifferential) {
     //   this.forceUpdate();
     // }
 
@@ -406,12 +406,12 @@ class DifferentialSearch extends Component {
     const {
       differentialStudy,
       differentialModel,
-      onMultisetQueriedDifferential,
+      onPlotMultisetQueriedDifferential,
       onSearchChangeDifferential,
       onSearchTransitionDifferential,
     } = this.props;
     onSearchTransitionDifferential(true);
-    onMultisetQueriedDifferential(false);
+    onPlotMultisetQueriedDifferential(false);
     const differentialTestMeta = this.props.differentialTestsMetadata.find(
       test => test.testID === value,
     );
@@ -531,7 +531,7 @@ class DifferentialSearch extends Component {
 
   handleMultisetToggleDifferential = () => {
     if (this.state.multisetFiltersVisibleDifferential === false) {
-      this.props.onHandleUpsetVisible(true);
+      this.props.onHandleMultisetFiltersVisible(true);
       const { upsetColsDifferential } = this.props;
       // on toggle open
       if (this.state.selectedColP.length === 0) {
@@ -581,8 +581,8 @@ class DifferentialSearch extends Component {
     } else {
       // on toggle close
       // this.props.onSearchTransitionDifferentialAlt(true);
-      // this.props.onMultisetQueriedDifferential(false);
-      this.props.onHandleUpsetVisible(false);
+      // this.props.onPlotMultisetQueriedDifferential(false);
+      this.props.onHandleMultisetFiltersVisible(false);
       this.setState(
         {
           multisetFiltersVisibleDifferential: false,
@@ -601,7 +601,7 @@ class DifferentialSearch extends Component {
   };
 
   handleErrorGetResultsIntersection = () => {
-    this.props.onHandleVolcanoTableLoading(false);
+    this.props.onHandleResultsTableLoading(false);
   };
 
   multisetTriggeredTestChange = (name, value) => {
@@ -658,7 +658,7 @@ class DifferentialSearch extends Component {
   };
 
   addFilterDifferential = () => {
-    // this.props.onHandleVolcanoTableLoading(true);
+    // this.props.onHandleResultsTableLoading(true);
     // this.setState({ loadingDifferentialMultisetFilters: true });
     // const uSetVP = _.cloneDeep(this.state.uSettingsP);
     const uSetVP = { ...this.state.uSettingsP };
@@ -720,7 +720,7 @@ class DifferentialSearch extends Component {
   };
 
   handleDropdownChange = (evt, { name, value, index }) => {
-    // this.props.onHandleVolcanoTableLoading(true);
+    // this.props.onHandleResultsTableLoading(true);
     const uSelVP = [...this.state[name]];
     uSelVP[index] = {
       key: value,
@@ -775,7 +775,7 @@ class DifferentialSearch extends Component {
     this.setState({
       isFilteredSearch: true,
     });
-    this.props.onHandleVolcanoTableLoading(true);
+    this.props.onHandleResultsTableLoading(true);
     cancelRequestGetResultsIntersection();
     let cancelToken = new CancelToken(e => {
       cancelRequestGetResultsIntersection = e;
@@ -911,8 +911,8 @@ class DifferentialSearch extends Component {
       differentialModel,
       differentialTest,
       isValidSearchDifferential,
-      multisetPlotAvailableDifferential,
-      plotButtonActiveDifferential,
+      plotMultisetAvailableDifferential,
+      plotMultisetBtnActiveDifferential,
       onHandlePlotAnimationDifferential,
       isDataStreamingResultsTable,
     } = this.props;
@@ -1028,7 +1028,7 @@ class DifferentialSearch extends Component {
       PlotRadio = (
         <Fragment>
           <Transition
-            visible={!multisetPlotAvailableDifferential}
+            visible={!plotMultisetAvailableDifferential}
             animation="flash"
             duration={1500}
           >
@@ -1036,11 +1036,11 @@ class DifferentialSearch extends Component {
               toggle
               label="View Plot"
               className={
-                multisetPlotAvailableDifferential ? 'ViewPlotRadio' : ''
+                plotMultisetAvailableDifferential ? 'ViewPlotRadio' : ''
               }
-              checked={plotButtonActiveDifferential}
+              checked={plotMultisetBtnActiveDifferential}
               onChange={onHandlePlotAnimationDifferential('uncover')}
-              disabled={!multisetPlotAvailableDifferential}
+              disabled={!plotMultisetAvailableDifferential}
             />
           </Transition>
           <Popup

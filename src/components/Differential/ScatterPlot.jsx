@@ -98,7 +98,7 @@ class ScatterPlot extends React.PureComponent {
       differentialResultsUnfiltered,
       volcanoPlotVisible,
       upperPlotsVisible,
-      isItemSelected,
+      plotOverlayVisible,
     } = this.props;
     // if data streaming is false when mounts, it's cached, so we just need to load everything on mount, because it won't get caught in update
     if (!isDataStreamingResultsTable) {
@@ -113,7 +113,7 @@ class ScatterPlot extends React.PureComponent {
       this.setupVolcano();
       this.hexBinning(differentialResultsUnfiltered);
       this.transitionZoom(dataInCurrentView, false, false, false);
-      if (volcanoPlotVisible && upperPlotsVisible && !isItemSelected) {
+      if (volcanoPlotVisible && upperPlotsVisible && !plotOverlayVisible) {
         this.setState({ optionsOpen: true });
       }
     }
@@ -121,18 +121,18 @@ class ScatterPlot extends React.PureComponent {
 
   componentDidUpdate(prevProps, prevState) {
     const {
-      volcanoDifferentialTableRowHighlight,
+      differentialHighlightedFeatures,
       upperPlotsHeight,
       volcanoWidth,
       isFilteredDifferential,
       isDataStreamingResultsTable,
       differentialResultsUnfiltered,
-      // HighlightedFeaturesArrVolcano,
+      // differentialHighlightedFeaturesData,
       volcanoPlotVisible,
       upperPlotsVisible,
       filteredDifferentialTableData,
-      volcanoDifferentialTableRowOutline,
-      isItemSelected,
+      differentialOutlinedFeature,
+      plotOverlayVisible,
     } = this.props;
 
     const {
@@ -157,7 +157,7 @@ class ScatterPlot extends React.PureComponent {
       this.setupVolcano();
       this.hexBinning(differentialResultsUnfiltered);
       this.transitionZoom(dataInCurrentView, false, false, false);
-      if (volcanoPlotVisible && upperPlotsVisible && !isItemSelected) {
+      if (volcanoPlotVisible && upperPlotsVisible && !plotOverlayVisible) {
         this.setState({ optionsOpen: true });
       }
     } else if (
@@ -176,7 +176,7 @@ class ScatterPlot extends React.PureComponent {
       this.transitionZoom(this.state.currentResults, false, false, false);
     } else if (
       (prevProps.isFilteredDifferential && !isFilteredDifferential) ||
-      (prevProps.isUpsetVisible && !this.props.isUpsetVisible)
+      (prevProps.multisetFiltersVisible && !this.props.multisetFiltersVisible)
     ) {
       // set analysis "filter" is clicked OR set analysis is toggled off
       const dataInCurrentView =
@@ -203,11 +203,10 @@ class ScatterPlot extends React.PureComponent {
     }
     if (
       !_.isEqual(
-        _.sortBy(volcanoDifferentialTableRowHighlight),
-        _.sortBy(prevProps.volcanoDifferentialTableRowHighlight),
+        _.sortBy(differentialHighlightedFeatures),
+        _.sortBy(prevProps.differentialHighlightedFeatures),
       ) ||
-      volcanoDifferentialTableRowOutline !==
-        prevProps.volcanoDifferentialTableRowOutline
+      differentialOutlinedFeature !== prevProps.differentialOutlinedFeature
     ) {
       this.highlightBrushedCircles();
     }
@@ -375,7 +374,7 @@ class ScatterPlot extends React.PureComponent {
       };
       this.setState({ ...volcanoState });
     }
-    this.props.onHandleVolcanoCurrentSelection(data);
+    this.props.onHandleScatterPlotBoxSelection(data);
     this.setupBrush(volcanoWidth, upperPlotsHeight);
 
     this.props.onHandleUpdateDifferentialResults(differentialResults);
@@ -557,7 +556,7 @@ class ScatterPlot extends React.PureComponent {
                 elem._groups[0][0].attributes.data.value,
               );
               let clickedElems = [
-                ...this.props.volcanoDifferentialTableRowHighlight.filter(
+                ...this.props.differentialHighlightedFeatures.filter(
                   elem => elem !== elemData[differentialFeatureIdKey],
                 ),
               ];
@@ -574,7 +573,7 @@ class ScatterPlot extends React.PureComponent {
                 el => el[differentialFeatureIdKey],
               );
               let allElems = [
-                ...this.props.volcanoDifferentialTableRowHighlight,
+                ...this.props.differentialHighlightedFeatures,
               ].concat(clickedDotFeatureId);
               this.props.onHandleDotClick(e, allElems, 0, false, false);
             }
@@ -709,13 +708,13 @@ class ScatterPlot extends React.PureComponent {
 
   highlightBrushedCircles = () => {
     const {
-      volcanoDifferentialTableRowHighlight,
-      volcanoDifferentialTableRowOutline,
+      differentialHighlightedFeatures,
+      differentialOutlinedFeature,
     } = this.props;
     if (d3.select('#nonfiltered-elements').size() !== 0) {
       if (
-        !volcanoDifferentialTableRowHighlight?.length &&
-        volcanoDifferentialTableRowOutline === ''
+        !differentialHighlightedFeatures?.length &&
+        differentialOutlinedFeature === ''
       ) {
         d3.select('#nonfiltered-elements')
           .selectAll('text')
@@ -751,18 +750,16 @@ class ScatterPlot extends React.PureComponent {
 
   handleCircleLabels = () => {
     const {
-      volcanoDifferentialTableRowHighlight,
-      volcanoDifferentialTableRowOutline,
+      differentialHighlightedFeatures,
+      differentialOutlinedFeature,
     } = this.props;
     const { identifier, circles } = this.state;
-    let combinedCircleFeatureIdsArr = [...volcanoDifferentialTableRowHighlight];
-    if (volcanoDifferentialTableRowOutline !== '') {
-      const volcanoDifferentialTableRowOutlineArr = [
-        volcanoDifferentialTableRowOutline,
-      ];
+    let combinedCircleFeatureIdsArr = [...differentialHighlightedFeatures];
+    if (differentialOutlinedFeature !== '') {
+      const differentialOutlinedFeatureArr = [differentialOutlinedFeature];
       combinedCircleFeatureIdsArr = _.union(
-        [...volcanoDifferentialTableRowHighlight],
-        [...volcanoDifferentialTableRowOutlineArr],
+        [...differentialHighlightedFeatures],
+        [...differentialOutlinedFeatureArr],
       );
     }
 
@@ -798,20 +795,20 @@ class ScatterPlot extends React.PureComponent {
 
   highlightCircles = () => {
     const {
-      volcanoDifferentialTableRowHighlight,
-      volcanoDifferentialTableRowOutline,
+      differentialHighlightedFeatures,
+      differentialOutlinedFeature,
     } = this.props;
-    if (volcanoDifferentialTableRowHighlight?.length > 0) {
-      volcanoDifferentialTableRowHighlight.forEach(element => {
+    if (differentialHighlightedFeatures?.length > 0) {
+      differentialHighlightedFeatures.forEach(element => {
         // style all highlighted circles
         const highlightedCircleId = this.getCircleOrBin(element);
         if (highlightedCircleId) {
           const highlightedCircle = d3.select(highlightedCircleId?.element);
-          let radius = element === volcanoDifferentialTableRowOutline ? 7 : 6;
+          let radius = element === differentialOutlinedFeature ? 7 : 6;
           let stroke =
-            element === volcanoDifferentialTableRowOutline ? '#1678c2' : '#000';
+            element === differentialOutlinedFeature ? '#1678c2' : '#000';
           // let strokeWidth =
-          //   element === volcanoDifferentialTableRowOutline ? 2 : 1;
+          //   element === differentialOutlinedFeature ? 2 : 1;
           if (highlightedCircle != null) {
             if (highlightedCircleId?.type === 'circle') {
               highlightedCircle.attr('stroke', stroke);
@@ -837,12 +834,10 @@ class ScatterPlot extends React.PureComponent {
   };
 
   outlineCircle = () => {
-    const { volcanoDifferentialTableRowOutline } = this.props;
-    if (volcanoDifferentialTableRowOutline) {
+    const { differentialOutlinedFeature } = this.props;
+    if (differentialOutlinedFeature) {
       // style outline highlighted circle
-      const outlinedId = this.getCircleOrBin(
-        volcanoDifferentialTableRowOutline,
-      );
+      const outlinedId = this.getCircleOrBin(differentialOutlinedFeature);
       if (outlinedId) {
         const outlined = d3.select(outlinedId?.element);
         if (outlined != null) {
@@ -1440,7 +1435,7 @@ class ScatterPlot extends React.PureComponent {
           .attr('opacity', 1);
         // ignore selection change if initiated by table filter, it shouldn't change]
         if (initiatedByTable !== true) {
-          this.props.onHandleVolcanoCurrentSelection(allDataInView);
+          this.props.onHandleScatterPlotBoxSelection(allDataInView);
         }
       },
     );
@@ -1645,7 +1640,7 @@ class ScatterPlot extends React.PureComponent {
   };
 
   handleSVGClick() {
-    // this.props.onHandleVolcanoTableLoading(true);
+    // this.props.onHandleResultsTableLoading(true);
     // this.unhighlightBrushedCircles();
     // this.props.onHandleVolcanoPlotSelectionChange(
     //   this.state.currentResults,
@@ -1657,7 +1652,7 @@ class ScatterPlot extends React.PureComponent {
     //   resizeScalarY: 1,
     //   volcanoCircleText: [],
     // });
-    this.props.onHandleSelectedVolcano([], false);
+    this.props.onHandleHighlightedFeaturesDifferential([], false);
   }
 
   getXAxisLabelY(upperPlotsHeight) {
