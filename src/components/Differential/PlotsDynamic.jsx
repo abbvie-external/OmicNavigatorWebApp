@@ -21,8 +21,8 @@ class PlotsDynamic extends Component {
 
   componentDidUpdate(prevProps) {
     if (
-      prevProps.plotSingleFeatureData?.title !==
-      this.props.plotSingleFeatureData?.title
+      prevProps.plotSingleFeatureData?.key !==
+      this.props.plotSingleFeatureData?.key
     ) {
       this.setState({ activeTabIndexPlotsDynamic: 0 });
     }
@@ -30,7 +30,14 @@ class PlotsDynamic extends Component {
       prevProps.plotMultiFeatureData?.title !==
       this.props.plotMultiFeatureData?.title
     ) {
-      this.setState({ activeTabIndexPlotsDynamic: 1 });
+      if (
+        this.props.plotMultiFeatureData?.title === '' ||
+        this.props.differentialHighlightedFeaturesData?.length < 2
+      ) {
+        this.setState({ activeTabIndexPlotsDynamic: 0 });
+      } else {
+        this.setState({ activeTabIndexPlotsDynamic: 1 });
+      }
     }
   }
 

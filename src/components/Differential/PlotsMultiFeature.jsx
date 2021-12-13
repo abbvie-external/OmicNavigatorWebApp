@@ -256,6 +256,7 @@ class PlotsMultiFeature extends Component {
       svgTabMax,
       modelSpecificMetaFeaturesExist,
       plotMultiFeatureDataLength,
+      differentialHighlightedFeaturesData,
     } = this.props;
     const {
       activeTabIndexPlotsMultiFeature,
@@ -268,7 +269,8 @@ class PlotsMultiFeature extends Component {
     if (upperPlotsVisible) {
       if (
         plotMultiFeatureDataLength !== 0 &&
-        plotMultiFeatureData.key != null
+        plotMultiFeatureData.key != null &&
+        differentialHighlightedFeaturesData?.length > 1
       ) {
         let options = [];
         const svgPanesMultiFeature = this.getSVGPanesMultiFeature();
