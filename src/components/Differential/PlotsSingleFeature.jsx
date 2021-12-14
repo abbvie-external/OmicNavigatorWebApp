@@ -195,7 +195,6 @@ class PlotsSingleFeature extends Component {
           activeTabIndexPlotsSingleFeature || 0;
         const svgArray = [...plotSingleFeatureData.svg];
         let options = [];
-        debugger;
         options = svgArray.map(function(s, index) {
           return {
             key: `${index}=VolcanoPlotDropdownOption`,
