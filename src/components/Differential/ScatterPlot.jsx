@@ -1487,15 +1487,31 @@ class ScatterPlot extends React.PureComponent {
           return JSON.parse(a.attributes.data.value);
         });
         const total = [...brushedBins, ...brushedDataArr];
-
         if (!!total.length) {
-          self.transitionZoom(total, false, false, false);
+          let boxSelectionToHighlight = self.mapBoxSelectionToHighlight([
+            ...total,
+          ]);
+          console.log(d3.event);
+          if (boxSelectionToHighlight === null) {
+            self.transitionZoom(total, false, false, false);
+          } else if (
+            d3.event.sourceEvent?.metaKey ||
+            d3.event.sourceEvent?.shiftKey ||
+            d3.event.soureEvent?.ctrlKey
+          ) {
+            self.props.onHandleHighlightedFeaturesDifferential(
+              boxSelectionToHighlight,
+              true,
+            );
+          } else {
+            self.transitionZoom(total, false, false, false);
+          }
+          d3.select('.volcanoPlotD3BrushSelection').call(
+            self.objsBrush.move,
+            null,
+          );
+          self.setState({ brushing: false });
         }
-        d3.select('.volcanoPlotD3BrushSelection').call(
-          self.objsBrush.move,
-          null,
-        );
-        self.setState({ brushing: false });
       }
     };
 
@@ -1510,6 +1526,8 @@ class ScatterPlot extends React.PureComponent {
       ])
       .on('start', brushingStart)
       .on('end', endBrush);
+    // .filter(() => !d3.event.shiftKey)
+    // .keyModifiers(false);
     d3.selectAll('.volcanoPlotD3BrushSelection').call(self.objsBrush);
     const brush = d3
       .select('.volcanoPlotD3BrushSelection')
@@ -1544,6 +1562,20 @@ class ScatterPlot extends React.PureComponent {
       d3.select('.volcanoPlotD3BrushSelection').call(self.objsBrush.move, null);
     }
   }
+
+  mapBoxSelectionToHighlight = total => {
+    debugger;
+    const { plotMultiFeatureAvailable, differentialFeatureIdKey } = this.props;
+    const els = total.map(item => ({
+      id: item.entrez,
+      value: item.entrez,
+      key: item.entrez,
+    }));
+    // if multi-feature plotting is not available, return null to initiate zoom
+    if (!plotMultiFeatureAvailable) {
+      return null;
+    } else return els;
+  };
 
   handleBrushedText = brushed => {
     // MAP brushedDataArr to circle text state
