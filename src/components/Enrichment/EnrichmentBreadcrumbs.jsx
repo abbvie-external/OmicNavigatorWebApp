@@ -70,7 +70,7 @@ class EnrichmentBreadcrumbs extends Component {
       enrichmentsFavicons,
       enrichmentFeatureIdKey,
     } = this.props;
-    const name = this.props.imageInfoEnrichment.title;
+    const name = this.props.plotDataEnrichment.title;
     const BreadcrumbPopupStyle = {
       backgroundColor: '2E2E2E',
       borderBottom: '2px solid var(--color-primary)',

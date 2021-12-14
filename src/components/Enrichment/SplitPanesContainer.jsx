@@ -91,7 +91,7 @@ class SplitPanesContainer extends Component {
       displayViolinPlot,
       enrichmentStudy,
       enrichmentModel,
-      imageInfoEnrichment,
+      plotDataEnrichment,
     } = this.props;
     const { activeViolinTableIndex } = this.state;
     const violinPlot = this.getViolinPlot();
@@ -150,8 +150,8 @@ class SplitPanesContainer extends Component {
     ];
 
     const testVar =
-      imageInfoEnrichment.key !== '' && imageInfoEnrichment.key != null
-        ? imageInfoEnrichment.key.split(':')[0]
+      plotDataEnrichment.key !== '' && plotDataEnrichment.key != null
+        ? plotDataEnrichment.key.split(':')[0]
         : '';
     const selectedPlot = violinAndTablePanes[activeViolinTableIndex].menuItem;
     const ButtonActionsClass = this.getButtonActionsClass();
@@ -179,7 +179,7 @@ class SplitPanesContainer extends Component {
           svgVisible={true}
           txtVisible={false}
           plot={this.props.violinSettings.id}
-          description={imageInfoEnrichment.key}
+          description={plotDataEnrichment.key}
         />
       );
     return (
@@ -288,9 +288,9 @@ class SplitPanesContainer extends Component {
                       pointSize={12}
                       svgTabMax={1}
                       tab={this.props.tab}
-                      imageInfoEnrichment={this.props.imageInfoEnrichment}
-                      imageInfoEnrichmentLength={
-                        this.props.imageInfoEnrichmentLength
+                      plotDataEnrichment={this.props.plotDataEnrichment}
+                      plotDataEnrichmentLength={
+                        this.props.plotDataEnrichmentLength
                       }
                       svgExportName={this.props.svgExportName}
                       enrichmentPlotTypes={this.props.enrichmentPlotTypes}

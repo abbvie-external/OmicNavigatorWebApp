@@ -2,46 +2,26 @@ import React, { Component } from 'react';
 import _ from 'lodash';
 import CustomEmptyMessage from '../Shared/Templates';
 // eslint-disable-next-line no-unused-vars
-import QHGrid, { EZGrid } from '../Shared/QHGrid';
-import DifferentialPlot from './DifferentialPlot';
-import SVGPlot from './SVGPlot';
-import {
-  scrollElement,
-  limitLength,
-  limitLengthOrNull,
-  // dynamicSizeLarger,
-} from '../Shared/helpers';
-import DifferentialVolcanoPlot from './DifferentialVolcanoPlot';
-import {
-  // Form,
-  Grid,
-  // Select,
-  // Checkbox,
-  Popup,
-  Label,
-  Sidebar,
-  // Button,
-  // Transition,
-  Icon,
-  // Button,
-  List,
-} from 'semantic-ui-react';
-// import VolcanoPlotIcon from '../../resources/VolcanoPlotIcon.png';
-// import VolcanoPlotIconSelected from '../../resources/VolcanoPlotIconSelected.png';
+import { EZGrid } from '../Shared/QHGrid';
+import PlotsOverlay from './PlotsOverlay';
+import PlotsDynamic from './PlotsDynamic';
+import { scrollElement } from '../Shared/helpers';
+import ScatterPlot from './ScatterPlot';
+import { Grid, Popup, Label, Sidebar, Icon, List } from 'semantic-ui-react';
 import ButtonActions from '../Shared/ButtonActions';
-import './DifferentialVolcano.scss';
+import './DifferentialDetail.scss';
 import SplitPane from 'react-split-pane';
 
-class DifferentialVolcano extends Component {
+class DifferentialDetail extends Component {
   state = {
     upperPlotsHeight:
-      parseInt(localStorage.getItem('upperPlotsHeight'), 10) || 370,
+      parseInt(localStorage.getItem('upperPlotsHeight'), 10) || 400,
     upperPlotsHeightBackup:
-      parseInt(localStorage.getItem('upperPlotsHeightBackup'), 10) || 370,
+      parseInt(localStorage.getItem('upperPlotsHeightBackup'), 10) || 400,
     upperPlotsDivHeight:
-      parseInt(localStorage.getItem('upperPlotsDivHeight'), 10) || 400,
+      parseInt(localStorage.getItem('upperPlotsDivHeight'), 10) || 440,
     upperPlotsDivHeightBackup:
-      parseInt(localStorage.getItem('upperPlotsDivHeightBackup'), 10) || 400,
+      parseInt(localStorage.getItem('upperPlotsDivHeightBackup'), 10) || 440,
     differentialDynamicPlotWidth:
       parseInt(localStorage.getItem('differentialDynamicPlotWidth'), 10) ||
       document.body.clientWidth * 0.75 - 420,
@@ -68,103 +48,40 @@ class DifferentialVolcano extends Component {
     animation: 'overlay',
     direction: 'right',
     visible: false,
-    volcanoCurrentSelection: [],
+    scatterPlotBoxSelection: [],
     allChecked: false,
-    hasMultifeaturePlots: false,
   };
   volcanoPlotFilteredGridRef = React.createRef();
-  differentialVolcanoPlotRef = React.createRef();
+  ScatterPlotRef = React.createRef();
 
   componentDidMount() {
-    const hasMultifeaturePlots = this.hasMultifeaturePlots();
     this.setState({
-      hasMultifeaturePlots,
       differentialTableData: this.props.differentialResults,
       // volcanoPlotRows: this.props.differentialResults.length,
     });
-    // integrate with streaming
-    // const { featureToHighlightInDiffTable } = this.props;
-    // if (featureToHighlightInDiffTable !== '') {
-    //   const featureToHighlightInDiffTableArr = [
-    //     {
-    //       id: featureToHighlightInDiffTable,
-    //       value: featureToHighlightInDiffTable,
-    //       key: featureToHighlightInDiffTable,
-    //     },
-    //   ];
-    // this.props.onHandleSelectedVolcano(featureToHighlightInDiffTableArr);
-    // this.pageToFeature(featureToHighlightInDiffTable);
-    // this.props.onResetFeatureToHighlightInDiffTable();
-    // }
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps) {
     const { differentialResults } = this.props;
-    // if (prevProps.differentialTest !== differentialTest) {
-    //   this.handleUpperPlotVisability(null, true);
-    // }
-
-    // THIS CODE ISN'T BEING USED NOW, BUT IS BREAKING THE APP IN SOME SITUATIONS, E.G. MULTIPLE COLUMN UPSET FILTERING WITH NO RESULTS
-    // if (this.state.hasMultifeaturePlots) {
-    //   const columnHeader = document.querySelector('[data-id="select"]');
-    //   if (!columnHeader.classList.value.split(' ').includes('th-select')) {
-    //     columnHeader.classList.add('th-select');
-    //     const toggleDiv = document.createElement('div');
-    //     toggleDiv.classList.add('toggleDiv');
-    //     // toggleDiv.onclick = () => {
-    //     //   this.toggleAllCheckboxes();
-    //     // };
-    //     columnHeader.appendChild(toggleDiv);
-    //   }
-    // }
-
     if (prevProps.differentialResults !== differentialResults) {
       let data =
         differentialResults.length !==
-          this.state.volcanoCurrentSelection.length &&
-        !!this.state.volcanoCurrentSelection.length
-          ? this.state.volcanoCurrentSelection
+          this.state.scatterPlotBoxSelection.length &&
+        !!this.state.scatterPlotBoxSelection.length
+          ? this.state.scatterPlotBoxSelection
           : differentialResults;
 
       this.setState({
         allChecked: false,
         differentialTableData: data,
         volcanoPlotRows: data?.length || 0,
-        featuresLength:
-          limitLength(data?.length, this.props.multifeaturePlotMax) || 0,
       });
     }
-
-    // if (
-    //   prevProps.HighlightedFeaturesArrVolcano?.length !==
-    //   this.props.HighlightedFeaturesArrVolcano?.length
-    // ) {
-    //   this.handleTableChange();
-    // }
-
-    // integrate with streaming
-    // if (
-    //   featureToHighlightInDiffTable !== '' &&
-    //   prevProps.featureToHighlightInDiffTable !== featureToHighlightInDiffTable
-    // ) {
-    //   const featureToHighlightInDiffTableArr = [
-    //     {
-    //       id: featureToHighlightInDiffTable,
-    //       value: featureToHighlightInDiffTable,
-    //       key: featureToHighlightInDiffTable,
-    //     },
-    //   ];
-    //   this.props.onHandleSelectedVolcano(featureToHighlightInDiffTableArr);
-    //   this.pageToFeature(featureToHighlightInDiffTable);
-    // }
-    // if (prevProps.isItemSelected !== isItemSelected) {
-    //   this.handlePlotAnimationVolcano('overlay');
-    // }
   }
 
-  handleVolcanoCurrentSelection = currentSelection => {
+  handleScatterPlotBoxSelection = currentSelection => {
     this.setState({
-      volcanoCurrentSelection: currentSelection,
+      scatterPlotBoxSelection: currentSelection,
     });
   };
 
@@ -196,13 +113,11 @@ class DifferentialVolcano extends Component {
     const {
       differentialFeatureIdKey,
       // volcanoDifferentialTableRowMax,
-      volcanoDifferentialTableRowHighlight,
-      volcanoDifferentialTableRowOutline,
+      differentialHighlightedFeatures,
+      differentialOutlinedFeature,
     } = this.props;
     if (
-      volcanoDifferentialTableRowHighlight?.includes(
-        item[differentialFeatureIdKey],
-      )
+      differentialHighlightedFeatures?.includes(item[differentialFeatureIdKey])
     ) {
       className = 'rowHighlightOther';
     }
@@ -211,7 +126,7 @@ class DifferentialVolcano extends Component {
     //   className = 'rowHighlightMax';
     // }
     /* eslint-disable eqeqeq */
-    if (item[differentialFeatureIdKey] === volcanoDifferentialTableRowOutline) {
+    if (item[differentialFeatureIdKey] === differentialOutlinedFeature) {
       id = 'rowOutline';
     }
     return {
@@ -224,13 +139,14 @@ class DifferentialVolcano extends Component {
     volcanoPlotSelectedDataArr,
     clearHighlightedData,
   ) => {
-    this.setState({
-      allChecked: false,
-    });
+    // this.setState({
+    //   allChecked: false,
+    // });
     // clear the highlighted rows/dots/svg on svg double-click
     if (clearHighlightedData) {
       this.pageToFeature();
-      this.props.onHandleSelectedVolcano([]);
+      this.props.onHandleHighlightedFeaturesDifferential([]);
+      this.props.onResetDifferentialOutlinedFeature();
       this.setState({
         differentialTableData: volcanoPlotSelectedDataArr,
       });
@@ -240,88 +156,84 @@ class DifferentialVolcano extends Component {
       i => i[this.props.differentialFeatureIdKey],
     );
     let isOutlinedFeatureInView = allFeatureIdsRemaining.includes(
-      this.props.volcanoDifferentialTableRowOutline,
+      this.props.differentialOutlinedFeature,
     );
     if (volcanoPlotSelectedDataArr.length > 0) {
-      let sortedData =
-        this.volcanoPlotFilteredGridRef?.current?.qhGridRef?.current?.getSortedData() ||
-        this.props.differentialResults;
-      // const sortDataIds = [...sortedData].map(d => d[this.props.differentialFeatureIdKey]);
-      const volcanoPlotDataArrIds = [...volcanoPlotSelectedDataArr].map(
-        d => d[this.props.differentialFeatureIdKey],
-      );
-      const matchCurrentTableOrder = [...sortedData].filter(d =>
-        volcanoPlotDataArrIds.includes(d[this.props.differentialFeatureIdKey]),
-      );
       const self = this;
-      this.setState({
-        differentialTableData: matchCurrentTableOrder,
-        volcanoPlotRows: volcanoPlotSelectedDataArr.length,
-      });
-      let multiselectedFeaturesArrRemaining = [
-        ...volcanoPlotSelectedDataArr,
-      ].filter(item =>
-        self.props.volcanoDifferentialTableRowHighlight.includes(
-          item[self.props.differentialFeatureIdKey],
-        ),
-      );
-      if (multiselectedFeaturesArrRemaining.length) {
-        // if there are multi-selected features in the box selection, reload the svg, single or multi
-        let multiselectedFeaturesArrMappedRemaining = [
-          ...multiselectedFeaturesArrRemaining,
-        ].map(item => ({
-          id: item[self.props.differentialFeatureIdKey],
-          value: item[self.props.differentialFeatureIdKey],
-          key: item[self.props.differentialFeatureIdKey],
-        }));
-        this.props.onHandleSelectedVolcano(
-          multiselectedFeaturesArrMappedRemaining,
-          true,
-        );
-        let multiselectedFeatureIdsMappedRemaining = [
-          ...multiselectedFeaturesArrRemaining,
-        ].map(item => item[self.props.differentialFeatureIdKey]);
-        this.reloadMultifeaturePlot(
-          multiselectedFeatureIdsMappedRemaining,
-          true,
-        );
-        // if the outlined dot is still in the chart, page to it, otherwise clear it's state and page to 0
-        if (isOutlinedFeatureInView) {
-          setTimeout(function() {
-            self.pageToFeature(self.props.volcanoDifferentialTableRowOutline);
-          }, 500);
-        } else {
-          this.props.onClearPlotSelected();
-          this.pageToFeature();
-        }
+      // IF DATA
+      if (isOutlinedFeatureInView) {
+        // PAGE TO OUTLINED FEATURE IF IT REMAINS
+        setTimeout(function() {
+          self.pageToFeature(self.props.differentialOutlinedFeature);
+        }, 500);
       } else {
-        this.props.onHandleSelectedVolcano([]);
-        // there are no multi-selected features in the box selection; check for outligned row and load, or clear svg pane
-        if (isOutlinedFeatureInView) {
-          // this timeout give the table time to load, before paging to the outlined feature
-          setTimeout(function() {
-            self.props.onGetPlot(
-              'Volcano',
-              self.props.volcanoDifferentialTableRowOutline,
-              false,
-              false,
+        // CLEAR OUTLINED FEATURE IF IT DOES NOT REMAIN, AND PAGE TO 0
+        this.props.onResetDifferentialOutlinedFeature();
+        this.pageToFeature();
+      }
+      if (this.props.plotMultiFeatureAvailable) {
+        // IF MULTI-FEATURE PLOTTING AVAILABLE AND THERE IS DATA
+        let sortedData =
+          this.volcanoPlotFilteredGridRef?.current?.qhGridRef?.current?.getSortedData() ||
+          this.props.differentialResults;
+        // const sortDataIds = [...sortedData].map(d => d[this.props.differentialFeatureIdKey]);
+        const volcanoPlotDataArrIds = [...volcanoPlotSelectedDataArr].map(
+          d => d[this.props.differentialFeatureIdKey],
+        );
+        const matchCurrentTableOrder = [...sortedData].filter(d =>
+          volcanoPlotDataArrIds.includes(
+            d[this.props.differentialFeatureIdKey],
+          ),
+        );
+        const self = this;
+        this.setState({
+          differentialTableData: matchCurrentTableOrder,
+          volcanoPlotRows: volcanoPlotSelectedDataArr.length,
+        });
+        let multiselectedFeaturesArrRemaining = [
+          ...volcanoPlotSelectedDataArr,
+        ].filter(item =>
+          self.props.differentialHighlightedFeatures.includes(
+            item[self.props.differentialFeatureIdKey],
+          ),
+        );
+        if (
+          self.props.differentialHighlightedFeatures.length !==
+          multiselectedFeaturesArrRemaining.length
+        ) {
+          // IF CHECKED FEATURES LENGTH IS DIFFERENT THAN EXISTING
+          if (multiselectedFeaturesArrRemaining.length) {
+            // if there are multi-selected features in the box selection, reload the svg, single or multi
+            let multiselectedFeaturesArrMappedRemaining = [
+              ...multiselectedFeaturesArrRemaining,
+            ].map(item => ({
+              id: item[self.props.differentialFeatureIdKey],
+              value: item[self.props.differentialFeatureIdKey],
+              key: item[self.props.differentialFeatureIdKey],
+            }));
+            this.props.onHandleHighlightedFeaturesDifferential(
+              multiselectedFeaturesArrMappedRemaining,
+              true,
             );
-            self.pageToFeature(self.props.volcanoDifferentialTableRowOutline);
-          }, 500);
-        } else {
-          this.props.onClearPlotSelected();
-          this.pageToFeature();
+            let multiselectedFeatureIdsMappedRemaining = [
+              ...multiselectedFeaturesArrRemaining,
+            ].map(item => item[self.props.differentialFeatureIdKey]);
+            this.reloadMultifeaturePlot(
+              multiselectedFeatureIdsMappedRemaining,
+              true,
+            );
+          }
         }
       }
     } else {
       // nothing is in box selection
-      this.props.onHandleSelectedVolcano([]);
-      this.props.onClearPlotSelected();
+      this.props.onHandleHighlightedFeaturesDifferential([]);
+      this.props.onResetDifferentialOutlinedFeature();
+      this.pageToFeature();
       this.setState({
         differentialTableData: [],
         volcanoPlotRows: 0,
       });
-      this.pageToFeature();
     }
   };
 
@@ -347,7 +259,7 @@ class DifferentialVolcano extends Component {
       };
     });
 
-    this.props.onHandleSelectedVolcano(bins);
+    this.props.onHandleHighlightedFeaturesDifferential(bins);
     // console.log('bin', bins[0]);
     this.pageToFeature(
       JSON.parse(item[0].props.data)[differentialFeatureIdKey],
@@ -361,7 +273,6 @@ class DifferentialVolcano extends Component {
     doNotUnhighlight,
     simpleClick,
     elem,
-    removedOutlined,
   ) => {
     const { differentialFeatureIdKey } = this.props;
     if (simpleClick) {
@@ -369,15 +280,18 @@ class DifferentialVolcano extends Component {
       const feature = obj ? obj[differentialFeatureIdKey] : '';
       this.props.onSetPlotSelected(feature);
       this.pageToFeature(event[differentialFeatureIdKey]);
-      this.props.onGetPlot('Volcano', feature, false, false);
+      this.props.onGetPlot('SingleFeature', feature, false, false);
     } else {
-      if (!this.state.hasMultifeaturePlots) return;
+      if (!this.props.plotMultiFeatureAvailable) return;
       let elementArray = items.map(item => ({
         id: item,
         value: item,
         key: item,
       }));
-      this.props.onHandleSelectedVolcano(elementArray, doNotUnhighlight);
+      this.props.onHandleHighlightedFeaturesDifferential(
+        elementArray,
+        doNotUnhighlight,
+      );
       if (items.length) {
         this.pageToFeature(event[differentialFeatureIdKey]);
       }
@@ -385,43 +299,17 @@ class DifferentialVolcano extends Component {
     }
   };
 
-  getTableHelpers = differentialFeatureIdKeyVar => {
-    const self = this;
-    let addParams = {};
-    addParams.showPlotDifferential = (dataItem, alphanumericTrigger) => {
-      return function() {
-        self.setState({
-          volcanoDifferentialTableRowOutline: dataItem[alphanumericTrigger],
-        });
-        self.getPlot('Volcano', dataItem[alphanumericTrigger], false, false);
-      };
-    };
-    addParams.elementId = differentialFeatureIdKeyVar;
-    this.setState({ additionalTemplateInfoDifferentialTable: addParams });
-  };
-
   removeSelectedFeature = featureToRemove => {
-    const { differentialResults, HighlightedFeaturesArrVolcano } = this.props;
-    let sortedData =
-      this.volcanoPlotFilteredGridRef?.current?.qhGridRef?.current?.getSortedData() ||
-      differentialResults;
-    const PreviouslyHighlighted = [...HighlightedFeaturesArrVolcano];
+    const {
+      differentialResults,
+      differentialHighlightedFeaturesData,
+    } = this.props;
+    const PreviouslyHighlighted = [...differentialHighlightedFeaturesData];
     const selectedTableDataArray = PreviouslyHighlighted.filter(
       i => i.id !== featureToRemove,
     );
-    this.props.onHandleSelectedVolcano(selectedTableDataArray);
-    this.setState({
-      featuresLength:
-        limitLengthOrNull(
-          selectedTableDataArray?.length,
-          this.props.multifeaturePlotMax,
-        ) || limitLength(sortedData?.length, this.props.multifeaturePlotMax),
-    });
-    // if (selectedTableDataArray.length === 1) {
-    // less then 2 left
-    // this.props.onClearPlotSelected();
+    this.props.onHandleHighlightedFeaturesDifferential(selectedTableDataArray);
     this.reloadMultifeaturePlot(selectedTableDataArray);
-    // }
   };
 
   reloadMultifeaturePlot = _.debounce((selected, boxSelection) => {
@@ -429,52 +317,34 @@ class DifferentialVolcano extends Component {
       ? selected
       : this.volcanoPlotFilteredGridRef?.current?.qhGridRef?.current?.getSortedData() ||
         this.props.differentialResults;
-    if (selected.length > 1) {
-      if (selected.length) this.props.onHandleMultifeaturePlot('Volcano', data);
-    } else if (selected.length === 1) {
-      this.setState({ allChecked: false });
-      if (this.props.volcanoDifferentialTableRowOutline) {
-        this.props.onGetPlot(
-          'Volcano',
-          this.props.volcanoDifferentialTableRowOutline,
-          false,
-          false,
-        );
-      } else {
-        this.props.onClearPlotSelected();
-        this.pageToFeature();
-      }
-    } else return;
+    if (selected?.length > 1) {
+      this.props.onHandleMultifeaturePlot('MultiFeature', data);
+    }
   }, 1250);
 
   handleRowClick = (event, item, index) => {
     const {
       differentialFeatureIdKey,
-      volcanoDifferentialTableRowOutline,
-      HighlightedFeaturesArrVolcano,
+      differentialOutlinedFeature,
+      differentialHighlightedFeaturesData,
       differentialResults,
     } = this.props;
-    const { hasMultifeaturePlots } = this.state;
+    const { plotMultiFeatureAvailable } = this.props;
     event.persist();
     event.stopPropagation();
-    // console.log('className', event.target.className);
-    // console.log('classList', event.target.classList);
-    // console.log('Event', { event });
-    // console.log(event?.target?.classList?.contains('DifferentialResultsRowCheckbox'));
-    // console.log(event?.target?.classList?.contains('DifferentialResultsRowCheckboxDiv'));
-    // console.log(event?.target?.innerHTML.includes('DifferentialResultsRowCheckboxDiv'));
     if (
       item == null ||
       event?.target?.className === 'ExternalSiteIcon' ||
       event?.target?.className === 'TableCellLink NoSelect' ||
       event?.target?.className === 'TableCellLink'
     ) {
+      // CLICK ON EXTERNAL LINK, OR FEATURE ID PROMPTING PLOT OVERLAY
       return;
     } else {
       let sortedData =
         this.volcanoPlotFilteredGridRef?.current?.qhGridRef?.current?.getSortedData() ||
         differentialResults;
-      const PreviouslyHighlighted = [...HighlightedFeaturesArrVolcano];
+      const PreviouslyHighlighted = [...differentialHighlightedFeaturesData];
       const itemAlreadyHighlighted = PreviouslyHighlighted.some(
         d => d.id === item[differentialFeatureIdKey],
       );
@@ -482,11 +352,12 @@ class DifferentialVolcano extends Component {
       if (PreviouslyHighlighted.length) {
         baseFeature = PreviouslyHighlighted[0]?.id;
       }
-      if (volcanoDifferentialTableRowOutline !== '') {
-        baseFeature = volcanoDifferentialTableRowOutline;
+      if (differentialOutlinedFeature !== '') {
+        baseFeature = differentialOutlinedFeature;
       }
       if (event.shiftKey) {
-        if (!hasMultifeaturePlots) return;
+        // SHIFT CLICK - ADD MULTIPLE FEATURES
+        if (!plotMultiFeatureAvailable) return;
         const currentTableData =
           this.volcanoPlotFilteredGridRef?.current?.qhGridRef.current?.getSortedData() ||
           [];
@@ -516,15 +387,9 @@ class DifferentialVolcano extends Component {
             oldAndNewTableDataArray.map(item => [item[key], item]),
           ).values(),
         ];
-        this.props.onHandleSelectedVolcano(uniqueTableDataArray);
-        this.setState({
-          featuresLength:
-            limitLengthOrNull(
-              uniqueTableDataArray?.length,
-              this.props.multifeaturePlotMax,
-            ) ||
-            limitLength(sortedData?.length, this.props.multifeaturePlotMax),
-        });
+        this.props.onHandleHighlightedFeaturesDifferential(
+          uniqueTableDataArray,
+        );
         this.reloadMultifeaturePlot(uniqueTableDataArray);
       } else if (
         event.ctrlKey ||
@@ -535,7 +400,8 @@ class DifferentialVolcano extends Component {
         ) ||
         event?.target?.innerHTML.includes('DifferentialResultsRowCheckboxDiv')
       ) {
-        if (!hasMultifeaturePlots) return;
+        // CONTROL CLICK OR CLICK IN CHECKBOX CELL CLICK - ADD/REMOVE ONE FEATURE
+        if (!plotMultiFeatureAvailable) return;
         // control-click or click specifically on checkbox
         const currentTableData =
           this.volcanoPlotFilteredGridRef?.current?.qhGridRef.current?.getSortedData() ||
@@ -546,15 +412,9 @@ class DifferentialVolcano extends Component {
           selectedTableDataArray = PreviouslyHighlighted.filter(
             i => i.id !== item[differentialFeatureIdKey],
           );
-          this.props.onHandleSelectedVolcano(selectedTableDataArray);
-          this.setState({
-            featuresLength:
-              limitLengthOrNull(
-                selectedTableDataArray?.length,
-                this.props.multifeaturePlotMax,
-              ) ||
-              limitLength(sortedData?.length, this.props.multifeaturePlotMax),
-          });
+          this.props.onHandleHighlightedFeaturesDifferential(
+            selectedTableDataArray,
+          );
           this.reloadMultifeaturePlot(selectedTableDataArray);
         } else {
           // not yet highlighted, add it to array
@@ -576,33 +436,21 @@ class DifferentialVolcano extends Component {
             PreviouslyHighlighted.push(mappedFeature);
           }
           selectedTableDataArray = [...PreviouslyHighlighted];
-          this.props.onHandleSelectedVolcano(selectedTableDataArray);
-          this.setState({
-            featuresLength:
-              limitLengthOrNull(
-                selectedTableDataArray?.length,
-                this.props.multifeaturePlotMax,
-              ) ||
-              limitLength(sortedData?.length, this.props.multifeaturePlotMax),
-          });
+          this.props.onHandleHighlightedFeaturesDifferential(
+            selectedTableDataArray,
+          );
           this.reloadMultifeaturePlot(selectedTableDataArray);
         }
       } else {
+        // CLICK WITHOUT SHIFT OR CONTROL, NOT IN CHECKBOX CELL
         // if item is already outlined, remove outline and clear plot
-        if (
-          item[differentialFeatureIdKey] === volcanoDifferentialTableRowOutline
-        ) {
-          if (this.props.volcanoDifferentialTableRowHighlight.length) {
-            this.reloadMultifeaturePlot(
-              this.props.volcanoDifferentialTableRowHighlight,
-            );
-          }
-          this.props.onClearPlotSelected();
+        if (item[differentialFeatureIdKey] === differentialOutlinedFeature) {
+          this.props.onResetDifferentialOutlinedFeature();
         } else {
           // simple row click without control nor shift
           this.props.onSetPlotSelected(item[differentialFeatureIdKey]);
           this.props.onGetPlot(
-            'Volcano',
+            'SingleFeature',
             item[differentialFeatureIdKey],
             false,
             false,
@@ -635,7 +483,7 @@ class DifferentialVolcano extends Component {
     });
     // opening the upper plots (use div height backup as new size) or closing the plot (use 1)
     const size = !upperPlotsVisible ? upperPlotsDivHeightBackup : 1;
-    this.onSizeChange(size, 'horizontal');
+    this.handleSizeChange(size, 'horizontal');
   };
 
   handleVolcanoVisability = e => {
@@ -659,10 +507,10 @@ class DifferentialVolcano extends Component {
       volcanoPlotVisible: !volcanoPlotVisible,
     });
     const size = !volcanoPlotVisible ? volcanoDivWidthBackup : 1;
-    this.onSizeChange(size, 'vertical');
+    this.handleSizeChange(size, 'vertical');
   };
 
-  onSizeChange = (newSize, axisDragged) => {
+  handleSizeChange = (newSize, axisDragged) => {
     const { volcanoDivWidth } = this.state;
     const { fwdRefDVC } = this.props;
     const plotSizeAdjustment = Math.round(newSize * 0.92);
@@ -720,137 +568,80 @@ class DifferentialVolcano extends Component {
       i => i[this.props.differentialFeatureIdKey],
     );
     let isOutlinedFeatureInView = allFeatureIdsRemaining.includes(
-      this.props.volcanoDifferentialTableRowOutline,
+      this.props.differentialOutlinedFeature,
     );
-
-    if (!this.hasMultifeaturePlots) {
+    if (sortedFilteredData.length > 0) {
       const self = this;
+      // IF DATA
       if (isOutlinedFeatureInView) {
+        // PAGE TO OUTLINED FEATURE IF IT REMAINS
         setTimeout(function() {
-          self.props.onGetPlot(
-            'Volcano',
-            self.props.volcanoDifferentialTableRowOutline,
-            false,
-            false,
-          );
-          self.pageToFeature(self.props.volcanoDifferentialTableRowOutline);
+          self.pageToFeature(self.props.differentialOutlinedFeature);
         }, 500);
       } else {
-        this.props.onClearPlotSelected();
+        // CLEAR OUTLINED FEATURE IF IT DOES NOT REMAIN, AND PAGE TO 0
+        this.props.onResetDifferentialOutlinedFeature();
         this.pageToFeature();
       }
-      this.setState({
-        featuresLength: 0,
-      });
-    } else {
-      if (sortedFilteredData.length > 0) {
-        const self = this;
+      if (this.props.plotMultiFeatureAvailable) {
+        // IF MULTI-FEATURE PLOTTING AVAILABLE AND THERE IS DATA
         let multiselectedFeaturesArrRemaining = [
           ...sortedFilteredData,
         ].filter(item =>
-          self.props.volcanoDifferentialTableRowHighlight.includes(
+          self.props.differentialHighlightedFeatures.includes(
             item[self.props.differentialFeatureIdKey],
           ),
         );
-        if (multiselectedFeaturesArrRemaining.length) {
-          if (multiselectedFeaturesArrRemaining.length === 1) {
-            this.setState({
-              featuresLength: 1,
-            });
-          } else if (multiselectedFeaturesArrRemaining.length > 1) {
-            this.setState({
-              featuresLength:
-                limitLengthOrNull(
-                  multiselectedFeaturesArrRemaining?.length,
-                  this.props.multifeaturePlotMax,
-                ) ||
-                limitLength(
-                  sortedFilteredData?.length,
-                  this.props.multifeaturePlotMax,
-                ),
-            });
-          }
-          // if there are multi-selected features in the table, reload the svg, single or multi
-          let multiselectedFeaturesArrMappedRemaining = [
-            ...multiselectedFeaturesArrRemaining,
-          ].map(item => ({
-            id: item[self.props.differentialFeatureIdKey],
-            value: item[self.props.differentialFeatureIdKey],
-            key: item[self.props.differentialFeatureIdKey],
-          }));
-          this.props.onHandleSelectedVolcano(
-            multiselectedFeaturesArrMappedRemaining,
-            true,
-          );
-          let multiselectedFeatureIdsMappedRemaining = [
-            ...multiselectedFeaturesArrRemaining,
-          ].map(item => item[self.props.differentialFeatureIdKey]);
-          this.reloadMultifeaturePlot(
-            multiselectedFeatureIdsMappedRemaining,
-            true,
-          );
-          // if the outlined row is still in the table, page to it, otherwise clear it's state and page to 0
-          if (isOutlinedFeatureInView) {
-            setTimeout(function() {
-              self.pageToFeature(self.props.volcanoDifferentialTableRowOutline);
-            }, 500);
+        if (
+          self.props.differentialHighlightedFeatures.length !==
+          multiselectedFeaturesArrRemaining.length
+        ) {
+          // IF CHECKED FEATURES LENGTH IS DIFFERENT THAN EXISTING
+          if (multiselectedFeaturesArrRemaining.length) {
+            // IF CHECKED FEATURES REMAIN, GET NEW SVG
+            let multiselectedFeaturesArrMappedRemaining = [
+              ...multiselectedFeaturesArrRemaining,
+            ].map(item => ({
+              id: item[self.props.differentialFeatureIdKey],
+              value: item[self.props.differentialFeatureIdKey],
+              key: item[self.props.differentialFeatureIdKey],
+            }));
+            this.props.onHandleHighlightedFeaturesDifferential(
+              multiselectedFeaturesArrMappedRemaining,
+              true,
+            );
+            let multiselectedFeatureIdsMappedRemaining = [
+              ...multiselectedFeaturesArrRemaining,
+            ].map(item => item[self.props.differentialFeatureIdKey]);
+            this.reloadMultifeaturePlot(
+              multiselectedFeatureIdsMappedRemaining,
+              true,
+            );
           } else {
-            this.props.onClearPlotSelected();
-            this.pageToFeature();
+            // no highlighted after table filter
+            this.props.onHandleHighlightedFeaturesDifferential([]);
           }
-        } else {
-          this.props.onHandleSelectedVolcano([]);
-          // there are no multi-selected features in the tablen; check for outligned row and load, or clear svg pane
-          if (isOutlinedFeatureInView) {
-            setTimeout(function() {
-              self.props.onGetPlot(
-                'Volcano',
-                self.props.volcanoDifferentialTableRowOutline,
-                false,
-                false,
-              );
-              self.pageToFeature(self.props.volcanoDifferentialTableRowOutline);
-            }, 500);
-          } else {
-            this.props.onClearPlotSelected();
-            this.pageToFeature();
-          }
-          this.setState({
-            featuresLength: 0,
-          });
         }
-      } else {
-        // no highlighted nor outlined features after table filter
-        this.props.onHandleSelectedVolcano([]);
-        this.props.onClearPlotSelected();
-        this.setState({
-          featuresLength: 0,
-        });
-        this.pageToFeature();
       }
+    } else {
+      this.props.onHandleHighlightedFeaturesDifferential([]);
+      this.props.onResetDifferentialOutlinedFeature();
+      this.pageToFeature();
     }
   };
 
-  hasMultifeaturePlots = () => {
-    if (this.props.differentialPlotTypes) {
-      const plotTypesMapped = this.props.differentialPlotTypes.map(
-        p => p.plotType,
-      );
-      return plotTypesMapped.includes('multiFeature') || false;
-    } else return false;
-  };
   toggleAllCheckboxes = () => {
     const { differentialFeatureIdKey } = this.props;
     const { allChecked } = this.state;
     if (allChecked) {
-      this.props.onHandleSelectedVolcano([], false);
+      this.props.onHandleHighlightedFeaturesDifferential([], false);
     } else {
       let tableData =
         this.volcanoPlotFilteredGridRef?.current?.qhGridRef?.current?.getSortedData() ||
         this.props.differentialResults;
       // const featureIds = tableData.map(featureId => featureId[this.props.differentialFeatureIdKey]);
-      if (tableData.length > this.props.multifeaturePlotMax) {
-        tableData = [...tableData].slice(0, this.props.multifeaturePlotMax);
+      if (tableData.length > this.props.plotMultiFeatureMax) {
+        tableData = [...tableData].slice(0, this.props.plotMultiFeatureMax);
       }
       let elementArray = tableData.map(item => ({
         id: item[differentialFeatureIdKey],
@@ -858,7 +649,7 @@ class DifferentialVolcano extends Component {
         key: item[differentialFeatureIdKey],
       }));
 
-      this.props.onHandleSelectedVolcano(elementArray, false);
+      this.props.onHandleHighlightedFeaturesDifferential(elementArray, false);
       this.reloadMultifeaturePlot(elementArray);
     }
     this.setState({
@@ -866,11 +657,11 @@ class DifferentialVolcano extends Component {
     });
   };
 
-  getMultifeaturePlotTransitionRef = () => {
+  getMultifeaturePlotTransitionAlt = () => {
     const tableData =
       this.volcanoPlotFilteredGridRef?.current?.qhGridRef?.current?.getSortedData() ||
       this.props.differentialResults;
-    this.props.onHandleMultifeaturePlot('Differential', tableData, true);
+    this.props.onHandleMultifeaturePlot('Overlay', tableData, true);
   };
 
   render() {
@@ -882,40 +673,42 @@ class DifferentialVolcano extends Component {
       upperPlotsVisible,
       upperPlotsDivHeight,
       volcanoDivWidth,
+      volcanoWidth,
       animation,
       direction,
-      featuresLength,
       differentialDynamicPlotWidth,
-      allChecked,
-      hasMultifeaturePlots,
     } = this.state;
 
     const {
       additionalTemplateInfoDifferentialTable,
       differentialColumns,
-      isVolcanoTableLoading,
+      differentialResultsTableLoading,
       differentialStudy,
       differentialModel,
       differentialTest,
-      tab,
-      isItemSelected,
-      imageInfoVolcano,
-      imageInfoVolcanoLength,
-      svgExportName,
       differentialPlotTypes,
-      tabsMessage,
-      isVolcanoPlotSVGLoaded,
       differentialFeature,
       differentialFeatureIdKey,
+      differentialHighlightedFeaturesData,
+      differentialHighlightedFeatures,
+      differentialOutlinedFeature,
+      plotMultiFeatureMax,
+      modelSpecificMetaFeaturesExist,
       onGetPlotTransition,
-      HighlightedFeaturesArrVolcano,
-      volcanoDifferentialTableRowHighlight,
-      volcanoDifferentialTableRowOutline,
-      multifeaturePlotMax,
+      plotOverlayVisible,
+      plotSingleFeatureData,
+      plotSingleFeatureDataLength,
+      plotSingleFeatureDataLoaded,
+      plotMultiFeatureAvailable,
+      plotMultiFeatureData,
+      plotMultiFeatureDataLength,
+      plotMultiFeatureDataLoaded,
+      svgExportName,
+      tab,
     } = this.props;
-    // let differentialVolcanoCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-Volcano`;
+    // let DifferentialDetailCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-Volcano`;
     // if (multisetQueriedDifferential) {
-    //   differentialVolcanoCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-${multisetQueriedDifferential}-Volcano`;
+    //   DifferentialDetailCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-${multisetQueriedDifferential}-Volcano`;
     // }
     const maxWidthPopupStyle = {
       backgroundColor: '2E2E2E',
@@ -941,22 +734,22 @@ class DifferentialVolcano extends Component {
     const hiddenResizerStyle = {
       display: 'none',
     };
-    const VerticalSidebar = ({ animation, direction, isItemSelected }) => {
+    const VerticalSidebar = ({ animation, direction, plotOverlayVisible }) => {
       const {
         featuresString,
         onBackToTable,
         differentialFeatureIdKey,
         differentialFeature,
-        isItemSVGLoaded,
         metaFeaturesDataDifferential,
         modelSpecificMetaFeaturesExist,
         fwdRefDVC,
-        imageInfoDifferentialLength,
-        imageInfoDifferential,
+        plotOverlayData,
+        plotOverlayDataLength,
+        plotOverlayLoaded,
         differentialPlotTypes,
         differentialTests,
       } = this.props;
-      if (isItemSelected) {
+      if (plotOverlayVisible) {
         return (
           <Sidebar
             as={'div'}
@@ -964,23 +757,23 @@ class DifferentialVolcano extends Component {
             direction={direction}
             icon="labeled"
             vertical="true"
-            visible={isItemSelected}
+            visible={plotOverlayVisible}
             width="very wide"
             className="VerticalSidebarPlot"
           >
-            <DifferentialPlot
+            <PlotsOverlay
               featuresString={featuresString}
               onBackToTable={onBackToTable}
               differentialFeatureIdKey={differentialFeatureIdKey}
               differentialFeature={differentialFeature}
-              isItemSVGLoaded={isItemSVGLoaded}
               metaFeaturesDataDifferential={metaFeaturesDataDifferential}
               modelSpecificMetaFeaturesExist={
                 modelSpecificMetaFeaturesExist || false
               }
               fwdRefDVC={fwdRefDVC}
-              imageInfoDifferentialLength={imageInfoDifferentialLength || 0}
-              imageInfoDifferential={imageInfoDifferential}
+              plotOverlayDataLength={plotOverlayDataLength || 0}
+              plotOverlayData={plotOverlayData}
+              plotOverlayLoaded={plotOverlayLoaded}
               differentialPlotTypes={differentialPlotTypes}
               svgTabMax={4}
               tab={tab}
@@ -988,7 +781,7 @@ class DifferentialVolcano extends Component {
               differentialModel={differentialModel}
               differentialTest={differentialTest}
               differentialTests={differentialTests}
-            ></DifferentialPlot>
+            ></PlotsOverlay>
           </Sidebar>
         );
       } else return null;
@@ -1024,7 +817,7 @@ class DifferentialVolcano extends Component {
           <VerticalSidebar
             animation={animation}
             direction={direction}
-            isItemSelected={isItemSelected}
+            plotOverlayVisible={plotOverlayVisible}
           />
           <Sidebar.Pusher>
             <div>
@@ -1042,7 +835,7 @@ class DifferentialVolcano extends Component {
                       minSize={400}
                       maxSize={1000}
                       onDragFinished={size =>
-                        this.onSizeChange(size, 'horizontal')
+                        this.handleSizeChange(size, 'horizontal')
                       }
                     >
                       <SplitPane
@@ -1062,11 +855,11 @@ class DifferentialVolcano extends Component {
                         minSize={350}
                         maxSize={1800}
                         onDragFinished={size =>
-                          this.onSizeChange(size, 'vertical')
+                          this.handleSizeChange(size, 'vertical')
                         }
                       >
-                        <DifferentialVolcanoPlot
-                          ref={this.differentialVolcanoPlotRef}
+                        <ScatterPlot
+                          ref={this.ScatterPlotRef}
                           {...this.state}
                           {...this.props}
                           onHandleVolcanoPlotSelectionChange={
@@ -1075,41 +868,58 @@ class DifferentialVolcano extends Component {
                           // getMaxAndMin={this.getMaxAndMin}
                           onHandleDotClick={this.handleDotClick}
                           onPageToFeature={this.pageToFeature}
-                          onHandleVolcanoCurrentSelection={
-                            this.handleVolcanoCurrentSelection
+                          onHandleScatterPlotBoxSelection={
+                            this.handleScatterPlotBoxSelection
                           }
-                          onClearPlotSelected={this.props.onClearPlotSelected}
-                        ></DifferentialVolcanoPlot>
-                        <SVGPlot
+                          onResetDifferentialOutlinedFeature={
+                            this.props.onResetDifferentialOutlinedFeature
+                          }
+                        ></ScatterPlot>
+                        <PlotsDynamic
+                          modelSpecificMetaFeaturesExist={
+                            modelSpecificMetaFeaturesExist || false
+                          }
                           differentialStudy={differentialStudy}
                           differentialModel={differentialModel}
                           differentialTest={differentialTest}
                           differentialFeature={differentialFeature}
-                          divWidth={differentialDynamicPlotWidth}
-                          divHeight={upperPlotsDivHeight}
                           pxToPtRatio={105}
                           pointSize={12}
                           svgTabMax={0}
                           tab={tab}
-                          volcanoWidth={volcanoDivWidth}
+                          upperPlotsDivHeight={upperPlotsDivHeight}
                           upperPlotsHeight={upperPlotsDivHeight}
+                          differentialDynamicPlotWidth={
+                            differentialDynamicPlotWidth
+                          }
+                          volcanoDivWidth={volcanoDivWidth}
+                          volcanoWidth={volcanoWidth}
                           volcanoPlotVisible={volcanoPlotVisible}
                           upperPlotsVisible={upperPlotsVisible}
-                          imageInfoVolcano={imageInfoVolcano}
-                          imageInfoVolcanoLength={imageInfoVolcanoLength}
+                          plotSingleFeatureData={plotSingleFeatureData}
+                          plotSingleFeatureDataLength={
+                            plotSingleFeatureDataLength
+                          }
+                          plotSingleFeatureDataLoaded={
+                            plotSingleFeatureDataLoaded
+                          }
+                          plotMultiFeatureData={plotMultiFeatureData}
+                          plotMultiFeatureDataLength={
+                            plotMultiFeatureDataLength
+                          }
+                          plotMultiFeatureDataLoaded={
+                            plotMultiFeatureDataLoaded
+                          }
                           svgExportName={svgExportName}
                           differentialPlotTypes={differentialPlotTypes}
-                          tabsMessage={tabsMessage}
-                          isVolcanoPlotSVGLoaded={isVolcanoPlotSVGLoaded}
-                          HighlightedFeaturesArrVolcano={
-                            HighlightedFeaturesArrVolcano
+                          differentialHighlightedFeaturesData={
+                            differentialHighlightedFeaturesData
                           }
-                          featuresLength={featuresLength}
                           differentialFeatureIdKey={differentialFeatureIdKey}
-                          multifeaturePlotMax={multifeaturePlotMax}
+                          plotMultiFeatureMax={plotMultiFeatureMax}
                           onGetPlotTransitionRef={onGetPlotTransition}
-                          onGetMultifeaturePlotTransitionRef={
-                            this.getMultifeaturePlotTransitionRef
+                          onGetMultifeaturePlotTransitionAlt={
+                            this.getMultifeaturePlotTransitionAlt
                           }
                           // onHandleMultifeaturePlotRef={
                           //   onHandleMultifeaturePlot
@@ -1117,15 +927,20 @@ class DifferentialVolcano extends Component {
                           onHandleVolcanoVisability={
                             this.handleVolcanoVisability
                           }
-                          onHandleSelectedVolcano={
-                            this.props.onHandleSelectedVolcano
+                          onHandleHighlightedFeaturesDifferential={
+                            this.props.onHandleHighlightedFeaturesDifferential
                           }
-                          onClearPlotSelected={this.props.onClearPlotSelected}
+                          onResetDifferentialOutlinedFeature={
+                            this.props.onResetDifferentialOutlinedFeature
+                          }
                           onRemoveSelectedFeature={this.removeSelectedFeature}
                           onHandleAllChecked={bool =>
                             this.setState({ allChecked: bool })
                           }
-                        ></SVGPlot>
+                          plotMultiFeatureAvailable={
+                            this.props.plotMultiFeatureAvailable
+                          }
+                        ></PlotsDynamic>
                       </SplitPane>
                       <Grid.Row>
                         <span
@@ -1154,18 +969,7 @@ class DifferentialVolcano extends Component {
                           </Label>
                         </span>
                         <div className="AbsoluteLegendDifferential NoSelect">
-                          {/* {volcanoDifferentialTableRowHighlight?.length > 0 &&
-                          volcanoDifferentialTableRowOutline ? (
-                            <Popup
-                              trigger={<Label circular id="MaxCircle" />}
-                              style={maxWidthPopupStyle}
-                              // content="Row is dark orange when the feature is selected, and has the lowest index in the current sort"
-                              content="Selected, and plots displayed"
-                              inverted
-                              basic
-                            />
-                          ) : null} */}
-                          {volcanoDifferentialTableRowOutline ? (
+                          {differentialOutlinedFeature ? (
                             <Popup
                               trigger={
                                 <Icon
@@ -1181,7 +985,7 @@ class DifferentialVolcano extends Component {
                               basic
                             />
                           ) : null}
-                          {volcanoDifferentialTableRowHighlight?.length > 0 ? (
+                          {differentialHighlightedFeatures?.length > 0 ? (
                             <Popup
                               trigger={
                                 <Icon
@@ -1217,7 +1021,7 @@ class DifferentialVolcano extends Component {
                         <Grid.Column
                           className="ResultsTableWrapper"
                           id={
-                            hasMultifeaturePlots
+                            plotMultiFeatureAvailable
                               ? 'DifferentialResultsTableWrapperCheckboxes'
                               : 'DifferentialResultsTableWrapper'
                           }
@@ -1226,7 +1030,7 @@ class DifferentialVolcano extends Component {
                           largeScreen={16}
                           widescreen={16}
                         >
-                          {hasMultifeaturePlots ? (
+                          {plotMultiFeatureAvailable ? (
                             <>
                               <Popup
                                 trigger={
@@ -1254,7 +1058,7 @@ class DifferentialVolcano extends Component {
                           ) : null}
                           <EZGrid
                             ref={this.volcanoPlotFilteredGridRef}
-                            // uniqueCacheKey={differentialVolcanoCacheKey}
+                            // uniqueCacheKey={DifferentialDetailCacheKey}
                             className="VolcanoPlotTable"
                             // note, default is 70vh; if you want a specific vh, specify like "40vh"; "auto" lets the height flow based on items per page
                             // height="auto"
@@ -1269,7 +1073,7 @@ class DifferentialVolcano extends Component {
                             disableGrouping
                             disableColumnVisibilityToggle
                             // exportBaseName="VolcanoPlot_Filtered_Results"
-                            loading={isVolcanoTableLoading}
+                            loading={differentialResultsTableLoading}
                             additionalTemplateInfo={
                               additionalTemplateInfoDifferentialTable
                             }
@@ -1293,4 +1097,4 @@ class DifferentialVolcano extends Component {
     );
   }
 }
-export default DifferentialVolcano;
+export default DifferentialDetail;

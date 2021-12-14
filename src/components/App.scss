@@ -198,6 +198,10 @@
   .ui.menu .orange.active.item {
     color: #fff !important;
     background-color: var(--color-primary) !important;
+    border-width: 3px !important;
+  }
+  .ui.secondary.pointing.menu .item {
+    border-width: 3px !important;
   }
 
   #rowOutline {

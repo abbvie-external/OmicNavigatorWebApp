@@ -5,10 +5,10 @@ export function updateUrl(
   stateChanges,
   type,
   optionalCallback,
-  searchCriteriaChange,
+  SearchChange,
   scTab,
 ) {
-  if (!searchCriteriaChange) {
+  if (!SearchChange) {
     // const [urlVar, setUrlFunc] = useState('/differential');
     let tab, tabIndex, lastTabIndex;
     // clear url

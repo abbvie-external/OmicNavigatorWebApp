@@ -6,7 +6,7 @@ import './MetafeaturesTable.scss';
 import { omicNavigatorService } from '../../services/omicNavigator.service';
 // import { CancelToken } from 'axios';
 // eslint-disable-next-line no-unused-vars
-import QHGrid, { EZGrid } from '../Shared/QHGrid';
+import { EZGrid } from '../Shared/QHGrid';
 
 class MetafeaturesTable extends Component {
   state = {
@@ -22,7 +22,7 @@ class MetafeaturesTable extends Component {
   componentDidMount() {
     console.log('mounted');
     const isMultifeaturePlot =
-      this.props.imageInfoDifferential.key?.includes('features') || false;
+      this.props.plotOverlayData.key?.includes('features') || false;
     if (
       this.props.modelSpecificMetaFeaturesExist !== false &&
       !isMultifeaturePlot
@@ -34,7 +34,7 @@ class MetafeaturesTable extends Component {
   async getMetafeaturesData() {
     const cachedMetafeaturesData = JSON.parse(
       sessionStorage.getItem(
-        `MetafeaturesData-${this.props.imageInfoDifferential.key}`,
+        `MetafeaturesData-${this.props.plotOverlayData.key}`,
       ),
     );
     let metaFeaturesDataDifferential = [];
@@ -47,7 +47,7 @@ class MetafeaturesTable extends Component {
       );
       metaFeaturesDataDifferential = data != null ? data : [];
       sessionStorage.setItem(
-        `MetafeaturesData-${this.props.imageInfoDifferential.key}`,
+        `MetafeaturesData-${this.props.plotOverlayData.key}`,
         JSON.stringify(metaFeaturesDataDifferential),
       );
       this.getMetafeaturesTableConfigCols(metaFeaturesDataDifferential);
