@@ -14,7 +14,7 @@ import { CancelToken } from 'axios';
 import '../Shared/Search.scss';
 import { omicNavigatorService } from '../../services/omicNavigator.service';
 import EnrichmentMultisetFilters from './EnrichmentMultisetFilters';
-import { getDynamicSize } from '../Shared/helpers';
+import { getDynamicSize, getWindowWidth } from '../Shared/helpers';
 
 let cancelRequestGetReportLinkEnrichment = () => {};
 // let cancelGetEnrichmentsTable = () => {};
@@ -1084,6 +1084,10 @@ class EnrichmentSearch extends Component {
     let MultisetRadio;
 
     if (isValidSearchEnrichment) {
+      const WindowWidth = getWindowWidth();
+      const QuarterWindowWidth = getWindowWidth() / 4;
+      const PlotLabel =
+        QuarterWindowWidth > 350 || WindowWidth < 1200 ? 'View Plot' : 'Plot';
       PlotRadio = (
         <Fragment>
           <Transition
@@ -1093,7 +1097,7 @@ class EnrichmentSearch extends Component {
           >
             <Radio
               toggle
-              label="View Plot"
+              label={PlotLabel}
               className={multisetPlotAvailableEnrichment ? 'ViewPlotRadio' : ''}
               checked={plotButtonActiveEnrichment}
               onChange={this.props.onHandlePlotAnimationEnrichment('uncover')}
