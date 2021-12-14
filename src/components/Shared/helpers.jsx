@@ -339,6 +339,10 @@ export const loadingDimmer = (
   </Dimmer>
 );
 
+export function getWindowWidth() {
+  return Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+}
+
 export function getDynamicSize() {
   let w = Math.max(
     document.documentElement.clientWidth,

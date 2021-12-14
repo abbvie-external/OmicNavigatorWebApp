@@ -13,7 +13,7 @@ import {
 // import _ from 'lodash';
 import ndjsonStream from 'can-ndjson-stream';
 import { CancelToken } from 'axios';
-import { getDynamicSize } from '../Shared/helpers';
+import { getDynamicSize, getWindowWidth } from '../Shared/helpers';
 import '../Shared/Search.scss';
 import { omicNavigatorService } from '../../services/omicNavigator.service';
 import DifferentialMultisetFilters from './DifferentialMultisetFilters';
@@ -1027,6 +1027,10 @@ class DifferentialSearch extends Component {
     let MultisetRadio;
 
     if (isValidSearchDifferential) {
+      const WindowWidth = getWindowWidth();
+      const QuarterWindowWidth = getWindowWidth() / 4;
+      const PlotLabel =
+        QuarterWindowWidth > 350 || WindowWidth < 1200 ? 'View Plot' : 'Plot';
       PlotRadio = (
         <Fragment>
           <Transition
@@ -1036,7 +1040,7 @@ class DifferentialSearch extends Component {
           >
             <Radio
               toggle
-              label="View Plot"
+              label={PlotLabel}
               className={plotMultisetLoadedDifferential ? 'ViewPlotRadio' : ''}
               checked={multisetButttonActiveDifferential}
               onChange={onHandlePlotAnimationDifferential('uncover')}
@@ -1086,7 +1090,7 @@ class DifferentialSearch extends Component {
             trigger={
               <Radio
                 toggle
-                label="Set Analysis"
+                label="SetAnalysis"
                 checked={multisetFiltersVisibleDifferential}
                 onChange={this.handleMultisetToggleDifferential}
                 disabled={differentialResultsTableStreaming}

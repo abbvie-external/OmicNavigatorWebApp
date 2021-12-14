@@ -4,6 +4,7 @@ import { withRouter } from 'react-router-dom';
 import { CancelToken } from 'axios';
 import { Grid, Menu, Popup, Sidebar, Tab, Message } from 'semantic-ui-react';
 import SVG from 'react-inlinesvg';
+import { toast } from 'react-toastify';
 import networkIcon from '../../resources/networkIcon.png';
 import networkIconSelected from '../../resources/networkIconSelected.png';
 import tableIcon from '../../resources/tableIcon.png';
@@ -492,6 +493,59 @@ class Enrichment extends Component {
         );
         this.setState({
           enrichmentPlotTypes: enrichmentModelData.plots,
+        });
+      }
+    }
+  };
+
+  handlePlotTypesEnrichment = enrichmentModel => {
+    if (enrichmentModel !== '') {
+      if (this.state.enrichmentStudyMetadata?.plots != null) {
+        const enrichmentModelData = this.state.enrichmentStudyMetadata.plots.find(
+          model => model.modelID === enrichmentModel,
+        );
+        const enrichmentPlotTypesRaw = enrichmentModelData?.plots;
+        // filter out invalid plots - plotType string must be 'singleFeature', 'multiFeature', 'singleTest', 'multiTest'
+        const enrichmentPlotTypesVar = [...enrichmentPlotTypesRaw].filter(
+          plot => {
+            let plotTypeArr = plot?.plotType || null;
+            const convertStringToArray = object => {
+              return typeof object === 'string' ? Array(object) : object;
+            };
+            if (plotTypeArr) {
+              plotTypeArr = convertStringToArray(plot.plotType);
+            }
+            const isValidPlotType = pt => {
+              return (
+                pt === 'singleFeature' ||
+                pt === 'multiFeature' ||
+                pt === 'singleTest' ||
+                pt === 'multiTest'
+              );
+            };
+            const valid = plotTypeArr.every(isValidPlotType);
+            if (!valid) {
+              console.log(
+                `Skipping ${plot?.plotID} because it has unknown plotType ${plot.plotType}`,
+              );
+              toast.error(
+                `Skipping ${plot?.plotID} because it has unknown plotType ${plot.plotType}`,
+              );
+            }
+            return valid;
+          },
+        );
+        let plotMultiFeatureAvailableVar = false;
+        if (enrichmentPlotTypesVar) {
+          const plotTypesMapped = [...enrichmentPlotTypesVar].map(
+            p => p.plotType,
+          );
+          plotMultiFeatureAvailableVar =
+            plotTypesMapped?.includes('multiFeature') || false;
+        }
+        this.setState({
+          enrichmentPlotTypes: enrichmentPlotTypesVar,
+          plotMultiFeatureAvailable: plotMultiFeatureAvailableVar,
         });
       }
     }

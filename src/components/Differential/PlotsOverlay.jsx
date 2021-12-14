@@ -133,6 +133,7 @@ class PlotsOverlay extends PureComponent {
         this.props.modelSpecificMetaFeaturesExist !== false &&
         !isMultifeaturePlot
       ) {
+        // METAFEATURES TAB ONLY AVAILABLE WHEN MODEL SPECIFIC METAFEATURES EXIST, FOR SINGLE FEATURE PLOTS
         let metafeaturesTab = [
           {
             menuItem: 'Feature Data',

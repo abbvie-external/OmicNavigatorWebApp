@@ -226,16 +226,53 @@ class Differential extends Component {
         const differentialModelData = this.state.differentialStudyMetadata.plots.find(
           model => model.modelID === differentialModel,
         );
-        let plotMultiFeatureAvailableVar = this.handlePlotMultiFeatureAvailable(
-          differentialModelData?.plots,
+        const differentialPlotTypesRaw = differentialModelData?.plots;
+        // filter out invalid plots - plotType string must be 'singleFeature', 'multiFeature', 'singleTest', 'multiTest'
+        const differentialPlotTypesVar = [...differentialPlotTypesRaw].filter(
+          plot => {
+            let plotTypeArr = plot?.plotType || null;
+            const convertStringToArray = object => {
+              return typeof object === 'string' ? Array(object) : object;
+            };
+            if (plotTypeArr) {
+              plotTypeArr = convertStringToArray(plot.plotType);
+            }
+            const isValidPlotType = pt => {
+              return (
+                pt === 'singleFeature' ||
+                pt === 'multiFeature' ||
+                pt === 'singleTest' ||
+                pt === 'multiTest'
+              );
+            };
+            const valid = plotTypeArr.every(isValidPlotType);
+            if (!valid) {
+              console.log(
+                `Skipping ${plot?.plotID} because it has unknown plotType ${plot.plotType}`,
+              );
+              toast.error(
+                `Skipping ${plot?.plotID} because it has unknown plotType ${plot.plotType}`,
+              );
+            }
+            return valid;
+          },
         );
+        let plotMultiFeatureAvailableVar = false;
+        if (differentialPlotTypesVar) {
+          const plotTypesMapped = [...differentialPlotTypesVar].map(
+            p => p.plotType,
+          );
+          plotMultiFeatureAvailableVar =
+            plotTypesMapped?.includes('multiFeature') || false;
+        }
         this.setState({
-          differentialPlotTypes: differentialModelData?.plots,
+          differentialPlotTypes: differentialPlotTypesVar,
           plotMultiFeatureAvailable: plotMultiFeatureAvailableVar,
         });
       }
     }
   };
+
   handleSearchChangeDifferential = (changes, scChange) => {
     this.props.onHandleUrlChange(changes, 'differential');
     this.setState({
@@ -1142,13 +1179,6 @@ class Differential extends Component {
       plotSingleFeatureDataLoaded: false,
       plotMultiFeatureDataLoaded: true,
     });
-  };
-
-  handlePlotMultiFeatureAvailable = differentialPlotTypes => {
-    if (differentialPlotTypes) {
-      const plotTypesMapped = differentialPlotTypes.map(p => p.plotType);
-      return plotTypesMapped?.includes('multiFeature') || false;
-    } else return false;
   };
 
   getConfigCols = testData => {
