@@ -61,6 +61,11 @@ class PlotsMultiFeature extends Component {
       plotMultiFeatureMax,
     } = this.props;
     let features = [];
+    // const uniqueFeaturesHighlighted = [
+    //   ...new Map(
+    //     differentialHighlightedFeaturesData.map(item => [item.id, item]),
+    //   ).values(),
+    // ];
     const featuresHighlighted =
       differentialHighlightedFeaturesData?.length || null;
     if (featuresHighlighted > 10) {
