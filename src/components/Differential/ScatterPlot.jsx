@@ -177,7 +177,8 @@ class ScatterPlot extends React.PureComponent {
       this.transitionZoom(this.state.currentResults, false, false, false);
     } else if (
       (prevProps.isFilteredDifferential && !isFilteredDifferential) ||
-      (prevProps.multisetFiltersVisible && !this.props.multisetFiltersVisible)
+      (prevProps.multisetFiltersVisibleParentRef &&
+        !this.props.multisetFiltersVisibleParentRef)
     ) {
       // set analysis "filter" is clicked OR set analysis is toggled off
       const dataInCurrentView =
@@ -661,7 +662,7 @@ class ScatterPlot extends React.PureComponent {
     }
   };
 
-  removeViolinBrush = () => {
+  removeScatterBrush = () => {
     const brush = d3
       .select('.volcanoPlotD3BrushSelection')
       .selectAll('rect.selection');
@@ -676,7 +677,7 @@ class ScatterPlot extends React.PureComponent {
   };
 
   resizeBrushSelection = () => {
-    this.removeViolinBrush();
+    this.removeScatterBrush();
     // add resizing later after priorities
   };
 
@@ -1495,9 +1496,8 @@ class ScatterPlot extends React.PureComponent {
           if (boxSelectionToHighlight === null) {
             self.transitionZoom(total, false, false, false);
           } else if (
-            d3.event.sourceEvent?.metaKey ||
-            d3.event.sourceEvent?.shiftKey ||
-            d3.event.soureEvent?.ctrlKey
+            // shift box select
+            d3.event.sourceEvent?.shiftKey
           ) {
             self.props.onHandleHighlightedFeaturesDifferential(
               boxSelectionToHighlight,
@@ -1519,7 +1519,7 @@ class ScatterPlot extends React.PureComponent {
     if (d3.selectAll('.brush').nodes().length > 0) {
       d3.selectAll('.brush').remove();
     }
-    self.objsBrush = d3
+    let brushScatter = d3
       .brush()
       .extent([
         [10, 5],
@@ -1529,6 +1529,9 @@ class ScatterPlot extends React.PureComponent {
       .on('end', endBrush);
     // .filter(() => !d3.event.shiftKey)
     // .keyModifiers(false);
+    brushScatter.filter(() => true);
+    brushScatter.keyModifiers(false);
+    self.objsBrush = brushScatter;
     d3.selectAll('.volcanoPlotD3BrushSelection').call(self.objsBrush);
     const brush = d3
       .select('.volcanoPlotD3BrushSelection')

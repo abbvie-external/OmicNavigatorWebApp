@@ -531,7 +531,7 @@ class DifferentialSearch extends Component {
 
   handleMultisetToggleDifferential = () => {
     if (this.state.multisetFiltersVisibleDifferential === false) {
-      this.props.onHandleMultisetFiltersVisible(true);
+      this.props.onHandleMultisetFiltersVisibleParentRef(true);
       const { multisetColsDifferential } = this.props;
       // on toggle open
       if (this.state.selectedColP.length === 0) {
@@ -584,7 +584,7 @@ class DifferentialSearch extends Component {
       // on toggle close
       // this.props.onSearchTransitionDifferentialAlt(true);
       // this.props.onMultisetQueriedDifferential(false);
-      this.props.onHandleMultisetFiltersVisible(false);
+      this.props.onHandleMultisetFiltersVisibleParentRef(false);
       this.setState(
         {
           multisetFiltersVisibleDifferential: false,
