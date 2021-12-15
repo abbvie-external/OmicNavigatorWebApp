@@ -874,6 +874,7 @@ class DifferentialDetail extends Component {
                           onResetDifferentialOutlinedFeature={
                             this.props.onResetDifferentialOutlinedFeature
                           }
+                          onReloadMultifeaturePlot={this.reloadMultifeaturePlot}
                         ></ScatterPlot>
                         <PlotsDynamic
                           modelSpecificMetaFeaturesExist={

@@ -1503,6 +1503,7 @@ class ScatterPlot extends React.PureComponent {
               boxSelectionToHighlight,
               true,
             );
+            self.props.onReloadMultifeaturePlot(boxSelectionToHighlight);
           } else {
             self.transitionZoom(total, false, false, false);
           }
