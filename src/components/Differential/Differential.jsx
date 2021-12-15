@@ -104,7 +104,7 @@ class Differential extends Component {
       visible: false,
       // MULTISET FILTERS
       multisetColsDifferential: [],
-      multisetFiltersVisible: false,
+      multisetFiltersVisibleParentRef: false,
       multisetButttonActiveDifferential: false,
       multisetQueriedDifferential: false,
     };
@@ -131,9 +131,9 @@ class Differential extends Component {
     });
   };
 
-  handleMultisetFiltersVisible = bool => {
+  handleMultisetFiltersVisibleParentRef = bool => {
     this.setState({
-      multisetFiltersVisible: bool,
+      multisetFiltersVisibleParentRef: bool,
     });
   };
 
@@ -1582,7 +1582,9 @@ class Differential extends Component {
               onHandleDifferentialResultsTableStreaming={
                 this.handleDifferentialResultsTableStreaming
               }
-              onHandleMultisetFiltersVisible={this.handleMultisetFiltersVisible}
+              onHandleMultisetFiltersVisibleParentRef={
+                this.handleMultisetFiltersVisibleParentRef
+              }
               onHandleIsFilteredDifferential={this.handleIsFilteredDifferential}
             />
           </Grid.Column>

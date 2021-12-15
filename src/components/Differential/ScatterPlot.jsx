@@ -177,7 +177,8 @@ class ScatterPlot extends React.PureComponent {
       this.transitionZoom(this.state.currentResults, false, false, false);
     } else if (
       (prevProps.isFilteredDifferential && !isFilteredDifferential) ||
-      (prevProps.multisetFiltersVisible && !this.props.multisetFiltersVisible)
+      (prevProps.multisetFiltersVisibleParentRef &&
+        !this.props.multisetFiltersVisibleParentRef)
     ) {
       // set analysis "filter" is clicked OR set analysis is toggled off
       const dataInCurrentView =
