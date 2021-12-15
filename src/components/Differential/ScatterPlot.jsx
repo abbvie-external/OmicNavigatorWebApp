@@ -1494,9 +1494,10 @@ class ScatterPlot extends React.PureComponent {
           ]);
           console.log(d3.event);
           if (boxSelectionToHighlight === null) {
+            // ZOOM IF NOT SHIFT BOX-SELECTING FOR MULTI-FEATURE PLOTS
             self.transitionZoom(total, false, false, false);
           } else if (
-            // shift box select
+            // SHIFT BOX-SELECT FOR MULTI-FEATURE PLOTS
             d3.event.sourceEvent?.shiftKey
           ) {
             self.props.onHandleHighlightedFeaturesDifferential(
@@ -1505,8 +1506,10 @@ class ScatterPlot extends React.PureComponent {
             );
             self.props.onReloadMultifeaturePlot(boxSelectionToHighlight);
           } else {
+            // DEFAULT ZOOM AFTER CHECK FOR SHIFT BOX-SELECT
             self.transitionZoom(total, false, false, false);
           }
+          // we are always clearing the box; if desired, place this in
           d3.select('.volcanoPlotD3BrushSelection').call(
             self.objsBrush.move,
             null,
@@ -2164,7 +2167,7 @@ class ScatterPlot extends React.PureComponent {
                     <List.Content>
                       <List.Header>Zoom In / Filter Data</List.Header>
                       <List.Description>
-                        Click and drag (box select) to zoom in and filter data
+                        Click and drag (box select)
                       </List.Description>
                     </List.Content>
                   </List.Item>
@@ -2173,8 +2176,7 @@ class ScatterPlot extends React.PureComponent {
                     <List.Content>
                       <List.Header>Zoom Out / Clear Filters</List.Header>
                       <List.Description>
-                        Double click on an area without circles to zoom out, and
-                        clear filters
+                        Double click on an area without circles
                       </List.Description>
                     </List.Content>
                   </List.Item>
@@ -2183,7 +2185,7 @@ class ScatterPlot extends React.PureComponent {
                     <List.Content>
                       <List.Header>Plot A Single Feature</List.Header>
                       <List.Description>
-                        Click a circle to select a single feature (blue outline)
+                        Click a circle (blue outline)
                       </List.Description>
                     </List.Content>
                   </List.Item>
@@ -2194,8 +2196,7 @@ class ScatterPlot extends React.PureComponent {
                         <List.Header>Plot Multiple Features</List.Header>
                         <List.Description>
                           Control-click circle/s, or hold Shift while
-                          box-selecting to highlight multiple features (orange
-                          fill)
+                          box-selecting (orange fill)
                         </List.Description>
                       </List.Content>
                     </List.Item>
