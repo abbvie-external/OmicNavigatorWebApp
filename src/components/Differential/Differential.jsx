@@ -897,10 +897,7 @@ class Differential extends Component {
   }
 
   handleMultifeaturePlot = (view, tableData) => {
-    const {
-      differentialHighlightedFeaturesData,
-      // differentialOutlinedFeature,
-    } = this.state;
+    const { differentialHighlightedFeaturesData } = this.state;
     const { differentialFeatureIdKey } = this.props;
     let data =
       differentialHighlightedFeaturesData.length > 0
@@ -915,11 +912,6 @@ class Differential extends Component {
         data = [...data.slice(0, this.state.plotMultiFeatureMax)];
       }
       const featureIds = data.map(featureId => featureId[key]);
-      // if (!featureIds.includes(differentialOutlinedFeature)) {
-      // this.setState({
-      //   differentialOutlinedFeature: '',
-      // });
-      // }
       const returnSVG = view === 'Overlay' ? true : false;
       if (returnSVG) {
         this.getMultifeaturePlotTransition(featureIds, false, 0);

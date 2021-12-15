@@ -1565,17 +1565,19 @@ class ScatterPlot extends React.PureComponent {
   }
 
   mapBoxSelectionToHighlight = total => {
-    debugger;
     const { plotMultiFeatureAvailable, differentialFeatureIdKey } = this.props;
-    const els = total.map(item => ({
-      id: item.entrez,
-      value: item.entrez,
-      key: item.entrez,
+    const scatterArr = total.map(item => ({
+      id: item[differentialFeatureIdKey],
+      value: item[differentialFeatureIdKey],
+      key: item[differentialFeatureIdKey],
     }));
+    const uniqueScatterArray = [
+      ...new Map(scatterArr.map(item => [item.id, item])).values(),
+    ];
     // if multi-feature plotting is not available, return null to initiate zoom
     if (!plotMultiFeatureAvailable) {
       return null;
-    } else return els;
+    } else return uniqueScatterArray;
   };
 
   handleBrushedText = brushed => {
