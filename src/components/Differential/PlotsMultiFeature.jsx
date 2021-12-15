@@ -243,7 +243,7 @@ class PlotsMultiFeature extends Component {
     const { differentialPlotTypes } = this.props;
     const hasPlots = differentialPlotTypes?.length > 0 || false;
     if (hasPlots) {
-      return 'Check 2 or more features to display plots';
+      return 'Select 2 or more features to display plots';
     } else {
       return 'Multi-feature plots are unavailable';
     }

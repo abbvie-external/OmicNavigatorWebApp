@@ -1527,8 +1527,6 @@ class ScatterPlot extends React.PureComponent {
       ])
       .on('start', brushingStart)
       .on('end', endBrush);
-    // .filter(() => !d3.event.shiftKey)
-    // .keyModifiers(false);
     brushScatter.filter(() => true);
     brushScatter.keyModifiers(false);
     self.objsBrush = brushScatter;
@@ -2185,8 +2183,7 @@ class ScatterPlot extends React.PureComponent {
                     <List.Content>
                       <List.Header>Plot A Single Feature</List.Header>
                       <List.Description>
-                        Click a circle to view plots for a single feature (blue
-                        outline)
+                        Click a circle to select a single feature (blue outline)
                       </List.Description>
                     </List.Content>
                   </List.Item>
@@ -2196,8 +2193,9 @@ class ScatterPlot extends React.PureComponent {
                       <List.Content>
                         <List.Header>Plot Multiple Features</List.Header>
                         <List.Description>
-                          Control-Click circle/s to view plots for multiple
-                          feature (orange fill)
+                          Control-click circle/s, or hold Shift while
+                          box-selecting to highlight multiple features (orange
+                          fill)
                         </List.Description>
                       </List.Content>
                     </List.Item>
