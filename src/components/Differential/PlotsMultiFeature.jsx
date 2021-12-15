@@ -210,7 +210,7 @@ class PlotsMultiFeature extends Component {
               as="div"
               key={`${index}-${s.plotType.plotDisplay}-pane-volcano`}
             >
-              <div id="VolcanoPlotSVG" className="svgSpan">
+              <div id="PlotsMultiFeatureContainer" className="svgSpan">
                 <SVG
                   cacheRequests={true}
                   src={srcUrl}
@@ -331,7 +331,7 @@ class PlotsMultiFeature extends Component {
                 imageInfo={plotMultiFeatureData}
                 tabIndex={activeTabIndexPlotsMultiFeatureVar}
                 svgExportName={svgExportName}
-                plot="VolcanoPlotSVG"
+                plot="PlotsMultiFeatureContainer"
               />
             </div>
             <Dropdown
