@@ -108,7 +108,7 @@ class PlotsOverlay extends PureComponent {
               render: () => (
                 <Tab.Pane attached="true" as="div">
                   <div
-                    id="DifferentialPlotTabsPlotSVGDiv"
+                    id="PlotsOverlayContainer"
                     className="svgSpan"
                     dangerouslySetInnerHTML={{ __html: s.svg }}
                   ></div>
@@ -214,7 +214,7 @@ class PlotsOverlay extends PureComponent {
                     feature={differentialFeature}
                     imageInfo={plotOverlayData}
                     tabIndex={activeTabIndexPlotsOverlayVar}
-                    plot={'DifferentialPlotTabsPlotSVGDiv'}
+                    plot={'PlotsOverlayContainer'}
                   />
                 </Grid.Column>
               </Grid.Row>

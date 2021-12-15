@@ -99,7 +99,7 @@ class PlotsSingleFeature extends Component {
             as="div"
             key={`${index}-${s.plotType.plotDisplay}-pane-volcano`}
           >
-            <div id="VolcanoPlotSVG" className="svgSpan">
+            <div id="PlotsSingleFeatureContainer" className="svgSpan">
               <SVG
                 cacheRequests={true}
                 src={srcUrl}
@@ -239,7 +239,7 @@ class PlotsSingleFeature extends Component {
                 imageInfo={plotSingleFeatureData}
                 tabIndex={activeTabIndexPlotsSingleFeatureVar}
                 svgExportName={svgExportName}
-                plot="VolcanoPlotSVG"
+                plot="PlotsSingleFeatureContainer"
                 refFwd={
                   this.metaFeaturesTableDynamicRef.current
                     ?.metafeaturesGridRefDynamic || null

@@ -51,7 +51,7 @@
   transform: translate(-50%, -50%);
 }
 
-#VolcanoPlotSVG {
+#PlotsSingleFeatureContainer, #PlotsMultiFeatureContainer {
   padding-right: 0px !important;
 
   svg {
