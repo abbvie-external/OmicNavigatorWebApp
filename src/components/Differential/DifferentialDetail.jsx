@@ -293,7 +293,8 @@ class DifferentialDetail extends Component {
         doNotUnhighlight,
       );
       if (items.length) {
-        this.pageToFeature(event[differentialFeatureIdKey]);
+        // IF YOU WANT TO PAGE TO A CONTROL-CLICKED FEATURE
+        // this.pageToFeature(event[differentialFeatureIdKey]);
       }
       this.reloadMultifeaturePlot(elementArray);
     }
@@ -1063,7 +1064,7 @@ class DifferentialDetail extends Component {
                             className="VolcanoPlotTable"
                             // note, default is 70vh; if you want a specific vh, specify like "40vh"; "auto" lets the height flow based on items per page
                             // height="auto"
-                            height={volcanoPlotVisible ? 'auto' : '70vh'}
+                            height={upperPlotsVisible ? 'auto' : '70vh'}
                             // height="70vh"
                             data={differentialTableData || []}
                             totalRows={volcanoPlotRows || 0}
