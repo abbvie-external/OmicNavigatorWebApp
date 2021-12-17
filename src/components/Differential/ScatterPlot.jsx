@@ -85,7 +85,6 @@ class ScatterPlot extends React.PureComponent {
     xAxisLabel: sessionStorage.getItem('yAxisLabel') || null,
     yAxisLabel: sessionStorage.getItem('yAxisLabel') || null,
     volcanoCircleLabel: sessionStorage.getItem('volcanoCircleLabel') || null,
-    identifier: null,
     volcanoCircleLabels: [],
     optionsOpen: false,
     usageOpen: false,
@@ -476,7 +475,7 @@ class ScatterPlot extends React.PureComponent {
   }
   renderCirclesFilter(circles) {
     const { differentialResultsUnfiltered } = this.props;
-    const { identifier, xAxisLabel, yAxisLabel } = this.state;
+    const { differentialFeatureIdKey, xAxisLabel, yAxisLabel } = this.state;
 
     const { xScale, yScale } = this.scaleFactory(
       this.state.currentResults.length > 0
@@ -497,8 +496,8 @@ class ScatterPlot extends React.PureComponent {
       .attr('stroke', '#aab1c0')
       .attr('strokeWidth', 0.4)
       .attr('class', 'volcanoPlot-dataPoint')
-      .attr('circleid', d => `${d[identifier]}`)
-      .attr('key', (d, index) => `${d[identifier]}_${index}`)
+      .attr('circleid', d => `${d[differentialFeatureIdKey]}`)
+      .attr('key', (d, index) => `${d[differentialFeatureIdKey]}_${index}`)
       .attr('data', d => JSON.stringify(d))
       .attr('ystatistic', d => `${this.doTransform(d[yAxisLabel], 'y')}`)
       .attr('xstatistic', d => `${this.doTransform(d[xAxisLabel], 'x')}`);
@@ -509,7 +508,7 @@ class ScatterPlot extends React.PureComponent {
       differentialResultsUnfiltered,
       differentialFeatureIdKey,
     } = this.props;
-    const { identifier, xAxisLabel, yAxisLabel } = this.state;
+    const { xAxisLabel, yAxisLabel } = this.state;
     const { xScale, yScale } = this.scaleFactory(
       this.state.currentResults.length > 0
         ? this.state.currentResults
@@ -530,9 +529,9 @@ class ScatterPlot extends React.PureComponent {
         .attr('stroke', '#000')
         .attr('strokeWidth', 0.4)
         .attr('class', 'volcanoPlot-dataPoint')
-        .attr('id', d => `volcanoDataPoint-${d[identifier]}`)
-        .attr('circleid', d => `${d[identifier]}`)
-        .attr('key', (d, index) => `${d[identifier]}_${index}`)
+        .attr('id', d => `volcanoDataPoint-${d[differentialFeatureIdKey]}`)
+        .attr('circleid', d => `${d[differentialFeatureIdKey]}`)
+        .attr('key', (d, index) => `${d[differentialFeatureIdKey]}_${index}`)
         .attr('data', d => JSON.stringify(d))
         .attr('ystatistic', d => `${this.doTransform(d[yAxisLabel], 'y')}`)
         .attr('xstatistic', d => `${this.doTransform(d[xAxisLabel], 'x')}`)
@@ -548,7 +547,7 @@ class ScatterPlot extends React.PureComponent {
           d3.select('#tooltip').remove();
           d3.event.stopPropagation();
           const elem = d3.select(
-            `circle[id='volcanoDataPoint-${e[identifier]}`,
+            `circle[id='volcanoDataPoint-${e[differentialFeatureIdKey]}`,
           );
 
           if (d3.event.metaKey || d3.event.ctrlKey) {
@@ -633,14 +632,13 @@ class ScatterPlot extends React.PureComponent {
   }
 
   getCircleOrBin = key => {
-    const { identifier } = this.state;
-    const { differentialTableData } = this.props;
+    const { differentialTableData, differentialFeatureIdKey } = this.props;
     let el = null;
     const circleWithKey = [...differentialTableData].find(
       c => c[this.props.differentialFeatureIdKey] === key,
     );
     if (circleWithKey) {
-      const circleIdentifier = circleWithKey[identifier] || null;
+      const circleIdentifier = circleWithKey[differentialFeatureIdKey] || null;
       if (circleIdentifier) {
         el = document.getElementById(`volcanoDataPoint-${circleIdentifier}`);
       } else return null;
@@ -649,7 +647,7 @@ class ScatterPlot extends React.PureComponent {
       return { element: d3.select(el)._groups[0][0], type: 'circle' };
     } else {
       const bin = this.state.bins.find(bin => {
-        return bin.some(b => b[identifier] === key);
+        return bin.some(b => b[differentialFeatureIdKey] === key);
       });
       if (bin && bin.x && bin.y && bin.length) {
         return {
@@ -754,8 +752,9 @@ class ScatterPlot extends React.PureComponent {
     const {
       differentialHighlightedFeatures,
       differentialOutlinedFeature,
+      differentialFeatureIdKey,
     } = this.props;
-    const { identifier, circles } = this.state;
+    const { circles } = this.state;
     let combinedCircleFeatureIdsArr = [...differentialHighlightedFeatures];
     if (differentialOutlinedFeature !== '') {
       const differentialOutlinedFeatureArr = [differentialOutlinedFeature];
@@ -773,7 +772,8 @@ class ScatterPlot extends React.PureComponent {
           c => c[this.props.differentialFeatureIdKey] === elem,
         );
         if (circleWithKey) {
-          const circleIdentifier = circleWithKey[identifier] || null;
+          const circleIdentifier =
+            circleWithKey[differentialFeatureIdKey] || null;
           if (circleIdentifier) {
             el = document.getElementById(
               `volcanoDataPoint-${circleIdentifier}`,
@@ -917,7 +917,7 @@ class ScatterPlot extends React.PureComponent {
 
   handleCircleHover = e => {
     const elem = d3.select(
-      `circle[id='volcanoDataPoint-${e[this.state.identifier]}`,
+      `circle[id='volcanoDataPoint-${e[this.props.differentialFeatureIdKey]}`,
     )._groups[0][0];
     if (!this.state.brushing) {
       const hoveredData = {
@@ -952,8 +952,11 @@ class ScatterPlot extends React.PureComponent {
     const hovered = document.getElementById(this.state.hoveredCircleElement);
     if (hovered != null) {
       const hoveredCircle =
-        d3.select(`circle[id='volcanoDataPoint-${e[this.state.identifier]}`)
-          ._groups[0][0] ?? null;
+        d3.select(
+          `circle[id='volcanoDataPoint-${
+            e[this.props.differentialFeatureIdKey]
+          }`,
+        )._groups[0][0] ?? null;
       if (hoveredCircle != null) {
         if (hoveredCircle.attributes['class'].value.endsWith('highlighted')) {
           hoveredCircle.attributes['r'].value = 6;
@@ -1015,10 +1018,12 @@ class ScatterPlot extends React.PureComponent {
       hoveredBin,
       xAxisLabel,
       yAxisLabel,
-      identifier,
       doXAxisTransformation,
       doYAxisTransformation,
+      volcanoCircleLabel,
+      circles,
     } = this.state;
+    const { differentialFeatureIdKey } = this.props;
 
     const clipPathHeight =
       d3
@@ -1118,7 +1123,15 @@ class ScatterPlot extends React.PureComponent {
           .attr('y', 23 + 16 * 2)
           .text(yText);
       } else if (hoveredElement === 'circle') {
-        const idText = identifier + ': ' + hoveredCircleData.id;
+        let idText = differentialFeatureIdKey + ': ' + hoveredCircleData.id;
+        if (circles.length && volcanoCircleLabel !== 'None') {
+          const hoveredCircleExtendedData = [...circles].filter(
+            c => hoveredCircleData.id === c[differentialFeatureIdKey],
+          );
+          if (hoveredCircleExtendedData) {
+            idText = `${volcanoCircleLabel}: ${hoveredCircleExtendedData[0][volcanoCircleLabel]}`;
+          }
+        }
         const tooltipHeight =
           clipPathHeight - (hoveredCircleData.position[1] * 1 + 10);
         const tooltipWidth = hoveredCircleData.position[0] * 1 + 200;
@@ -1821,19 +1834,8 @@ class ScatterPlot extends React.PureComponent {
         storedVolcanoCircleLabel,
       )
         ? storedVolcanoCircleLabel
-        : differentialAlphanumericFields[0];
-
-      // let identifierVar =
-      //   differentialAlphanumericFields[0] !== 'None'
-      //     ? differentialAlphanumericFields[0]
-      //     : differentialAlphanumericFields[1];
-      let identifierVar =
-        nextVolcanoCircleLabel !== 'None'
-          ? nextVolcanoCircleLabel
-          : differentialAlphanumericFields[1];
-
+        : this.props.differentialFeatureIdKey;
       this.setState({
-        identifier: identifierVar,
         volcanoCircleLabels: volcanoCircleLabelsVar,
         volcanoCircleLabel: nextVolcanoCircleLabel,
       });
@@ -1927,10 +1929,10 @@ class ScatterPlot extends React.PureComponent {
       differentialResultsTableStreaming,
       volcanoPlotVisible,
       plotMultiFeatureAvailable,
+      differentialFeatureIdKey,
     } = this.props;
 
     const {
-      identifier,
       volcanoCircleText,
       axisLabels,
       xAxisLabel,
@@ -1948,7 +1950,7 @@ class ScatterPlot extends React.PureComponent {
     const PlotName = `${differentialStudy}_${differentialModel}_${differentialTest}_scatter`;
     if (
       !differentialResultsTableStreaming &&
-      identifier !== null &&
+      differentialFeatureIdKey !== null &&
       xAxisLabel !== null &&
       yAxisLabel !== null
     ) {
