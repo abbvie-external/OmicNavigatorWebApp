@@ -493,7 +493,7 @@ class ScatterPlot extends React.PureComponent {
       .attr('cx', d => `${xScale(this.doTransform(d[xAxisLabel], 'x'))}`)
       .attr('cy', d => `${yScale(this.doTransform(d[yAxisLabel], 'y'))}`)
       .attr('fill', '#E0E1E2')
-      .attr('r', 2)
+      .attr('r', 3)
       .attr('stroke', '#aab1c0')
       .attr('strokeWidth', 0.4)
       .attr('class', 'volcanoPlot-dataPoint')
@@ -526,7 +526,7 @@ class ScatterPlot extends React.PureComponent {
         .attr('cx', d => `${xScale(this.doTransform(d[xAxisLabel], 'x'))}`)
         .attr('cy', d => `${yScale(this.doTransform(d[yAxisLabel], 'y'))}`)
         .attr('fill', '#1678c2')
-        .attr('r', 2)
+        .attr('r', 3)
         .attr('stroke', '#000')
         .attr('strokeWidth', 0.4)
         .attr('class', 'volcanoPlot-dataPoint')
@@ -703,7 +703,7 @@ class ScatterPlot extends React.PureComponent {
     const circles = d3.selectAll('circle.volcanoPlot-dataPoint');
     circles
       // .attr('style', 'fill: #1678c2')
-      // .attr('r', 2)
+      // .attr('r', 3)
       .classed('highlighted', false)
       .classed('outlined', false);
   };
@@ -729,7 +729,7 @@ class ScatterPlot extends React.PureComponent {
         .attr('fill', '#1678c2')
         .attr('stroke', '#000')
         .attr('stroke-width', 1)
-        .attr('r', 2)
+        .attr('r', 3)
         .classed('highlighted', false)
         .classed('outlined', false);
     }
