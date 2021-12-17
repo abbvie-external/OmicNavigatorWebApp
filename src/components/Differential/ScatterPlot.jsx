@@ -962,7 +962,7 @@ class ScatterPlot extends React.PureComponent {
         ) {
           hoveredCircle.attributes['r'].value = 7;
         } else {
-          hoveredCircle.attributes['r'].value = 2;
+          hoveredCircle.attributes['r'].value = 3;
         }
         this.setState({
           hoveredCircleData: {
