@@ -15,13 +15,13 @@ import SplitPane from 'react-split-pane';
 class DifferentialDetail extends Component {
   state = {
     upperPlotsHeight:
-      parseInt(localStorage.getItem('upperPlotsHeight'), 10) || 400,
+      parseInt(localStorage.getItem('upperPlotsHeight'), 10) || 420,
     upperPlotsHeightBackup:
-      parseInt(localStorage.getItem('upperPlotsHeightBackup'), 10) || 400,
+      parseInt(localStorage.getItem('upperPlotsHeightBackup'), 10) || 420,
     upperPlotsDivHeight:
-      parseInt(localStorage.getItem('upperPlotsDivHeight'), 10) || 440,
+      parseInt(localStorage.getItem('upperPlotsDivHeight'), 10) || 460,
     upperPlotsDivHeightBackup:
-      parseInt(localStorage.getItem('upperPlotsDivHeightBackup'), 10) || 440,
+      parseInt(localStorage.getItem('upperPlotsDivHeightBackup'), 10) || 460,
     differentialDynamicPlotWidth:
       parseInt(localStorage.getItem('differentialDynamicPlotWidth'), 10) ||
       document.body.clientWidth * 0.75 - 420,
@@ -293,7 +293,8 @@ class DifferentialDetail extends Component {
         doNotUnhighlight,
       );
       if (items.length) {
-        this.pageToFeature(event[differentialFeatureIdKey]);
+        // IF YOU WANT TO PAGE TO A CONTROL-CLICKED FEATURE
+        // this.pageToFeature(event[differentialFeatureIdKey]);
       }
       this.reloadMultifeaturePlot(elementArray);
     }
@@ -513,7 +514,7 @@ class DifferentialDetail extends Component {
   handleSizeChange = (newSize, axisDragged) => {
     const { volcanoDivWidth } = this.state;
     const { fwdRefDVC } = this.props;
-    const plotSizeAdjustment = Math.round(newSize * 0.92);
+    const plotSizeAdjustment = Math.round(newSize * 0.9);
     if (axisDragged === 'horizontal') {
       // if (newSize)
       // on up/down drag, we are forcing a dynamic plot resize by change the volcano width by 1
@@ -832,7 +833,7 @@ class DifferentialDetail extends Component {
                       }
                       // defaultSize={upperPlotsHeight * 1.05263157895} 1.20263157895
                       size={upperPlotsVisible ? upperPlotsDivHeight : 1}
-                      minSize={400}
+                      minSize={420}
                       maxSize={1000}
                       onDragFinished={size =>
                         this.handleSizeChange(size, 'horizontal')
@@ -1063,7 +1064,7 @@ class DifferentialDetail extends Component {
                             className="VolcanoPlotTable"
                             // note, default is 70vh; if you want a specific vh, specify like "40vh"; "auto" lets the height flow based on items per page
                             // height="auto"
-                            height={volcanoPlotVisible ? 'auto' : '70vh'}
+                            height={upperPlotsVisible ? 'auto' : '70vh'}
                             // height="70vh"
                             data={differentialTableData || []}
                             totalRows={volcanoPlotRows || 0}
