@@ -620,9 +620,10 @@ class Enrichment extends Component {
                 }
                 this.setState({ enrichmentColumnsUnfiltered: columns });
                 if (this.state.multisetTestsFilteredOut.length > 0) {
+                  const self = this;
                   columns = columns.filter(function(col) {
-                    return !this.setState.MultisetTestsFilteredOut.includes(
-                      col.title,
+                    return !self.setState.MultisetTestsFilteredOut.includes(
+                      col?.title,
                     );
                   });
                 }
