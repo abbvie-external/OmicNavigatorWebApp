@@ -1128,7 +1128,7 @@ class ScatterPlot extends React.PureComponent {
           const hoveredCircleExtendedData = [...circles].filter(
             c => hoveredCircleData.id === c[differentialFeatureIdKey],
           );
-          if (hoveredCircleExtendedData) {
+          if (hoveredCircleExtendedData.length) {
             idText = `${volcanoCircleLabel}: ${hoveredCircleExtendedData[0][volcanoCircleLabel]}`;
           }
         }
