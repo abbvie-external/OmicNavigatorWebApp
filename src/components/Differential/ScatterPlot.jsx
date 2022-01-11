@@ -921,13 +921,13 @@ class ScatterPlot extends React.PureComponent {
     )._groups[0][0];
     if (!this.state.brushing) {
       const hoveredData = {
-        id: elem.attributes['circleid'].value,
-        xstat: elem.attributes['xstatistic'].value,
-        ystat: elem.attributes['ystatistic'].value,
-        position: [elem.attributes['cx'].value, elem.attributes['cy'].value],
+        id: elem.attributes['circleid']?.value,
+        xstat: elem.attributes['xstatistic']?.value,
+        ystat: elem.attributes['ystatistic']?.value,
+        position: [elem.attributes['cx']?.value, elem.attributes['cy']?.value],
       };
-      const hoveredElement = `volcanoDataPoint-${elem.attributes['circleid'].value}`;
-      const hoveredId = `#volcanoDataPoint-${elem.attributes['circleid'].value}`;
+      const hoveredElement = `volcanoDataPoint-${elem.attributes['circleid']?.value}`;
+      const hoveredId = `#volcanoDataPoint-${elem.attributes['circleid']?.value}`;
       const hovered = document.getElementById(hoveredElement);
       if (hovered != null) {
         const circle = d3.select(hovered) ?? null;
@@ -1128,7 +1128,7 @@ class ScatterPlot extends React.PureComponent {
           const hoveredCircleExtendedData = [...circles].filter(
             c => hoveredCircleData.id === c[differentialFeatureIdKey],
           );
-          if (hoveredCircleExtendedData) {
+          if (hoveredCircleExtendedData.length) {
             idText = `${volcanoCircleLabel}: ${hoveredCircleExtendedData[0][volcanoCircleLabel]}`;
           }
         }
