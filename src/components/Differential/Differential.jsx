@@ -248,10 +248,10 @@ class Differential extends Component {
             const valid = plotTypeArr.every(isValidPlotType);
             if (!valid) {
               console.log(
-                `Skipping ${plot?.plotID} because it has unknown plotType ${plot.plotType}`,
+                `${plot?.plotID} will be ignored because it has unknown plotType ${plot.plotType}`,
               );
               toast.error(
-                `Skipping ${plot?.plotID} because it has unknown plotType ${plot.plotType}`,
+                `${plot?.plotID} will be ignored because it has unknown plotType ${plot.plotType}`,
               );
             }
             return valid;

@@ -103,15 +103,10 @@ class ScatterPlot extends React.PureComponent {
     if (!differentialResultsTableStreaming) {
       this.getAxisLabels();
       window.addEventListener('resize', this.debouncedResizeListener);
-      // user opens volcano plot any time after data finishes streaming
-      const dataInCurrentView =
-        this.state.currentResults.length > 0
-          ? this.state.currentResults
-          : differentialResultsUnfiltered;
       d3.select('#VolcanoChart').remove();
       this.setupVolcano();
       this.hexBinning(differentialResultsUnfiltered);
-      this.transitionZoom(dataInCurrentView, false, false, false);
+      this.transitionZoom(differentialResultsUnfiltered, false, false, false);
       if (volcanoPlotVisible && upperPlotsVisible && !plotOverlayVisible) {
         this.setState({ optionsOpen: true });
       }
@@ -132,6 +127,7 @@ class ScatterPlot extends React.PureComponent {
       filteredDifferentialTableData,
       differentialOutlinedFeature,
       plotOverlayVisible,
+      differentialTest,
     } = this.props;
 
     const {
@@ -142,10 +138,22 @@ class ScatterPlot extends React.PureComponent {
       doYAxisTransformation,
     } = this.state;
     // this if/else if/else if statement in place to minimize re-renders - should cover all situations
-    if (
+    if (differentialTest !== prevProps.differentialTest) {
+      // if the test is changed and data is cached, it won't steam, and this needs to run
+      this.getAxisLabels();
+      window.addEventListener('resize', this.debouncedResizeListener);
+      d3.select('#VolcanoChart').remove();
+      this.setupVolcano();
+      this.hexBinning(differentialResultsUnfiltered);
+      this.transitionZoom(differentialResultsUnfiltered, false, false, false);
+      if (volcanoPlotVisible && upperPlotsVisible && !plotOverlayVisible) {
+        this.setState({ optionsOpen: true });
+      }
+    } else if (
       !differentialResultsTableStreaming &&
       differentialResultsTableStreaming !==
         prevProps.differentialResultsTableStreaming
+      // data finishes streaming
     ) {
       this.getAxisLabels();
       window.addEventListener('resize', this.debouncedResizeListener);
