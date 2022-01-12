@@ -6,7 +6,7 @@ import './MetafeaturesTable.scss';
 import { omicNavigatorService } from '../../services/omicNavigator.service';
 // import { CancelToken } from 'axios';
 // eslint-disable-next-line no-unused-vars
-import QHGrid, { EZGrid } from '../Shared/QHGrid';
+import { EZGrid } from '../Shared/QHGrid';
 
 class MetafeaturesTableDynamic extends Component {
   state = {
@@ -22,7 +22,7 @@ class MetafeaturesTableDynamic extends Component {
 
   componentDidMount() {
     const isMultifeaturePlot =
-      this.props.imageInfoVolcano.key?.includes('features') || false;
+      this.props.plotSingleFeatureData.key?.includes('features') || false;
     if (
       this.props.modelSpecificMetaFeaturesExist !== false &&
       !isMultifeaturePlot
@@ -34,20 +34,20 @@ class MetafeaturesTableDynamic extends Component {
   async getMetafeaturesDataDynamic() {
     const cachedMetafeaturesData = JSON.parse(
       sessionStorage.getItem(
-        `MetafeaturesData-${this.props.imageInfoVolcano.key}`,
+        `MetafeaturesData-${this.props.plotSingleFeatureData.key}`,
       ),
     );
-    if (!cachedMetafeaturesData && this.props.imageInfoVolcano?.key) {
+    if (!cachedMetafeaturesData && this.props.plotSingleFeatureData?.key) {
       try {
         const data = await omicNavigatorService.getMetaFeaturesTable(
           this.props.differentialStudy,
           this.props.differentialModel,
-          this.props.imageInfoVolcano.key,
+          this.props.plotSingleFeatureData.key,
           null,
         );
         let metaFeaturesDataVolcano = data != null ? data : [];
         sessionStorage.setItem(
-          `MetafeaturesData-${this.props.imageInfoVolcano.key}`,
+          `MetafeaturesData-${this.props.plotSingleFeatureData.key}`,
           JSON.stringify(metaFeaturesDataVolcano),
         );
         this.getMetafeaturesTableConfigCols(metaFeaturesDataVolcano);
@@ -59,7 +59,7 @@ class MetafeaturesTableDynamic extends Component {
     }
   }
 
-  async getMetafeaturesTableConfigCols(data) {
+  getMetafeaturesTableConfigCols = data => {
     let configCols = [];
     if (data?.length > 0) {
       const TableValuePopupStyle = {
@@ -146,13 +146,13 @@ class MetafeaturesTableDynamic extends Component {
       configCols = metafeaturesAlphanumericColumnsMapped.concat(
         metafeaturesNumericColumnsMapped,
       );
+      this.setState({
+        metafeaturesTableConfigCols: configCols,
+        metafeaturesTableData: data,
+        metafeaturesLoaded: true,
+      });
     }
-    this.setState({
-      metafeaturesTableConfigCols: configCols,
-      metafeaturesTableData: data,
-      metafeaturesLoaded: true,
-    });
-  }
+  };
 
   handleItemsPerPageChange = items => {
     this.setState({

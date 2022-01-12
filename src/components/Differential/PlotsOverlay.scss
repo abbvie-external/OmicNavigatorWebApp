@@ -11,11 +11,6 @@
     .PlotContainerRow {
       padding-top: 0px !important;
     }
-
-    .svgContainerVolcano {
-      margin: 15px !important;
-    }
-
     .main {
       display: flex;
       flex-direction: column;
@@ -27,7 +22,7 @@
     }
   }
 }
-#DifferentialPlotTabsPlotSVGDiv {
+#PlotsOverlayContainer {
   width: 100% !important;
   svg {
     height: 100% !important;

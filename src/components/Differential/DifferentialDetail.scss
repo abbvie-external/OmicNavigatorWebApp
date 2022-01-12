@@ -51,8 +51,8 @@
   transform: translate(-50%, -50%);
 }
 
-#VolcanoPlotSVG {
-  padding-right: 25px !important;
+#PlotsSingleFeatureContainer, #PlotsMultiFeatureContainer {
+  padding-right: 0px !important;
 
   svg {
     width: inherit !important;
@@ -114,12 +114,13 @@
   .VolcanoSplitPane {
     max-width: 100% !important;
     position: relative !important;
-    padding-bottom: 50px !important;
+    padding-bottom: 0px !important;
     // transition: all 2s ease-out;
 
     .QHGrid--header {
       padding-top: 15px !important;
       padding-bottom: 10px !important;
+      padding-left: 0px !important;
     }
 
     .QHGrid--generalSearch {

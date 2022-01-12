@@ -68,6 +68,8 @@
     padding-top: 0px !important;
     padding-left: 10px !important;
     padding-right: 10px !important;
+    padding-bottom: 10px !important;
+    margin-bottom: 10px !important;
   }
 
   .QHGrid table thead:hover {
@@ -198,6 +200,10 @@
   .ui.menu .orange.active.item {
     color: #fff !important;
     background-color: var(--color-primary) !important;
+    border-width: 3px !important;
+  }
+  .ui.secondary.pointing.menu .item {
+    border-width: 3px !important;
   }
 
   #rowOutline {

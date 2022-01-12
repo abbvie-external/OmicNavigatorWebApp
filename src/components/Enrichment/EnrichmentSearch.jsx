@@ -11,15 +11,15 @@ import {
 } from 'semantic-ui-react';
 import ndjsonStream from 'can-ndjson-stream';
 import { CancelToken } from 'axios';
-import '../Shared/SearchCriteria.scss';
+import '../Shared/Search.scss';
 import { omicNavigatorService } from '../../services/omicNavigator.service';
 import EnrichmentMultisetFilters from './EnrichmentMultisetFilters';
-import { getDynamicSize } from '../Shared/helpers';
+import { getDynamicSize, getWindowWidth } from '../Shared/helpers';
 
 let cancelRequestGetReportLinkEnrichment = () => {};
 // let cancelGetEnrichmentsTable = () => {};
 let cancelRequestGetEnrichmentsIntersection = () => {};
-let cancelRequestGetEnrichmentsUpset = () => {};
+let cancelRequestGetEnrichmentsMultiset = () => {};
 const cacheEnrichmentsTable = {};
 async function* streamAsyncIterable(reader) {
   while (true) {
@@ -31,7 +31,7 @@ async function* streamAsyncIterable(reader) {
   }
 }
 
-class EnrichmentSearchCriteria extends Component {
+class EnrichmentSearch extends Component {
   state = {
     enrichmentStudies: [],
     enrichmentStudyHrefVisible: false,
@@ -146,7 +146,7 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentAnnotation,
       pValueType,
       enrichmentTestAndDescription,
-      onSearchCriteriaChangeEnrichment,
+      onSearchChangeEnrichment,
       onSearchTransitionEnrichment,
       onGetEnrichmentsLinkouts,
     } = this.props;
@@ -257,7 +257,7 @@ class EnrichmentSearchCriteria extends Component {
             .catch(error => {
               console.error('Error during getEnrichmentsTable', error);
             });
-          onSearchCriteriaChangeEnrichment(
+          onSearchChangeEnrichment(
             {
               enrichmentStudy: enrichmentStudy,
               enrichmentModel: enrichmentModel,
@@ -280,11 +280,8 @@ class EnrichmentSearchCriteria extends Component {
   };
 
   handleStudyChange = (evt, { name, value }) => {
-    const {
-      onSearchCriteriaChangeEnrichment,
-      onSearchCriteriaResetEnrichment,
-    } = this.props;
-    onSearchCriteriaChangeEnrichment(
+    const { onSearchChangeEnrichment, onSearchResetEnrichment } = this.props;
+    onSearchChangeEnrichment(
       {
         [name]: value,
         enrichmentModel: '',
@@ -293,7 +290,7 @@ class EnrichmentSearchCriteria extends Component {
       },
       true,
     );
-    onSearchCriteriaResetEnrichment({
+    onSearchResetEnrichment({
       isValidSearchEnrichment: false,
     });
     this.setState({
@@ -351,13 +348,13 @@ class EnrichmentSearchCriteria extends Component {
   handleModelChange = (evt, { name, value }) => {
     const {
       enrichmentStudy,
-      onSearchCriteriaChangeEnrichment,
-      onSearchCriteriaResetEnrichment,
+      onSearchChangeEnrichment,
+      onSearchResetEnrichment,
       enrichmentModelsAndAnnotations,
     } = this.props;
     this.props.onHandleHasBarcodeData();
     this.props.onHandlePlotTypesEnrichment(value);
-    onSearchCriteriaChangeEnrichment(
+    onSearchChangeEnrichment(
       {
         enrichmentStudy: enrichmentStudy,
         [name]: value,
@@ -366,7 +363,7 @@ class EnrichmentSearchCriteria extends Component {
       },
       true,
     );
-    onSearchCriteriaResetEnrichment({
+    onSearchResetEnrichment({
       isValidSearchEnrichment: false,
     });
     const enrichmentModelsAndAnnotationsCopy = [
@@ -405,7 +402,7 @@ class EnrichmentSearchCriteria extends Component {
       pValueType,
       onMultisetQueriedEnrichment,
       onSearchTransitionEnrichment,
-      onSearchCriteriaChangeEnrichment,
+      onSearchChangeEnrichment,
     } = this.props;
     onSearchTransitionEnrichment(true);
     onMultisetQueriedEnrichment(false);
@@ -420,7 +417,7 @@ class EnrichmentSearchCriteria extends Component {
       reloadPlot: true,
       multisetFiltersVisibleEnrichment: false,
     });
-    onSearchCriteriaChangeEnrichment(
+    onSearchChangeEnrichment(
       {
         enrichmentStudy: enrichmentStudy,
         enrichmentModel: enrichmentModel,
@@ -693,12 +690,12 @@ class EnrichmentSearchCriteria extends Component {
       enrichmentModel,
       pValueType,
       // onSearchTransitionEnrichment,
-      onSearchCriteriaChangeEnrichment,
+      onSearchChangeEnrichment,
     } = this.props;
     this.setState({
       multisetFiltersVisibleEnrichment: false,
     });
-    onSearchCriteriaChangeEnrichment(
+    onSearchChangeEnrichment(
       {
         enrichmentStudy: enrichmentStudy,
         enrichmentModel: enrichmentModel,
@@ -915,12 +912,12 @@ class EnrichmentSearchCriteria extends Component {
       return !multisetTestsFilteredOut.includes(col);
     });
     if (tests?.length > 1) {
-      cancelRequestGetEnrichmentsUpset();
+      cancelRequestGetEnrichmentsMultiset();
       let cancelToken = new CancelToken(e => {
-        cancelRequestGetEnrichmentsUpset = e;
+        cancelRequestGetEnrichmentsMultiset = e;
       });
       omicNavigatorService
-        .getEnrichmentsUpset(
+        .getEnrichmentsMultiset(
           enrichmentStudy,
           enrichmentModel,
           enrichmentAnnotation,
@@ -940,7 +937,7 @@ class EnrichmentSearchCriteria extends Component {
           }
         })
         .catch(error => {
-          console.error('Error during getEnrichmentsUpset', error);
+          console.error('Error during getEnrichmentsMultiset', error);
         });
     }
   }
@@ -1087,6 +1084,10 @@ class EnrichmentSearchCriteria extends Component {
     let MultisetRadio;
 
     if (isValidSearchEnrichment) {
+      const WindowWidth = getWindowWidth();
+      const QuarterWindowWidth = getWindowWidth() / 4;
+      const PlotLabel =
+        QuarterWindowWidth > 350 || WindowWidth < 1200 ? 'View Plot' : 'Plot';
       PlotRadio = (
         <Fragment>
           <Transition
@@ -1096,7 +1097,7 @@ class EnrichmentSearchCriteria extends Component {
           >
             <Radio
               toggle
-              label="View Plot"
+              label={PlotLabel}
               className={multisetPlotAvailableEnrichment ? 'ViewPlotRadio' : ''}
               checked={plotButtonActiveEnrichment}
               onChange={this.props.onHandlePlotAnimationEnrichment('uncover')}
@@ -1174,7 +1175,7 @@ class EnrichmentSearchCriteria extends Component {
 
     return (
       <React.Fragment>
-        <Form className="SearchCriteriaContainer">
+        <Form className="SearchContainer">
           <Popup
             trigger={
               <Form.Field
@@ -1319,4 +1320,4 @@ class EnrichmentSearchCriteria extends Component {
   }
 }
 
-export default EnrichmentSearchCriteria;
+export default EnrichmentSearch;

@@ -13,14 +13,14 @@ import {
 // import _ from 'lodash';
 import ndjsonStream from 'can-ndjson-stream';
 import { CancelToken } from 'axios';
-import { getDynamicSize } from '../Shared/helpers';
-import '../Shared/SearchCriteria.scss';
+import { getDynamicSize, getWindowWidth } from '../Shared/helpers';
+import '../Shared/Search.scss';
 import { omicNavigatorService } from '../../services/omicNavigator.service';
 import DifferentialMultisetFilters from './DifferentialMultisetFilters';
 
 let cancelRequestGetReportLinkDifferential = () => {};
 let cancelRequestGetResultsIntersection = () => {};
-let cancelRequestGetResultsUpset = () => {};
+let cancelRequestGetResultsMultiset = () => {};
 const cacheResultsTable = {};
 async function* streamAsyncIterable(reader) {
   while (true) {
@@ -31,7 +31,7 @@ async function* streamAsyncIterable(reader) {
     yield value;
   }
 }
-class DifferentialSearchCriteria extends Component {
+class DifferentialSearch extends Component {
   dom = '';
 
   state = {
@@ -104,7 +104,7 @@ class DifferentialSearchCriteria extends Component {
     multisetFiltersVisibleDifferential: false,
     activateMultisetFiltersP: false,
     uDataP: [],
-    isFilteredSearchCriteria: false,
+    isFilteredSearch: false,
   };
 
   componentDidMount() {
@@ -126,7 +126,7 @@ class DifferentialSearchCriteria extends Component {
     ) {
       this.populateDropdowns();
     }
-    // if (this.props.multisetPlotAvailableDifferential !== prevProps.multisetPlotAvailableDifferential) {
+    // if (this.props.plotMultisetLoadedDifferential !== prevProps.plotMultisetLoadedDifferential) {
     //   this.forceUpdate();
     // }
 
@@ -154,7 +154,7 @@ class DifferentialSearchCriteria extends Component {
       differentialModel,
       differentialTest,
       differentialFeature,
-      onSearchCriteriaChangeDifferential,
+      onSearchChangeDifferential,
       onSearchTransitionDifferential,
     } = this.props;
     const studies = allStudiesMetadata.map(study => {
@@ -201,7 +201,7 @@ class DifferentialSearchCriteria extends Component {
       } else {
         this.props.onDoMetaFeaturesExist(differentialStudy, differentialModel);
         this.props.onGetResultsLinkouts(differentialStudy, differentialModel);
-        this.props.onGetUpsetColsDifferential(
+        this.props.onGetMultisetColsDifferential(
           differentialStudy,
           differentialModel,
         );
@@ -264,7 +264,7 @@ class DifferentialSearchCriteria extends Component {
             .catch(error => {
               console.error('Error during getResultsTable', error);
             });
-          onSearchCriteriaChangeDifferential(
+          onSearchChangeDifferential(
             {
               differentialStudy: differentialStudy,
               differentialModel: differentialModel,
@@ -289,10 +289,10 @@ class DifferentialSearchCriteria extends Component {
 
   handleStudyChange = (evt, { name, value }) => {
     const {
-      onSearchCriteriaChangeDifferential,
-      onSearchCriteriaResetDifferential,
+      onSearchChangeDifferential,
+      onSearchResetDifferential,
     } = this.props;
-    onSearchCriteriaChangeDifferential(
+    onSearchChangeDifferential(
       {
         [name]: value,
         differentialModel: '',
@@ -300,7 +300,7 @@ class DifferentialSearchCriteria extends Component {
       },
       true,
     );
-    onSearchCriteriaResetDifferential({
+    onSearchResetDifferential({
       isValidSearchDifferential: false,
     });
     this.setState({
@@ -358,12 +358,12 @@ class DifferentialSearchCriteria extends Component {
   handleModelChange = (evt, { name, value }) => {
     const {
       differentialStudy,
-      onSearchCriteriaChangeDifferential,
-      onSearchCriteriaResetDifferential,
+      onSearchChangeDifferential,
+      onSearchResetDifferential,
       differentialModelsAndTests,
     } = this.props;
     this.props.onHandlePlotTypesDifferential(value);
-    onSearchCriteriaChangeDifferential(
+    onSearchChangeDifferential(
       {
         differentialStudy: differentialStudy,
         [name]: value,
@@ -371,7 +371,7 @@ class DifferentialSearchCriteria extends Component {
       },
       true,
     );
-    onSearchCriteriaResetDifferential({
+    onSearchResetDifferential({
       isValidSearchDifferential: false,
     });
     const differentialModelsAndTestsCopy = [...differentialModelsAndTests];
@@ -407,7 +407,7 @@ class DifferentialSearchCriteria extends Component {
       differentialStudy,
       differentialModel,
       onMultisetQueriedDifferential,
-      onSearchCriteriaChangeDifferential,
+      onSearchChangeDifferential,
       onSearchTransitionDifferential,
     } = this.props;
     onSearchTransitionDifferential(true);
@@ -424,7 +424,7 @@ class DifferentialSearchCriteria extends Component {
       selectedColP: [],
     });
 
-    onSearchCriteriaChangeDifferential(
+    onSearchChangeDifferential(
       {
         differentialStudy: differentialStudy,
         differentialModel: differentialModel,
@@ -472,7 +472,7 @@ class DifferentialSearchCriteria extends Component {
    */
   handleGetResultsTableStream = async (stream, test) => {
     this.reader?.cancel();
-    this.props.onHandleIsDataStreamingResultsTable(true);
+    this.props.onHandleDifferentialResultsTableStreaming(true);
     const { differentialStudy, differentialModel } = this.props;
     const cacheKey = `getResultsTable_${differentialStudy}_${differentialModel}_${test}`;
     let streamedResults = [];
@@ -531,25 +531,27 @@ class DifferentialSearchCriteria extends Component {
 
   handleMultisetToggleDifferential = () => {
     if (this.state.multisetFiltersVisibleDifferential === false) {
-      this.props.onHandleUpsetVisible(true);
-      const { upsetColsDifferential } = this.props;
+      this.props.onHandleMultisetFiltersVisibleParentRef(true);
+      const { multisetColsDifferential } = this.props;
       // on toggle open
       if (this.state.selectedColP.length === 0) {
         var defaultColKey = null;
-        const upsetColsDifferentialKeys = upsetColsDifferential.map(t => t.key);
-        if (upsetColsDifferentialKeys.includes('P_Value')) {
+        const multisetColsDifferentialKeys = multisetColsDifferential.map(
+          t => t.key,
+        );
+        if (multisetColsDifferentialKeys.includes('P_Value')) {
           defaultColKey = 'P_Value';
-        } else if (upsetColsDifferentialKeys.includes('P.Value')) {
+        } else if (multisetColsDifferentialKeys.includes('P.Value')) {
           defaultColKey = 'P.Value';
-        } else if (upsetColsDifferentialKeys.includes('PValue')) {
+        } else if (multisetColsDifferentialKeys.includes('PValue')) {
           defaultColKey = 'PValue';
-        } else if (upsetColsDifferentialKeys.includes('PVal')) {
+        } else if (multisetColsDifferentialKeys.includes('PVal')) {
           defaultColKey = 'PVal';
-        } else if (upsetColsDifferentialKeys.includes('P value')) {
+        } else if (multisetColsDifferentialKeys.includes('P value')) {
           defaultColKey = 'P value';
-        } else if (upsetColsDifferentialKeys.includes('adj_P_Value')) {
+        } else if (multisetColsDifferentialKeys.includes('adj_P_Value')) {
           defaultColKey = 'adj_P_Val';
-        } else if (upsetColsDifferentialKeys.includes('adj.P.Value')) {
+        } else if (multisetColsDifferentialKeys.includes('adj.P.Value')) {
           defaultColKey = 'adj.P.Val';
         } else {
           defaultColKey = null;
@@ -564,7 +566,7 @@ class DifferentialSearchCriteria extends Component {
             },
           ];
         } else {
-          defaultCol = [upsetColsDifferential[0]];
+          defaultCol = [multisetColsDifferential[0]];
         }
         this.setState({
           uSettingsP: {
@@ -582,11 +584,11 @@ class DifferentialSearchCriteria extends Component {
       // on toggle close
       // this.props.onSearchTransitionDifferentialAlt(true);
       // this.props.onMultisetQueriedDifferential(false);
-      this.props.onHandleUpsetVisible(false);
+      this.props.onHandleMultisetFiltersVisibleParentRef(false);
       this.setState(
         {
           multisetFiltersVisibleDifferential: false,
-          isFilteredSearchCriteria: false,
+          isFilteredSearch: false,
         },
         function() {
           const differentialTestName = 'differentialTest';
@@ -601,20 +603,20 @@ class DifferentialSearchCriteria extends Component {
   };
 
   handleErrorGetResultsIntersection = () => {
-    this.props.onHandleVolcanoTableLoading(false);
+    this.props.onHandleResultsTableLoading(false);
   };
 
   multisetTriggeredTestChange = (name, value) => {
     const {
       differentialStudy,
       differentialModel,
-      onSearchCriteriaChangeDifferential,
+      onSearchChangeDifferential,
     } = this.props;
     // onSearchTransitionDifferentialAlt(true);
     this.setState({
-      isFilteredSearchCriteria: false,
+      isFilteredSearch: false,
     });
-    onSearchCriteriaChangeDifferential(
+    onSearchChangeDifferential(
       {
         differentialStudy: differentialStudy,
         differentialModel: differentialModel,
@@ -658,7 +660,7 @@ class DifferentialSearchCriteria extends Component {
   };
 
   addFilterDifferential = () => {
-    // this.props.onHandleVolcanoTableLoading(true);
+    // this.props.onHandleResultsTableLoading(true);
     // this.setState({ loadingDifferentialMultisetFilters: true });
     // const uSetVP = _.cloneDeep(this.state.uSettingsP);
     const uSetVP = { ...this.state.uSettingsP };
@@ -676,7 +678,7 @@ class DifferentialSearchCriteria extends Component {
         this.state.uSettingsP.defaultSigValueP,
       ),
       uSettingsP: uSetVP,
-      isFilteredSearchCriteria: false,
+      isFilteredSearch: false,
     });
   };
 
@@ -700,7 +702,7 @@ class DifferentialSearchCriteria extends Component {
           .slice(0, index)
           .concat([...this.state.sigValueP].slice(index + 1)),
         uSettingsP: uSetVP,
-        isFilteredSearchCriteria: false,
+        isFilteredSearch: false,
       },
       // function() {
       //   this.updateQueryDataP();
@@ -720,7 +722,7 @@ class DifferentialSearchCriteria extends Component {
   };
 
   handleDropdownChange = (evt, { name, value, index }) => {
-    // this.props.onHandleVolcanoTableLoading(true);
+    // this.props.onHandleResultsTableLoading(true);
     const uSelVP = [...this.state[name]];
     uSelVP[index] = {
       key: value,
@@ -730,7 +732,7 @@ class DifferentialSearchCriteria extends Component {
     this.setState({
       [name]: uSelVP,
       reloadPlotP: true,
-      isFilteredSearchCriteria: false,
+      isFilteredSearch: false,
     });
   };
 
@@ -740,7 +742,7 @@ class DifferentialSearchCriteria extends Component {
     this.setState({
       [name]: uSelVP,
       reloadPlotP: true,
-      isFilteredSearchCriteria: false,
+      isFilteredSearch: false,
     });
   };
 
@@ -748,7 +750,7 @@ class DifferentialSearchCriteria extends Component {
     this.setState({
       mustDifferential,
       notDifferential,
-      isFilteredSearchCriteria: false,
+      isFilteredSearch: false,
     });
   };
 
@@ -773,9 +775,9 @@ class DifferentialSearchCriteria extends Component {
     // this.props.onSearchTransitionDifferentialAlt(true); Commented on 3/31 Paul
     this.props.onHandleIsFilteredDifferential(true);
     this.setState({
-      isFilteredSearchCriteria: true,
+      isFilteredSearch: true,
     });
-    this.props.onHandleVolcanoTableLoading(true);
+    this.props.onHandleResultsTableLoading(true);
     cancelRequestGetResultsIntersection();
     let cancelToken = new CancelToken(e => {
       cancelRequestGetResultsIntersection = e;
@@ -842,12 +844,12 @@ class DifferentialSearchCriteria extends Component {
     eOperatorP,
     eColP,
   ) {
-    cancelRequestGetResultsUpset();
+    cancelRequestGetResultsMultiset();
     let cancelToken = new CancelToken(e => {
-      cancelRequestGetResultsUpset = e;
+      cancelRequestGetResultsMultiset = e;
     });
     omicNavigatorService
-      .getResultsUpset(
+      .getResultsMultiset(
         differentialStudy,
         differentialModel,
         sigVal,
@@ -865,7 +867,7 @@ class DifferentialSearchCriteria extends Component {
         }
       })
       .catch(error => {
-        console.error('Error during getResultsUpset', error);
+        console.error('Error during getResultsMultiset', error);
       });
   }
 
@@ -903,7 +905,7 @@ class DifferentialSearchCriteria extends Component {
       differentialTestsDisabled,
       multisetFiltersVisibleDifferential,
       differentialStudyReportTooltip,
-      isFilteredSearchCriteria,
+      isFilteredSearch,
     } = this.state;
 
     const {
@@ -911,10 +913,10 @@ class DifferentialSearchCriteria extends Component {
       differentialModel,
       differentialTest,
       isValidSearchDifferential,
-      multisetPlotAvailableDifferential,
-      plotButtonActiveDifferential,
+      plotMultisetLoadedDifferential,
+      multisetButttonActiveDifferential,
       onHandlePlotAnimationDifferential,
-      isDataStreamingResultsTable,
+      differentialResultsTableStreaming,
     } = this.props;
 
     const dynamicSize = getDynamicSize();
@@ -986,7 +988,7 @@ class DifferentialSearchCriteria extends Component {
           multisetFiltersVisibleDifferential={
             this.state.multisetFiltersVisibleDifferential
           }
-          upsetColsDifferential={this.props.upsetColsDifferential}
+          multisetColsDifferential={this.props.multisetColsDifferential}
           numElementsP={this.state.numElementsP}
           maxElementsP={this.state.maxElementsP}
         />
@@ -999,17 +1001,17 @@ class DifferentialSearchCriteria extends Component {
           icon
           labelPosition="left"
           id={
-            isFilteredSearchCriteria
+            isFilteredSearch
               ? 'MultisetFilterButtonLight'
               : 'MultisetFilterButtonDark'
           }
-          className={isFilteredSearchCriteria ? 'disabled' : ''}
+          className={isFilteredSearch ? 'disabled' : ''}
           size={dynamicSize}
           fluid
           onClick={this.updateQueryDataP}
         >
-          {isFilteredSearchCriteria ? 'Filtered' : 'Filter'}
-          <Icon name={isFilteredSearchCriteria ? 'check' : 'filter'} />
+          {isFilteredSearch ? 'Filtered' : 'Filter'}
+          <Icon name={isFilteredSearch ? 'check' : 'filter'} />
         </Button>
         // }
         //   content="Use multiset criteria below to filter results"
@@ -1025,22 +1027,24 @@ class DifferentialSearchCriteria extends Component {
     let MultisetRadio;
 
     if (isValidSearchDifferential) {
+      const WindowWidth = getWindowWidth();
+      const QuarterWindowWidth = getWindowWidth() / 4;
+      const PlotLabel =
+        QuarterWindowWidth > 350 || WindowWidth < 1200 ? 'View Plot' : 'Plot';
       PlotRadio = (
         <Fragment>
           <Transition
-            visible={!multisetPlotAvailableDifferential}
+            visible={!plotMultisetLoadedDifferential}
             animation="flash"
             duration={1500}
           >
             <Radio
               toggle
-              label="View Plot"
-              className={
-                multisetPlotAvailableDifferential ? 'ViewPlotRadio' : ''
-              }
-              checked={plotButtonActiveDifferential}
+              label={PlotLabel}
+              className={plotMultisetLoadedDifferential ? 'ViewPlotRadio' : ''}
+              checked={multisetButttonActiveDifferential}
               onChange={onHandlePlotAnimationDifferential('uncover')}
-              disabled={!multisetPlotAvailableDifferential}
+              disabled={!plotMultisetLoadedDifferential}
             />
           </Transition>
           <Popup
@@ -1086,12 +1090,12 @@ class DifferentialSearchCriteria extends Component {
             trigger={
               <Radio
                 toggle
-                label="Set Analysis"
+                label="SetAnalysis"
                 checked={multisetFiltersVisibleDifferential}
                 onChange={this.handleMultisetToggleDifferential}
-                disabled={isDataStreamingResultsTable}
+                disabled={differentialResultsTableStreaming}
                 className={
-                  isDataStreamingResultsTable ? 'CursorNotAllowed' : ''
+                  differentialResultsTableStreaming ? 'CursorNotAllowed' : ''
                 }
               />
             }
@@ -1101,7 +1105,7 @@ class DifferentialSearchCriteria extends Component {
             inverted
             basic
             content={
-              isDataStreamingResultsTable
+              differentialResultsTableStreaming
                 ? 'Set Analysis is disabled until data finishes streaming'
                 : 'Apply column filter(s) across multiple test results'
             }
@@ -1114,7 +1118,7 @@ class DifferentialSearchCriteria extends Component {
 
     return (
       <React.Fragment>
-        <Form className="SearchCriteriaContainer">
+        <Form className="SearchContainer">
           <Popup
             trigger={
               <Form.Field
@@ -1223,4 +1227,4 @@ class DifferentialSearchCriteria extends Component {
   }
 }
 
-export default withRouter(DifferentialSearchCriteria);
+export default withRouter(DifferentialSearch);

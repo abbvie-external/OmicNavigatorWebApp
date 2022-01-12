@@ -4,6 +4,7 @@ import { withRouter } from 'react-router-dom';
 import { CancelToken } from 'axios';
 import { Grid, Menu, Popup, Sidebar, Tab, Message } from 'semantic-ui-react';
 import SVG from 'react-inlinesvg';
+import { toast } from 'react-toastify';
 import networkIcon from '../../resources/networkIcon.png';
 import networkIconSelected from '../../resources/networkIconSelected.png';
 import tableIcon from '../../resources/tableIcon.png';
@@ -23,11 +24,11 @@ import TransitionActive from '../Transitions/TransitionActive';
 import TransitionStill from '../Transitions/TransitionStill';
 import './Enrichment.scss';
 import NetworkGraphControls from './NetworkGraphControls';
-import EnrichmentSearchCriteria from './EnrichmentSearchCriteria';
+import EnrichmentSearch from './EnrichmentSearch';
 import SplitPanesContainer from './SplitPanesContainer';
 import CustomEmptyMessage from '../Shared/Templates';
 // eslint-disable-next-line no-unused-vars
-import QHGrid, { EZGrid } from '../Shared/QHGrid';
+import { EZGrid } from '../Shared/QHGrid';
 import ErrorBoundary from '../Shared/ErrorBoundary';
 
 let cancelRequestEnrichmentGetPlot = () => {};
@@ -71,7 +72,6 @@ class Enrichment extends Component {
       links: [],
       tests: [],
     },
-    filterNetworkFromUpset: [],
     networkDataLoaded: false,
     networkGraphReady: false,
     networkDataError: false,
@@ -112,7 +112,7 @@ class Enrichment extends Component {
     enrichmentTerm: '',
     itemsPerPageInformedEnrichmentMain: null,
     plotType: [],
-    imageInfoEnrichment: {
+    plotDataEnrichment: {
       key: null,
       title: '',
       svg: [],
@@ -272,7 +272,7 @@ class Enrichment extends Component {
     testSelectedTransitionCb(true);
     // const TestSiteVar = `${test}:${dataItem.description}`;
     // let xLargest = 0;
-    // let imageInfoEnrichment = { key: '', title: '', svg: [] };
+    // let plotDataEnrichment = { key: '', title: '', svg: [] };
     // omicNavigatorService
     //   .getDatabaseInfo(
     //     enrichmentStudy + 'plots',
@@ -290,8 +290,8 @@ class Enrichment extends Component {
     let term = dataItem?.termID || '';
     let description = dataItem?.description || '';
     self.setState({
-      imageInfoEnrichment: {
-        ...self.state.imageInfoEnrichment,
+      plotDataEnrichment: {
+        ...self.state.plotDataEnrichment,
         key: `${test}:${description}`,
         title: `${test}:${description}`,
       },
@@ -498,7 +498,60 @@ class Enrichment extends Component {
     }
   };
 
-  handleSearchCriteriaChangeEnrichment = (changes, scChange) => {
+  handlePlotTypesEnrichment = enrichmentModel => {
+    if (enrichmentModel !== '') {
+      if (this.state.enrichmentStudyMetadata?.plots != null) {
+        const enrichmentModelData = this.state.enrichmentStudyMetadata.plots.find(
+          model => model.modelID === enrichmentModel,
+        );
+        const enrichmentPlotTypesRaw = enrichmentModelData?.plots;
+        // filter out invalid plots - plotType string must be 'singleFeature', 'multiFeature', 'singleTest', 'multiTest'
+        const enrichmentPlotTypesVar = [...enrichmentPlotTypesRaw].filter(
+          plot => {
+            let plotTypeArr = plot?.plotType || null;
+            const convertStringToArray = object => {
+              return typeof object === 'string' ? Array(object) : object;
+            };
+            if (plotTypeArr) {
+              plotTypeArr = convertStringToArray(plot.plotType);
+            }
+            const isValidPlotType = pt => {
+              return (
+                pt === 'singleFeature' ||
+                pt === 'multiFeature' ||
+                pt === 'singleTest' ||
+                pt === 'multiTest'
+              );
+            };
+            const valid = plotTypeArr.every(isValidPlotType);
+            if (!valid) {
+              console.log(
+                `${plot?.plotID} will be ignored because it has unknown plotType ${plot.plotType}`,
+              );
+              toast.error(
+                `${plot?.plotID} will be ignored because it has unknown plotType ${plot.plotType}`,
+              );
+            }
+            return valid;
+          },
+        );
+        let plotMultiFeatureAvailableVar = false;
+        if (enrichmentPlotTypesVar) {
+          const plotTypesMapped = [...enrichmentPlotTypesVar].map(
+            p => p.plotType,
+          );
+          plotMultiFeatureAvailableVar =
+            plotTypesMapped?.includes('multiFeature') || false;
+        }
+        this.setState({
+          enrichmentPlotTypes: enrichmentPlotTypesVar,
+          plotMultiFeatureAvailable: plotMultiFeatureAvailableVar,
+        });
+      }
+    }
+  };
+
+  handleSearchChangeEnrichment = (changes, scChange) => {
     this.props.onHandleUrlChange(changes, 'enrichment');
     this.setState({
       plotButtonActiveEnrichment: false,
@@ -567,9 +620,10 @@ class Enrichment extends Component {
                 }
                 this.setState({ enrichmentColumnsUnfiltered: columns });
                 if (this.state.multisetTestsFilteredOut.length > 0) {
+                  const self = this;
                   columns = columns.filter(function(col) {
-                    return !this.setState.MultisetTestsFilteredOut.includes(
-                      col.title,
+                    return !self.setState.MultisetTestsFilteredOut.includes(
+                      col?.title,
                     );
                   });
                 }
@@ -721,7 +775,7 @@ class Enrichment extends Component {
     });
   };
 
-  handleSearchCriteriaResetEnrichment = () => {
+  handleSearchResetEnrichment = () => {
     this.setState({
       isTestSelected: false,
       isTestDataLoaded: false,
@@ -1157,7 +1211,7 @@ class Enrichment extends Component {
         },
         SVGPlotLoaded: false,
         SVGPlotLoading: false,
-        // imageInfoEnrichment: {
+        // plotDataEnrichment: {
         //   key: null,
         //   title: '',
         //   svg: []
@@ -1206,8 +1260,8 @@ class Enrichment extends Component {
         SVGPlotLoaded: false,
         SVGPlotLoading: false,
         HighlightedProteins: [],
-        // imageInfoEnrichment: {
-        //   ...this.state.imageInfoEnrichment,
+        // plotDataEnrichment: {
+        //   ...this.state.plotDataEnrichment,
         //   svg: []
         // },
       });
@@ -1218,9 +1272,9 @@ class Enrichment extends Component {
     const { enrichmentPlotTypes, enrichmentTest, uData } = this.state;
     const { enrichmentStudy, enrichmentModel } = this.props;
     let id = featureId != null ? featureId : '';
-    let imageInfoEnrichmentVar = { key: '', title: '', svg: [] };
-    imageInfoEnrichmentVar.title = this.state.imageInfoEnrichment.title;
-    imageInfoEnrichmentVar.key = id;
+    let plotDataEnrichmentVar = { key: '', title: '', svg: [] };
+    plotDataEnrichmentVar.title = this.state.plotDataEnrichment.title;
+    plotDataEnrichmentVar.key = id;
     this.setState({ svgExportName: id });
     cancelRequestEnrichmentGetPlot();
     let cancelToken = new CancelToken(e => {
@@ -1257,8 +1311,8 @@ class Enrichment extends Component {
           .filter(Boolean);
         Promise.race(promises)
           .then(svg => {
-            imageInfoEnrichmentVar.svg = [svg];
-            self.handleSVG(imageInfoEnrichmentVar);
+            plotDataEnrichmentVar.svg = [svg];
+            self.handleSVG(plotDataEnrichmentVar);
           })
           // Ignore error in first race - Handled later
           .catch(error => undefined)
@@ -1283,7 +1337,7 @@ class Enrichment extends Component {
               .filter(result => result.status === 'rejected')
               .map(({ reason }) => reason);
             if (svgArray.length) {
-              self.handleSVG({ ...imageInfoEnrichmentVar, svg: svgArray });
+              self.handleSVG({ ...plotDataEnrichmentVar, svg: svgArray });
             }
             if (errors.length === promises.length) {
               throw new Error('Error during plotStudyReturnSvgUrl');
@@ -1326,10 +1380,10 @@ class Enrichment extends Component {
     );
   };
 
-  handleSVG = imageInfoEnrichmentVar => {
+  handleSVG = plotDataEnrichmentVar => {
     this.setState({
-      imageInfoEnrichment: imageInfoEnrichmentVar,
-      imageInfoEnrichmentLength: imageInfoEnrichmentVar.svg?.length || 0,
+      plotDataEnrichment: plotDataEnrichmentVar,
+      plotDataEnrichmentLength: plotDataEnrichmentVar.svg?.length || 0,
       SVGPlotLoaded: true,
       SVGPlotLoading: false,
     });
@@ -1339,8 +1393,8 @@ class Enrichment extends Component {
     this.setState({
       // SVGPlotLoaded: false,
       SVGPlotLoading: false,
-      // imageInfoEnrichment: {
-      //   ...this.state.imageInfoEnrichment,
+      // plotDataEnrichment: {
+      //   ...this.state.plotDataEnrichment,
       //   svg: []
       // },
     });
@@ -1348,7 +1402,7 @@ class Enrichment extends Component {
 
   handleGetBarcodeDataError = () => {
     this.testSelectedTransition(false);
-    this.handleSearchCriteriaChangeEnrichment(
+    this.handleSearchChangeEnrichment(
       {
         enrichmentStudy: this.props.enrichmentStudy || '',
         enrichmentModel: this.props.enrichmentModel || '',
@@ -1369,7 +1423,7 @@ class Enrichment extends Component {
   ) => {
     this.testSelectedTransition(true);
     const TestSiteVar = `${test}:${dataItem.description}`;
-    this.handleSearchCriteriaChangeEnrichment(
+    this.handleSearchChangeEnrichment(
       {
         enrichmentStudy: this.props.enrichmentStudy || '',
         enrichmentModel: this.props.enrichmentModel || '',
@@ -1381,8 +1435,8 @@ class Enrichment extends Component {
     let term = dataItem?.termID || '';
     let description = dataItem?.description || '';
     this.setState({
-      imageInfoEnrichment: {
-        ...this.state.imageInfoEnrichment,
+      plotDataEnrichment: {
+        ...this.state.plotDataEnrichment,
         key: `${test}:${description}`,
         title: `${test}:${description}`,
         dataItem: dataItem,
@@ -1452,8 +1506,8 @@ class Enrichment extends Component {
         //   let term = dataItem.Annotation;
 
         //   self.setState({
-        //     imageInfoEnrichment: {
-        //       ...self.state.imageInfoEnrichment,
+        //     plotDataEnrichment: {
+        //       ...self.state.plotDataEnrichment,
         //       key: `${test} : ${dataItem.description}`,
         //       title: `${test} : ${dataItem.description}`
         //     },
@@ -1888,14 +1942,14 @@ class Enrichment extends Component {
       enrichmentNameLoaded: false,
       SVGPlotLoaded: false,
       SVGPlotLoading: false,
-      imageInfoEnrichment: {
+      plotDataEnrichment: {
         key: null,
         title: '',
         svg: [],
         dataItem: [],
       },
     });
-    this.handleSearchCriteriaChangeEnrichment(
+    this.handleSearchChangeEnrichment(
       {
         enrichmentStudy: this.props.enrichmentStudy || '',
         enrichmentModel: this.props.enrichmentModel || '',
@@ -2091,7 +2145,7 @@ class Enrichment extends Component {
                   />
                 </div>
                 <Grid.Column
-                  className="ResultsTableWrapper"
+                  className="EnrichmentTableWrapper"
                   mobile={16}
                   tablet={16}
                   largeScreen={16}
@@ -2378,7 +2432,7 @@ class Enrichment extends Component {
             largeScreen={4}
             widescreen={4}
           >
-            <EnrichmentSearchCriteria
+            <EnrichmentSearch
               {...this.state}
               {...this.props}
               onSearchTransitionEnrichment={
@@ -2386,12 +2440,8 @@ class Enrichment extends Component {
               }
               onEnrichmentSearch={this.handleEnrichmentSearch}
               onColumnReorder={this.handleColumnReorder}
-              onSearchCriteriaChangeEnrichment={
-                this.handleSearchCriteriaChangeEnrichment
-              }
-              onSearchCriteriaResetEnrichment={
-                this.handleSearchCriteriaResetEnrichment
-              }
+              onSearchChangeEnrichment={this.handleSearchChangeEnrichment}
+              onSearchResetEnrichment={this.handleSearchResetEnrichment}
               onDisablePlotEnrichment={this.disablePlotEnrichment}
               onGetMultisetPlotEnrichment={this.handleMultisetPlot}
               onMultisetQueriedEnrichment={this.handleMultisetQueriedEnrichment}

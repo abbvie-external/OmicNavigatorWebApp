@@ -7,7 +7,7 @@ import './FilteredDifferentialTable.scss';
 import { CancelToken } from 'axios';
 import CustomEmptyMessage from '../Shared/Templates';
 // eslint-disable-next-line no-unused-vars
-import QHGrid, { EZGrid } from '../Shared/QHGrid';
+import { EZGrid } from '../Shared/QHGrid';
 
 let cancelRequestFPTGetResultsTable = () => {};
 class FilteredDifferentialTable extends Component {
@@ -127,7 +127,7 @@ class FilteredDifferentialTable extends Component {
     if (this.state.filteredBarcodeData.length > 0) {
       this.setConfigCols(this.state.filteredBarcodeData, null, true);
     } else {
-      const key = this.props.imageInfoEnrichment.key.split(':');
+      const key = this.props.plotDataEnrichment.key.split(':');
       const name = key[0].trim() || '';
       cancelRequestFPTGetResultsTable();
       let cancelToken = new CancelToken(e => {

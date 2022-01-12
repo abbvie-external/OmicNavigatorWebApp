@@ -1,17 +1,10 @@
 .svgContainerVolcano {
-  height: 100% !important;
-  width: 100% !important;
-  margin: 0px 15px 0px 15px !important;
+  // height: 100% !important;
+  // width: 100% !important;
+  // margin: 0px 15px 0px 15px !important;
+  margin: 0px !important;
   display: flex;
   flex-direction: column;
-
-  .svgPlotDropdown {
-    max-width: fit-content !important;
-    z-index: 5 !important;
-    margin-top: 0px;
-    margin-bottom: 10px !important;
-    margin-left: 40px !important;
-  }
 
   .ui.secondary.pointing.menu {
     margin-left: 35px !important;
@@ -68,22 +61,31 @@
   cursor: pointer !important;
 }
 
+.svgPlotDropdown {
+  max-width: fit-content !important;
+  z-index: 5 !important;
+  margin-top: 0px;
+  margin-bottom: 10px !important;
+  margin-left: 40px !important;
+}
+
 .svgPlotDropdownInOverlay {
   max-width: fit-content !important;
   z-index: 5 !important;
   margin: 10px 10px 20px 10px !important;
 }
 
-#svgPlotDropdownSingle {
-  left: -35px !important;
+#svgPlotDropdownDifferential {
+  left: -50px !important;
   top: 8px;
-  border-bottom: 2px solid var(--color-link);
+  // border-bottom: 2px solid var(--color-link);
 }
 
+#svgPlotDropdownSingle, 
 #svgPlotDropdownMulti {
   left: -35px !important;
   top: 8px;
-  border-bottom: 2px solid var(--color-primary);
+  // border-bottom: 2px solid var(--color-primary);
 }
 
 .VolcanoPlotToggle {
@@ -92,7 +94,7 @@
   z-index: 4 !important;
   border: none !important;
   border-radius: 0px !important;
-  bottom: -30px !important;
+  bottom: 20px !important;
   margin-left: -15px !important;
 }
 #VolcanoPlotToggle {
@@ -118,4 +120,32 @@
 
 .FullScreenPadding {
   padding-right: 9px !important;
+}
+.SingleFeaturePlotPane,
+.MultiFeaturePlotPane {
+  padding-top: 0px !important;
+  // padding-right: 0px !important;
+  padding-bottom: 10px !important;
+  padding-left: 25px !important;
+  margin-bottom: 0px !important;
+  border: none !important;
+  min-height: 400px !important;
+}
+.PlotTabsContainer {
+  margin-bottom: 0px !important;
+  margin-top: 0px !important;
+  min-height: 2.6em !important;
+  max-height: 2.6em !important;
+  .item {
+    line-height: 0.5 !important;
+  }
+  // border: 0px !important;
+  a.active:last-child {
+    border-color: var(--color-primary) !important;
+    // border-width: 4px !important;
+  }
+  a.active:first-child {
+    border-color: var(--color-link) !important;
+    // border-width: 4px !important;
+  }
 }

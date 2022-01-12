@@ -343,8 +343,8 @@ class OmicNavigatorService {
     }
   }
 
-  async getUpsetCols(study, modelID) {
-    const cacheKey = `getUpsetCols${study}_${modelID}`;
+  async getMultisetCols(study, modelID) {
+    const cacheKey = `getMultisetCols${study}_${modelID}`;
     if (this[cacheKey] != null) {
       return this[cacheKey];
     } else {
@@ -453,7 +453,7 @@ class OmicNavigatorService {
     return dataFromPromise;
   }
 
-  async getResultsUpset(
+  async getResultsMultiset(
     study,
     modelID,
     sigValue,
@@ -462,7 +462,7 @@ class OmicNavigatorService {
     errorCb,
     cancelToken,
   ) {
-    const cacheKey = `getResultsUpset_${study}_${modelID}_${sigValue}_${operator}_${column}`;
+    const cacheKey = `getResultsMultiset_${study}_${modelID}_${sigValue}_${operator}_${column}`;
     if (this[cacheKey] != null) {
       return this[cacheKey];
     } else {
@@ -486,7 +486,7 @@ class OmicNavigatorService {
     }
   }
 
-  async getEnrichmentsUpset(
+  async getEnrichmentsMultiset(
     study,
     modelID,
     annotationID,
@@ -497,7 +497,7 @@ class OmicNavigatorService {
     errorCb,
     cancelToken,
   ) {
-    const cacheKey = `getEnrichmentsUpset_${study}_${modelID}_${annotationID}_${sigValue}_${operator}_${type}_${tests}`;
+    const cacheKey = `getEnrichmentsMultiset_${study}_${modelID}_${annotationID}_${sigValue}_${operator}_${type}_${tests}`;
     if (this[cacheKey] != null) {
       return this[cacheKey];
     } else {
@@ -650,11 +650,11 @@ class OmicNavigatorService {
     }
   }
 
-  async getFavicons(resultsLinkouts, errorCb, cancelToken) {
+  async getFavicons(differentialResultsLinkouts, errorCb, cancelToken) {
     const promise = this.axiosPost(
       'getFavicons',
       {
-        linkouts: resultsLinkouts,
+        linkouts: differentialResultsLinkouts,
       },
       false,
       errorCb,

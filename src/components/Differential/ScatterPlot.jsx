@@ -1,6 +1,6 @@
 import React from 'react';
 import _ from 'lodash';
-import './DifferentialVolcanoPlot.scss';
+import './ScatterPlot.scss';
 import {
   Form,
   Grid,
@@ -18,7 +18,7 @@ import * as d3 from 'd3';
 import * as hexbin from 'd3-hexbin';
 import ButtonActions from '../Shared/ButtonActions';
 
-class DifferentialVolcanoPlot extends React.PureComponent {
+class ScatterPlot extends React.PureComponent {
   plotCirclesSorted = [];
   differentialResults = [];
   circles = [];
@@ -85,7 +85,6 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     xAxisLabel: sessionStorage.getItem('yAxisLabel') || null,
     yAxisLabel: sessionStorage.getItem('yAxisLabel') || null,
     volcanoCircleLabel: sessionStorage.getItem('volcanoCircleLabel') || null,
-    identifier: null,
     volcanoCircleLabels: [],
     optionsOpen: false,
     usageOpen: false,
@@ -94,26 +93,21 @@ class DifferentialVolcanoPlot extends React.PureComponent {
 
   componentDidMount() {
     const {
-      isDataStreamingResultsTable,
+      differentialResultsTableStreaming,
       differentialResultsUnfiltered,
       volcanoPlotVisible,
       upperPlotsVisible,
-      isItemSelected,
+      plotOverlayVisible,
     } = this.props;
     // if data streaming is false when mounts, it's cached, so we just need to load everything on mount, because it won't get caught in update
-    if (!isDataStreamingResultsTable) {
+    if (!differentialResultsTableStreaming) {
       this.getAxisLabels();
       window.addEventListener('resize', this.debouncedResizeListener);
-      // user opens volcano plot any time after data finishes streaming
-      const dataInCurrentView =
-        this.state.currentResults.length > 0
-          ? this.state.currentResults
-          : differentialResultsUnfiltered;
       d3.select('#VolcanoChart').remove();
       this.setupVolcano();
       this.hexBinning(differentialResultsUnfiltered);
-      this.transitionZoom(dataInCurrentView, false, false, false);
-      if (volcanoPlotVisible && upperPlotsVisible && !isItemSelected) {
+      this.transitionZoom(differentialResultsUnfiltered, false, false, false);
+      if (volcanoPlotVisible && upperPlotsVisible && !plotOverlayVisible) {
         this.setState({ optionsOpen: true });
       }
     }
@@ -121,18 +115,19 @@ class DifferentialVolcanoPlot extends React.PureComponent {
 
   componentDidUpdate(prevProps, prevState) {
     const {
-      volcanoDifferentialTableRowHighlight,
+      differentialHighlightedFeatures,
       upperPlotsHeight,
       volcanoWidth,
       isFilteredDifferential,
-      isDataStreamingResultsTable,
+      differentialResultsTableStreaming,
       differentialResultsUnfiltered,
-      // HighlightedFeaturesArrVolcano,
+      // differentialHighlightedFeaturesData,
       volcanoPlotVisible,
       upperPlotsVisible,
       filteredDifferentialTableData,
-      volcanoDifferentialTableRowOutline,
-      isItemSelected,
+      differentialOutlinedFeature,
+      plotOverlayVisible,
+      differentialTest,
     } = this.props;
 
     const {
@@ -143,9 +138,22 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       doYAxisTransformation,
     } = this.state;
     // this if/else if/else if statement in place to minimize re-renders - should cover all situations
-    if (
-      !isDataStreamingResultsTable &&
-      isDataStreamingResultsTable !== prevProps.isDataStreamingResultsTable
+    if (differentialTest !== prevProps.differentialTest) {
+      // if the test is changed and data is cached, it won't steam, and this needs to run
+      this.getAxisLabels();
+      window.addEventListener('resize', this.debouncedResizeListener);
+      d3.select('#VolcanoChart').remove();
+      this.setupVolcano();
+      this.hexBinning(differentialResultsUnfiltered);
+      this.transitionZoom(differentialResultsUnfiltered, false, false, false);
+      if (volcanoPlotVisible && upperPlotsVisible && !plotOverlayVisible) {
+        this.setState({ optionsOpen: true });
+      }
+    } else if (
+      !differentialResultsTableStreaming &&
+      differentialResultsTableStreaming !==
+        prevProps.differentialResultsTableStreaming
+      // data finishes streaming
     ) {
       this.getAxisLabels();
       window.addEventListener('resize', this.debouncedResizeListener);
@@ -157,11 +165,11 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       this.setupVolcano();
       this.hexBinning(differentialResultsUnfiltered);
       this.transitionZoom(dataInCurrentView, false, false, false);
-      if (volcanoPlotVisible && upperPlotsVisible && !isItemSelected) {
+      if (volcanoPlotVisible && upperPlotsVisible && !plotOverlayVisible) {
         this.setState({ optionsOpen: true });
       }
     } else if (
-      !isDataStreamingResultsTable &&
+      !differentialResultsTableStreaming &&
       (prevState.xAxisLabel !== xAxisLabel ||
         prevState.yAxisLabel !== yAxisLabel ||
         prevState.doXAxisTransformation !== doXAxisTransformation ||
@@ -176,7 +184,8 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       this.transitionZoom(this.state.currentResults, false, false, false);
     } else if (
       (prevProps.isFilteredDifferential && !isFilteredDifferential) ||
-      (prevProps.isUpsetVisible && !this.props.isUpsetVisible)
+      (prevProps.multisetFiltersVisibleParentRef &&
+        !this.props.multisetFiltersVisibleParentRef)
     ) {
       // set analysis "filter" is clicked OR set analysis is toggled off
       const dataInCurrentView =
@@ -185,7 +194,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
           : differentialResultsUnfiltered;
       this.transitionZoom(dataInCurrentView, false, false, false);
     } else if (
-      !isDataStreamingResultsTable &&
+      !differentialResultsTableStreaming &&
       prevProps.filteredDifferentialTableData.length !== 30 &&
       filteredDifferentialTableData.length !==
         prevProps.filteredDifferentialTableData.length
@@ -203,11 +212,10 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     }
     if (
       !_.isEqual(
-        _.sortBy(volcanoDifferentialTableRowHighlight),
-        _.sortBy(prevProps.volcanoDifferentialTableRowHighlight),
+        _.sortBy(differentialHighlightedFeatures),
+        _.sortBy(prevProps.differentialHighlightedFeatures),
       ) ||
-      volcanoDifferentialTableRowOutline !==
-        prevProps.volcanoDifferentialTableRowOutline
+      differentialOutlinedFeature !== prevProps.differentialOutlinedFeature
     ) {
       this.highlightBrushedCircles();
     }
@@ -375,7 +383,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       };
       this.setState({ ...volcanoState });
     }
-    this.props.onHandleVolcanoCurrentSelection(data);
+    this.props.onHandleScatterPlotBoxSelection(data);
     this.setupBrush(volcanoWidth, upperPlotsHeight);
 
     this.props.onHandleUpdateDifferentialResults(differentialResults);
@@ -475,29 +483,32 @@ class DifferentialVolcanoPlot extends React.PureComponent {
   }
   renderCirclesFilter(circles) {
     const { differentialResultsUnfiltered } = this.props;
-    const { identifier, xAxisLabel, yAxisLabel } = this.state;
+    const { differentialFeatureIdKey, xAxisLabel, yAxisLabel } = this.state;
 
     const { xScale, yScale } = this.scaleFactory(
       this.state.currentResults.length > 0
         ? this.state.currentResults
         : differentialResultsUnfiltered,
     );
-
+    const circlesWithBothXAndYValues = circles.filter(
+      c =>
+        typeof c[xAxisLabel] === 'number' && typeof c[yAxisLabel] === 'number',
+    );
     const svg = d3.select('#filtered-elements');
     svg
       .selectAll('circle')
-      .data(circles)
+      .data(circlesWithBothXAndYValues)
       .enter()
       .append('circle')
       .attr('cx', d => `${xScale(this.doTransform(d[xAxisLabel], 'x'))}`)
       .attr('cy', d => `${yScale(this.doTransform(d[yAxisLabel], 'y'))}`)
       .attr('fill', '#E0E1E2')
-      .attr('r', 2)
+      .attr('r', 3)
       .attr('stroke', '#aab1c0')
       .attr('strokeWidth', 0.4)
       .attr('class', 'volcanoPlot-dataPoint')
-      .attr('circleid', d => `${d[identifier]}`)
-      .attr('key', (d, index) => `${d[identifier]}_${index}`)
+      .attr('circleid', d => `${d[differentialFeatureIdKey]}`)
+      .attr('key', (d, index) => `${d[differentialFeatureIdKey]}_${index}`)
       .attr('data', d => JSON.stringify(d))
       .attr('ystatistic', d => `${this.doTransform(d[yAxisLabel], 'y')}`)
       .attr('xstatistic', d => `${this.doTransform(d[xAxisLabel], 'x')}`);
@@ -508,7 +519,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       differentialResultsUnfiltered,
       differentialFeatureIdKey,
     } = this.props;
-    const { identifier, xAxisLabel, yAxisLabel } = this.state;
+    const { xAxisLabel, yAxisLabel } = this.state;
     const { xScale, yScale } = this.scaleFactory(
       this.state.currentResults.length > 0
         ? this.state.currentResults
@@ -517,21 +528,26 @@ class DifferentialVolcanoPlot extends React.PureComponent {
 
     if (d3.select('#nonfiltered-elements').size() !== 0) {
       const svg = d3.select('#nonfiltered-elements');
+      const circlesWithBothXAndYValues = circles.filter(
+        c =>
+          typeof c[xAxisLabel] === 'number' &&
+          typeof c[yAxisLabel] === 'number',
+      );
       svg
         .selectAll('circle')
-        .data(circles)
+        .data(circlesWithBothXAndYValues)
         .enter()
         .append('circle')
         .attr('cx', d => `${xScale(this.doTransform(d[xAxisLabel], 'x'))}`)
         .attr('cy', d => `${yScale(this.doTransform(d[yAxisLabel], 'y'))}`)
         .attr('fill', '#1678c2')
-        .attr('r', 2)
+        .attr('r', 3)
         .attr('stroke', '#000')
         .attr('strokeWidth', 0.4)
         .attr('class', 'volcanoPlot-dataPoint')
-        .attr('id', d => `volcanoDataPoint-${d[identifier]}`)
-        .attr('circleid', d => `${d[identifier]}`)
-        .attr('key', (d, index) => `${d[identifier]}_${index}`)
+        .attr('id', d => `volcanoDataPoint-${d[differentialFeatureIdKey]}`)
+        .attr('circleid', d => `${d[differentialFeatureIdKey]}`)
+        .attr('key', (d, index) => `${d[differentialFeatureIdKey]}_${index}`)
         .attr('data', d => JSON.stringify(d))
         .attr('ystatistic', d => `${this.doTransform(d[yAxisLabel], 'y')}`)
         .attr('xstatistic', d => `${this.doTransform(d[xAxisLabel], 'x')}`)
@@ -547,7 +563,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
           d3.select('#tooltip').remove();
           d3.event.stopPropagation();
           const elem = d3.select(
-            `circle[id='volcanoDataPoint-${e[identifier]}`,
+            `circle[id='volcanoDataPoint-${e[differentialFeatureIdKey]}`,
           );
 
           if (d3.event.metaKey || d3.event.ctrlKey) {
@@ -557,7 +573,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
                 elem._groups[0][0].attributes.data.value,
               );
               let clickedElems = [
-                ...this.props.volcanoDifferentialTableRowHighlight.filter(
+                ...this.props.differentialHighlightedFeatures.filter(
                   elem => elem !== elemData[differentialFeatureIdKey],
                 ),
               ];
@@ -574,7 +590,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
                 el => el[differentialFeatureIdKey],
               );
               let allElems = [
-                ...this.props.volcanoDifferentialTableRowHighlight,
+                ...this.props.differentialHighlightedFeatures,
               ].concat(clickedDotFeatureId);
               this.props.onHandleDotClick(e, allElems, 0, false, false);
             }
@@ -582,7 +598,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
             // simple dot click
             if (elem.attr('class').endsWith('outlined')) {
               // already outlined
-              this.props.onClearPlotSelected();
+              this.props.onResetDifferentialOutlinedFeature();
             } else {
               this.props.onHandleDotClick(
                 e,
@@ -632,14 +648,13 @@ class DifferentialVolcanoPlot extends React.PureComponent {
   }
 
   getCircleOrBin = key => {
-    const { identifier } = this.state;
-    const { differentialTableData } = this.props;
+    const { differentialTableData, differentialFeatureIdKey } = this.props;
     let el = null;
     const circleWithKey = [...differentialTableData].find(
       c => c[this.props.differentialFeatureIdKey] === key,
     );
     if (circleWithKey) {
-      const circleIdentifier = circleWithKey[identifier] || null;
+      const circleIdentifier = circleWithKey[differentialFeatureIdKey] || null;
       if (circleIdentifier) {
         el = document.getElementById(`volcanoDataPoint-${circleIdentifier}`);
       } else return null;
@@ -648,7 +663,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       return { element: d3.select(el)._groups[0][0], type: 'circle' };
     } else {
       const bin = this.state.bins.find(bin => {
-        return bin.some(b => b[identifier] === key);
+        return bin.some(b => b[differentialFeatureIdKey] === key);
       });
       if (bin && bin.x && bin.y && bin.length) {
         return {
@@ -661,7 +676,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     }
   };
 
-  removeViolinBrush = () => {
+  removeScatterBrush = () => {
     const brush = d3
       .select('.volcanoPlotD3BrushSelection')
       .selectAll('rect.selection');
@@ -676,7 +691,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
   };
 
   resizeBrushSelection = () => {
-    this.removeViolinBrush();
+    this.removeScatterBrush();
     // add resizing later after priorities
   };
 
@@ -702,20 +717,20 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     const circles = d3.selectAll('circle.volcanoPlot-dataPoint');
     circles
       // .attr('style', 'fill: #1678c2')
-      // .attr('r', 2)
+      // .attr('r', 3)
       .classed('highlighted', false)
       .classed('outlined', false);
   };
 
   highlightBrushedCircles = () => {
     const {
-      volcanoDifferentialTableRowHighlight,
-      volcanoDifferentialTableRowOutline,
+      differentialHighlightedFeatures,
+      differentialOutlinedFeature,
     } = this.props;
     if (d3.select('#nonfiltered-elements').size() !== 0) {
       if (
-        !volcanoDifferentialTableRowHighlight?.length &&
-        volcanoDifferentialTableRowOutline === ''
+        !differentialHighlightedFeatures?.length &&
+        differentialOutlinedFeature === ''
       ) {
         d3.select('#nonfiltered-elements')
           .selectAll('text')
@@ -728,7 +743,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         .attr('fill', '#1678c2')
         .attr('stroke', '#000')
         .attr('stroke-width', 1)
-        .attr('r', 2)
+        .attr('r', 3)
         .classed('highlighted', false)
         .classed('outlined', false);
     }
@@ -751,18 +766,17 @@ class DifferentialVolcanoPlot extends React.PureComponent {
 
   handleCircleLabels = () => {
     const {
-      volcanoDifferentialTableRowHighlight,
-      volcanoDifferentialTableRowOutline,
+      differentialHighlightedFeatures,
+      differentialOutlinedFeature,
+      differentialFeatureIdKey,
     } = this.props;
-    const { identifier, circles } = this.state;
-    let combinedCircleFeatureIdsArr = [...volcanoDifferentialTableRowHighlight];
-    if (volcanoDifferentialTableRowOutline !== '') {
-      const volcanoDifferentialTableRowOutlineArr = [
-        volcanoDifferentialTableRowOutline,
-      ];
+    const { circles } = this.state;
+    let combinedCircleFeatureIdsArr = [...differentialHighlightedFeatures];
+    if (differentialOutlinedFeature !== '') {
+      const differentialOutlinedFeatureArr = [differentialOutlinedFeature];
       combinedCircleFeatureIdsArr = _.union(
-        [...volcanoDifferentialTableRowHighlight],
-        [...volcanoDifferentialTableRowOutlineArr],
+        [...differentialHighlightedFeatures],
+        [...differentialOutlinedFeatureArr],
       );
     }
 
@@ -774,7 +788,8 @@ class DifferentialVolcanoPlot extends React.PureComponent {
           c => c[this.props.differentialFeatureIdKey] === elem,
         );
         if (circleWithKey) {
-          const circleIdentifier = circleWithKey[identifier] || null;
+          const circleIdentifier =
+            circleWithKey[differentialFeatureIdKey] || null;
           if (circleIdentifier) {
             el = document.getElementById(
               `volcanoDataPoint-${circleIdentifier}`,
@@ -798,20 +813,20 @@ class DifferentialVolcanoPlot extends React.PureComponent {
 
   highlightCircles = () => {
     const {
-      volcanoDifferentialTableRowHighlight,
-      volcanoDifferentialTableRowOutline,
+      differentialHighlightedFeatures,
+      differentialOutlinedFeature,
     } = this.props;
-    if (volcanoDifferentialTableRowHighlight?.length > 0) {
-      volcanoDifferentialTableRowHighlight.forEach(element => {
+    if (differentialHighlightedFeatures?.length > 0) {
+      differentialHighlightedFeatures.forEach(element => {
         // style all highlighted circles
         const highlightedCircleId = this.getCircleOrBin(element);
         if (highlightedCircleId) {
           const highlightedCircle = d3.select(highlightedCircleId?.element);
-          let radius = element === volcanoDifferentialTableRowOutline ? 7 : 6;
+          let radius = element === differentialOutlinedFeature ? 7 : 6;
           let stroke =
-            element === volcanoDifferentialTableRowOutline ? '#1678c2' : '#000';
+            element === differentialOutlinedFeature ? '#1678c2' : '#000';
           // let strokeWidth =
-          //   element === volcanoDifferentialTableRowOutline ? 2 : 1;
+          //   element === differentialOutlinedFeature ? 2 : 1;
           if (highlightedCircle != null) {
             if (highlightedCircleId?.type === 'circle') {
               highlightedCircle.attr('stroke', stroke);
@@ -837,12 +852,10 @@ class DifferentialVolcanoPlot extends React.PureComponent {
   };
 
   outlineCircle = () => {
-    const { volcanoDifferentialTableRowOutline } = this.props;
-    if (volcanoDifferentialTableRowOutline) {
+    const { differentialOutlinedFeature } = this.props;
+    if (differentialOutlinedFeature) {
       // style outline highlighted circle
-      const outlinedId = this.getCircleOrBin(
-        volcanoDifferentialTableRowOutline,
-      );
+      const outlinedId = this.getCircleOrBin(differentialOutlinedFeature);
       if (outlinedId) {
         const outlined = d3.select(outlinedId?.element);
         if (outlined != null) {
@@ -920,17 +933,17 @@ class DifferentialVolcanoPlot extends React.PureComponent {
 
   handleCircleHover = e => {
     const elem = d3.select(
-      `circle[id='volcanoDataPoint-${e[this.state.identifier]}`,
+      `circle[id='volcanoDataPoint-${e[this.props.differentialFeatureIdKey]}`,
     )._groups[0][0];
     if (!this.state.brushing) {
       const hoveredData = {
-        id: elem.attributes['circleid'].value,
-        xstat: elem.attributes['xstatistic'].value,
-        ystat: elem.attributes['ystatistic'].value,
-        position: [elem.attributes['cx'].value, elem.attributes['cy'].value],
+        id: elem.attributes['circleid']?.value,
+        xstat: elem.attributes['xstatistic']?.value,
+        ystat: elem.attributes['ystatistic']?.value,
+        position: [elem.attributes['cx']?.value, elem.attributes['cy']?.value],
       };
-      const hoveredElement = `volcanoDataPoint-${elem.attributes['circleid'].value}`;
-      const hoveredId = `#volcanoDataPoint-${elem.attributes['circleid'].value}`;
+      const hoveredElement = `volcanoDataPoint-${elem.attributes['circleid']?.value}`;
+      const hoveredId = `#volcanoDataPoint-${elem.attributes['circleid']?.value}`;
       const hovered = document.getElementById(hoveredElement);
       if (hovered != null) {
         const circle = d3.select(hovered) ?? null;
@@ -955,8 +968,11 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     const hovered = document.getElementById(this.state.hoveredCircleElement);
     if (hovered != null) {
       const hoveredCircle =
-        d3.select(`circle[id='volcanoDataPoint-${e[this.state.identifier]}`)
-          ._groups[0][0] ?? null;
+        d3.select(
+          `circle[id='volcanoDataPoint-${
+            e[this.props.differentialFeatureIdKey]
+          }`,
+        )._groups[0][0] ?? null;
       if (hoveredCircle != null) {
         if (hoveredCircle.attributes['class'].value.endsWith('highlighted')) {
           hoveredCircle.attributes['r'].value = 6;
@@ -965,7 +981,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         ) {
           hoveredCircle.attributes['r'].value = 7;
         } else {
-          hoveredCircle.attributes['r'].value = 2;
+          hoveredCircle.attributes['r'].value = 3;
         }
         this.setState({
           hoveredCircleData: {
@@ -1018,10 +1034,12 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       hoveredBin,
       xAxisLabel,
       yAxisLabel,
-      identifier,
       doXAxisTransformation,
       doYAxisTransformation,
+      volcanoCircleLabel,
+      circles,
     } = this.state;
+    const { differentialFeatureIdKey } = this.props;
 
     const clipPathHeight =
       d3
@@ -1121,7 +1139,15 @@ class DifferentialVolcanoPlot extends React.PureComponent {
           .attr('y', 23 + 16 * 2)
           .text(yText);
       } else if (hoveredElement === 'circle') {
-        const idText = identifier + ': ' + hoveredCircleData.id;
+        let idText = differentialFeatureIdKey + ': ' + hoveredCircleData.id;
+        if (circles.length && volcanoCircleLabel !== 'None') {
+          const hoveredCircleExtendedData = [...circles].filter(
+            c => hoveredCircleData.id === c[differentialFeatureIdKey],
+          );
+          if (hoveredCircleExtendedData.length) {
+            idText = `${volcanoCircleLabel}: ${hoveredCircleExtendedData[0][volcanoCircleLabel]}`;
+          }
+        }
         const tooltipHeight =
           clipPathHeight - (hoveredCircleData.position[1] * 1 + 10);
         const tooltipWidth = hoveredCircleData.position[0] * 1 + 200;
@@ -1203,7 +1229,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     }
   }
 
-  updateVolcanoAfterUpsetOrTableFilter(
+  updateVolcanoAfterMultisetOrTableFilter(
     dataInSelection,
     initiatedByTable,
     xScale,
@@ -1255,7 +1281,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
           )
         : [];
 
-    const dataInViewPassingTableFiltersAndUpset =
+    const dataInViewPassingTableFiltersAndMultiset =
       dataInViewPassingTableFilters.length > 0
         ? dataInViewPassingTableFilters.filter(divptf =>
             differentialResultsFeatureIds.includes(
@@ -1265,11 +1291,11 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         : [];
 
     let irrelevantDataRaw = [];
-    let relevantDataRaw = dataInViewPassingTableFiltersAndUpset || [];
-    if (dataInViewPassingTableFiltersAndUpset.length !== dataInView.length) {
+    let relevantDataRaw = dataInViewPassingTableFiltersAndMultiset || [];
+    if (dataInViewPassingTableFiltersAndMultiset.length !== dataInView.length) {
       irrelevantDataRaw = _.differenceBy(
         dataInView,
-        dataInViewPassingTableFiltersAndUpset,
+        dataInViewPassingTableFiltersAndMultiset,
         differentialFeatureIdKey,
       );
     }
@@ -1337,7 +1363,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         circles: unfilteredObject.circles,
       },
       function() {
-        this.updateVolcanoAfterUpsetOrTableFilter(
+        this.updateVolcanoAfterMultisetOrTableFilter(
           allDataInView,
           initiatedByTable,
           xScale,
@@ -1440,7 +1466,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
           .attr('opacity', 1);
         // ignore selection change if initiated by table filter, it shouldn't change]
         if (initiatedByTable !== true) {
-          this.props.onHandleVolcanoCurrentSelection(allDataInView);
+          this.props.onHandleScatterPlotBoxSelection(allDataInView);
         }
       },
     );
@@ -1491,22 +1517,41 @@ class DifferentialVolcanoPlot extends React.PureComponent {
           return JSON.parse(a.attributes.data.value);
         });
         const total = [...brushedBins, ...brushedDataArr];
-
         if (!!total.length) {
-          self.transitionZoom(total, false, false, false);
+          let boxSelectionToHighlight = self.mapBoxSelectionToHighlight([
+            ...total,
+          ]);
+          console.log(d3.event);
+          if (boxSelectionToHighlight === null) {
+            // ZOOM IF NOT SHIFT BOX-SELECTING FOR MULTI-FEATURE PLOTS
+            self.transitionZoom(total, false, false, false);
+          } else if (
+            // SHIFT BOX-SELECT FOR MULTI-FEATURE PLOTS
+            d3.event.sourceEvent?.shiftKey
+          ) {
+            self.props.onHandleHighlightedFeaturesDifferential(
+              boxSelectionToHighlight,
+              true,
+            );
+            self.props.onReloadMultifeaturePlot(boxSelectionToHighlight);
+          } else {
+            // DEFAULT ZOOM AFTER CHECK FOR SHIFT BOX-SELECT
+            self.transitionZoom(total, false, false, false);
+          }
+          // we are always clearing the box; if desired, place this in
+          d3.select('.volcanoPlotD3BrushSelection').call(
+            self.objsBrush.move,
+            null,
+          );
+          self.setState({ brushing: false });
         }
-        d3.select('.volcanoPlotD3BrushSelection').call(
-          self.objsBrush.move,
-          null,
-        );
-        self.setState({ brushing: false });
       }
     };
 
     if (d3.selectAll('.brush').nodes().length > 0) {
       d3.selectAll('.brush').remove();
     }
-    self.objsBrush = d3
+    let brushScatter = d3
       .brush()
       .extent([
         [10, 5],
@@ -1514,6 +1559,9 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       ])
       .on('start', brushingStart)
       .on('end', endBrush);
+    brushScatter.filter(() => true);
+    brushScatter.keyModifiers(false);
+    self.objsBrush = brushScatter;
     d3.selectAll('.volcanoPlotD3BrushSelection').call(self.objsBrush);
     const brush = d3
       .select('.volcanoPlotD3BrushSelection')
@@ -1548,6 +1596,22 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       d3.select('.volcanoPlotD3BrushSelection').call(self.objsBrush.move, null);
     }
   }
+
+  mapBoxSelectionToHighlight = total => {
+    const { plotMultiFeatureAvailable, differentialFeatureIdKey } = this.props;
+    const scatterArr = total.map(item => ({
+      id: item[differentialFeatureIdKey],
+      value: item[differentialFeatureIdKey],
+      key: item[differentialFeatureIdKey],
+    }));
+    const uniqueScatterArray = [
+      ...new Map(scatterArr.map(item => [item.id, item])).values(),
+    ];
+    // if multi-feature plotting is not available, return null to initiate zoom
+    if (!plotMultiFeatureAvailable) {
+      return null;
+    } else return uniqueScatterArray;
+  };
 
   handleBrushedText = brushed => {
     // MAP brushedDataArr to circle text state
@@ -1645,7 +1709,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
   };
 
   handleSVGClick() {
-    // this.props.onHandleVolcanoTableLoading(true);
+    // this.props.onHandleResultsTableLoading(true);
     // this.unhighlightBrushedCircles();
     // this.props.onHandleVolcanoPlotSelectionChange(
     //   this.state.currentResults,
@@ -1657,7 +1721,8 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     //   resizeScalarY: 1,
     //   volcanoCircleText: [],
     // });
-    this.props.onHandleSelectedVolcano([], false);
+    this.props.onResetDifferentialOutlinedFeature();
+    this.props.onHandleHighlightedFeaturesDifferential([], false);
   }
 
   getXAxisLabelY(upperPlotsHeight) {
@@ -1785,19 +1850,8 @@ class DifferentialVolcanoPlot extends React.PureComponent {
         storedVolcanoCircleLabel,
       )
         ? storedVolcanoCircleLabel
-        : differentialAlphanumericFields[0];
-
-      // let identifierVar =
-      //   differentialAlphanumericFields[0] !== 'None'
-      //     ? differentialAlphanumericFields[0]
-      //     : differentialAlphanumericFields[1];
-      let identifierVar =
-        nextVolcanoCircleLabel !== 'None'
-          ? nextVolcanoCircleLabel
-          : differentialAlphanumericFields[1];
-
+        : this.props.differentialFeatureIdKey;
       this.setState({
-        identifier: identifierVar,
         volcanoCircleLabels: volcanoCircleLabelsVar,
         volcanoCircleLabel: nextVolcanoCircleLabel,
       });
@@ -1888,13 +1942,13 @@ class DifferentialVolcanoPlot extends React.PureComponent {
       differentialStudy,
       differentialModel,
       differentialTest,
-      isDataStreamingResultsTable,
+      differentialResultsTableStreaming,
       volcanoPlotVisible,
-      hasMultifeaturePlots,
+      plotMultiFeatureAvailable,
+      differentialFeatureIdKey,
     } = this.props;
 
     const {
-      identifier,
       volcanoCircleText,
       axisLabels,
       xAxisLabel,
@@ -1911,8 +1965,8 @@ class DifferentialVolcanoPlot extends React.PureComponent {
 
     const PlotName = `${differentialStudy}_${differentialModel}_${differentialTest}_scatter`;
     if (
-      !isDataStreamingResultsTable &&
-      identifier !== null &&
+      !differentialResultsTableStreaming &&
+      differentialFeatureIdKey !== null &&
       xAxisLabel !== null &&
       yAxisLabel !== null
     ) {
@@ -2131,7 +2185,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
                     <List.Content>
                       <List.Header>Zoom In / Filter Data</List.Header>
                       <List.Description>
-                        Click and drag (box select) to zoom in and filter data
+                        Click and drag (box select)
                       </List.Description>
                     </List.Content>
                   </List.Item>
@@ -2140,8 +2194,7 @@ class DifferentialVolcanoPlot extends React.PureComponent {
                     <List.Content>
                       <List.Header>Zoom Out / Clear Filters</List.Header>
                       <List.Description>
-                        Double click on an area without circles to zoom out, and
-                        clear filters
+                        Double click on an area without circles
                       </List.Description>
                     </List.Content>
                   </List.Item>
@@ -2150,19 +2203,18 @@ class DifferentialVolcanoPlot extends React.PureComponent {
                     <List.Content>
                       <List.Header>Plot A Single Feature</List.Header>
                       <List.Description>
-                        Click a circle to view plots for a single feature (blue
-                        outline)
+                        Click a circle (blue outline)
                       </List.Description>
                     </List.Content>
                   </List.Item>
-                  {hasMultifeaturePlots ? (
+                  {plotMultiFeatureAvailable ? (
                     <List.Item>
                       <Icon name="circle" id="SelectedCircleIcon" />
                       <List.Content>
                         <List.Header>Plot Multiple Features</List.Header>
                         <List.Description>
-                          Control-Click circle/s to view plots for multiple
-                          feature (orange fill)
+                          Control-click circle/s, or hold Shift while
+                          box-selecting (orange fill)
                         </List.Description>
                       </List.Content>
                     </List.Item>
@@ -2209,4 +2261,4 @@ class DifferentialVolcanoPlot extends React.PureComponent {
     // } else return null;
   }
 }
-export default DifferentialVolcanoPlot;
+export default ScatterPlot;
