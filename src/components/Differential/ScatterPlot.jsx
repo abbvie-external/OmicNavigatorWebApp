@@ -490,11 +490,14 @@ class ScatterPlot extends React.PureComponent {
         ? this.state.currentResults
         : differentialResultsUnfiltered,
     );
-
+    const circlesWithBothXAndYValues = circles.filter(
+      c =>
+        typeof c[xAxisLabel] === 'number' && typeof c[yAxisLabel] === 'number',
+    );
     const svg = d3.select('#filtered-elements');
     svg
       .selectAll('circle')
-      .data(circles)
+      .data(circlesWithBothXAndYValues)
       .enter()
       .append('circle')
       .attr('cx', d => `${xScale(this.doTransform(d[xAxisLabel], 'x'))}`)
@@ -525,9 +528,14 @@ class ScatterPlot extends React.PureComponent {
 
     if (d3.select('#nonfiltered-elements').size() !== 0) {
       const svg = d3.select('#nonfiltered-elements');
+      const circlesWithBothXAndYValues = circles.filter(
+        c =>
+          typeof c[xAxisLabel] === 'number' &&
+          typeof c[yAxisLabel] === 'number',
+      );
       svg
         .selectAll('circle')
-        .data(circles)
+        .data(circlesWithBothXAndYValues)
         .enter()
         .append('circle')
         .attr('cx', d => `${xScale(this.doTransform(d[xAxisLabel], 'x'))}`)
