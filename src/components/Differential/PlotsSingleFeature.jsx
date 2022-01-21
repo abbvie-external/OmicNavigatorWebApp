@@ -5,6 +5,7 @@ import { roundToPrecision } from '../Shared/helpers';
 import ButtonActions from '../Shared/ButtonActions';
 import MetafeaturesTableDynamic from './MetafeaturesTableDynamic';
 import './PlotsDynamic.scss';
+import Plotly from '../Shared/Plotly';
 
 class PlotsSingleFeature extends Component {
   state = {
@@ -64,13 +65,14 @@ class PlotsSingleFeature extends Component {
     this.props.onGetPlotTransitionRef(key, null, plotSingleFeatureData, true);
   };
 
-  getSVGPanesSingleFeature = () => {
+  getSVGPanesSingleFeature = activeTabIndexPlotsSingleFeature => {
     const {
       divWidth,
       divHeight,
       pxToPtRatio,
       pointSize,
       plotSingleFeatureData,
+      // singleFeaturePlotTypes,
       modelSpecificMetaFeaturesExist,
       differentialStudy,
       differentialModel,
@@ -78,18 +80,72 @@ class PlotsSingleFeature extends Component {
     } = this.props;
     let panes = [];
     let dimensions = '';
+    let divWidthPt = 0;
+    let divHeightPt = 0;
+    let divWidthPadding = 0;
+    let divHeightPadding = 0;
     if (divWidth && divHeight && pxToPtRatio) {
-      const divWidthPadding = divWidth * 0.95;
-      const divHeightPadding = divHeight * 0.95 - 38;
-      const divWidthPt = roundToPrecision(divWidthPadding / pxToPtRatio, 1);
-      const divHeightPt = roundToPrecision(divHeightPadding / pxToPtRatio, 1);
+      divWidthPadding = divWidth * 0.95;
+      divHeightPadding = divHeight * 0.95 - 38;
+      divWidthPt = roundToPrecision(divWidthPadding / pxToPtRatio, 1);
+      divHeightPt = roundToPrecision(divHeightPadding / pxToPtRatio, 1);
       const divWidthPtString = `width=${divWidthPt}`;
       const divHeightPtString = `&height=${divHeightPt}`;
       const pointSizeString = `&pointsize=${pointSize}`;
       dimensions = `?${divWidthPtString}${divHeightPtString}${pointSizeString}`;
     }
     const svgArray = plotSingleFeatureData.svg;
+    // index determines whether to set svg, or feature data
+    // if (activeTabIndexPlotsSingleFeature < singleFeaturePlotTypes.length) {
+    //   const s = plotSingleFeatureData?.svg[activeTabIndexPlotsSingleFeature];
+    // const srcUrl = `${s.svg}${dimensions}`;
+    // const svgPanes = {
+    //   menuItem: `${s.plotType.plotDisplay}`,
+    //   render: () => (
+    //     <Tab.Pane
+    //       attached="true"
+    //       as="div"
+    //       key={`${activeTabIndexPlotsSingleFeature}-${s.plotType.plotDisplay}-pane-volcano`}
+    //     >
+    //       <div id="PlotsSingleFeatureContainer" className="svgSpan">
+    //         <SVG
+    //           cacheRequests={true}
+    //           src={srcUrl}
+    //           title={`${s.plotType.plotDisplay}`}
+    //           uniqueHash={`a1f8d1-${activeTabIndexPlotsSingleFeature}`}
+    //           uniquifyIDs={true}
+    //         />
+    //       </div>
+    //     </Tab.Pane>
+    //   ),
+    // };
+    // panes = panes.concat(svgPanes);
+    // } else {
+    //   const isMultifeaturePlot =
+    //   plotSingleFeatureData?.key?.includes('features') || false;
+    // if (modelSpecificMetaFeaturesExist !== false && !isMultifeaturePlot) {
+    //   let metafeaturesTab = [
+    //     {
+    //       menuItem: 'Feature Data',
+    //       render: () => (
+    //         <Tab.Pane attached="true" as="div">
+    //           <MetafeaturesTableDynamic
+    //             ref={this.metaFeaturesTableDynamicRef}
+    //             differentialStudy={differentialStudy}
+    //             differentialModel={differentialModel}
+    //             plotOverlayLoaded={plotOverlayLoaded}
+    //             plotSingleFeatureData={plotSingleFeatureData}
+    //             modelSpecificMetaFeaturesExist={modelSpecificMetaFeaturesExist}
+    //           />
+    //         </Tab.Pane>
+    //       ),
+    //     },
+    //   ];
+    //   panes = panes.concat(metafeaturesTab);
+    // }
+    // }
     const svgPanes = svgArray.map((s, index) => {
+      const isPlotlyPlot = s.plotType.plotType.includes('plotly');
       const srcUrl = `${s.svg}${dimensions}`;
       return {
         menuItem: `${s.plotType.plotDisplay}`,
@@ -100,13 +156,21 @@ class PlotsSingleFeature extends Component {
             key={`${index}-${s.plotType.plotDisplay}-pane-volcano`}
           >
             <div id="PlotsSingleFeatureContainer" className="svgSpan">
-              <SVG
-                cacheRequests={true}
-                src={srcUrl}
-                title={`${s.plotType.plotDisplay}`}
-                uniqueHash={`a1f8d1-${index}`}
-                uniquifyIDs={true}
-              />
+              {isPlotlyPlot ? (
+                <Plotly
+                  plotlyData={s.svg}
+                  divHeightPadding={divHeightPadding}
+                  divWidthPadding={divWidthPadding}
+                />
+              ) : (
+                <SVG
+                  cacheRequests={true}
+                  src={srcUrl}
+                  title={`${s.plotType.plotDisplay}`}
+                  uniqueHash={`a1f8d1-${index}`}
+                  uniquifyIDs={true}
+                />
+              )}
             </div>
           </Tab.Pane>
         ),
@@ -182,7 +246,9 @@ class PlotsSingleFeature extends Component {
         plotSingleFeatureDataLength !== 0 &&
         plotSingleFeatureData.key != null
       ) {
-        const svgPanesSingleFeature = this.getSVGPanesSingleFeature();
+        const svgPanesSingleFeature = this.getSVGPanesSingleFeature(
+          activeTabIndexPlotsSingleFeature,
+        );
         const DropdownClass =
           this.props.differentialPlotTypes?.length > this.props.svgTabMax
             ? 'Show svgPlotDropdown'
