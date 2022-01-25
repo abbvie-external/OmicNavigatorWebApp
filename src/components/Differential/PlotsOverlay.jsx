@@ -4,6 +4,7 @@ import { Grid, Dimmer, Loader, Tab, Dropdown } from 'semantic-ui-react';
 import DifferentialBreadcrumbs from './DifferentialBreadcrumbs';
 import ButtonActions from '../Shared/ButtonActions';
 import MetafeaturesTable from './MetafeaturesTable';
+import Plotly from '../Shared/Plotly';
 import '../Enrichment/SplitPanesContainer.scss';
 import './PlotsDynamic.scss';
 import './PlotsOverlay.scss';
@@ -103,15 +104,26 @@ class PlotsOverlay extends PureComponent {
         if (this.props.plotOverlayData.svg.length !== 0) {
           const svgArray = [...this.props.plotOverlayData.svg];
           const svgPanes = svgArray.map(s => {
+            const isPlotlyPlot = s.plotType.plotType.includes('plotly');
             return {
               menuItem: `${s.plotType.plotDisplay}`,
               render: () => (
                 <Tab.Pane attached="true" as="div">
-                  <div
-                    id="PlotsOverlayContainer"
-                    className="svgSpan"
-                    dangerouslySetInnerHTML={{ __html: s.svg }}
-                  ></div>
+                  {isPlotlyPlot ? (
+                    <div id="PlotsOverlayContainer" className="svgSpan">
+                      <Plotly
+                        plotlyData={s.svg}
+                        // divHeightPadding={divHeightPadding}
+                        // divWidthPadding={divWidthPadding}
+                      />
+                    </div>
+                  ) : (
+                    <div
+                      id="PlotsOverlayContainer"
+                      className="svgSpan"
+                      dangerouslySetInnerHTML={{ __html: s.svg }}
+                    ></div>
+                  )}
                 </Tab.Pane>
               ),
             };

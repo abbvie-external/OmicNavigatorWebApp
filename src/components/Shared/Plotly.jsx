@@ -49,7 +49,6 @@ export default class Plotly extends Component {
   };
 
   render() {
-    debugger;
     const { plotlyData } = this.props;
     // const { layout } = this.state;
     const parsedData = JSON.parse(plotlyData);
