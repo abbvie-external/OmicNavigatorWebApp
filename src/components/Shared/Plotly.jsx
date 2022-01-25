@@ -40,8 +40,8 @@ export default class Plotly extends Component {
 
   reviseLayout = layout => {
     const { divWidthPadding, divHeightPadding } = this.props;
-    layout.width = divWidthPadding;
-    layout.height = divHeightPadding;
+    layout.width = Math.floor(divWidthPadding * 0.9);
+    layout.height = Math.floor(divHeightPadding * 0.9);
     return layout;
     // this.setState({
     //   layout,
