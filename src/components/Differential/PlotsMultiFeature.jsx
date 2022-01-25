@@ -13,6 +13,7 @@ import {
 import SVG from 'react-inlinesvg';
 import { roundToPrecision } from '../Shared/helpers';
 import ButtonActions from '../Shared/ButtonActions';
+import PlotlyMultiFeature from './PlotlyMultiFeature';
 import './PlotsDynamic.scss';
 
 class PlotsMultiFeature extends Component {
@@ -187,13 +188,17 @@ class PlotsMultiFeature extends Component {
       plotMultiFeatureDataLength,
     } = this.props;
     let panes = [];
+    let dimensions = '';
+    let divWidthPt = 0;
+    let divHeightPt = 0;
+    let divWidthPadding = 0;
+    let divHeightPadding = 0;
     if (plotMultiFeatureDataLength !== 0) {
-      let dimensions = '';
       if (divWidth && divHeight && pxToPtRatio) {
-        const divWidthPadding = divWidth * 0.95;
-        const divHeightPadding = divHeight * 0.95 - 38;
-        const divWidthPt = roundToPrecision(divWidthPadding / pxToPtRatio, 1);
-        const divHeightPt = roundToPrecision(divHeightPadding / pxToPtRatio, 1);
+        divWidthPadding = divWidth * 0.95;
+        divHeightPadding = divHeight * 0.95 - 38;
+        divWidthPt = roundToPrecision(divWidthPadding / pxToPtRatio, 1);
+        divHeightPt = roundToPrecision(divHeightPadding / pxToPtRatio, 1);
         const divWidthPtString = `width=${divWidthPt}`;
         const divHeightPtString = `&height=${divHeightPt}`;
         const pointSizeString = `&pointsize=${pointSize}`;
@@ -201,6 +206,7 @@ class PlotsMultiFeature extends Component {
       }
       const svgArray = plotMultiFeatureData.svg;
       const svgPanes = svgArray.map((s, index) => {
+        const isPlotlyPlot = s.plotType.plotType.includes('plotly');
         const srcUrl = `${s.svg}${dimensions}`;
         return {
           menuItem: `${s.plotType.plotDisplay}`,
@@ -211,13 +217,21 @@ class PlotsMultiFeature extends Component {
               key={`${index}-${s.plotType.plotDisplay}-pane-volcano`}
             >
               <div id="PlotsMultiFeatureContainer" className="svgSpan">
-                <SVG
-                  cacheRequests={true}
-                  src={srcUrl}
-                  title={`${s.plotType.plotDisplay}`}
-                  uniqueHash={`b2g9e2-${index}`}
-                  uniquifyIDs={true}
-                />
+                {isPlotlyPlot ? (
+                  <PlotlyMultiFeature
+                    plotlyData={s.svg}
+                    height={divHeightPadding}
+                    width={divWidthPadding}
+                  />
+                ) : (
+                  <SVG
+                    cacheRequests={true}
+                    src={srcUrl}
+                    title={`${s.plotType.plotDisplay}`}
+                    uniqueHash={`b2g9e2-${index}`}
+                    uniquifyIDs={true}
+                  />
+                )}
               </div>
             </Tab.Pane>
           ),

@@ -74,6 +74,37 @@ class OmicNavigatorService {
     }
   }
 
+  async axiosPostPlotly(
+    method,
+    obj,
+    params,
+    handleError,
+    cancelToken,
+    timeout,
+  ) {
+    const paramsObj = params ? { digits: 10 } : {};
+    const self = this;
+    return new Promise(function(resolve, reject) {
+      const axiosPostUrl = `${self.url}/${method}/json?auto_unbox=true`;
+      axios
+        .post(axiosPostUrl, obj, {
+          params: paramsObj,
+          responseType: 'text',
+          cancelToken,
+          timeout,
+        })
+        .then(response => resolve(response.data))
+        .catch(function(error) {
+          if (!axios.isCancel(error)) {
+            toast.error(`${error.message}`);
+            if (handleError != null) {
+              handleError(false);
+            }
+          }
+        });
+    });
+  }
+
   async ocpuPlotCall(method, obj, handleError, cancelToken, timeout) {
     return new Promise(function(resolve, reject) {
       window.ocpu
@@ -114,26 +145,41 @@ class OmicNavigatorService {
   ) {
     this.setUrl();
     const timeoutLength = 60000;
-    const cacheKey = `plotStudy_${study}_${modelID}_${featureID}_${plotID}`;
-    if (this[cacheKey] != null) {
-      return this[cacheKey];
+    // const cacheKey = `plotStudy_${study}_${modelID}_${featureID}_${plotID}`;
+    // if (this[cacheKey] != null) {
+    //   return this[cacheKey];
+    // } else {
+    const obj = {
+      study,
+      modelID,
+      featureID,
+      plotID,
+      testID,
+    };
+    if (obj?.plotID.includes('plotly')) {
+      const data = await this.axiosPostPlotly(
+        'plotStudy',
+        obj,
+        null,
+        errorCb,
+        cancelToken,
+        timeoutLength,
+      );
+      // this[cacheKey] = dataFromPromise;
+      return data;
+      // }
     } else {
       const promise = this.axiosPostPlot(
         'plotStudy',
-        {
-          study,
-          modelID,
-          featureID,
-          plotID,
-          testID,
-        },
+        obj,
         errorCb,
         cancelToken,
         timeoutLength,
       );
       const dataFromPromise = await promise;
-      this[cacheKey] = dataFromPromise;
+      // this[cacheKey] = dataFromPromise;
       return dataFromPromise;
+      // }
     }
   }
 
@@ -148,21 +194,34 @@ class OmicNavigatorService {
   ) {
     this.setUrl();
     const timeoutLength = 60000;
-    const promise = this.ocpuPlotCall(
-      'plotStudy',
-      {
-        study,
-        modelID,
-        featureID,
-        plotID,
-        testID,
-      },
-      errorCb,
-      cancelToken,
-      timeoutLength,
-    );
-    const dataFromPromise = await promise;
-    return dataFromPromise;
+    const obj = {
+      study,
+      modelID,
+      featureID,
+      plotID,
+      testID,
+    };
+    if (obj?.plotID.includes('plotly')) {
+      const data = await this.axiosPostPlotly(
+        'plotStudy',
+        obj,
+        null,
+        errorCb,
+        cancelToken,
+        timeoutLength,
+      );
+      return data;
+    } else {
+      const promise = this.ocpuPlotCall(
+        'plotStudy',
+        obj,
+        errorCb,
+        cancelToken,
+        timeoutLength,
+      );
+      const dataFromPromise = await promise;
+      return dataFromPromise;
+    }
   }
 
   async plotStudyReturnSvgWithTimeoutResolver(

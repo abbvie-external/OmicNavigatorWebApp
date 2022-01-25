@@ -227,7 +227,7 @@ class Differential extends Component {
           model => model.modelID === differentialModel,
         );
         const differentialPlotTypesRaw = differentialModelData?.plots;
-        // filter out invalid plots - plotType string must be 'singleFeature', 'multiFeature', 'singleTest', 'multiTest'
+        // filter out invalid plots - plotType string must be 'singleFeature', 'multiFeature', 'singleTest', 'multiTest', 'plotly'
         const differentialPlotTypesVar = [...differentialPlotTypesRaw].filter(
           plot => {
             let plotTypeArr = plot?.plotType || null;
@@ -242,7 +242,8 @@ class Differential extends Component {
                 pt === 'singleFeature' ||
                 pt === 'multiFeature' ||
                 pt === 'singleTest' ||
-                pt === 'multiTest'
+                pt === 'multiTest' ||
+                pt === 'plotly'
               );
             };
             const valid = plotTypeArr.every(isValidPlotType);
@@ -258,15 +259,25 @@ class Differential extends Component {
           },
         );
         let plotMultiFeatureAvailableVar = false;
+        let singleFeaturePlotTypesVar = [];
+        let multiFeaturePlotTypesVar = [];
         if (differentialPlotTypesVar) {
           const plotTypesMapped = [...differentialPlotTypesVar].map(
             p => p.plotType,
           );
           plotMultiFeatureAvailableVar =
             plotTypesMapped?.includes('multiFeature') || false;
+          singleFeaturePlotTypesVar = [...differentialPlotTypesVar].filter(
+            p => !p.plotType.includes('multiFeature'),
+          );
+          multiFeaturePlotTypesVar = [...differentialPlotTypesVar].filter(p =>
+            p.plotType.includes('multiFeature'),
+          );
         }
         this.setState({
           differentialPlotTypes: differentialPlotTypesVar,
+          singleFeaturePlotTypes: singleFeaturePlotTypesVar,
+          multiFeaturePlotTypes: multiFeaturePlotTypesVar,
           plotMultiFeatureAvailable: plotMultiFeatureAvailableVar,
         });
       }
@@ -560,61 +571,85 @@ class Differential extends Component {
       if (plots?.length) {
         if (returnSVG) {
           _.forEach(plots, function(plot, i) {
-            // if (plots[i].plotType.includes('multiFeature')) {
-            //   return;
-            // }
             const testsArg = plots[i].plotType.includes('multiTest')
               ? differentialTestIds
               : differentialTest;
-            omicNavigatorService
-              .plotStudyReturnSvg(
-                differentialStudy,
-                differentialModel,
-                // ['12759', '53624'],
-                id,
-                plots[i].plotID,
-                testsArg,
-                null,
-                cancelToken,
-              )
-              .then(svg => {
-                let xml = svg?.data || null;
-                if (xml != null && xml !== []) {
-                  xml = xml.replace(/id="/g, 'id="' + id + '-' + i + '-');
-                  xml = xml.replace(/#glyph/g, '#' + id + '-' + i + '-glyph');
-                  xml = xml.replace(/#clip/g, '#' + id + '-' + i + '-clip');
-                  xml = xml.replace(
-                    /<svg/g,
-                    `<svg preserveAspectRatio="xMinYMin meet" id="currentSVG-${id}-${i}"`,
-                  );
-                  DOMPurify.addHook('afterSanitizeAttributes', function(node) {
-                    if (
-                      node.hasAttribute('xlink:href') &&
-                      !node.getAttribute('xlink:href').match(/^#/)
-                    ) {
-                      node.remove();
-                    }
-                  });
-                  // Clean HTML string and write into our DIV
-                  let sanitizedSVG = DOMPurify.sanitize(xml, {
-                    ADD_TAGS: ['use'],
-                  });
+            // handle plotly differently than static plot svgs
+            if (plots[i].plotType.includes('plotly')) {
+              omicNavigatorService
+                .plotStudyReturnSvgUrl(
+                  differentialStudy,
+                  differentialModel,
+                  // ['12759', '53624'],
+                  id,
+                  plot.plotID,
+                  testsArg,
+                  null,
+                  cancelToken,
+                )
+                // .then(svg => ({ svg, plotType: plot }));
+                .then(svg => {
                   let svgInfo = {
                     plotType: plots[i],
-                    svg: sanitizedSVG,
+                    svg,
                   };
                   plotDataVar.svg.push(svgInfo);
                   self.handleSVG(view, plotDataVar);
-                }
-              })
-              .catch(error => {
-                console.error(
-                  `Error during plotStudyReturnSvg for plot ${plots[i].plotID}`,
-                  error,
-                );
-                // if one of many plots fails we don't want to return to the table; eventually we should use this when single feature differentialPlotTypes length is 1
-                // self.handleItemSelected(false);
-              });
+                });
+            } else {
+              // static plot svgs
+              omicNavigatorService
+                .plotStudyReturnSvg(
+                  differentialStudy,
+                  differentialModel,
+                  // ['12759', '53624'],
+                  id,
+                  plots[i].plotID,
+                  testsArg,
+                  null,
+                  cancelToken,
+                )
+                .then(svg => {
+                  let xml = svg?.data || null;
+                  if (xml != null && xml !== []) {
+                    xml = xml.replace(/id="/g, 'id="' + id + '-' + i + '-');
+                    xml = xml.replace(/#glyph/g, '#' + id + '-' + i + '-glyph');
+                    xml = xml.replace(/#clip/g, '#' + id + '-' + i + '-clip');
+                    xml = xml.replace(
+                      /<svg/g,
+                      `<svg preserveAspectRatio="xMinYMin meet" id="currentSVG-${id}-${i}"`,
+                    );
+                    DOMPurify.addHook('afterSanitizeAttributes', function(
+                      node,
+                    ) {
+                      if (
+                        node.hasAttribute('xlink:href') &&
+                        !node.getAttribute('xlink:href').match(/^#/)
+                      ) {
+                        node.remove();
+                      }
+                    });
+                    // Clean HTML string and write into our DIV
+                    let sanitizedSVG = DOMPurify.sanitize(xml, {
+                      ADD_TAGS: ['use'],
+                    });
+                    let svgInfo = {
+                      plotType: plots[i],
+                      svg: sanitizedSVG,
+                    };
+                    plotDataVar.svg.push(svgInfo);
+                    self.handleSVG(view, plotDataVar);
+                  }
+                })
+                .catch(error => {
+                  console.error(
+                    `Error during plotStudyReturnSvg for plot ${plots[i].plotID}`,
+                    error,
+                  );
+                  // if one of many plots fails we don't want to return to the table; eventually we should use this when single feature differentialPlotTypes length is 1
+                  // self.handleItemSelected(false);
+                });
+            }
           });
         } else {
           // refined for dynamically sized plots on single-threaded servers (running R locally), we're using a race condition to take the first url and handle/display it asap; after that, we're using allSettled to wait for remaining urls, and then sending them all to the component as props
@@ -760,40 +795,65 @@ class Differential extends Component {
         title: `${differentialFeatureIdKey} (${featuresLengthParentVar} Features)`,
         svg: [],
       };
+      // const forTesting = [...multifeaturePlot].filter(p => p.plotType.includes('plotly'));
       if (multifeaturePlot.length !== 0) {
         if (multifeaturePlot.length === 1) {
           try {
             const testsArg = multifeaturePlot[0].plotType.includes('multiTest')
               ? differentialTestIds
               : differentialTest;
-            const promise = omicNavigatorService.plotStudyReturnSvgWithTimeoutResolver(
-              differentialStudy,
-              differentialModel,
-              featureids,
-              multifeaturePlot[0].plotID,
-              testsArg,
-              null,
-              cancelToken,
-            );
-            const svg = await promise;
-            if (svg) {
-              if (svg === true) {
-                // duration timeout
-                cancelRequestDifferentialResultsGetPlot();
-                this.getMultifeaturePlotTransition(featureids, true, 0);
-              } else {
-                let svgInfo = {
-                  plotType: multifeaturePlot[0],
-                  svg: svg.data,
-                };
-                const featuresLengthParentVar = featureids?.length || 0;
-                const plotDataVar = {
-                  key: `(${featuresLengthParentVar}-features)`,
-                  title: `${differentialFeatureIdKey} (${featuresLengthParentVar} Features)`,
-                  svg: [],
-                };
-                plotDataVar.svg.push(svgInfo);
-                self.handleSVG('Overlay', plotDataVar);
+            // handle plotly differently than static plot svgs
+            if (multifeaturePlot[0].plotType.includes('plotly')) {
+              omicNavigatorService
+                .plotStudyReturnSvgUrl(
+                  differentialStudy,
+                  differentialModel,
+                  // ['12759', '53624'],
+                  featureids,
+                  multifeaturePlot[0].plotID,
+                  testsArg,
+                  null,
+                  cancelToken,
+                )
+                // .then(svg => ({ svg, plotType: plot }));
+                .then(svg => {
+                  let svgInfo = {
+                    plotType: multifeaturePlot[0],
+                    svg,
+                  };
+                  plotDataVar.svg.push(svgInfo);
+                  self.handleSVG('Overlay', plotDataVar);
+                });
+            } else {
+              const promise = omicNavigatorService.plotStudyReturnSvgWithTimeoutResolver(
+                differentialStudy,
+                differentialModel,
+                featureids,
+                multifeaturePlot[0].plotID,
+                testsArg,
+                null,
+                cancelToken,
+              );
+              const svg = await promise;
+              if (svg) {
+                if (svg === true) {
+                  // duration timeout
+                  cancelRequestDifferentialResultsGetPlot();
+                  this.getMultifeaturePlotTransition(featureids, true, 0);
+                } else {
+                  let svgInfo = {
+                    plotType: multifeaturePlot[0],
+                    svg: svg.data,
+                  };
+                  const featuresLengthParentVar = featureids?.length || 0;
+                  const plotDataVar = {
+                    key: `(${featuresLengthParentVar}-features)`,
+                    title: `${differentialFeatureIdKey} (${featuresLengthParentVar} Features)`,
+                    svg: [],
+                  };
+                  plotDataVar.svg.push(svgInfo);
+                  self.handleSVG('Overlay', plotDataVar);
+                }
               }
             }
           } catch (err) {
@@ -805,67 +865,90 @@ class Differential extends Component {
             const testsArg = plot.plotType.includes('multiTest')
               ? differentialTestIds
               : differentialTest;
-
-            omicNavigatorService
-              .plotStudyReturnSvg(
-                differentialStudy,
-                differentialModel,
-                featureids,
-                multifeaturePlot[i].plotID,
-                testsArg,
-                null,
-                cancelToken,
-              )
-              .then(svg => {
-                if (svg) {
-                  // if (svg === true) {
-                  //   duration timeout - for multiple plots, won't open a new tab for each, but rather await the longer responses
-                  //   cancelRequestDifferentialResultsGetPlot();
-                  //   self.getMultifeaturePlotTransition(featureids, true, i);
-                  // } else {
-                  let xml = svg?.data || null;
-                  if (xml != null && xml !== []) {
-                    xml = xml.replace(/id="/g, 'id="' + i + '-');
-                    xml = xml.replace(/#glyph/g, '#' + i + '-glyph');
-                    xml = xml.replace(/#clip/g, '#' + i + '-clip');
-                    xml = xml.replace(
-                      /<svg/g,
-                      `<svg preserveAspectRatio="xMinYMin meet" id="currentSVG-multifeatures-${i}"`,
-                    );
-                    DOMPurify.addHook('afterSanitizeAttributes', function(
-                      node,
-                    ) {
-                      if (
-                        node.hasAttribute('xlink:href') &&
-                        !node.getAttribute('xlink:href').match(/^#/)
+            // handle plotly differently than static plot svgs
+            if (multifeaturePlot[i].plotType.includes('plotly')) {
+              omicNavigatorService
+                .plotStudyReturnSvgUrl(
+                  differentialStudy,
+                  differentialModel,
+                  // ['12759', '53624'],
+                  featureids,
+                  plot.plotID,
+                  testsArg,
+                  null,
+                  cancelToken,
+                )
+                // .then(svg => ({ svg, plotType: plot }));
+                .then(svg => {
+                  let svgInfo = {
+                    plotType: multifeaturePlot[i],
+                    svg,
+                  };
+                  plotDataVar.svg.push(svgInfo);
+                  self.handleSVG('Overlay', plotDataVar);
+                });
+            } else {
+              omicNavigatorService
+                .plotStudyReturnSvg(
+                  differentialStudy,
+                  differentialModel,
+                  featureids,
+                  multifeaturePlot[i].plotID,
+                  testsArg,
+                  null,
+                  cancelToken,
+                )
+                .then(svg => {
+                  if (svg) {
+                    // if (svg === true) {
+                    //   duration timeout - for multiple plots, won't open a new tab for each, but rather await the longer responses
+                    //   cancelRequestDifferentialResultsGetPlot();
+                    //   self.getMultifeaturePlotTransition(featureids, true, i);
+                    // } else {
+                    let xml = svg?.data || null;
+                    if (xml != null && xml !== []) {
+                      xml = xml.replace(/id="/g, 'id="' + i + '-');
+                      xml = xml.replace(/#glyph/g, '#' + i + '-glyph');
+                      xml = xml.replace(/#clip/g, '#' + i + '-clip');
+                      xml = xml.replace(
+                        /<svg/g,
+                        `<svg preserveAspectRatio="xMinYMin meet" id="currentSVG-multifeatures-${i}"`,
+                      );
+                      DOMPurify.addHook('afterSanitizeAttributes', function(
+                        node,
                       ) {
-                        node.remove();
-                      }
-                    });
-                    // Clean HTML string and write into our DIV
-                    let sanitizedSVG = DOMPurify.sanitize(xml, {
-                      ADD_TAGS: ['use'],
-                    });
-                    let svgInfo = {
-                      plotType: multifeaturePlot[i],
-                      svg: sanitizedSVG,
-                    };
+                        if (
+                          node.hasAttribute('xlink:href') &&
+                          !node.getAttribute('xlink:href').match(/^#/)
+                        ) {
+                          node.remove();
+                        }
+                      });
+                      // Clean HTML string and write into our DIV
+                      let sanitizedSVG = DOMPurify.sanitize(xml, {
+                        ADD_TAGS: ['use'],
+                      });
+                      let svgInfo = {
+                        plotType: multifeaturePlot[i],
+                        svg: sanitizedSVG,
+                      };
 
-                    plotDataVar.svg.push(svgInfo);
-                    self.handleSVG('Overlay', plotDataVar);
+                      plotDataVar.svg.push(svgInfo);
+                      self.handleSVG('Overlay', plotDataVar);
+                    }
                   }
-                }
-                // }
-              })
-              .catch(error => {
-                console.error(
-                  `Error during plotStudyReturnSvgWithTimeoutResolver for plot ${differentialPlotTypes[i].plotID}`,
-                  error,
-                );
-                // if one of many plots fails we don't want to return to the table; eventually we should use this when single feature differentialPlotTypes length is 1
-                // self.handleItemSelected(false);
-                return error;
-              });
+                  // }
+                })
+                .catch(error => {
+                  console.error(
+                    `Error during plotStudyReturnSvgWithTimeoutResolver for plot ${differentialPlotTypes[i].plotID}`,
+                    error,
+                  );
+                  // if one of many plots fails we don't want to return to the table; eventually we should use this when single feature differentialPlotTypes length is 1
+                  // self.handleItemSelected(false);
+                  return error;
+                });
+            }
           });
         }
       } else {
@@ -913,6 +996,7 @@ class Differential extends Component {
       }
       const featureIds = data.map(featureId => featureId[key]);
       const returnSVG = view === 'Overlay' ? true : false;
+
       if (returnSVG) {
         this.getMultifeaturePlotTransition(featureIds, false, 0);
       } else {

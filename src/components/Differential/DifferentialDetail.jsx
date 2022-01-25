@@ -704,6 +704,8 @@ class DifferentialDetail extends Component {
       plotMultiFeatureData,
       plotMultiFeatureDataLength,
       plotMultiFeatureDataLoaded,
+      singleFeaturePlotTypes,
+      multiFeaturePlotTypes,
       svgExportName,
       tab,
     } = this.props;
@@ -912,6 +914,8 @@ class DifferentialDetail extends Component {
                           plotMultiFeatureDataLoaded={
                             plotMultiFeatureDataLoaded
                           }
+                          singleFeaturePlotTypes={singleFeaturePlotTypes}
+                          multiFeaturePlotTypes={multiFeaturePlotTypes}
                           svgExportName={svgExportName}
                           differentialPlotTypes={differentialPlotTypes}
                           differentialHighlightedFeaturesData={
