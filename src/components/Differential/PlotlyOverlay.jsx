@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Dimmer, Loader } from 'semantic-ui-react';
 import Plot from 'react-plotly.js';
+import '../Shared/PlotlyOverrides.scss';
 // import axios from 'axios';
 
 export default class PlotlyOverlay extends Component {
