@@ -220,8 +220,8 @@ class PlotsMultiFeature extends Component {
                 {isPlotlyPlot ? (
                   <PlotlyMultiFeature
                     plotlyData={s.svg}
-                    divHeightPadding={divHeightPadding}
-                    divWidthPadding={divWidthPadding}
+                    height={divHeightPadding}
+                    width={divWidthPadding}
                   />
                 ) : (
                   <SVG

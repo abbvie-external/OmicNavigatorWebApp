@@ -39,9 +39,9 @@ export default class PlotlySingleFeature extends Component {
   // }
 
   reviseLayout = layout => {
-    const { divWidthPadding, divHeightPadding } = this.props;
-    layout.width = Math.floor(divWidthPadding * 0.9);
-    layout.height = Math.floor(divHeightPadding * 0.9);
+    const { width, height } = this.props;
+    layout.width = Math.floor(width * 0.9);
+    layout.height = Math.floor(height * 0.9);
     return layout;
     // this.setState({
     //   layout,

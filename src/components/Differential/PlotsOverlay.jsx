@@ -24,6 +24,7 @@ class PlotsOverlay extends PureComponent {
     };
   }
   metaFeaturesTableRef = React.createRef();
+  svgContainerRef = React.createRef();
 
   componentDidMount() {
     this.setButtonVisibility();
@@ -70,6 +71,20 @@ class PlotsOverlay extends PureComponent {
     });
   };
 
+  getWidth() {
+    if (this.svgContainerRef.current !== null) {
+      return this.svgContainerRef.current.parentElement.offsetWidth;
+    }
+    return 1200;
+  }
+
+  getHeight() {
+    if (this.svgContainerRef.current !== null) {
+      return this.svgContainerRef.current.parentElement.offsetWidth;
+    }
+    return 1200;
+  }
+
   render() {
     const {
       excelFlag,
@@ -105,16 +120,22 @@ class PlotsOverlay extends PureComponent {
           const svgArray = [...this.props.plotOverlayData.svg];
           const svgPanes = svgArray.map(s => {
             const isPlotlyPlot = s.plotType.plotType.includes('plotly');
+            const svgContainerWidth = this.getWidth();
+            const svgContainerHeight = this.getHeight();
             return {
               menuItem: `${s.plotType.plotDisplay}`,
               render: () => (
                 <Tab.Pane attached="true" as="div">
                   {isPlotlyPlot ? (
-                    <div id="PlotsOverlayContainer" className="svgSpan">
+                    <div
+                      id="PlotsOverlayContainer"
+                      className="svgSpan"
+                      ref={this.svgContainerRef}
+                    >
                       <PlotlyOverlay
                         plotlyData={s.svg}
-                        // divHeightPadding={divHeightPadding}
-                        // divWidthPadding={divWidthPadding}
+                        height={svgContainerHeight}
+                        width={svgContainerWidth}
                       />
                     </div>
                   ) : (

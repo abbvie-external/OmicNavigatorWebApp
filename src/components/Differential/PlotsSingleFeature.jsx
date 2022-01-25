@@ -159,8 +159,8 @@ class PlotsSingleFeature extends Component {
               {isPlotlyPlot ? (
                 <PlotlySingleFeature
                   plotlyData={s.svg}
-                  divHeightPadding={divHeightPadding}
-                  divWidthPadding={divWidthPadding}
+                  height={divHeightPadding}
+                  width={divWidthPadding}
                 />
               ) : (
                 <SVG
