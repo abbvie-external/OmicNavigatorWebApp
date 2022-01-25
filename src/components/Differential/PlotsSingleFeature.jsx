@@ -6,6 +6,7 @@ import ButtonActions from '../Shared/ButtonActions';
 import MetafeaturesTableDynamic from './MetafeaturesTableDynamic';
 import PlotlySingleFeature from './PlotlySingleFeature';
 import './PlotsDynamic.scss';
+import '../Shared/Plotly.scss';
 
 class PlotsSingleFeature extends Component {
   state = {

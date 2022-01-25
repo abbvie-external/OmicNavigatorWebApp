@@ -8,6 +8,7 @@ import PlotlyOverlay from './PlotlyOverlay';
 import '../Enrichment/SplitPanesContainer.scss';
 import './PlotsDynamic.scss';
 import './PlotsOverlay.scss';
+import '../Shared/Plotly.scss';
 
 class PlotsOverlay extends PureComponent {
   constructor(props) {

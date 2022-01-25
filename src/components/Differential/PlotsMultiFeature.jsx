@@ -15,6 +15,7 @@ import { roundToPrecision } from '../Shared/helpers';
 import ButtonActions from '../Shared/ButtonActions';
 import PlotlyMultiFeature from './PlotlyMultiFeature';
 import './PlotsDynamic.scss';
+import '../Shared/Plotly.scss';
 
 class PlotsMultiFeature extends Component {
   state = {
