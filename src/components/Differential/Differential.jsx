@@ -795,40 +795,65 @@ class Differential extends Component {
         title: `${differentialFeatureIdKey} (${featuresLengthParentVar} Features)`,
         svg: [],
       };
+      // const forTesting = [...multifeaturePlot].filter(p => p.plotType.includes('plotly'));
       if (multifeaturePlot.length !== 0) {
         if (multifeaturePlot.length === 1) {
           try {
             const testsArg = multifeaturePlot[0].plotType.includes('multiTest')
               ? differentialTestIds
               : differentialTest;
-            const promise = omicNavigatorService.plotStudyReturnSvgWithTimeoutResolver(
-              differentialStudy,
-              differentialModel,
-              featureids,
-              multifeaturePlot[0].plotID,
-              testsArg,
-              null,
-              cancelToken,
-            );
-            const svg = await promise;
-            if (svg) {
-              if (svg === true) {
-                // duration timeout
-                cancelRequestDifferentialResultsGetPlot();
-                this.getMultifeaturePlotTransition(featureids, true, 0);
-              } else {
-                let svgInfo = {
-                  plotType: multifeaturePlot[0],
-                  svg: svg.data,
-                };
-                const featuresLengthParentVar = featureids?.length || 0;
-                const plotDataVar = {
-                  key: `(${featuresLengthParentVar}-features)`,
-                  title: `${differentialFeatureIdKey} (${featuresLengthParentVar} Features)`,
-                  svg: [],
-                };
-                plotDataVar.svg.push(svgInfo);
-                self.handleSVG('Overlay', plotDataVar);
+            // handle plotly differently than static plot svgs
+            if (multifeaturePlot[0].plotType.includes('plotly')) {
+              omicNavigatorService
+                .plotStudyReturnSvgUrl(
+                  differentialStudy,
+                  differentialModel,
+                  // ['12759', '53624'],
+                  featureids,
+                  multifeaturePlot[0].plotID,
+                  testsArg,
+                  null,
+                  cancelToken,
+                )
+                // .then(svg => ({ svg, plotType: plot }));
+                .then(svg => {
+                  let svgInfo = {
+                    plotType: multifeaturePlot[0],
+                    svg,
+                  };
+                  plotDataVar.svg.push(svgInfo);
+                  self.handleSVG('Overlay', plotDataVar);
+                });
+            } else {
+              const promise = omicNavigatorService.plotStudyReturnSvgWithTimeoutResolver(
+                differentialStudy,
+                differentialModel,
+                featureids,
+                multifeaturePlot[0].plotID,
+                testsArg,
+                null,
+                cancelToken,
+              );
+              const svg = await promise;
+              if (svg) {
+                if (svg === true) {
+                  // duration timeout
+                  cancelRequestDifferentialResultsGetPlot();
+                  this.getMultifeaturePlotTransition(featureids, true, 0);
+                } else {
+                  let svgInfo = {
+                    plotType: multifeaturePlot[0],
+                    svg: svg.data,
+                  };
+                  const featuresLengthParentVar = featureids?.length || 0;
+                  const plotDataVar = {
+                    key: `(${featuresLengthParentVar}-features)`,
+                    title: `${differentialFeatureIdKey} (${featuresLengthParentVar} Features)`,
+                    svg: [],
+                  };
+                  plotDataVar.svg.push(svgInfo);
+                  self.handleSVG('Overlay', plotDataVar);
+                }
               }
             }
           } catch (err) {
