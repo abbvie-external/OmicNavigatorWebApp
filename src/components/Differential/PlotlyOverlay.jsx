@@ -3,7 +3,7 @@ import { Dimmer, Loader } from 'semantic-ui-react';
 import Plot from 'react-plotly.js';
 // import axios from 'axios';
 
-export default class Plotly extends Component {
+export default class PlotlyOverlay extends Component {
   state = {
     data: null,
     layout: null,

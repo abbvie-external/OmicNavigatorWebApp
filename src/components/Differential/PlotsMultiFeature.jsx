@@ -13,8 +13,8 @@ import {
 import SVG from 'react-inlinesvg';
 import { roundToPrecision } from '../Shared/helpers';
 import ButtonActions from '../Shared/ButtonActions';
+import PlotlyMultiFeature from './PlotlyMultiFeature';
 import './PlotsDynamic.scss';
-import Plotly from '../Shared/Plotly';
 
 class PlotsMultiFeature extends Component {
   state = {
@@ -218,7 +218,7 @@ class PlotsMultiFeature extends Component {
             >
               <div id="PlotsMultiFeatureContainer" className="svgSpan">
                 {isPlotlyPlot ? (
-                  <Plotly
+                  <PlotlyMultiFeature
                     plotlyData={s.svg}
                     divHeightPadding={divHeightPadding}
                     divWidthPadding={divWidthPadding}
