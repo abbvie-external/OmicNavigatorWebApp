@@ -3,11 +3,11 @@ a[data-title='Download plot as a png'] {
   visibility: hidden !important;
 }
 .js-plotly-plot .plotly .modebar--hover > :not(.watermark) {
-  opacity: 1;
-  transition: none;
-  margin-top: -5px;
+  opacity: 1 !important;
+  transition: none !important;
+  margin-top: -5px !important;
 }
 
 .js-plotly-plot .plotly .modebar-btn {
-  font-size: 22px;
+  font-size: 22px !important;
 }
