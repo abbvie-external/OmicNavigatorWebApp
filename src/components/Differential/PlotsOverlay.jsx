@@ -72,19 +72,19 @@ class PlotsOverlay extends PureComponent {
     });
   };
 
-  getWidth() {
+  getWidth = () => {
     if (this.svgContainerRef.current !== null) {
-      return this.svgContainerRef.current.parentElement.offsetWidth;
+      return this.svgContainerRef.current.offsetParent.offsetWidth;
     }
     return 1200;
-  }
+  };
 
-  getHeight() {
+  getHeight = () => {
     if (this.svgContainerRef.current !== null) {
-      return this.svgContainerRef.current.parentElement.offsetWidth;
+      return this.svgContainerRef.current.offsetParent.offsetHeight;
     }
-    return 1200;
-  }
+    return 700;
+  };
 
   render() {
     const {
@@ -121,6 +121,7 @@ class PlotsOverlay extends PureComponent {
           const svgArray = [...this.props.plotOverlayData.svg];
           const svgPanes = svgArray.map(s => {
             const isPlotlyPlot = s.plotType.plotType.includes('plotly');
+            debugger;
             const svgContainerWidth = this.getWidth();
             const svgContainerHeight = this.getHeight();
             return {
@@ -128,11 +129,7 @@ class PlotsOverlay extends PureComponent {
               render: () => (
                 <Tab.Pane attached="true" as="div">
                   {isPlotlyPlot ? (
-                    <div
-                      id="PlotsOverlayContainer"
-                      className="svgSpan"
-                      ref={this.svgContainerRef}
-                    >
+                    <div id="PlotsOverlayContainer" className="svgSpan">
                       <PlotlyOverlay
                         plotlyData={s.svg}
                         height={svgContainerHeight}
@@ -262,7 +259,7 @@ class PlotsOverlay extends PureComponent {
                   largeScreen={16}
                   widescreen={16}
                 >
-                  <div className="">
+                  <div className="" ref={this.svgContainerRef}>
                     <Dropdown
                       search
                       selection
