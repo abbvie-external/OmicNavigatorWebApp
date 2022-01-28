@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Dimmer, Loader } from 'semantic-ui-react';
 import Plot from 'react-plotly.js';
+import PlotlyConfig from '../Shared/PlotlyConfig.json';
 import '../Shared/PlotlyOverrides.scss';
 // import axios from 'axios';
 
@@ -65,7 +66,7 @@ export default class PlotlySingleFeature extends Component {
     );
     return (
       <div>
-        <Plot data={data} layout={layout} />
+        <Plot data={data} layout={layout} config={PlotlyConfig} />
         <span id="PlotSingleFeatureDataLoader">{loader}</span>
       </div>
     );
