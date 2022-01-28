@@ -1,0 +1,6 @@
+{
+  "modeBarButtonsToRemove": ["toImage"],
+  "displayModeBar": true,
+  "scrollZoom": true,
+  "displaylogo": false
+}
