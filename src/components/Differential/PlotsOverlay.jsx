@@ -121,7 +121,6 @@ class PlotsOverlay extends PureComponent {
           const svgArray = [...this.props.plotOverlayData.svg];
           const svgPanes = svgArray.map(s => {
             const isPlotlyPlot = s.plotType.plotType.includes('plotly');
-            debugger;
             const svgContainerWidth = this.getWidth();
             const svgContainerHeight = this.getHeight();
             return {
