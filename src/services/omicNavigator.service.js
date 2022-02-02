@@ -139,6 +139,7 @@ class OmicNavigatorService {
     modelID,
     featureID,
     plotID,
+    plotType,
     testID,
     errorCb,
     cancelToken,
@@ -156,7 +157,7 @@ class OmicNavigatorService {
       plotID,
       testID,
     };
-    if (obj?.plotID.includes('plotly')) {
+    if (plotType.includes('plotly')) {
       const data = await this.axiosPostPlotly(
         'plotStudy',
         obj,
@@ -188,6 +189,7 @@ class OmicNavigatorService {
     modelID,
     featureID,
     plotID,
+    plotType,
     testID,
     errorCb,
     cancelToken,
@@ -201,7 +203,7 @@ class OmicNavigatorService {
       plotID,
       testID,
     };
-    if (obj?.plotID.includes('plotly')) {
+    if (plotType.includes('plotly')) {
       const data = await this.axiosPostPlotly(
         'plotStudy',
         obj,
