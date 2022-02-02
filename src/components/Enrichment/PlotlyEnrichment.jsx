@@ -32,7 +32,7 @@ export default class PlotlyEnrichment extends Component {
     );
     return (
       <div>
-        <Plot data={data} layout={layout} responsive={true} />
+        <Plot data={data} layout={layout} config={PlotlyConfig} />
         <span id="PlotEnrichmentDataLoader">{loader}</span>
       </div>
     );
