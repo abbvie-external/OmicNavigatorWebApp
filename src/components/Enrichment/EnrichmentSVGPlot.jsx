@@ -13,6 +13,7 @@ import {
 import SVG from 'react-inlinesvg';
 import { roundToPrecision, loadingDimmer } from '../Shared/helpers';
 import ButtonActions from '../Shared/ButtonActions';
+import PlotlyEnrichment from './PlotlyEnrichment';
 import './EnrichmentSVGPlot.scss';
 
 class EnrichmentSVGPlot extends PureComponent {
@@ -62,11 +63,17 @@ class EnrichmentSVGPlot extends PureComponent {
       pointSize,
       plotDataEnrichmentLength,
     } = this.props;
+    let dimensions = '';
+    let divWidthPt = 0;
+    let divHeightPt = 0;
+    let divWidthPadding = 0;
+    let divHeightPadding = 0;
     if (plotDataEnrichmentLength > 0) {
-      let dimensions = '';
       if (divWidth && divHeight && pxToPtRatio) {
-        const divWidthPt = roundToPrecision(divWidth / pxToPtRatio, 1);
-        const divHeightPt = roundToPrecision(divHeight / pxToPtRatio, 1);
+        divWidthPt = roundToPrecision(divWidth / pxToPtRatio, 1);
+        divHeightPt = roundToPrecision(divHeight / pxToPtRatio, 1);
+        divWidthPadding = divWidth * 0.7;
+        divHeightPadding = divHeight * 0.85;
         const divWidthPtString = `width=${divWidthPt}`;
         const divHeightPtString = `&height=${divHeightPt}`;
         const pointSizeString = `&pointsize=${pointSize}`;
@@ -74,7 +81,8 @@ class EnrichmentSVGPlot extends PureComponent {
       }
       const svgArray = plotDataEnrichment.svg;
       const uniqueKey = plotDataEnrichment.key || '';
-      const panes = svgArray.map((s, index) => {
+      const svgPanes = svgArray.map((s, index) => {
+        const isPlotlyPlot = s.plotType.plotType.includes('plotly');
         let srcUrl = `${s.svg}${dimensions}`;
         return {
           menuItem: `${s.plotType.plotDisplay}`,
@@ -85,13 +93,21 @@ class EnrichmentSVGPlot extends PureComponent {
               key={`${uniqueKey}-${index}-${s.plotType.plotDisplay}-pane-enrichment`}
             >
               <div id="EnrichmentPlotSVGDiv" className="svgSpan">
-                <SVG
-                  cacheRequests={true}
-                  src={srcUrl}
-                  uniqueHash="e5j2h5"
-                  uniquifyIDs={true}
-                  id="EnrichmentPlotSVG"
-                />
+                {isPlotlyPlot ? (
+                  <PlotlyEnrichment
+                    plotlyData={s.svg}
+                    height={divHeightPadding}
+                    width={divWidthPadding}
+                  />
+                ) : (
+                  <SVG
+                    cacheRequests={true}
+                    src={srcUrl}
+                    uniqueHash="e5j2h5"
+                    uniquifyIDs={true}
+                    id="EnrichmentPlotSVG"
+                  />
+                )}
               </div>
             </Tab.Pane>
           ),
@@ -99,9 +115,9 @@ class EnrichmentSVGPlot extends PureComponent {
       });
       this.setState({
         isSVGReadyEnrichment: true,
-        svgPanes: panes,
+        svgPanes,
       });
-    } else return null;
+    }
   };
 
   render() {
