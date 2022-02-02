@@ -1303,6 +1303,7 @@ class Enrichment extends Component {
                 enrichmentModel,
                 id,
                 plot.plotID,
+                plot.plotType,
                 testsArg,
                 null,
                 cancelToken,
