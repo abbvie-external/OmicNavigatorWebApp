@@ -4,7 +4,7 @@ import Plot from 'react-plotly.js';
 import PlotlyConfig from '../Shared/PlotlyConfig.json';
 import '../Shared/PlotlyOverrides.scss';
 
-export default class PlotlyOverlay extends Component {
+export default class PlotlyEnrichment extends Component {
   state = {
     data: null,
     layout: null,
@@ -32,8 +32,8 @@ export default class PlotlyOverlay extends Component {
     );
     return (
       <div>
-        <Plot data={data} layout={layout} config={PlotlyConfig} />
-        <span id="PlotSingleFeatureDataLoader">{loader}</span>
+        <Plot data={data} layout={layout} responsive={true} />
+        <span id="PlotEnrichmentDataLoader">{loader}</span>
       </div>
     );
   }

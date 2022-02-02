@@ -520,7 +520,8 @@ class Enrichment extends Component {
                 pt === 'singleFeature' ||
                 pt === 'multiFeature' ||
                 pt === 'singleTest' ||
-                pt === 'multiTest'
+                pt === 'multiTest' ||
+                pt === 'plotly'
               );
             };
             const valid = plotTypeArr.every(isValidPlotType);
