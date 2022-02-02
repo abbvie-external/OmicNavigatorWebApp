@@ -141,6 +141,7 @@ class PlotsDynamic extends Component {
                   this.props.onHandleHighlightedFeaturesDifferential
                 }
                 onGetPlotTransitionRef={this.props.onGetPlotTransitionRef}
+                singleFeaturePlotTypes={this.props.singleFeaturePlotTypes}
               />
             </Tab.Pane>
           ),
@@ -196,6 +197,7 @@ class PlotsDynamic extends Component {
                 }
                 plotMultiFeatureMax={this.props.plotMultiFeatureMax}
                 onRemoveSelectedFeature={this.props.onRemoveSelectedFeature}
+                multiFeaturePlotTypes={this.props.multiFeaturePlotTypes}
               />
             </Tab.Pane>
           ),
@@ -252,6 +254,7 @@ class PlotsDynamic extends Component {
                   this.props.onHandleHighlightedFeaturesDifferential
                 }
                 onGetPlotTransitionRef={this.props.onGetPlotTransitionRef}
+                singleFeaturePlotTypes={this.props.singleFeaturePlotTypes}
               />
             </Tab.Pane>
           ),

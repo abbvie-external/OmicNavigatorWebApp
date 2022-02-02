@@ -1,10 +1,12 @@
 {
   "name": "omicnavigatorwebapp",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "private": true,
   "dependencies": {
     "d3-hexbin": "^0.2.2",
     "gh-pages": "^3.1.0",
+    "plotly.js": "^2.8.3",
+    "react-plotly.js": "^2.5.1",
     "regenerator-runtime": "^0.13.7"
   },
   "homepage": ".",

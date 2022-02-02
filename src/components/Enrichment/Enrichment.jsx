@@ -520,7 +520,8 @@ class Enrichment extends Component {
                 pt === 'singleFeature' ||
                 pt === 'multiFeature' ||
                 pt === 'singleTest' ||
-                pt === 'multiTest'
+                pt === 'multiTest' ||
+                pt === 'plotly'
               );
             };
             const valid = plotTypeArr.every(isValidPlotType);
@@ -654,6 +655,7 @@ class Enrichment extends Component {
             `EnrichmentsLinkouts-${enrichmentStudy}_${enrichmentAnnotation}`,
             JSON.stringify(linkouts),
           );
+          const self = this;
           omicNavigatorService
             .getFavicons(getEnrichmentsLinkoutsResponseData)
             .then(getFaviconsResponseData => {
@@ -664,18 +666,18 @@ class Enrichment extends Component {
                 },
                 function() {
                   let columns = [];
-                  if (this.state.enrichmentResults?.length > 0) {
-                    columns = this.getConfigCols(this.state.enrichmentResults);
+                  if (self.state.enrichmentResults?.length > 0) {
+                    columns = self.getConfigCols(self.state.enrichmentResults);
                   }
-                  this.setState({ enrichmentColumnsUnfiltered: columns });
-                  if (this.state.multisetTestsFilteredOut.length > 0) {
+                  self.setState({ enrichmentColumnsUnfiltered: columns });
+                  if (self.state.multisetTestsFilteredOut.length > 0) {
                     columns = columns.filter(function(col) {
-                      return !this.setState.MultisetTestsFilteredOut.includes(
+                      return !self.setState.MultisetTestsFilteredOut.includes(
                         col.title,
                       );
                     });
                   }
-                  this.setState({
+                  self.setState({
                     enrichmentColumns: columns,
                   });
                   sessionStorage.setItem(
@@ -1302,6 +1304,7 @@ class Enrichment extends Component {
                 enrichmentModel,
                 id,
                 plot.plotID,
+                plot.plotType,
                 testsArg,
                 null,
                 cancelToken,
