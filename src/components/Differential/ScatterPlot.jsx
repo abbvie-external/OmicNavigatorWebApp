@@ -1521,7 +1521,6 @@ class ScatterPlot extends React.PureComponent {
           let boxSelectionToHighlight = self.mapBoxSelectionToHighlight([
             ...total,
           ]);
-          console.log(d3.event);
           if (boxSelectionToHighlight === null) {
             // ZOOM IF NOT SHIFT BOX-SELECTING FOR MULTI-FEATURE PLOTS
             self.transitionZoom(total, false, false, false);
@@ -1651,7 +1650,6 @@ class ScatterPlot extends React.PureComponent {
         .remove();
 
       // if (d3.select('#nonfiltered-elements').size() !== 0) {
-      // console.log(d3.select('#nonfiltered-elements').size());
       d3.select('#nonfiltered-elements')
         .selectAll('text')
         .data(brushedCircleTextMapped)

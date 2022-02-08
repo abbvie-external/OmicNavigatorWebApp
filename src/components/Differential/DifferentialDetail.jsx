@@ -260,7 +260,6 @@ class DifferentialDetail extends Component {
     });
 
     this.props.onHandleHighlightedFeaturesDifferential(bins);
-    // console.log('bin', bins[0]);
     this.pageToFeature(
       JSON.parse(item[0].props.data)[differentialFeatureIdKey],
     );

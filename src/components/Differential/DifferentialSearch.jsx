@@ -10,7 +10,6 @@ import {
   Transition,
   Button,
 } from 'semantic-ui-react';
-// import _ from 'lodash';
 import ndjsonStream from 'can-ndjson-stream';
 import { CancelToken } from 'axios';
 import { getDynamicSize, getWindowWidth } from '../Shared/helpers';
@@ -871,25 +870,6 @@ class DifferentialSearch extends Component {
       });
   }
 
-  thisfunc = () => {
-    this.setState({
-      sigValueP: [0.25],
-    });
-    // document.getElementsByClassName('NumericExponentialInput')[0].value = [
-    //   0.25,
-    // ];
-    // this.dom = document.getElementsByClassName(
-    //   'MultisetFiltersDiv',
-    // )[0].innerHTML;
-    // console.log(this.dom);
-  };
-
-  thisfuncTwo = () => {
-    // document.getElementsByClassName(
-    //   'MultisetFiltersDiv',
-    // )[0].innerHTML = this.dom;
-  };
-
   render() {
     const {
       differentialStudies,
@@ -1149,8 +1129,6 @@ class DifferentialSearch extends Component {
             mouseLeaveDelay={0}
           />
           <span className="StudyHtmlIconDivP">{studyIcon}</span>
-          {/* <button onClick={this.thisfunc}>read me</button>
-          <button onClick={this.thisfuncTwo}>write me</button> */}
           <Popup
             trigger={
               <Form.Field

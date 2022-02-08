@@ -62,11 +62,9 @@ const useExponentialInput = ({
     setBase(+base);
     setPower(+power);
   }, [propValue]);
-  // console.log('propvalue', propValue, numberValue);
   const [fakeValue, setFakeValue] = useState(null);
   const isStepRef = useRef(true);
   const handleChange = evt => {
-    // console.log('evt', evt);
     isStepRef.current = evt.nativeEvent.data === undefined;
     let val = evt.currentTarget.value;
     if (isStepRef.current) {

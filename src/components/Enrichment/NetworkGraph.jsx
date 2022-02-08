@@ -146,7 +146,6 @@ class NetworkGraph extends Component {
     if (totalClusters !== 1) {
       // let networkCalculatedWidth = (relevantNodesLength * .75) * totalClusters * 1.5;
       let networkCalculatedWidth = relevantNodesLength * 20;
-      // console.log(networkCalculatedWidth);
       return Math.max(
         networkCalculatedWidth,
         adjustedDocumentWidth,
