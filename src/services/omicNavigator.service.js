@@ -146,41 +146,40 @@ class OmicNavigatorService {
   ) {
     this.setUrl();
     const timeoutLength = 60000;
-    // const cacheKey = `plotStudy_${study}_${modelID}_${featureID}_${plotID}`;
-    // if (this[cacheKey] != null) {
-    //   return this[cacheKey];
-    // } else {
-    const obj = {
-      study,
-      modelID,
-      featureID,
-      plotID,
-      testID,
-    };
-    if (plotType.includes('plotly')) {
-      const data = await this.axiosPostPlotly(
-        'plotStudy',
-        obj,
-        null,
-        errorCb,
-        cancelToken,
-        timeoutLength,
-      );
-      // this[cacheKey] = dataFromPromise;
-      return data;
-      // }
+    const cacheKey = `plotStudy_${study}_${modelID}_${featureID}_${plotID}_${plotType}`;
+    if (this[cacheKey] != null) {
+      return this[cacheKey];
     } else {
-      const promise = this.axiosPostPlot(
-        'plotStudy',
-        obj,
-        errorCb,
-        cancelToken,
-        timeoutLength,
-      );
-      const dataFromPromise = await promise;
-      // this[cacheKey] = dataFromPromise;
-      return dataFromPromise;
-      // }
+      const obj = {
+        study,
+        modelID,
+        featureID,
+        plotID,
+        testID,
+      };
+      if (plotType.includes('plotly')) {
+        const dataFromPlotly = await this.axiosPostPlotly(
+          'plotStudy',
+          obj,
+          null,
+          errorCb,
+          cancelToken,
+          timeoutLength,
+        );
+        this[cacheKey] = dataFromPlotly;
+        return dataFromPlotly;
+      } else {
+        const promise = this.axiosPostPlot(
+          'plotStudy',
+          obj,
+          errorCb,
+          cancelToken,
+          timeoutLength,
+        );
+        const dataFromPromise = await promise;
+        this[cacheKey] = dataFromPromise;
+        return dataFromPromise;
+      }
     }
   }
 
