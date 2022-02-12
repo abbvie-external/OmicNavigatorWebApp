@@ -394,3 +394,17 @@
 .PrimaryColor {
   color: var(--color-primary) !important;
 }
+
+.BottomBar {
+  // position: absolute;
+  // bottom: 10px;
+  // right: 10px;
+  // z-index: 2;
+  background-color: var(--color-dark) !important;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+  #TermsButton {
+    margin: 10px auto;
+  }
+}
