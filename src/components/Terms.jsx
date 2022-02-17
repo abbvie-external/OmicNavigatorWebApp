@@ -24,13 +24,13 @@ class Terms extends Component {
 
   async fetchTerms() {
     //   switch response to test file not that doesn't exist in public folder
-    let response = await fetch('/Terms.txt');
+    let response = await fetch('/Terms.html');
     // let response = await fetch('/Terms.txt');
     // read response stream as text
     let textData = await response.text();
     // we need to look for some specific string in the T&Cs because
     // if the .txt file doesn't exist, it prints out the html as a string
-    if (textData.includes('jalapeno')) {
+    if (textData.includes('OmicNavigator')) {
       return textData;
     } else return null;
   }
@@ -67,7 +67,7 @@ class Terms extends Component {
           <Modal.Header>Terms &#38; Conditions</Modal.Header>
           <Modal.Content image>
             <Modal.Description>
-              <p>{terms}</p>
+              <div dangerouslySetInnerHTML={{ __html: terms }} />
             </Modal.Description>
           </Modal.Content>
         </Modal>
