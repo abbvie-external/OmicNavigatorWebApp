@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Modal, Button, Header } from 'semantic-ui-react';
+import { Modal, Button } from 'semantic-ui-react';
 
 class Terms extends Component {
   state = {
@@ -18,18 +18,14 @@ class Terms extends Component {
         terms: terms,
       });
     } catch (e) {
-      alert(e.message);
+      console.log(e.message);
     }
   }
 
   async fetchTerms() {
-    //   switch response to test file not that doesn't exist in public folder
-    let response = await fetch('/Terms.html');
-    // let response = await fetch('/Terms.txt');
+    let response = await fetch('/terms.html');
     // read response stream as text
     let textData = await response.text();
-    // we need to look for some specific string in the T&Cs because
-    // if the .txt file doesn't exist, it prints out the html as a string
     if (textData.includes('OmicNavigator')) {
       return textData;
     } else return null;
@@ -52,7 +48,7 @@ class Terms extends Component {
           name="file"
           onClick={() => self.toggleTerms(true)}
         >
-          Terms
+          View Terms
         </Button>
         <Modal
           size="small"
