@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Modal, Button } from 'semantic-ui-react';
+import { omicNavigatorService } from '../services/omicNavigator.service';
 
 class Terms extends Component {
   state = {
@@ -23,12 +24,9 @@ class Terms extends Component {
   }
 
   async fetchTerms() {
-    let response = await fetch('/terms.html');
-    // read response stream as text
-    let textData = await response.text();
-    if (!textData.includes('JavaScript')) {
-      return textData;
-    } else return null;
+    return omicNavigatorService.fetchTerms().then(terms => {
+      return terms;
+    });
   }
 
   toggleTerms = bool => {
