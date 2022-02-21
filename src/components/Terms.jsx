@@ -26,7 +26,7 @@ class Terms extends Component {
     let response = await fetch('/terms.html');
     // read response stream as text
     let textData = await response.text();
-    if (textData.includes('OmicNavigator')) {
+    if (!textData.includes('JavaScript')) {
       return textData;
     } else return null;
   }
