@@ -18,7 +18,8 @@
 }
 
 .AppContainer {
-  height: 100vh !important;
+  height: 100% !important;
+  overflow: hidden;
 
   @media (max-width: 1199px) {
     .deviceMargin {
@@ -33,7 +34,7 @@
   }
 
   .EnrichmentContentContainer {
-    height: calc(100vh - 57px) !important;
+    min-height: calc(100vh - 53px) !important;
     margin-top: 0px !important;
     padding-left: 20px !important;
 
@@ -43,7 +44,7 @@
   }
 
   .DifferentialContentContainer {
-    height: calc(100vh - 57px) !important;
+    min-height: calc(100vh - 53px) !important;
     margin-top: 0px !important;
     // padding-left: 20px !important;
 
@@ -317,6 +318,7 @@
 
 .TopBar {
   margin: 0px;
+  margin-bottom: -14px;
   background-color: var(--color-dark) !important;
 
   .MenuContainer {
@@ -393,4 +395,20 @@
 
 .PrimaryColor {
   color: var(--color-primary) !important;
+}
+
+.BottomBar {
+  background-color: var(--color-dark) !important;
+  text-align: center;
+  margin: 0;
+  // margin-top: -15px;
+  padding: 0;
+  height: 53px;
+  #TermsButton {
+    margin: 5px auto;
+    border: none !important;
+    background-color: var(--color-dark) !important;
+    color: var(--color-light) !important;
+    font-size: 18px;
+  }
 }
