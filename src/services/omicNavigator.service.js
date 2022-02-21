@@ -10,6 +10,7 @@ class OmicNavigatorService {
         ? process.env.REACT_APP_DEVSERVER
         : window.location.origin;
     this.url = `${this.baseUrl}/ocpu/library/OmicNavigator/R`;
+    this.staticUrl = `${this.baseUrl}/ocpu/library/OmicNavigator/www`;
   }
 
   async axiosPost(method, obj, params, handleError, cancelToken, timeout) {
@@ -724,6 +725,18 @@ class OmicNavigatorService {
     );
     const dataFromPromise = await promise;
     return dataFromPromise;
+  }
+
+  async fetchTerms() {
+    const self = this;
+    let response = await fetch(`${self.staticUrl}/terms.html`);
+    // read response stream as text
+    let textData = await response.text();
+    if (response.status === 200) {
+      return textData;
+    } else {
+      return null;
+    }
   }
 }
 
