@@ -185,7 +185,7 @@ class PlotsOverlay extends PureComponent {
           },
         ];
         const singleFeaturePlotTypes = this.props.differentialPlotTypes.filter(
-          p => p.plotType !== 'multiFeature',
+          p => !p.plotType.includes('multiFeature'),
         );
         let metafeaturesDropdown = [
           {

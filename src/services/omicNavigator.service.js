@@ -10,6 +10,7 @@ class OmicNavigatorService {
         ? process.env.REACT_APP_DEVSERVER
         : window.location.origin;
     this.url = `${this.baseUrl}/ocpu/library/OmicNavigator/R`;
+    this.staticUrl = `${this.baseUrl}/ocpu/library/OmicNavigator/www`;
   }
 
   async axiosPost(method, obj, params, handleError, cancelToken, timeout) {
@@ -146,41 +147,40 @@ class OmicNavigatorService {
   ) {
     this.setUrl();
     const timeoutLength = 60000;
-    // const cacheKey = `plotStudy_${study}_${modelID}_${featureID}_${plotID}`;
-    // if (this[cacheKey] != null) {
-    //   return this[cacheKey];
-    // } else {
-    const obj = {
-      study,
-      modelID,
-      featureID,
-      plotID,
-      testID,
-    };
-    if (plotType.includes('plotly')) {
-      const data = await this.axiosPostPlotly(
-        'plotStudy',
-        obj,
-        null,
-        errorCb,
-        cancelToken,
-        timeoutLength,
-      );
-      // this[cacheKey] = dataFromPromise;
-      return data;
-      // }
+    const cacheKey = `plotStudy_${study}_${modelID}_${testID}_${featureID}_${plotID}_${plotType}`;
+    if (this[cacheKey] != null) {
+      return this[cacheKey];
     } else {
-      const promise = this.axiosPostPlot(
-        'plotStudy',
-        obj,
-        errorCb,
-        cancelToken,
-        timeoutLength,
-      );
-      const dataFromPromise = await promise;
-      // this[cacheKey] = dataFromPromise;
-      return dataFromPromise;
-      // }
+      const obj = {
+        study,
+        modelID,
+        featureID,
+        plotID,
+        testID,
+      };
+      if (plotType.includes('plotly')) {
+        const dataFromPromise = await this.axiosPostPlotly(
+          'plotStudy',
+          obj,
+          null,
+          errorCb,
+          cancelToken,
+          timeoutLength,
+        );
+        this[cacheKey] = dataFromPromise;
+        return dataFromPromise;
+      } else {
+        const promise = this.axiosPostPlot(
+          'plotStudy',
+          obj,
+          errorCb,
+          cancelToken,
+          timeoutLength,
+        );
+        const dataFromPromise = await promise;
+        this[cacheKey] = dataFromPromise;
+        return dataFromPromise;
+      }
     }
   }
 
@@ -237,10 +237,10 @@ class OmicNavigatorService {
   ) {
     this.setUrl();
     const timeoutLength = 240000;
-    // const cacheKey = `plotStudyMultifeature_${study}_${modelID}_${featureID}_${plotID}`;
-    // if (this[cacheKey] != null) {
-    //   return this[cacheKey];
-    // }
+    const cacheKey = `plotStudyMultifeature_${study}_${modelID}_${testID}_${featureID}_${plotID}`;
+    if (this[cacheKey] != null) {
+      return this[cacheKey];
+    }
     const promise = this.ocpuPlotCall(
       'plotStudy',
       {
@@ -263,7 +263,7 @@ class OmicNavigatorService {
     }
     try {
       await Promise.race([promise, timeoutResolver(10000)]);
-      // this[cacheKey] = promise;
+      this[cacheKey] = promise;
       return promise;
     } catch (err) {
       return err;
@@ -724,6 +724,18 @@ class OmicNavigatorService {
     );
     const dataFromPromise = await promise;
     return dataFromPromise;
+  }
+
+  async fetchTerms() {
+    const self = this;
+    let response = await fetch(`${self.staticUrl}/terms.html`);
+    // read response stream as text
+    let textData = await response.text();
+    if (response.status === 200) {
+      return textData;
+    } else {
+      return null;
+    }
   }
 }
 
