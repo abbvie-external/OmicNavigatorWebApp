@@ -619,7 +619,7 @@ class Differential extends Component {
                     xml = xml.replace(/#clip/g, '#' + id + '-' + i + '-clip');
                     xml = xml.replace(
                       /<svg/g,
-                      `<svg preserveAspectRatio="xMinYMin meet" id="currentSVG-${id}-${i}"`,
+                      `<svg preserveAspectRatio="xMinYMin meet" class="currentSVG" id="currentSVG-${id}-${i}"`,
                     );
                     DOMPurify.addHook('afterSanitizeAttributes', function(
                       node,
@@ -918,7 +918,7 @@ class Differential extends Component {
                       xml = xml.replace(/#clip/g, '#' + i + '-clip');
                       xml = xml.replace(
                         /<svg/g,
-                        `<svg preserveAspectRatio="xMinYMin meet" id="currentSVG-multifeatures-${i}"`,
+                        `<svg preserveAspectRatio="xMinYMin meet" class="currentSVG" id="currentSVG-multifeatures-${i}"`,
                       );
                       DOMPurify.addHook('afterSanitizeAttributes', function(
                         node,
