@@ -31,6 +31,23 @@ class MetafeaturesTableDynamic extends Component {
     }
   }
 
+  componentDidUpdate(prevProps) {
+    if (
+      prevProps.plotSingleFeatureData.key !==
+      this.props.plotSingleFeatureData.key
+    ) {
+      this.getMetafeaturesDataDynamic();
+    }
+  }
+
+  // componentWillUnmount() {
+  //   this.setState({
+  //     metafeaturesTableConfigCols: [],
+  //     metafeaturesTableData: [],
+  //     metafeaturesLoaded: false,
+  //   });
+  // }
+
   async getMetafeaturesDataDynamic() {
     const cachedMetafeaturesData = JSON.parse(
       sessionStorage.getItem(

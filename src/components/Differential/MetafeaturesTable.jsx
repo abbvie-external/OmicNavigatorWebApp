@@ -20,7 +20,6 @@ class MetafeaturesTable extends Component {
   metafeaturesGridRef = React.createRef();
 
   componentDidMount() {
-    console.log('mounted');
     const isMultifeaturePlot =
       this.props.plotOverlayData.key?.includes('features') || false;
     if (
