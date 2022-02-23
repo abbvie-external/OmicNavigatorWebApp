@@ -17,23 +17,46 @@ export default class PlotlyMultiFeature extends Component {
     return layout;
   };
 
-  render() {
-    const { plotlyData } = this.props;
-    // const { layout } = this.state;
-    const parsedData = JSON.parse(plotlyData);
-    const data = parsedData?.data || null;
-    let layout = parsedData?.layout || null;
-    if (layout) {
-      layout = this.reviseLayout(layout);
+  getDataAndLayout = () => {
+    const {
+      differentialStudy,
+      differentialModel,
+      differentialTest,
+      plotId,
+      plotlyData,
+      featureIdsString,
+      dimensions,
+    } = this.props;
+    const cacheKey = `PlotlyMultiFeature_${dimensions}_${differentialStudy}_${differentialModel}_${differentialTest}_${featureIdsString}_${plotId}`;
+    if (this[cacheKey] != null) {
+      return this[cacheKey];
+    } else {
+      const parsedData = JSON.parse(plotlyData);
+      const data = parsedData?.data || null;
+      let layout = parsedData?.layout || null;
+      if (layout) {
+        layout = this.reviseLayout(layout);
+      }
+      this[cacheKey] = { data, layout };
+      return { data, layout };
     }
-    const loader = data ? null : (
+  };
+
+  render() {
+    const dataAndLayout = this.getDataAndLayout();
+    // console.log(dataAndLayout);
+    const loader = dataAndLayout.data ? null : (
       <Dimmer active inverted>
         <Loader size="large">Loading...</Loader>
       </Dimmer>
     );
     return (
       <div>
-        <Plot data={data} layout={layout} config={PlotlyConfig} />
+        <Plot
+          data={dataAndLayout.data}
+          layout={dataAndLayout.layout}
+          config={PlotlyConfig}
+        />
         <span id="PlotSingleFeatureDataLoader">{loader}</span>
       </div>
     );

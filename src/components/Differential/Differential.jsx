@@ -1125,7 +1125,7 @@ class Differential extends Component {
     toHighlightArr,
     doNotUnhighlight,
   ) => {
-    const { differentialOutlinedFeature } = this.state;
+    // const { differentialOutlinedFeature } = this.state;
     if (toHighlightArr.length > 1) {
       // when multi-selecting, show svg loading
       this.setState({

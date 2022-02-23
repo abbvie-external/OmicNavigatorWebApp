@@ -179,7 +179,7 @@ class PlotsMultiFeature extends Component {
     return div;
   };
 
-  getSVGPanesMultiFeature = () => {
+  getSVGPanesMultiFeature = activeTabIndexPlotsMultiFeature => {
     const {
       plotMultiFeatureData,
       divWidth,
@@ -187,6 +187,11 @@ class PlotsMultiFeature extends Component {
       pxToPtRatio,
       pointSize,
       plotMultiFeatureDataLength,
+      multiFeaturePlotTypes,
+      differentialStudy,
+      differentialModel,
+      differentialTest,
+      differentialHighlightedFeaturesData,
     } = this.props;
     let panes = [];
     let dimensions = '';
@@ -205,42 +210,68 @@ class PlotsMultiFeature extends Component {
         const pointSizeString = `&pointsize=${pointSize}`;
         dimensions = `?${divWidthPtString}${divHeightPtString}${pointSizeString}`;
       }
-      const svgArray = plotMultiFeatureData.svg;
-      const svgPanes = svgArray.map((s, index) => {
-        const isPlotlyPlot = s.plotType.plotType.includes('plotly');
-        const srcUrl = `${s.svg}${dimensions}`;
-        return {
-          menuItem: `${s.plotType.plotDisplay}`,
-          render: () => (
-            <Tab.Pane
-              attached="true"
-              as="div"
-              key={`${index}-${s.plotType.plotDisplay}-pane-volcano`}
-            >
-              <div id="PlotsMultiFeatureContainer" className="svgSpan">
-                {isPlotlyPlot ? (
-                  <PlotlyMultiFeature
-                    plotlyData={s.svg}
-                    height={divHeightPadding}
-                    width={divWidthPadding}
-                  />
-                ) : (
-                  <SVG
-                    cacheRequests={true}
-                    src={srcUrl}
-                    title={`${s.plotType.plotDisplay}`}
-                    uniqueHash={`b2g9e2-${index}`}
-                    uniquifyIDs={true}
-                  />
-                )}
-              </div>
-            </Tab.Pane>
-          ),
-        };
-      });
-      panes = panes.concat(svgPanes);
+      const featureIdsArr = differentialHighlightedFeaturesData.map(f => f.id);
+      const featureIdsLength = featureIdsArr.length;
+      const featureIdsString = featureIdsArr.toString();
+      const plotId =
+        multiFeaturePlotTypes[activeTabIndexPlotsMultiFeature].plotID;
+      debugger;
+      const cacheKey = `multiFeaturePanes_${dimensions}_${differentialStudy}_${differentialModel}_${differentialTest}_${plotId}_${activeTabIndexPlotsMultiFeature}_${featureIdsLength}_${featureIdsString}_${plotMultiFeatureData.key}`;
+      if (this[cacheKey] != null) {
+        // console.log(`multifeature plot render cached ${cacheKey}`, this[cacheKey])
+        return this[cacheKey];
+      } else {
+        // since this call in in render, index determines the one tab to display (svg, plotly or feature data)
+        if (activeTabIndexPlotsMultiFeature < multiFeaturePlotTypes.length) {
+          const s = plotMultiFeatureData?.svg[activeTabIndexPlotsMultiFeature];
+          if (s) {
+            const srcUrl = `${s.svg}${dimensions}`;
+            debugger;
+            console.log(
+              `b2g9e2-${s.plotType.plotID}-${activeTabIndexPlotsMultiFeature}-${plotMultiFeatureDataLength}`,
+            );
+            const isPlotlyPlot = s.plotType.plotType.includes('plotly');
+            const svgPanes = {
+              menuItem: `${s.plotType.plotDisplay}`,
+              render: () => (
+                <Tab.Pane
+                  attached="true"
+                  as="div"
+                  key={`${activeTabIndexPlotsMultiFeature}_${s.plotType.plotID}-pane-mulitFeature`}
+                >
+                  <div id="PlotsMultiFeatureContainer" className="svgSpan">
+                    {isPlotlyPlot ? (
+                      <PlotlyMultiFeature
+                        plotlyData={s.svg}
+                        height={divHeightPadding}
+                        width={divWidthPadding}
+                        featureIdsString={featureIdsString}
+                        differentialStudy={differentialStudy}
+                        differentialModel={differentialModel}
+                        differentialTest={differentialTest}
+                        plotId={plotId}
+                        dimensions={dimensions}
+                      />
+                    ) : (
+                      <SVG
+                        cacheRequests={true}
+                        src={srcUrl}
+                        title={`${s.plotType.plotDisplay}`}
+                        uniqueHash={`b2g9e2-${s.plotType.plotID}-${activeTabIndexPlotsMultiFeature}-${plotMultiFeatureDataLength}-${featureIdsLength}`}
+                        uniquifyIDs={true}
+                      />
+                    )}
+                  </div>
+                </Tab.Pane>
+              ),
+            };
+            panes = panes.concat(svgPanes);
+          }
+        }
+        this[cacheKey] = panes;
+        return panes;
+      }
     }
-    return panes;
   };
 
   handleTabChangeMultiFeature = (e, { activeTabIndexPlotsMultiFeature }) => {
@@ -293,7 +324,9 @@ class PlotsMultiFeature extends Component {
         differentialHighlightedFeaturesData?.length > 1
       ) {
         let options = [];
-        const svgPanesMultiFeature = this.getSVGPanesMultiFeature();
+        const svgPanesMultiFeature = this.getSVGPanesMultiFeature(
+          activeTabIndexPlotsMultiFeature,
+        );
         const DropdownClass =
           differentialPlotTypes.length > svgTabMax
             ? 'Show svgPlotDropdown'
@@ -370,7 +403,7 @@ class PlotsMultiFeature extends Component {
               }}
               panes={svgPanesMultiFeature}
               onTabChange={this.handleTabChangeMultiFeature}
-              activeIndex={activeTabIndexPlotsMultiFeature}
+              activeIndex={0}
             />
             {featuresList}
             <span id={divWidth >= 625 ? 'FullScreenButton' : 'FullScreenIcon'}>

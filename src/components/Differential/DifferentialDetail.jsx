@@ -777,12 +777,14 @@ class DifferentialDetail extends Component {
               plotOverlayData={plotOverlayData}
               plotOverlayLoaded={plotOverlayLoaded}
               differentialPlotTypes={differentialPlotTypes}
-              svgTabMax={4}
+              svgTabMax={0}
               tab={tab}
               differentialStudy={differentialStudy}
               differentialModel={differentialModel}
               differentialTest={differentialTest}
               differentialTests={differentialTests}
+              singleFeaturePlotTypes={singleFeaturePlotTypes}
+              multiFeaturePlotTypes={multiFeaturePlotTypes}
             ></PlotsOverlay>
           </Sidebar>
         );

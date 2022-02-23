@@ -72,11 +72,12 @@ class PlotsSingleFeature extends Component {
       pxToPtRatio,
       pointSize,
       plotSingleFeatureData,
-      // singleFeaturePlotTypes,
       modelSpecificMetaFeaturesExist,
       differentialStudy,
       differentialModel,
+      differentialTest,
       plotOverlayLoaded,
+      singleFeaturePlotTypes,
     } = this.props;
     let panes = [];
     let dimensions = '';
@@ -94,112 +95,92 @@ class PlotsSingleFeature extends Component {
       const pointSizeString = `&pointsize=${pointSize}`;
       dimensions = `?${divWidthPtString}${divHeightPtString}${pointSizeString}`;
     }
-    const svgArray = plotSingleFeatureData.svg;
-    // index determines whether to set svg, or feature data
-    // if (activeTabIndexPlotsSingleFeature < singleFeaturePlotTypes.length) {
-    //   const s = plotSingleFeatureData?.svg[activeTabIndexPlotsSingleFeature];
-    // const srcUrl = `${s.svg}${dimensions}`;
-    // const svgPanes = {
-    //   menuItem: `${s.plotType.plotDisplay}`,
-    //   render: () => (
-    //     <Tab.Pane
-    //       attached="true"
-    //       as="div"
-    //       key={`${activeTabIndexPlotsSingleFeature}-${s.plotType.plotDisplay}-pane-volcano`}
-    //     >
-    //       <div id="PlotsSingleFeatureContainer" className="svgSpan">
-    //         <SVG
-    //           cacheRequests={true}
-    //           src={srcUrl}
-    //           title={`${s.plotType.plotDisplay}`}
-    //           uniqueHash={`a1f8d1-${activeTabIndexPlotsSingleFeature}`}
-    //           uniquifyIDs={true}
-    //         />
-    //       </div>
-    //     </Tab.Pane>
-    //   ),
-    // };
-    // panes = panes.concat(svgPanes);
-    // } else {
-    //   const isMultifeaturePlot =
-    //   plotSingleFeatureData?.key?.includes('features') || false;
-    // if (modelSpecificMetaFeaturesExist !== false && !isMultifeaturePlot) {
-    //   let metafeaturesTab = [
-    //     {
-    //       menuItem: 'Feature Data',
-    //       render: () => (
-    //         <Tab.Pane attached="true" as="div">
-    //           <MetafeaturesTableDynamic
-    //             ref={this.metaFeaturesTableDynamicRef}
-    //             differentialStudy={differentialStudy}
-    //             differentialModel={differentialModel}
-    //             plotOverlayLoaded={plotOverlayLoaded}
-    //             plotSingleFeatureData={plotSingleFeatureData}
-    //             modelSpecificMetaFeaturesExist={modelSpecificMetaFeaturesExist}
-    //           />
-    //         </Tab.Pane>
-    //       ),
-    //     },
-    //   ];
-    //   panes = panes.concat(metafeaturesTab);
-    // }
-    // }
-    const svgPanes = svgArray.map((s, index) => {
-      const isPlotlyPlot = s.plotType.plotType.includes('plotly');
-      const srcUrl = `${s.svg}${dimensions}`;
-      return {
-        menuItem: `${s.plotType.plotDisplay}`,
-        render: () => (
-          <Tab.Pane
-            attached="true"
-            as="div"
-            key={`${index}-${s.plotType.plotDisplay}-pane-volcano`}
-          >
-            <div id="PlotsSingleFeatureContainer" className="svgSpan">
-              {isPlotlyPlot ? (
-                <PlotlySingleFeature
-                  plotlyData={s.svg}
-                  height={divHeightPadding}
-                  width={divWidthPadding}
-                />
-              ) : (
-                <SVG
-                  cacheRequests={true}
-                  src={srcUrl}
-                  title={`${s.plotType.plotDisplay}`}
-                  uniqueHash={`a1f8d1-${index}`}
-                  uniquifyIDs={true}
-                />
-              )}
-            </div>
-          </Tab.Pane>
-        ),
-      };
-    });
-    panes = panes.concat(svgPanes);
-    const isMultifeaturePlot =
-      plotSingleFeatureData?.key?.includes('features') || false;
-    if (modelSpecificMetaFeaturesExist !== false && !isMultifeaturePlot) {
-      let metafeaturesTab = [
-        {
-          menuItem: 'Feature Data',
-          render: () => (
-            <Tab.Pane attached="true" as="div">
-              <MetafeaturesTableDynamic
-                ref={this.metaFeaturesTableDynamicRef}
-                differentialStudy={differentialStudy}
-                differentialModel={differentialModel}
-                plotOverlayLoaded={plotOverlayLoaded}
-                plotSingleFeatureData={plotSingleFeatureData}
-                modelSpecificMetaFeaturesExist={modelSpecificMetaFeaturesExist}
-              />
-            </Tab.Pane>
-          ),
-        },
-      ];
-      panes = panes.concat(metafeaturesTab);
+    if (plotSingleFeatureData && plotSingleFeatureData.svg?.length) {
+      // since this call is in render, index determines the one tab to display (svg, plotly or feature data)
+      if (activeTabIndexPlotsSingleFeature < singleFeaturePlotTypes.length) {
+        const plotKey = plotSingleFeatureData.key;
+        const plotId =
+          singleFeaturePlotTypes[activeTabIndexPlotsSingleFeature].plotID;
+        const cacheKey = `singleFeaturePanes_${dimensions}_${differentialStudy}_${differentialModel}_${differentialTest}_${plotKey}_${plotId}_${activeTabIndexPlotsSingleFeature}`;
+        if (this[cacheKey] != null) {
+          // console.log(
+          //   `single features render cached ${cacheKey}`,
+          //   this[cacheKey],
+          // );
+          return this[cacheKey];
+        } else {
+          const s =
+            plotSingleFeatureData?.svg[activeTabIndexPlotsSingleFeature];
+          if (s) {
+            const srcUrl = `${s.svg}${dimensions}`;
+            const isPlotlyPlot = s.plotType.plotType.includes('plotly');
+            const svgPanes = {
+              menuItem: `${s.plotType.plotDisplay}`,
+              render: () => (
+                <Tab.Pane
+                  attached="true"
+                  as="div"
+                  key={`${activeTabIndexPlotsSingleFeature}-${s.plotType.plotID}-pane-singleFeature`}
+                >
+                  <div id="PlotsSingleFeatureContainer" className="svgSpan">
+                    {isPlotlyPlot ? (
+                      <PlotlySingleFeature
+                        plotlyData={s.svg}
+                        height={divHeightPadding}
+                        width={divWidthPadding}
+                        differentialStudy={differentialStudy}
+                        differentialModel={differentialModel}
+                        differentialTest={differentialTest}
+                        plotKey={plotKey}
+                        plotId={plotId}
+                        dimensions={dimensions}
+                      />
+                    ) : (
+                      <SVG
+                        cacheRequests={true}
+                        src={srcUrl}
+                        title={`${s.plotType.plotDisplay}`}
+                        uniqueHash={`a1f8d1-${s.plotType.plotID}-${activeTabIndexPlotsSingleFeature}`}
+                        uniquifyIDs={true}
+                      />
+                    )}
+                  </div>
+                </Tab.Pane>
+              ),
+            };
+            panes = panes.concat(svgPanes);
+            this[cacheKey] = panes;
+          }
+        }
+      } else {
+        // if the activeTabIndex is the same as the singleFeaturePlotTypes length, it indicates app should display the Metafeatures tab
+        const isMultifeaturePlot =
+          plotSingleFeatureData?.key?.includes('features') || false;
+        if (modelSpecificMetaFeaturesExist !== false && !isMultifeaturePlot) {
+          let metafeaturesTab = [
+            {
+              menuItem: 'Feature Data',
+              render: () => (
+                <Tab.Pane attached="true" as="div">
+                  <MetafeaturesTableDynamic
+                    ref={this.metaFeaturesTableDynamicRef}
+                    differentialStudy={differentialStudy}
+                    differentialModel={differentialModel}
+                    plotOverlayLoaded={plotOverlayLoaded}
+                    plotSingleFeatureData={plotSingleFeatureData}
+                    modelSpecificMetaFeaturesExist={
+                      modelSpecificMetaFeaturesExist
+                    }
+                  />
+                </Tab.Pane>
+              ),
+            },
+          ];
+          panes = panes.concat(metafeaturesTab);
+        }
+      }
+      return panes;
     }
-    return panes;
   };
 
   getInstructions = () => {
@@ -246,9 +227,6 @@ class PlotsSingleFeature extends Component {
         plotSingleFeatureDataLength !== 0 &&
         plotSingleFeatureData.key != null
       ) {
-        const svgPanesSingleFeature = this.getSVGPanesSingleFeature(
-          activeTabIndexPlotsSingleFeature,
-        );
         const DropdownClass =
           this.props.differentialPlotTypes?.length > this.props.svgTabMax
             ? 'Show svgPlotDropdown'
@@ -260,6 +238,10 @@ class PlotsSingleFeature extends Component {
         const activeTabIndexPlotsSingleFeatureVar =
           activeTabIndexPlotsSingleFeature || 0;
         const svgArray = [...plotSingleFeatureData.svg];
+        const svgPanesSingleFeature = this.getSVGPanesSingleFeature(
+          activeTabIndexPlotsSingleFeature,
+          svgArray,
+        );
         let options = [];
         options = svgArray.map(function(s, index) {
           return {
@@ -341,7 +323,7 @@ class PlotsSingleFeature extends Component {
               }}
               panes={svgPanesSingleFeature}
               onTabChange={this.handleTabChange}
-              activeIndex={activeTabIndexPlotsSingleFeature}
+              activeIndex={0}
             />
             <span
               className={divWidth < 450 ? 'Hide' : 'Show'}

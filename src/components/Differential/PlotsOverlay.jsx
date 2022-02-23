@@ -15,7 +15,7 @@ class PlotsOverlay extends PureComponent {
     // this.resizeListener = this.resizeListener.bind(this);
     // this.debouncedResizeListener = _.debounce(this.resizeListener, 100);
     this.state = {
-      // activeTabIndexPlotsOverlay: 0,
+      activeTabIndexPlotsOverlay: 0,
       excelFlag: true,
       pngFlag: true,
       pdfFlag: false,
@@ -85,6 +85,98 @@ class PlotsOverlay extends PureComponent {
     return 700;
   };
 
+  getSVGPanesOverlay = (activeTabIndexPlotsOverlay, overlayPlotsTypes) => {
+    const {
+      plotOverlayData,
+      modelSpecificMetaFeaturesExist,
+      differentialStudy,
+      differentialModel,
+      differentialTest,
+      // plotOverlayLoaded,
+    } = this.props;
+    let panes = [];
+    if (plotOverlayData && plotOverlayData.svg?.length) {
+      // since this call is in render, index determines the one tab to display (svg, plotly or feature data)
+      if (activeTabIndexPlotsOverlay < overlayPlotsTypes.length) {
+        const plotId =
+          overlayPlotsTypes[activeTabIndexPlotsOverlay].plotType.plotID;
+        const plotKey = plotOverlayData.key;
+        const cacheKey = `overlayFeaturePanes_${differentialStudy}_${differentialModel}_${differentialTest}_${plotKey}_${plotId}_${activeTabIndexPlotsOverlay}`;
+        if (this[cacheKey] != null) {
+          // console.log(
+          //   `overlay features render cached ${cacheKey}`,
+          //   this[cacheKey],
+          // );
+          return this[cacheKey];
+        } else {
+          const s = plotOverlayData?.svg[activeTabIndexPlotsOverlay];
+          if (s) {
+            const svgContainerWidth = this.getWidth();
+            const svgContainerHeight = this.getHeight();
+            const isPlotlyPlot = s.plotType.plotType.includes('plotly');
+            const svgPanes = {
+              menuItem: `${s.plotType.plotDisplay}`,
+              render: () => (
+                <Tab.Pane attached="true" as="div">
+                  {isPlotlyPlot ? (
+                    <div id="PlotsOverlayContainer" className="svgSpan">
+                      <PlotlyOverlay
+                        plotlyData={s.svg}
+                        height={svgContainerHeight}
+                        width={svgContainerWidth}
+                        differentialStudy={differentialStudy}
+                        differentialModel={differentialModel}
+                        differentialTest={differentialTest}
+                        plotId={plotId}
+                        plotKey={plotKey}
+                      />
+                    </div>
+                  ) : (
+                    <div
+                      id="PlotsOverlayContainer"
+                      className="svgSpan"
+                      dangerouslySetInnerHTML={{ __html: s.svg }}
+                    ></div>
+                  )}
+                </Tab.Pane>
+              ),
+            };
+            panes = panes.concat(svgPanes);
+            this[cacheKey] = panes;
+          }
+        }
+      } else {
+        // if the activeTabIndex is the same as the overlayPlotTypes length, it indicates app should display the Metafeatures tab
+        const isMultifeaturePlot =
+          plotOverlayData?.key?.includes('features') || false;
+        if (modelSpecificMetaFeaturesExist !== false && !isMultifeaturePlot) {
+          let metafeaturesTab = [
+            {
+              menuItem: 'Feature Data',
+              render: () => (
+                <Tab.Pane attached="true" as="div">
+                  <MetafeaturesTable
+                    ref={this.metaFeaturesTableRef}
+                    differentialStudy={this.props.differentialStudy}
+                    differentialModel={this.props.differentialModel}
+                    differentialFeature={this.props.differentialFeature}
+                    plotOverlayLoaded={this.props.plotOverlayLoaded}
+                    plotOverlayData={this.props.plotOverlayData}
+                    modelSpecificMetaFeaturesExist={
+                      this.props.modelSpecificMetaFeaturesExist
+                    }
+                  />
+                </Tab.Pane>
+              ),
+            },
+          ];
+          panes = panes.concat(metafeaturesTab);
+        }
+      }
+      return panes;
+    }
+  };
+
   render() {
     const {
       excelFlag,
@@ -102,6 +194,9 @@ class PlotsOverlay extends PureComponent {
       differentialModel,
       differentialTest,
       differentialFeature,
+      // differentialPlotTypes,
+      modelSpecificMetaFeaturesExist,
+      singleFeaturePlotTypes,
     } = this.props;
     if (!plotOverlayLoaded) {
       return (
@@ -113,100 +208,52 @@ class PlotsOverlay extends PureComponent {
         </div>
       );
     } else {
-      let panes = [];
+      // if (
+      //   plotOverlayDataLength !== 0 &&
+      //   plotOverlayData.key != null
+      // ) {
+      const svgArray = [...plotOverlayData.svg];
+      // const overlayPlotsTypesLength = svgArray?.length || 0;
+      const svgPanesOverlay = this.getSVGPanesOverlay(
+        activeTabIndexPlotsOverlay,
+        svgArray,
+      );
+      const activeTabIndexPlotsOverlayVar = activeTabIndexPlotsOverlay || 0;
+      // const svgArrayLength = svgArray
       let options = [];
-      if (this.props.plotOverlayData) {
-        if (this.props.plotOverlayData.svg.length !== 0) {
-          const svgArray = [...this.props.plotOverlayData.svg];
-          const svgPanes = svgArray.map(s => {
-            const isPlotlyPlot = s.plotType.plotType.includes('plotly');
-            const svgContainerWidth = this.getWidth();
-            const svgContainerHeight = this.getHeight();
-            return {
-              menuItem: `${s.plotType.plotDisplay}`,
-              render: () => (
-                <Tab.Pane attached="true" as="div">
-                  {isPlotlyPlot ? (
-                    <div id="PlotsOverlayContainer" className="svgSpan">
-                      <PlotlyOverlay
-                        plotlyData={s.svg}
-                        height={svgContainerHeight}
-                        width={svgContainerWidth}
-                      />
-                    </div>
-                  ) : (
-                    <div
-                      id="PlotsOverlayContainer"
-                      className="svgSpan"
-                      dangerouslySetInnerHTML={{ __html: s.svg }}
-                    ></div>
-                  )}
-                </Tab.Pane>
-              ),
-            };
-          });
-          const plotOptions = svgArray.map(function(s, index) {
-            return {
-              key: `${index}=DifferentialPlotDropdownOption`,
-              text: s.plotType.plotDisplay,
-              value: index,
-            };
-          });
-          panes = panes.concat(svgPanes);
-          options = options.concat(plotOptions);
-        }
-      }
+      options = svgArray.map(function(s, index) {
+        return {
+          key: `${index}=VolcanoPlotDropdownOption`,
+          text: s.plotType.plotDisplay,
+          value: index,
+        };
+      });
       const isMultifeaturePlot =
-        this.props.plotOverlayData.key?.includes('features') || false;
-      if (
-        this.props.modelSpecificMetaFeaturesExist !== false &&
-        !isMultifeaturePlot
-      ) {
-        // METAFEATURES TAB ONLY AVAILABLE WHEN MODEL SPECIFIC METAFEATURES EXIST, FOR SINGLE FEATURE PLOTS
-        let metafeaturesTab = [
-          {
-            menuItem: 'Feature Data',
-            render: () => (
-              <Tab.Pane attached="true" as="div">
-                <MetafeaturesTable
-                  ref={this.metaFeaturesTableRef}
-                  differentialStudy={this.props.differentialStudy}
-                  differentialModel={this.props.differentialModel}
-                  differentialFeature={this.props.differentialFeature}
-                  plotOverlayLoaded={this.props.plotOverlayLoaded}
-                  plotOverlayData={this.props.plotOverlayData}
-                  modelSpecificMetaFeaturesExist={
-                    this.props.modelSpecificMetaFeaturesExist
-                  }
-                />
-              </Tab.Pane>
-            ),
-          },
-        ];
-        const singleFeaturePlotTypes = this.props.differentialPlotTypes.filter(
-          p => p.plotType !== 'multiFeature',
-        );
+        plotOverlayData.key?.includes('features') || false;
+      if (modelSpecificMetaFeaturesExist !== false && !isMultifeaturePlot) {
+        // const singleFeaturePlotTypes = differentialPlotTypes.filter(
+        //   p => p.plotType !== 'multiFeature',
+        // const overlayPlotTypes = differentialPlotTypes.filter(
+        //   p => !p.plotType.includes('multiFeature'),
+        // );
         let metafeaturesDropdown = [
           {
-            key: 'Feature-Data-Differential-Plot',
+            key: 'Feature-Data-SVG-Plot',
             text: 'Feature Data',
-            value: singleFeaturePlotTypes.length,
+            value: singleFeaturePlotTypes?.length,
           },
         ];
-        panes = panes.concat(metafeaturesTab);
-        options = options.concat(metafeaturesDropdown);
-        // }
+        options = [...options, ...metafeaturesDropdown];
       }
+      // const loader = plotOverlayLoaded ? null : (
+      //   //  <div className="PlotsMetafeaturesDimmer">
+      //   <Dimmer active inverted>
+      //     <Loader size="large">Loading...</Loader>
+      //   </Dimmer>
+      //   //  </div>
+      // );
+
       if (this.props.differentialPlotTypes && this.props.plotOverlayData) {
-        const DropdownClass =
-          this.props.differentialPlotTypes.length > this.props.svgTabMax
-            ? 'Show svgPlotDropdownInOverlay'
-            : 'Hide svgPlotDropdownInOverlay';
-        const TabMenuClass =
-          this.props.differentialPlotTypes.length > this.props.svgTabMax
-            ? 'Hide'
-            : 'Show';
-        const activeTabIndexPlotsOverlayVar = activeTabIndexPlotsOverlay || 0;
         return (
           <div className="PlotWrapper">
             <Grid columns={2} className="">
@@ -265,22 +312,22 @@ class PlotsOverlay extends PureComponent {
                       options={options}
                       value={options[activeTabIndexPlotsOverlayVar]?.value || 0}
                       onChange={this.handlePlotDropdownChange}
-                      className={DropdownClass}
                     />
                     <Tab
                       menu={{
                         secondary: true,
                         pointing: true,
-                        className: TabMenuClass,
+                        className: 'Hide',
                       }}
-                      panes={panes}
+                      panes={svgPanesOverlay}
                       onTabChange={this.handleTabChange}
-                      activeIndex={activeTabIndexPlotsOverlayVar}
+                      activeIndex={0}
                     />
                   </div>
                 </Grid.Column>
               </Grid.Row>
             </Grid>
+            {/* <span id="PlotOverlayDataLoader">{loader}</span> */}
           </div>
         );
       } else return null;
