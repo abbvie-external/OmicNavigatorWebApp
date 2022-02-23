@@ -147,7 +147,7 @@ class OmicNavigatorService {
   ) {
     this.setUrl();
     const timeoutLength = 60000;
-    const cacheKey = `plotStudy_${study}_${modelID}_${featureID}_${plotID}_${plotType}`;
+    const cacheKey = `plotStudy_${study}_${modelID}_${testID}_${featureID}_${plotID}_${plotType}`;
     if (this[cacheKey] != null) {
       return this[cacheKey];
     } else {
@@ -237,10 +237,10 @@ class OmicNavigatorService {
   ) {
     this.setUrl();
     const timeoutLength = 240000;
-    // const cacheKey = `plotStudyMultifeature_${study}_${modelID}_${featureID}_${plotID}`;
-    // if (this[cacheKey] != null) {
-    //   return this[cacheKey];
-    // }
+    const cacheKey = `plotStudyMultifeature_${study}_${modelID}_${testID}_${featureID}_${plotID}`;
+    if (this[cacheKey] != null) {
+      return this[cacheKey];
+    }
     const promise = this.ocpuPlotCall(
       'plotStudy',
       {
@@ -263,7 +263,7 @@ class OmicNavigatorService {
     }
     try {
       await Promise.race([promise, timeoutResolver(10000)]);
-      // this[cacheKey] = promise;
+      this[cacheKey] = promise;
       return promise;
     } catch (err) {
       return err;
