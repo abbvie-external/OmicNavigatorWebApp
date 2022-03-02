@@ -26,7 +26,32 @@ class PlotsMultiFeature extends Component {
     svgFlagMFPlots: true,
     pngFlagMFPlots: true,
     featuresListOpen: false,
+    plotlyExport: false,
+    plotlyExportType: 'svg',
+    isPlotlyPlot: true,
   };
+
+  // componentDidUpdate(prevProps, prevState) {
+  //   const { activeTabIndexPlotsMultiFeature } = this.state;
+  //   if (prevState.activeTabIndexPlotsMultiFeature !== activeTabIndexPlotsMultiFeature) {
+  //     this.setButtonVisibility(activeTabIndexPlotsMultiFeature);
+  //   }
+  // }
+
+  // setButtonVisibility = () => {
+  //   if (this.props.multiFeaturePlotTypes.length > 0) {
+  //     const isMetaFeatureTab =
+  //       this.metaFeaturesTableRef.current !== null ? true : false;
+  //     const isPlotlyPlot = s..includes('plotly');
+  //     this.setState({
+  //       plotlyFlagMFPlots: isPlotlyPlot,
+  //     });
+  //   } else {
+  //     this.setState({
+  //       plotlyFlagMFPlots: false,
+  //     });
+  //   }
+  // };
 
   handleTabChangeMultiFeature = (e, { activeIndex }) => {
     this.setState({
@@ -223,6 +248,8 @@ class PlotsMultiFeature extends Component {
                     plotlyData={s.svg}
                     height={divHeightPadding}
                     width={divWidthPadding}
+                    plotlyExport={this.state.plotlyExport}
+                    plotlyExportType={this.state.plotlyExportType}
                   />
                 ) : (
                   <SVG
@@ -264,6 +291,15 @@ class PlotsMultiFeature extends Component {
     }
   };
 
+  handlePlotlyExport = plotlyExportType => {
+    debugger;
+    this.setState({
+      plotlyExport: true,
+      plotlyExportType,
+    });
+    setTimeout(() => this.setState({ plotlyExport: false }), 2000);
+  };
+
   render() {
     const {
       plotMultiFeatureData,
@@ -285,6 +321,7 @@ class PlotsMultiFeature extends Component {
       svgFlagMFPlots,
       txtFlagMFPlots,
       excelFlagMFPlots,
+      isPlotlyExport,
     } = this.state;
     if (upperPlotsVisible) {
       if (
@@ -347,6 +384,8 @@ class PlotsMultiFeature extends Component {
                 tabIndex={activeTabIndexPlotsMultiFeatureVar}
                 svgExportName={svgExportName}
                 plot="PlotsMultiFeatureContainer"
+                handlePlotlyExport={this.handlePlotlyExport}
+                isPlotlyExport={isPlotlyExport}
               />
             </div>
             <Dropdown

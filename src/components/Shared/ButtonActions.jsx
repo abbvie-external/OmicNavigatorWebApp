@@ -14,6 +14,7 @@ class ButtonActions extends Component {
     pdfVisible: false,
     svgVisible: false,
     txtVisible: false,
+    isPlotlyExport: true,
   };
 
   PNGExport = () => {
@@ -27,7 +28,13 @@ class ButtonActions extends Component {
       tab,
       tabIndex,
       svgExportName,
+      handlePlotlyExport,
+      isPlotlyExport,
     } = this.props;
+    if (isPlotlyExport) {
+      handlePlotlyExport('png');
+      return;
+    }
     if (imageInfo == null) {
       let plotNoPeriods = plot.replace(/\./g, '_');
       let PlotName = `${plotNoPeriods}.png`;
@@ -88,7 +95,14 @@ class ButtonActions extends Component {
       tab,
       tabIndex,
       svgExportName,
+      handlePlotlyExport,
+      isPlotlyExport,
     } = this.props;
+    debugger;
+    if (isPlotlyExport) {
+      handlePlotlyExport('png');
+      return;
+    }
     if (imageInfo == null) {
       let plotNoPeriods = plot.replace(/\./g, '_');
       let PlotName = `${plotNoPeriods}.svg`;
