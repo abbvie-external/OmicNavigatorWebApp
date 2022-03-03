@@ -31,27 +31,7 @@ class PlotsMultiFeature extends Component {
     isPlotlyPlot: true,
   };
 
-  // componentDidUpdate(prevProps, prevState) {
-  //   const { activeTabIndexPlotsMultiFeature } = this.state;
-  //   if (prevState.activeTabIndexPlotsMultiFeature !== activeTabIndexPlotsMultiFeature) {
-  //     this.setButtonVisibility(activeTabIndexPlotsMultiFeature);
-  //   }
-  // }
-
-  // setButtonVisibility = () => {
-  //   if (this.props.multiFeaturePlotTypes.length > 0) {
-  //     const isMetaFeatureTab =
-  //       this.metaFeaturesTableRef.current !== null ? true : false;
-  //     const isPlotlyPlot = s..includes('plotly');
-  //     this.setState({
-  //       plotlyFlagMFPlots: isPlotlyPlot,
-  //     });
-  //   } else {
-  //     this.setState({
-  //       plotlyFlagMFPlots: false,
-  //     });
-  //   }
-  // };
+  differentialDetailPlotsMultiFeatureRef = React.createRef();
 
   handleTabChangeMultiFeature = (e, { activeIndex }) => {
     this.setState({
@@ -212,6 +192,7 @@ class PlotsMultiFeature extends Component {
       pxToPtRatio,
       pointSize,
       plotMultiFeatureDataLength,
+      differentialHighlightedFeaturesData,
     } = this.props;
     let panes = [];
     let dimensions = '';
@@ -230,6 +211,7 @@ class PlotsMultiFeature extends Component {
         const pointSizeString = `&pointsize=${pointSize}`;
         dimensions = `?${divWidthPtString}${divHeightPtString}${pointSizeString}`;
       }
+      const featuresLength = differentialHighlightedFeaturesData.length;
       const svgArray = plotMultiFeatureData.svg;
       const svgPanes = svgArray.map((s, index) => {
         const isPlotlyPlot = s.plotType.plotType.includes('plotly');
@@ -245,6 +227,8 @@ class PlotsMultiFeature extends Component {
               <div id="PlotsMultiFeatureContainer" className="svgSpan">
                 {isPlotlyPlot ? (
                   <PlotlyMultiFeature
+                    plotName={s.plotType.plotDisplay}
+                    featuresLength={featuresLength}
                     plotlyData={s.svg}
                     height={divHeightPadding}
                     width={divWidthPadding}
@@ -292,12 +276,16 @@ class PlotsMultiFeature extends Component {
   };
 
   handlePlotlyExport = plotlyExportType => {
-    debugger;
-    this.setState({
-      plotlyExport: true,
-      plotlyExportType,
-    });
-    setTimeout(() => this.setState({ plotlyExport: false }), 2000);
+    this.setState(
+      {
+        plotlyExport: true,
+        plotlyExportType,
+      },
+      function() {
+        // callback to reset plotly export in progress to false
+        this.setState({ plotlyExport: false });
+      },
+    );
   };
 
   render() {
@@ -321,7 +309,6 @@ class PlotsMultiFeature extends Component {
       svgFlagMFPlots,
       txtFlagMFPlots,
       excelFlagMFPlots,
-      isPlotlyExport,
     } = this.state;
     if (upperPlotsVisible) {
       if (
@@ -370,7 +357,10 @@ class PlotsMultiFeature extends Component {
           </Dimmer>
         );
         return (
-          <div className="svgContainerVolcano">
+          <div
+            className="differentialDetailSvgContainer"
+            ref={this.differentialDetailPlotsMultiFeatureRef}
+          >
             <div className="export-svg ShowBlock">
               <ButtonActions
                 exportButtonSize={'mini'}
@@ -385,7 +375,7 @@ class PlotsMultiFeature extends Component {
                 svgExportName={svgExportName}
                 plot="PlotsMultiFeatureContainer"
                 handlePlotlyExport={this.handlePlotlyExport}
-                isPlotlyExport={isPlotlyExport}
+                fwdRef={this.differentialDetailPlotsMultiFeatureRef}
               />
             </div>
             <Dropdown

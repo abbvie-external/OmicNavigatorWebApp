@@ -29,9 +29,8 @@ class ButtonActions extends Component {
       tabIndex,
       svgExportName,
       handlePlotlyExport,
-      isPlotlyExport,
     } = this.props;
-    if (isPlotlyExport) {
+    if (this.isPlotlyExport()) {
       handlePlotlyExport('png');
       return;
     }
@@ -84,6 +83,13 @@ class ButtonActions extends Component {
     }
   };
 
+  isPlotlyExport = () => {
+    const plotlyElement = this.props.fwdRef?.current?.getElementsByClassName(
+      'plotly',
+    );
+    return plotlyElement?.length > 0;
+  };
+
   SVGExport = () => {
     const {
       imageInfo,
@@ -96,11 +102,9 @@ class ButtonActions extends Component {
       tabIndex,
       svgExportName,
       handlePlotlyExport,
-      isPlotlyExport,
     } = this.props;
-    debugger;
-    if (isPlotlyExport) {
-      handlePlotlyExport('png');
+    if (this.isPlotlyExport()) {
+      handlePlotlyExport('svg');
       return;
     }
     if (imageInfo == null) {

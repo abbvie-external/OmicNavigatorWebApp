@@ -293,7 +293,7 @@ class PlotsSingleFeature extends Component {
           </Dimmer>
         );
         return (
-          <div className="svgContainerVolcano">
+          <div className="differentialDetailSvgContainer">
             <div className="export-svg ShowBlock">
               <ButtonActions
                 exportButtonSize={'mini'}

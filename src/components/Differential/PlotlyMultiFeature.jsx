@@ -11,12 +11,10 @@ export default class PlotlyMultiFeature extends Component {
   };
 
   componentDidUpdate(prevProps) {
-    debugger;
     if (
       this.props.plotlyExport &&
       prevProps.plotlyExport !== this.props.plotlyExport
     ) {
-      // setTimeout(()=>this.clickDownload(), 1000);
       this.clickDownload();
     }
   }
@@ -29,12 +27,7 @@ export default class PlotlyMultiFeature extends Component {
   };
 
   clickDownload = () => {
-    // debugger;
-    // const evt = new KeyboardEvent('click', {
-    //   key: 'Escape',
-    //   bubbles: true,
-    // });
-    // document.querySelectorAll('[data-title="Download plot"]')?.dispatchEvent(evt);
+    // use timeout so plotly config can switch export types if needed
     setTimeout(
       () =>
         document.querySelectorAll('[data-title="Download plot"]')[0]?.click(),
@@ -43,7 +36,12 @@ export default class PlotlyMultiFeature extends Component {
   };
 
   render() {
-    const { plotlyData, plotlyExportType } = this.props;
+    const {
+      plotName,
+      featuresLength,
+      plotlyData,
+      plotlyExportType,
+    } = this.props;
     // const { layout } = this.state;
     const parsedData = JSON.parse(plotlyData);
     const data = parsedData?.data || null;
@@ -63,6 +61,7 @@ export default class PlotlyMultiFeature extends Component {
       displaylogo: false,
       toImageButtonOptions: {
         format: plotlyExportType, // one of png, svg, jpeg, webp
+        filename: `${plotName}_(${featuresLength}-features)`,
       },
     };
 
