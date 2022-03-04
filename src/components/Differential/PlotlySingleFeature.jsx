@@ -1,13 +1,30 @@
 import React, { Component } from 'react';
 import { Dimmer, Loader } from 'semantic-ui-react';
 import Plot from 'react-plotly.js';
-import PlotlyConfig from '../Shared/PlotlyConfig.json';
 import '../Shared/PlotlyOverrides.scss';
 
 export default class PlotlySingleFeature extends Component {
   state = {
     data: null,
     layout: null,
+  };
+
+  componentDidUpdate(prevProps) {
+    if (
+      this.props.plotlyExport &&
+      prevProps.plotlyExport !== this.props.plotlyExport
+    ) {
+      this.clickDownload();
+    }
+  }
+
+  clickDownload = () => {
+    // use timeout so plotly config can switch export types if needed
+    setTimeout(
+      () =>
+        document.querySelectorAll('[data-title="Download plot"]')[0]?.click(),
+      1000,
+    );
   };
 
   reviseLayout = layout => {
@@ -18,7 +35,7 @@ export default class PlotlySingleFeature extends Component {
   };
 
   render() {
-    const { plotlyData } = this.props;
+    const { plotName, plotlyData, plotlyExportType, featureId } = this.props;
     const parsedData = JSON.parse(plotlyData);
     const data = parsedData?.data || null;
     let layout = parsedData?.layout || null;
@@ -30,9 +47,21 @@ export default class PlotlySingleFeature extends Component {
         <Loader size="large">Loading...</Loader>
       </Dimmer>
     );
+
+    const config = {
+      modeBarButtonsToRemove: ['sendDataToCloud'],
+      displayModeBar: true,
+      scrollZoom: true,
+      displaylogo: false,
+      toImageButtonOptions: {
+        format: plotlyExportType, // one of png, svg, jpeg, webp
+        filename: `${plotName}_(${featureId})`,
+      },
+    };
+
     return (
       <div>
-        <Plot data={data} layout={layout} config={PlotlyConfig} />
+        <Plot data={data} layout={layout} config={config} />
         <span id="PlotSingleFeatureDataLoader">{loader}</span>
       </div>
     );

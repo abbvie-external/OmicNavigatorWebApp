@@ -22,10 +22,14 @@ class PlotsOverlay extends PureComponent {
       pdfFlag: false,
       svgFlag: true,
       txtFlag: false,
+      plotlyExport: false,
+      plotlyExportType: 'svg',
+      isPlotlyPlot: true,
     };
   }
+
   metaFeaturesTableRef = React.createRef();
-  svgContainerRef = React.createRef();
+  differentialPlotsOverlayRef = React.createRef();
 
   componentDidMount() {
     this.setButtonVisibility();
@@ -73,17 +77,30 @@ class PlotsOverlay extends PureComponent {
   };
 
   getWidth = () => {
-    if (this.svgContainerRef.current !== null) {
-      return this.svgContainerRef.current.offsetParent.offsetWidth;
+    if (this.differentialPlotsOverlayRef.current !== null) {
+      return this.differentialPlotsOverlayRef.current.offsetParent.offsetWidth;
     }
     return 1200;
   };
 
   getHeight = () => {
-    if (this.svgContainerRef.current !== null) {
-      return this.svgContainerRef.current.offsetParent.offsetHeight;
+    if (this.differentialPlotsOverlayRef.current !== null) {
+      return this.differentialPlotsOverlayRef.current.offsetParent.offsetHeight;
     }
     return 700;
+  };
+
+  handlePlotlyExport = plotlyExportType => {
+    this.setState(
+      {
+        plotlyExport: true,
+        plotlyExportType,
+      },
+      function() {
+        // callback to reset plotly export in progress to false
+        this.setState({ plotlyExport: false });
+      },
+    );
   };
 
   render() {
@@ -118,6 +135,8 @@ class PlotsOverlay extends PureComponent {
       let options = [];
       if (this.props.plotOverlayData) {
         if (this.props.plotOverlayData.svg.length !== 0) {
+          const featuresLength = this.props.differentialHighlightedFeaturesData
+            .length;
           const svgArray = [...this.props.plotOverlayData.svg];
           const svgPanes = svgArray.map(s => {
             const isPlotlyPlot = s.plotType.plotType.includes('plotly');
@@ -133,6 +152,12 @@ class PlotsOverlay extends PureComponent {
                         plotlyData={s.svg}
                         height={svgContainerHeight}
                         width={svgContainerWidth}
+                        plotName={s.plotType.plotDisplay}
+                        plotType={s.plotType.plotType}
+                        featureId={plotOverlayData?.key}
+                        featuresLength={featuresLength}
+                        plotlyExport={this.state.plotlyExport}
+                        plotlyExportType={this.state.plotlyExportType}
                       />
                     </div>
                   ) : (
@@ -245,6 +270,8 @@ class PlotsOverlay extends PureComponent {
                     imageInfo={plotOverlayData}
                     tabIndex={activeTabIndexPlotsOverlayVar}
                     plot={'PlotsOverlayContainer'}
+                    handlePlotlyExport={this.handlePlotlyExport}
+                    fwdRef={this.differentialPlotsOverlayRef}
                   />
                 </Grid.Column>
               </Grid.Row>
@@ -258,7 +285,7 @@ class PlotsOverlay extends PureComponent {
                   largeScreen={16}
                   widescreen={16}
                 >
-                  <div className="" ref={this.svgContainerRef}>
+                  <div className="" ref={this.differentialPlotsOverlayRef}>
                     <Dropdown
                       search
                       selection

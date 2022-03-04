@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Dimmer, Loader } from 'semantic-ui-react';
 import Plot from 'react-plotly.js';
-// import PlotlyConfig from '../Shared/PlotlyConfig.json';
 import '../Shared/PlotlyOverrides.scss';
 
 export default class PlotlyMultiFeature extends Component {
@@ -19,13 +18,6 @@ export default class PlotlyMultiFeature extends Component {
     }
   }
 
-  reviseLayout = layout => {
-    const { width, height } = this.props;
-    layout.width = Math.floor(width * 0.9);
-    layout.height = Math.floor(height * 0.9);
-    return layout;
-  };
-
   clickDownload = () => {
     // use timeout so plotly config can switch export types if needed
     setTimeout(
@@ -35,6 +27,13 @@ export default class PlotlyMultiFeature extends Component {
     );
   };
 
+  reviseLayout = layout => {
+    const { width, height } = this.props;
+    layout.width = Math.floor(width * 0.9);
+    layout.height = Math.floor(height * 0.9);
+    return layout;
+  };
+
   render() {
     const {
       plotName,
@@ -42,7 +41,6 @@ export default class PlotlyMultiFeature extends Component {
       plotlyData,
       plotlyExportType,
     } = this.props;
-    // const { layout } = this.state;
     const parsedData = JSON.parse(plotlyData);
     const data = parsedData?.data || null;
     let layout = parsedData?.layout || null;

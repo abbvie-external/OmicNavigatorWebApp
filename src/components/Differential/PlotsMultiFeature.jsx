@@ -227,11 +227,11 @@ class PlotsMultiFeature extends Component {
               <div id="PlotsMultiFeatureContainer" className="svgSpan">
                 {isPlotlyPlot ? (
                   <PlotlyMultiFeature
-                    plotName={s.plotType.plotDisplay}
-                    featuresLength={featuresLength}
                     plotlyData={s.svg}
                     height={divHeightPadding}
                     width={divWidthPadding}
+                    plotName={s.plotType.plotDisplay}
+                    featuresLength={featuresLength}
                     plotlyExport={this.state.plotlyExport}
                     plotlyExportType={this.state.plotlyExportType}
                   />
