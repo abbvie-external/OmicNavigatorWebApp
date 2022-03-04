@@ -55,7 +55,7 @@ export default class PlotlySingleFeature extends Component {
       displaylogo: false,
       toImageButtonOptions: {
         format: plotlyExportType, // one of png, svg, jpeg, webp
-        filename: `${plotName}_(${featureId})`,
+        filename: `${plotName}_${featureId}`,
       },
     };
 
