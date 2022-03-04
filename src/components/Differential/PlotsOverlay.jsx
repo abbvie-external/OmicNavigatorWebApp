@@ -158,6 +158,7 @@ class PlotsOverlay extends PureComponent {
                         featuresLength={featuresLength}
                         plotlyExport={this.state.plotlyExport}
                         plotlyExportType={this.state.plotlyExportType}
+                        parentNode={this.differentialPlotsOverlayRef}
                       />
                     </div>
                   ) : (

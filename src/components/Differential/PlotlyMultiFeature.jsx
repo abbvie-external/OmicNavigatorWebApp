@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Dimmer, Loader } from 'semantic-ui-react';
 import Plot from 'react-plotly.js';
+import { reviseLayout, clickDownload } from '../Shared/helpers';
 import '../Shared/PlotlyOverrides.scss';
 
 export default class PlotlyMultiFeature extends Component {
@@ -14,25 +15,9 @@ export default class PlotlyMultiFeature extends Component {
       this.props.plotlyExport &&
       prevProps.plotlyExport !== this.props.plotlyExport
     ) {
-      this.clickDownload();
+      clickDownload(this.props.parentNode);
     }
   }
-
-  clickDownload = () => {
-    // use timeout so plotly config can switch export types if needed
-    setTimeout(
-      () =>
-        document.querySelectorAll('[data-title="Download plot"]')[0]?.click(),
-      1000,
-    );
-  };
-
-  reviseLayout = layout => {
-    const { width, height } = this.props;
-    layout.width = Math.floor(width * 0.9);
-    layout.height = Math.floor(height * 0.9);
-    return layout;
-  };
 
   render() {
     const {
@@ -40,12 +25,14 @@ export default class PlotlyMultiFeature extends Component {
       featuresLength,
       plotlyData,
       plotlyExportType,
+      width,
+      height,
     } = this.props;
     const parsedData = JSON.parse(plotlyData);
     const data = parsedData?.data || null;
     let layout = parsedData?.layout || null;
     if (layout) {
-      layout = this.reviseLayout(layout);
+      layout = reviseLayout(layout, width, height);
     }
     const loader = data ? null : (
       <Dimmer active inverted>

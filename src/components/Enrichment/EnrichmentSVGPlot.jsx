@@ -107,6 +107,7 @@ class EnrichmentSVGPlot extends PureComponent {
                     plotlyExport={this.state.plotlyExport}
                     plotlyExportType={this.state.plotlyExportType}
                     featureId={plotDataEnrichment?.key}
+                    parentNode={this.enrichmentSingleFeatureRef}
                   />
                 ) : (
                   <SVG

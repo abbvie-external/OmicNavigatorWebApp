@@ -234,6 +234,7 @@ class PlotsMultiFeature extends Component {
                     featuresLength={featuresLength}
                     plotlyExport={this.state.plotlyExport}
                     plotlyExportType={this.state.plotlyExportType}
+                    parentNode={this.differentialDetailPlotsMultiFeatureRef}
                   />
                 ) : (
                   <SVG

@@ -172,6 +172,7 @@ class PlotsSingleFeature extends Component {
                   plotlyExport={this.state.plotlyExport}
                   plotlyExportType={this.state.plotlyExportType}
                   featureId={plotSingleFeatureData?.key}
+                  parentNode={this.differentialDetailPlotsSingleFeatureRef}
                 />
               ) : (
                 <SVG
