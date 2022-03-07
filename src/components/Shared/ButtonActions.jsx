@@ -14,6 +14,7 @@ class ButtonActions extends Component {
     pdfVisible: false,
     svgVisible: false,
     txtVisible: false,
+    isPlotlyExport: true,
   };
 
   PNGExport = () => {
@@ -27,7 +28,12 @@ class ButtonActions extends Component {
       tab,
       tabIndex,
       svgExportName,
+      handlePlotlyExport,
     } = this.props;
+    if (this.isPlotlyExport()) {
+      handlePlotlyExport('png');
+      return;
+    }
     if (imageInfo == null) {
       let plotNoPeriods = plot.replace(/\./g, '_');
       let PlotName = `${plotNoPeriods}.png`;
@@ -77,6 +83,13 @@ class ButtonActions extends Component {
     }
   };
 
+  isPlotlyExport = () => {
+    const plotlyElement = this.props.fwdRef?.current?.getElementsByClassName(
+      'plotly',
+    );
+    return plotlyElement?.length > 0;
+  };
+
   SVGExport = () => {
     const {
       imageInfo,
@@ -88,7 +101,12 @@ class ButtonActions extends Component {
       tab,
       tabIndex,
       svgExportName,
+      handlePlotlyExport,
     } = this.props;
+    if (this.isPlotlyExport()) {
+      handlePlotlyExport('svg');
+      return;
+    }
     if (imageInfo == null) {
       let plotNoPeriods = plot.replace(/\./g, '_');
       let PlotName = `${plotNoPeriods}.svg`;

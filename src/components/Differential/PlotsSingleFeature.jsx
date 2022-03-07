@@ -6,6 +6,7 @@ import ButtonActions from '../Shared/ButtonActions';
 import MetafeaturesTableDynamic from './MetafeaturesTableDynamic';
 import PlotlySingleFeature from './PlotlySingleFeature';
 import './PlotsDynamic.scss';
+import '../Shared/Plotly.scss';
 
 class PlotsSingleFeature extends Component {
   state = {
@@ -15,7 +16,12 @@ class PlotsSingleFeature extends Component {
     pdfFlagSFPlots: false,
     svgFlagSFPlots: true,
     txtFlagSFPlots: false,
+    plotlyExport: false,
+    plotlyExportType: 'svg',
+    isPlotlyPlot: true,
   };
+
+  differentialDetailPlotsSingleFeatureRef = React.createRef();
   metaFeaturesTableDynamicRef = React.createRef();
 
   componentDidMount() {
@@ -94,6 +100,7 @@ class PlotsSingleFeature extends Component {
       const pointSizeString = `&pointsize=${pointSize}`;
       dimensions = `?${divWidthPtString}${divHeightPtString}${pointSizeString}`;
     }
+
     const svgArray = plotSingleFeatureData.svg;
     // index determines whether to set svg, or feature data
     // if (activeTabIndexPlotsSingleFeature < singleFeaturePlotTypes.length) {
@@ -161,6 +168,11 @@ class PlotsSingleFeature extends Component {
                   plotlyData={s.svg}
                   height={divHeightPadding}
                   width={divWidthPadding}
+                  plotName={s.plotType.plotDisplay}
+                  plotlyExport={this.state.plotlyExport}
+                  plotlyExportType={this.state.plotlyExportType}
+                  featureId={plotSingleFeatureData?.key}
+                  parentNode={this.differentialDetailPlotsSingleFeatureRef}
                 />
               ) : (
                 <SVG
@@ -217,6 +229,19 @@ class PlotsSingleFeature extends Component {
     } else {
       return 'No plots nor feature data available';
     }
+  };
+
+  handlePlotlyExport = plotlyExportType => {
+    this.setState(
+      {
+        plotlyExport: true,
+        plotlyExportType,
+      },
+      function() {
+        // callback to reset plotly export in progress to false
+        this.setState({ plotlyExport: false });
+      },
+    );
   };
 
   render() {
@@ -292,7 +317,10 @@ class PlotsSingleFeature extends Component {
           </Dimmer>
         );
         return (
-          <div className="svgContainerVolcano">
+          <div
+            className="differentialDetailSvgContainer"
+            ref={this.differentialDetailPlotsSingleFeatureRef}
+          >
             <div className="export-svg ShowBlock">
               <ButtonActions
                 exportButtonSize={'mini'}
@@ -305,7 +333,6 @@ class PlotsSingleFeature extends Component {
                 imageInfo={plotSingleFeatureData}
                 tabIndex={activeTabIndexPlotsSingleFeatureVar}
                 svgExportName={svgExportName}
-                plot="PlotsSingleFeatureContainer"
                 refFwd={
                   this.metaFeaturesTableDynamicRef.current
                     ?.metafeaturesGridRefDynamic || null
@@ -314,6 +341,9 @@ class PlotsSingleFeature extends Component {
                 model={differentialModel}
                 test={differentialTest}
                 feature={plotSingleFeatureData?.key}
+                plot="PlotsSingleFeatureContainer"
+                handlePlotlyExport={this.handlePlotlyExport}
+                fwdRef={this.differentialDetailPlotsSingleFeatureRef}
               />
             </div>
             <Dropdown

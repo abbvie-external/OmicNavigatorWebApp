@@ -26,7 +26,12 @@ class PlotsMultiFeature extends Component {
     svgFlagMFPlots: true,
     pngFlagMFPlots: true,
     featuresListOpen: false,
+    plotlyExport: false,
+    plotlyExportType: 'svg',
+    isPlotlyPlot: true,
   };
+
+  differentialDetailPlotsMultiFeatureRef = React.createRef();
 
   handleTabChangeMultiFeature = (e, { activeIndex }) => {
     this.setState({
@@ -187,6 +192,7 @@ class PlotsMultiFeature extends Component {
       pxToPtRatio,
       pointSize,
       plotMultiFeatureDataLength,
+      differentialHighlightedFeaturesData,
     } = this.props;
     let panes = [];
     let dimensions = '';
@@ -205,6 +211,7 @@ class PlotsMultiFeature extends Component {
         const pointSizeString = `&pointsize=${pointSize}`;
         dimensions = `?${divWidthPtString}${divHeightPtString}${pointSizeString}`;
       }
+      const featuresLength = differentialHighlightedFeaturesData.length;
       const svgArray = plotMultiFeatureData.svg;
       const svgPanes = svgArray.map((s, index) => {
         const isPlotlyPlot = s.plotType.plotType.includes('plotly');
@@ -223,6 +230,11 @@ class PlotsMultiFeature extends Component {
                     plotlyData={s.svg}
                     height={divHeightPadding}
                     width={divWidthPadding}
+                    plotName={s.plotType.plotDisplay}
+                    featuresLength={featuresLength}
+                    plotlyExport={this.state.plotlyExport}
+                    plotlyExportType={this.state.plotlyExportType}
+                    parentNode={this.differentialDetailPlotsMultiFeatureRef}
                   />
                 ) : (
                   <SVG
@@ -262,6 +274,19 @@ class PlotsMultiFeature extends Component {
     } else {
       return 'Multi-feature plots are unavailable';
     }
+  };
+
+  handlePlotlyExport = plotlyExportType => {
+    this.setState(
+      {
+        plotlyExport: true,
+        plotlyExportType,
+      },
+      function() {
+        // callback to reset plotly export in progress to false
+        this.setState({ plotlyExport: false });
+      },
+    );
   };
 
   render() {
@@ -333,7 +358,10 @@ class PlotsMultiFeature extends Component {
           </Dimmer>
         );
         return (
-          <div className="svgContainerVolcano">
+          <div
+            className="differentialDetailSvgContainer"
+            ref={this.differentialDetailPlotsMultiFeatureRef}
+          >
             <div className="export-svg ShowBlock">
               <ButtonActions
                 exportButtonSize={'mini'}
@@ -347,6 +375,8 @@ class PlotsMultiFeature extends Component {
                 tabIndex={activeTabIndexPlotsMultiFeatureVar}
                 svgExportName={svgExportName}
                 plot="PlotsMultiFeatureContainer"
+                handlePlotlyExport={this.handlePlotlyExport}
+                fwdRef={this.differentialDetailPlotsMultiFeatureRef}
               />
             </div>
             <Dropdown
