@@ -8,6 +8,7 @@ import PlotlyOverlay from './PlotlyOverlay';
 import '../Enrichment/SplitPanesContainer.scss';
 import './PlotsDynamic.scss';
 import './PlotsOverlay.scss';
+import '../Shared/Plotly.scss';
 
 class PlotsOverlay extends PureComponent {
   constructor(props) {
@@ -21,10 +22,14 @@ class PlotsOverlay extends PureComponent {
       pdfFlag: false,
       svgFlag: true,
       txtFlag: false,
+      plotlyExport: false,
+      plotlyExportType: 'svg',
+      isPlotlyPlot: true,
     };
   }
+
   metaFeaturesTableRef = React.createRef();
-  svgContainerRef = React.createRef();
+  differentialPlotsOverlayRef = React.createRef();
 
   componentDidMount() {
     this.setButtonVisibility();
@@ -72,17 +77,30 @@ class PlotsOverlay extends PureComponent {
   };
 
   getWidth = () => {
-    if (this.svgContainerRef.current !== null) {
-      return this.svgContainerRef.current.offsetParent.offsetWidth;
+    if (this.differentialPlotsOverlayRef.current !== null) {
+      return this.differentialPlotsOverlayRef.current.offsetParent.offsetWidth;
     }
     return 1200;
   };
 
   getHeight = () => {
-    if (this.svgContainerRef.current !== null) {
-      return this.svgContainerRef.current.offsetParent.offsetHeight;
+    if (this.differentialPlotsOverlayRef.current !== null) {
+      return this.differentialPlotsOverlayRef.current.offsetParent.offsetHeight;
     }
     return 700;
+  };
+
+  handlePlotlyExport = plotlyExportType => {
+    this.setState(
+      {
+        plotlyExport: true,
+        plotlyExportType,
+      },
+      function() {
+        // callback to reset plotly export in progress to false
+        this.setState({ plotlyExport: false });
+      },
+    );
   };
 
   getSVGPanesOverlay = (activeTabIndexPlotsOverlay, overlayPlotsTypes) => {
@@ -95,56 +113,75 @@ class PlotsOverlay extends PureComponent {
       // plotOverlayLoaded,
     } = this.props;
     let panes = [];
+    // if (!plotOverlayLoaded) {
+    //   return (
+    //     // <LoaderActivePlots />
+    //     <div className="PlotsMetafeaturesDimmer">
+    //       <Dimmer active inverted>
+    //         <Loader size="large">Loading...</Loader>
+    //       </Dimmer>
+    //     </div>
+    //   );
+    // } else {
     if (plotOverlayData && plotOverlayData.svg?.length) {
       // since this call is in render, index determines the one tab to display (svg, plotly or feature data)
       if (activeTabIndexPlotsOverlay < overlayPlotsTypes.length) {
         const plotId =
           overlayPlotsTypes[activeTabIndexPlotsOverlay].plotType.plotID;
         const plotKey = plotOverlayData.key;
-        const cacheKey = `overlayFeaturePanes_${differentialStudy}_${differentialModel}_${differentialTest}_${plotKey}_${plotId}_${activeTabIndexPlotsOverlay}`;
-        if (this[cacheKey] != null) {
-          // console.log(
-          //   `overlay features render cached ${cacheKey}`,
-          //   this[cacheKey],
-          // );
-          return this[cacheKey];
-        } else {
-          const s = plotOverlayData?.svg[activeTabIndexPlotsOverlay];
-          if (s) {
-            const svgContainerWidth = this.getWidth();
-            const svgContainerHeight = this.getHeight();
-            const isPlotlyPlot = s.plotType.plotType.includes('plotly');
-            const svgPanes = {
-              menuItem: `${s.plotType.plotDisplay}`,
-              render: () => (
-                <Tab.Pane attached="true" as="div">
-                  {isPlotlyPlot ? (
-                    <div id="PlotsOverlayContainer" className="svgSpan">
-                      <PlotlyOverlay
-                        plotlyData={s.svg}
-                        height={svgContainerHeight}
-                        width={svgContainerWidth}
-                        differentialStudy={differentialStudy}
-                        differentialModel={differentialModel}
-                        differentialTest={differentialTest}
-                        plotId={plotId}
-                        plotKey={plotKey}
-                      />
-                    </div>
-                  ) : (
-                    <div
-                      id="PlotsOverlayContainer"
-                      className="svgSpan"
-                      dangerouslySetInnerHTML={{ __html: s.svg }}
-                    ></div>
-                  )}
-                </Tab.Pane>
-              ),
-            };
-            panes = panes.concat(svgPanes);
-            this[cacheKey] = panes;
-          }
+        // const cacheKey = `overlayFeaturePanes_${differentialStudy}_${differentialModel}_${differentialTest}_${plotKey}_${plotId}_${activeTabIndexPlotsOverlay}`;
+        // if (this[cacheKey] != null) {
+        // console.log(
+        //   `overlay features render cached ${cacheKey}`,
+        //   this[cacheKey],
+        // );
+        //   return this[cacheKey];
+        // } else {
+        const s = plotOverlayData?.svg[activeTabIndexPlotsOverlay];
+        const featuresLength = this.props.differentialHighlightedFeaturesData
+          .length;
+        if (s) {
+          const svgContainerWidth = this.getWidth();
+          const svgContainerHeight = this.getHeight();
+          const isPlotlyPlot = s.plotType.plotType.includes('plotly');
+          const svgPanes = {
+            menuItem: `${s.plotType.plotDisplay}`,
+            render: () => (
+              <Tab.Pane attached="true" as="div">
+                {isPlotlyPlot ? (
+                  <div id="PlotsOverlayContainer" className="svgSpan">
+                    <PlotlyOverlay
+                      plotlyData={s.svg}
+                      height={svgContainerHeight}
+                      width={svgContainerWidth}
+                      differentialStudy={differentialStudy}
+                      differentialModel={differentialModel}
+                      differentialTest={differentialTest}
+                      plotId={plotId}
+                      plotKey={plotKey}
+                      plotName={s.plotType.plotDisplay}
+                      plotType={s.plotType.plotType}
+                      featureId={plotOverlayData?.key}
+                      featuresLength={featuresLength}
+                      plotlyExport={this.state.plotlyExport}
+                      plotlyExportType={this.state.plotlyExportType}
+                      parentNode={this.differentialPlotsOverlayRef}
+                    />
+                  </div>
+                ) : (
+                  <div
+                    id="PlotsOverlayContainer"
+                    className="svgSpan"
+                    dangerouslySetInnerHTML={{ __html: s.svg }}
+                  ></div>
+                )}
+              </Tab.Pane>
+            ),
+          };
+          panes = panes.concat(svgPanes);
+          // this[cacheKey] = panes;
         }
+        // }
       } else {
         // if the activeTabIndex is the same as the overlayPlotTypes length, it indicates app should display the Metafeatures tab
         const isMultifeaturePlot =
@@ -175,6 +212,7 @@ class PlotsOverlay extends PureComponent {
       }
       return panes;
     }
+    // }
   };
 
   render() {
@@ -291,6 +329,8 @@ class PlotsOverlay extends PureComponent {
                     imageInfo={plotOverlayData}
                     tabIndex={activeTabIndexPlotsOverlayVar}
                     plot={'PlotsOverlayContainer'}
+                    handlePlotlyExport={this.handlePlotlyExport}
+                    fwdRef={this.differentialPlotsOverlayRef}
                   />
                 </Grid.Column>
               </Grid.Row>
@@ -304,7 +344,7 @@ class PlotsOverlay extends PureComponent {
                   largeScreen={16}
                   widescreen={16}
                 >
-                  <div className="" ref={this.svgContainerRef}>
+                  <div className="" ref={this.differentialPlotsOverlayRef}>
                     <Dropdown
                       search
                       selection

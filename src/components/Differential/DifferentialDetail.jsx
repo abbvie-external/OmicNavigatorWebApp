@@ -750,6 +750,7 @@ class DifferentialDetail extends Component {
         plotOverlayLoaded,
         differentialPlotTypes,
         differentialTests,
+        differentialHighlightedFeaturesData,
       } = this.props;
       if (plotOverlayVisible) {
         return (
@@ -768,6 +769,9 @@ class DifferentialDetail extends Component {
               onBackToTable={onBackToTable}
               differentialFeatureIdKey={differentialFeatureIdKey}
               differentialFeature={differentialFeature}
+              differentialHighlightedFeaturesData={
+                differentialHighlightedFeaturesData
+              }
               metaFeaturesDataDifferential={metaFeaturesDataDifferential}
               modelSpecificMetaFeaturesExist={
                 modelSpecificMetaFeaturesExist || false

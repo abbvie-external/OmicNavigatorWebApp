@@ -85,25 +85,25 @@ class OmicNavigatorService {
   ) {
     const paramsObj = params ? { digits: 10 } : {};
     const self = this;
-    return new Promise(function(resolve, reject) {
-      const axiosPostUrl = `${self.url}/${method}/json?auto_unbox=true`;
-      axios
-        .post(axiosPostUrl, obj, {
-          params: paramsObj,
-          responseType: 'text',
-          cancelToken,
-          timeout,
-        })
-        .then(response => resolve(response.data))
-        .catch(function(error) {
-          if (!axios.isCancel(error)) {
-            toast.error(`${error.message}`);
-            if (handleError != null) {
-              handleError(false);
-            }
-          }
-        });
-    });
+    const axiosPostUrl = `${self.url}/${method}/json?auto_unbox=true`;
+    try {
+      const { data } = await axios.post(axiosPostUrl, obj, {
+        params: paramsObj,
+        responseType: 'text',
+        cancelToken,
+        timeout,
+      });
+      return data;
+    } catch (error) {
+      if (!axios.isCancel(error)) {
+        toast.error(`${error.message}`);
+        if (handleError != null) {
+          handleError(false);
+        } else {
+          throw error;
+        }
+      }
+    }
   }
 
   async ocpuPlotCall(method, obj, handleError, cancelToken, timeout) {

@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
-import { Dimmer, Loader } from 'semantic-ui-react';
+// import { Dimmer, Loader } from 'semantic-ui-react';
 import Plot from 'react-plotly.js';
-import PlotlyConfig from '../Shared/PlotlyConfig.json';
-// import plotlyFeatureData from '../Shared/plotlyFeatureData.json';
+import { reviseLayout, clickDownload } from '../Shared/helpers';
 import '../Shared/PlotlyOverrides.scss';
 
 export default class PlotlyMultiFeature extends Component {
@@ -25,6 +24,12 @@ export default class PlotlyMultiFeature extends Component {
   }
 
   componentDidUpdate(prevProps) {
+    if (
+      this.props.plotlyExport &&
+      prevProps.plotlyExport !== this.props.plotlyExport
+    ) {
+      clickDownload(this.props.parentNode);
+    }
     if (
       prevProps.featureIdsString !== this.props.featureIdsString ||
       prevProps.plotId !== this.props.plotId ||
@@ -64,20 +69,6 @@ export default class PlotlyMultiFeature extends Component {
   //   });
   // }
 
-  reviseLayout = layout => {
-    const layoutString = JSON.stringify(layout);
-    const layoutStringReplaced = layoutString.replaceAll(
-      '"automargin":true',
-      '"automargin":false',
-    );
-    const layoutParsed = JSON.parse(layoutStringReplaced);
-    const { width, height } = this.props;
-    layoutParsed.width = Math.floor(width * 0.9);
-    layoutParsed.height = Math.floor(height * 0.9);
-    layout.margin.r = 10;
-    return layoutParsed;
-  };
-
   getJson = () => {
     const {
       differentialStudy,
@@ -86,9 +77,10 @@ export default class PlotlyMultiFeature extends Component {
       plotId,
       plotlyData,
       featureIdsString,
-      dimensions,
+      width,
+      height,
     } = this.props;
-    const cacheKey = `PlotlyMultiFeature_${dimensions}_${differentialStudy}_${differentialModel}_${differentialTest}_${featureIdsString}_${plotId}`;
+    const cacheKey = `PlotlyMultiFeature_${width}_${height}_${differentialStudy}_${differentialModel}_${differentialTest}_${featureIdsString}_${plotId}`;
     if (this[cacheKey] != null) {
       return this[cacheKey];
     } else {
@@ -96,7 +88,7 @@ export default class PlotlyMultiFeature extends Component {
       const data = parsedData?.data || null;
       let layout = parsedData?.layout || null;
       if (layout) {
-        layout = this.reviseLayout(layout);
+        layout = reviseLayout(layout, width, height);
       }
       this[cacheKey] = { data, layout };
       return { data, layout };
@@ -110,11 +102,21 @@ export default class PlotlyMultiFeature extends Component {
   };
 
   render() {
-    const loader = this.state.json?.data ? null : (
-      <Dimmer active inverted>
-        <Loader size="large">Loading...</Loader>
-      </Dimmer>
-    );
+    const { plotName, featuresLength, plotlyExportType } = this.props;
+    // const loader = this.state.json?.data ? null : (
+    //   <Dimmer active inverted>
+    //   <Loader size="large">Loading...</Loader>
+    // </Dimmer>
+    const config = {
+      modeBarButtonsToRemove: ['sendDataToCloud'],
+      displayModeBar: true,
+      scrollZoom: true,
+      displaylogo: false,
+      toImageButtonOptions: {
+        format: plotlyExportType, // one of png, svg, jpeg, webp
+        filename: `${plotName}_(${featuresLength}-features)`,
+      },
+    };
     // console.log(JSON.stringify(this.state.json?.data));
     return (
       <div>
@@ -122,15 +124,15 @@ export default class PlotlyMultiFeature extends Component {
           <Plot
             data={this.state.json.data}
             layout={this.state.json.layout}
-            config={PlotlyConfig}
+            config={config}
             // onPurge={this.purgePlot}
-            onInitialized={figure => this.setState({ figure, loading: false })}
-            onUpdate={figure => this.setState(figure)}
+            // onInitialized={figure => this.setState({ figure, loading: false })}
+            // onUpdate={figure => this.setState(figure)}
           />
         )}
-        <span id="PlotSingleFeatureDataLoader">
+        {/* <span id="PlotSingleFeatureDataLoader">
           {this.state.loading && loader}
-        </span>
+        </span> */}
       </div>
     );
   }

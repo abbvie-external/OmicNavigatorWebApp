@@ -19,7 +19,12 @@ import './EnrichmentSVGPlot.scss';
 class EnrichmentSVGPlot extends PureComponent {
   state = {
     activeSVGTabIndexEnrichment: 0,
+    plotlyExport: false,
+    plotlyExportType: 'svg',
+    isPlotlyPlot: true,
   };
+
+  enrichmentSingleFeatureRef = React.createRef();
 
   componentDidUpdate(prevProps) {
     if (
@@ -98,6 +103,11 @@ class EnrichmentSVGPlot extends PureComponent {
                     plotlyData={s.svg}
                     height={divHeightPadding}
                     width={divWidthPadding}
+                    plotName={s.plotType.plotDisplay}
+                    plotlyExport={this.state.plotlyExport}
+                    plotlyExportType={this.state.plotlyExportType}
+                    featureId={plotDataEnrichment?.key}
+                    parentNode={this.enrichmentSingleFeatureRef}
                   />
                 ) : (
                   <SVG
@@ -118,6 +128,19 @@ class EnrichmentSVGPlot extends PureComponent {
         svgPanes,
       });
     }
+  };
+
+  handlePlotlyExport = plotlyExportType => {
+    this.setState(
+      {
+        plotlyExport: true,
+        plotlyExportType,
+      },
+      function() {
+        // callback to reset plotly export in progress to false
+        this.setState({ plotlyExport: false });
+      },
+    );
   };
 
   render() {
@@ -164,7 +187,10 @@ class EnrichmentSVGPlot extends PureComponent {
           };
         });
         return (
-          <div className="svgContainerEnrichment">
+          <div
+            className="svgContainerEnrichment"
+            ref={this.enrichmentSingleFeatureRef}
+          >
             <div className="export-svg ShowBlock">
               <ButtonActions
                 exportButtonSize={'mini'}
@@ -178,6 +204,9 @@ class EnrichmentSVGPlot extends PureComponent {
                 tabIndex={activeSVGTabIndexEnrichmentVar}
                 svgExportName={svgExportName}
                 plot="EnrichmentPlotSVGDiv"
+                feature={plotDataEnrichment?.key}
+                handlePlotlyExport={this.handlePlotlyExport}
+                fwdRef={this.enrichmentSingleFeatureRef}
               />
             </div>
             {/* <Popup

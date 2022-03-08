@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Dimmer, Loader } from 'semantic-ui-react';
 import Plot from 'react-plotly.js';
-import PlotlyConfig from '../Shared/PlotlyConfig.json';
+import { reviseLayout, clickDownload } from '../Shared/helpers';
 import '../Shared/PlotlyOverrides.scss';
 
 export default class PlotlyEnrichment extends Component {
@@ -10,29 +10,50 @@ export default class PlotlyEnrichment extends Component {
     layout: null,
   };
 
-  reviseLayout = layout => {
-    const { width, height } = this.props;
-    layout.width = Math.floor(width * 0.9);
-    layout.height = Math.floor(height * 0.9);
-    return layout;
-  };
+  componentDidUpdate(prevProps) {
+    if (
+      this.props.plotlyExport &&
+      prevProps.plotlyExport !== this.props.plotlyExport
+    ) {
+      clickDownload(this.props.parentNode);
+    }
+  }
 
   render() {
-    const { plotlyData } = this.props;
+    const {
+      plotName,
+      plotlyData,
+      plotlyExportType,
+      featureId,
+      width,
+      height,
+    } = this.props;
     const parsedData = JSON.parse(plotlyData);
     const data = parsedData?.data || null;
     let layout = parsedData?.layout || null;
     if (layout) {
-      layout = this.reviseLayout(layout);
+      layout = reviseLayout(layout, width, height);
     }
     const loader = data ? null : (
       <Dimmer active inverted>
         <Loader size="large">Loading...</Loader>
       </Dimmer>
     );
+
+    const config = {
+      modeBarButtonsToRemove: ['sendDataToCloud'],
+      displayModeBar: true,
+      scrollZoom: true,
+      displaylogo: false,
+      toImageButtonOptions: {
+        format: plotlyExportType, // one of png, svg, jpeg, webp
+        filename: `${plotName}_${featureId}`,
+      },
+    };
+
     return (
       <div>
-        <Plot data={data} layout={layout} config={PlotlyConfig} />
+        <Plot data={data} layout={layout} config={config} />
         <span id="PlotEnrichmentDataLoader">{loader}</span>
       </div>
     );

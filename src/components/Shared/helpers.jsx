@@ -1,6 +1,7 @@
 import React from 'react';
 import { Popup, Loader, Dimmer } from 'semantic-ui-react';
 import _ from 'lodash';
+import { toast } from 'react-toastify';
 import * as d3 from 'd3-array';
 
 export const Linkout = React.memo(
@@ -413,3 +414,33 @@ export function getDynamicSizeBtn() {
     return 'medium';
   } else if (w > 2599) return 'large';
 }
+
+// use debounce so plotly config can switch export types if needed
+export const clickDownload = _.debounce(parentNode => {
+  // plotly download data title could be 'Download plot' or 'Download plot as a png', and not always even with the export type config, so we need to find it
+  let downloadIcon = parentNode?.current?.querySelectorAll(
+    `[data-title="Download plot"]`,
+  );
+  if (downloadIcon?.length === 0) {
+    downloadIcon = parentNode?.current?.querySelectorAll(
+      `[data-title="Download plot as a png"]`,
+    );
+  }
+  if (downloadIcon?.length) {
+    downloadIcon[0].click();
+  } else {
+    toast.error('Please adjust the plot and try downloading again.');
+  }
+}, 1000);
+
+export const reviseLayout = (layout, width, height) => {
+  const layoutString = JSON.stringify(layout);
+  const layoutStringReplaced = layoutString.replaceAll(
+    '"automargin":true',
+    '"automargin":false',
+  );
+  const layoutParsed = JSON.parse(layoutStringReplaced);
+  layoutParsed.width = Math.floor(width * 0.9);
+  layoutParsed.height = Math.floor(height * 0.9);
+  return layoutParsed;
+};
