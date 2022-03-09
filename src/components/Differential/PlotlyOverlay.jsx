@@ -36,7 +36,6 @@ export default class PlotlyOverlay extends Component {
       prevProps.dimensions !== this.props.dimensions ||
       prevProps.plotlyData?.length !== this.props.plotlyData?.length
     ) {
-      // debugger;
       // console.log("updated!");
       const json = this.getJson();
       this.setState({
@@ -49,7 +48,6 @@ export default class PlotlyOverlay extends Component {
   }
 
   // componentWillUnmount() {
-  //   debugger;
   //   console.log("unmounted")
   //   this.setState({
   //     json: {

@@ -300,10 +300,7 @@ class DifferentialDetail extends Component {
   };
 
   removeSelectedFeature = featureToRemove => {
-    const {
-      differentialResults,
-      differentialHighlightedFeaturesData,
-    } = this.props;
+    const { differentialHighlightedFeaturesData } = this.props;
     const PreviouslyHighlighted = [...differentialHighlightedFeaturesData];
     const selectedTableDataArray = PreviouslyHighlighted.filter(
       i => i.id !== featureToRemove,
