@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import {
   Loader,
   Dimmer,
-  Tab,
   Popup,
   Icon,
   Label,
@@ -10,10 +9,8 @@ import {
   Dropdown,
   List,
 } from 'semantic-ui-react';
-import SVG from 'react-inlinesvg';
-import { roundToPrecision } from '../Shared/helpers';
 import ButtonActions from '../Shared/ButtonActions';
-import PlotlyMultiFeature from './PlotlyMultiFeature';
+import TabMultiFeature from './TabMultiFeature';
 import './PlotsDynamic.scss';
 import '../Shared/PlotlyOverrides.scss';
 
@@ -28,15 +25,19 @@ class PlotsMultiFeature extends Component {
     featuresListOpen: false,
     plotlyExport: false,
     plotlyExportType: 'svg',
-    isPlotlyPlot: true,
   };
 
   differentialDetailPlotsMultiFeatureRef = React.createRef();
 
-  handleTabChangeMultiFeature = (e, { activeIndex }) => {
-    this.setState({
-      activeTabIndexPlotsMultiFeature: activeIndex,
-    });
+  handleTabChangeMultiFeature = (e, { activeTabIndexPlotsMultiFeature }) => {
+    if (
+      activeTabIndexPlotsMultiFeature !==
+      this.state.activeTabIndexPlotsMultiFeature
+    ) {
+      this.setState({
+        activeTabIndexPlotsMultiFeature: activeTabIndexPlotsMultiFeature,
+      });
+    }
   };
 
   handlePlotDropdownChangeMultiFeature = (e, { value }) => {
@@ -161,138 +162,11 @@ class PlotsMultiFeature extends Component {
           closeOnEscape
           hideOnScroll
         >
-          <Popup.Content id="FeaturesListPopupContent">
-            {/* <Grid>
-              <Grid.Row>
-                <Grid.Column
-                  className="VolcanoPlotFilters"
-                  id="xAxisSelector"
-                  mobile={14}
-                  tablet={14}
-                  computer={14}
-                  largeScreen={14}
-                  widescreen={14}
-                > */}
-            {list}
-            {/* </Grid.Column>
-              </Grid.Row>
-            </Grid> */}
-          </Popup.Content>
+          <Popup.Content id="FeaturesListPopupContent">{list}</Popup.Content>
         </Popup>
       </span>
     );
     return div;
-  };
-
-  getSVGPanesMultiFeature = activeTabIndexPlotsMultiFeature => {
-    const {
-      plotMultiFeatureData,
-      divWidth,
-      divHeight,
-      pxToPtRatio,
-      pointSize,
-      plotMultiFeatureDataLength,
-      multiFeaturePlotTypes,
-      differentialStudy,
-      differentialModel,
-      differentialTest,
-      differentialHighlightedFeaturesData,
-    } = this.props;
-    let panes = [];
-    let dimensions = '';
-    let divWidthPt = 0;
-    let divHeightPt = 0;
-    let divWidthPadding = 0;
-    let divHeightPadding = 0;
-    if (plotMultiFeatureDataLength !== 0) {
-      if (divWidth && divHeight && pxToPtRatio) {
-        divWidthPadding = divWidth * 0.95;
-        divHeightPadding = divHeight * 0.95 - 38;
-        divWidthPt = roundToPrecision(divWidthPadding / pxToPtRatio, 1);
-        divHeightPt = roundToPrecision(divHeightPadding / pxToPtRatio, 1);
-        const divWidthPtString = `width=${divWidthPt}`;
-        const divHeightPtString = `&height=${divHeightPt}`;
-        const pointSizeString = `&pointsize=${pointSize}`;
-        dimensions = `?${divWidthPtString}${divHeightPtString}${pointSizeString}`;
-      }
-      const featureIdsArr = differentialHighlightedFeaturesData.map(f => f.id);
-      const featureIdsLength = featureIdsArr.length;
-      const featureIdsString = featureIdsArr.toString();
-      const plotId =
-        multiFeaturePlotTypes[activeTabIndexPlotsMultiFeature].plotID;
-      debugger;
-      // const cacheKey = `multiFeaturePanes_${dimensions}_${differentialStudy}_${differentialModel}_${differentialTest}_${plotId}_${activeTabIndexPlotsMultiFeature}_${featureIdsLength}_${featureIdsString}_${plotMultiFeatureData.key}`;
-      // if (this[cacheKey] != null) {
-      // console.log(`multifeature plot render cached ${cacheKey}`, this[cacheKey])
-      //   return this[cacheKey];
-      // } else {
-      // since this call in in render, index determines the one tab to display (svg, plotly or feature data)
-      if (activeTabIndexPlotsMultiFeature < multiFeaturePlotTypes.length) {
-        const s = plotMultiFeatureData?.svg[activeTabIndexPlotsMultiFeature];
-        if (s) {
-          const srcUrl = `${s.svg}${dimensions}`;
-          debugger;
-          console.log(
-            `b2g9e2-${s.plotType.plotID}-${activeTabIndexPlotsMultiFeature}-${plotMultiFeatureDataLength}`,
-          );
-          const isPlotlyPlot = s.plotType.plotType.includes('plotly');
-          const svgPanes = {
-            menuItem: `${s.plotType.plotDisplay}`,
-            render: () => (
-              <Tab.Pane
-                attached="true"
-                as="div"
-                key={`${activeTabIndexPlotsMultiFeature}_${s.plotType.plotID}-pane-mulitFeature`}
-              >
-                <div id="PlotsMultiFeatureContainer" className="svgSpan">
-                  {isPlotlyPlot ? (
-                    <PlotlyMultiFeature
-                      plotlyData={s.svg}
-                      height={divHeightPadding}
-                      width={divWidthPadding}
-                      featureIdsString={featureIdsString}
-                      differentialStudy={differentialStudy}
-                      differentialModel={differentialModel}
-                      differentialTest={differentialTest}
-                      plotId={plotId}
-                      dimensions={dimensions}
-                      plotName={s.plotType.plotDisplay}
-                      featureIdsLength={featureIdsLength}
-                      plotlyExport={this.state.plotlyExport}
-                      plotlyExportType={this.state.plotlyExportType}
-                      parentNode={this.differentialDetailPlotsMultiFeatureRef}
-                    />
-                  ) : (
-                    <SVG
-                      cacheRequests={true}
-                      src={srcUrl}
-                      title={`${s.plotType.plotDisplay}`}
-                      uniqueHash={`b2g9e2-${s.plotType.plotID}-${activeTabIndexPlotsMultiFeature}-${plotMultiFeatureDataLength}-${featureIdsLength}`}
-                      uniquifyIDs={true}
-                    />
-                  )}
-                </div>
-              </Tab.Pane>
-            ),
-          };
-          panes = panes.concat(svgPanes);
-        }
-      }
-      // this[cacheKey] = panes;
-      return panes;
-      // }
-    }
-  };
-
-  handleTabChangeMultiFeature = (e, { activeTabIndexPlotsMultiFeature }) => {
-    if (
-      activeTabIndexPlotsMultiFeature !==
-      this.state.activeTabIndexPlotsMultiFeature
-    ) {
-      this.setState({
-        activeTabIndexPlotsMultiFeature: activeTabIndexPlotsMultiFeature,
-      });
-    }
   };
 
   getInstructions = () => {
@@ -320,20 +194,29 @@ class PlotsMultiFeature extends Component {
 
   render() {
     const {
-      plotMultiFeatureData,
+      differentialPlotTypes,
+      differentialStudy,
+      differentialModel,
+      differentialTest,
+      differentialHighlightedFeaturesData,
+      divWidth,
+      divHeight,
+      modelSpecificMetaFeaturesExist,
+      multiFeaturePlotTypes,
       plotMultiFeatureDataLoaded,
-      upperPlotsVisible,
+      plotMultiFeatureData,
+      pointSize,
+      plotMultiFeatureDataLength,
+      pxToPtRatio,
+      svgTabMax,
       svgExportName,
       tab,
-      divWidth,
-      differentialPlotTypes,
-      svgTabMax,
-      modelSpecificMetaFeaturesExist,
-      plotMultiFeatureDataLength,
-      differentialHighlightedFeaturesData,
+      upperPlotsVisible,
     } = this.props;
     const {
       activeTabIndexPlotsMultiFeature,
+      plotlyExport,
+      plotlyExportType,
       pdfFlagMFPlots,
       pngFlagMFPlots,
       svgFlagMFPlots,
@@ -347,15 +230,10 @@ class PlotsMultiFeature extends Component {
         differentialHighlightedFeaturesData?.length > 1
       ) {
         let options = [];
-        const svgPanesMultiFeature = this.getSVGPanesMultiFeature(
-          activeTabIndexPlotsMultiFeature,
-        );
         const DropdownClass =
           differentialPlotTypes.length > svgTabMax
             ? 'Show svgPlotDropdown'
             : 'Hide svgPlotDropdown';
-        const TabMenuClass =
-          differentialPlotTypes.length > svgTabMax ? 'Hide' : 'Show';
         const activeTabIndexPlotsMultiFeatureVar =
           activeTabIndexPlotsMultiFeature || 0;
         const svgArray = [...plotMultiFeatureData.svg];
@@ -423,30 +301,37 @@ class PlotsMultiFeature extends Component {
               className={DropdownClass}
               id="svgPlotDropdownDifferential"
             />
-            <Tab
-              menu={{
-                secondary: true,
-                pointing: true,
-                className: TabMenuClass,
-              }}
-              panes={svgPanesMultiFeature}
-              onTabChange={this.handleTabChangeMultiFeature}
-              activeIndex={0}
+            <TabMultiFeature
+              activeTabIndexPlotsMultiFeature={activeTabIndexPlotsMultiFeature}
+              differentialDetailPlotsMultiFeatureRefFwd={
+                this.differentialDetailPlotsMultiFeatureRef
+              }
+              differentialHighlightedFeaturesData={
+                differentialHighlightedFeaturesData
+              }
+              divHeight={divHeight}
+              divWidth={divWidth}
+              differentialPlotTypes={differentialPlotTypes}
+              differentialStudy={differentialStudy}
+              differentialModel={differentialModel}
+              differentialTest={differentialTest}
+              plotlyExport={plotlyExport}
+              plotlyExportType={plotlyExportType}
+              plotMultiFeatureData={plotMultiFeatureData}
+              pointSize={pointSize}
+              plotMultiFeatureDataLength={plotMultiFeatureDataLength}
+              pxToPtRatio={pxToPtRatio}
+              multiFeaturePlotTypes={multiFeaturePlotTypes}
+              svgTabMax={svgTabMax}
             />
             {featuresList}
             <span id={divWidth >= 625 ? 'FullScreenButton' : 'FullScreenIcon'}>
-              {/* <Popup
-                  trigger={ */}
               <Button
                 size="mini"
                 onClick={this.props.onGetMultifeaturePlotTransitionAlt}
                 className={divWidth >= 625 ? '' : 'FullScreenPadding'}
               >
-                <Icon
-                  // name="expand"
-                  name="expand arrows alternate"
-                  className=""
-                />
+                <Icon name="expand arrows alternate" className="" />
                 {divWidth >= 625 ? 'FULL SCREEN' : ''}
               </Button>
             </span>
