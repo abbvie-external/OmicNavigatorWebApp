@@ -3,7 +3,6 @@ import { Loader, Dimmer, Icon, Button, Dropdown } from 'semantic-ui-react';
 import ButtonActions from '../Shared/ButtonActions';
 import TabSingleFeature from './TabSingleFeature';
 import './PlotsDynamic.scss';
-import '../Shared/Plotly.scss';
 
 class PlotsSingleFeature extends Component {
   state = {
