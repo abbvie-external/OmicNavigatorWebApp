@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
-// import { Dimmer, Loader } from 'semantic-ui-react';
 import Plot from 'react-plotly.js';
-import { reviseLayout, clickDownload } from '../Shared/helpers';
+import { reviseLayout, clickDownload, loadingDimmer } from '../Shared/helpers';
 import '../Shared/PlotlyOverrides.scss';
 
 export default class PlotlyOverlay extends Component {
@@ -12,15 +11,9 @@ export default class PlotlyOverlay extends Component {
     },
     loading: true,
   };
+
   componentDidMount() {
-    const json = this.getJson();
-    // console.log("mounted");
-    this.setState({
-      json: {
-        data: json.data,
-        layout: json.layout,
-      },
-    });
+    this.getJson(this.props.cacheString);
   }
 
   componentDidUpdate(prevProps) {
@@ -30,82 +23,34 @@ export default class PlotlyOverlay extends Component {
     ) {
       clickDownload(this.props.parentNode);
     }
-    if (
-      prevProps.featureIdsString !== this.props.featureIdsString ||
-      prevProps.plotId !== this.props.plotId ||
-      prevProps.dimensions !== this.props.dimensions ||
-      prevProps.plotlyData?.length !== this.props.plotlyData?.length
-    ) {
-      // console.log("updated!");
-      const json = this.getJson();
-      this.setState({
-        json: {
-          data: json.data,
-          layout: json.layout,
-        },
-      });
+    if (this.props.cacheString !== prevProps.cacheString) {
+      this.getJson();
     }
   }
 
-  // componentWillUnmount() {
-  //   console.log("unmounted")
-  //   this.setState({
-  //     json: {
-  //       data: null,
-  //       layout: null,
-  //     },
-  //   });
-  // }
-
-  // purgePlot = () => {
-  //   console.log("purge");
-  //   this.setState({
-  //     json: {
-  //       data: null,
-  //       layout: null,
-  //     },
-  //   });
-  // }
-
   getJson = () => {
-    const {
-      differentialStudy,
-      differentialModel,
-      differentialTest,
-      plotId,
-      plotlyData,
-      plotKey,
-      featureIdsString,
-      width,
-      height,
-    } = this.props;
-    const cacheKey = `PlotlyOverlay_${width}_${height}_${differentialStudy}_${differentialModel}_${differentialTest}_${featureIdsString}_${plotId}_${plotKey}`;
-    if (this[cacheKey] != null) {
-      return this[cacheKey];
-    } else {
-      const parsedData = JSON.parse(plotlyData);
-      const data = parsedData?.data || null;
-      let layout = parsedData?.layout || null;
-      if (layout) {
-        layout = reviseLayout(layout, width, height);
-      }
-      this[cacheKey] = { data, layout };
-      return { data, layout };
+    const { plotlyData, width, height } = this.props;
+    const parsedData = JSON.parse(plotlyData);
+    const data = parsedData?.data || null;
+    let layout = parsedData?.layout || null;
+    if (layout) {
+      layout = reviseLayout(layout, width, height);
     }
-  };
-
-  handleInitialized = () => {
     this.setState({
-      loading: false,
+      json: {
+        data,
+        layout,
+        loading: false,
+      },
     });
   };
 
   render() {
-    const { plotName, featuresLength, plotlyExportType } = this.props;
-    // const loader = this.state.json?.data ? null : (
-    //   <Dimmer active inverted>
-    //   <Loader size="large">Loading...</Loader>
-    // </Dimmer>
+    const { plotName, plotKey, featuresLength, plotlyExportType } = this.props;
+    const filename =
+      featuresLength > 1
+        ? `${plotName}_(${featuresLength}-features)`
+        : `${plotName}_${`${plotKey}`}`;
     const config = {
       modeBarButtonsToRemove: ['sendDataToCloud'],
       displayModeBar: true,
@@ -113,25 +58,21 @@ export default class PlotlyOverlay extends Component {
       displaylogo: false,
       toImageButtonOptions: {
         format: plotlyExportType, // one of png, svg, jpeg, webp
-        filename: `${plotName}_(${featuresLength}-features)`,
+        filename: filename,
       },
     };
-    // console.log(JSON.stringify(this.state.json?.data));
     return (
       <div>
-        {this.state.json?.data && this.state.json?.layout && (
+        {this.state.json.data && this.state.json.layout && (
           <Plot
             data={this.state.json.data}
             layout={this.state.json.layout}
             config={config}
-            // onPurge={this.purgePlot}
-            // onInitialized={figure => this.setState({ figure, loading: false })}
-            // onUpdate={figure => this.setState(figure)}
           />
         )}
-        {/* <span id="PlotSingleFeatureDataLoader">
-          {this.state.loading && loader}
-        </span> */}
+        <span id="PlotOverlayDataLoader">
+          {!this.state.loading && loadingDimmer}
+        </span>
       </div>
     );
   }

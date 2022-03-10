@@ -137,13 +137,12 @@ class TabSingleFeature extends Component {
   };
 
   render() {
-    const { differentialPlotTypes, svgTabMax } = this.props;
     return (
       <Tab
         menu={{
           secondary: true,
           pointing: true,
-          className: differentialPlotTypes.length > svgTabMax ? 'Hide' : 'Show',
+          className: 'Hide',
         }}
         panes={this.state.svgPanesSingleFeature}
         activeIndex={0}

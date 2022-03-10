@@ -68,9 +68,6 @@ class TabMultiFeature extends Component {
         const s = plotMultiFeatureData?.svg[activeTabIndexPlotsMultiFeature];
         if (s) {
           const srcUrl = `${s.svg}${dimensions}`;
-          console.log(
-            `b2g9e2-${s.plotType.plotID}-${activeTabIndexPlotsMultiFeature}-${plotMultiFeatureDataLength}`,
-          );
           const isPlotlyPlot = s.plotType.plotType.includes('plotly');
           const svgPanes = {
             menuItem: `${s.plotType.plotDisplay}`,
@@ -114,13 +111,12 @@ class TabMultiFeature extends Component {
   };
 
   render() {
-    const { differentialPlotTypes, svgTabMax } = this.props;
     return (
       <Tab
         menu={{
           secondary: true,
           pointing: true,
-          className: differentialPlotTypes.length > svgTabMax ? 'Hide' : 'Show',
+          className: 'Hide',
         }}
         panes={this.state.svgPanesMultiFeature}
         activeIndex={0}

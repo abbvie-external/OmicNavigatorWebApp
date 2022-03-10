@@ -40,7 +40,6 @@ class PlotsSingleFeature extends Component {
         this.props.singleFeaturePlotTypes.length
           ? false
           : true;
-      // this.metaFeaturesTableDynamicRef.current !== null ? true : false;
       this.setState({
         // display excel and text on meta-feature tab
         excelFlagSFPlots: isMetaFeatureTab,
@@ -116,6 +115,7 @@ class PlotsSingleFeature extends Component {
       txtFlagSFPlots,
       excelFlagSFPlots,
     } = this.state;
+
     if (upperPlotsVisible) {
       if (
         plotSingleFeatureDataLength !== 0 &&
@@ -207,6 +207,7 @@ class PlotsSingleFeature extends Component {
               }
             />
             <TabSingleFeature
+              // DEV - add only necessary props
               {...this.props}
               {...this.state}
               differentialDetailPlotsSingleFeatureRefFwd={

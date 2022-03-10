@@ -486,7 +486,7 @@ class NetworkGraph extends Component {
             .style('stroke-width', 0.25)
             .style('stroke-opacity', 1)
             .style('stroke', 'black')
-            // Paul - make this opacity 0 if you don't want lines, want to see full labels
+            // DEV - make this opacity 0 if you don't want lines, want to see full labels
             .style('opacity', 0.5);
           // .style('opacity', function(d) {
           //   if (d.data.length * averageLetterWidth * pt_px * font_treesize >= d.dx) {

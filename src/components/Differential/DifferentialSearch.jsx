@@ -771,7 +771,6 @@ class DifferentialSearch extends Component {
       notDifferential,
       maxElementsP,
     } = this.state;
-    // this.props.onSearchTransitionDifferentialAlt(true); Commented on 3/31 Paul
     this.props.onHandleIsFilteredDifferential(true);
     this.setState({
       isFilteredSearch: true,

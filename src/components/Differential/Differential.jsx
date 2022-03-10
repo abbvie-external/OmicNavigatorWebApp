@@ -331,10 +331,10 @@ class Differential extends Component {
       .getMetaFeatures(differentialStudy, differentialModel)
       .then(getMetaFeaturesResponseData => {
         const exist = getMetaFeaturesResponseData.length > 0 ? true : false;
-        // Paul - save this data to local storage (e.g. indexDB)
         this.setState({
           modelSpecificMetaFeaturesExist: exist,
-          allMetaFeaturesDataDifferential: getMetaFeaturesResponseData,
+          // Dev - if needed save this data to local storage (e.g. indexDB)
+          // allMetaFeaturesDataDifferential: getMetaFeaturesResponseData,
         });
       });
   };
