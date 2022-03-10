@@ -22,12 +22,12 @@ export default class PlotlyMultiFeature extends Component {
     ) {
       clickDownload(this.props.parentNode);
     }
-    this.getJson(this.props.cacheString);
+    if (this.props.cacheString !== prevProps.cacheString) {
+      this.getJson();
+    }
   }
 
-  getJson = cacheStringProp => {
-    if (this.cacheString === cacheStringProp) return;
-    this.cacheString = cacheStringProp;
+  getJson = () => {
     const { plotlyData, width, height } = this.props;
     const parsedData = JSON.parse(plotlyData);
     const data = parsedData?.data || null;
@@ -41,12 +41,6 @@ export default class PlotlyMultiFeature extends Component {
         layout,
         loading: false,
       },
-    });
-  };
-
-  handleInitialized = () => {
-    this.setState({
-      loading: false,
     });
   };
 
@@ -64,14 +58,14 @@ export default class PlotlyMultiFeature extends Component {
     };
     return (
       <div>
-        {this.state.json?.data && this.state.json?.layout && (
+        {this.state.json.data && this.state.json.layout && (
           <Plot
             data={this.state.json.data}
             layout={this.state.json.layout}
             config={config}
           />
         )}
-        <span id="PlotSingleFeatureDataLoader">
+        <span id="PlotMultiFeatureDataLoader">
           {!this.state.loading && loadingDimmer}
         </span>
       </div>

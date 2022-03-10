@@ -11,7 +11,7 @@ class TabMultiFeature extends Component {
     svgPanesMultiFeature: [],
   };
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate() {
     const {
       activeTabIndexPlotsMultiFeature,
       divHeight,
@@ -23,8 +23,6 @@ class TabMultiFeature extends Component {
       plotMultiFeatureData,
       multiFeaturePlotTypes,
     } = this.props;
-    const height = Math.floor(divHeight);
-    const width = Math.floor(divWidth);
     const featureIdsArr = differentialHighlightedFeaturesData.map(f => f.id);
     const featureIdsString = featureIdsArr.toString();
     const featuresLength = differentialHighlightedFeaturesData?.length;
@@ -32,7 +30,7 @@ class TabMultiFeature extends Component {
     const plotLength = plotMultiFeatureData?.svg.length;
     const plotId =
       multiFeaturePlotTypes[activeTabIndexPlotsMultiFeature].plotID;
-    const cacheStringArg = `multiFeaturePanes_${activeTabIndexPlotsMultiFeature}_${height}_${width}_${divHeight}_${plotId}_${plotKey}_${plotLength}_${featuresLength}_${featureIdsString}_${differentialStudy}_${differentialModel}_${differentialTest}`;
+    const cacheStringArg = `multiFeaturePanes_${activeTabIndexPlotsMultiFeature}_${divHeight}_${divWidth}_${divHeight}_${plotId}_${plotKey}_${plotLength}_${featuresLength}_${featureIdsString}_${differentialStudy}_${differentialModel}_${differentialTest}`;
     this.getSVGPanesMultiFeature(cacheStringArg, featuresLength);
   }
 
