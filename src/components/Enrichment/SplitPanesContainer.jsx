@@ -218,6 +218,7 @@ class SplitPanesContainer extends Component {
 
   render() {
     const { verticalSplitPaneSize, horizontalSplitPaneSize } = this.state;
+    const { enrichmentStudy, enrichmentModel } = this.props;
     const BarcodePlot = this.getBarcodePlot();
     const ViolinAndTable = this.getViolinAndTable();
     const width =
@@ -283,7 +284,6 @@ class SplitPanesContainer extends Component {
                     <EnrichmentSVGPlot
                       divWidth={width - verticalSplitPaneSize - 300}
                       divHeight={height - horizontalSplitPaneSize - 51}
-                      px
                       pxToPtRatio={105}
                       pointSize={12}
                       svgTabMax={1}
@@ -298,6 +298,8 @@ class SplitPanesContainer extends Component {
                       SVGPlotLoaded={this.props.SVGPlotLoaded}
                       SVGPlotLoading={this.props.SVGPlotLoading}
                       HighlightedProteins={this.props.HighlightedProteins}
+                      enrichmentStudy={enrichmentStudy}
+                      enrichmentModel={enrichmentModel}
                     />
                   </div>
                 </SplitPane>

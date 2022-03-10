@@ -10,7 +10,6 @@ import {
   Transition,
   Button,
 } from 'semantic-ui-react';
-// import _ from 'lodash';
 import ndjsonStream from 'can-ndjson-stream';
 import { CancelToken } from 'axios';
 import { getDynamicSize, getWindowWidth } from '../Shared/helpers';
@@ -772,7 +771,6 @@ class DifferentialSearch extends Component {
       notDifferential,
       maxElementsP,
     } = this.state;
-    // this.props.onSearchTransitionDifferentialAlt(true); Commented on 3/31 Paul
     this.props.onHandleIsFilteredDifferential(true);
     this.setState({
       isFilteredSearch: true,
@@ -870,25 +868,6 @@ class DifferentialSearch extends Component {
         console.error('Error during getResultsMultiset', error);
       });
   }
-
-  thisfunc = () => {
-    this.setState({
-      sigValueP: [0.25],
-    });
-    // document.getElementsByClassName('NumericExponentialInput')[0].value = [
-    //   0.25,
-    // ];
-    // this.dom = document.getElementsByClassName(
-    //   'MultisetFiltersDiv',
-    // )[0].innerHTML;
-    // console.log(this.dom);
-  };
-
-  thisfuncTwo = () => {
-    // document.getElementsByClassName(
-    //   'MultisetFiltersDiv',
-    // )[0].innerHTML = this.dom;
-  };
 
   render() {
     const {
@@ -1149,8 +1128,6 @@ class DifferentialSearch extends Component {
             mouseLeaveDelay={0}
           />
           <span className="StudyHtmlIconDivP">{studyIcon}</span>
-          {/* <button onClick={this.thisfunc}>read me</button>
-          <button onClick={this.thisfuncTwo}>write me</button> */}
           <Popup
             trigger={
               <Form.Field

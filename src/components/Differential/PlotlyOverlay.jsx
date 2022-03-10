@@ -1,14 +1,20 @@
 import React, { Component } from 'react';
-import { Dimmer, Loader } from 'semantic-ui-react';
 import Plot from 'react-plotly.js';
-import { reviseLayout, clickDownload } from '../Shared/helpers';
+import { reviseLayout, clickDownload, loadingDimmer } from '../Shared/helpers';
 import '../Shared/PlotlyOverrides.scss';
 
 export default class PlotlyOverlay extends Component {
   state = {
-    data: null,
-    layout: null,
+    json: {
+      data: null,
+      layout: null,
+    },
+    loading: true,
   };
+
+  componentDidMount() {
+    this.getJson(this.props.cacheString);
+  }
 
   componentDidUpdate(prevProps) {
     if (
@@ -17,27 +23,34 @@ export default class PlotlyOverlay extends Component {
     ) {
       clickDownload(this.props.parentNode);
     }
+    if (this.props.cacheString !== prevProps.cacheString) {
+      this.getJson();
+    }
   }
 
-  render() {
-    const {
-      plotName,
-      plotlyData,
-      plotlyExportType,
-      width,
-      height,
-    } = this.props;
+  getJson = () => {
+    const { plotlyData, width, height } = this.props;
     const parsedData = JSON.parse(plotlyData);
     const data = parsedData?.data || null;
     let layout = parsedData?.layout || null;
     if (layout) {
       layout = reviseLayout(layout, width, height);
     }
-    const loader = data ? null : (
-      <Dimmer active inverted>
-        <Loader size="large">Loading...</Loader>
-      </Dimmer>
-    );
+    this.setState({
+      json: {
+        data,
+        layout,
+        loading: false,
+      },
+    });
+  };
+
+  render() {
+    const { plotName, plotKey, featuresLength, plotlyExportType } = this.props;
+    const filename =
+      featuresLength > 1
+        ? `${plotName}_(${featuresLength}-features)`
+        : `${plotName}_${`${plotKey}`}`;
     const config = {
       modeBarButtonsToRemove: ['sendDataToCloud'],
       displayModeBar: true,
@@ -45,14 +58,21 @@ export default class PlotlyOverlay extends Component {
       displaylogo: false,
       toImageButtonOptions: {
         format: plotlyExportType, // one of png, svg, jpeg, webp
-        filename: `${plotName}_${`${this.props.featureId}`}`,
+        filename: filename,
       },
     };
-
     return (
       <div>
-        <Plot data={data} layout={layout} config={config} />
-        <span id="PlotSingleFeatureDataLoader">{loader}</span>
+        {this.state.json.data && this.state.json.layout && (
+          <Plot
+            data={this.state.json.data}
+            layout={this.state.json.layout}
+            config={config}
+          />
+        )}
+        <span id="PlotOverlayDataLoader">
+          {!this.state.loading && loadingDimmer}
+        </span>
       </div>
     );
   }

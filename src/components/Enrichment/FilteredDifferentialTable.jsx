@@ -391,7 +391,7 @@ class FilteredDifferentialTable extends Component {
             // sample: d.phosphosite,
             featureID: d[filteredDifferentialFeatureIdKey],
             key: d[filteredDifferentialFeatureIdKey],
-            // PAUL - this needs adjustment, looking for d.abs(t) instead of d.T, for example
+            // DEV - this may need adjustment, looking for d.abs(t) instead of d.T, for example
             // cpm: d[stat],
             // cpm: d.F == null ? d.t : d.F,
           };
@@ -425,7 +425,7 @@ class FilteredDifferentialTable extends Component {
             // sample: ctrlClickedObj.phosphosite,
             featureID: item[filteredDifferentialFeatureIdKey],
             key: item[filteredDifferentialFeatureIdKey],
-            // PAUL
+            // DEV
             // cpm: ctrlClickedObj[stat],
             // cpm: ctrlClickedObj.F == null ? ctrlClickedObj.t : ctrlClickedObj.F,
           };

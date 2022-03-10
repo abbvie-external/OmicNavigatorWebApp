@@ -1,5 +1,4 @@
 .MetafeaturesTableDiv {
-  margin-top: -10px !important;
   height: 100% !important;
   direction: ltr !important;
   // .ui.selectable.table tbody tr:first-child, .ui.selectable.table tbody tr:first-child:hover {
@@ -29,6 +28,10 @@
   .TableValue {
     cursor: auto !important;
   }
+}
+
+#MetafeaturesTableDynamicDiv {
+  margin-top: -10px !important;
 }
 
 .TableLoadingDiv {

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Tab, Popup, Icon, Label } from 'semantic-ui-react';
 import PlotsSingleFeature from './PlotsSingleFeature';
-import MultiFeaturePlots from './PlotsMultiFeature';
+import PlotsMultiFeature from './PlotsMultiFeature';
 import './PlotsDynamic.scss';
 
 const maxWidthPopupStyle = {
@@ -154,7 +154,10 @@ class PlotsDynamic extends Component {
               className="MultiFeaturePlotPane"
             >
               {/* MULTI-FEATURE PLOT COMPONENT */}
-              <MultiFeaturePlots
+              <PlotsMultiFeature
+                differentialStudy={this.props.differentialStudy}
+                differentialModel={this.props.differentialModel}
+                differentialTest={this.props.differentialTest}
                 differentialPlotTypes={this.props.differentialPlotTypes}
                 // for plot dimension calculations
                 divWidth={this.props.differentialDynamicPlotWidth}

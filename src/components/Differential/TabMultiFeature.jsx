@@ -1,0 +1,128 @@
+import React, { Component } from 'react';
+import { Tab } from 'semantic-ui-react';
+import SVG from 'react-inlinesvg';
+import { roundToPrecision } from '../Shared/helpers';
+import PlotlyMultiFeature from './PlotlyMultiFeature';
+import './PlotsDynamic.scss';
+import '../Shared/PlotlyOverrides.scss';
+
+class TabMultiFeature extends Component {
+  state = {
+    svgPanesMultiFeature: [],
+  };
+
+  componentDidUpdate() {
+    const {
+      activeTabIndexPlotsMultiFeature,
+      divHeight,
+      divWidth,
+      differentialHighlightedFeaturesData,
+      differentialStudy,
+      differentialModel,
+      differentialTest,
+      plotMultiFeatureData,
+      multiFeaturePlotTypes,
+    } = this.props;
+    const featureIdsArr = differentialHighlightedFeaturesData.map(f => f.id);
+    const featureIdsString = featureIdsArr.toString();
+    const featuresLength = differentialHighlightedFeaturesData?.length;
+    const plotKey = plotMultiFeatureData.key;
+    const plotLength = plotMultiFeatureData?.svg.length;
+    const plotId =
+      multiFeaturePlotTypes[activeTabIndexPlotsMultiFeature].plotID;
+    const cacheStringArg = `multiFeaturePanes_${activeTabIndexPlotsMultiFeature}_${divHeight}_${divWidth}_${divHeight}_${plotId}_${plotKey}_${plotLength}_${featuresLength}_${featureIdsString}_${differentialStudy}_${differentialModel}_${differentialTest}`;
+    this.getSVGPanesMultiFeature(cacheStringArg, featuresLength);
+  }
+
+  getSVGPanesMultiFeature = (cacheStringArg, featuresLength) => {
+    if (this.cacheString === cacheStringArg) return;
+    this.cacheString = cacheStringArg;
+    const {
+      activeTabIndexPlotsMultiFeature,
+      plotMultiFeatureData,
+      divWidth,
+      divHeight,
+      pxToPtRatio,
+      pointSize,
+      plotMultiFeatureDataLength,
+      multiFeaturePlotTypes,
+    } = this.props;
+    let panes = [];
+    let dimensions = '';
+    let divWidthPt = 0;
+    let divHeightPt = 0;
+    let divWidthPadding = 0;
+    let divHeightPadding = 0;
+    if (plotMultiFeatureDataLength !== 0) {
+      if (divWidth && divHeight && pxToPtRatio) {
+        divWidthPadding = divWidth * 0.95;
+        divHeightPadding = divHeight * 0.95 - 38;
+        divWidthPt = roundToPrecision(divWidthPadding / pxToPtRatio, 1);
+        divHeightPt = roundToPrecision(divHeightPadding / pxToPtRatio, 1);
+        const divWidthPtString = `width=${divWidthPt}`;
+        const divHeightPtString = `&height=${divHeightPt}`;
+        const pointSizeString = `&pointsize=${pointSize}`;
+        dimensions = `?${divWidthPtString}${divHeightPtString}${pointSizeString}`;
+      }
+      if (activeTabIndexPlotsMultiFeature < multiFeaturePlotTypes.length) {
+        const s = plotMultiFeatureData?.svg[activeTabIndexPlotsMultiFeature];
+        if (s) {
+          const srcUrl = `${s.svg}${dimensions}`;
+          const isPlotlyPlot = s.plotType.plotType.includes('plotly');
+          const svgPanes = {
+            menuItem: `${s.plotType.plotDisplay}`,
+            render: () => (
+              <Tab.Pane attached="true" as="div" key={cacheStringArg}>
+                <div id="PlotsMultiFeatureContainer" className="svgSpan">
+                  {isPlotlyPlot ? (
+                    <PlotlyMultiFeature
+                      cacheString={cacheStringArg}
+                      plotlyData={s.svg}
+                      height={divHeightPadding}
+                      width={divWidthPadding}
+                      plotName={s.plotType.plotDisplay}
+                      plotlyExport={this.props.plotlyExport}
+                      plotlyExportType={this.props.plotlyExportType}
+                      parentNode={
+                        this.props.differentialDetailPlotsMultiFeatureRefFwd
+                      }
+                      featuresLength={featuresLength}
+                    />
+                  ) : (
+                    <SVG
+                      cacheRequests={true}
+                      src={srcUrl}
+                      title={`${s.plotType.plotDisplay}`}
+                      uniqueHash={`b2g9e2-${cacheStringArg}`}
+                      uniquifyIDs={true}
+                    />
+                  )}
+                </div>
+              </Tab.Pane>
+            ),
+          };
+          panes = panes.concat(svgPanes);
+        }
+      }
+      this.setState({
+        svgPanesMultiFeature: panes,
+      });
+    }
+  };
+
+  render() {
+    return (
+      <Tab
+        menu={{
+          secondary: true,
+          pointing: true,
+          className: 'Hide',
+        }}
+        panes={this.state.svgPanesMultiFeature}
+        activeIndex={0}
+      />
+    );
+  }
+}
+
+export default TabMultiFeature;

@@ -159,7 +159,7 @@ class OmicNavigatorService {
         testID,
       };
       if (plotType.includes('plotly')) {
-        const dataFromPromise = await this.axiosPostPlotly(
+        const dataFromPlotly = await this.axiosPostPlotly(
           'plotStudy',
           obj,
           null,
@@ -167,8 +167,8 @@ class OmicNavigatorService {
           cancelToken,
           timeoutLength,
         );
-        this[cacheKey] = dataFromPromise;
-        return dataFromPromise;
+        this[cacheKey] = dataFromPlotly;
+        return dataFromPlotly;
       } else {
         const promise = this.axiosPostPlot(
           'plotStudy',

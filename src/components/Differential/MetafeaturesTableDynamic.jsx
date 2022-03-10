@@ -188,7 +188,7 @@ class MetafeaturesTableDynamic extends Component {
 
     // const { metaFeaturesData } = this.props;
     return (
-      <div className="MetafeaturesTableDiv">
+      <div className="MetafeaturesTableDiv" id="MetafeaturesTableDynamicDiv">
         <EZGrid
           ref={this.metafeaturesGridRefDynamic}
           data={metafeaturesTableData}

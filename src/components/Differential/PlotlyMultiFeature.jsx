@@ -1,14 +1,19 @@
 import React, { Component } from 'react';
-import { Dimmer, Loader } from 'semantic-ui-react';
 import Plot from 'react-plotly.js';
-import { reviseLayout, clickDownload } from '../Shared/helpers';
+import { reviseLayout, clickDownload, loadingDimmer } from '../Shared/helpers';
 import '../Shared/PlotlyOverrides.scss';
 
 export default class PlotlyMultiFeature extends Component {
   state = {
-    data: null,
-    layout: null,
+    json: {
+      data: null,
+      layout: null,
+    },
+    loading: true,
   };
+  componentDidMount() {
+    this.getJson(this.props.cacheString);
+  }
 
   componentDidUpdate(prevProps) {
     if (
@@ -17,28 +22,30 @@ export default class PlotlyMultiFeature extends Component {
     ) {
       clickDownload(this.props.parentNode);
     }
+    if (this.props.cacheString !== prevProps.cacheString) {
+      this.getJson();
+    }
   }
 
-  render() {
-    const {
-      plotName,
-      featuresLength,
-      plotlyData,
-      plotlyExportType,
-      width,
-      height,
-    } = this.props;
+  getJson = () => {
+    const { plotlyData, width, height } = this.props;
     const parsedData = JSON.parse(plotlyData);
     const data = parsedData?.data || null;
     let layout = parsedData?.layout || null;
     if (layout) {
       layout = reviseLayout(layout, width, height);
     }
-    const loader = data ? null : (
-      <Dimmer active inverted>
-        <Loader size="large">Loading...</Loader>
-      </Dimmer>
-    );
+    this.setState({
+      json: {
+        data,
+        layout,
+        loading: false,
+      },
+    });
+  };
+
+  render() {
+    const { plotName, featuresLength, plotlyExportType } = this.props;
     const config = {
       modeBarButtonsToRemove: ['sendDataToCloud'],
       displayModeBar: true,
@@ -49,11 +56,18 @@ export default class PlotlyMultiFeature extends Component {
         filename: `${plotName}_(${featuresLength}-features)`,
       },
     };
-
     return (
       <div>
-        <Plot data={data} layout={layout} config={config} />
-        <span id="PlotSingleFeatureDataLoader">{loader}</span>
+        {this.state.json.data && this.state.json.layout && (
+          <Plot
+            data={this.state.json.data}
+            layout={this.state.json.layout}
+            config={config}
+          />
+        )}
+        <span id="PlotMultiFeatureDataLoader">
+          {!this.state.loading && loadingDimmer}
+        </span>
       </div>
     );
   }

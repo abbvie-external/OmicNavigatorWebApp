@@ -260,7 +260,6 @@ class DifferentialDetail extends Component {
     });
 
     this.props.onHandleHighlightedFeaturesDifferential(bins);
-    // console.log('bin', bins[0]);
     this.pageToFeature(
       JSON.parse(item[0].props.data)[differentialFeatureIdKey],
     );
@@ -301,10 +300,7 @@ class DifferentialDetail extends Component {
   };
 
   removeSelectedFeature = featureToRemove => {
-    const {
-      differentialResults,
-      differentialHighlightedFeaturesData,
-    } = this.props;
+    const { differentialHighlightedFeaturesData } = this.props;
     const PreviouslyHighlighted = [...differentialHighlightedFeaturesData];
     const selectedTableDataArray = PreviouslyHighlighted.filter(
       i => i.id !== featureToRemove,
@@ -782,12 +778,14 @@ class DifferentialDetail extends Component {
               plotOverlayData={plotOverlayData}
               plotOverlayLoaded={plotOverlayLoaded}
               differentialPlotTypes={differentialPlotTypes}
-              svgTabMax={4}
+              svgTabMax={0}
               tab={tab}
               differentialStudy={differentialStudy}
               differentialModel={differentialModel}
               differentialTest={differentialTest}
               differentialTests={differentialTests}
+              singleFeaturePlotTypes={singleFeaturePlotTypes}
+              multiFeaturePlotTypes={multiFeaturePlotTypes}
             ></PlotsOverlay>
           </Sidebar>
         );

@@ -21,30 +21,30 @@ class EnrichmentSVGPlot extends PureComponent {
     activeSVGTabIndexEnrichment: 0,
     plotlyExport: false,
     plotlyExportType: 'svg',
-    isPlotlyPlot: true,
   };
 
   enrichmentSingleFeatureRef = React.createRef();
 
-  componentDidUpdate(prevProps) {
-    if (
-      // this.state.isSVGReadyEnrichment &&
-      // prevProps.HighlightedProteins !== this.props.HighlightedProteins ||
-      prevProps.plotDataEnrichmentLength !==
-        this.props.plotDataEnrichmentLength ||
-      prevProps.plotDataEnrichment.key !== this.props.plotDataEnrichment.key ||
-      prevProps.divWidth !== this.props.divWidth ||
-      prevProps.divHeight !== this.props.divHeight
-    ) {
-      this.getSVGPanes();
-    }
-  }
+  // componentMount(prevProps) {
+  //   this.getSvgPanesEnrichment();
+  // }
 
-  handleTabChange = (e, { activeIndex }) => {
-    this.setState({
-      activeSVGTabIndexEnrichment: activeIndex,
-    });
-  };
+  componentDidUpdate(prevProps) {
+    const {
+      divHeight,
+      divWidth,
+      enrichmentStudy,
+      enrichmentModel,
+      plotDataEnrichment,
+      plotDataEnrichmentLength,
+      enrichmentPlotTypes,
+    } = this.props;
+    const { activeSVGTabIndexEnrichment } = this.state;
+    const plotKey = plotDataEnrichment.key;
+    const plotId = enrichmentPlotTypes[activeSVGTabIndexEnrichment]?.plotID;
+    const cacheStringArg = `singleFeaturePanesEnrichment_${activeSVGTabIndexEnrichment}_${divHeight}_${divWidth}_${plotId}_${plotKey}_${plotDataEnrichmentLength}_${enrichmentStudy}_${enrichmentModel}`;
+    this.getSvgPanesEnrichment(cacheStringArg);
+  }
 
   handlePlotDropdownChange = (e, { value }) => {
     this.setState({
@@ -59,7 +59,9 @@ class EnrichmentSVGPlot extends PureComponent {
   //   this.props.onFindDifferentialFeature(test, featureID);
   // };
 
-  getSVGPanes = () => {
+  getSvgPanesEnrichment = cacheStringArg => {
+    if (this.cacheString === cacheStringArg) return;
+    this.cacheString = cacheStringArg;
     const {
       plotDataEnrichment,
       divWidth,
@@ -68,6 +70,8 @@ class EnrichmentSVGPlot extends PureComponent {
       pointSize,
       plotDataEnrichmentLength,
     } = this.props;
+    const { activeSVGTabIndexEnrichment } = this.state;
+    let panes = [];
     let dimensions = '';
     let divWidthPt = 0;
     let divHeightPt = 0;
@@ -84,29 +88,25 @@ class EnrichmentSVGPlot extends PureComponent {
         const pointSizeString = `&pointsize=${pointSize}`;
         dimensions = `?${divWidthPtString}${divHeightPtString}${pointSizeString}`;
       }
-      const svgArray = plotDataEnrichment.svg;
-      const uniqueKey = plotDataEnrichment.key || '';
-      const svgPanes = svgArray.map((s, index) => {
-        const isPlotlyPlot = s.plotType.plotType.includes('plotly');
+      const s = plotDataEnrichment?.svg[activeSVGTabIndexEnrichment];
+      if (s) {
         let srcUrl = `${s.svg}${dimensions}`;
-        return {
+        const isPlotlyPlot = s.plotType.plotType.includes('plotly');
+        const svgPanes = {
           menuItem: `${s.plotType.plotDisplay}`,
           render: () => (
-            <Tab.Pane
-              attached="true"
-              as="div"
-              key={`${uniqueKey}-${index}-${s.plotType.plotDisplay}-pane-enrichment`}
-            >
+            <Tab.Pane attached="true" as="div" key={`${cacheStringArg}`}>
               <div id="EnrichmentPlotSVGDiv" className="svgSpan">
                 {isPlotlyPlot ? (
                   <PlotlyEnrichment
+                    cacheString={cacheStringArg}
                     plotlyData={s.svg}
                     height={divHeightPadding}
                     width={divWidthPadding}
                     plotName={s.plotType.plotDisplay}
                     plotlyExport={this.state.plotlyExport}
                     plotlyExportType={this.state.plotlyExportType}
-                    featureId={plotDataEnrichment?.key}
+                    plotId={plotDataEnrichment?.key}
                     parentNode={this.enrichmentSingleFeatureRef}
                   />
                 ) : (
@@ -122,11 +122,12 @@ class EnrichmentSVGPlot extends PureComponent {
             </Tab.Pane>
           ),
         };
-      });
-      this.setState({
-        isSVGReadyEnrichment: true,
-        svgPanes,
-      });
+        panes = panes.concat(svgPanes);
+        this.setState({
+          isSVGReadyEnrichment: true,
+          svgPanesEnrichment: panes,
+        });
+      }
     }
   };
 
@@ -154,7 +155,7 @@ class EnrichmentSVGPlot extends PureComponent {
 
     const {
       activeSVGTabIndexEnrichment,
-      svgPanes,
+      svgPanesEnrichment,
       isSVGReadyEnrichment,
     } = this.state;
 
@@ -239,9 +240,8 @@ class EnrichmentSVGPlot extends PureComponent {
                 pointing: true,
                 className: TabMenuClassEnrichment,
               }}
-              panes={svgPanes}
-              onTabChange={this.handleTabChange}
-              activeIndex={activeSVGTabIndexEnrichmentVar}
+              panes={svgPanesEnrichment}
+              activeIndex={0}
             />
           </div>
         );
