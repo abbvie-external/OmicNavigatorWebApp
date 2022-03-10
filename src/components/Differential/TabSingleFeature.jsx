@@ -42,7 +42,6 @@ class TabSingleFeature extends Component {
       activeTabIndexPlotsSingleFeature,
       differentialStudy,
       differentialModel,
-      differentialTest,
       divWidth,
       divHeight,
       pxToPtRatio,
@@ -52,7 +51,6 @@ class TabSingleFeature extends Component {
       modelSpecificMetaFeaturesExist,
       singleFeaturePlotTypes,
     } = this.props;
-    debugger;
     let panes = [];
     let dimensions = '';
     let divWidthPt = 0;
@@ -74,7 +72,6 @@ class TabSingleFeature extends Component {
       if (s) {
         const srcUrl = `${s.svg}${dimensions}`;
         const isPlotlyPlot = s.plotType.plotType.includes('plotly');
-        debugger;
         const svgPanes = {
           menuItem: `${s.plotType.plotDisplay}`,
           render: () => (
@@ -86,9 +83,6 @@ class TabSingleFeature extends Component {
                     plotlyData={s.svg}
                     height={divHeightPadding}
                     width={divWidthPadding}
-                    differentialStudy={differentialStudy}
-                    differentialModel={differentialModel}
-                    differentialTest={differentialTest}
                     plotName={s.plotType.plotDisplay}
                     plotKey={plotSingleFeatureData.key}
                     plotlyExport={this.props.plotlyExport}

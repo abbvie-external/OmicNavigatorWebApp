@@ -46,9 +46,6 @@ class TabMultiFeature extends Component {
       pointSize,
       plotMultiFeatureDataLength,
       multiFeaturePlotTypes,
-      differentialStudy,
-      differentialModel,
-      differentialTest,
     } = this.props;
     let panes = [];
     let dimensions = '';
@@ -86,9 +83,6 @@ class TabMultiFeature extends Component {
                       plotlyData={s.svg}
                       height={divHeightPadding}
                       width={divWidthPadding}
-                      differentialStudy={differentialStudy}
-                      differentialModel={differentialModel}
-                      differentialTest={differentialTest}
                       plotName={s.plotType.plotDisplay}
                       plotlyExport={this.props.plotlyExport}
                       plotlyExportType={this.props.plotlyExportType}
