@@ -44,6 +44,17 @@ export default class PlotlyMultiFeature extends Component {
     });
   };
 
+  handleClick = e => {
+    if (e?.points?.length) {
+      let exactLabel = isNaN(e.points[0].y);
+      let feature = exactLabel ? e.points[0].y : e.points[0].text;
+      // heatmaply, iheatmapr use .text, heatmap uses .y
+      if (feature) {
+        this.props.onHandlePlotlyClick(feature, exactLabel);
+      }
+    }
+  };
+
   render() {
     const { plotName, featuresLength, plotlyExportType } = this.props;
     const config = {
@@ -63,6 +74,9 @@ export default class PlotlyMultiFeature extends Component {
             data={this.state.json.data}
             layout={this.state.json.layout}
             config={config}
+            onClick={this.handleClick}
+            onClickAnnotation={this.handleClickAnnotation}
+            onSelected={this.handleSelected}
           />
         )}
         <span id="PlotMultiFeatureDataLoader">

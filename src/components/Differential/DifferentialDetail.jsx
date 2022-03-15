@@ -319,6 +319,43 @@ class DifferentialDetail extends Component {
     }
   }, 1250);
 
+  handlePlotlyClick = (featureArg, exactLabel) => {
+    let featureData = [];
+    let relevantFeatures = [...this.state.differentialTableData].filter(f =>
+      this.props.differentialHighlightedFeatures.includes(
+        f[this.props.differentialFeatureIdKey],
+      ),
+    );
+    if (exactLabel) {
+      // if Plotly gives us the exact string matching a value in our data
+      featureData = relevantFeatures.find(f => {
+        const fValues = _.values(f);
+        return fValues.includes(featureArg);
+      });
+    } else {
+      // if Plotly gives us a string containing some value in our data
+      featureData = relevantFeatures.find(f => {
+        const fValues = _.values(f);
+        function hasValue(value) {
+          return featureArg.includes(value);
+        }
+        return fValues.some(hasValue);
+      });
+    }
+    if (featureData) {
+      const feature = featureData[this.props.differentialFeatureIdKey];
+      // if item is already outlined, remove outline and clear plot
+      if (this.props.differentialOutlinedFeature === feature) {
+        this.props.onResetDifferentialOutlinedFeature();
+      } else {
+        // simple row click without control nor shift
+        this.props.onSetPlotSelected(feature);
+        this.pageToFeature(feature);
+        this.props.onGetPlot('SingleFeature', feature, false, false);
+      }
+    }
+  };
+
   handleRowClick = (event, item, index) => {
     const {
       differentialFeatureIdKey,
@@ -948,6 +985,7 @@ class DifferentialDetail extends Component {
                           plotMultiFeatureAvailable={
                             this.props.plotMultiFeatureAvailable
                           }
+                          onHandlePlotlyClick={this.handlePlotlyClick}
                         ></PlotsDynamic>
                       </SplitPane>
                       <Grid.Row>

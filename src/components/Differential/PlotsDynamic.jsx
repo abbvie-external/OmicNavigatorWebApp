@@ -201,6 +201,7 @@ class PlotsDynamic extends Component {
                 plotMultiFeatureMax={this.props.plotMultiFeatureMax}
                 onRemoveSelectedFeature={this.props.onRemoveSelectedFeature}
                 multiFeaturePlotTypes={this.props.multiFeaturePlotTypes}
+                onHandlePlotlyClick={this.props.onHandlePlotlyClick}
               />
             </Tab.Pane>
           ),
