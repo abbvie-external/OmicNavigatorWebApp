@@ -1719,6 +1719,7 @@ class ScatterPlot extends React.PureComponent {
     //   resizeScalarY: 1,
     //   volcanoCircleText: [],
     // });
+    if (this.state.optionsOpen) return;
     this.props.onResetDifferentialOutlinedFeature();
     this.props.onHandleHighlightedFeaturesDifferential([], false);
   }
@@ -1921,7 +1922,11 @@ class ScatterPlot extends React.PureComponent {
 
   toggleOptionsPopup = (e, obj, close) => {
     if (close) {
-      this.setState({ optionsOpen: false });
+      const self = this;
+      // timeout needed so optionsOpen still true briefly on scatterplot click
+      setTimeout(function() {
+        self.setState({ optionsOpen: false });
+      }, 10);
     } else {
       this.setState({ optionsOpen: true });
     }
