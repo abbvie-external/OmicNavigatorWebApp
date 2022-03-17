@@ -324,7 +324,7 @@ class DifferentialDetail extends Component {
   }, 1250);
 
   handlePlotlyClick = (featureArg, exactLabel) => {
-    let featureData = [];
+    let featureData = null;
     let relevantFeatures = [...this.state.differentialTableData].filter(f =>
       this.props.differentialHighlightedFeatures.includes(
         f[this.props.differentialFeatureIdKey],
