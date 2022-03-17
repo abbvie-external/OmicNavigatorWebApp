@@ -50,6 +50,7 @@ class DifferentialDetail extends Component {
     visible: false,
     scatterPlotBoxSelection: [],
     allChecked: false,
+    enableTabChangeOnSelection: true,
   };
   volcanoPlotFilteredGridRef = React.createRef();
   ScatterPlotRef = React.createRef();
@@ -274,6 +275,9 @@ class DifferentialDetail extends Component {
     elem,
   ) => {
     const { differentialFeatureIdKey } = this.props;
+    this.setState({
+      enableTabChangeOnSelection: true,
+    });
     if (simpleClick) {
       const obj = JSON.parse(elem._groups[0][0].attributes.data.value) || '';
       const feature = obj ? obj[differentialFeatureIdKey] : '';
@@ -343,6 +347,9 @@ class DifferentialDetail extends Component {
       });
     }
     if (featureData) {
+      this.setState({
+        enableTabChangeOnSelection: false,
+      });
       const feature = featureData[this.props.differentialFeatureIdKey];
       // if item is already outlined, remove outline and clear plot
       if (this.props.differentialOutlinedFeature === feature) {
@@ -366,6 +373,9 @@ class DifferentialDetail extends Component {
     const { plotMultiFeatureAvailable } = this.props;
     event.persist();
     event.stopPropagation();
+    this.setState({
+      enableTabChangeOnSelection: true,
+    });
     if (
       item == null ||
       event?.target?.className === 'ExternalSiteIcon' ||
@@ -711,6 +721,7 @@ class DifferentialDetail extends Component {
       animation,
       direction,
       differentialDynamicPlotWidth,
+      enableTabChangeOnSelection,
     } = this.state;
 
     const {
@@ -926,6 +937,9 @@ class DifferentialDetail extends Component {
                           differentialModel={differentialModel}
                           differentialTest={differentialTest}
                           differentialFeature={differentialFeature}
+                          enableTabChangeOnSelection={
+                            enableTabChangeOnSelection
+                          }
                           pxToPtRatio={105}
                           pointSize={12}
                           svgTabMax={0}
