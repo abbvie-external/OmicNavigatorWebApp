@@ -25,3 +25,9 @@ a[data-title='Download plot'] {
 .notifier-note {
   display: none !important;
 }
+
+.PlotlyInteractive {
+  position: absolute !important;
+  right: 15px;
+  z-index: 2;
+}
