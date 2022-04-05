@@ -1069,7 +1069,7 @@ class DifferentialSearch extends Component {
             trigger={
               <Radio
                 toggle
-                label="SetAnalysis"
+                label="Set Analysis"
                 checked={multisetFiltersVisibleDifferential}
                 onChange={this.handleMultisetToggleDifferential}
                 disabled={differentialResultsTableStreaming}
