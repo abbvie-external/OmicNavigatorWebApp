@@ -1,7 +1,16 @@
 import React, { Component } from 'react';
 import Plot from 'react-plotly.js';
+import { Icon, Popup } from 'semantic-ui-react';
 import { reviseLayout, clickDownload, loadingDimmer } from '../Shared/helpers';
 import '../Shared/PlotlyOverrides.scss';
+
+const PopupStyle = {
+  backgroundColor: '2E2E2E',
+  borderBottom: '2px solid var(--color-primary)',
+  color: '#FFF',
+  padding: '1em',
+  fontSize: '13px',
+};
 
 export default class PlotlyMultiFeature extends Component {
   state = {
@@ -10,6 +19,7 @@ export default class PlotlyMultiFeature extends Component {
       layout: null,
     },
     loading: true,
+    plotlyInteractive: true,
   };
   componentDidMount() {
     this.getJson(this.props.cacheString);
@@ -44,8 +54,26 @@ export default class PlotlyMultiFeature extends Component {
     });
   };
 
+  handleClick = e => {
+    if (e?.points?.length) {
+      let exactLabel = isNaN(e.points[0].y);
+      let feature = exactLabel ? e.points[0].y : e.points[0].text;
+      // heatmaply, iheatmapr use .text, heatmap uses .y
+      if (feature && this.state.plotlyInteractive) {
+        this.props.onHandlePlotlyClick(feature, exactLabel);
+      }
+    }
+  };
+
+  togglePlotlyInteractive = () => {
+    this.setState(prevState => ({
+      plotlyInteractive: !prevState.plotlyInteractive,
+    }));
+  };
+
   render() {
     const { plotName, featuresLength, plotlyExportType } = this.props;
+    const { plotlyInteractive } = this.state;
     const config = {
       modeBarButtonsToRemove: ['sendDataToCloud'],
       displayModeBar: true,
@@ -59,11 +87,38 @@ export default class PlotlyMultiFeature extends Component {
     return (
       <div>
         {this.state.json.data && this.state.json.layout && (
-          <Plot
-            data={this.state.json.data}
-            layout={this.state.json.layout}
-            config={config}
-          />
+          <>
+            <Popup
+              trigger={
+                <Icon
+                  name="mouse pointer"
+                  size="small"
+                  inverted
+                  circular
+                  onClick={this.togglePlotlyInteractive}
+                  id={plotlyInteractive ? 'PrimaryBackground' : ''}
+                  className="PlotlyInteractive"
+                />
+              }
+              style={PopupStyle}
+              position="left center"
+              inverted
+              basic
+              content={
+                plotlyInteractive
+                  ? 'Disable Plotly click interactivity with scatter plot and table'
+                  : 'Enable Plotly click interactivity with scatter plot and table'
+              }
+            />
+            <Plot
+              data={this.state.json.data}
+              layout={this.state.json.layout}
+              config={config}
+              onClick={this.handleClick}
+              onClickAnnotation={this.handleClickAnnotation}
+              onSelected={this.handleSelected}
+            />
+          </>
         )}
         <span id="PlotMultiFeatureDataLoader">
           {!this.state.loading && loadingDimmer}

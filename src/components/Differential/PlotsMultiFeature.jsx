@@ -323,6 +323,7 @@ class PlotsMultiFeature extends Component {
               pxToPtRatio={pxToPtRatio}
               multiFeaturePlotTypes={multiFeaturePlotTypes}
               svgTabMax={svgTabMax}
+              onHandlePlotlyClick={this.props.onHandlePlotlyClick}
             />
             {featuresList}
             <span id={divWidth >= 625 ? 'FullScreenButton' : 'FullScreenIcon'}>

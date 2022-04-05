@@ -20,23 +20,25 @@ class PlotsDynamic extends Component {
   };
 
   componentDidUpdate(prevProps) {
-    if (
-      prevProps.plotSingleFeatureData?.key !==
-      this.props.plotSingleFeatureData?.key
-    ) {
-      this.setState({ activeTabIndexPlotsDynamic: 0 });
-    }
-    if (
-      prevProps.plotMultiFeatureData?.title !==
-      this.props.plotMultiFeatureData?.title
-    ) {
+    if (this.props.enableTabChangeOnSelection) {
       if (
-        this.props.plotMultiFeatureData?.title === '' ||
-        this.props.differentialHighlightedFeaturesData?.length < 2
+        prevProps.plotSingleFeatureData?.key !==
+        this.props.plotSingleFeatureData?.key
       ) {
         this.setState({ activeTabIndexPlotsDynamic: 0 });
-      } else {
-        this.setState({ activeTabIndexPlotsDynamic: 1 });
+      }
+      if (
+        prevProps.plotMultiFeatureData?.title !==
+        this.props.plotMultiFeatureData?.title
+      ) {
+        if (
+          this.props.plotMultiFeatureData?.title === '' ||
+          this.props.differentialHighlightedFeaturesData?.length < 2
+        ) {
+          this.setState({ activeTabIndexPlotsDynamic: 0 });
+        } else {
+          this.setState({ activeTabIndexPlotsDynamic: 1 });
+        }
       }
     }
   }
@@ -201,6 +203,7 @@ class PlotsDynamic extends Component {
                 plotMultiFeatureMax={this.props.plotMultiFeatureMax}
                 onRemoveSelectedFeature={this.props.onRemoveSelectedFeature}
                 multiFeaturePlotTypes={this.props.multiFeaturePlotTypes}
+                onHandlePlotlyClick={this.props.onHandlePlotlyClick}
               />
             </Tab.Pane>
           ),

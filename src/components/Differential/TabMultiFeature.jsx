@@ -87,6 +87,7 @@ class TabMultiFeature extends Component {
                         this.props.differentialDetailPlotsMultiFeatureRefFwd
                       }
                       featuresLength={featuresLength}
+                      onHandlePlotlyClick={this.props.onHandlePlotlyClick}
                     />
                   ) : (
                     <SVG
