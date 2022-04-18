@@ -832,22 +832,42 @@ class Enrichment extends Component {
     function isNotNANorNullNorUndefined(o) {
       return typeof o !== 'undefined' && o !== null && o !== 'NA';
     }
+    if (annotationData.length < 1) return;
+    // grab first object
+    let firstFullObject =
+      [...annotationData].length > 0 ? [...annotationData][0] : null;
+    // if exists, loop through the values of each property,
+    // find the first real value,
+    // and set the config column types
+    if (firstFullObject) {
+      let allProperties = Object.keys(firstFullObject);
+      const dataCopy = [...annotationData];
+      allProperties.forEach(property => {
+        // loop through data, one property at a time
+        const notNullObject = dataCopy.find(row => {
+          // find the first value for that property
+          return isNotNANorNullNorUndefined(row[property]);
+        });
+        let notNullValue = null;
+        if (notNullObject) {
+          notNullValue = notNullObject[property] || null;
+          // if the property has a value somewhere in the data
+          if (
+            typeof notNullValue === 'string' ||
+            notNullValue instanceof String
+          ) {
+            // push it to the appropriate field type
+            enrichmentAlphanumericFields.push(property);
+          } else {
+            enrichmentNumericFields.push(property);
+          }
+        } else {
+          // otherwise push it to type string
+          enrichmentAlphanumericFields.push(property);
+        }
+      });
+    }
 
-    function everyIsNotNANorNullNorUndefined(arr) {
-      return arr.every(isNotNANorNullNorUndefined);
-    }
-    const objectValuesArr = [...annotationData].map(f => Object.values(f));
-    const firstFullObjectIndex = objectValuesArr.findIndex(
-      everyIsNotNANorNullNorUndefined,
-    );
-    const firstFullObject = annotationData[firstFullObjectIndex];
-    for (let [key, value] of Object.entries(firstFullObject)) {
-      if (typeof value === 'string' || value instanceof String) {
-        enrichmentAlphanumericFields.push(key);
-      } else {
-        enrichmentNumericFields.push(key);
-      }
-    }
     const alphanumericTrigger = enrichmentAlphanumericFields[0];
     this.setState({ enrichmentFeatureIdKey: alphanumericTrigger });
     const enrichmentAlphanumericColumnsMapped = enrichmentAlphanumericFields.map(
