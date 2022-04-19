@@ -172,25 +172,22 @@ class DifferentialDetail extends Component {
         this.props.onResetDifferentialOutlinedFeature();
         this.pageToFeature();
       }
+      let sortedData =
+        this.volcanoPlotFilteredGridRef?.current?.qhGridRef?.current?.getSortedData() ||
+        this.props.differentialResults;
+      // const sortDataIds = [...sortedData].map(d => d[this.props.differentialFeatureIdKey]);
+      const volcanoPlotDataArrIds = [...volcanoPlotSelectedDataArr].map(
+        d => d[this.props.differentialFeatureIdKey],
+      );
+      const matchCurrentTableOrder = [...sortedData].filter(d =>
+        volcanoPlotDataArrIds.includes(d[this.props.differentialFeatureIdKey]),
+      );
+      this.setState({
+        differentialTableData: matchCurrentTableOrder,
+        volcanoPlotRows: volcanoPlotSelectedDataArr.length,
+      });
       if (this.props.plotMultiFeatureAvailable) {
         // IF MULTI-FEATURE PLOTTING AVAILABLE AND THERE IS DATA
-        let sortedData =
-          this.volcanoPlotFilteredGridRef?.current?.qhGridRef?.current?.getSortedData() ||
-          this.props.differentialResults;
-        // const sortDataIds = [...sortedData].map(d => d[this.props.differentialFeatureIdKey]);
-        const volcanoPlotDataArrIds = [...volcanoPlotSelectedDataArr].map(
-          d => d[this.props.differentialFeatureIdKey],
-        );
-        const matchCurrentTableOrder = [...sortedData].filter(d =>
-          volcanoPlotDataArrIds.includes(
-            d[this.props.differentialFeatureIdKey],
-          ),
-        );
-        const self = this;
-        this.setState({
-          differentialTableData: matchCurrentTableOrder,
-          volcanoPlotRows: volcanoPlotSelectedDataArr.length,
-        });
         let multiselectedFeaturesArrRemaining = [
           ...volcanoPlotSelectedDataArr,
         ].filter(item =>
