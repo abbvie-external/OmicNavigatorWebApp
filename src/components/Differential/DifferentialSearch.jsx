@@ -443,6 +443,7 @@ class DifferentialSearch extends Component {
         true,
         true,
         value,
+        true,
       );
       return;
     }
@@ -635,6 +636,7 @@ class DifferentialSearch extends Component {
         false,
         true,
         value,
+        true,
       );
       return;
     }
@@ -799,6 +801,7 @@ class DifferentialSearch extends Component {
             differentialResults: inferenceData,
           },
           false,
+          true,
           true,
         );
         this.setState({
