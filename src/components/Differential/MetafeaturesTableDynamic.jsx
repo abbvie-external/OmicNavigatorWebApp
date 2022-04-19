@@ -93,20 +93,39 @@ class MetafeaturesTableDynamic extends Component {
       function isNotNANorNullNorUndefined(o) {
         return typeof o !== 'undefined' && o !== null && o !== 'NA';
       }
-      function everyIsNotNANorNullNorUndefined(arr) {
-        return arr.every(isNotNANorNullNorUndefined);
-      }
-      const objectValuesArr = [...data].map(f => Object.values(f));
-      const firstFullObjectIndex = objectValuesArr.findIndex(
-        everyIsNotNANorNullNorUndefined,
-      );
-      const firstFullObject = data[firstFullObjectIndex];
-      for (let [key, value] of Object.entries(firstFullObject)) {
-        if (typeof value === 'string' || value instanceof String) {
-          metafeaturesAlphanumericFields.push(key);
-        } else {
-          metafeaturesNumericFields.push(key);
-        }
+      if (data.length < 1) return;
+      // grab first object
+      const firstFullObject = data.length > 0 ? [...data][0] : null;
+      // if exists, loop through the values of each property,
+      // find the first real value,
+      // and set the config column types
+      if (firstFullObject) {
+        let allProperties = Object.keys(firstFullObject);
+        const dataCopy = [...data];
+        allProperties.forEach(property => {
+          // loop through data, one property at a time
+          const notNullObject = dataCopy.find(row => {
+            // find the first value for that property
+            return isNotNANorNullNorUndefined(row[property]);
+          });
+          let notNullValue = null;
+          if (notNullObject) {
+            notNullValue = notNullObject[property] || null;
+            // if the property has a value somewhere in the data
+            if (
+              typeof notNullValue === 'string' ||
+              notNullValue instanceof String
+            ) {
+              // push it to the appropriate field type
+              metafeaturesAlphanumericFields.push(property);
+            } else {
+              metafeaturesNumericFields.push(property);
+            }
+          } else {
+            // otherwise push it to type string
+            metafeaturesAlphanumericFields.push(property);
+          }
+        });
       }
       const metafeaturesAlphanumericColumnsMapped = metafeaturesAlphanumericFields.map(
         f => {
