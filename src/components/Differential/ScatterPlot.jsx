@@ -1887,117 +1887,130 @@ class ScatterPlot extends React.PureComponent {
   };
 
   getAxisLabels = () => {
-    if (this.props.differentialResults.length > 0) {
-      let differentialAlphanumericFields = [];
-      let relevantConfigColumns = [];
-      function isNotNANorNullNorUndefined(o) {
-        return typeof o !== 'undefined' && o !== null && o !== 'NA';
-      }
-      function everyIsNotNANorNullNorUndefined(arr) {
-        return arr.every(isNotNANorNullNorUndefined);
-      }
-      const objectValuesArr = [...this.props.differentialResults].map(f =>
-        Object.values(f),
-      );
-      const firstFullObjectIndex = objectValuesArr.findIndex(
-        everyIsNotNANorNullNorUndefined,
-      );
-      const firstFullObject = this.props.differentialResults[
-        firstFullObjectIndex
-      ];
-      for (let [key, value] of Object.entries(firstFullObject)) {
-        if (typeof value === 'string' || value instanceof String) {
-          differentialAlphanumericFields.push(key);
+    const { differentialResults } = this.props;
+    if (differentialResults.length < 1) return;
+    let differentialAlphanumericFields = [];
+    let relevantConfigColumns = [];
+    function isNotNANorNullNorUndefined(o) {
+      return typeof o !== 'undefined' && o !== null && o !== 'NA';
+    }
+    // grab first object
+    const firstFullObject =
+      differentialResults.length > 0 ? [...differentialResults][0] : null;
+    // if exists, loop through the values of each property,
+    // find the first real value,
+    // and set the config column types
+    if (firstFullObject) {
+      let allProperties = Object.keys(firstFullObject);
+      const dataCopy = [...differentialResults];
+      allProperties.forEach(property => {
+        // loop through data, one property at a time
+        const notNullObject = dataCopy.find(row => {
+          // find the first value for that property
+          return isNotNANorNullNorUndefined(row[property]);
+        });
+        let notNullValue = null;
+        if (notNullObject) {
+          notNullValue = notNullObject[property] || null;
+          // if the property has a value somewhere in the data
+          if (
+            typeof notNullValue === 'string' ||
+            notNullValue instanceof String
+          ) {
+            // push it to the appropriate field type
+            differentialAlphanumericFields.push(property);
+          } else {
+            relevantConfigColumns.push(property);
+          }
         } else {
-          relevantConfigColumns.push(key);
+          // otherwise push it to type string
+          differentialAlphanumericFields.push(property);
         }
-      }
-      //Pushes "none" option into Volcano circle text dropdown
-      differentialAlphanumericFields.unshift('None');
-      let volcanoCircleLabelsVar = differentialAlphanumericFields.map(e => {
-        return {
-          key: e,
-          text: e,
-          value: e,
-        };
-      });
-
-      let storedVolcanoCircleLabel = sessionStorage.getItem(
-        'volcanoCircleLabel',
-      );
-      let nextVolcanoCircleLabel = differentialAlphanumericFields?.includes(
-        storedVolcanoCircleLabel,
-      )
-        ? storedVolcanoCircleLabel
-        : this.props.differentialFeatureIdKey;
-      this.setState({
-        volcanoCircleLabels: volcanoCircleLabelsVar,
-        volcanoCircleLabel: nextVolcanoCircleLabel,
-      });
-      sessionStorage.setItem('volcanoCircleLabel', nextVolcanoCircleLabel);
-      // XAXIS
-      let storedXAxisLabel = sessionStorage.getItem('xAxisLabel');
-      // if session storage cached xlabel is an option, use it
-      let xLabel = relevantConfigColumns?.includes(storedXAxisLabel)
-        ? storedXAxisLabel
-        : null;
-
-      // otherwise, if not cached in session, default to logFC. If no logFC, set to first index
-      if (xLabel == null) {
-        if (relevantConfigColumns.indexOf('logFC') >= 0) {
-          xLabel = 'logFC';
-        } else {
-          xLabel = relevantConfigColumns[0];
-        }
-      }
-      // YAXIS
-      let storedYAxisLabel = sessionStorage.getItem('yAxisLabel');
-      // if session storage cached ylabel is an option, use it, otherwise, if not cached in session, look for a p value label
-      let yLabel = relevantConfigColumns?.includes(storedYAxisLabel)
-        ? storedYAxisLabel
-        : null;
-      // DOY
-      let doY = this.state.doYAxisTransformation;
-      if (yLabel == null) {
-        if (relevantConfigColumns.indexOf('P_Value') >= 0) {
-          yLabel = 'P_Value';
-          doY = true;
-        } else if (relevantConfigColumns.indexOf('P.Value') >= 0) {
-          yLabel = 'P.Value';
-          doY = true;
-        } else if (relevantConfigColumns.indexOf('PValue') >= 0) {
-          yLabel = 'PValue';
-          doY = true;
-        } else if (relevantConfigColumns.indexOf('PVal') >= 0) {
-          yLabel = 'PVal';
-          doY = true;
-        } else if (relevantConfigColumns.indexOf('P value') >= 0) {
-          yLabel = 'P value';
-          doY = true;
-        } else if (relevantConfigColumns.indexOf('adj_P_Val') >= 0) {
-          yLabel = 'adj_P_Val';
-          doY = true;
-        } else if (relevantConfigColumns.indexOf('adj.P.Val') >= 0) {
-          yLabel = 'adj.P.Val';
-          doY = true;
-        } else {
-          yLabel = relevantConfigColumns[0];
-        }
-      }
-      const axes = relevantConfigColumns.map(e => {
-        return {
-          key: e,
-          text: e,
-          value: e,
-        };
-      });
-      this.setState({
-        axisLabels: axes,
-        yAxisLabel: yLabel,
-        doYAxisTransformation: doY,
-        xAxisLabel: xLabel,
       });
     }
+    //Pushes "none" option into Volcano circle text dropdown
+    differentialAlphanumericFields.unshift('None');
+    let volcanoCircleLabelsVar = differentialAlphanumericFields.map(e => {
+      return {
+        key: e,
+        text: e,
+        value: e,
+      };
+    });
+
+    let storedVolcanoCircleLabel = sessionStorage.getItem('volcanoCircleLabel');
+    let nextVolcanoCircleLabel = differentialAlphanumericFields?.includes(
+      storedVolcanoCircleLabel,
+    )
+      ? storedVolcanoCircleLabel
+      : this.props.differentialFeatureIdKey;
+    this.setState({
+      volcanoCircleLabels: volcanoCircleLabelsVar,
+      volcanoCircleLabel: nextVolcanoCircleLabel,
+    });
+    sessionStorage.setItem('volcanoCircleLabel', nextVolcanoCircleLabel);
+    // XAXIS
+    let storedXAxisLabel = sessionStorage.getItem('xAxisLabel');
+    // if session storage cached xlabel is an option, use it
+    let xLabel = relevantConfigColumns?.includes(storedXAxisLabel)
+      ? storedXAxisLabel
+      : null;
+
+    // otherwise, if not cached in session, default to logFC. If no logFC, set to first index
+    if (xLabel == null) {
+      if (relevantConfigColumns.indexOf('logFC') >= 0) {
+        xLabel = 'logFC';
+      } else {
+        xLabel = relevantConfigColumns[0];
+      }
+    }
+    // YAXIS
+    let storedYAxisLabel = sessionStorage.getItem('yAxisLabel');
+    // if session storage cached ylabel is an option, use it, otherwise, if not cached in session, look for a p value label
+    let yLabel = relevantConfigColumns?.includes(storedYAxisLabel)
+      ? storedYAxisLabel
+      : null;
+    // DOY
+    let doY = this.state.doYAxisTransformation;
+    if (yLabel == null) {
+      if (relevantConfigColumns.indexOf('P_Value') >= 0) {
+        yLabel = 'P_Value';
+        doY = true;
+      } else if (relevantConfigColumns.indexOf('P.Value') >= 0) {
+        yLabel = 'P.Value';
+        doY = true;
+      } else if (relevantConfigColumns.indexOf('PValue') >= 0) {
+        yLabel = 'PValue';
+        doY = true;
+      } else if (relevantConfigColumns.indexOf('PVal') >= 0) {
+        yLabel = 'PVal';
+        doY = true;
+      } else if (relevantConfigColumns.indexOf('P value') >= 0) {
+        yLabel = 'P value';
+        doY = true;
+      } else if (relevantConfigColumns.indexOf('adj_P_Val') >= 0) {
+        yLabel = 'adj_P_Val';
+        doY = true;
+      } else if (relevantConfigColumns.indexOf('adj.P.Val') >= 0) {
+        yLabel = 'adj.P.Val';
+        doY = true;
+      } else {
+        yLabel = relevantConfigColumns[0];
+      }
+    }
+    const axes = relevantConfigColumns.map(e => {
+      return {
+        key: e,
+        text: e,
+        value: e,
+      };
+    });
+    this.setState({
+      axisLabels: axes,
+      yAxisLabel: yLabel,
+      doYAxisTransformation: doY,
+      xAxisLabel: xLabel,
+    });
   };
 
   toggleOptionsPopup = (e, obj, close) => {
