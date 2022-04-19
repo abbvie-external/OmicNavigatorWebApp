@@ -1286,22 +1286,41 @@ class Differential extends Component {
     function isNotNANorNullNorUndefined(o) {
       return typeof o !== 'undefined' && o !== null && o !== 'NA';
     }
-    function everyIsNotNANorNullNorUndefined(arr) {
-      return arr.every(isNotNANorNullNorUndefined);
-    }
-    const objectValuesArr = [...differentialResultsVar].map(f =>
-      Object.values(f),
-    );
-    const firstFullObjectIndex = objectValuesArr.findIndex(
-      everyIsNotNANorNullNorUndefined,
-    );
-    const firstFullObject = differentialResultsVar[firstFullObjectIndex];
-    for (let [key, value] of Object.entries(firstFullObject)) {
-      if (typeof value === 'string' || value instanceof String) {
-        differentialAlphanumericFields.push(key);
-      } else {
-        differentialNumericFields.push(key);
-      }
+
+    if (differentialResultsVar.length < 1) return;
+    // grab first object
+    const firstFullObject =
+      differentialResultsVar.length > 0 ? [...differentialResultsVar][0] : null;
+    // if exists, loop through the values of each property,
+    // find the first real value,
+    // and set the config column types
+    if (firstFullObject) {
+      let allProperties = Object.keys(firstFullObject);
+      const dataCopy = [...differentialResultsVar];
+      allProperties.forEach(property => {
+        // loop through data, one property at a time
+        const notNullObject = dataCopy.find(row => {
+          // find the first value for that property
+          return isNotNANorNullNorUndefined(row[property]);
+        });
+        let notNullValue = null;
+        if (notNullObject) {
+          notNullValue = notNullObject[property] || null;
+          // if the property has a value somewhere in the data
+          if (
+            typeof notNullValue === 'string' ||
+            notNullValue instanceof String
+          ) {
+            // push it to the appropriate field type
+            differentialAlphanumericFields.push(property);
+          } else {
+            differentialNumericFields.push(property);
+          }
+        } else {
+          // otherwise push it to type string
+          differentialAlphanumericFields.push(property);
+        }
+      });
     }
     const alphanumericTrigger = differentialAlphanumericFields[0];
     if (differentialFeature !== '') {
