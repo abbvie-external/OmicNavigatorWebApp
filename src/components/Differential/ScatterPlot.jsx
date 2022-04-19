@@ -147,13 +147,12 @@ class ScatterPlot extends React.PureComponent {
     if (differentialTest !== prevProps.differentialTest) {
       // if the test is changed and data is cached, it won't steam, and this needs to run
       this.clearState();
-      const self = this;
-      self.getAxisLabels();
-      window.addEventListener('resize', self.debouncedResizeListener);
+      this.getAxisLabels();
+      window.addEventListener('resize', this.debouncedResizeListener);
       d3.select('#VolcanoChart').remove();
-      self.setupVolcano();
-      self.hexBinning(differentialResultsUnfiltered);
-      self.transitionZoom(
+      this.setupVolcano();
+      this.hexBinning(differentialResultsUnfiltered);
+      this.transitionZoom(
         differentialResultsUnfiltered,
         false,
         false,
@@ -161,8 +160,9 @@ class ScatterPlot extends React.PureComponent {
         false,
       );
       if (volcanoPlotVisible && upperPlotsVisible && !plotOverlayVisible) {
-        self.setState({ optionsOpen: true });
+        this.setState({ optionsOpen: true });
       }
+      const self = this;
       setTimeout(function() {
         self.highlightBrushedCircles();
       }, 500);
@@ -1601,10 +1601,7 @@ class ScatterPlot extends React.PureComponent {
           let boxSelectionToHighlight = self.mapBoxSelectionToHighlight([
             ...total,
           ]);
-          if (boxSelectionToHighlight === null) {
-            // ZOOM IF NOT SHIFT BOX-SELECTING FOR MULTI-FEATURE PLOTS
-            self.transitionZoom(total, false, false, false, true);
-          } else if (
+          if (
             // SHIFT BOX-SELECT FOR MULTI-FEATURE PLOTS
             d3.event.sourceEvent?.shiftKey
           ) {
@@ -1678,6 +1675,7 @@ class ScatterPlot extends React.PureComponent {
 
   mapBoxSelectionToHighlight = total => {
     const { plotMultiFeatureAvailable, differentialFeatureIdKey } = this.props;
+    if (!plotMultiFeatureAvailable) return null;
     const scatterArr = total.map(item => ({
       id: item[differentialFeatureIdKey],
       value: item[differentialFeatureIdKey],
@@ -1686,10 +1684,7 @@ class ScatterPlot extends React.PureComponent {
     const uniqueScatterArray = [
       ...new Map(scatterArr.map(item => [item.id, item])).values(),
     ];
-    // if multi-feature plotting is not available, return null to initiate zoom
-    if (!plotMultiFeatureAvailable) {
-      return null;
-    } else return uniqueScatterArray;
+    return uniqueScatterArray;
   };
 
   handleBrushedText = brushed => {
