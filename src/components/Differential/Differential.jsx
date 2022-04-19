@@ -1126,7 +1126,7 @@ class Differential extends Component {
     doNotUnhighlight,
   ) => {
     // const { differentialOutlinedFeature } = this.state;
-    if (toHighlightArr.length > 1) {
+    if (toHighlightArr?.length > 1) {
       // when multi-selecting, show svg loading
       this.setState({
         plotMultiFeatureDataLoaded: false,
@@ -1137,7 +1137,7 @@ class Differential extends Component {
         differentialHighlightedFeaturesData: toHighlightArr,
       });
     }
-    if (toHighlightArr.length > 0) {
+    if (toHighlightArr?.length > 0) {
       if (toHighlightArr.length === 1) {
         // 1 feature
         if (

@@ -2134,7 +2134,6 @@ class ScatterPlot extends React.PureComponent {
               onClose={e => this.toggleOptionsPopup(e, null, true)}
               closeOnDocumentClick
               closeOnEscape
-              hideOnScroll
             >
               <Popup.Content
                 id="VolcanoOptionsPopupContent"
