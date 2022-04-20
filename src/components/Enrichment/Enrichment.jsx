@@ -537,12 +537,17 @@ class Enrichment extends Component {
           },
         );
         let plotMultiFeatureAvailableVar = false;
+        // let singleFeaturePlotTypesVar = [];
+        let multiFeaturePlotTypesVar = [];
         if (enrichmentPlotTypesVar) {
-          const plotTypesMapped = [...enrichmentPlotTypesVar].map(
-            p => p.plotType,
+          // singleFeaturePlotTypesVar = [...enrichmentPlotTypesVar].filter(
+          //   p => !p.plotType.includes('multiFeature'),
+          // );
+          multiFeaturePlotTypesVar = [...enrichmentPlotTypesVar].filter(p =>
+            p.plotType.includes('multiFeature'),
           );
           plotMultiFeatureAvailableVar =
-            plotTypesMapped?.includes('multiFeature') || false;
+            multiFeaturePlotTypesVar?.length || false;
         }
         this.setState({
           enrichmentPlotTypes: enrichmentPlotTypesVar,
