@@ -262,17 +262,14 @@ class Differential extends Component {
         let singleFeaturePlotTypesVar = [];
         let multiFeaturePlotTypesVar = [];
         if (differentialPlotTypesVar) {
-          const plotTypesMapped = [...differentialPlotTypesVar].map(
-            p => p.plotType,
-          );
-          plotMultiFeatureAvailableVar =
-            plotTypesMapped?.includes('multiFeature') || false;
           singleFeaturePlotTypesVar = [...differentialPlotTypesVar].filter(
             p => !p.plotType.includes('multiFeature'),
           );
           multiFeaturePlotTypesVar = [...differentialPlotTypesVar].filter(p =>
             p.plotType.includes('multiFeature'),
           );
+          plotMultiFeatureAvailableVar =
+            multiFeaturePlotTypesVar?.length || false;
         }
         this.setState({
           differentialPlotTypes: differentialPlotTypesVar,
@@ -1126,7 +1123,7 @@ class Differential extends Component {
     doNotUnhighlight,
   ) => {
     // const { differentialOutlinedFeature } = this.state;
-    if (toHighlightArr.length > 1) {
+    if (toHighlightArr?.length > 1) {
       // when multi-selecting, show svg loading
       this.setState({
         plotMultiFeatureDataLoaded: false,
@@ -1137,7 +1134,7 @@ class Differential extends Component {
         differentialHighlightedFeaturesData: toHighlightArr,
       });
     }
-    if (toHighlightArr.length > 0) {
+    if (toHighlightArr?.length > 0) {
       if (toHighlightArr.length === 1) {
         // 1 feature
         if (

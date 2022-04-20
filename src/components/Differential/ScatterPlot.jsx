@@ -106,7 +106,13 @@ class ScatterPlot extends React.PureComponent {
       d3.select('#VolcanoChart').remove();
       this.setupVolcano();
       this.hexBinning(differentialResultsUnfiltered);
-      this.transitionZoom(differentialResultsUnfiltered, false, false, false);
+      this.transitionZoom(
+        differentialResultsUnfiltered,
+        false,
+        false,
+        false,
+        true,
+      );
       if (volcanoPlotVisible && upperPlotsVisible && !plotOverlayVisible) {
         this.setState({ optionsOpen: true });
       }
@@ -140,15 +146,26 @@ class ScatterPlot extends React.PureComponent {
     // this if/else if/else if statement in place to minimize re-renders - should cover all situations
     if (differentialTest !== prevProps.differentialTest) {
       // if the test is changed and data is cached, it won't steam, and this needs to run
+      this.clearState();
       this.getAxisLabels();
       window.addEventListener('resize', this.debouncedResizeListener);
       d3.select('#VolcanoChart').remove();
       this.setupVolcano();
       this.hexBinning(differentialResultsUnfiltered);
-      this.transitionZoom(differentialResultsUnfiltered, false, false, false);
+      this.transitionZoom(
+        differentialResultsUnfiltered,
+        false,
+        false,
+        false,
+        false,
+      );
       if (volcanoPlotVisible && upperPlotsVisible && !plotOverlayVisible) {
         this.setState({ optionsOpen: true });
       }
+      const self = this;
+      setTimeout(function() {
+        self.highlightBrushedCircles();
+      }, 500);
     } else if (
       !differentialResultsTableStreaming &&
       differentialResultsTableStreaming !==
@@ -164,7 +181,11 @@ class ScatterPlot extends React.PureComponent {
       d3.select('#VolcanoChart').remove();
       this.setupVolcano();
       this.hexBinning(differentialResultsUnfiltered);
-      this.transitionZoom(dataInCurrentView, false, false, false);
+      this.transitionZoom(dataInCurrentView, false, false, false, false);
+      const self = this;
+      setTimeout(function() {
+        self.highlightBrushedCircles();
+      }, 500);
       if (volcanoPlotVisible && upperPlotsVisible && !plotOverlayVisible) {
         this.setState({ optionsOpen: true });
       }
@@ -181,7 +202,13 @@ class ScatterPlot extends React.PureComponent {
       d3.select('#VolcanoChart').remove();
       this.setupVolcano();
       this.hexBinning(this.state.currentResults);
-      this.transitionZoom(this.state.currentResults, false, false, false);
+      this.transitionZoom(
+        this.state.currentResults,
+        false,
+        false,
+        false,
+        false,
+      );
     } else if (
       (prevProps.isFilteredDifferential && !isFilteredDifferential) ||
       (prevProps.multisetFiltersVisibleParentRef &&
@@ -192,7 +219,7 @@ class ScatterPlot extends React.PureComponent {
         this.state.currentResults.length > 0
           ? this.state.currentResults
           : differentialResultsUnfiltered;
-      this.transitionZoom(dataInCurrentView, false, false, false);
+      this.transitionZoom(dataInCurrentView, false, false, false, true);
     } else if (
       !differentialResultsTableStreaming &&
       prevProps.filteredDifferentialTableData.length !== 30 &&
@@ -205,7 +232,7 @@ class ScatterPlot extends React.PureComponent {
           ? this.state.currentResults
           : differentialResultsUnfiltered;
       // if (upperPlotsVisible && volcanoPlotVisible)
-      this.transitionZoom(allDataInSelectedArea, false, true, false);
+      this.transitionZoom(allDataInSelectedArea, false, true, false, true);
     }
     if (volcanoCircleLabel !== prevState.volcanoCircleLabel) {
       this.handleCircleLabels();
@@ -231,6 +258,7 @@ class ScatterPlot extends React.PureComponent {
   }
 
   componentWillUnmount() {
+    d3.select('#VolcanoChart').remove();
     window.removeEventListener('resize', this.debouncedResizeListener);
   }
 
@@ -244,6 +272,49 @@ class ScatterPlot extends React.PureComponent {
     resizedFn = _.debounce(() => {
       this.windowResized();
     }, 200);
+  };
+
+  clearState = () => {
+    // needed when when the component doesn't unmount,
+    // for example, on test change with cached data
+    this.plotCirclesSorted = [];
+    this.differentialResults = [];
+    this.circles = [];
+    this.bins = [];
+    this.hexbin = hexbin.hexbin();
+    this.objsBrush = {};
+    this.setState({
+      hoveredElement: 'bin' || 'circle',
+      hoveredCircleData: {
+        position: [],
+        id: null,
+        xstat: null,
+        ystat: null,
+      },
+      hovering: false,
+      hoveredTextScalar: 12,
+      tooltipPosition: null,
+      brushedCircles: [],
+      brushing: false,
+      resizeScalarX: 1,
+      resizeScalarY: 1,
+      volcanoCircleText: [],
+      bins: [],
+      loading: false,
+      circles: [],
+      showCircles: true,
+      showBins: true,
+      isBinClicked: false,
+      clickedBin: null,
+      xxAxis: '',
+      yyAxis: '',
+      currentResults: [],
+      axisLabels: [],
+      volcanoCircleLabels: [],
+      optionsOpen: false,
+      usageOpen: false,
+      renderedOnce: false,
+    });
   };
 
   setupVolcano() {
@@ -340,7 +411,13 @@ class ScatterPlot extends React.PureComponent {
       });
 
     svg.on('dblclick', () => {
-      this.transitionZoom(differentialResultsUnfiltered, true, false, true);
+      this.transitionZoom(
+        differentialResultsUnfiltered,
+        true,
+        false,
+        true,
+        true,
+      );
     });
   }
 
@@ -699,7 +776,7 @@ class ScatterPlot extends React.PureComponent {
     d3.select('#VolcanoChart').remove();
     this.setupVolcano();
     this.hexBinning(this.state.currentResults);
-    this.transitionZoom(this.state.currentResults, false, false, false);
+    this.transitionZoom(this.state.currentResults, false, false, false, false);
   };
 
   doTransform(value, axis) {
@@ -1348,6 +1425,7 @@ class ScatterPlot extends React.PureComponent {
     clearHighlightedData,
     initiatedByTable,
     doubleClick,
+    tableFilterOrMultisetInitiated,
   ) {
     const self = this;
     const { xScale, yScale } = self.scaleFactory(allDataInView);
@@ -1363,14 +1441,16 @@ class ScatterPlot extends React.PureComponent {
         circles: unfilteredObject.circles,
       },
       function() {
-        this.updateVolcanoAfterMultisetOrTableFilter(
-          allDataInView,
-          initiatedByTable,
-          xScale,
-          yScale,
-          clearHighlightedData,
-          doubleClick,
-        );
+        if (tableFilterOrMultisetInitiated) {
+          this.updateVolcanoAfterMultisetOrTableFilter(
+            allDataInView,
+            initiatedByTable,
+            xScale,
+            yScale,
+            clearHighlightedData,
+            doubleClick,
+          );
+        }
 
         // const highlighted = d3
         //   .select('#nonfiltered-elements')
@@ -1521,10 +1601,7 @@ class ScatterPlot extends React.PureComponent {
           let boxSelectionToHighlight = self.mapBoxSelectionToHighlight([
             ...total,
           ]);
-          if (boxSelectionToHighlight === null) {
-            // ZOOM IF NOT SHIFT BOX-SELECTING FOR MULTI-FEATURE PLOTS
-            self.transitionZoom(total, false, false, false);
-          } else if (
+          if (
             // SHIFT BOX-SELECT FOR MULTI-FEATURE PLOTS
             d3.event.sourceEvent?.shiftKey
           ) {
@@ -1535,7 +1612,7 @@ class ScatterPlot extends React.PureComponent {
             self.props.onReloadMultifeaturePlot(boxSelectionToHighlight);
           } else {
             // DEFAULT ZOOM AFTER CHECK FOR SHIFT BOX-SELECT
-            self.transitionZoom(total, false, false, false);
+            self.transitionZoom(total, false, false, false, true);
           }
           // we are always clearing the box; if desired, place this in
           d3.select('.volcanoPlotD3BrushSelection').call(
@@ -1598,6 +1675,7 @@ class ScatterPlot extends React.PureComponent {
 
   mapBoxSelectionToHighlight = total => {
     const { plotMultiFeatureAvailable, differentialFeatureIdKey } = this.props;
+    if (!plotMultiFeatureAvailable) return null;
     const scatterArr = total.map(item => ({
       id: item[differentialFeatureIdKey],
       value: item[differentialFeatureIdKey],
@@ -1606,10 +1684,7 @@ class ScatterPlot extends React.PureComponent {
     const uniqueScatterArray = [
       ...new Map(scatterArr.map(item => [item.id, item])).values(),
     ];
-    // if multi-feature plotting is not available, return null to initiate zoom
-    if (!plotMultiFeatureAvailable) {
-      return null;
-    } else return uniqueScatterArray;
+    return uniqueScatterArray;
   };
 
   handleBrushedText = brushed => {
@@ -2059,7 +2134,6 @@ class ScatterPlot extends React.PureComponent {
               onClose={e => this.toggleOptionsPopup(e, null, true)}
               closeOnDocumentClick
               closeOnEscape
-              hideOnScroll
             >
               <Popup.Content
                 id="VolcanoOptionsPopupContent"
