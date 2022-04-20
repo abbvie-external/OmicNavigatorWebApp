@@ -262,17 +262,14 @@ class Differential extends Component {
         let singleFeaturePlotTypesVar = [];
         let multiFeaturePlotTypesVar = [];
         if (differentialPlotTypesVar) {
-          const plotTypesMapped = [...differentialPlotTypesVar].map(
-            p => p.plotType,
-          );
-          plotMultiFeatureAvailableVar =
-            plotTypesMapped?.includes('multiFeature') || false;
           singleFeaturePlotTypesVar = [...differentialPlotTypesVar].filter(
             p => !p.plotType.includes('multiFeature'),
           );
           multiFeaturePlotTypesVar = [...differentialPlotTypesVar].filter(p =>
             p.plotType.includes('multiFeature'),
           );
+          plotMultiFeatureAvailableVar =
+            multiFeaturePlotTypesVar?.length || false;
         }
         this.setState({
           differentialPlotTypes: differentialPlotTypesVar,
