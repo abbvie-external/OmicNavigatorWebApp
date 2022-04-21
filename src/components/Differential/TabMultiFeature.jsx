@@ -81,6 +81,7 @@ class TabMultiFeature extends Component {
                       height={divHeightPadding}
                       width={divWidthPadding}
                       plotName={s.plotType.plotDisplay}
+                      plotId={s.plotType.plotID}
                       plotlyExport={this.props.plotlyExport}
                       plotlyExportType={this.props.plotlyExportType}
                       parentNode={

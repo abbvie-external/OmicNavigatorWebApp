@@ -29,12 +29,12 @@ export default class PlotlyOverlay extends Component {
   }
 
   getJson = () => {
-    const { plotlyData, width, height } = this.props;
+    const { plotlyData, width, height, plotId } = this.props;
     const parsedData = JSON.parse(plotlyData);
     const data = parsedData?.data || null;
     let layout = parsedData?.layout || null;
     if (layout) {
-      layout = reviseLayout(layout, width, height);
+      layout = reviseLayout(layout, width, height, plotId);
     }
     this.setState({
       json: {

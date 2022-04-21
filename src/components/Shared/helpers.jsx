@@ -433,13 +433,23 @@ export const clickDownload = _.debounce(parentNode => {
   }
 }, 1000);
 
-export const reviseLayout = (layout, width, height) => {
-  const layoutString = JSON.stringify(layout);
-  const layoutStringReplaced = layoutString.replaceAll(
-    '"automargin":true',
-    '"automargin":false',
-  );
-  const layoutParsed = JSON.parse(layoutStringReplaced);
+export const reviseLayout = (layout, width, height, plotId) => {
+  let layoutParsed = layout;
+  if (plotId && plotId.includes('heatmaply')) {
+    debugger;
+    const layoutString = JSON.stringify(layout);
+    const layoutStringReplaced = layoutString.replaceAll(
+      '"automargin":true',
+      '"automargin":false',
+    );
+    layoutParsed = JSON.parse(layoutStringReplaced);
+    layoutParsed.margin = {
+      b: layoutParsed.margin.b,
+      l: layoutParsed.margin.l + 50,
+      r: layoutParsed.margin.r,
+      t: layoutParsed.margin.t,
+    };
+  }
   layoutParsed.width = Math.floor(width * 0.9);
   layoutParsed.height = Math.floor(height * 0.9);
   return layoutParsed;
