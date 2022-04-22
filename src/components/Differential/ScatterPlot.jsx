@@ -19,8 +19,6 @@ import * as hexbin from 'd3-hexbin';
 import ButtonActions from '../Shared/ButtonActions';
 
 class ScatterPlot extends React.PureComponent {
-  plotCirclesSorted = [];
-  differentialResults = [];
   circles = [];
   bins = [];
   hexbin = hexbin.hexbin();
@@ -165,7 +163,7 @@ class ScatterPlot extends React.PureComponent {
       const self = this;
       setTimeout(function() {
         self.highlightBrushedCircles();
-      }, 500);
+      }, 250);
     } else if (
       !differentialResultsTableStreaming &&
       differentialResultsTableStreaming !==
@@ -185,7 +183,7 @@ class ScatterPlot extends React.PureComponent {
       const self = this;
       setTimeout(function() {
         self.highlightBrushedCircles();
-      }, 500);
+      }, 250);
       if (volcanoPlotVisible && upperPlotsVisible && !plotOverlayVisible) {
         this.setState({ optionsOpen: true });
       }
@@ -262,10 +260,6 @@ class ScatterPlot extends React.PureComponent {
     window.removeEventListener('resize', this.debouncedResizeListener);
   }
 
-  // shouldComponentUpdate() {
-  //   return this.props.volcanoPlotVisible && this.props.upperPlotsVisible;
-  // }
-
   debouncedResizeListener = () => {
     let resizedFn;
     clearTimeout(resizedFn);
@@ -277,11 +271,6 @@ class ScatterPlot extends React.PureComponent {
   clearState = () => {
     // needed when when the component doesn't unmount,
     // for example, on test change with cached data
-    this.plotCirclesSorted = [];
-    this.differentialResults = [];
-    this.circles = [];
-    this.bins = [];
-    this.hexbin = hexbin.hexbin();
     this.objsBrush = {};
     this.setState({
       hoveredElement: 'bin' || 'circle',
@@ -423,7 +412,6 @@ class ScatterPlot extends React.PureComponent {
 
   hexBinning(data) {
     const { volcanoWidth, upperPlotsHeight, differentialResults } = this.props;
-
     if (data.length > 2500) {
       const { xScale, yScale } = this.scaleFactory(data);
       const { bins, circles } = this.parseDataToBinsAndCircles(
@@ -431,38 +419,15 @@ class ScatterPlot extends React.PureComponent {
         xScale,
         yScale,
       );
-
-      this.bins = bins;
-      this.circles = circles;
-
       this.renderBins(bins);
       this.renderCircles(circles);
-
-      let volcanoState = {
-        volcanoCircleText: this.state.volcanoCircleText,
-        previousResult: data,
-        currentResults: data,
-        circles: circles,
-        bins: bins,
-      };
-
-      this.setState({ ...volcanoState });
     } else {
       this.scaleFactory(data);
-
       this.renderCircles(data);
-
-      let volcanoState = {
-        volcanoCircleText: this.state.volcanoCircleText,
-        currentResults: data,
-        circles: data,
-        bins: [],
-      };
-      this.setState({ ...volcanoState });
     }
     this.props.onHandleScatterPlotBoxSelection(data);
     this.setupBrush(volcanoWidth, upperPlotsHeight);
-
+    // paul - why is this needed?!
     this.props.onHandleUpdateDifferentialResults(differentialResults);
   }
 
