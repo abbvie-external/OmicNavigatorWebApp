@@ -30,7 +30,7 @@ export default class PlotlyOverlay extends Component {
 
   getJson = () => {
     const { plotlyData, width, height } = this.props;
-    const parsedData = plotlyData.length ? JSON.parse(plotlyData) : null;
+    const parsedData = plotlyData ? JSON.parse(plotlyData) : null;
     const data = parsedData?.data || null;
     let layout = parsedData?.layout || null;
     if (layout) {
