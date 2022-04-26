@@ -29,7 +29,7 @@ export default class PlotlySingleFeature extends Component {
 
   getJson = () => {
     const { plotlyData, width, height } = this.props;
-    const parsedData = JSON.parse(plotlyData);
+    const parsedData = plotlyData.length ? JSON.parse(plotlyData) : null;
     const data = parsedData?.data || null;
     let layout = parsedData?.layout || null;
     if (layout) {
