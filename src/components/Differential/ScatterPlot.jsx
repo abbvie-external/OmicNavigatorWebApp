@@ -411,7 +411,7 @@ class ScatterPlot extends React.PureComponent {
   }
 
   hexBinning(data) {
-    const { volcanoWidth, upperPlotsHeight, differentialResults } = this.props;
+    const { volcanoWidth, upperPlotsHeight } = this.props;
     if (data.length > 2500) {
       const { xScale, yScale } = this.scaleFactory(data);
       const { bins, circles } = this.parseDataToBinsAndCircles(
@@ -425,10 +425,7 @@ class ScatterPlot extends React.PureComponent {
       this.scaleFactory(data);
       this.renderCircles(data);
     }
-    this.props.onHandleScatterPlotBoxSelection(data);
     this.setupBrush(volcanoWidth, upperPlotsHeight);
-    // paul - why is this needed?!
-    this.props.onHandleUpdateDifferentialResults(differentialResults);
   }
 
   determineBinColor(binArray, length) {
@@ -1304,48 +1301,37 @@ class ScatterPlot extends React.PureComponent {
     const filteredDifferentialTableDataFeatureIds = filteredDifferentialTableData.map(
       tableDataElement => tableDataElement[differentialFeatureIdKey],
     );
-    const differentialResultsFeatureIds = differentialResults.map(
-      differentialResultElement =>
-        differentialResultElement[differentialFeatureIdKey],
-    );
     const dataInViewCopy = [...dataInSelection];
 
     const dataInView = doubleClick
       ? differentialResultsUnfiltered
       : dataInViewCopy;
 
-    let dataInViewPassingTableFilters =
-      dataInView.length > 0
-        ? dataInView.filter(d =>
-            filteredDifferentialTableDataFeatureIds.includes(
-              d[differentialFeatureIdKey],
-            ),
-          )
-        : [];
+    const idsInView = dataInView.map(obj => obj[differentialFeatureIdKey]);
 
-    const dataInViewPassingTableFiltersAndMultiset =
-      dataInViewPassingTableFilters.length > 0
-        ? dataInViewPassingTableFilters.filter(divptf =>
-            differentialResultsFeatureIds.includes(
-              divptf[differentialFeatureIdKey],
-            ),
-          )
-        : [];
+    function intersect(a, b) {
+      return a.filter(Set.prototype.has, new Set(b));
+    }
+    const idsPassingTable = intersect(
+      idsInView,
+      filteredDifferentialTableDataFeatureIds,
+    );
 
-    let irrelevantDataRaw = [];
-    let relevantDataRaw = dataInViewPassingTableFiltersAndMultiset || [];
-    if (dataInViewPassingTableFiltersAndMultiset.length !== dataInView.length) {
-      irrelevantDataRaw = _.differenceBy(
-        dataInView,
-        dataInViewPassingTableFiltersAndMultiset,
-        differentialFeatureIdKey,
-      );
+    let irrelevantIds = [];
+    if (idsPassingTable.length !== idsInView.length) {
+      irrelevantIds = _.difference(idsInView, idsPassingTable);
     }
 
-    const irrelevantData = _.uniqBy(
-      irrelevantDataRaw,
-      differentialFeatureIdKey,
-    );
+    let irrelevantData = [];
+    let relevantData = [];
+
+    dataInView.forEach(obj => {
+      if (irrelevantIds.includes(obj[differentialFeatureIdKey])) {
+        irrelevantData.push(obj);
+      } else {
+        relevantData.push(obj);
+      }
+    });
 
     const irrelevantCirclesAndBins = self.parseDataToBinsAndCircles(
       irrelevantData,
@@ -1353,7 +1339,6 @@ class ScatterPlot extends React.PureComponent {
       yScale,
     );
 
-    const relevantData = _.uniqBy(relevantDataRaw, differentialFeatureIdKey);
     const relevantCirclesAndBins = self.parseDataToBinsAndCircles(
       relevantData,
       xScale,
@@ -1417,53 +1402,6 @@ class ScatterPlot extends React.PureComponent {
           );
         }
 
-        // const highlighted = d3
-        //   .select('#nonfiltered-elements')
-        //   .selectAll('[class$=highlighted')
-        //   .attr('cx', function(d) {
-        //     return xScale(self.doTransform(d[self.state.xAxisLabel], 'x'));
-        //   })
-        //   .attr('cy', function(d) {
-        //     return yScale(self.doTransform(d[self.state.yAxisLabel], 'y'));
-        //   });
-
-        // const outlined = d3
-        //   .select('#nonfiltered-elements')
-        //   .selectAll('[class$=outlined')
-        //   .attr('cx', function(d) {
-        //     return xScale(self.doTransform(d[self.state.xAxisLabel], 'x'));
-        //   })
-        //   .attr('cy', function(d) {
-        //     return yScale(self.doTransform(d[self.state.yAxisLabel], 'y'));
-        //   });
-        // if (highlighted?._groups.length || outlined?._groups.length) {
-        //   let circleLabels = [];
-        //   if (highlighted?._groups.length && outlined?._groups.length) {
-        //     circleLabels = [
-        //       ...highlighted?._groups[0],
-        //       ...outlined?._groups[0],
-        //     ];
-        //   } else if (highlighted?._groups.length) {
-        //     circleLabels = [...highlighted?._groups[0]];
-        //   } else if (outlined?._groups.length) {
-        //     circleLabels = [...outlined?._groups[0]];
-        //   }
-
-        //   if (!!circleLabels.length) {
-        // this.handleBrushedText({ _groups: [circleLabels] });
-        // this.props.onHandleDotClick(
-        //   _,
-        //   circleLabels.map(circle =>
-        //     JSON.parse(circle.attributes.data.value),
-        //   ),
-        //   0,
-        //   // pass true so single selected feature is not unhighlighted
-        //   true,
-        //   false,
-        // );
-        //   }
-        // }
-
         d3.select('#clip-path')
           .selectAll('path')
           .attr('opacity', 0);
@@ -1509,10 +1447,6 @@ class ScatterPlot extends React.PureComponent {
           .delay(100)
           .duration(100)
           .attr('opacity', 1);
-        // ignore selection change if initiated by table filter, it shouldn't change]
-        if (initiatedByTable !== true) {
-          this.props.onHandleScatterPlotBoxSelection(allDataInView);
-        }
       },
     );
   }
@@ -1749,7 +1683,7 @@ class ScatterPlot extends React.PureComponent {
   handleSVGClick() {
     // this.props.onHandleResultsTableLoading(true);
     // this.unhighlightBrushedCircles();
-    // this.props.onHandleVolcanoPlotSelectionChange(
+    // this.props.(
     //   this.state.currentResults,
     //   true,
     // );

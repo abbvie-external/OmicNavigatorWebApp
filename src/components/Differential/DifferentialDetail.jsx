@@ -48,7 +48,6 @@ class DifferentialDetail extends Component {
     animation: 'overlay',
     direction: 'right',
     visible: false,
-    scatterPlotBoxSelection: [],
     allChecked: false,
     enableTabChangeOnSelection: true,
   };
@@ -65,26 +64,13 @@ class DifferentialDetail extends Component {
   componentDidUpdate(prevProps) {
     const { differentialResults } = this.props;
     if (prevProps.differentialResults !== differentialResults) {
-      let data =
-        differentialResults.length !==
-          this.state.scatterPlotBoxSelection.length &&
-        !!this.state.scatterPlotBoxSelection.length
-          ? this.state.scatterPlotBoxSelection
-          : differentialResults;
-
       this.setState({
         allChecked: false,
-        differentialTableData: data,
-        volcanoPlotRows: data?.length || 0,
+        differentialTableData: differentialResults,
+        volcanoPlotRows: differentialResults?.length || 0,
       });
     }
   }
-
-  handleScatterPlotBoxSelection = currentSelection => {
-    this.setState({
-      scatterPlotBoxSelection: currentSelection,
-    });
-  };
 
   pageToFeature = featureToHighlight => {
     if (featureToHighlight) {
@@ -233,10 +219,6 @@ class DifferentialDetail extends Component {
         volcanoPlotRows: 0,
       });
     }
-  };
-
-  handleUpdateDifferentialResults = results => {
-    this.props.onHandleUpdateDifferentialResults(results);
   };
 
   handleItemsPerPageChange = items => {
@@ -918,9 +900,6 @@ class DifferentialDetail extends Component {
                           // getMaxAndMin={this.getMaxAndMin}
                           onHandleDotClick={this.handleDotClick}
                           onPageToFeature={this.pageToFeature}
-                          onHandleScatterPlotBoxSelection={
-                            this.handleScatterPlotBoxSelection
-                          }
                           onResetDifferentialOutlinedFeature={
                             this.props.onResetDifferentialOutlinedFeature
                           }
