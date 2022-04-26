@@ -436,7 +436,6 @@ export const clickDownload = _.debounce(parentNode => {
 export const reviseLayout = (layout, width, height, plotId) => {
   let layoutParsed = layout;
   if (plotId && plotId.includes('heatmaply')) {
-    debugger;
     const layoutString = JSON.stringify(layout);
     const layoutStringReplaced = layoutString.replaceAll(
       '"automargin":true',
