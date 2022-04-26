@@ -106,6 +106,7 @@ class TabOverlay extends Component {
                       height={svgContainerHeight}
                       width={svgContainerWidth}
                       plotName={s.plotType.plotDisplay}
+                      plotId={s.plotType.plotID}
                       plotlyExport={this.props.plotlyExport}
                       plotlyExportType={this.props.plotlyExportType}
                       parentNode={this.props.differentialPlotsOverlayRefFwd}
