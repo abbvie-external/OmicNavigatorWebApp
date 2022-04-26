@@ -97,9 +97,9 @@ class ScatterPlot extends React.PureComponent {
       upperPlotsVisible,
       plotOverlayVisible,
     } = this.props;
+    this.getAxisLabels();
     // if data streaming is false when mounts, it's cached, so we just need to load everything on mount, because it won't get caught in update
     if (!differentialResultsTableStreaming) {
-      this.getAxisLabels();
       window.addEventListener('resize', this.debouncedResizeListener);
       d3.select('#VolcanoChart').remove();
       this.setupVolcano();
@@ -170,7 +170,6 @@ class ScatterPlot extends React.PureComponent {
         prevProps.differentialResultsTableStreaming
       // data finishes streaming
     ) {
-      this.getAxisLabels();
       window.addEventListener('resize', this.debouncedResizeListener);
       const dataInCurrentView =
         this.state.currentResults.length > 0
