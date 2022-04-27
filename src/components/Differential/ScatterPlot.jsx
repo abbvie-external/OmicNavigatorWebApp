@@ -199,13 +199,7 @@ class ScatterPlot extends React.PureComponent {
       d3.select('#VolcanoChart').remove();
       this.setupVolcano();
       this.hexBinning(this.state.currentResults);
-      this.transitionZoom(
-        this.state.currentResults,
-        false,
-        false,
-        false,
-        false,
-      );
+      this.transitionZoom(this.state.currentResults, false, false, false, true);
     } else if (
       (prevProps.isFilteredDifferential && !isFilteredDifferential) ||
       (prevProps.multisetFiltersVisibleParentRef &&
