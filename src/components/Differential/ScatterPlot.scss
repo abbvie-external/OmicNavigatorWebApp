@@ -6,73 +6,18 @@
 
 .volcanoPlotYAxis {
   stroke: #838383;
-  stroke-width: 2px;
+  stroke-width: 2;
 }
 .volcanoPlotXAxis {
   stroke: #838383;
   stroke-width: 1;
 }
-.axisLabel {
-  stroke: #000;
-  font-weight: bold;
-}
 
-.tick text {
-  font-size: 13px;
-}
+// .tick text {
+//   font-size: 13px;
+// }
 
 #VolcanoChart {
   margin-left: 0px !important;
   margin-top: 45px !important;
-}
-
-#VolcanoPlotDiv {
-  // margin-bottom: 5px;
-  .ExportButtonGroup {
-    margin-top: 4px !important;
-    float: right !important;
-  }
-}
-
-.breadcrumb-container {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-
-  .clear-button {
-    margin: 0px 0px 15px 7px;
-    cursor: pointer;
-    &:hover {
-      color: #ff4400;
-    }
-  }
-
-  .ui.steps {
-    .step.active {
-      background-color: #ff4400;
-    }
-  }
-
-  .ui.loader:after,
-  .ui.loader:before {
-    margin: 5px 0px 0px -5px;
-  }
-}
-
-.PlotInstructions {
-  height: 100%;
-}
-
-.PlotInstructionsText {
-  text-align: center !important;
-  margin: 0;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.UsagePadding,
-.OptionsPadding {
-  padding-right: 9px !important;
 }

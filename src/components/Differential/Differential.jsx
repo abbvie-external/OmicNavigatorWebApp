@@ -196,9 +196,17 @@ class Differential extends Component {
       visible: false,
       plotOverlayLoaded: false,
     });
-
+    // differentialResults flow down
+    // and update the table state (differentialTableData)
+    // this callback ensures streaming follows later
+    // so scatter plot lifecycles don't interupt the table from finishing
+    const self = this;
     if (streamingFinished) {
-      this.setState({ differentialResultsTableStreaming: false });
+      // if we need to delay them longer,
+      // setTimeout(function() {
+      // DEV - can we add this back up ^ now?
+      self.setState({ differentialResultsTableStreaming: false });
+      // }, 500);
     }
   };
 
@@ -1428,6 +1436,8 @@ class Differential extends Component {
       differentialNumericFields,
     );
     this.setState({
+      differentialAlphanumericFields,
+      differentialNumericFields,
       multisetColsDifferential: multisetColsDifferentialVar,
     });
     const differentialNumericColumnsMapped = differentialNumericFields.map(

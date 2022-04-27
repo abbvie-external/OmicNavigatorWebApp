@@ -39,7 +39,7 @@ export default class PlotlyMultiFeature extends Component {
 
   getJson = () => {
     const { plotlyData, width, height, plotId } = this.props;
-    const parsedData = JSON.parse(plotlyData);
+    const parsedData = plotlyData ? JSON.parse(plotlyData) : null;
     const data = parsedData?.data || null;
     let layout = parsedData?.layout || null;
     if (layout) {
