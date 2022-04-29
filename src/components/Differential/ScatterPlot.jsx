@@ -33,6 +33,7 @@ class ScatterPlot extends Component {
     xxAxis: '',
     yyAxis: '',
     currentResults: [],
+    zoomedOut: true,
   };
 
   componentDidMount() {
@@ -77,6 +78,7 @@ class ScatterPlot extends Component {
       setTimeout(function() {
         self.highlightBrushedCircles();
       }, 250);
+      this.setState({ zoomedOut: true });
     } else if (
       prevProps.xAxisLabel !== xAxisLabel ||
       prevProps.yAxisLabel !== yAxisLabel ||
@@ -93,21 +95,24 @@ class ScatterPlot extends Component {
       d3.select('#VolcanoChart').remove();
       this.setupVolcano();
       this.hexBinning(allDataInSelectedArea);
-      // Dev - do we need above and below?
+      // DEV - do we need both above and below
       this.transitionZoom(allDataInSelectedArea, false, true, false, true);
     } else if (
-      prevProps.filteredDifferentialTableData.length !== 30 &&
       filteredDifferentialTableData.length !==
-        prevProps.filteredDifferentialTableData.length
+      prevProps.filteredDifferentialTableData.length
     ) {
-      // fired when table data changed (table filter OR set analysis)
-      let allDataInSelectedArea =
-        this.state.currentResults.length > 0
-          ? this.state.currentResults
-          : differentialResultsUnfiltered;
-      // DEV - need to revisit the plot functions, when scatter is hidden
-      // if (upperPlotsVisible && volcanoPlotVisible)
-      this.transitionZoom(allDataInSelectedArea, false, true, false, true);
+      if (this.state.transitioning) {
+        this.setState({ transitioning: false });
+      } else {
+        // fired when table data changed (table filter OR set analysis)
+        let allDataInSelectedArea =
+          this.state.currentResults.length > 0
+            ? this.state.currentResults
+            : differentialResultsUnfiltered;
+        // DEV - need to revisit the plot functions, when scatter is hidden
+        // if (upperPlotsVisible && volcanoPlotVisible)
+        this.transitionZoom(allDataInSelectedArea, false, true, false, true);
+      }
     }
     if (volcanoCircleLabel !== prevProps.volcanoCircleLabel) {
       this.handleCircleLabels();
@@ -182,7 +187,6 @@ class ScatterPlot extends Component {
 
     this.xxAxis = d3.axisTop(xScale).ticks();
     this.yyAxis = d3.axisRight(yScale).ticks();
-
     const svg = d3
       .select('#volcano')
       .append('svg')
@@ -261,18 +265,11 @@ class ScatterPlot extends Component {
     const self = this;
     // Dev - separate dbl from single
     svg.on('dblclick', () => {
-      const { xScale, yScale } = self.scaleFactory(
-        self.props.differentialResultsUnfiltered,
-      );
-      const unfilteredObject = self.parseDataToBinsAndCircles(
-        self.props.differentialResultsUnfiltered,
-        xScale,
-        yScale,
-      );
+      if (this.state.zoomedOut) return;
       self.setState({
-        currentResults: self.props.differentialResultsUnfiltered,
-        bins: unfilteredObject.bins,
-        circles: unfilteredObject.circles,
+        currentResults: [],
+        zoomedOut: true,
+        transitioningDoubleClick: true,
       });
       // this changes filteredTableData in the parent
       // which in componentDidUpdate calls transitionZoom
@@ -281,6 +278,18 @@ class ScatterPlot extends Component {
         true,
       );
     });
+    // cannot call transitionZoom,
+    // because we don't don't what the differential results will look like with current filters applied
+    // svg.on('dblclick', () => {
+    //   this.setState({ transitioning: true });
+    //   this.transitionZoom(
+    //     differentialResultsUnfiltered,
+    //     true,
+    //     false,
+    //     true,
+    //     true,
+    //   );
+    // });
   }
 
   hexBinning(data) {
@@ -292,6 +301,8 @@ class ScatterPlot extends Component {
         xScale,
         yScale,
       );
+      // this.bins = bins;
+      // this.circles = circles;
       this.setState({ bins, circles }, function() {
         this.renderBins(bins);
         this.renderCircles(circles);
@@ -876,12 +887,11 @@ class ScatterPlot extends Component {
           });
         }
       }
-
       this.getToolTip();
     }
   };
 
-  handleCircleLeave = e => {
+  handleCircleLeave(e) {
     d3.selectAll('circle.volcanoPlot-dataPoint').classed('hovered', false);
     const hovered = document.getElementById(this.state.hoveredCircleElement);
     if (hovered != null) {
@@ -912,9 +922,9 @@ class ScatterPlot extends Component {
         });
       }
     }
-  };
+  }
 
-  handleBinLeave = (d, bins) => {
+  handleBinLeave(d, bins) {
     const bin = d3.select(
       `#path-${Math.ceil(d.x)}-${Math.ceil(d.y)}-${d.length}`,
     );
@@ -944,7 +954,7 @@ class ScatterPlot extends Component {
     this.setState({
       hovering: false,
     });
-  };
+  }
 
   getToolTip() {
     const {
@@ -1181,6 +1191,7 @@ class ScatterPlot extends Component {
         .remove();
     }
 
+    // const relevantTableData = doubleClick ? differentialResults : filteredDifferentialTableData;
     const filteredDifferentialTableDataFeatureIds = filteredDifferentialTableData.map(
       tableDataElement => tableDataElement[differentialFeatureIdKey],
     );
@@ -1238,13 +1249,13 @@ class ScatterPlot extends Component {
       self.renderBinsFilter(irrelevantCirclesAndBins.bins);
       self.renderCircles(relevantData);
     } else {
-      self.renderCirclesFilter(dataInView);
+      self.renderCirclesFilter(irrelevantCirclesAndBins.circles);
       self.renderCircles(relevantData);
     }
-    const relevantDataOverride =
-      doubleClick || dataInView.length >= differentialResults.length
-        ? differentialResults
-        : relevantData;
+
+    const relevantDataOverride = doubleClick
+      ? differentialResults
+      : relevantData;
     if (isTableAlreadyAccurate !== true) {
       // only call this if the table has NOT already been updated
       self.props.onHandleVolcanoPlotSelectionChange(
@@ -1386,21 +1397,12 @@ class ScatterPlot extends Component {
             );
             self.props.onReloadMultifeaturePlot(boxSelectionToHighlight);
           } else {
-            // DEFAULT ZOOM AFTER CHECK FOR SHIFT BOX-SELECT
-            const { xScale, yScale } = self.scaleFactory(total);
-            const unfilteredObject = self.parseDataToBinsAndCircles(
-              total,
-              xScale,
-              yScale,
-            );
+            // set this to true so that when lifecycle method is called after table changes, nothing happens
             self.setState({
-              currentResults: total,
-              bins: unfilteredObject.bins,
-              circles: unfilteredObject.circles,
+              transitioning: true,
+              zoomedOut: false,
             });
-            // this changes filteredTableData in the parent
-            // which in componentDidUpdate calls transitionZoom
-            self.props.onHandleVolcanoPlotSelectionChange(total, false);
+            self.transitionZoom(total, false, false, false, true);
           }
           // we are always clearing the box; if desired, place this in
           d3.select('.volcanoPlotD3BrushSelection').call(

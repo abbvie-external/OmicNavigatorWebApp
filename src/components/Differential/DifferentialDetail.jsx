@@ -130,12 +130,17 @@ class DifferentialDetail extends Component {
     // });
     // clear the highlighted rows/dots/svg on svg double-click
     if (clearHighlightedData) {
-      this.pageToFeature();
-      this.props.onHandleHighlightedFeaturesDifferential([]);
-      this.props.onResetDifferentialOutlinedFeature();
-      this.setState({
-        differentialTableData: volcanoPlotSelectedDataArr,
-      });
+      this.setState(
+        {
+          differentialTableData: volcanoPlotSelectedDataArr,
+        },
+        // in callback so scatter reload is priority
+        function() {
+          this.pageToFeature();
+          this.props.onHandleHighlightedFeaturesDifferential([]);
+          this.props.onResetDifferentialOutlinedFeature();
+        },
+      );
       return;
     }
     let allFeatureIdsRemaining = [...volcanoPlotSelectedDataArr].map(
@@ -157,18 +162,19 @@ class DifferentialDetail extends Component {
         this.props.onResetDifferentialOutlinedFeature();
         this.pageToFeature();
       }
-      let sortedData =
-        this.volcanoPlotFilteredGridRef?.current?.qhGridRef?.current?.getSortedData() ||
-        this.props.differentialResults;
-      // const sortDataIds = [...sortedData].map(d => d[this.props.differentialFeatureIdKey]);
-      const volcanoPlotDataArrIds = [...volcanoPlotSelectedDataArr].map(
-        d => d[this.props.differentialFeatureIdKey],
-      );
-      const matchCurrentTableOrder = [...sortedData].filter(d =>
-        volcanoPlotDataArrIds.includes(d[this.props.differentialFeatureIdKey]),
-      );
+      // DEV - this is a bottle neck; we should either add a threshold (e.g. 20K features) or not worry about
+      // let sortedData =
+      //   this.volcanoPlotFilteredGridRef?.current?.qhGridRef?.current?.getSortedData() ||
+      //   this.props.differentialResults;
+      // // const sortDataIds = [...sortedData].map(d => d[this.props.differentialFeatureIdKey]);
+      // const volcanoPlotDataArrIds = [...volcanoPlotSelectedDataArr].map(
+      //   d => d[this.props.differentialFeatureIdKey],
+      // );
+      // const matchCurrentTableOrder = [...sortedData].filter(d =>
+      //   volcanoPlotDataArrIds.includes(d[this.props.differentialFeatureIdKey]),
+      // );
       this.setState({
-        differentialTableData: matchCurrentTableOrder,
+        differentialTableData: volcanoPlotSelectedDataArr,
         volcanoPlotRows: volcanoPlotSelectedDataArr.length,
       });
       if (this.props.plotMultiFeatureAvailable) {
@@ -582,74 +588,79 @@ class DifferentialDetail extends Component {
     let sortedFilteredData =
       this.volcanoPlotFilteredGridRef?.current?.qhGridRef?.current?.getSortedData() ||
       this.props.differentialResults;
-    this.setState({
-      filteredDifferentialTableData: sortedFilteredData,
-      // allChecked: false,
-    });
-    let allFeatureIdsRemaining = [...sortedFilteredData].map(
-      i => i[this.props.differentialFeatureIdKey],
-    );
-    let isOutlinedFeatureInView = allFeatureIdsRemaining.includes(
-      this.props.differentialOutlinedFeature,
-    );
-    if (sortedFilteredData.length > 0) {
-      const self = this;
-      // IF DATA
-      if (isOutlinedFeatureInView) {
-        // PAGE TO OUTLINED FEATURE IF IT REMAINS
-        setTimeout(function() {
-          self.pageToFeature(self.props.differentialOutlinedFeature);
-        }, 500);
-      } else {
-        // CLEAR OUTLINED FEATURE IF IT DOES NOT REMAIN, AND PAGE TO 0
-        this.props.onResetDifferentialOutlinedFeature();
-        this.pageToFeature();
-      }
-      if (this.props.plotMultiFeatureAvailable) {
-        // IF MULTI-FEATURE PLOTTING AVAILABLE AND THERE IS DATA
-        let multiselectedFeaturesArrRemaining = [
-          ...sortedFilteredData,
-        ].filter(item =>
-          self.props.differentialHighlightedFeatures.includes(
-            item[self.props.differentialFeatureIdKey],
-          ),
+    this.setState(
+      {
+        filteredDifferentialTableData: sortedFilteredData,
+        // allChecked: false,
+      },
+      function() {
+        // DEV - test whether we want the rest of this in a callback, so scatter loads faster...
+        let allFeatureIdsRemaining = [...sortedFilteredData].map(
+          i => i[this.props.differentialFeatureIdKey],
         );
-        if (
-          self.props.differentialHighlightedFeatures.length !==
-          multiselectedFeaturesArrRemaining.length
-        ) {
-          // IF CHECKED FEATURES LENGTH IS DIFFERENT THAN EXISTING
-          if (multiselectedFeaturesArrRemaining.length) {
-            // IF CHECKED FEATURES REMAIN, GET NEW SVG
-            let multiselectedFeaturesArrMappedRemaining = [
-              ...multiselectedFeaturesArrRemaining,
-            ].map(item => ({
-              id: item[self.props.differentialFeatureIdKey],
-              value: item[self.props.differentialFeatureIdKey],
-              key: item[self.props.differentialFeatureIdKey],
-            }));
-            this.props.onHandleHighlightedFeaturesDifferential(
-              multiselectedFeaturesArrMappedRemaining,
-              true,
-            );
-            let multiselectedFeatureIdsMappedRemaining = [
-              ...multiselectedFeaturesArrRemaining,
-            ].map(item => item[self.props.differentialFeatureIdKey]);
-            this.reloadMultifeaturePlot(
-              multiselectedFeatureIdsMappedRemaining,
-              true,
-            );
+        let isOutlinedFeatureInView = allFeatureIdsRemaining.includes(
+          this.props.differentialOutlinedFeature,
+        );
+        if (sortedFilteredData.length > 0) {
+          const self = this;
+          // IF DATA
+          if (isOutlinedFeatureInView) {
+            // PAGE TO OUTLINED FEATURE IF IT REMAINS
+            setTimeout(function() {
+              self.pageToFeature(self.props.differentialOutlinedFeature);
+            }, 500);
           } else {
-            // no highlighted after table filter
-            this.props.onHandleHighlightedFeaturesDifferential([]);
+            // CLEAR OUTLINED FEATURE IF IT DOES NOT REMAIN, AND PAGE TO 0
+            this.props.onResetDifferentialOutlinedFeature();
+            this.pageToFeature();
           }
+          if (this.props.plotMultiFeatureAvailable) {
+            // IF MULTI-FEATURE PLOTTING AVAILABLE AND THERE IS DATA
+            let multiselectedFeaturesArrRemaining = [
+              ...sortedFilteredData,
+            ].filter(item =>
+              self.props.differentialHighlightedFeatures.includes(
+                item[self.props.differentialFeatureIdKey],
+              ),
+            );
+            if (
+              self.props.differentialHighlightedFeatures.length !==
+              multiselectedFeaturesArrRemaining.length
+            ) {
+              // IF CHECKED FEATURES LENGTH IS DIFFERENT THAN EXISTING
+              if (multiselectedFeaturesArrRemaining.length) {
+                // IF CHECKED FEATURES REMAIN, GET NEW SVG
+                let multiselectedFeaturesArrMappedRemaining = [
+                  ...multiselectedFeaturesArrRemaining,
+                ].map(item => ({
+                  id: item[self.props.differentialFeatureIdKey],
+                  value: item[self.props.differentialFeatureIdKey],
+                  key: item[self.props.differentialFeatureIdKey],
+                }));
+                this.props.onHandleHighlightedFeaturesDifferential(
+                  multiselectedFeaturesArrMappedRemaining,
+                  true,
+                );
+                let multiselectedFeatureIdsMappedRemaining = [
+                  ...multiselectedFeaturesArrRemaining,
+                ].map(item => item[self.props.differentialFeatureIdKey]);
+                this.reloadMultifeaturePlot(
+                  multiselectedFeatureIdsMappedRemaining,
+                  true,
+                );
+              } else {
+                // no highlighted after table filter
+                this.props.onHandleHighlightedFeaturesDifferential([]);
+              }
+            }
+          }
+        } else {
+          this.props.onHandleHighlightedFeaturesDifferential([]);
+          this.props.onResetDifferentialOutlinedFeature();
+          this.pageToFeature();
         }
-      }
-    } else {
-      this.props.onHandleHighlightedFeaturesDifferential([]);
-      this.props.onResetDifferentialOutlinedFeature();
-      this.pageToFeature();
-    }
+      },
+    );
   };
 
   toggleAllCheckboxes = () => {
@@ -889,7 +900,6 @@ class DifferentialDetail extends Component {
         // getMaxAndMin={this.getMaxAndMin}
         onHandleDotClick={this.handleDotClick}
         onPageToFeature={this.pageToFeature}
-        onHandleScatterPlotBoxSelection={this.handleScatterPlotBoxSelection}
         onHandleUpdateDifferentialResults={
           this.props.onHandleUpdateDifferentialResults
         }

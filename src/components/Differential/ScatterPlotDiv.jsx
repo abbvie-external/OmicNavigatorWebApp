@@ -645,9 +645,6 @@ class ScatterPlotDiv extends Component {
             onHandleHighlightedFeaturesDifferential={
               this.props.onHandleHighlightedFeaturesDifferential
             }
-            onHandleScatterPlotBoxSelection={
-              this.props.onHandleScatterPlotBoxSelection
-            }
             onHandleUpdateDifferentialResults={
               this.props.onHandleUpdateDifferentialResults
             }
