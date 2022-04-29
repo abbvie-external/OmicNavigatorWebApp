@@ -417,7 +417,6 @@ class ScatterPlotDiv extends Component {
               onClose={e => this.toggleOptionsPopup(e, null, true)}
               closeOnDocumentClick
               closeOnEscape
-              hideOnScroll
             >
               <Popup.Content
                 id="VolcanoOptionsPopupContent"
@@ -614,7 +613,7 @@ class ScatterPlotDiv extends Component {
             // state
             doXAxisTransformation={doXAxisTransformation}
             doYAxisTransformation={doYAxisTransformation}
-            optionssOpen={optionsOpen}
+            optionsOpen={optionsOpen}
             volcanoCircleLabel={volcanoCircleLabel}
             xAxisLabel={xAxisLabel}
             yAxisLabel={yAxisLabel}
@@ -656,6 +655,9 @@ class ScatterPlotDiv extends Component {
               this.props.onResetDifferentialOutlinedFeature
             }
             onReloadMultifeaturePlot={this.props.onReloadMultifeaturePlot}
+            differentialResultsTableLoading={
+              this.props.differentialResultsTableLoading
+            }
           />
         </>
       );

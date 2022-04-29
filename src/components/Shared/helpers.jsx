@@ -340,6 +340,12 @@ export const loadingDimmer = (
   </Dimmer>
 );
 
+export const loadingDimmerGeneric = (
+  <Dimmer active inverted>
+    <Loader size="large">Loading</Loader>
+  </Dimmer>
+);
+
 export function getWindowWidth() {
   return Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
 }
