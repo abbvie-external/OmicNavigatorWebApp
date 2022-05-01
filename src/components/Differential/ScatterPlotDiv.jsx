@@ -623,11 +623,12 @@ class ScatterPlotDiv extends Component {
             differentialOutlinedFeature={differentialOutlinedFeature}
             differentialResults={differentialResults}
             differentialResultsUnfiltered={differentialResultsUnfiltered}
-            differentialTableData={differentialTableData}
             differentialResultsTableStreaming={
               differentialResultsTableStreaming
             }
+            differentialTableData={differentialTableData}
             filteredDifferentialTableData={filteredDifferentialTableData}
+            differentialTest={differentialTest}
             isFilteredDifferential={isFilteredDifferential}
             multisetFiltersVisibleParentRef={
               this.props.multisetFiltersVisibleParentRef
@@ -644,9 +645,6 @@ class ScatterPlotDiv extends Component {
             onPageToFeature={this.props.onPageToFeature}
             onHandleHighlightedFeaturesDifferential={
               this.props.onHandleHighlightedFeaturesDifferential
-            }
-            onHandleScatterPlotBoxSelection={
-              this.props.onHandleScatterPlotBoxSelection
             }
             onHandleUpdateDifferentialResults={
               this.props.onHandleUpdateDifferentialResults
