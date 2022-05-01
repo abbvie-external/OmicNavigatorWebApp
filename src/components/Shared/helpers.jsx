@@ -126,7 +126,7 @@ export function separateItemValues(value) {
 }
 
 export function formatNumberForDisplay(num) {
-  if (!isNaN(num)) {
+  if (parseFloat(num) !== +num) {
     const number = Math.abs(num);
     if (number === 0) {
       return num;
@@ -140,7 +140,7 @@ export function formatNumberForDisplay(num) {
       // * If a number is < 1 & >= .001, report this value with three decimal places
       // PN - what's left is >=1 and <1000, guess that goes to 3 digits too
     } else {
-      return num.toPrecision(3);
+      return num?.toPrecision(3);
     }
   } else return null;
 }
