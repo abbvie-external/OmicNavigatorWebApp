@@ -218,7 +218,14 @@ class ScatterPlot extends Component {
       .attr('height', upperPlotsHeight + 20)
       .attr('id', 'VolcanoChart')
       .attr('class', 'VolcanoPlotSVG')
-      .on('click', () => this.handleSVGClick());
+      .on('click', () => {
+        if (this.props.optionsOpen) return;
+        this.handleSVGClick(false);
+      })
+      .on('dblclick', () => {
+        if (this.props.optionsOpen) return;
+        this.handleSVGClick(true);
+      });
 
     svg
       .append('defs')
@@ -288,20 +295,7 @@ class ScatterPlot extends Component {
       });
     const self = this;
     // Dev - separate dbl from single
-    svg.on('dblclick', () => {
-      if (this.state.zoomedOut) return;
-      self.setState({
-        currentResults: [],
-        zoomedOut: true,
-        transitioningDoubleClick: true,
-      });
-      // this changes filteredTableData in the parent
-      // which in componentDidUpdate calls transition zoom
-      self.props.onHandleVolcanoPlotSelectionChange(
-        self.props.differentialResults,
-        true,
-      );
-    });
+
     // cannot call transition zoom,
     // because we don't don't what the differential results will look like with current filters applied
     // svg.on('dblclick', () => {
@@ -1616,23 +1610,25 @@ class ScatterPlot extends Component {
     }
   };
 
-  handleSVGClick() {
-    // this.props.onHandleResultsTableLoading(true);
-    // this.unhighlightBrushedCircles();
-    // this.props.(
-    //   this.state.currentResults,
-    //   true,
-    // );
-    // this.setState({
-    //   brushing: false,
-    //   resizeScalarX: 1,
-    //   resizeScalarY: 1,
-    //   volcanoCircleText: [],
-    // });
-    if (this.state.optionsOpen) return;
-    this.props.onResetDifferentialOutlinedFeature();
-    this.props.onHandleHighlightedFeaturesDifferential([], false);
-  }
+  handleSVGClick = _.debounce(function(doubleClick) {
+    if (doubleClick) {
+      if (this.state.zoomedOut) return;
+      this.setState({
+        zoomedOut: true,
+        // transitioningDoubleClick: true,
+        currentResults: [],
+      });
+      // this changes filteredTableData in the parent
+      // which in componentDidUpdate calls transition zoom
+      this.props.onHandleVolcanoPlotSelectionChange(
+        this.props.differentialResults,
+        false,
+      );
+    } else {
+      this.props.onResetDifferentialOutlinedFeature();
+      this.props.onHandleHighlightedFeaturesDifferential([], false);
+    }
+  }, 250);
 
   getXAxisLabelY(upperPlotsHeight) {
     if (upperPlotsHeight < 300) {
