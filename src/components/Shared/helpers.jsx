@@ -460,3 +460,7 @@ export const reviseLayout = (layout, width, height, plotId) => {
   layoutParsed.height = Math.floor(height * 0.9);
   return layoutParsed;
 };
+
+export function isNotNANullUndefinedEmptyString(o) {
+  return typeof o !== 'undefined' && o !== null && o !== 'NA' && o !== '';
+}
