@@ -653,9 +653,7 @@ class ScatterPlotDiv extends Component {
               this.props.onResetDifferentialOutlinedFeature
             }
             onReloadMultifeaturePlot={this.props.onReloadMultifeaturePlot}
-            differentialResultsTableLoading={
-              this.props.differentialResultsTableLoading
-            }
+            upperPlotsVisible={this.props.upperPlotsVisible}
           />
         </>
       );

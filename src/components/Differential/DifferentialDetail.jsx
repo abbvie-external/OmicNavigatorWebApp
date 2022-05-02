@@ -43,7 +43,7 @@ class DifferentialDetail extends Component {
     // differentialTableData: [],
     filteredDifferentialTableData: [],
     itemsPerPageVolcanoTable:
-      parseInt(localStorage.getItem('itemsPerPageVolcanoTable'), 10) || 30,
+      parseInt(localStorage.getItem('itemsPerPageVolcanoTable'), 10) || 15,
     // volcanoPlotRows: 0,
     animation: 'overlay',
     direction: 'right',
