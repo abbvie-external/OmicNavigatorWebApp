@@ -44,7 +44,6 @@ class ScatterPlot extends Component {
     } = this.props;
     // prevent any scatter plot activity when it is not visible
     if (!volcanoPlotVisible || !upperPlotsVisible) return;
-    window.addEventListener('resize', this.debouncedResizeListener);
     d3.select('#VolcanoChart').remove();
     this.setupVolcano();
     this.hexBinning(differentialResultsUnfiltered);
@@ -152,16 +151,7 @@ class ScatterPlot extends Component {
 
   componentWillUnmount() {
     d3.select('#VolcanoChart').remove();
-    window.removeEventListener('resize', this.debouncedResizeListener);
   }
-
-  debouncedResizeListener = () => {
-    let resizedFn;
-    clearTimeout(resizedFn);
-    resizedFn = _.debounce(() => {
-      this.windowResized();
-    }, 200);
-  };
 
   clearState = () => {
     // Dev - when should we call this?
@@ -291,20 +281,6 @@ class ScatterPlot extends Component {
       .text(function() {
         return doXAxisTransformation ? '-log(' + xAxisLabel + ')' : xAxisLabel;
       });
-    const self = this;
-    // Dev - separate dbl from single
-
-    // cannot call transition zoom,
-    // because we don't don't what the differential results will look like with current filters applied
-    // svg.on('dblclick', () => {
-    //   this.setState({ transitioning: true });
-    //   this.transition zoom(
-    //     differentialResultsUnfiltered,
-    //     true,
-    //     false,
-    //     true,
-    //   );
-    // });
   }
 
   hexBinning(data) {
@@ -640,13 +616,6 @@ class ScatterPlot extends Component {
   resizeBrushSelection = () => {
     this.removeScatterBrush();
     // add resizing later after priorities
-  };
-
-  windowResized = () => {
-    d3.select('#VolcanoChart').remove();
-    this.setupVolcano();
-    this.hexBinning(this.state.currentResults);
-    this.transitionZoom(this.state.currentResults, false, false, true);
   };
 
   doTransform(value, axis) {
@@ -1296,7 +1265,9 @@ class ScatterPlot extends Component {
     }
 
     if (isTableAlreadyAccurate !== true) {
-      // only call this if the table has NOT already been updated
+      // this is only called on DEFAULT scatter plot box select
+      // the table needs to be updated, but when it does,
+      // we have a "transitioning" flag to ensure we don't rerender the scatter plot
       self.props.onHandleVolcanoPlotSelectionChange(
         relevantData,
         clearHighlightedData,
@@ -1434,7 +1405,8 @@ class ScatterPlot extends Component {
             );
             self.props.onReloadMultifeaturePlot(boxSelectionToHighlight);
           } else {
-            // set this to true so that when lifecycle method is called after table changes, nothing happens
+            // DEFAULT SCATTER PLOT BOX SELECT
+            // set 'transitioning' to true so that when componentDidUpdate is called after table data changes, nothing happens
             self.setState({
               transitioning: true,
               zoomedOut: false,
