@@ -564,9 +564,18 @@ class ScatterPlotDiv extends Component {
                   <List.Item>
                     <Icon name="zoom out" />
                     <List.Content>
-                      <List.Header>Zoom Out / Clear Filters</List.Header>
+                      <List.Header>Zoom Out</List.Header>
                       <List.Description>
                         Double click on an area without circles
+                      </List.Description>
+                    </List.Content>
+                  </List.Item>
+                  <List.Item>
+                    <Icon name="remove" />
+                    <List.Content>
+                      <List.Header>Remove Plot Selection</List.Header>
+                      <List.Description>
+                        Single click on an area without circles
                       </List.Description>
                     </List.Content>
                   </List.Item>
