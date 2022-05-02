@@ -37,7 +37,13 @@ class ScatterPlot extends Component {
   };
 
   componentDidMount() {
-    const { differentialResultsUnfiltered } = this.props;
+    const {
+      differentialResultsUnfiltered,
+      volcanoPlotVisible,
+      upperPlotsVisible,
+    } = this.props;
+    // prevent any scatter plot activity when it is not visible
+    if (!volcanoPlotVisible || !upperPlotsVisible) return;
     window.addEventListener('resize', this.debouncedResizeListener);
     d3.select('#VolcanoChart').remove();
     this.setupVolcano();
@@ -58,7 +64,20 @@ class ScatterPlot extends Component {
       yAxisLabel,
       doXAxisTransformation,
       doYAxisTransformation,
+      volcanoPlotVisible,
+      upperPlotsVisible,
     } = this.props;
+    if (
+      (!upperPlotsVisible &&
+        upperPlotsVisible !== prevProps.upperPlotsVisible) ||
+      (!volcanoPlotVisible &&
+        volcanoPlotVisible !== prevProps.volcanoPlotVisible)
+    ) {
+      // scatter plot closes, remove scatter
+      d3.select('#VolcanoChart').remove();
+    }
+    // prevent any scatter plot activity when it is not visible
+    if (!volcanoPlotVisible || !upperPlotsVisible) return;
     // this if/else if/else if statement in place to minimize re-renders - should cover all situations
     if (differentialTest !== prevProps.differentialTest) {
       // if the test is changed and data is cached, it won't stream, and this needs to run
@@ -67,6 +86,21 @@ class ScatterPlot extends Component {
       this.setupVolcano();
       this.hexBinning(differentialResultsUnfiltered);
       this.setState({ zoomedOut: true });
+    } else if (
+      upperPlotsVisible &&
+      volcanoPlotVisible &&
+      (volcanoPlotVisible !== prevProps.volcanoPlotVisible ||
+        upperPlotsVisible !== prevProps.upperPlotsVisible)
+      // scatter plot opens
+    ) {
+      let allDataInSelectedArea =
+        this.state.currentResults.length > 0
+          ? this.state.currentResults
+          : differentialResultsUnfiltered;
+      this.setupVolcano();
+      this.hexBinning(allDataInSelectedArea);
+      // DEV - do we need both above and below
+      this.transitionZoom(allDataInSelectedArea, false, true, true);
     } else if (
       prevProps.xAxisLabel !== xAxisLabel ||
       prevProps.yAxisLabel !== yAxisLabel ||
@@ -89,12 +123,12 @@ class ScatterPlot extends Component {
       filteredDifferentialTableData.length !==
       prevProps.filteredDifferentialTableData.length
     ) {
+      // fired when table data changed (table filter OR set analysis)
       if (this.state.transitioning) {
         // if "transitioning" is true, this lifecycle method occurred
         // after a brush box selection zoom event, and has already rerendered the plot
         this.setState({ transitioning: false });
       } else {
-        // fired when table data changed (table filter OR set analysis)
         let allDataInSelectedArea =
           this.state.currentResults.length > 0
             ? this.state.currentResults
@@ -1189,7 +1223,6 @@ class ScatterPlot extends Component {
     // WE MUST CALCULTATE RELEVANT AND IRRELEVANT BINS/CIRCLES
     let irrelevantData = [];
     let relevantData = [];
-    debugger;
     if (
       !transitioning &&
       allFilteredDifferentialTableDataFeatureIds.length ===
@@ -1202,7 +1235,7 @@ class ScatterPlot extends Component {
       // OTHERWISE THERE IS A ZOOM OR TABLE FILTER IN EFFECT
       // AND WE MUST FIND THE INTERSECTION AND DIFFERENCE
       // BETWEEN THE TABLE DATA AND (POSSIBLY ZOOMED) VIEW
-      console.time('forEach + includes');
+      // console.time('forEach + includes');
       // [...dataInSelection].forEach(obj => {
       //   if (
       //     allFilteredDifferentialTableDataFeatureIds.includes(
@@ -1225,7 +1258,7 @@ class ScatterPlot extends Component {
           relevantData.push(obj);
         }
       });
-      console.timeEnd('forEach + includes');
+      // console.timeEnd('forEach + includes');
 
       // console.time('forEach + i');
       // let counterRelevant = 0;
