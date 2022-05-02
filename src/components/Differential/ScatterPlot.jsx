@@ -34,6 +34,7 @@ class ScatterPlot extends Component {
     yyAxis: '',
     currentResults: [],
     zoomedOut: true,
+    transitioning: true,
   };
 
   componentDidMount() {
@@ -130,7 +131,7 @@ class ScatterPlot extends Component {
       if (this.state.transitioning) {
         // BOX SELECT TRANSTION
         // if "transitioning" is true, this lifecycle method occurred
-        // after a brush box selection zoom event,
+        // after a brush box selection zoom event (OR by default on componentDidMount),
         // and has already rerendered the plot
         this.setState({ transitioning: false });
       } else {
@@ -1281,8 +1282,9 @@ class ScatterPlot extends Component {
       // the table needs to be updated, but when it does,
       // we have a "transitioning" flag to ensure we don't rerender the scatter plot
       self.props.onHandleVolcanoPlotSelectionChange(
-        relevantData,
-        clearHighlightedData,
+        relevantData, // new data for table
+        clearHighlightedData, // clear highlighted data and plots
+        false, // double click flag
       );
     }
   }
@@ -1609,8 +1611,9 @@ class ScatterPlot extends Component {
       // BUT if the data hasn't changed length it ensure rerender
       // with a "transitioningDoubleClick" flag
       this.props.onHandleVolcanoPlotSelectionChange(
-        this.props.differentialResults,
-        false,
+        this.props.differentialResults, // reset data
+        false, // clear highlighted data and plots
+        true, // double click flag
       );
     } else {
       this.props.onResetDifferentialOutlinedFeature();
