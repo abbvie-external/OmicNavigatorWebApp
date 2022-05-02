@@ -41,12 +41,14 @@ class ScatterPlot extends Component {
       differentialResultsUnfiltered,
       volcanoPlotVisible,
       upperPlotsVisible,
+      volcanoWidth,
+      upperPlotsHeight,
     } = this.props;
     // prevent any scatter plot activity when it is not visible
     if (!volcanoPlotVisible || !upperPlotsVisible) return;
-    d3.select('#VolcanoChart').remove();
     this.setupVolcano();
     this.hexBinning(differentialResultsUnfiltered);
+    this.setupBrush(volcanoWidth, upperPlotsHeight);
   }
 
   componentDidUpdate(prevProps) {
@@ -83,7 +85,8 @@ class ScatterPlot extends Component {
       this.clearState();
       d3.select('#VolcanoChart').remove();
       this.setupVolcano();
-      this.hexBinning(differentialResultsUnfiltered);
+      this.transitionZoom(differentialResultsUnfiltered, false, true, true);
+      this.setupBrush(volcanoWidth, upperPlotsHeight);
       this.setState({ zoomedOut: true });
     } else if (
       upperPlotsVisible &&
@@ -96,10 +99,10 @@ class ScatterPlot extends Component {
         this.state.currentResults.length > 0
           ? this.state.currentResults
           : differentialResultsUnfiltered;
+      d3.select('#VolcanoChart').remove();
       this.setupVolcano();
-      this.hexBinning(allDataInSelectedArea);
-      // DEV - do we need both above and below
       this.transitionZoom(allDataInSelectedArea, false, true, true);
+      this.setupBrush(volcanoWidth, upperPlotsHeight);
     } else if (
       prevProps.xAxisLabel !== xAxisLabel ||
       prevProps.yAxisLabel !== yAxisLabel ||
@@ -115,19 +118,30 @@ class ScatterPlot extends Component {
           : differentialResultsUnfiltered;
       d3.select('#VolcanoChart').remove();
       this.setupVolcano();
-      this.hexBinning(allDataInSelectedArea);
-      // DEV - do we need both above and below
       this.transitionZoom(allDataInSelectedArea, false, true, true);
+      this.setupBrush(volcanoWidth, upperPlotsHeight);
     } else if (
       filteredDifferentialTableData.length !==
-      prevProps.filteredDifferentialTableData.length
+        prevProps.filteredDifferentialTableData.length ||
+      this.state.transitioningDoubleClick
     ) {
       // fired when table data changed (table filter OR set analysis)
+      // OR we are transitioning after double-click (even when data length isn't changed)
       if (this.state.transitioning) {
+        // BOX SELECT TRANSTION
         // if "transitioning" is true, this lifecycle method occurred
-        // after a brush box selection zoom event, and has already rerendered the plot
+        // after a brush box selection zoom event,
+        // and has already rerendered the plot
         this.setState({ transitioning: false });
       } else {
+        if (this.state.transitioningDoubleClick) {
+          // DOUBLE-CLICK TRANSITION
+          this.setState({ transitioningDoubleClick: false });
+          d3.select('#VolcanoChart').remove();
+          this.setupVolcano();
+          this.setupBrush(volcanoWidth, upperPlotsHeight);
+        }
+        // TABLE FILTER OR SET ANALYSIS - only run this!
         let allDataInSelectedArea =
           this.state.currentResults.length > 0
             ? this.state.currentResults
@@ -284,7 +298,6 @@ class ScatterPlot extends Component {
   }
 
   hexBinning(data) {
-    const { volcanoWidth, upperPlotsHeight } = this.props;
     if (data.length > 2500) {
       const { xScale, yScale } = this.scaleFactory(data);
       const { bins, circles } = this.parseDataToBinsAndCircles(
@@ -302,7 +315,6 @@ class ScatterPlot extends Component {
       this.scaleFactory(data);
       this.renderCircles(data);
     }
-    this.setupBrush(volcanoWidth, upperPlotsHeight);
   }
 
   determineBinColor(binArray, length) {
@@ -1412,6 +1424,10 @@ class ScatterPlot extends Component {
               zoomedOut: false,
             });
             self.transitionZoom(total, false, false, true);
+            self.setupBrush(
+              self.props.volcanoWidth,
+              self.props.upperPlotsHeight,
+            );
           }
           // we are always clearing the box; if desired, place this in
           d3.select('.volcanoPlotD3BrushSelection').call(
@@ -1585,11 +1601,13 @@ class ScatterPlot extends Component {
       if (this.state.zoomedOut) return;
       this.setState({
         zoomedOut: true,
-        // transitioningDoubleClick: true,
+        transitioningDoubleClick: true,
         currentResults: [],
       });
       // this changes filteredTableData in the parent
       // which in componentDidUpdate calls transition zoom
+      // BUT if the data hasn't changed length it ensure rerender
+      // with a "transitioningDoubleClick" flag
       this.props.onHandleVolcanoPlotSelectionChange(
         this.props.differentialResults,
         false,
