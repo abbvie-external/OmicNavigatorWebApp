@@ -195,19 +195,21 @@ class Differential extends Component {
       multisetButttonActiveDifferential: false,
       visible: false,
       plotOverlayLoaded: false,
+      differentialResultsTableStreaming: !streamingFinished,
     });
+    // if needed...
     // differentialResults flow down
     // and update the table state (differentialTableData)
     // this callback ensures streaming follows later
     // so scatter plot lifecycles don't interupt the table from finishing
-    const self = this;
-    if (streamingFinished) {
-      // if we need to delay them longer,
-      // setTimeout(function() {
-      // DEV - can we add this back up ^ now?
-      self.setState({ differentialResultsTableStreaming: false });
-      // }, 500);
-    }
+    // const self = this;
+    // if (streamingFinished) {
+    // if we need to delay them longer,
+    // setTimeout(function() {
+    // DEV - can we add this back up ^ now?
+    // self.setState({ differentialResultsTableStreaming: false });
+    // }, 500);
+    // }
   };
 
   handleResultsTableLoading = bool => {
