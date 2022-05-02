@@ -1,7 +1,11 @@
 import React, { Component } from 'react';
 import { Popup } from 'semantic-ui-react';
 // import _ from 'lodash';
-import { formatNumberForDisplay, splitValue } from '../Shared/helpers';
+import {
+  isNotNANullUndefinedEmptyString,
+  formatNumberForDisplay,
+  splitValue,
+} from '../Shared/helpers';
 import './MetafeaturesTable.scss';
 import { omicNavigatorService } from '../../services/omicNavigator.service';
 // import { CancelToken } from 'axios';
@@ -69,9 +73,6 @@ class MetafeaturesTable extends Component {
       };
       let metafeaturesAlphanumericFields = [];
       let metafeaturesNumericFields = [];
-      function isNotNANorNullNorUndefined(o) {
-        return typeof o !== 'undefined' && o !== null && o !== 'NA';
-      }
       if (data.length < 1) return;
       // grab first object
       const firstFullObject = data.length > 0 ? [...data][0] : null;
@@ -85,7 +86,7 @@ class MetafeaturesTable extends Component {
           // loop through data, one property at a time
           const notNullObject = dataCopy.find(row => {
             // find the first value for that property
-            return isNotNANorNullNorUndefined(row[property]);
+            return isNotNANullUndefinedEmptyString(row[property]);
           });
           let notNullValue = null;
           if (notNullObject) {

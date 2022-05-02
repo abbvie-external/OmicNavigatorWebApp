@@ -12,6 +12,7 @@ import {
   Dimmer,
   List,
 } from 'semantic-ui-react';
+import { isNotNANullUndefinedEmptyString } from '../Shared/helpers';
 import ButtonActions from '../Shared/ButtonActions';
 import ScatterPlot from './ScatterPlot';
 import './ScatterPlotDiv.scss';
@@ -161,9 +162,6 @@ class ScatterPlotDiv extends Component {
     if (differentialResults.length < 1) return;
     let differentialAlphanumericFields = [];
     let relevantConfigColumns = [];
-    function isNotNANorNullNorUndefined(o) {
-      return typeof o !== 'undefined' && o !== null && o !== 'NA';
-    }
     // grab first object
     const firstFullObject =
       differentialResults.length > 0 ? [...differentialResults][0] : null;
@@ -177,7 +175,7 @@ class ScatterPlotDiv extends Component {
         // loop through data, one property at a time
         const notNullObject = dataCopy.find(row => {
           // find the first value for that property
-          return isNotNANorNullNorUndefined(row[property]);
+          return isNotNANullUndefinedEmptyString(row[property]);
         });
         let notNullValue = null;
         if (notNullObject) {

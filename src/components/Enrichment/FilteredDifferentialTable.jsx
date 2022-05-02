@@ -2,7 +2,12 @@ import React, { Component } from 'react';
 import { Popup, Dimmer, Loader } from 'semantic-ui-react';
 import { omicNavigatorService } from '../../services/omicNavigator.service';
 import _ from 'lodash';
-import { formatNumberForDisplay, splitValue, Linkout } from '../Shared/helpers';
+import {
+  isNotNANullUndefinedEmptyString,
+  formatNumberForDisplay,
+  splitValue,
+  Linkout,
+} from '../Shared/helpers';
 import './FilteredDifferentialTable.scss';
 import { CancelToken } from 'axios';
 import CustomEmptyMessage from '../Shared/Templates';
@@ -168,9 +173,6 @@ class FilteredDifferentialTable extends Component {
     };
     let filteredDifferentialAlphanumericFields = [];
     let filteredDifferentialNumericFields = [];
-    function isNotNANorNullNorUndefined(o) {
-      return typeof o !== 'undefined' && o !== null && o !== 'NA';
-    }
     if (dataFromService.length < 1) return;
     // grab first object
     const firstFullObject =
@@ -185,7 +187,7 @@ class FilteredDifferentialTable extends Component {
         // loop through data, one property at a time
         const notNullObject = dataCopy.find(row => {
           // find the first value for that property
-          return isNotNANorNullNorUndefined(row[property]);
+          return isNotNANullUndefinedEmptyString(row[property]);
         });
         let notNullValue = null;
         if (notNullObject) {

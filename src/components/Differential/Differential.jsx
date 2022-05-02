@@ -7,6 +7,7 @@ import { withRouter } from 'react-router-dom';
 import SVG from 'react-inlinesvg';
 import { toast } from 'react-toastify';
 import {
+  isNotNANullUndefinedEmptyString,
   formatNumberForDisplay,
   splitValue,
   Linkout,
@@ -1290,10 +1291,6 @@ class Differential extends Component {
     };
     let differentialAlphanumericFields = [];
     let differentialNumericFields = [];
-    function isNotNANorNullNorUndefined(o) {
-      return typeof o !== 'undefined' && o !== null && o !== 'NA';
-    }
-
     if (differentialResultsVar.length < 1) return;
     // grab first object
     const firstFullObject =
@@ -1308,7 +1305,7 @@ class Differential extends Component {
         // loop through data, one property at a time
         const notNullObject = dataCopy.find(row => {
           // find the first value for that property
-          return isNotNANorNullNorUndefined(row[property]);
+          return isNotNANullUndefinedEmptyString(row[property]);
         });
         let notNullValue = null;
         if (notNullObject) {
