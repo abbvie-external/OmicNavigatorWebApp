@@ -133,8 +133,6 @@ class ScatterPlot extends Component {
           this.state.currentResults.length > 0
             ? this.state.currentResults
             : differentialResultsUnfiltered;
-        // DEV - need to revisit the plot functions, when scatter is hidden
-        // if (upperPlotsVisible && volcanoPlotVisible)
         this.transitionZoom(allDataInSelectedArea, false, true, true);
       }
     }

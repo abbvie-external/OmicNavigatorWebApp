@@ -890,7 +890,7 @@ class DifferentialDetail extends Component {
       <ScatterPlotDiv
         {...this.state}
         {...this.props}
-        // PAUL - drill just as needed!
+        // DEV - drill just as needed!
         onHandleHighlightedFeaturesDifferential={
           this.props.onHandleHighlightedFeaturesDifferential
         }
