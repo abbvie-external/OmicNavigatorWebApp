@@ -1435,6 +1435,12 @@ class Differential extends Component {
         };
       },
     );
+    const multisetColsDifferentialVar = this.listToJson(
+      differentialNumericFields,
+    );
+    this.setState({
+      multisetColsDifferential: multisetColsDifferentialVar,
+    });
     const differentialNumericColumnsMapped = differentialNumericFields.map(
       c => {
         return {
@@ -1495,12 +1501,6 @@ class Differential extends Component {
     const configCols = checkboxAndAlphanumericCols.concat(
       differentialNumericColumnsMapped,
     );
-    const multisetColsDifferentialVar = this.listToJson(
-      differentialNumericFields,
-    );
-    this.setState({
-      multisetColsDifferential: multisetColsDifferentialVar,
-    });
     return configCols;
   };
 
