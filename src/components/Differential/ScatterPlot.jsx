@@ -1181,6 +1181,7 @@ class ScatterPlot extends Component {
     xScale,
     yScale,
     clearHighlightedData,
+    brushing,
   ) {
     const self = this;
     const {
@@ -1210,6 +1211,32 @@ class ScatterPlot extends Component {
       // OTHERWISE THERE IS A ZOOM OR TABLE FILTER IN EFFECT
       // AND WE MUST FIND THE INTERSECTION AND DIFFERENCE
       // BETWEEN THE TABLE DATA AND (POSSIBLY ZOOMED) VIEW
+      // console.log(dataInSelection.length);
+      let dataInSelectionDeduped = [...dataInSelection];
+      if (brushing) {
+        // console.time('index');
+        // dataInSelectionDeduped = [...dataInSelection].filter(
+        //   (value, index, self) =>
+        //     index ===
+        //     self.findIndex(
+        //       t =>
+        //         t[differentialFeatureIdKey] === value[differentialFeatureIdKey],
+        //     ),
+        // );
+        // console.timeEnd('index');
+        // console.time('includes');
+        let dataInSelectionIds = [...dataInSelection].map(o => o.id);
+        dataInSelectionDeduped = [...dataInSelection].filter(
+          (obj, index) =>
+            !dataInSelectionIds.includes(
+              obj[differentialFeatureIdKey],
+              index + 1,
+            ),
+        );
+        // console.timeEnd('includes');
+      }
+
+      // console.log(dataInSelectionDeduped.length);
       // console.time('forEach + includes');
       // [...dataInSelection].forEach(obj => {
       //   if (
@@ -1222,7 +1249,7 @@ class ScatterPlot extends Component {
       //     irrelevantData.push(obj);
       //   }
       // });
-      [...dataInSelection].forEach(obj => {
+      dataInSelectionDeduped.forEach(obj => {
         if (
           !allFilteredDifferentialTableDataFeatureIds.includes(
             obj[differentialFeatureIdKey],
@@ -1295,6 +1322,7 @@ class ScatterPlot extends Component {
     clearHighlightedData,
     isTableAlreadyAccurate,
     recalculateHexbin,
+    brushing,
   ) {
     const self = this;
     const { xScale, yScale } = self.scaleFactory(allDataInView);
@@ -1318,6 +1346,7 @@ class ScatterPlot extends Component {
             xScale,
             yScale,
             clearHighlightedData,
+            brushing,
           );
         }
         d3.select('#clip-path')
@@ -1426,7 +1455,7 @@ class ScatterPlot extends Component {
               transitioning: true,
               zoomedOut: false,
             });
-            self.transitionZoom(total, false, false, true);
+            self.transitionZoom(total, false, false, true, true);
             self.setupBrush(
               self.props.volcanoWidth,
               self.props.upperPlotsHeight,
