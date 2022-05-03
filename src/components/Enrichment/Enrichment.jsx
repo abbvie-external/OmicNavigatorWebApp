@@ -46,6 +46,8 @@ class Enrichment extends Component {
     isEnrichmentTableLoading: false,
     enrichmentResults: [],
     enrichmentColumns: [],
+    enrichmentColumnsUnfiltered: [],
+    enrichmentColumnsConfigured: false,
     enrichmentFeatureID: '',
     enrichmentPlotSVGHeight: 0,
     enrichmentPlotSVGWidth: 0,
@@ -259,6 +261,12 @@ class Enrichment extends Component {
     sessionStorage.setItem('pValueType', type);
   };
 
+  handleEnrichmentColumnsConfigured = bool => {
+    this.setState({
+      enrichmentColumnsConfigured: bool,
+    });
+  };
+
   getThreePlotsFromUrl = (
     enrichmentStudy,
     enrichmentModel,
@@ -438,11 +446,15 @@ class Enrichment extends Component {
     // if (this.state.enrichmentColumns.length === 0) {
     //   this.handleColumnReorder(searchResults);
     // }
-    let columns = [];
-    if (searchResults?.length > 0) {
+    let columns = this.state.enrichmentColumnsUnfiltered || [];
+    if (searchResults?.length && !this.state.enrichmentColumnsConfigured) {
       columns = this.getConfigCols(searchResults);
+      this.setState({
+        enrichmentColumnsConfigured: true,
+        enrichmentColumnsUnfiltered: columns,
+      });
+      console.log('enrichment config cols - see this just one per db');
     }
-    this.setState({ enrichmentColumnsUnfiltered: columns });
     if (multisetTestsFilteredOut.length > 0) {
       columns = columns.map(col => {
         if (!multisetTestsFilteredOut.includes(col.title)) {
@@ -620,11 +632,20 @@ class Enrichment extends Component {
                 enrichmentsFavicons: favicons,
               },
               function() {
-                let columns = [];
-                if (this.state.enrichmentResults?.length > 0) {
+                let columns = this.state.enrichmentColumnsUnfiltered || [];
+                if (
+                  this.state.enrichmentResults?.length &&
+                  !this.state.enrichmentColumnsConfigured
+                ) {
                   columns = this.getConfigCols(this.state.enrichmentResults);
+                  this.setState({
+                    enrichmentColumnsConfigured: true,
+                    enrichmentColumnsUnfiltered: columns,
+                  });
+                  console.log(
+                    'enrichment config cols - see this just one per db',
+                  );
                 }
-                this.setState({ enrichmentColumnsUnfiltered: columns });
                 if (this.state.multisetTestsFilteredOut.length > 0) {
                   const self = this;
                   columns = columns.filter(function(col) {
@@ -670,11 +691,20 @@ class Enrichment extends Component {
                   enrichmentsFavicons: favicons,
                 },
                 function() {
-                  let columns = [];
-                  if (self.state.enrichmentResults?.length > 0) {
-                    columns = self.getConfigCols(self.state.enrichmentResults);
+                  let columns = this.state.enrichmentColumnsUnfiltered || [];
+                  if (
+                    this.state.enrichmentResults?.length &&
+                    !this.state.enrichmentColumnsConfigured
+                  ) {
+                    columns = this.getConfigCols(this.state.enrichmentResults);
+                    this.setState({
+                      enrichmentColumnsConfigured: true,
+                      enrichmentColumnsUnfiltered: columns,
+                    });
+                    console.log(
+                      'enrichment config cols - see this just one per db',
+                    );
                   }
-                  self.setState({ enrichmentColumnsUnfiltered: columns });
                   if (self.state.multisetTestsFilteredOut.length > 0) {
                     columns = columns.filter(function(col) {
                       return !self.setState.MultisetTestsFilteredOut.includes(
@@ -837,7 +867,6 @@ class Enrichment extends Component {
     function isNotNANorNullNorUndefined(o) {
       return typeof o !== 'undefined' && o !== null && o !== 'NA';
     }
-    if (annotationData.length < 1) return;
     // grab first object
     let firstFullObject =
       [...annotationData].length > 0 ? [...annotationData][0] : null;
@@ -2494,6 +2523,9 @@ class Enrichment extends Component {
                 this.handleIsDataStreamingEnrichmentsTable
               }
               onHandlePValueTypeChange={this.handlePValueTypeChange}
+              onHandleEnrichmentColumnsConfigured={
+                this.handleEnrichmentColumnsConfigured
+              }
             />
           </Grid.Column>
           <Grid.Column
