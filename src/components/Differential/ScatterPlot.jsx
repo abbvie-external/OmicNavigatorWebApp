@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import _ from 'lodash';
 import * as d3 from 'd3';
 import * as hexbin from 'd3-hexbin';
+import { loadingDimmerGeneric } from '../Shared/helpers';
 import './ScatterPlot.scss';
 
 class ScatterPlot extends Component {
@@ -127,7 +128,7 @@ class ScatterPlot extends Component {
       this.state.transitioningDoubleClick
     ) {
       // fired when table data changed (table filter OR set analysis)
-      // OR we are transitioning after double-click (even when data length isn't changed)
+      // OR we are transitioning after double-click (even when filteredDifferentialTableData length isn't changed)
       if (this.state.transitioning) {
         // BOX SELECT TRANSTION
         // if "transitioning" is true, this lifecycle method occurred
@@ -691,18 +692,18 @@ class ScatterPlot extends Component {
         .attr('r', 3)
         .classed('highlighted', false)
         .classed('outlined', false);
-    }
 
-    // set bins back to default
-    d3.select('#nonfiltered-elements')
-      .selectAll('path')
-      .attr('fill', d => this.determineBinColor(this.state.bins, d.length))
-      .attr('stroke', '#000')
-      .attr('class', 'bin')
-      .attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(5)}`);
-    this.highlightCircles();
-    this.outlineCircle();
-    this.handleCircleLabels();
+      // set bins back to default
+      d3.select('#nonfiltered-elements')
+        .selectAll('path')
+        .attr('fill', d => this.determineBinColor(this.state.bins, d.length))
+        .attr('stroke', '#000')
+        .attr('class', 'bin')
+        .attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(5)}`);
+      this.highlightCircles();
+      this.outlineCircle();
+      this.handleCircleLabels();
+    }
   };
 
   handleCircleLabels = () => {
@@ -1652,6 +1653,11 @@ class ScatterPlot extends Component {
         className={this.props.volcanoPlotVisible ? 'Show' : 'Hide'}
       >
         {this.state.volcanoCircleText}
+        <span id="ScatterplotDataLoader">
+          {this.props.differentialResultsTableLoading
+            ? loadingDimmerGeneric
+            : null}
+        </span>
       </div>
     );
   }
