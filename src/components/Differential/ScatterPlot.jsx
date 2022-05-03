@@ -1291,7 +1291,6 @@ class ScatterPlot extends Component {
       yScale,
     );
 
-    debugger;
     if (dataInSelection.length >= 2500 && relevantData.length >= 2500) {
       self.renderCirclesFilter(irrelevantCirclesAndBins.circles);
       self.renderBinsFilter(irrelevantCirclesAndBins.bins);
