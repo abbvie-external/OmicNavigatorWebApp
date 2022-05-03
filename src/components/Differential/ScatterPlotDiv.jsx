@@ -630,6 +630,9 @@ class ScatterPlotDiv extends Component {
             differentialOutlinedFeature={differentialOutlinedFeature}
             differentialResults={differentialResults}
             differentialResultsUnfiltered={differentialResultsUnfiltered}
+            differentialResultsTableLoading={
+              this.props.differentialResultsTableLoading
+            }
             differentialResultsTableStreaming={
               differentialResultsTableStreaming
             }
