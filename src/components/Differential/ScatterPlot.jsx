@@ -76,10 +76,10 @@ class ScatterPlot extends Component {
       (!volcanoPlotVisible &&
         volcanoPlotVisible !== prevProps.volcanoPlotVisible)
     ) {
-      // scatter plot closes, remove scatter
+      // if scatter plot closes, remove scatter
       d3.select('#VolcanoChart').remove();
     }
-    // prevent any scatter plot activity when it is not visible
+    // prevent scatter plot activity when it is not visible
     if (!volcanoPlotVisible || !upperPlotsVisible) return;
     // this if/else if/else if statement in place to minimize re-renders - should cover all situations
     if (differentialTest !== prevProps.differentialTest) {
@@ -309,7 +309,7 @@ class ScatterPlot extends Component {
       );
       // this.bins = bins;
       // this.circles = circles;
-      this.setState({ bins, circles }, function() {
+      this.setState({ bins, circles, relevantCircles: circles }, function() {
         this.renderBins(bins);
         this.renderCircles(circles);
       });
@@ -398,12 +398,13 @@ class ScatterPlot extends Component {
             d3.select('#nonfiltered-elements')
               .selectAll('circle')
               .remove();
-            let circles = [...this.state.circles, ...item];
-            this.renderCircles(circles);
+            let allCircles = [...this.state.circles, ...item];
+            let relevantCircles = [...this.state.relevantCircles, ...item];
+            this.renderCircles(relevantCircles);
             this.setState({
-              circles: circles,
+              circles: allCircles,
+              relevantCircles,
             });
-
             d3.select(
               `#path-${Math.ceil(item.x)}-${Math.ceil(item.y)}-${item.length}`,
             ).remove();
@@ -1181,7 +1182,6 @@ class ScatterPlot extends Component {
     xScale,
     yScale,
     clearHighlightedData,
-    brushing,
   ) {
     const self = this;
     const {
@@ -1213,45 +1213,7 @@ class ScatterPlot extends Component {
       // OTHERWISE THERE IS A ZOOM OR TABLE FILTER IN EFFECT
       // AND WE MUST FIND THE INTERSECTION AND DIFFERENCE
       // BETWEEN THE TABLE DATA AND (POSSIBLY ZOOMED) VIEW
-      // console.log(dataInSelection.length);
-      let dataInSelectionDeduped = [...dataInSelection];
-      if (brushing) {
-        // console.time('index');
-        // dataInSelectionDeduped = [...dataInSelection].filter(
-        //   (value, index, self) =>
-        //     index ===
-        //     self.findIndex(
-        //       t =>
-        //         t[differentialFeatureIdKey] === value[differentialFeatureIdKey],
-        //     ),
-        // );
-        // console.timeEnd('index');
-        // console.time('includes');
-        let dataInSelectionIds = [...dataInSelection].map(o => o.id);
-        dataInSelectionDeduped = [...dataInSelection].filter(
-          (obj, index) =>
-            !dataInSelectionIds.includes(
-              obj[differentialFeatureIdKey],
-              index + 1,
-            ),
-        );
-        // console.timeEnd('includes');
-      }
-
-      // console.log(dataInSelectionDeduped.length);
-      // console.time('forEach + includes');
-      // [...dataInSelection].forEach(obj => {
-      //   if (
-      //     allFilteredDifferentialTableDataFeatureIds.includes(
-      //       obj[differentialFeatureIdKey],
-      //     )
-      //   ) {
-      //     relevantData.push(obj);
-      //   } else {
-      //     irrelevantData.push(obj);
-      //   }
-      // });
-      dataInSelectionDeduped.forEach(obj => {
+      [...dataInSelection].forEach(obj => {
         if (
           !allFilteredDifferentialTableDataFeatureIds.has(
             obj[differentialFeatureIdKey],
@@ -1262,23 +1224,6 @@ class ScatterPlot extends Component {
           relevantData.push(obj);
         }
       });
-      // console.timeEnd('forEach + includes');
-
-      // console.time('forEach + i');
-      // let counterRelevant = 0;
-      // let counterIrrelevant = 0;
-      // [...dataInSelection].forEach((obj, i) => {
-      //   if (
-      //     allFilteredDifferentialTableDataFeatureIds.includes(
-      //       obj[differentialFeatureIdKey],
-      //     )
-      //   ) {
-      //     relevantData[counterRelevant++] = obj;
-      //   } else {
-      //     irrelevantData[counterIrrelevant++] = obj;
-      //   }
-      // });
-      // console.timeEnd('forEach + i');
     }
 
     const irrelevantCirclesAndBins = self.parseDataToBinsAndCircles(
@@ -1301,11 +1246,12 @@ class ScatterPlot extends Component {
     } else if (dataInSelection.length >= 2500 && relevantData.length < 2500) {
       self.renderCirclesFilter(irrelevantCirclesAndBins.circles);
       self.renderBinsFilter(irrelevantCirclesAndBins.bins);
-      self.renderCircles(relevantData);
+      self.renderCircles(relevantCirclesAndBins.circles);
     } else {
       self.renderCirclesFilter(irrelevantCirclesAndBins.circles);
-      self.renderCircles(relevantData);
+      self.renderCircles(relevantCirclesAndBins.circles);
     }
+    this.setState({ relevantCircles: relevantCirclesAndBins.circles });
 
     if (isTableAlreadyAccurate !== true) {
       // this is only called on DEFAULT scatter plot box select
@@ -1324,7 +1270,6 @@ class ScatterPlot extends Component {
     clearHighlightedData,
     isTableAlreadyAccurate,
     recalculateHexbin,
-    brushing,
   ) {
     const self = this;
     const { xScale, yScale } = self.scaleFactory(allDataInView);
@@ -1348,7 +1293,6 @@ class ScatterPlot extends Component {
             xScale,
             yScale,
             clearHighlightedData,
-            brushing,
           );
         }
         d3.select('#clip-path')
@@ -1457,7 +1401,7 @@ class ScatterPlot extends Component {
               transitioning: true,
               zoomedOut: false,
             });
-            self.transitionZoom(total, false, false, true, true);
+            self.transitionZoom(total, false, false, true);
             self.setupBrush(
               self.props.volcanoWidth,
               self.props.upperPlotsHeight,
