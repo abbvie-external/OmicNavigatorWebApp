@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Popup, Dimmer, Loader } from 'semantic-ui-react';
 import { omicNavigatorService } from '../../services/omicNavigator.service';
-import _ from 'lodash';
+import _ from 'lodash-es';
 import {
   isNotNANullUndefinedEmptyString,
   formatNumberForDisplay,
@@ -12,7 +12,7 @@ import './FilteredDifferentialTable.scss';
 import { CancelToken } from 'axios';
 import CustomEmptyMessage from '../Shared/Templates';
 // eslint-disable-next-line no-unused-vars
-import { EZGrid } from '../Shared/QHGrid';
+import { EZGrid } from '../Shared/QHGrid/index.module.js';
 
 let cancelRequestFPTGetResultsTable = () => {};
 class FilteredDifferentialTable extends Component {

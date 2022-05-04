@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import _ from 'lodash';
+import _ from 'lodash-es';
 import * as d3 from 'd3';
 import * as hexbin from 'd3-hexbin';
 import { loadingDimmerGeneric } from '../Shared/helpers';
@@ -1192,8 +1192,10 @@ class ScatterPlot extends Component {
     const { transitioning } = this.state;
     this.removeCirclesBinsAndLabels();
 
-    const allFilteredDifferentialTableDataFeatureIds = filteredDifferentialTableData.map(
-      tableDataElement => tableDataElement[differentialFeatureIdKey],
+    const allFilteredDifferentialTableDataFeatureIds = new Set(
+      filteredDifferentialTableData.map(
+        tableDataElement => tableDataElement[differentialFeatureIdKey],
+      ),
     );
 
     // WE MUST CALCULTATE RELEVANT AND IRRELEVANT BINS/CIRCLES
@@ -1201,7 +1203,7 @@ class ScatterPlot extends Component {
     let relevantData = [];
     if (
       !transitioning &&
-      allFilteredDifferentialTableDataFeatureIds.length ===
+      allFilteredDifferentialTableDataFeatureIds.size ===
         differentialResultsUnfiltered.length
     ) {
       // IF THE TABLE HAS THE SAME DATA LENGTH THE differentialResultsUnfiltered,
@@ -1251,7 +1253,7 @@ class ScatterPlot extends Component {
       // });
       dataInSelectionDeduped.forEach(obj => {
         if (
-          !allFilteredDifferentialTableDataFeatureIds.includes(
+          !allFilteredDifferentialTableDataFeatureIds.has(
             obj[differentialFeatureIdKey],
           )
         ) {

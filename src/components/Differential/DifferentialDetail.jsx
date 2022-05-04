@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import _ from 'lodash';
+import _ from 'lodash-es';
 import CustomEmptyMessage from '../Shared/Templates';
 // eslint-disable-next-line no-unused-vars
-import { EZGrid } from '../Shared/QHGrid';
+import { EZGrid } from '../Shared/QHGrid/index.module.js';
 import PlotsOverlay from './PlotsOverlay';
 import PlotsDynamic from './PlotsDynamic';
 import { scrollElement } from '../Shared/helpers';

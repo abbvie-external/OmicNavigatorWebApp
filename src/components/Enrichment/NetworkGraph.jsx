@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import _ from 'lodash';
+import _ from 'lodash-es';
 import * as d3 from 'd3';
 import { Dimmer, Loader, Message } from 'semantic-ui-react';
 import './NetworkGraph.scss';

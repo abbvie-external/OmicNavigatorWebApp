@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Popup } from 'semantic-ui-react';
-// import _ from 'lodash';
+// import _ from 'lodash-es';
 import {
   isNotNANullUndefinedEmptyString,
   formatNumberForDisplay,
@@ -10,7 +10,7 @@ import './MetafeaturesTable.scss';
 import { omicNavigatorService } from '../../services/omicNavigator.service';
 // import { CancelToken } from 'axios';
 // eslint-disable-next-line no-unused-vars
-import { EZGrid } from '../Shared/QHGrid';
+import { EZGrid } from '../Shared/QHGrid/index.module.js';
 
 class MetafeaturesTable extends Component {
   state = {

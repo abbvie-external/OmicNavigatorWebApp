@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _ from 'lodash-es';
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { CancelToken } from 'axios';
@@ -29,7 +29,7 @@ import EnrichmentSearch from './EnrichmentSearch';
 import SplitPanesContainer from './SplitPanesContainer';
 import CustomEmptyMessage from '../Shared/Templates';
 // eslint-disable-next-line no-unused-vars
-import { EZGrid } from '../Shared/QHGrid';
+import { EZGrid } from '../Shared/QHGrid/index.module.js';
 import ErrorBoundary from '../Shared/ErrorBoundary';
 
 let cancelRequestEnrichmentGetPlot = () => {};

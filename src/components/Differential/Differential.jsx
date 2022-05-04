@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Grid, Popup, Sidebar, Icon } from 'semantic-ui-react';
-import _ from 'lodash';
+import _ from 'lodash-es';
 import { CancelToken } from 'axios';
 import DOMPurify from 'dompurify';
 import { withRouter } from 'react-router-dom';
