@@ -35,7 +35,8 @@ class ScatterPlot extends Component {
     yyAxis: '',
     allDataInWithinView: [],
     zoomedOut: true,
-    transitioning: true,
+    // DEV: this is true on init, to prevent lifecycle event (F) after mount
+    transitioningBoxSelect: true,
   };
 
   componentDidMount() {
@@ -76,13 +77,13 @@ class ScatterPlot extends Component {
       (!volcanoPlotVisible &&
         volcanoPlotVisible !== prevProps.volcanoPlotVisible)
     ) {
-      // if scatter plot closes, remove scatter
+      // A) if scatter plot closes, remove scatter
       d3.select('#VolcanoChart').remove();
     }
-    // prevent scatter plot activity when it is not visible
     if (!volcanoPlotVisible || !upperPlotsVisible) return;
-    // this if/else if/else if statement in place to minimize re-renders - should cover all situations
+    // B) prevent scatter plot activity when it is not visible
     if (differentialTest !== prevProps.differentialTest) {
+      // C) this if/else if/else if statement in place to minimize re-renders - should cover all situations
       // if the test is changed and data is cached, it won't stream, and this needs to run
       this.clearState();
       d3.select('#VolcanoChart').remove();
@@ -95,7 +96,7 @@ class ScatterPlot extends Component {
       volcanoPlotVisible &&
       (volcanoPlotVisible !== prevProps.volcanoPlotVisible ||
         upperPlotsVisible !== prevProps.upperPlotsVisible)
-      // scatter plot opens
+      // D) if scatter plot opens
     ) {
       let allDataInSelectedArea =
         this.state.allDataInWithinView.length > 0
@@ -113,7 +114,7 @@ class ScatterPlot extends Component {
       prevProps.upperPlotsHeight !== upperPlotsHeight ||
       prevProps.volcanoWidth !== volcanoWidth
     ) {
-      // first when user changes dimensions, axis labels, or transform data
+      // E) first when user changes dimensions, axis labels, or transform data
       let allDataInSelectedArea =
         this.state.allDataInWithinView.length > 0
           ? this.state.allDataInWithinView
@@ -127,17 +128,17 @@ class ScatterPlot extends Component {
         prevProps.filteredDifferentialTableData.length ||
       this.state.transitioningDoubleClick
     ) {
-      // fired when table data changed (table filter OR set analysis)
+      // F) fired when table data changed (table filter OR set analysis)
       // OR we are transitioning after double-click (DEV: ONLY IF filteredDifferentialTableData length isn't changed)
       if (this.state.transitioningBoxSelect) {
-        // BOX-SELECT TRANSITION
+        // G) BOX-SELECT TRANSITION
         // if "transitioning" is true, this lifecycle method occurred
         // after a brush box selection zoom event (OR by default on componentDidMount),
         // and has already rerendered the plot
         this.setState({ transitioningBoxSelect: false });
       } else {
         if (this.state.transitioningDoubleClick) {
-          // DOUBLE-CLICK TRANSITION
+          // H) DOUBLE-CLICK TRANSITION
           this.setState({ transitioningDoubleClick: false });
           d3.select('#VolcanoChart').remove();
           this.setupVolcano();
@@ -152,6 +153,7 @@ class ScatterPlot extends Component {
       }
     }
     if (volcanoCircleLabel !== prevProps.volcanoCircleLabel) {
+      // I) Circle labels change
       this.handleCircleLabels();
     }
     if (
@@ -161,6 +163,7 @@ class ScatterPlot extends Component {
         _.sortBy(prevProps.differentialHighlightedFeatures),
       )
     ) {
+      // J) circle/bin outline or highlighting changes
       this.unhighlightCirclesAndBinsAndLabels();
       this.highlightCirclesAndBins();
       this.outlineCircleOrBin();
@@ -173,7 +176,7 @@ class ScatterPlot extends Component {
     d3.select('#VolcanoChart').remove();
   }
 
-  clearState = () => {
+  clearState() {
     // Dev - when should we call this?
     // d3.select('#VolcanoChart').remove();
     // needed when when the component doesn't unmount,
@@ -203,9 +206,9 @@ class ScatterPlot extends Component {
       yyAxis: '',
       allDataInWithinView: [],
       zoomedOut: true,
-      transitioning: true,
+      transitioningBoxSelect: true,
     });
-  };
+  }
 
   setupVolcano() {
     const {
@@ -632,7 +635,7 @@ class ScatterPlot extends Component {
     }
   }
 
-  removeScatterBrush = () => {
+  removeScatterBrush() {
     const brush = d3
       .select('.volcanoPlotD3BrushSelection')
       .selectAll('rect.selection');
@@ -644,12 +647,7 @@ class ScatterPlot extends Component {
     ) {
       d3.select('.volcanoPlotD3BrushSelection').call(brushObjs.move, null);
     }
-  };
-
-  resizeBrushSelection = () => {
-    this.removeScatterBrush();
-    // add resizing later after priorities
-  };
+  }
 
   doTransform(value, axis) {
     const { doXAxisTransformation, doYAxisTransformation } = this.props;
@@ -1440,7 +1438,9 @@ class ScatterPlot extends Component {
             self.props.onReloadMultifeaturePlot(boxSelectionToHighlight);
           } else {
             // DEFAULT SCATTER PLOT BOX SELECT
-            // set 'transitioning' to true so that when componentDidUpdate is called after table data changes, nothing happens
+            // set 'transitioningBoxSelect' to true
+            //so that when componentDidUpdate is called after table data changes,
+            // transitionZoom is not re-ran, except 'transitioningBoxSelect' changed to false
             self.setState({
               transitioningBoxSelect: true,
               zoomedOut: false,
@@ -1450,6 +1450,13 @@ class ScatterPlot extends Component {
               self.props.volcanoWidth,
               self.props.upperPlotsHeight,
             );
+            // DEV IF box select doesn't change the data length, we need a timeout to change it
+            // otherwise the next time data changes, it will hit a flag and only turn transitioningBoxSelect to false
+            // setTimeout(function() {
+            //   self.setState({
+            //     transitioningBoxSelect: false,
+            //   });
+            // }, 1500);
           }
           // we are always clearing the box; if desired, place this in
           d3.select('.volcanoPlotD3BrushSelection').call(
@@ -1510,7 +1517,7 @@ class ScatterPlot extends Component {
     }
   }
 
-  mapBoxSelectionToHighlight = total => {
+  mapBoxSelectionToHighlight(total) {
     const { plotMultiFeatureAvailable, differentialFeatureIdKey } = this.props;
     if (!plotMultiFeatureAvailable) return null;
     const scatterArr = total.map(item => ({
@@ -1522,7 +1529,7 @@ class ScatterPlot extends Component {
       ...new Map(scatterArr.map(item => [item.id, item])).values(),
     ];
     return uniqueScatterArray;
-  };
+  }
 
   handleBrushedText(brushed) {
     // MAP brushedDataArr to circle text state
