@@ -453,7 +453,6 @@ class Enrichment extends Component {
         enrichmentColumnsConfigured: true,
         enrichmentColumnsUnfiltered: columns,
       });
-      console.log('enrichment config cols - see this just one per db');
     }
     if (multisetTestsFilteredOut.length > 0) {
       columns = columns.map(col => {
@@ -642,9 +641,6 @@ class Enrichment extends Component {
                     enrichmentColumnsConfigured: true,
                     enrichmentColumnsUnfiltered: columns,
                   });
-                  console.log(
-                    'enrichment config cols - see this just one per db',
-                  );
                 }
                 if (this.state.multisetTestsFilteredOut.length > 0) {
                   const self = this;
