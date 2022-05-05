@@ -54,7 +54,7 @@ class ScatterPlot extends Component {
     this.setupBrush(volcanoWidth, upperPlotsHeight);
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps, prevState) {
     const {
       differentialHighlightedFeatures,
       upperPlotsHeight,
@@ -126,19 +126,25 @@ class ScatterPlot extends Component {
     } else if (
       filteredDifferentialTableData.length !==
         prevProps.filteredDifferentialTableData.length ||
-      this.state.transitioningDoubleClick
+      (this.state.transitioningDoubleClick &&
+        prevState.transitioningDoubleClick !==
+          this.state.transitioningDoubleClick)
     ) {
-      // F) fired when table data changed (table filter OR set analysis)
-      // OR we are transitioning after double-click (DEV: ONLY IF filteredDifferentialTableData length isn't changed)
+      // F) fired when table data changed (table filter OR set analysis, or zoom out)
       if (this.state.transitioningBoxSelect) {
         // G) BOX-SELECT TRANSITION
-        // if "transitioning" is true, this lifecycle method occurred
+        // if "transitioningBoxSelect" is true, this lifecycle method occurred
         // after a brush box selection zoom event (OR by default on componentDidMount),
         // and has already rerendered the plot
+        // the only thing to do is turn the flag to false
+        // note: it is being turned to false at the very end of 'handleRecalculateHexbin'
+        // if length of state.relevantData and props.filteredDifferentialTableData are already the same,
         this.setState({ transitioningBoxSelect: false });
       } else {
         if (this.state.transitioningDoubleClick) {
           // H) DOUBLE-CLICK TRANSITION
+          // if "transitioningDoubleClick"
+
           this.setState({ transitioningDoubleClick: false });
           d3.select('#VolcanoChart').remove();
           this.setupVolcano();
@@ -1258,6 +1264,7 @@ class ScatterPlot extends Component {
       {
         relevantCircles: relevantCirclesAndBins.circles,
         relevantBins: relevantCirclesAndBins.bins,
+        relevantData,
       },
       function() {
         // after we set relevant circles and bins, then render them
@@ -1289,9 +1296,14 @@ class ScatterPlot extends Component {
         this.handleCircleLabels();
 
         if (isTableAlreadyAccurate !== true) {
-          // this is only called on DEFAULT scatter plot box select
+          // this is ONLY called on scatter plot box select
           // the table needs to be updated, but when it does,
           // we have a "transitioningBoxSelect" flag to ensure we don't rerender the scatter plot
+          // However, if the length of relevantData and filteredTableData are already the same,
+          // we need to set that flag to false now, so that next update it won't interfere
+          if (relevantData.length === filteredDifferentialTableData.length) {
+            this.setState({ transitioningBoxSelect: false });
+          }
           self.props.onHandleVolcanoPlotSelectionChange(
             relevantData, // new data for table
             clearHighlightedData, // clear highlighted data and plots
@@ -1627,9 +1639,16 @@ class ScatterPlot extends Component {
   handleSVGClick = _.debounce(function(doubleClick) {
     if (doubleClick) {
       if (this.state.zoomedOut) return;
+      // if we are zooming out to differentialResults with a length the same as our relevant data,
+      // then componentDidUpdate (F) needs to fire based on 'transitioningDoubleClick' being newly true
+      const transitionDoubleClickOverride =
+        this.props.filteredDifferentialTableData.length ===
+        this.state.relevantData.length
+          ? true
+          : false;
       this.setState({
         zoomedOut: true,
-        transitioningDoubleClick: true,
+        transitioningDoubleClick: transitionDoubleClickOverride,
         allDataInWithinView: [],
       });
       // this changes filteredTableData in the parent
