@@ -128,7 +128,7 @@ class ScatterPlot extends Component {
       this.state.transitioningDoubleClick
     ) {
       // fired when table data changed (table filter OR set analysis)
-      // OR we are transitioning after double-click (even when filteredDifferentialTableData length isn't changed)
+      // OR we are transitioning after double-click (DEV: ONLY IF filteredDifferentialTableData length isn't changed)
       if (this.state.transitioningBoxSelect) {
         // BOX-SELECT TRANSITION
         // if "transitioning" is true, this lifecycle method occurred
@@ -161,11 +161,15 @@ class ScatterPlot extends Component {
         _.sortBy(prevProps.differentialHighlightedFeatures),
       )
     ) {
-      this.highlightBrushedCirclesAndBins();
+      this.unhighlightCirclesAndBinsAndLabels();
+      this.highlightCirclesAndBins();
+      this.outlineCircleOrBin();
+      this.handleCircleLabels();
     }
   }
 
   componentWillUnmount() {
+    this.clearState();
     d3.select('#VolcanoChart').remove();
   }
 
@@ -198,6 +202,8 @@ class ScatterPlot extends Component {
       xxAxis: '',
       yyAxis: '',
       allDataInWithinView: [],
+      zoomedOut: true,
+      transitioning: true,
     });
   };
 
@@ -307,20 +313,24 @@ class ScatterPlot extends Component {
         xScale,
         yScale,
       );
-      // this.bins = bins;
-      // this.circles = circles;
       this.setState(
         { bins, circles, relevantCircles: circles, relevantBins: bins },
         function() {
           this.renderBins(bins);
           this.renderCircles(circles);
-          this.highlightBrushedCirclesAndBins();
+          this.unhighlightCirclesAndBinsAndLabels();
+          this.highlightCirclesAndBins();
+          this.outlineCircleOrBin();
+          this.handleCircleLabels();
         },
       );
     } else {
       this.scaleFactory(data);
       this.renderCircles(data);
-      this.highlightBrushedCirclesAndBins();
+      this.unhighlightCirclesAndBinsAndLabels();
+      this.highlightCirclesAndBins();
+      this.outlineCircleOrBin();
+      this.handleCircleLabels();
     }
   }
 
@@ -406,7 +416,10 @@ class ScatterPlot extends Component {
             let allCircles = [...this.state.circles, ...item];
             let relevantCircles = [...this.state.relevantCircles, ...item];
             this.renderCircles(relevantCircles);
-            this.highlightBrushedCirclesAndBins();
+            this.unhighlightCirclesAndBinsAndLabels();
+            this.highlightCirclesAndBins();
+            this.outlineCircleOrBin();
+            this.handleCircleLabels();
             this.setState({
               circles: allCircles,
               relevantCircles,
@@ -456,7 +469,7 @@ class ScatterPlot extends Component {
       .attr('xstatistic', d => `${this.doTransform(d[xAxisLabel], 'x')}`);
   }
 
-  renderCircles = circles => {
+  renderCircles(circles) {
     const {
       differentialResultsUnfiltered,
       differentialFeatureIdKey,
@@ -555,7 +568,7 @@ class ScatterPlot extends Component {
           }
         });
     }
-  };
+  }
 
   scaleFactory(scaleData) {
     const {
@@ -590,7 +603,7 @@ class ScatterPlot extends Component {
     };
   }
 
-  getCircleOrBin = key => {
+  getCircleOrBin(key) {
     const { differentialTableData, differentialFeatureIdKey } = this.props;
     let el = null;
     const circleWithKey = [...differentialTableData].find(
@@ -605,7 +618,7 @@ class ScatterPlot extends Component {
     if (el) {
       return { element: d3.select(el)._groups[0][0], type: 'circle' };
     } else {
-      const bin = this.state.bins.find(bin => {
+      const bin = this.state.relevantBins.find(bin => {
         return bin.some(b => b[differentialFeatureIdKey] === key);
       });
       if (bin && bin.x && bin.y && bin.length) {
@@ -617,7 +630,7 @@ class ScatterPlot extends Component {
         };
       } else return null;
     }
-  };
+  }
 
   removeScatterBrush = () => {
     const brush = d3
@@ -665,7 +678,7 @@ class ScatterPlot extends Component {
     }
   }
 
-  highlightBrushedCirclesAndBins = () => {
+  unhighlightCirclesAndBinsAndLabels() {
     const {
       differentialHighlightedFeatures,
       differentialOutlinedFeature,
@@ -698,19 +711,16 @@ class ScatterPlot extends Component {
         .attr('stroke', '#000')
         .attr('class', 'bin')
         .attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(5)}`);
-      this.highlightCirclesAndBins();
-      this.outlineCircleOrBin();
-      this.handleCircleLabels();
     }
-  };
+  }
 
-  handleCircleLabels = () => {
+  handleCircleLabels() {
     const {
       differentialHighlightedFeatures,
       differentialOutlinedFeature,
       differentialFeatureIdKey,
     } = this.props;
-    const { circles } = this.state;
+    const { relevantCircles } = this.state;
     let combinedCircleFeatureIdsArr = [...differentialHighlightedFeatures];
     if (differentialOutlinedFeature !== '') {
       const differentialOutlinedFeatureArr = [differentialOutlinedFeature];
@@ -724,7 +734,7 @@ class ScatterPlot extends Component {
     if (combinedCircleFeatureIdsArr?.length > 0) {
       combinedCircleElementsArr = [...combinedCircleFeatureIdsArr].map(elem => {
         let el = null;
-        const circleWithKey = [...circles].find(
+        const circleWithKey = [...relevantCircles].find(
           c => c[this.props.differentialFeatureIdKey] === elem,
         );
         if (circleWithKey) {
@@ -739,7 +749,6 @@ class ScatterPlot extends Component {
         return el ? d3.select(el)._groups[0][0] : null;
       });
     }
-
     if (combinedCircleElementsArr.length) {
       this.handleBrushedText({ _groups: [combinedCircleElementsArr] });
     } else {
@@ -749,9 +758,9 @@ class ScatterPlot extends Component {
           .remove();
       }
     }
-  };
+  }
 
-  highlightCirclesAndBins = () => {
+  highlightCirclesAndBins() {
     const {
       differentialHighlightedFeatures,
       differentialOutlinedFeature,
@@ -789,9 +798,9 @@ class ScatterPlot extends Component {
         }
       });
     }
-  };
+  }
 
-  outlineCircleOrBin = () => {
+  outlineCircleOrBin() {
     const { differentialOutlinedFeature } = this.props;
     if (differentialOutlinedFeature) {
       // style outline highlighted circle
@@ -826,9 +835,9 @@ class ScatterPlot extends Component {
         }
       }
     }
-  };
+  }
 
-  handleBinHover = d => {
+  handleBinHover(d) {
     if (!this.state.brushing) {
       const bin = d3.select(
         `#path-${Math.ceil(d.x)}-${Math.ceil(d.y)}-${d.length}`,
@@ -869,9 +878,9 @@ class ScatterPlot extends Component {
 
       this.getToolTip();
     }
-  };
+  }
 
-  handleCircleHover = e => {
+  handleCircleHover(e) {
     const elem = d3.select(
       `circle[id='volcanoDataPoint-${e[this.props.differentialFeatureIdKey]}`,
     )._groups[0][0];
@@ -901,7 +910,7 @@ class ScatterPlot extends Component {
       }
       this.getToolTip();
     }
-  };
+  }
 
   handleCircleLeave(e) {
     d3.selectAll('circle.volcanoPlot-dataPoint').classed('hovered', false);
@@ -1187,7 +1196,6 @@ class ScatterPlot extends Component {
       differentialFeatureIdKey,
       filteredDifferentialTableData,
     } = self.props;
-    const { transitioningBoxSelect } = this.state;
     this.removeCirclesBinsAndLabels();
 
     const allFilteredDifferentialTableDataFeatureIds = new Set(
@@ -1201,19 +1209,21 @@ class ScatterPlot extends Component {
     let relevantData = [];
     let dataInSelectionDeduped = [...dataInSelection];
     if (
-      !transitioningBoxSelect &&
+      !brushEvent &&
       allFilteredDifferentialTableDataFeatureIds.size ===
         differentialResultsUnfiltered.length
     ) {
-      // IF THE TABLE HAS THE SAME DATA LENGTH THE differentialResultsUnfiltered,
-      // THERE IS NO ZOOM NOR TABLE FILTER IN EFFECT, SO THIS SAVES US ANY CALCULATION
+      // If NOT a brushEvent (which fires this function before table data is accurate)
+      // AND if the table has the same length as differentialResultsUnfiltered,
+      // this function doesn't not have SET ANALYSIS, NOR TABLE FILTER IN EFFECT
+      // so we can use differentialResultsUnfiltered for relevant data
       relevantData = [...differentialResultsUnfiltered];
     } else {
       // OTHERWISE THERE IS A ZOOM OR TABLE FILTER IN EFFECT
       // AND WE MUST FIND THE INTERSECTION AND DIFFERENCE
       // BETWEEN THE TABLE DATA AND (POSSIBLY ZOOMED) VIEW
       if (brushEvent) {
-        // DEV - on box select (after table filter or set analysis), duplicate objects are appearing
+        // DEV - on box select (after table filter or set analysis), duplicate objects sometimes appear
         // presumably from unfiltered and filtered circles
         dataInSelectionDeduped = _.uniqBy(
           dataInSelection,
@@ -1244,43 +1254,54 @@ class ScatterPlot extends Component {
       xScale,
       yScale,
     );
-    if (dataInSelectionDeduped.length >= 2500 && relevantData.length >= 2500) {
-      self.renderCirclesFilter(irrelevantCirclesAndBins.circles);
-      self.renderBinsFilter(irrelevantCirclesAndBins.bins);
-      self.renderCircles(relevantCirclesAndBins.circles);
-      this.highlightBrushedCirclesAndBins();
-      self.renderBins(relevantCirclesAndBins.bins);
-    } else if (
-      dataInSelectionDeduped.length >= 2500 &&
-      relevantData.length < 2500
-    ) {
-      self.renderCirclesFilter(irrelevantCirclesAndBins.circles);
-      self.renderBinsFilter(irrelevantCirclesAndBins.bins);
-      // pass in relevant data, because it will not bin the circles from bins
-      self.renderCircles(relevantData);
-      this.highlightBrushedCirclesAndBins();
-    } else {
-      // pass in relevant/irrelevant data
-      // because otherwise it will not include the circles allocated to bins
-      self.renderCirclesFilter(irrelevantData);
-      self.renderCircles(relevantData);
-      this.highlightBrushedCirclesAndBins();
-    }
-    this.setState({
-      relevantCircles: relevantCirclesAndBins.circles,
-      relevantBins: relevantCirclesAndBins.bins,
-    });
+    // always unhighlight, and remove labels
+    this.unhighlightCirclesAndBinsAndLabels();
+    this.setState(
+      {
+        relevantCircles: relevantCirclesAndBins.circles,
+        relevantBins: relevantCirclesAndBins.bins,
+      },
+      function() {
+        // after we set relevant circles and bins, then render them
+        if (
+          dataInSelectionDeduped.length >= 2500 &&
+          relevantData.length >= 2500
+        ) {
+          self.renderCirclesFilter(irrelevantCirclesAndBins.circles);
+          self.renderBinsFilter(irrelevantCirclesAndBins.bins);
+          self.renderBins(relevantCirclesAndBins.bins);
+          self.renderCircles(relevantCirclesAndBins.circles);
+        } else if (
+          dataInSelectionDeduped.length >= 2500 &&
+          relevantData.length < 2500
+        ) {
+          self.renderCirclesFilter(irrelevantCirclesAndBins.circles);
+          self.renderBinsFilter(irrelevantCirclesAndBins.bins);
+          // pass in relevant data, because it will not bin the circles from bins
+          self.renderCircles(relevantData);
+        } else {
+          // pass in relevant/irrelevant data
+          // because otherwise it will not include the circles allocated to bins
 
-    if (isTableAlreadyAccurate !== true) {
-      // this is only called on DEFAULT scatter plot box select
-      // the table needs to be updated, but when it does,
-      // we have a "transitioningBoxSelect" flag to ensure we don't rerender the scatter plot
-      self.props.onHandleVolcanoPlotSelectionChange(
-        relevantData, // new data for table
-        clearHighlightedData, // clear highlighted data and plots
-        false, // double click flag
-      );
-    }
+          self.renderCirclesFilter(irrelevantData);
+          self.renderCircles(relevantData);
+        }
+        this.highlightCirclesAndBins();
+        this.outlineCircleOrBin();
+        this.handleCircleLabels();
+
+        if (isTableAlreadyAccurate !== true) {
+          // this is only called on DEFAULT scatter plot box select
+          // the table needs to be updated, but when it does,
+          // we have a "transitioningBoxSelect" flag to ensure we don't rerender the scatter plot
+          self.props.onHandleVolcanoPlotSelectionChange(
+            relevantData, // new data for table
+            clearHighlightedData, // clear highlighted data and plots
+            false, // double click flag
+          );
+        }
+      },
+    );
   }
 
   transitionZoom(
@@ -1328,16 +1349,20 @@ class ScatterPlot extends Component {
         // .transition()
         // .duration(200);
         d3.select('#xaxis-line')
-          .transition(t)
+          // DEV - these transitions are making the scatter seem
+          // either slower, or like it is re-rendering when it isn't
+          // revisit for cool factor later
+          // .transition(t)
           .call(self.xxAxis);
         d3.select('#yaxis-line')
-          .transition(t)
+          // .transition(t)
           .call(self.yyAxis);
         // transition circles and bins
-        const container = d3.select('#clip-path').transition(t);
+        const container = d3.select('#clip-path');
+        // .transition(t);
         const circle = container.selectAll('circle');
         circle
-          .transition(t)
+          // .transition(t)
           .attr('cx', function(d) {
             return xScale(self.doTransform(d[self.props.xAxisLabel], 'x'));
           })
@@ -1499,7 +1524,7 @@ class ScatterPlot extends Component {
     return uniqueScatterArray;
   };
 
-  handleBrushedText = brushed => {
+  handleBrushedText(brushed) {
     // MAP brushedDataArr to circle text state
     const brushedCircleTextMapped = brushed?._groups[0].map(a => {
       if (!a || !a.attributes) return null;
@@ -1531,12 +1556,11 @@ class ScatterPlot extends Component {
     });
     if (!brushedCircleTextMapped) return;
     const self = this;
-    if (d3.select('#nonfiltered-elements').size() !== 0) {
-      d3.select('#nonfiltered-elements')
-        .selectAll('text')
-        .remove();
+    d3.select('#nonfiltered-elements')
+      .selectAll('text')
+      .remove();
 
-      // if (d3.select('#nonfiltered-elements').size() !== 0) {
+    if (d3.select('#nonfiltered-elements').size() !== 0) {
       d3.select('#nonfiltered-elements')
         .selectAll('text')
         .data(brushedCircleTextMapped)
@@ -1591,7 +1615,7 @@ class ScatterPlot extends Component {
           }
         });
     }
-  };
+  }
 
   handleSVGClick = _.debounce(function(doubleClick) {
     if (doubleClick) {
