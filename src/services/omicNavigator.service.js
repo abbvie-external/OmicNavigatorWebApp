@@ -64,8 +64,8 @@ class OmicNavigatorService {
       const url = `${self.baseUrl}${graphicsUrl}/svg`;
       return url;
     } catch (error) {
-      // DEV - what methods should we not throw errors for?
-      // if (method === 'getResultsUpset') return;
+      // DEV - what methods should we not throw errors/toasts for?
+      if (method === 'getResultsUpset') return;
       if (!axios.isCancel(error)) {
         toast.error(`${error.message}`);
         if (handleError != null) {
