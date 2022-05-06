@@ -40,6 +40,7 @@ class Differential extends Component {
     this.state = {
       // GENERAL
       // differentialPlotTypes: [],
+
       differentialStudyMetadata: [],
       differentialModelsAndTests: [],
       differentialTestsMetadata: [],
@@ -54,7 +55,8 @@ class Differential extends Component {
       /**
        * @type {QHGrid.ColumnConfig[]}
        */
-      // differentialColumns: [],
+      differentialColumns: [],
+      differentialColumnsConfigured: false,
       isSearchingDifferential: false,
       isValidSearchDifferential: false,
       isFilteredDifferential: false,
@@ -143,6 +145,12 @@ class Differential extends Component {
     });
   };
 
+  handleDifferentialColumnsConfigured = bool => {
+    this.setState({
+      differentialColumnsConfigured: bool,
+    });
+  };
+
   handleSearchTransitionDifferentialAlt = bool => {
     this.setState({
       differentialResultsTableLoading: bool,
@@ -181,14 +189,19 @@ class Differential extends Component {
     /**
      * @type {QHGrid.ColumnConfig<{}>[]}
      */
-    let columns = [{}];
     // need this check for page refresh
-    if (searchResults.differentialResults?.length > 0) {
-      columns = this.getConfigCols(searchResults);
+    if (
+      searchResults?.differentialResults?.length &&
+      !this.state.differentialColumnsConfigured
+    ) {
+      let columns = this.getConfigCols(searchResults);
+      this.setState({
+        differentialColumnsConfigured: true,
+        differentialColumns: columns,
+      });
     }
     this.setState({
       differentialResults: searchResults.differentialResults,
-      differentialColumns: columns,
       isSearchingDifferential: false,
       isValidSearchDifferential: true,
       differentialResultsTableLoading: false,
@@ -1283,8 +1296,6 @@ class Differential extends Component {
     function isNotNANorNullNorUndefined(o) {
       return typeof o !== 'undefined' && o !== null && o !== 'NA';
     }
-
-    if (differentialResultsVar.length < 1) return;
     // grab first object
     const firstFullObject =
       differentialResultsVar.length > 0 ? [...differentialResultsVar][0] : null;
@@ -1539,7 +1550,7 @@ class Differential extends Component {
           onBackToTable={this.backToTable}
           onHandleUpdateDifferentialResults={this.updateDifferentialResults}
           onHandleVolcanoState={this.updateVolcanoState}
-          onHandleTableDataChange={this.handleTableDataChange}
+          onTableDataChange={this.handleTableDataChange}
           fwdRefDVC={this.differentialViewContainerRef}
           onHandleMultifeaturePlot={this.handleMultifeaturePlot}
           onGetMultifeaturePlotTransition={this.getMultifeaturePlotTransition}
@@ -1692,6 +1703,9 @@ class Differential extends Component {
                 this.handleMultisetFiltersVisibleParentRef
               }
               onHandleIsFilteredDifferential={this.handleIsFilteredDifferential}
+              onHandleDifferentialColumnsConfigured={
+                this.handleDifferentialColumnsConfigured
+              }
             />
           </Grid.Column>
           <Grid.Column

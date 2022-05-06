@@ -403,7 +403,9 @@ class EnrichmentSearch extends Component {
       onMultisetQueriedEnrichment,
       onSearchTransitionEnrichment,
       onSearchChangeEnrichment,
+      onHandleEnrichmentColumnsConfigured,
     } = this.props;
+    onHandleEnrichmentColumnsConfigured(false);
     onSearchTransitionEnrichment(true);
     onMultisetQueriedEnrichment(false);
     const enrichmentAnnotationMeta = this.props.enrichmentAnnotationsMetadata.find(
