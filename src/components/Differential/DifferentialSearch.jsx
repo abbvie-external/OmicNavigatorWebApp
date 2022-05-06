@@ -408,7 +408,9 @@ class DifferentialSearch extends Component {
       onMultisetQueriedDifferential,
       onSearchChangeDifferential,
       onSearchTransitionDifferential,
+      onHandleDifferentialColumnsConfigured,
     } = this.props;
+    onHandleDifferentialColumnsConfigured(false);
     onSearchTransitionDifferential(true);
     onMultisetQueriedDifferential(false);
     const differentialTestMeta = this.props.differentialTestsMetadata.find(

@@ -16,7 +16,6 @@ class MetafeaturesTableDynamic extends Component {
   state = {
     metafeaturesTableConfigCols: [],
     metafeaturesTableData: [],
-    filteredBarcodeData: [],
     itemsPerPageMetafeaturesTable:
       parseInt(localStorage.getItem('itemsPerPageMetafeaturesTable'), 10) || 60,
     additionalTemplateInfo: [],
