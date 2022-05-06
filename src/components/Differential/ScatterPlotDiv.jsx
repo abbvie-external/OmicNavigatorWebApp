@@ -191,8 +191,8 @@ class ScatterPlotDiv extends Component {
             relevantConfigColumns.push(property);
           }
         } else {
-          // otherwise push it to type string
-          differentialAlphanumericFields.push(property);
+          // otherwise push it to type numeric
+          relevantConfigColumns.push(property);
         }
       });
     }

@@ -890,8 +890,8 @@ class Enrichment extends Component {
             enrichmentNumericFields.push(property);
           }
         } else {
-          // otherwise push it to type string
-          enrichmentAlphanumericFields.push(property);
+          // otherwise push it to type numeric
+          enrichmentNumericFields.push(property);
         }
       });
     }

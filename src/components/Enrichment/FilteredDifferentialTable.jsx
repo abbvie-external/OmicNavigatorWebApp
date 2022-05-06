@@ -203,8 +203,8 @@ class FilteredDifferentialTable extends Component {
             filteredDifferentialNumericFields.push(property);
           }
         } else {
-          // otherwise push it to type string
-          filteredDifferentialAlphanumericFields.push(property);
+          // otherwise push it to type numeric
+          filteredDifferentialNumericFields.push(property);
         }
       });
     }
