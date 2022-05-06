@@ -318,7 +318,7 @@ class ScatterPlot extends Component {
 
     d3.select('#VolcanoChart')
       .append('g')
-      .attr('class', 'volcanoPlotYAxis NoSelect')
+      .attr('class', 'volcanoPlotAxis NoSelect')
       .attr('id', 'yaxis-line')
       .attr('transform', 'translate(30, 0)')
       .call(this.yyAxis);
@@ -341,7 +341,7 @@ class ScatterPlot extends Component {
 
     d3.select('#VolcanoChart')
       .append('g')
-      .attr('class', 'volcanoPlotXAxis NoSelect')
+      .attr('class', 'volcanoPlotAxis NoSelect')
       .attr('id', 'xaxis-line')
       .attr('transform', 'translate(0,' + (upperPlotsHeight - 35) + ')')
       .call(this.xxAxis);
