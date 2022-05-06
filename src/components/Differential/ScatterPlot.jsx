@@ -12,31 +12,32 @@ class ScatterPlot extends Component {
   objsBrush = {};
 
   state = {
-    hoveredElement: 'bin' || 'circle',
-    hoveredCircleData: {
-      position: [],
-      id: null,
-      xstat: null,
-      ystat: null,
-    },
-    hovering: false,
-    tooltipPosition: null,
+    allDataInWithinView: [],
+    bins: [],
     brushing: false,
+    circles: [],
+    clickedBin: null,
+    hoveredCircleData: null,
+    hoveredCircleElement: '',
+    hoveredCircleId: '',
+    hoveredElement: '',
+    hovering: false,
+    isBinClicked: false,
+    relevantBins: [],
+    relevantCircles: [],
+    relevantData: [],
     resizeScalarX: 1,
     resizeScalarY: 1,
-    volcanoCircleText: [],
-    bins: [],
-    circles: [],
-    showCircles: true,
     showBins: true,
-    isBinClicked: false,
-    clickedBin: null,
-    xxAxis: '',
-    yyAxis: '',
-    allDataInWithinView: [],
-    zoomedOut: true,
+    showCircles: true,
+    tooltipPosition: null,
     // DEV: this is true on init, to prevent lifecycle event (F) after mount
     transitioningBoxSelect: true,
+    transitioningDoubleClick: false,
+    volcanoCircleText: [],
+    xxAxis: '',
+    yyAxis: '',
+    zoomedOut: true,
   };
 
   componentDidMount() {
@@ -85,12 +86,7 @@ class ScatterPlot extends Component {
     if (differentialTest !== prevProps.differentialTest) {
       // C) this if/else if/else if statement in place to minimize re-renders - should cover all situations
       // if the test is changed and data is cached, it won't stream, and this needs to run
-      this.clearState();
-      d3.select('#VolcanoChart').remove();
-      this.setupVolcano();
-      this.transitionZoom(differentialResultsUnfiltered, false, true);
-      this.setupBrush(volcanoWidth, upperPlotsHeight);
-      this.setState({ zoomedOut: true });
+      this.handleCachedTest();
     } else if (
       upperPlotsVisible &&
       volcanoPlotVisible &&
@@ -189,32 +185,83 @@ class ScatterPlot extends Component {
     // for example, on test change with cached data
     this.objsBrush = {};
     this.setState({
-      hoveredElement: 'bin' || 'circle',
-      hoveredCircleData: {
-        position: [],
-        id: null,
-        xstat: null,
-        ystat: null,
-      },
-      hovering: false,
-      tooltipPosition: null,
+      allDataInWithinView: [],
+      bins: [],
       brushing: false,
+      circles: [],
+      clickedBin: null,
+      hoveredCircleData: null,
+      hoveredCircleElement: '',
+      hoveredCircleId: '',
+      hoveredElement: '',
+      hovering: false,
+      isBinClicked: false,
+      relevantBins: [],
+      relevantCircles: [],
+      relevantData: [],
       resizeScalarX: 1,
       resizeScalarY: 1,
-      volcanoCircleText: [],
-      bins: [],
-      circles: [],
-      showCircles: true,
       showBins: true,
-      isBinClicked: false,
-      clickedBin: null,
+      showCircles: true,
+      tooltipPosition: null,
+      transitioningBoxSelect: true,
+      transitioningDoubleClick: false,
+      volcanoCircleText: [],
       xxAxis: '',
       yyAxis: '',
-      allDataInWithinView: [],
       zoomedOut: true,
-      transitioningBoxSelect: true,
     });
   }
+
+  handleCachedTest = () => {
+    // needed when when the component doesn't unmount,
+    // for example, on test change with cached data
+    const {
+      differentialResultsUnfiltered,
+      volcanoPlotVisible,
+      upperPlotsVisible,
+      volcanoWidth,
+      upperPlotsHeight,
+    } = this.props;
+    // prevent any scatter plot activity when it is not visible
+    this.objsBrush = {};
+    this.setState(
+      {
+        allDataInWithinView: [],
+        bins: [],
+        brushing: false,
+        circles: [],
+        clickedBin: null,
+        hoveredCircleData: null,
+        hoveredCircleElement: '',
+        hoveredCircleId: '',
+        hoveredElement: '',
+        hovering: false,
+        isBinClicked: false,
+        relevantBins: [],
+        relevantCircles: [],
+        relevantData: [],
+        resizeScalarX: 1,
+        resizeScalarY: 1,
+        showBins: true,
+        showCircles: true,
+        tooltipPosition: null,
+        transitioningBoxSelect: true, // for cached data, this is set to false
+        transitioningDoubleClick: false,
+        volcanoCircleText: [],
+        xxAxis: '',
+        yyAxis: '',
+        zoomedOut: true,
+      },
+      function() {
+        d3.select('#VolcanoChart').remove();
+        if (!volcanoPlotVisible || !upperPlotsVisible) return;
+        this.setupVolcano();
+        this.hexBinning(differentialResultsUnfiltered);
+        this.setupBrush(volcanoWidth, upperPlotsHeight);
+      },
+    );
+  };
 
   setupVolcano() {
     const {
