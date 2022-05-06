@@ -1343,8 +1343,8 @@ class Differential extends Component {
             differentialNumericFields.push(property);
           }
         } else {
-          // otherwise push it to type string
-          differentialAlphanumericFields.push(property);
+          // otherwise push it to type numeric
+          differentialNumericFields.push(property);
         }
       });
     }
