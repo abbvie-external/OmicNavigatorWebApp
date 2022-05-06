@@ -191,7 +191,7 @@ export interface QuickViewConfig {
     /**
      * view holds all the information that the grid needs to display. If a piece isn't present in this, then that part won't be applied. For instance if there is a grouping already applied to the grid, and they select a quick view without a grouping set, then the grouping will still exist.
      */
-    view: View;
+    view: Partial<View>;
     /**
      * the quick view group the view is in. (nested menus)
      */

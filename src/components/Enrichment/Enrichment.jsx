@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _ from 'lodash-es';
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { CancelToken } from 'axios';
@@ -13,6 +13,7 @@ import { omicNavigatorService } from '../../services/omicNavigator.service';
 import ButtonActions from '../Shared/ButtonActions';
 import * as d3 from 'd3';
 import {
+  isNotNANullUndefinedEmptyString,
   formatNumberForDisplay,
   splitValue,
   Linkout,
@@ -28,7 +29,7 @@ import EnrichmentSearch from './EnrichmentSearch';
 import SplitPanesContainer from './SplitPanesContainer';
 import CustomEmptyMessage from '../Shared/Templates';
 // eslint-disable-next-line no-unused-vars
-import { EZGrid } from '../Shared/QHGrid';
+import { EZGrid } from '../Shared/QHGrid/index.module.js';
 import ErrorBoundary from '../Shared/ErrorBoundary';
 
 let cancelRequestEnrichmentGetPlot = () => {};
@@ -860,9 +861,6 @@ class Enrichment extends Component {
     };
     let enrichmentAlphanumericFields = [];
     let enrichmentNumericFields = [];
-    function isNotNANorNullNorUndefined(o) {
-      return typeof o !== 'undefined' && o !== null && o !== 'NA';
-    }
     // grab first object
     let firstFullObject =
       [...annotationData].length > 0 ? [...annotationData][0] : null;
@@ -876,7 +874,7 @@ class Enrichment extends Component {
         // loop through data, one property at a time
         const notNullObject = dataCopy.find(row => {
           // find the first value for that property
-          return isNotNANorNullNorUndefined(row[property]);
+          return isNotNANullUndefinedEmptyString(row[property]);
         });
         let notNullValue = null;
         if (notNullObject) {

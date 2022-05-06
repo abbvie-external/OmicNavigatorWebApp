@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import { Icon, Popup } from 'semantic-ui-react';
 import * as d3 from 'd3';
-import * as _ from 'lodash';
+import * as _ from 'lodash-es';
 // import { select } from "d3-selection";
 import './ViolinPlot.scss';
 

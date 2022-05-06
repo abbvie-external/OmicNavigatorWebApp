@@ -1,6 +1,6 @@
 import React from 'react';
 import { Popup, Loader, Dimmer } from 'semantic-ui-react';
-import _ from 'lodash';
+import _, { intersectionWith, isEqual, differenceWith } from 'lodash-es';
 import { toast } from 'react-toastify';
 import * as d3 from 'd3-array';
 
@@ -126,6 +126,7 @@ export function separateItemValues(value) {
 }
 
 export function formatNumberForDisplay(num) {
+  // if (parseFloat(num) !== +num) {
   if (!isNaN(num)) {
     const number = Math.abs(num);
     if (number === 0) {
@@ -340,6 +341,12 @@ export const loadingDimmer = (
   </Dimmer>
 );
 
+export const loadingDimmerGeneric = (
+  <Dimmer active inverted>
+    <Loader size="large">Loading</Loader>
+  </Dimmer>
+);
+
 export function getWindowWidth() {
   return Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
 }
@@ -453,3 +460,41 @@ export const reviseLayout = (layout, width, height, plotId) => {
   layoutParsed.height = Math.floor(height * 0.9);
   return layoutParsed;
 };
+
+export function isNotNANullUndefinedEmptyString(o) {
+  return typeof o !== 'undefined' && o !== null && o !== 'NA' && o !== '';
+}
+
+/**
+ * https://github.com/crubier/react-graph-vis/commit/68bf2e27b2046d6c0bb8b334c2cf974d23443264
+ * @template {T extends object}
+ *
+ * @param {T[]} from
+ * @param {T[]} to
+ * @param {keyof T} field
+ * @returns
+ */
+export function diff(from, to, field = 'id') {
+  function accessor(item) {
+    return item[field];
+  }
+  const nextIds = new Set(to.map(accessor));
+  const prevIds = new Set(from.map(accessor));
+  const removed = from.filter(item => !nextIds.has(accessor(item)));
+
+  const unchanged = intersectionWith(from, to, isEqual);
+
+  const updated = differenceWith(
+    intersectionWith(to, from, (a, b) => accessor(a) === accessor(b)),
+    unchanged,
+    isEqual,
+  );
+
+  const added = to.filter(item => !prevIds.has(accessor(item)));
+  return {
+    removed,
+    unchanged,
+    updated,
+    added,
+  };
+}

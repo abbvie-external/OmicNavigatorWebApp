@@ -1,33 +1,27 @@
 th.dragging > * {
   pointer-events: none;
 }
-
 .QHGrid {
   position: relative;
 }
-
 .QHGrid--empty {
   display: flex;
   justify-content: center;
   height: calc(100% - 50px);
   align-items: center;
 }
-
 @media only screen and (max-width: 767px) {
   .QHGrid--empty {
     height: unset;
   }
 }
-
 th.QHGrid--header:empty {
   padding: 0 !important;
   border: none !important;
 }
-
-.QHGrid--header > *:not(:last-child) {
+.QHGrid--header > :not(:last-child) {
   margin-right: 0.45rem;
 }
-
 .QHGrid--generalSearch {
   box-shadow: 0 0 0 2px #fff;
   border-radius: 0.28571429rem;
@@ -40,9 +34,7 @@ th.QHGrid--header:empty {
   button.ui.button {
   border-radius: 0 0.28571429rem 0.28571429rem 0;
 }
-
 .QHGrid--body thead th {
-  position: -webkit-sticky;
   position: sticky;
   top: 0;
   z-index: 1;
@@ -50,18 +42,15 @@ th.QHGrid--header:empty {
 .QHGrid--body thead th .dropdown .menu {
   top: 150%;
 }
-
 .QHGrid
   .QHGrid--body.QHGrid--body.QHGrid--body.QHGrid--body.QHGrid--body
   thead
   th {
   background: #f9fafb;
 }
-
 .QHGrid .QHGrid--body.QHGrid--body.QHGrid--body.QHGrid--body thead th:hover {
   background: #edf0f3;
 }
-
 .QHGrid .QHGrid--body.QHGrid--body.QHGrid--body.QHGrid--body thead th.sorted {
   background: #edf0f3;
 }
@@ -71,7 +60,6 @@ th.QHGrid--header:empty {
   th.sorted:hover {
   background: #e7ebef;
 }
-
 .QHGrid .dimmer.ui {
   height: unset;
   width: unset;
@@ -79,24 +67,18 @@ th.QHGrid--header:empty {
   bottom: 50px;
   right: 0;
 }
-
 .QHGrid .QHGrid--body.striped.table tbody tr:nth-child(2n) {
-  -webkit-filter: brightness(0.96);
   filter: brightness(0.96);
 }
-
 .QHGrid .QHGrid--body tbody > tr > td {
   border-top: 2px solid rgba(34, 36, 38, 0.1);
 }
-
 .QHGrid .QHGrid--body thead .ui.multiple.dropdown {
   padding: 0.22619048em 0 0.22619048em 0.35714286em;
 }
-
 .QHGrid .QHGrid--body thead th {
   font-size: 1.05em;
 }
-
 .ui.popup a.item .ui.ui.button.QHGrid--ButtonClear.icon {
   margin: 0 !important;
   font-size: 0.78571429rem !important;
@@ -107,44 +89,37 @@ th.QHGrid--header:empty {
   font-size: 0.78571429rem !important;
 }
 .ui.popup a.item .ui.ui.button.QHGrid--ButtonClear.icon:first-of-type {
-  margin: 0px 2px !important;
+  margin: 0 2px !important;
 }
 .ui.popup a.item .ui.ui.button.QHGrid--ButtonClear.icon:hover {
-  background: lightgrey;
+  background: #d3d3d3;
 }
-
 i.icon.quickViewIcon {
   float: unset !important;
   margin: 0 0.75em 0 0 !important;
 }
-
 :root {
-  --AbbviePrimary: rgb(7, 29, 73);
-  --AbbvieBlue: rgb(0, 75, 255);
-  --AbbviePurple: rgb(146, 0, 230);
-  --AbbvieTeal: rgb(26, 201, 168);
-  --AbbvieOrange: rgb(255, 131, 7);
+  --AbbviePrimary: #071d49;
+  --AbbvieBlue: #004bff;
+  --AbbviePurple: #9200e6;
+  --AbbvieTeal: #1ac9a8;
+  --AbbvieOrange: #ff8307;
 }
-
 .quickViewIcon.AbbvieBlue {
   color: var(--AbbvieBlue);
 }
-
 .quickViewIcon.AbbviePurple {
   color: var(--AbbviePurple);
 }
-
 .quickViewIcon.AbbvieTeal {
   color: var(--AbbvieTeal);
 }
-
 .quickViewIcon.AbbvieOrange {
   color: var(--AbbvieOrange);
 }
 .DateFilter .ui.input {
   min-width: 18rem;
 }
-
 .ComparisonFilter {
   min-width: 17.7rem;
   display: flex;
@@ -170,19 +145,14 @@ i.icon.quickViewIcon {
   display: flex;
   flex-direction: column;
 }
-
 .ComparisonFilterPopup.ui.popup {
   max-height: 25rem;
   overflow-y: auto;
   padding: 0;
 }
-.ComparisonFilterPopup.ui.popup::before {
+.ComparisonFilterPopup.ui.popup:before {
   content: none;
 }
-
-/* make the native arrow invisible and stretch it
-  over the whole field so you can click anywhere in
-  the input field to trigger the native datepicker*/
 .DateFilterDropdown input[type='date']::-webkit-calendar-picker-indicator {
   margin-left: 0;
   position: absolute;
@@ -195,23 +165,18 @@ i.icon.quickViewIcon {
   color: transparent;
   background: transparent;
 }
-
 .DateFilterDropdown .ui.input > i.icon {
   cursor: pointer;
 }
 .DateFilterDropdown .ui.input > i.icon:hover {
   opacity: 1;
 }
-
-/* adjust increase/decrease button */
 .DateFilterDropdown input[type='date']::-webkit-inner-spin-button {
   display: none;
 }
-
 .DateFilterDropdown input[type='date']::-webkit-clear-button {
   display: none;
 }
-
 .dropdownItem {
   cursor: pointer;
   padding: 0.78571429rem 1.14285714rem;
@@ -225,12 +190,13 @@ i.icon.quickViewIcon {
   color: rgba(0, 0, 0, 0.95);
   z-index: 13;
 }
-
 .dropdownMenu {
   width: 25vw !important;
+  min-width: 265px;
   position: static;
   border-top: 1px solid rgba(34, 36, 38, 0.15);
 }
 .dropdownMenu div.ReactVirtualized__Grid__innerScrollContainer {
   max-width: 25vw !important;
 }
+/*# sourceMappingURL=index.css.map */

@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import { Grid, Popup, Sidebar, Icon } from 'semantic-ui-react';
-import _ from 'lodash';
+import _ from 'lodash-es';
 import { CancelToken } from 'axios';
 import DOMPurify from 'dompurify';
 import { withRouter } from 'react-router-dom';
 import SVG from 'react-inlinesvg';
 import { toast } from 'react-toastify';
 import {
+  isNotNANullUndefinedEmptyString,
   formatNumberForDisplay,
   splitValue,
   Linkout,
@@ -208,11 +209,21 @@ class Differential extends Component {
       multisetButttonActiveDifferential: false,
       visible: false,
       plotOverlayLoaded: false,
+      differentialResultsTableStreaming: !streamingFinished,
     });
-
-    if (streamingFinished) {
-      this.setState({ differentialResultsTableStreaming: false });
-    }
+    // if needed...
+    // differentialResults flow down
+    // and update the table state (differentialTableData)
+    // this callback ensures streaming follows later
+    // so scatter plot lifecycles don't interupt the table from finishing
+    // const self = this;
+    // if (streamingFinished) {
+    // if we need to delay them longer,
+    // setTimeout(function() {
+    // DEV - can we add this back up ^ now?
+    // self.setState({ differentialResultsTableStreaming: false });
+    // }, 500);
+    // }
   };
 
   handleResultsTableLoading = bool => {
@@ -1293,9 +1304,6 @@ class Differential extends Component {
     };
     let differentialAlphanumericFields = [];
     let differentialNumericFields = [];
-    function isNotNANorNullNorUndefined(o) {
-      return typeof o !== 'undefined' && o !== null && o !== 'NA';
-    }
     // grab first object
     const firstFullObject =
       differentialResultsVar.length > 0 ? [...differentialResultsVar][0] : null;
@@ -1309,7 +1317,7 @@ class Differential extends Component {
         // loop through data, one property at a time
         const notNullObject = dataCopy.find(row => {
           // find the first value for that property
-          return isNotNANorNullNorUndefined(row[property]);
+          return isNotNANullUndefinedEmptyString(row[property]);
         });
         let notNullValue = null;
         if (notNullObject) {
@@ -1439,6 +1447,8 @@ class Differential extends Component {
       differentialNumericFields,
     );
     this.setState({
+      differentialAlphanumericFields,
+      differentialNumericFields,
       multisetColsDifferential: multisetColsDifferentialVar,
     });
     const differentialNumericColumnsMapped = differentialNumericFields.map(

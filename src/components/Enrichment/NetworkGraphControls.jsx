@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import * as d3 from 'd3';
-import _ from 'lodash';
+import _ from 'lodash-es';
 import {
   Popup,
   Grid,
