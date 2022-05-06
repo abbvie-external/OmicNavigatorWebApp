@@ -271,6 +271,7 @@ class DifferentialSearch extends Component {
               differentialFeature: differentialFeature,
             },
             false,
+            true,
           );
           const differentialTestMeta = differentialTestsMetadataVar.find(
             test => test.testID === differentialTest,
@@ -297,6 +298,7 @@ class DifferentialSearch extends Component {
         differentialModel: '',
         differentialTest: '',
       },
+      true,
       true,
     );
     onSearchResetDifferential({
@@ -369,6 +371,7 @@ class DifferentialSearch extends Component {
         differentialTest: '',
       },
       true,
+      true,
     );
     onSearchResetDifferential({
       isValidSearchDifferential: false,
@@ -431,6 +434,7 @@ class DifferentialSearch extends Component {
         differentialModel: differentialModel,
         [name]: value,
       },
+      true,
       true,
     );
     const obj = {
@@ -582,6 +586,7 @@ class DifferentialSearch extends Component {
         reloadPlotP: true,
         multisetFiltersVisibleDifferential: true,
       });
+      this.props.onResetOverlay();
     } else {
       // on toggle close
       // this.props.onSearchTransitionDifferentialAlt(true);
@@ -625,6 +630,7 @@ class DifferentialSearch extends Component {
         [name]: value,
       },
       true,
+      false,
     );
     const obj = {
       study: differentialStudy,

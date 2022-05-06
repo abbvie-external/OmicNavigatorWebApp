@@ -305,28 +305,38 @@ class Differential extends Component {
     }
   };
 
-  handleSearchChangeDifferential = (changes, scChange) => {
+  resetOverlay = () => {
+    this.setState({
+      plotOverlayData: { key: null, title: '', svg: [] },
+      plotOverlayVisible: false,
+      plotOverlayLoaded: true,
+    });
+  };
+
+  handleSearchChangeDifferential = (
+    changes,
+    scChange,
+    resetSelectedFeatures,
+  ) => {
     this.props.onHandleUrlChange(changes, 'differential');
     this.setState({
       visible: false,
       multisetButttonActiveDifferential: false,
     });
     if (scChange) {
-      this.setState({
-        plotMultisetLoadedDifferential: false,
-        plotSingleFeatureData: { key: null, title: '', svg: [] },
-        plotMultiFeatureData: { key: null, title: '', svg: [] },
-        plotOverlayData: { key: null, title: '', svg: [] },
-        // differentialResults: [],
-        // differentialResultsUnfiltered: [],
-        differentialHighlightedFeaturesData: [],
-        differentialHighlightedFeatures: [],
-        differentialOutlinedFeature: '',
-        plotSingleFeatureDataLoaded: true,
-        plotMultiFeatureDataLoaded: true,
-        plotOverlayVisible: false,
-        plotOverlayLoaded: true,
-      });
+      this.resetOverlay();
+      if (resetSelectedFeatures) {
+        this.setState({
+          plotMultisetLoadedDifferential: false,
+          plotSingleFeatureData: { key: null, title: '', svg: [] },
+          plotMultiFeatureData: { key: null, title: '', svg: [] },
+          differentialHighlightedFeaturesData: [],
+          differentialHighlightedFeatures: [],
+          differentialOutlinedFeature: '',
+          plotSingleFeatureDataLoaded: true,
+          plotMultiFeatureDataLoaded: true,
+        });
+      }
     }
     if (
       changes.differentialModel !== '' &&
@@ -1716,6 +1726,7 @@ class Differential extends Component {
               onHandleDifferentialColumnsConfigured={
                 this.handleDifferentialColumnsConfigured
               }
+              onResetOverlay={this.resetOverlay}
             />
           </Grid.Column>
           <Grid.Column
