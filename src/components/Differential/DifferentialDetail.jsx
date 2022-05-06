@@ -342,10 +342,11 @@ class DifferentialDetail extends Component {
       // if Plotly gives us a string containing some value in our data
       featureData = relevantFeatures.find(f => {
         const fValues = _.values(f);
+        const fValuesRelevant = fValues.filter(f => isNaN(f));
         function hasValue(value) {
           return featureArg.includes(value);
         }
-        return fValues.some(hasValue);
+        return fValuesRelevant.some(hasValue);
       });
     }
     if (featureData) {
