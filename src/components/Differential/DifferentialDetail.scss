@@ -51,7 +51,8 @@
   transform: translate(-50%, -50%);
 }
 
-#PlotsSingleFeatureContainer, #PlotsMultiFeatureContainer {
+#PlotsSingleFeatureContainer,
+#PlotsMultiFeatureContainer {
   padding-right: 0px !important;
 
   svg {
@@ -64,6 +65,9 @@
 #yAxisSelector,
 #volcanoCircleSelector {
   min-width: 113px !important;
+  .visible.menu {
+    width: auto !important;
+  }
 }
 
 .VolcanoAxisLabel {
