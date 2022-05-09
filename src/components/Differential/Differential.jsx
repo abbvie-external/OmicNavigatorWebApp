@@ -38,6 +38,7 @@ class Differential extends Component {
     super(props);
     // this.resizeListener = this.resizeListener.bind(this);
     // this.debouncedResizeListener = _.debounce(this.resizeListener, 100);
+    this.differentialColumnsConfigured = false;
     this.state = {
       // GENERAL
       // differentialPlotTypes: [],
@@ -57,7 +58,6 @@ class Differential extends Component {
        * @type {QHGrid.ColumnConfig[]}
        */
       differentialColumns: [],
-      differentialColumnsConfigured: false,
       isSearchingDifferential: false,
       isValidSearchDifferential: false,
       isFilteredDifferential: false,
@@ -147,9 +147,7 @@ class Differential extends Component {
   };
 
   handleDifferentialColumnsConfigured = bool => {
-    this.setState({
-      differentialColumnsConfigured: bool,
-    });
+    this.differentialColumnsConfigured = bool;
   };
 
   handleSearchTransitionDifferentialAlt = bool => {
@@ -193,13 +191,13 @@ class Differential extends Component {
     // need this check for page refresh
     if (
       searchResults?.differentialResults?.length &&
-      !this.state.differentialColumnsConfigured
+      !this.differentialColumnsConfigured
     ) {
       let columns = this.getConfigCols(searchResults);
       this.setState({
-        differentialColumnsConfigured: true,
         differentialColumns: columns,
       });
+      this.differentialColumnsConfigured = true;
     }
     this.setState({
       differentialResults: searchResults.differentialResults,
