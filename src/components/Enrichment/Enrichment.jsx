@@ -40,6 +40,7 @@ class Enrichment extends Component {
   storedEnrichmentActiveIndex =
     parseInt(sessionStorage.getItem('enrichmentViewTab'), 10) || 0;
 
+  enrichmentColumnsConfigured = false;
   state = {
     pValueType: sessionStorage.getItem('pValueType') || 'nominal',
     isValidSearchEnrichment: false,
@@ -48,7 +49,6 @@ class Enrichment extends Component {
     enrichmentResults: [],
     enrichmentColumns: [],
     enrichmentColumnsUnfiltered: [],
-    enrichmentColumnsConfigured: false,
     enrichmentFeatureID: '',
     enrichmentPlotSVGHeight: 0,
     enrichmentPlotSVGWidth: 0,
@@ -263,9 +263,7 @@ class Enrichment extends Component {
   };
 
   handleEnrichmentColumnsConfigured = bool => {
-    this.setState({
-      enrichmentColumnsConfigured: bool,
-    });
+    this.enrichmentColumnsConfigured = bool;
   };
 
   getThreePlotsFromUrl = (
@@ -448,12 +446,12 @@ class Enrichment extends Component {
     //   this.handleColumnReorder(searchResults);
     // }
     let columns = this.state.enrichmentColumnsUnfiltered || [];
-    if (searchResults?.length && !this.state.enrichmentColumnsConfigured) {
+    if (searchResults?.length && !this.enrichmentColumnsConfigured) {
       columns = this.getConfigCols(searchResults);
       this.setState({
-        enrichmentColumnsConfigured: true,
         enrichmentColumnsUnfiltered: columns,
       });
+      this.enrichmentColumnsConfigured = true;
     }
     if (multisetTestsFilteredOut.length > 0) {
       columns = columns.map(col => {
@@ -635,13 +633,13 @@ class Enrichment extends Component {
                 let columns = this.state.enrichmentColumnsUnfiltered || [];
                 if (
                   this.state.enrichmentResults?.length &&
-                  !this.state.enrichmentColumnsConfigured
+                  !this.enrichmentColumnsConfigured
                 ) {
                   columns = this.getConfigCols(this.state.enrichmentResults);
                   this.setState({
-                    enrichmentColumnsConfigured: true,
                     enrichmentColumnsUnfiltered: columns,
                   });
+                  this.enrichmentColumnsConfigured = true;
                 }
                 if (this.state.multisetTestsFilteredOut.length > 0) {
                   const self = this;
@@ -691,16 +689,13 @@ class Enrichment extends Component {
                   let columns = this.state.enrichmentColumnsUnfiltered || [];
                   if (
                     this.state.enrichmentResults?.length &&
-                    !this.state.enrichmentColumnsConfigured
+                    !this.enrichmentColumnsConfigured
                   ) {
                     columns = this.getConfigCols(this.state.enrichmentResults);
                     this.setState({
-                      enrichmentColumnsConfigured: true,
                       enrichmentColumnsUnfiltered: columns,
                     });
-                    console.log(
-                      'enrichment config cols - see this just one per db',
-                    );
+                    this.enrichmentColumnsConfigured = true;
                   }
                   if (self.state.multisetTestsFilteredOut.length > 0) {
                     columns = columns.filter(function(col) {
