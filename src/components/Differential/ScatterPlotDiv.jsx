@@ -69,6 +69,7 @@ class ScatterPlotDiv extends Component {
       yAxisLabel: null,
       volcanoCircleLabel: null,
       volcanoCircleLabels: [],
+      // DEV : do we want to reset these ^ ?
       optionsOpen: false,
       usageOpen: false,
     });
@@ -240,11 +241,14 @@ class ScatterPlotDiv extends Component {
       : null;
     // DOY
     let doY = this.state.doYAxisTransformation;
-    debugger;
     if (yLabel == null) {
       yLabel = getYAxis(relevantConfigColumns);
+      if (yLabel !== null) {
+        doY = true;
+      } else {
+        yLabel = relevantConfigColumns[0];
+      }
     }
-    debugger;
     const axes = relevantConfigColumns.map(e => {
       return {
         key: e,

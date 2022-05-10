@@ -501,7 +501,6 @@ export function diff(from, to, field = 'id') {
 
 export function getYAxis(array) {
   const match = array.find(column => {
-    debugger;
     const columnLowerCase = column.toLowerCase();
     if (
       // p value
@@ -521,12 +520,11 @@ export function getYAxis(array) {
   if (match !== undefined) {
     // array contains substring match
     return match;
-  } else return array[0];
+  } else return null;
 }
 
 export function getXAxis(array) {
   const match = array.find(column => {
-    debugger;
     const columnLowerCase = column.toLowerCase();
     if (
       // logfc
