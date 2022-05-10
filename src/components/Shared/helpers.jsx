@@ -498,3 +498,47 @@ export function diff(from, to, field = 'id') {
     added,
   };
 }
+
+export function getYAxis(array) {
+  const match = array.find(column => {
+    debugger;
+    const columnLowerCase = column.toLowerCase();
+    if (
+      // p value
+      columnLowerCase.includes('pval') ||
+      columnLowerCase.includes('p.val') ||
+      columnLowerCase.includes('p_val') ||
+      columnLowerCase.includes('p val') ||
+      // adjusted p value
+      columnLowerCase.includes('adjpval') ||
+      columnLowerCase.includes('adj.p.val') ||
+      columnLowerCase.includes('adj_p_val') ||
+      columnLowerCase.includes('adj p val')
+    ) {
+      return true;
+    } else return undefined;
+  });
+  if (match !== undefined) {
+    // array contains substring match
+    return match;
+  } else return array[0];
+}
+
+export function getXAxis(array) {
+  const match = array.find(column => {
+    debugger;
+    const columnLowerCase = column.toLowerCase();
+    if (
+      // logfc
+      columnLowerCase.includes('logfc') ||
+      columnLowerCase.includes('fc') ||
+      columnLowerCase.includes('log')
+    ) {
+      return true;
+    } else return undefined;
+  });
+  if (match !== undefined) {
+    // array contains substring match
+    return match;
+  } else return array[0];
+}
