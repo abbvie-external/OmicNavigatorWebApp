@@ -12,7 +12,7 @@ import {
 } from 'semantic-ui-react';
 import ndjsonStream from 'can-ndjson-stream';
 import { CancelToken } from 'axios';
-import { getDynamicSize, getWindowWidth } from '../Shared/helpers';
+import { getDynamicSize, getWindowWidth, getYAxis } from '../Shared/helpers';
 import '../Shared/Search.scss';
 import { omicNavigatorService } from '../../services/omicNavigator.service';
 import DifferentialMultisetFilters from './DifferentialMultisetFilters';
@@ -541,27 +541,10 @@ class DifferentialSearch extends Component {
       const { multisetColsDifferential } = this.props;
       // on toggle open
       if (this.state.selectedColP.length === 0) {
-        var defaultColKey = null;
         const multisetColsDifferentialKeys = multisetColsDifferential.map(
           t => t.key,
         );
-        if (multisetColsDifferentialKeys.includes('P_Value')) {
-          defaultColKey = 'P_Value';
-        } else if (multisetColsDifferentialKeys.includes('P.Value')) {
-          defaultColKey = 'P.Value';
-        } else if (multisetColsDifferentialKeys.includes('PValue')) {
-          defaultColKey = 'PValue';
-        } else if (multisetColsDifferentialKeys.includes('PVal')) {
-          defaultColKey = 'PVal';
-        } else if (multisetColsDifferentialKeys.includes('P value')) {
-          defaultColKey = 'P value';
-        } else if (multisetColsDifferentialKeys.includes('adj_P_Value')) {
-          defaultColKey = 'adj_P_Val';
-        } else if (multisetColsDifferentialKeys.includes('adj.P.Value')) {
-          defaultColKey = 'adj.P.Val';
-        } else {
-          defaultColKey = null;
-        }
+        let defaultColKey = getYAxis(multisetColsDifferentialKeys);
         let defaultCol = null;
         if (defaultColKey != null) {
           defaultCol = [
