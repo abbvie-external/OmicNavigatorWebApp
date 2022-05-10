@@ -529,6 +529,10 @@ export function getXAxis(array) {
     if (
       // logfc
       columnLowerCase.includes('logfc') ||
+      columnLowerCase.includes('log.fc') ||
+      columnLowerCase.includes('log2fc') ||
+      columnLowerCase.includes('foldchange') ||
+      columnLowerCase.includes('fold change') ||
       columnLowerCase.includes('fc') ||
       columnLowerCase.includes('log')
     ) {

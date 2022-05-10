@@ -50,10 +50,12 @@ class DifferentialDetail extends Component {
     visible: false,
     allChecked: false,
     enableTabChangeOnSelection: true,
+    scatterplotLoaded: false,
   };
   volcanoPlotFilteredGridRef = React.createRef();
 
   componentDidMount() {
+    debugger;
     this.setState({
       differentialTableData: this.props.differentialResults,
       // volcanoPlotRows: this.props.differentialResults.length,
@@ -63,6 +65,7 @@ class DifferentialDetail extends Component {
   componentDidUpdate(prevProps) {
     const { differentialResults } = this.props;
     if (prevProps.differentialResults !== differentialResults) {
+      debugger;
       this.setState({
         allChecked: false,
         differentialTableData: differentialResults,
@@ -234,6 +237,7 @@ class DifferentialDetail extends Component {
       );
     } else {
       // nothing is in box selection
+      debugger;
       this.props.onHandleHighlightedFeaturesDifferential([]);
       this.props.onResetDifferentialOutlinedFeature();
       this.pageToFeature();
@@ -604,6 +608,7 @@ class DifferentialDetail extends Component {
   };
 
   handleTableChange = () => {
+    debugger;
     let sortedFilteredData =
       this.volcanoPlotFilteredGridRef?.current?.qhGridRef?.current?.getSortedData() ||
       this.props.differentialResults;
@@ -611,6 +616,7 @@ class DifferentialDetail extends Component {
       {
         filteredDifferentialTableData: sortedFilteredData,
         // allChecked: false,
+        scatterplotLoaded: true,
       },
       function() {
         // DEV - test whether we want the rest of this in a callback, so scatter loads faster...
