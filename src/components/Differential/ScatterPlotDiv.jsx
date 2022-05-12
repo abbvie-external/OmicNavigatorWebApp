@@ -12,7 +12,11 @@ import {
   Dimmer,
   List,
 } from 'semantic-ui-react';
-import { isNotNANullUndefinedEmptyString } from '../Shared/helpers';
+import {
+  isNotNANullUndefinedEmptyString,
+  getYAxis,
+  getXAxis,
+} from '../Shared/helpers';
 import ButtonActions from '../Shared/ButtonActions';
 import ScatterPlot from './ScatterPlot';
 import './ScatterPlotDiv.scss';
@@ -65,6 +69,7 @@ class ScatterPlotDiv extends Component {
       yAxisLabel: null,
       volcanoCircleLabel: null,
       volcanoCircleLabels: [],
+      // DEV : do we want to reset these ^ ?
       optionsOpen: false,
       usageOpen: false,
     });
@@ -226,11 +231,7 @@ class ScatterPlotDiv extends Component {
 
     // otherwise, if not cached in session, default to logFC. If no logFC, set to first index
     if (xLabel == null) {
-      if (relevantConfigColumns.indexOf('logFC') >= 0) {
-        xLabel = 'logFC';
-      } else {
-        xLabel = relevantConfigColumns[0];
-      }
+      xLabel = getXAxis(relevantConfigColumns);
     }
     // YAXIS
     let storedYAxisLabel = sessionStorage.getItem('yAxisLabel');
@@ -241,26 +242,8 @@ class ScatterPlotDiv extends Component {
     // DOY
     let doY = this.state.doYAxisTransformation;
     if (yLabel == null) {
-      if (relevantConfigColumns.indexOf('P_Value') >= 0) {
-        yLabel = 'P_Value';
-        doY = true;
-      } else if (relevantConfigColumns.indexOf('P.Value') >= 0) {
-        yLabel = 'P.Value';
-        doY = true;
-      } else if (relevantConfigColumns.indexOf('PValue') >= 0) {
-        yLabel = 'PValue';
-        doY = true;
-      } else if (relevantConfigColumns.indexOf('PVal') >= 0) {
-        yLabel = 'PVal';
-        doY = true;
-      } else if (relevantConfigColumns.indexOf('P value') >= 0) {
-        yLabel = 'P value';
-        doY = true;
-      } else if (relevantConfigColumns.indexOf('adj_P_Val') >= 0) {
-        yLabel = 'adj_P_Val';
-        doY = true;
-      } else if (relevantConfigColumns.indexOf('adj.P.Val') >= 0) {
-        yLabel = 'adj.P.Val';
+      yLabel = getYAxis(relevantConfigColumns);
+      if (yLabel !== null) {
         doY = true;
       } else {
         yLabel = relevantConfigColumns[0];

@@ -50,6 +50,7 @@ class DifferentialDetail extends Component {
     visible: false,
     allChecked: false,
     enableTabChangeOnSelection: true,
+    scatterplotLoaded: false,
   };
   volcanoPlotFilteredGridRef = React.createRef();
 
@@ -611,6 +612,7 @@ class DifferentialDetail extends Component {
       {
         filteredDifferentialTableData: sortedFilteredData,
         // allChecked: false,
+        scatterplotLoaded: true,
       },
       function() {
         // DEV - test whether we want the rest of this in a callback, so scatter loads faster...
