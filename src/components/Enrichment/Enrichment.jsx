@@ -644,7 +644,7 @@ class Enrichment extends Component {
                 if (this.state.multisetTestsFilteredOut.length > 0) {
                   const self = this;
                   columns = columns.filter(function(col) {
-                    return !self.setState.MultisetTestsFilteredOut.includes(
+                    return !self.state.MultisetTestsFilteredOut.includes(
                       col?.title,
                     );
                   });
@@ -699,7 +699,7 @@ class Enrichment extends Component {
                   }
                   if (self.state.multisetTestsFilteredOut.length > 0) {
                     columns = columns.filter(function(col) {
-                      return !self.setState.MultisetTestsFilteredOut.includes(
+                      return !self.state.MultisetTestsFilteredOut.includes(
                         col.title,
                       );
                     });
