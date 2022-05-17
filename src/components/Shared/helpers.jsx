@@ -534,7 +534,8 @@ export function getXAxis(array) {
       columnLowerCase.includes('foldchange') ||
       columnLowerCase.includes('fold change') ||
       columnLowerCase.includes('fc') ||
-      columnLowerCase.includes('log')
+      columnLowerCase.includes('log') ||
+      columnLowerCase.includes('pmod')
     ) {
       return true;
     } else return undefined;
