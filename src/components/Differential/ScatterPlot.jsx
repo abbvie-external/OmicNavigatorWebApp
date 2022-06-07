@@ -1402,7 +1402,7 @@ class ScatterPlot extends Component {
         // transition ticks
         self.xxAxis = d3.axisTop(xScale).ticks();
         self.yyAxis = d3.axisRight(yScale).ticks();
-        let t = d3.select('svg');
+        d3.select('svg');
         // .transition()
         // .duration(200);
         d3.select('#xaxis-line')
