@@ -75,7 +75,7 @@ class ViolinPlot extends Component {
       if (HighlightedProteins.length > 0) {
         HighlightedProteins.forEach(element => {
           const highlightedDotId = element.featureID;
-          const dot = d3.select(`#violin_${highlightedDotId}`);
+          const dot = d3.select(`circle[id='violin_${highlightedDotId}']`);
           dot
             .transition()
             .duration(100)
@@ -98,7 +98,7 @@ class ViolinPlot extends Component {
       // if max protein exists, get id
       if (HighlightedProteins[0]?.featureID) {
         const maxDotId = HighlightedProteins[0].featureID;
-        d3.select(`#violin_${maxDotId}`)
+        d3.select(`circle[id='violin_${maxDotId}']`)
           .transition()
           .duration(100)
           .attr('fill', '#FF4400')
@@ -106,7 +106,7 @@ class ViolinPlot extends Component {
           .attr('r', dOpts.pointSize * 2);
         this.maxCircle = maxDotId;
         this.addToolTiptoMax(HighlightedProteins[0]);
-        d3.select(`#violin_${maxDotId}`).raise();
+        d3.select(`circle[id='violin_${maxDotId}']`).raise();
       }
       const opacityVar = this.state.displayElementTextViolin ? 1 : 0;
       chartSVG.selectAll('g.circleText').attr('opacity', opacityVar);
@@ -221,9 +221,13 @@ class ViolinPlot extends Component {
   addToolTiptoMax = id => {
     if (id != null) {
       const self = this;
-      d3.select(`#violin_${id.featureID}`);
-      const cx = Math.ceil(d3.select(`#violin_${id.featureID}`).attr('cx'));
-      const cy = Math.ceil(d3.select(`#violin_${id.featureID}`).attr('cy'));
+      d3.select(`circle[id='violin_${id.featureID}']`);
+      const cx = Math.ceil(
+        d3.select(`circle[id='violin_${id.featureID}']`).attr('cx'),
+      );
+      const cy = Math.ceil(
+        d3.select(`circle[id='violin_${id.featureID}']`).attr('cy'),
+      );
 
       const svg = document.getElementById(`${this.props.violinSettings.id}`);
       let parent = '';
@@ -1494,13 +1498,13 @@ class ViolinPlot extends Component {
               // self.dotHover.emit({ object: d, action: 'mouseover' });
               self.isHovering = true;
               if (self.maxCircle === d.featureID) {
-                d3.select(`#violin_${d.featureID}`)
+                d3.select(`circle[id='violin_${d.featureID}']`)
                   .transition()
                   .duration(100)
                   .attr('cursor', 'pointer')
                   .attr('r', dOpts.pointSize * 2.5);
               } else {
-                d3.select(`#violin_${d.featureID}`)
+                d3.select(`circle[id='violin_${d.featureID}']`)
                   .transition()
                   .duration(100)
                   .attr('cursor', 'pointer')
@@ -1527,7 +1531,7 @@ class ViolinPlot extends Component {
             })
             .on('mouseout', d => {
               // var id = d.sample.replace(/\;/g, "_");
-              d3.select(`#violin_${d.featureID}`)
+              d3.select(`circle[id='violin_${d.featureID}']`)
                 .transition()
                 .duration(300)
                 .attr('r', x => {
