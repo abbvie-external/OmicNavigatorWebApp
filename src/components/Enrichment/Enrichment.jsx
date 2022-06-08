@@ -189,7 +189,6 @@ class Enrichment extends Component {
     previousEnrichmentModel: '',
     previousEnrichmentAnnotation: '',
     multisetTestsFilteredOut: [],
-    enrichmentColumnsUnfiltered: [],
     itemsPerPageEnrichmentTable:
       parseInt(localStorage.getItem('itemsPerPageEnrichmentTable'), 10) || 30,
     isDataStreamingEnrichmentsTable: false,

@@ -76,13 +76,17 @@ class BarcodePlot extends Component {
           const OtherFeatures = HighlightedProteinsCopy.slice(1);
           OtherFeatures.forEach(element => {
             const lineId = `${element.featureID}`;
-            const OtherHighlighted = d3.select(`#barcode-line-${lineId}`);
+            const OtherHighlighted = d3.select(
+              `line[id='barcode-line-${lineId}']`,
+            );
             OtherHighlighted.classed('HighlightedLine', true)
               .attr('y1', this.state.settings.margin.highlighted)
               .attr('style', 'stroke:#ff7e38;stroke-width:3');
           });
           const MaxFeatureId = MaxFeatureData.featureID;
-          const MaxFeatureElement = d3.select(`#barcode-line-${MaxFeatureId}`);
+          const MaxFeatureElement = d3.select(
+            `line[id='barcode-line-${MaxFeatureId}']`,
+          );
           if (MaxFeatureElement != null) {
             MaxFeatureElement.classed('MaxLine', true)
               .attr('y1', this.state.settings.margin.max)
@@ -163,7 +167,8 @@ class BarcodePlot extends Component {
         ? event.target.attributes[2].nodeValue - 5
         : event.target.attributes[2].nodeValue + 5;
     const lineId = `#barcode-line-${lineIdMult}`;
-    const hoveredLine = d3.select(lineId);
+    const hoveredLine = d3.select(`line[id='barcode-line-${lineIdMult}']`);
+    // const hoveredLine = d3.select(lineId);
     if (hoveredLine.attr('class').endsWith('selected')) {
       hoveredLine.attr('y1', this.state.settings.margin.selected - 10);
     } else if (hoveredLine.attr('class').endsWith('MaxLine')) {
@@ -335,7 +340,7 @@ class BarcodePlot extends Component {
             if (brushedDataVar.length > 0) {
               const maxLineObject = self.getMaxObject(brushedDataVar);
               const maxLineId = `${maxLineObject.lineID}`;
-              const maxLine = d3.select(`#barcode-line-${maxLineId}`);
+              const maxLine = d3.select(`line[id='barcode-line-${maxLineId}']`);
               maxLine
                 .classed('MaxLine', true)
                 .attr('style', 'stroke:#FF4400;stroke-width:3.5')
