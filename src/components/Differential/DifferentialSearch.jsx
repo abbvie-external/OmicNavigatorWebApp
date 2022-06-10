@@ -362,8 +362,11 @@ class DifferentialSearch extends Component {
       onSearchChangeDifferential,
       onSearchResetDifferential,
       differentialModelsAndTests,
+      onHandlePlotTypesDifferential,
+      onHandleDifferentialColumnsConfigured,
     } = this.props;
-    this.props.onHandlePlotTypesDifferential(value);
+    onHandleDifferentialColumnsConfigured(false);
+    onHandlePlotTypesDifferential(value);
     onSearchChangeDifferential(
       {
         differentialStudy: differentialStudy,
