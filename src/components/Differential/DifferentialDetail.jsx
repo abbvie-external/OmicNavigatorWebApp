@@ -7,7 +7,16 @@ import PlotsOverlay from './PlotsOverlay';
 import PlotsDynamic from './PlotsDynamic';
 import { scrollElement } from '../Shared/helpers';
 import ScatterPlotDiv from './ScatterPlotDiv';
-import { Grid, Popup, Label, Sidebar, Icon, List } from 'semantic-ui-react';
+import {
+  Grid,
+  Popup,
+  Label,
+  Sidebar,
+  Icon,
+  List,
+  Button,
+  Form,
+} from 'semantic-ui-react';
 import ButtonActions from '../Shared/ButtonActions';
 import './DifferentialDetail.scss';
 import SplitPane from 'react-split-pane';
@@ -51,6 +60,8 @@ class DifferentialDetail extends Component {
     allChecked: false,
     enableTabChangeOnSelection: true,
     scatterplotLoaded: false,
+    multiSearchOpen: false,
+    featuresList: [],
   };
   volcanoPlotFilteredGridRef = React.createRef();
 
@@ -316,6 +327,14 @@ class DifferentialDetail extends Component {
     this.reloadMultifeaturePlot(selectedTableDataArray);
   };
 
+  removeFeatureFromList = featureToRemove => {
+    const { featuresList } = this.props;
+    const newFeaturesList = featuresList.filter(i => i.id !== featureToRemove);
+    this.setState({
+      featuresList: newFeaturesList,
+    });
+  };
+
   reloadMultifeaturePlot = _.debounce((selected, boxSelection) => {
     const data = boxSelection
       ? selected
@@ -558,6 +577,12 @@ class DifferentialDetail extends Component {
     this.handleSizeChange(size, 'vertical');
   };
 
+  toggleMultiSearchPopup = () => {
+    this.setState({
+      multiSearchOpen: !this.state.multiSearchOpen,
+    });
+  };
+
   handleSizeChange = (newSize, axisDragged) => {
     const { volcanoDivWidth } = this.state;
     const { fwdRefDVC } = this.props;
@@ -718,6 +743,10 @@ class DifferentialDetail extends Component {
     this.props.onHandleMultifeaturePlot('Overlay', tableData, true);
   };
 
+  handleMultiFeatureSearch = () => {
+    this.setState({ featuresList: ['12759', '53624'] });
+  };
+
   render() {
     const {
       differentialTableData,
@@ -732,6 +761,8 @@ class DifferentialDetail extends Component {
       direction,
       differentialDynamicPlotWidth,
       enableTabChangeOnSelection,
+      multiSearchOpen,
+      featuresList,
     } = this.state;
 
     const {
@@ -810,6 +841,7 @@ class DifferentialDetail extends Component {
         differentialTests,
         differentialHighlightedFeaturesData,
       } = this.props;
+
       if (plotOverlayVisible) {
         return (
           <Sidebar
@@ -930,6 +962,17 @@ class DifferentialDetail extends Component {
         onReloadMultifeaturePlot={this.reloadMultifeaturePlot}
       ></ScatterPlotDiv>
     );
+
+    const AdvancedSearchPopup = {
+      backgroundColor: '2E2E2E',
+      borderBottom: '2px solid var(--color-primary)',
+      color: '#FFF',
+      padding: '1em',
+      minWidth: '30vw',
+      maxWidth: '30vw',
+      fontSize: '13px',
+      wordBreak: 'break-all',
+    };
 
     const dynamicPlots = (
       <PlotsDynamic
@@ -1110,6 +1153,86 @@ class DifferentialDetail extends Component {
                             model={differentialModel}
                             test={differentialTest}
                           />
+                        </div>
+                        <div className="AbsoluteMultiSearchDifferential">
+                          <span id="MultiSearchPopupContainer">
+                            <Popup
+                              trigger={
+                                <Button
+                                  size="mini"
+                                  onClick={this.toggleMultiSearchPopup}
+                                >
+                                  <Icon
+                                    name="search"
+                                    className="ViewPlotOptions"
+                                  />
+                                  ADVANCED SEARCH
+                                </Button>
+                              }
+                              position="right center"
+                              basic
+                              on="click"
+                              inverted
+                              style={AdvancedSearchPopup}
+                              open={multiSearchOpen}
+                              closeOnDocumentClick
+                              closeOnEscape
+                            >
+                              <Popup.Content id="">
+                                <Form>
+                                  <Form.TextArea placeholder="Separate features with a comma or semi-colon" />
+                                  <Form.Button
+                                    onClick={() =>
+                                      this.handleMultiFeatureSearch
+                                    }
+                                  >
+                                    Add
+                                  </Form.Button>
+                                </Form>
+                                {featuresList?.length ? (
+                                  <List
+                                    animated
+                                    inverted
+                                    verticalAlign="middle"
+                                    id="FeaturesListHorizontal"
+                                    className="NoSelect"
+                                    divided
+                                    horizontal
+                                    size="mini"
+                                  >
+                                    <List.Item className="NoSelect">
+                                      <Label
+                                        className="PrimaryBackground CursorPointer"
+                                        onClick={() =>
+                                          this.setState({ featuresList: [] })
+                                        }
+                                      >
+                                        CLEAR ALL <Icon name="trash" />
+                                      </Label>
+                                    </List.Item>
+                                    {featuresList.map(f => {
+                                      return (
+                                        <List.Item
+                                          key={`featureList-${f}`}
+                                          className="NoSelect"
+                                        >
+                                          <Label
+                                            className="CursorPointer"
+                                            onClick={() =>
+                                              this.onRemoveFeatureFromList(f)
+                                            }
+                                          >
+                                            {f}
+                                            <Icon name="delete" />
+                                          </Label>
+                                        </List.Item>
+                                      );
+                                    })}
+                                  </List>
+                                ) : null}
+                              </Popup.Content>
+                            </Popup>
+                          </span>
                         </div>
                         <Grid.Column
                           className="ResultsTableWrapper"
