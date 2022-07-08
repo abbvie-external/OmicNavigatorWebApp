@@ -61,7 +61,8 @@ class DifferentialDetail extends Component {
     enableTabChangeOnSelection: true,
     scatterplotLoaded: false,
     multiSearchOpen: false,
-    featuresList: [],
+    multiFeaturesSearched: [],
+    multiFeatureSearchText: '',
   };
   volcanoPlotFilteredGridRef = React.createRef();
 
@@ -72,14 +73,38 @@ class DifferentialDetail extends Component {
     });
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps, prevState) {
     const { differentialResults } = this.props;
+    const { multiFeaturesSearched } = this.state;
     if (prevProps.differentialResults !== differentialResults) {
       this.setState({
         allChecked: false,
         differentialTableData: differentialResults,
         volcanoPlotRows: differentialResults?.length || 0,
+        multiFeaturesSearched: [],
       });
+    } else if (prevState.multiFeaturesSearched !== multiFeaturesSearched) {
+      if (multiFeaturesSearched.length) {
+        const multiFeaturesSearchedSet = new Set(multiFeaturesSearched);
+        const differentialResultsWithinMultiFeatureSearch = [
+          ...differentialResults,
+        ].filter(d =>
+          multiFeaturesSearchedSet.has(d[this.props.differentialFeatureIdKey]),
+        );
+        this.setState({
+          allChecked: false,
+          differentialTableData: differentialResultsWithinMultiFeatureSearch,
+          volcanoPlotRows:
+            differentialResultsWithinMultiFeatureSearch?.length || 0,
+        });
+      } else {
+        // reset differential table data if multiFeaturesSearched is empty
+        this.setState({
+          allChecked: false,
+          differentialTableData: differentialResults,
+          volcanoPlotRows: differentialResults?.length || 0,
+        });
+      }
     }
   }
 
@@ -328,10 +353,13 @@ class DifferentialDetail extends Component {
   };
 
   removeFeatureFromList = featureToRemove => {
-    const { featuresList } = this.props;
-    const newFeaturesList = featuresList.filter(i => i.id !== featureToRemove);
+    debugger;
+    const { multiFeaturesSearched } = this.state;
+    const newMultiFeaturesSearched = multiFeaturesSearched.filter(
+      i => i !== featureToRemove,
+    );
     this.setState({
-      featuresList: newFeaturesList,
+      multiFeaturesSearched: newMultiFeaturesSearched,
     });
   };
 
@@ -577,12 +605,6 @@ class DifferentialDetail extends Component {
     this.handleSizeChange(size, 'vertical');
   };
 
-  toggleMultiSearchPopup = () => {
-    this.setState({
-      multiSearchOpen: !this.state.multiSearchOpen,
-    });
-  };
-
   handleSizeChange = (newSize, axisDragged) => {
     const { volcanoDivWidth } = this.state;
     const { fwdRefDVC } = this.props;
@@ -744,7 +766,7 @@ class DifferentialDetail extends Component {
   };
 
   handleMultiFeatureSearch = () => {
-    this.setState({ featuresList: ['12759', '53624'] });
+    this.setState({ multiFeaturesSearched: ['12759', '53624'] });
   };
 
   render() {
@@ -761,9 +783,10 @@ class DifferentialDetail extends Component {
       direction,
       differentialDynamicPlotWidth,
       enableTabChangeOnSelection,
-      multiSearchOpen,
-      featuresList,
+      multiFeaturesSearched,
+      multiFeatureSearchText,
     } = this.state;
+    debugger;
 
     const {
       additionalTemplateInfoDifferentialTable,
@@ -963,13 +986,13 @@ class DifferentialDetail extends Component {
       ></ScatterPlotDiv>
     );
 
-    const AdvancedSearchPopup = {
+    const MultiFeatureSearchPopup = {
       backgroundColor: '2E2E2E',
       borderBottom: '2px solid var(--color-primary)',
       color: '#FFF',
       padding: '1em',
-      minWidth: '30vw',
-      maxWidth: '30vw',
+      minWidth: '40vw',
+      maxWidth: '40vw',
       fontSize: '13px',
       wordBreak: 'break-all',
     };
@@ -1158,43 +1181,42 @@ class DifferentialDetail extends Component {
                           <span id="MultiSearchPopupContainer">
                             <Popup
                               trigger={
-                                <Button
-                                  size="mini"
-                                  onClick={this.toggleMultiSearchPopup}
-                                >
+                                <Button size="mini">
                                   <Icon
                                     name="search"
                                     className="ViewPlotOptions"
                                   />
-                                  ADVANCED SEARCH
+                                  MULTI-FEATURE SEARCH
                                 </Button>
                               }
                               position="right center"
                               basic
                               on="click"
                               inverted
-                              style={AdvancedSearchPopup}
-                              open={multiSearchOpen}
+                              style={MultiFeatureSearchPopup}
                               closeOnDocumentClick
                               closeOnEscape
                             >
                               <Popup.Content id="">
                                 <Form>
-                                  <Form.TextArea placeholder="Separate features with a comma or semi-colon" />
+                                  <Form.TextArea
+                                    placeholder="Separate features with a comma or semi-colon"
+                                    defaultValue={multiFeatureSearchText}
+                                  />
                                   <Form.Button
-                                    onClick={() =>
-                                      this.handleMultiFeatureSearch
+                                    onClick={value =>
+                                      this.handleMultiFeatureSearch(value)
                                     }
                                   >
                                     Add
                                   </Form.Button>
                                 </Form>
-                                {featuresList?.length ? (
+                                {multiFeaturesSearched?.length ? (
                                   <List
                                     animated
                                     inverted
                                     verticalAlign="middle"
-                                    id="FeaturesListHorizontal"
+                                    id="MultiFeaturesSearchedHorizontal"
                                     className="NoSelect"
                                     divided
                                     horizontal
@@ -1204,13 +1226,15 @@ class DifferentialDetail extends Component {
                                       <Label
                                         className="PrimaryBackground CursorPointer"
                                         onClick={() =>
-                                          this.setState({ featuresList: [] })
+                                          this.setState({
+                                            multiFeaturesSearched: [],
+                                          })
                                         }
                                       >
                                         CLEAR ALL <Icon name="trash" />
                                       </Label>
                                     </List.Item>
-                                    {featuresList.map(f => {
+                                    {multiFeaturesSearched.map(f => {
                                       return (
                                         <List.Item
                                           key={`featureList-${f}`}
@@ -1219,7 +1243,7 @@ class DifferentialDetail extends Component {
                                           <Label
                                             className="CursorPointer"
                                             onClick={() =>
-                                              this.onRemoveFeatureFromList(f)
+                                              this.removeFeatureFromList(f)
                                             }
                                           >
                                             {f}
