@@ -75,7 +75,7 @@ class DifferentialDetail extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     const { differentialResults } = this.props;
-    const { multiFeaturesSearched } = this.state;
+    const { multiFeaturesSearched, filteredDifferentialTableData } = this.state;
     if (prevProps.differentialResults !== differentialResults) {
       this.setState({
         allChecked: false,
@@ -86,16 +86,17 @@ class DifferentialDetail extends Component {
     } else if (prevState.multiFeaturesSearched !== multiFeaturesSearched) {
       if (multiFeaturesSearched.length) {
         const multiFeaturesSearchedSet = new Set(multiFeaturesSearched);
-        const differentialResultsWithinMultiFeatureSearch = [
-          ...differentialResults,
+        const filteredDifferentialTableDataWithinMultiFeatureSearch = [
+          ...filteredDifferentialTableData,
         ].filter(d =>
           multiFeaturesSearchedSet.has(d[this.props.differentialFeatureIdKey]),
         );
         this.setState({
           allChecked: false,
-          differentialTableData: differentialResultsWithinMultiFeatureSearch,
+          // filteredDifferentialTableData: filteredDifferentialTableDataWithinMultiFeatureSearch,
+          differentialTableData: filteredDifferentialTableDataWithinMultiFeatureSearch,
           volcanoPlotRows:
-            differentialResultsWithinMultiFeatureSearch?.length || 0,
+            filteredDifferentialTableDataWithinMultiFeatureSearch?.length || 0,
         });
       } else {
         // reset differential table data if multiFeaturesSearched is empty
