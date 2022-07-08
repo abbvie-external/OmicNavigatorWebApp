@@ -60,7 +60,6 @@ class DifferentialDetail extends Component {
     allChecked: false,
     enableTabChangeOnSelection: true,
     scatterplotLoaded: false,
-    multiSearchOpen: false,
     multiFeaturesSearched: [],
     multiFeatureSearchText: '',
   };
@@ -75,7 +74,6 @@ class DifferentialDetail extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     const { differentialResults } = this.props;
-    const { multiFeaturesSearched, filteredDifferentialTableData } = this.state;
     if (prevProps.differentialResults !== differentialResults) {
       this.setState({
         allChecked: false,
@@ -83,29 +81,6 @@ class DifferentialDetail extends Component {
         volcanoPlotRows: differentialResults?.length || 0,
         multiFeaturesSearched: [],
       });
-    } else if (prevState.multiFeaturesSearched !== multiFeaturesSearched) {
-      if (multiFeaturesSearched.length) {
-        const multiFeaturesSearchedSet = new Set(multiFeaturesSearched);
-        const filteredDifferentialTableDataWithinMultiFeatureSearch = [
-          ...filteredDifferentialTableData,
-        ].filter(d =>
-          multiFeaturesSearchedSet.has(d[this.props.differentialFeatureIdKey]),
-        );
-        this.setState({
-          allChecked: false,
-          // filteredDifferentialTableData: filteredDifferentialTableDataWithinMultiFeatureSearch,
-          differentialTableData: filteredDifferentialTableDataWithinMultiFeatureSearch,
-          volcanoPlotRows:
-            filteredDifferentialTableDataWithinMultiFeatureSearch?.length || 0,
-        });
-      } else {
-        // reset differential table data if multiFeaturesSearched is empty
-        this.setState({
-          allChecked: false,
-          differentialTableData: differentialResults,
-          volcanoPlotRows: differentialResults?.length || 0,
-        });
-      }
     }
   }
 
@@ -351,17 +326,6 @@ class DifferentialDetail extends Component {
     );
     this.props.onHandleHighlightedFeaturesDifferential(selectedTableDataArray);
     this.reloadMultifeaturePlot(selectedTableDataArray);
-  };
-
-  removeFeatureFromList = featureToRemove => {
-    debugger;
-    const { multiFeaturesSearched } = this.state;
-    const newMultiFeaturesSearched = multiFeaturesSearched.filter(
-      i => i !== featureToRemove,
-    );
-    this.setState({
-      multiFeaturesSearched: newMultiFeaturesSearched,
-    });
   };
 
   reloadMultifeaturePlot = _.debounce((selected, boxSelection) => {
@@ -766,8 +730,104 @@ class DifferentialDetail extends Component {
     this.props.onHandleMultifeaturePlot('Overlay', tableData, true);
   };
 
-  handleMultiFeatureSearch = () => {
-    this.setState({ multiFeaturesSearched: ['12759', '53624'] });
+  handleMultiFeatureSearchTextChange = (e, { name, value }) =>
+    this.setState({ [name]: value });
+
+  // filterDifferentialTableData = (multiFeatures) => {
+
+  // }
+
+  handleMultiFeatureSearchAction = (type, featureToRemove) => {
+    debugger;
+    const { differentialResults } = this.props;
+    const {
+      filteredDifferentialTableData,
+      multiFeaturesSearched,
+      multiFeatureSearchText,
+    } = this.state;
+    if (type === 'clear') {
+      this.setState({
+        differentialTableData: differentialResults,
+        volcanoPlotRows: differentialResults?.length || 0,
+        multiFeaturesSearched: [],
+        multiFeatureSearchText: '',
+      });
+    } else if (type === 'remove') {
+      const newMultiFeaturesSearched = multiFeaturesSearched.filter(
+        i => i !== featureToRemove,
+      );
+      if (newMultiFeaturesSearched.length) {
+        const newMultiFeaturesSearchedSet = new Set(newMultiFeaturesSearched);
+        const relevantFilteredDifferentialTableData = [
+          ...filteredDifferentialTableData,
+        ].filter(d =>
+          newMultiFeaturesSearchedSet.has(
+            d[this.props.differentialFeatureIdKey],
+          ),
+        );
+        this.setState({
+          differentialTableData: relevantFilteredDifferentialTableData,
+          volcanoPlotRows: relevantFilteredDifferentialTableData?.length || 0,
+          multiFeaturesSearched: newMultiFeaturesSearched,
+        });
+      } else {
+        // reset differential table data if multiFeaturesSearched is empty
+        this.setState({
+          differentialTableData: differentialResults,
+          volcanoPlotRows: differentialResults?.length || 0,
+          multiFeaturesSearched: [],
+          multiFeatureSearchText: '',
+        });
+      }
+    } else {
+      // new search
+      if (multiFeatureSearchText !== '') {
+        // 12759, 67451,19253;22249; 70737
+        const multiFeatureSearchTextSplit = multiFeatureSearchText
+          // .replace(/[,;]$/, '')
+          // .split(',')
+          // .split(/[ .:;?!~,`"&|()<>{}\[\]\r\n/\\]+/)
+          .split(/[ ;,]+/)
+          .map(item => item.trim());
+
+        let multiFeaturesSearchedVar = [];
+        const multiFeaturesSearchedSet = new Set(multiFeatureSearchTextSplit);
+        const relevantFilteredDifferentialTableData = [
+          ...filteredDifferentialTableData,
+        ].filter(d => {
+          if (
+            multiFeaturesSearchedSet.has(d[this.props.differentialFeatureIdKey])
+          ) {
+            multiFeaturesSearchedVar.push([
+              d[this.props.differentialFeatureIdKey],
+            ]);
+            return true;
+          } else return false;
+        });
+        // if any filteredDifferentialTableData matches the search text, take action
+        if (multiFeaturesSearchedVar.length) {
+          this.setState({
+            differentialTableData: relevantFilteredDifferentialTableData,
+            volcanoPlotRows: relevantFilteredDifferentialTableData?.length || 0,
+            multiFeaturesSearched: multiFeaturesSearchedVar,
+          });
+        } else {
+          this.resetMultiFeatureSearch();
+        }
+      } else {
+        this.resetMultiFeatureSearch();
+      }
+    }
+  };
+
+  resetMultiFeatureSearch = () => {
+    const { filteredDifferentialTableData } = this.state;
+    this.setState({
+      differentialTableData: filteredDifferentialTableData,
+      volcanoPlotRows: filteredDifferentialTableData?.length || 0,
+      multiFeaturesSearched: [],
+      multiFeatureSearchText: '',
+    });
   };
 
   render() {
@@ -787,7 +847,6 @@ class DifferentialDetail extends Component {
       multiFeaturesSearched,
       multiFeatureSearchText,
     } = this.state;
-    debugger;
 
     const {
       additionalTemplateInfoDifferentialTable,
@@ -928,7 +987,7 @@ class DifferentialDetail extends Component {
           <List.Content>
             <List.Header>Select Multiple</List.Header>
             <List.Description>
-              Control-Click or Shift-Click a ROW to multi-select/mulit-deselect
+              Control-Click or Shift-Click a ROW to multi-select/multi-deselect
             </List.Description>
           </List.Content>
         </List.Item>
@@ -1036,9 +1095,6 @@ class DifferentialDetail extends Component {
         onGetMultifeaturePlotTransitionAlt={
           this.getMultifeaturePlotTransitionAlt
         }
-        // onHandleMultifeaturePlotRef={
-        //   onHandleMultifeaturePlot
-        // }
         onHandleVolcanoVisability={this.handleVolcanoVisability}
         onHandleHighlightedFeaturesDifferential={
           this.props.onHandleHighlightedFeaturesDifferential
@@ -1199,18 +1255,22 @@ class DifferentialDetail extends Component {
                               closeOnEscape
                             >
                               <Popup.Content id="">
-                                <Form>
+                                <Form
+                                  onSubmit={() =>
+                                    this.handleMultiFeatureSearchAction(
+                                      'submit',
+                                    )
+                                  }
+                                >
                                   <Form.TextArea
                                     placeholder="Separate features with a comma or semi-colon"
-                                    defaultValue={multiFeatureSearchText}
-                                  />
-                                  <Form.Button
-                                    onClick={value =>
-                                      this.handleMultiFeatureSearch(value)
+                                    name="multiFeatureSearchText"
+                                    value={multiFeatureSearchText}
+                                    onChange={
+                                      this.handleMultiFeatureSearchTextChange
                                     }
-                                  >
-                                    Add
-                                  </Form.Button>
+                                  />
+                                  <Form.Button content="Add" />
                                 </Form>
                                 {multiFeaturesSearched?.length ? (
                                   <List
@@ -1227,9 +1287,9 @@ class DifferentialDetail extends Component {
                                       <Label
                                         className="PrimaryBackground CursorPointer"
                                         onClick={() =>
-                                          this.setState({
-                                            multiFeaturesSearched: [],
-                                          })
+                                          this.handleMultiFeatureSearchAction(
+                                            'clear',
+                                          )
                                         }
                                       >
                                         CLEAR ALL <Icon name="trash" />
@@ -1244,7 +1304,10 @@ class DifferentialDetail extends Component {
                                           <Label
                                             className="CursorPointer"
                                             onClick={() =>
-                                              this.removeFeatureFromList(f)
+                                              this.handleMultiFeatureSearchAction(
+                                                'remove',
+                                                f,
+                                              )
                                             }
                                           >
                                             {f}
