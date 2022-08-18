@@ -153,13 +153,23 @@ class OmicNavigatorService {
     if (this[cacheKey] != null) {
       return this[cacheKey];
     } else {
-      const obj = {
+      // if (!Array.isArray(modelID)) return;
+      if (Array.isArray(modelID)) {
+        // const modelLength = modelID.length;
+        // const testsLimitedToModelLength = testID.slice(0, modelLength);
+        // testID = testsLimitedToModelLength;
+        const testsSplit = testID.split('_');
+        // debugger;
+        testID = testsSplit;
+      }
+      let obj = {
         study,
         modelID,
         featureID,
         plotID,
         testID,
       };
+      console.log(JSON.stringify(obj));
       if (plotType.includes('plotly')) {
         const dataFromPlotly = await this.axiosPostPlotly(
           'plotStudy',

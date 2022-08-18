@@ -47,6 +47,7 @@ class Differential extends Component {
       differentialModelsAndTests: [],
       differentialTestsMetadata: [],
       differentialTestIds: [],
+      differentialModelIds: [],
       // RESULTS
       differentialResultsTableLoading: false,
       // differentialResults: [],
@@ -175,6 +176,12 @@ class Differential extends Component {
     });
   };
 
+  setDifferentialModelIds = differentialModelIds => {
+    this.setState({
+      differentialModelIds,
+    });
+  };
+
   handleDifferentialSearch = (
     searchResults,
     setUnfiltered,
@@ -265,7 +272,8 @@ class Differential extends Component {
                 pt === 'multiFeature' ||
                 pt === 'singleTest' ||
                 pt === 'multiTest' ||
-                pt === 'plotly'
+                pt === 'plotly' ||
+                pt === 'multiModel'
               );
             };
             const valid = plotTypeArr.every(isValidPlotType);
@@ -283,6 +291,7 @@ class Differential extends Component {
         let plotMultiFeatureAvailableVar = false;
         let singleFeaturePlotTypesVar = [];
         let multiFeaturePlotTypesVar = [];
+        // let multiModelPlotTypesVar = [];
         if (differentialPlotTypesVar) {
           singleFeaturePlotTypesVar = [...differentialPlotTypesVar].filter(
             p => !p.plotType.includes('multiFeature'),
@@ -290,6 +299,19 @@ class Differential extends Component {
           multiFeaturePlotTypesVar = [...differentialPlotTypesVar].filter(p =>
             p.plotType.includes('multiFeature'),
           );
+          // in progress - if we need to distinuguish tabs for multi-modal
+          // multiModelPlotTypesVar = [...differentialPlotTypesVar].filter(p =>
+          //   p.plotType.includes('multiModel'),
+          // );
+          // const notMultiModelPlotTypesVar = [
+          //   ...differentialPlotTypesVar,
+          // ].filter(p => p.plotType.includes('!multiModel'));
+          // singleFeaturePlotTypesVar = [...notMultiModelPlotTypesVar].filter(
+          //   p => !p.plotType.includes('multiFeature'),
+          // );
+          // multiFeaturePlotTypesVar = [...notMultiModelPlotTypesVar].filter(p =>
+          //   p.plotType.includes('multiFeature'),
+          // );
           plotMultiFeatureAvailableVar =
             multiFeaturePlotTypesVar?.length || false;
         }
@@ -297,6 +319,7 @@ class Differential extends Component {
           differentialPlotTypes: differentialPlotTypesVar,
           singleFeaturePlotTypes: singleFeaturePlotTypesVar,
           multiFeaturePlotTypes: multiFeaturePlotTypesVar,
+          // multiModelPlotTypes: multiModelPlotTypesVar,
           plotMultiFeatureAvailable: plotMultiFeatureAvailableVar,
         });
       }
@@ -557,7 +580,11 @@ class Differential extends Component {
   };
 
   getPlot = (view, featureId, returnSVG, multifeaturePlot) => {
-    const { differentialPlotTypes, differentialTestIds } = this.state;
+    const {
+      differentialPlotTypes,
+      differentialTestIds,
+      differentialModelIds,
+    } = this.state;
     const {
       differentialStudy,
       differentialModel,
@@ -600,15 +627,20 @@ class Differential extends Component {
       if (plots?.length) {
         if (returnSVG) {
           _.forEach(plots, function(plot, i) {
-            const testsArg = plots[i].plotType.includes('multiTest')
-              ? differentialTestIds
-              : differentialTest;
+            const testsArg =
+              plots[i].plotType.includes('multiTest') &&
+              !plots[i].plotType.includes('multiModel')
+                ? differentialTestIds
+                : differentialTest;
+            const modelsArg = plot.plotType.includes('multiModel')
+              ? differentialModelIds
+              : differentialModel;
             // handle plotly differently than static plot svgs
             if (plots[i].plotType.includes('plotly')) {
               omicNavigatorService
                 .plotStudyReturnSvgUrl(
                   differentialStudy,
-                  differentialModel,
+                  modelsArg,
                   // ['12759', '53624'],
                   id,
                   plot.plotID,
@@ -627,7 +659,6 @@ class Differential extends Component {
                   self.handleSVG(view, plotDataVar);
                 });
             } else {
-              // static plot svgs
               omicNavigatorService
                 .plotStudyReturnSvg(
                   differentialStudy,
@@ -686,13 +717,18 @@ class Differential extends Component {
           // refined for dynamically sized plots on single-threaded servers (running R locally), we're using a race condition to take the first url and handle/display it asap; after that, we're using allSettled to wait for remaining urls, and then sending them all to the component as props
           const promises = plots
             .map(plot => {
-              const testsArg = plot.plotType.includes('multiTest')
-                ? differentialTestIds
-                : differentialTest;
+              const testsArg =
+                plot.plotType.includes('multiTest') &&
+                !plot.plotType.includes('multiModel')
+                  ? differentialTestIds
+                  : differentialTest;
+              const modelsArg = plot.plotType.includes('multiModel')
+                ? differentialModelIds
+                : differentialModel;
               return omicNavigatorService
                 .plotStudyReturnSvgUrl(
                   differentialStudy,
-                  differentialModel,
+                  modelsArg,
                   // ['12759', '53624'],
                   id,
                   plot.plotID,
@@ -806,7 +842,11 @@ class Differential extends Component {
 
   async getMultifeaturePlot(featureids) {
     if (featureids?.length) {
-      const { differentialPlotTypes, differentialTestIds } = this.state;
+      const {
+        differentialPlotTypes,
+        differentialTestIds,
+        differentialModelIds,
+      } = this.state;
       const {
         differentialStudy,
         differentialModel,
@@ -831,15 +871,22 @@ class Differential extends Component {
       if (multifeaturePlot.length !== 0) {
         if (multifeaturePlot.length === 1) {
           try {
-            const testsArg = multifeaturePlot[0].plotType.includes('multiTest')
-              ? differentialTestIds
-              : differentialTest;
+            const testsArg =
+              multifeaturePlot[0].plotType.includes('multiTest') &&
+              !multifeaturePlot[0].plotType.includes('multiModel')
+                ? differentialTestIds
+                : differentialTest;
+            const modelsArg = multifeaturePlot[0].plotType.includes(
+              'multiModel',
+            )
+              ? differentialModelIds
+              : differentialModel;
             // handle plotly differently than static plot svgs
             if (multifeaturePlot[0].plotType.includes('plotly')) {
               omicNavigatorService
                 .plotStudyReturnSvgUrl(
                   differentialStudy,
-                  differentialModel,
+                  modelsArg,
                   // ['12759', '53624'],
                   featureids,
                   multifeaturePlot[0].plotID,
@@ -860,7 +907,7 @@ class Differential extends Component {
             } else {
               const promise = omicNavigatorService.plotStudyReturnSvgWithTimeoutResolver(
                 differentialStudy,
-                differentialModel,
+                modelsArg,
                 featureids,
                 multifeaturePlot[0].plotID,
                 testsArg,
@@ -895,15 +942,20 @@ class Differential extends Component {
           }
         } else {
           _.forEach(multifeaturePlot, function(plot, i) {
-            const testsArg = plot.plotType.includes('multiTest')
-              ? differentialTestIds
-              : differentialTest;
+            const testsArg =
+              plot.plotType.includes('multiTest') &&
+              !plot.plotType.includes('multiModel')
+                ? differentialTestIds
+                : differentialTest;
+            const modelsArg = plot.plotType.includes('multiModel')
+              ? differentialModelIds
+              : differentialModel;
             // handle plotly differently than static plot svgs
             if (multifeaturePlot[i].plotType.includes('plotly')) {
               omicNavigatorService
                 .plotStudyReturnSvgUrl(
                   differentialStudy,
-                  differentialModel,
+                  modelsArg,
                   // ['12759', '53624'],
                   featureids,
                   plot.plotID,
@@ -925,7 +977,7 @@ class Differential extends Component {
               omicNavigatorService
                 .plotStudyReturnSvg(
                   differentialStudy,
-                  differentialModel,
+                  modelsArg,
                   featureids,
                   multifeaturePlot[i].plotID,
                   multifeaturePlot[i].plotType,
@@ -1709,6 +1761,7 @@ class Differential extends Component {
               onSetStudyModelTestMetadata={this.setStudyModelTestMetadata}
               onSetTestsMetadata={this.setTestsMetadata}
               onSetDifferentialTestIds={this.setDifferentialTestIds}
+              onSetDifferentialModelIds={this.setDifferentialModelIds}
               onHandlePlotTypesDifferential={this.handlePlotTypesDifferential}
               onHandleResultsTableLoading={this.handleResultsTableLoading}
               onDoMetaFeaturesExist={this.doMetaFeaturesExist}

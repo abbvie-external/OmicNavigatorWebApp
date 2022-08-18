@@ -179,6 +179,11 @@ class DifferentialSearch extends Component {
         differentialStudyData,
         differentialModelsAndTestsVar,
       );
+      const differentialModelIds = [];
+      differentialModelsAndTestsVar.forEach(result =>
+        differentialModelIds.push(result.modelID),
+      );
+      this.props.onSetDifferentialModelIds(differentialModelIds);
       const differentialModelsMapped = differentialModelsAndTestsVar.map(
         result => {
           return {
