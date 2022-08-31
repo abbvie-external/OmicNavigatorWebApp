@@ -567,6 +567,15 @@ class Enrichment extends Component {
   };
 
   handleSearchChangeEnrichment = (changes, scChange) => {
+    if (
+      changes.enrichmentAnnotation !== '' &&
+      changes.enrichmentAnnotation !== this.props.enrichmentAnnotation
+    ) {
+      this.getEnrichmentsLinkouts(
+        changes.enrichmentStudy,
+        changes.enrichmentAnnotation,
+      );
+    }
     this.props.onHandleUrlChange(changes, 'enrichment');
     this.setState({
       plotButtonActiveEnrichment: false,
@@ -576,15 +585,6 @@ class Enrichment extends Component {
       this.setState({
         multisetPlotAvailableEnrichment: false,
       });
-    }
-    if (
-      changes.enrichmentAnnotation !== '' &&
-      changes.enrichmentAnnotation !== this.props.enrichmentAnnotation
-    ) {
-      this.getEnrichmentsLinkouts(
-        changes.enrichmentStudy,
-        changes.enrichmentAnnotation,
-      );
     }
   };
 
@@ -631,8 +631,8 @@ class Enrichment extends Component {
               function() {
                 let columns = this.state.enrichmentColumnsUnfiltered || [];
                 if (
-                  this.state.enrichmentResults?.length &&
-                  !this.enrichmentColumnsConfigured
+                  this.state.enrichmentResults?.length
+                  // && !this.enrichmentColumnsConfigured
                 ) {
                   columns = this.getConfigCols(this.state.enrichmentResults);
                   this.setState({
@@ -687,8 +687,8 @@ class Enrichment extends Component {
                 function() {
                   let columns = this.state.enrichmentColumnsUnfiltered || [];
                   if (
-                    this.state.enrichmentResults?.length &&
-                    !this.enrichmentColumnsConfigured
+                    this.state.enrichmentResults?.length
+                    // && !this.enrichmentColumnsConfigured
                   ) {
                     columns = this.getConfigCols(this.state.enrichmentResults);
                     this.setState({
