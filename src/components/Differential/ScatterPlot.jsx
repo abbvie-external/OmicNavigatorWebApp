@@ -362,7 +362,7 @@ class ScatterPlot extends Component {
   }
 
   hexBinning(data) {
-    if (data.length > 2500) {
+    if (data.length >= 2500) {
       const { xScale, yScale } = this.scaleFactory(data);
       const { bins, circles } = this.parseDataToBinsAndCircles(
         data,
@@ -381,12 +381,22 @@ class ScatterPlot extends Component {
         },
       );
     } else {
-      this.scaleFactory(data);
-      this.renderCircles(data);
-      this.unhighlightCirclesAndBinsAndLabels();
-      this.highlightCirclesAndBins();
-      this.outlineCircleOrBin();
-      this.handleCircleLabels();
+      this.setState(
+        {
+          bins: [],
+          circles: data,
+          relevantCircles: data,
+          relevantBins: [],
+        },
+        function() {
+          this.scaleFactory(data);
+          this.renderCircles(data);
+          this.unhighlightCirclesAndBinsAndLabels();
+          this.highlightCirclesAndBins();
+          this.outlineCircleOrBin();
+          this.handleCircleLabels();
+        },
+      );
     }
   }
 
