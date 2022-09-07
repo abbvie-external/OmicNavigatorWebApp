@@ -334,8 +334,12 @@ class Enrichment extends Component {
           }
           showBarcodePlotCb(barcodeDataResponse, dataItem);
         } else {
-          // empty barcode data array
-          this.handleGetBarcodeDataError();
+          this.setState({
+            displayViolinPlot: false,
+          });
+          showBarcodePlotCb(barcodeDataResponse, dataItem);
+          // empty barcode data array - we've decided to render the table and plots without barcode and violin
+          // this.handleGetBarcodeDataError();
         }
       })
       .catch(error => {
@@ -1199,12 +1203,15 @@ class Enrichment extends Component {
 
   handleBarcodeChanges = changes => {
     let self = this;
+    const splitPaneData = this.state.hasBarcodeData
+      ? this.state.barcodeSettings.barcodeData
+      : this.state.filteredDifferentialResults;
     if (changes.brushedData.length > 0) {
       const boxPlotArray = _.map(changes.brushedData, function(d) {
-        d.statistic = _.find(self.state.barcodeSettings.barcodeData, {
+        d.statistic = _.find(splitPaneData, {
           featureID: d.featureID,
         }).statistic;
-        d.logFC = _.find(self.state.barcodeSettings.barcodeData, {
+        d.logFC = _.find(splitPaneData, {
           featureID: d.featureID,
         }).logFoldChange;
         return d;
@@ -1275,27 +1282,32 @@ class Enrichment extends Component {
   // };
 
   handleProteinSelected = toHighlightArray => {
-    const prevHighestValueObject = this.state.HighlightedProteins[0]?.featureID;
+    const featureID = this.state.hasBarcodeData
+      ? 'featureID'
+      : this.props.filteredDifferentialFeatureIdKey;
+    const prevHighestValueObject = this.state.HighlightedProteins.length
+      ? this.state.HighlightedProteins[0]['featureID']
+      : null;
     const highestValueObject = toHighlightArray[0];
-    if (
-      this.state.barcodeSettings.barcodeData?.length > 0 &&
-      toHighlightArray.length > 0
-    ) {
+    const splitPaneData = this.state.hasBarcodeData
+      ? this.state.barcodeSettings.barcodeData
+      : this.state.filteredDifferentialResults;
+    if (splitPaneData?.length > 0 && toHighlightArray.length > 0) {
       this.setState({
         HighlightedProteins: toHighlightArray,
       });
       if (
-        highestValueObject?.featureID !== prevHighestValueObject ||
+        highestValueObject.featureID !== prevHighestValueObject ||
         this.state.SVGPlotLoaded === false
       ) {
         this.setState({
           SVGPlotLoaded: false,
           SVGPlotLoading: true,
         });
-        const dataItem = this.state.barcodeSettings.barcodeData.find(
-          i => i.featureID === highestValueObject?.featureID,
+        const dataItem = splitPaneData.find(
+          i => i[featureID] === highestValueObject.featureID,
         );
-        let id = dataItem.featureID || '';
+        let id = dataItem[featureID] || '';
         this.getPlot(id);
       }
     } else {
@@ -1517,7 +1529,12 @@ class Enrichment extends Component {
           }
           this.showBarcodePlot(barcodeDataResponse, dataItem);
         } else {
-          this.handleGetBarcodeDataError();
+          this.setState({
+            displayViolinPlot: false,
+          });
+          this.showBarcodePlot(barcodeDataResponse, dataItem);
+          // empty barcode data array - we've decided to render the table and plots without barcode and violin
+          // this.handleGetBarcodeDataError();
         }
       })
       .catch(error => {
@@ -2075,6 +2092,9 @@ class Enrichment extends Component {
             // onHandleFilteredDifferentialFeatureIdKey={
             //   this.handleFilteredDifferentialFeatureIdKey
             // }
+            onSetFilteredDifferentialResults={filteredDifferentialResults => {
+              this.setState({ filteredDifferentialResults });
+            }}
           ></SplitPanesContainer>
         </div>
       );
