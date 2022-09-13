@@ -543,7 +543,7 @@ class BarcodePlot extends Component {
     // featureID: "17747_1"
     // logFoldChange: 0
     // statistic: 19.0484
-    const barcodeLines = barcodeSettings.barcodeData.map(d => (
+    const barcodeLines = barcodeSettings.barcodeData?.map(d => (
       <line
         id={`barcode-line-${d.featureID}`}
         className="barcode-line"

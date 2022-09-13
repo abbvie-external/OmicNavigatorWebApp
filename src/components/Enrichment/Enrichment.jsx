@@ -977,18 +977,14 @@ class Enrichment extends Component {
               <Popup
                 trigger={
                   <span
-                    className={hasBarcodeData ? 'TableCellLink' : ''}
-                    onClick={
-                      hasBarcodeData
-                        ? addParams.barcodeData(
-                            enrichmentStudy,
-                            enrichmentModel,
-                            enrichmentAnnotation,
-                            item,
-                            c,
-                          )
-                        : {}
-                    }
+                    className="TableCellLink"
+                    onClick={addParams.barcodeData(
+                      enrichmentStudy,
+                      enrichmentModel,
+                      enrichmentAnnotation,
+                      item,
+                      c,
+                    )}
                   >
                     {formatNumberForDisplay(value)}
                   </span>
