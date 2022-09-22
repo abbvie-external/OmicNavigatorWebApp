@@ -545,3 +545,53 @@ export function getXAxis(array) {
     return match;
   } else return array[0];
 }
+
+export function getModelsArg(
+  plotType,
+  differentialModelsAndTests,
+  differentialModelIds,
+  differentialModel,
+  differentialTestIds,
+  differentialTest,
+) {
+  // if plotType does not include 'multiModel', return the model
+  if (!plotType.includes('multiModel')) {
+    return differentialModel;
+  } else {
+    // if plot type includes 'multiModel', return all models, duplicated by the number of tests
+    let models = [];
+    differentialTestIds.forEach(id => {
+      models = models
+        .concat(differentialModelIds)
+        .sort()
+        .reverse();
+    });
+    return models;
+  }
+}
+
+export function getTestsArg(
+  plotType,
+  differentialModelsAndTests,
+  differentialModelIds,
+  differentialModel,
+  differentialTestIds,
+  differentialTest,
+) {
+  // if plot type does not include 'multiTest', return just the test
+  if (!plotType.includes('multiTest')) {
+    return differentialTest;
+  } else {
+    // if plot type include 'multiTest' NOT 'multiModel', return all tests, no duplication
+    if (!plotType.includes('multiModel')) {
+      return differentialTestIds;
+    } else {
+      // if plot type includes 'multiTest' AND 'multiModel', return all tests, duplicated by the number of models
+      let tests = [];
+      differentialModelIds.forEach(id => {
+        tests = tests.concat(differentialTestIds);
+      });
+      return tests;
+    }
+  }
+}

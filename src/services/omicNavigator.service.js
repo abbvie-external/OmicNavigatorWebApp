@@ -153,15 +153,6 @@ class OmicNavigatorService {
     if (this[cacheKey] != null) {
       return this[cacheKey];
     } else {
-      // if (!Array.isArray(modelID)) return;
-      if (Array.isArray(modelID)) {
-        // const modelLength = modelID.length;
-        // const testsLimitedToModelLength = testID.slice(0, modelLength);
-        // testID = testsLimitedToModelLength;
-        const testsSplit = testID.split('_');
-        // debugger;
-        testID = testsSplit;
-      }
       let obj = {
         study,
         modelID,

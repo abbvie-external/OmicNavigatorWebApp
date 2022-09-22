@@ -13,6 +13,8 @@ import {
   Linkout,
   roundToPrecision,
   limitValues,
+  getTestsArg,
+  getModelsArg,
 } from '../Shared/helpers';
 import ButtonActions from '../Shared/ButtonActions';
 import DifferentialSearch from './DifferentialSearch';
@@ -584,6 +586,7 @@ class Differential extends Component {
       differentialPlotTypes,
       differentialTestIds,
       differentialModelIds,
+      differentialModelsAndTests,
     } = this.state;
     const {
       differentialStudy,
@@ -627,14 +630,22 @@ class Differential extends Component {
       if (plots?.length) {
         if (returnSVG) {
           _.forEach(plots, function(plot, i) {
-            const testsArg =
-              plots[i].plotType.includes('multiTest') &&
-              !plots[i].plotType.includes('multiModel')
-                ? differentialTestIds
-                : differentialTest;
-            const modelsArg = plot.plotType.includes('multiModel')
-              ? differentialModelIds
-              : differentialModel;
+            const testsArg = getTestsArg(
+              plot.plotType,
+              differentialModelsAndTests,
+              differentialModelIds,
+              differentialModel,
+              differentialTestIds,
+              differentialTest,
+            );
+            const modelsArg = getModelsArg(
+              plot.plotType,
+              differentialModelsAndTests,
+              differentialModelIds,
+              differentialModel,
+              differentialTestIds,
+              differentialTest,
+            );
             // handle plotly differently than static plot svgs
             if (plots[i].plotType.includes('plotly')) {
               omicNavigatorService
@@ -662,7 +673,7 @@ class Differential extends Component {
               omicNavigatorService
                 .plotStudyReturnSvg(
                   differentialStudy,
-                  differentialModel,
+                  modelsArg,
                   // ['12759', '53624'],
                   id,
                   plots[i].plotID,
@@ -717,14 +728,22 @@ class Differential extends Component {
           // refined for dynamically sized plots on single-threaded servers (running R locally), we're using a race condition to take the first url and handle/display it asap; after that, we're using allSettled to wait for remaining urls, and then sending them all to the component as props
           const promises = plots
             .map(plot => {
-              const testsArg =
-                plot.plotType.includes('multiTest') &&
-                !plot.plotType.includes('multiModel')
-                  ? differentialTestIds
-                  : differentialTest;
-              const modelsArg = plot.plotType.includes('multiModel')
-                ? differentialModelIds
-                : differentialModel;
+              const testsArg = getTestsArg(
+                plot.plotType,
+                differentialModelsAndTests,
+                differentialModelIds,
+                differentialModel,
+                differentialTestIds,
+                differentialTest,
+              );
+              const modelsArg = getModelsArg(
+                plot.plotType,
+                differentialModelsAndTests,
+                differentialModelIds,
+                differentialModel,
+                differentialTestIds,
+                differentialTest,
+              );
               return omicNavigatorService
                 .plotStudyReturnSvgUrl(
                   differentialStudy,
