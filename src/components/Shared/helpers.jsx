@@ -548,11 +548,9 @@ export function getXAxis(array) {
 
 export function getModelsArg(
   plotType,
-  differentialModelsAndTests,
   differentialModelIds,
-  differentialModel,
   differentialTestIds,
-  differentialTest,
+  differentialModel,
 ) {
   // if plotType does not include 'multiModel', return the model
   if (!plotType.includes('multiModel')) {
@@ -572,9 +570,7 @@ export function getModelsArg(
 
 export function getTestsArg(
   plotType,
-  differentialModelsAndTests,
   differentialModelIds,
-  differentialModel,
   differentialTestIds,
   differentialTest,
 ) {

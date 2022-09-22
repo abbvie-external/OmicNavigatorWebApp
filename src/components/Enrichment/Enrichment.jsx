@@ -18,6 +18,8 @@ import {
   splitValue,
   Linkout,
   roundToPrecision,
+  getTestsArg,
+  getModelsArg,
 } from '../Shared/helpers';
 import '../Shared/Table.scss';
 import SearchingAlt from '../Transitions/SearchingAlt';
@@ -1343,14 +1345,18 @@ class Enrichment extends Component {
             if (plot.plotType.includes('multiFeature')) {
               return undefined;
             }
-            const testsArg =
-              plot.plotType.includes('multiTest') &&
-              !plot.plotType.includes('multiModel')
-                ? uData
-                : enrichmentTest;
-            const modelsArg = plot.plotType.includes('multiModel')
-              ? enrichmentModelIds
-              : enrichmentModel;
+            const testsArg = getTestsArg(
+              plot.plotType,
+              enrichmentModelIds,
+              uData,
+              enrichmentTest,
+            );
+            const modelsArg = getModelsArg(
+              plot.plotType,
+              enrichmentModelIds,
+              uData,
+              enrichmentModel,
+            );
             return omicNavigatorService
               .plotStudyReturnSvgUrl(
                 enrichmentStudy,
