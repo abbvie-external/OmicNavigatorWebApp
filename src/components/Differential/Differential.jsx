@@ -329,6 +329,10 @@ class Differential extends Component {
   };
 
   setMultiModelMappingObject = multiModelMappingObject => {
+    if (!multiModelMappingObject) return;
+    const multiModelMappingFirstKey = Object.keys(
+      multiModelMappingObject[0],
+    )[0];
     const multiModelMappingObjectCopy = [...multiModelMappingObject];
     const relevantArrays = multiModelMappingObjectCopy.filter(mm => {
       return Object.values(mm).every(x => x !== 'NA' && x !== '' && x != null);
@@ -340,6 +344,7 @@ class Differential extends Component {
     const multiModelMappingFlat = multiModelMappingObjectArr.flat();
     let multiModelMappingSet = new Set(multiModelMappingFlat);
     this.setState({
+      multiModelMappingFirstKey,
       multiModelMappingSet,
     });
   };
@@ -603,6 +608,7 @@ class Differential extends Component {
       differentialTestIds,
       differentialModelIds,
       differentialModelsAndTests,
+      multiModelMappingFirstKey,
     } = this.state;
     const {
       differentialStudy,
@@ -652,6 +658,7 @@ class Differential extends Component {
               differentialTestIds,
               differentialTest,
               differentialModelsAndTests,
+              multiModelMappingFirstKey,
             );
             const modelsArg = getModelsArg(
               plot.plotType,
@@ -659,6 +666,7 @@ class Differential extends Component {
               differentialTestIds,
               differentialModel,
               differentialModelsAndTests,
+              multiModelMappingFirstKey,
             );
             // handle plotly differently than static plot svgs
             if (plots[i].plotType.includes('plotly')) {
@@ -748,6 +756,7 @@ class Differential extends Component {
                 differentialTestIds,
                 differentialTest,
                 differentialModelsAndTests,
+                multiModelMappingFirstKey,
               );
               const modelsArg = getModelsArg(
                 plot.plotType,
@@ -755,6 +764,7 @@ class Differential extends Component {
                 differentialTestIds,
                 differentialModel,
                 differentialModelsAndTests,
+                multiModelMappingFirstKey,
               );
               return omicNavigatorService
                 .plotStudyReturnSvgUrl(
@@ -878,6 +888,7 @@ class Differential extends Component {
         differentialTestIds,
         differentialModelIds,
         differentialModelsAndTests,
+        multiModelMappingFirstKey,
       } = this.state;
       const {
         differentialStudy,
@@ -908,6 +919,7 @@ class Differential extends Component {
               differentialTestIds,
               differentialTest,
               differentialModelsAndTests,
+              multiModelMappingFirstKey,
             );
             const modelsArg = getModelsArg(
               multifeaturePlot[0].plotType,
@@ -915,6 +927,7 @@ class Differential extends Component {
               differentialTestIds,
               differentialModel,
               differentialModelsAndTests,
+              multiModelMappingFirstKey,
             );
             // handle plotly differently than static plot svgs
             if (multifeaturePlot[0].plotType.includes('plotly')) {
@@ -983,6 +996,7 @@ class Differential extends Component {
               differentialTestIds,
               differentialTest,
               differentialModelsAndTests,
+              multiModelMappingFirstKey,
             );
             const modelsArg = getModelsArg(
               plot.plotType,
@@ -990,6 +1004,7 @@ class Differential extends Component {
               differentialTestIds,
               differentialModel,
               differentialModelsAndTests,
+              multiModelMappingFirstKey,
             );
             // handle plotly differently than static plot svgs
             if (multifeaturePlot[i].plotType.includes('plotly')) {
@@ -1186,6 +1201,7 @@ class Differential extends Component {
       differentialTestIds,
       differentialModelIds,
       differentialModelsAndTests,
+      multiModelMappingFirstKey,
     } = this.state;
     const {
       differentialStudy,
@@ -1206,6 +1222,7 @@ class Differential extends Component {
         differentialTestIds,
         differentialTest,
         differentialModelsAndTests,
+        multiModelMappingFirstKey,
       );
       const modelsArg = getModelsArg(
         multifeaturePlot[plotindex].plotType,
@@ -1213,6 +1230,7 @@ class Differential extends Component {
         differentialTestIds,
         differentialModel,
         differentialModelsAndTests,
+        multiModelMappingFirstKey,
       );
       try {
         const promise = omicNavigatorService.plotStudyReturnSvg(

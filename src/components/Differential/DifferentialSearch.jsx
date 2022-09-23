@@ -20,6 +20,7 @@ import DifferentialMultisetFilters from './DifferentialMultisetFilters';
 let cancelRequestGetReportLinkDifferential = () => {};
 let cancelRequestGetResultsIntersection = () => {};
 let cancelRequestGetResultsMultiset = () => {};
+let cancelRequestGetMapping = () => {};
 const cacheResultsTable = {};
 async function* streamAsyncIterable(reader) {
   while (true) {
@@ -200,15 +201,7 @@ class DifferentialSearch extends Component {
         differentialModelsDisabled: false,
         differentialModels: differentialModelsMapped,
       });
-      omicNavigatorService.getMapping(differentialStudy).then(mappingObj => {
-        const mappingObject = mappingObj?.default || null;
-        this.props.onSetMultiModelMappingObject(mappingObject);
-      });
-      // .catch(error => {
-      //   console.error(
-      //     `no multi-model mapping object available for study ${differentialStudy}`,
-      //   );
-      // });
+      this.getMultiModelMappingObject(differentialStudy);
       if (differentialModel === '') {
         this.getReportLink(differentialStudy, 'default');
       } else {
@@ -306,6 +299,7 @@ class DifferentialSearch extends Component {
       onSearchChangeDifferential,
       onSearchResetDifferential,
     } = this.props;
+    this.getMultiModelMappingObject(value);
     onSearchChangeDifferential(
       {
         [name]: value,
@@ -339,6 +333,24 @@ class DifferentialSearch extends Component {
           'Select a study and model to view Analysis Details',
       });
     }
+  };
+
+  getMultiModelMappingObject = differentialStudy => {
+    cancelRequestGetMapping();
+    let cancelToken = new CancelToken(e => {
+      cancelRequestGetMapping = e;
+    });
+    omicNavigatorService
+      .getMapping(differentialStudy, cancelToken)
+      .then(mappingObj => {
+        const mappingObject = mappingObj?.default || null;
+        this.props.onSetMultiModelMappingObject(mappingObject);
+      });
+    // .catch(error => {
+    //   console.error(
+    //     `no multi-model mapping object available for study ${differentialStudy}`,
+    //   );
+    // });
   };
 
   getReportLink = (study, model) => {

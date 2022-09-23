@@ -546,12 +546,20 @@ export function getXAxis(array) {
   } else return array[0];
 }
 
+export function arrayMove(arr, fromIndex, toIndex) {
+  var element = arr[fromIndex];
+  arr.splice(fromIndex, 1);
+  arr.splice(toIndex, 0, element);
+  return arr;
+}
+
 export function getModelsArg(
   plotType,
   differentialModelIds,
   differentialTestIds,
   differentialModel,
   differentialModelsAndTests,
+  multiModelMappingFirstKey,
 ) {
   // if plotType does not include 'multiModel', return the model
   if (!plotType.includes('multiModel')) {
@@ -559,12 +567,19 @@ export function getModelsArg(
   } else {
     // if plot type includes 'multiModel', return all modelIDs per every test in the study
     let models = [];
-    differentialModelsAndTests.forEach(arr => {
+    const firstMappingModelIndex = differentialModelsAndTests.findIndex(
+      a => a.modelID === multiModelMappingFirstKey,
+    );
+    const adjustedArr =
+      firstMappingModelIndex > 0
+        ? arrayMove(differentialModelsAndTests, firstMappingModelIndex, 0)
+        : differentialModelsAndTests;
+    adjustedArr.forEach(arr => {
       arr.tests.forEach(test => {
         models.push(arr.modelID);
       });
     });
-    return models.reverse();
+    return models;
   }
 }
 
@@ -574,6 +589,7 @@ export function getTestsArg(
   differentialTestIds,
   differentialTest,
   differentialModelsAndTests,
+  multiModelMappingFirstKey,
 ) {
   // if plot type does not include 'multiTest', return just the test
   if (!plotType.includes('multiTest')) {
@@ -585,7 +601,14 @@ export function getTestsArg(
     } else {
       // if plot type includes 'multiTest' AND 'multiModel', push all testIDs per every test in the study
       let tests = [];
-      differentialModelsAndTests.forEach(arr => {
+      const firstMappingModelIndex = differentialModelsAndTests.findIndex(
+        a => a.modelID === multiModelMappingFirstKey,
+      );
+      const adjustedArr =
+        firstMappingModelIndex > 0
+          ? arrayMove(differentialModelsAndTests, firstMappingModelIndex, 0)
+          : differentialModelsAndTests;
+      adjustedArr.forEach(arr => {
         arr.tests.forEach(test => {
           tests.push(test.testID);
         });
