@@ -861,13 +861,13 @@ class Differential extends Component {
         differentialPlotTypes,
         differentialTestIds,
         differentialModelIds,
+        differentialModelsAndTests,
       } = this.state;
       const {
         differentialStudy,
         differentialModel,
         differentialFeatureIdKey,
         differentialTest,
-        differentialModelsAndTests,
       } = this.props;
       const self = this;
       cancelRequestDifferentialResultsGetMultifeaturePlot();
@@ -883,7 +883,6 @@ class Differential extends Component {
         title: `${differentialFeatureIdKey} (${featuresLengthParentVar} Features)`,
         svg: [],
       };
-      // const forTesting = [...multifeaturePlot].filter(p => p.plotType.includes('plotly'));
       if (multifeaturePlot.length !== 0) {
         if (multifeaturePlot.length === 1) {
           try {
@@ -1170,12 +1169,12 @@ class Differential extends Component {
       differentialPlotTypes,
       differentialTestIds,
       differentialModelIds,
+      differentialModelsAndTests,
     } = this.state;
     const {
       differentialStudy,
       differentialModel,
       differentialTest,
-      differentialModelsAndTests,
     } = this.props;
     cancelRequestDifferentialResultsGetMultifeaturePlot();
     let cancelToken = new CancelToken(e => {
