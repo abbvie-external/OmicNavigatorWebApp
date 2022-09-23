@@ -28,6 +28,7 @@ import '../Shared/Table.scss';
 
 let cancelRequestDifferentialResultsGetPlot = () => {};
 let cancelRequestDifferentialResultsGetMultifeaturePlot = () => {};
+let cancelRequestGetMapping = () => {};
 class Differential extends Component {
   static defaultProps = {
     differentialStudy: '',
@@ -118,6 +119,12 @@ class Differential extends Component {
 
   differentialViewContainerRef = React.createRef();
   differentialGridRef = React.createRef();
+
+  componentDidMount() {
+    if (this.props.differentialFeature) {
+      this.getMultiModelMappingObject(this.props.differentialStudy);
+    }
+  }
 
   shouldComponentUpdate(nextProps) {
     return nextProps.tab === 'differential';
@@ -326,27 +333,6 @@ class Differential extends Component {
         });
       }
     }
-  };
-
-  setMultiModelMappingObject = multiModelMappingObject => {
-    if (!multiModelMappingObject) return;
-    const multiModelMappingFirstKey = Object.keys(
-      multiModelMappingObject[0],
-    )[0];
-    const multiModelMappingObjectCopy = [...multiModelMappingObject];
-    const relevantArrays = multiModelMappingObjectCopy.filter(mm => {
-      return Object.values(mm).every(x => x !== 'NA' && x !== '' && x != null);
-    });
-    let multiModelMappingObjectArr = [];
-    relevantArrays.forEach(a => {
-      multiModelMappingObjectArr.push(Object.values(a));
-    });
-    const multiModelMappingFlat = multiModelMappingObjectArr.flat();
-    let multiModelMappingSet = new Set(multiModelMappingFlat);
-    this.setState({
-      multiModelMappingFirstKey,
-      multiModelMappingSet,
-    });
   };
 
   resetOverlay = () => {
@@ -1712,6 +1698,45 @@ class Differential extends Component {
     } else return <TransitionStill stillMessage={message} />;
   };
 
+  setMultiModelMappingObject = multiModelMappingObject => {
+    if (!multiModelMappingObject) return;
+    const multiModelMappingFirstKey = Object.keys(
+      multiModelMappingObject[0],
+    )[0];
+    const multiModelMappingObjectCopy = [...multiModelMappingObject];
+    const relevantArrays = multiModelMappingObjectCopy.filter(mm => {
+      return Object.values(mm).every(x => x !== 'NA' && x !== '' && x != null);
+    });
+    let multiModelMappingObjectArr = [];
+    relevantArrays.forEach(a => {
+      multiModelMappingObjectArr.push(Object.values(a));
+    });
+    const multiModelMappingFlat = multiModelMappingObjectArr.flat();
+    let multiModelMappingSet = new Set(multiModelMappingFlat);
+    this.setState({
+      multiModelMappingFirstKey,
+      multiModelMappingSet,
+    });
+  };
+
+  getMultiModelMappingObject = differentialStudy => {
+    cancelRequestGetMapping();
+    let cancelToken = new CancelToken(e => {
+      cancelRequestGetMapping = e;
+    });
+    omicNavigatorService
+      .getMapping(differentialStudy, cancelToken)
+      .then(mappingObj => {
+        const mappingObject = mappingObj?.default || null;
+        this.setMultiModelMappingObject(mappingObject);
+      });
+    // .catch(error => {
+    //   console.error(
+    //     `no multi-model mapping object available for study ${differentialStudy}`,
+    //   );
+    // });
+  };
+
   render() {
     const differentialView = this.getView();
     const {
@@ -1855,7 +1880,7 @@ class Differential extends Component {
                 this.handleDifferentialColumnsConfigured
               }
               onResetOverlay={this.resetOverlay}
-              onSetMultiModelMappingObject={this.setMultiModelMappingObject}
+              onGetMultiModelMappingObject={this.getMultiModelMappingObject}
             />
           </Grid.Column>
           <Grid.Column
