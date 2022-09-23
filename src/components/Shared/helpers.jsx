@@ -551,20 +551,20 @@ export function getModelsArg(
   differentialModelIds,
   differentialTestIds,
   differentialModel,
+  differentialModelsAndTests,
 ) {
   // if plotType does not include 'multiModel', return the model
   if (!plotType.includes('multiModel')) {
     return differentialModel;
   } else {
-    // if plot type includes 'multiModel', return all models, duplicated by the number of tests
+    // if plot type includes 'multiModel', return all modelIDs per every test in the study
     let models = [];
-    differentialTestIds.forEach(id => {
-      models = models
-        .concat(differentialModelIds)
-        .sort()
-        .reverse();
+    differentialModelsAndTests.forEach(arr => {
+      arr.tests.forEach(test => {
+        models.push(arr.modelID);
+      });
     });
-    return models;
+    return models.reverse();
   }
 }
 
@@ -573,6 +573,7 @@ export function getTestsArg(
   differentialModelIds,
   differentialTestIds,
   differentialTest,
+  differentialModelsAndTests,
 ) {
   // if plot type does not include 'multiTest', return just the test
   if (!plotType.includes('multiTest')) {
@@ -582,10 +583,12 @@ export function getTestsArg(
     if (!plotType.includes('multiModel')) {
       return differentialTestIds;
     } else {
-      // if plot type includes 'multiTest' AND 'multiModel', return all tests, duplicated by the number of models
+      // if plot type includes 'multiTest' AND 'multiModel', push all testIDs per every test in the study
       let tests = [];
-      differentialModelIds.forEach(id => {
-        tests = tests.concat(differentialTestIds);
+      differentialModelsAndTests.forEach(arr => {
+        arr.tests.forEach(test => {
+          tests.push(test.testID);
+        });
       });
       return tests;
     }
