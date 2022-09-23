@@ -56,14 +56,21 @@ export default class PlotlySingleFeature extends Component {
         filename: `${plotName}_${plotKey}`,
       },
     };
+    debugger;
     return (
       <div>
-        {this.state.json.data && this.state.json.layout && (
+        {this.state.json.data && this.state.json.layout ? (
           <Plot
             data={this.state.json.data}
             layout={this.state.json.layout}
             config={config}
           />
+        ) : (
+          <div className="PlotInstructions">
+            <h4 className="PlotInstructionsText NoSelect">
+              {plotName} is not available for feature {plotKey}
+            </h4>
+          </div>
         )}
         <span id="PlotSingleFeatureDataLoader">
           {!this.state.loading && loadingDimmer}
