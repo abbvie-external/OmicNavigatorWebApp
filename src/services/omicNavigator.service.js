@@ -740,6 +740,27 @@ class OmicNavigatorService {
       return null;
     }
   }
+
+  async getMapping(study) {
+    const cacheKey = `getMapping_${study}}`;
+    if (this[cacheKey] != null) {
+      return this[cacheKey];
+    } else {
+      const promise = this.axiosPost(
+        'getMapping',
+        {
+          study,
+        },
+        false,
+        null,
+        null,
+        25000,
+      );
+      const dataFromPromise = await promise;
+      this[cacheKey] = dataFromPromise;
+      return dataFromPromise;
+    }
+  }
 }
 
 export const omicNavigatorService = new OmicNavigatorService();

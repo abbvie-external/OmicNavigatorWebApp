@@ -200,6 +200,15 @@ class DifferentialSearch extends Component {
         differentialModelsDisabled: false,
         differentialModels: differentialModelsMapped,
       });
+      omicNavigatorService.getMapping(differentialStudy).then(mappingObj => {
+        const mappingObject = mappingObj?.default || null;
+        this.props.onSetMultiModelMappingObject(mappingObject);
+      });
+      // .catch(error => {
+      //   console.error(
+      //     `no multi-model mapping object available for study ${differentialStudy}`,
+      //   );
+      // });
       if (differentialModel === '') {
         this.getReportLink(differentialStudy, 'default');
       } else {

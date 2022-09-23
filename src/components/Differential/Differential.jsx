@@ -328,6 +328,22 @@ class Differential extends Component {
     }
   };
 
+  setMultiModelMappingObject = multiModelMappingObject => {
+    const multiModelMappingObjectCopy = [...multiModelMappingObject];
+    const relevantArrays = multiModelMappingObjectCopy.filter(mm => {
+      return Object.values(mm).every(x => x !== 'NA' && x !== '' && x != null);
+    });
+    let multiModelMappingObjectArr = [];
+    relevantArrays.forEach(a => {
+      multiModelMappingObjectArr.push(Object.values(a));
+    });
+    const multiModelMappingFlat = multiModelMappingObjectArr.flat();
+    let multiModelMappingSet = new Set(multiModelMappingFlat);
+    this.setState({
+      multiModelMappingSet,
+    });
+  };
+
   resetOverlay = () => {
     this.setState({
       plotOverlayData: { key: null, title: '', svg: [] },
@@ -1510,6 +1526,11 @@ class Differential extends Component {
                     trigger={
                       <span className={featureIdClass} onClick={featureIdClick}>
                         {splitValue(value)}
+                        {this.state.multiModelMappingSet
+                          ? this.state.multiModelMappingSet.has(value)
+                            ? '*'
+                            : null
+                          : null}
                       </span>
                     }
                     style={TableValuePopupStyle}
@@ -1816,6 +1837,7 @@ class Differential extends Component {
                 this.handleDifferentialColumnsConfigured
               }
               onResetOverlay={this.resetOverlay}
+              onSetMultiModelMappingObject={this.setMultiModelMappingObject}
             />
           </Grid.Column>
           <Grid.Column
