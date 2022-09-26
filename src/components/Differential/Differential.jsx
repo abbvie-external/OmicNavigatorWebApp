@@ -1555,17 +1555,25 @@ class Differential extends Component {
                   : addParams.showPlotOverlay(item, alphanumericTrigger);
               return (
                 <div className="NoSelect" key={keyVar}>
+                  {this.state.multiModelMappingFirstValuesSet ? (
+                    this.state.multiModelMappingFirstValuesSet.has(value) ? (
+                      // ? '*'
+                      <Popup
+                        trigger={
+                          <Icon name="asterisk" size="small" color="blue" />
+                        }
+                        style={TableValuePopupStyle}
+                        content="Multi-Model plot available for this feature"
+                        inverted
+                        basic
+                        // position="top left"
+                      />
+                    ) : null
+                  ) : null}
                   <Popup
                     trigger={
                       <span className={featureIdClass} onClick={featureIdClick}>
                         {splitValue(value)}
-                        {this.state.multiModelMappingFirstValuesSet
-                          ? this.state.multiModelMappingFirstValuesSet.has(
-                              value,
-                            )
-                            ? '*'
-                            : null
-                          : null}
                       </span>
                     }
                     style={TableValuePopupStyle}

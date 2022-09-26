@@ -745,8 +745,6 @@ class DifferentialDetail extends Component {
       differentialFeature,
       differentialFeatureIdKey,
       differentialHighlightedFeaturesData,
-      differentialHighlightedFeatures,
-      differentialOutlinedFeature,
       plotMultiFeatureMax,
       modelSpecificMetaFeaturesExist,
       onGetPlotTransition,
@@ -762,6 +760,7 @@ class DifferentialDetail extends Component {
       multiFeaturePlotTypes,
       svgExportName,
       tab,
+      // multiModelMappingFirstKey,
     } = this.props;
 
     // let DifferentialDetailCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-Volcano`;
@@ -769,14 +768,14 @@ class DifferentialDetail extends Component {
     //   DifferentialDetailCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-${multisetQueriedDifferential}-Volcano`;
     // }
 
-    const maxWidthPopupStyle = {
-      backgroundColor: '2E2E2E',
-      borderBottom: '2px solid var(--color-primary)',
-      color: '#FFF',
-      padding: '1em',
-      maxWidth: '15vw',
-      fontSize: '13px',
-    };
+    // const maxWidthPopupStyle = {
+    //   backgroundColor: '2E2E2E',
+    //   borderBottom: '2px solid var(--color-primary)',
+    //   color: '#FFF',
+    //   padding: '1em',
+    //   maxWidth: '15vw',
+    //   fontSize: '13px',
+    // };
 
     const selectAllPopupStyle = {
       backgroundColor: '2E2E2E',
@@ -1061,6 +1060,31 @@ class DifferentialDetail extends Component {
                             {upperPlotsVisible ? 'Hide Plots' : 'Show Plots'}
                           </Label>
                         </span>
+                        {/* <div className="DifferentialDetailMultiModelText NoSelect">
+                          {multiModelMappingFirstKey ? (
+                            <Popup
+                              trigger={
+                                <Icon
+                                  name="asterisk"
+                                  size="small"
+                                  color="blue"
+                                />
+                              }
+                              style={maxWidthPopupStyle}
+                              content="Multi-Model plot available for this feature"
+                              inverted
+                              basic
+                            />
+                          ) : null}
+                        </div> */}
+                        {/* <div className="DifferentialDetailMultiModelText NoSelect">
+                          {multiModelMappingFirstKey ? (
+                            <>
+                              <Icon name="asterisk" size="small" color="blue" />
+                              Multi-Model plot available for this feature
+                            </>
+                          ) : null}
+                        </div> */}
                         <div className="FloatRight AbsoluteExportDifferential">
                           <ButtonActions
                             exportButtonSize={'small'}
