@@ -121,7 +121,7 @@ class Differential extends Component {
   differentialGridRef = React.createRef();
 
   componentDidMount() {
-    if (this.props.differentialFeature) {
+    if (this.props.differentialStudy) {
       this.getMultiModelMappingObject(this.props.differentialStudy);
     }
   }
@@ -645,6 +645,7 @@ class Differential extends Component {
               differentialTest,
               differentialModelsAndTests,
               multiModelMappingFirstKey,
+              differentialModel,
             );
             const modelsArg = getModelsArg(
               plot.plotType,
@@ -743,6 +744,7 @@ class Differential extends Component {
                 differentialTest,
                 differentialModelsAndTests,
                 multiModelMappingFirstKey,
+                differentialModel,
               );
               const modelsArg = getModelsArg(
                 plot.plotType,
@@ -906,6 +908,7 @@ class Differential extends Component {
               differentialTest,
               differentialModelsAndTests,
               multiModelMappingFirstKey,
+              differentialModel,
             );
             const modelsArg = getModelsArg(
               multifeaturePlot[0].plotType,
@@ -983,6 +986,7 @@ class Differential extends Component {
               differentialTest,
               differentialModelsAndTests,
               multiModelMappingFirstKey,
+              differentialModel,
             );
             const modelsArg = getModelsArg(
               plot.plotType,
@@ -1209,6 +1213,7 @@ class Differential extends Component {
         differentialTest,
         differentialModelsAndTests,
         multiModelMappingFirstKey,
+        differentialModel,
       );
       const modelsArg = getModelsArg(
         multifeaturePlot[plotindex].plotType,

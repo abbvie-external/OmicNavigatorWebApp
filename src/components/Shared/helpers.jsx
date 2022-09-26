@@ -560,6 +560,7 @@ export function getModelsArg(
   differentialModel,
   differentialModelsAndTests,
   multiModelMappingFirstKey,
+  // differentialModel
 ) {
   // if plotType does not include 'multiModel', return the model
   if (!plotType.includes('multiModel')) {
@@ -569,6 +570,7 @@ export function getModelsArg(
     let models = [];
     const firstMappingModelIndex = differentialModelsAndTests.findIndex(
       a => a.modelID === multiModelMappingFirstKey,
+      // a => a.modelID === differentialModel,
     );
     const adjustedArr =
       firstMappingModelIndex > 0
@@ -590,6 +592,7 @@ export function getTestsArg(
   differentialTest,
   differentialModelsAndTests,
   multiModelMappingFirstKey,
+  // differentialModel,
 ) {
   // if plot type does not include 'multiTest', return just the test
   if (!plotType.includes('multiTest')) {
@@ -603,6 +606,7 @@ export function getTestsArg(
       let tests = [];
       const firstMappingModelIndex = differentialModelsAndTests.findIndex(
         a => a.modelID === multiModelMappingFirstKey,
+        // a => a.modelID === differentialModel,
       );
       const adjustedArr =
         firstMappingModelIndex > 0

@@ -56,7 +56,6 @@ export default class PlotlySingleFeature extends Component {
         filename: `${plotName}_${plotKey}`,
       },
     };
-    debugger;
     return (
       <div>
         {this.state.json.data && this.state.json.layout ? (
