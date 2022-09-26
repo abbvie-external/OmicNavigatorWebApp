@@ -158,14 +158,13 @@ class OmicNavigatorService {
     if (this[cacheKey] != null) {
       return this[cacheKey];
     } else {
-      let obj = {
+      const obj = {
         study,
         modelID,
         featureID,
         plotID,
         testID,
       };
-      console.log(JSON.stringify(obj));
       if (plotType.includes('plotly')) {
         const dataFromPlotly = await this.axiosPostPlotly(
           'plotStudy',

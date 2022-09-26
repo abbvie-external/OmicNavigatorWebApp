@@ -72,7 +72,7 @@ export default class PlotlyMultiFeature extends Component {
   };
 
   render() {
-    const { plotName, featuresLength, plotlyExportType, plotKey } = this.props;
+    const { plotName, featuresLength, plotlyExportType } = this.props;
     const { plotlyInteractive } = this.state;
     const config = {
       modeBarButtonsToRemove: ['sendDataToCloud'],

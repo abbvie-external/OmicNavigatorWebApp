@@ -760,7 +760,6 @@ class DifferentialDetail extends Component {
       plotMultiFeatureDataLoaded,
       singleFeaturePlotTypes,
       multiFeaturePlotTypes,
-      // multiModelPlotTypes,
       svgExportName,
       tab,
     } = this.props;
@@ -848,7 +847,6 @@ class DifferentialDetail extends Component {
               differentialTests={differentialTests}
               singleFeaturePlotTypes={singleFeaturePlotTypes}
               multiFeaturePlotTypes={multiFeaturePlotTypes}
-              // multiModelPlotTypes={multiModelPlotTypes}
             ></PlotsOverlay>
           </Sidebar>
         );
