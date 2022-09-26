@@ -1061,41 +1061,6 @@ class DifferentialDetail extends Component {
                             {upperPlotsVisible ? 'Hide Plots' : 'Show Plots'}
                           </Label>
                         </span>
-                        <div className="AbsoluteLegendDifferential NoSelect">
-                          {differentialOutlinedFeature ? (
-                            <Popup
-                              trigger={
-                                <Icon
-                                  name="square outline"
-                                  size="big"
-                                  id="SelectedPlotLegend"
-                                />
-                              }
-                              style={maxWidthPopupStyle}
-                              // content="Row is outlined blue when the feature's plots are being displayed"
-                              content="Plots are displayed above"
-                              inverted
-                              basic
-                            />
-                          ) : null}
-                          {differentialHighlightedFeatures?.length > 0 ? (
-                            <Popup
-                              trigger={
-                                <Icon
-                                  name="check square outline"
-                                  size="big"
-                                  id="SelectedRowLegend"
-                                />
-                                // <Label circular id="OtherCircle" />
-                              }
-                              style={maxWidthPopupStyle}
-                              // content="Row is light orange when the feature is selected"
-                              content="Selected"
-                              inverted
-                              basic
-                            />
-                          ) : null}
-                        </div>
                         <div className="FloatRight AbsoluteExportDifferential">
                           <ButtonActions
                             exportButtonSize={'small'}
