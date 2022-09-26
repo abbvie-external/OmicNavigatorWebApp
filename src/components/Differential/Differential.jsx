@@ -13,6 +13,7 @@ import {
   Linkout,
   roundToPrecision,
   limitValues,
+  getIdArg,
   getTestsArg,
   getModelsArg,
 } from '../Shared/helpers';
@@ -595,6 +596,7 @@ class Differential extends Component {
       differentialModelIds,
       differentialModelsAndTests,
       multiModelMappingFirstKey,
+      multiModelMappingArrays,
     } = this.state;
     const {
       differentialStudy,
@@ -638,6 +640,17 @@ class Differential extends Component {
       if (plots?.length) {
         if (returnSVG) {
           _.forEach(plots, function(plot, i) {
+            const idArg = getIdArg(
+              plot.plotType,
+              differentialModelIds,
+              differentialTestIds,
+              differentialTest,
+              differentialModelsAndTests,
+              multiModelMappingFirstKey,
+              // differentialModel,
+              multiModelMappingArrays,
+              id,
+            );
             const testsArg = getTestsArg(
               plot.plotType,
               differentialModelIds,
@@ -662,7 +675,7 @@ class Differential extends Component {
                   differentialStudy,
                   modelsArg,
                   // ['12759', '53624'],
-                  id,
+                  idArg,
                   plot.plotID,
                   plot.plotType,
                   testsArg,
@@ -737,6 +750,17 @@ class Differential extends Component {
           // refined for dynamically sized plots on single-threaded servers (running R locally), we're using a race condition to take the first url and handle/display it asap; after that, we're using allSettled to wait for remaining urls, and then sending them all to the component as props
           const promises = plots
             .map(plot => {
+              const idArg = getIdArg(
+                plot.plotType,
+                differentialModelIds,
+                differentialTestIds,
+                differentialTest,
+                differentialModelsAndTests,
+                multiModelMappingFirstKey,
+                // differentialModel,
+                multiModelMappingArrays,
+                id,
+              );
               const testsArg = getTestsArg(
                 plot.plotType,
                 differentialModelIds,
@@ -759,7 +783,7 @@ class Differential extends Component {
                   differentialStudy,
                   modelsArg,
                   // ['12759', '53624'],
-                  id,
+                  idArg,
                   plot.plotID,
                   plot.plotType,
                   testsArg,
@@ -1535,8 +1559,10 @@ class Differential extends Component {
                     trigger={
                       <span className={featureIdClass} onClick={featureIdClick}>
                         {splitValue(value)}
-                        {this.state.multiModelMappingSet
-                          ? this.state.multiModelMappingSet.has(value)
+                        {this.state.multiModelMappingFirstValuesSet
+                          ? this.state.multiModelMappingFirstValuesSet.has(
+                              value,
+                            )
                             ? '*'
                             : null
                           : null}
@@ -1709,18 +1735,31 @@ class Differential extends Component {
       multiModelMappingObject[0],
     )[0];
     const multiModelMappingObjectCopy = [...multiModelMappingObject];
-    const relevantArrays = multiModelMappingObjectCopy.filter(mm => {
+    const multiModelMappingArrays = multiModelMappingObjectCopy.filter(mm => {
       return Object.values(mm).every(x => x !== 'NA' && x !== '' && x != null);
     });
     let multiModelMappingObjectArr = [];
-    relevantArrays.forEach(a => {
+    multiModelMappingArrays.forEach(a => {
       multiModelMappingObjectArr.push(Object.values(a));
     });
     const multiModelMappingFlat = multiModelMappingObjectArr.flat();
     let multiModelMappingSet = new Set(multiModelMappingFlat);
+
+    let multiModelMappingFirstKeyValues = [];
+    multiModelMappingArrays.forEach(a => {
+      multiModelMappingFirstKeyValues.push(a[multiModelMappingFirstKey]);
+    });
+    // const multiModelMappingFirstValuesFlat = multiModelMappingFirstKeyValues.flat();
+    let multiModelMappingFirstValuesSet = new Set(
+      multiModelMappingFirstKeyValues,
+    );
+
     this.setState({
       multiModelMappingFirstKey,
       multiModelMappingSet,
+      multiModelMappingFirstKeyValues,
+      multiModelMappingFirstValuesSet,
+      multiModelMappingArrays,
     });
   };
 
