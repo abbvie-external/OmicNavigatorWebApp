@@ -1555,7 +1555,7 @@ class Differential extends Component {
                   : addParams.showPlotOverlay(item, alphanumericTrigger);
               return (
                 <div className="NoSelect" key={keyVar}>
-                  {this.state.multiModelMappingFirstValuesSet ? (
+                  {/* {this.state.multiModelMappingFirstValuesSet ? (
                     this.state.multiModelMappingFirstValuesSet.has(value) ? (
                       // ? '*'
                       <Popup
@@ -1563,13 +1563,14 @@ class Differential extends Component {
                           <Icon name="asterisk" size="small" color="blue" />
                         }
                         style={TableValuePopupStyle}
-                        content="Multi-Model plot available for this feature"
+                        content="This feature is also available in all other models"
+                        content="This feature is not available across models"
                         inverted
                         basic
                         // position="top left"
                       />
                     ) : null
-                  ) : null}
+                  ) : null} */}
                   <Popup
                     trigger={
                       <span className={featureIdClass} onClick={featureIdClick}>
@@ -1757,16 +1758,17 @@ class Differential extends Component {
     multiModelMappingArrays.forEach(a => {
       multiModelMappingFirstKeyValues.push(a[multiModelMappingFirstKey]);
     });
+    // this will be a part of phase 2, displaying in the UI what features are/are not available across models to plot
     // const multiModelMappingFirstValuesFlat = multiModelMappingFirstKeyValues.flat();
-    let multiModelMappingFirstValuesSet = new Set(
-      multiModelMappingFirstKeyValues,
-    );
+    // let multiModelMappingFirstValuesSet = new Set(
+    //   multiModelMappingFirstKeyValues,
+    // );
 
     this.setState({
       multiModelMappingFirstKey,
       multiModelMappingSet,
       multiModelMappingFirstKeyValues,
-      multiModelMappingFirstValuesSet,
+      // multiModelMappingFirstValuesSet,
       multiModelMappingArrays,
     });
   };
