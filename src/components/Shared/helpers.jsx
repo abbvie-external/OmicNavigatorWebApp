@@ -545,3 +545,116 @@ export function getXAxis(array) {
     return match;
   } else return array[0];
 }
+
+export function arrayMove(arr, fromIndex, toIndex) {
+  var element = arr[fromIndex];
+  arr.splice(fromIndex, 1);
+  arr.splice(toIndex, 0, element);
+  return arr;
+}
+
+export function getIdArg(
+  plotType,
+  differentialModelIds,
+  differentialTestIds,
+  differentialTest,
+  differentialModelsAndTests,
+  multiModelMappingFirstKey,
+  // differentialModel,
+  multiModelMappingArrays,
+  id,
+) {
+  debugger;
+  // if plot type does not include 'multiModel', return just the id
+  if (!plotType.includes('multiModel')) {
+    return id;
+  } else {
+    // if plot type includes 'multiModel', use the id matched in first in the mapping object
+    let mappingId = id;
+    const firstMappingModelIndex = differentialModelsAndTests.findIndex(
+      a => a.modelID === multiModelMappingFirstKey,
+    );
+    const isNotMappingId = firstMappingModelIndex > 0;
+    if (isNotMappingId) {
+      const idMappingObject = multiModelMappingArrays.filter(m =>
+        Object.values(m).includes(id),
+      );
+      mappingId = idMappingObject[0]?.[multiModelMappingFirstKey] || id;
+    }
+    return mappingId;
+  }
+}
+
+export function getTestsArg(
+  plotType,
+  differentialModelIds,
+  differentialTestIds,
+  differentialTest,
+  differentialModelsAndTests,
+  multiModelMappingFirstKey,
+  // differentialModel,
+) {
+  // if plot type does not include 'multiTest', return just the test
+  if (!plotType.includes('multiTest')) {
+    return differentialTest;
+  } else {
+    // if plot type include 'multiTest' NOT 'multiModel', return all tests, no duplication
+    if (!plotType.includes('multiModel')) {
+      return differentialTestIds;
+    } else {
+      // if plot type includes 'multiTest' AND 'multiModel'
+      let tests = [];
+      const firstMappingModelIndex = differentialModelsAndTests.findIndex(
+        a => a.modelID === multiModelMappingFirstKey,
+        // a => a.modelID === differentialModel,
+      );
+      // move the first mapping object models first
+      const adjustedArr =
+        firstMappingModelIndex > 0
+          ? arrayMove(differentialModelsAndTests, firstMappingModelIndex, 0)
+          : differentialModelsAndTests;
+      // push all testIDs per every test in the study
+      adjustedArr.forEach(arr => {
+        arr.tests.forEach(test => {
+          tests.push(test.testID);
+        });
+      });
+      return tests;
+    }
+  }
+}
+
+export function getModelsArg(
+  plotType,
+  differentialModelIds,
+  differentialTestIds,
+  differentialModel,
+  differentialModelsAndTests,
+  multiModelMappingFirstKey,
+  // differentialModel
+  multiModelMappingArrays,
+) {
+  // if plotType does not include 'multiModel', return the model
+  if (!plotType.includes('multiModel')) {
+    return differentialModel;
+  } else {
+    // if plot type includes 'multiModel'
+    let models = [];
+    const firstMappingModelIndex = differentialModelsAndTests.findIndex(
+      a => a.modelID === multiModelMappingFirstKey,
+      // a => a.modelID === differentialModel,
+    );
+    // move the first mapping object models first
+    const adjustedArr =
+      firstMappingModelIndex > 0
+        ? arrayMove(differentialModelsAndTests, firstMappingModelIndex, 0)
+        : differentialModelsAndTests;
+    // push all modelIDs per every test in the study
+    adjustedArr.forEach(arr => {
+      arr.tests.forEach(test => {
+        models.push(arr.modelID);
+      });
+    });
+    return models;
+  }
+}

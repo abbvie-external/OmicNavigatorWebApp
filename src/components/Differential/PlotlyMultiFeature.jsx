@@ -86,7 +86,7 @@ export default class PlotlyMultiFeature extends Component {
     };
     return (
       <div>
-        {this.state.json.data && this.state.json.layout && (
+        {this.state.json.data && this.state.json.layout ? (
           <>
             <Popup
               trigger={
@@ -119,6 +119,12 @@ export default class PlotlyMultiFeature extends Component {
               onSelected={this.handleSelected}
             />
           </>
+        ) : (
+          <div className="PlotInstructions">
+            <h4 className="PlotInstructionsText NoSelect">
+              {plotName} is not available for this combination of features
+            </h4>
+          </div>
         )}
         <span id="PlotMultiFeatureDataLoader">
           {!this.state.loading && loadingDimmer}

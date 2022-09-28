@@ -79,11 +79,12 @@
   left: -50px !important;
   top: 8px;
   width: fit-content;
+  min-width: 195px !important;
   max-width: 195px !important;
   // border-bottom: 2px solid var(--color-link);
 }
 
-#svgPlotDropdownSingle, 
+#svgPlotDropdownSingle,
 #svgPlotDropdownMulti {
   left: -35px !important;
   top: 8px;

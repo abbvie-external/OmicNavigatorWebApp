@@ -745,8 +745,6 @@ class DifferentialDetail extends Component {
       differentialFeature,
       differentialFeatureIdKey,
       differentialHighlightedFeaturesData,
-      differentialHighlightedFeatures,
-      differentialOutlinedFeature,
       plotMultiFeatureMax,
       modelSpecificMetaFeaturesExist,
       onGetPlotTransition,
@@ -762,6 +760,7 @@ class DifferentialDetail extends Component {
       multiFeaturePlotTypes,
       svgExportName,
       tab,
+      // multiModelMappingFirstKey,
     } = this.props;
 
     // let DifferentialDetailCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-Volcano`;
@@ -769,14 +768,14 @@ class DifferentialDetail extends Component {
     //   DifferentialDetailCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-${multisetQueriedDifferential}-Volcano`;
     // }
 
-    const maxWidthPopupStyle = {
-      backgroundColor: '2E2E2E',
-      borderBottom: '2px solid var(--color-primary)',
-      color: '#FFF',
-      padding: '1em',
-      maxWidth: '15vw',
-      fontSize: '13px',
-    };
+    // const maxWidthPopupStyle = {
+    //   backgroundColor: '2E2E2E',
+    //   borderBottom: '2px solid var(--color-primary)',
+    //   color: '#FFF',
+    //   padding: '1em',
+    //   maxWidth: '15vw',
+    //   fontSize: '13px',
+    // };
 
     const selectAllPopupStyle = {
       backgroundColor: '2E2E2E',
@@ -1061,41 +1060,31 @@ class DifferentialDetail extends Component {
                             {upperPlotsVisible ? 'Hide Plots' : 'Show Plots'}
                           </Label>
                         </span>
-                        <div className="AbsoluteLegendDifferential NoSelect">
-                          {differentialOutlinedFeature ? (
+                        {/* <div className="DifferentialDetailMultiModelText NoSelect">
+                          {multiModelMappingFirstKey ? (
                             <Popup
                               trigger={
                                 <Icon
-                                  name="square outline"
-                                  size="big"
-                                  id="SelectedPlotLegend"
+                                  name="asterisk"
+                                  size="small"
+                                  color="blue"
                                 />
                               }
                               style={maxWidthPopupStyle}
-                              // content="Row is outlined blue when the feature's plots are being displayed"
-                              content="Plots are displayed above"
+                              content="Multi-Model plot available for this feature"
                               inverted
                               basic
                             />
                           ) : null}
-                          {differentialHighlightedFeatures?.length > 0 ? (
-                            <Popup
-                              trigger={
-                                <Icon
-                                  name="check square outline"
-                                  size="big"
-                                  id="SelectedRowLegend"
-                                />
-                                // <Label circular id="OtherCircle" />
-                              }
-                              style={maxWidthPopupStyle}
-                              // content="Row is light orange when the feature is selected"
-                              content="Selected"
-                              inverted
-                              basic
-                            />
+                        </div> */}
+                        {/* <div className="DifferentialDetailMultiModelText NoSelect">
+                          {multiModelMappingFirstKey ? (
+                            <>
+                              <Icon name="asterisk" size="small" color="blue" />
+                              Multi-Model plot available for this feature
+                            </>
                           ) : null}
-                        </div>
+                        </div> */}
                         <div className="FloatRight AbsoluteExportDifferential">
                           <ButtonActions
                             exportButtonSize={'small'}
