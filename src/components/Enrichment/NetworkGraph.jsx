@@ -916,7 +916,6 @@ class NetworkGraph extends Component {
                           ? `${d3.event.pageY - 100}px`
                           : `${d3.event.pageY - 15}px`;
                       let pValueDisplay;
-                      debugger;
                       if (Math.abs(d.data.value) > 0.001)
                         pValueDisplay = d.data.value?.toPrecision(3) || 'N/A';
                       else

@@ -564,7 +564,6 @@ export function getIdArg(
   multiModelMappingArrays,
   id,
 ) {
-  debugger;
   // if plot type does not include 'multiModel', return just the id
   if (!plotType.includes('multiModel')) {
     return id;
