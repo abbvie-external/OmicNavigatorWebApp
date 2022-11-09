@@ -412,7 +412,7 @@ class BarcodePlot extends Component {
           quartileTicks.nodes()[0].getAttribute('x1'),
         ]);
       }, 500);
-      d3.select('.overlay').remove();
+      d3.select('.barcodeBrush rect.overlay').remove();
     } else {
       // reposition the brushed rect on window resize, or horizontal pane resize
       const selectedTicks = d3.selectAll('line').filter(function() {
@@ -425,7 +425,7 @@ class BarcodePlot extends Component {
           selectedTicks.nodes()[0].getAttribute('x1'),
         ]);
       }
-      d3.select('.overlay').remove();
+      d3.select('.barcodeBrush rect.overlay').remove();
     }
   }
 

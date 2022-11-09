@@ -65,8 +65,10 @@ class OmicNavigatorService {
       return url;
     } catch (error) {
       // DEV - what methods should we not throw errors/toasts for?
-      if (method === 'getResultsUpset') return;
-      if (!axios.isCancel(error)) {
+      if (method === 'getResultsUpset' || method === 'plotStudy') {
+        console.log(`failed to retrieve plot for ${method} with payload:`);
+        console.info(obj);
+      } else if (!axios.isCancel(error)) {
         toast.error(`${error.message}`);
         if (handleError != null) {
           handleError(false);
@@ -97,7 +99,10 @@ class OmicNavigatorService {
       });
       return data;
     } catch (error) {
-      if (!axios.isCancel(error)) {
+      if (method === 'getResultsUpset' || method === 'plotStudy') {
+        console.log(`failed to retrieve plot for ${method} with payload:`);
+        console.info(obj);
+      } else if (!axios.isCancel(error)) {
         toast.error(`${error.message}`);
         if (handleError != null) {
           handleError(false);
@@ -737,6 +742,33 @@ class OmicNavigatorService {
       return textData;
     } else {
       return null;
+    }
+  }
+
+  async getMapping(study, cancelToken) {
+    const cacheKey = `getMapping_${study}}`;
+    if (this[cacheKey] != null) {
+      return this[cacheKey];
+    } else {
+      try {
+        const promise = this.axiosPost(
+          'getMapping',
+          {
+            study,
+          },
+          false,
+          null,
+          cancelToken,
+          25000,
+        );
+        const dataFromPromise = await promise;
+        this[cacheKey] = dataFromPromise;
+        return dataFromPromise;
+      } catch {
+        if (axios.isCancel) {
+          // console.log('multi-model mapping cancelled')
+        }
+      }
     }
   }
 }

@@ -917,8 +917,9 @@ class NetworkGraph extends Component {
                           : `${d3.event.pageY - 15}px`;
                       let pValueDisplay;
                       if (Math.abs(d.data.value) > 0.001)
-                        pValueDisplay = d.data.value.toPrecision(3);
-                      else pValueDisplay = d.data.value.toExponential(3);
+                        pValueDisplay = d.data.value?.toPrecision(3) || 'N/A';
+                      else
+                        pValueDisplay = d.data.value?.toExponential(3) || 'N/A';
                       div
                         .html(
                           `<div className="tooltipLink"><b>Description: </b>${d.data.metaData.description}<br/><b>Test: </b>${d.data.prop}<br/><b><span className="textTransformCapitalize">${pValueType}</span> P Value: </b>${pValueDisplay}<br/><b>Ontology: </b>${d.data.metaData.termID}</div>`,

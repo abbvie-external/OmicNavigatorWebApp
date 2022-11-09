@@ -174,6 +174,11 @@ class EnrichmentSearch extends Component {
         enrichmentStudyData,
         enrichmentModelsAndAnnotationsVar,
       );
+      const enrichmentModelIds = [];
+      enrichmentModelsAndAnnotationsVar.forEach(enrichment =>
+        enrichmentModelIds.push(enrichment.modelID),
+      );
+      this.props.onSetEnrichmentModelIds(enrichmentModelIds);
       const enrichmentModelsMapped = enrichmentModelsAndAnnotationsVar.map(
         enrichment => {
           return {
