@@ -16,6 +16,8 @@ import {
   List,
   Button,
   Form,
+  Input,
+  Message,
 } from 'semantic-ui-react';
 import ButtonActions from '../Shared/ButtonActions';
 import './DifferentialDetail.scss';
@@ -62,6 +64,8 @@ class DifferentialDetail extends Component {
     scatterplotLoaded: false,
     multiFeaturesSearched: [],
     multiFeatureSearchText: '',
+    singleFeatureSearchText: '',
+    multiSearching: false,
   };
   volcanoPlotFilteredGridRef = React.createRef();
 
@@ -730,8 +734,85 @@ class DifferentialDetail extends Component {
     this.props.onHandleMultifeaturePlot('Overlay', tableData, true);
   };
 
-  handleMultiFeatureSearchTextChange = (e, { name, value }) =>
-    this.setState({ [name]: value });
+  handleSingleFeatureSearchTextChange = e => {
+    if (e.target.value.includes(';') || e.target.value.includes(',')) {
+      this.setState({
+        singleFeatureSearchText: '',
+        multiFeatureSearchText: e.target.value,
+        multiSearching: true,
+        multiSearchOpen: true,
+      });
+    } else {
+      this.setState({
+        multiFeatureSearchText: '',
+        singleFeatureSearchText: e.target.value,
+        multiSearching: false,
+        multiSearchOpen: false,
+      });
+    }
+  };
+
+  handleMultiSearchClear = () => {
+    this.setState({
+      multiFeatureSearchText: '',
+    });
+  };
+
+  handleMultiSearchSubmit = () => {
+    const { multiFeatureSearchText } = this.state;
+    if (
+      multiFeatureSearchText.includes(';') ||
+      multiFeatureSearchText.includes(',')
+    ) {
+      // do the multi-search!
+      this.handleMultiFeatureSearchAction('submit');
+    } else {
+      this.setState({ multiFeatureSearchTextError: true });
+      // toast.error('Separate features with a comma or semi-colon');
+    }
+  };
+
+  handleMultiSearchClose = () => {
+    const { multiFeatureSearchText } = this.state;
+    if (
+      multiFeatureSearchText.includes(';') ||
+      multiFeatureSearchText.includes(',')
+    ) {
+      this.setState({
+        multiSearchOpen: false,
+        singleFeatureSearchText: '',
+      });
+    } else {
+      this.setState({
+        multiFeatureSearchText: '',
+        multiSearching: false,
+        multiSearchOpen: false,
+        singleFeatureSearchText: multiFeatureSearchText,
+      });
+    }
+  };
+
+  handleMultiFeatureSearchTextChange = (e, { value }) => {
+    // if multi-searching is false, and a semi-colon or comma is entered, open the popup
+    // if (
+    //   !this.state.multiSearching &&
+    //   (value.includes(';') || value.includes(','))
+    // ) {
+    this.setState({
+      multiFeatureSearchText: value,
+      // multiSearching: true,
+      // multiSearchOpen: true,
+    });
+    // }
+    // else {
+    //   this.setState({
+    //     multiFeatureSearchText: '',
+    //     multiSearching: false,
+    //     multiSearchOpen: false,
+    //     singleFeatureSearchText: value,
+    //   });
+    // }
+  };
 
   // filterDifferentialTableData = (multiFeatures) => {
 
@@ -751,6 +832,7 @@ class DifferentialDetail extends Component {
         volcanoPlotRows: differentialResults?.length || 0,
         multiFeaturesSearched: [],
         multiFeatureSearchText: '',
+        multiFeatureSearchTextError: false,
       });
     } else if (type === 'remove') {
       const newMultiFeaturesSearched = multiFeaturesSearched.filter(
@@ -777,6 +859,7 @@ class DifferentialDetail extends Component {
           volcanoPlotRows: differentialResults?.length || 0,
           multiFeaturesSearched: [],
           multiFeatureSearchText: '',
+          multiFeatureSearchTextError: false,
         });
       }
     } else {
@@ -827,6 +910,7 @@ class DifferentialDetail extends Component {
       volcanoPlotRows: filteredDifferentialTableData?.length || 0,
       multiFeaturesSearched: [],
       multiFeatureSearchText: '',
+      multiFeatureSearchTextError: false,
     });
   };
 
@@ -846,6 +930,8 @@ class DifferentialDetail extends Component {
       enableTabChangeOnSelection,
       multiFeaturesSearched,
       multiFeatureSearchText,
+      multiFeatureSearchTextError,
+      multiSearchOpen,
     } = this.state;
 
     const {
@@ -993,6 +1079,187 @@ class DifferentialDetail extends Component {
       </List>
     );
 
+    const MultiFeatureSearchPopup = {
+      backgroundColor: '2E2E2E',
+      borderBottom: '2px solid var(--color-primary)',
+      color: '#FFF',
+      padding: '1em',
+      minWidth: '40vw',
+      maxWidth: '40vw',
+      fontSize: '13px',
+      wordBreak: 'break-all',
+    };
+
+    // const differentialTableDataOptions =
+    //   differentialTableData?.map(data => {
+    //     debugger;
+    //     return {
+    //       key: data[this.props.differentialFeatureIdKey],
+    //       text: data[this.props.differentialFeatureIdKey],
+    //       value: data[this.props.differentialFeatureIdKey],
+    //     };
+    //   }) || [];
+
+    // const onSearch = searchString => {
+    //   debugger;
+    // };
+
+    const isMultiSearchOpen = bool => {
+      if (bool != null) {
+        this.setState({ multiSearchOpen: bool });
+      } else this.setState({ multiSearchOpen: !this.state.multiOpen });
+    };
+
+    const multiSearchInput = (
+      // this.state.multiSearching ? (
+      <div className="AbsoluteMultiSearchDifferential">
+        <span id="MultiSearchPopupContainer">
+          {!this.state.multiSearching ? (
+            <Input
+              icon
+              // labelPosition="right"
+              type="text"
+              placeholder="Search..."
+              value={this.state.singleFeatureSearchText}
+              onChange={this.handleSingleFeatureSearchTextChange}
+            >
+              <input />
+              {/* <Label
+                  basic
+                  id={
+                    this.state.singleFeatureSearchText === ''
+                      ? 'SearchLabel'
+                      : 'CloseLabel'
+                  }
+                > */}
+              <Icon
+                name={
+                  this.state.singleFeatureSearchText === '' ? 'search' : 'close'
+                }
+              />
+              {/* </Label> */}
+            </Input>
+          ) : null}
+          {this.state.multiSearching ? (
+            <Popup
+              trigger={
+                <Button
+                  as="div"
+                  labelPosition="right"
+                  onClick={isMultiSearchOpen}
+                >
+                  <Button color="blue" size="mini">
+                    <Icon name="search" />
+                    FEATURES SEARCHED
+                  </Button>
+                  <Label as="a" basic color="blue" pointing="left">
+                    {multiFeaturesSearched.length}
+                  </Label>
+                </Button>
+              }
+              position="right center"
+              basic
+              on="click"
+              open={multiSearchOpen}
+              inverted
+              style={MultiFeatureSearchPopup}
+              id="MultiFeatureSearchPopup"
+            >
+              <Popup.Header>Multi-Feature Search</Popup.Header>
+              <Popup.Content>
+                Paste or type features below; separate with a comma, semi-colon
+                or newline
+              </Popup.Content>
+              <Popup.Content>
+                <Form
+                // onSubmit={() => this.handleMultiFeatureSearchAction('submit')}
+                >
+                  <Form.TextArea
+                    placeholder="Separate features with a comma, semi-colon or newline"
+                    name="multiFeatureSearchText"
+                    id="multiFeatureSearchTextArea"
+                    value={multiFeatureSearchText}
+                    onChange={this.handleMultiFeatureSearchTextChange}
+                  />
+                  {multiFeatureSearchTextError ? (
+                    <Message
+                      error
+                      header="Action Forbidden"
+                      content="Features must be separated with a comma or semi-colon"
+                    />
+                  ) : null}
+                </Form>
+                <div>
+                  <Button
+                    className="PrimaryBackground multiSearchAction"
+                    content="Search"
+                    onClick={this.handleMultiSearchSubmit}
+                    icon="search"
+                  />
+                  <Button
+                    color="blue"
+                    className="multiSearchAction"
+                    content="Clear"
+                    onClick={this.handleMultiSearchClear}
+                    icon="remove"
+                  />
+                  <Button
+                    className="multiSearchAction"
+                    content="Close"
+                    onClick={this.handleMultiSearchClose}
+                    icon="reply"
+                  />
+                </div>
+                {multiFeaturesSearched?.length ? (
+                  <List
+                    animated
+                    inverted
+                    verticalAlign="middle"
+                    id="MultiFeaturesSearchedHorizontal"
+                    className="NoSelect"
+                    divided
+                    horizontal
+                    size="mini"
+                  >
+                    <List.Item className="NoSelect">
+                      <Label
+                        className="PrimaryBackground CursorPointer"
+                        onClick={() =>
+                          this.handleMultiFeatureSearchAction('clear')
+                        }
+                      >
+                        CLEAR ALL <Icon name="trash" />
+                      </Label>
+                    </List.Item>
+                    {multiFeaturesSearched.map(f => {
+                      return (
+                        <List.Item
+                          key={`featureList-${f}`}
+                          className="NoSelect"
+                        >
+                          <Label
+                            className="CursorPointer"
+                            onClick={() =>
+                              this.handleMultiFeatureSearchAction('remove', f)
+                            }
+                          >
+                            {f}
+                            <Icon name="delete" />
+                          </Label>
+                        </List.Item>
+                      );
+                    })}
+                  </List>
+                ) : null}
+              </Popup.Content>
+            </Popup>
+          ) : null}
+        </span>
+      </div>
+      // ) : (
+      //   <Input onChange={this.handleSingleFeatureSearchTextChange} />
+    );
+
     const table = (
       <EZGrid
         ref={this.volcanoPlotFilteredGridRef}
@@ -1007,7 +1274,7 @@ class DifferentialDetail extends Component {
         columnsConfig={differentialColumns}
         itemsPerPage={itemsPerPageVolcanoTable}
         onItemsPerPageChange={this.handleItemsPerPageChange}
-        // disableGeneralSearch
+        disableGeneralSearch
         disableGrouping
         disableColumnVisibilityToggle
         // exportBaseName="VolcanoPlot_Filtered_Results"
@@ -1019,6 +1286,16 @@ class DifferentialDetail extends Component {
         onFiltered={this.handleTableChange}
         disableQuickViewEditing
         disableQuickViewMenu
+        extraHeaderItem={
+          multiSearchInput
+          // <Dropdown
+          //   placeholder="Search"
+          //   multiple
+          //   search
+          //   selection
+          //   options={differentialTableDataOptions}
+          // />
+        }
       />
     );
     const scatterPlot = (
@@ -1044,17 +1321,6 @@ class DifferentialDetail extends Component {
         onReloadMultifeaturePlot={this.reloadMultifeaturePlot}
       ></ScatterPlotDiv>
     );
-
-    const MultiFeatureSearchPopup = {
-      backgroundColor: '2E2E2E',
-      borderBottom: '2px solid var(--color-primary)',
-      color: '#FFF',
-      padding: '1em',
-      minWidth: '40vw',
-      maxWidth: '40vw',
-      fontSize: '13px',
-      wordBreak: 'break-all',
-    };
 
     const dynamicPlots = (
       <PlotsDynamic
@@ -1222,94 +1488,6 @@ class DifferentialDetail extends Component {
                             model={differentialModel}
                             test={differentialTest}
                           />
-                        </div>
-                        <div className="AbsoluteMultiSearchDifferential">
-                          <span id="MultiSearchPopupContainer">
-                            <Popup
-                              trigger={
-                                <Button size="mini">
-                                  <Icon
-                                    name="search"
-                                    className="ViewPlotOptions"
-                                  />
-                                  MULTI-FEATURE SEARCH
-                                </Button>
-                              }
-                              position="right center"
-                              basic
-                              on="click"
-                              inverted
-                              style={MultiFeatureSearchPopup}
-                              closeOnDocumentClick
-                              closeOnEscape
-                            >
-                              <Popup.Content id="">
-                                <Form
-                                  onSubmit={() =>
-                                    this.handleMultiFeatureSearchAction(
-                                      'submit',
-                                    )
-                                  }
-                                >
-                                  <Form.TextArea
-                                    placeholder="Separate features with a comma or semi-colon"
-                                    name="multiFeatureSearchText"
-                                    value={multiFeatureSearchText}
-                                    onChange={
-                                      this.handleMultiFeatureSearchTextChange
-                                    }
-                                  />
-                                  <Form.Button content="Add" />
-                                </Form>
-                                {multiFeaturesSearched?.length ? (
-                                  <List
-                                    animated
-                                    inverted
-                                    verticalAlign="middle"
-                                    id="MultiFeaturesSearchedHorizontal"
-                                    className="NoSelect"
-                                    divided
-                                    horizontal
-                                    size="mini"
-                                  >
-                                    <List.Item className="NoSelect">
-                                      <Label
-                                        className="PrimaryBackground CursorPointer"
-                                        onClick={() =>
-                                          this.handleMultiFeatureSearchAction(
-                                            'clear',
-                                          )
-                                        }
-                                      >
-                                        CLEAR ALL <Icon name="trash" />
-                                      </Label>
-                                    </List.Item>
-                                    {multiFeaturesSearched.map(f => {
-                                      return (
-                                        <List.Item
-                                          key={`featureList-${f}`}
-                                          className="NoSelect"
-                                        >
-                                          <Label
-                                            className="CursorPointer"
-                                            onClick={() =>
-                                              this.handleMultiFeatureSearchAction(
-                                                'remove',
-                                                f,
-                                              )
-                                            }
-                                          >
-                                            {f}
-                                            <Icon name="delete" />
-                                          </Label>
-                                        </List.Item>
-                                      );
-                                    })}
-                                  </List>
-                                ) : null}
-                              </Popup.Content>
-                            </Popup>
-                          </span>
                         </div>
                         <Grid.Column
                           className="ResultsTableWrapper"
