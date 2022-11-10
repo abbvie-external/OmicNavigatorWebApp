@@ -760,9 +760,11 @@ class DifferentialDetail extends Component {
 
   handleMultiSearchSubmit = () => {
     const { multiFeatureSearchText } = this.state;
+    debugger;
     if (
       multiFeatureSearchText.includes(';') ||
-      multiFeatureSearchText.includes(',')
+      multiFeatureSearchText.includes(',') ||
+      multiFeatureSearchText.includes('\n')
     ) {
       // do the multi-search!
       this.handleMultiFeatureSearchAction('submit');
@@ -870,7 +872,8 @@ class DifferentialDetail extends Component {
           // .replace(/[,;]$/, '')
           // .split(',')
           // .split(/[ .:;?!~,`"&|()<>{}\[\]\r\n/\\]+/)
-          .split(/[ ;,]+/)
+          // .split(/[ ;,]+/)
+          .split(/\s*[,\n.]+\s*/)
           .map(item => item.trim());
 
         let multiFeaturesSearchedVar = [];
@@ -1172,7 +1175,7 @@ class DifferentialDetail extends Component {
               </Popup.Content>
               <Popup.Content>
                 <Form
-                // onSubmit={() => this.handleMultiFeatureSearchAction('submit')}
+                  onSubmit={() => this.handleMultiFeatureSearchAction('submit')}
                 >
                   <Form.TextArea
                     placeholder="Separate features with a comma, semi-colon or newline"
@@ -1181,14 +1184,13 @@ class DifferentialDetail extends Component {
                     value={multiFeatureSearchText}
                     onChange={this.handleMultiFeatureSearchTextChange}
                   />
-                  {multiFeatureSearchTextError ? (
-                    <Message
-                      error
-                      header="Action Forbidden"
-                      content="Features must be separated with a comma or semi-colon"
-                    />
-                  ) : null}
                 </Form>
+                {multiFeatureSearchTextError ? (
+                  <Popup.Content id="multiFeatureSearchTextError">
+                    Features must be separated with a comma, semi-colon or
+                    newline
+                  </Popup.Content>
+                ) : null}
                 <div>
                   <Button
                     className="PrimaryBackground multiSearchAction"
