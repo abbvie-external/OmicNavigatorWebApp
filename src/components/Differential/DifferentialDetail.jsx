@@ -621,9 +621,20 @@ class DifferentialDetail extends Component {
   };
 
   handleTableChange = () => {
+    // debugger;
+    // const { multiFeaturesSearched } = this.state;
+    // const multiFeaturesSearched = ['12759, 53624'];
     let sortedFilteredData =
       this.volcanoPlotFilteredGridRef?.current?.qhGridRef?.current?.getSortedData() ||
       this.props.differentialResults;
+    // if "SEARCHED FEATURES"//
+    // get the intersection between them and the sortedFilteredData
+    // if (multiFeaturesSearched.length) {
+    //   sortedFilteredData = intersectionWith(
+    //     sortedFilteredData,
+    //     multiFeaturesSearched,
+    //   );
+    // }
     this.setState(
       {
         filteredDifferentialTableData: sortedFilteredData,
@@ -735,7 +746,11 @@ class DifferentialDetail extends Component {
   };
 
   handleSingleFeatureSearchTextChange = e => {
-    if (e.target.value.includes(';') || e.target.value.includes(',')) {
+    if (
+      e.target.value.includes(';') ||
+      e.target.value.includes(',') ||
+      e.target.value.includes('\n')
+    ) {
       this.setState({
         singleFeatureSearchText: '',
         multiFeatureSearchText: e.target.value,
@@ -752,11 +767,11 @@ class DifferentialDetail extends Component {
     }
   };
 
-  handleMultiSearchClear = () => {
-    this.setState({
-      multiFeatureSearchText: '',
-    });
-  };
+  // handleMultiSearchClear = () => {
+  //   this.setState({
+  //     multiFeatureSearchText: '',
+  //   });
+  // };
 
   handleMultiSearchSubmit = () => {
     const { multiFeatureSearchText } = this.state;
@@ -778,7 +793,8 @@ class DifferentialDetail extends Component {
     const { multiFeatureSearchText } = this.state;
     if (
       multiFeatureSearchText.includes(';') ||
-      multiFeatureSearchText.includes(',')
+      multiFeatureSearchText.includes(',') ||
+      multiFeatureSearchText.includes('\n')
     ) {
       this.setState({
         multiSearchOpen: false,
@@ -871,9 +887,9 @@ class DifferentialDetail extends Component {
         const multiFeatureSearchTextSplit = multiFeatureSearchText
           // .replace(/[,;]$/, '')
           // .split(',')
+          // .split(/\s*[,\n.]+\s*/)
           // .split(/[ .:;?!~,`"&|()<>{}\[\]\r\n/\\]+/)
-          // .split(/[ ;,]+/)
-          .split(/\s*[,\n.]+\s*/)
+          .split(/[ ;,\s]+/)
           .map(item => item.trim());
 
         let multiFeaturesSearchedVar = [];
@@ -1173,51 +1189,12 @@ class DifferentialDetail extends Component {
                 Paste or type features below; separate with a comma, semi-colon
                 or newline
               </Popup.Content>
-              <Popup.Content>
-                <Form
-                  onSubmit={() => this.handleMultiFeatureSearchAction('submit')}
-                >
-                  <Form.TextArea
-                    placeholder="Separate features with a comma, semi-colon or newline"
-                    name="multiFeatureSearchText"
-                    id="multiFeatureSearchTextArea"
-                    value={multiFeatureSearchText}
-                    onChange={this.handleMultiFeatureSearchTextChange}
-                  />
-                </Form>
-                {multiFeatureSearchTextError ? (
-                  <Popup.Content id="multiFeatureSearchTextError">
-                    Features must be separated with a comma, semi-colon or
-                    newline
-                  </Popup.Content>
-                ) : null}
-                <div>
-                  <Button
-                    className="PrimaryBackground multiSearchAction"
-                    content="Search"
-                    onClick={this.handleMultiSearchSubmit}
-                    icon="search"
-                  />
-                  <Button
-                    color="blue"
-                    className="multiSearchAction"
-                    content="Clear"
-                    onClick={this.handleMultiSearchClear}
-                    icon="remove"
-                  />
-                  <Button
-                    className="multiSearchAction"
-                    content="Close"
-                    onClick={this.handleMultiSearchClose}
-                    icon="reply"
-                  />
-                </div>
+              <Popup.Content id="MultiFeaturesSearchedList">
                 {multiFeaturesSearched?.length ? (
                   <List
                     animated
                     inverted
                     verticalAlign="middle"
-                    id="MultiFeaturesSearchedHorizontal"
                     className="NoSelect"
                     divided
                     horizontal
@@ -1225,7 +1202,8 @@ class DifferentialDetail extends Component {
                   >
                     <List.Item className="NoSelect">
                       <Label
-                        className="PrimaryBackground CursorPointer"
+                        color="blue"
+                        className="CursorPointer"
                         onClick={() =>
                           this.handleMultiFeatureSearchAction('clear')
                         }
@@ -1253,6 +1231,46 @@ class DifferentialDetail extends Component {
                     })}
                   </List>
                 ) : null}
+              </Popup.Content>
+              <Popup.Content>
+                <Form
+                  onSubmit={() => this.handleMultiFeatureSearchAction('submit')}
+                >
+                  <Form.TextArea
+                    placeholder="Separate features with a comma, semi-colon or newline"
+                    name="multiFeatureSearchText"
+                    id="multiFeatureSearchTextArea"
+                    value={multiFeatureSearchText}
+                    onChange={this.handleMultiFeatureSearchTextChange}
+                  />
+                </Form>
+                {multiFeatureSearchTextError ? (
+                  <Popup.Content id="multiFeatureSearchTextError">
+                    Features must be separated with a comma, semi-colon or
+                    newline
+                  </Popup.Content>
+                ) : null}
+                <div>
+                  <Button
+                    className="PrimaryBackground multiSearchAction"
+                    content="Search"
+                    onClick={this.handleMultiSearchSubmit}
+                    icon="search"
+                  />
+                  {/* <Button
+                    color="blue"
+                    className="multiSearchAction"
+                    content="Clear Selection"
+                    onClick={this.handleMultiSearchClear}
+                    icon="undo"
+                  /> */}
+                  <Button
+                    className="multiSearchAction"
+                    content="Close"
+                    onClick={this.handleMultiSearchClose}
+                    icon="close"
+                  />
+                </div>
               </Popup.Content>
             </Popup>
           ) : null}
