@@ -17,7 +17,6 @@ import {
   Button,
   Form,
   Input,
-  Message,
 } from 'semantic-ui-react';
 import ButtonActions from '../Shared/ButtonActions';
 import './DifferentialDetail.scss';
@@ -65,6 +64,8 @@ class DifferentialDetail extends Component {
     multiFeaturesSearched: [],
     multiFeatureSearchText: '',
     singleFeatureSearchText: '',
+    singleFeatureSearchActive: false,
+    singleFeatureSearchIcon: 'search',
     multiSearching: false,
     volcanoPlotSelectedDataArr: [],
   };
@@ -746,6 +747,13 @@ class DifferentialDetail extends Component {
   };
 
   handleSingleFeatureSearchTextChange = e => {
+    this.setState({
+      singleFeatureSearchActive: true,
+      singleFeatureSearchIcon: 'search',
+    });
+    if (e.target.value === '') {
+      this.handleSingleFeatureSearchClear();
+    }
     if (
       e.target.value.includes(';') ||
       e.target.value.includes(',') ||
@@ -835,6 +843,41 @@ class DifferentialDetail extends Component {
   // filterDifferentialTableData = (multiFeatures) => {
 
   // }
+
+  handleSingleFeatureSearchSubmit = () => {
+    const { volcanoPlotSelectedDataArr, singleFeatureSearchText } = this.state;
+    if (singleFeatureSearchText.length < 3) return;
+    const relevantFilteredDifferentialTableData = [
+      ...volcanoPlotSelectedDataArr,
+    ].filter(d =>
+      d[this.props.differentialFeatureIdKey].includes(singleFeatureSearchText),
+    );
+    // if any filteredDifferentialTableData matches the search text, take action
+    if (relevantFilteredDifferentialTableData.length) {
+      this.setState({
+        differentialTableData: relevantFilteredDifferentialTableData,
+        volcanoPlotRows: relevantFilteredDifferentialTableData?.length || 0,
+        singleFeatureSearchActive: false,
+        singleFeatureSearchIcon: 'remove',
+      });
+    }
+  };
+
+  handleSingleFeatureSearchClear = () => {
+    const { volcanoPlotSelectedDataArr, singleFeatureSearchText } = this.state;
+    if (singleFeatureSearchText.length) {
+      this.setState({
+        differentialTableData: volcanoPlotSelectedDataArr,
+        volcanoPlotRows: volcanoPlotSelectedDataArr?.length || 0,
+        singleFeatureSearchActive: false,
+        singleFeatureSearchText: '',
+        // multiFeatureSearchText: '',
+        // multiSearching: false,
+        // multiSearchOpen: false,
+        // singleFeatureSearchIcon: 'search',
+      });
+    }
+  };
 
   handleMultiFeatureSearchAction = (type, featureToRemove) => {
     const { differentialResults } = this.props;
@@ -1134,37 +1177,52 @@ class DifferentialDetail extends Component {
         this.setState({ multiSearchOpen: bool });
       } else this.setState({ multiSearchOpen: !this.state.multiOpen });
     };
-
+    const searchColor =
+      this.state.singleFeatureSearchText.length < 3 ? 'lightgrey' : 'blue';
+    const searchIcon = this.state.singleFeatureSearchIcon;
+    const searchClick = this.state.singleFeatureSearchActive
+      ? this.handleSingleFeatureSearchSubmit
+      : this.handleSingleFeatureSearchClear;
     const multiSearchInput = (
       // this.state.multiSearching ? (
       <div className="AbsoluteMultiSearchDifferential">
         <span id="MultiSearchPopupContainer">
           {!this.state.multiSearching ? (
             <Input
-              icon
-              // labelPosition="right"
-              type="text"
-              placeholder="Search..."
+              placeholder="Search (min 3 char)"
               value={this.state.singleFeatureSearchText}
               onChange={this.handleSingleFeatureSearchTextChange}
-            >
-              <input />
-              {/* <Label
-                  basic
-                  id={
-                    this.state.singleFeatureSearchText === ''
-                      ? 'SearchLabel'
-                      : 'CloseLabel'
-                  }
-                > */}
-              <Icon
-                name={
-                  this.state.singleFeatureSearchText === '' ? 'search' : 'close'
-                }
-              />
-              {/* </Label> */}
-            </Input>
-          ) : null}
+              action={{
+                color: searchColor,
+                icon: searchIcon,
+                onClick: searchClick,
+              }}
+            />
+          ) : // <Input
+          //   icon
+          //   // labelPosition="right"
+          //   type="text"
+          //   placeholder="Search..."
+          //   value={this.state.singleFeatureSearchText}
+          //   onChange={this.handleSingleFeatureSearchTextChange}
+          // >
+          //   <input />
+          //   {/* <Label
+          //       basic
+          //       id={
+          //         this.state.singleFeatureSearchText === ''
+          //           ? 'SearchLabel'
+          //           : 'CloseLabel'
+          //       }
+          //     > */}
+          //   <Icon
+          //     name={
+          //       this.state.singleFeatureSearchText === '' ? 'search' : 'close'
+          //     }
+          //   />
+          //   {/* </Label> */}
+          // </Input>
+          null}
           {this.state.multiSearching ? (
             <Popup
               trigger={
