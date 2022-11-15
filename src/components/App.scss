@@ -303,6 +303,9 @@
     // margin-top: 13px;
     // left: 250px !important;
     float: left;
+    input {
+      min-width: 185px;
+    }
   }
 
   .AbsoluteExport {

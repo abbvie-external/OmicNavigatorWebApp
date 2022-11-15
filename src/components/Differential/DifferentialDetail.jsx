@@ -87,9 +87,14 @@ class DifferentialDetail extends Component {
         differentialTableData: differentialResults,
         volcanoPlotRows: differentialResults?.length || 0,
         multiFeaturesSearched: [],
+        volcanoPlotSelectedDataArr: this.props.differentialResults,
       });
     }
   }
+
+  hasWhitespace = s => {
+    return s.indexOf(' ') >= 0;
+  };
 
   pageToFeature = featureToHighlight => {
     if (featureToHighlight) {
@@ -152,15 +157,28 @@ class DifferentialDetail extends Component {
       differentialOutlinedFeature,
       plotMultiFeatureAvailable,
     } = this.props;
-    const { multiFeaturesSearched } = this.state;
+    const { multiFeaturesSearched, singleFeatureSearchText } = this.state;
     this.setState({ volcanoPlotSelectedDataArr });
     // find the intersection between the searched features, and volcano plot
-    const multiFeaturesSearchedSet = new Set(multiFeaturesSearched);
-    let relevantFilteredDifferentialTableData = [
-      ...volcanoPlotSelectedDataArr,
-    ].filter(d =>
-      multiFeaturesSearchedSet.has(d[this.props.differentialFeatureIdKey]),
-    );
+    let relevantFilteredDifferentialTableData = [...volcanoPlotSelectedDataArr];
+    if (multiFeaturesSearched.length || singleFeatureSearchText !== '') {
+      if (multiFeaturesSearched.length) {
+        const multiFeaturesSearchedSet = new Set(multiFeaturesSearched);
+        relevantFilteredDifferentialTableData = [
+          ...volcanoPlotSelectedDataArr,
+        ].filter(d =>
+          multiFeaturesSearchedSet.has(d[this.props.differentialFeatureIdKey]),
+        );
+      } else {
+        relevantFilteredDifferentialTableData = [
+          ...volcanoPlotSelectedDataArr,
+        ].filter(d =>
+          d[this.props.differentialFeatureIdKey].includes(
+            singleFeatureSearchText,
+          ),
+        );
+      }
+    }
     // this.setState({
     //   allChecked: false,
     // });
@@ -754,10 +772,12 @@ class DifferentialDetail extends Component {
     if (e.target.value === '') {
       this.handleSingleFeatureSearchClear();
     }
+
     if (
       e.target.value.includes(';') ||
       e.target.value.includes(',') ||
-      e.target.value.includes('\n')
+      e.target.value.includes('\n') ||
+      this.hasWhitespace(e.target.value)
     ) {
       this.setState({
         singleFeatureSearchText: '',
@@ -786,14 +806,14 @@ class DifferentialDetail extends Component {
     if (
       multiFeatureSearchText.includes(';') ||
       multiFeatureSearchText.includes(',') ||
-      multiFeatureSearchText.includes('\n')
+      multiFeatureSearchText.includes('\n') ||
+      this.hasWhitespace(multiFeatureSearchText)
     ) {
       // do the multi-search!
       this.setState({ multiFeatureSearchTextError: false });
       this.handleMultiFeatureSearchAction('submit');
     } else {
       this.setState({ multiFeatureSearchTextError: true });
-      // toast.error('Separate features with a comma or semi-colon');
     }
   };
 
@@ -802,7 +822,8 @@ class DifferentialDetail extends Component {
     if (
       multiFeatureSearchText.includes(';') ||
       multiFeatureSearchText.includes(',') ||
-      multiFeatureSearchText.includes('\n')
+      multiFeatureSearchText.includes('\n') ||
+      this.hasWhitespace(multiFeatureSearchText)
     ) {
       this.setState({
         multiSearchOpen: false,
@@ -819,7 +840,7 @@ class DifferentialDetail extends Component {
   };
 
   handleMultiFeatureSearchTextChange = (e, { value }) => {
-    // if multi-searching is false, and a semi-colon or comma is entered, open the popup
+    // if multi-searching is false, and a space, or comma is entered, open the popup
     // if (
     //   !this.state.multiSearching &&
     //   (value.includes(';') || value.includes(','))
@@ -864,6 +885,7 @@ class DifferentialDetail extends Component {
   };
 
   handleSingleFeatureSearchClear = () => {
+    // must filter differently paul!
     const { volcanoPlotSelectedDataArr, singleFeatureSearchText } = this.state;
     if (singleFeatureSearchText.length) {
       this.setState({
@@ -1189,7 +1211,7 @@ class DifferentialDetail extends Component {
         <span id="MultiSearchPopupContainer">
           {!this.state.multiSearching ? (
             <Input
-              placeholder="Search (min 3 char)"
+              placeholder="Search feature/s (min 3 char)"
               value={this.state.singleFeatureSearchText}
               onChange={this.handleSingleFeatureSearchTextChange}
               action={{
@@ -1250,8 +1272,8 @@ class DifferentialDetail extends Component {
             >
               <Popup.Header>Multi-Feature Search</Popup.Header>
               <Popup.Content>
-                Paste or type features below; separate with a comma, semi-colon
-                or newline
+                Paste or type features below; separate with a comma, space or
+                newline
               </Popup.Content>
               <Popup.Content id="MultiFeaturesSearchedList">
                 {multiFeaturesSearched?.length ? (
@@ -1301,7 +1323,7 @@ class DifferentialDetail extends Component {
                   onSubmit={() => this.handleMultiFeatureSearchAction('submit')}
                 >
                   <Form.TextArea
-                    placeholder="Separate features with a comma, semi-colon or newline"
+                    placeholder="Separate features with a comma, space, or newline"
                     name="multiFeatureSearchText"
                     id="multiFeatureSearchTextArea"
                     value={multiFeatureSearchText}
@@ -1310,8 +1332,7 @@ class DifferentialDetail extends Component {
                 </Form>
                 {multiFeatureSearchTextError ? (
                   <Popup.Content id="multiFeatureSearchTextError">
-                    Features must be separated with a comma, semi-colon or
-                    newline
+                    Features must be separated with a space, comma, or newline
                   </Popup.Content>
                 ) : null}
                 <div>
