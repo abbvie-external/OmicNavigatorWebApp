@@ -902,94 +902,55 @@ class DifferentialDetail extends Component {
   };
 
   handleMultiFeatureSearchAction = (type, featureToRemove) => {
-    const { differentialResults } = this.props;
+    // const { differentialResults } = this.props;
     const {
-      differentialTableData,
-      multiFeaturesSearched,
+      // differentialTableData,
+      // multiFeaturesSearched,
       multiFeatureSearchText,
       volcanoPlotSelectedDataArr,
     } = this.state;
-    if (type === 'clear') {
-      const resetDifferentialTableData = volcanoPlotSelectedDataArr?.length
-        ? volcanoPlotSelectedDataArr
-        : differentialResults;
-      this.setState({
-        differentialTableData: resetDifferentialTableData,
-        volcanoPlotRows: differentialResults?.length || 0,
-        multiFeaturesSearched: [],
-        multiFeatureSearchText: '',
+    // new search
+    if (multiFeatureSearchText !== '') {
+      // 12759, 67451,19253;22249; 70737
+      const multiFeatureSearchTextSplit = multiFeatureSearchText
+        // .replace(/[,;]$/, '')
+        // .split(',')
+        // .split(/\s*[,\n.]+\s*/)
+        // .split(/[ .:;?!~,`"&|()<>{}\[\]\r\n/\\]+/)
+        .split(/[ ;,\s]+/)
+        .map(item => item.trim());
+
+      let multiFeaturesSearchedVar = [];
+      const multiFeaturesSearchedSet = new Set(multiFeatureSearchTextSplit);
+      const relevantFilteredDifferentialTableData = [
+        ...volcanoPlotSelectedDataArr,
+      ].filter(d => {
+        if (
+          multiFeaturesSearchedSet.has(d[this.props.differentialFeatureIdKey])
+        ) {
+          multiFeaturesSearchedVar.push(d[this.props.differentialFeatureIdKey]);
+          return true;
+        } else return false;
       });
-    } else if (type === 'remove') {
-      const newMultiFeaturesSearched = multiFeaturesSearched.filter(
-        i => i !== featureToRemove,
+      const notFound = _.difference(
+        multiFeatureSearchTextSplit,
+        multiFeaturesSearchedVar,
       );
-      if (newMultiFeaturesSearched.length) {
-        const newMultiFeaturesSearchedSet = new Set(newMultiFeaturesSearched);
-        let relevantFilteredDifferentialTableData = [
-          ...differentialTableData,
-        ].filter(d =>
-          newMultiFeaturesSearchedSet.has(
-            d[this.props.differentialFeatureIdKey],
-          ),
-        );
-        relevantFilteredDifferentialTableData = relevantFilteredDifferentialTableData.length
-          ? relevantFilteredDifferentialTableData
-          : volcanoPlotSelectedDataArr;
+      debugger;
+      // if any filteredDifferentialTableData matches the search text, take action
+      if (multiFeaturesSearchedVar.length) {
         this.setState({
           differentialTableData: relevantFilteredDifferentialTableData,
           volcanoPlotRows: relevantFilteredDifferentialTableData?.length || 0,
-          multiFeaturesSearched: newMultiFeaturesSearched,
+          multiFeaturesSearched: multiFeaturesSearchedVar,
+          multiFeaturesNotFound: notFound,
         });
       } else {
-        // reset differential table data if multiFeaturesSearched is empty
-        this.setState({
-          differentialTableData: differentialResults,
-          volcanoPlotRows: differentialResults?.length || 0,
-          multiFeaturesSearched: [],
-          multiFeatureSearchText: '',
-          multiFeatureSearchTextError: false,
-        });
-      }
-    } else {
-      // new search
-      if (multiFeatureSearchText !== '') {
-        // 12759, 67451,19253;22249; 70737
-        const multiFeatureSearchTextSplit = multiFeatureSearchText
-          // .replace(/[,;]$/, '')
-          // .split(',')
-          // .split(/\s*[,\n.]+\s*/)
-          // .split(/[ .:;?!~,`"&|()<>{}\[\]\r\n/\\]+/)
-          .split(/[ ;,\s]+/)
-          .map(item => item.trim());
-
-        let multiFeaturesSearchedVar = [];
-        const multiFeaturesSearchedSet = new Set(multiFeatureSearchTextSplit);
-        const relevantFilteredDifferentialTableData = [
-          ...volcanoPlotSelectedDataArr,
-        ].filter(d => {
-          if (
-            multiFeaturesSearchedSet.has(d[this.props.differentialFeatureIdKey])
-          ) {
-            multiFeaturesSearchedVar.push(
-              d[this.props.differentialFeatureIdKey],
-            );
-            return true;
-          } else return false;
-        });
-        // if any filteredDifferentialTableData matches the search text, take action
-        if (multiFeaturesSearchedVar.length) {
-          this.setState({
-            differentialTableData: relevantFilteredDifferentialTableData,
-            volcanoPlotRows: relevantFilteredDifferentialTableData?.length || 0,
-            multiFeaturesSearched: multiFeaturesSearchedVar,
-          });
-        } else {
-          this.setState({ differentialTableData: [] });
-          this.resetMultiFeatureSearch();
-        }
-      } else {
+        this.setState({ differentialTableData: [] });
         this.resetMultiFeatureSearch();
       }
+    } else {
+      this.resetMultiFeatureSearch();
     }
   };
 
@@ -1022,6 +983,7 @@ class DifferentialDetail extends Component {
       multiFeatureSearchText,
       multiFeatureSearchTextError,
       multiSearchOpen,
+      multiFeaturesNotFound,
     } = this.state;
 
     const {
@@ -1286,7 +1248,7 @@ class DifferentialDetail extends Component {
                     horizontal
                     size="mini"
                   >
-                    <List.Item className="NoSelect">
+                    {/* <List.Item className="NoSelect">
                       <Label
                         color="blue"
                         className="CursorPointer"
@@ -1296,21 +1258,23 @@ class DifferentialDetail extends Component {
                       >
                         CLEAR ALL <Icon name="trash" />
                       </Label>
-                    </List.Item>
-                    {multiFeaturesSearched.map(f => {
+                    </List.Item> */}
+                    <List.Item>NOT FOUND:</List.Item>
+                    {multiFeaturesNotFound.map(f => {
                       return (
                         <List.Item
                           key={`featureList-${f}`}
                           className="NoSelect"
                         >
                           <Label
+                            color="red"
                             className="CursorPointer"
-                            onClick={() =>
-                              this.handleMultiFeatureSearchAction('remove', f)
-                            }
+                            // onClick={() =>
+                            //   this.handleMultiFeatureSearchAction('remove', f)
+                            // }
                           >
                             {f}
-                            <Icon name="delete" />
+                            {/* <Icon name="delete" /> */}
                           </Label>
                         </List.Item>
                       );
