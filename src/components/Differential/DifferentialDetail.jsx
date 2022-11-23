@@ -81,14 +81,24 @@ class DifferentialDetail extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    const { differentialResults } = this.props;
+    const { differentialResults, differentialFeatureIdKey } = this.props;
+    const { multiFeaturesSearched } = this.state;
     if (prevProps.differentialResults !== differentialResults) {
+      let relevantFilteredDifferentialTableData = [...differentialResults];
+      if (multiFeaturesSearched.length) {
+        const multiFeaturesSearchedSet = new Set(multiFeaturesSearched);
+        relevantFilteredDifferentialTableData = [
+          ...differentialResults,
+        ].filter(d =>
+          multiFeaturesSearchedSet.has(d[differentialFeatureIdKey]),
+        );
+      }
       this.setState({
         allChecked: false,
-        differentialTableData: differentialResults,
+        differentialTableData: relevantFilteredDifferentialTableData,
         volcanoPlotRows: differentialResults?.length || 0,
         multiFeaturesSearched: [],
-        volcanoPlotSelectedDataArr: this.props.differentialResults,
+        volcanoPlotSelectedDataArr: differentialResults,
       });
     }
   }
@@ -777,7 +787,6 @@ class DifferentialDetail extends Component {
     if (e.target.value === '') {
       this.handleSingleFeatureSearchClear();
     } else if (
-      e.target.value.includes(';') ||
       e.target.value.includes(',') ||
       e.target.value.includes('\n') ||
       this.hasWhitespace(e.target.value)
@@ -788,7 +797,6 @@ class DifferentialDetail extends Component {
         multiSearching: true,
         multiSearchOpen: true,
       });
-      debugger;
       // this.multiFeatureSearchTextRefChild?.current?.focus();
     } else {
       this.setState({
@@ -822,7 +830,6 @@ class DifferentialDetail extends Component {
       });
     } else if (
       multiFeatureSearchText !== '' ||
-      multiFeatureSearchText.includes(';') ||
       multiFeatureSearchText.includes(',') ||
       multiFeatureSearchText.includes('\n') ||
       this.hasWhitespace(multiFeatureSearchText)
@@ -838,7 +845,6 @@ class DifferentialDetail extends Component {
 
   handleMultiSearchClose = () => {
     const { multiFeatureSearchText, volcanoPlotSelectedDataArr } = this.state;
-    debugger;
     if (multiFeatureSearchText === '') {
       // if close with nothing in text area
       this.setState({
@@ -851,7 +857,6 @@ class DifferentialDetail extends Component {
         singleFeatureSearchText: '',
       });
     } else if (
-      multiFeatureSearchText.includes(';') ||
       multiFeatureSearchText.includes(',') ||
       multiFeatureSearchText.includes('\n') ||
       this.hasWhitespace(multiFeatureSearchText)
@@ -934,7 +939,7 @@ class DifferentialDetail extends Component {
         // .split(',')
         // .split(/\s*[,\n.]+\s*/)
         // .split(/[ .:;?!~,`"&|()<>{}\[\]\r\n/\\]+/)
-        .split(/[ ;,\s]+/)
+        .split(/[,\s]+/)
         .map(item => item.trim());
 
       let multiFeaturesFound = [];
@@ -1173,7 +1178,6 @@ class DifferentialDetail extends Component {
 
     // const differentialTableDataOptions =
     //   differentialTableData?.map(data => {
-    //     debugger;
     //     return {
     //       key: data[this.props.differentialFeatureIdKey],
     //       text: data[this.props.differentialFeatureIdKey],
@@ -1182,7 +1186,6 @@ class DifferentialDetail extends Component {
     //   }) || [];
 
     // const onSearch = searchString => {
-    //   debugger;
     // };
 
     const isMultiSearchOpen = bool => {
