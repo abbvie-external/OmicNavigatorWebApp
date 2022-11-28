@@ -83,22 +83,31 @@ class DifferentialDetail extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     const { differentialResults, differentialFeatureIdKey } = this.props;
-    const { multiFeaturesSearched } = this.state;
+    const { multiFeaturesSearched, singleFeatureSearched } = this.state;
     if (prevProps.differentialResults !== differentialResults) {
       let relevantFilteredDifferentialTableData = [...differentialResults];
-      if (multiFeaturesSearched.length) {
-        const multiFeaturesSearchedSet = new Set(multiFeaturesSearched);
-        relevantFilteredDifferentialTableData = [
-          ...differentialResults,
-        ].filter(d =>
-          multiFeaturesSearchedSet.has(d[differentialFeatureIdKey]),
-        );
+      if (multiFeaturesSearched.length || singleFeatureSearched !== '') {
+        if (multiFeaturesSearched.length) {
+          const multiFeaturesSearchedSet = new Set(multiFeaturesSearched);
+          relevantFilteredDifferentialTableData = [
+            ...differentialResults,
+          ].filter(d =>
+            multiFeaturesSearchedSet.has(d[differentialFeatureIdKey]),
+          );
+        } else {
+          relevantFilteredDifferentialTableData = [
+            ...differentialResults,
+          ].filter(d =>
+            d[this.props.differentialFeatureIdKey].includes(
+              singleFeatureSearched,
+            ),
+          );
+        }
       }
       this.setState({
         allChecked: false,
         differentialTableData: relevantFilteredDifferentialTableData,
         volcanoPlotRows: differentialResults?.length || 0,
-        multiFeaturesSearched: [],
         volcanoPlotSelectedDataArr: differentialResults,
       });
     }
