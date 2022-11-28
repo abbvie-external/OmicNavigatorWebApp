@@ -830,6 +830,7 @@ class DifferentialDetail extends Component {
         differentialTableData: volcanoPlotSelectedDataArr,
         volcanoPlotRows: volcanoPlotSelectedDataArr?.length || 0,
         singleFeatureSearchActive: false,
+        singleFeatureSearchIcon: 'search',
         singleFeatureSearchText: '',
       });
     } else if (
@@ -860,6 +861,7 @@ class DifferentialDetail extends Component {
         differentialTableData: volcanoPlotSelectedDataArr,
         volcanoPlotRows: volcanoPlotSelectedDataArr?.length || 0,
         singleFeatureSearchActive: false,
+        singleFeatureSearchIcon: 'search',
         singleFeatureSearchText: '',
       });
     } else if (
@@ -921,6 +923,7 @@ class DifferentialDetail extends Component {
         differentialTableData: volcanoPlotSelectedDataArr,
         volcanoPlotRows: volcanoPlotSelectedDataArr?.length || 0,
         singleFeatureSearchActive: false,
+        singleFeatureSearchIcon: 'search',
         singleFeatureSearchText: '',
         // multiFeatureSearchText: '',
         // multiSearching: false,
