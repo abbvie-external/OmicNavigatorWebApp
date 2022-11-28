@@ -63,6 +63,7 @@ class DifferentialDetail extends Component {
     scatterplotLoaded: false,
     multiFeaturesSearched: [],
     multiFeatureSearchText: '',
+    singleFeatureSearched: '',
     singleFeatureSearchText: '',
     singleFeatureSearchActive: false,
     singleFeatureSearchIcon: 'search',
@@ -168,11 +169,11 @@ class DifferentialDetail extends Component {
       differentialOutlinedFeature,
       plotMultiFeatureAvailable,
     } = this.props;
-    const { multiFeaturesSearched } = this.state;
+    const { multiFeaturesSearched, singleFeatureSearched } = this.state;
     this.setState({ volcanoPlotSelectedDataArr });
     // find the intersection between the searched features, and volcano plot
     let relevantFilteredDifferentialTableData = [...volcanoPlotSelectedDataArr];
-    if (multiFeaturesSearched.length) {
+    if (multiFeaturesSearched.length || singleFeatureSearched !== '') {
       // PAUL - do we need single features searched
       if (multiFeaturesSearched.length) {
         const multiFeaturesSearchedSet = new Set(multiFeaturesSearched);
@@ -181,14 +182,14 @@ class DifferentialDetail extends Component {
         ].filter(d =>
           multiFeaturesSearchedSet.has(d[this.props.differentialFeatureIdKey]),
         );
-        // } else {
-        //   relevantFilteredDifferentialTableData = [
-        //     ...volcanoPlotSelectedDataArr,
-        //   ].filter(d =>
-        //     d[this.props.differentialFeatureIdKey].includes(
-        //       singleFeatureSearchText,
-        //     ),
-        //   );
+      } else {
+        relevantFilteredDifferentialTableData = [
+          ...volcanoPlotSelectedDataArr,
+        ].filter(d =>
+          d[this.props.differentialFeatureIdKey].includes(
+            singleFeatureSearched,
+          ),
+        );
       }
     }
     // this.setState({
@@ -911,6 +912,7 @@ class DifferentialDetail extends Component {
         volcanoPlotRows: relevantFilteredDifferentialTableData?.length || 0,
         singleFeatureSearchActive: false,
         singleFeatureSearchIcon: 'remove',
+        singleFeatureSearched: singleFeatureSearchText,
       });
     }
   };
@@ -925,6 +927,7 @@ class DifferentialDetail extends Component {
         singleFeatureSearchActive: false,
         singleFeatureSearchIcon: 'search',
         singleFeatureSearchText: '',
+        singleFeatureSearched: '',
         // multiFeatureSearchText: '',
         // multiSearching: false,
         // multiSearchOpen: false,
@@ -982,6 +985,7 @@ class DifferentialDetail extends Component {
           multiFeaturesNotFound: multiFeaturesNotFoundValues,
           multiFeatureSearchText: multiFeaturesFound.toString(),
           multiFeatureSearchActive: false,
+          singleFeatureSearched: '',
         });
       } else {
         // if features are not found, display them
@@ -1013,6 +1017,7 @@ class DifferentialDetail extends Component {
       multiFeatureSearchTextError: false,
       singleFeatureSearchActive: false,
       singleFeatureSearchText: '',
+      singleFeatureSearched: '',
     });
   };
 
