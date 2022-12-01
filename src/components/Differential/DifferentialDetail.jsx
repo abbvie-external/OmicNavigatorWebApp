@@ -559,6 +559,7 @@ class DifferentialDetail extends Component {
   };
 
   handleSizeChange = (newSize, axisDragged) => {
+    if (newSize === undefined) return;
     const { volcanoDivWidth } = this.state;
     const { fwdRefDVC } = this.props;
     const plotSizeAdjustment = Math.round(newSize * 0.9);
