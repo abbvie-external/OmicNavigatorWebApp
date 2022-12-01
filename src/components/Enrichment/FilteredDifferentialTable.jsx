@@ -143,6 +143,8 @@ class FilteredDifferentialTable extends Component {
           this.props.enrichmentStudy,
           this.props.enrichmentModel,
           name,
+          this.props.enrichmentAnnotation,
+          this.props.enrichmentTerm,
           null,
           cancelToken,
         )
