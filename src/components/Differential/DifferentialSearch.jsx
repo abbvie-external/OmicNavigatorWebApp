@@ -179,6 +179,11 @@ class DifferentialSearch extends Component {
         differentialStudyData,
         differentialModelsAndTestsVar,
       );
+      const differentialModelIds = [];
+      differentialModelsAndTestsVar.forEach(result =>
+        differentialModelIds.push(result.modelID),
+      );
+      this.props.onSetDifferentialModelIds(differentialModelIds);
       const differentialModelsMapped = differentialModelsAndTestsVar.map(
         result => {
           return {
@@ -292,6 +297,7 @@ class DifferentialSearch extends Component {
       onSearchChangeDifferential,
       onSearchResetDifferential,
     } = this.props;
+    this.props.onGetMultiModelMappingObject(value);
     onSearchChangeDifferential(
       {
         [name]: value,

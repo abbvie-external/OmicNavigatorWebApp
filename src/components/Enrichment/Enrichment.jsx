@@ -18,6 +18,8 @@ import {
   splitValue,
   Linkout,
   roundToPrecision,
+  getTestsArg,
+  getModelsArg,
 } from '../Shared/helpers';
 import '../Shared/Table.scss';
 import SearchingAlt from '../Transitions/SearchingAlt';
@@ -194,6 +196,7 @@ class Enrichment extends Component {
       parseInt(localStorage.getItem('itemsPerPageEnrichmentTable'), 10) || 30,
     isDataStreamingEnrichmentsTable: false,
     enrichmentTest: '',
+    enrichmentModelIds: [],
   };
   EnrichmentViewContainerRef = React.createRef();
   EnrichmentGridRef = React.createRef();
@@ -1321,7 +1324,12 @@ class Enrichment extends Component {
   };
 
   getPlot = featureId => {
-    const { enrichmentPlotTypes, enrichmentTest, uData } = this.state;
+    const {
+      enrichmentPlotTypes,
+      enrichmentTest,
+      uData,
+      enrichmentModelIds,
+    } = this.state;
     const { enrichmentStudy, enrichmentModel } = this.props;
     let id = featureId != null ? featureId : '';
     let plotDataEnrichmentVar = { key: '', title: '', svg: [] };
@@ -1345,13 +1353,22 @@ class Enrichment extends Component {
             if (plot.plotType.includes('multiFeature')) {
               return undefined;
             }
-            const testsArg = plot.plotType.includes('multiTest')
-              ? uData
-              : enrichmentTest;
+            const testsArg = getTestsArg(
+              plot.plotType,
+              enrichmentModelIds,
+              uData,
+              enrichmentTest,
+            );
+            const modelsArg = getModelsArg(
+              plot.plotType,
+              enrichmentModelIds,
+              uData,
+              enrichmentModel,
+            );
             return omicNavigatorService
               .plotStudyReturnSvgUrl(
                 enrichmentStudy,
-                enrichmentModel,
+                modelsArg,
                 id,
                 plot.plotID,
                 plot.plotType,
@@ -2397,6 +2414,12 @@ class Enrichment extends Component {
   //   // clearTimeout(this.timeout);
   // };
 
+  setEnrichmentModelIds = enrichmentModelIds => {
+    this.setState({
+      enrichmentModelIds,
+    });
+  };
+
   render() {
     const enrichmentView = this.getView();
     const {
@@ -2530,6 +2553,7 @@ class Enrichment extends Component {
               onHandleEnrichmentColumnsConfigured={
                 this.handleEnrichmentColumnsConfigured
               }
+              onSetEnrichmentModelIds={this.setEnrichmentModelIds}
             />
           </Grid.Column>
           <Grid.Column

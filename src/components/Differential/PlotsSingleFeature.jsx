@@ -17,7 +17,7 @@ class PlotsSingleFeature extends Component {
   };
 
   differentialDetailPlotsSingleFeatureRef = React.createRef();
-  metaFeaturesTableDynamicRef = React.createRef();
+  metafeaturesTableDynamicRef = React.createRef();
 
   componentDidMount() {
     this.setButtonVisibility();
@@ -176,10 +176,7 @@ class PlotsSingleFeature extends Component {
                 imageInfo={plotSingleFeatureData}
                 tabIndex={activeTabIndexPlotsSingleFeatureVar}
                 svgExportName={svgExportName}
-                refFwd={
-                  this.metaFeaturesTableDynamicRef.current
-                    ?.metafeaturesGridRefDynamic || null
-                }
+                refFwd={this.metafeaturesTableDynamicRef}
                 study={differentialStudy}
                 model={differentialModel}
                 test={differentialTest}
@@ -213,6 +210,7 @@ class PlotsSingleFeature extends Component {
               differentialDetailPlotsSingleFeatureRefFwd={
                 this.differentialDetailPlotsSingleFeatureRef
               }
+              ref={this.metafeaturesTableDynamicRef}
             />
             <span
               className={divWidth < 450 ? 'Hide' : 'Show'}

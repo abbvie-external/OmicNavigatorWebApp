@@ -223,13 +223,12 @@
 //   transition: transform 0.5s step-end 0.1s !important;
 // }
 
-.AbsoluteLegendDifferential {
-  position: absolute;
-  z-index: 1;
-  margin-top: 19px;
-  margin-left: 220px !important;
-  display: none;
-}
+// .DifferentialDetailMultiModelText {
+//   position: absolute;
+//   z-index: 1;
+//   margin-top: 19px;
+//   margin-left: 240px !important;
+// }
 
 #VolcanoOptionsPopup {
   position: absolute !important;
@@ -306,46 +305,6 @@
   // min-width: 300px;
   max-width: 350px;
 }
-
-// #OutlinedCircleIcon {
-// color: var(--color-link);
-// background-color: var(--color-white);
-// display: flex;
-// border-radius: 7px;
-// font-size: 14px;
-// border: 2px solid var(--color-link);
-// }
-
-// #SelectedCircleIcon {
-// color: var(--color-primary);
-// display: flex;
-// border-radius: 7px;
-// font-size: 14px;
-// border: 2px solid var(--color-link);
-// }
-
-// #MaxCircle {
-//   background-color: var(--color-primary);
-// }
-
-// #OtherCircle {
-//   background-color: var(--color-primary-gradient);
-// }
-
-#SelectedRowLegend {
-  color: var(--color-primary);
-}
-
-#SelectedPlotLegend {
-  color: var(--color-link);
-}
-
-// #MaxCircle {
-//   margin-top: 5px !important;
-//   margin-left: 755px !important;
-//   cursor: pointer !important;
-//   box-shadow: 0 1px 0px rgba(0, 0, 0, 0.12), 0 1px 0px rgba(0, 0, 0, 0.24) !important;
-// }
 
 #ToggleAllCheckbox {
   position: absolute !important;

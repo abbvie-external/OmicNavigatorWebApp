@@ -63,12 +63,16 @@ export default class PlotlyOverlay extends Component {
     };
     return (
       <div>
-        {this.state.json.data && this.state.json.layout && (
+        {this.state.json.data && this.state.json.layout ? (
           <Plot
             data={this.state.json.data}
             layout={this.state.json.layout}
             config={config}
           />
+        ) : (
+          <h4 className="PlotInstructionsText NoSelect">
+            {plotName} is not available for feature {plotKey}
+          </h4>
         )}
         <span id="PlotOverlayDataLoader">
           {!this.state.loading && loadingDimmer}

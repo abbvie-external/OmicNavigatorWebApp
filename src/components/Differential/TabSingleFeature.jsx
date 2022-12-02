@@ -115,7 +115,7 @@ class TabSingleFeature extends Component {
             render: () => (
               <Tab.Pane attached="true" as="div">
                 <MetafeaturesTableDynamic
-                  ref={this.metaFeaturesTableDynamicRef}
+                  ref={this.props.metafeaturesTableDynamicRef}
                   differentialStudy={differentialStudy}
                   differentialModel={differentialModel}
                   plotOverlayLoaded={plotOverlayLoaded}
@@ -151,4 +151,6 @@ class TabSingleFeature extends Component {
   }
 }
 
-export default TabSingleFeature;
+export default React.forwardRef((props, ref) => (
+  <TabSingleFeature {...props} metafeaturesTableDynamicRef={ref} />
+));
