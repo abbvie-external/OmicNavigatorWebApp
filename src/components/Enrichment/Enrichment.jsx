@@ -34,6 +34,7 @@ import ErrorBoundary from '../Shared/ErrorBoundary';
 
 let cancelRequestEnrichmentGetPlot = () => {};
 let cancelRequestGetEnrichmentsNetwork = () => {};
+let cancelRequestGetBarcodeData = () => {};
 const cacheGetEnrichmentsNetwork = {};
 
 class Enrichment extends Component {
@@ -127,7 +128,7 @@ class Enrichment extends Component {
     SVGPlotLoading: false,
     SVGPlotLoaded: false,
     isViolinPlotLoaded: false,
-    hasBarcodeData: true,
+    hasBarcodeData: false,
     barcodeSettings: {
       barcodeData: [],
       brushedData: [],
@@ -306,7 +307,10 @@ class Enrichment extends Component {
       enrichmentTerm: term,
       enrichmentTest: test,
     });
-
+    cancelRequestGetBarcodeData();
+    let cancelToken = new CancelToken(e => {
+      cancelRequestGetBarcodeData = e;
+    });
     omicNavigatorService
       .getBarcodeData(
         enrichmentStudy,
@@ -315,7 +319,7 @@ class Enrichment extends Component {
         enrichmentAnnotation,
         term,
         this.handleGetBarcodeDataError,
-        null,
+        cancelToken,
       )
       .then(barcodeDataResponse => {
         if (barcodeDataResponse?.data?.length > 0) {
@@ -843,11 +847,7 @@ class Enrichment extends Component {
       enrichmentModel,
       enrichmentAnnotation,
     } = this.props;
-    const {
-      hasBarcodeData,
-      enrichmentsLinkouts,
-      enrichmentsFavicons,
-    } = this.state;
+    const { enrichmentsLinkouts, enrichmentsFavicons } = this.state;
     const TableValuePopupStyle = {
       backgroundColor: '2E2E2E',
       borderBottom: '2px solid var(--color-primary)',
