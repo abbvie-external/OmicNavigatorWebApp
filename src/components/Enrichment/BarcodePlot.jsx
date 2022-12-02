@@ -410,8 +410,8 @@ class BarcodePlot extends Component {
       const quartile = Math.round(quartileTicks.nodes().length * 0.25);
       setTimeout(function() {
         d3.select('.barcodeBrush').call([objsBrush][0].move, [
-          quartileTicks.nodes()[quartile].getAttribute('x1'),
-          quartileTicks.nodes()[0].getAttribute('x1'),
+          quartileTicks.nodes()[quartile]?.getAttribute('x1'),
+          quartileTicks.nodes()[0]?.getAttribute('x1'),
         ]);
       }, 500);
       d3.select('.barcodeBrush rect.overlay').remove();
