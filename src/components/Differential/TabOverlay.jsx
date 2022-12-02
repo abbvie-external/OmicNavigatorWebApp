@@ -141,7 +141,7 @@ class TabOverlay extends Component {
             render: () => (
               <Tab.Pane attached="true" as="div">
                 <MetafeaturesTable
-                  ref={this.metaFeaturesTableRef}
+                  ref={this.props.metafeaturesTableRef}
                   differentialStudy={this.props.differentialStudy}
                   differentialModel={this.props.differentialModel}
                   differentialFeature={this.props.differentialFeature}
@@ -179,4 +179,6 @@ class TabOverlay extends Component {
   }
 }
 
-export default TabOverlay;
+export default React.forwardRef((props, ref) => (
+  <TabOverlay {...props} metafeaturesTableRef={ref} />
+));

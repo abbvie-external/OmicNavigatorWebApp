@@ -204,6 +204,7 @@ class SplitPanesContainer extends Component {
   };
 
   splitPaneResized = (size, paneType) => {
+    if (size === undefined) return;
     if (paneType === 'horizontal') {
       this.setState({
         horizontalSplitPaneSize: size,

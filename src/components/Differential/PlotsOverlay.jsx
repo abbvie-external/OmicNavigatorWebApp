@@ -23,6 +23,7 @@ class PlotsOverlay extends PureComponent {
       plotlyExport: false,
       plotlyExportType: 'svg',
     };
+    this.metafeaturesTableRef = React.createRef();
   }
 
   metaFeaturesTableRef = React.createRef();
@@ -185,10 +186,7 @@ class PlotsOverlay extends PureComponent {
                     pdfVisible={pdfFlag}
                     svgVisible={svgFlag}
                     txtVisible={txtFlag}
-                    refFwd={
-                      this.metaFeaturesTableRef.current?.metafeaturesGridRef ||
-                      null
-                    }
+                    refFwd={this.metafeaturesTableRef}
                     tab={tab}
                     study={differentialStudy}
                     model={differentialModel}
@@ -227,6 +225,7 @@ class PlotsOverlay extends PureComponent {
                       differentialPlotsOverlayRefFwd={
                         this.differentialPlotsOverlayRef
                       }
+                      ref={this.metafeaturesTableRef}
                       // DEV - add only necessary props
                       // activeTabIndexPlotsMultiFeature={activeTabIndexPlotsMultiFeature}
                       // differentialDetailPlotsMultiFeatureRefFwd={
