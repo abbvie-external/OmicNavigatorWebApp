@@ -1269,6 +1269,7 @@ class ScatterPlot extends Component {
     let irrelevantData = [];
     let relevantData = [];
     let dataInSelectionDeduped = [...dataInSelection];
+    let allDataInScatterView = [...dataInSelection];
     if (
       !brushEvent &&
       allFilteredDifferentialTableDataFeatureIds.size ===
@@ -1365,6 +1366,7 @@ class ScatterPlot extends Component {
             relevantData, // new data for table
             clearHighlightedData, // clear highlighted data and plots
             false, // double click flag
+            allDataInScatterView, // need to know this for when search filters are cleared
           );
         }
       },
@@ -1713,9 +1715,10 @@ class ScatterPlot extends Component {
       // BUT if the data hasn't changed length it ensure rerender
       // with a "transitioningDoubleClick" flag
       this.props.onHandleVolcanoPlotSelectionChange(
-        this.props.differentialResults, // reset data
+        [...this.props.differentialResults], // reset data
         false, // clear highlighted data and plots
         true, // double click flag
+        this.props.differentialResultsUnfiltered, // need to know this for when search filters are cleared
       );
     } else {
       this.props.onResetDifferentialOutlinedFeature();
