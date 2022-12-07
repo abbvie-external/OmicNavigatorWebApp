@@ -77,26 +77,40 @@ class DifferentialDetail extends Component {
     this.setState({
       differentialTableData: this.props.differentialResults,
       volcanoPlotSelectedDataArr: this.props.differentialResults,
-      // volcanoPlotRows: this.props.differentialResults.length,
+      volcanoPlotRows: this.props.differentialResults.length,
     });
   }
 
   componentDidUpdate(prevProps, prevState) {
     const { differentialResults, differentialFeatureIdKey } = this.props;
-    const { multiFeaturesSearched, singleFeatureSearched } = this.state;
+    const {
+      multiFeaturesSearched,
+      singleFeatureSearched,
+      volcanoPlotSelectedDataArr,
+    } = this.state;
     if (prevProps.differentialResults !== differentialResults) {
-      let relevantFilteredDifferentialTableData = [...differentialResults];
+      debugger;
+      let relevantDifferentialDataRaw = [...volcanoPlotSelectedDataArr];
+      if (
+        volcanoPlotSelectedDataArr.length === 30 ||
+        volcanoPlotSelectedDataArr.length >= differentialResults.length
+      ) {
+        relevantDifferentialDataRaw = [...differentialResults];
+      }
+      let relevantDifferentialData = [...relevantDifferentialDataRaw];
       if (multiFeaturesSearched.length || singleFeatureSearched !== '') {
         if (multiFeaturesSearched.length) {
           const multiFeaturesSearchedSet = new Set(multiFeaturesSearched);
-          relevantFilteredDifferentialTableData = [
-            ...differentialResults,
+          relevantDifferentialData = [
+            ...relevantDifferentialDataRaw,
+            // ...differentialResults,
           ].filter(d =>
             multiFeaturesSearchedSet.has(d[differentialFeatureIdKey]),
           );
         } else {
-          relevantFilteredDifferentialTableData = [
-            ...differentialResults,
+          relevantDifferentialData = [
+            // ...differentialResults,
+            ...relevantDifferentialDataRaw,
           ].filter(d =>
             d[this.props.differentialFeatureIdKey].includes(
               singleFeatureSearched,
@@ -106,9 +120,9 @@ class DifferentialDetail extends Component {
       }
       this.setState({
         allChecked: false,
-        differentialTableData: relevantFilteredDifferentialTableData,
+        differentialTableData: relevantDifferentialData,
         volcanoPlotRows: differentialResults?.length || 0,
-        volcanoPlotSelectedDataArr: differentialResults,
+        // volcanoPlotSelectedDataArr: differentialResults,
       });
     }
   }
@@ -172,6 +186,7 @@ class DifferentialDetail extends Component {
     clearHighlightedData,
     doubleClickEvent,
   ) => {
+    debugger;
     const {
       differentialFeatureIdKey,
       differentialHighlightedFeatures,
@@ -181,20 +196,16 @@ class DifferentialDetail extends Component {
     const { multiFeaturesSearched, singleFeatureSearched } = this.state;
     this.setState({ volcanoPlotSelectedDataArr });
     // find the intersection between the searched features, and volcano plot
-    let relevantFilteredDifferentialTableData = [...volcanoPlotSelectedDataArr];
+    let relevantDifferentialData = [...volcanoPlotSelectedDataArr];
     if (multiFeaturesSearched.length || singleFeatureSearched !== '') {
       // PAUL - do we need single features searched
       if (multiFeaturesSearched.length) {
         const multiFeaturesSearchedSet = new Set(multiFeaturesSearched);
-        relevantFilteredDifferentialTableData = [
-          ...volcanoPlotSelectedDataArr,
-        ].filter(d =>
+        relevantDifferentialData = [...volcanoPlotSelectedDataArr].filter(d =>
           multiFeaturesSearchedSet.has(d[this.props.differentialFeatureIdKey]),
         );
       } else {
-        relevantFilteredDifferentialTableData = [
-          ...volcanoPlotSelectedDataArr,
-        ].filter(d =>
+        relevantDifferentialData = [...volcanoPlotSelectedDataArr].filter(d =>
           d[this.props.differentialFeatureIdKey].includes(
             singleFeatureSearched,
           ),
@@ -208,7 +219,7 @@ class DifferentialDetail extends Component {
     if (clearHighlightedData) {
       this.setState(
         {
-          differentialTableData: relevantFilteredDifferentialTableData,
+          differentialTableData: relevantDifferentialData,
         },
         // in callback so scatter reload is priority
         function() {
@@ -225,7 +236,7 @@ class DifferentialDetail extends Component {
     //    this.props.differentialResults;
     //  // const sortDataIds = new Set([...sortedData].map(d => d[this.props.differentialFeatureIdKey]));
     //  const volcanoPlotDataArrIds = new Set(
-    //    [...relevantFilteredDifferentialTableData].map(
+    //    [...relevantDifferentialData].map(
     //      d => d[this.props.differentialFeatureIdKey],
     //    ),
     //  );
@@ -233,18 +244,18 @@ class DifferentialDetail extends Component {
     //    volcanoPlotDataArrIds.has(d[this.props.differentialFeatureIdKey]),
     //  );
     // IF DATA
-    if (relevantFilteredDifferentialTableData.length > 0) {
+    if (relevantDifferentialData.length > 0) {
       const self = this;
       self.setState(
         {
-          differentialTableData: relevantFilteredDifferentialTableData,
-          volcanoPlotRows: relevantFilteredDifferentialTableData.length,
+          differentialTableData: relevantDifferentialData,
+          volcanoPlotRows: relevantDifferentialData.length,
         },
         function() {
           // load the table, then paging and mapping
-          let allFeatureIdsRemaining = [
-            ...relevantFilteredDifferentialTableData,
-          ].map(i => i[differentialFeatureIdKey]);
+          let allFeatureIdsRemaining = [...relevantDifferentialData].map(
+            i => i[differentialFeatureIdKey],
+          );
           let isOutlinedFeatureInView = allFeatureIdsRemaining.includes(
             differentialOutlinedFeature,
           );
@@ -266,7 +277,7 @@ class DifferentialDetail extends Component {
               differentialHighlightedFeatures,
             );
             let multiselectedFeaturesArrRemaining = [
-              ...relevantFilteredDifferentialTableData,
+              ...relevantDifferentialData,
             ].filter(item =>
               highlightedFeatures.has(item[differentialFeatureIdKey]),
             );
@@ -676,6 +687,7 @@ class DifferentialDetail extends Component {
     let sortedFilteredData =
       this.volcanoPlotFilteredGridRef?.current?.qhGridRef?.current?.getSortedData() ||
       this.props.differentialResults;
+    debugger;
     this.setState(
       {
         filteredDifferentialTableData: sortedFilteredData,
@@ -909,16 +921,14 @@ class DifferentialDetail extends Component {
   handleSingleFeatureSearchSubmit = () => {
     const { volcanoPlotSelectedDataArr, singleFeatureSearchText } = this.state;
     if (singleFeatureSearchText.length < 3) return;
-    const relevantFilteredDifferentialTableData = [
-      ...volcanoPlotSelectedDataArr,
-    ].filter(d =>
+    const relevantDifferentialData = [...volcanoPlotSelectedDataArr].filter(d =>
       d[this.props.differentialFeatureIdKey].includes(singleFeatureSearchText),
     );
     // if any filteredDifferentialTableData matches the search text, take action
-    if (relevantFilteredDifferentialTableData.length) {
+    if (relevantDifferentialData.length) {
       this.setState({
-        differentialTableData: relevantFilteredDifferentialTableData,
-        volcanoPlotRows: relevantFilteredDifferentialTableData?.length || 0,
+        differentialTableData: relevantDifferentialData,
+        volcanoPlotRows: relevantDifferentialData?.length || 0,
         singleFeatureSearchActive: false,
         singleFeatureSearchIcon: 'remove',
         singleFeatureSearched: singleFeatureSearchText,
@@ -928,6 +938,7 @@ class DifferentialDetail extends Component {
 
   handleSingleFeatureSearchClear = () => {
     // PAUL - must filter differently
+    debugger;
     const { volcanoPlotSelectedDataArr, singleFeatureSearchText } = this.state;
     if (singleFeatureSearchText.length) {
       this.setState({
@@ -966,16 +977,16 @@ class DifferentialDetail extends Component {
 
       let multiFeaturesFound = [];
       const multiFeaturesSearchedSet = new Set(multiFeatureSearchTextSplit);
-      const relevantFilteredDifferentialTableData = [
-        ...volcanoPlotSelectedDataArr,
-      ].filter(d => {
-        if (
-          multiFeaturesSearchedSet.has(d[this.props.differentialFeatureIdKey])
-        ) {
-          multiFeaturesFound.push(d[this.props.differentialFeatureIdKey]);
-          return true;
-        } else return false;
-      });
+      const relevantDifferentialData = [...volcanoPlotSelectedDataArr].filter(
+        d => {
+          if (
+            multiFeaturesSearchedSet.has(d[this.props.differentialFeatureIdKey])
+          ) {
+            multiFeaturesFound.push(d[this.props.differentialFeatureIdKey]);
+            return true;
+          } else return false;
+        },
+      );
       function getDifference(setA, setB) {
         return new Set([...setA].filter(element => !setB.has(element)));
       }
@@ -988,8 +999,8 @@ class DifferentialDetail extends Component {
       // if any filteredDifferentialTableData matches the search text, take action
       if (multiFeaturesFound.length) {
         this.setState({
-          differentialTableData: relevantFilteredDifferentialTableData,
-          volcanoPlotRows: relevantFilteredDifferentialTableData?.length || 0,
+          differentialTableData: relevantDifferentialData,
+          volcanoPlotRows: relevantDifferentialData?.length || 0,
           multiFeaturesSearched: multiFeaturesFound,
           multiFeaturesNotFound: multiFeaturesNotFoundValues,
           multiFeatureSearchText: multiFeaturesFound.toString(),
