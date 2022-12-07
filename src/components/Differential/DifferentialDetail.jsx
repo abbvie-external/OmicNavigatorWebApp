@@ -54,7 +54,7 @@ class DifferentialDetail extends Component {
     filteredDifferentialTableData: [],
     itemsPerPageVolcanoTable:
       parseInt(localStorage.getItem('itemsPerPageVolcanoTable'), 10) || 15,
-    // volcanoPlotRows: 0,
+    // differentialTableRows: 0,
     animation: 'overlay',
     direction: 'right',
     visible: false,
@@ -77,7 +77,7 @@ class DifferentialDetail extends Component {
     this.setState({
       differentialTableData: this.props.differentialResults,
       volcanoPlotSelectedDataArr: this.props.differentialResults,
-      volcanoPlotRows: this.props.differentialResults.length,
+      differentialTableRows: this.props.differentialResults.length,
     });
   }
 
@@ -90,6 +90,8 @@ class DifferentialDetail extends Component {
     } = this.state;
     if (prevProps.differentialResults !== differentialResults) {
       debugger;
+      // goal: set the new state for differentialTableData, which will update the scatter plot
+      // what we know: volcanoPlotSelectedDataArr could have more OR less data than differentialResults
       let relevantDifferentialDataRaw = [...volcanoPlotSelectedDataArr];
       if (
         volcanoPlotSelectedDataArr.length === 30 ||
@@ -121,7 +123,7 @@ class DifferentialDetail extends Component {
       this.setState({
         allChecked: false,
         differentialTableData: relevantDifferentialData,
-        volcanoPlotRows: differentialResults?.length || 0,
+        differentialTableRows: differentialResults?.length || 0,
         // volcanoPlotSelectedDataArr: differentialResults,
       });
     }
@@ -249,7 +251,7 @@ class DifferentialDetail extends Component {
       self.setState(
         {
           differentialTableData: relevantDifferentialData,
-          volcanoPlotRows: relevantDifferentialData.length,
+          differentialTableRows: relevantDifferentialData.length,
         },
         function() {
           // load the table, then paging and mapping
@@ -319,7 +321,7 @@ class DifferentialDetail extends Component {
       this.pageToFeature();
       this.setState({
         differentialTableData: [],
-        volcanoPlotRows: 0,
+        differentialTableRows: 0,
       });
     }
   };
@@ -850,7 +852,7 @@ class DifferentialDetail extends Component {
         multiFeaturesSearched: [],
         multiFeaturesNotFound: '',
         differentialTableData: volcanoPlotSelectedDataArr,
-        volcanoPlotRows: volcanoPlotSelectedDataArr?.length || 0,
+        differentialTableRows: volcanoPlotSelectedDataArr?.length || 0,
         singleFeatureSearchActive: false,
         singleFeatureSearchIcon: 'search',
         singleFeatureSearchText: '',
@@ -881,7 +883,7 @@ class DifferentialDetail extends Component {
         multiFeaturesSearched: [],
         multiFeaturesNotFound: '',
         differentialTableData: volcanoPlotSelectedDataArr,
-        volcanoPlotRows: volcanoPlotSelectedDataArr?.length || 0,
+        differentialTableRows: volcanoPlotSelectedDataArr?.length || 0,
         singleFeatureSearchActive: false,
         singleFeatureSearchIcon: 'search',
         singleFeatureSearchText: '',
@@ -928,7 +930,7 @@ class DifferentialDetail extends Component {
     if (relevantDifferentialData.length) {
       this.setState({
         differentialTableData: relevantDifferentialData,
-        volcanoPlotRows: relevantDifferentialData?.length || 0,
+        differentialTableRows: relevantDifferentialData?.length || 0,
         singleFeatureSearchActive: false,
         singleFeatureSearchIcon: 'remove',
         singleFeatureSearched: singleFeatureSearchText,
@@ -943,7 +945,7 @@ class DifferentialDetail extends Component {
     if (singleFeatureSearchText.length) {
       this.setState({
         differentialTableData: volcanoPlotSelectedDataArr,
-        volcanoPlotRows: volcanoPlotSelectedDataArr?.length || 0,
+        differentialTableRows: volcanoPlotSelectedDataArr?.length || 0,
         singleFeatureSearchActive: false,
         singleFeatureSearchIcon: 'search',
         singleFeatureSearchText: '',
@@ -1000,7 +1002,7 @@ class DifferentialDetail extends Component {
       if (multiFeaturesFound.length) {
         this.setState({
           differentialTableData: relevantDifferentialData,
-          volcanoPlotRows: relevantDifferentialData?.length || 0,
+          differentialTableRows: relevantDifferentialData?.length || 0,
           multiFeaturesSearched: multiFeaturesFound,
           multiFeaturesNotFound: multiFeaturesNotFoundValues,
           multiFeatureSearchText: multiFeaturesFound.toString(),
@@ -1027,7 +1029,7 @@ class DifferentialDetail extends Component {
     const { volcanoPlotSelectedDataArr } = this.state;
     this.setState({
       differentialTableData: volcanoPlotSelectedDataArr,
-      volcanoPlotRows: volcanoPlotSelectedDataArr?.length || 0,
+      differentialTableRows: volcanoPlotSelectedDataArr?.length || 0,
       multiFeatureSearchText: '',
       multiSearching: false,
       multiSearchOpen: false,
@@ -1045,7 +1047,7 @@ class DifferentialDetail extends Component {
     const {
       differentialTableData,
       itemsPerPageVolcanoTable,
-      volcanoPlotRows,
+      differentialTableRows,
       volcanoPlotVisible,
       upperPlotsVisible,
       upperPlotsDivHeight,
@@ -1403,7 +1405,7 @@ class DifferentialDetail extends Component {
         height={upperPlotsVisible ? 'auto' : '70vh'}
         // height="70vh"
         data={differentialTableData || []}
-        totalRows={volcanoPlotRows || 0}
+        totalRows={differentialTableRows || 0}
         columnsConfig={differentialColumns}
         itemsPerPage={itemsPerPageVolcanoTable}
         onItemsPerPageChange={this.handleItemsPerPageChange}
