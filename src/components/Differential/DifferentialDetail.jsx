@@ -21,6 +21,7 @@ import {
 import ButtonActions from '../Shared/ButtonActions';
 import './DifferentialDetail.scss';
 import SplitPane from 'react-split-pane';
+import { toast } from 'react-toastify';
 
 class DifferentialDetail extends Component {
   state = {
@@ -868,6 +869,7 @@ class DifferentialDetail extends Component {
   getEmptySearchData = () => {
     const { differentialResults } = this.props;
     const { allDataInScatterView } = this.state;
+    debugger;
     let relevantDifferentialDataSearchAndInView = [...differentialResults];
     // 1) keep data that is in current volcano view/selection
     if (allDataInScatterView.length) {
@@ -1008,9 +1010,13 @@ class DifferentialDetail extends Component {
   // }
 
   handleSingleFeatureSearchSubmit = () => {
-    const { volcanoPlotSelectedDataArr, singleFeatureSearchText } = this.state;
+    const {
+      // volcanoPlotSelectedDataArr,
+      allDataInScatterView,
+      singleFeatureSearchText,
+    } = this.state;
     if (singleFeatureSearchText.length < 3) return;
-    const relevantDifferentialData = [...volcanoPlotSelectedDataArr].filter(d =>
+    const relevantDifferentialData = [...allDataInScatterView].filter(d =>
       d[this.props.differentialFeatureIdKey].includes(singleFeatureSearchText),
     );
     // if any filteredDifferentialTableData matches the search text, take action
@@ -1022,6 +1028,8 @@ class DifferentialDetail extends Component {
         singleFeatureSearchIcon: 'remove',
         singleFeatureSearched: singleFeatureSearchText,
       });
+    } else {
+      toast.error('No features found, please adjust your search');
     }
   };
 
@@ -1051,7 +1059,8 @@ class DifferentialDetail extends Component {
       // differentialTableData,
       // multiFeaturesSearched,
       multiFeatureSearchText,
-      volcanoPlotSelectedDataArr,
+      // volcanoPlotSelectedDataArr,
+      allDataInScatterView,
     } = this.state;
     // new search
     if (multiFeatureSearchText !== '') {
@@ -1066,16 +1075,14 @@ class DifferentialDetail extends Component {
 
       let multiFeaturesFound = [];
       const multiFeaturesSearchedSet = new Set(multiFeatureSearchTextSplit);
-      const relevantDifferentialData = [...volcanoPlotSelectedDataArr].filter(
-        d => {
-          if (
-            multiFeaturesSearchedSet.has(d[this.props.differentialFeatureIdKey])
-          ) {
-            multiFeaturesFound.push(d[this.props.differentialFeatureIdKey]);
-            return true;
-          } else return false;
-        },
-      );
+      const relevantDifferentialData = [...allDataInScatterView].filter(d => {
+        if (
+          multiFeaturesSearchedSet.has(d[this.props.differentialFeatureIdKey])
+        ) {
+          multiFeaturesFound.push(d[this.props.differentialFeatureIdKey]);
+          return true;
+        } else return false;
+      });
       function getDifference(setA, setB) {
         return new Set([...setA].filter(element => !setB.has(element)));
       }
@@ -1113,10 +1120,10 @@ class DifferentialDetail extends Component {
   };
 
   resetSearch = () => {
-    const { volcanoPlotSelectedDataArr } = this.state;
+    const { allDataInScatterView } = this.state;
     this.setState({
-      differentialTableData: volcanoPlotSelectedDataArr,
-      differentialTableRows: volcanoPlotSelectedDataArr?.length || 0,
+      differentialTableData: allDataInScatterView,
+      differentialTableRows: allDataInScatterView?.length || 0,
       multiFeatureSearchText: '',
       multiSearching: false,
       multiSearchOpen: false,
@@ -1429,7 +1436,9 @@ class DifferentialDetail extends Component {
                 ) : null}
               </Popup.Content>
               <Popup.Content>
-                <Form onSubmit={this.handleMultiFeatureSearch}>
+                <Form
+                // onSubmit={this.handleMultiFeatureSearch}
+                >
                   <Form.TextArea
                     autoFocus
                     placeholder="Separate features with a comma, space, or newline"
