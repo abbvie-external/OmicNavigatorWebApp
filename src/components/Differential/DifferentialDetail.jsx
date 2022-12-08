@@ -72,7 +72,6 @@ class DifferentialDetail extends Component {
     allDataInScatterView: [],
   };
   volcanoPlotFilteredGridRef = React.createRef();
-  multiFeatureSearchTextRefChild = React.createRef();
 
   componentDidMount() {
     this.setState({
@@ -824,10 +823,6 @@ class DifferentialDetail extends Component {
     this.props.onHandleMultifeaturePlot('Overlay', tableData, true);
   };
 
-  focusTextArea = () => {
-    this.multiFeatureSearchTextRefChild?.current?.focus();
-  };
-
   getRelevantData = () => {
     //   // goal: set the new state for differentialTableData, which will update the scatter plot
     //   let relevantSearchedDifferentialData = [...differentialResults];
@@ -909,7 +904,6 @@ class DifferentialDetail extends Component {
         multiSearchOpen: true,
         multiFeatureSearchActive: true,
       });
-      // this.multiFeatureSearchTextRefChild?.current?.focus();
     } else {
       this.setState({
         // multiFeatureSearchText: '',
@@ -994,6 +988,12 @@ class DifferentialDetail extends Component {
         singleFeatureSearchText: multiFeatureSearchText,
       });
     }
+  };
+
+  moveCaretAtEnd = e => {
+    var temp_value = e.target.value;
+    e.target.value = '';
+    e.target.value = temp_value;
   };
 
   handleMultiFeatureSearchTextChange = (e, { value }) => {
@@ -1391,7 +1391,6 @@ class DifferentialDetail extends Component {
               position="right center"
               basic
               on="click"
-              // onOpen={this.focusTextArea}
               open={multiSearchOpen}
               inverted
               style={MultiFeatureSearchPopup}
@@ -1430,17 +1429,15 @@ class DifferentialDetail extends Component {
                 ) : null}
               </Popup.Content>
               <Popup.Content>
-                <Form
-                  // ref={this.multiFeatureSearchTextRef}
-                  onSubmit={this.handleMultiFeatureSearch}
-                >
+                <Form onSubmit={this.handleMultiFeatureSearch}>
                   <Form.TextArea
-                    // ref={this.multiFeatureSearchTextRefChild}
+                    autoFocus
                     placeholder="Separate features with a comma, space, or newline"
                     name="multiFeatureSearchText"
                     id="multiFeatureSearchTextArea"
                     value={multiFeatureSearchText}
                     onChange={this.handleMultiFeatureSearchTextChange}
+                    onFocus={this.moveCaretAtEnd}
                   />
                 </Form>
                 {multiFeatureSearchTextError ? (
