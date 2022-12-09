@@ -51,26 +51,26 @@ class DifferentialDetail extends Component {
       localStorage.getItem('upperPlotsVisible') == null
         ? true
         : false,
-    // differentialTableData: [],
-    filteredDifferentialTableData: [],
     itemsPerPageVolcanoTable:
       parseInt(localStorage.getItem('itemsPerPageVolcanoTable'), 10) || 15,
+    // differentialTableData: [],
     // differentialTableRows: 0,
+    filteredDifferentialTableData: [],
+    volcanoPlotSelectedDataArr: [],
+    allDataInScatterView: [],
     animation: 'overlay',
     direction: 'right',
     visible: false,
     allChecked: false,
     enableTabChangeOnSelection: true,
     scatterplotLoaded: false,
-    multiFeaturesSearched: [],
-    multiFeatureSearchText: '',
-    singleFeatureSearched: '',
-    singleFeatureSearchText: '',
     singleFeatureSearchActive: false,
     singleFeatureSearchIcon: 'search',
+    singleFeatureSearchText: '',
+    singleFeatureSearched: '',
+    multiFeatureSearchText: '',
+    multiFeaturesSearched: [],
     multiSearching: false,
-    volcanoPlotSelectedDataArr: [],
-    allDataInScatterView: [],
   };
   volcanoPlotFilteredGridRef = React.createRef();
 
