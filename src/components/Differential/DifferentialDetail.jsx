@@ -84,17 +84,28 @@ class DifferentialDetail extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    const { differentialResults, differentialFeatureIdKey } = this.props;
+    const {
+      differentialResults,
+      differentialFeatureIdKey,
+      differentialResultsUnfiltered,
+    } = this.props;
     const {
       multiFeaturesSearched,
       singleFeatureSearched,
       allDataInScatterView,
     } = this.state;
+    if (
+      prevProps.differentialResultsUnfiltered !==
+      this.props.differentialResultsUnfiltered
+    ) {
+      this.setState({
+        allDataInScatterView: differentialResultsUnfiltered,
+      });
+    }
     if (prevProps.differentialResults !== differentialResults) {
-      debugger;
       // goal: set the new state for differentialTableData, which will update the scatter plot
       let relevantSearchedDifferentialData = [...differentialResults];
-      // 1) keep data that passes search filters
+      // 1) keep the differentialResults that pass single or multiple feature SEARCH filters
       if (multiFeaturesSearched.length || singleFeatureSearched !== '') {
         if (multiFeaturesSearched.length) {
           // multi-search filter
@@ -116,21 +127,20 @@ class DifferentialDetail extends Component {
         }
       }
       let relevantDifferentialDataSearchAndInView = relevantSearchedDifferentialData;
-      // 2) keep data is in current volcano view/selection
-      if (allDataInScatterView.length) {
-        const allDataInScatterViewIdsSet = new Set(
-          [...allDataInScatterView].map(
-            d => d[this.props.differentialFeatureIdKey],
-          ),
-        );
-        relevantDifferentialDataSearchAndInView = [
-          ...relevantSearchedDifferentialData,
-        ].filter(d =>
-          allDataInScatterViewIdsSet.has(
-            d[this.props.differentialFeatureIdKey],
-          ),
-        );
-      }
+      // 2) keep the intersection from 1) above and what is in current volcano view/selection
+      // if (allDataInScatterView.length) {
+      // paul - is this needed?
+      const allDataInScatterViewIdsSet = new Set(
+        [...allDataInScatterView].map(
+          d => d[this.props.differentialFeatureIdKey],
+        ),
+      );
+      relevantDifferentialDataSearchAndInView = [
+        ...relevantSearchedDifferentialData,
+      ].filter(d =>
+        allDataInScatterViewIdsSet.has(d[this.props.differentialFeatureIdKey]),
+      );
+      // }
       this.setState({
         allChecked: false,
         differentialTableData: relevantDifferentialDataSearchAndInView,
@@ -825,31 +835,18 @@ class DifferentialDetail extends Component {
     this.props.onHandleMultifeaturePlot('Overlay', tableData, true);
   };
 
-  getRelevantData = () => {
-    const { differentialResults, differentialFeatureIdKey } = this.props;
-    const {
-      multiFeaturesSearched,
-      singleFeatureSearched,
-      allDataInScatterView,
-    } = this.state;
+  getRelevantSingleFeatureSearchData = () => {
+    const { differentialResults } = this.props;
+    const { singleFeatureSearchText, allDataInScatterView } = this.state;
     // goal: set the new state for differentialTableData, which will update the scatter plot
     let relevantSearchedDifferentialData = [...differentialResults];
-    // 1) keep data that passes search filters
-    if (multiFeaturesSearched.length || singleFeatureSearched !== '') {
-      if (multiFeaturesSearched.length) {
-        // multi-search filter
-        const multiFeaturesSearchedSet = new Set(multiFeaturesSearched);
-        relevantSearchedDifferentialData = [...differentialResults].filter(d =>
-          multiFeaturesSearchedSet.has(d[differentialFeatureIdKey]),
-        );
-      } else {
-        // single search filter
-        relevantSearchedDifferentialData = [...differentialResults].filter(d =>
-          d[this.props.differentialFeatureIdKey].includes(
-            singleFeatureSearched,
-          ),
-        );
-      }
+    // 1) keep the differentialResults that pass SINGLE SEARCH filters
+    if (singleFeatureSearchText !== '') {
+      relevantSearchedDifferentialData = [...differentialResults].filter(d =>
+        d[this.props.differentialFeatureIdKey].includes(
+          singleFeatureSearchText,
+        ),
+      );
     }
     let relevantDifferentialDataSearchAndInView = relevantSearchedDifferentialData;
     // 2) keep data is in current volcano view/selection
@@ -933,7 +930,7 @@ class DifferentialDetail extends Component {
         multiSearching: false,
         multiSearchOpen: false,
         multiFeaturesSearched: [],
-        multiFeaturesNotFound: '',
+        multiFeaturesNotFound: [],
         differentialTableData: emptySearchData,
         differentialTableRows: emptySearchData?.length || 0,
         singleFeatureSearchActive: false,
@@ -965,7 +962,7 @@ class DifferentialDetail extends Component {
         multiSearching: false,
         multiSearchOpen: false,
         multiFeaturesSearched: [],
-        multiFeaturesNotFound: '',
+        multiFeaturesNotFound: [],
         differentialTableData: emptySearchData,
         differentialTableRows: emptySearchData?.length || 0,
         singleFeatureSearchActive: false,
@@ -1006,10 +1003,6 @@ class DifferentialDetail extends Component {
     });
   };
 
-  // filterDifferentialTableData = (multiFeatures) => {
-
-  // }
-
   handleSingleFeatureSearchSubmit = () => {
     const {
       // volcanoPlotSelectedDataArr,
@@ -1017,11 +1010,7 @@ class DifferentialDetail extends Component {
       singleFeatureSearchText,
     } = this.state;
     if (singleFeatureSearchText.length < 3) return;
-    // const relevantDifferentialData = [...allDataInScatterView].filter(d =>
-    //   d[this.props.differentialFeatureIdKey].includes(singleFeatureSearchText),
-    // );
-    const relevantDifferentialData = this.getRelevantData();
-    // if any filteredDifferentialTableData matches the search text, take action
+    const relevantDifferentialData = this.getRelevantSingleFeatureSearchData();
     if (relevantDifferentialData.length) {
       this.setState({
         differentialTableData: relevantDifferentialData,
@@ -1055,15 +1044,38 @@ class DifferentialDetail extends Component {
     }
   };
 
+  getRelevantDataAfterSearchAndSelectionFilters = () => {
+    const { differentialResults, differentialFeatureIdKey } = this.props;
+    const { multiFeaturesSearched, allDataInScatterView } = this.state;
+    // goal: set the new state for differentialTableData, which will update the scatter plot
+    let relevantSearchedDifferentialData = [...differentialResults];
+    // 1) keep the differentialResults that pass MULTIFEATURE SEARCH filters
+    // 1) keep data that passes search filters
+    if (multiFeaturesSearched.length) {
+      const multiFeaturesSearchedSet = new Set(multiFeaturesSearched);
+      relevantSearchedDifferentialData = [...differentialResults].filter(d =>
+        multiFeaturesSearchedSet.has(d[differentialFeatureIdKey]),
+      );
+    }
+    let relevantDifferentialDataSearchAndInView = relevantSearchedDifferentialData;
+    // 2) keep data is in current volcano view/selection
+    // if (allDataInScatterView.length) {
+    const allDataInScatterViewIdsSet = new Set(
+      [...allDataInScatterView].map(
+        d => d[this.props.differentialFeatureIdKey],
+      ),
+    );
+    relevantDifferentialDataSearchAndInView = [
+      ...relevantSearchedDifferentialData,
+    ].filter(d =>
+      allDataInScatterViewIdsSet.has(d[this.props.differentialFeatureIdKey]),
+    );
+    // }
+    return relevantDifferentialDataSearchAndInView;
+  };
+
   handleMultiFeatureSearch = () => {
-    // const { differentialResults } = this.props;
-    const {
-      // differentialTableData,
-      // multiFeaturesSearched,
-      multiFeatureSearchText,
-      // volcanoPlotSelectedDataArr,
-      allDataInScatterView,
-    } = this.state;
+    const { multiFeatureSearchText } = this.state;
     // new search
     if (multiFeatureSearchText !== '') {
       // 12759, 67451,19253;22249; 70737
@@ -1075,10 +1087,12 @@ class DifferentialDetail extends Component {
         .split(/[,\s]+/)
         .map(item => item.trim())
         .filter(Boolean);
-      debugger;
       let multiFeaturesFound = [];
+      const relevantDataAfterSearchAndSelectionFilters = this.getRelevantDataAfterSearchAndSelectionFilters();
       const multiFeaturesSearchedSet = new Set(multiFeatureSearchTextSplit);
-      const relevantDifferentialData = [...allDataInScatterView].filter(d => {
+      const relevantDifferentialData = [
+        ...relevantDataAfterSearchAndSelectionFilters,
+      ].filter(d => {
         if (
           multiFeaturesSearchedSet.has(d[this.props.differentialFeatureIdKey])
         ) {
@@ -1102,6 +1116,8 @@ class DifferentialDetail extends Component {
         differentialTableRows: relevantDifferentialData?.length || 0,
         multiFeaturesSearched: multiFeaturesFound,
         multiFeaturesNotFound: multiFeaturesNotFoundValues,
+        multiFeatureSearchTextError:
+          !multiFeaturesFound.length && multiFeaturesNotFoundValues.length,
         multiFeatureSearchText: multiFeaturesFound.toString(),
         multiFeatureSearchActive: false,
         singleFeatureSearched: '',
@@ -1131,7 +1147,7 @@ class DifferentialDetail extends Component {
       multiSearching: false,
       multiSearchOpen: false,
       multiFeaturesSearched: [],
-      multiFeaturesNotFound: '',
+      multiFeaturesNotFound: [],
       multiFeatureSearchActive: false,
       multiFeatureSearchTextError: false,
       singleFeatureSearchActive: false,
