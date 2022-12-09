@@ -53,8 +53,8 @@ class DifferentialDetail extends Component {
         : false,
     itemsPerPageVolcanoTable:
       parseInt(localStorage.getItem('itemsPerPageVolcanoTable'), 10) || 15,
-    // differentialTableData: [],
-    // differentialTableRows: 0,
+    differentialTableData: [],
+    differentialTableRows: 0,
     filteredDifferentialTableData: [],
     volcanoPlotSelectedDataArr: [],
     allDataInScatterView: [],
@@ -74,14 +74,14 @@ class DifferentialDetail extends Component {
   };
   volcanoPlotFilteredGridRef = React.createRef();
 
-  componentDidMount() {
-    this.setState({
-      allDataInScatterView: this.props.differentialResultsUnfiltered,
-      differentialTableData: this.props.differentialResults,
-      // volcanoPlotSelectedDataArr: this.props.differentialResults,
-      differentialTableRows: this.props.differentialResults.length,
-    });
-  }
+  // componentDidMount() {
+  //   this.setState({
+  //     allDataInScatterView: this.props.differentialResultsUnfiltered,
+  //     differentialTableData: this.props.differentialResults,
+  //     // volcanoPlotSelectedDataArr: this.props.differentialResults,
+  //     differentialTableRows: this.props.differentialResults.length,
+  //   });
+  // }
 
   componentDidUpdate(prevProps, prevState) {
     const {
@@ -1020,7 +1020,14 @@ class DifferentialDetail extends Component {
         singleFeatureSearched: singleFeatureSearchText,
       });
     } else {
-      toast.error('No features found, please adjust your search');
+      this.setState({
+        differentialTableData: [],
+        differentialTableRows: 0,
+        singleFeatureSearchActive: false,
+        singleFeatureSearchIcon: 'remove',
+        singleFeatureSearched: singleFeatureSearchText,
+      });
+      // toast.error('No features found, please adjust your search');
     }
   };
 
@@ -1036,10 +1043,6 @@ class DifferentialDetail extends Component {
         singleFeatureSearchIcon: 'search',
         singleFeatureSearchText: '',
         singleFeatureSearched: '',
-        // multiFeatureSearchText: '',
-        // multiSearching: false,
-        // multiSearchOpen: false,
-        // singleFeatureSearchIcon: 'search',
       });
     }
   };
@@ -1120,10 +1123,14 @@ class DifferentialDetail extends Component {
           !multiFeaturesFound.length && multiFeaturesNotFoundValues.length,
         multiFeatureSearchText: multiFeaturesFound.toString(),
         multiFeatureSearchActive: false,
+        singleFeatureSearchActive: false,
+        singleFeatureSearchIcon: 'search',
         singleFeatureSearched: '',
       });
       // } else {
-      //   // if features are not found, display them
+      //  if no features are found
+      //  we are continuing with the search, and displaying no data
+      //  use and adjust this if we'd rather just not go through with the search
       //   if (multiFeaturesNotFoundValues.length) {
       //     this.setState({
       //       multiFeaturesNotFound: multiFeaturesNotFoundValues,
