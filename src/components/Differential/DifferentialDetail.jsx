@@ -71,6 +71,10 @@ class DifferentialDetail extends Component {
     multiFeatureSearchText: '',
     multiFeaturesSearched: [],
     multiSearching: false,
+    multiSearchOpen: false,
+    multiFeaturesNotFound: [],
+    multiFeatureSearchActive: false,
+    multiFeatureSearchTextError: false,
   };
   volcanoPlotFilteredGridRef = React.createRef();
 
@@ -1032,7 +1036,6 @@ class DifferentialDetail extends Component {
   };
 
   handleSingleFeatureSearchClear = () => {
-    // PAUL - must filter differently?
     const { singleFeatureSearchText } = this.state;
     const emptySearchData = this.getEmptySearchData();
     if (singleFeatureSearchText.length) {
