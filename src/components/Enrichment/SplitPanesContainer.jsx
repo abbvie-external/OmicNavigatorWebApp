@@ -204,6 +204,7 @@ class SplitPanesContainer extends Component {
   };
 
   splitPaneResized = (size, paneType) => {
+    if (size === undefined) return;
     if (paneType === 'horizontal') {
       this.setState({
         horizontalSplitPaneSize: size,
@@ -218,8 +219,7 @@ class SplitPanesContainer extends Component {
 
   render() {
     const { verticalSplitPaneSize, horizontalSplitPaneSize } = this.state;
-    const { enrichmentStudy, enrichmentModel } = this.props;
-    const BarcodePlot = this.getBarcodePlot();
+    const { enrichmentStudy, enrichmentModel, hasBarcodeData } = this.props;
     const ViolinAndTable = this.getViolinAndTable();
     const width =
       window.innerWidth ||
@@ -230,47 +230,120 @@ class SplitPanesContainer extends Component {
       document.documentElement.clientHeight ||
       document.body.clientHeight;
 
-    return (
-      <div className="PlotsWrapper">
-        <Grid className="">
-          <Grid.Row className="ActionsRow">
-            <Grid.Column
-              mobile={16}
-              tablet={16}
-              computer={8}
-              largeScreen={8}
-              widescreen={8}
-            >
-              <EnrichmentBreadcrumbs {...this.props} />
-            </Grid.Column>
-            <Grid.Column
-              mobile={16}
-              tablet={16}
-              computer={8}
-              largeScreen={8}
-              widescreen={8}
-              className="elementTextCol"
-            ></Grid.Column>
-
-            <Grid.Column
-              mobile={16}
-              tablet={16}
-              largeScreen={16}
-              widescreen={16}
-            >
-              <SplitPane
-                className="ThreePlotsDiv SplitPanesWrapper"
-                split="horizontal"
-                size={this.state.horizontalSplitPaneSize}
-                minSize={185}
-                maxSize={400}
-                onDragFinished={size =>
-                  this.splitPaneResized(size, 'horizontal')
-                }
+    if (hasBarcodeData) {
+      const BarcodePlot = this.getBarcodePlot();
+      return (
+        <div className="PlotsWrapper">
+          <Grid className="">
+            <Grid.Row className="ActionsRow">
+              <Grid.Column
+                mobile={16}
+                tablet={16}
+                computer={8}
+                largeScreen={8}
+                widescreen={8}
               >
-                {BarcodePlot}
+                <EnrichmentBreadcrumbs {...this.props} />
+              </Grid.Column>
+              <Grid.Column
+                mobile={16}
+                tablet={16}
+                computer={8}
+                largeScreen={8}
+                widescreen={8}
+                className="elementTextCol"
+              ></Grid.Column>
+
+              <Grid.Column
+                mobile={16}
+                tablet={16}
+                largeScreen={16}
+                widescreen={16}
+              >
                 <SplitPane
-                  className="BottomSplitPaneContainer"
+                  className="ThreePlotsDiv SplitPanesWrapper"
+                  split="horizontal"
+                  size={horizontalSplitPaneSize}
+                  minSize={185}
+                  maxSize={400}
+                  onDragFinished={size =>
+                    this.splitPaneResized(size, 'horizontal')
+                  }
+                >
+                  {BarcodePlot}
+                  <SplitPane
+                    className="BottomSplitPaneContainer"
+                    split="vertical"
+                    size={this.state.verticalSplitPaneSize}
+                    minSize={315}
+                    maxSize={1300}
+                    onDragFinished={size =>
+                      this.splitPaneResized(size, 'vertical')
+                    }
+                  >
+                    <div id="ViolinAndTableSplitContainer">
+                      {ViolinAndTable}
+                    </div>
+                    <div id="SVGSplitContainer">
+                      <EnrichmentSVGPlot
+                        divWidth={width - verticalSplitPaneSize - 300}
+                        divHeight={height - horizontalSplitPaneSize - 51}
+                        pxToPtRatio={105}
+                        pointSize={12}
+                        svgTabMax={1}
+                        tab={this.props.tab}
+                        plotDataEnrichment={this.props.plotDataEnrichment}
+                        plotDataEnrichmentLength={
+                          this.props.plotDataEnrichmentLength
+                        }
+                        svgExportName={this.props.svgExportName}
+                        enrichmentPlotTypes={this.props.enrichmentPlotTypes}
+                        // isEnrichmentPlotSVGLoaded={this.props.isEnrichmentPlotSVGLoaded}
+                        SVGPlotLoaded={this.props.SVGPlotLoaded}
+                        SVGPlotLoading={this.props.SVGPlotLoading}
+                        HighlightedProteins={this.props.HighlightedProteins}
+                        enrichmentStudy={enrichmentStudy}
+                        enrichmentModel={enrichmentModel}
+                      />
+                    </div>
+                  </SplitPane>
+                </SplitPane>
+              </Grid.Column>
+            </Grid.Row>
+          </Grid>
+        </div>
+      );
+    } else
+      return (
+        <div className="PlotsWrapper">
+          <Grid className="">
+            <Grid.Row className="ActionsRow">
+              <Grid.Column
+                mobile={16}
+                tablet={16}
+                computer={8}
+                largeScreen={8}
+                widescreen={8}
+              >
+                <EnrichmentBreadcrumbs {...this.props} />
+              </Grid.Column>
+              <Grid.Column
+                mobile={16}
+                tablet={16}
+                computer={8}
+                largeScreen={8}
+                widescreen={8}
+                className="elementTextCol"
+              ></Grid.Column>
+
+              <Grid.Column
+                mobile={16}
+                tablet={16}
+                largeScreen={16}
+                widescreen={16}
+              >
+                <SplitPane
+                  className="ThreePlotsDiv SplitPanesWrapper"
                   split="vertical"
                   size={this.state.verticalSplitPaneSize}
                   minSize={315}
@@ -283,7 +356,7 @@ class SplitPanesContainer extends Component {
                   <div id="SVGSplitContainer">
                     <EnrichmentSVGPlot
                       divWidth={width - verticalSplitPaneSize - 300}
-                      divHeight={height - horizontalSplitPaneSize - 51}
+                      divHeight={height - 51}
                       pxToPtRatio={105}
                       pointSize={12}
                       svgTabMax={1}
@@ -303,12 +376,11 @@ class SplitPanesContainer extends Component {
                     />
                   </div>
                 </SplitPane>
-              </SplitPane>
-            </Grid.Column>
-          </Grid.Row>
-        </Grid>
-      </div>
-    );
+              </Grid.Column>
+            </Grid.Row>
+          </Grid>
+        </div>
+      );
   }
 }
 

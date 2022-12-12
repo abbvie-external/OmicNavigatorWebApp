@@ -20,7 +20,6 @@ class MetafeaturesTable extends Component {
       parseInt(localStorage.getItem('itemsPerPageMetafeaturesTable'), 10) || 60,
     additionalTemplateInfo: [],
   };
-  metafeaturesGridRef = React.createRef();
 
   componentDidMount() {
     const isMultifeaturePlot =
@@ -189,7 +188,7 @@ class MetafeaturesTable extends Component {
     return (
       <div className="MetafeaturesTableDiv">
         <EZGrid
-          ref={this.metafeaturesGridRef}
+          ref={this.props.metafeaturesTableRef}
           data={metafeaturesTableData}
           columnsConfig={metafeaturesTableConfigCols}
           totalRows={15}
@@ -215,4 +214,6 @@ class MetafeaturesTable extends Component {
   }
 }
 
-export default MetafeaturesTable;
+export default React.forwardRef((props, ref) => (
+  <MetafeaturesTable {...props} metafeaturesTableRef={ref} />
+));
