@@ -101,7 +101,7 @@ class FilteredDifferentialTable extends Component {
   };
 
   getTableData = () => {
-    if (this.props.barcodeSettings.brushedData.length > 0) {
+    if (this.props.hasBarcodeData) {
       const brushedMultIds = this.props.barcodeSettings.brushedData.map(
         b => b.featureID,
       );
@@ -123,7 +123,7 @@ class FilteredDifferentialTable extends Component {
       });
     } else {
       this.setState({
-        filteredTableData: [],
+        filteredTableData: this.state.filteredBarcodeData,
       });
     }
   };
@@ -143,12 +143,17 @@ class FilteredDifferentialTable extends Component {
           this.props.enrichmentStudy,
           this.props.enrichmentModel,
           name,
+          this.props.enrichmentAnnotation,
+          this.props.enrichmentTerm,
           null,
           cancelToken,
         )
-        .then(dataFromService => {
-          if (dataFromService.length > 0) {
-            this.setConfigCols(barcodeData, dataFromService, false);
+        .then(filteredDifferentialResults => {
+          if (filteredDifferentialResults.length > 0) {
+            this.setConfigCols(barcodeData, filteredDifferentialResults, false);
+            this.props.onSetFilteredDifferentialResults(
+              filteredDifferentialResults,
+            );
           }
         })
         .catch(error => {
@@ -157,7 +162,13 @@ class FilteredDifferentialTable extends Component {
     }
   };
 
-  setConfigCols = (data, dataFromService, dataAlreadyFiltered) => {
+  setConfigCols = (
+    barcodeData,
+    filteredDifferentialResults,
+    dataAlreadyFiltered,
+  ) => {
+    const { hasBarcodeData } = this.props;
+    let data = hasBarcodeData ? barcodeData : [...filteredDifferentialResults];
     const {
       filteredDifferentialLinkouts,
       filteredDifferentialFavicons,
@@ -173,16 +184,18 @@ class FilteredDifferentialTable extends Component {
     };
     let filteredDifferentialAlphanumericFields = [];
     let filteredDifferentialNumericFields = [];
-    if (dataFromService.length < 1) return;
+    if (filteredDifferentialResults.length < 1) return;
     // grab first object
     const firstFullObject =
-      dataFromService.length > 0 ? [...dataFromService][0] : null;
+      filteredDifferentialResults.length > 0
+        ? [...filteredDifferentialResults][0]
+        : null;
     // if exists, loop through the values of each property,
     // find the first real value,
     // and set the config column types
     if (firstFullObject) {
       let allProperties = Object.keys(firstFullObject);
-      const dataCopy = [...dataFromService];
+      const dataCopy = [...filteredDifferentialResults];
       allProperties.forEach(property => {
         // loop through data, one property at a time
         const notNullObject = dataCopy.find(row => {
@@ -209,14 +222,15 @@ class FilteredDifferentialTable extends Component {
       });
     }
     const alphanumericTrigger = filteredDifferentialAlphanumericFields[0];
+    let featureID = hasBarcodeData ? 'featureID' : alphanumericTrigger;
     this.props.onHandleDifferentialFeatureIdKey(
       'filteredDifferentialFeatureIdKey',
       alphanumericTrigger,
     );
     this.setState({ identifier: alphanumericTrigger });
     if (!dataAlreadyFiltered) {
-      const barcodeMultIds = data.map(b => b.featureID);
-      data = dataFromService.filter(d =>
+      const barcodeMultIds = data.map(b => b[featureID]);
+      data = filteredDifferentialResults.filter(d =>
         barcodeMultIds.includes(d[alphanumericTrigger]),
       );
     }

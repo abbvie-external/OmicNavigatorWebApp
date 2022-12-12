@@ -41,6 +41,7 @@ class BarcodePlot extends Component {
   barcodeSVGRef = React.createRef();
 
   componentDidMount() {
+    if (!this.props.hasBarcodeData) return;
     this.setWidth(true, false);
     let resizedFn;
     window.addEventListener('resize', () => {
@@ -52,6 +53,7 @@ class BarcodePlot extends Component {
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
+    if (!this.props.hasBarcodeData) return;
     if (
       this.props.horizontalSplitPaneSize !== prevProps.horizontalSplitPaneSize
     ) {
@@ -408,8 +410,8 @@ class BarcodePlot extends Component {
       const quartile = Math.round(quartileTicks.nodes().length * 0.25);
       setTimeout(function() {
         d3.select('.barcodeBrush').call([objsBrush][0].move, [
-          quartileTicks.nodes()[quartile].getAttribute('x1'),
-          quartileTicks.nodes()[0].getAttribute('x1'),
+          quartileTicks.nodes()[quartile]?.getAttribute('x1'),
+          quartileTicks.nodes()[0]?.getAttribute('x1'),
         ]);
       }, 500);
       d3.select('.barcodeBrush rect.overlay').remove();
@@ -496,7 +498,13 @@ class BarcodePlot extends Component {
       displayElementTextBarcode,
     } = this.state;
 
-    const { horizontalSplitPaneSize, barcodeSettings } = this.props;
+    const {
+      horizontalSplitPaneSize,
+      barcodeSettings,
+      hasBarcodeData,
+    } = this.props;
+    if (!hasBarcodeData) return null;
+
     const barcodeHeight =
       horizontalSplitPaneSize - settings.margin.top - settings.margin.bottom;
 
@@ -535,7 +543,7 @@ class BarcodePlot extends Component {
     // featureID: "17747_1"
     // logFoldChange: 0
     // statistic: 19.0484
-    const barcodeLines = barcodeSettings.barcodeData.map(d => (
+    const barcodeLines = barcodeSettings.barcodeData?.map(d => (
       <line
         id={`barcode-line-${d.featureID}`}
         className="barcode-line"
