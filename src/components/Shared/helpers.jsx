@@ -559,8 +559,8 @@ export function getIdArg(
   differentialTestIds,
   differentialTest,
   differentialModelsAndTests,
-  multiModelMappingFirstKey,
-  // differentialModel,
+  // multiModelMappingFirstKey,
+  differentialModel,
   multiModelMappingArrays,
   id,
 ) {
@@ -571,14 +571,15 @@ export function getIdArg(
     // if plot type includes 'multiModel', use the id matched in first in the mapping object
     let mappingId = id;
     const firstMappingModelIndex = differentialModelsAndTests.findIndex(
-      a => a.modelID === multiModelMappingFirstKey,
+      // a => a.modelID === multiModelMappingFirstKey,
+      a => a.modelID === differentialModel,
     );
     const isNotMappingId = firstMappingModelIndex > 0;
     if (isNotMappingId) {
       const idMappingObject = multiModelMappingArrays.filter(m =>
         Object.values(m).includes(id),
       );
-      mappingId = idMappingObject[0]?.[multiModelMappingFirstKey] || id;
+      mappingId = idMappingObject[0]?.[differentialModel] || id;
     }
     return mappingId;
   }
@@ -591,7 +592,7 @@ export function getTestsArg(
   differentialTest,
   differentialModelsAndTests,
   multiModelMappingFirstKey,
-  // differentialModel,
+  differentialModel,
 ) {
   // if plot type does not include 'multiTest', return just the test
   if (!plotType.includes('multiTest')) {
@@ -604,8 +605,8 @@ export function getTestsArg(
       // if plot type includes 'multiTest' AND 'multiModel'
       let tests = [];
       const firstMappingModelIndex = differentialModelsAndTests.findIndex(
-        a => a.modelID === multiModelMappingFirstKey,
-        // a => a.modelID === differentialModel,
+        // a => a.modelID === multiModelMappingFirstKey,
+        a => a.modelID === differentialModel,
       );
       // move the first mapping object models first
       const adjustedArr =
@@ -630,7 +631,6 @@ export function getModelsArg(
   differentialModel,
   differentialModelsAndTests,
   multiModelMappingFirstKey,
-  // differentialModel
   multiModelMappingArrays,
 ) {
   // if plotType does not include 'multiModel', return the model
@@ -640,8 +640,8 @@ export function getModelsArg(
     // if plot type includes 'multiModel'
     let models = [];
     const firstMappingModelIndex = differentialModelsAndTests.findIndex(
-      a => a.modelID === multiModelMappingFirstKey,
-      // a => a.modelID === differentialModel,
+      // a => a.modelID === multiModelMappingFirstKey,
+      a => a.modelID === differentialModel,
     );
     // move the first mapping object models first
     const adjustedArr =
