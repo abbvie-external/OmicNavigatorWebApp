@@ -647,8 +647,8 @@ class Differential extends Component {
               differentialTestIds,
               differentialTest,
               differentialModelsAndTests,
-              multiModelMappingFirstKey,
-              // differentialModel,
+              // multiModelMappingFirstKey,
+              differentialModel,
               multiModelMappingArrays,
               id,
             );
@@ -757,8 +757,8 @@ class Differential extends Component {
                 differentialTestIds,
                 differentialTest,
                 differentialModelsAndTests,
-                multiModelMappingFirstKey,
-                // differentialModel,
+                // multiModelMappingFirstKey,
+                differentialModel,
                 multiModelMappingArrays,
                 id,
               );
