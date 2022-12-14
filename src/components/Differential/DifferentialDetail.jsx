@@ -258,6 +258,10 @@ class DifferentialDetail extends Component {
     this.setState({
       volcanoPlotSelectedDataArr: volcanoPlotSelectedDataArrArg,
       allDataInScatterView,
+      // on scatter brush, make search active
+      // singleFeatureSearchActive: true,
+      // singleFeatureSearchIcon: 'search',
+      multiFeatureSearchActive: true,
     });
     let relevantDifferentialData = [...volcanoPlotSelectedDataArrArg];
     if (doubleClickEvent) {
@@ -1084,73 +1088,58 @@ class DifferentialDetail extends Component {
     }
   };
 
-  getRelevantMultiFeatureSearchData = () => {
+  handleMultiFeatureSearch = () => {
     const { differentialResults, differentialFeatureIdKey } = this.props;
-    const { multiFeaturesSearched, allDataInScatterView } = this.state;
+    const { allDataInScatterView, multiFeatureSearchText } = this.state;
+    const multiFeatureSearchTextSplit = multiFeatureSearchText
+      // split by comma or whitespace (\s), trim and filter out empty strings
+      .split(/[,\s]+/)
+      .map(item => item.trim())
+      .filter(Boolean);
+    debugger;
     // goal: set the new state for differentialTableData, which will update the scatter plot
-    let relevantSearchedDifferentialData = [...differentialResults];
+
     // 1) keep the differentialResults that pass MULTIFEATURE SEARCH filters
-    // 1) keep data that passes search filters
-    if (multiFeaturesSearched.length) {
-      const multiFeaturesSearchedSet = new Set(multiFeaturesSearched);
-      relevantSearchedDifferentialData = [...differentialResults].filter(d =>
-        multiFeaturesSearchedSet.has(d[differentialFeatureIdKey]),
-      );
-    }
-    let relevantDifferentialDataSearchAndInView = relevantSearchedDifferentialData;
+    const multiFeatureSearchTextSet = new Set(multiFeatureSearchTextSplit);
+    const relevantDifferentialDataPassingSearch = [
+      ...differentialResults,
+    ].filter(d => multiFeatureSearchTextSet.has(d[differentialFeatureIdKey]));
+
     // 2) keep data is in current volcano view/selection
-    // if (allDataInScatterView.length) {
     const allDataInScatterViewIdsSet = new Set(
       [...allDataInScatterView].map(
         d => d[this.props.differentialFeatureIdKey],
       ),
     );
-    relevantDifferentialDataSearchAndInView = [
-      ...relevantSearchedDifferentialData,
-    ].filter(d =>
-      allDataInScatterViewIdsSet.has(d[this.props.differentialFeatureIdKey]),
-    );
-    // }
-    return relevantDifferentialDataSearchAndInView;
-  };
 
-  handleMultiFeatureSearch = () => {
-    const { multiFeatureSearchText } = this.state;
-    const multiFeatureSearchTextSplit = multiFeatureSearchText
-      // .replace(/[,;]$/, '')
-      // .split(',')
-      // .split(/\s*[,\n.]+\s*/)
-      // .split(/[ .:;?!~,`"&|()<>{}\[\]\r\n/\\]+/)
-      .split(/[,\s]+/)
-      .map(item => item.trim())
-      .filter(Boolean);
     let multiFeaturesFound = [];
-    const relevantDataAfterSearchAndSelectionFilters = this.getRelevantMultiFeatureSearchData();
-    const multiFeaturesSearchedSet = new Set(multiFeatureSearchTextSplit);
-    const relevantDifferentialData = [
-      ...relevantDataAfterSearchAndSelectionFilters,
+    const relevantDifferentialDataSearchAndInView = [
+      ...relevantDifferentialDataPassingSearch,
     ].filter(d => {
       if (
-        multiFeaturesSearchedSet.has(d[this.props.differentialFeatureIdKey])
+        allDataInScatterViewIdsSet.has(d[this.props.differentialFeatureIdKey])
       ) {
+        // push the features found to an array
+        // that will be used to calculate the "Not Found" state
         multiFeaturesFound.push(d[this.props.differentialFeatureIdKey]);
         return true;
       } else return false;
     });
+
     function getDifference(setA, setB) {
       return new Set([...setA].filter(element => !setB.has(element)));
     }
     const multiFeaturesFoundSet = new Set(multiFeaturesFound);
+    // get the difference between the features searched and found
     const multiFeaturesNotFoundSet = getDifference(
-      multiFeaturesSearchedSet,
+      multiFeatureSearchTextSet,
       multiFeaturesFoundSet,
     );
     const multiFeaturesNotFoundValues = Array.from(multiFeaturesNotFoundSet);
-    // if any filteredDifferentialTableData matches the search text, take action
-    // if (multiFeaturesFound.length) {
     this.setState({
-      differentialTableData: relevantDifferentialData,
-      differentialTableRows: relevantDifferentialData?.length || 0,
+      differentialTableData: relevantDifferentialDataSearchAndInView,
+      differentialTableRows:
+        relevantDifferentialDataSearchAndInView?.length || 0,
       multiFeaturesSearched: multiFeaturesFound,
       multiFeaturesNotFound: multiFeaturesNotFoundValues,
       multiFeatureSearchTextError:
