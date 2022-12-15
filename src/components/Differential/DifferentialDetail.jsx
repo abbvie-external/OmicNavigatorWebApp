@@ -75,7 +75,7 @@ class DifferentialDetail extends Component {
     // multi-feature search
     multiFeatureSearchText: '',
     multiSearching: false,
-    multiSearchOpen: false,
+    multiFeatureSearchOpen: false,
     multiFeaturesSearched: [],
     multiFeaturesNotFound: [],
     multiFeatureSearchActive: false,
@@ -122,7 +122,6 @@ class DifferentialDetail extends Component {
       singleFeatureSearched,
       allDataInScatterView,
     } = this.state;
-    debugger;
     // GOAL: set the new state for differentialTableData (consumed by EZGrid)
     // which will update itself (filters) and fire 'handleTableChanged'
     // which sets new state for volcanoPlotSelectedDataArr (consumed by scatter plot)
@@ -173,7 +172,7 @@ class DifferentialDetail extends Component {
         // multi-feature search
         multiFeatureSearchText: '',
         multiSearching: false,
-        multiSearchOpen: false,
+        multiFeatureSearchOpen: false,
         multiFeaturesSearched: [],
         multiFeaturesNotFound: [],
         multiFeatureSearchActive: false,
@@ -940,7 +939,7 @@ class DifferentialDetail extends Component {
         // singleFeatureSearchText: '',
         multiFeatureSearchText: e.target.value,
         multiSearching: true,
-        multiSearchOpen: true,
+        multiFeatureSearchOpen: true,
         multiFeatureSearchActive: true,
       });
     } else {
@@ -948,7 +947,7 @@ class DifferentialDetail extends Component {
         // multiFeatureSearchText: '',
         singleFeatureSearchText: e.target.value,
         // multiSearching: false,
-        // multiSearchOpen: false,
+        // multiFeatureSearchOpen: false,
       });
     }
   };
@@ -1009,33 +1008,9 @@ class DifferentialDetail extends Component {
     });
   };
 
-  // handleMultiSearchClear = () => {
-  //   this.setState({
-  //     multiFeatureSearchText: '',
-  //   });
-  // };
-
   submitMultiFeatureSearch = () => {
     const { multiFeatureSearchText } = this.state;
-    if (multiFeatureSearchText === '') {
-      const emptySearchData = this.getEmptySearchData();
-      // if submit nothing, close and single feature search
-      this.setState({
-        singleFeatureSearchActive: false,
-        singleFeatureSearchIcon: 'search',
-        singleFeatureSearchText: '',
-        singleFeatureSearched: '',
-        multiFeatureSearchText: '',
-        multiSearching: false,
-        multiSearchOpen: false,
-        multiFeaturesSearched: [],
-        multiFeaturesNotFound: [],
-        multiFeatureSearchActive: false,
-        multiFeatureSearchTextError: false,
-        differentialTableData: emptySearchData,
-        differentialTableRows: emptySearchData?.length || 0,
-      });
-    } else if (
+    if (
       multiFeatureSearchText !== '' ||
       multiFeatureSearchText.includes(',') ||
       multiFeatureSearchText.includes('\n') ||
@@ -1045,48 +1020,76 @@ class DifferentialDetail extends Component {
       this.setState({ multiFeatureSearchTextError: false });
       this.handleMultiFeatureSearch();
     } else {
-      // there are no features matched, but there is text
+      // no delimiters
       this.setState({ multiFeatureSearchTextError: true });
     }
   };
 
-  handleMultiSearchClose = () => {
-    const { multiFeatureSearchText } = this.state;
-    if (multiFeatureSearchText === '') {
-      // if close with nothing in text area
-      const emptySearchData = this.getEmptySearchData();
-      this.setState({
-        multiFeatureSearchText: '',
-        multiSearching: false,
-        multiSearchOpen: false,
-        multiFeaturesSearched: [],
-        multiFeaturesNotFound: [],
-        differentialTableData: emptySearchData,
-        differentialTableRows: emptySearchData?.length || 0,
-        singleFeatureSearchActive: false,
-        singleFeatureSearchIcon: 'search',
-        singleFeatureSearchText: '',
-      });
-    } else if (
-      multiFeatureSearchText.includes(',') ||
-      multiFeatureSearchText.includes('\n') ||
-      this.hasWhitespace(multiFeatureSearchText)
-    ) {
-      // if close with something valid in the text area
-      this.setState({
-        multiSearchOpen: false,
-        // singleFeatureSearchText: '',
-      });
-    } else {
-      // if close with something not valid in the text area
-      this.setState({
-        multiFeatureSearchText: '',
-        multiSearching: false,
-        multiSearchOpen: false,
-        singleFeatureSearchText: multiFeatureSearchText,
-      });
-    }
+  handleMultiSearchClear = () => {
+    this.setState({
+      multiFeatureSearchText: '',
+    });
   };
+
+  handleMultiSearchClose = () => {
+    this.setState({
+      multiFeatureSearchOpen: false,
+    });
+  };
+
+  handleMultiSearchCancel = () => {
+    const emptySearchData = this.getEmptySearchData();
+    this.setState({
+      multiFeatureSearchText: '',
+      multiSearching: false,
+      multiFeatureSearchOpen: false,
+      multiFeaturesSearched: [],
+      multiFeaturesNotFound: [],
+      differentialTableData: emptySearchData,
+      differentialTableRows: emptySearchData?.length || 0,
+      singleFeatureSearchActive: false,
+      singleFeatureSearchIcon: 'search',
+      singleFeatureSearchText: '',
+    });
+  };
+
+  // handleMultiSearchEscape = () => {
+  //   const { multiFeatureSearchText } = this.state;
+  //   if (multiFeatureSearchText === '') {
+  //     // if close with nothing in text area
+  //     const emptySearchData = this.getEmptySearchData();
+  //     this.setState({
+  //       multiFeatureSearchText: '',
+  //       multiSearching: false,
+  //       multiFeatureSearchOpen: false,
+  //       multiFeaturesSearched: [],
+  //       multiFeaturesNotFound: [],
+  //       differentialTableData: emptySearchData,
+  //       differentialTableRows: emptySearchData?.length || 0,
+  //       singleFeatureSearchActive: false,
+  //       singleFeatureSearchIcon: 'search',
+  //       singleFeatureSearchText: '',
+  //     });
+  //   } else if (
+  //     multiFeatureSearchText.includes(',') ||
+  //     multiFeatureSearchText.includes('\n') ||
+  //     this.hasWhitespace(multiFeatureSearchText)
+  //   ) {
+  //     // if close with something valid in the text area
+  //     this.setState({
+  //       multiFeatureSearchOpen: false,
+  //       // singleFeatureSearchText: '',
+  //     });
+  //   } else {
+  //     // if close with something not valid in the text area
+  //     this.setState({
+  //       multiFeatureSearchText: '',
+  //       multiSearching: false,
+  //       multiFeatureSearchOpen: false,
+  //       singleFeatureSearchText: multiFeatureSearchText,
+  //     });
+  //   }
+  // };
 
   handleMultiFeatureSearch = () => {
     const { differentialResults, differentialFeatureIdKey } = this.props;
@@ -1096,7 +1099,6 @@ class DifferentialDetail extends Component {
       .split(/[,\s]+/)
       .map(item => item.trim())
       .filter(Boolean);
-    debugger;
     // goal: set the new state for differentialTableData, which will update the scatter plot
 
     // 1) keep the differentialResults that pass MULTIFEATURE SEARCH filters
@@ -1142,6 +1144,7 @@ class DifferentialDetail extends Component {
         relevantDifferentialDataSearchAndInView?.length || 0,
       multiFeaturesSearched: multiFeaturesFound,
       multiFeaturesNotFound: multiFeaturesNotFoundValues,
+      multiFeatureSearchOpen: multiFeaturesNotFoundValues.length ? true : false,
       multiFeatureSearchTextError:
         !multiFeaturesFound.length && multiFeaturesNotFoundValues.length,
       multiFeatureSearchText: multiFeaturesFound.toString(),
@@ -1179,10 +1182,14 @@ class DifferentialDetail extends Component {
       direction,
       differentialDynamicPlotWidth,
       enableTabChangeOnSelection,
+      singleFeatureSearchActive,
+      singleFeatureSearchText,
+      singleFeatureSearchIcon,
+      multiSearching,
       multiFeaturesSearched,
       multiFeatureSearchText,
       multiFeatureSearchTextError,
-      multiSearchOpen,
+      multiFeatureSearchOpen,
       multiFeaturesNotFound,
       multiFeatureSearchActive,
     } = this.state;
@@ -1355,25 +1362,30 @@ class DifferentialDetail extends Component {
     // const onSearch = searchString => {
     // };
 
-    const isMultiSearchOpen = bool => {
-      if (bool != null) {
-        this.setState({ multiSearchOpen: bool });
-      } else this.setState({ multiSearchOpen: !this.state.multiOpen });
-    };
+    // const toggleMultiFeatureSearch = () => {
+    //   debugger;
+    //   this.setState({
+    //     multiFeatureSearchOpen: !this.state.multiFeatureSearchOpen,
+    //     multiSearching: true,
+    //   });
+    // };
+
     const searchColor =
-      this.state.singleFeatureSearchText.length < 3 ? 'lightgrey' : 'blue';
-    const searchIcon = this.state.singleFeatureSearchIcon;
-    const searchClick = this.state.singleFeatureSearchActive
+      singleFeatureSearchText.length < 3 ? 'lightgrey' : 'blue';
+    const searchIcon = singleFeatureSearchIcon;
+    const searchClick = singleFeatureSearchActive
       ? this.handleSingleFeatureSearchSubmit
       : this.handleSingleFeatureSearchClear;
+    const featuresText =
+      multiFeaturesSearched.length === 1 ? 'FEATURE' : 'FEATURES';
     const multiSearchInput = (
       // this.state.multiSearching ? (
       <div className="AbsoluteMultiSearchDifferential">
         <span id="MultiSearchPopupContainer">
-          {!this.state.multiSearching ? (
+          {!multiSearching ? (
             <Input
               placeholder="Search feature/s (min 3 char)"
-              value={this.state.singleFeatureSearchText}
+              value={singleFeatureSearchText}
               onChange={this.handleSingleFeatureSearchTextChange}
               action={{
                 color: searchColor,
@@ -1382,27 +1394,41 @@ class DifferentialDetail extends Component {
               }}
             />
           ) : null}
-          {this.state.multiSearching ? (
+          {/* {!singleFeatureSearchText.length ? (
+            <Button icon onClick={toggleMultiFeatureSearch}>
+              <Icon name="search plus" />
+            </Button>
+          ) : null} */}
+          {multiSearching ? (
             <Popup
+              closeOnDocumentClick
+              closeOnEscape
+              onClose={() => this.setState({ multiFeatureSearchOpen: false })}
               trigger={
                 <Button
                   as="div"
                   labelPosition="right"
-                  onClick={isMultiSearchOpen}
+                  onClick={toggleMultiFeatureSearch}
                 >
-                  <Button color="blue" size="mini">
-                    <Icon name="search" />
-                    FEATURES SEARCHED
+                  <Button color="blue" size="small">
+                    {multiFeaturesSearched.length} {featuresText} SEARCHED
                   </Button>
-                  <Label as="a" basic color="blue" pointing="left">
-                    {multiFeaturesSearched.length}
+                  <Label
+                    as="a"
+                    basic
+                    color="blue"
+                    pointing="left"
+                    onClick={this.handleMultiSearchCancel}
+                    id="ClearMultiFeatureSearchLabel"
+                  >
+                    <Icon name="remove" />
                   </Label>
                 </Button>
               }
               position="right center"
               basic
               on="click"
-              open={multiSearchOpen}
+              open={multiFeatureSearchOpen}
               inverted
               style={MultiFeatureSearchPopup}
               id="MultiFeatureSearchPopup"
@@ -1419,6 +1445,7 @@ class DifferentialDetail extends Component {
                     inverted
                     verticalAlign="middle"
                     className="NoSelect"
+                    id="NotFoundList"
                     divided
                     horizontal
                     size="mini"
@@ -1463,22 +1490,25 @@ class DifferentialDetail extends Component {
                         ? 'PrimaryBackground multiSearchAction'
                         : 'multiSearchAction'
                     }
-                    content="Search"
-                    onClick={this.submitMultiFeatureSearch}
+                    content={multiFeatureSearchActive ? 'Search' : 'Close'}
+                    onClick={
+                      multiFeatureSearchActive
+                        ? this.submitMultiFeatureSearch
+                        : this.handleMultiSearchClose
+                    }
                     icon="search"
                   />
-                  {/* <Button
-                    color="blue"
-                    className="multiSearchAction"
-                    content="Clear Selection"
-                    onClick={this.handleMultiSearchClear}
-                    icon="undo"
-                  /> */}
                   <Button
                     className="multiSearchAction"
-                    content="Close"
-                    onClick={this.handleMultiSearchClose}
-                    icon="close"
+                    content={multiFeatureSearchText.length ? 'Clear' : 'Cancel'}
+                    onClick={
+                      multiFeatureSearchText.length
+                        ? this.handleMultiSearchClear
+                        : this.handleMultiSearchCancel
+                    }
+                    icon={
+                      multiFeatureSearchText.length ? 'remove circle' : 'close'
+                    }
                   />
                 </div>
               </Popup.Content>
