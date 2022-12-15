@@ -541,7 +541,8 @@ class Enrichment extends Component {
                 pt === 'multiFeature' ||
                 pt === 'singleTest' ||
                 pt === 'multiTest' ||
-                pt === 'plotly'
+                pt === 'plotly' ||
+                pt === 'multiModel'
               );
             };
             const valid = plotTypeArr.every(isValidPlotType);
