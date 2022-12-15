@@ -1363,7 +1363,7 @@ class DifferentialDetail extends Component {
                 id="MultiFeatureSearchToggle"
                 onClick={() => toggleMultiFeatureSearch(true)}
               >
-                <Icon name="search plus" />
+                <Icon name="unordered list" />
               </Button>
             }
             style={SearchPopupStyle}
