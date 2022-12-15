@@ -1150,7 +1150,7 @@ class DifferentialDetail extends Component {
       multiSearching,
       multiFeaturesSearched,
       multiFeatureSearchText,
-      multiFeatureSearchTextError,
+      // multiFeatureSearchTextError,
       multiFeatureSearchOpen,
       multiFeaturesNotFound,
       multiFeatureSearchActive,
@@ -1353,27 +1353,28 @@ class DifferentialDetail extends Component {
     const multiSearchInput = (
       // this.state.multiSearching ? (
       <div className="AbsoluteMultiSearchDifferential">
-        {!singleFeatureSearchText.length && !multiSearching ? (
-          <span>
-            <Popup
-              trigger={
-                <Button
-                  icon
-                  id="MultiFeatureSearchToggle"
-                  onClick={() => toggleMultiFeatureSearch(true)}
-                >
-                  <Icon name="search plus" />
-                </Button>
-              }
-              style={SearchPopupStyle}
-              className="TablePopupValue"
-              content="Multi-Feature Search"
-              inverted
-              basic
-              position="right center"
-            />
-          </span>
-        ) : null}
+        {/* uncomment if we do not want to show the multi-feature search toggle at all times */}
+        {/* {!singleFeatureSearchText.length && !multiSearching ? ( */}
+        <span>
+          <Popup
+            trigger={
+              <Button
+                icon
+                id="MultiFeatureSearchToggle"
+                onClick={() => toggleMultiFeatureSearch(true)}
+              >
+                <Icon name="search plus" />
+              </Button>
+            }
+            style={SearchPopupStyle}
+            className="TablePopupValue"
+            content="Multi-Feature Search"
+            inverted
+            basic
+            position="right center"
+          />
+        </span>
+        {/* ) : null} */}
         <span id="MultiSearchPopupContainer">
           {!multiSearching ? (
             <Input
@@ -1463,11 +1464,12 @@ class DifferentialDetail extends Component {
                     onFocus={this.moveCaretAtEnd}
                   />
                 </Form>
-                {multiFeatureSearchTextError ? (
+                {/* uncomment if we want to an additional alert for the user */}
+                {/* {multiFeatureSearchTextError ? (
                   <Popup.Content id="multiFeatureSearchTextError">
                     Features must be separated with a space, comma, or newline
                   </Popup.Content>
-                ) : null}
+                ) : null} */}
                 <div>
                   <Button
                     className={
@@ -1481,7 +1483,7 @@ class DifferentialDetail extends Component {
                         ? this.submitMultiFeatureSearch
                         : this.handleMultiSearchClose
                     }
-                    icon="search"
+                    icon={multiFeatureSearchActive ? 'search' : null}
                   />
                   <Button
                     className="multiSearchAction"
