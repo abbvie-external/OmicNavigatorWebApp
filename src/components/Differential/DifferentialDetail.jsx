@@ -1053,44 +1053,6 @@ class DifferentialDetail extends Component {
     });
   };
 
-  // handleMultiSearchEscape = () => {
-  //   const { multiFeatureSearchText } = this.state;
-  //   if (multiFeatureSearchText === '') {
-  //     // if close with nothing in text area
-  //     const emptySearchData = this.getEmptySearchData();
-  //     this.setState({
-  //       multiFeatureSearchText: '',
-  //       multiSearching: false,
-  //       multiFeatureSearchOpen: false,
-  //       multiFeaturesSearched: [],
-  //       multiFeaturesNotFound: [],
-  //       differentialTableData: emptySearchData,
-  //       differentialTableRows: emptySearchData?.length || 0,
-  //       singleFeatureSearchActive: false,
-  //       singleFeatureSearchIcon: 'search',
-  //       singleFeatureSearchText: '',
-  //     });
-  //   } else if (
-  //     multiFeatureSearchText.includes(',') ||
-  //     multiFeatureSearchText.includes('\n') ||
-  //     this.hasWhitespace(multiFeatureSearchText)
-  //   ) {
-  //     // if close with something valid in the text area
-  //     this.setState({
-  //       multiFeatureSearchOpen: false,
-  //       // singleFeatureSearchText: '',
-  //     });
-  //   } else {
-  //     // if close with something not valid in the text area
-  //     this.setState({
-  //       multiFeatureSearchText: '',
-  //       multiSearching: false,
-  //       multiFeatureSearchOpen: false,
-  //       singleFeatureSearchText: multiFeatureSearchText,
-  //     });
-  //   }
-  // };
-
   handleMultiFeatureSearch = () => {
     const { differentialResults, differentialFeatureIdKey } = this.props;
     const { allDataInScatterView, multiFeatureSearchText } = this.state;
@@ -1362,13 +1324,14 @@ class DifferentialDetail extends Component {
     // const onSearch = searchString => {
     // };
 
-    // const toggleMultiFeatureSearch = () => {
-    //   debugger;
-    //   this.setState({
-    //     multiFeatureSearchOpen: !this.state.multiFeatureSearchOpen,
-    //     multiSearching: true,
-    //   });
-    // };
+    const toggleMultiFeatureSearch = bool => {
+      this.setState({
+        multiFeatureSearchOpen: bool
+          ? bool
+          : !this.state.multiFeatureSearchOpen,
+        multiSearching: bool ? bool : this.state.multiSearching,
+      });
+    };
 
     const searchColor =
       singleFeatureSearchText.length < 3 ? 'lightgrey' : 'blue';
@@ -1378,9 +1341,39 @@ class DifferentialDetail extends Component {
       : this.handleSingleFeatureSearchClear;
     const featuresText =
       multiFeaturesSearched.length === 1 ? 'FEATURE' : 'FEATURES';
+    const SearchPopupStyle = {
+      backgroundColor: '2E2E2E',
+      borderBottom: '2px solid var(--color-primary)',
+      color: '#FFF',
+      padding: '1em',
+      maxWidth: '50vw',
+      fontSize: '13px',
+      wordBreak: 'break-all',
+    };
     const multiSearchInput = (
       // this.state.multiSearching ? (
       <div className="AbsoluteMultiSearchDifferential">
+        {!singleFeatureSearchText.length && !multiSearching ? (
+          <span>
+            <Popup
+              trigger={
+                <Button
+                  icon
+                  id="MultiFeatureSearchToggle"
+                  onClick={() => toggleMultiFeatureSearch(true)}
+                >
+                  <Icon name="search plus" />
+                </Button>
+              }
+              style={SearchPopupStyle}
+              className="TablePopupValue"
+              content="Multi-Feature Search"
+              inverted
+              basic
+              position="right center"
+            />
+          </span>
+        ) : null}
         <span id="MultiSearchPopupContainer">
           {!multiSearching ? (
             <Input
@@ -1394,11 +1387,6 @@ class DifferentialDetail extends Component {
               }}
             />
           ) : null}
-          {/* {!singleFeatureSearchText.length ? (
-            <Button icon onClick={toggleMultiFeatureSearch}>
-              <Icon name="search plus" />
-            </Button>
-          ) : null} */}
           {multiSearching ? (
             <Popup
               closeOnDocumentClick
@@ -1408,7 +1396,7 @@ class DifferentialDetail extends Component {
                 <Button
                   as="div"
                   labelPosition="right"
-                  onClick={toggleMultiFeatureSearch}
+                  onClick={() => toggleMultiFeatureSearch()}
                 >
                   <Button color="blue" size="small">
                     {multiFeaturesSearched.length} {featuresText} SEARCHED
@@ -1418,7 +1406,10 @@ class DifferentialDetail extends Component {
                     basic
                     color="blue"
                     pointing="left"
-                    onClick={this.handleMultiSearchCancel}
+                    onClick={e => {
+                      e.stopPropagation();
+                      this.handleMultiSearchCancel();
+                    }}
                     id="ClearMultiFeatureSearchLabel"
                   >
                     <Icon name="remove" />
@@ -1445,21 +1436,15 @@ class DifferentialDetail extends Component {
                     inverted
                     verticalAlign="middle"
                     className="NoSelect"
-                    id="NotFoundList"
                     divided
                     horizontal
                     size="mini"
                   >
-                    <List.Item>NOT FOUND:</List.Item>
+                    <List.Item className="NoSelect">NOT FOUND:</List.Item>
                     {multiFeaturesNotFound.map(f => {
                       return (
-                        <List.Item
-                          key={`featureList-${f}`}
-                          className="NoSelect"
-                        >
-                          <Label color="red" className="CursorPointer">
-                            {f}
-                          </Label>
+                        <List.Item key={`featureList-${f}`}>
+                          <Label color="red">{f}</Label>
                         </List.Item>
                       );
                     })}
