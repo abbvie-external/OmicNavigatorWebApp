@@ -322,8 +322,9 @@ class Differential extends Component {
           // multiFeaturePlotTypesVar = [...notMultiModelPlotTypesVar].filter(p =>
           //   p.plotType.includes('multiFeature'),
           // );
-          plotMultiFeatureAvailableVar =
-            multiFeaturePlotTypesVar?.length || false;
+          plotMultiFeatureAvailableVar = multiFeaturePlotTypesVar?.length
+            ? true
+            : false;
         }
         this.setState({
           differentialPlotTypes: differentialPlotTypesVar,

@@ -317,7 +317,7 @@
 
 #ToggleAllCheckboxInfo {
   position: absolute !important;
-  margin-top: 80px;
+  margin-top: 70px;
   margin-left: 20px;
   color: var(--color-dark);
   cursor: pointer;
@@ -341,4 +341,31 @@
   font-size: 15px;
   margin: 0 auto;
   padding-bottom: 10px;
+}
+
+#MultiFeatureSearchPopup {
+  top: 61px !important;
+  left: -235px !important;
+}
+
+#multiFeatureSearchTextError {
+  margin: 10px 0 !important;
+  color: var(--color-primary);
+}
+
+#MultiFeaturesSearchedList {
+  margin: 10px 0 5px 0;
+}
+
+#multiFeatureSearchTextArea {
+  margin: 10px 0;
+}
+
+#ClearMultiFeatureSearchLabel {
+  padding-right: 0;
+}
+
+#MultiFeatureSearchToggle {
+  padding: 10px;
+  margin-left: 5px;
 }

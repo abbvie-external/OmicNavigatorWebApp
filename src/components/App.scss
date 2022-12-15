@@ -297,6 +297,17 @@
     right: 9px !important;
   }
 
+  .AbsoluteMultiSearchDifferential {
+    // position: absolute;
+    // z-index: 1;
+    // margin-top: 13px;
+    // left: 250px !important;
+    float: left;
+    input {
+      min-width: 185px;
+    }
+  }
+
   .AbsoluteExport {
     position: absolute;
     z-index: 1;
