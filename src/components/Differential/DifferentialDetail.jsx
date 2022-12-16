@@ -1372,16 +1372,26 @@ class DifferentialDetail extends Component {
           <Popup
             trigger={
               <Button
+                className={
+                  singleFeatureSearchText.length ? 'FakeDisabled' : null
+                }
                 icon
                 id="MultiFeatureSearchToggle"
-                onClick={() => toggleMultiFeatureSearch(true)}
+                onClick={() => {
+                  if (!singleFeatureSearchText.length)
+                    toggleMultiFeatureSearch(true);
+                }}
               >
                 <Icon name="unordered list" />
               </Button>
             }
             style={SearchPopupStyle}
             className="TablePopupValue"
-            content="Multi-Feature List Search"
+            content={
+              !singleFeatureSearchText.length
+                ? 'Multi-Feature List Search'
+                : 'Single-Feature Search must be cleared, to enable Multi-Feature List Search'
+            }
             inverted
             basic
             position="right center"
