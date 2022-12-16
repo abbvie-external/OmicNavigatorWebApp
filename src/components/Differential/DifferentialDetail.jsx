@@ -1023,7 +1023,6 @@ class DifferentialDetail extends Component {
       this.hasWhitespace(multiFeatureSearchText)
     ) {
       // do the multi-search!
-      this.setState({ multiFeatureSearchTextError: false });
       this.handleMultiFeatureSearch();
     } else {
       // no delimiters
@@ -1113,8 +1112,7 @@ class DifferentialDetail extends Component {
       multiFeaturesSearched: multiFeaturesFound,
       multiFeaturesNotFound: multiFeaturesNotFoundValues,
       multiFeatureSearchOpen: multiFeaturesNotFoundValues.length ? true : false,
-      multiFeatureSearchTextError:
-        !multiFeaturesFound.length && multiFeaturesNotFoundValues.length,
+      multiFeatureSearchTextError: multiFeaturesNotFoundValues.length,
       multiFeatureSearchText: multiFeaturesFound.toString(),
       multiFeatureSearchActive: false,
       singleFeatureSearchActive: false,
@@ -1156,7 +1154,7 @@ class DifferentialDetail extends Component {
       multiSearching,
       multiFeaturesSearched,
       multiFeatureSearchText,
-      // multiFeatureSearchTextError,
+      multiFeatureSearchTextError,
       multiFeatureSearchOpen,
       multiFeaturesNotFound,
       multiFeatureSearchActive,
@@ -1371,7 +1369,7 @@ class DifferentialDetail extends Component {
             }
             style={SearchPopupStyle}
             className="TablePopupValue"
-            content="Multi-Feature Search"
+            content="Multi-Feature List Search"
             inverted
             basic
             position="right center"
@@ -1433,7 +1431,7 @@ class DifferentialDetail extends Component {
               style={MultiFeatureSearchPopup}
               id="MultiFeatureSearchPopup"
             >
-              <Popup.Header>Multi-Feature Search</Popup.Header>
+              <Popup.Header>Multi-Feature List Search</Popup.Header>
               <Popup.Content>
                 Paste or type features below; separate with a comma, space or
                 newline
@@ -1464,7 +1462,7 @@ class DifferentialDetail extends Component {
                 <Form>
                   <Form.TextArea
                     autoFocus
-                    placeholder="Separate features with a comma, space, or newline"
+                    placeholder="Separate features with a comma, space, or newline (NOTE: This is an exact search)"
                     name="multiFeatureSearchText"
                     id="multiFeatureSearchTextArea"
                     value={multiFeatureSearchText}
@@ -1472,12 +1470,12 @@ class DifferentialDetail extends Component {
                     onFocus={this.moveCaretAtEnd}
                   />
                 </Form>
-                {/* uncomment if we want to an additional alert for the user */}
-                {/* {multiFeatureSearchTextError ? (
+                {multiFeatureSearchTextError ? (
                   <Popup.Content id="multiFeatureSearchTextError">
-                    Features must be separated with a space, comma, or newline
+                    Did you enter the exact search term, separated by comma,
+                    space or newline?
                   </Popup.Content>
-                ) : null} */}
+                ) : null}
                 <div>
                   <Button
                     className={
