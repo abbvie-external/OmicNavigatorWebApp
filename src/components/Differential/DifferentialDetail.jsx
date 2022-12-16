@@ -949,11 +949,8 @@ class DifferentialDetail extends Component {
         value.includes('\n') ||
         this.hasWhitespace(value)
       ) {
+        this.handleSingleFeatureSearchClear();
         this.setState({
-          singleFeatureSearchActive: false,
-          singleFeatureSearchText: '',
-          singleFeatureSearched: '',
-          singleFeatureSearchIcon: 'search',
           multiFeatureSearchText: value,
           multiSearching: true,
           multiFeatureSearchOpen: true,
@@ -1317,18 +1314,6 @@ class DifferentialDetail extends Component {
       fontSize: '13px',
       wordBreak: 'break-all',
     };
-
-    // const differentialTableDataOptions =
-    //   differentialTableData?.map(data => {
-    //     return {
-    //       key: data[this.props.differentialFeatureIdKey],
-    //       text: data[this.props.differentialFeatureIdKey],
-    //       value: data[this.props.differentialFeatureIdKey],
-    //     };
-    //   }) || [];
-
-    // const onSearch = searchString => {
-    // };
 
     const toggleMultiFeatureSearch = bool => {
       this.setState({
