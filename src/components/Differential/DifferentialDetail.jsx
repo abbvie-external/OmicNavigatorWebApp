@@ -116,7 +116,11 @@ class DifferentialDetail extends Component {
   }
 
   setRelevantData = () => {
-    const { differentialResults, differentialFeatureIdKey } = this.props;
+    const {
+      differentialResults,
+      differentialFeatureIdKey,
+      differentialAlphanumericFields,
+    } = this.props;
     const {
       multiFeaturesSearched,
       singleFeatureSearched,
@@ -127,7 +131,7 @@ class DifferentialDetail extends Component {
     // which sets new state for volcanoPlotSelectedDataArr (consumed by scatter plot)
     let relevantSearched = [...differentialResults];
     // 1) keep the differentialResults that pass single or multiple feature SEARCH filters
-    if (multiFeaturesSearched.length || singleFeatureSearched !== '') {
+    if (multiFeaturesSearched.length || singleFeatureSearched.length) {
       if (multiFeaturesSearched.length) {
         // multi-search filter
         const multiFeaturesSearchedSet = new Set(multiFeaturesSearched);
@@ -136,11 +140,15 @@ class DifferentialDetail extends Component {
         );
       } else {
         // single search filter
-        relevantSearched = [...differentialResults].filter(d =>
-          d[this.props.differentialFeatureIdKey].includes(
-            singleFeatureSearched,
-          ),
-        );
+        // filter the differentialResults for "includes" across all alphanumeric columns
+        relevantSearched = [];
+        differentialAlphanumericFields.forEach(daf => {
+          const columnIncludes = [...differentialResults].filter(d => {
+            const dafLowercase = d[daf].toLowerCase();
+            return dafLowercase.includes(singleFeatureSearched);
+          });
+          relevantSearched = [...relevantSearched, ...columnIncludes];
+        });
       }
     }
     let relevantSearchedAndInScatterView = relevantSearched;
@@ -874,19 +882,23 @@ class DifferentialDetail extends Component {
   };
 
   getRelevantSingleFeatureSearchData = singleFeatureSearchTextArg => {
-    const { differentialResults } = this.props;
+    const { differentialResults, differentialAlphanumericFields } = this.props;
     const { allDataInScatterView } = this.state;
     // goal: set the new state for differentialTableData, which will update the scatter plot
-    let relevantSearchedDifferentialData = [...differentialResults];
+    let relevantSearched = [...differentialResults];
     // 1) keep the differentialResults that pass SINGLE SEARCH filters
     if (singleFeatureSearchTextArg !== '') {
-      relevantSearchedDifferentialData = [...differentialResults].filter(d =>
-        d[this.props.differentialFeatureIdKey].includes(
-          singleFeatureSearchTextArg,
-        ),
-      );
+      relevantSearched = [];
+      // filter the differentialResults for "includes" across all alphanumeric columns
+      differentialAlphanumericFields.forEach(daf => {
+        const columnIncludes = [...differentialResults].filter(d => {
+          const dafLowercase = d[daf].toLowerCase();
+          return dafLowercase.includes(singleFeatureSearchTextArg);
+        });
+        relevantSearched = [...relevantSearched, ...columnIncludes];
+      });
     }
-    let relevantDifferentialDataSearchAndInView = relevantSearchedDifferentialData;
+    let relevantDifferentialDataSearchAndInView = relevantSearched;
     // 2) keep data is in current volcano view/selection
     if (allDataInScatterView.length) {
       const allDataInScatterViewIdsSet = new Set(
@@ -895,7 +907,7 @@ class DifferentialDetail extends Component {
         ),
       );
       relevantDifferentialDataSearchAndInView = [
-        ...relevantSearchedDifferentialData,
+        ...relevantSearched,
       ].filter(d =>
         allDataInScatterViewIdsSet.has(d[this.props.differentialFeatureIdKey]),
       );
@@ -953,8 +965,9 @@ class DifferentialDetail extends Component {
   }, 500);
 
   handleSingleFeatureSearchSubmit = singleFeatureSearchTextArg => {
+    const singleFeatureSearchTextLower = singleFeatureSearchTextArg.toLowerCase();
     const relevantDifferentialData = this.getRelevantSingleFeatureSearchData(
-      singleFeatureSearchTextArg,
+      singleFeatureSearchTextLower,
     );
     if (relevantDifferentialData.length) {
       this.setState({
@@ -962,7 +975,7 @@ class DifferentialDetail extends Component {
         differentialTableRows: relevantDifferentialData?.length || 0,
         singleFeatureSearchActive: false,
         singleFeatureSearchIcon: 'remove',
-        singleFeatureSearched: singleFeatureSearchTextArg,
+        singleFeatureSearched: singleFeatureSearchTextLower,
       });
     } else {
       this.setState({
@@ -970,7 +983,7 @@ class DifferentialDetail extends Component {
         differentialTableRows: 0,
         singleFeatureSearchActive: false,
         singleFeatureSearchIcon: 'remove',
-        singleFeatureSearched: singleFeatureSearchTextArg,
+        singleFeatureSearched: singleFeatureSearchTextLower,
       });
       // toast.error('No features found, please adjust your search');
     }
@@ -1328,7 +1341,7 @@ class DifferentialDetail extends Component {
 
     const searchColor =
       singleFeatureSearchText.length < 1 ? 'lightgrey' : 'blue';
-    // const searchIcon = singleFeatureSearchIcon;
+    const searchIcon = singleFeatureSearchText.length < 1 ? 'search' : 'remove';
     const featuresText =
       multiFeaturesSearched.length === 1 ? 'FEATURE' : 'FEATURES';
     const SearchPopupStyle = {
@@ -1368,7 +1381,7 @@ class DifferentialDetail extends Component {
         <span id="MultiSearchPopupContainer">
           {!multiSearching ? (
             <Input
-              placeholder="Search feature/s"
+              placeholder="Search features"
               value={singleFeatureSearchText}
               onChange={e => {
                 this.setState({
@@ -1378,7 +1391,7 @@ class DifferentialDetail extends Component {
               }}
               action={{
                 color: searchColor,
-                icon: 'remove',
+                icon: searchIcon,
                 onClick: this.handleSingleFeatureSearchClear,
               }}
             />
