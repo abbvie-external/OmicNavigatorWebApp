@@ -930,7 +930,7 @@ class DifferentialDetail extends Component {
     });
     if (value === '') {
       this.handleSingleFeatureSearchClear();
-    } else if (value.length >= 3) {
+    } else {
       if (
         value.includes(',') ||
         value.includes('\n') ||
@@ -1327,7 +1327,7 @@ class DifferentialDetail extends Component {
     };
 
     const searchColor =
-      singleFeatureSearchText.length < 3 ? 'lightgrey' : 'blue';
+      singleFeatureSearchText.length < 1 ? 'lightgrey' : 'blue';
     // const searchIcon = singleFeatureSearchIcon;
     const featuresText =
       multiFeaturesSearched.length === 1 ? 'FEATURE' : 'FEATURES';
@@ -1368,7 +1368,7 @@ class DifferentialDetail extends Component {
         <span id="MultiSearchPopupContainer">
           {!multiSearching ? (
             <Input
-              placeholder="Search feature/s (min 3 char)"
+              placeholder="Search feature/s"
               value={singleFeatureSearchText}
               onChange={e => {
                 this.setState({
