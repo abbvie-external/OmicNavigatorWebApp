@@ -16,4 +16,29 @@ Typical use of this code is via the installation of the OmicNavigator R package 
 ---
 ### Application Build
 ```npm run build```
-  
+
+## New release
+
+Follow these steps to create a new release
+
+1. Bump the version number in the files `package-lock.json`, `package.json`,
+   `public/manifest.json`, and `src/components/Tabs.jsx`. See [this
+   commit][example-bump-commit] for an example
+1. Add, commit, and push
+1. On GitHub, navigate to [Releases][releases] and click [Draft a new
+   release][draft-a-new-release]
+1. In the box "Choose a tag", enter the new version preceded by a `v`, eg
+   `vX.X.X`. Then click the message below to create the new tag when the release
+   is published
+1. Enter the release title as "OmicNavigatorWebApp X.X.X"
+1. Add any release notes to the description box
+1. Click "Publish release"
+
+After following the above steps, the app will automatically be built and
+uploaded to the release as `build.zip`, and the [R package repository][on-r]
+will be triggered to create a new release.
+
+[example-bump-commit]: https://github.com/abbvie-external/OmicNavigatorWebApp/commit/ce7ec16c6f06d8c722bb21a08210aca0b70ed10a
+[releases]: https://github.com/abbvie-external/OmicNavigatorWebApp/releases
+[draft-a-new-release]: https://github.com/abbvie-external/OmicNavigatorWebApp/releases/new
+[on-r]: https://github.com/abbvie-external/OmicNavigator

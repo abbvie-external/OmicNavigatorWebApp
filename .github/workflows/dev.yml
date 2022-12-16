@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - dev
+  workflow_dispatch:
 jobs:
   deploy-dev:
     if: ${{ github.repository == 'abbvie-external/OmicNavigatorWebApp' && github.event_name != 'pull_request' }}

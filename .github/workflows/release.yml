@@ -1,6 +1,9 @@
-name: Dispatch to trigger new release of the R package
-# After a new release, this Action triggers the R package repository to update
-# the pinned version of the app and create a new release.
+name: Upload build.zip and dispatch to trigger new release of the R package
+# After a new release, this workflow:
+#
+# 1) Builds `build.zip` and uploads it as a release asset
+# 2) Triggers the R package repository to update the pinned version of the app
+#    and create a new release.
 #
 # https://github.com/abbvie-external/OmicNavigator/releases
 # https://github.com/peter-evans/repository-dispatch
@@ -8,7 +11,34 @@ on:
   release:
     types: [published]
 jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v3
+      - name: JavaScript info
+        run: |
+          echo "Node.js version: $(node --version)"
+          echo "npm version: $(npm --version)"
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+      - name: Build
+        env:
+          CI: false
+        run: npm run build
+      - name: Zip
+        run: zip -r build.zip build/
+      - name: Upload zipfile as release asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag=${GITHUB_REF#refs/tags/}
+          echo "Uploading build.zip to version ${tag}"
+          gh release upload ${tag} build.zip --clobber
   dispatch:
+    if: ${{ github.repository == 'abbvie-external/OmicNavigatorWebApp' }}
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Repository Dispatch
