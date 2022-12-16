@@ -80,6 +80,7 @@ class DifferentialDetail extends Component {
     multiFeaturesNotFound: [],
     multiFeatureSearchActive: false,
     multiFeatureSearchTextError: false,
+    notFoundLimit: 5,
   };
   volcanoPlotFilteredGridRef = React.createRef();
 
@@ -1158,6 +1159,7 @@ class DifferentialDetail extends Component {
       multiFeatureSearchOpen,
       multiFeaturesNotFound,
       multiFeatureSearchActive,
+      notFoundLimit,
     } = this.state;
 
     const {
@@ -1351,6 +1353,16 @@ class DifferentialDetail extends Component {
       fontSize: '13px',
       wordBreak: 'break-all',
     };
+    const notFoundLength = multiFeaturesNotFound.length;
+    const limitNotFound = notFoundLength > notFoundLimit ? true : false;
+    const notFoundList = limitNotFound
+      ? [...multiFeaturesNotFound].slice(0, notFoundLimit)
+      : [...multiFeaturesNotFound];
+    const limitNotFoundText = limitNotFound ? (
+      <span id="LimitNotFoundText">
+        ...{notFoundLength - notFoundLimit} more
+      </span>
+    ) : null;
     const multiSearchInput = (
       // this.state.multiSearching ? (
       <div className="AbsoluteMultiSearchDifferential">
@@ -1434,7 +1446,8 @@ class DifferentialDetail extends Component {
               <Popup.Header>Multi-Feature List Search</Popup.Header>
               <Popup.Content>
                 Paste or type features below; separate with a comma, space or
-                newline
+                newline (<strong className="PrimaryColor">NOTE</strong>: this is
+                an <strong className="PrimaryColor">exact</strong> search)
               </Popup.Content>
               <Popup.Content id="MultiFeaturesSearchedList">
                 {multiFeaturesNotFound?.length ? (
@@ -1448,13 +1461,14 @@ class DifferentialDetail extends Component {
                     size="mini"
                   >
                     <List.Item className="NoSelect">NOT FOUND:</List.Item>
-                    {multiFeaturesNotFound.map(f => {
+                    {notFoundList.map(f => {
                       return (
                         <List.Item key={`featureList-${f}`}>
-                          <Label color="red">{f}</Label>
+                          <Label className="PrimaryBackground">{f}</Label>
                         </List.Item>
                       );
                     })}
+                    {limitNotFoundText}
                   </List>
                 ) : null}
               </Popup.Content>
@@ -1462,7 +1476,7 @@ class DifferentialDetail extends Component {
                 <Form>
                   <Form.TextArea
                     autoFocus
-                    placeholder="Separate features with a comma, space, or newline (NOTE: This is an exact search)"
+                    placeholder="Separate featurs with a comma, space, or newline (NOTE: This is an exact search)"
                     name="multiFeatureSearchText"
                     id="multiFeatureSearchTextArea"
                     value={multiFeatureSearchText}
