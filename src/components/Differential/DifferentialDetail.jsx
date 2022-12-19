@@ -134,11 +134,15 @@ class DifferentialDetail extends Component {
     // 1) keep the differentialResults that pass single or multiple feature SEARCH filters
     if (multiFeaturesSearched.length || singleFeatureSearched.length) {
       if (multiFeaturesSearched.length) {
+        relevantSearched = [];
         // multi-search filter
         const multiFeaturesSearchedSet = new Set(multiFeaturesSearched);
-        relevantSearched = [...differentialResults].filter(d =>
-          multiFeaturesSearchedSet.has(d[differentialFeatureIdKey]),
-        );
+        differentialAlphanumericFields.forEach(daf => {
+          const columnIncludes = [...differentialResults].filter(d => {
+            return multiFeaturesSearchedSet.has(d[daf]);
+          });
+          relevantSearched = [...relevantSearched, ...columnIncludes];
+        });
       } else {
         // single search filter
         // filter the differentialResults for "includes" across all alphanumeric columns
@@ -281,11 +285,16 @@ class DifferentialDetail extends Component {
         // find the intersection between the searched features, and volcano plot
         if (multiFeaturesSearched.length) {
           const multiFeaturesSearchedSet = new Set(multiFeaturesSearched);
-          relevantDifferentialData = [...differentialResults].filter(d =>
-            multiFeaturesSearchedSet.has(
-              d[this.props.differentialFeatureIdKey],
-            ),
-          );
+          relevantDifferentialData = [];
+          differentialAlphanumericFields.forEach(daf => {
+            const columnIncludes = [...differentialResults].filter(d => {
+              return multiFeaturesSearchedSet.has(d[daf]);
+            });
+            relevantDifferentialData = [
+              ...relevantDifferentialData,
+              ...columnIncludes,
+            ];
+          });
         } else {
           // single search filter
           // filter the differentialResults for "includes" across all alphanumeric columns
@@ -1066,7 +1075,7 @@ class DifferentialDetail extends Component {
   };
 
   handleMultiFeatureSearch = () => {
-    const { differentialResults, differentialFeatureIdKey } = this.props;
+    const { differentialResults, differentialAlphanumericFields } = this.props;
     const { allDataInScatterView, multiFeatureSearchText } = this.state;
     const multiFeatureSearchTextSplit = multiFeatureSearchText
       // split by comma or whitespace (\s), trim and filter out empty strings
@@ -1077,29 +1086,33 @@ class DifferentialDetail extends Component {
 
     // 1) keep the differentialResults that pass MULTIFEATURE SEARCH filters
     const multiFeatureSearchTextSet = new Set(multiFeatureSearchTextSplit);
-    const relevantDifferentialDataPassingSearch = [
-      ...differentialResults,
-    ].filter(d => multiFeatureSearchTextSet.has(d[differentialFeatureIdKey]));
+    // filter the differentialResults for "includes" across all alphanumeric columns
+    let relevantDifferentialDataSearchAndInView = [];
+    differentialAlphanumericFields.forEach(daf => {
+      const columnIncludes = [...differentialResults].filter(d => {
+        return multiFeatureSearchTextSet.has(d[daf]);
+      });
+      relevantDifferentialDataSearchAndInView = [
+        ...relevantDifferentialDataSearchAndInView,
+        ...columnIncludes,
+      ];
+    });
 
-    // 2) keep data is in current volcano view/selection
-    const allDataInScatterViewIdsSet = new Set(
-      [...allDataInScatterView].map(
-        d => d[this.props.differentialFeatureIdKey],
-      ),
-    );
-
+    // filter the differentialResults for "includes" across all alphanumeric columns
     let multiFeaturesFound = [];
-    const relevantDifferentialDataSearchAndInView = [
-      ...relevantDifferentialDataPassingSearch,
-    ].filter(d => {
-      if (
-        allDataInScatterViewIdsSet.has(d[this.props.differentialFeatureIdKey])
-      ) {
-        // push the features found to an array
-        // that will be used to calculate the "Not Found" state
-        multiFeaturesFound.push(d[this.props.differentialFeatureIdKey]);
-        return true;
-      } else return false;
+    differentialAlphanumericFields.forEach(daf => {
+      const columnIncludes = [...allDataInScatterView].filter(d => {
+        if (multiFeatureSearchTextSet.has(d[daf])) {
+          // push the features found to an array
+          // that will be used to calculate the "Not Found" state
+          multiFeaturesFound.push(d[daf]);
+          return true;
+        } else return false;
+      });
+      relevantDifferentialDataSearchAndInView = [
+        ...relevantDifferentialDataSearchAndInView,
+        ...columnIncludes,
+      ];
     });
 
     function getDifference(setA, setB) {
@@ -1111,16 +1124,23 @@ class DifferentialDetail extends Component {
       multiFeatureSearchTextSet,
       multiFeaturesFoundSet,
     );
-    const multiFeaturesNotFoundValues = Array.from(multiFeaturesNotFoundSet);
+    // const multiFeaturesNotFoundValues = Array.from(multiFeaturesNotFoundSet);
+    const uniqueMultiFeaturesNotFoundValues = [
+      ...new Set(multiFeaturesNotFoundSet),
+    ];
+    const uniqueMultiFeaturesFoundValues = [...new Set(multiFeaturesFoundSet)];
+
     this.setState({
       differentialTableData: relevantDifferentialDataSearchAndInView,
       differentialTableRows:
         relevantDifferentialDataSearchAndInView?.length || 0,
-      multiFeaturesSearched: multiFeaturesFound,
-      multiFeaturesNotFound: multiFeaturesNotFoundValues,
-      multiFeatureSearchOpen: multiFeaturesNotFoundValues.length ? true : false,
-      multiFeatureSearchTextError: multiFeaturesNotFoundValues.length,
-      multiFeatureSearchText: multiFeaturesFound.toString(),
+      multiFeaturesSearched: uniqueMultiFeaturesFoundValues,
+      multiFeaturesNotFound: uniqueMultiFeaturesNotFoundValues,
+      multiFeatureSearchOpen: uniqueMultiFeaturesNotFoundValues.length
+        ? true
+        : false,
+      multiFeatureSearchTextError: uniqueMultiFeaturesNotFoundValues.length,
+      multiFeatureSearchText: uniqueMultiFeaturesFoundValues.toString(),
       multiFeatureSearchActive: false,
       singleFeatureSearchActive: false,
       singleFeatureSearchIcon: 'search',
