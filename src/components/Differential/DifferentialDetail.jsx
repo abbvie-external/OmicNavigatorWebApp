@@ -259,6 +259,7 @@ class DifferentialDetail extends Component {
       differentialOutlinedFeature,
       plotMultiFeatureAvailable,
       differentialResults,
+      differentialAlphanumericFields,
     } = this.props;
     const { multiFeaturesSearched, singleFeatureSearched } = this.state;
     // volcanoPlotSelectedDataArrArg is empty
@@ -286,11 +287,19 @@ class DifferentialDetail extends Component {
             ),
           );
         } else {
-          relevantDifferentialData = [...differentialResults].filter(d =>
-            d[this.props.differentialFeatureIdKey].includes(
-              singleFeatureSearched,
-            ),
-          );
+          // single search filter
+          // filter the differentialResults for "includes" across all alphanumeric columns
+          relevantDifferentialData = [];
+          differentialAlphanumericFields.forEach(daf => {
+            const columnIncludes = [...differentialResults].filter(d => {
+              const dafLowercase = d[daf].toLowerCase();
+              return dafLowercase.includes(singleFeatureSearched);
+            });
+            relevantDifferentialData = [
+              ...relevantDifferentialData,
+              ...columnIncludes,
+            ];
+          });
         }
       }
     }
