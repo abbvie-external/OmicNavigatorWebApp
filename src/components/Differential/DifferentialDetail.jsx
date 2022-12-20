@@ -162,11 +162,16 @@ class DifferentialDetail extends Component {
     relevantSearchedAndInScatterView = [...relevantSearched].filter(d =>
       allDataInScatterViewIdsSet.has(d[this.props.differentialFeatureIdKey]),
     );
+    const uniqueRelevantSearchedAndInScatterView = [
+      ...new Set(relevantSearchedAndInScatterView),
+    ];
+
     this.setState({
       allChecked: false,
-      differentialTableData: relevantSearchedAndInScatterView,
-      differentialTableRows: relevantSearchedAndInScatterView?.length || 0,
-      filteredDifferentialTableData: relevantSearchedAndInScatterView,
+      differentialTableData: uniqueRelevantSearchedAndInScatterView,
+      differentialTableRows:
+        uniqueRelevantSearchedAndInScatterView?.length || 0,
+      filteredDifferentialTableData: uniqueRelevantSearchedAndInScatterView,
     });
   };
 
@@ -1125,11 +1130,14 @@ class DifferentialDetail extends Component {
       ...new Set(multiFeaturesNotFoundSet),
     ];
     const uniqueMultiFeaturesFoundValues = [...new Set(multiFeaturesFoundSet)];
+    const uniqueRelevantDifferentialResultsInViewAndSearch = [
+      ...new Set(relevantDifferentialResultsInViewAndSearch),
+    ];
 
     this.setState({
-      differentialTableData: relevantDifferentialResultsInViewAndSearch,
+      differentialTableData: uniqueRelevantDifferentialResultsInViewAndSearch,
       differentialTableRows:
-        relevantDifferentialResultsInViewAndSearch?.length || 0,
+        uniqueRelevantDifferentialResultsInViewAndSearch?.length || 0,
       multiFeaturesSearched: uniqueMultiFeaturesFoundValues,
       multiFeaturesNotFound: uniqueMultiFeaturesNotFoundValues,
       multiFeatureSearchOpen: uniqueMultiFeaturesNotFoundValues.length
