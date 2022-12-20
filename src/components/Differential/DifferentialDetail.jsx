@@ -311,6 +311,7 @@ class DifferentialDetail extends Component {
             ];
           });
         }
+        relevantDifferentialData = [...new Set(relevantDifferentialData)];
       }
     }
     // this.setState({
@@ -932,7 +933,10 @@ class DifferentialDetail extends Component {
         allDataInScatterViewIdsSet.has(d[this.props.differentialFeatureIdKey]),
       );
     }
-    return relevantDifferentialDataSearchAndInView;
+    const uniqueRelevantDifferentialDataSearchAndInView = [
+      ...new Set(relevantDifferentialDataSearchAndInView),
+    ];
+    return uniqueRelevantDifferentialDataSearchAndInView;
   };
 
   getEmptySearchData = () => {
