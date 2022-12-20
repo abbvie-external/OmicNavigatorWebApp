@@ -1362,8 +1362,7 @@ class DifferentialDetail extends Component {
       });
     };
 
-    const searchColor =
-      singleFeatureSearchText.length < 1 ? 'lightgrey' : 'blue';
+    const searchColor = singleFeatureSearchText.length < 1 ? null : 'blue';
     const searchIcon = singleFeatureSearchText.length < 1 ? 'search' : 'remove';
     const featuresText =
       multiFeaturesSearched.length === 1 ? 'FEATURE' : 'FEATURES';
