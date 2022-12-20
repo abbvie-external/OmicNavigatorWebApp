@@ -141,9 +141,9 @@ class DifferentialDetail extends Component {
         });
       } else {
         // single search filter
-        // filter the differentialResults for "includes" across all alphanumeric columns
         relevantSearched = [];
         differentialAlphanumericFields.forEach(columnKey => {
+          // filter the differentialResults for "includes" across all alphanumeric columns
           const columnIncludes = [...differentialResults].filter(d => {
             const columnValueLowercase = d[columnKey].toLowerCase();
             return columnValueLowercase.includes(singleFeatureSearched);
@@ -287,9 +287,9 @@ class DifferentialDetail extends Component {
         if (multiFeaturesSearched.length) {
           const multiFeaturesSearchedSet = new Set(multiFeaturesSearched);
           relevantDifferentialData = [];
-          differentialAlphanumericFields.forEach(daf => {
+          differentialAlphanumericFields.forEach(column => {
             const columnIncludes = [...differentialResults].filter(d => {
-              return multiFeaturesSearchedSet.has(d[daf]);
+              return multiFeaturesSearchedSet.has(d[column]);
             });
             relevantDifferentialData = [
               ...relevantDifferentialData,
@@ -300,10 +300,10 @@ class DifferentialDetail extends Component {
           // single search filter
           // filter the differentialResults for "includes" across all alphanumeric columns
           relevantDifferentialData = [];
-          differentialAlphanumericFields.forEach(daf => {
+          differentialAlphanumericFields.forEach(column => {
             const columnIncludes = [...differentialResults].filter(d => {
-              const dafLowercase = d[daf].toLowerCase();
-              return dafLowercase.includes(singleFeatureSearched);
+              const columnValueLowercase = d[column].toLowerCase();
+              return columnValueLowercase.includes(singleFeatureSearched);
             });
             relevantDifferentialData = [
               ...relevantDifferentialData,
@@ -311,6 +311,7 @@ class DifferentialDetail extends Component {
             ];
           });
         }
+        // de-duplicate array (might have pushed an object as it passed filter in multiple columns)
         relevantDifferentialData = [...new Set(relevantDifferentialData)];
       }
     }
@@ -911,10 +912,10 @@ class DifferentialDetail extends Component {
     if (singleFeatureSearchTextArg !== '') {
       relevantSearched = [];
       // filter the differentialResults for "includes" across all alphanumeric columns
-      differentialAlphanumericFields.forEach(daf => {
+      differentialAlphanumericFields.forEach(column => {
         const columnIncludes = [...differentialResults].filter(d => {
-          const dafLowercase = d[daf].toLowerCase();
-          return dafLowercase.includes(singleFeatureSearchTextArg);
+          const columnValueLowercase = d[column].toLowerCase();
+          return columnValueLowercase.includes(singleFeatureSearchTextArg);
         });
         relevantSearched = [...relevantSearched, ...columnIncludes];
       });
