@@ -117,11 +117,7 @@ class DifferentialDetail extends Component {
   }
 
   setRelevantData = () => {
-    const {
-      differentialResults,
-      differentialFeatureIdKey,
-      differentialAlphanumericFields,
-    } = this.props;
+    const { differentialResults, differentialAlphanumericFields } = this.props;
     const {
       multiFeaturesSearched,
       singleFeatureSearched,
@@ -137,9 +133,9 @@ class DifferentialDetail extends Component {
         relevantSearched = [];
         // multi-search filter
         const multiFeaturesSearchedSet = new Set(multiFeaturesSearched);
-        differentialAlphanumericFields.forEach(daf => {
+        differentialAlphanumericFields.forEach(columnKey => {
           const columnIncludes = [...differentialResults].filter(d => {
-            return multiFeaturesSearchedSet.has(d[daf]);
+            return multiFeaturesSearchedSet.has(d[columnKey]);
           });
           relevantSearched = [...relevantSearched, ...columnIncludes];
         });
@@ -147,10 +143,10 @@ class DifferentialDetail extends Component {
         // single search filter
         // filter the differentialResults for "includes" across all alphanumeric columns
         relevantSearched = [];
-        differentialAlphanumericFields.forEach(daf => {
+        differentialAlphanumericFields.forEach(columnKey => {
           const columnIncludes = [...differentialResults].filter(d => {
-            const dafLowercase = d[daf].toLowerCase();
-            return dafLowercase.includes(singleFeatureSearched);
+            const columnValueLowercase = d[columnKey].toLowerCase();
+            return columnValueLowercase.includes(singleFeatureSearched);
           });
           relevantSearched = [...relevantSearched, ...columnIncludes];
         });
@@ -1082,35 +1078,35 @@ class DifferentialDetail extends Component {
       .split(/[,\s]+/)
       .map(item => item.trim())
       .filter(Boolean);
-    // goal: set the new state for differentialTableData, which will update the scatter plot
+    // goal: set the new state for differentialTableData, which will update the scatter plot accordingly
+    // 1) Keep all of the differentialResults in the current scatter plot view
+    const allDataInScatterViewIdsSet = new Set(
+      [...allDataInScatterView].map(
+        d => d[this.props.differentialFeatureIdKey],
+      ),
+    );
+    let relevantDifferentialResultsInView = [...differentialResults].filter(d =>
+      allDataInScatterViewIdsSet.has(d[this.props.differentialFeatureIdKey]),
+    );
 
-    // 1) keep the differentialResults that pass MULTIFEATURE SEARCH filters
+    // 2) keep the "relevantDifferentialResultsInView" that pass MULTIFEATURE SEARCH filters
     const multiFeatureSearchTextSet = new Set(multiFeatureSearchTextSplit);
-    // filter the differentialResults for "includes" across all alphanumeric columns
-    let relevantDifferentialDataSearchAndInView = [];
-    differentialAlphanumericFields.forEach(daf => {
-      const columnIncludes = [...differentialResults].filter(d => {
-        return multiFeatureSearchTextSet.has(d[daf]);
-      });
-      relevantDifferentialDataSearchAndInView = [
-        ...relevantDifferentialDataSearchAndInView,
-        ...columnIncludes,
-      ];
-    });
-
-    // filter the differentialResults for "includes" across all alphanumeric columns
     let multiFeaturesFound = [];
-    differentialAlphanumericFields.forEach(daf => {
-      const columnIncludes = [...allDataInScatterView].filter(d => {
-        if (multiFeatureSearchTextSet.has(d[daf])) {
-          // push the features found to an array
-          // that will be used to calculate the "Not Found" state
-          multiFeaturesFound.push(d[daf]);
-          return true;
-        } else return false;
-      });
-      relevantDifferentialDataSearchAndInView = [
-        ...relevantDifferentialDataSearchAndInView,
+    let relevantDifferentialResultsInViewAndSearch = [];
+    differentialAlphanumericFields.forEach(columnKey => {
+      // filter the differentialResults for "includes" across all alphanumeric columns
+      const columnIncludes = [...relevantDifferentialResultsInView].filter(
+        d => {
+          if (multiFeatureSearchTextSet.has(d[columnKey])) {
+            // push the features found to an array
+            // that will be used to calculate the "Not Found" state
+            multiFeaturesFound.push(d[columnKey]);
+            return true;
+          } else return false;
+        },
+      );
+      relevantDifferentialResultsInViewAndSearch = [
+        ...relevantDifferentialResultsInViewAndSearch,
         ...columnIncludes,
       ];
     });
@@ -1131,9 +1127,9 @@ class DifferentialDetail extends Component {
     const uniqueMultiFeaturesFoundValues = [...new Set(multiFeaturesFoundSet)];
 
     this.setState({
-      differentialTableData: relevantDifferentialDataSearchAndInView,
+      differentialTableData: relevantDifferentialResultsInViewAndSearch,
       differentialTableRows:
-        relevantDifferentialDataSearchAndInView?.length || 0,
+        relevantDifferentialResultsInViewAndSearch?.length || 0,
       multiFeaturesSearched: uniqueMultiFeaturesFoundValues,
       multiFeaturesNotFound: uniqueMultiFeaturesNotFoundValues,
       multiFeatureSearchOpen: uniqueMultiFeaturesNotFoundValues.length
