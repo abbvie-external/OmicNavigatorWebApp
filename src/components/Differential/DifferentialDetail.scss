@@ -345,7 +345,7 @@
 
 #MultiFeatureSearchPopup {
   top: 61px !important;
-  left: -235px !important;
+  left: -375px !important;
 }
 
 #multiFeatureSearchTextError {
@@ -372,4 +372,10 @@
 
 #LimitNotFoundText {
   font-size: 14px;
+}
+
+#MultiFeatureSearchTermsLabel {
+  background-color: #2185d0;
+  color: white;
+  border-radius: 0;
 }

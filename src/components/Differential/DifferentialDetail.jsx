@@ -1195,6 +1195,7 @@ class DifferentialDetail extends Component {
       multiFeaturesNotFound,
       multiFeatureSearchActive,
       notFoundLimit,
+      filteredDifferentialTableData,
     } = this.state;
 
     const {
@@ -1364,8 +1365,10 @@ class DifferentialDetail extends Component {
 
     const searchColor = singleFeatureSearchText.length < 1 ? null : 'blue';
     const searchIcon = singleFeatureSearchText.length < 1 ? 'search' : 'remove';
-    const featuresText =
-      multiFeaturesSearched.length === 1 ? 'FEATURE' : 'FEATURES';
+    const featuresFoundText =
+      filteredDifferentialTableData.length === 1 ? 'FEATURE' : 'FEATURES';
+    const termsSearchText =
+      multiFeaturesSearched.length === 1 ? 'TERM' : 'TERMS';
     const SearchPopupStyle = {
       backgroundColor: '2E2E2E',
       borderBottom: '2px solid var(--color-primary)',
@@ -1397,6 +1400,7 @@ class DifferentialDetail extends Component {
                 className={
                   singleFeatureSearchText.length ? 'FakeDisabled' : null
                 }
+                size="small"
                 icon
                 id="MultiFeatureSearchToggle"
                 onClick={() => {
@@ -1446,12 +1450,17 @@ class DifferentialDetail extends Component {
               trigger={
                 <Button
                   as="div"
+                  size="small"
                   labelPosition="right"
                   onClick={() => toggleMultiFeatureSearch()}
                 >
-                  <Button color="blue" size="small">
-                    {multiFeaturesSearched.length} {featuresText} FOUND
-                  </Button>
+                  <Label as="a" image>
+                    {filteredDifferentialTableData.length} {featuresFoundText}{' '}
+                    FOUND
+                    <Label.Detail id="MultiFeatureSearchTermsLabel">
+                      {multiFeaturesSearched.length} {termsSearchText} SEARCHED
+                    </Label.Detail>
+                  </Label>
                   <Label
                     as="a"
                     basic
@@ -1508,7 +1517,7 @@ class DifferentialDetail extends Component {
                 <Form>
                   <Form.TextArea
                     autoFocus
-                    placeholder="Separate featurs with a comma, space, or newline (NOTE: This is an exact search)"
+                    placeholder="Separate features with a comma, space, or newline (NOTE: This is an exact search)"
                     name="multiFeatureSearchText"
                     id="multiFeatureSearchTextArea"
                     value={multiFeatureSearchText}
