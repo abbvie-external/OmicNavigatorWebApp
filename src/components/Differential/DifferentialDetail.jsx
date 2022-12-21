@@ -1508,7 +1508,7 @@ class DifferentialDetail extends Component {
                 <Form>
                   <Form.TextArea
                     autoFocus
-                    placeholder="Separate featurs with a comma, space, or newline (NOTE: This is an exact search)"
+                    placeholder="Separate features with a comma, space, or newline (NOTE: This is an exact search)"
                     name="multiFeatureSearchText"
                     id="multiFeatureSearchTextArea"
                     value={multiFeatureSearchText}
