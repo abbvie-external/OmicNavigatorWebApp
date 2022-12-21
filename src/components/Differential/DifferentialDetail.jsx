@@ -1514,6 +1514,7 @@ class DifferentialDetail extends Component {
                     value={multiFeatureSearchText}
                     onChange={this.handleMultiFeatureSearchTextChange}
                     onFocus={this.moveCaretAtEnd}
+                    spellCheck={false}
                   />
                 </Form>
                 {multiFeatureSearchTextError ? (
