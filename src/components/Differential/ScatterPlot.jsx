@@ -1499,8 +1499,19 @@ class ScatterPlot extends Component {
             // SHIFT BOX-SELECT FOR MULTI-FEATURE PLOTS
             d3.event.sourceEvent?.shiftKey
           ) {
+            // filter out irrelevant grey circles
+            const filteredDifferentialTableDataSet = new Set(
+              [...self.props.filteredDifferentialTableData].map(
+                d => d[self.props.differentialFeatureIdKey],
+              ),
+            );
+            const intersection = [...total].filter(d =>
+              filteredDifferentialTableDataSet.has(
+                d[self.props.differentialFeatureIdKey],
+              ),
+            );
             let boxSelectionToHighlight = self.mapBoxSelectionToHighlight([
-              ...total,
+              ...intersection,
             ]);
             self.props.onHandleHighlightedFeaturesDifferential(
               boxSelectionToHighlight,

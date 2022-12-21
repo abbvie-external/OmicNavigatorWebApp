@@ -1450,7 +1450,7 @@ class DifferentialDetail extends Component {
                   onClick={() => toggleMultiFeatureSearch()}
                 >
                   <Button color="blue" size="small">
-                    {multiFeaturesSearched.length} {featuresText} SEARCHED
+                    {multiFeaturesSearched.length} {featuresText} FOUND
                   </Button>
                   <Label
                     as="a"
