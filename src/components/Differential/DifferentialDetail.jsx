@@ -172,6 +172,7 @@ class DifferentialDetail extends Component {
       differentialTableRows:
         uniqueRelevantSearchedAndInScatterView?.length || 0,
       filteredDifferentialTableData: uniqueRelevantSearchedAndInScatterView,
+      multiFeatureSearchActive: true,
     });
   };
 
@@ -1523,6 +1524,7 @@ class DifferentialDetail extends Component {
                     value={multiFeatureSearchText}
                     onChange={this.handleMultiFeatureSearchTextChange}
                     onFocus={this.moveCaretAtEnd}
+                    spellCheck={false}
                   />
                 </Form>
                 {multiFeatureSearchTextError ? (
