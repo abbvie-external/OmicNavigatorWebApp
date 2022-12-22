@@ -408,6 +408,13 @@
   color: var(--color-primary) !important;
 }
 
+.FakeDisabled {
+  cursor: default;
+  opacity: 0.45 !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
 .BottomBar {
   background-color: var(--color-dark) !important;
   text-align: center;

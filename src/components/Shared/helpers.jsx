@@ -576,10 +576,14 @@ export function getIdArg(
     );
     const isNotMappingId = firstMappingModelIndex > 0;
     if (isNotMappingId) {
-      const idMappingObject = multiModelMappingArrays.filter(m =>
-        Object.values(m).includes(id),
-      );
-      mappingId = idMappingObject[0]?.[differentialModel] || id;
+      if (multiModelMappingArrays?.length) {
+        const idMappingObject = multiModelMappingArrays.filter(m =>
+          Object.values(m).includes(id),
+        );
+        mappingId = idMappingObject[0]?.[differentialModel] || id;
+      } else {
+        mappingId = id;
+      }
     }
     return mappingId;
   }
