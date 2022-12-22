@@ -172,6 +172,7 @@ class DifferentialDetail extends Component {
       differentialTableRows:
         uniqueRelevantSearchedAndInScatterView?.length || 0,
       filteredDifferentialTableData: uniqueRelevantSearchedAndInScatterView,
+      multiFeatureSearchActive: true,
     });
   };
 
@@ -1364,8 +1365,7 @@ class DifferentialDetail extends Component {
 
     const searchColor = singleFeatureSearchText.length < 1 ? null : 'blue';
     const searchIcon = singleFeatureSearchText.length < 1 ? 'search' : 'remove';
-    const featuresText =
-      multiFeaturesSearched.length === 1 ? 'FEATURE' : 'FEATURES';
+    const termsText = multiFeaturesSearched.length === 1 ? 'TERM' : 'TERMS';
     const SearchPopupStyle = {
       backgroundColor: '2E2E2E',
       borderBottom: '2px solid var(--color-primary)',
@@ -1450,7 +1450,7 @@ class DifferentialDetail extends Component {
                   onClick={() => toggleMultiFeatureSearch()}
                 >
                   <Button color="blue" size="small">
-                    {multiFeaturesSearched.length} {featuresText} FOUND
+                    {multiFeaturesSearched.length} {termsText} SEARCHED
                   </Button>
                   <Label
                     as="a"
