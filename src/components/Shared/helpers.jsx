@@ -661,3 +661,8 @@ export function getModelsArg(
     return models;
   }
 }
+
+// helper function to get the difference between two sets
+export function getDifferenceTwoSets(setA, setB) {
+  return new Set([...setA].filter(element => !setB.has(element)));
+}

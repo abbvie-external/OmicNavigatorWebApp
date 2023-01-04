@@ -408,6 +408,11 @@
   color: var(--color-primary) !important;
 }
 
+.LinkBackground {
+  background-color: var(--color-link) !important;
+  color: var(--color-white) !important;
+}
+
 .FakeDisabled {
   cursor: default;
   opacity: 0.45 !important;
