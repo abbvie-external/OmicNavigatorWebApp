@@ -1250,6 +1250,7 @@ class DifferentialDetail extends Component {
   handleMultiSearchClear = () => {
     this.setState({
       multiFeatureSearchText: '',
+      multiFeatureSearchActive: true,
     });
   };
 
