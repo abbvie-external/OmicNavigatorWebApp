@@ -1284,13 +1284,26 @@ class DifferentialDetail extends Component {
       differentialAlphanumericFields,
       differentialResultsUnfiltered,
     } = this.props;
-    const { allDataInScatterView, multiFeatureSearchText } = this.state;
+    const {
+      allDataInScatterView,
+      multiFeatureSearchText,
+      multiFeaturesFilteredOut,
+    } = this.state;
     const multiFeatureSearchTextSplit = multiFeatureSearchText
       // split by comma or whitespace (\s), trim and filter out empty strings
       .split(/[,\s]+/)
       .map(item => item.trim())
       .filter(Boolean);
-    const multiFeatureSearchTextSet = new Set(multiFeatureSearchTextSplit);
+    const multiFeatureSearchTextAndFilteredOut = [
+      ...multiFeatureSearchTextSplit,
+      ...multiFeaturesFilteredOut,
+    ];
+    const uniqueMultiFeatureSearchTextAndFilteredOut = [
+      ...new Set(multiFeatureSearchTextAndFilteredOut),
+    ];
+    const multiFeatureSearchTextSet = new Set(
+      uniqueMultiFeatureSearchTextAndFilteredOut,
+    );
     // goal: set the new state for differentialTableData, which will update the scatter plot accordingly
     // 1) Set the "NOT FOUND" data
     let multiFeaturesUnfilteredFound = [];
@@ -1620,10 +1633,26 @@ class DifferentialDetail extends Component {
     const notFoundList = limitNotFound
       ? [...multiFeaturesNotFound].slice(0, notFoundLimit)
       : [...multiFeaturesNotFound];
+    const notFoundAdditional = limitNotFound
+      ? [...multiFeaturesNotFound].slice(
+          notFoundLimit,
+          multiFeaturesNotFound.length,
+        )
+      : [];
     const limitNotFoundText = limitNotFound ? (
-      <span id="LimitNotFoundText">
-        ...{notFoundLength - notFoundLimit} more
-      </span>
+      <Popup
+        trigger={
+          <span id="LimitNotFoundText">
+            ...{notFoundLength - notFoundLimit} more
+          </span>
+        }
+        style={SearchPopupStyle}
+        className="TablePopupValue"
+        content={notFoundAdditional.toString().replace(/,/g, ', ')}
+        // inverted
+        // basic
+        position="right center"
+      />
     ) : null;
 
     const filteredOutLength = multiFeaturesFilteredOut.length;
@@ -1632,10 +1661,26 @@ class DifferentialDetail extends Component {
     const filteredOutList = limitFilteredOut
       ? [...multiFeaturesFilteredOut].slice(0, filteredOutLimit)
       : [...multiFeaturesFilteredOut];
+    const filteredOutAdditional = limitFilteredOut
+      ? [...multiFeaturesFilteredOut].slice(
+          filteredOutLimit,
+          multiFeaturesFilteredOut.length,
+        )
+      : [];
     const limitFilteredOutText = limitFilteredOut ? (
-      <span id="LimitfilteredOutText">
-        ...{filteredOutLength - filteredOutLimit} more
-      </span>
+      <Popup
+        trigger={
+          <span id="LimitfilteredOutText">
+            ...{filteredOutLength - filteredOutLimit} more
+          </span>
+        }
+        // style={SearchPopupStyle}
+        // className="TablePopupValue"
+        content={filteredOutAdditional.toString().replace(/,/g, ', ')}
+        // inverted
+        // basic
+        position="right center"
+      />
     ) : null;
     const multiSearchInput = (
       // this.state.multiSearching ? (
