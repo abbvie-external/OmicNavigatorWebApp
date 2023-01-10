@@ -1423,6 +1423,7 @@ class DifferentialDetail extends Component {
       singleFeatureSearchText,
       // singleFeatureSearchIcon,
       multiSearching,
+      multiFeaturesSearched,
       multiFeatureSearchText,
       multiFeatureSearchTextError,
       multiFeatureSearchOpen,
@@ -1694,7 +1695,23 @@ class DifferentialDetail extends Component {
             <Popup
               closeOnDocumentClick
               closeOnEscape
-              onClose={() => this.setState({ multiFeatureSearchOpen: false })}
+              onClose={() => {
+                const setSingleSearch =
+                  !multiFeaturesSearched.length && multiFeatureSearchText === ''
+                    ? true
+                    : false;
+                if (setSingleSearch) {
+                  // if user closes popup without search or textarea
+                  this.setState({
+                    multiSearching: false,
+                    multiFeaturesNotFound: [],
+                    multiFeaturesFilteredOut: [],
+                    multiFeatureSearchActive: false,
+                    multiFeatureSearchTextError: false,
+                  });
+                }
+                this.setState({ multiFeatureSearchOpen: false });
+              }}
               trigger={
                 <Button
                   as="div"
