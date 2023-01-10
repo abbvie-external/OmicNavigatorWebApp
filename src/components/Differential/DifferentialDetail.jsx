@@ -1625,7 +1625,12 @@ class DifferentialDetail extends Component {
       color: '#FFF',
       padding: '1em',
       maxWidth: '50vw',
-      fontSize: '13px',
+      fontSize: '12px',
+      wordBreak: 'break-all',
+    };
+    const SearchPopupMinimalStyle = {
+      maxWidth: '25vw',
+      fontSize: '12px',
       wordBreak: 'break-all',
     };
     const notFoundLength = multiFeaturesNotFound.length;
@@ -1646,12 +1651,10 @@ class DifferentialDetail extends Component {
             ...{notFoundLength - notFoundLimit} more
           </span>
         }
-        style={SearchPopupStyle}
+        style={SearchPopupMinimalStyle}
         className="TablePopupValue"
         content={notFoundAdditional.toString().replace(/,/g, ', ')}
-        // inverted
-        // basic
-        position="right center"
+        position="bottom center"
       />
     ) : null;
 
@@ -1670,16 +1673,14 @@ class DifferentialDetail extends Component {
     const limitFilteredOutText = limitFilteredOut ? (
       <Popup
         trigger={
-          <span id="LimitfilteredOutText">
+          <span id="LimitFilteredOutText">
             ...{filteredOutLength - filteredOutLimit} more
           </span>
         }
-        // style={SearchPopupStyle}
-        // className="TablePopupValue"
+        style={SearchPopupMinimalStyle}
+        className="TablePopupValue"
         content={filteredOutAdditional.toString().replace(/,/g, ', ')}
-        // inverted
-        // basic
-        position="right center"
+        position="bottom center"
       />
     ) : null;
     const multiSearchInput = (
