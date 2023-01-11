@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import _ from 'lodash-es';
 import CustomEmptyMessage from '../Shared/Templates';
-// eslint-disable-next-line no-unused-vars
 import { EZGrid } from '../Shared/QHGrid/index.module.js';
 import PlotsOverlay from './PlotsOverlay';
 import PlotsDynamic from './PlotsDynamic';
@@ -176,9 +175,6 @@ class DifferentialDetail extends Component {
     relevantSearchedAndInScatterView = [...relevantSearched].filter(d =>
       allDataInScatterViewIdsSet.has(d[this.props.differentialFeatureIdKey]),
     );
-    // const relevantSearchedAndInScatterViewSet = new Set(
-    //   relevantSearchedAndInScatterView,
-    // );
     const uniqueRelevantSearchedAndInScatterView = [
       ...new Set(relevantSearchedAndInScatterView),
     ];
@@ -380,8 +376,6 @@ class DifferentialDetail extends Component {
       ];
       this.setState({
         // on scatter brush, make search active
-        // singleFeatureSearchActive: true,
-        // singleFeatureSearchIcon: 'search',
         multiFeatureSearchActive: false,
         multiFeaturesSearched: uniqueMultiFeaturesFoundValues,
         multiFeaturesFilteredOut: uniqueMultiFeaturesFilteredOutValues,
@@ -1470,9 +1464,7 @@ class DifferentialDetail extends Component {
       direction,
       differentialDynamicPlotWidth,
       enableTabChangeOnSelection,
-      // singleFeatureSearchActive,
       singleFeatureSearchText,
-      // singleFeatureSearchIcon,
       multiSearching,
       multiFeaturesSearched,
       multiFeatureSearchText,
@@ -1520,15 +1512,6 @@ class DifferentialDetail extends Component {
     // if (multisetQueriedDifferential) {
     //   DifferentialDetailCacheKey = `${differentialStudy}-${differentialModel}-${differentialTest}-${multisetQueriedDifferential}-Volcano`;
     // }
-
-    // const maxWidthPopupStyle = {
-    //   backgroundColor: '2E2E2E',
-    //   borderBottom: '2px solid var(--color-primary)',
-    //   color: '#FFF',
-    //   padding: '1em',
-    //   maxWidth: '15vw',
-    //   fontSize: '13px',
-    // };
 
     const selectAllPopupStyle = {
       backgroundColor: '2E2E2E',
@@ -1816,33 +1799,6 @@ class DifferentialDetail extends Component {
                     <Icon name="remove" />
                   </Label>
                 </Button>
-                // <Button
-                //   as="div"
-                //   size="small"
-                //   labelPosition="right"
-                //   onClick={() => toggleMultiFeatureSearch()}
-                // >
-                //   <Label as="a" image>
-                //     {filteredDifferentialTableData.length} {featuresFoundText}{' '}
-                //     FOUND
-                //     <Label.Detail id="MultiFeatureSearchTermsLabel">
-                //       {multiFeaturesSearched.length} {termsSearchText} SEARCHED
-                //     </Label.Detail>
-                //   </Label>
-                //   <Label
-                //     as="a"
-                //     basic
-                //     color="blue"
-                //     pointing="left"
-                //     onClick={e => {
-                //       e.stopPropagation();
-                //       this.handleMultiSearchCancel();
-                //     }}
-                //     id="ClearMultiFeatureSearchLabel"
-                //   >
-                //     <Icon name="remove" />
-                //   </Label>
-                // </Button>
               }
               position="right center"
               basic
@@ -2034,16 +1990,7 @@ class DifferentialDetail extends Component {
         onFiltered={this.handleTableChange}
         disableQuickViewEditing
         disableQuickViewMenu
-        extraHeaderItem={
-          multiSearchInput
-          // <Dropdown
-          //   placeholder="Search"
-          //   multiple
-          //   search
-          //   selection
-          //   options={differentialTableDataOptions}
-          // />
-        }
+        extraHeaderItem={multiSearchInput}
       />
     );
     const scatterPlot = (
