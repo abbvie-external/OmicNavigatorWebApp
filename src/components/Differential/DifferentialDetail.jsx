@@ -1445,6 +1445,7 @@ class DifferentialDetail extends Component {
       this.setState({
         multiFeatureSearchText: multiFeaturesSearched.toString(),
         multiFeatureSearchOpen: false,
+        multiFeatureSearchActive: false,
       });
       // }
     }
