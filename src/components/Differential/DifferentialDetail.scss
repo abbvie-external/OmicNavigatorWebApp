@@ -353,6 +353,11 @@
   color: var(--color-primary);
 }
 
+#multiFeatureSearchWarning {
+  margin: 10px 0 !important;
+  // color: var(--color-primary);
+}
+
 #MultiFeaturesSearchedList {
   margin: 10px 0 5px 0;
 }
@@ -370,6 +375,13 @@
   margin-left: 5px;
 }
 
-#LimitNotFoundText {
+#LimitNotFoundText,
+#LimitFilteredOutText {
   font-size: 14px;
+}
+
+#MultiFeatureSearchTermsLabel {
+  background-color: #2185d0;
+  color: white;
+  border-radius: 0;
 }
