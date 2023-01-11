@@ -81,6 +81,7 @@ class DifferentialDetail extends Component {
     multiFeaturesFilteredOut: [],
     multiFeatureSearchActive: false,
     multiFeatureSearchTextError: false,
+    multiFeatureSearchWarning: false,
     notFoundLimit: 5,
     filteredOutLimit: 5,
     eventFromTableColumnFilter: true,
@@ -134,7 +135,6 @@ class DifferentialDetail extends Component {
     // which sets new state for volcanoPlotSelectedDataArr (consumed by scatter plot)
     let relevantSearched = [...differentialResults];
     // 1) keep the differentialResults that pass single or multiple feature SEARCH filters
-    // PAUL - what is this below? the filtered out labels are not staying after a set analysis
     const multiFeaturesSearchedAndFilteredOut = [
       ...multiFeaturesFilteredOut,
       ...multiFeaturesSearched,
@@ -211,8 +211,6 @@ class DifferentialDetail extends Component {
       );
       uniqueFilteredOutValues = [...new Set(newlyFilteredOutSet)];
       this.setState({
-        // PAUL
-        // adjust the not found, and found (new text)
         multiFeaturesFilteredOut: uniqueFilteredOutValues,
         multiFeatureSearchText: multiFeaturesFound.toString(),
         multiFeatureSearchActive: false,
@@ -246,6 +244,7 @@ class DifferentialDetail extends Component {
         multiFeaturesFilteredOut: [],
         multiFeatureSearchActive: false,
         multiFeatureSearchTextError: false,
+        multiFeatureSearchWarning: false,
         // data
         allDataInScatterView: this.props.differentialResultsUnfiltered,
         differentialTableData: this.props.differentialResults,
@@ -335,6 +334,7 @@ class DifferentialDetail extends Component {
       eventFromTableColumnFilter: false,
       multiFeaturesNotFound: [],
       multiFeatureSearchTextError: false,
+      multiFeatureSearchWarning: false,
     });
     const multiFeaturesSearchedAndFilteredOut = [
       ...multiFeaturesSearched,
@@ -386,6 +386,7 @@ class DifferentialDetail extends Component {
         multiFeaturesSearched: uniqueMultiFeaturesFoundValues,
         multiFeaturesFilteredOut: uniqueMultiFeaturesFilteredOutValues,
         multiFeatureSearchTextError: false,
+        multiFeatureSearchWarning: false,
         multiFeatureSearchText: uniqueMultiFeaturesFoundValues.toString(),
       });
     }
@@ -432,6 +433,7 @@ class DifferentialDetail extends Component {
             multiFeaturesNotFound: [],
             multiFeaturesFilteredOut: uniqueFilteredOutValues,
             multiFeatureSearchTextError: false,
+            multiFeatureSearchWarning: false,
             multiFeatureSearchText: uniqueFoundValues.toString(),
           });
         } else {
@@ -1228,22 +1230,27 @@ class DifferentialDetail extends Component {
     this.setState({
       multiFeatureSearchText: value,
       multiFeatureSearchActive: true,
+      multiFeatureSearchWarning: false,
     });
   };
 
   submitMultiFeatureSearch = () => {
     const { multiFeatureSearchText } = this.state;
     if (
-      multiFeatureSearchText !== '' ||
-      multiFeatureSearchText.includes(',') ||
-      multiFeatureSearchText.includes('\n') ||
-      this.hasWhitespace(multiFeatureSearchText)
+      multiFeatureSearchText !== '' &&
+      multiFeatureSearchText !== ',' &&
+      (multiFeatureSearchText.includes(',') ||
+        multiFeatureSearchText.includes('\n') ||
+        this.hasWhitespace(multiFeatureSearchText))
     ) {
       // do the multi-search!
       this.handleMultiFeatureSearch();
     } else {
       // no delimiters
-      this.setState({ multiFeatureSearchTextError: true });
+      this.setState({
+        multiFeatureSearchTextError: true,
+        multiFeatureSearchWarning: false,
+      });
     }
   };
 
@@ -1270,6 +1277,7 @@ class DifferentialDetail extends Component {
       multiFeaturesNotFound: [],
       multiFeaturesFilteredOut: [],
       multiFeatureSearchTextError: false,
+      multiFeatureSearchWarning: false,
       differentialTableData: emptySearchData,
       differentialTableRows: emptySearchData?.length || 0,
       singleFeatureSearchActive: false,
@@ -1396,6 +1404,7 @@ class DifferentialDetail extends Component {
         ? true
         : false,
       multiFeatureSearchTextError: uniqueMultiFeaturesNotFoundValues.length,
+      multiFeatureSearchWarning: false,
       multiFeatureSearchText: uniqueMultiFeaturesPassingFiltersValues.toString(),
       multiFeatureSearchActive: false,
       singleFeatureSearchActive: false,
@@ -1416,6 +1425,35 @@ class DifferentialDetail extends Component {
     //     this.resetSearchAndData(allDataInScatterView);
     //   }
     // }
+  };
+
+  toggleMultiFeatureSearch = bool => {
+    this.setState({
+      multiFeatureSearchOpen: bool ? bool : !this.state.multiFeatureSearchOpen,
+      multiSearching: bool ? bool : this.state.multiSearching,
+    });
+  };
+
+  closeMultiSearch = () => {
+    const {
+      multiFeaturesSearched,
+      // multiFeatureSearchText
+    } = this.state;
+    const setSingleSearch = !multiFeaturesSearched.length
+      ? // && multiFeatureSearchText === ''
+        true
+      : false;
+    if (setSingleSearch) {
+      // if user closes popup without search or textarea
+      this.handleMultiSearchCancel();
+    } else {
+      // if (multiFeaturesSearched.length) {
+      this.setState({
+        multiFeatureSearchText: multiFeaturesSearched.toString(),
+        multiFeatureSearchOpen: false,
+      });
+      // }
+    }
   };
 
   render() {
@@ -1439,6 +1477,7 @@ class DifferentialDetail extends Component {
       multiFeaturesSearched,
       multiFeatureSearchText,
       multiFeatureSearchTextError,
+      multiFeatureSearchWarning,
       multiFeatureSearchOpen,
       multiFeaturesNotFound,
       multiFeaturesFilteredOut,
@@ -1604,15 +1643,6 @@ class DifferentialDetail extends Component {
       wordBreak: 'break-all',
     };
 
-    const toggleMultiFeatureSearch = bool => {
-      this.setState({
-        multiFeatureSearchOpen: bool
-          ? bool
-          : !this.state.multiFeatureSearchOpen,
-        multiSearching: bool ? bool : this.state.multiSearching,
-      });
-    };
-
     const searchColor = singleFeatureSearchText.length < 1 ? null : 'blue';
     const searchIcon = singleFeatureSearchText.length < 1 ? 'search' : 'remove';
     const featuresFoundText =
@@ -1700,7 +1730,7 @@ class DifferentialDetail extends Component {
                 id="MultiFeatureSearchToggle"
                 onClick={() => {
                   if (!singleFeatureSearchText.length)
-                    toggleMultiFeatureSearch(true);
+                    this.toggleMultiFeatureSearch(true);
                 }}
               >
                 <Icon name="unordered list" />
@@ -1742,27 +1772,31 @@ class DifferentialDetail extends Component {
               closeOnDocumentClick
               closeOnEscape
               onClose={() => {
-                const setSingleSearch =
-                  !multiFeaturesSearched.length && multiFeatureSearchText === ''
-                    ? true
-                    : false;
-                if (setSingleSearch) {
-                  // if user closes popup without search or textarea
+                if (
+                  multiFeatureSearchActive &&
+                  (multiFeaturesSearched.length ||
+                    multiFeatureSearchText !== '')
+                ) {
+                  // if the search is active
+                  // (meaning it's been altered since last search was applied)
+                  // AND
+                  // a search has already found results
+                  // OR
+                  // the search text is not empty
+                  // THEN
+                  // show the warning
                   this.setState({
-                    multiSearching: false,
-                    multiFeaturesNotFound: [],
-                    multiFeaturesFilteredOut: [],
-                    multiFeatureSearchActive: false,
-                    multiFeatureSearchTextError: false,
+                    multiFeatureSearchWarning: true,
                   });
+                } else {
+                  this.closeMultiSearch();
                 }
-                this.setState({ multiFeatureSearchOpen: false });
               }}
               trigger={
                 <Button
                   as="div"
                   labelPosition="right"
-                  onClick={() => toggleMultiFeatureSearch()}
+                  onClick={() => this.toggleMultiFeatureSearch()}
                 >
                   <Button color="blue" size="small">
                     {filteredDifferentialTableData.length} {featuresFoundText}{' '}
@@ -1893,6 +1927,48 @@ class DifferentialDetail extends Component {
                     space or newline?
                   </Popup.Content>
                 ) : null}
+                {multiFeatureSearchWarning ? (
+                  <Popup.Content id="multiFeatureSearchWarning">
+                    <Grid>
+                      <Grid.Row>
+                        <Grid.Column width={11}>
+                          Text has changed but has not been searched.{' '}
+                          <strong>Are you sure you want to close?</strong>
+                          <br></br>"Yes" will close the popup and reset the text
+                          to your last search (if it exists).
+                        </Grid.Column>
+                        <Grid.Column width={5}>
+                          <div className="FloatLeft">
+                            <Button
+                              size="small"
+                              icon
+                              color="blue"
+                              onClick={() => {
+                                this.setState({
+                                  multiFeatureSearchWarning: false,
+                                });
+                                this.closeMultiSearch();
+                              }}
+                            >
+                              <Icon name="check" /> Yes
+                            </Button>
+                            <Button
+                              size="small"
+                              icon
+                              onClick={() => {
+                                this.setState({
+                                  multiFeatureSearchWarning: false,
+                                });
+                              }}
+                            >
+                              <Icon name="remove" /> No
+                            </Button>
+                          </div>
+                        </Grid.Column>
+                      </Grid.Row>
+                    </Grid>
+                  </Popup.Content>
+                ) : null}
                 <div>
                   <Button
                     className={
@@ -1910,7 +1986,11 @@ class DifferentialDetail extends Component {
                   />
                   <Button
                     className="multiSearchAction"
-                    content={multiFeatureSearchText.length ? 'Clear' : 'Cancel'}
+                    content={
+                      multiFeatureSearchText.length
+                        ? 'Clear Text'
+                        : 'Cancel Search'
+                    }
                     onClick={
                       multiFeatureSearchText.length
                         ? this.handleMultiSearchClear
