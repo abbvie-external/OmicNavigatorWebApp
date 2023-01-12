@@ -141,8 +141,12 @@ class DifferentialDetail extends Component {
     const multiFeaturesSearchedAndFilteredOutSet = new Set(
       multiFeaturesSearchedAndFilteredOut,
     );
-    if (multiFeaturesSearched.length || singleFeatureSearched.length) {
-      if (multiFeaturesSearched.length) {
+    if (
+      multiFeaturesSearched.length ||
+      multiFeaturesFilteredOut.length ||
+      singleFeatureSearched.length
+    ) {
+      if (multiFeaturesSearched.length || multiFeaturesFilteredOut.length) {
         relevantSearched = [];
         // multi-search filter
         // const multiFeaturesSearchedSet = new Set(multiFeaturesSearched);
@@ -180,7 +184,7 @@ class DifferentialDetail extends Component {
     ];
     let uniqueFilteredOutValues = []; // multiFeaturesFilteredOut
 
-    if (multiFeaturesSearched.length) {
+    if (multiFeaturesSearched.length || multiFeaturesFilteredOut.length) {
       // reset the multi-feature search 'filtered out' labels
       // const multiFeaturesSearchedAndFilteredOut = [...multiFeaturesSearched, ...multiFeaturesFilteredOut];
       let multiFeaturesFound = [];
@@ -208,6 +212,7 @@ class DifferentialDetail extends Component {
       uniqueFilteredOutValues = [...new Set(newlyFilteredOutSet)];
       this.setState({
         multiFeaturesFilteredOut: uniqueFilteredOutValues,
+        multiFeaturesSearched: multiFeaturesFound,
         multiFeatureSearchText: multiFeaturesFound.toString(),
         multiFeatureSearchActive: false,
         eventFromTableColumnFilter: false,
@@ -947,8 +952,9 @@ class DifferentialDetail extends Component {
         // and the multi-feature search is in effect
         // update the multi-feature search UI
         if (
-          eventFromTableColumnFilter &&
-          (multiFeaturesSearched.length || multiFeaturesFilteredOut.length)
+          // eventFromTableColumnFilter &&
+          multiFeaturesSearched.length ||
+          multiFeaturesFilteredOut.length
           // multiFeaturesSearchedAndFilteredOut.length
         ) {
           const multiFeaturesSearchedAndFilteredOut = [
@@ -1431,12 +1437,14 @@ class DifferentialDetail extends Component {
   closeMultiSearch = () => {
     const {
       multiFeaturesSearched,
+      multiFeaturesFilteredOut,
       // multiFeatureSearchText
     } = this.state;
-    const setSingleSearch = !multiFeaturesSearched.length
-      ? // && multiFeatureSearchText === ''
-        true
-      : false;
+    const setSingleSearch =
+      !multiFeaturesSearched.length && !multiFeaturesFilteredOut.length
+        ? // && multiFeatureSearchText === ''
+          true
+        : false;
     if (setSingleSearch) {
       // if user closes popup without search or textarea
       this.handleMultiSearchCancel();
@@ -1759,6 +1767,7 @@ class DifferentialDetail extends Component {
                 if (
                   multiFeatureSearchActive &&
                   (multiFeaturesSearched.length ||
+                    multiFeaturesFilteredOut.length ||
                     multiFeatureSearchText !== '')
                 ) {
                   // if the search is active
