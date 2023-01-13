@@ -83,7 +83,6 @@ class DifferentialDetail extends Component {
     multiFeatureSearchWarning: false,
     notFoundLimit: 5,
     filteredOutLimit: 5,
-    eventFromTableColumnFilter: true,
   };
   volcanoPlotFilteredGridRef = React.createRef();
 
@@ -112,7 +111,6 @@ class DifferentialDetail extends Component {
       this.setState({
         allDataInScatterView: differentialResultsUnfiltered,
         multiFeaturesNotFound: [],
-        eventFromTableColumnFilter: true,
       });
     }
     if (prevProps.differentialResults !== differentialResults) {
@@ -215,7 +213,6 @@ class DifferentialDetail extends Component {
         multiFeaturesSearched: multiFeaturesFound,
         multiFeatureSearchText: multiFeaturesFound.toString(),
         multiFeatureSearchActive: false,
-        eventFromTableColumnFilter: false,
       });
     }
 
@@ -251,7 +248,6 @@ class DifferentialDetail extends Component {
         differentialTableData: this.props.differentialResults,
         differentialTableRows: this.props.differentialResults.length,
         volcanoPlotSelectedDataArr: this.props.differentialResults,
-        eventFromTableColumnFilter: true,
       },
       function() {
         this.setRelevantData();
@@ -332,7 +328,6 @@ class DifferentialDetail extends Component {
     this.setState({
       allDataInScatterView,
       volcanoPlotSelectedDataArr: volcanoPlotSelectedDataArrArg,
-      eventFromTableColumnFilter: false,
       multiFeaturesNotFound: [],
       multiFeatureSearchTextError: false,
       multiFeatureSearchWarning: false,
@@ -930,11 +925,7 @@ class DifferentialDetail extends Component {
 
   handleTableChange = () => {
     const { differentialAlphanumericFields } = this.props;
-    const {
-      multiFeaturesSearched,
-      multiFeaturesFilteredOut,
-      eventFromTableColumnFilter,
-    } = this.state;
+    const { multiFeaturesSearched, multiFeaturesFilteredOut } = this.state;
     let sortedFilteredData =
       this.volcanoPlotFilteredGridRef?.current?.qhGridRef?.current?.getSortedData() ||
       this.props.differentialResults;
@@ -952,7 +943,6 @@ class DifferentialDetail extends Component {
         // and the multi-feature search is in effect
         // update the multi-feature search UI
         if (
-          // eventFromTableColumnFilter &&
           multiFeaturesSearched.length ||
           multiFeaturesFilteredOut.length
           // multiFeaturesSearchedAndFilteredOut.length
@@ -1059,9 +1049,7 @@ class DifferentialDetail extends Component {
           this.props.onResetDifferentialOutlinedFeature();
           this.pageToFeature();
         }
-        this.setState({
-          eventFromTableColumnFilter: true,
-        });
+        this.setState({});
       },
     );
   };
@@ -1410,21 +1398,7 @@ class DifferentialDetail extends Component {
       singleFeatureSearchActive: false,
       singleFeatureSearchIcon: 'search',
       singleFeatureSearched: '',
-      eventFromTableColumnFilter: false,
     });
-    // } else {
-    //  if no features are found
-    //  we are continuing with the search, and displaying no data
-    //  use and adjust this if we'd rather just not go through with the search
-    //   if (multiFeaturesNotFoundValues.length) {
-    //     this.setState({
-    //       multiFeaturesNotFound: multiFeaturesNotFoundValues,
-    //       // multiFeatureSearchActive: true,
-    //     });
-    //   } else {
-    //     this.resetSearchAndData(allDataInScatterView);
-    //   }
-    // }
   };
 
   toggleMultiFeatureSearch = bool => {
