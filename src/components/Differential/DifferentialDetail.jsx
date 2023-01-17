@@ -83,7 +83,6 @@ class DifferentialDetail extends Component {
     multiFeatureSearchWarning: false,
     notFoundLimit: 5,
     filteredOutLimit: 5,
-    eventFromTableColumnFilter: true,
   };
   volcanoPlotFilteredGridRef = React.createRef();
 
@@ -112,7 +111,6 @@ class DifferentialDetail extends Component {
       this.setState({
         allDataInScatterView: differentialResultsUnfiltered,
         multiFeaturesNotFound: [],
-        eventFromTableColumnFilter: true,
       });
     }
     if (prevProps.differentialResults !== differentialResults) {
@@ -141,8 +139,12 @@ class DifferentialDetail extends Component {
     const multiFeaturesSearchedAndFilteredOutSet = new Set(
       multiFeaturesSearchedAndFilteredOut,
     );
-    if (multiFeaturesSearched.length || singleFeatureSearched.length) {
-      if (multiFeaturesSearched.length) {
+    if (
+      multiFeaturesSearched.length ||
+      multiFeaturesFilteredOut.length ||
+      singleFeatureSearched.length
+    ) {
+      if (multiFeaturesSearched.length || multiFeaturesFilteredOut.length) {
         relevantSearched = [];
         // multi-search filter
         // const multiFeaturesSearchedSet = new Set(multiFeaturesSearched);
@@ -178,41 +180,6 @@ class DifferentialDetail extends Component {
     const uniqueRelevantSearchedAndInScatterView = [
       ...new Set(relevantSearchedAndInScatterView),
     ];
-    let uniqueFilteredOutValues = []; // multiFeaturesFilteredOut
-
-    if (multiFeaturesSearched.length) {
-      // reset the multi-feature search 'filtered out' labels
-      // const multiFeaturesSearchedAndFilteredOut = [...multiFeaturesSearched, ...multiFeaturesFilteredOut];
-      let multiFeaturesFound = [];
-      // multi-search filter
-      // change the "filtered out" tags accordingly"
-      // const multiFeaturesSearchedSet = new Set(multiFeaturesSearched);
-      differentialAlphanumericFields.forEach(columnKey => {
-        // eslint-disable-next-line no-unused-vars
-        const columnIncludes = [
-          ...uniqueRelevantSearchedAndInScatterView,
-        ].filter(d => {
-          if (multiFeaturesSearchedAndFilteredOutSet.has(d[columnKey])) {
-            // push the features found to an array
-            // that will be used to calculate the "Not Found" state
-            multiFeaturesFound.push(d[columnKey]);
-            return true;
-          } else return false;
-        });
-      });
-      const multiFeaturesFoundSet = new Set(multiFeaturesFound);
-      const newlyFilteredOutSet = getDifferenceTwoSets(
-        multiFeaturesSearchedAndFilteredOutSet,
-        multiFeaturesFoundSet,
-      );
-      uniqueFilteredOutValues = [...new Set(newlyFilteredOutSet)];
-      this.setState({
-        multiFeaturesFilteredOut: uniqueFilteredOutValues,
-        multiFeatureSearchText: multiFeaturesFound.toString(),
-        multiFeatureSearchActive: false,
-        eventFromTableColumnFilter: false,
-      });
-    }
 
     this.setState({
       allChecked: false,
@@ -246,7 +213,6 @@ class DifferentialDetail extends Component {
         differentialTableData: this.props.differentialResults,
         differentialTableRows: this.props.differentialResults.length,
         volcanoPlotSelectedDataArr: this.props.differentialResults,
-        eventFromTableColumnFilter: true,
       },
       function() {
         this.setRelevantData();
@@ -327,7 +293,6 @@ class DifferentialDetail extends Component {
     this.setState({
       allDataInScatterView,
       volcanoPlotSelectedDataArr: volcanoPlotSelectedDataArrArg,
-      eventFromTableColumnFilter: false,
       multiFeaturesNotFound: [],
       multiFeatureSearchTextError: false,
       multiFeatureSearchWarning: false,
@@ -336,54 +301,7 @@ class DifferentialDetail extends Component {
       ...multiFeaturesSearched,
       ...multiFeaturesFilteredOut,
     ];
-    // We want to "carry over" search terms FILTERED OUT to subsequent zooms
-    const multiFeaturesSearchedAndFilteredOutSet = new Set(
-      multiFeaturesSearchedAndFilteredOut,
-    );
-    if (multiFeaturesSearched.length && !doubleClickEvent) {
-      // on zoom, we want to change the multi-feature search/textarea to display found/not found pills and text
-      const multiFeaturesSearchedSet = new Set(multiFeaturesSearched);
-      let relevantDifferentialData = [];
-      let multiFeaturesFound = [];
 
-      differentialAlphanumericFields.forEach(columnKey => {
-        // filter the differentialResults for "includes" across all alphanumeric columns
-        const columnIncludes = [...volcanoPlotSelectedDataArrArg].filter(d => {
-          if (multiFeaturesSearchedSet.has(d[columnKey])) {
-            // push the features found to an array
-            // that will be used to calculate the "Not Found" state
-            multiFeaturesFound.push(d[columnKey]);
-            return true;
-          } else return false;
-        });
-        relevantDifferentialData = [
-          ...relevantDifferentialData,
-          ...columnIncludes,
-        ];
-      });
-      const multiFeaturesFoundSet = new Set(multiFeaturesFound);
-      // get the difference between the features searched and found
-      const multiFeaturesFilteredOutSet = getDifferenceTwoSets(
-        multiFeaturesSearchedAndFilteredOutSet,
-        multiFeaturesFoundSet,
-      );
-      //const multiFeaturesAndFilteredOutValues = Array.from(multiFeaturesFilteredOutSet);
-      const uniqueMultiFeaturesFilteredOutValues = [
-        ...new Set(multiFeaturesFilteredOutSet),
-      ];
-      const uniqueMultiFeaturesFoundValues = [
-        ...new Set(multiFeaturesFoundSet),
-      ];
-      this.setState({
-        // on scatter brush, make search active
-        multiFeatureSearchActive: false,
-        multiFeaturesSearched: uniqueMultiFeaturesFoundValues,
-        multiFeaturesFilteredOut: uniqueMultiFeaturesFilteredOutValues,
-        multiFeatureSearchTextError: false,
-        multiFeatureSearchWarning: false,
-        multiFeatureSearchText: uniqueMultiFeaturesFoundValues.toString(),
-      });
-    }
     let relevantDifferentialData = [...volcanoPlotSelectedDataArrArg];
     if (doubleClickEvent) {
       // on double click,
@@ -414,21 +332,8 @@ class DifferentialDetail extends Component {
               ...columnIncludes,
             ];
           });
-          const multiFeaturesFoundSet = new Set(multiFeaturesFound);
-          const newlyFilteredOutSet = getDifferenceTwoSets(
-            multiFeaturesSearchedAndFilteredOutSet,
-            multiFeaturesFoundSet,
-          );
-          const uniqueFilteredOutValues = [...new Set(newlyFilteredOutSet)];
-          const uniqueFoundValues = [...new Set(multiFeaturesFoundSet)];
           this.setState({
-            multiFeatureSearchActive: false,
-            multiFeaturesSearched: uniqueFoundValues,
             multiFeaturesNotFound: [],
-            multiFeaturesFilteredOut: uniqueFilteredOutValues,
-            multiFeatureSearchTextError: false,
-            multiFeatureSearchWarning: false,
-            multiFeatureSearchText: uniqueFoundValues.toString(),
           });
         } else {
           // single search filter
@@ -925,11 +830,7 @@ class DifferentialDetail extends Component {
 
   handleTableChange = () => {
     const { differentialAlphanumericFields } = this.props;
-    const {
-      multiFeaturesSearched,
-      multiFeaturesFilteredOut,
-      eventFromTableColumnFilter,
-    } = this.state;
+    const { multiFeaturesSearched, multiFeaturesFilteredOut } = this.state;
     let sortedFilteredData =
       this.volcanoPlotFilteredGridRef?.current?.qhGridRef?.current?.getSortedData() ||
       this.props.differentialResults;
@@ -943,12 +844,11 @@ class DifferentialDetail extends Component {
         scatterplotLoaded: true,
       },
       function() {
-        // if the event stems from the table column filter
-        // and the multi-feature search is in effect
+        // if multi-feature search is in effect
         // update the multi-feature search UI
         if (
-          eventFromTableColumnFilter &&
-          (multiFeaturesSearched.length || multiFeaturesFilteredOut.length)
+          multiFeaturesSearched.length ||
+          multiFeaturesFilteredOut.length
           // multiFeaturesSearchedAndFilteredOut.length
         ) {
           const multiFeaturesSearchedAndFilteredOut = [
@@ -1053,9 +953,7 @@ class DifferentialDetail extends Component {
           this.props.onResetDifferentialOutlinedFeature();
           this.pageToFeature();
         }
-        this.setState({
-          eventFromTableColumnFilter: true,
-        });
+        this.setState({});
       },
     );
   };
@@ -1404,21 +1302,7 @@ class DifferentialDetail extends Component {
       singleFeatureSearchActive: false,
       singleFeatureSearchIcon: 'search',
       singleFeatureSearched: '',
-      eventFromTableColumnFilter: false,
     });
-    // } else {
-    //  if no features are found
-    //  we are continuing with the search, and displaying no data
-    //  use and adjust this if we'd rather just not go through with the search
-    //   if (multiFeaturesNotFoundValues.length) {
-    //     this.setState({
-    //       multiFeaturesNotFound: multiFeaturesNotFoundValues,
-    //       // multiFeatureSearchActive: true,
-    //     });
-    //   } else {
-    //     this.resetSearchAndData(allDataInScatterView);
-    //   }
-    // }
   };
 
   toggleMultiFeatureSearch = bool => {
@@ -1431,12 +1315,14 @@ class DifferentialDetail extends Component {
   closeMultiSearch = () => {
     const {
       multiFeaturesSearched,
+      multiFeaturesFilteredOut,
       // multiFeatureSearchText
     } = this.state;
-    const setSingleSearch = !multiFeaturesSearched.length
-      ? // && multiFeatureSearchText === ''
-        true
-      : false;
+    const setSingleSearch =
+      !multiFeaturesSearched.length && !multiFeaturesFilteredOut.length
+        ? // && multiFeatureSearchText === ''
+          true
+        : false;
     if (setSingleSearch) {
       // if user closes popup without search or textarea
       this.handleMultiSearchCancel();
@@ -1759,6 +1645,7 @@ class DifferentialDetail extends Component {
                 if (
                   multiFeatureSearchActive &&
                   (multiFeaturesSearched.length ||
+                    multiFeaturesFilteredOut.length ||
                     multiFeatureSearchText !== '')
                 ) {
                   // if the search is active
