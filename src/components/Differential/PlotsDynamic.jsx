@@ -95,7 +95,7 @@ class PlotsDynamic extends Component {
     if (plotMultiFeatureAvailable) {
       panes = [
         {
-          menuItem: 'Single Feature Plots',
+          menuItem: 'Single-Feature Plots',
           pane: (
             <Tab.Pane
               key="single-feature-plots-pane"
@@ -212,7 +212,7 @@ class PlotsDynamic extends Component {
     } else {
       panes = [
         {
-          menuItem: 'Single Feature Plots',
+          menuItem: 'Single-Feature Plots',
           pane: (
             <Tab.Pane
               key="single-feature-plots-pane"
