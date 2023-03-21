@@ -64,10 +64,8 @@ class PlotsSingleFeature extends Component {
   };
 
   getInstructions = () => {
-    const {
-      modelSpecificMetaFeaturesExist,
-      differentialPlotTypes,
-    } = this.props;
+    const { modelSpecificMetaFeaturesExist, differentialPlotTypes } =
+      this.props;
     const hasPlots = differentialPlotTypes?.length > 0 || false;
     if (hasPlots && modelSpecificMetaFeaturesExist) {
       return 'Select a feature to display plots and data';
@@ -80,13 +78,13 @@ class PlotsSingleFeature extends Component {
     }
   };
 
-  handlePlotlyExport = plotlyExportType => {
+  handlePlotlyExport = (plotlyExportType) => {
     this.setState(
       {
         plotlyExport: true,
         plotlyExportType,
       },
-      function() {
+      function () {
         // callback to reset plotly export in progress to false
         this.setState({ plotlyExport: false });
       },
@@ -129,7 +127,7 @@ class PlotsSingleFeature extends Component {
           activeTabIndexPlotsSingleFeature || 0;
         const svgArray = [...plotSingleFeatureData.svg];
         let options = [];
-        options = svgArray.map(function(s, index) {
+        options = svgArray.map(function (s, index) {
           return {
             key: `${index}=VolcanoPlotDropdownOption`,
             text: s.plotType.plotDisplay,
@@ -142,9 +140,10 @@ class PlotsSingleFeature extends Component {
           this.props.modelSpecificMetaFeaturesExist !== false &&
           !isMultifeaturePlot
         ) {
-          const singleFeaturePlotTypes = this.props.differentialPlotTypes.filter(
-            p => !p.plotType.includes('multiFeature'),
-          );
+          const singleFeaturePlotTypes =
+            this.props.differentialPlotTypes.filter(
+              (p) => !p.plotType.includes('multiFeature'),
+            );
           let metafeaturesDropdown = [
             {
               key: 'Feature-Data-SVG-Plot',
@@ -156,7 +155,7 @@ class PlotsSingleFeature extends Component {
         }
         const loader = plotSingleFeatureDataLoaded ? null : (
           <Dimmer active inverted>
-            <Loader size="large">Loading Single Feature Plots</Loader>
+            <Loader size="large">Loading Single-Feature Plots</Loader>
           </Dimmer>
         );
         return (

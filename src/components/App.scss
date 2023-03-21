@@ -208,11 +208,11 @@
   }
 
   #rowOutline {
-    // border: 3px 7px 3px 6px solid var(--color-link) !important;
+    // border: 3px 3px 3px 3px solid var(--color-link) !important;
     border-top: 3px solid var(--color-link) !important;
-    // border-right: 7px solid var(--color-link) !important;
+    border-right: 3px solid var(--color-link) !important;
     border-bottom: 3px solid var(--color-link) !important;
-    border-left: 6px solid var(--color-link) !important;
+    border-left: 3px solid var(--color-link) !important;
   }
 
   .rowHighlightOther i.icon.square.outline:before {

@@ -1720,6 +1720,7 @@ class ScatterPlot extends Component {
         zoomedOut: true,
         transitioningDoubleClick: transitionDoubleClickOverride,
         allDataInWithinView: [],
+        brushing: false,
       });
       // this changes filteredTableData in the parent
       // which in componentDidUpdate calls transition zoom
@@ -1732,6 +1733,9 @@ class ScatterPlot extends Component {
         this.props.differentialResultsUnfiltered, // need to know this for when search filters are cleared
       );
     } else {
+      this.setState({
+        brushing: false,
+      });
       this.props.onResetDifferentialOutlinedFeature();
       this.props.onHandleHighlightedFeaturesDifferential([], false);
     }
