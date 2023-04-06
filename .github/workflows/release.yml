@@ -17,8 +17,6 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v3
-        with:
-          node-version: 16
       - name: JavaScript info
         run: |
           echo "Node.js version: $(node --version)"
@@ -26,6 +24,8 @@ jobs:
       - name: Install dependencies
         run: npm install --legacy-peer-deps
       - name: Build
+        with:
+          node-version: 16
         env:
           CI: false
         run: npm run build
