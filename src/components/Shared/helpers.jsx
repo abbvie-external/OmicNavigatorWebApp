@@ -598,28 +598,37 @@ export function getTestsArg(
   multiModelMappingFirstKey,
   differentialModel,
 ) {
-  // if plot type does not include 'multiTest', return just the test
-  if (!plotType.includes('multiTest')) {
-    return differentialTest;
-  } else {
-    // if plot type include 'multiTest' NOT 'multiModel', return all tests, no duplication
-    if (!plotType.includes('multiModel')) {
-      return differentialTestIds;
+  // SINGLE-MODEL
+  if (!plotType.includes('multiModel')) {
+    // does not include 'multiTest', return test
+    if (!plotType.includes('multiTest')) {
+      return differentialTest;
     } else {
-      // if plot type includes 'multiTest' AND 'multiModel'
+      // includes 'multiTest', return all tests
+      return differentialTestIds;
+    }
+  } else {
+    // MULTI-MODEL
+    if (!plotType.includes('multiTest')) {
+      // ‘singleTest’: vector of the currently selected test
+      // repeated n times,
+      // where n is the number of models in the study
       let tests = [];
-      const firstMappingModelIndex = differentialModelsAndTests.findIndex(
-        // a => a.modelID === multiModelMappingFirstKey,
+      differentialModelIds.forEach(() => {
+        tests.push(differentialTest);
+      });
+      return tests;
+    } else {
+      // 'multiTest': vector of each test
+      // within the currently selected model,
+      // repeated j times,
+      // where j is the number of models in the study
+      let tests = [];
+      const currentModelAndTests = [...differentialModelsAndTests].find(
         a => a.modelID === differentialModel,
       );
-      // move the first mapping object models first
-      const adjustedArr =
-        firstMappingModelIndex > 0
-          ? arrayMove(differentialModelsAndTests, firstMappingModelIndex, 0)
-          : differentialModelsAndTests;
-      // push all testIDs per every test in the study
-      adjustedArr.forEach(arr => {
-        arr.tests.forEach(test => {
+      differentialModelIds.forEach(() => {
+        currentModelAndTests.tests.forEach(test => {
           tests.push(test.testID);
         });
       });
@@ -641,24 +650,25 @@ export function getModelsArg(
   if (!plotType.includes('multiModel')) {
     return differentialModel;
   } else {
-    // if plot type includes 'multiModel'
-    let models = [];
-    const firstMappingModelIndex = differentialModelsAndTests.findIndex(
-      // a => a.modelID === multiModelMappingFirstKey,
-      a => a.modelID === differentialModel,
-    );
-    // move the first mapping object models first
-    const adjustedArr =
-      firstMappingModelIndex > 0
-        ? arrayMove(differentialModelsAndTests, firstMappingModelIndex, 0)
-        : differentialModelsAndTests;
-    // push all modelIDs per every test in the study
-    adjustedArr.forEach(arr => {
-      arr.tests.forEach(test => {
-        models.push(arr.modelID);
+    // MULTI-MODEL
+    if (!plotType.includes('multiTest')) {
+      // ‘singleTest’: vector containing all models
+      return differentialModelIds;
+    } else {
+      // 'multiTest': vector of each model,
+      // repeated n times,
+      // where n is the number of tests present under the currently selected model
+      let models = [];
+      const currentModelAndTests = [...differentialModelsAndTests].find(
+        a => a.modelID === differentialModel,
+      );
+      currentModelAndTests.tests.forEach(() => {
+        differentialModelIds.forEach(modelId => {
+          models.push(modelId);
+        });
       });
-    });
-    return models;
+      return models;
+    }
   }
 }
 
