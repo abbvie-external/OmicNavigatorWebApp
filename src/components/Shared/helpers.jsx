@@ -651,11 +651,20 @@ export function getModelsArg(
     return differentialModel;
   } else {
     // MULTI-MODEL
+    const currentModelIndex = differentialModelIds.findIndex(
+      id => id === differentialModel,
+    );
+    const orderedDifferentialModelIds =
+      currentModelIndex > 0
+        ? arrayMove(differentialModelIds, currentModelIndex, 0)
+        : differentialModelIds;
     if (!plotType.includes('multiTest')) {
       // ‘singleTest’: vector containing all models
-      return differentialModelIds;
+      // with the currently selected model moved to the first index
+      return orderedDifferentialModelIds;
     } else {
       // 'multiTest': vector of each model,
+      // with the currently selected model moved to the first index
       // repeated n times,
       // where n is the number of tests present under the currently selected model
       let models = [];
@@ -663,7 +672,7 @@ export function getModelsArg(
         a => a.modelID === differentialModel,
       );
       currentModelAndTests.tests.forEach(() => {
-        differentialModelIds.forEach(modelId => {
+        orderedDifferentialModelIds.forEach(modelId => {
           models.push(modelId);
         });
       });
