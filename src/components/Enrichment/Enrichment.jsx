@@ -2495,7 +2495,7 @@ class Enrichment extends Component {
           </Grid.Row>
         </Grid>
         <div className="MultisetSvgOuter" id="enrichmentMultisetAnalysisSVGDiv">
-          {multisetPlotInfoEnrichment.svg?.length ? (
+          {multisetPlotInfoEnrichment.svg ? (
             <SVG
               cacheRequests={true}
               src={srcUrl}
@@ -2503,7 +2503,14 @@ class Enrichment extends Component {
               uniquifyIDs={true}
               id="enrichmentMultisetAnalysisSVG"
             />
-          ) : null}
+          ) : (
+            <div className="PlotInstructions">
+              <h4 className="PlotInstructionsText NoSelect">
+                {multisetPlotInfoEnrichment.title} is not available for this
+                combination of features
+              </h4>
+            </div>
+          )}
         </div>
       </Sidebar>
     );
