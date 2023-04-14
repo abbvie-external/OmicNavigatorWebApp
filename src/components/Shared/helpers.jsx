@@ -668,12 +668,21 @@ export function getModelsArg(
       // repeated n times,
       // where n is the number of tests present under the currently selected model
       let models = [];
-      const currentModelAndTests = [...differentialModelsAndTests].find(
-        a => a.modelID === differentialModel,
-      );
-      currentModelAndTests.tests.forEach(() => {
-        orderedDifferentialModelIds.forEach(modelId => {
-          models.push(modelId);
+      const currentDifferentialModelsAndTestsIndex = [
+        ...differentialModelsAndTests,
+      ].findIndex(a => a.modelID === differentialModel);
+      // move the first mapping object models first
+      const currentDifferentialModelsAndTestsMoved =
+        currentDifferentialModelsAndTestsIndex > 0
+          ? arrayMove(
+              differentialModelsAndTests,
+              currentDifferentialModelsAndTestsIndex,
+              0,
+            )
+          : differentialModelsAndTests;
+      currentDifferentialModelsAndTestsMoved.forEach(cdmtm => {
+        cdmtm.tests.forEach(test => {
+          models.push(cdmtm.modelID);
         });
       });
       return models;
