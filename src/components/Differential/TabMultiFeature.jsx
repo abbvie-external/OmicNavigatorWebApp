@@ -90,7 +90,7 @@ class TabMultiFeature extends Component {
                       featuresLength={featuresLength}
                       onHandlePlotlyClick={this.props.onHandlePlotlyClick}
                     />
-                  ) : (
+                  ) : s.svg ? (
                     <SVG
                       cacheRequests={true}
                       src={srcUrl}
@@ -98,6 +98,13 @@ class TabMultiFeature extends Component {
                       uniqueHash={`b2g9e2-${cacheStringArg}`}
                       uniquifyIDs={true}
                     />
+                  ) : (
+                    <div className="PlotInstructions">
+                      <h4 className="PlotInstructionsText NoSelect">
+                        {s.plotType.plotDisplay} is not available for this
+                        combination of features
+                      </h4>
+                    </div>
                   )}
                 </div>
               </Tab.Pane>

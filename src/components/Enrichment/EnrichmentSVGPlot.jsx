@@ -109,7 +109,7 @@ class EnrichmentSVGPlot extends PureComponent {
                     plotId={plotDataEnrichment?.key}
                     parentNode={this.enrichmentSingleFeatureRef}
                   />
-                ) : (
+                ) : s.svg ? (
                   <SVG
                     cacheRequests={true}
                     src={srcUrl}
@@ -117,6 +117,13 @@ class EnrichmentSVGPlot extends PureComponent {
                     uniquifyIDs={true}
                     id="EnrichmentPlotSVG"
                   />
+                ) : (
+                  <div className="PlotInstructions">
+                    <h4 className="PlotInstructionsText NoSelect">
+                      {s.plotType.plotDisplay} is not available for{' '}
+                      {plotDataEnrichment?.key}
+                    </h4>
+                  </div>
                 )}
               </div>
             </Tab.Pane>
