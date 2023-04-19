@@ -1050,11 +1050,7 @@ class DifferentialSearch extends Component {
           >
             <Popup.Content>
               View an intersecting sets, or{' '}
-              <a
-                href="https://github.com/hms-dbmi/UpSetR"
-                target="_blank"
-                rel="noreferrer"
-              >
+              <a href="https://upset.app/" target="_blank" rel="noreferrer">
                 UpSet
               </a>{' '}
               plot, that displays the number of features found in every
