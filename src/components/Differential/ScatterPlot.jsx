@@ -1527,7 +1527,13 @@ class ScatterPlot extends Component {
               transitioningBoxSelect: true,
               zoomedOut: false,
             });
-            self.transitionZoom(total, false, false, true);
+            const totalSet = new Set(
+              [...total].map(d => d[self.props.differentialFeatureIdKey]),
+            );
+            const intersection2 = [
+              ...self.props.filteredDifferentialTableData,
+            ].filter(d => totalSet.has(d[self.props.differentialFeatureIdKey]));
+            self.transitionZoom(intersection2, false, false, true);
             self.setupBrush(
               self.props.volcanoWidth,
               self.props.upperPlotsHeight,
@@ -1720,6 +1726,7 @@ class ScatterPlot extends Component {
         zoomedOut: true,
         transitioningDoubleClick: transitionDoubleClickOverride,
         allDataInWithinView: [],
+        brushing: false,
       });
       // this changes filteredTableData in the parent
       // which in componentDidUpdate calls transition zoom
@@ -1732,6 +1739,9 @@ class ScatterPlot extends Component {
         this.props.differentialResultsUnfiltered, // need to know this for when search filters are cleared
       );
     } else {
+      this.setState({
+        brushing: false,
+      });
       this.props.onResetDifferentialOutlinedFeature();
       this.props.onHandleHighlightedFeaturesDifferential([], false);
     }

@@ -435,6 +435,7 @@ class DifferentialSearch extends Component {
       multisetFiltersVisibleDifferential: false,
       sigValP: this.state.uSettingsP.defaultSigValueP,
       selectedColP: [],
+      selectedOperatorP: [this.state.uSettingsP.defaultselectedOperatorP],
     });
 
     onSearchChangeDifferential(
@@ -1046,15 +1047,11 @@ class DifferentialSearch extends Component {
           >
             <Popup.Content>
               View an intersecting sets, or{' '}
-              <a
-                href="https://github.com/hms-dbmi/UpSetR"
-                target="_blank"
-                rel="noreferrer"
-              >
+              <a href="https://upset.app/" target="_blank" rel="noreferrer">
                 UpSet
               </a>{' '}
-              plot, derived from features that pass the selected filters in at
-              least one of the possible sets. Note that this plot considers the
+              plot, that displays the number of features found in every
+              combination of test results. Note that this plot considers the
               column/operator/value selection and ignores the must/maybe/not
               selection.
             </Popup.Content>

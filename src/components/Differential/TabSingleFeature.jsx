@@ -91,7 +91,7 @@ class TabSingleFeature extends Component {
                       this.props.differentialDetailPlotsSingleFeatureRefFwd
                     }
                   />
-                ) : (
+                ) : s.svg ? (
                   <SVG
                     cacheRequests={true}
                     src={srcUrl}
@@ -99,6 +99,13 @@ class TabSingleFeature extends Component {
                     uniqueHash={`a1f8d1-${cacheStringArg}`}
                     uniquifyIDs={true}
                   />
+                ) : (
+                  <div className="PlotInstructions">
+                    <h4 className="PlotInstructionsText NoSelect">
+                      {s.plotType.plotDisplay} is not available for feature{' '}
+                      {plotSingleFeatureData.key}
+                    </h4>
+                  </div>
                 )}
               </div>
             </Tab.Pane>

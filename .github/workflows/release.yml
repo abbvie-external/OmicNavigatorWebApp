@@ -17,6 +17,9 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
       - name: JavaScript info
         run: |
           echo "Node.js version: $(node --version)"

@@ -1,6 +1,6 @@
 {
   "name": "omicnavigatorwebapp",
-  "version": "1.7.9",
+  "version": "1.8.2",
   "private": true,
   "dependencies": {
     "@observablehq/stdlib": "^5.4.3",
