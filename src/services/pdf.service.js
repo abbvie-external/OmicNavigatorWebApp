@@ -1,6 +1,6 @@
 import jsPDF from 'jspdf';
-// import canvg from 'canvg';
-// import html2canvas from 'html2canvas';
+import canvg from 'canvg';
+import html2canvas from 'html2canvas';
 
 // import SVGtoPDF from 'svg-to-pdfkit';
 // import blobStream from 'blob-stream';
@@ -8,10 +8,10 @@ import jsPDF from 'jspdf';
 
 class PdfService {
   createPDF(svg) {
-    // window.html2canvas = html2canvas;
+    window.html2canvas = html2canvas;
     let canvas = document.createElement('canvas');
     let data = svg.outerHTML;
-    // canvg(canvas, data);
+    canvg(canvas, data);
     let imgData = canvas.toDataURL('image/png');
     let doc = new jsPDF('l');
     // var pdfWidth = doc.internal.pageSize.getWidth();
