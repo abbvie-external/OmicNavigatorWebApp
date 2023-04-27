@@ -174,7 +174,6 @@ class Tabs extends Component {
     omicNavigatorService
       .listStudies()
       .then((listStudiesResponseData) => {
-        debugger;
         const allStudiesMetadata = Array.from(listStudiesResponseData);
         this.setState({
           allStudiesMetadata,
