@@ -54,7 +54,7 @@ class ViolinPlot extends Component {
         prevValues.every(
           (o, i) =>
             Object.keys(o).length === Object.keys(currentValues[i]).length &&
-            Object.keys(o).every(k => o[k] === currentValues[i][k]),
+            Object.keys(o).every((k) => o[k] === currentValues[i][k]),
         );
       if (!isSame) {
         this.initiateViolinPlot(true);
@@ -73,7 +73,7 @@ class ViolinPlot extends Component {
       const chartSVG = d3.select(`#${this.props.violinSettings.id}`);
       chartSVG.selectAll('g.circleText').remove();
       if (HighlightedProteins.length > 0) {
-        HighlightedProteins.forEach(element => {
+        HighlightedProteins.forEach((element) => {
           const highlightedDotId = element.featureID;
           const dot = d3.select(`circle[id='violin_${highlightedDotId}']`);
           dot
@@ -126,7 +126,7 @@ class ViolinPlot extends Component {
     this.renderDataPlots({ showPlot: true });
   };
 
-  getColorFunct = colorOptions => {
+  getColorFunct = (colorOptions) => {
     const self = this;
     if (typeof colorOptions === 'function') {
       return colorOptions;
@@ -135,28 +135,28 @@ class ViolinPlot extends Component {
       //  If an array is provided, map it to the domain
       const colorMap = {};
       let cColor = 0;
-      Object.keys(self.chart.groupObjs).forEach(key => {
+      Object.keys(self.chart.groupObjs).forEach((key) => {
         if (Object.prototype.hasOwnProperty.call(self.chart.groupObjs, key)) {
           colorMap[key] = colorOptions[cColor];
           cColor = (cColor + 1) % colorOptions.length;
         }
       });
-      return group => {
+      return (group) => {
         return colorMap[group];
       };
     }
     if (typeof colorOptions === 'object') {
       // if an object is provided, assume it maps to  the colors
-      return group => {
+      return (group) => {
         return colorOptions[group];
       };
     }
     return d3.scaleOrdinal(d3.schemeCategory10);
   };
 
-  shallowCopy = oldObj => {
+  shallowCopy = (oldObj) => {
     const newObj = {};
-    Object.keys(oldObj).forEach(key => {
+    Object.keys(oldObj).forEach((key) => {
       if (Object.prototype.hasOwnProperty.call(oldObj, key)) {
         newObj[key] = oldObj[key];
       }
@@ -165,11 +165,11 @@ class ViolinPlot extends Component {
   };
 
   kernelDensityEstimator = (kernel, x) => {
-    return sample => {
-      return x.map(x1 => {
+    return (sample) => {
+      return x.map((x1) => {
         return {
           x: x1,
-          y: d3.mean(sample, v => {
+          y: d3.mean(sample, (v) => {
             return kernel(x1 - v);
           }),
         };
@@ -177,8 +177,8 @@ class ViolinPlot extends Component {
     };
   };
 
-  eKernel = scale => {
-    return u => {
+  eKernel = (scale) => {
+    return (u) => {
       let u2 = u;
       u2 /= scale;
       // gaussian
@@ -189,8 +189,8 @@ class ViolinPlot extends Component {
   // Used to find the roots for adjusting violin axis
   // Given an array, find the value for a single point, even if it is not in the domain
   eKernelTest = (kernel, array) => {
-    return testX => {
-      return d3.mean(array, v => {
+    return (testX) => {
+      return d3.mean(array, (v) => {
         return kernel(testX - v);
       });
     };
@@ -207,18 +207,18 @@ class ViolinPlot extends Component {
     return objSize;
   };
 
-  getMaxStat = array => {
+  getMaxStat = (array) => {
     // finds the highest value based on t statistics
     // used to figure out which dot gets highlighted
 
-    const statArray = array.map(o => {
+    const statArray = array.map((o) => {
       return o.statistic;
     });
     const max = Math.max(...statArray);
     return max;
   };
 
-  addToolTiptoMax = id => {
+  addToolTiptoMax = (id) => {
     if (id != null) {
       const self = this;
       d3.select(`circle[id='violin_${id.featureID}']`);
@@ -251,7 +251,7 @@ class ViolinPlot extends Component {
           return opacity;
         })
         .style('display', null);
-      id.cpm = _.find(this.props.barcodeSettings.barcodeData, function(o) {
+      id.cpm = _.find(this.props.barcodeSettings.barcodeData, function (o) {
         return o.featureID === id.featureID;
       }).logFoldChange;
       this.tooltipHover(id);
@@ -277,7 +277,7 @@ class ViolinPlot extends Component {
     var self = this;
     // const brushingStart = function() {
     // };
-    const highlightBrushedCircles = function() {
+    const highlightBrushedCircles = function () {
       const circles = d3.selectAll(
         '.' + self.props.violinSettings.id + '.vPoint',
       );
@@ -285,7 +285,7 @@ class ViolinPlot extends Component {
         const brush_coords = d3.brushSelection(this);
         // style brushed circles
         // tslint:disable-next-line:no-shadowed-variable
-        const isBrushed = function(brush_coords, cx, cy) {
+        const isBrushed = function (brush_coords, cx, cy) {
           const x0 = brush_coords[0][0],
             x1 = brush_coords[1][0],
             y0 = brush_coords[0][1],
@@ -297,7 +297,7 @@ class ViolinPlot extends Component {
         const chartSVG = d3.select(`#${self.props.violinSettings.id}`);
         chartSVG.selectAll('.brushed').classed('brushed', false);
         const brushed = circles
-          .filter(function() {
+          .filter(function () {
             const cx = d3.select(this).attr('cx'),
               cy = d3.select(this).attr('cy');
             return isBrushed(brush_coords, cx, cy);
@@ -307,7 +307,7 @@ class ViolinPlot extends Component {
             'brushed point ' + self.props.violinSettings.id + ' vPoint',
           )
           .attr('opacity', 1.0);
-        circles.filter(function() {
+        circles.filter(function () {
           const cx = d3.select(this).attr('cx'),
             cy = d3.select(this).attr('cy');
           return !isBrushed(brush_coords, cx, cy);
@@ -343,7 +343,7 @@ class ViolinPlot extends Component {
   tooltipHover = (d, override) => {
     const tooltipFields = this.props.violinSettings.tooltip.fields;
     let tooltipString = '';
-    _.forEach(tooltipFields, field => {
+    _.forEach(tooltipFields, (field) => {
       if (d[field.value] != null && d[field.value] !== '') {
         tooltipString += `<span>${field.label} = ${d[field.value]}</span><br/>`;
       }
@@ -437,10 +437,10 @@ class ViolinPlot extends Component {
 
     self.chart.groupObjs = self.chart.data;
 
-    Object.keys(self.chart.groupObjs).forEach(key => {
+    Object.keys(self.chart.groupObjs).forEach((key) => {
       if (Object.prototype.hasOwnProperty.call(self.chart.groupObjs, key)) {
         const pointValues = self.chart.groupObjs[key].values.map(
-          d => d[self.props.violinSettings.pointValue],
+          (d) => d[self.props.violinSettings.pointValue],
         );
         pointValues.sort(d3.ascending);
         self.chart.groupObjs[key].metrics = {};
@@ -471,7 +471,7 @@ class ViolinPlot extends Component {
     if (self.props.violinSettings.constrainExtremes === true) {
       const fences = [];
 
-      Object.keys(self.chart.groupObjs).forEach(key => {
+      Object.keys(self.chart.groupObjs).forEach((key) => {
         if (Object.prototype.hasOwnProperty.call(self.chart.groupObjs, key)) {
           fences.push(self.chart.groupObjs[key].metrics.lowerInnerFence);
           fences.push(self.chart.groupObjs[key].metrics.upperInnerFence);
@@ -480,7 +480,7 @@ class ViolinPlot extends Component {
       self.chart.range = d3.extent(fences);
     } else {
       const fences = [];
-      Object.keys(self.chart.groupObjs).forEach(key => {
+      Object.keys(self.chart.groupObjs).forEach((key) => {
         if (Object.prototype.hasOwnProperty.call(self.chart.groupObjs, key)) {
           fences.push(self.chart.groupObjs[key].metrics.min);
           fences.push(self.chart.groupObjs[key].metrics.max);
@@ -627,7 +627,7 @@ class ViolinPlot extends Component {
       .text(self.props.violinSettings.subtitle);
   };
 
-  renderViolinPlot = options => {
+  renderViolinPlot = (options) => {
     const self = this;
     self.chart.violinPlots = {};
 
@@ -643,7 +643,7 @@ class ViolinPlot extends Component {
       yDomainVP: null,
     };
     self.chart.violinPlots.options = self.shallowCopy(defaultOptions);
-    Object.keys(options).forEach(option => {
+    Object.keys(options).forEach((option) => {
       if (Object.prototype.hasOwnProperty.call(options, option)) {
         self.chart.violinPlots.options[option] = options[option];
       }
@@ -651,23 +651,23 @@ class ViolinPlot extends Component {
     const vOpts = self.chart.violinPlots.options;
 
     // Create violin plot objects
-    Object.keys(self.chart.groupObjs).forEach(cName => {
+    Object.keys(self.chart.groupObjs).forEach((cName) => {
       if (Object.prototype.hasOwnProperty.call(self.chart.groupObjs, cName)) {
         self.chart.groupObjs[cName].violin = {};
         self.chart.groupObjs[cName].violin.objs = {};
       }
     });
 
-    self.chart.violinPlots.change = updateOptions => {
+    self.chart.violinPlots.change = (updateOptions) => {
       if (updateOptions) {
-        Object.keys(updateOptions).forEach(key => {
+        Object.keys(updateOptions).forEach((key) => {
           if (Object.prototype.hasOwnProperty.call(updateOptions, key)) {
             vOpts[key] = updateOptions[key];
           }
         });
       }
 
-      Object.keys(self.chart.groupObjs).forEach(cName => {
+      Object.keys(self.chart.groupObjs).forEach((cName) => {
         if (Object.prototype.hasOwnProperty.call(self.chart.groupObjs, cName)) {
           self.chart.groupObjs[cName].violin.objs.g.remove();
         }
@@ -680,7 +680,7 @@ class ViolinPlot extends Component {
     self.chart.violinPlots.reset = () => {
       self.chart.violinPlots.change(defaultOptions);
     };
-    self.chart.violinPlots.show = opts => {
+    self.chart.violinPlots.show = (opts) => {
       let tempOpts = opts;
       if (opts !== undefined) {
         tempOpts.show = true;
@@ -693,7 +693,7 @@ class ViolinPlot extends Component {
       self.chart.violinPlots.change(tempOpts);
     };
 
-    self.chart.violinPlots.hide = opts => {
+    self.chart.violinPlots.hide = (opts) => {
       let tempOpts = opts;
       if (opts !== undefined) {
         tempOpts.show = false;
@@ -713,9 +713,9 @@ class ViolinPlot extends Component {
       // let cName;
       let cViolinPlot;
       let xVScale;
-      Object.keys(self.chart.groupObjs).forEach(cName => {
+      Object.keys(self.chart.groupObjs).forEach((cName) => {
         if (Object.prototype.hasOwnProperty.call(self.chart.groupObjs, cName)) {
-          const pointValues = _.map(self.chart.groupObjs[cName].values, d => {
+          const pointValues = _.map(self.chart.groupObjs[cName].values, (d) => {
             return d[self.props.violinSettings.pointValue];
           });
           cViolinPlot = self.chart.groupObjs[cName].violin;
@@ -738,23 +738,23 @@ class ViolinPlot extends Component {
             // When clamp is 0, calculate the min and max that is needed to bring the violin plot to a point
             // interpolateMax = the Minimum value greater than the max where y = 0
             interpolateMax = d3.min(
-              cViolinPlot.kdedata.filter(d => {
+              cViolinPlot.kdedata.filter((d) => {
                 return (
                   d.x > self.chart.groupObjs[cName].metrics.max && d.y === 0
                 );
               }),
-              d => {
+              (d) => {
                 return d.x;
               },
             );
             // interpolateMin = the Maximum value less than the min where y = 0
             interpolateMin = d3.max(
-              cViolinPlot.kdedata.filter(d => {
+              cViolinPlot.kdedata.filter((d) => {
                 return (
                   d.x < self.chart.groupObjs[cName].metrics.min && d.y === 0
                 );
               }),
-              d => {
+              (d) => {
                 return d.x;
               },
             );
@@ -817,15 +817,15 @@ class ViolinPlot extends Component {
           }
 
           cViolinPlot.kdedata = cViolinPlot.kdedata
-            .filter(d => {
+            .filter((d) => {
               return !interpolateMin || d.x >= interpolateMin;
             })
-            .filter(d => {
+            .filter((d) => {
               return !interpolateMax || d.x <= interpolateMax;
             });
         }
       });
-      Object.keys(self.chart.groupObjs).forEach(cName => {
+      Object.keys(self.chart.groupObjs).forEach((cName) => {
         if (Object.prototype.hasOwnProperty.call(self.chart.groupObjs, cName)) {
           cViolinPlot = self.chart.groupObjs[cName].violin;
 
@@ -833,7 +833,7 @@ class ViolinPlot extends Component {
           const objBounds = self.getObjWidth(vOpts.width, cName, self);
           const width = (objBounds.right - objBounds.left) / 2;
 
-          const max = d3.max(cViolinPlot.kdedata, d => {
+          const max = d3.max(cViolinPlot.kdedata, (d) => {
             return d.y;
           });
 
@@ -847,21 +847,21 @@ class ViolinPlot extends Component {
             const area = d3
               .area()
               .curve(vOpts.interpolation)
-              .x(d => {
+              .x((d) => {
                 return xVScale(d.x);
               })
               .y0(width)
-              .y1(d => {
+              .y1((d) => {
                 return yVScale(d.y);
               });
 
             const line = d3
               .line()
               .curve(vOpts.interpolation)
-              .x(d => {
+              .x((d) => {
                 return xVScale(d.x);
               })
-              .y(d => {
+              .y((d) => {
                 return yVScale(d.y);
               });
 
@@ -912,7 +912,7 @@ class ViolinPlot extends Component {
         return;
       }
 
-      Object.keys(self.chart.groupObjs).forEach(cName => {
+      Object.keys(self.chart.groupObjs).forEach((cName) => {
         if (Object.prototype.hasOwnProperty.call(self.chart.groupObjs, cName)) {
           cViolinPlot = self.chart.groupObjs[cName].violin;
 
@@ -975,7 +975,7 @@ class ViolinPlot extends Component {
     return self.chart;
   };
 
-  renderBoxPlot = options => {
+  renderBoxPlot = (options) => {
     const self = this;
     self.chart.boxPlots = {};
 
@@ -993,7 +993,7 @@ class ViolinPlot extends Component {
       colors: self.chart.colorFunct,
     };
     self.chart.boxPlots.options = self.shallowCopy(defaultOptions);
-    Object.keys(options).forEach(option => {
+    Object.keys(options).forEach((option) => {
       if (Object.prototype.hasOwnProperty.call(options, option)) {
         self.chart.boxPlots.options[option] = options[option];
       }
@@ -1001,23 +1001,23 @@ class ViolinPlot extends Component {
     const bOpts = self.chart.boxPlots.options;
 
     // Create box plot objects
-    Object.keys(self.chart.groupObjs).forEach(cName => {
+    Object.keys(self.chart.groupObjs).forEach((cName) => {
       if (Object.prototype.hasOwnProperty.call(self.chart.groupObjs, cName)) {
         self.chart.groupObjs[cName].boxPlot = {};
         self.chart.groupObjs[cName].boxPlot.objs = {};
       }
     });
 
-    self.chart.boxPlots.change = updateOptions => {
+    self.chart.boxPlots.change = (updateOptions) => {
       if (updateOptions) {
-        Object.keys(updateOptions).forEach(key => {
+        Object.keys(updateOptions).forEach((key) => {
           if (Object.prototype.hasOwnProperty.call(updateOptions, key)) {
             bOpts[key] = updateOptions[key];
           }
         });
       }
 
-      Object.keys(self.chart.groupObjs).forEach(cName => {
+      Object.keys(self.chart.groupObjs).forEach((cName) => {
         if (Object.prototype.hasOwnProperty.call(self.chart.groupObjs, cName)) {
           self.chart.groupObjs[cName].boxPlot.objs.g.remove();
         }
@@ -1029,7 +1029,7 @@ class ViolinPlot extends Component {
     self.chart.boxPlots.reset = () => {
       self.chart.boxPlots.change(defaultOptions);
     };
-    self.chart.boxPlots.show = opts => {
+    self.chart.boxPlots.show = (opts) => {
       let newOpts = opts;
       if (opts !== undefined) {
         newOpts.show = true;
@@ -1041,7 +1041,7 @@ class ViolinPlot extends Component {
       }
       self.chart.boxPlots.change(newOpts);
     };
-    self.chart.boxPlots.hide = opts => {
+    self.chart.boxPlots.hide = (opts) => {
       let newOpts = opts;
       if (opts !== undefined) {
         newOpts.show = false;
@@ -1061,7 +1061,7 @@ class ViolinPlot extends Component {
       // let cName;
       let cBoxPlot;
 
-      Object.keys(self.chart.groupObjs).forEach(cName => {
+      Object.keys(self.chart.groupObjs).forEach((cName) => {
         if (Object.prototype.hasOwnProperty.call(self.chart.groupObjs, cName)) {
           cBoxPlot = self.chart.groupObjs[cName].boxPlot;
 
@@ -1070,7 +1070,7 @@ class ViolinPlot extends Component {
           const width = objBounds.right - objBounds.left;
 
           const sMetrics = {}; // temp var for scaled (plottable) metric values
-          Object.keys(self.chart.groupObjs[cName].metrics).forEach(attr => {
+          Object.keys(self.chart.groupObjs[cName].metrics).forEach((attr) => {
             if (
               Object.prototype.hasOwnProperty.call(
                 self.chart.groupObjs[cName].metrics,
@@ -1171,7 +1171,7 @@ class ViolinPlot extends Component {
         return;
       }
 
-      Object.keys(self.chart.groupObjs).forEach(cName => {
+      Object.keys(self.chart.groupObjs).forEach((cName) => {
         if (Object.prototype.hasOwnProperty.call(self.chart.groupObjs, cName)) {
           cBoxPlot = self.chart.groupObjs[cName].boxPlot;
 
@@ -1251,7 +1251,7 @@ class ViolinPlot extends Component {
     return self.chart;
   };
 
-  renderDataPlots = options => {
+  renderDataPlots = (options) => {
     const self = this;
     // const id = '';
     self.chart.dataPlots = {};
@@ -1267,7 +1267,7 @@ class ViolinPlot extends Component {
       colors: null,
     };
     self.chart.dataPlots.options = self.shallowCopy(defaultOptions);
-    Object.keys(options).forEach(option => {
+    Object.keys(options).forEach((option) => {
       if (Object.prototype.hasOwnProperty.call(options, option)) {
         self.chart.dataPlots.options[option] = options[option];
       }
@@ -1275,7 +1275,7 @@ class ViolinPlot extends Component {
     const dOpts = self.chart.dataPlots.options;
 
     // Create notch objects
-    Object.keys(self.chart.groupObjs).forEach(cName => {
+    Object.keys(self.chart.groupObjs).forEach((cName) => {
       if (Object.prototype.hasOwnProperty.call(self.chart.groupObjs, cName)) {
         self.chart.groupObjs[cName].dataPlots = {};
         self.chart.groupObjs[cName].dataPlots.objs = {};
@@ -1284,9 +1284,9 @@ class ViolinPlot extends Component {
     // The lines don't fit into a group bucket so they live under the dataPlot object
     self.chart.dataPlots.objs = {};
 
-    self.chart.dataPlots.change = updateOptions => {
+    self.chart.dataPlots.change = (updateOptions) => {
       if (updateOptions) {
-        Object.keys(updateOptions).forEach(key => {
+        Object.keys(updateOptions).forEach((key) => {
           if (Object.prototype.hasOwnProperty.call(updateOptions, key)) {
             dOpts[key] = updateOptions[key];
           }
@@ -1294,7 +1294,7 @@ class ViolinPlot extends Component {
       }
 
       self.chart.dataPlots.objs.g.remove();
-      Object.keys(self.chart.groupObjs).forEach(cName => {
+      Object.keys(self.chart.groupObjs).forEach((cName) => {
         if (Object.prototype.hasOwnProperty.call(self.chart.groupObjs, cName)) {
           self.chart.groupObjs[cName].dataPlots.objs.g.remove();
         }
@@ -1306,7 +1306,7 @@ class ViolinPlot extends Component {
     self.chart.dataPlots.reset = () => {
       self.chart.dataPlots.change(defaultOptions);
     };
-    self.chart.dataPlots.show = opts => {
+    self.chart.dataPlots.show = (opts) => {
       let newOpts = opts;
       if (opts !== undefined) {
         newOpts.show = true;
@@ -1318,7 +1318,7 @@ class ViolinPlot extends Component {
       }
       self.chart.dataPlots.change(newOpts);
     };
-    self.chart.dataPlots.hide = opts => {
+    self.chart.dataPlots.hide = (opts) => {
       let newOpts = opts;
       if (opts !== undefined) {
         newOpts.show = false;
@@ -1342,14 +1342,14 @@ class ViolinPlot extends Component {
       // Metrics lines
       if (self.chart.dataPlots.objs.g) {
         const halfBand = self.chart.xScale.bandwidth() / 2; // find the middle of each band
-        Object.keys(self.chart.dataPlots.objs.lines).forEach(cMetric => {
+        Object.keys(self.chart.dataPlots.objs.lines).forEach((cMetric) => {
           if (
             Object.prototype.hasOwnProperty.call(
               self.chart.dataPlots.objs.lines,
               cMetric,
             )
           ) {
-            self.chart.dataPlots.objs.lines[cMetric].line.x(d => {
+            self.chart.dataPlots.objs.lines[cMetric].line.x((d) => {
               return self.chart.xScale(d.x) + halfBand;
             });
             self.chart.dataPlots.objs.lines[cMetric].g
@@ -1359,7 +1359,7 @@ class ViolinPlot extends Component {
         });
       }
 
-      Object.keys(self.chart.groupObjs).forEach(cName => {
+      Object.keys(self.chart.groupObjs).forEach((cName) => {
         if (Object.prototype.hasOwnProperty.call(self.chart.groupObjs, cName)) {
           const cGroup = self.chart.groupObjs[cName];
           cPlot = cGroup.dataPlots;
@@ -1415,7 +1415,7 @@ class ViolinPlot extends Component {
       }
 
       //Double Click Behavior
-      self.chart.objs.svg.on('dblclick', function() {
+      self.chart.objs.svg.on('dblclick', function () {
         d3.selectAll(`.violin-tooltip`).style('display', 'none');
         self.brushedData = [];
         self.clearBrush(self);
@@ -1424,7 +1424,7 @@ class ViolinPlot extends Component {
         self.props.onHandleProteinSelected([]);
       });
 
-      Object.keys(self.chart.groupObjs).forEach(cName => {
+      Object.keys(self.chart.groupObjs).forEach((cName) => {
         if (Object.prototype.hasOwnProperty.call(self.chart.groupObjs, cName)) {
           cPlot = self.chart.groupObjs[cName].dataPlots;
 
@@ -1443,7 +1443,7 @@ class ViolinPlot extends Component {
               cPlot.objs.points.pts.push(
                 cPlot.objs.points.g
                   .append('circle')
-                  .attr('id', d => {
+                  .attr('id', (d) => {
                     // return (
                     //   'violin_' +
                     //   self.chart.groupObjs[cName].values[pt][
@@ -1468,7 +1468,7 @@ class ViolinPlot extends Component {
                     }
                     return dOpts.pointSize * 1;
                   })
-                  .attr('fill', d => {
+                  .attr('fill', (d) => {
                     if (
                       self.chart.groupObjs[cName].values[pt].statistic === max
                     ) {
@@ -1493,7 +1493,7 @@ class ViolinPlot extends Component {
             .selectAll('circle')
             .data(circleData)
             .attr('pointer-events', 'all')
-            .on('mouseover', d => {
+            .on('mouseover', (d) => {
               // var id = d.sample.replace(/\;/g, "_");
               // self.dotHover.emit({ object: d, action: 'mouseover' });
               self.isHovering = true;
@@ -1529,14 +1529,14 @@ class ViolinPlot extends Component {
               }
               return null;
             })
-            .on('mouseout', d => {
+            .on('mouseout', (d) => {
               // var id = d.sample.replace(/\;/g, "_");
               d3.select(`circle[id='violin_${d.featureID}']`)
                 .transition()
                 .duration(300)
-                .attr('r', x => {
+                .attr('r', (x) => {
                   const inBrush = this.brushedData.findIndex(
-                    d => d.featureID === x.featureID,
+                    (d) => d.featureID === x.featureID,
                   );
                   if (self.maxCircle !== x.featureID) {
                     if (inBrush > 0) {
@@ -1558,9 +1558,9 @@ class ViolinPlot extends Component {
                 }
               }
             })
-            .on('click', d => {
+            .on('click', (d) => {
               self.isHovering = false;
-              const inBrush = this.brushedData.findIndex(function(x) {
+              const inBrush = this.brushedData.findIndex(function (x) {
                 return x.featureID === d.featureID;
               });
               if (inBrush > 0) {
@@ -1595,7 +1595,7 @@ class ViolinPlot extends Component {
     // this.initiateViolinPlot(true);
   };
 
-  initiateViolinPlot = resetDimensions => {
+  initiateViolinPlot = (resetDimensions) => {
     const { violinSettings, verticalSplitPaneSize } = this.props;
     d3.select(`#${violinSettings.id}`).remove();
     if (resetDimensions) {
@@ -1622,7 +1622,7 @@ class ViolinPlot extends Component {
           violinContainerWidth: containerWidth,
           violinWidth: width,
         },
-        function() {
+        function () {
           this.createViolinPlot();
         },
       );
@@ -1669,7 +1669,7 @@ class ViolinPlot extends Component {
     );
     this.setState(
       { displayElementTextViolin: !this.state.displayElementTextViolin },
-      function() {
+      function () {
         this.handleElementText(false, this.props.HighlightedProteins);
       },
     );
@@ -1700,6 +1700,7 @@ class ViolinPlot extends Component {
               fontSize: '13px',
             }}
             className=""
+            position="bottom center"
             basic
             content={displayElementTextViolin ? 'Hide Labels' : 'Show Labels'}
           />

@@ -29,7 +29,7 @@ export const Linkout = React.memo(
         for (const item of itemValuesSeparated) {
           linkoutsConcatenated.push(`${link}${item}`);
         }
-        linkoutsConcatenated.forEach(link => {
+        linkoutsConcatenated.forEach((link) => {
           window.open(link, '_blank', windowFeatures);
         });
       }
@@ -71,6 +71,7 @@ export const Linkout = React.memo(
             content={iconDomains[index]}
             inverted
             basic
+            position="bottom center"
           />
         );
       });
@@ -106,6 +107,7 @@ export const Linkout = React.memo(
           content={iconDomains}
           inverted
           basic
+          position="bottom center"
         />
       );
     }
@@ -189,7 +191,7 @@ export function limitString(string, indexes, characters) {
 export function scrollElement(_this, grid, target) {
   const bodyRef =
     _this[grid].current?.qhGridRef?.current?.bodyRef?.current || null;
-  window.requestAnimationFrame(function() {
+  window.requestAnimationFrame(function () {
     if (bodyRef != null) {
       const row = bodyRef.getElementsByClassName(target);
       if (row.length !== 0) {
@@ -231,9 +233,9 @@ export function networkByCluster(network) {
 
     while (keepGoing) {
       keepGoing = false;
-      _.forEach(network.links, link => {
+      _.forEach(network.links, (link) => {
         nowInBucket = false;
-        _.forEach(buckets, bucket => {
+        _.forEach(buckets, (bucket) => {
           if (
             _.includes(bucket, link.source) ||
             _.includes(bucket, link.target)
@@ -270,9 +272,9 @@ export function networkByCluster(network) {
     }
     return nodeArray;
   };
-  _.forEach(network.links, link => {
+  _.forEach(network.links, (link) => {
     inBucket = false;
-    _.forEach(buckets, bucket => {
+    _.forEach(buckets, (bucket) => {
       if (_.includes(bucket, link.source) || _.includes(bucket, link.target)) {
         inBucket = true;
       }
@@ -283,7 +285,7 @@ export function networkByCluster(network) {
     }
   });
   let nextIndex = 1;
-  _.forEach(network.nodes, node => {
+  _.forEach(network.nodes, (node) => {
     let found = false;
     _.forEach(buckets, (bucket, i) => {
       if (_.includes(bucket, node.id)) {
@@ -296,7 +298,7 @@ export function networkByCluster(network) {
       nextIndex++;
     }
   });
-  _.forEach(network.links, link => {
+  _.forEach(network.links, (link) => {
     _.forEach(buckets, (bucket, i) => {
       if (_.includes(bucket, link.target || _.includes(bucket, link.source))) {
         link.group = i;
@@ -304,25 +306,25 @@ export function networkByCluster(network) {
     });
   });
   network.nodes = _.sortBy(network.nodes, [
-    function(o) {
+    function (o) {
       return o.group;
     },
   ]);
   network.links = _.sortBy(network.links, [
-    function(o) {
+    function (o) {
       return o.group;
     },
   ]);
-  let nodes = d3.group(network.nodes, d => d.group);
-  let links = d3.group(network.links, d => d.group);
-  let nodeArray = Array.from(nodes, function(o) {
+  let nodes = d3.group(network.nodes, (d) => d.group);
+  let links = d3.group(network.links, (d) => d.group);
+  let nodeArray = Array.from(nodes, function (o) {
     return { name: 'cluster' + o[0], size: o[1].length, nodes: o[1] };
   });
-  let linkArray = Array.from(links, function(o) {
+  let linkArray = Array.from(links, function (o) {
     return { name: 'cluster' + o[0], size_links: o[1].length, links: o[1] };
   });
-  _.forEach(nodeArray, nObj => {
-    let links = _.find(linkArray, function(lObj) {
+  _.forEach(nodeArray, (nObj) => {
+    let links = _.find(linkArray, function (lObj) {
       return lObj.name === nObj.name;
     });
     if (links) {
@@ -423,7 +425,7 @@ export function getDynamicSizeBtn() {
 }
 
 // use debounce so plotly config can switch export types if needed
-export const clickDownload = _.debounce(parentNode => {
+export const clickDownload = _.debounce((parentNode) => {
   // plotly download data title could be 'Download plot' or 'Download plot as a png', and not always even with the export type config, so we need to find it
   let downloadIcon = parentNode?.current?.querySelectorAll(
     `[data-title="Download plot"]`,
@@ -480,7 +482,7 @@ export function diff(from, to, field = 'id') {
   }
   const nextIds = new Set(to.map(accessor));
   const prevIds = new Set(from.map(accessor));
-  const removed = from.filter(item => !nextIds.has(accessor(item)));
+  const removed = from.filter((item) => !nextIds.has(accessor(item)));
 
   const unchanged = intersectionWith(from, to, isEqual);
 
@@ -490,7 +492,7 @@ export function diff(from, to, field = 'id') {
     isEqual,
   );
 
-  const added = to.filter(item => !prevIds.has(accessor(item)));
+  const added = to.filter((item) => !prevIds.has(accessor(item)));
   return {
     removed,
     unchanged,
@@ -500,7 +502,7 @@ export function diff(from, to, field = 'id') {
 }
 
 export function getYAxis(array) {
-  const match = array.find(column => {
+  const match = array.find((column) => {
     const columnLowerCase = column.toLowerCase();
     if (
       // p value
@@ -524,7 +526,7 @@ export function getYAxis(array) {
 }
 
 export function getXAxis(array) {
-  const match = array.find(column => {
+  const match = array.find((column) => {
     const columnLowerCase = column.toLowerCase();
     if (
       // logfc
@@ -572,12 +574,12 @@ export function getIdArg(
     let mappingId = id;
     const firstMappingModelIndex = differentialModelsAndTests.findIndex(
       // a => a.modelID === multiModelMappingFirstKey,
-      a => a.modelID === differentialModel,
+      (a) => a.modelID === differentialModel,
     );
     const isNotMappingId = firstMappingModelIndex > 0;
     if (isNotMappingId) {
       if (multiModelMappingArrays?.length) {
-        const idMappingObject = multiModelMappingArrays.filter(m =>
+        const idMappingObject = multiModelMappingArrays.filter((m) =>
           Object.values(m).includes(id),
         );
         mappingId = idMappingObject[0]?.[differentialModel] || id;
@@ -625,10 +627,10 @@ export function getTestsArg(
       // where j is the number of models in the study
       let tests = [];
       const currentModelAndTests = [...differentialModelsAndTests].find(
-        a => a.modelID === differentialModel,
+        (a) => a.modelID === differentialModel,
       );
       differentialModelIds.forEach(() => {
-        currentModelAndTests.tests.forEach(test => {
+        currentModelAndTests.tests.forEach((test) => {
           tests.push(test.testID);
         });
       });
@@ -652,7 +654,7 @@ export function getModelsArg(
   } else {
     // MULTI-MODEL
     const currentModelIndex = differentialModelIds.findIndex(
-      id => id === differentialModel,
+      (id) => id === differentialModel,
     );
     const orderedDifferentialModelIds =
       currentModelIndex > 0
@@ -670,7 +672,7 @@ export function getModelsArg(
       let models = [];
       const currentDifferentialModelsAndTestsIndex = [
         ...differentialModelsAndTests,
-      ].findIndex(a => a.modelID === differentialModel);
+      ].findIndex((a) => a.modelID === differentialModel);
       // move the first mapping object models first
       const currentDifferentialModelsAndTestsMoved =
         currentDifferentialModelsAndTestsIndex > 0
@@ -680,8 +682,8 @@ export function getModelsArg(
               0,
             )
           : differentialModelsAndTests;
-      currentDifferentialModelsAndTestsMoved.forEach(cdmtm => {
-        cdmtm.tests.forEach(test => {
+      currentDifferentialModelsAndTestsMoved.forEach((cdmtm) => {
+        cdmtm.tests.forEach((test) => {
           models.push(cdmtm.modelID);
         });
       });
@@ -692,5 +694,5 @@ export function getModelsArg(
 
 // helper function to get the difference between two sets
 export function getDifferenceTwoSets(setA, setB) {
-  return new Set([...setA].filter(element => !setB.has(element)));
+  return new Set([...setA].filter((element) => !setB.has(element)));
 }

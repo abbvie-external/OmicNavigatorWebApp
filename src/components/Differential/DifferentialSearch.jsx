@@ -1077,7 +1077,7 @@ class DifferentialSearch extends Component {
             }
             style={StudyPopupStyle}
             className="CustomTooltip"
-            position="bottom center"
+            position="right center"
             inverted
             basic
             content={

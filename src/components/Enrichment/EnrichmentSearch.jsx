@@ -119,11 +119,8 @@ class EnrichmentSearch extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    const {
-      allStudiesMetadata,
-      enrichmentStudy,
-      enrichmentResults,
-    } = this.props;
+    const { allStudiesMetadata, enrichmentStudy, enrichmentResults } =
+      this.props;
     if (
       allStudiesMetadata !== prevProps.allStudiesMetadata ||
       enrichmentStudy !== prevProps.enrichmentStudy
@@ -151,7 +148,7 @@ class EnrichmentSearch extends Component {
       onGetEnrichmentsLinkouts,
     } = this.props;
 
-    const studies = allStudiesMetadata.map(study => {
+    const studies = allStudiesMetadata.map((study) => {
       const studyName = study.name;
       return {
         key: `${studyName}Enrichment`,
@@ -166,7 +163,7 @@ class EnrichmentSearch extends Component {
       // loop through allStudiesMetadata to find the object with the name matching enrichmentStudy
       const allStudiesMetadataCopy = [...allStudiesMetadata];
       const enrichmentStudyData = allStudiesMetadataCopy.find(
-        study => study.name === enrichmentStudy,
+        (study) => study.name === enrichmentStudy,
       );
       const enrichmentModelsAndAnnotationsVar =
         enrichmentStudyData?.enrichments || [];
@@ -175,12 +172,12 @@ class EnrichmentSearch extends Component {
         enrichmentModelsAndAnnotationsVar,
       );
       const enrichmentModelIds = [];
-      enrichmentModelsAndAnnotationsVar.forEach(enrichment =>
+      enrichmentModelsAndAnnotationsVar.forEach((enrichment) =>
         enrichmentModelIds.push(enrichment.modelID),
       );
       this.props.onSetEnrichmentModelIds(enrichmentModelIds);
       const enrichmentModelsMapped = enrichmentModelsAndAnnotationsVar.map(
-        enrichment => {
+        (enrichment) => {
           return {
             key: `${enrichment.modelID}Enrichment`,
             text: enrichment.modelID,
@@ -200,9 +197,10 @@ class EnrichmentSearch extends Component {
       } else {
         this.props.onHandleHasBarcodeData();
         this.props.onHandlePlotTypesEnrichment(enrichmentModel);
-        const enrichmentModelWithAnnotations = enrichmentModelsAndAnnotationsVar.find(
-          model => model.modelID === enrichmentModel,
-        );
+        const enrichmentModelWithAnnotations =
+          enrichmentModelsAndAnnotationsVar.find(
+            (model) => model.modelID === enrichmentModel,
+          );
         const enrichmentModelTooltip =
           enrichmentModelWithAnnotations?.modelDisplay || '';
         this.setState({
@@ -210,15 +208,14 @@ class EnrichmentSearch extends Component {
         });
         const enrichmentAnnotationsMetadataVar =
           enrichmentModelWithAnnotations?.annotations || [];
-        const enrichmentAnnotationsMapped = enrichmentAnnotationsMetadataVar.map(
-          annotation => {
+        const enrichmentAnnotationsMapped =
+          enrichmentAnnotationsMetadataVar.map((annotation) => {
             return {
               key: `${annotation.annotationID}Enrichment`,
               text: annotation.annotationID,
               value: annotation.annotationID,
             };
-          },
-        );
+          });
         // const uDataMapped = enrichmentAnnotationsMetadataVar.map(
         //   a => a.annotationID,
         // );
@@ -247,10 +244,10 @@ class EnrichmentSearch extends Component {
             body: JSON.stringify(obj), // body data type must match "Content-Type" header
           })
             // can nd-json-stream - assumes json is NDJSON, a data format that is separated into individual JSON objects with a newline character (\n). The 'nd' stands for newline delimited JSON
-            .then(response => {
+            .then((response) => {
               return ndjsonStream(response.body); //ndjsonStream parses the response.body
             })
-            .then(canNdJsonStream => {
+            .then((canNdJsonStream) => {
               this.handleGetEnrichmentsTableStream(
                 canNdJsonStream,
                 enrichmentAnnotation,
@@ -259,7 +256,7 @@ class EnrichmentSearch extends Component {
                 false,
               );
             })
-            .catch(error => {
+            .catch((error) => {
               console.error('Error during getEnrichmentsTable', error);
             });
           onSearchChangeEnrichment(
@@ -271,9 +268,10 @@ class EnrichmentSearch extends Component {
             },
             false,
           );
-          const enrichmentAnnotationMeta = enrichmentAnnotationsMetadataVar.find(
-            annotation => annotation.annotationID === enrichmentAnnotation,
-          );
+          const enrichmentAnnotationMeta =
+            enrichmentAnnotationsMetadataVar.find(
+              (annotation) => annotation.annotationID === enrichmentAnnotation,
+            );
           const enrichmentAnnotationTooltip =
             enrichmentAnnotationMeta?.annotationDisplay || '';
           this.setState({
@@ -323,12 +321,12 @@ class EnrichmentSearch extends Component {
 
   getReportLink = (study, model) => {
     cancelRequestGetReportLinkEnrichment();
-    let cancelToken = new CancelToken(e => {
+    let cancelToken = new CancelToken((e) => {
       cancelRequestGetReportLinkEnrichment = e;
     });
     omicNavigatorService
       .getReportLink(study, model, this.setStudyTooltip, cancelToken)
-      .then(getReportLinkResponse => {
+      .then((getReportLinkResponse) => {
         if (getReportLinkResponse.length > 0) {
           const link = getReportLinkResponse.includes('http')
             ? getReportLinkResponse
@@ -345,7 +343,7 @@ class EnrichmentSearch extends Component {
           });
         }
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Error during getReportLink', error);
       });
   };
@@ -376,15 +374,16 @@ class EnrichmentSearch extends Component {
     const enrichmentModelsAndAnnotationsCopy = [
       ...enrichmentModelsAndAnnotations,
     ];
-    const enrichmentModelWithAnnotations = enrichmentModelsAndAnnotationsCopy.find(
-      model => model.modelID === value,
-    );
+    const enrichmentModelWithAnnotations =
+      enrichmentModelsAndAnnotationsCopy.find(
+        (model) => model.modelID === value,
+      );
     const enrichmentModelTooltip =
       enrichmentModelWithAnnotations?.modelDisplay || '';
     const enrichmentAnnotationsMetadataVar =
       enrichmentModelWithAnnotations.annotations || [];
     const enrichmentAnnotationsMapped = enrichmentAnnotationsMetadataVar.map(
-      annotation => {
+      (annotation) => {
         return {
           key: annotation.annotationID,
           text: annotation.annotationID,
@@ -415,9 +414,10 @@ class EnrichmentSearch extends Component {
     onHandleEnrichmentColumnsConfigured(false);
     onSearchTransitionEnrichment(true);
     onMultisetQueriedEnrichment(false);
-    const enrichmentAnnotationMeta = this.props.enrichmentAnnotationsMetadata.find(
-      annotation => annotation.annotationID === value,
-    );
+    const enrichmentAnnotationMeta =
+      this.props.enrichmentAnnotationsMetadata.find(
+        (annotation) => annotation.annotationID === value,
+      );
     const enrichmentAnnotationTooltip =
       enrichmentAnnotationMeta?.annotationDisplay || '';
     this.props.onAnnotationChange();
@@ -461,10 +461,10 @@ class EnrichmentSearch extends Component {
       body: JSON.stringify(obj), // body data type must match "Content-Type" header
     })
       // can nd-json-stream - assumes json is NDJSON, a data format that is separated into individual JSON objects with a newline character (\n). The 'nd' stands for newline delimited JSON
-      .then(response => {
+      .then((response) => {
         return ndjsonStream(response.body); //ndjsonStream parses the response.body
       })
-      .then(canNdJsonStream => {
+      .then((canNdJsonStream) => {
         this.handleGetEnrichmentsTableStream(
           canNdJsonStream,
           value,
@@ -473,7 +473,7 @@ class EnrichmentSearch extends Component {
           false,
         );
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Error during getEnrichmentsTable', error);
       });
   };
@@ -594,10 +594,10 @@ class EnrichmentSearch extends Component {
         body: JSON.stringify(obj), // body data type must match "Content-Type" header
       })
         // can nd-json-stream - assumes json is NDJSON, a data format that is separated into individual JSON objects with a newline character (\n). The 'nd' stands for newline delimited JSON
-        .then(response => {
+        .then((response) => {
           return ndjsonStream(response.body); //ndjsonStream parses the response.body
         })
-        .then(canNdJsonStream => {
+        .then((canNdJsonStream) => {
           this.handleGetEnrichmentsTableStream(
             canNdJsonStream,
             enrichmentAnnotation,
@@ -606,24 +606,20 @@ class EnrichmentSearch extends Component {
             false,
           );
         })
-        .catch(error => {
+        .catch((error) => {
           onSearchTransitionEnrichment(false);
           console.error('Error during getEnrichmentsTable', error);
         });
     } else {
-      const {
-        sigValue,
-        selectedOperator,
-        mustEnrichment,
-        notEnrichment,
-      } = this.state;
+      const { sigValue, selectedOperator, mustEnrichment, notEnrichment } =
+        this.state;
       this.setState({
         reloadPlot: true,
         isFilteredEnrichment: this.hasMustOrNotAnnotations(),
       });
       this.props.onHandleEnrichmentTableLoading(true);
       cancelRequestGetEnrichmentsIntersection();
-      let cancelToken = new CancelToken(e => {
+      let cancelToken = new CancelToken((e) => {
         cancelRequestGetEnrichmentsIntersection = e;
       });
       omicNavigatorService
@@ -639,7 +635,7 @@ class EnrichmentSearch extends Component {
           undefined,
           cancelToken,
         )
-        .then(annotationData => {
+        .then((annotationData) => {
           const multisetResults = annotationData;
           this.setState({
             mustEnrichment,
@@ -649,7 +645,7 @@ class EnrichmentSearch extends Component {
           });
           onEnrichmentSearch(multisetResults, enrichmentAnnotation);
         })
-        .catch(error => {
+        .catch((error) => {
           console.error('Error during getEnrichmentsIntersection', error);
         });
     }
@@ -739,10 +735,10 @@ class EnrichmentSearch extends Component {
       body: JSON.stringify(obj), // body data type must match "Content-Type" header
     })
       // can nd-json-stream - assumes json is NDJSON, a data format that is separated into individual JSON objects with a newline character (\n). The 'nd' stands for newline delimited JSON
-      .then(response => {
+      .then((response) => {
         return ndjsonStream(response.body); //ndjsonStream parses the response.body
       })
-      .then(canNdJsonStream => {
+      .then((canNdJsonStream) => {
         this.handleGetEnrichmentsTableStream(
           canNdJsonStream,
           value,
@@ -751,12 +747,12 @@ class EnrichmentSearch extends Component {
           false,
         );
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Error during getEnrichmentsTable', error);
       });
   };
 
-  changeHoveredFilter = index => {
+  changeHoveredFilter = (index) => {
     const uSetVP = { ...this.state.uSettings };
     uSetVP.hoveredFilter = index;
     this.setState({ uSettings: uSetVP });
@@ -779,7 +775,7 @@ class EnrichmentSearch extends Component {
     });
   };
 
-  handleSigValueEInputChange = value => {
+  handleSigValueEInputChange = (value) => {
     this.setState({
       sigValue: [parseFloat(value)],
       reloadPlot: true,
@@ -801,11 +797,8 @@ class EnrichmentSearch extends Component {
   };
 
   handleFilterOutChange = (test, isMultiset) => {
-    const {
-      mustEnrichment,
-      notEnrichment,
-      multisetFiltersVisibleEnrichment,
-    } = this.state;
+    const { mustEnrichment, notEnrichment, multisetFiltersVisibleEnrichment } =
+      this.state;
     let mustEnrichmentCopy = [...mustEnrichment];
     let notEnrichmentCopy = [...notEnrichment];
     if (mustEnrichmentCopy.includes(test)) {
@@ -857,7 +850,7 @@ class EnrichmentSearch extends Component {
       onDisablePlotEnrichment();
     }
     cancelRequestGetEnrichmentsIntersection();
-    let cancelToken = new CancelToken(e => {
+    let cancelToken = new CancelToken((e) => {
       cancelRequestGetEnrichmentsIntersection = e;
     });
     omicNavigatorService
@@ -873,7 +866,7 @@ class EnrichmentSearch extends Component {
         this.handleErrorGetEnrichmentsIntersection,
         cancelToken,
       )
-      .then(annotationData => {
+      .then((annotationData) => {
         const multisetResults = annotationData;
         this.setState({
           mustEnrichment,
@@ -884,7 +877,7 @@ class EnrichmentSearch extends Component {
         });
         onEnrichmentSearch(multisetResults, enrichmentAnnotation);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Error during getEnrichmentsIntersection', error);
       });
     const testsLength = typeof tests === 'string' ? 1 : tests.length;
@@ -917,12 +910,12 @@ class EnrichmentSearch extends Component {
     pValueType,
   ) {
     const { uData, multisetTestsFilteredOut } = this.props;
-    const tests = uData.filter(function(col) {
+    const tests = uData.filter(function (col) {
       return !multisetTestsFilteredOut.includes(col);
     });
     if (tests?.length > 1) {
       cancelRequestGetEnrichmentsMultiset();
-      let cancelToken = new CancelToken(e => {
+      let cancelToken = new CancelToken((e) => {
         cancelRequestGetEnrichmentsMultiset = e;
       });
       omicNavigatorService
@@ -937,7 +930,7 @@ class EnrichmentSearch extends Component {
           undefined,
           cancelToken,
         )
-        .then(svgUrl => {
+        .then((svgUrl) => {
           if (svgUrl) {
             let svgInfo = { plotType: 'Multiset', svg: svgUrl };
             this.props.onGetMultisetPlotEnrichment({
@@ -945,15 +938,16 @@ class EnrichmentSearch extends Component {
             });
           }
         })
-        .catch(error => {
+        .catch((error) => {
           console.error('Error during getEnrichmentsMultiset', error);
         });
     }
   }
 
   handleMultisetFiltersVisibleEnrichment = () => {
-    this.setState(prevState => ({
-      multisetFiltersVisibleEnrichment: !prevState.multisetFiltersVisibleEnrichment,
+    this.setState((prevState) => ({
+      multisetFiltersVisibleEnrichment:
+        !prevState.multisetFiltersVisibleEnrichment,
     }));
   };
 
@@ -1163,7 +1157,7 @@ class EnrichmentSearch extends Component {
             }
             style={StudyPopupStyle}
             className="CustomTooltip"
-            position="bottom center"
+            position="right center"
             inverted
             basic
             content={
