@@ -64,7 +64,7 @@ const StyledThumb = styled.div`
 const NodeStyledTrack = styled.div`
   top: 0;
   bottom: 0;
-  background: ${props =>
+  background: ${(props) =>
     props.index === 2
       ? '#2e2e2e'
       : props.index === 1
@@ -77,7 +77,7 @@ const NodeStyledTrack = styled.div`
 const LinkCutoffStyledTrack = styled.div`
   top: 0;
   bottom: 0;
-  background: ${props =>
+  background: ${(props) =>
     props.index === 2
       ? '#fff'
       : props.index === 1
@@ -90,7 +90,7 @@ const LinkCutoffStyledTrack = styled.div`
 const LinkTypeStyledTrack = styled.div`
   top: 0;
   bottom: 0;
-  background: ${props =>
+  background: ${(props) =>
     props.index === 2
       ? '#2e2e2e'
       : props.index === 1
@@ -111,7 +111,7 @@ const CustomPopupStyle = {
   wordBreak: 'break-word',
 };
 
-const getItemName = val => {
+const getItemName = (val) => {
   if (val === 'significance') {
     return 'Significance';
   } else if (val === 'nodecount') {
@@ -122,8 +122,8 @@ const getItemName = val => {
 };
 
 const DragHandle = SortableHandle(() => <Icon name="bars" />);
-const SortableItem = sortableElement(props => {
-  const ItemTooltip = function() {
+const SortableItem = sortableElement((props) => {
+  const ItemTooltip = function () {
     if (props.value === 'significance') {
       return 'Sort clusters by chosen significance metric';
     } else if (props.value === 'nodecount') {
@@ -205,7 +205,7 @@ class NetworkGraphControls extends Component {
   }
 
   handleLabels = () => {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       showNetworkLabels: !prevState.showNetworkLabels,
     }));
     if (this.state.showNetworkLabels) {
@@ -239,7 +239,7 @@ class NetworkGraphControls extends Component {
       });
       const valueLowercase = value?.toLowerCase();
       this.setState({
-        networkSearchResults: this.state.descriptions.filter(result =>
+        networkSearchResults: this.state.descriptions.filter((result) =>
           result.description?.toLowerCase().includes(valueLowercase),
         ),
         networkSearchValue: valueLowercase,
@@ -251,7 +251,7 @@ class NetworkGraphControls extends Component {
   handleSearchChangeAlt = (e, { value }) => {
     const valueLowercase = value?.toLowerCase();
     this.setState({
-      networkSearchResults: this.state.descriptions.filter(result =>
+      networkSearchResults: this.state.descriptions.filter((result) =>
         result.description?.toLowerCase().includes(valueLowercase),
       ),
       networkSearchValue: valueLowercase,
@@ -259,8 +259,8 @@ class NetworkGraphControls extends Component {
     });
   };
 
-  setupNetworkSearch = filteredNodes => {
-    const networkDataNodeDescriptions = filteredNodes.map(r => ({
+  setupNetworkSearch = (filteredNodes) => {
+    const networkDataNodeDescriptions = filteredNodes.map((r) => ({
       description: r.description?.toLowerCase(),
       termid: r.termID,
       // genes: r.EnrichmentMap_Genes,
@@ -281,22 +281,22 @@ class NetworkGraphControls extends Component {
   };
 
   // NODE CUTOFF
-  handleNodeCutoffInputChange = value => {
+  handleNodeCutoffInputChange = (value) => {
     this.setState({
       nodeCutoffLocal: value,
     });
   };
 
-  actuallyHandleNodeCutoffInputChange = _.debounce(value => {
+  actuallyHandleNodeCutoffInputChange = _.debounce((value) => {
     this.props.onHandleNodeCutoffInputChange(value);
   }, 1250);
 
-  actuallyHandleNodeCutoffSliderChange = value => {
+  actuallyHandleNodeCutoffSliderChange = (value) => {
     let decimalValue = value / 100;
     this.props.onHandleNodeCutoffSliderChange(decimalValue);
   };
 
-  handleNodeCutoffSliderChange = value => {
+  handleNodeCutoffSliderChange = (value) => {
     let decimalValue = value / 100;
     this.setState({
       nodeCutoffLocal: decimalValue,
@@ -304,22 +304,22 @@ class NetworkGraphControls extends Component {
   };
 
   // LINK CUTOFF
-  handleLinkCutoffInputChange = value => {
+  handleLinkCutoffInputChange = (value) => {
     this.setState({
       linkCutoffLocal: value,
     });
   };
 
-  actuallyHandleLinkCutoffInputChange = _.debounce(value => {
+  actuallyHandleLinkCutoffInputChange = _.debounce((value) => {
     this.props.onHandleLinkCutoffInputChange(value);
   }, 1250);
 
-  actuallyHandleLinkCutoffSliderChange = value => {
+  actuallyHandleLinkCutoffSliderChange = (value) => {
     let decimalValue = value >= 5 ? value / 100 : 0.05;
     this.props.onHandleLinkCutoffSliderChange(decimalValue);
   };
 
-  handleLinkCutoffSliderChange = value => {
+  handleLinkCutoffSliderChange = (value) => {
     let decimalValue = value >= 5 ? value / 100 : 0.05;
     this.setState({
       linkCutoffLocal: decimalValue,
@@ -327,12 +327,12 @@ class NetworkGraphControls extends Component {
   };
 
   // LINK TYPE
-  actuallyHandleLinkTypeSliderChange = value => {
+  actuallyHandleLinkTypeSliderChange = (value) => {
     let decimalValue = value / 100;
     this.props.onHandleLinkTypeSliderChange(decimalValue);
   };
 
-  handleLinkTypeSliderChange = value => {
+  handleLinkTypeSliderChange = (value) => {
     let decimalValue = value / 100;
     this.setState({
       linkTypeLocal: decimalValue,
@@ -350,7 +350,7 @@ class NetworkGraphControls extends Component {
 
   getNodeFeatures(enrichmentStudy, enrichmentAnnotation, termid) {
     cancelRequestGetNodeFeaturesSearch();
-    let cancelToken = new CancelToken(e => {
+    let cancelToken = new CancelToken((e) => {
       cancelRequestGetNodeFeaturesSearch = e;
     });
     omicNavigatorService
@@ -361,12 +361,12 @@ class NetworkGraphControls extends Component {
         null,
         cancelToken,
       )
-      .then(getNodeFeaturesResponseData => {
+      .then((getNodeFeaturesResponseData) => {
         this.setState({
           hoveredFeatures: getNodeFeaturesResponseData,
         });
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Error during getNodeFeatures', error);
       });
   }
@@ -409,7 +409,7 @@ class NetworkGraphControls extends Component {
           </Label> */}
           <Popup
             on="hover"
-            onOpen={e =>
+            onOpen={(e) =>
               this.getNodeFeatures(
                 enrichmentStudy,
                 enrichmentAnnotation,
@@ -418,7 +418,7 @@ class NetworkGraphControls extends Component {
             }
             flowing
             basic
-            onClose={e => this.setState({ hoveredFeatures: '' })}
+            onClose={(e) => this.setState({ hoveredFeatures: '' })}
             trigger={
               <Label circular color="blue" key={description}>
                 {size}
@@ -622,7 +622,7 @@ class NetworkGraphControls extends Component {
                   </Popup.Content>
                 </Popup>
                 <NumericExponentialInput
-                  onChange={number => {
+                  onChange={(number) => {
                     this.handleNodeCutoffInputChange(number);
                     this.actuallyHandleNodeCutoffInputChange(number);
                   }}
@@ -684,7 +684,7 @@ class NetworkGraphControls extends Component {
                   mouseLeaveDelay={0}
                 />
                 <NumericExponentialInput
-                  onChange={number => {
+                  onChange={(number) => {
                     let revisedNumber = number >= 0.1 ? number : 0.1;
                     this.handleLinkCutoffInputChange(revisedNumber);
                     this.actuallyHandleLinkCutoffInputChange(revisedNumber);

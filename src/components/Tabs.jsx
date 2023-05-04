@@ -83,7 +83,7 @@ class Tabs extends Component {
     this.getStudies();
   }
 
-  setTabIndex = tabIndex => {
+  setTabIndex = (tabIndex) => {
     this.setState({
       activeIndex: tabIndex,
     });
@@ -173,13 +173,14 @@ class Tabs extends Component {
   getStudies = () => {
     omicNavigatorService
       .listStudies()
-      .then(listStudiesResponseData => {
+      .then((listStudiesResponseData) => {
+        const allStudiesMetadata = Array.from(listStudiesResponseData);
         this.setState({
-          allStudiesMetadata: listStudiesResponseData,
+          allStudiesMetadata,
         });
         this.getPackageVersion();
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Error during listStudies', error);
       });
   };
@@ -187,12 +188,12 @@ class Tabs extends Component {
   getPackageVersion = () => {
     omicNavigatorService
       .getPackageVersion()
-      .then(packageVersionResponseData => {
+      .then((packageVersionResponseData) => {
         this.setState({
           packageVersion: packageVersionResponseData,
         });
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Error during packageVersion', error);
       });
   };
@@ -201,13 +202,13 @@ class Tabs extends Component {
     this.setState({ featureToHighlightInDiffTable: '' });
   };
 
-  toggleInfoFirst = bool => {
+  toggleInfoFirst = (bool) => {
     this.setState({
       infoOpenFirst: bool,
     });
   };
 
-  toggleInfoSecond = bool => {
+  toggleInfoSecond = (bool) => {
     this.setState({
       infoOpenSecond: bool,
     });
@@ -358,7 +359,7 @@ class Tabs extends Component {
         differentialFeatureIdKey: '',
         filteredDifferentialFeatureIdKey: '',
       },
-      function() {
+      function () {
         updateUrl(
           this.props,
           this.state,

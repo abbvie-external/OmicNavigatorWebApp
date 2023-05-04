@@ -78,10 +78,10 @@ class PlotsMultiFeature extends Component {
       differentialHighlightedFeaturesData?.length || null;
     if (featuresHighlighted > 10) {
       let shortenedArr = [...differentialHighlightedFeaturesData].slice(0, 10);
-      features = shortenedArr.map(m => m.key);
+      features = shortenedArr.map((m) => m.key);
     } else {
       if (featuresHighlighted > 0) {
-        features = [...differentialHighlightedFeaturesData].map(m => m.key);
+        features = [...differentialHighlightedFeaturesData].map((m) => m.key);
       }
     }
     const featuresListHorizontalStyle = {
@@ -123,7 +123,7 @@ class PlotsMultiFeature extends Component {
         </List.Item>
         {featuresHighlighted > 10
           ? null
-          : features.map(f => {
+          : features.map((f) => {
               return (
                 <List.Item key={`featureList-${f}`} className="NoSelect">
                   <Label
@@ -156,8 +156,9 @@ class PlotsMultiFeature extends Component {
           basic
           on="click"
           inverted
+          position="bottom center"
           open={this.state.featuresListOpen}
-          onClose={e => this.toggleFeaturesListPopup(e, null, true)}
+          onClose={(e) => this.toggleFeaturesListPopup(e, null, true)}
           closeOnDocumentClick
           closeOnEscape
           hideOnScroll
@@ -179,13 +180,13 @@ class PlotsMultiFeature extends Component {
     }
   };
 
-  handlePlotlyExport = plotlyExportType => {
+  handlePlotlyExport = (plotlyExportType) => {
     this.setState(
       {
         plotlyExport: true,
         plotlyExportType,
       },
-      function() {
+      function () {
         // callback to reset plotly export in progress to false
         this.setState({ plotlyExport: false });
       },
@@ -237,7 +238,7 @@ class PlotsMultiFeature extends Component {
         const activeTabIndexPlotsMultiFeatureVar =
           activeTabIndexPlotsMultiFeature || 0;
         const svgArray = [...plotMultiFeatureData.svg];
-        options = svgArray.map(function(s, index) {
+        options = svgArray.map(function (s, index) {
           return {
             key: `${index}=VolcanoPlotDropdownOption`,
             text: s.plotType.plotDisplay,
@@ -248,7 +249,7 @@ class PlotsMultiFeature extends Component {
           plotMultiFeatureData?.key?.includes('features') || false;
         if (modelSpecificMetaFeaturesExist !== false && !isMultifeaturePlot) {
           const multiFeaturePlotTypes = differentialPlotTypes.filter(
-            p => !p.plotType.includes('multiFeature'),
+            (p) => !p.plotType.includes('multiFeature'),
           );
           let metafeaturesDropdown = [
             {

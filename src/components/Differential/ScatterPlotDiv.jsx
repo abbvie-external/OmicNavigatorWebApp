@@ -176,9 +176,9 @@ class ScatterPlotDiv extends Component {
     if (firstFullObject) {
       let allProperties = Object.keys(firstFullObject);
       const dataCopy = [...differentialResults];
-      allProperties.forEach(property => {
+      allProperties.forEach((property) => {
         // loop through data, one property at a time
-        const notNullObject = dataCopy.find(row => {
+        const notNullObject = dataCopy.find((row) => {
           // find the first value for that property
           return isNotNANullUndefinedEmptyString(row[property]);
         });
@@ -203,7 +203,7 @@ class ScatterPlotDiv extends Component {
     }
     //Pushes "none" option into Volcano circle text dropdown
     differentialAlphanumericFields.unshift('None');
-    let volcanoCircleLabelsVar = differentialAlphanumericFields.map(e => {
+    let volcanoCircleLabelsVar = differentialAlphanumericFields.map((e) => {
       return {
         key: e,
         text: e,
@@ -249,7 +249,7 @@ class ScatterPlotDiv extends Component {
         yLabel = relevantConfigColumns[0];
       }
     }
-    const axes = relevantConfigColumns.map(e => {
+    const axes = relevantConfigColumns.map((e) => {
       return {
         key: e,
         text: e,
@@ -268,7 +268,7 @@ class ScatterPlotDiv extends Component {
     if (close) {
       const self = this;
       // timeout needed so optionsOpen still true briefly on scatterplot click
-      setTimeout(function() {
+      setTimeout(function () {
         self.setState({ optionsOpen: false });
       }, 10);
     } else {
@@ -395,7 +395,7 @@ class ScatterPlotDiv extends Component {
               on="click"
               inverted
               open={optionsOpen}
-              onClose={e => this.toggleOptionsPopup(e, null, true)}
+              onClose={(e) => this.toggleOptionsPopup(e, null, true)}
               closeOnDocumentClick
               closeOnEscape
             >
@@ -516,12 +516,12 @@ class ScatterPlotDiv extends Component {
               }
               // style={StudyPopupStyle}
               id="UsageTooltip"
-              position="right center"
+              position="bottom left"
               basic
               on="click"
               inverted
               open={usageOpen}
-              onClose={e => this.toggleUsagePopup(e, null, true)}
+              onClose={(e) => this.toggleUsagePopup(e, null, true)}
               closeOnDocumentClick
               closeOnEscape
               hideOnScroll

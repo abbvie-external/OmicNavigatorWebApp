@@ -156,7 +156,7 @@ class DifferentialSearch extends Component {
       onSearchChangeDifferential,
       onSearchTransitionDifferential,
     } = this.props;
-    const studies = allStudiesMetadata.map(study => {
+    const studies = allStudiesMetadata.map((study) => {
       const studyName = study.name;
       return {
         key: `${studyName}Differential`,
@@ -171,7 +171,7 @@ class DifferentialSearch extends Component {
       // loop through allStudiesMetadata to find the object with name matching differentialStudy
       const allStudiesMetadataCopy = [...allStudiesMetadata];
       const differentialStudyData = allStudiesMetadataCopy.find(
-        study => study.name === differentialStudy,
+        (study) => study.name === differentialStudy,
       );
       const differentialModelsAndTestsVar =
         differentialStudyData?.results || [];
@@ -180,12 +180,12 @@ class DifferentialSearch extends Component {
         differentialModelsAndTestsVar,
       );
       const differentialModelIds = [];
-      differentialModelsAndTestsVar.forEach(result =>
+      differentialModelsAndTestsVar.forEach((result) =>
         differentialModelIds.push(result.modelID),
       );
       this.props.onSetDifferentialModelIds(differentialModelIds);
       const differentialModelsMapped = differentialModelsAndTestsVar.map(
-        result => {
+        (result) => {
           return {
             key: `${result.modelID}Differential`,
             text: result.modelID,
@@ -211,7 +211,7 @@ class DifferentialSearch extends Component {
         );
         this.props.onHandlePlotTypesDifferential(differentialModel);
         const differentialModelWithTests = differentialModelsAndTestsVar.find(
-          model => model.modelID === differentialModel,
+          (model) => model.modelID === differentialModel,
         );
         const differentialModelTooltip =
           differentialModelWithTests?.modelDisplay || '';
@@ -221,7 +221,7 @@ class DifferentialSearch extends Component {
         const differentialTestsMetadataVar =
           differentialModelWithTests?.tests || [];
         const differentialTestsMapped = differentialTestsMetadataVar.map(
-          test => {
+          (test) => {
             return {
               key: `${test.testID}Differential`,
               text: test.testID,
@@ -230,7 +230,7 @@ class DifferentialSearch extends Component {
           },
         );
         const differentialTestIds = differentialTestsMetadataVar.map(
-          t => t.testID,
+          (t) => t.testID,
         );
         this.setState({
           differentialTestsDisabled: false,
@@ -256,16 +256,16 @@ class DifferentialSearch extends Component {
             body: JSON.stringify(obj), // body data type must match "Content-Type" header
           })
             // can nd-json-stream - assumes json is NDJSON, a data format that is separated into individual JSON objects with a newline character (\n). The 'nd' stands for newline delimited JSON
-            .then(response => {
+            .then((response) => {
               return ndjsonStream(response.body); //ndjsonStream parses the response.body
             })
-            .then(canNdJsonStream => {
+            .then((canNdJsonStream) => {
               this.handleGetResultsTableStream(
                 canNdJsonStream,
                 differentialTest,
               );
             })
-            .catch(error => {
+            .catch((error) => {
               console.error('Error during getResultsTable', error);
             });
           onSearchChangeDifferential(
@@ -279,7 +279,7 @@ class DifferentialSearch extends Component {
             true,
           );
           const differentialTestMeta = differentialTestsMetadataVar.find(
-            test => test.testID === differentialTest,
+            (test) => test.testID === differentialTest,
           );
           const differentialTestTooltip =
             differentialTestMeta?.testDisplay || '';
@@ -293,10 +293,8 @@ class DifferentialSearch extends Component {
   };
 
   handleStudyChange = (evt, { name, value }) => {
-    const {
-      onSearchChangeDifferential,
-      onSearchResetDifferential,
-    } = this.props;
+    const { onSearchChangeDifferential, onSearchResetDifferential } =
+      this.props;
     this.props.onGetMultiModelMappingObject(value);
     onSearchChangeDifferential(
       {
@@ -335,12 +333,12 @@ class DifferentialSearch extends Component {
 
   getReportLink = (study, model) => {
     cancelRequestGetReportLinkDifferential();
-    let cancelToken = new CancelToken(e => {
+    let cancelToken = new CancelToken((e) => {
       cancelRequestGetReportLinkDifferential = e;
     });
     omicNavigatorService
       .getReportLink(study, model, this.setStudyTooltip, cancelToken)
-      .then(getReportLinkResponse => {
+      .then((getReportLinkResponse) => {
         if (getReportLinkResponse.length > 0) {
           const link = getReportLinkResponse.includes('http')
             ? getReportLinkResponse
@@ -357,7 +355,7 @@ class DifferentialSearch extends Component {
           });
         }
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Error during getReportLink', error);
       });
   };
@@ -387,20 +385,22 @@ class DifferentialSearch extends Component {
     });
     const differentialModelsAndTestsCopy = [...differentialModelsAndTests];
     const differentialModelWithTests = differentialModelsAndTestsCopy.find(
-      model => model.modelID === value,
+      (model) => model.modelID === value,
     );
     const differentialModelTooltip =
       differentialModelWithTests?.modelDisplay || '';
     const differentialTestsMetadataVar =
       differentialModelWithTests?.tests || [];
-    const differentialTestsMapped = differentialTestsMetadataVar.map(test => {
+    const differentialTestsMapped = differentialTestsMetadataVar.map((test) => {
       return {
         key: test.testID,
         text: test.testID,
         value: test.testID,
       };
     });
-    const differentialTestIds = differentialTestsMetadataVar.map(t => t.testID);
+    const differentialTestIds = differentialTestsMetadataVar.map(
+      (t) => t.testID,
+    );
     this.setState({
       differentialTestsDisabled: false,
       differentialTests: differentialTestsMapped,
@@ -426,7 +426,7 @@ class DifferentialSearch extends Component {
     onSearchTransitionDifferential(true);
     onMultisetQueriedDifferential(false);
     const differentialTestMeta = this.props.differentialTestsMetadata.find(
-      test => test.testID === value,
+      (test) => test.testID === value,
     );
     const differentialTestTooltip = differentialTestMeta?.testDisplay || '';
     this.setState({
@@ -472,13 +472,13 @@ class DifferentialSearch extends Component {
       body: JSON.stringify(obj), // body data type must match "Content-Type" header
     })
       // can nd-json-stream - assumes json is NDJSON, a data format that is separated into individual JSON objects with a newline character (\n). The 'nd' stands for newline delimited JSON
-      .then(response => {
+      .then((response) => {
         return ndjsonStream(response.body); //ndjsonStream parses the response.body
       })
-      .then(canNdJsonStream => {
+      .then((canNdJsonStream) => {
         this.handleGetResultsTableStream(canNdJsonStream, value);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Error during getResultsTable', error);
       });
   };
@@ -552,7 +552,7 @@ class DifferentialSearch extends Component {
       // on toggle open
       if (this.state.selectedColP.length === 0) {
         const multisetColsDifferentialKeys = multisetColsDifferential.map(
-          t => t.key,
+          (t) => t.key,
         );
         let defaultColKey = getYAxis(multisetColsDifferentialKeys);
         let defaultCol = null;
@@ -590,7 +590,7 @@ class DifferentialSearch extends Component {
           multisetFiltersVisibleDifferential: false,
           isFilteredSearch: false,
         },
-        function() {
+        function () {
           const differentialTestName = 'differentialTest';
           const differentialTestVar = this.props.differentialTest;
           this.multisetTriggeredTestChange(
@@ -607,11 +607,8 @@ class DifferentialSearch extends Component {
   };
 
   multisetTriggeredTestChange = (name, value) => {
-    const {
-      differentialStudy,
-      differentialModel,
-      onSearchChangeDifferential,
-    } = this.props;
+    const { differentialStudy, differentialModel, onSearchChangeDifferential } =
+      this.props;
     // onSearchTransitionDifferentialAlt(true);
     this.setState({
       isFilteredSearch: false,
@@ -650,13 +647,13 @@ class DifferentialSearch extends Component {
       body: JSON.stringify(obj), // body data type must match "Content-Type" header
     })
       // can nd-json-stream - assumes json is NDJSON, a data format that is separated into individual JSON objects with a newline character (\n). The 'nd' stands for newline delimited JSON
-      .then(response => {
+      .then((response) => {
         return ndjsonStream(response.body); //ndjsonStream parses the response.body
       })
-      .then(canNdJsonStream => {
+      .then((canNdJsonStream) => {
         this.handleGetResultsTableStream(canNdJsonStream, value);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Error during getResultsTable', error);
       });
   };
@@ -684,7 +681,7 @@ class DifferentialSearch extends Component {
     });
   };
 
-  removeFilterDifferential = index => {
+  removeFilterDifferential = (index) => {
     const uSetVP = { ...this.state.uSettingsP };
     uSetVP.indexFiltersP = [...uSetVP.indexFiltersP]
       .slice(0, index)
@@ -712,7 +709,7 @@ class DifferentialSearch extends Component {
     );
   };
 
-  changeHoveredFilter = index => {
+  changeHoveredFilter = (index) => {
     // const uSetVP = { ...this.state.uSettingsP };
     // uSetVP.hoveredFilter = index;
     this.setState({
@@ -780,7 +777,7 @@ class DifferentialSearch extends Component {
     });
     this.props.onHandleResultsTableLoading(true);
     cancelRequestGetResultsIntersection();
-    let cancelToken = new CancelToken(e => {
+    let cancelToken = new CancelToken((e) => {
       cancelRequestGetResultsIntersection = e;
     });
     omicNavigatorService
@@ -796,7 +793,7 @@ class DifferentialSearch extends Component {
         this.handleErrorGetResultsIntersection,
         cancelToken,
       )
-      .then(inferenceData => {
+      .then((inferenceData) => {
         onDifferentialSearch(
           {
             differentialResults: inferenceData,
@@ -814,7 +811,7 @@ class DifferentialSearch extends Component {
         });
         this.props.onHandleIsFilteredDifferential(false);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Error during getResultsIntersection', error);
         this.props.onHandleIsFilteredDifferential(false);
       });
@@ -847,7 +844,7 @@ class DifferentialSearch extends Component {
     eColP,
   ) {
     cancelRequestGetResultsMultiset();
-    let cancelToken = new CancelToken(e => {
+    let cancelToken = new CancelToken((e) => {
       cancelRequestGetResultsMultiset = e;
     });
     omicNavigatorService
@@ -860,7 +857,7 @@ class DifferentialSearch extends Component {
         undefined,
         cancelToken,
       )
-      .then(svgUrl => {
+      .then((svgUrl) => {
         if (svgUrl) {
           let svgInfo = { plotType: 'Multiset', svg: svgUrl };
           this.props.onGetMultisetPlotDifferential({
@@ -868,7 +865,7 @@ class DifferentialSearch extends Component {
           });
         }
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Error during getResultsMultiset', error);
       });
   }
@@ -1080,7 +1077,7 @@ class DifferentialSearch extends Component {
             }
             style={StudyPopupStyle}
             className="CustomTooltip"
-            position="bottom center"
+            position="right center"
             inverted
             basic
             content={
