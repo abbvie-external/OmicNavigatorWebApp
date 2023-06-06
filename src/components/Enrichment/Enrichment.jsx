@@ -99,7 +99,7 @@ class Enrichment extends Component {
       facetAndValueLabel: ['Test', 'pValue'],
       nodeLabel: 'description',
       radiusScale: [10, 50],
-      lineScale: [1, 10],
+      lineScale: [5, 25],
       nodeSize: 'geneSetSize',
       linkSize: 'overlapSize',
       linkMetaLabels: ['Overlap Size', 'Source', 'Target'],
