@@ -106,7 +106,7 @@ class Enrichment extends Component {
       linkMeta: ['overlapSize', 'source', 'target'],
       linkMetaLookup: ['description', 'description'],
       nodeColorScale: [0, 0.1, 1],
-      nodeColors: ['red', 'white', 'blue'],
+      nodeColors: ['#e34a33', '#fdbb84', '#fee8c8'],
       mostSignificantColorScale: ['#B78628', '#DBA514', '#FCC201'],
       title: '',
       id: 'chart-network',
