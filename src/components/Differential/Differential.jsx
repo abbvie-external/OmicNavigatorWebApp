@@ -139,54 +139,54 @@ class Differential extends Component {
   //   this.forceUpdate();
   // }
 
-  handleSearchTransitionDifferential = bool => {
+  handleSearchTransitionDifferential = (bool) => {
     this.setState({
       isSearchingDifferential: bool,
     });
   };
 
-  handleMultisetFiltersVisibleParentRef = bool => {
+  handleMultisetFiltersVisibleParentRef = (bool) => {
     this.setState({
       multisetFiltersVisibleParentRef: bool,
     });
   };
 
-  handleIsFilteredDifferential = bool => {
+  handleIsFilteredDifferential = (bool) => {
     this.setState({
       isFilteredDifferential: bool,
     });
   };
 
-  handleDifferentialColumnsConfigured = bool => {
+  handleDifferentialColumnsConfigured = (bool) => {
     this.differentialColumnsConfigured = bool;
   };
 
-  handleSearchTransitionDifferentialAlt = bool => {
+  handleSearchTransitionDifferentialAlt = (bool) => {
     this.setState({
       differentialResultsTableLoading: bool,
     });
   };
 
-  handleMultisetQueriedDifferential = value => {
+  handleMultisetQueriedDifferential = (value) => {
     this.setState({
       multisetQueriedDifferential: value,
       // dynamicPlotsLoaded: !value,
     });
   };
 
-  setTestsMetadata = testsData => {
+  setTestsMetadata = (testsData) => {
     this.setState({
       differentialTestsMetadata: testsData,
     });
   };
 
-  setDifferentialTestIds = differentialTestIds => {
+  setDifferentialTestIds = (differentialTestIds) => {
     this.setState({
       differentialTestIds,
     });
   };
 
-  setDifferentialModelIds = differentialModelIds => {
+  setDifferentialModelIds = (differentialModelIds) => {
     this.setState({
       differentialModelIds,
     });
@@ -241,7 +241,7 @@ class Differential extends Component {
     // }
   };
 
-  handleResultsTableLoading = bool => {
+  handleResultsTableLoading = (bool) => {
     this.setState({
       differentialResultsTableLoading: bool,
     });
@@ -253,30 +253,31 @@ class Differential extends Component {
         differentialStudyMetadata: studyData,
         differentialModelsAndTests: modelsAndTests,
       },
-      function() {
+      function () {
         this.handlePlotTypesDifferential(this.props.differentialModel);
       },
     );
   };
 
-  handlePlotTypesDifferential = differentialModel => {
+  handlePlotTypesDifferential = (differentialModel) => {
     if (differentialModel !== '') {
       if (this.state.differentialStudyMetadata?.plots != null) {
-        const differentialModelData = this.state.differentialStudyMetadata.plots.find(
-          model => model.modelID === differentialModel,
-        );
+        const differentialModelData =
+          this.state.differentialStudyMetadata.plots.find(
+            (model) => model.modelID === differentialModel,
+          );
         const differentialPlotTypesRaw = differentialModelData?.plots;
         // filter out invalid plots - plotType string must be 'singleFeature', 'multiFeature', 'singleTest', 'multiTest', 'plotly'
         const differentialPlotTypesVar = [...differentialPlotTypesRaw].filter(
-          plot => {
+          (plot) => {
             let plotTypeArr = plot?.plotType || null;
-            const convertStringToArray = object => {
+            const convertStringToArray = (object) => {
               return typeof object === 'string' ? Array(object) : object;
             };
             if (plotTypeArr) {
               plotTypeArr = convertStringToArray(plot.plotType);
             }
-            const isValidPlotType = pt => {
+            const isValidPlotType = (pt) => {
               return (
                 pt === 'singleFeature' ||
                 pt === 'multiFeature' ||
@@ -304,9 +305,9 @@ class Differential extends Component {
         // let multiModelPlotTypesVar = [];
         if (differentialPlotTypesVar) {
           singleFeaturePlotTypesVar = [...differentialPlotTypesVar].filter(
-            p => !p.plotType.includes('multiFeature'),
+            (p) => !p.plotType.includes('multiFeature'),
           );
-          multiFeaturePlotTypesVar = [...differentialPlotTypesVar].filter(p =>
+          multiFeaturePlotTypesVar = [...differentialPlotTypesVar].filter((p) =>
             p.plotType.includes('multiFeature'),
           );
           // in progress - if we need to distinuguish tabs for multi-modal
@@ -392,7 +393,7 @@ class Differential extends Component {
   doMetaFeaturesExist = (differentialStudy, differentialModel) => {
     omicNavigatorService
       .getMetaFeatures(differentialStudy, differentialModel)
-      .then(getMetaFeaturesResponseData => {
+      .then((getMetaFeaturesResponseData) => {
         const exist = getMetaFeaturesResponseData.length > 0 ? true : false;
         this.setState({
           modelSpecificMetaFeaturesExist: exist,
@@ -425,7 +426,7 @@ class Differential extends Component {
         });
         omicNavigatorService
           .getFavicons(parsedResultsLinkouts)
-          .then(getFaviconsResponseData => {
+          .then((getFaviconsResponseData) => {
             const favicons = getFaviconsResponseData || [];
             this.setState({
               differentialResultsFavicons: favicons,
@@ -443,7 +444,7 @@ class Differential extends Component {
       });
       omicNavigatorService
         .getResultsLinkouts(differentialStudy, differentialModel)
-        .then(getResultsLinkoutsResponseData => {
+        .then((getResultsLinkoutsResponseData) => {
           const linkouts = getResultsLinkoutsResponseData || [];
           this.setState({
             differentialResultsLinkouts: linkouts,
@@ -454,7 +455,7 @@ class Differential extends Component {
           );
           omicNavigatorService
             .getFavicons(linkouts)
-            .then(getFaviconsResponseData => {
+            .then((getFaviconsResponseData) => {
               const favicons = getFaviconsResponseData || [];
               this.setState({
                 differentialResultsFavicons: favicons,
@@ -485,7 +486,7 @@ class Differential extends Component {
       });
       omicNavigatorService
         .getMultisetCols(differentialStudy, differentialModel)
-        .then(getMultisetColsDifferentialResponseData => {
+        .then((getMultisetColsDifferentialResponseData) => {
           const cols = getMultisetColsDifferentialResponseData || [];
           this.setState({
             multisetColsDifferential: cols,
@@ -498,7 +499,7 @@ class Differential extends Component {
     }
   };
 
-  handleDifferentialResultsTableStreaming = bool => {
+  handleDifferentialResultsTableStreaming = (bool) => {
     this.setState({
       differentialResultsTableStreaming: bool,
     });
@@ -521,15 +522,16 @@ class Differential extends Component {
     });
   };
 
-  handlePlotAnimationDifferential = animation => () => {
-    this.setState(prevState => ({
+  handlePlotAnimationDifferential = (animation) => () => {
+    this.setState((prevState) => ({
       animation,
       visible: !prevState.visible,
-      multisetButttonActiveDifferential: !prevState.multisetButttonActiveDifferential,
+      multisetButttonActiveDifferential:
+        !prevState.multisetButttonActiveDifferential,
     }));
   };
 
-  handleMultisetPlot = multisetPlotResults => {
+  handleMultisetPlot = (multisetPlotResults) => {
     this.setState({
       plotMultisetDataDifferential: {
         title: multisetPlotResults.svgInfo.plotType,
@@ -552,7 +554,7 @@ class Differential extends Component {
         plotOverlayVisible: true,
         plotOverlayLoaded: false,
       },
-      function() {
+      function () {
         this.handleSearchChangeDifferential(
           {
             differentialStudy: this.props.differentialStudy || '',
@@ -567,11 +569,11 @@ class Differential extends Component {
     );
   };
 
-  getTableHelpers = differentialFeatureIdKeyVar => {
+  getTableHelpers = (differentialFeatureIdKeyVar) => {
     const self = this;
     let addParams = {};
     addParams.showPlotOverlay = (dataItem, alphanumericTrigger) => {
-      return function() {
+      return function () {
         let value = dataItem[alphanumericTrigger];
         let plotOverlayData = {
           key: `${value}`,
@@ -618,13 +620,13 @@ class Differential extends Component {
       svg: [],
     };
     cancelRequestDifferentialResultsGetPlot();
-    let cancelToken = new CancelToken(e => {
+    let cancelToken = new CancelToken((e) => {
       cancelRequestDifferentialResultsGetPlot = e;
     });
     if (differentialPlotTypes.length !== 0) {
       let plots = differentialPlotTypes;
       if (multifeaturePlot) {
-        plots = differentialPlotTypes.filter(p =>
+        plots = differentialPlotTypes.filter((p) =>
           p.plotType.includes('multiFeature'),
         );
         const featuresLengthParentVar = featureId?.length || 0;
@@ -635,12 +637,12 @@ class Differential extends Component {
         };
       } else {
         plots = differentialPlotTypes.filter(
-          p => !p.plotType.includes('multiFeature'),
+          (p) => !p.plotType.includes('multiFeature'),
         );
       }
       if (plots?.length) {
         if (returnSVG) {
-          _.forEach(plots, function(plot, i) {
+          _.forEach(plots, function (plot, i) {
             const idArg = getIdArg(
               plot.plotType,
               differentialModelIds,
@@ -684,7 +686,7 @@ class Differential extends Component {
                   cancelToken,
                 )
                 // .then(svg => ({ svg, plotType: plot }));
-                .then(svg => {
+                .then((svg) => {
                   let svgInfo = {
                     plotType: plots[i],
                     svg,
@@ -705,7 +707,7 @@ class Differential extends Component {
                   null,
                   cancelToken,
                 )
-                .then(svg => {
+                .then((svg) => {
                   let xml = svg?.data || null;
                   if (xml != null && xml !== []) {
                     xml = xml.replace(/id="/g, 'id="' + id + '-' + i + '-');
@@ -715,16 +717,17 @@ class Differential extends Component {
                       /<svg/g,
                       `<svg preserveAspectRatio="xMinYMin meet" class="currentSVG" id="currentSVG-${id}-${i}"`,
                     );
-                    DOMPurify.addHook('afterSanitizeAttributes', function(
-                      node,
-                    ) {
-                      if (
-                        node.hasAttribute('xlink:href') &&
-                        !node.getAttribute('xlink:href').match(/^#/)
-                      ) {
-                        node.remove();
-                      }
-                    });
+                    DOMPurify.addHook(
+                      'afterSanitizeAttributes',
+                      function (node) {
+                        if (
+                          node.hasAttribute('xlink:href') &&
+                          !node.getAttribute('xlink:href').match(/^#/)
+                        ) {
+                          node.remove();
+                        }
+                      },
+                    );
                     // Clean HTML string and write into our DIV
                     let sanitizedSVG = DOMPurify.sanitize(xml, {
                       ADD_TAGS: ['use'],
@@ -737,7 +740,7 @@ class Differential extends Component {
                     self.handleSVG(view, plotDataVar);
                   }
                 })
-                .catch(error => {
+                .catch((error) => {
                   console.error(
                     `Error during plotStudyReturnSvg for plot ${plots[i].plotID}`,
                     error,
@@ -750,7 +753,7 @@ class Differential extends Component {
         } else {
           // refined for dynamically sized plots on single-threaded servers (running R locally), we're using a race condition to take the first url and handle/display it asap; after that, we're using allSettled to wait for remaining urls, and then sending them all to the component as props
           const promises = plots
-            .map(plot => {
+            .map((plot) => {
               const idArg = getIdArg(
                 plot.plotType,
                 differentialModelIds,
@@ -791,36 +794,36 @@ class Differential extends Component {
                   null,
                   cancelToken,
                 )
-                .then(svg => ({ svg, plotType: plot }));
+                .then((svg) => ({ svg, plotType: plot }));
             })
             .filter(Boolean);
           Promise.race(promises)
-            .then(svg => {
+            .then((svg) => {
               plotDataVar.svg = [svg];
 
               self.handleSVG(view, plotDataVar);
             })
             // Ignore error in first race - Handled later
-            .catch(error => undefined)
+            .catch((error) => undefined)
             .then(() => {
               if (promises.length > 1) {
                 const all = Promise.allSettled(promises);
                 return all;
               }
             })
-            .then(promiseResults => {
+            .then((promiseResults) => {
               if (!promiseResults) {
                 // If promise.length===1, then this is undefined
                 return;
               }
               const svgArray = promiseResults
-                .filter(result => result.status === 'fulfilled')
+                .filter((result) => result.status === 'fulfilled')
                 .map(({ value }) => value);
               /**
                * @type {Error[]}
                */
               const errors = promiseResults
-                .filter(result => result.status === 'rejected')
+                .filter((result) => result.status === 'rejected')
                 .map(({ reason }) => reason);
               if (svgArray.length) {
                 self.handleSVG(view, { ...plotDataVar, svg: svgArray });
@@ -833,7 +836,7 @@ class Differential extends Component {
                 // Handle errors coming in - warn users
               }
             })
-            .catch(error => {
+            .catch((error) => {
               console.error(`Error during plotStudyReturnSvgUrl`, error);
               // if one of many plots fails we don't want to alter the UI, however eventually consdider how best to handle failure when single feature differentialPlotTypes length is 1
             });
@@ -911,10 +914,10 @@ class Differential extends Component {
       } = this.props;
       const self = this;
       cancelRequestDifferentialResultsGetMultifeaturePlot();
-      let cancelToken = new CancelToken(e => {
+      let cancelToken = new CancelToken((e) => {
         cancelRequestDifferentialResultsGetMultifeaturePlot = e;
       });
-      let multifeaturePlot = differentialPlotTypes.filter(p =>
+      let multifeaturePlot = differentialPlotTypes.filter((p) =>
         p.plotType.includes('multiFeature'),
       );
       const featuresLengthParentVar = featureids?.length || 0;
@@ -958,7 +961,7 @@ class Differential extends Component {
                   cancelToken,
                 )
                 // .then(svg => ({ svg, plotType: plot }));
-                .then(svg => {
+                .then((svg) => {
                   let svgInfo = {
                     plotType: multifeaturePlot[0],
                     svg,
@@ -967,15 +970,16 @@ class Differential extends Component {
                   self.handleSVG('Overlay', plotDataVar);
                 });
             } else {
-              const promise = omicNavigatorService.plotStudyReturnSvgWithTimeoutResolver(
-                differentialStudy,
-                modelsArg,
-                featureids,
-                multifeaturePlot[0].plotID,
-                testsArg,
-                null,
-                cancelToken,
-              );
+              const promise =
+                omicNavigatorService.plotStudyReturnSvgWithTimeoutResolver(
+                  differentialStudy,
+                  modelsArg,
+                  featureids,
+                  multifeaturePlot[0].plotID,
+                  testsArg,
+                  null,
+                  cancelToken,
+                );
               const svg = await promise;
               if (svg) {
                 if (svg === true) {
@@ -1003,7 +1007,7 @@ class Differential extends Component {
             return err;
           }
         } else {
-          _.forEach(multifeaturePlot, function(plot, i) {
+          _.forEach(multifeaturePlot, function (plot, i) {
             const testsArg = getTestsArg(
               plot.plotType,
               differentialModelIds,
@@ -1035,7 +1039,7 @@ class Differential extends Component {
                   cancelToken,
                 )
                 // .then(svg => ({ svg, plotType: plot }));
-                .then(svg => {
+                .then((svg) => {
                   let svgInfo = {
                     plotType: multifeaturePlot[i],
                     svg,
@@ -1055,7 +1059,7 @@ class Differential extends Component {
                   null,
                   cancelToken,
                 )
-                .then(svg => {
+                .then((svg) => {
                   if (svg) {
                     // if (svg === true) {
                     //   duration timeout - for multiple plots, won't open a new tab for each, but rather await the longer responses
@@ -1071,16 +1075,17 @@ class Differential extends Component {
                         /<svg/g,
                         `<svg preserveAspectRatio="xMinYMin meet" class="currentSVG" id="currentSVG-multifeatures-${i}"`,
                       );
-                      DOMPurify.addHook('afterSanitizeAttributes', function(
-                        node,
-                      ) {
-                        if (
-                          node.hasAttribute('xlink:href') &&
-                          !node.getAttribute('xlink:href').match(/^#/)
-                        ) {
-                          node.remove();
-                        }
-                      });
+                      DOMPurify.addHook(
+                        'afterSanitizeAttributes',
+                        function (node) {
+                          if (
+                            node.hasAttribute('xlink:href') &&
+                            !node.getAttribute('xlink:href').match(/^#/)
+                          ) {
+                            node.remove();
+                          }
+                        },
+                      );
                       // Clean HTML string and write into our DIV
                       let sanitizedSVG = DOMPurify.sanitize(xml, {
                         ADD_TAGS: ['use'],
@@ -1096,7 +1101,7 @@ class Differential extends Component {
                   }
                   // }
                 })
-                .catch(error => {
+                .catch((error) => {
                   console.error(
                     `Error during plotStudyReturnSvgWithTimeoutResolver for plot ${differentialPlotTypes[i].plotID}`,
                     error,
@@ -1151,7 +1156,7 @@ class Differential extends Component {
       if (data.length > this.state.plotMultiFeatureMax) {
         data = [...data.slice(0, this.state.plotMultiFeatureMax)];
       }
-      const featureIds = data.map(featureId => featureId[key]);
+      const featureIds = data.map((featureId) => featureId[key]);
       const returnSVG = view === 'Overlay' ? true : false;
 
       if (returnSVG) {
@@ -1194,7 +1199,7 @@ class Differential extends Component {
           plotOverlayLoaded: false,
           featuresString,
         },
-        function() {
+        function () {
           this.handleSearchChangeDifferential(
             {
               differentialStudy: this.props.differentialStudy || '',
@@ -1218,16 +1223,13 @@ class Differential extends Component {
       differentialModelsAndTests,
       multiModelMappingFirstKey,
     } = this.state;
-    const {
-      differentialStudy,
-      differentialModel,
-      differentialTest,
-    } = this.props;
+    const { differentialStudy, differentialModel, differentialTest } =
+      this.props;
     cancelRequestDifferentialResultsGetMultifeaturePlot();
-    let cancelToken = new CancelToken(e => {
+    let cancelToken = new CancelToken((e) => {
       cancelRequestDifferentialResultsGetMultifeaturePlot = e;
     });
-    let multifeaturePlot = differentialPlotTypes.filter(p =>
+    let multifeaturePlot = differentialPlotTypes.filter((p) =>
       p.plotType.includes('multiFeature'),
     );
     if (multifeaturePlot.length !== 0) {
@@ -1284,7 +1286,7 @@ class Differential extends Component {
     }
   }
 
-  updateDifferentialResults = results => {
+  updateDifferentialResults = (results) => {
     this.setState({
       differentialResults: results,
     });
@@ -1329,7 +1331,7 @@ class Differential extends Component {
             HighlightedFeaturesCopy != null &&
             HighlightedFeaturesCopy !== {}
           ) {
-            HighlightedFeaturesCopy.forEach(element => {
+            HighlightedFeaturesCopy.forEach((element) => {
               differentialHighlightedFeaturesVar.push(element.key);
             });
           }
@@ -1348,7 +1350,7 @@ class Differential extends Component {
           HighlightedFeaturesCopy != null &&
           HighlightedFeaturesCopy !== {}
         ) {
-          HighlightedFeaturesCopy.forEach(element => {
+          HighlightedFeaturesCopy.forEach((element) => {
             differentialHighlightedFeaturesVar.push(element.key);
           });
         }
@@ -1368,7 +1370,7 @@ class Differential extends Component {
     }
   };
 
-  handleItemSelected = bool => {
+  handleItemSelected = (bool) => {
     this.setState({
       plotOverlayVisible: bool,
     });
@@ -1402,15 +1404,15 @@ class Differential extends Component {
     );
   };
 
-  isChecked = item => {
-    return function() {
+  isChecked = (item) => {
+    return function () {
       return this.state.differentialHighlightedFeatures.contains(
         item[this.state.differentialFeatureIdKey],
       );
     };
   };
 
-  setPlotSelected = featureId => {
+  setPlotSelected = (featureId) => {
     this.setState({
       differentialOutlinedFeature: featureId || '',
     });
@@ -1432,7 +1434,7 @@ class Differential extends Component {
     });
   };
 
-  getConfigCols = testData => {
+  getConfigCols = (testData) => {
     const differentialResultsVar = testData.differentialResults;
     const { differentialFeature } = this.props;
     const {
@@ -1461,9 +1463,9 @@ class Differential extends Component {
     if (firstFullObject) {
       let allProperties = Object.keys(firstFullObject);
       const dataCopy = [...differentialResultsVar];
-      allProperties.forEach(property => {
+      allProperties.forEach((property) => {
         // loop through data, one property at a time
-        const notNullObject = dataCopy.find(row => {
+        const notNullObject = dataCopy.find((row) => {
           // find the first value for that property
           return isNotNANullUndefinedEmptyString(row[property]);
         });
@@ -1508,10 +1510,23 @@ class Differential extends Component {
     );
     this.getTableHelpers(alphanumericTrigger);
     const noPlots = !differentialPlotTypes?.length > 0;
-    const differentialAlphanumericColumnsMapped = differentialAlphanumericFields.map(
-      (f, { index }) => {
+    const differentialAlphanumericColumnsMapped =
+      differentialAlphanumericFields.map((f, { index }) => {
         return {
-          title: f,
+          // headerAttributes: (
+          //   <Popup
+          //     trigger={<span className="HeaderTooltip">{f}</span>}
+          //     content="test tooltip"
+          //   />
+          // ),
+          // headerAttributes: { title: 'column header tooltip' },
+          title: (
+            <span>
+              {/* {f} */}
+              <Popup trigger={<span>{f}</span>} content="column header popup" />
+            </span>
+          ),
+          exportTitle: f,
           field: f,
           filterable: { type: 'multiFilter' },
           template: (value, item, addParams) => {
@@ -1527,9 +1542,8 @@ class Differential extends Component {
                 const columnLinkoutsIsArray = Array.isArray(columnLinkoutsObj);
                 let favicons = [];
                 if (columnFaviconsObj != null) {
-                  const columnFaviconsIsArray = Array.isArray(
-                    columnFaviconsObj,
-                  );
+                  const columnFaviconsIsArray =
+                    Array.isArray(columnFaviconsObj);
                   favicons = columnFaviconsIsArray
                     ? columnFaviconsObj
                     : [columnFaviconsObj];
@@ -1605,8 +1619,7 @@ class Differential extends Component {
             }
           },
         };
-      },
-    );
+      });
     const multisetColsDifferentialVar = this.listToJson(
       differentialNumericFields,
     );
@@ -1616,13 +1629,13 @@ class Differential extends Component {
       multisetColsDifferential: multisetColsDifferentialVar,
     });
     const differentialNumericColumnsMapped = differentialNumericFields.map(
-      c => {
+      (c) => {
         return {
           title: c,
           field: c,
           type: 'number',
           filterable: { type: 'numericFilter' },
-          exportTemplate: value => (value ? `${value}` : 'N/A'),
+          exportTemplate: (value) => (value ? `${value}` : 'N/A'),
           template: (value, item, addParams) => {
             return (
               <div className="NoSelect">
@@ -1691,11 +1704,8 @@ class Differential extends Component {
   }
 
   getMessage = () => {
-    const {
-      differentialStudy,
-      differentialModel,
-      differentialTest,
-    } = this.props;
+    const { differentialStudy, differentialModel, differentialTest } =
+      this.props;
     if (differentialStudy === '') {
       return 'study';
     } else if (differentialModel === '') {
@@ -1739,24 +1749,26 @@ class Differential extends Component {
     } else return <TransitionStill stillMessage={message} />;
   };
 
-  setMultiModelMappingObject = multiModelMappingObject => {
+  setMultiModelMappingObject = (multiModelMappingObject) => {
     if (!multiModelMappingObject) return;
     const multiModelMappingFirstKey = Object.keys(
       multiModelMappingObject[0],
     )[0];
     const multiModelMappingObjectCopy = [...multiModelMappingObject];
-    const multiModelMappingArrays = multiModelMappingObjectCopy.filter(mm => {
-      return Object.values(mm).every(x => x !== 'NA' && x !== '' && x != null);
+    const multiModelMappingArrays = multiModelMappingObjectCopy.filter((mm) => {
+      return Object.values(mm).every(
+        (x) => x !== 'NA' && x !== '' && x != null,
+      );
     });
     let multiModelMappingObjectArr = [];
-    multiModelMappingArrays.forEach(a => {
+    multiModelMappingArrays.forEach((a) => {
       multiModelMappingObjectArr.push(Object.values(a));
     });
     const multiModelMappingFlat = multiModelMappingObjectArr.flat();
     let multiModelMappingSet = new Set(multiModelMappingFlat);
 
     let multiModelMappingFirstKeyValues = [];
-    multiModelMappingArrays.forEach(a => {
+    multiModelMappingArrays.forEach((a) => {
       multiModelMappingFirstKeyValues.push(a[multiModelMappingFirstKey]);
     });
     // this will be a part of phase 2, displaying in the UI what features are/are not available across models to plot
@@ -1774,14 +1786,14 @@ class Differential extends Component {
     });
   };
 
-  getMultiModelMappingObject = differentialStudy => {
+  getMultiModelMappingObject = (differentialStudy) => {
     cancelRequestGetMapping();
-    let cancelToken = new CancelToken(e => {
+    let cancelToken = new CancelToken((e) => {
       cancelRequestGetMapping = e;
     });
     omicNavigatorService
       .getMapping(differentialStudy, cancelToken)
-      .then(mappingObj => {
+      .then((mappingObj) => {
         const mappingObject = mappingObj?.default || null;
         this.setMultiModelMappingObject(mappingObject);
       });
@@ -1794,12 +1806,8 @@ class Differential extends Component {
 
   render() {
     const differentialView = this.getView();
-    const {
-      plotMultisetDataDifferential,
-      animation,
-      direction,
-      visible,
-    } = this.state;
+    const { plotMultisetDataDifferential, animation, direction, visible } =
+      this.state;
     const { tab, differentialStudy, differentialModel } = this.props;
     let pxToPtRatio,
       pointSize,

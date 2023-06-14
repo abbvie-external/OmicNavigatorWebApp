@@ -223,14 +223,14 @@ class Enrichment extends Component {
         const AllDescriptionsAndTests = this.state.enrichmentResults;
         const ResultsLength = this.state.enrichmentResults.length;
         if (ResultsLength > 0) {
-          const dataItemDescription = getDataItemDescription(
-            DescriptionAndTest,
+          const dataItemDescription =
+            getDataItemDescription(DescriptionAndTest);
+          const dataItemIndex = _.findIndex(
+            AllDescriptionsAndTests,
+            function (d) {
+              return d.description === dataItemDescription;
+            },
           );
-          const dataItemIndex = _.findIndex(AllDescriptionsAndTests, function(
-            d,
-          ) {
-            return d.description === dataItemDescription;
-          });
           const dataItem = AllDescriptionsAndTests[dataItemIndex];
           const test = getTestName(DescriptionAndTest);
           // const testNameIndex = _.findIndex(dataItem, function(n) {
@@ -258,14 +258,14 @@ class Enrichment extends Component {
   //   });
   // };
 
-  handlePValueTypeChange = type => {
+  handlePValueTypeChange = (type) => {
     this.setState({
       pValueType: type,
     });
     sessionStorage.setItem('pValueType', type);
   };
 
-  handleEnrichmentColumnsConfigured = bool => {
+  handleEnrichmentColumnsConfigured = (bool) => {
     this.enrichmentColumnsConfigured = bool;
   };
 
@@ -311,7 +311,7 @@ class Enrichment extends Component {
       enrichmentTest: test,
     });
     cancelRequestGetBarcodeData();
-    let cancelToken = new CancelToken(e => {
+    let cancelToken = new CancelToken((e) => {
       cancelRequestGetBarcodeData = e;
     });
     omicNavigatorService
@@ -324,12 +324,12 @@ class Enrichment extends Component {
         this.handleGetBarcodeDataError,
         cancelToken,
       )
-      .then(barcodeDataResponse => {
+      .then((barcodeDataResponse) => {
         if (barcodeDataResponse?.data?.length > 0) {
           const logFoldChangeArr = barcodeDataResponse.data.map(
-            b => b.logFoldChange,
+            (b) => b.logFoldChange,
           );
-          const isZero = logFoldChangeVal => logFoldChangeVal === 0;
+          const isZero = (logFoldChangeVal) => logFoldChangeVal === 0;
           if (logFoldChangeArr.every(isZero)) {
             this.setState({
               displayViolinPlot: false,
@@ -349,7 +349,7 @@ class Enrichment extends Component {
           // this.handleGetBarcodeDataError();
         }
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Error during getBarcodeData', error);
       });
     // })
@@ -383,7 +383,7 @@ class Enrichment extends Component {
     }
     if (execute) {
       this.setState({
-        enrichmentColumns: enrichmentColumnsUnfiltered.map(col => {
+        enrichmentColumns: enrichmentColumnsUnfiltered.map((col) => {
           if (!arr.includes(col.title)) {
             return col;
           }
@@ -398,13 +398,13 @@ class Enrichment extends Component {
     }
   };
 
-  handleSearchTransitionEnrichment = bool => {
+  handleSearchTransitionEnrichment = (bool) => {
     this.setState({
       isSearchingEnrichment: bool,
     });
   };
 
-  handleMultisetQueriedEnrichment = value => {
+  handleMultisetQueriedEnrichment = (value) => {
     this.setState({
       multisetQueriedEnrichment: value,
     });
@@ -416,25 +416,25 @@ class Enrichment extends Component {
         enrichmentStudyMetadata: studyData,
         enrichmentModelsAndAnnotations: modelsAndAnnotations,
       },
-      function() {
+      function () {
         this.handlePlotTypesEnrichment(this.props.enrichmentModel);
       },
     );
   };
 
-  setAnnotationsMetadata = annotationsData => {
+  setAnnotationsMetadata = (annotationsData) => {
     this.setState({
       enrichmentAnnotationsMetadata: annotationsData,
     });
   };
 
-  handleNetworkSigValue = val => {
+  handleNetworkSigValue = (val) => {
     this.setState({
       networkSigValue: val.toString(),
     });
   };
 
-  handleNetworkOperator = op => {
+  handleNetworkOperator = (op) => {
     this.setState({
       networkOperator: op,
     });
@@ -464,7 +464,7 @@ class Enrichment extends Component {
       this.enrichmentColumnsConfigured = true;
     }
     if (multisetTestsFilteredOut.length > 0) {
-      columns = columns.map(col => {
+      columns = columns.map((col) => {
         if (!multisetTestsFilteredOut.includes(col.title)) {
           return col;
         }
@@ -486,7 +486,7 @@ class Enrichment extends Component {
     });
   };
 
-  handleEnrichmentTableLoading = bool => {
+  handleEnrichmentTableLoading = (bool) => {
     this.setState({
       isEnrichmentTableLoading: bool,
     });
@@ -505,12 +505,13 @@ class Enrichment extends Component {
   //   this.setState({ enrichmentColumns: columns });
   // };
 
-  handlePlotTypesEnrichment = enrichmentModel => {
+  handlePlotTypesEnrichment = (enrichmentModel) => {
     if (enrichmentModel !== '') {
       if (this.state.enrichmentStudyMetadata?.plots != null) {
-        const enrichmentModelData = this.state.enrichmentStudyMetadata.plots.find(
-          model => model.modelID === enrichmentModel,
-        );
+        const enrichmentModelData =
+          this.state.enrichmentStudyMetadata.plots.find(
+            (model) => model.modelID === enrichmentModel,
+          );
         this.setState({
           enrichmentPlotTypes: enrichmentModelData.plots,
         });
@@ -518,24 +519,25 @@ class Enrichment extends Component {
     }
   };
 
-  handlePlotTypesEnrichment = enrichmentModel => {
+  handlePlotTypesEnrichment = (enrichmentModel) => {
     if (enrichmentModel !== '') {
       if (this.state.enrichmentStudyMetadata?.plots != null) {
-        const enrichmentModelData = this.state.enrichmentStudyMetadata.plots.find(
-          model => model.modelID === enrichmentModel,
-        );
+        const enrichmentModelData =
+          this.state.enrichmentStudyMetadata.plots.find(
+            (model) => model.modelID === enrichmentModel,
+          );
         const enrichmentPlotTypesRaw = enrichmentModelData?.plots;
         // filter out invalid plots - plotType string must be 'singleFeature', 'multiFeature', 'singleTest', 'multiTest'
         const enrichmentPlotTypesVar = [...enrichmentPlotTypesRaw].filter(
-          plot => {
+          (plot) => {
             let plotTypeArr = plot?.plotType || null;
-            const convertStringToArray = object => {
+            const convertStringToArray = (object) => {
               return typeof object === 'string' ? Array(object) : object;
             };
             if (plotTypeArr) {
               plotTypeArr = convertStringToArray(plot.plotType);
             }
-            const isValidPlotType = pt => {
+            const isValidPlotType = (pt) => {
               return (
                 pt === 'singleFeature' ||
                 pt === 'multiFeature' ||
@@ -564,7 +566,7 @@ class Enrichment extends Component {
           // singleFeaturePlotTypesVar = [...enrichmentPlotTypesVar].filter(
           //   p => !p.plotType.includes('multiFeature'),
           // );
-          multiFeaturePlotTypesVar = [...enrichmentPlotTypesVar].filter(p =>
+          multiFeaturePlotTypesVar = [...enrichmentPlotTypesVar].filter((p) =>
             p.plotType.includes('multiFeature'),
           );
           plotMultiFeatureAvailableVar = multiFeaturePlotTypesVar?.length
@@ -605,7 +607,7 @@ class Enrichment extends Component {
     const { enrichmentStudy, enrichmentModel } = this.props;
     omicNavigatorService
       .getBarcodes(enrichmentStudy, enrichmentModel, null, null)
-      .then(getBarcodesResponseData => {
+      .then((getBarcodesResponseData) => {
         this.setState({
           hasBarcodeData: getBarcodesResponseData.length === 0 ? false : true,
         });
@@ -635,13 +637,13 @@ class Enrichment extends Component {
         });
         omicNavigatorService
           .getFavicons(parsedEnrichmentsLinkouts)
-          .then(getFaviconsResponseData => {
+          .then((getFaviconsResponseData) => {
             const favicons = getFaviconsResponseData || [];
             this.setState(
               {
                 enrichmentsFavicons: favicons,
               },
-              function() {
+              function () {
                 let columns = this.state.enrichmentColumnsUnfiltered || [];
                 if (
                   this.state.enrichmentResults?.length
@@ -655,7 +657,7 @@ class Enrichment extends Component {
                 }
                 if (this.state.multisetTestsFilteredOut.length > 0) {
                   const self = this;
-                  columns = columns.filter(function(col) {
+                  columns = columns.filter(function (col) {
                     return !self.state.MultisetTestsFilteredOut.includes(
                       col?.title,
                     );
@@ -679,7 +681,7 @@ class Enrichment extends Component {
       });
       omicNavigatorService
         .getEnrichmentsLinkouts(enrichmentStudy, enrichmentAnnotation)
-        .then(getEnrichmentsLinkoutsResponseData => {
+        .then((getEnrichmentsLinkoutsResponseData) => {
           const linkouts = getEnrichmentsLinkoutsResponseData;
           this.setState({
             enrichmentsLinkouts: linkouts,
@@ -691,13 +693,13 @@ class Enrichment extends Component {
           const self = this;
           omicNavigatorService
             .getFavicons(getEnrichmentsLinkoutsResponseData)
-            .then(getFaviconsResponseData => {
+            .then((getFaviconsResponseData) => {
               const favicons = getFaviconsResponseData || [];
               this.setState(
                 {
                   enrichmentsFavicons: favicons,
                 },
-                function() {
+                function () {
                   let columns = this.state.enrichmentColumnsUnfiltered || [];
                   if (
                     this.state.enrichmentResults?.length
@@ -710,7 +712,7 @@ class Enrichment extends Component {
                     this.enrichmentColumnsConfigured = true;
                   }
                   if (self.state.multisetTestsFilteredOut.length > 0) {
-                    columns = columns.filter(function(col) {
+                    columns = columns.filter(function (col) {
                       return !self.state.MultisetTestsFilteredOut.includes(
                         col.title,
                       );
@@ -761,7 +763,7 @@ class Enrichment extends Component {
         });
         omicNavigatorService
           .getFavicons(parsedFilteredDifferentialLinkouts)
-          .then(getFaviconsResponseData => {
+          .then((getFaviconsResponseData) => {
             const favicons = getFaviconsResponseData || [];
             this.setState({
               filteredDifferentialFavicons: favicons,
@@ -779,7 +781,7 @@ class Enrichment extends Component {
       });
       omicNavigatorService
         .getResultsLinkouts(enrichmentStudy, enrichmentModel)
-        .then(getFilteredDifferentialLinkoutsResponseData => {
+        .then((getFilteredDifferentialLinkoutsResponseData) => {
           const linkouts = getFilteredDifferentialLinkoutsResponseData || [];
           this.setState({
             filteredDifferentialLinkouts: linkouts,
@@ -790,7 +792,7 @@ class Enrichment extends Component {
           );
           omicNavigatorService
             .getFavicons(linkouts)
-            .then(getFaviconsResponseData => {
+            .then((getFaviconsResponseData) => {
               const favicons = getFaviconsResponseData || [];
               this.setState({
                 filteredDifferentialFavicons: favicons,
@@ -804,7 +806,7 @@ class Enrichment extends Component {
     }
   };
 
-  handleIsDataStreamingEnrichmentsTable = bool => {
+  handleIsDataStreamingEnrichmentsTable = (bool) => {
     this.setState({
       isDataStreamingEnrichmentsTable: bool,
     });
@@ -828,15 +830,15 @@ class Enrichment extends Component {
     });
   };
 
-  handlePlotAnimationEnrichment = animationEnrichment => () => {
-    this.setState(prevState => ({
+  handlePlotAnimationEnrichment = (animationEnrichment) => () => {
+    this.setState((prevState) => ({
       animationEnrichment,
       visibleEnrichment: !prevState.visibleEnrichment,
       plotButtonActiveEnrichment: !prevState.plotButtonActiveEnrichment,
     }));
   };
 
-  handleMultisetPlot = multisetPlotResults => {
+  handleMultisetPlot = (multisetPlotResults) => {
     this.setState({
       multisetPlotInfoEnrichment: {
         title: multisetPlotResults.svgInfo.plotType,
@@ -846,12 +848,9 @@ class Enrichment extends Component {
     });
   };
 
-  getConfigCols = annotationData => {
-    const {
-      enrichmentStudy,
-      enrichmentModel,
-      enrichmentAnnotation,
-    } = this.props;
+  getConfigCols = (annotationData) => {
+    const { enrichmentStudy, enrichmentModel, enrichmentAnnotation } =
+      this.props;
     const { enrichmentsLinkouts, enrichmentsFavicons } = this.state;
     const TableValuePopupStyle = {
       backgroundColor: '2E2E2E',
@@ -873,9 +872,9 @@ class Enrichment extends Component {
     if (firstFullObject) {
       let allProperties = Object.keys(firstFullObject);
       const dataCopy = [...annotationData];
-      allProperties.forEach(property => {
+      allProperties.forEach((property) => {
         // loop through data, one property at a time
-        const notNullObject = dataCopy.find(row => {
+        const notNullObject = dataCopy.find((row) => {
           // find the first value for that property
           return isNotNANullUndefinedEmptyString(row[property]);
         });
@@ -901,8 +900,8 @@ class Enrichment extends Component {
 
     const alphanumericTrigger = enrichmentAlphanumericFields[0];
     this.setState({ enrichmentFeatureIdKey: alphanumericTrigger });
-    const enrichmentAlphanumericColumnsMapped = enrichmentAlphanumericFields.map(
-      f => {
+    const enrichmentAlphanumericColumnsMapped =
+      enrichmentAlphanumericFields.map((f) => {
         return {
           title: f,
           field: f,
@@ -916,9 +915,8 @@ class Enrichment extends Component {
                 : [enrichmentsLinkouts];
               let favicons = [];
               if (linkouts.length > 0) {
-                const columnFaviconsIsArray = Array.isArray(
-                  enrichmentsFavicons,
-                );
+                const columnFaviconsIsArray =
+                  Array.isArray(enrichmentsFavicons);
                 favicons = columnFaviconsIsArray
                   ? enrichmentsFavicons
                   : [enrichmentsFavicons];
@@ -960,8 +958,7 @@ class Enrichment extends Component {
             }
           },
         };
-      },
-    );
+      });
 
     // multiset svg rebuilds based on uData...if there are no results we need to override this from being passed down
     if (enrichmentNumericFields.length !== 0) {
@@ -969,13 +966,13 @@ class Enrichment extends Component {
         uData: enrichmentNumericFields,
       });
     }
-    const enrichmentNumericColumnsMapped = enrichmentNumericFields.map(c => {
+    const enrichmentNumericColumnsMapped = enrichmentNumericFields.map((c) => {
       return {
         title: c,
         field: c,
         type: 'number',
         filterable: { type: 'numericFilter' },
-        exportTemplate: value => (value ? `${value}` : 'N/A'),
+        exportTemplate: (value) => (value ? `${value}` : 'N/A'),
         template: (value, item, addParams) => {
           return (
             <div>
@@ -1037,7 +1034,7 @@ class Enrichment extends Component {
       );
     } else {
       cancelRequestGetEnrichmentsNetwork();
-      let cancelToken = new CancelToken(e => {
+      let cancelToken = new CancelToken((e) => {
         cancelRequestGetEnrichmentsNetwork = e;
       });
       omicNavigatorService
@@ -1048,10 +1045,9 @@ class Enrichment extends Component {
           this.handleGetEnrichmentNetworkError,
           cancelToken,
         )
-        .then(getEnrichmentNetworkResponseData => {
-          cacheGetEnrichmentsNetwork[
-            cacheKey
-          ] = getEnrichmentNetworkResponseData;
+        .then((getEnrichmentNetworkResponseData) => {
+          cacheGetEnrichmentsNetwork[cacheKey] =
+            getEnrichmentNetworkResponseData;
           if (
             getEnrichmentNetworkResponseData.nodes?.length > 0 ||
             getEnrichmentNetworkResponseData.links?.length > 0 ||
@@ -1070,7 +1066,7 @@ class Enrichment extends Component {
             this.handleGetEnrichmentNetworkError();
           }
         })
-        .catch(error => {
+        .catch((error) => {
           console.error('Error during getEnrichmentNetwork', error);
           this.handleGetEnrichmentNetworkError();
         });
@@ -1083,14 +1079,14 @@ class Enrichment extends Component {
     let networkDataVar = { ...unfilteredNetworkData };
     var tests = unfilteredNetworkData.tests;
     const enrichmentResultsDescriptions = [...enrichmentResults].map(
-      r => r.description,
+      (r) => r.description,
     );
     if (
       unfilteredNetworkData.nodes?.length > 0 ||
       unfilteredNetworkData.links?.length > 0 ||
       unfilteredNetworkData.tests?.length > 0
     ) {
-      const filteredNodes = unfilteredNetworkData.nodes.filter(n =>
+      const filteredNodes = unfilteredNetworkData.nodes.filter((n) =>
         enrichmentResultsDescriptions.includes(n.description),
       );
       networkDataVar.nodes = filteredNodes;
@@ -1104,7 +1100,7 @@ class Enrichment extends Component {
       if (multisetTestsFilteredOut.length > 0) {
         let isArrayBeforeFilter = Array.isArray(testsAfterFilter);
         if (isArrayBeforeFilter) {
-          testsAfterFilter = testsAfterFilter.filter(function(col) {
+          testsAfterFilter = testsAfterFilter.filter(function (col) {
             return !multisetTestsFilteredOut.includes(col);
           });
         } else {
@@ -1142,7 +1138,7 @@ class Enrichment extends Component {
     }
   };
 
-  handleNetworkGraphReady = bool => {
+  handleNetworkGraphReady = (bool) => {
     this.setState({
       networkGraphReady: bool,
     });
@@ -1202,13 +1198,13 @@ class Enrichment extends Component {
     });
   };
 
-  handleBarcodeChanges = changes => {
+  handleBarcodeChanges = (changes) => {
     let self = this;
     const splitPaneData = this.state.hasBarcodeData
       ? this.state.barcodeSettings.barcodeData
       : this.state.filteredDifferentialResults;
     if (changes.brushedData.length > 0) {
-      const boxPlotArray = _.map(changes.brushedData, function(d) {
+      const boxPlotArray = _.map(changes.brushedData, function (d) {
         d.statistic = _.find(splitPaneData, {
           featureID: d.featureID,
         }).statistic;
@@ -1219,7 +1215,7 @@ class Enrichment extends Component {
       });
       const reducedBoxPlotArray = _.reduce(
         boxPlotArray,
-        function(res, datum) {
+        function (res, datum) {
           // (res[datum.statLabel] || (res[datum.statLabel] = [])).push({
           (
             res[self.state.barcodeSettings.statLabel] ||
@@ -1235,13 +1231,13 @@ class Enrichment extends Component {
         {},
       );
 
-      const vData = _.mapValues(reducedBoxPlotArray, function(v) {
+      const vData = _.mapValues(reducedBoxPlotArray, function (v) {
         return { values: v };
       });
       const ordered = {};
       Object.keys(vData)
         .sort()
-        .forEach(function(key) {
+        .forEach(function (key) {
           ordered[key] = vData[key];
         });
 
@@ -1272,7 +1268,7 @@ class Enrichment extends Component {
     }
   };
 
-  handleHighlightedLineReset = emptyArr => {
+  handleHighlightedLineReset = (emptyArr) => {
     this.setState(emptyArr);
   };
 
@@ -1282,7 +1278,7 @@ class Enrichment extends Component {
   //   });
   // };
 
-  handleProteinSelected = toHighlightArray => {
+  handleProteinSelected = (toHighlightArray) => {
     const featureID = this.state.hasBarcodeData
       ? 'featureID'
       : this.props.filteredDifferentialFeatureIdKey;
@@ -1306,7 +1302,7 @@ class Enrichment extends Component {
           SVGPlotLoading: true,
         });
         const dataItem = splitPaneData.find(
-          i => i[featureID] === highestValueObject.featureID,
+          (i) => i[featureID] === highestValueObject.featureID,
         );
         let id = dataItem[featureID] || '';
         this.getPlot(id);
@@ -1325,13 +1321,9 @@ class Enrichment extends Component {
     }
   };
 
-  getPlot = featureId => {
-    const {
-      enrichmentPlotTypes,
-      enrichmentTest,
-      uData,
-      enrichmentModelIds,
-    } = this.state;
+  getPlot = (featureId) => {
+    const { enrichmentPlotTypes, enrichmentTest, uData, enrichmentModelIds } =
+      this.state;
     const { enrichmentStudy, enrichmentModel } = this.props;
     let id = featureId != null ? featureId : '';
     let plotDataEnrichmentVar = { key: '', title: '', svg: [] };
@@ -1339,19 +1331,19 @@ class Enrichment extends Component {
     plotDataEnrichmentVar.key = id;
     this.setState({ svgExportName: id });
     cancelRequestEnrichmentGetPlot();
-    let cancelToken = new CancelToken(e => {
+    let cancelToken = new CancelToken((e) => {
       cancelRequestEnrichmentGetPlot = e;
     });
     let self = this;
     let plots = enrichmentPlotTypes;
     if (plots.length) {
       plots = enrichmentPlotTypes.filter(
-        p => !p.plotType.includes('multiFeature'),
+        (p) => !p.plotType.includes('multiFeature'),
       );
       if (plots.length) {
         // refined for dynamically sized plots on single-threaded servers (running R locally), we're using a race condition to take the first url and handle/display it asap; after that, we're using allSettled to wait for remaining urls, and then sending them all to the component as props
         const promises = plots
-          .map(plot => {
+          .map((plot) => {
             if (plot.plotType.includes('multiFeature')) {
               return undefined;
             }
@@ -1378,35 +1370,35 @@ class Enrichment extends Component {
                 null,
                 cancelToken,
               )
-              .then(svg => ({ svg, plotType: plot }));
+              .then((svg) => ({ svg, plotType: plot }));
           })
           .filter(Boolean);
         Promise.race(promises)
-          .then(svg => {
+          .then((svg) => {
             plotDataEnrichmentVar.svg = [svg];
             self.handleSVG(plotDataEnrichmentVar);
           })
           // Ignore error in first race - Handled later
-          .catch(error => undefined)
+          .catch((error) => undefined)
           .then(() => {
             if (promises.length > 1) {
               const all = Promise.allSettled(promises);
               return all;
             }
           })
-          .then(promiseResults => {
+          .then((promiseResults) => {
             if (!promiseResults) {
               // If promise.length===1, then this is undefined
               return;
             }
             const svgArray = promiseResults
-              .filter(result => result.status === 'fulfilled')
+              .filter((result) => result.status === 'fulfilled')
               .map(({ value }) => value);
             /**
              * @type {Error[]}
              */
             const errors = promiseResults
-              .filter(result => result.status === 'rejected')
+              .filter((result) => result.status === 'rejected')
               .map(({ reason }) => reason);
             if (svgArray.length) {
               self.handleSVG({ ...plotDataEnrichmentVar, svg: svgArray });
@@ -1419,7 +1411,7 @@ class Enrichment extends Component {
               // Handle errors coming in - warn users
             }
           })
-          .catch(error => {
+          .catch((error) => {
             console.error(`Error during plotStudyReturnSvgUrl`, error);
             // if one of many plots fails we don't want to alter the UI, however eventually consider how best to handle failure when single feature enrichmentPlotTypes length is 1
             // self.handlePlotStudyError();
@@ -1428,7 +1420,7 @@ class Enrichment extends Component {
     }
   };
 
-  handleEnrichmentSVGSizeChange = id => {
+  handleEnrichmentSVGSizeChange = (id) => {
     // keep whatever dimension is less (height or width)
     // then multiply the other dimension by original svg ratio (height 595px, width 841px)
     let EnrichmentPlotSVGHeight = this.calculateHeight();
@@ -1446,13 +1438,13 @@ class Enrichment extends Component {
         enrichmentPlotSVGHeight: EnrichmentPlotSVGHeight,
         enrichmentPlotSVGWidth: EnrichmentPlotSVGWidth,
       },
-      function() {
+      function () {
         this.getPlot(id);
       },
     );
   };
 
-  handleSVG = plotDataEnrichmentVar => {
+  handleSVG = (plotDataEnrichmentVar) => {
     this.setState({
       plotDataEnrichment: plotDataEnrichmentVar,
       plotDataEnrichmentLength: plotDataEnrichmentVar.svg?.length || 0,
@@ -1527,12 +1519,12 @@ class Enrichment extends Component {
         term,
         this.handleGetBarcodeDataError,
       )
-      .then(barcodeDataResponse => {
+      .then((barcodeDataResponse) => {
         if (barcodeDataResponse?.data?.length > 0) {
           const logFoldChangeArr = barcodeDataResponse.data.map(
-            b => b.logFoldChange,
+            (b) => b.logFoldChange,
           );
-          const isZero = logFoldChangeVal => logFoldChangeVal === 0;
+          const isZero = (logFoldChangeVal) => logFoldChangeVal === 0;
           if (logFoldChangeArr.every(isZero)) {
             this.setState({
               displayViolinPlot: false,
@@ -1552,7 +1544,7 @@ class Enrichment extends Component {
           // this.handleGetBarcodeDataError();
         }
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Error during getBarcodeData', error);
       });
   };
@@ -1567,7 +1559,7 @@ class Enrichment extends Component {
       test,
     ) => {
       let self = this;
-      return function() {
+      return function () {
         self.testSelected(
           enrichmentStudy,
           enrichmentModel,
@@ -1651,14 +1643,8 @@ class Enrichment extends Component {
       height = 300,
       radius = 50;
 
-    let pie = d3
-      .pie()
-      .sort(null)
-      .value(1);
-    let arc = d3
-      .arc()
-      .outerRadius(radius)
-      .innerRadius(0);
+    let pie = d3.pie().sort(null).value(1);
+    let arc = d3.arc().outerRadius(radius).innerRadius(0);
 
     if (singleTest) {
       arc = d3
@@ -1672,10 +1658,7 @@ class Enrichment extends Component {
     legend.attr('transform', 'translate(' + width / 2 + ',' + height / 3 + ')');
 
     /* ------- PIE SLICES -------*/
-    var slice = legend
-      .select('.slices')
-      .selectAll('path.slice')
-      .data(pie);
+    var slice = legend.select('.slices').selectAll('path.slice').data(pie);
 
     slice
       .enter()
@@ -1686,10 +1669,7 @@ class Enrichment extends Component {
       .attr('d', arc);
 
     /* ------- TEXT LABELS -------*/
-    var text = legend
-      .select('.labels')
-      .selectAll('text')
-      .data(pie);
+    var text = legend.select('.labels').selectAll('text').data(pie);
     if (!singleTest) {
       text
         .enter()
@@ -1698,21 +1678,21 @@ class Enrichment extends Component {
         .attr('dy', '.35em')
         // .attr('transform', 'rotate(' + 10 + ')')
         .style('font-size', '.8em')
-        .text(function(d) {
+        .text(function (d) {
           return d.data;
         })
-        .attr('x', function(d) {
+        .attr('x', function (d) {
           var a = d.startAngle + (d.endAngle - d.startAngle) / 2 - Math.PI / 2;
           d.cx = Math.cos(a) * (radius - 10);
           return (d.x = Math.cos(a) * (radius + 30));
         })
-        .attr('y', function(d) {
+        .attr('y', function (d) {
           var a = d.startAngle + (d.endAngle - d.startAngle) / 2 - Math.PI / 2;
           d.cy = Math.sin(a) * (radius - 10);
           return (d.y = Math.sin(a) * (radius + 30));
         })
         .style('text-anchor', 'middle')
-        .each(function(d) {
+        .each(function (d) {
           var bbox = this.getBBox();
           d.sx = d.x - bbox.width / 2 - 2;
           d.ox = d.x + bbox.width / 2 + 2;
@@ -1726,7 +1706,7 @@ class Enrichment extends Component {
         .style('fill', 'none')
         .style('stroke', 'black')
 
-        .attr('d', function(d) {
+        .attr('d', function (d) {
           if (d.cx > d.ox) {
             return (
               'M' +
@@ -1769,7 +1749,7 @@ class Enrichment extends Component {
         .attr('dy', '.35em')
         // .attr('transform', 'rotate(' + 10 + ')')
         .style('font-size', '.8em')
-        .text(function(d) {
+        .text(function (d) {
           return d.data;
         });
       text
@@ -1789,20 +1769,14 @@ class Enrichment extends Component {
 
     // Create the stops of the main gradient. Each stop will be assigned
     // a class to style the stop using CSS.
-    mainGradient
-      .append('stop')
-      .attr('class', 'stop-left')
-      .attr('offset', '0');
+    mainGradient.append('stop').attr('class', 'stop-left').attr('offset', '0');
 
     mainGradient
       .append('stop')
       .attr('class', 'stop-middle')
       .attr('offset', '0.5');
 
-    mainGradient
-      .append('stop')
-      .attr('class', 'stop-right')
-      .attr('offset', '1');
+    mainGradient.append('stop').attr('class', 'stop-right').attr('offset', '1');
 
     // Use the gradient to set the shape fill, via CSS.
     var gradient = legend.selectAll('.gradient');
@@ -1815,15 +1789,9 @@ class Enrichment extends Component {
       .attr('width', 100)
       .attr('height', 15);
 
-    var y = d3
-      .scaleLinear()
-      .range([0, 50, 100])
-      .domain([0, 0.1, 1]);
+    var y = d3.scaleLinear().range([0, 50, 100]).domain([0, 0.1, 1]);
 
-    var yAxis = d3
-      .axisBottom()
-      .scale(y)
-      .ticks(2);
+    var yAxis = d3.axisBottom().scale(y).ticks(2);
 
     gradient
       .append('g')
@@ -1859,10 +1827,10 @@ class Enrichment extends Component {
       .data(mostSignificantColorScale.range())
       .enter()
       .append('stop')
-      .attr('offset', function(d, i) {
+      .attr('offset', function (d, i) {
         return i / (mostSignificantColorScale.range().length - 1);
       })
-      .attr('stop-color', function(d) {
+      .attr('stop-color', function (d) {
         return d;
       });
 
@@ -2038,7 +2006,7 @@ class Enrichment extends Component {
     this.handleLegendClose();
   };
 
-  testSelectedTransition = bool => {
+  testSelectedTransition = (bool) => {
     this.setState({
       isTestSelected: bool,
     });
@@ -2070,11 +2038,8 @@ class Enrichment extends Component {
   };
 
   getMessage = () => {
-    const {
-      enrichmentStudy,
-      enrichmentModel,
-      enrichmentAnnotation,
-    } = this.props;
+    const { enrichmentStudy, enrichmentModel, enrichmentAnnotation } =
+      this.props;
     if (enrichmentStudy === '') {
       return 'study';
     } else if (enrichmentModel === '') {
@@ -2107,7 +2072,7 @@ class Enrichment extends Component {
             // onHandleFilteredDifferentialFeatureIdKey={
             //   this.handleFilteredDifferentialFeatureIdKey
             // }
-            onSetFilteredDifferentialResults={filteredDifferentialResults => {
+            onSetFilteredDifferentialResults={(filteredDifferentialResults) => {
               this.setState({ filteredDifferentialResults });
             }}
           ></SplitPanesContainer>
@@ -2140,7 +2105,7 @@ class Enrichment extends Component {
     } else return <TransitionStill stillMessage={message} />;
   };
 
-  handleItemsPerPageChange = items => {
+  handleItemsPerPageChange = (items) => {
     this.setState({
       itemsPerPageEnrichmentTable: items,
     });
@@ -2148,12 +2113,8 @@ class Enrichment extends Component {
   };
 
   getTableAndNetworkPanes = () => {
-    const {
-      tab,
-      enrichmentStudy,
-      enrichmentModel,
-      enrichmentAnnotation,
-    } = this.props;
+    const { tab, enrichmentStudy, enrichmentModel, enrichmentAnnotation } =
+      this.props;
     const {
       enrichmentResults,
       enrichmentColumns,
@@ -2354,7 +2315,7 @@ class Enrichment extends Component {
     });
   };
 
-  handleNodeCutoffInputChange = value => {
+  handleNodeCutoffInputChange = (value) => {
     if (this.state.nodeCutoff !== value) {
       this.setState({
         nodeCutoff: value,
@@ -2363,7 +2324,7 @@ class Enrichment extends Component {
     }
   };
 
-  handleLinkCutoffInputChange = value => {
+  handleLinkCutoffInputChange = (value) => {
     if (this.state.linkCutoff !== value) {
       this.setState({
         linkCutoff: value,
@@ -2372,7 +2333,7 @@ class Enrichment extends Component {
     }
   };
 
-  handleLinkTypeInputChange = value => {
+  handleLinkTypeInputChange = (value) => {
     if (this.state.linkType !== value) {
       this.setState({
         linkType: value,
@@ -2381,21 +2342,21 @@ class Enrichment extends Component {
     }
   };
 
-  handleNodeCutoffSliderChange = value => {
+  handleNodeCutoffSliderChange = (value) => {
     if (this.state.nodeCutoff !== value) {
       this.setState({ nodeCutoff: value });
     }
     sessionStorage.setItem('nodeCutoff', value);
   };
 
-  handleLinkCutoffSliderChange = value => {
+  handleLinkCutoffSliderChange = (value) => {
     if (this.state.linkCutoff !== value) {
       this.setState({ linkCutoff: value });
     }
     sessionStorage.setItem('linkCutoff', value);
   };
 
-  handleLinkTypeSliderChange = value => {
+  handleLinkTypeSliderChange = (value) => {
     if (this.state.linkType !== value) {
       this.setState({ linkType: value });
     }
@@ -2416,7 +2377,7 @@ class Enrichment extends Component {
   //   // clearTimeout(this.timeout);
   // };
 
-  setEnrichmentModelIds = enrichmentModelIds => {
+  setEnrichmentModelIds = (enrichmentModelIds) => {
     this.setState({
       enrichmentModelIds,
     });
@@ -2430,12 +2391,8 @@ class Enrichment extends Component {
       directionEnrichment,
       visibleEnrichment,
     } = this.state;
-    const {
-      tab,
-      enrichmentStudy,
-      enrichmentModel,
-      enrichmentAnnotation,
-    } = this.props;
+    const { tab, enrichmentStudy, enrichmentModel, enrichmentAnnotation } =
+      this.props;
 
     const pxToPtRatio = 105;
     const pointSize = 12;

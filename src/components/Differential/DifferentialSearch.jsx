@@ -916,16 +916,25 @@ class DifferentialSearch extends Component {
           <a
             target="_blank"
             rel="noopener noreferrer"
-            href={differentialStudyHrefVisible ? differentialStudyHref : '/'}
+            href={differentialStudyHrefVisible ? differentialStudyHref : null}
           >
-            <Icon
-              name="line graph"
-              size="large"
-              className="StudyHtmlIcon"
-              inverted
-              circular
-              disabled={!differentialStudyHrefVisible}
-            />
+            <Transition
+              visible={!differentialStudyHrefVisible}
+              animation="flash"
+              duration={1500}
+            >
+              <Icon
+                name="info"
+                className={
+                  differentialStudyHrefVisible
+                    ? 'StudyHtmlIcon'
+                    : 'StudyHtmlIcon DisabledLink'
+                }
+                color={!differentialStudyHrefVisible ? 'grey' : ''}
+                inverted
+                circular
+              />
+            </Transition>
           </a>
         }
         style={StudyPopupStyle}
@@ -1007,10 +1016,6 @@ class DifferentialSearch extends Component {
     let MultisetRadio;
 
     if (isValidSearchDifferential) {
-      const WindowWidth = getWindowWidth();
-      const QuarterWindowWidth = getWindowWidth() / 4;
-      const PlotLabel =
-        QuarterWindowWidth > 350 || WindowWidth < 1200 ? 'View Plot' : 'Plot';
       PlotRadio = (
         <Fragment>
           <Transition
@@ -1020,7 +1025,7 @@ class DifferentialSearch extends Component {
           >
             <Radio
               toggle
-              label={PlotLabel}
+              label="View Plot Intersections"
               className={plotMultisetLoadedDifferential ? 'ViewPlotRadio' : ''}
               checked={multisetButttonActiveDifferential}
               onChange={onHandlePlotAnimationDifferential('uncover')}
@@ -1030,7 +1035,7 @@ class DifferentialSearch extends Component {
           <Popup
             trigger={
               <Icon
-                size="small"
+                // size="small"
                 name="info circle"
                 className="ViewPlotInfo"
                 color="grey"
@@ -1091,7 +1096,7 @@ class DifferentialSearch extends Component {
         </React.Fragment>
       );
     }
-
+    const WindowWidth = getWindowWidth();
     return (
       <React.Fragment>
         <Form className="SearchContainer">
@@ -1187,7 +1192,9 @@ class DifferentialSearch extends Component {
         <div className="MultisetContainer">
           <div className="SliderDiv">
             <span className="MultisetRadio">{MultisetRadio}</span>
-            <span className="PlotRadio">{PlotRadio}</span>
+            <span className={WindowWidth < 1725 ? 'Block' : 'PlotRadio'}>
+              {PlotRadio}
+            </span>
           </div>
           <div className="MultisetFilterButtonDiv">
             {MultisetFilterButtonDifferential}

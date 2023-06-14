@@ -40,7 +40,7 @@ class EnrichmentSearch extends Component {
       'Select a study and model to view Analysis Details',
     enrichmentModels: [],
     enrichmentAnnotations: [],
-    enrichmentStudyTooltip: 'Select a study',
+    enrichmentStudyReportTooltip: 'Select a study',
     enrichmentModelTooltip: '',
     enrichmentAnnotationTooltip: '',
     enrichmentStudiesDisabled: true,
@@ -185,10 +185,10 @@ class EnrichmentSearch extends Component {
           };
         },
       );
-      const enrichmentStudyTooltip =
+      const enrichmentStudyReportTooltip =
         enrichmentStudyData?.package?.description || '';
       this.setState({
-        enrichmentStudyTooltip: enrichmentStudyTooltip,
+        enrichmentStudyReportTooltip: enrichmentStudyReportTooltip,
         enrichmentModelsDisabled: false,
         enrichmentModels: enrichmentModelsMapped,
       });
@@ -958,7 +958,7 @@ class EnrichmentSearch extends Component {
       enrichmentStudyHrefVisible,
       enrichmentModels,
       enrichmentAnnotations,
-      enrichmentStudyTooltip,
+      enrichmentStudyReportTooltip,
       enrichmentModelTooltip,
       enrichmentAnnotationTooltip,
       enrichmentStudiesDisabled,
@@ -988,51 +988,47 @@ class EnrichmentSearch extends Component {
       fontSize: '13px',
     };
 
-    let studyIcon;
     let studyName = `${enrichmentStudy} Analysis Details`;
     const dynamicSize = getDynamicSize();
-
-    if (enrichmentStudyHrefVisible) {
-      studyIcon = (
-        <Popup
-          trigger={
-            <a
-              target="_blank"
-              rel="noopener noreferrer"
-              href={enrichmentStudyHref}
+    let studyIcon = (
+      <Popup
+        trigger={
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href={enrichmentStudyHrefVisible ? enrichmentStudyHref : null}
+          >
+            <Transition
+              visible={!enrichmentStudyHrefVisible}
+              animation="flash"
+              duration={1500}
             >
               <Icon
-                name="line graph"
-                size="large"
-                className="StudyHtmlIcon"
+                name="info"
+                className={
+                  enrichmentStudyHrefVisible
+                    ? 'StudyHtmlIcon'
+                    : 'StudyHtmlIcon DisabledLink'
+                }
+                color={!enrichmentStudyHrefVisible ? 'grey' : ''}
                 inverted
                 circular
               />
-            </a>
-          }
-          style={StudyPopupStyle}
-          inverted
-          basic
-          position="bottom center"
-          content={studyName}
-        />
-      );
-    } else {
-      studyIcon = (
-        <Popup
-          trigger={
-            <a target="_blank" rel="noopener noreferrer" href={'/'}>
-              <Icon name="line graph" size="large" circular inverted disabled />
-            </a>
-          }
-          style={StudyPopupStyle}
-          basic
-          inverted
-          position="bottom center"
-          content={this.state.enrichmentStudyReportTooltip}
-        />
-      );
-    }
+            </Transition>
+          </a>
+        }
+        style={StudyPopupStyle}
+        className="CustomTooltip"
+        inverted
+        basic
+        position="bottom center"
+        content={
+          enrichmentStudyHrefVisible ? studyName : enrichmentStudyReportTooltip
+        }
+        mouseEnterDelay={0}
+        mouseLeaveDelay={0}
+      />
+    );
 
     let MultisetFiltersEnrichment;
     let MultisetFilterButtonEnrichment;
@@ -1087,10 +1083,6 @@ class EnrichmentSearch extends Component {
     let MultisetRadio;
 
     if (isValidSearchEnrichment) {
-      const WindowWidth = getWindowWidth();
-      const QuarterWindowWidth = getWindowWidth() / 4;
-      const PlotLabel =
-        QuarterWindowWidth > 350 || WindowWidth < 1200 ? 'View Plot' : 'Plot';
       PlotRadio = (
         <Fragment>
           <Transition
@@ -1100,7 +1092,7 @@ class EnrichmentSearch extends Component {
           >
             <Radio
               toggle
-              label={PlotLabel}
+              label="View Plot Intersections"
               className={multisetPlotAvailableEnrichment ? 'ViewPlotRadio' : ''}
               checked={plotButtonActiveEnrichment}
               onChange={this.props.onHandlePlotAnimationEnrichment('uncover')}
@@ -1110,7 +1102,7 @@ class EnrichmentSearch extends Component {
           <Popup
             trigger={
               <Icon
-                size="small"
+                // size="small"
                 name="info circle"
                 className="ViewPlotInfo"
                 color="grey"
@@ -1171,7 +1163,7 @@ class EnrichmentSearch extends Component {
         </React.Fragment>
       );
     }
-
+    const WindowWidth = getWindowWidth();
     return (
       <React.Fragment>
         <Form className="SearchContainer">
@@ -1200,7 +1192,7 @@ class EnrichmentSearch extends Component {
             className="CustomTooltip"
             inverted
             position="bottom right"
-            content={enrichmentStudyTooltip}
+            content={enrichmentStudyReportTooltip}
             mouseEnterDelay={1000}
             mouseLeaveDelay={0}
           />
@@ -1307,7 +1299,9 @@ class EnrichmentSearch extends Component {
         >
           <div className="SliderDiv">
             <span className="MultisetRadio">{MultisetRadio}</span>
-            <span className="PlotRadio">{PlotRadio}</span>
+            <span className={WindowWidth < 1725 ? 'Block' : 'PlotRadio'}>
+              {PlotRadio}
+            </span>
           </div>
           <div className="MultisetFilterButtonDiv">
             {MultisetFilterButtonEnrichment}

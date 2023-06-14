@@ -289,19 +289,31 @@ class PlotsMultiFeature extends Component {
                 fwdRef={this.differentialDetailPlotsMultiFeatureRef}
               />
             </div>
-            <Dropdown
-              search
-              selection
-              compact
-              options={options}
-              value={
-                options[activeTabIndexPlotsMultiFeatureVar]?.value ||
-                options[0]?.value
+            <Popup
+              trigger={
+                <Dropdown
+                  search
+                  selection
+                  compact
+                  options={options}
+                  value={
+                    options[activeTabIndexPlotsMultiFeatureVar]?.value ||
+                    options[0]?.value
+                  }
+                  onChange={this.handlePlotDropdownChangeMultiFeature}
+                  className={DropdownClass}
+                  id="svgPlotDropdownDifferential"
+                />
               }
-              onChange={this.handlePlotDropdownChangeMultiFeature}
-              className={DropdownClass}
-              id="svgPlotDropdownDifferential"
-            />
+              basic
+              inverted
+              position="bottom center"
+              closeOnDocumentClick
+              closeOnEscape
+              hideOnScroll
+            >
+              <Popup.Content>dropdown header popup</Popup.Content>
+            </Popup>
             <TabMultiFeature
               activeTabIndexPlotsMultiFeature={activeTabIndexPlotsMultiFeature}
               differentialDetailPlotsMultiFeatureRefFwd={
