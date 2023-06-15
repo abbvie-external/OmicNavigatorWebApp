@@ -1052,7 +1052,7 @@ class EnrichmentSearch extends Component {
           >
             <Transition
               visible={!enrichmentStudyHrefVisible}
-              animation="flash"
+              animation={enrichmentStudyHrefVisible ? 'flash' : null}
               duration={1000}
             >
               <Icon

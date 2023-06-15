@@ -47,6 +47,10 @@
     background-color: var(--color-primary) !important;
   }
 
+  i.inverted.circular.icon .DisabledLink {
+    background-color: var(--color-dark) !important;
+  }
+
   .PValueTypeContainer {
     padding-top: 10px !important;
     padding-left: 20px;

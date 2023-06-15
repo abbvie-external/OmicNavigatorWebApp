@@ -972,7 +972,7 @@ class DifferentialSearch extends Component {
           >
             <Transition
               visible={!differentialStudyHrefVisible}
-              animation="flash"
+              animation={differentialStudyHrefVisible ? 'flash' : null}
               duration={1000}
             >
               <Icon
