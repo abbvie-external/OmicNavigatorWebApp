@@ -696,3 +696,11 @@ export function getModelsArg(
 export function getDifferenceTwoSets(setA, setB) {
   return new Set([...setA].filter((element) => !setB.has(element)));
 }
+
+export function isObjectEmpty(objectName) {
+  return (
+    objectName &&
+    Object.keys(objectName).length === 0 &&
+    objectName.constructor === Object
+  );
+}

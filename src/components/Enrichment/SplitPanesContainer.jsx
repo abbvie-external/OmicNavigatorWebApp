@@ -22,7 +22,7 @@ class SplitPanesContainer extends Component {
   };
   filteredDifferentialGridRef = React.createRef();
 
-  handleSVGTabChange = activeTabIndex => {
+  handleSVGTabChange = (activeTabIndex) => {
     this.setState({
       activeSvgTabIndexEnrichment: activeTabIndex,
     });
@@ -219,7 +219,12 @@ class SplitPanesContainer extends Component {
 
   render() {
     const { verticalSplitPaneSize, horizontalSplitPaneSize } = this.state;
-    const { enrichmentStudy, enrichmentModel, hasBarcodeData } = this.props;
+    const {
+      enrichmentStudy,
+      enrichmentModel,
+      hasBarcodeData,
+      enrichmentPlotDescriptions,
+    } = this.props;
     const ViolinAndTable = this.getViolinAndTable();
     const width =
       window.innerWidth ||
@@ -266,7 +271,7 @@ class SplitPanesContainer extends Component {
                   size={horizontalSplitPaneSize}
                   minSize={185}
                   maxSize={400}
-                  onDragFinished={size =>
+                  onDragFinished={(size) =>
                     this.splitPaneResized(size, 'horizontal')
                   }
                 >
@@ -277,7 +282,7 @@ class SplitPanesContainer extends Component {
                     size={this.state.verticalSplitPaneSize}
                     minSize={315}
                     maxSize={1300}
-                    onDragFinished={size =>
+                    onDragFinished={(size) =>
                       this.splitPaneResized(size, 'vertical')
                     }
                   >
@@ -304,6 +309,7 @@ class SplitPanesContainer extends Component {
                         HighlightedProteins={this.props.HighlightedProteins}
                         enrichmentStudy={enrichmentStudy}
                         enrichmentModel={enrichmentModel}
+                        enrichmentPlotDescriptions={enrichmentPlotDescriptions}
                       />
                     </div>
                   </SplitPane>
@@ -348,7 +354,7 @@ class SplitPanesContainer extends Component {
                   size={this.state.verticalSplitPaneSize}
                   minSize={315}
                   maxSize={1300}
-                  onDragFinished={size =>
+                  onDragFinished={(size) =>
                     this.splitPaneResized(size, 'vertical')
                   }
                 >
@@ -373,6 +379,7 @@ class SplitPanesContainer extends Component {
                       HighlightedProteins={this.props.HighlightedProteins}
                       enrichmentStudy={enrichmentStudy}
                       enrichmentModel={enrichmentModel}
+                      enrichmentPlotDescriptions={enrichmentPlotDescriptions}
                     />
                   </div>
                 </SplitPane>

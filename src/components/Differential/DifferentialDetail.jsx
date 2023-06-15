@@ -148,8 +148,8 @@ class DifferentialDetail extends Component {
         relevantSearched = [];
         // multi-search filter
         // const multiFeaturesSearchedSet = new Set(multiFeaturesSearched);
-        differentialAlphanumericFields.forEach(columnKey => {
-          const columnIncludes = [...differentialResults].filter(d => {
+        differentialAlphanumericFields.forEach((columnKey) => {
+          const columnIncludes = [...differentialResults].filter((d) => {
             return multiFeaturesSearchedAndFilteredOutSet.has(d[columnKey]);
           });
           relevantSearched = [...relevantSearched, ...columnIncludes];
@@ -157,9 +157,9 @@ class DifferentialDetail extends Component {
       } else {
         // single search filter
         relevantSearched = [];
-        differentialAlphanumericFields.forEach(columnKey => {
+        differentialAlphanumericFields.forEach((columnKey) => {
           // filter the differentialResults for "includes" across all alphanumeric columns
-          const columnIncludes = [...differentialResults].filter(d => {
+          const columnIncludes = [...differentialResults].filter((d) => {
             const columnValueLowercase = d[columnKey].toLowerCase();
             return columnValueLowercase.includes(singleFeatureSearched);
           });
@@ -171,10 +171,10 @@ class DifferentialDetail extends Component {
     // 2) keep the intersection from 1) above and what is in current scatterplot view
     const allDataInScatterViewIdsSet = new Set(
       [...allDataInScatterView].map(
-        d => d[this.props.differentialFeatureIdKey],
+        (d) => d[this.props.differentialFeatureIdKey],
       ),
     );
-    relevantSearchedAndInScatterView = [...relevantSearched].filter(d =>
+    relevantSearchedAndInScatterView = [...relevantSearched].filter((d) =>
       allDataInScatterViewIdsSet.has(d[this.props.differentialFeatureIdKey]),
     );
     const uniqueRelevantSearchedAndInScatterView = [
@@ -214,17 +214,17 @@ class DifferentialDetail extends Component {
         differentialTableRows: this.props.differentialResults.length,
         volcanoPlotSelectedDataArr: this.props.differentialResults,
       },
-      function() {
+      function () {
         this.setRelevantData();
       },
     );
   };
 
-  hasWhitespace = s => {
+  hasWhitespace = (s) => {
     return s.indexOf(' ') >= 0;
   };
 
-  pageToFeature = featureToHighlight => {
+  pageToFeature = (featureToHighlight) => {
     if (featureToHighlight) {
       const { differentialFeatureIdKey } = this.props;
       const { itemsPerPageVolcanoTable } = this.state;
@@ -232,7 +232,7 @@ class DifferentialDetail extends Component {
         this.volcanoPlotFilteredGridRef?.current?.qhGridRef?.current?.getSortedData() ||
         [];
       if (sortedData != null) {
-        const Index = _.findIndex(sortedData, function(p) {
+        const Index = _.findIndex(sortedData, function (p) {
           return p[differentialFeatureIdKey] === featureToHighlight;
         });
         const pageNumber = Math.ceil((Index + 1) / itemsPerPageVolcanoTable);
@@ -246,7 +246,7 @@ class DifferentialDetail extends Component {
     }
   };
 
-  rowLevelPropsCalc = item => {
+  rowLevelPropsCalc = (item) => {
     let className;
     let id;
     const {
@@ -318,8 +318,8 @@ class DifferentialDetail extends Component {
           );
           relevantDifferentialData = [];
           const multiFeaturesFound = [];
-          differentialAlphanumericFields.forEach(columnKey => {
-            const columnIncludes = [...differentialResults].filter(d => {
+          differentialAlphanumericFields.forEach((columnKey) => {
+            const columnIncludes = [...differentialResults].filter((d) => {
               if (multiFeaturesSearchedAndFilteredOutSet.has(d[columnKey])) {
                 // push the features found to an array
                 // that will be used to calculate the "Not Found" state
@@ -339,8 +339,8 @@ class DifferentialDetail extends Component {
           // single search filter
           // filter the differentialResults for "includes" across all alphanumeric columns
           relevantDifferentialData = [];
-          differentialAlphanumericFields.forEach(column => {
-            const columnIncludes = [...differentialResults].filter(d => {
+          differentialAlphanumericFields.forEach((column) => {
+            const columnIncludes = [...differentialResults].filter((d) => {
               const columnValueLowercase = d[column].toLowerCase();
               return columnValueLowercase.includes(singleFeatureSearched);
             });
@@ -366,7 +366,7 @@ class DifferentialDetail extends Component {
           differentialTableData: differentialResults,
         },
         // in callback so scatter reload is priority
-        function() {
+        function () {
           this.pageToFeature();
           this.props.onHandleHighlightedFeaturesDifferential([]);
           this.props.onResetDifferentialOutlinedFeature();
@@ -395,17 +395,17 @@ class DifferentialDetail extends Component {
           differentialTableData: relevantDifferentialData,
           differentialTableRows: relevantDifferentialData.length,
         },
-        function() {
+        function () {
           // load the table, then paging and mapping
           let allFeatureIdsRemaining = [...relevantDifferentialData].map(
-            i => i[differentialFeatureIdKey],
+            (i) => i[differentialFeatureIdKey],
           );
           let isOutlinedFeatureInView = allFeatureIdsRemaining.includes(
             differentialOutlinedFeature,
           );
           if (isOutlinedFeatureInView) {
             // PAGE TO OUTLINED FEATURE IF IT REMAINS
-            setTimeout(function() {
+            setTimeout(function () {
               self.pageToFeature(differentialOutlinedFeature);
             }, 500);
           } else {
@@ -422,7 +422,7 @@ class DifferentialDetail extends Component {
             );
             let multiselectedFeaturesArrRemaining = [
               ...relevantDifferentialData,
-            ].filter(item =>
+            ].filter((item) =>
               highlightedFeatures.has(item[differentialFeatureIdKey]),
             );
 
@@ -435,7 +435,7 @@ class DifferentialDetail extends Component {
                 // if there are multi-selected features in the box selection, reload the svg, single or multi
                 let multiselectedFeaturesArrMappedRemaining = [
                   ...multiselectedFeaturesArrRemaining,
-                ].map(item => ({
+                ].map((item) => ({
                   id: item[differentialFeatureIdKey],
                   value: item[differentialFeatureIdKey],
                   key: item[differentialFeatureIdKey],
@@ -446,7 +446,7 @@ class DifferentialDetail extends Component {
                 );
                 let multiselectedFeatureIdsMappedRemaining = [
                   ...multiselectedFeaturesArrRemaining,
-                ].map(item => item[differentialFeatureIdKey]);
+                ].map((item) => item[differentialFeatureIdKey]);
                 self.reloadMultifeaturePlot(
                   multiselectedFeatureIdsMappedRemaining,
                   true,
@@ -468,16 +468,16 @@ class DifferentialDetail extends Component {
     }
   };
 
-  handleItemsPerPageChange = items => {
+  handleItemsPerPageChange = (items) => {
     this.setState({
       itemsPerPageVolcanoTable: items,
     });
     localStorage.setItem('itemsPerPageVolcanoTable', items);
   };
 
-  handleBinClick = item => {
+  handleBinClick = (item) => {
     const { differentialFeatureIdKey } = this.props;
-    const bins = item.map(elem => {
+    const bins = item.map((elem) => {
       const data = JSON.parse(elem.props.data);
       return {
         id: data[differentialFeatureIdKey],
@@ -512,7 +512,7 @@ class DifferentialDetail extends Component {
       this.props.onGetPlot('SingleFeature', feature, false, false);
     } else {
       if (!this.props.plotMultiFeatureAvailable) return;
-      let elementArray = items.map(item => ({
+      let elementArray = items.map((item) => ({
         id: item,
         value: item,
         key: item,
@@ -529,11 +529,11 @@ class DifferentialDetail extends Component {
     }
   };
 
-  removeSelectedFeature = featureToRemove => {
+  removeSelectedFeature = (featureToRemove) => {
     const { differentialHighlightedFeaturesData } = this.props;
     const PreviouslyHighlighted = [...differentialHighlightedFeaturesData];
     const selectedTableDataArray = PreviouslyHighlighted.filter(
-      i => i.id !== featureToRemove,
+      (i) => i.id !== featureToRemove,
     );
     this.props.onHandleHighlightedFeaturesDifferential(selectedTableDataArray);
     this.reloadMultifeaturePlot(selectedTableDataArray);
@@ -551,22 +551,22 @@ class DifferentialDetail extends Component {
 
   handlePlotlyClick = (featureArg, exactLabel) => {
     let featureData = null;
-    let relevantFeatures = [...this.state.differentialTableData].filter(f =>
+    let relevantFeatures = [...this.state.differentialTableData].filter((f) =>
       this.props.differentialHighlightedFeatures.includes(
         f[this.props.differentialFeatureIdKey],
       ),
     );
     if (exactLabel) {
       // if Plotly gives us the exact string matching a value in our data
-      featureData = relevantFeatures.find(f => {
+      featureData = relevantFeatures.find((f) => {
         const fValues = _.values(f);
         return fValues.includes(featureArg);
       });
     } else {
       // if Plotly gives us a string containing some value in our data
-      featureData = relevantFeatures.find(f => {
+      featureData = relevantFeatures.find((f) => {
         const fValues = _.values(f);
-        const fValuesRelevant = fValues.filter(f => isNaN(f));
+        const fValuesRelevant = fValues.filter((f) => isNaN(f));
         function hasValue(value) {
           return featureArg.includes(value);
         }
@@ -617,7 +617,7 @@ class DifferentialDetail extends Component {
         differentialResults;
       const PreviouslyHighlighted = [...differentialHighlightedFeaturesData];
       const itemAlreadyHighlighted = PreviouslyHighlighted.some(
-        d => d.id === item[differentialFeatureIdKey],
+        (d) => d.id === item[differentialFeatureIdKey],
       );
       let baseFeature = sortedData[0][differentialFeatureIdKey];
       if (PreviouslyHighlighted.length) {
@@ -632,7 +632,7 @@ class DifferentialDetail extends Component {
         const currentTableData =
           this.volcanoPlotFilteredGridRef?.current?.qhGridRef.current?.getSortedData() ||
           [];
-        const indexBaseFeature = _.findIndex(currentTableData, function(d) {
+        const indexBaseFeature = _.findIndex(currentTableData, function (d) {
           return d[differentialFeatureIdKey] === baseFeature;
         });
         const sliceFirst = index < indexBaseFeature ? index : indexBaseFeature;
@@ -641,7 +641,7 @@ class DifferentialDetail extends Component {
           sliceFirst,
           sliceLast + 1,
         );
-        const shiftedTableDataArray = shiftedTableData.map(function(d) {
+        const shiftedTableDataArray = shiftedTableData.map(function (d) {
           return {
             id: d[differentialFeatureIdKey],
             value: d[differentialFeatureIdKey],
@@ -655,7 +655,7 @@ class DifferentialDetail extends Component {
         const key = 'id';
         const uniqueTableDataArray = [
           ...new Map(
-            oldAndNewTableDataArray.map(item => [item[key], item]),
+            oldAndNewTableDataArray.map((item) => [item[key], item]),
           ).values(),
         ];
         this.props.onHandleHighlightedFeaturesDifferential(
@@ -681,7 +681,7 @@ class DifferentialDetail extends Component {
         // already highlighted, remove it from array
         if (itemAlreadyHighlighted) {
           selectedTableDataArray = PreviouslyHighlighted.filter(
-            i => i.id !== item[differentialFeatureIdKey],
+            (i) => i.id !== item[differentialFeatureIdKey],
           );
           this.props.onHandleHighlightedFeaturesDifferential(
             selectedTableDataArray,
@@ -689,7 +689,7 @@ class DifferentialDetail extends Component {
           this.reloadMultifeaturePlot(selectedTableDataArray);
         } else {
           // not yet highlighted, add it to array
-          const indexBaseFeature = _.findIndex(currentTableData, function(d) {
+          const indexBaseFeature = _.findIndex(currentTableData, function (d) {
             return d[differentialFeatureIdKey] === baseFeature;
           });
           // map feature to fix obj entries
@@ -731,7 +731,7 @@ class DifferentialDetail extends Component {
     }
   };
 
-  handleUpperPlotsVisability = e => {
+  handleUpperPlotsVisability = (e) => {
     // toggle visability
     const {
       upperPlotsVisible,
@@ -757,7 +757,7 @@ class DifferentialDetail extends Component {
     this.handleSizeChange(size, 'horizontal');
   };
 
-  handleVolcanoVisability = e => {
+  handleVolcanoVisability = (e) => {
     const {
       volcanoPlotVisible,
       volcanoWidth,
@@ -843,7 +843,7 @@ class DifferentialDetail extends Component {
         // allChecked: false,
         scatterplotLoaded: true,
       },
-      function() {
+      function () {
         // if multi-feature search is in effect
         // update the multi-feature search UI
         if (
@@ -861,8 +861,8 @@ class DifferentialDetail extends Component {
           );
           let relevantDifferentialData = [];
           const multiFeaturesFound = [];
-          differentialAlphanumericFields.forEach(columnKey => {
-            const columnIncludes = [...sortedFilteredData].filter(d => {
+          differentialAlphanumericFields.forEach((columnKey) => {
+            const columnIncludes = [...sortedFilteredData].filter((d) => {
               if (multiFeaturesSearchedAndFilteredOutSet.has(d[columnKey])) {
                 // push the features found to an array
                 // that will be used to calculate the "Not Found" state
@@ -890,7 +890,7 @@ class DifferentialDetail extends Component {
           });
         }
         let allFeatureIdsRemaining = [...sortedFilteredData].map(
-          i => i[this.props.differentialFeatureIdKey],
+          (i) => i[this.props.differentialFeatureIdKey],
         );
         let isOutlinedFeatureInView = allFeatureIdsRemaining.includes(
           this.props.differentialOutlinedFeature,
@@ -900,7 +900,7 @@ class DifferentialDetail extends Component {
           // IF DATA
           if (isOutlinedFeatureInView) {
             // PAGE TO OUTLINED FEATURE IF IT REMAINS
-            setTimeout(function() {
+            setTimeout(function () {
               self.pageToFeature(self.props.differentialOutlinedFeature);
             }, 500);
           } else {
@@ -912,7 +912,7 @@ class DifferentialDetail extends Component {
             // IF MULTI-FEATURE PLOTTING AVAILABLE AND THERE IS DATA
             let multiselectedFeaturesArrRemaining = [
               ...sortedFilteredData,
-            ].filter(item =>
+            ].filter((item) =>
               self.props.differentialHighlightedFeatures.includes(
                 item[self.props.differentialFeatureIdKey],
               ),
@@ -926,7 +926,7 @@ class DifferentialDetail extends Component {
                 // IF CHECKED FEATURES REMAIN, GET NEW SVG
                 let multiselectedFeaturesArrMappedRemaining = [
                   ...multiselectedFeaturesArrRemaining,
-                ].map(item => ({
+                ].map((item) => ({
                   id: item[self.props.differentialFeatureIdKey],
                   value: item[self.props.differentialFeatureIdKey],
                   key: item[self.props.differentialFeatureIdKey],
@@ -937,7 +937,7 @@ class DifferentialDetail extends Component {
                 );
                 let multiselectedFeatureIdsMappedRemaining = [
                   ...multiselectedFeaturesArrRemaining,
-                ].map(item => item[self.props.differentialFeatureIdKey]);
+                ].map((item) => item[self.props.differentialFeatureIdKey]);
                 this.reloadMultifeaturePlot(
                   multiselectedFeatureIdsMappedRemaining,
                   true,
@@ -971,7 +971,7 @@ class DifferentialDetail extends Component {
       if (tableData.length > this.props.plotMultiFeatureMax) {
         tableData = [...tableData].slice(0, this.props.plotMultiFeatureMax);
       }
-      let elementArray = tableData.map(item => ({
+      let elementArray = tableData.map((item) => ({
         id: item[differentialFeatureIdKey],
         value: item[differentialFeatureIdKey],
         key: item[differentialFeatureIdKey],
@@ -992,7 +992,7 @@ class DifferentialDetail extends Component {
     this.props.onHandleMultifeaturePlot('Overlay', tableData, true);
   };
 
-  getRelevantSingleFeatureSearchData = singleFeatureSearchTextArg => {
+  getRelevantSingleFeatureSearchData = (singleFeatureSearchTextArg) => {
     const { differentialResults, differentialAlphanumericFields } = this.props;
     const { allDataInScatterView } = this.state;
     // goal: set the new state for differentialTableData, which will update the scatter plot
@@ -1001,8 +1001,8 @@ class DifferentialDetail extends Component {
     if (singleFeatureSearchTextArg !== '') {
       relevantSearched = [];
       // filter the differentialResults for "includes" across all alphanumeric columns
-      differentialAlphanumericFields.forEach(column => {
-        const columnIncludes = [...differentialResults].filter(d => {
+      differentialAlphanumericFields.forEach((column) => {
+        const columnIncludes = [...differentialResults].filter((d) => {
           const columnValueLowercase = d[column].toLowerCase();
           return columnValueLowercase.includes(singleFeatureSearchTextArg);
         });
@@ -1014,13 +1014,14 @@ class DifferentialDetail extends Component {
     if (allDataInScatterView.length) {
       const allDataInScatterViewIdsSet = new Set(
         [...allDataInScatterView].map(
-          d => d[this.props.differentialFeatureIdKey],
+          (d) => d[this.props.differentialFeatureIdKey],
         ),
       );
-      relevantDifferentialDataSearchAndInView = [
-        ...relevantSearched,
-      ].filter(d =>
-        allDataInScatterViewIdsSet.has(d[this.props.differentialFeatureIdKey]),
+      relevantDifferentialDataSearchAndInView = [...relevantSearched].filter(
+        (d) =>
+          allDataInScatterViewIdsSet.has(
+            d[this.props.differentialFeatureIdKey],
+          ),
       );
     }
     const uniqueRelevantDifferentialDataSearchAndInView = [
@@ -1037,19 +1038,20 @@ class DifferentialDetail extends Component {
     if (allDataInScatterView.length) {
       const allDataInScatterViewIdsSet = new Set(
         [...allDataInScatterView].map(
-          d => d[this.props.differentialFeatureIdKey],
+          (d) => d[this.props.differentialFeatureIdKey],
         ),
       );
-      relevantDifferentialDataSearchAndInView = [
-        ...differentialResults,
-      ].filter(d =>
-        allDataInScatterViewIdsSet.has(d[this.props.differentialFeatureIdKey]),
+      relevantDifferentialDataSearchAndInView = [...differentialResults].filter(
+        (d) =>
+          allDataInScatterViewIdsSet.has(
+            d[this.props.differentialFeatureIdKey],
+          ),
       );
     }
     return relevantDifferentialDataSearchAndInView;
   };
 
-  handleSingleFeatureSearchTextChange = _.debounce(value => {
+  handleSingleFeatureSearchTextChange = _.debounce((value) => {
     this.setState({
       singleFeatureSearchActive: true,
       singleFeatureSearchIcon: 'search',
@@ -1075,8 +1077,9 @@ class DifferentialDetail extends Component {
     }
   }, 500);
 
-  handleSingleFeatureSearchSubmit = singleFeatureSearchTextArg => {
-    const singleFeatureSearchTextLower = singleFeatureSearchTextArg.toLowerCase();
+  handleSingleFeatureSearchSubmit = (singleFeatureSearchTextArg) => {
+    const singleFeatureSearchTextLower =
+      singleFeatureSearchTextArg.toLowerCase();
     const relevantDifferentialData = this.getRelevantSingleFeatureSearchData(
       singleFeatureSearchTextLower,
     );
@@ -1112,7 +1115,7 @@ class DifferentialDetail extends Component {
     });
   };
 
-  moveCaretAtEnd = e => {
+  moveCaretAtEnd = (e) => {
     var temp_value = e.target.value;
     e.target.value = '';
     e.target.value = temp_value;
@@ -1192,7 +1195,7 @@ class DifferentialDetail extends Component {
     const multiFeatureSearchTextSplit = multiFeatureSearchText
       // split by comma or whitespace (\s), trim and filter out empty strings
       .split(/[,\s]+/)
-      .map(item => item.trim())
+      .map((item) => item.trim())
       .filter(Boolean);
     const multiFeatureSearchTextAndFilteredOut = [
       ...multiFeatureSearchTextSplit,
@@ -1208,9 +1211,9 @@ class DifferentialDetail extends Component {
     // 1) Set the "NOT FOUND" data
     let multiFeaturesUnfilteredFound = [];
     let relevantDifferentialResultsUnfiltered = [];
-    differentialAlphanumericFields.forEach(columnKey => {
+    differentialAlphanumericFields.forEach((columnKey) => {
       // filter the differentialResults for "includes" across all alphanumeric columns
-      const columnIncludes = [...differentialResultsUnfiltered].filter(d => {
+      const columnIncludes = [...differentialResultsUnfiltered].filter((d) => {
         if (multiFeatureSearchTextSet.has(d[columnKey])) {
           // push the features found to an array
           // that will be used to calculate the "Not Found" state
@@ -1241,20 +1244,21 @@ class DifferentialDetail extends Component {
     // 2) Keep all of the differentialResults in the current scatter plot view
     const allDataInScatterViewIdsSet = new Set(
       [...allDataInScatterView].map(
-        d => d[this.props.differentialFeatureIdKey],
+        (d) => d[this.props.differentialFeatureIdKey],
       ),
     );
-    let relevantDifferentialResultsInView = [...differentialResults].filter(d =>
-      allDataInScatterViewIdsSet.has(d[this.props.differentialFeatureIdKey]),
+    let relevantDifferentialResultsInView = [...differentialResults].filter(
+      (d) =>
+        allDataInScatterViewIdsSet.has(d[this.props.differentialFeatureIdKey]),
     );
 
     // 3) keep the "relevantDifferentialResultsInView" that pass MULTIFEATURE SEARCH filters
     let multiFeaturesPassingFilters = [];
     let relevantDifferentialResultsInViewAndSearch = [];
-    differentialAlphanumericFields.forEach(columnKey => {
+    differentialAlphanumericFields.forEach((columnKey) => {
       // filter the differentialResults for "includes" across all alphanumeric columns
       const columnIncludes = [...relevantDifferentialResultsInView].filter(
-        d => {
+        (d) => {
           if (multiFeatureSearchTextSetAfterNotFoundRemoved.has(d[columnKey])) {
             // push the features found to an array
             // that will be used to calculate the "Not Found" state
@@ -1297,7 +1301,8 @@ class DifferentialDetail extends Component {
         : false,
       multiFeatureSearchTextError: uniqueMultiFeaturesNotFoundValues.length,
       multiFeatureSearchWarning: false,
-      multiFeatureSearchText: uniqueMultiFeaturesPassingFiltersValues.toString(),
+      multiFeatureSearchText:
+        uniqueMultiFeaturesPassingFiltersValues.toString(),
       multiFeatureSearchActive: false,
       singleFeatureSearchActive: false,
       singleFeatureSearchIcon: 'search',
@@ -1305,7 +1310,7 @@ class DifferentialDetail extends Component {
     });
   };
 
-  toggleMultiFeatureSearch = bool => {
+  toggleMultiFeatureSearch = (bool) => {
     this.setState({
       multiFeatureSearchOpen: bool ? bool : !this.state.multiFeatureSearchOpen,
       multiSearching: bool ? bool : this.state.multiSearching,
@@ -1470,6 +1475,9 @@ class DifferentialDetail extends Component {
               differentialTests={differentialTests}
               singleFeaturePlotTypes={singleFeaturePlotTypes}
               multiFeaturePlotTypes={multiFeaturePlotTypes}
+              differentialPlotDescriptions={
+                this.props.differentialPlotDescriptions
+              }
             ></PlotsOverlay>
           </Sidebar>
         );
@@ -1624,7 +1632,7 @@ class DifferentialDetail extends Component {
             <Input
               placeholder="Search features"
               value={singleFeatureSearchText}
-              onChange={e => {
+              onChange={(e) => {
                 this.setState({
                   singleFeatureSearchText: e.target.value,
                 });
@@ -1678,7 +1686,7 @@ class DifferentialDetail extends Component {
                     basic
                     color="blue"
                     pointing="left"
-                    onClick={e => {
+                    onClick={(e) => {
                       e.stopPropagation();
                       this.handleMultiSearchCancel();
                     }}
@@ -1714,7 +1722,7 @@ class DifferentialDetail extends Component {
                     size="mini"
                   >
                     <List.Item className="NoSelect">DOESN'T EXIST:</List.Item>
-                    {notFoundList.map(f => {
+                    {notFoundList.map((f) => {
                       return (
                         <List.Item key={`featureList-${f}`}>
                           <Label className="PrimaryBackground">{f}</Label>
@@ -1737,7 +1745,7 @@ class DifferentialDetail extends Component {
                     size="mini"
                   >
                     <List.Item className="NoSelect">FILTERED OUT:</List.Item>
-                    {filteredOutList.map(f => {
+                    {filteredOutList.map((f) => {
                       return (
                         <List.Item key={`featureList-${f}`}>
                           <Label
@@ -1951,9 +1959,10 @@ class DifferentialDetail extends Component {
           this.props.onResetDifferentialOutlinedFeature
         }
         onRemoveSelectedFeature={this.removeSelectedFeature}
-        onHandleAllChecked={bool => this.setState({ allChecked: bool })}
+        onHandleAllChecked={(bool) => this.setState({ allChecked: bool })}
         plotMultiFeatureAvailable={this.props.plotMultiFeatureAvailable}
         onHandlePlotlyClick={this.handlePlotlyClick}
+        differentialPlotDescriptions={this.props.differentialPlotDescriptions}
       ></PlotsDynamic>
     );
     return (
@@ -1979,7 +1988,7 @@ class DifferentialDetail extends Component {
                       size={upperPlotsVisible ? upperPlotsDivHeight : 1}
                       minSize={420}
                       maxSize={1000}
-                      onDragFinished={size =>
+                      onDragFinished={(size) =>
                         this.handleSizeChange(size, 'horizontal')
                       }
                     >
@@ -1999,7 +2008,7 @@ class DifferentialDetail extends Component {
                         size={volcanoDivWidth}
                         minSize={350}
                         maxSize={1800}
-                        onDragFinished={size =>
+                        onDragFinished={(size) =>
                           this.handleSizeChange(size, 'vertical')
                         }
                       >

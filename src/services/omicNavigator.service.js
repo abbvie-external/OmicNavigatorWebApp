@@ -805,6 +805,32 @@ class OmicNavigatorService {
       }
     }
   }
+
+  async getPlotDescriptions(study, cancelToken) {
+    const cacheKey = `getPlots_${study}}`;
+    if (this[cacheKey] != null) {
+      return this[cacheKey];
+    } else {
+      try {
+        const promise = this.axiosPost(
+          'getPlots',
+          {
+            study,
+          },
+          false,
+          null,
+          cancelToken,
+          25000,
+        );
+        const dataFromPromise = await promise;
+        this[cacheKey] = dataFromPromise;
+        return dataFromPromise;
+      } catch {
+        if (axios.isCancel) {
+        }
+      }
+    }
+  }
 }
 
 export const omicNavigatorService = new OmicNavigatorService();

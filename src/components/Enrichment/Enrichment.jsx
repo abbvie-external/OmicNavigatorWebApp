@@ -198,6 +198,7 @@ class Enrichment extends Component {
     enrichmentTest: '',
     enrichmentModelIds: [],
     enrichmentResultsColumnTooltips: [],
+    enrichmentPlotDescriptions: [],
   };
   EnrichmentViewContainerRef = React.createRef();
   EnrichmentGridRef = React.createRef();
@@ -2390,6 +2391,12 @@ class Enrichment extends Component {
     });
   };
 
+  setEnrichmentPlotDescriptions = (response) => {
+    this.setState({
+      enrichmentPlotDescriptions: response,
+    });
+  };
+
   render() {
     const enrichmentView = this.getView();
     const {
@@ -2529,6 +2536,9 @@ class Enrichment extends Component {
               onSetEnrichmentModelIds={this.setEnrichmentModelIds}
               onSetEnrichmentResultsColumnTooltips={
                 this.setEnrichmentResultsColumnTooltips
+              }
+              onSetEnrichmentPlotDescriptions={
+                this.setEnrichmentPlotDescriptions
               }
             />
           </Grid.Column>

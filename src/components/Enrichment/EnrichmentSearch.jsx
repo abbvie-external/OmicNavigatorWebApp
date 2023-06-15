@@ -21,6 +21,7 @@ let cancelRequestGetReportLinkEnrichment = () => {};
 let cancelRequestGetEnrichmentsIntersection = () => {};
 let cancelRequestGetEnrichmentsMultiset = () => {};
 let cancelGetEnrichmentResultsColumnTooltips = () => {};
+let cancelGetEnrichmentPlotDescriptions = () => {};
 const cacheEnrichmentsTable = {};
 async function* streamAsyncIterable(reader) {
   while (true) {
@@ -194,6 +195,7 @@ class EnrichmentSearch extends Component {
         enrichmentModels: enrichmentModelsMapped,
       });
       this.getResultsColumnTooltips(enrichmentStudy);
+      this.getEnrichmentPlotDescriptions(enrichmentStudy);
       if (enrichmentModel === '') {
         this.getReportLink(enrichmentStudy, 'default');
       } else {
@@ -304,6 +306,29 @@ class EnrichmentSearch extends Component {
       .catch((error) => {
         console.error(
           'Error during getEnrichmentResultsColumnTooltipsResponse',
+          error,
+        );
+      });
+  };
+
+  getEnrichmentPlotDescriptions = (study) => {
+    const { onSetEnrichmentPlotDescriptions } = this.props;
+    cancelGetEnrichmentPlotDescriptions();
+    let cancelToken = new CancelToken((e) => {
+      cancelGetEnrichmentPlotDescriptions = e;
+    });
+    omicNavigatorService
+      .getPlotDescriptions(study)
+      .then((getPlotDescriptionsResponse) => {
+        if (getPlotDescriptionsResponse) {
+          onSetEnrichmentPlotDescriptions(getPlotDescriptionsResponse);
+        } else {
+          onSetEnrichmentPlotDescriptions([]);
+        }
+      })
+      .catch((error) => {
+        console.error(
+          'Error during getEnrichmentPlotDescriptionsResponse',
           error,
         );
       });
@@ -1028,7 +1053,7 @@ class EnrichmentSearch extends Component {
             <Transition
               visible={!enrichmentStudyHrefVisible}
               animation="flash"
-              duration={1500}
+              duration={1000}
             >
               <Icon
                 name="info"

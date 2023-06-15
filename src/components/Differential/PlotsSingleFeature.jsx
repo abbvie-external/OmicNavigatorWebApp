@@ -1,8 +1,16 @@
 import React, { Component } from 'react';
-import { Loader, Dimmer, Icon, Button, Dropdown } from 'semantic-ui-react';
+import {
+  Loader,
+  Dimmer,
+  Icon,
+  Button,
+  Dropdown,
+  Popup,
+} from 'semantic-ui-react';
 import ButtonActions from '../Shared/ButtonActions';
 import TabSingleFeature from './TabSingleFeature';
 import './PlotsDynamic.scss';
+import { isObjectEmpty } from '../Shared/helpers';
 
 class PlotsSingleFeature extends Component {
   state = {
@@ -103,6 +111,7 @@ class PlotsSingleFeature extends Component {
       differentialStudy,
       differentialModel,
       differentialTest,
+      differentialPlotDescriptions,
     } = this.props;
 
     const {
@@ -153,6 +162,26 @@ class PlotsSingleFeature extends Component {
           ];
           options = [...options, ...metafeaturesDropdown];
         }
+        let differentialPlotDescription = null;
+        let currentDifferentialPlotDescriptions =
+          differentialPlotDescriptions?.[differentialModel] || {};
+        const currentPlotText =
+          options?.[activeTabIndexPlotsSingleFeature]?.text || null;
+        if (!isObjectEmpty(currentDifferentialPlotDescriptions)) {
+          const DescriptionsAsArray = Object.entries(
+            currentDifferentialPlotDescriptions,
+          );
+          if (DescriptionsAsArray.length && currentPlotText) {
+            let currentDifferentialPlotDescription =
+              DescriptionsAsArray.filter(
+                (p) => p[1].displayName === currentPlotText,
+              ) || null;
+            differentialPlotDescription =
+              currentDifferentialPlotDescription.length
+                ? currentDifferentialPlotDescription?.[0]?.[1]?.description
+                : null;
+          }
+        }
         const loader = plotSingleFeatureDataLoaded ? null : (
           <Dimmer active inverted>
             <Loader size="large">Loading Single-Feature Plots</Loader>
@@ -185,23 +214,55 @@ class PlotsSingleFeature extends Component {
                 fwdRef={this.differentialDetailPlotsSingleFeatureRef}
               />
             </div>
-            <Dropdown
-              search
-              selection
-              compact
-              options={options}
-              value={
-                options[activeTabIndexPlotsSingleFeatureVar]?.value ||
-                options[0]?.value
-              }
-              onChange={this.handlePlotDropdownChangeSingleFeature}
-              className={DropdownClass}
-              id={
-                isMultifeaturePlot
-                  ? 'svgPlotDropdownMulti'
-                  : 'svgPlotDropdownSingle'
-              }
-            />
+            {differentialPlotDescription ? (
+              <Popup
+                trigger={
+                  <Dropdown
+                    search
+                    selection
+                    compact
+                    options={options}
+                    value={
+                      options[activeTabIndexPlotsSingleFeatureVar]?.value ||
+                      options[0]?.value
+                    }
+                    onChange={this.handlePlotDropdownChangeSingleFeature}
+                    className={DropdownClass}
+                    id={
+                      isMultifeaturePlot
+                        ? 'svgPlotDropdownMulti'
+                        : 'svgPlotDropdownSingle'
+                    }
+                  />
+                }
+                basic
+                inverted
+                position="bottom center"
+                closeOnDocumentClick
+                closeOnEscape
+                hideOnScroll
+              >
+                <Popup.Content>{differentialPlotDescription}</Popup.Content>
+              </Popup>
+            ) : (
+              <Dropdown
+                search
+                selection
+                compact
+                options={options}
+                value={
+                  options[activeTabIndexPlotsSingleFeatureVar]?.value ||
+                  options[0]?.value
+                }
+                onChange={this.handlePlotDropdownChangeSingleFeature}
+                className={DropdownClass}
+                id={
+                  isMultifeaturePlot
+                    ? 'svgPlotDropdownMulti'
+                    : 'svgPlotDropdownSingle'
+                }
+              />
+            )}
             <TabSingleFeature
               // DEV - add only necessary props
               {...this.props}

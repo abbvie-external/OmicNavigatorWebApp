@@ -1,12 +1,13 @@
 import React, { PureComponent } from 'react';
 import { withRouter } from 'react-router-dom';
-import { Grid, Dimmer, Loader, Dropdown } from 'semantic-ui-react';
+import { Grid, Dimmer, Loader, Dropdown, Popup } from 'semantic-ui-react';
 import DifferentialBreadcrumbs from './DifferentialBreadcrumbs';
 import ButtonActions from '../Shared/ButtonActions';
 import TabOverlay from './TabOverlay';
 import '../Enrichment/SplitPanesContainer.scss';
 import './PlotsDynamic.scss';
 import './PlotsOverlay.scss';
+import { isObjectEmpty } from '../Shared/helpers';
 
 class PlotsOverlay extends PureComponent {
   constructor(props) {
@@ -73,13 +74,13 @@ class PlotsOverlay extends PureComponent {
     });
   };
 
-  handlePlotlyExport = plotlyExportType => {
+  handlePlotlyExport = (plotlyExportType) => {
     this.setState(
       {
         plotlyExport: true,
         plotlyExportType,
       },
-      function() {
+      function () {
         // callback to reset plotly export in progress to false
         this.setState({ plotlyExport: false });
       },
@@ -95,9 +96,10 @@ class PlotsOverlay extends PureComponent {
       differentialModel,
       differentialTest,
       differentialFeature,
-      // differentialPlotTypes,
+      differentialPlotTypes,
       modelSpecificMetaFeaturesExist,
       singleFeaturePlotTypes,
+      differentialPlotDescriptions,
     } = this.props;
 
     const {
@@ -128,7 +130,7 @@ class PlotsOverlay extends PureComponent {
       const activeTabIndexPlotsOverlayVar = activeTabIndexPlotsOverlay || 0;
       // const svgArrayLength = svgArray
       let options = [];
-      options = svgArray.map(function(s, index) {
+      options = svgArray.map(function (s, index) {
         return {
           key: `${index}=VolcanoPlotDropdownOption`,
           text: s.plotType.plotDisplay,
@@ -160,7 +162,27 @@ class PlotsOverlay extends PureComponent {
       //   //  </div>
       // );
 
-      if (this.props.differentialPlotTypes && this.props.plotOverlayData) {
+      if (differentialPlotTypes && plotOverlayData) {
+        let differentialPlotDescription = null;
+        let currentDifferentialPlotDescriptions =
+          differentialPlotDescriptions?.[differentialModel] || {};
+        const currentPlotText =
+          options?.[activeTabIndexPlotsOverlayVar]?.text || null;
+        if (!isObjectEmpty(currentDifferentialPlotDescriptions)) {
+          const DescriptionsAsArray = Object.entries(
+            currentDifferentialPlotDescriptions,
+          );
+          if (DescriptionsAsArray.length && currentPlotText) {
+            let currentDifferentialPlotDescription =
+              DescriptionsAsArray.filter(
+                (p) => p[1].displayName === currentPlotText,
+              ) || null;
+            differentialPlotDescription =
+              currentDifferentialPlotDescription.length
+                ? currentDifferentialPlotDescription?.[0]?.[1]?.description
+                : null;
+          }
+        }
         return (
           <div className="PlotWrapper">
             <Grid columns={2} className="">
@@ -211,44 +233,108 @@ class PlotsOverlay extends PureComponent {
                   widescreen={16}
                 >
                   <div className="" ref={this.differentialPlotsOverlayRef}>
-                    <Dropdown
-                      search
-                      selection
-                      compact
-                      options={options}
-                      value={options[activeTabIndexPlotsOverlayVar]?.value || 0}
-                      onChange={this.handlePlotDropdownChange}
-                    />
-                    <TabOverlay
-                      {...this.props}
-                      {...this.state}
-                      differentialPlotsOverlayRefFwd={
-                        this.differentialPlotsOverlayRef
-                      }
-                      ref={this.metafeaturesTableRef}
-                      // DEV - add only necessary props
-                      // activeTabIndexPlotsMultiFeature={activeTabIndexPlotsMultiFeature}
-                      // differentialDetailPlotsMultiFeatureRefFwd={
-                      //   this.differentialDetailPlotsMultiFeatureRef
-                      // }
-                      // differentialHighlightedFeaturesData={
-                      //   differentialHighlightedFeaturesData
-                      // }
-                      // divHeight={divHeight}
-                      // divWidth={divWidth}
-                      // differentialPlotTypes={differentialPlotTypes}
-                      // differentialStudy={differentialStudy}
-                      // differentialModel={differentialModel}
-                      // differentialTest={differentialTest}
-                      // plotlyExport={plotlyExport}
-                      // plotlyExportType={plotlyExportType}
-                      // plotMultiFeatureData={plotMultiFeatureData}
-                      // pointSize={pointSize}
-                      // plotMultiFeatureDataLength={plotMultiFeatureDataLength}
-                      // pxToPtRatio={pxToPtRatio}
-                      // multiFeaturePlotTypes={multiFeaturePlotTypes}
-                      // svgTabMax={svgTabMax}
-                    />
+                    {differentialPlotDescription ? (
+                      <>
+                        <Popup
+                          trigger={
+                            <Dropdown
+                              search
+                              selection
+                              compact
+                              options={options}
+                              value={
+                                options[activeTabIndexPlotsOverlayVar]?.value ||
+                                0
+                              }
+                              onChange={this.handlePlotDropdownChange}
+                            />
+                          }
+                          basic
+                          inverted
+                          position="right center"
+                          closeOnDocumentClick
+                          closeOnEscape
+                          hideOnScroll
+                        >
+                          <Popup.Content>
+                            {differentialPlotDescription}
+                          </Popup.Content>
+                        </Popup>
+                        <TabOverlay
+                          {...this.props}
+                          {...this.state}
+                          differentialPlotsOverlayRefFwd={
+                            this.differentialPlotsOverlayRef
+                          }
+                          ref={this.metafeaturesTableRef}
+                          // DEV - add only necessary props
+                          // activeTabIndexPlotsMultiFeature={activeTabIndexPlotsMultiFeature}
+                          // differentialDetailPlotsMultiFeatureRefFwd={
+                          //   this.differentialDetailPlotsMultiFeatureRef
+                          // }
+                          // differentialHighlightedFeaturesData={
+                          //   differentialHighlightedFeaturesData
+                          // }
+                          // divHeight={divHeight}
+                          // divWidth={divWidth}
+                          // differentialPlotTypes={differentialPlotTypes}
+                          // differentialStudy={differentialStudy}
+                          // differentialModel={differentialModel}
+                          // differentialTest={differentialTest}
+                          // plotlyExport={plotlyExport}
+                          // plotlyExportType={plotlyExportType}
+                          // plotMultiFeatureData={plotMultiFeatureData}
+                          // pointSize={pointSize}
+                          // plotMultiFeatureDataLength={plotMultiFeatureDataLength}
+                          // pxToPtRatio={pxToPtRatio}
+                          // multiFeaturePlotTypes={multiFeaturePlotTypes}
+                          // svgTabMax={svgTabMax}
+                        />
+                      </>
+                    ) : (
+                      <>
+                        <Dropdown
+                          search
+                          selection
+                          compact
+                          options={options}
+                          value={
+                            options[activeTabIndexPlotsOverlayVar]?.value || 0
+                          }
+                          onChange={this.handlePlotDropdownChange}
+                        />
+                        <TabOverlay
+                          {...this.props}
+                          {...this.state}
+                          differentialPlotsOverlayRefFwd={
+                            this.differentialPlotsOverlayRef
+                          }
+                          ref={this.metafeaturesTableRef}
+                          // DEV - add only necessary props
+                          // activeTabIndexPlotsMultiFeature={activeTabIndexPlotsMultiFeature}
+                          // differentialDetailPlotsMultiFeatureRefFwd={
+                          //   this.differentialDetailPlotsMultiFeatureRef
+                          // }
+                          // differentialHighlightedFeaturesData={
+                          //   differentialHighlightedFeaturesData
+                          // }
+                          // divHeight={divHeight}
+                          // divWidth={divWidth}
+                          // differentialPlotTypes={differentialPlotTypes}
+                          // differentialStudy={differentialStudy}
+                          // differentialModel={differentialModel}
+                          // differentialTest={differentialTest}
+                          // plotlyExport={plotlyExport}
+                          // plotlyExportType={plotlyExportType}
+                          // plotMultiFeatureData={plotMultiFeatureData}
+                          // pointSize={pointSize}
+                          // plotMultiFeatureDataLength={plotMultiFeatureDataLength}
+                          // pxToPtRatio={pxToPtRatio}
+                          // multiFeaturePlotTypes={multiFeaturePlotTypes}
+                          // svgTabMax={svgTabMax}
+                        />
+                      </>
+                    )}
                   </div>
                 </Grid.Column>
               </Grid.Row>

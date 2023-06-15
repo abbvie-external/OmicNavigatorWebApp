@@ -59,6 +59,7 @@ class Differential extends Component {
       differentialResultsLinkouts: [],
       differentialResultsFavicons: [],
       differentialResultsColumnTooltips: [],
+      differentialPlotDescriptions: [],
       // differentialResultsUnfiltered: [],
       /**
        * @type {QHGrid.ColumnConfig[]}
@@ -1269,7 +1270,7 @@ class Differential extends Component {
           } else return svg;
         } else return null;
       } catch (err) {
-        console.log(err);
+        // console.log(err);
         return null;
       }
     } else {
@@ -1519,11 +1520,11 @@ class Differential extends Component {
     const noPlots = !differentialPlotTypes?.length > 0;
     const differentialAlphanumericColumnsMapped =
       differentialAlphanumericFields.map((f, { index }) => {
-        console.log(
-          differentialResultsColumnTooltips?.[differentialModel]?.[
-            differentialTest
-          ]?.[f],
-        );
+        // console.log(
+        //   differentialResultsColumnTooltips?.[differentialModel]?.[
+        //     differentialTest
+        //   ]?.[f],
+        // );
         return {
           title: f,
           headerAttributes: {
@@ -1677,7 +1678,7 @@ class Differential extends Component {
           field: 'select',
           hideOnExport: true,
           sortDisabled: true,
-          sortAccessor: (item, field) => console.log(item, field),
+          // sortAccessor: (item, field) => console.log(item, field),
           // self.state.differentialHighlightedFeatures.contains(item),
           template: (value, item, addParams) => {
             return (
@@ -1819,6 +1820,12 @@ class Differential extends Component {
   setDifferentialResultsColumnTooltips = (response) => {
     this.setState({
       differentialResultsColumnTooltips: response,
+    });
+  };
+
+  setDifferentialPlotDescriptions = (response) => {
+    this.setState({
+      differentialPlotDescriptions: response,
     });
   };
 
@@ -1964,6 +1971,9 @@ class Differential extends Component {
               onGetMultiModelMappingObject={this.getMultiModelMappingObject}
               onSetDifferentialResultsColumnTooltips={
                 this.setDifferentialResultsColumnTooltips
+              }
+              onSetDifferentialPlotDescriptions={
+                this.setDifferentialPlotDescriptions
               }
             />
           </Grid.Column>

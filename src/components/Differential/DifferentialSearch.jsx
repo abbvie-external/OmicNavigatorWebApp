@@ -21,6 +21,7 @@ let cancelRequestGetReportLinkDifferential = () => {};
 let cancelRequestGetResultsIntersection = () => {};
 let cancelRequestGetResultsMultiset = () => {};
 let cancelGetDifferentialResultsColumnTooltips = () => {};
+let cancelGetDifferentialPlotDescriptions = () => {};
 const cacheResultsTable = {};
 async function* streamAsyncIterable(reader) {
   while (true) {
@@ -202,6 +203,7 @@ class DifferentialSearch extends Component {
         differentialModels: differentialModelsMapped,
       });
       this.getResultsColumnTooltips(differentialStudy);
+      this.getDifferentialPlotDescriptions(differentialStudy);
       if (differentialModel === '') {
         this.getReportLink(differentialStudy, 'default');
       } else {
@@ -314,6 +316,29 @@ class DifferentialSearch extends Component {
       .catch((error) => {
         console.error(
           'Error during getDifferentialResultsColumnTooltipsResponse',
+          error,
+        );
+      });
+  };
+
+  getDifferentialPlotDescriptions = (study) => {
+    const { onSetDifferentialPlotDescriptions } = this.props;
+    cancelGetDifferentialPlotDescriptions();
+    let cancelToken = new CancelToken((e) => {
+      cancelGetDifferentialPlotDescriptions = e;
+    });
+    omicNavigatorService
+      .getPlotDescriptions(study)
+      .then((getPlotDescriptionsResponse) => {
+        if (getPlotDescriptionsResponse) {
+          onSetDifferentialPlotDescriptions(getPlotDescriptionsResponse);
+        } else {
+          onSetDifferentialPlotDescriptions([]);
+        }
+      })
+      .catch((error) => {
+        console.error(
+          'Error during getDifferentialPlotDescriptionsResponse',
           error,
         );
       });
@@ -948,7 +973,7 @@ class DifferentialSearch extends Component {
             <Transition
               visible={!differentialStudyHrefVisible}
               animation="flash"
-              duration={1500}
+              duration={1000}
             >
               <Icon
                 name="info"
@@ -975,8 +1000,8 @@ class DifferentialSearch extends Component {
             ? studyName
             : differentialStudyReportTooltip
         }
-        mouseEnterDelay={0}
-        mouseLeaveDelay={0}
+        mouseEnterDelay={50}
+        mouseLeaveDelay={50}
       />
     );
 
