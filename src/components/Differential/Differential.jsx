@@ -58,6 +58,7 @@ class Differential extends Component {
       differentialResultsTableStreaming: true,
       differentialResultsLinkouts: [],
       differentialResultsFavicons: [],
+      differentialResultsColumnTooltips: [],
       // differentialResultsUnfiltered: [],
       /**
        * @type {QHGrid.ColumnConfig[]}
@@ -1436,10 +1437,16 @@ class Differential extends Component {
 
   getConfigCols = (testData) => {
     const differentialResultsVar = testData.differentialResults;
-    const { differentialFeature } = this.props;
+    const {
+      differentialFeature,
+      onHandleDifferentialFeatureIdKey,
+      differentialModel,
+      differentialTest,
+    } = this.props;
     const {
       differentialResultsLinkouts,
       differentialResultsFavicons,
+      differentialResultsColumnTooltips,
       differentialPlotTypes,
       modelSpecificMetaFeaturesExist,
     } = this.state;
@@ -1504,7 +1511,7 @@ class Differential extends Component {
       });
       this.getPlot('Overlay', differentialFeature, true);
     }
-    this.props.onHandleDifferentialFeatureIdKey(
+    onHandleDifferentialFeatureIdKey(
       'differentialFeatureIdKey',
       alphanumericTrigger,
     );
@@ -1512,20 +1519,19 @@ class Differential extends Component {
     const noPlots = !differentialPlotTypes?.length > 0;
     const differentialAlphanumericColumnsMapped =
       differentialAlphanumericFields.map((f, { index }) => {
+        console.log(
+          differentialResultsColumnTooltips?.[differentialModel]?.[
+            differentialTest
+          ]?.[f],
+        );
         return {
-          // headerAttributes: (
-          //   <Popup
-          //     trigger={<span className="HeaderTooltip">{f}</span>}
-          //     content="test tooltip"
-          //   />
-          // ),
-          // headerAttributes: { title: 'column header tooltip' },
-          title: (
-            <span>
-              {/* {f} */}
-              <Popup trigger={<span>{f}</span>} content="column header popup" />
-            </span>
-          ),
+          title: f,
+          headerAttributes: {
+            title:
+              differentialResultsColumnTooltips?.[differentialModel]?.[
+                differentialTest
+              ]?.[f] || null,
+          },
           exportTitle: f,
           field: f,
           filterable: { type: 'multiFilter' },
@@ -1632,6 +1638,12 @@ class Differential extends Component {
       (c) => {
         return {
           title: c,
+          headerAttributes: {
+            title:
+              differentialResultsColumnTooltips?.[differentialModel]?.[
+                differentialTest
+              ]?.[c] || null,
+          },
           field: c,
           type: 'number',
           filterable: { type: 'numericFilter' },
@@ -1804,6 +1816,12 @@ class Differential extends Component {
     // });
   };
 
+  setDifferentialResultsColumnTooltips = (response) => {
+    this.setState({
+      differentialResultsColumnTooltips: response,
+    });
+  };
+
   render() {
     const differentialView = this.getView();
     const { plotMultisetDataDifferential, animation, direction, visible } =
@@ -1944,6 +1962,9 @@ class Differential extends Component {
               }
               onResetOverlay={this.resetOverlay}
               onGetMultiModelMappingObject={this.getMultiModelMappingObject}
+              onSetDifferentialResultsColumnTooltips={
+                this.setDifferentialResultsColumnTooltips
+              }
             />
           </Grid.Column>
           <Grid.Column

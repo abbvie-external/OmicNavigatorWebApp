@@ -197,6 +197,7 @@ class Enrichment extends Component {
     isDataStreamingEnrichmentsTable: false,
     enrichmentTest: '',
     enrichmentModelIds: [],
+    enrichmentResultsColumnTooltips: [],
   };
   EnrichmentViewContainerRef = React.createRef();
   EnrichmentGridRef = React.createRef();
@@ -2383,6 +2384,12 @@ class Enrichment extends Component {
     });
   };
 
+  setEnrichmentResultsColumnTooltips = (response) => {
+    this.setState({
+      enrichmentResultsColumnTooltips: response,
+    });
+  };
+
   render() {
     const enrichmentView = this.getView();
     const {
@@ -2520,6 +2527,9 @@ class Enrichment extends Component {
                 this.handleEnrichmentColumnsConfigured
               }
               onSetEnrichmentModelIds={this.setEnrichmentModelIds}
+              onSetEnrichmentResultsColumnTooltips={
+                this.setEnrichmentResultsColumnTooltips
+              }
             />
           </Grid.Column>
           <Grid.Column

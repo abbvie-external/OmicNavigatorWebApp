@@ -779,6 +779,32 @@ class OmicNavigatorService {
       }
     }
   }
+
+  async getResultsColumnTooltips(study, cancelToken) {
+    const cacheKey = `getTests_${study}}`;
+    if (this[cacheKey] != null) {
+      return this[cacheKey];
+    } else {
+      try {
+        const promise = this.axiosPost(
+          'getTests',
+          {
+            study,
+          },
+          false,
+          null,
+          cancelToken,
+          25000,
+        );
+        const dataFromPromise = await promise;
+        this[cacheKey] = dataFromPromise;
+        return dataFromPromise;
+      } catch {
+        if (axios.isCancel) {
+        }
+      }
+    }
+  }
 }
 
 export const omicNavigatorService = new OmicNavigatorService();

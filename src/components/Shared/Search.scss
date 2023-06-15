@@ -23,14 +23,14 @@
     cursor: pointer;
     position: absolute;
     right: 5%;
-    top: 16%;
+    top: 13%;
   }
 
   .StudyHtmlIconDivP {
     cursor: pointer;
     position: absolute;
     right: 5%;
-    top: 20%;
+    top: 16%;
   }
 
   .StudyHtmlIcon {
@@ -44,7 +44,6 @@
   }
 
   i.inverted.circular.icon {
-    // background-color: var(--color-dark) !important;
     background-color: var(--color-primary) !important;
   }
 
@@ -111,7 +110,7 @@
     }
   }
 
-  .PlotRadio {
+  .FloatRight {
     // margin-top: 10px !important;
     float: right !important;
   }

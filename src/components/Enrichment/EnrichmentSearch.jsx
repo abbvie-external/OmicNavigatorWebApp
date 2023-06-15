@@ -20,6 +20,7 @@ let cancelRequestGetReportLinkEnrichment = () => {};
 // let cancelGetEnrichmentsTable = () => {};
 let cancelRequestGetEnrichmentsIntersection = () => {};
 let cancelRequestGetEnrichmentsMultiset = () => {};
+let cancelGetEnrichmentResultsColumnTooltips = () => {};
 const cacheEnrichmentsTable = {};
 async function* streamAsyncIterable(reader) {
   while (true) {
@@ -192,6 +193,7 @@ class EnrichmentSearch extends Component {
         enrichmentModelsDisabled: false,
         enrichmentModels: enrichmentModelsMapped,
       });
+      this.getResultsColumnTooltips(enrichmentStudy);
       if (enrichmentModel === '') {
         this.getReportLink(enrichmentStudy, 'default');
       } else {
@@ -280,6 +282,31 @@ class EnrichmentSearch extends Component {
         }
       }
     }
+  };
+
+  getResultsColumnTooltips = (study) => {
+    const { onSetEnrichmentResultsColumnTooltips } = this.props;
+    cancelGetEnrichmentResultsColumnTooltips();
+    let cancelToken = new CancelToken((e) => {
+      cancelGetEnrichmentResultsColumnTooltips = e;
+    });
+    omicNavigatorService
+      .getResultsColumnTooltips(study)
+      .then((getResultsColumnTooltipsResponse) => {
+        if (getResultsColumnTooltipsResponse) {
+          onSetEnrichmentResultsColumnTooltips(
+            getResultsColumnTooltipsResponse,
+          );
+        } else {
+          onSetEnrichmentResultsColumnTooltips([]);
+        }
+      })
+      .catch((error) => {
+        console.error(
+          'Error during getEnrichmentResultsColumnTooltipsResponse',
+          error,
+        );
+      });
   };
 
   handleStudyChange = (evt, { name, value }) => {
@@ -1005,12 +1032,13 @@ class EnrichmentSearch extends Component {
             >
               <Icon
                 name="info"
+                size="large"
                 className={
                   enrichmentStudyHrefVisible
                     ? 'StudyHtmlIcon'
                     : 'StudyHtmlIcon DisabledLink'
                 }
-                color={!enrichmentStudyHrefVisible ? 'grey' : ''}
+                color={!enrichmentStudyHrefVisible ? 'grey' : null}
                 inverted
                 circular
               />
@@ -1299,7 +1327,7 @@ class EnrichmentSearch extends Component {
         >
           <div className="SliderDiv">
             <span className="MultisetRadio">{MultisetRadio}</span>
-            <span className={WindowWidth < 1725 ? 'Block' : 'PlotRadio'}>
+            <span className={WindowWidth < 1725 ? 'Block' : 'FloatRight'}>
               {PlotRadio}
             </span>
           </div>

@@ -20,6 +20,7 @@ import DifferentialMultisetFilters from './DifferentialMultisetFilters';
 let cancelRequestGetReportLinkDifferential = () => {};
 let cancelRequestGetResultsIntersection = () => {};
 let cancelRequestGetResultsMultiset = () => {};
+let cancelGetDifferentialResultsColumnTooltips = () => {};
 const cacheResultsTable = {};
 async function* streamAsyncIterable(reader) {
   while (true) {
@@ -200,6 +201,7 @@ class DifferentialSearch extends Component {
         differentialModelsDisabled: false,
         differentialModels: differentialModelsMapped,
       });
+      this.getResultsColumnTooltips(differentialStudy);
       if (differentialModel === '') {
         this.getReportLink(differentialStudy, 'default');
       } else {
@@ -290,6 +292,31 @@ class DifferentialSearch extends Component {
         }
       }
     }
+  };
+
+  getResultsColumnTooltips = (study) => {
+    const { onSetDifferentialResultsColumnTooltips } = this.props;
+    cancelGetDifferentialResultsColumnTooltips();
+    let cancelToken = new CancelToken((e) => {
+      cancelGetDifferentialResultsColumnTooltips = e;
+    });
+    omicNavigatorService
+      .getResultsColumnTooltips(study)
+      .then((getResultsColumnTooltipsResponse) => {
+        if (getResultsColumnTooltipsResponse) {
+          onSetDifferentialResultsColumnTooltips(
+            getResultsColumnTooltipsResponse,
+          );
+        } else {
+          onSetDifferentialResultsColumnTooltips([]);
+        }
+      })
+      .catch((error) => {
+        console.error(
+          'Error during getDifferentialResultsColumnTooltipsResponse',
+          error,
+        );
+      });
   };
 
   handleStudyChange = (evt, { name, value }) => {
@@ -925,12 +952,13 @@ class DifferentialSearch extends Component {
             >
               <Icon
                 name="info"
+                size="large"
                 className={
                   differentialStudyHrefVisible
                     ? 'StudyHtmlIcon'
                     : 'StudyHtmlIcon DisabledLink'
                 }
-                color={!differentialStudyHrefVisible ? 'grey' : ''}
+                color={!differentialStudyHrefVisible ? 'grey' : null}
                 inverted
                 circular
               />
@@ -1192,7 +1220,7 @@ class DifferentialSearch extends Component {
         <div className="MultisetContainer">
           <div className="SliderDiv">
             <span className="MultisetRadio">{MultisetRadio}</span>
-            <span className={WindowWidth < 1725 ? 'Block' : 'PlotRadio'}>
+            <span className={WindowWidth < 1725 ? 'Block' : 'FloatRight'}>
               {PlotRadio}
             </span>
           </div>
