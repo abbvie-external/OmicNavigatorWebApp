@@ -1000,8 +1000,8 @@ class DifferentialSearch extends Component {
             ? studyName
             : differentialStudyReportTooltip
         }
-        mouseEnterDelay={50}
-        mouseLeaveDelay={50}
+        mouseEnterDelay={0}
+        mouseLeaveDelay={0}
       />
     );
 

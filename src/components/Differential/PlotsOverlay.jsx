@@ -311,27 +311,6 @@ class PlotsOverlay extends PureComponent {
                           }
                           ref={this.metafeaturesTableRef}
                           // DEV - add only necessary props
-                          // activeTabIndexPlotsMultiFeature={activeTabIndexPlotsMultiFeature}
-                          // differentialDetailPlotsMultiFeatureRefFwd={
-                          //   this.differentialDetailPlotsMultiFeatureRef
-                          // }
-                          // differentialHighlightedFeaturesData={
-                          //   differentialHighlightedFeaturesData
-                          // }
-                          // divHeight={divHeight}
-                          // divWidth={divWidth}
-                          // differentialPlotTypes={differentialPlotTypes}
-                          // differentialStudy={differentialStudy}
-                          // differentialModel={differentialModel}
-                          // differentialTest={differentialTest}
-                          // plotlyExport={plotlyExport}
-                          // plotlyExportType={plotlyExportType}
-                          // plotMultiFeatureData={plotMultiFeatureData}
-                          // pointSize={pointSize}
-                          // plotMultiFeatureDataLength={plotMultiFeatureDataLength}
-                          // pxToPtRatio={pxToPtRatio}
-                          // multiFeaturePlotTypes={multiFeaturePlotTypes}
-                          // svgTabMax={svgTabMax}
                         />
                       </>
                     )}
