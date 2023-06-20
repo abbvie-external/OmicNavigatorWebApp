@@ -249,7 +249,6 @@ class ScatterPlotDiv extends Component {
     if (xLabel == null) {
       xLabel = getXAxis(relevantConfigColumns);
     }
-    const X = this.getMaxAndMin(differentialResults, xLabel);
     const allowXTransCheck =
       this.getMaxAndMin(differentialResults, xLabel)[0] > 0;
     const doXaxisTransCheck = allowXTransCheck
@@ -269,7 +268,6 @@ class ScatterPlotDiv extends Component {
         yLabel = relevantConfigColumns[0];
       }
     }
-    const Y = this.getMaxAndMin(differentialResults, yLabel);
     const allowYTransCheck =
       this.getMaxAndMin(differentialResults, yLabel)[0] > 0;
     const doYaxisTransCheck = allowYTransCheck
