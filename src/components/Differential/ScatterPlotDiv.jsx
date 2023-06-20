@@ -54,10 +54,6 @@ class ScatterPlotDiv extends Component {
     usageOpen: false,
   };
 
-  componentDidMount() {
-    this.getAxisLabels();
-  }
-
   componentWillUnmount() {
     this.setState({
       doXAxisTransformation: false,
@@ -76,7 +72,12 @@ class ScatterPlotDiv extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    const { upperPlotsVisible, volcanoPlotVisible } = this.props;
+    const {
+      upperPlotsVisible,
+      volcanoPlotVisible,
+      differentialResultsTableStreaming,
+      differentialTest,
+    } = this.props;
     if (
       (!upperPlotsVisible &&
         upperPlotsVisible !== prevProps.upperPlotsVisible) ||
@@ -86,18 +87,33 @@ class ScatterPlotDiv extends Component {
       // user closes volcano plot, close options
       this.setState({ optionsOpen: false, usageOpen: false });
     }
+    if (
+      differentialResultsTableStreaming !==
+        prevProps.differentialResultsTableStreaming ||
+      // need this check for cached data from another test
+      differentialTest !== prevProps.differentialTest
+    ) {
+      this.getAxisLabels();
+    }
   }
 
   getMaxAndMin = (data, element) => {
     if (data.length > 0 && data[0][element] != null) {
       var values = [data[0][element], data[0][element]];
       for (var i = 1; i < data.length; i++) {
-        if (data[i] != null && data[i][element] != null) {
+        if (
+          data[i] != null &&
+          data[i][element] != null &&
+          // data[i][element] !== 'NA'
+          !isNaN(data[i][element])
+        ) {
           if (data[i][element] > values[1]) {
             values[1] = data[i][element];
           } else if (data[i][element] < values[0]) {
             values[0] = data[i][element];
           }
+        } else {
+          values[0] = 0;
         }
       }
       return values;
@@ -106,12 +122,12 @@ class ScatterPlotDiv extends Component {
 
   handleDropdownChange = (evt, { name, value }) => {
     const { differentialResultsUnfiltered } = this.props;
-    const allowXTransCheck =
-      this.getMaxAndMin(differentialResultsUnfiltered, value)[0] > 0;
-    const doXaxisTransCheck = allowXTransCheck
-      ? this.state.doXAxisTransformation
-      : false;
     if (name === 'xAxisSelector') {
+      const allowXTransCheck =
+        this.getMaxAndMin(differentialResultsUnfiltered, value)[0] > 0;
+      const doXaxisTransCheck = allowXTransCheck
+        ? this.state.doXAxisTransformation
+        : false;
       this.setState({
         xAxisLabel: value,
         doXAxisTransformation: doXaxisTransCheck,
@@ -233,6 +249,13 @@ class ScatterPlotDiv extends Component {
     if (xLabel == null) {
       xLabel = getXAxis(relevantConfigColumns);
     }
+    const X = this.getMaxAndMin(differentialResults, xLabel);
+    const allowXTransCheck =
+      this.getMaxAndMin(differentialResults, xLabel)[0] > 0;
+    const doXaxisTransCheck = allowXTransCheck
+      ? this.state.doXAxisTransformation
+      : false;
+
     // YAXIS
     let storedYAxisLabel = sessionStorage.getItem('yAxisLabel');
     // if session storage cached ylabel is an option, use it, otherwise, if not cached in session, look for a p value label
@@ -240,15 +263,18 @@ class ScatterPlotDiv extends Component {
       ? storedYAxisLabel
       : null;
     // DOY
-    let doY = this.state.doYAxisTransformation;
     if (yLabel == null) {
       yLabel = getYAxis(relevantConfigColumns);
-      if (yLabel !== null) {
-        doY = true;
-      } else {
+      if (yLabel === null) {
         yLabel = relevantConfigColumns[0];
       }
     }
+    const Y = this.getMaxAndMin(differentialResults, yLabel);
+    const allowYTransCheck =
+      this.getMaxAndMin(differentialResults, yLabel)[0] > 0;
+    const doYaxisTransCheck = allowYTransCheck
+      ? this.state.doYAxisTransformation
+      : false;
     const axes = relevantConfigColumns.map((e) => {
       return {
         key: e,
@@ -256,11 +282,22 @@ class ScatterPlotDiv extends Component {
         value: e,
       };
     });
+
+    // session storage
+    sessionStorage.setItem('xAxisLabel', xLabel);
+    sessionStorage.setItem('allowXTransformation', allowXTransCheck);
+    sessionStorage.setItem('doXAxisTransformation', doXaxisTransCheck);
+    sessionStorage.setItem('yAxisLabel', yLabel);
+    sessionStorage.setItem('allowYTransformation', allowYTransCheck);
+    sessionStorage.setItem('doYAxisTransformation', doYaxisTransCheck);
     this.setState({
       axisLabels: axes,
-      yAxisLabel: yLabel,
-      doYAxisTransformation: doY,
       xAxisLabel: xLabel,
+      allowXTransformation: allowXTransCheck,
+      doXAxisTransformation: doXaxisTransCheck,
+      yAxisLabel: yLabel,
+      allowYTransformation: allowYTransCheck,
+      doYAxisTransformation: doYaxisTransCheck,
     });
   };
 
@@ -324,40 +361,24 @@ class ScatterPlotDiv extends Component {
       xAxisLabel !== null &&
       yAxisLabel !== null
     ) {
-      const xAxisTransformBox = allowXTransformation ? (
+      const xAxisTransformBox = (
         <Form.Field
           control={Checkbox}
           name="xTransformationCheckbox"
           className="VolcanoTransformationCheckbox"
           checked={doXAxisTransformation}
+          disabled={!allowXTransformation}
           onClick={this.handleTransformationChange}
         ></Form.Field>
-      ) : (
-        <Form.Field
-          control={Checkbox}
-          name="xTransformationCheckbox"
-          className="VolcanoTransformationCheckbox"
-          checked={false}
-          disabled={true}
-          //checked={doXAxisTransformation}
-          //onClick={this.handleTransformationChange)}
-        ></Form.Field>
       );
-      const yAxisTransformBox = allowYTransformation ? (
+      const yAxisTransformBox = (
         <Form.Field
           control={Checkbox}
           name="yTransformationCheckbox"
           className="VolcanoTransformationCheckbox"
           checked={doYAxisTransformation}
+          disabled={!allowYTransformation}
           onClick={this.handleTransformationChange}
-        ></Form.Field>
-      ) : (
-        <Form.Field
-          control={Checkbox}
-          name="yTransformationCheckbox"
-          className="VolcanoTransformationCheckbox"
-          checked={false}
-          disabled={true}
         ></Form.Field>
       );
       const TableValuePopupStyle = {
