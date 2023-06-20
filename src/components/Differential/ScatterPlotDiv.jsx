@@ -113,12 +113,10 @@ class ScatterPlotDiv extends Component {
           } else if (data[i][element] < values[0]) {
             values[0] = data[i][element];
           }
-        } else {
-          values[0] = 0;
         }
       }
       return values;
-    } else return [0, 0];
+    }
   };
 
   handleDropdownChange = (evt, { name, value }) => {
