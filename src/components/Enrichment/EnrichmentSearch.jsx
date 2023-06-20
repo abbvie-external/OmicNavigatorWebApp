@@ -1163,7 +1163,7 @@ class EnrichmentSearch extends Component {
             }
             style={StudyPopupStyle}
             className="CustomTooltip"
-            position="bottom center"
+            position="top center"
             inverted
             basic
             on="click"

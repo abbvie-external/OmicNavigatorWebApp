@@ -994,7 +994,7 @@ class DifferentialSearch extends Component {
         className="CustomTooltip"
         inverted
         basic
-        position="bottom center"
+        position="top center"
         content={
           differentialStudyHrefVisible
             ? studyName
