@@ -54,6 +54,10 @@ class ScatterPlotDiv extends Component {
     usageOpen: false,
   };
 
+  componentDidMount() {
+    this.getAxisLabels();
+  }
+
   componentWillUnmount() {
     this.setState({
       doXAxisTransformation: false,
