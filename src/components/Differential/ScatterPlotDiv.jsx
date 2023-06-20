@@ -104,7 +104,6 @@ class ScatterPlotDiv extends Component {
         if (
           data[i] != null &&
           data[i][element] != null &&
-          // data[i][element] !== 'NA'
           !isNaN(data[i][element])
         ) {
           if (data[i][element] > values[1]) {
