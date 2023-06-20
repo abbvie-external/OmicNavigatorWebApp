@@ -55,7 +55,9 @@ class ScatterPlotDiv extends Component {
   };
 
   componentDidMount() {
-    this.getAxisLabels();
+    if (!this.props.differentialResultsTableStreaming) {
+      this.getAxisLabels();
+    }
   }
 
   componentWillUnmount() {
