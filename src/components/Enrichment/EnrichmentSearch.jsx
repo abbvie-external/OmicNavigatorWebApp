@@ -9,6 +9,7 @@ import {
   Transition,
   Button,
 } from 'semantic-ui-react';
+import _ from 'lodash-es';
 import ndjsonStream from 'can-ndjson-stream';
 import { CancelToken } from 'axios';
 import '../Shared/Search.scss';
@@ -1029,6 +1030,7 @@ class EnrichmentSearch extends Component {
       enrichmentAnnotationsDisabled,
       // activateMultisetFilters,
       multisetFiltersVisibleEnrichment,
+      isSmallScreen,
     } = this.state;
 
     const {
