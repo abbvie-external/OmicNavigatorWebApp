@@ -12,7 +12,8 @@ import {
 } from 'semantic-ui-react';
 import ndjsonStream from 'can-ndjson-stream';
 import { CancelToken } from 'axios';
-import { getDynamicSize, getWindowWidth, getYAxis } from '../Shared/helpers';
+import _ from 'lodash-es';
+import { getDynamicSize, getYAxis } from '../Shared/helpers';
 import '../Shared/Search.scss';
 import { omicNavigatorService } from '../../services/omicNavigator.service';
 import DifferentialMultisetFilters from './DifferentialMultisetFilters';
@@ -106,12 +107,19 @@ class DifferentialSearch extends Component {
     activateMultisetFiltersP: false,
     uDataP: [],
     isFilteredSearch: false,
+    isSmallScreen: true,
   };
 
   componentDidMount() {
     this.setState({
       differentialStudiesDisabled: false,
+      isSmallScreen: window.innerWidth < 1725,
     });
+    const setScreen = _.debounce(
+      () => this.setState({ isSmallScreen: window.innerWidth < 1725 }),
+      300,
+    );
+    window.addEventListener('resize', setScreen, false);
   }
 
   componentDidUpdate(prevProps) {
@@ -146,6 +154,10 @@ class DifferentialSearch extends Component {
         maxElementsP: differentialResultsUnfiltered?.length || null,
       });
     }
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize');
   }
 
   populateDropdowns = () => {
@@ -938,6 +950,7 @@ class DifferentialSearch extends Component {
       multisetFiltersVisibleDifferential,
       differentialStudyReportTooltip,
       isFilteredSearch,
+      isSmallScreen,
     } = this.state;
 
     const {
@@ -1149,7 +1162,6 @@ class DifferentialSearch extends Component {
         </React.Fragment>
       );
     }
-    const WindowWidth = getWindowWidth();
     return (
       <React.Fragment>
         <Form className="SearchContainer">
@@ -1245,7 +1257,7 @@ class DifferentialSearch extends Component {
         <div className="MultisetContainer">
           <div className="SliderDiv">
             <span className="MultisetRadio">{MultisetRadio}</span>
-            <span className={WindowWidth < 1725 ? 'Block' : 'FloatRight'}>
+            <span className={isSmallScreen ? 'Block' : 'FloatRight'}>
               {PlotRadio}
             </span>
           </div>

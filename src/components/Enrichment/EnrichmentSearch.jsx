@@ -14,7 +14,7 @@ import { CancelToken } from 'axios';
 import '../Shared/Search.scss';
 import { omicNavigatorService } from '../../services/omicNavigator.service';
 import EnrichmentMultisetFilters from './EnrichmentMultisetFilters';
-import { getDynamicSize, getWindowWidth } from '../Shared/helpers';
+import { getDynamicSize } from '../Shared/helpers';
 
 let cancelRequestGetReportLinkEnrichment = () => {};
 // let cancelGetEnrichmentsTable = () => {};
@@ -112,12 +112,19 @@ class EnrichmentSearch extends Component {
     reloadTests: false,
     isFilteredEnrichment: false,
     multisetFiltersVisibleEnrichment: false,
+    isSmallScreen: true,
   };
 
   componentDidMount() {
     this.setState({
       enrichmentStudiesDisabled: false,
+      isSmallScreen: window.innerWidth < 1725,
     });
+    const setScreen = _.debounce(
+      () => this.setState({ isSmallScreen: window.innerWidth < 1725 }),
+      300,
+    );
+    window.addEventListener('resize', setScreen, false);
   }
 
   componentDidUpdate(prevProps) {
@@ -135,6 +142,10 @@ class EnrichmentSearch extends Component {
         numElements: enrichmentResults?.length || null,
       });
     }
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize');
   }
 
   populateDropdowns = () => {
@@ -1216,7 +1227,6 @@ class EnrichmentSearch extends Component {
         </React.Fragment>
       );
     }
-    const WindowWidth = getWindowWidth();
     return (
       <React.Fragment>
         <Form className="SearchContainer">
@@ -1352,7 +1362,7 @@ class EnrichmentSearch extends Component {
         >
           <div className="SliderDiv">
             <span className="MultisetRadio">{MultisetRadio}</span>
-            <span className={WindowWidth < 1725 ? 'Block' : 'FloatRight'}>
+            <span className={isSmallScreen ? 'Block' : 'FloatRight'}>
               {PlotRadio}
             </span>
           </div>
