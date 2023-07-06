@@ -72,17 +72,18 @@ class NetworkGraph extends Component {
       d3.selectAll('.node-label').style('opacity', 1);
     } else {
       d3.selectAll('.node-label').style('opacity', 0);
-      var keep = d3.selectAll('.node-label').filter(function(d) {
+      var keep = d3.selectAll('.node-label').filter(function (d) {
         return d[nodeLabel].toLowerCase().includes(str);
       });
       keep.style('opacity', 1);
       if (this.props.networkSearchResultSelected) {
         keep.classed('scrollToHere', true);
-        window.requestAnimationFrame(function() {
+        window.requestAnimationFrame(function () {
           if (_this.networkContainerRef !== null) {
-            const node = _this.networkContainerRef.current.getElementsByClassName(
-              'scrollToHere',
-            );
+            const node =
+              _this.networkContainerRef.current.getElementsByClassName(
+                'scrollToHere',
+              );
             if (node.length !== 0) {
               _this.networkContainerRef.current.scrollTo({
                 top: 0,
@@ -129,8 +130,8 @@ class NetworkGraph extends Component {
     let adjustedDocumentWidth = window.innerWidth - 100;
     let networkContainerWidth = 0;
     if (this.networkContainerRef.current !== null) {
-      networkContainerWidth = this.networkContainerRef.current.parentElement
-        .offsetWidth;
+      networkContainerWidth =
+        this.networkContainerRef.current.parentElement.offsetWidth;
     }
 
     // we may want to discuss an algorithm using nodes and clusters to determining svg width
@@ -175,7 +176,7 @@ class NetworkGraph extends Component {
     if (networkSettings.facets.length < 1) {
       return;
     } else {
-      _.forEach(formattedNodes, function(o1) {
+      _.forEach(formattedNodes, function (o1) {
         if (networkSettings.facets.length > 1) {
           const keys = networkSettings.facets;
           const values = o1[pValueType];
@@ -189,7 +190,7 @@ class NetworkGraph extends Component {
           });
 
           let i = 0;
-          o1.facets = _.map(picked, value => {
+          o1.facets = _.map(picked, (value) => {
             let prop = networkSettings.propLabel[i];
             i++;
             return {
@@ -223,7 +224,7 @@ class NetworkGraph extends Component {
             const propValue = networkSettings.facets[0];
             const singleTestIndex = _.findIndex(
               tests,
-              test => test === propValue,
+              (test) => test === propValue,
             );
             const valueValue = o1[pValueType][singleTestIndex];
             const key1 = networkSettings.metaLabels[0];
@@ -246,10 +247,12 @@ class NetworkGraph extends Component {
 
       function getNodeLowestSignificantValue(facets) {
         if (facets.length > 1) {
-          return Math.min(...facets.map(f => f.value).filter(v => v != null));
+          return Math.min(
+            ...facets.map((f) => f.value).filter((v) => v != null),
+          );
         } else return facets[0].value;
       }
-      formattedNodes.forEach(node => {
+      formattedNodes.forEach((node) => {
         const lowestTestValueInNode = getNodeLowestSignificantValue(
           node.facets,
         );
@@ -257,11 +260,11 @@ class NetworkGraph extends Component {
       });
       let filteredNodes = [];
       let mostSignificantTestValue = 0;
-      filteredNodes = formattedNodes.filter(n => n.lowestValue <= nodeCutoff);
+      filteredNodes = formattedNodes.filter((n) => n.lowestValue <= nodeCutoff);
       mostSignificantTestValue = Math.min(
-        ...filteredNodes.map(f => f.lowestValue).filter(v => v != null),
+        ...filteredNodes.map((f) => f.lowestValue).filter((v) => v != null),
       );
-      let filteredLinks = formattedLinks.filter(function(l) {
+      let filteredLinks = formattedLinks.filter(function (l) {
         let jaccardTotal = linkType * l.jaccard;
         let overlapValue = 1 - linkType;
         let overlapTotal = overlapValue * l.overlap;
@@ -270,32 +273,32 @@ class NetworkGraph extends Component {
       });
 
       if (filteredNodes.length !== 0 && filteredNodes.length != null) {
-        let relevantNodeIds = filteredNodes.map(n => n.id);
+        let relevantNodeIds = filteredNodes.map((n) => n.id);
 
         // filter links out that contain source or target of node not meeting cutoff
         let relevantLinks = filteredLinks.filter(
-          l =>
+          (l) =>
             _.includes(relevantNodeIds, l.source) &&
             _.includes(relevantNodeIds, l.target),
         );
 
         let minSetVar = _.min(
-          _.map(filteredNodes, function(o) {
+          _.map(filteredNodes, function (o) {
             return o[networkSettings.nodeSize];
           }),
         );
         let maxSetVar = _.max(
-          _.map(filteredNodes, function(o) {
+          _.map(filteredNodes, function (o) {
             return o[networkSettings.nodeSize];
           }),
         );
         let minLineVar = _.min(
-          _.map(relevantLinks, function(o) {
+          _.map(relevantLinks, function (o) {
             return o[networkSettings.linkSize];
           }),
         );
         let maxLineVar = _.max(
-          _.map(relevantLinks, function(o) {
+          _.map(relevantLinks, function (o) {
             return o[networkSettings.linkSize];
           }),
         );
@@ -321,14 +324,14 @@ class NetworkGraph extends Component {
         // only run if there are clusters
         if (clusters.children.length > 0) {
           function getClusterLowestSignificantValue(nodes) {
-            let facetsArr = nodes.flatMap(node => node.facets);
+            let facetsArr = nodes.flatMap((node) => node.facets);
             return Math.min(
-              ...facetsArr.map(f => f.value).filter(v => v != null),
+              ...facetsArr.map((f) => f.value).filter((v) => v != null),
             );
           }
 
-          clusters.children.forEach(cluster => {
-            _.forEach(clusters.children, function(cluster, i) {
+          clusters.children.forEach((cluster) => {
+            _.forEach(clusters.children, function (cluster, i) {
               let lowestTestValue = getClusterLowestSignificantValue(
                 cluster.nodes,
               );
@@ -388,12 +391,12 @@ class NetworkGraph extends Component {
           let pie = d3
             .pie()
             .sort(null)
-            .value(function(d) {
+            .value(function (d) {
               return 1;
             });
 
           function sumBySize(d) {
-            let sumofRadii = _.sumBy(d.nodes, function(o) {
+            let sumofRadii = _.sumBy(d.nodes, function (o) {
               return radiusVar(o[networkSettings.nodeSize]);
             });
             //return Math.sqrt(sumofRadii + d.size);
@@ -409,7 +412,7 @@ class NetworkGraph extends Component {
 
           let root = d3
             .hierarchy(clusters)
-            .eachBefore(d => {
+            .eachBefore((d) => {
               d.data.id =
                 (d.parent ? d.parent.data.id + '.' : '') + d.data.name;
               d.key = d.data.id;
@@ -419,7 +422,7 @@ class NetworkGraph extends Component {
               (a, b) =>
                 self.props.networkSortBy
                   // FOR SORT BY LIST
-                  .map(sortBy => {
+                  .map((sortBy) => {
                     return (
                       (sortBy === 'significance' ? 1 : -1) *
                       (a.data[sortBy] - b.data[sortBy])
@@ -460,7 +463,7 @@ class NetworkGraph extends Component {
             .data(root.leaves())
             .enter()
             .append('g')
-            .attr('transform', function(d) {
+            .attr('transform', function (d) {
               return `translate(${d.x0}, ${d.y0})`;
             });
 
@@ -471,13 +474,13 @@ class NetworkGraph extends Component {
           cell
             .append('rect')
             .attr('class', 'rect')
-            .attr('id', function(d) {
+            .attr('id', function (d) {
               return d.data.id;
             })
-            .attr('width', function(d) {
+            .attr('width', function (d) {
               return d.x1 - d.x0;
             })
-            .attr('height', function(d) {
+            .attr('height', function (d) {
               return d.y1 - d.y0;
             })
             // .attr('fill', '#e0e1e2')
@@ -496,7 +499,7 @@ class NetworkGraph extends Component {
           // });
 
           if (cell._groups.length > 0) {
-            cell.each(function(d, i) {
+            cell.each(function (d, i) {
               let cellWidth = d.x1 - d.x0;
               let cellHeight = d.y1 - d.y0;
               if (d.data.nodes.length > 0) {
@@ -504,16 +507,13 @@ class NetworkGraph extends Component {
                   .forceSimulation(d.data.nodes)
                   .force(
                     'link',
-                    d3.forceLink(d.data.links).id(function(d) {
+                    d3.forceLink(d.data.links).id(function (d) {
                       return d.id;
                     }),
                   )
                   .force(
                     'charge',
-                    d3
-                      .forceManyBody()
-                      .strength([-1200])
-                      .distanceMax([500]),
+                    d3.forceManyBody().strength([-1200]).distanceMax([500]),
                   )
                   .force(
                     'center',
@@ -522,7 +522,7 @@ class NetworkGraph extends Component {
                   .force(
                     'collision',
                     // collide(0.5)
-                    d3.forceCollide().radius(function(d) {
+                    d3.forceCollide().radius(function (d) {
                       // return radiusVar(d[networkSettings.nodeSize]);
                       let r = radiusVar(d[networkSettings.nodeSize]);
                       return r;
@@ -580,7 +580,7 @@ class NetworkGraph extends Component {
                   .data(d.data.links)
                   .enter()
                   .append('line')
-                  .style('stroke', function(d) {
+                  .style('stroke', function (d) {
                     // unhighlight this if you want to highlight highest link coefficient
                     // if (
                     //   d.EnrichmentMap_similarity_coefficient ===
@@ -599,10 +599,10 @@ class NetworkGraph extends Component {
                   //     return 1;
                   //   } else return 0.3;
                   // })
-                  .style('stroke-width', function(d) {
+                  .style('stroke-width', function (d) {
                     return lineScaleVar(d[networkSettings.linkSize]);
                   })
-                  .attr('x1', function(d) {
+                  .attr('x1', function (d) {
                     return Math.max(
                       radiusVar(d.source[networkSettings.nodeSize]),
                       Math.min(
@@ -612,7 +612,7 @@ class NetworkGraph extends Component {
                       ),
                     );
                   })
-                  .attr('y1', function(d) {
+                  .attr('y1', function (d) {
                     return Math.max(
                       radiusVar(d.source[networkSettings.nodeSize]),
                       Math.min(
@@ -622,7 +622,7 @@ class NetworkGraph extends Component {
                       ),
                     );
                   })
-                  .attr('x2', function(d) {
+                  .attr('x2', function (d) {
                     return Math.max(
                       radiusVar(d.target[networkSettings.nodeSize]),
                       Math.min(
@@ -632,7 +632,7 @@ class NetworkGraph extends Component {
                       ),
                     );
                   })
-                  .attr('y2', function(d) {
+                  .attr('y2', function (d) {
                     return Math.max(
                       radiusVar(d.target[networkSettings.nodeSize]),
                       Math.min(
@@ -642,7 +642,7 @@ class NetworkGraph extends Component {
                       ),
                     );
                   })
-                  .on('mouseover', function(d, i) {
+                  .on('mouseover', function (d, i) {
                     let jaccardTotal = linkType * d.jaccard;
                     let overlapValue = 1 - linkType;
                     let overlapTotal = overlapValue * d.overlap;
@@ -661,10 +661,7 @@ class NetworkGraph extends Component {
                       .duration(50)
                       .attr('opacity', 0.5)
                       .attr('d', arc.outerRadius(50).innerRadius(0));
-                    div
-                      .transition()
-                      .duration(50)
-                      .style('opacity', 1);
+                    div.transition().duration(50).style('opacity', 1);
                     div
                       .html(
                         `<b>Overlap Size: </b>${d.overlapSize}<br/><b>Edge Weight: </b>${edgeWeight}<br/><b>Source: </b>${d.source.description}<br/><b>Target: </b>${d.target.description}`,
@@ -722,15 +719,12 @@ class NetworkGraph extends Component {
                   //         .style('top', tooltipTBPosition);
                   //     });
                   // })
-                  .on('mouseout', function(d, i) {
+                  .on('mouseout', function (d, i) {
                     // d3.select(this).transition()
                     //     .duration('50')
                     //     .attr('opacity', .75)
                     //     .attr("d", arc.outerRadius(r).innerRadius(0));
-                    div
-                      .transition()
-                      .duration('50')
-                      .style('opacity', 0);
+                    div.transition().duration('50').style('opacity', 0);
                   });
 
                 const node = d3
@@ -741,7 +735,7 @@ class NetworkGraph extends Component {
                   .data(d.data.nodes)
                   .enter()
                   .append('g')
-                  .attr('transform', function(d) {
+                  .attr('transform', function (d) {
                     return `translate(${Math.max(
                       radiusVar(d[networkSettings.nodeSize]),
                       Math.min(
@@ -753,10 +747,10 @@ class NetworkGraph extends Component {
                   .call(
                     d3
                       .drag()
-                      .on('start', function() {
+                      .on('start', function () {
                         dragstarted(this);
                       })
-                      .on('drag', function(d) {
+                      .on('drag', function (d) {
                         ondrag(d, cellHeight, cellWidth, this);
                       })
                       .on('end', dragended),
@@ -771,7 +765,7 @@ class NetworkGraph extends Component {
                     .append('text')
                     .attr('class', 'node-label')
                     .attr('id', 'rectWrap')
-                    .text(function(d) {
+                    .text(function (d) {
                       let text = d[networkSettings.nodeLabel];
                       if (text?.length < 40) {
                         return text;
@@ -806,7 +800,7 @@ class NetworkGraph extends Component {
                     .append('text')
                     .attr('class', 'node-label')
                     .attr('id', 'rectWrap')
-                    .text(function(d) {
+                    .text(function (d) {
                       let text = d[networkSettings.nodeLabel];
                       if (text?.length < 30) {
                         return text;
@@ -851,10 +845,10 @@ class NetworkGraph extends Component {
                   .data(mostSignificantColorScale.range())
                   .enter()
                   .append('stop')
-                  .attr('offset', function(d, i) {
+                  .attr('offset', function (d, i) {
                     return i / (mostSignificantColorScale.range().length - 1);
                   })
-                  .attr('stop-color', function(d) {
+                  .attr('stop-color', function (d) {
                     return d;
                   });
 
@@ -864,21 +858,21 @@ class NetworkGraph extends Component {
 
                   node
                     .selectAll('path')
-                    .data(function(d) {
+                    .data(function (d) {
                       return pie(d.facets);
                     })
                     .enter()
                     .append('svg:path')
                     .attr('d', arc.outerRadius(r).innerRadius(0))
                     .attr('opacity', 0.75)
-                    .style('opacity', function(d) {
+                    .style('opacity', function (d) {
                       let opacity =
                         d.data.value === mostSignificantTestValue ? 1.0 : 0.75;
                       return opacity;
                     })
                     .style('cursor', 'pointer')
                     .attr('stroke', 'black')
-                    .style('fill', function(d) {
+                    .style('fill', function (d) {
                       if (d.data.value === mostSignificantTestValue)
                         // return self.props.networkSettings
                         //   .colorMostSignificantTest;
@@ -886,7 +880,7 @@ class NetworkGraph extends Component {
                       if (d.data.value != null) return color(d.data.value);
                       return '#d3d3d3';
                     })
-                    .on('click', function(d) {
+                    .on('click', function (d) {
                       // if (d3.event.defaultPrevented) return;
                       d3.selectAll('.tooltip-pieSlice').style('opacity', 0);
                       self.props.onHandlePieClick(
@@ -897,16 +891,13 @@ class NetworkGraph extends Component {
                         d.data.prop,
                       );
                     })
-                    .on('mouseover', function(d, i) {
+                    .on('mouseover', function (d, i) {
                       d3.select(this)
                         .transition()
                         .duration(50)
                         .attr('opacity', 0.5)
                         .attr('d', arc.outerRadius(50).innerRadius(0));
-                      div
-                        .transition()
-                        .duration(50)
-                        .style('opacity', 1);
+                      div.transition().duration(50).style('opacity', 1);
                       let tooltipLRPosition =
                         d3.event.pageX > window.innerWidth * 0.8
                           ? `${d3.event.pageX - 275}px`
@@ -983,7 +974,7 @@ class NetworkGraph extends Component {
                     //     console.error('Error during getNodeFeatures', error);
                     //   });
                     //})
-                    .on('mouseout', function(d, i) {
+                    .on('mouseout', function (d, i) {
                       // self.setState({
                       //   nodeFeatures: '',
                       // });
@@ -992,10 +983,7 @@ class NetworkGraph extends Component {
                         .duration('50')
                         .attr('opacity', 0.75)
                         .attr('d', arc.outerRadius(r).innerRadius(0));
-                      div
-                        .transition()
-                        .duration('50')
-                        .style('opacity', 0);
+                      div.transition().duration('50').style('opacity', 0);
                     });
                 }
                 function dragstarted(o) {
@@ -1021,7 +1009,7 @@ class NetworkGraph extends Component {
                     ),
                   );
 
-                  d3.select(me).attr('transform', function(d) {
+                  d3.select(me).attr('transform', function (d) {
                     return `translate(${Math.max(
                       radiusVar(d[networkSettings.nodeSize]),
                       Math.min(
@@ -1032,13 +1020,13 @@ class NetworkGraph extends Component {
                   });
 
                   link
-                    .filter(function(l) {
+                    .filter(function (l) {
                       return l.source === d;
                     })
                     .attr('x1', xPos)
                     .attr('y1', yPos);
                   link
-                    .filter(function(l) {
+                    .filter(function (l) {
                       return l.target === d;
                     })
                     .attr('x2', xPos)

@@ -16,7 +16,7 @@ class OmicNavigatorService {
   async axiosPost(method, obj, params, handleError, cancelToken, timeout) {
     const paramsObj = params ? { digits: 10 } : {};
     const self = this;
-    return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
       const axiosPostUrl = `${self.url}/${method}/json?auto_unbox=true&na="string"`;
       axios
         .post(axiosPostUrl, obj, {
@@ -25,8 +25,8 @@ class OmicNavigatorService {
           cancelToken,
           timeout,
         })
-        .then(response => resolve(response.data))
-        .catch(function(error) {
+        .then((response) => resolve(response.data))
+        .catch(function (error) {
           if (!axios.isCancel(error)) {
             if (
               method !== 'getFavicons' &&
@@ -59,7 +59,7 @@ class OmicNavigatorService {
         timeout,
       });
       const splitUrls = data.split('/ocpu/');
-      const graphics = splitUrls.filter(u => u.includes('graphics'));
+      const graphics = splitUrls.filter((u) => u.includes('graphics'));
       const graphicsUrl = `/ocpu/${graphics}`;
       const url = `${self.baseUrl}${graphicsUrl}/svg`;
       return url;
@@ -114,17 +114,17 @@ class OmicNavigatorService {
   }
 
   async ocpuPlotCall(method, obj, handleError, cancelToken, timeout) {
-    return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
       window.ocpu
-        .call(method, obj, function(session) {
+        .call(method, obj, function (session) {
           axios
             .get(session.getLoc() + 'graphics/1/svg', {
               responseType: 'text',
               cancelToken,
               timeout,
             })
-            .then(response => resolve(response))
-            .catch(function(thrown) {
+            .then((response) => resolve(response))
+            .catch(function (thrown) {
               if (!axios.isCancel(thrown)) {
                 toast.error(`${thrown.message}`);
                 if (handleError != null) {
@@ -133,7 +133,7 @@ class OmicNavigatorService {
               }
             });
         })
-        .catch(error => {
+        .catch((error) => {
           toast.error(`${error.statusText}: ${error.responseText}`);
           if (handleError != null) {
             handleError(false);
@@ -263,7 +263,7 @@ class OmicNavigatorService {
     );
     function timeoutResolver(ms) {
       return new Promise((resolve, reject) => {
-        setTimeout(function() {
+        setTimeout(function () {
           reject(true);
         }, ms);
       });
@@ -278,8 +278,8 @@ class OmicNavigatorService {
   }
 
   async ocpuRPCOutput(method, obj) {
-    return new Promise(function(resolve, reject) {
-      window.ocpu.rpc(method, obj, function(output) {
+    return new Promise(function (resolve, reject) {
+      window.ocpu.rpc(method, obj, function (output) {
         resolve(output);
       });
     });
@@ -775,6 +775,58 @@ class OmicNavigatorService {
       } catch {
         if (axios.isCancel) {
           // console.log('multi-model mapping cancelled')
+        }
+      }
+    }
+  }
+
+  async getResultsColumnTooltips(study, cancelToken) {
+    const cacheKey = `getTests_${study}}`;
+    if (this[cacheKey] != null) {
+      return this[cacheKey];
+    } else {
+      try {
+        const promise = this.axiosPost(
+          'getTests',
+          {
+            study,
+          },
+          false,
+          null,
+          cancelToken,
+          25000,
+        );
+        const dataFromPromise = await promise;
+        this[cacheKey] = dataFromPromise;
+        return dataFromPromise;
+      } catch {
+        if (axios.isCancel) {
+        }
+      }
+    }
+  }
+
+  async getPlotDescriptions(study, cancelToken) {
+    const cacheKey = `getPlots_${study}}`;
+    if (this[cacheKey] != null) {
+      return this[cacheKey];
+    } else {
+      try {
+        const promise = this.axiosPost(
+          'getPlots',
+          {
+            study,
+          },
+          false,
+          null,
+          cancelToken,
+          25000,
+        );
+        const dataFromPromise = await promise;
+        this[cacheKey] = dataFromPromise;
+        return dataFromPromise;
+      } catch {
+        if (axios.isCancel) {
         }
       }
     }

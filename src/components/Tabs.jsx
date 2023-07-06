@@ -63,7 +63,7 @@ class Tabs extends Component {
       allStudiesMetadata: [],
       differentialFeatureIdKey: '',
       filteredDifferentialFeatureIdKey: '',
-      appVersion: '1.8.2',
+      appVersion: '1.8.3',
       packageVersion: '',
       infoOpenFirst: false,
       infoOpenSecond: false,
@@ -243,7 +243,6 @@ class Tabs extends Component {
           className="TablePopupValue"
           inverted
           basic
-          position="left center"
         >
           <Popup.Content>
             App: {`v${appVersion}`}

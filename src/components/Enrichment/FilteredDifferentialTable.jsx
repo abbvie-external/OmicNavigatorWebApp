@@ -67,7 +67,7 @@ class FilteredDifferentialTable extends Component {
     }
   }
 
-  pageToFeature = featureToHighlight => {
+  pageToFeature = (featureToHighlight) => {
     if (
       featureToHighlight !== '' &&
       featureToHighlight !== [] &&
@@ -82,7 +82,7 @@ class FilteredDifferentialTable extends Component {
         this.props.filteredDifferentialGridRef?.current?.qhGridRef.current?.getSortedData() ||
         null;
       if (sortedData != null) {
-        const Index = _.findIndex(sortedData, function(p) {
+        const Index = _.findIndex(sortedData, function (p) {
           return p[filteredDifferentialFeatureIdKey] === featureToHighlight;
         });
         const pageNumber = Math.ceil(
@@ -103,10 +103,13 @@ class FilteredDifferentialTable extends Component {
   getTableData = () => {
     if (this.props.hasBarcodeData) {
       const brushedMultIds = this.props.barcodeSettings.brushedData.map(
-        b => b.featureID,
+        (b) => b.featureID,
       );
-      let filteredDifferentialData = this.state.filteredBarcodeData.filter(d =>
-        brushedMultIds.includes(d[this.props.filteredDifferentialFeatureIdKey]),
+      let filteredDifferentialData = this.state.filteredBarcodeData.filter(
+        (d) =>
+          brushedMultIds.includes(
+            d[this.props.filteredDifferentialFeatureIdKey],
+          ),
       );
       // for sorting, if desired
       if (filteredDifferentialData.length > 0) {
@@ -128,14 +131,14 @@ class FilteredDifferentialTable extends Component {
     }
   };
 
-  getFilteredTableConfigCols = barcodeData => {
+  getFilteredTableConfigCols = (barcodeData) => {
     if (this.state.filteredBarcodeData.length > 0) {
       this.setConfigCols(this.state.filteredBarcodeData, null, true);
     } else {
       const key = this.props.plotDataEnrichment.key.split(':');
       const name = key[0].trim() || '';
       cancelRequestFPTGetResultsTable();
-      let cancelToken = new CancelToken(e => {
+      let cancelToken = new CancelToken((e) => {
         cancelRequestFPTGetResultsTable = e;
       });
       omicNavigatorService
@@ -148,7 +151,7 @@ class FilteredDifferentialTable extends Component {
           null,
           cancelToken,
         )
-        .then(filteredDifferentialResults => {
+        .then((filteredDifferentialResults) => {
           if (filteredDifferentialResults.length > 0) {
             this.setConfigCols(barcodeData, filteredDifferentialResults, false);
             this.props.onSetFilteredDifferentialResults(
@@ -156,7 +159,7 @@ class FilteredDifferentialTable extends Component {
             );
           }
         })
-        .catch(error => {
+        .catch((error) => {
           console.error('Error during getResultsTable', error);
         });
     }
@@ -167,12 +170,16 @@ class FilteredDifferentialTable extends Component {
     filteredDifferentialResults,
     dataAlreadyFiltered,
   ) => {
-    const { hasBarcodeData } = this.props;
-    let data = hasBarcodeData ? barcodeData : [...filteredDifferentialResults];
     const {
+      hasBarcodeData,
+      enrichmentResultsColumnTooltips,
+      enrichmentModel,
+      enrichmentTest,
       filteredDifferentialLinkouts,
       filteredDifferentialFavicons,
+      onHandleDifferentialFeatureIdKey,
     } = this.props;
+    let data = hasBarcodeData ? barcodeData : [...filteredDifferentialResults];
     const TableValuePopupStyle = {
       backgroundColor: '2E2E2E',
       borderBottom: '2px solid var(--color-primary)',
@@ -196,9 +203,9 @@ class FilteredDifferentialTable extends Component {
     if (firstFullObject) {
       let allProperties = Object.keys(firstFullObject);
       const dataCopy = [...filteredDifferentialResults];
-      allProperties.forEach(property => {
+      allProperties.forEach((property) => {
         // loop through data, one property at a time
-        const notNullObject = dataCopy.find(row => {
+        const notNullObject = dataCopy.find((row) => {
           // find the first value for that property
           return isNotNANullUndefinedEmptyString(row[property]);
         });
@@ -223,21 +230,27 @@ class FilteredDifferentialTable extends Component {
     }
     const alphanumericTrigger = filteredDifferentialAlphanumericFields[0];
     let featureID = hasBarcodeData ? 'featureID' : alphanumericTrigger;
-    this.props.onHandleDifferentialFeatureIdKey(
+    onHandleDifferentialFeatureIdKey(
       'filteredDifferentialFeatureIdKey',
       alphanumericTrigger,
     );
     this.setState({ identifier: alphanumericTrigger });
     if (!dataAlreadyFiltered) {
-      const barcodeMultIds = data.map(b => b[featureID]);
-      data = filteredDifferentialResults.filter(d =>
+      const barcodeMultIds = data.map((b) => b[featureID]);
+      data = filteredDifferentialResults.filter((d) =>
         barcodeMultIds.includes(d[alphanumericTrigger]),
       );
     }
-    const filteredDifferentialAlphanumericColumnsMapped = filteredDifferentialAlphanumericFields.map(
-      f => {
+    const filteredDifferentialAlphanumericColumnsMapped =
+      filteredDifferentialAlphanumericFields.map((f) => {
         return {
           title: f,
+          headerAttributes: {
+            title:
+              enrichmentResultsColumnTooltips?.[enrichmentModel]?.[
+                enrichmentTest
+              ]?.[f] || null,
+          },
           field: f,
           filterable: { type: 'multiFilter' },
           template: (value, item) => {
@@ -253,9 +266,8 @@ class FilteredDifferentialTable extends Component {
                 const columnLinkoutsIsArray = Array.isArray(columnLinkoutsObj);
                 let favicons = [];
                 if (columnFaviconsObj != null) {
-                  const columnFaviconsIsArray = Array.isArray(
-                    columnFaviconsObj,
-                  );
+                  const columnFaviconsIsArray =
+                    Array.isArray(columnFaviconsObj);
                   favicons = columnFaviconsIsArray
                     ? columnFaviconsObj
                     : [columnFaviconsObj];
@@ -304,16 +316,21 @@ class FilteredDifferentialTable extends Component {
             }
           },
         };
-      },
-    );
-    const filteredDifferentialNumericColumnsMapped = filteredDifferentialNumericFields.map(
-      c => {
+      });
+    const filteredDifferentialNumericColumnsMapped =
+      filteredDifferentialNumericFields.map((c) => {
         return {
           title: c,
+          headerAttributes: {
+            title:
+              enrichmentResultsColumnTooltips?.[enrichmentModel]?.[
+                enrichmentTest
+              ]?.[c] || null,
+          },
           field: c,
           type: 'number',
           filterable: { type: 'numericFilter' },
-          exportTemplate: value => (value ? `${value}` : 'N/A'),
+          exportTemplate: (value) => (value ? `${value}` : 'N/A'),
           template: (value, item, addParams) => {
             return (
               <p>
@@ -333,8 +350,7 @@ class FilteredDifferentialTable extends Component {
             );
           },
         };
-      },
-    );
+      });
     const configCols = filteredDifferentialAlphanumericColumnsMapped.concat(
       filteredDifferentialNumericColumnsMapped,
     );
@@ -345,7 +361,7 @@ class FilteredDifferentialTable extends Component {
     this.getTableData();
   };
 
-  rowLevelPropsCalc = item => {
+  rowLevelPropsCalc = (item) => {
     let className;
     const {
       filteredDifferentialTableRowMax,
@@ -381,7 +397,7 @@ class FilteredDifferentialTable extends Component {
     const SelectedProteins = HighlightedProteinsCopy.slice(1);
     let filteredDifferentialTableRowOtherVar = [];
     if (SelectedProteins.length > 0 && SelectedProteins != null) {
-      SelectedProteins.forEach(element => {
+      SelectedProteins.forEach((element) => {
         filteredDifferentialTableRowOtherVar.push(element.featureID);
       });
     }
@@ -395,7 +411,7 @@ class FilteredDifferentialTable extends Component {
     this.setState({ rowClicked: false });
   };
 
-  handleItemsPerPageChange = items => {
+  handleItemsPerPageChange = (items) => {
     this.setState({
       itemsPerPageFilteredDifferentialTable: items,
     });
@@ -412,7 +428,7 @@ class FilteredDifferentialTable extends Component {
         const allTableData =
           this.props.filteredDifferentialGridRef.current?.qhGridRef.current?.getSortedData() ||
           [];
-        const indexMaxProtein = _.findIndex(allTableData, function(d) {
+        const indexMaxProtein = _.findIndex(allTableData, function (d) {
           return (
             d[filteredDifferentialFeatureIdKey] ===
             PreviouslyHighlighted[0]?.featureID
@@ -421,7 +437,7 @@ class FilteredDifferentialTable extends Component {
         const sliceFirst = index < indexMaxProtein ? index : indexMaxProtein;
         const sliceLast = index > indexMaxProtein ? index : indexMaxProtein;
         const shiftedTableData = allTableData.slice(sliceFirst, sliceLast + 1);
-        const shiftedTableDataArray = shiftedTableData.map(function(d) {
+        const shiftedTableDataArray = shiftedTableData.map(function (d) {
           return {
             // sample: d.symbol,
             // sample: d.phosphosite,
@@ -440,17 +456,17 @@ class FilteredDifferentialTable extends Component {
         let selectedTableDataArray = [];
 
         const alreadyHighlighted = PreviouslyHighlighted.some(
-          d => d.featureID === item[filteredDifferentialFeatureIdKey],
+          (d) => d.featureID === item[filteredDifferentialFeatureIdKey],
         );
         // already highlighted, remove it from array
         if (alreadyHighlighted) {
           selectedTableDataArray = PreviouslyHighlighted.filter(
-            i => i.featureID !== item[filteredDifferentialFeatureIdKey],
+            (i) => i.featureID !== item[filteredDifferentialFeatureIdKey],
           );
           this.props.onHandleProteinSelected(selectedTableDataArray);
         } else {
           // not yet highlighted, add it to array
-          const indexMaxProtein = _.findIndex(allTableData, function(d) {
+          const indexMaxProtein = _.findIndex(allTableData, function (d) {
             return (
               d[filteredDifferentialFeatureIdKey] ===
               PreviouslyHighlighted[0]?.featureID

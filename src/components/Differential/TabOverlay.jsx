@@ -27,7 +27,7 @@ class TabOverlay extends Component {
       singleFeaturePlotTypes,
       multiFeaturePlotTypes,
     } = this.props;
-    const featureIdsArr = differentialHighlightedFeaturesData.map(f => f.id);
+    const featureIdsArr = differentialHighlightedFeaturesData.map((f) => f.id);
     const featureIdsString = featureIdsArr.toString();
     const featuresLength = differentialHighlightedFeaturesData?.length;
     const plotKey = plotOverlayData.key;

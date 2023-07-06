@@ -3,7 +3,7 @@ import {
   Loader,
   Dimmer,
   Tab,
-  // Popup,
+  Popup,
   // Icon,
   // Message,
   // Menu,
@@ -15,6 +15,7 @@ import { roundToPrecision, loadingDimmer } from '../Shared/helpers';
 import ButtonActions from '../Shared/ButtonActions';
 import PlotlyEnrichment from './PlotlyEnrichment';
 import './EnrichmentSVGPlot.scss';
+import { isObjectEmpty } from '../Shared/helpers';
 
 class EnrichmentSVGPlot extends PureComponent {
   state = {
@@ -59,7 +60,7 @@ class EnrichmentSVGPlot extends PureComponent {
   //   this.props.onFindDifferentialFeature(test, featureID);
   // };
 
-  getSvgPanesEnrichment = cacheStringArg => {
+  getSvgPanesEnrichment = (cacheStringArg) => {
     if (this.cacheString === cacheStringArg) return;
     this.cacheString = cacheStringArg;
     const {
@@ -138,13 +139,13 @@ class EnrichmentSVGPlot extends PureComponent {
     }
   };
 
-  handlePlotlyExport = plotlyExportType => {
+  handlePlotlyExport = (plotlyExportType) => {
     this.setState(
       {
         plotlyExport: true,
         plotlyExportType,
       },
-      function() {
+      function () {
         // callback to reset plotly export in progress to false
         this.setState({ plotlyExport: false });
       },
@@ -158,6 +159,8 @@ class EnrichmentSVGPlot extends PureComponent {
       tab,
       SVGPlotLoaded,
       SVGPlotLoading,
+      enrichmentModel,
+      enrichmentPlotDescriptions,
     } = this.props;
 
     const {
@@ -187,13 +190,34 @@ class EnrichmentSVGPlot extends PureComponent {
         // };
         const activeSVGTabIndexEnrichmentVar = activeSVGTabIndexEnrichment || 0;
         const svgArray = plotDataEnrichment.svg;
-        const plotOptions = svgArray.map(function(s, index) {
+        const plotOptions = svgArray.map(function (s, index) {
           return {
             key: `${index}=EnrichmentPlotDropdownOption`,
             text: s.plotType.plotDisplay,
             value: index,
           };
         });
+
+        let enrichmentPlotDescription = null;
+        let currentEnrichmentPlotDescriptions =
+          enrichmentPlotDescriptions?.[enrichmentModel] || {};
+        const currentPlotText =
+          plotOptions?.[activeSVGTabIndexEnrichment]?.text || null;
+        if (!isObjectEmpty(currentEnrichmentPlotDescriptions)) {
+          const DescriptionsAsArray = Object.entries(
+            currentEnrichmentPlotDescriptions,
+          );
+          if (DescriptionsAsArray.length && currentPlotText) {
+            let currentEnrichmentPlotDescription =
+              DescriptionsAsArray.filter(
+                (p) => p[1].displayName === currentPlotText,
+              ) || null;
+            enrichmentPlotDescription = currentEnrichmentPlotDescription.length
+              ? currentEnrichmentPlotDescription?.[0]?.[1]?.description
+              : null;
+          }
+        }
+
         return (
           <div
             className="svgContainerEnrichment"
@@ -232,15 +256,39 @@ class EnrichmentSVGPlot extends PureComponent {
             position="bottom left"
             content="view in differential analysis section"
           /> */}
-            <Dropdown
-              search
-              selection
-              compact
-              options={plotOptions}
-              value={plotOptions[activeSVGTabIndexEnrichmentVar]?.value}
-              onChange={this.handlePlotDropdownChange}
-              className={DropdownClass}
-            />
+            {enrichmentPlotDescription ? (
+              <Popup
+                trigger={
+                  <Dropdown
+                    search
+                    selection
+                    compact
+                    options={plotOptions}
+                    value={plotOptions[activeSVGTabIndexEnrichmentVar]?.value}
+                    onChange={this.handlePlotDropdownChange}
+                    className={DropdownClass}
+                  />
+                }
+                basic
+                inverted
+                position="bottom center"
+                closeOnDocumentClick
+                closeOnEscape
+                hideOnScroll
+              >
+                <Popup.Content>{enrichmentPlotDescription}</Popup.Content>
+              </Popup>
+            ) : (
+              <Dropdown
+                search
+                selection
+                compact
+                options={plotOptions}
+                value={plotOptions[activeSVGTabIndexEnrichmentVar]?.value}
+                onChange={this.handlePlotDropdownChange}
+                className={DropdownClass}
+              />
+            )}
             <Tab
               menu={{
                 secondary: true,
