@@ -1150,7 +1150,7 @@ class EnrichmentSearch extends Component {
 
     if (isValidSearchEnrichment) {
       PlotRadio = (
-        <Fragment>
+        <div className={multisetFiltersVisibleEnrichment ? 'Show' : 'Hide'}>
           <Transition
             visible={!multisetPlotAvailableEnrichment}
             animation="flash"
@@ -1158,7 +1158,7 @@ class EnrichmentSearch extends Component {
           >
             <Radio
               toggle
-              label="View Plot Intersections"
+              label="View Set Intersections"
               className={multisetPlotAvailableEnrichment ? 'ViewPlotRadio' : ''}
               checked={plotButtonActiveEnrichment}
               onChange={this.props.onHandlePlotAnimationEnrichment('uncover')}
@@ -1194,7 +1194,7 @@ class EnrichmentSearch extends Component {
               selection.
             </Popup.Content>
           </Popup>
-        </Fragment>
+        </div>
       );
 
       MultisetRadio = (
