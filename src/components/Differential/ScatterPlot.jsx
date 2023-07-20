@@ -1726,14 +1726,17 @@ class ScatterPlot extends Component {
   }
 
   getMaxAndMin(data, element) {
-    if (data?.length > 0 && data[0][element] != null) {
-      var values = [data[0][element], data[0][element]];
+    if (data?.length > 0) {
+      let values = [0, 0];
+      if (data[0][element] != null) {
+        values = [data[0][element], data[0][element]];
+      }
       for (var i = 1; i < data.length; i++) {
         if (
           data[i] != null &&
           data[i][element] != null &&
           data[i][element] !== 0
-          // ignore 0s, but plot positive or negatives
+          // ignore blanks and 0s, but plot positive or negatives
         ) {
           if (data[i][element] > values[1]) {
             values[1] = data[i][element];
@@ -1742,6 +1745,7 @@ class ScatterPlot extends Component {
           }
         }
       }
+      debugger;
       return values;
     } else return [0, 0];
   }
