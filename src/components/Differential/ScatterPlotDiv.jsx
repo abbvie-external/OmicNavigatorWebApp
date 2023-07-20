@@ -123,7 +123,6 @@ class ScatterPlotDiv extends Component {
           }
         }
       }
-      debugger;
       return values;
     }
   };

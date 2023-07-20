@@ -31,8 +31,7 @@ class ScatterPlot extends Component {
     showBins: true,
     showCircles: true,
     tooltipPosition: null,
-    // DEV: this is true on init, to prevent lifecycle event (F) after mount
-    transitioningBoxSelect: true,
+    transitioningBoxSelect: false,
     transitioningDoubleClick: false,
     volcanoCircleText: [],
     xxAxis: '',
@@ -1745,7 +1744,6 @@ class ScatterPlot extends Component {
           }
         }
       }
-      debugger;
       return values;
     } else return [0, 0];
   }
