@@ -107,7 +107,12 @@ class ScatterPlotDiv extends Component {
     if (data.length > 0 && data[0][element] != null) {
       var values = [data[0][element], data[0][element]];
       for (var i = 1; i < data.length; i++) {
-        if (data[i] != null && data[i][element] != null) {
+        if (
+          data[i] != null &&
+          data[i][element] != null &&
+          data[i][element] > 0
+          // only use positive values to create plot
+        ) {
           if (data[i][element] > values[1]) {
             values[1] = data[i][element];
           } else if (data[i][element] < values[0]) {
