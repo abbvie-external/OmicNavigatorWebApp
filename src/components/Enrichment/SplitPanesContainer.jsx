@@ -3,7 +3,7 @@ import { withRouter } from 'react-router-dom';
 import { Grid, Dimmer, Loader, Tab } from 'semantic-ui-react';
 import EnrichmentBreadcrumbs from './EnrichmentBreadcrumbs';
 import ButtonActions from '../Shared/ButtonActions';
-import SplitPane from 'react-split-pane';
+import SplitPane from 'react-split-pane-r17';
 import './SplitPanesContainer.scss';
 import EnrichmentSVGPlot from './EnrichmentSVGPlot';
 import BarcodePlot from './BarcodePlot';
