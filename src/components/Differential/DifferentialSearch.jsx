@@ -1083,7 +1083,7 @@ class DifferentialSearch extends Component {
 
     if (isValidSearchDifferential) {
       PlotRadio = (
-        <Fragment>
+        <div className={multisetFiltersVisibleDifferential ? 'Show' : 'Hide'}>
           <Transition
             visible={!plotMultisetLoadedDifferential}
             animation="flash"
@@ -1091,7 +1091,7 @@ class DifferentialSearch extends Component {
           >
             <Radio
               toggle
-              label="View Plot Intersections"
+              label="View Set Intersections"
               className={plotMultisetLoadedDifferential ? 'ViewPlotRadio' : ''}
               checked={multisetButttonActiveDifferential}
               onChange={onHandlePlotAnimationDifferential('uncover')}
@@ -1127,7 +1127,7 @@ class DifferentialSearch extends Component {
               selection.
             </Popup.Content>
           </Popup>
-        </Fragment>
+        </div>
       );
 
       MultisetRadio = (

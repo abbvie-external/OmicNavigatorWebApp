@@ -31,8 +31,7 @@ class ScatterPlot extends Component {
     showBins: true,
     showCircles: true,
     tooltipPosition: null,
-    // DEV: this is true on init, to prevent lifecycle event (F) after mount
-    transitioningBoxSelect: true,
+    transitioningBoxSelect: false,
     transitioningDoubleClick: false,
     volcanoCircleText: [],
     xxAxis: '',
@@ -253,7 +252,7 @@ class ScatterPlot extends Component {
         yyAxis: '',
         zoomedOut: true,
       },
-      function() {
+      function () {
         d3.select('#VolcanoChart').remove();
         if (!volcanoPlotVisible || !upperPlotsVisible) return;
         this.setupVolcano();
@@ -335,7 +334,7 @@ class ScatterPlot extends Component {
         'font-family',
         'Lato, Helvetica Neue, Arial, Helvetica, sans-serif',
       )
-      .text(function() {
+      .text(function () {
         return doYAxisTransformation ? '-log(' + yAxisLabel + ')' : yAxisLabel;
       });
 
@@ -356,7 +355,7 @@ class ScatterPlot extends Component {
         'font-family',
         'Lato, Helvetica Neue, Arial, Helvetica, sans-serif',
       )
-      .text(function() {
+      .text(function () {
         return doXAxisTransformation ? '-log(' + xAxisLabel + ')' : xAxisLabel;
       });
   }
@@ -371,7 +370,7 @@ class ScatterPlot extends Component {
       );
       this.setState(
         { bins, circles, relevantCircles: circles, relevantBins: bins },
-        function() {
+        function () {
           this.renderBins(bins);
           this.renderCircles(circles);
           this.unhighlightCirclesAndBinsAndLabels();
@@ -388,7 +387,7 @@ class ScatterPlot extends Component {
           relevantCircles: data,
           relevantBins: [],
         },
-        function() {
+        function () {
           this.scaleFactory(data);
           this.renderCircles(data);
           this.unhighlightCirclesAndBinsAndLabels();
@@ -403,7 +402,7 @@ class ScatterPlot extends Component {
   determineBinColor(binArray, length) {
     const color = d3
       .scaleSequential(d3.interpolateBlues)
-      .domain([0, d3.max(binArray, d => d.length) / 5]);
+      .domain([0, d3.max(binArray, (d) => d.length) / 5]);
 
     return color(length);
   }
@@ -413,8 +412,8 @@ class ScatterPlot extends Component {
 
     const hexb = hexbin
       .hexbin()
-      .x(d => xScale(this.doTransform(d[xAxisLabel], 'x')))
-      .y(d => yScale(this.doTransform(d[yAxisLabel], 'y')))
+      .x((d) => xScale(this.doTransform(d[xAxisLabel], 'x')))
+      .y((d) => yScale(this.doTransform(d[yAxisLabel], 'y')))
       .radius(5);
 
     let bins = [];
@@ -425,7 +424,7 @@ class ScatterPlot extends Component {
 
     bins.forEach((bin, index) => {
       if (bin.length <= 5) {
-        circ.push(...bin.flatMap(b => b));
+        circ.push(...bin.flatMap((b) => b));
       } else {
         b.push(bin);
       }
@@ -445,8 +444,8 @@ class ScatterPlot extends Component {
       .attr('stroke', '#aab1c0')
       .attr('stroke-opacity', 1)
       .attr('stroke-width', 1)
-      .attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(5)}`)
-      .attr('fill', d => '#E0E1E2');
+      .attr('d', (d) => `M${d.x},${d.y}${this.hexbin.hexagon(5)}`)
+      .attr('fill', (d) => '#E0E1E2');
   }
 
   renderBins(bins) {
@@ -461,14 +460,17 @@ class ScatterPlot extends Component {
         .attr('stroke-opacity', 1)
         .attr('stroke-width', 1)
         .attr('class', 'bin')
-        .attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(5)}`)
-        .attr('fill', d => this.determineBinColor(bins, d.length))
-        .attr('id', d => `path-${Math.ceil(d.x)}-${Math.ceil(d.y)}-${d.length}`)
+        .attr('d', (d) => `M${d.x},${d.y}${this.hexbin.hexagon(5)}`)
+        .attr('fill', (d) => this.determineBinColor(bins, d.length))
+        .attr(
+          'id',
+          (d) => `path-${Math.ceil(d.x)}-${Math.ceil(d.y)}-${d.length}`,
+        )
         .attr('cursor', 'pointer')
-        .on('mouseenter', d => {
+        .on('mouseenter', (d) => {
           this.handleBinHover(d);
         })
-        .on('mouseleave', d => {
+        .on('mouseleave', (d) => {
           this.handleBinLeave(d, bins);
           d3.select('#tooltip').remove();
         })
@@ -476,9 +478,7 @@ class ScatterPlot extends Component {
           d3.event.stopPropagation();
           if (!d3.event.metaKey && !d3.event.ctrlKey) {
             d3.select('#tooltip').remove();
-            d3.select('#nonfiltered-elements')
-              .selectAll('circle')
-              .remove();
+            d3.select('#nonfiltered-elements').selectAll('circle').remove();
             let allCircles = [...this.state.circles, ...item];
             let relevantCircles = [...this.state.relevantCircles, ...item];
             this.renderCircles(relevantCircles);
@@ -512,7 +512,7 @@ class ScatterPlot extends Component {
         : differentialResultsUnfiltered,
     );
     const circlesWithBothXAndYValues = circles.filter(
-      c =>
+      (c) =>
         typeof c[xAxisLabel] === 'number' && typeof c[yAxisLabel] === 'number',
     );
     const svg = d3.select('#filtered-elements');
@@ -521,18 +521,18 @@ class ScatterPlot extends Component {
       .data(circlesWithBothXAndYValues)
       .enter()
       .append('circle')
-      .attr('cx', d => `${xScale(this.doTransform(d[xAxisLabel], 'x'))}`)
-      .attr('cy', d => `${yScale(this.doTransform(d[yAxisLabel], 'y'))}`)
+      .attr('cx', (d) => `${xScale(this.doTransform(d[xAxisLabel], 'x'))}`)
+      .attr('cy', (d) => `${yScale(this.doTransform(d[yAxisLabel], 'y'))}`)
       .attr('fill', '#E0E1E2')
       .attr('r', 3)
       .attr('stroke', '#aab1c0')
       .attr('strokeWidth', 0.4)
       .attr('class', 'volcanoPlot-dataPoint')
-      .attr('circleid', d => `${d[differentialFeatureIdKey]}`)
+      .attr('circleid', (d) => `${d[differentialFeatureIdKey]}`)
       .attr('key', (d, index) => `${d[differentialFeatureIdKey]}_${index}`)
-      .attr('data', d => JSON.stringify(d))
-      .attr('ystatistic', d => `${this.doTransform(d[yAxisLabel], 'y')}`)
-      .attr('xstatistic', d => `${this.doTransform(d[xAxisLabel], 'x')}`);
+      .attr('data', (d) => JSON.stringify(d))
+      .attr('ystatistic', (d) => `${this.doTransform(d[yAxisLabel], 'y')}`)
+      .attr('xstatistic', (d) => `${this.doTransform(d[xAxisLabel], 'x')}`);
   }
 
   renderCircles(circles) {
@@ -551,7 +551,7 @@ class ScatterPlot extends Component {
     if (d3.select('#nonfiltered-elements').size() !== 0) {
       const svg = d3.select('#nonfiltered-elements');
       const circlesWithBothXAndYValues = circles.filter(
-        c =>
+        (c) =>
           typeof c[xAxisLabel] === 'number' &&
           typeof c[yAxisLabel] === 'number',
       );
@@ -560,28 +560,28 @@ class ScatterPlot extends Component {
         .data(circlesWithBothXAndYValues)
         .enter()
         .append('circle')
-        .attr('cx', d => `${xScale(this.doTransform(d[xAxisLabel], 'x'))}`)
-        .attr('cy', d => `${yScale(this.doTransform(d[yAxisLabel], 'y'))}`)
+        .attr('cx', (d) => `${xScale(this.doTransform(d[xAxisLabel], 'x'))}`)
+        .attr('cy', (d) => `${yScale(this.doTransform(d[yAxisLabel], 'y'))}`)
         .attr('fill', '#1678c2')
         .attr('r', 3)
         .attr('stroke', '#000')
         .attr('strokeWidth', 0.4)
         .attr('class', 'volcanoPlot-dataPoint')
-        .attr('id', d => `volcanoDataPoint-${d[differentialFeatureIdKey]}`)
-        .attr('circleid', d => `${d[differentialFeatureIdKey]}`)
+        .attr('id', (d) => `volcanoDataPoint-${d[differentialFeatureIdKey]}`)
+        .attr('circleid', (d) => `${d[differentialFeatureIdKey]}`)
         .attr('key', (d, index) => `${d[differentialFeatureIdKey]}_${index}`)
-        .attr('data', d => JSON.stringify(d))
-        .attr('ystatistic', d => `${this.doTransform(d[yAxisLabel], 'y')}`)
-        .attr('xstatistic', d => `${this.doTransform(d[xAxisLabel], 'x')}`)
+        .attr('data', (d) => JSON.stringify(d))
+        .attr('ystatistic', (d) => `${this.doTransform(d[yAxisLabel], 'y')}`)
+        .attr('xstatistic', (d) => `${this.doTransform(d[xAxisLabel], 'x')}`)
         .attr('cursor', 'pointer')
-        .on('mouseenter', e => {
+        .on('mouseenter', (e) => {
           this.handleCircleHover(e);
         })
-        .on('mouseleave', e => {
+        .on('mouseleave', (e) => {
           this.handleCircleLeave(e);
           d3.select('#tooltip').remove();
         })
-        .on('click', e => {
+        .on('click', (e) => {
           d3.select('#tooltip').remove();
           d3.event.stopPropagation();
           const elem = d3.select(
@@ -596,7 +596,7 @@ class ScatterPlot extends Component {
               );
               let clickedElems = [
                 ...this.props.differentialHighlightedFeatures.filter(
-                  elem => elem !== elemData[differentialFeatureIdKey],
+                  (elem) => elem !== elemData[differentialFeatureIdKey],
                 ),
               ];
               this.props.onHandleDotClick(e, clickedElems, 0, false, false);
@@ -605,11 +605,11 @@ class ScatterPlot extends Component {
               //   clickedElements: clickedElems,
               // });
             } else {
-              let clickedDotValues = [...[elem._groups[0][0]]].map(elem =>
+              let clickedDotValues = [...[elem._groups[0][0]]].map((elem) =>
                 elem.attributes ? JSON.parse(elem.attributes.data.value) : elem,
               );
               let clickedDotFeatureId = clickedDotValues.map(
-                el => el[differentialFeatureIdKey],
+                (el) => el[differentialFeatureIdKey],
               );
               let allElems = [
                 ...this.props.differentialHighlightedFeatures,
@@ -637,12 +637,8 @@ class ScatterPlot extends Component {
   }
 
   scaleFactory(scaleData) {
-    const {
-      volcanoWidth,
-      upperPlotsHeight,
-      xAxisLabel,
-      yAxisLabel,
-    } = this.props;
+    const { volcanoWidth, upperPlotsHeight, xAxisLabel, yAxisLabel } =
+      this.props;
 
     var xMM = this.getMaxAndMin(scaleData, xAxisLabel);
     var yMM = this.getMaxAndMin(scaleData, yAxisLabel);
@@ -673,7 +669,7 @@ class ScatterPlot extends Component {
     const { differentialTableData, differentialFeatureIdKey } = this.props;
     let el = null;
     const circleWithKey = [...differentialTableData].find(
-      c => c[this.props.differentialFeatureIdKey] === key,
+      (c) => c[this.props.differentialFeatureIdKey] === key,
     );
     if (circleWithKey) {
       const circleIdentifier = circleWithKey[differentialFeatureIdKey] || null;
@@ -684,8 +680,8 @@ class ScatterPlot extends Component {
     if (el) {
       return { element: d3.select(el)._groups[0][0], type: 'circle' };
     } else {
-      const bin = this.state.relevantBins.find(bin => {
-        return bin.some(b => b[differentialFeatureIdKey] === key);
+      const bin = this.state.relevantBins.find((bin) => {
+        return bin.some((b) => b[differentialFeatureIdKey] === key);
       });
       if (bin && bin.x && bin.y && bin.length) {
         return {
@@ -724,34 +720,24 @@ class ScatterPlot extends Component {
   }
 
   removeCirclesBinsAndLabels() {
-    d3.select('#clip-path')
-      .selectAll('path')
-      .remove();
+    d3.select('#clip-path').selectAll('path').remove();
 
-    d3.select('#clip-path')
-      .selectAll('circle')
-      .remove();
+    d3.select('#clip-path').selectAll('circle').remove();
 
     if (d3.select('#nonfiltered-elements').size() !== 0) {
-      d3.select('#nonfiltered-elements')
-        .selectAll('text')
-        .remove();
+      d3.select('#nonfiltered-elements').selectAll('text').remove();
     }
   }
 
   unhighlightCirclesAndBinsAndLabels() {
-    const {
-      differentialHighlightedFeatures,
-      differentialOutlinedFeature,
-    } = this.props;
+    const { differentialHighlightedFeatures, differentialOutlinedFeature } =
+      this.props;
     if (d3.select('#nonfiltered-elements').size() !== 0) {
       if (
         !differentialHighlightedFeatures?.length &&
         differentialOutlinedFeature === ''
       ) {
-        d3.select('#nonfiltered-elements')
-          .selectAll('text')
-          .remove();
+        d3.select('#nonfiltered-elements').selectAll('text').remove();
       }
       // set circles back to default
       d3.select('#nonfiltered-elements')
@@ -766,12 +752,12 @@ class ScatterPlot extends Component {
       // set bins back to default
       d3.select('#nonfiltered-elements')
         .selectAll('path')
-        .attr('fill', d =>
+        .attr('fill', (d) =>
           this.determineBinColor(this.state.relevantBins, d.length),
         )
         .attr('stroke', '#000')
         .attr('class', 'bin')
-        .attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(5)}`);
+        .attr('d', (d) => `M${d.x},${d.y}${this.hexbin.hexagon(5)}`);
     }
   }
 
@@ -793,41 +779,39 @@ class ScatterPlot extends Component {
 
     let combinedCircleElementsArr = [];
     if (combinedCircleFeatureIdsArr?.length > 0) {
-      combinedCircleElementsArr = [...combinedCircleFeatureIdsArr].map(elem => {
-        let el = null;
-        const circleWithKey = [...relevantCircles].find(
-          c => c[this.props.differentialFeatureIdKey] === elem,
-        );
-        if (circleWithKey) {
-          const circleIdentifier =
-            circleWithKey[differentialFeatureIdKey] || null;
-          if (circleIdentifier) {
-            el = document.getElementById(
-              `volcanoDataPoint-${circleIdentifier}`,
-            );
+      combinedCircleElementsArr = [...combinedCircleFeatureIdsArr].map(
+        (elem) => {
+          let el = null;
+          const circleWithKey = [...relevantCircles].find(
+            (c) => c[this.props.differentialFeatureIdKey] === elem,
+          );
+          if (circleWithKey) {
+            const circleIdentifier =
+              circleWithKey[differentialFeatureIdKey] || null;
+            if (circleIdentifier) {
+              el = document.getElementById(
+                `volcanoDataPoint-${circleIdentifier}`,
+              );
+            }
           }
-        }
-        return el ? d3.select(el)._groups[0][0] : null;
-      });
+          return el ? d3.select(el)._groups[0][0] : null;
+        },
+      );
     }
     if (combinedCircleElementsArr.length) {
       this.handleBrushedText({ _groups: [combinedCircleElementsArr] });
     } else {
       if (d3.select('#nonfiltered-elements').size() !== 0) {
-        d3.select('#nonfiltered-elements')
-          .selectAll('text')
-          .remove();
+        d3.select('#nonfiltered-elements').selectAll('text').remove();
       }
     }
   }
 
   highlightCirclesAndBins() {
-    const {
-      differentialHighlightedFeatures,
-      differentialOutlinedFeature,
-    } = this.props;
+    const { differentialHighlightedFeatures, differentialOutlinedFeature } =
+      this.props;
     if (differentialHighlightedFeatures?.length > 0) {
-      differentialHighlightedFeatures.forEach(element => {
+      differentialHighlightedFeatures.forEach((element) => {
         // style all highlighted circles
         const highlightedCircleId = this.getCircleOrBin(element);
         if (highlightedCircleId) {
@@ -891,7 +875,7 @@ class ScatterPlot extends Component {
           outlined.attr('r', 7);
           outlined.classed('outlined', true);
           outlined.attr('stroke', '#1678c2');
-          outlined.attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(8)}`);
+          outlined.attr('d', (d) => `M${d.x},${d.y}${this.hexbin.hexagon(8)}`);
           outlined.raise();
         }
       }
@@ -908,26 +892,26 @@ class ScatterPlot extends Component {
         bin.attr('stroke', '#1678c2');
         bin.attr('stroke-width', 1);
         bin.attr('fill', '#ff4400');
-        bin.attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(9)}`);
+        bin.attr('d', (d) => `M${d.x},${d.y}${this.hexbin.hexagon(9)}`);
         bin.raise();
       } else if (binClass.endsWith('highlighted')) {
         bin.attr('stroke', '#000');
         bin.attr('stroke-width', 1);
         bin.attr('fill', '#ff4400');
-        bin.attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(7)}`);
+        bin.attr('d', (d) => `M${d.x},${d.y}${this.hexbin.hexagon(7)}`);
         bin.raise();
       } else if (binClass.endsWith('outlined')) {
         bin.attr('stroke', '#1678c2');
         bin.attr('stroke-width', 1);
         bin.attr('fill', '#fff');
-        bin.attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(9)}`);
+        bin.attr('d', (d) => `M${d.x},${d.y}${this.hexbin.hexagon(9)}`);
         bin.raise();
       } else {
         bin
           .attr('fill', '#1678c2')
           .attr('stroke', '#000')
           .attr('stroke-width', 1)
-          .attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(6)}`)
+          .attr('d', (d) => `M${d.x},${d.y}${this.hexbin.hexagon(6)}`)
           .raise();
       }
 
@@ -1015,23 +999,23 @@ class ScatterPlot extends Component {
       bin.attr('stroke', '#1678c2');
       bin.attr('stroke-width', 1);
       bin.attr('fill', '#ff4400');
-      bin.attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(8)}`);
+      bin.attr('d', (d) => `M${d.x},${d.y}${this.hexbin.hexagon(8)}`);
     } else if (binClass.endsWith('outlined')) {
       bin.attr('stroke', '#1678c2');
       bin.attr('stroke-width', 1);
       bin.attr('fill', '#fff');
-      bin.attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(8)}`);
+      bin.attr('d', (d) => `M${d.x},${d.y}${this.hexbin.hexagon(8)}`);
     } else if (binClass.endsWith('highlighted')) {
       bin.attr('stroke', '#000');
       bin.attr('stroke-width', 1);
       bin.attr('fill', '#ff4400');
-      bin.attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(6)}`);
+      bin.attr('d', (d) => `M${d.x},${d.y}${this.hexbin.hexagon(6)}`);
     } else {
       bin
-        .attr('fill', d => this.determineBinColor(bins, d.length))
+        .attr('fill', (d) => this.determineBinColor(bins, d.length))
         .attr('stroke', '#000')
         .attr('stroke-width', 1)
-        .attr('d', d => `M${d.x},${d.y}${this.hexbin.hexagon(5)}`);
+        .attr('d', (d) => `M${d.x},${d.y}${this.hexbin.hexagon(5)}`);
     }
     this.setState({
       hovering: false,
@@ -1039,13 +1023,8 @@ class ScatterPlot extends Component {
   }
 
   getToolTip() {
-    const {
-      hoveredCircleData,
-      hovering,
-      hoveredElement,
-      hoveredBin,
-      circles,
-    } = this.state;
+    const { hoveredCircleData, hovering, hoveredElement, hoveredBin, circles } =
+      this.state;
     const {
       differentialFeatureIdKey,
       xAxisLabel,
@@ -1055,17 +1034,9 @@ class ScatterPlot extends Component {
       volcanoCircleLabel,
     } = this.props;
 
-    const clipPathHeight =
-      d3
-        .select('#clip-path')
-        .node()
-        .getBBox().height - 40;
+    const clipPathHeight = d3.select('#clip-path').node().getBBox().height - 40;
 
-    const clipPathWidth =
-      d3
-        .select('#clip-path')
-        .node()
-        .getBBox().width - 47;
+    const clipPathWidth = d3.select('#clip-path').node().getBBox().width - 47;
 
     if (hovering) {
       if (hoveredElement === 'bin') {
@@ -1073,11 +1044,11 @@ class ScatterPlot extends Component {
         const tooltipHeight = clipPathHeight - (bin.y * 1 + 10);
         const tooltipWidth = bin.x * 1 + 200;
         const xstat = bin
-          .map(circle => this.doTransform(circle[xAxisLabel], 'x'))
+          .map((circle) => this.doTransform(circle[xAxisLabel], 'x'))
           .reduce((reducer, stat) => reducer + stat);
 
         const ystat = bin
-          .map(circle => this.doTransform(circle[yAxisLabel], 'y'))
+          .map((circle) => this.doTransform(circle[yAxisLabel], 'y'))
           .reduce((reducer, stat) => reducer + stat);
 
         const xText = doXAxisTransformation
@@ -1156,7 +1127,7 @@ class ScatterPlot extends Component {
         let idText = differentialFeatureIdKey + ': ' + hoveredCircleData.id;
         if (circles.length && volcanoCircleLabel !== 'None') {
           const hoveredCircleExtendedData = [...circles].filter(
-            c => hoveredCircleData.id === c[differentialFeatureIdKey],
+            (c) => hoveredCircleData.id === c[differentialFeatureIdKey],
           );
           if (hoveredCircleExtendedData.length) {
             idText = `${volcanoCircleLabel}: ${hoveredCircleExtendedData[0][volcanoCircleLabel]}`;
@@ -1261,7 +1232,7 @@ class ScatterPlot extends Component {
 
     const allFilteredDifferentialTableDataFeatureIds = new Set(
       filteredDifferentialTableData.map(
-        tableDataElement => tableDataElement[differentialFeatureIdKey],
+        (tableDataElement) => tableDataElement[differentialFeatureIdKey],
       ),
     );
 
@@ -1292,7 +1263,7 @@ class ScatterPlot extends Component {
           differentialFeatureIdKey,
         );
       }
-      dataInSelectionDeduped.forEach(obj => {
+      dataInSelectionDeduped.forEach((obj) => {
         if (
           !allFilteredDifferentialTableDataFeatureIds.has(
             obj[differentialFeatureIdKey],
@@ -1324,7 +1295,7 @@ class ScatterPlot extends Component {
         relevantBins: relevantCirclesAndBins.bins,
         relevantData,
       },
-      function() {
+      function () {
         // after we set relevant circles and bins, then render them
         if (
           dataInSelectionDeduped.length >= 2500 &&
@@ -1392,7 +1363,7 @@ class ScatterPlot extends Component {
         bins: unfilteredObject.bins,
         circles: unfilteredObject.circles,
       },
-      function() {
+      function () {
         this.handleRecalculateHexbin(
           allDataInView,
           isTableAlreadyAccurate,
@@ -1402,9 +1373,7 @@ class ScatterPlot extends Component {
           brushEvent,
         );
         // clear brush
-        d3.select('#clip-path')
-          .selectAll('path')
-          .attr('opacity', 0);
+        d3.select('#clip-path').selectAll('path').attr('opacity', 0);
         if (d3.select('.volcanoPlotD3BrushSelection').size() !== 0) {
           d3.select('.volcanoPlotD3BrushSelection').call(
             self.objsBrush.move,
@@ -1432,10 +1401,10 @@ class ScatterPlot extends Component {
         const circle = container.selectAll('circle');
         circle
           // .transition(t)
-          .attr('cx', function(d) {
+          .attr('cx', function (d) {
             return xScale(self.doTransform(d[self.props.xAxisLabel], 'x'));
           })
-          .attr('cy', function(d) {
+          .attr('cy', function (d) {
             return yScale(self.doTransform(d[self.props.yAxisLabel], 'y'));
           });
         const bin = container.selectAll('path');
@@ -1452,7 +1421,7 @@ class ScatterPlot extends Component {
     const self = this;
     this.objsBrush = {};
 
-    const brushingStart = function() {
+    const brushingStart = function () {
       self.setState({
         brushing: d3.brushSelection(this)?.length > 0 ? true : false,
         hoveredCircleData: {
@@ -1463,11 +1432,11 @@ class ScatterPlot extends Component {
         },
       });
     };
-    const endBrush = function() {
+    const endBrush = function () {
       if (d3.event.selection != null) {
         const brush = d3.brushSelection(this);
 
-        const isBrushed = function(x, y) {
+        const isBrushed = function (x, y) {
           const brushTest =
             brush[0][0] <= x &&
             x <= brush[1][0] &&
@@ -1477,20 +1446,20 @@ class ScatterPlot extends Component {
         };
 
         const brushedBins = self.state.bins
-          .filter(bin => {
+          .filter((bin) => {
             return isBrushed(bin.x, bin.y);
           })
-          .flatMap(elem => elem);
+          .flatMap((elem) => elem);
 
         const circles = d3.selectAll('circle.volcanoPlot-dataPoint');
 
-        const brushedCircles = circles.filter(function() {
+        const brushedCircles = circles.filter(function () {
           const x = d3.select(this).attr('cx');
           const y = d3.select(this).attr('cy');
           return isBrushed(x, y);
         });
 
-        const brushedDataArr = brushedCircles._groups[0].map(a => {
+        const brushedDataArr = brushedCircles._groups[0].map((a) => {
           return JSON.parse(a.attributes.data.value);
         });
         const total = [...brushedBins, ...brushedDataArr];
@@ -1502,10 +1471,10 @@ class ScatterPlot extends Component {
             // filter out irrelevant grey circles
             const filteredDifferentialTableDataSet = new Set(
               [...self.props.filteredDifferentialTableData].map(
-                d => d[self.props.differentialFeatureIdKey],
+                (d) => d[self.props.differentialFeatureIdKey],
               ),
             );
-            const intersection = [...total].filter(d =>
+            const intersection = [...total].filter((d) =>
               filteredDifferentialTableDataSet.has(
                 d[self.props.differentialFeatureIdKey],
               ),
@@ -1528,11 +1497,13 @@ class ScatterPlot extends Component {
               zoomedOut: false,
             });
             const totalSet = new Set(
-              [...total].map(d => d[self.props.differentialFeatureIdKey]),
+              [...total].map((d) => d[self.props.differentialFeatureIdKey]),
             );
             const intersection2 = [
               ...self.props.filteredDifferentialTableData,
-            ].filter(d => totalSet.has(d[self.props.differentialFeatureIdKey]));
+            ].filter((d) =>
+              totalSet.has(d[self.props.differentialFeatureIdKey]),
+            );
             self.transitionZoom(intersection2, false, false, true);
             self.setupBrush(
               self.props.volcanoWidth,
@@ -1608,20 +1579,20 @@ class ScatterPlot extends Component {
   mapBoxSelectionToHighlight(total) {
     const { plotMultiFeatureAvailable, differentialFeatureIdKey } = this.props;
     if (!plotMultiFeatureAvailable) return null;
-    const scatterArr = total.map(item => ({
+    const scatterArr = total.map((item) => ({
       id: item[differentialFeatureIdKey],
       value: item[differentialFeatureIdKey],
       key: item[differentialFeatureIdKey],
     }));
     const uniqueScatterArray = [
-      ...new Map(scatterArr.map(item => [item.id, item])).values(),
+      ...new Map(scatterArr.map((item) => [item.id, item])).values(),
     ];
     return uniqueScatterArray;
   }
 
   handleBrushedText(brushed) {
     // MAP brushedDataArr to circle text state
-    const brushedCircleTextMapped = brushed?._groups[0].map(a => {
+    const brushedCircleTextMapped = brushed?._groups[0].map((a) => {
       if (!a || !a.attributes) return null;
       const columnData = JSON.parse(a.attributes['data'].nodeValue);
       const key = this.props.volcanoCircleLabel || 0;
@@ -1651,9 +1622,7 @@ class ScatterPlot extends Component {
     });
     if (!brushedCircleTextMapped) return;
     const self = this;
-    d3.select('#nonfiltered-elements')
-      .selectAll('text')
-      .remove();
+    d3.select('#nonfiltered-elements').selectAll('text').remove();
 
     if (d3.select('#nonfiltered-elements').size() !== 0) {
       d3.select('#nonfiltered-elements')
@@ -1661,13 +1630,13 @@ class ScatterPlot extends Component {
         .data(brushedCircleTextMapped)
         .enter()
         .append('text')
-        .attr('key', d => {
+        .attr('key', (d) => {
           if (d) {
             return `volcanoCircleText-${d.id}`;
           }
         })
         .attr('class', 'NoSelect volcanoCircleTooltipText')
-        .attr('transform', d => {
+        .attr('transform', (d) => {
           if (d) {
             if (d.data) {
               //create temporary element to get text width in pixels
@@ -1694,7 +1663,7 @@ class ScatterPlot extends Component {
         })
         .style('font-size', '11px')
         .style('color', '#d3d3')
-        .attr('textAnchor', d => {
+        .attr('textAnchor', (d) => {
           if (d) {
             const circleOnLeftSide = d.cx <= self.props.volcanoWidth / 2;
             return circleOnLeftSide ? 'start' : 'end';
@@ -1704,7 +1673,7 @@ class ScatterPlot extends Component {
           'font-family',
           'Lato, Helvetica Neue, Arial, Helvetica, sans-serif',
         )
-        .text(d => {
+        .text((d) => {
           if (d) {
             return d.data;
           }
@@ -1712,7 +1681,7 @@ class ScatterPlot extends Component {
     }
   }
 
-  handleSVGClick = _.debounce(function(doubleClick) {
+  handleSVGClick = _.debounce(function (doubleClick) {
     if (doubleClick) {
       if (this.state.zoomedOut) return;
       // if we are zooming out to differentialResults with a length the same as our relevant data,
@@ -1756,10 +1725,18 @@ class ScatterPlot extends Component {
   }
 
   getMaxAndMin(data, element) {
-    if (data?.length > 0 && data[0][element] != null) {
-      var values = [data[0][element], data[0][element]];
+    if (data?.length > 0) {
+      let values = [0, 0];
+      if (data[0][element] != null) {
+        values = [data[0][element], data[0][element]];
+      }
       for (var i = 1; i < data.length; i++) {
-        if (data[i] != null && data[i][element] != null) {
+        if (
+          data[i] != null &&
+          data[i][element] != null &&
+          data[i][element] !== 0
+          // ignore blanks and 0s, but plot positive or negatives
+        ) {
           if (data[i][element] > values[1]) {
             values[1] = data[i][element];
           } else if (data[i][element] < values[0]) {
