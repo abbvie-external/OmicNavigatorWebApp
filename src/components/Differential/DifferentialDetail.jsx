@@ -19,7 +19,7 @@ import {
 } from 'semantic-ui-react';
 import ButtonActions from '../Shared/ButtonActions';
 import './DifferentialDetail.scss';
-import SplitPane from 'react-split-pane';
+import SplitPane from 'react-split-pane-r17';
 
 class DifferentialDetail extends Component {
   state = {
