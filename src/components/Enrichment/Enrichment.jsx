@@ -13,7 +13,7 @@ import { omicNavigatorService } from '../../services/omicNavigator.service';
 import ButtonActions from '../Shared/ButtonActions';
 import * as d3 from 'd3';
 import {
-  isNotNANullUndefinedEmptyString,
+  isNotNANullUndefinedEmptyStringInf,
   formatNumberForDisplay,
   splitValue,
   Linkout,
@@ -878,7 +878,7 @@ class Enrichment extends Component {
         // loop through data, one property at a time
         const notNullObject = dataCopy.find((row) => {
           // find the first value for that property
-          return isNotNANullUndefinedEmptyString(row[property]);
+          return isNotNANullUndefinedEmptyStringInf(row[property]);
         });
         let notNullValue = null;
         if (notNullObject) {

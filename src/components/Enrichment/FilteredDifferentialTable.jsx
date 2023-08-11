@@ -3,7 +3,7 @@ import { Popup, Dimmer, Loader } from 'semantic-ui-react';
 import { omicNavigatorService } from '../../services/omicNavigator.service';
 import _ from 'lodash-es';
 import {
-  isNotNANullUndefinedEmptyString,
+  isNotNANullUndefinedEmptyStringInf,
   formatNumberForDisplay,
   splitValue,
   Linkout,
@@ -207,7 +207,7 @@ class FilteredDifferentialTable extends Component {
         // loop through data, one property at a time
         const notNullObject = dataCopy.find((row) => {
           // find the first value for that property
-          return isNotNANullUndefinedEmptyString(row[property]);
+          return isNotNANullUndefinedEmptyStringInf(row[property]);
         });
         let notNullValue = null;
         if (notNullObject) {

@@ -463,8 +463,15 @@ export const reviseLayout = (layout, width, height, plotId) => {
   return layoutParsed;
 };
 
-export function isNotNANullUndefinedEmptyString(o) {
-  return typeof o !== 'undefined' && o !== null && o !== 'NA' && o !== '';
+export function isNotNANullUndefinedEmptyStringInf(o) {
+  return (
+    typeof o !== 'undefined' &&
+    o !== null &&
+    o !== 'NA' &&
+    o !== '' &&
+    o !== 'Inf' &&
+    o !== '-Inf'
+  );
 }
 
 /**

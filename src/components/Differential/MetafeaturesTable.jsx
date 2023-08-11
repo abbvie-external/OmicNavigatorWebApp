@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Popup } from 'semantic-ui-react';
 // import _ from 'lodash-es';
 import {
-  isNotNANullUndefinedEmptyString,
+  isNotNANullUndefinedEmptyStringInf,
   formatNumberForDisplay,
   splitValue,
 } from '../Shared/helpers';
@@ -57,7 +57,7 @@ class MetafeaturesTable extends Component {
     }
   }
 
-  getMetafeaturesTableConfigCols = data => {
+  getMetafeaturesTableConfigCols = (data) => {
     let configCols = [];
     if (data?.length > 0) {
       const TableValuePopupStyle = {
@@ -80,11 +80,11 @@ class MetafeaturesTable extends Component {
       if (firstFullObject) {
         let allProperties = Object.keys(firstFullObject);
         const dataCopy = [...data];
-        allProperties.forEach(property => {
+        allProperties.forEach((property) => {
           // loop through data, one property at a time
-          const notNullObject = dataCopy.find(row => {
+          const notNullObject = dataCopy.find((row) => {
             // find the first value for that property
-            return isNotNANullUndefinedEmptyString(row[property]);
+            return isNotNANullUndefinedEmptyStringInf(row[property]);
           });
           let notNullValue = null;
           if (notNullObject) {
@@ -106,8 +106,8 @@ class MetafeaturesTable extends Component {
         });
       }
 
-      const metafeaturesAlphanumericColumnsMapped = metafeaturesAlphanumericFields.map(
-        f => {
+      const metafeaturesAlphanumericColumnsMapped =
+        metafeaturesAlphanumericFields.map((f) => {
           return {
             title: f,
             field: f,
@@ -127,16 +127,15 @@ class MetafeaturesTable extends Component {
               );
             },
           };
-        },
-      );
+        });
       const metafeaturesNumericColumnsMapped = metafeaturesNumericFields.map(
-        c => {
+        (c) => {
           return {
             title: c,
             field: c,
             type: 'number',
             filterable: { type: 'numericFilter' },
-            exportTemplate: value => (value ? `${value}` : 'N/A'),
+            exportTemplate: (value) => (value ? `${value}` : 'N/A'),
             template: (value, item, addParams) => {
               return (
                 <p>
@@ -169,7 +168,7 @@ class MetafeaturesTable extends Component {
     });
   };
 
-  handleItemsPerPageChange = items => {
+  handleItemsPerPageChange = (items) => {
     this.setState({
       itemsPerPageMetafeaturesTable: items,
     });

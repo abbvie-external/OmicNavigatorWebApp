@@ -13,7 +13,7 @@ import {
   List,
 } from 'semantic-ui-react';
 import {
-  isNotNANullUndefinedEmptyString,
+  isNotNANullUndefinedEmptyStringInf,
   getYAxis,
   getXAxis,
 } from '../Shared/helpers';
@@ -203,7 +203,7 @@ class ScatterPlotDiv extends Component {
         // loop through data, one property at a time
         const notNullObject = dataCopy.find((row) => {
           // find the first value for that property
-          return isNotNANullUndefinedEmptyString(row[property]);
+          return isNotNANullUndefinedEmptyStringInf(row[property]);
         });
         let notNullValue = null;
         if (notNullObject) {
