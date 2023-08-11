@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import _ from 'lodash-es';
 import * as d3 from 'd3';
 import * as hexbin from 'd3-hexbin';
-import { loadingDimmerGeneric } from '../Shared/helpers';
+import { loadingDimmerGeneric, getMaxAndMin } from '../Shared/helpers';
 import './ScatterPlot.scss';
 
 class ScatterPlot extends Component {
@@ -637,11 +637,17 @@ class ScatterPlot extends Component {
   }
 
   scaleFactory(scaleData) {
-    const { volcanoWidth, upperPlotsHeight, xAxisLabel, yAxisLabel } =
-      this.props;
+    const {
+      volcanoWidth,
+      upperPlotsHeight,
+      xAxisLabel,
+      yAxisLabel,
+      doXAxisTransformation,
+      doYAxisTransformation,
+    } = this.props;
 
-    var xMM = this.getMaxAndMin(scaleData, xAxisLabel);
-    var yMM = this.getMaxAndMin(scaleData, yAxisLabel);
+    var xMM = getMaxAndMin(scaleData, xAxisLabel, doXAxisTransformation);
+    var yMM = getMaxAndMin(scaleData, yAxisLabel, doYAxisTransformation);
     xMM = [this.doTransform(xMM[0], 'x'), this.doTransform(xMM[1], 'x')];
     yMM = [this.doTransform(yMM[0], 'y'), this.doTransform(yMM[1], 'y')];
 
@@ -1722,30 +1728,6 @@ class ScatterPlot extends Component {
     } else if (upperPlotsHeight > 500) {
       return upperPlotsHeight - 10;
     } else return upperPlotsHeight - 15;
-  }
-
-  getMaxAndMin(data, element) {
-    if (data?.length > 0) {
-      let values = [0, 0];
-      if (data[0][element] != null) {
-        values = [data[0][element], data[0][element]];
-      }
-      for (var i = 1; i < data.length; i++) {
-        if (
-          data[i] != null &&
-          data[i][element] != null &&
-          data[i][element] !== 0
-          // ignore blanks and 0s, but plot positive or negatives
-        ) {
-          if (data[i][element] > values[1]) {
-            values[1] = data[i][element];
-          } else if (data[i][element] < values[0]) {
-            values[0] = data[i][element];
-          }
-        }
-      }
-      return values;
-    } else return [0, 0];
   }
 
   render() {

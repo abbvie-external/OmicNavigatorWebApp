@@ -13,7 +13,8 @@ import {
   List,
 } from 'semantic-ui-react';
 import {
-  isNotNANullUndefinedEmptyString,
+  isNotNANullUndefinedEmptyStringInf,
+  getMaxAndMin,
   getYAxis,
   getXAxis,
 } from '../Shared/helpers';
@@ -24,15 +25,15 @@ import './ScatterPlotDiv.scss';
 class ScatterPlotDiv extends Component {
   state = {
     doXAxisTransformation:
-      JSON.parse(sessionStorage.getItem('doXAxisTransformation')) === true
-        ? // || sessionStorage.getItem('doXAxisTransformation') == null
-          true
+      JSON.parse(sessionStorage.getItem('doXAxisTransformation')) === true ||
+      sessionStorage.getItem('doXAxisTransformation') == null
+        ? true
         : false,
 
     doYAxisTransformation:
-      JSON.parse(sessionStorage.getItem('doYAxisTransformation')) === true
-        ? // || sessionStorage.getItem('doYAxisTransformation') == null
-          true
+      JSON.parse(sessionStorage.getItem('doYAxisTransformation')) === true ||
+      sessionStorage.getItem('doYAxisTransformation') == null
+        ? true
         : false,
 
     allowXTransformation:
@@ -103,35 +104,11 @@ class ScatterPlotDiv extends Component {
     }
   }
 
-  getMaxAndMin = (data, element) => {
-    if (data.length > 0) {
-      let values = [0, 0];
-      if (data[0][element] != null) {
-        values = [data[0][element], data[0][element]];
-      }
-      for (var i = 1; i < data.length; i++) {
-        if (
-          data[i] != null &&
-          data[i][element] != null &&
-          data[i][element] !== 0
-          // ignore blanks and 0s, but plot positive or negatives
-        ) {
-          if (data[i][element] > values[1]) {
-            values[1] = data[i][element];
-          } else if (data[i][element] < values[0]) {
-            values[0] = data[i][element];
-          }
-        }
-      }
-      return values;
-    }
-  };
-
   handleDropdownChange = (evt, { name, value }) => {
     const { differentialResultsUnfiltered } = this.props;
     if (name === 'xAxisSelector') {
       const allowXTransCheck =
-        this.getMaxAndMin(differentialResultsUnfiltered, value)[0] > 0;
+        getMaxAndMin(differentialResultsUnfiltered, value)[0] >= 0;
       const doXaxisTransCheck = allowXTransCheck
         ? this.state.doXAxisTransformation
         : false;
@@ -145,7 +122,7 @@ class ScatterPlotDiv extends Component {
       sessionStorage.setItem('allowXTransformation', allowXTransCheck);
     } else if (name === 'yAxisSelector') {
       const allowYTransCheck =
-        this.getMaxAndMin(differentialResultsUnfiltered, value)[0] > 0;
+        getMaxAndMin(differentialResultsUnfiltered, value)[0] >= 0;
       const doYaxisTransCheck = allowYTransCheck
         ? this.state.doYAxisTransformation
         : false;
@@ -203,7 +180,7 @@ class ScatterPlotDiv extends Component {
         // loop through data, one property at a time
         const notNullObject = dataCopy.find((row) => {
           // find the first value for that property
-          return isNotNANullUndefinedEmptyString(row[property]);
+          return isNotNANullUndefinedEmptyStringInf(row[property]);
         });
         let notNullValue = null;
         if (notNullObject) {
@@ -256,8 +233,7 @@ class ScatterPlotDiv extends Component {
     if (xLabel == null) {
       xLabel = getXAxis(relevantConfigColumns);
     }
-    const allowXTransCheck =
-      this.getMaxAndMin(differentialResults, xLabel)[0] > 0;
+    const allowXTransCheck = getMaxAndMin(differentialResults, xLabel)[0] >= 0;
     const doXaxisTransCheck = allowXTransCheck
       ? this.state.doXAxisTransformation
       : false;
@@ -275,8 +251,7 @@ class ScatterPlotDiv extends Component {
         yLabel = relevantConfigColumns[0];
       }
     }
-    const allowYTransCheck =
-      this.getMaxAndMin(differentialResults, yLabel)[0] > 0;
+    const allowYTransCheck = getMaxAndMin(differentialResults, yLabel)[0] >= 0;
     const doYaxisTransCheck = allowYTransCheck
       ? this.state.doYAxisTransformation
       : false;

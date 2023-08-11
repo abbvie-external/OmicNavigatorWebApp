@@ -463,8 +463,40 @@ export const reviseLayout = (layout, width, height, plotId) => {
   return layoutParsed;
 };
 
-export function isNotNANullUndefinedEmptyString(o) {
-  return typeof o !== 'undefined' && o !== null && o !== 'NA' && o !== '';
+export function getMaxAndMin(data, element, doTransform) {
+  if (!data.length) return [0, 0];
+  const arrayOfNumbers = [];
+  for (var i = 1; i < data.length; i++) {
+    if (
+      data[i] != null &&
+      data[i][element] != null &&
+      !isNaN(data[i][element])
+    ) {
+      if (doTransform) {
+        // if doing a -log10 transform, filter out 0's (specific to scaleFactory function)
+        if (data[i][element] != 0) {
+          arrayOfNumbers.push(data[i][element]);
+        }
+      } else {
+        arrayOfNumbers.push(data[i][element]);
+      }
+    }
+  }
+  const min = Math.min(...arrayOfNumbers);
+  const max = Math.max(...arrayOfNumbers);
+  return [min, max];
+}
+
+export function isNotNANullUndefinedEmptyStringInf(o) {
+  return (
+    typeof o !== 'undefined' &&
+    o !== null &&
+    o !== 'NA' &&
+    o !== 'N/A' &&
+    o !== '' &&
+    o !== 'Inf' &&
+    o !== '-Inf'
+  );
 }
 
 /**
