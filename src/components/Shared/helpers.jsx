@@ -471,10 +471,7 @@ export function getMaxAndMin(data, element) {
       data[i] != null &&
       data[i][element] != null &&
       data[i][element] !== 0 &&
-      data[i][element] !== 'NA' &&
-      data[i][element] !== 'N/A' &&
-      data[i][element] !== 'Inf' &&
-      data[i][element] !== '-Inf'
+      !isNaN(data[i][element])
     ) {
       arrayOfNumbers.push(data[i][element]);
     }
