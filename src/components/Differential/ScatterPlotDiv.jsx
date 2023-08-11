@@ -25,15 +25,15 @@ import './ScatterPlotDiv.scss';
 class ScatterPlotDiv extends Component {
   state = {
     doXAxisTransformation:
-      JSON.parse(sessionStorage.getItem('doXAxisTransformation')) === true
-        ? // || sessionStorage.getItem('doXAxisTransformation') == null
-          true
+      JSON.parse(sessionStorage.getItem('doXAxisTransformation')) === true ||
+      sessionStorage.getItem('doXAxisTransformation') == null
+        ? true
         : false,
 
     doYAxisTransformation:
-      JSON.parse(sessionStorage.getItem('doYAxisTransformation')) === true
-        ? // || sessionStorage.getItem('doYAxisTransformation') == null
-          true
+      JSON.parse(sessionStorage.getItem('doYAxisTransformation')) === true ||
+      sessionStorage.getItem('doYAxisTransformation') == null
+        ? true
         : false,
 
     allowXTransformation:
@@ -108,7 +108,7 @@ class ScatterPlotDiv extends Component {
     const { differentialResultsUnfiltered } = this.props;
     if (name === 'xAxisSelector') {
       const allowXTransCheck =
-        getMaxAndMin(differentialResultsUnfiltered, value)[0] > 0;
+        getMaxAndMin(differentialResultsUnfiltered, value)[0] >= 0;
       const doXaxisTransCheck = allowXTransCheck
         ? this.state.doXAxisTransformation
         : false;
@@ -122,7 +122,7 @@ class ScatterPlotDiv extends Component {
       sessionStorage.setItem('allowXTransformation', allowXTransCheck);
     } else if (name === 'yAxisSelector') {
       const allowYTransCheck =
-        getMaxAndMin(differentialResultsUnfiltered, value)[0] > 0;
+        getMaxAndMin(differentialResultsUnfiltered, value)[0] >= 0;
       const doYaxisTransCheck = allowYTransCheck
         ? this.state.doYAxisTransformation
         : false;
@@ -233,7 +233,7 @@ class ScatterPlotDiv extends Component {
     if (xLabel == null) {
       xLabel = getXAxis(relevantConfigColumns);
     }
-    const allowXTransCheck = getMaxAndMin(differentialResults, xLabel)[0] > 0;
+    const allowXTransCheck = getMaxAndMin(differentialResults, xLabel)[0] >= 0;
     const doXaxisTransCheck = allowXTransCheck
       ? this.state.doXAxisTransformation
       : false;
@@ -251,7 +251,7 @@ class ScatterPlotDiv extends Component {
         yLabel = relevantConfigColumns[0];
       }
     }
-    const allowYTransCheck = getMaxAndMin(differentialResults, yLabel)[0] > 0;
+    const allowYTransCheck = getMaxAndMin(differentialResults, yLabel)[0] >= 0;
     const doYaxisTransCheck = allowYTransCheck
       ? this.state.doYAxisTransformation
       : false;
