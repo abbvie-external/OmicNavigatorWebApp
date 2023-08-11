@@ -463,11 +463,33 @@ export const reviseLayout = (layout, width, height, plotId) => {
   return layoutParsed;
 };
 
+export function getMaxAndMin(data, element) {
+  if (!data.length) return [0, 0];
+  const arrayOfNumbers = [];
+  for (var i = 1; i < data.length; i++) {
+    if (
+      data[i] != null &&
+      data[i][element] != null &&
+      data[i][element] !== 0 &&
+      data[i][element] !== 'NA' &&
+      data[i][element] !== 'N/A' &&
+      data[i][element] !== 'Inf' &&
+      data[i][element] !== '-Inf'
+    ) {
+      arrayOfNumbers.push(data[i][element]);
+    }
+  }
+  const min = Math.min(...arrayOfNumbers);
+  const max = Math.max(...arrayOfNumbers);
+  return [min, max];
+}
+
 export function isNotNANullUndefinedEmptyStringInf(o) {
   return (
     typeof o !== 'undefined' &&
     o !== null &&
     o !== 'NA' &&
+    o !== 'N/A' &&
     o !== '' &&
     o !== 'Inf' &&
     o !== '-Inf'
