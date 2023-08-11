@@ -1900,7 +1900,6 @@ class DifferentialDetail extends Component {
         onHandleVolcanoPlotSelectionChange={
           this.handleVolcanoPlotSelectionChange
         }
-        // getMaxAndMin={this.getMaxAndMin}
         onHandleDotClick={this.handleDotClick}
         onPageToFeature={this.pageToFeature}
         onHandleUpdateDifferentialResults={

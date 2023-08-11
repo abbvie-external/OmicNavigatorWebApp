@@ -637,11 +637,17 @@ class ScatterPlot extends Component {
   }
 
   scaleFactory(scaleData) {
-    const { volcanoWidth, upperPlotsHeight, xAxisLabel, yAxisLabel } =
-      this.props;
+    const {
+      volcanoWidth,
+      upperPlotsHeight,
+      xAxisLabel,
+      yAxisLabel,
+      doXAxisTransformation,
+      doYAxisTransformation,
+    } = this.props;
 
-    var xMM = getMaxAndMin(scaleData, xAxisLabel);
-    var yMM = getMaxAndMin(scaleData, yAxisLabel);
+    var xMM = getMaxAndMin(scaleData, xAxisLabel, doXAxisTransformation);
+    var yMM = getMaxAndMin(scaleData, yAxisLabel, doYAxisTransformation);
     xMM = [this.doTransform(xMM[0], 'x'), this.doTransform(xMM[1], 'x')];
     yMM = [this.doTransform(yMM[0], 'y'), this.doTransform(yMM[1], 'y')];
 
