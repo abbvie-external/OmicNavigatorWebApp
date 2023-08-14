@@ -19,17 +19,17 @@ class Terms extends Component {
         terms: terms,
       });
     } catch (e) {
-      console.log(e.message);
+      // console.log(e.message);
     }
   }
 
   async fetchTerms() {
-    return omicNavigatorService.fetchTerms().then(terms => {
+    return omicNavigatorService.fetchTerms().then((terms) => {
       return terms;
     });
   }
 
-  toggleTerms = bool => {
+  toggleTerms = (bool) => {
     this.setState({
       termsOpen: bool,
     });

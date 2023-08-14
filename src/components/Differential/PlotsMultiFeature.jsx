@@ -13,6 +13,7 @@ import ButtonActions from '../Shared/ButtonActions';
 import TabMultiFeature from './TabMultiFeature';
 import './PlotsDynamic.scss';
 import '../Shared/PlotlyOverrides.scss';
+import { isObjectEmpty } from '../Shared/helpers';
 
 class PlotsMultiFeature extends Component {
   state = {
@@ -213,6 +214,7 @@ class PlotsMultiFeature extends Component {
       svgExportName,
       tab,
       upperPlotsVisible,
+      differentialPlotDescriptions,
     } = this.props;
     const {
       activeTabIndexPlotsMultiFeature,
@@ -267,6 +269,26 @@ class PlotsMultiFeature extends Component {
             <Loader size="large">Loading Multi-Feature Plots</Loader>
           </Dimmer>
         );
+        let differentialPlotDescription = null;
+        let currentDifferentialPlotDescriptions =
+          differentialPlotDescriptions?.[differentialModel] || {};
+        const currentPlotText =
+          options?.[activeTabIndexPlotsMultiFeatureVar]?.text || null;
+        if (!isObjectEmpty(currentDifferentialPlotDescriptions)) {
+          const DescriptionsAsArray = Object.entries(
+            currentDifferentialPlotDescriptions,
+          );
+          if (DescriptionsAsArray.length && currentPlotText) {
+            let currentDifferentialPlotDescription =
+              DescriptionsAsArray.filter(
+                (p) => p[1].displayName === currentPlotText,
+              ) || null;
+            differentialPlotDescription =
+              currentDifferentialPlotDescription.length
+                ? currentDifferentialPlotDescription?.[0]?.[1]?.description
+                : null;
+          }
+        }
         return (
           <div
             className="differentialDetailSvgContainer"
@@ -289,19 +311,47 @@ class PlotsMultiFeature extends Component {
                 fwdRef={this.differentialDetailPlotsMultiFeatureRef}
               />
             </div>
-            <Dropdown
-              search
-              selection
-              compact
-              options={options}
-              value={
-                options[activeTabIndexPlotsMultiFeatureVar]?.value ||
-                options[0]?.value
-              }
-              onChange={this.handlePlotDropdownChangeMultiFeature}
-              className={DropdownClass}
-              id="svgPlotDropdownDifferential"
-            />
+            {differentialPlotDescription ? (
+              <Popup
+                trigger={
+                  <Dropdown
+                    search
+                    selection
+                    compact
+                    options={options}
+                    value={
+                      options[activeTabIndexPlotsMultiFeatureVar]?.value ||
+                      options[0]?.value
+                    }
+                    onChange={this.handlePlotDropdownChangeMultiFeature}
+                    className={DropdownClass}
+                    id="svgPlotDropdownDifferential"
+                  />
+                }
+                basic
+                inverted
+                position="bottom center"
+                closeOnDocumentClick
+                closeOnEscape
+                hideOnScroll
+              >
+                <Popup.Content>{differentialPlotDescription}</Popup.Content>
+              </Popup>
+            ) : (
+              <Dropdown
+                search
+                selection
+                compact
+                options={options}
+                value={
+                  options[activeTabIndexPlotsMultiFeatureVar]?.value ||
+                  options[0]?.value
+                }
+                onChange={this.handlePlotDropdownChangeMultiFeature}
+                className={DropdownClass}
+                id="svgPlotDropdownDifferential"
+              />
+            )}
             <TabMultiFeature
               activeTabIndexPlotsMultiFeature={activeTabIndexPlotsMultiFeature}
               differentialDetailPlotsMultiFeatureRefFwd={

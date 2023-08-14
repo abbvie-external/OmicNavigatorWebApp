@@ -7,7 +7,7 @@ import { withRouter } from 'react-router-dom';
 import SVG from 'react-inlinesvg';
 import { toast } from 'react-toastify';
 import {
-  isNotNANullUndefinedEmptyString,
+  isNotNANullUndefinedEmptyStringInf,
   formatNumberForDisplay,
   splitValue,
   Linkout,
@@ -58,6 +58,8 @@ class Differential extends Component {
       differentialResultsTableStreaming: true,
       differentialResultsLinkouts: [],
       differentialResultsFavicons: [],
+      differentialResultsColumnTooltips: [],
+      differentialPlotDescriptions: [],
       // differentialResultsUnfiltered: [],
       /**
        * @type {QHGrid.ColumnConfig[]}
@@ -1268,7 +1270,7 @@ class Differential extends Component {
           } else return svg;
         } else return null;
       } catch (err) {
-        console.log(err);
+        // console.log(err);
         return null;
       }
     } else {
@@ -1436,10 +1438,16 @@ class Differential extends Component {
 
   getConfigCols = (testData) => {
     const differentialResultsVar = testData.differentialResults;
-    const { differentialFeature } = this.props;
+    const {
+      differentialFeature,
+      onHandleDifferentialFeatureIdKey,
+      differentialModel,
+      differentialTest,
+    } = this.props;
     const {
       differentialResultsLinkouts,
       differentialResultsFavicons,
+      differentialResultsColumnTooltips,
       differentialPlotTypes,
       modelSpecificMetaFeaturesExist,
     } = this.state;
@@ -1467,7 +1475,7 @@ class Differential extends Component {
         // loop through data, one property at a time
         const notNullObject = dataCopy.find((row) => {
           // find the first value for that property
-          return isNotNANullUndefinedEmptyString(row[property]);
+          return isNotNANullUndefinedEmptyStringInf(row[property]);
         });
         let notNullValue = null;
         if (notNullObject) {
@@ -1504,7 +1512,7 @@ class Differential extends Component {
       });
       this.getPlot('Overlay', differentialFeature, true);
     }
-    this.props.onHandleDifferentialFeatureIdKey(
+    onHandleDifferentialFeatureIdKey(
       'differentialFeatureIdKey',
       alphanumericTrigger,
     );
@@ -1512,8 +1520,20 @@ class Differential extends Component {
     const noPlots = !differentialPlotTypes?.length > 0;
     const differentialAlphanumericColumnsMapped =
       differentialAlphanumericFields.map((f, { index }) => {
+        // console.log(
+        //   differentialResultsColumnTooltips?.[differentialModel]?.[
+        //     differentialTest
+        //   ]?.[f],
+        // );
         return {
           title: f,
+          headerAttributes: {
+            title:
+              differentialResultsColumnTooltips?.[differentialModel]?.[
+                differentialTest
+              ]?.[f] || null,
+          },
+          exportTitle: f,
           field: f,
           filterable: { type: 'multiFilter' },
           template: (value, item, addParams) => {
@@ -1619,6 +1639,12 @@ class Differential extends Component {
       (c) => {
         return {
           title: c,
+          headerAttributes: {
+            title:
+              differentialResultsColumnTooltips?.[differentialModel]?.[
+                differentialTest
+              ]?.[c] || null,
+          },
           field: c,
           type: 'number',
           filterable: { type: 'numericFilter' },
@@ -1652,7 +1678,7 @@ class Differential extends Component {
           field: 'select',
           hideOnExport: true,
           sortDisabled: true,
-          sortAccessor: (item, field) => console.log(item, field),
+          // sortAccessor: (item, field) => console.log(item, field),
           // self.state.differentialHighlightedFeatures.contains(item),
           template: (value, item, addParams) => {
             return (
@@ -1744,7 +1770,8 @@ class Differential extends Component {
     const multiModelMappingObjectCopy = [...multiModelMappingObject];
     const multiModelMappingArrays = multiModelMappingObjectCopy.filter((mm) => {
       return Object.values(mm).every(
-        (x) => x !== 'NA' && x !== '' && x != null,
+        (x) =>
+          x !== 'NA' && x !== '' && x != null && x !== 'Inf' && x !== '-Inf',
       );
     });
     let multiModelMappingObjectArr = [];
@@ -1789,6 +1816,18 @@ class Differential extends Component {
     //     `no multi-model mapping object available for study ${differentialStudy}`,
     //   );
     // });
+  };
+
+  setDifferentialResultsColumnTooltips = (response) => {
+    this.setState({
+      differentialResultsColumnTooltips: response,
+    });
+  };
+
+  setDifferentialPlotDescriptions = (response) => {
+    this.setState({
+      differentialPlotDescriptions: response,
+    });
   };
 
   render() {
@@ -1931,6 +1970,12 @@ class Differential extends Component {
               }
               onResetOverlay={this.resetOverlay}
               onGetMultiModelMappingObject={this.getMultiModelMappingObject}
+              onSetDifferentialResultsColumnTooltips={
+                this.setDifferentialResultsColumnTooltips
+              }
+              onSetDifferentialPlotDescriptions={
+                this.setDifferentialPlotDescriptions
+              }
             />
           </Grid.Column>
           <Grid.Column

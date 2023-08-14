@@ -12,7 +12,8 @@ import {
 } from 'semantic-ui-react';
 import ndjsonStream from 'can-ndjson-stream';
 import { CancelToken } from 'axios';
-import { getDynamicSize, getWindowWidth, getYAxis } from '../Shared/helpers';
+import _ from 'lodash-es';
+import { getDynamicSize, getYAxis } from '../Shared/helpers';
 import '../Shared/Search.scss';
 import { omicNavigatorService } from '../../services/omicNavigator.service';
 import DifferentialMultisetFilters from './DifferentialMultisetFilters';
@@ -20,6 +21,8 @@ import DifferentialMultisetFilters from './DifferentialMultisetFilters';
 let cancelRequestGetReportLinkDifferential = () => {};
 let cancelRequestGetResultsIntersection = () => {};
 let cancelRequestGetResultsMultiset = () => {};
+let cancelGetDifferentialResultsColumnTooltips = () => {};
+let cancelGetDifferentialPlotDescriptions = () => {};
 const cacheResultsTable = {};
 async function* streamAsyncIterable(reader) {
   while (true) {
@@ -104,12 +107,19 @@ class DifferentialSearch extends Component {
     activateMultisetFiltersP: false,
     uDataP: [],
     isFilteredSearch: false,
+    isSmallScreen: true,
   };
 
   componentDidMount() {
     this.setState({
       differentialStudiesDisabled: false,
+      isSmallScreen: window.innerWidth < 1725,
     });
+    const setScreen = _.debounce(
+      () => this.setState({ isSmallScreen: window.innerWidth < 1725 }),
+      300,
+    );
+    window.addEventListener('resize', setScreen, false);
   }
 
   componentDidUpdate(prevProps) {
@@ -144,6 +154,10 @@ class DifferentialSearch extends Component {
         maxElementsP: differentialResultsUnfiltered?.length || null,
       });
     }
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize');
   }
 
   populateDropdowns = () => {
@@ -200,6 +214,8 @@ class DifferentialSearch extends Component {
         differentialModelsDisabled: false,
         differentialModels: differentialModelsMapped,
       });
+      this.getResultsColumnTooltips(differentialStudy);
+      this.getDifferentialPlotDescriptions(differentialStudy);
       if (differentialModel === '') {
         this.getReportLink(differentialStudy, 'default');
       } else {
@@ -290,6 +306,54 @@ class DifferentialSearch extends Component {
         }
       }
     }
+  };
+
+  getResultsColumnTooltips = (study) => {
+    const { onSetDifferentialResultsColumnTooltips } = this.props;
+    cancelGetDifferentialResultsColumnTooltips();
+    let cancelToken = new CancelToken((e) => {
+      cancelGetDifferentialResultsColumnTooltips = e;
+    });
+    omicNavigatorService
+      .getResultsColumnTooltips(study)
+      .then((getResultsColumnTooltipsResponse) => {
+        if (getResultsColumnTooltipsResponse) {
+          onSetDifferentialResultsColumnTooltips(
+            getResultsColumnTooltipsResponse,
+          );
+        } else {
+          onSetDifferentialResultsColumnTooltips([]);
+        }
+      })
+      .catch((error) => {
+        console.error(
+          'Error during getDifferentialResultsColumnTooltipsResponse',
+          error,
+        );
+      });
+  };
+
+  getDifferentialPlotDescriptions = (study) => {
+    const { onSetDifferentialPlotDescriptions } = this.props;
+    cancelGetDifferentialPlotDescriptions();
+    let cancelToken = new CancelToken((e) => {
+      cancelGetDifferentialPlotDescriptions = e;
+    });
+    omicNavigatorService
+      .getPlotDescriptions(study)
+      .then((getPlotDescriptionsResponse) => {
+        if (getPlotDescriptionsResponse) {
+          onSetDifferentialPlotDescriptions(getPlotDescriptionsResponse);
+        } else {
+          onSetDifferentialPlotDescriptions([]);
+        }
+      })
+      .catch((error) => {
+        console.error(
+          'Error during getDifferentialPlotDescriptionsResponse',
+          error,
+        );
+      });
   };
 
   handleStudyChange = (evt, { name, value }) => {
@@ -886,6 +950,7 @@ class DifferentialSearch extends Component {
       multisetFiltersVisibleDifferential,
       differentialStudyReportTooltip,
       isFilteredSearch,
+      isSmallScreen,
     } = this.state;
 
     const {
@@ -916,23 +981,33 @@ class DifferentialSearch extends Component {
           <a
             target="_blank"
             rel="noopener noreferrer"
-            href={differentialStudyHrefVisible ? differentialStudyHref : '/'}
+            href={differentialStudyHrefVisible ? differentialStudyHref : null}
           >
-            <Icon
-              name="line graph"
-              size="large"
-              className="StudyHtmlIcon"
-              inverted
-              circular
-              disabled={!differentialStudyHrefVisible}
-            />
+            <Transition
+              visible={!differentialStudyHrefVisible}
+              animation={differentialStudyHrefVisible ? 'flash' : null}
+              duration={1000}
+            >
+              <Icon
+                name="info"
+                size="large"
+                className={
+                  differentialStudyHrefVisible
+                    ? 'StudyHtmlIcon'
+                    : 'StudyHtmlIcon DisabledLink'
+                }
+                color={!differentialStudyHrefVisible ? 'grey' : null}
+                inverted
+                circular
+              />
+            </Transition>
           </a>
         }
         style={StudyPopupStyle}
         className="CustomTooltip"
         inverted
         basic
-        position="bottom center"
+        position="top center"
         content={
           differentialStudyHrefVisible
             ? studyName
@@ -1007,12 +1082,8 @@ class DifferentialSearch extends Component {
     let MultisetRadio;
 
     if (isValidSearchDifferential) {
-      const WindowWidth = getWindowWidth();
-      const QuarterWindowWidth = getWindowWidth() / 4;
-      const PlotLabel =
-        QuarterWindowWidth > 350 || WindowWidth < 1200 ? 'View Plot' : 'Plot';
       PlotRadio = (
-        <Fragment>
+        <div className={multisetFiltersVisibleDifferential ? 'Show' : 'Hide'}>
           <Transition
             visible={!plotMultisetLoadedDifferential}
             animation="flash"
@@ -1020,7 +1091,7 @@ class DifferentialSearch extends Component {
           >
             <Radio
               toggle
-              label={PlotLabel}
+              label="View Set Intersections"
               className={plotMultisetLoadedDifferential ? 'ViewPlotRadio' : ''}
               checked={multisetButttonActiveDifferential}
               onChange={onHandlePlotAnimationDifferential('uncover')}
@@ -1030,7 +1101,7 @@ class DifferentialSearch extends Component {
           <Popup
             trigger={
               <Icon
-                size="small"
+                // size="small"
                 name="info circle"
                 className="ViewPlotInfo"
                 color="grey"
@@ -1056,7 +1127,7 @@ class DifferentialSearch extends Component {
               selection.
             </Popup.Content>
           </Popup>
-        </Fragment>
+        </div>
       );
 
       MultisetRadio = (
@@ -1091,7 +1162,6 @@ class DifferentialSearch extends Component {
         </React.Fragment>
       );
     }
-
     return (
       <React.Fragment>
         <Form className="SearchContainer">
@@ -1187,7 +1257,9 @@ class DifferentialSearch extends Component {
         <div className="MultisetContainer">
           <div className="SliderDiv">
             <span className="MultisetRadio">{MultisetRadio}</span>
-            <span className="PlotRadio">{PlotRadio}</span>
+            <span className={isSmallScreen ? 'Block' : 'FloatRight'}>
+              {PlotRadio}
+            </span>
           </div>
           <div className="MultisetFilterButtonDiv">
             {MultisetFilterButtonDifferential}

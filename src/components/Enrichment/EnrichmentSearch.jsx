@@ -9,17 +9,20 @@ import {
   Transition,
   Button,
 } from 'semantic-ui-react';
+import _ from 'lodash-es';
 import ndjsonStream from 'can-ndjson-stream';
 import { CancelToken } from 'axios';
 import '../Shared/Search.scss';
 import { omicNavigatorService } from '../../services/omicNavigator.service';
 import EnrichmentMultisetFilters from './EnrichmentMultisetFilters';
-import { getDynamicSize, getWindowWidth } from '../Shared/helpers';
+import { getDynamicSize } from '../Shared/helpers';
 
 let cancelRequestGetReportLinkEnrichment = () => {};
 // let cancelGetEnrichmentsTable = () => {};
 let cancelRequestGetEnrichmentsIntersection = () => {};
 let cancelRequestGetEnrichmentsMultiset = () => {};
+let cancelGetEnrichmentResultsColumnTooltips = () => {};
+let cancelGetEnrichmentPlotDescriptions = () => {};
 const cacheEnrichmentsTable = {};
 async function* streamAsyncIterable(reader) {
   while (true) {
@@ -40,7 +43,7 @@ class EnrichmentSearch extends Component {
       'Select a study and model to view Analysis Details',
     enrichmentModels: [],
     enrichmentAnnotations: [],
-    enrichmentStudyTooltip: 'Select a study',
+    enrichmentStudyReportTooltip: 'Select a study',
     enrichmentModelTooltip: '',
     enrichmentAnnotationTooltip: '',
     enrichmentStudiesDisabled: true,
@@ -110,12 +113,19 @@ class EnrichmentSearch extends Component {
     reloadTests: false,
     isFilteredEnrichment: false,
     multisetFiltersVisibleEnrichment: false,
+    isSmallScreen: true,
   };
 
   componentDidMount() {
     this.setState({
       enrichmentStudiesDisabled: false,
+      isSmallScreen: window.innerWidth < 1725,
     });
+    const setScreen = _.debounce(
+      () => this.setState({ isSmallScreen: window.innerWidth < 1725 }),
+      300,
+    );
+    window.addEventListener('resize', setScreen, false);
   }
 
   componentDidUpdate(prevProps) {
@@ -133,6 +143,10 @@ class EnrichmentSearch extends Component {
         numElements: enrichmentResults?.length || null,
       });
     }
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize');
   }
 
   populateDropdowns = () => {
@@ -185,13 +199,15 @@ class EnrichmentSearch extends Component {
           };
         },
       );
-      const enrichmentStudyTooltip =
+      const enrichmentStudyReportTooltip =
         enrichmentStudyData?.package?.description || '';
       this.setState({
-        enrichmentStudyTooltip: enrichmentStudyTooltip,
+        enrichmentStudyReportTooltip: enrichmentStudyReportTooltip,
         enrichmentModelsDisabled: false,
         enrichmentModels: enrichmentModelsMapped,
       });
+      this.getResultsColumnTooltips(enrichmentStudy);
+      this.getEnrichmentPlotDescriptions(enrichmentStudy);
       if (enrichmentModel === '') {
         this.getReportLink(enrichmentStudy, 'default');
       } else {
@@ -280,6 +296,54 @@ class EnrichmentSearch extends Component {
         }
       }
     }
+  };
+
+  getResultsColumnTooltips = (study) => {
+    const { onSetEnrichmentResultsColumnTooltips } = this.props;
+    cancelGetEnrichmentResultsColumnTooltips();
+    let cancelToken = new CancelToken((e) => {
+      cancelGetEnrichmentResultsColumnTooltips = e;
+    });
+    omicNavigatorService
+      .getResultsColumnTooltips(study)
+      .then((getResultsColumnTooltipsResponse) => {
+        if (getResultsColumnTooltipsResponse) {
+          onSetEnrichmentResultsColumnTooltips(
+            getResultsColumnTooltipsResponse,
+          );
+        } else {
+          onSetEnrichmentResultsColumnTooltips([]);
+        }
+      })
+      .catch((error) => {
+        console.error(
+          'Error during getEnrichmentResultsColumnTooltipsResponse',
+          error,
+        );
+      });
+  };
+
+  getEnrichmentPlotDescriptions = (study) => {
+    const { onSetEnrichmentPlotDescriptions } = this.props;
+    cancelGetEnrichmentPlotDescriptions();
+    let cancelToken = new CancelToken((e) => {
+      cancelGetEnrichmentPlotDescriptions = e;
+    });
+    omicNavigatorService
+      .getPlotDescriptions(study)
+      .then((getPlotDescriptionsResponse) => {
+        if (getPlotDescriptionsResponse) {
+          onSetEnrichmentPlotDescriptions(getPlotDescriptionsResponse);
+        } else {
+          onSetEnrichmentPlotDescriptions([]);
+        }
+      })
+      .catch((error) => {
+        console.error(
+          'Error during getEnrichmentPlotDescriptionsResponse',
+          error,
+        );
+      });
   };
 
   handleStudyChange = (evt, { name, value }) => {
@@ -958,7 +1022,7 @@ class EnrichmentSearch extends Component {
       enrichmentStudyHrefVisible,
       enrichmentModels,
       enrichmentAnnotations,
-      enrichmentStudyTooltip,
+      enrichmentStudyReportTooltip,
       enrichmentModelTooltip,
       enrichmentAnnotationTooltip,
       enrichmentStudiesDisabled,
@@ -966,6 +1030,7 @@ class EnrichmentSearch extends Component {
       enrichmentAnnotationsDisabled,
       // activateMultisetFilters,
       multisetFiltersVisibleEnrichment,
+      isSmallScreen,
     } = this.state;
 
     const {
@@ -988,51 +1053,48 @@ class EnrichmentSearch extends Component {
       fontSize: '13px',
     };
 
-    let studyIcon;
     let studyName = `${enrichmentStudy} Analysis Details`;
     const dynamicSize = getDynamicSize();
-
-    if (enrichmentStudyHrefVisible) {
-      studyIcon = (
-        <Popup
-          trigger={
-            <a
-              target="_blank"
-              rel="noopener noreferrer"
-              href={enrichmentStudyHref}
+    let studyIcon = (
+      <Popup
+        trigger={
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href={enrichmentStudyHrefVisible ? enrichmentStudyHref : null}
+          >
+            <Transition
+              visible={!enrichmentStudyHrefVisible}
+              animation={enrichmentStudyHrefVisible ? 'flash' : null}
+              duration={1000}
             >
               <Icon
-                name="line graph"
+                name="info"
                 size="large"
-                className="StudyHtmlIcon"
+                className={
+                  enrichmentStudyHrefVisible
+                    ? 'StudyHtmlIcon'
+                    : 'StudyHtmlIcon DisabledLink'
+                }
+                color={!enrichmentStudyHrefVisible ? 'grey' : null}
                 inverted
                 circular
               />
-            </a>
-          }
-          style={StudyPopupStyle}
-          inverted
-          basic
-          position="bottom center"
-          content={studyName}
-        />
-      );
-    } else {
-      studyIcon = (
-        <Popup
-          trigger={
-            <a target="_blank" rel="noopener noreferrer" href={'/'}>
-              <Icon name="line graph" size="large" circular inverted disabled />
-            </a>
-          }
-          style={StudyPopupStyle}
-          basic
-          inverted
-          position="bottom center"
-          content={this.state.enrichmentStudyReportTooltip}
-        />
-      );
-    }
+            </Transition>
+          </a>
+        }
+        style={StudyPopupStyle}
+        className="CustomTooltip"
+        inverted
+        basic
+        position="bottom center"
+        content={
+          enrichmentStudyHrefVisible ? studyName : enrichmentStudyReportTooltip
+        }
+        mouseEnterDelay={0}
+        mouseLeaveDelay={0}
+      />
+    );
 
     let MultisetFiltersEnrichment;
     let MultisetFilterButtonEnrichment;
@@ -1087,12 +1149,8 @@ class EnrichmentSearch extends Component {
     let MultisetRadio;
 
     if (isValidSearchEnrichment) {
-      const WindowWidth = getWindowWidth();
-      const QuarterWindowWidth = getWindowWidth() / 4;
-      const PlotLabel =
-        QuarterWindowWidth > 350 || WindowWidth < 1200 ? 'View Plot' : 'Plot';
       PlotRadio = (
-        <Fragment>
+        <div className={multisetFiltersVisibleEnrichment ? 'Show' : 'Hide'}>
           <Transition
             visible={!multisetPlotAvailableEnrichment}
             animation="flash"
@@ -1100,7 +1158,7 @@ class EnrichmentSearch extends Component {
           >
             <Radio
               toggle
-              label={PlotLabel}
+              label="View Set Intersections"
               className={multisetPlotAvailableEnrichment ? 'ViewPlotRadio' : ''}
               checked={plotButtonActiveEnrichment}
               onChange={this.props.onHandlePlotAnimationEnrichment('uncover')}
@@ -1110,7 +1168,7 @@ class EnrichmentSearch extends Component {
           <Popup
             trigger={
               <Icon
-                size="small"
+                // size="small"
                 name="info circle"
                 className="ViewPlotInfo"
                 color="grey"
@@ -1118,7 +1176,7 @@ class EnrichmentSearch extends Component {
             }
             style={StudyPopupStyle}
             className="CustomTooltip"
-            position="bottom center"
+            position="top center"
             inverted
             basic
             on="click"
@@ -1136,7 +1194,7 @@ class EnrichmentSearch extends Component {
               selection.
             </Popup.Content>
           </Popup>
-        </Fragment>
+        </div>
       );
 
       MultisetRadio = (
@@ -1171,7 +1229,6 @@ class EnrichmentSearch extends Component {
         </React.Fragment>
       );
     }
-
     return (
       <React.Fragment>
         <Form className="SearchContainer">
@@ -1200,7 +1257,7 @@ class EnrichmentSearch extends Component {
             className="CustomTooltip"
             inverted
             position="bottom right"
-            content={enrichmentStudyTooltip}
+            content={enrichmentStudyReportTooltip}
             mouseEnterDelay={1000}
             mouseLeaveDelay={0}
           />
@@ -1307,7 +1364,9 @@ class EnrichmentSearch extends Component {
         >
           <div className="SliderDiv">
             <span className="MultisetRadio">{MultisetRadio}</span>
-            <span className="PlotRadio">{PlotRadio}</span>
+            <span className={isSmallScreen ? 'Block' : 'FloatRight'}>
+              {PlotRadio}
+            </span>
           </div>
           <div className="MultisetFilterButtonDiv">
             {MultisetFilterButtonEnrichment}

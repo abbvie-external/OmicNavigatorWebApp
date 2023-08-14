@@ -13,7 +13,7 @@ import { omicNavigatorService } from '../../services/omicNavigator.service';
 import ButtonActions from '../Shared/ButtonActions';
 import * as d3 from 'd3';
 import {
-  isNotNANullUndefinedEmptyString,
+  isNotNANullUndefinedEmptyStringInf,
   formatNumberForDisplay,
   splitValue,
   Linkout,
@@ -197,6 +197,8 @@ class Enrichment extends Component {
     isDataStreamingEnrichmentsTable: false,
     enrichmentTest: '',
     enrichmentModelIds: [],
+    enrichmentResultsColumnTooltips: [],
+    enrichmentPlotDescriptions: [],
   };
   EnrichmentViewContainerRef = React.createRef();
   EnrichmentGridRef = React.createRef();
@@ -876,7 +878,7 @@ class Enrichment extends Component {
         // loop through data, one property at a time
         const notNullObject = dataCopy.find((row) => {
           // find the first value for that property
-          return isNotNANullUndefinedEmptyString(row[property]);
+          return isNotNANullUndefinedEmptyStringInf(row[property]);
         });
         let notNullValue = null;
         if (notNullObject) {
@@ -2383,6 +2385,18 @@ class Enrichment extends Component {
     });
   };
 
+  setEnrichmentResultsColumnTooltips = (response) => {
+    this.setState({
+      enrichmentResultsColumnTooltips: response,
+    });
+  };
+
+  setEnrichmentPlotDescriptions = (response) => {
+    this.setState({
+      enrichmentPlotDescriptions: response,
+    });
+  };
+
   render() {
     const enrichmentView = this.getView();
     const {
@@ -2520,6 +2534,12 @@ class Enrichment extends Component {
                 this.handleEnrichmentColumnsConfigured
               }
               onSetEnrichmentModelIds={this.setEnrichmentModelIds}
+              onSetEnrichmentResultsColumnTooltips={
+                this.setEnrichmentResultsColumnTooltips
+              }
+              onSetEnrichmentPlotDescriptions={
+                this.setEnrichmentPlotDescriptions
+              }
             />
           </Grid.Column>
           <Grid.Column
