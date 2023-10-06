@@ -413,7 +413,7 @@ class DifferentialDetail extends Component {
             self.props.onResetDifferentialOutlinedFeature();
             self.pageToFeature();
           }
-          if (!doubleClickEvent && plotMultiFeatureAvailable) {
+          if (!doubleClickEvent) {
             // IF MULTI-FEATURE PLOTTING AVAILABLE AND THERE IS DATA
             const highlightedFeaturesLength =
               differentialHighlightedFeatures.length;
@@ -511,7 +511,6 @@ class DifferentialDetail extends Component {
       this.pageToFeature(event[differentialFeatureIdKey]);
       this.props.onGetPlot('SingleFeature', feature, false, false);
     } else {
-      if (!this.props.plotMultiFeatureAvailable) return;
       let elementArray = items.map((item) => ({
         id: item,
         value: item,
@@ -540,6 +539,7 @@ class DifferentialDetail extends Component {
   };
 
   reloadMultifeaturePlot = _.debounce((selected, boxSelection) => {
+    if (!this.props.plotMultiFeatureAvailable) return;
     const data = boxSelection
       ? selected
       : this.volcanoPlotFilteredGridRef?.current?.qhGridRef?.current?.getSortedData() ||
@@ -597,7 +597,6 @@ class DifferentialDetail extends Component {
       differentialHighlightedFeaturesData,
       differentialResults,
     } = this.props;
-    const { plotMultiFeatureAvailable } = this.props;
     event.persist();
     event.stopPropagation();
     this.setState({
@@ -628,7 +627,6 @@ class DifferentialDetail extends Component {
       }
       if (event.shiftKey) {
         // SHIFT CLICK - ADD MULTIPLE FEATURES
-        if (!plotMultiFeatureAvailable) return;
         const currentTableData =
           this.volcanoPlotFilteredGridRef?.current?.qhGridRef.current?.getSortedData() ||
           [];
@@ -672,7 +670,6 @@ class DifferentialDetail extends Component {
         event?.target?.innerHTML.includes('DifferentialResultsRowCheckboxDiv')
       ) {
         // CONTROL CLICK OR CLICK IN CHECKBOX CELL CLICK - ADD/REMOVE ONE FEATURE
-        if (!plotMultiFeatureAvailable) return;
         // control-click or click specifically on checkbox
         const currentTableData =
           this.volcanoPlotFilteredGridRef?.current?.qhGridRef.current?.getSortedData() ||
@@ -908,44 +905,42 @@ class DifferentialDetail extends Component {
             this.props.onResetDifferentialOutlinedFeature();
             this.pageToFeature();
           }
-          if (this.props.plotMultiFeatureAvailable) {
-            // IF MULTI-FEATURE PLOTTING AVAILABLE AND THERE IS DATA
-            let multiselectedFeaturesArrRemaining = [
-              ...sortedFilteredData,
-            ].filter((item) =>
-              self.props.differentialHighlightedFeatures.includes(
-                item[self.props.differentialFeatureIdKey],
-              ),
-            );
-            if (
-              self.props.differentialHighlightedFeatures.length !==
-              multiselectedFeaturesArrRemaining.length
-            ) {
-              // IF CHECKED FEATURES LENGTH IS DIFFERENT THAN EXISTING
-              if (multiselectedFeaturesArrRemaining.length) {
-                // IF CHECKED FEATURES REMAIN, GET NEW SVG
-                let multiselectedFeaturesArrMappedRemaining = [
-                  ...multiselectedFeaturesArrRemaining,
-                ].map((item) => ({
-                  id: item[self.props.differentialFeatureIdKey],
-                  value: item[self.props.differentialFeatureIdKey],
-                  key: item[self.props.differentialFeatureIdKey],
-                }));
-                this.props.onHandleHighlightedFeaturesDifferential(
-                  multiselectedFeaturesArrMappedRemaining,
-                  true,
-                );
-                let multiselectedFeatureIdsMappedRemaining = [
-                  ...multiselectedFeaturesArrRemaining,
-                ].map((item) => item[self.props.differentialFeatureIdKey]);
-                this.reloadMultifeaturePlot(
-                  multiselectedFeatureIdsMappedRemaining,
-                  true,
-                );
-              } else {
-                // no highlighted after table filter
-                this.props.onHandleHighlightedFeaturesDifferential([]);
-              }
+          // IF MULTI-FEATURE PLOTTING AVAILABLE AND THERE IS DATA
+          let multiselectedFeaturesArrRemaining = [
+            ...sortedFilteredData,
+          ].filter((item) =>
+            self.props.differentialHighlightedFeatures.includes(
+              item[self.props.differentialFeatureIdKey],
+            ),
+          );
+          if (
+            self.props.differentialHighlightedFeatures.length !==
+            multiselectedFeaturesArrRemaining.length
+          ) {
+            // IF CHECKED FEATURES LENGTH IS DIFFERENT THAN EXISTING
+            if (multiselectedFeaturesArrRemaining.length) {
+              // IF CHECKED FEATURES REMAIN, GET NEW SVG
+              let multiselectedFeaturesArrMappedRemaining = [
+                ...multiselectedFeaturesArrRemaining,
+              ].map((item) => ({
+                id: item[self.props.differentialFeatureIdKey],
+                value: item[self.props.differentialFeatureIdKey],
+                key: item[self.props.differentialFeatureIdKey],
+              }));
+              this.props.onHandleHighlightedFeaturesDifferential(
+                multiselectedFeaturesArrMappedRemaining,
+                true,
+              );
+              let multiselectedFeatureIdsMappedRemaining = [
+                ...multiselectedFeaturesArrRemaining,
+              ].map((item) => item[self.props.differentialFeatureIdKey]);
+              this.reloadMultifeaturePlot(
+                multiselectedFeatureIdsMappedRemaining,
+                true,
+              );
+            } else {
+              // no highlighted after table filter
+              this.props.onHandleHighlightedFeaturesDifferential([]);
             }
           }
         } else {
@@ -986,6 +981,7 @@ class DifferentialDetail extends Component {
   };
 
   getMultifeaturePlotTransitionAlt = () => {
+    if (!this.props.plotMultiFeatureAvailable) return;
     const tableData =
       this.volcanoPlotFilteredGridRef?.current?.qhGridRef?.current?.getSortedData() ||
       this.props.differentialResults;
@@ -1389,7 +1385,6 @@ class DifferentialDetail extends Component {
       plotSingleFeatureData,
       plotSingleFeatureDataLength,
       plotSingleFeatureDataLoaded,
-      plotMultiFeatureAvailable,
       plotMultiFeatureData,
       plotMultiFeatureDataLength,
       plotMultiFeatureDataLoaded,
@@ -2082,32 +2077,24 @@ class DifferentialDetail extends Component {
                         </div>
                         <Grid.Column
                           className="ResultsTableWrapper"
-                          id={
-                            plotMultiFeatureAvailable
-                              ? 'DifferentialResultsTableWrapperCheckboxes'
-                              : 'DifferentialResultsTableWrapper'
-                          }
+                          id="DifferentialResultsTableWrapperCheckboxes"
                           mobile={16}
                           tablet={16}
                           largeScreen={16}
                           widescreen={16}
                         >
-                          {plotMultiFeatureAvailable ? (
-                            <>
-                              <Popup
-                                trigger={
-                                  <Icon
-                                    name="info"
-                                    id="ToggleAllCheckboxInfo"
-                                  />
-                                }
-                                style={selectAllPopupStyle}
-                                // content="Row is light orange when the feature is selected"
-                                content={SelectAllPopupContent}
-                                inverted
-                                basic
-                              />
-                              {/* <Icon
+                          <>
+                            <Popup
+                              trigger={
+                                <Icon name="info" id="ToggleAllCheckboxInfo" />
+                              }
+                              style={selectAllPopupStyle}
+                              // content="Row is light orange when the feature is selected"
+                              content={SelectAllPopupContent}
+                              inverted
+                              basic
+                            />
+                            {/* <Icon
                                 name={
                                   allChecked ? 'check square' : 'square outline'
                                 }
@@ -2116,8 +2103,7 @@ class DifferentialDetail extends Component {
                                 className={allChecked ? 'PrimaryColor' : ''}
                                 onClick={this.toggleAllCheckboxes}
                               /> */}
-                            </>
-                          ) : null}
+                          </>
                           {table}
                         </Grid.Column>
                       </Grid.Row>

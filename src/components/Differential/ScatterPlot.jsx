@@ -1583,8 +1583,7 @@ class ScatterPlot extends Component {
   }
 
   mapBoxSelectionToHighlight(total) {
-    const { plotMultiFeatureAvailable, differentialFeatureIdKey } = this.props;
-    if (!plotMultiFeatureAvailable) return null;
+    const { differentialFeatureIdKey } = this.props;
     const scatterArr = total.map((item) => ({
       id: item[differentialFeatureIdKey],
       value: item[differentialFeatureIdKey],
