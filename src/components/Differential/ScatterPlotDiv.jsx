@@ -570,18 +570,16 @@ class ScatterPlotDiv extends Component {
                       </List.Description>
                     </List.Content>
                   </List.Item>
-                  {plotMultiFeatureAvailable ? (
-                    <List.Item>
-                      <Icon name="circle" id="SelectedCircleIcon" />
-                      <List.Content>
-                        <List.Header>Plot Multiple Features</List.Header>
-                        <List.Description>
-                          Control-click circle/s, or hold Shift while
-                          box-selecting (orange fill)
-                        </List.Description>
-                      </List.Content>
-                    </List.Item>
-                  ) : null}
+                  <List.Item>
+                    <Icon name="circle" id="SelectedCircleIcon" />
+                    <List.Content>
+                      <List.Header>Select Multiple Features</List.Header>
+                      <List.Description>
+                        Control-click circle/s, or hold Shift while
+                        box-selecting (orange fill)
+                      </List.Description>
+                    </List.Content>
+                  </List.Item>
                 </List>
               </Popup.Content>
             </Popup>

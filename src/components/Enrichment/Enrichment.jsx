@@ -561,7 +561,7 @@ class Enrichment extends Component {
             return valid;
           },
         );
-        let plotMultiFeatureAvailableVar = false;
+        // let plotMultiFeatureAvailableVar = false;
         // let singleFeaturePlotTypesVar = [];
         let multiFeaturePlotTypesVar = [];
         if (enrichmentPlotTypesVar) {
@@ -571,13 +571,13 @@ class Enrichment extends Component {
           multiFeaturePlotTypesVar = [...enrichmentPlotTypesVar].filter((p) =>
             p.plotType.includes('multiFeature'),
           );
-          plotMultiFeatureAvailableVar = multiFeaturePlotTypesVar?.length
-            ? true
-            : false;
+          // plotMultiFeatureAvailableVar = multiFeaturePlotTypesVar?.length
+          //   ? true
+          //   : false;
         }
         this.setState({
           enrichmentPlotTypes: enrichmentPlotTypesVar,
-          plotMultiFeatureAvailable: plotMultiFeatureAvailableVar,
+          // plotMultiFeatureAvailable: plotMultiFeatureAvailableVar,
         });
       }
     }

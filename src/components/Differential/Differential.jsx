@@ -549,6 +549,7 @@ class Differential extends Component {
       ? id
       : dataItem[differentialFeatureIdKey];
     const self = this;
+    debugger;
     this.setState(
       {
         plotOverlayData: plotOverlayData,
@@ -711,7 +712,7 @@ class Differential extends Component {
                 )
                 .then((svg) => {
                   let xml = svg?.data || null;
-                  if (xml != null && xml !== []) {
+                  if (xml != null && xml.length > 0) {
                     xml = xml.replace(/id="/g, 'id="' + id + '-' + i + '-');
                     xml = xml.replace(/#glyph/g, '#' + id + '-' + i + '-glyph');
                     xml = xml.replace(/#clip/g, '#' + id + '-' + i + '-clip');
@@ -1069,7 +1070,7 @@ class Differential extends Component {
                     //   self.getMultifeaturePlotTransition(featureids, true, i);
                     // } else {
                     let xml = svg?.data || null;
-                    if (xml != null && xml !== []) {
+                    if (xml != null && xml.length > 0) {
                       xml = xml.replace(/id="/g, 'id="' + i + '-');
                       xml = xml.replace(/#glyph/g, '#' + i + '-glyph');
                       xml = xml.replace(/#clip/g, '#' + i + '-clip');
@@ -1330,8 +1331,7 @@ class Differential extends Component {
           let differentialHighlightedFeaturesVar = [];
           if (
             HighlightedFeaturesCopy.length > 0 &&
-            HighlightedFeaturesCopy != null &&
-            HighlightedFeaturesCopy !== {}
+            HighlightedFeaturesCopy != null
           ) {
             HighlightedFeaturesCopy.forEach((element) => {
               differentialHighlightedFeaturesVar.push(element.key);
@@ -1349,8 +1349,7 @@ class Differential extends Component {
         let differentialHighlightedFeaturesVar = [];
         if (
           HighlightedFeaturesCopy.length > 0 &&
-          HighlightedFeaturesCopy != null &&
-          HighlightedFeaturesCopy !== {}
+          HighlightedFeaturesCopy != null
         ) {
           HighlightedFeaturesCopy.forEach((element) => {
             differentialHighlightedFeaturesVar.push(element.key);
@@ -1671,29 +1670,27 @@ class Differential extends Component {
       },
     );
     let checkboxCol = [];
-    if (this.state.plotMultiFeatureAvailable) {
-      checkboxCol = [
-        {
-          title: '',
-          field: 'select',
-          hideOnExport: true,
-          sortDisabled: true,
-          // sortAccessor: (item, field) => console.log(item, field),
-          // self.state.differentialHighlightedFeatures.contains(item),
-          template: (value, item, addParams) => {
-            return (
-              <div className="DifferentialResultsRowCheckboxDiv">
-                <Icon
-                  name="square outline"
-                  size="large"
-                  className="DifferentialResultsRowCheckbox"
-                />
-              </div>
-            );
-          },
+    checkboxCol = [
+      {
+        title: '',
+        field: 'select',
+        hideOnExport: true,
+        sortDisabled: true,
+        // sortAccessor: (item, field) => console.log(item, field),
+        // self.state.differentialHighlightedFeatures.contains(item),
+        template: (value, item, addParams) => {
+          return (
+            <div className="DifferentialResultsRowCheckboxDiv">
+              <Icon
+                name="square outline"
+                size="large"
+                className="DifferentialResultsRowCheckbox"
+              />
+            </div>
+          );
         },
-      ];
-    }
+      },
+    ];
 
     const checkboxAndAlphanumericCols = checkboxCol.concat(
       differentialAlphanumericColumnsMapped,
