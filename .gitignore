@@ -18,5 +18,6 @@
 .env.test.local
 .env.production.local
 .env
+.tool-versions
 
 npm-debug.log*
