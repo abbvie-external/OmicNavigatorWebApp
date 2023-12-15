@@ -216,7 +216,6 @@ class Differential extends Component {
       this.setState({
         differentialColumns: columns,
       });
-      this.differentialColumnsConfigured = true;
     }
     this.setState({
       differentialResults: searchResults.differentialResults,
@@ -1470,6 +1469,7 @@ class Differential extends Component {
     if (firstFullObject) {
       let allProperties = Object.keys(firstFullObject);
       const dataCopy = [...differentialResultsVar];
+      let differentialColumnsConfiguredVar = false;
       allProperties.forEach((property) => {
         // loop through data, one property at a time
         const notNullObject = dataCopy.find((row) => {
@@ -1490,9 +1490,14 @@ class Differential extends Component {
             differentialNumericFields.push(property);
           }
         } else {
-          // otherwise push it to type numeric
+          // if this occurs, the first 30 records streamed
+          // did not have a value for all properties
+          // we push it to number just so we can show the table quickly
           differentialNumericFields.push(property);
+          // but set flag false so this func can be called again
+          differentialColumnsConfiguredVar = false;
         }
+        this.differentialColumnsConfigured = differentialColumnsConfiguredVar;
       });
     }
     const alphanumericTrigger = differentialAlphanumericFields[0];
