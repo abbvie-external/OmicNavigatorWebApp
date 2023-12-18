@@ -63,6 +63,7 @@ class Tabs extends Component {
       allStudiesMetadata: [],
       differentialFeatureIdKey: '',
       filteredDifferentialFeatureIdKey: '',
+      // when updating the app version, change one line in 3 files: package.json, manifest.json and Tabs.jsx
       appVersion: '1.8.8',
       packageVersion: '',
       infoOpenFirst: false,
