@@ -64,11 +64,13 @@ class Tabs extends Component {
       differentialFeatureIdKey: '',
       filteredDifferentialFeatureIdKey: '',
       // when updating the app version, change one line in 3 files: package.json, manifest.json and Tabs.jsx
-      appVersion: '1.8.8',
+      appVersion: '1.8.9',
       packageVersion: '',
       infoOpenFirst: false,
       infoOpenSecond: false,
+      screenWidth: window.innerWidth,
     };
+    this.handleResize = this.handleResize.bind(this);
   }
 
   componentDidMount() {
@@ -82,6 +84,19 @@ class Tabs extends Component {
       null,
     );
     this.getStudies();
+    window.addEventListener('resize', this.handleResize);
+  }
+
+  componentWillUnmount() {
+    // Remove the event listener when the component is unmounted
+    window.removeEventListener('resize', this.handleResize);
+  }
+
+  handleResize() {
+    // Update the state with the new screen width when the resize event occurs
+    this.setState({
+      screenWidth: window.innerWidth,
+    });
   }
 
   setTabIndex = (tabIndex) => {
@@ -341,6 +356,27 @@ class Tabs extends Component {
     );
   };
 
+  getSmallScreenMessage = () => {
+    const { screenWidth } = this.state;
+    return (
+      <span id="SmallScreenOverlay">
+        <span className="LogoElement">
+          <img
+            alt="OmicNavigator"
+            src={omicNavigatorIcon}
+            id="SmallScreenLogoImage"
+          />
+        </span>
+        <span id="SmallScreenHeaderFirst">Omic</span>
+        <span id="SmallScreenHeaderSecond">Navigator</span>
+        <span id="SmallScreenText">
+          For an optimal experience, Omic Navigator is best viewed on screens
+          1024+ pixels wide. Your screen is {screenWidth} pixels wide.
+        </span>
+      </span>
+    );
+  };
+
   resetApp = () => {
     this.setState(
       {
@@ -375,7 +411,7 @@ class Tabs extends Component {
   };
 
   render() {
-    const { activeIndex } = this.state;
+    const { activeIndex, screenWidth } = this.state;
     const panes = [
       {
         menuItem: (
@@ -431,8 +467,10 @@ class Tabs extends Component {
       },
     ];
     const InfoButton = this.getInfoButton();
+    const SmallScreenMessage = this.getSmallScreenMessage();
     return (
       <>
+        {screenWidth < 1024 ? SmallScreenMessage : null}
         <Tab
           onTabChange={this.handleTabChange}
           panes={panes}
