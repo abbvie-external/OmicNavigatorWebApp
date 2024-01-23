@@ -371,7 +371,7 @@ class Tabs extends Component {
         <span id="SmallScreenHeaderSecond">Navigator</span>
         <span id="SmallScreenText">
           For an optimal experience, Omic Navigator is best viewed on screens
-          wider than 1024+ pixels. Your screen is {screenWidth} pixels wide.
+          1024+ pixels wide. Your screen is {screenWidth} pixels wide.
         </span>
       </span>
     );
