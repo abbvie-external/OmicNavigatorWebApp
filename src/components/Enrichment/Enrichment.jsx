@@ -141,6 +141,7 @@ class Enrichment extends Component {
       highLabel: {},
       lowLabel: {},
       highStat: null,
+      lowStat: null,
       enableBrush: false,
     },
     violinSettings: {
@@ -1195,6 +1196,7 @@ class Enrichment extends Component {
         highLabel: barcodeData.labelHigh,
         lowLabel: barcodeData.labelLow,
         highStat: barcodeData.highest,
+        lowStat: barcodeData.lowest,
         enableBrush: true,
       },
     });
