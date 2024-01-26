@@ -421,7 +421,7 @@ class EnrichmentSearch extends Component {
       onHandleEnrichmentColumnsConfigured,
     } = this.props;
     onHandleEnrichmentColumnsConfigured(false);
-    this.props.onHandleHasBarcodeData();
+    this.props.onHandleHasBarcodeData(value);
     this.props.onHandlePlotTypesEnrichment(value);
     onSearchChangeEnrichment(
       {

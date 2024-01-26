@@ -507,7 +507,7 @@ class BarcodePlot extends Component {
 
     const xScale = d3
       .scaleLinear()
-      .domain([0, barcodeSettings.highStat])
+      .domain([barcodeSettings.lowStat, barcodeSettings.highStat])
       .range([5, barcodeWidth - 5]);
 
     const xAxisTicks = xScale.ticks().map((value) => ({

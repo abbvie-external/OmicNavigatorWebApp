@@ -141,6 +141,7 @@ class Enrichment extends Component {
       highLabel: {},
       lowLabel: {},
       highStat: null,
+      lowStat: null,
       enableBrush: false,
     },
     violinSettings: {
@@ -605,10 +606,11 @@ class Enrichment extends Component {
     }
   };
 
-  handleHasBarcodeData = () => {
+  handleHasBarcodeData = (modelArg) => {
     const { enrichmentStudy, enrichmentModel } = this.props;
+    const model = modelArg ? modelArg : enrichmentModel;
     omicNavigatorService
-      .getBarcodes(enrichmentStudy, enrichmentModel, null, null)
+      .getBarcodes(enrichmentStudy, model, null, null)
       .then((getBarcodesResponseData) => {
         this.setState({
           hasBarcodeData: getBarcodesResponseData.length === 0 ? false : true,
@@ -1195,6 +1197,7 @@ class Enrichment extends Component {
         highLabel: barcodeData.labelHigh,
         lowLabel: barcodeData.labelLow,
         highStat: barcodeData.highest,
+        lowStat: barcodeData.lowest,
         enableBrush: true,
       },
     });
