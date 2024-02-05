@@ -118,12 +118,12 @@ class OmicNavigatorService {
     return new Promise(function (resolve, reject) {
       window.ocpu
         .call(method, obj, function (session) {
-          const splitUrls = session?.output;
-          if (!session.output) resolve([]);
-          const graphics = splitUrls.filter((u) => u.includes('graphics'));
+          const sessionUrls = session.output || null;
+          if (!sessionUrls) resolve([]);
+          const graphicsUrl = sessionUrls.filter((u) => u.includes('graphics'));
           // graphics = ["/ocpu/tmp/x07486ce55d395d/graphics/1"]
-          if (!graphics.length) resolve([]);
-          const url = `${self.baseUrl}${graphics[0]}/svg`;
+          if (!graphicsUrl.length) resolve([]);
+          const url = `${self.baseUrl}${graphicsUrl[0]}/svg`;
           axios
             .get(url, {
               responseType: 'text',
