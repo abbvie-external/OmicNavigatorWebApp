@@ -114,11 +114,18 @@ class OmicNavigatorService {
   }
 
   async ocpuPlotCall(method, obj, handleError, cancelToken, timeout) {
+    const self = this;
     return new Promise(function (resolve, reject) {
       window.ocpu
         .call(method, obj, function (session) {
+          const splitUrls = session?.output;
+          if (!session.output) resolve([]);
+          const graphics = splitUrls.filter((u) => u.includes('graphics'));
+          // graphics = ["/ocpu/tmp/x07486ce55d395d/graphics/1"]
+          if (!graphics.length) resolve([]);
+          const url = `${self.baseUrl}${graphics[0]}/svg`;
           axios
-            .get(session.getLoc() + 'graphics/1/svg', {
+            .get(url, {
               responseType: 'text',
               cancelToken,
               timeout,

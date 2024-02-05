@@ -548,7 +548,6 @@ class Differential extends Component {
       ? id
       : dataItem[differentialFeatureIdKey];
     const self = this;
-    debugger;
     this.setState(
       {
         plotOverlayData: plotOverlayData,
