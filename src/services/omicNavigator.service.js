@@ -60,7 +60,6 @@ class OmicNavigatorService {
       });
       const splitUrls = data.split('/ocpu/');
       const graphics = splitUrls.filter((u) => u.includes('graphics'));
-      debugger;
       const graphicsUrl = `/ocpu/${graphics}`;
       const url = `${self.baseUrl}${graphicsUrl}/svg`;
       return url;
@@ -122,7 +121,6 @@ class OmicNavigatorService {
           const sessionUrls = session.output || null;
           if (!sessionUrls) resolve([]);
           const graphicsUrl = sessionUrls.filter((u) => u.includes('graphics'));
-          debugger;
           // graphics = ["/ocpu/tmp/tempid/graphics/1"]
           if (!graphicsUrl.length) resolve([]);
           const url = `${self.baseUrl}${graphicsUrl}/svg`;
