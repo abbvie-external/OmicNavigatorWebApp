@@ -49,7 +49,7 @@ class OmicNavigatorService {
     }
   }
 
-  async axiosPostPlot(method, obj, handleError, cancelToken, timeout) {
+  async getPlotUrl(method, obj, handleError, cancelToken, timeout) {
     const self = this;
     const axiosPostUrl = `${self.url}/${method}`;
     try {
@@ -177,7 +177,7 @@ class OmicNavigatorService {
         this[cacheKey] = dataFromPlotly;
         return dataFromPlotly;
       } else {
-        const promise = this.axiosPostPlot(
+        const promise = this.getPlotUrl(
           'plotStudy',
           obj,
           errorCb,
@@ -543,7 +543,7 @@ class OmicNavigatorService {
       return this[cacheKey];
     } else {
       this.setUrl();
-      const promise = this.axiosPostPlot(
+      const promise = this.getPlotUrl(
         'getResultsUpset',
         {
           study,
@@ -578,7 +578,7 @@ class OmicNavigatorService {
       return this[cacheKey];
     } else {
       this.setUrl();
-      const promise = this.axiosPostPlot(
+      const promise = this.getPlotUrl(
         'getEnrichmentsUpset',
         {
           study,
