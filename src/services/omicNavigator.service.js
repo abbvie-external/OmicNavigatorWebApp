@@ -49,7 +49,7 @@ class OmicNavigatorService {
     }
   }
 
-  async axiosPostPlot(method, obj, handleError, cancelToken, timeout) {
+  async getPlotUrl(method, obj, handleError, cancelToken, timeout) {
     const self = this;
     const axiosPostUrl = `${self.url}/${method}`;
     try {
@@ -114,11 +114,18 @@ class OmicNavigatorService {
   }
 
   async ocpuPlotCall(method, obj, handleError, cancelToken, timeout) {
+    const self = this;
     return new Promise(function (resolve, reject) {
       window.ocpu
         .call(method, obj, function (session) {
+          const sessionUrls = session.output || null;
+          if (!sessionUrls) resolve([]);
+          const graphicsUrl = sessionUrls.filter((u) => u.includes('graphics'));
+          // graphics = ["/ocpu/tmp/tempid/graphics/1"]
+          if (!graphicsUrl.length) resolve([]);
+          const url = `${self.baseUrl}${graphicsUrl}/svg`;
           axios
-            .get(session.getLoc() + 'graphics/1/svg', {
+            .get(url, {
               responseType: 'text',
               cancelToken,
               timeout,
@@ -177,7 +184,7 @@ class OmicNavigatorService {
         this[cacheKey] = dataFromPlotly;
         return dataFromPlotly;
       } else {
-        const promise = this.axiosPostPlot(
+        const promise = this.getPlotUrl(
           'plotStudy',
           obj,
           errorCb,
@@ -543,7 +550,7 @@ class OmicNavigatorService {
       return this[cacheKey];
     } else {
       this.setUrl();
-      const promise = this.axiosPostPlot(
+      const promise = this.getPlotUrl(
         'getResultsUpset',
         {
           study,
@@ -578,7 +585,7 @@ class OmicNavigatorService {
       return this[cacheKey];
     } else {
       this.setUrl();
-      const promise = this.axiosPostPlot(
+      const promise = this.getPlotUrl(
         'getEnrichmentsUpset',
         {
           study,
