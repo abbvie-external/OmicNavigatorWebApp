@@ -115,6 +115,10 @@ class TabOverlay extends Component {
                       // plotId={plotId}
                       plotType={s.plotType.plotType}
                       plotKey={plotOverlayData?.key}
+                      differentialTest={this.props.differentialTest}
+                      differentialTestIdsCommon={
+                        this.props.differentialTestIdsCommon
+                      }
                     />
                   ) : (
                     <div
