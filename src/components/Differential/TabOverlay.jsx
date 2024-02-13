@@ -94,6 +94,15 @@ class TabOverlay extends Component {
           const svgContainerWidth = this.getWidth();
           const svgContainerHeight = this.getHeight();
           const isPlotlyPlot = s.plotType.plotType.includes('plotly');
+          const isMultiModelMultiTestVar = isMultiModelMultiTest(
+            s.plotType.plotType,
+          );
+          const testIdNotCommon =
+            !differentialTestIdsCommon.includes(differentialTest);
+          const errorMessagePlotlyOverlay =
+            isMultiModelMultiTestVar && testIdNotCommon
+              ? `No plot can be created because the currently selected test is not present in all models`
+              : `${plotName} is not available for feature ${plotKey}`;
           const svgPanes = {
             menuItem: `${s.plotType.plotDisplay}`,
             render: () => (
@@ -115,10 +124,7 @@ class TabOverlay extends Component {
                       // plotId={plotId}
                       plotType={s.plotType.plotType}
                       plotKey={plotOverlayData?.key}
-                      differentialTest={this.props.differentialTest}
-                      differentialTestIdsCommon={
-                        this.props.differentialTestIdsCommon
-                      }
+                      errorMessagePlotlyOverlay={errorMessagePlotlyOverlay}
                     />
                   ) : (
                     <div

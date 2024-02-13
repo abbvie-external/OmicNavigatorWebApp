@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Tab } from 'semantic-ui-react';
 import SVG from 'react-inlinesvg';
-import { roundToPrecision } from '../Shared/helpers';
+import { roundToPrecision, isMultiModelMultiTest } from '../Shared/helpers';
 import PlotlyMultiFeature from './PlotlyMultiFeature';
 import './PlotsDynamic.scss';
 import '../Shared/PlotlyOverrides.scss';
@@ -71,12 +71,16 @@ class TabMultiFeature extends Component {
         if (s) {
           const srcUrl = `${s.svg}${dimensions}`;
           const isPlotlyPlot = s.plotType.plotType.includes('plotly');
-          const errorMessage = differentialTestIdsCommon.includes(
-            differentialTest,
-          )
-            ? `${s.plotType.plotDisplay} is not available for this
-          combination of features`
-            : `No plot can be created because the currently selected test is not present in all models`;
+          const isMultiModelMultiTestVar = isMultiModelMultiTest(
+            s.plotType.plotType,
+          );
+          const testIdNotCommon =
+            !differentialTestIdsCommon.includes(differentialTest);
+          const errorMessagePlotlyMultiFeature =
+            isMultiModelMultiTestVar && testIdNotCommon
+              ? `No plot can be created because the currently selected test is not present in all models`
+              : `${s.plotType.plotDisplay} is not available for this
+          combination of features`;
           const svgPanes = {
             menuItem: `${s.plotType.plotDisplay}`,
             render: () => (
@@ -98,7 +102,9 @@ class TabMultiFeature extends Component {
                       featuresLength={featuresLength}
                       onHandlePlotlyClick={this.props.onHandlePlotlyClick}
                       differentialTest={this.props.differentialTest}
-                      errorMessage={errorMessage}
+                      errorMessagePlotlyMultiFeature={
+                        errorMessagePlotlyMultiFeature
+                      }
                     />
                   ) : s.svg ? (
                     <SVG
@@ -111,7 +117,7 @@ class TabMultiFeature extends Component {
                   ) : (
                     <div className="PlotInstructions">
                       <h4 className="PlotInstructionsText NoSelect">
-                        {errorMessage}
+                        {errorMessagePlotlyMultiFeature}
                       </h4>
                     </div>
                   )}

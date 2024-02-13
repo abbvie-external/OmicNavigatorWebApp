@@ -51,8 +51,7 @@ export default class PlotlyOverlay extends Component {
       plotKey,
       featuresLength,
       plotlyExportType,
-      differentialTest,
-      differentialTestIdsCommon,
+      errorMessagePlotlyOverlay,
     } = this.props;
     const filename =
       featuresLength > 1
@@ -68,9 +67,6 @@ export default class PlotlyOverlay extends Component {
         filename: filename,
       },
     };
-    const errorMessage = differentialTestIdsCommon.includes(differentialTest)
-      ? `${plotName} is not available for feature ${plotKey}`
-      : `No plot can be created because the currently selected test is not present in all models`;
     return (
       <div>
         {this.state.json.data && this.state.json.layout ? (
@@ -80,7 +76,9 @@ export default class PlotlyOverlay extends Component {
             config={config}
           />
         ) : (
-          <h4 className="PlotInstructionsText NoSelect">{errorMessage}</h4>
+          <h4 className="PlotInstructionsText NoSelect">
+            {errorMessagePlotlyOverlay}
+          </h4>
         )}
         <span id="PlotOverlayDataLoader">
           {!this.state.loading && loadingDimmer}

@@ -49,8 +49,7 @@ export default class PlotlySingleFeature extends Component {
       plotName,
       plotKey,
       plotlyExportType,
-      differentialTest,
-      differentialTestIdsCommon,
+      errorMessagePlotlySingleFeature,
     } = this.props;
     const config = {
       modeBarButtonsToRemove: ['sendDataToCloud'],
@@ -62,9 +61,6 @@ export default class PlotlySingleFeature extends Component {
         filename: `${plotName}_${plotKey}`,
       },
     };
-    const errorMessage = differentialTestIdsCommon.includes(differentialTest)
-      ? `${plotName} is not available for feature ${plotKey}`
-      : `No plot can be created because the currently selected test is not present in all models`;
     return (
       <div>
         {this.state.json.data && this.state.json.layout ? (
@@ -75,7 +71,9 @@ export default class PlotlySingleFeature extends Component {
           />
         ) : (
           <div className="PlotInstructions">
-            <h4 className="PlotInstructionsText NoSelect">{errorMessage}</h4>
+            <h4 className="PlotInstructionsText NoSelect">
+              {errorMessagePlotlySingleFeature}
+            </h4>
           </div>
         )}
         <span id="PlotSingleFeatureDataLoader">

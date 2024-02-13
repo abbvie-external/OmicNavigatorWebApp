@@ -587,6 +587,10 @@ export function arrayMove(arr, fromIndex, toIndex) {
   return arr;
 }
 
+export function isMultiModelMultiTest(plotType) {
+  return plotType.includes('multiModel') && plotType.includes('multiTest');
+}
+
 export function getIdArg(
   plotType,
   differentialModelIds,

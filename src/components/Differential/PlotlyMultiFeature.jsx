@@ -72,8 +72,12 @@ export default class PlotlyMultiFeature extends Component {
   };
 
   render() {
-    const { plotName, featuresLength, plotlyExportType, errorMessage } =
-      this.props;
+    const {
+      plotName,
+      featuresLength,
+      plotlyExportType,
+      errorMessagePlotlyMultiFeature,
+    } = this.props;
     const { plotlyInteractive } = this.state;
     const config = {
       modeBarButtonsToRemove: ['sendDataToCloud'],
@@ -122,7 +126,9 @@ export default class PlotlyMultiFeature extends Component {
           </>
         ) : (
           <div className="PlotInstructions">
-            <h4 className="PlotInstructionsText NoSelect">{errorMessage}</h4>
+            <h4 className="PlotInstructionsText NoSelect">
+              {errorMessagePlotlyMultiFeature}
+            </h4>
           </div>
         )}
         <span id="PlotMultiFeatureDataLoader">
