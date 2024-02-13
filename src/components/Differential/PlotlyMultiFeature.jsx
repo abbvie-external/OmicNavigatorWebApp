@@ -54,7 +54,7 @@ export default class PlotlyMultiFeature extends Component {
     });
   };
 
-  handleClick = e => {
+  handleClick = (e) => {
     if (e?.points?.length) {
       let exactLabel = isNaN(e.points[0].y);
       let feature = exactLabel ? e.points[0].y : e.points[0].text;
@@ -66,13 +66,14 @@ export default class PlotlyMultiFeature extends Component {
   };
 
   togglePlotlyInteractive = () => {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       plotlyInteractive: !prevState.plotlyInteractive,
     }));
   };
 
   render() {
-    const { plotName, featuresLength, plotlyExportType } = this.props;
+    const { plotName, featuresLength, plotlyExportType, errorMessage } =
+      this.props;
     const { plotlyInteractive } = this.state;
     const config = {
       modeBarButtonsToRemove: ['sendDataToCloud'],
@@ -121,9 +122,7 @@ export default class PlotlyMultiFeature extends Component {
           </>
         ) : (
           <div className="PlotInstructions">
-            <h4 className="PlotInstructionsText NoSelect">
-              {plotName} is not available for this combination of features
-            </h4>
+            <h4 className="PlotInstructionsText NoSelect">{errorMessage}</h4>
           </div>
         )}
         <span id="PlotMultiFeatureDataLoader">

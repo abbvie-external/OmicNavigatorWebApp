@@ -200,6 +200,7 @@ class PlotsMultiFeature extends Component {
       differentialStudy,
       differentialModel,
       differentialTest,
+      differentialTestIdsCommon,
       differentialHighlightedFeaturesData,
       divWidth,
       divHeight,
@@ -215,6 +216,7 @@ class PlotsMultiFeature extends Component {
       tab,
       upperPlotsVisible,
       differentialPlotDescriptions,
+      onHandlePlotlyClick,
     } = this.props;
     const {
       activeTabIndexPlotsMultiFeature,
@@ -366,6 +368,7 @@ class PlotsMultiFeature extends Component {
               differentialStudy={differentialStudy}
               differentialModel={differentialModel}
               differentialTest={differentialTest}
+              differentialTestIdsCommon={differentialTestIdsCommon}
               plotlyExport={plotlyExport}
               plotlyExportType={plotlyExportType}
               plotMultiFeatureData={plotMultiFeatureData}
@@ -374,7 +377,7 @@ class PlotsMultiFeature extends Component {
               pxToPtRatio={pxToPtRatio}
               multiFeaturePlotTypes={multiFeaturePlotTypes}
               svgTabMax={svgTabMax}
-              onHandlePlotlyClick={this.props.onHandlePlotlyClick}
+              onHandlePlotlyClick={onHandlePlotlyClick}
             />
             {featuresList}
             <span id={divWidth >= 625 ? 'FullScreenButton' : 'FullScreenIcon'}>

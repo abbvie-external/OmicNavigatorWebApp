@@ -163,6 +163,7 @@ class PlotsDynamic extends Component {
                 differentialStudy={this.props.differentialStudy}
                 differentialModel={this.props.differentialModel}
                 differentialTest={this.props.differentialTest}
+                differentialTestIdsCommon={this.props.differentialTestIdsCommon}
                 differentialPlotTypes={this.props.differentialPlotTypes}
                 // for plot dimension calculations
                 divWidth={this.props.differentialDynamicPlotWidth}
