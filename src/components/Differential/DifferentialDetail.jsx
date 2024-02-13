@@ -1374,6 +1374,7 @@ class DifferentialDetail extends Component {
       differentialStudy,
       differentialModel,
       differentialTest,
+      differentialTestIdsCommon,
       differentialPlotTypes,
       differentialFeature,
       differentialFeatureIdKey,
@@ -1468,6 +1469,7 @@ class DifferentialDetail extends Component {
               differentialModel={differentialModel}
               differentialTest={differentialTest}
               differentialTests={differentialTests}
+              differentialTestIdsCommon={differentialTestIdsCommon}
               singleFeaturePlotTypes={singleFeaturePlotTypes}
               multiFeaturePlotTypes={multiFeaturePlotTypes}
               differentialPlotDescriptions={
@@ -1913,6 +1915,7 @@ class DifferentialDetail extends Component {
         differentialStudy={differentialStudy}
         differentialModel={differentialModel}
         differentialTest={differentialTest}
+        differentialTestIdsCommon={differentialTestIdsCommon}
         differentialFeature={differentialFeature}
         enableTabChangeOnSelection={enableTabChangeOnSelection}
         pxToPtRatio={105}

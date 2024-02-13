@@ -631,6 +631,7 @@ export function getTestsArg(
   differentialModelsAndTests,
   multiModelMappingFirstKey,
   differentialModel,
+  differentialTestIdsCommon,
 ) {
   // SINGLE-MODEL
   if (!plotType.includes('multiModel')) {
@@ -653,7 +654,7 @@ export function getTestsArg(
       });
       return tests;
     } else {
-      // 'multiTest': vector of each test
+      // 'multiTest': vector of each test (that is a member of ALL models)
       // within the currently selected model,
       // repeated j times,
       // where j is the number of models in the study
@@ -663,7 +664,10 @@ export function getTestsArg(
       );
       differentialModelIds.forEach(() => {
         currentModelAndTests.tests.forEach((test) => {
-          tests.push(test.testID);
+          // check if test id is a member of ALL models)
+          if (differentialTestIdsCommon.includes(test.testID)) {
+            tests.push(test.testID);
+          }
         });
       });
       return tests;
