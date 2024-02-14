@@ -8,6 +8,7 @@ import MetafeaturesTable from './MetafeaturesTable';
 import PlotlyOverlay from './PlotlyOverlay';
 import './PlotsDynamic.scss';
 import '../Shared/PlotlyOverrides.scss';
+import { isMultiModelMultiTest } from '../Shared/helpers';
 
 class TabOverlay extends Component {
   state = {
@@ -84,6 +85,8 @@ class TabOverlay extends Component {
       activeTabIndexPlotsOverlay,
       plotOverlayData,
       modelSpecificMetaFeaturesExist,
+      differentialTest,
+      differentialTestIdsCommon,
     } = this.props;
     // since this call is in render, index determines the one tab to display (svg, plotly or feature data)
     let panes = [];
@@ -102,7 +105,7 @@ class TabOverlay extends Component {
           const errorMessagePlotlyOverlay =
             isMultiModelMultiTestVar && testIdNotCommon
               ? `No plot can be created because the currently selected test is not present in all models`
-              : `${plotName} is not available for feature ${plotKey}`;
+              : `${s.plotType.plotName} is not available for feature ${s.plotType.plotKey}`;
           const svgPanes = {
             menuItem: `${s.plotType.plotDisplay}`,
             render: () => (
