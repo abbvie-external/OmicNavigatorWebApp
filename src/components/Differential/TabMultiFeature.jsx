@@ -78,7 +78,7 @@ class TabMultiFeature extends Component {
             !differentialTestIdsCommon.includes(differentialTest);
           const errorMessagePlotlyMultiFeature =
             isMultiModelMultiTestVar && testIdNotCommon
-              ? `No plot can be created because the currently selected test is not present in all models`
+              ? `${s.plotType.plotDisplay} can not be created because the currently selected test is not present in all models`
               : `${s.plotType.plotDisplay} is not available for this
           combination of features`;
           const svgPanes = {

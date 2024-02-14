@@ -81,7 +81,7 @@ class TabSingleFeature extends Component {
           !differentialTestIdsCommon.includes(differentialTest);
         const errorMessagePlotlySingleFeature =
           isMultiModelMultiTestVar && testIdNotCommon
-            ? `No plot can be created because the currently selected test is not present in all models`
+            ? `${s.plotType.plotDisplay} can not be created because the currently selected test is not present in all models`
             : `${s.plotType.plotDisplay} is not available for feature ${plotSingleFeatureData.key}`;
         const svgPanes = {
           menuItem: `${s.plotType.plotDisplay}`,

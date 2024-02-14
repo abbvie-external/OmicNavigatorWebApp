@@ -104,8 +104,8 @@ class TabOverlay extends Component {
             !differentialTestIdsCommon.includes(differentialTest);
           const errorMessagePlotlyOverlay =
             isMultiModelMultiTestVar && testIdNotCommon
-              ? `No plot can be created because the currently selected test is not present in all models`
-              : `${s.plotType.plotName} is not available for feature ${s.plotType.plotKey}`;
+              ? `${s.plotType.plotDisplay} can not be created because the currently selected test is not present in all models`
+              : `${s.plotType.plotDisplay} is not available for feature ${s.plotType.plotKey}`;
           const svgPanes = {
             menuItem: `${s.plotType.plotDisplay}`,
             render: () => (
