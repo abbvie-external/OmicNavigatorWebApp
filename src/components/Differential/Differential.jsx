@@ -698,6 +698,7 @@ class Differential extends Component {
               differentialModel,
               differentialModelsAndTests,
               multiModelMappingFirstKey,
+              differentialTestIdsCommon,
             );
             // handle plotly differently than static plot svgs
             if (plots[i].plotType.includes('plotly')) {
@@ -810,6 +811,7 @@ class Differential extends Component {
                 differentialModel,
                 differentialModelsAndTests,
                 multiModelMappingFirstKey,
+                differentialTestIdsCommon,
               );
               return omicNavigatorService
                 .plotStudyReturnSvgUrl(
@@ -976,6 +978,7 @@ class Differential extends Component {
               differentialModel,
               differentialModelsAndTests,
               multiModelMappingFirstKey,
+              differentialTestIdsCommon,
             );
             // handle plotly differently than static plot svgs
             if (multifeaturePlot[0].plotType.includes('plotly')) {
@@ -1056,6 +1059,7 @@ class Differential extends Component {
               differentialModel,
               differentialModelsAndTests,
               multiModelMappingFirstKey,
+              differentialTestIdsCommon,
             );
             // handle plotly differently than static plot svgs
             if (multifeaturePlot[i].plotType.includes('plotly')) {
@@ -1283,6 +1287,7 @@ class Differential extends Component {
         differentialModel,
         differentialModelsAndTests,
         multiModelMappingFirstKey,
+        differentialTestIdsCommon,
       );
       try {
         const promise = omicNavigatorService.plotStudyReturnSvg(

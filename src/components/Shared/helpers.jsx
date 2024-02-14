@@ -686,8 +686,9 @@ export function getModelsArg(
   differentialModel,
   differentialModelsAndTests,
   multiModelMappingFirstKey,
-  multiModelMappingArrays,
+  differentialTestIdsCommon,
 ) {
+  debugger;
   // if plotType does not include 'multiModel', return the model
   if (!plotType.includes('multiModel')) {
     return differentialModel;
@@ -708,7 +709,7 @@ export function getModelsArg(
       // 'multiTest': vector of each model,
       // with the currently selected model moved to the first index
       // repeated n times,
-      // where n is the number of tests present under the currently selected model
+      // where n is the number of tests (that are a member of ALL models) repeated under the currently selected model
       let models = [];
       const currentDifferentialModelsAndTestsIndex = [
         ...differentialModelsAndTests,
@@ -724,7 +725,10 @@ export function getModelsArg(
           : differentialModelsAndTests;
       currentDifferentialModelsAndTestsMoved.forEach((cdmtm) => {
         cdmtm.tests.forEach((test) => {
-          models.push(cdmtm.modelID);
+          // check if test id is a member of ALL models
+          if (differentialTestIdsCommon?.includes(test.testID)) {
+            models.push(cdmtm.modelID);
+          }
         });
       });
       return models;
