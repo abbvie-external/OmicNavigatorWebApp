@@ -20,6 +20,7 @@ import {
   roundToPrecision,
   getTestsArg,
   getModelsArg,
+  isMultiModelMultiTest,
 } from '../Shared/helpers';
 import '../Shared/Table.scss';
 import SearchingAlt from '../Transitions/SearchingAlt';
@@ -414,10 +415,38 @@ class Enrichment extends Component {
   };
 
   setStudyModelAnnotationMetadata = (studyData, modelsAndAnnotations) => {
+    let commonAnnotationIds = [];
+    let annotationIDsArrays = [];
+    if (modelsAndAnnotations.length) {
+      if (modelsAndAnnotations.length === 1) {
+        annotationIDsArrays = modelsAndAnnotations.map((obj) => {
+          obj.annotations.map((annotation) => annotation.annotationID);
+        });
+        commonAnnotationIds = annotationIDsArrays;
+      }
+      if (modelsAndAnnotations.length > 1) {
+        // Iterate over the annotations of the first object
+        for (const annotation of modelsAndAnnotations[0].annotations) {
+          // Check if the annotationID exists in all other objects
+          if (
+            modelsAndAnnotations.every((obj) =>
+              obj.annotations.some(
+                (t) => t.annotationID === annotation.annotationID,
+              ),
+            )
+          ) {
+            commonAnnotationIds.push(annotation.annotationID);
+          }
+        }
+        // console.log('Common testIDs across all objects:', commonTestIds);
+      }
+    }
+
     this.setState(
       {
         enrichmentStudyMetadata: studyData,
         enrichmentModelsAndAnnotations: modelsAndAnnotations,
+        enrichmentAnnotationIdsCommon: commonAnnotationIds,
       },
       function () {
         this.handlePlotTypesEnrichment(this.props.enrichmentModel);
@@ -1327,9 +1356,15 @@ class Enrichment extends Component {
   };
 
   getPlot = (featureId) => {
-    const { enrichmentPlotTypes, enrichmentTest, uData, enrichmentModelIds } =
-      this.state;
-    const { enrichmentStudy, enrichmentModel } = this.props;
+    const {
+      enrichmentPlotTypes,
+      enrichmentTest,
+      uData,
+      enrichmentModelIds,
+      enrichmentAnnotationIdsCommon,
+    } = this.state;
+    const { enrichmentStudy, enrichmentModel, enrichmentAnnotation } =
+      this.props;
     let id = featureId != null ? featureId : '';
     let plotDataEnrichmentVar = { key: '', title: '', svg: [] };
     plotDataEnrichmentVar.title = this.state.plotDataEnrichment.title;
@@ -1352,12 +1387,23 @@ class Enrichment extends Component {
             if (plot.plotType.includes('multiFeature')) {
               return undefined;
             }
-            const testsArg = getTestsArg(
+            const isMultiModelMultiTestVar = isMultiModelMultiTest(
               plot.plotType,
-              enrichmentModelIds,
-              uData,
-              enrichmentTest,
             );
+            const testIdNotCommon =
+              !enrichmentAnnotationIdsCommon.includes(enrichmentAnnotation);
+            let testsArg = [];
+            // don't get testsArg for MultiModelMultiTest plot when test is not common
+            if (isMultiModelMultiTestVar && testIdNotCommon) {
+              testsArg = [];
+            } else {
+              testsArg = getTestsArg(
+                plot.plotType,
+                enrichmentModelIds,
+                uData,
+                enrichmentTest,
+              );
+            }
             const modelsArg = getModelsArg(
               plot.plotType,
               enrichmentModelIds,

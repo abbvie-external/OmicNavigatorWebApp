@@ -688,7 +688,6 @@ export function getModelsArg(
   multiModelMappingFirstKey,
   differentialTestIdsCommon,
 ) {
-  debugger;
   // if plotType does not include 'multiModel', return the model
   if (!plotType.includes('multiModel')) {
     return differentialModel;
