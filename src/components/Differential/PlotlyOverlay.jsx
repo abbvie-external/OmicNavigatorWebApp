@@ -46,7 +46,13 @@ export default class PlotlyOverlay extends Component {
   };
 
   render() {
-    const { plotName, plotKey, featuresLength, plotlyExportType } = this.props;
+    const {
+      plotName,
+      plotKey,
+      featuresLength,
+      plotlyExportType,
+      errorMessagePlotlyOverlay,
+    } = this.props;
     const filename =
       featuresLength > 1
         ? `${plotName}_(${featuresLength}-features)`
@@ -71,7 +77,7 @@ export default class PlotlyOverlay extends Component {
           />
         ) : (
           <h4 className="PlotInstructionsText NoSelect">
-            {plotName} is not available for feature {plotKey}
+            {errorMessagePlotlyOverlay}
           </h4>
         )}
         <span id="PlotOverlayDataLoader">

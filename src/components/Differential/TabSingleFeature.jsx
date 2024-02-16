@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Tab } from 'semantic-ui-react';
 import SVG from 'react-inlinesvg';
-import { roundToPrecision } from '../Shared/helpers';
+import { roundToPrecision, isMultiModelMultiTest } from '../Shared/helpers';
 import MetafeaturesTableDynamic from './MetafeaturesTableDynamic';
 import PlotlySingleFeature from './PlotlySingleFeature';
 import './PlotsDynamic.scss';
@@ -35,13 +35,15 @@ class TabSingleFeature extends Component {
     this.getSVGPanesSingleFeature(cacheStringArg);
   }
 
-  getSVGPanesSingleFeature = cacheStringArg => {
+  getSVGPanesSingleFeature = (cacheStringArg) => {
     if (this.cacheString === cacheStringArg) return;
     this.cacheString = cacheStringArg;
     const {
       activeTabIndexPlotsSingleFeature,
       differentialStudy,
       differentialModel,
+      differentialTest,
+      differentialTestIdsCommon,
       divWidth,
       divHeight,
       pxToPtRatio,
@@ -72,6 +74,15 @@ class TabSingleFeature extends Component {
       if (s) {
         const srcUrl = `${s.svg}${dimensions}`;
         const isPlotlyPlot = s.plotType.plotType.includes('plotly');
+        const isMultiModelMultiTestVar = isMultiModelMultiTest(
+          s.plotType.plotType,
+        );
+        const testIdNotCommon =
+          !differentialTestIdsCommon.includes(differentialTest);
+        const errorMessagePlotlySingleFeature =
+          isMultiModelMultiTestVar && testIdNotCommon
+            ? `${s.plotType.plotDisplay} can not be created because the currently selected test is not present in all models`
+            : `${s.plotType.plotDisplay} is not available for feature ${plotSingleFeatureData.key}`;
         const svgPanes = {
           menuItem: `${s.plotType.plotDisplay}`,
           render: () => (
@@ -90,6 +101,9 @@ class TabSingleFeature extends Component {
                     parentNode={
                       this.props.differentialDetailPlotsSingleFeatureRefFwd
                     }
+                    errorMessagePlotlySingleFeature={
+                      errorMessagePlotlySingleFeature
+                    }
                   />
                 ) : s.svg ? (
                   <SVG
@@ -102,8 +116,7 @@ class TabSingleFeature extends Component {
                 ) : (
                   <div className="PlotInstructions">
                     <h4 className="PlotInstructionsText NoSelect">
-                      {s.plotType.plotDisplay} is not available for feature{' '}
-                      {plotSingleFeatureData.key}
+                      {errorMessagePlotlySingleFeature}
                     </h4>
                   </div>
                 )}

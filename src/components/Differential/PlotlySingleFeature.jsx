@@ -45,7 +45,12 @@ export default class PlotlySingleFeature extends Component {
   };
 
   render() {
-    const { plotName, plotKey, plotlyExportType } = this.props;
+    const {
+      plotName,
+      plotKey,
+      plotlyExportType,
+      errorMessagePlotlySingleFeature,
+    } = this.props;
     const config = {
       modeBarButtonsToRemove: ['sendDataToCloud'],
       displayModeBar: true,
@@ -67,7 +72,7 @@ export default class PlotlySingleFeature extends Component {
         ) : (
           <div className="PlotInstructions">
             <h4 className="PlotInstructionsText NoSelect">
-              {plotName} is not available for feature {plotKey}
+              {errorMessagePlotlySingleFeature}
             </h4>
           </div>
         )}

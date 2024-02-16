@@ -16,6 +16,7 @@ import {
   getIdArg,
   getTestsArg,
   getModelsArg,
+  isMultiModelMultiTest,
 } from '../Shared/helpers';
 import ButtonActions from '../Shared/ButtonActions';
 import DifferentialSearch from './DifferentialSearch';
@@ -46,11 +47,11 @@ class Differential extends Component {
     this.state = {
       // GENERAL
       // differentialPlotTypes: [],
-
       differentialStudyMetadata: [],
       differentialModelsAndTests: [],
       differentialTestsMetadata: [],
       differentialTestIds: [],
+      differentialTestIdsCommon: [],
       differentialModelIds: [],
       // RESULTS
       differentialResultsTableLoading: false,
@@ -249,10 +250,35 @@ class Differential extends Component {
   };
 
   setStudyModelTestMetadata = (studyData, modelsAndTests) => {
+    let commonTestIds = [];
+    let testIDsArrays = [];
+    if (modelsAndTests.length) {
+      if (modelsAndTests.length === 1) {
+        testIDsArrays = modelsAndTests.map((obj) => {
+          obj.tests.map((test) => test.testID);
+        });
+        commonTestIds = testIDsArrays;
+      }
+      if (modelsAndTests.length > 1) {
+        // Iterate over the tests of the first object
+        for (const test of modelsAndTests[0].tests) {
+          // Check if the testID exists in all other objects
+          if (
+            modelsAndTests.every((obj) =>
+              obj.tests.some((t) => t.testID === test.testID),
+            )
+          ) {
+            commonTestIds.push(test.testID);
+          }
+        }
+        // console.log('Common testIDs across all objects:', commonTestIds);
+      }
+    }
     this.setState(
       {
         differentialStudyMetadata: studyData,
         differentialModelsAndTests: modelsAndTests,
+        differentialTestIdsCommon: commonTestIds,
       },
       function () {
         this.handlePlotTypesDifferential(this.props.differentialModel);
@@ -597,6 +623,7 @@ class Differential extends Component {
     const {
       differentialPlotTypes,
       differentialTestIds,
+      differentialTestIdsCommon,
       differentialModelIds,
       differentialModelsAndTests,
       multiModelMappingFirstKey,
@@ -655,15 +682,27 @@ class Differential extends Component {
               multiModelMappingArrays,
               id,
             );
-            const testsArg = getTestsArg(
+            const isMultiModelMultiTestVar = isMultiModelMultiTest(
               plot.plotType,
-              differentialModelIds,
-              differentialTestIds,
-              differentialTest,
-              differentialModelsAndTests,
-              multiModelMappingFirstKey,
-              differentialModel,
             );
+            const testIdNotCommon =
+              !differentialTestIdsCommon.includes(differentialTest);
+            let testsArg = [];
+            // don't get testsArg for MultiModelMultiTest plot when test is not common
+            if (isMultiModelMultiTestVar && testIdNotCommon) {
+              testsArg = [];
+            } else {
+              testsArg = getTestsArg(
+                plot.plotType,
+                differentialModelIds,
+                differentialTestIds,
+                differentialTest,
+                differentialModelsAndTests,
+                multiModelMappingFirstKey,
+                differentialModel,
+                differentialTestIdsCommon,
+              );
+            }
             const modelsArg = getModelsArg(
               plot.plotType,
               differentialModelIds,
@@ -671,6 +710,7 @@ class Differential extends Component {
               differentialModel,
               differentialModelsAndTests,
               multiModelMappingFirstKey,
+              differentialTestIdsCommon,
             );
             // handle plotly differently than static plot svgs
             if (plots[i].plotType.includes('plotly')) {
@@ -766,15 +806,27 @@ class Differential extends Component {
                 multiModelMappingArrays,
                 id,
               );
-              const testsArg = getTestsArg(
+              const isMultiModelMultiTestVar = isMultiModelMultiTest(
                 plot.plotType,
-                differentialModelIds,
-                differentialTestIds,
-                differentialTest,
-                differentialModelsAndTests,
-                multiModelMappingFirstKey,
-                differentialModel,
               );
+              const testIdNotCommon =
+                !differentialTestIdsCommon.includes(differentialTest);
+              let testsArg = [];
+              // don't get testsArg for MultiModelMultiTest plot when test is not common
+              if (isMultiModelMultiTestVar && testIdNotCommon) {
+                testsArg = [];
+              } else {
+                testsArg = getTestsArg(
+                  plot.plotType,
+                  differentialModelIds,
+                  differentialTestIds,
+                  differentialTest,
+                  differentialModelsAndTests,
+                  multiModelMappingFirstKey,
+                  differentialModel,
+                  differentialTestIdsCommon,
+                );
+              }
               const modelsArg = getModelsArg(
                 plot.plotType,
                 differentialModelIds,
@@ -782,6 +834,7 @@ class Differential extends Component {
                 differentialModel,
                 differentialModelsAndTests,
                 multiModelMappingFirstKey,
+                differentialTestIdsCommon,
               );
               return omicNavigatorService
                 .plotStudyReturnSvgUrl(
@@ -903,6 +956,7 @@ class Differential extends Component {
       const {
         differentialPlotTypes,
         differentialTestIds,
+        differentialTestIdsCommon,
         differentialModelIds,
         differentialModelsAndTests,
         multiModelMappingFirstKey,
@@ -930,15 +984,27 @@ class Differential extends Component {
       if (multifeaturePlot.length !== 0) {
         if (multifeaturePlot.length === 1) {
           try {
-            const testsArg = getTestsArg(
-              multifeaturePlot[0].plotType,
-              differentialModelIds,
-              differentialTestIds,
-              differentialTest,
-              differentialModelsAndTests,
-              multiModelMappingFirstKey,
-              differentialModel,
+            const isMultiModelMultiTestVar = isMultiModelMultiTest(
+              plot.plotType,
             );
+            const testIdNotCommon =
+              !differentialTestIdsCommon.includes(differentialTest);
+            let testsArg = [];
+            // don't get testsArg for MultiModelMultiTest plot when test is not common
+            if (isMultiModelMultiTestVar && testIdNotCommon) {
+              testsArg = [];
+            } else {
+              testsArg = getTestsArg(
+                multifeaturePlot[0].plotType,
+                differentialModelIds,
+                differentialTestIds,
+                differentialTest,
+                differentialModelsAndTests,
+                multiModelMappingFirstKey,
+                differentialModel,
+                differentialTestIdsCommon,
+              );
+            }
             const modelsArg = getModelsArg(
               multifeaturePlot[0].plotType,
               differentialModelIds,
@@ -946,6 +1012,7 @@ class Differential extends Component {
               differentialModel,
               differentialModelsAndTests,
               multiModelMappingFirstKey,
+              differentialTestIdsCommon,
             );
             // handle plotly differently than static plot svgs
             if (multifeaturePlot[0].plotType.includes('plotly')) {
@@ -1009,15 +1076,27 @@ class Differential extends Component {
           }
         } else {
           _.forEach(multifeaturePlot, function (plot, i) {
-            const testsArg = getTestsArg(
+            const isMultiModelMultiTestVar = isMultiModelMultiTest(
               plot.plotType,
-              differentialModelIds,
-              differentialTestIds,
-              differentialTest,
-              differentialModelsAndTests,
-              multiModelMappingFirstKey,
-              differentialModel,
             );
+            const testIdNotCommon =
+              !differentialTestIdsCommon.includes(differentialTest);
+            let testsArg = [];
+            // don't get testsArg for MultiModelMultiTest plot when test is not common
+            if (isMultiModelMultiTestVar && testIdNotCommon) {
+              testsArg = [];
+            } else {
+              testsArg = getTestsArg(
+                plot.plotType,
+                differentialModelIds,
+                differentialTestIds,
+                differentialTest,
+                differentialModelsAndTests,
+                multiModelMappingFirstKey,
+                differentialModel,
+                differentialTestIdsCommon,
+              );
+            }
             const modelsArg = getModelsArg(
               plot.plotType,
               differentialModelIds,
@@ -1025,6 +1104,7 @@ class Differential extends Component {
               differentialModel,
               differentialModelsAndTests,
               multiModelMappingFirstKey,
+              differentialTestIdsCommon,
             );
             // handle plotly differently than static plot svgs
             if (multifeaturePlot[i].plotType.includes('plotly')) {
@@ -1220,6 +1300,7 @@ class Differential extends Component {
     const {
       differentialPlotTypes,
       differentialTestIds,
+      differentialTestIdsCommon,
       differentialModelIds,
       differentialModelsAndTests,
       multiModelMappingFirstKey,
@@ -1234,15 +1315,27 @@ class Differential extends Component {
       p.plotType.includes('multiFeature'),
     );
     if (multifeaturePlot.length !== 0) {
-      const testsArg = getTestsArg(
+      const isMultiModelMultiTestVar = isMultiModelMultiTest(
         multifeaturePlot[plotindex].plotType,
-        differentialModelIds,
-        differentialTestIds,
-        differentialTest,
-        differentialModelsAndTests,
-        multiModelMappingFirstKey,
-        differentialModel,
       );
+      const testIdNotCommon =
+        !differentialTestIdsCommon.includes(differentialTest);
+      let testsArg = [];
+      // don't get testsArg for MultiModelMultiTest plot when test is not common
+      if (isMultiModelMultiTestVar && testIdNotCommon) {
+        testsArg = [];
+      } else {
+        testsArg = getTestsArg(
+          multifeaturePlot[plotindex].plotType,
+          differentialModelIds,
+          differentialTestIds,
+          differentialTest,
+          differentialModelsAndTests,
+          multiModelMappingFirstKey,
+          differentialModel,
+          differentialTestIdsCommon,
+        );
+      }
       const modelsArg = getModelsArg(
         multifeaturePlot[plotindex].plotType,
         differentialModelIds,
@@ -1250,6 +1343,7 @@ class Differential extends Component {
         differentialModel,
         differentialModelsAndTests,
         multiModelMappingFirstKey,
+        differentialTestIdsCommon,
       );
       try {
         const promise = omicNavigatorService.plotStudyReturnSvg(

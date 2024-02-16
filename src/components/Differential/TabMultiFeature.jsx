@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Tab } from 'semantic-ui-react';
 import SVG from 'react-inlinesvg';
-import { roundToPrecision } from '../Shared/helpers';
+import { roundToPrecision, isMultiModelMultiTest } from '../Shared/helpers';
 import PlotlyMultiFeature from './PlotlyMultiFeature';
 import './PlotsDynamic.scss';
 import '../Shared/PlotlyOverrides.scss';
@@ -23,7 +23,7 @@ class TabMultiFeature extends Component {
       plotMultiFeatureData,
       multiFeaturePlotTypes,
     } = this.props;
-    const featureIdsArr = differentialHighlightedFeaturesData.map(f => f.id);
+    const featureIdsArr = differentialHighlightedFeaturesData.map((f) => f.id);
     const featureIdsString = featureIdsArr.toString();
     const featuresLength = differentialHighlightedFeaturesData?.length;
     const plotKey = plotMultiFeatureData.key;
@@ -46,6 +46,8 @@ class TabMultiFeature extends Component {
       pointSize,
       plotMultiFeatureDataLength,
       multiFeaturePlotTypes,
+      differentialTest,
+      differentialTestIdsCommon,
     } = this.props;
     let panes = [];
     let dimensions = '';
@@ -69,6 +71,16 @@ class TabMultiFeature extends Component {
         if (s) {
           const srcUrl = `${s.svg}${dimensions}`;
           const isPlotlyPlot = s.plotType.plotType.includes('plotly');
+          const isMultiModelMultiTestVar = isMultiModelMultiTest(
+            s.plotType.plotType,
+          );
+          const testIdNotCommon =
+            !differentialTestIdsCommon.includes(differentialTest);
+          const errorMessagePlotlyMultiFeature =
+            isMultiModelMultiTestVar && testIdNotCommon
+              ? `${s.plotType.plotDisplay} can not be created because the currently selected test is not present in all models`
+              : `${s.plotType.plotDisplay} is not available for this
+          combination of features`;
           const svgPanes = {
             menuItem: `${s.plotType.plotDisplay}`,
             render: () => (
@@ -89,6 +101,10 @@ class TabMultiFeature extends Component {
                       }
                       featuresLength={featuresLength}
                       onHandlePlotlyClick={this.props.onHandlePlotlyClick}
+                      differentialTest={this.props.differentialTest}
+                      errorMessagePlotlyMultiFeature={
+                        errorMessagePlotlyMultiFeature
+                      }
                     />
                   ) : s.svg ? (
                     <SVG
@@ -101,8 +117,7 @@ class TabMultiFeature extends Component {
                   ) : (
                     <div className="PlotInstructions">
                       <h4 className="PlotInstructionsText NoSelect">
-                        {s.plotType.plotDisplay} is not available for this
-                        combination of features
+                        {errorMessagePlotlyMultiFeature}
                       </h4>
                     </div>
                   )}
