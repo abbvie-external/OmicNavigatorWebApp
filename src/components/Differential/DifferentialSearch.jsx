@@ -160,7 +160,7 @@ class DifferentialSearch extends Component {
     window.removeEventListener('resize');
   }
 
-  populateDropdowns = () => {
+  populateDropdowns = async () => {
     const {
       allStudiesMetadata,
       differentialStudy,
@@ -220,7 +220,10 @@ class DifferentialSearch extends Component {
         this.getReportLink(differentialStudy, 'default');
       } else {
         this.props.onDoMetaFeaturesExist(differentialStudy, differentialModel);
-        this.props.onGetResultsLinkouts(differentialStudy, differentialModel);
+        await this.props.onGetResultsLinkouts(
+          differentialStudy,
+          differentialModel,
+        );
         this.props.onGetMultisetColsDifferential(
           differentialStudy,
           differentialModel,

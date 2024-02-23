@@ -618,6 +618,7 @@ class Enrichment extends Component {
       changes.enrichmentAnnotation !== '' &&
       changes.enrichmentAnnotation !== this.props.enrichmentAnnotation
     ) {
+      // get favicons before anything else
       await this.getEnrichmentsLinkouts(
         changes.enrichmentStudy,
         changes.enrichmentAnnotation,
@@ -945,7 +946,6 @@ class Enrichment extends Component {
 
     // multiset svg rebuilds based on uData...if there are no results we need to override this from being passed down
     if (enrichmentNumericFields.length !== 0) {
-      console.log(enrichmentNumericFields.length);
       this.setState({
         uData: enrichmentNumericFields,
       });
