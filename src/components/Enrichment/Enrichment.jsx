@@ -977,7 +977,7 @@ class Enrichment extends Component {
                 }
                 style={TableValuePopupStyle}
                 className="TablePopupValue"
-                content={value}
+                content={'View Interactive Barcode Plot'}
                 inverted
                 basic
               />
