@@ -149,7 +149,7 @@ class EnrichmentSearch extends Component {
     window.removeEventListener('resize');
   }
 
-  populateDropdowns = () => {
+  populateDropdowns = async () => {
     const {
       allStudiesMetadata,
       enrichmentStudy,
@@ -243,8 +243,8 @@ class EnrichmentSearch extends Component {
         this.props.onSetAnnotationsMetadata(enrichmentAnnotationsMetadataVar);
         this.getReportLink(enrichmentStudy, enrichmentModel);
         if (enrichmentAnnotation !== '') {
-          onGetEnrichmentsLinkouts(enrichmentStudy, enrichmentAnnotation);
           onSearchTransitionEnrichment(true);
+          await onGetEnrichmentsLinkouts(enrichmentStudy, enrichmentAnnotation);
           const obj = {
             study: enrichmentStudy,
             modelID: enrichmentModel,
