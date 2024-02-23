@@ -373,7 +373,7 @@ class Differential extends Component {
     });
   };
 
-  handleSearchChangeDifferential = async (
+  handleSearchChangeDifferential = (
     changes,
     scChange,
     resetSelectedFeatures,
@@ -388,7 +388,7 @@ class Differential extends Component {
       changes.differentialModel !== this.props.differentialModel
     ) {
       // get favicons before anything else
-      await this.getResultsLinkouts(
+      this.getResultsLinkouts(
         changes.differentialStudy,
         changes.differentialModel,
       );

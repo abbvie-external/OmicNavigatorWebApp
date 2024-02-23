@@ -613,13 +613,13 @@ class Enrichment extends Component {
     }
   };
 
-  handleSearchChangeEnrichment = async (changes, scChange) => {
+  handleSearchChangeEnrichment = (changes, scChange) => {
     if (
       changes.enrichmentAnnotation !== '' &&
       changes.enrichmentAnnotation !== this.props.enrichmentAnnotation
     ) {
       // get favicons before anything else
-      await this.getEnrichmentsLinkouts(
+      this.getEnrichmentsLinkouts(
         changes.enrichmentStudy,
         changes.enrichmentAnnotation,
       );
