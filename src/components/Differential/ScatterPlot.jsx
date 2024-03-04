@@ -645,7 +645,10 @@ class ScatterPlot extends Component {
       doXAxisTransformation,
       doYAxisTransformation,
     } = this.props;
-
+    if (scaleData.length === 1) {
+      // need two objects in order to do scaleFactory
+      scaleData = [...scaleData, ...scaleData];
+    }
     var xMM = getMaxAndMin(scaleData, xAxisLabel, doXAxisTransformation);
     var yMM = getMaxAndMin(scaleData, yAxisLabel, doYAxisTransformation);
     xMM = [this.doTransform(xMM[0], 'x'), this.doTransform(xMM[1], 'x')];
