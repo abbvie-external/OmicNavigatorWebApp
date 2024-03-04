@@ -383,6 +383,16 @@ class Differential extends Component {
       visible: false,
       multisetButttonActiveDifferential: false,
     });
+    if (
+      changes.differentialModel !== '' &&
+      changes.differentialModel !== this.props.differentialModel
+    ) {
+      // get favicons before anything else
+      this.getResultsLinkouts(
+        changes.differentialStudy,
+        changes.differentialModel,
+      );
+    }
     if (scChange) {
       this.resetOverlay();
       if (resetSelectedFeatures) {
@@ -403,10 +413,6 @@ class Differential extends Component {
       changes.differentialModel !== this.props.differentialModel
     ) {
       this.doMetaFeaturesExist(
-        changes.differentialStudy,
-        changes.differentialModel,
-      );
-      this.getResultsLinkouts(
         changes.differentialStudy,
         changes.differentialModel,
       );
