@@ -391,7 +391,6 @@ class EnrichmentSearch extends Component {
     omicNavigatorService
       .getReportLink(study, model, this.setStudyTooltip, cancelToken)
       .then((getReportLinkResponse) => {
-        debugger;
         if (getReportLinkResponse.length > 0) {
           const link = getReportLinkResponse.includes('http')
             ? getReportLinkResponse
