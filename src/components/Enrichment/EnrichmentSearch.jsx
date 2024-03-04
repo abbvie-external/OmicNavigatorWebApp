@@ -43,7 +43,7 @@ class EnrichmentSearch extends Component {
       'Select a study and model to view Analysis Details',
     enrichmentModels: [],
     enrichmentAnnotations: [],
-    enrichmentStudyReportTooltip: 'Select a study',
+    enrichmentStudyTooltip: 'Select a study',
     enrichmentModelTooltip: '',
     enrichmentAnnotationTooltip: '',
     enrichmentStudiesDisabled: true,
@@ -199,10 +199,10 @@ class EnrichmentSearch extends Component {
           };
         },
       );
-      const enrichmentStudyReportTooltip =
+      const enrichmentStudyTooltip =
         enrichmentStudyData?.package?.description || '';
       this.setState({
-        enrichmentStudyReportTooltip: enrichmentStudyReportTooltip,
+        enrichmentStudyTooltip: enrichmentStudyTooltip,
         enrichmentModelsDisabled: false,
         enrichmentModels: enrichmentModelsMapped,
       });
@@ -391,6 +391,7 @@ class EnrichmentSearch extends Component {
     omicNavigatorService
       .getReportLink(study, model, this.setStudyTooltip, cancelToken)
       .then((getReportLinkResponse) => {
+        debugger;
         if (getReportLinkResponse.length > 0) {
           const link = getReportLinkResponse.includes('http')
             ? getReportLinkResponse
@@ -1018,6 +1019,7 @@ class EnrichmentSearch extends Component {
   render() {
     const {
       enrichmentStudies,
+      enrichmentStudyTooltip,
       enrichmentStudyHref,
       enrichmentStudyHrefVisible,
       enrichmentModels,
@@ -1257,7 +1259,7 @@ class EnrichmentSearch extends Component {
             className="CustomTooltip"
             inverted
             position="bottom right"
-            content={enrichmentStudyReportTooltip}
+            content={enrichmentStudyTooltip}
             mouseEnterDelay={1000}
             mouseLeaveDelay={0}
           />
