@@ -279,9 +279,12 @@ class PlotsDynamic extends Component {
         },
       ];
     }
-
+    // Feature Data needs this to correctly scroll overflow
+    // 3/4 screen width - volcano div width - padding
+    const maxDivWidth =
+      window.screen.width * 0.75 - this.props.volcanoDivWidth - 20;
     return (
-      <>
+      <div style={{ maxWidth: maxDivWidth }}>
         {Toggle}
         <Tab
           onTabChange={this.handleTabChange}
@@ -296,7 +299,7 @@ class PlotsDynamic extends Component {
             className: 'PlotTabsContainer',
           }}
         />
-      </>
+      </div>
     );
   }
 }
