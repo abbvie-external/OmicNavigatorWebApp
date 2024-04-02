@@ -282,7 +282,7 @@ class PlotsDynamic extends Component {
     // Feature Data needs this to correctly scroll overflow
     // 3/4 screen width - volcano div width - padding
     const maxDivWidth =
-      window.screen.width * 0.75 - this.props.volcanoDivWidth - 20;
+      window.screen.width * 0.75 - this.props.volcanoDivWidth - 50;
     return (
       <div style={{ maxWidth: maxDivWidth }}>
         {Toggle}
