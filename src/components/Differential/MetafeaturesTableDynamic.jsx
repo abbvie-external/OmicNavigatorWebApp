@@ -202,7 +202,11 @@ class MetafeaturesTableDynamic extends Component {
       metafeaturesTableData,
       metafeaturesLoaded,
     } = this.state;
-
+    const ratio = this.props.upperPlotsHeight / window.screen.height;
+    const ratioVh = ratio * 100;
+    const ratioVhRound = Math.round(ratioVh) - 20;
+    const ratioVhString = `${ratioVhRound}vh`;
+    console.log(ratioVhString);
     // const { metaFeaturesData } = this.props;
     return (
       <div className="MetafeaturesTableDiv" id="MetafeaturesTableDynamicDiv">
@@ -224,6 +228,7 @@ class MetafeaturesTableDynamic extends Component {
           disableColumnReorder
           // disableFilters={false}
           min-height="5vh"
+          height={ratioVhString}
           emptyMessage={'No Feature Data Available'}
           disableQuickViewEditing
           disableQuickViewMenu
