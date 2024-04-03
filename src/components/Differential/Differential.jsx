@@ -991,7 +991,7 @@ class Differential extends Component {
         if (multifeaturePlot.length === 1) {
           try {
             const isMultiModelMultiTestVar = isMultiModelMultiTest(
-              plot.plotType,
+              multifeaturePlot[0].plotType,
             );
             const testIdNotCommon =
               !differentialTestIdsCommon.includes(differentialTest);
