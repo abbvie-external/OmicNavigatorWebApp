@@ -52,6 +52,7 @@ class TabSingleFeature extends Component {
       plotOverlayLoaded,
       modelSpecificMetaFeaturesExist,
       singleFeaturePlotTypes,
+      upperPlotsHeight,
     } = this.props;
     let panes = [];
     let dimensions = '';
@@ -143,6 +144,7 @@ class TabSingleFeature extends Component {
                   modelSpecificMetaFeaturesExist={
                     modelSpecificMetaFeaturesExist
                   }
+                  upperPlotsHeight={upperPlotsHeight}
                 />
               </Tab.Pane>
             ),
