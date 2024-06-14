@@ -22,7 +22,7 @@ export default class PlotlyMultiFeature extends Component {
     plotlyInteractive: true,
   };
   componentDidMount() {
-    this.getJson(this.props.cacheString);
+    this.getJson();
   }
 
   componentDidUpdate(prevProps) {
@@ -38,19 +38,29 @@ export default class PlotlyMultiFeature extends Component {
   }
 
   getJson = () => {
-    const { plotlyData, width, height, plotId } = this.props;
-    const parsedData = plotlyData ? JSON.parse(plotlyData) : null;
-    const data = parsedData?.data || null;
-    let layout = parsedData?.layout || null;
-    if (layout) {
-      layout = reviseLayout(layout, width, height, plotId);
+    const {
+      plotlyData,
+      width,
+      height,
+      plotId,
+      errorMessagePlotlyMultiFeature,
+    } = this.props;
+    if (!errorMessagePlotlyMultiFeature) {
+      const parsedData = plotlyData ? JSON.parse(plotlyData) : null;
+      const data = parsedData?.data || null;
+      let layout = parsedData?.layout || null;
+      if (layout) {
+        layout = reviseLayout(layout, width, height, plotId);
+      }
+      this.setState({
+        json: {
+          data,
+          layout,
+        },
+      });
     }
     this.setState({
-      json: {
-        data,
-        layout,
-        loading: false,
-      },
+      loading: false,
     });
   };
 
@@ -91,7 +101,9 @@ export default class PlotlyMultiFeature extends Component {
     };
     return (
       <div>
-        {this.state.json.data && this.state.json.layout ? (
+        {this.state.json.data &&
+        this.state.json.layout &&
+        !errorMessagePlotlyMultiFeature ? (
           <>
             <Popup
               trigger={
@@ -132,7 +144,7 @@ export default class PlotlyMultiFeature extends Component {
           </div>
         )}
         <span id="PlotMultiFeatureDataLoader">
-          {!this.state.loading && loadingDimmer}
+          {this.state.loading && loadingDimmer}
         </span>
       </div>
     );

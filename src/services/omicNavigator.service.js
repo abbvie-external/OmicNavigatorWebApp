@@ -64,17 +64,11 @@ class OmicNavigatorService {
       const url = `${self.baseUrl}${graphicsUrl}/svg`;
       return url;
     } catch (error) {
-      // DEV - what methods should we not throw errors/toasts for?
-      if (method === 'getResultsUpset' || method === 'plotStudy') {
-        console.log(`failed to retrieve plot for ${method} with payload:`);
-        console.info(obj);
-      } else if (!axios.isCancel(error)) {
-        toast.error(`${error.message}`);
+      if (!axios.isCancel(error)) {
         if (handleError != null) {
           handleError(false);
-        } else {
-          throw error;
         }
+        return `Note: ${error.response.data}`;
       }
     }
   }
@@ -99,16 +93,13 @@ class OmicNavigatorService {
       });
       return data;
     } catch (error) {
-      if (method === 'getResultsUpset' || method === 'plotStudy') {
+      if (!axios.isCancel(error)) {
         console.log(`failed to retrieve plot for ${method} with payload:`);
         console.info(obj);
-      } else if (!axios.isCancel(error)) {
-        toast.error(`${error.message}`);
         if (handleError != null) {
           handleError(false);
-        } else {
-          throw error;
         }
+        return `Note: ${error.response.data}`;
       }
     }
   }
@@ -133,18 +124,18 @@ class OmicNavigatorService {
             .then((response) => resolve(response))
             .catch(function (thrown) {
               if (!axios.isCancel(thrown)) {
-                toast.error(`${thrown.message}`);
                 if (handleError != null) {
                   handleError(false);
                 }
+                return `Note: ${error.response.data}`;
               }
             });
         })
         .catch((error) => {
-          toast.error(`${error.statusText}: ${error.responseText}`);
           if (handleError != null) {
             handleError(false);
           }
+          return `Note: ${error.response.data}`;
         });
     });
   }
@@ -280,7 +271,8 @@ class OmicNavigatorService {
       this[cacheKey] = promise;
       return promise;
     } catch (err) {
-      return err;
+      return `Note: ${error.response.data}`;
+      // return err;
     }
   }
 
@@ -780,9 +772,9 @@ class OmicNavigatorService {
         this[cacheKey] = dataFromPromise;
         return dataFromPromise;
       } catch {
-        if (axios.isCancel) {
-          // console.log('multi-model mapping cancelled')
-        }
+        // if (axios.isCancel) {
+        // console.log('multi-model mapping cancelled')
+        // }
       }
     }
   }

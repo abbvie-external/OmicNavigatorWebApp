@@ -13,7 +13,7 @@ export default class PlotlyOverlay extends Component {
   };
 
   componentDidMount() {
-    this.getJson(this.props.cacheString);
+    this.getJson();
   }
 
   componentDidUpdate(prevProps) {
@@ -29,19 +29,24 @@ export default class PlotlyOverlay extends Component {
   }
 
   getJson = () => {
-    const { plotlyData, width, height, plotId } = this.props;
-    const parsedData = plotlyData ? JSON.parse(plotlyData) : null;
-    const data = parsedData?.data || null;
-    let layout = parsedData?.layout || null;
-    if (layout) {
-      layout = reviseLayout(layout, width, height, plotId);
+    const { plotlyData, width, height, plotId, errorMessagePlotlyOverlay } =
+      this.props;
+    if (!errorMessagePlotlyOverlay) {
+      const parsedData = plotlyData ? JSON.parse(plotlyData) : null;
+      const data = parsedData?.data || null;
+      let layout = parsedData?.layout || null;
+      if (layout) {
+        layout = reviseLayout(layout, width, height, plotId);
+      }
+      this.setState({
+        json: {
+          data,
+          layout,
+        },
+      });
     }
     this.setState({
-      json: {
-        data,
-        layout,
-        loading: false,
-      },
+      loading: false,
     });
   };
 
@@ -69,7 +74,9 @@ export default class PlotlyOverlay extends Component {
     };
     return (
       <div>
-        {this.state.json.data && this.state.json.layout ? (
+        {this.state.json.data &&
+        this.state.json.layout &&
+        !errorMessagePlotlyOverlay ? (
           <Plot
             data={this.state.json.data}
             layout={this.state.json.layout}
@@ -81,7 +88,7 @@ export default class PlotlyOverlay extends Component {
           </h4>
         )}
         <span id="PlotOverlayDataLoader">
-          {!this.state.loading && loadingDimmer}
+          {this.state.loading && loadingDimmer}
         </span>
       </div>
     );
