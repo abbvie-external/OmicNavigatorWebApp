@@ -1312,6 +1312,8 @@ class Enrichment extends Component {
       enrichmentTest,
       uData,
       enrichmentModelIds,
+      enrichmentModelsAndAnnotations,
+      enrichmentPlotDescriptions,
       enrichmentAnnotationIdsCommon,
     } = this.state;
     const { enrichmentStudy, enrichmentModel, enrichmentAnnotation } =
@@ -1337,7 +1339,24 @@ class Enrichment extends Component {
           .map((plot) => {
             if (plot.plotType.includes('multiFeature')) {
               return undefined;
+              // enrichment doesn't support multi-feature plotting yet
+              // thus, we do not use `getIdArg`
             }
+            // plot metadata will now include the field 'models'. This field should be referenced for all plots of type 'multimodel' in the following way:
+            // 1) if 'models' exists and !='all' AND the currently selected model is not in the character vector assigned to 'models' THEN do not render this plot.
+            // 2) if 'models' exists and != 'all' AND the currently selected model is in this character vector, only pass the specified models to plotStudy, starting with the currently selected model.
+            // The existing conventions for intersections of tests across models still applies, but only to the set of models specified following the execution of the above logic.
+            const plotMetadata = enrichmentPlotDescriptions[enrichmentModel];
+            const plotMetadataSpecificPlot = plotMetadata[plot.plotID];
+            const designatedModels = plotMetadataSpecificPlot.models || null;
+            const designatedModelsMultiModelExists =
+              designatedModels &&
+              designatedModels !== 'all' &&
+              designatedModels.includes(enrichmentModel);
+            const enrichmentModelIdsOverride = designatedModelsMultiModelExists
+              ? designatedModels
+              : enrichmentModelIds;
+            // end of enrichmentModelIdsOverride
             const isMultiModelMultiTestVar = isMultiModelMultiTest(
               plot.plotType,
             );
@@ -1350,16 +1369,19 @@ class Enrichment extends Component {
             } else {
               testsArg = getTestsArg(
                 plot.plotType,
-                enrichmentModelIds,
+                enrichmentModelIdsOverride,
                 uData,
                 enrichmentTest,
               );
             }
             const modelsArg = getModelsArg(
               plot.plotType,
-              enrichmentModelIds,
+              enrichmentModelIdsOverride,
               uData,
               enrichmentModel,
+              enrichmentModelsAndAnnotations,
+              null,
+              enrichmentAnnotationIdsCommon,
             );
             return omicNavigatorService
               .plotStudyReturnSvgUrl(

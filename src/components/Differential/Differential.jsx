@@ -634,6 +634,7 @@ class Differential extends Component {
       differentialModelsAndTests,
       multiModelMappingFirstKey,
       multiModelMappingArrays,
+      differentialPlotDescriptions,
     } = this.state;
     const {
       differentialStudy,
@@ -688,6 +689,23 @@ class Differential extends Component {
               multiModelMappingArrays,
               id,
             );
+            // plot metadata will now include the field 'models'. This field should be referenced for all plots of type 'multimodel' in the following way:
+            // 1) if 'models' exists and !='all' AND the currently selected model is not in the character vector assigned to 'models' THEN do not render this plot.
+            // 2) if 'models' exists and != 'all' AND the currently selected model is in this character vector, only pass the specified models to plotStudy, starting with the currently selected model.
+            // The existing conventions for intersections of tests across models still applies, but only to the set of models specified following the execution of the above logic.
+            const plotMetadata =
+              differentialPlotDescriptions[differentialModel];
+            const plotMetadataSpecificPlot = plotMetadata[plot.plotID];
+            const designatedModels = plotMetadataSpecificPlot.models || null;
+            const designatedModelsMultiModelExists =
+              designatedModels &&
+              designatedModels !== 'all' &&
+              designatedModels.includes(differentialModel);
+            const differentialModelIdsOverride =
+              designatedModelsMultiModelExists
+                ? designatedModels
+                : differentialModelIds;
+            // end of differentialModelIdsOverride
             const isMultiModelMultiTestVar = isMultiModelMultiTest(
               plot.plotType,
             );
@@ -700,7 +718,7 @@ class Differential extends Component {
             } else {
               testsArg = getTestsArg(
                 plot.plotType,
-                differentialModelIds,
+                differentialModelIdsOverride,
                 differentialTestIds,
                 differentialTest,
                 differentialModelsAndTests,
@@ -732,7 +750,6 @@ class Differential extends Component {
                   null,
                   cancelToken,
                 )
-                // .then(svg => ({ svg, plotType: plot }));
                 .then((svg) => {
                   let svgInfo = {
                     plotType: plots[i],
@@ -812,6 +829,23 @@ class Differential extends Component {
                 multiModelMappingArrays,
                 id,
               );
+              // plot metadata will now include the field 'models'. This field should be referenced for all plots of type 'multimodel' in the following way:
+              // 1) if 'models' exists and !='all' AND the currently selected model is not in the character vector assigned to 'models' THEN do not render this plot.
+              // 2) if 'models' exists and != 'all' AND the currently selected model is in this character vector, only pass the specified models to plotStudy, starting with the currently selected model.
+              // The existing conventions for intersections of tests across models still applies, but only to the set of models specified following the execution of the above logic.
+              const plotMetadata =
+                differentialPlotDescriptions[differentialModel];
+              const plotMetadataSpecificPlot = plotMetadata[plot.plotID];
+              const designatedModels = plotMetadataSpecificPlot.models || null;
+              const designatedModelsMultiModelExists =
+                designatedModels &&
+                designatedModels !== 'all' &&
+                designatedModels.includes(differentialModel);
+              const differentialModelIdsOverride =
+                designatedModelsMultiModelExists
+                  ? designatedModels
+                  : differentialModelIds;
+              // end of differentialModelIdsOverride
               const isMultiModelMultiTestVar = isMultiModelMultiTest(
                 plot.plotType,
               );
@@ -824,7 +858,7 @@ class Differential extends Component {
               } else {
                 testsArg = getTestsArg(
                   plot.plotType,
-                  differentialModelIds,
+                  differentialModelIdsOverride,
                   differentialTestIds,
                   differentialTest,
                   differentialModelsAndTests,
@@ -835,7 +869,7 @@ class Differential extends Component {
               }
               const modelsArg = getModelsArg(
                 plot.plotType,
-                differentialModelIds,
+                differentialModelIdsOverride,
                 differentialTestIds,
                 differentialModel,
                 differentialModelsAndTests,
@@ -966,6 +1000,7 @@ class Differential extends Component {
         differentialModelIds,
         differentialModelsAndTests,
         multiModelMappingFirstKey,
+        differentialPlotDescriptions,
       } = this.state;
       const {
         differentialStudy,
@@ -990,6 +1025,24 @@ class Differential extends Component {
       if (multifeaturePlot.length !== 0) {
         if (multifeaturePlot.length === 1) {
           try {
+            // plot metadata will now include the field 'models'. This field should be referenced for all plots of type 'multimodel' in the following way:
+            // 1) if 'models' exists and !='all' AND the currently selected model is not in the character vector assigned to 'models' THEN do not render this plot.
+            // 2) if 'models' exists and != 'all' AND the currently selected model is in this character vector, only pass the specified models to plotStudy, starting with the currently selected model.
+            // The existing conventions for intersections of tests across models still applies, but only to the set of models specified following the execution of the above logic.
+            const plotMetadata =
+              differentialPlotDescriptions[differentialModel];
+            const plotMetadataSpecificPlot =
+              plotMetadata[multifeaturePlot[0].plotID];
+            const designatedModels = plotMetadataSpecificPlot.models || null;
+            const designatedModelsMultiModelExists =
+              designatedModels &&
+              designatedModels !== 'all' &&
+              designatedModels.includes(differentialModel);
+            const differentialModelIdsOverride =
+              designatedModelsMultiModelExists
+                ? designatedModels
+                : differentialModelIds;
+            // end of differentialModelIdsOverride
             const isMultiModelMultiTestVar = isMultiModelMultiTest(
               multifeaturePlot[0].plotType,
             );
@@ -1002,7 +1055,7 @@ class Differential extends Component {
             } else {
               testsArg = getTestsArg(
                 multifeaturePlot[0].plotType,
-                differentialModelIds,
+                differentialModelIdsOverride,
                 differentialTestIds,
                 differentialTest,
                 differentialModelsAndTests,
@@ -1013,7 +1066,7 @@ class Differential extends Component {
             }
             const modelsArg = getModelsArg(
               multifeaturePlot[0].plotType,
-              differentialModelIds,
+              differentialModelIdsOverride,
               differentialTestIds,
               differentialModel,
               differentialModelsAndTests,
@@ -1082,6 +1135,23 @@ class Differential extends Component {
           }
         } else {
           _.forEach(multifeaturePlot, function (plot, i) {
+            // plot metadata will now include the field 'models'. This field should be referenced for all plots of type 'multimodel' in the following way:
+            // 1) if 'models' exists and !='all' AND the currently selected model is not in the character vector assigned to 'models' THEN do not render this plot.
+            // 2) if 'models' exists and != 'all' AND the currently selected model is in this character vector, only pass the specified models to plotStudy, starting with the currently selected model.
+            // The existing conventions for intersections of tests across models still applies, but only to the set of models specified following the execution of the above logic.
+            const plotMetadata =
+              differentialPlotDescriptions[differentialModel];
+            const plotMetadataSpecificPlot = plotMetadata[plot.plotID];
+            const designatedModels = plotMetadataSpecificPlot.models || null;
+            const designatedModelsMultiModelExists =
+              designatedModels &&
+              designatedModels !== 'all' &&
+              designatedModels.includes(differentialModel);
+            const differentialModelIdsOverride =
+              designatedModelsMultiModelExists
+                ? designatedModels
+                : differentialModelIds;
+            // end of differentialModelIdsOverride
             const isMultiModelMultiTestVar = isMultiModelMultiTest(
               plot.plotType,
             );
@@ -1094,7 +1164,7 @@ class Differential extends Component {
             } else {
               testsArg = getTestsArg(
                 plot.plotType,
-                differentialModelIds,
+                differentialModelIdsOverride,
                 differentialTestIds,
                 differentialTest,
                 differentialModelsAndTests,
@@ -1105,7 +1175,7 @@ class Differential extends Component {
             }
             const modelsArg = getModelsArg(
               plot.plotType,
-              differentialModelIds,
+              differentialModelIdsOverride,
               differentialTestIds,
               differentialModel,
               differentialModelsAndTests,
@@ -1321,6 +1391,21 @@ class Differential extends Component {
       p.plotType.includes('multiFeature'),
     );
     if (multifeaturePlot.length !== 0) {
+      // plot metadata will now include the field 'models'. This field should be referenced for all plots of type 'multimodel' in the following way:
+      // 1) if 'models' exists and !='all' AND the currently selected model is not in the character vector assigned to 'models' THEN do not render this plot.
+      // 2) if 'models' exists and != 'all' AND the currently selected model is in this character vector, only pass the specified models to plotStudy, starting with the currently selected model.
+      // The existing conventions for intersections of tests across models still applies, but only to the set of models specified following the execution of the above logic.
+      const plotMetadata = differentialPlotDescriptions[differentialModel];
+      const plotMetadataSpecificPlot = plotMetadata[plot.plotID];
+      const designatedModels = plotMetadataSpecificPlot.models || null;
+      const designatedModelsMultiModelExists =
+        designatedModels &&
+        designatedModels !== 'all' &&
+        designatedModels.includes(differentialModel);
+      const differentialModelIdsOverride = designatedModelsMultiModelExists
+        ? designatedModels
+        : differentialModelIds;
+      // end of differentialModelIdsOverride
       const isMultiModelMultiTestVar = isMultiModelMultiTest(
         multifeaturePlot[plotindex].plotType,
       );
@@ -1333,7 +1418,7 @@ class Differential extends Component {
       } else {
         testsArg = getTestsArg(
           multifeaturePlot[plotindex].plotType,
-          differentialModelIds,
+          differentialModelIdsOverride,
           differentialTestIds,
           differentialTest,
           differentialModelsAndTests,
@@ -1344,7 +1429,7 @@ class Differential extends Component {
       }
       const modelsArg = getModelsArg(
         multifeaturePlot[plotindex].plotType,
-        differentialModelIds,
+        differentialModelIdsOverride,
         differentialTestIds,
         differentialModel,
         differentialModelsAndTests,
@@ -1364,7 +1449,6 @@ class Differential extends Component {
         const svg = await promise;
         if (svg) {
           if (svg === true) {
-            // 10 second timeout
             return;
           } else return svg;
         } else return null;
