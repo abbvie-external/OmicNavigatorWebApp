@@ -111,7 +111,7 @@ class Tabs extends Component {
         proxy: '',
         site: 'datadoghq.com',
         service: 'omicnavigator-ui',
-        env: process.env.NODE_ENV,
+        env: 'dev',
         sessionSampleRate: 100,
         sessionReplaySampleRate: 20,
         trackUserInteractions: true,
