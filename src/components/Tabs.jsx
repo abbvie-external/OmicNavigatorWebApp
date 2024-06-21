@@ -10,11 +10,14 @@ import {
   Header,
 } from 'semantic-ui-react';
 import { omicNavigatorService } from '../services/omicNavigator.service';
+import { authService } from '../services/auth.service';
 import Differential from './Differential/Differential';
 import omicNavigatorIcon from '../resources/icon.png';
 import Enrichment from './Enrichment/Enrichment';
 import { updateUrl } from './Shared/UrlControl';
-
+import { datadogRum } from '@datadog/browser-rum';
+import { jwtDecode } from 'jwt-decode';
+import { createHash } from 'crypto';
 class Tabs extends Component {
   constructor(props) {
     super(props);
@@ -74,6 +77,9 @@ class Tabs extends Component {
   }
 
   componentDidMount() {
+    if (process.env.NODE_ENV === 'development') {
+      this.initDatadog();
+    }
     updateUrl(
       this.props,
       this.state,
@@ -84,12 +90,38 @@ class Tabs extends Component {
       null,
     );
     this.getStudies();
-    window.addEventListener('resize', this.handleResize);
+    window.addEventListener('resizeDifferential', this.handleResize);
   }
 
   componentWillUnmount() {
     // Remove the event listener when the component is unmounted
-    window.removeEventListener('resize', this.handleResize);
+    window.removeEventListener('resizeDifferential', this.handleResize);
+  }
+
+  async initDatadog() {
+    try {
+      let authToken = await authService.getAuthToken();
+      let decodedToken = jwtDecode(authToken.token);
+      let userUpi = decodedToken?.upi || null;
+      let hashedUpi = createHash('md5').update(userUpi).digest('hex');
+      datadogRum.setUser({ id: hashedUpi });
+      datadogRum.init({
+        applicationId: '',
+        clientToken: '',
+        proxy: '',
+        site: 'datadoghq.com',
+        service: 'omicnavigator-ui',
+        env: 'dev',
+        sessionSampleRate: 100,
+        sessionReplaySampleRate: 20,
+        trackUserInteractions: true,
+        trackResources: true,
+        trackLongTasks: true,
+        defaultPrivacyLevel: 'allow',
+      });
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   handleResize() {
