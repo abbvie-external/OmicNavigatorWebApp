@@ -68,7 +68,7 @@ class OmicNavigatorService {
         if (handleError != null) {
           handleError(false);
         }
-        return `Note: ${error.response.data}`;
+        return `Error: ${error.response.data}`;
       }
     }
   }
@@ -99,7 +99,7 @@ class OmicNavigatorService {
         if (handleError != null) {
           handleError(false);
         }
-        return `Note: ${error.response.data}`;
+        return `Error: ${error.response.data}`;
       }
     }
   }
@@ -127,7 +127,7 @@ class OmicNavigatorService {
                 if (handleError != null) {
                   handleError(false);
                 }
-                return `Note: ${error.response.data}`;
+                return `Error: ${error.response.data}`;
               }
             });
         })
@@ -135,7 +135,7 @@ class OmicNavigatorService {
           if (handleError != null) {
             handleError(false);
           }
-          return `Note: ${error.response.data}`;
+          return `Error: ${error.response.data}`;
         });
     });
   }
@@ -271,7 +271,7 @@ class OmicNavigatorService {
       this[cacheKey] = promise;
       return promise;
     } catch (err) {
-      return `Note: ${error.response.data}`;
+      return `Error: ${error.response.data}`;
       // return err;
     }
   }
