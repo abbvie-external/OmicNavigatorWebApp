@@ -107,7 +107,7 @@ class TabOverlay extends Component {
           if (
             // !isPlotlyPlot &&
             (typeof svg === 'string' || svg instanceof String) &&
-            svg.startsWith('Note:')
+            svg.startsWith('Error:')
           ) {
             errorMessagePlotlyOverlay =
               plotOverlayData.svg[activeTabIndexPlotsOverlay].svg;
