@@ -102,16 +102,26 @@ class TabOverlay extends Component {
           );
           const testIdNotCommon =
             !differentialTestIdsCommon.includes(differentialTest);
-          const errorMessagePlotlyOverlay =
-            isMultiModelMultiTestVar && testIdNotCommon
-              ? `${s.plotType.plotDisplay} can not be created because the currently selected test is not present in all models`
-              : `${s.plotType.plotDisplay} is not available for feature ${s.plotType.plotKey}`;
+          let svg = plotOverlayData.svg[activeTabIndexPlotsOverlay].svg;
+          let errorMessagePlotlyOverlay = null;
+          if (
+            // !isPlotlyPlot &&
+            (typeof svg === 'string' || svg instanceof String) &&
+            svg.startsWith('Error:')
+          ) {
+            errorMessagePlotlyOverlay =
+              plotOverlayData.svg[activeTabIndexPlotsOverlay].svg;
+          }
+          if (isMultiModelMultiTestVar && testIdNotCommon) {
+            errorMessagePlotlyOverlay = `${s.plotType.plotDisplay} can not be created because the currently selected test is not present in all models`;
+          }
+          // `${s.plotType.plotDisplay} is not available for feature ${s.plotType.plotKey}`;
           const svgPanes = {
             menuItem: `${s.plotType.plotDisplay}`,
             render: () => (
               <Tab.Pane attached="true" as="div" key={cacheStringArg}>
                 <div id="PlotsOverlayContainer" className="svgSpan">
-                  {isPlotlyPlot ? (
+                  {isPlotlyPlot && !errorMessagePlotlyOverlay ? (
                     <PlotlyOverlay
                       cacheString={cacheStringArg}
                       plotlyData={s.svg}
@@ -129,12 +139,18 @@ class TabOverlay extends Component {
                       plotKey={plotOverlayData?.key}
                       errorMessagePlotlyOverlay={errorMessagePlotlyOverlay}
                     />
-                  ) : (
+                  ) : s.svg && !errorMessagePlotlyOverlay ? (
                     <div
                       id="PlotsOverlayContainer"
                       className="svgSpan"
                       dangerouslySetInnerHTML={{ __html: s.svg }}
                     ></div>
+                  ) : (
+                    <div className="PlotInstructions">
+                      <h4 className="PlotInstructionsText NoSelect">
+                        {errorMessagePlotlyOverlay}
+                      </h4>
+                    </div>
                   )}
                 </div>
               </Tab.Pane>
