@@ -729,7 +729,7 @@ class Differential extends Component {
             }
             const modelsArg = getModelsArg(
               plot.plotType,
-              differentialModelIds,
+              differentialModelIdsOverride,
               differentialTestIds,
               differentialModel,
               differentialModelsAndTests,
