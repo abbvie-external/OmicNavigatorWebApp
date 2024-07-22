@@ -76,17 +76,26 @@ class TabMultiFeature extends Component {
           );
           const testIdNotCommon =
             !differentialTestIdsCommon.includes(differentialTest);
-          const errorMessagePlotlyMultiFeature =
-            isMultiModelMultiTestVar && testIdNotCommon
-              ? `${s.plotType.plotDisplay} can not be created because the currently selected test is not present in all models`
-              : `${s.plotType.plotDisplay} is not available for this
-          combination of features`;
+          let svg =
+            plotMultiFeatureData.svg[activeTabIndexPlotsMultiFeature].svg;
+          let errorMessagePlotlyMultiFeature = null;
+          if (
+            // !isPlotlyPlot &&
+            (typeof svg === 'string' || svg instanceof String) &&
+            svg.startsWith('Error:')
+          ) {
+            errorMessagePlotlySingleFeature = svg;
+          }
+          if (isMultiModelMultiTestVar && testIdNotCommon) {
+            errorMessagePlotlyMultiFeature = `${s.plotType.plotDisplay} can not be created because the currently selected test is not present in all models`;
+          }
+          // ${s.plotType.plotDisplay} is not available for this combination of features`;
           const svgPanes = {
             menuItem: `${s.plotType.plotDisplay}`,
             render: () => (
               <Tab.Pane attached="true" as="div" key={cacheStringArg}>
                 <div id="PlotsMultiFeatureContainer" className="svgSpan">
-                  {isPlotlyPlot ? (
+                  {isPlotlyPlot && !errorMessagePlotlyMultiFeature ? (
                     <PlotlyMultiFeature
                       cacheString={cacheStringArg}
                       plotlyData={s.svg}
@@ -106,7 +115,7 @@ class TabMultiFeature extends Component {
                         errorMessagePlotlyMultiFeature
                       }
                     />
-                  ) : s.svg ? (
+                  ) : s.svg && !errorMessagePlotlyMultiFeature ? (
                     <SVG
                       cacheRequests={true}
                       src={srcUrl}

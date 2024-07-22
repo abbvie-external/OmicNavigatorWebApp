@@ -28,19 +28,24 @@ export default class PlotlySingleFeature extends Component {
   }
 
   getJson = () => {
-    const { plotlyData, width, height } = this.props;
-    const parsedData = plotlyData ? JSON.parse(plotlyData) : null;
-    const data = parsedData?.data || null;
-    let layout = parsedData?.layout || null;
-    if (layout) {
-      layout = reviseLayout(layout, width, height);
+    const { plotlyData, width, height, errorMessagePlotlySingleFeature } =
+      this.props;
+    if (!errorMessagePlotlySingleFeature) {
+      const parsedData = plotlyData ? JSON.parse(plotlyData) : null;
+      const data = parsedData?.data || null;
+      let layout = parsedData?.layout || null;
+      if (layout) {
+        layout = reviseLayout(layout, width, height);
+      }
+      this.setState({
+        json: {
+          data,
+          layout,
+        },
+      });
     }
     this.setState({
-      json: {
-        data,
-        layout,
-        loading: false,
-      },
+      loading: false,
     });
   };
 
@@ -63,7 +68,9 @@ export default class PlotlySingleFeature extends Component {
     };
     return (
       <div>
-        {this.state.json.data && this.state.json.layout ? (
+        {this.state.json.data &&
+        this.state.json.layout &&
+        !errorMessagePlotlySingleFeature ? (
           <Plot
             data={this.state.json.data}
             layout={this.state.json.layout}
@@ -77,7 +84,7 @@ export default class PlotlySingleFeature extends Component {
           </div>
         )}
         <span id="PlotSingleFeatureDataLoader">
-          {!this.state.loading && loadingDimmer}
+          {this.state.loading && loadingDimmer}
         </span>
       </div>
     );
