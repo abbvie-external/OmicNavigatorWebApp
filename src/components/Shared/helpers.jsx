@@ -466,7 +466,7 @@ export const reviseLayout = (layout, width, height, plotId) => {
 export function getMaxAndMin(data, element, doTransform) {
   if (!data.length) return [0, 0];
   const arrayOfNumbers = [];
-  for (var i = 1; i < data.length; i++) {
+  for (var i = 0; i < data.length; i++) {
     if (
       data[i] != null &&
       data[i][element] != null &&
