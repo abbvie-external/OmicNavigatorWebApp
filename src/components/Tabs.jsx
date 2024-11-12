@@ -14,7 +14,6 @@ import Differential from './Differential/Differential';
 import omicNavigatorIcon from '../resources/icon.png';
 import Enrichment from './Enrichment/Enrichment';
 import { updateUrl } from './Shared/UrlControl';
-
 class Tabs extends Component {
   constructor(props) {
     super(props);
@@ -64,7 +63,7 @@ class Tabs extends Component {
       differentialFeatureIdKey: '',
       filteredDifferentialFeatureIdKey: '',
       // when updating the app version, change one line in 3 files: package.json, manifest.json and Tabs.jsx
-      appVersion: '1.9.5',
+      appVersion: '1.9.7',
       packageVersion: '',
       infoOpenFirst: false,
       infoOpenSecond: false,

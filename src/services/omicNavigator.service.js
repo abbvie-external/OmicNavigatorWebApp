@@ -298,7 +298,11 @@ class OmicNavigatorService {
   }
 
   async listStudies() {
-    const promise = this.axiosPost('listStudies', {}, true, null, null, 25000);
+    const promise = await fetch(
+      `${this.baseUrl}/ocpu/library/OmicNavigator/R/listStudies/json?auto_unbox=true&na="string"`,
+    );
+    // test to remove axios and see if performance improves
+    // const promise = this.axiosPost('listStudies', {}, true, null, null, 25000);
     const studiesFromPromise = await promise;
     return studiesFromPromise;
   }
