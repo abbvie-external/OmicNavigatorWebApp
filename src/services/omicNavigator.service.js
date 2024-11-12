@@ -298,12 +298,18 @@ class OmicNavigatorService {
   }
 
   async listStudies() {
-    const promise = await fetch(
-      `${this.baseUrl}/ocpu/library/OmicNavigator/R/listStudies/json?auto_unbox=true&na="string"`,
-    );
     // test to remove axios and see if performance improves
     // const promise = this.axiosPost('listStudies', {}, true, null, null, 25000);
-    const studiesFromPromise = await promise;
+    const response = await fetch(
+      `${this.baseUrl}/ocpu/library/OmicNavigator/R/listStudies/json?auto_unbox=true&na="string"`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+    const studiesFromPromise = await response.json();
     return studiesFromPromise;
   }
 
