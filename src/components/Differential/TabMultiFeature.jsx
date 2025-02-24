@@ -84,7 +84,7 @@ class TabMultiFeature extends Component {
             (typeof svg === 'string' || svg instanceof String) &&
             svg.startsWith('Error:')
           ) {
-            errorMessagePlotlySingleFeature = svg;
+            errorMessagePlotlyMultiFeature = svg;
           }
           if (isMultiModelMultiTestVar && testIdNotCommon) {
             errorMessagePlotlyMultiFeature = `${s.plotType.plotDisplay} can not be created because the currently selected test is not present in all models`;
