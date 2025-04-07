@@ -63,10 +63,9 @@ class Tabs extends Component {
       differentialFeatureIdKey: '',
       filteredDifferentialFeatureIdKey: '',
       // when updating the app version, change one line in 3 files: package.json, manifest.json and Tabs.jsx
-      appVersion: '1.9.7',
+      appVersion: '1.9.8',
       packageVersion: '',
-      infoOpenFirst: false,
-      infoOpenSecond: false,
+      infoOpen: false,
       screenWidth: window.innerWidth,
     };
     this.handleResize = this.handleResize.bind(this);
@@ -219,13 +218,7 @@ class Tabs extends Component {
 
   toggleInfoFirst = (bool) => {
     this.setState({
-      infoOpenFirst: bool,
-    });
-  };
-
-  toggleInfoSecond = (bool) => {
-    this.setState({
-      infoOpenSecond: bool,
+      infoOpen: bool,
     });
   };
 
@@ -275,7 +268,7 @@ class Tabs extends Component {
           closeOnEscape={true}
           closeIcon
           centered={false}
-          open={self.state.infoOpenFirst}
+          open={self.state.infoOpen}
           onOpen={() => self.toggleInfoFirst(true)}
           onClose={() => self.toggleInfoFirst(false)}
         >
@@ -289,67 +282,28 @@ class Tabs extends Component {
                 </span>
               </Header>
               <p>
-                To report a bug, please open a GitHub Issue within our{' '}
-                <b>public repository</b> (note that anything you write is open
-                to the public and not private to AbbVie). In your report, please
-                include the app and package versions listed above.
-              </p>
-              <p>
-                If you are an AbbVie employee and need to include specific
-                details about your study data, please email the developers at{' '}
+                To report a bug, please email the developers at{' '}
                 <a
                   href={MailToString}
                   rel="noreferrer"
                   alt="Email OmicNavigator Team"
                   target="_blank"
+                  onClick={() => (window.location.href = MailToString)}
                 >
                   OmicNavigator@abbvie.com
                 </a>
-                .
+                . Please include the app and package versions listed above.
               </p>
             </Modal.Description>
           </Modal.Content>
           <Modal.Actions>
-            <Button onClick={() => self.toggleInfoSecond(true)} primary>
-              Open Issue
+            <Button
+              primary
+              onClick={() => (window.location.href = MailToString)}
+            >
+              Email OmicNavigator
             </Button>
           </Modal.Actions>
-          <Modal
-            onClose={() => self.toggleInfoSecond(false)}
-            open={self.state.infoOpenSecond}
-            size="small"
-          >
-            <Modal.Header className="PrimaryBackground">
-              Proceed to public repository?
-            </Modal.Header>
-            <Modal.Content>
-              <p>
-                Thank you for contributing to this open-source project. You are
-                being redirected to our public repository to make a public
-                comment. Please click below to proceed.
-              </p>
-            </Modal.Content>
-            <Modal.Actions>
-              <Button
-                icon="cancel"
-                content="Cancel"
-                onClick={() => self.toggleInfoSecond(false)}
-              />
-              <a
-                href="https://github.com/abbvie-external/OmicNavigatorWebApp/issues/new"
-                rel="noreferrer"
-                alt="OmicNavigator Issues Github"
-                target="_blank"
-              >
-                <Button
-                  onClick={() => self.toggleInfoSecond(false)}
-                  className="PrimaryBackground"
-                >
-                  Proceed <Icon name="right chevron" />
-                </Button>
-              </a>
-            </Modal.Actions>
-          </Modal>
         </Modal>
       </span>
     );
