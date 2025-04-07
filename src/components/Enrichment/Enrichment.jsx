@@ -1383,6 +1383,11 @@ class Enrichment extends Component {
               null,
               enrichmentAnnotationIdsCommon,
             );
+            // hotfix for multiModel_boxplot_pro until logic is clarified
+            if (plot.plotID === 'multiModel_boxplot_pro') {
+              modelsArg = ['Proteomics', 'Transcriptomics'];
+              testsArg = null;
+            }
             return omicNavigatorService
               .plotStudyReturnSvgUrl(
                 enrichmentStudy,
