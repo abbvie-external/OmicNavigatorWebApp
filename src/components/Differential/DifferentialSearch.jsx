@@ -1074,7 +1074,7 @@ class DifferentialSearch extends Component {
             ? studyName
             : differentialStudyReportTooltip
         }
-        on="click"
+        on="hover"
       />
     );
 

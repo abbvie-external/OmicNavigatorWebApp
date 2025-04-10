@@ -1153,7 +1153,7 @@ class EnrichmentSearch extends Component {
         }
         mouseEnterDelay={0}
         mouseLeaveDelay={0}
-        on="click"
+        on="hover"
       />
     );
 
