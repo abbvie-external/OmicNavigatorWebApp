@@ -39,6 +39,7 @@ class EnrichmentSearch extends Component {
     enrichmentStudies: [],
     enrichmentStudyHrefVisible: false,
     enrichmentStudyHref: '',
+    enrichmentMaintainer: null,
     enrichmentStudyReportTooltip:
       'Select a study and model to view Analysis Details',
     enrichmentModels: [],
@@ -121,11 +122,7 @@ class EnrichmentSearch extends Component {
       enrichmentStudiesDisabled: false,
       isSmallScreen: window.innerWidth < 1725,
     });
-    const setScreen = _.debounce(
-      () => this.setState({ isSmallScreen: window.innerWidth < 1725 }),
-      300,
-    );
-    window.addEventListener('resize', setScreen, false);
+    window.addEventListener('resize', this.setScreen, false);
   }
 
   componentDidUpdate(prevProps) {
@@ -146,8 +143,13 @@ class EnrichmentSearch extends Component {
   }
 
   componentWillUnmount() {
-    window.removeEventListener('resize');
+    window.removeEventListener('resize', this.setScreen);
   }
+
+  setScreen = _.debounce(
+    () => this.setState({ isSmallScreen: window.innerWidth < 1725 }),
+    300,
+  );
 
   populateDropdowns = async () => {
     const {
@@ -201,7 +203,9 @@ class EnrichmentSearch extends Component {
       );
       const enrichmentStudyTooltip =
         enrichmentStudyData?.package?.description || '';
+      const maintainer = enrichmentStudyData?.package?.Maintainer || null;
       this.setState({
+        enrichmentMaintainer: maintainer,
         enrichmentStudyTooltip: enrichmentStudyTooltip,
         enrichmentModelsDisabled: false,
         enrichmentModels: enrichmentModelsMapped,
@@ -1018,6 +1022,7 @@ class EnrichmentSearch extends Component {
   render() {
     const {
       enrichmentStudies,
+      enrichmentMaintainer,
       enrichmentStudyTooltip,
       enrichmentStudyHref,
       enrichmentStudyHrefVisible,
@@ -1054,6 +1059,61 @@ class EnrichmentSearch extends Component {
       fontSize: '13px',
     };
 
+    const getMaintainer = () => {
+      if (enrichmentStudy === '') {
+        return <div>Select a study to view Maintainer</div>;
+      } else {
+        const [name, emailRaw] = maintainer
+          ? maintainer.split(' <')
+          : ['Unknown', 'unknown@unknown'];
+        const email = emailRaw ? emailRaw.slice(0, -1) : null;
+        return !maintainer || maintainer === 'Unknown <unknown@unknown>' ? (
+          <div>Maintainer unknown</div>
+        ) : (
+          <>
+            Maintainer: <br></br>
+            {name}
+            <br></br>
+            <a href={`mailto:${email}?subject=${enrichmentStudy}`}>{email}</a>
+          </>
+        );
+      }
+    };
+
+    let maintainerIcon = (
+      <Popup
+        trigger={
+          <span>
+            <Transition
+              visible={!enrichmentMaintainer}
+              animation={enrichmentMaintainer ? 'flash' : null}
+              duration={1000}
+            >
+              <Icon
+                name="user"
+                // size="large"
+                className={
+                  enrichmentMaintainer &&
+                  enrichmentMaintainer !== 'Unknown <unknown@unknown>'
+                    ? 'StudyHtmlIcon'
+                    : 'StudyHtmlIcon DisabledLink'
+                }
+                color={!enrichmentMaintainer ? 'grey' : null}
+                inverted
+                circular
+              />
+            </Transition>
+          </span>
+        }
+        style={StudyPopupStyle}
+        inverted
+        basic
+        position="bottom center"
+        content={getMaintainer()}
+        on="click"
+      />
+    );
+
     let studyName = `${enrichmentStudy} Analysis Details`;
     const dynamicSize = getDynamicSize();
     let studyIcon = (
@@ -1071,7 +1131,6 @@ class EnrichmentSearch extends Component {
             >
               <Icon
                 name="info"
-                size="large"
                 className={
                   enrichmentStudyHrefVisible
                     ? 'StudyHtmlIcon'
@@ -1094,6 +1153,7 @@ class EnrichmentSearch extends Component {
         }
         mouseEnterDelay={0}
         mouseLeaveDelay={0}
+        on="hover"
       />
     );
 
@@ -1263,6 +1323,7 @@ class EnrichmentSearch extends Component {
             mouseLeaveDelay={0}
           />
           <span className="StudyHtmlIconDivE">{studyIcon}</span>
+          <span className="MaintainerHtmlIconDivE">{maintainerIcon}</span>
           <Popup
             trigger={
               <Form.Field

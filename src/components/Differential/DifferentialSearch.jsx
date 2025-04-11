@@ -40,6 +40,7 @@ class DifferentialSearch extends Component {
     differentialStudies: [],
     differentialStudyHrefVisible: false,
     differentialStudyHref: '',
+    differentialMaintainer: null,
     differentialStudyReportTooltip:
       'Select a study and model to view Analysis Details',
     differentialModels: [],
@@ -115,11 +116,7 @@ class DifferentialSearch extends Component {
       differentialStudiesDisabled: false,
       isSmallScreen: window.innerWidth < 1725,
     });
-    const setScreen = _.debounce(
-      () => this.setState({ isSmallScreen: window.innerWidth < 1725 }),
-      300,
-    );
-    window.addEventListener('resize', setScreen, false);
+    window.addEventListener('resize', this.setScreen, false);
   }
 
   componentDidUpdate(prevProps) {
@@ -157,8 +154,13 @@ class DifferentialSearch extends Component {
   }
 
   componentWillUnmount() {
-    window.removeEventListener('resize');
+    window.removeEventListener('resize', this.setScreen);
   }
+
+  setScreen = _.debounce(
+    () => this.setState({ isSmallScreen: window.innerWidth < 1725 }),
+    300,
+  );
 
   populateDropdowns = async () => {
     const {
@@ -209,7 +211,9 @@ class DifferentialSearch extends Component {
       );
       const differentialStudyTooltip =
         differentialStudyData?.package?.description || '';
+      const maintainer = differentialStudyData?.package?.Maintainer || '';
       this.setState({
+        differentialMaintainer: maintainer,
         differentialStudyTooltip: differentialStudyTooltip,
         differentialModelsDisabled: false,
         differentialModels: differentialModelsMapped,
@@ -940,6 +944,7 @@ class DifferentialSearch extends Component {
   render() {
     const {
       differentialStudies,
+      differentialMaintainer,
       differentialStudyTooltip,
       differentialStudyHref,
       differentialStudyHrefVisible,
@@ -977,6 +982,60 @@ class DifferentialSearch extends Component {
       fontSize: '13px',
     };
 
+    const getMaintainer = () => {
+      if (differentialStudy === '') {
+        return <div>Select a study to view Maintainer</div>;
+      } else {
+        const [name, emailRaw] = differentialMaintainer
+          ? differentialMaintainer.split(' <')
+          : ['Unknown', 'unknown@unknown'];
+        const email = emailRaw ? emailRaw.slice(0, -1) : null;
+        return !differentialMaintainer ||
+          differentialMaintainer === 'Unknown <unknown@unknown>' ? (
+          <div>Maintainer unknown</div>
+        ) : (
+          <>
+            Maintainer: <br></br>
+            {name} <br></br>
+            <a href={`mailto:${email}?subject=${differentialStudy}`}>{email}</a>
+          </>
+        );
+      }
+    };
+
+    let maintainerIcon = (
+      <Popup
+        trigger={
+          <span>
+            <Transition
+              visible={!differentialMaintainer}
+              animation={differentialMaintainer ? 'flash' : null}
+              duration={1000}
+            >
+              <Icon
+                name="user"
+                // size="large"
+                className={
+                  differentialMaintainer &&
+                  differentialMaintainer !== 'Unknown <unknown@unknown>'
+                    ? 'StudyHtmlIcon'
+                    : 'StudyHtmlIcon DisabledLink'
+                }
+                color={!differentialMaintainer ? 'grey' : null}
+                inverted
+                circular
+              />
+            </Transition>
+          </span>
+        }
+        style={StudyPopupStyle}
+        inverted
+        basic
+        position="bottom center"
+        content={getMaintainer()}
+        on="click"
+      />
+    );
     let studyName = `${differentialStudy} Analysis Details`;
     let studyIcon = (
       <Popup
@@ -993,7 +1052,6 @@ class DifferentialSearch extends Component {
             >
               <Icon
                 name="info"
-                size="large"
                 className={
                   differentialStudyHrefVisible
                     ? 'StudyHtmlIcon'
@@ -1010,14 +1068,13 @@ class DifferentialSearch extends Component {
         className="CustomTooltip"
         inverted
         basic
-        position="top center"
+        position="bottom center"
         content={
           differentialStudyHrefVisible
             ? studyName
             : differentialStudyReportTooltip
         }
-        mouseEnterDelay={0}
-        mouseLeaveDelay={0}
+        on="hover"
       />
     );
 
@@ -1198,6 +1255,7 @@ class DifferentialSearch extends Component {
             mouseLeaveDelay={0}
           />
           <span className="StudyHtmlIconDivP">{studyIcon}</span>
+          <span className="MaintainerHtmlIconDivP">{maintainerIcon}</span>
           <Popup
             trigger={
               <Form.Field
