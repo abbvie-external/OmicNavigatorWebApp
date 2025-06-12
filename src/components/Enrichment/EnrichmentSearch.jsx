@@ -1063,11 +1063,12 @@ class EnrichmentSearch extends Component {
       if (enrichmentStudy === '') {
         return <div>Select a study to view Maintainer</div>;
       } else {
-        const [name, emailRaw] = maintainer
-          ? maintainer.split(' <')
+        const [name, emailRaw] = enrichmentMaintainer
+          ? enrichmentMaintainer.split(' <')
           : ['Unknown', 'unknown@unknown'];
         const email = emailRaw ? emailRaw.slice(0, -1) : null;
-        return !maintainer || maintainer === 'Unknown <unknown@unknown>' ? (
+        return !enrichmentMaintainer ||
+          enrichmentMaintainer === 'Unknown <unknown@unknown>' ? (
           <div>Maintainer unknown</div>
         ) : (
           <>
