@@ -126,13 +126,23 @@ class EnrichmentSearch extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    const { allStudiesMetadata, enrichmentStudy, enrichmentResults } =
-      this.props;
+    const {
+      allStudiesMetadata,
+      enrichmentStudy,
+      enrichmentModel,
+      enrichmentResults,
+    } = this.props;
     if (
       allStudiesMetadata !== prevProps.allStudiesMetadata ||
       enrichmentStudy !== prevProps.enrichmentStudy
     ) {
       this.populateDropdowns();
+      if (enrichmentModel) {
+        this.getEnrichmentPlotDescriptions(enrichmentStudy, enrichmentModel);
+      }
+    }
+    if (enrichmentModel && enrichmentModel !== prevProps.enrichmentModel) {
+      this.getEnrichmentPlotDescriptions(enrichmentStudy, enrichmentModel);
     }
 
     if (prevProps.enrichmentResults !== enrichmentResults) {
@@ -211,10 +221,11 @@ class EnrichmentSearch extends Component {
         enrichmentModels: enrichmentModelsMapped,
       });
       this.getResultsColumnTooltips(enrichmentStudy);
-      this.getEnrichmentPlotDescriptions(enrichmentStudy);
       if (enrichmentModel === '') {
         this.getReportLink(enrichmentStudy, 'default');
       } else {
+        // moving this to own effect 7/17/25
+        // this.getEnrichmentPlotDescriptions(enrichmentStudy, enrichmentModel);
         this.props.onHandleHasBarcodeData();
         this.props.onHandlePlotTypesEnrichment(enrichmentModel);
         const enrichmentModelWithAnnotations =
@@ -327,14 +338,14 @@ class EnrichmentSearch extends Component {
       });
   };
 
-  getEnrichmentPlotDescriptions = (study) => {
+  getEnrichmentPlotDescriptions = (study, model) => {
     const { onSetEnrichmentPlotDescriptions } = this.props;
     cancelGetEnrichmentPlotDescriptions();
     let cancelToken = new CancelToken((e) => {
       cancelGetEnrichmentPlotDescriptions = e;
     });
     omicNavigatorService
-      .getPlotDescriptions(study)
+      .getPlotDescriptions(study, model)
       .then((getPlotDescriptionsResponse) => {
         if (getPlotDescriptionsResponse) {
           onSetEnrichmentPlotDescriptions(getPlotDescriptionsResponse);

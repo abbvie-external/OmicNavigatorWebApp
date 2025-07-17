@@ -164,7 +164,7 @@ class PlotsSingleFeature extends Component {
         }
         let differentialPlotDescription = null;
         let currentDifferentialPlotDescriptions =
-          differentialPlotDescriptions?.[differentialModel] || {};
+          differentialPlotDescriptions || {};
         const currentPlotText =
           options?.[activeTabIndexPlotsSingleFeature]?.text || null;
         if (!isObjectEmpty(currentDifferentialPlotDescriptions)) {

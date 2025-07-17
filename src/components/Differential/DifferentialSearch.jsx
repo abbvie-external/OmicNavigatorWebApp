@@ -122,6 +122,7 @@ class DifferentialSearch extends Component {
   componentDidUpdate(prevProps) {
     const {
       allStudiesMetadata,
+      differentialModel,
       differentialStudy,
       differentialResults,
       differentialResultsUnfiltered,
@@ -131,6 +132,21 @@ class DifferentialSearch extends Component {
       differentialStudy !== prevProps.differentialStudy
     ) {
       this.populateDropdowns();
+      if (differentialModel) {
+        this.getDifferentialPlotDescriptions(
+          differentialStudy,
+          differentialModel,
+        );
+      }
+    }
+    if (
+      differentialModel &&
+      differentialModel !== prevProps.differentialModel
+    ) {
+      this.getDifferentialPlotDescriptions(
+        differentialStudy,
+        differentialModel,
+      );
     }
     // if (this.props.plotMultisetLoadedDifferential !== prevProps.plotMultisetLoadedDifferential) {
     //   this.forceUpdate();
@@ -219,10 +235,14 @@ class DifferentialSearch extends Component {
         differentialModels: differentialModelsMapped,
       });
       this.getResultsColumnTooltips(differentialStudy);
-      this.getDifferentialPlotDescriptions(differentialStudy);
       if (differentialModel === '') {
         this.getReportLink(differentialStudy, 'default');
       } else {
+        // moving to own effect 7/17/25
+        // this.getDifferentialPlotDescriptions(
+        //   differentialStudy,
+        //   differentialModel,
+        // );
         this.props.onDoMetaFeaturesExist(differentialStudy, differentialModel);
         await this.props.onGetResultsLinkouts(
           differentialStudy,
@@ -340,14 +360,15 @@ class DifferentialSearch extends Component {
       });
   };
 
-  getDifferentialPlotDescriptions = (study) => {
+  getDifferentialPlotDescriptions = (study, model) => {
+    debugger;
     const { onSetDifferentialPlotDescriptions } = this.props;
     cancelGetDifferentialPlotDescriptions();
     let cancelToken = new CancelToken((e) => {
       cancelGetDifferentialPlotDescriptions = e;
     });
     omicNavigatorService
-      .getPlotDescriptions(study)
+      .getPlotDescriptions(study, model)
       .then((getPlotDescriptionsResponse) => {
         if (getPlotDescriptionsResponse) {
           onSetDifferentialPlotDescriptions(getPlotDescriptionsResponse);

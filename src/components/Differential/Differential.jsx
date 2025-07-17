@@ -693,10 +693,9 @@ class Differential extends Component {
             // 1) if 'models' exists and !='all' AND the currently selected model is not in the character vector assigned to 'models' THEN do not render this plot.
             // 2) if 'models' exists and != 'all' AND the currently selected model is in this character vector, only pass the specified models to plotStudy, starting with the currently selected model.
             // The existing conventions for intersections of tests across models still applies, but only to the set of models specified following the execution of the above logic.
-            const plotMetadata =
-              differentialPlotDescriptions[differentialModel];
-            const plotMetadataSpecificPlot = plotMetadata[plot.plotID];
-            const designatedModels = plotMetadataSpecificPlot.models || null;
+            const plotMetadataSpecificPlot =
+              differentialPlotDescriptions[plot.plotID];
+            const designatedModels = plotMetadataSpecificPlot?.models || null;
             const designatedModelsMultiModelExists =
               designatedModels &&
               designatedModels !== 'all' &&
@@ -833,10 +832,9 @@ class Differential extends Component {
               // 1) if 'models' exists and !='all' AND the currently selected model is not in the character vector assigned to 'models' THEN do not render this plot.
               // 2) if 'models' exists and != 'all' AND the currently selected model is in this character vector, only pass the specified models to plotStudy, starting with the currently selected model.
               // The existing conventions for intersections of tests across models still applies, but only to the set of models specified following the execution of the above logic.
-              const plotMetadata =
-                differentialPlotDescriptions[differentialModel];
-              const plotMetadataSpecificPlot = plotMetadata[plot.plotID];
-              const designatedModels = plotMetadataSpecificPlot.models || null;
+              const plotMetadataSpecificPlot =
+                differentialPlotDescriptions[plot.plotID];
+              const designatedModels = plotMetadataSpecificPlot?.models || null;
               const designatedModelsMultiModelExists =
                 designatedModels &&
                 designatedModels !== 'all' &&
@@ -1029,11 +1027,9 @@ class Differential extends Component {
             // 1) if 'models' exists and !='all' AND the currently selected model is not in the character vector assigned to 'models' THEN do not render this plot.
             // 2) if 'models' exists and != 'all' AND the currently selected model is in this character vector, only pass the specified models to plotStudy, starting with the currently selected model.
             // The existing conventions for intersections of tests across models still applies, but only to the set of models specified following the execution of the above logic.
-            const plotMetadata =
-              differentialPlotDescriptions[differentialModel];
             const plotMetadataSpecificPlot =
-              plotMetadata[multifeaturePlot[0].plotID];
-            const designatedModels = plotMetadataSpecificPlot.models || null;
+              differentialPlotDescriptions[multifeaturePlot[0].plotID];
+            const designatedModels = plotMetadataSpecificPlot?.models || null;
             const designatedModelsMultiModelExists =
               designatedModels &&
               designatedModels !== 'all' &&
@@ -1139,10 +1135,9 @@ class Differential extends Component {
             // 1) if 'models' exists and !='all' AND the currently selected model is not in the character vector assigned to 'models' THEN do not render this plot.
             // 2) if 'models' exists and != 'all' AND the currently selected model is in this character vector, only pass the specified models to plotStudy, starting with the currently selected model.
             // The existing conventions for intersections of tests across models still applies, but only to the set of models specified following the execution of the above logic.
-            const plotMetadata =
-              differentialPlotDescriptions[differentialModel];
-            const plotMetadataSpecificPlot = plotMetadata[plot.plotID];
-            const designatedModels = plotMetadataSpecificPlot.models || null;
+            const plotMetadataSpecificPlot =
+              differentialPlotDescriptions[plot.plotID];
+            const designatedModels = plotMetadataSpecificPlot?.models || null;
             const designatedModelsMultiModelExists =
               designatedModels &&
               designatedModels !== 'all' &&
@@ -1395,9 +1390,9 @@ class Differential extends Component {
       // 1) if 'models' exists and !='all' AND the currently selected model is not in the character vector assigned to 'models' THEN do not render this plot.
       // 2) if 'models' exists and != 'all' AND the currently selected model is in this character vector, only pass the specified models to plotStudy, starting with the currently selected model.
       // The existing conventions for intersections of tests across models still applies, but only to the set of models specified following the execution of the above logic.
-      const plotMetadata = differentialPlotDescriptions[differentialModel];
-      const plotMetadataSpecificPlot = plotMetadata[plot.plotID];
-      const designatedModels = plotMetadataSpecificPlot.models || null;
+      const plotMetadataSpecificPlot =
+        differentialPlotDescriptions[plot.plotID];
+      const designatedModels = plotMetadataSpecificPlot?.models || null;
       const designatedModelsMultiModelExists =
         designatedModels &&
         designatedModels !== 'all' &&
