@@ -273,7 +273,7 @@ class PlotsMultiFeature extends Component {
         );
         let differentialPlotDescription = null;
         let currentDifferentialPlotDescriptions =
-          differentialPlotDescriptions?.[differentialModel] || {};
+          differentialPlotDescriptions || {};
         const currentPlotText =
           options?.[activeTabIndexPlotsMultiFeatureVar]?.text || null;
         if (!isObjectEmpty(currentDifferentialPlotDescriptions)) {

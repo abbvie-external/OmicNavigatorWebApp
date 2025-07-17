@@ -165,7 +165,7 @@ class PlotsOverlay extends PureComponent {
       if (differentialPlotTypes && plotOverlayData) {
         let differentialPlotDescription = null;
         let currentDifferentialPlotDescriptions =
-          differentialPlotDescriptions?.[differentialModel] || {};
+          differentialPlotDescriptions || {};
         const currentPlotText =
           options?.[activeTabIndexPlotsOverlayVar]?.text || null;
         if (!isObjectEmpty(currentDifferentialPlotDescriptions)) {

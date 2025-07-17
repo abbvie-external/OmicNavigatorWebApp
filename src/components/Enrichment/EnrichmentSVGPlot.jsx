@@ -200,7 +200,7 @@ class EnrichmentSVGPlot extends PureComponent {
 
         let enrichmentPlotDescription = null;
         let currentEnrichmentPlotDescriptions =
-          enrichmentPlotDescriptions?.[enrichmentModel] || {};
+          enrichmentPlotDescriptions || {};
         const currentPlotText =
           plotOptions?.[activeSVGTabIndexEnrichment]?.text || null;
         if (!isObjectEmpty(currentEnrichmentPlotDescriptions)) {
