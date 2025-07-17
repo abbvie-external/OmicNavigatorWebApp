@@ -361,7 +361,6 @@ class DifferentialSearch extends Component {
   };
 
   getDifferentialPlotDescriptions = (study, model) => {
-    debugger;
     const { onSetDifferentialPlotDescriptions } = this.props;
     cancelGetDifferentialPlotDescriptions();
     let cancelToken = new CancelToken((e) => {
