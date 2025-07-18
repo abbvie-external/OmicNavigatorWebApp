@@ -805,8 +805,8 @@ class OmicNavigatorService {
     }
   }
 
-  async getPlotDescriptions(study, cancelToken) {
-    const cacheKey = `getPlots_${study}}`;
+  async getPlotDescriptions(study, model, cancelToken) {
+    const cacheKey = `getPlots_${study}_${model}`;
     if (this[cacheKey] != null) {
       return this[cacheKey];
     } else {
@@ -815,6 +815,7 @@ class OmicNavigatorService {
           'getPlots',
           {
             study,
+            model,
           },
           false,
           null,
