@@ -298,7 +298,7 @@ class OmicNavigatorService {
   }
 
   async listStudies() {
-    const promise = this.axiosPost('listStudies', {}, true, null, null, 25000);
+    const promise = this.axiosPost('listStudies', {}, true, null, null, 60000);
     const studiesFromPromise = await promise;
     return studiesFromPromise;
   }
