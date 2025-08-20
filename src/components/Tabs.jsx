@@ -63,7 +63,7 @@ class Tabs extends Component {
       differentialFeatureIdKey: '',
       filteredDifferentialFeatureIdKey: '',
       // when updating the app version, change one line in 3 files: package.json, manifest.json and Tabs.jsx
-      appVersion: '1.9.9',
+      appVersion: '2.0.2',
       packageVersion: '',
       infoOpen: false,
       screenWidth: window.innerWidth,
