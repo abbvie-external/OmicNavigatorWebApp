@@ -81,8 +81,15 @@ class Tabs extends Component {
       false,
       null,
     );
-    this.getStudies();
     window.addEventListener('resize', this.handleResize);
+    omicNavigatorService
+      .getPackageVersion()
+      .then((packageVersionResponseData) => {
+        console.log(JSON.stringify(packageVersionResponseData));
+        console.log('we got the package, now call listStudies');
+        this.getStudies();
+        window.addEventListener('resize', this.handleResize);
+      });
   }
 
   componentWillUnmount() {
@@ -188,11 +195,12 @@ class Tabs extends Component {
     omicNavigatorService
       .listStudies()
       .then((listStudiesResponseData) => {
+        console.log('got the studies');
+        console.log(JSON.stringify(listStudiesResponseData));
         const allStudiesMetadata = Array.from(listStudiesResponseData);
         this.setState({
           allStudiesMetadata,
         });
-        this.getPackageVersion();
       })
       .catch((error) => {
         console.error('Error during listStudies', error);
