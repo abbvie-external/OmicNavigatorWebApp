@@ -448,7 +448,7 @@ class Tabs extends Component {
     return (
       <>
         {screenWidth < 1024 ? SmallScreenMessage : null}
-        {!appLoading ? LoadingMessage : null}
+        {appLoading ? LoadingMessage : null}
         <Tab
           onTabChange={this.handleTabChange}
           panes={panes}
