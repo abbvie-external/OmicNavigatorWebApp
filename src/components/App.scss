@@ -470,6 +470,45 @@
   }
 }
 
+#AppLoadingOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 1);
+  align-items: center;
+  z-index: 999;
+  color: white !important;
+
+  #AppLoadingLogoDiv {
+    text-align: center;
+    margin-top: 30vh;
+    margin-bottom: 60px;
+    #AppLoadingLogoImage {
+      height: 69px;
+    }
+    #AppLoadingHeaderFirst {
+      vertical-align: super;
+      font-size: 54px;
+    }
+
+    #AppLoadingHeaderSecond {
+      vertical-align: super;
+      font-size: 54px;
+      font-weight: 100 !important;
+      font-style: italic;
+      color: #e0e1e2 !important;
+    }
+  }
+  #AppLoadingText {
+    width: 100%;
+    font-size: 30px !important;
+    text-align: center;
+    color: lightgrey !important;
+  }
+}
+
 // .ui.inverted.popup a {
 //   color: var(--color-primary) !important;
 // }
