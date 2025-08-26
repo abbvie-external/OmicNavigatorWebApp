@@ -82,11 +82,22 @@ class Tabs extends Component {
       null,
     );
     window.addEventListener('resize', this.handleResize);
+    const startPackage = performance.now();
     omicNavigatorService
       .getPackageVersion()
       .then((packageVersionResponseData) => {
+        const endPackage = performance.now();
+        console.log(
+          `getPackageVersion took ${
+            (endPackage - startPackage) / 1000
+          } seconds`,
+        );
         console.log(JSON.stringify(packageVersionResponseData));
         console.log('we got the package, now call listStudies');
+        const start = performance.now();
+        this.getStudies();
+        const end = performance.now();
+        console.log(`getStudies took ${(end - start) / 1000} seconds`);
         this.getStudies();
         window.addEventListener('resize', this.handleResize);
       });
