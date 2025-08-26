@@ -94,10 +94,6 @@ class Tabs extends Component {
         );
         console.log(JSON.stringify(packageVersionResponseData));
         console.log('we got the package, now call listStudies');
-        const start = performance.now();
-        this.getStudies();
-        const end = performance.now();
-        console.log(`getStudies took ${(end - start) / 1000} seconds`);
         this.getStudies();
         window.addEventListener('resize', this.handleResize);
       });
@@ -203,10 +199,13 @@ class Tabs extends Component {
   };
 
   getStudies = () => {
+    const start = performance.now();
     omicNavigatorService
       .listStudies()
       .then((listStudiesResponseData) => {
         console.log('got the studies');
+        const end = performance.now();
+        console.log(`getStudies took ${(end - start) / 1000} seconds`);
         console.log(JSON.stringify(listStudiesResponseData));
         const allStudiesMetadata = Array.from(listStudiesResponseData);
         this.setState({
