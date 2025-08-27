@@ -43,6 +43,7 @@ class Tabs extends Component {
     );
     const isEnrichment = tabFromUrl === 'enrichment';
     this.state = {
+      appLoading: true,
       baseUrl: baseUrlVar,
       activeIndex: isEnrichment ? 2 : 1,
       tab: tabFromUrl || 'differential',
@@ -63,7 +64,7 @@ class Tabs extends Component {
       differentialFeatureIdKey: '',
       filteredDifferentialFeatureIdKey: '',
       // when updating the app version, change one line in 3 files: package.json, manifest.json and Tabs.jsx
-      appVersion: '2.0.2',
+      appVersion: '2.0.3',
       packageVersion: '',
       infoOpen: false,
       screenWidth: window.innerWidth,
@@ -191,11 +192,13 @@ class Tabs extends Component {
         const allStudiesMetadata = Array.from(listStudiesResponseData);
         this.setState({
           allStudiesMetadata,
+          appLoading: false,
         });
         this.getPackageVersion();
       })
       .catch((error) => {
         console.error('Error during listStudies', error);
+        this.setState({ appLoading: false });
       });
   };
 
@@ -330,6 +333,25 @@ class Tabs extends Component {
     );
   };
 
+  getLoadingMessage = () => {
+    return (
+      <span id="AppLoadingOverlay">
+        <div id="AppLoadingLogoDiv">
+          <span className="LogoElement">
+            <img
+              alt="OmicNavigator"
+              src={omicNavigatorIcon}
+              id="AppLoadingLogoImage"
+            />
+          </span>
+          <span id="AppLoadingHeaderFirst">Omic</span>
+          <span id="AppLoadingHeaderSecond">Navigator</span>
+        </div>
+        <div id="AppLoadingText">Loading Studies...</div>
+      </span>
+    );
+  };
+
   resetApp = () => {
     this.setState(
       {
@@ -364,7 +386,7 @@ class Tabs extends Component {
   };
 
   render() {
-    const { activeIndex, screenWidth } = this.state;
+    const { appLoading, activeIndex, screenWidth } = this.state;
     const panes = [
       {
         menuItem: (
@@ -421,9 +443,11 @@ class Tabs extends Component {
     ];
     const InfoButton = this.getInfoButton();
     const SmallScreenMessage = this.getSmallScreenMessage();
+    const LoadingMessage = this.getLoadingMessage();
     return (
       <>
         {screenWidth < 1024 ? SmallScreenMessage : null}
+        {appLoading ? LoadingMessage : null}
         <Tab
           onTabChange={this.handleTabChange}
           panes={panes}
