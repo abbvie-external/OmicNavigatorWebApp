@@ -82,22 +82,8 @@ class Tabs extends Component {
       false,
       null,
     );
+    this.getStudies();
     window.addEventListener('resize', this.handleResize);
-    const startPackage = performance.now();
-    omicNavigatorService
-      .getPackageVersion()
-      .then((packageVersionResponseData) => {
-        const endPackage = performance.now();
-        console.log(
-          `getPackageVersion took ${
-            (endPackage - startPackage) / 1000
-          } seconds`,
-        );
-        console.log(JSON.stringify(packageVersionResponseData));
-        console.log('we got the package, now call listStudies');
-        this.getStudies();
-        window.addEventListener('resize', this.handleResize);
-      });
   }
 
   componentWillUnmount() {
@@ -200,19 +186,15 @@ class Tabs extends Component {
   };
 
   getStudies = () => {
-    const start = performance.now();
     omicNavigatorService
       .listStudies()
       .then((listStudiesResponseData) => {
-        console.log('got the studies');
-        const end = performance.now();
-        console.log(`getStudies took ${(end - start) / 1000} seconds`);
-        console.log(JSON.stringify(listStudiesResponseData));
         const allStudiesMetadata = Array.from(listStudiesResponseData);
         this.setState({
           allStudiesMetadata,
           appLoading: false,
         });
+        this.getPackageVersion();
       })
       .catch((error) => {
         console.error('Error during listStudies', error);
