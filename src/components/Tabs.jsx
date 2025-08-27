@@ -8,7 +8,6 @@ import {
   Modal,
   Button,
   Header,
-  Loader,
 } from 'semantic-ui-react';
 import { omicNavigatorService } from '../services/omicNavigator.service';
 import Differential from './Differential/Differential';
