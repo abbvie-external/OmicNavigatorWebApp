@@ -177,9 +177,8 @@ class Enrichment extends Component {
     violinData: [],
     HighlightedProteins: [],
     enrichmentPlotTypes: [],
-    enrichmentStudyMetadata: [],
-    enrichmentModelsAndAnnotations: [],
-    enrichmentAnnotationsMetadata: [],
+    enrichmentModelsAndAnnotations: [], // listStudies.enrichments
+    enrichmentAnnotationIdsCommon: [],
     enrichmentsLinkouts: [],
     enrichmentsFavicons: [],
     enrichmentFeatureIdKey: '',
@@ -414,52 +413,6 @@ class Enrichment extends Component {
     });
   };
 
-  setStudyModelAnnotationMetadata = (studyData, modelsAndAnnotations) => {
-    let commonAnnotationIds = [];
-    let annotationIDsArrays = [];
-    if (modelsAndAnnotations.length) {
-      if (modelsAndAnnotations.length === 1) {
-        annotationIDsArrays = modelsAndAnnotations.map((obj) => {
-          obj.annotations.map((annotation) => annotation.annotationID);
-        });
-        commonAnnotationIds = annotationIDsArrays;
-      }
-      if (modelsAndAnnotations.length > 1) {
-        // Iterate over the annotations of the first object
-        for (const annotation of modelsAndAnnotations[0].annotations) {
-          // Check if the annotationID exists in all other objects
-          if (
-            modelsAndAnnotations.every((obj) =>
-              obj.annotations.some(
-                (t) => t.annotationID === annotation.annotationID,
-              ),
-            )
-          ) {
-            commonAnnotationIds.push(annotation.annotationID);
-          }
-        }
-        // console.log('Common testIDs across all objects:', commonTestIds);
-      }
-    }
-
-    this.setState(
-      {
-        enrichmentStudyMetadata: studyData,
-        enrichmentModelsAndAnnotations: modelsAndAnnotations,
-        enrichmentAnnotationIdsCommon: commonAnnotationIds,
-      },
-      function () {
-        this.handlePlotTypesEnrichment(this.props.enrichmentModel);
-      },
-    );
-  };
-
-  setAnnotationsMetadata = (annotationsData) => {
-    this.setState({
-      enrichmentAnnotationsMetadata: annotationsData,
-    });
-  };
-
   handleNetworkSigValue = (val) => {
     this.setState({
       networkSigValue: val.toString(),
@@ -537,79 +490,69 @@ class Enrichment extends Component {
   //   this.setState({ enrichmentColumns: columns });
   // };
 
-  handlePlotTypesEnrichment = (enrichmentModel) => {
-    if (enrichmentModel !== '') {
-      if (this.state.enrichmentStudyMetadata?.plots != null) {
-        const enrichmentModelData =
-          this.state.enrichmentStudyMetadata.plots.find(
-            (model) => model.modelID === enrichmentModel,
-          );
-        this.setState({
-          enrichmentPlotTypes: enrichmentModelData.plots,
-        });
-      }
-    }
-  };
-
-  handlePlotTypesEnrichment = (enrichmentModel) => {
-    if (enrichmentModel !== '') {
-      if (this.state.enrichmentStudyMetadata?.plots != null) {
-        const enrichmentModelData =
-          this.state.enrichmentStudyMetadata.plots.find(
-            (model) => model.modelID === enrichmentModel,
-          );
-        const enrichmentPlotTypesRaw = enrichmentModelData?.plots;
-        // filter out invalid plots - plotType string must be 'singleFeature', 'multiFeature', 'singleTest', 'multiTest'
-        const enrichmentPlotTypesVar = [...enrichmentPlotTypesRaw].filter(
-          (plot) => {
-            let plotTypeArr = plot?.plotType || null;
-            const convertStringToArray = (object) => {
-              return typeof object === 'string' ? Array(object) : object;
-            };
-            if (plotTypeArr) {
-              plotTypeArr = convertStringToArray(plot.plotType);
-            }
-            const isValidPlotType = (pt) => {
-              return (
-                pt === 'singleFeature' ||
-                pt === 'multiFeature' ||
-                pt === 'singleTest' ||
-                pt === 'multiTest' ||
-                pt === 'plotly' ||
-                pt === 'multiModel'
-              );
-            };
-            const valid = plotTypeArr.every(isValidPlotType);
-            if (!valid) {
-              console.log(
-                `${plot?.plotID} will be ignored because it has unknown plotType ${plot.plotType}`,
-              );
-              toast.error(
-                `${plot?.plotID} will be ignored because it has unknown plotType ${plot.plotType}`,
-              );
-            }
-            return valid;
-          },
-        );
-        // let plotMultiFeatureAvailableVar = false;
-        // let singleFeaturePlotTypesVar = [];
-        let multiFeaturePlotTypesVar = [];
-        if (enrichmentPlotTypesVar) {
-          // singleFeaturePlotTypesVar = [...enrichmentPlotTypesVar].filter(
-          //   p => !p.plotType.includes('multiFeature'),
-          // );
-          multiFeaturePlotTypesVar = [...enrichmentPlotTypesVar].filter((p) =>
-            p.plotType.includes('multiFeature'),
-          );
-          // plotMultiFeatureAvailableVar = multiFeaturePlotTypesVar?.length
-          //   ? true
-          //   : false;
-        }
-        this.setState({
-          enrichmentPlotTypes: enrichmentPlotTypesVar,
-          // plotMultiFeatureAvailable: plotMultiFeatureAvailableVar,
-        });
-      }
+  handlePlotTypesEnrichment = () => {
+    const { enrichmentPlotsMetadata } = this.state;
+    if (enrichmentPlotsMetadata.length) {
+      // filter out invalid plots - plotType string must be 'singleFeature', 'multiFeature', 'singleTest', 'multiTest', 'plotly'
+      const enrichmentPlotTypesVar = [...enrichmentPlotsMetadata].filter(
+        // if undefined or null plotType, set default
+        (plot) => {
+          if (!plot.plotType) {
+            plot.plotType = ['singleFeature', 'singleTest'];
+          }
+          let plotTypeArr = plot?.plotType;
+          // Convert string to array
+          if (typeof plotTypeArr === 'string') {
+            plotTypeArr = [plotTypeArr];
+          }
+          const isValidPlotType = (pt) => {
+            return (
+              pt === 'singleFeature' ||
+              pt === 'multiFeature' ||
+              pt === 'singleTest' ||
+              pt === 'multiTest' ||
+              pt === 'plotly' ||
+              pt === 'multiModel'
+            );
+          };
+          const valid = plotTypeArr.every(isValidPlotType);
+          if (!valid) {
+            console.log(
+              `${plot?.plotID} will be ignored because it has unknown plotType ${plot.plotType}`,
+            );
+            toast.error(
+              `${plot?.plotID} will be ignored because it has unknown plotType ${plot.plotType}`,
+            );
+          }
+          return valid;
+        },
+      );
+      // TODO - enrichment doesn't have multi-feature plots yet
+      // let plotMultiFeatureAvailableVar = false;
+      // let singleFeaturePlotTypesVar = [];
+      // let multiFeaturePlotTypesVar = [];
+      // if (enrichmentPlotTypesVar) {
+      // singleFeaturePlotTypesVar = [...enrichmentPlotTypesVar].filter(
+      //   p => !p.plotType.includes('multiFeature'),
+      // );
+      // multiFeaturePlotTypesVar = [...enrichmentPlotTypesVar].filter((p) =>
+      //   p.plotType.includes('multiFeature'),
+      // );
+      // plotMultiFeatureAvailableVar = multiFeaturePlotTypesVar?.length
+      //   ? true
+      //   : false;
+      this.setState({
+        enrichmentPlotTypes: enrichmentPlotTypesVar,
+        // plotMultiFeatureAvailable: plotMultiFeatureAvailableVar,
+      });
+    } else {
+      this.setState({
+        enrichmentPlotTypes: [],
+        // singleFeaturePlotTypes: singleFeaturePlotTypesVar,
+        // multiFeaturePlotTypes: multiFeaturePlotTypesVar,
+        // multiModelPlotTypes: multiModelPlotTypesVar,
+        // plotMultiFeatureAvailable: plotMultiFeatureAvailableVar,
+      });
     }
   };
 
@@ -642,8 +585,15 @@ class Enrichment extends Component {
     omicNavigatorService
       .getBarcodes(enrichmentStudy, model, null, null)
       .then((getBarcodesResponseData) => {
+        // TODO - why is barcode return no longer an array?
+        const hasBarcodeData = Array.isArray(getBarcodesResponseData)
+          ? getBarcodesResponseData.length > 0
+          : !!(
+              getBarcodesResponseData &&
+              Object.keys(getBarcodesResponseData).length
+            );
         this.setState({
-          hasBarcodeData: getBarcodesResponseData.length === 0 ? false : true,
+          hasBarcodeData,
         });
       });
   };
@@ -1379,7 +1329,7 @@ class Enrichment extends Component {
               enrichmentModelIdsOverride,
               uData,
               enrichmentModel,
-              enrichmentModelsAndAnnotations,
+              enrichmentModelsAndAnnotations, // listStudies.enrichments
               null,
               enrichmentAnnotationIdsCommon,
             );
@@ -2414,9 +2364,28 @@ class Enrichment extends Component {
   };
 
   setEnrichmentPlotDescriptions = (response) => {
-    this.setState({
-      enrichmentPlotDescriptions: response,
-    });
+    /**
+     * @param {Object} plots - The plots object, e.g. { lineplot: { displayName: "Line plot", plotType: "singleFeature" }, ... }
+     * @returns {Array} Array of plot metadata objects: [{ plotID, plotDisplay, plotType }]
+     */
+    function convertGetPlotsTypeToListStudiesType(plots) {
+      if (!plots || typeof plots !== 'object') return [];
+      return Object.entries(plots).map(([plotID, plotObj]) => ({
+        plotID,
+        plotDisplay: plotObj.displayName,
+        plotType: plotObj.plotType,
+      }));
+    }
+    const plotsMetadata = convertGetPlotsTypeToListStudiesType(response);
+    this.setState(
+      {
+        enrichmentPlotDescriptions: response,
+        enrichmentPlotsMetadata: plotsMetadata,
+      },
+      () => {
+        this.handlePlotTypesEnrichment();
+      },
+    );
   };
 
   render() {
@@ -2535,10 +2504,6 @@ class Enrichment extends Component {
                 this.handlePlotAnimationEnrichment
               }
               onHandlePlotTypesEnrichment={this.handlePlotTypesEnrichment}
-              onSetStudyModelAnnotationMetadata={
-                this.setStudyModelAnnotationMetadata
-              }
-              onSetAnnotationsMetadata={this.setAnnotationsMetadata}
               onHandleNetworkSigValue={this.handleNetworkSigValue}
               onHandleNetworkOperator={this.handleNetworkOperator}
               onHandleNetworkTests={this.handleNetworkTests}

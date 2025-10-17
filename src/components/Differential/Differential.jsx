@@ -46,10 +46,8 @@ class Differential extends Component {
     this.differentialColumnsConfigured = false;
     this.state = {
       // GENERAL
-      // differentialPlotTypes: [],
-      differentialStudyMetadata: [],
+      differentialPlotTypes: [],
       differentialModelsAndTests: [],
-      differentialTestsMetadata: [],
       differentialTestIds: [],
       differentialTestIdsCommon: [],
       differentialModelIds: [],
@@ -177,12 +175,6 @@ class Differential extends Component {
     });
   };
 
-  setTestsMetadata = (testsData) => {
-    this.setState({
-      differentialTestsMetadata: testsData,
-    });
-  };
-
   setDifferentialTestIds = (differentialTestIds) => {
     this.setState({
       differentialTestIds,
@@ -249,15 +241,21 @@ class Differential extends Component {
     });
   };
 
-  setStudyModelTestMetadata = (studyData, modelsAndTests) => {
+  setStudyModelTestMetadata = (allTests) => {
+    const modelsAndTests = Object.entries(allTests).map(
+      ([modelID, testsObj]) => ({
+        modelID,
+        tests: Object.keys(testsObj).map((testID) => ({ testID })),
+      }),
+    );
     let commonTestIds = [];
     let testIDsArrays = [];
     if (modelsAndTests.length) {
       if (modelsAndTests.length === 1) {
         testIDsArrays = modelsAndTests.map((obj) => {
-          obj.tests.map((test) => test.testID);
+          return obj.tests.map((test) => test.testID);
         });
-        commonTestIds = testIDsArrays;
+        commonTestIds = testIDsArrays.flat();
       }
       if (modelsAndTests.length > 1) {
         // Iterate over the tests of the first object
@@ -274,94 +272,92 @@ class Differential extends Component {
         // console.log('Common testIDs across all objects:', commonTestIds);
       }
     }
-    this.setState(
-      {
-        differentialStudyMetadata: studyData,
-        differentialModelsAndTests: modelsAndTests,
-        differentialTestIdsCommon: commonTestIds,
-      },
-      function () {
-        this.handlePlotTypesDifferential(this.props.differentialModel);
-      },
-    );
+    this.setState({
+      differentialModelsAndTests: modelsAndTests,
+      differentialTestIdsCommon: commonTestIds,
+    });
   };
 
-  handlePlotTypesDifferential = (differentialModel) => {
-    if (differentialModel !== '') {
-      if (this.state.differentialStudyMetadata?.plots != null) {
-        const differentialModelData =
-          this.state.differentialStudyMetadata.plots.find(
-            (model) => model.modelID === differentialModel,
-          );
-        const differentialPlotTypesRaw = differentialModelData?.plots;
-        // filter out invalid plots - plotType string must be 'singleFeature', 'multiFeature', 'singleTest', 'multiTest', 'plotly'
-        const differentialPlotTypesVar = [...differentialPlotTypesRaw].filter(
-          (plot) => {
-            let plotTypeArr = plot?.plotType || null;
-            const convertStringToArray = (object) => {
-              return typeof object === 'string' ? Array(object) : object;
-            };
-            if (plotTypeArr) {
-              plotTypeArr = convertStringToArray(plot.plotType);
-            }
-            const isValidPlotType = (pt) => {
-              return (
-                pt === 'singleFeature' ||
-                pt === 'multiFeature' ||
-                pt === 'singleTest' ||
-                pt === 'multiTest' ||
-                pt === 'plotly' ||
-                pt === 'multiModel'
-              );
-            };
-            const valid = plotTypeArr.every(isValidPlotType);
-            if (!valid) {
-              console.log(
-                `${plot?.plotID} will be ignored because it has unknown plotType ${plot.plotType}`,
-              );
-              toast.error(
-                `${plot?.plotID} will be ignored because it has unknown plotType ${plot.plotType}`,
-              );
-            }
-            return valid;
-          },
+  handlePlotTypesDifferential = () => {
+    const { differentialPlotsMetadata } = this.state;
+    if (differentialPlotsMetadata.length) {
+      // filter out invalid plots - plotType string must be 'singleFeature', 'multiFeature', 'singleTest', 'multiTest', 'plotly'
+      const differentialPlotTypesVar = [...differentialPlotsMetadata].filter(
+        // if undefined or null plotType, set default
+        (plot) => {
+          if (!plot.plotType) {
+            plot.plotType = ['singleFeature', 'singleTest'];
+          }
+          let plotTypeArr = plot?.plotType;
+          // Convert string to array
+          if (typeof plotTypeArr === 'string') {
+            plotTypeArr = [plotTypeArr];
+          }
+          const isValidPlotType = (pt) => {
+            return (
+              pt === 'singleFeature' ||
+              pt === 'multiFeature' ||
+              pt === 'singleTest' ||
+              pt === 'multiTest' ||
+              pt === 'plotly' ||
+              pt === 'multiModel'
+            );
+          };
+          const valid = plotTypeArr.every(isValidPlotType);
+          if (!valid) {
+            console.log(
+              `${plot?.plotID} will be ignored because it has unknown plotType ${plot.plotType}`,
+            );
+            toast.error(
+              `${plot?.plotID} will be ignored because it has unknown plotType ${plot.plotType}`,
+            );
+          }
+          return valid;
+        },
+      );
+      let plotMultiFeatureAvailableVar = false;
+      let singleFeaturePlotTypesVar = [];
+      let multiFeaturePlotTypesVar = [];
+      // let multiModelPlotTypesVar = [];
+      if (differentialPlotTypesVar) {
+        singleFeaturePlotTypesVar = [...differentialPlotTypesVar].filter(
+          (p) => !p.plotType.includes('multiFeature'),
         );
-        let plotMultiFeatureAvailableVar = false;
-        let singleFeaturePlotTypesVar = [];
-        let multiFeaturePlotTypesVar = [];
-        // let multiModelPlotTypesVar = [];
-        if (differentialPlotTypesVar) {
-          singleFeaturePlotTypesVar = [...differentialPlotTypesVar].filter(
-            (p) => !p.plotType.includes('multiFeature'),
-          );
-          multiFeaturePlotTypesVar = [...differentialPlotTypesVar].filter((p) =>
-            p.plotType.includes('multiFeature'),
-          );
-          // in progress - if we need to distinuguish tabs for multi-modal
-          // multiModelPlotTypesVar = [...differentialPlotTypesVar].filter(p =>
-          //   p.plotType.includes('multiModel'),
-          // );
-          // const notMultiModelPlotTypesVar = [
-          //   ...differentialPlotTypesVar,
-          // ].filter(p => p.plotType.includes('!multiModel'));
-          // singleFeaturePlotTypesVar = [...notMultiModelPlotTypesVar].filter(
-          //   p => !p.plotType.includes('multiFeature'),
-          // );
-          // multiFeaturePlotTypesVar = [...notMultiModelPlotTypesVar].filter(p =>
-          //   p.plotType.includes('multiFeature'),
-          // );
-          plotMultiFeatureAvailableVar = multiFeaturePlotTypesVar?.length
-            ? true
-            : false;
-        }
-        this.setState({
-          differentialPlotTypes: differentialPlotTypesVar,
-          singleFeaturePlotTypes: singleFeaturePlotTypesVar,
-          multiFeaturePlotTypes: multiFeaturePlotTypesVar,
-          // multiModelPlotTypes: multiModelPlotTypesVar,
-          plotMultiFeatureAvailable: plotMultiFeatureAvailableVar,
-        });
+        multiFeaturePlotTypesVar = [...differentialPlotTypesVar].filter((p) =>
+          p.plotType.includes('multiFeature'),
+        );
+        // in progress - if we need to distinuguish tabs for multi-modal
+        // multiModelPlotTypesVar = [...differentialPlotTypesVar].filter(p =>
+        //   p.plotType.includes('multiModel'),
+        // );
+        // const notMultiModelPlotTypesVar = [
+        //   ...differentialPlotTypesVar,
+        // ].filter(p => p.plotType.includes('!multiModel'));
+        // singleFeaturePlotTypesVar = [...notMultiModelPlotTypesVar].filter(
+        //   p => !p.plotType.includes('multiFeature'),
+        // );
+        // multiFeaturePlotTypesVar = [...notMultiModelPlotTypesVar].filter(p =>
+        //   p.plotType.includes('multiFeature'),
+        // );
+        plotMultiFeatureAvailableVar = multiFeaturePlotTypesVar?.length
+          ? true
+          : false;
       }
+      this.setState({
+        differentialPlotTypes: differentialPlotTypesVar,
+        singleFeaturePlotTypes: singleFeaturePlotTypesVar,
+        multiFeaturePlotTypes: multiFeaturePlotTypesVar,
+        // multiModelPlotTypes: multiModelPlotTypesVar,
+        plotMultiFeatureAvailable: plotMultiFeatureAvailableVar,
+      });
+    } else {
+      this.setState({
+        differentialPlotTypes: [],
+        singleFeaturePlotTypes: [],
+        multiFeaturePlotTypes: [],
+        // multiModelPlotTypes: [],
+        plotMultiFeatureAvailable: false,
+      });
     }
   };
 
@@ -1998,16 +1994,35 @@ class Differential extends Component {
     // });
   };
 
-  setDifferentialResultsColumnTooltips = (response) => {
-    this.setState({
-      differentialResultsColumnTooltips: response,
-    });
-  };
+  // setDifferentialResultsColumnTooltips = (response) => {
+  //   this.setState({
+  //     differentialResultsColumnTooltips: response,
+  //   });
+  // };
 
   setDifferentialPlotDescriptions = (response) => {
-    this.setState({
-      differentialPlotDescriptions: response,
-    });
+    /**
+     * @param {Object} plots - The plots object, e.g. { lineplot: { displayName: "Line plot", plotType: "singleFeature" }, ... }
+     * @returns {Array} Array of plot metadata objects: [{ plotID, plotDisplay, plotType }]
+     */
+    function convertGetPlotsTypeToListStudiesType(plots) {
+      if (!plots || typeof plots !== 'object') return [];
+      return Object.entries(plots).map(([plotID, plotObj]) => ({
+        plotID,
+        plotDisplay: plotObj.displayName,
+        plotType: plotObj.plotType,
+      }));
+    }
+    const plotsMetadata = convertGetPlotsTypeToListStudiesType(response);
+    this.setState(
+      {
+        differentialPlotDescriptions: response,
+        differentialPlotsMetadata: plotsMetadata,
+      },
+      () => {
+        this.handlePlotTypesDifferential();
+      },
+    );
   };
 
   render() {
@@ -2130,7 +2145,6 @@ class Differential extends Component {
                 this.handleMultisetQueriedDifferential
               }
               onSetStudyModelTestMetadata={this.setStudyModelTestMetadata}
-              onSetTestsMetadata={this.setTestsMetadata}
               onSetDifferentialTestIds={this.setDifferentialTestIds}
               onSetDifferentialModelIds={this.setDifferentialModelIds}
               onHandlePlotTypesDifferential={this.handlePlotTypesDifferential}
@@ -2150,9 +2164,9 @@ class Differential extends Component {
               }
               onResetOverlay={this.resetOverlay}
               onGetMultiModelMappingObject={this.getMultiModelMappingObject}
-              onSetDifferentialResultsColumnTooltips={
-                this.setDifferentialResultsColumnTooltips
-              }
+              // onSetDifferentialResultsColumnTooltips={
+              //   this.setDifferentialResultsColumnTooltips
+              // }
               onSetDifferentialPlotDescriptions={
                 this.setDifferentialPlotDescriptions
               }

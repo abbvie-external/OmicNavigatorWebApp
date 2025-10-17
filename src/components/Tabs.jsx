@@ -43,7 +43,7 @@ class Tabs extends Component {
     );
     const isEnrichment = tabFromUrl === 'enrichment';
     this.state = {
-      appLoading: true,
+      appLoading: false,
       baseUrl: baseUrlVar,
       activeIndex: isEnrichment ? 2 : 1,
       tab: tabFromUrl || 'differential',
@@ -60,7 +60,6 @@ class Tabs extends Component {
         ? decodedFeatureOrTestAndDescription
         : '',
       featureToHighlightInDiffTable: '',
-      allStudiesMetadata: [],
       differentialFeatureIdKey: '',
       filteredDifferentialFeatureIdKey: '',
       // when updating the app version, change one line in 3 files: package.json, manifest.json and Tabs.jsx
@@ -82,7 +81,7 @@ class Tabs extends Component {
       false,
       null,
     );
-    this.getStudies();
+    this.getPackageVersion();
     window.addEventListener('resize', this.handleResize);
   }
 
@@ -183,23 +182,6 @@ class Tabs extends Component {
       true,
       'differential',
     );
-  };
-
-  getStudies = () => {
-    omicNavigatorService
-      .listStudies()
-      .then((listStudiesResponseData) => {
-        const allStudiesMetadata = Array.from(listStudiesResponseData);
-        this.setState({
-          allStudiesMetadata,
-          appLoading: false,
-        });
-        this.getPackageVersion();
-      })
-      .catch((error) => {
-        console.error('Error during listStudies', error);
-        this.setState({ appLoading: false });
-      });
   };
 
   getPackageVersion = () => {
@@ -366,7 +348,6 @@ class Tabs extends Component {
         differentialTest: '',
         differentialFeature: '',
         featureToHighlightInDiffTable: '',
-        allStudiesMetadata: [],
         differentialFeatureIdKey: '',
         filteredDifferentialFeatureIdKey: '',
       },

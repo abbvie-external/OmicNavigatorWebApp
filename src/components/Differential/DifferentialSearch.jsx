@@ -21,8 +21,11 @@ import DifferentialMultisetFilters from './DifferentialMultisetFilters';
 let cancelRequestGetReportLinkDifferential = () => {};
 let cancelRequestGetResultsIntersection = () => {};
 let cancelRequestGetResultsMultiset = () => {};
-let cancelGetDifferentialResultsColumnTooltips = () => {};
+let cancelGetAllDifferentialTests = () => {};
+let cancelGetDifferentialTests = () => {};
 let cancelGetDifferentialPlotDescriptions = () => {};
+let cancelGetDifferentialModels = () => {};
+
 const cacheResultsTable = {};
 async function* streamAsyncIterable(reader) {
   while (true) {
@@ -46,8 +49,11 @@ class DifferentialSearch extends Component {
     differentialModels: [],
     differentialTests: [],
     differentialStudyTooltip: 'Select a study',
-    differentialModelTooltip: '',
-    differentialTestTooltip: '',
+    differentialStudyTooltips: {},
+    differentialModelTooltip: 'Select a model',
+    differentialModelTooltips: {},
+    differentialTestTooltip: 'Select a test',
+    differentialTestTooltips: {},
     differentialStudiesDisabled: true,
     differentialModelsDisabled: true,
     differentialTestsDisabled: true,
@@ -112,6 +118,15 @@ class DifferentialSearch extends Component {
   };
 
   componentDidMount() {
+    const { differentialStudy, differentialModel } = this.props;
+    this.getInstalledStudies();
+    this.populateDropdowns();
+    if (differentialModel) {
+      this.getDifferentialPlotDescriptions(
+        differentialStudy,
+        differentialModel,
+      );
+    }
     this.setState({
       differentialStudiesDisabled: false,
       isSmallScreen: window.innerWidth < 1725,
@@ -121,23 +136,13 @@ class DifferentialSearch extends Component {
 
   componentDidUpdate(prevProps) {
     const {
-      allStudiesMetadata,
       differentialModel,
       differentialStudy,
       differentialResults,
       differentialResultsUnfiltered,
     } = this.props;
-    if (
-      allStudiesMetadata !== prevProps.allStudiesMetadata ||
-      differentialStudy !== prevProps.differentialStudy
-    ) {
+    if (differentialStudy !== prevProps.differentialStudy) {
       this.populateDropdowns();
-      if (differentialModel) {
-        this.getDifferentialPlotDescriptions(
-          differentialStudy,
-          differentialModel,
-        );
-      }
     }
     if (
       differentialModel &&
@@ -156,8 +161,6 @@ class DifferentialSearch extends Component {
     //   ...this.state.uSettingsP,
     //   maxElementsP: handleMaxElements ? tableData.length : 0,
     // }
-
-    //Double check this Joey D
     if (
       prevProps.differentialResults !== differentialResults ||
       prevProps.differentialResultsUnfiltered !== differentialResultsUnfiltered
@@ -178,9 +181,41 @@ class DifferentialSearch extends Component {
     300,
   );
 
+  getInstalledStudies = () => {
+    omicNavigatorService
+      .getInstalledStudies()
+      .then((getInstalledStudiesResponseData) => {
+        let studies = [];
+        if (getInstalledStudiesResponseData.length) {
+          studies = getInstalledStudiesResponseData.map((studyName) => {
+            return {
+              key: `${studyName}Differential`,
+              text: studyName,
+              value: studyName,
+            };
+          });
+        }
+        this.setState({
+          differentialStudies: studies,
+        });
+      })
+      .catch((error) => {
+        console.error('Error during getInstalledStudies differential', error);
+      });
+  };
+
+  getStudyMetaFunc = async () => {
+    const { differentialStudy } = this.props;
+    const response = await omicNavigatorService.getStudyMeta(differentialStudy);
+    this.setState({
+      differentialStudyTooltip: response.description,
+      differentialMaintainer: response.maintainer,
+      differentialMaintainerEmail: response.maintainerEmail,
+    });
+  };
+
   populateDropdowns = async () => {
     const {
-      allStudiesMetadata,
       differentialStudy,
       differentialModel,
       differentialTest,
@@ -188,61 +223,21 @@ class DifferentialSearch extends Component {
       onSearchChangeDifferential,
       onSearchTransitionDifferential,
     } = this.props;
-    const studies = allStudiesMetadata.map((study) => {
-      const studyName = study.name;
-      return {
-        key: `${studyName}Differential`,
-        text: studyName,
-        value: studyName,
-      };
-    });
-    this.setState({
-      differentialStudies: studies,
-    });
+    let models = [];
+    let differentialModelIds = {};
+    let tests = [];
+    let differentialTestIds = {};
     if (differentialStudy !== '') {
-      // loop through allStudiesMetadata to find the object with name matching differentialStudy
-      const allStudiesMetadataCopy = [...allStudiesMetadata];
-      const differentialStudyData = allStudiesMetadataCopy.find(
-        (study) => study.name === differentialStudy,
-      );
-      const differentialModelsAndTestsVar =
-        differentialStudyData?.results || [];
-      this.props.onSetStudyModelTestMetadata(
-        differentialStudyData,
-        differentialModelsAndTestsVar,
-      );
-      const differentialModelIds = [];
-      differentialModelsAndTestsVar.forEach((result) =>
-        differentialModelIds.push(result.modelID),
-      );
+      this.getStudyMetaFunc();
+      models = await this.getAndSetModelOptions(differentialStudy);
+      differentialModelIds = Object.keys(models) || [];
       this.props.onSetDifferentialModelIds(differentialModelIds);
-      const differentialModelsMapped = differentialModelsAndTestsVar.map(
-        (result) => {
-          return {
-            key: `${result.modelID}Differential`,
-            text: result.modelID,
-            value: result.modelID,
-          };
-        },
-      );
-      const differentialStudyTooltip =
-        differentialStudyData?.package?.description || '';
-      const maintainer = differentialStudyData?.package?.Maintainer || '';
-      this.setState({
-        differentialMaintainer: maintainer,
-        differentialStudyTooltip: differentialStudyTooltip,
-        differentialModelsDisabled: false,
-        differentialModels: differentialModelsMapped,
-      });
-      this.getResultsColumnTooltips(differentialStudy);
+
+      const allTests = await this.getAllTests(differentialStudy);
+      this.props.onSetStudyModelTestMetadata(allTests);
       if (differentialModel === '') {
         this.getReportLink(differentialStudy, 'default');
       } else {
-        // moving to own effect 7/17/25
-        // this.getDifferentialPlotDescriptions(
-        //   differentialStudy,
-        //   differentialModel,
-        // );
         this.props.onDoMetaFeaturesExist(differentialStudy, differentialModel);
         await this.props.onGetResultsLinkouts(
           differentialStudy,
@@ -252,36 +247,17 @@ class DifferentialSearch extends Component {
           differentialStudy,
           differentialModel,
         );
-        this.props.onHandlePlotTypesDifferential(differentialModel);
-        const differentialModelWithTests = differentialModelsAndTestsVar.find(
-          (model) => model.modelID === differentialModel,
+        tests = await this.getAndSetTestOptions(
+          differentialStudy,
+          differentialModel,
         );
-        const differentialModelTooltip =
-          differentialModelWithTests?.modelDisplay || '';
+        differentialTestIds = Object.keys(tests || {});
         this.setState({
-          differentialModelTooltip: differentialModelTooltip,
-        });
-        const differentialTestsMetadataVar =
-          differentialModelWithTests?.tests || [];
-        const differentialTestsMapped = differentialTestsMetadataVar.map(
-          (test) => {
-            return {
-              key: `${test.testID}Differential`,
-              text: test.testID,
-              value: test.testID,
-            };
-          },
-        );
-        const differentialTestIds = differentialTestsMetadataVar.map(
-          (t) => t.testID,
-        );
-        this.setState({
-          differentialTestsDisabled: false,
-          differentialTests: differentialTestsMapped,
+          differentialModelTooltip:
+            models?.[differentialModel]?.description || 'N/A',
           uDataP: differentialTestIds,
         });
         this.props.onSetDifferentialTestIds(differentialTestIds);
-        this.props.onSetTestsMetadata(differentialTestsMetadataVar);
         this.getReportLink(differentialStudy, differentialModel);
         if (differentialTest !== '') {
           onSearchTransitionDifferential(true);
@@ -321,11 +297,8 @@ class DifferentialSearch extends Component {
             false,
             true,
           );
-          const differentialTestMeta = differentialTestsMetadataVar.find(
-            (test) => test.testID === differentialTest,
-          );
           const differentialTestTooltip =
-            differentialTestMeta?.testDisplay || '';
+            tests?.[differentialTest]?.description || 'N/A';
           this.setState({
             differentialTestTooltip,
             uAnchorP: differentialTest,
@@ -335,29 +308,75 @@ class DifferentialSearch extends Component {
     }
   };
 
-  getResultsColumnTooltips = (study) => {
-    const { onSetDifferentialResultsColumnTooltips } = this.props;
-    cancelGetDifferentialResultsColumnTooltips();
+  getAllTests = async (study) => {
+    // const { onSetDifferentialResultsColumnTooltips } = this.props;
+    cancelGetAllDifferentialTests();
     let cancelToken = new CancelToken((e) => {
-      cancelGetDifferentialResultsColumnTooltips = e;
+      cancelGetAllDifferentialTests = e;
     });
-    omicNavigatorService
-      .getResultsColumnTooltips(study)
-      .then((getResultsColumnTooltipsResponse) => {
-        if (getResultsColumnTooltipsResponse) {
-          onSetDifferentialResultsColumnTooltips(
-            getResultsColumnTooltipsResponse,
-          );
-        } else {
-          onSetDifferentialResultsColumnTooltips([]);
-        }
-      })
-      .catch((error) => {
-        console.error(
-          'Error during getDifferentialResultsColumnTooltipsResponse',
-          error,
+    try {
+      const getAllTestsResponse = await omicNavigatorService.getAllTests(
+        study,
+        cancelToken,
+      );
+      // if (getAllTestsResponse) {
+      //   debugger;
+      //   TODO - column descriptions used for tooltips used to be present listStudies
+      //   onSetDifferentialResultsColumnTooltips(getAllTestsResponse);
+      // } else {
+      //   onSetDifferentialResultsColumnTooltips([]);
+      // }
+      return getAllTestsResponse;
+    } catch (error) {
+      console.error('Error during getAllTests', error);
+    }
+  };
+
+  getAndSetTestOptions = async (study, model) => {
+    cancelGetDifferentialTests();
+    let cancelToken = new CancelToken((e) => {
+      cancelGetDifferentialTests = e;
+    });
+    try {
+      const getTestsResponse = await omicNavigatorService.getTests(
+        study,
+        model,
+        cancelToken,
+      );
+      if (getTestsResponse && Object.keys(getTestsResponse).length > 0) {
+        const testOptions = Object.entries(getTestsResponse).map(
+          ([testName, testObj]) => ({
+            key: `${testName}-test-differential`,
+            value: testName,
+            text: testName,
+            // tooltip: testObj.description || '',
+            // analyst: testObj.analyst,
+            // analystemail: testObj.analyst_email,
+          }),
         );
-      });
+        const testTooltips = Object.entries(getTestsResponse).reduce(
+          (acc, [testName, testObj]) => {
+            acc[testName] = testObj.description || '';
+            return acc;
+          },
+          {},
+        );
+        this.setState({
+          differentialTests: testOptions,
+          differentialTestTooltips: testTooltips,
+          differentialTestsDisabled: false,
+        });
+        return getTestsResponse;
+      } else {
+        this.setState({
+          differentialTests: [],
+          differentialTestsDisabled: false,
+        });
+        return getTestsResponse;
+      }
+    } catch (error) {
+      console.error('Error during getTests', error);
+    }
   };
 
   getDifferentialPlotDescriptions = (study, model) => {
@@ -367,7 +386,7 @@ class DifferentialSearch extends Component {
       cancelGetDifferentialPlotDescriptions = e;
     });
     omicNavigatorService
-      .getPlotDescriptions(study, model)
+      .getPlotDescriptions(study, model, cancelToken)
       .then((getPlotDescriptionsResponse) => {
         if (getPlotDescriptionsResponse) {
           onSetDifferentialPlotDescriptions(getPlotDescriptionsResponse);
@@ -383,9 +402,54 @@ class DifferentialSearch extends Component {
       });
   };
 
-  handleStudyChange = (evt, { name, value }) => {
+  getAndSetModelOptions = async (study) => {
+    cancelGetDifferentialModels();
+    let cancelToken = new CancelToken((e) => {
+      cancelGetDifferentialModels = e;
+    });
+    try {
+      const getModelsResponse = await omicNavigatorService.getModels(
+        study,
+        cancelToken,
+      );
+      if (getModelsResponse && Object.keys(getModelsResponse).length > 0) {
+        const modelOptions = Object.entries(getModelsResponse).map(
+          ([modelName]) => ({
+            key: `${modelName}-model-differential`,
+            value: modelName,
+            text: modelName,
+          }),
+        );
+        const modelTooltips = Object.entries(getModelsResponse).reduce(
+          (acc, [modelName, modelObj]) => {
+            acc[modelName] = modelObj.description || '';
+            return acc;
+          },
+          {},
+        );
+        this.setState({
+          differentialModels: modelOptions,
+          differentialModelTooltips: modelTooltips,
+          differentialModelsDisabled: false,
+        });
+        return getModelsResponse;
+      } else {
+        this.setState({
+          differentialModels: [],
+          differentialModelTooltips: [],
+        });
+        return getModelsResponse;
+      }
+    } catch (error) {
+      console.error('Error during getDifferentialModelsResponse', error);
+    }
+  };
+
+  handleStudyChange = async (evt, { name, value }) => {
     const { onSearchChangeDifferential, onSearchResetDifferential } =
       this.props;
+    await this.getAndSetModelOptions(value);
+    // const allTests = await this.getAllTests(value);
     this.props.onGetMultiModelMappingObject(value);
     onSearchChangeDifferential(
       {
@@ -403,8 +467,9 @@ class DifferentialSearch extends Component {
       differentialStudyHrefVisible: false,
       differentialModelsDisabled: true,
       differentialTestsDisabled: true,
-      differentialModelTooltip: '',
-      differentialTestTooltip: '',
+      differentialStudyTooltip: 'Select a study',
+      differentialModelTooltip: 'Select a model',
+      differentialTestTooltip: 'Select a test',
     });
     this.getReportLink(value, 'default');
   };
@@ -430,38 +495,53 @@ class DifferentialSearch extends Component {
     omicNavigatorService
       .getReportLink(study, model, this.setStudyTooltip, cancelToken)
       .then((getReportLinkResponse) => {
-        if (getReportLinkResponse.length > 0) {
-          const link = getReportLinkResponse.includes('http')
+        let links = [];
+        if (Array.isArray(getReportLinkResponse)) {
+          if (getReportLinkResponse.length > 0) {
+            links = getReportLinkResponse.map((response) =>
+              response.includes('http')
+                ? response
+                : `${this.props.baseUrl}/ocpu/library/${response}`,
+            );
+            this.setState({
+              differentialStudyHrefVisible: true,
+              differentialStudyHref: links,
+            });
+            return;
+          }
+        } else if (
+          typeof getReportLinkResponse === 'string' &&
+          getReportLinkResponse
+        ) {
+          links = getReportLinkResponse.includes('http')
             ? getReportLinkResponse
             : `${this.props.baseUrl}/ocpu/library/${getReportLinkResponse}`;
           this.setState({
             differentialStudyHrefVisible: true,
-            differentialStudyHref: link,
+            differentialStudyHref: links,
           });
-        } else {
-          this.setStudyTooltip();
-          this.setState({
-            differentialStudyHrefVisible: false,
-            differentialStudyHref: '',
-          });
+          return;
         }
+        this.setStudyTooltip();
+        this.setState({
+          differentialStudyHrefVisible: false,
+          differentialStudyHref: '',
+        });
       })
       .catch((error) => {
         console.error('Error during getReportLink', error);
       });
   };
 
-  handleModelChange = (evt, { name, value }) => {
+  handleModelChange = async (evt, { name, value }) => {
     const {
       differentialStudy,
       onSearchChangeDifferential,
       onSearchResetDifferential,
-      differentialModelsAndTests,
-      onHandlePlotTypesDifferential,
       onHandleDifferentialColumnsConfigured,
     } = this.props;
+    const { differentialModelTooltips } = this.state;
     onHandleDifferentialColumnsConfigured(false);
-    onHandlePlotTypesDifferential(value);
     onSearchChangeDifferential(
       {
         differentialStudy: differentialStudy,
@@ -474,33 +554,15 @@ class DifferentialSearch extends Component {
     onSearchResetDifferential({
       isValidSearchDifferential: false,
     });
-    const differentialModelsAndTestsCopy = [...differentialModelsAndTests];
-    const differentialModelWithTests = differentialModelsAndTestsCopy.find(
-      (model) => model.modelID === value,
-    );
-    const differentialModelTooltip =
-      differentialModelWithTests?.modelDisplay || '';
-    const differentialTestsMetadataVar =
-      differentialModelWithTests?.tests || [];
-    const differentialTestsMapped = differentialTestsMetadataVar.map((test) => {
-      return {
-        key: test.testID,
-        text: test.testID,
-        value: test.testID,
-      };
-    });
-    const differentialTestIds = differentialTestsMetadataVar.map(
-      (t) => t.testID,
-    );
+    const tests = await this.getAndSetTestOptions(differentialStudy, value);
+    const differentialTestIds = Object.keys(tests || {});
     this.setState({
       differentialTestsDisabled: false,
-      differentialTests: differentialTestsMapped,
       uDataP: differentialTestIds,
-      differentialModelTooltip: differentialModelTooltip,
-      differentialTestTooltip: '',
+      differentialModelTooltip: differentialModelTooltips?.[value] || 'N/A',
+      differentialTestTooltip: 'Select a test',
     });
     this.props.onSetDifferentialTestIds(differentialTestIds);
-    this.props.onSetTestsMetadata(differentialTestsMetadataVar);
     this.getReportLink(differentialStudy, value);
   };
 
@@ -513,15 +575,12 @@ class DifferentialSearch extends Component {
       onSearchTransitionDifferential,
       onHandleDifferentialColumnsConfigured,
     } = this.props;
+    const { differentialTestTooltips } = this.state;
     onHandleDifferentialColumnsConfigured(false);
     onSearchTransitionDifferential(true);
     onMultisetQueriedDifferential(false);
-    const differentialTestMeta = this.props.differentialTestsMetadata.find(
-      (test) => test.testID === value,
-    );
-    const differentialTestTooltip = differentialTestMeta?.testDisplay || '';
     this.setState({
-      differentialTestTooltip: differentialTestTooltip,
+      differentialTestTooltip: differentialTestTooltips?.[value] || 'N/A',
       reloadPlotP: true,
       multisetFiltersVisibleDifferential: false,
       sigValP: this.state.uSettingsP.defaultSigValueP,
@@ -1002,46 +1061,49 @@ class DifferentialSearch extends Component {
       fontSize: '13px',
     };
 
-    const getMaintainer = () => {
+    const getMaintainer = (hasMaintainer) => {
+      const { differentialStudy } = this.props;
+      const { differentialMaintainer, differentialMaintainerEmail } =
+        this.state;
       if (differentialStudy === '') {
         return <div>Select a study to view Maintainer</div>;
       } else {
-        const [name, emailRaw] = differentialMaintainer
-          ? differentialMaintainer.split(' <')
-          : ['Unknown', 'unknown@unknown'];
-        const email = emailRaw ? emailRaw.slice(0, -1) : null;
-        return !differentialMaintainer ||
-          differentialMaintainer === 'Unknown <unknown@unknown>' ? (
+        return !hasMaintainer ? (
           <div>Maintainer unknown</div>
         ) : (
           <>
             Maintainer: <br></br>
-            {name} <br></br>
-            <a href={`mailto:${email}?subject=${differentialStudy}`}>{email}</a>
+            {differentialMaintainer} <br></br>
+            <a
+              href={`mailto:${differentialMaintainerEmail}?subject=${differentialStudy}`}
+            >
+              {differentialMaintainerEmail}
+            </a>
           </>
         );
       }
     };
+    const hasMaintainer =
+      differentialMaintainer != null &&
+      differentialMaintainer !== '' &&
+      differentialMaintainer !== 'Unknown';
 
     let maintainerIcon = (
       <Popup
         trigger={
           <span>
             <Transition
-              visible={!differentialMaintainer}
-              animation={differentialMaintainer ? 'flash' : null}
+              visible={!hasMaintainer}
+              animation={hasMaintainer ? 'flash' : null}
               duration={1000}
             >
               <Icon
                 name="user"
                 // size="large"
                 className={
-                  differentialMaintainer &&
-                  differentialMaintainer !== 'Unknown <unknown@unknown>'
-                    ? 'StudyHtmlIcon'
-                    : 'StudyHtmlIcon DisabledLink'
+                  hasMaintainer ? 'StudyHtmlIcon' : 'StudyHtmlIcon DisabledLink'
                 }
-                color={!differentialMaintainer ? 'grey' : null}
+                color={hasMaintainer ? null : 'grey'}
                 inverted
                 circular
               />
@@ -1052,7 +1114,7 @@ class DifferentialSearch extends Component {
         inverted
         basic
         position="bottom center"
-        content={getMaintainer()}
+        content={getMaintainer(hasMaintainer)}
         on="click"
       />
     );
@@ -1063,7 +1125,27 @@ class DifferentialSearch extends Component {
           <a
             target="_blank"
             rel="noopener noreferrer"
-            href={differentialStudyHrefVisible ? differentialStudyHref : null}
+            href={null}
+            onClick={(e) => {
+              e.preventDefault();
+              if (
+                differentialStudyHrefVisible &&
+                Array.isArray(differentialStudyHref)
+              ) {
+                differentialStudyHref.forEach((link) => {
+                  if (link) window.open(link, '_blank', 'noopener,noreferrer');
+                });
+              } else if (
+                differentialStudyHrefVisible &&
+                typeof differentialStudyHref === 'string'
+              ) {
+                window.open(
+                  differentialStudyHref,
+                  '_blank',
+                  'noopener,noreferrer',
+                );
+              }
+            }}
           >
             <Transition
               visible={!differentialStudyHrefVisible}
@@ -1297,7 +1379,7 @@ class DifferentialSearch extends Component {
               />
             }
             style={StudyPopupStyle}
-            disabled={differentialModelTooltip === ''}
+            disabled={!differentialStudy}
             className="CustomTooltip"
             inverted
             position="bottom right"
