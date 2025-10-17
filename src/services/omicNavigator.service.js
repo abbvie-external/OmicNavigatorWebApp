@@ -303,6 +303,125 @@ class OmicNavigatorService {
     return studiesFromPromise;
   }
 
+  async getInstalledStudies(params, cancelToken) {
+    const optionalParams = params ? params : {};
+    const promise = this.axiosPost(
+      'getInstalledStudies',
+      optionalParams,
+      true,
+      null,
+      null,
+      25000,
+    );
+    const studiesFromPromise = await promise;
+    return studiesFromPromise;
+  }
+
+  async getStudyMeta(study, cancelToken) {
+    const cacheKey = `getStudyMeta_${study}`;
+    if (this[cacheKey] != null) {
+      return this[cacheKey];
+    } else {
+      try {
+        const promise = this.axiosPost(
+          'getStudyMeta',
+          {
+            study,
+          },
+          false,
+          null,
+          cancelToken,
+          25000,
+        );
+        const dataFromPromise = await promise;
+        this[cacheKey] = dataFromPromise;
+        return dataFromPromise;
+      } catch {
+        // if (axios.isCancel) {
+        // }
+      }
+    }
+  }
+
+  async getModels(study, cancelToken) {
+    const cacheKey = `getModels_${study}`;
+    if (this[cacheKey] != null) {
+      return this[cacheKey];
+    } else {
+      try {
+        const promise = this.axiosPost(
+          'getModels',
+          {
+            study,
+          },
+          false,
+          null,
+          cancelToken,
+          25000,
+        );
+        const dataFromPromise = await promise;
+        this[cacheKey] = dataFromPromise;
+        return dataFromPromise;
+      } catch {
+        // if (axios.isCancel) {
+        // }
+      }
+    }
+  }
+
+  async getTests(study, model, cancelToken) {
+    const cacheKey = `getTests_${study}-${model}`;
+    if (this[cacheKey] != null) {
+      return this[cacheKey];
+    } else {
+      try {
+        const promise = this.axiosPost(
+          'getTests',
+          {
+            study,
+            model,
+          },
+          false,
+          null,
+          cancelToken,
+          25000,
+        );
+        const dataFromPromise = await promise;
+        this[cacheKey] = dataFromPromise;
+        return dataFromPromise;
+      } catch {
+        if (axios.isCancel) {
+        }
+      }
+    }
+  }
+
+  async getAnnotations(study, cancelToken) {
+    const cacheKey = `getAnnotations_${study}`;
+    if (this[cacheKey] != null) {
+      return this[cacheKey];
+    } else {
+      try {
+        const promise = this.axiosPost(
+          'getAnnotations',
+          {
+            study,
+          },
+          false,
+          null,
+          cancelToken,
+          25000,
+        );
+        const dataFromPromise = await promise;
+        this[cacheKey] = dataFromPromise;
+        return dataFromPromise;
+      } catch {
+        if (axios.isCancel) {
+        }
+      }
+    }
+  }
+
   async getReportLink(study, modelID, errorCb, cancelToken) {
     const cacheKey = `getReportLink_${study}_${modelID}`;
     if (this[cacheKey] != null) {
@@ -779,8 +898,8 @@ class OmicNavigatorService {
     }
   }
 
-  async getResultsColumnTooltips(study, cancelToken) {
-    const cacheKey = `getTests_${study}}`;
+  async getAllTests(study, cancelToken) {
+    const cacheKey = `getAllTests_${study}`;
     if (this[cacheKey] != null) {
       return this[cacheKey];
     } else {
