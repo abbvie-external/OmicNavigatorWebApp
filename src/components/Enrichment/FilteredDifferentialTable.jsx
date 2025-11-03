@@ -70,7 +70,7 @@ class FilteredDifferentialTable extends Component {
   pageToFeature = (featureToHighlight) => {
     if (
       featureToHighlight !== '' &&
-      featureToHighlight !== [] &&
+      (!Array.isArray(featureToHighlight) || featureToHighlight.length > 0) &&
       featureToHighlight !== null
     ) {
       const {

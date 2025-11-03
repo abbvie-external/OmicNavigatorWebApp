@@ -19,6 +19,7 @@ import { getDynamicSize } from '../Shared/helpers';
 
 let cancelRequestGetReportLinkEnrichment = () => {};
 // let cancelGetEnrichmentsTable = () => {};
+let cancelGetAllEnrichmentTests = () => {};
 let cancelRequestGetEnrichmentsIntersection = () => {};
 let cancelRequestGetEnrichmentsMultiset = () => {};
 let cancelGetAnnotations = () => {};
@@ -225,6 +226,7 @@ class EnrichmentSearch extends Component {
       models = await this.getAndSetModelOptions(enrichmentStudy);
       enrichmentModelIds = Object.keys(models) || [];
       this.props.onSetEnrichmentModelIds(enrichmentModelIds);
+      this.getAllTests(enrichmentStudy);
       if (enrichmentModel === '') {
         this.getReportLink(enrichmentStudy, 'default');
       } else {
@@ -284,6 +286,28 @@ class EnrichmentSearch extends Component {
           });
         }
       }
+    }
+  };
+
+  getAllTests = async (study) => {
+    const { onSetEnrichmentResultsColumnTooltips } = this.props;
+    cancelGetAllEnrichmentTests();
+    let cancelToken = new CancelToken((e) => {
+      cancelGetAllEnrichmentTests = e;
+    });
+    try {
+      const getAllTestsResponse = await omicNavigatorService.getAllTests(
+        study,
+        cancelToken,
+      );
+      if (getAllTestsResponse) {
+        onSetEnrichmentResultsColumnTooltips(getAllTestsResponse);
+      } else {
+        onSetEnrichmentResultsColumnTooltips([]);
+      }
+      return getAllTestsResponse;
+    } catch (error) {
+      console.error('Error during getAllTests', error);
     }
   };
 

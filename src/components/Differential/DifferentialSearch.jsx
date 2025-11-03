@@ -309,7 +309,7 @@ class DifferentialSearch extends Component {
   };
 
   getAllTests = async (study) => {
-    // const { onSetDifferentialResultsColumnTooltips } = this.props;
+    const { onSetDifferentialResultsColumnTooltips } = this.props;
     cancelGetAllDifferentialTests();
     let cancelToken = new CancelToken((e) => {
       cancelGetAllDifferentialTests = e;
@@ -319,13 +319,11 @@ class DifferentialSearch extends Component {
         study,
         cancelToken,
       );
-      // if (getAllTestsResponse) {
-      //   debugger;
-      //   TODO - column descriptions used for tooltips used to be present listStudies
-      //   onSetDifferentialResultsColumnTooltips(getAllTestsResponse);
-      // } else {
-      //   onSetDifferentialResultsColumnTooltips([]);
-      // }
+      if (getAllTestsResponse) {
+        onSetDifferentialResultsColumnTooltips(getAllTestsResponse);
+      } else {
+        onSetDifferentialResultsColumnTooltips([]);
+      }
       return getAllTestsResponse;
     } catch (error) {
       console.error('Error during getAllTests', error);
