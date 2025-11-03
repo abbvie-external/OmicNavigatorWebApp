@@ -1698,11 +1698,6 @@ class Differential extends Component {
     const noPlots = !differentialPlotTypes?.length > 0;
     const differentialAlphanumericColumnsMapped =
       differentialAlphanumericFields.map((f, { index }) => {
-        // console.log(
-        //   differentialResultsColumnTooltips?.[differentialModel]?.[
-        //     differentialTest
-        //   ]?.[f],
-        // );
         return {
           title: f,
           headerAttributes: {
@@ -1994,11 +1989,11 @@ class Differential extends Component {
     // });
   };
 
-  // setDifferentialResultsColumnTooltips = (response) => {
-  //   this.setState({
-  //     differentialResultsColumnTooltips: response,
-  //   });
-  // };
+  setDifferentialResultsColumnTooltips = (response) => {
+    this.setState({
+      differentialResultsColumnTooltips: response,
+    });
+  };
 
   setDifferentialPlotDescriptions = (response) => {
     /**
@@ -2164,9 +2159,9 @@ class Differential extends Component {
               }
               onResetOverlay={this.resetOverlay}
               onGetMultiModelMappingObject={this.getMultiModelMappingObject}
-              // onSetDifferentialResultsColumnTooltips={
-              //   this.setDifferentialResultsColumnTooltips
-              // }
+              onSetDifferentialResultsColumnTooltips={
+                this.setDifferentialResultsColumnTooltips
+              }
               onSetDifferentialPlotDescriptions={
                 this.setDifferentialPlotDescriptions
               }
