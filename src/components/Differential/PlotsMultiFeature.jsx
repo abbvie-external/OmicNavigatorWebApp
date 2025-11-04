@@ -63,6 +63,26 @@ class PlotsMultiFeature extends Component {
     this.props.onHandleHighlightedFeaturesDifferential([], false);
   };
 
+  /**
+   * Gets the label for a feature based on the volcano plot option settings.
+   *
+   * @param {string|number} featureId - The ID of the feature to get the label for.
+   * @returns {string|number} - The label for the feature, which is either the feature ID itself or a value from the volcano circle label column.
+   */
+  getLabelForFeature = (featureId) => {
+    const { differentialTableData, differentialFeatureIdKey } = this.props;
+    const volcanoCircleLabel = sessionStorage.getItem('volcanoCircleLabel');
+
+    if (!volcanoCircleLabel || volcanoCircleLabel === 'None') {
+      return featureId;
+    }
+    const row = differentialTableData?.find(
+      (r) => r[differentialFeatureIdKey] === featureId,
+    );
+
+    return (row && row[volcanoCircleLabel]) || featureId;
+  };
+
   getFeaturesList = () => {
     const {
       divWidth,
@@ -79,10 +99,16 @@ class PlotsMultiFeature extends Component {
       differentialHighlightedFeaturesData?.length || null;
     if (featuresHighlighted > 10) {
       let shortenedArr = [...differentialHighlightedFeaturesData].slice(0, 10);
-      features = shortenedArr.map((m) => m.key);
+      features = shortenedArr.map((m) => ({
+        key: m.key,
+        label: this.getLabelForFeature(m.key),
+      }));
     } else {
       if (featuresHighlighted > 0) {
-        features = [...differentialHighlightedFeaturesData].map((m) => m.key);
+        features = [...differentialHighlightedFeaturesData].map((m) => ({
+          key: m.key,
+          label: this.getLabelForFeature(m.key),
+        }));
       }
     }
     const featuresListHorizontalStyle = {
@@ -126,12 +152,12 @@ class PlotsMultiFeature extends Component {
           ? null
           : features.map((f) => {
               return (
-                <List.Item key={`featureList-${f}`} className="NoSelect">
+                <List.Item key={`featureList-${f.key}`} className="NoSelect">
                   <Label
                     className="CursorPointer"
-                    onClick={() => this.props.onRemoveSelectedFeature(f)}
+                    onClick={() => this.props.onRemoveSelectedFeature(f.key)}
                   >
-                    {f}
+                    {f.label}
                     <Icon name="delete" />
                   </Label>
                 </List.Item>

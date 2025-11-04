@@ -212,6 +212,8 @@ class PlotsDynamic extends Component {
                 differentialPlotDescriptions={
                   this.props.differentialPlotDescriptions
                 }
+                differentialTableData={this.props.differentialTableData}
+                differentialFeatureIdKey={this.props.differentialFeatureIdKey}
               />
             </Tab.Pane>
           ),
