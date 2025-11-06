@@ -1945,6 +1945,7 @@ class DifferentialDetail extends Component {
         differentialFeatureIdKey={differentialFeatureIdKey}
         plotMultiFeatureMax={plotMultiFeatureMax}
         onGetPlotTransitionRef={onGetPlotTransition}
+        differentialTableData={differentialTableData}
         onGetMultifeaturePlotTransitionAlt={
           this.getMultifeaturePlotTransitionAlt
         }
