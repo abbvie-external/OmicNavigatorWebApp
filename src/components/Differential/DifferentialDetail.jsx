@@ -86,9 +86,48 @@ class DifferentialDetail extends Component {
   };
   volcanoPlotFilteredGridRef = React.createRef();
 
+  // Flag to track if the component is mounted to prevent state updates on unmounted components
+  _isMountedDifferential = false;
+
   componentDidMount() {
     this.resetSearchAndData();
+    // Set flag indicating that the component is now mounted
+    this._isMountedDifferential = true;
   }
+
+  /**
+   * Prevents drag and drop operations on the first column of a results table
+   *
+   * @returns {void} No return value
+   */
+  preventDropOnFirstColumn = () => {
+    const wrapper = document.querySelector('.ResultsTableWrapper');
+    if (!wrapper) return;
+
+    const table = wrapper.querySelector('table.ui.celled.table');
+    if (!table) return;
+
+    const firstHeader = table.querySelector('thead tr th:nth-child(1)');
+    if (!firstHeader) return;
+
+    /**
+     * Event handler to prevent drag operations
+     *
+     * @param {Event} e - The drag event object
+     * @returns {boolean} Always returns false to prevent default behavior
+     */
+    const preventDrag = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.type === 'dragover') e.dataTransfer.dropEffect = 'none'; // Show "not allowed" cursor
+      return false;
+    };
+
+    // Add event listeners for all drag-related events
+    ['dragstart', 'dragover', 'drop', 'dragenter'].forEach((type) => {
+      firstHeader.addEventListener(type, preventDrag, { capture: true });
+    });
+  };
 
   componentDidUpdate(prevProps, prevState) {
     const {
@@ -117,6 +156,15 @@ class DifferentialDetail extends Component {
       // take new data (possibly only from set analysis), do not reset search
       this.setRelevantData();
     }
+
+    // Update the preventDropOnFirstColumn only if differentialTableData has changed
+    if (prevState.differentialTableData !== this.state.differentialTableData) {
+      this.preventDropOnFirstColumn();
+    }
+  }
+
+  componentWillUnmount() {
+    this._isMountedDifferential = false;
   }
 
   setRelevantData = () => {

@@ -200,9 +200,12 @@ class Enrichment extends Component {
     enrichmentModelIds: [],
     enrichmentResultsColumnTooltips: [],
     enrichmentPlotDescriptions: [],
+    frozenFirstColumnWidth: null,
   };
   EnrichmentViewContainerRef = React.createRef();
   EnrichmentGridRef = React.createRef();
+
+  _isMountedEnrichment = false;
 
   shouldComponentUpdate(nextProps) {
     return nextProps.tab === 'enrichment';
@@ -217,6 +220,8 @@ class Enrichment extends Component {
     //     this.windowResized();
     //   }, 200);
     // });
+    this._isMountedEnrichment = true;
+    this.measureFrozenColumnWidth();
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
@@ -252,6 +257,18 @@ class Enrichment extends Component {
         }
       }
     }
+    if (prevState.enrichmentResults !== this.state.enrichmentResults) {
+      this.measureFrozenColumnWidth();
+    }
+
+    if (prevState.enrichmentColumns !== this.state.enrichmentColumns) {
+      this.measureFrozenColumnWidth();
+    }
+  }
+
+  componentWillUnmount() {
+    // ADD THIS:
+    this._isMountedEnrichment = false;
   }
 
   // windowResized = () => {
@@ -941,6 +958,65 @@ class Enrichment extends Component {
       enrichmentNumericColumnsMapped,
     );
     return configCols;
+  };
+
+  /**
+   * Measures the width of the first column using requestAnimationFrame for better timing accuracy
+   * This helps ensure that DOM measurements happen at the right time in the rendering cycle
+   *
+   * @returns {void}
+   */
+  measureFrozenColumnWidth = () => {
+    requestAnimationFrame(() => {
+      if (!this._isMountedEnrichment) return;
+      const width = this.getFrozenFirstColumnWidth();
+
+      if (
+        width != null &&
+        width > 0 &&
+        width !== this.state.frozenFirstColumnWidth
+      ) {
+        this.setState({ frozenFirstColumnWidth: width });
+      }
+    });
+  };
+
+  /**
+   * Calculates the width of the first column header
+   *
+   * @returns {number|null} Width in pixels (rounded) or null if measurement not possible
+   */
+  getFrozenFirstColumnWidth = () => {
+    try {
+      const container = document.querySelector('.EnrichmentTableWrapper');
+      if (!container) return null;
+      let gridRoot =
+        container.querySelector('.ui.celled.table') ||
+        container.querySelector('table');
+
+      if (!gridRoot) return null;
+
+      let firstHeaderCell = gridRoot.querySelector('thead tr th:first-child');
+      if (!firstHeaderCell) {
+        firstHeaderCell = gridRoot.querySelector(
+          'div[role="columnheader"]:first-child',
+        );
+      }
+
+      if (!firstHeaderCell) return null;
+      const rect = firstHeaderCell.getBoundingClientRect();
+      if (rect.width === 0 && rect.height === 0) {
+        return null;
+      }
+
+      const width = rect.width;
+
+      if (!width || isNaN(width) || width <= 0) return null;
+
+      return Math.round(width);
+    } catch (error) {
+      return null;
+    }
   };
 
   removeNetworkSVG = () => {
@@ -2098,6 +2174,7 @@ class Enrichment extends Component {
       activeIndexEnrichmentView,
       isEnrichmentTableLoading,
       networkDataError,
+      frozenFirstColumnWidth,
     } = this.state;
     let enrichmentCacheKey = `${enrichmentStudy}-${enrichmentModel}-${enrichmentAnnotation}-${multisetQueriedEnrichment}`;
     const TableValuePopupStyle = {
@@ -2141,6 +2218,9 @@ class Enrichment extends Component {
             className="EnrichmentContentPane"
             id="EnrichmentContentPaneTable"
             // ref="EnrichmentContentPaneTable"
+            style={{
+              '--frozen-first-column-width': `${frozenFirstColumnWidth}px`,
+            }}
           >
             <Grid>
               <Grid.Row>
