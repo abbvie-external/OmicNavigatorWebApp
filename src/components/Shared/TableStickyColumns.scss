@@ -3,11 +3,10 @@
 * Works with Semantic UI `.ui.celled.table` produced by QHGrid.
 *
 * Usage:
-*   <div className="EnrichmentTableWrapper two-col-sticky">...</div>
+*   <div className="two-col-sticky">...</div>
 *   <div id="DifferentialResultsTableWrapperCheckboxes" className="two-col-sticky">...</div>
 */
 .two-col-sticky {
-  /* Default, overridden at runtime by ResizeObserver */
   --frozen-first-column-width: 35px;
 
   .ui.celled.table {
@@ -34,7 +33,6 @@
     left: var(--frozen-first-column-width);
   }
 
-  /* Make header a bit higher z-index and non-draggable/selectable */
   .ui.celled.table thead tr th:nth-child(-n + 2) {
     -webkit-user-drag: none;
     -moz-user-drag: none;
