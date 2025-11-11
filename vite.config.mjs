@@ -59,5 +59,12 @@ export default defineConfig(({ mode }) => {
       port: 3000,
       open: false,
     },
+    css: {
+      preprocessorOptions: {
+        scss: {
+          api: 'modern',
+        },
+      },
+    },
   };
 });
