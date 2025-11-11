@@ -2,7 +2,7 @@ import $ from 'jquery';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 window.jQuery = $;
-require('opencpu.js/opencpu-0.5.js');
+await import('opencpu.js/opencpu-0.5.js');
 class OmicNavigatorService {
   constructor() {
     this.baseUrl =

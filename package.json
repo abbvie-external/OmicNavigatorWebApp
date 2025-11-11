@@ -31,7 +31,6 @@
     "react-plotly.js": "^2.6.0",
     "react-resizable": "^3.0.5",
     "react-router-dom": "^5.0.1",
-    "react-scripts": "^4.0.3",
     "react-slider": "^2.0.4",
     "react-sortable-hoc": "^2.0.0",
     "react-split-pane-r17": "^1.1.0",
@@ -61,12 +60,13 @@
   },
   "scripts": {
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build",
-    "start": "react-scripts start",
-    "build": "GENERATE_SOURCEMAP=false react-scripts --max_old_space_size=4096 build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "analyse": "node analyse.js"
+    "deploy": "gh-pages -d dist",
+    "dev": "vite",
+    "start": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest",
+    "analyse": "cross-env ANALYZE=true vite build"
   },
   "browserslist": {
     "production": [
@@ -81,12 +81,16 @@
     ]
   },
   "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.1",
+    "cross-env": "^7.0.3",
     "eslint": "^7.32.0",
     "gh-pages": "^5.0.0",
     "lint-staged": "^13.2.2",
-    "node-sass": "^8.0.0",
     "prettier": "^2.8.8",
+    "rollup-plugin-visualizer": "^5.12.0",
+    "sass": "^1.77.0",
     "standard-version": "^9.5.0",
-    "webpack-bundle-analyzer": "^4.8.0"
+    "vite": "^5.3.1",
+    "vitest": "^1.6.0"
   }
 }

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Button, Dropdown } from 'semantic-ui-react';
 import * as saveSvgAsPng from 'save-svg-as-png';
+import jsonToTxt from 'json-to-txt';
 // import { excelService } from '../../services/excel.service';
 import { pdfService } from '../../services/pdf.service';
 import './ButtonActions.scss';
@@ -84,9 +85,8 @@ class ButtonActions extends Component {
   };
 
   isPlotlyExport = () => {
-    const plotlyElement = this.props.fwdRef?.current?.getElementsByClassName(
-      'plotly',
-    );
+    const plotlyElement =
+      this.props.fwdRef?.current?.getElementsByClassName('plotly');
     return plotlyElement?.length > 0;
   };
 
@@ -172,7 +172,6 @@ class ButtonActions extends Component {
     let modelNoPeriods = model.replace(/\./g, '_');
     let testNoPeriods = test.replace(/\./g, '_');
     const sortedData = refFwd.current?.qhGridRef.current?.getSortedData() || [];
-    const jsonToTxt = require('json-to-txt');
     const dataInString = jsonToTxt({ data: sortedData });
     let a = document.createElement('a');
     let file = new Blob([dataInString], { type: 'text/plain' });
@@ -291,13 +290,8 @@ class ButtonActions extends Component {
   };
 
   render() {
-    const {
-      excelVisible,
-      pdfVisible,
-      pngVisible,
-      svgVisible,
-      txtVisible,
-    } = this.props;
+    const { excelVisible, pdfVisible, pngVisible, svgVisible, txtVisible } =
+      this.props;
     const excelDropdownItem = this.getExcelDropdownItem();
     const pdfDropdownItem = this.getPDFDropdownItem();
     const pngDropdownItem = this.getPNGDropdownItem();
