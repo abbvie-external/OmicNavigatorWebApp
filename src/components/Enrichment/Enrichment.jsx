@@ -44,6 +44,10 @@ class Enrichment extends Component {
   storedEnrichmentActiveIndex =
     parseInt(sessionStorage.getItem('enrichmentViewTab'), 10) || 0;
 
+  frozenColumnResizeObserver = null;
+  frozenColumnObservedElement = null;
+  frozenColumnWrapperRef = null;
+
   enrichmentColumnsConfigured = false;
   state = {
     pValueType: sessionStorage.getItem('pValueType') || 'nominal',
@@ -200,7 +204,6 @@ class Enrichment extends Component {
     enrichmentModelIds: [],
     enrichmentResultsColumnTooltips: [],
     enrichmentPlotDescriptions: [],
-    frozenFirstColumnWidth: null,
   };
   EnrichmentViewContainerRef = React.createRef();
   EnrichmentGridRef = React.createRef();
@@ -221,7 +224,6 @@ class Enrichment extends Component {
     //   }, 200);
     // });
     this._isMountedEnrichment = true;
-    this.measureFrozenColumnWidth();
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
@@ -257,18 +259,19 @@ class Enrichment extends Component {
         }
       }
     }
-    if (prevState.enrichmentResults !== this.state.enrichmentResults) {
-      this.measureFrozenColumnWidth();
-    }
-
-    if (prevState.enrichmentColumns !== this.state.enrichmentColumns) {
-      this.measureFrozenColumnWidth();
-    }
   }
 
   componentWillUnmount() {
-    // ADD THIS:
     this._isMountedEnrichment = false;
+
+    if (this.frozenColumnResizeObserver && this.frozenColumnObservedElement) {
+      this.frozenColumnResizeObserver.unobserve(
+        this.frozenColumnObservedElement,
+      );
+    }
+    if (this.frozenColumnResizeObserver) {
+      this.frozenColumnResizeObserver.disconnect();
+    }
   }
 
   // windowResized = () => {
@@ -961,62 +964,58 @@ class Enrichment extends Component {
   };
 
   /**
-   * Measures the width of the first column using requestAnimationFrame for better timing accuracy
-   * This helps ensure that DOM measurements happen at the right time in the rendering cycle
-   *
-   * @returns {void}
+   * Sets up a ResizeObserver to keep the frozen first column width in sync
+   * with the actual rendered header width. The observer updates the
+   * CSS variable --frozen-first-column-width directly on the wrapper.
    */
-  measureFrozenColumnWidth = () => {
-    requestAnimationFrame(() => {
-      if (!this._isMountedEnrichment) return;
-      const width = this.getFrozenFirstColumnWidth();
-
-      if (
-        width != null &&
-        width > 0 &&
-        width !== this.state.frozenFirstColumnWidth
-      ) {
-        this.setState({ frozenFirstColumnWidth: width });
-      }
-    });
-  };
-
-  /**
-   * Calculates the width of the first column header
-   *
-   * @returns {number|null} Width in pixels (rounded) or null if measurement not possible
-   */
-  getFrozenFirstColumnWidth = () => {
-    try {
-      const container = document.querySelector('.EnrichmentTableWrapper');
-      if (!container) return null;
-      let gridRoot =
-        container.querySelector('.ui.celled.table') ||
-        container.querySelector('table');
-
-      if (!gridRoot) return null;
-
-      let firstHeaderCell = gridRoot.querySelector('thead tr th:first-child');
-      if (!firstHeaderCell) {
-        firstHeaderCell = gridRoot.querySelector(
-          'div[role="columnheader"]:first-child',
-        );
-      }
-
-      if (!firstHeaderCell) return null;
-      const rect = firstHeaderCell.getBoundingClientRect();
-      if (rect.width === 0 && rect.height === 0) {
-        return null;
-      }
-
-      const width = rect.width;
-
-      if (!width || isNaN(width) || width <= 0) return null;
-
-      return Math.round(width);
-    } catch (error) {
-      return null;
+  setupFrozenColumnResizeObserver = () => {
+    // Clean up any existing observer first
+    if (this.frozenColumnResizeObserver) {
+      this.frozenColumnResizeObserver.disconnect();
+      this.frozenColumnResizeObserver = null;
+      this.frozenColumnObservedElement = null;
     }
+
+    // Find the wrapper that contains the QHGrid table
+    const wrapper = document.querySelector('.EnrichmentTableWrapper');
+    if (!wrapper) return;
+
+    // Helper to compute header width and set CSS var
+    const updateWidth = () => {
+      try {
+        const table =
+          wrapper.querySelector('.ui.celled.table') ||
+          wrapper.querySelector('table');
+
+        if (!table) return;
+
+        let firstHeaderCell = table.querySelector('thead tr th:first-child');
+        if (!firstHeaderCell) {
+          firstHeaderCell = table.querySelector(
+            'div[role="columnheader"]:first-child',
+          );
+        }
+        if (!firstHeaderCell) return;
+
+        const rect = firstHeaderCell.getBoundingClientRect();
+        if (!rect.width || rect.width <= 0) return;
+
+        const width = Math.round(rect.width);
+        wrapper.style.setProperty('--frozen-first-column-width', `${width}px`);
+      } catch (e) {}
+    };
+
+    // Do an initial measurement once the table exists
+    updateWidth();
+
+    // Create the observer on the wrapper (not the header itself) so
+    // it still works if the header node is re-rendered.
+    this.frozenColumnResizeObserver = new ResizeObserver(() => {
+      updateWidth();
+    });
+
+    this.frozenColumnResizeObserver.observe(wrapper);
+    this.frozenColumnObservedElement = wrapper;
   };
 
   removeNetworkSVG = () => {
@@ -2174,7 +2173,6 @@ class Enrichment extends Component {
       activeIndexEnrichmentView,
       isEnrichmentTableLoading,
       networkDataError,
-      frozenFirstColumnWidth,
     } = this.state;
     let enrichmentCacheKey = `${enrichmentStudy}-${enrichmentModel}-${enrichmentAnnotation}-${multisetQueriedEnrichment}`;
     const TableValuePopupStyle = {
@@ -2218,9 +2216,6 @@ class Enrichment extends Component {
             className="EnrichmentContentPane"
             id="EnrichmentContentPaneTable"
             // ref="EnrichmentContentPaneTable"
-            style={{
-              '--frozen-first-column-width': `${frozenFirstColumnWidth}px`,
-            }}
           >
             <Grid>
               <Grid.Row>
@@ -2240,35 +2235,50 @@ class Enrichment extends Component {
                   />
                 </div>
                 <Grid.Column
-                  className="EnrichmentTableWrapper"
+                  className="EnrichmentTableWrapper two-col-sticky"
                   mobile={16}
                   tablet={16}
                   largeScreen={16}
                   widescreen={16}
                 >
-                  <EZGrid
-                    ref={this.EnrichmentGridRef}
-                    uniqueCacheKey={enrichmentCacheKey}
-                    data={enrichmentResults}
-                    columnsConfig={enrichmentColumns}
-                    // totalRows={rows}
-                    // use "rows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
-                    itemsPerPage={itemsPerPageEnrichmentTable}
-                    onItemsPerPageChange={this.handleItemsPerPageChange}
-                    loading={isEnrichmentTableLoading}
-                    // exportBaseName="Enrichment_Analysis"
-                    // columnReorder={this.props.columnReorder}
-                    disableColumnReorder
-                    disableGrouping
-                    disableColumnVisibilityToggle
-                    min-height="75vh"
-                    additionalTemplateInfo={
-                      additionalTemplateInfoEnrichmentTable
-                    }
-                    emptyMessage={CustomEmptyMessage}
-                    disableQuickViewEditing
-                    disableQuickViewMenu
-                  />
+                  <div
+                    ref={(el) => {
+                      if (el && !this.frozenColumnWrapperRef) {
+                        this.frozenColumnWrapperRef = el;
+                        this.setupFrozenColumnResizeObserver();
+                      } else if (!el && this.frozenColumnWrapperRef) {
+                        this.frozenColumnWrapperRef = null;
+                        if (this.frozenColumnResizeObserver) {
+                          this.frozenColumnResizeObserver.disconnect();
+                          this.frozenColumnResizeObserver = null;
+                        }
+                      }
+                    }}
+                  >
+                    <EZGrid
+                      ref={this.EnrichmentGridRef}
+                      uniqueCacheKey={enrichmentCacheKey}
+                      data={enrichmentResults}
+                      columnsConfig={enrichmentColumns}
+                      // totalRows={rows}
+                      // use "rows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
+                      itemsPerPage={itemsPerPageEnrichmentTable}
+                      onItemsPerPageChange={this.handleItemsPerPageChange}
+                      loading={isEnrichmentTableLoading}
+                      // exportBaseName="Enrichment_Analysis"
+                      // columnReorder={this.props.columnReorder}
+                      disableColumnReorder
+                      disableGrouping
+                      disableColumnVisibilityToggle
+                      min-height="75vh"
+                      additionalTemplateInfo={
+                        additionalTemplateInfoEnrichmentTable
+                      }
+                      emptyMessage={CustomEmptyMessage}
+                      disableQuickViewEditing
+                      disableQuickViewMenu
+                    />
+                  </div>
                 </Grid.Column>
               </Grid.Row>
             </Grid>

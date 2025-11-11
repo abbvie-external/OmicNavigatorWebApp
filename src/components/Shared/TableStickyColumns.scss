@@ -1,0 +1,46 @@
+/**
+* Utility class for tables with 2 sticky left columns.
+* Works with Semantic UI `.ui.celled.table` produced by QHGrid.
+*
+* Usage:
+*   <div className="EnrichmentTableWrapper two-col-sticky">...</div>
+*   <div id="DifferentialResultsTableWrapperCheckboxes" className="two-col-sticky">...</div>
+*/
+.two-col-sticky {
+  /* Default, overridden at runtime by ResizeObserver */
+  --frozen-first-column-width: 35px;
+
+  .ui.celled.table {
+    position: relative;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  .ui.celled.table :is(th, td):nth-child(-n + 2) {
+    position: sticky;
+    background-color: #ffffff;
+    z-index: 1;
+  }
+
+  /* First column sticks at the very left */
+  .ui.celled.table thead tr th:nth-child(1),
+  .ui.celled.table tbody tr td:nth-child(1) {
+    left: 0;
+  }
+
+  /* Second column sticks based on the frozen first column width */
+  .ui.celled.table thead tr th:nth-child(2),
+  .ui.celled.table tbody tr td:nth-child(2) {
+    left: var(--frozen-first-column-width);
+  }
+
+  /* Make header a bit higher z-index and non-draggable/selectable */
+  .ui.celled.table thead tr th:nth-child(-n + 2) {
+    -webkit-user-drag: none;
+    -moz-user-drag: none;
+    -ms-user-drag: none;
+    user-select: none;
+    cursor: default;
+    z-index: 2;
+  }
+}

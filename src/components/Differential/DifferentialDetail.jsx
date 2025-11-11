@@ -2128,7 +2128,7 @@ class DifferentialDetail extends Component {
                           />
                         </div>
                         <Grid.Column
-                          className="ResultsTableWrapper"
+                          className="ResultsTableWrapper two-col-sticky"
                           id="DifferentialResultsTableWrapperCheckboxes"
                           mobile={16}
                           tablet={16}
