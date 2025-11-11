@@ -85,6 +85,8 @@ class DifferentialDetail extends Component {
     filteredOutLimit: 5,
   };
   volcanoPlotFilteredGridRef = React.createRef();
+  firstHeaderEl = null;
+  events = ['dragstart', 'dragover', 'drop', 'dragenter'];
 
   // Flag to track if the component is mounted to prevent state updates on unmounted components
   _isMountedDifferential = false;
@@ -110,6 +112,22 @@ class DifferentialDetail extends Component {
     const firstHeader = table.querySelector('thead tr th:nth-child(1)');
     if (!firstHeader) return;
 
+    // If we already wired up a different header, remove listeners from it
+    if (this._firstHeaderEl && this._firstHeaderEl !== firstHeader) {
+      events.forEach((type) => {
+        this._firstHeaderEl.removeEventListener(
+          type,
+          this._preventDragHandler,
+          true,
+        );
+      });
+    }
+
+    // If this is the same header we already wired, do nothing
+    if (this._firstHeaderEl === firstHeader) {
+      return;
+    }
+
     /**
      * Event handler to prevent drag operations
      *
@@ -123,10 +141,11 @@ class DifferentialDetail extends Component {
       return false;
     };
 
-    // Add event listeners for all drag-related events
-    ['dragstart', 'dragover', 'drop', 'dragenter'].forEach((type) => {
-      firstHeader.addEventListener(type, preventDrag, { capture: true });
+    this.events.forEach((type) => {
+      firstHeader.addEventListener(type, preventDrag, true);
     });
+
+    this._firstHeaderEl = firstHeader;
   };
 
   componentDidUpdate(prevProps, prevState) {
@@ -165,6 +184,18 @@ class DifferentialDetail extends Component {
 
   componentWillUnmount() {
     this._isMountedDifferential = false;
+
+    if (this._firstHeaderEl) {
+      this.events.forEach((type) => {
+        this._firstHeaderEl.removeEventListener(
+          type,
+          this._preventDragHandler,
+          true,
+        );
+      });
+    }
+
+    this._firstHeaderEl = null;
   }
 
   setRelevantData = () => {
