@@ -979,16 +979,15 @@ class Enrichment extends Component {
     // Find the wrapper that contains the QHGrid table
     const wrapper = document.querySelector('.EnrichmentTableWrapper');
     if (!wrapper) return;
+    const table =
+      wrapper.querySelector('.ui.celled.table') ||
+      wrapper.querySelector('table');
+
+    if (!table) return;
 
     // Helper to compute header width and set CSS var
     const updateWidth = () => {
       try {
-        const table =
-          wrapper.querySelector('.ui.celled.table') ||
-          wrapper.querySelector('table');
-
-        if (!table) return;
-
         let firstHeaderCell = table.querySelector('thead tr th:first-child');
         if (!firstHeaderCell) {
           firstHeaderCell = table.querySelector(
@@ -1014,8 +1013,8 @@ class Enrichment extends Component {
       updateWidth();
     });
 
-    this.frozenColumnResizeObserver.observe(wrapper);
-    this.frozenColumnObservedElement = wrapper;
+    this.frozenColumnResizeObserver.observe(table);
+    this.frozenColumnObservedElement = table;
   };
 
   removeNetworkSVG = () => {
