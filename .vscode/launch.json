@@ -6,15 +6,13 @@
   "configurations": [
     {
       "type": "node",
-      "name": "vscode-jest-tests",
+      "name": "vitest",
       "request": "launch",
-      "args": ["test", "--runInBand"],
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "disableOptimisticBPs": true,
-      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/react-scripts",
-      "protocol": "inspector"
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "test"]
     },
     {
       "name": "Chrome",

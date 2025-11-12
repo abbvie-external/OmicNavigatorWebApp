@@ -1324,7 +1324,7 @@ class Enrichment extends Component {
                 enrichmentTest,
               );
             }
-            const modelsArg = getModelsArg(
+            let modelsArg = getModelsArg(
               plot.plotType,
               enrichmentModelIdsOverride,
               uData,

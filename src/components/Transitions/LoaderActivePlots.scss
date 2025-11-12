@@ -1,3 +1,6 @@
+@use 'sass:list';
+@use 'sass:math';
+
 //variables
 $speed: 2.5; //second
 $part-second: 0.25; //second
@@ -5,9 +8,9 @@ $speed: $speed + $part-second * 4;
 $animation-timing: ease-in-out;
 $logo-width: 180px;
 $loader-active-plots-dot-count: 5;
-$loader-active-plots-dot-width: $logo-width / 3;
-$rotateFinish: percentage(($speed - ($part-second * 4)) / $speed);
-$scaleFinish: $rotateFinish/2;
+$loader-active-plots-dot-width: math.div($logo-width, 3);
+$rotateFinish: math.percentage(math.div($speed - ($part-second * 4), $speed));
+$scaleFinish: math.div($rotateFinish, 2);
 $loader-active-plots-dot-positions: (
   (120, -209, top, right),
   (-161, -194, bottom, right),
@@ -55,18 +58,17 @@ $loader-active-plots-dot-positions: (
         transform: scale(0.17);
       }
       @for $i from 1 through $loader-active-plots-dot-count {
+        $position: list.nth($loader-active-plots-dot-positions, $i);
+        $vertical-origin: list.nth($position, 3);
+        $horizontal-origin: list.nth($position, 4);
         &:nth-child(#{$i}) {
-          top: #{nth(nth($loader-active-plots-dot-positions, $i), 1)}px;
-          left: #{nth(nth($loader-active-plots-dot-positions, $i), 2)}px;
+          top: #{list.nth($position, 1)}px;
+          left: #{list.nth($position, 2)}px;
           animation-delay: ($i - 1) * $part-second * 1s;
           &:after {
-            transform-origin: #{nth(
-                nth($loader-active-plots-dot-positions, $i),
-                3
-              )}
-              #{nth(nth($loader-active-plots-dot-positions, $i), 4)};
-            #{nth(nth($loader-active-plots-dot-positions, $i) , 3)}: 0;
-            #{nth(nth($loader-active-plots-dot-positions, $i) , 4)}: 0;
+            transform-origin: #{$vertical-origin} #{$horizontal-origin};
+            #{$vertical-origin}: 0;
+            #{$horizontal-origin}: 0;
             animation-delay: ($i - 1) * $part-second * 1s;
           }
         }

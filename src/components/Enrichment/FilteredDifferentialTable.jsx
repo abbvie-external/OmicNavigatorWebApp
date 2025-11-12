@@ -390,7 +390,7 @@ class FilteredDifferentialTable extends Component {
   highlightRows = (HighlightedProteins, rowClicked) => {
     const MaxLine = HighlightedProteins[0] || null;
     let filteredDifferentialTableRowMaxVar = [];
-    if (MaxLine !== {} && MaxLine != null) {
+    if (MaxLine != null && Object.keys(MaxLine).length > 0) {
       filteredDifferentialTableRowMaxVar = MaxLine.featureID;
     }
     const HighlightedProteinsCopy = [...HighlightedProteins];

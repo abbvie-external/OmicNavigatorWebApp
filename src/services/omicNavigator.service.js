@@ -1,8 +1,8 @@
 import $ from 'jquery';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import('opencpu.js/opencpu-0.5.js');
 window.jQuery = $;
-require('opencpu.js/opencpu-0.5.js');
 class OmicNavigatorService {
   constructor() {
     this.baseUrl =
@@ -21,7 +21,6 @@ class OmicNavigatorService {
       axios
         .post(axiosPostUrl, obj, {
           params: paramsObj,
-          responseType: 'text',
           cancelToken,
           timeout,
         })
@@ -54,7 +53,6 @@ class OmicNavigatorService {
     const axiosPostUrl = `${self.url}/${method}`;
     try {
       const { data } = await axios.post(axiosPostUrl, obj, {
-        responseType: 'text',
         cancelToken,
         timeout,
       });
@@ -87,7 +85,6 @@ class OmicNavigatorService {
     try {
       const { data } = await axios.post(axiosPostUrl, obj, {
         params: paramsObj,
-        responseType: 'text',
         cancelToken,
         timeout,
       });
@@ -117,7 +114,7 @@ class OmicNavigatorService {
           const url = `${self.baseUrl}${graphicsUrl}/svg`;
           axios
             .get(url, {
-              responseType: 'text',
+              responseType: 'text', // needed for SVG
               cancelToken,
               timeout,
             })
