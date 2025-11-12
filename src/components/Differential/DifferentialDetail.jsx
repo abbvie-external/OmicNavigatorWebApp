@@ -85,16 +85,12 @@ class DifferentialDetail extends Component {
     filteredOutLimit: 5,
   };
   volcanoPlotFilteredGridRef = React.createRef();
-  firstHeaderEl = null;
+  _firstHeaderEl = null;
+  abortcontroller = null;
   events = ['dragstart', 'dragover', 'drop', 'dragenter'];
-
-  // Flag to track if the component is mounted to prevent state updates on unmounted components
-  _isMountedDifferential = false;
 
   componentDidMount() {
     this.resetSearchAndData();
-    // Set flag indicating that the component is now mounted
-    this._isMountedDifferential = true;
   }
 
   /**
@@ -106,27 +102,24 @@ class DifferentialDetail extends Component {
     const wrapper = document.querySelector('.ResultsTableWrapper');
     if (!wrapper) return;
 
-    const table = wrapper.querySelector('table.ui.celled.table');
+    const table = wrapper.querySelector('table.QHGrid--body');
     if (!table) return;
-
     const firstHeader = table.querySelector('thead tr th:nth-child(1)');
     if (!firstHeader) return;
 
     // If we already wired up a different header, remove listeners from it
     if (this._firstHeaderEl && this._firstHeaderEl !== firstHeader) {
-      events.forEach((type) => {
-        this._firstHeaderEl.removeEventListener(
-          type,
-          this._preventDragHandler,
-          true,
-        );
-      });
+      this.abortController?.abort();
+      this.abortController = null;
     }
 
     // If this is the same header we already wired, do nothing
     if (this._firstHeaderEl === firstHeader) {
       return;
     }
+
+    this.abortController = new AbortController();
+    const { signal } = this.abortController;
 
     /**
      * Event handler to prevent drag operations
@@ -142,7 +135,10 @@ class DifferentialDetail extends Component {
     };
 
     this.events.forEach((type) => {
-      firstHeader.addEventListener(type, preventDrag, true);
+      firstHeader.addEventListener(type, preventDrag, {
+        capture: true,
+        signal,
+      });
     });
 
     this._firstHeaderEl = firstHeader;
@@ -183,18 +179,8 @@ class DifferentialDetail extends Component {
   }
 
   componentWillUnmount() {
-    this._isMountedDifferential = false;
-
-    if (this._firstHeaderEl) {
-      this.events.forEach((type) => {
-        this._firstHeaderEl.removeEventListener(
-          type,
-          this._preventDragHandler,
-          true,
-        );
-      });
-    }
-
+    this.abortController?.abort();
+    this.abortController = null;
     this._firstHeaderEl = null;
   }
 

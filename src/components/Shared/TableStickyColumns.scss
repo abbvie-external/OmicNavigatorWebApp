@@ -9,36 +9,36 @@
 .two-col-sticky {
   --frozen-first-column-width: 35px;
 
-  .ui.celled.table {
+  .table.QHGrid--body {
     position: relative;
     border-collapse: separate;
     border-spacing: 0;
-  }
 
-  .ui.celled.table :is(th, td):nth-child(-n + 2) {
-    position: sticky;
-    background-color: #ffffff;
-    z-index: 1;
-  }
+    // Common styles for sticky columns
+    :is(th, td):nth-child(-n + 2) {
+      position: sticky;
+      background-color: #ffffff;
+      z-index: 1;
+    }
 
-  /* First column sticks at the very left */
-  .ui.celled.table thead tr th:nth-child(1),
-  .ui.celled.table tbody tr td:nth-child(1) {
-    left: 0;
-  }
+    // Position first column
+    :is(thead, tbody) tr :is(th, td):nth-child(1) {
+      left: 0;
+    }
 
-  /* Second column sticks based on the frozen first column width */
-  .ui.celled.table thead tr th:nth-child(2),
-  .ui.celled.table tbody tr td:nth-child(2) {
-    left: var(--frozen-first-column-width);
-  }
+    // Position second column
+    :is(thead, tbody) tr :is(th, td):nth-child(2) {
+      left: var(--frozen-first-column-width);
+    }
 
-  .ui.celled.table thead tr th:nth-child(-n + 2) {
-    -webkit-user-drag: none;
-    -moz-user-drag: none;
-    -ms-user-drag: none;
-    user-select: none;
-    cursor: default;
-    z-index: 2;
+    // Header-specific styles
+    thead tr th:nth-child(-n + 2) {
+      z-index: 2; // Higher z-index to appear above body cells
+      user-select: none;
+      cursor: default;
+      -webkit-user-drag: none;
+      -moz-user-drag: none;
+      -ms-user-drag: none;
+    }
   }
 }
