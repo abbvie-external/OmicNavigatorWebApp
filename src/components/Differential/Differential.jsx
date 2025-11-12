@@ -722,7 +722,7 @@ class Differential extends Component {
                 differentialTestIdsCommon,
               );
             }
-            const modelsArg = getModelsArg(
+            let modelsArg = getModelsArg(
               plot.plotType,
               differentialModelIdsOverride,
               differentialTestIds,
@@ -861,7 +861,7 @@ class Differential extends Component {
                   differentialTestIdsCommon,
                 );
               }
-              const modelsArg = getModelsArg(
+              let modelsArg = getModelsArg(
                 plot.plotType,
                 differentialModelIdsOverride,
                 differentialTestIds,
