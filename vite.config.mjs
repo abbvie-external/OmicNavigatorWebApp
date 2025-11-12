@@ -36,7 +36,7 @@ export default defineConfig(({ mode }) => {
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
       alias: {
-        'react-virtualized': 'react-virtualized/dist/commonjs/index.js',
+        'react-virtualized': 'react-virtualized/dist/es/index.js',
       },
     },
     esbuild: {
