@@ -1,27 +1,16 @@
 import $ from 'jquery';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import('opencpu.js/opencpu-0.5.js');
 window.jQuery = $;
-let opencpuLoadPromise;
-function loadOpencpu() {
-  if (!opencpuLoadPromise) {
-    opencpuLoadPromise = import('opencpu.js/opencpu-0.5.js');
-  }
-  return opencpuLoadPromise;
-}
 class OmicNavigatorService {
   constructor() {
-    this.opencpuReady = loadOpencpu();
     this.baseUrl =
       process.env.NODE_ENV === 'development'
         ? process.env.REACT_APP_DEVSERVER
         : window.location.origin;
     this.url = `${this.baseUrl}/ocpu/library/OmicNavigator/R`;
     this.staticUrl = `${this.baseUrl}/ocpu/library/OmicNavigator/www`;
-  }
-
-  async ensureOpenCpuLoaded() {
-    await this.opencpuReady;
   }
 
   async axiosPost(method, obj, params, handleError, cancelToken, timeout) {
@@ -53,15 +42,13 @@ class OmicNavigatorService {
     });
   }
 
-  async setUrl() {
-    await this.ensureOpenCpuLoaded();
+  setUrl() {
     if (process.env.NODE_ENV === 'development') {
       window.ocpu.seturl(this.url);
     }
   }
 
   async getPlotUrl(method, obj, handleError, cancelToken, timeout) {
-    await this.ensureOpenCpuLoaded();
     const self = this;
     const axiosPostUrl = `${self.url}/${method}`;
     try {
@@ -160,7 +147,7 @@ class OmicNavigatorService {
     errorCb,
     cancelToken,
   ) {
-    await this.setUrl();
+    this.setUrl();
     const timeoutLength = 60000;
     const cacheKey = `plotStudy_${study}_${modelID}_${testID}_${featureID}_${plotID}_${plotType}`;
     if (this[cacheKey] != null) {
@@ -209,7 +196,7 @@ class OmicNavigatorService {
     errorCb,
     cancelToken,
   ) {
-    await this.setUrl();
+    this.setUrl();
     const timeoutLength = 60000;
     const obj = {
       study,
@@ -250,7 +237,7 @@ class OmicNavigatorService {
     errorCb,
     cancelToken,
   ) {
-    await this.setUrl();
+    this.setUrl();
     const timeoutLength = 240000;
     const cacheKey = `plotStudyMultifeature_${study}_${modelID}_${testID}_${featureID}_${plotID}`;
     if (this[cacheKey] != null) {
@@ -287,7 +274,6 @@ class OmicNavigatorService {
   }
 
   async ocpuRPCOutput(method, obj) {
-    await this.ensureOpenCpuLoaded();
     return new Promise(function (resolve, reject) {
       window.ocpu.rpc(method, obj, function (output) {
         resolve(output);
@@ -671,7 +657,7 @@ class OmicNavigatorService {
     if (this[cacheKey] != null) {
       return this[cacheKey];
     } else {
-      await this.setUrl();
+      this.setUrl();
       const promise = this.getPlotUrl(
         'getResultsUpset',
         {
@@ -706,7 +692,7 @@ class OmicNavigatorService {
     if (this[cacheKey] != null) {
       return this[cacheKey];
     } else {
-      await this.setUrl();
+      this.setUrl();
       const promise = this.getPlotUrl(
         'getEnrichmentsUpset',
         {
