@@ -263,15 +263,6 @@ class Enrichment extends Component {
 
   componentWillUnmount() {
     this._isMountedEnrichment = false;
-
-    if (this.frozenColumnResizeObserver && this.frozenColumnObservedElement) {
-      this.frozenColumnResizeObserver.unobserve(
-        this.frozenColumnObservedElement,
-      );
-    }
-    if (this.frozenColumnResizeObserver) {
-      this.frozenColumnResizeObserver.disconnect();
-    }
   }
 
   // windowResized = () => {
@@ -977,11 +968,9 @@ class Enrichment extends Component {
     }
 
     // Find the wrapper that contains the QHGrid table
-    const wrapper = document.querySelector('.EnrichmentTableWrapper');
-    if (!wrapper) return;
-    const table =
-      wrapper.querySelector('.ui.celled.table') ||
-      wrapper.querySelector('table');
+    const table = document.querySelector(
+      '.EnrichmentTableWrapper table.QHGrid--body',
+    );
 
     if (!table) return;
 
