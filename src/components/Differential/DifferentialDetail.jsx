@@ -99,23 +99,18 @@ class DifferentialDetail extends Component {
    * @returns {void} No return value
    */
   preventDropOnFirstColumn = () => {
-    const wrapper = document.querySelector('.ResultsTableWrapper');
-    if (!wrapper) return;
-
-    const table = wrapper.querySelector('table.QHGrid--body');
-    if (!table) return;
-    const firstHeader = table.querySelector('thead tr th:nth-child(1)');
-    if (!firstHeader) return;
-
-    // If we already wired up a different header, remove listeners from it
-    if (this._firstHeaderEl && this._firstHeaderEl !== firstHeader) {
-      this.abortController?.abort();
-      this.abortController = null;
-    }
+    const firstHeader = document.querySelector(
+      '.ResultsTableWrapper table.QHGrid--body thead tr th:nth-child(1)',
+    );
 
     // If this is the same header we already wired, do nothing
     if (this._firstHeaderEl === firstHeader) {
       return;
+    }
+
+    // If we already wired up a different header, remove listeners from it
+    if (this._firstHeaderEl && this._firstHeaderEl !== firstHeader) {
+      this.abortController?.abort();
     }
 
     this.abortController = new AbortController();
@@ -180,7 +175,6 @@ class DifferentialDetail extends Component {
 
   componentWillUnmount() {
     this.abortController?.abort();
-    this.abortController = null;
     this._firstHeaderEl = null;
   }
 
