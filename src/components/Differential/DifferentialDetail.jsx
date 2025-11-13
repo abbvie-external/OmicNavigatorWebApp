@@ -85,10 +85,59 @@ class DifferentialDetail extends Component {
     filteredOutLimit: 5,
   };
   volcanoPlotFilteredGridRef = React.createRef();
+  _firstHeaderEl = null;
+  abortcontroller = null;
+  events = ['dragstart', 'dragover', 'drop', 'dragenter'];
 
   componentDidMount() {
     this.resetSearchAndData();
   }
+
+  /**
+   * Prevents drag and drop operations on the first column of a results table
+   *
+   * @returns {void} No return value
+   */
+  preventDropOnFirstColumn = () => {
+    const firstHeader = document.querySelector(
+      '.ResultsTableWrapper table.QHGrid--body thead tr th:nth-child(1)',
+    );
+
+    // If this is the same header we already wired, do nothing
+    if (this._firstHeaderEl === firstHeader) {
+      return;
+    }
+
+    // If we already wired up a different header, remove listeners from it
+    if (this._firstHeaderEl && this._firstHeaderEl !== firstHeader) {
+      this.abortController?.abort();
+    }
+
+    this.abortController = new AbortController();
+    const { signal } = this.abortController;
+
+    /**
+     * Event handler to prevent drag operations
+     *
+     * @param {Event} e - The drag event object
+     * @returns {boolean} Always returns false to prevent default behavior
+     */
+    const preventDrag = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.type === 'dragover') e.dataTransfer.dropEffect = 'none'; // Show "not allowed" cursor
+      return false;
+    };
+
+    this.events.forEach((type) => {
+      firstHeader.addEventListener(type, preventDrag, {
+        capture: true,
+        signal,
+      });
+    });
+
+    this._firstHeaderEl = firstHeader;
+  };
 
   componentDidUpdate(prevProps, prevState) {
     const {
@@ -117,6 +166,16 @@ class DifferentialDetail extends Component {
       // take new data (possibly only from set analysis), do not reset search
       this.setRelevantData();
     }
+
+    // Update the preventDropOnFirstColumn only if differentialTableData has changed
+    if (prevState.differentialTableData !== this.state.differentialTableData) {
+      this.preventDropOnFirstColumn();
+    }
+  }
+
+  componentWillUnmount() {
+    this.abortController?.abort();
+    this._firstHeaderEl = null;
   }
 
   setRelevantData = () => {
@@ -2080,7 +2139,7 @@ class DifferentialDetail extends Component {
                           />
                         </div>
                         <Grid.Column
-                          className="ResultsTableWrapper"
+                          className="ResultsTableWrapper two-col-sticky"
                           id="DifferentialResultsTableWrapperCheckboxes"
                           mobile={16}
                           tablet={16}
