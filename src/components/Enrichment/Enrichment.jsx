@@ -989,7 +989,7 @@ class Enrichment extends Component {
         if (!rect.width || rect.width <= 0) return;
 
         const width = Math.round(rect.width);
-        wrapper.style.setProperty('--frozen-first-column-width', `${width}px`);
+        table.style.setProperty('--frozen-first-column-width', `${width}px`);
       } catch (e) {}
     };
 
