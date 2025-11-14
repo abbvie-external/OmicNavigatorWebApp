@@ -1,4 +1,4 @@
-@import './Shared/TableStickyColumns';
+@use './Shared/TableStickyColumns' as *;
 
 :root {
   // --color-primary: #ff4400;
