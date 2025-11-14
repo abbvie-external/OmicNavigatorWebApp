@@ -186,7 +186,19 @@ class DifferentialSearch extends Component {
       .getInstalledStudies()
       .then((getInstalledStudiesResponseData) => {
         let studies = [];
-        if (getInstalledStudiesResponseData.length) {
+        // Handle if response is a string (single study) or array
+        if (typeof getInstalledStudiesResponseData === 'string') {
+          studies = [
+            {
+              key: `${getInstalledStudiesResponseData}Differential`,
+              text: getInstalledStudiesResponseData,
+              value: getInstalledStudiesResponseData,
+            },
+          ];
+        } else if (
+          Array.isArray(getInstalledStudiesResponseData) &&
+          getInstalledStudiesResponseData.length
+        ) {
           studies = getInstalledStudiesResponseData.map((studyName) => {
             return {
               key: `${studyName}Differential`,
