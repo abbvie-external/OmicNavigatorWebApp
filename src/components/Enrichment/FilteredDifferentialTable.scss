@@ -18,30 +18,12 @@
     cursor: auto !important;
   }
 
-  .rowHighlightMax {
-    background: var(--color-primary) !important;
-    color: white !important;
-  }
-
-  .rowHighlightOther {
-    background: var(--color-primary-gradient) !important;
-    color: white !important;
-  }
-
-  .rowHighlightMax .TableCellLink,
-  .rowHighlightOther .TableCellLink {
-    color: white !important;
-    cursor: pointer !important;
-  }
-
-  .ui.selectable.table tbody .rowHighlightOther:hover {
-    background: rgba(255, 126, 5, 0.9) !important;
-    color: white !important;
-  }
-
-  .ui.selectable.table tbody .highlightedRow:hover {
-    background: #f14000 !important;
-    color: white !important;
+  #rowOutline {
+    border: 3px 3px 3px 3px solid var(--color-link) !important;
+    border-top: 3px solid var(--color-link) !important;
+    border-right: 3px solid var(--color-link) !important;
+    border-bottom: 3px solid var(--color-link) !important;
+    border-left: 3px solid var(--color-link) !important;
   }
 }
 

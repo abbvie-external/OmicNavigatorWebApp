@@ -121,6 +121,25 @@ class BarcodePlot extends Component {
       }
       this.setState({ initialLoad: false });
     }
+
+    if (this.props.selectedProteinId !== prevProps.selectedProteinId) {
+      // reset any previous single-selected styling
+      d3.selectAll('.SingleSelectedLine')
+        .attr('y1', this.state.settings.margin.selected)
+        .attr('style', 'stroke:#2c3b78;stroke-width:2.5;opacity:1')
+        .classed('SingleSelectedLine', false);
+
+      const selectedId = this.props.selectedProteinId;
+      if (selectedId) {
+        const selectedLine = d3.select(`line[id='barcode-line-${selectedId}']`);
+        if (!selectedLine.empty()) {
+          selectedLine
+            .classed('SingleSelectedLine', true)
+            .attr('y1', this.state.settings.margin.max) // or a separate margin if you like
+            .attr('style', 'stroke:#3a5ce9;stroke-width:3.5;opacity:1'); // distinct from orange MaxLine
+        }
+      }
+    }
   }
 
   windowResized = () => {
@@ -385,7 +404,17 @@ class BarcodePlot extends Component {
                   // logfc: m.cpm,
                 };
               });
-              self.props.onHandleProteinSelected(highlightedLineArray);
+              if (!initialBrush) {
+                self.props.onHandleProteinSelected(highlightedLineArray);
+              }
+
+              if (
+                initialBrush &&
+                self.props.onHandleSingleProteinSelected &&
+                !self.props.selectedProteinId
+              ) {
+                self.props.onHandleSingleProteinSelected(maxLineData.featureID);
+              }
             } else {
               self.props.onHandleProteinSelected([]);
               self.setState({

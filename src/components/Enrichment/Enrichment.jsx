@@ -180,6 +180,7 @@ class Enrichment extends Component {
     },
     violinData: [],
     HighlightedProteins: [],
+    selectedProteinId: '',
     enrichmentPlotTypes: [],
     enrichmentModelsAndAnnotations: [], // listStudies.enrichments
     enrichmentAnnotationIdsCommon: [],
@@ -1280,43 +1281,72 @@ class Enrichment extends Component {
     const featureID = this.state.hasBarcodeData
       ? 'featureID'
       : this.props.filteredDifferentialFeatureIdKey;
-    const prevHighestValueObject = this.state.HighlightedProteins.length
-      ? this.state.HighlightedProteins[0]['featureID']
-      : null;
-    const highestValueObject = toHighlightArray[0];
+
     const splitPaneData = this.state.hasBarcodeData
       ? this.state.barcodeSettings.barcodeData
       : this.state.filteredDifferentialResults;
-    if (splitPaneData?.length > 0 && toHighlightArray.length > 0) {
+
+    // Only care about valid data; this stays multi-only
+    if (splitPaneData?.length > 0 && Array.isArray(toHighlightArray)) {
       this.setState({
         HighlightedProteins: toHighlightArray,
       });
-      if (
-        highestValueObject.featureID !== prevHighestValueObject ||
-        this.state.SVGPlotLoaded === false
-      ) {
-        this.setState({
-          SVGPlotLoaded: false,
-          SVGPlotLoading: true,
-        });
-        const dataItem = splitPaneData.find(
-          (i) => i[featureID] === highestValueObject.featureID,
-        );
-        let id = dataItem[featureID] || '';
-        this.getPlot(id);
-      }
     } else {
+      this.setState({
+        HighlightedProteins: [],
+      });
+    }
+    // IMPORTANT: no getPlot and no selectedProteinId here.
+  };
+
+  handleSingleProteinSelected = (featureId) => {
+    const featureKey = this.state.hasBarcodeData
+      ? 'featureID'
+      : this.props.filteredDifferentialFeatureIdKey;
+
+    const splitPaneData = this.state.hasBarcodeData
+      ? this.state.barcodeSettings.barcodeData
+      : this.state.filteredDifferentialResults;
+
+    // If no feature or no data, just clear
+    if (!featureId || !splitPaneData || splitPaneData.length === 0) {
+      cancelRequestEnrichmentGetPlot();
+      this.setState({
+        selectedProteinId: '',
+        SVGPlotLoaded: false,
+        SVGPlotLoading: false,
+      });
+      return;
+    }
+
+    const prevSelected = this.state.selectedProteinId;
+    // Toggle: clicking same row/dot again clears selection
+    const nextSelected = prevSelected === featureId ? '' : featureId;
+
+    this.setState({
+      selectedProteinId: nextSelected,
+    });
+
+    // If cleared, just stop here
+    if (!nextSelected) {
       cancelRequestEnrichmentGetPlot();
       this.setState({
         SVGPlotLoaded: false,
         SVGPlotLoading: false,
-        HighlightedProteins: [],
-        // plotDataEnrichment: {
-        //   ...this.state.plotDataEnrichment,
-        //   svg: []
-        // },
       });
+      return;
     }
+
+    // Load single-feature plot for the selected protein
+    this.setState({
+      SVGPlotLoaded: false,
+      SVGPlotLoading: true,
+    });
+
+    const dataItem = splitPaneData.find((i) => i[featureKey] === nextSelected);
+    const id = dataItem ? dataItem[featureKey] : nextSelected;
+
+    this.getPlot(id);
   };
 
   getPlot = (featureId) => {
@@ -2104,6 +2134,7 @@ class Enrichment extends Component {
             {...this.state}
             onBackToTable={this.backToTable}
             onHandleProteinSelected={this.handleProteinSelected}
+            onHandleSingleProteinSelected={this.handleSingleProteinSelected}
             onHandleHighlightedLineReset={this.handleHighlightedLineReset}
             onHandleBarcodeChanges={this.handleBarcodeChanges}
             // onHandleFilteredDifferentialFeatureIdKey={

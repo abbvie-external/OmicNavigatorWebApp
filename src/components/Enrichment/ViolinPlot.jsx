@@ -1579,6 +1579,12 @@ class ViolinPlot extends Component {
                   },
                 ]);
               }
+
+              // SINGLE: dot click toggles single-selected protein
+              if (self.props.onHandleSingleProteinSelected) {
+                self.props.onHandleSingleProteinSelected(d.featureID);
+              }
+
               self.maxCircle = d.featureID;
               self.addToolTiptoMax(d);
             });
