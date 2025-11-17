@@ -36,6 +36,7 @@ import { EZGrid } from '../Shared/QHGrid/index.module.js';
 import ErrorBoundary from '../Shared/ErrorBoundary';
 
 let cancelRequestEnrichmentGetPlot = () => {};
+let cancelRequestEnrichmentGetMultiPlot = () => {};
 let cancelRequestGetEnrichmentsNetwork = () => {};
 let cancelRequestGetBarcodeData = () => {};
 const cacheGetEnrichmentsNetwork = {};
@@ -182,6 +183,16 @@ class Enrichment extends Component {
     HighlightedProteins: [],
     selectedProteinId: '',
     enrichmentPlotTypes: [],
+    plotMultiFeatureAvailable: false,
+    plotMultiFeatureDataLoaded: true,
+    plotMultiFeatureData: {
+      key: null,
+      title: '',
+      svg: [],
+    },
+    plotMultiFeatureDataLength: 0,
+    plotMultiFeatureMax: 1000,
+
     enrichmentModelsAndAnnotations: [], // listStudies.enrichments
     enrichmentAnnotationIdsCommon: [],
     enrichmentsLinkouts: [],
@@ -507,27 +518,30 @@ class Enrichment extends Component {
     if (enrichmentPlotsMetadata.length) {
       // filter out invalid plots - plotType string must be 'singleFeature', 'multiFeature', 'singleTest', 'multiTest', 'plotly'
       const enrichmentPlotTypesVar = [...enrichmentPlotsMetadata].filter(
-        // if undefined or null plotType, set default
         (plot) => {
           if (!plot.plotType) {
             plot.plotType = ['singleFeature', 'singleTest'];
           }
           let plotTypeArr = plot?.plotType;
+
           // Convert string to array
           if (typeof plotTypeArr === 'string') {
             plotTypeArr = [plotTypeArr];
           }
-          const isValidPlotType = (pt) => {
-            return (
-              pt === 'singleFeature' ||
-              pt === 'multiFeature' ||
-              pt === 'singleTest' ||
-              pt === 'multiTest' ||
-              pt === 'plotly' ||
-              pt === 'multiModel'
-            );
-          };
-          const valid = plotTypeArr.every(isValidPlotType);
+
+          const isValidPlotType = (pt) =>
+            [
+              'singleFeature',
+              'multiFeature',
+              'singleTest',
+              'multiTest',
+              'plotly',
+            ].includes(pt);
+
+          const valid = Array.isArray(plotTypeArr)
+            ? plotTypeArr.every((t) => isValidPlotType(t))
+            : isValidPlotType(plotTypeArr);
+
           if (!valid) {
             console.log(
               `${plot?.plotID} will be ignored because it has unknown plotType ${plot.plotType}`,
@@ -539,33 +553,209 @@ class Enrichment extends Component {
           return valid;
         },
       );
-      // TODO - enrichment doesn't have multi-feature plots yet
-      // let plotMultiFeatureAvailableVar = false;
-      // let singleFeaturePlotTypesVar = [];
-      // let multiFeaturePlotTypesVar = [];
-      // if (enrichmentPlotTypesVar) {
-      // singleFeaturePlotTypesVar = [...enrichmentPlotTypesVar].filter(
-      //   p => !p.plotType.includes('multiFeature'),
-      // );
-      // multiFeaturePlotTypesVar = [...enrichmentPlotTypesVar].filter((p) =>
-      //   p.plotType.includes('multiFeature'),
-      // );
-      // plotMultiFeatureAvailableVar = multiFeaturePlotTypesVar?.length
-      //   ? true
-      //   : false;
+
+      // Split into single- and multi-feature plots
+      let singleFeaturePlotTypesVar = [];
+      let multiFeaturePlotTypesVar = [];
+      let plotMultiFeatureAvailableVar = false;
+
+      if (enrichmentPlotTypesVar && enrichmentPlotTypesVar.length) {
+        singleFeaturePlotTypesVar = enrichmentPlotTypesVar.filter(
+          (p) => !p.plotType.includes('multiFeature'),
+        );
+        multiFeaturePlotTypesVar = enrichmentPlotTypesVar.filter((p) =>
+          p.plotType.includes('multiFeature'),
+        );
+        plotMultiFeatureAvailableVar = multiFeaturePlotTypesVar.length > 0;
+      }
+
       this.setState({
-        enrichmentPlotTypes: enrichmentPlotTypesVar,
-        // plotMultiFeatureAvailable: plotMultiFeatureAvailableVar,
+        // keep existing single-feature behavior
+        enrichmentPlotTypes: singleFeaturePlotTypesVar,
+        // expose multi-feature plotTypes
+        enrichmentMultiFeaturePlotTypes: multiFeaturePlotTypesVar,
+        plotMultiFeatureAvailable: plotMultiFeatureAvailableVar,
       });
     } else {
       this.setState({
         enrichmentPlotTypes: [],
-        // singleFeaturePlotTypes: singleFeaturePlotTypesVar,
-        // multiFeaturePlotTypes: multiFeaturePlotTypesVar,
-        // multiModelPlotTypes: multiModelPlotTypesVar,
-        // plotMultiFeatureAvailable: plotMultiFeatureAvailableVar,
+        enrichmentMultiFeaturePlotTypes: [],
+        plotMultiFeatureAvailable: false,
       });
     }
+  };
+
+  handleSVGMultiFeature = (plotDataMultiFeatureVar) => {
+    this.setState({
+      plotMultiFeatureData: plotDataMultiFeatureVar,
+      plotMultiFeatureDataLength: plotDataMultiFeatureVar.svg?.length || 0,
+      plotMultiFeatureDataLoaded: true,
+    });
+  };
+
+  getMultifeaturePlotEnrichment = (featureIds) => {
+    const {
+      enrichmentMultiFeaturePlotTypes,
+      enrichmentTest,
+      uData,
+      enrichmentModelIds,
+      enrichmentModelsAndAnnotations,
+      enrichmentPlotDescriptions,
+      enrichmentAnnotationIdsCommon,
+      plotMultiFeatureMax,
+    } = this.state;
+    const { enrichmentStudy, enrichmentModel, enrichmentAnnotation } =
+      this.props;
+
+    const idsRaw = Array.isArray(featureIds) ? featureIds.filter(Boolean) : [];
+    if (!idsRaw.length || !enrichmentMultiFeaturePlotTypes.length) {
+      this.setState({
+        plotMultiFeatureData: { key: null, title: '', svg: [] },
+        plotMultiFeatureDataLength: 0,
+        plotMultiFeatureDataLoaded: true,
+      });
+      return;
+    }
+
+    // cap number of features
+    const max = plotMultiFeatureMax || 1000;
+    const ids = idsRaw.slice(0, max);
+
+    let plotDataMultiFeatureVar = {
+      key: ids.join(','),
+      title: this.state.plotDataEnrichment.title || '',
+      svg: [],
+    };
+
+    // cancel any previous multi-feature in-flight request
+    cancelRequestEnrichmentGetMultiPlot();
+    const cancelToken = new CancelToken((c) => {
+      cancelRequestEnrichmentGetMultiPlot = c;
+    });
+
+    const self = this;
+
+    const promises = enrichmentMultiFeaturePlotTypes.map((plot) => {
+      const plotMetadataSpecificPlot = enrichmentPlotDescriptions[plot.plotID];
+      const designatedModels = plotMetadataSpecificPlot?.models || null;
+      const designatedModelsMultiModelExists =
+        designatedModels &&
+        designatedModels !== 'all' &&
+        designatedModels.includes(enrichmentModel);
+
+      const enrichmentModelIdsOverride = designatedModelsMultiModelExists
+        ? designatedModels
+        : enrichmentModelIds;
+
+      const isMultiModelMultiTestVar = isMultiModelMultiTest(plot.plotType);
+      const testIdNotCommon =
+        !enrichmentAnnotationIdsCommon.includes(enrichmentAnnotation);
+
+      let testsArg = [];
+      if (isMultiModelMultiTestVar && testIdNotCommon) {
+        testsArg = [];
+      } else {
+        testsArg = getTestsArg(
+          plot.plotType,
+          enrichmentModelIdsOverride,
+          uData,
+          enrichmentTest,
+        );
+      }
+
+      let modelsArg = getModelsArg(
+        plot.plotType,
+        enrichmentModelIdsOverride,
+        uData,
+        enrichmentModel,
+        enrichmentModelsAndAnnotations, // listStudies.enrichments
+        null,
+        enrichmentAnnotationIdsCommon,
+      );
+
+      // for multi-feature plots, backend expects an array of feature IDs
+      const idArg = ids;
+
+      return omicNavigatorService
+        .plotStudyReturnSvgUrl(
+          enrichmentStudy,
+          modelsArg,
+          idArg,
+          plot.plotID,
+          plot.plotType,
+          testsArg,
+          null,
+          cancelToken,
+        )
+        .then((svg) => {
+          const svgInfo = { plotType: plot, svg };
+          plotDataMultiFeatureVar.svg.push(svgInfo);
+          return svgInfo;
+        });
+    });
+
+    if (!promises.length) {
+      this.setState({ plotMultiFeatureDataLoaded: true });
+      return;
+    }
+
+    // First arriving SVG -> quick feedback in UI
+    Promise.race(promises)
+      .then(() => {
+        self.handleSVGMultiFeature({ ...plotDataMultiFeatureVar });
+      })
+      .catch((error) => {
+        if (!error.__CANCEL__) {
+          console.error('Error during multi-feature plot race:', error);
+        }
+      });
+
+    // Then complete set for export, etc.
+    Promise.allSettled(promises)
+      .then((results) => {
+        if (!results) return;
+        const svgArray = results
+          .filter((r) => r.status === 'fulfilled')
+          .map(({ value }) => value);
+
+        if (svgArray.length) {
+          self.handleSVGMultiFeature({
+            ...plotDataMultiFeatureVar,
+            svg: svgArray,
+          });
+        }
+      })
+      .catch((error) => {
+        if (!error.__CANCEL__) {
+          console.error('Error during multi-feature plot allSettled:', error);
+        }
+      });
+  };
+
+  getMultifeaturePlotTransitionEnrichment = () => {
+    const { HighlightedProteins } = this.state;
+
+    const featureIds = (HighlightedProteins || [])
+      .map((p) => p.featureID || p.key)
+      .filter(Boolean);
+
+    if (!featureIds.length) {
+      this.setState({
+        plotMultiFeatureData: { key: null, title: '', svg: [] },
+        plotMultiFeatureDataLength: 0,
+        plotMultiFeatureDataLoaded: true,
+      });
+      return;
+    }
+
+    // start loader funnel: clear old data and mark as loading
+    this.setState({
+      plotMultiFeatureDataLoaded: false,
+      plotMultiFeatureData: { key: null, title: '', svg: [] },
+      plotMultiFeatureDataLength: 0,
+    });
+
+    this.getMultifeaturePlotEnrichment(featureIds);
   };
 
   handleSearchChangeEnrichment = (changes, scChange) => {
@@ -2137,6 +2327,9 @@ class Enrichment extends Component {
             onHandleSingleProteinSelected={this.handleSingleProteinSelected}
             onHandleHighlightedLineReset={this.handleHighlightedLineReset}
             onHandleBarcodeChanges={this.handleBarcodeChanges}
+            onGetMultifeaturePlotTransitionEnrichment={
+              this.getMultifeaturePlotTransitionEnrichment
+            }
             // onHandleFilteredDifferentialFeatureIdKey={
             //   this.handleFilteredDifferentialFeatureIdKey
             // }

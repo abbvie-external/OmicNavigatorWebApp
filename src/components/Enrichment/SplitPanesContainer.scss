@@ -182,3 +182,22 @@
     }
   }
 }
+
+.PlotTabsContainer {
+  margin-bottom: 0px !important;
+  margin-top: 0px !important;
+  min-height: 2.6em !important;
+  max-height: 2.6em !important;
+  .item {
+    line-height: 0.5 !important;
+  }
+  // border: 0px !important;
+  a.active:last-child {
+    border-color: var(--color-primary) !important;
+    // border-width: 4px !important;
+  }
+  a.active:first-child {
+    border-color: var(--color-link) !important;
+    // border-width: 4px !important;
+  }
+}

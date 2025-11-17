@@ -59,6 +59,11 @@ class BarcodePlot extends Component {
     ) {
       this.setWidth(false, true);
     }
+
+    const HighlightedProteins = this.props.HighlightedProteins || [];
+    const selectedProteinId = this.props.selectedProteinId;
+
+    // --- MULTI-SELECTION (ORANGE / RED) UPDATE ---
     if (this.props.HighlightedProteins !== prevProps.HighlightedProteins) {
       if (!this.state.initialLoad) {
         d3.selectAll(`.MaxLine`)
@@ -81,10 +86,14 @@ class BarcodePlot extends Component {
             const OtherHighlighted = d3.select(
               `line[id='barcode-line-${lineId}']`,
             );
-            OtherHighlighted.classed('HighlightedLine', true)
-              .attr('y1', this.state.settings.margin.highlighted)
-              .attr('style', 'stroke:#ff7e38;stroke-width:3');
+            if (!OtherHighlighted.empty()) {
+              OtherHighlighted.classed('HighlightedLine', true)
+                .attr('y1', this.state.settings.margin.highlighted)
+                .attr('style', 'stroke:#ff7e38;stroke-width:3;opacity:1');
+            }
           });
+
+          // Max line
           const MaxFeatureId = MaxFeatureData.featureID;
           const MaxFeatureElement = d3.select(
             `line[id='barcode-line-${MaxFeatureId}']`,
@@ -92,7 +101,8 @@ class BarcodePlot extends Component {
           if (MaxFeatureElement != null) {
             MaxFeatureElement.classed('MaxLine', true)
               .attr('y1', this.state.settings.margin.max)
-              .attr('style', 'stroke:#FF4400;stroke-width:3.5');
+              .attr('style', 'stroke:#FF4400;stroke-width:3.5;opacity:1');
+
             const MaxFeatureLineData = {
               x2: MaxFeatureElement.attr('x2') || null,
               featureID: MaxFeatureElement.attr('featureid') || null,
@@ -100,6 +110,7 @@ class BarcodePlot extends Component {
               logFC: MaxFeatureElement.attr('logfc') || null,
               statistic: MaxFeatureElement.attr('statistic') || null,
             };
+
             const statistic = MaxFeatureLineData.statistic;
             const textAnchorMax =
               statistic > this.props.barcodeSettings.highStat / 2
@@ -109,6 +120,7 @@ class BarcodePlot extends Component {
               textAnchorMax === 'end'
                 ? MaxFeatureLineData.x2 - 5
                 : MaxFeatureLineData.x2 + 5;
+
             this.setState({
               hoveredLineId: null,
               hoveredLineName: null,
@@ -117,29 +129,104 @@ class BarcodePlot extends Component {
               tooltipTextAnchorMax: textAnchorMax,
             });
           }
+        } else {
+          this.setState({
+            hoveredLineId: null,
+            hoveredLineName: null,
+            highlightedLineName: null,
+            tooltipPositionMax: null,
+            tooltipTextAnchorMax: null,
+          });
         }
       }
+
       this.setState({ initialLoad: false });
-    }
 
-    if (this.props.selectedProteinId !== prevProps.selectedProteinId) {
-      // reset any previous single-selected styling
-      d3.selectAll('.SingleSelectedLine')
-        .attr('y1', this.state.settings.margin.selected)
-        .attr('style', 'stroke:#2c3b78;stroke-width:2.5;opacity:1')
-        .classed('SingleSelectedLine', false);
-
-      const selectedId = this.props.selectedProteinId;
-      if (selectedId) {
-        const selectedLine = d3.select(`line[id='barcode-line-${selectedId}']`);
-        if (!selectedLine.empty()) {
-          selectedLine
-            .classed('SingleSelectedLine', true)
-            .attr('y1', this.state.settings.margin.max) // or a separate margin if you like
-            .attr('style', 'stroke:#3a5ce9;stroke-width:3.5;opacity:1'); // distinct from orange MaxLine
-        }
+      // Multi changed, but single might still be active → re-apply single style on top
+      if (selectedProteinId) {
+        this.applySingleSelectedStyle(selectedProteinId, HighlightedProteins);
       }
     }
+
+    // --- SINGLE-SELECTION (BLUE) UPDATE ---
+    if (selectedProteinId !== prevProps.selectedProteinId) {
+      // Revert previous single-selected line back to its multi/default style
+      this.resetPreviousSingleSelected(
+        prevProps.selectedProteinId,
+        HighlightedProteins,
+      );
+
+      // Apply styling to the new single-selected line (if any)
+      if (selectedProteinId) {
+        this.applySingleSelectedStyle(selectedProteinId, HighlightedProteins);
+      }
+    }
+  }
+
+  resetPreviousSingleSelected(prevSelectedId, highlightedProteins = []) {
+    if (!prevSelectedId) return;
+
+    const line = d3.select(`line[id='barcode-line-${prevSelectedId}']`);
+    if (line.empty()) return;
+
+    const isMax =
+      highlightedProteins.length > 0 &&
+      highlightedProteins[0].featureID === prevSelectedId;
+    const isOther = highlightedProteins
+      .slice(1)
+      .some((p) => p.featureID === prevSelectedId);
+
+    line.classed('SingleSelectedLine', false);
+
+    if (isMax) {
+      // still max multi → restore red max style
+      line
+        .classed('MaxLine', true)
+        .attr('y1', this.state.settings.margin.max)
+        .attr('style', 'stroke:#FF4400;stroke-width:3.5;opacity:1');
+    } else if (isOther) {
+      // still part of multi → restore orange highlighted style
+      line
+        .classed('HighlightedLine', true)
+        .attr('y1', this.state.settings.margin.highlighted)
+        .attr('style', 'stroke:#ff7e38;stroke-width:3;opacity:1');
+    } else {
+      // no longer multi → reset to base grey
+      line
+        .attr('y1', this.state.settings.margin.top)
+        .attr('style', 'stroke:#838383;stroke-width:1.5;opacity:0.5');
+    }
+  }
+
+  applySingleSelectedStyle(selectedId, highlightedProteins = []) {
+    if (!selectedId) return;
+
+    const line = d3.select(`line[id='barcode-line-${selectedId}']`);
+    if (line.empty()) return;
+
+    const isMax =
+      highlightedProteins.length > 0 &&
+      highlightedProteins[0].featureID === selectedId;
+    const isOther = highlightedProteins
+      .slice(1)
+      .some((p) => p.featureID === selectedId);
+
+    line.classed('SingleSelectedLine', true);
+
+    // If it's also part of the multi set, keep its vertical position from multi
+    let y1;
+    if (isMax) {
+      y1 = this.state.settings.margin.max;
+    } else if (isOther) {
+      y1 = this.state.settings.margin.highlighted;
+    } else {
+      // single-only → reuse max lane visually
+      y1 = this.state.settings.margin.max;
+    }
+
+    line
+      .attr('y1', y1)
+      .attr('style', 'stroke:#3a5ce9;stroke-width:3.5;opacity:1');
   }
 
   windowResized = () => {

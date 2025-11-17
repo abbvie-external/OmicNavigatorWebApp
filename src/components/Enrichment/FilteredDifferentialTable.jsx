@@ -388,8 +388,6 @@ class FilteredDifferentialTable extends Component {
     /* eslint-disable eqeqeq */
     const highlightedIds = HighlightedProteins.map((p) => p.featureID);
     const featureId = item[filteredDifferentialFeatureIdKey];
-    console.log(selectedProteinId);
-
     // MULTI: orange rows (same as Differential .rowHighlightOther)
     if (highlightedIds.includes(featureId)) {
       className = 'rowHighlightOther';
@@ -425,7 +423,6 @@ class FilteredDifferentialTable extends Component {
     this.setState({ rowClicked: true });
 
     if (item !== null && event?.target?.className !== 'ExternalSiteIcon') {
-      console.log('clicked row' + event.target.classList);
       const { filteredDifferentialFeatureIdKey } = this.props;
       event.stopPropagation();
 
@@ -439,8 +436,6 @@ class FilteredDifferentialTable extends Component {
         ) ||
         event?.target?.innerHTML?.includes('DifferentialResultsRowCheckboxDiv');
 
-      console.log('clickedInCheckboxCell:', clickedInCheckboxCell);
-      // SHIFT = range multi-select (orange)
       if (event.shiftKey) {
         const allTableData =
           this.props.filteredDifferentialGridRef.current?.qhGridRef.current?.getSortedData() ||
@@ -509,10 +504,6 @@ class FilteredDifferentialTable extends Component {
       // SIMPLE ROW CLICK = single-select toggle (blue), NO change to multi
       else {
         if (this.props.onHandleSingleProteinSelected) {
-          console.log(
-            'Single protein selected:',
-            item[filteredDifferentialFeatureIdKey],
-          );
           this.props.onHandleSingleProteinSelected(
             item[filteredDifferentialFeatureIdKey],
           );
