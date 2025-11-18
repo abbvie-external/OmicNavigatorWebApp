@@ -205,23 +205,25 @@ class PlotHelpers {
         `<svg preserveAspectRatio="xMinYMin meet" class="currentSVG" id="${svgId}"`,
       );
 
-      DOMPurify.addHook('afterSanitizeAttributes', function (node) {
+      const restrictExternalUseHref = function (node) {
         if (node.hasAttribute('xlink:href')) {
           const href = node.getAttribute('xlink:href');
           if (!href.match(/^#/)) {
             node.remove();
           }
         }
-      });
+      };
 
-      const sanitized = DOMPurify.sanitize(updated, {
-        ADD_TAGS: ['use'],
-        ADD_ATTR: ['xlink:href'],
-      });
+      DOMPurify.addHook('afterSanitizeAttributes', restrictExternalUseHref);
 
-      DOMPurify.removeHook('afterSanitizeAttributes');
-
-      return sanitized;
+      try {
+        return DOMPurify.sanitize(updated, {
+          ADD_TAGS: ['use'],
+          ADD_ATTR: ['xlink:href'],
+        });
+      } finally {
+        DOMPurify.removeHook('afterSanitizeAttributes');
+      }
     } catch (error) {
       console.error('Error sanitizing SVG:', error);
       return '';
