@@ -86,10 +86,10 @@ class DifferentialDetail extends Component {
     multiFeatureSearchWarning: false,
     notFoundLimit: 5,
     filteredOutLimit: 5,
-    multiFeatureOptionsOpen: false,
+    multiFeatureBullPenOpen: false,
   };
   //Timeout to handle delayed close of multi-feature options popup
-  multiFeatureOptionsCloseTimeout = null;
+  multiFeatureBullpenCloseTimeout = null;
 
   volcanoPlotFilteredGridRef = React.createRef();
   _firstHeaderEl = null;
@@ -108,25 +108,25 @@ class DifferentialDetail extends Component {
    * @param {boolean} isOpen     true if opening, false if closing
    * @param {boolean} delayClose true if close should be delayed with a timeout
    */
-  handleMultiFeatureOptionsOpenChange = (isOpen, delayClose = false) => {
+  handleMultiFeatureBullpenOpenChange = (isOpen, delayClose = false) => {
     // Clear any pending delayed close
-    if (this.multiFeatureOptionsCloseTimeout) {
-      clearTimeout(this.multiFeatureOptionsCloseTimeout);
-      this.multiFeatureOptionsCloseTimeout = null;
+    if (this.multiFeatureBullpenCloseTimeout) {
+      clearTimeout(this.multiFeatureBullpenCloseTimeout);
+      this.multiFeatureBullpenCloseTimeout = null;
     }
 
     if (isOpen) {
-      this.setState({ multiFeatureOptionsOpen: true });
+      this.setState({ multiFeatureBullPenOpen: true });
       return;
     }
 
     if (delayClose) {
-      this.multiFeatureOptionsCloseTimeout = setTimeout(() => {
-        this.setState({ multiFeatureOptionsOpen: false });
-        this.multiFeatureOptionsCloseTimeout = null;
+      this.multiFeatureBullpenCloseTimeout = setTimeout(() => {
+        this.setState({ multiFeatureBullPenOpen: false });
+        this.multiFeatureBullpenCloseTimeout = null;
       }, OVERLAY_CLOSE_DELAY_MS);
     } else {
-      this.setState({ multiFeatureOptionsOpen: false });
+      this.setState({ multiFeatureBullPenOpen: false });
     }
   };
 
@@ -214,9 +214,9 @@ class DifferentialDetail extends Component {
     this.abortController?.abort();
     this._firstHeaderEl = null;
 
-    if (this.multiFeatureOptionsCloseTimeout) {
-      clearTimeout(this.multiFeatureOptionsCloseTimeout);
-      this.multiFeatureOptionsCloseTimeout = null;
+    if (this.multiFeatureBullpenCloseTimeout) {
+      clearTimeout(this.multiFeatureBullpenCloseTimeout);
+      this.multiFeatureBullpenCloseTimeout = null;
     }
   }
 
@@ -2062,8 +2062,8 @@ class DifferentialDetail extends Component {
         plotMultiFeatureAvailable={this.props.plotMultiFeatureAvailable}
         onHandlePlotlyClick={this.handlePlotlyClick}
         differentialPlotDescriptions={this.props.differentialPlotDescriptions}
-        onMultiFeatureOptionsOpenChange={
-          this.handleMultiFeatureOptionsOpenChange
+        onMultiFeatureBullpenOpenChange={
+          this.handleMultiFeatureBullpenOpenChange
         }
       ></PlotsDynamic>
     );
