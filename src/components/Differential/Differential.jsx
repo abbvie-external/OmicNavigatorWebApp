@@ -13,10 +13,6 @@ import {
   Linkout,
   roundToPrecision,
   limitValues,
-  getIdArg,
-  getTestsArg,
-  getModelsArg,
-  isMultiModelMultiTest,
 } from '../Shared/helpers';
 import ButtonActions from '../Shared/ButtonActions';
 import DifferentialSearch from './DifferentialSearch';
@@ -29,8 +25,6 @@ import PlotHelpers from '../Shared/Plots/PlotHelpers';
 import './Differential.scss';
 import '../Shared/Table.scss';
 
-let cancelRequestDifferentialResultsGetPlot = () => {};
-let cancelRequestDifferentialResultsGetMultifeaturePlot = () => {};
 let cancelRequestGetMapping = () => {};
 class Differential extends Component {
   static defaultProps = {

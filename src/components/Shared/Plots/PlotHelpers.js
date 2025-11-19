@@ -107,7 +107,10 @@ class PlotHelpers {
       return { modelsArg: [], testsArg: [], idArg: null, modelIdsOverride: [] };
     }
 
-    // 1) Determine which models to use
+    // plot metadata will now include the field 'models'. This field should be referenced for all plots of type 'multimodel' in the following way:
+    // 1) if 'models' exists and !='all' AND the currently selected model is not in the character vector assigned to 'models' THEN do not render this plot.
+    // 2) if 'models' exists and != 'all' AND the currently selected model is in this character vector, only pass the specified models to plotStudy, starting with the currently selected model.
+    // The existing conventions for intersections of tests across models still applies, but only to the set of models specified following the execution of the above logic.
     const plotMetadataSpecificPlot =
       differentialPlotDescriptions?.[plot.plotID] || {};
 
@@ -273,19 +276,6 @@ class PlotHelpers {
       title: '',
       svg: [],
     };
-  }
-
-  // =====================================================
-  // VALIDATION
-  // =====================================================
-
-  static isValidPlotData(plotData) {
-    return (
-      plotData &&
-      typeof plotData === 'object' &&
-      plotData.key !== null &&
-      Array.isArray(plotData.svg)
-    );
   }
 
   static isValidPlotArray(plots) {
