@@ -187,8 +187,9 @@ class PlotsMultiFeature extends Component {
         id={divWidth >= 625 ? 'FeaturesListButton' : 'FeaturesListIcon'}
       >
         <Popup
+          onOpen={this.toggleFeaturesListPopup}
           trigger={
-            <Button size="mini" onClick={this.toggleFeaturesListPopup}>
+            <Button size="mini">
               <Icon name="setting" />
               {featuresHighlighted} {divWidth >= 625 ? 'FEATURES' : ''}
             </Button>
