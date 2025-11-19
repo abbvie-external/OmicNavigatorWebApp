@@ -48,10 +48,25 @@ class PlotsMultiFeature extends Component {
   };
 
   toggleFeaturesListPopup = (e, obj, close) => {
+    const { onMultiFeatureOptionsOpenChange } = this.props;
+
     if (close) {
       this.setState({ featuresListOpen: false });
+
+      if (typeof onMultiFeatureOptionsOpenChange === 'function') {
+        onMultiFeatureOptionsOpenChange(false, true);
+      }
     } else {
-      this.setState({ featuresListOpen: !this.state.featuresListOpen });
+      this.setState(
+        (prevState) => ({
+          featuresListOpen: !prevState.featuresListOpen,
+        }),
+        () => {
+          if (typeof onMultiFeatureOptionsOpenChange === 'function') {
+            onMultiFeatureOptionsOpenChange(this.state.featuresListOpen, false);
+          }
+        },
+      );
     }
   };
 

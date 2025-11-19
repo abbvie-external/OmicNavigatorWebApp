@@ -335,6 +335,9 @@ class ScatterPlotDiv extends Component {
       volcanoWidth,
     } = this.props;
 
+    const bullPenOpen =
+      optionsOpen || usageOpen || Boolean(this.props.multiFeatureOptionsOpen);
+
     if (
       !differentialResultsTableStreaming &&
       differentialFeatureIdKey != null &&
@@ -603,6 +606,7 @@ class ScatterPlotDiv extends Component {
             doXAxisTransformation={doXAxisTransformation}
             doYAxisTransformation={doYAxisTransformation}
             optionsOpen={optionsOpen}
+            bullPenOpen={bullPenOpen}
             volcanoCircleLabel={volcanoCircleLabel}
             xAxisLabel={xAxisLabel}
             yAxisLabel={yAxisLabel}
