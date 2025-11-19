@@ -21,6 +21,9 @@ import ButtonActions from '../Shared/ButtonActions';
 import './DifferentialDetail.scss';
 import SplitPane from 'react-split-pane-r17';
 
+// Delay in ms to ignore outside clicks when closing multi-feature options popup
+const OVERLAY_CLOSE_DELAY_MS = 10;
+
 class DifferentialDetail extends Component {
   state = {
     upperPlotsHeight:
@@ -83,7 +86,11 @@ class DifferentialDetail extends Component {
     multiFeatureSearchWarning: false,
     notFoundLimit: 5,
     filteredOutLimit: 5,
+    multiFeatureBullpenOpen: false,
   };
+  //Timeout to handle delayed close of multi-feature options popup
+  multiFeatureBullpenCloseTimeout = null;
+
   volcanoPlotFilteredGridRef = React.createRef();
   _firstHeaderEl = null;
   abortcontroller = null;
@@ -92,6 +99,36 @@ class DifferentialDetail extends Component {
   componentDidMount() {
     this.resetSearchAndData();
   }
+
+  /**
+   * Tracks the open/close state of the multi-feature FEATURES popup.
+   * When closed due to outside click, keeps it logically "open" briefly
+   * so the current volcano background click is ignored.
+   *
+   * @param {boolean} isOpen     true if opening, false if closing
+   * @param {boolean} delayClose true if close should be delayed with a timeout
+   */
+  handleMultiFeatureBullpenOpenChange = (isOpen, delayClose = false) => {
+    // Clear any pending delayed close
+    if (this.multiFeatureBullpenCloseTimeout) {
+      clearTimeout(this.multiFeatureBullpenCloseTimeout);
+      this.multiFeatureBullpenCloseTimeout = null;
+    }
+
+    if (isOpen) {
+      this.setState({ multiFeatureBullpenOpen: true });
+      return;
+    }
+
+    if (delayClose) {
+      this.multiFeatureBullpenCloseTimeout = setTimeout(() => {
+        this.setState({ multiFeatureBullpenOpen: false });
+        this.multiFeatureBullpenCloseTimeout = null;
+      }, OVERLAY_CLOSE_DELAY_MS);
+    } else {
+      this.setState({ multiFeatureBullpenOpen: false });
+    }
+  };
 
   /**
    * Prevents drag and drop operations on the first column of a results table
@@ -176,6 +213,11 @@ class DifferentialDetail extends Component {
   componentWillUnmount() {
     this.abortController?.abort();
     this._firstHeaderEl = null;
+
+    if (this.multiFeatureBullpenCloseTimeout) {
+      clearTimeout(this.multiFeatureBullpenCloseTimeout);
+      this.multiFeatureBullpenCloseTimeout = null;
+    }
   }
 
   setRelevantData = () => {
@@ -2020,6 +2062,9 @@ class DifferentialDetail extends Component {
         plotMultiFeatureAvailable={this.props.plotMultiFeatureAvailable}
         onHandlePlotlyClick={this.handlePlotlyClick}
         differentialPlotDescriptions={this.props.differentialPlotDescriptions}
+        onMultiFeatureBullpenOpenChange={
+          this.handleMultiFeatureBullpenOpenChange
+        }
       ></PlotsDynamic>
     );
     return (

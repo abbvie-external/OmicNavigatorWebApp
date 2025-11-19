@@ -284,11 +284,13 @@ class ScatterPlot extends Component {
       .attr('id', 'VolcanoChart')
       .attr('class', 'VolcanoPlotSVG')
       .on('click', () => {
-        if (this.props.optionsOpen) return;
+        if (this.props.optionsOpen || this.props.multiFeatureBullpenOpen)
+          return;
         this.handleSVGClick(false);
       })
       .on('dblclick', () => {
-        if (this.props.optionsOpen) return;
+        if (this.props.optionsOpen || this.props.multiFeatureBullpenOpen)
+          return;
         this.handleSVGClick(true);
       });
 

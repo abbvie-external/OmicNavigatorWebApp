@@ -214,6 +214,9 @@ class PlotsDynamic extends Component {
                 }
                 differentialTableData={this.props.differentialTableData}
                 differentialFeatureIdKey={this.props.differentialFeatureIdKey}
+                onMultiFeatureBullpenOpenChange={
+                  this.props.onMultiFeatureBullpenOpenChange
+                }
               />
             </Tab.Pane>
           ),
