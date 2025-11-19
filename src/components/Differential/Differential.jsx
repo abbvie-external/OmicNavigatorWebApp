@@ -814,7 +814,7 @@ class Differential extends Component {
 
     // Race for first result
     Promise.race(
-      promises.map((p) => p.then((r) => r || Promise.reject('null'))),
+      promises.map((p) => p.then((r) => r || Promise.reject(new Error('No result')))),
     )
       .then((firstResult) => {
         if (firstResult) {
