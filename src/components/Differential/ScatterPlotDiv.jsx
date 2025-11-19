@@ -336,7 +336,7 @@ class ScatterPlotDiv extends Component {
     } = this.props;
 
     const multiFeatureBullpenOpen =
-      optionsOpen || usageOpen || Boolean(this.props.multiFeatureBullPenOpen);
+      optionsOpen || usageOpen || Boolean(this.props.multiFeatureBullpenOpen);
 
     if (
       !differentialResultsTableStreaming &&

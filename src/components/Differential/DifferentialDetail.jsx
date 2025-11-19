@@ -86,7 +86,7 @@ class DifferentialDetail extends Component {
     multiFeatureSearchWarning: false,
     notFoundLimit: 5,
     filteredOutLimit: 5,
-    multiFeatureBullPenOpen: false,
+    multiFeatureBullpenOpen: false,
   };
   //Timeout to handle delayed close of multi-feature options popup
   multiFeatureBullpenCloseTimeout = null;
@@ -116,17 +116,17 @@ class DifferentialDetail extends Component {
     }
 
     if (isOpen) {
-      this.setState({ multiFeatureBullPenOpen: true });
+      this.setState({ multiFeatureBullpenOpen: true });
       return;
     }
 
     if (delayClose) {
       this.multiFeatureBullpenCloseTimeout = setTimeout(() => {
-        this.setState({ multiFeatureBullPenOpen: false });
+        this.setState({ multiFeatureBullpenOpen: false });
         this.multiFeatureBullpenCloseTimeout = null;
       }, OVERLAY_CLOSE_DELAY_MS);
     } else {
-      this.setState({ multiFeatureBullPenOpen: false });
+      this.setState({ multiFeatureBullpenOpen: false });
     }
   };
 
