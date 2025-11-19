@@ -87,7 +87,6 @@ class OmicNavigatorService {
     } catch (error) {
       if (!axios.isCancel(error)) {
         console.log(`failed to retrieve plot for ${method} with payload:`);
-        console.info(obj);
         if (handleError != null) {
           handleError(false);
         }
