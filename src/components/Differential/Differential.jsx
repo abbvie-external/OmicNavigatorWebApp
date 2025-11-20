@@ -22,7 +22,6 @@ import { omicNavigatorService } from '../../services/omicNavigator.service';
 import TransitionActive from '../Transitions/TransitionActive';
 import TransitionStill from '../Transitions/TransitionStill';
 import PlotHelpers from '../Shared/Plots/PlotHelpers';
-import PlotHelpers from '../Shared/Plots/PlotHelpers';
 import './Differential.scss';
 import '../Shared/Table.scss';
 
