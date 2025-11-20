@@ -17,7 +17,7 @@
     // Common styles for sticky columns
     :is(th, td):nth-child(-n + 2) {
       position: sticky;
-      background-color: #ffffff;
+      background-color: #ffffff !important;
       z-index: 1;
     }
 
@@ -39,6 +39,7 @@
       -webkit-user-drag: none;
       -moz-user-drag: none;
       -ms-user-drag: none;
+      opacity: 1 !important;
     }
   }
 }

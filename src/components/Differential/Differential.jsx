@@ -13,10 +13,6 @@ import {
   Linkout,
   roundToPrecision,
   limitValues,
-  getIdArg,
-  getTestsArg,
-  getModelsArg,
-  isMultiModelMultiTest,
 } from '../Shared/helpers';
 import ButtonActions from '../Shared/ButtonActions';
 import DifferentialSearch from './DifferentialSearch';
@@ -26,11 +22,10 @@ import { omicNavigatorService } from '../../services/omicNavigator.service';
 import TransitionActive from '../Transitions/TransitionActive';
 import TransitionStill from '../Transitions/TransitionStill';
 import PlotHelpers from '../Shared/Plots/PlotHelpers';
+import PlotHelpers from '../Shared/Plots/PlotHelpers';
 import './Differential.scss';
 import '../Shared/Table.scss';
 
-let cancelRequestDifferentialResultsGetPlot = () => {};
-let cancelRequestDifferentialResultsGetMultifeaturePlot = () => {};
 let cancelRequestGetMapping = () => {};
 class Differential extends Component {
   static defaultProps = {
@@ -814,7 +809,9 @@ class Differential extends Component {
 
     // Race for first result
     Promise.race(
-      promises.map((p) => p.then((r) => r || Promise.reject('null'))),
+      promises.map((p) =>
+        p.then((r) => r || Promise.reject(new Error('No result'))),
+      ),
     )
       .then((firstResult) => {
         if (firstResult) {

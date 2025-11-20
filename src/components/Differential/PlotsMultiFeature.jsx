@@ -48,10 +48,25 @@ class PlotsMultiFeature extends Component {
   };
 
   toggleFeaturesListPopup = (e, obj, close) => {
+    const { onMultiFeatureBullpenOpenChange } = this.props;
+
     if (close) {
       this.setState({ featuresListOpen: false });
+
+      if (typeof onMultiFeatureBullpenOpenChange === 'function') {
+        onMultiFeatureBullpenOpenChange(false, true);
+      }
     } else {
-      this.setState({ featuresListOpen: !this.state.featuresListOpen });
+      this.setState(
+        (prevState) => ({
+          featuresListOpen: !prevState.featuresListOpen,
+        }),
+        () => {
+          if (typeof onMultiFeatureBullpenOpenChange === 'function') {
+            onMultiFeatureBullpenOpenChange(this.state.featuresListOpen, false);
+          }
+        },
+      );
     }
   };
 
@@ -172,8 +187,9 @@ class PlotsMultiFeature extends Component {
         id={divWidth >= 625 ? 'FeaturesListButton' : 'FeaturesListIcon'}
       >
         <Popup
+          onOpen={this.toggleFeaturesListPopup}
           trigger={
-            <Button size="mini" onClick={this.toggleFeaturesListPopup}>
+            <Button size="mini">
               <Icon name="setting" />
               {featuresHighlighted} {divWidth >= 625 ? 'FEATURES' : ''}
             </Button>

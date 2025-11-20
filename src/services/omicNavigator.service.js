@@ -3,6 +3,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import('opencpu.js/opencpu-0.5.js');
 window.jQuery = $;
+
 class OmicNavigatorService {
   constructor() {
     this.baseUrl =
@@ -11,9 +12,10 @@ class OmicNavigatorService {
         : window.location.origin;
     this.url = `${this.baseUrl}/ocpu/library/OmicNavigator/R`;
     this.staticUrl = `${this.baseUrl}/ocpu/library/OmicNavigator/www`;
+    this.timeoutLength = 240000;
   }
 
-  async axiosPost(method, obj, params, handleError, cancelToken, timeout) {
+  async axiosPost(method, obj, params, handleError, cancelToken) {
     const paramsObj = params ? { digits: 10 } : {};
     const self = this;
     return new Promise(function (resolve, reject) {
@@ -22,7 +24,7 @@ class OmicNavigatorService {
         .post(axiosPostUrl, obj, {
           params: paramsObj,
           cancelToken,
-          timeout,
+          timeout: self.timeoutLength,
         })
         .then((response) => resolve(response.data))
         .catch(function (error) {
@@ -48,13 +50,13 @@ class OmicNavigatorService {
     }
   }
 
-  async getPlotUrl(method, obj, handleError, cancelToken, timeout) {
+  async getPlotUrl(method, obj, handleError, cancelToken) {
     const self = this;
     const axiosPostUrl = `${self.url}/${method}`;
     try {
       const { data } = await axios.post(axiosPostUrl, obj, {
         cancelToken,
-        timeout,
+        timeout: self.timeoutLength,
       });
       const splitUrls = data.split('/ocpu/');
       const graphics = splitUrls.filter((u) => u.includes('graphics'));
@@ -71,14 +73,7 @@ class OmicNavigatorService {
     }
   }
 
-  async axiosPostPlotly(
-    method,
-    obj,
-    params,
-    handleError,
-    cancelToken,
-    timeout,
-  ) {
+  async axiosPostPlotly(method, obj, params, handleError, cancelToken) {
     const paramsObj = params ? { digits: 10 } : {};
     const self = this;
     const axiosPostUrl = `${self.url}/${method}/json?auto_unbox=true`;
@@ -86,13 +81,12 @@ class OmicNavigatorService {
       const { data } = await axios.post(axiosPostUrl, obj, {
         params: paramsObj,
         cancelToken,
-        timeout,
+        timeout: self.timeoutLength,
       });
       return data;
     } catch (error) {
       if (!axios.isCancel(error)) {
         console.log(`failed to retrieve plot for ${method} with payload:`);
-        console.info(obj);
         if (handleError != null) {
           handleError(false);
         }
@@ -101,7 +95,7 @@ class OmicNavigatorService {
     }
   }
 
-  async ocpuPlotCall(method, obj, handleError, cancelToken, timeout) {
+  async ocpuPlotCall(method, obj, handleError, cancelToken) {
     const self = this;
     return new Promise(function (resolve, reject) {
       window.ocpu
@@ -116,7 +110,7 @@ class OmicNavigatorService {
             .get(url, {
               responseType: 'text', // needed for SVG
               cancelToken,
-              timeout,
+              timeout: self.timeoutLength,
             })
             .then((response) => resolve(response))
             .catch(function (thrown) {
@@ -148,7 +142,6 @@ class OmicNavigatorService {
     cancelToken,
   ) {
     this.setUrl();
-    const timeoutLength = 60000;
     const cacheKey = `plotStudy_${study}_${modelID}_${testID}_${featureID}_${plotID}_${plotType}`;
     if (this[cacheKey] != null) {
       return this[cacheKey];
@@ -167,18 +160,11 @@ class OmicNavigatorService {
           null,
           errorCb,
           cancelToken,
-          timeoutLength,
         );
         this[cacheKey] = dataFromPlotly;
         return dataFromPlotly;
       } else {
-        const promise = this.getPlotUrl(
-          'plotStudy',
-          obj,
-          errorCb,
-          cancelToken,
-          timeoutLength,
-        );
+        const promise = this.getPlotUrl('plotStudy', obj, errorCb, cancelToken);
         const dataFromPromise = await promise;
         this[cacheKey] = dataFromPromise;
         return dataFromPromise;
@@ -197,7 +183,6 @@ class OmicNavigatorService {
     cancelToken,
   ) {
     this.setUrl();
-    const timeoutLength = 60000;
     const obj = {
       study,
       modelID,
@@ -212,17 +197,10 @@ class OmicNavigatorService {
         null,
         errorCb,
         cancelToken,
-        timeoutLength,
       );
       return data;
     } else {
-      const promise = this.ocpuPlotCall(
-        'plotStudy',
-        obj,
-        errorCb,
-        cancelToken,
-        timeoutLength,
-      );
+      const promise = this.ocpuPlotCall('plotStudy', obj, errorCb, cancelToken);
       const dataFromPromise = await promise;
       return dataFromPromise;
     }
@@ -238,7 +216,6 @@ class OmicNavigatorService {
     cancelToken,
   ) {
     this.setUrl();
-    const timeoutLength = 240000;
     const cacheKey = `plotStudyMultifeature_${study}_${modelID}_${testID}_${featureID}_${plotID}`;
     if (this[cacheKey] != null) {
       return this[cacheKey];
@@ -254,7 +231,6 @@ class OmicNavigatorService {
       },
       errorCb,
       cancelToken,
-      timeoutLength,
     );
     function timeoutResolver(ms) {
       return new Promise((resolve, reject) => {
