@@ -28,6 +28,12 @@
     min-height: 75vh !important;
   }
 
+  .export-svg {
+    margin: 5px 20px 5px 0px !important;
+    position: absolute;
+    right: 0;
+  }
+
   // .DiffTableIcon {
   //   display: none !important;
   //   position: absolute !important;
@@ -41,12 +47,6 @@
     margin: 40px auto !important;
     width: 300px !important;
   }
-}
-
-.export-svg {
-  margin: 5px 20px 5px 0px !important;
-  position: absolute;
-  right: 0;
 }
 
 // .TwoPlotsDiv {
@@ -67,4 +67,15 @@
   left: 10px !important;
   // right: 50% !important;
   cursor: pointer !important;
+}
+
+.SingleFeaturePlotPane,
+.MultiFeaturePlotPane {
+  padding-top: 0px !important;
+  // padding-right: 0px !important;
+  padding-bottom: 10px !important;
+  padding-left: 25px !important;
+  margin-bottom: 0px !important;
+  border: none !important;
+  min-height: 400px !important;
 }
