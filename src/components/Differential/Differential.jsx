@@ -965,7 +965,6 @@ class Differential extends Component {
         });
 
         if (plot.plotType.includes('plotly')) {
-          // 🔧 IMPORTANT: use raw featureids (original behavior) – not idArg
           const svg = await omicNavigatorService.plotStudyReturnSvgUrl(
             differentialStudy,
             modelsArg,
@@ -994,7 +993,6 @@ class Differential extends Component {
             );
 
           if (result === true) {
-            // Timeout - open in new tab
             PlotHelpers.cancelRequest('multiPlot');
             this.getMultifeaturePlotTransition(featureids, true, 0);
           } else if (result && result.data) {
@@ -1033,7 +1031,6 @@ class Differential extends Component {
       });
 
       if (plot.plotType.includes('plotly')) {
-        // 🔧 IMPORTANT: use raw featureids (original behavior) – not idArg
         omicNavigatorService
           .plotStudyReturnSvgUrl(
             differentialStudy,
