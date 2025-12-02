@@ -373,13 +373,13 @@ class DifferentialSearch extends Component {
           differentialTestTooltips: testTooltips,
           differentialTestsDisabled: false,
         });
-        return getTestsResponse;
+        return getResultsTestsResponse;
       } else {
         this.setState({
           differentialTests: [],
           differentialTestsDisabled: false,
         });
-        return getTestsResponse;
+        return getResultsTestsResponse;
       }
     } catch (error) {
       console.error('Error during getResultsTests', error);
