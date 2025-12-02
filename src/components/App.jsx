@@ -12,7 +12,7 @@ const App = () => (
       <Tabs></Tabs>
     </div>
     <div className="BottomBar">
-      <Terms />
+      {/* <Terms /> */} {/* Removing 12/2/25 */}
     </div>
   </div>
 );
