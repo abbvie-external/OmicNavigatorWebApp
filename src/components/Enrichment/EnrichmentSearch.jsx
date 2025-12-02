@@ -22,9 +22,9 @@ let cancelRequestGetReportLinkEnrichment = () => {};
 let cancelGetAllEnrichmentTests = () => {};
 let cancelRequestGetEnrichmentsIntersection = () => {};
 let cancelRequestGetEnrichmentsMultiset = () => {};
-let cancelGetAnnotations = () => {};
+let cancelGetEnrichmentsAnnotations = () => {};
 let cancelGetEnrichmentPlotDescriptions = () => {};
-let cancelGetEnrichmentModels = () => {};
+let cancelGetEnrichmentsModels = () => {};
 
 const cacheEnrichmentsTable = {};
 async function* streamAsyncIterable(reader) {
@@ -124,7 +124,7 @@ class EnrichmentSearch extends Component {
 
   componentDidMount() {
     const { enrichmentStudy, enrichmentModel } = this.props;
-    this.getInstalledStudies();
+    this.getEnrichmentsStudies();
     this.populateDropdowns();
     if (enrichmentModel) {
       this.getEnrichmentPlotDescriptions(enrichmentStudy, enrichmentModel);
@@ -161,26 +161,25 @@ class EnrichmentSearch extends Component {
     300,
   );
 
-  getInstalledStudies = () => {
-    const params = { hasElements: 'enrichments' };
+  getEnrichmentsStudies = () => {
     omicNavigatorService
-      .getInstalledStudies(params)
-      .then((getInstalledStudiesResponseData) => {
+      .getEnrichmentsStudies()
+      .then((getEnrichmentsStudiesResponseData) => {
         let studies = [];
         // Handle if response is a string (single study) or array
-        if (typeof getInstalledStudiesResponseData === 'string') {
+        if (typeof getEnrichmentsStudiesResponseData === 'string') {
           studies = [
             {
-              key: `${getInstalledStudiesResponseData}Enrichment`,
-              text: getInstalledStudiesResponseData,
-              value: getInstalledStudiesResponseData,
+              key: `${getEnrichmentsStudiesResponseData}Enrichment`,
+              text: getEnrichmentsStudiesResponseData,
+              value: getEnrichmentsStudiesResponseData,
             },
           ];
         } else if (
-          Array.isArray(getInstalledStudiesResponseData) &&
-          getInstalledStudiesResponseData.length
+          Array.isArray(getEnrichmentsStudiesResponseData) &&
+          getEnrichmentsStudiesResponseData.length
         ) {
-          studies = getInstalledStudiesResponseData.map((studyName) => {
+          studies = getEnrichmentsStudiesResponseData.map((studyName) => {
             return {
               key: `${studyName}Enrichment`,
               text: studyName,
@@ -193,7 +192,7 @@ class EnrichmentSearch extends Component {
         });
       })
       .catch((error) => {
-        console.error('Error during getInstalledStudies enrichments', error);
+        console.error('Error during getEnrichmentsStudies enrichments', error);
       });
   };
 
@@ -231,10 +230,12 @@ class EnrichmentSearch extends Component {
         this.getReportLink(enrichmentStudy, 'default');
       } else {
         this.props.onHandleHasBarcodeData();
-        annotations = await this.getAndSetAnnotationOptions(enrichmentStudy);
+        annotations = await this.getAndSetAnnotationOptions(
+          enrichmentStudy,
+          enrichmentModel,
+        );
         this.setState({
-          enrichmentModelTooltip:
-            models?.[enrichmentModel]?.description || 'N/A',
+          enrichmentModelTooltip: models?.[enrichmentModel] || enrichmentModel,
         });
         this.getReportLink(enrichmentStudy, enrichmentModel);
         if (enrichmentAnnotation !== '') {
@@ -280,7 +281,7 @@ class EnrichmentSearch extends Component {
             false,
           );
           const enrichmentAnnotationTooltip =
-            annotations?.[enrichmentAnnotation]?.description || 'N/A';
+            annotations?.[enrichmentAnnotation] || enrichmentAnnotation;
           this.setState({
             enrichmentAnnotationTooltip,
           });
@@ -311,31 +312,33 @@ class EnrichmentSearch extends Component {
     }
   };
 
-  getAndSetAnnotationOptions = async (study) => {
-    cancelGetAnnotations();
+  getAndSetAnnotationOptions = async (study, model) => {
+    cancelGetEnrichmentsAnnotations();
     let cancelToken = new CancelToken((e) => {
-      cancelGetAnnotations = e;
+      cancelGetEnrichmentsAnnotations = e;
     });
     try {
-      const getAnnotationsResponse = await omicNavigatorService.getAnnotations(
-        study,
-        cancelToken,
-      );
-      if (
-        getAnnotationsResponse &&
-        Object.keys(getAnnotationsResponse).length > 0
-      ) {
-        const annotationOptions = Object.entries(getAnnotationsResponse).map(
-          ([annotationName, annotationObj]) => ({
-            key: `${annotationName}-annotation-enrichment`,
-            value: annotationName,
-            text: annotationName,
-          }),
+      const getEnrichmentsAnnotationsResponse =
+        await omicNavigatorService.getEnrichmentsAnnotations(
+          study,
+          model,
+          cancelToken,
         );
+      if (
+        getEnrichmentsAnnotationsResponse &&
+        Object.keys(getEnrichmentsAnnotationsResponse).length > 0
+      ) {
+        const annotationOptions = Object.entries(
+          getEnrichmentsAnnotationsResponse,
+        ).map(([annotationName]) => ({
+          key: `${annotationName}-annotation-enrichment`,
+          value: annotationName,
+          text: annotationName,
+        }));
         const annotationTooltips = Object.entries(
-          getAnnotationsResponse,
+          getEnrichmentsAnnotationsResponse,
         ).reduce((acc, [annotationName, annotationObj]) => {
-          acc[annotationName] = annotationObj.description || '';
+          acc[annotationName] = annotationObj || annotationName;
           return acc;
         }, {});
         this.setState({
@@ -343,16 +346,16 @@ class EnrichmentSearch extends Component {
           enrichmentAnnotationTooltips: annotationTooltips,
           enrichmentAnnotationsDisabled: false,
         });
-        return getAnnotationsResponse;
+        return getEnrichmentsAnnotationsResponse;
       } else {
         this.setState({
           enrichmentAnnotations: [],
           enrichmentAnnotationsDisabled: false,
         });
-        return getAnnotationsResponse;
+        return getEnrichmentsAnnotationsResponse;
       }
     } catch (error) {
-      console.error('Error during getAnnotations', error);
+      console.error('Error during getEnrichmentsAnnotations', error);
     }
   };
 
@@ -380,45 +383,45 @@ class EnrichmentSearch extends Component {
   };
 
   getAndSetModelOptions = async (study) => {
-    cancelGetEnrichmentModels();
+    cancelGetEnrichmentsModels();
     let cancelToken = new CancelToken((e) => {
-      cancelGetEnrichmentModels = e;
+      cancelGetEnrichmentsModels = e;
     });
     try {
-      const getModelsResponse = await omicNavigatorService.getModels(
-        study,
-        cancelToken,
-      );
-      if (getModelsResponse && Object.keys(getModelsResponse).length > 0) {
-        const modelOptions = Object.entries(getModelsResponse).map(
+      const getEnrichmentsModelsResponse =
+        await omicNavigatorService.getEnrichmentsModels(study, cancelToken);
+      if (
+        getEnrichmentsModelsResponse &&
+        Object.keys(getEnrichmentsModelsResponse).length > 0
+      ) {
+        const modelOptions = Object.entries(getEnrichmentsModelsResponse).map(
           ([modelName]) => ({
             key: `${modelName}-model-enrichment`,
             value: modelName,
             text: modelName,
           }),
         );
-        const modelTooltips = Object.entries(getModelsResponse).reduce(
-          (acc, [modelName, modelObj]) => {
-            acc[modelName] = modelObj.description || '';
-            return acc;
-          },
-          {},
-        );
+        const modelTooltips = Object.entries(
+          getEnrichmentsModelsResponse,
+        ).reduce((acc, [modelName, modelObj]) => {
+          acc[modelName] = modelObj || modelName;
+          return acc;
+        }, {});
         this.setState({
           enrichmentModels: modelOptions,
           enrichmentModelTooltips: modelTooltips,
           enrichmentModelsDisabled: false,
         });
-        return getModelsResponse;
+        return getEnrichmentsModelsResponse;
       } else {
         this.setState({
           enrichmentModels: [],
           enrichmentModelTooltips: [],
         });
-        return getModelsResponse;
+        return getEnrichmentsModelsResponse;
       }
     } catch (error) {
-      console.error('Error during getEnrichmentModelsResponse', error);
+      console.error('Error during getEnrichmentsModelsResponse', error);
     }
   };
 
@@ -530,10 +533,10 @@ class EnrichmentSearch extends Component {
     onSearchResetEnrichment({
       isValidSearchEnrichment: false,
     });
-    await this.getAndSetAnnotationOptions(enrichmentStudy);
+    await this.getAndSetAnnotationOptions(enrichmentStudy, value);
     this.setState({
       enrichmentAnnotationsDisabled: false,
-      enrichmentModelTooltip: enrichmentModelTooltips?.[value] || 'N/A',
+      enrichmentModelTooltip: enrichmentModelTooltips?.[value] || value,
       enrichmentAnnotationTooltip: 'Select a database',
     });
     this.getReportLink(enrichmentStudy, value);
@@ -556,7 +559,7 @@ class EnrichmentSearch extends Component {
     this.props.onAnnotationChange();
     this.setState({
       enrichmentAnnotationTooltip:
-        enrichmentAnnotationTooltips?.[value] || 'N/A',
+        enrichmentAnnotationTooltips?.[value] || value,
       reloadPlot: true,
       multisetFiltersVisibleEnrichment: false,
     });

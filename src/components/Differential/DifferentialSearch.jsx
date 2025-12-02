@@ -22,9 +22,9 @@ let cancelRequestGetReportLinkDifferential = () => {};
 let cancelRequestGetResultsIntersection = () => {};
 let cancelRequestGetResultsMultiset = () => {};
 let cancelGetAllDifferentialTests = () => {};
-let cancelGetDifferentialTests = () => {};
+let cancelGetResultsTests = () => {};
 let cancelGetDifferentialPlotDescriptions = () => {};
-let cancelGetDifferentialModels = () => {};
+let cancelGetResultsModels = () => {};
 
 const cacheResultsTable = {};
 async function* streamAsyncIterable(reader) {
@@ -119,7 +119,7 @@ class DifferentialSearch extends Component {
 
   componentDidMount() {
     const { differentialStudy, differentialModel } = this.props;
-    this.getInstalledStudies();
+    this.getResultsStudies();
     this.populateDropdowns();
     if (differentialModel) {
       this.getDifferentialPlotDescriptions(
@@ -181,25 +181,25 @@ class DifferentialSearch extends Component {
     300,
   );
 
-  getInstalledStudies = () => {
+  getResultsStudies = () => {
     omicNavigatorService
-      .getInstalledStudies()
-      .then((getInstalledStudiesResponseData) => {
+      .getResultsStudies()
+      .then((getResultsStudiesResponseData) => {
         let studies = [];
         // Handle if response is a string (single study) or array
-        if (typeof getInstalledStudiesResponseData === 'string') {
+        if (typeof getResultsStudiesResponseData === 'string') {
           studies = [
             {
-              key: `${getInstalledStudiesResponseData}Differential`,
-              text: getInstalledStudiesResponseData,
-              value: getInstalledStudiesResponseData,
+              key: `${getResultsStudiesResponseData}Differential`,
+              text: getResultsStudiesResponseData,
+              value: getResultsStudiesResponseData,
             },
           ];
         } else if (
-          Array.isArray(getInstalledStudiesResponseData) &&
-          getInstalledStudiesResponseData.length
+          Array.isArray(getResultsStudiesResponseData) &&
+          getResultsStudiesResponseData.length
         ) {
-          studies = getInstalledStudiesResponseData.map((studyName) => {
+          studies = getResultsStudiesResponseData.map((studyName) => {
             return {
               key: `${studyName}Differential`,
               text: studyName,
@@ -212,7 +212,7 @@ class DifferentialSearch extends Component {
         });
       })
       .catch((error) => {
-        console.error('Error during getInstalledStudies differential', error);
+        console.error('Error during getResultsStudies differential', error);
       });
   };
 
@@ -266,7 +266,7 @@ class DifferentialSearch extends Component {
         differentialTestIds = Object.keys(tests || {});
         this.setState({
           differentialModelTooltip:
-            models?.[differentialModel]?.description || 'N/A',
+            models?.[differentialModel] || differentialModel,
           uDataP: differentialTestIds,
         });
         this.props.onSetDifferentialTestIds(differentialTestIds);
@@ -310,7 +310,7 @@ class DifferentialSearch extends Component {
             true,
           );
           const differentialTestTooltip =
-            tests?.[differentialTest]?.description || 'N/A';
+            tests?.[differentialTest] || differentialTest;
           this.setState({
             differentialTestTooltip,
             uAnchorP: differentialTest,
@@ -343,30 +343,27 @@ class DifferentialSearch extends Component {
   };
 
   getAndSetTestOptions = async (study, model) => {
-    cancelGetDifferentialTests();
+    cancelGetResultsTests();
     let cancelToken = new CancelToken((e) => {
-      cancelGetDifferentialTests = e;
+      cancelGetResultsTests = e;
     });
     try {
-      const getTestsResponse = await omicNavigatorService.getTests(
-        study,
-        model,
-        cancelToken,
-      );
-      if (getTestsResponse && Object.keys(getTestsResponse).length > 0) {
-        const testOptions = Object.entries(getTestsResponse).map(
-          ([testName, testObj]) => ({
+      const getResultsTestsResponse =
+        await omicNavigatorService.getResultsTests(study, model, cancelToken);
+      if (
+        getResultsTestsResponse &&
+        Object.keys(getResultsTestsResponse).length > 0
+      ) {
+        const testOptions = Object.entries(getResultsTestsResponse).map(
+          ([testName]) => ({
             key: `${testName}-test-differential`,
             value: testName,
             text: testName,
-            // tooltip: testObj.description || '',
-            // analyst: testObj.analyst,
-            // analystemail: testObj.analyst_email,
           }),
         );
-        const testTooltips = Object.entries(getTestsResponse).reduce(
+        const testTooltips = Object.entries(getResultsTestsResponse).reduce(
           (acc, [testName, testObj]) => {
-            acc[testName] = testObj.description || '';
+            acc[testName] = testObj || testName;
             return acc;
           },
           {},
@@ -385,7 +382,7 @@ class DifferentialSearch extends Component {
         return getTestsResponse;
       }
     } catch (error) {
-      console.error('Error during getTests', error);
+      console.error('Error during getResultsTests', error);
     }
   };
 
@@ -413,26 +410,27 @@ class DifferentialSearch extends Component {
   };
 
   getAndSetModelOptions = async (study) => {
-    cancelGetDifferentialModels();
+    cancelGetResultsModels();
     let cancelToken = new CancelToken((e) => {
-      cancelGetDifferentialModels = e;
+      cancelGetResultsModels = e;
     });
     try {
-      const getModelsResponse = await omicNavigatorService.getModels(
-        study,
-        cancelToken,
-      );
-      if (getModelsResponse && Object.keys(getModelsResponse).length > 0) {
-        const modelOptions = Object.entries(getModelsResponse).map(
+      const getResultsModelsResponse =
+        await omicNavigatorService.getResultsModels(study, cancelToken);
+      if (
+        getResultsModelsResponse &&
+        Object.keys(getResultsModelsResponse).length > 0
+      ) {
+        const modelOptions = Object.entries(getResultsModelsResponse).map(
           ([modelName]) => ({
             key: `${modelName}-model-differential`,
             value: modelName,
             text: modelName,
           }),
         );
-        const modelTooltips = Object.entries(getModelsResponse).reduce(
+        const modelTooltips = Object.entries(getResultsModelsResponse).reduce(
           (acc, [modelName, modelObj]) => {
-            acc[modelName] = modelObj.description || '';
+            acc[modelName] = modelObj || modelName;
             return acc;
           },
           {},
@@ -442,16 +440,16 @@ class DifferentialSearch extends Component {
           differentialModelTooltips: modelTooltips,
           differentialModelsDisabled: false,
         });
-        return getModelsResponse;
+        return getResultsModelsResponse;
       } else {
         this.setState({
           differentialModels: [],
           differentialModelTooltips: [],
         });
-        return getModelsResponse;
+        return getResultsModelsResponse;
       }
     } catch (error) {
-      console.error('Error during getDifferentialModelsResponse', error);
+      console.error('Error during getResultsModelsResponse', error);
     }
   };
 
@@ -569,7 +567,7 @@ class DifferentialSearch extends Component {
     this.setState({
       differentialTestsDisabled: false,
       uDataP: differentialTestIds,
-      differentialModelTooltip: differentialModelTooltips?.[value] || 'N/A',
+      differentialModelTooltip: differentialModelTooltips?.[value] || value,
       differentialTestTooltip: 'Select a test',
     });
     this.props.onSetDifferentialTestIds(differentialTestIds);
@@ -590,7 +588,7 @@ class DifferentialSearch extends Component {
     onSearchTransitionDifferential(true);
     onMultisetQueriedDifferential(false);
     this.setState({
-      differentialTestTooltip: differentialTestTooltips?.[value] || 'N/A',
+      differentialTestTooltip: differentialTestTooltips?.[value] || value,
       reloadPlotP: true,
       multisetFiltersVisibleDifferential: false,
       sigValP: this.state.uSettingsP.defaultSigValueP,
