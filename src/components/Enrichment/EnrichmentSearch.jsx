@@ -519,9 +519,6 @@ class EnrichmentSearch extends Component {
       onHandleEnrichmentColumnsConfigured,
     } = this.props;
     const { enrichmentModelTooltips } = this.state;
-    await this.getAndSetAnnotationOptions(enrichmentStudy, value);
-    onHandleEnrichmentColumnsConfigured(false);
-    this.props.onHandleHasBarcodeData(value);
     onSearchChangeEnrichment(
       {
         enrichmentStudy: enrichmentStudy,
@@ -531,13 +528,16 @@ class EnrichmentSearch extends Component {
       },
       true,
     );
-    onSearchResetEnrichment({
-      isValidSearchEnrichment: false,
-    });
+    await this.getAndSetAnnotationOptions(enrichmentStudy, value);
     this.setState({
       enrichmentAnnotationsDisabled: false,
       enrichmentModelTooltip: enrichmentModelTooltips?.[value] || value,
       enrichmentAnnotationTooltip: 'Select a database',
+    });
+    onHandleEnrichmentColumnsConfigured(false);
+    this.props.onHandleHasBarcodeData(value);
+    onSearchResetEnrichment({
+      isValidSearchEnrichment: false,
     });
     this.getReportLink(enrichmentStudy, value);
   };
