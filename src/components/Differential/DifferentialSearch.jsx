@@ -250,16 +250,16 @@ class DifferentialSearch extends Component {
       if (differentialModel === '') {
         this.getReportLink(differentialStudy, 'default');
       } else {
+        tests = await this.getAndSetTestOptions(
+          differentialStudy,
+          differentialModel,
+        );
         this.props.onDoMetaFeaturesExist(differentialStudy, differentialModel);
         await this.props.onGetResultsLinkouts(
           differentialStudy,
           differentialModel,
         );
         this.props.onGetMultisetColsDifferential(
-          differentialStudy,
-          differentialModel,
-        );
-        tests = await this.getAndSetTestOptions(
           differentialStudy,
           differentialModel,
         );
@@ -549,6 +549,7 @@ class DifferentialSearch extends Component {
       onHandleDifferentialColumnsConfigured,
     } = this.props;
     const { differentialModelTooltips } = this.state;
+    const tests = await this.getAndSetTestOptions(differentialStudy, value);
     onHandleDifferentialColumnsConfigured(false);
     onSearchChangeDifferential(
       {
@@ -562,7 +563,6 @@ class DifferentialSearch extends Component {
     onSearchResetDifferential({
       isValidSearchDifferential: false,
     });
-    const tests = await this.getAndSetTestOptions(differentialStudy, value);
     const differentialTestIds = Object.keys(tests || {});
     this.setState({
       differentialTestsDisabled: false,
