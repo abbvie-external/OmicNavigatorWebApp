@@ -240,8 +240,8 @@ class DifferentialSearch extends Component {
     let tests = [];
     let differentialTestIds = {};
     if (differentialStudy !== '') {
-      this.getStudyMetaFunc();
       models = await this.getAndSetModelOptions(differentialStudy);
+      this.getStudyMetaFunc();
       differentialModelIds = Object.keys(models) || [];
       this.props.onSetDifferentialModelIds(differentialModelIds);
 

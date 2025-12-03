@@ -221,8 +221,8 @@ class EnrichmentSearch extends Component {
     let enrichmentModelIds = {};
     let annotations = [];
     if (enrichmentStudy !== '') {
-      this.getStudyMetaFunc();
       models = await this.getAndSetModelOptions(enrichmentStudy);
+      this.getStudyMetaFunc();
       enrichmentModelIds = Object.keys(models) || [];
       this.props.onSetEnrichmentModelIds(enrichmentModelIds);
       this.getAllTests(enrichmentStudy);
