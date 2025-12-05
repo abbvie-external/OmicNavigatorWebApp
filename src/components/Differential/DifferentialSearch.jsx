@@ -456,6 +456,9 @@ class DifferentialSearch extends Component {
   handleStudyChange = async (evt, { name, value }) => {
     const { onSearchChangeDifferential, onSearchResetDifferential } =
       this.props;
+    await this.getAndSetModelOptions(value);
+    // const allTests = await this.getAllTests(value);
+    this.props.onGetMultiModelMappingObject(value);
     onSearchChangeDifferential(
       {
         [name]: value,
@@ -465,7 +468,9 @@ class DifferentialSearch extends Component {
       true,
       true,
     );
-    await this.getAndSetModelOptions(value);
+    onSearchResetDifferential({
+      isValidSearchDifferential: false,
+    });
     this.setState({
       differentialStudyHrefVisible: false,
       differentialModelsDisabled: true,
@@ -473,10 +478,6 @@ class DifferentialSearch extends Component {
       differentialStudyTooltip: 'Select a study',
       differentialModelTooltip: 'Select a model',
       differentialTestTooltip: 'Select a test',
-    });
-    this.props.onGetMultiModelMappingObject(value);
-    onSearchResetDifferential({
-      isValidSearchDifferential: false,
     });
     this.getReportLink(value, 'default');
   };
