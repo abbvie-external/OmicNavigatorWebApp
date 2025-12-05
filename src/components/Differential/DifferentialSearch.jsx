@@ -464,8 +464,6 @@ class DifferentialSearch extends Component {
       differentialModelTooltip: 'Select a model',
       differentialTestTooltip: 'Select a test',
     });
-    await this.getAndSetModelOptions(value);
-    // const allTests = await this.getAllTests(value);
     this.props.onGetMultiModelMappingObject(value);
     onSearchChangeDifferential(
       {

@@ -435,7 +435,6 @@ class EnrichmentSearch extends Component {
       enrichmentModelTooltip: 'Select a model',
       enrichmentAnnotationTooltip: 'Select a database',
     });
-    await this.getAndSetModelOptions(value);
     onSearchChangeEnrichment(
       {
         [name]: value,
