@@ -456,6 +456,14 @@ class DifferentialSearch extends Component {
   handleStudyChange = async (evt, { name, value }) => {
     const { onSearchChangeDifferential, onSearchResetDifferential } =
       this.props;
+    this.setState({
+      differentialStudyHrefVisible: false,
+      differentialModelsDisabled: true,
+      differentialTestsDisabled: true,
+      differentialStudyTooltip: 'Select a study',
+      differentialModelTooltip: 'Select a model',
+      differentialTestTooltip: 'Select a test',
+    });
     await this.getAndSetModelOptions(value);
     // const allTests = await this.getAllTests(value);
     this.props.onGetMultiModelMappingObject(value);
@@ -471,18 +479,10 @@ class DifferentialSearch extends Component {
     onSearchResetDifferential({
       isValidSearchDifferential: false,
     });
-    this.setState({
-      differentialStudyHrefVisible: false,
-      differentialModelsDisabled: true,
-      differentialTestsDisabled: true,
-      differentialStudyTooltip: 'Select a study',
-      differentialModelTooltip: 'Select a model',
-      differentialTestTooltip: 'Select a test',
-    });
     this.getReportLink(value, 'default');
   };
 
-  setStudyTooltip = () => {
+  setStudyReportTooltip = () => {
     if (this.props.differentialModel !== '') {
       this.setState({
         differentialStudyReportTooltip: `The model ${this.props.differentialModel} from the study ${this.props.differentialStudy} does not have additional analysis details available.`,
@@ -501,7 +501,7 @@ class DifferentialSearch extends Component {
       cancelRequestGetReportLinkDifferential = e;
     });
     omicNavigatorService
-      .getReportLink(study, model, this.setStudyTooltip, cancelToken)
+      .getReportLink(study, model, this.setStudyReportTooltip, cancelToken)
       .then((getReportLinkResponse) => {
         let links = [];
         if (Array.isArray(getReportLinkResponse)) {
@@ -530,7 +530,7 @@ class DifferentialSearch extends Component {
           });
           return;
         }
-        this.setStudyTooltip();
+        this.setStudyReportTooltip();
         this.setState({
           differentialStudyHrefVisible: false,
           differentialStudyHref: '',

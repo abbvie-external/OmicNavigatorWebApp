@@ -427,8 +427,15 @@ class EnrichmentSearch extends Component {
 
   handleStudyChange = async (evt, { name, value }) => {
     const { onSearchChangeEnrichment, onSearchResetEnrichment } = this.props;
+    this.setState({
+      enrichmentStudyHrefVisible: false,
+      enrichmentModelsDisabled: true,
+      enrichmentAnnotationsDisabled: true,
+      enrichmentStudyTooltip: 'Select a study',
+      enrichmentModelTooltip: 'Select a model',
+      enrichmentAnnotationTooltip: 'Select a database',
+    });
     await this.getAndSetModelOptions(value);
-
     onSearchChangeEnrichment(
       {
         [name]: value,
@@ -441,17 +448,10 @@ class EnrichmentSearch extends Component {
     onSearchResetEnrichment({
       isValidSearchEnrichment: false,
     });
-    this.setState({
-      enrichmentStudyHrefVisible: false,
-      enrichmentModelsDisabled: true,
-      enrichmentAnnotationsDisabled: true,
-      enrichmentModelTooltip: 'Select a model',
-      enrichmentAnnotationTooltip: 'Select a database',
-    });
     this.getReportLink(value, 'default');
   };
 
-  setStudyTooltip = () => {
+  setStudyReportTooltip = () => {
     if (this.props.enrichmentModel !== '') {
       this.setState({
         enrichmentStudyReportTooltip: `The model ${this.props.enrichmentModel} from the study ${this.props.enrichmentStudy} does not have additional analysis details available.`,
@@ -470,7 +470,7 @@ class EnrichmentSearch extends Component {
       cancelRequestGetReportLinkEnrichment = e;
     });
     omicNavigatorService
-      .getReportLink(study, model, this.setStudyTooltip, cancelToken)
+      .getReportLink(study, model, this.setStudyReportTooltip, cancelToken)
       .then((getReportLinkResponse) => {
         let links = [];
         if (Array.isArray(getReportLinkResponse)) {
@@ -499,7 +499,7 @@ class EnrichmentSearch extends Component {
           });
           return;
         }
-        this.setStudyTooltip();
+        this.setStudyReportTooltip();
         this.setState({
           enrichmentStudyHrefVisible: false,
           enrichmentStudyHref: '',
