@@ -17,6 +17,8 @@ class BarcodePlot extends Component {
     tooltipPositionMax: null,
     tooltipTextAnchor: 'start',
     tooltipTextAnchorMax: 'start',
+    autoMaxAssigned: false,
+    allTooltips: null,
     displayElementTextBarcode:
       JSON.parse(sessionStorage.getItem('displayElementTextBarcode')) || false,
     settings: {
@@ -30,7 +32,7 @@ class BarcodePlot extends Component {
         left: 20,
         hovered: 45,
         selected: 45,
-        highlighted: 25,
+        highlighted: 30,
         max: 15,
       },
     },
@@ -66,10 +68,6 @@ class BarcodePlot extends Component {
     // --- MULTI-SELECTION (ORANGE / RED) UPDATE ---
     if (this.props.HighlightedProteins !== prevProps.HighlightedProteins) {
       if (!this.state.initialLoad) {
-        d3.selectAll(`.MaxLine`)
-          .attr('y1', this.state.settings.margin.selected)
-          .attr('style', 'stroke:#838383;strokeWidth: 1.5;opacity: 0.5')
-          .classed('MaxLine', false);
         d3.selectAll(`.HighlightedLine`)
           .attr('y1', this.state.settings.margin.selected)
           .attr('style', 'stroke:#838383;strokeWidth: 1.5;opacity: 0.5')
@@ -79,9 +77,7 @@ class BarcodePlot extends Component {
           .attr('style', 'stroke:#2c3b78;strokeWidth: 2.5;opacity: 1');
         if (this.props.HighlightedProteins.length > 0) {
           const HighlightedProteinsCopy = [...this.props.HighlightedProteins];
-          const MaxFeatureData = HighlightedProteinsCopy[0];
-          const OtherFeatures = HighlightedProteinsCopy.slice(1);
-          OtherFeatures.forEach((element) => {
+          HighlightedProteinsCopy.forEach((element) => {
             const lineId = `${element.featureID}`;
             const OtherHighlighted = d3.select(
               `line[id='barcode-line-${lineId}']`,
@@ -93,42 +89,14 @@ class BarcodePlot extends Component {
             }
           });
 
-          // Max line
-          const MaxFeatureId = MaxFeatureData.featureID;
-          const MaxFeatureElement = d3.select(
-            `line[id='barcode-line-${MaxFeatureId}']`,
-          );
-          if (MaxFeatureElement != null) {
-            MaxFeatureElement.classed('MaxLine', true)
-              .attr('y1', this.state.settings.margin.max)
-              .attr('style', 'stroke:#FF4400;stroke-width:3.5;opacity:1');
-
-            const MaxFeatureLineData = {
-              x2: MaxFeatureElement.attr('x2') || null,
-              featureID: MaxFeatureElement.attr('featureid') || null,
-              lineID: MaxFeatureElement.attr('lineid') || null,
-              logFC: MaxFeatureElement.attr('logfc') || null,
-              statistic: MaxFeatureElement.attr('statistic') || null,
-            };
-
-            const statistic = MaxFeatureLineData.statistic;
-            const textAnchorMax =
-              statistic > this.props.barcodeSettings.highStat / 2
-                ? 'end'
-                : 'start';
-            const ttPositionMax =
-              textAnchorMax === 'end'
-                ? MaxFeatureLineData.x2 - 5
-                : MaxFeatureLineData.x2 + 5;
-
-            this.setState({
-              hoveredLineId: null,
-              hoveredLineName: null,
-              highlightedLineName: MaxFeatureLineData.lineID,
-              tooltipPositionMax: ttPositionMax,
-              tooltipTextAnchorMax: textAnchorMax,
-            });
-          }
+          // Clear tooltip states
+          this.setState({
+            hoveredLineId: null,
+            hoveredLineName: null,
+            highlightedLineName: null,
+            tooltipPositionMax: null,
+            tooltipTextAnchorMax: null,
+          });
         } else {
           this.setState({
             hoveredLineId: null,
@@ -169,29 +137,32 @@ class BarcodePlot extends Component {
     const line = d3.select(`line[id='barcode-line-${prevSelectedId}']`);
     if (line.empty()) return;
 
-    const isMax =
-      highlightedProteins.length > 0 &&
-      highlightedProteins[0].featureID === prevSelectedId;
-    const isOther = highlightedProteins
-      .slice(1)
-      .some((p) => p.featureID === prevSelectedId);
-
     line.classed('SingleSelectedLine', false);
 
-    if (isMax) {
-      // still max multi → restore red max style
-      line
-        .classed('MaxLine', true)
-        .attr('y1', this.state.settings.margin.max)
-        .attr('style', 'stroke:#FF4400;stroke-width:3.5;opacity:1');
-    } else if (isOther) {
-      // still part of multi → restore orange highlighted style
+    // Check if this line is still in highlighted proteins
+    const isHighlighted = highlightedProteins.some(
+      (p) => p.featureID === prevSelectedId,
+    );
+
+    // Check if this line is in brushed data
+    const isBrushed = this.props.barcodeSettings.brushedData.some(
+      (item) => item.featureID === prevSelectedId,
+    );
+
+    if (isHighlighted) {
+      // Still highlighted → use orange style
       line
         .classed('HighlightedLine', true)
         .attr('y1', this.state.settings.margin.highlighted)
         .attr('style', 'stroke:#ff7e38;stroke-width:3;opacity:1');
+    } else if (isBrushed) {
+      // In brushed data but not highlighted → use blue selection style
+      line
+        .classed('selected', true)
+        .attr('y1', this.state.settings.margin.selected)
+        .attr('style', 'stroke:#2c3b78;stroke-width:2.5;opacity:1');
     } else {
-      // no longer multi → reset to base grey
+      // Not in any selection → reset to base grey
       line
         .attr('y1', this.state.settings.margin.top)
         .attr('style', 'stroke:#838383;stroke-width:1.5;opacity:0.5');
@@ -203,30 +174,23 @@ class BarcodePlot extends Component {
 
     const line = d3.select(`line[id='barcode-line-${selectedId}']`);
     if (line.empty()) return;
-
-    const isMax =
-      highlightedProteins.length > 0 &&
-      highlightedProteins[0].featureID === selectedId;
-    const isOther = highlightedProteins
-      .slice(1)
-      .some((p) => p.featureID === selectedId);
+    const isHighlighted = highlightedProteins.some(
+      (p) => p.featureID === selectedId,
+    );
 
     line.classed('SingleSelectedLine', true);
 
     // If it's also part of the multi set, keep its vertical position from multi
-    let y1;
-    if (isMax) {
-      y1 = this.state.settings.margin.max;
-    } else if (isOther) {
-      y1 = this.state.settings.margin.highlighted;
+    let y1 = this.state.settings.margin.max;
+    if (isHighlighted) {
+      line
+        .attr('y1', y1)
+        .attr('style', 'stroke:#ff7e38;stroke-width:3.5;opacity:1');
     } else {
-      // single-only → reuse max lane visually
-      y1 = this.state.settings.margin.max;
+      line
+        .attr('y1', y1)
+        .attr('style', 'stroke:#0066f5;stroke-width:3.5;opacity:1');
     }
-
-    line
-      .attr('y1', y1)
-      .attr('style', 'stroke:#3a5ce9;stroke-width:3.5;opacity:1');
   }
 
   windowResized = () => {
@@ -276,10 +240,10 @@ class BarcodePlot extends Component {
         : event.target.attributes[2].nodeValue + 5;
     const lineId = `#barcode-line-${lineIdMult}`;
     const hoveredLine = d3.select(`line[id='barcode-line-${lineIdMult}']`);
-    // const hoveredLine = d3.select(lineId);
+
     if (hoveredLine.attr('class').endsWith('selected')) {
       hoveredLine.attr('y1', this.state.settings.margin.selected - 10);
-    } else if (hoveredLine.attr('class').endsWith('MaxLine')) {
+    } else if (hoveredLine.attr('class').endsWith('SingleSelectedLine')) {
       hoveredLine.attr('y1', this.state.settings.margin.max);
     } else if (hoveredLine.attr('class').endsWith('HighlightedLine')) {
       hoveredLine.attr('y1', this.state.settings.margin.highlighted - 10);
@@ -288,6 +252,7 @@ class BarcodePlot extends Component {
         .classed('HoveredLine', true)
         .attr('y1', this.state.settings.margin.hovered);
     }
+
     if (lineIdMult !== this.state.highlightedLineName) {
       this.setState({
         hoveredLineId: lineId,
@@ -305,7 +270,7 @@ class BarcodePlot extends Component {
     if (!hoveredLine.empty()) {
       if (hoveredLine.attr('class').endsWith('selected')) {
         hoveredLine.attr('y1', this.state.settings.margin.selected);
-      } else if (hoveredLine.attr('class').endsWith('MaxLine')) {
+      } else if (hoveredLine.attr('class').endsWith('SingleSelectedLine')) {
         hoveredLine.attr('y1', this.state.settings.margin.max);
       } else if (hoveredLine.attr('class').endsWith('HighlightedLine')) {
         hoveredLine.attr('y1', this.state.settings.margin.highlighted);
@@ -331,6 +296,7 @@ class BarcodePlot extends Component {
         array.map(function (o) {
           return o.statistic;
         }),
+        5,
       );
       const obj = array.find(function (o) {
         return o.statistic === max;
@@ -371,26 +337,47 @@ class BarcodePlot extends Component {
             const isBrushed = function (brushedLines, x) {
               const xMin = brushedLines[0];
               const xMax = brushedLines[1];
-              const brushTest = xMin <= x && x <= xMax;
-              return brushTest;
+              return xMin <= x && x <= xMax;
             };
 
-            const lines = d3
-              .selectAll('line.barcode-line')
-              .attr('y1', settings.margin.top)
-              .attr('style', 'stroke:#838383;stroke-width: 1.5;opacity: 0.5')
-              .classed('selectedReference', false)
-              .classed('selected', false)
-              .classed('MaxLine', false);
-            const brushed = lines
-              .filter(function () {
-                const x = d3.select(this).attr('x1');
-                return isBrushed(brushedLines, x);
-              })
-              .attr('y1', settings.margin.selected)
-              .attr('style', 'stroke:#2c3b78;stroke-width: 2.5;opacity: 1')
-              .classed('selectedReference', true)
-              .classed('selected', true);
+            const lines = d3.selectAll('line.barcode-line');
+
+            lines.each(function () {
+              const lineSel = d3.select(this);
+              const x = parseFloat(lineSel.attr('x1'));
+              if (!isBrushed(brushedLines, x)) {
+                lineSel
+                  .classed('selectedReference', false)
+                  .classed('selected', false)
+                  .classed('MaxLine', false)
+                  .classed('SingleSelectedLine', false)
+                  .classed('HighlightedLine', false)
+                  .attr('y1', settings.margin.top)
+                  .attr('style', 'stroke:#838383;stroke-width:1.5;opacity:0.5');
+              }
+            });
+
+            // Apply blue style to brushed lines
+            const brushed = lines.filter(function () {
+              const x = parseFloat(d3.select(this).attr('x1'));
+              return isBrushed(brushedLines, x);
+            });
+
+            brushed.each(function () {
+              const lineSel = d3.select(this);
+              const className = lineSel.attr('class') || '';
+              const isSingleSelected = className.includes('SingleSelectedLine');
+              const isHighlighted = className.includes('HighlightedLine');
+
+              if (!isSingleSelected && !isHighlighted) {
+                lineSel
+                  .classed('selectedReference', true)
+                  .classed('selected', true)
+                  .attr('y1', settings.margin.selected)
+                  .attr('style', 'stroke:#2c3b78;stroke-width:2.5;opacity:1');
+              }
+            });
+
             const brushedArr = brushed._groups[0];
             const brushedDataVar = brushedArr.map((a) => {
               return {
@@ -442,35 +429,16 @@ class BarcodePlot extends Component {
                 </text>
               );
             });
+
+            self.lastBrushedData = brushedDataVar;
+
+            self.setState({
+              allTooltips: brushedDataTooltips,
+            });
+
             self.props.onHandleBarcodeChanges({
               brushedData: brushedDataVar,
             });
-            if (brushedDataVar.length > 0) {
-              const maxLineObject = self.getMaxObject(brushedDataVar);
-              const maxLineId = `${maxLineObject.lineID}`;
-              const maxLine = d3.select(`line[id='barcode-line-${maxLineId}']`);
-              maxLine
-                .classed('MaxLine', true)
-                .attr('style', 'stroke:#FF4400;stroke-width:3.5')
-                .attr('y1', settings.margin.max);
-              const statistic = maxLineObject.statistic;
-              const textAnchorMax =
-                statistic > self.props.barcodeSettings.highStat / 2
-                  ? 'end'
-                  : 'start';
-              const ttPositionMax =
-                textAnchorMax === 'end'
-                  ? maxLineObject.x2 - 5
-                  : maxLineObject.x2 + 5;
-              self.setState({
-                hoveredLineId: null,
-                hoveredLineName: null,
-                highlightedLineName: maxLineObject.lineID,
-                tooltipPositionMax: ttPositionMax,
-                tooltipTextAnchorMax: textAnchorMax,
-                allTooltips: brushedDataTooltips,
-              });
-            }
           }
         }
       })
@@ -478,32 +446,47 @@ class BarcodePlot extends Component {
         if (!self.resized || d3.event.sourceEvent?.composed) {
           const selection = d3.event?.selection || null;
           if (selection != null) {
-            if (self.props.barcodeSettings.brushedData.length > 0) {
-              const maxLineData = self.getMaxObject(
-                self.props.barcodeSettings.brushedData,
-              );
-              const maxLineDataArr = [maxLineData];
-              const highlightedLineArray = maxLineDataArr.map(function (m) {
-                return {
-                  sample: m.lineID,
-                  featureID: m.featureID,
-                  cpm: m.statistic,
-                  // logfc: m.cpm,
-                };
-              });
-              if (!initialBrush) {
-                self.props.onHandleProteinSelected(highlightedLineArray);
-              }
+            const brushedData = self.props.barcodeSettings.brushedData || [];
+            const brushedIds = new Set(brushedData.map((d) => d.featureID));
 
+            const HighlightedProteins = self.props.HighlightedProteins || [];
+            const selectedProteinId = self.props.selectedProteinId;
+
+            if (
+              selectedProteinId &&
+              !brushedIds.has(selectedProteinId) &&
+              self.props.onHandleSingleProteinSelected
+            ) {
+              self.props.onHandleSingleProteinSelected(null);
+            }
+
+            if (self.props.onHandleProteinSelected) {
+              const filteredMulti = HighlightedProteins.filter((p) =>
+                brushedIds.has(p.featureID),
+              );
+              self.props.onHandleProteinSelected(filteredMulti);
+            }
+
+            if (brushedData.length > 0) {
+              const maxLineData = self.getMaxObject(brushedData);
               if (
                 initialBrush &&
                 self.props.onHandleSingleProteinSelected &&
-                !self.props.selectedProteinId
+                !self.props.selectedProteinId &&
+                !self.state.autoMaxAssigned
               ) {
                 self.props.onHandleSingleProteinSelected(maxLineData.featureID);
+                self.setState({
+                  autoMaxAssigned: true,
+                });
               }
             } else {
-              self.props.onHandleProteinSelected([]);
+              if (self.props.onHandleProteinSelected) {
+                self.props.onHandleProteinSelected([]);
+              }
+              if (self.props.onHandleSingleProteinSelected) {
+                self.props.onHandleSingleProteinSelected(null);
+              }
               self.setState({
                 tooltipPosition: null,
                 tooltipTextAnchor: null,
@@ -548,51 +531,51 @@ class BarcodePlot extends Component {
   }
 
   getTooltip = () => {
-    const { hoveredLineName, tooltipPosition } = this.state;
-    if (tooltipPosition) {
-      if (hoveredLineName) {
-        return (
-          <text
-            className="BarcodeTooltipText"
-            // transform={`translate(${tooltipPosition}, 15)rotate(-45)`}
-            transform={`translate(${tooltipPosition}, 13)`}
-            fontSize="14px"
-            textAnchor="end"
-            fontFamily="Lato, Helvetica Neue, Arial, Helvetica, sans-serif"
-          >
-            {hoveredLineName}
-          </text>
-        );
-      }
-    }
-  };
-
-  getMaxTooltip = () => {
-    const {
-      // tooltipPosition,
-      highlightedLineName,
-      tooltipPositionMax,
-      tooltipTextAnchorMax,
-    } = this.state;
-    if (
-      tooltipPositionMax &&
-      highlightedLineName &&
-      this.props.HighlightedProteins.length > 0
-    ) {
+    const { hoveredLineName, tooltipPosition, tooltipTextAnchor } = this.state;
+    if (tooltipPosition && hoveredLineName) {
       return (
         <text
           className="BarcodeTooltipText"
-          // transform={`translate(${tooltipPosition}, 15)rotate(-45)`}
-          transform={`translate(${tooltipPositionMax}, 15)`}
+          transform={`translate(${tooltipPosition}, 13)`}
           fontSize="14px"
-          textAnchor={tooltipTextAnchorMax}
+          textAnchor={tooltipTextAnchor || 'end'}
           fontFamily="Lato, Helvetica Neue, Arial, Helvetica, sans-serif"
         >
-          {highlightedLineName}
+          {hoveredLineName}
         </text>
       );
     }
     return null;
+  };
+
+  getSingleSelectedTooltip = () => {
+    const { selectedProteinId } = this.props;
+    if (!selectedProteinId) return null;
+
+    // Find the line and get its information
+    const line = d3.select(`line[id='barcode-line-${selectedProteinId}']`);
+    if (line.empty()) return null;
+
+    const featureName = line.attr('lineid');
+    const xPosition = line.attr('x2');
+    const statistic = line.attr('statistic');
+
+    // Calculate text anchor position similar to tooltip
+    const textAnchor =
+      statistic > this.props.barcodeSettings.highStat / 2 ? 'end' : 'start';
+    const ttPosition = textAnchor === 'end' ? xPosition - 5 : +xPosition + 5;
+
+    return (
+      <text
+        className="BarcodeTooltipText"
+        transform={`translate(${ttPosition}, 15)`}
+        fontSize="14px"
+        textAnchor={textAnchor}
+        fontFamily="Lato, Helvetica Neue, Arial, Helvetica, sans-serif"
+      >
+        {featureName}
+      </text>
+    );
   };
 
   handleElementTextChange = () => {
@@ -677,7 +660,7 @@ class BarcodePlot extends Component {
     ));
 
     const tooltip = this.getTooltip();
-    const maxTooltip = this.getMaxTooltip();
+    const maxTooltip = this.getSingleSelectedTooltip();
     return (
       <div ref={this.barcodeContainerRef} id="BarcodeChartContainer">
         <div className="export-container">

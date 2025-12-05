@@ -1478,8 +1478,12 @@ class Enrichment extends Component {
 
     // Only care about valid data; this stays multi-only
     if (splitPaneData?.length > 0 && Array.isArray(toHighlightArray)) {
+      const sortedArray = [...toHighlightArray].sort(
+        (a, b) => b.statistic - a.statistic,
+      );
+
       this.setState({
-        HighlightedProteins: toHighlightArray,
+        HighlightedProteins: sortedArray,
       });
     } else {
       this.setState({
