@@ -63,6 +63,17 @@ class FilteredDifferentialTable extends Component {
     if (this.props.HighlightedProteins !== prevProps.HighlightedProteins) {
       this.highlightRows(this.props.HighlightedProteins, this.state.rowClicked);
     }
+
+    if (this.props.selectedProteinId !== prevProps.selectedProteinId) {
+      const { selectedProteinId, HighlightedProteins = [] } = this.props;
+      if (
+        !this.state.rowClicked &&
+        selectedProteinId &&
+        HighlightedProteins.length === 0
+      ) {
+        this.pageToFeature(selectedProteinId);
+      }
+    }
   }
 
   pageToFeature = (featureToHighlight) => {

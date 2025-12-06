@@ -192,7 +192,7 @@ class Enrichment extends Component {
     },
     plotMultiFeatureDataLength: 0,
     plotMultiFeatureMax: 1000,
-
+    enableSvgTabChangeOnSelection: true,
     enrichmentModelsAndAnnotations: [], // listStudies.enrichments
     enrichmentAnnotationIdsCommon: [],
     enrichmentsLinkouts: [],
@@ -1543,6 +1543,30 @@ class Enrichment extends Component {
     this.getPlot(id);
   };
 
+  handleSingleProteinSelectedFromUI = (featureId) => {
+    // dot click, violin click, table row click → allow tab auto-switch
+    this.setState(
+      {
+        enableSvgTabChangeOnSelection: true,
+      },
+      () => {
+        this.handleSingleProteinSelected(featureId);
+      },
+    );
+  };
+
+  handleSingleProteinSelectedFromMultiPlot = (featureId) => {
+    // MultiFeature Plotly click → DO NOT auto-switch tabs
+    this.setState(
+      {
+        enableSvgTabChangeOnSelection: false,
+      },
+      () => {
+        this.handleSingleProteinSelected(featureId);
+      },
+    );
+  };
+
   getPlot = (featureId) => {
     const {
       enrichmentPlotTypes,
@@ -2328,7 +2352,12 @@ class Enrichment extends Component {
             {...this.state}
             onBackToTable={this.backToTable}
             onHandleProteinSelected={this.handleProteinSelected}
-            onHandleSingleProteinSelected={this.handleSingleProteinSelected}
+            onHandleSingleProteinSelected={
+              this.handleSingleProteinSelectedFromUI
+            }
+            onHandleSingleProteinSelectedFromMultiPlot={
+              this.handleSingleProteinSelectedFromMultiPlot
+            }
             onHandleHighlightedLineReset={this.handleHighlightedLineReset}
             onHandleBarcodeChanges={this.handleBarcodeChanges}
             onGetMultifeaturePlotTransitionEnrichment={

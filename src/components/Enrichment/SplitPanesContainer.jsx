@@ -34,16 +34,29 @@ class SplitPanesContainer extends Component {
     const { activeSvgTabIndexEnrichment } = this.state;
     const hasMultiFeature = this.props.plotMultiFeatureAvailable;
 
-    // 1) crossing from <2 to ≥2 highlighted proteins -> auto-jump to Multi-feature tab
-    if (currCount >= 2 && prevCount < 2 && hasMultiFeature) {
-      this.handleSVGTabChange(1);
+    const prevSelected = prevProps.selectedProteinId;
+    const currSelected = this.props.selectedProteinId;
+
+    const canChangeTabs = this.props.enableSvgTabChangeOnSelection !== false;
+
+    if (
+      canChangeTabs &&
+      currSelected &&
+      currSelected !== prevSelected &&
+      activeSvgTabIndexEnrichment !== 0
+    ) {
+      this.handleSVGTabChange(0);
+    }
+
+    if (currCount >= 2 && currCount !== prevCount && hasMultiFeature) {
+      if (canChangeTabs) {
+        this.handleSVGTabChange(1);
+      }
       if (this.props.onGetMultifeaturePlotTransitionEnrichment) {
         this.props.onGetMultifeaturePlotTransitionEnrichment();
       }
     }
 
-    // 2) while already on Multi-feature tab, if selection count changes (still ≥2),
-    //    refresh the multi-feature plot
     if (
       activeSvgTabIndexEnrichment === 1 &&
       currCount >= 2 &&
@@ -54,8 +67,12 @@ class SplitPanesContainer extends Component {
       this.props.onGetMultifeaturePlotTransitionEnrichment();
     }
 
-    // 3) if selection drops below 2 while on Multi-feature tab, fall back to single-feature tab
-    if (activeSvgTabIndexEnrichment === 1 && currCount < 2 && prevCount >= 2) {
+    if (
+      canChangeTabs &&
+      activeSvgTabIndexEnrichment === 1 &&
+      currCount < 2 &&
+      prevCount >= 2
+    ) {
       this.handleSVGTabChange(0);
     }
   }
