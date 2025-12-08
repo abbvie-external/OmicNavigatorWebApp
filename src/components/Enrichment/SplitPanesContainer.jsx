@@ -174,7 +174,7 @@ class SplitPanesContainer extends Component {
             attached
             key="1"
             id="TableResultsTab"
-            className="TableResultsTab"
+            className="TableResultsTab two-col-sticky"
             // as="div"
           >
             <FilteredDifferentialTable
