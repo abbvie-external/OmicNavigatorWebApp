@@ -456,16 +456,6 @@ class DifferentialSearch extends Component {
   handleStudyChange = async (evt, { name, value }) => {
     const { onSearchChangeDifferential, onSearchResetDifferential } =
       this.props;
-    onSearchChangeDifferential(
-      {
-        [name]: value,
-        differentialModel: '',
-        differentialTest: '',
-      },
-      true,
-      true,
-    );
-    await this.getAndSetModelOptions(value);
     this.setState({
       differentialStudyHrefVisible: false,
       differentialModelsDisabled: true,
@@ -475,13 +465,22 @@ class DifferentialSearch extends Component {
       differentialTestTooltip: 'Select a test',
     });
     this.props.onGetMultiModelMappingObject(value);
+    onSearchChangeDifferential(
+      {
+        [name]: value,
+        differentialModel: '',
+        differentialTest: '',
+      },
+      true,
+      true,
+    );
     onSearchResetDifferential({
       isValidSearchDifferential: false,
     });
     this.getReportLink(value, 'default');
   };
 
-  setStudyTooltip = () => {
+  setStudyReportTooltip = () => {
     if (this.props.differentialModel !== '') {
       this.setState({
         differentialStudyReportTooltip: `The model ${this.props.differentialModel} from the study ${this.props.differentialStudy} does not have additional analysis details available.`,
@@ -500,7 +499,7 @@ class DifferentialSearch extends Component {
       cancelRequestGetReportLinkDifferential = e;
     });
     omicNavigatorService
-      .getReportLink(study, model, this.setStudyTooltip, cancelToken)
+      .getReportLink(study, model, this.setStudyReportTooltip, cancelToken)
       .then((getReportLinkResponse) => {
         let links = [];
         if (Array.isArray(getReportLinkResponse)) {
@@ -529,7 +528,7 @@ class DifferentialSearch extends Component {
           });
           return;
         }
-        this.setStudyTooltip();
+        this.setStudyReportTooltip();
         this.setState({
           differentialStudyHrefVisible: false,
           differentialStudyHref: '',
