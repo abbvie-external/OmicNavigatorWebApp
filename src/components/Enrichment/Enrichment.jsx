@@ -1602,7 +1602,6 @@ class Enrichment extends Component {
       // Exact match: check if featureArg exists in any column value
       featureData = relevantFeatures.find((row) => {
         const rowValues = Object.values(row);
-        console.log('Row values to check:', rowValues);
         return rowValues.includes(featureArg);
       });
     } else {

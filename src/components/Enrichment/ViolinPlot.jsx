@@ -1566,7 +1566,6 @@ class ViolinPlot extends Component {
               }
             })
             .on('click', (d) => {
-              console.log('click d', d);
               self.isHovering = false;
               d3.event.stopPropagation();
 
