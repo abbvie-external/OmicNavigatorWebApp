@@ -424,6 +424,7 @@ class SplitPanesContainer extends Component {
                     svgTabMax={1}
                     tab={tab}
                     upperPlotsVisible={true}
+                    showFullScreen={false}
                     // selection syncing
                     onHandleAllChecked={() => onHandleProteinSelected([])}
                     onHandleHighlightedFeaturesDifferential={(arr) =>
