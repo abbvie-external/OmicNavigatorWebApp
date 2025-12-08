@@ -1572,7 +1572,6 @@ class Enrichment extends Component {
    * Handles clicks on Plotly multi-feature plots (heatmaps).
    * Finds the clicked feature among highlighted proteins and selects it.
    *
-   * MIRRORS DIFFERENTIAL: DifferentialDetail.handlePlotlyClick
    *
    * @param {string} featureArg - The feature label from Plotly click event
    * @param {boolean} exactLabel - If true, featureArg is exact; if false, it's a substring
@@ -1580,27 +1579,11 @@ class Enrichment extends Component {
   handlePlotlyClickEnrichment = (featureArg, exactLabel) => {
     const { HighlightedProteins } = this.state;
 
-    console.log(
-      'EnrichmentDetail.handlePlotlyClickEnrichment called with:',
-      featureArg,
-      exactLabel,
-      this.props.filteredDifferentialFeatureIdKey,
-    );
-
     const featureKey = this.props.filteredDifferentialFeatureIdKey;
 
-    console.log('Using featureKey:', featureKey);
     const splitPaneData = this.state.filteredDifferentialResults;
 
     if (!splitPaneData?.length || !HighlightedProteins?.length) return;
-    console.log(
-      'EnrichmentDetail.handlePlotlyClickEnrichment splitPaneData length:',
-      splitPaneData,
-    );
-    console.log(
-      'EnrichmentDetail.handlePlotlyClickEnrichment HighlightedProteins length:',
-      HighlightedProteins,
-    );
 
     // Filter to only highlighted proteins (same as Differential)
     const relevantFeatures = splitPaneData.filter((row) =>
@@ -1608,14 +1591,8 @@ class Enrichment extends Component {
         (hp) => (hp.featureID || hp.key || hp.id) === row[featureKey],
       ),
     );
-    console.log(
-      'EnrichmentDetail.handlePlotlyClickEnrichment relevantFeatures:',
-      relevantFeatures,
-    );
 
     let featureData = null;
-    console.log('exactLabel is:', exactLabel);
-    console.log('Searching for featureArg:', featureArg);
     if (exactLabel) {
       // Exact match: check if featureArg exists in any column value
       featureData = relevantFeatures.find((row) => {
@@ -1633,10 +1610,6 @@ class Enrichment extends Component {
         return stringValues.some((v) => featureArg.includes(String(v)));
       });
     }
-    console.log(
-      'EnrichmentDetail.handlePlotlyClickEnrichment found featureData:',
-      featureData,
-    );
     if (featureData) {
       const feature = featureData[featureKey];
       // Use the "from multi plot" handler to avoid auto-switching tabs

@@ -66,11 +66,7 @@ class FilteredDifferentialTable extends Component {
 
     if (this.props.selectedProteinId !== prevProps.selectedProteinId) {
       const { selectedProteinId, HighlightedProteins = [] } = this.props;
-      if (
-        !this.state.rowClicked &&
-        selectedProteinId &&
-        HighlightedProteins.length === 0
-      ) {
+      if (!this.state.rowClicked && selectedProteinId) {
         this.pageToFeature(selectedProteinId);
       }
     }

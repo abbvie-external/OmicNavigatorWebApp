@@ -65,7 +65,6 @@ class BarcodePlot extends Component {
     const HighlightedProteins = this.props.HighlightedProteins || [];
     const selectedProteinId = this.props.selectedProteinId;
 
-    // --- MULTI-SELECTION (ORANGE / RED) UPDATE ---
     if (this.props.HighlightedProteins !== prevProps.HighlightedProteins) {
       if (!this.state.initialLoad) {
         d3.selectAll(`.HighlightedLine`)
@@ -88,25 +87,16 @@ class BarcodePlot extends Component {
                 .attr('style', 'stroke:#ff7e38;stroke-width:3;opacity:1');
             }
           });
-
-          // Clear tooltip states
-          this.setState({
-            hoveredLineId: null,
-            hoveredLineName: null,
-            highlightedLineName: null,
-            tooltipPositionMax: null,
-            tooltipTextAnchorMax: null,
-          });
-        } else {
-          this.setState({
-            hoveredLineId: null,
-            hoveredLineName: null,
-            highlightedLineName: null,
-            tooltipPositionMax: null,
-            tooltipTextAnchorMax: null,
-          });
         }
       }
+
+      this.setState({
+        hoveredLineId: null,
+        hoveredLineName: null,
+        highlightedLineName: null,
+        tooltipPositionMax: null,
+        tooltipTextAnchorMax: null,
+      });
 
       this.setState({ initialLoad: false });
 
@@ -131,6 +121,16 @@ class BarcodePlot extends Component {
     }
   }
 
+  /**
+   * Resets the styling of a previously selected line in the barcode plot
+   *
+   * This method removes the single selection styling from a line and applies the
+   * appropriate styling based on its current state (highlighted, brushed, or neither).
+   *
+   * @param {string} prevSelectedId - The ID of the previously selected protein/feature
+   * @param {Array} highlightedProteins - List of currently highlighted proteins
+   * @returns {void} - Returns early if prevSelectedId is falsy or the line doesn't exist
+   */
   resetPreviousSingleSelected(prevSelectedId, highlightedProteins = []) {
     if (!prevSelectedId) return;
 
