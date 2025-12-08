@@ -449,7 +449,7 @@ class FilteredDifferentialTable extends Component {
 
       if (event.shiftKey) {
         const allTableData =
-          this.props.filteredDifferentialGridRef.current?.qhGridRef.current?.getSortedData() ||
+          this.props.filteredDifferentialGridRef?.current?.qhGridRef.current?.getSortedData() ||
           [];
 
         const anchorId = PreviouslyHighlighted[0]?.featureID;
@@ -474,7 +474,7 @@ class FilteredDifferentialTable extends Component {
       // CTRL or CHECKBOX = multi-toggle (orange)
       else if (event.ctrlKey || clickedInCheckboxCell) {
         const allTableData =
-          this.props.filteredDifferentialGridRef.current?.qhGridRef.current?.getSortedData() ||
+          this.props.filteredDifferentialGridRef?.current?.qhGridRef.current?.getSortedData() ||
           [];
 
         let selectedTableDataArray = [];

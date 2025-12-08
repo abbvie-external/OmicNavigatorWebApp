@@ -1,4 +1,4 @@
-import _ from 'lodash-es';
+import _, { filter } from 'lodash-es';
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { CancelToken } from 'axios';
@@ -192,6 +192,7 @@ class Enrichment extends Component {
     },
     plotMultiFeatureDataLength: 0,
     plotMultiFeatureMax: 1000,
+    multiFeatureBullpenOpen: false,
     enableSvgTabChangeOnSelection: true,
     enrichmentModelsAndAnnotations: [], // listStudies.enrichments
     enrichmentAnnotationIdsCommon: [],
@@ -1567,6 +1568,196 @@ class Enrichment extends Component {
     );
   };
 
+  /**
+   * Handles clicks on Plotly multi-feature plots (heatmaps).
+   * Finds the clicked feature among highlighted proteins and selects it.
+   *
+   * MIRRORS DIFFERENTIAL: DifferentialDetail.handlePlotlyClick
+   *
+   * @param {string} featureArg - The feature label from Plotly click event
+   * @param {boolean} exactLabel - If true, featureArg is exact; if false, it's a substring
+   */
+  handlePlotlyClickEnrichment = (featureArg, exactLabel) => {
+    const { HighlightedProteins } = this.state;
+
+    console.log(
+      'EnrichmentDetail.handlePlotlyClickEnrichment called with:',
+      featureArg,
+      exactLabel,
+      this.props.filteredDifferentialFeatureIdKey,
+    );
+
+    const featureKey = this.props.filteredDifferentialFeatureIdKey;
+
+    console.log('Using featureKey:', featureKey);
+    const splitPaneData = this.state.filteredDifferentialResults;
+
+    if (!splitPaneData?.length || !HighlightedProteins?.length) return;
+    console.log(
+      'EnrichmentDetail.handlePlotlyClickEnrichment splitPaneData length:',
+      splitPaneData,
+    );
+    console.log(
+      'EnrichmentDetail.handlePlotlyClickEnrichment HighlightedProteins length:',
+      HighlightedProteins,
+    );
+
+    // Filter to only highlighted proteins (same as Differential)
+    const relevantFeatures = splitPaneData.filter((row) =>
+      HighlightedProteins.some(
+        (hp) => (hp.featureID || hp.key || hp.id) === row[featureKey],
+      ),
+    );
+    console.log(
+      'EnrichmentDetail.handlePlotlyClickEnrichment relevantFeatures:',
+      relevantFeatures,
+    );
+
+    let featureData = null;
+    console.log('exactLabel is:', exactLabel);
+    console.log('Searching for featureArg:', featureArg);
+    if (exactLabel) {
+      // Exact match: check if featureArg exists in any column value
+      featureData = relevantFeatures.find((row) => {
+        const rowValues = Object.values(row);
+        console.log('Row values to check:', rowValues);
+        return rowValues.includes(featureArg);
+      });
+    } else {
+      // Substring match: check if any non-numeric value contains featureArg
+      featureData = relevantFeatures.find((row) => {
+        const rowValues = Object.values(row);
+        const stringValues = rowValues.filter(
+          (v) => typeof v === 'string' || isNaN(v),
+        );
+        return stringValues.some((v) => featureArg.includes(String(v)));
+      });
+    }
+    console.log(
+      'EnrichmentDetail.handlePlotlyClickEnrichment found featureData:',
+      featureData,
+    );
+    if (featureData) {
+      const feature = featureData[featureKey];
+      // Use the "from multi plot" handler to avoid auto-switching tabs
+      this.handleSingleProteinSelectedFromMultiPlot(feature);
+    }
+  };
+
+  /**
+   * Removes a single feature from the highlighted proteins list.
+   * Called when user clicks the X on an individual feature chip in the gear popup.
+   *
+   * MIRRORS DIFFERENTIAL: DifferentialDetail.removeSelectedFeature
+   * - Filters out the feature
+   * - Calls the central selection handler (handleProteinSelected)
+   * - Triggers debounced plot reload
+   *
+   * @param {string} featureToRemove - The feature key/ID to remove
+   */
+  removeSelectedFeatureEnrichment = (featureToRemove) => {
+    const { HighlightedProteins } = this.state;
+
+    if (!HighlightedProteins?.length) return;
+
+    // Filter out the feature to remove (check all possible key properties)
+    const updatedHighlightedProteins = HighlightedProteins.filter((protein) => {
+      const proteinKey = protein.featureID || protein.key || protein.id;
+      return proteinKey !== featureToRemove;
+    });
+
+    // Use the central selection handler (mirrors Differential's onHandleHighlightedFeaturesDifferential)
+    // This ensures all side effects (barcode/violin/table sync) happen consistently
+    this.handleProteinSelected(updatedHighlightedProteins);
+
+    // Trigger debounced plot reload (mirrors Differential's reloadMultifeaturePlot)
+    this.reloadMultifeaturePlotEnrichment(updatedHighlightedProteins);
+  };
+
+  /**
+   * Debounced reload of multi-feature plot after selection changes.
+   *
+   * MIRRORS DIFFERENTIAL: DifferentialDetail.reloadMultifeaturePlot (1250ms debounce)
+   *
+   * WHY DEBOUNCE: Prevents rapid API calls when user quickly removes multiple features.
+   * WHY PASS ARRAY: Can't rely on this.state.HighlightedProteins because setState is async.
+   *                 The array passed here is the "truth" at call time.
+   *
+   * WHY NOT USE getMultifeaturePlotTransitionEnrichment:
+   * - That method reads from this.state.HighlightedProteins
+   * - After setState, state may not be updated yet (async)
+   * - Passing the array directly ensures we use the correct data
+   *
+   * @param {Array} selectedProteins - The current selection (post-removal)
+   */
+  reloadMultifeaturePlotEnrichment = _.debounce((selectedProteins) => {
+    if (!this.state.plotMultiFeatureAvailable) return;
+
+    // Need 2+ features for multi-feature plot
+    if (!selectedProteins || selectedProteins.length < 2) {
+      // Clear the plot when less than 2 features
+      this.setState({
+        plotMultiFeatureData: { key: null, title: '', svg: [] },
+        plotMultiFeatureDataLength: 0,
+        plotMultiFeatureDataLoaded: true,
+      });
+      return;
+    }
+
+    // Extract feature IDs and call existing API method
+    const featureIds = selectedProteins
+      .map((p) => p.featureID || p.key || p.id)
+      .filter(Boolean);
+
+    if (featureIds.length >= 2) {
+      // Set loading state and fetch
+      this.setState({
+        plotMultiFeatureDataLoaded: false,
+        plotMultiFeatureData: { key: null, title: '', svg: [] },
+        plotMultiFeatureDataLength: 0,
+      });
+      this.getMultifeaturePlotEnrichment(featureIds);
+    }
+  }, 1250);
+
+  /**
+   * Tracks when the gear popup (feature bullpen) opens/closes.
+   *
+   * PURPOSE: Can be used to:
+   * 1. Prevent other click handlers while popup is open
+   * 2. Track UI state for analytics
+   * 3. Coordinate with other components (future features)
+   *
+   * MIRRORS DIFFERENTIAL: DifferentialDetail.handleMultiFeatureBullpenOpenChange
+   *
+   * @param {boolean} isOpen - true if popup is opening, false if closing
+   * @param {boolean} delayClose - true if close should be delayed (for click-outside handling)
+   */
+  handleMultiFeatureBullpenOpenChange = (isOpen, delayClose = false) => {
+    const OVERLAY_CLOSE_DELAY_MS = 10;
+
+    // Clear any pending delayed close
+    if (this.multiFeatureBullpenCloseTimeout) {
+      clearTimeout(this.multiFeatureBullpenCloseTimeout);
+      this.multiFeatureBullpenCloseTimeout = null;
+    }
+
+    if (isOpen) {
+      this.setState({ multiFeatureBullpenOpen: true });
+      return;
+    }
+
+    if (delayClose) {
+      // Delay close slightly to handle click-outside events
+      this.multiFeatureBullpenCloseTimeout = setTimeout(() => {
+        this.setState({ multiFeatureBullpenOpen: false });
+        this.multiFeatureBullpenCloseTimeout = null;
+      }, OVERLAY_CLOSE_DELAY_MS);
+    } else {
+      this.setState({ multiFeatureBullpenOpen: false });
+    }
+  };
+
   getPlot = (featureId) => {
     const {
       enrichmentPlotTypes,
@@ -2369,6 +2560,14 @@ class Enrichment extends Component {
             onSetFilteredDifferentialResults={(filteredDifferentialResults) => {
               this.setState({ filteredDifferentialResults });
             }}
+            // Multi-feature interaction handlers
+            onHandlePlotlyClickEnrichment={this.handlePlotlyClickEnrichment}
+            onRemoveSelectedFeatureEnrichment={
+              this.removeSelectedFeatureEnrichment
+            }
+            onMultiFeatureBullpenOpenChangeEnrichment={
+              this.handleMultiFeatureBullpenOpenChange
+            }
           ></SplitPanesContainer>
         </div>
       );

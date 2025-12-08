@@ -300,6 +300,11 @@ class SplitPanesContainer extends Component {
       SVGPlotLoading,
       plotDataEnrichment,
       plotDataEnrichmentLength,
+      // Data for feature labels in gear popup
+      hasBarcodeData,
+      barcodeSettings,
+      filteredDifferentialResults,
+      filteredDifferentialFeatureIdKey,
     } = this.props;
 
     const { activeSvgTabIndexEnrichment } = this.state;
@@ -308,109 +313,152 @@ class SplitPanesContainer extends Component {
     const contentWidth = width - verticalSplitPaneSize - 300;
     const multiContentWidth = width - verticalSplitPaneSize - 500;
 
-    const contentHeight = height - (horizontalSplitPaneSize || 0) - 51;
+    const contentHeight = height - (horizontalSplitPaneSize || 0) - 55;
+    const multiContentHeight = contentHeight - 45;
+
+    // 1. Determine the feature ID key based on data source
+    const featureIdKey = hasBarcodeData
+      ? 'featureID'
+      : filteredDifferentialFeatureIdKey;
+
+    // 2. Get the table data for label lookups
+    const tableData = hasBarcodeData
+      ? barcodeSettings?.barcodeData || []
+      : filteredDifferentialResults || [];
+
+    // 3. Transform HighlightedProteins to have .key/.id/.value properties
+    //    PlotsMultiFeature expects: { key, id, value } for getFeaturesList()
+    //    Enrichment has: { featureID, sample, cpm }
+    const transformedHighlightedFeatures = (HighlightedProteins || []).map(
+      (protein) => ({
+        ...protein,
+        key: protein.featureID || protein.key || protein.id,
+        id: protein.featureID || protein.key || protein.id,
+        value: protein.featureID || protein.key || protein.id,
+      }),
+    );
 
     return (
-      <Tab
-        className="EnrichmentRightTabs"
-        menu={{ secondary: true, pointing: true }}
-        renderActiveOnly={false}
-        activeIndex={activeSvgTabIndexEnrichment}
-        onTabChange={(e, data) => {
-          const nextIndex = data.activeIndex;
-          this.handleSVGTabChange(nextIndex);
+      <div className="EnrichmentPlots">
+        <Tab
+          className="EnrichmentRightTabs"
+          menu={{ secondary: true, pointing: true }}
+          renderActiveOnly={false}
+          activeIndex={activeSvgTabIndexEnrichment}
+          onTabChange={(e, data) => {
+            const nextIndex = data.activeIndex;
+            this.handleSVGTabChange(nextIndex);
 
-          if (
-            nextIndex === 1 &&
-            plotMultiFeatureAvailable &&
-            (HighlightedProteins?.length || 0) >= 2 &&
-            onGetMultifeaturePlotTransitionEnrichment
-          ) {
-            onGetMultifeaturePlotTransitionEnrichment();
-          }
-        }}
-        panes={[
-          {
-            menuItem: 'Single-Feature Plots',
-            pane: (
-              <Tab.Pane
-                key="single-feature-plots-pane"
-                attached={false}
-                className="SingleFeaturePlotPane"
-              >
-                <EnrichmentSVGPlot
-                  // unified dimensions for single-feature
-                  divWidth={contentWidth}
-                  divHeight={contentHeight}
-                  pxToPtRatio={105}
-                  pointSize={12}
-                  svgTabMax={1}
-                  tab={tab}
-                  plotDataEnrichment={plotDataEnrichment}
-                  plotDataEnrichmentLength={plotDataEnrichmentLength}
-                  svgExportName={svgExportName}
-                  enrichmentPlotTypes={enrichmentPlotTypes}
-                  SVGPlotLoaded={SVGPlotLoaded}
-                  SVGPlotLoading={SVGPlotLoading}
-                  HighlightedProteins={HighlightedProteins}
-                  enrichmentStudy={enrichmentStudy}
-                  enrichmentModel={enrichmentModel}
-                  enrichmentPlotDescriptions={enrichmentPlotDescriptions}
-                />
-              </Tab.Pane>
-            ),
-          },
-          {
-            menuItem: 'Multi-Feature Plots',
-            disabled: !plotMultiFeatureAvailable,
-            pane: (
-              <Tab.Pane
-                attached={false}
-                className="MultiFeaturePlotPane"
-                key="multi-feature-plots-pane"
-              >
-                <PlotsMultiFeature
-                  // enrichment mapped into differential-style props
-                  differentialPlotTypes={enrichmentPlotTypes}
-                  differentialStudy={enrichmentStudy}
-                  differentialModel={enrichmentModel}
-                  differentialTest={enrichmentAnnotation}
-                  differentialTestIdsCommon={
-                    enrichmentAnnotationIdsCommon || []
-                  }
-                  differentialHighlightedFeaturesData={
-                    HighlightedProteins || []
-                  }
-                  modelSpecificMetaFeaturesExist={false}
-                  multiFeaturePlotTypes={enrichmentMultiFeaturePlotTypes || []}
-                  plotMultiFeatureData={plotMultiFeatureData}
-                  plotMultiFeatureDataLoaded={plotMultiFeatureDataLoaded}
-                  plotMultiFeatureDataLength={plotMultiFeatureDataLength}
-                  plotMultiFeatureMax={plotMultiFeatureMax}
-                  svgExportName={svgExportName}
-                  // unified dimensions for multi-feature (same as Differential)
-                  divWidth={multiContentWidth}
-                  divHeight={contentHeight}
-                  pointSize={12}
-                  pxToPtRatio={105}
-                  svgTabMax={1}
-                  tab={tab}
-                  upperPlotsVisible={true}
-                  // selection syncing
-                  onHandleAllChecked={() => onHandleProteinSelected([])}
-                  onHandleHighlightedFeaturesDifferential={(arr) =>
-                    onHandleProteinSelected(arr)
-                  }
-                  onGetMultifeaturePlotTransitionAlt={
-                    onGetMultifeaturePlotTransitionEnrichment
-                  }
-                  onHandlePlotlyClick={() => {}}
-                />
-              </Tab.Pane>
-            ),
-          },
-        ]}
-      />
+            if (
+              nextIndex === 1 &&
+              plotMultiFeatureAvailable &&
+              (HighlightedProteins?.length || 0) >= 2 &&
+              onGetMultifeaturePlotTransitionEnrichment
+            ) {
+              onGetMultifeaturePlotTransitionEnrichment();
+            }
+          }}
+          panes={[
+            {
+              menuItem: 'Single-Feature Plots',
+              pane: (
+                <Tab.Pane
+                  key="single-feature-plots-pane"
+                  attached={false}
+                  className="SingleFeaturePlotPane"
+                >
+                  <EnrichmentSVGPlot
+                    // unified dimensions for single-feature
+                    divWidth={contentWidth}
+                    divHeight={contentHeight}
+                    pxToPtRatio={105}
+                    pointSize={12}
+                    svgTabMax={1}
+                    tab={tab}
+                    plotDataEnrichment={plotDataEnrichment}
+                    plotDataEnrichmentLength={plotDataEnrichmentLength}
+                    svgExportName={svgExportName}
+                    enrichmentPlotTypes={enrichmentPlotTypes}
+                    SVGPlotLoaded={SVGPlotLoaded}
+                    SVGPlotLoading={SVGPlotLoading}
+                    HighlightedProteins={HighlightedProteins}
+                    enrichmentStudy={enrichmentStudy}
+                    enrichmentModel={enrichmentModel}
+                    enrichmentPlotDescriptions={enrichmentPlotDescriptions}
+                  />
+                </Tab.Pane>
+              ),
+            },
+            {
+              menuItem: 'Multi-Feature Plots',
+              disabled: !plotMultiFeatureAvailable,
+              pane: (
+                <Tab.Pane
+                  attached={false}
+                  className="MultiFeaturePlotPane"
+                  key="multi-feature-plots-pane"
+                >
+                  <PlotsMultiFeature
+                    // enrichment mapped into differential-style props
+                    differentialPlotTypes={enrichmentPlotTypes}
+                    differentialStudy={enrichmentStudy}
+                    differentialModel={enrichmentModel}
+                    differentialTest={enrichmentAnnotation}
+                    differentialTestIdsCommon={
+                      enrichmentAnnotationIdsCommon || []
+                    }
+                    // differentialHighlightedFeaturesData={
+                    //   HighlightedProteins || []
+                    // }
+                    modelSpecificMetaFeaturesExist={false}
+                    multiFeaturePlotTypes={
+                      enrichmentMultiFeaturePlotTypes || []
+                    }
+                    plotMultiFeatureData={plotMultiFeatureData}
+                    plotMultiFeatureDataLoaded={plotMultiFeatureDataLoaded}
+                    plotMultiFeatureDataLength={plotMultiFeatureDataLength}
+                    plotMultiFeatureMax={plotMultiFeatureMax}
+                    svgExportName={svgExportName}
+                    // unified dimensions for multi-feature (same as Differential)
+                    divWidth={multiContentWidth}
+                    divHeight={multiContentHeight}
+                    pointSize={12}
+                    pxToPtRatio={105}
+                    svgTabMax={1}
+                    tab={tab}
+                    upperPlotsVisible={true}
+                    // selection syncing
+                    onHandleAllChecked={() => onHandleProteinSelected([])}
+                    onHandleHighlightedFeaturesDifferential={(arr) =>
+                      onHandleProteinSelected(arr)
+                    }
+                    onGetMultifeaturePlotTransitionAlt={
+                      onGetMultifeaturePlotTransitionEnrichment
+                    }
+                    // Interaction handlers
+                    onHandlePlotlyClick={
+                      this.props.onHandlePlotlyClickEnrichment
+                    }
+                    onRemoveSelectedFeature={
+                      this.props.onRemoveSelectedFeatureEnrichment
+                    }
+                    onMultiFeatureBullpenOpenChange={
+                      this.props.onMultiFeatureBullpenOpenChangeEnrichment
+                    }
+                    // Highlighted features (TRANSFORMED with .key property)
+                    differentialHighlightedFeaturesData={
+                      transformedHighlightedFeatures
+                    }
+                    // Table data for label lookups (REQUIRED for getLabelForFeature)
+                    differentialTableData={tableData}
+                    differentialFeatureIdKey={featureIdKey}
+                  />
+                </Tab.Pane>
+              ),
+            },
+          ]}
+        />
+      </div>
     );
   };
 

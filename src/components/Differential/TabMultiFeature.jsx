@@ -29,7 +29,7 @@ class TabMultiFeature extends Component {
     const plotKey = plotMultiFeatureData.key;
     const plotLength = plotMultiFeatureData?.svg.length;
     const plotId =
-      multiFeaturePlotTypes[activeTabIndexPlotsMultiFeature].plotID;
+      multiFeaturePlotTypes[activeTabIndexPlotsMultiFeature]?.plotID;
     const cacheStringArg = `multiFeaturePanes_${activeTabIndexPlotsMultiFeature}_${divHeight}_${divWidth}_${divHeight}_${plotId}_${plotKey}_${plotLength}_${featuresLength}_${featureIdsString}_${differentialStudy}_${differentialModel}_${differentialTest}`;
     this.getSVGPanesMultiFeature(cacheStringArg, featuresLength);
   }

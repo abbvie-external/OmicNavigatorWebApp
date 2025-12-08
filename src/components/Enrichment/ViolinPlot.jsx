@@ -79,17 +79,18 @@ class ViolinPlot extends Component {
       const dOpts = this.chart.dataPlots.options;
       const chartSVG = d3.select(`#${this.props.violinSettings.id}`);
 
-      // Reset all dots back to base blue
+      // Reset all dots back to base blue (Scatter-style)
       d3.selectAll('.vPoint')
         .transition()
         .duration(300)
         .attr('fill', '#1678C2')
         .attr('stroke', '#000')
-        .attr('r', dOpts.pointSize * 1);
+        .attr('stroke-width', 1) // reset width so old singles don't look darker
+        .attr('r', dOpts.pointSize);
 
       chartSVG.selectAll('g.circleText').remove();
 
-      // --- MULTI-SELECT (orange) ---
+      // --- MULTI-SELECT (orange, Scatter-style) ---
       if (HighlightedProteins.length > 0) {
         HighlightedProteins.forEach((element) => {
           const highlightedDotId = element.featureID;
@@ -99,8 +100,9 @@ class ViolinPlot extends Component {
             dot
               .transition()
               .duration(100)
-              .attr('fill', '#FF7E38')
+              .attr('fill', '#ff4400') // same orange as Scatter
               .attr('stroke', '#000')
+              .attr('stroke-width', 1)
               .attr('r', dOpts.pointSize * 1.5);
 
             const circleText = self.chart.objs.svg
@@ -117,28 +119,9 @@ class ViolinPlot extends Component {
               .text(highlightedDotId);
           }
         });
-
-        // Max protein (first in HighlightedProteins) = brighter orange + tooltip
-        if (HighlightedProteins[0]?.featureID) {
-          const maxDotId = HighlightedProteins[0].featureID;
-          const maxDot = d3.select(`circle[id='violin_${maxDotId}']`);
-
-          if (!maxDot.empty()) {
-            maxDot
-              .transition()
-              .duration(100)
-              .attr('fill', '#FF4400')
-              .attr('stroke', '#000')
-              .attr('r', dOpts.pointSize * 2);
-
-            this.maxCircle = maxDotId;
-            this.addToolTiptoMax(HighlightedProteins[0]);
-            maxDot.raise();
-          }
-        }
       }
 
-      // --- SINGLE-SELECT (blue) overlays multi ---
+      // --- SINGLE-SELECT (blue outline) overlays multi ---
       if (selectedProteinId) {
         const selectedDot = d3.select(
           `circle[id='violin_${selectedProteinId}']`,
@@ -151,12 +134,10 @@ class ViolinPlot extends Component {
           selectedDot
             .transition()
             .duration(150)
-            .attr('stroke', '#1678C2')
-            .attr('stroke-width', isAlsoHighlighted ? 2 : 2)
-            // if also in multi, keep it "max" orange fill but with a blue outline
-            .attr('fill', isAlsoHighlighted ? '#FF4400' : '#ffffff')
-            .attr('r', dOpts.pointSize * 2);
-
+            .attr('stroke', '#1678C2') // blue outline
+            .attr('stroke-width', 2)
+            .attr('fill', isAlsoHighlighted ? '#ff4400' : '#ffffff')
+            .attr('r', dOpts.pointSize * 2); // bigger radius
           selectedDot.raise();
         }
       }
@@ -258,57 +239,6 @@ class ViolinPlot extends Component {
     objSize.left = padding + gShift;
     objSize.right = objSize.left + width;
     return objSize;
-  };
-
-  getMaxStat = (array) => {
-    // finds the highest value based on t statistics
-    // used to figure out which dot gets highlighted
-
-    const statArray = array.map((o) => {
-      return o.statistic;
-    });
-    const max = Math.max(...statArray);
-    return max;
-  };
-
-  addToolTiptoMax = (id) => {
-    if (id != null) {
-      const self = this;
-      d3.select(`circle[id='violin_${id.featureID}']`);
-      const cx = Math.ceil(
-        d3.select(`circle[id='violin_${id.featureID}']`).attr('cx'),
-      );
-      const cy = Math.ceil(
-        d3.select(`circle[id='violin_${id.featureID}']`).attr('cy'),
-      );
-
-      const svg = document.getElementById(`${this.props.violinSettings.id}`);
-      let parent = '';
-      parent = document
-        .getElementById(this.props.violinSettings.id)
-        .getBoundingClientRect();
-
-      const shape = document
-        .getElementById(`violin_${id.featureID}`)
-        .getBoundingClientRect();
-      const relative = shape.left - parent.left;
-
-      const res = self.getPos(cx, cy, svg, svg);
-      const opacity = this.state.displayElementTextViolin ? 0 : 1;
-      self.chart.objs.tooltip
-        .transition()
-        .duration(300)
-        .style('left', `${relative + 20}px`)
-        .style('top', `${res.y + 20}px`)
-        .style('opacity', () => {
-          return opacity;
-        })
-        .style('display', null);
-      id.cpm = _.find(this.props.barcodeSettings.barcodeData, function (o) {
-        return o.featureID === id.featureID;
-      }).logFoldChange;
-      this.tooltipHover(id);
-    }
   };
 
   getPos = (x, y, svg, element) => {
@@ -1496,15 +1426,42 @@ class ViolinPlot extends Component {
         return;
       }
 
-      //Double Click Behavior
-      self.chart.objs.svg.on('dblclick', function () {
-        d3.selectAll(`.violin-tooltip`).style('display', 'none');
-        self.brushedData = [];
-        self.clearBrush(self);
-        const chartSVG = d3.select(`#${self.props.violinSettings.id}`);
-        chartSVG.selectAll('.brushed').classed('brushed', false);
-        self.props.onHandleProteinSelected([]);
-      });
+      self.chart.objs.svg
+        .on('click', function () {
+          const target = d3.event.target || {};
+          const tagName = (target.tagName || '').toLowerCase();
+
+          // Ignore clicks on circles; those are handled on the point itself
+          if (tagName === 'circle') return;
+
+          // Clear tooltip & brush visuals
+          d3.selectAll('.violin-tooltip').style('display', 'none');
+          self.brushedData = [];
+          self.clearBrush(self);
+          const chartSVG = d3.select(`#${self.props.violinSettings.id}`);
+          chartSVG.selectAll('.brushed').classed('brushed', false);
+
+          // Clear multi + single selection (Scatter-style background click)
+          if (self.props.onHandleProteinSelected) {
+            self.props.onHandleProteinSelected([]);
+          }
+          if (self.props.onHandleSingleProteinSelected) {
+            self.props.onHandleSingleProteinSelected(null);
+          }
+        })
+        .on('dblclick', function () {
+          // Same clear as click +
+          d3.selectAll('.violin-tooltip').style('display', 'none');
+          self.brushedData = [];
+          self.clearBrush(self);
+          const chartSVG = d3.select(`#${self.props.violinSettings.id}`);
+          chartSVG.selectAll('.brushed').classed('brushed', false);
+
+          // Zoom placeholder hook (like Scatter's handleSVGClick(true))
+          if (typeof self.zoomWithBrushPlaceholder === 'function') {
+            self.zoomWithBrushPlaceholder([]);
+          }
+        });
 
       Object.keys(self.chart.groupObjs).forEach((cName) => {
         if (Object.prototype.hasOwnProperty.call(self.chart.groupObjs, cName)) {
@@ -1521,45 +1478,18 @@ class ViolinPlot extends Component {
               pt < self.chart.groupObjs[cName].values.length;
               pt += 1
             ) {
-              const max = self.getMaxStat(self.chart.groupObjs[cName].values);
+              const idMult = self.chart.groupObjs[cName].values[pt].featureID;
+
               cPlot.objs.points.pts.push(
                 cPlot.objs.points.g
                   .append('circle')
-                  .attr('id', (d) => {
-                    // return (
-                    //   'violin_' +
-                    //   self.chart.groupObjs[cName].values[pt][
-                    //     self.chart.settings.pointUniqueId
-                    //   ].replace(/\./g, '')
-                    // );
-                    // const id = self.chart.groupObjs[cName].values[pt][
-                    //   self.props.violinSettings.pointUniqueId
-                    // ].replace(/\./g, '');
-                    const idMult =
-                      self.chart.groupObjs[cName].values[pt].featureID;
-                    return `violin_${idMult}`;
-                  })
+                  .attr('id', () => `violin_${idMult}`)
                   .attr('class', `point ${self.props.violinSettings.id} vPoint`)
-                  .attr('stroke', 'black')
-                  // .attr('r', dOpts.pointSize / 2) // Options is diameter, r takes radius so divide by 2
-                  .attr('r', () => {
-                    if (
-                      self.chart.groupObjs[cName].values[pt].statistic === max
-                    ) {
-                      return dOpts.pointSize * 2;
-                    }
-                    return dOpts.pointSize * 1;
-                  })
-                  .attr('fill', (d) => {
-                    if (
-                      self.chart.groupObjs[cName].values[pt].statistic === max
-                    ) {
-                      const id = self.chart.groupObjs[cName].values[pt];
-                      self.maxCircle = id;
-                      return '#FF4400';
-                    }
-                    return self.chart.dataPlots.colorFunct(cName);
-                  }),
+                  // Base style similar to Scatter before selection kicks in
+                  .attr('stroke', '#aab1c0')
+                  .attr('stroke-width', 0.4)
+                  .attr('r', dOpts.pointSize)
+                  .attr('fill', self.chart.dataPlots.colorFunct(cName)),
               );
             }
           }
@@ -1576,34 +1506,25 @@ class ViolinPlot extends Component {
             .data(circleData)
             .attr('pointer-events', 'all')
             .on('mouseover', (d) => {
-              // var id = d.sample.replace(/\;/g, "_");
-              // self.dotHover.emit({ object: d, action: 'mouseover' });
               self.isHovering = true;
-              if (self.maxCircle === d.featureID) {
-                d3.select(`circle[id='violin_${d.featureID}']`)
-                  .transition()
-                  .duration(100)
-                  .attr('cursor', 'pointer')
-                  .attr('r', dOpts.pointSize * 2.5);
-              } else {
-                d3.select(`circle[id='violin_${d.featureID}']`)
-                  .transition()
-                  .duration(100)
-                  .attr('cursor', 'pointer')
-                  .attr('r', dOpts.pointSize * 2);
-              }
+
+              d3.select(`circle[id='violin_${d.featureID}']`)
+                .transition()
+                .duration(100)
+                .attr('cursor', 'pointer')
+                .attr('r', dOpts.pointSize * 2); // same hover behavior for all
+
               if (self.props.violinSettings.tooltip.show) {
                 const m = d3.mouse(self.chart.objs.chartDiv.node());
                 const opacity = this.state.displayElementTextViolin ? 0 : 1;
+
                 self.chart.objs.tooltip
                   .style('left', `${m[0] + 10}px`)
                   .style('top', `${m[1] - 10}px`)
                   .transition()
                   .delay(500)
                   .duration(500)
-                  .style('opacity', () => {
-                    return opacity;
-                  })
+                  .style('opacity', opacity)
                   .style('fill', '#f46d43')
                   .style('display', null);
 
@@ -1625,26 +1546,20 @@ class ViolinPlot extends Component {
                   );
                   const isSingle = selectedProteinId === x.featureID;
 
-                  // Keep max circle visually larger
-                  if (self.maxCircle === x.featureID) {
-                    return dOpts.pointSize * 2;
-                  }
                   if (isSingle) {
                     return dOpts.pointSize * 2;
                   }
                   if (isMulti) {
                     return dOpts.pointSize * 1.5;
                   }
-                  return dOpts.pointSize * 1;
+                  return dOpts.pointSize;
                 });
 
               if (self.isHovering) {
-                if (self.maxCircle !== d.featureID) {
-                  self.chart.objs.tooltip
-                    .transition()
-                    .duration(500)
-                    .style('opacity', 0);
-                }
+                self.chart.objs.tooltip
+                  .transition()
+                  .duration(500)
+                  .style('opacity', 0);
               }
             })
             .on('click', (d) => {
