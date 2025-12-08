@@ -395,12 +395,10 @@ class FilteredDifferentialTable extends Component {
     /* eslint-disable eqeqeq */
     const highlightedIds = HighlightedProteins.map((p) => p.featureID);
     const featureId = item[filteredDifferentialFeatureIdKey];
-    // MULTI: orange rows (same as Differential .rowHighlightOther)
     if (highlightedIds.includes(featureId)) {
       className = 'rowHighlightOther';
     }
 
-    // SINGLE: blue outline (same as Differential #rowOutline)
     if (featureId === selectedProteinId) {
       id = 'rowOutline';
     }

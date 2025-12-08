@@ -1462,12 +1462,6 @@ class Enrichment extends Component {
     this.setState(emptyArr);
   };
 
-  // handleFilteredDifferentialFeatureIdKey = (name, id) => {
-  //   this.setState({
-  //     [name]: id,
-  //   });
-  // };
-
   handleProteinSelected = (toHighlightArray) => {
     const featureID = this.state.hasBarcodeData
       ? 'featureID'
@@ -1477,7 +1471,6 @@ class Enrichment extends Component {
       ? this.state.barcodeSettings.barcodeData
       : this.state.filteredDifferentialResults;
 
-    // Only care about valid data; this stays multi-only
     if (splitPaneData?.length > 0 && Array.isArray(toHighlightArray)) {
       const sortedArray = [...toHighlightArray].sort(
         (a, b) => b.statistic - a.statistic,
@@ -1491,9 +1484,14 @@ class Enrichment extends Component {
         HighlightedProteins: [],
       });
     }
-    // IMPORTANT: no getPlot and no selectedProteinId here.
   };
 
+  /**
+   * Handles the selection of a single protein in the visualization.
+   *
+   * @param {string} featureId - The ID of the protein feature to select.
+   * @returns {void}
+   */
   handleSingleProteinSelected = (featureId) => {
     const featureKey = this.state.hasBarcodeData
       ? 'featureID'
@@ -1556,6 +1554,13 @@ class Enrichment extends Component {
     );
   };
 
+  /**
+   * Handles protein selection triggered from the MultiFeature plot.
+   *
+   * @param {string} featureId - The ID of the protein feature to select.
+   * @returns {void}
+   *
+   */
   handleSingleProteinSelectedFromMultiPlot = (featureId) => {
     // MultiFeature Plotly click → DO NOT auto-switch tabs
     this.setState(
@@ -1621,10 +1626,6 @@ class Enrichment extends Component {
    * Removes a single feature from the highlighted proteins list.
    * Called when user clicks the X on an individual feature chip in the gear popup.
    *
-   * MIRRORS DIFFERENTIAL: DifferentialDetail.removeSelectedFeature
-   * - Filters out the feature
-   * - Calls the central selection handler (handleProteinSelected)
-   * - Triggers debounced plot reload
    *
    * @param {string} featureToRemove - The feature key/ID to remove
    */
@@ -1649,12 +1650,6 @@ class Enrichment extends Component {
 
   /**
    * Debounced reload of multi-feature plot after selection changes.
-   *
-   * MIRRORS DIFFERENTIAL: DifferentialDetail.reloadMultifeaturePlot (1250ms debounce)
-   *
-   * WHY DEBOUNCE: Prevents rapid API calls when user quickly removes multiple features.
-   * WHY PASS ARRAY: Can't rely on this.state.HighlightedProteins because setState is async.
-   *                 The array passed here is the "truth" at call time.
    *
    * WHY NOT USE getMultifeaturePlotTransitionEnrichment:
    * - That method reads from this.state.HighlightedProteins
@@ -1696,12 +1691,6 @@ class Enrichment extends Component {
   /**
    * Tracks when the gear popup (feature bullpen) opens/closes.
    *
-   * PURPOSE: Can be used to:
-   * 1. Prevent other click handlers while popup is open
-   * 2. Track UI state for analytics
-   * 3. Coordinate with other components (future features)
-   *
-   * MIRRORS DIFFERENTIAL: DifferentialDetail.handleMultiFeatureBullpenOpenChange
    *
    * @param {boolean} isOpen - true if popup is opening, false if closing
    * @param {boolean} delayClose - true if close should be delayed (for click-outside handling)

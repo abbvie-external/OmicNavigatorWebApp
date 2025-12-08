@@ -1428,6 +1428,9 @@ class ViolinPlot extends Component {
 
       self.chart.objs.svg
         .on('click', function () {
+          if (self.props.multiFeatureBullpenOpen) {
+            return;
+          }
           const target = d3.event.target || {};
           const tagName = (target.tagName || '').toLowerCase();
 

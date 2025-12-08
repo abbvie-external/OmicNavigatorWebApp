@@ -272,7 +272,7 @@ class SplitPanesContainer extends Component {
     localStorage.setItem(`${paneType}SplitPaneSize`, size);
   };
 
-  renderRightBottomTabs = (
+  renderFeaturePlotTabs = (
     width,
     height,
     verticalSplitPaneSize,
@@ -407,9 +407,6 @@ class SplitPanesContainer extends Component {
                     differentialTestIdsCommon={
                       enrichmentAnnotationIdsCommon || []
                     }
-                    // differentialHighlightedFeaturesData={
-                    //   HighlightedProteins || []
-                    // }
                     modelSpecificMetaFeaturesExist={false}
                     multiFeaturePlotTypes={
                       enrichmentMultiFeaturePlotTypes || []
@@ -445,11 +442,9 @@ class SplitPanesContainer extends Component {
                     onMultiFeatureBullpenOpenChange={
                       this.props.onMultiFeatureBullpenOpenChangeEnrichment
                     }
-                    // Highlighted features (TRANSFORMED with .key property)
                     differentialHighlightedFeaturesData={
                       transformedHighlightedFeatures
                     }
-                    // Table data for label lookups (REQUIRED for getLabelForFeature)
                     differentialTableData={tableData}
                     differentialFeatureIdKey={featureIdKey}
                   />
@@ -544,7 +539,7 @@ class SplitPanesContainer extends Component {
                     </div>
 
                     <div id="SVGSplitContainer">
-                      {this.renderRightBottomTabs(
+                      {this.renderFeaturePlotTabs(
                         width,
                         height,
                         verticalSplitPaneSize,
@@ -607,7 +602,7 @@ class SplitPanesContainer extends Component {
                 <div id="ViolinAndTableSplitContainer">{ViolinAndTable}</div>
 
                 <div id="SVGSplitContainer">
-                  {this.renderRightBottomTabs(
+                  {this.renderFeaturePlotTabs(
                     width,
                     height,
                     verticalSplitPaneSize,

@@ -169,6 +169,22 @@ class BarcodePlot extends Component {
     }
   }
 
+  /**
+   * Applies styling to a single selected protein line in a barcode visualization.
+   *
+   * @param {string} selectedId - The ID of the selected protein feature to style.
+   * @param {Array} highlightedProteins - An array of proteins that are currently highlighted in the visualization.
+   *                                     Default is an empty array if no proteins are highlighted.
+   * @returns {void} - Returns early if no selectedId is provided or if the line element doesn't exist.
+   *
+   * This method styles a selected protein line in the barcode visualization by:
+   * 1. Adding the 'SingleSelectedLine' CSS class to the line
+   * 2. Setting its vertical position based on margin settings
+   * 3. Applying different styling based on whether the protein is also in the highlighted set:
+   *    - Orange color (#ff7e38) if the protein is also highlighted
+   *    - Blue color (#0066f5) if the protein is only selected but not highlighted
+   * Both styling options use increased stroke width (3.5) and full opacity (1).
+   */
   applySingleSelectedStyle(selectedId, highlightedProteins = []) {
     if (!selectedId) return;
 

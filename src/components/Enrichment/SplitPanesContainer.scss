@@ -74,8 +74,6 @@
     position: relative;
     overflow: visible; /* allow content and export to show fully */
 
-    /* If you still need generic spacing for other "ShowBlock" elements,
-     keep it, but explicitly exclude the export bar. */
     .ShowBlock:not(.export-svg) {
       margin-right: 30px;
     }
@@ -196,14 +194,13 @@
   .item {
     line-height: 0.5 !important;
   }
-  // border: 0px !important;
+
   a.active:last-child {
     border-color: var(--color-primary) !important;
-    // border-width: 4px !important;
   }
+
   a.active:first-child {
     border-color: var(--color-link) !important;
-    // border-width: 4px !important;
   }
 }
 .EnrichmentPlots {
@@ -220,7 +217,6 @@
 
   /* Treat differentialDetailSvgContainer as our "svgContainerEnrichment" for multi-feature */
   .MultiFeaturePlotPane .differentialDetailSvgContainer {
-    /* mimic .svgContainerEnrichment's layout, but adapted for split pane */
     height: 100%;
     width: 100%;
     margin: 0px 15px 0px 15px;
@@ -234,12 +230,11 @@
     flex: 1 1 auto;
     width: 100% !important;
     height: 100% !important;
-    min-height: 0 !important; /* override 75vh-style assumptions */
+    min-height: 0 !important;
   }
 
-  /* Use the same export behavior as single-feature Enrichment */
   .MultiFeaturePlotPane .export-svg {
-    margin: 5px 20px 5px 0px !important; /* same numbers as .svgContainerEnrichment .export-svg */
+    margin: 5px 20px 5px 0px !important;
     position: absolute;
     right: 0;
     top: 0;
