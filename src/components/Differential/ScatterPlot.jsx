@@ -592,7 +592,7 @@ class ScatterPlot extends Component {
 
           if (d3.event.metaKey || d3.event.ctrlKey) {
             // control-click dot
-            if (elem.attr('class').endsWith('highlighted')) {
+            if (elem.attr('class').includes('highlighted')) {
               let elemData = JSON.parse(
                 elem._groups[0][0].attributes.data.value,
               );
