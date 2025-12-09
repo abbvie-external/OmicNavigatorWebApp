@@ -28,6 +28,12 @@
     min-height: 75vh !important;
   }
 
+  .export-svg {
+    margin: 5px 20px 5px 0px !important;
+    position: absolute;
+    right: 0;
+  }
+
   // .DiffTableIcon {
   //   display: none !important;
   //   position: absolute !important;
@@ -41,12 +47,6 @@
     margin: 40px auto !important;
     width: 300px !important;
   }
-}
-
-.export-svg {
-  margin: 5px 20px 5px 0px !important;
-  position: absolute;
-  right: 0;
 }
 
 // .TwoPlotsDiv {

@@ -44,70 +44,104 @@ class ViolinPlot extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    const { violinData, HighlightedProteins } = this.props;
+    const {
+      violinData,
+      HighlightedProteins = [],
+      selectedProteinId,
+    } = this.props;
+
+    // 1. Rebuild violin if the underlying data changed
     if (violinData !== prevProps.violinData) {
       const label = this.props.barcodeSettings.statLabel;
-      let prevValues = prevProps?.violinData?.[label]?.values ?? [];
-      let currentValues = violinData?.[label]?.values ?? [];
-      var isSame =
+      const prevValues = prevProps?.violinData?.[label]?.values ?? [];
+      const currentValues = violinData?.[label]?.values ?? [];
+      const isSame =
         prevValues.length === currentValues.length &&
         prevValues.every(
           (o, i) =>
-            Object.keys(o).length === Object.keys(currentValues[i]).length &&
+            Object.keys(o).length ===
+              Object.keys(currentValues[i] || {}).length &&
             Object.keys(o).every((k) => o[k] === currentValues[i][k]),
         );
+
       if (!isSame) {
         this.initiateViolinPlot(true);
       }
     }
-    if (HighlightedProteins !== prevProps.HighlightedProteins) {
+
+    const multiChanged = HighlightedProteins !== prevProps.HighlightedProteins;
+    const singleChanged = selectedProteinId !== prevProps.selectedProteinId;
+
+    // 2. Update dot styling when either multi or single selection changes
+    if ((multiChanged || singleChanged) && this.chart && this.chart.dataPlots) {
       const self = this;
       this.isHovering = false;
-      // set all dots back to small, blue
       const dOpts = this.chart.dataPlots.options;
-      d3.selectAll(`.vPoint`)
+      const chartSVG = d3.select(`#${this.props.violinSettings.id}`);
+
+      // Reset all dots back to base blue (Scatter-style)
+      d3.selectAll('.vPoint')
         .transition()
         .duration(300)
         .attr('fill', '#1678C2')
-        .attr('r', dOpts.pointSize * 1);
-      const chartSVG = d3.select(`#${this.props.violinSettings.id}`);
+        .attr('stroke', '#000')
+        .attr('stroke-width', 1) // reset width so old singles don't look darker
+        .attr('r', dOpts.pointSize);
+
       chartSVG.selectAll('g.circleText').remove();
+
+      // --- MULTI-SELECT (orange, Scatter-style) ---
       if (HighlightedProteins.length > 0) {
         HighlightedProteins.forEach((element) => {
           const highlightedDotId = element.featureID;
           const dot = d3.select(`circle[id='violin_${highlightedDotId}']`);
-          dot
-            .transition()
-            .duration(100)
-            .attr('fill', '#FF7E38')
-            .attr('stroke', '#000')
-            .attr('r', dOpts.pointSize * 1.5);
-          const circleText = self.chart.objs.svg
-            .append('g')
-            .attr('class', 'circleText');
-          circleText
-            .append('text')
-            .attr('x', parseInt(dot.attr('cx')) + parseInt(70))
-            .attr('y', parseInt(dot.attr('cy')) + parseInt(20))
-            .style('fill', 'black')
-            .attr('font-size', '10px')
-            .attr('font-family', 'Arial')
-            .text(highlightedDotId);
+
+          if (!dot.empty()) {
+            dot
+              .transition()
+              .duration(100)
+              .attr('fill', '#ff4400') // same orange as Scatter
+              .attr('stroke', '#000')
+              .attr('stroke-width', 1)
+              .attr('r', dOpts.pointSize * 1.5);
+
+            const circleText = self.chart.objs.svg
+              .append('g')
+              .attr('class', 'circleText');
+
+            circleText
+              .append('text')
+              .attr('x', parseInt(dot.attr('cx'), 10) + 70)
+              .attr('y', parseInt(dot.attr('cy'), 10) + 20)
+              .style('fill', 'black')
+              .attr('font-size', '10px')
+              .attr('font-family', 'Arial')
+              .text(highlightedDotId);
+          }
         });
       }
-      // if max protein exists, get id
-      if (HighlightedProteins[0]?.featureID) {
-        const maxDotId = HighlightedProteins[0].featureID;
-        d3.select(`circle[id='violin_${maxDotId}']`)
-          .transition()
-          .duration(100)
-          .attr('fill', '#FF4400')
-          .attr('stroke', '#000')
-          .attr('r', dOpts.pointSize * 2);
-        this.maxCircle = maxDotId;
-        this.addToolTiptoMax(HighlightedProteins[0]);
-        d3.select(`circle[id='violin_${maxDotId}']`).raise();
+
+      // --- SINGLE-SELECT (blue outline) overlays multi ---
+      if (selectedProteinId) {
+        const selectedDot = d3.select(
+          `circle[id='violin_${selectedProteinId}']`,
+        );
+        if (!selectedDot.empty()) {
+          const isAlsoHighlighted = HighlightedProteins.some(
+            (p) => p.featureID === selectedProteinId,
+          );
+
+          selectedDot
+            .transition()
+            .duration(150)
+            .attr('stroke', '#1678C2') // blue outline
+            .attr('stroke-width', 2)
+            .attr('fill', isAlsoHighlighted ? '#ff4400' : '#ffffff')
+            .attr('r', dOpts.pointSize * 2); // bigger radius
+          selectedDot.raise();
+        }
       }
+
       const opacityVar = this.state.displayElementTextViolin ? 1 : 0;
       chartSVG.selectAll('g.circleText').attr('opacity', opacityVar);
     }
@@ -207,57 +241,6 @@ class ViolinPlot extends Component {
     return objSize;
   };
 
-  getMaxStat = (array) => {
-    // finds the highest value based on t statistics
-    // used to figure out which dot gets highlighted
-
-    const statArray = array.map((o) => {
-      return o.statistic;
-    });
-    const max = Math.max(...statArray);
-    return max;
-  };
-
-  addToolTiptoMax = (id) => {
-    if (id != null) {
-      const self = this;
-      d3.select(`circle[id='violin_${id.featureID}']`);
-      const cx = Math.ceil(
-        d3.select(`circle[id='violin_${id.featureID}']`).attr('cx'),
-      );
-      const cy = Math.ceil(
-        d3.select(`circle[id='violin_${id.featureID}']`).attr('cy'),
-      );
-
-      const svg = document.getElementById(`${this.props.violinSettings.id}`);
-      let parent = '';
-      parent = document
-        .getElementById(this.props.violinSettings.id)
-        .getBoundingClientRect();
-
-      const shape = document
-        .getElementById(`violin_${id.featureID}`)
-        .getBoundingClientRect();
-      const relative = shape.left - parent.left;
-
-      const res = self.getPos(cx, cy, svg, svg);
-      const opacity = this.state.displayElementTextViolin ? 0 : 1;
-      self.chart.objs.tooltip
-        .transition()
-        .duration(300)
-        .style('left', `${relative + 20}px`)
-        .style('top', `${res.y + 20}px`)
-        .style('opacity', () => {
-          return opacity;
-        })
-        .style('display', null);
-      id.cpm = _.find(this.props.barcodeSettings.barcodeData, function (o) {
-        return o.featureID === id.featureID;
-      }).logFoldChange;
-      this.tooltipHover(id);
-    }
-  };
-
   getPos = (x, y, svg, element) => {
     const p = svg.createSVGPoint();
     const ctm = element.getCTM();
@@ -274,65 +257,94 @@ class ViolinPlot extends Component {
   };
 
   makeBrush() {
-    var self = this;
-    // const brushingStart = function() {
-    // };
-    const highlightBrushedCircles = function () {
-      const circles = d3.selectAll(
-        '.' + self.props.violinSettings.id + '.vPoint',
-      );
-      if (d3.event.selection != null) {
-        const brush_coords = d3.brushSelection(this);
-        // style brushed circles
-        // tslint:disable-next-line:no-shadowed-variable
-        const isBrushed = function (brush_coords, cx, cy) {
-          const x0 = brush_coords[0][0],
-            x1 = brush_coords[1][0],
-            y0 = brush_coords[0][1],
-            y1 = brush_coords[1][1];
+    const self = this;
 
-          const brushTest = x0 <= cx && cx <= x1 && y0 <= cy && cy <= y1;
-          return brushTest;
-        };
-        const chartSVG = d3.select(`#${self.props.violinSettings.id}`);
-        chartSVG.selectAll('.brushed').classed('brushed', false);
-        const brushed = circles
-          .filter(function () {
-            const cx = d3.select(this).attr('cx'),
-              cy = d3.select(this).attr('cy');
-            return isBrushed(brush_coords, cx, cy);
-          })
-          .attr(
-            'class',
-            'brushed point ' + self.props.violinSettings.id + ' vPoint',
-          )
-          .attr('opacity', 1.0);
-        circles.filter(function () {
-          const cx = d3.select(this).attr('cx'),
-            cy = d3.select(this).attr('cy');
-          return !isBrushed(brush_coords, cx, cy);
+    const highlightBrushedCircles = function (event) {
+      // D3 v6+ passes the event as first arg. Fall back to d3.brushSelection(this) for safety.
+      const brushCoords = (event && event.selection) || d3.brushSelection(this);
+      if (!brushCoords) return; // nothing selected
+      const isBrushed = function (coords, cx, cy) {
+        const x0 = coords[0][0];
+        const x1 = coords[1][0];
+        const y0 = coords[0][1];
+        const y1 = coords[1][1];
+        return x0 <= cx && cx <= x1 && y0 <= cy && cy <= y1;
+      };
+
+      // Select all plotted points and scope to this chart by class if needed
+      let circles = d3.selectAll('.vPoint');
+      if (self.props.violinSettings && self.props.violinSettings.id) {
+        // safer than building a fragile combined selector string
+        circles = circles.filter(function () {
+          return d3.select(this).classed(self.props.violinSettings.id);
         });
-        self.brushedData = brushed.data();
-        if (self.brushedData.length > 0) {
-          const sortedData = self.brushedData.sort(
+      }
+
+      const chartSVG = d3.select(`#${self.props.violinSettings.id}`);
+
+      // Clear previous brushed styling
+      chartSVG.selectAll('.brushed').classed('brushed', false);
+
+      const brushed = circles
+        .filter(function () {
+          const cx = +d3.select(this).attr('cx');
+          const cy = +d3.select(this).attr('cy');
+          return isBrushed(brushCoords, cx, cy);
+        })
+        .attr(
+          'class',
+          'brushed point ' + self.props.violinSettings.id + ' vPoint',
+        )
+        .attr('opacity', 1.0);
+      const brushedData = brushed.data() || [];
+      const sourceEvent = (event && event.sourceEvent) || {};
+      const isShift = !!d3.event.sourceEvent.shiftKey;
+      const isCtrlOrMeta = !!sourceEvent.ctrlKey || !!sourceEvent.metaKey;
+
+      if (brushedData.length > 0) {
+        if (isShift) {
+          // SHIFT + brush => multi-select (Scatter-style)
+          const sortedData = [...brushedData].sort(
             (a, b) => b.statistic - a.statistic,
           );
-          self.props.onHandleProteinSelected(sortedData);
+          self.brushedData = sortedData;
+          if (self.props.onHandleProteinSelected) {
+            const formatted = sortedData.map((d) => ({
+              sample: d.sample,
+              featureID: d.featureID,
+              cpm: d.statistic,
+            }));
+            self.props.onHandleProteinSelected(formatted);
+          }
+        } else {
+          // CTRL or normal brush => fallback/zoom placeholder
+          self.brushedData = [];
+          if (typeof self.zoomWithBrushPlaceholder === 'function') {
+            self.zoomWithBrushPlaceholder(brushedData);
+          }
         }
+
+        // Clear brush only when a non-empty selection happened
+        self.clearBrush(self);
       }
     };
+
+    // Use inner chart area (the group is translated by margins) so coords align with circle cx/cy
     self.chart.objs.brush = d3
       .brush()
       .extent([
         [0, 0],
-        [self.state.violinContainerWidth, self.state.violinContainerHeight],
+        [self.chart.width, self.chart.height],
       ])
-      // .on('start', brushingStart)
-      // .on('brush', highlightBrushedCircles);
+      .filter(() => true) // allow modifier keys like SHIFT/Ctrl
+      .keyModifiers(false) // mirror scatter behavior
       .on('end', highlightBrushedCircles);
+
+    // Append brush to the translated chart group (chart.objs.g)
     self.chart.objs.g
       .append('g')
       .attr('class', 'violinBrush')
+      .attr('fill', 'none')
       .call(self.chart.objs.brush);
   }
 
@@ -1414,15 +1426,45 @@ class ViolinPlot extends Component {
         return;
       }
 
-      //Double Click Behavior
-      self.chart.objs.svg.on('dblclick', function () {
-        d3.selectAll(`.violin-tooltip`).style('display', 'none');
-        self.brushedData = [];
-        self.clearBrush(self);
-        const chartSVG = d3.select(`#${self.props.violinSettings.id}`);
-        chartSVG.selectAll('.brushed').classed('brushed', false);
-        self.props.onHandleProteinSelected([]);
-      });
+      self.chart.objs.svg
+        .on('click', function () {
+          if (self.props.multiFeatureBullpenOpen) {
+            return;
+          }
+          const target = d3.event.target || {};
+          const tagName = (target.tagName || '').toLowerCase();
+
+          // Ignore clicks on circles; those are handled on the point itself
+          if (tagName === 'circle') return;
+
+          // Clear tooltip & brush visuals
+          d3.selectAll('.violin-tooltip').style('display', 'none');
+          self.brushedData = [];
+          self.clearBrush(self);
+          const chartSVG = d3.select(`#${self.props.violinSettings.id}`);
+          chartSVG.selectAll('.brushed').classed('brushed', false);
+
+          // Clear multi + single selection (Scatter-style background click)
+          if (self.props.onHandleProteinSelected) {
+            self.props.onHandleProteinSelected([]);
+          }
+          if (self.props.onHandleSingleProteinSelected) {
+            self.props.onHandleSingleProteinSelected(null);
+          }
+        })
+        .on('dblclick', function () {
+          // Same clear as click +
+          d3.selectAll('.violin-tooltip').style('display', 'none');
+          self.brushedData = [];
+          self.clearBrush(self);
+          const chartSVG = d3.select(`#${self.props.violinSettings.id}`);
+          chartSVG.selectAll('.brushed').classed('brushed', false);
+
+          // Zoom placeholder hook (like Scatter's handleSVGClick(true))
+          if (typeof self.zoomWithBrushPlaceholder === 'function') {
+            self.zoomWithBrushPlaceholder([]);
+          }
+        });
 
       Object.keys(self.chart.groupObjs).forEach((cName) => {
         if (Object.prototype.hasOwnProperty.call(self.chart.groupObjs, cName)) {
@@ -1439,45 +1481,18 @@ class ViolinPlot extends Component {
               pt < self.chart.groupObjs[cName].values.length;
               pt += 1
             ) {
-              const max = self.getMaxStat(self.chart.groupObjs[cName].values);
+              const idMult = self.chart.groupObjs[cName].values[pt].featureID;
+
               cPlot.objs.points.pts.push(
                 cPlot.objs.points.g
                   .append('circle')
-                  .attr('id', (d) => {
-                    // return (
-                    //   'violin_' +
-                    //   self.chart.groupObjs[cName].values[pt][
-                    //     self.chart.settings.pointUniqueId
-                    //   ].replace(/\./g, '')
-                    // );
-                    // const id = self.chart.groupObjs[cName].values[pt][
-                    //   self.props.violinSettings.pointUniqueId
-                    // ].replace(/\./g, '');
-                    const idMult =
-                      self.chart.groupObjs[cName].values[pt].featureID;
-                    return `violin_${idMult}`;
-                  })
+                  .attr('id', () => `violin_${idMult}`)
                   .attr('class', `point ${self.props.violinSettings.id} vPoint`)
-                  .attr('stroke', 'black')
-                  // .attr('r', dOpts.pointSize / 2) // Options is diameter, r takes radius so divide by 2
-                  .attr('r', () => {
-                    if (
-                      self.chart.groupObjs[cName].values[pt].statistic === max
-                    ) {
-                      return dOpts.pointSize * 2;
-                    }
-                    return dOpts.pointSize * 1;
-                  })
-                  .attr('fill', (d) => {
-                    if (
-                      self.chart.groupObjs[cName].values[pt].statistic === max
-                    ) {
-                      const id = self.chart.groupObjs[cName].values[pt];
-                      self.maxCircle = id;
-                      return '#FF4400';
-                    }
-                    return self.chart.dataPlots.colorFunct(cName);
-                  }),
+                  // Base style similar to Scatter before selection kicks in
+                  .attr('stroke', '#aab1c0')
+                  .attr('stroke-width', 0.4)
+                  .attr('r', dOpts.pointSize)
+                  .attr('fill', self.chart.dataPlots.colorFunct(cName)),
               );
             }
           }
@@ -1494,34 +1509,25 @@ class ViolinPlot extends Component {
             .data(circleData)
             .attr('pointer-events', 'all')
             .on('mouseover', (d) => {
-              // var id = d.sample.replace(/\;/g, "_");
-              // self.dotHover.emit({ object: d, action: 'mouseover' });
               self.isHovering = true;
-              if (self.maxCircle === d.featureID) {
-                d3.select(`circle[id='violin_${d.featureID}']`)
-                  .transition()
-                  .duration(100)
-                  .attr('cursor', 'pointer')
-                  .attr('r', dOpts.pointSize * 2.5);
-              } else {
-                d3.select(`circle[id='violin_${d.featureID}']`)
-                  .transition()
-                  .duration(100)
-                  .attr('cursor', 'pointer')
-                  .attr('r', dOpts.pointSize * 2);
-              }
+
+              d3.select(`circle[id='violin_${d.featureID}']`)
+                .transition()
+                .duration(100)
+                .attr('cursor', 'pointer')
+                .attr('r', dOpts.pointSize * 2); // same hover behavior for all
+
               if (self.props.violinSettings.tooltip.show) {
                 const m = d3.mouse(self.chart.objs.chartDiv.node());
                 const opacity = this.state.displayElementTextViolin ? 0 : 1;
+
                 self.chart.objs.tooltip
                   .style('left', `${m[0] + 10}px`)
                   .style('top', `${m[1] - 10}px`)
                   .transition()
                   .delay(500)
                   .duration(500)
-                  .style('opacity', () => {
-                    return opacity;
-                  })
+                  .style('opacity', opacity)
                   .style('fill', '#f46d43')
                   .style('display', null);
 
@@ -1530,57 +1536,80 @@ class ViolinPlot extends Component {
               return null;
             })
             .on('mouseout', (d) => {
-              // var id = d.sample.replace(/\;/g, "_");
               d3.select(`circle[id='violin_${d.featureID}']`)
                 .transition()
                 .duration(300)
                 .attr('r', (x) => {
-                  const inBrush = this.brushedData.findIndex(
-                    (d) => d.featureID === x.featureID,
+                  const dOpts = self.chart.dataPlots.options;
+                  const { HighlightedProteins = [], selectedProteinId } =
+                    self.props;
+
+                  const isMulti = HighlightedProteins.some(
+                    (p) => p.featureID === x.featureID,
                   );
-                  if (self.maxCircle !== x.featureID) {
-                    if (inBrush > 0) {
-                      return dOpts.pointSize * 1.5;
-                    } else {
-                      return dOpts.pointSize * 1;
-                    }
+                  const isSingle = selectedProteinId === x.featureID;
+
+                  if (isSingle) {
+                    return dOpts.pointSize * 2;
                   }
-                  return dOpts.pointSize * 2;
+                  if (isMulti) {
+                    return dOpts.pointSize * 1.5;
+                  }
+                  return dOpts.pointSize;
                 });
 
-              // self.dotHover.emit({ object: d, action: 'mouseout' });
               if (self.isHovering) {
-                if (self.maxCircle !== d.featureID) {
-                  self.chart.objs.tooltip
-                    .transition()
-                    .duration(500)
-                    .style('opacity', 0);
-                }
+                self.chart.objs.tooltip
+                  .transition()
+                  .duration(500)
+                  .style('opacity', 0);
               }
             })
             .on('click', (d) => {
               self.isHovering = false;
-              const inBrush = this.brushedData.findIndex(function (x) {
-                return x.featureID === d.featureID;
-              });
-              if (inBrush > 0) {
-                const HighlightedProteins = [...this.brushedData];
-                HighlightedProteins.splice(inBrush, 1);
-                HighlightedProteins.unshift(d);
-                self.props.onHandleProteinSelected(HighlightedProteins);
-              } else {
-                this.brushedData = [];
-                this.clearBrush(self);
-                self.props.onHandleProteinSelected([
-                  {
-                    sample: d.sample,
-                    featureID: d.featureID,
-                    cpm: d.statistic,
-                  },
-                ]);
+              d3.event.stopPropagation();
+
+              const isCtrlOrMeta = d3.event.metaKey || d3.event.ctrlKey;
+              const { HighlightedProteins = [], selectedProteinId } =
+                self.props;
+
+              if (isCtrlOrMeta) {
+                // CTRL / META => multi-select toggle (Scatter-like)
+                if (self.props.onHandleProteinSelected) {
+                  const current = HighlightedProteins || [];
+                  const existingIndex = current.findIndex(
+                    (p) => p.featureID === d.featureID,
+                  );
+
+                  let nextMulti;
+                  if (existingIndex >= 0) {
+                    // remove from multi
+                    nextMulti = [
+                      ...current.slice(0, existingIndex),
+                      ...current.slice(existingIndex + 1),
+                    ];
+                  } else {
+                    // add to multi
+                    const item = {
+                      sample: d.sample,
+                      featureID: d.featureID,
+                      cpm: d.statistic,
+                    };
+                    nextMulti = current.concat(item);
+                  }
+
+                  self.props.onHandleProteinSelected(nextMulti);
+                }
+              } else if (self.props.onHandleSingleProteinSelected) {
+                // Simple click => toggle single selection only
+                if (selectedProteinId === d.featureID) {
+                  // de-select single
+                  self.props.onHandleSingleProteinSelected(null);
+                } else {
+                  // select new single
+                  self.props.onHandleSingleProteinSelected(d.featureID);
+                }
               }
-              self.maxCircle = d.featureID;
-              self.addToolTiptoMax(d);
             });
         }
       });

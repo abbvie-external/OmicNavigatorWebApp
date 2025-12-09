@@ -289,7 +289,7 @@ class PlotsDynamic extends Component {
     const maxDivWidth =
       window.screen.width * 0.75 - this.props.volcanoDivWidth - 50;
     return (
-      <div style={{ maxWidth: maxDivWidth }}>
+      <div className="DifferentialPlots" style={{ maxWidth: maxDivWidth }}>
         {Toggle}
         <Tab
           onTabChange={this.handleTabChange}

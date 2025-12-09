@@ -9,6 +9,7 @@ import EnrichmentSVGPlot from './EnrichmentSVGPlot';
 import BarcodePlot from './BarcodePlot';
 import ViolinPlot from './ViolinPlot';
 import FilteredDifferentialTable from './FilteredDifferentialTable';
+import PlotsMultiFeature from '../Differential/PlotsMultiFeature';
 
 class SplitPanesContainer extends Component {
   state = {
@@ -21,6 +22,60 @@ class SplitPanesContainer extends Component {
     elementTextKey: 'featureID',
   };
   filteredDifferentialGridRef = React.createRef();
+
+  componentDidUpdate(prevProps, prevState) {
+    const prevCount = prevProps.HighlightedProteins
+      ? prevProps.HighlightedProteins.length
+      : 0;
+    const currCount = this.props.HighlightedProteins
+      ? this.props.HighlightedProteins.length
+      : 0;
+
+    const { activeSvgTabIndexEnrichment } = this.state;
+    const hasMultiFeature = this.props.plotMultiFeatureAvailable;
+
+    const prevSelected = prevProps.selectedProteinId;
+    const currSelected = this.props.selectedProteinId;
+
+    const canChangeTabs = this.props.enableSvgTabChangeOnSelection !== false;
+
+    if (
+      canChangeTabs &&
+      currSelected &&
+      currSelected !== prevSelected &&
+      activeSvgTabIndexEnrichment !== 0
+    ) {
+      this.handleSVGTabChange(0);
+    }
+
+    if (currCount >= 2 && currCount !== prevCount && hasMultiFeature) {
+      if (canChangeTabs) {
+        this.handleSVGTabChange(1);
+      }
+      if (this.props.onGetMultifeaturePlotTransitionEnrichment) {
+        this.props.onGetMultifeaturePlotTransitionEnrichment();
+      }
+    }
+
+    if (
+      activeSvgTabIndexEnrichment === 1 &&
+      currCount >= 2 &&
+      currCount !== prevCount &&
+      hasMultiFeature &&
+      this.props.onGetMultifeaturePlotTransitionEnrichment
+    ) {
+      this.props.onGetMultifeaturePlotTransitionEnrichment();
+    }
+
+    if (
+      canChangeTabs &&
+      activeSvgTabIndexEnrichment === 1 &&
+      currCount < 2 &&
+      prevCount >= 2
+    ) {
+      this.handleSVGTabChange(0);
+    }
+  }
 
   handleSVGTabChange = (activeTabIndex) => {
     this.setState({
@@ -119,7 +174,7 @@ class SplitPanesContainer extends Component {
             attached
             key="1"
             id="TableResultsTab"
-            className="TableResultsTab"
+            className="TableResultsTab two-col-sticky"
             // as="div"
           >
             <FilteredDifferentialTable
@@ -217,6 +272,192 @@ class SplitPanesContainer extends Component {
     localStorage.setItem(`${paneType}SplitPaneSize`, size);
   };
 
+  renderFeaturePlotTabs = (
+    width,
+    height,
+    verticalSplitPaneSize,
+    horizontalSplitPaneSize,
+    enrichmentStudy,
+    enrichmentModel,
+    enrichmentPlotDescriptions,
+  ) => {
+    const {
+      plotMultiFeatureAvailable,
+      HighlightedProteins,
+      enrichmentPlotTypes,
+      enrichmentAnnotation,
+      enrichmentAnnotationIdsCommon,
+      enrichmentMultiFeaturePlotTypes,
+      plotMultiFeatureData,
+      plotMultiFeatureDataLoaded,
+      plotMultiFeatureDataLength,
+      plotMultiFeatureMax,
+      svgExportName,
+      tab,
+      onHandleProteinSelected,
+      onGetMultifeaturePlotTransitionEnrichment,
+      SVGPlotLoaded,
+      SVGPlotLoading,
+      plotDataEnrichment,
+      plotDataEnrichmentLength,
+      // Data for feature labels in gear popup
+      hasBarcodeData,
+      barcodeSettings,
+      filteredDifferentialResults,
+      filteredDifferentialFeatureIdKey,
+    } = this.props;
+
+    const { activeSvgTabIndexEnrichment } = this.state;
+
+    // Same width/height logic you already had, unified
+    const contentWidth = width - verticalSplitPaneSize - 300;
+    const multiContentWidth = width - verticalSplitPaneSize - 500;
+
+    const contentHeight = height - (horizontalSplitPaneSize || 0) - 55;
+    const multiContentHeight = contentHeight - 45;
+
+    // 1. Determine the feature ID key based on data source
+    const featureIdKey = hasBarcodeData
+      ? 'featureID'
+      : filteredDifferentialFeatureIdKey;
+
+    // 2. Get the table data for label lookups
+    const tableData = hasBarcodeData
+      ? barcodeSettings?.barcodeData || []
+      : filteredDifferentialResults || [];
+
+    // 3. Transform HighlightedProteins to have .key/.id/.value properties
+    //    PlotsMultiFeature expects: { key, id, value } for getFeaturesList()
+    //    Enrichment has: { featureID, sample, cpm }
+    const transformedHighlightedFeatures = (HighlightedProteins || []).map(
+      (protein) => ({
+        ...protein,
+        key: protein.featureID || protein.key || protein.id,
+        id: protein.featureID || protein.key || protein.id,
+        value: protein.featureID || protein.key || protein.id,
+      }),
+    );
+
+    return (
+      <div className="EnrichmentPlots">
+        <Tab
+          className="EnrichmentRightTabs"
+          menu={{ secondary: true, pointing: true }}
+          renderActiveOnly={false}
+          activeIndex={activeSvgTabIndexEnrichment}
+          onTabChange={(e, data) => {
+            const nextIndex = data.activeIndex;
+            this.handleSVGTabChange(nextIndex);
+
+            if (
+              nextIndex === 1 &&
+              plotMultiFeatureAvailable &&
+              (HighlightedProteins?.length || 0) >= 2 &&
+              onGetMultifeaturePlotTransitionEnrichment
+            ) {
+              onGetMultifeaturePlotTransitionEnrichment();
+            }
+          }}
+          panes={[
+            {
+              menuItem: 'Single-Feature Plots',
+              pane: (
+                <Tab.Pane
+                  key="single-feature-plots-pane"
+                  attached={false}
+                  className="SingleFeaturePlotPane"
+                >
+                  <EnrichmentSVGPlot
+                    // unified dimensions for single-feature
+                    divWidth={contentWidth}
+                    divHeight={contentHeight}
+                    pxToPtRatio={105}
+                    pointSize={12}
+                    svgTabMax={1}
+                    tab={tab}
+                    plotDataEnrichment={plotDataEnrichment}
+                    plotDataEnrichmentLength={plotDataEnrichmentLength}
+                    svgExportName={svgExportName}
+                    enrichmentPlotTypes={enrichmentPlotTypes}
+                    SVGPlotLoaded={SVGPlotLoaded}
+                    SVGPlotLoading={SVGPlotLoading}
+                    HighlightedProteins={HighlightedProteins}
+                    enrichmentStudy={enrichmentStudy}
+                    enrichmentModel={enrichmentModel}
+                    enrichmentPlotDescriptions={enrichmentPlotDescriptions}
+                  />
+                </Tab.Pane>
+              ),
+            },
+            {
+              menuItem: 'Multi-Feature Plots',
+              disabled: !plotMultiFeatureAvailable,
+              pane: (
+                <Tab.Pane
+                  attached={false}
+                  className="MultiFeaturePlotPane"
+                  key="multi-feature-plots-pane"
+                >
+                  <PlotsMultiFeature
+                    // enrichment mapped into differential-style props
+                    differentialPlotTypes={enrichmentPlotTypes}
+                    differentialStudy={enrichmentStudy}
+                    differentialModel={enrichmentModel}
+                    differentialTest={enrichmentAnnotation}
+                    differentialTestIdsCommon={
+                      enrichmentAnnotationIdsCommon || []
+                    }
+                    modelSpecificMetaFeaturesExist={false}
+                    multiFeaturePlotTypes={
+                      enrichmentMultiFeaturePlotTypes || []
+                    }
+                    plotMultiFeatureData={plotMultiFeatureData}
+                    plotMultiFeatureDataLoaded={plotMultiFeatureDataLoaded}
+                    plotMultiFeatureDataLength={plotMultiFeatureDataLength}
+                    plotMultiFeatureMax={plotMultiFeatureMax}
+                    svgExportName={svgExportName}
+                    // unified dimensions for multi-feature (same as Differential)
+                    divWidth={multiContentWidth}
+                    divHeight={multiContentHeight}
+                    pointSize={12}
+                    pxToPtRatio={105}
+                    svgTabMax={1}
+                    tab={tab}
+                    upperPlotsVisible={true}
+                    showFullScreen={false}
+                    // selection syncing
+                    onHandleAllChecked={() => onHandleProteinSelected([])}
+                    onHandleHighlightedFeaturesDifferential={(arr) =>
+                      onHandleProteinSelected(arr)
+                    }
+                    onGetMultifeaturePlotTransitionAlt={
+                      onGetMultifeaturePlotTransitionEnrichment
+                    }
+                    // Interaction handlers
+                    onHandlePlotlyClick={
+                      this.props.onHandlePlotlyClickEnrichment
+                    }
+                    onRemoveSelectedFeature={
+                      this.props.onRemoveSelectedFeatureEnrichment
+                    }
+                    onMultiFeatureBullpenOpenChange={
+                      this.props.onMultiFeatureBullpenOpenChangeEnrichment
+                    }
+                    differentialHighlightedFeaturesData={
+                      transformedHighlightedFeatures
+                    }
+                    differentialTableData={tableData}
+                    differentialFeatureIdKey={featureIdKey}
+                  />
+                </Tab.Pane>
+              ),
+            },
+          ]}
+        />
+      </div>
+    );
+  };
+
   render() {
     const { verticalSplitPaneSize, horizontalSplitPaneSize } = this.state;
     const {
@@ -225,7 +466,9 @@ class SplitPanesContainer extends Component {
       hasBarcodeData,
       enrichmentPlotDescriptions,
     } = this.props;
+
     const ViolinAndTable = this.getViolinAndTable();
+
     const width =
       window.innerWidth ||
       document.documentElement.clientWidth ||
@@ -235,8 +478,11 @@ class SplitPanesContainer extends Component {
       document.documentElement.clientHeight ||
       document.body.clientHeight;
 
+    // WITH BARCODE BRANCH
     if (hasBarcodeData) {
+      console.log('Rendering with barcode data');
       const BarcodePlot = this.getBarcodePlot();
+
       return (
         <div className="PlotsWrapper">
           <Grid className="">
@@ -250,6 +496,7 @@ class SplitPanesContainer extends Component {
               >
                 <EnrichmentBreadcrumbs {...this.props} />
               </Grid.Column>
+
               <Grid.Column
                 mobile={16}
                 tablet={16}
@@ -265,6 +512,7 @@ class SplitPanesContainer extends Component {
                 largeScreen={16}
                 widescreen={16}
               >
+                {/* Top: Barcode, Bottom: Violin+Table vs Right Plots */}
                 <SplitPane
                   className="ThreePlotsDiv SplitPanesWrapper"
                   split="horizontal"
@@ -276,10 +524,11 @@ class SplitPanesContainer extends Component {
                   }
                 >
                   {BarcodePlot}
+
                   <SplitPane
                     className="BottomSplitPaneContainer"
                     split="vertical"
-                    size={this.state.verticalSplitPaneSize}
+                    size={verticalSplitPaneSize}
                     minSize={315}
                     maxSize={1300}
                     onDragFinished={(size) =>
@@ -289,28 +538,17 @@ class SplitPanesContainer extends Component {
                     <div id="ViolinAndTableSplitContainer">
                       {ViolinAndTable}
                     </div>
+
                     <div id="SVGSplitContainer">
-                      <EnrichmentSVGPlot
-                        divWidth={width - verticalSplitPaneSize - 300}
-                        divHeight={height - horizontalSplitPaneSize - 51}
-                        pxToPtRatio={105}
-                        pointSize={12}
-                        svgTabMax={1}
-                        tab={this.props.tab}
-                        plotDataEnrichment={this.props.plotDataEnrichment}
-                        plotDataEnrichmentLength={
-                          this.props.plotDataEnrichmentLength
-                        }
-                        svgExportName={this.props.svgExportName}
-                        enrichmentPlotTypes={this.props.enrichmentPlotTypes}
-                        // isEnrichmentPlotSVGLoaded={this.props.isEnrichmentPlotSVGLoaded}
-                        SVGPlotLoaded={this.props.SVGPlotLoaded}
-                        SVGPlotLoading={this.props.SVGPlotLoading}
-                        HighlightedProteins={this.props.HighlightedProteins}
-                        enrichmentStudy={enrichmentStudy}
-                        enrichmentModel={enrichmentModel}
-                        enrichmentPlotDescriptions={enrichmentPlotDescriptions}
-                      />
+                      {this.renderFeaturePlotTabs(
+                        width,
+                        height,
+                        verticalSplitPaneSize,
+                        horizontalSplitPaneSize,
+                        enrichmentStudy,
+                        enrichmentModel,
+                        enrichmentPlotDescriptions,
+                      )}
                     </div>
                   </SplitPane>
                 </SplitPane>
@@ -319,75 +557,68 @@ class SplitPanesContainer extends Component {
           </Grid>
         </div>
       );
-    } else
-      return (
-        <div className="PlotsWrapper">
-          <Grid className="">
-            <Grid.Row className="ActionsRow">
-              <Grid.Column
-                mobile={16}
-                tablet={16}
-                computer={8}
-                largeScreen={8}
-                widescreen={8}
-              >
-                <EnrichmentBreadcrumbs {...this.props} />
-              </Grid.Column>
-              <Grid.Column
-                mobile={16}
-                tablet={16}
-                computer={8}
-                largeScreen={8}
-                widescreen={8}
-                className="elementTextCol"
-              ></Grid.Column>
+    }
 
-              <Grid.Column
-                mobile={16}
-                tablet={16}
-                largeScreen={16}
-                widescreen={16}
+    // NO BARCODE BRANCH
+    return (
+      <div className="PlotsWrapper">
+        <Grid className="">
+          <Grid.Row className="ActionsRow">
+            <Grid.Column
+              mobile={16}
+              tablet={16}
+              computer={8}
+              largeScreen={8}
+              widescreen={8}
+            >
+              <EnrichmentBreadcrumbs {...this.props} />
+            </Grid.Column>
+
+            <Grid.Column
+              mobile={16}
+              tablet={16}
+              computer={8}
+              largeScreen={8}
+              widescreen={8}
+              className="elementTextCol"
+            ></Grid.Column>
+
+            <Grid.Column
+              mobile={16}
+              tablet={16}
+              largeScreen={16}
+              widescreen={16}
+            >
+              {/* Simple vertical split: Left = Violin+Table, Right = Plots */}
+              <SplitPane
+                className="ThreePlotsDiv SplitPanesWrapper"
+                split="vertical"
+                size={verticalSplitPaneSize}
+                minSize={315}
+                maxSize={1300}
+                onDragFinished={(size) =>
+                  this.splitPaneResized(size, 'vertical')
+                }
               >
-                <SplitPane
-                  className="ThreePlotsDiv SplitPanesWrapper"
-                  split="vertical"
-                  size={this.state.verticalSplitPaneSize}
-                  minSize={315}
-                  maxSize={1300}
-                  onDragFinished={(size) =>
-                    this.splitPaneResized(size, 'vertical')
-                  }
-                >
-                  <div id="ViolinAndTableSplitContainer">{ViolinAndTable}</div>
-                  <div id="SVGSplitContainer">
-                    <EnrichmentSVGPlot
-                      divWidth={width - verticalSplitPaneSize - 300}
-                      divHeight={height - 51}
-                      pxToPtRatio={105}
-                      pointSize={12}
-                      svgTabMax={1}
-                      tab={this.props.tab}
-                      plotDataEnrichment={this.props.plotDataEnrichment}
-                      plotDataEnrichmentLength={
-                        this.props.plotDataEnrichmentLength
-                      }
-                      svgExportName={this.props.svgExportName}
-                      enrichmentPlotTypes={this.props.enrichmentPlotTypes}
-                      // isEnrichmentPlotSVGLoaded={this.props.isEnrichmentPlotSVGLoaded}
-                      SVGPlotLoaded={this.props.SVGPlotLoaded}
-                      SVGPlotLoading={this.props.SVGPlotLoading}
-                      HighlightedProteins={this.props.HighlightedProteins}
-                      enrichmentStudy={enrichmentStudy}
-                      enrichmentModel={enrichmentModel}
-                      enrichmentPlotDescriptions={enrichmentPlotDescriptions}
-                    />
-                  </div>
-                </SplitPane>
-              </Grid.Column>
-            </Grid.Row>
-          </Grid>
-        </div>
-      );
+                <div id="ViolinAndTableSplitContainer">{ViolinAndTable}</div>
+
+                <div id="SVGSplitContainer">
+                  {this.renderFeaturePlotTabs(
+                    width,
+                    height,
+                    verticalSplitPaneSize,
+                    0, // no barcode → same as your old (height - 51) case
+                    enrichmentStudy,
+                    enrichmentModel,
+                    enrichmentPlotDescriptions,
+                  )}
+                </div>
+              </SplitPane>
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>
+      </div>
+    );
   }
 }
 

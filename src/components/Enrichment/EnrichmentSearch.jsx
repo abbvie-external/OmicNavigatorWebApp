@@ -1472,7 +1472,7 @@ class EnrichmentSearch extends Component {
             mouseEnterDelay={1000}
             mouseLeaveDelay={0}
           />
-          <span className={!isTestDataLoaded ? 'ShowBlock' : 'Hide'}>
+          <div className={enrichmentAnnotation !== '' ? 'ShowBlock' : 'Hide'}>
             <label
               className={
                 enrichmentAnnotationsDisabled ? 'greyText' : 'normalText'
@@ -1505,11 +1505,11 @@ class EnrichmentSearch extends Component {
                 Adjusted
               </Button>
             </Button.Group>
-          </span>
+          </div>
         </Form>
         <div
           className={
-            !isTestDataLoaded
+            enrichmentAnnotation !== ''
               ? 'ShowBlock MultisetContainer'
               : 'Hide MultisetContainer'
           }

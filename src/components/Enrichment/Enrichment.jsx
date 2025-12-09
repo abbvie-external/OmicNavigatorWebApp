@@ -1,4 +1,4 @@
-import _ from 'lodash-es';
+import _, { filter } from 'lodash-es';
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { CancelToken } from 'axios';
@@ -36,6 +36,7 @@ import { EZGrid } from '../Shared/QHGrid/index.module.js';
 import ErrorBoundary from '../Shared/ErrorBoundary';
 
 let cancelRequestEnrichmentGetPlot = () => {};
+let cancelRequestEnrichmentGetMultiPlot = () => {};
 let cancelRequestGetEnrichmentsNetwork = () => {};
 let cancelRequestGetBarcodeData = () => {};
 const cacheGetEnrichmentsNetwork = {};
@@ -180,7 +181,19 @@ class Enrichment extends Component {
     },
     violinData: [],
     HighlightedProteins: [],
+    selectedProteinId: '',
     enrichmentPlotTypes: [],
+    plotMultiFeatureAvailable: false,
+    plotMultiFeatureDataLoaded: true,
+    plotMultiFeatureData: {
+      key: null,
+      title: '',
+      svg: [],
+    },
+    plotMultiFeatureDataLength: 0,
+    plotMultiFeatureMax: 1000,
+    multiFeatureBullpenOpen: false,
+    enableSvgTabChangeOnSelection: true,
     enrichmentModelsAndAnnotations: [], // listStudies.enrichments
     enrichmentAnnotationIdsCommon: [],
     enrichmentsLinkouts: [],
@@ -506,27 +519,30 @@ class Enrichment extends Component {
     if (enrichmentPlotsMetadata.length) {
       // filter out invalid plots - plotType string must be 'singleFeature', 'multiFeature', 'singleTest', 'multiTest', 'plotly'
       const enrichmentPlotTypesVar = [...enrichmentPlotsMetadata].filter(
-        // if undefined or null plotType, set default
         (plot) => {
           if (!plot.plotType) {
             plot.plotType = ['singleFeature', 'singleTest'];
           }
           let plotTypeArr = plot?.plotType;
+
           // Convert string to array
           if (typeof plotTypeArr === 'string') {
             plotTypeArr = [plotTypeArr];
           }
-          const isValidPlotType = (pt) => {
-            return (
-              pt === 'singleFeature' ||
-              pt === 'multiFeature' ||
-              pt === 'singleTest' ||
-              pt === 'multiTest' ||
-              pt === 'plotly' ||
-              pt === 'multiModel'
-            );
-          };
-          const valid = plotTypeArr.every(isValidPlotType);
+
+          const isValidPlotType = (pt) =>
+            [
+              'singleFeature',
+              'multiFeature',
+              'singleTest',
+              'multiTest',
+              'plotly',
+            ].includes(pt);
+
+          const valid = Array.isArray(plotTypeArr)
+            ? plotTypeArr.every((t) => isValidPlotType(t))
+            : isValidPlotType(plotTypeArr);
+
           if (!valid) {
             console.log(
               `${plot?.plotID} will be ignored because it has unknown plotType ${plot.plotType}`,
@@ -538,33 +554,209 @@ class Enrichment extends Component {
           return valid;
         },
       );
-      // TODO - enrichment doesn't have multi-feature plots yet
-      // let plotMultiFeatureAvailableVar = false;
-      // let singleFeaturePlotTypesVar = [];
-      // let multiFeaturePlotTypesVar = [];
-      // if (enrichmentPlotTypesVar) {
-      // singleFeaturePlotTypesVar = [...enrichmentPlotTypesVar].filter(
-      //   p => !p.plotType.includes('multiFeature'),
-      // );
-      // multiFeaturePlotTypesVar = [...enrichmentPlotTypesVar].filter((p) =>
-      //   p.plotType.includes('multiFeature'),
-      // );
-      // plotMultiFeatureAvailableVar = multiFeaturePlotTypesVar?.length
-      //   ? true
-      //   : false;
+
+      // Split into single- and multi-feature plots
+      let singleFeaturePlotTypesVar = [];
+      let multiFeaturePlotTypesVar = [];
+      let plotMultiFeatureAvailableVar = false;
+
+      if (enrichmentPlotTypesVar && enrichmentPlotTypesVar.length) {
+        singleFeaturePlotTypesVar = enrichmentPlotTypesVar.filter(
+          (p) => !p.plotType.includes('multiFeature'),
+        );
+        multiFeaturePlotTypesVar = enrichmentPlotTypesVar.filter((p) =>
+          p.plotType.includes('multiFeature'),
+        );
+        plotMultiFeatureAvailableVar = multiFeaturePlotTypesVar.length > 0;
+      }
+
       this.setState({
-        enrichmentPlotTypes: enrichmentPlotTypesVar,
-        // plotMultiFeatureAvailable: plotMultiFeatureAvailableVar,
+        // keep existing single-feature behavior
+        enrichmentPlotTypes: singleFeaturePlotTypesVar,
+        // expose multi-feature plotTypes
+        enrichmentMultiFeaturePlotTypes: multiFeaturePlotTypesVar,
+        plotMultiFeatureAvailable: plotMultiFeatureAvailableVar,
       });
     } else {
       this.setState({
         enrichmentPlotTypes: [],
-        // singleFeaturePlotTypes: singleFeaturePlotTypesVar,
-        // multiFeaturePlotTypes: multiFeaturePlotTypesVar,
-        // multiModelPlotTypes: multiModelPlotTypesVar,
-        // plotMultiFeatureAvailable: plotMultiFeatureAvailableVar,
+        enrichmentMultiFeaturePlotTypes: [],
+        plotMultiFeatureAvailable: false,
       });
     }
+  };
+
+  handleSVGMultiFeature = (plotDataMultiFeatureVar) => {
+    this.setState({
+      plotMultiFeatureData: plotDataMultiFeatureVar,
+      plotMultiFeatureDataLength: plotDataMultiFeatureVar.svg?.length || 0,
+      plotMultiFeatureDataLoaded: true,
+    });
+  };
+
+  getMultifeaturePlotEnrichment = (featureIds) => {
+    const {
+      enrichmentMultiFeaturePlotTypes,
+      enrichmentTest,
+      uData,
+      enrichmentModelIds,
+      enrichmentModelsAndAnnotations,
+      enrichmentPlotDescriptions,
+      enrichmentAnnotationIdsCommon,
+      plotMultiFeatureMax,
+    } = this.state;
+    const { enrichmentStudy, enrichmentModel, enrichmentAnnotation } =
+      this.props;
+
+    const idsRaw = Array.isArray(featureIds) ? featureIds.filter(Boolean) : [];
+    if (!idsRaw.length || !enrichmentMultiFeaturePlotTypes.length) {
+      this.setState({
+        plotMultiFeatureData: { key: null, title: '', svg: [] },
+        plotMultiFeatureDataLength: 0,
+        plotMultiFeatureDataLoaded: true,
+      });
+      return;
+    }
+
+    // cap number of features
+    const max = plotMultiFeatureMax || 1000;
+    const ids = idsRaw.slice(0, max);
+
+    let plotDataMultiFeatureVar = {
+      key: ids.join(','),
+      title: this.state.plotDataEnrichment.title || '',
+      svg: [],
+    };
+
+    // cancel any previous multi-feature in-flight request
+    cancelRequestEnrichmentGetMultiPlot();
+    const cancelToken = new CancelToken((c) => {
+      cancelRequestEnrichmentGetMultiPlot = c;
+    });
+
+    const self = this;
+
+    const promises = enrichmentMultiFeaturePlotTypes.map((plot) => {
+      const plotMetadataSpecificPlot = enrichmentPlotDescriptions[plot.plotID];
+      const designatedModels = plotMetadataSpecificPlot?.models || null;
+      const designatedModelsMultiModelExists =
+        designatedModels &&
+        designatedModels !== 'all' &&
+        designatedModels.includes(enrichmentModel);
+
+      const enrichmentModelIdsOverride = designatedModelsMultiModelExists
+        ? designatedModels
+        : enrichmentModelIds;
+
+      const isMultiModelMultiTestVar = isMultiModelMultiTest(plot.plotType);
+      const testIdNotCommon =
+        !enrichmentAnnotationIdsCommon.includes(enrichmentAnnotation);
+
+      let testsArg = [];
+      if (isMultiModelMultiTestVar && testIdNotCommon) {
+        testsArg = [];
+      } else {
+        testsArg = getTestsArg(
+          plot.plotType,
+          enrichmentModelIdsOverride,
+          uData,
+          enrichmentTest,
+        );
+      }
+
+      let modelsArg = getModelsArg(
+        plot.plotType,
+        enrichmentModelIdsOverride,
+        uData,
+        enrichmentModel,
+        enrichmentModelsAndAnnotations, // listStudies.enrichments
+        null,
+        enrichmentAnnotationIdsCommon,
+      );
+
+      // for multi-feature plots, backend expects an array of feature IDs
+      const idArg = ids;
+
+      return omicNavigatorService
+        .plotStudyReturnSvgUrl(
+          enrichmentStudy,
+          modelsArg,
+          idArg,
+          plot.plotID,
+          plot.plotType,
+          testsArg,
+          null,
+          cancelToken,
+        )
+        .then((svg) => {
+          const svgInfo = { plotType: plot, svg };
+          plotDataMultiFeatureVar.svg.push(svgInfo);
+          return svgInfo;
+        });
+    });
+
+    if (!promises.length) {
+      this.setState({ plotMultiFeatureDataLoaded: true });
+      return;
+    }
+
+    // First arriving SVG -> quick feedback in UI
+    Promise.race(promises)
+      .then(() => {
+        self.handleSVGMultiFeature({ ...plotDataMultiFeatureVar });
+      })
+      .catch((error) => {
+        if (!error.__CANCEL__) {
+          console.error('Error during multi-feature plot race:', error);
+        }
+      });
+
+    // Then complete set for export, etc.
+    Promise.allSettled(promises)
+      .then((results) => {
+        if (!results) return;
+        const svgArray = results
+          .filter((r) => r.status === 'fulfilled')
+          .map(({ value }) => value);
+
+        if (svgArray.length) {
+          self.handleSVGMultiFeature({
+            ...plotDataMultiFeatureVar,
+            svg: svgArray,
+          });
+        }
+      })
+      .catch((error) => {
+        if (!error.__CANCEL__) {
+          console.error('Error during multi-feature plot allSettled:', error);
+        }
+      });
+  };
+
+  getMultifeaturePlotTransitionEnrichment = () => {
+    const { HighlightedProteins } = this.state;
+
+    const featureIds = (HighlightedProteins || [])
+      .map((p) => p.featureID || p.key)
+      .filter(Boolean);
+
+    if (!featureIds.length) {
+      this.setState({
+        plotMultiFeatureData: { key: null, title: '', svg: [] },
+        plotMultiFeatureDataLength: 0,
+        plotMultiFeatureDataLoaded: true,
+      });
+      return;
+    }
+
+    // start loader funnel: clear old data and mark as loading
+    this.setState({
+      plotMultiFeatureDataLoaded: false,
+      plotMultiFeatureData: { key: null, title: '', svg: [] },
+      plotMultiFeatureDataLength: 0,
+    });
+
+    this.getMultifeaturePlotEnrichment(featureIds);
   };
 
   handleSearchChangeEnrichment = (changes, scChange) => {
@@ -1270,52 +1462,260 @@ class Enrichment extends Component {
     this.setState(emptyArr);
   };
 
-  // handleFilteredDifferentialFeatureIdKey = (name, id) => {
-  //   this.setState({
-  //     [name]: id,
-  //   });
-  // };
-
   handleProteinSelected = (toHighlightArray) => {
     const featureID = this.state.hasBarcodeData
       ? 'featureID'
       : this.props.filteredDifferentialFeatureIdKey;
-    const prevHighestValueObject = this.state.HighlightedProteins.length
-      ? this.state.HighlightedProteins[0]['featureID']
-      : null;
-    const highestValueObject = toHighlightArray[0];
+
     const splitPaneData = this.state.hasBarcodeData
       ? this.state.barcodeSettings.barcodeData
       : this.state.filteredDifferentialResults;
-    if (splitPaneData?.length > 0 && toHighlightArray.length > 0) {
+
+    if (splitPaneData?.length > 0 && Array.isArray(toHighlightArray)) {
+      const sortedArray = [...toHighlightArray].sort(
+        (a, b) => b.statistic - a.statistic,
+      );
+
       this.setState({
-        HighlightedProteins: toHighlightArray,
+        HighlightedProteins: sortedArray,
       });
-      if (
-        highestValueObject.featureID !== prevHighestValueObject ||
-        this.state.SVGPlotLoaded === false
-      ) {
-        this.setState({
-          SVGPlotLoaded: false,
-          SVGPlotLoading: true,
-        });
-        const dataItem = splitPaneData.find(
-          (i) => i[featureID] === highestValueObject.featureID,
-        );
-        let id = dataItem[featureID] || '';
-        this.getPlot(id);
-      }
     } else {
+      this.setState({
+        HighlightedProteins: [],
+      });
+    }
+  };
+
+  /**
+   * Handles the selection of a single protein in the visualization.
+   *
+   * @param {string} featureId - The ID of the protein feature to select.
+   * @returns {void}
+   */
+  handleSingleProteinSelected = (featureId) => {
+    const featureKey = this.state.hasBarcodeData
+      ? 'featureID'
+      : this.props.filteredDifferentialFeatureIdKey;
+
+    const splitPaneData = this.state.hasBarcodeData
+      ? this.state.barcodeSettings.barcodeData
+      : this.state.filteredDifferentialResults;
+
+    // If no feature or no data, just clear
+    if (!featureId || !splitPaneData || splitPaneData.length === 0) {
+      cancelRequestEnrichmentGetPlot();
+      this.setState({
+        selectedProteinId: '',
+        SVGPlotLoaded: false,
+        SVGPlotLoading: false,
+      });
+      return;
+    }
+
+    const prevSelected = this.state.selectedProteinId;
+    // Toggle: clicking same row/dot again clears selection
+    const nextSelected = prevSelected === featureId ? '' : featureId;
+
+    this.setState({
+      selectedProteinId: nextSelected,
+    });
+
+    // If cleared, just stop here
+    if (!nextSelected) {
       cancelRequestEnrichmentGetPlot();
       this.setState({
         SVGPlotLoaded: false,
         SVGPlotLoading: false,
-        HighlightedProteins: [],
-        // plotDataEnrichment: {
-        //   ...this.state.plotDataEnrichment,
-        //   svg: []
-        // },
       });
+      return;
+    }
+
+    // Load single-feature plot for the selected protein
+    this.setState({
+      SVGPlotLoaded: false,
+      SVGPlotLoading: true,
+    });
+
+    const dataItem = splitPaneData.find((i) => i[featureKey] === nextSelected);
+    const id = dataItem ? dataItem[featureKey] : nextSelected;
+
+    this.getPlot(id);
+  };
+
+  handleSingleProteinSelectedFromUI = (featureId) => {
+    // dot click, violin click, table row click → allow tab auto-switch
+    this.setState(
+      {
+        enableSvgTabChangeOnSelection: true,
+      },
+      () => {
+        this.handleSingleProteinSelected(featureId);
+      },
+    );
+  };
+
+  /**
+   * Handles protein selection triggered from the MultiFeature plot.
+   *
+   * @param {string} featureId - The ID of the protein feature to select.
+   * @returns {void}
+   *
+   */
+  handleSingleProteinSelectedFromMultiPlot = (featureId) => {
+    // MultiFeature Plotly click → DO NOT auto-switch tabs
+    this.setState(
+      {
+        enableSvgTabChangeOnSelection: false,
+      },
+      () => {
+        this.handleSingleProteinSelected(featureId);
+      },
+    );
+  };
+
+  /**
+   * Handles clicks on Plotly multi-feature plots (heatmaps).
+   * Finds the clicked feature among highlighted proteins and selects it.
+   *
+   *
+   * @param {string} featureArg - The feature label from Plotly click event
+   * @param {boolean} exactLabel - If true, featureArg is exact; if false, it's a substring
+   */
+  handlePlotlyClickEnrichment = (featureArg, exactLabel) => {
+    const { HighlightedProteins } = this.state;
+
+    const featureKey = this.props.filteredDifferentialFeatureIdKey;
+
+    const splitPaneData = this.state.filteredDifferentialResults;
+
+    if (!splitPaneData?.length || !HighlightedProteins?.length) return;
+
+    // Filter to only highlighted proteins (same as Differential)
+    const relevantFeatures = splitPaneData.filter((row) =>
+      HighlightedProteins.some(
+        (hp) => (hp.featureID || hp.key || hp.id) === row[featureKey],
+      ),
+    );
+
+    let featureData = null;
+    if (exactLabel) {
+      // Exact match: check if featureArg exists in any column value
+      featureData = relevantFeatures.find((row) => {
+        const rowValues = Object.values(row);
+        return rowValues.includes(featureArg);
+      });
+    } else {
+      // Substring match: check if any non-numeric value contains featureArg
+      featureData = relevantFeatures.find((row) => {
+        const rowValues = Object.values(row);
+        const stringValues = rowValues.filter(
+          (v) => typeof v === 'string' || isNaN(v),
+        );
+        return stringValues.some((v) => featureArg.includes(String(v)));
+      });
+    }
+    if (featureData) {
+      const feature = featureData[featureKey];
+      // Use the "from multi plot" handler to avoid auto-switching tabs
+      this.handleSingleProteinSelectedFromMultiPlot(feature);
+    }
+  };
+
+  /**
+   * Removes a single feature from the highlighted proteins list.
+   * Called when user clicks the X on an individual feature chip in the gear popup.
+   *
+   *
+   * @param {string} featureToRemove - The feature key/ID to remove
+   */
+  removeSelectedFeatureEnrichment = (featureToRemove) => {
+    const { HighlightedProteins } = this.state;
+
+    if (!HighlightedProteins?.length) return;
+
+    // Filter out the feature to remove (check all possible key properties)
+    const updatedHighlightedProteins = HighlightedProteins.filter((protein) => {
+      const proteinKey = protein.featureID || protein.key || protein.id;
+      return proteinKey !== featureToRemove;
+    });
+
+    // Use the central selection handler (mirrors Differential's onHandleHighlightedFeaturesDifferential)
+    // This ensures all side effects (barcode/violin/table sync) happen consistently
+    this.handleProteinSelected(updatedHighlightedProteins);
+
+    // Trigger debounced plot reload (mirrors Differential's reloadMultifeaturePlot)
+    this.reloadMultifeaturePlotEnrichment(updatedHighlightedProteins);
+  };
+
+  /**
+   * Debounced reload of multi-feature plot after selection changes.
+   *
+   * WHY NOT USE getMultifeaturePlotTransitionEnrichment:
+   * - That method reads from this.state.HighlightedProteins
+   * - After setState, state may not be updated yet (async)
+   * - Passing the array directly ensures we use the correct data
+   *
+   * @param {Array} selectedProteins - The current selection (post-removal)
+   */
+  reloadMultifeaturePlotEnrichment = _.debounce((selectedProteins) => {
+    if (!this.state.plotMultiFeatureAvailable) return;
+
+    // Need 2+ features for multi-feature plot
+    if (!selectedProteins || selectedProteins.length < 2) {
+      // Clear the plot when less than 2 features
+      this.setState({
+        plotMultiFeatureData: { key: null, title: '', svg: [] },
+        plotMultiFeatureDataLength: 0,
+        plotMultiFeatureDataLoaded: true,
+      });
+      return;
+    }
+
+    // Extract feature IDs and call existing API method
+    const featureIds = selectedProteins
+      .map((p) => p.featureID || p.key || p.id)
+      .filter(Boolean);
+
+    if (featureIds.length >= 2) {
+      // Set loading state and fetch
+      this.setState({
+        plotMultiFeatureDataLoaded: false,
+        plotMultiFeatureData: { key: null, title: '', svg: [] },
+        plotMultiFeatureDataLength: 0,
+      });
+      this.getMultifeaturePlotEnrichment(featureIds);
+    }
+  }, 1250);
+
+  /**
+   * Tracks when the gear popup (feature bullpen) opens/closes.
+   *
+   *
+   * @param {boolean} isOpen - true if popup is opening, false if closing
+   * @param {boolean} delayClose - true if close should be delayed (for click-outside handling)
+   */
+  handleMultiFeatureBullpenOpenChange = (isOpen, delayClose = false) => {
+    const OVERLAY_CLOSE_DELAY_MS = 10;
+
+    // Clear any pending delayed close
+    if (this.multiFeatureBullpenCloseTimeout) {
+      clearTimeout(this.multiFeatureBullpenCloseTimeout);
+      this.multiFeatureBullpenCloseTimeout = null;
+    }
+
+    if (isOpen) {
+      this.setState({ multiFeatureBullpenOpen: true });
+      return;
+    }
+
+    if (delayClose) {
+      // Delay close slightly to handle click-outside events
+      this.multiFeatureBullpenCloseTimeout = setTimeout(() => {
+        this.setState({ multiFeatureBullpenOpen: false });
+        this.multiFeatureBullpenCloseTimeout = null;
+      }, OVERLAY_CLOSE_DELAY_MS);
+    } else {
+      this.setState({ multiFeatureBullpenOpen: false });
     }
   };
 
@@ -2104,14 +2504,31 @@ class Enrichment extends Component {
             {...this.state}
             onBackToTable={this.backToTable}
             onHandleProteinSelected={this.handleProteinSelected}
+            onHandleSingleProteinSelected={
+              this.handleSingleProteinSelectedFromUI
+            }
+            onHandleSingleProteinSelectedFromMultiPlot={
+              this.handleSingleProteinSelectedFromMultiPlot
+            }
             onHandleHighlightedLineReset={this.handleHighlightedLineReset}
             onHandleBarcodeChanges={this.handleBarcodeChanges}
+            onGetMultifeaturePlotTransitionEnrichment={
+              this.getMultifeaturePlotTransitionEnrichment
+            }
             // onHandleFilteredDifferentialFeatureIdKey={
             //   this.handleFilteredDifferentialFeatureIdKey
             // }
             onSetFilteredDifferentialResults={(filteredDifferentialResults) => {
               this.setState({ filteredDifferentialResults });
             }}
+            // Multi-feature interaction handlers
+            onHandlePlotlyClickEnrichment={this.handlePlotlyClickEnrichment}
+            onRemoveSelectedFeatureEnrichment={
+              this.removeSelectedFeatureEnrichment
+            }
+            onMultiFeatureBullpenOpenChangeEnrichment={
+              this.handleMultiFeatureBullpenOpenChange
+            }
           ></SplitPanesContainer>
         </div>
       );

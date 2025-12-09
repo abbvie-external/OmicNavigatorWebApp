@@ -67,14 +67,16 @@
   }
 
   #SVGSplitContainer {
-    // margin: 0px 15px 0px 15px !important;
-    .ShowBlock {
+    height: 98%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: visible; /* allow content and export to show fully */
+
+    .ShowBlock:not(.export-svg) {
       margin-right: 30px;
     }
-  }
-
-  .PlotInstructions {
-    height: 100%;
   }
 
   .PlotInstructionsText {
@@ -84,6 +86,7 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    pointer-events: none;
   }
 
   .ViolinPlotDiv {
@@ -180,5 +183,60 @@
       height: 100% !important;
       width: inherit !important;
     }
+  }
+}
+
+.PlotTabsContainer {
+  margin-bottom: 0px !important;
+  margin-top: 0px !important;
+  min-height: 2.6em !important;
+  max-height: 2.6em !important;
+  .item {
+    line-height: 0.5 !important;
+  }
+
+  a.active:last-child {
+    border-color: var(--color-primary) !important;
+  }
+
+  a.active:first-child {
+    border-color: var(--color-link) !important;
+  }
+}
+.EnrichmentPlots {
+  /* Multi-feature Tab.Pane in the bottom-right split pane */
+  .MultiFeaturePlotPane {
+    /* base padding comes from shared pane rule; here we control flex/height */
+    min-height: 0; /* critical for split panes */
+    height: 100%; /* fill bottom-right area */
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: visible; /* never clip Plotly or export bar */
+  }
+
+  /* Treat differentialDetailSvgContainer as our "svgContainerEnrichment" for multi-feature */
+  .MultiFeaturePlotPane .differentialDetailSvgContainer {
+    height: 100%;
+    width: 100%;
+    margin: 0px 15px 0px 15px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  /* The Plotly/SVG area inside multi-feature */
+  .MultiFeaturePlotPane .SVGPlot {
+    flex: 1 1 auto;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+  }
+
+  .MultiFeaturePlotPane .export-svg {
+    margin: 5px 20px 5px 0px !important;
+    position: absolute;
+    right: 0;
+    top: 0;
   }
 }

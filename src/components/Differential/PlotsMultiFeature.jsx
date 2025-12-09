@@ -26,6 +26,7 @@ class PlotsMultiFeature extends Component {
     featuresListOpen: false,
     plotlyExport: false,
     plotlyExportType: 'svg',
+    enableFullScreenButton: true,
   };
 
   differentialDetailPlotsMultiFeatureRef = React.createRef();
@@ -259,6 +260,7 @@ class PlotsMultiFeature extends Component {
       upperPlotsVisible,
       differentialPlotDescriptions,
       onHandlePlotlyClick,
+      showFullScreen = 'true',
     } = this.props;
     const {
       activeTabIndexPlotsMultiFeature,
@@ -422,16 +424,20 @@ class PlotsMultiFeature extends Component {
               onHandlePlotlyClick={onHandlePlotlyClick}
             />
             {featuresList}
-            <span id={divWidth >= 625 ? 'FullScreenButton' : 'FullScreenIcon'}>
-              <Button
-                size="mini"
-                onClick={this.props.onGetMultifeaturePlotTransitionAlt}
-                className={divWidth >= 625 ? '' : 'FullScreenPadding'}
+            {showFullScreen && (
+              <span
+                id={divWidth >= 625 ? 'FullScreenButton' : 'FullScreenIcon'}
               >
-                <Icon name="expand arrows alternate" className="" />
-                {divWidth >= 625 ? 'FULL SCREEN' : ''}
-              </Button>
-            </span>
+                <Button
+                  size="mini"
+                  onClick={this.props.onGetMultifeaturePlotTransitionAlt}
+                  className={divWidth >= 625 ? '' : 'FullScreenPadding'}
+                >
+                  <Icon name="expand arrows alternate" className="" />
+                  {divWidth >= 625 ? 'FULL SCREEN' : ''}
+                </Button>
+              </span>
+            )}
             <span id="PlotMultiFeatureDataLoader">{loader}</span>
           </div>
         );
