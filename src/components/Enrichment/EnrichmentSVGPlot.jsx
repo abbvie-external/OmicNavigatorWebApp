@@ -304,7 +304,7 @@ class EnrichmentSVGPlot extends PureComponent {
         return (
           <div className="PlotInstructions">
             <h4 className="PlotInstructionsText">
-              Select barcode line/s to display SVG Plot
+              Select a feature to display plots
             </h4>
           </div>
         );
