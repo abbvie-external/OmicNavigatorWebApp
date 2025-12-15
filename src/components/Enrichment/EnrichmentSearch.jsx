@@ -240,6 +240,11 @@ class EnrichmentSearch extends Component {
         this.getReportLink(enrichmentStudy, enrichmentModel);
         if (enrichmentAnnotation !== '') {
           onSearchTransitionEnrichment(true);
+          const HasAnnotationTerms = await this.props.onSetHasAnnotationTerms(
+            enrichmentStudy,
+            enrichmentAnnotation,
+          );
+          console.log('HasAnnotationTerms:', HasAnnotationTerms);
           await onGetEnrichmentsLinkouts(enrichmentStudy, enrichmentAnnotation);
           const obj = {
             study: enrichmentStudy,
@@ -541,7 +546,7 @@ class EnrichmentSearch extends Component {
     this.getReportLink(enrichmentStudy, value);
   };
 
-  handleAnnotationChange = (evt, { name, value }) => {
+  handleAnnotationChange = async (evt, { name, value }) => {
     const {
       enrichmentStudy,
       enrichmentModel,
@@ -562,6 +567,12 @@ class EnrichmentSearch extends Component {
       reloadPlot: true,
       multisetFiltersVisibleEnrichment: false,
     });
+    conthis.props.onSetAnnotationTerms();
+    const HasAnnotationTerms = await this.props.onSetHasAnnotationTerms(
+      enrichmentStudy,
+      value,
+    );
+    console.log('HasAnnotationTerms:', HasAnnotationTerms);
     onSearchChangeEnrichment(
       {
         enrichmentStudy: enrichmentStudy,

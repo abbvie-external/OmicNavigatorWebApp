@@ -510,6 +510,17 @@ class Enrichment extends Component {
     });
   };
 
+  setHasAnnotationTerms = async (study, annotationID) => {
+    const hasAnnotationTerms = await omicNavigatorService.getHasAnnotationTerms(
+      study,
+      annotationID,
+    );
+    this.setState({
+      hasAnnotationTerms,
+    });
+    return hasAnnotationTerms;
+  };
+
   // handleColumnReorder = searchResults => {
   //   const columns = this.getConfigCols(searchResults);
   //   this.setState({ enrichmentColumns: columns });
@@ -969,7 +980,8 @@ class Enrichment extends Component {
   getConfigCols = (annotationData) => {
     const { enrichmentStudy, enrichmentModel, enrichmentAnnotation } =
       this.props;
-    const { enrichmentsLinkouts, enrichmentsFavicons } = this.state;
+    const { enrichmentsLinkouts, enrichmentsFavicons, hasAnnotationTerms } =
+      this.state;
     const TableValuePopupStyle = {
       backgroundColor: '2E2E2E',
       borderBottom: '2px solid var(--color-primary)',
@@ -1097,21 +1109,29 @@ class Enrichment extends Component {
               <Popup
                 trigger={
                   <span
-                    className="TableCellLink"
-                    onClick={addParams.barcodeData(
-                      enrichmentStudy,
-                      enrichmentModel,
-                      enrichmentAnnotation,
-                      item,
-                      c,
-                    )}
+                    className={hasAnnotationTerms ? 'TableCellLink' : ''}
+                    onClick={
+                      hasAnnotationTerms
+                        ? addParams.barcodeData(
+                            enrichmentStudy,
+                            enrichmentModel,
+                            enrichmentAnnotation,
+                            item,
+                            c,
+                          )
+                        : undefined
+                    }
                   >
                     {formatNumberForDisplay(value)}
                   </span>
                 }
-                style={TableValuePopupStyle}
-                className="TablePopupValue"
-                content={'View Interactive Barcode Plot'}
+                style={hasAnnotationTerms ? TableValuePopupStyle : undefined}
+                className={hasAnnotationTerms ? 'TablePopupValue' : ''}
+                content={
+                  hasAnnotationTerms
+                    ? 'View Interactive Barcode Plot'
+                    : 'No Annotation Terms Available'
+                }
                 inverted
                 basic
               />
@@ -3093,6 +3113,7 @@ class Enrichment extends Component {
               onHandleNetworkTests={this.handleNetworkTests}
               onMultisetTestsFiltered={this.handleMultisetTestsFiltered}
               onAnnotationChange={this.handleAnnotationChange}
+              onSetHasAnnotationTerms={this.setHasAnnotationTerms}
               onHandleNetworkGraphReady={this.handleNetworkGraphReady}
               onHandleEnrichmentTableLoading={this.handleEnrichmentTableLoading}
               onHandleHasBarcodeData={this.handleHasBarcodeData}
