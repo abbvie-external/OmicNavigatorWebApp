@@ -52,19 +52,6 @@ class SplitPanesContainer extends Component {
       if (canChangeTabs) {
         this.handleSVGTabChange(1);
       }
-      if (this.props.onGetMultifeaturePlotTransitionEnrichment) {
-        this.props.onGetMultifeaturePlotTransitionEnrichment();
-      }
-    }
-
-    if (
-      activeSvgTabIndexEnrichment === 1 &&
-      currCount >= 2 &&
-      currCount !== prevCount &&
-      hasMultiFeature &&
-      this.props.onGetMultifeaturePlotTransitionEnrichment
-    ) {
-      this.props.onGetMultifeaturePlotTransitionEnrichment();
     }
 
     if (

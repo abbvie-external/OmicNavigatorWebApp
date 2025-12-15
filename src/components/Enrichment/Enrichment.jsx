@@ -736,27 +736,7 @@ class Enrichment extends Component {
   getMultifeaturePlotTransitionEnrichment = () => {
     const { HighlightedProteins } = this.state;
 
-    const featureIds = (HighlightedProteins || [])
-      .map((p) => p.featureID || p.key)
-      .filter(Boolean);
-
-    if (!featureIds.length) {
-      this.setState({
-        plotMultiFeatureData: { key: null, title: '', svg: [] },
-        plotMultiFeatureDataLength: 0,
-        plotMultiFeatureDataLoaded: true,
-      });
-      return;
-    }
-
-    // start loader funnel: clear old data and mark as loading
-    this.setState({
-      plotMultiFeatureDataLoaded: false,
-      plotMultiFeatureData: { key: null, title: '', svg: [] },
-      plotMultiFeatureDataLength: 0,
-    });
-
-    this.getMultifeaturePlotEnrichment(featureIds);
+    this.reloadMultifeaturePlotEnrichment(HighlightedProteins || []);
   };
 
   handleSearchChangeEnrichment = (changes, scChange) => {
@@ -1463,27 +1443,86 @@ class Enrichment extends Component {
   };
 
   handleProteinSelected = (toHighlightArray) => {
-    const featureID = this.state.hasBarcodeData
-      ? 'featureID'
-      : this.props.filteredDifferentialFeatureIdKey;
-
+    // Guard: Enrichment relies on “context” data (barcode or filtered differential)
     const splitPaneData = this.state.hasBarcodeData
-      ? this.state.barcodeSettings.barcodeData
+      ? this.state.barcodeSettings?.barcodeData
       : this.state.filteredDifferentialResults;
 
-    if (splitPaneData?.length > 0 && Array.isArray(toHighlightArray)) {
-      const sortedArray = [...toHighlightArray].sort(
-        (a, b) => b.statistic - a.statistic,
+    if (!splitPaneData?.length || !Array.isArray(toHighlightArray)) {
+      // Clear selection + clear multi-feature cleanly
+      this.setState(
+        {
+          HighlightedProteins: [],
+          plotMultiFeatureDataLoaded: true,
+          plotMultiFeatureData: { key: null, title: '', svg: [] },
+          plotMultiFeatureDataLength: 0,
+        },
+        () => {
+          // cancel any pending reloads
+          this.reloadMultifeaturePlotEnrichment?.cancel?.();
+        },
       );
-
-      this.setState({
-        HighlightedProteins: sortedArray,
-      });
-    } else {
-      this.setState({
-        HighlightedProteins: [],
-      });
+      return;
     }
+
+    // Cancel pending debounced reload so stale work doesn't fire later
+    this.reloadMultifeaturePlotEnrichment?.cancel?.();
+
+    const featureKeyFromTable = this.props.filteredDifferentialFeatureIdKey;
+    const featureKey = this.state.hasBarcodeData
+      ? 'featureID'
+      : featureKeyFromTable;
+
+    // Normalize + dedupe to consistent shape and small payload
+    const normalize = (arr) => {
+      const out = [];
+      const seen = new Set();
+
+      for (const item of arr) {
+        if (!item) continue;
+
+        const id =
+          item.featureID ||
+          item.key ||
+          item.id ||
+          (featureKey ? item[featureKey] : null);
+
+        if (!id || seen.has(id)) continue;
+        seen.add(id);
+
+        out.push({
+          featureID: id,
+          key: id,
+          statistic: item.statistic,
+          sample: item.sample,
+          cpm: item.cpm,
+        });
+      }
+
+      // Sort only if statistic exists (otherwise keep click order)
+      const hasStat = out.some((x) => typeof x?.statistic === 'number');
+      if (hasStat) {
+        out.sort((a, b) => (b.statistic || 0) - (a.statistic || 0));
+      }
+
+      return out;
+    };
+
+    const normalized = normalize(toHighlightArray);
+
+    // Immediate visual feedback (don’t wait for debounce)
+    const shouldLoadMulti =
+      this.state.plotMultiFeatureAvailable && normalized.length >= 2;
+
+    this.setState(
+      {
+        HighlightedProteins: normalized,
+        ...(shouldLoadMulti ? { plotMultiFeatureDataLoaded: false } : {}),
+      },
+      () => {
+        this.reloadMultifeaturePlotEnrichment(normalized);
+      },
+    );
   };
 
   /**
@@ -1642,9 +1681,6 @@ class Enrichment extends Component {
     // Use the central selection handler (mirrors Differential's onHandleHighlightedFeaturesDifferential)
     // This ensures all side effects (barcode/violin/table sync) happen consistently
     this.handleProteinSelected(updatedHighlightedProteins);
-
-    // Trigger debounced plot reload (mirrors Differential's reloadMultifeaturePlot)
-    this.reloadMultifeaturePlotEnrichment(updatedHighlightedProteins);
   };
 
   /**
@@ -1660,9 +1696,8 @@ class Enrichment extends Component {
   reloadMultifeaturePlotEnrichment = _.debounce((selectedProteins) => {
     if (!this.state.plotMultiFeatureAvailable) return;
 
-    // Need 2+ features for multi-feature plot
+    // Need 2+ features
     if (!selectedProteins || selectedProteins.length < 2) {
-      // Clear the plot when less than 2 features
       this.setState({
         plotMultiFeatureData: { key: null, title: '', svg: [] },
         plotMultiFeatureDataLength: 0,
@@ -1671,21 +1706,34 @@ class Enrichment extends Component {
       return;
     }
 
-    // Extract feature IDs and call existing API method
     const featureIds = selectedProteins
       .map((p) => p.featureID || p.key || p.id)
       .filter(Boolean);
 
-    if (featureIds.length >= 2) {
-      // Set loading state and fetch
-      this.setState({
+    if (featureIds.length < 2) return;
+
+    // Clear old SVGs ONLY if there is zero overlap (avoids confusion)
+    this.setState((prev) => {
+      const prevKey = prev.plotMultiFeatureData?.key || '';
+      const prevIds = new Set(
+        prevKey ? prevKey.split(',').filter(Boolean) : [],
+      );
+      const newIds = new Set(featureIds);
+      const hasOverlap = [...newIds].some((id) => prevIds.has(id));
+
+      return {
         plotMultiFeatureDataLoaded: false,
-        plotMultiFeatureData: { key: null, title: '', svg: [] },
-        plotMultiFeatureDataLength: 0,
-      });
-      this.getMultifeaturePlotEnrichment(featureIds);
-    }
-  }, 1250);
+        ...(hasOverlap
+          ? {}
+          : {
+              plotMultiFeatureData: { key: null, title: '', svg: [] },
+              plotMultiFeatureDataLength: 0,
+            }),
+      };
+    });
+
+    this.getMultifeaturePlotEnrichment(featureIds);
+  }, 300);
 
   /**
    * Tracks when the gear popup (feature bullpen) opens/closes.
