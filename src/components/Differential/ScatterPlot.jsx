@@ -39,6 +39,86 @@ class ScatterPlot extends Component {
     zoomedOut: true,
   };
 
+  /**
+   * UX enhancement: controlled circle radius scaling when zoomed-in.
+   *
+   * Design constraints:
+   * - Default (no zoom): identical to legacy sizes (base=3, highlighted=6, outlined=7, hover=8)
+   * - Zoomed-in: slightly larger base radius for better targetability
+   * - Never exceed legacy caps for highlighted/outlined/hover to avoid layout/UX regressions
+   */
+  getZoomRadiusMultiplier = () => {
+    const { differentialResultsUnfiltered = [] } = this.props;
+
+    // If we cannot compute scales, fall back to legacy.
+    if (
+      !Array.isArray(differentialResultsUnfiltered) ||
+      differentialResultsUnfiltered.length < 2
+    ) {
+      return 1;
+    }
+
+    // "Full" domain uses the unfiltered dataset.
+    const full = this.scaleFactory(differentialResultsUnfiltered);
+
+    // "Current" domain uses whatever is in view (after zoom), otherwise full.
+    const viewData =
+      this.state.allDataInWithinView &&
+      this.state.allDataInWithinView.length > 0
+        ? this.state.allDataInWithinView
+        : differentialResultsUnfiltered;
+    const cur = this.scaleFactory(viewData);
+
+    const fullSpanX = Math.max(
+      1e-9,
+      Math.abs((full.xMax ?? 0) - (full.xMin ?? 0)),
+    );
+    const fullSpanY = Math.max(
+      1e-9,
+      Math.abs((full.yMax ?? 0) - (full.yMin ?? 0)),
+    );
+    const curSpanX = Math.max(
+      1e-9,
+      Math.abs((cur.xMax ?? 0) - (cur.xMin ?? 0)),
+    );
+    const curSpanY = Math.max(
+      1e-9,
+      Math.abs((cur.yMax ?? 0) - (cur.yMin ?? 0)),
+    );
+
+    // How "zoomed" are we? Use the stronger zoom between axes.
+    const zoomFactor = Math.max(
+      1,
+      Math.min(fullSpanX / curSpanX, fullSpanY / curSpanY),
+    );
+
+    // Clamp so the multiplier stays stable.
+    const clamped = Math.min(12, zoomFactor);
+
+    // Convert zoomFactor → multiplier: gentle growth, capped.
+    const multiplier = 1 + (clamped - 1) * 0.15;
+    return Math.min(2, multiplier);
+  };
+
+  getBaseCircleRadius = () => {
+    const base = 3;
+    const r = base * this.getZoomRadiusMultiplier();
+    return Number(r.toFixed(2));
+  };
+
+  // Legacy caps: highlighted <= 7, hover <= 8
+  getHighlightedCircleRadius = () =>
+    Math.min(this.getBaseCircleRadius() + 3, 7);
+  getOutlinedCircleRadius = () => Math.min(this.getBaseCircleRadius() + 4, 7);
+  getHoverCircleRadius = () => Math.min(this.getBaseCircleRadius() + 5, 8);
+
+  getRadiusForCircleClass = (classValue = '') => {
+    const cls = String(classValue);
+    if (cls.includes('outlined')) return this.getOutlinedCircleRadius();
+    if (cls.includes('highlighted')) return this.getHighlightedCircleRadius();
+    return this.getBaseCircleRadius();
+  };
+
   componentDidMount() {
     const {
       differentialResultsUnfiltered,
@@ -526,7 +606,7 @@ class ScatterPlot extends Component {
       .attr('cx', (d) => `${xScale(this.doTransform(d[xAxisLabel], 'x'))}`)
       .attr('cy', (d) => `${yScale(this.doTransform(d[yAxisLabel], 'y'))}`)
       .attr('fill', '#E0E1E2')
-      .attr('r', 3)
+      .attr('r', this.getBaseCircleRadius())
       .attr('stroke', '#aab1c0')
       .attr('strokeWidth', 0.4)
       .attr('class', 'volcanoPlot-dataPoint')
@@ -565,7 +645,7 @@ class ScatterPlot extends Component {
         .attr('cx', (d) => `${xScale(this.doTransform(d[xAxisLabel], 'x'))}`)
         .attr('cy', (d) => `${yScale(this.doTransform(d[yAxisLabel], 'y'))}`)
         .attr('fill', '#1678c2')
-        .attr('r', 3)
+        .attr('r', this.getBaseCircleRadius())
         .attr('stroke', '#000')
         .attr('strokeWidth', 0.4)
         .attr('class', 'volcanoPlot-dataPoint')
@@ -756,7 +836,7 @@ class ScatterPlot extends Component {
         .attr('fill', '#1678c2')
         .attr('stroke', '#000')
         .attr('stroke-width', 1)
-        .attr('r', 3)
+        .attr('r', this.getBaseCircleRadius())
         .classed('highlighted', false)
         .classed('outlined', false);
 
@@ -827,7 +907,10 @@ class ScatterPlot extends Component {
         const highlightedCircleId = this.getCircleOrBin(element);
         if (highlightedCircleId) {
           const highlightedCircle = d3.select(highlightedCircleId?.element);
-          let radius = element === differentialOutlinedFeature ? 7 : 6;
+          let radius =
+            element === differentialOutlinedFeature
+              ? this.getOutlinedCircleRadius()
+              : this.getHighlightedCircleRadius();
           let stroke =
             element === differentialOutlinedFeature ? '#1678c2' : '#000';
           // let strokeWidth =
@@ -883,7 +966,7 @@ class ScatterPlot extends Component {
               outlined.attr('stroke-width', 1);
             }
           }
-          outlined.attr('r', 7);
+          outlined.attr('r', this.getOutlinedCircleRadius());
           outlined.classed('outlined', true);
           outlined.attr('stroke', '#1678c2');
           outlined.attr('d', (d) => `M${d.x},${d.y}${this.hexbin.hexagon(8)}`);
@@ -953,7 +1036,7 @@ class ScatterPlot extends Component {
       if (hovered != null) {
         const circle = d3.select(hovered) ?? null;
         if (circle != null) {
-          circle.attr('r', 8);
+          circle.attr('r', this.getHoverCircleRadius());
           circle.raise();
           this.setState({
             hoveredElement: 'circle',
@@ -979,15 +1062,10 @@ class ScatterPlot extends Component {
           }`,
         )._groups[0][0] ?? null;
       if (hoveredCircle != null) {
-        if (hoveredCircle.attributes['class'].value.endsWith('highlighted')) {
-          hoveredCircle.attributes['r'].value = 6;
-        } else if (
-          hoveredCircle.attributes['class'].value.endsWith('outlined')
-        ) {
-          hoveredCircle.attributes['r'].value = 7;
-        } else {
-          hoveredCircle.attributes['r'].value = 3;
-        }
+        const nextR = this.getRadiusForCircleClass(
+          hoveredCircle.attributes['class']?.value,
+        );
+        hoveredCircle.attributes['r'].value = nextR;
         this.setState({
           hoveredCircleData: {
             position: [],
