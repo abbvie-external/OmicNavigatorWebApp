@@ -40,17 +40,23 @@ class ScatterPlot extends Component {
   };
 
   /**
-   * UX enhancement: controlled circle radius scaling when zoomed-in.
+   * Detects if the current device is touch-capable for enhanced touch interaction.
+   */
+  _isTouchDevice =
+    typeof window !== 'undefined' &&
+    ('ontouchstart' in window ||
+      (typeof navigator !== 'undefined' &&
+        (navigator.maxTouchPoints || 0) > 0));
+
+  /**
+   * Calculates a scaling factor for circle sizes based on the current zoom level.
+   * Compares full dataset domain to current view domain and applies balanced scaling.
    *
-   * Design constraints:
-   * - Default (no zoom): identical to legacy sizes (base=3, highlighted=6, outlined=7, hover=8)
-   * - Zoomed-in: slightly larger base radius for better targetability
-   * - Never exceed legacy caps for highlighted/outlined/hover to avoid layout/UX regressions
+   * @returns {number} A multiplier between 1.0 and 2.5 for radius scaling
    */
   getZoomRadiusMultiplier = () => {
     const { differentialResultsUnfiltered = [] } = this.props;
 
-    // If we cannot compute scales, fall back to legacy.
     if (
       !Array.isArray(differentialResultsUnfiltered) ||
       differentialResultsUnfiltered.length < 2
@@ -58,10 +64,8 @@ class ScatterPlot extends Component {
       return 1;
     }
 
-    // "Full" domain uses the unfiltered dataset.
     const full = this.scaleFactory(differentialResultsUnfiltered);
 
-    // "Current" domain uses whatever is in view (after zoom), otherwise full.
     const viewData =
       this.state.allDataInWithinView &&
       this.state.allDataInWithinView.length > 0
@@ -86,32 +90,47 @@ class ScatterPlot extends Component {
       Math.abs((cur.yMax ?? 0) - (cur.yMin ?? 0)),
     );
 
-    // How "zoomed" are we? Use the stronger zoom between axes.
-    const zoomFactor = Math.max(
-      1,
-      Math.min(fullSpanX / curSpanX, fullSpanY / curSpanY),
-    );
+    // Balanced zoom measure (avoids "one-axis spike" making dots huge).
+    const zx = fullSpanX / curSpanX;
+    const zy = fullSpanY / curSpanY;
+    const zoomFactor = Math.max(1, Math.sqrt(zx * zy));
 
     // Clamp so the multiplier stays stable.
-    const clamped = Math.min(12, zoomFactor);
+    const clamped = Math.min(16, zoomFactor);
 
-    // Convert zoomFactor → multiplier: gentle growth, capped.
-    const multiplier = 1 + (clamped - 1) * 0.15;
-    return Math.min(2, multiplier);
+    // Convert zoomFactor → multiplier: responsive at 2x-6x zoom, capped.
+    const multiplier = 1 + Math.sqrt(clamped - 1) * 0.38;
+    return Math.min(2.5, multiplier);
   };
 
+  /**
+   * Calculates the base radius for standard data points.
+   * Applies zoom multiplier with additional size for touch devices when zoomed.
+   * @returns {number} The radius in pixels for normal circles
+   */
   getBaseCircleRadius = () => {
     const base = 3;
-    const r = base * this.getZoomRadiusMultiplier();
+    const mult = this.getZoomRadiusMultiplier();
+
+    // Touch UX: make targets a bit bigger *after* you’re actually zooming.
+    const touchBonus = this._isTouchDevice && mult > 1.05 ? 1.25 : 1;
+
+    const r = base * mult * touchBonus;
     return Number(r.toFixed(2));
   };
 
-  // Legacy caps: highlighted <= 7, hover <= 8
+  // Multiplicative hierarchy keeps contrast consistent at all zoom levels.
   getHighlightedCircleRadius = () =>
-    Math.min(this.getBaseCircleRadius() + 3, 7);
-  getOutlinedCircleRadius = () => Math.min(this.getBaseCircleRadius() + 4, 7);
-  getHoverCircleRadius = () => Math.min(this.getBaseCircleRadius() + 5, 8);
+    Math.min(this.getBaseCircleRadius() * 1.7, 10);
+  getOutlinedCircleRadius = () =>
+    Math.min(this.getBaseCircleRadius() * 1.9, 11);
+  getHoverCircleRadius = () => Math.min(this.getBaseCircleRadius() * 2.1, 12);
 
+  /**
+   * Selects appropriate radius based on circle's CSS class.
+   * @param {string} classValue - CSS class of the circle
+   * @returns {number} The radius in pixels for the given circle class
+   */
   getRadiusForCircleClass = (classValue = '') => {
     const cls = String(classValue);
     if (cls.includes('outlined')) return this.getOutlinedCircleRadius();
