@@ -261,6 +261,7 @@ class PlotsMultiFeature extends Component {
       differentialPlotDescriptions,
       onHandlePlotlyClick,
       showFullScreen = 'true',
+      isLoading = false,
     } = this.props;
     const {
       activeTabIndexPlotsMultiFeature,
@@ -439,6 +440,15 @@ class PlotsMultiFeature extends Component {
               </span>
             )}
             <span id="PlotMultiFeatureDataLoader">{loader}</span>
+          </div>
+        );
+      } else if (isLoading) {
+        // Initial selection / selection change: show loader instead of instructions
+        return (
+          <div className="PlotInstructions">
+            <Dimmer active inverted>
+              <Loader size="large">Loading Multi-Feature Plots</Loader>
+            </Dimmer>
           </div>
         );
       } else {

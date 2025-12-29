@@ -34,11 +34,14 @@ import CustomEmptyMessage from '../Shared/Templates';
 // eslint-disable-next-line no-unused-vars
 import { EZGrid } from '../Shared/QHGrid/index.module.js';
 import ErrorBoundary from '../Shared/ErrorBoundary';
+import PlotsOverlay from '../Differential/PlotsOverlay';
+import EnrichmentOverlayBreadcrumbs from './EnrichmentOverlayBreadcrumbs';
 
 let cancelRequestEnrichmentGetPlot = () => {};
 let cancelRequestEnrichmentGetMultiPlot = () => {};
 let cancelRequestGetEnrichmentsNetwork = () => {};
 let cancelRequestGetBarcodeData = () => {};
+let cancelRequestEnrichmentGetOverlayPlot = () => {};
 const cacheGetEnrichmentsNetwork = {};
 
 class Enrichment extends Component {
@@ -191,6 +194,16 @@ class Enrichment extends Component {
       svg: [],
     },
     plotMultiFeatureDataLength: 0,
+    // Fullscreen plot overlay (reuses Differential PlotsOverlay)
+    plotOverlayVisibleEnrichment: false,
+    plotOverlayLoadedEnrichment: false,
+    plotOverlayDataEnrichment: {
+      key: null,
+      title: '',
+      svg: [],
+    },
+    isMultiFeatureOverlayEnrichment: false,
+    featuresStringEnrichment: '',
     plotMultiFeatureMax: 1000,
     multiFeatureBullpenOpen: false,
     enableSvgTabChangeOnSelection: true,
@@ -955,6 +968,170 @@ class Enrichment extends Component {
     }));
   };
 
+  // --- Fullscreen plot overlay (Enrichment) ---
+  getSingleFeaturePlotTransitionEnrichment = (
+    key /*, dataItem, plotData, useId */,
+  ) => {
+    if (!key) return;
+    const self = this;
+    this.setState(
+      {
+        plotOverlayVisibleEnrichment: true,
+        plotOverlayLoadedEnrichment: false,
+        isMultiFeatureOverlayEnrichment: false,
+        featuresStringEnrichment: String(key),
+        plotOverlayDataEnrichment: {
+          key: key,
+          title: key,
+          svg: [],
+        },
+      },
+      function () {
+        self.getPlotOverlay(key);
+      },
+    );
+  };
+
+  getMultifeaturePlotTransitionOverlayEnrichment = () => {
+    const { HighlightedProteins, plotMultiFeatureData } = this.state;
+    if (!HighlightedProteins || HighlightedProteins.length < 2) return;
+
+    const featureIds = HighlightedProteins.map(
+      (p) => p.featureID || p.key || p.id,
+    ).filter(Boolean);
+
+    this.setState({
+      plotOverlayVisibleEnrichment: true,
+      plotOverlayLoadedEnrichment: true,
+      isMultiFeatureOverlayEnrichment: true,
+      featuresStringEnrichment: featureIds.join(', '),
+      plotOverlayDataEnrichment: {
+        ...plotMultiFeatureData,
+        key: `${featureIds.length} features`,
+        title: `Multi-Feature Plot (${featureIds.length} features)`,
+      },
+    });
+  };
+
+  backToSplitPanesEnrichment = () => {
+    this.setState({
+      plotOverlayVisibleEnrichment: false,
+      plotOverlayLoadedEnrichment: false,
+      isMultiFeatureOverlayEnrichment: false,
+      featuresStringEnrichment: '',
+      plotOverlayDataEnrichment: { key: null, title: '', svg: [] },
+    });
+  };
+
+  /**
+   * Fetch plot data for the overlay view using plotStudyReturnSvg.
+   * TabOverlay expects raw SVG markup (not URLs) for dangerouslySetInnerHTML.
+   */
+  getPlotOverlay = (featureId) => {
+    const {
+      enrichmentPlotTypes,
+      enrichmentTest,
+      uData,
+      enrichmentModelIds,
+      enrichmentModelsAndAnnotations,
+      enrichmentPlotDescriptions,
+      enrichmentAnnotationIdsCommon,
+    } = this.state;
+    const { enrichmentStudy, enrichmentModel, enrichmentAnnotation } =
+      this.props;
+
+    const id = featureId != null ? featureId : '';
+
+    cancelRequestEnrichmentGetOverlayPlot();
+    const cancelToken = new CancelToken((e) => {
+      cancelRequestEnrichmentGetOverlayPlot = e;
+    });
+
+    const self = this;
+
+    // Filter to single-feature plot types only
+    const plots = (enrichmentPlotTypes || []).filter(
+      (p) => !p.plotType.includes('multiFeature'),
+    );
+
+    if (plots.length === 0) {
+      this.setState({ plotOverlayLoadedEnrichment: true });
+      return;
+    }
+
+    const promises = plots.map((plot) => {
+      const plotMetadataSpecificPlot = enrichmentPlotDescriptions[plot.plotID];
+      const designatedModels = plotMetadataSpecificPlot?.models || null;
+      const designatedModelsMultiModelExists =
+        designatedModels &&
+        designatedModels !== 'all' &&
+        designatedModels.includes(enrichmentModel);
+      const enrichmentModelIdsOverride = designatedModelsMultiModelExists
+        ? designatedModels
+        : enrichmentModelIds;
+
+      const isMultiModelMultiTestVar = isMultiModelMultiTest(plot.plotType);
+      const testIdNotCommon =
+        !enrichmentAnnotationIdsCommon.includes(enrichmentAnnotation);
+
+      let testsArg = [];
+      if (isMultiModelMultiTestVar && testIdNotCommon) {
+        testsArg = [];
+      } else {
+        testsArg = getTestsArg(
+          plot.plotType,
+          enrichmentModelIdsOverride,
+          uData,
+          enrichmentTest,
+        );
+      }
+
+      const modelsArg = getModelsArg(
+        plot.plotType,
+        enrichmentModelIdsOverride,
+        uData,
+        enrichmentModel,
+        enrichmentModelsAndAnnotations,
+        null,
+        enrichmentAnnotationIdsCommon,
+      );
+
+      // Use plotStudyReturnSvg to get raw SVG content (not URL)
+      return omicNavigatorService
+        .plotStudyReturnSvg(
+          enrichmentStudy,
+          modelsArg,
+          id,
+          plot.plotID,
+          plot.plotType,
+          testsArg,
+          null,
+          cancelToken,
+        )
+        .then((svgResponse) => {
+          // plotStudyReturnSvg returns { data: '<svg>...</svg>' } or raw string
+          const svgContent = svgResponse?.data || svgResponse;
+          return { svg: svgContent, plotType: plot };
+        })
+        .catch((error) => {
+          console.error(`Error fetching overlay plot ${plot.plotID}:`, error);
+          return null;
+        });
+    });
+
+    Promise.all(promises).then((results) => {
+      const svgArray = results.filter(Boolean);
+      self.setState({
+        plotOverlayDataEnrichment: {
+          key: id,
+          title: id,
+          svg: svgArray,
+        },
+        plotOverlayLoadedEnrichment: true,
+      });
+    });
+  };
+
   handleMultisetPlot = (multisetPlotResults) => {
     this.setState({
       multisetPlotInfoEnrichment: {
@@ -1540,14 +1717,24 @@ class Enrichment extends Component {
       ? this.state.barcodeSettings.barcodeData
       : this.state.filteredDifferentialResults;
 
-    // If no feature or no data, just clear
+    // Helper to create cleared plot state
+    const getClearedPlotState = () => ({
+      selectedProteinId: '',
+      SVGPlotLoaded: false,
+      SVGPlotLoading: false,
+      plotDataEnrichment: {
+        key: null,
+        title: '',
+        svg: [],
+        dataItem: '',
+      },
+      plotDataEnrichmentLength: 0,
+    });
+
+    // If no feature or no data, just clear (single atomic setState)
     if (!featureId || !splitPaneData || splitPaneData.length === 0) {
       cancelRequestEnrichmentGetPlot();
-      this.setState({
-        selectedProteinId: '',
-        SVGPlotLoaded: false,
-        SVGPlotLoading: false,
-      });
+      this.setState(getClearedPlotState());
       return;
     }
 
@@ -1555,22 +1742,16 @@ class Enrichment extends Component {
     // Toggle: clicking same row/dot again clears selection
     const nextSelected = prevSelected === featureId ? '' : featureId;
 
-    this.setState({
-      selectedProteinId: nextSelected,
-    });
-
-    // If cleared, just stop here
+    // If clearing selection (deselect), do single atomic setState
     if (!nextSelected) {
       cancelRequestEnrichmentGetPlot();
-      this.setState({
-        SVGPlotLoaded: false,
-        SVGPlotLoading: false,
-      });
+      this.setState(getClearedPlotState());
       return;
     }
 
-    // Load single-feature plot for the selected protein
+    // If selecting a new feature, set loading state and fetch plot
     this.setState({
+      selectedProteinId: nextSelected,
       SVGPlotLoaded: false,
       SVGPlotLoading: true,
     });
@@ -2536,6 +2717,68 @@ class Enrichment extends Component {
 
   getView = () => {
     const message = this.getMessage();
+
+    // Fullscreen overlay: reuse Differential PlotsOverlay with Enrichment breadcrumbs.
+    if (this.state.plotOverlayVisibleEnrichment) {
+      const { enrichmentPlotTypes, enrichmentMultiFeaturePlotTypes } =
+        this.state;
+
+      const singleFeaturePlotTypes = (enrichmentPlotTypes || []).filter(
+        (p) => !p.plotType?.includes('multiFeature'),
+      );
+      const multiFeaturePlotTypes = enrichmentMultiFeaturePlotTypes || [];
+
+      const isMulti = this.state.isMultiFeatureOverlayEnrichment;
+
+      const plotOverlayData = this.state.plotOverlayDataEnrichment;
+      const plotOverlayLoaded = this.state.plotOverlayLoadedEnrichment;
+      const plotOverlayDataLength = plotOverlayData?.svg?.length || 0;
+
+      const transformedHighlightedFeatures = (
+        this.state.HighlightedProteins || []
+      ).map((protein) => ({
+        key: protein.featureID,
+        id: protein.featureID,
+        value: protein.featureID,
+        text: splitValue(protein.featureID),
+      }));
+
+      const featureIdKey = this.state.hasBarcodeData
+        ? 'featureID'
+        : this.props.filteredDifferentialFeatureIdKey;
+
+      return (
+        <PlotsOverlay
+          onBackToTable={this.backToSplitPanesEnrichment}
+          plotOverlayData={plotOverlayData}
+          plotOverlayDataLength={plotOverlayDataLength}
+          plotOverlayLoaded={plotOverlayLoaded}
+          differentialStudy={this.props.enrichmentStudy}
+          differentialModel={this.props.enrichmentModel}
+          differentialTest={this.props.enrichmentAnnotation}
+          differentialFeature={plotOverlayData?.key || ''}
+          differentialFeatureIdKey={featureIdKey}
+          featuresString={
+            this.state.featuresStringEnrichment || plotOverlayData?.key || ''
+          }
+          differentialPlotTypes={enrichmentPlotTypes}
+          singleFeaturePlotTypes={singleFeaturePlotTypes}
+          multiFeaturePlotTypes={multiFeaturePlotTypes}
+          differentialTestIdsCommon={
+            this.state.enrichmentAnnotationIdsCommon || []
+          }
+          differentialPlotDescriptions={this.state.enrichmentPlotDescriptions}
+          differentialHighlightedFeaturesData={transformedHighlightedFeatures}
+          tab="enrichment"
+          svgTabMax={0}
+          modelSpecificMetaFeaturesExist={false}
+          BreadcrumbsComponent={EnrichmentOverlayBreadcrumbs}
+          breadcrumbsProps={{ backLabel: 'Back to Plots' }}
+          isMultiFeature={isMulti}
+        />
+      );
+    }
+
     if (this.state.isTestSelected && !this.state.isTestDataLoaded) {
       return (
         <div className="SearchingAltDiv">
@@ -2562,6 +2805,12 @@ class Enrichment extends Component {
             onHandleBarcodeChanges={this.handleBarcodeChanges}
             onGetMultifeaturePlotTransitionEnrichment={
               this.getMultifeaturePlotTransitionEnrichment
+            }
+            onGetSingleFeaturePlotTransitionEnrichment={
+              this.getSingleFeaturePlotTransitionEnrichment
+            }
+            onGetMultifeaturePlotTransitionOverlayEnrichment={
+              this.getMultifeaturePlotTransitionOverlayEnrichment
             }
             // onHandleFilteredDifferentialFeatureIdKey={
             //   this.handleFilteredDifferentialFeatureIdKey

@@ -5,11 +5,11 @@ import EnrichmentBreadcrumbs from './EnrichmentBreadcrumbs';
 import ButtonActions from '../Shared/ButtonActions';
 import SplitPane from 'react-split-pane-r17';
 import './SplitPanesContainer.scss';
-import EnrichmentSVGPlot from './EnrichmentSVGPlot';
 import BarcodePlot from './BarcodePlot';
 import ViolinPlot from './ViolinPlot';
 import FilteredDifferentialTable from './FilteredDifferentialTable';
 import PlotsMultiFeature from '../Differential/PlotsMultiFeature';
+import PlotsSingleFeature from '../Differential/PlotsSingleFeature';
 
 class SplitPanesContainer extends Component {
   state = {
@@ -282,7 +282,6 @@ class SplitPanesContainer extends Component {
       svgExportName,
       tab,
       onHandleProteinSelected,
-      onGetMultifeaturePlotTransitionEnrichment,
       SVGPlotLoaded,
       SVGPlotLoading,
       plotDataEnrichment,
@@ -316,6 +315,11 @@ class SplitPanesContainer extends Component {
     // 3. Transform HighlightedProteins to have .key/.id/.value properties
     //    PlotsMultiFeature expects: { key, id, value } for getFeaturesList()
     //    Enrichment has: { featureID, sample, cpm }
+    // Single-feature plot types (exclude multiFeature plot types)
+    const singleFeaturePlotTypes = (enrichmentPlotTypes || []).filter(
+      (p) => !p.plotType?.includes('multiFeature'),
+    );
+
     const transformedHighlightedFeatures = (HighlightedProteins || []).map(
       (protein) => ({
         ...protein,
@@ -335,15 +339,6 @@ class SplitPanesContainer extends Component {
           onTabChange={(e, data) => {
             const nextIndex = data.activeIndex;
             this.handleSVGTabChange(nextIndex);
-
-            if (
-              nextIndex === 1 &&
-              plotMultiFeatureAvailable &&
-              (HighlightedProteins?.length || 0) >= 2 &&
-              onGetMultifeaturePlotTransitionEnrichment
-            ) {
-              onGetMultifeaturePlotTransitionEnrichment();
-            }
           }}
           panes={[
             {
@@ -354,7 +349,11 @@ class SplitPanesContainer extends Component {
                   attached={false}
                   className="SingleFeaturePlotPane"
                 >
-                  <EnrichmentSVGPlot
+                  <PlotsSingleFeature
+                    plotSingleFeatureData={plotDataEnrichment}
+                    plotSingleFeatureDataLength={plotDataEnrichmentLength}
+                    plotSingleFeatureDataLoaded={SVGPlotLoaded}
+                    isLoading={SVGPlotLoading}
                     // unified dimensions for single-feature
                     divWidth={contentWidth}
                     divHeight={contentHeight}
@@ -362,16 +361,22 @@ class SplitPanesContainer extends Component {
                     pointSize={12}
                     svgTabMax={1}
                     tab={tab}
-                    plotDataEnrichment={plotDataEnrichment}
-                    plotDataEnrichmentLength={plotDataEnrichmentLength}
+                    upperPlotsVisible={true}
                     svgExportName={svgExportName}
-                    enrichmentPlotTypes={enrichmentPlotTypes}
-                    SVGPlotLoaded={SVGPlotLoaded}
-                    SVGPlotLoading={SVGPlotLoading}
-                    HighlightedProteins={HighlightedProteins}
-                    enrichmentStudy={enrichmentStudy}
-                    enrichmentModel={enrichmentModel}
-                    enrichmentPlotDescriptions={enrichmentPlotDescriptions}
+                    differentialStudy={enrichmentStudy}
+                    differentialModel={enrichmentModel}
+                    differentialTest={enrichmentAnnotation}
+                    differentialTestIdsCommon={enrichmentAnnotationIdsCommon || []}
+                    differentialPlotTypes={enrichmentPlotTypes}
+                    singleFeaturePlotTypes={singleFeaturePlotTypes}
+                    differentialPlotDescriptions={enrichmentPlotDescriptions}
+                    modelSpecificMetaFeaturesExist={false}
+                    onGetPlotTransitionRef={
+                      this.props.onGetSingleFeaturePlotTransitionEnrichment
+                    }
+                    showFullScreenButton={
+                      !!this.props.onGetSingleFeaturePlotTransitionEnrichment
+                    }
                   />
                 </Tab.Pane>
               ),
@@ -400,6 +405,7 @@ class SplitPanesContainer extends Component {
                     }
                     plotMultiFeatureData={plotMultiFeatureData}
                     plotMultiFeatureDataLoaded={plotMultiFeatureDataLoaded}
+                    isLoading={!plotMultiFeatureDataLoaded && (HighlightedProteins?.length || 0) >= 2}
                     plotMultiFeatureDataLength={plotMultiFeatureDataLength}
                     plotMultiFeatureMax={plotMultiFeatureMax}
                     svgExportName={svgExportName}
@@ -411,14 +417,14 @@ class SplitPanesContainer extends Component {
                     svgTabMax={1}
                     tab={tab}
                     upperPlotsVisible={true}
-                    showFullScreen={false}
+                    showFullScreen={!!this.props.onGetMultifeaturePlotTransitionOverlayEnrichment}
                     // selection syncing
                     onHandleAllChecked={() => onHandleProteinSelected([])}
                     onHandleHighlightedFeaturesDifferential={(arr) =>
                       onHandleProteinSelected(arr)
                     }
                     onGetMultifeaturePlotTransitionAlt={
-                      onGetMultifeaturePlotTransitionEnrichment
+                      this.props.onGetMultifeaturePlotTransitionOverlayEnrichment
                     }
                     // Interaction handlers
                     onHandlePlotlyClick={

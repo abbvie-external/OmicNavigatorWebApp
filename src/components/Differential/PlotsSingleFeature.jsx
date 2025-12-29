@@ -112,6 +112,8 @@ class PlotsSingleFeature extends Component {
       differentialModel,
       differentialTest,
       differentialPlotDescriptions,
+      isLoading = false,
+      showFullScreenButton = true,
     } = this.props;
 
     const {
@@ -272,26 +274,31 @@ class PlotsSingleFeature extends Component {
               }
               ref={this.metafeaturesTableDynamicRef}
             />
-            <span
-              className={divWidth < 450 ? 'Hide' : 'Show'}
-              id={divWidth >= 625 ? 'FullScreenButton' : 'FullScreenIcon'}
-            >
-              {/* <Popup
-                  trigger={ */}
-              <Button
-                size="mini"
-                onClick={this.handlePlotOverlaySingleFeature}
-                className={divWidth >= 625 ? '' : 'FullScreenPadding'}
+            {showFullScreenButton && (
+              <span
+                className={divWidth < 450 ? 'Hide' : 'Show'}
+                id={divWidth >= 625 ? 'FullScreenButton' : 'FullScreenIcon'}
               >
-                <Icon
-                  // name="expand"
-                  name="expand arrows alternate"
-                  className=""
-                />
-                {divWidth >= 625 ? 'FULL SCREEN' : ''}
-              </Button>
-            </span>
+                <Button
+                  size="mini"
+                  onClick={this.handlePlotOverlaySingleFeature}
+                  className={divWidth >= 625 ? '' : 'FullScreenPadding'}
+                >
+                  <Icon name="expand arrows alternate" className="" />
+                  {divWidth >= 625 ? 'FULL SCREEN' : ''}
+                </Button>
+              </span>
+            )}
             <span id="PlotSingleFeatureDataLoader">{loader}</span>
+          </div>
+        );
+      } else if (isLoading) {
+        // Initial selection / selection change: show loader instead of instructions
+        return (
+          <div className="PlotInstructions">
+            <Dimmer active inverted>
+              <Loader size="large">Loading Single-Feature Plots</Loader>
+            </Dimmer>
           </div>
         );
       } else {

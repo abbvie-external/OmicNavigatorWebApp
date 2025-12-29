@@ -41,10 +41,19 @@ class PlotsOverlay extends PureComponent {
     }
   }
 
+  /**
+   * Determines if this is a multi-feature plot.
+   * Prefers explicit isMultiFeature prop if provided; falls back to key detection.
+   */
+  getIsMultiFeature = () => {
+    const { isMultiFeature, plotOverlayData } = this.props;
+    if (typeof isMultiFeature === 'boolean') return isMultiFeature;
+    return plotOverlayData?.key?.includes('features') || false;
+  };
+
   setButtonVisibility = () => {
     if (this.props.differentialPlotTypes.length > 0) {
-      const isMultifeaturePlot =
-        this.props.plotOverlayData.key?.includes('features') || false;
+      const isMultifeaturePlot = this.getIsMultiFeature();
       const length = isMultifeaturePlot
         ? this.props.multiFeaturePlotTypes.length
         : this.props.singleFeaturePlotTypes.length;
@@ -100,6 +109,8 @@ class PlotsOverlay extends PureComponent {
       modelSpecificMetaFeaturesExist,
       singleFeaturePlotTypes,
       differentialPlotDescriptions,
+      BreadcrumbsComponent = DifferentialBreadcrumbs,
+      breadcrumbsProps = {},
     } = this.props;
 
     const {
@@ -137,8 +148,7 @@ class PlotsOverlay extends PureComponent {
           value: index,
         };
       });
-      const isMultifeaturePlot =
-        plotOverlayData.key?.includes('features') || false;
+      const isMultifeaturePlot = this.getIsMultiFeature();
       if (modelSpecificMetaFeaturesExist !== false && !isMultifeaturePlot) {
         // const singleFeaturePlotTypes = differentialPlotTypes.filter(
         //   p => p.plotType !== 'multiFeature',
@@ -193,7 +203,7 @@ class PlotsOverlay extends PureComponent {
                   largeScreen={8}
                   widescreen={8}
                 >
-                  <DifferentialBreadcrumbs {...this.props} />
+                  <BreadcrumbsComponent {...this.props} {...breadcrumbsProps} />
                 </Grid.Column>
                 <Grid.Column
                   mobile={8}
