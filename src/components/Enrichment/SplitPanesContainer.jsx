@@ -355,8 +355,8 @@ class SplitPanesContainer extends Component {
                     plotSingleFeatureDataLoaded={SVGPlotLoaded}
                     isLoading={SVGPlotLoading}
                     // unified dimensions for single-feature
-                    divWidth={contentWidth}
-                    divHeight={contentHeight}
+                    divWidth={multiContentWidth}
+                    divHeight={multiContentHeight}
                     pxToPtRatio={105}
                     pointSize={12}
                     svgTabMax={1}
@@ -366,7 +366,9 @@ class SplitPanesContainer extends Component {
                     differentialStudy={enrichmentStudy}
                     differentialModel={enrichmentModel}
                     differentialTest={enrichmentAnnotation}
-                    differentialTestIdsCommon={enrichmentAnnotationIdsCommon || []}
+                    differentialTestIdsCommon={
+                      enrichmentAnnotationIdsCommon || []
+                    }
                     differentialPlotTypes={enrichmentPlotTypes}
                     singleFeaturePlotTypes={singleFeaturePlotTypes}
                     differentialPlotDescriptions={enrichmentPlotDescriptions}
@@ -405,7 +407,10 @@ class SplitPanesContainer extends Component {
                     }
                     plotMultiFeatureData={plotMultiFeatureData}
                     plotMultiFeatureDataLoaded={plotMultiFeatureDataLoaded}
-                    isLoading={!plotMultiFeatureDataLoaded && (HighlightedProteins?.length || 0) >= 2}
+                    isLoading={
+                      !plotMultiFeatureDataLoaded &&
+                      (HighlightedProteins?.length || 0) >= 2
+                    }
                     plotMultiFeatureDataLength={plotMultiFeatureDataLength}
                     plotMultiFeatureMax={plotMultiFeatureMax}
                     svgExportName={svgExportName}
@@ -417,14 +422,18 @@ class SplitPanesContainer extends Component {
                     svgTabMax={1}
                     tab={tab}
                     upperPlotsVisible={true}
-                    showFullScreen={!!this.props.onGetMultifeaturePlotTransitionOverlayEnrichment}
+                    showFullScreen={
+                      !!this.props
+                        .onGetMultifeaturePlotTransitionOverlayEnrichment
+                    }
                     // selection syncing
                     onHandleAllChecked={() => onHandleProteinSelected([])}
                     onHandleHighlightedFeaturesDifferential={(arr) =>
                       onHandleProteinSelected(arr)
                     }
                     onGetMultifeaturePlotTransitionAlt={
-                      this.props.onGetMultifeaturePlotTransitionOverlayEnrichment
+                      this.props
+                        .onGetMultifeaturePlotTransitionOverlayEnrichment
                     }
                     // Interaction handlers
                     onHandlePlotlyClick={

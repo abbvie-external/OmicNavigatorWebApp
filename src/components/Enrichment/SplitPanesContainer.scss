@@ -204,6 +204,43 @@
   }
 }
 .EnrichmentPlots {
+  /* Single-feature Tab.Pane in the top-right split pane (reuses Differential PlotsSingleFeature) */
+  .SingleFeaturePlotPane {
+    /* critical for SplitPane children: allow flex items to shrink */
+    min-height: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative; /* anchor export/fullscreen absolute buttons */
+    overflow: visible; /* prevent SVG spilling outside pane */
+  }
+
+  /* Treat differentialDetailSvgContainer as our svg container for single-feature */
+  .SingleFeaturePlotPane .differentialDetailSvgContainer {
+    height: 100%;
+    width: 100%;
+    margin: 0px 15px 0px 15px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    min-height: 0;
+  }
+
+  /* Override Differential's default min-height (75vh) to respect SplitPane sizing */
+  .SingleFeaturePlotPane .SVGPlot {
+    flex: 1 1 auto;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+  }
+
+  .SingleFeaturePlotPane .export-svg {
+    margin: 5px 20px 5px 0px !important;
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+
   /* Multi-feature Tab.Pane in the bottom-right split pane */
   .MultiFeaturePlotPane {
     /* base padding comes from shared pane rule; here we control flex/height */
