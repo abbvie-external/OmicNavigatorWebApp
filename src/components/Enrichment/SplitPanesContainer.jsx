@@ -12,12 +12,21 @@ import PlotsMultiFeature from '../Differential/PlotsMultiFeature';
 import PlotsSingleFeature from '../Differential/PlotsSingleFeature';
 
 class SplitPanesContainer extends Component {
+  // Smooth redraw during SplitPane drag without spamming localStorage
+  _pendingDragSizes = { horizontal: null, vertical: null };
+  _dragRafId = null;
+
   state = {
     activeSvgTabIndexEnrichment: 0,
+    // Persisted split sizes (enrichment-scoped; fall back to legacy keys if present)
     horizontalSplitPaneSize:
-      parseInt(localStorage.getItem('horizontalSplitPaneSize'), 10) || 250,
+      parseInt(localStorage.getItem('enrichmentHorizontalSplitPaneSize'), 10) ||
+      parseInt(localStorage.getItem('horizontalSplitPaneSize'), 10) ||
+      250,
     verticalSplitPaneSize:
-      parseInt(localStorage.getItem('verticalSplitPaneSize'), 10) || 525,
+      parseInt(localStorage.getItem('enrichmentVerticalSplitPaneSize'), 10) ||
+      parseInt(localStorage.getItem('verticalSplitPaneSize'), 10) ||
+      525,
     activeViolinTableIndex: 0,
     elementTextKey: 'featureID',
   };
@@ -61,6 +70,13 @@ class SplitPanesContainer extends Component {
       prevCount >= 2
     ) {
       this.handleSVGTabChange(0);
+    }
+  }
+
+  componentWillUnmount() {
+    if (this._dragRafId) {
+      cancelAnimationFrame(this._dragRafId);
+      this._dragRafId = null;
     }
   }
 
@@ -245,6 +261,28 @@ class SplitPanesContainer extends Component {
     );
   };
 
+  // Called while dragging (SplitPane onChange). Updates state at most once per animation frame.
+  splitPaneDragging = (size, paneType) => {
+    if (size === undefined) return;
+    this._pendingDragSizes[paneType] = size;
+    if (this._dragRafId) return;
+    this._dragRafId = requestAnimationFrame(() => {
+      const next = {};
+      if (this._pendingDragSizes.horizontal !== null) {
+        next.horizontalSplitPaneSize = this._pendingDragSizes.horizontal;
+        this._pendingDragSizes.horizontal = null;
+      }
+      if (this._pendingDragSizes.vertical !== null) {
+        next.verticalSplitPaneSize = this._pendingDragSizes.vertical;
+        this._pendingDragSizes.vertical = null;
+      }
+      this._dragRafId = null;
+      if (Object.keys(next).length) {
+        this.setState(next);
+      }
+    });
+  };
+
   splitPaneResized = (size, paneType) => {
     if (size === undefined) return;
     if (paneType === 'horizontal') {
@@ -256,7 +294,11 @@ class SplitPanesContainer extends Component {
         verticalSplitPaneSize: size,
       });
     }
-    localStorage.setItem(`${paneType}SplitPaneSize`, size);
+    const key =
+      paneType === 'horizontal'
+        ? 'enrichmentHorizontalSplitPaneSize'
+        : 'enrichmentVerticalSplitPaneSize';
+    localStorage.setItem(key, String(size));
   };
 
   renderFeaturePlotTabs = (
@@ -521,6 +563,7 @@ class SplitPanesContainer extends Component {
                   size={horizontalSplitPaneSize}
                   minSize={185}
                   maxSize={400}
+                  onChange={(size) => this.splitPaneDragging(size, 'horizontal')}
                   onDragFinished={(size) =>
                     this.splitPaneResized(size, 'horizontal')
                   }
@@ -533,6 +576,7 @@ class SplitPanesContainer extends Component {
                     size={verticalSplitPaneSize}
                     minSize={315}
                     maxSize={1300}
+                    onChange={(size) => this.splitPaneDragging(size, 'vertical')}
                     onDragFinished={(size) =>
                       this.splitPaneResized(size, 'vertical')
                     }
@@ -598,6 +642,7 @@ class SplitPanesContainer extends Component {
                 size={verticalSplitPaneSize}
                 minSize={315}
                 maxSize={1300}
+                onChange={(size) => this.splitPaneDragging(size, 'vertical')}
                 onDragFinished={(size) =>
                   this.splitPaneResized(size, 'vertical')
                 }
