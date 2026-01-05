@@ -970,10 +970,16 @@ class Enrichment extends Component {
     }));
   };
 
-  // --- Fullscreen plot overlay (Enrichment) ---
-  getSingleFeaturePlotTransitionEnrichment = (
-    key /*, dataItem, plotData, useId */,
-  ) => {
+  /**
+   * Handles the transition to display a single feature plot enrichment overlay
+   *
+   * This method prepares the component state to display a single feature plot in an overlay.
+   * It sets the necessary state variables for the overlay visibility and data structure,
+   * then triggers the actual plot data loading via the getPlotOverlay method.
+   *
+   * @param {string|number} key - The identifier of the feature to be plotted
+   */
+  getSingleFeaturePlotTransitionEnrichment = (key) => {
     if (!key) return;
     const self = this;
     this.setState(
@@ -994,6 +1000,15 @@ class Enrichment extends Component {
     );
   };
 
+  /**
+   * Handles the transition to display a multi-feature plot enrichment overlay
+   *
+   * This method prepares the component state to display a plot of multiple features in an overlay.
+   * It extracts feature IDs from highlighted proteins, validates there are enough features to display,
+   * then sets up the necessary state variables before triggering the data loading process.
+   *
+   * @returns {void}
+   */
   getMultifeaturePlotTransitionOverlayEnrichment = () => {
     const { HighlightedProteins } = this.state;
     if (!HighlightedProteins || HighlightedProteins.length < 2) return;
@@ -1024,6 +1039,15 @@ class Enrichment extends Component {
     );
   };
 
+  /**
+   * Resets the state to hide the plot overlay and return to the split panes view
+   *
+   * This method resets all state variables related to the plot overlay enrichment,
+   * effectively hiding the overlay and clearing its data. It's typically used as
+   * a callback for "back" or "close" buttons in the overlay interface.
+   *
+   * @returns {void}
+   */
   backToSplitPanesEnrichment = () => {
     this.setState({
       plotOverlayVisibleEnrichment: false,
