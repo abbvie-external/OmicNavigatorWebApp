@@ -435,13 +435,13 @@ class OmicNavigatorService {
   }
 
   async getHasAnnotationTerms(study, annotationID, cancelToken) {
-    const cacheKey = `getHasAnnotationTerms_${study}_${annotationID}`;
+    const cacheKey = `hasTerms_${study}_${annotationID}`;
     if (this[cacheKey] != null) {
       return this[cacheKey];
     } else {
       try {
         const promise = this.axiosPost(
-          'getHasAnnotationTerms',
+          'hasTerms',
           {
             study,
             annotationID,
@@ -820,28 +820,6 @@ class OmicNavigatorService {
         false,
         errorCb,
         cancelToken,
-        25000,
-      );
-      const dataFromPromise = await promise;
-      this[cacheKey] = dataFromPromise;
-      return dataFromPromise;
-    }
-  }
-
-  async getBarcodes(study, modelID) {
-    const cacheKey = `getBarcodes_${study}_${modelID}`;
-    if (this[cacheKey] != null) {
-      return this[cacheKey];
-    } else {
-      const promise = this.axiosPost(
-        'getBarcodes',
-        {
-          study,
-          modelID,
-        },
-        false,
-        null,
-        null,
         25000,
       );
       const dataFromPromise = await promise;

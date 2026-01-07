@@ -43,7 +43,6 @@ class BarcodePlot extends Component {
   barcodeSVGRef = React.createRef();
 
   componentDidMount() {
-    if (!this.props.hasBarcodeData) return;
     this.setWidth(true, false);
     let resizedFn;
     window.addEventListener('resize', () => {
@@ -55,7 +54,6 @@ class BarcodePlot extends Component {
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
-    if (!this.props.hasBarcodeData) return;
     if (
       this.props.horizontalSplitPaneSize !== prevProps.horizontalSplitPaneSize
     ) {
@@ -613,9 +611,7 @@ class BarcodePlot extends Component {
       displayElementTextBarcode,
     } = this.state;
 
-    const { horizontalSplitPaneSize, barcodeSettings, hasBarcodeData } =
-      this.props;
-    if (!hasBarcodeData) return null;
+    const { horizontalSplitPaneSize, barcodeSettings } = this.props;
 
     const barcodeHeight =
       horizontalSplitPaneSize - settings.margin.top - settings.margin.bottom;

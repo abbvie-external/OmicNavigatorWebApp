@@ -233,18 +233,16 @@ class EnrichmentSearch extends Component {
           enrichmentStudy,
           enrichmentModel,
         );
-        this.props.onHandleHasBarcodeData();
         this.setState({
           enrichmentModelTooltip: models?.[enrichmentModel] || enrichmentModel,
         });
         this.getReportLink(enrichmentStudy, enrichmentModel);
         if (enrichmentAnnotation !== '') {
           onSearchTransitionEnrichment(true);
-          const HasAnnotationTerms = await this.props.onSetHasAnnotationTerms(
+          this.props.onSetHasAnnotationTerms(
             enrichmentStudy,
             enrichmentAnnotation,
           );
-          console.log('HasAnnotationTerms:', HasAnnotationTerms);
           await onGetEnrichmentsLinkouts(enrichmentStudy, enrichmentAnnotation);
           const obj = {
             study: enrichmentStudy,
@@ -539,7 +537,6 @@ class EnrichmentSearch extends Component {
       enrichmentAnnotationTooltip: 'Select a database',
     });
     onHandleEnrichmentColumnsConfigured(false);
-    this.props.onHandleHasBarcodeData(value);
     onSearchResetEnrichment({
       isValidSearchEnrichment: false,
     });
@@ -567,12 +564,7 @@ class EnrichmentSearch extends Component {
       reloadPlot: true,
       multisetFiltersVisibleEnrichment: false,
     });
-    conthis.props.onSetAnnotationTerms();
-    const HasAnnotationTerms = await this.props.onSetHasAnnotationTerms(
-      enrichmentStudy,
-      value,
-    );
-    console.log('HasAnnotationTerms:', HasAnnotationTerms);
+    this.props.onSetHasAnnotationTerms(enrichmentStudy, value);
     onSearchChangeEnrichment(
       {
         enrichmentStudy: enrichmentStudy,

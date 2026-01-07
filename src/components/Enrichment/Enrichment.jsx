@@ -137,7 +137,7 @@ class Enrichment extends Component {
     SVGPlotLoading: false,
     SVGPlotLoaded: false,
     isViolinPlotLoaded: false,
-    hasBarcodeData: false,
+    hasAnnotationTerms: false,
     barcodeSettings: {
       barcodeData: [],
       brushedData: [],
@@ -518,7 +518,6 @@ class Enrichment extends Component {
     this.setState({
       hasAnnotationTerms,
     });
-    return hasAnnotationTerms;
   };
 
   // handleColumnReorder = searchResults => {
@@ -772,25 +771,6 @@ class Enrichment extends Component {
         multisetPlotAvailableEnrichment: false,
       });
     }
-  };
-
-  handleHasBarcodeData = (modelArg) => {
-    const { enrichmentStudy, enrichmentModel } = this.props;
-    const model = modelArg ? modelArg : enrichmentModel;
-    omicNavigatorService
-      .getBarcodes(enrichmentStudy, model, null, null)
-      .then((getBarcodesResponseData) => {
-        // TODO - why is barcode return no longer an array?
-        const hasBarcodeData = Array.isArray(getBarcodesResponseData)
-          ? getBarcodesResponseData.length > 0
-          : !!(
-              getBarcodesResponseData &&
-              Object.keys(getBarcodesResponseData).length
-            );
-        this.setState({
-          hasBarcodeData,
-        });
-      });
   };
 
   getEnrichmentsLinkouts = (enrichmentStudy, enrichmentAnnotation) => {
@@ -1424,9 +1404,7 @@ class Enrichment extends Component {
 
   handleBarcodeChanges = (changes) => {
     let self = this;
-    const splitPaneData = this.state.hasBarcodeData
-      ? this.state.barcodeSettings.barcodeData
-      : this.state.filteredDifferentialResults;
+    const splitPaneData = this.state.barcodeSettings.barcodeData;
     if (changes.brushedData.length > 0) {
       const boxPlotArray = _.map(changes.brushedData, function (d) {
         d.statistic = _.find(splitPaneData, {
@@ -1497,10 +1475,9 @@ class Enrichment extends Component {
   };
 
   handleProteinSelected = (toHighlightArray) => {
-    // Guard: Enrichment relies on “context” data (barcode or filtered differential)
-    const splitPaneData = this.state.hasBarcodeData
-      ? this.state.barcodeSettings?.barcodeData
-      : this.state.filteredDifferentialResults;
+    const splitPaneData =
+      this.state.barcodeSettings?.barcodeData ||
+      this.state.filteredDifferentialResults;
 
     if (!splitPaneData?.length || !Array.isArray(toHighlightArray)) {
       // Clear selection + clear multi-feature cleanly
@@ -1522,10 +1499,7 @@ class Enrichment extends Component {
     // Cancel pending debounced reload so stale work doesn't fire later
     this.reloadMultifeaturePlotEnrichment?.cancel?.();
 
-    const featureKeyFromTable = this.props.filteredDifferentialFeatureIdKey;
-    const featureKey = this.state.hasBarcodeData
-      ? 'featureID'
-      : featureKeyFromTable;
+    const featureKey = 'featureID';
 
     // Normalize + dedupe to consistent shape and small payload
     const normalize = (arr) => {
@@ -1586,13 +1560,8 @@ class Enrichment extends Component {
    * @returns {void}
    */
   handleSingleProteinSelected = (featureId) => {
-    const featureKey = this.state.hasBarcodeData
-      ? 'featureID'
-      : this.props.filteredDifferentialFeatureIdKey;
-
-    const splitPaneData = this.state.hasBarcodeData
-      ? this.state.barcodeSettings.barcodeData
-      : this.state.filteredDifferentialResults;
+    const featureKey = 'featureID';
+    const splitPaneData = this.state.barcodeSettings.barcodeData;
 
     // If no feature or no data, just clear
     if (!featureId || !splitPaneData || splitPaneData.length === 0) {
@@ -3116,7 +3085,6 @@ class Enrichment extends Component {
               onSetHasAnnotationTerms={this.setHasAnnotationTerms}
               onHandleNetworkGraphReady={this.handleNetworkGraphReady}
               onHandleEnrichmentTableLoading={this.handleEnrichmentTableLoading}
-              onHandleHasBarcodeData={this.handleHasBarcodeData}
               onGetEnrichmentsLinkouts={this.getEnrichmentsLinkouts}
               onHandleIsDataStreamingEnrichmentsTable={
                 this.handleIsDataStreamingEnrichmentsTable
