@@ -329,7 +329,11 @@ class SplitPanesContainer extends Component {
       <div className="EnrichmentPlots">
         <Tab
           className="EnrichmentRightTabs"
-          menu={{ secondary: true, pointing: true }}
+          menu={{
+            secondary: true,
+            pointing: true,
+            className: 'PlotTabsContainer',
+          }}
           renderActiveOnly={false}
           activeIndex={activeSvgTabIndexEnrichment}
           onTabChange={(e, data) => {
