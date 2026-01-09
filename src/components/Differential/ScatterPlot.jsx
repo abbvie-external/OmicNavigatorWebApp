@@ -1638,11 +1638,17 @@ class ScatterPlot extends Component {
     if (d3.selectAll('.brush').nodes().length > 0) {
       d3.selectAll('.brush').remove();
     }
+    // Brush should be usable across the entire SVG surface (including margins),
+    // while still selecting only points that fall within the brush rectangle.
+    // Note: the SVG is created with +50 width and +20 height padding.
+    const svgWidth = width + 50;
+    const svgHeight = height + 20;
+
     let brushScatter = d3
       .brush()
       .extent([
-        [10, 5],
-        [width + 25, height - 10],
+        [0, 0],
+        [svgWidth, svgHeight],
       ])
       .on('start', brushingStart)
       .on('end', endBrush);

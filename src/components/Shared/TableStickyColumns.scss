@@ -13,12 +13,13 @@
     position: relative;
     border-collapse: separate;
     border-spacing: 0;
+    isolation: isolate; // ensure z-index works reliably for sticky columns
 
     // Common styles for sticky columns
     :is(th, td):nth-child(-n + 2) {
       position: sticky;
       background-color: #ffffff !important;
-      z-index: 1;
+      z-index: 3;
     }
 
     // Position first column
@@ -33,7 +34,7 @@
 
     // Header-specific styles
     thead tr th:nth-child(-n + 2) {
-      z-index: 2; // Higher z-index to appear above body cells
+      z-index: 6; // Higher z-index to appear above body cells
       user-select: none;
       cursor: default;
       -webkit-user-drag: none;
