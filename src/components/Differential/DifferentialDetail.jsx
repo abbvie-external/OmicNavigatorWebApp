@@ -896,7 +896,7 @@ class DifferentialDetail extends Component {
       localStorage.setItem('volcanoDivWidth', vDivWidth + 1);
       localStorage.setItem('volcanoWidth', vWidth + 1);
       localStorage.setItem('upperPlotsHeight', plotSizeAdjustment + 1);
-      localStorage.setItem('upperPlotsDivHeight', newSize + 1);
+      localStorage.setItem('upperPlotsDivHeight', newSize + 1 + 5);
       localStorage.setItem(
         'differentialDynamicPlotWidth',
         differentialDynamicPlotWidthPx,
@@ -905,7 +905,7 @@ class DifferentialDetail extends Component {
         differentialDynamicPlotWidth: differentialDynamicPlotWidthPx,
         volcanoWidth: vWidth + 1,
         upperPlotsHeight: plotSizeAdjustment + 1,
-        upperPlotsDivHeight: newSize + 1,
+        upperPlotsDivHeight: newSize + 1 + 5,
         volcanoDivWidth: vDivWidth + 1,
       });
     } else {
@@ -2087,7 +2087,7 @@ class DifferentialDetail extends Component {
                         upperPlotsVisible ? resizerStyle : hiddenResizerStyle
                       }
                       // defaultSize={upperPlotsHeight * 1.05263157895} 1.20263157895
-                      size={upperPlotsVisible ? upperPlotsDivHeight : 1}
+                      size={upperPlotsVisible ? upperPlotsDivHeight + 5 : 1}
                       minSize={420}
                       maxSize={1000}
                       onDragFinished={(size) =>
