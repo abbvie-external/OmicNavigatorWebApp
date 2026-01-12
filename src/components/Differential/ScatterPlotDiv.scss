@@ -1,11 +1,3 @@
-#VolcanoPlotDiv {
-  // margin-bottom: 5px;
-  .ExportButtonGroup {
-    margin-top: 4px !important;
-    float: right !important;
-  }
-}
-
 .PlotInstructions {
   height: 100%;
 }
@@ -13,4 +5,36 @@
 .UsagePadding,
 .OptionsPadding {
   padding-right: 9px !important;
+}
+
+// Toolbar layout for ScatterPlot controls (prevents overlays from blocking box-zoom/box-select)
+.VolcanoPlotToolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: nowrap;
+  overflow: visible;
+  position: relative;
+  z-index: 20;
+  padding: 6px 0 6px 0;
+}
+
+.VolcanoPlotToolbarLeft,
+.VolcanoPlotToolbarRight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.VolcanoPlotToolbarRight .ExportButtonGroup {
+  margin-top: 0 !important;
+  float: none !important;
+}
+
+.VolcanoPlotToolbar #VolcanoOptionsPopup,
+.VolcanoPlotToolbar #VolcanoUsagePopup {
+  position: static;
+  top: auto;
+  left: auto;
 }

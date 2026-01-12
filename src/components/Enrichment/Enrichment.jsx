@@ -51,6 +51,7 @@ class Enrichment extends Component {
     parseInt(sessionStorage.getItem('enrichmentViewTab'), 10) || 0;
 
   frozenColumnResizeObserver = null;
+  frozenColumnMutationObserver = null;
   frozenColumnObservedElement = null;
   frozenColumnWrapperRef = null;
 
@@ -1496,55 +1497,88 @@ class Enrichment extends Component {
   };
 
   /**
-   * Sets up a ResizeObserver to keep the frozen first column width in sync
-   * with the actual rendered header width. The observer updates the
-   * CSS variable --frozen-first-column-width directly on the wrapper.
+   * Measures the current rendered first column header width and writes it to
+   * --frozen-first-column-width on the sticky wrapper.
+   *
+   * IMPORTANT: write the CSS variable on the wrapper (stable across QHGrid re-renders),
+   * not on the table node (which can be replaced on sort/filter).
+   */
+  updateFrozenFirstColWidth = () => {
+    const inner = this.frozenColumnWrapperRef;
+    if (!inner) return;
+
+    const wrapper =
+      (inner.closest && inner.closest('.two-col-sticky')) || inner;
+
+    const table =
+      wrapper.querySelector('table.QHGrid--body') ||
+      wrapper.querySelector('.QHGrid--body');
+
+    if (!table) return;
+
+    let firstHeaderCell = table.querySelector('thead tr th:first-child');
+    if (!firstHeaderCell) {
+      firstHeaderCell = table.querySelector(
+        'div[role="columnheader"]:first-child',
+      );
+    }
+    if (!firstHeaderCell) return;
+
+    const rect = firstHeaderCell.getBoundingClientRect();
+    const width = Math.ceil(rect.width);
+    if (!width || width <= 0) return;
+
+    wrapper.style.setProperty('--frozen-first-column-width', `${width}px`);
+  };
+
+  /**
+   * Sets up observers to keep the frozen first column width in sync with the
+   * actual rendered header width. This prevents sticky columns from overlapping
+   * (e.g., col 2 covering col 3/4) after sorting/filtering or grid re-renders.
    */
   setupFrozenColumnResizeObserver = () => {
-    // Clean up any existing observer first
+    // Clean up any existing observers first
     if (this.frozenColumnResizeObserver) {
       this.frozenColumnResizeObserver.disconnect();
       this.frozenColumnResizeObserver = null;
       this.frozenColumnObservedElement = null;
     }
+    if (this.frozenColumnMutationObserver) {
+      this.frozenColumnMutationObserver.disconnect();
+      this.frozenColumnMutationObserver = null;
+    }
 
-    // Find the wrapper that contains the QHGrid table
-    const table = document.querySelector(
-      '.EnrichmentTableWrapper table.QHGrid--body',
-    );
+    const inner = this.frozenColumnWrapperRef;
+    if (!inner) return;
 
-    if (!table) return;
+    const wrapper =
+      (inner.closest && inner.closest('.two-col-sticky')) || inner;
 
-    // Helper to compute header width and set CSS var
-    const updateWidth = () => {
-      try {
-        let firstHeaderCell = table.querySelector('thead tr th:first-child');
-        if (!firstHeaderCell) {
-          firstHeaderCell = table.querySelector(
-            'div[role="columnheader"]:first-child',
-          );
-        }
-        if (!firstHeaderCell) return;
+    this.updateFrozenFirstColWidth();
+    requestAnimationFrame(this.updateFrozenFirstColWidth);
 
-        const rect = firstHeaderCell.getBoundingClientRect();
-        if (!rect.width || rect.width <= 0) return;
+    // Resize: split panes, window resize, etc.
+    this.frozenColumnResizeObserver = new ResizeObserver(() => {
+      this.updateFrozenFirstColWidth();
+    });
+    this.frozenColumnResizeObserver.observe(wrapper);
+    this.frozenColumnObservedElement = wrapper;
 
-        const width = Math.round(rect.width);
-        table.style.setProperty('--frozen-first-column-width', `${width}px`);
-      } catch (e) {}
+    let rafId = 0;
+    const schedule = () => {
+      if (rafId) return;
+      rafId = requestAnimationFrame(() => {
+        rafId = 0;
+        this.updateFrozenFirstColWidth();
+      });
     };
 
-    // Do an initial measurement once the table exists
-    updateWidth();
-
-    // Create the observer on the wrapper (not the header itself) so
-    // it still works if the header node is re-rendered.
-    this.frozenColumnResizeObserver = new ResizeObserver(() => {
-      updateWidth();
+    this.frozenColumnMutationObserver = new MutationObserver(() => schedule());
+    this.frozenColumnMutationObserver.observe(wrapper, {
+      childList: true,
+      subtree: true,
+      attributes: true,
     });
-
-    this.frozenColumnResizeObserver.observe(table);
-    this.frozenColumnObservedElement = table;
   };
 
   removeNetworkSVG = () => {
@@ -3146,6 +3180,10 @@ class Enrichment extends Component {
                           this.frozenColumnResizeObserver.disconnect();
                           this.frozenColumnResizeObserver = null;
                         }
+                        if (this.frozenColumnMutationObserver) {
+                          this.frozenColumnMutationObserver.disconnect();
+                          this.frozenColumnMutationObserver = null;
+                        }
                       }
                     }}
                   >
@@ -3159,6 +3197,9 @@ class Enrichment extends Component {
                       itemsPerPage={itemsPerPageEnrichmentTable}
                       onItemsPerPageChange={this.handleItemsPerPageChange}
                       loading={isEnrichmentTableLoading}
+                      onSorted={() =>
+                        requestAnimationFrame(this.updateFrozenFirstColWidth)
+                      }
                       // exportBaseName="Enrichment_Analysis"
                       // columnReorder={this.props.columnReorder}
                       disableColumnReorder

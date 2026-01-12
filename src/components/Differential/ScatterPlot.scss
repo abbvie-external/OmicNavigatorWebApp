@@ -5,8 +5,14 @@
 }
 
 .volcanoPlotAxis {
+  pointer-events: none; // allow brush/zoom interactions even over axes
+
   stroke: #838383;
   stroke-width: 1;
+}
+
+.volcanoAxisLabel {
+  pointer-events: none; // axis labels should not block brush interactions
 }
 
 // .tick text {
@@ -15,7 +21,11 @@
 
 #VolcanoChart {
   margin-left: 0px !important;
-  margin-top: 45px !important;
+  margin-top: 5px !important;
+}
+
+.volcanoPlot-dataPoint {
+  transition: r 150ms ease-out, fill 100ms ease-out, stroke 100ms ease-out;
 }
 
 .volcanoPlot-dataPoint {

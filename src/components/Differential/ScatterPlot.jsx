@@ -5,6 +5,8 @@ import * as hexbin from 'd3-hexbin';
 import { loadingDimmerGeneric, getMaxAndMin } from '../Shared/helpers';
 import './ScatterPlot.scss';
 
+const VOLCANO_TOP_GAP = 10;
+
 class ScatterPlot extends Component {
   circles = [];
   bins = [];
@@ -379,7 +381,7 @@ class ScatterPlot extends Component {
       .select('#volcano')
       .append('svg')
       .attr('width', volcanoWidth + 50)
-      .attr('height', upperPlotsHeight + 20)
+      .attr('height', upperPlotsHeight + 20 + VOLCANO_TOP_GAP)
       .attr('id', 'VolcanoChart')
       .attr('class', 'VolcanoPlotSVG')
       .on('click', () => {
@@ -399,7 +401,7 @@ class ScatterPlot extends Component {
       .attr('id', 'clip')
       .append('svg:rect')
       .attr('width', volcanoWidth + 50)
-      .attr('height', upperPlotsHeight + 20)
+      .attr('height', upperPlotsHeight + 20 + VOLCANO_TOP_GAP)
       .attr('x', 0)
       .attr('y', -15);
 
@@ -427,9 +429,12 @@ class ScatterPlot extends Component {
       .append('text')
       .attr('class', 'volcanoAxisLabel NoSelect')
       .attr('textAnchor', 'middle')
-      .attr('transform', `rotate(-90,20,${upperPlotsHeight * 0.5 + 20})`)
+      .attr(
+        'transform',
+        `rotate(-90,20,${upperPlotsHeight * 0.5 + 20 + VOLCANO_TOP_GAP})`,
+      )
       .attr('x', 60)
-      .attr('y', `${upperPlotsHeight * 0.5 + 20}`)
+      .attr('y', `${upperPlotsHeight * 0.5 + 20 + VOLCANO_TOP_GAP}`)
       .attr('font-size', '18px')
       .style(
         'font-family',
@@ -443,14 +448,17 @@ class ScatterPlot extends Component {
       .append('g')
       .attr('class', 'volcanoPlotAxis NoSelect')
       .attr('id', 'xaxis-line')
-      .attr('transform', 'translate(0,' + (upperPlotsHeight - 35) + ')')
+      .attr(
+        'transform',
+        'translate(0,' + (upperPlotsHeight - 35 + VOLCANO_TOP_GAP) + ')',
+      )
       .call(this.xxAxis);
 
     d3.select('#VolcanoChart')
       .append('text')
       .attr('class', 'volcanoAxisLabel NoSelect')
       .attr('x', volcanoWidth * 0.5 + 10)
-      .attr('y', upperPlotsHeight - 15)
+      .attr('y', upperPlotsHeight - 15 + VOLCANO_TOP_GAP)
       .attr('font-size', '18px')
       .style(
         'font-family',
@@ -763,7 +771,7 @@ class ScatterPlot extends Component {
     const yScale = d3
       .scaleLinear()
       .domain([Math.min(...yMM), Math.max(...yMM)])
-      .range([upperPlotsHeight - 64, 10]);
+      .range([upperPlotsHeight - 64 + VOLCANO_TOP_GAP, 10 + VOLCANO_TOP_GAP]);
 
     return {
       xScale: xScale,
@@ -1638,11 +1646,17 @@ class ScatterPlot extends Component {
     if (d3.selectAll('.brush').nodes().length > 0) {
       d3.selectAll('.brush').remove();
     }
+    // Brush should be usable across the entire SVG surface (including margins),
+    // while still selecting only points that fall within the brush rectangle.
+    // Note: the SVG is created with +50 width and +20 height padding.
+    const svgWidth = width + 50;
+    const svgHeight = height + 20 + VOLCANO_TOP_GAP;
+
     let brushScatter = d3
       .brush()
       .extent([
-        [10, 5],
-        [width + 25, height - 10],
+        [0, 0],
+        [svgWidth, svgHeight],
       ])
       .on('start', brushingStart)
       .on('end', endBrush);
