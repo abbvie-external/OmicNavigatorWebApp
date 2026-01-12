@@ -376,10 +376,12 @@ class ScatterPlotDiv extends Component {
       const PlotName = `${differentialStudy}_${differentialModel}_${differentialTest}_scatter`;
       return (
         <>
-          <span
-            id="VolcanoOptionsPopup"
-            className={volcanoPlotVisible ? 'Show' : 'Hide'}
-          >
+          <div className="VolcanoPlotToolbar">
+            <div className="VolcanoPlotToolbarLeft">
+              <span
+                id="VolcanoOptionsPopup"
+                className={volcanoPlotVisible ? 'Show' : 'Hide'}
+              >
             <Popup
               trigger={
                 <Button
@@ -501,11 +503,12 @@ class ScatterPlotDiv extends Component {
                 </Grid>
               </Popup.Content>
             </Popup>
-          </span>
-          <span
-            id="VolcanoUsagePopup"
-            className={volcanoPlotVisible ? 'Show' : 'Hide'}
-          >
+              </span>
+
+              <span
+                id="VolcanoUsagePopup"
+                className={volcanoPlotVisible ? 'Show' : 'Hide'}
+              >
             <Popup
               trigger={
                 <Button
@@ -586,20 +589,26 @@ class ScatterPlotDiv extends Component {
                 </List>
               </Popup.Content>
             </Popup>
-          </span>
-          <div
-            id="VolcanoPlotDiv"
-            className={volcanoPlotVisible ? 'Show' : 'Hide'}
-          >
-            <ButtonActions
-              exportButtonSize="mini"
-              plotName={PlotName}
-              plot="VolcanoChart"
-              excelVisible={false}
-              pdfVisible={false}
-              pngVisible={true}
-              svgVisible={true}
-            />
+              </span>
+            </div>
+
+            <div
+              className={
+                volcanoPlotVisible
+                  ? 'VolcanoPlotToolbarRight Show'
+                  : 'VolcanoPlotToolbarRight Hide'
+              }
+            >
+              <ButtonActions
+                exportButtonSize="mini"
+                plotName={PlotName}
+                plot="VolcanoChart"
+                excelVisible={false}
+                pdfVisible={false}
+                pngVisible={true}
+                svgVisible={true}
+              />
+            </div>
           </div>
           <ScatterPlot
             // state

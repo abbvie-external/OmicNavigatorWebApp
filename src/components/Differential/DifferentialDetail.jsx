@@ -2087,7 +2087,7 @@ class DifferentialDetail extends Component {
                         upperPlotsVisible ? resizerStyle : hiddenResizerStyle
                       }
                       // defaultSize={upperPlotsHeight * 1.05263157895} 1.20263157895
-                      size={upperPlotsVisible ? upperPlotsDivHeight : 1}
+                      size={upperPlotsVisible ? upperPlotsDivHeight + 5 : 1}
                       minSize={420}
                       maxSize={1000}
                       onDragFinished={(size) =>

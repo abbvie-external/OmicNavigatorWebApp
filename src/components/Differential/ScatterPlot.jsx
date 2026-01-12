@@ -5,6 +5,8 @@ import * as hexbin from 'd3-hexbin';
 import { loadingDimmerGeneric, getMaxAndMin } from '../Shared/helpers';
 import './ScatterPlot.scss';
 
+const VOLCANO_TOP_GAP = 10;
+
 class ScatterPlot extends Component {
   circles = [];
   bins = [];
@@ -37,6 +39,105 @@ class ScatterPlot extends Component {
     xxAxis: '',
     yyAxis: '',
     zoomedOut: true,
+  };
+
+  /**
+   * Detects if the current device is touch-capable for enhanced touch interaction.
+   */
+  _isTouchDevice =
+    typeof window !== 'undefined' &&
+    ('ontouchstart' in window ||
+      (typeof navigator !== 'undefined' &&
+        (navigator.maxTouchPoints || 0) > 0));
+
+  /**
+   * Calculates a scaling factor for circle sizes based on the current zoom level.
+   * Compares full dataset domain to current view domain and applies balanced scaling.
+   *
+   * @returns {number} A multiplier between 1.0 and 2.5 for radius scaling
+   */
+  getZoomRadiusMultiplier = () => {
+    const { differentialResultsUnfiltered = [] } = this.props;
+
+    if (
+      !Array.isArray(differentialResultsUnfiltered) ||
+      differentialResultsUnfiltered.length < 2
+    ) {
+      return 1;
+    }
+
+    const full = this.scaleFactory(differentialResultsUnfiltered);
+
+    const viewData =
+      this.state.allDataInWithinView &&
+      this.state.allDataInWithinView.length > 0
+        ? this.state.allDataInWithinView
+        : differentialResultsUnfiltered;
+    const cur = this.scaleFactory(viewData);
+
+    const fullSpanX = Math.max(
+      1e-9,
+      Math.abs((full.xMax ?? 0) - (full.xMin ?? 0)),
+    );
+    const fullSpanY = Math.max(
+      1e-9,
+      Math.abs((full.yMax ?? 0) - (full.yMin ?? 0)),
+    );
+    const curSpanX = Math.max(
+      1e-9,
+      Math.abs((cur.xMax ?? 0) - (cur.xMin ?? 0)),
+    );
+    const curSpanY = Math.max(
+      1e-9,
+      Math.abs((cur.yMax ?? 0) - (cur.yMin ?? 0)),
+    );
+
+    // Balanced zoom measure (avoids "one-axis spike" making dots huge).
+    const zx = fullSpanX / curSpanX;
+    const zy = fullSpanY / curSpanY;
+    const zoomFactor = Math.max(1, Math.sqrt(zx * zy));
+
+    // Clamp so the multiplier stays stable.
+    const clamped = Math.min(16, zoomFactor);
+
+    // Convert zoomFactor → multiplier: responsive at 2x-6x zoom, capped.
+    const multiplier = 1 + Math.sqrt(clamped - 1) * 0.38;
+    return Math.min(2.5, multiplier);
+  };
+
+  /**
+   * Calculates the base radius for standard data points.
+   * Applies zoom multiplier with additional size for touch devices when zoomed.
+   * @returns {number} The radius in pixels for normal circles
+   */
+  getBaseCircleRadius = () => {
+    const base = 3;
+    const mult = this.getZoomRadiusMultiplier();
+
+    // Touch UX: make targets a bit bigger *after* you’re actually zooming.
+    const touchBonus = this._isTouchDevice && mult > 1.05 ? 1.25 : 1;
+
+    const r = base * mult * touchBonus;
+    return Number(r.toFixed(2));
+  };
+
+  // Multiplicative hierarchy keeps contrast consistent at all zoom levels.
+  getHighlightedCircleRadius = () =>
+    Math.min(this.getBaseCircleRadius() * 1.7, 10);
+  getOutlinedCircleRadius = () =>
+    Math.min(this.getBaseCircleRadius() * 1.9, 11);
+  getHoverCircleRadius = () => Math.min(this.getBaseCircleRadius() * 2.1, 12);
+
+  /**
+   * Selects appropriate radius based on circle's CSS class.
+   * @param {string} classValue - CSS class of the circle
+   * @returns {number} The radius in pixels for the given circle class
+   */
+  getRadiusForCircleClass = (classValue = '') => {
+    const cls = String(classValue);
+    if (cls.includes('outlined')) return this.getOutlinedCircleRadius();
+    if (cls.includes('highlighted')) return this.getHighlightedCircleRadius();
+    return this.getBaseCircleRadius();
   };
 
   componentDidMount() {
@@ -280,7 +381,7 @@ class ScatterPlot extends Component {
       .select('#volcano')
       .append('svg')
       .attr('width', volcanoWidth + 50)
-      .attr('height', upperPlotsHeight + 20)
+      .attr('height', upperPlotsHeight + 20 + VOLCANO_TOP_GAP)
       .attr('id', 'VolcanoChart')
       .attr('class', 'VolcanoPlotSVG')
       .on('click', () => {
@@ -300,7 +401,7 @@ class ScatterPlot extends Component {
       .attr('id', 'clip')
       .append('svg:rect')
       .attr('width', volcanoWidth + 50)
-      .attr('height', upperPlotsHeight + 20)
+      .attr('height', upperPlotsHeight + 20 + VOLCANO_TOP_GAP)
       .attr('x', 0)
       .attr('y', -15);
 
@@ -328,9 +429,12 @@ class ScatterPlot extends Component {
       .append('text')
       .attr('class', 'volcanoAxisLabel NoSelect')
       .attr('textAnchor', 'middle')
-      .attr('transform', `rotate(-90,20,${upperPlotsHeight * 0.5 + 20})`)
+      .attr(
+        'transform',
+        `rotate(-90,20,${upperPlotsHeight * 0.5 + 20 + VOLCANO_TOP_GAP})`,
+      )
       .attr('x', 60)
-      .attr('y', `${upperPlotsHeight * 0.5 + 20}`)
+      .attr('y', `${upperPlotsHeight * 0.5 + 20 + VOLCANO_TOP_GAP}`)
       .attr('font-size', '18px')
       .style(
         'font-family',
@@ -344,14 +448,17 @@ class ScatterPlot extends Component {
       .append('g')
       .attr('class', 'volcanoPlotAxis NoSelect')
       .attr('id', 'xaxis-line')
-      .attr('transform', 'translate(0,' + (upperPlotsHeight - 35) + ')')
+      .attr(
+        'transform',
+        'translate(0,' + (upperPlotsHeight - 35 + VOLCANO_TOP_GAP) + ')',
+      )
       .call(this.xxAxis);
 
     d3.select('#VolcanoChart')
       .append('text')
       .attr('class', 'volcanoAxisLabel NoSelect')
       .attr('x', volcanoWidth * 0.5 + 10)
-      .attr('y', upperPlotsHeight - 15)
+      .attr('y', upperPlotsHeight - 15 + VOLCANO_TOP_GAP)
       .attr('font-size', '18px')
       .style(
         'font-family',
@@ -526,7 +633,7 @@ class ScatterPlot extends Component {
       .attr('cx', (d) => `${xScale(this.doTransform(d[xAxisLabel], 'x'))}`)
       .attr('cy', (d) => `${yScale(this.doTransform(d[yAxisLabel], 'y'))}`)
       .attr('fill', '#E0E1E2')
-      .attr('r', 3)
+      .attr('r', this.getBaseCircleRadius())
       .attr('stroke', '#aab1c0')
       .attr('strokeWidth', 0.4)
       .attr('class', 'volcanoPlot-dataPoint')
@@ -565,7 +672,7 @@ class ScatterPlot extends Component {
         .attr('cx', (d) => `${xScale(this.doTransform(d[xAxisLabel], 'x'))}`)
         .attr('cy', (d) => `${yScale(this.doTransform(d[yAxisLabel], 'y'))}`)
         .attr('fill', '#1678c2')
-        .attr('r', 3)
+        .attr('r', this.getBaseCircleRadius())
         .attr('stroke', '#000')
         .attr('strokeWidth', 0.4)
         .attr('class', 'volcanoPlot-dataPoint')
@@ -664,7 +771,7 @@ class ScatterPlot extends Component {
     const yScale = d3
       .scaleLinear()
       .domain([Math.min(...yMM), Math.max(...yMM)])
-      .range([upperPlotsHeight - 64, 10]);
+      .range([upperPlotsHeight - 64 + VOLCANO_TOP_GAP, 10 + VOLCANO_TOP_GAP]);
 
     return {
       xScale: xScale,
@@ -756,7 +863,7 @@ class ScatterPlot extends Component {
         .attr('fill', '#1678c2')
         .attr('stroke', '#000')
         .attr('stroke-width', 1)
-        .attr('r', 3)
+        .attr('r', this.getBaseCircleRadius())
         .classed('highlighted', false)
         .classed('outlined', false);
 
@@ -827,7 +934,10 @@ class ScatterPlot extends Component {
         const highlightedCircleId = this.getCircleOrBin(element);
         if (highlightedCircleId) {
           const highlightedCircle = d3.select(highlightedCircleId?.element);
-          let radius = element === differentialOutlinedFeature ? 7 : 6;
+          let radius =
+            element === differentialOutlinedFeature
+              ? this.getOutlinedCircleRadius()
+              : this.getHighlightedCircleRadius();
           let stroke =
             element === differentialOutlinedFeature ? '#1678c2' : '#000';
           // let strokeWidth =
@@ -883,7 +993,7 @@ class ScatterPlot extends Component {
               outlined.attr('stroke-width', 1);
             }
           }
-          outlined.attr('r', 7);
+          outlined.attr('r', this.getOutlinedCircleRadius());
           outlined.classed('outlined', true);
           outlined.attr('stroke', '#1678c2');
           outlined.attr('d', (d) => `M${d.x},${d.y}${this.hexbin.hexagon(8)}`);
@@ -953,7 +1063,7 @@ class ScatterPlot extends Component {
       if (hovered != null) {
         const circle = d3.select(hovered) ?? null;
         if (circle != null) {
-          circle.attr('r', 8);
+          circle.attr('r', this.getHoverCircleRadius());
           circle.raise();
           this.setState({
             hoveredElement: 'circle',
@@ -979,15 +1089,10 @@ class ScatterPlot extends Component {
           }`,
         )._groups[0][0] ?? null;
       if (hoveredCircle != null) {
-        if (hoveredCircle.attributes['class'].value.endsWith('highlighted')) {
-          hoveredCircle.attributes['r'].value = 6;
-        } else if (
-          hoveredCircle.attributes['class'].value.endsWith('outlined')
-        ) {
-          hoveredCircle.attributes['r'].value = 7;
-        } else {
-          hoveredCircle.attributes['r'].value = 3;
-        }
+        const nextR = this.getRadiusForCircleClass(
+          hoveredCircle.attributes['class']?.value,
+        );
+        hoveredCircle.attributes['r'].value = nextR;
         this.setState({
           hoveredCircleData: {
             position: [],
@@ -1541,11 +1646,17 @@ class ScatterPlot extends Component {
     if (d3.selectAll('.brush').nodes().length > 0) {
       d3.selectAll('.brush').remove();
     }
+    // Brush should be usable across the entire SVG surface (including margins),
+    // while still selecting only points that fall within the brush rectangle.
+    // Note: the SVG is created with +50 width and +20 height padding.
+    const svgWidth = width + 50;
+    const svgHeight = height + 20 + VOLCANO_TOP_GAP;
+
     let brushScatter = d3
       .brush()
       .extent([
-        [10, 5],
-        [width + 25, height - 10],
+        [0, 0],
+        [svgWidth, svgHeight],
       ])
       .on('start', brushingStart)
       .on('end', endBrush);

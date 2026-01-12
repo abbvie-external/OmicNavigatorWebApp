@@ -231,14 +231,12 @@
 // }
 
 #VolcanoOptionsPopup {
-  position: absolute !important;
-  margin-top: 8px;
-  // margin-left: 50px;
+  position: static !important;
+  margin-top: 0;
   cursor: pointer;
-  z-index: 1111111111 !important;
-  // top: 0 !important;
-  // right: 0 !important;
+  z-index: 2;
 }
+
 
 #FullScreenButton,
 #FullScreenIcon,
@@ -275,22 +273,15 @@
 }
 
 #VolcanoUsagePopup {
-  position: absolute !important;
-  margin-top: 8px;
+  position: static !important;
+  margin-top: 0;
   cursor: pointer;
-  z-index: 1111111111 !important;
-  // top: 0 !important;
-  left: 110px !important;
-  // bottom: 0;
-  // left: 0;
-  // margin-bottom: -40px;
+  z-index: 2;
 }
 #VolcanoUsagePopupContent {
   padding-top: 8px !important;
 }
 #OptionsTooltip {
-  top: -38px !important;
-  left: -265px !important;
   border-bottom: 2px solid var(--color-primary);
   background-color: var(--color-dark) !important;
   padding: 10px 10px 20px 20px;

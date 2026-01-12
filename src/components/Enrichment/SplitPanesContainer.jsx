@@ -52,19 +52,6 @@ class SplitPanesContainer extends Component {
       if (canChangeTabs) {
         this.handleSVGTabChange(1);
       }
-      if (this.props.onGetMultifeaturePlotTransitionEnrichment) {
-        this.props.onGetMultifeaturePlotTransitionEnrichment();
-      }
-    }
-
-    if (
-      activeSvgTabIndexEnrichment === 1 &&
-      currCount >= 2 &&
-      currCount !== prevCount &&
-      hasMultiFeature &&
-      this.props.onGetMultifeaturePlotTransitionEnrichment
-    ) {
-      this.props.onGetMultifeaturePlotTransitionEnrichment();
     }
 
     if (
@@ -342,7 +329,11 @@ class SplitPanesContainer extends Component {
       <div className="EnrichmentPlots">
         <Tab
           className="EnrichmentRightTabs"
-          menu={{ secondary: true, pointing: true }}
+          menu={{
+            secondary: true,
+            pointing: true,
+            className: 'PlotTabsContainer',
+          }}
           renderActiveOnly={false}
           activeIndex={activeSvgTabIndexEnrichment}
           onTabChange={(e, data) => {

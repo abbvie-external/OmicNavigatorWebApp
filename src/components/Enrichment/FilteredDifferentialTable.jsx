@@ -466,7 +466,7 @@ class FilteredDifferentialTable extends Component {
       }
 
       // CTRL or CHECKBOX = multi-toggle (orange)
-      else if (event.ctrlKey || clickedInCheckboxCell) {
+      else if (event.ctrlKey || event.metaKey || clickedInCheckboxCell) {
         const allTableData =
           this.props.filteredDifferentialGridRef?.current?.qhGridRef.current?.getSortedData() ||
           [];
