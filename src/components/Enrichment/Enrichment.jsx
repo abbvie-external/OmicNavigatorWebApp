@@ -1138,7 +1138,8 @@ class Enrichment extends Component {
     const inner = this.frozenColumnWrapperRef;
     if (!inner) return;
 
-    const wrapper = (inner.closest && inner.closest('.two-col-sticky')) || inner;
+    const wrapper =
+      (inner.closest && inner.closest('.two-col-sticky')) || inner;
 
     const table =
       wrapper.querySelector('table.QHGrid--body') ||
@@ -1181,10 +1182,9 @@ class Enrichment extends Component {
     const inner = this.frozenColumnWrapperRef;
     if (!inner) return;
 
-    // Prefer writing the CSS variable on the `.two-col-sticky` wrapper so it survives table re-renders.
-    const wrapper = (inner.closest && inner.closest('.two-col-sticky')) || inner;
+    const wrapper =
+      (inner.closest && inner.closest('.two-col-sticky')) || inner;
 
-    // Initial measurement once the table exists (and one more after layout settles)
     this.updateFrozenFirstColWidth();
     requestAnimationFrame(this.updateFrozenFirstColWidth);
 
@@ -1195,7 +1195,6 @@ class Enrichment extends Component {
     this.frozenColumnResizeObserver.observe(wrapper);
     this.frozenColumnObservedElement = wrapper;
 
-    // DOM changes: sorting/filtering can replace header nodes without resizing
     let rafId = 0;
     const schedule = () => {
       if (rafId) return;
