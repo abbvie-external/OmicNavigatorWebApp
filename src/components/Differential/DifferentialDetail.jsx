@@ -896,7 +896,7 @@ class DifferentialDetail extends Component {
       localStorage.setItem('volcanoDivWidth', vDivWidth + 1);
       localStorage.setItem('volcanoWidth', vWidth + 1);
       localStorage.setItem('upperPlotsHeight', plotSizeAdjustment + 1);
-      localStorage.setItem('upperPlotsDivHeight', newSize + 1 + 5);
+      localStorage.setItem('upperPlotsDivHeight', newSize + 1);
       localStorage.setItem(
         'differentialDynamicPlotWidth',
         differentialDynamicPlotWidthPx,
@@ -905,7 +905,7 @@ class DifferentialDetail extends Component {
         differentialDynamicPlotWidth: differentialDynamicPlotWidthPx,
         volcanoWidth: vWidth + 1,
         upperPlotsHeight: plotSizeAdjustment + 1,
-        upperPlotsDivHeight: newSize + 1 + 5,
+        upperPlotsDivHeight: newSize + 1,
         volcanoDivWidth: vDivWidth + 1,
       });
     } else {
