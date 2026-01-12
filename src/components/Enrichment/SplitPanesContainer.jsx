@@ -11,26 +11,83 @@ import FilteredDifferentialTable from './FilteredDifferentialTable';
 import PlotsMultiFeature from '../Differential/PlotsMultiFeature';
 import PlotsSingleFeature from '../Differential/PlotsSingleFeature';
 
+const ENRICHMENT_SPLIT_DEFAULTS = { horizontal: 250, vertical: 525 };
+// Toggle persistence of Enrichment split sizes. When false, reload returns to defaults.
+const PERSIST_ENRICHMENT_SPLIT_SIZES = false;
+
+const getInitialEnrichmentSplitSize = (enrichmentKey, legacyKey, defaultValue) => {
+  if (!PERSIST_ENRICHMENT_SPLIT_SIZES) return defaultValue;
+  try {
+    const v = parseInt(localStorage.getItem(enrichmentKey), 10);
+    if (!Number.isNaN(v) && v) return v;
+    const legacy = parseInt(localStorage.getItem(legacyKey), 10);
+    if (!Number.isNaN(legacy) && legacy) return legacy;
+  } catch (e) {
+    // ignore
+  }
+  return defaultValue;
+};
+
 class SplitPanesContainer extends Component {
   // Smooth redraw during SplitPane drag without spamming localStorage
   _pendingDragSizes = { horizontal: null, vertical: null };
   _dragRafId = null;
 
+  // Cache for freezing heavy right-side plot subtree during SplitPane drag
+  _featurePlotTabsCacheWithBarcode = null;
+  _featurePlotTabsCacheNoBarcode = null;
+
+  // Global safety handler: ensures drag state resets if onDragFinished does not fire
+  _onGlobalPointerUp = null;
+
   state = {
     activeSvgTabIndexEnrichment: 0,
-    // Persisted split sizes (enrichment-scoped; fall back to legacy keys if present)
-    horizontalSplitPaneSize:
-      parseInt(localStorage.getItem('enrichmentHorizontalSplitPaneSize'), 10) ||
-      parseInt(localStorage.getItem('horizontalSplitPaneSize'), 10) ||
-      250,
-    verticalSplitPaneSize:
-      parseInt(localStorage.getItem('enrichmentVerticalSplitPaneSize'), 10) ||
-      parseInt(localStorage.getItem('verticalSplitPaneSize'), 10) ||
-      525,
+
+    // Live sizes: update continuously during drag (keeps SplitPane divider responsive)
+    horizontalSplitPaneSize: getInitialEnrichmentSplitSize('enrichmentHorizontalSplitPaneSize', 'horizontalSplitPaneSize', ENRICHMENT_SPLIT_DEFAULTS.horizontal),
+    verticalSplitPaneSize: getInitialEnrichmentSplitSize('enrichmentVerticalSplitPaneSize', 'verticalSplitPaneSize', ENRICHMENT_SPLIT_DEFAULTS.vertical),
+
+    // Committed sizes: update only on drag end (used to size heavy plots)
+    horizontalSplitPaneSizeCommitted: getInitialEnrichmentSplitSize('enrichmentHorizontalSplitPaneSize', 'horizontalSplitPaneSize', ENRICHMENT_SPLIT_DEFAULTS.horizontal),
+    verticalSplitPaneSizeCommitted: getInitialEnrichmentSplitSize('enrichmentVerticalSplitPaneSize', 'verticalSplitPaneSize', ENRICHMENT_SPLIT_DEFAULTS.vertical),
+
+    // True while the user is actively dragging a SplitPane divider
+    isSplitPaneDragging: false,
+
     activeViolinTableIndex: 0,
     elementTextKey: 'featureID',
   };
   filteredDifferentialGridRef = React.createRef();
+
+  componentDidMount() {
+    // Ensure Enrichment always starts from defaults when persistence is disabled
+    if (!PERSIST_ENRICHMENT_SPLIT_SIZES) {
+      try {
+        localStorage.removeItem('enrichmentHorizontalSplitPaneSize');
+        localStorage.removeItem('enrichmentVerticalSplitPaneSize');
+      } catch (e) {
+        // ignore
+      }
+    }
+
+    // Safety: reset drag flag if pointer/touch ends outside SplitPane (onDragFinished may not fire)
+    this._onGlobalPointerUp = () => {
+      if (!this.state.isSplitPaneDragging) return;
+
+      if (this._dragRafId) {
+        cancelAnimationFrame(this._dragRafId);
+        this._dragRafId = null;
+      }
+      this._pendingDragSizes = { horizontal: null, vertical: null };
+
+      this.setState({ isSplitPaneDragging: false });
+    };
+
+    window.addEventListener('mouseup', this._onGlobalPointerUp);
+    window.addEventListener('touchend', this._onGlobalPointerUp);
+    window.addEventListener('pointerup', this._onGlobalPointerUp);
+    window.addEventListener('blur', this._onGlobalPointerUp);
+  }
 
   componentDidUpdate(prevProps, prevState) {
     const prevCount = prevProps.HighlightedProteins
@@ -74,10 +131,22 @@ class SplitPanesContainer extends Component {
   }
 
   componentWillUnmount() {
+    if (this._onGlobalPointerUp) {
+      window.removeEventListener('mouseup', this._onGlobalPointerUp);
+      window.removeEventListener('touchend', this._onGlobalPointerUp);
+      window.removeEventListener('pointerup', this._onGlobalPointerUp);
+      window.removeEventListener('blur', this._onGlobalPointerUp);
+      this._onGlobalPointerUp = null;
+    }
+
     if (this._dragRafId) {
       cancelAnimationFrame(this._dragRafId);
       this._dragRafId = null;
     }
+
+    this._pendingDragSizes = { horizontal: null, vertical: null };
+    this._featurePlotTabsCacheWithBarcode = null;
+    this._featurePlotTabsCacheNoBarcode = null;
   }
 
   handleSVGTabChange = (activeTabIndex) => {
@@ -261,13 +330,15 @@ class SplitPanesContainer extends Component {
     );
   };
 
-  // Called while dragging (SplitPane onChange). Updates state at most once per animation frame.
+  // Called while dragging (SplitPane onChange). Updates *live* sizes at most once per animation frame.
   splitPaneDragging = (size, paneType) => {
     if (size === undefined) return;
     this._pendingDragSizes[paneType] = size;
     if (this._dragRafId) return;
+
     this._dragRafId = requestAnimationFrame(() => {
       const next = {};
+
       if (this._pendingDragSizes.horizontal !== null) {
         next.horizontalSplitPaneSize = this._pendingDragSizes.horizontal;
         this._pendingDragSizes.horizontal = null;
@@ -276,6 +347,11 @@ class SplitPanesContainer extends Component {
         next.verticalSplitPaneSize = this._pendingDragSizes.vertical;
         this._pendingDragSizes.vertical = null;
       }
+
+      if (!this.state.isSplitPaneDragging) {
+        next.isSplitPaneDragging = true;
+      }
+
       this._dragRafId = null;
       if (Object.keys(next).length) {
         this.setState(next);
@@ -285,20 +361,83 @@ class SplitPanesContainer extends Component {
 
   splitPaneResized = (size, paneType) => {
     if (size === undefined) return;
+
+    // Ensure no pending RAF updates run after drag completes
+    if (this._dragRafId) {
+      cancelAnimationFrame(this._dragRafId);
+      this._dragRafId = null;
+    }
+    this._pendingDragSizes = { horizontal: null, vertical: null };
+
     if (paneType === 'horizontal') {
       this.setState({
         horizontalSplitPaneSize: size,
+        horizontalSplitPaneSizeCommitted: size,
+        isSplitPaneDragging: false,
       });
     } else {
       this.setState({
         verticalSplitPaneSize: size,
+        verticalSplitPaneSizeCommitted: size,
+        isSplitPaneDragging: false,
       });
     }
-    const key =
-      paneType === 'horizontal'
-        ? 'enrichmentHorizontalSplitPaneSize'
-        : 'enrichmentVerticalSplitPaneSize';
-    localStorage.setItem(key, String(size));
+
+    if (PERSIST_ENRICHMENT_SPLIT_SIZES) {
+      const key =
+        paneType === 'horizontal'
+          ? 'enrichmentHorizontalSplitPaneSize'
+          : 'enrichmentVerticalSplitPaneSize';
+      try {
+        localStorage.setItem(key, String(size));
+      } catch (e) {
+        // ignore
+      }
+    }
+  };
+
+  getFeaturePlotTabsInvalidationKey = () => {
+    const {
+      HighlightedProteins = [],
+      selectedProteinId,
+      plotMultiFeatureAvailable,
+      plotMultiFeatureDataLoaded,
+      plotMultiFeatureDataLength,
+      plotDataEnrichmentLength,
+      SVGPlotLoaded,
+      SVGPlotLoading,
+      enrichmentStudy,
+      enrichmentModel,
+      enrichmentAnnotation,
+    } = this.props;
+
+    const { activeSvgTabIndexEnrichment } = this.state;
+
+    // Fingerprint highlighted feature IDs (avoid stale cache during drag if selection changes)
+    const ids = (HighlightedProteins || [])
+      .map((p) => p.featureID || p.key || p.id || '')
+      .filter(Boolean);
+
+    const fingerprint =
+      ids.length <= 50
+        ? ids.join('|')
+        : `${ids.length}|${ids[0] || ''}|${ids[ids.length - 1] || ''}`;
+
+    return [
+      activeSvgTabIndexEnrichment,
+      selectedProteinId || '',
+      fingerprint,
+      ids.length,
+      plotMultiFeatureAvailable ? 1 : 0,
+      plotMultiFeatureDataLoaded ? 1 : 0,
+      plotMultiFeatureDataLength || 0,
+      plotDataEnrichmentLength || 0,
+      SVGPlotLoaded ? 1 : 0,
+      SVGPlotLoading ? 1 : 0,
+      enrichmentStudy || '',
+      enrichmentModel || '',
+      enrichmentAnnotation || '',
+    ].join('::');
   };
 
   renderFeaturePlotTabs = (
@@ -503,7 +642,13 @@ class SplitPanesContainer extends Component {
   };
 
   render() {
-    const { verticalSplitPaneSize, horizontalSplitPaneSize } = this.state;
+    const {
+      verticalSplitPaneSize,
+      horizontalSplitPaneSize,
+      verticalSplitPaneSizeCommitted,
+      horizontalSplitPaneSizeCommitted,
+      isSplitPaneDragging,
+    } = this.state;
     const {
       enrichmentStudy,
       enrichmentModel,
@@ -522,9 +667,37 @@ class SplitPanesContainer extends Component {
       document.documentElement.clientHeight ||
       document.body.clientHeight;
 
+    // Freeze heavy right-side plot subtree during SplitPane drag to prevent jank
+    const featurePlotTabsCacheKey = hasBarcodeData
+      ? '_featurePlotTabsCacheWithBarcode'
+      : '_featurePlotTabsCacheNoBarcode';
+
+    const cacheInvalidationKey = this.getFeaturePlotTabsInvalidationKey();
+    const cached = this[featurePlotTabsCacheKey];
+    const canUseCache =
+      isSplitPaneDragging && cached && cached.key === cacheInvalidationKey;
+
+    const featurePlotTabs = canUseCache
+      ? cached.jsx
+      : this.renderFeaturePlotTabs(
+          width,
+          height,
+          verticalSplitPaneSizeCommitted,
+          hasBarcodeData ? horizontalSplitPaneSizeCommitted : 0,
+          enrichmentStudy,
+          enrichmentModel,
+          enrichmentPlotDescriptions,
+        );
+
+    if (!canUseCache) {
+      this[featurePlotTabsCacheKey] = {
+        jsx: featurePlotTabs,
+        key: cacheInvalidationKey,
+      };
+    }
+
     // WITH BARCODE BRANCH
     if (hasBarcodeData) {
-      console.log('Rendering with barcode data');
       const BarcodePlot = this.getBarcodePlot();
 
       return (
@@ -585,16 +758,11 @@ class SplitPanesContainer extends Component {
                       {ViolinAndTable}
                     </div>
 
-                    <div id="SVGSplitContainer">
-                      {this.renderFeaturePlotTabs(
-                        width,
-                        height,
-                        verticalSplitPaneSize,
-                        horizontalSplitPaneSize,
-                        enrichmentStudy,
-                        enrichmentModel,
-                        enrichmentPlotDescriptions,
-                      )}
+                    <div
+                  id="SVGSplitContainer"
+                  style={{ overflow: isSplitPaneDragging ? 'hidden' : undefined }}
+                >
+                      {featurePlotTabs}
                     </div>
                   </SplitPane>
                 </SplitPane>
@@ -649,16 +817,11 @@ class SplitPanesContainer extends Component {
               >
                 <div id="ViolinAndTableSplitContainer">{ViolinAndTable}</div>
 
-                <div id="SVGSplitContainer">
-                  {this.renderFeaturePlotTabs(
-                    width,
-                    height,
-                    verticalSplitPaneSize,
-                    0, // no barcode → same as your old (height - 51) case
-                    enrichmentStudy,
-                    enrichmentModel,
-                    enrichmentPlotDescriptions,
-                  )}
+                <div
+                  id="SVGSplitContainer"
+                  style={{ overflow: isSplitPaneDragging ? 'hidden' : undefined }}
+                >
+                  {featurePlotTabs}
                 </div>
               </SplitPane>
             </Grid.Column>
