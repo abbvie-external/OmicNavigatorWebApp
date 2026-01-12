@@ -137,7 +137,7 @@ class Enrichment extends Component {
     SVGPlotLoading: false,
     SVGPlotLoaded: false,
     isViolinPlotLoaded: false,
-    hasBarcodeData: false,
+    hasAnnotationTerms: false,
     barcodeSettings: {
       barcodeData: [],
       brushedData: [],
@@ -510,6 +510,16 @@ class Enrichment extends Component {
     });
   };
 
+  setHasAnnotationTerms = async (study, annotationID) => {
+    const hasAnnotationTerms = await omicNavigatorService.getHasAnnotationTerms(
+      study,
+      annotationID,
+    );
+    this.setState({
+      hasAnnotationTerms,
+    });
+  };
+
   // handleColumnReorder = searchResults => {
   //   const columns = this.getConfigCols(searchResults);
   //   this.setState({ enrichmentColumns: columns });
@@ -763,25 +773,6 @@ class Enrichment extends Component {
     }
   };
 
-  handleHasBarcodeData = (modelArg) => {
-    const { enrichmentStudy, enrichmentModel } = this.props;
-    const model = modelArg ? modelArg : enrichmentModel;
-    omicNavigatorService
-      .getBarcodes(enrichmentStudy, model, null, null)
-      .then((getBarcodesResponseData) => {
-        // TODO - why is barcode return no longer an array?
-        const hasBarcodeData = Array.isArray(getBarcodesResponseData)
-          ? getBarcodesResponseData.length > 0
-          : !!(
-              getBarcodesResponseData &&
-              Object.keys(getBarcodesResponseData).length
-            );
-        this.setState({
-          hasBarcodeData,
-        });
-      });
-  };
-
   getEnrichmentsLinkouts = (enrichmentStudy, enrichmentAnnotation) => {
     const cachedEnrichmentsLinkouts = sessionStorage.getItem(
       `EnrichmentsLinkouts-${enrichmentStudy}_${enrichmentAnnotation}`,
@@ -969,7 +960,8 @@ class Enrichment extends Component {
   getConfigCols = (annotationData) => {
     const { enrichmentStudy, enrichmentModel, enrichmentAnnotation } =
       this.props;
-    const { enrichmentsLinkouts, enrichmentsFavicons } = this.state;
+    const { enrichmentsLinkouts, enrichmentsFavicons, hasAnnotationTerms } =
+      this.state;
     const TableValuePopupStyle = {
       backgroundColor: '2E2E2E',
       borderBottom: '2px solid var(--color-primary)',
@@ -1097,21 +1089,29 @@ class Enrichment extends Component {
               <Popup
                 trigger={
                   <span
-                    className="TableCellLink"
-                    onClick={addParams.barcodeData(
-                      enrichmentStudy,
-                      enrichmentModel,
-                      enrichmentAnnotation,
-                      item,
-                      c,
-                    )}
+                    className={hasAnnotationTerms ? 'TableCellLink' : ''}
+                    onClick={
+                      hasAnnotationTerms
+                        ? addParams.barcodeData(
+                            enrichmentStudy,
+                            enrichmentModel,
+                            enrichmentAnnotation,
+                            item,
+                            c,
+                          )
+                        : undefined
+                    }
                   >
                     {formatNumberForDisplay(value)}
                   </span>
                 }
-                style={TableValuePopupStyle}
-                className="TablePopupValue"
-                content={'View Interactive Barcode Plot'}
+                style={hasAnnotationTerms ? TableValuePopupStyle : undefined}
+                className={hasAnnotationTerms ? 'TablePopupValue' : ''}
+                content={
+                  hasAnnotationTerms
+                    ? 'View Interactive Barcode Plot'
+                    : 'No Annotation Terms Available'
+                }
                 inverted
                 basic
               />
@@ -1138,7 +1138,8 @@ class Enrichment extends Component {
     const inner = this.frozenColumnWrapperRef;
     if (!inner) return;
 
-    const wrapper = (inner.closest && inner.closest('.two-col-sticky')) || inner;
+    const wrapper =
+      (inner.closest && inner.closest('.two-col-sticky')) || inner;
 
     const table =
       wrapper.querySelector('table.QHGrid--body') ||
@@ -1181,10 +1182,9 @@ class Enrichment extends Component {
     const inner = this.frozenColumnWrapperRef;
     if (!inner) return;
 
-    // Prefer writing the CSS variable on the `.two-col-sticky` wrapper so it survives table re-renders.
-    const wrapper = (inner.closest && inner.closest('.two-col-sticky')) || inner;
+    const wrapper =
+      (inner.closest && inner.closest('.two-col-sticky')) || inner;
 
-    // Initial measurement once the table exists (and one more after layout settles)
     this.updateFrozenFirstColWidth();
     requestAnimationFrame(this.updateFrozenFirstColWidth);
 
@@ -1195,7 +1195,6 @@ class Enrichment extends Component {
     this.frozenColumnResizeObserver.observe(wrapper);
     this.frozenColumnObservedElement = wrapper;
 
-    // DOM changes: sorting/filtering can replace header nodes without resizing
     let rafId = 0;
     const schedule = () => {
       if (rafId) return;
@@ -1405,9 +1404,7 @@ class Enrichment extends Component {
 
   handleBarcodeChanges = (changes) => {
     let self = this;
-    const splitPaneData = this.state.hasBarcodeData
-      ? this.state.barcodeSettings.barcodeData
-      : this.state.filteredDifferentialResults;
+    const splitPaneData = this.state.barcodeSettings.barcodeData;
     if (changes.brushedData.length > 0) {
       const boxPlotArray = _.map(changes.brushedData, function (d) {
         d.statistic = _.find(splitPaneData, {
@@ -1478,10 +1475,9 @@ class Enrichment extends Component {
   };
 
   handleProteinSelected = (toHighlightArray) => {
-    // Guard: Enrichment relies on “context” data (barcode or filtered differential)
-    const splitPaneData = this.state.hasBarcodeData
-      ? this.state.barcodeSettings?.barcodeData
-      : this.state.filteredDifferentialResults;
+    const splitPaneData =
+      this.state.barcodeSettings?.barcodeData ||
+      this.state.filteredDifferentialResults;
 
     if (!splitPaneData?.length || !Array.isArray(toHighlightArray)) {
       // Clear selection + clear multi-feature cleanly
@@ -1503,10 +1499,7 @@ class Enrichment extends Component {
     // Cancel pending debounced reload so stale work doesn't fire later
     this.reloadMultifeaturePlotEnrichment?.cancel?.();
 
-    const featureKeyFromTable = this.props.filteredDifferentialFeatureIdKey;
-    const featureKey = this.state.hasBarcodeData
-      ? 'featureID'
-      : featureKeyFromTable;
+    const featureKey = 'featureID';
 
     // Normalize + dedupe to consistent shape and small payload
     const normalize = (arr) => {
@@ -1567,13 +1560,8 @@ class Enrichment extends Component {
    * @returns {void}
    */
   handleSingleProteinSelected = (featureId) => {
-    const featureKey = this.state.hasBarcodeData
-      ? 'featureID'
-      : this.props.filteredDifferentialFeatureIdKey;
-
-    const splitPaneData = this.state.hasBarcodeData
-      ? this.state.barcodeSettings.barcodeData
-      : this.state.filteredDifferentialResults;
+    const featureKey = 'featureID';
+    const splitPaneData = this.state.barcodeSettings.barcodeData;
 
     // If no feature or no data, just clear
     if (!featureId || !splitPaneData || splitPaneData.length === 0) {
@@ -3094,9 +3082,9 @@ class Enrichment extends Component {
               onHandleNetworkTests={this.handleNetworkTests}
               onMultisetTestsFiltered={this.handleMultisetTestsFiltered}
               onAnnotationChange={this.handleAnnotationChange}
+              onSetHasAnnotationTerms={this.setHasAnnotationTerms}
               onHandleNetworkGraphReady={this.handleNetworkGraphReady}
               onHandleEnrichmentTableLoading={this.handleEnrichmentTableLoading}
-              onHandleHasBarcodeData={this.handleHasBarcodeData}
               onGetEnrichmentsLinkouts={this.getEnrichmentsLinkouts}
               onHandleIsDataStreamingEnrichmentsTable={
                 this.handleIsDataStreamingEnrichmentsTable

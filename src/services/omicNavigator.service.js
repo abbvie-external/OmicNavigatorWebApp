@@ -434,6 +434,33 @@ class OmicNavigatorService {
     }
   }
 
+  async getHasAnnotationTerms(study, annotationID, cancelToken) {
+    const cacheKey = `hasTerms_${study}_${annotationID}`;
+    if (this[cacheKey] != null) {
+      return this[cacheKey];
+    } else {
+      try {
+        const promise = this.axiosPost(
+          'hasTerms',
+          {
+            study,
+            annotationID,
+          },
+          false,
+          null,
+          cancelToken,
+          25000,
+        );
+        const dataFromPromise = await promise;
+        this[cacheKey] = dataFromPromise;
+        return dataFromPromise;
+      } catch {
+        if (axios.isCancel) {
+        }
+      }
+    }
+  }
+
   async getReportLink(study, modelID, errorCb, cancelToken) {
     const cacheKey = `getReportLink_${study}_${modelID}`;
     if (this[cacheKey] != null) {
@@ -793,28 +820,6 @@ class OmicNavigatorService {
         false,
         errorCb,
         cancelToken,
-        25000,
-      );
-      const dataFromPromise = await promise;
-      this[cacheKey] = dataFromPromise;
-      return dataFromPromise;
-    }
-  }
-
-  async getBarcodes(study, modelID) {
-    const cacheKey = `getBarcodes_${study}_${modelID}`;
-    if (this[cacheKey] != null) {
-      return this[cacheKey];
-    } else {
-      const promise = this.axiosPost(
-        'getBarcodes',
-        {
-          study,
-          modelID,
-        },
-        false,
-        null,
-        null,
         25000,
       );
       const dataFromPromise = await promise;

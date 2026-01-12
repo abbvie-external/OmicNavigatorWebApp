@@ -288,7 +288,6 @@ class SplitPanesContainer extends Component {
       plotDataEnrichment,
       plotDataEnrichmentLength,
       // Data for feature labels in gear popup
-      hasBarcodeData,
       barcodeSettings,
       filteredDifferentialResults,
       filteredDifferentialFeatureIdKey,
@@ -304,15 +303,10 @@ class SplitPanesContainer extends Component {
     const multiContentHeight = contentHeight - 45;
 
     // 1. Determine the feature ID key based on data source
-    const featureIdKey = hasBarcodeData
-      ? 'featureID'
-      : filteredDifferentialFeatureIdKey;
+    const featureIdKey = 'featureID';
 
     // 2. Get the table data for label lookups
-    const tableData = hasBarcodeData
-      ? barcodeSettings?.barcodeData || []
-      : filteredDifferentialResults || [];
-
+    const tableData = barcodeSettings?.barcodeData || [];
     // 3. Transform HighlightedProteins to have .key/.id/.value properties
     //    PlotsMultiFeature expects: { key, id, value } for getFeaturesList()
     //    Enrichment has: { featureID, sample, cpm }
@@ -451,12 +445,8 @@ class SplitPanesContainer extends Component {
 
   render() {
     const { verticalSplitPaneSize, horizontalSplitPaneSize } = this.state;
-    const {
-      enrichmentStudy,
-      enrichmentModel,
-      hasBarcodeData,
-      enrichmentPlotDescriptions,
-    } = this.props;
+    const { enrichmentStudy, enrichmentModel, enrichmentPlotDescriptions } =
+      this.props;
 
     const ViolinAndTable = this.getViolinAndTable();
 
@@ -469,88 +459,8 @@ class SplitPanesContainer extends Component {
       document.documentElement.clientHeight ||
       document.body.clientHeight;
 
-    // WITH BARCODE BRANCH
-    if (hasBarcodeData) {
-      console.log('Rendering with barcode data');
-      const BarcodePlot = this.getBarcodePlot();
+    const BarcodePlot = this.getBarcodePlot();
 
-      return (
-        <div className="PlotsWrapper">
-          <Grid className="">
-            <Grid.Row className="ActionsRow">
-              <Grid.Column
-                mobile={16}
-                tablet={16}
-                computer={8}
-                largeScreen={8}
-                widescreen={8}
-              >
-                <EnrichmentBreadcrumbs {...this.props} />
-              </Grid.Column>
-
-              <Grid.Column
-                mobile={16}
-                tablet={16}
-                computer={8}
-                largeScreen={8}
-                widescreen={8}
-                className="elementTextCol"
-              ></Grid.Column>
-
-              <Grid.Column
-                mobile={16}
-                tablet={16}
-                largeScreen={16}
-                widescreen={16}
-              >
-                {/* Top: Barcode, Bottom: Violin+Table vs Right Plots */}
-                <SplitPane
-                  className="ThreePlotsDiv SplitPanesWrapper"
-                  split="horizontal"
-                  size={horizontalSplitPaneSize}
-                  minSize={185}
-                  maxSize={400}
-                  onDragFinished={(size) =>
-                    this.splitPaneResized(size, 'horizontal')
-                  }
-                >
-                  {BarcodePlot}
-
-                  <SplitPane
-                    className="BottomSplitPaneContainer"
-                    split="vertical"
-                    size={verticalSplitPaneSize}
-                    minSize={315}
-                    maxSize={1300}
-                    onDragFinished={(size) =>
-                      this.splitPaneResized(size, 'vertical')
-                    }
-                  >
-                    <div id="ViolinAndTableSplitContainer">
-                      {ViolinAndTable}
-                    </div>
-
-                    <div id="SVGSplitContainer">
-                      {this.renderFeaturePlotTabs(
-                        width,
-                        height,
-                        verticalSplitPaneSize,
-                        horizontalSplitPaneSize,
-                        enrichmentStudy,
-                        enrichmentModel,
-                        enrichmentPlotDescriptions,
-                      )}
-                    </div>
-                  </SplitPane>
-                </SplitPane>
-              </Grid.Column>
-            </Grid.Row>
-          </Grid>
-        </div>
-      );
-    }
-
-    // NO BARCODE BRANCH
     return (
       <div className="PlotsWrapper">
         <Grid className="">
@@ -580,30 +490,43 @@ class SplitPanesContainer extends Component {
               largeScreen={16}
               widescreen={16}
             >
-              {/* Simple vertical split: Left = Violin+Table, Right = Plots */}
+              {/* Top: Barcode, Bottom: Violin+Table vs Right Plots */}
               <SplitPane
                 className="ThreePlotsDiv SplitPanesWrapper"
-                split="vertical"
-                size={verticalSplitPaneSize}
-                minSize={315}
-                maxSize={1300}
+                split="horizontal"
+                size={horizontalSplitPaneSize}
+                minSize={185}
+                maxSize={400}
                 onDragFinished={(size) =>
-                  this.splitPaneResized(size, 'vertical')
+                  this.splitPaneResized(size, 'horizontal')
                 }
               >
-                <div id="ViolinAndTableSplitContainer">{ViolinAndTable}</div>
+                {BarcodePlot}
 
-                <div id="SVGSplitContainer">
-                  {this.renderFeaturePlotTabs(
-                    width,
-                    height,
-                    verticalSplitPaneSize,
-                    0, // no barcode → same as your old (height - 51) case
-                    enrichmentStudy,
-                    enrichmentModel,
-                    enrichmentPlotDescriptions,
-                  )}
-                </div>
+                <SplitPane
+                  className="BottomSplitPaneContainer"
+                  split="vertical"
+                  size={verticalSplitPaneSize}
+                  minSize={315}
+                  maxSize={1300}
+                  onDragFinished={(size) =>
+                    this.splitPaneResized(size, 'vertical')
+                  }
+                >
+                  <div id="ViolinAndTableSplitContainer">{ViolinAndTable}</div>
+
+                  <div id="SVGSplitContainer">
+                    {this.renderFeaturePlotTabs(
+                      width,
+                      height,
+                      verticalSplitPaneSize,
+                      horizontalSplitPaneSize,
+                      enrichmentStudy,
+                      enrichmentModel,
+                      enrichmentPlotDescriptions,
+                    )}
+                  </div>
+                </SplitPane>
               </SplitPane>
             </Grid.Column>
           </Grid.Row>
