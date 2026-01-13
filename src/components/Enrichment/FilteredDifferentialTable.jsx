@@ -106,34 +106,23 @@ class FilteredDifferentialTable extends Component {
   };
 
   getTableData = () => {
-    if (this.props.hasBarcodeData) {
-      const brushedMultIds = this.props.barcodeSettings.brushedData.map(
-        (b) => b.featureID,
+    const brushedMultIds = this.props.barcodeSettings.brushedData.map(
+      (b) => b.featureID,
+    );
+    let filteredDifferentialData = this.state.filteredBarcodeData.filter((d) =>
+      brushedMultIds.includes(d[this.props.filteredDifferentialFeatureIdKey]),
+    );
+    // for sorting, if desired
+    if (filteredDifferentialData.length > 0) {
+      const statToSort =
+        'P.Value' in this.state.filteredBarcodeData[0] ? 'P.Value' : 'P_Value';
+      filteredDifferentialData = filteredDifferentialData.sort(
+        (a, b) => a[statToSort] - b[statToSort],
       );
-      let filteredDifferentialData = this.state.filteredBarcodeData.filter(
-        (d) =>
-          brushedMultIds.includes(
-            d[this.props.filteredDifferentialFeatureIdKey],
-          ),
-      );
-      // for sorting, if desired
-      if (filteredDifferentialData.length > 0) {
-        const statToSort =
-          'P.Value' in this.state.filteredBarcodeData[0]
-            ? 'P.Value'
-            : 'P_Value';
-        filteredDifferentialData = filteredDifferentialData.sort(
-          (a, b) => a[statToSort] - b[statToSort],
-        );
-      }
-      this.setState({
-        filteredTableData: filteredDifferentialData,
-      });
-    } else {
-      this.setState({
-        filteredTableData: this.state.filteredBarcodeData,
-      });
     }
+    this.setState({
+      filteredTableData: filteredDifferentialData,
+    });
   };
 
   getFilteredTableConfigCols = (barcodeData) => {
@@ -176,7 +165,6 @@ class FilteredDifferentialTable extends Component {
     dataAlreadyFiltered,
   ) => {
     const {
-      hasBarcodeData,
       enrichmentResultsColumnTooltips,
       enrichmentModel,
       enrichmentTest,
@@ -184,7 +172,7 @@ class FilteredDifferentialTable extends Component {
       filteredDifferentialFavicons,
       onHandleDifferentialFeatureIdKey,
     } = this.props;
-    let data = hasBarcodeData ? barcodeData : [...filteredDifferentialResults];
+    let data = barcodeData || [...filteredDifferentialResults];
     const TableValuePopupStyle = {
       backgroundColor: '2E2E2E',
       borderBottom: '2px solid var(--color-primary)',
@@ -234,7 +222,7 @@ class FilteredDifferentialTable extends Component {
       });
     }
     const alphanumericTrigger = filteredDifferentialAlphanumericFields[0];
-    let featureID = hasBarcodeData ? 'featureID' : alphanumericTrigger;
+    let featureID = 'featureID';
     onHandleDifferentialFeatureIdKey(
       'filteredDifferentialFeatureIdKey',
       alphanumericTrigger,
