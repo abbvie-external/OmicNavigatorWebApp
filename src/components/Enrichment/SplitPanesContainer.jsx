@@ -15,7 +15,11 @@ const ENRICHMENT_SPLIT_DEFAULTS = { horizontal: 250, vertical: 525 };
 // Toggle persistence of Enrichment split sizes. When false, reload returns to defaults.
 const PERSIST_ENRICHMENT_SPLIT_SIZES = false;
 
-const getInitialEnrichmentSplitSize = (enrichmentKey, legacyKey, defaultValue) => {
+const getInitialEnrichmentSplitSize = (
+  enrichmentKey,
+  legacyKey,
+  defaultValue,
+) => {
   if (!PERSIST_ENRICHMENT_SPLIT_SIZES) return defaultValue;
   try {
     const v = parseInt(localStorage.getItem(enrichmentKey), 10);
@@ -44,12 +48,28 @@ class SplitPanesContainer extends Component {
     activeSvgTabIndexEnrichment: 0,
 
     // Live sizes: update continuously during drag (keeps SplitPane divider responsive)
-    horizontalSplitPaneSize: getInitialEnrichmentSplitSize('enrichmentHorizontalSplitPaneSize', 'horizontalSplitPaneSize', ENRICHMENT_SPLIT_DEFAULTS.horizontal),
-    verticalSplitPaneSize: getInitialEnrichmentSplitSize('enrichmentVerticalSplitPaneSize', 'verticalSplitPaneSize', ENRICHMENT_SPLIT_DEFAULTS.vertical),
+    horizontalSplitPaneSize: getInitialEnrichmentSplitSize(
+      'enrichmentHorizontalSplitPaneSize',
+      'horizontalSplitPaneSize',
+      ENRICHMENT_SPLIT_DEFAULTS.horizontal,
+    ),
+    verticalSplitPaneSize: getInitialEnrichmentSplitSize(
+      'enrichmentVerticalSplitPaneSize',
+      'verticalSplitPaneSize',
+      ENRICHMENT_SPLIT_DEFAULTS.vertical,
+    ),
 
     // Committed sizes: update only on drag end (used to size heavy plots)
-    horizontalSplitPaneSizeCommitted: getInitialEnrichmentSplitSize('enrichmentHorizontalSplitPaneSize', 'horizontalSplitPaneSize', ENRICHMENT_SPLIT_DEFAULTS.horizontal),
-    verticalSplitPaneSizeCommitted: getInitialEnrichmentSplitSize('enrichmentVerticalSplitPaneSize', 'verticalSplitPaneSize', ENRICHMENT_SPLIT_DEFAULTS.vertical),
+    horizontalSplitPaneSizeCommitted: getInitialEnrichmentSplitSize(
+      'enrichmentHorizontalSplitPaneSize',
+      'horizontalSplitPaneSize',
+      ENRICHMENT_SPLIT_DEFAULTS.horizontal,
+    ),
+    verticalSplitPaneSizeCommitted: getInitialEnrichmentSplitSize(
+      'enrichmentVerticalSplitPaneSize',
+      'verticalSplitPaneSize',
+      ENRICHMENT_SPLIT_DEFAULTS.vertical,
+    ),
 
     // True while the user is actively dragging a SplitPane divider
     isSplitPaneDragging: false,
@@ -468,7 +488,6 @@ class SplitPanesContainer extends Component {
       plotDataEnrichment,
       plotDataEnrichmentLength,
       // Data for feature labels in gear popup
-      hasBarcodeData,
       barcodeSettings,
       filteredDifferentialResults,
       filteredDifferentialFeatureIdKey,
@@ -484,15 +503,10 @@ class SplitPanesContainer extends Component {
     const multiContentHeight = contentHeight - 45;
 
     // 1. Determine the feature ID key based on data source
-    const featureIdKey = hasBarcodeData
-      ? 'featureID'
-      : filteredDifferentialFeatureIdKey;
+    const featureIdKey = 'featureID';
 
     // 2. Get the table data for label lookups
-    const tableData = hasBarcodeData
-      ? barcodeSettings?.barcodeData || []
-      : filteredDifferentialResults || [];
-
+    const tableData = barcodeSettings?.barcodeData || [];
     // 3. Transform HighlightedProteins to have .key/.id/.value properties
     //    PlotsMultiFeature expects: { key, id, value } for getFeaturesList()
     //    Enrichment has: { featureID, sample, cpm }
@@ -740,7 +754,9 @@ class SplitPanesContainer extends Component {
                   size={horizontalSplitPaneSize}
                   minSize={185}
                   maxSize={400}
-                  onChange={(size) => this.splitPaneDragging(size, 'horizontal')}
+                  onChange={(size) =>
+                    this.splitPaneDragging(size, 'horizontal')
+                  }
                   onDragFinished={(size) =>
                     this.splitPaneResized(size, 'horizontal')
                   }
@@ -753,7 +769,9 @@ class SplitPanesContainer extends Component {
                     size={verticalSplitPaneSize}
                     minSize={315}
                     maxSize={1300}
-                    onChange={(size) => this.splitPaneDragging(size, 'vertical')}
+                    onChange={(size) =>
+                      this.splitPaneDragging(size, 'vertical')
+                    }
                     onDragFinished={(size) =>
                       this.splitPaneResized(size, 'vertical')
                     }
@@ -763,9 +781,11 @@ class SplitPanesContainer extends Component {
                     </div>
 
                     <div
-                  id="SVGSplitContainer"
-                  style={{ overflow: isSplitPaneDragging ? 'hidden' : undefined }}
-                >
+                      id="SVGSplitContainer"
+                      style={{
+                        overflow: isSplitPaneDragging ? 'hidden' : undefined,
+                      }}
+                    >
                       {featurePlotTabs}
                     </div>
                   </SplitPane>
@@ -823,7 +843,9 @@ class SplitPanesContainer extends Component {
 
                 <div
                   id="SVGSplitContainer"
-                  style={{ overflow: isSplitPaneDragging ? 'hidden' : undefined }}
+                  style={{
+                    overflow: isSplitPaneDragging ? 'hidden' : undefined,
+                  }}
                 >
                   {featurePlotTabs}
                 </div>
