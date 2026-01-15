@@ -463,4 +463,4 @@ class PlotsMultiFeature extends Component {
   }
 }
 
-export default PlotsMultiFeature;
+export default React.memo(PlotsMultiFeature);

@@ -2958,9 +2958,7 @@ class Enrichment extends Component {
         text: splitValue(protein.featureID),
       }));
 
-      const featureIdKey = this.state.hasBarcodeData
-        ? 'featureID'
-        : this.props.filteredDifferentialFeatureIdKey;
+      const featureIdKey = 'featureID';
 
       return (
         <PlotsOverlay

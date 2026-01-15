@@ -37,10 +37,6 @@ class SplitPanesContainer extends Component {
   _pendingDragSizes = { horizontal: null, vertical: null };
   _dragRafId = null;
 
-  // Cache for freezing heavy right-side plot subtree during SplitPane drag
-  _featurePlotTabsCacheWithBarcode = null;
-  _featurePlotTabsCacheNoBarcode = null;
-
   // Global safety handler: ensures drag state resets if onDragFinished does not fire
   _onGlobalPointerUp = null;
 
@@ -165,8 +161,6 @@ class SplitPanesContainer extends Component {
     }
 
     this._pendingDragSizes = { horizontal: null, vertical: null };
-    this._featurePlotTabsCacheWithBarcode = null;
-    this._featurePlotTabsCacheNoBarcode = null;
   }
 
   handleSVGTabChange = (activeTabIndex) => {
@@ -251,7 +245,6 @@ class SplitPanesContainer extends Component {
             key="0"
             id="ViolinPlotTab"
             className="ViolinPlotTab"
-            // as="div"
           >
             <div id="" className="ViolinPlotDiv">
               {violinPlot}
@@ -267,7 +260,6 @@ class SplitPanesContainer extends Component {
             key="1"
             id="TableResultsTab"
             className="TableResultsTab two-col-sticky"
-            // as="div"
           >
             <FilteredDifferentialTable
               {...this.state}
@@ -288,7 +280,6 @@ class SplitPanesContainer extends Component {
             key="1"
             id="TableResultsTab"
             className="TableResultsTab"
-            // as="div"
           >
             <FilteredDifferentialTable {...this.state} {...this.props} />
           </Tab.Pane>
@@ -336,7 +327,6 @@ class SplitPanesContainer extends Component {
           className="ViolinAndTableTabsDiv"
           onTabChange={this.handleViolinTableTabChange}
           panes={displayViolinPlot ? violinAndTablePanes : onlyTablePane}
-          // panes={violinAndTablePanes}
           activeIndex={activeViolinTableIndex}
           renderActiveOnly={false}
           menu={{
@@ -414,50 +404,6 @@ class SplitPanesContainer extends Component {
         // ignore
       }
     }
-  };
-
-  getFeaturePlotTabsInvalidationKey = () => {
-    const {
-      HighlightedProteins = [],
-      selectedProteinId,
-      plotMultiFeatureAvailable,
-      plotMultiFeatureDataLoaded,
-      plotMultiFeatureDataLength,
-      plotDataEnrichmentLength,
-      SVGPlotLoaded,
-      SVGPlotLoading,
-      enrichmentStudy,
-      enrichmentModel,
-      enrichmentAnnotation,
-    } = this.props;
-
-    const { activeSvgTabIndexEnrichment } = this.state;
-
-    // Fingerprint highlighted feature IDs (avoid stale cache during drag if selection changes)
-    const ids = (HighlightedProteins || [])
-      .map((p) => p.featureID || p.key || p.id || '')
-      .filter(Boolean);
-
-    const fingerprint =
-      ids.length <= 50
-        ? ids.join('|')
-        : `${ids.length}|${ids[0] || ''}|${ids[ids.length - 1] || ''}`;
-
-    return [
-      activeSvgTabIndexEnrichment,
-      selectedProteinId || '',
-      fingerprint,
-      ids.length,
-      plotMultiFeatureAvailable ? 1 : 0,
-      plotMultiFeatureDataLoaded ? 1 : 0,
-      plotMultiFeatureDataLength || 0,
-      plotDataEnrichmentLength || 0,
-      SVGPlotLoaded ? 1 : 0,
-      SVGPlotLoading ? 1 : 0,
-      enrichmentStudy || '',
-      enrichmentModel || '',
-      enrichmentAnnotation || '',
-    ].join('::');
   };
 
   renderFeaturePlotTabs = (
@@ -667,12 +613,8 @@ class SplitPanesContainer extends Component {
       horizontalSplitPaneSizeCommitted,
       isSplitPaneDragging,
     } = this.state;
-    const {
-      enrichmentStudy,
-      enrichmentModel,
-      hasBarcodeData,
-      enrichmentPlotDescriptions,
-    } = this.props;
+    const { enrichmentStudy, enrichmentModel, enrichmentPlotDescriptions } =
+      this.props;
 
     const ViolinAndTable = this.getViolinAndTable();
 
@@ -685,119 +627,18 @@ class SplitPanesContainer extends Component {
       document.documentElement.clientHeight ||
       document.body.clientHeight;
 
-    // Freeze heavy right-side plot subtree during SplitPane drag to prevent jank
-    const featurePlotTabsCacheKey = hasBarcodeData
-      ? '_featurePlotTabsCacheWithBarcode'
-      : '_featurePlotTabsCacheNoBarcode';
+    const BarcodePlot = this.getBarcodePlot();
 
-    const cacheInvalidationKey = this.getFeaturePlotTabsInvalidationKey();
-    const cached = this[featurePlotTabsCacheKey];
-    const canUseCache =
-      isSplitPaneDragging && cached && cached.key === cacheInvalidationKey;
+    const featurePlotTabs = this.renderFeaturePlotTabs(
+      width,
+      height,
+      verticalSplitPaneSizeCommitted,
+      horizontalSplitPaneSizeCommitted,
+      enrichmentStudy,
+      enrichmentModel,
+      enrichmentPlotDescriptions,
+    );
 
-    const featurePlotTabs = canUseCache
-      ? cached.jsx
-      : this.renderFeaturePlotTabs(
-          width,
-          height,
-          verticalSplitPaneSizeCommitted,
-          hasBarcodeData ? horizontalSplitPaneSizeCommitted : 0,
-          enrichmentStudy,
-          enrichmentModel,
-          enrichmentPlotDescriptions,
-        );
-
-    if (!canUseCache) {
-      this[featurePlotTabsCacheKey] = {
-        jsx: featurePlotTabs,
-        key: cacheInvalidationKey,
-      };
-    }
-
-    // WITH BARCODE BRANCH
-    if (hasBarcodeData) {
-      const BarcodePlot = this.getBarcodePlot();
-
-      return (
-        <div className="PlotsWrapper">
-          <Grid className="">
-            <Grid.Row className="ActionsRow">
-              <Grid.Column
-                mobile={16}
-                tablet={16}
-                computer={8}
-                largeScreen={8}
-                widescreen={8}
-              >
-                <EnrichmentBreadcrumbs {...this.props} />
-              </Grid.Column>
-
-              <Grid.Column
-                mobile={16}
-                tablet={16}
-                computer={8}
-                largeScreen={8}
-                widescreen={8}
-                className="elementTextCol"
-              ></Grid.Column>
-
-              <Grid.Column
-                mobile={16}
-                tablet={16}
-                largeScreen={16}
-                widescreen={16}
-              >
-                {/* Top: Barcode, Bottom: Violin+Table vs Right Plots */}
-                <SplitPane
-                  className="ThreePlotsDiv SplitPanesWrapper"
-                  split="horizontal"
-                  size={horizontalSplitPaneSize}
-                  minSize={185}
-                  maxSize={400}
-                  onChange={(size) =>
-                    this.splitPaneDragging(size, 'horizontal')
-                  }
-                  onDragFinished={(size) =>
-                    this.splitPaneResized(size, 'horizontal')
-                  }
-                >
-                  {BarcodePlot}
-
-                  <SplitPane
-                    className="BottomSplitPaneContainer"
-                    split="vertical"
-                    size={verticalSplitPaneSize}
-                    minSize={315}
-                    maxSize={1300}
-                    onChange={(size) =>
-                      this.splitPaneDragging(size, 'vertical')
-                    }
-                    onDragFinished={(size) =>
-                      this.splitPaneResized(size, 'vertical')
-                    }
-                  >
-                    <div id="ViolinAndTableSplitContainer">
-                      {ViolinAndTable}
-                    </div>
-
-                    <div
-                      id="SVGSplitContainer"
-                      style={{
-                        overflow: isSplitPaneDragging ? 'hidden' : undefined,
-                      }}
-                    >
-                      {featurePlotTabs}
-                    </div>
-                  </SplitPane>
-                </SplitPane>
-              </Grid.Column>
-            </Grid.Row>
-          </Grid>
-        </div>
-      );
-    }
-
-    // NO BARCODE BRANCH
     return (
       <div className="PlotsWrapper">
         <Grid className="">
@@ -827,28 +668,42 @@ class SplitPanesContainer extends Component {
               largeScreen={16}
               widescreen={16}
             >
-              {/* Simple vertical split: Left = Violin+Table, Right = Plots */}
+              {/* Top: Barcode, Bottom: Violin+Table vs Right Plots */}
               <SplitPane
                 className="ThreePlotsDiv SplitPanesWrapper"
-                split="vertical"
-                size={verticalSplitPaneSize}
-                minSize={315}
-                maxSize={1300}
-                onChange={(size) => this.splitPaneDragging(size, 'vertical')}
+                split="horizontal"
+                size={horizontalSplitPaneSize}
+                minSize={185}
+                maxSize={400}
+                onChange={(size) => this.splitPaneDragging(size, 'horizontal')}
                 onDragFinished={(size) =>
-                  this.splitPaneResized(size, 'vertical')
+                  this.splitPaneResized(size, 'horizontal')
                 }
               >
-                <div id="ViolinAndTableSplitContainer">{ViolinAndTable}</div>
+                {BarcodePlot}
 
-                <div
-                  id="SVGSplitContainer"
-                  style={{
-                    overflow: isSplitPaneDragging ? 'hidden' : undefined,
-                  }}
+                <SplitPane
+                  className="BottomSplitPaneContainer"
+                  split="vertical"
+                  size={verticalSplitPaneSize}
+                  minSize={315}
+                  maxSize={1300}
+                  onChange={(size) => this.splitPaneDragging(size, 'vertical')}
+                  onDragFinished={(size) =>
+                    this.splitPaneResized(size, 'vertical')
+                  }
                 >
-                  {featurePlotTabs}
-                </div>
+                  <div id="ViolinAndTableSplitContainer">{ViolinAndTable}</div>
+
+                  <div
+                    id="SVGSplitContainer"
+                    style={{
+                      overflow: isSplitPaneDragging ? 'hidden' : undefined,
+                    }}
+                  >
+                    {featurePlotTabs}
+                  </div>
+                </SplitPane>
               </SplitPane>
             </Grid.Column>
           </Grid.Row>
