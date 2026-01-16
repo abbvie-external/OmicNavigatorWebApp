@@ -13,7 +13,7 @@ import PlotsSingleFeature from '../Differential/PlotsSingleFeature';
 
 const ENRICHMENT_SPLIT_DEFAULTS = { horizontal: 250, vertical: 525 };
 // Toggle persistence of Enrichment split sizes. When false, reload returns to defaults.
-const PERSIST_ENRICHMENT_SPLIT_SIZES = false;
+const PERSIST_ENRICHMENT_SPLIT_SIZES = true;
 
 const getInitialEnrichmentSplitSize = (
   enrichmentKey,
