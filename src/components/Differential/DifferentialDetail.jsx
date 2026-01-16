@@ -2012,6 +2012,7 @@ class DifferentialDetail extends Component {
 
     const dynamicPlots = (
       <PlotsDynamic
+        differentialOutlinedFeature={this.props.differentialOutlinedFeature}
         modelSpecificMetaFeaturesExist={modelSpecificMetaFeaturesExist || false}
         differentialStudy={differentialStudy}
         differentialModel={differentialModel}

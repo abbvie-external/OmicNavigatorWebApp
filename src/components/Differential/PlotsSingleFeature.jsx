@@ -314,4 +314,4 @@ class PlotsSingleFeature extends Component {
   }
 }
 
-export default React.memo(PlotsSingleFeature);
+export default PlotsSingleFeature;

@@ -148,6 +148,10 @@ class PlotsDynamic extends Component {
                 differentialPlotDescriptions={
                   this.props.differentialPlotDescriptions
                 }
+                isLoading={
+                  !this.props.plotSingleFeatureDataLoaded &&
+                  !!this.props.differentialOutlinedFeature
+                }
               />
             </Tab.Pane>
           ),
@@ -217,6 +221,10 @@ class PlotsDynamic extends Component {
                 onMultiFeatureBullpenOpenChange={
                   this.props.onMultiFeatureBullpenOpenChange
                 }
+                isLoading={
+                  !this.props.plotMultiFeatureDataLoaded &&
+                  this.props.differentialHighlightedFeaturesData?.length > 2
+                }
               />
             </Tab.Pane>
           ),
@@ -277,6 +285,10 @@ class PlotsDynamic extends Component {
                 singleFeaturePlotTypes={this.props.singleFeaturePlotTypes}
                 differentialPlotDescriptions={
                   this.props.differentialPlotDescriptions
+                }
+                isLoading={
+                  !this.props.plotSingleFeatureDataLoaded &&
+                  !!this.props.differentialOutlinedFeature
                 }
               />
             </Tab.Pane>
