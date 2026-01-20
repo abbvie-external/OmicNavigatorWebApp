@@ -1939,9 +1939,8 @@ class Enrichment extends Component {
       SVGPlotLoading: false,
       plotDataEnrichment: {
         key: null,
-        title: '',
         svg: [],
-        dataItem: '',
+        ...this.state.plotDataEnrichment,
       },
       plotDataEnrichmentLength: 0,
     });
