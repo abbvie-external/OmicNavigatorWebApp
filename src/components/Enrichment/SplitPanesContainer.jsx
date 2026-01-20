@@ -5,23 +5,105 @@ import EnrichmentBreadcrumbs from './EnrichmentBreadcrumbs';
 import ButtonActions from '../Shared/ButtonActions';
 import SplitPane from 'react-split-pane-r17';
 import './SplitPanesContainer.scss';
-import EnrichmentSVGPlot from './EnrichmentSVGPlot';
 import BarcodePlot from './BarcodePlot';
 import ViolinPlot from './ViolinPlot';
 import FilteredDifferentialTable from './FilteredDifferentialTable';
 import PlotsMultiFeature from '../Differential/PlotsMultiFeature';
+import PlotsSingleFeature from '../Differential/PlotsSingleFeature';
+
+const ENRICHMENT_SPLIT_DEFAULTS = { horizontal: 250, vertical: 525 };
+// Toggle persistence of Enrichment split sizes. When false, reload returns to defaults.
+const PERSIST_ENRICHMENT_SPLIT_SIZES = true;
+
+const getInitialEnrichmentSplitSize = (
+  enrichmentKey,
+  legacyKey,
+  defaultValue,
+) => {
+  if (!PERSIST_ENRICHMENT_SPLIT_SIZES) return defaultValue;
+  try {
+    const v = parseInt(localStorage.getItem(enrichmentKey), 10);
+    if (!Number.isNaN(v) && v) return v;
+    const legacy = parseInt(localStorage.getItem(legacyKey), 10);
+    if (!Number.isNaN(legacy) && legacy) return legacy;
+  } catch (e) {
+    // ignore
+  }
+  return defaultValue;
+};
 
 class SplitPanesContainer extends Component {
+  // Smooth redraw during SplitPane drag without spamming localStorage
+  _pendingDragSizes = { horizontal: null, vertical: null };
+  _dragRafId = null;
+
+  // Global safety handler: ensures drag state resets if onDragFinished does not fire
+  _onGlobalPointerUp = null;
+
   state = {
     activeSvgTabIndexEnrichment: 0,
-    horizontalSplitPaneSize:
-      parseInt(localStorage.getItem('horizontalSplitPaneSize'), 10) || 250,
-    verticalSplitPaneSize:
-      parseInt(localStorage.getItem('verticalSplitPaneSize'), 10) || 525,
+
+    // Live sizes: update continuously during drag (keeps SplitPane divider responsive)
+    horizontalSplitPaneSize: getInitialEnrichmentSplitSize(
+      'enrichmentHorizontalSplitPaneSize',
+      'horizontalSplitPaneSize',
+      ENRICHMENT_SPLIT_DEFAULTS.horizontal,
+    ),
+    verticalSplitPaneSize: getInitialEnrichmentSplitSize(
+      'enrichmentVerticalSplitPaneSize',
+      'verticalSplitPaneSize',
+      ENRICHMENT_SPLIT_DEFAULTS.vertical,
+    ),
+
+    // Committed sizes: update only on drag end (used to size heavy plots)
+    horizontalSplitPaneSizeCommitted: getInitialEnrichmentSplitSize(
+      'enrichmentHorizontalSplitPaneSize',
+      'horizontalSplitPaneSize',
+      ENRICHMENT_SPLIT_DEFAULTS.horizontal,
+    ),
+    verticalSplitPaneSizeCommitted: getInitialEnrichmentSplitSize(
+      'enrichmentVerticalSplitPaneSize',
+      'verticalSplitPaneSize',
+      ENRICHMENT_SPLIT_DEFAULTS.vertical,
+    ),
+
+    // True while the user is actively dragging a SplitPane divider
+    isSplitPaneDragging: false,
+
     activeViolinTableIndex: 0,
     elementTextKey: 'featureID',
   };
   filteredDifferentialGridRef = React.createRef();
+
+  componentDidMount() {
+    // Ensure Enrichment always starts from defaults when persistence is disabled
+    if (!PERSIST_ENRICHMENT_SPLIT_SIZES) {
+      try {
+        localStorage.removeItem('enrichmentHorizontalSplitPaneSize');
+        localStorage.removeItem('enrichmentVerticalSplitPaneSize');
+      } catch (e) {
+        // ignore
+      }
+    }
+
+    // Safety: reset drag flag if pointer/touch ends outside SplitPane (onDragFinished may not fire)
+    this._onGlobalPointerUp = () => {
+      if (!this.state.isSplitPaneDragging) return;
+
+      if (this._dragRafId) {
+        cancelAnimationFrame(this._dragRafId);
+        this._dragRafId = null;
+      }
+      this._pendingDragSizes = { horizontal: null, vertical: null };
+
+      this.setState({ isSplitPaneDragging: false });
+    };
+
+    window.addEventListener('mouseup', this._onGlobalPointerUp);
+    window.addEventListener('touchend', this._onGlobalPointerUp);
+    window.addEventListener('pointerup', this._onGlobalPointerUp);
+    window.addEventListener('blur', this._onGlobalPointerUp);
+  }
 
   componentDidUpdate(prevProps, prevState) {
     const prevCount = prevProps.HighlightedProteins
@@ -62,6 +144,23 @@ class SplitPanesContainer extends Component {
     ) {
       this.handleSVGTabChange(0);
     }
+  }
+
+  componentWillUnmount() {
+    if (this._onGlobalPointerUp) {
+      window.removeEventListener('mouseup', this._onGlobalPointerUp);
+      window.removeEventListener('touchend', this._onGlobalPointerUp);
+      window.removeEventListener('pointerup', this._onGlobalPointerUp);
+      window.removeEventListener('blur', this._onGlobalPointerUp);
+      this._onGlobalPointerUp = null;
+    }
+
+    if (this._dragRafId) {
+      cancelAnimationFrame(this._dragRafId);
+      this._dragRafId = null;
+    }
+
+    this._pendingDragSizes = { horizontal: null, vertical: null };
   }
 
   handleSVGTabChange = (activeTabIndex) => {
@@ -146,7 +245,6 @@ class SplitPanesContainer extends Component {
             key="0"
             id="ViolinPlotTab"
             className="ViolinPlotTab"
-            // as="div"
           >
             <div id="" className="ViolinPlotDiv">
               {violinPlot}
@@ -162,7 +260,6 @@ class SplitPanesContainer extends Component {
             key="1"
             id="TableResultsTab"
             className="TableResultsTab two-col-sticky"
-            // as="div"
           >
             <FilteredDifferentialTable
               {...this.state}
@@ -183,7 +280,6 @@ class SplitPanesContainer extends Component {
             key="1"
             id="TableResultsTab"
             className="TableResultsTab"
-            // as="div"
           >
             <FilteredDifferentialTable {...this.state} {...this.props} />
           </Tab.Pane>
@@ -231,7 +327,6 @@ class SplitPanesContainer extends Component {
           className="ViolinAndTableTabsDiv"
           onTabChange={this.handleViolinTableTabChange}
           panes={displayViolinPlot ? violinAndTablePanes : onlyTablePane}
-          // panes={violinAndTablePanes}
           activeIndex={activeViolinTableIndex}
           renderActiveOnly={false}
           menu={{
@@ -245,18 +340,70 @@ class SplitPanesContainer extends Component {
     );
   };
 
+  // Called while dragging (SplitPane onChange). Updates *live* sizes at most once per animation frame.
+  splitPaneDragging = (size, paneType) => {
+    if (size === undefined) return;
+    this._pendingDragSizes[paneType] = size;
+    if (this._dragRafId) return;
+
+    this._dragRafId = requestAnimationFrame(() => {
+      const next = {};
+
+      if (this._pendingDragSizes.horizontal !== null) {
+        next.horizontalSplitPaneSize = this._pendingDragSizes.horizontal;
+        this._pendingDragSizes.horizontal = null;
+      }
+      if (this._pendingDragSizes.vertical !== null) {
+        next.verticalSplitPaneSize = this._pendingDragSizes.vertical;
+        this._pendingDragSizes.vertical = null;
+      }
+
+      if (!this.state.isSplitPaneDragging) {
+        next.isSplitPaneDragging = true;
+      }
+
+      this._dragRafId = null;
+      if (Object.keys(next).length) {
+        this.setState(next);
+      }
+    });
+  };
+
   splitPaneResized = (size, paneType) => {
     if (size === undefined) return;
+
+    // Ensure no pending RAF updates run after drag completes
+    if (this._dragRafId) {
+      cancelAnimationFrame(this._dragRafId);
+      this._dragRafId = null;
+    }
+    this._pendingDragSizes = { horizontal: null, vertical: null };
+
     if (paneType === 'horizontal') {
       this.setState({
         horizontalSplitPaneSize: size,
+        horizontalSplitPaneSizeCommitted: size,
+        isSplitPaneDragging: false,
       });
     } else {
       this.setState({
         verticalSplitPaneSize: size,
+        verticalSplitPaneSizeCommitted: size,
+        isSplitPaneDragging: false,
       });
     }
-    localStorage.setItem(`${paneType}SplitPaneSize`, size);
+
+    if (PERSIST_ENRICHMENT_SPLIT_SIZES) {
+      const key =
+        paneType === 'horizontal'
+          ? 'enrichmentHorizontalSplitPaneSize'
+          : 'enrichmentVerticalSplitPaneSize';
+      try {
+        localStorage.setItem(key, String(size));
+      } catch (e) {
+        // ignore
+      }
+    }
   };
 
   renderFeaturePlotTabs = (
@@ -282,7 +429,6 @@ class SplitPanesContainer extends Component {
       svgExportName,
       tab,
       onHandleProteinSelected,
-      onGetMultifeaturePlotTransitionEnrichment,
       SVGPlotLoaded,
       SVGPlotLoading,
       plotDataEnrichment,
@@ -310,6 +456,11 @@ class SplitPanesContainer extends Component {
     // 3. Transform HighlightedProteins to have .key/.id/.value properties
     //    PlotsMultiFeature expects: { key, id, value } for getFeaturesList()
     //    Enrichment has: { featureID, sample, cpm }
+    // Single-feature plot types (exclude multiFeature plot types)
+    const singleFeaturePlotTypes = (enrichmentPlotTypes || []).filter(
+      (p) => !p.plotType?.includes('multiFeature'),
+    );
+
     const transformedHighlightedFeatures = (HighlightedProteins || []).map(
       (protein) => ({
         ...protein,
@@ -333,15 +484,6 @@ class SplitPanesContainer extends Component {
           onTabChange={(e, data) => {
             const nextIndex = data.activeIndex;
             this.handleSVGTabChange(nextIndex);
-
-            if (
-              nextIndex === 1 &&
-              plotMultiFeatureAvailable &&
-              (HighlightedProteins?.length || 0) >= 2 &&
-              onGetMultifeaturePlotTransitionEnrichment
-            ) {
-              onGetMultifeaturePlotTransitionEnrichment();
-            }
           }}
           panes={[
             {
@@ -352,24 +494,36 @@ class SplitPanesContainer extends Component {
                   attached={false}
                   className="SingleFeaturePlotPane"
                 >
-                  <EnrichmentSVGPlot
+                  <PlotsSingleFeature
+                    plotSingleFeatureData={plotDataEnrichment}
+                    plotSingleFeatureDataLength={plotDataEnrichmentLength}
+                    plotSingleFeatureDataLoaded={SVGPlotLoaded}
+                    isLoading={SVGPlotLoading}
                     // unified dimensions for single-feature
-                    divWidth={contentWidth}
-                    divHeight={contentHeight}
+                    divWidth={multiContentWidth}
+                    divHeight={multiContentHeight}
                     pxToPtRatio={105}
                     pointSize={12}
                     svgTabMax={1}
                     tab={tab}
-                    plotDataEnrichment={plotDataEnrichment}
-                    plotDataEnrichmentLength={plotDataEnrichmentLength}
+                    upperPlotsVisible={true}
                     svgExportName={svgExportName}
-                    enrichmentPlotTypes={enrichmentPlotTypes}
-                    SVGPlotLoaded={SVGPlotLoaded}
-                    SVGPlotLoading={SVGPlotLoading}
-                    HighlightedProteins={HighlightedProteins}
-                    enrichmentStudy={enrichmentStudy}
-                    enrichmentModel={enrichmentModel}
-                    enrichmentPlotDescriptions={enrichmentPlotDescriptions}
+                    differentialStudy={enrichmentStudy}
+                    differentialModel={enrichmentModel}
+                    differentialTest={enrichmentAnnotation}
+                    differentialTestIdsCommon={
+                      enrichmentAnnotationIdsCommon || []
+                    }
+                    differentialPlotTypes={enrichmentPlotTypes}
+                    singleFeaturePlotTypes={singleFeaturePlotTypes}
+                    differentialPlotDescriptions={enrichmentPlotDescriptions}
+                    modelSpecificMetaFeaturesExist={false}
+                    onGetPlotTransitionRef={
+                      this.props.onGetSingleFeaturePlotTransitionEnrichment
+                    }
+                    showFullScreenButton={
+                      !!this.props.onGetSingleFeaturePlotTransitionEnrichment
+                    }
                   />
                 </Tab.Pane>
               ),
@@ -398,6 +552,10 @@ class SplitPanesContainer extends Component {
                     }
                     plotMultiFeatureData={plotMultiFeatureData}
                     plotMultiFeatureDataLoaded={plotMultiFeatureDataLoaded}
+                    isLoading={
+                      !plotMultiFeatureDataLoaded &&
+                      (HighlightedProteins?.length || 0) >= 2
+                    }
                     plotMultiFeatureDataLength={plotMultiFeatureDataLength}
                     plotMultiFeatureMax={plotMultiFeatureMax}
                     svgExportName={svgExportName}
@@ -409,14 +567,18 @@ class SplitPanesContainer extends Component {
                     svgTabMax={1}
                     tab={tab}
                     upperPlotsVisible={true}
-                    showFullScreen={false}
+                    showFullScreen={
+                      !!this.props
+                        .onGetMultifeaturePlotTransitionOverlayEnrichment
+                    }
                     // selection syncing
                     onHandleAllChecked={() => onHandleProteinSelected([])}
                     onHandleHighlightedFeaturesDifferential={(arr) =>
                       onHandleProteinSelected(arr)
                     }
                     onGetMultifeaturePlotTransitionAlt={
-                      onGetMultifeaturePlotTransitionEnrichment
+                      this.props
+                        .onGetMultifeaturePlotTransitionOverlayEnrichment
                     }
                     // Interaction handlers
                     onHandlePlotlyClick={
@@ -444,7 +606,13 @@ class SplitPanesContainer extends Component {
   };
 
   render() {
-    const { verticalSplitPaneSize, horizontalSplitPaneSize } = this.state;
+    const {
+      verticalSplitPaneSize,
+      horizontalSplitPaneSize,
+      verticalSplitPaneSizeCommitted,
+      horizontalSplitPaneSizeCommitted,
+      isSplitPaneDragging,
+    } = this.state;
     const { enrichmentStudy, enrichmentModel, enrichmentPlotDescriptions } =
       this.props;
 
@@ -460,6 +628,16 @@ class SplitPanesContainer extends Component {
       document.body.clientHeight;
 
     const BarcodePlot = this.getBarcodePlot();
+
+    const featurePlotTabs = this.renderFeaturePlotTabs(
+      width,
+      height,
+      verticalSplitPaneSizeCommitted,
+      horizontalSplitPaneSizeCommitted,
+      enrichmentStudy,
+      enrichmentModel,
+      enrichmentPlotDescriptions,
+    );
 
     return (
       <div className="PlotsWrapper">
@@ -497,6 +675,7 @@ class SplitPanesContainer extends Component {
                 size={horizontalSplitPaneSize}
                 minSize={185}
                 maxSize={400}
+                onChange={(size) => this.splitPaneDragging(size, 'horizontal')}
                 onDragFinished={(size) =>
                   this.splitPaneResized(size, 'horizontal')
                 }
@@ -509,22 +688,20 @@ class SplitPanesContainer extends Component {
                   size={verticalSplitPaneSize}
                   minSize={315}
                   maxSize={1300}
+                  onChange={(size) => this.splitPaneDragging(size, 'vertical')}
                   onDragFinished={(size) =>
                     this.splitPaneResized(size, 'vertical')
                   }
                 >
                   <div id="ViolinAndTableSplitContainer">{ViolinAndTable}</div>
 
-                  <div id="SVGSplitContainer">
-                    {this.renderFeaturePlotTabs(
-                      width,
-                      height,
-                      verticalSplitPaneSize,
-                      horizontalSplitPaneSize,
-                      enrichmentStudy,
-                      enrichmentModel,
-                      enrichmentPlotDescriptions,
-                    )}
+                  <div
+                    id="SVGSplitContainer"
+                    style={{
+                      overflow: isSplitPaneDragging ? 'hidden' : undefined,
+                    }}
+                  >
+                    {featurePlotTabs}
                   </div>
                 </SplitPane>
               </SplitPane>

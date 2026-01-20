@@ -15,7 +15,18 @@ class TabOverlay extends Component {
     svgPanesOverlay: [],
   };
 
+  componentDidMount() {
+    // Ensure panes are built on first mount.
+    // This fixes cases where TabOverlay mounts *after* the parent overlay becomes loaded,
+    // and no subsequent state/prop change happens (so componentDidUpdate wouldn't run).
+    this.refreshPanes();
+  }
+
   componentDidUpdate() {
+    this.refreshPanes();
+  }
+
+  refreshPanes = () => {
     const {
       activeTabIndexPlotsOverlay,
       divHeight,
@@ -28,17 +39,23 @@ class TabOverlay extends Component {
       singleFeaturePlotTypes,
       multiFeaturePlotTypes,
     } = this.props;
-    const featureIdsArr = differentialHighlightedFeaturesData.map((f) => f.id);
+
+    const featureIdsArr = (differentialHighlightedFeaturesData || []).map(
+      (f) => f.id,
+    );
     const featureIdsString = featureIdsArr.toString();
     const featuresLength = differentialHighlightedFeaturesData?.length;
-    const plotKey = plotOverlayData.key;
-    const plotLength = plotOverlayData?.svg.length;
+    const plotKey = plotOverlayData?.key;
+    const plotLength = plotOverlayData?.svg?.length;
     const overlayPlotTypes =
       featuresLength > 1 ? multiFeaturePlotTypes : singleFeaturePlotTypes;
-    const plotId = overlayPlotTypes[activeTabIndexPlotsOverlay]?.plotID;
+    const plotId = overlayPlotTypes?.[activeTabIndexPlotsOverlay]?.plotID;
+
     const cacheStringArg = `overlayPanes_${activeTabIndexPlotsOverlay}_${divHeight}_${divWidth}_${divHeight}_${plotId}_${plotKey}_${plotLength}_${featuresLength}_${featureIdsString}_${differentialStudy}_${differentialModel}_${differentialTest}`;
+
     this.getSVGPanesOverlay(cacheStringArg, featuresLength, overlayPlotTypes);
-  }
+  };
+
 
   getWidth = () => {
     if (this.props.differentialPlotsOverlayRefFwd?.current !== null) {
