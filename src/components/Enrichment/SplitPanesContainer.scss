@@ -5,7 +5,14 @@
 .SplitPanesWrapper {
   width: 100% !important;
   min-height: 90vh !important;
+  height: 90vh !important;
+  overflow: hidden !important;
   padding-left: 20px !important;
+
+  .Pane {
+    min-width: 0 !important;
+    min-height: 0 !important;
+  }
 
   .Resizer {
     background: #000;
@@ -72,8 +79,9 @@
     display: flex;
     flex-direction: column;
     position: relative;
-    overflow: visible; /* allow content and export to show fully */
-
+    overflow: hidden; /* allow content and export to show fully */
+    min-width: 0;
+    min-height: 0;
     .ShowBlock:not(.export-svg) {
       margin-right: 30px;
     }
@@ -90,13 +98,15 @@
   }
 
   .ViolinPlotDiv {
-    min-height: 350px !important;
     padding-top: 0px;
+    height: 100% !important;
+    min-height: 0;
     // padding-top: 40px !important;
   }
 
   .ViolinPlotTab {
-    // height: 100% !important;
+    height: 100% !important;
+    min-height: 0;
     margin-top: 0px !important;
     border: none !important;
     padding: 0px !important;
@@ -132,7 +142,9 @@
     // min-height: 350px !important;
     height: 100% !important;
     // direction: rtl !important;
-    overflow-y: overlay !important;
+    overflow-y: auto !important;
+    display: flex;
+    flex-direction: column;
   }
 
   #TableResultsTab .QHGrid {
@@ -173,6 +185,8 @@
   .main {
     display: flex;
     flex-direction: column;
+    height: 100%;
+    min-height: 0;
   }
 
   #EnrichmentPlotSVGDiv {
@@ -204,6 +218,43 @@
   }
 }
 .EnrichmentPlots {
+  /* Single-feature Tab.Pane in the top-right split pane (reuses Differential PlotsSingleFeature) */
+  .SingleFeaturePlotPane {
+    /* critical for SplitPane children: allow flex items to shrink */
+    min-height: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative; /* anchor export/fullscreen absolute buttons */
+    overflow: visible; /* prevent SVG spilling outside pane */
+  }
+
+  /* Treat differentialDetailSvgContainer as our svg container for single-feature */
+  .SingleFeaturePlotPane .differentialDetailSvgContainer {
+    height: 100%;
+    width: 100%;
+    margin: 0px 15px 0px 15px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    min-height: 0;
+  }
+
+  /* Override Differential's default min-height (75vh) to respect SplitPane sizing */
+  .SingleFeaturePlotPane .SVGPlot {
+    flex: 1 1 auto;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+  }
+
+  .SingleFeaturePlotPane .export-svg {
+    margin: 5px 20px 5px 0px !important;
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+
   /* Multi-feature Tab.Pane in the bottom-right split pane */
   .MultiFeaturePlotPane {
     /* base padding comes from shared pane rule; here we control flex/height */

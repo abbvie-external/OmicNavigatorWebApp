@@ -11,6 +11,7 @@ import tableIcon from '../../resources/tableIcon.png';
 import tableIconSelected from '../../resources/tableIconSelected.png';
 import { omicNavigatorService } from '../../services/omicNavigator.service';
 import ButtonActions from '../Shared/ButtonActions';
+import PlotHelpers from '../Shared/Plots/PlotHelpers';
 import * as d3 from 'd3';
 import {
   isNotNANullUndefinedEmptyStringInf,
@@ -34,11 +35,15 @@ import CustomEmptyMessage from '../Shared/Templates';
 // eslint-disable-next-line no-unused-vars
 import { EZGrid } from '../Shared/QHGrid/index.module.js';
 import ErrorBoundary from '../Shared/ErrorBoundary';
+import PlotsOverlay from '../Differential/PlotsOverlay';
+import EnrichmentOverlayBreadcrumbs from './EnrichmentOverlayBreadcrumbs';
 
 let cancelRequestEnrichmentGetPlot = () => {};
 let cancelRequestEnrichmentGetMultiPlot = () => {};
 let cancelRequestGetEnrichmentsNetwork = () => {};
 let cancelRequestGetBarcodeData = () => {};
+let cancelRequestEnrichmentGetOverlayPlot = () => {};
+let cancelRequestEnrichmentGetOverlayMultiPlot = () => {};
 const cacheGetEnrichmentsNetwork = {};
 
 class Enrichment extends Component {
@@ -192,6 +197,16 @@ class Enrichment extends Component {
       svg: [],
     },
     plotMultiFeatureDataLength: 0,
+    // Fullscreen plot overlay (reuses Differential PlotsOverlay)
+    plotOverlayVisibleEnrichment: false,
+    plotOverlayLoadedEnrichment: false,
+    plotOverlayDataEnrichment: {
+      key: null,
+      title: '',
+      svg: [],
+    },
+    isMultiFeatureOverlayEnrichment: false,
+    featuresStringEnrichment: '',
     plotMultiFeatureMax: 1000,
     multiFeatureBullpenOpen: false,
     enableSvgTabChangeOnSelection: true,
@@ -947,6 +962,360 @@ class Enrichment extends Component {
     }));
   };
 
+  /**
+   * Handles the transition to display a single feature plot enrichment overlay
+   *
+   * This method prepares the component state to display a single feature plot in an overlay.
+   * It sets the necessary state variables for the overlay visibility and data structure,
+   * then triggers the actual plot data loading via the getPlotOverlay method.
+   *
+   * @param {string|number} key - The identifier of the feature to be plotted
+   */
+  getSingleFeaturePlotTransitionEnrichment = (key) => {
+    if (!key) return;
+    const self = this;
+    this.setState(
+      {
+        plotOverlayVisibleEnrichment: true,
+        plotOverlayLoadedEnrichment: false,
+        isMultiFeatureOverlayEnrichment: false,
+        featuresStringEnrichment: String(key),
+        plotOverlayDataEnrichment: {
+          key: key,
+          title: key,
+          svg: [],
+        },
+      },
+      function () {
+        self.getPlotOverlay(key);
+      },
+    );
+  };
+
+  /**
+   * Handles the transition to display a multi-feature plot enrichment overlay
+   *
+   * This method prepares the component state to display a plot of multiple features in an overlay.
+   * It extracts feature IDs from highlighted proteins, validates there are enough features to display,
+   * then sets up the necessary state variables before triggering the data loading process.
+   *
+   * @returns {void}
+   */
+  getMultifeaturePlotTransitionOverlayEnrichment = () => {
+    const { HighlightedProteins } = this.state;
+    if (!HighlightedProteins || HighlightedProteins.length < 2) return;
+
+    const featureIds = HighlightedProteins.map(
+      (p) => p.featureID || p.key || p.id,
+    ).filter(Boolean);
+
+    if (featureIds.length < 2) return;
+
+    const title = `Multi-Feature Plot (${featureIds.length} features)`;
+
+    this.setState(
+      {
+        plotOverlayVisibleEnrichment: true,
+        plotOverlayLoadedEnrichment: false,
+        isMultiFeatureOverlayEnrichment: true,
+        featuresStringEnrichment: featureIds.join(', '),
+        plotOverlayDataEnrichment: {
+          key: `${featureIds.length} features`,
+          title,
+          svg: [],
+        },
+      },
+      () => {
+        this.getPlotOverlayMultiFeatureEnrichment(featureIds);
+      },
+    );
+  };
+
+  /**
+   * Resets the state to hide the plot overlay and return to the split panes view
+   *
+   * This method resets all state variables related to the plot overlay enrichment,
+   * effectively hiding the overlay and clearing its data. It's typically used as
+   * a callback for "back" or "close" buttons in the overlay interface.
+   *
+   * @returns {void}
+   */
+  backToSplitPanesEnrichment = () => {
+    this.setState({
+      plotOverlayVisibleEnrichment: false,
+      plotOverlayLoadedEnrichment: false,
+      isMultiFeatureOverlayEnrichment: false,
+      featuresStringEnrichment: '',
+      plotOverlayDataEnrichment: { key: null, title: '', svg: [] },
+    });
+  };
+
+  /**
+   * Fetch plot data for the overlay view using plotStudyReturnSvg.
+   * TabOverlay expects raw SVG markup (not URLs) for dangerouslySetInnerHTML.
+   */
+  getPlotOverlay = (featureId) => {
+    const {
+      enrichmentPlotTypes,
+      enrichmentTest,
+      uData,
+      enrichmentModelIds,
+      enrichmentModelsAndAnnotations,
+      enrichmentPlotDescriptions,
+      enrichmentAnnotationIdsCommon,
+    } = this.state;
+    const { enrichmentStudy, enrichmentModel, enrichmentAnnotation } =
+      this.props;
+
+    const id = featureId != null ? featureId : '';
+
+    cancelRequestEnrichmentGetOverlayPlot();
+    const cancelToken = new CancelToken((e) => {
+      cancelRequestEnrichmentGetOverlayPlot = e;
+    });
+
+    const self = this;
+
+    // Filter to single-feature plot types only
+    const plots = (enrichmentPlotTypes || []).filter(
+      (p) => !p.plotType.includes('multiFeature'),
+    );
+
+    if (plots.length === 0) {
+      this.setState({ plotOverlayLoadedEnrichment: true });
+      return;
+    }
+
+    const promises = plots.map((plot, index) => {
+      const plotMetadataSpecificPlot = enrichmentPlotDescriptions[plot.plotID];
+      const designatedModels = plotMetadataSpecificPlot?.models || null;
+      const designatedModelsMultiModelExists =
+        designatedModels &&
+        designatedModels !== 'all' &&
+        designatedModels.includes(enrichmentModel);
+      const enrichmentModelIdsOverride = designatedModelsMultiModelExists
+        ? designatedModels
+        : enrichmentModelIds;
+
+      const isMultiModelMultiTestVar = isMultiModelMultiTest(plot.plotType);
+      const testIdNotCommon =
+        !enrichmentAnnotationIdsCommon.includes(enrichmentAnnotation);
+
+      let testsArg = [];
+      if (isMultiModelMultiTestVar && testIdNotCommon) {
+        testsArg = [];
+      } else {
+        testsArg = getTestsArg(
+          plot.plotType,
+          enrichmentModelIdsOverride,
+          uData,
+          enrichmentTest,
+        );
+      }
+
+      const modelsArg = getModelsArg(
+        plot.plotType,
+        enrichmentModelIdsOverride,
+        uData,
+        enrichmentModel,
+        enrichmentModelsAndAnnotations,
+        null,
+        enrichmentAnnotationIdsCommon,
+      );
+
+      // Use plotStudyReturnSvg to get raw SVG content (not URL)
+      return omicNavigatorService
+        .plotStudyReturnSvg(
+          enrichmentStudy,
+          modelsArg,
+          id,
+          plot.plotID,
+          plot.plotType,
+          testsArg,
+          null,
+          cancelToken,
+        )
+        .then((svgResponse) => {
+          // plotStudyReturnSvg returns { data: '<svg>...</svg>' } or raw string
+          const raw = svgResponse?.data || svgResponse || '';
+          const isPlotlyPlot = plot.plotType.includes('plotly');
+          const svg = isPlotlyPlot
+            ? raw
+            : PlotHelpers.sanitizeStaticSvg(raw, {
+                idBase: 'enrichment-overlay-single',
+                svgIndex: index,
+                multiFeature: false,
+              });
+          return { svg, plotType: plot };
+        })
+        .catch((error) => {
+          console.error(`Error fetching overlay plot ${plot.plotID}:`, error);
+          return null;
+        });
+    });
+
+    Promise.all(promises).then((results) => {
+      const svgArray = results.filter(Boolean);
+      self.setState({
+        plotOverlayDataEnrichment: {
+          key: id,
+          title: id,
+          svg: svgArray,
+        },
+        plotOverlayLoadedEnrichment: true,
+      });
+    });
+  };
+
+  /**
+   * Build overlay data for multi-feature plots.
+   *
+   */
+  getPlotOverlayMultiFeatureEnrichment = (featureIds) => {
+    const {
+      enrichmentMultiFeaturePlotTypes,
+      enrichmentTest,
+      uData,
+      enrichmentModelIds,
+      enrichmentModelsAndAnnotations,
+      enrichmentPlotDescriptions,
+      enrichmentAnnotationIdsCommon,
+      plotMultiFeatureMax,
+    } = this.state;
+
+    const { enrichmentStudy, enrichmentModel, enrichmentAnnotation } =
+      this.props;
+
+    const idsRaw = Array.isArray(featureIds) ? featureIds.filter(Boolean) : [];
+    if (idsRaw.length < 2 || !(enrichmentMultiFeaturePlotTypes || []).length) {
+      this.setState({ plotOverlayLoadedEnrichment: true });
+      return;
+    }
+
+    const max = plotMultiFeatureMax || 1000;
+    const ids = idsRaw.slice(0, max);
+
+    // Cancel any previous in-flight multi-feature overlay request.
+    cancelRequestEnrichmentGetOverlayMultiPlot();
+    const cancelToken = new CancelToken((c) => {
+      cancelRequestEnrichmentGetOverlayMultiPlot = c;
+    });
+
+    const title = `Multi-Feature Plot (${ids.length} features)`;
+
+    const promises = (enrichmentMultiFeaturePlotTypes || []).map(
+      (plot, index) => {
+        try {
+          const plotMetadataSpecificPlot =
+            enrichmentPlotDescriptions?.[plot.plotID];
+          const designatedModels = plotMetadataSpecificPlot?.models || null;
+          const designatedModelsMultiModelExists =
+            designatedModels &&
+            designatedModels !== 'all' &&
+            designatedModels.includes(enrichmentModel);
+
+          const enrichmentModelIdsOverride = designatedModelsMultiModelExists
+            ? designatedModels
+            : enrichmentModelIds;
+
+          const isMultiModelMultiTestVar = isMultiModelMultiTest(plot.plotType);
+          const testIdNotCommon =
+            !enrichmentAnnotationIdsCommon.includes(enrichmentAnnotation);
+
+          let testsArg = [];
+          if (isMultiModelMultiTestVar && testIdNotCommon) {
+            testsArg = [];
+          } else {
+            testsArg = getTestsArg(
+              plot.plotType,
+              enrichmentModelIdsOverride,
+              uData,
+              enrichmentTest,
+            );
+          }
+
+          const modelsArg = getModelsArg(
+            plot.plotType,
+            enrichmentModelIdsOverride,
+            uData,
+            enrichmentModel,
+            enrichmentModelsAndAnnotations,
+            null,
+            enrichmentAnnotationIdsCommon,
+          );
+
+          const idArg = ids; // backend expects an array of feature IDs for multi-feature
+
+          const isPlotlyPlot = plot.plotType.includes('plotly');
+
+          const request = isPlotlyPlot
+            ? omicNavigatorService.plotStudyReturnSvgUrl(
+                enrichmentStudy,
+                modelsArg,
+                idArg,
+                plot.plotID,
+                plot.plotType,
+                testsArg,
+                null,
+                cancelToken,
+              )
+            : omicNavigatorService.plotStudyReturnSvg(
+                enrichmentStudy,
+                modelsArg,
+                idArg,
+                plot.plotID,
+                plot.plotType,
+                testsArg,
+                null,
+                cancelToken,
+              );
+
+          return request
+            .then((res) => {
+              const raw = res?.data || res || '';
+              const svg = isPlotlyPlot
+                ? raw
+                : PlotHelpers.sanitizeStaticSvg(raw, {
+                    idBase: 'enrichment-overlay-multifeature',
+                    svgIndex: index,
+                    multiFeature: true,
+                  });
+              return { svg, plotType: plot };
+            })
+            .catch((error) => {
+              if (!error?.__CANCEL__) {
+                console.error(
+                  `Error fetching multi-feature overlay plot ${plot.plotID}:`,
+                  error,
+                );
+              }
+              return {
+                svg: `Error: ${plot.plotDisplay} could not be created`,
+                plotType: plot,
+              };
+            });
+        } catch (e) {
+          console.error('Error building multi-feature overlay request:', e);
+          return Promise.resolve({
+            svg: `Error: ${plot?.plotDisplay || 'Plot'} could not be created`,
+            plotType: plot,
+          });
+        }
+      },
+    );
+
+    Promise.all(promises).then((svgArray) => {
+      this.setState({
+        plotOverlayDataEnrichment: {
+          key: `${ids.length} features`,
+          title,
+          svg: svgArray.filter(Boolean),
+        },
+        plotOverlayLoadedEnrichment: true,
+      });
+    });
+  };
+
   handleMultisetPlot = (multisetPlotResults) => {
     this.setState({
       multisetPlotInfoEnrichment: {
@@ -1563,14 +1932,23 @@ class Enrichment extends Component {
     const featureKey = 'featureID';
     const splitPaneData = this.state.barcodeSettings.barcodeData;
 
-    // If no feature or no data, just clear
+    // Helper to create cleared plot state
+    const getClearedPlotState = () => ({
+      selectedProteinId: '',
+      SVGPlotLoaded: false,
+      SVGPlotLoading: false,
+      plotDataEnrichment: {
+        key: null,
+        svg: [],
+        ...this.state.plotDataEnrichment,
+      },
+      plotDataEnrichmentLength: 0,
+    });
+
+    // If no feature or no data, just clear (single atomic setState)
     if (!featureId || !splitPaneData || splitPaneData.length === 0) {
       cancelRequestEnrichmentGetPlot();
-      this.setState({
-        selectedProteinId: '',
-        SVGPlotLoaded: false,
-        SVGPlotLoading: false,
-      });
+      this.setState(getClearedPlotState());
       return;
     }
 
@@ -1578,22 +1956,16 @@ class Enrichment extends Component {
     // Toggle: clicking same row/dot again clears selection
     const nextSelected = prevSelected === featureId ? '' : featureId;
 
-    this.setState({
-      selectedProteinId: nextSelected,
-    });
-
-    // If cleared, just stop here
+    // If clearing selection (deselect), do single atomic setState
     if (!nextSelected) {
       cancelRequestEnrichmentGetPlot();
-      this.setState({
-        SVGPlotLoaded: false,
-        SVGPlotLoading: false,
-      });
+      this.setState(getClearedPlotState());
       return;
     }
 
-    // Load single-feature plot for the selected protein
+    // If selecting a new feature, set loading state and fetch plot
     this.setState({
+      selectedProteinId: nextSelected,
       SVGPlotLoaded: false,
       SVGPlotLoading: true,
     });
@@ -2559,6 +2931,66 @@ class Enrichment extends Component {
 
   getView = () => {
     const message = this.getMessage();
+
+    // Fullscreen overlay: reuse Differential PlotsOverlay with Enrichment breadcrumbs.
+    if (this.state.plotOverlayVisibleEnrichment) {
+      const { enrichmentPlotTypes, enrichmentMultiFeaturePlotTypes } =
+        this.state;
+
+      const singleFeaturePlotTypes = (enrichmentPlotTypes || []).filter(
+        (p) => !p.plotType?.includes('multiFeature'),
+      );
+      const multiFeaturePlotTypes = enrichmentMultiFeaturePlotTypes || [];
+
+      const isMulti = this.state.isMultiFeatureOverlayEnrichment;
+
+      const plotOverlayData = this.state.plotOverlayDataEnrichment;
+      const plotOverlayLoaded = this.state.plotOverlayLoadedEnrichment;
+      const plotOverlayDataLength = plotOverlayData?.svg?.length || 0;
+
+      const transformedHighlightedFeatures = (
+        this.state.HighlightedProteins || []
+      ).map((protein) => ({
+        key: protein.featureID,
+        id: protein.featureID,
+        value: protein.featureID,
+        text: splitValue(protein.featureID),
+      }));
+
+      const featureIdKey = 'featureID';
+
+      return (
+        <PlotsOverlay
+          onBackToTable={this.backToSplitPanesEnrichment}
+          plotOverlayData={plotOverlayData}
+          plotOverlayDataLength={plotOverlayDataLength}
+          plotOverlayLoaded={plotOverlayLoaded}
+          differentialStudy={this.props.enrichmentStudy}
+          differentialModel={this.props.enrichmentModel}
+          differentialTest={this.props.enrichmentAnnotation}
+          differentialFeature={plotOverlayData?.key || ''}
+          differentialFeatureIdKey={featureIdKey}
+          featuresString={
+            this.state.featuresStringEnrichment || plotOverlayData?.key || ''
+          }
+          differentialPlotTypes={enrichmentPlotTypes}
+          singleFeaturePlotTypes={singleFeaturePlotTypes}
+          multiFeaturePlotTypes={multiFeaturePlotTypes}
+          differentialTestIdsCommon={
+            this.state.enrichmentAnnotationIdsCommon || []
+          }
+          differentialPlotDescriptions={this.state.enrichmentPlotDescriptions}
+          differentialHighlightedFeaturesData={transformedHighlightedFeatures}
+          tab="enrichment"
+          svgTabMax={0}
+          modelSpecificMetaFeaturesExist={false}
+          BreadcrumbsComponent={EnrichmentOverlayBreadcrumbs}
+          breadcrumbsProps={{ backLabel: 'Back to Plots' }}
+          isMultiFeature={isMulti}
+        />
+      );
+    }
+
     if (this.state.isTestSelected && !this.state.isTestDataLoaded) {
       return (
         <div className="SearchingAltDiv">
@@ -2585,6 +3017,12 @@ class Enrichment extends Component {
             onHandleBarcodeChanges={this.handleBarcodeChanges}
             onGetMultifeaturePlotTransitionEnrichment={
               this.getMultifeaturePlotTransitionEnrichment
+            }
+            onGetSingleFeaturePlotTransitionEnrichment={
+              this.getSingleFeaturePlotTransitionEnrichment
+            }
+            onGetMultifeaturePlotTransitionOverlayEnrichment={
+              this.getMultifeaturePlotTransitionOverlayEnrichment
             }
             // onHandleFilteredDifferentialFeatureIdKey={
             //   this.handleFilteredDifferentialFeatureIdKey

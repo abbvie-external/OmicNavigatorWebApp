@@ -10,16 +10,10 @@ class ViolinPlot extends Component {
   state = {
     displayElementTextViolin:
       JSON.parse(sessionStorage.getItem('displayElementTextViolin')) || false,
-    violinContainerHeight:
-      this.violinContainerRef?.current?.parentElement?.offsetHeight ||
-      window.screen.height - this.props.horizontalSplitPaneSize - 51,
-    violinHeight:
-      this.violinContainerRef?.current?.parentElement?.offsetHeight ||
-      window.screen.height -
-        this.props.horizontalSplitPaneSize -
-        this.props.violinSettings.margin.top -
-        this.props.violinSettings.margin.bottom -
-        51,
+
+    // Dimensions are measured on mount / resize; these are safe defaults
+    violinContainerHeight: 400,
+    violinHeight: 300,
     violinContainerWidth: this.props.verticalSplitPaneSize,
     violinWidth:
       this.props.verticalSplitPaneSize -
@@ -33,14 +27,35 @@ class ViolinPlot extends Component {
   brushedData = [];
 
   componentDidMount() {
-    let resizedFn;
-    window.addEventListener('resize', () => {
-      clearTimeout(resizedFn);
-      resizedFn = setTimeout(() => {
-        this.windowResized();
+    this._resizeTimer = null;
+    this._onWindowResize = () => {
+      clearTimeout(this._resizeTimer);
+      this._resizeTimer = setTimeout(() => {
+        this.handleDimensionChange('both');
       }, 200);
+    };
+    window.addEventListener('resize', this._onWindowResize);
+
+    // Initial measurement: ensure correct height/width before first render.
+    // This avoids a 'small height' first paint and makes horizontal-drag responsive immediately.
+    requestAnimationFrame(() => {
+      this.handleDimensionChange('both');
+      if (this.handleDimensionChange && this.handleDimensionChange.flush) {
+        this.handleDimensionChange.flush();
+      }
     });
-    this.initiateViolinPlot(true);
+  }
+  componentWillUnmount() {
+    if (this._onWindowResize) {
+      window.removeEventListener('resize', this._onWindowResize);
+    }
+    if (this._resizeTimer) {
+      clearTimeout(this._resizeTimer);
+      this._resizeTimer = null;
+    }
+    if (this.handleDimensionChange && this.handleDimensionChange.cancel) {
+      this.handleDimensionChange.cancel();
+    }
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -145,7 +160,122 @@ class ViolinPlot extends Component {
       const opacityVar = this.state.displayElementTextViolin ? 1 : 0;
       chartSVG.selectAll('g.circleText').attr('opacity', opacityVar);
     }
+
+    // 3. Resize violin when SplitPane dimensions change
+    const verticalChanged =
+      this.props.verticalSplitPaneSize !== prevProps.verticalSplitPaneSize;
+    const horizontalChanged =
+      this.props.horizontalSplitPaneSize !== prevProps.horizontalSplitPaneSize;
+
+    if (verticalChanged && horizontalChanged) {
+      this.handleDimensionChange('both');
+    } else if (verticalChanged) {
+      this.handleDimensionChange('width');
+    } else if (horizontalChanged) {
+      this.handleDimensionChange('height');
+    }
   }
+
+  // Measure actual plot container. Falls back to parent height or viewport if needed.
+  measureContainer = () => {
+    const el = this.violinContainerRef.current;
+
+    const width = el?.offsetWidth || this.props.verticalSplitPaneSize || 525;
+
+    const heightFromSelf = el?.offsetHeight || 0;
+    const heightFromParent = el?.parentElement?.offsetHeight || 0;
+    const baseHeight = heightFromSelf || heightFromParent;
+
+    if (baseHeight && baseHeight > 0) {
+      return { width, height: baseHeight };
+    }
+
+    const viewportH =
+      window.innerHeight ||
+      document.documentElement.clientHeight ||
+      document.body.clientHeight ||
+      800;
+
+    const fallback = viewportH - (this.props.horizontalSplitPaneSize || 0) - 51;
+
+    return { width, height: Math.max(fallback, 350) };
+  };
+  reapplySelectionStyling = () => {
+    if (!this.chart || !this.chart.dataPlots) return;
+
+    const { HighlightedProteins = [], selectedProteinId } = this.props;
+    const dOpts = this.chart.dataPlots.options;
+
+    // Multi-select: orange fill
+    if (HighlightedProteins.length > 0) {
+      HighlightedProteins.forEach((element) => {
+        const dot = d3.select(`circle[id='violin_${element.featureID}']`);
+        if (!dot.empty()) {
+          dot
+            .attr('fill', '#ff4400')
+            .attr('stroke', '#000')
+            .attr('stroke-width', 1)
+            .attr('r', dOpts.pointSize * 1.5);
+        }
+      });
+    }
+
+    // Single-select: blue outline, larger
+    if (selectedProteinId) {
+      const selectedDot = d3.select(`circle[id='violin_${selectedProteinId}']`);
+      if (!selectedDot.empty()) {
+        const isAlsoHighlighted = HighlightedProteins.some(
+          (p) => p.featureID === selectedProteinId,
+        );
+        selectedDot
+          .attr('stroke', '#1678C2')
+          .attr('stroke-width', 2)
+          .attr('fill', isAlsoHighlighted ? '#ff4400' : '#ffffff')
+          .attr('r', dOpts.pointSize * 2);
+        selectedDot.raise();
+      }
+    }
+  };
+
+  // Resize handler driven by SplitPane props. Debounced for smoothness.
+  handleDimensionChange = _.debounce(
+    (mode) => {
+      const { violinSettings } = this.props;
+      const { width: containerWidth, height: containerHeight } =
+        this.measureContainer();
+
+      const next = {};
+
+      if (mode === 'width' || mode === 'both') {
+        next.violinContainerWidth = containerWidth;
+        next.violinWidth = Math.max(
+          containerWidth -
+            violinSettings.margin.left -
+            violinSettings.margin.right,
+          50,
+        );
+      }
+
+      if (mode === 'height' || mode === 'both') {
+        next.violinContainerHeight = containerHeight;
+        next.violinHeight = Math.max(
+          containerHeight -
+            violinSettings.margin.top -
+            violinSettings.margin.bottom,
+          100,
+        );
+      }
+
+      if (!Object.keys(next).length) return;
+
+      this.setState(next, () => {
+        this.initiateViolinPlot(false);
+        this.reapplySelectionStyling();
+      });
+    },
+    60,
+    { leading: true, trailing: true, maxWait: 120 },
+  );
 
   createViolinPlot = () => {
     d3.select(`#${this.props.violinSettings.id}`).remove();
@@ -550,8 +680,8 @@ class ViolinPlot extends Component {
       .append('svg')
       .attr('class', 'chart-area vChart')
       .attr('id', `${self.props.violinSettings.id}`)
-      .attr('width', '100%')
-      .attr('height', '100%')
+      .attr('width', self.state.violinContainerWidth)
+      .attr('height', self.state.violinContainerHeight)
       .attr(
         'viewBox',
         `0 0 ${self.state.violinContainerWidth} ${self.state.violinContainerHeight}`,
@@ -1489,10 +1619,10 @@ class ViolinPlot extends Component {
                   .attr('id', () => `violin_${idMult}`)
                   .attr('class', `point ${self.props.violinSettings.id} vPoint`)
                   // Base style similar to Scatter before selection kicks in
-                  .attr('stroke', '#aab1c0')
-                  .attr('stroke-width', 0.4)
+                  .attr('stroke', '#000')
+                  .attr('stroke-width', 1)
                   .attr('r', dOpts.pointSize)
-                  .attr('fill', self.chart.dataPlots.colorFunct(cName)),
+                  .attr('fill', '#1678C2'),
               );
             }
           }
@@ -1625,31 +1755,29 @@ class ViolinPlot extends Component {
   };
 
   initiateViolinPlot = (resetDimensions) => {
-    const { violinSettings, verticalSplitPaneSize } = this.props;
+    const { violinSettings } = this.props;
     d3.select(`#${violinSettings.id}`).remove();
+
     if (resetDimensions) {
-      // we calculate height based on the containerRef
-      let containerHeight = this.getHeight();
-      if (containerHeight === 0) {
-        containerHeight = 400;
-      }
+      const { width: containerWidth, height: containerHeight } =
+        this.measureContainer();
+
       const height =
         containerHeight -
         violinSettings.margin.top -
         violinSettings.margin.bottom;
 
-      const containerWidth = verticalSplitPaneSize;
       const width =
-        verticalSplitPaneSize -
+        containerWidth -
         violinSettings.margin.left -
         violinSettings.margin.right;
 
       this.setState(
         {
           violinContainerHeight: containerHeight,
-          violinHeight: height,
+          violinHeight: Math.max(height, 100),
           violinContainerWidth: containerWidth,
-          violinWidth: width,
+          violinWidth: Math.max(width, 50),
         },
         function () {
           this.createViolinPlot();
