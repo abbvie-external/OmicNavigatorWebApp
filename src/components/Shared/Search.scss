@@ -1,12 +1,36 @@
 .SidebarContainer {
   // background-color: #F6F6F6;
   background-color: #e0e1e2;
-  overflow: auto !important;
-  min-height: calc(100vh - 57px) !important;
-  height: auto !important;
-
+  overflow-y: auto !important;
+  overflow-x: auto !important;
+  height: calc(100vh - 57px) !important;
+  max-height: calc(100vh - 57px) !important;
   @media (max-width: 677px) {
     padding-right: 10px !important;
+  }
+
+  /* Keep dropdowns from forcing horizontal scroll; show ellipsis instead */
+  .ui.selection.dropdown {
+    max-width: 100%;
+  }
+
+  .ui.selection.dropdown > .text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    max-width: 100%;
+  }
+
+  .ui.selection.dropdown .menu {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .ui.selection.dropdown .menu > .item {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .SearchContainer {
@@ -150,6 +174,8 @@
 .MultisetSvgOuter {
   padding-left: 35px !important;
   width: 100%;
+  max-width: 100%;
+  overflow: auto;
 }
 
 #enrichmentMultisetAnalysisSVGDiv,
@@ -157,4 +183,9 @@
   height: 100% !important;
   max-height: 75vh !important;
   width: inherit !important;
+}
+
+// Tooltips should never block clicks on dropdowns
+.CustomTooltip.ui.popup {
+  pointer-events: none;
 }

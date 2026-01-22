@@ -120,6 +120,9 @@ class EnrichmentSearch extends Component {
     isFilteredEnrichment: false,
     multisetFiltersVisibleEnrichment: false,
     isSmallScreen: true,
+    isDropdownOpenStudy: false,
+    isDropdownOpenModel: false,
+    isDropdownOpenAnnotation: false,
   };
 
   componentDidMount() {
@@ -1108,6 +1111,9 @@ class EnrichmentSearch extends Component {
       // activateMultisetFilters,
       multisetFiltersVisibleEnrichment,
       isSmallScreen,
+      isDropdownOpenStudy,
+      isDropdownOpenModel,
+      isDropdownOpenAnnotation,
     } = this.state;
 
     const {
@@ -1405,9 +1411,12 @@ class EnrichmentSearch extends Component {
                 searchInput={{ id: 'form-select-control-estudy' }}
                 selectOnBlur={false}
                 selectOnNavigation={false}
+                onOpen={() => this.setState({ isDropdownOpenStudy: true })}
+                onClose={() => this.setState({ isDropdownOpenStudy: false })}
               />
             }
             style={StudyPopupStyle}
+            disabled={isDropdownOpenStudy}
             className="CustomTooltip"
             inverted
             position="bottom right"
@@ -1435,10 +1444,12 @@ class EnrichmentSearch extends Component {
                 searchInput={{ id: 'form-select-control-emodel' }}
                 selectOnBlur={false}
                 selectOnNavigation={false}
+                onOpen={() => this.setState({ isDropdownOpenModel: true })}
+                onClose={() => this.setState({ isDropdownOpenModel: false })}
               />
             }
             style={StudyPopupStyle}
-            disabled={!enrichmentStudy}
+            disabled={isDropdownOpenModel || !enrichmentStudy}
             className="CustomTooltip"
             inverted
             position="bottom right"
@@ -1464,10 +1475,12 @@ class EnrichmentSearch extends Component {
                 searchInput={{ id: 'form-select-control-edatabase' }}
                 selectOnBlur={false}
                 selectOnNavigation={false}
+                onOpen={() => this.setState({ isDropdownOpenAnnotation: true })}
+                onClose={() => this.setState({ isDropdownOpenAnnotation: false })}
               />
             }
             style={StudyPopupStyle}
-            disabled={enrichmentAnnotationTooltip === ''}
+            disabled={isDropdownOpenAnnotation || enrichmentAnnotationTooltip === ''}
             className="CustomTooltip"
             inverted
             position="bottom right"

@@ -115,6 +115,9 @@ class DifferentialSearch extends Component {
     uDataP: [],
     isFilteredSearch: false,
     isSmallScreen: true,
+    isDropdownOpenStudy: false,
+    isDropdownOpenModel: false,
+    isDropdownOpenTest: false,
   };
 
   componentDidMount() {
@@ -1044,6 +1047,9 @@ class DifferentialSearch extends Component {
       differentialStudyReportTooltip,
       isFilteredSearch,
       isSmallScreen,
+      isDropdownOpenStudy,
+      isDropdownOpenModel,
+      isDropdownOpenTest,
     } = this.state;
 
     const {
@@ -1352,9 +1358,12 @@ class DifferentialSearch extends Component {
                 width={13}
                 selectOnBlur={false}
                 selectOnNavigation={false}
+                onOpen={() => this.setState({ isDropdownOpenStudy: true })}
+                onClose={() => this.setState({ isDropdownOpenStudy: false })}
               />
             }
             style={StudyPopupStyle}
+            disabled={isDropdownOpenStudy}
             className="CustomTooltip"
             inverted
             position="bottom right"
@@ -1382,10 +1391,12 @@ class DifferentialSearch extends Component {
                 searchInput={{ id: 'form-select-control-pmodel' }}
                 selectOnBlur={false}
                 selectOnNavigation={false}
+                onOpen={() => this.setState({ isDropdownOpenModel: true })}
+                onClose={() => this.setState({ isDropdownOpenModel: false })}
               />
             }
             style={StudyPopupStyle}
-            disabled={!differentialStudy}
+            disabled={isDropdownOpenModel || !differentialStudy}
             className="CustomTooltip"
             inverted
             position="bottom right"
@@ -1411,10 +1422,12 @@ class DifferentialSearch extends Component {
                 searchInput={{ id: 'form-select-control-ptest' }}
                 selectOnBlur={false}
                 selectOnNavigation={false}
+                onOpen={() => this.setState({ isDropdownOpenTest: true })}
+                onClose={() => this.setState({ isDropdownOpenTest: false })}
               />
             }
             style={StudyPopupStyle}
-            disabled={differentialTestTooltip === ''}
+            disabled={isDropdownOpenTest || differentialTestTooltip === ''}
             className="CustomTooltip"
             inverted
             position="bottom right"

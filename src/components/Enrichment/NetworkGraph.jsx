@@ -26,7 +26,17 @@ class NetworkGraph extends Component {
   };
   networkContainerRef = React.createRef();
 
-  componentDidMount() {
+  
+  _isMounted = false;
+  _resizeTimeout = null;
+  _handleResize = null;
+
+  safeSetState = (updater, cb) => {
+    if (!this._isMounted) return;
+    this.setState(updater, cb);
+  };
+
+componentDidMount() {
     this.prepareAndRenderTree();
 
     let resizedFn;
@@ -58,6 +68,17 @@ class NetworkGraph extends Component {
   }
 
   componentWillUnmount() {
+    this._isMounted = false;
+
+    if (this._handleResize) {
+      window.removeEventListener('resize', this._handleResize);
+      this._handleResize = null;
+    }
+    if (this._resizeTimeout) {
+      clearTimeout(this._resizeTimeout);
+      this._resizeTimeout = null;
+    }
+
     this.removeNetworkSVG();
     this.props.onCancelGetEnrichmentsNetwork();
   }
@@ -360,7 +381,7 @@ class NetworkGraph extends Component {
             containerHeight -
             networkSettings.margin.top -
             networkSettings.margin.bottom;
-          this.setState({
+          this.safeSetState({
             networkContainerWidth: containerWidth,
             networkWidth: width,
             networkContainerHeight: containerHeight,
@@ -1040,7 +1061,7 @@ class NetworkGraph extends Component {
                 }
               }
             });
-            this.setState({
+            this.safeSetState({
               noResults: false,
             });
           }
@@ -1078,7 +1099,7 @@ class NetworkGraph extends Component {
           }
         }
       } else {
-        this.setState({
+        this.safeSetState({
           noResults: true,
         });
         this.props.onHandleTotals(0, 0);

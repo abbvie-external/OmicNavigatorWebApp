@@ -41,16 +41,21 @@ class BarcodePlot extends Component {
   barcodeContainerRef = React.createRef();
 
   barcodeSVGRef = React.createRef();
+  _isMounted = false;
+  _resizeTimeout = null;
+  _handleResize = null;
 
   componentDidMount() {
     this.setWidth(true, false);
-    let resizedFn;
-    window.addEventListener('resize', () => {
-      clearTimeout(resizedFn);
-      resizedFn = setTimeout(() => {
-        this.windowResized();
+    this._isMounted = true;
+    this._handleResize = () => {
+      if (this._resizeTimeout) clearTimeout(this._resizeTimeout);
+      this._resizeTimeout = setTimeout(() => {
+        if (this._isMounted) this.windowResized();
       }, 200);
-    });
+    };
+
+    window.addEventListener('resize', this._handleResize);
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
@@ -116,6 +121,20 @@ class BarcodePlot extends Component {
       if (selectedProteinId) {
         this.applySingleSelectedStyle(selectedProteinId, HighlightedProteins);
       }
+    }
+  }
+
+  componentWillUnmount() {
+    this._isMounted = false;
+
+    if (this._handleResize) {
+      window.removeEventListener('resize', this._handleResize);
+      this._handleResize = null;
+    }
+
+    if (this._resizeTimeout) {
+      clearTimeout(this._resizeTimeout);
+      this._resizeTimeout = null;
     }
   }
 
