@@ -72,6 +72,7 @@ class SplitPanesContainer extends Component {
 
     activeViolinTableIndex: 0,
     elementTextKey: 'featureID',
+    featurePlotsExportPortalNode: null,
   };
   filteredDifferentialGridRef = React.createRef();
 
@@ -167,6 +168,12 @@ class SplitPanesContainer extends Component {
     this.setState({
       activeSvgTabIndexEnrichment: activeTabIndex,
     });
+  };
+
+  setFeaturePlotsExportPortalNode = (node) => {
+    if (node && node !== this.state.featurePlotsExportPortalNode) {
+      this.setState({ featurePlotsExportPortalNode: node });
+    }
   };
 
   getBarcodePlot = () => {
@@ -472,6 +479,10 @@ class SplitPanesContainer extends Component {
 
     return (
       <div className="EnrichmentPlots">
+        <div
+          className="PlotTabsExportHost"
+          ref={this.setFeaturePlotsExportPortalNode}
+        />
         <Tab
           className="EnrichmentRightTabs"
           menu={{
@@ -508,6 +519,9 @@ class SplitPanesContainer extends Component {
                     tab={tab}
                     upperPlotsVisible={true}
                     svgExportName={svgExportName}
+                    exportInTabHeader={true}
+                    exportPortalNode={this.state.featurePlotsExportPortalNode}
+                    exportPortalActive={activeSvgTabIndexEnrichment === 0}
                     differentialStudy={enrichmentStudy}
                     differentialModel={enrichmentModel}
                     differentialTest={enrichmentAnnotation}
@@ -559,6 +573,9 @@ class SplitPanesContainer extends Component {
                     plotMultiFeatureDataLength={plotMultiFeatureDataLength}
                     plotMultiFeatureMax={plotMultiFeatureMax}
                     svgExportName={svgExportName}
+                    exportInTabHeader={true}
+                    exportPortalNode={this.state.featurePlotsExportPortalNode}
+                    exportPortalActive={activeSvgTabIndexEnrichment === 1}
                     // unified dimensions for multi-feature (same as Differential)
                     divWidth={multiContentWidth}
                     divHeight={multiContentHeight}

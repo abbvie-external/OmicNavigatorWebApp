@@ -17,6 +17,7 @@ class PlotsDynamic extends Component {
   state = {
     activeTabIndexPlotsDynamic: 0,
     featuresListOpen: false,
+    plotTabsExportPortalNode: null,
   };
 
   componentDidUpdate(prevProps) {
@@ -54,6 +55,12 @@ class PlotsDynamic extends Component {
       this.setState({
         activeTabIndexPlotsDynamic: activeIndex,
       });
+    }
+  };
+
+  setPlotTabsExportPortalNode = (node) => {
+    if (node && node !== this.state.plotTabsExportPortalNode) {
+      this.setState({ plotTabsExportPortalNode: node });
     }
   };
 
@@ -130,6 +137,11 @@ class PlotsDynamic extends Component {
                 svgTabMax={this.props.svgTabMax}
                 // to be used by resuable export
                 svgExportName={this.props.svgExportName}
+                exportInTabHeader={true}
+                exportPortalNode={this.state.plotTabsExportPortalNode}
+                exportPortalActive={
+                  this.state.activeTabIndexPlotsDynamic === 0
+                }
                 // to determine updates, dynamic rendered ui and loaders
                 activeTabIndexPlotsDynamic={
                   this.state.activeTabIndexPlotsDynamic
@@ -189,6 +201,11 @@ class PlotsDynamic extends Component {
                 svgTabMax={this.props.svgTabMax}
                 // to be used by resuable export
                 svgExportName={this.props.svgExportName}
+                exportInTabHeader={true}
+                exportPortalNode={this.state.plotTabsExportPortalNode}
+                exportPortalActive={
+                  this.state.activeTabIndexPlotsDynamic === 1
+                }
                 // to determine updates, dynamic rendered ui and loaders
                 activeTabIndexPlotsDynamic={
                   this.state.activeTabIndexPlotsDynamic
@@ -268,6 +285,11 @@ class PlotsDynamic extends Component {
                 svgTabMax={this.props.svgTabMax}
                 // to be used by resuable export
                 svgExportName={this.props.svgExportName}
+                exportInTabHeader={true}
+                exportPortalNode={this.state.plotTabsExportPortalNode}
+                exportPortalActive={
+                  this.state.activeTabIndexPlotsDynamic === 0
+                }
                 // to be used by dynamic rendered ui and loaders
                 activeTabIndexPlotsDynamic={
                   this.state.activeTabIndexPlotsDynamic
@@ -303,6 +325,10 @@ class PlotsDynamic extends Component {
     return (
       <div className="DifferentialPlots" style={{ maxWidth: maxDivWidth }}>
         {Toggle}
+        <div
+          className="PlotTabsExportHost"
+          ref={this.setPlotTabsExportPortalNode}
+        />
         <Tab
           onTabChange={this.handleTabChange}
           panes={panes}
