@@ -124,7 +124,6 @@
     overflow: hidden !important;
   }
 
-  /* ViolinPlot.scss sets min-height: 350px; inside SplitPane allow shrink to avoid scrollbars */
   #ViolinPlotTab .violin-chart-wrapper {
     min-height: 0 !important;
   }
@@ -334,7 +333,6 @@
     overflow: visible; /* prevent SVG spilling outside pane */
   }
 
-  /* Treat differentialDetailSvgContainer as our svg container for single-feature */
   .SingleFeaturePlotPane .differentialDetailSvgContainer {
     height: 100%;
     width: 100%;
@@ -345,7 +343,6 @@
     min-height: 0;
   }
 
-  /* Override Differential's default min-height (75vh) to respect SplitPane sizing */
   .SingleFeaturePlotPane .SVGPlot {
     flex: 1 1 auto;
     width: 100% !important;
@@ -362,7 +359,6 @@
 
   /* Multi-feature Tab.Pane in the bottom-right split pane */
   .MultiFeaturePlotPane {
-    /* base padding comes from shared pane rule; here we control flex/height */
     min-height: 0; /* critical for split panes */
     height: 100%; /* fill bottom-right area */
     display: flex;
@@ -371,7 +367,6 @@
     overflow: visible; /* never clip Plotly or export bar */
   }
 
-  /* Treat differentialDetailSvgContainer as our "svgContainerEnrichment" for multi-feature */
   .MultiFeaturePlotPane .differentialDetailSvgContainer {
     height: 100%;
     width: 100%;
