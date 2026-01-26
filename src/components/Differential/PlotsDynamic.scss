@@ -41,7 +41,7 @@
     justify-content: space-between;
     flex-wrap: nowrap;
     gap: 8px;
-    padding: 6px 10px 10px 10px;
+    padding: 6px 0px 10px 10px;
   }
 
   .PlotToolbarLeft {
@@ -217,7 +217,7 @@
   margin: 0;
   position: absolute;
   top: 0;
-  right: 10px;
+  right: 14px;
   height: 40px;
   z-index: 6; /* keep above tab menu during resize/drag */
   display: flex;
