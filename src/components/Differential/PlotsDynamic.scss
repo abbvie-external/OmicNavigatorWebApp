@@ -189,8 +189,13 @@
     display: flex !important;
     align-items: center !important;
     line-height: normal !important;
+    border-bottom: 3px !important;
   }
 
+  a.active.item {
+    border-bottom-style: solid !important;
+    opacity: 1 !important;
+  }
   // border: 0px !important;
   a.active:last-child {
     border-color: var(--color-primary) !important;
@@ -222,6 +227,7 @@
   z-index: 6; /* keep above tab menu during resize/drag */
   display: flex;
   align-items: center;
+  max-width: calc(100% - 250px);
 }
 
 .PlotTabsExportInner {
