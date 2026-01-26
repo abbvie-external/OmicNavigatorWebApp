@@ -304,6 +304,7 @@
     min-height: 0;
     display: flex;
     flex-direction: column;
+    padding: 0 !important; /* avoid extra segment padding causing subtle overflow */
   }
 
   /* Center initial-load loader / instructions reliably (no absolute positioning dependency) */

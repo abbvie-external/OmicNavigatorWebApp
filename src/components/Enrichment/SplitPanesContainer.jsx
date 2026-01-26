@@ -37,6 +37,11 @@ class SplitPanesContainer extends Component {
   _pendingDragSizes = { horizontal: null, vertical: null };
   _dragRafId = null;
 
+  // Container-driven sizing for the bottom-right split pane (feature plots)
+  svgSplitContainerRef = React.createRef();
+  _svgSplitResizeObserver = null;
+  _onWindowResize = null;
+
   // Global safety handler: ensures drag state resets if onDragFinished does not fire
   _onGlobalPointerUp = null;
 
@@ -73,6 +78,10 @@ class SplitPanesContainer extends Component {
     activeViolinTableIndex: 0,
     elementTextKey: 'featureID',
     featurePlotsExportPortalNode: null,
+
+    // Measured size of the bottom-right split pane container (#SVGSplitContainer)
+    svgSplitPaneWidth: null,
+    svgSplitPaneHeight: null,
   };
   filteredDifferentialGridRef = React.createRef();
 
@@ -104,7 +113,47 @@ class SplitPanesContainer extends Component {
     window.addEventListener('touchend', this._onGlobalPointerUp);
     window.addEventListener('pointerup', this._onGlobalPointerUp);
     window.addEventListener('blur', this._onGlobalPointerUp);
+
+    // Measure the real bottom-right container size so plots never overflow.
+    this._setupSvgSplitPaneResizeObserver();
   }
+
+  _setupSvgSplitPaneResizeObserver = () => {
+    const node = this.svgSplitContainerRef?.current;
+    if (!node) return;
+
+    const commitSize = () => {
+      const nextWidth = Math.max(0, Math.round(node.clientWidth || 0));
+      const nextHeight = Math.max(0, Math.round(node.clientHeight || 0));
+
+      if (
+        nextWidth !== this.state.svgSplitPaneWidth ||
+        nextHeight !== this.state.svgSplitPaneHeight
+      ) {
+        this.setState({
+          svgSplitPaneWidth: nextWidth,
+          svgSplitPaneHeight: nextHeight,
+        });
+      }
+    };
+
+    // Initial measure
+    commitSize();
+
+    // ResizeObserver covers SplitPane drags + responsive layout changes.
+    if (typeof ResizeObserver !== 'undefined') {
+      try {
+        this._svgSplitResizeObserver = new ResizeObserver(() => commitSize());
+        this._svgSplitResizeObserver.observe(node);
+      } catch (e) {
+        // ignore and fall back
+      }
+    }
+
+    // Fallback: keep updated on window resize too
+    this._onWindowResize = () => commitSize();
+    window.addEventListener('resize', this._onWindowResize);
+  };
 
   componentDidUpdate(prevProps, prevState) {
     const prevCount = prevProps.HighlightedProteins
@@ -159,6 +208,20 @@ class SplitPanesContainer extends Component {
     if (this._dragRafId) {
       cancelAnimationFrame(this._dragRafId);
       this._dragRafId = null;
+    }
+
+    if (this._svgSplitResizeObserver) {
+      try {
+        this._svgSplitResizeObserver.disconnect();
+      } catch (e) {
+        // ignore
+      }
+      this._svgSplitResizeObserver = null;
+    }
+
+    if (this._onWindowResize) {
+      window.removeEventListener('resize', this._onWindowResize);
+      this._onWindowResize = null;
     }
 
     this._pendingDragSizes = { horizontal: null, vertical: null };
@@ -448,12 +511,30 @@ class SplitPanesContainer extends Component {
 
     const { activeSvgTabIndexEnrichment } = this.state;
 
-    // Same width/height logic you already had, unified
-    const contentWidth = width - verticalSplitPaneSize - 300;
-    const multiContentWidth = contentWidth;
+    // Container-driven sizing (matches Differential behavior) to eliminate overflow and magic numbers.
+    // Fallback to previous window-based math if the container hasn't been measured yet.
+    const { svgSplitPaneWidth, svgSplitPaneHeight } = this.state;
 
-    const contentHeight = height - (horizontalSplitPaneSize || 0) - 55;
-    const multiContentHeight = contentHeight - 45;
+    const TAB_MENU_HEIGHT = 40; // .PlotTabsContainer in SCSS
+    const PLOT_HORIZONTAL_MARGINS = 30; // .differentialDetailSvgContainer margin: 0 15px
+
+    const fallbackPaneWidth = width - verticalSplitPaneSize - 300;
+    const fallbackPaneHeight = height - (horizontalSplitPaneSize || 0) - 55;
+
+    const paneWidth =
+      typeof svgSplitPaneWidth === 'number' && svgSplitPaneWidth > 0
+        ? svgSplitPaneWidth
+        : fallbackPaneWidth;
+    const paneHeight =
+      typeof svgSplitPaneHeight === 'number' && svgSplitPaneHeight > 0
+        ? svgSplitPaneHeight
+        : fallbackPaneHeight;
+
+    const contentWidth = Math.max(0, paneWidth - PLOT_HORIZONTAL_MARGINS);
+    const contentHeight = Math.max(0, paneHeight - TAB_MENU_HEIGHT);
+
+    const multiContentWidth = contentWidth;
+    const multiContentHeight = contentHeight;
 
     // 1. Determine the feature ID key based on data source
     const featureIdKey = 'featureID';
@@ -714,6 +795,7 @@ class SplitPanesContainer extends Component {
 
                   <div
                     id="SVGSplitContainer"
+                    ref={this.svgSplitContainerRef}
                     style={{
                       overflow: isSplitPaneDragging ? 'hidden' : undefined,
                     }}
