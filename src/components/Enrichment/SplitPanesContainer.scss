@@ -177,6 +177,19 @@
     // width: 90% !important;
     background: white !important;
     // border-bottom: none !important;
+    min-height: 40px !important;
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    padding-right: 120px !important; /* reserve space for export */
+    overflow: visible !important;
+
+    .item {
+      height: 40px !important;
+      display: flex !important;
+      align-items: center !important;
+      line-height: normal !important;
+    }
   }
 
   // .BottomSplitPaneContainer,

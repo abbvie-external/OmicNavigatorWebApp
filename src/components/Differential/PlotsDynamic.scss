@@ -35,12 +35,13 @@
 
   // Unified plot toolbar row: dropdown(s) left, actions right.
   .PlotToolbarRow {
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-wrap: nowrap;
     gap: 8px;
-    padding: 0px 10px 10px 10px;
+    padding: 6px 10px 10px 10px;
   }
 
   .PlotToolbarLeft {
@@ -56,6 +57,7 @@
     justify-content: flex-end;
     gap: 8px;
     flex: 0 0 auto;
+    margin-left: auto;
   }
 
   // When the dropdown is inside the unified toolbar row, keep it left-justified.
@@ -178,11 +180,15 @@
 .PlotTabsContainer {
   margin-bottom: 0px !important;
   margin-top: 0px !important;
-  min-height: 2.6em !important;
-  max-height: 2.6em !important;
+  height: 40px !important;
+  display: flex !important;
+  align-items: center !important;
 
   .item {
-    line-height: 0.5 !important;
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    line-height: normal !important;
   }
 
   // border: 0px !important;
@@ -197,7 +203,6 @@
   }
 }
 
-
 /* -------------------------------------------------------------------------- */
 /* Export in plot-tab header (Single/Multi Feature) */
 /* -------------------------------------------------------------------------- */
@@ -205,13 +210,15 @@
 .DifferentialPlots,
 .EnrichmentPlots {
   position: relative; /* anchor .PlotTabsExportHost */
+  overflow: visible;
 }
 
 .PlotTabsExportHost {
-  margin: 4px 25px 2px 0px;
+  margin: 0;
   position: absolute;
   top: 0;
-  right: 0;
+  right: 10px;
+  height: 40px;
   z-index: 6; /* keep above tab menu during resize/drag */
   display: flex;
   align-items: center;
