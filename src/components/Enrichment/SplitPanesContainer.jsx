@@ -11,7 +11,7 @@ import FilteredDifferentialTable from './FilteredDifferentialTable';
 import PlotsMultiFeature from '../Differential/PlotsMultiFeature';
 import PlotsSingleFeature from '../Differential/PlotsSingleFeature';
 
-const ENRICHMENT_SPLIT_DEFAULTS = { horizontal: 250, vertical: 525 };
+const ENRICHMENT_SPLIT_DEFAULTS = { horizontal: 250, vertical: 465 };
 // Toggle persistence of Enrichment split sizes. When false, reload returns to defaults.
 const PERSIST_ENRICHMENT_SPLIT_SIZES = true;
 
