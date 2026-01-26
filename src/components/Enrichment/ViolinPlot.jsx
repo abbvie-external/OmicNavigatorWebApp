@@ -1649,17 +1649,25 @@ class ViolinPlot extends Component {
 
               if (self.props.violinSettings.tooltip.show) {
                 const m = d3.mouse(self.chart.objs.chartDiv.node());
-                const opacity = this.state.displayElementTextViolin ? 0 : 1;
+
+                // Avoid leaving an invisible tooltip "displayed" above the SVG
+                // (it can intercept clicks/hover/brush). When element labels are
+                // shown, we intentionally suppress tooltips.
+                const shouldShowTooltip = !this.state.displayElementTextViolin;
+
+                // Stop any in-flight tooltip transitions to prevent stale end states.
+                self.chart.objs.tooltip.interrupt();
 
                 self.chart.objs.tooltip
                   .style('left', `${m[0] + 10}px`)
                   .style('top', `${m[1] - 10}px`)
+                  .style('display', shouldShowTooltip ? null : 'none')
                   .transition()
                   .delay(500)
                   .duration(500)
-                  .style('opacity', opacity)
+                  .style('opacity', shouldShowTooltip ? 1 : 0)
                   .style('fill', '#f46d43')
-                  .style('display', null);
+                  .style('display', shouldShowTooltip ? null : 'none');
 
                 return self.tooltipHover(d, true);
               }
@@ -1690,14 +1698,21 @@ class ViolinPlot extends Component {
 
               if (self.isHovering) {
                 self.chart.objs.tooltip
+                  .interrupt()
                   .transition()
-                  .duration(500)
-                  .style('opacity', 0);
+                  .duration(200)
+                  .style('opacity', 0)
+                  .on('end', () => {
+                    // Ensure tooltip is removed from layout/hit-testing.
+                    self.chart.objs.tooltip.style('display', 'none');
+                  });
               }
             })
             .on('click', (d) => {
               self.isHovering = false;
               d3.event.stopPropagation();
+
+              self.chart.objs.tooltip.interrupt().style('opacity', 0).style('display', 'none');
 
               const isCtrlOrMeta = d3.event.metaKey || d3.event.ctrlKey;
               const { HighlightedProteins = [], selectedProteinId } =

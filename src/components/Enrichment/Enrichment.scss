@@ -133,3 +133,15 @@
   cursor: not-allowed !important;
   background: red;
 }
+
+
+/* Keep split panes mounted under fullscreen overlay, but make them inert. */
+.EnrichmentSplitPanesHidden {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* Defensive: ensure hidden panes never capture pointer events. */
+.EnrichmentSplitPanesHidden * {
+  pointer-events: none !important;
+}

@@ -112,6 +112,8 @@
 
 .violin-tooltip {
   position: absolute;
+  /* Tooltips must never intercept mouse events (prevents invisible overlays blocking brush/click). */
+  pointer-events: none;
   width: auto;
   height: auto;
   padding: 10px;
