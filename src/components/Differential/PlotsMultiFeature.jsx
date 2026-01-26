@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { createPortal } from 'react-dom';
 import {
   Loader,
   Dimmer,
@@ -316,6 +317,39 @@ class PlotsMultiFeature extends Component {
             <Loader size="large">Loading Multi-Feature Plots</Loader>
           </Dimmer>
         );
+
+        const exportInTabHeader = !!this.props.exportInTabHeader;
+        const exportPortalNode = this.props.exportPortalNode || null;
+        const exportPortalActive = !!this.props.exportPortalActive;
+        const exportWrapperClass = exportInTabHeader
+          ? 'PlotTabsExportInner'
+          : 'export-svg ShowBlock';
+
+        const exportContent = (
+          <div className={exportWrapperClass}>
+            <ButtonActions
+              exportButtonSize={'mini'}
+              excelVisible={excelFlagMFPlots}
+              pdfVisible={pdfFlagMFPlots}
+              pngVisible={pngFlagMFPlots}
+              svgVisible={svgFlagMFPlots}
+              txtVisible={txtFlagMFPlots}
+              tab={tab}
+              imageInfo={plotMultiFeatureData}
+              tabIndex={activeTabIndexPlotsMultiFeatureVar}
+              svgExportName={svgExportName}
+              plot="PlotsMultiFeatureContainer"
+              handlePlotlyExport={this.handlePlotlyExport}
+              fwdRef={this.differentialDetailPlotsMultiFeatureRef}
+            />
+          </div>
+        );
+
+        const exportRender = exportInTabHeader
+          ? exportPortalNode && exportPortalActive
+            ? createPortal(exportContent, exportPortalNode)
+            : null
+          : exportContent;
         let differentialPlotDescription = null;
         let currentDifferentialPlotDescriptions =
           differentialPlotDescriptions || {};
@@ -341,26 +375,36 @@ class PlotsMultiFeature extends Component {
             className="differentialDetailSvgContainer"
             ref={this.differentialDetailPlotsMultiFeatureRef}
           >
-            <div className="export-svg ShowBlock">
-              <ButtonActions
-                exportButtonSize={'mini'}
-                excelVisible={excelFlagMFPlots}
-                pdfVisible={pdfFlagMFPlots}
-                pngVisible={pngFlagMFPlots}
-                svgVisible={svgFlagMFPlots}
-                txtVisible={txtFlagMFPlots}
-                tab={tab}
-                imageInfo={plotMultiFeatureData}
-                tabIndex={activeTabIndexPlotsMultiFeatureVar}
-                svgExportName={svgExportName}
-                plot="PlotsMultiFeatureContainer"
-                handlePlotlyExport={this.handlePlotlyExport}
-                fwdRef={this.differentialDetailPlotsMultiFeatureRef}
-              />
-            </div>
-            {differentialPlotDescription ? (
-              <Popup
-                trigger={
+            {exportRender}
+            <div className="PlotToolbarRow">
+              <div className="PlotToolbarLeft">
+                {differentialPlotDescription ? (
+                  <Popup
+                    trigger={
+                      <Dropdown
+                        search
+                        selection
+                        compact
+                        options={options}
+                        value={
+                          options[activeTabIndexPlotsMultiFeatureVar]?.value ||
+                          options[0]?.value
+                        }
+                        onChange={this.handlePlotDropdownChangeMultiFeature}
+                        className={DropdownClass}
+                        id="svgPlotDropdownDifferential"
+                      />
+                    }
+                    basic
+                    inverted
+                    position="bottom center"
+                    closeOnDocumentClick
+                    closeOnEscape
+                    hideOnScroll
+                  >
+                    <Popup.Content>{differentialPlotDescription}</Popup.Content>
+                  </Popup>
+                ) : (
                   <Dropdown
                     search
                     selection
@@ -374,31 +418,26 @@ class PlotsMultiFeature extends Component {
                     className={DropdownClass}
                     id="svgPlotDropdownDifferential"
                   />
-                }
-                basic
-                inverted
-                position="bottom center"
-                closeOnDocumentClick
-                closeOnEscape
-                hideOnScroll
-              >
-                <Popup.Content>{differentialPlotDescription}</Popup.Content>
-              </Popup>
-            ) : (
-              <Dropdown
-                search
-                selection
-                compact
-                options={options}
-                value={
-                  options[activeTabIndexPlotsMultiFeatureVar]?.value ||
-                  options[0]?.value
-                }
-                onChange={this.handlePlotDropdownChangeMultiFeature}
-                className={DropdownClass}
-                id="svgPlotDropdownDifferential"
-              />
-            )}
+                )}
+              </div>
+              <div className="PlotToolbarRight">
+                {featuresList}
+                {showFullScreen && (
+                  <span
+                    id={divWidth >= 625 ? 'FullScreenButton' : 'FullScreenIcon'}
+                  >
+                    <Button
+                      size="mini"
+                      onClick={this.props.onGetMultifeaturePlotTransitionAlt}
+                      className={divWidth >= 625 ? '' : 'FullScreenPadding'}
+                    >
+                      <Icon name="expand arrows alternate" className="" />
+                      {divWidth >= 625 ? 'FULL SCREEN' : ''}
+                    </Button>
+                  </span>
+                )}
+              </div>
+            </div>
             <TabMultiFeature
               activeTabIndexPlotsMultiFeature={activeTabIndexPlotsMultiFeature}
               differentialDetailPlotsMultiFeatureRefFwd={
@@ -424,21 +463,6 @@ class PlotsMultiFeature extends Component {
               svgTabMax={svgTabMax}
               onHandlePlotlyClick={onHandlePlotlyClick}
             />
-            {featuresList}
-            {showFullScreen && (
-              <span
-                id={divWidth >= 625 ? 'FullScreenButton' : 'FullScreenIcon'}
-              >
-                <Button
-                  size="mini"
-                  onClick={this.props.onGetMultifeaturePlotTransitionAlt}
-                  className={divWidth >= 625 ? '' : 'FullScreenPadding'}
-                >
-                  <Icon name="expand arrows alternate" className="" />
-                  {divWidth >= 625 ? 'FULL SCREEN' : ''}
-                </Button>
-              </span>
-            )}
             <span id="PlotMultiFeatureDataLoader">{loader}</span>
           </div>
         );

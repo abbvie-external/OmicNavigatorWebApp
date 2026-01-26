@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { createPortal } from 'react-dom';
 import {
   Loader,
   Dimmer,
@@ -189,36 +190,88 @@ class PlotsSingleFeature extends Component {
             <Loader size="large">Loading Single-Feature Plots</Loader>
           </Dimmer>
         );
+
+        const exportInTabHeader = !!this.props.exportInTabHeader;
+        const exportPortalNode = this.props.exportPortalNode || null;
+        const exportPortalActive = !!this.props.exportPortalActive;
+        const exportWrapperClass = exportInTabHeader
+          ? 'PlotTabsExportInner'
+          : 'export-svg ShowBlock';
+
+        const exportContent = (
+          <div className={exportWrapperClass}>
+            <ButtonActions
+              exportButtonSize={'mini'}
+              excelVisible={excelFlagSFPlots}
+              pdfVisible={pdfFlagSFPlots}
+              pngVisible={pngFlagSFPlots}
+              svgVisible={svgFlagSFPlots}
+              txtVisible={txtFlagSFPlots}
+              tab={tab}
+              imageInfo={plotSingleFeatureData}
+              tabIndex={activeTabIndexPlotsSingleFeatureVar}
+              svgExportName={svgExportName}
+              refFwd={this.metafeaturesTableDynamicRef}
+              study={differentialStudy}
+              model={differentialModel}
+              test={differentialTest}
+              feature={plotSingleFeatureData?.key}
+              plot="PlotsSingleFeatureContainer"
+              handlePlotlyExport={this.handlePlotlyExport}
+              fwdRef={this.differentialDetailPlotsSingleFeatureRef}
+            />
+          </div>
+        );
+
+        const exportRender = exportInTabHeader
+          ? exportPortalNode && exportPortalActive
+            ? createPortal(exportContent, exportPortalNode)
+            : null
+          : exportContent;
+
         return (
           <div
             className="differentialDetailSvgContainer"
             ref={this.differentialDetailPlotsSingleFeatureRef}
           >
-            <div className="export-svg ShowBlock">
-              <ButtonActions
-                exportButtonSize={'mini'}
-                excelVisible={excelFlagSFPlots}
-                pdfVisible={pdfFlagSFPlots}
-                pngVisible={pngFlagSFPlots}
-                svgVisible={svgFlagSFPlots}
-                txtVisible={txtFlagSFPlots}
-                tab={tab}
-                imageInfo={plotSingleFeatureData}
-                tabIndex={activeTabIndexPlotsSingleFeatureVar}
-                svgExportName={svgExportName}
-                refFwd={this.metafeaturesTableDynamicRef}
-                study={differentialStudy}
-                model={differentialModel}
-                test={differentialTest}
-                feature={plotSingleFeatureData?.key}
-                plot="PlotsSingleFeatureContainer"
-                handlePlotlyExport={this.handlePlotlyExport}
-                fwdRef={this.differentialDetailPlotsSingleFeatureRef}
-              />
-            </div>
-            {differentialPlotDescription ? (
-              <Popup
-                trigger={
+            {exportRender}
+            <div className="PlotToolbarRow">
+              <div className="PlotToolbarLeft">
+                {differentialPlotDescription ? (
+                  <Popup
+                    trigger={
+                      <Dropdown
+                        search
+                        selection
+                        compact
+                        options={options}
+                        value={
+                          options[activeTabIndexPlotsSingleFeatureVar]?.value ||
+                          options[0]?.value
+                        }
+                        onChange={
+                          this.handlePlotDropdownChangeSingleFeature
+                        }
+                        className={DropdownClass}
+                        id={
+                          isMultifeaturePlot
+                            ? 'svgPlotDropdownMulti'
+                            : 'svgPlotDropdownSingle'
+                        }
+                      />
+                    }
+                    basic
+                    inverted
+                    position="bottom center"
+                    closeOnDocumentClick
+                    closeOnEscape
+                    hideOnScroll
+                  >
+                    <Popup.Content>
+                      {differentialPlotDescription}
+                    </Popup.Content>
+                  </Popup>
+                ) : (
                   <Dropdown
                     search
                     selection
@@ -236,35 +289,28 @@ class PlotsSingleFeature extends Component {
                         : 'svgPlotDropdownSingle'
                     }
                   />
-                }
-                basic
-                inverted
-                position="bottom center"
-                closeOnDocumentClick
-                closeOnEscape
-                hideOnScroll
-              >
-                <Popup.Content>{differentialPlotDescription}</Popup.Content>
-              </Popup>
-            ) : (
-              <Dropdown
-                search
-                selection
-                compact
-                options={options}
-                value={
-                  options[activeTabIndexPlotsSingleFeatureVar]?.value ||
-                  options[0]?.value
-                }
-                onChange={this.handlePlotDropdownChangeSingleFeature}
-                className={DropdownClass}
-                id={
-                  isMultifeaturePlot
-                    ? 'svgPlotDropdownMulti'
-                    : 'svgPlotDropdownSingle'
-                }
-              />
-            )}
+                )}
+              </div>
+              <div className="PlotToolbarRight">
+                {showFullScreenButton && (
+                  <span
+                    className={divWidth < 450 ? 'Hide' : 'Show'}
+                    id={
+                      divWidth >= 625 ? 'FullScreenButton' : 'FullScreenIcon'
+                    }
+                  >
+                    <Button
+                      size="mini"
+                      onClick={this.handlePlotOverlaySingleFeature}
+                      className={divWidth >= 625 ? '' : 'FullScreenPadding'}
+                    >
+                      <Icon name="expand arrows alternate" className="" />
+                      {divWidth >= 625 ? 'FULL SCREEN' : ''}
+                    </Button>
+                  </span>
+                )}
+              </div>
+            </div>
             <TabSingleFeature
               // DEV - add only necessary props
               {...this.props}
@@ -274,21 +320,6 @@ class PlotsSingleFeature extends Component {
               }
               ref={this.metafeaturesTableDynamicRef}
             />
-            {showFullScreenButton && (
-              <span
-                className={divWidth < 450 ? 'Hide' : 'Show'}
-                id={divWidth >= 625 ? 'FullScreenButton' : 'FullScreenIcon'}
-              >
-                <Button
-                  size="mini"
-                  onClick={this.handlePlotOverlaySingleFeature}
-                  className={divWidth >= 625 ? '' : 'FullScreenPadding'}
-                >
-                  <Icon name="expand arrows alternate" className="" />
-                  {divWidth >= 625 ? 'FULL SCREEN' : ''}
-                </Button>
-              </span>
-            )}
             <span id="PlotSingleFeatureDataLoader">{loader}</span>
           </div>
         );
