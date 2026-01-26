@@ -2509,7 +2509,18 @@ class Enrichment extends Component {
 
   createLegend = () => {
     const self = this;
+
+    const propTest = this.state?.networkSettings?.propLabel;
+    const hasValidPropLabel =
+      typeof propTest === 'string' || Array.isArray(propTest);
+    if (
+      !hasValidPropLabel ||
+      (Array.isArray(propTest) && propTest.length === 0)
+    ) {
+      return;
+    }
     const singleTest = typeof this.state.networkSettings.propLabel === 'string';
+
     var svg = d3
       .selectAll('.legend')
       .append('svg')
@@ -3022,7 +3033,7 @@ class Enrichment extends Component {
                 : 'EnrichmentSplitPanes'
             }
             aria-hidden={showOverlay}
-            inert={showOverlay ? '' : undefined}
+            inert={showOverlay || undefined}
           >
             <SplitPanesContainer
               {...this.props}
