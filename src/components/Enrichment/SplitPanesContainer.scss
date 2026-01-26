@@ -79,7 +79,7 @@
     display: flex;
     flex-direction: column;
     position: relative;
-    overflow: hidden; /* allow content and export to show fully */
+    overflow: visible; /* allow tab header / export portal & menus to render without clipping */
     min-width: 0;
     min-height: 0;
     .ShowBlock:not(.export-svg) {
@@ -269,10 +269,16 @@
 .PlotTabsContainer {
   margin-bottom: 0px !important;
   margin-top: 0px !important;
-  min-height: 2.6em !important;
-  max-height: 2.6em !important;
+  height: 40px !important;
+  display: flex !important;
+  align-items: center !important;
+  overflow: visible !important;
+
   .item {
-    line-height: 0.5 !important;
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    line-height: normal !important;
   }
 
   a.active:last-child {
@@ -283,7 +289,36 @@
     border-color: var(--color-link) !important;
   }
 }
+
 .EnrichmentPlots {
+  /* Match Differential layout: Tab content must fill the right split-pane height */
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+
+  /* Semantic UI tab segment must participate in the height chain */
+  .ui.bottom.attached.tab.segment {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Center initial-load loader / instructions reliably (no absolute positioning dependency) */
+  .PlotInstructions {
+    height: 100%;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .PlotInstructionsText {
+    position: static !important;
+    top: auto !important;
+    left: auto !important;
+    transform: none !important;
+  }
   /* Single-feature Tab.Pane in the top-right split pane (reuses Differential PlotsSingleFeature) */
   .SingleFeaturePlotPane {
     /* critical for SplitPane children: allow flex items to shrink */

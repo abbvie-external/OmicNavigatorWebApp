@@ -450,7 +450,7 @@ class SplitPanesContainer extends Component {
 
     // Same width/height logic you already had, unified
     const contentWidth = width - verticalSplitPaneSize - 300;
-    const multiContentWidth = width - verticalSplitPaneSize - 500;
+    const multiContentWidth = contentWidth;
 
     const contentHeight = height - (horizontalSplitPaneSize || 0) - 55;
     const multiContentHeight = contentHeight - 45;
