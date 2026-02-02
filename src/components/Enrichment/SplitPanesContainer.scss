@@ -8,6 +8,11 @@
   height: 90vh !important;
   overflow: hidden !important;
   padding-left: 20px !important;
+  box-sizing: border-box !important;
+
+  * {
+    box-sizing: border-box;
+  }
 
   .Pane {
     min-width: 0 !important;
@@ -17,7 +22,7 @@
   .Resizer {
     background: #000;
     opacity: 0.2;
-    z-index: 1;
+    z-index: 10;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
@@ -39,7 +44,7 @@
     border-bottom: 8px solid rgba(255, 255, 255, 0);
     cursor: row-resize;
     width: 100%;
-    z-index: 4 !important;
+    z-index: 10 !important;
   }
 
   .Resizer.horizontal:hover {
@@ -74,12 +79,12 @@
   }
 
   #SVGSplitContainer {
-    height: 98%;
+    height: 100%;
     width: 100%;
     display: flex;
     flex-direction: column;
     position: relative;
-    overflow: hidden; /* allow content and export to show fully */
+    overflow: hidden;
     min-width: 0;
     min-height: 0;
     .ShowBlock:not(.export-svg) {
@@ -100,16 +105,31 @@
   .ViolinPlotDiv {
     padding-top: 0px;
     height: 100% !important;
+    min-width: 0;
     min-height: 0;
+    flex: 1 1 auto;
+    overflow: hidden;
     // padding-top: 40px !important;
   }
 
   .ViolinPlotTab {
     height: 100% !important;
+    min-width: 0;
     min-height: 0;
     margin-top: 0px !important;
     border: none !important;
     padding: 0px !important;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  #ViolinPlotTab {
+    overflow: hidden !important;
+  }
+
+  #ViolinPlotTab .violin-chart-wrapper {
+    min-height: 0 !important;
   }
 
   .TableResultsTab {
@@ -118,10 +138,38 @@
     padding-top: 0px !important;
     margin-top: 0px !important;
     border: none !important;
+    min-width: 0;
+    min-height: 0;
+    flex: 1 1 auto;
+    overflow: auto; /* allow scroll only for table */
+    display: flex;
+    flex-direction: column;
   }
 
   .ViolinAndTableTabsDiv {
     height: 100% !important;
+    min-width: 0;
+    min-height: 0;
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* Make Semantic-UI Tab fill remaining height under the menu */
+  .ViolinAndTableTabsDiv > .ViolinAndTableMenu {
+    flex: 0 0 auto;
+  }
+
+  .ViolinAndTableTabsDiv > .ui.bottom.attached.segment {
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden; /* default; table tab overrides */
+    display: flex;
+    flex-direction: column;
+    padding: 0px !important;
+    border: none !important;
   }
 
   .ViolinAndTableMenu {
@@ -133,18 +181,35 @@
     // width: 90% !important;
     background: white !important;
     // border-bottom: none !important;
+    min-height: 40px !important;
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    padding-right: 120px !important; /* reserve space for export */
+    overflow: visible !important;
+
+    .item {
+      height: 40px !important;
+      display: flex !important;
+      align-items: center !important;
+      line-height: normal !important;
+    }
   }
 
   // .BottomSplitPaneContainer,
   #ViolinAndTableSplitContainer {
-    overflow-x: hidden !important;
-    // overflow-y: scroll !important;
-    // min-height: 350px !important;
     height: 100% !important;
-    // direction: rtl !important;
-    overflow-y: auto !important;
+    min-width: 0;
+    min-height: 0;
     display: flex;
     flex-direction: column;
+    overflow: hidden !important; /* scrolling is handled per active tab */
+  }
+
+  #TableResultsTab {
+    overflow: auto !important;
+    min-height: 0;
+    min-width: 0;
   }
 
   #TableResultsTab .QHGrid {
@@ -173,7 +238,9 @@
   .export-violin {
     margin: 4px 25px 2px 0px;
     position: absolute;
+    top: 0;
     right: 0;
+    z-index: 6; /* keep above tab menu during resize/drag */
   }
 
   @media (min-width: 1599px) {
@@ -187,6 +254,9 @@
     flex-direction: column;
     height: 100%;
     min-height: 0;
+    min-width: 0;
+    position: relative; /* anchor .export-violin */
+    overflow: hidden; /* plot tab must not create internal scrollbars */
   }
 
   #EnrichmentPlotSVGDiv {
@@ -203,10 +273,16 @@
 .PlotTabsContainer {
   margin-bottom: 0px !important;
   margin-top: 0px !important;
-  min-height: 2.6em !important;
-  max-height: 2.6em !important;
+  height: 40px !important;
+  display: flex !important;
+  align-items: center !important;
+  overflow: visible !important;
+
   .item {
-    line-height: 0.5 !important;
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    line-height: normal !important;
   }
 
   a.active:last-child {
@@ -217,19 +293,69 @@
     border-color: var(--color-link) !important;
   }
 }
+
 .EnrichmentPlots {
+  /* Match Differential layout: Tab content must fill the right split-pane height */
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+
+  .EnrichmentPlotsBounded {
+    position: relative; /* anchor .PlotTabsExportHost exactly like Differential */
+    width: 100%;
+    min-width: 0;
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    height: 100%;
+  }
+
+  .EnrichmentPlotsBounded .PlotTabsExportHost {
+    flex-shrink: 0;
+  }
+
+  /* Semantic UI tab segment must participate in the height chain */
+  .ui.bottom.attached.tab.segment {
+    flex: 1 1 auto;
+    min-height: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 0 !important; /* avoid extra segment padding causing subtle overflow */
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Center initial-load loader / instructions reliably (no absolute positioning dependency) */
+  .PlotInstructions {
+    height: 100%;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .PlotInstructionsText {
+    position: static !important;
+    top: auto !important;
+    left: auto !important;
+    transform: none !important;
+  }
   /* Single-feature Tab.Pane in the top-right split pane (reuses Differential PlotsSingleFeature) */
   .SingleFeaturePlotPane {
     /* critical for SplitPane children: allow flex items to shrink */
     min-height: 0;
     height: 100%;
+    flex: 1 1 auto;
     display: flex;
     flex-direction: column;
     position: relative; /* anchor export/fullscreen absolute buttons */
     overflow: visible; /* prevent SVG spilling outside pane */
   }
 
-  /* Treat differentialDetailSvgContainer as our svg container for single-feature */
   .SingleFeaturePlotPane .differentialDetailSvgContainer {
     height: 100%;
     width: 100%;
@@ -240,7 +366,6 @@
     min-height: 0;
   }
 
-  /* Override Differential's default min-height (75vh) to respect SplitPane sizing */
   .SingleFeaturePlotPane .SVGPlot {
     flex: 1 1 auto;
     width: 100% !important;
@@ -257,16 +382,15 @@
 
   /* Multi-feature Tab.Pane in the bottom-right split pane */
   .MultiFeaturePlotPane {
-    /* base padding comes from shared pane rule; here we control flex/height */
     min-height: 0; /* critical for split panes */
     height: 100%; /* fill bottom-right area */
+    flex: 1 1 auto;
     display: flex;
     flex-direction: column;
     position: relative;
     overflow: visible; /* never clip Plotly or export bar */
   }
 
-  /* Treat differentialDetailSvgContainer as our "svgContainerEnrichment" for multi-feature */
   .MultiFeaturePlotPane .differentialDetailSvgContainer {
     height: 100%;
     width: 100%;
@@ -290,4 +414,11 @@
     right: 0;
     top: 0;
   }
+}
+
+/* Enrichment-only override: avoid extra bottom gap/line and allow SplitPane to shrink */
+.EnrichmentPlots .SingleFeaturePlotPane,
+.EnrichmentPlots .MultiFeaturePlotPane {
+  padding-bottom: 0px !important;
+  min-height: 0px !important;
 }

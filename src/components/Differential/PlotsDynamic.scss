@@ -32,6 +32,46 @@
     margin: 40px auto !important;
     width: 300px !important;
   }
+
+  // Unified plot toolbar row: dropdown(s) left, actions right.
+  .PlotToolbarRow {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    gap: 8px;
+    padding: 6px 0px 10px 10px;
+  }
+
+  .PlotToolbarLeft {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  .PlotToolbarRight {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    flex: 0 0 auto;
+    margin-left: auto;
+  }
+
+  // When the dropdown is inside the unified toolbar row, keep it left-justified.
+  .PlotToolbarRow {
+    #svgPlotDropdownSingle,
+    #svgPlotDropdownMulti,
+    #svgPlotDropdownDifferential {
+      left: 0px !important;
+      top: 0px !important;
+      margin-left: 0px !important;
+      margin-top: 0px !important;
+      margin-bottom: 0px !important;
+    }
+  }
 }
 
 .export-svg {
@@ -140,13 +180,22 @@
 .PlotTabsContainer {
   margin-bottom: 0px !important;
   margin-top: 0px !important;
-  min-height: 2.6em !important;
-  max-height: 2.6em !important;
+  height: 40px !important;
+  display: flex !important;
+  align-items: center !important;
 
   .item {
-    line-height: 0.5 !important;
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    line-height: normal !important;
+    border-bottom-width: 3px !important;
   }
 
+  a.active.item {
+    border-bottom-style: solid !important;
+    opacity: 1 !important;
+  }
   // border: 0px !important;
   a.active:last-child {
     border-color: var(--color-primary) !important;
@@ -157,4 +206,36 @@
     border-color: var(--color-link) !important;
     // border-width: 4px !important;
   }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Export in plot-tab header (Single/Multi Feature) */
+/* -------------------------------------------------------------------------- */
+
+.DifferentialPlots,
+.EnrichmentPlots {
+  position: relative; /* anchor .PlotTabsExportHost */
+  overflow: visible;
+}
+
+.PlotTabsExportHost {
+  margin: 0;
+  position: absolute;
+  top: 0;
+  right: 14px;
+  height: 40px;
+  z-index: 6; /* keep above tab menu during resize/drag */
+  display: flex;
+  align-items: center;
+  max-width: calc(100% - 250px);
+}
+
+.PlotTabsExportInner {
+  position: static;
+}
+
+/* leave space on the right for the Export button group so the tab text never overlaps */
+.DifferentialPlots .PlotTabsContainer,
+.EnrichmentPlots .PlotTabsContainer {
+  padding-right: 120px !important;
 }

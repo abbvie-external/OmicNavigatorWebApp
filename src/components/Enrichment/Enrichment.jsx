@@ -1041,13 +1041,20 @@ class Enrichment extends Component {
    * @returns {void}
    */
   backToSplitPanesEnrichment = () => {
-    this.setState({
-      plotOverlayVisibleEnrichment: false,
-      plotOverlayLoadedEnrichment: false,
-      isMultiFeatureOverlayEnrichment: false,
-      featuresStringEnrichment: '',
-      plotOverlayDataEnrichment: { key: null, title: '', svg: [] },
-    });
+    this.setState(
+      {
+        plotOverlayVisibleEnrichment: false,
+        plotOverlayLoadedEnrichment: false,
+        isMultiFeatureOverlayEnrichment: false,
+        featuresStringEnrichment: '',
+        plotOverlayDataEnrichment: { key: null, title: '', svg: [] },
+      },
+      () => {
+        // Ensure plots re-measure correctly after returning from an overlay.
+        // (Some SVG/D3 layouts depend on a resize/reflow signal.)
+        window.dispatchEvent(new Event('resize'));
+      },
+    );
   };
 
   /**
@@ -2502,7 +2509,18 @@ class Enrichment extends Component {
 
   createLegend = () => {
     const self = this;
+
+    const propTest = this.state?.networkSettings?.propLabel;
+    const hasValidPropLabel =
+      typeof propTest === 'string' || Array.isArray(propTest);
+    if (
+      !hasValidPropLabel ||
+      (Array.isArray(propTest) && propTest.length === 0)
+    ) {
+      return;
+    }
     const singleTest = typeof this.state.networkSettings.propLabel === 'string';
+
     var svg = d3
       .selectAll('.legend')
       .append('svg')
@@ -2933,7 +2951,12 @@ class Enrichment extends Component {
     const message = this.getMessage();
 
     // Fullscreen overlay: reuse Differential PlotsOverlay with Enrichment breadcrumbs.
-    if (this.state.plotOverlayVisibleEnrichment) {
+
+    const showOverlay = this.state.plotOverlayVisibleEnrichment;
+
+    // Build overlay view (kept mounted alongside split panes to preserve state)
+    let overlayView = null;
+    if (showOverlay) {
       const { enrichmentPlotTypes, enrichmentMultiFeaturePlotTypes } =
         this.state;
 
@@ -2959,7 +2982,7 @@ class Enrichment extends Component {
 
       const featureIdKey = 'featureID';
 
-      return (
+      overlayView = (
         <PlotsOverlay
           onBackToTable={this.backToSplitPanesEnrichment}
           plotOverlayData={plotOverlayData}
@@ -3001,44 +3024,57 @@ class Enrichment extends Component {
       return <TransitionActive />;
     } else if (this.state.isTestSelected && this.state.isTestDataLoaded) {
       return (
-        <div>
-          <SplitPanesContainer
-            {...this.props}
-            {...this.state}
-            onBackToTable={this.backToTable}
-            onHandleProteinSelected={this.handleProteinSelected}
-            onHandleSingleProteinSelected={
-              this.handleSingleProteinSelectedFromUI
+        <div className="EnrichmentViewRoot">
+          {overlayView}
+          <div
+            className={
+              showOverlay
+                ? 'EnrichmentSplitPanes EnrichmentSplitPanesHidden'
+                : 'EnrichmentSplitPanes'
             }
-            onHandleSingleProteinSelectedFromMultiPlot={
-              this.handleSingleProteinSelectedFromMultiPlot
-            }
-            onHandleHighlightedLineReset={this.handleHighlightedLineReset}
-            onHandleBarcodeChanges={this.handleBarcodeChanges}
-            onGetMultifeaturePlotTransitionEnrichment={
-              this.getMultifeaturePlotTransitionEnrichment
-            }
-            onGetSingleFeaturePlotTransitionEnrichment={
-              this.getSingleFeaturePlotTransitionEnrichment
-            }
-            onGetMultifeaturePlotTransitionOverlayEnrichment={
-              this.getMultifeaturePlotTransitionOverlayEnrichment
-            }
-            // onHandleFilteredDifferentialFeatureIdKey={
-            //   this.handleFilteredDifferentialFeatureIdKey
-            // }
-            onSetFilteredDifferentialResults={(filteredDifferentialResults) => {
-              this.setState({ filteredDifferentialResults });
-            }}
-            // Multi-feature interaction handlers
-            onHandlePlotlyClickEnrichment={this.handlePlotlyClickEnrichment}
-            onRemoveSelectedFeatureEnrichment={
-              this.removeSelectedFeatureEnrichment
-            }
-            onMultiFeatureBullpenOpenChangeEnrichment={
-              this.handleMultiFeatureBullpenOpenChange
-            }
-          ></SplitPanesContainer>
+            aria-hidden={showOverlay}
+            inert={showOverlay || undefined}
+          >
+            <SplitPanesContainer
+              {...this.props}
+              {...this.state}
+              onBackToTable={this.backToTable}
+              onHandleProteinSelected={this.handleProteinSelected}
+              onHandleSingleProteinSelected={
+                this.handleSingleProteinSelectedFromUI
+              }
+              onHandleSingleProteinSelectedFromMultiPlot={
+                this.handleSingleProteinSelectedFromMultiPlot
+              }
+              onHandleHighlightedLineReset={this.handleHighlightedLineReset}
+              onHandleBarcodeChanges={this.handleBarcodeChanges}
+              onGetMultifeaturePlotTransitionEnrichment={
+                this.getMultifeaturePlotTransitionEnrichment
+              }
+              onGetSingleFeaturePlotTransitionEnrichment={
+                this.getSingleFeaturePlotTransitionEnrichment
+              }
+              onGetMultifeaturePlotTransitionOverlayEnrichment={
+                this.getMultifeaturePlotTransitionOverlayEnrichment
+              }
+              // onHandleFilteredDifferentialFeatureIdKey={
+              //   this.handleFilteredDifferentialFeatureIdKey
+              // }
+              onSetFilteredDifferentialResults={(
+                filteredDifferentialResults,
+              ) => {
+                this.setState({ filteredDifferentialResults });
+              }}
+              // Multi-feature interaction handlers
+              onHandlePlotlyClickEnrichment={this.handlePlotlyClickEnrichment}
+              onRemoveSelectedFeatureEnrichment={
+                this.removeSelectedFeatureEnrichment
+              }
+              onMultiFeatureBullpenOpenChangeEnrichment={
+                this.handleMultiFeatureBullpenOpenChange
+              }
+            ></SplitPanesContainer>
+          </div>
         </div>
       );
     } else if (
