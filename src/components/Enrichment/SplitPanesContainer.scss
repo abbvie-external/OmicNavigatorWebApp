@@ -8,6 +8,11 @@
   height: 90vh !important;
   overflow: hidden !important;
   padding-left: 20px !important;
+  box-sizing: border-box !important;
+
+  * {
+    box-sizing: border-box;
+  }
 
   .Pane {
     min-width: 0 !important;
@@ -74,13 +79,12 @@
   }
 
   #SVGSplitContainer {
-    height: 98%;
+    height: 100%;
     width: 100%;
     display: flex;
     flex-direction: column;
     position: relative;
-    //overflow: visible; /* allow tab header / export portal & menus to render without clipping */
-    overflow-x: hidden;
+    overflow: hidden;
     min-width: 0;
     min-height: 0;
     .ShowBlock:not(.export-svg) {
@@ -293,19 +297,37 @@
 .EnrichmentPlots {
   /* Match Differential layout: Tab content must fill the right split-pane height */
   height: 100%;
+  width: 100%;
   display: flex;
   flex-direction: column;
+  flex: 1 1 auto;
   min-height: 0;
-  flex: 0 0 auto;
-  min-height: 40px;
+
+  .EnrichmentPlotsBounded {
+    position: relative; /* anchor .PlotTabsExportHost exactly like Differential */
+    width: 100%;
+    min-width: 0;
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    height: 100%;
+  }
+
+  .EnrichmentPlotsBounded .PlotTabsExportHost {
+    flex-shrink: 0;
+  }
 
   /* Semantic UI tab segment must participate in the height chain */
   .ui.bottom.attached.tab.segment {
     flex: 1 1 auto;
     min-height: 0;
+    height: 100%;
     display: flex;
     flex-direction: column;
     padding: 0 !important; /* avoid extra segment padding causing subtle overflow */
+    border: none !important;
+    box-shadow: none !important;
   }
 
   /* Center initial-load loader / instructions reliably (no absolute positioning dependency) */
@@ -327,6 +349,7 @@
     /* critical for SplitPane children: allow flex items to shrink */
     min-height: 0;
     height: 100%;
+    flex: 1 1 auto;
     display: flex;
     flex-direction: column;
     position: relative; /* anchor export/fullscreen absolute buttons */
@@ -361,6 +384,7 @@
   .MultiFeaturePlotPane {
     min-height: 0; /* critical for split panes */
     height: 100%; /* fill bottom-right area */
+    flex: 1 1 auto;
     display: flex;
     flex-direction: column;
     position: relative;
@@ -390,4 +414,11 @@
     right: 0;
     top: 0;
   }
+}
+
+/* Enrichment-only override: avoid extra bottom gap/line and allow SplitPane to shrink */
+.EnrichmentPlots .SingleFeaturePlotPane,
+.EnrichmentPlots .MultiFeaturePlotPane {
+  padding-bottom: 0px !important;
+  min-height: 0px !important;
 }
