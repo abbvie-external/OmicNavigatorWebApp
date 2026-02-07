@@ -46,7 +46,7 @@ let cancelRequestEnrichmentGetOverlayPlot = () => {};
 let cancelRequestEnrichmentGetOverlayMultiPlot = () => {};
 const cacheGetEnrichmentsNetwork = {};
 
-// maximum fraction of viewport width for frozen first column (45vw)
+// maximum fraction of viewport width for frozen first column (35 vw)
 const FROZEN_FIRST_COL_MAX_VW = 0.35;
 
 class Enrichment extends Component {

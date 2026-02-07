@@ -48,7 +48,6 @@ export default class PlotlySingleFeature extends Component {
         try {
           parsedData = JSON.parse(plotlyData);
         } catch (err) {
-          console.warn('PlotlySingleFeature: failed to parse plotlyData', err);
           this.signalRenderReady();
           this.setState({ loading: false, json: { data: null, layout: null } });
           return;
