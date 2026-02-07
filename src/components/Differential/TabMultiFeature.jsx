@@ -37,6 +37,10 @@ class TabMultiFeature extends Component {
   getSVGPanesMultiFeature = (cacheStringArg, featuresLength) => {
     if (this.cacheString === cacheStringArg) return;
     this.cacheString = cacheStringArg;
+
+    if (typeof this.props.onActivePlotRenderStart === 'function') {
+      this.props.onActivePlotRenderStart(cacheStringArg);
+    }
     const {
       activeTabIndexPlotsMultiFeature,
       plotMultiFeatureData,
@@ -49,6 +53,16 @@ class TabMultiFeature extends Component {
       differentialTest,
       differentialTestIdsCommon,
     } = this.props;
+
+    // If there is no plot payload (e.g., not enough features yet), ensure we don't get stuck in a loading state.
+    if (plotMultiFeatureDataLength === 0) {
+      if (typeof this.props.onActivePlotRenderReady === 'function') {
+        this.props.onActivePlotRenderReady(cacheStringArg);
+      }
+      this.setState({ svgPanesMultiFeature: [] });
+      return;
+    }
+
     let panes = [];
     let dimensions = '';
     let divWidthPt = 0;
@@ -90,6 +104,10 @@ class TabMultiFeature extends Component {
             errorMessagePlotlyMultiFeature = `${s.plotType.plotDisplay} can not be created because the currently selected test is not present in all models`;
           }
           // ${s.plotType.plotDisplay} is not available for this combination of features`;
+          const willRenderErrorPane = !!errorMessagePlotlyMultiFeature;
+          if (willRenderErrorPane && typeof this.props.onActivePlotRenderReady === 'function') {
+            this.props.onActivePlotRenderReady(cacheStringArg);
+          }
           const svgPanes = {
             menuItem: `${s.plotType.plotDisplay}`,
             render: () => (
@@ -114,6 +132,11 @@ class TabMultiFeature extends Component {
                       errorMessagePlotlyMultiFeature={
                         errorMessagePlotlyMultiFeature
                       }
+                                          onRenderReady={() => {
+                        if (typeof this.props.onActivePlotRenderReady === 'function') {
+                          this.props.onActivePlotRenderReady(cacheStringArg);
+                        }
+                      }}
                     />
                   ) : s.svg && !errorMessagePlotlyMultiFeature ? (
                     <SVG
@@ -122,6 +145,16 @@ class TabMultiFeature extends Component {
                       title={`${s.plotType.plotDisplay}`}
                       uniqueHash={`b2g9e2-${cacheStringArg}`}
                       uniquifyIDs={true}
+                      onLoad={() => {
+                        if (typeof this.props.onActivePlotRenderReady === 'function') {
+                          this.props.onActivePlotRenderReady(cacheStringArg);
+                        }
+                      }}
+                      onError={() => {
+                        if (typeof this.props.onActivePlotRenderReady === 'function') {
+                          this.props.onActivePlotRenderReady(cacheStringArg);
+                        }
+                      }}
                     />
                   ) : (
                     <div className="PlotInstructions">
@@ -135,6 +168,11 @@ class TabMultiFeature extends Component {
             ),
           };
           panes = panes.concat(svgPanes);
+        } else {
+          // Safety: if the pane data is unexpectedly missing, avoid a stuck loader.
+          if (typeof this.props.onActivePlotRenderReady === 'function') {
+            this.props.onActivePlotRenderReady(cacheStringArg);
+          }
         }
       }
       this.setState({

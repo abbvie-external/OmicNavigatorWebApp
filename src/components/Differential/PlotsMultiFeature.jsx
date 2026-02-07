@@ -18,6 +18,8 @@ import { isObjectEmpty } from '../Shared/helpers';
 
 class PlotsMultiFeature extends Component {
   state = {
+    activePlotRenderKey: null,
+    activePlotRenderReady: false,
     activeTabIndexPlotsMultiFeature: 0,
     excelFlagMFPlots: false,
     txtFlagMFPlots: false,
@@ -39,6 +41,7 @@ class PlotsMultiFeature extends Component {
     ) {
       this.setState({
         activeTabIndexPlotsMultiFeature: activeTabIndexPlotsMultiFeature,
+        activePlotRenderReady: false,
       });
     }
   };
@@ -238,6 +241,21 @@ class PlotsMultiFeature extends Component {
     );
   };
 
+
+  handleActivePlotRenderStart = (renderKey) => {
+    this.setState({
+      activePlotRenderKey: renderKey || null,
+      activePlotRenderReady: false,
+    });
+  };
+
+  handleActivePlotRenderReady = (renderKey) => {
+    if (renderKey && this.state.activePlotRenderKey !== renderKey) return;
+    if (!this.state.activePlotRenderReady) {
+      this.setState({ activePlotRenderReady: true });
+    }
+  };
+
   render() {
     const {
       differentialPlotTypes,
@@ -312,7 +330,7 @@ class PlotsMultiFeature extends Component {
         }
         let featuresList = null;
         featuresList = this.getFeaturesList();
-        const loader = plotMultiFeatureDataLoaded ? null : (
+        const loader = plotMultiFeatureDataLoaded && this.state.activePlotRenderReady ? null : (
           <Dimmer active inverted>
             <Loader size="large">Loading Multi-Feature Plots</Loader>
           </Dimmer>
@@ -440,6 +458,8 @@ class PlotsMultiFeature extends Component {
             </div>
             <TabMultiFeature
               activeTabIndexPlotsMultiFeature={activeTabIndexPlotsMultiFeature}
+              onActivePlotRenderStart={this.handleActivePlotRenderStart}
+              onActivePlotRenderReady={this.handleActivePlotRenderReady}
               differentialDetailPlotsMultiFeatureRefFwd={
                 this.differentialDetailPlotsMultiFeatureRef
               }

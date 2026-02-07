@@ -15,6 +15,8 @@ import { isObjectEmpty } from '../Shared/helpers';
 
 class PlotsSingleFeature extends Component {
   state = {
+    activePlotRenderKey: null,
+    activePlotRenderReady: false,
     activeTabIndexPlotsSingleFeature: 0,
     excelFlagSFPlots: true,
     pngFlagSFPlots: true,
@@ -98,6 +100,24 @@ class PlotsSingleFeature extends Component {
         this.setState({ plotlyExport: false });
       },
     );
+  };
+
+
+  handleActivePlotRenderStart = (renderKey) => {
+    // Called when the active plot pane is about to render (e.g., new feature/tab/size).
+    // Keep loader visible until the render completion callback fires for the same key.
+    this.setState({
+      activePlotRenderKey: renderKey || null,
+      activePlotRenderReady: false,
+    });
+  };
+
+  handleActivePlotRenderReady = (renderKey) => {
+    // Only accept readiness signal for the current renderKey to avoid races.
+    if (renderKey && this.state.activePlotRenderKey !== renderKey) return;
+    if (!this.state.activePlotRenderReady) {
+      this.setState({ activePlotRenderReady: true });
+    }
   };
 
   render() {
@@ -185,7 +205,7 @@ class PlotsSingleFeature extends Component {
                 : null;
           }
         }
-        const loader = plotSingleFeatureDataLoaded ? null : (
+        const loader = plotSingleFeatureDataLoaded && this.state.activePlotRenderReady ? null : (
           <Dimmer active inverted>
             <Loader size="large">Loading Single-Feature Plots</Loader>
           </Dimmer>
@@ -315,6 +335,8 @@ class PlotsSingleFeature extends Component {
               // DEV - add only necessary props
               {...this.props}
               {...this.state}
+              onActivePlotRenderStart={this.handleActivePlotRenderStart}
+              onActivePlotRenderReady={this.handleActivePlotRenderReady}
               differentialDetailPlotsSingleFeatureRefFwd={
                 this.differentialDetailPlotsSingleFeatureRef
               }

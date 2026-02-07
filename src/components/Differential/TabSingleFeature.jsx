@@ -38,6 +38,11 @@ class TabSingleFeature extends Component {
   getSVGPanesSingleFeature = (cacheStringArg) => {
     if (this.cacheString === cacheStringArg) return;
     this.cacheString = cacheStringArg;
+
+    // Notify parent that a new active pane is about to render.
+    if (typeof this.props.onActivePlotRenderStart === 'function') {
+      this.props.onActivePlotRenderStart(cacheStringArg);
+    }
     const {
       activeTabIndexPlotsSingleFeature,
       differentialStudy,
@@ -95,6 +100,12 @@ class TabSingleFeature extends Component {
           errorMessagePlotlySingleFeature = `${s.plotType.plotDisplay} can not be created because the currently selected test is not present in all models`;
         }
         // `${s.plotType.plotDisplay} is not available for feature ${plotSingleFeatureData.key}`;
+
+        // If we are going to render an error/instructions pane, consider it render-ready.
+        const willRenderErrorPane = !!errorMessagePlotlySingleFeature;
+        if (willRenderErrorPane && typeof this.props.onActivePlotRenderReady === 'function') {
+          this.props.onActivePlotRenderReady(cacheStringArg);
+        }
         const svgPanes = {
           menuItem: `${s.plotType.plotDisplay}`,
           render: () => (
@@ -116,6 +127,11 @@ class TabSingleFeature extends Component {
                     errorMessagePlotlySingleFeature={
                       errorMessagePlotlySingleFeature
                     }
+                                      onRenderReady={() => {
+                      if (typeof this.props.onActivePlotRenderReady === 'function') {
+                        this.props.onActivePlotRenderReady(cacheStringArg);
+                      }
+                    }}
                   />
                 ) : s.svg && !errorMessagePlotlySingleFeature ? (
                   <SVG
@@ -124,6 +140,17 @@ class TabSingleFeature extends Component {
                     title={`${s.plotType.plotDisplay}`}
                     uniqueHash={`a1f8d1-${cacheStringArg}`}
                     uniquifyIDs={true}
+                    onLoad={() => {
+                      if (typeof this.props.onActivePlotRenderReady === 'function') {
+                        this.props.onActivePlotRenderReady(cacheStringArg);
+                      }
+                    }}
+                    onError={() => {
+                      // Avoid stuck loader if the SVG fails to load.
+                      if (typeof this.props.onActivePlotRenderReady === 'function') {
+                        this.props.onActivePlotRenderReady(cacheStringArg);
+                      }
+                    }}
                   />
                 ) : (
                   <div className="PlotInstructions">
@@ -137,6 +164,11 @@ class TabSingleFeature extends Component {
           ),
         };
         panes = panes.concat(svgPanes);
+      } else {
+        // Safety: if the pane data is unexpectedly missing, avoid a stuck loader.
+        if (typeof this.props.onActivePlotRenderReady === 'function') {
+          this.props.onActivePlotRenderReady(cacheStringArg);
+        }
       }
     } else {
       // if the activeTabIndex is the same as the singleFeaturePlotTypes length, it indicates app should display the Metafeatures tab
